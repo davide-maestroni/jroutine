@@ -11,15 +11,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.wtf.xtr.flood;
+package com.bmd.wtf.xtr.fld;
 
 import com.bmd.wtf.Waterfall;
 import com.bmd.wtf.dam.OpenDam;
 import com.bmd.wtf.src.Floodgate;
 import com.bmd.wtf.src.Spring;
-import com.bmd.wtf.xtr.fld.FloodControl;
-import com.bmd.wtf.xtr.fld.FloodObserver;
-import com.bmd.wtf.xtr.fld.Levee;
 
 import junit.framework.TestCase;
 

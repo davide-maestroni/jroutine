@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.wtf.xtr.pipe;
+package com.bmd.wtf.xtr.ppl;
 
 import com.bmd.wtf.Waterfall;
 import com.bmd.wtf.dam.AbstractDam;
@@ -20,8 +20,6 @@ import com.bmd.wtf.dam.OpenDam;
 import com.bmd.wtf.src.Floodgate;
 import com.bmd.wtf.src.Spring;
 import com.bmd.wtf.xtr.bsn.BlockingBasin;
-import com.bmd.wtf.xtr.ppl.AbstractDuct;
-import com.bmd.wtf.xtr.ppl.Pipeline;
 
 import junit.framework.TestCase;
 
@@ -31,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
- * Unit test for {@link com.bmd.wtf.xtr.pipe} package classes.
+ * Unit test for {@link com.bmd.wtf.xtr.ppl} package classes.
  * <p/>
  * Created by davide on 4/8/14.
  */

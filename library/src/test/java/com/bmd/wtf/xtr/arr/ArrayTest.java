@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.wtf.xtr.array;
+package com.bmd.wtf.xtr.arr;
 
 import com.bmd.wtf.Waterfall;
 import com.bmd.wtf.bdr.Stream;
@@ -23,11 +23,6 @@ import com.bmd.wtf.flw.Flow;
 import com.bmd.wtf.flw.Flows;
 import com.bmd.wtf.src.Floodgate;
 import com.bmd.wtf.src.Pool;
-import com.bmd.wtf.xtr.arr.AbstractBarrage;
-import com.bmd.wtf.xtr.arr.Barrage;
-import com.bmd.wtf.xtr.arr.DamFactory;
-import com.bmd.wtf.xtr.arr.FlowFactories;
-import com.bmd.wtf.xtr.arr.WaterfallArray;
 import com.bmd.wtf.xtr.bsn.Basin;
 
 import junit.framework.TestCase;
@@ -41,7 +36,7 @@ import java.util.concurrent.TimeUnit;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
- * Unit test for {@link com.bmd.wtf.xtr.array} package classes.
+ * Unit test for {@link com.bmd.wtf.xtr.arr} package classes.
  * <p/>
  * Created by davide on 4/8/14.
  */

@@ -21,10 +21,10 @@ import com.bmd.wtf.example1.DownloadedObserver;
 import com.bmd.wtf.example1.Downloader;
 import com.bmd.wtf.flw.Flows;
 import com.bmd.wtf.src.Spring;
-import com.bmd.wtf.xtr.array.DamFactory;
-import com.bmd.wtf.xtr.array.FlowFactories;
-import com.bmd.wtf.xtr.array.WaterfallArray;
-import com.bmd.wtf.xtr.flood.FloodControl;
+import com.bmd.wtf.xtr.arr.DamFactory;
+import com.bmd.wtf.xtr.arr.FlowFactories;
+import com.bmd.wtf.xtr.arr.WaterfallArray;
+import com.bmd.wtf.xtr.fld.FloodControl;
 
 import java.io.File;
 import java.io.IOException;

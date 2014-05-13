@@ -14,7 +14,7 @@
 package com.bmd.wtf.example2;
 
 import com.bmd.wtf.src.Floodgate;
-import com.bmd.wtf.xtr.array.AbstractBarrage;
+import com.bmd.wtf.xtr.arr.AbstractBarrage;
 
 import java.util.ArrayList;
 import java.util.Collection;

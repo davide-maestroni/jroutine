@@ -3,7 +3,7 @@ apply plugin: 'java'
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
-    compile project(':lib')
+    compile project(':library')
     compile project(':sample1')
     compile project(':sample2')
     compile project(':sample3')

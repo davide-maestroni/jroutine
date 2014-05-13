@@ -13,7 +13,7 @@
  */
 package com.bmd.wtf.example1;
 
-import com.bmd.wtf.xtr.flood.FloodObserver;
+import com.bmd.wtf.xtr.fld.FloodObserver;
 
 /**
  * Observer of downloaded files definition.

@@ -1,1 +1,1 @@
-include ':lib', ':sample1', ':sample2', ':sample3', ':sample4', 'robofall'
+include ':sample1', ':sample2', ':sample3', ':sample4', 'robofall', 'library'

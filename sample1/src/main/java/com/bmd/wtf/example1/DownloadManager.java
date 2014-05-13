@@ -16,7 +16,7 @@ package com.bmd.wtf.example1;
 import com.bmd.wtf.Waterfall;
 import com.bmd.wtf.flw.Flow;
 import com.bmd.wtf.flw.Flows;
-import com.bmd.wtf.xtr.flood.FloodControl;
+import com.bmd.wtf.xtr.fld.FloodControl;
 
 import java.io.File;
 import java.io.IOException;

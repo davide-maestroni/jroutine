@@ -38,7 +38,7 @@ public class AndroidFlows {
      *
      * @return The newly created flow.
      */
-    public static Flow currentThread() {
+    public static Flow currentLooperFlow() {
 
         return new LooperFlow(Looper.myLooper());
     }
@@ -48,7 +48,7 @@ public class AndroidFlows {
      *
      * @return The newly created flow.
      */
-    public static Flow looper(final Looper looper) {
+    public static Flow looperFlowOf(final Looper looper) {
 
         return new LooperFlow(looper);
     }
@@ -58,7 +58,7 @@ public class AndroidFlows {
      *
      * @return The default flow instance.
      */
-    public static Flow mainLooper() {
+    public static Flow mainLooperFlow() {
 
         if (sMain == null) {
 

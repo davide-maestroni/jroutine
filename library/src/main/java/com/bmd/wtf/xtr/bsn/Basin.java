@@ -96,7 +96,7 @@ public class Basin<IN, OUT> {
 
         final CollectorDam<OUT> dam = new CollectorDam<OUT>();
 
-        return new Basin<IN, OUT>(springs, dam, streams[0].thenJoiningThrough(dam, streams));
+        return new Basin<IN, OUT>(springs, dam, streams[0].thenMergingThrough(dam, streams));
     }
 
     /**
@@ -127,7 +127,7 @@ public class Basin<IN, OUT> {
 
         final CollectorDam<OUT> dam = new CollectorDam<OUT>();
 
-        return new Basin<IN, OUT>(springs, dam, firstStream.thenJoiningThrough(dam, streams));
+        return new Basin<IN, OUT>(springs, dam, firstStream.thenMergingThrough(dam, streams));
     }
 
     /**

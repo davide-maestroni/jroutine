@@ -151,7 +151,7 @@ public class ArrayTest extends TestCase {
                         };
                     }
 
-                }).thenJoiningThrough(new AbstractDam<List<String>, String>() {
+                }).thenMergingThrough(new AbstractDam<List<String>, String>() {
 
                     private int mCount;
 
@@ -220,14 +220,14 @@ public class ArrayTest extends TestCase {
 
         final Basin<Integer, Integer> basin1 = Basin.collect(
                 WaterfallArray.formingFrom(stream1, stream2, stream3, stream2)
-                              .thenJoiningInto(Flows.straightFlow())
+                              .thenMergingInto(Flows.straightFlow())
         );
         Basin.collect(stream1, stream2, stream3).thenFeedWith(1);
         assertThat(basin1.collectOutput()).containsExactly(1, 1, 1);
 
         final Basin<Integer, Integer> basin2 = Basin.collect(
                 WaterfallArray.formingFrom(Arrays.asList(stream1, stream2, stream3, stream1))
-                              .thenJoiningInto(Flows.straightFlow())
+                              .thenMergingInto(Flows.straightFlow())
         );
         Basin.collect(stream1, stream2, stream3).thenFeedWith(1);
         assertThat(basin2.collectOutput()).containsExactly(1, 1, 1);
@@ -342,7 +342,7 @@ public class ArrayTest extends TestCase {
         try {
 
             WaterfallArray.formingFrom(Waterfall.fallingFrom(Dams.openDam())).thenSplittingIn(1)
-                          .thenJoiningInto(null);
+                          .thenMergingInto(null);
 
             fail();
 
@@ -366,7 +366,7 @@ public class ArrayTest extends TestCase {
         try {
 
             WaterfallArray.formingFrom(Waterfall.fallingFrom(Dams.openDam())).thenSplittingIn(1)
-                          .thenJoiningThrough(null);
+                          .thenMergingThrough(null);
 
             fail();
 
@@ -517,7 +517,7 @@ public class ArrayTest extends TestCase {
 
                                       return null;
                                   }
-                              }).thenJoining()
+                              }).thenMerging()
         ).thenFeedWith(1, 2, 3).collectOutput()).contains(1, 2, 3);
         assertThat(Basin.collect(
                 WaterfallArray.formingFrom(Waterfall.fallingFrom(new OpenDam<Integer>()))
@@ -537,7 +537,7 @@ public class ArrayTest extends TestCase {
                                       return null;
                                   }
                               }).thenFlowingInto(FlowFactories.singletonFlowFactory(testFlow))
-                              .thenJoining()
+                              .thenMerging()
         ).thenFeedWith(1, 2, 3).collectOutput()).contains(1, 2, 3);
     }
 }

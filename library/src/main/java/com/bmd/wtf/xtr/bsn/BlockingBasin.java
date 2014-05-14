@@ -91,7 +91,7 @@ public class BlockingBasin<IN, OUT> extends Basin<IN, OUT> {
         final BlockingCollectorDam<OUT> dam = new BlockingCollectorDam<OUT>();
 
         return new BlockingBasin<IN, OUT>(springs, dam,
-                                          streams[0].thenJoiningThrough(dam, streams));
+                                          streams[0].thenMergingThrough(dam, streams));
     }
 
     /**
@@ -123,7 +123,7 @@ public class BlockingBasin<IN, OUT> extends Basin<IN, OUT> {
         final BlockingCollectorDam<OUT> dam = new BlockingCollectorDam<OUT>();
 
         return new BlockingBasin<IN, OUT>(springs, dam,
-                                          firstStream.thenJoiningThrough(dam, streams));
+                                          firstStream.thenMergingThrough(dam, streams));
     }
 
     /**

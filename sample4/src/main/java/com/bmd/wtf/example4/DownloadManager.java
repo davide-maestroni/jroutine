@@ -35,7 +35,7 @@ import combmd.wtf.example3.RetryPolicy;
 /**
  * Enhanced download manager supporting retry and abort functionalities.
  */
-public class DownloadManager4 {
+public class DownloadManager {
 
     private final Spring<String> mAbortSpring;
 
@@ -44,7 +44,7 @@ public class DownloadManager4 {
 
     private final Spring<String> mSpring;
 
-    public DownloadManager4(final int maxThreads, final File downloadDir) throws IOException {
+    public DownloadManager(final int maxThreads, final File downloadDir) throws IOException {
 
         if (!downloadDir.isDirectory() && !downloadDir.mkdirs()) {
 
@@ -88,7 +88,7 @@ public class DownloadManager4 {
 
                         return new OutputHandler(downloadDir);
                     }
-                }).thenJoiningThrough(mControl.leveeControlledBy(new DownloadedObserver()))
+                }).thenMergingThrough(mControl.leveeControlledBy(new DownloadedObserver()))
                                 .backToSource();
     }
 
@@ -98,7 +98,7 @@ public class DownloadManager4 {
 
         final File tempDir = new File(args[1]);
 
-        final DownloadManager4 manager = new DownloadManager4(maxThreads, tempDir);
+        final DownloadManager manager = new DownloadManager(maxThreads, tempDir);
 
         for (int i = 2; i < args.length; i++) {
 

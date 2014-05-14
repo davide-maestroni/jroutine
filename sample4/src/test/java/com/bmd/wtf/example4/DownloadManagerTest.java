@@ -37,7 +37,7 @@ public class DownloadManagerTest extends TestCase {
     private static final String SMALL_FILE_URL3 =
             "http://upload.wikimedia.org/wikipedia/commons/b/b1/Bing_logo_%282013%29.svg";
 
-    private DownloadManager4 mDownloadManager;
+    private DownloadManager mDownloadManager;
 
     private String mTmpDirPath;
 
@@ -217,7 +217,7 @@ public class DownloadManagerTest extends TestCase {
 
         mTmpDirPath = System.getProperty("java.io.tmpdir");
 
-        mDownloadManager = new DownloadManager4(2, new File(mTmpDirPath));
+        mDownloadManager = new DownloadManager(2, new File(mTmpDirPath));
     }
 
     private void waitFor(final String url, final long startTime, final long timeoutMs) throws

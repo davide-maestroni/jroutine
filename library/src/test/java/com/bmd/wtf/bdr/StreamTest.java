@@ -178,7 +178,7 @@ public class StreamTest extends TestCase {
 
             final Dam<Object, Object> dam = Dams.openDam();
 
-            Waterfall.fallingFrom(dam).thenMerging(null);
+            Waterfall.fallingFrom(dam).thenJoining(null);
 
             fail();
 
@@ -191,23 +191,7 @@ public class StreamTest extends TestCase {
 
             final Dam<Object, Object> dam = Dams.openDam();
 
-            Waterfall.fallingFrom(dam).thenMergingInto(null);
-
-            fail();
-
-        } catch (final Exception e) {
-
-            // Ignore it
-        }
-
-        try {
-
-            final Dam<Object, Object> dam = Dams.openDam();
-
-            final Stream<Object, Object, Object> stream1 = Waterfall.fallingFrom(dam);
-            final Stream<Object, Object, Object> stream2 =
-                    stream1.thenMergingInto(stream1).thenFlowingThrough(Dams.closedDam());
-            stream2.thenMerging(stream1);
+            Waterfall.fallingFrom(dam).thenJoiningInto(null);
 
             fail();
 
@@ -222,8 +206,24 @@ public class StreamTest extends TestCase {
 
             final Stream<Object, Object, Object> stream1 = Waterfall.fallingFrom(dam);
             final Stream<Object, Object, Object> stream2 =
-                    stream1.thenMergingInto(stream1).thenFlowingThrough(Dams.closedDam());
-            stream2.thenMergingInto(stream1);
+                    stream1.thenJoiningInto(stream1).thenFlowingThrough(Dams.closedDam());
+            stream2.thenJoining(stream1);
+
+            fail();
+
+        } catch (final Exception e) {
+
+            // Ignore it
+        }
+
+        try {
+
+            final Dam<Object, Object> dam = Dams.openDam();
+
+            final Stream<Object, Object, Object> stream1 = Waterfall.fallingFrom(dam);
+            final Stream<Object, Object, Object> stream2 =
+                    stream1.thenJoiningInto(stream1).thenFlowingThrough(Dams.closedDam());
+            stream2.thenJoiningInto(stream1);
 
             fail();
 
@@ -294,7 +294,7 @@ public class StreamTest extends TestCase {
 
             final Dam<Object, Object> dam = Dams.openDam();
 
-            Waterfall.fallingFrom(dam).thenJoining((Stream<Object, Object, Object>) null);
+            Waterfall.fallingFrom(dam).thenMerging((Stream<Object, Object, Object>) null);
 
             fail();
 
@@ -307,7 +307,7 @@ public class StreamTest extends TestCase {
 
             final Dam<Object, Object> dam = Dams.openDam();
 
-            Waterfall.fallingFrom(dam).thenJoining((Stream<Object, Object, Object>[]) null);
+            Waterfall.fallingFrom(dam).thenMerging((Stream<Object, Object, Object>[]) null);
 
             fail();
 
@@ -320,7 +320,7 @@ public class StreamTest extends TestCase {
 
             final Dam<Object, Object> dam = Dams.openDam();
 
-            Waterfall.fallingFrom(dam).thenJoining((Iterable<Stream<Object, Object, Object>>) null);
+            Waterfall.fallingFrom(dam).thenMerging((Iterable<Stream<Object, Object, Object>>) null);
 
             fail();
 
@@ -662,83 +662,6 @@ public class StreamTest extends TestCase {
 
     public void testJoin() {
 
-        final Dam<Integer, Integer> openDam = Dams.openDam();
-
-        final Stream<Integer, Integer, Integer> stream1 = Waterfall.fallingFrom(openDam);
-        final Stream<Integer, Integer, Integer> stream2 =
-                Waterfall.fallingFrom(new AbstractDam<Integer, Integer>() {
-
-                    @Override
-                    public Object onDischarge(final Floodgate<Integer, Integer> gate,
-                            final Integer drop) {
-
-                        gate.discharge(drop, drop);
-
-                        return null;
-                    }
-                });
-        final Stream<Integer, Integer, Integer> stream3 =
-                Waterfall.fallingFrom(new AbstractDam<Integer, Integer>() {
-
-                    @Override
-                    public Object onDischarge(final Floodgate<Integer, Integer> gate,
-                            final Integer drop) {
-
-                        gate.discharge(Arrays.asList(drop + 1, drop + 1));
-
-                        return null;
-                    }
-                });
-
-        assertThat(Basin.collect(stream1.thenJoining(stream1)).thenFeedWith(5).collectOutput())
-                .containsExactly(5);
-
-        final Basin<Integer, Integer> basin1 = Basin.collect(stream1.thenJoining(stream2));
-
-        stream1.backToSource().discharge(5);
-        stream2.backToSource().discharge(5);
-        assertThat(basin1.collectOutput()).containsExactly(5, 5, 5);
-
-        final Basin<Integer, Integer> basin2 = Basin.collect(stream1.thenJoining(stream2, stream1));
-
-        stream1.backToSource().discharge(5);
-        stream2.backToSource().discharge(5);
-        assertThat(basin2.collectOutput()).containsExactly(5, 5, 5);
-
-        final Basin<Integer, Integer> basin3 =
-                Basin.collect(stream1.thenJoining(Arrays.asList(stream1, stream2, stream3)));
-
-        stream1.backToSource().discharge(5);
-        stream2.backToSource().discharge(5);
-        stream3.backToSource().discharge(4);
-        assertThat(basin3.collectOutput()).containsExactly(5, 5, 5, 5, 5);
-
-        stream1.backToSource().dischargeAfter(100, TimeUnit.MILLISECONDS, 4);
-        assertThat(basin3.collectOutput()).containsExactly(4);
-
-        stream1.backToSource().dischargeAfter(100, TimeUnit.MILLISECONDS, 4, 4);
-        assertThat(basin3.collectOutput()).containsExactly(4, 4);
-
-        stream1.backToSource().dischargeAfter(100, TimeUnit.MILLISECONDS, Arrays.asList(4, 4, 4));
-        assertThat(basin3.collectOutput()).containsExactly(4, 4, 4);
-
-        stream1.backToSource().discharge((Integer) null);
-        assertThat(basin3.collectOutput()).containsExactly((Integer) null);
-        assertThat(basin3.collectPushedDebris()).isEmpty();
-
-        stream2.backToSource().discharge((Integer) null);
-        assertThat(basin3.collectOutput()).containsExactly(null, null);
-        assertThat(basin3.collectPushedDebris()).isEmpty();
-
-        stream3.backToSource().discharge((Integer) null);
-        assertThat(basin3.collectOutput()).isEmpty();
-        assertThat(basin3.collectFirstPushedDebris())
-                .isExactlyInstanceOf(NullPointerException.class);
-        assertThat(basin3.collectFirstPushedDebris()).isNull();
-    }
-
-    public void testMerge() {
-
         final Stream<Character, Character, Integer> stream1 =
                 Waterfall.fallingFrom(new AbstractDam<Character, Integer>() {
 
@@ -792,7 +715,7 @@ public class StreamTest extends TestCase {
         final Stream<Integer, Integer, Integer> stream2 =
                 Waterfall.fallingFrom(new OpenDam<Integer>());
 
-        stream2.thenMergingInto(stream1).backToSource().discharge('0', '1', '2', '3');
+        stream2.thenJoiningInto(stream1).backToSource().discharge('0', '1', '2', '3');
         stream2.backToSource().discharge(0, 1, 2, 3);
 
         final ArrayList<Integer> output = new ArrayList<Integer>(1);
@@ -807,7 +730,7 @@ public class StreamTest extends TestCase {
                 Waterfall.fallingFrom(new OpenDam<Integer>());
 
         stream1.backToSource().discharge('0', '1', '2', '3');
-        stream3.thenMerging(stream1).backToSource().discharge(Arrays.asList(4, 5, -4));
+        stream3.thenJoining(stream1).backToSource().discharge(Arrays.asList(4, 5, -4));
         stream2.backToSource().discharge(77);
 
         output.clear();
@@ -843,12 +766,89 @@ public class StreamTest extends TestCase {
                 );
 
         stream1.backToSource().discharge('0', '1', '2', '3');
-        stream3.thenMerging(stream1).backToSource().discharge(Arrays.asList(4, 5, -4));
+        stream3.thenJoining(stream1).backToSource().discharge(Arrays.asList(4, 5, -4));
 
         output.clear();
         basin1.flush().collectOutputInto(output);
         basin2.collectOutputInto(output);
 
         assertThat(output).containsExactly(128, 136);
+    }
+
+    public void testMerge() {
+
+        final Dam<Integer, Integer> openDam = Dams.openDam();
+
+        final Stream<Integer, Integer, Integer> stream1 = Waterfall.fallingFrom(openDam);
+        final Stream<Integer, Integer, Integer> stream2 =
+                Waterfall.fallingFrom(new AbstractDam<Integer, Integer>() {
+
+                    @Override
+                    public Object onDischarge(final Floodgate<Integer, Integer> gate,
+                            final Integer drop) {
+
+                        gate.discharge(drop, drop);
+
+                        return null;
+                    }
+                });
+        final Stream<Integer, Integer, Integer> stream3 =
+                Waterfall.fallingFrom(new AbstractDam<Integer, Integer>() {
+
+                    @Override
+                    public Object onDischarge(final Floodgate<Integer, Integer> gate,
+                            final Integer drop) {
+
+                        gate.discharge(Arrays.asList(drop + 1, drop + 1));
+
+                        return null;
+                    }
+                });
+
+        assertThat(Basin.collect(stream1.thenMerging(stream1)).thenFeedWith(5).collectOutput())
+                .containsExactly(5);
+
+        final Basin<Integer, Integer> basin1 = Basin.collect(stream1.thenMerging(stream2));
+
+        stream1.backToSource().discharge(5);
+        stream2.backToSource().discharge(5);
+        assertThat(basin1.collectOutput()).containsExactly(5, 5, 5);
+
+        final Basin<Integer, Integer> basin2 = Basin.collect(stream1.thenMerging(stream2, stream1));
+
+        stream1.backToSource().discharge(5);
+        stream2.backToSource().discharge(5);
+        assertThat(basin2.collectOutput()).containsExactly(5, 5, 5);
+
+        final Basin<Integer, Integer> basin3 =
+                Basin.collect(stream1.thenMerging(Arrays.asList(stream1, stream2, stream3)));
+
+        stream1.backToSource().discharge(5);
+        stream2.backToSource().discharge(5);
+        stream3.backToSource().discharge(4);
+        assertThat(basin3.collectOutput()).containsExactly(5, 5, 5, 5, 5);
+
+        stream1.backToSource().dischargeAfter(100, TimeUnit.MILLISECONDS, 4);
+        assertThat(basin3.collectOutput()).containsExactly(4);
+
+        stream1.backToSource().dischargeAfter(100, TimeUnit.MILLISECONDS, 4, 4);
+        assertThat(basin3.collectOutput()).containsExactly(4, 4);
+
+        stream1.backToSource().dischargeAfter(100, TimeUnit.MILLISECONDS, Arrays.asList(4, 4, 4));
+        assertThat(basin3.collectOutput()).containsExactly(4, 4, 4);
+
+        stream1.backToSource().discharge((Integer) null);
+        assertThat(basin3.collectOutput()).containsExactly((Integer) null);
+        assertThat(basin3.collectPushedDebris()).isEmpty();
+
+        stream2.backToSource().discharge((Integer) null);
+        assertThat(basin3.collectOutput()).containsExactly(null, null);
+        assertThat(basin3.collectPushedDebris()).isEmpty();
+
+        stream3.backToSource().discharge((Integer) null);
+        assertThat(basin3.collectOutput()).isEmpty();
+        assertThat(basin3.collectFirstPushedDebris())
+                .isExactlyInstanceOf(NullPointerException.class);
+        assertThat(basin3.collectFirstPushedDebris()).isNull();
     }
 }

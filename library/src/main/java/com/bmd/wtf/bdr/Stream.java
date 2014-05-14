@@ -187,6 +187,30 @@ public class Stream<SOURCE, IN, OUT> {
     /**
      * Feeds the specified stream with the data flowing into this one, and returns a new stream
      * originating from the same pool.
+     * <p/>
+     * Before (where 'a' is this stream, and the number represents the type of source):
+     * <pre>
+     *     <code>
+     *
+     *         -()-a1-
+     *
+     *         -()-b2-
+     *
+     *     </code>
+     * </pre>
+     * <p/>
+     * After (where 'r' is the returned stream, and the number represents the type of source):
+     * <pre>
+     *     <code>
+     *
+     *         -()-a1-
+     *           \
+     *         --()-b2-
+     *            \
+     *              r1-
+     *
+     *     </code>
+     * </pre>
      *
      * @param stream The stream to feed.
      * @param <NOUT> The transported data type of the target stream.
@@ -202,6 +226,30 @@ public class Stream<SOURCE, IN, OUT> {
 
     /**
      * Feeds the specified stream with the data flowing into this one, and returns it.
+     * <p/>
+     * Before (where 'a' is this stream, and the number represents the type of source):
+     * <pre>
+     *     <code>
+     *
+     *         -()-a1-
+     *
+     *         -()-b2-
+     *
+     *     </code>
+     * </pre>
+     * <p/>
+     * After (where 'r' is the returned stream, and the number represents the type of source):
+     * <pre>
+     *     <code>
+     *
+     *         -()-a1-
+     *           \
+     *         --()-b2-
+     *            \
+     *              r2-
+     *
+     *     </code>
+     * </pre>
      *
      * @param stream    The stream to feed.
      * @param <NSOURCE> The data type of the target stream spring.
@@ -260,6 +308,24 @@ public class Stream<SOURCE, IN, OUT> {
 
     /**
      * Makes this stream flow through the specified dam.
+     * <p/>
+     * Before (where 'a' is this stream, and the number represents the type of source):
+     * <pre>
+     *     <code>
+     *
+     *         -()-a1-
+     *
+     *     </code>
+     * </pre>
+     * <p/>
+     * After (where 'r' is the returned stream, and the number represents the type of source):
+     * <pre>
+     *     <code>
+     *
+     *         -()-a1-(D)-r1-
+     *
+     *     </code>
+     * </pre>
      *
      * @param dam    The dam.
      * @param <NOUT> The output data type.
@@ -287,65 +353,302 @@ public class Stream<SOURCE, IN, OUT> {
     }
 
     /**
-     * Joins the streams returned by the specified iterable with this one.
+     * Joins the specified stream with this one, and returns this stream.
      * <p/>
-     * Note that a new pool collecting all the data flowing through the joining streams is created
-     * in the process.
+     * After the joining this stream pool will feed all the streams fed by the target stream pool.
+     * <p/>
+     * Before (where 'a' is this stream, and the number represents the type of source):
+     * <pre>
+     *     <code>
      *
-     * @param streams   The iterable returning the streams to join.
-     * @param <NSOURCE> The data type of the target stream spring.
-     * @return A new stream fed by all the joining stream.
-     */
-    public <NSOURCE> Stream<SOURCE, OUT, OUT> thenJoining(
-            final Iterable<? extends Stream<NSOURCE, ?, OUT>> streams) {
-
-        return thenJoiningThrough(new OpenDam<OUT>(), streams);
-    }
-
-    /**
-     * Joins the specified streams with this one.
-     * <p/>
-     * Note that a new pool collecting all the data flowing through the joining streams is created
-     * in the process.
+     *         -()-a1-
      *
-     * @param streams   The streams to join.
-     * @param <NSOURCE> The data type of the target stream spring.
-     * @return A new stream fed by all the joining stream.
-     */
-    public <NSOURCE> Stream<SOURCE, OUT, OUT> thenJoining(
-            final Stream<NSOURCE, ?, OUT>... streams) {
-
-        return thenJoiningThrough(new OpenDam<OUT>(), streams);
-    }
-
-    /**
-     * Joins the specified stream with this one.
+     *         -()-b2-()-
+     *           \
+     *             c2-()-
+     *
+     *     </code>
+     * </pre>
      * <p/>
-     * Note that a new pool collecting all the data flowing through the joining streams is created
-     * in the process.
+     * After (where the number represents the type of source):
+     * <pre>
+     *     <code>
+     *
+     *         ------(.....)-a1-
+     *                \    \
+     *         -()-b2-()-   \
+     *           \           \
+     *             -------c2-()-
+     *
+     *     </code>
+     * </pre>
      *
      * @param stream    The stream to join.
      * @param <NSOURCE> The data type of the target stream spring.
      * @param <NIN>     The data type of the target stream pool.
-     * @return A new stream fed by all the joining stream.
+     * @return This stream.
      */
-    public <NSOURCE, NIN> Stream<SOURCE, OUT, OUT> thenJoining(
+    public <NSOURCE, NIN> Stream<SOURCE, IN, OUT> thenJoining(
             final Stream<NSOURCE, NIN, OUT> stream) {
 
-        return thenJoiningThrough(new OpenDam<OUT>(), stream);
+        thenJoiningInto(stream);
+
+        return this;
     }
 
     /**
-     * Joins the streams returned by the specified iterable with this one, through the specified
-     * dam.
+     * Joins the specified stream with this one, and returns it.
+     * <p/>
+     * After the joining this stream pool will feed all the streams fed by the target stream pool.
+     * <p/>
+     * Before (where 'a' is this stream, and the number represents the type of source):
+     * <pre>
+     *     <code>
      *
-     * @param dam       The joining dam.
-     * @param streams   The iterable returning the streams to join.
+     *         -()-a1-
+     *
+     *         -()-b2-()-
+     *           \
+     *             c2-()-
+     *
+     *     </code>
+     * </pre>
+     * <p/>
+     * After (where the number represents the type of source):
+     * <pre>
+     *     <code>
+     *
+     *         ------(.....)-a1-
+     *                \    \
+     *         -()-b2-()-   \
+     *           \           \
+     *             -------c2-()-
+     *
+     *     </code>
+     * </pre>
+     *
+     * @param stream    The stream to join.
+     * @param <NSOURCE> The data type of the target stream spring.
+     * @param <NIN>     The data type of the target stream pool.
+     * @return The target stream.
+     */
+    public <NSOURCE, NIN> Stream<NSOURCE, NIN, OUT> thenJoiningInto(
+            final Stream<NSOURCE, NIN, OUT> stream) {
+
+        if (this == stream) {
+
+            return stream;
+        }
+
+        final Collection<? extends Stream<?, NIN, OUT>> outStreams;
+
+        final DataPool<NIN, OUT> joiningUpPool = stream.mUpstreamPool;
+
+        final DataPool<OUT, ?> joiningDownPool = stream.mDownstreamPool;
+
+        if (joiningUpPool != null) {
+
+            outStreams = joiningUpPool.outputStreams;
+
+        } else {
+
+            if (joiningDownPool == null) {
+
+                throw new DryStreamException(
+                        "cannot join the target stream since it has no downstream pool");
+            }
+
+            outStreams = Collections.singleton(stream);
+        }
+
+        for (final Stream<?, NIN, OUT> outStream : outStreams) {
+
+            if (outStream.canReach(this)) {
+
+                throw new ClosedLoopException("a stream closed loop has been detected during join");
+            }
+        }
+
+        final DataPool<IN, OUT> upPool = mUpstreamPool;
+
+        for (final Stream<?, ?, OUT> outStream : outStreams) {
+
+            final DataPool<OUT, ?> downPool = outStream.mDownstreamPool;
+
+            final Stream<SOURCE, IN, OUT> joiningStream =
+                    new Stream<SOURCE, IN, OUT>(mSpring, upPool, downPool);
+
+            if (upPool != null) {
+
+                upPool.outputStreams.add(joiningStream);
+            }
+
+            downPool.inputStreams.add(joiningStream);
+        }
+
+        return stream;
+    }
+
+    /**
+     * Merges the specified stream with this one.
+     * <p/>
+     * Note that a new pool collecting all the data flowing through the merging streams is created
+     * in the process.
+     * <p/>
+     * Before (where 'a' is this stream, and the number represents the type of source):
+     * <pre>
+     *     <code>
+     *
+     *         -()-a1-
+     *
+     *         -()-b2-
+     *
+     *     </code>
+     * </pre>
+     * <p/>
+     * After (where 'r' is the returned stream, and the number represents the type of source):
+     * <pre>
+     *     <code>
+     *
+     *         -()-a1-()-r1-
+     *                /
+     *         ------()-b2-
+     *
+     *     </code>
+     * </pre>
+     *
+     * @param stream    The stream to merge.
+     * @param <NSOURCE> The data type of the target stream spring.
+     * @param <NIN>     The data type of the target stream pool.
+     * @return A new stream fed by all the merging stream.
+     */
+    public <NSOURCE, NIN> Stream<SOURCE, OUT, OUT> thenMerging(
+            final Stream<NSOURCE, NIN, OUT> stream) {
+
+        return thenMergingThrough(new OpenDam<OUT>(), stream);
+    }
+
+    /**
+     * Merges the specified streams with this one.
+     * <p/>
+     * Note that a new pool collecting all the data flowing through the merging streams is created
+     * in the process.
+     * <p/>
+     * Before (where 'a' is this stream, and the number represents the type of source):
+     * <pre>
+     *     <code>
+     *
+     *         -()-a1-
+     *
+     *         -()-b2-
+     *
+     *         -()-.2-
+     *
+     *     </code>
+     * </pre>
+     * <p/>
+     * After (where 'r' is the returned stream, and the number represents the type of source):
+     * <pre>
+     *     <code>
+     *
+     *         -()-a1-(.........)-r1-
+     *                /        /
+     *         ------()-b2-   /
+     *                       /
+     *         -------------()-.2-
+     *
+     *     </code>
+     * </pre>
+     *
+     * @param streams   The streams to merge.
+     * @param <NSOURCE> The data type of the target stream spring.
+     * @return A new stream fed by all the merging stream.
+     */
+    public <NSOURCE> Stream<SOURCE, OUT, OUT> thenMerging(
+            final Stream<NSOURCE, ?, OUT>... streams) {
+
+        return thenMergingThrough(new OpenDam<OUT>(), streams);
+    }
+
+    /**
+     * Merges the streams returned by the specified iterable with this one.
+     * <p/>
+     * Note that a new pool collecting all the data flowing through the merging streams is created
+     * in the process.
+     * <p/>
+     * Before (where 'a' is this stream, and the number represents the type of source):
+     * <pre>
+     *     <code>
+     *
+     *         -()-a1-
+     *
+     *         -()-b2-
+     *
+     *         -()-.2-
+     *
+     *     </code>
+     * </pre>
+     * <p/>
+     * After (where 'r' is the returned stream, and the number represents the type of source):
+     * <pre>
+     *     <code>
+     *
+     *         -()-a1-(.........)-r1-
+     *                /        /
+     *         ------()-b2-   /
+     *                       /
+     *         -------------()-.2-
+     *
+     *     </code>
+     * </pre>
+     *
+     * @param streams   The iterable returning the streams to merge.
+     * @param <NSOURCE> The data type of the target stream spring.
+     * @return A new stream fed by all the merging streams.
+     */
+    public <NSOURCE> Stream<SOURCE, OUT, OUT> thenMerging(
+            final Iterable<? extends Stream<NSOURCE, ?, OUT>> streams) {
+
+        return thenMergingThrough(new OpenDam<OUT>(), streams);
+    }
+
+    /**
+     * Merges the streams returned by the specified iterable with this one, through the specified
+     * dam.
+     * <p/>
+     * Before (where 'a' is this stream, and the number represents the type of source):
+     * <pre>
+     *     <code>
+     *
+     *         -()-a1-
+     *
+     *         -()-b2-
+     *
+     *         -()-.2-
+     *
+     *     </code>
+     * </pre>
+     * <p/>
+     * After (where 'r' is the returned stream, and the number represents the type of source):
+     * <pre>
+     *     <code>
+     *
+     *         -()-a1-(....D....)-r1-
+     *                /        /
+     *         ------()-b2-   /
+     *                       /
+     *         -------------()-.2-
+     *
+     *     </code>
+     * </pre>
+     *
+     * @param dam       The merging dam.
+     * @param streams   The iterable returning the streams to merge.
      * @param <NSOURCE> The data type of the target stream spring.
      * @param <NOUT>    The data type of the returned stream.
-     * @return A new stream fed by all the joining stream.
+     * @return A new stream fed by all the merging stream.
      */
-    public <NSOURCE, NOUT> Stream<SOURCE, OUT, NOUT> thenJoiningThrough(final Dam<OUT, NOUT> dam,
+    public <NSOURCE, NOUT> Stream<SOURCE, OUT, NOUT> thenMergingThrough(final Dam<OUT, NOUT> dam,
             final Iterable<? extends Stream<NSOURCE, ?, OUT>> streams) {
 
         final Stream<SOURCE, OUT, NOUT> resultStream = thenFlowingThrough(dam);
@@ -362,30 +665,56 @@ public class Stream<SOURCE, IN, OUT> {
             @SuppressWarnings("unchecked")
             final DataPool<Object, OUT> upPool = (DataPool<Object, OUT>) stream.mUpstreamPool;
 
-            final Stream<NSOURCE, Object, OUT> joinStream =
+            final Stream<NSOURCE, Object, OUT> mergeStream =
                     new Stream<NSOURCE, Object, OUT>(stream.mSpring, upPool, downPool);
 
             if (upPool != null) {
 
-                upPool.outputStreams.add(joinStream);
+                upPool.outputStreams.add(mergeStream);
             }
 
-            downPool.inputStreams.add(joinStream);
+            downPool.inputStreams.add(mergeStream);
         }
 
         return resultStream;
     }
 
     /**
-     * Joins the specified streams with this one, through the specified dam.
+     * Merges the specified streams with this one, through the specified dam.
+     * <p/>
+     * Before (where 'a' is this stream, and the number represents the type of source):
+     * <pre>
+     *     <code>
      *
-     * @param dam       The joining dam.
-     * @param streams   The streams to join.
+     *         -()-a1-
+     *
+     *         -()-b2-
+     *
+     *         -()-.2-
+     *
+     *     </code>
+     * </pre>
+     * <p/>
+     * After (where 'r' is the returned stream, and the number represents the type of source):
+     * <pre>
+     *     <code>
+     *
+     *         -()-a1-(....D....)-r1-
+     *                /        /
+     *         ------()-b2-   /
+     *                       /
+     *         -------------()-.2-
+     *
+     *     </code>
+     * </pre>
+     *
+     * @param dam       The merging dam.
+     * @param streams   The streams to merge.
      * @param <NSOURCE> The data type of the target stream spring.
      * @param <NOUT>    The data type of the returned stream.
-     * @return A new stream fed by all the joining stream.
+     * @return A new stream fed by all the merging stream.
      */
-    public <NSOURCE, NOUT> Stream<SOURCE, OUT, NOUT> thenJoiningThrough(final Dam<OUT, NOUT> dam,
+    public <NSOURCE, NOUT> Stream<SOURCE, OUT, NOUT> thenMergingThrough(final Dam<OUT, NOUT> dam,
             final Stream<NSOURCE, ?, OUT>... streams) {
 
         final Stream<SOURCE, OUT, NOUT> resultStream = thenFlowingThrough(dam);
@@ -402,30 +731,52 @@ public class Stream<SOURCE, IN, OUT> {
             @SuppressWarnings("unchecked")
             final DataPool<Object, OUT> upPool = (DataPool<Object, OUT>) stream.mUpstreamPool;
 
-            final Stream<NSOURCE, Object, OUT> joinStream =
+            final Stream<NSOURCE, Object, OUT> mergeStream =
                     new Stream<NSOURCE, Object, OUT>(stream.mSpring, upPool, downPool);
 
             if (upPool != null) {
 
-                upPool.outputStreams.add(joinStream);
+                upPool.outputStreams.add(mergeStream);
             }
 
-            downPool.inputStreams.add(joinStream);
+            downPool.inputStreams.add(mergeStream);
         }
 
         return resultStream;
     }
 
     /**
-     * Joins the specified stream with this one, through the specified dam.
+     * Merges the specified stream with this one, through the specified dam.
+     * <p/>
+     * Before (where 'a' is this stream, and the number represents the type of source):
+     * <pre>
+     *     <code>
      *
-     * @param dam       The joining dam.
-     * @param stream    The stream to join.
+     *         -()-a1-
+     *
+     *         -()-b2-
+     *
+     *     </code>
+     * </pre>
+     * <p/>
+     * After (where 'r' is the returned stream, and the number represents the type of source):
+     * <pre>
+     *     <code>
+     *
+     *         -()-a1-(D)-r1-
+     *                /
+     *         ------()-b2-
+     *
+     *     </code>
+     * </pre>
+     *
+     * @param dam       The merging dam.
+     * @param stream    The stream to merge.
      * @param <NSOURCE> The data type of the target stream spring.
      * @param <NOUT>    The data type of the returned stream.
-     * @return A new stream fed by all the joining stream.
+     * @return A new stream fed by all the merging stream.
      */
-    public <NSOURCE, NIN, NOUT> Stream<SOURCE, OUT, NOUT> thenJoiningThrough(
+    public <NSOURCE, NIN, NOUT> Stream<SOURCE, OUT, NOUT> thenMergingThrough(
             final Dam<OUT, NOUT> dam, final Stream<NSOURCE, NIN, OUT> stream) {
 
         final Stream<SOURCE, OUT, NOUT> resultStream = thenFlowingThrough(dam);
@@ -439,103 +790,17 @@ public class Stream<SOURCE, IN, OUT> {
 
         final DataPool<NIN, OUT> upPool = stream.mUpstreamPool;
 
-        final Stream<NSOURCE, NIN, OUT> joinStream =
+        final Stream<NSOURCE, NIN, OUT> mergeStream =
                 new Stream<NSOURCE, NIN, OUT>(stream.mSpring, upPool, downPool);
 
         if (upPool != null) {
 
-            upPool.outputStreams.add(joinStream);
+            upPool.outputStreams.add(mergeStream);
         }
 
-        downPool.inputStreams.add(joinStream);
+        downPool.inputStreams.add(mergeStream);
 
         return resultStream;
-    }
-
-    /**
-     * Merges the specified stream with this one.
-     * <p/>
-     * After the merging this stream pool will feed all the streams fed by the target stream pool.
-     *
-     * @param stream    The stream to merge.
-     * @param <NSOURCE> The data type of the target stream spring.
-     * @param <NIN>     The data type of the target stream pool.
-     * @return This stream.
-     */
-    public <NSOURCE, NIN> Stream<SOURCE, IN, OUT> thenMerging(
-            final Stream<NSOURCE, NIN, OUT> stream) {
-
-        thenMergingInto(stream);
-
-        return this;
-    }
-
-    /**
-     * Merges the specified stream with this one, and returns it.
-     * <p/>
-     * After the merging this stream pool will feed all the streams fed by the target stream pool.
-     *
-     * @param stream    The stream to merge.
-     * @param <NSOURCE> The data type of the target stream spring.
-     * @param <NIN>     The data type of the target stream pool.
-     * @return The target stream.
-     */
-    public <NSOURCE, NIN> Stream<NSOURCE, NIN, OUT> thenMergingInto(
-            final Stream<NSOURCE, NIN, OUT> stream) {
-
-        if (this == stream) {
-
-            return stream;
-        }
-
-        final Collection<? extends Stream<?, NIN, OUT>> outStreams;
-
-        final DataPool<NIN, OUT> mergeUpPool = stream.mUpstreamPool;
-
-        final DataPool<OUT, ?> mergeDownPool = stream.mDownstreamPool;
-
-        if (mergeUpPool != null) {
-
-            outStreams = mergeUpPool.outputStreams;
-
-        } else {
-
-            if (mergeDownPool == null) {
-
-                throw new DryStreamException(
-                        "cannot merge the target stream since it has no downstream pool");
-            }
-
-            outStreams = Collections.singleton(stream);
-        }
-
-        for (final Stream<?, NIN, OUT> outStream : outStreams) {
-
-            if (outStream.canReach(this)) {
-
-                throw new ClosedLoopException(
-                        "a stream closed loop has been detected during merging");
-            }
-        }
-
-        final DataPool<IN, OUT> upPool = mUpstreamPool;
-
-        for (final Stream<?, ?, OUT> outStream : outStreams) {
-
-            final DataPool<OUT, ?> downPool = outStream.mDownstreamPool;
-
-            final Stream<SOURCE, IN, OUT> mergeStream =
-                    new Stream<SOURCE, IN, OUT>(mSpring, upPool, downPool);
-
-            if (upPool != null) {
-
-                upPool.outputStreams.add(mergeStream);
-            }
-
-            downPool.inputStreams.add(mergeStream);
-        }
-
-        return stream;
     }
 
     void discharge(final OUT drop) {

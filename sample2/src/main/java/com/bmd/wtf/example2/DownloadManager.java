@@ -61,7 +61,7 @@ public class DownloadManager {
 
                                         return new Downloader(downloadDir);
                                     }
-                                }).thenJoiningThrough(
+                                }).thenMergingThrough(
                         mControl.leveeControlledBy(new DownloadedObserver())).backToSource();
     }
 

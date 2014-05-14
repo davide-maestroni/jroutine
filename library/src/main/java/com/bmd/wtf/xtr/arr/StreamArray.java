@@ -173,24 +173,24 @@ public class StreamArray<SOURCE, IN, OUT> {
     }
 
     /**
-     * Joins this array into one stream.
+     * Merges this array into one stream.
      *
-     * @return The joined stream.
+     * @return The merged stream.
      */
-    public Stream<SOURCE, OUT, OUT> thenJoining() {
+    public Stream<SOURCE, OUT, OUT> thenMerging() {
 
         final ArrayList<Stream<SOURCE, IN, OUT>> streams = mStreams;
 
-        return streams.get(0).thenJoining(streams);
+        return streams.get(0).thenMerging(streams);
     }
 
     /**
-     * Joins this array into one stream flowing into the specified flow.
+     * Merges this array into one stream flowing into the specified flow.
      *
      * @param flow The flow instance.
-     * @return The joined stream.
+     * @return The merged stream.
      */
-    public Stream<SOURCE, OUT, OUT> thenJoiningInto(final Flow flow) {
+    public Stream<SOURCE, OUT, OUT> thenMergingInto(final Flow flow) {
 
         final ArrayList<Stream<SOURCE, IN, OUT>> streams = new ArrayList<Stream<SOURCE, IN, OUT>>();
 
@@ -199,18 +199,18 @@ public class StreamArray<SOURCE, IN, OUT> {
             streams.add(stream.thenFlowingInto(flow));
         }
 
-        return streams.get(0).thenJoining(streams);
+        return streams.get(0).thenMerging(streams);
     }
 
     /**
-     * Joins this array into one stream flowing from the specified dam.
+     * Merges this array into one stream flowing from the specified dam.
      *
      * @param dam    The dam instance.
      * @param <NOUT> The output data type.
-     * @return The joined stream.
+     * @return The merged stream.
      */
-    public <NOUT> Stream<SOURCE, OUT, NOUT> thenJoiningThrough(final Dam<OUT, NOUT> dam) {
+    public <NOUT> Stream<SOURCE, OUT, NOUT> thenMergingThrough(final Dam<OUT, NOUT> dam) {
 
-        return thenJoining().thenFlowingThrough(dam);
+        return thenMerging().thenFlowingThrough(dam);
     }
 }

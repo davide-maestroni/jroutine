@@ -276,7 +276,7 @@ public class BasinTest extends TestCase {
 
                                   }
 
-                              }).thenJoiningThrough(new AbstractDam<List<String>, String>() {
+                              }).thenMergingThrough(new AbstractDam<List<String>, String>() {
 
                     private int mCount;
 

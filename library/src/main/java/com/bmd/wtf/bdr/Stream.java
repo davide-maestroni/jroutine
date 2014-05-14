@@ -322,7 +322,7 @@ public class Stream<SOURCE, IN, OUT> {
      * <pre>
      *     <code>
      *
-     *         -()-a1-(D)-r1-
+     *         -()-a1-(DAM)-r1-
      *
      *     </code>
      * </pre>
@@ -374,7 +374,7 @@ public class Stream<SOURCE, IN, OUT> {
      * <pre>
      *     <code>
      *
-     *         ------(.....)-a1-
+     *         ------(=====)-a1-
      *                \    \
      *         -()-b2-()-   \
      *           \           \
@@ -418,7 +418,7 @@ public class Stream<SOURCE, IN, OUT> {
      * <pre>
      *     <code>
      *
-     *         ------(.....)-a1-
+     *         ------(=====)-a1-
      *                \    \
      *         -()-b2-()-   \
      *           \           \
@@ -542,7 +542,7 @@ public class Stream<SOURCE, IN, OUT> {
      *
      *         -()-b2-
      *
-     *         -()-.2-
+     *         -()-*2-
      *
      *     </code>
      * </pre>
@@ -551,11 +551,11 @@ public class Stream<SOURCE, IN, OUT> {
      * <pre>
      *     <code>
      *
-     *         -()-a1-(.........)-r1-
+     *         -()-a1-(=========)-r1-
      *                /        /
      *         ------()-b2-   /
      *                       /
-     *         -------------()-.2-
+     *         -------------()-*2-
      *
      *     </code>
      * </pre>
@@ -584,7 +584,7 @@ public class Stream<SOURCE, IN, OUT> {
      *
      *         -()-b2-
      *
-     *         -()-.2-
+     *         -()-*2-
      *
      *     </code>
      * </pre>
@@ -593,11 +593,11 @@ public class Stream<SOURCE, IN, OUT> {
      * <pre>
      *     <code>
      *
-     *         -()-a1-(.........)-r1-
+     *         -()-a1-(=========)-r1-
      *                /        /
      *         ------()-b2-   /
      *                       /
-     *         -------------()-.2-
+     *         -------------()-*2-
      *
      *     </code>
      * </pre>
@@ -624,7 +624,7 @@ public class Stream<SOURCE, IN, OUT> {
      *
      *         -()-b2-
      *
-     *         -()-.2-
+     *         -()-*2-
      *
      *     </code>
      * </pre>
@@ -633,11 +633,11 @@ public class Stream<SOURCE, IN, OUT> {
      * <pre>
      *     <code>
      *
-     *         -()-a1-(....D....)-r1-
+     *         -()-a1-(===DAM===)-r1-
      *                /        /
      *         ------()-b2-   /
      *                       /
-     *         -------------()-.2-
+     *         -------------()-*2-
      *
      *     </code>
      * </pre>
@@ -690,7 +690,7 @@ public class Stream<SOURCE, IN, OUT> {
      *
      *         -()-b2-
      *
-     *         -()-.2-
+     *         -()-*2-
      *
      *     </code>
      * </pre>
@@ -699,11 +699,11 @@ public class Stream<SOURCE, IN, OUT> {
      * <pre>
      *     <code>
      *
-     *         -()-a1-(....D....)-r1-
+     *         -()-a1-(===DAM===)-r1-
      *                /        /
      *         ------()-b2-   /
      *                       /
-     *         -------------()-.2-
+     *         -------------()-*2-
      *
      *     </code>
      * </pre>
@@ -763,7 +763,7 @@ public class Stream<SOURCE, IN, OUT> {
      * <pre>
      *     <code>
      *
-     *         -()-a1-(D)-r1-
+     *         -()-a1-(DAM)-r1-
      *                /
      *         ------()-b2-
      *

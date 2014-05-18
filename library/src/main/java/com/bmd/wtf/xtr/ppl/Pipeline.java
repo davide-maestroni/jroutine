@@ -14,12 +14,9 @@
 package com.bmd.wtf.xtr.ppl;
 
 import com.bmd.wtf.Waterfall;
-import com.bmd.wtf.bdr.DuplicateDamException;
 import com.bmd.wtf.bdr.Stream;
 import com.bmd.wtf.dam.OpenDam;
 import com.bmd.wtf.src.Spring;
-
-import java.util.WeakHashMap;
 
 /**
  * A pipeline object is used to create a connection between two parts of the
@@ -37,8 +34,6 @@ import java.util.WeakHashMap;
  * @param <OUT>    The transported data type, that is the output data type of the upstream pool.
  */
 public class Pipeline<SOURCE, IN, OUT> {
-
-    private static final WeakHashMap<Duct<?, ?>, Void> sDucts = new WeakHashMap<Duct<?, ?>, Void>();
 
     private final Stream<SOURCE, IN, OUT> mInputStream;
 
@@ -97,13 +92,6 @@ public class Pipeline<SOURCE, IN, OUT> {
 
             throw new IllegalArgumentException("the output duct cannot be null");
         }
-
-        if (sDucts.containsKey(duct)) {
-
-            throw new DuplicateDamException("the waterfall already contains the duct: " + duct);
-        }
-
-        sDucts.put(duct, null);
 
         final Stream<NOUT, NOUT, NOUT> stream = Waterfall.fallingFrom(new OpenDam<NOUT>());
 

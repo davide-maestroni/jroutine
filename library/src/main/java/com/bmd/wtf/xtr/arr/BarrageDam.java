@@ -29,21 +29,25 @@ class BarrageDam<IN, OUT> implements Dam<IN, OUT> {
 
     private final Barrage<IN, OUT> mBarrage;
 
+    private final Object mMutex;
+
     private final int mStreamNumber;
 
     /**
      * Creates a dam associated to the specified stream number, wrapping the specified barrage.
      *
+     * @param mutex        The barrage mutex.
      * @param streamNumber The number of the stream associated with the barrage.
      * @param barrage      The wrapped barrage.
      */
-    public BarrageDam(final int streamNumber, final Barrage<IN, OUT> barrage) {
+    public BarrageDam(final Object mutex, final int streamNumber, final Barrage<IN, OUT> barrage) {
 
         if (barrage == null) {
 
             throw new IllegalArgumentException("the wrapped barrage cannot be null");
         }
 
+        mMutex = mutex;
         mStreamNumber = streamNumber;
         mBarrage = barrage;
     }
@@ -51,7 +55,7 @@ class BarrageDam<IN, OUT> implements Dam<IN, OUT> {
     @Override
     public Object onDischarge(final Floodgate<IN, OUT> gate, final IN drop) {
 
-        synchronized (mBarrage) {
+        synchronized (mMutex) {
 
             return mBarrage.onDischarge(mStreamNumber, gate, drop);
         }
@@ -60,7 +64,7 @@ class BarrageDam<IN, OUT> implements Dam<IN, OUT> {
     @Override
     public Object onFlush(final Floodgate<IN, OUT> gate) {
 
-        synchronized (mBarrage) {
+        synchronized (mMutex) {
 
             return mBarrage.onFlush(mStreamNumber, gate);
         }
@@ -69,7 +73,7 @@ class BarrageDam<IN, OUT> implements Dam<IN, OUT> {
     @Override
     public Object onPullDebris(final Floodgate<IN, OUT> gate, final Object debris) {
 
-        synchronized (mBarrage) {
+        synchronized (mMutex) {
 
             return mBarrage.onPullDebris(mStreamNumber, gate, debris);
         }
@@ -78,7 +82,7 @@ class BarrageDam<IN, OUT> implements Dam<IN, OUT> {
     @Override
     public Object onPushDebris(final Floodgate<IN, OUT> gate, final Object debris) {
 
-        synchronized (mBarrage) {
+        synchronized (mMutex) {
 
             return mBarrage.onPushDebris(mStreamNumber, gate, debris);
         }

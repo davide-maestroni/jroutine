@@ -224,9 +224,11 @@ public class StreamArray<SOURCE, IN, OUT> {
 
         int n = 0;
 
+        final Object mutex = new Object();
+
         for (final Stream<SOURCE, IN, OUT> stream : mStreams) {
 
-            streams.add(stream.thenFlowingThrough(new BarrageDam<OUT, NOUT>(n++, barrage)));
+            streams.add(stream.thenFlowingThrough(new BarrageDam<OUT, NOUT>(mutex, n++, barrage)));
         }
 
         return new StreamArray<SOURCE, OUT, NOUT>(streams);

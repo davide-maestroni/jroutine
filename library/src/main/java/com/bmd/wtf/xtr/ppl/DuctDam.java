@@ -54,6 +54,35 @@ class DuctDam<IN, OUT> implements Dam<IN, OUT> {
     }
 
     @Override
+    public int hashCode() {
+
+        return mDuct.hashCode();
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+
+        if (this == o) {
+
+            return true;
+        }
+        if (!(o instanceof DuctDam)) {
+
+            return false;
+        }
+
+        final DuctDam ductDam = (DuctDam) o;
+
+        //noinspection RedundantIfStatement
+        if (!mDuct.equals(ductDam.mDuct)) {
+
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
     public Object onDischarge(final Floodgate<IN, OUT> gate, final IN drop) {
 
         return mDuct.onDischarge(mSpring, drop);

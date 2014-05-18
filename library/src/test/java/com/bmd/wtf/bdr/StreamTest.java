@@ -14,12 +14,12 @@
 package com.bmd.wtf.bdr;
 
 import com.bmd.wtf.Waterfall;
+import com.bmd.wtf.crr.Current;
+import com.bmd.wtf.crr.Currents;
 import com.bmd.wtf.dam.AbstractDam;
 import com.bmd.wtf.dam.Dam;
 import com.bmd.wtf.dam.Dams;
 import com.bmd.wtf.dam.OpenDam;
-import com.bmd.wtf.flw.Flow;
-import com.bmd.wtf.flw.Flows;
 import com.bmd.wtf.src.Floodgate;
 import com.bmd.wtf.xtr.bsn.Basin;
 
@@ -165,7 +165,7 @@ public class StreamTest extends TestCase {
 
             final Dam<Object, Object> dam = Dams.openDam();
 
-            Waterfall.fallingFrom(dam).thenFlowingInto((Flow) null);
+            Waterfall.fallingFrom(dam).thenFlowingInto((Current) null);
 
             fail();
 
@@ -331,7 +331,7 @@ public class StreamTest extends TestCase {
 
         final boolean[] fail = new boolean[1];
 
-        Basin.collect(Waterfall.flowingInto(Flows.straightFlow())
+        Basin.collect(Waterfall.flowingInto(Currents.straightCurrent())
                                .thenFlowingThrough(new OpenDam<Object>() {
 
                                                        public boolean mFlushed;

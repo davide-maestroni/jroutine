@@ -16,8 +16,8 @@ package com.bmd.wtf.xtr.arr;
 import com.bmd.wtf.Waterfall;
 import com.bmd.wtf.bdr.DuplicateDamException;
 import com.bmd.wtf.bdr.Stream;
+import com.bmd.wtf.crr.Current;
 import com.bmd.wtf.dam.Dam;
-import com.bmd.wtf.flw.Flow;
 import com.bmd.wtf.src.Spring;
 
 import java.util.ArrayList;
@@ -153,12 +153,12 @@ public class StreamArray<SOURCE, IN, OUT> {
     }
 
     /**
-     * Makes this stream array run into the flows created by the specified factory.
+     * Makes this stream array run into the currents created by the specified factory.
      *
-     * @param factory The flow factory.
-     * @return A new stream running into the created flows.
+     * @param factory The current factory.
+     * @return A new stream running into the created currents.
      */
-    public StreamArray<SOURCE, IN, OUT> thenFlowingInto(final FlowFactory factory) {
+    public StreamArray<SOURCE, IN, OUT> thenFlowingInto(final CurrentFactory factory) {
 
         final ArrayList<Stream<SOURCE, IN, OUT>> streams =
                 new ArrayList<Stream<SOURCE, IN, OUT>>(mStreams.size());
@@ -245,18 +245,18 @@ public class StreamArray<SOURCE, IN, OUT> {
     }
 
     /**
-     * Merges this array into one stream flowing into the specified flow.
+     * Merges this array into one stream flowing into the specified current.
      *
-     * @param flow The flow instance.
+     * @param current The current instance.
      * @return The merged stream.
      */
-    public Stream<SOURCE, OUT, OUT> thenMergingInto(final Flow flow) {
+    public Stream<SOURCE, OUT, OUT> thenMergingInto(final Current current) {
 
         final ArrayList<Stream<SOURCE, IN, OUT>> streams = new ArrayList<Stream<SOURCE, IN, OUT>>();
 
         for (final Stream<SOURCE, IN, OUT> stream : mStreams) {
 
-            streams.add(stream.thenFlowingInto(flow));
+            streams.add(stream.thenFlowingInto(current));
         }
 
         return streams.get(0).thenMerging(streams);

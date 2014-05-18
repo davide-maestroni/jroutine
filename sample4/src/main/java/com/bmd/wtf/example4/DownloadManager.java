@@ -15,15 +15,15 @@ package com.bmd.wtf.example4;
 
 import com.bmd.wtf.Waterfall;
 import com.bmd.wtf.bdr.Stream;
+import com.bmd.wtf.crr.Currents;
 import com.bmd.wtf.dam.Dam;
 import com.bmd.wtf.dam.OpenDam;
 import com.bmd.wtf.example1.Downloaded;
 import com.bmd.wtf.example1.DownloadedObserver;
-import com.bmd.wtf.flw.Flows;
 import com.bmd.wtf.src.Floodgate;
 import com.bmd.wtf.src.Spring;
+import com.bmd.wtf.xtr.arr.CurrentFactories;
 import com.bmd.wtf.xtr.arr.DamFactory;
-import com.bmd.wtf.xtr.arr.FlowFactories;
 import com.bmd.wtf.xtr.arr.WaterfallArray;
 import com.bmd.wtf.xtr.fld.FloodControl;
 
@@ -65,16 +65,16 @@ public class DownloadManager {
 
         mSpring = WaterfallArray.formingFrom(stream).thenSplittingIn(maxThreads)
                                 .thenFlowingThrough(new UrlBalancer(maxThreads)).thenFlowingInto(
-                        FlowFactories.singletonFlowFactory(Flows.threadPoolFlow(maxThreads)))
-                                .thenFlowingThrough(new DamFactory<String, String>() {
+                        CurrentFactories
+                                .singletonCurrentFactory(Currents.threadPoolCurrent(maxThreads))
+                ).thenFlowingThrough(new DamFactory<String, String>() {
 
-                                    @Override
-                                    public Dam<String, String> createForStream(
-                                            final int streamNumber) {
+                    @Override
+                    public Dam<String, String> createForStream(final int streamNumber) {
 
-                                        return new RetryPolicy<String>(3);
-                                    }
-                                }).thenFlowingThrough(new DamFactory<String, Chunk>() {
+                        return new RetryPolicy<String>(3);
+                    }
+                }).thenFlowingThrough(new DamFactory<String, Chunk>() {
 
                     @Override
                     public Dam<String, Chunk> createForStream(final int streamNumber) {

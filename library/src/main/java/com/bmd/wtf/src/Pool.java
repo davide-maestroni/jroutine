@@ -14,11 +14,11 @@
 package com.bmd.wtf.src;
 
 /**
- * A pool instance gives a {@link com.bmd.wtf.flw.Flow} a way to discharge data into the
- * {@link com.bmd.wtf.Waterfall} data flow both upstream and downstream.
+ * A pool instance gives a {@link com.bmd.wtf.crr.Current} a way to discharge data into the
+ * {@link com.bmd.wtf.Waterfall} flow both upstream and downstream.
  * <p/>
- * Its methods must be called as a result of the invocation of the relative Flow ones, inside the
- * thread or queue handled by the specific implementation.
+ * Its methods must be called as a result of the invocation of the relative current ones, inside
+ * the thread or queue handled by the specific implementation.
  * <p/>
  * Created by davide on 2/27/14.
  *

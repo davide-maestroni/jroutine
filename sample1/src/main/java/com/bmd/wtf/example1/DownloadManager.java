@@ -14,8 +14,8 @@
 package com.bmd.wtf.example1;
 
 import com.bmd.wtf.Waterfall;
-import com.bmd.wtf.flw.Flow;
-import com.bmd.wtf.flw.Flows;
+import com.bmd.wtf.crr.Current;
+import com.bmd.wtf.crr.Currents;
 import com.bmd.wtf.xtr.fld.FloodControl;
 
 import java.io.File;
@@ -30,11 +30,11 @@ public class DownloadManager {
     private final FloodControl<String, String, Downloaded> mControl =
             new FloodControl<String, String, Downloaded>(Downloaded.class);
 
+    private final Current mCurrent;
+
     private final File mDownloadDir;
 
     private final DownloadedObserver mDownloaded = new DownloadedObserver();
-
-    private final Flow mFlow;
 
     public DownloadManager(final int maxThreads, final File downloadDir) throws IOException {
 
@@ -45,7 +45,7 @@ public class DownloadManager {
         }
 
         mDownloadDir = downloadDir;
-        mFlow = Flows.threadPoolFlow(maxThreads);
+        mCurrent = Currents.threadPoolCurrent(maxThreads);
     }
 
     public static void main(final String args[]) throws IOException {
@@ -64,7 +64,7 @@ public class DownloadManager {
 
     public void download(final String url) {
 
-        Waterfall.flowingInto(mFlow).thenFlowingThrough(new Downloader(mDownloadDir))
+        Waterfall.flowingInto(mCurrent).thenFlowingThrough(new Downloader(mDownloadDir))
                  .thenFlowingThrough(mControl.leveeControlledBy(mDownloaded)).backToSource()
                  .discharge(url);
     }

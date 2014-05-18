@@ -15,12 +15,12 @@ package com.bmd.wtf.xtr.arr;
 
 import com.bmd.wtf.Waterfall;
 import com.bmd.wtf.bdr.Stream;
+import com.bmd.wtf.crr.Current;
+import com.bmd.wtf.crr.Currents;
 import com.bmd.wtf.dam.AbstractDam;
 import com.bmd.wtf.dam.Dam;
 import com.bmd.wtf.dam.Dams;
 import com.bmd.wtf.dam.OpenDam;
-import com.bmd.wtf.flw.Flow;
-import com.bmd.wtf.flw.Flows;
 import com.bmd.wtf.src.Floodgate;
 import com.bmd.wtf.xtr.bsn.Basin;
 
@@ -218,14 +218,14 @@ public class ArrayTest extends TestCase {
 
         final Basin<Integer, Integer> basin1 = Basin.collect(
                 WaterfallArray.formingFrom(stream1, stream2, stream3, stream2)
-                              .thenMergingInto(Flows.straightFlow())
+                              .thenMergingInto(Currents.straightCurrent())
         );
         Basin.collect(stream1, stream2, stream3).thenFeedWith(1);
         assertThat(basin1.collectOutput()).containsExactly(1, 1, 1);
 
         final Basin<Integer, Integer> basin2 = Basin.collect(
                 WaterfallArray.formingFrom(Arrays.asList(stream1, stream2, stream3, stream1))
-                              .thenMergingInto(Flows.straightFlow())
+                              .thenMergingInto(Currents.straightCurrent())
         );
         Basin.collect(stream1, stream2, stream3).thenFeedWith(1);
         assertThat(basin2.collectOutput()).containsExactly(1, 1, 1);
@@ -443,12 +443,12 @@ public class ArrayTest extends TestCase {
 
     public void testOrder() {
 
-        final Flow flow = Flows.straightFlow();
+        final Current current = Currents.straightCurrent();
 
         assertThat(Basin.collect(
                 WaterfallArray.formingFrom(Waterfall.fallingFrom(new OpenDam<Integer>()))
                               .thenSplittingIn(2)
-                              .thenFlowingInto(FlowFactories.singletonFlowFactory(flow))
+                              .thenFlowingInto(CurrentFactories.singletonCurrentFactory(current))
                               .thenBalancedBy(new AbstractArrayBalancer<Integer>() {
 
                                   @Override
@@ -470,7 +470,7 @@ public class ArrayTest extends TestCase {
 
                                       return (drop % 2);
                                   }
-                              }).thenFlowingInto(FlowFactories.singletonFlowFactory(flow))
+                              }).thenFlowingInto(CurrentFactories.singletonCurrentFactory(current))
                               .thenMerging()
         ).thenFeedWith(1, 2, 3).collectOutput()).contains(1, 2, 3);
     }

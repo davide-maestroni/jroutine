@@ -13,36 +13,36 @@
  */
 package com.bmd.wtf.xtr.arr;
 
-import com.bmd.wtf.flw.Flow;
+import com.bmd.wtf.crr.Current;
 
 /**
- * Utility class for {@link FlowFactory} instances.
+ * Utility class for {@link CurrentFactory} instances.
  * <p/>
  * Created by davide on 3/5/14.
  */
-public class FlowFactories {
+public class CurrentFactories {
 
     /**
      * Avoid direct instantiation.
      */
-    protected FlowFactories() {
+    protected CurrentFactories() {
 
     }
 
     /**
-     * Creates a new factory that always return the specified flow.
+     * Creates a new factory that always return the specified current.
      *
-     * @param flow The singleton flow instance.
+     * @param current The singleton current instance.
      * @return The factory.
      */
-    public static FlowFactory singletonFlowFactory(final Flow flow) {
+    public static CurrentFactory singletonCurrentFactory(final Current current) {
 
-        return new FlowFactory() {
+        return new CurrentFactory() {
 
             @Override
-            public Flow createForStream(final int streamNumber) {
+            public Current createForStream(final int streamNumber) {
 
-                return flow;
+                return current;
             }
         };
     }

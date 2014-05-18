@@ -13,8 +13,8 @@
  */
 package com.bmd.wtf.bdr;
 
+import com.bmd.wtf.crr.Current;
 import com.bmd.wtf.dam.Dam;
-import com.bmd.wtf.flw.Flow;
 import com.bmd.wtf.src.Pool;
 
 import java.util.WeakHashMap;
@@ -23,7 +23,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 /**
  * Instances of this class implement {@link com.bmd.wtf.src.Pool}s by managing internally
  * stored {@link com.bmd.wtf.dam.Dam}s. Each instance has a single input
- * {@link com.bmd.wtf.flw.Flow}, shared by all the input {@link Stream}s which feed it with data
+ * {@link com.bmd.wtf.crr.Current}, shared by all the input {@link Stream}s which feed it with data
  * and objects.
  * <p/>
  * This class ensures that the internal Dam is always accessed in a thread safe way, so that the
@@ -38,7 +38,7 @@ class DataPool<IN, OUT> implements Pool<IN> {
 
     private static final WeakHashMap<Dam<?, ?>, Void> sDams = new WeakHashMap<Dam<?, ?>, Void>();
 
-    final Flow inputFlow;
+    final Current inputCurrent;
 
     final CopyOnWriteArraySet<Stream<?, ?, IN>> inputStreams =
             new CopyOnWriteArraySet<Stream<?, ?, IN>>();
@@ -50,11 +50,11 @@ class DataPool<IN, OUT> implements Pool<IN> {
 
     private final DataFloodgate<IN, OUT> mGate;
 
-    public DataPool(final Flow inputFlow, final Dam<IN, OUT> dam) {
+    public DataPool(final Current inputCurrent, final Dam<IN, OUT> dam) {
 
-        if (inputFlow == null) {
+        if (inputCurrent == null) {
 
-            throw new IllegalArgumentException("the input flow cannot be null");
+            throw new IllegalArgumentException("the input current cannot be null");
         }
 
         if (dam == null) {
@@ -69,7 +69,7 @@ class DataPool<IN, OUT> implements Pool<IN> {
 
         sDams.put(dam, null);
 
-        this.inputFlow = inputFlow;
+        this.inputCurrent = inputCurrent;
         mDam = dam;
         mGate = new DataFloodgate<IN, OUT>(this);
     }

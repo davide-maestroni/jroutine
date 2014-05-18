@@ -11,40 +11,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.android.wtf;
+package com.bmd.wtf.crr;
 
-import android.os.Handler;
-import android.os.Looper;
-
-import com.bmd.wtf.flw.Flow;
 import com.bmd.wtf.src.Pool;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Implementation of {@link com.bmd.wtf.flw.Flow} employing the Android
- * {@link android.os.Looper} queue to execute the waterfall commands.
+ * Implementation of a {@link Current} employing a
+ * {@link java.util.concurrent.ScheduledExecutorService} to run the commands in a pool of
+ * threads.
  * <p/>
- * Created by davide on 3/5/14.
+ * Created by davide on 2/27/14.
  */
-class LooperFlow implements Flow {
+public class ThreadPoolCurrent implements Current {
 
-    private final Handler mHandler;
+    private final ScheduledExecutorService mService;
 
     /**
-     * Constructor.
+     * Avoid instantiation outside the package.
      *
-     * @param looper The looper to employ.
+     * @param threadPoolSize The maximum size of the thread pool.
      */
-    public LooperFlow(final Looper looper) {
+    ThreadPoolCurrent(final int threadPoolSize) {
 
-        mHandler = new Handler(looper);
+        mService = Executors.newScheduledThreadPool(threadPoolSize);
     }
 
     @Override
     public <DATA> void discharge(final Pool<DATA> pool, final DATA drop) {
 
-        mHandler.post(new Runnable() {
+        mService.execute(new Runnable() {
 
             @Override
             public void run() {
@@ -58,7 +57,7 @@ class LooperFlow implements Flow {
     public <DATA> void dischargeAfter(final Pool<DATA> pool, final long delay,
             final TimeUnit timeUnit, final DATA drop) {
 
-        mHandler.postDelayed(new Runnable() {
+        mService.schedule(new Runnable() {
 
             @Override
             public void run() {
@@ -66,31 +65,31 @@ class LooperFlow implements Flow {
                 pool.discharge(drop);
             }
 
-        }, timeUnit.toMillis(delay));
+        }, delay, timeUnit);
     }
 
     @Override
     public <DATA> void dischargeAfter(final Pool<DATA> pool, final long delay,
             final TimeUnit timeUnit, final Iterable<? extends DATA> drops) {
 
-        mHandler.postDelayed(new Runnable() {
+        for (final DATA drop : drops) {
 
-            @Override
-            public void run() {
+            mService.schedule(new Runnable() {
 
-                for (final DATA drop : drops) {
+                @Override
+                public void run() {
 
                     pool.discharge(drop);
                 }
-            }
 
-        }, timeUnit.toMillis(delay));
+            }, delay, timeUnit);
+        }
     }
 
     @Override
     public void flush(final Pool<?> pool) {
 
-        mHandler.post(new Runnable() {
+        mService.execute(new Runnable() {
 
             @Override
             public void run() {
@@ -103,7 +102,7 @@ class LooperFlow implements Flow {
     @Override
     public void pull(final Pool<?> pool, final Object debris) {
 
-        mHandler.post(new Runnable() {
+        mService.execute(new Runnable() {
 
             @Override
             public void run() {
@@ -116,7 +115,7 @@ class LooperFlow implements Flow {
     @Override
     public void push(final Pool<?> pool, final Object debris) {
 
-        mHandler.post(new Runnable() {
+        mService.execute(new Runnable() {
 
             @Override
             public void run() {

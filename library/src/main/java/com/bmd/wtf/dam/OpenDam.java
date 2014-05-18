@@ -16,8 +16,8 @@ package com.bmd.wtf.dam;
 import com.bmd.wtf.src.Floodgate;
 
 /**
- * Implementation of an open {@link Dam}, that lets all the data and objects to flow downstream
- * and upstream untouched.
+ * Implementation of an open {@link Dam}, that lets all the data and objects flow downstream and
+ * upstream untouched.
  * <p/>
  * Created by davide on 2/27/14.
  *

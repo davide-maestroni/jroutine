@@ -13,20 +13,20 @@
  */
 package com.bmd.wtf.xtr.arr;
 
-import com.bmd.wtf.flw.Flow;
+import com.bmd.wtf.crr.Current;
 
 /**
- * A {@link com.bmd.wtf.flw.Flow} factory used to provide instances to an array of streams.
+ * A {@link com.bmd.wtf.crr.Current} factory used to provide instances to an array of streams.
  * <p/>
  * Created by davide on 3/3/14.
  */
-public interface FlowFactory {
+public interface CurrentFactory {
 
     /**
-     * Creates the flow associated to the specified stream number.
+     * Creates the current associated to the specified stream number.
      *
      * @param streamNumber The number of the stream.
-     * @return The associated flow.
+     * @return The associated current.
      */
-    public Flow createForStream(int streamNumber);
+    public Current createForStream(int streamNumber);
 }

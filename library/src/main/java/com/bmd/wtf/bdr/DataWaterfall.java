@@ -13,8 +13,8 @@
  */
 package com.bmd.wtf.bdr;
 
+import com.bmd.wtf.crr.Current;
 import com.bmd.wtf.dam.Dam;
-import com.bmd.wtf.flw.Flow;
 
 /**
  * This utility class is used to start the waterfall by creating the first
@@ -32,18 +32,18 @@ public class DataWaterfall {
     }
 
     /**
-     * Creates a new stream running into the specified flow and through the specified dam.
+     * Creates a new stream running into the specified current and through the specified dam.
      *
-     * @param inputFlow The input flow instance.
-     * @param dam       The dam to flow through.
-     * @param <IN>      The input data type.
-     * @param <OUT>     The output data type.
+     * @param inputCurrent The input current instance.
+     * @param dam          The dam to flow through.
+     * @param <IN>         The input data type.
+     * @param <OUT>        The output data type.
      * @return The newly created stream.
      */
-    public static <IN, OUT> Stream<IN, IN, OUT> flowingThrough(final Flow inputFlow,
+    public static <IN, OUT> Stream<IN, IN, OUT> flowingThrough(final Current inputCurrent,
             final Dam<IN, OUT> dam) {
 
-        final DataPool<IN, OUT> pool = new DataPool<IN, OUT>(inputFlow, dam);
+        final DataPool<IN, OUT> pool = new DataPool<IN, OUT>(inputCurrent, dam);
         final DataSpring<IN> spring = new DataSpring<IN>();
         final Stream<IN, Void, IN> stream = new Stream<IN, Void, IN>(spring, null, pool);
 

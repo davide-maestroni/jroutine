@@ -15,9 +15,9 @@ package com.bmd.wtf;
 
 import com.bmd.wtf.bdr.DataWaterfall;
 import com.bmd.wtf.bdr.Stream;
+import com.bmd.wtf.crr.Current;
+import com.bmd.wtf.crr.Currents;
 import com.bmd.wtf.dam.Dam;
-import com.bmd.wtf.flw.Flow;
-import com.bmd.wtf.flw.Flows;
 
 /**
  * Here is where everything starts.
@@ -26,31 +26,31 @@ import com.bmd.wtf.flw.Flows;
  */
 public class Waterfall {
 
-    private final Flow mFlow;
+    private final Current mCurrent;
 
     /**
      * Private constructor to avoid direct instantiation.
      *
-     * @param flow The starting flow.
+     * @param current The starting current.
      */
-    private Waterfall(final Flow flow) {
+    private Waterfall(final Current current) {
 
-        if (flow == null) {
+        if (current == null) {
 
             throw new IllegalArgumentException();
         }
 
-        mFlow = flow;
+        mCurrent = current;
     }
 
     /**
-     * Creates a new waterfall running through a straight flow.
+     * Creates a new waterfall running through a straight current.
      *
      * @return The new waterfall instance.
      */
     public static Waterfall falling() {
 
-        return new Waterfall(Flows.straightFlow());
+        return new Waterfall(Currents.straightCurrent());
     }
 
     /**
@@ -64,14 +64,14 @@ public class Waterfall {
     }
 
     /**
-     * Creates a new waterfall running into the specified flow.
+     * Creates a new waterfall running into the specified current.
      *
-     * @param flow The flow instance.
+     * @param current The current instance.
      * @return The new waterfall instance.
      */
-    public static Waterfall flowingInto(final Flow flow) {
+    public static Waterfall flowingInto(final Current current) {
 
-        return new Waterfall(flow);
+        return new Waterfall(current);
     }
 
     /**
@@ -84,6 +84,6 @@ public class Waterfall {
      */
     public <IN, OUT> Stream<IN, IN, OUT> thenFlowingThrough(final Dam<IN, OUT> dam) {
 
-        return DataWaterfall.flowingThrough(mFlow, dam);
+        return DataWaterfall.flowingThrough(mCurrent, dam);
     }
 }

@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.wtf.flw;
+package com.bmd.wtf.crr;
 
 import com.bmd.wtf.src.Pool;
 
@@ -24,45 +24,46 @@ import java.util.concurrent.TimeUnit;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
- * Unit test for {@link com.bmd.wtf.flw.Flow}
+ * Unit test for {@link Current}
  * <p/>
  * Created by davide on 4/10/14.
  */
-public class FlowTest extends TestCase {
+public class CurrentTest extends TestCase {
 
     public void testDecorator() {
 
         final TestPool pool = new TestPool();
-        final Flow wrapped = Flows.straightFlow();
-        final MyDecorator flow = new MyDecorator(wrapped);
+        final Current wrapped = Currents.straightCurrent();
+        final MyDecorator current = new MyDecorator(wrapped);
 
-        assertThat(flow.getWrapped()).isEqualTo(wrapped);
+        assertThat(current.getWrapped()).isEqualTo(wrapped);
 
-        flow.discharge(pool, "test");
+        current.discharge(pool, "test");
         assertThat(pool.getDrop()).isEqualTo("test");
 
         long now = System.currentTimeMillis();
-        flow.dischargeAfter(pool, 1000, TimeUnit.MILLISECONDS, "delay1");
+        current.dischargeAfter(pool, 1000, TimeUnit.MILLISECONDS, "delay1");
         assertThat(pool.getTime()).isGreaterThanOrEqualTo(now + 1000);
         assertThat(pool.getDrop()).isEqualTo("delay1");
 
         now = System.currentTimeMillis();
-        flow.dischargeAfter(pool, 1, TimeUnit.SECONDS, "delay2");
+        current.dischargeAfter(pool, 1, TimeUnit.SECONDS, "delay2");
         assertThat(pool.getTime()).isGreaterThanOrEqualTo(now + 1000);
         assertThat(pool.getDrop()).isEqualTo("delay2");
 
         now = System.currentTimeMillis();
-        flow.dischargeAfter(pool, 1, TimeUnit.SECONDS, Arrays.asList("delay1", "delay2", "delay3"));
+        current.dischargeAfter(pool, 1, TimeUnit.SECONDS,
+                               Arrays.asList("delay1", "delay2", "delay3"));
         assertThat(pool.getTime()).isGreaterThanOrEqualTo(now + 1000);
         assertThat(pool.getDrop()).isEqualTo("delay3");
 
-        flow.discharge(pool, "test");
+        current.discharge(pool, "test");
         assertThat(pool.getDrop()).isEqualTo("test");
         assertThat(pool.isFlush()).isFalse();
         assertThat(pool.getPush()).isNull();
         assertThat(pool.getPull()).isNull();
 
-        flow.flush(pool);
+        current.flush(pool);
         assertThat(pool.getDrop()).isEqualTo("test");
         assertThat(pool.isFlush()).isTrue();
         assertThat(pool.getPush()).isNull();
@@ -70,13 +71,13 @@ public class FlowTest extends TestCase {
 
         pool.setFlush(false);
 
-        flow.push(pool, new IllegalArgumentException());
+        current.push(pool, new IllegalArgumentException());
         assertThat(pool.getDrop()).isEqualTo("test");
         assertThat(pool.isFlush()).isFalse();
         assertThat(pool.getPush()).isExactlyInstanceOf(IllegalArgumentException.class);
         assertThat(pool.getPull()).isNull();
 
-        flow.pull(pool, new IllegalStateException());
+        current.pull(pool, new IllegalStateException());
         assertThat(pool.getDrop()).isEqualTo("test");
         assertThat(pool.isFlush()).isFalse();
         assertThat(pool.getPush()).isExactlyInstanceOf(IllegalArgumentException.class);
@@ -86,36 +87,37 @@ public class FlowTest extends TestCase {
     public void testPool() throws InterruptedException {
 
         final TestPool pool = new TestPool();
-        final Flow flow = Flows.threadPoolFlow(1);
+        final Current current = Currents.threadPoolCurrent(1);
 
         pool.reset();
-        flow.discharge(pool, "test");
+        current.discharge(pool, "test");
         pool.waitCall();
         assertThat(pool.getDrop()).isEqualTo("test");
 
         long now = System.currentTimeMillis();
         pool.reset();
-        flow.dischargeAfter(pool, 1000, TimeUnit.MILLISECONDS, "delay1");
+        current.dischargeAfter(pool, 1000, TimeUnit.MILLISECONDS, "delay1");
         pool.waitCall();
         assertThat(pool.getTime()).isGreaterThanOrEqualTo(now + 1000);
         assertThat(pool.getDrop()).isEqualTo("delay1");
 
         now = System.currentTimeMillis();
         pool.reset();
-        flow.dischargeAfter(pool, 1, TimeUnit.SECONDS, "delay2");
+        current.dischargeAfter(pool, 1, TimeUnit.SECONDS, "delay2");
         pool.waitCall();
         assertThat(pool.getTime()).isGreaterThanOrEqualTo(now + 1000);
         assertThat(pool.getDrop()).isEqualTo("delay2");
 
         now = System.currentTimeMillis();
         pool.reset();
-        flow.dischargeAfter(pool, 1, TimeUnit.SECONDS, Arrays.asList("delay1", "delay2", "delay3"));
+        current.dischargeAfter(pool, 1, TimeUnit.SECONDS,
+                               Arrays.asList("delay1", "delay2", "delay3"));
         pool.waitCall();
         assertThat(pool.getTime()).isGreaterThanOrEqualTo(now + 1000);
         assertThat(pool.getDrop()).isEqualTo("delay3");
 
         pool.reset();
-        flow.discharge(pool, "test");
+        current.discharge(pool, "test");
         pool.waitCall();
         assertThat(pool.getDrop()).isEqualTo("test");
         assertThat(pool.isFlush()).isFalse();
@@ -123,7 +125,7 @@ public class FlowTest extends TestCase {
         assertThat(pool.getPull()).isNull();
 
         pool.reset();
-        flow.flush(pool);
+        current.flush(pool);
         pool.waitCall();
         assertThat(pool.getDrop()).isEqualTo("test");
         assertThat(pool.isFlush()).isTrue();
@@ -133,7 +135,7 @@ public class FlowTest extends TestCase {
         pool.setFlush(false);
 
         pool.reset();
-        flow.push(pool, new IllegalArgumentException());
+        current.push(pool, new IllegalArgumentException());
         pool.waitCall();
         assertThat(pool.getDrop()).isEqualTo("test");
         assertThat(pool.isFlush()).isFalse();
@@ -141,7 +143,7 @@ public class FlowTest extends TestCase {
         assertThat(pool.getPull()).isNull();
 
         pool.reset();
-        flow.pull(pool, new IllegalStateException());
+        current.pull(pool, new IllegalStateException());
         pool.waitCall();
         assertThat(pool.getDrop()).isEqualTo("test");
         assertThat(pool.isFlush()).isFalse();
@@ -152,33 +154,34 @@ public class FlowTest extends TestCase {
     public void testStraight() {
 
         final TestPool pool = new TestPool();
-        final Flow flow = Flows.straightFlow();
+        final Current current = Currents.straightCurrent();
 
-        flow.discharge(pool, "test");
+        current.discharge(pool, "test");
         assertThat(pool.getDrop()).isEqualTo("test");
 
         long now = System.currentTimeMillis();
-        flow.dischargeAfter(pool, 1000, TimeUnit.MILLISECONDS, "delay1");
+        current.dischargeAfter(pool, 1000, TimeUnit.MILLISECONDS, "delay1");
         assertThat(pool.getTime()).isGreaterThanOrEqualTo(now + 1000);
         assertThat(pool.getDrop()).isEqualTo("delay1");
 
         now = System.currentTimeMillis();
-        flow.dischargeAfter(pool, 1, TimeUnit.SECONDS, "delay2");
+        current.dischargeAfter(pool, 1, TimeUnit.SECONDS, "delay2");
         assertThat(pool.getTime()).isGreaterThanOrEqualTo(now + 1000);
         assertThat(pool.getDrop()).isEqualTo("delay2");
 
         now = System.currentTimeMillis();
-        flow.dischargeAfter(pool, 1, TimeUnit.SECONDS, Arrays.asList("delay1", "delay2", "delay3"));
+        current.dischargeAfter(pool, 1, TimeUnit.SECONDS,
+                               Arrays.asList("delay1", "delay2", "delay3"));
         assertThat(pool.getTime()).isGreaterThanOrEqualTo(now + 1000);
         assertThat(pool.getDrop()).isEqualTo("delay3");
 
-        flow.discharge(pool, "test");
+        current.discharge(pool, "test");
         assertThat(pool.getDrop()).isEqualTo("test");
         assertThat(pool.isFlush()).isFalse();
         assertThat(pool.getPush()).isNull();
         assertThat(pool.getPull()).isNull();
 
-        flow.flush(pool);
+        current.flush(pool);
         assertThat(pool.getDrop()).isEqualTo("test");
         assertThat(pool.isFlush()).isTrue();
         assertThat(pool.getPush()).isNull();
@@ -186,27 +189,27 @@ public class FlowTest extends TestCase {
 
         pool.setFlush(false);
 
-        flow.push(pool, new IllegalArgumentException());
+        current.push(pool, new IllegalArgumentException());
         assertThat(pool.getDrop()).isEqualTo("test");
         assertThat(pool.isFlush()).isFalse();
         assertThat(pool.getPush()).isExactlyInstanceOf(IllegalArgumentException.class);
         assertThat(pool.getPull()).isNull();
 
-        flow.pull(pool, new IllegalStateException());
+        current.pull(pool, new IllegalStateException());
         assertThat(pool.getDrop()).isEqualTo("test");
         assertThat(pool.isFlush()).isFalse();
         assertThat(pool.getPush()).isExactlyInstanceOf(IllegalArgumentException.class);
         assertThat(pool.getPull()).isExactlyInstanceOf(IllegalStateException.class);
     }
 
-    private static class MyDecorator extends FlowDecorator {
+    private static class MyDecorator extends CurrentDecorator {
 
-        private MyDecorator(final Flow wrapped) {
+        private MyDecorator(final Current wrapped) {
 
             super(wrapped);
         }
 
-        public Flow getWrapped() {
+        public Current getWrapped() {
 
             return wrapped();
         }

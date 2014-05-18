@@ -14,16 +14,16 @@
 package combmd.wtf.example3;
 
 import com.bmd.wtf.Waterfall;
+import com.bmd.wtf.crr.Currents;
 import com.bmd.wtf.dam.Dam;
 import com.bmd.wtf.dam.OpenDam;
 import com.bmd.wtf.example1.Downloaded;
 import com.bmd.wtf.example1.DownloadedObserver;
 import com.bmd.wtf.example1.Downloader;
 import com.bmd.wtf.example2.Balancer;
-import com.bmd.wtf.flw.Flows;
 import com.bmd.wtf.src.Spring;
+import com.bmd.wtf.xtr.arr.CurrentFactories;
 import com.bmd.wtf.xtr.arr.DamFactory;
-import com.bmd.wtf.xtr.arr.FlowFactories;
 import com.bmd.wtf.xtr.arr.WaterfallArray;
 import com.bmd.wtf.xtr.fld.FloodControl;
 
@@ -51,8 +51,8 @@ public class DownloadManager {
         mSpring = WaterfallArray.formingFrom(Waterfall.fallingFrom(new OpenDam<String>()))
                                 .thenSplittingIn(maxThreads)
                                 .thenFlowingThrough(new Balancer<String>(maxThreads))
-                                .thenFlowingInto(FlowFactories.singletonFlowFactory(
-                                        Flows.threadPoolFlow(maxThreads)))
+                                .thenFlowingInto(CurrentFactories.singletonCurrentFactory(
+                                        Currents.threadPoolCurrent(maxThreads)))
                                 .thenFlowingThrough(new DamFactory<String, String>() {
 
                                     @Override

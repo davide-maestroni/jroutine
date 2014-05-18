@@ -68,7 +68,7 @@ public class Dams {
     }
 
     /**
-     * Creates a new dam which let any data drop and object to flow through it.
+     * Creates a new dam which let any data drop and object flow through it.
      *
      * @param <DATA> The data type.
      * @return The open dam.

@@ -13,7 +13,7 @@
  */
 package com.bmd.wtf.bdr;
 
-import com.bmd.wtf.flw.Flow;
+import com.bmd.wtf.crr.Current;
 
 import java.util.Arrays;
 import java.util.List;
@@ -210,9 +210,9 @@ class DataPump {
 
             final long currentDelay = updateDelay(delay, timeUnit, dischargeTimeNs);
 
-            final Flow inputFlow = pool.inputFlow;
+            final Current inputCurrent = pool.inputCurrent;
 
-            inputFlow.dischargeAfter(pool, currentDelay, timeUnit, (IN) drop);
+            inputCurrent.dischargeAfter(pool, currentDelay, timeUnit, (IN) drop);
         }
     };
 
@@ -225,9 +225,9 @@ class DataPump {
 
             final long currentDelay = updateDelay(delay, timeUnit, dischargeTimeNs);
 
-            final Flow inputFlow = pool.inputFlow;
+            final Current inputCurrent = pool.inputCurrent;
 
-            inputFlow.dischargeAfter(pool, currentDelay, timeUnit, Arrays.asList((IN[]) drops));
+            inputCurrent.dischargeAfter(pool, currentDelay, timeUnit, Arrays.asList((IN[]) drops));
         }
     };
 
@@ -240,9 +240,9 @@ class DataPump {
 
             final long currentDelay = updateDelay(delay, timeUnit, dischargeTimeNs);
 
-            final Flow inputFlow = pool.inputFlow;
+            final Current inputCurrent = pool.inputCurrent;
 
-            inputFlow.dischargeAfter(pool, currentDelay, timeUnit, (Iterable<IN>) drops);
+            inputCurrent.dischargeAfter(pool, currentDelay, timeUnit, (Iterable<IN>) drops);
         }
     };
 

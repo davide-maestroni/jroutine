@@ -13,9 +13,9 @@
  */
 package com.bmd.wtf.bdr;
 
+import com.bmd.wtf.crr.Current;
 import com.bmd.wtf.dam.Dam;
 import com.bmd.wtf.dam.OpenDam;
-import com.bmd.wtf.flw.Flow;
 import com.bmd.wtf.src.Spring;
 
 import java.util.ArrayList;
@@ -44,7 +44,7 @@ public class Stream<SOURCE, IN, OUT> {
 
     private final DataPool<OUT, ?> mDownstreamPool;
 
-    private final Flow mOutFlow;
+    private final Current mOutCurrent;
 
     private final boolean mPassThrough;
 
@@ -68,13 +68,13 @@ public class Stream<SOURCE, IN, OUT> {
 
         if (downstreamPool != null) {
 
-            mOutFlow = downstreamPool.inputFlow;
+            mOutCurrent = downstreamPool.inputCurrent;
 
-            mPassThrough = (upstreamPool != null) && upstreamPool.inputFlow.equals(mOutFlow);
+            mPassThrough = (upstreamPool != null) && upstreamPool.inputCurrent.equals(mOutCurrent);
 
         } else {
 
-            mOutFlow = upstreamPool.inputFlow;
+            mOutCurrent = upstreamPool.inputCurrent;
 
             mPassThrough = false;
         }
@@ -85,16 +85,16 @@ public class Stream<SOURCE, IN, OUT> {
      *
      * @param spring       The associated spring.
      * @param upstreamPool The upstream pool.
-     * @param outFlow      The output flow.
+     * @param outCurrent   The output current.
      */
     private Stream(final Spring<SOURCE> spring, final DataPool<IN, OUT> upstreamPool,
-            final Flow outFlow) {
+            final Current outCurrent) {
 
         mSpring = spring;
         mUpstreamPool = upstreamPool;
         mDownstreamPool = null;
 
-        mOutFlow = outFlow;
+        mOutCurrent = outCurrent;
 
         mPassThrough = false;
     }
@@ -131,7 +131,7 @@ public class Stream<SOURCE, IN, OUT> {
     public int hashCode() {
 
         int result = mDownstreamPool != null ? mDownstreamPool.hashCode() : 0;
-        result = 31 * result + mOutFlow.hashCode();
+        result = 31 * result + mOutCurrent.hashCode();
         result = 31 * result + (mPassThrough ? 1 : 0);
         result = 31 * result + mSpring.hashCode();
         result = 31 * result + (mUpstreamPool != null ? mUpstreamPool.hashCode() : 0);
@@ -164,7 +164,7 @@ public class Stream<SOURCE, IN, OUT> {
             return false;
         }
 
-        if (!mOutFlow.equals(stream.mOutFlow)) {
+        if (!mOutCurrent.equals(stream.mOutCurrent)) {
 
             return false;
         }
@@ -291,19 +291,19 @@ public class Stream<SOURCE, IN, OUT> {
     }
 
     /**
-     * Makes this stream run into the specified flow.
+     * Makes this stream run into the specified current.
      *
-     * @param flow The flow instance.
-     * @return A new stream running into the passed flow.
+     * @param current The current instance.
+     * @return A new stream running into the passed current.
      */
-    public Stream<SOURCE, IN, OUT> thenFlowingInto(final Flow flow) {
+    public Stream<SOURCE, IN, OUT> thenFlowingInto(final Current current) {
 
-        if (flow == null) {
+        if (current == null) {
 
-            throw new IllegalArgumentException("the flow cannot be null");
+            throw new IllegalArgumentException("the current cannot be null");
         }
 
-        return new Stream<SOURCE, IN, OUT>(mSpring, mUpstreamPool, flow);
+        return new Stream<SOURCE, IN, OUT>(mSpring, mUpstreamPool, current);
     }
 
     /**
@@ -338,7 +338,7 @@ public class Stream<SOURCE, IN, OUT> {
             throw new IllegalArgumentException("the dam cannot be null");
         }
 
-        final DataPool<OUT, NOUT> outPool = new DataPool<OUT, NOUT>(mOutFlow, dam);
+        final DataPool<OUT, NOUT> outPool = new DataPool<OUT, NOUT>(mOutCurrent, dam);
         final Stream<SOURCE, IN, OUT> stream =
                 new Stream<SOURCE, IN, OUT>(mSpring, mUpstreamPool, outPool);
 
@@ -813,9 +813,9 @@ public class Stream<SOURCE, IN, OUT> {
 
         } else {
 
-            final Flow inputFlow = downPool.inputFlow;
+            final Current inputCurrent = downPool.inputCurrent;
 
-            inputFlow.discharge(downPool, drop);
+            inputCurrent.discharge(downPool, drop);
         }
     }
 
@@ -823,7 +823,7 @@ public class Stream<SOURCE, IN, OUT> {
 
         final DataPool<OUT, ?> pool = mDownstreamPool;
 
-        pool.inputFlow.dischargeAfter(pool, delay, timeUnit, drop);
+        pool.inputCurrent.dischargeAfter(pool, delay, timeUnit, drop);
     }
 
     void dischargeAfter(final long delay, final TimeUnit timeUnit,
@@ -831,7 +831,7 @@ public class Stream<SOURCE, IN, OUT> {
 
         final DataPool<OUT, ?> pool = mDownstreamPool;
 
-        pool.inputFlow.dischargeAfter(pool, delay, timeUnit, drops);
+        pool.inputCurrent.dischargeAfter(pool, delay, timeUnit, drops);
     }
 
     void drain(final boolean downstream) {
@@ -853,9 +853,9 @@ public class Stream<SOURCE, IN, OUT> {
 
         } else {
 
-            final Flow inputFlow = downPool.inputFlow;
+            final Current inputCurrent = downPool.inputCurrent;
 
-            inputFlow.flush(downPool);
+            inputCurrent.flush(downPool);
         }
     }
 
@@ -871,9 +871,9 @@ public class Stream<SOURCE, IN, OUT> {
 
             } else {
 
-                final Flow inputFlow = upPool.inputFlow;
+                final Current inputCurrent = upPool.inputCurrent;
 
-                inputFlow.pull(upPool, debris);
+                inputCurrent.pull(upPool, debris);
             }
         }
     }
@@ -888,9 +888,9 @@ public class Stream<SOURCE, IN, OUT> {
 
         } else {
 
-            final Flow inputFlow = downPool.inputFlow;
+            final Current inputCurrent = downPool.inputCurrent;
 
-            inputFlow.push(downPool, debris);
+            inputCurrent.push(downPool, debris);
         }
     }
 

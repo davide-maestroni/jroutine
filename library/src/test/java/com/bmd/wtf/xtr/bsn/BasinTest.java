@@ -15,15 +15,15 @@ package com.bmd.wtf.xtr.bsn;
 
 import com.bmd.wtf.Waterfall;
 import com.bmd.wtf.bdr.Stream;
+import com.bmd.wtf.crr.Currents;
 import com.bmd.wtf.dam.AbstractDam;
 import com.bmd.wtf.dam.Dam;
 import com.bmd.wtf.dam.Dams;
 import com.bmd.wtf.dam.OpenDam;
-import com.bmd.wtf.flw.Flows;
 import com.bmd.wtf.src.Floodgate;
 import com.bmd.wtf.xtr.arr.AbstractBarrage;
+import com.bmd.wtf.xtr.arr.CurrentFactories;
 import com.bmd.wtf.xtr.arr.DamFactory;
-import com.bmd.wtf.xtr.arr.FlowFactories;
 import com.bmd.wtf.xtr.arr.WaterfallArray;
 
 import junit.framework.TestCase;
@@ -207,7 +207,7 @@ public class BasinTest extends TestCase {
                                   }
 
                               }).thenFlowingInto(
-                        FlowFactories.singletonFlowFactory(Flows.threadPoolFlow(2)))
+                        CurrentFactories.singletonCurrentFactory(Currents.threadPoolCurrent(2)))
                               .thenFlowingThrough(new DamFactory<String, List<String>>() {
 
                                   @Override
@@ -320,7 +320,7 @@ public class BasinTest extends TestCase {
                 .containsExactly("1111", "3", "CAPITAL", "Ciao", "a", "is", "zOO", "test", "This");
 
         final BlockingBasin<String, Integer> basin1 = BlockingBasin.collect(
-                Waterfall.flowingInto(Flows.threadPoolFlow(1))
+                Waterfall.flowingInto(Currents.threadPoolCurrent(1))
                          .thenFlowingThrough(new AbstractDam<String, Integer>() {
 
                              @Override
@@ -485,7 +485,7 @@ public class BasinTest extends TestCase {
                         return null;
                     }
 
-                }).thenFlowingInto(Flows.threadPoolFlow(1)).thenFlowingThrough(closed))
+                }).thenFlowingInto(Currents.threadPoolCurrent(1)).thenFlowingThrough(closed))
                              .afterMax(1, TimeUnit.MILLISECONDS);
 
         final ArrayList<Integer> output = new ArrayList<Integer>(1);

@@ -39,15 +39,6 @@ public interface Flow {
     public <DATA> void discharge(Pool<DATA> pool, DATA drop);
 
     /**
-     * This method is called when data drops must be discharged through the flow.
-     *
-     * @param pool   The pool instance to be used to discharge data into the waterfall.
-     * @param drops  The iterable returning the drops of data to discharge.
-     * @param <DATA> The data type.
-     */
-    public <DATA> void discharge(Pool<DATA> pool, Iterable<? extends DATA> drops);
-
-    /**
      * This method is called when a data drop must be discharged through the flow, after the
      * specified time has elapsed.
      *

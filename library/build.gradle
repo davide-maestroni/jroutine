@@ -13,6 +13,12 @@
  */
 apply plugin: 'java'
 apply plugin: 'jacoco'
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+group = 'com.github.davide-maestroni'
+version = '1.0.0'
+archivesBaseName = project.parent.name
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
@@ -22,11 +28,84 @@ dependencies {
 }
 
 javadoc {
+    title = "${archivesBaseName} ${version}"
     options.links("http://docs.oracle.com/javase/7/docs/api/")
+    options.overview("${project.name}/docs/overview.html")
+    options.windowTitle("Javadoc - ${archivesBaseName}")
 }
 
 task("jacocoTest", dependsOn: 'test') {
     description = "Runs the tests and generates the JaCoCo report files."
 } << {
     tasks.jacocoTestReport.execute()
+}
+
+artifacts {
+
+    archives task("sourcesJar", type: Jar) {
+        description "Generates sources Jar"
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
+    archives task("javadocJar", type: Jar, dependsOn: tasks["javadoc"]) {
+        description "Generates Javadoc Jar"
+        classifier = 'javadoc'
+        from 'build/docs/javadoc'
+    }
+}
+
+signing {
+    sign configurations.archives
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            def localRepoUrl = mavenLocal().url.toString()
+
+            if (file(localRepoUrl).exists()) {
+
+                // Upload the artifacts to the local repository
+                repository(url: localRepoUrl)
+            }
+
+            if (project.hasProperty('sonatypeUsername') && project.hasProperty('sonatypePassword')) {
+
+                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                    authentication(userName: sonatypeUsername, password: sonatypePassword)
+                }
+            }
+
+            pom.project {
+                name = archivesBaseName
+                packaging = 'jar'
+                description = 'Easily iterate through Android sparse collections'
+                url = 'http://davide-maestroni.github.io/javafall/'
+
+                scm {
+                    url = 'git@github.com:davide-maestroni/javafall.git'
+                    connection = 'scm:git:git@github.com:davide-maestroni/javafall.git'
+                    developerConnection = 'scm:git:git@github.com:davide-maestroni/javafall.git'
+                }
+
+                licenses {
+                    license {
+                        name = 'The Apache Software License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        distribution = 'repo'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id = 'davide-maestroni'
+                        name = 'Davide Maestroni'
+                    }
+                }
+            }
+        }
+    }
 }

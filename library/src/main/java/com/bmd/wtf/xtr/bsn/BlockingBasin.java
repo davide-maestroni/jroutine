@@ -25,6 +25,8 @@ import java.util.concurrent.TimeUnit;
  * Implementation of a {@link Basin} which can block waiting for the data to flow down
  * asynchronously.
  * <p/>
+ * The basin will wait for a flush in order to know that data have complete.
+ * <p/>
  * Created by davide on 3/7/14.
  *
  * @param <IN>  The input data type.
@@ -197,16 +199,40 @@ public class BlockingBasin<IN, OUT> extends Basin<IN, OUT> {
     }
 
     /**
+     * Sets to 0 the timeout to wait for data to be fully collected.
+     *
+     * @return This basin.
+     */
+    public BlockingBasin<IN, OUT> immediately() {
+
+        mCollector.setTimeout(0, TimeUnit.MILLISECONDS);
+
+        return throwIfTimeout(null);
+    }
+
+    /**
      * Sets the exception to be thrown in case the timeout elapsed before all the data has been
      * collected. If <code>null</code> no exception will be thrown.
      *
      * @param exception The exception to be thrown.
      * @return This basin.
      */
-    public BlockingBasin<IN, OUT> throwTimeoutException(final RuntimeException exception) {
+    public BlockingBasin<IN, OUT> throwIfTimeout(final RuntimeException exception) {
 
         mCollector.setTimeoutException(exception);
 
         return this;
+    }
+
+    /**
+     * Sets to an indefinite time the timeout to wait for data to be fully collected.
+     *
+     * @return This basin.
+     */
+    public BlockingBasin<IN, OUT> whenAvailable() {
+
+        mCollector.setNoTimeout();
+
+        return throwIfTimeout(null);
     }
 }

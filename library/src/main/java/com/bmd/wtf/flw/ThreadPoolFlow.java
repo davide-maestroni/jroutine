@@ -54,22 +54,6 @@ public class ThreadPoolFlow implements Flow {
     }
 
     @Override
-    public <DATA> void discharge(final Pool<DATA> pool, final Iterable<? extends DATA> drops) {
-
-        mService.execute(new Runnable() {
-
-            @Override
-            public void run() {
-
-                for (final DATA drop : drops) {
-
-                    pool.discharge(drop);
-                }
-            }
-        });
-    }
-
-    @Override
     public <DATA> void dischargeAfter(final Pool<DATA> pool, final long delay,
             final TimeUnit timeUnit, final DATA drop) {
 
@@ -88,18 +72,18 @@ public class ThreadPoolFlow implements Flow {
     public <DATA> void dischargeAfter(final Pool<DATA> pool, final long delay,
             final TimeUnit timeUnit, final Iterable<? extends DATA> drops) {
 
-        mService.schedule(new Runnable() {
+        for (final DATA drop : drops) {
 
-            @Override
-            public void run() {
+            mService.schedule(new Runnable() {
 
-                for (final DATA drop : drops) {
+                @Override
+                public void run() {
 
                     pool.discharge(drop);
                 }
-            }
 
-        }, delay, timeUnit);
+            }, delay, timeUnit);
+        }
     }
 
     @Override

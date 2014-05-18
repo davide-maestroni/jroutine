@@ -81,7 +81,7 @@ public class Pipeline<SOURCE, IN, OUT> {
      */
     public <NOUT> Pipeline<SOURCE, NOUT, NOUT> thenConnecting(final Duct<OUT, NOUT> duct) {
 
-        return Pipeline.binding(thenFlowingThrough(duct));
+        return new Pipeline<SOURCE, NOUT, NOUT>(thenFlowingThrough(duct));
     }
 
     /**

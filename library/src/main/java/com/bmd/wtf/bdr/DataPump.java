@@ -121,13 +121,16 @@ class DataPump {
         public <IN, OUT> void discharge(final DataPool<IN, OUT> pool, final long delay,
                 final TimeUnit timeUnit, final long dischargeTimeNs, final Object drops) {
 
-            final List<OUT> outs = Arrays.asList((OUT[]) drops);
+            final OUT[] outs = (OUT[]) drops;
 
             final CopyOnWriteArraySet<Stream<?, IN, OUT>> outStreams = pool.outputStreams;
 
-            for (final Stream<?, IN, OUT> stream : outStreams) {
+            for (final OUT out : outs) {
 
-                stream.discharge(outs);
+                for (final Stream<?, IN, OUT> stream : outStreams) {
+
+                    stream.discharge(out);
+                }
             }
         }
     };
@@ -143,9 +146,12 @@ class DataPump {
 
             final CopyOnWriteArraySet<Stream<?, IN, OUT>> outStreams = pool.outputStreams;
 
-            for (final Stream<?, IN, OUT> stream : outStreams) {
+            for (final OUT out : outs) {
 
-                stream.discharge(outs);
+                for (final Stream<?, IN, OUT> stream : outStreams) {
+
+                    stream.discharge(out);
+                }
             }
         }
     };

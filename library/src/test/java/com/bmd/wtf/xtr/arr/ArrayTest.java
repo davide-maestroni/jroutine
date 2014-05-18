@@ -22,7 +22,6 @@ import com.bmd.wtf.dam.OpenDam;
 import com.bmd.wtf.flw.Flow;
 import com.bmd.wtf.flw.Flows;
 import com.bmd.wtf.src.Floodgate;
-import com.bmd.wtf.src.Pool;
 import com.bmd.wtf.xtr.bsn.Basin;
 
 import junit.framework.TestCase;
@@ -31,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
@@ -445,98 +443,34 @@ public class ArrayTest extends TestCase {
 
     public void testOrder() {
 
-        final Flow testFlow = new Flow() {
-
-            @Override
-            public <DATA> void discharge(final Pool<DATA> pool, final DATA drop) {
-
-                pool.discharge(drop);
-            }
-
-            @Override
-            public <DATA> void discharge(final Pool<DATA> pool,
-                    final Iterable<? extends DATA> drops) {
-
-                for (final DATA drop : drops) {
-
-                    pool.discharge(drop);
-                }
-            }
-
-            @Override
-            public <DATA> void dischargeAfter(final Pool<DATA> pool, final long delay,
-                    final TimeUnit timeUnit, final DATA drop) {
-
-                pool.discharge(drop);
-            }
-
-            @Override
-            public <DATA> void dischargeAfter(final Pool<DATA> pool, final long delay,
-                    final TimeUnit timeUnit, final Iterable<? extends DATA> drops) {
-
-                for (final DATA drop : drops) {
-
-                    pool.discharge(drop);
-                }
-            }
-
-            @Override
-            public void flush(final Pool<?> pool) {
-
-                pool.flush();
-            }
-
-            @Override
-            public void pull(final Pool<?> pool, final Object debris) {
-
-                pool.pull(debris);
-            }
-
-            @Override
-            public void push(final Pool<?> pool, final Object debris) {
-
-                pool.push(debris);
-            }
-        };
+        final Flow flow = Flows.straightFlow();
 
         assertThat(Basin.collect(
                 WaterfallArray.formingFrom(Waterfall.fallingFrom(new OpenDam<Integer>()))
                               .thenSplittingIn(2)
-                              .thenFlowingInto(FlowFactories.singletonFlowFactory(testFlow))
-                              .thenFlowingThrough(new AbstractBarrage<Integer, Integer>() {
+                              .thenFlowingInto(FlowFactories.singletonFlowFactory(flow))
+                              .thenBalancedBy(new AbstractArrayBalancer<Integer>() {
 
                                   @Override
-                                  public Object onDischarge(final int streamNumber,
-                                          final Floodgate<Integer, Integer> gate,
-                                          final Integer drop) {
+                                  public int chooseDataStream(final Integer drop,
+                                          final int streamCount) {
 
-                                      if ((drop % 2) == streamNumber) {
-
-                                          gate.discharge(drop);
-                                      }
-
-                                      return null;
+                                      return (drop % 2);
                                   }
                               }).thenMerging()
         ).thenFeedWith(1, 2, 3).collectOutput()).contains(1, 2, 3);
         assertThat(Basin.collect(
                 WaterfallArray.formingFrom(Waterfall.fallingFrom(new OpenDam<Integer>()))
                               .thenSplittingIn(2)
-                              .thenFlowingThrough(new AbstractBarrage<Integer, Integer>() {
+                              .thenBalancedBy(new AbstractArrayBalancer<Integer>() {
 
                                   @Override
-                                  public Object onDischarge(final int streamNumber,
-                                          final Floodgate<Integer, Integer> gate,
-                                          final Integer drop) {
+                                  public int chooseDataStream(final Integer drop,
+                                          final int streamCount) {
 
-                                      if ((drop % 2) == streamNumber) {
-
-                                          gate.discharge(drop);
-                                      }
-
-                                      return null;
+                                      return (drop % 2);
                                   }
-                              }).thenFlowingInto(FlowFactories.singletonFlowFactory(testFlow))
+                              }).thenFlowingInto(FlowFactories.singletonFlowFactory(flow))
                               .thenMerging()
         ).thenFeedWith(1, 2, 3).collectOutput()).contains(1, 2, 3);
     }

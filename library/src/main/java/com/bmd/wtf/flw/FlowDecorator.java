@@ -43,12 +43,6 @@ public class FlowDecorator implements Flow {
     }
 
     @Override
-    public <DATA> void discharge(final Pool<DATA> pool, final Iterable<? extends DATA> drops) {
-
-        mFlow.discharge(pool, drops);
-    }
-
-    @Override
     public <DATA> void dischargeAfter(final Pool<DATA> pool, final long delay,
             final TimeUnit timeUnit, final DATA drop) {
 

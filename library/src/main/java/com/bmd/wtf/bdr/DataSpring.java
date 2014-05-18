@@ -46,7 +46,10 @@ class DataSpring<DATA> implements Spring<DATA> {
 
         if (drops != null) {
 
-            mOutStream.discharge(Arrays.asList(drops));
+            for (final DATA drop : drops) {
+
+                mOutStream.discharge(drop);
+            }
         }
 
         return this;
@@ -57,7 +60,10 @@ class DataSpring<DATA> implements Spring<DATA> {
 
         if (drops != null) {
 
-            mOutStream.discharge(drops);
+            for (final DATA drop : drops) {
+
+                mOutStream.discharge(drop);
+            }
         }
 
         return this;

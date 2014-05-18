@@ -42,15 +42,6 @@ public class StraightFlow implements Flow {
     }
 
     @Override
-    public <DATA> void discharge(final Pool<DATA> pool, final Iterable<? extends DATA> drops) {
-
-        for (final DATA drop : drops) {
-
-            pool.discharge(drop);
-        }
-    }
-
-    @Override
     public <DATA> void dischargeAfter(final Pool<DATA> pool, final long delay,
             final TimeUnit timeUnit, final DATA drop) {
 

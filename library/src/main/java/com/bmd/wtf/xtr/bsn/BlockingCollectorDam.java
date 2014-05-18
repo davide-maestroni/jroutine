@@ -26,6 +26,8 @@ import java.util.concurrent.locks.ReentrantLock;
  * Implementation of a {@link com.bmd.wtf.dam.CollectorDam} which can block waiting for the data
  * to flow down asynchronously.
  * <p/>
+ * The dam will wait for a flush in order to know that data have complete.
+ * <p/>
  * Created by davide on 4/11/14.
  *
  * @param <DATA> The data type.
@@ -46,7 +48,8 @@ class BlockingCollectorDam<DATA> extends CollectorDam<DATA> {
 
     private RuntimeException mTimeoutException;
 
-    private long mTimeoutMs;
+    // No timeout by default
+    private long mTimeoutMs = -1;
 
     public BlockingCollectorDam() {
 
@@ -192,6 +195,20 @@ class BlockingCollectorDam<DATA> extends CollectorDam<DATA> {
     }
 
     /**
+     * Sets an indefinite timeout to wait for data to be collected.
+     */
+    public void setNoTimeout() {
+
+        final ReentrantLock lock = mLock;
+
+        lock.lock();
+
+        mTimeoutMs = -1;
+
+        lock.unlock();
+    }
+
+    /**
      * Sets the timeout to wait for data to be fully collected.
      *
      * @param maxDelay The maximum delay in <code>timeUnit</code> time units.
@@ -209,8 +226,9 @@ class BlockingCollectorDam<DATA> extends CollectorDam<DATA> {
     }
 
     /**
-     * Sets the exception to be thrown in case the timeout elapsed before all the data has been
-     * collected. If <code>null</code> no exception will be thrown.
+     * Sets the exception to be thrown in case the timeout elapsed before all the data have been
+     * collected.<br/>
+     * If <code>null</code> no exception will be thrown.
      *
      * @param exception The exception to be thrown.
      */

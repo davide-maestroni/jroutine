@@ -364,7 +364,7 @@ public class BasinTest extends TestCase {
 
                                                }
                 )
-        ).afterMax(2, TimeUnit.SECONDS).throwTimeoutException(new UnsupportedOperationException());
+        ).afterMax(2, TimeUnit.SECONDS).throwIfTimeout(new UnsupportedOperationException());
         assertThat(basin1.thenFeedWith("1", "ciao", "2", "5").collectFirstOutput()).isEqualTo(8);
         assertThat(basin1.collectFirstPushedDebris())
                 .isExactlyInstanceOf(NumberFormatException.class);
@@ -500,7 +500,7 @@ public class BasinTest extends TestCase {
         basin1.collectPulledDebrisInto(debris);
         assertThat(debris).isEmpty();
 
-        basin1.throwTimeoutException(new UnsupportedOperationException());
+        basin1.throwIfTimeout(new UnsupportedOperationException());
 
         try {
 

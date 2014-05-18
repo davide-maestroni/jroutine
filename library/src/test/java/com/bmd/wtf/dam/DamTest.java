@@ -542,7 +542,8 @@ public class DamTest extends TestCase {
                                                                            if ((debris instanceof Throwable)
                                                                                    && "pull1"
                                                                                    .equals(((Throwable) debris)
-                                                                                                   .getMessage())) {
+                                                                                                   .getMessage()
+                                                                                   )) {
 
                                                                                throw new IllegalArgumentException(
                                                                                        "pull1");
@@ -559,7 +560,8 @@ public class DamTest extends TestCase {
                                                                            if ((debris instanceof Throwable)
                                                                                    && "push1"
                                                                                    .equals(((Throwable) debris)
-                                                                                                   .getMessage())) {
+                                                                                                   .getMessage()
+                                                                                   )) {
 
                                                                                throw new IllegalArgumentException(
                                                                                        "push1");
@@ -641,7 +643,8 @@ public class DamTest extends TestCase {
                                                                            if ((debris instanceof Throwable)
                                                                                    && "push2"
                                                                                    .equals(((Throwable) debris)
-                                                                                                   .getMessage())) {
+                                                                                                   .getMessage()
+                                                                                   )) {
 
                                                                                throw new IllegalArgumentException(
                                                                                        "push2");
@@ -841,7 +844,8 @@ public class DamTest extends TestCase {
                                                                                  if ((debris instanceof Throwable)
                                                                                          && "pull1"
                                                                                          .equals(((Throwable) debris)
-                                                                                                         .getMessage())) {
+                                                                                                         .getMessage()
+                                                                                         )) {
 
                                                                                      throw new IllegalArgumentException(
                                                                                              "pull1");
@@ -858,7 +862,8 @@ public class DamTest extends TestCase {
                                                                                  if ((debris instanceof Throwable)
                                                                                          && "push1"
                                                                                          .equals(((Throwable) debris)
-                                                                                                         .getMessage())) {
+                                                                                                         .getMessage()
+                                                                                         )) {
 
                                                                                      throw new IllegalArgumentException(
                                                                                              "push1");
@@ -944,7 +949,8 @@ public class DamTest extends TestCase {
                                                                                  if ((debris instanceof Throwable)
                                                                                          && "push2"
                                                                                          .equals(((Throwable) debris)
-                                                                                                         .getMessage())) {
+                                                                                                         .getMessage()
+                                                                                         )) {
 
                                                                                      throw new IllegalArgumentException(
                                                                                              "push2");

@@ -13,10 +13,12 @@
  */
 package com.bmd.wtf.xtr.arr;
 
+import com.bmd.wtf.Waterfall;
 import com.bmd.wtf.bdr.DuplicateDamException;
 import com.bmd.wtf.bdr.Stream;
 import com.bmd.wtf.dam.Dam;
 import com.bmd.wtf.flw.Flow;
+import com.bmd.wtf.src.Spring;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -35,6 +37,8 @@ public class StreamArray<SOURCE, IN, OUT> {
 
     private static final WeakHashMap<Barrage<?, ?>, Void> sBarrages =
             new WeakHashMap<Barrage<?, ?>, Void>();
+
+    private final boolean mIsSingleStream;
 
     private final ArrayList<Stream<SOURCE, IN, OUT>> mStreams;
 
@@ -65,6 +69,7 @@ public class StreamArray<SOURCE, IN, OUT> {
         }
 
         mStreams = streams;
+        mIsSingleStream = true;
     }
 
     /**
@@ -90,6 +95,61 @@ public class StreamArray<SOURCE, IN, OUT> {
         }
 
         mStreams = streams;
+        mIsSingleStream = false;
+    }
+
+    /**
+     * Balances the data flows running through this stream array.
+     * <p/>
+     * The balancer is used to indicate into which one of the streams of the array to propagate
+     * the flow of data. If -1 is returned from the balancer, no further propagation will happen.
+     * If the total stream count is returned instead, the data or object will be propagated to
+     * all the streams. All the other out-of-range values will be ignored.
+     *
+     * @param balancer The array balancer.
+     * @return A new stream whose flows are balanced by the specified balancer.
+     */
+    public StreamArray<SOURCE, OUT, OUT> thenBalancedBy(final ArrayBalancer<OUT> balancer) {
+
+        if (balancer == null) {
+
+            throw new IllegalArgumentException("the array balancer cannot be null");
+        }
+
+        final ArrayList<Stream<SOURCE, IN, OUT>> streams = mStreams;
+
+        final int streamsCount = streams.size();
+
+        final ArrayList<Spring<OUT>> springs = new ArrayList<Spring<OUT>>(streamsCount);
+
+        final SpringBalancerDam<OUT> balancerDam =
+                new SpringBalancerDam<OUT>(balancer, streamsCount, springs);
+
+        final Stream<SOURCE, OUT, OUT> balancedStream;
+
+        if (mIsSingleStream) {
+
+            balancedStream = streams.get(0).thenFlowingThrough(balancerDam);
+
+        } else {
+
+            balancedStream = thenMergingThrough(balancerDam);
+        }
+
+        final ArrayList<Stream<SOURCE, OUT, OUT>> outStreams =
+                new ArrayList<Stream<SOURCE, OUT, OUT>>(streamsCount);
+
+        for (int i = 0; i < streamsCount; ++i) {
+
+            final Stream<OUT, OUT, OUT> outStream =
+                    Waterfall.fallingFrom(new DebrisBalancerDam<OUT>(balancer, i));
+
+            springs.add(outStream.backToSource());
+
+            outStreams.add(balancedStream.thenFeeding(outStream));
+        }
+
+        return new StreamArray<SOURCE, OUT, OUT>(outStreams);
     }
 
     /**

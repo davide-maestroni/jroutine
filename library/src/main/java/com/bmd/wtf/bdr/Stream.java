@@ -819,25 +819,6 @@ public class Stream<SOURCE, IN, OUT> {
         }
     }
 
-    void discharge(final Iterable<? extends OUT> drops) {
-
-        final DataPool<OUT, ?> downPool = mDownstreamPool;
-
-        if (mPassThrough) {
-
-            for (final OUT drop : drops) {
-
-                downPool.discharge(drop);
-            }
-
-        } else {
-
-            final Flow inputFlow = downPool.inputFlow;
-
-            inputFlow.discharge(downPool, drops);
-        }
-    }
-
     void dischargeAfter(final long delay, final TimeUnit timeUnit, final OUT drop) {
 
         final DataPool<OUT, ?> pool = mDownstreamPool;

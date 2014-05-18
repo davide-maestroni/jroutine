@@ -55,22 +55,6 @@ class LooperFlow implements Flow {
     }
 
     @Override
-    public <DATA> void discharge(final Pool<DATA> pool, final Iterable<? extends DATA> drops) {
-
-        mHandler.post(new Runnable() {
-
-            @Override
-            public void run() {
-
-                for (final DATA drop : drops) {
-
-                    pool.discharge(drop);
-                }
-            }
-        });
-    }
-
-    @Override
     public <DATA> void dischargeAfter(final Pool<DATA> pool, final long delay,
             final TimeUnit timeUnit, final DATA drop) {
 

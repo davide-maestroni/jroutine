@@ -139,9 +139,8 @@ public class DownloadManagerTest extends TestCase {
 
             fail();
 
-        } catch (final IOException e) {
+        } catch (final IOException ignored) {
 
-            // Ignore it
         }
 
         assertThat(outFile).doesNotExist();
@@ -166,9 +165,8 @@ public class DownloadManagerTest extends TestCase {
 
                 Thread.sleep(100);
 
-            } catch (final InterruptedException e) {
+            } catch (final InterruptedException ignored) {
 
-                // Ignore it
             }
 
             if ((System.currentTimeMillis() - startTime) > timeoutMs) {

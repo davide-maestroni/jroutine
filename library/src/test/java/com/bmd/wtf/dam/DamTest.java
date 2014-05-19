@@ -118,9 +118,8 @@ public class DamTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
     }
 

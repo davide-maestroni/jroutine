@@ -42,9 +42,8 @@ public class DownstreamDebrisDam<IN, OUT> extends DamDecorator<IN, OUT> {
 
             super.onPullDebris(gate, debris);
 
-        } catch (final Throwable t) {
+        } catch (final Throwable ignored) {
 
-            // Ignore it
         }
 
         return null;

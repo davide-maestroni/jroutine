@@ -514,9 +514,8 @@ public class DamBuilderTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -532,9 +531,8 @@ public class DamBuilderTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -550,9 +548,8 @@ public class DamBuilderTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -568,9 +565,8 @@ public class DamBuilderTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -586,9 +582,8 @@ public class DamBuilderTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
     }
 
@@ -949,9 +944,8 @@ public class DamBuilderTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
     }
 
@@ -1301,9 +1295,8 @@ public class DamBuilderTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -1312,9 +1305,8 @@ public class DamBuilderTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
     }
 
@@ -1458,13 +1450,12 @@ public class DamBuilderTest extends TestCase {
 
         try {
 
-            DamBuilders.downstreamDebrisBasedOn((DischargeHandler<Object, Object>) null);
+            DamBuilders.downstreamDebrisBasedOn(null);
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -1473,9 +1464,8 @@ public class DamBuilderTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
     }
 
@@ -1605,13 +1595,12 @@ public class DamBuilderTest extends TestCase {
 
         try {
 
-            DamBuilders.noDebrisBasedOn((DischargeHandler<Object, Object>) null);
+            DamBuilders.noDebrisBasedOn(null);
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -1620,9 +1609,8 @@ public class DamBuilderTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
     }
 
@@ -1766,13 +1754,12 @@ public class DamBuilderTest extends TestCase {
 
         try {
 
-            DamBuilders.upstreamDebrisBasedOn((DischargeHandler<Object, Object>) null);
+            DamBuilders.upstreamDebrisBasedOn(null);
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -1781,9 +1768,8 @@ public class DamBuilderTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
     }
 
@@ -2209,9 +2195,8 @@ public class DamBuilderTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -2220,9 +2205,8 @@ public class DamBuilderTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -2240,9 +2224,8 @@ public class DamBuilderTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -2260,9 +2243,8 @@ public class DamBuilderTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -2280,9 +2262,8 @@ public class DamBuilderTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -2300,9 +2281,8 @@ public class DamBuilderTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
     }
 
@@ -2662,6 +2642,7 @@ public class DamBuilderTest extends TestCase {
         assertThat(weak1).isNotEqualTo(weak3);
         assertThat(weak2).isNotEqualTo(weak3);
 
+        //noinspection UnusedAssignment
         openDam = null;
 
         System.gc();
@@ -2921,7 +2902,9 @@ public class DamBuilderTest extends TestCase {
         assertThat(basin2.collectFirstPushedDebris()).isNull();
         assertThat(basin2.collectPulledDebris()).isEmpty();
 
+        //noinspection UnusedAssignment
         dam1 = null;
+        //noinspection UnusedAssignment
         dam2 = null;
 
         System.gc();

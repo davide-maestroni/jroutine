@@ -44,6 +44,28 @@ public class Stream<SOURCE, IN, OUT> {
 
     private final DataPool<OUT, ?> mDownstreamPool;
 
+    private static final WaterfallVisitor IDLE_WAIT_VISITOR = new WaterfallVisitor() {
+
+        @Override
+        public boolean stopVisit() {
+
+            return false;
+        }
+
+        @Override
+        public boolean visit(final boolean downstream, final Stream<?, ?, ?> stream) {
+
+            final DataPool<?, ?> pool = stream.mDownstreamPool;
+
+            if (pool != null) {
+
+                pool.waitIdle();
+            }
+
+            return true;
+        }
+    };
+
     private final Current mOutCurrent;
 
     private final boolean mPassThrough;
@@ -322,7 +344,9 @@ public class Stream<SOURCE, IN, OUT> {
      * <pre>
      *     <code>
      *
-     *         -()-a1-(DAM)-r1-
+     *         -()-a1-
+     *           \
+     *           (DAM)-r1-
      *
      *     </code>
      * </pre>
@@ -551,11 +575,13 @@ public class Stream<SOURCE, IN, OUT> {
      * <pre>
      *     <code>
      *
-     *         -()-a1-(=========)-r1-
-     *                /        /
-     *         ------()-b2-   /
-     *                       /
-     *         -------------()-*2-
+     *         -()-a1-
+     *           \
+     *           (=========)-r1-
+     *           /        /
+     *         -()-b2-   /
+     *                  /
+     *         --------()-*2-
      *
      *     </code>
      * </pre>
@@ -593,11 +619,13 @@ public class Stream<SOURCE, IN, OUT> {
      * <pre>
      *     <code>
      *
-     *         -()-a1-(=========)-r1-
-     *                /        /
-     *         ------()-b2-   /
-     *                       /
-     *         -------------()-*2-
+     *         -()-a1-
+     *           \
+     *           (=========)-r1-
+     *           /        /
+     *         -()-b2-   /
+     *                  /
+     *         --------()-*2-
      *
      *     </code>
      * </pre>
@@ -633,11 +661,13 @@ public class Stream<SOURCE, IN, OUT> {
      * <pre>
      *     <code>
      *
-     *         -()-a1-(===DAM===)-r1-
-     *                /        /
-     *         ------()-b2-   /
-     *                       /
-     *         -------------()-*2-
+     *         -()-a1-
+     *           \
+     *           (===DAM===)-r1-
+     *           /        /
+     *         -()-b2-   /
+     *                  /
+     *         --------()-*2-
      *
      *     </code>
      * </pre>
@@ -699,11 +729,13 @@ public class Stream<SOURCE, IN, OUT> {
      * <pre>
      *     <code>
      *
-     *         -()-a1-(===DAM===)-r1-
-     *                /        /
-     *         ------()-b2-   /
-     *                       /
-     *         -------------()-*2-
+     *         -()-a1-
+     *           \
+     *           (===DAM===)-r1-
+     *           /        /
+     *         -()-b2-   /
+     *                  /
+     *         --------()-*2-
      *
      *     </code>
      * </pre>
@@ -763,9 +795,11 @@ public class Stream<SOURCE, IN, OUT> {
      * <pre>
      *     <code>
      *
-     *         -()-a1-(DAM)-r1-
-     *                /
-     *         ------()-b2-
+     *         -()-a1-
+     *           \
+     *           (DAM)-r1-
+     *           /
+     *         -()-b2-
      *
      *     </code>
      * </pre>
@@ -805,23 +839,27 @@ public class Stream<SOURCE, IN, OUT> {
 
     void discharge(final OUT drop) {
 
-        final DataPool<OUT, ?> downPool = mDownstreamPool;
+        final DataPool<OUT, ?> pool = mDownstreamPool;
+
+        pool.incrementIdleCount(1);
 
         if (mPassThrough) {
 
-            downPool.discharge(drop);
+            pool.discharge(drop);
 
         } else {
 
-            final Current inputCurrent = downPool.inputCurrent;
+            final Current inputCurrent = pool.inputCurrent;
 
-            inputCurrent.discharge(downPool, drop);
+            inputCurrent.discharge(pool, drop);
         }
     }
 
     void dischargeAfter(final long delay, final TimeUnit timeUnit, final OUT drop) {
 
         final DataPool<OUT, ?> pool = mDownstreamPool;
+
+        pool.incrementIdleCount(1);
 
         pool.inputCurrent.dischargeAfter(pool, delay, timeUnit, drop);
     }
@@ -830,6 +868,15 @@ public class Stream<SOURCE, IN, OUT> {
             final Iterable<? extends OUT> drops) {
 
         final DataPool<OUT, ?> pool = mDownstreamPool;
+
+        int size = 0;
+
+        for (final OUT ignored : drops) {
+
+            ++size;
+        }
+
+        pool.incrementIdleCount(size);
 
         pool.inputCurrent.dischargeAfter(pool, delay, timeUnit, drops);
     }
@@ -845,73 +892,67 @@ public class Stream<SOURCE, IN, OUT> {
 
     void flush() {
 
-        final DataPool<OUT, ?> downPool = mDownstreamPool;
+        final DataPool<OUT, ?> pool = mDownstreamPool;
 
         if (mPassThrough) {
 
-            downPool.flush();
+            pool.flush();
 
         } else {
 
-            final Current inputCurrent = downPool.inputCurrent;
+            final Current inputCurrent = pool.inputCurrent;
 
-            inputCurrent.flush(downPool);
+            inputCurrent.flush(pool);
         }
     }
 
     void pull(final Object debris) {
 
-        final DataPool<IN, OUT> upPool = mUpstreamPool;
+        final DataPool<IN, OUT> pool = mUpstreamPool;
 
-        if (upPool != null) {
+        if (pool != null) {
+
+            pool.incrementIdleCount(1);
 
             if (mPassThrough) {
 
-                upPool.pull(debris);
+                pool.pull(debris);
 
             } else {
 
-                final Current inputCurrent = upPool.inputCurrent;
+                final Current inputCurrent = pool.inputCurrent;
 
-                inputCurrent.pull(upPool, debris);
+                inputCurrent.pull(pool, debris);
             }
         }
     }
 
     void push(final Object debris) {
 
-        final DataPool<OUT, ?> downPool = mDownstreamPool;
+        final DataPool<OUT, ?> pool = mDownstreamPool;
+
+        pool.incrementIdleCount(1);
 
         if (mPassThrough) {
 
-            downPool.push(debris);
+            pool.push(debris);
 
         } else {
 
-            final Current inputCurrent = downPool.inputCurrent;
+            final Current inputCurrent = pool.inputCurrent;
 
-            inputCurrent.push(downPool, debris);
+            inputCurrent.push(pool, debris);
         }
+    }
+
+    void waitForIdle() {
+
+        ride(true, IDLE_WAIT_VISITOR);
     }
 
     private boolean canReach(final Stream<?, ?, ?> targetStream) {
 
-        final DataPool<?, ?> upstreamPool = targetStream.mUpstreamPool;
-
-        final WaterfallVisitor visitor = new WaterfallVisitor() {
-
-            @Override
-            public boolean stopVisit() {
-
-                return true;
-            }
-
-            @Override
-            public boolean visit(final boolean downstream, final Stream<?, ?, ?> stream) {
-
-                return upstreamPool != stream.mDownstreamPool;
-            }
-        };
+        final ReachabilityVisitor visitor = new ReachabilityVisitor(targetStream);
 
         return !ride(true, visitor) || !ride(false, visitor);
     }
@@ -1101,6 +1142,32 @@ public class Stream<SOURCE, IN, OUT> {
 
             return (stream.mUpstreamPool == null) || (stream.mUpstreamPool.outputStreams.size()
                     < 2);
+        }
+    }
+
+    /**
+     * Implementation of a {@link WaterfallVisitor} used to verify whether a target stream is
+     * reachable.
+     */
+    private static class ReachabilityVisitor implements WaterfallVisitor {
+
+        private final DataPool<?, ?> mUpstreamPool;
+
+        public ReachabilityVisitor(final Stream<?, ?, ?> targetStream) {
+
+            mUpstreamPool = targetStream.mUpstreamPool;
+        }
+
+        @Override
+        public boolean stopVisit() {
+
+            return true;
+        }
+
+        @Override
+        public boolean visit(final boolean downstream, final Stream<?, ?, ?> stream) {
+
+            return mUpstreamPool != stream.mDownstreamPool;
         }
     }
 }

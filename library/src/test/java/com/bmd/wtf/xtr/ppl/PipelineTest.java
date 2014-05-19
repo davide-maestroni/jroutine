@@ -43,9 +43,8 @@ public class PipelineTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -54,9 +53,8 @@ public class PipelineTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -65,9 +63,8 @@ public class PipelineTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -86,9 +83,8 @@ public class PipelineTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
     }
 
@@ -124,7 +120,7 @@ public class PipelineTest extends TestCase {
 
                                                spring.discharge(Integer.parseInt(drop));
 
-                                           } catch (InterruptedException e) {
+                                           } catch (final InterruptedException e) {
 
                                                Thread.currentThread().interrupt();
                                            }

@@ -42,9 +42,8 @@ public class NoDebrisDam<IN, OUT> extends DamDecorator<IN, OUT> {
 
             super.onDischarge(gate, drop);
 
-        } catch (final Throwable t) {
+        } catch (final Throwable ignored) {
 
-            // Ignore it
         }
 
         return null;
@@ -57,9 +56,8 @@ public class NoDebrisDam<IN, OUT> extends DamDecorator<IN, OUT> {
 
             super.onFlush(gate);
 
-        } catch (final Throwable t) {
+        } catch (final Throwable ignored) {
 
-            // Ignore it
         }
 
         return null;
@@ -72,9 +70,8 @@ public class NoDebrisDam<IN, OUT> extends DamDecorator<IN, OUT> {
 
             super.onPullDebris(gate, debris);
 
-        } catch (final Throwable t) {
+        } catch (final Throwable ignored) {
 
-            // Ignore it
         }
 
         return null;
@@ -87,9 +84,8 @@ public class NoDebrisDam<IN, OUT> extends DamDecorator<IN, OUT> {
 
             super.onPushDebris(gate, debris);
 
-        } catch (final Throwable t) {
+        } catch (final Throwable ignored) {
 
-            // Ignore it
         }
 
         return null;

@@ -119,9 +119,8 @@ public class StreamTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -130,9 +129,8 @@ public class StreamTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -143,9 +141,8 @@ public class StreamTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -156,9 +153,8 @@ public class StreamTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -169,9 +165,8 @@ public class StreamTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -182,9 +177,8 @@ public class StreamTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -195,9 +189,8 @@ public class StreamTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -211,9 +204,8 @@ public class StreamTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -227,9 +219,8 @@ public class StreamTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -240,9 +231,8 @@ public class StreamTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -256,9 +246,8 @@ public class StreamTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -269,9 +258,8 @@ public class StreamTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -285,9 +273,8 @@ public class StreamTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -298,9 +285,8 @@ public class StreamTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -311,9 +297,8 @@ public class StreamTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -324,9 +309,8 @@ public class StreamTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         final boolean[] fail = new boolean[1];
@@ -520,6 +504,7 @@ public class StreamTest extends TestCase {
 
                             if (iterable.iterator().next() instanceof Integer) {
 
+                                //noinspection unchecked
                                 gate.dischargeAfter(100, TimeUnit.MILLISECONDS,
                                                     (Iterable<Integer>) drop);
 
@@ -820,7 +805,7 @@ public class StreamTest extends TestCase {
         stream2.backToSource().discharge(5);
         assertThat(basin2.collectOutput()).containsExactly(5, 5, 5);
 
-        final Basin<Integer, Integer> basin3 =
+        @SuppressWarnings("unchecked") final Basin<Integer, Integer> basin3 =
                 Basin.collect(stream1.thenMerging(Arrays.asList(stream1, stream2, stream3)));
 
         stream1.backToSource().discharge(5);

@@ -110,6 +110,7 @@ class DataSpring<DATA> implements Spring<DATA> {
     @Override
     public void flush() {
 
+        mOutStream.waitForIdle();
         mOutStream.flush();
     }
 

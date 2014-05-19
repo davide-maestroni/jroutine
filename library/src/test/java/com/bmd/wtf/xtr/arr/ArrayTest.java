@@ -216,6 +216,7 @@ public class ArrayTest extends TestCase {
         final Stream<Integer, Integer, Integer> stream2 = Waterfall.fallingFrom(dam2);
         final Stream<Integer, Integer, Integer> stream3 = Waterfall.fallingFrom(dam3);
 
+        //noinspection unchecked
         final Basin<Integer, Integer> basin1 = Basin.collect(
                 WaterfallArray.formingFrom(stream1, stream2, stream3, stream2)
                               .thenMergingInto(Currents.straightCurrent())
@@ -223,6 +224,7 @@ public class ArrayTest extends TestCase {
         Basin.collect(stream1, stream2, stream3).thenFeedWith(1);
         assertThat(basin1.collectOutput()).containsExactly(1, 1, 1);
 
+        //noinspection unchecked
         final Basin<Integer, Integer> basin2 = Basin.collect(
                 WaterfallArray.formingFrom(Arrays.asList(stream1, stream2, stream3, stream1))
                               .thenMergingInto(Currents.straightCurrent())
@@ -239,42 +241,41 @@ public class ArrayTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
 
+            //noinspection unchecked
             WaterfallArray.formingFrom((Stream<Object, Object, Object>[]) null);
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
 
+            //noinspection unchecked
             WaterfallArray.formingFrom();
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
 
+            //noinspection unchecked
             WaterfallArray.formingFrom(Waterfall.fallingFrom(Dams.openDam()), null);
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -283,9 +284,8 @@ public class ArrayTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -294,25 +294,25 @@ public class ArrayTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
 
+            //noinspection MismatchedQueryAndUpdateOfCollection
             final ArrayList<Stream<Object, Object, Object>> streams =
                     new ArrayList<Stream<Object, Object, Object>>();
             streams.add(null);
             streams.add(Waterfall.fallingFrom(Dams.openDam()));
 
+            //noinspection unchecked
             WaterfallArray.formingFrom();
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -321,9 +321,8 @@ public class ArrayTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -332,9 +331,8 @@ public class ArrayTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -344,9 +342,8 @@ public class ArrayTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -356,9 +353,8 @@ public class ArrayTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -368,9 +364,8 @@ public class ArrayTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -380,9 +375,8 @@ public class ArrayTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -392,9 +386,8 @@ public class ArrayTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -435,9 +428,8 @@ public class ArrayTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
     }
 

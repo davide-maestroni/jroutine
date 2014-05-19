@@ -19,6 +19,9 @@ import com.bmd.wtf.src.Pool;
 
 import java.util.WeakHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Instances of this class implement {@link com.bmd.wtf.src.Pool}s by managing internally
@@ -46,9 +49,15 @@ class DataPool<IN, OUT> implements Pool<IN> {
     final CopyOnWriteArraySet<Stream<?, IN, OUT>> outputStreams =
             new CopyOnWriteArraySet<Stream<?, IN, OUT>>();
 
+    private final Condition mCondition;
+
     private final Dam<IN, OUT> mDam;
 
     private final DataFloodgate<IN, OUT> mGate;
+
+    private final ReentrantLock mLock = new ReentrantLock();
+
+    private int mIdleCount;
 
     public DataPool(final Current inputCurrent, final Dam<IN, OUT> dam) {
 
@@ -71,6 +80,7 @@ class DataPool<IN, OUT> implements Pool<IN> {
 
         this.inputCurrent = inputCurrent;
         mDam = dam;
+        mCondition = mLock.newCondition();
         mGate = new DataFloodgate<IN, OUT>(this);
     }
 
@@ -102,6 +112,8 @@ class DataPool<IN, OUT> implements Pool<IN> {
         } finally {
 
             gate.close();
+
+            decrementIdleCount();
         }
     }
 
@@ -133,6 +145,8 @@ class DataPool<IN, OUT> implements Pool<IN> {
         } finally {
 
             gate.close();
+
+            decrementIdleCount();
         }
     }
 
@@ -164,6 +178,8 @@ class DataPool<IN, OUT> implements Pool<IN> {
         } finally {
 
             gate.close();
+
+            decrementIdleCount();
         }
     }
 
@@ -195,6 +211,113 @@ class DataPool<IN, OUT> implements Pool<IN> {
         } finally {
 
             gate.close();
+
+            decrementIdleCount();
+        }
+    }
+
+    void incrementIdleCount(final int count) {
+
+        final ReentrantLock lock = mLock;
+
+        lock.lock();
+
+        try {
+
+            mIdleCount += count;
+
+        } finally {
+
+            lock.unlock();
+        }
+    }
+
+    void waitIdle(final long timeout, TimeUnit timeUnit, final RuntimeException exception) {
+
+        boolean isTimeout = false;
+
+        final ReentrantLock lock = mLock;
+
+        lock.lock();
+
+        try {
+
+            if (mIdleCount <= 0) {
+
+                return;
+            }
+
+            long currentTimeout = timeUnit.toMillis(timeout);
+
+            final long startTime = System.currentTimeMillis();
+
+            final long endTime = startTime + currentTimeout;
+
+            do {
+
+                if (currentTimeout >= 0) {
+
+                    mCondition.await(currentTimeout, TimeUnit.MILLISECONDS);
+
+                    currentTimeout = endTime - System.currentTimeMillis();
+
+                    if (mIdleCount > 0) {
+
+                        isTimeout = true;
+
+                        break;
+                    }
+
+                } else {
+
+                    mCondition.await();
+                }
+
+            } while (mIdleCount > 0);
+
+        } catch (final InterruptedException e) {
+
+            Thread.currentThread().interrupt();
+
+            throw new DelayInterruptedException(e);
+
+        } finally {
+
+            if (!isTimeout) {
+
+                mIdleCount = 0;
+            }
+
+            lock.unlock();
+        }
+
+        if (isTimeout && (exception != null)) {
+
+            throw exception;
+        }
+    }
+
+    void waitIdle() {
+
+        waitIdle(-1, TimeUnit.MILLISECONDS, null);
+    }
+
+    private void decrementIdleCount() {
+
+        final ReentrantLock lock = mLock;
+
+        lock.lock();
+
+        try {
+
+            if (--mIdleCount <= 0) {
+
+                mCondition.signalAll();
+            }
+
+        } finally {
+
+            lock.unlock();
         }
     }
 }

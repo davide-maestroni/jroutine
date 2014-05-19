@@ -125,6 +125,7 @@ public class BasinTest extends TestCase {
 
         assertThat(Basin.collect(stream1, stream2, stream3, stream1).thenFeedWith("test")
                         .collectOutput()).containsExactly("test", "test", "test");
+        //noinspection unchecked
         assertThat(Basin.collect(Arrays.asList(stream1, stream2, stream3, stream2))
                         .thenFeedWith("test").collectOutput())
                 .containsExactly("test", "test", "test");
@@ -138,9 +139,8 @@ public class BasinTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -149,20 +149,19 @@ public class BasinTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
 
+            //noinspection unchecked
             Basin.collect(new Stream[0]);
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -171,9 +170,8 @@ public class BasinTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
     }
 
@@ -421,6 +419,7 @@ public class BasinTest extends TestCase {
         assertThat(BlockingBasin.collect(stream1, stream2, stream3, stream1).thenFeedWith("test")
                                 .collectOutput()
         ).containsExactly("test", "test", "test");
+        //noinspection unchecked
         assertThat(BlockingBasin.collect(Arrays.asList(stream1, stream2, stream3, stream2))
                                 .thenFeedWith("test").collectOutput())
                 .containsExactly("test", "test", "test");
@@ -434,9 +433,8 @@ public class BasinTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -445,20 +443,19 @@ public class BasinTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
 
+            //noinspection unchecked
             BlockingBasin.collect(new Stream[0]);
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -467,9 +464,8 @@ public class BasinTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         final Dam<Integer, Integer> closed = Dams.closedDam();
@@ -508,9 +504,8 @@ public class BasinTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -519,9 +514,8 @@ public class BasinTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -530,9 +524,8 @@ public class BasinTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -541,9 +534,8 @@ public class BasinTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -552,9 +544,8 @@ public class BasinTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
 
         try {
@@ -563,9 +554,8 @@ public class BasinTest extends TestCase {
 
             fail();
 
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
 
-            // Ignore it
         }
     }
 }

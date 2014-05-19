@@ -60,9 +60,8 @@ public class DownloadUtils {
 
                 inputStream.close();
 
-            } catch (final IOException e) {
+            } catch (final IOException ignored) {
 
-                // ignore it
             }
         }
     }
@@ -80,9 +79,8 @@ public class DownloadUtils {
 
                 outputStream.close();
 
-            } catch (final IOException e) {
+            } catch (final IOException ignored) {
 
-                // ignore it
             }
         }
     }

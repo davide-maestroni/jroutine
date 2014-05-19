@@ -61,9 +61,8 @@ public class CollectorDam<DATA> extends OpenDam<DATA> {
 
             return mDrops.remove(0);
 
-        } catch (final IndexOutOfBoundsException e) {
+        } catch (final IndexOutOfBoundsException ignored) {
 
-            // Ignore it
         }
 
         return null;
@@ -81,9 +80,8 @@ public class CollectorDam<DATA> extends OpenDam<DATA> {
 
             return mPulledDebris.remove(0);
 
-        } catch (final IndexOutOfBoundsException e) {
+        } catch (final IndexOutOfBoundsException ignored) {
 
-            // Ignore it
         }
 
         return null;
@@ -101,9 +99,8 @@ public class CollectorDam<DATA> extends OpenDam<DATA> {
 
             return mPushedDebris.remove(0);
 
-        } catch (final IndexOutOfBoundsException e) {
+        } catch (final IndexOutOfBoundsException ignored) {
 
-            // Ignore it
         }
 
         return null;

@@ -21,6 +21,8 @@ import com.bmd.wtf.dam.Dam;
 import com.bmd.wtf.src.Spring;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.WeakHashMap;
 
@@ -99,6 +101,16 @@ public class StreamArray<SOURCE, IN, OUT> {
     }
 
     /**
+     * Returns an immutable list of the streams composing this array.
+     *
+     * @return The list of streams.
+     */
+    public List<Stream<SOURCE, IN, OUT>> streams() {
+
+        return Collections.unmodifiableList(mStreams);
+    }
+
+    /**
      * Balances the data flows running through this stream array.
      * <p/>
      * The balancer is used to indicate into which one of the streams of the array to propagate
@@ -174,29 +186,6 @@ public class StreamArray<SOURCE, IN, OUT> {
     }
 
     /**
-     * Makes this stream array flow through the dams created by the specified factory.
-     *
-     * @param factory The dam factory.
-     * @param <NOUT>  The output data type.
-     * @return A new stream array flowing from the dams.
-     */
-    public <NOUT> StreamArray<SOURCE, OUT, NOUT> thenFlowingThrough(
-            final DamFactory<OUT, NOUT> factory) {
-
-        final ArrayList<Stream<SOURCE, OUT, NOUT>> streams =
-                new ArrayList<Stream<SOURCE, OUT, NOUT>>(mStreams.size());
-
-        int n = 0;
-
-        for (final Stream<SOURCE, IN, OUT> stream : mStreams) {
-
-            streams.add(stream.thenFlowingThrough(factory.createForStream(n++)));
-        }
-
-        return new StreamArray<SOURCE, OUT, NOUT>(streams);
-    }
-
-    /**
      * Makes this stream array flow through the specified barrage.
      *
      * @param barrage The barrage instance.
@@ -229,6 +218,29 @@ public class StreamArray<SOURCE, IN, OUT> {
         for (final Stream<SOURCE, IN, OUT> stream : mStreams) {
 
             streams.add(stream.thenFlowingThrough(new BarrageDam<OUT, NOUT>(mutex, n++, barrage)));
+        }
+
+        return new StreamArray<SOURCE, OUT, NOUT>(streams);
+    }
+
+    /**
+     * Makes this stream array flow through the dams created by the specified factory.
+     *
+     * @param factory The dam factory.
+     * @param <NOUT>  The output data type.
+     * @return A new stream array flowing from the dams.
+     */
+    public <NOUT> StreamArray<SOURCE, OUT, NOUT> thenFlowingThrough(
+            final DamFactory<OUT, NOUT> factory) {
+
+        final ArrayList<Stream<SOURCE, OUT, NOUT>> streams =
+                new ArrayList<Stream<SOURCE, OUT, NOUT>>(mStreams.size());
+
+        int n = 0;
+
+        for (final Stream<SOURCE, IN, OUT> stream : mStreams) {
+
+            streams.add(stream.thenFlowingThrough(factory.createForStream(n++)));
         }
 
         return new StreamArray<SOURCE, OUT, NOUT>(streams);

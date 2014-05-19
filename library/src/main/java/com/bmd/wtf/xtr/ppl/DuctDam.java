@@ -66,6 +66,7 @@ class DuctDam<IN, OUT> implements Dam<IN, OUT> {
 
             return true;
         }
+
         if (!(o instanceof DuctDam)) {
 
             return false;

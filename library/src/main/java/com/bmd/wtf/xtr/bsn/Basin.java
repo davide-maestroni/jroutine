@@ -131,6 +131,182 @@ public class Basin<IN, OUT> {
     }
 
     /**
+     * Feeds the specified basin by discharging the passed partial data drops into the originating
+     * springs.
+     *
+     * @param basin The basin instance.
+     * @param drops The data drops to discharge.
+     * @return The passed basin.
+     */
+    public static <OUT, BASIN extends Basin<Byte, OUT>> BASIN partiallyFeed(final BASIN basin,
+            final byte... drops) {
+
+        if (drops != null) {
+
+            for (final byte drop : drops) {
+
+                basin.thenPartiallyFeedWith(drop);
+            }
+        }
+
+        return basin;
+    }
+
+    /**
+     * Feeds the specified basin by discharging the passed partial data drops into the originating
+     * springs.
+     *
+     * @param basin The basin instance.
+     * @param drops The data drops to discharge.
+     * @return The passed basin.
+     */
+    public static <OUT, BASIN extends Basin<Character, OUT>> BASIN partiallyFeed(final BASIN basin,
+            final char... drops) {
+
+        if (drops != null) {
+
+            for (final char drop : drops) {
+
+                basin.thenPartiallyFeedWith(drop);
+            }
+        }
+
+        return basin;
+    }
+
+    /**
+     * Feeds the specified basin by discharging the passed partial data drops into the originating
+     * springs.
+     *
+     * @param basin The basin instance.
+     * @param drops The data drops to discharge.
+     * @return The passed basin.
+     */
+    public static <OUT, BASIN extends Basin<Boolean, OUT>> BASIN partiallyFeed(final BASIN basin,
+            final boolean... drops) {
+
+        if (drops != null) {
+
+            for (final boolean drop : drops) {
+
+                basin.thenPartiallyFeedWith(drop);
+            }
+        }
+
+        return basin;
+    }
+
+    /**
+     * Feeds the specified basin by discharging the passed partial data drops into the originating
+     * springs.
+     *
+     * @param basin The basin instance.
+     * @param drops The data drops to discharge.
+     * @return The passed basin.
+     */
+    public static <OUT, BASIN extends Basin<Short, OUT>> BASIN partiallyFeed(final BASIN basin,
+            final short... drops) {
+
+        if (drops != null) {
+
+            for (final short drop : drops) {
+
+                basin.thenPartiallyFeedWith(drop);
+            }
+        }
+
+        return basin;
+    }
+
+    /**
+     * Feeds the specified basin by discharging the passed partial data drops into the originating
+     * springs.
+     *
+     * @param basin The basin instance.
+     * @param drops The data drops to discharge.
+     * @return The passed basin.
+     */
+    public static <OUT, BASIN extends Basin<Integer, OUT>> BASIN partiallyFeed(final BASIN basin,
+            final int... drops) {
+
+        if (drops != null) {
+
+            for (final int drop : drops) {
+
+                basin.thenPartiallyFeedWith(drop);
+            }
+        }
+
+        return basin;
+    }
+
+    /**
+     * Feeds the specified basin by discharging the passed partial data drops into the originating
+     * springs.
+     *
+     * @param basin The basin instance.
+     * @param drops The data drops to discharge.
+     * @return The passed basin.
+     */
+    public static <OUT, BASIN extends Basin<Long, OUT>> BASIN partiallyFeed(final BASIN basin,
+            final long... drops) {
+
+        if (drops != null) {
+
+            for (final long drop : drops) {
+
+                basin.thenPartiallyFeedWith(drop);
+            }
+        }
+
+        return basin;
+    }
+
+    /**
+     * Feeds the specified basin by discharging the passed partial data drops into the originating
+     * springs.
+     *
+     * @param basin The basin instance.
+     * @param drops The data drops to discharge.
+     * @return The passed basin.
+     */
+    public static <OUT, BASIN extends Basin<Float, OUT>> BASIN partiallyFeed(final BASIN basin,
+            final float... drops) {
+
+        if (drops != null) {
+
+            for (final float drop : drops) {
+
+                basin.thenPartiallyFeedWith(drop);
+            }
+        }
+
+        return basin;
+    }
+
+    /**
+     * Feeds the specified basin by discharging the passed partial data drops into the originating
+     * springs.
+     *
+     * @param basin The basin instance.
+     * @param drops The data drops to discharge.
+     * @return The passed basin.
+     */
+    public static <OUT, BASIN extends Basin<Double, OUT>> BASIN partiallyFeed(final BASIN basin,
+            final double... drops) {
+
+        if (drops != null) {
+
+            for (final double drop : drops) {
+
+                basin.thenPartiallyFeedWith(drop);
+            }
+        }
+
+        return basin;
+    }
+
+    /**
      * Collects the first data drop flown through the basin.
      *
      * @return The data drop.
@@ -230,67 +406,39 @@ public class Basin<IN, OUT> {
     }
 
     /**
-     * Flushes this basin by flushing the originating springs.
-     *
-     * @return This basin.
-     */
-    public Basin<IN, OUT> flush() {
-
-        for (final Spring<IN> spring : mSprings) {
-
-            spring.flush();
-        }
-
-        return this;
-    }
-
-    /**
-     * Feeds this basin by discharging the specified data drops into the originating springs.
+     * Feeds this basin by discharging the specified data drops into the originating springs, then
+     * flushes the spring flows.
      *
      * @param drops The data drops to discharge.
      * @return This basin.
      */
     public Basin<IN, OUT> thenFeedWith(final IN... drops) {
 
-        for (final Spring<IN> spring : mSprings) {
-
-            spring.discharge(drops).flush();
-        }
-
-        return this;
+        return thenPartiallyFeedWith(drops).thenFlush();
     }
 
     /**
      * Feeds this basin by discharging the data drops returned by the specified iterable into the
-     * originating springs.
+     * originating springs, then flushes the spring flows.
      *
      * @param drops The iterable returning the data drops to discharge.
      * @return This basin.
      */
     public Basin<IN, OUT> thenFeedWith(final Iterable<? extends IN> drops) {
 
-        for (final Spring<IN> spring : mSprings) {
-
-            spring.discharge(drops).flush();
-        }
-
-        return this;
+        return thenPartiallyFeedWith(drops).thenFlush();
     }
 
     /**
-     * Feeds this basin by discharging the specified data drop into the originating springs.
+     * Feeds this basin by discharging the specified data drop into the originating springs, then
+     * flushes the spring flows.
      *
      * @param drop The data drop to discharge.
      * @return This basin.
      */
     public Basin<IN, OUT> thenFeedWith(final IN drop) {
 
-        for (final Spring<IN> spring : mSprings) {
-
-            spring.discharge(drop).flush();
-        }
-
-        return this;
+        return thenPartiallyFeedWith(drop).thenFlush();
     }
 
     /**
@@ -301,5 +449,73 @@ public class Basin<IN, OUT> {
     public Stream<IN, OUT, OUT> thenFlow() {
 
         return mOutStream;
+    }
+
+    /**
+     * Flushes this basin by flushing the originating springs.
+     *
+     * @return This basin.
+     */
+    public Basin<IN, OUT> thenFlush() {
+
+        for (final Spring<IN> spring : mSprings) {
+
+            spring.flush();
+        }
+
+        return this;
+    }
+
+    /**
+     * Feeds this basin by discharging the specified partial data drops into the originating
+     * springs.
+     *
+     * @param drops The data drops to discharge.
+     * @return This basin.
+     */
+    public Basin<IN, OUT> thenPartiallyFeedWith(final IN... drops) {
+
+        // TODO: make test to verify data are not flushed
+
+        for (final Spring<IN> spring : mSprings) {
+
+            spring.discharge(drops);
+        }
+
+        return this;
+    }
+
+    /**
+     * Feeds this basin by discharging the partial data drops returned by the specified iterable
+     * into the originating springs.
+     *
+     * @param drops The iterable returning the data drops to discharge.
+     * @return This basin.
+     */
+    public Basin<IN, OUT> thenPartiallyFeedWith(final Iterable<? extends IN> drops) {
+
+        for (final Spring<IN> spring : mSprings) {
+
+            spring.discharge(drops);
+        }
+
+        return this;
+    }
+
+    /**
+     * Feeds this basin by discharging the specified partial data drop into the originating
+     * springs.
+     *
+     * @param drop The data drop to discharge.
+     * @return This basin.
+     */
+    public Basin<IN, OUT> thenPartiallyFeedWith(final IN drop) {
+
+        for (final Spring<IN> spring : mSprings) {
+
+            spring.discharge(drop);
+        }
+
+        return this;
     }
 }

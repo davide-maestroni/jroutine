@@ -754,7 +754,7 @@ public class StreamTest extends TestCase {
         stream3.thenJoining(stream1).backToSource().discharge(Arrays.asList(4, 5, -4));
 
         output.clear();
-        basin1.flush().collectOutputInto(output);
+        basin1.thenFlush().collectOutputInto(output);
         basin2.collectOutputInto(output);
 
         assertThat(output).containsExactly(128, 136);

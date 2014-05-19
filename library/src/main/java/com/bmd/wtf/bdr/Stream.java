@@ -44,28 +44,6 @@ public class Stream<SOURCE, IN, OUT> {
 
     private final DataPool<OUT, ?> mDownstreamPool;
 
-    private static final WaterfallVisitor IDLE_WAIT_VISITOR = new WaterfallVisitor() {
-
-        @Override
-        public boolean stopVisit() {
-
-            return false;
-        }
-
-        @Override
-        public boolean visit(final boolean downstream, final Stream<?, ?, ?> stream) {
-
-            final DataPool<?, ?> pool = stream.mDownstreamPool;
-
-            if (pool != null) {
-
-                pool.waitIdle();
-            }
-
-            return true;
-        }
-    };
-
     private final Current mOutCurrent;
 
     private final boolean mPassThrough;
@@ -841,7 +819,7 @@ public class Stream<SOURCE, IN, OUT> {
 
         final DataPool<OUT, ?> pool = mDownstreamPool;
 
-        pool.incrementIdleCount(1);
+        pool.incrementIdleCountdown(1);
 
         if (mPassThrough) {
 
@@ -859,7 +837,7 @@ public class Stream<SOURCE, IN, OUT> {
 
         final DataPool<OUT, ?> pool = mDownstreamPool;
 
-        pool.incrementIdleCount(1);
+        pool.incrementIdleCountdown(1);
 
         pool.inputCurrent.dischargeAfter(pool, delay, timeUnit, drop);
     }
@@ -876,7 +854,7 @@ public class Stream<SOURCE, IN, OUT> {
             ++size;
         }
 
-        pool.incrementIdleCount(size);
+        pool.incrementIdleCountdown(size);
 
         pool.inputCurrent.dischargeAfter(pool, delay, timeUnit, drops);
     }
@@ -893,6 +871,8 @@ public class Stream<SOURCE, IN, OUT> {
     void flush() {
 
         final DataPool<OUT, ?> pool = mDownstreamPool;
+
+        pool.waitIdle();
 
         if (mPassThrough) {
 
@@ -912,7 +892,7 @@ public class Stream<SOURCE, IN, OUT> {
 
         if (pool != null) {
 
-            pool.incrementIdleCount(1);
+            pool.incrementIdleCountdown(1);
 
             if (mPassThrough) {
 
@@ -931,7 +911,7 @@ public class Stream<SOURCE, IN, OUT> {
 
         final DataPool<OUT, ?> pool = mDownstreamPool;
 
-        pool.incrementIdleCount(1);
+        pool.incrementIdleCountdown(1);
 
         if (mPassThrough) {
 
@@ -943,11 +923,6 @@ public class Stream<SOURCE, IN, OUT> {
 
             inputCurrent.push(pool, debris);
         }
-    }
-
-    void waitForIdle() {
-
-        ride(true, IDLE_WAIT_VISITOR);
     }
 
     private boolean canReach(final Stream<?, ?, ?> targetStream) {

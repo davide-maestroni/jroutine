@@ -167,14 +167,6 @@ public class BlockingBasin<IN, OUT> extends Basin<IN, OUT> {
     }
 
     @Override
-    public BlockingBasin<IN, OUT> flush() {
-
-        super.flush();
-
-        return this;
-    }
-
-    @Override
     public BlockingBasin<IN, OUT> thenFeedWith(final IN... drops) {
 
         super.thenFeedWith(drops);
@@ -194,6 +186,38 @@ public class BlockingBasin<IN, OUT> extends Basin<IN, OUT> {
     public BlockingBasin<IN, OUT> thenFeedWith(final IN drop) {
 
         super.thenFeedWith(drop);
+
+        return this;
+    }
+
+    @Override
+    public BlockingBasin<IN, OUT> thenFlush() {
+
+        super.thenFlush();
+
+        return this;
+    }
+
+    @Override
+    public BlockingBasin<IN, OUT> thenPartiallyFeedWith(final IN... drops) {
+
+        super.thenPartiallyFeedWith(drops);
+
+        return this;
+    }
+
+    @Override
+    public BlockingBasin<IN, OUT> thenPartiallyFeedWith(final Iterable<? extends IN> drops) {
+
+        super.thenPartiallyFeedWith(drops);
+
+        return this;
+    }
+
+    @Override
+    public BlockingBasin<IN, OUT> thenPartiallyFeedWith(final IN drop) {
+
+        super.thenPartiallyFeedWith(drop);
 
         return this;
     }

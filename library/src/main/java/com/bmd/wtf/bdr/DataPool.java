@@ -57,7 +57,7 @@ class DataPool<IN, OUT> implements Pool<IN> {
 
     private final ReentrantLock mLock = new ReentrantLock();
 
-    private int mIdleCount;
+    private int mIdleCountdown;
 
     public DataPool(final Current inputCurrent, final Dam<IN, OUT> dam) {
 
@@ -113,7 +113,7 @@ class DataPool<IN, OUT> implements Pool<IN> {
 
             gate.close();
 
-            decrementIdleCount();
+            decrementIdleCountdown();
         }
     }
 
@@ -146,7 +146,7 @@ class DataPool<IN, OUT> implements Pool<IN> {
 
             gate.close();
 
-            decrementIdleCount();
+            decrementIdleCountdown();
         }
     }
 
@@ -179,7 +179,7 @@ class DataPool<IN, OUT> implements Pool<IN> {
 
             gate.close();
 
-            decrementIdleCount();
+            decrementIdleCountdown();
         }
     }
 
@@ -212,11 +212,11 @@ class DataPool<IN, OUT> implements Pool<IN> {
 
             gate.close();
 
-            decrementIdleCount();
+            decrementIdleCountdown();
         }
     }
 
-    void incrementIdleCount(final int count) {
+    void incrementIdleCountdown(final int count) {
 
         final ReentrantLock lock = mLock;
 
@@ -224,7 +224,7 @@ class DataPool<IN, OUT> implements Pool<IN> {
 
         try {
 
-            mIdleCount += count;
+            mIdleCountdown += count;
 
         } finally {
 
@@ -242,7 +242,7 @@ class DataPool<IN, OUT> implements Pool<IN> {
 
         try {
 
-            if (mIdleCount <= 0) {
+            if (mIdleCountdown <= 0) {
 
                 return;
             }
@@ -261,7 +261,7 @@ class DataPool<IN, OUT> implements Pool<IN> {
 
                     currentTimeout = endTime - System.currentTimeMillis();
 
-                    if (mIdleCount > 0) {
+                    if (mIdleCountdown > 0) {
 
                         isTimeout = true;
 
@@ -273,7 +273,7 @@ class DataPool<IN, OUT> implements Pool<IN> {
                     mCondition.await();
                 }
 
-            } while (mIdleCount > 0);
+            } while (mIdleCountdown > 0);
 
         } catch (final InterruptedException e) {
 
@@ -285,7 +285,7 @@ class DataPool<IN, OUT> implements Pool<IN> {
 
             if (!isTimeout) {
 
-                mIdleCount = 0;
+                mIdleCountdown = 0;
             }
 
             lock.unlock();
@@ -302,7 +302,7 @@ class DataPool<IN, OUT> implements Pool<IN> {
         waitIdle(-1, TimeUnit.MILLISECONDS, null);
     }
 
-    private void decrementIdleCount() {
+    private void decrementIdleCountdown() {
 
         final ReentrantLock lock = mLock;
 
@@ -310,7 +310,7 @@ class DataPool<IN, OUT> implements Pool<IN> {
 
         try {
 
-            if (--mIdleCount <= 0) {
+            if (--mIdleCountdown <= 0) {
 
                 mCondition.signalAll();
             }

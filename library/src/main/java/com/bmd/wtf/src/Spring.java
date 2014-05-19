@@ -94,6 +94,11 @@ public interface Spring<DATA> {
     /**
      * Flushes the spring, that is, it informs the fed streams that no more data drops are likely
      * to come.
+     * <p/>
+     * Be aware that the call blocks until the pool fed by this spring will discharge all the data
+     * drops, included the delayed ones.<br/>
+     * Be also aware that, in case more than one flushes is expected, based on waterfall topology,
+     * the total number should be checked before further propagating the flush.
      */
     public void flush();
 }

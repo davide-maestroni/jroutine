@@ -230,13 +230,6 @@ class DataFloodgate<IN, OUT> implements Floodgate<IN, OUT> {
 
         failIfClosed();
 
-        final DataPool<IN, OUT> pool = mPool;
-
-        for (final Stream<?, IN, OUT> stream : pool.outputStreams) {
-
-            stream.waitForIdle();
-        }
-
         mPump.flush(mPool);
     }
 

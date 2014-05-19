@@ -266,19 +266,9 @@ public class CurrentTest extends TestCase {
             return mDrop;
         }
 
-        public void setDrop(final String drop) {
-
-            mDrop = drop;
-        }
-
         public Object getPull() {
 
             return mPull;
-        }
-
-        public void setPull(final Object debris) {
-
-            mPull = debris;
         }
 
         public Object getPush() {
@@ -286,19 +276,9 @@ public class CurrentTest extends TestCase {
             return mPush;
         }
 
-        public void setPush(final Object debris) {
-
-            mPush = debris;
-        }
-
         public long getTime() {
 
             return mTime;
-        }
-
-        public void setTime(final long time) {
-
-            mTime = time;
         }
 
         public boolean isFlush() {

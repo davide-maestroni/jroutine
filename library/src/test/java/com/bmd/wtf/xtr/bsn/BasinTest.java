@@ -371,7 +371,7 @@ public class BasinTest extends TestCase {
         basin1.thenFeedWith(Arrays.asList("1", "0")).collectOutputInto(outInts);
         assertThat(outInts).containsExactly(1);
         basin1.thenFlow().backToSource().discharge(Arrays.asList("1", "0"));
-        basin1.flush();
+        basin1.thenFlush();
         assertThat(basin1.collectFirstOutput()).isEqualTo(1);
 
         final LinkedHashSet<Object> debris = new LinkedHashSet<Object>(1);

@@ -19,7 +19,6 @@ import com.bmd.wtf.src.Pool;
 
 import java.util.WeakHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -232,9 +231,7 @@ class DataPool<IN, OUT> implements Pool<IN> {
         }
     }
 
-    void waitIdle(final long timeout, TimeUnit timeUnit, final RuntimeException exception) {
-
-        boolean isTimeout = false;
+    void waitIdle() {
 
         final ReentrantLock lock = mLock;
 
@@ -247,31 +244,9 @@ class DataPool<IN, OUT> implements Pool<IN> {
                 return;
             }
 
-            long currentTimeout = timeUnit.toMillis(timeout);
-
-            final long startTime = System.currentTimeMillis();
-
-            final long endTime = startTime + currentTimeout;
-
             do {
 
-                if (currentTimeout >= 0) {
-
-                    mCondition.await(currentTimeout, TimeUnit.MILLISECONDS);
-
-                    currentTimeout = endTime - System.currentTimeMillis();
-
-                    if (mIdleCountdown > 0) {
-
-                        isTimeout = true;
-
-                        break;
-                    }
-
-                } else {
-
-                    mCondition.await();
-                }
+                mCondition.await();
 
             } while (mIdleCountdown > 0);
 
@@ -283,23 +258,10 @@ class DataPool<IN, OUT> implements Pool<IN> {
 
         } finally {
 
-            if (!isTimeout) {
-
-                mIdleCountdown = 0;
-            }
+            mIdleCountdown = 0;
 
             lock.unlock();
         }
-
-        if (isTimeout && (exception != null)) {
-
-            throw exception;
-        }
-    }
-
-    void waitIdle() {
-
-        waitIdle(-1, TimeUnit.MILLISECONDS, null);
     }
 
     private void decrementIdleCountdown() {

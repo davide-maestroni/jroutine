@@ -36,6 +36,11 @@ public interface Pool<DATA> {
     /**
      * Flushes the pool, that is, it informs the fed streams that no more data drops are likely to
      * come.
+     * <p/>
+     * Be aware that the call may block until the pool will discharge all the data drops, included
+     * the delayed ones.<br/>
+     * Be also aware that, in case more than one flushes is expected, based on waterfall topology,
+     * the total number should be checked downstream before further propagating the flush.
      */
     public void flush();
 

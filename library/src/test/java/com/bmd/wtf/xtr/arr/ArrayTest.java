@@ -22,6 +22,7 @@ import com.bmd.wtf.dam.Dam;
 import com.bmd.wtf.dam.Dams;
 import com.bmd.wtf.dam.OpenDam;
 import com.bmd.wtf.src.Floodgate;
+import com.bmd.wtf.src.Spring;
 import com.bmd.wtf.xtr.bsn.Basin;
 
 import junit.framework.TestCase;
@@ -441,26 +442,30 @@ public class ArrayTest extends TestCase {
                 WaterfallArray.formingFrom(Waterfall.fallingFrom(new OpenDam<Integer>()))
                               .thenSplittingIn(2)
                               .thenFlowingInto(CurrentFactories.singletonCurrentFactory(current))
-                              .thenBalancedBy(new AbstractArrayBalancer<Integer>() {
+                              .thenBalancedBy(new AbstractArrayBalancer<Integer, Integer>() {
 
                                   @Override
-                                  public int chooseDataStream(final Integer drop,
-                                          final int streamCount) {
+                                  public Object onDischarge(final List<Spring<Integer>> springs,
+                                          final Integer drop) {
 
-                                      return (drop % 2);
+                                      springs.get(drop % 2).discharge(drop);
+
+                                      return null;
                                   }
                               }).thenMerging()
         ).thenFeedWith(1, 2, 3).collectOutput()).contains(1, 2, 3);
         assertThat(Basin.collect(
                 WaterfallArray.formingFrom(Waterfall.fallingFrom(new OpenDam<Integer>()))
                               .thenSplittingIn(2)
-                              .thenBalancedBy(new AbstractArrayBalancer<Integer>() {
+                              .thenBalancedBy(new AbstractArrayBalancer<Integer, Integer>() {
 
                                   @Override
-                                  public int chooseDataStream(final Integer drop,
-                                          final int streamCount) {
+                                  public Object onDischarge(final List<Spring<Integer>> springs,
+                                          final Integer drop) {
 
-                                      return (drop % 2);
+                                      springs.get(drop % 2).discharge(drop);
+
+                                      return null;
                                   }
                               }).thenFlowingInto(CurrentFactories.singletonCurrentFactory(current))
                               .thenMerging()

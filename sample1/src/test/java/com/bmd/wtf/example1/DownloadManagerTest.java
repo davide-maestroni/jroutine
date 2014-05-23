@@ -21,6 +21,9 @@ import java.net.URL;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
+/**
+ * {@link DownloadManager} unit test.
+ */
 public class DownloadManagerTest extends TestCase {
 
     private static final String FAIL_URL = "http://this.domain.does.not.exist/test.txt";
@@ -34,9 +37,19 @@ public class DownloadManagerTest extends TestCase {
     private static final String SMALL_FILE_URL3 =
             "http://upload.wikimedia.org/wikipedia/commons/b/b1/Bing_logo_%282013%29.svg";
 
+    private final String mTmpDirPath;
+
     private DownloadManager mDownloadManager;
 
-    private String mTmpDirPath;
+    public DownloadManagerTest() {
+
+        mTmpDirPath = System.getProperty("java.io.tmpdir");
+    }
+
+    private static boolean deleteFile(final File file) {
+
+        return file.delete();
+    }
 
     public void testAll() throws IOException {
 
@@ -46,13 +59,13 @@ public class DownloadManagerTest extends TestCase {
         final String fileName3 = DownloadUtils.getFileName(new URL(SMALL_FILE_URL3));
 
         final File outFile = new File(mTmpDirPath, fileName);
-        outFile.delete();
+        deleteFile(outFile);
         final File outFile1 = new File(mTmpDirPath, fileName1);
-        outFile1.delete();
+        deleteFile(outFile1);
         final File outFile2 = new File(mTmpDirPath, fileName2);
-        outFile2.delete();
+        deleteFile(outFile2);
         final File outFile3 = new File(mTmpDirPath, fileName3);
-        outFile3.delete();
+        deleteFile(outFile3);
 
         assertThat(outFile).doesNotExist();
         assertThat(outFile1).doesNotExist();
@@ -75,9 +88,9 @@ public class DownloadManagerTest extends TestCase {
         assertThat(outFile3).exists();
         assertThat(outFile).doesNotExist();
 
-        outFile1.delete();
-        outFile2.delete();
-        outFile3.delete();
+        deleteFile(outFile1);
+        deleteFile(outFile2);
+        deleteFile(outFile3);
     }
 
     public void testDownload() throws IOException {
@@ -87,11 +100,11 @@ public class DownloadManagerTest extends TestCase {
         final String fileName3 = DownloadUtils.getFileName(new URL(SMALL_FILE_URL3));
 
         final File outFile1 = new File(mTmpDirPath, fileName1);
-        outFile1.delete();
+        deleteFile(outFile1);
         final File outFile2 = new File(mTmpDirPath, fileName2);
-        outFile2.delete();
+        deleteFile(outFile2);
         final File outFile3 = new File(mTmpDirPath, fileName3);
-        outFile3.delete();
+        deleteFile(outFile3);
 
         assertThat(outFile1).doesNotExist();
         assertThat(outFile2).doesNotExist();
@@ -111,9 +124,9 @@ public class DownloadManagerTest extends TestCase {
         assertThat(outFile2).exists();
         assertThat(outFile3).exists();
 
-        outFile1.delete();
-        outFile2.delete();
-        outFile3.delete();
+        deleteFile(outFile1);
+        deleteFile(outFile2);
+        deleteFile(outFile3);
     }
 
     public void testFail() throws IOException {
@@ -121,7 +134,7 @@ public class DownloadManagerTest extends TestCase {
         final String fileName = DownloadUtils.getFileName(new URL(FAIL_URL));
 
         final File outFile = new File(mTmpDirPath, fileName);
-        outFile.delete();
+        deleteFile(outFile);
 
         assertThat(outFile).doesNotExist();
 
@@ -146,8 +159,6 @@ public class DownloadManagerTest extends TestCase {
     protected void setUp() throws Exception {
 
         super.setUp();
-
-        mTmpDirPath = System.getProperty("java.io.tmpdir");
 
         mDownloadManager = new DownloadManager(2, new File(mTmpDirPath));
     }

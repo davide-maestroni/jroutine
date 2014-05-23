@@ -17,27 +17,31 @@ import com.bmd.wtf.dam.AbstractDam;
 import com.bmd.wtf.src.Floodgate;
 import com.bmd.wtf.src.Spring;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
  * Dam wrapping an array balancer.
  * <p/>
  * Created by davide on 5/15/14.
+ *
+ * @param <IN>  The input data type.
+ * @param <OUT> The output data type.
  */
-class SpringBalancerDam<DATA> extends AbstractDam<DATA, DATA> {
+class SpringBalancerDam<IN, OUT> extends AbstractDam<IN, OUT> {
 
-    private final ArrayBalancer<DATA> mBalancer;
+    private final ArrayBalancer<IN, OUT> mBalancer;
 
-    private final List<Spring<DATA>> mSprings;
+    private final Object mMutex;
 
-    private final int mStreamsCount;
+    private final List<Spring<OUT>> mSprings;
 
-    public SpringBalancerDam(final ArrayBalancer<DATA> balancer, final int streamsCount,
-            final List<Spring<DATA>> springs) {
+    public SpringBalancerDam(final Object mutex, final ArrayBalancer<IN, OUT> balancer,
+            final List<Spring<OUT>> springs) {
 
-        if (balancer == null) {
+        if (mutex == null) {
 
-            throw new IllegalArgumentException("the array balancer cannot be null");
+            throw new IllegalArgumentException("the array balancer mutex cannot be null");
         }
 
         if (springs == null) {
@@ -45,61 +49,31 @@ class SpringBalancerDam<DATA> extends AbstractDam<DATA, DATA> {
             throw new IllegalArgumentException("the list of springs cannot be null");
         }
 
-        if (streamsCount < 0) {
+        if (balancer == null) {
 
-            throw new IllegalArgumentException("the total number of streams cannot be negative");
+            throw new IllegalArgumentException("the array balancer cannot be null");
         }
 
+        mMutex = mutex;
+        mSprings = Collections.unmodifiableList(springs);
         mBalancer = balancer;
-        mStreamsCount = streamsCount;
-        mSprings = springs;
     }
 
     @Override
-    public Object onDischarge(final Floodgate<DATA, DATA> gate, final DATA drop) {
+    public Object onDischarge(final Floodgate<IN, OUT> gate, final IN drop) {
 
-        final int streamNumber = mBalancer.chooseDataStream(drop, mStreamsCount);
+        synchronized (mMutex) {
 
-        final List<Spring<DATA>> springs = mSprings;
-
-        final int size = springs.size();
-
-        if ((streamNumber >= 0) && (streamNumber < size)) {
-
-            springs.get(streamNumber).discharge(drop);
-
-        } else if (streamNumber == size) {
-
-            for (final Spring<DATA> spring : springs) {
-
-                spring.flush();
-            }
+            return mBalancer.onDischarge(mSprings, drop);
         }
-
-        return null;
     }
 
     @Override
-    public Object onFlush(final Floodgate<DATA, DATA> gate) {
+    public Object onFlush(final Floodgate<IN, OUT> gate) {
 
-        final int streamNumber = mBalancer.chooseFlushStream(mStreamsCount);
+        synchronized (mMutex) {
 
-        final List<Spring<DATA>> springs = mSprings;
-
-        final int size = springs.size();
-
-        if ((streamNumber >= 0) && (streamNumber < size)) {
-
-            springs.get(streamNumber).flush();
-
-        } else if (streamNumber == size) {
-
-            for (final Spring<DATA> spring : springs) {
-
-                spring.flush();
-            }
+            return mBalancer.onFlush(mSprings);
         }
-
-        return null;
     }
 }

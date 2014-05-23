@@ -32,9 +32,7 @@ public class FloatingException extends RuntimeException {
     }
 
     /**
-     * Constructor taking a debris as parameter.
-     *
-     * @param debris The debris instance.
+     * Like {@link RuntimeException#RuntimeException()} with an additional debris parameter.
      */
     public FloatingException(final Object debris) {
 
@@ -46,9 +44,17 @@ public class FloatingException extends RuntimeException {
      */
     public FloatingException(final String message) {
 
+        this(message, (Object) null);
+    }
+
+    /**
+     * Like {@link RuntimeException#RuntimeException(String)} with an additional debris parameter.
+     */
+    public FloatingException(final String message, final Object debris) {
+
         super(message);
 
-        mDebris = null;
+        mDebris = debris;
     }
 
     /**
@@ -56,9 +62,17 @@ public class FloatingException extends RuntimeException {
      */
     public FloatingException(final String message, final Throwable cause) {
 
+        this(message, cause, null);
+    }
+
+    /**
+     * Like {@link RuntimeException#RuntimeException(String, Throwable)} with an additional debris parameter.
+     */
+    public FloatingException(final String message, final Throwable cause, final Object debris) {
+
         super(message, cause);
 
-        mDebris = null;
+        mDebris = debris;
     }
 
     /**
@@ -66,9 +80,18 @@ public class FloatingException extends RuntimeException {
      */
     public FloatingException(final Throwable cause) {
 
+        this(cause, null);
+    }
+
+    /**
+     * Like {@link RuntimeException#RuntimeException(Throwable)} with an additional debris
+     * parameter.
+     */
+    public FloatingException(final Throwable cause, final Object debris) {
+
         super(cause);
 
-        mDebris = null;
+        mDebris = debris;
     }
 
     /**
@@ -77,9 +100,20 @@ public class FloatingException extends RuntimeException {
     public FloatingException(final String message, final Throwable cause,
             final boolean enableSuppression, final boolean writableStackTrace) {
 
+        this(message, cause, enableSuppression, writableStackTrace, null);
+    }
+
+    /**
+     * Like {@link RuntimeException#RuntimeException(String, Throwable, boolean, boolean)} with an
+     * additional debris parameter.
+     */
+    public FloatingException(final String message, final Throwable cause,
+            final boolean enableSuppression, final boolean writableStackTrace,
+            final Object debris) {
+
         super(message, cause, enableSuppression, writableStackTrace);
 
-        mDebris = null;
+        mDebris = debris;
     }
 
     /**

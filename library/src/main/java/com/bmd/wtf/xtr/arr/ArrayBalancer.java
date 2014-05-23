@@ -13,52 +13,55 @@
  */
 package com.bmd.wtf.xtr.arr;
 
+import com.bmd.wtf.src.Floodgate;
+import com.bmd.wtf.src.Spring;
+
+import java.util.List;
+
 /**
- * An array balancer is used to sort the data flow in a stream array.
- * <p/>
- * The index returned by the balancer indicates into which stream to propagate the flow of data.
- * <br/>In case -1 is returned, no further propagation will happen. While, if the total stream
- * count is returned instead, the data or object will be propagated to all the streams in the
- * array. All the other out-of-range values will be ignored.
+ * An array balancer is an object used to sort the data drops flowing in a stream array.
  * <p/>
  * Created by davide on 5/15/14.
+ *
+ * @param <IN>  The input data type.
+ * @param <OUT> The output data type.
  */
-public interface ArrayBalancer<DATA> {
+public interface ArrayBalancer<IN, OUT> {
 
     /**
-     * Chooses the index of the stream into which to discharge the specified data drop.
-     * <br/><code>-1</code> means no stream and <code>streamCount</code> means all the streams.
+     * This method is called when a data drop is discharged through the balancer.
      *
-     * @param drop        The data drop to discharge.
-     * @param streamCount The total count of streams in the array.
-     * @return The index of the target stream.
+     * @param springs The list of output springs.
+     * @param drop    The data drop to discharge.
+     * @return The debris to push downstream and pull upstream, or <code>null</code>.
      */
-    public int chooseDataStream(DATA drop, int streamCount);
+    public Object onDischarge(List<Spring<OUT>> springs, IN drop);
 
     /**
-     * Chooses the index of the stream into which to propagate the flush.
-     * <br/><code>-1</code> means no stream and <code>streamCount</code> means all the streams.
+     * This method is called when data are flushed through the balancer.
      *
-     * @param streamCount The total count of streams in the array.
-     * @return The index of the target stream.
+     * @param springs The list of output springs.
+     * @return The debris to push downstream and pull upstream, or <code>null</code>.
      */
-    public int chooseFlushStream(int streamCount);
+    public Object onFlush(List<Spring<OUT>> springs);
 
     /**
-     * Chooses if to pull the specified debris further upstream.
+     * This method is called when an debris is pulled upstream through the balancer.
      *
-     * @param debris       The debris to pull.
      * @param streamNumber The number of the stream in which data is flowing.
-     * @return Whether to pull the debris upstream.
+     * @param gate         The gate instance to be used to discharge data into the waterfall.
+     * @param debris       The pulled debris.
+     * @return The debris to pull further upstream, or <code>null</code>.
      */
-    public boolean choosePulledDebrisStream(Object debris, int streamNumber);
+    public Object onPullDebris(int streamNumber, Floodgate<OUT, OUT> gate, Object debris);
 
     /**
-     * Chooses if to push the specified debris further downstream.
+     * This method is called when an object is pushed downstream through the dam.
      *
-     * @param debris       The debris to push.
      * @param streamNumber The number of the stream in which data is flowing.
-     * @return Whether to push the debris downstream.
+     * @param gate         The gate instance to be used to discharge data into the waterfall.
+     * @param debris       The pushed debris.
+     * @return The debris to push further downstream, or <code>null</code>.
      */
-    public boolean choosePushedDebrisStream(Object debris, int streamNumber);
+    public Object onPushDebris(int streamNumber, Floodgate<OUT, OUT> gate, Object debris);
 }

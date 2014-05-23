@@ -11,8 +11,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package combmd.wtf.example3;
+package com.bmd.wtf.example3;
 
+import com.bmd.wtf.bdr.FloatingException;
 import com.bmd.wtf.dam.AbstractDam;
 import com.bmd.wtf.src.Floodgate;
 
@@ -51,7 +52,7 @@ public class RetryPolicy<DATA> extends AbstractDam<DATA, DATA> {
     @Override
     public Object onPullDebris(final Floodgate<DATA, DATA> gate, final Object debris) {
 
-        if (debris instanceof Throwable) {
+        if (debris instanceof FloatingException) {
 
             // This is an error, let's try again until we reach the max retry count
 

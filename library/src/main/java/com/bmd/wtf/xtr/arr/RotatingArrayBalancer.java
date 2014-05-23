@@ -13,23 +13,29 @@
  */
 package com.bmd.wtf.xtr.arr;
 
+import com.bmd.wtf.src.Spring;
+
+import java.util.List;
+
 /**
  * Implementation of an {@link ArrayBalancer} discharging data by rotating through all the streams
  * in the array.
  * <p/>
  * Created by davide on 5/15/14.
+ *
+ * @param <DATA> The data type.
  */
-public class RotatingArrayBalancer<DATA> extends AbstractArrayBalancer<DATA> {
+public class RotatingArrayBalancer<DATA> extends AbstractArrayBalancer<DATA, DATA> {
 
-    private int mStreamNumber;
+    private int mStreamNumber = -1;
 
     @Override
-    public int chooseDataStream(final DATA drop, final int streamCount) {
+    public Object onDischarge(final List<Spring<DATA>> springs, final DATA drop) {
 
-        final int streamNumber = mStreamNumber;
+        mStreamNumber = (mStreamNumber + 1) % springs.size();
 
-        mStreamNumber = (streamNumber + 1) % streamCount;
+        springs.get(mStreamNumber).discharge(drop);
 
-        return streamNumber;
+        return null;
     }
 }

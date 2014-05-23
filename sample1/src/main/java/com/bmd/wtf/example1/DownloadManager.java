@@ -27,14 +27,14 @@ import java.io.IOException;
  */
 public class DownloadManager {
 
-    private final FloodControl<String, String, Downloaded> mControl =
-            new FloodControl<String, String, Downloaded>(Downloaded.class);
+    private final FloodControl<String, String, UrlObserver> mControl =
+            new FloodControl<String, String, UrlObserver>(UrlObserver.class);
 
     private final Current mCurrent;
 
     private final File mDownloadDir;
 
-    private final DownloadedObserver mDownloaded = new DownloadedObserver();
+    private final DownloadObserver mDownloaded;
 
     public DownloadManager(final int maxThreads, final File downloadDir) throws IOException {
 
@@ -44,6 +44,7 @@ public class DownloadManager {
                     "Could not create temp directory: " + downloadDir.getAbsolutePath());
         }
 
+        mDownloaded = new DownloadObserver();
         mDownloadDir = downloadDir;
         mCurrent = Currents.threadPoolCurrent(maxThreads);
     }
@@ -64,9 +65,8 @@ public class DownloadManager {
 
     public void download(final String url) {
 
-        Waterfall.flowingInto(mCurrent).thenFlowingThrough(new Downloader(mDownloadDir))
-                 .thenFlowingThrough(mControl.leveeControlledBy(mDownloaded)).backToSource()
-                 .discharge(url);
+        Waterfall.fallingFrom(mControl.leveeControlledBy(mDownloaded)).thenFlowingInto(mCurrent)
+                 .thenFlowingThrough(new Downloader(mDownloadDir)).backToSource().discharge(url);
     }
 
     public boolean isComplete(final String url) {

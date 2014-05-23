@@ -20,43 +20,51 @@ import com.bmd.wtf.src.Floodgate;
  * Dam handling debris flowing through an array balancer.
  * <p/>
  * Created by davide on 5/15/14.
+ *
+ * @param <IN>  The input data type.
+ * @param <OUT> The output data type.
  */
-class DebrisBalancerDam<DATA> extends OpenDam<DATA> {
+class DebrisBalancerDam<IN, OUT> extends OpenDam<OUT> {
 
-    private final ArrayBalancer<DATA> mBalancer;
+    private final ArrayBalancer<IN, OUT> mBalancer;
+
+    private final Object mMutex;
 
     private final int mStreamNumber;
 
-    public DebrisBalancerDam(final ArrayBalancer<DATA> balancer, final int streamNumber) {
+    public DebrisBalancerDam(final Object mutex, final int streamNumber,
+            final ArrayBalancer<IN, OUT> balancer) {
+
+        if (mutex == null) {
+
+            throw new IllegalArgumentException("the array balancer mutex cannot be null");
+        }
 
         if (balancer == null) {
 
             throw new IllegalArgumentException("the array balancer cannot be null");
         }
 
-        mBalancer = balancer;
+        mMutex = mutex;
         mStreamNumber = streamNumber;
+        mBalancer = balancer;
     }
 
     @Override
-    public Object onPullDebris(final Floodgate<DATA, DATA> gate, final Object debris) {
+    public Object onPullDebris(final Floodgate<OUT, OUT> gate, final Object debris) {
 
-        if (mBalancer.choosePulledDebrisStream(debris, mStreamNumber)) {
+        synchronized (mMutex) {
 
-            return super.onPullDebris(gate, debris);
+            return mBalancer.onPullDebris(mStreamNumber, gate, debris);
         }
-
-        return null;
     }
 
     @Override
-    public Object onPushDebris(final Floodgate<DATA, DATA> gate, final Object debris) {
+    public Object onPushDebris(final Floodgate<OUT, OUT> gate, final Object debris) {
 
-        if (mBalancer.choosePushedDebrisStream(debris, mStreamNumber)) {
+        synchronized (mMutex) {
 
-            return super.onPushDebris(gate, debris);
+            return mBalancer.onPushDebris(mStreamNumber, gate, debris);
         }
-
-        return null;
     }
 }

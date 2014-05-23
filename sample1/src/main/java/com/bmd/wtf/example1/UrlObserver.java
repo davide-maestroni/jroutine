@@ -16,9 +16,11 @@ package com.bmd.wtf.example1;
 import com.bmd.wtf.xtr.fld.FloodObserver;
 
 /**
- * Observer of downloaded files definition.
+ * Observer of downloaded urls.
  */
-public interface Downloaded extends FloodObserver<String, String> {
+public interface UrlObserver extends FloodObserver<String, String> {
 
     public boolean isDownloaded(String url);
+
+    public boolean isDownloading(String url);
 }

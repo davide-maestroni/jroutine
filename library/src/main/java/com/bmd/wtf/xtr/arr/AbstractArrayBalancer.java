@@ -13,26 +13,44 @@
  */
 package com.bmd.wtf.xtr.arr;
 
+import com.bmd.wtf.src.Floodgate;
+import com.bmd.wtf.src.Spring;
+
+import java.util.List;
+
 /**
+ * Abstract base implementation of an {@link ArrayBalancer}. Flushes and debris are propagated
+ * to all the streams.
+ * <p/>
  * Created by davide on 5/15/14.
+ *
+ * @param <IN>  The input data type.
+ * @param <OUT> The output data type.
  */
-public abstract class AbstractArrayBalancer<DATA> implements ArrayBalancer<DATA> {
+public abstract class AbstractArrayBalancer<IN, OUT> implements ArrayBalancer<IN, OUT> {
 
     @Override
-    public int chooseFlushStream(final int streamCount) {
+    public Object onFlush(final List<Spring<OUT>> springs) {
 
-        return streamCount;
+        for (final Spring<OUT> spring : springs) {
+
+            spring.flush();
+        }
+
+        return null;
     }
 
     @Override
-    public boolean choosePulledDebrisStream(final Object debris, final int streamNumber) {
+    public Object onPullDebris(final int streamNumber, final Floodgate<OUT, OUT> gate,
+            final Object debris) {
 
-        return true;
+        return debris;
     }
 
     @Override
-    public boolean choosePushedDebrisStream(final Object debris, final int streamCount) {
+    public Object onPushDebris(final int streamNumber, final Floodgate<OUT, OUT> gate,
+            final Object debris) {
 
-        return true;
+        return debris;
     }
 }

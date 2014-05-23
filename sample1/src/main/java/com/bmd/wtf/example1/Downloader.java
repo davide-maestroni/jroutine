@@ -65,7 +65,7 @@ public class Downloader extends OpenDam<String> {
 
                     // The request has failed...
 
-                    return new FloatingException(responseCode);
+                    return new FloatingException(drop, responseCode);
                 }
             }
 
@@ -86,7 +86,7 @@ public class Downloader extends OpenDam<String> {
 
         } catch (final IOException e) {
 
-            return e;
+            return new FloatingException(drop, e);
 
         } finally {
 
@@ -96,8 +96,8 @@ public class Downloader extends OpenDam<String> {
             DownloadUtils.safeClose(inputStream);
         }
 
-        // Return true if everything worked as expected
+        // Return the url if everything worked as expected
 
-        return true;
+        return drop;
     }
 }

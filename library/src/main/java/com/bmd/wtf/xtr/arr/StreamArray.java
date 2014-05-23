@@ -119,9 +119,11 @@ public class StreamArray<SOURCE, IN, OUT> {
      * all the streams. All the other out-of-range values will be ignored.
      *
      * @param balancer The array balancer.
+     * @param <NOUT>   The transported data type of the specified balancer.
      * @return A new stream whose flows are balanced by the specified balancer.
      */
-    public StreamArray<SOURCE, OUT, OUT> thenBalancedBy(final ArrayBalancer<OUT> balancer) {
+    public <NOUT> StreamArray<SOURCE, NOUT, NOUT> thenBalancedBy(
+            final ArrayBalancer<OUT, NOUT> balancer) {
 
         if (balancer == null) {
 
@@ -132,12 +134,14 @@ public class StreamArray<SOURCE, IN, OUT> {
 
         final int streamsCount = streams.size();
 
-        final ArrayList<Spring<OUT>> springs = new ArrayList<Spring<OUT>>(streamsCount);
+        final ArrayList<Spring<NOUT>> springs = new ArrayList<Spring<NOUT>>(streamsCount);
 
-        final SpringBalancerDam<OUT> balancerDam =
-                new SpringBalancerDam<OUT>(balancer, streamsCount, springs);
+        final Object mutex = new Object();
 
-        final Stream<SOURCE, OUT, OUT> balancedStream;
+        final SpringBalancerDam<OUT, NOUT> balancerDam =
+                new SpringBalancerDam<OUT, NOUT>(mutex, balancer, springs);
+
+        final Stream<SOURCE, OUT, NOUT> balancedStream;
 
         if (mIsSingleStream) {
 
@@ -148,20 +152,20 @@ public class StreamArray<SOURCE, IN, OUT> {
             balancedStream = thenMergingThrough(balancerDam);
         }
 
-        final ArrayList<Stream<SOURCE, OUT, OUT>> outStreams =
-                new ArrayList<Stream<SOURCE, OUT, OUT>>(streamsCount);
+        final ArrayList<Stream<SOURCE, NOUT, NOUT>> outStreams =
+                new ArrayList<Stream<SOURCE, NOUT, NOUT>>(streamsCount);
 
         for (int i = 0; i < streamsCount; ++i) {
 
-            final Stream<OUT, OUT, OUT> outStream =
-                    Waterfall.fallingFrom(new DebrisBalancerDam<OUT>(balancer, i));
+            final Stream<NOUT, NOUT, NOUT> outStream =
+                    Waterfall.fallingFrom(new DebrisBalancerDam<OUT, NOUT>(mutex, i, balancer));
 
             springs.add(outStream.backToSource());
 
             outStreams.add(balancedStream.thenFeeding(outStream));
         }
 
-        return new StreamArray<SOURCE, OUT, OUT>(outStreams);
+        return new StreamArray<SOURCE, NOUT, NOUT>(outStreams);
     }
 
     /**

@@ -42,6 +42,11 @@ class BarrageDam<IN, OUT> implements Dam<IN, OUT> {
      */
     public BarrageDam(final Object mutex, final int streamNumber, final Barrage<IN, OUT> barrage) {
 
+        if (mutex == null) {
+
+            throw new IllegalArgumentException("the barrage mutex cannot be null");
+        }
+
         if (barrage == null) {
 
             throw new IllegalArgumentException("the wrapped barrage cannot be null");

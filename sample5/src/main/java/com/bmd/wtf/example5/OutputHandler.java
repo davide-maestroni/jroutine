@@ -11,8 +11,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.wtf.example4;
+package com.bmd.wtf.example5;
 
+import com.bmd.wtf.bdr.FloatingException;
 import com.bmd.wtf.dam.AbstractDam;
 import com.bmd.wtf.example1.DownloadUtils;
 import com.bmd.wtf.src.Floodgate;
@@ -41,15 +42,17 @@ public class OutputHandler extends AbstractDam<Chunk, String> {
     @Override
     public Object onDischarge(final Floodgate<Chunk, String> gate, final Chunk drop) {
 
+        final String url = drop.getUrl();
+
         if (mOutputStream == null) {
 
             try {
 
-                setupOutput(new URL(drop.getUrl()));
+                setupOutput(new URL(url));
 
             } catch (final IOException e) {
 
-                return e;
+                return new FloatingException(url, e);
             }
         }
 
@@ -57,11 +60,11 @@ public class OutputHandler extends AbstractDam<Chunk, String> {
 
             resetOutput(false);
 
-            gate.discharge(drop.getUrl());
+            gate.discharge(url);
 
-            // Return true if everything worked as expected
+            // Return the url if everything worked as expected
 
-            return true;
+            return url;
         }
 
         try {
@@ -72,7 +75,7 @@ public class OutputHandler extends AbstractDam<Chunk, String> {
 
             resetOutput(true);
 
-            return e;
+            return new FloatingException(url, e);
         }
 
         return null;
@@ -102,6 +105,7 @@ public class OutputHandler extends AbstractDam<Chunk, String> {
 
         if (deleteFile && (mOutputFile != null)) {
 
+            //noinspection ResultOfMethodCallIgnored
             mOutputFile.delete();
 
             mOutputFile = null;

@@ -11,11 +11,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.wtf.example4;
+package com.bmd.wtf.example5;
 
 import com.bmd.wtf.bdr.FloatingException;
 import com.bmd.wtf.dam.AbstractDam;
 import com.bmd.wtf.example1.DownloadUtils;
+import com.bmd.wtf.example4.AbortException;
 import com.bmd.wtf.src.Floodgate;
 
 import java.io.IOException;
@@ -51,11 +52,11 @@ public class InputHandler extends AbstractDam<String, Chunk> {
 
             try {
 
-                setupConnection(new URL(drop));
+                setupConnection(drop);
 
             } catch (final IOException e) {
 
-                return e;
+                return new FloatingException(drop, e);
             }
 
             mCurrent = drop;
@@ -77,14 +78,14 @@ public class InputHandler extends AbstractDam<String, Chunk> {
 
             // Cannot receive another download request when one is already in progress
 
-            return new IllegalStateException();
+            return new FloatingException(mCurrent, drop);
         }
 
         try {
 
             // Read a chunk of data
 
-            final Chunk chunk = new Chunk(drop, CHUNK_SIZE, mContentLength);
+            final Chunk chunk = new Chunk(drop, CHUNK_SIZE);
             chunk.readFrom(mInputStream);
 
             gate.discharge(chunk);
@@ -106,7 +107,7 @@ public class InputHandler extends AbstractDam<String, Chunk> {
 
             resetConnection();
 
-            return e;
+            return new FloatingException(drop, e);
         }
 
         // Let the writer signal the completion
@@ -126,6 +127,8 @@ public class InputHandler extends AbstractDam<String, Chunk> {
                 // Abort the download
 
                 abort();
+
+                return null;
             }
         }
 
@@ -137,11 +140,21 @@ public class InputHandler extends AbstractDam<String, Chunk> {
 
         if (debris instanceof AbortException) {
 
-            if (!mAborted && ((AbortException) debris).getMessage().equals(mCurrent)) {
+            final AbortException ex = (AbortException) debris;
+
+            if (!mAborted && ex.getMessage().equals(mCurrent)) {
+
+                final Chunk chunk = new Chunk(mCurrent, CHUNK_SIZE);
 
                 // Abort the download
 
                 abort();
+
+                // Let's pretend download is complete
+
+                gate.discharge(chunk);
+
+                return null;
             }
         }
 
@@ -162,11 +175,11 @@ public class InputHandler extends AbstractDam<String, Chunk> {
         mInputStream = null;
     }
 
-    private void setupConnection(final URL url) throws IOException {
+    private void setupConnection(final String url) throws IOException {
 
         mInputStream = null;
 
-        final URLConnection connection = url.openConnection();
+        final URLConnection connection = new URL(url).openConnection();
 
         // Open the input stream
 
@@ -180,7 +193,7 @@ public class InputHandler extends AbstractDam<String, Chunk> {
 
                 // The request has failed...
 
-                throw new FloatingException(responseCode);
+                throw new FloatingException(mCurrent, responseCode);
             }
         }
 

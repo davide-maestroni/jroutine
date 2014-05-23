@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.wtf.example4;
+package com.bmd.wtf.example5;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,17 +24,14 @@ public class Chunk {
 
     private final byte[] mBuffer;
 
-    private final long mTotal;
-
     private final String mUrl;
 
-    private int mRead;
+    private int mRead = -1;
 
-    public Chunk(final String url, final int maxSize, final long totalSize) {
+    public Chunk(final String url, final int maxSize) {
 
         mUrl = url;
         mBuffer = new byte[maxSize];
-        mTotal = totalSize;
     }
 
     public String getUrl() {
@@ -50,16 +47,6 @@ public class Chunk {
     public void readFrom(final InputStream inputStream) throws IOException {
 
         mRead = inputStream.read(mBuffer);
-    }
-
-    public int size() {
-
-        return mRead;
-    }
-
-    public long totalBytes() {
-
-        return mTotal;
     }
 
     public void writeTo(final OutputStream outputStream) throws IOException {

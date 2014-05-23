@@ -11,17 +11,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.wtf.example4;
+package com.bmd.wtf.example5;
 
 import com.bmd.wtf.Waterfall;
 import com.bmd.wtf.bdr.Stream;
 import com.bmd.wtf.crr.Currents;
 import com.bmd.wtf.dam.Dam;
 import com.bmd.wtf.dam.OpenDam;
-import com.bmd.wtf.example1.Downloader;
 import com.bmd.wtf.example1.UrlObserver;
 import com.bmd.wtf.example2.DownloadBalancer;
 import com.bmd.wtf.example3.RetryPolicy;
+import com.bmd.wtf.example4.AbortException;
+import com.bmd.wtf.example4.CancelableObserver;
 import com.bmd.wtf.src.Floodgate;
 import com.bmd.wtf.src.Spring;
 import com.bmd.wtf.xtr.arr.CurrentFactories;
@@ -33,7 +34,7 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * Download manager with support for abort operation.
+ * Enhanced download manager supporting retry and abort functionalities.
  */
 public class DownloadManager {
 
@@ -75,12 +76,19 @@ public class DownloadManager {
 
                         return new RetryPolicy<String>(3);
                     }
-                }).thenFlowingThrough(new DamFactory<String, String>() {
+                }).thenFlowingThrough(new DamFactory<String, Chunk>() {
 
                     @Override
-                    public Dam<String, String> createForStream(final int streamNumber) {
+                    public Dam<String, Chunk> createForStream(final int streamNumber) {
 
-                        return new Downloader(downloadDir);
+                        return new InputHandler();
+                    }
+                }).thenFlowingThrough(new DamFactory<Chunk, String>() {
+
+                    @Override
+                    public Dam<Chunk, String> createForStream(final int streamNumber) {
+
+                        return new OutputHandler(downloadDir);
                     }
                 }).streams().get(0).backToSource();
     }

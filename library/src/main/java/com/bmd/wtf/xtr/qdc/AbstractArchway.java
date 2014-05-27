@@ -11,41 +11,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.wtf.dam;
+package com.bmd.wtf.xtr.qdc;
 
 import com.bmd.wtf.src.Floodgate;
+import com.bmd.wtf.src.Spring;
+
+import java.util.List;
 
 /**
- * A {@link Dam} decorator which prevents debris from flowing further downstream.
+ * Base abstract implementation of {@link Archway}.
  * <p/>
- * Created by davide on 3/11/14.
+ * Created by davide on 3/6/14.
  *
  * @param <IN>  The input data type.
  * @param <OUT> The output data type.
  */
-public class UpstreamDebrisDam<IN, OUT> extends DamDecorator<IN, OUT> {
+public abstract class AbstractArchway<IN, OUT> implements Archway<IN, OUT> {
 
-    /**
-     * Constructor.
-     *
-     * @param wrapped The wrapped dam.
-     */
-    public UpstreamDebrisDam(final Dam<IN, OUT> wrapped) {
+    @Override
+    public void onDrop(final Floodgate<IN, OUT> gate, final List<Spring<OUT>> springs,
+            final Object debris) {
 
-        super(wrapped);
+        for (final Spring<OUT> spring : springs) {
+
+            spring.drop(debris);
+        }
     }
 
     @Override
-    public Object onPushDebris(final Floodgate<IN, OUT> gate, final Object debris) {
+    public void onFlush(final Floodgate<IN, OUT> gate, final List<Spring<OUT>> springs) {
 
-        try {
+        for (final Spring<OUT> spring : springs) {
 
-            super.onPushDebris(gate, debris);
-
-        } catch (final Throwable ignored) {
-
+            spring.flush();
         }
-
-        return null;
     }
 }

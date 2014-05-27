@@ -40,20 +40,18 @@ public class DownloadObserver extends OpenDam<String> implements UrlObserver {
     }
 
     @Override
-    public Object onDischarge(final Floodgate<String, String> gate, final String drop) {
+    public void onDischarge(final Floodgate<String, String> gate, final String drop) {
 
         if (mDownloadingUrls.add(drop)) {
 
             mDownloadedUrls.remove(drop);
 
-            return super.onDischarge(gate, drop);
+            super.onDischarge(gate, drop);
         }
-
-        return null;
     }
 
     @Override
-    public Object onPullDebris(final Floodgate<String, String> gate, final Object debris) {
+    public void onDrop(final Floodgate<String, String> gate, final Object debris) {
 
         final String url;
 
@@ -65,20 +63,20 @@ public class DownloadObserver extends OpenDam<String> implements UrlObserver {
 
             mDownloadedUrls.add(url);
 
+            mDownloadingUrls.remove(url);
+
         } else if (debris instanceof Throwable) {
 
             url = ((Throwable) debris).getMessage();
 
             System.out.println("Download failed: " + url);
 
+            mDownloadingUrls.remove(url);
+
         } else {
 
-            url = null;
+            super.onDrop(gate, debris);
         }
-
-        mDownloadingUrls.remove(url);
-
-        return super.onPullDebris(gate, debris);
     }
 
     protected Set<String> downloaded() {

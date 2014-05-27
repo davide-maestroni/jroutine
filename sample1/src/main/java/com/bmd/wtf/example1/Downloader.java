@@ -38,7 +38,7 @@ public class Downloader extends OpenDam<String> {
     }
 
     @Override
-    public Object onDischarge(final Floodgate<String, String> gate, final String drop) {
+    public void onDischarge(final Floodgate<String, String> gate, final String drop) {
 
         InputStream inputStream = null;
 
@@ -65,7 +65,7 @@ public class Downloader extends OpenDam<String> {
 
                     // The request has failed...
 
-                    return new FloatingException(drop, responseCode);
+                    throw new FloatingException(drop, responseCode);
                 }
             }
 
@@ -86,7 +86,7 @@ public class Downloader extends OpenDam<String> {
 
         } catch (final IOException e) {
 
-            return new FloatingException(drop, e);
+            throw new FloatingException(drop, e);
 
         } finally {
 
@@ -96,8 +96,8 @@ public class Downloader extends OpenDam<String> {
             DownloadUtils.safeClose(inputStream);
         }
 
-        // Return the url if everything worked as expected
+        // Drop the url if everything worked as expected
 
-        return drop;
+        gate.drop(drop);
     }
 }

@@ -38,18 +38,16 @@ class BlockingCollectorDam<DATA> extends CollectorDam<DATA> {
 
     private final ReentrantLock mLock = new ReentrantLock();
 
+    private int mDebrisCount;
+
     private int mDropCount;
 
     private int mFlushCount;
 
-    private int mPullCount;
-
-    private int mPushCount;
-
     private RuntimeException mTimeoutException;
 
-    // No timeout by default
-    private long mTimeoutMs = -1;
+    // Immediate timeout by default
+    private long mTimeoutMs = 0;
 
     public BlockingCollectorDam() {
 
@@ -65,6 +63,14 @@ class BlockingCollectorDam<DATA> extends CollectorDam<DATA> {
     }
 
     @Override
+    public List<Object> collectDebris() {
+
+        waitForDebris(true);
+
+        return super.collectDebris();
+    }
+
+    @Override
     public DATA collectNext() {
 
         waitForData(false);
@@ -73,41 +79,17 @@ class BlockingCollectorDam<DATA> extends CollectorDam<DATA> {
     }
 
     @Override
-    public Object collectNextPulledDebris() {
+    public Object collectNextDebris() {
 
-        waitForPull(false);
+        waitForDebris(false);
 
-        return super.collectNextPulledDebris();
+        return super.collectNextDebris();
     }
 
     @Override
-    public Object collectNextPushedDebris() {
+    public void onDischarge(final Floodgate<DATA, DATA> gate, final DATA drop) {
 
-        waitForPush(false);
-
-        return super.collectNextPushedDebris();
-    }
-
-    @Override
-    public List<Object> collectPulledDebris() {
-
-        waitForPull(true);
-
-        return super.collectPulledDebris();
-    }
-
-    @Override
-    public List<Object> collectPushedDebris() {
-
-        waitForPush(true);
-
-        return super.collectPushedDebris();
-    }
-
-    @Override
-    public Object onDischarge(final Floodgate<DATA, DATA> gate, final DATA drop) {
-
-        final Object debris = super.onDischarge(gate, drop);
+        super.onDischarge(gate, drop);
 
         final ReentrantLock lock = mLock;
 
@@ -121,14 +103,12 @@ class BlockingCollectorDam<DATA> extends CollectorDam<DATA> {
 
             lock.unlock();
         }
-
-        return debris;
     }
 
     @Override
-    public Object onPullDebris(final Floodgate<DATA, DATA> gate, final Object debris) {
+    public void onDrop(final Floodgate<DATA, DATA> gate, final Object debris) {
 
-        final Object next = super.onPullDebris(gate, debris);
+        super.onDrop(gate, debris);
 
         final ReentrantLock lock = mLock;
 
@@ -136,7 +116,7 @@ class BlockingCollectorDam<DATA> extends CollectorDam<DATA> {
 
         try {
 
-            ++mPullCount;
+            ++mDebrisCount;
 
             mCondition.signalAll();
 
@@ -144,37 +124,12 @@ class BlockingCollectorDam<DATA> extends CollectorDam<DATA> {
 
             lock.unlock();
         }
-
-        return next;
     }
 
     @Override
-    public Object onPushDebris(final Floodgate<DATA, DATA> gate, final Object debris) {
+    public void onFlush(final Floodgate<DATA, DATA> gate) {
 
-        final Object next = super.onPushDebris(gate, debris);
-
-        final ReentrantLock lock = mLock;
-
-        lock.lock();
-
-        try {
-
-            ++mPushCount;
-
-            mCondition.signalAll();
-
-        } finally {
-
-            lock.unlock();
-        }
-
-        return next;
-    }
-
-    @Override
-    public Object onFlush(final Floodgate<DATA, DATA> gate) {
-
-        final Object debris = super.onFlush(gate);
+        super.onFlush(gate);
 
         final ReentrantLock lock = mLock;
 
@@ -190,8 +145,6 @@ class BlockingCollectorDam<DATA> extends CollectorDam<DATA> {
 
             lock.unlock();
         }
-
-        return debris;
     }
 
     /**
@@ -313,7 +266,7 @@ class BlockingCollectorDam<DATA> extends CollectorDam<DATA> {
         }
     }
 
-    private void waitForPull(final boolean drain) {
+    private void waitForDebris(final boolean drain) {
 
         final ReentrantLock lock = mLock;
 
@@ -325,7 +278,7 @@ class BlockingCollectorDam<DATA> extends CollectorDam<DATA> {
 
         try {
 
-            if (mPullCount > 0) {
+            if (mDebrisCount > 0) {
 
                 return;
             }
@@ -346,7 +299,7 @@ class BlockingCollectorDam<DATA> extends CollectorDam<DATA> {
 
                     currentTimeout = endTime - System.currentTimeMillis();
 
-                    if ((mPullCount == 0) && (currentTimeout <= 0)) {
+                    if ((mDebrisCount == 0) && (currentTimeout <= 0)) {
 
                         isTimeout = true;
 
@@ -358,7 +311,7 @@ class BlockingCollectorDam<DATA> extends CollectorDam<DATA> {
                     mCondition.await();
                 }
 
-            } while (mPullCount == 0);
+            } while (mDebrisCount == 0);
 
         } catch (final InterruptedException e) {
 
@@ -368,78 +321,9 @@ class BlockingCollectorDam<DATA> extends CollectorDam<DATA> {
 
         } finally {
 
-            if (drain || (--mPullCount <= 0)) {
+            if (drain || (--mDebrisCount <= 0)) {
 
-                mPullCount = 0;
-            }
-
-            lock.unlock();
-        }
-
-        if (isTimeout && (exception != null)) {
-
-            throw exception;
-        }
-    }
-
-    private void waitForPush(final boolean drain) {
-
-        final ReentrantLock lock = mLock;
-
-        lock.lock();
-
-        boolean isTimeout = false;
-
-        RuntimeException exception = null;
-
-        try {
-
-            if (mPushCount > 0) {
-
-                return;
-            }
-
-            exception = mTimeoutException;
-
-            long currentTimeout = mTimeoutMs;
-
-            final long startTime = System.currentTimeMillis();
-
-            final long endTime = startTime + currentTimeout;
-
-            do {
-
-                if (currentTimeout >= 0) {
-
-                    mCondition.await(currentTimeout, TimeUnit.MILLISECONDS);
-
-                    currentTimeout = endTime - System.currentTimeMillis();
-
-                    if ((mPushCount == 0) && (currentTimeout <= 0)) {
-
-                        isTimeout = true;
-
-                        break;
-                    }
-
-                } else {
-
-                    mCondition.await();
-                }
-
-            } while (mPushCount == 0);
-
-        } catch (final InterruptedException e) {
-
-            Thread.currentThread().interrupt();
-
-            throw new DelayInterruptedException(e);
-
-        } finally {
-
-            if (drain || (--mPushCount <= 0)) {
-
-                mPushCount = 0;
+                mDebrisCount = 0;
             }
 
             lock.unlock();

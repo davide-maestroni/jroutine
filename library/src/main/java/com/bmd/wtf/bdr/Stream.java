@@ -185,6 +185,54 @@ public class Stream<SOURCE, IN, OUT> {
     }
 
     /**
+     * Makes this stream fall through the specified dam.
+     * <p/>
+     * Before (where 'a' is this stream, and the number represents the type of source):
+     * <pre>
+     *     <code>
+     *
+     *         -()-a1-
+     *
+     *     </code>
+     * </pre>
+     * <p/>
+     * After (where 'r' is the returned stream, and the number represents the type of source):
+     * <pre>
+     *     <code>
+     *
+     *         -()-a1-
+     *           \
+     *           (DAM)-r1-
+     *
+     *     </code>
+     * </pre>
+     *
+     * @param dam    The dam.
+     * @param <NOUT> The output data type.
+     * @return A new stream flowing from the dam.
+     */
+    public <NOUT> Stream<SOURCE, OUT, NOUT> thenFallingThrough(final Dam<OUT, NOUT> dam) {
+
+        if (dam == null) {
+
+            throw new IllegalArgumentException("the dam cannot be null");
+        }
+
+        final DataPool<OUT, NOUT> outPool = new DataPool<OUT, NOUT>(mOutCurrent, dam);
+        final Stream<SOURCE, IN, OUT> stream =
+                new Stream<SOURCE, IN, OUT>(mSpring, mUpstreamPool, outPool);
+
+        if (mUpstreamPool != null) {
+
+            mUpstreamPool.outputStreams.add(stream);
+        }
+
+        outPool.inputStreams.add(stream);
+
+        return new Stream<SOURCE, OUT, NOUT>(mSpring, outPool, (DataPool<NOUT, ?>) null);
+    }
+
+    /**
      * Feeds the specified stream with the data flowing into this one, and returns a new stream
      * originating from the same pool.
      * <p/>
@@ -304,54 +352,6 @@ public class Stream<SOURCE, IN, OUT> {
         }
 
         return new Stream<SOURCE, IN, OUT>(mSpring, mUpstreamPool, current);
-    }
-
-    /**
-     * Makes this stream flow through the specified dam.
-     * <p/>
-     * Before (where 'a' is this stream, and the number represents the type of source):
-     * <pre>
-     *     <code>
-     *
-     *         -()-a1-
-     *
-     *     </code>
-     * </pre>
-     * <p/>
-     * After (where 'r' is the returned stream, and the number represents the type of source):
-     * <pre>
-     *     <code>
-     *
-     *         -()-a1-
-     *           \
-     *           (DAM)-r1-
-     *
-     *     </code>
-     * </pre>
-     *
-     * @param dam    The dam.
-     * @param <NOUT> The output data type.
-     * @return A new stream flowing from the dam.
-     */
-    public <NOUT> Stream<SOURCE, OUT, NOUT> thenFlowingThrough(final Dam<OUT, NOUT> dam) {
-
-        if (dam == null) {
-
-            throw new IllegalArgumentException("the dam cannot be null");
-        }
-
-        final DataPool<OUT, NOUT> outPool = new DataPool<OUT, NOUT>(mOutCurrent, dam);
-        final Stream<SOURCE, IN, OUT> stream =
-                new Stream<SOURCE, IN, OUT>(mSpring, mUpstreamPool, outPool);
-
-        if (mUpstreamPool != null) {
-
-            mUpstreamPool.outputStreams.add(stream);
-        }
-
-        outPool.inputStreams.add(stream);
-
-        return new Stream<SOURCE, OUT, NOUT>(mSpring, outPool, (DataPool<NOUT, ?>) null);
     }
 
     /**
@@ -659,7 +659,7 @@ public class Stream<SOURCE, IN, OUT> {
     public <NSOURCE, NOUT> Stream<SOURCE, OUT, NOUT> thenMergingThrough(final Dam<OUT, NOUT> dam,
             final Iterable<? extends Stream<NSOURCE, ?, OUT>> streams) {
 
-        final Stream<SOURCE, OUT, NOUT> resultStream = thenFlowingThrough(dam);
+        final Stream<SOURCE, OUT, NOUT> resultStream = thenFallingThrough(dam);
 
         final DataPool<OUT, NOUT> downPool = resultStream.mUpstreamPool;
 
@@ -670,7 +670,7 @@ public class Stream<SOURCE, IN, OUT> {
                 continue;
             }
 
-            @SuppressWarnings("unchecked")
+            //noinspection unchecked
             final DataPool<Object, OUT> upPool = (DataPool<Object, OUT>) stream.mUpstreamPool;
 
             final Stream<NSOURCE, Object, OUT> mergeStream =
@@ -727,7 +727,7 @@ public class Stream<SOURCE, IN, OUT> {
     public <NSOURCE, NOUT> Stream<SOURCE, OUT, NOUT> thenMergingThrough(final Dam<OUT, NOUT> dam,
             final Stream<NSOURCE, ?, OUT>... streams) {
 
-        final Stream<SOURCE, OUT, NOUT> resultStream = thenFlowingThrough(dam);
+        final Stream<SOURCE, OUT, NOUT> resultStream = thenFallingThrough(dam);
 
         final DataPool<OUT, NOUT> downPool = resultStream.mUpstreamPool;
 
@@ -738,7 +738,7 @@ public class Stream<SOURCE, IN, OUT> {
                 continue;
             }
 
-            @SuppressWarnings("unchecked")
+            //noinspection unchecked
             final DataPool<Object, OUT> upPool = (DataPool<Object, OUT>) stream.mUpstreamPool;
 
             final Stream<NSOURCE, Object, OUT> mergeStream =
@@ -791,7 +791,7 @@ public class Stream<SOURCE, IN, OUT> {
     public <NSOURCE, NIN, NOUT> Stream<SOURCE, OUT, NOUT> thenMergingThrough(
             final Dam<OUT, NOUT> dam, final Stream<NSOURCE, NIN, OUT> stream) {
 
-        final Stream<SOURCE, OUT, NOUT> resultStream = thenFlowingThrough(dam);
+        final Stream<SOURCE, OUT, NOUT> resultStream = thenFallingThrough(dam);
 
         if (this == stream) {
 
@@ -868,6 +868,33 @@ public class Stream<SOURCE, IN, OUT> {
         visitor.dryUp();
     }
 
+    void drop(final Object debris) {
+
+        final DataPool<OUT, ?> pool = mDownstreamPool;
+
+        pool.incrementIdleCountdown(1);
+
+        if (mPassThrough) {
+
+            pool.drop(debris);
+
+        } else {
+
+            final Current inputCurrent = pool.inputCurrent;
+
+            inputCurrent.drop(pool, debris);
+        }
+    }
+
+    void dropAfter(final long delay, final TimeUnit timeUnit, final Object debris) {
+
+        final DataPool<OUT, ?> pool = mDownstreamPool;
+
+        pool.incrementIdleCountdown(1);
+
+        pool.inputCurrent.dropAfter(pool, delay, timeUnit, debris);
+    }
+
     void flush() {
 
         final DataPool<OUT, ?> pool = mDownstreamPool;
@@ -883,45 +910,6 @@ public class Stream<SOURCE, IN, OUT> {
             final Current inputCurrent = pool.inputCurrent;
 
             inputCurrent.flush(pool);
-        }
-    }
-
-    void pull(final Object debris) {
-
-        final DataPool<IN, OUT> pool = mUpstreamPool;
-
-        if (pool != null) {
-
-            pool.incrementIdleCountdown(1);
-
-            if (mPassThrough) {
-
-                pool.pull(debris);
-
-            } else {
-
-                final Current inputCurrent = pool.inputCurrent;
-
-                inputCurrent.pull(pool, debris);
-            }
-        }
-    }
-
-    void push(final Object debris) {
-
-        final DataPool<OUT, ?> pool = mDownstreamPool;
-
-        pool.incrementIdleCountdown(1);
-
-        if (mPassThrough) {
-
-            pool.push(debris);
-
-        } else {
-
-            final Current inputCurrent = pool.inputCurrent;
-
-            inputCurrent.push(pool, debris);
         }
     }
 

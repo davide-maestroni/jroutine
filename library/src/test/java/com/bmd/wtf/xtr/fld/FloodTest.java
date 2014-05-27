@@ -38,31 +38,21 @@ public class FloodTest extends TestCase {
         final TestObserver observer1 = new TestObserver() {
 
             @Override
-            public Object onDischarge(final Floodgate<Integer, String> gate, final Integer drop) {
+            public void onDischarge(final Floodgate<Integer, String> gate, final Integer drop) {
 
                 gate.discharge(drop.toString());
-
-                return null;
             }
 
             @Override
-            public Object onFlush(final Floodgate<Integer, String> gate) {
+            public void onFlush(final Floodgate<Integer, String> gate) {
 
                 gate.flush();
-
-                return null;
             }
 
             @Override
-            public Object onPullDebris(final Floodgate<Integer, String> gate, final Object debris) {
+            public void onDrop(final Floodgate<Integer, String> gate, final Object debris) {
 
-                return debris;
-            }
-
-            @Override
-            public Object onPushDebris(final Floodgate<Integer, String> gate, final Object debris) {
-
-                return debris;
+                gate.drop(debris);
             }
         };
 
@@ -94,31 +84,21 @@ public class FloodTest extends TestCase {
         final TestObserver observer2 = new TestObserver() {
 
             @Override
-            public Object onDischarge(final Floodgate<Integer, String> gate, final Integer drop) {
+            public void onDischarge(final Floodgate<Integer, String> gate, final Integer drop) {
 
                 gate.discharge(drop.toString());
-
-                return null;
             }
 
             @Override
-            public Object onFlush(final Floodgate<Integer, String> gate) {
+            public void onFlush(final Floodgate<Integer, String> gate) {
 
                 gate.flush();
-
-                return null;
             }
 
             @Override
-            public Object onPullDebris(final Floodgate<Integer, String> gate, final Object debris) {
+            public void onDrop(final Floodgate<Integer, String> gate, final Object debris) {
 
-                return debris;
-            }
-
-            @Override
-            public Object onPushDebris(final Floodgate<Integer, String> gate, final Object debris) {
-
-                return debris;
+                gate.drop(debris);
             }
         };
 
@@ -196,30 +176,34 @@ public class FloodTest extends TestCase {
         final Spring<String> spring = Waterfall.fallingFrom(new OpenDam<String>() {
 
             @Override
-            public Object onDischarge(final Floodgate<String, String> gate, final String drop) {
+            public void onDischarge(final Floodgate<String, String> gate, final String drop) {
 
                 if ("push".equals(drop)) {
 
-                    return drop;
+                    gate.drop(drop);
+
+                    return;
                 }
 
-                return super.onDischarge(gate, drop);
+                super.onDischarge(gate, drop);
             }
 
-        }).thenFlowingThrough(control.leveeControlledBy(new ObjectObserverImpl()))
-                                               .thenFlowingThrough(new OpenDam<String>() {
+        }).thenFallingThrough(control.leveeControlledBy(new ObjectObserverImpl()))
+                                               .thenFallingThrough(new OpenDam<String>() {
 
                                                    @Override
-                                                   public Object onDischarge(
+                                                   public void onDischarge(
                                                            final Floodgate<String, String> gate,
                                                            final String drop) {
 
                                                        if ("pull".equals(drop)) {
 
-                                                           return drop;
+                                                           gate.drop(drop);
+
+                                                           return;
                                                        }
 
-                                                       return super.onDischarge(gate, drop);
+                                                       super.onDischarge(gate, drop);
                                                    }
 
                                                }).backToSource();
@@ -227,44 +211,37 @@ public class FloodTest extends TestCase {
         final ObjectObserver controller = control.controller();
 
         assertThat(controller.getLastDrop()).isNull();
-        assertThat(controller.getLastPulledDebris()).isNull();
-        assertThat(controller.getLastPushedDebris()).isNull();
+        assertThat(controller.getLastDebris()).isNull();
 
         spring.discharge("test");
 
         assertThat(controller.getLastDrop()).isEqualTo("test");
-        assertThat(controller.getLastPulledDebris()).isNull();
-        assertThat(controller.getLastPushedDebris()).isNull();
+        assertThat(controller.getLastDebris()).isNull();
 
         spring.discharge("test1");
 
         assertThat(controller.getLastDrop()).isEqualTo("test1");
-        assertThat(controller.getLastPulledDebris()).isNull();
-        assertThat(controller.getLastPushedDebris()).isNull();
+        assertThat(controller.getLastDebris()).isNull();
 
         spring.discharge("push");
 
         assertThat(controller.getLastDrop()).isEqualTo("test1");
-        assertThat(controller.getLastPulledDebris()).isNull();
-        assertThat(controller.getLastPushedDebris()).isEqualTo("push");
+        assertThat(controller.getLastDebris()).isEqualTo("push");
 
         spring.discharge("test2");
 
         assertThat(controller.getLastDrop()).isEqualTo("test2");
-        assertThat(controller.getLastPulledDebris()).isNull();
-        assertThat(controller.getLastPushedDebris()).isEqualTo("push");
+        assertThat(controller.getLastDebris()).isEqualTo("push");
 
         spring.discharge("pull");
 
         assertThat(controller.getLastDrop()).isEqualTo("pull");
-        assertThat(controller.getLastPulledDebris()).isEqualTo("pull");
-        assertThat(controller.getLastPushedDebris()).isEqualTo("push");
+        assertThat(controller.getLastDebris()).isEqualTo("push");
 
         spring.flush();
 
         assertThat(controller.getLastDrop()).isEqualTo("pull");
-        assertThat(controller.getLastPulledDebris()).isEqualTo("pull");
-        assertThat(controller.getLastPushedDebris()).isEqualTo("push");
+        assertThat(controller.getLastDebris()).isEqualTo("push");
     }
 
     @Override
@@ -275,11 +252,9 @@ public class FloodTest extends TestCase {
 
     private interface ObjectObserver extends FloodObserver<String, String> {
 
+        public Object getLastDebris();
+
         public String getLastDrop();
-
-        public Object getLastPulledDebris();
-
-        public Object getLastPushedDebris();
     }
 
     private interface TestObserver extends FloodObserver<Integer, String> {
@@ -288,11 +263,15 @@ public class FloodTest extends TestCase {
 
     private static class ObjectObserverImpl extends OpenDam<String> implements ObjectObserver {
 
+        private Object mLastDebris;
+
         private String mLastDrop;
 
-        private Object mLastPulledDebris;
+        @Override
+        public Object getLastDebris() {
 
-        private Object mLastPushedDebris;
+            return mLastDebris;
+        }
 
         @Override
         public String getLastDrop() {
@@ -301,39 +280,19 @@ public class FloodTest extends TestCase {
         }
 
         @Override
-        public Object getLastPulledDebris() {
-
-            return mLastPulledDebris;
-        }
-
-        @Override
-        public Object getLastPushedDebris() {
-
-            return mLastPushedDebris;
-        }
-
-        @Override
-        public Object onDischarge(final Floodgate<String, String> gate, final String drop) {
+        public void onDischarge(final Floodgate<String, String> gate, final String drop) {
 
             mLastDrop = drop;
 
-            return super.onDischarge(gate, drop);
+            super.onDischarge(gate, drop);
         }
 
         @Override
-        public Object onPullDebris(final Floodgate<String, String> gate, final Object debris) {
+        public void onDrop(final Floodgate<String, String> gate, final Object debris) {
 
-            mLastPulledDebris = debris;
+            mLastDebris = debris;
 
-            return super.onPullDebris(gate, debris);
-        }
-
-        @Override
-        public Object onPushDebris(final Floodgate<String, String> gate, final Object debris) {
-
-            mLastPushedDebris = debris;
-
-            return super.onPushDebris(gate, debris);
+            super.onDrop(gate, debris);
         }
     }
 

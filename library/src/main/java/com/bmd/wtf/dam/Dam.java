@@ -41,33 +41,21 @@ public interface Dam<IN, OUT> {
      *
      * @param gate The gate instance to be used to discharge data into the waterfall.
      * @param drop The drop of data discharged.
-     * @return The debris to push downstream and pull upstream, or <code>null</code>.
      */
-    public Object onDischarge(Floodgate<IN, OUT> gate, IN drop);
-
-    /**
-     * This method is called when data are flushed through the dam.
-     *
-     * @param gate The gate instance to be used to discharge data into the waterfall.
-     * @return The debris to push downstream and pull upstream, or <code>null</code>.
-     */
-    public Object onFlush(Floodgate<IN, OUT> gate);
-
-    /**
-     * This method is called when an debris is pulled upstream through the dam.
-     *
-     * @param gate   The gate instance to be used to discharge data into the waterfall.
-     * @param debris The pulled debris.
-     * @return The debris to pull further upstream, or <code>null</code>.
-     */
-    public Object onPullDebris(Floodgate<IN, OUT> gate, Object debris);
+    public void onDischarge(Floodgate<IN, OUT> gate, IN drop);
 
     /**
      * This method is called when an object is pushed downstream through the dam.
      *
      * @param gate   The gate instance to be used to discharge data into the waterfall.
      * @param debris The pushed debris.
-     * @return The debris to push further downstream, or <code>null</code>.
      */
-    public Object onPushDebris(Floodgate<IN, OUT> gate, Object debris);
+    public void onDrop(Floodgate<IN, OUT> gate, Object debris);
+
+    /**
+     * This method is called when data are flushed through the dam.
+     *
+     * @param gate The gate instance to be used to discharge data into the waterfall.
+     */
+    public void onFlush(Floodgate<IN, OUT> gate);
 }

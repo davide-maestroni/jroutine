@@ -54,14 +54,14 @@ public class DownloadManager {
                                         .thenBalancedBy(new DownloadBalancer()).thenFlowingInto(
                         CurrentFactories
                                 .singletonCurrentFactory(Currents.threadPoolCurrent(maxThreads))
-                ).thenFlowingThrough(new DamFactory<String, String>() {
+                ).thenFallingThrough(new DamFactory<String, String>() {
 
                     @Override
                     public Dam<String, String> createForStream(final int streamNumber) {
 
                         return new RetryPolicy<String>(3);
                     }
-                }).thenFlowingThrough(new DamFactory<String, String>() {
+                }).thenFallingThrough(new DamFactory<String, String>() {
 
                     @Override
                     public Dam<String, String> createForStream(final int streamNumber) {

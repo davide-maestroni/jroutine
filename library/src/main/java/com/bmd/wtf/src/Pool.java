@@ -15,7 +15,7 @@ package com.bmd.wtf.src;
 
 /**
  * A pool instance gives a {@link com.bmd.wtf.crr.Current} a way to discharge data into the
- * {@link com.bmd.wtf.Waterfall} flow both upstream and downstream.
+ * {@link com.bmd.wtf.Waterfall} flow.
  * <p/>
  * Its methods must be called as a result of the invocation of the relative current ones, inside
  * the thread or queue handled by the specific implementation.
@@ -34,6 +34,13 @@ public interface Pool<DATA> {
     public void discharge(DATA drop);
 
     /**
+     * Drops the specified debris into the waterfall.
+     *
+     * @param debris The debris instance to drop.
+     */
+    public void drop(Object debris);
+
+    /**
      * Flushes the pool, that is, it informs the fed streams that no more data drops are likely to
      * come.
      * <p/>
@@ -43,18 +50,4 @@ public interface Pool<DATA> {
      * the total number should be checked downstream before further propagating the flush.
      */
     public void flush();
-
-    /**
-     * Pulls upstream the specified debris.
-     *
-     * @param debris The debris instance to pull.
-     */
-    public void pull(Object debris);
-
-    /**
-     * Pushes downstream the specified debris.
-     *
-     * @param debris The debris instance to push.
-     */
-    public void push(Object debris);
 }

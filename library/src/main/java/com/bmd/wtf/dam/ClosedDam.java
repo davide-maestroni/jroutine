@@ -26,26 +26,17 @@ import com.bmd.wtf.src.Floodgate;
 public class ClosedDam<IN, OUT> implements Dam<IN, OUT> {
 
     @Override
-    public Object onDischarge(final Floodgate<IN, OUT> gate, final IN drop) {
+    public void onDischarge(final Floodgate<IN, OUT> gate, final IN drop) {
 
-        return null;
     }
 
     @Override
-    public Object onFlush(final Floodgate<IN, OUT> gate) {
+    public void onDrop(final Floodgate<IN, OUT> gate, final Object debris) {
 
-        return null;
     }
 
     @Override
-    public Object onPullDebris(final Floodgate<IN, OUT> gate, final Object debris) {
+    public void onFlush(final Floodgate<IN, OUT> gate) {
 
-        return null;
-    }
-
-    @Override
-    public Object onPushDebris(final Floodgate<IN, OUT> gate, final Object debris) {
-
-        return null;
     }
 }

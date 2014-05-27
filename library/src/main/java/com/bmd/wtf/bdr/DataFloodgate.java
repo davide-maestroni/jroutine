@@ -151,6 +151,27 @@ class DataFloodgate<IN, OUT> implements Floodgate<IN, OUT> {
     }
 
     @Override
+    public Floodgate<IN, OUT> drop(final Object debris) {
+
+        failIfClosed();
+
+        mPump.drop(mPool, debris);
+
+        return this;
+    }
+
+    @Override
+    public Floodgate<IN, OUT> dropAfter(final long delay, final TimeUnit timeUnit,
+            final Object debris) {
+
+        failIfClosed();
+
+        mPump.dropAfter(mPool, delay, timeUnit, debris);
+
+        return this;
+    }
+
+    @Override
     public void drain() {
 
         final DataPool<IN, OUT> pool = mPool;
@@ -210,6 +231,17 @@ class DataFloodgate<IN, OUT> implements Floodgate<IN, OUT> {
     }
 
     @Override
+    public Floodgate<IN, OUT> redropAfter(final long delay, final TimeUnit timeUnit,
+            final Object debris) {
+
+        failIfClosed();
+
+        mPump.redropAfter(mPool, delay, timeUnit, debris);
+
+        return this;
+    }
+
+    @Override
     public void exhaust() {
 
         final DataPool<IN, OUT> pool = mPool;
@@ -255,24 +287,6 @@ class DataFloodgate<IN, OUT> implements Floodgate<IN, OUT> {
         mLock.lock();
 
         mPump = sPump.get();
-    }
-
-    DataFloodgate<IN, OUT> pull(final Object debris) {
-
-        failIfClosed();
-
-        mPump.pull(mPool, debris);
-
-        return this;
-    }
-
-    DataFloodgate<IN, OUT> push(final Object debris) {
-
-        failIfClosed();
-
-        mPump.push(mPool, debris);
-
-        return this;
     }
 
     private void failIfClosed() {

@@ -88,6 +88,34 @@ class LooperCurrent implements Current {
     }
 
     @Override
+    public void drop(final Pool<?> pool, final Object debris) {
+
+        mHandler.post(new Runnable() {
+
+            @Override
+            public void run() {
+
+                pool.drop(debris);
+            }
+        });
+    }
+
+    @Override
+    public void dropAfter(final Pool<?> pool, final long delay, final TimeUnit timeUnit,
+            final Object debris) {
+
+        mHandler.postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+
+                pool.drop(debris);
+            }
+
+        }, timeUnit.toMillis(delay));
+    }
+
+    @Override
     public void flush(final Pool<?> pool) {
 
         mHandler.post(new Runnable() {
@@ -96,32 +124,6 @@ class LooperCurrent implements Current {
             public void run() {
 
                 pool.flush();
-            }
-        });
-    }
-
-    @Override
-    public void pull(final Pool<?> pool, final Object debris) {
-
-        mHandler.post(new Runnable() {
-
-            @Override
-            public void run() {
-
-                pool.pull(debris);
-            }
-        });
-    }
-
-    @Override
-    public void push(final Pool<?> pool, final Object debris) {
-
-        mHandler.post(new Runnable() {
-
-            @Override
-            public void run() {
-
-                pool.push(debris);
             }
         });
     }

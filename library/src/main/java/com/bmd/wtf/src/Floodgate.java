@@ -48,6 +48,12 @@ public interface Floodgate<IN, OUT> extends Spring<OUT> {
     public Floodgate<IN, OUT> dischargeAfter(long delay, TimeUnit timeUnit,
             Iterable<? extends OUT> drops);
 
+    @Override
+    public Floodgate<IN, OUT> drop(Object debris);
+
+    @Override
+    public Floodgate<IN, OUT> dropAfter(long delay, TimeUnit timeUnit, Object debris);
+
     /**
      * Drains the gate, that is, the associated {@link Pool} is detached
      * from the waterfall and no more data will flow through it and through this gate.
@@ -66,8 +72,8 @@ public interface Floodgate<IN, OUT> extends Spring<OUT> {
     public Floodgate<IN, OUT> rechargeAfter(long delay, TimeUnit timeUnit, IN drop);
 
     /**
-     * Discharges again the specified data drops into the same {@link Pool}
-     * associated with this gate, after the specified time has elapsed.
+     * Discharges again the specified data drops into the same {@link Pool} associated with this
+     * gate, after the specified time has elapsed.
      *
      * @param delay    The delay in <code>timeUnit</code> time units.
      * @param timeUnit The delay time unit.
@@ -88,4 +94,15 @@ public interface Floodgate<IN, OUT> extends Spring<OUT> {
      */
     public Floodgate<IN, OUT> rechargeAfter(long delay, TimeUnit timeUnit,
             Iterable<? extends IN> drops);
+
+    /**
+     * Drops again the specified debris into the same {@link Pool} associated with this gate,
+     * after the specified time has elapsed.
+     *
+     * @param delay    The delay in <code>timeUnit</code> time units.
+     * @param timeUnit The delay time unit.
+     * @param debris   The debris to drop downstream.
+     * @return This gate.
+     */
+    public Floodgate<IN, OUT> redropAfter(long delay, TimeUnit timeUnit, Object debris);
 }

@@ -16,8 +16,8 @@ package com.bmd.wtf.dam;
 import com.bmd.wtf.src.Floodgate;
 
 /**
- * Implementation of an open {@link Dam}, that lets all the data and objects flow downstream and
- * upstream untouched.
+ * Implementation of an open {@link Dam}, that lets all the data and objects flow downstream
+ * untouched.
  * <p/>
  * Created by davide on 2/27/14.
  *
@@ -26,10 +26,8 @@ import com.bmd.wtf.src.Floodgate;
 public class OpenDam<DATA> extends AbstractDam<DATA, DATA> {
 
     @Override
-    public Object onDischarge(final Floodgate<DATA, DATA> gate, final DATA drop) {
+    public void onDischarge(final Floodgate<DATA, DATA> gate, final DATA drop) {
 
         gate.discharge(drop);
-
-        return null;
     }
 }

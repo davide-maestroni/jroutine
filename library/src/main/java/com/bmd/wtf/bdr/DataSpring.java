@@ -102,6 +102,22 @@ class DataSpring<DATA> implements Spring<DATA> {
     }
 
     @Override
+    public Spring<DATA> drop(final Object debris) {
+
+        mOutStream.drop(debris);
+
+        return this;
+    }
+
+    @Override
+    public Spring<DATA> dropAfter(final long delay, final TimeUnit timeUnit, final Object debris) {
+
+        mOutStream.dropAfter(delay, timeUnit, debris);
+
+        return this;
+    }
+
+    @Override
     public void exhaust() {
 
         mOutStream.drain(true);

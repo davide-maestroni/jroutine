@@ -87,6 +87,34 @@ public class ThreadPoolCurrent implements Current {
     }
 
     @Override
+    public void drop(final Pool<?> pool, final Object debris) {
+
+        mService.execute(new Runnable() {
+
+            @Override
+            public void run() {
+
+                pool.drop(debris);
+            }
+        });
+    }
+
+    @Override
+    public void dropAfter(final Pool<?> pool, final long delay, final TimeUnit timeUnit,
+            final Object debris) {
+
+        mService.schedule(new Runnable() {
+
+            @Override
+            public void run() {
+
+                pool.drop(debris);
+            }
+
+        }, delay, timeUnit);
+    }
+
+    @Override
     public void flush(final Pool<?> pool) {
 
         mService.execute(new Runnable() {
@@ -95,32 +123,6 @@ public class ThreadPoolCurrent implements Current {
             public void run() {
 
                 pool.flush();
-            }
-        });
-    }
-
-    @Override
-    public void pull(final Pool<?> pool, final Object debris) {
-
-        mService.execute(new Runnable() {
-
-            @Override
-            public void run() {
-
-                pool.pull(debris);
-            }
-        });
-    }
-
-    @Override
-    public void push(final Pool<?> pool, final Object debris) {
-
-        mService.execute(new Runnable() {
-
-            @Override
-            public void run() {
-
-                pool.push(debris);
             }
         });
     }

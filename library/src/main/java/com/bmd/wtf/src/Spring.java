@@ -86,6 +86,24 @@ public interface Spring<DATA> {
             Iterable<? extends DATA> drops);
 
     /**
+     * Discharges the specified debris into the waterfall.
+     *
+     * @param debris The debris to drop downstream.
+     * @return This spring.
+     */
+    public Spring<DATA> drop(Object debris);
+
+    /**
+     * Drops the specified debris into the waterfall, after the specified time has elapsed.
+     *
+     * @param delay    The delay in <code>timeUnit</code> time units.
+     * @param timeUnit The delay time unit.
+     * @param debris   The debris to drop downstream.
+     * @return This spring.
+     */
+    public Spring<DATA> dropAfter(long delay, TimeUnit timeUnit, Object debris);
+
+    /**
      * Exhaust this spring, that is, all the streams fed only by it are detached from the waterfall
      * and no more data will flow through them and through this spring.
      */

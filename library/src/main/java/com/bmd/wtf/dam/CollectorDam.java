@@ -28,11 +28,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class CollectorDam<DATA> extends OpenDam<DATA> {
 
+    private CopyOnWriteArrayList<Object> mDebris = new CopyOnWriteArrayList<Object>();
+
     private CopyOnWriteArrayList<DATA> mDrops = new CopyOnWriteArrayList<DATA>();
-
-    private CopyOnWriteArrayList<Object> mPulledDebris = new CopyOnWriteArrayList<Object>();
-
-    private CopyOnWriteArrayList<Object> mPushedDebris = new CopyOnWriteArrayList<Object>();
 
     /**
      * Returns the list of data drops discharged through this dam in the arrival order, after
@@ -47,6 +45,21 @@ public class CollectorDam<DATA> extends OpenDam<DATA> {
         mDrops.removeAll(values);
 
         return values;
+    }
+
+    /**
+     * Returns the list of debris dropped downstream through this dam in the arrival order, after
+     * removing them from the internal storage.
+     *
+     * @return The list of pushed debris.
+     */
+    public List<Object> collectDebris() {
+
+        final ArrayList<Object> objects = new ArrayList<Object>(mDebris);
+
+        mDebris.removeAll(objects);
+
+        return objects;
     }
 
     /**
@@ -69,35 +82,16 @@ public class CollectorDam<DATA> extends OpenDam<DATA> {
     }
 
     /**
-     * Returns the next debris pulled upstream through this dam in the arrival order, after
-     * removing it from the internal storage.
-     *
-     * @return The pulled debris or <code>null</code>.
-     */
-    public Object collectNextPulledDebris() {
-
-        try {
-
-            return mPulledDebris.remove(0);
-
-        } catch (final IndexOutOfBoundsException ignored) {
-
-        }
-
-        return null;
-    }
-
-    /**
-     * Returns the next debris pushed downstream through this dam in the arrival order, after
+     * Returns the next debris dropped downstream through this dam in the arrival order, after
      * removing it from the internal storage.
      *
      * @return The pushed debris or <code>null</code>.
      */
-    public Object collectNextPushedDebris() {
+    public Object collectNextDebris() {
 
         try {
 
-            return mPushedDebris.remove(0);
+            return mDebris.remove(0);
 
         } catch (final IndexOutOfBoundsException ignored) {
 
@@ -106,57 +100,19 @@ public class CollectorDam<DATA> extends OpenDam<DATA> {
         return null;
     }
 
-    /**
-     * Returns the list of debris pulled upstream through this dam in the arrival order, after
-     * removing them from the internal storage.
-     *
-     * @return The list of pulled debris.
-     */
-    public List<Object> collectPulledDebris() {
-
-        final ArrayList<Object> objects = new ArrayList<Object>(mPulledDebris);
-
-        mPulledDebris.removeAll(objects);
-
-        return objects;
-    }
-
-    /**
-     * Returns the list of debris pushed downstream through this dam in the arrival order, after
-     * removing them from the internal storage.
-     *
-     * @return The list of pushed debris.
-     */
-    public List<Object> collectPushedDebris() {
-
-        final ArrayList<Object> objects = new ArrayList<Object>(mPushedDebris);
-
-        mPushedDebris.removeAll(objects);
-
-        return objects;
-    }
-
     @Override
-    public Object onDischarge(final Floodgate<DATA, DATA> gate, final DATA drop) {
+    public void onDischarge(final Floodgate<DATA, DATA> gate, final DATA drop) {
 
         mDrops.add(drop);
 
-        return super.onDischarge(gate, drop);
+        super.onDischarge(gate, drop);
     }
 
     @Override
-    public Object onPullDebris(final Floodgate<DATA, DATA> gate, final Object debris) {
+    public void onDrop(final Floodgate<DATA, DATA> gate, final Object debris) {
 
-        mPulledDebris.add(debris);
+        mDebris.add(debris);
 
-        return super.onPullDebris(gate, debris);
-    }
-
-    @Override
-    public Object onPushDebris(final Floodgate<DATA, DATA> gate, final Object debris) {
-
-        mPushedDebris.add(debris);
-
-        return super.onPushDebris(gate, debris);
+        super.onDrop(gate, debris);
     }
 }

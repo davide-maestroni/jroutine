@@ -60,28 +60,25 @@ public class CurrentTest extends TestCase {
         current.discharge(pool, "test");
         assertThat(pool.getDrop()).isEqualTo("test");
         assertThat(pool.isFlush()).isFalse();
-        assertThat(pool.getPush()).isNull();
-        assertThat(pool.getPull()).isNull();
+        assertThat(pool.getDebris()).isNull();
 
         current.flush(pool);
         assertThat(pool.getDrop()).isEqualTo("test");
         assertThat(pool.isFlush()).isTrue();
-        assertThat(pool.getPush()).isNull();
-        assertThat(pool.getPull()).isNull();
+        assertThat(pool.getDebris()).isNull();
 
         pool.setFlush(false);
 
-        current.push(pool, new IllegalArgumentException());
+        current.drop(pool, new IllegalArgumentException());
         assertThat(pool.getDrop()).isEqualTo("test");
         assertThat(pool.isFlush()).isFalse();
-        assertThat(pool.getPush()).isExactlyInstanceOf(IllegalArgumentException.class);
-        assertThat(pool.getPull()).isNull();
+        assertThat(pool.getDebris()).isExactlyInstanceOf(IllegalArgumentException.class);
 
-        current.pull(pool, new IllegalStateException());
+        now = System.currentTimeMillis();
+        current.dropAfter(pool, 1, TimeUnit.SECONDS, "delay");
         assertThat(pool.getDrop()).isEqualTo("test");
-        assertThat(pool.isFlush()).isFalse();
-        assertThat(pool.getPush()).isExactlyInstanceOf(IllegalArgumentException.class);
-        assertThat(pool.getPull()).isExactlyInstanceOf(IllegalStateException.class);
+        assertThat(pool.getTime()).isGreaterThanOrEqualTo(now + 1000);
+        assertThat(pool.getDebris()).isEqualTo("delay");
     }
 
     public void testPool() throws InterruptedException {
@@ -121,34 +118,31 @@ public class CurrentTest extends TestCase {
         pool.waitCall();
         assertThat(pool.getDrop()).isEqualTo("test");
         assertThat(pool.isFlush()).isFalse();
-        assertThat(pool.getPush()).isNull();
-        assertThat(pool.getPull()).isNull();
+        assertThat(pool.getDebris()).isNull();
 
         pool.reset();
         current.flush(pool);
         pool.waitCall();
         assertThat(pool.getDrop()).isEqualTo("test");
         assertThat(pool.isFlush()).isTrue();
-        assertThat(pool.getPush()).isNull();
-        assertThat(pool.getPull()).isNull();
+        assertThat(pool.getDebris()).isNull();
 
         pool.setFlush(false);
 
         pool.reset();
-        current.push(pool, new IllegalArgumentException());
+        current.drop(pool, new IllegalArgumentException());
         pool.waitCall();
         assertThat(pool.getDrop()).isEqualTo("test");
         assertThat(pool.isFlush()).isFalse();
-        assertThat(pool.getPush()).isExactlyInstanceOf(IllegalArgumentException.class);
-        assertThat(pool.getPull()).isNull();
+        assertThat(pool.getDebris()).isExactlyInstanceOf(IllegalArgumentException.class);
 
         pool.reset();
-        current.pull(pool, new IllegalStateException());
+        now = System.currentTimeMillis();
+        current.dropAfter(pool, 1, TimeUnit.SECONDS, "delay");
         pool.waitCall();
         assertThat(pool.getDrop()).isEqualTo("test");
-        assertThat(pool.isFlush()).isFalse();
-        assertThat(pool.getPush()).isExactlyInstanceOf(IllegalArgumentException.class);
-        assertThat(pool.getPull()).isExactlyInstanceOf(IllegalStateException.class);
+        assertThat(pool.getTime()).isGreaterThanOrEqualTo(now + 1000);
+        assertThat(pool.getDebris()).isEqualTo("delay");
     }
 
     public void testStraight() {
@@ -178,28 +172,25 @@ public class CurrentTest extends TestCase {
         current.discharge(pool, "test");
         assertThat(pool.getDrop()).isEqualTo("test");
         assertThat(pool.isFlush()).isFalse();
-        assertThat(pool.getPush()).isNull();
-        assertThat(pool.getPull()).isNull();
+        assertThat(pool.getDebris()).isNull();
 
         current.flush(pool);
         assertThat(pool.getDrop()).isEqualTo("test");
         assertThat(pool.isFlush()).isTrue();
-        assertThat(pool.getPush()).isNull();
-        assertThat(pool.getPull()).isNull();
+        assertThat(pool.getDebris()).isNull();
 
         pool.setFlush(false);
 
-        current.push(pool, new IllegalArgumentException());
+        current.drop(pool, new IllegalArgumentException());
         assertThat(pool.getDrop()).isEqualTo("test");
         assertThat(pool.isFlush()).isFalse();
-        assertThat(pool.getPush()).isExactlyInstanceOf(IllegalArgumentException.class);
-        assertThat(pool.getPull()).isNull();
+        assertThat(pool.getDebris()).isExactlyInstanceOf(IllegalArgumentException.class);
 
-        current.pull(pool, new IllegalStateException());
+        now = System.currentTimeMillis();
+        current.dropAfter(pool, 1, TimeUnit.SECONDS, "delay");
         assertThat(pool.getDrop()).isEqualTo("test");
-        assertThat(pool.isFlush()).isFalse();
-        assertThat(pool.getPush()).isExactlyInstanceOf(IllegalArgumentException.class);
-        assertThat(pool.getPull()).isExactlyInstanceOf(IllegalStateException.class);
+        assertThat(pool.getTime()).isGreaterThanOrEqualTo(now + 1000);
+        assertThat(pool.getDebris()).isEqualTo("delay");
     }
 
     private static class MyDecorator extends CurrentDecorator {
@@ -219,13 +210,11 @@ public class CurrentTest extends TestCase {
 
         private final Semaphore mSemaphore = new Semaphore(0);
 
+        private Object mDebris;
+
         private String mDrop;
 
         private boolean mFlush;
-
-        private Object mPull;
-
-        private Object mPush;
 
         private long mTime;
 
@@ -238,6 +227,14 @@ public class CurrentTest extends TestCase {
         }
 
         @Override
+        public void drop(final Object debris) {
+
+            mDebris = debris;
+            mTime = System.currentTimeMillis();
+            mSemaphore.release();
+        }
+
+        @Override
         public void flush() {
 
             mFlush = true;
@@ -245,35 +242,14 @@ public class CurrentTest extends TestCase {
             mSemaphore.release();
         }
 
-        @Override
-        public void pull(final Object debris) {
+        public Object getDebris() {
 
-            mPull = debris;
-            mTime = System.currentTimeMillis();
-            mSemaphore.release();
-        }
-
-        @Override
-        public void push(final Object debris) {
-
-            mPush = debris;
-            mTime = System.currentTimeMillis();
-            mSemaphore.release();
+            return mDebris;
         }
 
         public String getDrop() {
 
             return mDrop;
-        }
-
-        public Object getPull() {
-
-            return mPull;
-        }
-
-        public Object getPush() {
-
-            return mPush;
         }
 
         public long getTime() {

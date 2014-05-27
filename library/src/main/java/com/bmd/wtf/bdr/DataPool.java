@@ -92,20 +92,39 @@ class DataPool<IN, OUT> implements Pool<IN> {
 
             gate.open();
 
-            Object debris;
-
             try {
 
-                debris = mDam.onDischarge(gate, drop);
+                mDam.onDischarge(gate, drop);
 
             } catch (final Throwable t) {
 
-                debris = t;
+                gate.drop(t);
             }
 
-            if (debris != null) {
+        } finally {
 
-                gate.pull(debris).push(debris);
+            gate.close();
+
+            decrementIdleCountdown();
+        }
+    }
+
+    @Override
+    public void drop(final Object debris) {
+
+        final DataFloodgate<IN, OUT> gate = mGate;
+
+        try {
+
+            gate.open();
+
+            try {
+
+                mDam.onDrop(gate, debris);
+
+            } catch (final Throwable t) {
+
+                gate.drop(t);
             }
 
         } finally {
@@ -125,86 +144,13 @@ class DataPool<IN, OUT> implements Pool<IN> {
 
             gate.open();
 
-            Object debris;
-
             try {
 
-                debris = mDam.onFlush(gate);
+                mDam.onFlush(gate);
 
             } catch (final Throwable t) {
 
-                debris = t;
-            }
-
-            if (debris != null) {
-
-                gate.pull(debris).push(debris);
-            }
-
-        } finally {
-
-            gate.close();
-
-            decrementIdleCountdown();
-        }
-    }
-
-    @Override
-    public void pull(final Object debris) {
-
-        final DataFloodgate<IN, OUT> gate = mGate;
-
-        try {
-
-            gate.open();
-
-            Object next = null;
-
-            try {
-
-                next = mDam.onPullDebris(gate, debris);
-
-            } catch (final Throwable t) {
-
-                gate.pull(t).push(t);
-            }
-
-            if (next != null) {
-
-                gate.pull(next);
-            }
-
-        } finally {
-
-            gate.close();
-
-            decrementIdleCountdown();
-        }
-    }
-
-    @Override
-    public void push(final Object debris) {
-
-        final DataFloodgate<IN, OUT> gate = mGate;
-
-        try {
-
-            gate.open();
-
-            Object next = null;
-
-            try {
-
-                next = mDam.onPushDebris(gate, debris);
-
-            } catch (final Throwable t) {
-
-                gate.pull(t).push(t);
-            }
-
-            if (next != null) {
-
-                gate.push(next);
+                gate.drop(t);
             }
 
         } finally {

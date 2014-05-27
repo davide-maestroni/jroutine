@@ -26,22 +26,14 @@ import com.bmd.wtf.src.Floodgate;
 public abstract class AbstractDam<IN, OUT> implements Dam<IN, OUT> {
 
     @Override
-    public Object onFlush(final Floodgate<IN, OUT> gate) {
+    public void onDrop(final Floodgate<IN, OUT> gate, final Object debris) {
+
+        gate.drop(debris);
+    }
+
+    @Override
+    public void onFlush(final Floodgate<IN, OUT> gate) {
 
         gate.flush();
-
-        return null;
-    }
-
-    @Override
-    public Object onPullDebris(final Floodgate<IN, OUT> gate, final Object debris) {
-
-        return debris;
-    }
-
-    @Override
-    public Object onPushDebris(final Floodgate<IN, OUT> gate, final Object debris) {
-
-        return debris;
     }
 }

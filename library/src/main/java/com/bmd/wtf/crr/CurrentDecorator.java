@@ -57,21 +57,22 @@ public class CurrentDecorator implements Current {
     }
 
     @Override
+    public void drop(final Pool<?> pool, final Object debris) {
+
+        mCurrent.drop(pool, debris);
+    }
+
+    @Override
+    public void dropAfter(final Pool<?> pool, final long delay, final TimeUnit timeUnit,
+            final Object debris) {
+
+        mCurrent.dropAfter(pool, delay, timeUnit, debris);
+    }
+
+    @Override
     public void flush(final Pool<?> pool) {
 
         mCurrent.flush(pool);
-    }
-
-    @Override
-    public void pull(final Pool<?> pool, final Object debris) {
-
-        mCurrent.pull(pool, debris);
-    }
-
-    @Override
-    public void push(final Pool<?> pool, final Object debris) {
-
-        mCurrent.push(pool, debris);
     }
 
     /**

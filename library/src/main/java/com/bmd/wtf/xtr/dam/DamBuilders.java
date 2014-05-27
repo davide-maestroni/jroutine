@@ -35,36 +35,6 @@ public class DamBuilders extends Dams {
     }
 
     /**
-     * Creates a new dam preventing debris from being pulled upstream and <code>null</code> data
-     * to be discharged, based on the specified handler.
-     *
-     * @param handler The discharge handler.
-     * @param <IN>    The input data type.
-     * @param <OUT>   The output data type.
-     * @return The new dam instance.
-     */
-    public static <IN, OUT> Dam<IN, OUT> downstreamDebrisAvoidingNullBasedOn(
-            final DischargeHandler<IN, OUT> handler) {
-
-        return downstreamDebris(simpleDamAvoidingNullBasedOn(handler));
-    }
-
-    /**
-     * Creates a new dam preventing debris from being pulled upstream, based on the specified
-     * handler.
-     *
-     * @param handler The discharge handler.
-     * @param <IN>    The input data type.
-     * @param <OUT>   The output data type.
-     * @return The new dam instance.
-     */
-    public static <IN, OUT> Dam<IN, OUT> downstreamDebrisBasedOn(
-            final DischargeHandler<IN, OUT> handler) {
-
-        return downstreamDebris(simpleDamBasedOn(handler));
-    }
-
-    /**
      * Creates a new dam preventing debris from being pushed downstream or pulled upstream and
      * <code>null</code> data to be discharged, based on the specified handler.
      *
@@ -113,7 +83,7 @@ public class DamBuilders extends Dams {
         return new AbstractDam<IN, OUT>() {
 
             @Override
-            public Object onDischarge(final Floodgate<IN, OUT> gate, final IN drop) {
+            public void onDischarge(final Floodgate<IN, OUT> gate, final IN drop) {
 
                 final OUT out = handler.onDischarge(drop);
 
@@ -121,8 +91,6 @@ public class DamBuilders extends Dams {
 
                     gate.discharge(out);
                 }
-
-                return null;
             }
         };
     }
@@ -145,42 +113,10 @@ public class DamBuilders extends Dams {
         return new AbstractDam<IN, OUT>() {
 
             @Override
-            public Object onDischarge(final Floodgate<IN, OUT> gate, final IN drop) {
+            public void onDischarge(final Floodgate<IN, OUT> gate, final IN drop) {
 
                 gate.discharge(handler.onDischarge(drop));
-
-                return null;
             }
         };
-    }
-
-    /**
-     * Creates a new dam preventing debris from being pushed downstream and <code>null</code> data
-     * to be discharged, based on the specified handler.
-     *
-     * @param handler The discharge handler.
-     * @param <IN>    The input data type.
-     * @param <OUT>   The output data type.
-     * @return The new dam instance.
-     */
-    public static <IN, OUT> Dam<IN, OUT> upstreamDebrisAvoidingNullBasedOn(
-            final DischargeHandler<IN, OUT> handler) {
-
-        return upstreamDebris(simpleDamAvoidingNullBasedOn(handler));
-    }
-
-    /**
-     * Creates a new dam preventing debris from being pushed downstream, based on the specified
-     * handler.
-     *
-     * @param handler The discharge handler.
-     * @param <IN>    The input data type.
-     * @param <OUT>   The output data type.
-     * @return The new dam instance.
-     */
-    public static <IN, OUT> Dam<IN, OUT> upstreamDebrisBasedOn(
-            final DischargeHandler<IN, OUT> handler) {
-
-        return upstreamDebris(simpleDamBasedOn(handler));
     }
 }

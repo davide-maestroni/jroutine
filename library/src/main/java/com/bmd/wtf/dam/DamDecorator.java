@@ -66,27 +66,21 @@ public class DamDecorator<IN, OUT> implements Dam<IN, OUT> {
     }
 
     @Override
-    public Object onDischarge(final Floodgate<IN, OUT> gate, final IN drop) {
+    public void onDischarge(final Floodgate<IN, OUT> gate, final IN drop) {
 
-        return mDam.onDischarge(gate, drop);
+        mDam.onDischarge(gate, drop);
     }
 
     @Override
-    public Object onFlush(final Floodgate<IN, OUT> gate) {
+    public void onDrop(final Floodgate<IN, OUT> gate, final Object debris) {
 
-        return mDam.onFlush(gate);
+        mDam.onDrop(gate, debris);
     }
 
     @Override
-    public Object onPullDebris(final Floodgate<IN, OUT> gate, final Object debris) {
+    public void onFlush(final Floodgate<IN, OUT> gate) {
 
-        return mDam.onPullDebris(gate, debris);
-    }
-
-    @Override
-    public Object onPushDebris(final Floodgate<IN, OUT> gate, final Object debris) {
-
-        return mDam.onPushDebris(gate, debris);
+        mDam.onFlush(gate);
     }
 
     /**

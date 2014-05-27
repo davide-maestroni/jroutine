@@ -47,20 +47,21 @@ public class DownloadManager {
                     "Could not create temp directory: " + downloadDir.getAbsolutePath());
         }
 
-        mDownloadSpring = WaterfallArray.formingFrom(
-                Waterfall.fallingFrom(mControl.leveeControlledBy(new DownloadObserver())))
-                                        .thenSplittingIn(maxThreads)
-                                        .thenBalancedBy(new DownloadBalancer()).thenFlowingInto(
-                        CurrentFactories
-                                .singletonCurrentFactory(Currents.threadPoolCurrent(maxThreads))
-                ).thenFlowingThrough(new DamFactory<String, String>() {
+        final DownloadObserver downloadObserver = new DownloadObserver();
+
+        mDownloadSpring = WaterfallArray
+                .formingFrom(Waterfall.fallingFrom(mControl.leveeControlledBy(downloadObserver)))
+                .thenSplittingIn(maxThreads).thenBalancedBy(new RotatingArrayBalancer<String>())
+                .thenFlowingInto(CurrentFactories.singletonCurrentFactory(
+                                         Currents.threadPoolCurrent(maxThreads))
+                ).thenFallingThrough(new DamFactory<String, String>() {
 
                     @Override
                     public Dam<String, String> createForStream(final int streamNumber) {
 
                         return new Downloader(downloadDir);
                     }
-                }).streams().get(0).backToSource();
+                }).thenMergingThrough(mControl.leveeControlledBy(downloadObserver)).backToSource();
     }
 
     public static void main(final String args[]) throws IOException {

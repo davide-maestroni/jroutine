@@ -64,25 +64,28 @@ public interface Current {
             Iterable<? extends DATA> drops);
 
     /**
+     * This method is called when an object must be dropped downstream through the current.
+     *
+     * @param pool   The pool instance to be used to discharge data into the waterfall.
+     * @param debris The debris to drop.
+     */
+    public void drop(Pool<?> pool, Object debris);
+
+    /**
+     * This method is called when an object must be dropped downstream through the current, after
+     * the specified time has elapsed.
+     *
+     * @param pool     The pool instance to be used to discharge data into the waterfall.
+     * @param delay    The delay in <code>timeUnit</code> time units.
+     * @param timeUnit The delay time unit.
+     * @param debris   The debris to drop.
+     */
+    public void dropAfter(Pool<?> pool, long delay, TimeUnit timeUnit, Object debris);
+
+    /**
      * This method is called when data must be flushed through the current.
      *
      * @param pool The pool instance to be used to discharge data into the waterfall.
      */
     public void flush(Pool<?> pool);
-
-    /**
-     * This method is called when an object must be pulled upstream through the current.
-     *
-     * @param pool   The pool instance to be used to discharge data into the waterfall.
-     * @param debris The debris to pull.
-     */
-    public void pull(Pool<?> pool, Object debris);
-
-    /**
-     * This method is called when an object must be pushed downstream through the current.
-     *
-     * @param pool   The pool instance to be used to discharge data into the waterfall.
-     * @param debris The debris to push.
-     */
-    public void push(Pool<?> pool, Object debris);
 }

@@ -13,12 +13,10 @@
  */
 package com.bmd.wtf.xtr.arr;
 
-import com.bmd.wtf.Waterfall;
 import com.bmd.wtf.bdr.DuplicateDamException;
 import com.bmd.wtf.bdr.Stream;
 import com.bmd.wtf.crr.Current;
 import com.bmd.wtf.dam.Dam;
-import com.bmd.wtf.src.Spring;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,8 +37,6 @@ public class StreamArray<SOURCE, IN, OUT> {
 
     private static final WeakHashMap<Barrage<?, ?>, Void> sBarrages =
             new WeakHashMap<Barrage<?, ?>, Void>();
-
-    private final boolean mIsSingleStream;
 
     private final ArrayList<Stream<SOURCE, IN, OUT>> mStreams;
 
@@ -71,7 +67,6 @@ public class StreamArray<SOURCE, IN, OUT> {
         }
 
         mStreams = streams;
-        mIsSingleStream = true;
     }
 
     /**
@@ -97,7 +92,6 @@ public class StreamArray<SOURCE, IN, OUT> {
         }
 
         mStreams = streams;
-        mIsSingleStream = false;
     }
 
     /**
@@ -111,61 +105,28 @@ public class StreamArray<SOURCE, IN, OUT> {
     }
 
     /**
-     * Balances the data flows running through this stream array.
-     * <p/>
-     * The balancer is used to indicate into which one of the streams of the array to propagate
-     * the flow of data. If -1 is returned from the balancer, no further propagation will happen.
-     * If the total stream count is returned instead, the data or object will be propagated to
-     * all the streams. All the other out-of-range values will be ignored.
+     * Makes this stream array fall through the dams created by the specified factory.
      *
-     * @param balancer The array balancer.
-     * @param <NOUT>   The transported data type of the specified balancer.
-     * @return A new stream whose flows are balanced by the specified balancer.
+     * @param factory The dam factory.
+     * @param <NOUT>  The output data type.
+     * @return A new stream array flowing from the dams.
      */
-    public <NOUT> StreamArray<SOURCE, NOUT, NOUT> thenBalancedBy(
-            final ArrayBalancer<OUT, NOUT> balancer) {
-
-        if (balancer == null) {
-
-            throw new IllegalArgumentException("the array balancer cannot be null");
-        }
+    public <NOUT> StreamArray<SOURCE, OUT, NOUT> thenFallingThrough(
+            final DamFactory<OUT, NOUT> factory) {
 
         final ArrayList<Stream<SOURCE, IN, OUT>> streams = mStreams;
 
-        final int streamsCount = streams.size();
+        final ArrayList<Stream<SOURCE, OUT, NOUT>> outStreams =
+                new ArrayList<Stream<SOURCE, OUT, NOUT>>(streams.size());
 
-        final ArrayList<Spring<NOUT>> springs = new ArrayList<Spring<NOUT>>(streamsCount);
+        int n = 0;
 
-        final Object mutex = new Object();
+        for (final Stream<SOURCE, IN, OUT> stream : streams) {
 
-        final SpringBalancerDam<OUT, NOUT> balancerDam =
-                new SpringBalancerDam<OUT, NOUT>(mutex, balancer, springs);
-
-        final Stream<SOURCE, OUT, NOUT> balancedStream;
-
-        if (mIsSingleStream) {
-
-            balancedStream = streams.get(0).thenFlowingThrough(balancerDam);
-
-        } else {
-
-            balancedStream = thenMergingThrough(balancerDam);
+            outStreams.add(stream.thenFallingThrough(factory.createForStream(n++)));
         }
 
-        final ArrayList<Stream<SOURCE, NOUT, NOUT>> outStreams =
-                new ArrayList<Stream<SOURCE, NOUT, NOUT>>(streamsCount);
-
-        for (int i = 0; i < streamsCount; ++i) {
-
-            final Stream<NOUT, NOUT, NOUT> outStream =
-                    Waterfall.fallingFrom(new DebrisBalancerDam<OUT, NOUT>(mutex, i, balancer));
-
-            springs.add(outStream.backToSource());
-
-            outStreams.add(balancedStream.thenFeeding(outStream));
-        }
-
-        return new StreamArray<SOURCE, NOUT, NOUT>(outStreams);
+        return new StreamArray<SOURCE, OUT, NOUT>(outStreams);
     }
 
     /**
@@ -176,17 +137,19 @@ public class StreamArray<SOURCE, IN, OUT> {
      */
     public StreamArray<SOURCE, IN, OUT> thenFlowingInto(final CurrentFactory factory) {
 
-        final ArrayList<Stream<SOURCE, IN, OUT>> streams =
-                new ArrayList<Stream<SOURCE, IN, OUT>>(mStreams.size());
+        final ArrayList<Stream<SOURCE, IN, OUT>> streams = mStreams;
+
+        final ArrayList<Stream<SOURCE, IN, OUT>> outStreams =
+                new ArrayList<Stream<SOURCE, IN, OUT>>(streams.size());
 
         int n = 0;
 
-        for (final Stream<SOURCE, IN, OUT> stream : mStreams) {
+        for (final Stream<SOURCE, IN, OUT> stream : streams) {
 
-            streams.add(stream.thenFlowingInto(factory.createForStream(n++)));
+            outStreams.add(stream.thenFlowingInto(factory.createForStream(n++)));
         }
 
-        return new StreamArray<SOURCE, IN, OUT>(streams);
+        return new StreamArray<SOURCE, IN, OUT>(outStreams);
     }
 
     /**
@@ -212,42 +175,22 @@ public class StreamArray<SOURCE, IN, OUT> {
 
         sBarrages.put(barrage, null);
 
-        final ArrayList<Stream<SOURCE, OUT, NOUT>> streams =
-                new ArrayList<Stream<SOURCE, OUT, NOUT>>(mStreams.size());
+        final ArrayList<Stream<SOURCE, IN, OUT>> streams = mStreams;
+
+        final ArrayList<Stream<SOURCE, OUT, NOUT>> outStreams =
+                new ArrayList<Stream<SOURCE, OUT, NOUT>>(streams.size());
 
         int n = 0;
 
         final Object mutex = new Object();
 
-        for (final Stream<SOURCE, IN, OUT> stream : mStreams) {
+        for (final Stream<SOURCE, IN, OUT> stream : streams) {
 
-            streams.add(stream.thenFlowingThrough(new BarrageDam<OUT, NOUT>(mutex, n++, barrage)));
+            outStreams
+                    .add(stream.thenFallingThrough(new BarrageDam<OUT, NOUT>(mutex, n++, barrage)));
         }
 
-        return new StreamArray<SOURCE, OUT, NOUT>(streams);
-    }
-
-    /**
-     * Makes this stream array flow through the dams created by the specified factory.
-     *
-     * @param factory The dam factory.
-     * @param <NOUT>  The output data type.
-     * @return A new stream array flowing from the dams.
-     */
-    public <NOUT> StreamArray<SOURCE, OUT, NOUT> thenFlowingThrough(
-            final DamFactory<OUT, NOUT> factory) {
-
-        final ArrayList<Stream<SOURCE, OUT, NOUT>> streams =
-                new ArrayList<Stream<SOURCE, OUT, NOUT>>(mStreams.size());
-
-        int n = 0;
-
-        for (final Stream<SOURCE, IN, OUT> stream : mStreams) {
-
-            streams.add(stream.thenFlowingThrough(factory.createForStream(n++)));
-        }
-
-        return new StreamArray<SOURCE, OUT, NOUT>(streams);
+        return new StreamArray<SOURCE, OUT, NOUT>(outStreams);
     }
 
     /**
@@ -289,6 +232,8 @@ public class StreamArray<SOURCE, IN, OUT> {
      */
     public <NOUT> Stream<SOURCE, OUT, NOUT> thenMergingThrough(final Dam<OUT, NOUT> dam) {
 
-        return thenMerging().thenFlowingThrough(dam);
+        final ArrayList<Stream<SOURCE, IN, OUT>> streams = mStreams;
+
+        return streams.get(0).thenMergingThrough(dam, streams);
     }
 }

@@ -39,38 +39,24 @@ public interface Barrage<IN, OUT> {
      * @param gate         The gate instance to be used to discharge data and objects into the
      *                     waterfall.
      * @param drop         The drop of data discharged.
-     * @return The debris to push downstream and pull upstream, or <code>null</code>.
      */
-    public Object onDischarge(int streamNumber, Floodgate<IN, OUT> gate, IN drop);
+    public void onDischarge(int streamNumber, Floodgate<IN, OUT> gate, IN drop);
+
+    /**
+     * This method is called when an debris is dropped downstream through the barrage.
+     *
+     * @param streamNumber The number of the stream in which data is flowing.
+     * @param gate         The gate instance to be used to discharge data and objects into the
+     *                     waterfall.
+     * @param debris       The dropped debris.
+     */
+    public void onDrop(int streamNumber, Floodgate<IN, OUT> gate, Object debris);
 
     /**
      * This method is called when data are flushed through the barrage.
      *
      * @param streamNumber The number of the stream in which data is flowing.
      * @param gate         The gate instance to be used to discharge data and objects into the
-     * @return The debris to push downstream and pull upstream, or <code>null</code>.
      */
-    public Object onFlush(int streamNumber, Floodgate<IN, OUT> gate);
-
-    /**
-     * This method is called when an debris is pulled upstream through the barrage.
-     *
-     * @param streamNumber The number of the stream in which data is flowing.
-     * @param gate         The gate instance to be used to discharge data and objects into the
-     *                     waterfall.
-     * @param debris       The pulled debris.
-     * @return The debris to pull further upstream, or <code>null</code>.
-     */
-    public Object onPullDebris(int streamNumber, Floodgate<IN, OUT> gate, Object debris);
-
-    /**
-     * This method is called when an debris is pushed downstream through the barrage.
-     *
-     * @param streamNumber The number of the stream in which data is flowing.
-     * @param gate         The gate instance to be used to discharge data and objects into the
-     *                     waterfall.
-     * @param debris       The pushed debris.
-     * @return The debris to push further downstream, or <code>null</code>.
-     */
-    public Object onPushDebris(int streamNumber, Floodgate<IN, OUT> gate, Object debris);
+    public void onFlush(int streamNumber, Floodgate<IN, OUT> gate);
 }

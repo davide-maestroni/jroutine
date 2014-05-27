@@ -33,10 +33,10 @@ class DataPump {
     private static final Fluid DISCHARGE = new Fluid() {
 
         @Override
-        @SuppressWarnings("unchecked")
         public <IN, OUT> void discharge(final DataPool<IN, OUT> pool, final long delay,
                 final TimeUnit timeUnit, final long dischargeTimeNs, final Object drop) {
 
+            //noinspection unchecked
             final OUT out = (OUT) drop;
 
             final CopyOnWriteArraySet<Stream<?, IN, OUT>> outStreams = pool.outputStreams;
@@ -51,12 +51,12 @@ class DataPump {
     private static final Fluid DISCHARGE_AFTER = new Fluid() {
 
         @Override
-        @SuppressWarnings("unchecked")
         public <IN, OUT> void discharge(final DataPool<IN, OUT> pool, final long delay,
                 final TimeUnit timeUnit, final long dischargeTimeNs, final Object drop) {
 
             long currentDelay = delay;
 
+            //noinspection unchecked
             final OUT out = (OUT) drop;
 
             final CopyOnWriteArraySet<Stream<?, IN, OUT>> outStreams = pool.outputStreams;
@@ -73,12 +73,12 @@ class DataPump {
     private static final Fluid DISCHARGE_AFTER_ARRAY = new Fluid() {
 
         @Override
-        @SuppressWarnings("unchecked")
         public <IN, OUT> void discharge(final DataPool<IN, OUT> pool, final long delay,
                 final TimeUnit timeUnit, final long dischargeTimeNs, final Object drops) {
 
             long currentDelay = delay;
 
+            //noinspection unchecked
             final List<OUT> outs = Arrays.asList((OUT[]) drops);
 
             final CopyOnWriteArraySet<Stream<?, IN, OUT>> outStreams = pool.outputStreams;
@@ -95,12 +95,12 @@ class DataPump {
     private static final Fluid DISCHARGE_AFTER_ITERABLE = new Fluid() {
 
         @Override
-        @SuppressWarnings("unchecked")
         public <IN, OUT> void discharge(final DataPool<IN, OUT> pool, final long delay,
                 final TimeUnit timeUnit, final long dischargeTimeNs, final Object drops) {
 
             long currentDelay = delay;
 
+            //noinspection unchecked
             final Iterable<OUT> outs = (Iterable<OUT>) drops;
 
             final CopyOnWriteArraySet<Stream<?, IN, OUT>> outStreams = pool.outputStreams;
@@ -117,10 +117,10 @@ class DataPump {
     private static final Fluid DISCHARGE_ARRAY = new Fluid() {
 
         @Override
-        @SuppressWarnings("unchecked")
         public <IN, OUT> void discharge(final DataPool<IN, OUT> pool, final long delay,
                 final TimeUnit timeUnit, final long dischargeTimeNs, final Object drops) {
 
+            //noinspection unchecked
             final OUT[] outs = (OUT[]) drops;
 
             final CopyOnWriteArraySet<Stream<?, IN, OUT>> outStreams = pool.outputStreams;
@@ -138,10 +138,10 @@ class DataPump {
     private static final Fluid DISCHARGE_ITERABLE = new Fluid() {
 
         @Override
-        @SuppressWarnings("unchecked")
         public <IN, OUT> void discharge(final DataPool<IN, OUT> pool, final long delay,
                 final TimeUnit timeUnit, final long dischargeTimeNs, final Object drops) {
 
+            //noinspection unchecked
             final Iterable<OUT> outs = (Iterable<OUT>) drops;
 
             final CopyOnWriteArraySet<Stream<?, IN, OUT>> outStreams = pool.outputStreams;
@@ -152,6 +152,43 @@ class DataPump {
 
                     stream.discharge(out);
                 }
+            }
+        }
+    };
+
+    private static final Fluid DROP = new Fluid() {
+
+        @Override
+        public <IN, OUT> void discharge(final DataPool<IN, OUT> pool, final long delay,
+                final TimeUnit timeUnit, final long dischargeTimeNs, final Object drop) {
+
+            final CopyOnWriteArraySet<Stream<?, IN, OUT>> outStreams = pool.outputStreams;
+
+            for (final Stream<?, IN, OUT> stream : outStreams) {
+
+                stream.drop(drop);
+            }
+        }
+    };
+
+    private static final Fluid DROP_AFTER = new Fluid() {
+
+        @Override
+        public <IN, OUT> void discharge(final DataPool<IN, OUT> pool, final long delay,
+                final TimeUnit timeUnit, final long dischargeTimeNs, final Object drop) {
+
+            long currentDelay = delay;
+
+            //noinspection unchecked
+            final OUT out = (OUT) drop;
+
+            final CopyOnWriteArraySet<Stream<?, IN, OUT>> outStreams = pool.outputStreams;
+
+            for (final Stream<?, IN, OUT> stream : outStreams) {
+
+                currentDelay = updateDelay(currentDelay, timeUnit, dischargeTimeNs);
+
+                stream.dropAfter(currentDelay, timeUnit, out);
             }
         }
     };
@@ -171,40 +208,9 @@ class DataPump {
         }
     };
 
-    private static final Fluid PULL = new Fluid() {
-
-        @Override
-        public <IN, OUT> void discharge(final DataPool<IN, OUT> pool, final long delay,
-                final TimeUnit timeUnit, final long dischargeTimeNs, final Object drop) {
-
-            final CopyOnWriteArraySet<Stream<?, ?, IN>> inStreams = pool.inputStreams;
-
-            for (final Stream<?, ?, IN> stream : inStreams) {
-
-                stream.pull(drop);
-            }
-        }
-    };
-
-    private static final Fluid PUSH = new Fluid() {
-
-        @Override
-        public <IN, OUT> void discharge(final DataPool<IN, OUT> pool, final long delay,
-                final TimeUnit timeUnit, final long dischargeTimeNs, final Object drop) {
-
-            final CopyOnWriteArraySet<Stream<?, IN, OUT>> outStreams = pool.outputStreams;
-
-            for (final Stream<?, IN, OUT> stream : outStreams) {
-
-                stream.push(drop);
-            }
-        }
-    };
-
     private static final Fluid RECHARGE_AFTER = new Fluid() {
 
         @Override
-        @SuppressWarnings("unchecked")
         public <IN, OUT> void discharge(final DataPool<IN, OUT> pool, final long delay,
                 final TimeUnit timeUnit, final long dischargeTimeNs, final Object drop) {
 
@@ -212,6 +218,7 @@ class DataPump {
 
             final Current inputCurrent = pool.inputCurrent;
 
+            //noinspection unchecked
             inputCurrent.dischargeAfter(pool, currentDelay, timeUnit, (IN) drop);
         }
     };
@@ -219,7 +226,6 @@ class DataPump {
     private static final Fluid RECHARGE_AFTER_ARRAY = new Fluid() {
 
         @Override
-        @SuppressWarnings("unchecked")
         public <IN, OUT> void discharge(final DataPool<IN, OUT> pool, final long delay,
                 final TimeUnit timeUnit, final long dischargeTimeNs, final Object drops) {
 
@@ -227,6 +233,7 @@ class DataPump {
 
             final Current inputCurrent = pool.inputCurrent;
 
+            //noinspection unchecked
             inputCurrent.dischargeAfter(pool, currentDelay, timeUnit, Arrays.asList((IN[]) drops));
         }
     };
@@ -234,7 +241,6 @@ class DataPump {
     private static final Fluid RECHARGE_AFTER_ITERABLE = new Fluid() {
 
         @Override
-        @SuppressWarnings("unchecked")
         public <IN, OUT> void discharge(final DataPool<IN, OUT> pool, final long delay,
                 final TimeUnit timeUnit, final long dischargeTimeNs, final Object drops) {
 
@@ -242,7 +248,23 @@ class DataPump {
 
             final Current inputCurrent = pool.inputCurrent;
 
+            //noinspection unchecked
             inputCurrent.dischargeAfter(pool, currentDelay, timeUnit, (Iterable<IN>) drops);
+        }
+    };
+
+    private static final Fluid REDROP_AFTER = new Fluid() {
+
+        @Override
+        public <IN, OUT> void discharge(final DataPool<IN, OUT> pool, final long delay,
+                final TimeUnit timeUnit, final long dischargeTimeNs, final Object drop) {
+
+            final long currentDelay = updateDelay(delay, timeUnit, dischargeTimeNs);
+
+            final Current inputCurrent = pool.inputCurrent;
+
+            //noinspection unchecked
+            inputCurrent.dropAfter(pool, currentDelay, timeUnit, drop);
         }
     };
 
@@ -324,19 +346,20 @@ class DataPump {
         add(DISCHARGE_AFTER_ITERABLE, pool, delay, timeUnit, System.nanoTime(), drops);
     }
 
+    public void drop(final DataPool<?, ?> pool, final Object debris) {
+
+        add(DROP, pool, 0, TimeUnit.MILLISECONDS, 0, debris);
+    }
+
+    public void dropAfter(final DataPool<?, ?> pool, final long delay, final TimeUnit timeUnit,
+            final Object debris) {
+
+        add(DROP_AFTER, pool, delay, timeUnit, System.nanoTime(), debris);
+    }
+
     public void flush(final DataPool<?, ?> pool) {
 
         add(FLUSH, pool, 0, TimeUnit.MILLISECONDS, 0, null);
-    }
-
-    public void pull(final DataPool<?, ?> pool, final Object object) {
-
-        add(PULL, pool, 0, TimeUnit.MILLISECONDS, 0, object);
-    }
-
-    public void push(final DataPool<?, ?> pool, final Object object) {
-
-        add(PUSH, pool, 0, TimeUnit.MILLISECONDS, 0, object);
     }
 
     public <OUT> void rechargeAfter(final DataPool<OUT, ?> pool, final long delay,
@@ -355,6 +378,12 @@ class DataPump {
             final TimeUnit timeUnit, final Iterable<? extends OUT> drops) {
 
         add(RECHARGE_AFTER_ITERABLE, pool, delay, timeUnit, System.nanoTime(), drops);
+    }
+
+    public void redropAfter(final DataPool<?, ?> pool, final long delay, final TimeUnit timeUnit,
+            final Object debris) {
+
+        add(REDROP_AFTER, pool, delay, timeUnit, System.nanoTime(), debris);
     }
 
     public void run() {

@@ -43,7 +43,7 @@ public class CancelableObserver extends DownloadObserver {
     }
 
     @Override
-    public Object onDischarge(final Floodgate<String, String> gate, final String drop) {
+    public void onDischarge(final Floodgate<String, String> gate, final String drop) {
 
         // A new download is requested so we remove the url from the aborted ones
 
@@ -66,6 +66,32 @@ public class CancelableObserver extends DownloadObserver {
         }
 
         return null;
+    }
+
+    @Override
+    public void onDrop(final Floodgate<String, String> gate, final Object debris) {
+
+        if (debris instanceof AbortException) {
+
+            final String url = ((AbortException) debris).getMessage();
+
+            if (downloaded().remove(url)) {
+
+                // If already downloaded just delete it
+
+                delete(url);
+
+            } else if (downloading().contains(url)) {
+
+                // If still in progress wait for completion
+
+                mAbortedDownloadUrls.add(url);
+            }
+
+            mPendingUrls.remove(url);
+        }
+
+        return super.onDrop(gate, debris);
     }
 
     @Override
@@ -110,32 +136,6 @@ public class CancelableObserver extends DownloadObserver {
         }
 
         return outDebris;
-    }
-
-    @Override
-    public Object onPushDebris(final Floodgate<String, String> gate, final Object debris) {
-
-        if (debris instanceof AbortException) {
-
-            final String url = ((AbortException) debris).getMessage();
-
-            if (downloaded().remove(url)) {
-
-                // If already downloaded just delete it
-
-                delete(url);
-
-            } else if (downloading().contains(url)) {
-
-                // If still in progress wait for completion
-
-                mAbortedDownloadUrls.add(url);
-            }
-
-            mPendingUrls.remove(url);
-        }
-
-        return super.onPushDebris(gate, debris);
     }
 
     private boolean delete(final String url) {

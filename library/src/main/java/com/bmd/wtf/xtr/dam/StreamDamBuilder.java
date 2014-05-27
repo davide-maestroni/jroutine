@@ -88,6 +88,14 @@ public class StreamDamBuilder<SOURCE, IN, OUT> extends DamBuilder<IN, OUT> {
     }
 
     @Override
+    public StreamDamBuilder<SOURCE, IN, OUT> avoidDebris() {
+
+        super.avoidDebris();
+
+        return this;
+    }
+
+    @Override
     public StreamDamBuilder<SOURCE, IN, OUT> avoidFlush() {
 
         super.avoidFlush();
@@ -99,30 +107,6 @@ public class StreamDamBuilder<SOURCE, IN, OUT> extends DamBuilder<IN, OUT> {
     public StreamDamBuilder<SOURCE, IN, OUT> avoidNull() {
 
         super.avoidNull();
-
-        return this;
-    }
-
-    @Override
-    public StreamDamBuilder<SOURCE, IN, OUT> avoidPull() {
-
-        super.avoidPull();
-
-        return this;
-    }
-
-    @Override
-    public StreamDamBuilder<SOURCE, IN, OUT> avoidPush() {
-
-        super.avoidPush();
-
-        return this;
-    }
-
-    @Override
-    public StreamDamBuilder<SOURCE, IN, OUT> downstreamDebris() {
-
-        super.downstreamDebris();
 
         return this;
     }
@@ -143,33 +127,17 @@ public class StreamDamBuilder<SOURCE, IN, OUT> extends DamBuilder<IN, OUT> {
     }
 
     @Override
+    public StreamDamBuilder<SOURCE, IN, OUT> onDrop(final DropHandler handler) {
+
+        super.onDrop(handler);
+
+        return this;
+    }
+
+    @Override
     public StreamDamBuilder<SOURCE, IN, OUT> onFlush(final FlushHandler handler) {
 
         super.onFlush(handler);
-
-        return this;
-    }
-
-    @Override
-    public StreamDamBuilder<SOURCE, IN, OUT> onPullDebris(final PullHandler handler) {
-
-        super.onPullDebris(handler);
-
-        return this;
-    }
-
-    @Override
-    public StreamDamBuilder<SOURCE, IN, OUT> onPushDebris(final PushHandler handler) {
-
-        super.onPushDebris(handler);
-
-        return this;
-    }
-
-    @Override
-    public StreamDamBuilder<SOURCE, IN, OUT> upstreamDebris() {
-
-        super.upstreamDebris();
 
         return this;
     }
@@ -181,6 +149,6 @@ public class StreamDamBuilder<SOURCE, IN, OUT> extends DamBuilder<IN, OUT> {
      */
     public Stream<SOURCE, IN, OUT> fallFrom() {
 
-        return mInStream.thenFlowingThrough(build());
+        return mInStream.thenFallingThrough(build());
     }
 }

@@ -40,7 +40,7 @@ public class OutputHandler extends AbstractDam<Chunk, String> {
     }
 
     @Override
-    public Object onDischarge(final Floodgate<Chunk, String> gate, final Chunk drop) {
+    public void onDischarge(final Floodgate<Chunk, String> gate, final Chunk drop) {
 
         final String url = drop.getUrl();
 
@@ -82,19 +82,19 @@ public class OutputHandler extends AbstractDam<Chunk, String> {
     }
 
     @Override
+    public void onDrop(final Floodgate<Chunk, String> gate, final Object debris) {
+
+        resetOutput(true);
+
+        return super.onDrop(gate, debris);
+    }
+
+    @Override
     public Object onPullDebris(final Floodgate<Chunk, String> gate, final Object debris) {
 
         resetOutput(true);
 
         return super.onPullDebris(gate, debris);
-    }
-
-    @Override
-    public Object onPushDebris(final Floodgate<Chunk, String> gate, final Object debris) {
-
-        resetOutput(true);
-
-        return super.onPushDebris(gate, debris);
     }
 
     private void resetOutput(final boolean deleteFile) {

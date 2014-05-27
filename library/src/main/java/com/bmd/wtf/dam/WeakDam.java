@@ -106,59 +106,43 @@ public class WeakDam<IN, OUT> implements Dam<IN, OUT> {
     }
 
     @Override
-    public Object onDischarge(final Floodgate<IN, OUT> gate, final IN drop) {
+    public void onDischarge(final Floodgate<IN, OUT> gate, final IN drop) {
 
         final Dam<IN, OUT> dam = mDam.get();
 
         if (dam != null) {
 
-            return dam.onDischarge(gate, drop);
+            dam.onDischarge(gate, drop);
         }
-
-        return null;
     }
 
     @Override
-    public Object onFlush(final Floodgate<IN, OUT> gate) {
+    public void onDrop(final Floodgate<IN, OUT> gate, final Object debris) {
 
         final Dam<IN, OUT> dam = mDam.get();
 
         if (dam != null) {
 
-            return dam.onFlush(gate);
+            dam.onDrop(gate, debris);
+
+        } else if (!mCloseWhenNull) {
+
+            gate.drop(debris);
+        }
+    }
+
+    @Override
+    public void onFlush(final Floodgate<IN, OUT> gate) {
+
+        final Dam<IN, OUT> dam = mDam.get();
+
+        if (dam != null) {
+
+            dam.onFlush(gate);
 
         } else if (!mCloseWhenNull) {
 
             gate.flush();
         }
-
-        return null;
-    }
-
-    @Override
-    public Object onPullDebris(final Floodgate<IN, OUT> gate, final Object debris) {
-
-        final Dam<IN, OUT> dam = mDam.get();
-
-        if (dam != null) {
-
-            return dam.onPullDebris(gate, debris);
-        }
-
-        return (!mCloseWhenNull) ? debris : null;
-    }
-
-    @Override
-    public Object onPushDebris(final Floodgate<IN, OUT> gate, final Object debris) {
-
-        final Dam<IN, OUT> dam = mDam.get();
-
-        if (dam != null) {
-
-            return dam.onPushDebris(gate, debris);
-
-        }
-
-        return (!mCloseWhenNull) ? debris : null;
     }
 }

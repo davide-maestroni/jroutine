@@ -36,7 +36,7 @@ public class NoDebrisDam<IN, OUT> extends DamDecorator<IN, OUT> {
     }
 
     @Override
-    public Object onDischarge(final Floodgate<IN, OUT> gate, final IN drop) {
+    public void onDischarge(final Floodgate<IN, OUT> gate, final IN drop) {
 
         try {
 
@@ -45,12 +45,22 @@ public class NoDebrisDam<IN, OUT> extends DamDecorator<IN, OUT> {
         } catch (final Throwable ignored) {
 
         }
-
-        return null;
     }
 
     @Override
-    public Object onFlush(final Floodgate<IN, OUT> gate) {
+    public void onDrop(final Floodgate<IN, OUT> gate, final Object debris) {
+
+        try {
+
+            super.onDrop(gate, debris);
+
+        } catch (final Throwable ignored) {
+
+        }
+    }
+
+    @Override
+    public void onFlush(final Floodgate<IN, OUT> gate) {
 
         try {
 
@@ -59,35 +69,5 @@ public class NoDebrisDam<IN, OUT> extends DamDecorator<IN, OUT> {
         } catch (final Throwable ignored) {
 
         }
-
-        return null;
-    }
-
-    @Override
-    public Object onPullDebris(final Floodgate<IN, OUT> gate, final Object debris) {
-
-        try {
-
-            super.onPullDebris(gate, debris);
-
-        } catch (final Throwable ignored) {
-
-        }
-
-        return null;
-    }
-
-    @Override
-    public Object onPushDebris(final Floodgate<IN, OUT> gate, final Object debris) {
-
-        try {
-
-            super.onPushDebris(gate, debris);
-
-        } catch (final Throwable ignored) {
-
-        }
-
-        return null;
     }
 }

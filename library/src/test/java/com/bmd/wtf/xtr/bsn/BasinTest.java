@@ -51,70 +51,51 @@ public class BasinTest extends TestCase {
                 Basin.collect(Waterfall.fallingFrom(new AbstractDam<String, Integer>() {
 
                     @Override
-                    public Object onDischarge(final Floodgate<String, Integer> gate,
+                    public void onDischarge(final Floodgate<String, Integer> gate,
                             final String drop) {
 
                         if ("test".equals(drop)) {
 
-                            return new IllegalArgumentException();
+                            throw new IllegalArgumentException();
                         }
 
                         gate.discharge(Integer.parseInt(drop));
 
-                        return null;
                     }
 
-                }).thenFlowingThrough(new AbstractDam<Integer, Integer>() {
+                }).thenFallingThrough(new AbstractDam<Integer, Integer>() {
 
                     private int mSum = 0;
 
                     @Override
-                    public Object onDischarge(final Floodgate<Integer, Integer> gate,
+                    public void onDischarge(final Floodgate<Integer, Integer> gate,
                             final Integer drop) {
 
                         mSum += drop;
-
-                        return null;
                     }
 
                     @Override
-                    public Object onFlush(final Floodgate<Integer, Integer> gate) {
+                    public void onFlush(final Floodgate<Integer, Integer> gate) {
 
                         gate.discharge(mSum).flush();
 
                         mSum = 0;
-
-                        return null;
                     }
 
                 }));
         assertThat(basin.thenFeedWith("1", "ciao", "2", "5").collectFirstOutput()).isEqualTo(8);
-        assertThat(basin.collectFirstPushedDebris())
-                .isExactlyInstanceOf(NumberFormatException.class);
+        assertThat(basin.collectFirstDebris()).isExactlyInstanceOf(NumberFormatException.class);
 
         final ArrayList<Integer> output = new ArrayList<Integer>(1);
         basin.thenFeedWith(Arrays.asList("1", "0")).collectOutputInto(output);
         assertThat(output).containsExactly(1);
 
         final LinkedHashSet<Object> debris = new LinkedHashSet<Object>(1);
-        basin.thenFeedWith("test", "test").collectPushedDebrisInto(debris);
+        basin.thenFeedWith("test", "test").collectDebrisInto(debris);
         final Iterator<Object> iterator = debris.iterator();
         assertThat(iterator.next()).isExactlyInstanceOf(IllegalArgumentException.class);
         assertThat(iterator.next()).isExactlyInstanceOf(IllegalArgumentException.class);
         assertThat(iterator.hasNext()).isFalse();
-
-        Basin.collect(basin.thenFlow().thenFlowingThrough(new AbstractDam<Integer, Object>() {
-
-            @Override
-            public Object onDischarge(final Floodgate<Integer, Object> gate, final Integer drop) {
-
-                return new IllegalStateException();
-            }
-
-        })).thenFeedWith("test");
-        debris.clear();
-        basin.collectPulledDebrisInto(debris);
-        assertThat(debris.iterator().next()).isExactlyInstanceOf(IllegalStateException.class);
 
         final Dam<String, String> dam1 = Dams.openDam();
         final Dam<String, String> dam2 = Dams.openDam();
@@ -185,7 +166,7 @@ public class BasinTest extends TestCase {
                               .thenFlowingThrough(new AbstractBarrage<String, String>() {
 
                                   @Override
-                                  public Object onDischarge(final int streamNumber,
+                                  public void onDischarge(final int streamNumber,
                                           final Floodgate<String, String> gate, final String drop) {
 
                                       if ((drop.length() == 0)
@@ -200,13 +181,11 @@ public class BasinTest extends TestCase {
 
                                           gate.discharge(drop);
                                       }
-
-                                      return null;
                                   }
 
                               }).thenFlowingInto(
                         CurrentFactories.singletonCurrentFactory(Currents.threadPoolCurrent(2)))
-                              .thenFlowingThrough(new DamFactory<String, List<String>>() {
+                              .thenFallingThrough(new DamFactory<String, List<String>>() {
 
                                   @Override
                                   public Dam<String, List<String>> createForStream(
@@ -220,7 +199,7 @@ public class BasinTest extends TestCase {
                                                       new ArrayList<String>();
 
                                               @Override
-                                              public Object onDischarge(
+                                              public void onDischarge(
                                                       final Floodgate<String, List<String>> gate,
                                                       final String drop) {
 
@@ -230,18 +209,14 @@ public class BasinTest extends TestCase {
                                                   }
 
                                                   mWords.add(drop);
-
-                                                  return null;
                                               }
 
                                               @Override
-                                              public Object onFlush(
+                                              public void onFlush(
                                                       final Floodgate<String, List<String>> gate) {
 
                                                   Collections.sort(mWords);
                                                   gate.discharge(mWords);
-
-                                                  return null;
                                               }
                                           };
                                       }
@@ -252,23 +227,19 @@ public class BasinTest extends TestCase {
                                                   new ArrayList<String>();
 
                                           @Override
-                                          public Object onDischarge(
+                                          public void onDischarge(
                                                   final Floodgate<String, List<String>> gate,
                                                   final String drop) {
 
                                               mWords.add(drop);
-
-                                              return null;
                                           }
 
                                           @Override
-                                          public Object onFlush(
+                                          public void onFlush(
                                                   final Floodgate<String, List<String>> gate) {
 
                                               Collections.sort(mWords, Collections.reverseOrder());
                                               gate.discharge(mWords);
-
-                                              return null;
                                           }
                                       };
 
@@ -281,7 +252,7 @@ public class BasinTest extends TestCase {
                     private ArrayList<String> mList = new ArrayList<String>();
 
                     @Override
-                    public Object onDischarge(final Floodgate<List<String>, String> gate,
+                    public void onDischarge(final Floodgate<List<String>, String> gate,
                             final List<String> drop) {
 
                         if (mList.isEmpty() || drop.isEmpty()) {
@@ -306,8 +277,6 @@ public class BasinTest extends TestCase {
 
                             gate.discharge(mList).flush();
                         }
-
-                        return null;
                     }
 
                 })
@@ -317,25 +286,23 @@ public class BasinTest extends TestCase {
         assertThat(output)
                 .containsExactly("1111", "3", "CAPITAL", "Ciao", "a", "is", "zOO", "test", "This");
 
-        final BlockingBasin<String, Integer> basin1 = BlockingBasin.collect(
+        final BlockingBasin<String, Integer> basin = BlockingBasin.collect(
                 Waterfall.flowingInto(Currents.threadPoolCurrent(1))
                          .thenFlowingThrough(new AbstractDam<String, Integer>() {
 
                              @Override
-                             public Object onDischarge(final Floodgate<String, Integer> gate,
+                             public void onDischarge(final Floodgate<String, Integer> gate,
                                      final String drop) {
 
                                  gate.discharge(Integer.parseInt(drop));
-
-                                 return null;
                              }
 
-                         }).thenFlowingThrough(new AbstractDam<Integer, Integer>() {
+                         }).thenFallingThrough(new AbstractDam<Integer, Integer>() {
 
                                                    private int mSum = 0;
 
                                                    @Override
-                                                   public Object onDischarge(
+                                                   public void onDischarge(
                                                            final Floodgate<Integer, Integer> gate,
                                                            final Integer drop) {
 
@@ -345,69 +312,40 @@ public class BasinTest extends TestCase {
                                                        }
 
                                                        mSum += drop;
-
-                                                       return null;
                                                    }
 
                                                    @Override
-                                                   public Object onFlush(
+                                                   public void onFlush(
                                                            final Floodgate<Integer, Integer> gate) {
 
                                                        gate.discharge(mSum).flush();
 
                                                        mSum = 0;
-
-                                                       return null;
                                                    }
-
                                                }
                 )
         ).afterMax(2, TimeUnit.SECONDS).throwIfTimeout(new UnsupportedOperationException());
-        assertThat(basin1.thenFeedWith("1", "ciao", "2", "5").collectFirstOutput()).isEqualTo(8);
-        assertThat(basin1.collectFirstPushedDebris())
-                .isExactlyInstanceOf(NumberFormatException.class);
+        assertThat(basin.thenFeedWith("1", "ciao", "2", "5").collectFirstOutput()).isEqualTo(8);
+        assertThat(basin.collectFirstDebris()).isExactlyInstanceOf(NumberFormatException.class);
 
         final ArrayList<Integer> outInts = new ArrayList<Integer>(1);
-        basin1.thenFeedWith(Arrays.asList("1", "0")).collectOutputInto(outInts);
+        basin.thenFeedWith(Arrays.asList("1", "0")).collectOutputInto(outInts);
         assertThat(outInts).containsExactly(1);
-        basin1.thenFlow().backToSource().discharge(Arrays.asList("1", "0"));
-        basin1.thenFlush();
-        assertThat(basin1.collectFirstOutput()).isEqualTo(1);
+        basin.thenFlow().backToSource().discharge(Arrays.asList("1", "0"));
+        basin.thenFlush();
+        assertThat(basin.collectFirstOutput()).isEqualTo(1);
 
         final LinkedHashSet<Object> debris = new LinkedHashSet<Object>(1);
-        basin1.thenFeedWith(null, null);
+        basin.thenFeedWith(null, null);
         do {
 
-            basin1.collectPushedDebrisInto(debris);
+            basin.collectDebrisInto(debris);
 
         } while (debris.size() < 2);
         final Iterator<Object> iterator = debris.iterator();
         assertThat(iterator.next()).isExactlyInstanceOf(NumberFormatException.class);
         assertThat(iterator.next()).isExactlyInstanceOf(NumberFormatException.class);
         assertThat(iterator.hasNext()).isFalse();
-
-        final Basin<String, Object> basin2 = Basin.collect(
-                basin1.thenFlow().thenFlowingThrough(new AbstractDam<Integer, Object>() {
-
-                                                         @Override
-                                                         public Object onDischarge(
-                                                                 final Floodgate<Integer, Object> gate,
-                                                                 final Integer drop) {
-
-                                                             throw new IllegalStateException();
-                                                         }
-
-                                                     }
-                )
-        );
-        basin2.thenFeedWith("test");
-        debris.clear();
-        basin1.collectPulledDebrisInto(debris);
-        assertThat(debris.iterator().next()).isExactlyInstanceOf(IllegalStateException.class);
-        basin2.thenFeedWith("test");
-        debris.clear();
-        assertThat(basin1.collectFirstPulledDebris())
-                .isExactlyInstanceOf(IllegalStateException.class);
 
         final Dam<String, String> dam1 = Dams.openDam();
         final Dam<String, String> dam2 = Dams.openDam();
@@ -423,6 +361,37 @@ public class BasinTest extends TestCase {
         assertThat(BlockingBasin.collect(Arrays.asList(stream1, stream2, stream3, stream2))
                                 .thenFeedWith("test").collectOutput())
                 .containsExactly("test", "test", "test");
+
+        final BlockingBasin<String, String> basin1 = BlockingBasin.collect(
+                Waterfall.flowingInto(Currents.threadPoolCurrent(1))
+                         .thenFlowingThrough(new OpenDam<String>() {
+
+                             public String mDrop;
+
+                             @Override
+                             public void onDischarge(final Floodgate<String, String> gate,
+                                     final String drop) {
+
+                                 mDrop = drop;
+                             }
+
+                             @Override
+                             public void onFlush(final Floodgate<String, String> gate) {
+
+                                 try {
+
+                                     Thread.sleep(1000);
+
+                                 } catch (final InterruptedException ignored) {
+
+                                 }
+
+                                 gate.discharge(mDrop).flush();
+                             }
+                         })
+        );
+        assertThat(basin1.thenFeedWith("test").immediately().collectOutput()).isEmpty();
+        assertThat(basin1.whenAvailable().collectOutput()).containsExactly("test");
     }
 
     public void testBlockingError() {
@@ -473,15 +442,13 @@ public class BasinTest extends TestCase {
                 BlockingBasin.collect(Waterfall.fallingFrom(new AbstractDam<String, Integer>() {
 
                     @Override
-                    public Object onDischarge(final Floodgate<String, Integer> gate,
+                    public void onDischarge(final Floodgate<String, Integer> gate,
                             final String drop) {
 
                         gate.discharge(Integer.parseInt(drop));
-
-                        return null;
                     }
 
-                }).thenFlowingInto(Currents.threadPoolCurrent(1)).thenFlowingThrough(closed))
+                }).thenFlowingInto(Currents.threadPoolCurrent(1)).thenFallingThrough(closed))
                              .afterMax(1, TimeUnit.MILLISECONDS);
 
         final ArrayList<Integer> output = new ArrayList<Integer>(1);
@@ -489,11 +456,9 @@ public class BasinTest extends TestCase {
         assertThat(basin1.collectFirstOutput()).isNull();
         basin1.collectOutputInto(output);
         assertThat(output).isEmpty();
-        assertThat(basin1.collectFirstPushedDebris()).isNull();
-        basin1.collectPushedDebrisInto(debris);
+        assertThat(basin1.collectFirstDebris()).isNull();
+        basin1.collectDebrisInto(debris);
         assertThat(debris).isEmpty();
-        assertThat(basin1.collectFirstPulledDebris()).isNull();
-        basin1.collectPulledDebrisInto(debris);
         assertThat(debris).isEmpty();
 
         basin1.throwIfTimeout(new UnsupportedOperationException());
@@ -520,7 +485,7 @@ public class BasinTest extends TestCase {
 
         try {
 
-            basin1.collectFirstPushedDebris();
+            basin1.collectFirstDebris();
 
             fail();
 
@@ -530,32 +495,84 @@ public class BasinTest extends TestCase {
 
         try {
 
-            basin1.collectPushedDebrisInto(debris);
+            basin1.collectDebrisInto(debris);
 
             fail();
 
         } catch (final Exception ignored) {
 
         }
+    }
 
-        try {
+    public void testPartialFeed() {
 
-            basin1.collectFirstPulledDebris();
+        final Basin<Object, Object> basin =
+                Basin.collect(Waterfall.fallingFrom(new OpenDam<Object>() {
 
-            fail();
+                    @Override
+                    public void onFlush(final Floodgate<Object, Object> gate) {
 
-        } catch (final Exception ignored) {
+                        gate.discharge(new IllegalStateException());
+                    }
+                }));
 
-        }
+        assertThat(basin.thenPartiallyFeedWith("test").collectOutput()).containsExactly("test");
+        assertThat(basin.thenPartiallyFeedWith("1", "ciao", "2", "5").collectOutput())
+                .containsExactly("1", "ciao", "2", "5");
+        assertThat(
+                basin.thenPartiallyFeedWith(Arrays.asList("1", "ciao", "2", "5")).collectOutput())
+                .containsExactly("1", "ciao", "2", "5");
+        final List<Object> objects = basin.thenFeedWith("test").collectOutput();
+        assertThat(objects).hasSize(2);
+        assertThat(objects.get(0)).isEqualTo("test");
+        assertThat(objects.get(1)).isExactlyInstanceOf(IllegalStateException.class);
 
-        try {
-
-            basin1.collectPulledDebrisInto(debris);
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
+        assertThat(Basin.partiallyFeed(Basin.collect(Waterfall.fallingFrom(new OpenDam<Byte>())),
+                                       (byte[]) null).collectOutput()).isEmpty();
+        assertThat(Basin.partiallyFeed(Basin.collect(Waterfall.fallingFrom(new OpenDam<Byte>())),
+                                       new byte[]{1, 2, 3}).collectOutput())
+                .containsExactly((byte) 1, (byte) 2, (byte) 3);
+        assertThat(
+                Basin.partiallyFeed(Basin.collect(Waterfall.fallingFrom(new OpenDam<Character>())),
+                                    (char[]) null).collectOutput()
+        ).isEmpty();
+        assertThat(
+                Basin.partiallyFeed(Basin.collect(Waterfall.fallingFrom(new OpenDam<Character>())),
+                                    new char[]{1, 2, 3}).collectOutput()
+        ).containsExactly((char) 1, (char) 2, (char) 3);
+        assertThat(Basin.partiallyFeed(Basin.collect(Waterfall.fallingFrom(new OpenDam<Boolean>())),
+                                       (boolean[]) null).collectOutput()).isEmpty();
+        assertThat(Basin.partiallyFeed(Basin.collect(Waterfall.fallingFrom(new OpenDam<Boolean>())),
+                                       true, true, false).collectOutput())
+                .containsExactly(true, true, false);
+        assertThat(Basin.partiallyFeed(Basin.collect(Waterfall.fallingFrom(new OpenDam<Short>())),
+                                       (short[]) null).collectOutput()).isEmpty();
+        assertThat(Basin.partiallyFeed(Basin.collect(Waterfall.fallingFrom(new OpenDam<Short>())),
+                                       new short[]{1, 2, 3}).collectOutput()
+        ).containsExactly((short) 1, (short) 2, (short) 3);
+        assertThat(Basin.partiallyFeed(Basin.collect(Waterfall.fallingFrom(new OpenDam<Integer>())),
+                                       (int[]) null).collectOutput()).isEmpty();
+        assertThat(
+                Basin.partiallyFeed(Basin.collect(Waterfall.fallingFrom(new OpenDam<Integer>())), 1,
+                                    2, 3).collectOutput()
+        ).containsExactly(1, 2, 3);
+        assertThat(Basin.partiallyFeed(Basin.collect(Waterfall.fallingFrom(new OpenDam<Long>())),
+                                       (long[]) null).collectOutput()).isEmpty();
+        assertThat(
+                Basin.partiallyFeed(Basin.collect(Waterfall.fallingFrom(new OpenDam<Long>())), 1L,
+                                    2L, 3L).collectOutput()
+        ).containsExactly((long) 1, (long) 2, (long) 3);
+        assertThat(Basin.partiallyFeed(Basin.collect(Waterfall.fallingFrom(new OpenDam<Float>())),
+                                       (float[]) null).collectOutput()).isEmpty();
+        assertThat(
+                Basin.partiallyFeed(Basin.collect(Waterfall.fallingFrom(new OpenDam<Float>())), 1f,
+                                    2f, 3f).collectOutput()
+        ).containsExactly((float) 1, (float) 2, (float) 3);
+        assertThat(Basin.partiallyFeed(Basin.collect(Waterfall.fallingFrom(new OpenDam<Double>())),
+                                       (double[]) null).collectOutput()).isEmpty();
+        assertThat(
+                Basin.partiallyFeed(Basin.collect(Waterfall.fallingFrom(new OpenDam<Double>())), 1D,
+                                    2D, 3D).collectOutput()
+        ).containsExactly((double) 1, (double) 2, (double) 3);
     }
 }

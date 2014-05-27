@@ -4,4 +4,4 @@
  * <p/>
  * Created by davide on 4/16/14.
  */
-package com.bmd.wtf.xtr.ppl;
+package com.bmd.wtf.xtr.qdc;

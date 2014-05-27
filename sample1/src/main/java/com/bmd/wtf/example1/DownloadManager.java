@@ -66,7 +66,9 @@ public class DownloadManager {
     public void download(final String url) {
 
         Waterfall.fallingFrom(mControl.leveeControlledBy(mDownloaded)).thenFlowingInto(mCurrent)
-                 .thenFlowingThrough(new Downloader(mDownloadDir)).backToSource().discharge(url);
+                 .thenFallingThrough(new Downloader(mDownloadDir))
+                 .thenFallingThrough(mControl.leveeControlledBy(mDownloaded)).backToSource()
+                 .discharge(url);
     }
 
     public boolean isComplete(final String url) {

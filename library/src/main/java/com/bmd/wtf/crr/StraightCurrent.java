@@ -105,20 +105,44 @@ public class StraightCurrent implements Current {
     }
 
     @Override
+    public void drop(final Pool<?> pool, final Object debris) {
+
+        pool.drop(debris);
+    }
+
+    @Override
+    public void dropAfter(final Pool<?> pool, final long delay, final TimeUnit timeUnit,
+            final Object debris) {
+
+        try {
+
+            long timeToWait = timeUnit.toMillis(delay);
+
+            final long startTime = System.currentTimeMillis();
+
+            final long endTime = startTime + timeToWait;
+
+            do {
+
+                Thread.sleep(timeToWait);
+
+                timeToWait = endTime - System.currentTimeMillis();
+
+            } while (timeToWait > 0);
+
+            pool.drop(debris);
+
+        } catch (final InterruptedException e) {
+
+            Thread.currentThread().interrupt();
+
+            throw new DelayInterruptedException(e);
+        }
+    }
+
+    @Override
     public void flush(final Pool<?> pool) {
 
         pool.flush();
-    }
-
-    @Override
-    public void pull(final Pool<?> pool, final Object debris) {
-
-        pool.pull(debris);
-    }
-
-    @Override
-    public void push(final Pool<?> pool, final Object debris) {
-
-        pool.push(debris);
     }
 }

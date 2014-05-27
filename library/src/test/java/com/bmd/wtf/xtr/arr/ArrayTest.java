@@ -22,7 +22,6 @@ import com.bmd.wtf.dam.Dam;
 import com.bmd.wtf.dam.Dams;
 import com.bmd.wtf.dam.OpenDam;
 import com.bmd.wtf.src.Floodgate;
-import com.bmd.wtf.src.Spring;
 import com.bmd.wtf.xtr.bsn.Basin;
 
 import junit.framework.TestCase;
@@ -49,25 +48,24 @@ public class ArrayTest extends TestCase {
                 WaterfallArray.formingFrom(Waterfall.fallingFrom(new OpenDam<String>() {
 
                                                                      @Override
-                                                                     public Object onDischarge(
+                                                                     public void onDischarge(
                                                                              final Floodgate<String, String> gate,
                                                                              final String drop) {
 
                                                                          if ("test".equals(drop)) {
 
-                                                                             return new IllegalArgumentException();
+                                                                             throw new IllegalArgumentException();
                                                                          }
 
-                                                                         return super
-                                                                                 .onDischarge(gate,
-                                                                                              drop);
+                                                                         super.onDischarge(gate,
+                                                                                           drop);
                                                                      }
 
                                                                  }
                 )).thenSplittingIn(2).thenFlowingThrough(new AbstractBarrage<String, String>() {
 
                                                              @Override
-                                                             public Object onDischarge(
+                                                             public void onDischarge(
                                                                      final int streamNumber,
                                                                      final Floodgate<String, String> gate,
                                                                      final String drop) {
@@ -85,11 +83,9 @@ public class ArrayTest extends TestCase {
 
                                                                      gate.discharge(drop);
                                                                  }
-
-                                                                 return null;
                                                              }
                                                          }
-                ).thenFlowingThrough(new DamFactory<String, List<String>>() {
+                ).thenFallingThrough(new DamFactory<String, List<String>>() {
 
                     @Override
                     public Dam<String, List<String>> createForStream(final int streamNumber) {
@@ -101,8 +97,7 @@ public class ArrayTest extends TestCase {
                                 private final ArrayList<String> mWords = new ArrayList<String>();
 
                                 @Override
-                                public Object onDischarge(
-                                        final Floodgate<String, List<String>> gate,
+                                public void onDischarge(final Floodgate<String, List<String>> gate,
                                         final String drop) {
 
                                     if ("atest".equals(drop)) {
@@ -111,17 +106,13 @@ public class ArrayTest extends TestCase {
                                     }
 
                                     mWords.add(drop);
-
-                                    return null;
                                 }
 
                                 @Override
-                                public Object onFlush(final Floodgate<String, List<String>> gate) {
+                                public void onFlush(final Floodgate<String, List<String>> gate) {
 
                                     Collections.sort(mWords);
                                     gate.discharge(mWords);
-
-                                    return null;
                                 }
                             };
                         }
@@ -131,21 +122,17 @@ public class ArrayTest extends TestCase {
                             private final ArrayList<String> mWords = new ArrayList<String>();
 
                             @Override
-                            public Object onDischarge(final Floodgate<String, List<String>> gate,
+                            public void onDischarge(final Floodgate<String, List<String>> gate,
                                     final String drop) {
 
                                 mWords.add(drop);
-
-                                return null;
                             }
 
                             @Override
-                            public Object onFlush(final Floodgate<String, List<String>> gate) {
+                            public void onFlush(final Floodgate<String, List<String>> gate) {
 
                                 Collections.sort(mWords, Collections.reverseOrder());
                                 gate.discharge(mWords);
-
-                                return null;
                             }
                         };
                     }
@@ -157,7 +144,7 @@ public class ArrayTest extends TestCase {
                     private ArrayList<String> mList = new ArrayList<String>();
 
                     @Override
-                    public Object onDischarge(final Floodgate<List<String>, String> gate,
+                    public void onDischarge(final Floodgate<List<String>, String> gate,
                             final List<String> drop) {
 
                         if (mList.isEmpty() || drop.isEmpty()) {
@@ -182,8 +169,6 @@ public class ArrayTest extends TestCase {
 
                             gate.discharge(mList).flush();
                         }
-
-                        return null;
                     }
 
                 })
@@ -192,23 +177,15 @@ public class ArrayTest extends TestCase {
 
         assertThat(output)
                 .containsExactly("1111", "3", "CAPITAL", "Ciao", "a", "is", "zOO", "This");
-        assertThat(basin.collectFirstPushedDebris())
-                .isExactlyInstanceOf(NullPointerException.class);
-        assertThat(basin.collectFirstPushedDebris())
-                .isExactlyInstanceOf(NullPointerException.class);
-        assertThat(basin.collectFirstPushedDebris())
-                .isExactlyInstanceOf(IllegalArgumentException.class);
-        assertThat(basin.collectFirstPushedDebris())
-                .isExactlyInstanceOf(IllegalArgumentException.class);
-        assertThat(basin.collectFirstPushedDebris())
-                .isExactlyInstanceOf(IllegalStateException.class);
-        assertThat(basin.collectFirstPulledDebris()).isNull();
+        assertThat(basin.collectFirstDebris()).isExactlyInstanceOf(NullPointerException.class);
+        assertThat(basin.collectFirstDebris()).isExactlyInstanceOf(NullPointerException.class);
+        assertThat(basin.collectFirstDebris()).isExactlyInstanceOf(IllegalArgumentException.class);
+        assertThat(basin.collectFirstDebris()).isExactlyInstanceOf(IllegalArgumentException.class);
+        assertThat(basin.collectFirstDebris()).isExactlyInstanceOf(IllegalStateException.class);
 
         basin.thenFeedWith("test");
         assertThat(basin.collectFirstOutput()).isNull();
-        assertThat(basin.collectFirstPushedDebris())
-                .isExactlyInstanceOf(IllegalArgumentException.class);
-        assertThat(basin.collectFirstPulledDebris()).isNull();
+        assertThat(basin.collectFirstDebris()).isExactlyInstanceOf(IllegalArgumentException.class);
 
         final Dam<Integer, Integer> dam1 = Dams.openDam();
         final Dam<Integer, Integer> dam2 = Dams.openDam();
@@ -372,7 +349,7 @@ public class ArrayTest extends TestCase {
         try {
 
             WaterfallArray.formingFrom(Waterfall.fallingFrom(Dams.openDam())).thenSplittingIn(1)
-                          .thenFlowingThrough((DamFactory<Object, Object>) null);
+                          .thenFallingThrough(null);
 
             fail();
 
@@ -383,7 +360,7 @@ public class ArrayTest extends TestCase {
         try {
 
             WaterfallArray.formingFrom(Waterfall.fallingFrom(Dams.openDam())).thenSplittingIn(1)
-                          .thenFlowingThrough((Barrage<Object, Object>) null);
+                          .thenFlowingThrough(null);
 
             fail();
 
@@ -396,31 +373,20 @@ public class ArrayTest extends TestCase {
             final Barrage<Object, Object> barrage = new Barrage<Object, Object>() {
 
                 @Override
-                public Object onDischarge(final int streamNumber,
+                public void onDischarge(final int streamNumber,
                         final Floodgate<Object, Object> gate, final Object drop) {
 
-                    return null;
                 }
 
                 @Override
-                public Object onFlush(final int streamNumber,
-                        final Floodgate<Object, Object> gate) {
+                public void onFlush(final int streamNumber, final Floodgate<Object, Object> gate) {
 
-                    return null;
                 }
 
                 @Override
-                public Object onPullDebris(final int streamNumber,
-                        final Floodgate<Object, Object> gate, final Object debris) {
+                public void onDrop(final int streamNumber, final Floodgate<Object, Object> gate,
+                        final Object debris) {
 
-                    return null;
-                }
-
-                @Override
-                public Object onPushDebris(final int streamNumber,
-                        final Floodgate<Object, Object> gate, final Object debris) {
-
-                    return null;
                 }
             };
 
@@ -442,33 +408,43 @@ public class ArrayTest extends TestCase {
                 WaterfallArray.formingFrom(Waterfall.fallingFrom(new OpenDam<Integer>()))
                               .thenSplittingIn(2)
                               .thenFlowingInto(CurrentFactories.singletonCurrentFactory(current))
-                              .thenBalancedBy(new AbstractArrayBalancer<Integer, Integer>() {
+                              .thenFlowingThrough(new AbstractBarrage<Integer, Object>() {
 
                                   @Override
-                                  public Object onDischarge(final List<Spring<Integer>> springs,
+                                  public void onDischarge(final int streamNumber,
+                                          final Floodgate<Integer, Object> gate,
                                           final Integer drop) {
 
-                                      springs.get(drop % 2).discharge(drop);
+                                      if ((drop % 2) == streamNumber) {
 
-                                      return null;
+                                          gate.discharge(drop);
+                                      }
                                   }
                               }).thenMerging()
         ).thenFeedWith(1, 2, 3).collectOutput()).contains(1, 2, 3);
         assertThat(Basin.collect(
                 WaterfallArray.formingFrom(Waterfall.fallingFrom(new OpenDam<Integer>()))
                               .thenSplittingIn(2)
-                              .thenBalancedBy(new AbstractArrayBalancer<Integer, Integer>() {
+                              .thenFlowingThrough(new AbstractBarrage<Integer, Object>() {
 
                                   @Override
-                                  public Object onDischarge(final List<Spring<Integer>> springs,
+                                  public void onDischarge(final int streamNumber,
+                                          final Floodgate<Integer, Object> gate,
                                           final Integer drop) {
 
-                                      springs.get(drop % 2).discharge(drop);
+                                      if ((drop % 2) == streamNumber) {
 
-                                      return null;
+                                          gate.discharge(drop);
+                                      }
                                   }
                               }).thenFlowingInto(CurrentFactories.singletonCurrentFactory(current))
                               .thenMerging()
         ).thenFeedWith(1, 2, 3).collectOutput()).contains(1, 2, 3);
+    }
+
+    public void testSize() {
+
+        assertThat(WaterfallArray.formingFrom(Waterfall.fallingFrom(new OpenDam<Object>()))
+                                 .thenSplittingIn(2).streams()).hasSize(2);
     }
 }

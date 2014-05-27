@@ -68,7 +68,7 @@ public class Basin<IN, OUT> {
         final CollectorDam<OUT> dam = new CollectorDam<OUT>();
 
         return new Basin<IN, OUT>(Collections.singleton(stream.backToSource()), dam,
-                                  stream.thenFlowingThrough(dam));
+                                  stream.thenFallingThrough(dam));
     }
 
     /**
@@ -307,6 +307,39 @@ public class Basin<IN, OUT> {
     }
 
     /**
+     * Collects the debris dropped through the basin.
+     *
+     * @return The dropped debris.
+     */
+    public List<Object> collectDebris() {
+
+        return mCollector.collectDebris();
+    }
+
+    /**
+     * Collects the debris dropped through the basin into the specified bucket.
+     *
+     * @param bucket The bucket to put the debris into.
+     * @return This basin.
+     */
+    public Basin<IN, OUT> collectDebrisInto(final Collection<Object> bucket) {
+
+        bucket.addAll(mCollector.collectDebris());
+
+        return this;
+    }
+
+    /**
+     * Collects the first debris dropped through the basin.
+     *
+     * @return The dropped debris.
+     */
+    public Object collectFirstDebris() {
+
+        return mCollector.collectNextDebris();
+    }
+
+    /**
      * Collects the first data drop flown through the basin.
      *
      * @return The data drop.
@@ -314,26 +347,6 @@ public class Basin<IN, OUT> {
     public OUT collectFirstOutput() {
 
         return mCollector.collectNext();
-    }
-
-    /**
-     * Collects the first debris pulled through the basin.
-     *
-     * @return The pulled debris.
-     */
-    public Object collectFirstPulledDebris() {
-
-        return mCollector.collectNextPulledDebris();
-    }
-
-    /**
-     * Collects the first debris pushed through the basin.
-     *
-     * @return The pushed debris.
-     */
-    public Object collectFirstPushedDebris() {
-
-        return mCollector.collectNextPushedDebris();
     }
 
     /**
@@ -360,47 +373,17 @@ public class Basin<IN, OUT> {
     }
 
     /**
-     * Collects the debris pulled through the basin.
+     * Drops the specified debris into the originating springs.
      *
-     * @return The pulled debris.
-     */
-    public List<Object> collectPulledDebris() {
-
-        return mCollector.collectPulledDebris();
-    }
-
-    /**
-     * Collects the debris pulled through the basin into the specified bucket.
-     *
-     * @param bucket The bucket to put the debris into.
+     * @param debris The debris to drop.
      * @return This basin.
      */
-    public Basin<IN, OUT> collectPulledDebrisInto(final Collection<Object> bucket) {
+    public Basin<IN, OUT> thenDrop(final Object debris) {
 
-        bucket.addAll(mCollector.collectPulledDebris());
+        for (final Spring<IN> spring : mSprings) {
 
-        return this;
-    }
-
-    /**
-     * Collects the debris pushed through the basin.
-     *
-     * @return The pushed debris.
-     */
-    public List<Object> collectPushedDebris() {
-
-        return mCollector.collectPushedDebris();
-    }
-
-    /**
-     * Collects the debris pushed through the basin into the specified bucket.
-     *
-     * @param bucket The bucket to put the debris into.
-     * @return This basin.
-     */
-    public Basin<IN, OUT> collectPushedDebrisInto(final Collection<Object> bucket) {
-
-        bucket.addAll(mCollector.collectPushedDebris());
+            spring.drop(debris);
+        }
 
         return this;
     }

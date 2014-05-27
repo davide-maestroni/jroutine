@@ -253,38 +253,29 @@ public class FloodControl<IN, OUT, CONTROLLER extends FloodObserver<IN, OUT>> {
         }
 
         @Override
-        public Object onDischarge(final Floodgate<IN, OUT> gate, final IN drop) {
+        public void onDischarge(final Floodgate<IN, OUT> gate, final IN drop) {
 
             synchronized (mMutex) {
 
-                return mObserver.onDischarge(gate, drop);
+                mObserver.onDischarge(gate, drop);
             }
         }
 
         @Override
-        public Object onFlush(final Floodgate<IN, OUT> gate) {
+        public void onDrop(final Floodgate<IN, OUT> gate, final Object debris) {
 
             synchronized (mMutex) {
 
-                return mObserver.onFlush(gate);
+                mObserver.onDrop(gate, debris);
             }
         }
 
         @Override
-        public Object onPullDebris(final Floodgate<IN, OUT> gate, final Object debris) {
+        public void onFlush(final Floodgate<IN, OUT> gate) {
 
             synchronized (mMutex) {
 
-                return mObserver.onPullDebris(gate, debris);
-            }
-        }
-
-        @Override
-        public Object onPushDebris(final Floodgate<IN, OUT> gate, final Object debris) {
-
-            synchronized (mMutex) {
-
-                return mObserver.onPushDebris(gate, debris);
+                mObserver.onFlush(gate);
             }
         }
     }

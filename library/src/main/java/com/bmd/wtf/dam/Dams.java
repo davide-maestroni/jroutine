@@ -40,20 +40,6 @@ public class Dams {
     }
 
     /**
-     * Creates a new dam preventing debris from being pulled further upstream, by wrapping the
-     * specified one.
-     *
-     * @param dam   The dam to wrap.
-     * @param <IN>  The input data type.
-     * @param <OUT> The output data type.
-     * @return The new dam instance.
-     */
-    public static <IN, OUT> Dam<IN, OUT> downstreamDebris(final Dam<IN, OUT> dam) {
-
-        return new DownstreamDebrisDam<IN, OUT>(dam);
-    }
-
-    /**
      * Creates a new dam preventing debris from being pushed downstream or pulled upstream, by
      * wrapping the specified one.
      *
@@ -76,20 +62,6 @@ public class Dams {
     public static <DATA> Dam<DATA, DATA> openDam() {
 
         return new OpenDam<DATA>();
-    }
-
-    /**
-     * Creates a new dam preventing debris from being pushed further downstream, by wrapping the
-     * specified one.
-     *
-     * @param dam   The dam to wrap.
-     * @param <IN>  The input data type.
-     * @param <OUT> The output data type.
-     * @return The new dam instance.
-     */
-    public static <IN, OUT> Dam<IN, OUT> upstreamDebris(final Dam<IN, OUT> dam) {
-
-        return new UpstreamDebrisDam<IN, OUT>(dam);
     }
 
     /**

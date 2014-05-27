@@ -14,9 +14,7 @@
 package com.bmd.wtf.xtr.dam;
 
 import com.bmd.wtf.dam.Dam;
-import com.bmd.wtf.dam.DownstreamDebrisDam;
 import com.bmd.wtf.dam.NoDebrisDam;
-import com.bmd.wtf.dam.UpstreamDebrisDam;
 import com.bmd.wtf.src.Floodgate;
 
 /**
@@ -30,6 +28,15 @@ import com.bmd.wtf.src.Floodgate;
  */
 public class DamBuilder<IN, OUT> {
 
+    private static final DropHandler CLOSED_DROP_HANDLER = new DropHandler() {
+
+        @Override
+        public Object onDrop(final Object debris) {
+
+            return null;
+        }
+    };
+
     private static final FlushHandler CLOSED_FLUSH_HANDLER = new FlushHandler() {
 
         @Override
@@ -39,23 +46,16 @@ public class DamBuilder<IN, OUT> {
         }
     };
 
-    private static final PullHandler CLOSED_PULL_HANDLER = new PullHandler() {
+    private static final DropHandler OPEN_DROP_HANDLER = new DropHandler() {
 
         @Override
-        public Object onPullDebris(final Object debris) {
+        public Object onDrop(final Object debris) {
 
-            return null;
+            return debris;
         }
     };
 
-    private static final PushHandler CLOSED_PUSH_HANDLER = new PushHandler() {
-
-        @Override
-        public Object onPushDebris(final Object debris) {
-
-            return null;
-        }
-    };
+    private DropHandler mOnDrop = OPEN_DROP_HANDLER;
 
     private static final FlushHandler OPEN_FLUSH_HANDLER = new FlushHandler() {
 
@@ -68,35 +68,11 @@ public class DamBuilder<IN, OUT> {
 
     private FlushHandler mOnFlush = OPEN_FLUSH_HANDLER;
 
-    private static final PullHandler OPEN_PULL_HANDLER = new PullHandler() {
-
-        @Override
-        public Object onPullDebris(final Object debris) {
-
-            return debris;
-        }
-    };
-
-    private PullHandler mOnPull = OPEN_PULL_HANDLER;
-
-    private static final PushHandler OPEN_PUSH_HANDLER = new PushHandler() {
-
-        @Override
-        public Object onPushDebris(final Object debris) {
-
-            return debris;
-        }
-    };
-
-    private PushHandler mOnPush = OPEN_PUSH_HANDLER;
-
     private final DischargeHandler<IN, OUT> mOnDischarge;
 
     private boolean mAvoidNull;
 
-    private boolean mDownstreamDebris;
-
-    private boolean mUpstreamDebris;
+    private boolean mNoDebris;
 
     /**
      * Constructor.
@@ -109,11 +85,9 @@ public class DamBuilder<IN, OUT> {
         this(handler);
 
         mOnFlush = other.mOnFlush;
-        mOnPush = other.mOnPush;
-        mOnPull = other.mOnPull;
+        mOnDrop = other.mOnDrop;
         mAvoidNull = other.mAvoidNull;
-        mDownstreamDebris = other.mDownstreamDebris;
-        mUpstreamDebris = other.mUpstreamDebris;
+        mNoDebris = other.mNoDebris;
     }
 
     /**
@@ -129,8 +103,6 @@ public class DamBuilder<IN, OUT> {
         }
 
         mOnDischarge = handler;
-        mDownstreamDebris = true;
-        mUpstreamDebris = true;
     }
 
     /**
@@ -144,6 +116,18 @@ public class DamBuilder<IN, OUT> {
     public static <IN, OUT> DamBuilder<IN, OUT> basedOn(final DischargeHandler<IN, OUT> handler) {
 
         return new DamBuilder<IN, OUT>(handler);
+    }
+
+    /**
+     * Makes the built dam avoid debris to be dropped downstream.
+     *
+     * @return This builder.
+     */
+    public DamBuilder<IN, OUT> avoidDebris() {
+
+        mOnDrop = CLOSED_DROP_HANDLER;
+
+        return this;
     }
 
     /**
@@ -171,30 +155,6 @@ public class DamBuilder<IN, OUT> {
     }
 
     /**
-     * Makes the built dam avoid debris to be pulled upstream.
-     *
-     * @return This builder.
-     */
-    public DamBuilder<IN, OUT> avoidPull() {
-
-        mOnPull = CLOSED_PULL_HANDLER;
-
-        return this;
-    }
-
-    /**
-     * Makes the built dam avoid debris to be pushed downstream.
-     *
-     * @return This builder.
-     */
-    public DamBuilder<IN, OUT> avoidPush() {
-
-        mOnPush = CLOSED_PUSH_HANDLER;
-
-        return this;
-    }
-
-    /**
      * Builds the dam.
      *
      * @return The newly created dam.
@@ -205,52 +165,25 @@ public class DamBuilder<IN, OUT> {
 
         final FlushHandler flush = mOnFlush;
 
-        final PushHandler push = mOnPush;
-
-        final PullHandler pull = mOnPull;
+        final DropHandler drop = mOnDrop;
 
         final Dam<IN, OUT> dam;
 
         if (mAvoidNull) {
 
-            dam = new AvoidingNullDam<IN, OUT>(discharge, push, flush, pull);
+            dam = new AvoidingNullDam<IN, OUT>(discharge, drop, flush);
 
         } else {
 
-            dam = new ArtificialDam<IN, OUT>(discharge, push, flush, pull);
+            dam = new ArtificialDam<IN, OUT>(discharge, drop, flush);
         }
 
-        if (mDownstreamDebris) {
-
-            if (!mUpstreamDebris) {
-
-                return new DownstreamDebrisDam<IN, OUT>(dam);
-            }
-
-            return dam;
-
-        } else {
-
-            if (mUpstreamDebris) {
-
-                return new UpstreamDebrisDam<IN, OUT>(dam);
-            }
+        if (mNoDebris) {
 
             return new NoDebrisDam<IN, OUT>(dam);
         }
-    }
 
-    /**
-     * Makes the built dam avoid debris to be pulled upstream.
-     *
-     * @return This builder.
-     */
-    public DamBuilder<IN, OUT> downstreamDebris() {
-
-        mDownstreamDebris = true;
-        mUpstreamDebris = false;
-
-        return this;
+        return dam;
     }
 
     /**
@@ -260,8 +193,7 @@ public class DamBuilder<IN, OUT> {
      */
     public DamBuilder<IN, OUT> noDebris() {
 
-        mDownstreamDebris = false;
-        mUpstreamDebris = false;
+        mNoDebris = true;
 
         return this;
     }
@@ -281,6 +213,24 @@ public class DamBuilder<IN, OUT> {
     }
 
     /**
+     * Set the drop handler instance.
+     *
+     * @param handler The drop handler.
+     * @return This builder.
+     */
+    public DamBuilder<IN, OUT> onDrop(final DropHandler handler) {
+
+        if (handler == null) {
+
+            throw new IllegalArgumentException("the drop handler cannot be null");
+        }
+
+        mOnDrop = handler;
+
+        return this;
+    }
+
+    /**
      * Set the flush handler instance.
      *
      * @param handler The flush handler.
@@ -294,55 +244,6 @@ public class DamBuilder<IN, OUT> {
         }
 
         mOnFlush = handler;
-
-        return this;
-    }
-
-    /**
-     * Set the pull handler instance.
-     *
-     * @param handler The pull handler.
-     * @return This builder.
-     */
-    public DamBuilder<IN, OUT> onPullDebris(final PullHandler handler) {
-
-        if (handler == null) {
-
-            throw new IllegalArgumentException("the pull handler cannot be null");
-        }
-
-        mOnPull = handler;
-
-        return this;
-    }
-
-    /**
-     * Set the push handler instance.
-     *
-     * @param handler The push handler.
-     * @return This builder.
-     */
-    public DamBuilder<IN, OUT> onPushDebris(final PushHandler handler) {
-
-        if (handler == null) {
-
-            throw new IllegalArgumentException("the push handler cannot be null");
-        }
-
-        mOnPush = handler;
-
-        return this;
-    }
-
-    /**
-     * Makes the built dam avoid debris to be pushed downstream.
-     *
-     * @return This builder.
-     */
-    public DamBuilder<IN, OUT> upstreamDebris() {
-
-        mDownstreamDebris = false;
-        mUpstreamDebris = true;
 
         return this;
     }
@@ -365,6 +266,20 @@ public class DamBuilder<IN, OUT> {
     }
 
     /**
+     * This interface defines an object handling the debris dropped through the dam.
+     */
+    public interface DropHandler {
+
+        /**
+         * This method is called when a debris is dropped downstream through the dam.
+         *
+         * @param debris The dropped object.
+         * @return The debris to drop further downstream, or <code>null</code>.
+         */
+        public Object onDrop(Object debris);
+    }
+
+    /**
      * This interface defines an object handling the data flushed through the dam.
      */
     public interface FlushHandler {
@@ -378,34 +293,6 @@ public class DamBuilder<IN, OUT> {
     }
 
     /**
-     * This interface defines an object handling the debris pulled through the dam.
-     */
-    public interface PullHandler {
-
-        /**
-         * This method is called when an debris is pulled upstream through the dam.
-         *
-         * @param debris The pulled debris.
-         * @return The debris to pull further upstream, or <code>null</code>.
-         */
-        public Object onPullDebris(Object debris);
-    }
-
-    /**
-     * This interface defines an object handling the debris pushed through the dam.
-     */
-    public interface PushHandler {
-
-        /**
-         * This method is called when an debris is pushed downstream through the dam.
-         *
-         * @param debris The pushed object.
-         * @return The debris to push further downstream, or <code>null</code>.
-         */
-        public Object onPushDebris(Object debris);
-    }
-
-    /**
      * Dam built through a builder instance.
      *
      * @param <IN>  The input data type.
@@ -415,50 +302,42 @@ public class DamBuilder<IN, OUT> {
 
         private final DischargeHandler<IN, OUT> mDischarge;
 
+        private final DropHandler mDrop;
+
         private final FlushHandler mFlush;
 
-        private final PullHandler mPull;
-
-        private final PushHandler mPush;
-
-        public ArtificialDam(final DischargeHandler<IN, OUT> discharge, final PushHandler push,
-                final FlushHandler flush, final PullHandler pull) {
+        public ArtificialDam(final DischargeHandler<IN, OUT> discharge, final DropHandler drop,
+                final FlushHandler flush) {
 
             mDischarge = discharge;
-            mPush = push;
+            mDrop = drop;
             mFlush = flush;
-            mPull = pull;
         }
 
         @Override
-        public Object onDischarge(final Floodgate<IN, OUT> gate, final IN drop) {
+        public void onDischarge(final Floodgate<IN, OUT> gate, final IN drop) {
 
             gate.discharge(mDischarge.onDischarge(drop));
-
-            return null;
         }
 
         @Override
-        public Object onFlush(final Floodgate<IN, OUT> gate) {
+        public void onDrop(final Floodgate<IN, OUT> gate, final Object debris) {
+
+            final Object next = mDrop.onDrop(debris);
+
+            if (next != null) {
+
+                gate.drop(next);
+            }
+        }
+
+        @Override
+        public void onFlush(final Floodgate<IN, OUT> gate) {
 
             if (mFlush.onFlush()) {
 
                 gate.flush();
             }
-
-            return null;
-        }
-
-        @Override
-        public Object onPullDebris(final Floodgate<IN, OUT> gate, final Object debris) {
-
-            return mPull.onPullDebris(debris);
-        }
-
-        @Override
-        public Object onPushDebris(final Floodgate<IN, OUT> gate, final Object debris) {
-
-            return mPush.onPushDebris(debris);
         }
     }
 
@@ -472,16 +351,16 @@ public class DamBuilder<IN, OUT> {
 
         private final DischargeHandler<IN, OUT> mDischarge;
 
-        public AvoidingNullDam(final DischargeHandler<IN, OUT> discharge, final PushHandler push,
-                final FlushHandler flush, final PullHandler pull) {
+        public AvoidingNullDam(final DischargeHandler<IN, OUT> discharge, final DropHandler drop,
+                final FlushHandler flush) {
 
-            super(discharge, push, flush, pull);
+            super(discharge, drop, flush);
 
             mDischarge = discharge;
         }
 
         @Override
-        public Object onDischarge(final Floodgate<IN, OUT> gate, final IN drop) {
+        public void onDischarge(final Floodgate<IN, OUT> gate, final IN drop) {
 
             final OUT out = mDischarge.onDischarge(drop);
 
@@ -489,8 +368,6 @@ public class DamBuilder<IN, OUT> {
 
                 gate.discharge(out);
             }
-
-            return null;
         }
     }
 }

@@ -64,7 +64,7 @@ public class BlockingBasin<IN, OUT> extends Basin<IN, OUT> {
         final BlockingCollectorDam<OUT> dam = new BlockingCollectorDam<OUT>();
 
         return new BlockingBasin<IN, OUT>(Collections.singleton(stream.backToSource()), dam,
-                                          stream.thenFlowingThrough(dam));
+                                          stream.thenFallingThrough(dam));
     }
 
     /**
@@ -143,6 +143,14 @@ public class BlockingBasin<IN, OUT> extends Basin<IN, OUT> {
     }
 
     @Override
+    public BlockingBasin<IN, OUT> collectDebrisInto(final Collection<Object> bucket) {
+
+        super.collectDebrisInto(bucket);
+
+        return this;
+    }
+
+    @Override
     public BlockingBasin<IN, OUT> collectOutputInto(final Collection<OUT> bucket) {
 
         super.collectOutputInto(bucket);
@@ -151,17 +159,9 @@ public class BlockingBasin<IN, OUT> extends Basin<IN, OUT> {
     }
 
     @Override
-    public BlockingBasin<IN, OUT> collectPulledDebrisInto(final Collection<Object> bucket) {
+    public BlockingBasin<IN, OUT> thenDrop(final Object debris) {
 
-        super.collectPulledDebrisInto(bucket);
-
-        return this;
-    }
-
-    @Override
-    public BlockingBasin<IN, OUT> collectPushedDebrisInto(final Collection<Object> bucket) {
-
-        super.collectPushedDebrisInto(bucket);
+        super.thenDrop(debris);
 
         return this;
     }

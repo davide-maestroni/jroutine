@@ -36,7 +36,7 @@ public class RetryPolicy<DATA> extends AbstractDam<DATA, DATA> {
     }
 
     @Override
-    public Object onDischarge(final Floodgate<DATA, DATA> gate, final DATA drop) {
+    public void onDischarge(final Floodgate<DATA, DATA> gate, final DATA drop) {
 
         // Reset the count and store the data drop for later
 

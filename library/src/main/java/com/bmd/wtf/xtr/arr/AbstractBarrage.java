@@ -26,24 +26,14 @@ import com.bmd.wtf.src.Floodgate;
 public abstract class AbstractBarrage<IN, OUT> implements Barrage<IN, OUT> {
 
     @Override
-    public Object onFlush(final int streamNumber, final Floodgate<IN, OUT> gate) {
+    public void onDrop(final int streamNumber, final Floodgate<IN, OUT> gate, final Object debris) {
+
+        gate.drop(debris);
+    }
+
+    @Override
+    public void onFlush(final int streamNumber, final Floodgate<IN, OUT> gate) {
 
         gate.flush();
-
-        return null;
-    }
-
-    @Override
-    public Object onPullDebris(final int streamNumber, final Floodgate<IN, OUT> gate,
-            final Object debris) {
-
-        return debris;
-    }
-
-    @Override
-    public Object onPushDebris(final int streamNumber, final Floodgate<IN, OUT> gate,
-            final Object debris) {
-
-        return debris;
     }
 }

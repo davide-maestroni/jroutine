@@ -42,7 +42,7 @@ public class InputHandler extends AbstractDam<String, Chunk> {
     private InputStream mInputStream;
 
     @Override
-    public Object onDischarge(final Floodgate<String, Chunk> gate, final String drop) {
+    public void onDischarge(final Floodgate<String, Chunk> gate, final String drop) {
 
         if (mCurrent == null) {
 
@@ -116,27 +116,7 @@ public class InputHandler extends AbstractDam<String, Chunk> {
     }
 
     @Override
-    public Object onPullDebris(final Floodgate<String, Chunk> gate, final Object debris) {
-
-        if (debris instanceof Throwable) {
-
-            // An error occurred downstream
-
-            if ((mCurrent != null) && !mAborted) {
-
-                // Abort the download
-
-                abort();
-
-                return null;
-            }
-        }
-
-        return super.onPullDebris(gate, debris);
-    }
-
-    @Override
-    public Object onPushDebris(final Floodgate<String, Chunk> gate, final Object debris) {
+    public void onDrop(final Floodgate<String, Chunk> gate, final Object debris) {
 
         if (debris instanceof AbortException) {
 
@@ -158,7 +138,27 @@ public class InputHandler extends AbstractDam<String, Chunk> {
             }
         }
 
-        return super.onPushDebris(gate, debris);
+        return super.onDrop(gate, debris);
+    }
+
+    @Override
+    public Object onPullDebris(final Floodgate<String, Chunk> gate, final Object debris) {
+
+        if (debris instanceof Throwable) {
+
+            // An error occurred downstream
+
+            if ((mCurrent != null) && !mAborted) {
+
+                // Abort the download
+
+                abort();
+
+                return null;
+            }
+        }
+
+        return super.onPullDebris(gate, debris);
     }
 
     private void abort() {

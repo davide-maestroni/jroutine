@@ -11,31 +11,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.wtf.xtr.arr;
+package com.bmd.wtf.xtr.qdc;
 
+import com.bmd.wtf.src.Floodgate;
 import com.bmd.wtf.src.Spring;
 
 import java.util.List;
 
 /**
- * Implementation of an {@link ArrayBalancer} discharging data by rotating through all the streams
+ * Implementation of an {@link Archway} discharging data by rotating through all the springs
  * in the array.
  * <p/>
  * Created by davide on 5/15/14.
  *
  * @param <DATA> The data type.
  */
-public class RotatingArrayBalancer<DATA> extends AbstractArrayBalancer<DATA, DATA> {
+public class RotatingArchway<DATA> extends AbstractArchway<DATA, DATA> {
 
     private int mStreamNumber = -1;
 
     @Override
-    public Object onDischarge(final List<Spring<DATA>> springs, final DATA drop) {
+    public void onDischarge(final Floodgate<DATA, DATA> gate, final List<Spring<DATA>> springs,
+            final DATA drop) {
 
         mStreamNumber = (mStreamNumber + 1) % springs.size();
 
         springs.get(mStreamNumber).discharge(drop);
-
-        return null;
     }
 }

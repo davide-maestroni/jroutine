@@ -59,7 +59,7 @@ public class DownloadManager {
         mAbortSpring = Waterfall.fallingFrom(new OpenDam<String>() {
 
             @Override
-            public Object onDischarge(final Floodgate<String, String> gate, final String drop) {
+            public void onDischarge(final Floodgate<String, String> gate, final String drop) {
 
                 return new AbortException(drop);
             }
@@ -69,21 +69,21 @@ public class DownloadManager {
                                         .thenBalancedBy(new DownloadBalancer()).thenFlowingInto(
                         CurrentFactories
                                 .singletonCurrentFactory(Currents.threadPoolCurrent(maxThreads))
-                ).thenFlowingThrough(new DamFactory<String, String>() {
+                ).thenFallingThrough(new DamFactory<String, String>() {
 
                     @Override
                     public Dam<String, String> createForStream(final int streamNumber) {
 
                         return new RetryPolicy<String>(3);
                     }
-                }).thenFlowingThrough(new DamFactory<String, Chunk>() {
+                }).thenFallingThrough(new DamFactory<String, Chunk>() {
 
                     @Override
                     public Dam<String, Chunk> createForStream(final int streamNumber) {
 
                         return new InputHandler();
                     }
-                }).thenFlowingThrough(new DamFactory<Chunk, String>() {
+                }).thenFallingThrough(new DamFactory<Chunk, String>() {
 
                     @Override
                     public Dam<Chunk, String> createForStream(final int streamNumber) {

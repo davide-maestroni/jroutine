@@ -58,38 +58,29 @@ class BarrageDam<IN, OUT> implements Dam<IN, OUT> {
     }
 
     @Override
-    public Object onDischarge(final Floodgate<IN, OUT> gate, final IN drop) {
+    public void onDischarge(final Floodgate<IN, OUT> gate, final IN drop) {
 
         synchronized (mMutex) {
 
-            return mBarrage.onDischarge(mStreamNumber, gate, drop);
+            mBarrage.onDischarge(mStreamNumber, gate, drop);
         }
     }
 
     @Override
-    public Object onFlush(final Floodgate<IN, OUT> gate) {
+    public void onDrop(final Floodgate<IN, OUT> gate, final Object debris) {
 
         synchronized (mMutex) {
 
-            return mBarrage.onFlush(mStreamNumber, gate);
+            mBarrage.onDrop(mStreamNumber, gate, debris);
         }
     }
 
     @Override
-    public Object onPullDebris(final Floodgate<IN, OUT> gate, final Object debris) {
+    public void onFlush(final Floodgate<IN, OUT> gate) {
 
         synchronized (mMutex) {
 
-            return mBarrage.onPullDebris(mStreamNumber, gate, debris);
-        }
-    }
-
-    @Override
-    public Object onPushDebris(final Floodgate<IN, OUT> gate, final Object debris) {
-
-        synchronized (mMutex) {
-
-            return mBarrage.onPushDebris(mStreamNumber, gate, debris);
+            mBarrage.onFlush(mStreamNumber, gate);
         }
     }
 }

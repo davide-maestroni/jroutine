@@ -20,7 +20,6 @@ import com.bmd.wtf.dam.Dam;
 import com.bmd.wtf.dam.OpenDam;
 import com.bmd.wtf.example1.Downloader;
 import com.bmd.wtf.example1.UrlObserver;
-import com.bmd.wtf.example2.DownloadBalancer;
 import com.bmd.wtf.example3.RetryPolicy;
 import com.bmd.wtf.src.Floodgate;
 import com.bmd.wtf.src.Spring;
@@ -28,6 +27,8 @@ import com.bmd.wtf.xtr.arr.CurrentFactories;
 import com.bmd.wtf.xtr.arr.DamFactory;
 import com.bmd.wtf.xtr.arr.WaterfallArray;
 import com.bmd.wtf.xtr.fld.FloodControl;
+import com.bmd.wtf.xtr.qdc.Aqueduct;
+import com.bmd.wtf.xtr.qdc.QueueArchway;
 
 import java.io.File;
 import java.io.IOException;
@@ -52,37 +53,44 @@ public class DownloadManager {
                     "Could not create temp directory: " + downloadDir.getAbsolutePath());
         }
 
-        final Stream<String, String, String> stream = Waterfall.fallingFrom(
-                mControl.leveeControlledBy(new CancelableObserver(downloadDir, maxThreads)));
+        final QueueArchway<String> archway = new QueueArchway<String>();
+
+        final CancelableObserver downloadObserver = new CancelableObserver(archway, downloadDir);
+
+        final Stream<String, String, String> stream =
+                Waterfall.fallingFrom(mControl.leveeControlledBy(downloadObserver));
 
         mAbortSpring = Waterfall.fallingFrom(new OpenDam<String>() {
 
             @Override
             public void onDischarge(final Floodgate<String, String> gate, final String drop) {
 
-                return new AbortException(drop);
+                gate.drop(new AbortException(drop));
             }
         }).thenFeeding(stream).backToSource();
 
-        mDownloadSpring = WaterfallArray.formingFrom(stream).thenSplittingIn(maxThreads)
-                                        .thenBalancedBy(new DownloadBalancer()).thenFlowingInto(
-                        CurrentFactories
-                                .singletonCurrentFactory(Currents.threadPoolCurrent(maxThreads))
-                ).thenFallingThrough(new DamFactory<String, String>() {
+        mDownloadSpring = WaterfallArray.formingFrom(Aqueduct.binding(
+                Waterfall.fallingFrom(mControl.leveeControlledBy(downloadObserver)))
+                                                             .thenSeparatingIn(maxThreads)
+                                                             .thenFallingThrough(archway))
+                                        .thenFlowingInto(CurrentFactories.singletonCurrentFactory(
+                                                Currents.threadPoolCurrent(maxThreads)))
+                                        .thenFallingThrough(new DamFactory<String, String>() {
+
+                                            @Override
+                                            public Dam<String, String> createForStream(
+                                                    final int streamNumber) {
+
+                                                return new Downloader(downloadDir);
+                                            }
+                                        }).thenFallingThrough(new DamFactory<String, String>() {
 
                     @Override
                     public Dam<String, String> createForStream(final int streamNumber) {
 
-                        return new RetryPolicy<String>(3);
+                        return new RetryPolicy<String>(archway, streamNumber, 3);
                     }
-                }).thenFallingThrough(new DamFactory<String, String>() {
-
-                    @Override
-                    public Dam<String, String> createForStream(final int streamNumber) {
-
-                        return new Downloader(downloadDir);
-                    }
-                }).streams().get(0).backToSource();
+                }).thenMergingThrough(mControl.leveeControlledBy(downloadObserver)).backToSource();
     }
 
     public static void main(final String args[]) throws IOException {

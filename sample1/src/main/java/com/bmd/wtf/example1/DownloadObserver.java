@@ -101,6 +101,8 @@ public class DownloadObserver extends OpenDam<String> implements UrlObserver {
 
     protected void onFailure(final String url, final Throwable error) {
 
+        mDownloadedUrls.remove(url);
+
         delete(url);
     }
 

@@ -19,8 +19,10 @@ import com.bmd.wtf.src.Spring;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -38,6 +40,8 @@ public class QueueArchway<DATA> extends AbstractArchway<DATA, DATA> {
     private final HashMap<DATA, Integer> mDropMap = new HashMap<DATA, Integer>();
 
     private final Object mMutex = new Object();
+
+    private final HashSet<DATA> mRchargeDrop = new HashSet<DATA>();
 
     private final ArrayList<DATA> mWaitingDrops = new ArrayList<DATA>();
 
@@ -92,21 +96,18 @@ public class QueueArchway<DATA> extends AbstractArchway<DATA, DATA> {
 
         synchronized (mMutex) {
 
-            final ArrayList<DATA> pendingDrops = mWaitingDrops;
+            final ArrayList<DATA> waitingDrops = mWaitingDrops;
 
             if (mDropMap.size() >= springs.size()) {
 
-                pendingDrops.add(drop);
+                waitingDrops.add(drop);
 
             } else {
 
                 discharge(springs, drop);
             }
 
-            if (!pendingDrops.isEmpty()) {
-
-                gate.redropAfter(0, TimeUnit.MILLISECONDS, mMutex);
-            }
+            keepAlive(gate);
         }
     }
 
@@ -118,20 +119,29 @@ public class QueueArchway<DATA> extends AbstractArchway<DATA, DATA> {
 
             if (debris == mMutex) {
 
-                final ArrayList<DATA> pendingDrops = mWaitingDrops;
+                final HashMap<DATA, Integer> dropMap = mDropMap;
 
-                if (mDropMap.size() < springs.size()) {
+                final ArrayList<DATA> waitingDrops = mWaitingDrops;
 
-                    if (!pendingDrops.isEmpty()) {
+                for (final DATA drop : mRchargeDrop) {
 
-                        discharge(springs, pendingDrops.remove(0));
+                    final Integer level = dropMap.remove(drop);
+
+                    if (level != null) {
+
+                        springs.get(level).discharge(drop);
                     }
                 }
 
-                if (!pendingDrops.isEmpty()) {
+                if (dropMap.size() < springs.size()) {
 
-                    gate.redropAfter(0, TimeUnit.MILLISECONDS, mMutex);
+                    if (!waitingDrops.isEmpty()) {
+
+                        discharge(springs, waitingDrops.remove(0));
+                    }
                 }
+
+                keepAlive(gate);
 
             } else {
 
@@ -141,7 +151,54 @@ public class QueueArchway<DATA> extends AbstractArchway<DATA, DATA> {
     }
 
     /**
-     * Releases the specified level by making the related stream available again.
+     * Recharges the specified data drop into the same stream consuming it. If the drop is not
+     * currently consumed nothing will happen.
+     *
+     * @param drop The data drop to recharge.
+     * @return Whether the drop was currently being served.
+     */
+    public boolean recharge(final DATA drop) {
+
+        synchronized (mMutex) {
+
+            if (mDropMap.containsKey(drop)) {
+
+                mRchargeDrop.add(drop);
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Refills the stream at the specified level by dropping again the same data drop being
+     * consumed. If the stream is not currently busy nothing will happen.
+     *
+     * @param levelNumber The number of the level.
+     * @return Whether the stream was currently busy.
+     */
+    public boolean refillLevel(final int levelNumber) {
+
+        synchronized (mMutex) {
+
+            for (final Entry<DATA, Integer> entry : mDropMap.entrySet()) {
+
+                if (entry.getValue() == levelNumber) {
+
+                    mRchargeDrop.add(entry.getKey());
+
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Releases the stream at the specified level by making the related stream available again.
      *
      * @param levelNumber The number of the level.
      * @return Whether the consuming stream was made available.
@@ -161,9 +218,9 @@ public class QueueArchway<DATA> extends AbstractArchway<DATA, DATA> {
                     return true;
                 }
             }
-
-            return false;
         }
+
+        return false;
     }
 
     /**
@@ -198,6 +255,14 @@ public class QueueArchway<DATA> extends AbstractArchway<DATA, DATA> {
 
                 break;
             }
+        }
+    }
+
+    private void keepAlive(final Floodgate<DATA, DATA> gate) {
+
+        if (!mDropMap.isEmpty() || !mWaitingDrops.isEmpty()) {
+
+            gate.redropAfter(0, TimeUnit.MILLISECONDS, mMutex);
         }
     }
 }

@@ -13,33 +13,23 @@
  */
 package com.bmd.wtf.example4;
 
-import com.bmd.wtf.example1.DownloadObserver;
-import com.bmd.wtf.example1.DownloadUtils;
+import com.bmd.wtf.example2.ConsumeObserver;
 import com.bmd.wtf.src.Floodgate;
+import com.bmd.wtf.xtr.qdc.QueueArchway;
 
 import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashSet;
 
 /**
  * Observer of downloaded urls supporting abort operation.
  */
-public class CancelableObserver extends DownloadObserver {
+public class CancelableObserver extends ConsumeObserver {
 
     private final HashSet<String> mAbortedDownloadUrls = new HashSet<String>();
 
-    private final File mDir;
+    public CancelableObserver(final QueueArchway<String> archway, final File downloadDir) {
 
-    private final int mMaxThreads;
-
-    private final ArrayList<String> mPendingUrls = new ArrayList<String>();
-
-    public CancelableObserver(final File downloadDir, final int maxThreads) {
-
-        mDir = downloadDir;
-        mMaxThreads = maxThreads;
+        super(archway, downloadDir);
     }
 
     @Override
@@ -49,23 +39,7 @@ public class CancelableObserver extends DownloadObserver {
 
         mAbortedDownloadUrls.remove(drop);
 
-        if (downloading().size() < mMaxThreads) {
-
-            // Discharge only if at least one stream is available
-
-            return super.onDischarge(gate, drop);
-        }
-
-        final ArrayList<String> pendingUrls = mPendingUrls;
-
-        if (!pendingUrls.contains(drop)) {
-
-            // Add the url to the pending ones only if not already present
-
-            pendingUrls.add(drop);
-        }
-
-        return null;
+        super.onDischarge(gate, drop);
     }
 
     @Override
@@ -73,82 +47,28 @@ public class CancelableObserver extends DownloadObserver {
 
         if (debris instanceof AbortException) {
 
-            final String url = ((AbortException) debris).getMessage();
+            final AbortException error = (AbortException) debris;
 
-            if (downloaded().remove(url)) {
+            final String url = error.getMessage();
 
-                // If already downloaded just delete it
+            mAbortedDownloadUrls.add(url);
 
-                delete(url);
-
-            } else if (downloading().contains(url)) {
-
-                // If still in progress wait for completion
-
-                mAbortedDownloadUrls.add(url);
-            }
-
-            mPendingUrls.remove(url);
+            onFailure(url, error);
         }
 
-        return super.onDrop(gate, debris);
+        super.onDrop(gate, debris);
     }
 
     @Override
-    public Object onPullDebris(final Floodgate<String, String> gate, final Object debris) {
-
-        final String url;
-
-        if (debris instanceof String) {
-
-            url = (String) debris;
-
-        } else if (debris instanceof Throwable) {
-
-            url = ((Throwable) debris).getMessage();
-
-        } else {
-
-            url = null;
-        }
-
-        final Object outDebris = super.onPullDebris(gate, debris);
+    protected void onComplete(final String url) {
 
         if (mAbortedDownloadUrls.remove(url)) {
 
-            System.out.println("Download aborted: " + url);
+            onFailure(url, new AbortException(url));
 
-            downloaded().remove(url);
+        } else {
 
-            delete(url);
+            super.onComplete(url);
         }
-
-        if (downloading().size() < mMaxThreads) {
-
-            // If a stream became available we check for the presence of pending urls
-
-            final ArrayList<String> pendingUrls = mPendingUrls;
-
-            if (!pendingUrls.isEmpty()) {
-
-                super.onDischarge(gate, pendingUrls.remove(0));
-            }
-        }
-
-        return outDebris;
-    }
-
-    private boolean delete(final String url) {
-
-        try {
-
-            final File file = new File(mDir, DownloadUtils.getFileName(new URL(url)));
-            return file.delete();
-
-        } catch (final MalformedURLException ignored) {
-
-        }
-
-        return false;
     }
 }

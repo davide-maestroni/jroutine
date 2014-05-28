@@ -13,59 +13,52 @@
  */
 package com.bmd.wtf.example3;
 
-import com.bmd.wtf.bdr.FloatingException;
-import com.bmd.wtf.dam.AbstractDam;
+import com.bmd.wtf.dam.OpenDam;
 import com.bmd.wtf.src.Floodgate;
+import com.bmd.wtf.xtr.qdc.QueueArchway;
 
 /**
  * This class is meant to retry the discharge of data in case an error occurred.
  *
  * @param <DATA> The data type.
  */
-public class RetryPolicy<DATA> extends AbstractDam<DATA, DATA> {
+public class RetryPolicy<DATA> extends OpenDam<DATA> {
+
+    private final QueueArchway<DATA> mArchway;
 
     private final int mMaxCount;
 
+    private final int mStreamNumber;
+
     private int mCount;
 
-    private DATA mData;
+    public RetryPolicy(final QueueArchway<DATA> archway, final int streamNumber,
+            final int maxCount) {
 
-    public RetryPolicy(final int maxCount) {
-
+        mArchway = archway;
+        mStreamNumber = streamNumber;
         mMaxCount = maxCount;
     }
 
     @Override
-    public void onDischarge(final Floodgate<DATA, DATA> gate, final DATA drop) {
+    public void onDrop(final Floodgate<DATA, DATA> gate, final Object debris) {
 
-        // Reset the count and store the data drop for later
+        if (debris instanceof String) {
 
-        mCount = 0;
+            // Reset the count and store the data drop for later
 
-        mData = drop;
+            mCount = 0;
 
-        gate.discharge(drop);
+        } else if (debris instanceof Throwable) {
 
-        return null;
-    }
+            if (mCount++ < mMaxCount) {
 
-    @Override
-    public Object onPullDebris(final Floodgate<DATA, DATA> gate, final Object debris) {
+                mArchway.refillLevel(mStreamNumber);
 
-        if (debris instanceof FloatingException) {
-
-            // This is an error, let's try again until we reach the max retry count
-
-            if (mCount < mMaxCount) {
-
-                ++mCount;
-
-                gate.discharge(mData);
-
-                return null;
+                return;
             }
         }
 
-        return super.onPullDebris(gate, debris);
+        super.onDrop(gate, debris);
     }
 }

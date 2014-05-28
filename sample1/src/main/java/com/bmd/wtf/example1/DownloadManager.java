@@ -44,7 +44,7 @@ public class DownloadManager {
                     "Could not create temp directory: " + downloadDir.getAbsolutePath());
         }
 
-        mDownloaded = new DownloadObserver();
+        mDownloaded = new DownloadObserver(downloadDir);
         mDownloadDir = downloadDir;
         mCurrent = Currents.threadPoolCurrent(maxThreads);
     }

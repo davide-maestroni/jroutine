@@ -16,17 +16,26 @@ package com.bmd.wtf.example1;
 import com.bmd.wtf.dam.OpenDam;
 import com.bmd.wtf.src.Floodgate;
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Observer of downloaded urls filtering the ones already in progress.
  */
 public class DownloadObserver extends OpenDam<String> implements UrlObserver {
 
+    private final File mDir;
+
     private final HashSet<String> mDownloadedUrls = new HashSet<String>();
 
     private final HashSet<String> mDownloadingUrls = new HashSet<String>();
+
+    public DownloadObserver(final File downloadDir) {
+
+        mDir = downloadDir;
+    }
 
     public boolean isDownloaded(final String url) {
 
@@ -59,19 +68,25 @@ public class DownloadObserver extends OpenDam<String> implements UrlObserver {
 
             url = (String) debris;
 
-            System.out.println("Download complete: " + url);
+            if (mDownloadingUrls.remove(url)) {
 
-            mDownloadedUrls.add(url);
+                System.out.println("Download complete: " + url);
 
-            mDownloadingUrls.remove(url);
+                onComplete(url);
+            }
 
         } else if (debris instanceof Throwable) {
 
-            url = ((Throwable) debris).getMessage();
+            final Throwable error = (Throwable) debris;
 
-            System.out.println("Download failed: " + url);
+            url = error.getMessage();
 
-            mDownloadingUrls.remove(url);
+            if (mDownloadingUrls.remove(url)) {
+
+                System.out.println("Download failed: " + url);
+
+                onFailure(url, error);
+            }
 
         } else {
 
@@ -79,13 +94,27 @@ public class DownloadObserver extends OpenDam<String> implements UrlObserver {
         }
     }
 
-    protected Set<String> downloaded() {
+    protected void onComplete(final String url) {
 
-        return mDownloadedUrls;
+        mDownloadedUrls.add(url);
     }
 
-    protected Set<String> downloading() {
+    protected void onFailure(final String url, final Throwable error) {
 
-        return mDownloadingUrls;
+        delete(url);
+    }
+
+    private boolean delete(final String url) {
+
+        try {
+
+            final File file = new File(mDir, DownloadUtils.getFileName(new URL(url)));
+            return file.delete();
+
+        } catch (final MalformedURLException ignored) {
+
+        }
+
+        return false;
     }
 }

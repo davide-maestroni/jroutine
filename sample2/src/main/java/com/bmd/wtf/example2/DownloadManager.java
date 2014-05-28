@@ -16,7 +16,6 @@ package com.bmd.wtf.example2;
 import com.bmd.wtf.Waterfall;
 import com.bmd.wtf.crr.Currents;
 import com.bmd.wtf.dam.Dam;
-import com.bmd.wtf.example1.DownloadObserver;
 import com.bmd.wtf.example1.Downloader;
 import com.bmd.wtf.example1.UrlObserver;
 import com.bmd.wtf.src.Spring;
@@ -24,6 +23,8 @@ import com.bmd.wtf.xtr.arr.CurrentFactories;
 import com.bmd.wtf.xtr.arr.DamFactory;
 import com.bmd.wtf.xtr.arr.WaterfallArray;
 import com.bmd.wtf.xtr.fld.FloodControl;
+import com.bmd.wtf.xtr.qdc.Aqueduct;
+import com.bmd.wtf.xtr.qdc.QueueArchway;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,21 +48,26 @@ public class DownloadManager {
                     "Could not create temp directory: " + downloadDir.getAbsolutePath());
         }
 
-        final DownloadObserver downloadObserver = new DownloadObserver();
+        final QueueArchway<String> archway = new QueueArchway<String>();
 
-        mDownloadSpring = WaterfallArray
-                .formingFrom(Waterfall.fallingFrom(mControl.leveeControlledBy(downloadObserver)))
-                .thenSplittingIn(maxThreads).thenBalancedBy(new RotatingArrayBalancer<String>())
-                .thenFlowingInto(CurrentFactories.singletonCurrentFactory(
-                                         Currents.threadPoolCurrent(maxThreads))
-                ).thenFallingThrough(new DamFactory<String, String>() {
+        final ConsumeObserver downloadObserver = new ConsumeObserver(archway, downloadDir);
 
-                    @Override
-                    public Dam<String, String> createForStream(final int streamNumber) {
+        mDownloadSpring = WaterfallArray.formingFrom(Aqueduct.binding(
+                Waterfall.fallingFrom(mControl.leveeControlledBy(downloadObserver)))
+                                                             .thenSeparatingIn(maxThreads)
+                                                             .thenFallingThrough(archway))
+                                        .thenFlowingInto(CurrentFactories.singletonCurrentFactory(
+                                                Currents.threadPoolCurrent(maxThreads)))
+                                        .thenFallingThrough(new DamFactory<String, String>() {
 
-                        return new Downloader(downloadDir);
-                    }
-                }).thenMergingThrough(mControl.leveeControlledBy(downloadObserver)).backToSource();
+                                            @Override
+                                            public Dam<String, String> createForStream(
+                                                    final int streamNumber) {
+
+                                                return new Downloader(downloadDir);
+                                            }
+                                        }).thenMergingThrough(
+                        mControl.leveeControlledBy(downloadObserver)).backToSource();
     }
 
     public static void main(final String args[]) throws IOException {

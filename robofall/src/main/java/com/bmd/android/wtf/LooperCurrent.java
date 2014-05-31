@@ -55,8 +55,8 @@ class LooperCurrent implements Current {
     }
 
     @Override
-    public <DATA> void dischargeAfter(final Pool<DATA> pool, final long delay,
-            final TimeUnit timeUnit, final DATA drop) {
+    public <DATA> void dischargeAfter(final Pool<DATA> pool, final long delay, final TimeUnit timeUnit,
+            final DATA drop) {
 
         mHandler.postDelayed(new Runnable() {
 
@@ -70,8 +70,8 @@ class LooperCurrent implements Current {
     }
 
     @Override
-    public <DATA> void dischargeAfter(final Pool<DATA> pool, final long delay,
-            final TimeUnit timeUnit, final Iterable<? extends DATA> drops) {
+    public <DATA> void dischargeAfter(final Pool<DATA> pool, final long delay, final TimeUnit timeUnit,
+            final Iterable<? extends DATA> drops) {
 
         mHandler.postDelayed(new Runnable() {
 
@@ -101,8 +101,7 @@ class LooperCurrent implements Current {
     }
 
     @Override
-    public void dropAfter(final Pool<?> pool, final long delay, final TimeUnit timeUnit,
-            final Object debris) {
+    public void dropAfter(final Pool<?> pool, final long delay, final TimeUnit timeUnit, final Object debris) {
 
         mHandler.postDelayed(new Runnable() {
 

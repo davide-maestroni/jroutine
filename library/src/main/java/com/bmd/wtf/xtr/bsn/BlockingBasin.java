@@ -79,8 +79,7 @@ public class BlockingBasin<IN, OUT> extends Basin<IN, OUT> {
 
         if ((streams == null) || (streams.length == 0)) {
 
-            throw new IllegalArgumentException(
-                    "the array of streams to collect cannot be null or empty");
+            throw new IllegalArgumentException("the array of streams to collect cannot be null or empty");
         }
 
         final ArrayList<Spring<IN>> springs = new ArrayList<Spring<IN>>(streams.length);
@@ -92,8 +91,7 @@ public class BlockingBasin<IN, OUT> extends Basin<IN, OUT> {
 
         final BlockingCollectorDam<OUT> dam = new BlockingCollectorDam<OUT>();
 
-        return new BlockingBasin<IN, OUT>(springs, dam,
-                                          streams[0].thenMergingThrough(dam, streams));
+        return new BlockingBasin<IN, OUT>(springs, dam, streams[0].thenMergingThrough(dam, streams));
     }
 
     /**
@@ -104,13 +102,11 @@ public class BlockingBasin<IN, OUT> extends Basin<IN, OUT> {
      * @param <OUT>   The output data type.
      * @return The new basin.
      */
-    public static <IN, OUT> BlockingBasin<IN, OUT> collect(
-            final Iterable<? extends Stream<IN, ?, OUT>> streams) {
+    public static <IN, OUT> BlockingBasin<IN, OUT> collect(final Iterable<? extends Stream<IN, ?, OUT>> streams) {
 
         if (streams == null) {
 
-            throw new IllegalArgumentException(
-                    "the collection of streams to collect cannot be null or empty");
+            throw new IllegalArgumentException("the collection of streams to collect cannot be null or empty");
         }
 
         final Stream<IN, ?, OUT> firstStream = streams.iterator().next();
@@ -124,8 +120,7 @@ public class BlockingBasin<IN, OUT> extends Basin<IN, OUT> {
 
         final BlockingCollectorDam<OUT> dam = new BlockingCollectorDam<OUT>();
 
-        return new BlockingBasin<IN, OUT>(springs, dam,
-                                          firstStream.thenMergingThrough(dam, streams));
+        return new BlockingBasin<IN, OUT>(springs, dam, firstStream.thenMergingThrough(dam, streams));
     }
 
     /**

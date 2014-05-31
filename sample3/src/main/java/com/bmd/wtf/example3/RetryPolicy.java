@@ -15,50 +15,64 @@ package com.bmd.wtf.example3;
 
 import com.bmd.wtf.dam.OpenDam;
 import com.bmd.wtf.src.Floodgate;
-import com.bmd.wtf.xtr.qdc.QueueArchway;
+import com.bmd.wtf.src.Spring;
+
+import java.util.HashMap;
 
 /**
  * This class is meant to retry the discharge of data in case an error occurred.
- *
- * @param <DATA> The data type.
  */
-public class RetryPolicy<DATA> extends OpenDam<DATA> {
-
-    private final QueueArchway<DATA> mArchway;
+public class RetryPolicy extends OpenDam<String> {
 
     private final int mMaxCount;
 
-    private final int mStreamNumber;
+    private final HashMap<String, Integer> mRetryCounts = new HashMap<String, Integer>();
 
-    private int mCount;
+    private final Spring<String> mSpring;
 
-    public RetryPolicy(final QueueArchway<DATA> archway, final int streamNumber,
-            final int maxCount) {
+    public RetryPolicy(final Spring<String> spring, final int maxCount) {
 
-        mArchway = archway;
-        mStreamNumber = streamNumber;
+        mSpring = spring;
         mMaxCount = maxCount;
     }
 
     @Override
-    public void onDrop(final Floodgate<DATA, DATA> gate, final Object debris) {
+    public void onDischarge(final Floodgate<String, String> gate, final String drop) {
 
-        if (debris instanceof String) {
+        // Reset the count
 
-            // Reset the count and store the data drop for later
+        onReset(drop);
 
-            mCount = 0;
+        super.onDischarge(gate, drop);
+    }
 
-        } else if (debris instanceof Throwable) {
+    @Override
+    public void onDrop(final Floodgate<String, String> gate, final Object debris) {
 
-            if (mCount++ < mMaxCount) {
+        if (debris instanceof Throwable) {
 
-                mArchway.refillLevel(mStreamNumber);
+            final String url = ((Throwable) debris).getMessage();
+
+            final Integer count = mRetryCounts.get(url);
+
+            final int currentCount = (count != null) ? count : 0;
+
+            if (currentCount < mMaxCount) {
+
+                mRetryCounts.put(url, currentCount + 1);
+                mSpring.discharge(url);
 
                 return;
             }
+
+            mRetryCounts.remove(url);
         }
 
         super.onDrop(gate, debris);
+    }
+
+    protected void onReset(final String url) {
+
+        mRetryCounts.remove(url);
     }
 }

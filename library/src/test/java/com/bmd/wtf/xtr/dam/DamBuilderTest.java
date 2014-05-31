@@ -24,7 +24,6 @@ import com.bmd.wtf.xtr.bsn.Basin;
 import com.bmd.wtf.xtr.dam.DamBuilder.DischargeHandler;
 import com.bmd.wtf.xtr.dam.DamBuilder.DropHandler;
 import com.bmd.wtf.xtr.dam.DamBuilder.FlushHandler;
-import com.bmd.wtf.xtr.qdc.Aqueduct;
 
 import junit.framework.TestCase;
 
@@ -41,22 +40,22 @@ public class DamBuilderTest extends TestCase {
 
     public void testClosed() {
 
-        final Basin<Object, Object> basin1 =
-                Basin.collect(Waterfall.fallingFrom(new AbstractDam<Object, Object>() {
+        final Basin<Object, Object> basin1 = Basin.collect(Waterfall.fallingFrom(new AbstractDam<Object, Object>() {
 
-                                  @Override
-                                  public void onDischarge(final Floodgate<Object, Object> gate,
-                                          final Object drop) {
+                                                               @Override
+                                                               public void onDischarge(
+                                                                       final Floodgate<Object, Object> gate,
+                                                                       final Object drop) {
 
-                                      if (drop == null) {
+                                                                   if (drop == null) {
 
-                                          throw new IllegalArgumentException();
-                                      }
+                                                                       throw new IllegalArgumentException();
+                                                                   }
 
-                                      gate.discharge(drop);
-                                  }
-                              }).thenFallingThrough(DamBuilders.openDam())
-                );
+                                                                   gate.discharge(drop);
+                                                               }
+                                                           }).thenFallingThrough(DamBuilders.openDam())
+        );
         final Basin<Object, Object> basin2 =
                 Basin.collect(basin1.thenFlow().thenFallingThrough(DamBuilders.closedDam()));
 
@@ -76,8 +75,7 @@ public class DamBuilderTest extends TestCase {
         assertThat(basin1.collectFirstDebris()).isExactlyInstanceOf(IllegalArgumentException.class);
         assertThat(basin2.collectFirstDebris()).isNull();
 
-        final Basin<Object, Object> basin3 =
-                Basin.collect(Waterfall.fallingFrom(DamBuilders.openDam()));
+        final Basin<Object, Object> basin3 = Basin.collect(Waterfall.fallingFrom(DamBuilders.openDam()));
         basin3.thenFlow().thenFallingThrough(new AbstractDam<Object, Object>() {
 
             @Override
@@ -100,46 +98,43 @@ public class DamBuilderTest extends TestCase {
 
     public void testDamBuilder() {
 
-        final Dam<String, Integer> dam1 =
-                DamBuilder.basedOn(new DischargeHandler<String, Integer>() {
+        final Dam<String, Integer> dam1 = DamBuilder.basedOn(new DischargeHandler<String, Integer>() {
 
-                                       @Override
-                                       public Integer onDischarge(final String drop) {
+                                                                 @Override
+                                                                 public Integer onDischarge(final String drop) {
 
-                                           return Integer.parseInt(drop);
-                                       }
+                                                                     return Integer.parseInt(drop);
+                                                                 }
 
-                                   }
-                ).build();
+                                                             }
+        ).build();
         final ArrayList<Object> debris = new ArrayList<Object>();
-        assertThat(Basin.collect(Waterfall.fallingFrom(dam1)).thenFeedWith("1", "test", "2")
-                        .collectDebrisInto(debris).collectOutput()).containsExactly(1, 2);
+        assertThat(Basin.collect(Waterfall.fallingFrom(dam1)).thenFeedWith("1", "test", "2").collectDebrisInto(debris)
+                        .collectOutput()).containsExactly(1, 2);
         assertThat(debris.get(0)).isExactlyInstanceOf(NumberFormatException.class);
         assertThat(debris).hasSize(1);
 
-        final Dam<String, Integer> dam2 =
-                DamBuilder.basedOn(new DischargeHandler<String, Integer>() {
+        final Dam<String, Integer> dam2 = DamBuilder.basedOn(new DischargeHandler<String, Integer>() {
 
-                                       @Override
-                                       public Integer onDischarge(final String drop) {
+                                                                 @Override
+                                                                 public Integer onDischarge(final String drop) {
 
-                                           return Integer.parseInt(drop);
-                                       }
+                                                                     return Integer.parseInt(drop);
+                                                                 }
 
-                                   }
-                ).avoidFlush().build();
+                                                             }
+        ).avoidFlush().build();
         debris.clear();
-        assertThat(Basin.collect(
-                           Waterfall.fallingFrom(dam2).thenFallingThrough(new OpenDam<Integer>() {
+        assertThat(Basin.collect(Waterfall.fallingFrom(dam2).thenFallingThrough(new OpenDam<Integer>() {
 
-                                                                              @Override
-                                                                              public void onFlush(
-                                                                                      final Floodgate<Integer, Integer> gate) {
+                                                                                    @Override
+                                                                                    public void onFlush(
+                                                                                            final Floodgate<Integer, Integer> gate) {
 
-                                                                                  throw new IllegalStateException();
-                                                                              }
-                                                                          }
-                           )
+                                                                                        throw new IllegalStateException();
+                                                                                    }
+                                                                                }
+                                 )
                    ).thenFeedWith("1", "test", "2").collectDebrisInto(debris).collectOutput()
         ).containsExactly(1, 2);
         assertThat(debris.get(0)).isExactlyInstanceOf(NumberFormatException.class);
@@ -148,8 +143,7 @@ public class DamBuilderTest extends TestCase {
         final Dam<String, String> dam3 = DamBuilder.basedOn(new DischargeHandler<String, String>() {
 
                                                                 @Override
-                                                                public String onDischarge(
-                                                                        final String drop) {
+                                                                public String onDischarge(final String drop) {
 
                                                                     return drop;
                                                                 }
@@ -165,34 +159,34 @@ public class DamBuilderTest extends TestCase {
         final Dam<String, String> dam4 = DamBuilder.basedOn(new DischargeHandler<String, String>() {
 
                                                                 @Override
-                                                                public String onDischarge(
-                                                                        final String drop) {
+                                                                public String onDischarge(final String drop) {
 
                                                                     return drop;
                                                                 }
 
                                                             }
         ).build();
-        final Basin<String, String> basin1 =
-                Basin.collect(Waterfall.fallingFrom(new OpenDam<String>()));
+        final Basin<String, String> basin1 = Basin.collect(Waterfall.fallingFrom(new OpenDam<String>()));
         debris.clear();
-        assertThat(Basin.collect(basin1.thenFlow().thenFallingThrough(dam4)
-                                       .thenFallingThrough(new OpenDam<String>() {
+        assertThat(Basin.collect(basin1.thenFlow().thenFallingThrough(dam4).thenFallingThrough(new OpenDam<String>() {
 
-                                                               @Override
-                                                               public void onDischarge(
-                                                                       final Floodgate<String, String> gate,
-                                                                       final String drop) {
+                                                                                                   @Override
+                                                                                                   public void onDischarge(
+                                                                                                           final Floodgate<String, String> gate,
+                                                                                                           final String drop) {
 
-                                                                   if (drop == null) {
+                                                                                                       if (drop
+                                                                                                               == null) {
 
-                                                                       throw new NullPointerException();
-                                                                   }
+                                                                                                           throw new NullPointerException();
+                                                                                                       }
 
-                                                                   super.onDischarge(gate, drop);
-                                                               }
-                                                           }
-                                       )
+                                                                                                       super.onDischarge(
+                                                                                                               gate,
+                                                                                                               drop);
+                                                                                                   }
+                                                                                               }
+                                 )
                    ).thenFeedWith("1", "test", null, "2").collectDebrisInto(debris).collectOutput()
         ).containsExactly("1", "test", "2");
         assertThat(debris.get(0)).isExactlyInstanceOf(NullPointerException.class);
@@ -201,8 +195,7 @@ public class DamBuilderTest extends TestCase {
         final Dam<String, String> dam5 = DamBuilder.basedOn(new DischargeHandler<String, String>() {
 
                                                                 @Override
-                                                                public String onDischarge(
-                                                                        final String drop) {
+                                                                public String onDischarge(final String drop) {
 
                                                                     return drop;
                                                                 }
@@ -222,41 +215,41 @@ public class DamBuilderTest extends TestCase {
 
                 super.onDischarge(gate, drop);
             }
-        }).thenFallingThrough(dam5)).thenFeedWith("1", "test", null, "2").collectDebrisInto(debris)
-                        .collectOutput()).containsExactly("1", "test", "2");
+        }).thenFallingThrough(dam5)).thenFeedWith("1", "test", null, "2").collectDebrisInto(debris).collectOutput())
+                .containsExactly("1", "test", "2");
         assertThat(debris).isEmpty();
 
         final Dam<String, String> dam6 = DamBuilder.basedOn(new DischargeHandler<String, String>() {
 
                                                                 @Override
-                                                                public String onDischarge(
-                                                                        final String drop) {
+                                                                public String onDischarge(final String drop) {
 
                                                                     return drop;
                                                                 }
 
                                                             }
         ).build();
-        final Basin<String, String> basin2 =
-                Basin.collect(Waterfall.fallingFrom(new OpenDam<String>()));
+        final Basin<String, String> basin2 = Basin.collect(Waterfall.fallingFrom(new OpenDam<String>()));
         debris.clear();
-        assertThat(Basin.collect(basin2.thenFlow().thenFallingThrough(dam6)
-                                       .thenFallingThrough(new OpenDam<String>() {
+        assertThat(Basin.collect(basin2.thenFlow().thenFallingThrough(dam6).thenFallingThrough(new OpenDam<String>() {
 
-                                                               @Override
-                                                               public void onDischarge(
-                                                                       final Floodgate<String, String> gate,
-                                                                       final String drop) {
+                                                                                                   @Override
+                                                                                                   public void onDischarge(
+                                                                                                           final Floodgate<String, String> gate,
+                                                                                                           final String drop) {
 
-                                                                   if (drop == null) {
+                                                                                                       if (drop
+                                                                                                               == null) {
 
-                                                                       throw new NullPointerException();
-                                                                   }
+                                                                                                           throw new NullPointerException();
+                                                                                                       }
 
-                                                                   super.onDischarge(gate, drop);
-                                                               }
-                                                           }
-                                       )
+                                                                                                       super.onDischarge(
+                                                                                                               gate,
+                                                                                                               drop);
+                                                                                                   }
+                                                                                               }
+                                 )
                    ).thenFeedWith("1", "test", null, "2").collectDebrisInto(debris).collectOutput()
         ).containsExactly("1", "test", "2");
         assertThat(debris).hasSize(1);
@@ -265,8 +258,7 @@ public class DamBuilderTest extends TestCase {
         final Dam<String, String> dam7 = DamBuilder.basedOn(new DischargeHandler<String, String>() {
 
                                                                 @Override
-                                                                public String onDischarge(
-                                                                        final String drop) {
+                                                                public String onDischarge(final String drop) {
 
                                                                     return drop;
                                                                 }
@@ -300,16 +292,15 @@ public class DamBuilderTest extends TestCase {
 
                 super.onDischarge(gate, drop);
             }
-        }).thenFallingThrough(dam7)).thenFeedWith("1", "test", null, "2").collectDebrisInto(debris)
-                        .collectOutput()).containsExactly("1", "test", "2");
+        }).thenFallingThrough(dam7)).thenFeedWith("1", "test", null, "2").collectDebrisInto(debris).collectOutput())
+                .containsExactly("1", "test", "2");
         assertThat(debris).hasSize(1);
         assertThat(debris.get(0)).isExactlyInstanceOf(FloatingException.class);
 
         final Dam<String, String> dam8 = DamBuilder.basedOn(new DischargeHandler<String, String>() {
 
                                                                 @Override
-                                                                public String onDischarge(
-                                                                        final String drop) {
+                                                                public String onDischarge(final String drop) {
 
                                                                     return drop;
                                                                 }
@@ -330,73 +321,73 @@ public class DamBuilderTest extends TestCase {
                 return false;
             }
         }).noDebris().build();
-        final Basin<String, String> basin3 =
-                Basin.collect(Waterfall.fallingFrom(new OpenDam<String>() {
-
-                                  @Override
-                                  public void onDischarge(final Floodgate<String, String> gate,
-                                          final String drop) {
-
-                                      if ("pull".equals(drop)) {
-
-                                          throw new IllegalArgumentException();
-                                      }
-
-                                      super.onDischarge(gate, drop);
-                                  }
-                              })
-                );
-        debris.clear();
-        assertThat(Basin.collect(basin3.thenFlow().thenFallingThrough(dam8)
-                                       .thenFallingThrough(new OpenDam<String>() {
+        final Basin<String, String> basin3 = Basin.collect(Waterfall.fallingFrom(new OpenDam<String>() {
 
                                                                @Override
                                                                public void onDischarge(
                                                                        final Floodgate<String, String> gate,
                                                                        final String drop) {
 
-                                                                   if ("push".equals(drop)) {
+                                                                   if ("pull".equals(drop)) {
 
-                                                                       throw new IllegalStateException();
+                                                                       throw new IllegalArgumentException();
                                                                    }
 
                                                                    super.onDischarge(gate, drop);
                                                                }
-                                                           }
-                                       )
-                   ).thenFeedWith("1", "pull", "push", "2").collectDebrisInto(debris)
-                        .collectOutput()
+                                                           })
+        );
+        debris.clear();
+        assertThat(Basin.collect(basin3.thenFlow().thenFallingThrough(dam8).thenFallingThrough(new OpenDam<String>() {
+
+                                                                                                   @Override
+                                                                                                   public void onDischarge(
+                                                                                                           final Floodgate<String, String> gate,
+                                                                                                           final String drop) {
+
+                                                                                                       if ("push"
+                                                                                                               .equals(drop)) {
+
+                                                                                                           throw new IllegalStateException();
+                                                                                                       }
+
+                                                                                                       super.onDischarge(
+                                                                                                               gate,
+                                                                                                               drop);
+                                                                                                   }
+                                                                                               }
+                                 )
+                   ).thenFeedWith("1", "pull", "push", "2").collectDebrisInto(debris).collectOutput()
         ).containsExactly("1", "2");
         assertThat(debris.get(0)).isExactlyInstanceOf(IllegalStateException.class);
         assertThat(debris).hasSize(1);
         assertThat(basin3.collectFirstDebris()).isExactlyInstanceOf(IllegalArgumentException.class);
         assertThat(basin3.collectFirstDebris()).isNull();
 
-        final Dam<String, String> dam9 =
-                DamBuilder.basedOn(new DischargeHandler<String, Integer>() {
+        final Dam<String, String> dam9 = DamBuilder.basedOn(new DischargeHandler<String, Integer>() {
 
-                                       @Override
-                                       public Integer onDischarge(final String drop) {
+                                                                @Override
+                                                                public Integer onDischarge(final String drop) {
 
-                                           throw new NumberFormatException();
-                                       }
+                                                                    throw new NumberFormatException();
+                                                                }
 
-                                   }
-                ).onFlush(new FlushHandler() {
+                                                            }
+        ).onFlush(new FlushHandler() {
 
-                    @Override
-                    public boolean onFlush() {
+            @Override
+            public boolean onFlush() {
 
-                        throw new IllegalStateException();
-                    }
-                }).onDischarge(new DischargeHandler<String, String>() {
+                throw new IllegalStateException();
+            }
+        }).onDischarge(new DischargeHandler<String, String>() {
 
-                    @Override
-                    public String onDischarge(final String drop) {
+            @Override
+            public String onDischarge(final String drop) {
 
-                        return drop;
-                    }
-                }).build();
+                return drop;
+            }
+        }).build();
         debris.clear();
         assertThat(Basin.collect(Waterfall.fallingFrom(dam9)).thenFeedWith("1", "test", null, "2")
                         .collectDebrisInto(debris).collectOutput()
@@ -404,64 +395,64 @@ public class DamBuilderTest extends TestCase {
         assertThat(debris.get(0)).isExactlyInstanceOf(IllegalStateException.class);
         assertThat(debris).hasSize(1);
 
-        final Dam<String, String> dam10 =
-                DamBuilder.basedOn(new DischargeHandler<String, String>() {
+        final Dam<String, String> dam10 = DamBuilder.basedOn(new DischargeHandler<String, String>() {
 
-                                       @Override
-                                       public String onDischarge(final String drop) {
+                                                                 @Override
+                                                                 public String onDischarge(final String drop) {
 
-                                           return drop;
-                                       }
+                                                                     return drop;
+                                                                 }
 
-                                   }
-                ).onFlush(new FlushHandler() {
+                                                             }
+        ).onFlush(new FlushHandler() {
 
-                    boolean mFlush;
+            boolean mFlush;
 
-                    @Override
-                    public boolean onFlush() {
+            @Override
+            public boolean onFlush() {
 
-                        mFlush = !mFlush;
+                mFlush = !mFlush;
 
-                        return mFlush;
-                    }
-                }).noDebris().avoidNull().build();
-        final Basin<String, String> basin4 =
-                Basin.collect(Waterfall.fallingFrom(new OpenDam<String>() {
-
-                                  @Override
-                                  public void onDischarge(final Floodgate<String, String> gate,
-                                          final String drop) {
-
-                                      if ("pull".equals(drop)) {
-
-                                          throw new IllegalArgumentException();
-                                      }
-
-                                      super.onDischarge(gate, drop);
-                                  }
-                              })
-                );
-        debris.clear();
-        assertThat(Basin.collect(basin4.thenFlow().thenFallingThrough(dam10)
-                                       .thenFallingThrough(new OpenDam<String>() {
+                return mFlush;
+            }
+        }).noDebris().avoidNull().build();
+        final Basin<String, String> basin4 = Basin.collect(Waterfall.fallingFrom(new OpenDam<String>() {
 
                                                                @Override
                                                                public void onDischarge(
                                                                        final Floodgate<String, String> gate,
                                                                        final String drop) {
 
-                                                                   if ("push".equals(drop)) {
+                                                                   if ("pull".equals(drop)) {
 
-                                                                       throw new IllegalStateException();
+                                                                       throw new IllegalArgumentException();
                                                                    }
 
                                                                    super.onDischarge(gate, drop);
                                                                }
-                                                           }
-                                       )
-                   ).thenFeedWith("1", "pull", "push").thenFeedWith(null, "2")
-                        .collectDebrisInto(debris).collectOutput()
+                                                           })
+        );
+        debris.clear();
+        assertThat(Basin.collect(basin4.thenFlow().thenFallingThrough(dam10).thenFallingThrough(new OpenDam<String>() {
+
+                                                                                                    @Override
+                                                                                                    public void onDischarge(
+                                                                                                            final Floodgate<String, String> gate,
+                                                                                                            final String drop) {
+
+                                                                                                        if ("push"
+                                                                                                                .equals(drop)) {
+
+                                                                                                            throw new IllegalStateException();
+                                                                                                        }
+
+                                                                                                        super.onDischarge(
+                                                                                                                gate,
+                                                                                                                drop);
+                                                                                                    }
+                                                                                                }
+                                 )
+                   ).thenFeedWith("1", "pull", "push").thenFeedWith(null, "2").collectDebrisInto(debris).collectOutput()
         ).containsExactly("1", "2");
         assertThat(debris.get(0)).isExactlyInstanceOf(IllegalArgumentException.class);
         assertThat(debris.get(1)).isExactlyInstanceOf(IllegalStateException.class);
@@ -470,91 +461,27 @@ public class DamBuilderTest extends TestCase {
         assertThat(basin4.collectFirstDebris()).isNull();
     }
 
-    public void testDamBuilderError() {
-
-        try {
-
-            DamBuilder.basedOn(null);
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            DamBuilder.basedOn(new DischargeHandler<Object, Object>() {
-
-                @Override
-                public Object onDischarge(final Object drop) {
-
-                    return null;
-                }
-            }).onFlush(null);
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            DamBuilder.basedOn(new DischargeHandler<Object, Object>() {
-
-                @Override
-                public Object onDischarge(final Object drop) {
-
-                    return null;
-                }
-            }).onDrop(null);
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            DamBuilder.basedOn(new DischargeHandler<Object, Object>() {
-
-                @Override
-                public Object onDischarge(final Object drop) {
-
-                    return null;
-                }
-            }).onDischarge(null);
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-    }
-
     public void testDownstreamError() {
 
-        final Basin<Object, Object> basin1 =
-                Basin.collect(Waterfall.fallingFrom(new OpenDam<Object>() {
+        final Basin<Object, Object> basin1 = Basin.collect(Waterfall.fallingFrom(new OpenDam<Object>() {
 
-                                  @Override
-                                  public void onDischarge(final Floodgate<Object, Object> gate,
-                                          final Object drop) {
+                                                               @Override
+                                                               public void onDischarge(
+                                                                       final Floodgate<Object, Object> gate,
+                                                                       final Object drop) {
 
-                                      final String string = drop.toString();
+                                                                   final String string = drop.toString();
 
-                                      if (string.startsWith("push")) {
+                                                                   if (string.startsWith("push")) {
 
-                                          throw new IllegalStateException(string);
-                                      }
+                                                                       throw new IllegalStateException(string);
+                                                                   }
 
-                                      super.onDischarge(gate, drop);
-                                  }
+                                                                   super.onDischarge(gate, drop);
+                                                               }
 
-                              })
-                );
+                                                           })
+        );
         final Basin<Object, Object> basin2 =
                 Basin.collect(basin1.thenFlow().thenFallingThrough(new Dam<Object, Object>() {
 
@@ -567,8 +494,7 @@ public class DamBuilderTest extends TestCase {
 
                                                                            mLast = drop;
 
-                                                                           if ("discharge1"
-                                                                                   .equals(drop)) {
+                                                                           if ("discharge1".equals(drop)) {
 
                                                                                throw new IllegalArgumentException(
                                                                                        "discharge1");
@@ -581,8 +507,7 @@ public class DamBuilderTest extends TestCase {
                                                                        public void onFlush(
                                                                                final Floodgate<Object, Object> gate) {
 
-                                                                           if ("flush1"
-                                                                                   .equals(mLast)) {
+                                                                           if ("flush1".equals(mLast)) {
 
                                                                                throw new IllegalArgumentException(
                                                                                        "flush1");
@@ -596,8 +521,7 @@ public class DamBuilderTest extends TestCase {
                                                                                final Floodgate<Object, Object> gate,
                                                                                final Object debris) {
 
-                                                                           if ((debris instanceof Throwable)
-                                                                                   && "push1"
+                                                                           if ((debris instanceof Throwable) && "push1"
                                                                                    .equals(((Throwable) debris)
                                                                                                    .getMessage())) {
 
@@ -622,23 +546,18 @@ public class DamBuilderTest extends TestCase {
 
                                                                            mLast = drop;
 
-                                                                           if ("discharge2"
-                                                                                   .equals(drop)) {
+                                                                           if ("discharge2".equals(drop)) {
 
                                                                                throw new IllegalArgumentException(
                                                                                        "discharge2");
                                                                            }
 
-                                                                           final String string =
-                                                                                   drop.toString();
+                                                                           final String string = drop.toString();
 
-                                                                           if (string.startsWith(
-                                                                                   "pull") || string
-                                                                                   .startsWith(
-                                                                                           "push")) {
+                                                                           if (string.startsWith("pull") || string
+                                                                                   .startsWith("push")) {
 
-                                                                               throw new IllegalStateException(
-                                                                                       string);
+                                                                               throw new IllegalStateException(string);
 
                                                                            } else {
 
@@ -650,8 +569,7 @@ public class DamBuilderTest extends TestCase {
                                                                        public void onFlush(
                                                                                final Floodgate<Object, Object> gate) {
 
-                                                                           if ("flush2"
-                                                                                   .equals(mLast)) {
+                                                                           if ("flush2".equals(mLast)) {
 
                                                                                throw new IllegalArgumentException(
                                                                                        "flush2");
@@ -665,8 +583,7 @@ public class DamBuilderTest extends TestCase {
                                                                                final Floodgate<Object, Object> gate,
                                                                                final Object debris) {
 
-                                                                           if ((debris instanceof Throwable)
-                                                                                   && "push2"
+                                                                           if ((debris instanceof Throwable) && "push2"
                                                                                    .equals(((Throwable) debris)
                                                                                                    .getMessage())) {
 
@@ -782,7 +699,58 @@ public class DamBuilderTest extends TestCase {
 
         try {
 
-            Aqueduct.binding(null);
+            DamBuilder.basedOn(null);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            DamBuilder.basedOn(new DischargeHandler<Object, Object>() {
+
+                @Override
+                public Object onDischarge(final Object drop) {
+
+                    return null;
+                }
+            }).onFlush(null);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            DamBuilder.basedOn(new DischargeHandler<Object, Object>() {
+
+                @Override
+                public Object onDischarge(final Object drop) {
+
+                    return null;
+                }
+            }).onDrop(null);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            DamBuilder.basedOn(new DischargeHandler<Object, Object>() {
+
+                @Override
+                public Object onDischarge(final Object drop) {
+
+                    return null;
+                }
+            }).onDischarge(null);
 
             fail();
 
@@ -793,159 +761,152 @@ public class DamBuilderTest extends TestCase {
 
     public void testNoError() {
 
-        final Basin<Object, Object> basin1 =
-                Basin.collect(Waterfall.fallingFrom(new OpenDam<Object>() {
+        final Basin<Object, Object> basin1 = Basin.collect(Waterfall.fallingFrom(new OpenDam<Object>() {
 
-                                  @Override
-                                  public void onDischarge(final Floodgate<Object, Object> gate,
-                                          final Object drop) {
+                                                               @Override
+                                                               public void onDischarge(
+                                                                       final Floodgate<Object, Object> gate,
+                                                                       final Object drop) {
 
-                                      final String string = drop.toString();
+                                                                   final String string = drop.toString();
 
-                                      if (string.startsWith("push")) {
+                                                                   if (string.startsWith("push")) {
 
-                                          throw new IllegalStateException(string);
-                                      }
+                                                                       throw new IllegalStateException(string);
+                                                                   }
 
-                                      super.onDischarge(gate, drop);
-                                  }
-                              })
+                                                                   super.onDischarge(gate, drop);
+                                                               }
+                                                           })
+        );
+        final Basin<Object, Object> basin2 =
+                Basin.collect(basin1.thenFlow().thenFallingThrough(DamBuilders.noDebris(new Dam<Object, Object>() {
+
+                                                                                            private Object mLast;
+
+                                                                                            @Override
+                                                                                            public void onDischarge(
+                                                                                                    final Floodgate<Object, Object> gate,
+                                                                                                    final Object drop) {
+
+                                                                                                mLast = drop;
+
+                                                                                                if ("discharge1"
+                                                                                                        .equals(drop)) {
+
+                                                                                                    throw new IllegalArgumentException(
+                                                                                                            "discharge1");
+                                                                                                }
+
+                                                                                                gate.discharge(drop);
+                                                                                            }
+
+                                                                                            @Override
+                                                                                            public void onFlush(
+                                                                                                    final Floodgate<Object, Object> gate) {
+
+                                                                                                if ("flush1"
+                                                                                                        .equals(mLast)) {
+
+                                                                                                    throw new IllegalArgumentException(
+                                                                                                            "flush1");
+                                                                                                }
+
+                                                                                                gate.flush();
+                                                                                            }
+
+                                                                                            @Override
+                                                                                            public void onDrop(
+                                                                                                    final Floodgate<Object, Object> gate,
+                                                                                                    final Object debris) {
+
+                                                                                                if ((debris instanceof Throwable)
+                                                                                                        && "push1"
+                                                                                                        .equals(((Throwable) debris)
+                                                                                                                        .getMessage())) {
+
+                                                                                                    throw new IllegalArgumentException(
+                                                                                                            "push1");
+                                                                                                }
+
+                                                                                                gate.drop(debris);
+                                                                                            }
+                                                                                        }
+                                                                   )
+                              )
                 );
-        final Basin<Object, Object> basin2 = Basin.collect(basin1.thenFlow().thenFallingThrough(
-                                                                   DamBuilders.noDebris(
-                                                                           new Dam<Object, Object>() {
+        final Basin<Object, Object> basin3 =
+                Basin.collect(basin2.thenFlow().thenFallingThrough(DamBuilders.noDebris(new Dam<Object, Object>() {
 
-                                                                               private Object mLast;
+                                                                                            private Object mLast;
 
-                                                                               @Override
-                                                                               public void onDischarge(
-                                                                                       final Floodgate<Object, Object> gate,
-                                                                                       final Object drop) {
+                                                                                            @Override
+                                                                                            public void onDischarge(
+                                                                                                    final Floodgate<Object, Object> gate,
+                                                                                                    final Object drop) {
 
-                                                                                   mLast = drop;
+                                                                                                mLast = drop;
 
-                                                                                   if ("discharge1"
-                                                                                           .equals(drop)) {
+                                                                                                if ("discharge2"
+                                                                                                        .equals(drop)) {
 
-                                                                                       throw new IllegalArgumentException(
-                                                                                               "discharge1");
-                                                                                   }
+                                                                                                    throw new IllegalArgumentException(
+                                                                                                            "discharge2");
+                                                                                                }
 
-                                                                                   gate.discharge(
-                                                                                           drop);
-                                                                               }
+                                                                                                final String string =
+                                                                                                        drop.toString();
 
-                                                                               @Override
-                                                                               public void onFlush(
-                                                                                       final Floodgate<Object, Object> gate) {
+                                                                                                if (string.startsWith(
+                                                                                                        "pull")
+                                                                                                        || string
+                                                                                                        .startsWith(
+                                                                                                                "push")) {
 
-                                                                                   if ("flush1"
-                                                                                           .equals(mLast)) {
+                                                                                                    throw new IllegalStateException(
+                                                                                                            string);
 
-                                                                                       throw new IllegalArgumentException(
-                                                                                               "flush1");
-                                                                                   }
+                                                                                                } else {
 
-                                                                                   gate.flush();
-                                                                               }
+                                                                                                    gate.discharge(
+                                                                                                            drop);
+                                                                                                }
+                                                                                            }
 
-                                                                               @Override
-                                                                               public void onDrop(
-                                                                                       final Floodgate<Object, Object> gate,
-                                                                                       final Object debris) {
+                                                                                            @Override
+                                                                                            public void onFlush(
+                                                                                                    final Floodgate<Object, Object> gate) {
 
-                                                                                   if ((debris instanceof Throwable)
-                                                                                           && "push1"
-                                                                                           .equals(((Throwable) debris)
-                                                                                                           .getMessage())) {
+                                                                                                if ("flush2"
+                                                                                                        .equals(mLast)) {
 
-                                                                                       throw new IllegalArgumentException(
-                                                                                               "push1");
-                                                                                   }
+                                                                                                    throw new IllegalArgumentException(
+                                                                                                            "flush2");
+                                                                                                }
 
-                                                                                   gate.drop(
-                                                                                           debris);
-                                                                               }
-                                                                           }
+                                                                                                gate.flush();
+                                                                                            }
+
+                                                                                            @Override
+                                                                                            public void onDrop(
+                                                                                                    final Floodgate<Object, Object> gate,
+                                                                                                    final Object debris) {
+
+                                                                                                if ((debris instanceof Throwable)
+                                                                                                        && "push2"
+                                                                                                        .equals(((Throwable) debris)
+                                                                                                                        .getMessage())) {
+
+                                                                                                    throw new IllegalArgumentException(
+                                                                                                            "push2");
+                                                                                                }
+
+                                                                                                gate.drop(debris);
+                                                                                            }
+                                                                                        }
                                                                    )
-                                                           )
-        );
-        final Basin<Object, Object> basin3 = Basin.collect(basin2.thenFlow().thenFallingThrough(
-                                                                   DamBuilders.noDebris(
-                                                                           new Dam<Object, Object>() {
-
-                                                                               private Object mLast;
-
-                                                                               @Override
-                                                                               public void onDischarge(
-                                                                                       final Floodgate<Object, Object> gate,
-                                                                                       final Object drop) {
-
-                                                                                   mLast = drop;
-
-                                                                                   if ("discharge2"
-                                                                                           .equals(drop)) {
-
-                                                                                       throw new IllegalArgumentException(
-                                                                                               "discharge2");
-                                                                                   }
-
-                                                                                   final String
-                                                                                           string =
-                                                                                           drop.toString();
-
-                                                                                   if (string
-                                                                                           .startsWith(
-                                                                                                   "pull")
-                                                                                           || string
-                                                                                           .startsWith(
-                                                                                                   "push")) {
-
-                                                                                       throw new IllegalStateException(
-                                                                                               string);
-
-                                                                                   } else {
-
-                                                                                       gate.discharge(
-                                                                                               drop);
-                                                                                   }
-                                                                               }
-
-                                                                               @Override
-                                                                               public void onFlush(
-                                                                                       final Floodgate<Object, Object> gate) {
-
-                                                                                   if ("flush2"
-                                                                                           .equals(mLast)) {
-
-                                                                                       throw new IllegalArgumentException(
-                                                                                               "flush2");
-                                                                                   }
-
-                                                                                   gate.flush();
-                                                                               }
-
-                                                                               @Override
-                                                                               public void onDrop(
-                                                                                       final Floodgate<Object, Object> gate,
-                                                                                       final Object debris) {
-
-                                                                                   if ((debris instanceof Throwable)
-                                                                                           && "push2"
-                                                                                           .equals(((Throwable) debris)
-                                                                                                           .getMessage())) {
-
-                                                                                       throw new IllegalArgumentException(
-                                                                                               "push2");
-                                                                                   }
-
-                                                                                   gate.drop(
-                                                                                           debris);
-                                                                               }
-                                                                           }
-                                                                   )
-                                                           )
-        );
+                              )
+                );
 
         basin2.thenFeedWith("discharge");
         assertThat(basin1.collectOutput()).containsExactly("discharge");
@@ -1036,16 +997,15 @@ public class DamBuilderTest extends TestCase {
 
     public void testSimpleDam() {
 
-        final Dam<Object, Object> dam1 =
-                DamBuilders.simpleDamBasedOn(new DischargeHandler<Object, Object>() {
+        final Dam<Object, Object> dam1 = DamBuilders.simpleDamBasedOn(new DischargeHandler<Object, Object>() {
 
-                                                 @Override
-                                                 public Object onDischarge(final Object drop) {
+                                                                          @Override
+                                                                          public Object onDischarge(final Object drop) {
 
-                                                     return drop;
-                                                 }
-                                             }
-                );
+                                                                              return drop;
+                                                                          }
+                                                                      }
+        );
         final ArrayList<Object> debris = new ArrayList<Object>();
         assertThat(Basin.collect(Waterfall.fallingFrom(dam1)).thenFeedWith("1", "test", null, "2")
                         .collectDebrisInto(debris).collectOutput()
@@ -1056,8 +1016,7 @@ public class DamBuilderTest extends TestCase {
                 DamBuilders.simpleDamAvoidingNullBasedOn(new DischargeHandler<Object, Object>() {
 
                                                              @Override
-                                                             public Object onDischarge(
-                                                                     final Object drop) {
+                                                             public Object onDischarge(final Object drop) {
 
                                                                  return drop;
                                                              }
@@ -1092,55 +1051,55 @@ public class DamBuilderTest extends TestCase {
 
     public void testSimpleNoErrorDam() {
 
-        final Dam<Object, Object> dam1 =
-                DamBuilders.noDebrisBasedOn(new DischargeHandler<Object, Object>() {
+        final Dam<Object, Object> dam1 = DamBuilders.noDebrisBasedOn(new DischargeHandler<Object, Object>() {
 
-                    @Override
-                    public Object onDischarge(final Object drop) {
+            @Override
+            public Object onDischarge(final Object drop) {
 
-                        if ("test".equals(drop)) {
+                if ("test".equals(drop)) {
 
-                            throw new NullPointerException();
-                        }
+                    throw new NullPointerException();
+                }
 
-                        return drop;
-                    }
-                });
-        final Basin<Object, Object> basin1 =
-                Basin.collect(Waterfall.fallingFrom(new OpenDam<Object>() {
+                return drop;
+            }
+        });
+        final Basin<Object, Object> basin1 = Basin.collect(Waterfall.fallingFrom(new OpenDam<Object>() {
 
-                                  @Override
-                                  public void onDischarge(final Floodgate<Object, Object> gate,
-                                          final Object drop) {
+                                                               @Override
+                                                               public void onDischarge(
+                                                                       final Floodgate<Object, Object> gate,
+                                                                       final Object drop) {
 
-                                      if ("push".equals(drop)) {
+                                                                   if ("push".equals(drop)) {
 
-                                          throw new IllegalArgumentException();
-                                      }
+                                                                       throw new IllegalArgumentException();
+                                                                   }
 
-                                      super.onDischarge(gate, drop);
-                                  }
-                              })
-                );
-        final Basin<Object, Object> basin2 = Basin.collect(
-                basin1.thenFlow().thenFallingThrough(dam1)
-                      .thenFallingThrough(new OpenDam<Object>() {
-
-                                              @Override
-                                              public void onDischarge(
-                                                      final Floodgate<Object, Object> gate,
-                                                      final Object drop) {
-
-                                                  if ("pull".equals(drop)) {
-
-                                                      throw new IllegalStateException();
-                                                  }
-
-                                                  super.onDischarge(gate, drop);
-                                              }
-                                          }
-                      )
+                                                                   super.onDischarge(gate, drop);
+                                                               }
+                                                           })
         );
+        final Basin<Object, Object> basin2 =
+                Basin.collect(basin1.thenFlow().thenFallingThrough(dam1).thenFallingThrough(new OpenDam<Object>() {
+
+                                                                                                @Override
+                                                                                                public void onDischarge(
+                                                                                                        final Floodgate<Object, Object> gate,
+                                                                                                        final Object drop) {
+
+                                                                                                    if ("pull"
+                                                                                                            .equals(drop)) {
+
+                                                                                                        throw new IllegalStateException();
+                                                                                                    }
+
+                                                                                                    super.onDischarge(
+                                                                                                            gate, drop);
+                                                                                                }
+                                                                                            }
+                              )
+                );
         basin2.thenFeedWith("1", "push", "test", null, "pull", "2");
         assertThat(basin1.collectOutput()).containsExactly("1", "test", null, "pull", "2");
         assertThat(basin1.collectFirstDebris()).isExactlyInstanceOf(IllegalArgumentException.class);
@@ -1164,41 +1123,42 @@ public class DamBuilderTest extends TestCase {
                         return drop;
                     }
                 });
-        final Basin<Object, Object> basin3 =
-                Basin.collect(Waterfall.fallingFrom(new OpenDam<Object>() {
+        final Basin<Object, Object> basin3 = Basin.collect(Waterfall.fallingFrom(new OpenDam<Object>() {
 
-                                  @Override
-                                  public void onDischarge(final Floodgate<Object, Object> gate,
-                                          final Object drop) {
+                                                               @Override
+                                                               public void onDischarge(
+                                                                       final Floodgate<Object, Object> gate,
+                                                                       final Object drop) {
 
-                                      if ("push".equals(drop)) {
+                                                                   if ("push".equals(drop)) {
 
-                                          throw new IllegalArgumentException();
-                                      }
+                                                                       throw new IllegalArgumentException();
+                                                                   }
 
-                                      super.onDischarge(gate, drop);
-                                  }
-                              })
-                );
-        final Basin<Object, Object> basin4 = Basin.collect(
-                basin3.thenFlow().thenFallingThrough(dam2)
-                      .thenFallingThrough(new OpenDam<Object>() {
-
-                                              @Override
-                                              public void onDischarge(
-                                                      final Floodgate<Object, Object> gate,
-                                                      final Object drop) {
-
-                                                  if ("pull".equals(drop)) {
-
-                                                      throw new IllegalStateException();
-                                                  }
-
-                                                  super.onDischarge(gate, drop);
-                                              }
-                                          }
-                      )
+                                                                   super.onDischarge(gate, drop);
+                                                               }
+                                                           })
         );
+        final Basin<Object, Object> basin4 =
+                Basin.collect(basin3.thenFlow().thenFallingThrough(dam2).thenFallingThrough(new OpenDam<Object>() {
+
+                                                                                                @Override
+                                                                                                public void onDischarge(
+                                                                                                        final Floodgate<Object, Object> gate,
+                                                                                                        final Object drop) {
+
+                                                                                                    if ("pull"
+                                                                                                            .equals(drop)) {
+
+                                                                                                        throw new IllegalStateException();
+                                                                                                    }
+
+                                                                                                    super.onDischarge(
+                                                                                                            gate, drop);
+                                                                                                }
+                                                                                            }
+                              )
+                );
         basin4.thenFeedWith("1", "push", "test", null, "pull", "2");
         assertThat(basin3.collectOutput()).containsExactly("1", "test", null, "pull", "2");
         assertThat(basin3.collectFirstDebris()).isExactlyInstanceOf(IllegalArgumentException.class);
@@ -1232,115 +1192,110 @@ public class DamBuilderTest extends TestCase {
     public void testStreamDamBuilder() {
 
         final ArrayList<Object> debris = new ArrayList<Object>();
-        assertThat(Basin.collect(
-                StreamDamBuilder.blocking(Waterfall.fallingFrom(new OpenDam<String>()))
-                                .onDischarge(new DischargeHandler<String, Integer>() {
+        assertThat(Basin.collect(StreamDamBuilder.blocking(Waterfall.fallingFrom(new OpenDam<String>()))
+                                                 .onDischarge(new DischargeHandler<String, Integer>() {
 
-                                                 @Override
-                                                 public Integer onDischarge(final String drop) {
+                                                                  @Override
+                                                                  public Integer onDischarge(final String drop) {
 
-                                                     return Integer.parseInt(drop);
-                                                 }
-                                             }
-                                ).fallFrom()
-        ).thenFeedWith("1", "test", "2").collectDebrisInto(debris).collectOutput())
-                .containsExactly(1, 2);
+                                                                      return Integer.parseInt(drop);
+                                                                  }
+                                                              }
+                                                 ).fallFrom()
+        ).thenFeedWith("1", "test", "2").collectDebrisInto(debris).collectOutput()).containsExactly(1, 2);
         assertThat(debris).hasSize(1);
         assertThat(debris.get(0)).isExactlyInstanceOf(NumberFormatException.class);
 
-        final Dam<String, Integer> dam2 =
-                StreamDamBuilder.blocking(Waterfall.fallingFrom(new OpenDam<String>()))
-                                .onDischarge(new DischargeHandler<String, Integer>() {
+        final Dam<String, Integer> dam2 = StreamDamBuilder.blocking(Waterfall.fallingFrom(new OpenDam<String>()))
+                                                          .onDischarge(new DischargeHandler<String, Integer>() {
 
-                                                 @Override
-                                                 public Integer onDischarge(final String drop) {
+                                                                           @Override
+                                                                           public Integer onDischarge(
+                                                                                   final String drop) {
 
-                                                     return Integer.parseInt(drop);
-                                                 }
+                                                                               return Integer.parseInt(drop);
+                                                                           }
 
-                                             }
-                                ).avoidFlush().build();
+                                                                       }
+                                                          ).avoidFlush().build();
         debris.clear();
-        assertThat(Basin.collect(
-                           Waterfall.fallingFrom(dam2).thenFallingThrough(new OpenDam<Integer>() {
+        assertThat(Basin.collect(Waterfall.fallingFrom(dam2).thenFallingThrough(new OpenDam<Integer>() {
 
-                                                                              @Override
-                                                                              public void onFlush(
-                                                                                      final Floodgate<Integer, Integer> gate) {
+                                                                                    @Override
+                                                                                    public void onFlush(
+                                                                                            final Floodgate<Integer, Integer> gate) {
 
-                                                                                  throw new IllegalStateException();
-                                                                              }
-                                                                          }
-                           )
+                                                                                        throw new IllegalStateException();
+                                                                                    }
+                                                                                }
+                                 )
                    ).thenFeedWith("1", "test", "2").collectDebrisInto(debris).collectOutput()
         ).containsExactly(1, 2);
         assertThat(debris.get(0)).isExactlyInstanceOf(NumberFormatException.class);
         assertThat(debris).hasSize(1);
 
-        final Dam<String, String> dam3 =
-                StreamDamBuilder.blocking(Waterfall.fallingFrom(new OpenDam<String>()))
-                                .onDischarge(new DischargeHandler<String, String>() {
+        final Dam<String, String> dam3 = StreamDamBuilder.blocking(Waterfall.fallingFrom(new OpenDam<String>()))
+                                                         .onDischarge(new DischargeHandler<String, String>() {
 
-                                    @Override
-                                    public String onDischarge(final String drop) {
+                                                             @Override
+                                                             public String onDischarge(final String drop) {
 
-                                        return drop;
-                                    }
+                                                                 return drop;
+                                                             }
 
-                                }).avoidNull().build();
+                                                         }).avoidNull().build();
         debris.clear();
         assertThat(Basin.collect(Waterfall.fallingFrom(dam3)).thenFeedWith("1", "test", null, "2")
                         .collectDebrisInto(debris).collectOutput()
         ).containsExactly("1", "test", "2");
         assertThat(debris).isEmpty();
 
-        final Dam<String, String> dam4 =
-                StreamDamBuilder.blocking(Waterfall.fallingFrom(new OpenDam<String>()))
-                                .onDischarge(new DischargeHandler<String, String>() {
+        final Dam<String, String> dam4 = StreamDamBuilder.blocking(Waterfall.fallingFrom(new OpenDam<String>()))
+                                                         .onDischarge(new DischargeHandler<String, String>() {
 
-                                    @Override
-                                    public String onDischarge(final String drop) {
+                                                             @Override
+                                                             public String onDischarge(final String drop) {
 
-                                        return drop;
-                                    }
+                                                                 return drop;
+                                                             }
 
-                                }).build();
-        final Basin<String, String> basin1 =
-                Basin.collect(Waterfall.fallingFrom(new OpenDam<String>()));
+                                                         }).build();
+        final Basin<String, String> basin1 = Basin.collect(Waterfall.fallingFrom(new OpenDam<String>()));
         debris.clear();
-        assertThat(Basin.collect(basin1.thenFlow().thenFallingThrough(dam4)
-                                       .thenFallingThrough(new OpenDam<String>() {
+        assertThat(Basin.collect(basin1.thenFlow().thenFallingThrough(dam4).thenFallingThrough(new OpenDam<String>() {
 
-                                                               @Override
-                                                               public void onDischarge(
-                                                                       final Floodgate<String, String> gate,
-                                                                       final String drop) {
+                                                                                                   @Override
+                                                                                                   public void onDischarge(
+                                                                                                           final Floodgate<String, String> gate,
+                                                                                                           final String drop) {
 
-                                                                   if (drop == null) {
+                                                                                                       if (drop
+                                                                                                               == null) {
 
-                                                                       throw new NullPointerException();
-                                                                   }
+                                                                                                           throw new NullPointerException();
+                                                                                                       }
 
-                                                                   super.onDischarge(gate, drop);
-                                                               }
-                                                           }
-                                       )
+                                                                                                       super.onDischarge(
+                                                                                                               gate,
+                                                                                                               drop);
+                                                                                                   }
+                                                                                               }
+                                 )
                    ).thenFeedWith("1", "test", null, "2").collectDebrisInto(debris).collectOutput()
         ).containsExactly("1", "test", "2");
         assertThat(debris.get(0)).isExactlyInstanceOf(NullPointerException.class);
         assertThat(debris).hasSize(1);
 
-        final Dam<String, String> dam5 =
-                StreamDamBuilder.blocking(Waterfall.fallingFrom(new OpenDam<String>()))
-                                .onDischarge(new DischargeHandler<String, String>() {
+        final Dam<String, String> dam5 = StreamDamBuilder.blocking(Waterfall.fallingFrom(new OpenDam<String>()))
+                                                         .onDischarge(new DischargeHandler<String, String>() {
 
-                                                 @Override
-                                                 public String onDischarge(final String drop) {
+                                                                          @Override
+                                                                          public String onDischarge(final String drop) {
 
-                                                     return drop;
-                                                 }
-                                             }
-                                ).avoidDebris().build();
+                                                                              return drop;
+                                                                          }
+                                                                      }
+                                                         ).avoidDebris().build();
         debris.clear();
         assertThat(Basin.collect(Waterfall.fallingFrom(new OpenDam<String>() {
 
@@ -1354,58 +1309,57 @@ public class DamBuilderTest extends TestCase {
 
                 super.onDischarge(gate, drop);
             }
-        }).thenFallingThrough(dam5)).thenFeedWith("1", "test", null, "2").collectDebrisInto(debris)
-                        .collectOutput()).containsExactly("1", "test", "2");
+        }).thenFallingThrough(dam5)).thenFeedWith("1", "test", null, "2").collectDebrisInto(debris).collectOutput())
+                .containsExactly("1", "test", "2");
         assertThat(debris).isEmpty();
 
-        final Dam<String, String> dam6 =
-                StreamDamBuilder.blocking(Waterfall.fallingFrom(new OpenDam<String>()))
-                                .onDischarge(new DischargeHandler<String, String>() {
+        final Dam<String, String> dam6 = StreamDamBuilder.blocking(Waterfall.fallingFrom(new OpenDam<String>()))
+                                                         .onDischarge(new DischargeHandler<String, String>() {
 
-                                                 @Override
-                                                 public String onDischarge(final String drop) {
+                                                                          @Override
+                                                                          public String onDischarge(final String drop) {
 
-                                                     return drop;
-                                                 }
-                                             }
-                                ).build();
-        final Basin<String, String> basin2 =
-                Basin.collect(Waterfall.fallingFrom(new OpenDam<String>()));
+                                                                              return drop;
+                                                                          }
+                                                                      }
+                                                         ).build();
+        final Basin<String, String> basin2 = Basin.collect(Waterfall.fallingFrom(new OpenDam<String>()));
         debris.clear();
-        assertThat(Basin.collect(basin2.thenFlow().thenFallingThrough(dam6)
-                                       .thenFallingThrough(new OpenDam<String>() {
+        assertThat(Basin.collect(basin2.thenFlow().thenFallingThrough(dam6).thenFallingThrough(new OpenDam<String>() {
 
-                                                               @Override
-                                                               public void onDischarge(
-                                                                       final Floodgate<String, String> gate,
-                                                                       final String drop) {
+                                                                                                   @Override
+                                                                                                   public void onDischarge(
+                                                                                                           final Floodgate<String, String> gate,
+                                                                                                           final String drop) {
 
-                                                                   if (drop == null) {
+                                                                                                       if (drop
+                                                                                                               == null) {
 
-                                                                       throw new NullPointerException();
-                                                                   }
+                                                                                                           throw new NullPointerException();
+                                                                                                       }
 
-                                                                   super.onDischarge(gate, drop);
-                                                               }
-                                                           }
-                                       )
+                                                                                                       super.onDischarge(
+                                                                                                               gate,
+                                                                                                               drop);
+                                                                                                   }
+                                                                                               }
+                                 )
                    ).thenFeedWith("1", "test", null, "2").collectDebrisInto(debris).collectOutput()
         ).containsExactly("1", "test", "2");
         assertThat(debris).hasSize(1);
         assertThat(debris.get(0)).isExactlyInstanceOf(NullPointerException.class);
 
-        final Dam<String, String> dam7 =
-                StreamDamBuilder.blocking(Waterfall.fallingFrom(new OpenDam<String>()))
-                                .onDischarge(new DischargeHandler<String, String>() {
+        final Dam<String, String> dam7 = StreamDamBuilder.blocking(Waterfall.fallingFrom(new OpenDam<String>()))
+                                                         .onDischarge(new DischargeHandler<String, String>() {
 
-                                                 @Override
-                                                 public String onDischarge(final String drop) {
+                                                                          @Override
+                                                                          public String onDischarge(final String drop) {
 
-                                                     return drop;
-                                                 }
+                                                                              return drop;
+                                                                          }
 
-                                             }
-                                ).onDrop(new DropHandler() {
+                                                                      }
+                                                         ).onDrop(new DropHandler() {
 
                     @Override
                     public Object onDrop(final Object debris) {
@@ -1433,23 +1387,22 @@ public class DamBuilderTest extends TestCase {
 
                 super.onDischarge(gate, drop);
             }
-        }).thenFallingThrough(dam7)).thenFeedWith("1", "test", null, "2").collectDebrisInto(debris)
-                        .collectOutput()).containsExactly("1", "test", "2");
+        }).thenFallingThrough(dam7)).thenFeedWith("1", "test", null, "2").collectDebrisInto(debris).collectOutput())
+                .containsExactly("1", "test", "2");
         assertThat(debris).hasSize(1);
         assertThat(debris.get(0)).isExactlyInstanceOf(FloatingException.class);
 
-        final Dam<String, String> dam8 =
-                StreamDamBuilder.blocking(Waterfall.fallingFrom(new OpenDam<String>()))
-                                .onDischarge(new DischargeHandler<String, String>() {
+        final Dam<String, String> dam8 = StreamDamBuilder.blocking(Waterfall.fallingFrom(new OpenDam<String>()))
+                                                         .onDischarge(new DischargeHandler<String, String>() {
 
-                                                 @Override
-                                                 public String onDischarge(final String drop) {
+                                                                          @Override
+                                                                          public String onDischarge(final String drop) {
 
-                                                     return drop;
-                                                 }
+                                                                              return drop;
+                                                                          }
 
-                                             }
-                                ).onDrop(new DropHandler() {
+                                                                      }
+                                                         ).onDrop(new DropHandler() {
 
                     @Override
                     public Object onDrop(final Object debris) {
@@ -1464,60 +1417,61 @@ public class DamBuilderTest extends TestCase {
                         return false;
                     }
                 }).noDebris().build();
-        final Basin<String, String> basin3 =
-                Basin.collect(Waterfall.fallingFrom(new OpenDam<String>() {
-
-                                  @Override
-                                  public void onDischarge(final Floodgate<String, String> gate,
-                                          final String drop) {
-
-                                      if ("pull".equals(drop)) {
-
-                                          throw new IllegalArgumentException();
-                                      }
-
-                                      super.onDischarge(gate, drop);
-                                  }
-                              })
-                );
-        debris.clear();
-        assertThat(Basin.collect(basin3.thenFlow().thenFallingThrough(dam8)
-                                       .thenFallingThrough(new OpenDam<String>() {
+        final Basin<String, String> basin3 = Basin.collect(Waterfall.fallingFrom(new OpenDam<String>() {
 
                                                                @Override
                                                                public void onDischarge(
                                                                        final Floodgate<String, String> gate,
                                                                        final String drop) {
 
-                                                                   if ("push".equals(drop)) {
+                                                                   if ("pull".equals(drop)) {
 
-                                                                       throw new IllegalStateException();
+                                                                       throw new IllegalArgumentException();
                                                                    }
 
                                                                    super.onDischarge(gate, drop);
                                                                }
-                                                           }
-                                       )
-                   ).thenFeedWith("1", "pull", "push", "2").collectDebrisInto(debris)
-                        .collectOutput()
+                                                           })
+        );
+        debris.clear();
+        assertThat(Basin.collect(basin3.thenFlow().thenFallingThrough(dam8).thenFallingThrough(new OpenDam<String>() {
+
+                                                                                                   @Override
+                                                                                                   public void onDischarge(
+                                                                                                           final Floodgate<String, String> gate,
+                                                                                                           final String drop) {
+
+                                                                                                       if ("push"
+                                                                                                               .equals(drop)) {
+
+                                                                                                           throw new IllegalStateException();
+                                                                                                       }
+
+                                                                                                       super.onDischarge(
+                                                                                                               gate,
+                                                                                                               drop);
+                                                                                                   }
+                                                                                               }
+                                 )
+                   ).thenFeedWith("1", "pull", "push", "2").collectDebrisInto(debris).collectOutput()
         ).containsExactly("1", "2");
         assertThat(debris.get(0)).isExactlyInstanceOf(IllegalStateException.class);
         assertThat(debris).hasSize(1);
         assertThat(basin3.collectFirstDebris()).isExactlyInstanceOf(IllegalArgumentException.class);
         assertThat(basin3.collectFirstDebris()).isNull();
 
-        final Dam<String, String> dam9 =
-                StreamDamBuilder.blocking(Waterfall.fallingFrom(new OpenDam<String>()))
-                                .onDischarge(new DischargeHandler<String, Integer>() {
+        final Dam<String, String> dam9 = StreamDamBuilder.blocking(Waterfall.fallingFrom(new OpenDam<String>()))
+                                                         .onDischarge(new DischargeHandler<String, Integer>() {
 
-                                                 @Override
-                                                 public Integer onDischarge(final String drop) {
+                                                                          @Override
+                                                                          public Integer onDischarge(
+                                                                                  final String drop) {
 
-                                                     throw new NumberFormatException();
-                                                 }
+                                                                              throw new NumberFormatException();
+                                                                          }
 
-                                             }
-                                ).onFlush(new FlushHandler() {
+                                                                      }
+                                                         ).onFlush(new FlushHandler() {
 
                     @Override
                     public boolean onFlush() {
@@ -1539,18 +1493,18 @@ public class DamBuilderTest extends TestCase {
         assertThat(debris.get(0)).isExactlyInstanceOf(IllegalStateException.class);
         assertThat(debris).hasSize(1);
 
-        final Dam<String, String> dam10 =
-                StreamDamBuilder.blocking(Waterfall.fallingFrom(new OpenDam<String>()))
-                                .onDischarge(new DischargeHandler<String, String>() {
+        final Dam<String, String> dam10 = StreamDamBuilder.blocking(Waterfall.fallingFrom(new OpenDam<String>()))
+                                                          .onDischarge(new DischargeHandler<String, String>() {
 
-                                                 @Override
-                                                 public String onDischarge(final String drop) {
+                                                                           @Override
+                                                                           public String onDischarge(
+                                                                                   final String drop) {
 
-                                                     return drop;
-                                                 }
+                                                                               return drop;
+                                                                           }
 
-                                             }
-                                ).onFlush(new FlushHandler() {
+                                                                       }
+                                                          ).onFlush(new FlushHandler() {
 
                     boolean mFlush;
 
@@ -1562,42 +1516,43 @@ public class DamBuilderTest extends TestCase {
                         return mFlush;
                     }
                 }).noDebris().avoidNull().build();
-        final Basin<String, String> basin4 =
-                Basin.collect(Waterfall.fallingFrom(new OpenDam<String>() {
-
-                                  @Override
-                                  public void onDischarge(final Floodgate<String, String> gate,
-                                          final String drop) {
-
-                                      if ("pull".equals(drop)) {
-
-                                          throw new IllegalArgumentException();
-                                      }
-
-                                      super.onDischarge(gate, drop);
-                                  }
-                              })
-                );
-        debris.clear();
-        assertThat(Basin.collect(basin4.thenFlow().thenFallingThrough(dam10)
-                                       .thenFallingThrough(new OpenDam<String>() {
+        final Basin<String, String> basin4 = Basin.collect(Waterfall.fallingFrom(new OpenDam<String>() {
 
                                                                @Override
                                                                public void onDischarge(
                                                                        final Floodgate<String, String> gate,
                                                                        final String drop) {
 
-                                                                   if ("push".equals(drop)) {
+                                                                   if ("pull".equals(drop)) {
 
-                                                                       throw new IllegalStateException();
+                                                                       throw new IllegalArgumentException();
                                                                    }
 
                                                                    super.onDischarge(gate, drop);
                                                                }
-                                                           }
-                                       )
-                   ).thenFeedWith("1", "pull", "push").thenFeedWith(null, "2")
-                        .collectDebrisInto(debris).collectOutput()
+                                                           })
+        );
+        debris.clear();
+        assertThat(Basin.collect(basin4.thenFlow().thenFallingThrough(dam10).thenFallingThrough(new OpenDam<String>() {
+
+                                                                                                    @Override
+                                                                                                    public void onDischarge(
+                                                                                                            final Floodgate<String, String> gate,
+                                                                                                            final String drop) {
+
+                                                                                                        if ("push"
+                                                                                                                .equals(drop)) {
+
+                                                                                                            throw new IllegalStateException();
+                                                                                                        }
+
+                                                                                                        super.onDischarge(
+                                                                                                                gate,
+                                                                                                                drop);
+                                                                                                    }
+                                                                                                }
+                                 )
+                   ).thenFeedWith("1", "pull", "push").thenFeedWith(null, "2").collectDebrisInto(debris).collectOutput()
         ).containsExactly("1", "2");
         assertThat(debris).hasSize(2);
         assertThat(debris.get(0)).isExactlyInstanceOf(IllegalArgumentException.class);
@@ -1605,8 +1560,7 @@ public class DamBuilderTest extends TestCase {
         assertThat(basin4.collectFirstDebris()).isExactlyInstanceOf(IllegalArgumentException.class);
         assertThat(basin4.collectFirstDebris()).isNull();
 
-        final Dam<String, ?> dam11 =
-                StreamDamBuilder.blocking(Waterfall.fallingFrom(new OpenDam<String>())).build();
+        final Dam<String, ?> dam11 = StreamDamBuilder.blocking(Waterfall.fallingFrom(new OpenDam<String>())).build();
         debris.clear();
         assertThat(Basin.collect(Waterfall.fallingFrom(dam11)).thenFeedWith("1", "test", null, "2")
                         .collectDebrisInto(debris).collectOutput()
@@ -1761,8 +1715,7 @@ public class DamBuilderTest extends TestCase {
             @Override
             public void onDrop(final Floodgate<Object, Object> gate, final Object debris) {
 
-                if ((debris instanceof Throwable) && "push1"
-                        .equals(((Throwable) debris).getMessage())) {
+                if ((debris instanceof Throwable) && "push1".equals(((Throwable) debris).getMessage())) {
 
                     throw new IllegalArgumentException("push1");
                 }
@@ -1770,8 +1723,7 @@ public class DamBuilderTest extends TestCase {
                 gate.drop(debris);
             }
         };
-        final Basin<Object, Object> basin1 =
-                Basin.collect(Waterfall.fallingFrom(DamBuilders.weak(dam1)));
+        final Basin<Object, Object> basin1 = Basin.collect(Waterfall.fallingFrom(DamBuilders.weak(dam1)));
         Dam<Object, Object> dam2 = new Dam<Object, Object>() {
 
             private Object mLast;
@@ -1813,8 +1765,7 @@ public class DamBuilderTest extends TestCase {
             @Override
             public void onDrop(final Floodgate<Object, Object> gate, final Object debris) {
 
-                if ((debris instanceof Throwable) && "push2"
-                        .equals(((Throwable) debris).getMessage())) {
+                if ((debris instanceof Throwable) && "push2".equals(((Throwable) debris).getMessage())) {
 
                     throw new IllegalArgumentException("push2");
                 }

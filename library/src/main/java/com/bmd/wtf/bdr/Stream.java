@@ -59,8 +59,7 @@ public class Stream<SOURCE, IN, OUT> {
      * @param upstreamPool   The upstream pool.
      * @param downstreamPool The downstream pool.
      */
-    Stream(final Spring<SOURCE> spring, final DataPool<IN, OUT> upstreamPool,
-            final DataPool<OUT, ?> downstreamPool) {
+    Stream(final Spring<SOURCE> spring, final DataPool<IN, OUT> upstreamPool, final DataPool<OUT, ?> downstreamPool) {
 
         mSpring = spring;
         mUpstreamPool = upstreamPool;
@@ -87,8 +86,7 @@ public class Stream<SOURCE, IN, OUT> {
      * @param upstreamPool The upstream pool.
      * @param outCurrent   The output current.
      */
-    private Stream(final Spring<SOURCE> spring, final DataPool<IN, OUT> upstreamPool,
-            final Current outCurrent) {
+    private Stream(final Spring<SOURCE> spring, final DataPool<IN, OUT> upstreamPool, final Current outCurrent) {
 
         mSpring = spring;
         mUpstreamPool = upstreamPool;
@@ -175,8 +173,7 @@ public class Stream<SOURCE, IN, OUT> {
         }
 
         //noinspection RedundantIfStatement
-        if ((mUpstreamPool != null) ? !mUpstreamPool.equals(stream.mUpstreamPool)
-                : stream.mUpstreamPool != null) {
+        if ((mUpstreamPool != null) ? !mUpstreamPool.equals(stream.mUpstreamPool) : stream.mUpstreamPool != null) {
 
             return false;
         }
@@ -219,8 +216,7 @@ public class Stream<SOURCE, IN, OUT> {
         }
 
         final DataPool<OUT, NOUT> outPool = new DataPool<OUT, NOUT>(mOutCurrent, dam);
-        final Stream<SOURCE, IN, OUT> stream =
-                new Stream<SOURCE, IN, OUT>(mSpring, mUpstreamPool, outPool);
+        final Stream<SOURCE, IN, OUT> stream = new Stream<SOURCE, IN, OUT>(mSpring, mUpstreamPool, outPool);
 
         if (mUpstreamPool != null) {
 
@@ -268,8 +264,7 @@ public class Stream<SOURCE, IN, OUT> {
 
         thenFlowingInto(stream);
 
-        return new Stream<SOURCE, OUT, NOUT>(mSpring, stream.mUpstreamPool,
-                                             (DataPool<NOUT, ?>) null);
+        return new Stream<SOURCE, OUT, NOUT>(mSpring, stream.mUpstreamPool, (DataPool<NOUT, ?>) null);
     }
 
     /**
@@ -286,15 +281,13 @@ public class Stream<SOURCE, IN, OUT> {
      *     </code>
      * </pre>
      * <p/>
-     * After (where 'r' is the returned stream, and the number represents the type of source):
+     * After (where the number represents the type of source):
      * <pre>
      *     <code>
      *
      *         -()-a1-
      *           \
      *         --()-b2-
-     *            \
-     *              r2-
      *
      *     </code>
      * </pre>
@@ -304,36 +297,42 @@ public class Stream<SOURCE, IN, OUT> {
      * @param <NOUT>    The transported data type of the target stream.
      * @return The target stream.
      */
-    public <NSOURCE, NOUT> Stream<NSOURCE, OUT, NOUT> thenFlowingInto(
-            final Stream<NSOURCE, OUT, NOUT> stream) {
+    public <NSOURCE, NOUT> Stream<NSOURCE, OUT, NOUT> thenFlowingInto(final Stream<NSOURCE, OUT, NOUT> stream) {
 
         if (this == stream) {
 
             return stream;
         }
 
-        final DataPool<OUT, NOUT> upPool = stream.mUpstreamPool;
+        final DataPool<IN, OUT> upPool = mUpstreamPool;
 
-        if (upPool == null) {
+        final DataPool<OUT, ?> downPool = mDownstreamPool;
 
-            throw new DryStreamException(
-                    "the target stream has no upstream pool and cannot be fed");
+        if ((upPool != null) && (downPool == null) && !mOutCurrent.equals(upPool.inputCurrent)) {
+
+            return thenFallingThrough(new OpenDam<OUT>()).thenFlowingInto(stream);
         }
 
-        if (canReachFrom(upPool, this)) {
+        final DataPool<OUT, NOUT> pool = stream.mUpstreamPool;
+
+        if (pool == null) {
+
+            throw new DryStreamException("the target stream has no upstream pool and cannot be fed");
+        }
+
+        if (canReachFrom(pool, this)) {
 
             throw new ClosedLoopException("a stream closed loop has been detected during feeding");
         }
 
-        final Stream<SOURCE, IN, OUT> feedStream =
-                new Stream<SOURCE, IN, OUT>(mSpring, mUpstreamPool, upPool);
+        final Stream<SOURCE, IN, OUT> feedingStream = new Stream<SOURCE, IN, OUT>(mSpring, upPool, pool);
 
-        if (mUpstreamPool != null) {
+        if (upPool != null) {
 
-            mUpstreamPool.outputStreams.add(feedStream);
+            upPool.outputStreams.add(feedingStream);
         }
 
-        upPool.inputStreams.add(feedStream);
+        pool.inputStreams.add(feedingStream);
 
         return stream;
     }
@@ -390,8 +389,7 @@ public class Stream<SOURCE, IN, OUT> {
      * @param <NIN>     The data type of the target stream pool.
      * @return This stream.
      */
-    public <NSOURCE, NIN> Stream<SOURCE, IN, OUT> thenJoining(
-            final Stream<NSOURCE, NIN, OUT> stream) {
+    public <NSOURCE, NIN> Stream<SOURCE, IN, OUT> thenJoining(final Stream<NSOURCE, NIN, OUT> stream) {
 
         thenJoiningInto(stream);
 
@@ -434,12 +432,20 @@ public class Stream<SOURCE, IN, OUT> {
      * @param <NIN>     The data type of the target stream pool.
      * @return The target stream.
      */
-    public <NSOURCE, NIN> Stream<NSOURCE, NIN, OUT> thenJoiningInto(
-            final Stream<NSOURCE, NIN, OUT> stream) {
+    public <NSOURCE, NIN> Stream<NSOURCE, NIN, OUT> thenJoiningInto(final Stream<NSOURCE, NIN, OUT> stream) {
 
         if (this == stream) {
 
             return stream;
+        }
+
+        final DataPool<IN, OUT> upPool = mUpstreamPool;
+
+        final DataPool<OUT, ?> downPool = mDownstreamPool;
+
+        if ((upPool != null) && (downPool == null) && !mOutCurrent.equals(upPool.inputCurrent)) {
+
+            return thenFallingThrough(new OpenDam<OUT>()).thenJoiningInto(stream);
         }
 
         final Collection<? extends Stream<?, NIN, OUT>> outStreams;
@@ -456,8 +462,7 @@ public class Stream<SOURCE, IN, OUT> {
 
             if (joiningDownPool == null) {
 
-                throw new DryStreamException(
-                        "cannot join the target stream since it has no downstream pool");
+                throw new DryStreamException("cannot join the target stream since it has no downstream pool");
             }
 
             outStreams = Collections.singleton(stream);
@@ -471,21 +476,18 @@ public class Stream<SOURCE, IN, OUT> {
             }
         }
 
-        final DataPool<IN, OUT> upPool = mUpstreamPool;
-
         for (final Stream<?, ?, OUT> outStream : outStreams) {
 
-            final DataPool<OUT, ?> downPool = outStream.mDownstreamPool;
+            final DataPool<OUT, ?> outPool = outStream.mDownstreamPool;
 
-            final Stream<SOURCE, IN, OUT> joiningStream =
-                    new Stream<SOURCE, IN, OUT>(mSpring, upPool, downPool);
+            final Stream<SOURCE, IN, OUT> joiningStream = new Stream<SOURCE, IN, OUT>(mSpring, upPool, outPool);
 
             if (upPool != null) {
 
                 upPool.outputStreams.add(joiningStream);
             }
 
-            downPool.inputStreams.add(joiningStream);
+            outPool.inputStreams.add(joiningStream);
         }
 
         return stream;
@@ -524,8 +526,7 @@ public class Stream<SOURCE, IN, OUT> {
      * @param <NIN>     The data type of the target stream pool.
      * @return A new stream fed by all the merging stream.
      */
-    public <NSOURCE, NIN> Stream<SOURCE, OUT, OUT> thenMerging(
-            final Stream<NSOURCE, NIN, OUT> stream) {
+    public <NSOURCE, NIN> Stream<SOURCE, OUT, OUT> thenMerging(final Stream<NSOURCE, NIN, OUT> stream) {
 
         return thenMergingThrough(new OpenDam<OUT>(), stream);
     }
@@ -568,8 +569,7 @@ public class Stream<SOURCE, IN, OUT> {
      * @param <NSOURCE> The data type of the target stream spring.
      * @return A new stream fed by all the merging stream.
      */
-    public <NSOURCE> Stream<SOURCE, OUT, OUT> thenMerging(
-            final Stream<NSOURCE, ?, OUT>... streams) {
+    public <NSOURCE> Stream<SOURCE, OUT, OUT> thenMerging(final Stream<NSOURCE, ?, OUT>... streams) {
 
         return thenMergingThrough(new OpenDam<OUT>(), streams);
     }
@@ -612,8 +612,7 @@ public class Stream<SOURCE, IN, OUT> {
      * @param <NSOURCE> The data type of the target stream spring.
      * @return A new stream fed by all the merging streams.
      */
-    public <NSOURCE> Stream<SOURCE, OUT, OUT> thenMerging(
-            final Iterable<? extends Stream<NSOURCE, ?, OUT>> streams) {
+    public <NSOURCE> Stream<SOURCE, OUT, OUT> thenMerging(final Iterable<? extends Stream<NSOURCE, ?, OUT>> streams) {
 
         return thenMergingThrough(new OpenDam<OUT>(), streams);
     }
@@ -788,8 +787,8 @@ public class Stream<SOURCE, IN, OUT> {
      * @param <NOUT>    The data type of the returned stream.
      * @return A new stream fed by all the merging stream.
      */
-    public <NSOURCE, NIN, NOUT> Stream<SOURCE, OUT, NOUT> thenMergingThrough(
-            final Dam<OUT, NOUT> dam, final Stream<NSOURCE, NIN, OUT> stream) {
+    public <NSOURCE, NIN, NOUT> Stream<SOURCE, OUT, NOUT> thenMergingThrough(final Dam<OUT, NOUT> dam,
+            final Stream<NSOURCE, NIN, OUT> stream) {
 
         final Stream<SOURCE, OUT, NOUT> resultStream = thenFallingThrough(dam);
 
@@ -802,8 +801,7 @@ public class Stream<SOURCE, IN, OUT> {
 
         final DataPool<NIN, OUT> upPool = stream.mUpstreamPool;
 
-        final Stream<NSOURCE, NIN, OUT> mergeStream =
-                new Stream<NSOURCE, NIN, OUT>(stream.mSpring, upPool, downPool);
+        final Stream<NSOURCE, NIN, OUT> mergeStream = new Stream<NSOURCE, NIN, OUT>(stream.mSpring, upPool, downPool);
 
         if (upPool != null) {
 
@@ -842,8 +840,7 @@ public class Stream<SOURCE, IN, OUT> {
         pool.inputCurrent.dischargeAfter(pool, delay, timeUnit, drop);
     }
 
-    void dischargeAfter(final long delay, final TimeUnit timeUnit,
-            final Iterable<? extends OUT> drops) {
+    void dischargeAfter(final long delay, final TimeUnit timeUnit, final Iterable<? extends OUT> drops) {
 
         final DataPool<OUT, ?> pool = mDownstreamPool;
 
@@ -917,7 +914,7 @@ public class Stream<SOURCE, IN, OUT> {
 
         final ReachabilityVisitor visitor = new ReachabilityVisitor(targetStream);
 
-        return !ride(true, visitor) || !ride(false, visitor);
+        return !ride(true, visitor);
     }
 
     private void dryUp() {
@@ -975,8 +972,7 @@ public class Stream<SOURCE, IN, OUT> {
             final int currIndex = indexStack.get(indexStack.size() - 1);
 
             final CopyOnWriteArraySet<? extends Stream<?, ?, ?>> streams =
-                    (downstream ? currStream.mDownstreamPool.outputStreams
-                            : currStream.mUpstreamPool.inputStreams);
+                    (downstream ? currStream.mDownstreamPool.outputStreams : currStream.mUpstreamPool.inputStreams);
 
             if (currIndex < streams.size()) {
 
@@ -1012,8 +1008,7 @@ public class Stream<SOURCE, IN, OUT> {
 
                 } else {
 
-                    final DataPool<?, ?> nextPool =
-                            downstream ? nextStream.mDownstreamPool : nextStream.mUpstreamPool;
+                    final DataPool<?, ?> nextPool = downstream ? nextStream.mDownstreamPool : nextStream.mUpstreamPool;
 
                     if (nextPool == null) {
 
@@ -1103,8 +1098,7 @@ public class Stream<SOURCE, IN, OUT> {
                 return (stream.mDownstreamPool.inputStreams.size() < 2);
             }
 
-            return (stream.mUpstreamPool == null) || (stream.mUpstreamPool.outputStreams.size()
-                    < 2);
+            return (stream.mUpstreamPool == null) || (stream.mUpstreamPool.outputStreams.size() < 2);
         }
     }
 

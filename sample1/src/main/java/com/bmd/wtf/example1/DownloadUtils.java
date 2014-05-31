@@ -41,7 +41,7 @@ public class DownloadUtils {
 
         if (fileName.equals("")) {
 
-            return Long.toString(System.nanoTime()) + ".tmp";
+            return Long.toString(path.hashCode()) + ".tmp";
         }
 
         return fileName;

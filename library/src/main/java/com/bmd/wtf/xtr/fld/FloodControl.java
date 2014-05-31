@@ -122,8 +122,7 @@ public class FloodControl<IN, OUT, CONTROLLER extends FloodObserver<IN, OUT>> {
 
             for (final CONTROLLER controller : mLevees.values()) {
 
-                if (observer.equals(((ObserverInvocationHandler) Proxy
-                        .getInvocationHandler(controller)).mObserver)) {
+                if (observer.equals(((ObserverInvocationHandler) Proxy.getInvocationHandler(controller)).mObserver)) {
 
                     return controller;
                 }
@@ -142,8 +141,7 @@ public class FloodControl<IN, OUT, CONTROLLER extends FloodObserver<IN, OUT>> {
      * @param <OBSERVER> The observer type.
      * @return The newly created levee.
      */
-    public <OBSERVER extends CONTROLLER> Levee<IN, OUT, CONTROLLER> leveeControlledBy(
-            final OBSERVER observer) {
+    public <OBSERVER extends CONTROLLER> Levee<IN, OUT, CONTROLLER> leveeControlledBy(final OBSERVER observer) {
 
         if (observer == null) {
 
@@ -186,8 +184,7 @@ public class FloodControl<IN, OUT, CONTROLLER extends FloodObserver<IN, OUT>> {
         }
 
         @Override
-        public Object invoke(final Object proxy, final Method method, final Object[] args) throws
-                Throwable {
+        public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
 
             synchronized (mMutex) {
 
@@ -213,8 +210,7 @@ public class FloodControl<IN, OUT, CONTROLLER extends FloodObserver<IN, OUT>> {
 
                 if (invocationHandler instanceof ObserverInvocationHandler) {
 
-                    return mObserver
-                            .equals(((ObserverInvocationHandler) invocationHandler).mObserver);
+                    return mObserver.equals(((ObserverInvocationHandler) invocationHandler).mObserver);
                 }
             }
 
@@ -238,8 +234,7 @@ public class FloodControl<IN, OUT, CONTROLLER extends FloodObserver<IN, OUT>> {
 
         private final FloodObserver<IN, OUT> mObserver;
 
-        public ObserverLevee(final FloodObserver<IN, OUT> observer, final Object mutex,
-                final CONTROLLER controller) {
+        public ObserverLevee(final FloodObserver<IN, OUT> observer, final Object mutex, final CONTROLLER controller) {
 
             mObserver = observer;
             mMutex = mutex;

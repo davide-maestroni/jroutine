@@ -13,23 +13,23 @@
  */
 package com.bmd.wtf.example4;
 
-import com.bmd.wtf.example2.ConsumeObserver;
+import com.bmd.wtf.example1.DownloadObserver;
 import com.bmd.wtf.src.Floodgate;
-import com.bmd.wtf.xtr.qdc.QueueArchway;
 
 import java.io.File;
 import java.util.HashSet;
 
 /**
- * Observer of downloaded urls supporting abort operation.
+ * Observer of downloaded urls supporting abort operation by remembering the ongoing donwloads and
+ * then cancel them when completed.
  */
-public class CancelableObserver extends ConsumeObserver {
+public class AbortObserver extends DownloadObserver {
 
     private final HashSet<String> mAbortedDownloadUrls = new HashSet<String>();
 
-    public CancelableObserver(final QueueArchway<String> archway, final File downloadDir) {
+    public AbortObserver(final File downloadDir) {
 
-        super(archway, downloadDir);
+        super(downloadDir);
     }
 
     @Override
@@ -51,12 +51,19 @@ public class CancelableObserver extends ConsumeObserver {
 
             final String url = error.getMessage();
 
-            mAbortedDownloadUrls.add(url);
+            if (isDownloaded(url)) {
 
-            onFailure(url, error);
+                onFailure(url, error);
+
+            } else if (isDownloading(url)) {
+
+                mAbortedDownloadUrls.add(url);
+            }
+
+        } else {
+
+            super.onDrop(gate, debris);
         }
-
-        super.onDrop(gate, debris);
     }
 
     @Override

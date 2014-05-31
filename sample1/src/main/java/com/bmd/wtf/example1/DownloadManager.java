@@ -16,6 +16,8 @@ package com.bmd.wtf.example1;
 import com.bmd.wtf.Waterfall;
 import com.bmd.wtf.crr.Current;
 import com.bmd.wtf.crr.Currents;
+import com.bmd.wtf.dam.OpenDam;
+import com.bmd.wtf.src.Floodgate;
 import com.bmd.wtf.xtr.fld.FloodControl;
 
 import java.io.File;
@@ -40,8 +42,7 @@ public class DownloadManager {
 
         if (!downloadDir.isDirectory() && !downloadDir.mkdirs()) {
 
-            throw new IOException(
-                    "Could not create temp directory: " + downloadDir.getAbsolutePath());
+            throw new IOException("Could not create temp directory: " + downloadDir.getAbsolutePath());
         }
 
         mDownloaded = new DownloadObserver(downloadDir);
@@ -66,12 +67,25 @@ public class DownloadManager {
     public void download(final String url) {
 
         Waterfall.fallingFrom(mControl.leveeControlledBy(mDownloaded)).thenFlowingInto(mCurrent)
-                 .thenFallingThrough(new Downloader(mDownloadDir))
-                 .thenFallingThrough(mControl.leveeControlledBy(mDownloaded)).backToSource()
-                 .discharge(url);
+                 .thenFallingThrough(new Downloader(mDownloadDir)).thenFallingThrough(new OpenDam<String>() {
+
+                                                                                          @Override
+                                                                                          public void onDischarge(
+                                                                                                  final Floodgate<String, String> gate,
+                                                                                                  final String drop) {
+
+                                                                                              gate.drop(drop);
+                                                                                          }
+                                                                                      }
+        ).thenFallingThrough(mControl.leveeControlledBy(mDownloaded)).backToSource().discharge(url);
     }
 
     public boolean isComplete(final String url) {
+
+        return !mControl.controller().isDownloading(url);
+    }
+
+    public boolean isDownloaded(final String url) {
 
         return mControl.controller().isDownloaded(url);
     }

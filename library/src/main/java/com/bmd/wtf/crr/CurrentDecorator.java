@@ -43,15 +43,15 @@ public class CurrentDecorator implements Current {
     }
 
     @Override
-    public <DATA> void dischargeAfter(final Pool<DATA> pool, final long delay,
-            final TimeUnit timeUnit, final DATA drop) {
+    public <DATA> void dischargeAfter(final Pool<DATA> pool, final long delay, final TimeUnit timeUnit,
+            final DATA drop) {
 
         mCurrent.dischargeAfter(pool, delay, timeUnit, drop);
     }
 
     @Override
-    public <DATA> void dischargeAfter(final Pool<DATA> pool, final long delay,
-            final TimeUnit timeUnit, final Iterable<? extends DATA> drops) {
+    public <DATA> void dischargeAfter(final Pool<DATA> pool, final long delay, final TimeUnit timeUnit,
+            final Iterable<? extends DATA> drops) {
 
         mCurrent.dischargeAfter(pool, delay, timeUnit, drops);
     }
@@ -63,8 +63,7 @@ public class CurrentDecorator implements Current {
     }
 
     @Override
-    public void dropAfter(final Pool<?> pool, final long delay, final TimeUnit timeUnit,
-            final Object debris) {
+    public void dropAfter(final Pool<?> pool, final long delay, final TimeUnit timeUnit, final Object debris) {
 
         mCurrent.dropAfter(pool, delay, timeUnit, debris);
     }

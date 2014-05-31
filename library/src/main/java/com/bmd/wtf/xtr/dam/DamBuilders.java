@@ -43,8 +43,7 @@ public class DamBuilders extends Dams {
      * @param <OUT>   The output data type.
      * @return The new dam instance.
      */
-    public static <IN, OUT> Dam<IN, OUT> noDebrisAvoidingNullBasedOn(
-            final DischargeHandler<IN, OUT> handler) {
+    public static <IN, OUT> Dam<IN, OUT> noDebrisAvoidingNullBasedOn(final DischargeHandler<IN, OUT> handler) {
 
         return noDebris(simpleDamAvoidingNullBasedOn(handler));
     }
@@ -72,8 +71,7 @@ public class DamBuilders extends Dams {
      * @param <OUT>   The output data type.
      * @return The new dam instance.
      */
-    public static <IN, OUT> Dam<IN, OUT> simpleDamAvoidingNullBasedOn(
-            final DischargeHandler<IN, OUT> handler) {
+    public static <IN, OUT> Dam<IN, OUT> simpleDamAvoidingNullBasedOn(final DischargeHandler<IN, OUT> handler) {
 
         if (handler == null) {
 

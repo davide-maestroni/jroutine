@@ -78,8 +78,7 @@ class DataSpring<DATA> implements Spring<DATA> {
     }
 
     @Override
-    public Spring<DATA> dischargeAfter(final long delay, final TimeUnit timeUnit,
-            final DATA... drops) {
+    public Spring<DATA> dischargeAfter(final long delay, final TimeUnit timeUnit, final DATA... drops) {
 
         if (drops != null) {
 

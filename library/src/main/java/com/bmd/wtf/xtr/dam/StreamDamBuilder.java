@@ -35,8 +35,7 @@ public class StreamDamBuilder<SOURCE, IN, OUT> extends DamBuilder<IN, OUT> {
      * @param stream  The input stream.
      * @param handler The discharge handler.
      */
-    protected StreamDamBuilder(final Stream<SOURCE, ?, IN> stream,
-            final DischargeHandler<IN, OUT> handler) {
+    protected StreamDamBuilder(final Stream<SOURCE, ?, IN> stream, final DischargeHandler<IN, OUT> handler) {
 
         super(handler);
 
@@ -54,8 +53,7 @@ public class StreamDamBuilder<SOURCE, IN, OUT> extends DamBuilder<IN, OUT> {
      * @param other   The other instance from which to copy the parameters.
      * @param handler The discharge handler.
      */
-    protected StreamDamBuilder(final StreamDamBuilder<SOURCE, IN, ?> other,
-            final DischargeHandler<IN, OUT> handler) {
+    protected StreamDamBuilder(final StreamDamBuilder<SOURCE, IN, ?> other, final DischargeHandler<IN, OUT> handler) {
 
         super(other, handler);
 
@@ -71,19 +69,16 @@ public class StreamDamBuilder<SOURCE, IN, OUT> extends DamBuilder<IN, OUT> {
      * @param <OUT>    The transported data type.
      * @return The new dam builder.
      */
-    public static <SOURCE, IN, OUT> StreamDamBuilder<SOURCE, OUT, ?> blocking(
-            final Stream<SOURCE, IN, OUT> stream) {
+    public static <SOURCE, IN, OUT> StreamDamBuilder<SOURCE, OUT, ?> blocking(final Stream<SOURCE, IN, OUT> stream) {
 
-        return new StreamDamBuilder<SOURCE, OUT, Object>(stream,
-                                                         new DischargeHandler<OUT, Object>() {
+        return new StreamDamBuilder<SOURCE, OUT, Object>(stream, new DischargeHandler<OUT, Object>() {
 
-                                                             @Override
-                                                             public Object onDischarge(
-                                                                     final OUT drop) {
+            @Override
+            public Object onDischarge(final OUT drop) {
 
-                                                                 return drop;
-                                                             }
-                                                         }
+                return drop;
+            }
+        }
         );
     }
 
@@ -120,8 +115,7 @@ public class StreamDamBuilder<SOURCE, IN, OUT> extends DamBuilder<IN, OUT> {
     }
 
     @Override
-    public <NOUT> StreamDamBuilder<SOURCE, IN, NOUT> onDischarge(
-            final DischargeHandler<IN, NOUT> handler) {
+    public <NOUT> StreamDamBuilder<SOURCE, IN, NOUT> onDischarge(final DischargeHandler<IN, NOUT> handler) {
 
         return new StreamDamBuilder<SOURCE, IN, NOUT>(this, handler);
     }

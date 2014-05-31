@@ -67,8 +67,7 @@ public class Basin<IN, OUT> {
 
         final CollectorDam<OUT> dam = new CollectorDam<OUT>();
 
-        return new Basin<IN, OUT>(Collections.singleton(stream.backToSource()), dam,
-                                  stream.thenFallingThrough(dam));
+        return new Basin<IN, OUT>(Collections.singleton(stream.backToSource()), dam, stream.thenFallingThrough(dam));
     }
 
     /**
@@ -83,8 +82,7 @@ public class Basin<IN, OUT> {
 
         if ((streams == null) || (streams.length == 0)) {
 
-            throw new IllegalArgumentException(
-                    "the array of streams to collect cannot be null or empty");
+            throw new IllegalArgumentException("the array of streams to collect cannot be null or empty");
         }
 
         final ArrayList<Spring<IN>> springs = new ArrayList<Spring<IN>>(streams.length);
@@ -107,13 +105,11 @@ public class Basin<IN, OUT> {
      * @param <OUT>   The output data type.
      * @return The new basin.
      */
-    public static <IN, OUT> Basin<IN, OUT> collect(
-            final Iterable<? extends Stream<IN, ?, OUT>> streams) {
+    public static <IN, OUT> Basin<IN, OUT> collect(final Iterable<? extends Stream<IN, ?, OUT>> streams) {
 
         if (streams == null) {
 
-            throw new IllegalArgumentException(
-                    "the collection of streams to collect cannot be null or empty");
+            throw new IllegalArgumentException("the collection of streams to collect cannot be null or empty");
         }
 
         final Stream<IN, ?, OUT> firstStream = streams.iterator().next();
@@ -138,8 +134,7 @@ public class Basin<IN, OUT> {
      * @param drops The data drops to discharge.
      * @return The passed basin.
      */
-    public static <OUT, BASIN extends Basin<Byte, OUT>> BASIN partiallyFeed(final BASIN basin,
-            final byte... drops) {
+    public static <OUT, BASIN extends Basin<Byte, OUT>> BASIN partiallyFeed(final BASIN basin, final byte... drops) {
 
         if (drops != null) {
 
@@ -204,8 +199,7 @@ public class Basin<IN, OUT> {
      * @param drops The data drops to discharge.
      * @return The passed basin.
      */
-    public static <OUT, BASIN extends Basin<Short, OUT>> BASIN partiallyFeed(final BASIN basin,
-            final short... drops) {
+    public static <OUT, BASIN extends Basin<Short, OUT>> BASIN partiallyFeed(final BASIN basin, final short... drops) {
 
         if (drops != null) {
 
@@ -226,8 +220,7 @@ public class Basin<IN, OUT> {
      * @param drops The data drops to discharge.
      * @return The passed basin.
      */
-    public static <OUT, BASIN extends Basin<Integer, OUT>> BASIN partiallyFeed(final BASIN basin,
-            final int... drops) {
+    public static <OUT, BASIN extends Basin<Integer, OUT>> BASIN partiallyFeed(final BASIN basin, final int... drops) {
 
         if (drops != null) {
 
@@ -248,8 +241,7 @@ public class Basin<IN, OUT> {
      * @param drops The data drops to discharge.
      * @return The passed basin.
      */
-    public static <OUT, BASIN extends Basin<Long, OUT>> BASIN partiallyFeed(final BASIN basin,
-            final long... drops) {
+    public static <OUT, BASIN extends Basin<Long, OUT>> BASIN partiallyFeed(final BASIN basin, final long... drops) {
 
         if (drops != null) {
 
@@ -270,8 +262,7 @@ public class Basin<IN, OUT> {
      * @param drops The data drops to discharge.
      * @return The passed basin.
      */
-    public static <OUT, BASIN extends Basin<Float, OUT>> BASIN partiallyFeed(final BASIN basin,
-            final float... drops) {
+    public static <OUT, BASIN extends Basin<Float, OUT>> BASIN partiallyFeed(final BASIN basin, final float... drops) {
 
         if (drops != null) {
 

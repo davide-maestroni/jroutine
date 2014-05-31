@@ -29,8 +29,7 @@ import java.util.List;
 public abstract class AbstractArchway<IN, OUT> implements Archway<IN, OUT> {
 
     @Override
-    public void onDrop(final Floodgate<IN, OUT> gate, final List<Spring<OUT>> springs,
-            final Object debris) {
+    public void onDrop(final Floodgate<IN, OUT> gate, final List<Spring<OUT>> springs, final Object debris) {
 
         for (final Spring<OUT> spring : springs) {
 

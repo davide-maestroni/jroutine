@@ -41,14 +41,12 @@ public class StreamTest extends TestCase {
 
     public void testDrain() {
 
-        final Stream<Integer, Integer, Integer> stream1 =
-                Waterfall.fallingFrom(new OpenDam<Integer>());
+        final Stream<Integer, Integer, Integer> stream1 = Waterfall.fallingFrom(new OpenDam<Integer>());
         final Stream<Integer, Integer, String> stream2 =
                 stream1.thenFallingThrough(new AbstractDam<Integer, Integer>() {
 
                     @Override
-                    public void onDischarge(final Floodgate<Integer, Integer> gate,
-                            final Integer drop) {
+                    public void onDischarge(final Floodgate<Integer, Integer> gate, final Integer drop) {
 
                         gate.discharge(drop - 1);
 
@@ -60,8 +58,7 @@ public class StreamTest extends TestCase {
                 }).thenFallingThrough(new AbstractDam<Integer, String>() {
 
                     @Override
-                    public void onDischarge(final Floodgate<Integer, String> gate,
-                            final Integer drop) {
+                    public void onDischarge(final Floodgate<Integer, String> gate, final Integer drop) {
 
                         gate.discharge(drop.toString());
                     }
@@ -307,171 +304,206 @@ public class StreamTest extends TestCase {
 
         final boolean[] fail = new boolean[1];
 
-        Basin.collect(Waterfall.flowingInto(Currents.straightCurrent())
-                               .thenFlowingThrough(new OpenDam<Object>() {
+        Basin.collect(Waterfall.flowingInto(Currents.straightCurrent()).thenFlowingThrough(new OpenDam<Object>() {
 
-                                                       public boolean mFlushed;
+                                                                                               public boolean mFlushed;
 
-                                                       @Override
-                                                       public void onDischarge(
-                                                               final Floodgate<Object, Object> gate,
-                                                               final Object drop) {
+                                                                                               @Override
+                                                                                               public void onDischarge(
+                                                                                                       final Floodgate<Object, Object> gate,
+                                                                                                       final Object drop) {
 
-                                                           if (fail[0] || !"test".equals(drop)) {
+                                                                                                   if (fail[0]
+                                                                                                           || !"test"
+                                                                                                           .equals(drop)) {
 
-                                                               return;
-                                                           }
+                                                                                                       return;
+                                                                                                   }
 
-                                                           fail[0] = true;
+                                                                                                   fail[0] = true;
 
-                                                           gate.discharge((Object) null)
-                                                               .discharge((Object[]) null)
-                                                               .discharge((Iterable<Object>) null)
-                                                               .discharge(new Object[0])
-                                                               .discharge(Arrays.asList())
-                                                               .dischargeAfter(0,
-                                                                               TimeUnit.MILLISECONDS,
-                                                                               (Object) null)
-                                                               .dischargeAfter(0,
-                                                                               TimeUnit.MILLISECONDS,
-                                                                               (Object[]) null)
-                                                               .dischargeAfter(0,
-                                                                               TimeUnit.MILLISECONDS,
-                                                                               (Iterable<Object>) null)
-                                                               .dischargeAfter(0,
-                                                                               TimeUnit.MILLISECONDS,
-                                                                               new Object[0])
-                                                               .dischargeAfter(0,
-                                                                               TimeUnit.MILLISECONDS,
-                                                                               Arrays.asList())
-                                                               .rechargeAfter(0,
-                                                                              TimeUnit.MILLISECONDS,
-                                                                              (Object) null)
-                                                               .rechargeAfter(0,
-                                                                              TimeUnit.MILLISECONDS,
-                                                                              (Object[]) null)
-                                                               .rechargeAfter(0,
-                                                                              TimeUnit.MILLISECONDS,
-                                                                              (Iterable<Object>) null)
-                                                               .rechargeAfter(0,
-                                                                              TimeUnit.MILLISECONDS,
-                                                                              new Object[0])
-                                                               .rechargeAfter(0,
-                                                                              TimeUnit.MILLISECONDS,
-                                                                              Arrays.asList());
+                                                                                                   gate.discharge(
+                                                                                                           (Object) null)
+                                                                                                       .discharge(
+                                                                                                               (Object[]) null)
+                                                                                                       .discharge(
+                                                                                                               (Iterable<Object>) null)
+                                                                                                       .discharge(
+                                                                                                               new Object[0])
+                                                                                                       .discharge(
+                                                                                                               Arrays.asList())
+                                                                                                       .dischargeAfter(
+                                                                                                               0,
+                                                                                                               TimeUnit.MILLISECONDS,
+                                                                                                               (Object) null)
+                                                                                                       .dischargeAfter(
+                                                                                                               0,
+                                                                                                               TimeUnit.MILLISECONDS,
+                                                                                                               (Object[]) null)
+                                                                                                       .dischargeAfter(
+                                                                                                               0,
+                                                                                                               TimeUnit.MILLISECONDS,
+                                                                                                               (Iterable<Object>) null)
+                                                                                                       .dischargeAfter(
+                                                                                                               0,
+                                                                                                               TimeUnit.MILLISECONDS,
+                                                                                                               new Object[0])
+                                                                                                       .dischargeAfter(
+                                                                                                               0,
+                                                                                                               TimeUnit.MILLISECONDS,
+                                                                                                               Arrays.asList())
+                                                                                                       .rechargeAfter(0,
+                                                                                                                      TimeUnit.MILLISECONDS,
+                                                                                                                      (Object) null)
+                                                                                                       .rechargeAfter(0,
+                                                                                                                      TimeUnit.MILLISECONDS,
+                                                                                                                      (Object[]) null)
+                                                                                                       .rechargeAfter(0,
+                                                                                                                      TimeUnit.MILLISECONDS,
+                                                                                                                      (Iterable<Object>) null)
+                                                                                                       .rechargeAfter(0,
+                                                                                                                      TimeUnit.MILLISECONDS,
+                                                                                                                      new Object[0])
+                                                                                                       .rechargeAfter(0,
+                                                                                                                      TimeUnit.MILLISECONDS,
+                                                                                                                      Arrays.asList());
 
-                                                           fail[0] = false;
-                                                       }
+                                                                                                   fail[0] = false;
+                                                                                               }
 
-                                                       @Override
-                                                       public void onFlush(
-                                                               final Floodgate<Object, Object> gate) {
+                                                                                               @Override
+                                                                                               public void onFlush(
+                                                                                                       final Floodgate<Object, Object> gate) {
 
-                                                           if (fail[0] || mFlushed) {
+                                                                                                   if (fail[0]
+                                                                                                           || mFlushed) {
 
-                                                               return;
-                                                           }
+                                                                                                       return;
+                                                                                                   }
 
-                                                           mFlushed = true;
+                                                                                                   mFlushed = true;
 
-                                                           fail[0] = true;
+                                                                                                   fail[0] = true;
 
-                                                           gate.discharge((Object) null)
-                                                               .discharge((Object[]) null)
-                                                               .discharge((Iterable<Object>) null)
-                                                               .discharge(new Object[0])
-                                                               .discharge(Arrays.asList())
-                                                               .dischargeAfter(0,
-                                                                               TimeUnit.MILLISECONDS,
-                                                                               (Object) null)
-                                                               .dischargeAfter(0,
-                                                                               TimeUnit.MILLISECONDS,
-                                                                               (Object[]) null)
-                                                               .dischargeAfter(0,
-                                                                               TimeUnit.MILLISECONDS,
-                                                                               (Iterable<Object>) null)
-                                                               .dischargeAfter(0,
-                                                                               TimeUnit.MILLISECONDS,
-                                                                               new Object[0])
-                                                               .dischargeAfter(0,
-                                                                               TimeUnit.MILLISECONDS,
-                                                                               Arrays.asList())
-                                                               .rechargeAfter(0,
-                                                                              TimeUnit.MILLISECONDS,
-                                                                              (Object) null)
-                                                               .rechargeAfter(0,
-                                                                              TimeUnit.MILLISECONDS,
-                                                                              (Object[]) null)
-                                                               .rechargeAfter(0,
-                                                                              TimeUnit.MILLISECONDS,
-                                                                              (Iterable<Object>) null)
-                                                               .rechargeAfter(0,
-                                                                              TimeUnit.MILLISECONDS,
-                                                                              new Object[0])
-                                                               .rechargeAfter(0,
-                                                                              TimeUnit.MILLISECONDS,
-                                                                              Arrays.asList());
+                                                                                                   gate.discharge(
+                                                                                                           (Object) null)
+                                                                                                       .discharge(
+                                                                                                               (Object[]) null)
+                                                                                                       .discharge(
+                                                                                                               (Iterable<Object>) null)
+                                                                                                       .discharge(
+                                                                                                               new Object[0])
+                                                                                                       .discharge(
+                                                                                                               Arrays.asList())
+                                                                                                       .dischargeAfter(
+                                                                                                               0,
+                                                                                                               TimeUnit.MILLISECONDS,
+                                                                                                               (Object) null)
+                                                                                                       .dischargeAfter(
+                                                                                                               0,
+                                                                                                               TimeUnit.MILLISECONDS,
+                                                                                                               (Object[]) null)
+                                                                                                       .dischargeAfter(
+                                                                                                               0,
+                                                                                                               TimeUnit.MILLISECONDS,
+                                                                                                               (Iterable<Object>) null)
+                                                                                                       .dischargeAfter(
+                                                                                                               0,
+                                                                                                               TimeUnit.MILLISECONDS,
+                                                                                                               new Object[0])
+                                                                                                       .dischargeAfter(
+                                                                                                               0,
+                                                                                                               TimeUnit.MILLISECONDS,
+                                                                                                               Arrays.asList())
+                                                                                                       .rechargeAfter(0,
+                                                                                                                      TimeUnit.MILLISECONDS,
+                                                                                                                      (Object) null)
+                                                                                                       .rechargeAfter(0,
+                                                                                                                      TimeUnit.MILLISECONDS,
+                                                                                                                      (Object[]) null)
+                                                                                                       .rechargeAfter(0,
+                                                                                                                      TimeUnit.MILLISECONDS,
+                                                                                                                      (Iterable<Object>) null)
+                                                                                                       .rechargeAfter(0,
+                                                                                                                      TimeUnit.MILLISECONDS,
+                                                                                                                      new Object[0])
+                                                                                                       .rechargeAfter(0,
+                                                                                                                      TimeUnit.MILLISECONDS,
+                                                                                                                      Arrays.asList());
 
-                                                           fail[0] = false;
-                                                       }
+                                                                                                   fail[0] = false;
+                                                                                               }
 
-                                                       @Override
-                                                       public void onDrop(
-                                                               final Floodgate<Object, Object> gate,
-                                                               final Object debris) {
+                                                                                               @Override
+                                                                                               public void onDrop(
+                                                                                                       final Floodgate<Object, Object> gate,
+                                                                                                       final Object debris) {
 
-                                                           if (fail[0] || !"test".equals(debris)) {
+                                                                                                   if (fail[0]
+                                                                                                           || !"test"
+                                                                                                           .equals(debris)) {
 
-                                                               gate.drop(debris);
+                                                                                                       gate.drop(
+                                                                                                               debris);
 
-                                                               return;
-                                                           }
+                                                                                                       return;
+                                                                                                   }
 
-                                                           fail[0] = true;
+                                                                                                   fail[0] = true;
 
-                                                           gate.discharge((Object) null)
-                                                               .discharge((Object[]) null)
-                                                               .discharge((Iterable<Object>) null)
-                                                               .discharge(new Object[0])
-                                                               .discharge(Arrays.asList())
-                                                               .dischargeAfter(0,
-                                                                               TimeUnit.MILLISECONDS,
-                                                                               (Object) null)
-                                                               .dischargeAfter(0,
-                                                                               TimeUnit.MILLISECONDS,
-                                                                               (Object[]) null)
-                                                               .dischargeAfter(0,
-                                                                               TimeUnit.MILLISECONDS,
-                                                                               (Iterable<Object>) null)
-                                                               .dischargeAfter(0,
-                                                                               TimeUnit.MILLISECONDS,
-                                                                               new Object[0])
-                                                               .dischargeAfter(0,
-                                                                               TimeUnit.MILLISECONDS,
-                                                                               Arrays.asList())
-                                                               .rechargeAfter(0,
-                                                                              TimeUnit.MILLISECONDS,
-                                                                              (Object) null)
-                                                               .rechargeAfter(0,
-                                                                              TimeUnit.MILLISECONDS,
-                                                                              (Object[]) null)
-                                                               .rechargeAfter(0,
-                                                                              TimeUnit.MILLISECONDS,
-                                                                              (Iterable<Object>) null)
-                                                               .rechargeAfter(0,
-                                                                              TimeUnit.MILLISECONDS,
-                                                                              new Object[0])
-                                                               .rechargeAfter(0,
-                                                                              TimeUnit.MILLISECONDS,
-                                                                              Arrays.asList());
+                                                                                                   gate.discharge(
+                                                                                                           (Object) null)
+                                                                                                       .discharge(
+                                                                                                               (Object[]) null)
+                                                                                                       .discharge(
+                                                                                                               (Iterable<Object>) null)
+                                                                                                       .discharge(
+                                                                                                               new Object[0])
+                                                                                                       .discharge(
+                                                                                                               Arrays.asList())
+                                                                                                       .dischargeAfter(
+                                                                                                               0,
+                                                                                                               TimeUnit.MILLISECONDS,
+                                                                                                               (Object) null)
+                                                                                                       .dischargeAfter(
+                                                                                                               0,
+                                                                                                               TimeUnit.MILLISECONDS,
+                                                                                                               (Object[]) null)
+                                                                                                       .dischargeAfter(
+                                                                                                               0,
+                                                                                                               TimeUnit.MILLISECONDS,
+                                                                                                               (Iterable<Object>) null)
+                                                                                                       .dischargeAfter(
+                                                                                                               0,
+                                                                                                               TimeUnit.MILLISECONDS,
+                                                                                                               new Object[0])
+                                                                                                       .dischargeAfter(
+                                                                                                               0,
+                                                                                                               TimeUnit.MILLISECONDS,
+                                                                                                               Arrays.asList())
+                                                                                                       .rechargeAfter(0,
+                                                                                                                      TimeUnit.MILLISECONDS,
+                                                                                                                      (Object) null)
+                                                                                                       .rechargeAfter(0,
+                                                                                                                      TimeUnit.MILLISECONDS,
+                                                                                                                      (Object[]) null)
+                                                                                                       .rechargeAfter(0,
+                                                                                                                      TimeUnit.MILLISECONDS,
+                                                                                                                      (Iterable<Object>) null)
+                                                                                                       .rechargeAfter(0,
+                                                                                                                      TimeUnit.MILLISECONDS,
+                                                                                                                      new Object[0])
+                                                                                                       .rechargeAfter(0,
+                                                                                                                      TimeUnit.MILLISECONDS,
+                                                                                                                      Arrays.asList());
 
-                                                           fail[0] = false;
+                                                                                                   fail[0] = false;
 
-                                                           gate.drop(debris);
-                                                       }
+                                                                                                   gate.drop(debris);
+                                                                                               }
 
-                                                   }
-                               )).thenFeedWith("test").thenFlow().backToSource().discharge("push");
+                                                                                           }
+        )).thenFeedWith("test").thenFlow().backToSource().discharge("push");
 
         if (fail[0]) {
 
@@ -481,81 +513,77 @@ public class StreamTest extends TestCase {
 
     public void testGate() {
 
-        final Basin<Object, Integer> basin =
-                Basin.collect(Waterfall.fallingFrom(new AbstractDam<Object, Integer>() {
+        final Basin<Object, Integer> basin = Basin.collect(Waterfall.fallingFrom(new AbstractDam<Object, Integer>() {
 
-                    @Override
-                    public void onDischarge(final Floodgate<Object, Integer> gate,
-                            final Object drop) {
+            @Override
+            public void onDischarge(final Floodgate<Object, Integer> gate, final Object drop) {
 
-                        if (drop instanceof Iterable) {
+                if (drop instanceof Iterable) {
 
-                            final Iterable<?> iterable = (Iterable<?>) drop;
+                    final Iterable<?> iterable = (Iterable<?>) drop;
 
-                            if (iterable.iterator().next() instanceof Integer) {
+                    if (iterable.iterator().next() instanceof Integer) {
 
-                                //noinspection unchecked
-                                gate.dischargeAfter(100, TimeUnit.MILLISECONDS,
-                                                    (Iterable<Integer>) drop);
+                        //noinspection unchecked
+                        gate.dischargeAfter(100, TimeUnit.MILLISECONDS, (Iterable<Integer>) drop);
 
-                            } else {
+                    } else {
 
-                                final ArrayList<Object> list = new ArrayList<Object>();
+                        final ArrayList<Object> list = new ArrayList<Object>();
 
-                                for (final Object obj : iterable) {
+                        for (final Object obj : iterable) {
 
-                                    list.add(Integer.valueOf(obj.toString()));
-                                }
-
-                                gate.rechargeAfter(100, TimeUnit.MILLISECONDS, list);
-                            }
-
-                        } else if (drop instanceof Integer) {
-
-                            final Integer integer = (Integer) drop;
-
-                            gate.dischargeAfter(integer, TimeUnit.MILLISECONDS, integer);
-
-                            if (Integer.valueOf(-1).equals(drop)) {
-
-                                gate.drain();
-                            }
-
-                        } else if (drop.getClass().isArray()) {
-
-                            if (drop.getClass().getComponentType().equals(String.class)) {
-
-                                final int length = Array.getLength(drop);
-
-                                final Object[] integers = new Object[length];
-
-                                for (int i = 0; i < length; i++) {
-
-                                    integers[i] = Integer.valueOf(Array.get(drop, i).toString());
-                                }
-
-                                gate.rechargeAfter(100, TimeUnit.MILLISECONDS, integers);
-
-                            } else {
-
-                                gate.dischargeAfter(100, TimeUnit.MILLISECONDS, (Integer[]) drop);
-                            }
-
-                        } else if (drop instanceof String) {
-
-                            gate.rechargeAfter(100, TimeUnit.MILLISECONDS,
-                                               Integer.valueOf(drop.toString()));
-
-                        } else if (drop instanceof Number) {
-
-                            gate.dropAfter(100, TimeUnit.MILLISECONDS, drop);
-
-                        } else {
-
-                            gate.redropAfter(100, TimeUnit.MILLISECONDS, 11);
+                            list.add(Integer.valueOf(obj.toString()));
                         }
+
+                        gate.rechargeAfter(100, TimeUnit.MILLISECONDS, list);
                     }
-                }));
+
+                } else if (drop instanceof Integer) {
+
+                    final Integer integer = (Integer) drop;
+
+                    gate.dischargeAfter(integer, TimeUnit.MILLISECONDS, integer);
+
+                    if (Integer.valueOf(-1).equals(drop)) {
+
+                        gate.drain();
+                    }
+
+                } else if (drop.getClass().isArray()) {
+
+                    if (drop.getClass().getComponentType().equals(String.class)) {
+
+                        final int length = Array.getLength(drop);
+
+                        final Object[] integers = new Object[length];
+
+                        for (int i = 0; i < length; i++) {
+
+                            integers[i] = Integer.valueOf(Array.get(drop, i).toString());
+                        }
+
+                        gate.rechargeAfter(100, TimeUnit.MILLISECONDS, integers);
+
+                    } else {
+
+                        gate.dischargeAfter(100, TimeUnit.MILLISECONDS, (Integer[]) drop);
+                    }
+
+                } else if (drop instanceof String) {
+
+                    gate.rechargeAfter(100, TimeUnit.MILLISECONDS, Integer.valueOf(drop.toString()));
+
+                } else if (drop instanceof Number) {
+
+                    gate.dropAfter(100, TimeUnit.MILLISECONDS, drop);
+
+                } else {
+
+                    gate.redropAfter(100, TimeUnit.MILLISECONDS, 11);
+                }
+            }
+        }));
 
         basin.thenFeedWith((Object) null);
         assertThat(basin.collectFirstOutput()).isNull();
@@ -666,8 +694,7 @@ public class StreamTest extends TestCase {
                     private final StringBuffer mBuffer = new StringBuffer();
 
                     @Override
-                    public void onDischarge(final Floodgate<Character, Integer> gate,
-                            final Character drop) {
+                    public void onDischarge(final Floodgate<Character, Integer> gate, final Character drop) {
 
                         mBuffer.append(drop);
                     }
@@ -681,29 +708,26 @@ public class StreamTest extends TestCase {
                     }
                 });
 
-        final Basin<Character, Integer> basin1 =
-                Basin.collect(stream1.thenFallingThrough(new OpenDam<Integer>() {
+        final Basin<Character, Integer> basin1 = Basin.collect(stream1.thenFallingThrough(new OpenDam<Integer>() {
 
-                    private int mSum;
+            private int mSum;
 
-                    @Override
-                    public void onDischarge(final Floodgate<Integer, Integer> gate,
-                            final Integer drop) {
+            @Override
+            public void onDischarge(final Floodgate<Integer, Integer> gate, final Integer drop) {
 
-                        mSum += drop;
-                    }
+                mSum += drop;
+            }
 
-                    @Override
-                    public void onFlush(final Floodgate<Integer, Integer> gate) {
+            @Override
+            public void onFlush(final Floodgate<Integer, Integer> gate) {
 
-                        gate.discharge(new Integer[]{mSum}).flush();
+                gate.discharge(new Integer[]{mSum}).flush();
 
-                        mSum = 0;
-                    }
-                }));
+                mSum = 0;
+            }
+        }));
 
-        final Stream<Integer, Integer, Integer> stream2 =
-                Waterfall.fallingFrom(new OpenDam<Integer>());
+        final Stream<Integer, Integer, Integer> stream2 = Waterfall.fallingFrom(new OpenDam<Integer>());
 
         stream2.thenJoiningInto(stream1).backToSource().discharge('0', '1', '2', '3');
         stream2.backToSource().discharge(0, 1, 2, 3);
@@ -716,8 +740,7 @@ public class StreamTest extends TestCase {
 
         stream2.backToSource().exhaust();
 
-        final Stream<Integer, Integer, Integer> stream3 =
-                Waterfall.fallingFrom(new OpenDam<Integer>());
+        final Stream<Integer, Integer, Integer> stream3 = Waterfall.fallingFrom(new OpenDam<Integer>());
 
         stream1.backToSource().discharge('0', '1', '2', '3');
         stream3.thenJoining(stream1).backToSource().discharge(Arrays.asList(4, 5, -4));
@@ -729,27 +752,28 @@ public class StreamTest extends TestCase {
 
         assertThat(output).containsExactly(128);
 
-        final Basin<Character, Integer> basin2 =
-                Basin.collect(stream1.thenFallingThrough(new OpenDam<Integer>() {
+        final Basin<Character, Integer> basin2 = Basin.collect(stream1.thenFallingThrough(new OpenDam<Integer>() {
 
-                                  private int mAbsSum;
+                                                                   private int mAbsSum;
 
-                                  @Override
-                                  public void onDischarge(final Floodgate<Integer, Integer> gate,
-                                          final Integer drop) {
+                                                                   @Override
+                                                                   public void onDischarge(
+                                                                           final Floodgate<Integer, Integer> gate,
+                                                                           final Integer drop) {
 
-                                      mAbsSum += Math.abs(drop);
-                                  }
+                                                                       mAbsSum += Math.abs(drop);
+                                                                   }
 
-                                  @Override
-                                  public void onFlush(final Floodgate<Integer, Integer> gate) {
+                                                                   @Override
+                                                                   public void onFlush(
+                                                                           final Floodgate<Integer, Integer> gate) {
 
-                                      gate.discharge(mAbsSum).flush();
+                                                                       gate.discharge(mAbsSum).flush();
 
-                                      mAbsSum = 0;
-                                  }
-                              })
-                );
+                                                                       mAbsSum = 0;
+                                                                   }
+                                                               })
+        );
 
         stream1.backToSource().discharge('0', '1', '2', '3');
         stream3.thenJoining(stream1).backToSource().discharge(Arrays.asList(4, 5, -4));
@@ -766,29 +790,24 @@ public class StreamTest extends TestCase {
         final Dam<Integer, Integer> openDam = Dams.openDam();
 
         final Stream<Integer, Integer, Integer> stream1 = Waterfall.fallingFrom(openDam);
-        final Stream<Integer, Integer, Integer> stream2 =
-                Waterfall.fallingFrom(new AbstractDam<Integer, Integer>() {
+        final Stream<Integer, Integer, Integer> stream2 = Waterfall.fallingFrom(new AbstractDam<Integer, Integer>() {
 
-                    @Override
-                    public void onDischarge(final Floodgate<Integer, Integer> gate,
-                            final Integer drop) {
+            @Override
+            public void onDischarge(final Floodgate<Integer, Integer> gate, final Integer drop) {
 
-                        gate.discharge(drop, drop);
-                    }
-                });
-        final Stream<Integer, Integer, Integer> stream3 =
-                Waterfall.fallingFrom(new AbstractDam<Integer, Integer>() {
+                gate.discharge(drop, drop);
+            }
+        });
+        final Stream<Integer, Integer, Integer> stream3 = Waterfall.fallingFrom(new AbstractDam<Integer, Integer>() {
 
-                    @Override
-                    public void onDischarge(final Floodgate<Integer, Integer> gate,
-                            final Integer drop) {
+            @Override
+            public void onDischarge(final Floodgate<Integer, Integer> gate, final Integer drop) {
 
-                        gate.discharge(Arrays.asList(drop + 1, drop + 1));
-                    }
-                });
+                gate.discharge(Arrays.asList(drop + 1, drop + 1));
+            }
+        });
 
-        assertThat(Basin.collect(stream1.thenMerging(stream1)).thenFeedWith(5).collectOutput())
-                .containsExactly(5);
+        assertThat(Basin.collect(stream1.thenMerging(stream1)).thenFeedWith(5).collectOutput()).containsExactly(5);
 
         final Basin<Integer, Integer> basin1 = Basin.collect(stream1.thenMerging(stream2));
 

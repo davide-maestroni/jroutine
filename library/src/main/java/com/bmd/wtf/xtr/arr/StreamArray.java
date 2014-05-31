@@ -35,8 +35,7 @@ import java.util.WeakHashMap;
  */
 public class StreamArray<SOURCE, IN, OUT> {
 
-    private static final WeakHashMap<Barrage<?, ?>, Void> sBarrages =
-            new WeakHashMap<Barrage<?, ?>, Void>();
+    private static final WeakHashMap<Barrage<?, ?>, Void> sBarrages = new WeakHashMap<Barrage<?, ?>, Void>();
 
     private final ArrayList<Stream<SOURCE, IN, OUT>> mStreams;
 
@@ -58,8 +57,7 @@ public class StreamArray<SOURCE, IN, OUT> {
             throw new IllegalArgumentException("the number of streams cannot be negative");
         }
 
-        final ArrayList<Stream<SOURCE, IN, OUT>> streams =
-                new ArrayList<Stream<SOURCE, IN, OUT>>(streamNumber);
+        final ArrayList<Stream<SOURCE, IN, OUT>> streams = new ArrayList<Stream<SOURCE, IN, OUT>>(streamNumber);
 
         for (int i = 0; i < streamNumber; ++i) {
 
@@ -109,10 +107,9 @@ public class StreamArray<SOURCE, IN, OUT> {
      *
      * @param factory The dam factory.
      * @param <NOUT>  The output data type.
-     * @return A new stream array flowing from the dams.
+     * @return A new stream array falling through the created dams.
      */
-    public <NOUT> StreamArray<SOURCE, OUT, NOUT> thenFallingThrough(
-            final DamFactory<OUT, NOUT> factory) {
+    public <NOUT> StreamArray<SOURCE, OUT, NOUT> thenFallingThrough(final DamFactory<OUT, NOUT> factory) {
 
         final ArrayList<Stream<SOURCE, IN, OUT>> streams = mStreams;
 
@@ -133,14 +130,13 @@ public class StreamArray<SOURCE, IN, OUT> {
      * Makes this stream array run into the currents created by the specified factory.
      *
      * @param factory The current factory.
-     * @return A new stream running into the created currents.
+     * @return A new stream array running into the created currents.
      */
     public StreamArray<SOURCE, IN, OUT> thenFlowingInto(final CurrentFactory factory) {
 
         final ArrayList<Stream<SOURCE, IN, OUT>> streams = mStreams;
 
-        final ArrayList<Stream<SOURCE, IN, OUT>> outStreams =
-                new ArrayList<Stream<SOURCE, IN, OUT>>(streams.size());
+        final ArrayList<Stream<SOURCE, IN, OUT>> outStreams = new ArrayList<Stream<SOURCE, IN, OUT>>(streams.size());
 
         int n = 0;
 
@@ -153,14 +149,39 @@ public class StreamArray<SOURCE, IN, OUT> {
     }
 
     /**
+     * Makes this stream array flow through the streams created by the specified factory.
+     *
+     * @param factory The stream factory.
+     * @param <NIN>   The input data type of the created stream.
+     * @param <NOUT>  The output data type of the created stream.
+     * @return A new stream array formed by the streams created by the factory.
+     */
+    public <NIN, NOUT> StreamArray<SOURCE, NIN, NOUT> thenFlowingThrough(
+            final StreamFactory<SOURCE, IN, OUT, NIN, NOUT> factory) {
+
+        final ArrayList<Stream<SOURCE, IN, OUT>> streams = mStreams;
+
+        final ArrayList<Stream<SOURCE, NIN, NOUT>> outStreams =
+                new ArrayList<Stream<SOURCE, NIN, NOUT>>(streams.size());
+
+        int n = 0;
+
+        for (final Stream<SOURCE, IN, OUT> stream : streams) {
+
+            outStreams.add(factory.createFrom(stream, n++));
+        }
+
+        return new StreamArray<SOURCE, NIN, NOUT>(outStreams);
+    }
+
+    /**
      * Makes this stream array flow through the specified barrage.
      *
      * @param barrage The barrage instance.
      * @param <NOUT>  The output data type.
-     * @return A new stream array flowing from the barrage.
+     * @return A new stream array flowing through the barrage.
      */
-    public <NOUT> StreamArray<SOURCE, OUT, NOUT> thenFlowingThrough(
-            final Barrage<OUT, NOUT> barrage) {
+    public <NOUT> StreamArray<SOURCE, OUT, NOUT> thenFlowingThrough(final Barrage<OUT, NOUT> barrage) {
 
         if (barrage == null) {
 
@@ -169,8 +190,7 @@ public class StreamArray<SOURCE, IN, OUT> {
 
         if (sBarrages.containsKey(barrage)) {
 
-            throw new DuplicateDamException(
-                    "the waterfall already contains the barrage: " + barrage);
+            throw new DuplicateDamException("the waterfall already contains the barrage: " + barrage);
         }
 
         sBarrages.put(barrage, null);
@@ -186,8 +206,7 @@ public class StreamArray<SOURCE, IN, OUT> {
 
         for (final Stream<SOURCE, IN, OUT> stream : streams) {
 
-            outStreams
-                    .add(stream.thenFallingThrough(new BarrageDam<OUT, NOUT>(mutex, n++, barrage)));
+            outStreams.add(stream.thenFallingThrough(new BarrageDam<OUT, NOUT>(mutex, n++, barrage)));
         }
 
         return new StreamArray<SOURCE, OUT, NOUT>(outStreams);

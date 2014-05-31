@@ -82,6 +82,8 @@ public class Downloader extends OpenDam<String> {
                 outputStream.write(buffer, 0, b);
             }
 
+            // Discharge the url if everything worked as expected
+
             super.onDischarge(gate, drop);
 
         } catch (final IOException e) {
@@ -95,9 +97,5 @@ public class Downloader extends OpenDam<String> {
             DownloadUtils.safeClose(outputStream);
             DownloadUtils.safeClose(inputStream);
         }
-
-        // Drop the url if everything worked as expected
-
-        gate.drop(drop);
     }
 }

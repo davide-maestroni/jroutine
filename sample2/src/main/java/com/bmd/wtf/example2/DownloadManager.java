@@ -16,15 +16,18 @@ package com.bmd.wtf.example2;
 import com.bmd.wtf.Waterfall;
 import com.bmd.wtf.crr.Currents;
 import com.bmd.wtf.dam.Dam;
+import com.bmd.wtf.dam.OpenDam;
+import com.bmd.wtf.example1.DownloadObserver;
 import com.bmd.wtf.example1.Downloader;
 import com.bmd.wtf.example1.UrlObserver;
+import com.bmd.wtf.src.Floodgate;
 import com.bmd.wtf.src.Spring;
 import com.bmd.wtf.xtr.arr.CurrentFactories;
 import com.bmd.wtf.xtr.arr.DamFactory;
 import com.bmd.wtf.xtr.arr.WaterfallArray;
 import com.bmd.wtf.xtr.fld.FloodControl;
 import com.bmd.wtf.xtr.qdc.Aqueduct;
-import com.bmd.wtf.xtr.qdc.QueueArchway;
+import com.bmd.wtf.xtr.qdc.RotatingArchway;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,36 +41,36 @@ public class DownloadManager {
     private final FloodControl<String, String, UrlObserver> mControl =
             new FloodControl<String, String, UrlObserver>(UrlObserver.class);
 
-    private final Spring<String> mDownloadSpring;
+    private final Spring<String> mSpring;
 
     public DownloadManager(final int maxThreads, final File downloadDir) throws IOException {
 
         if (!downloadDir.isDirectory() && !downloadDir.mkdirs()) {
 
-            throw new IOException(
-                    "Could not create temp directory: " + downloadDir.getAbsolutePath());
+            throw new IOException("Could not create temp directory: " + downloadDir.getAbsolutePath());
         }
 
-        final QueueArchway<String> archway = new QueueArchway<String>();
+        final DownloadObserver downloadObserver = new DownloadObserver(downloadDir);
 
-        final ConsumeObserver downloadObserver = new ConsumeObserver(archway, downloadDir);
+        mSpring = WaterfallArray.formingFrom(
+                Aqueduct.fedBy(Waterfall.fallingFrom(mControl.leveeControlledBy(downloadObserver)))
+                        .thenSeparatingIn(maxThreads).thenFlowingThrough(new RotatingArchway<String>())
+        ).thenFlowingInto(CurrentFactories.singletonCurrentFactory(Currents.threadPoolCurrent(maxThreads)))
+                                .thenFallingThrough(new DamFactory<String, String>() {
 
-        mDownloadSpring = WaterfallArray.formingFrom(Aqueduct.binding(
-                Waterfall.fallingFrom(mControl.leveeControlledBy(downloadObserver)))
-                                                             .thenSeparatingIn(maxThreads)
-                                                             .thenFallingThrough(archway))
-                                        .thenFlowingInto(CurrentFactories.singletonCurrentFactory(
-                                                Currents.threadPoolCurrent(maxThreads)))
-                                        .thenFallingThrough(new DamFactory<String, String>() {
+                                    @Override
+                                    public Dam<String, String> createForStream(final int streamNumber) {
 
-                                            @Override
-                                            public Dam<String, String> createForStream(
-                                                    final int streamNumber) {
+                                        return new Downloader(downloadDir);
+                                    }
+                                }).thenMergingThrough(new OpenDam<String>() {
 
-                                                return new Downloader(downloadDir);
-                                            }
-                                        }).thenMergingThrough(
-                        mControl.leveeControlledBy(downloadObserver)).backToSource();
+                    @Override
+                    public void onDischarge(final Floodgate<String, String> gate, final String drop) {
+
+                        gate.drop(drop);
+                    }
+                }).thenFallingThrough(mControl.leveeControlledBy(downloadObserver)).backToSource();
     }
 
     public static void main(final String args[]) throws IOException {
@@ -86,10 +89,15 @@ public class DownloadManager {
 
     public void download(final String url) {
 
-        mDownloadSpring.discharge(url);
+        mSpring.discharge(url);
     }
 
     public boolean isComplete(final String url) {
+
+        return !mControl.controller().isDownloading(url);
+    }
+
+    public boolean isDownloaded(final String url) {
 
         return mControl.controller().isDownloaded(url);
     }

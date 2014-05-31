@@ -42,11 +42,9 @@ class DataPool<IN, OUT> implements Pool<IN> {
 
     final Current inputCurrent;
 
-    final CopyOnWriteArraySet<Stream<?, ?, IN>> inputStreams =
-            new CopyOnWriteArraySet<Stream<?, ?, IN>>();
+    final CopyOnWriteArraySet<Stream<?, ?, IN>> inputStreams = new CopyOnWriteArraySet<Stream<?, ?, IN>>();
 
-    final CopyOnWriteArraySet<Stream<?, IN, OUT>> outputStreams =
-            new CopyOnWriteArraySet<Stream<?, IN, OUT>>();
+    final CopyOnWriteArraySet<Stream<?, IN, OUT>> outputStreams = new CopyOnWriteArraySet<Stream<?, IN, OUT>>();
 
     private final Condition mCondition;
 

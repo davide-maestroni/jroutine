@@ -30,24 +30,23 @@ public class DamTest extends TestCase {
 
     public void testClosed() {
 
-        final Basin<Object, Object> basin1 =
-                Basin.collect(Waterfall.fallingFrom(new AbstractDam<Object, Object>() {
+        final Basin<Object, Object> basin1 = Basin.collect(Waterfall.fallingFrom(new AbstractDam<Object, Object>() {
 
-                                  @Override
-                                  public void onDischarge(final Floodgate<Object, Object> gate,
-                                          final Object drop) {
+                                                               @Override
+                                                               public void onDischarge(
+                                                                       final Floodgate<Object, Object> gate,
+                                                                       final Object drop) {
 
-                                      if (drop == null) {
+                                                                   if (drop == null) {
 
-                                          throw new IllegalArgumentException();
-                                      }
+                                                                       throw new IllegalArgumentException();
+                                                                   }
 
-                                      gate.discharge(drop);
-                                  }
-                              }).thenFallingThrough(Dams.openDam())
-                );
-        final Basin<Object, Object> basin2 =
-                Basin.collect(basin1.thenFlow().thenFallingThrough(Dams.closedDam()));
+                                                                   gate.discharge(drop);
+                                                               }
+                                                           }).thenFallingThrough(Dams.openDam())
+        );
+        final Basin<Object, Object> basin2 = Basin.collect(basin1.thenFlow().thenFallingThrough(Dams.closedDam()));
 
         basin1.thenFeedWith("test");
         assertThat(basin1.collectFirstOutput()).isEqualTo("test");
@@ -116,25 +115,25 @@ public class DamTest extends TestCase {
 
     public void testDownstreamError() {
 
-        final Basin<Object, Object> basin1 =
-                Basin.collect(Waterfall.fallingFrom(new OpenDam<Object>() {
+        final Basin<Object, Object> basin1 = Basin.collect(Waterfall.fallingFrom(new OpenDam<Object>() {
 
-                                  @Override
-                                  public void onDischarge(final Floodgate<Object, Object> gate,
-                                          final Object drop) {
+                                                               @Override
+                                                               public void onDischarge(
+                                                                       final Floodgate<Object, Object> gate,
+                                                                       final Object drop) {
 
-                                      final String string = drop.toString();
+                                                                   final String string = drop.toString();
 
-                                      if (string.startsWith("push")) {
+                                                                   if (string.startsWith("push")) {
 
-                                          throw new IllegalStateException(string);
-                                      }
+                                                                       throw new IllegalStateException(string);
+                                                                   }
 
-                                      super.onDischarge(gate, drop);
-                                  }
+                                                                   super.onDischarge(gate, drop);
+                                                               }
 
-                              })
-                );
+                                                           })
+        );
         final Basin<Object, Object> basin2 =
                 Basin.collect(basin1.thenFlow().thenFallingThrough(new Dam<Object, Object>() {
 
@@ -147,8 +146,7 @@ public class DamTest extends TestCase {
 
                                                                            mLast = drop;
 
-                                                                           if ("discharge1"
-                                                                                   .equals(drop)) {
+                                                                           if ("discharge1".equals(drop)) {
 
                                                                                throw new IllegalArgumentException(
                                                                                        "discharge1");
@@ -161,8 +159,7 @@ public class DamTest extends TestCase {
                                                                        public void onFlush(
                                                                                final Floodgate<Object, Object> gate) {
 
-                                                                           if ("flush1"
-                                                                                   .equals(mLast)) {
+                                                                           if ("flush1".equals(mLast)) {
 
                                                                                throw new IllegalArgumentException(
                                                                                        "flush1");
@@ -176,8 +173,7 @@ public class DamTest extends TestCase {
                                                                                final Floodgate<Object, Object> gate,
                                                                                final Object debris) {
 
-                                                                           if ((debris instanceof Throwable)
-                                                                                   && "push1"
+                                                                           if ((debris instanceof Throwable) && "push1"
                                                                                    .equals(((Throwable) debris)
                                                                                                    .getMessage())) {
 
@@ -202,23 +198,18 @@ public class DamTest extends TestCase {
 
                                                                            mLast = drop;
 
-                                                                           if ("discharge2"
-                                                                                   .equals(drop)) {
+                                                                           if ("discharge2".equals(drop)) {
 
                                                                                throw new IllegalArgumentException(
                                                                                        "discharge2");
                                                                            }
 
-                                                                           final String string =
-                                                                                   drop.toString();
+                                                                           final String string = drop.toString();
 
-                                                                           if (string.startsWith(
-                                                                                   "pull") || string
-                                                                                   .startsWith(
-                                                                                           "push")) {
+                                                                           if (string.startsWith("pull") || string
+                                                                                   .startsWith("push")) {
 
-                                                                               throw new IllegalStateException(
-                                                                                       string);
+                                                                               throw new IllegalStateException(string);
 
                                                                            } else {
 
@@ -230,8 +221,7 @@ public class DamTest extends TestCase {
                                                                        public void onFlush(
                                                                                final Floodgate<Object, Object> gate) {
 
-                                                                           if ("flush2"
-                                                                                   .equals(mLast)) {
+                                                                           if ("flush2".equals(mLast)) {
 
                                                                                throw new IllegalArgumentException(
                                                                                        "flush2");
@@ -245,8 +235,7 @@ public class DamTest extends TestCase {
                                                                                final Floodgate<Object, Object> gate,
                                                                                final Object debris) {
 
-                                                                           if ((debris instanceof Throwable)
-                                                                                   && "push2"
+                                                                           if ((debris instanceof Throwable) && "push2"
                                                                                    .equals(((Throwable) debris)
                                                                                                    .getMessage())) {
 
@@ -360,153 +349,150 @@ public class DamTest extends TestCase {
 
     public void testNoError() {
 
-        final Basin<Object, Object> basin1 =
-                Basin.collect(Waterfall.fallingFrom(new OpenDam<Object>() {
+        final Basin<Object, Object> basin1 = Basin.collect(Waterfall.fallingFrom(new OpenDam<Object>() {
 
-                                  @Override
-                                  public void onDischarge(final Floodgate<Object, Object> gate,
-                                          final Object drop) {
+                                                               @Override
+                                                               public void onDischarge(
+                                                                       final Floodgate<Object, Object> gate,
+                                                                       final Object drop) {
 
-                                      final String string = drop.toString();
+                                                                   final String string = drop.toString();
 
-                                      if (string.startsWith("push")) {
+                                                                   if (string.startsWith("push")) {
 
-                                          throw new IllegalStateException(string);
-                                      }
+                                                                       throw new IllegalStateException(string);
+                                                                   }
 
-                                      super.onDischarge(gate, drop);
-                                  }
+                                                                   super.onDischarge(gate, drop);
+                                                               }
 
-                              })
+                                                           })
+        );
+        final Basin<Object, Object> basin2 =
+                Basin.collect(basin1.thenFlow().thenFallingThrough(Dams.noDebris(new Dam<Object, Object>() {
+
+                                                                                     private Object mLast;
+
+                                                                                     @Override
+                                                                                     public void onDischarge(
+                                                                                             final Floodgate<Object, Object> gate,
+                                                                                             final Object drop) {
+
+                                                                                         mLast = drop;
+
+                                                                                         if ("discharge1"
+                                                                                                 .equals(drop)) {
+
+                                                                                             throw new IllegalArgumentException(
+                                                                                                     "discharge1");
+                                                                                         }
+
+                                                                                         gate.discharge(drop);
+                                                                                     }
+
+                                                                                     @Override
+                                                                                     public void onFlush(
+                                                                                             final Floodgate<Object, Object> gate) {
+
+                                                                                         if ("flush1".equals(mLast)) {
+
+                                                                                             throw new IllegalArgumentException(
+                                                                                                     "flush1");
+                                                                                         }
+
+                                                                                         gate.flush();
+                                                                                     }
+
+                                                                                     @Override
+                                                                                     public void onDrop(
+                                                                                             final Floodgate<Object, Object> gate,
+                                                                                             final Object debris) {
+
+                                                                                         if ((debris instanceof Throwable)
+                                                                                                 && "push1"
+                                                                                                 .equals(((Throwable) debris)
+                                                                                                                 .getMessage()
+                                                                                                 )) {
+
+                                                                                             throw new IllegalArgumentException(
+                                                                                                     "push1");
+                                                                                         }
+
+                                                                                         gate.drop(debris);
+                                                                                     }
+                                                                                 }
+                                                                   )
+                              )
                 );
-        final Basin<Object, Object> basin2 = Basin.collect(
-                basin1.thenFlow().thenFallingThrough(Dams.noDebris(new Dam<Object, Object>() {
+        final Basin<Object, Object> basin3 =
+                Basin.collect(basin2.thenFlow().thenFallingThrough(Dams.noDebris(new Dam<Object, Object>() {
 
-                                                                       private Object mLast;
+                                                                                     private Object mLast;
 
-                                                                       @Override
-                                                                       public void onDischarge(
-                                                                               final Floodgate<Object, Object> gate,
-                                                                               final Object drop) {
+                                                                                     @Override
+                                                                                     public void onDischarge(
+                                                                                             final Floodgate<Object, Object> gate,
+                                                                                             final Object drop) {
 
-                                                                           mLast = drop;
+                                                                                         mLast = drop;
 
-                                                                           if ("discharge1"
-                                                                                   .equals(drop)) {
+                                                                                         if ("discharge2"
+                                                                                                 .equals(drop)) {
 
-                                                                               throw new IllegalArgumentException(
-                                                                                       "discharge1");
-                                                                           }
+                                                                                             throw new IllegalArgumentException(
+                                                                                                     "discharge2");
+                                                                                         }
 
-                                                                           gate.discharge(drop);
-                                                                       }
+                                                                                         final String string =
+                                                                                                 drop.toString();
 
-                                                                       @Override
-                                                                       public void onFlush(
-                                                                               final Floodgate<Object, Object> gate) {
+                                                                                         if (string.startsWith("pull")
+                                                                                                 || string
+                                                                                                 .startsWith("push")) {
 
-                                                                           if ("flush1"
-                                                                                   .equals(mLast)) {
+                                                                                             throw new IllegalStateException(
+                                                                                                     string);
 
-                                                                               throw new IllegalArgumentException(
-                                                                                       "flush1");
-                                                                           }
+                                                                                         } else {
 
-                                                                           gate.flush();
-                                                                       }
+                                                                                             gate.discharge(drop);
+                                                                                         }
+                                                                                     }
 
-                                                                       @Override
-                                                                       public void onDrop(
-                                                                               final Floodgate<Object, Object> gate,
-                                                                               final Object debris) {
+                                                                                     @Override
+                                                                                     public void onFlush(
+                                                                                             final Floodgate<Object, Object> gate) {
 
-                                                                           if ((debris instanceof Throwable)
-                                                                                   && "push1"
-                                                                                   .equals(((Throwable) debris)
-                                                                                                   .getMessage()
-                                                                                   )) {
+                                                                                         if ("flush2".equals(mLast)) {
 
-                                                                               throw new IllegalArgumentException(
-                                                                                       "push1");
-                                                                           }
+                                                                                             throw new IllegalArgumentException(
+                                                                                                     "flush2");
+                                                                                         }
 
-                                                                           gate.drop(debris);
-                                                                       }
-                                                                   }
-                                                     )
-                )
-        );
-        final Basin<Object, Object> basin3 = Basin.collect(
-                basin2.thenFlow().thenFallingThrough(Dams.noDebris(new Dam<Object, Object>() {
+                                                                                         gate.flush();
+                                                                                     }
 
-                                                                       private Object mLast;
+                                                                                     @Override
+                                                                                     public void onDrop(
+                                                                                             final Floodgate<Object, Object> gate,
+                                                                                             final Object debris) {
 
-                                                                       @Override
-                                                                       public void onDischarge(
-                                                                               final Floodgate<Object, Object> gate,
-                                                                               final Object drop) {
+                                                                                         if ((debris instanceof Throwable)
+                                                                                                 && "push2"
+                                                                                                 .equals(((Throwable) debris)
+                                                                                                                 .getMessage()
+                                                                                                 )) {
 
-                                                                           mLast = drop;
+                                                                                             throw new IllegalArgumentException(
+                                                                                                     "push2");
+                                                                                         }
 
-                                                                           if ("discharge2"
-                                                                                   .equals(drop)) {
-
-                                                                               throw new IllegalArgumentException(
-                                                                                       "discharge2");
-                                                                           }
-
-                                                                           final String string =
-                                                                                   drop.toString();
-
-                                                                           if (string.startsWith(
-                                                                                   "pull") || string
-                                                                                   .startsWith(
-                                                                                           "push")) {
-
-                                                                               throw new IllegalStateException(
-                                                                                       string);
-
-                                                                           } else {
-
-                                                                               gate.discharge(drop);
-                                                                           }
-                                                                       }
-
-                                                                       @Override
-                                                                       public void onFlush(
-                                                                               final Floodgate<Object, Object> gate) {
-
-                                                                           if ("flush2"
-                                                                                   .equals(mLast)) {
-
-                                                                               throw new IllegalArgumentException(
-                                                                                       "flush2");
-                                                                           }
-
-                                                                           gate.flush();
-                                                                       }
-
-                                                                       @Override
-                                                                       public void onDrop(
-                                                                               final Floodgate<Object, Object> gate,
-                                                                               final Object debris) {
-
-                                                                           if ((debris instanceof Throwable)
-                                                                                   && "push2"
-                                                                                   .equals(((Throwable) debris)
-                                                                                                   .getMessage()
-                                                                                   )) {
-
-                                                                               throw new IllegalArgumentException(
-                                                                                       "push2");
-                                                                           }
-
-                                                                           gate.drop(debris);
-                                                                       }
-                                                                   }
-                                                     )
-                )
-        );
+                                                                                         gate.drop(debris);
+                                                                                     }
+                                                                                 }
+                                                                   )
+                              )
+                );
 
         basin2.thenFeedWith("discharge");
         assertThat(basin1.collectOutput()).containsExactly("discharge");
@@ -662,8 +648,7 @@ public class DamTest extends TestCase {
             @Override
             public void onDrop(final Floodgate<Object, Object> gate, final Object debris) {
 
-                if ((debris instanceof Throwable) && "push1"
-                        .equals(((Throwable) debris).getMessage())) {
+                if ((debris instanceof Throwable) && "push1".equals(((Throwable) debris).getMessage())) {
 
                     throw new IllegalArgumentException("push1");
                 }
@@ -713,8 +698,7 @@ public class DamTest extends TestCase {
             @Override
             public void onDrop(final Floodgate<Object, Object> gate, final Object debris) {
 
-                if ((debris instanceof Throwable) && "push2"
-                        .equals(((Throwable) debris).getMessage())) {
+                if ((debris instanceof Throwable) && "push2".equals(((Throwable) debris).getMessage())) {
 
                     throw new IllegalArgumentException("push2");
                 }
@@ -722,8 +706,7 @@ public class DamTest extends TestCase {
                 gate.drop(debris);
             }
         };
-        final Basin<Object, Object> basin2 =
-                Basin.collect(basin1.thenFlow().thenFallingThrough(Dams.weak(dam2, true)));
+        final Basin<Object, Object> basin2 = Basin.collect(basin1.thenFlow().thenFallingThrough(Dams.weak(dam2, true)));
 
         basin2.thenFeedWith("discharge");
         assertThat(basin1.collectOutput()).containsExactly("discharge");

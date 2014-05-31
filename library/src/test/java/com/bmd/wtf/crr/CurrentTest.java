@@ -52,8 +52,7 @@ public class CurrentTest extends TestCase {
         assertThat(pool.getDrop()).isEqualTo("delay2");
 
         now = System.currentTimeMillis();
-        current.dischargeAfter(pool, 1, TimeUnit.SECONDS,
-                               Arrays.asList("delay1", "delay2", "delay3"));
+        current.dischargeAfter(pool, 1, TimeUnit.SECONDS, Arrays.asList("delay1", "delay2", "delay3"));
         assertThat(pool.getTime()).isGreaterThanOrEqualTo(now + 1000);
         assertThat(pool.getDrop()).isEqualTo("delay3");
 
@@ -107,8 +106,7 @@ public class CurrentTest extends TestCase {
 
         now = System.currentTimeMillis();
         pool.reset();
-        current.dischargeAfter(pool, 1, TimeUnit.SECONDS,
-                               Arrays.asList("delay1", "delay2", "delay3"));
+        current.dischargeAfter(pool, 1, TimeUnit.SECONDS, Arrays.asList("delay1", "delay2", "delay3"));
         pool.waitCall();
         assertThat(pool.getTime()).isGreaterThanOrEqualTo(now + 1000);
         assertThat(pool.getDrop()).isEqualTo("delay3");
@@ -164,8 +162,7 @@ public class CurrentTest extends TestCase {
         assertThat(pool.getDrop()).isEqualTo("delay2");
 
         now = System.currentTimeMillis();
-        current.dischargeAfter(pool, 1, TimeUnit.SECONDS,
-                               Arrays.asList("delay1", "delay2", "delay3"));
+        current.dischargeAfter(pool, 1, TimeUnit.SECONDS, Arrays.asList("delay1", "delay2", "delay3"));
         assertThat(pool.getTime()).isGreaterThanOrEqualTo(now + 1000);
         assertThat(pool.getDrop()).isEqualTo("delay3");
 

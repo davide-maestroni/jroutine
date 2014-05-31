@@ -65,8 +65,7 @@ public class WaterfallArray<SOURCE, IN, OUT> {
      *                 pool.
      * @return The new waterfall.
      */
-    public static <SOURCE, IN, OUT> WaterfallArray<SOURCE, IN, OUT> formingFrom(
-            final Stream<SOURCE, IN, OUT> stream) {
+    public static <SOURCE, IN, OUT> WaterfallArray<SOURCE, IN, OUT> formingFrom(final Stream<SOURCE, IN, OUT> stream) {
 
         return new WaterfallArray<SOURCE, IN, OUT>(stream);
     }
@@ -81,8 +80,7 @@ public class WaterfallArray<SOURCE, IN, OUT> {
      *                 pool.
      * @return The new stream array.
      */
-    public static <SOURCE, IN, OUT> StreamArray<SOURCE, IN, OUT> formingFrom(
-            final Stream<SOURCE, IN, OUT>... streams) {
+    public static <SOURCE, IN, OUT> StreamArray<SOURCE, IN, OUT> formingFrom(final Stream<SOURCE, IN, OUT>... streams) {
 
         if ((streams == null) || (streams.length == 0)) {
 
@@ -105,8 +103,7 @@ public class WaterfallArray<SOURCE, IN, OUT> {
     public static <SOURCE, IN, OUT> StreamArray<SOURCE, IN, OUT> formingFrom(
             final Iterable<? extends Stream<SOURCE, IN, OUT>> streams) {
 
-        final LinkedHashSet<Stream<SOURCE, IN, OUT>> streamList =
-                new LinkedHashSet<Stream<SOURCE, IN, OUT>>();
+        final LinkedHashSet<Stream<SOURCE, IN, OUT>> streamList = new LinkedHashSet<Stream<SOURCE, IN, OUT>>();
 
         for (final Stream<SOURCE, IN, OUT> stream : streams) {
 

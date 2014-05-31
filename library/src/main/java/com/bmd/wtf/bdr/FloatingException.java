@@ -97,8 +97,8 @@ public class FloatingException extends RuntimeException {
     /**
      * Overrides {@link RuntimeException#RuntimeException(String, Throwable, boolean, boolean)}.
      */
-    public FloatingException(final String message, final Throwable cause,
-            final boolean enableSuppression, final boolean writableStackTrace) {
+    public FloatingException(final String message, final Throwable cause, final boolean enableSuppression,
+            final boolean writableStackTrace) {
 
         this(message, cause, enableSuppression, writableStackTrace, null);
     }
@@ -107,9 +107,8 @@ public class FloatingException extends RuntimeException {
      * Like {@link RuntimeException#RuntimeException(String, Throwable, boolean, boolean)} with an
      * additional debris parameter.
      */
-    public FloatingException(final String message, final Throwable cause,
-            final boolean enableSuppression, final boolean writableStackTrace,
-            final Object debris) {
+    public FloatingException(final String message, final Throwable cause, final boolean enableSuppression,
+            final boolean writableStackTrace, final Object debris) {
 
         super(message, cause, enableSuppression, writableStackTrace);
 

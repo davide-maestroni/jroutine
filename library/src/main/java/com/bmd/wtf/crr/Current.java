@@ -60,8 +60,7 @@ public interface Current {
      * @param drops    The iterable returning the drops of data to discharge.
      * @param <DATA>   The data type.
      */
-    public <DATA> void dischargeAfter(Pool<DATA> pool, long delay, TimeUnit timeUnit,
-            Iterable<? extends DATA> drops);
+    public <DATA> void dischargeAfter(Pool<DATA> pool, long delay, TimeUnit timeUnit, Iterable<? extends DATA> drops);
 
     /**
      * This method is called when an object must be dropped downstream through the current.

@@ -192,8 +192,7 @@ public class FloodTest extends TestCase {
                                                .thenFallingThrough(new OpenDam<String>() {
 
                                                    @Override
-                                                   public void onDischarge(
-                                                           final Floodgate<String, String> gate,
+                                                   public void onDischarge(final Floodgate<String, String> gate,
                                                            final String drop) {
 
                                                        if ("pull".equals(drop)) {
@@ -296,8 +295,7 @@ public class FloodTest extends TestCase {
         }
     }
 
-    private static class TestObserverImpl extends OpenDam<String>
-            implements FloodObserver<String, String> {
+    private static class TestObserverImpl extends OpenDam<String> implements FloodObserver<String, String> {
 
     }
 }

@@ -37,6 +37,7 @@ public class DownloadObserver extends OpenDam<String> implements UrlObserver {
         mDir = downloadDir;
     }
 
+    @Override
     public boolean isDownloaded(final String url) {
 
         return mDownloadedUrls.contains(url);

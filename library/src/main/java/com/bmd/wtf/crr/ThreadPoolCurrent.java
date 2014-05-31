@@ -54,8 +54,8 @@ public class ThreadPoolCurrent implements Current {
     }
 
     @Override
-    public <DATA> void dischargeAfter(final Pool<DATA> pool, final long delay,
-            final TimeUnit timeUnit, final DATA drop) {
+    public <DATA> void dischargeAfter(final Pool<DATA> pool, final long delay, final TimeUnit timeUnit,
+            final DATA drop) {
 
         mService.schedule(new Runnable() {
 
@@ -69,8 +69,8 @@ public class ThreadPoolCurrent implements Current {
     }
 
     @Override
-    public <DATA> void dischargeAfter(final Pool<DATA> pool, final long delay,
-            final TimeUnit timeUnit, final Iterable<? extends DATA> drops) {
+    public <DATA> void dischargeAfter(final Pool<DATA> pool, final long delay, final TimeUnit timeUnit,
+            final Iterable<? extends DATA> drops) {
 
         for (final DATA drop : drops) {
 
@@ -100,8 +100,7 @@ public class ThreadPoolCurrent implements Current {
     }
 
     @Override
-    public void dropAfter(final Pool<?> pool, final long delay, final TimeUnit timeUnit,
-            final Object debris) {
+    public void dropAfter(final Pool<?> pool, final long delay, final TimeUnit timeUnit, final Object debris) {
 
         mService.schedule(new Runnable() {
 

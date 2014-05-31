@@ -45,8 +45,7 @@ public interface Floodgate<IN, OUT> extends Spring<OUT> {
     public Floodgate<IN, OUT> dischargeAfter(long delay, TimeUnit timeUnit, OUT... drops);
 
     @Override
-    public Floodgate<IN, OUT> dischargeAfter(long delay, TimeUnit timeUnit,
-            Iterable<? extends OUT> drops);
+    public Floodgate<IN, OUT> dischargeAfter(long delay, TimeUnit timeUnit, Iterable<? extends OUT> drops);
 
     @Override
     public Floodgate<IN, OUT> drop(Object debris);
@@ -92,8 +91,7 @@ public interface Floodgate<IN, OUT> extends Spring<OUT> {
      * @param drops    The iterable returning the drops of data to discharge.
      * @return This gate.
      */
-    public Floodgate<IN, OUT> rechargeAfter(long delay, TimeUnit timeUnit,
-            Iterable<? extends IN> drops);
+    public Floodgate<IN, OUT> rechargeAfter(long delay, TimeUnit timeUnit, Iterable<? extends IN> drops);
 
     /**
      * Drops again the specified debris into the same {@link Pool} associated with this gate,

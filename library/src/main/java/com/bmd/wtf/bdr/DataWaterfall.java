@@ -40,8 +40,7 @@ public class DataWaterfall {
      * @param <OUT>        The output data type.
      * @return The newly created stream.
      */
-    public static <IN, OUT> Stream<IN, IN, OUT> flowingThrough(final Current inputCurrent,
-            final Dam<IN, OUT> dam) {
+    public static <IN, OUT> Stream<IN, IN, OUT> flowingThrough(final Current inputCurrent, final Dam<IN, OUT> dam) {
 
         final DataPool<IN, OUT> pool = new DataPool<IN, OUT>(inputCurrent, dam);
         final DataSpring<IN> spring = new DataSpring<IN>();

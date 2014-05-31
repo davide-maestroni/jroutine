@@ -68,7 +68,7 @@ public class Aqueduct<SOURCE, IN, OUT> {
     }
 
     /**
-     * Creates an aqueduct bound to the specified stream.
+     * Creates an aqueduct connected to the specified stream.
      *
      * @param stream   The data source stream.
      * @param <SOURCE> The spring data type.
@@ -76,8 +76,7 @@ public class Aqueduct<SOURCE, IN, OUT> {
      * @param <OUT>    The transported data type, that is the output data type of the upstream pool.
      * @return The new aqueduct.
      */
-    public static <SOURCE, IN, OUT> Aqueduct<SOURCE, IN, OUT> binding(
-            final Stream<SOURCE, IN, OUT> stream) {
+    public static <SOURCE, IN, OUT> Aqueduct<SOURCE, IN, OUT> fedBy(final Stream<SOURCE, IN, OUT> stream) {
 
         return new Aqueduct<SOURCE, IN, OUT>(stream, 1);
     }
@@ -85,28 +84,37 @@ public class Aqueduct<SOURCE, IN, OUT> {
     /**
      * Crosses the gap by making data flowing through the specified archway.
      *
-     * @param arch   The archway.
-     * @param <NOUT> The output data type.
+     * @param archway The archway.
+     * @param <NOUT>  The output data type.
      * @return The new aqueduct.
      */
-    public <NOUT> Aqueduct<SOURCE, NOUT, NOUT> thenCrossingThrough(final Archway<OUT, NOUT> arch) {
+    public <NOUT> Aqueduct<SOURCE, NOUT, NOUT> thenCrossingThrough(final Archway<OUT, NOUT> archway) {
 
-        final List<Stream<SOURCE, NOUT, NOUT>> streams = thenFallingThrough(arch);
+        final List<Stream<SOURCE, NOUT, NOUT>> streams = thenFlowingThrough(archway);
 
         return new Aqueduct<SOURCE, NOUT, NOUT>(streams.get(0).thenMerging(streams), 1);
     }
 
     /**
+     * Returns this aqueduct output stream.
+     *
+     * @return The output stream.
+     */
+    public Stream<SOURCE, IN, OUT> thenFalling() {
+
+        return mInputStream;
+    }
+
+    /**
      * Makes this aqueduct flow through the specified archway and returns the resulting streams.
      *
-     * @param arch   The archway.
-     * @param <NOUT> The output data type.
+     * @param archway The archway.
+     * @param <NOUT>  The output data type.
      * @return The list of streams.
      */
-    public <NOUT> List<Stream<SOURCE, NOUT, NOUT>> thenFallingThrough(
-            final Archway<OUT, NOUT> arch) {
+    public <NOUT> List<Stream<SOURCE, NOUT, NOUT>> thenFlowingThrough(final Archway<OUT, NOUT> archway) {
 
-        if (arch == null) {
+        if (archway == null) {
 
             throw new IllegalArgumentException("the archway cannot be null");
         }
@@ -116,10 +124,9 @@ public class Aqueduct<SOURCE, IN, OUT> {
         final ArrayList<Spring<NOUT>> springs = new ArrayList<Spring<NOUT>>(levelNumber);
 
         final Stream<SOURCE, OUT, NOUT> stream =
-                mInputStream.thenFallingThrough(new ArchwayDam<OUT, NOUT>(arch, springs));
+                mInputStream.thenFallingThrough(new ArchwayDam<OUT, NOUT>(archway, springs));
 
-        final ArrayList<Stream<SOURCE, NOUT, NOUT>> outStreams =
-                new ArrayList<Stream<SOURCE, NOUT, NOUT>>(levelNumber);
+        final ArrayList<Stream<SOURCE, NOUT, NOUT>> outStreams = new ArrayList<Stream<SOURCE, NOUT, NOUT>>(levelNumber);
 
         for (int i = 0; i < levelNumber; i++) {
 
@@ -127,8 +134,7 @@ public class Aqueduct<SOURCE, IN, OUT> {
 
             springs.add(outStream.backToSource());
 
-            outStreams.add(stream.thenFallingThrough(new ClosedDam<NOUT, NOUT>())
-                                 .thenFeeding(outStream));
+            outStreams.add(stream.thenFallingThrough(new ClosedDam<NOUT, NOUT>()).thenFeeding(outStream));
         }
 
         return outStreams;

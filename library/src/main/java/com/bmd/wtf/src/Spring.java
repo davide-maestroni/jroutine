@@ -82,8 +82,7 @@ public interface Spring<DATA> {
      * @param drops    The iterable returning the drops of data to discharge.
      * @return This spring.
      */
-    public Spring<DATA> dischargeAfter(long delay, TimeUnit timeUnit,
-            Iterable<? extends DATA> drops);
+    public Spring<DATA> dischargeAfter(long delay, TimeUnit timeUnit, Iterable<? extends DATA> drops);
 
     /**
      * Discharges the specified debris into the waterfall.

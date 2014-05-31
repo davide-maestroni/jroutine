@@ -41,9 +41,11 @@ public class QueueArchway<DATA> extends AbstractArchway<DATA, DATA> {
 
     private final Object mMutex = new Object();
 
+    private final ArrayList<Fluid<DATA>> mQueue = new ArrayList<Fluid<DATA>>();
+
     private final HashSet<DATA> mRchargeDrop = new HashSet<DATA>();
 
-    private final ArrayList<DATA> mWaitingDrops = new ArrayList<DATA>();
+    private boolean mIsWaitingRedrop;
 
     /**
      * Signals to this archway that the specified drop has been consumed, so the related stream
@@ -70,7 +72,15 @@ public class QueueArchway<DATA> extends AbstractArchway<DATA, DATA> {
 
         synchronized (mMutex) {
 
-            return mWaitingDrops.contains(drop);
+            for (final Fluid<DATA> fluid : mQueue) {
+
+                if (fluid.is(drop)) {
+
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 
@@ -91,37 +101,46 @@ public class QueueArchway<DATA> extends AbstractArchway<DATA, DATA> {
     }
 
     @Override
-    public void onDischarge(final Floodgate<DATA, DATA> gate, final List<Spring<DATA>> springs,
-            final DATA drop) {
+    public void onDischarge(final Floodgate<DATA, DATA> gate, final List<Spring<DATA>> springs, final DATA drop) {
 
         synchronized (mMutex) {
 
-            final ArrayList<DATA> waitingDrops = mWaitingDrops;
-
             if (mDropMap.size() >= springs.size()) {
 
-                waitingDrops.add(drop);
+                mQueue.add(new Fluid<DATA>() {
+
+                    @Override
+                    public void flow(final Floodgate<DATA, DATA> gate, final List<Spring<DATA>> springs) {
+
+                        onDischarge(gate, springs, drop);
+                    }
+
+                    @Override
+                    public boolean is(final DATA other) {
+
+                        return (drop == null) ? other == null : drop.equals(other);
+                    }
+                });
 
             } else {
 
                 discharge(springs, drop);
             }
-
-            keepAlive(gate);
         }
+
+        keepAlive(gate);
     }
 
     @Override
-    public void onDrop(final Floodgate<DATA, DATA> gate, final List<Spring<DATA>> springs,
-            final Object debris) {
+    public void onDrop(final Floodgate<DATA, DATA> gate, final List<Spring<DATA>> springs, final Object debris) {
 
         synchronized (mMutex) {
 
             if (debris == mMutex) {
 
-                final HashMap<DATA, Integer> dropMap = mDropMap;
+                mIsWaitingRedrop = false;
 
-                final ArrayList<DATA> waitingDrops = mWaitingDrops;
+                final HashMap<DATA, Integer> dropMap = mDropMap;
 
                 for (final DATA drop : mRchargeDrop) {
 
@@ -135,19 +154,66 @@ public class QueueArchway<DATA> extends AbstractArchway<DATA, DATA> {
 
                 if (dropMap.size() < springs.size()) {
 
-                    if (!waitingDrops.isEmpty()) {
+                    final ArrayList<Fluid<DATA>> queue = mQueue;
 
-                        discharge(springs, waitingDrops.remove(0));
+                    if (!queue.isEmpty()) {
+
+                        queue.remove(0).flow(gate, springs);
                     }
                 }
 
-                keepAlive(gate);
+            } else if (!mDropMap.isEmpty()) {
+
+                mQueue.add(new Fluid<DATA>() {
+
+                    @Override
+                    public void flow(final Floodgate<DATA, DATA> gate, final List<Spring<DATA>> springs) {
+
+                        onDrop(gate, springs, debris);
+                    }
+
+                    @Override
+                    public boolean is(final DATA drop) {
+
+                        return false;
+                    }
+                });
 
             } else {
 
                 super.onDrop(gate, springs, debris);
             }
+
+            keepAlive(gate);
         }
+    }
+
+    @Override
+    public void onFlush(final Floodgate<DATA, DATA> gate, final List<Spring<DATA>> springs) {
+
+        if (!mDropMap.isEmpty()) {
+
+            mQueue.add(new Fluid<DATA>() {
+
+                @Override
+                public void flow(final Floodgate<DATA, DATA> gate, final List<Spring<DATA>> springs) {
+
+                    onFlush(gate, springs);
+                }
+
+                @Override
+                public boolean is(final DATA drop) {
+
+                    return false;
+                }
+            });
+
+        } else {
+
+            super.onFlush(gate, springs);
+        }
+
+        keepAlive(gate);
     }
 
     /**
@@ -157,6 +223,7 @@ public class QueueArchway<DATA> extends AbstractArchway<DATA, DATA> {
      * @param drop The data drop to recharge.
      * @return Whether the drop was currently being served.
      */
+
     public boolean recharge(final DATA drop) {
 
         synchronized (mMutex) {
@@ -233,7 +300,19 @@ public class QueueArchway<DATA> extends AbstractArchway<DATA, DATA> {
 
         synchronized (mMutex) {
 
-            return mWaitingDrops.remove(drop);
+            final Iterator<Fluid<DATA>> iterator = mQueue.iterator();
+
+            while (iterator.hasNext()) {
+
+                if (iterator.next().is(drop)) {
+
+                    iterator.remove();
+
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 
@@ -260,9 +339,18 @@ public class QueueArchway<DATA> extends AbstractArchway<DATA, DATA> {
 
     private void keepAlive(final Floodgate<DATA, DATA> gate) {
 
-        if (!mDropMap.isEmpty() || !mWaitingDrops.isEmpty()) {
+        if (!mIsWaitingRedrop && !mDropMap.isEmpty() || !mQueue.isEmpty()) {
+
+            mIsWaitingRedrop = true;
 
             gate.redropAfter(0, TimeUnit.MILLISECONDS, mMutex);
         }
+    }
+
+    private interface Fluid<DATA> {
+
+        public void flow(Floodgate<DATA, DATA> gate, List<Spring<DATA>> springs);
+
+        public boolean is(DATA drop);
     }
 }

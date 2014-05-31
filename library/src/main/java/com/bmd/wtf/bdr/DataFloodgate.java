@@ -101,8 +101,7 @@ class DataFloodgate<IN, OUT> implements Floodgate<IN, OUT> {
     }
 
     @Override
-    public Floodgate<IN, OUT> dischargeAfter(final long delay, final TimeUnit timeUnit,
-            final OUT drop) {
+    public Floodgate<IN, OUT> dischargeAfter(final long delay, final TimeUnit timeUnit, final OUT drop) {
 
         failIfClosed();
 
@@ -112,8 +111,7 @@ class DataFloodgate<IN, OUT> implements Floodgate<IN, OUT> {
     }
 
     @Override
-    public Floodgate<IN, OUT> dischargeAfter(final long delay, final TimeUnit timeUnit,
-            final OUT... drops) {
+    public Floodgate<IN, OUT> dischargeAfter(final long delay, final TimeUnit timeUnit, final OUT... drops) {
 
         failIfClosed();
 
@@ -161,8 +159,7 @@ class DataFloodgate<IN, OUT> implements Floodgate<IN, OUT> {
     }
 
     @Override
-    public Floodgate<IN, OUT> dropAfter(final long delay, final TimeUnit timeUnit,
-            final Object debris) {
+    public Floodgate<IN, OUT> dropAfter(final long delay, final TimeUnit timeUnit, final Object debris) {
 
         failIfClosed();
 
@@ -181,8 +178,7 @@ class DataFloodgate<IN, OUT> implements Floodgate<IN, OUT> {
     }
 
     @Override
-    public Floodgate<IN, OUT> rechargeAfter(final long delay, final TimeUnit timeUnit,
-            final IN drop) {
+    public Floodgate<IN, OUT> rechargeAfter(final long delay, final TimeUnit timeUnit, final IN drop) {
 
         failIfClosed();
 
@@ -192,8 +188,7 @@ class DataFloodgate<IN, OUT> implements Floodgate<IN, OUT> {
     }
 
     @Override
-    public Floodgate<IN, OUT> rechargeAfter(final long delay, final TimeUnit timeUnit,
-            final IN... drops) {
+    public Floodgate<IN, OUT> rechargeAfter(final long delay, final TimeUnit timeUnit, final IN... drops) {
 
         failIfClosed();
 
@@ -231,8 +226,7 @@ class DataFloodgate<IN, OUT> implements Floodgate<IN, OUT> {
     }
 
     @Override
-    public Floodgate<IN, OUT> redropAfter(final long delay, final TimeUnit timeUnit,
-            final Object debris) {
+    public Floodgate<IN, OUT> redropAfter(final long delay, final TimeUnit timeUnit, final Object debris) {
 
         failIfClosed();
 
@@ -269,8 +263,7 @@ class DataFloodgate<IN, OUT> implements Floodgate<IN, OUT> {
 
         if (!mLock.isHeldByCurrentThread()) {
 
-            throw new UnauthorizedDischargeException(
-                    "an open floodgate cannot be closed in a different thread");
+            throw new UnauthorizedDischargeException("an open floodgate cannot be closed in a different thread");
         }
 
         final DataPump pump = mPump;
@@ -297,8 +290,7 @@ class DataFloodgate<IN, OUT> implements Floodgate<IN, OUT> {
 
             if (mPump == null) {
 
-                throw new UnauthorizedDischargeException(
-                        "cannot discharge into a closed floodgate");
+                throw new UnauthorizedDischargeException("cannot discharge into a closed floodgate");
             }
 
         } finally {

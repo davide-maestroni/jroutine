@@ -19,6 +19,7 @@ import junit.framework.TestCase;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import static org.fest.assertions.api.Assertions.assertThat;
@@ -73,9 +74,15 @@ public class DownloadManagerTest extends TestCase {
 
         final long startTime = System.currentTimeMillis();
 
+        waitFor(FAIL_URL, startTime, 30000);
         waitFor(SMALL_FILE_URL1, startTime, 30000);
         waitFor(SMALL_FILE_URL2, startTime, 30000);
         waitFor(SMALL_FILE_URL3, startTime, 30000);
+
+        assertThat(mDownloadManager.isDownloaded(FAIL_URL)).isFalse();
+        assertThat(mDownloadManager.isDownloaded(SMALL_FILE_URL1)).isTrue();
+        assertThat(mDownloadManager.isDownloaded(SMALL_FILE_URL2)).isTrue();
+        assertThat(mDownloadManager.isDownloaded(SMALL_FILE_URL3)).isTrue();
 
         assertThat(outFile1).exists();
         assertThat(outFile2).exists();
@@ -119,6 +126,10 @@ public class DownloadManagerTest extends TestCase {
         waitFor(SMALL_FILE_URL2, startTime, 30000);
         waitFor(SMALL_FILE_URL3, startTime, 30000);
 
+        assertThat(mDownloadManager.isDownloaded(SMALL_FILE_URL1)).isTrue();
+        assertThat(mDownloadManager.isDownloaded(SMALL_FILE_URL2)).isTrue();
+        assertThat(mDownloadManager.isDownloaded(SMALL_FILE_URL3)).isTrue();
+
         assertThat(outFile1).exists();
         assertThat(outFile2).exists();
         assertThat(outFile3).exists();
@@ -144,15 +155,9 @@ public class DownloadManagerTest extends TestCase {
 
         final long startTime = System.currentTimeMillis();
 
-        try {
+        waitFor(FAIL_URL, startTime, 5000);
 
-            waitFor(FAIL_URL, startTime, 5000);
-
-            fail();
-
-        } catch (final IOException ignored) {
-
-        }
+        assertThat(mDownloadManager.isDownloaded(FAIL_URL)).isFalse();
 
         assertThat(outFile).doesNotExist();
     }
@@ -179,21 +184,9 @@ public class DownloadManagerTest extends TestCase {
 
         final long startTime = System.currentTimeMillis();
 
-        while (mDownloadManager.isCompleting(SMALL_FILE_URL1)) {
+        waitFor(SMALL_FILE_URL1, startTime, 20000);
 
-            try {
-
-                Thread.sleep(100);
-
-            } catch (final InterruptedException ignored) {
-
-            }
-
-            if ((System.currentTimeMillis() - startTime) > 2000) {
-
-                throw new IOException();
-            }
-        }
+        assertThat(mDownloadManager.isDownloaded(SMALL_FILE_URL1)).isFalse();
 
         assertThat(outFile).doesNotExist();
     }
@@ -230,27 +223,29 @@ public class DownloadManagerTest extends TestCase {
 
         mDownloadManager.abort(SMALL_FILE_URL1);
 
-        while (mDownloadManager.isCompleting(SMALL_FILE_URL1)) {
+        waitFor(SMALL_FILE_URL1, startTime, 20000);
 
-            try {
-
-                Thread.sleep(100);
-
-            } catch (final InterruptedException ignored) {
-
-            }
-
-            if ((System.currentTimeMillis() - startTime) > 2000) {
-
-                throw new IOException();
-            }
-        }
+        assertThat(mDownloadManager.isDownloaded(SMALL_FILE_URL1)).isFalse();
 
         assertThat(outFile).doesNotExist();
     }
 
-    private void waitFor(final String url, final long startTime, final long timeoutMs) throws
-            IOException {
+    @Override
+    protected void setUp() throws Exception {
+
+        super.setUp();
+
+        delete(SMALL_FILE_URL1);
+        delete(SMALL_FILE_URL2);
+        delete(SMALL_FILE_URL3);
+    }
+
+    private boolean delete(final String url) throws MalformedURLException {
+
+        return new File(mTmpDirPath, DownloadUtils.getFileName(new URL(url))).delete();
+    }
+
+    private void waitFor(final String url, final long startTime, final long timeoutMs) throws IOException {
 
         while (!mDownloadManager.isComplete(url)) {
 

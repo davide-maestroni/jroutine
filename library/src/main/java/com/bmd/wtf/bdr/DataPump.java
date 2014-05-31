@@ -33,8 +33,8 @@ class DataPump {
     private static final Fluid DISCHARGE = new Fluid() {
 
         @Override
-        public <IN, OUT> void discharge(final DataPool<IN, OUT> pool, final long delay,
-                final TimeUnit timeUnit, final long dischargeTimeNs, final Object drop) {
+        public <IN, OUT> void discharge(final DataPool<IN, OUT> pool, final long delay, final TimeUnit timeUnit,
+                final long dischargeTimeNs, final Object drop) {
 
             //noinspection unchecked
             final OUT out = (OUT) drop;
@@ -51,8 +51,8 @@ class DataPump {
     private static final Fluid DISCHARGE_AFTER = new Fluid() {
 
         @Override
-        public <IN, OUT> void discharge(final DataPool<IN, OUT> pool, final long delay,
-                final TimeUnit timeUnit, final long dischargeTimeNs, final Object drop) {
+        public <IN, OUT> void discharge(final DataPool<IN, OUT> pool, final long delay, final TimeUnit timeUnit,
+                final long dischargeTimeNs, final Object drop) {
 
             long currentDelay = delay;
 
@@ -73,8 +73,8 @@ class DataPump {
     private static final Fluid DISCHARGE_AFTER_ARRAY = new Fluid() {
 
         @Override
-        public <IN, OUT> void discharge(final DataPool<IN, OUT> pool, final long delay,
-                final TimeUnit timeUnit, final long dischargeTimeNs, final Object drops) {
+        public <IN, OUT> void discharge(final DataPool<IN, OUT> pool, final long delay, final TimeUnit timeUnit,
+                final long dischargeTimeNs, final Object drops) {
 
             long currentDelay = delay;
 
@@ -95,8 +95,8 @@ class DataPump {
     private static final Fluid DISCHARGE_AFTER_ITERABLE = new Fluid() {
 
         @Override
-        public <IN, OUT> void discharge(final DataPool<IN, OUT> pool, final long delay,
-                final TimeUnit timeUnit, final long dischargeTimeNs, final Object drops) {
+        public <IN, OUT> void discharge(final DataPool<IN, OUT> pool, final long delay, final TimeUnit timeUnit,
+                final long dischargeTimeNs, final Object drops) {
 
             long currentDelay = delay;
 
@@ -117,8 +117,8 @@ class DataPump {
     private static final Fluid DISCHARGE_ARRAY = new Fluid() {
 
         @Override
-        public <IN, OUT> void discharge(final DataPool<IN, OUT> pool, final long delay,
-                final TimeUnit timeUnit, final long dischargeTimeNs, final Object drops) {
+        public <IN, OUT> void discharge(final DataPool<IN, OUT> pool, final long delay, final TimeUnit timeUnit,
+                final long dischargeTimeNs, final Object drops) {
 
             //noinspection unchecked
             final OUT[] outs = (OUT[]) drops;
@@ -138,8 +138,8 @@ class DataPump {
     private static final Fluid DISCHARGE_ITERABLE = new Fluid() {
 
         @Override
-        public <IN, OUT> void discharge(final DataPool<IN, OUT> pool, final long delay,
-                final TimeUnit timeUnit, final long dischargeTimeNs, final Object drops) {
+        public <IN, OUT> void discharge(final DataPool<IN, OUT> pool, final long delay, final TimeUnit timeUnit,
+                final long dischargeTimeNs, final Object drops) {
 
             //noinspection unchecked
             final Iterable<OUT> outs = (Iterable<OUT>) drops;
@@ -159,8 +159,8 @@ class DataPump {
     private static final Fluid DROP = new Fluid() {
 
         @Override
-        public <IN, OUT> void discharge(final DataPool<IN, OUT> pool, final long delay,
-                final TimeUnit timeUnit, final long dischargeTimeNs, final Object drop) {
+        public <IN, OUT> void discharge(final DataPool<IN, OUT> pool, final long delay, final TimeUnit timeUnit,
+                final long dischargeTimeNs, final Object drop) {
 
             final CopyOnWriteArraySet<Stream<?, IN, OUT>> outStreams = pool.outputStreams;
 
@@ -174,8 +174,8 @@ class DataPump {
     private static final Fluid DROP_AFTER = new Fluid() {
 
         @Override
-        public <IN, OUT> void discharge(final DataPool<IN, OUT> pool, final long delay,
-                final TimeUnit timeUnit, final long dischargeTimeNs, final Object drop) {
+        public <IN, OUT> void discharge(final DataPool<IN, OUT> pool, final long delay, final TimeUnit timeUnit,
+                final long dischargeTimeNs, final Object drop) {
 
             long currentDelay = delay;
 
@@ -196,8 +196,8 @@ class DataPump {
     private static final Fluid FLUSH = new Fluid() {
 
         @Override
-        public <IN, OUT> void discharge(final DataPool<IN, OUT> pool, final long delay,
-                final TimeUnit timeUnit, final long dischargeTimeNs, final Object drop) {
+        public <IN, OUT> void discharge(final DataPool<IN, OUT> pool, final long delay, final TimeUnit timeUnit,
+                final long dischargeTimeNs, final Object drop) {
 
             final CopyOnWriteArraySet<Stream<?, IN, OUT>> outStreams = pool.outputStreams;
 
@@ -211,8 +211,8 @@ class DataPump {
     private static final Fluid RECHARGE_AFTER = new Fluid() {
 
         @Override
-        public <IN, OUT> void discharge(final DataPool<IN, OUT> pool, final long delay,
-                final TimeUnit timeUnit, final long dischargeTimeNs, final Object drop) {
+        public <IN, OUT> void discharge(final DataPool<IN, OUT> pool, final long delay, final TimeUnit timeUnit,
+                final long dischargeTimeNs, final Object drop) {
 
             final long currentDelay = updateDelay(delay, timeUnit, dischargeTimeNs);
 
@@ -226,8 +226,8 @@ class DataPump {
     private static final Fluid RECHARGE_AFTER_ARRAY = new Fluid() {
 
         @Override
-        public <IN, OUT> void discharge(final DataPool<IN, OUT> pool, final long delay,
-                final TimeUnit timeUnit, final long dischargeTimeNs, final Object drops) {
+        public <IN, OUT> void discharge(final DataPool<IN, OUT> pool, final long delay, final TimeUnit timeUnit,
+                final long dischargeTimeNs, final Object drops) {
 
             final long currentDelay = updateDelay(delay, timeUnit, dischargeTimeNs);
 
@@ -241,8 +241,8 @@ class DataPump {
     private static final Fluid RECHARGE_AFTER_ITERABLE = new Fluid() {
 
         @Override
-        public <IN, OUT> void discharge(final DataPool<IN, OUT> pool, final long delay,
-                final TimeUnit timeUnit, final long dischargeTimeNs, final Object drops) {
+        public <IN, OUT> void discharge(final DataPool<IN, OUT> pool, final long delay, final TimeUnit timeUnit,
+                final long dischargeTimeNs, final Object drops) {
 
             final long currentDelay = updateDelay(delay, timeUnit, dischargeTimeNs);
 
@@ -256,8 +256,8 @@ class DataPump {
     private static final Fluid REDROP_AFTER = new Fluid() {
 
         @Override
-        public <IN, OUT> void discharge(final DataPool<IN, OUT> pool, final long delay,
-                final TimeUnit timeUnit, final long dischargeTimeNs, final Object drop) {
+        public <IN, OUT> void discharge(final DataPool<IN, OUT> pool, final long delay, final TimeUnit timeUnit,
+                final long dischargeTimeNs, final Object drop) {
 
             final long currentDelay = updateDelay(delay, timeUnit, dischargeTimeNs);
 
@@ -301,16 +301,14 @@ class DataPump {
         mFluids = new Fluid[initialCapacity];
     }
 
-    private static long updateDelay(final long delay, final TimeUnit timeUnit,
-            final long dischargeTimeNs) {
+    private static long updateDelay(final long delay, final TimeUnit timeUnit, final long dischargeTimeNs) {
 
         if (delay <= 0) {
 
             return 0;
         }
 
-        return (delay - timeUnit
-                .convert(System.nanoTime() - dischargeTimeNs, TimeUnit.NANOSECONDS));
+        return (delay - timeUnit.convert(System.nanoTime() - dischargeTimeNs, TimeUnit.NANOSECONDS));
     }
 
     public <OUT> void discharge(final DataPool<?, OUT> pool, final OUT drop) {
@@ -328,20 +326,19 @@ class DataPump {
         add(DISCHARGE_ITERABLE, pool, 0, TimeUnit.MILLISECONDS, 0, drops);
     }
 
-    public <T> void dischargeAfter(final DataPool<?, T> pool, final long delay,
-            final TimeUnit timeUnit, final T drop) {
+    public <T> void dischargeAfter(final DataPool<?, T> pool, final long delay, final TimeUnit timeUnit, final T drop) {
 
         add(DISCHARGE_AFTER, pool, delay, timeUnit, System.nanoTime(), drop);
     }
 
-    public <OUT> void dischargeAfter(final DataPool<?, OUT> pool, final long delay,
-            final TimeUnit timeUnit, final OUT... drops) {
+    public <OUT> void dischargeAfter(final DataPool<?, OUT> pool, final long delay, final TimeUnit timeUnit,
+            final OUT... drops) {
 
         add(DISCHARGE_AFTER_ARRAY, pool, delay, timeUnit, System.nanoTime(), drops);
     }
 
-    public <OUT> void dischargeAfter(final DataPool<?, OUT> pool, final long delay,
-            final TimeUnit timeUnit, final Iterable<? extends OUT> drops) {
+    public <OUT> void dischargeAfter(final DataPool<?, OUT> pool, final long delay, final TimeUnit timeUnit,
+            final Iterable<? extends OUT> drops) {
 
         add(DISCHARGE_AFTER_ITERABLE, pool, delay, timeUnit, System.nanoTime(), drops);
     }
@@ -351,8 +348,7 @@ class DataPump {
         add(DROP, pool, 0, TimeUnit.MILLISECONDS, 0, debris);
     }
 
-    public void dropAfter(final DataPool<?, ?> pool, final long delay, final TimeUnit timeUnit,
-            final Object debris) {
+    public void dropAfter(final DataPool<?, ?> pool, final long delay, final TimeUnit timeUnit, final Object debris) {
 
         add(DROP_AFTER, pool, delay, timeUnit, System.nanoTime(), debris);
     }
@@ -362,26 +358,25 @@ class DataPump {
         add(FLUSH, pool, 0, TimeUnit.MILLISECONDS, 0, null);
     }
 
-    public <OUT> void rechargeAfter(final DataPool<OUT, ?> pool, final long delay,
-            final TimeUnit timeUnit, final OUT drop) {
+    public <OUT> void rechargeAfter(final DataPool<OUT, ?> pool, final long delay, final TimeUnit timeUnit,
+            final OUT drop) {
 
         add(RECHARGE_AFTER, pool, delay, timeUnit, System.nanoTime(), drop);
     }
 
-    public <OUT> void rechargeAfter(final DataPool<OUT, ?> pool, final long delay,
-            final TimeUnit timeUnit, final OUT... drops) {
+    public <OUT> void rechargeAfter(final DataPool<OUT, ?> pool, final long delay, final TimeUnit timeUnit,
+            final OUT... drops) {
 
         add(RECHARGE_AFTER_ARRAY, pool, delay, timeUnit, System.nanoTime(), drops);
     }
 
-    public <OUT> void rechargeAfter(final DataPool<OUT, ?> pool, final long delay,
-            final TimeUnit timeUnit, final Iterable<? extends OUT> drops) {
+    public <OUT> void rechargeAfter(final DataPool<OUT, ?> pool, final long delay, final TimeUnit timeUnit,
+            final Iterable<? extends OUT> drops) {
 
         add(RECHARGE_AFTER_ITERABLE, pool, delay, timeUnit, System.nanoTime(), drops);
     }
 
-    public void redropAfter(final DataPool<?, ?> pool, final long delay, final TimeUnit timeUnit,
-            final Object debris) {
+    public void redropAfter(final DataPool<?, ?> pool, final long delay, final TimeUnit timeUnit, final Object debris) {
 
         add(REDROP_AFTER, pool, delay, timeUnit, System.nanoTime(), debris);
     }
@@ -401,8 +396,7 @@ class DataPump {
 
                 final int i = mFirst;
 
-                mFluids[i].discharge(mPools[i], mDelays[i], mTimeUnits[i], mDischargeTimeNs[i],
-                                     mData[i]);
+                mFluids[i].discharge(mPools[i], mDelays[i], mTimeUnits[i], mDischargeTimeNs[i], mData[i]);
 
                 // Note that the value of mFirst may have already changed here
                 final int n = mFirst;
@@ -429,8 +423,8 @@ class DataPump {
         }
     }
 
-    private void add(final Fluid fluid, final DataPool<?, ?> pool, final long delay,
-            final TimeUnit timeUnit, final long dischargeTimeNs, final Object drop) {
+    private void add(final Fluid fluid, final DataPool<?, ?> pool, final long delay, final TimeUnit timeUnit,
+            final long dischargeTimeNs, final Object drop) {
 
         if (mData.length == 0) {
 
@@ -559,7 +553,7 @@ class DataPump {
 
     private interface Fluid {
 
-        public <IN, OUT> void discharge(DataPool<IN, OUT> pool, long delay, TimeUnit timeUnit,
-                long dischargeTimeNs, Object drop);
+        public <IN, OUT> void discharge(DataPool<IN, OUT> pool, long delay, TimeUnit timeUnit, long dischargeTimeNs,
+                Object drop);
     }
 }

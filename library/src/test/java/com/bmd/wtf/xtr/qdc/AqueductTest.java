@@ -14,6 +14,7 @@
 package com.bmd.wtf.xtr.qdc;
 
 import com.bmd.wtf.Waterfall;
+import com.bmd.wtf.crr.Currents;
 import com.bmd.wtf.dam.AbstractDam;
 import com.bmd.wtf.dam.ClosedDam;
 import com.bmd.wtf.dam.Dam;
@@ -48,22 +49,20 @@ public class AqueductTest extends TestCase {
         final ArrayList<Object> debris = new ArrayList<Object>(2);
         final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
-        BlockingBasin.collect(Aqueduct.binding(Waterfall.fallingFrom(new OpenDam<String>()))
+        BlockingBasin.collect(Aqueduct.fedBy(Waterfall.fallingFrom(new OpenDam<String>()))
                                       .thenCrossingThrough(new AbstractArchway<String, String>() {
 
                                           @Override
-                                          public void onDischarge(
-                                                  final Floodgate<String, String> gate,
-                                                  final List<Spring<String>> springs,
-                                                  final String drop) {
+                                          public void onDischarge(final Floodgate<String, String> gate,
+                                                  final List<Spring<String>> springs, final String drop) {
 
                                               springs.get(0).discharge(drop.toLowerCase());
                                           }
-                                      }).thenFallingThrough(new Archway<String, Integer>() {
+                                      }).thenFlowingThrough(new Archway<String, Integer>() {
 
                     @Override
-                    public void onDischarge(final Floodgate<String, Integer> gate,
-                            final List<Spring<Integer>> springs, final String drop) {
+                    public void onDischarge(final Floodgate<String, Integer> gate, final List<Spring<Integer>> springs,
+                            final String drop) {
 
                         executorService.execute(new Runnable() {
 
@@ -89,8 +88,8 @@ public class AqueductTest extends TestCase {
                     }
 
                     @Override
-                    public void onDrop(final Floodgate<String, Integer> gate,
-                            final List<Spring<Integer>> springs, final Object debris) {
+                    public void onDrop(final Floodgate<String, Integer> gate, final List<Spring<Integer>> springs,
+                            final Object debris) {
 
                         executorService.execute(new Runnable() {
 
@@ -103,8 +102,7 @@ public class AqueductTest extends TestCase {
                     }
 
                     @Override
-                    public void onFlush(final Floodgate<String, Integer> gate,
-                            final List<Spring<Integer>> springs) {
+                    public void onFlush(final Floodgate<String, Integer> gate, final List<Spring<Integer>> springs) {
 
                         executorService.execute(new Runnable() {
 
@@ -120,16 +118,14 @@ public class AqueductTest extends TestCase {
                                                  private int mSum = 0;
 
                                                  @Override
-                                                 public void onDischarge(
-                                                         final Floodgate<Integer, Integer> gate,
+                                                 public void onDischarge(final Floodgate<Integer, Integer> gate,
                                                          final Integer drop) {
 
                                                      mSum += drop;
                                                  }
 
                                                  @Override
-                                                 public void onFlush(
-                                                         final Floodgate<Integer, Integer> gate) {
+                                                 public void onFlush(final Floodgate<Integer, Integer> gate) {
 
                                                      gate.discharge(mSum).flush();
                                                  }
@@ -147,7 +143,7 @@ public class AqueductTest extends TestCase {
 
         try {
 
-            Aqueduct.binding(null);
+            Aqueduct.fedBy(null);
 
             fail();
 
@@ -157,7 +153,7 @@ public class AqueductTest extends TestCase {
 
         try {
 
-            Aqueduct.binding(Waterfall.fallingFrom(Dams.openDam())).thenSeparatingIn(0);
+            Aqueduct.fedBy(Waterfall.fallingFrom(Dams.openDam())).thenSeparatingIn(0);
 
             fail();
 
@@ -167,7 +163,7 @@ public class AqueductTest extends TestCase {
 
         try {
 
-            Aqueduct.binding(Waterfall.fallingFrom(Dams.openDam())).thenSeparatingIn(-1);
+            Aqueduct.fedBy(Waterfall.fallingFrom(Dams.openDam())).thenSeparatingIn(-1);
 
             fail();
 
@@ -177,7 +173,7 @@ public class AqueductTest extends TestCase {
 
         try {
 
-            Aqueduct.binding(Waterfall.fallingFrom(Dams.openDam())).thenCrossingThrough(null);
+            Aqueduct.fedBy(Waterfall.fallingFrom(Dams.openDam())).thenCrossingThrough(null);
 
             fail();
 
@@ -187,7 +183,7 @@ public class AqueductTest extends TestCase {
 
         try {
 
-            Aqueduct.binding(Waterfall.fallingFrom(Dams.openDam())).thenFallingThrough(null);
+            Aqueduct.fedBy(Waterfall.fallingFrom(Dams.openDam())).thenFlowingThrough((Archway<Object, Object>) null);
 
             fail();
 
@@ -200,14 +196,14 @@ public class AqueductTest extends TestCase {
             final AbstractArchway<Object, Object> archway = new AbstractArchway<Object, Object>() {
 
                 @Override
-                public void onDischarge(final Floodgate<Object, Object> gate,
-                        final List<Spring<Object>> springs, final Object drop) {
+                public void onDischarge(final Floodgate<Object, Object> gate, final List<Spring<Object>> springs,
+                        final Object drop) {
 
                 }
             };
 
-            Aqueduct.binding(Waterfall.fallingFrom(Dams.openDam())).thenCrossingThrough(archway)
-                    .thenFallingThrough(archway);
+            Aqueduct.fedBy(Waterfall.fallingFrom(Dams.openDam())).thenCrossingThrough(archway)
+                    .thenFlowingThrough(archway);
 
             fail();
 
@@ -216,30 +212,28 @@ public class AqueductTest extends TestCase {
         }
 
         final BlockingBasin<Object, Object> basin = BlockingBasin.collect(
-                Aqueduct.binding(Waterfall.fallingFrom(Dams.openDam()))
-                        .thenFallingThrough(new Archway<Object, Object>() {
+                Aqueduct.fedBy(Waterfall.fallingFrom(Dams.openDam())).thenFlowingThrough(new Archway<Object, Object>() {
 
-                            @Override
-                            public void onDischarge(final Floodgate<Object, Object> gate,
-                                    final List<Spring<Object>> springs, final Object drop) {
+                    @Override
+                    public void onDischarge(final Floodgate<Object, Object> gate, final List<Spring<Object>> springs,
+                            final Object drop) {
 
-                                throw new NullPointerException();
-                            }
+                        throw new NullPointerException();
+                    }
 
-                            @Override
-                            public void onDrop(final Floodgate<Object, Object> gate,
-                                    final List<Spring<Object>> springs, final Object debris) {
+                    @Override
+                    public void onDrop(final Floodgate<Object, Object> gate, final List<Spring<Object>> springs,
+                            final Object debris) {
 
-                                throw new IllegalArgumentException();
-                            }
+                        throw new IllegalArgumentException();
+                    }
 
-                            @Override
-                            public void onFlush(final Floodgate<Object, Object> gate,
-                                    final List<Spring<Object>> springs) {
+                    @Override
+                    public void onFlush(final Floodgate<Object, Object> gate, final List<Spring<Object>> springs) {
 
-                                throw new IllegalStateException();
-                            }
-                        }).get(0)
+                        throw new IllegalStateException();
+                    }
+                }).get(0)
         );
         basin.thenFeedWith("test");
         assertThat(basin.collectOutput()).isEmpty();
@@ -261,8 +255,8 @@ public class AqueductTest extends TestCase {
         final QueueArchway<Float> archway = new QueueArchway<Float>();
 
         final double result = BlockingBasin.collect(WaterfallArray.formingFrom(
-                Aqueduct.binding(Waterfall.fallingFrom(new OpenDam<Float>())).thenSeparatingIn(3)
-                        .thenFallingThrough(archway)
+                Aqueduct.fedBy(Waterfall.fallingFrom(new OpenDam<Float>())).thenSeparatingIn(3)
+                        .thenFlowingThrough(archway)
         ).thenFallingThrough(new DamFactory<Float, Double>() {
 
             @Override
@@ -346,11 +340,139 @@ public class AqueductTest extends TestCase {
         assertThat(result).isEqualTo(rms);
     }
 
+    public void testQueueArchwayAsync() {
+
+        final QueueArchway<Float> archway = new QueueArchway<Float>();
+
+        final double result = BlockingBasin.collect(WaterfallArray.formingFrom(Aqueduct.fedBy(
+                Waterfall.fallingFrom(new OpenDam<Float>()).thenFlowingInto(Currents.threadPoolCurrent(1)))
+                                                                                       .thenSeparatingIn(3)
+                                                                                       .thenFlowingThrough(archway))
+                                                                  .thenFallingThrough(new DamFactory<Float, Double>() {
+
+                                                                                          @Override
+                                                                                          public Dam<Float, Double> createForStream(
+                                                                                                  final int streamNumber) {
+
+                                                                                              return new AbstractDam<Float, Double>() {
+
+                                                                                                  @Override
+                                                                                                  public void onDischarge(
+                                                                                                          final Floodgate<Float, Double> gate,
+                                                                                                          final Float drop) {
+
+                                                                                                      final double
+                                                                                                              sample =
+                                                                                                              drop;
+                                                                                                      gate.discharge(
+                                                                                                              sample
+                                                                                                                      * sample);
+
+                                                                                                      assertThat(
+                                                                                                              archway.isWaiting(
+                                                                                                                      drop)
+                                                                                                      ).isFalse();
+                                                                                                      assertThat(
+                                                                                                              archway.removeIfWaiting(
+                                                                                                                      drop)
+                                                                                                      ).isFalse();
+                                                                                                      assertThat(
+                                                                                                              archway.levelOf(
+                                                                                                                      drop)
+                                                                                                      ).isEqualTo(
+                                                                                                              streamNumber);
+
+                                                                                                      new Thread() {
+
+                                                                                                          @Override
+                                                                                                          public void run() {
+
+                                                                                                              try {
+
+                                                                                                                  Thread.sleep(
+                                                                                                                          100);
+
+                                                                                                              } catch (final InterruptedException ignored) {
+
+                                                                                                              }
+
+                                                                                                              if (streamNumber
+                                                                                                                      == 0) {
+
+                                                                                                                  assertThat(
+                                                                                                                          archway.consume(
+                                                                                                                                  drop)
+                                                                                                                  ).isTrue();
+
+                                                                                                              } else {
+
+                                                                                                                  assertThat(
+                                                                                                                          archway.consume(
+                                                                                                                                  3333f)
+                                                                                                                  ).isFalse();
+                                                                                                                  assertThat(
+                                                                                                                          archway.releaseLevel(
+                                                                                                                                  streamNumber)
+                                                                                                                  ).isTrue();
+                                                                                                              }
+                                                                                                          }
+                                                                                                      }.start();
+                                                                                                  }
+                                                                                              };
+                                                                                          }
+                                                                                      }
+                                                                  ).thenMergingThrough(new ClosedDam<Double, Double>() {
+
+                                                                                           private int mCount;
+
+                                                                                           private int mFlushes;
+
+                                                                                           private double mSum;
+
+                                                                                           @Override
+                                                                                           public void onDischarge(
+                                                                                                   final Floodgate<Double, Double> gate,
+                                                                                                   final Double drop) {
+
+                                                                                               mSum += drop;
+                                                                                               ++mCount;
+                                                                                           }
+
+                                                                                           @Override
+                                                                                           public void onFlush(
+                                                                                                   final Floodgate<Double, Double> gate) {
+
+                                                                                               if (++mFlushes >= 3) {
+
+                                                                                                   gate.discharge(
+                                                                                                           Math.sqrt(
+                                                                                                                   mSum
+                                                                                                                           / mCount))
+                                                                                                       .flush();
+                                                                                               }
+                                                                                           }
+                                                                                       }
+                )).thenDrop(null).thenFeedWith(12f, -2354f, 636f, -77f, 93f, 39f).whenAvailable().collectFirstOutput();
+
+        final float[] input = new float[]{12, -2354, 636, -77, 93, 39};
+
+        double sum = 0;
+
+        for (final float i : input) {
+
+            sum += (i * i);
+        }
+
+        final double rms = Math.sqrt(sum / input.length);
+
+        assertThat(result).isEqualTo(rms);
+    }
+
     public void testRotatingArchway() {
 
         final double result = BlockingBasin.collect(WaterfallArray.formingFrom(
-                Aqueduct.binding(Waterfall.fallingFrom(new OpenDam<Float>())).thenSeparatingIn(3)
-                        .thenFallingThrough(new RotatingArchway<Float>())
+                Aqueduct.fedBy(Waterfall.fallingFrom(new OpenDam<Float>())).thenSeparatingIn(3)
+                        .thenFlowingThrough(new RotatingArchway<Float>())
         ).thenFallingThrough(new DamFactory<Float, Double>() {
 
             @Override

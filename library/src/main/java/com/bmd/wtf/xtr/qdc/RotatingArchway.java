@@ -31,8 +31,7 @@ public class RotatingArchway<DATA> extends AbstractArchway<DATA, DATA> {
     private int mStreamNumber = -1;
 
     @Override
-    public void onDischarge(final Floodgate<DATA, DATA> gate, final List<Spring<DATA>> springs,
-            final DATA drop) {
+    public void onDischarge(final Floodgate<DATA, DATA> gate, final List<Spring<DATA>> springs, final DATA drop) {
 
         mStreamNumber = (mStreamNumber + 1) % springs.size();
 

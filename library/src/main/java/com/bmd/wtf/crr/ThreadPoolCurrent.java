@@ -13,7 +13,7 @@
  */
 package com.bmd.wtf.crr;
 
-import com.bmd.wtf.src.Pool;
+import com.bmd.wtf.flw.Fall;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
  * {@link java.util.concurrent.ScheduledExecutorService} to run the commands in a pool of
  * threads.
  * <p/>
- * Created by davide on 2/27/14.
+ * Created by davide on 6/8/14.
  */
 public class ThreadPoolCurrent implements Current {
 
@@ -41,20 +41,46 @@ public class ThreadPoolCurrent implements Current {
     }
 
     @Override
-    public <DATA> void discharge(final Pool<DATA> pool, final DATA drop) {
+    public void flush(final Fall<?> fall) {
 
         mService.execute(new Runnable() {
 
             @Override
             public void run() {
 
-                pool.discharge(drop);
+                fall.flush();
             }
         });
     }
 
     @Override
-    public <DATA> void dischargeAfter(final Pool<DATA> pool, final long delay, final TimeUnit timeUnit,
+    public void forward(final Fall<?> fall, final Throwable throwable) {
+
+        mService.execute(new Runnable() {
+
+            @Override
+            public void run() {
+
+                fall.forward(throwable);
+            }
+        });
+    }
+
+    @Override
+    public <DATA> void push(final Fall<DATA> fall, final DATA drop) {
+
+        mService.execute(new Runnable() {
+
+            @Override
+            public void run() {
+
+                fall.push(drop);
+            }
+        });
+    }
+
+    @Override
+    public <DATA> void pushAfter(final Fall<DATA> fall, final long delay, final TimeUnit timeUnit,
             final DATA drop) {
 
         mService.schedule(new Runnable() {
@@ -62,67 +88,27 @@ public class ThreadPoolCurrent implements Current {
             @Override
             public void run() {
 
-                pool.discharge(drop);
+                fall.push(drop);
             }
-
         }, delay, timeUnit);
     }
 
     @Override
-    public <DATA> void dischargeAfter(final Pool<DATA> pool, final long delay, final TimeUnit timeUnit,
+    public <DATA> void pushAfter(final Fall<DATA> fall, final long delay, final TimeUnit timeUnit,
             final Iterable<? extends DATA> drops) {
+
+        final ScheduledExecutorService service = mService;
 
         for (final DATA drop : drops) {
 
-            mService.schedule(new Runnable() {
+            service.schedule(new Runnable() {
 
                 @Override
                 public void run() {
 
-                    pool.discharge(drop);
+                    fall.push(drop);
                 }
-
             }, delay, timeUnit);
         }
-    }
-
-    @Override
-    public void drop(final Pool<?> pool, final Object debris) {
-
-        mService.execute(new Runnable() {
-
-            @Override
-            public void run() {
-
-                pool.drop(debris);
-            }
-        });
-    }
-
-    @Override
-    public void dropAfter(final Pool<?> pool, final long delay, final TimeUnit timeUnit, final Object debris) {
-
-        mService.schedule(new Runnable() {
-
-            @Override
-            public void run() {
-
-                pool.drop(debris);
-            }
-
-        }, delay, timeUnit);
-    }
-
-    @Override
-    public void flush(final Pool<?> pool) {
-
-        mService.execute(new Runnable() {
-
-            @Override
-            public void run() {
-
-                pool.flush();
-            }
-        });
     }
 }

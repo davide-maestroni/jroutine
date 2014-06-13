@@ -14,9 +14,9 @@
 package com.bmd.wtf.crr;
 
 /**
- * Utility class for {@link Current} instances.
+ * Utility class for {@link com.bmd.wtf.crr.Current} instances.
  * <p/>
- * Created by davide on 3/4/14.
+ * Created by davide on 6/8/14.
  */
 public class Currents {
 
@@ -30,11 +30,22 @@ public class Currents {
     }
 
     /**
-     * Returns the default {@link StraightCurrent} instance.
+     * Returns a new {@link com.bmd.wtf.crr.ThreadPoolCurrent} instance.
+     *
+     * @param poolSize The maximum size of the thread pool.
+     * @return The new instance.
+     */
+    public static Current pool(final int poolSize) {
+
+        return new ThreadPoolCurrent(poolSize);
+    }
+
+    /**
+     * Returns the default {@link com.bmd.wtf.crr.StraightCurrent} instance.
      *
      * @return The instance.
      */
-    public static Current straightCurrent() {
+    public static Current straight() {
 
         if (sStraight == null) {
 
@@ -42,16 +53,5 @@ public class Currents {
         }
 
         return sStraight;
-    }
-
-    /**
-     * Returns a new {@link ThreadPoolCurrent} instance.
-     *
-     * @param poolSize The maximum size of the thread pool.
-     * @return The new instance.
-     */
-    public static Current threadPoolCurrent(final int poolSize) {
-
-        return new ThreadPoolCurrent(poolSize);
     }
 }

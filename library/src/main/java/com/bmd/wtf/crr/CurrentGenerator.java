@@ -13,23 +13,10 @@
  */
 package com.bmd.wtf.crr;
 
-import com.bmd.wtf.flw.Fall;
-
-import java.util.concurrent.TimeUnit;
-
 /**
- * Created by davide on 6/7/14.
+ * Created by davide on 6/10/14.
  */
-public interface Current {
+public interface CurrentGenerator {
 
-    public void flush(Fall<?> fall);
-
-    public void forward(Fall<?> fall, Throwable throwable);
-
-    public <DATA> void push(Fall<DATA> fall, DATA drop);
-
-    public <DATA> void pushAfter(Fall<DATA> fall, long delay, TimeUnit timeUnit, DATA drop);
-
-    public <DATA> void pushAfter(Fall<DATA> fall, long delay, TimeUnit timeUnit,
-            Iterable<? extends DATA> drops);
+    public Current create(int fallNumber);
 }

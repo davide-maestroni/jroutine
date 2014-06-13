@@ -11,25 +11,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.wtf.crr;
+package com.bmd.wtf.lps;
 
-import com.bmd.wtf.flw.Fall;
-
-import java.util.concurrent.TimeUnit;
+import com.bmd.wtf.flw.River;
 
 /**
- * Created by davide on 6/7/14.
+ * Created by davide on 6/9/14.
  */
-public interface Current {
+public abstract class AbstractLeap<SOURCE, IN, OUT> implements Leap<SOURCE, IN, OUT> {
 
-    public void flush(Fall<?> fall);
+    @Override
+    public void onFlush(final River<SOURCE, IN> upRiver, final River<SOURCE, OUT> downRiver,
+            final int fallNumber) {
 
-    public void forward(Fall<?> fall, Throwable throwable);
+        downRiver.flush();
+    }
 
-    public <DATA> void push(Fall<DATA> fall, DATA drop);
+    @Override
+    public void onUnhandled(final River<SOURCE, IN> upRiver, final River<SOURCE, OUT> downRiver,
+            final int fallNumber, final Throwable throwable) {
 
-    public <DATA> void pushAfter(Fall<DATA> fall, long delay, TimeUnit timeUnit, DATA drop);
-
-    public <DATA> void pushAfter(Fall<DATA> fall, long delay, TimeUnit timeUnit,
-            Iterable<? extends DATA> drops);
+        downRiver.forward(throwable);
+    }
 }

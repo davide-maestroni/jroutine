@@ -11,25 +11,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.wtf.crr;
-
-import com.bmd.wtf.flw.Fall;
-
-import java.util.concurrent.TimeUnit;
+package com.bmd.wtf.lps;
 
 /**
- * Created by davide on 6/7/14.
+ * Created by davide on 6/8/14.
  */
-public interface Current {
+public interface LeapGenerator<SOURCE, IN, OUT> {
 
-    public void flush(Fall<?> fall);
-
-    public void forward(Fall<?> fall, Throwable throwable);
-
-    public <DATA> void push(Fall<DATA> fall, DATA drop);
-
-    public <DATA> void pushAfter(Fall<DATA> fall, long delay, TimeUnit timeUnit, DATA drop);
-
-    public <DATA> void pushAfter(Fall<DATA> fall, long delay, TimeUnit timeUnit,
-            Iterable<? extends DATA> drops);
+    public Leap<SOURCE, IN, OUT> start(int fallNumber);
 }

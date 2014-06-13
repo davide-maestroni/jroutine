@@ -11,25 +11,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.wtf.crr;
-
-import com.bmd.wtf.flw.Fall;
+package com.bmd.wtf.flw;
 
 import java.util.concurrent.TimeUnit;
 
 /**
  * Created by davide on 6/7/14.
  */
-public interface Current {
+public interface Stream<DATA> {
 
-    public void flush(Fall<?> fall);
+    public Stream<DATA> flush();
 
-    public void forward(Fall<?> fall, Throwable throwable);
+    public Stream<DATA> forward(Throwable throwable);
 
-    public <DATA> void push(Fall<DATA> fall, DATA drop);
+    public Stream<DATA> push(DATA... drops);
 
-    public <DATA> void pushAfter(Fall<DATA> fall, long delay, TimeUnit timeUnit, DATA drop);
+    public Stream<DATA> push(Iterable<? extends DATA> drops);
 
-    public <DATA> void pushAfter(Fall<DATA> fall, long delay, TimeUnit timeUnit,
-            Iterable<? extends DATA> drops);
+    public Stream<DATA> push(DATA drop);
+
+    public Stream<DATA> pushAfter(long delay, TimeUnit timeUnit, Iterable<? extends DATA> drops);
+
+    public Stream<DATA> pushAfter(long delay, TimeUnit timeUnit, DATA drop);
+
+    public Stream<DATA> pushAfter(long delay, TimeUnit timeUnit, DATA... drops);
 }

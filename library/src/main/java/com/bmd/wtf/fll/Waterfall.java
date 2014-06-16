@@ -25,9 +25,11 @@ import com.bmd.wtf.lps.LeapGenerator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.WeakHashMap;
 import java.util.concurrent.TimeUnit;
@@ -44,6 +46,8 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
     private static FreeLeap<?, ?> sFreeLeap;
 
+    private final Barrage<SOURCE, ?> mBarrage;
+
     private final Current mCurrent;
 
     private final CurrentGenerator mCurrentGenerator;
@@ -52,21 +56,22 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
     private final Class<?> mGlass;
 
-    private final HashMap<Class<?>, GlassLeap<?, ?, ?>> mGlassMap;
+    private final Map<Class<?>, GlassLeap<?, ?, ?>> mGlassMap;
 
     private final int mSize;
 
     private final Waterfall<SOURCE, SOURCE, ?> mSource;
 
     private Waterfall(final Waterfall<SOURCE, SOURCE, ?> source,
-            final HashMap<Class<?>, GlassLeap<?, ?, ?>> glassMap, final Class<?> glass,
-            final int size, final Current current, final CurrentGenerator generator,
-            final DataFall<SOURCE, IN, OUT>... falls) {
+            final Map<Class<?>, GlassLeap<?, ?, ?>> glassMap, final Class<?> glass,
+            final Barrage<SOURCE, ?> barrage, final int size, final Current current,
+            final CurrentGenerator generator, final DataFall<SOURCE, IN, OUT>... falls) {
 
         //noinspection unchecked
         mSource = (source != null) ? source : (Waterfall<SOURCE, SOURCE, ?>) this;
         mGlassMap = glassMap;
         mGlass = glass;
+        mBarrage = barrage;
         mSize = size;
         mCurrent = current;
         mCurrentGenerator = generator;
@@ -74,13 +79,12 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
     }
 
     private Waterfall(final Waterfall<SOURCE, SOURCE, ?> source,
-            final HashMap<Class<?>, GlassLeap<?, ?, ?>> glassMap, final Class<?> glass,
-            final int size, final Current current, final CurrentGenerator generator,
-            final Leap<SOURCE, IN, OUT>... leaps) {
+            final Map<Class<?>, GlassLeap<?, ?, ?>> glassMap, final Class<?> glass,
+            final Barrage<SOURCE, ?> barrage, final int size, final Current current,
+            final CurrentGenerator generator, final Leap<SOURCE, IN, OUT>... leaps) {
 
         //noinspection unchecked
         mSource = (source != null) ? source : (Waterfall<SOURCE, SOURCE, ?>) this;
-        mGlassMap = glassMap;
         mGlass = null;
         mSize = size;
         mCurrent = current;
@@ -90,32 +94,28 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
         final DataFall[] falls = new DataFall[length];
 
-        final Barrage barrage;
-
         if (length == 1) {
 
-            glassMap.remove(Barrage.class);
-
-            barrage = null;
-
-        } else if (glassMap.containsKey(Barrage.class)) {
-
-            barrage = when(new Glass<Barrage>() {}).perform();
+            mBarrage = null;
 
         } else {
 
-            barrage = null;
+            mBarrage = barrage;
         }
 
         if (glass == null) {
+
+            mGlassMap = glassMap;
+
+            final Barrage<SOURCE, ?> fallBarrage = mBarrage;
 
             for (int i = 0; i < length; i++) {
 
                 final Leap<SOURCE, IN, OUT> fallLeap;
 
-                if (barrage != null) {
+                if (fallBarrage != null) {
 
-                    fallLeap = new BarrageLeap<SOURCE, IN, OUT>(leaps[i], barrage, i);
+                    fallLeap = new BarrageLeap<SOURCE, IN, OUT>(leaps[i], fallBarrage, i);
 
                 } else {
 
@@ -138,6 +138,13 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
         } else {
 
+            final HashMap<Class<?>, GlassLeap<?, ?, ?>> fallGlassMap =
+                    new HashMap<Class<?>, GlassLeap<?, ?, ?>>(glassMap);
+
+            mGlassMap = fallGlassMap;
+
+            final Barrage<SOURCE, ?> fallBarrage = mBarrage;
+
             final boolean isSelf = Reflection.class.equals(glass);
 
             final HashMap<Leap<?, ?, ?>, GlassLeap<?, ?, ?>> leapMap =
@@ -156,14 +163,14 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
                     glassLeap = new GlassLeap<SOURCE, IN, OUT>(leap);
                     leapMap.put(leap, glassLeap);
 
-                    exposeGlass(glassMap, (isSelf) ? leap.getClass() : glass, glassLeap);
+                    exposeGlass(fallGlassMap, (isSelf) ? leap.getClass() : glass, glassLeap);
                 }
 
                 final Leap<SOURCE, IN, OUT> fallLeap;
 
-                if (barrage != null) {
+                if (fallBarrage != null) {
 
-                    fallLeap = new BarrageLeap<SOURCE, IN, OUT>(glassLeap, barrage, i);
+                    fallLeap = new BarrageLeap<SOURCE, IN, OUT>(glassLeap, fallBarrage, i);
 
                 } else {
 
@@ -191,10 +198,11 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
     public static Waterfall<Object, Object, Object> create() {
 
+        final Map<Class<?>, GlassLeap<?, ?, ?>> glassMap = Collections.emptyMap();
+
         //noinspection unchecked
-        return new Waterfall<Object, Object, Object>(null,
-                                                     new HashMap<Class<?>, GlassLeap<?, ?, ?>>(),
-                                                     null, 1, Currents.straight(), null, NO_FALL);
+        return new Waterfall<Object, Object, Object>(null, glassMap, null, null, 1,
+                                                     Currents.straight(), null, NO_FALL);
     }
 
     private static <SOURCE, DATA> FreeLeap<SOURCE, DATA> freeLeap() {
@@ -244,7 +252,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         }
 
         //noinspection unchecked
-        return new Waterfall<SOURCE, IN, OUT>(mSource, mGlassMap, glass, mSize, mCurrent,
+        return new Waterfall<SOURCE, IN, OUT>(mSource, mGlassMap, glass, mBarrage, mSize, mCurrent,
                                               mCurrentGenerator, mFalls);
     }
 
@@ -351,8 +359,8 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
             //noinspection unchecked
             final Waterfall<SOURCE, OUT, NOUT> waterfall =
-                    new Waterfall<SOURCE, OUT, NOUT>(mSource, mGlassMap, mGlass, 1, mCurrent,
-                                                     mCurrentGenerator, leap);
+                    new Waterfall<SOURCE, OUT, NOUT>(mSource, mGlassMap, mGlass, mBarrage, 1,
+                                                     mCurrent, mCurrentGenerator, leap);
 
             final DataFall<SOURCE, OUT, NOUT> outFall = waterfall.mFalls[0];
 
@@ -384,7 +392,8 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         //noinspection unchecked
         final Waterfall<SOURCE, OUT, NOUT> waterfall =
                 new Waterfall<SOURCE, OUT, NOUT>(inWaterfall.mSource, inWaterfall.mGlassMap,
-                                                 inWaterfall.mGlass, size, inWaterfall.mCurrent,
+                                                 inWaterfall.mGlass, mBarrage, size,
+                                                 inWaterfall.mCurrent,
                                                  inWaterfall.mCurrentGenerator, leaps);
 
         final DataFall<SOURCE, ?, OUT>[] inFalls = inWaterfall.mFalls;
@@ -429,8 +438,8 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
             //noinspection unchecked
             final Waterfall<SOURCE, OUT, OUT> waterfall =
-                    new Waterfall<SOURCE, OUT, OUT>(mSource, mGlassMap, mGlass, 1, mCurrent,
-                                                    mCurrentGenerator, leap);
+                    new Waterfall<SOURCE, OUT, OUT>(mSource, mGlassMap, mGlass, mBarrage, 1,
+                                                    mCurrent, mCurrentGenerator, leap);
 
             final DataFall<SOURCE, OUT, OUT> outFall = waterfall.mFalls[0];
 
@@ -462,8 +471,9 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         //noinspection unchecked
         final Waterfall<SOURCE, OUT, OUT> waterfall =
                 new Waterfall<SOURCE, OUT, OUT>(inWaterfall.mSource, inWaterfall.mGlassMap,
-                                                inWaterfall.mGlass, size, inWaterfall.mCurrent,
-                                                inWaterfall.mCurrentGenerator, leaps);
+                                                inWaterfall.mGlass, mBarrage, size,
+                                                inWaterfall.mCurrent, inWaterfall.mCurrentGenerator,
+                                                leaps);
 
         final DataFall<SOURCE, ?, OUT>[] inFalls = inWaterfall.mFalls;
 
@@ -512,8 +522,8 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
             //noinspection unchecked
             final Waterfall<SOURCE, OUT, NOUT> waterfall =
-                    new Waterfall<SOURCE, OUT, NOUT>(mSource, mGlassMap, mGlass, 1, mCurrent,
-                                                     mCurrentGenerator, leap);
+                    new Waterfall<SOURCE, OUT, NOUT>(mSource, mGlassMap, mGlass, mBarrage, 1,
+                                                     mCurrent, mCurrentGenerator, leap);
 
             final DataFall<SOURCE, OUT, NOUT> outFall = waterfall.mFalls[0];
 
@@ -547,7 +557,8 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         //noinspection unchecked
         final Waterfall<SOURCE, OUT, NOUT> waterfall =
                 new Waterfall<SOURCE, OUT, NOUT>(inWaterfall.mSource, inWaterfall.mGlassMap,
-                                                 inWaterfall.mGlass, size, inWaterfall.mCurrent,
+                                                 inWaterfall.mGlass, mBarrage, size,
+                                                 inWaterfall.mCurrent,
                                                  inWaterfall.mCurrentGenerator, leaps);
 
         final DataFall<SOURCE, ?, OUT>[] inFalls = inWaterfall.mFalls;
@@ -600,8 +611,8 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
             //noinspection unchecked
             final Waterfall<SOURCE, OUT, NOUT> waterfall =
-                    new Waterfall<SOURCE, OUT, NOUT>(mSource, mGlassMap, mGlass, 1, mCurrent,
-                                                     mCurrentGenerator, leap);
+                    new Waterfall<SOURCE, OUT, NOUT>(mSource, mGlassMap, mGlass, mBarrage, 1,
+                                                     mCurrent, mCurrentGenerator, leap);
 
             final DataFall<SOURCE, OUT, NOUT> outFall = waterfall.mFalls[0];
 
@@ -640,7 +651,8 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         //noinspection unchecked
         final Waterfall<SOURCE, OUT, NOUT> waterfall =
                 new Waterfall<SOURCE, OUT, NOUT>(inWaterfall.mSource, inWaterfall.mGlassMap,
-                                                 inWaterfall.mGlass, size, inWaterfall.mCurrent,
+                                                 inWaterfall.mGlass, mBarrage, size,
+                                                 inWaterfall.mCurrent,
                                                  inWaterfall.mCurrentGenerator, leaps);
 
         final DataFall<SOURCE, ?, OUT>[] inFalls = inWaterfall.mFalls;
@@ -684,7 +696,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
             return chain();
         }
 
-        return in(1).chain(new DataBarrage<SOURCE, OUT>(size)).asGlass().in(size);
+        return in(1).chainBarrage(new Barrage<SOURCE, OUT>(size)).in(size);
     }
 
     public void drain(final boolean downStream) {
@@ -1059,7 +1071,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         }
 
         //noinspection unchecked
-        return new Waterfall<SOURCE, IN, OUT>(mSource, glassMap, mGlass, mSize, mCurrent,
+        return new Waterfall<SOURCE, IN, OUT>(mSource, glassMap, mGlass, mBarrage, mSize, mCurrent,
                                               mCurrentGenerator, mFalls);
     }
 
@@ -1076,8 +1088,8 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         }
 
         //noinspection unchecked
-        return new Waterfall<SOURCE, IN, OUT>(mSource, mGlassMap, mGlass, mSize, null, generator,
-                                              mFalls);
+        return new Waterfall<SOURCE, IN, OUT>(mSource, mGlassMap, mGlass, mBarrage, mSize, null,
+                                              generator, mFalls);
     }
 
     public Waterfall<SOURCE, IN, OUT> in(final int fallCount) {
@@ -1088,8 +1100,8 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         }
 
         //noinspection unchecked
-        return new Waterfall<SOURCE, IN, OUT>(mSource, mGlassMap, mGlass, fallCount, mCurrent,
-                                              mCurrentGenerator, mFalls);
+        return new Waterfall<SOURCE, IN, OUT>(mSource, mGlassMap, mGlass, mBarrage, fallCount,
+                                              mCurrent, mCurrentGenerator, mFalls);
     }
 
     public Waterfall<SOURCE, IN, OUT> in(final Current current) {
@@ -1100,20 +1112,33 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         }
 
         //noinspection unchecked
-        return new Waterfall<SOURCE, IN, OUT>(mSource, mGlassMap, mGlass, mSize, current, null,
-                                              mFalls);
+        return new Waterfall<SOURCE, IN, OUT>(mSource, mGlassMap, mGlass, mBarrage, mSize, current,
+                                              null, mFalls);
     }
 
-    public Waterfall<SOURCE, IN, OUT> inBackground(final int fallCount) {
-
-        if (fallCount <= 0) {
-
-            throw new IllegalArgumentException("the fall count cannot be negative or zero");
-        }
+    public Waterfall<SOURCE, IN, OUT> inBackground(final int poolSize) {
 
         //noinspection unchecked
-        return new Waterfall<SOURCE, IN, OUT>(mSource, mGlassMap, mGlass, fallCount,
-                                              Currents.pool(fallCount), null, mFalls);
+        return new Waterfall<SOURCE, IN, OUT>(mSource, mGlassMap, mGlass, mBarrage, mSize,
+                                              Currents.pool(poolSize), null, mFalls);
+    }
+
+    public Waterfall<SOURCE, IN, OUT> inBackground() {
+
+        final int processors = Runtime.getRuntime().availableProcessors();
+
+        final int poolSize;
+
+        if (processors < 4) {
+
+            poolSize = Math.max(1, Math.min(mSize, processors - 1));
+
+        } else {
+
+            poolSize = Math.min(mSize, processors / 2);
+        }
+
+        return inBackground(poolSize);
     }
 
     public Waterfall<OUT, OUT, OUT> start() {
@@ -1126,8 +1151,10 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
         Arrays.fill(leaps, leap);
 
+        final Map<Class<?>, GlassLeap<?, ?, ?>> glassMap = Collections.emptyMap();
+
         //noinspection unchecked
-        return new Waterfall<OUT, OUT, OUT>(null, mGlassMap, mGlass, size, mCurrent,
+        return new Waterfall<OUT, OUT, OUT>(null, glassMap, null, null, size, mCurrent,
                                             mCurrentGenerator, leaps);
     }
 
@@ -1141,9 +1168,28 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
         Arrays.fill(leaps, leap);
 
+        final Map<Class<?>, GlassLeap<?, ?, ?>> glassMap = Collections.emptyMap();
+
         //noinspection unchecked
-        return new Waterfall<DATA, DATA, DATA>(null, mGlassMap, mGlass, size, mCurrent,
+        return new Waterfall<DATA, DATA, DATA>(null, glassMap, null, null, size, mCurrent,
                                                mCurrentGenerator, leaps);
+    }
+
+    public <CLASS> Waterfall<CLASS, CLASS, CLASS> start(final Glass<CLASS> type) {
+
+        final int size = mSize;
+
+        final FreeLeap<CLASS, CLASS> leap = freeLeap();
+
+        final Leap[] leaps = new Leap[size];
+
+        Arrays.fill(leaps, leap);
+
+        final Map<Class<?>, GlassLeap<?, ?, ?>> glassMap = Collections.emptyMap();
+
+        //noinspection unchecked
+        return new Waterfall<CLASS, CLASS, CLASS>(null, glassMap, null, null, size, mCurrent,
+                                                  mCurrentGenerator, leaps);
     }
 
     public <NIN, NOUT> Waterfall<NIN, NIN, NOUT> start(
@@ -1154,6 +1200,8 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
             throw new IllegalArgumentException("the waterfall generator cannot be null");
         }
 
+        final Map<Class<?>, GlassLeap<?, ?, ?>> glassMap = Collections.emptyMap();
+
         final int size = mSize;
 
         if (size == 1) {
@@ -1163,7 +1211,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
             registerLeap(leap);
 
             //noinspection unchecked
-            return new Waterfall<NIN, NIN, NOUT>(null, mGlassMap, mGlass, 1, mCurrent,
+            return new Waterfall<NIN, NIN, NOUT>(null, glassMap, mGlass, null, 1, mCurrent,
                                                  mCurrentGenerator, leap);
         }
 
@@ -1179,7 +1227,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         }
 
         //noinspection unchecked
-        return new Waterfall<NIN, NIN, NOUT>(null, mGlassMap, mGlass, size, mCurrent,
+        return new Waterfall<NIN, NIN, NOUT>(null, glassMap, mGlass, null, size, mCurrent,
                                              mCurrentGenerator, leaps);
     }
 
@@ -1192,9 +1240,22 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
         registerLeap(leap);
 
+        final Map<Class<?>, GlassLeap<?, ?, ?>> glassMap = Collections.emptyMap();
+
         //noinspection unchecked
-        return new Waterfall<NIN, NIN, NOUT>(null, mGlassMap, mGlass, mSize, mCurrent,
+        return new Waterfall<NIN, NIN, NOUT>(null, glassMap, mGlass, null, mSize, mCurrent,
                                              mCurrentGenerator, leap);
+    }
+
+    private Waterfall<SOURCE, OUT, OUT> chainBarrage(final Barrage<SOURCE, OUT> barrage) {
+
+        final Waterfall<SOURCE, OUT, OUT> waterfall = chain(barrage);
+
+        //noinspection unchecked
+        return new Waterfall<SOURCE, OUT, OUT>(waterfall.mSource, waterfall.mGlassMap,
+                                               waterfall.mGlass, barrage, waterfall.mSize,
+                                               waterfall.mCurrent, waterfall.mCurrentGenerator,
+                                               waterfall.mFalls);
     }
 
     private void exposeGlass(final HashMap<Class<?>, GlassLeap<?, ?, ?>> glassMap,
@@ -1248,7 +1309,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
     private GlassLeap<?, ?, ?> findBestMatch(final Class<?> glass) {
 
-        final HashMap<Class<?>, GlassLeap<?, ?, ?>> glassMap = mGlassMap;
+        final Map<Class<?>, GlassLeap<?, ?, ?>> glassMap = mGlassMap;
 
         GlassLeap<?, ?, ?> leap = glassMap.get(glass);
 

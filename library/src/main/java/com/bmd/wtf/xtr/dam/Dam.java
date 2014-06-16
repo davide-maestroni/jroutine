@@ -66,6 +66,11 @@ public class Dam<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA>, CollectorBas
         return new DamBasin<SOURCE, DATA>(waterfall);
     }
 
+    public static <SOURCE, DATA> DamEvaluatorBuilder<SOURCE, DATA> evaluator() {
+
+        return new DamEvaluatorBuilder<SOURCE, DATA>();
+    }
+
     @Override
     public Dam<SOURCE, DATA> all() {
 
@@ -75,7 +80,7 @@ public class Dam<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA>, CollectorBas
     }
 
     @Override
-    public Dam<SOURCE, DATA> collect(final List<DATA> bucket) {
+    public Dam<SOURCE, DATA> collectData(final List<DATA> bucket) {
 
         final int maxCount = mMaxCount;
 
@@ -95,7 +100,7 @@ public class Dam<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA>, CollectorBas
     }
 
     @Override
-    public Dam<SOURCE, DATA> collect(final int streamNumber, final List<DATA> bucket) {
+    public Dam<SOURCE, DATA> collectData(final int streamNumber, final List<DATA> bucket) {
 
         final List<DATA> drops = mDrops.get(streamNumber);
 
@@ -162,7 +167,7 @@ public class Dam<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA>, CollectorBas
     }
 
     @Override
-    public DATA pull() {
+    public DATA pullData() {
 
         final List<List<DATA>> dropLists = mDrops;
 
@@ -178,7 +183,7 @@ public class Dam<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA>, CollectorBas
     }
 
     @Override
-    public DATA pull(final int streamNumber) {
+    public DATA pullData(final int streamNumber) {
 
         return mDrops.get(streamNumber).remove(0);
     }
@@ -203,11 +208,6 @@ public class Dam<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA>, CollectorBas
     public Throwable pullUnhandled(final int streamNumber) {
 
         return mThrowables.get(streamNumber).remove(0);
-    }
-
-    public DamEvaluatorBuilder<SOURCE, DATA> evaluator() {
-
-        return new DamEvaluatorBuilder<SOURCE, DATA>(this);
     }
 
     @Override
@@ -239,8 +239,6 @@ public class Dam<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA>, CollectorBas
     public static class DamEvaluator<SOURCE, DATA>
             implements Evaluator<CollectorBasin<SOURCE, DATA>> {
 
-        private final Dam<SOURCE, DATA> mDam;
-
         private BasinEvaluator<DATA> mEvaluator;
 
         private boolean mIsOnData;
@@ -249,10 +247,9 @@ public class Dam<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA>, CollectorBas
 
         private boolean mIsOnThrowable;
 
-        private DamEvaluator(final Dam<SOURCE, DATA> dam, final BasinEvaluator<DATA> evaluator,
-                final boolean onFlush, final boolean onData, final boolean onThrowable) {
+        private DamEvaluator(final BasinEvaluator<DATA> evaluator, final boolean onFlush,
+                final boolean onData, final boolean onThrowable) {
 
-            mDam = dam;
             mEvaluator = evaluator;
             mIsOnFlush = onFlush;
             mIsOnData = onData;
@@ -262,7 +259,8 @@ public class Dam<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA>, CollectorBas
         @Override
         public <GLASS extends CollectorBasin<SOURCE, DATA>> boolean isSatisfied(final GLASS glass) {
 
-            final Dam<SOURCE, DATA> dam = mDam;
+            //noinspection unchecked
+            final Dam<SOURCE, DATA> dam = (Dam<SOURCE, DATA>) glass;
 
             final BasinEvaluator<DATA> evaluator = mEvaluator;
 
@@ -304,8 +302,6 @@ public class Dam<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA>, CollectorBas
 
     public static class DamEvaluatorBuilder<SOURCE, DATA> {
 
-        private final Dam<SOURCE, DATA> mDam;
-
         private BasinEvaluator<DATA> mEvaluator;
 
         private boolean mIsOnData;
@@ -314,14 +310,13 @@ public class Dam<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA>, CollectorBas
 
         private boolean mIsOnThrowable;
 
-        private DamEvaluatorBuilder(final Dam<SOURCE, DATA> dam) {
+        private DamEvaluatorBuilder() {
 
-            mDam = dam;
         }
 
-        public Evaluator<CollectorBasin<SOURCE, DATA>> match() {
+        public Evaluator<CollectorBasin<SOURCE, DATA>> matches() {
 
-            return new DamEvaluator<SOURCE, DATA>(mDam, mEvaluator, mIsOnFlush, mIsOnData,
+            return new DamEvaluator<SOURCE, DATA>(mEvaluator, mIsOnFlush, mIsOnData,
                                                   mIsOnThrowable);
         }
 

@@ -22,9 +22,9 @@ public interface CollectorBasin<SOURCE, DATA> {
 
     public CollectorBasin<SOURCE, DATA> all();
 
-    public CollectorBasin<SOURCE, DATA> collect(List<DATA> bucket);
+    public CollectorBasin<SOURCE, DATA> collectData(List<DATA> bucket);
 
-    public CollectorBasin<SOURCE, DATA> collect(int streamNumber, List<DATA> bucket);
+    public CollectorBasin<SOURCE, DATA> collectData(int streamNumber, List<DATA> bucket);
 
     public CollectorBasin<SOURCE, DATA> collectUnhandled(List<Throwable> bucket);
 
@@ -34,9 +34,9 @@ public interface CollectorBasin<SOURCE, DATA> {
 
     public CollectorBasin<SOURCE, DATA> max(int maxCount);
 
-    public DATA pull();
+    public DATA pullData();
 
-    public DATA pull(int streamNumber);
+    public DATA pullData(int streamNumber);
 
     public Throwable pullUnhandled();
 

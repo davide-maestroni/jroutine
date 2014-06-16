@@ -29,9 +29,9 @@ import java.util.concurrent.TimeUnit;
 public class DamBasin<SOURCE, DATA> extends UpstreamRiver<SOURCE, SOURCE>
         implements CollectorBasin<SOURCE, DATA> {
 
-    private final Dam<SOURCE, DATA> mDam;
-
     private final Waterfall<SOURCE, DATA, DATA> mInWaterfall;
+
+    private final Object mMutex = new Object();
 
     private final Waterfall<SOURCE, DATA, DATA> mOutWaterfall;
 
@@ -45,9 +45,8 @@ public class DamBasin<SOURCE, DATA> extends UpstreamRiver<SOURCE, SOURCE>
 
         super(waterfall.source());
 
-        mDam = new Dam<SOURCE, DATA>(waterfall.size());
         mInWaterfall = waterfall;
-        mOutWaterfall = waterfall.asGlass().chain(mDam);
+        mOutWaterfall = waterfall.asGlass().chain(new Dam<SOURCE, DATA>(waterfall.size()));
     }
 
     public DamBasin<SOURCE, DATA> afterMax(final long maxDelay, final TimeUnit timeUnit) {
@@ -66,17 +65,17 @@ public class DamBasin<SOURCE, DATA> extends UpstreamRiver<SOURCE, SOURCE>
     }
 
     @Override
-    public DamBasin<SOURCE, DATA> collect(final List<DATA> bucket) {
+    public DamBasin<SOURCE, DATA> collectData(final List<DATA> bucket) {
 
-        getBasin().collect(bucket);
+        getBasin().collectData(bucket);
 
         return this;
     }
 
     @Override
-    public DamBasin<SOURCE, DATA> collect(final int streamNumber, final List<DATA> bucket) {
+    public DamBasin<SOURCE, DATA> collectData(final int streamNumber, final List<DATA> bucket) {
 
-        getBasin().collect(streamNumber, bucket);
+        getBasin().collectData(streamNumber, bucket);
 
         return this;
     }
@@ -115,15 +114,15 @@ public class DamBasin<SOURCE, DATA> extends UpstreamRiver<SOURCE, SOURCE>
     }
 
     @Override
-    public DATA pull() {
+    public DATA pullData() {
 
-        return getBasin().pull();
+        return getBasin().pullData();
     }
 
     @Override
-    public DATA pull(final int streamNumber) {
+    public DATA pullData(final int streamNumber) {
 
-        return getBasin().pull(streamNumber);
+        return getBasin().pullData(streamNumber);
     }
 
     @Override
@@ -355,34 +354,43 @@ public class DamBasin<SOURCE, DATA> extends UpstreamRiver<SOURCE, SOURCE>
 
     private CollectorBasin<SOURCE, DATA> getBasin() {
 
-        if (mBasin == null) {
+        synchronized (mMutex) {
 
-            mBasin = mReflection.matches(mEvaluatorBuilder.match()).perform();
-            mReflection = null;
+            if (mBasin == null) {
+
+                mBasin = mReflection.matches(mEvaluatorBuilder.matches()).perform();
+                mEvaluatorBuilder = null;
+                mReflection = null;
+            }
+
+            return mBasin;
         }
-
-        return mBasin;
     }
 
     private DamEvaluatorBuilder<SOURCE, DATA> getEvaluatorBuilder() {
 
-        if (mEvaluatorBuilder == null) {
+        synchronized (mMutex) {
 
-            mEvaluatorBuilder = mDam.evaluator();
+            if (mEvaluatorBuilder == null) {
+
+                mEvaluatorBuilder = Dam.evaluator();
+            }
+
+            return mEvaluatorBuilder;
         }
-
-        return mEvaluatorBuilder;
     }
 
     private Reflection<CollectorBasin<SOURCE, DATA>> getReflection() {
 
-        if (mReflection == null) {
+        synchronized (mMutex) {
 
-            mBasin = null;
-            mEvaluatorBuilder = null;
-            mReflection = mOutWaterfall.when(new Glass<CollectorBasin<SOURCE, DATA>>() {});
+            if (mReflection == null) {
+
+                mBasin = null;
+                mReflection = mOutWaterfall.when(new Glass<CollectorBasin<SOURCE, DATA>>() {});
+            }
+
+            return mReflection;
         }
-
-        return mReflection;
     }
 }

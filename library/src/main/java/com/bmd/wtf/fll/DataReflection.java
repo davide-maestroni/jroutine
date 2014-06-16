@@ -131,7 +131,7 @@ class DataReflection<CLASS> implements Reflection<CLASS> {
             try {
 
                 //noinspection unchecked
-                waitForCondition((CLASS) proxy);
+                waitForCondition((CLASS) mLeap);
 
                 return method.invoke(mLeap, args);
 

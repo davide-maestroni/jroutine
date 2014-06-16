@@ -32,6 +32,6 @@ public interface Reflection<CLASS> {
 
     public interface Evaluator<CLASS> {
 
-        public <GLASS extends CLASS> boolean isSatisfied(GLASS glass);
+        public boolean isSatisfied(CLASS glass);
     }
 }

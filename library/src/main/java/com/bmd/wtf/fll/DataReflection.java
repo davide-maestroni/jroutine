@@ -33,7 +33,7 @@ class DataReflection<CLASS> implements Reflection<CLASS> {
 
     private final GlassLeap<?, ?, ?> mLeap;
 
-    private Evaluator<CLASS> mEvaluator;
+    private volatile Evaluator<CLASS> mEvaluator;
 
     private volatile RuntimeException mTimeoutException;
 

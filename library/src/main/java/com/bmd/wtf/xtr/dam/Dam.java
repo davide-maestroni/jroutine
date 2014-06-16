@@ -257,7 +257,7 @@ public class Dam<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA>, CollectorBas
         }
 
         @Override
-        public <GLASS extends CollectorBasin<SOURCE, DATA>> boolean isSatisfied(final GLASS glass) {
+        public boolean isSatisfied(final CollectorBasin<SOURCE, DATA> glass) {
 
             //noinspection unchecked
             final Dam<SOURCE, DATA> dam = (Dam<SOURCE, DATA>) glass;

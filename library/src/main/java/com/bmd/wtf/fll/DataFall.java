@@ -42,8 +42,6 @@ class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
 
     final Leap<SOURCE, IN, OUT> leap;
 
-    final Object mutex;
-
     final CopyOnWriteArrayList<DataStream<OUT>> outputStreams =
             new CopyOnWriteArrayList<DataStream<OUT>>();
 
@@ -60,7 +58,7 @@ class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
     private int mWaterline;
 
     public DataFall(final Waterfall<SOURCE, IN, OUT> waterfall, final Current inputCurrent,
-            final Leap<SOURCE, IN, OUT> leap, final int number, final Object mutex) {
+            final Leap<SOURCE, IN, OUT> leap, final int number) {
 
         if (waterfall == null) {
 
@@ -77,26 +75,14 @@ class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
             throw new IllegalArgumentException("the fall output leap cannot be null");
         }
 
-        if (mutex == null) {
-
-            throw new IllegalArgumentException("the fall mutex cannot be null");
-        }
-
         this.inputCurrent = inputCurrent;
         this.leap = leap;
         mNumber = number;
-        this.mutex = mutex;
         mLock = new ReentrantLock();
         mCondition = mLock.newCondition();
         mInRiver = new LockRiver<SOURCE, IN>(new UpstreamRiver<SOURCE, IN>(waterfall));
         mOutRiver =
                 new LockRiver<SOURCE, OUT>(new StreamRiver<SOURCE, OUT>(outputStreams, waterfall));
-    }
-
-    public DataFall(final Waterfall<SOURCE, IN, OUT> waterfall, final Current inputCurrent,
-            final Leap<SOURCE, IN, OUT> leap, final int number) {
-
-        this(waterfall, inputCurrent, leap, number, new ReentrantLock());
     }
 
     @Override
@@ -110,16 +96,13 @@ class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
         inRiver.open(dataLock);
         outRiver.open(dataLock);
 
-        synchronized (mutex) {
+        try {
 
-            try {
+            leap.onFlush(inRiver, outRiver, mNumber);
 
-                leap.onFlush(inRiver, outRiver, mNumber);
+        } catch (final Throwable t) {
 
-            } catch (final Throwable t) {
-
-                outRiver.forward(t);
-            }
+            outRiver.forward(t);
         }
 
         outRiver.close();
@@ -139,16 +122,13 @@ class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
         inRiver.open(dataLock);
         outRiver.open(dataLock);
 
-        synchronized (mutex) {
+        try {
 
-            try {
+            leap.onUnhandled(inRiver, outRiver, mNumber, throwable);
 
-                leap.onUnhandled(inRiver, outRiver, mNumber, throwable);
+        } catch (final Throwable t) {
 
-            } catch (final Throwable t) {
-
-                outRiver.forward(t);
-            }
+            outRiver.forward(t);
         }
 
         outRiver.close();
@@ -168,16 +148,13 @@ class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
         inRiver.open(dataLock);
         outRiver.open(dataLock);
 
-        synchronized (mutex) {
+        try {
 
-            try {
+            leap.onPush(inRiver, outRiver, mNumber, drop);
 
-                leap.onPush(inRiver, outRiver, mNumber, drop);
+        } catch (final Throwable t) {
 
-            } catch (final Throwable t) {
-
-                outRiver.forward(t);
-            }
+            outRiver.forward(t);
         }
 
         outRiver.close();

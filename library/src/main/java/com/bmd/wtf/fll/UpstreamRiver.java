@@ -13,6 +13,8 @@
  */
 package com.bmd.wtf.fll;
 
+import com.bmd.wtf.flw.Glass;
+import com.bmd.wtf.flw.Reflection;
 import com.bmd.wtf.flw.River;
 
 import java.util.concurrent.TimeUnit;
@@ -27,12 +29,6 @@ public class UpstreamRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     public UpstreamRiver(final Waterfall<SOURCE, DATA, ?> waterfall) {
 
         mWaterfall = waterfall;
-    }
-
-    @Override
-    public <GLASS> GLASS when(final Class<GLASS> glass) {
-
-        return mWaterfall.when(glass);
     }
 
     @Override
@@ -194,12 +190,6 @@ public class UpstreamRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public <GLASS> GLASS when(final Class<GLASS> glass) {
-
-        return mWaterfall.when(glass);
-    }
-
-    @Override
     public int size() {
 
         return mWaterfall.size();
@@ -209,5 +199,11 @@ public class UpstreamRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     public River<SOURCE, SOURCE> source() {
 
         return mWaterfall.source();
+    }
+
+    @Override
+    public <CLASS> Reflection<CLASS> when(final Glass<CLASS> glass) {
+
+        return mWaterfall.when(glass);
     }
 }

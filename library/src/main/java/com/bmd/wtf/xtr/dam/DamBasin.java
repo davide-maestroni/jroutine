@@ -13,323 +13,103 @@
  */
 package com.bmd.wtf.xtr.dam;
 
-import com.bmd.wtf.fll.DelayInterruptedException;
+import com.bmd.wtf.fll.UpstreamRiver;
 import com.bmd.wtf.fll.Waterfall;
-import com.bmd.wtf.flw.River;
-import com.bmd.wtf.lps.Leap;
+import com.bmd.wtf.flw.Glass;
+import com.bmd.wtf.flw.Reflection;
+import com.bmd.wtf.xtr.dam.Dam.BasinEvaluator;
+import com.bmd.wtf.xtr.dam.Dam.DamEvaluatorBuilder;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Created by davide on 6/12/14.
+ * Created by davide on 6/11/14.
  */
-class DamBasin<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA>, CollectorBasin<SOURCE, DATA> {
+public class DamBasin<SOURCE, DATA> extends UpstreamRiver<SOURCE, SOURCE>
+        implements CollectorBasin<SOURCE, DATA> {
 
-    private final java.util.concurrent.locks.Condition mCondition;
+    private final Dam<SOURCE, DATA> mDam;
 
-    private final List<List<DATA>> mDrops;
+    private final Waterfall<SOURCE, DATA, DATA> mInWaterfall;
 
-    private final ReentrantLock mLock = new ReentrantLock();
+    private final Waterfall<SOURCE, DATA, DATA> mOutWaterfall;
 
-    private final List<List<Throwable>> mThrowables;
+    private CollectorBasin<SOURCE, DATA> mBasin;
 
-    private final Waterfall<SOURCE, DATA, DATA> mWaterfall;
+    private DamEvaluatorBuilder<SOURCE, DATA> mEvaluatorBuilder;
 
-    private Condition<SOURCE, DATA> mAvailableCondition;
+    private Reflection<CollectorBasin<SOURCE, DATA>> mReflection;
 
-    private int mFlushCount;
+    DamBasin(final Waterfall<SOURCE, DATA, DATA> waterfall) {
 
-    private boolean mIsOnFlush;
+        super(waterfall.source());
 
-    private int mMaxCount;
-
-    private RuntimeException mTimeoutException;
-
-    // Immediate timeout by default
-    private long mTimeoutMs = 0;
-
-    public DamBasin(final Waterfall<SOURCE, DATA, DATA> waterfall) {
-
-        mWaterfall = waterfall;
-        mCondition = mLock.newCondition();
-
-        final int size = waterfall.size();
-
-        //noinspection unchecked
-        final List<DATA>[] dropLists = new ArrayList[size];
-
-        for (int i = 0; i < size; i++) {
-
-            dropLists[i] = new ArrayList<DATA>();
-        }
-
-        //noinspection unchecked
-        mDrops = Arrays.asList(dropLists);
-
-        //noinspection unchecked
-        final List<Throwable>[] throwableLists = new ArrayList[size];
-
-        for (int i = 0; i < size; i++) {
-
-            throwableLists[i] = new ArrayList<Throwable>();
-        }
-
-        //noinspection unchecked
-        mThrowables = Arrays.asList(throwableLists);
+        mDam = new Dam<SOURCE, DATA>(waterfall.size());
+        mInWaterfall = waterfall;
+        mOutWaterfall = waterfall.asGlass().chain(mDam);
     }
 
-    @Override
-    public CollectorBasin<SOURCE, DATA> afterMax(final long maxDelay, final TimeUnit timeUnit) {
+    public DamBasin<SOURCE, DATA> afterMax(final long maxDelay, final TimeUnit timeUnit) {
 
-        final ReentrantLock lock = mLock;
-
-        lock.lock();
-
-        try {
-
-            mTimeoutMs = timeUnit.toMillis(maxDelay);
-
-        } finally {
-
-            lock.unlock();
-        }
+        getReflection().afterMax(maxDelay, timeUnit);
 
         return this;
     }
 
     @Override
-    public CollectorBasin<SOURCE, DATA> all() {
+    public DamBasin<SOURCE, DATA> all() {
 
-        final ReentrantLock lock = mLock;
-
-        lock.lock();
-
-        try {
-
-            mMaxCount = Integer.MAX_VALUE;
-
-        } finally {
-
-            lock.unlock();
-        }
+        getBasin().all();
 
         return this;
     }
 
     @Override
-    public CollectorBasin<SOURCE, DATA> collect(final List<DATA> bucket) {
+    public DamBasin<SOURCE, DATA> collect(final List<DATA> bucket) {
 
-        final ReentrantLock lock = mLock;
-
-        lock.lock();
-
-        try {
-
-            waitForData();
-
-            final List<List<DATA>> dropLists = mDrops;
-
-            for (final List<DATA> drops : dropLists) {
-
-                final List<DATA> subList =
-                        drops.subList(0, Math.max(0, Math.min(mMaxCount, drops.size())));
-
-                bucket.addAll(subList);
-
-                subList.clear();
-            }
-
-        } finally {
-
-            lock.unlock();
-        }
+        getBasin().collect(bucket);
 
         return this;
     }
 
     @Override
-    public CollectorBasin<SOURCE, DATA> collect(final int streamNumber, final List<DATA> bucket) {
+    public DamBasin<SOURCE, DATA> collect(final int streamNumber, final List<DATA> bucket) {
 
-        final ReentrantLock lock = mLock;
-
-        lock.lock();
-
-        try {
-
-            final List<DATA> drops = mDrops.get(streamNumber);
-
-            final List<DATA> subList =
-                    drops.subList(0, Math.max(0, Math.min(mMaxCount, drops.size())));
-
-            bucket.addAll(subList);
-
-            subList.clear();
-
-        } finally {
-
-            lock.unlock();
-        }
+        getBasin().collect(streamNumber, bucket);
 
         return this;
     }
 
     @Override
-    public CollectorBasin<SOURCE, DATA> collectUnhandled(final List<Throwable> bucket) {
+    public DamBasin<SOURCE, DATA> collectUnhandled(final List<Throwable> bucket) {
 
-        final ReentrantLock lock = mLock;
-
-        lock.lock();
-
-        try {
-
-            waitForThrowable();
-
-            final List<List<Throwable>> throwableLists = mThrowables;
-
-            for (final List<Throwable> throwables : throwableLists) {
-
-                final List<Throwable> subList =
-                        throwables.subList(0, Math.max(0, Math.min(mMaxCount, throwables.size())));
-
-                bucket.addAll(subList);
-
-                subList.clear();
-            }
-
-        } finally {
-
-            lock.unlock();
-        }
+        getBasin().collectUnhandled(bucket);
 
         return this;
     }
 
     @Override
-    public CollectorBasin<SOURCE, DATA> collectUnhandled(final int streamNumber,
+    public DamBasin<SOURCE, DATA> collectUnhandled(final int streamNumber,
             final List<Throwable> bucket) {
 
-        final ReentrantLock lock = mLock;
-
-        lock.lock();
-
-        try {
-
-            final List<Throwable> throwables = mThrowables.get(streamNumber);
-
-            final List<Throwable> subList =
-                    throwables.subList(0, Math.max(0, Math.min(mMaxCount, throwables.size())));
-
-            bucket.addAll(subList);
-
-            subList.clear();
-
-        } finally {
-
-            lock.unlock();
-        }
+        getBasin().collectUnhandled(streamNumber, bucket);
 
         return this;
     }
 
     @Override
-    public CollectorBasin<SOURCE, DATA> empty() {
+    public DamBasin<SOURCE, DATA> empty() {
 
-        final ReentrantLock lock = mLock;
-
-        lock.lock();
-
-        try {
-
-            mDrops.clear();
-            mThrowables.clear();
-
-        } finally {
-
-            lock.unlock();
-        }
+        getBasin().empty();
 
         return this;
     }
 
     @Override
-    public CollectorBasin<SOURCE, DATA> eventuallyThrow(final RuntimeException exception) {
+    public DamBasin<SOURCE, DATA> max(final int maxCount) {
 
-        final ReentrantLock lock = mLock;
-
-        lock.lock();
-
-        try {
-
-            mTimeoutException = exception;
-
-        } finally {
-
-            lock.unlock();
-        }
-
-        return this;
-    }
-
-    @Override
-    public CollectorBasin<SOURCE, DATA> immediately() {
-
-        final ReentrantLock lock = mLock;
-
-        lock.lock();
-
-        try {
-
-            mTimeoutMs = 0;
-            mIsOnFlush = false;
-            mAvailableCondition = null;
-
-        } finally {
-
-            lock.unlock();
-        }
-
-        return this;
-    }
-
-    @Override
-    public CollectorBasin<SOURCE, DATA> max(final int maxCount) {
-
-        final ReentrantLock lock = mLock;
-
-        lock.lock();
-
-        try {
-
-            mMaxCount = maxCount;
-
-        } finally {
-
-            lock.unlock();
-        }
-
-        return this;
-    }
-
-    @Override
-    public CollectorBasin<SOURCE, DATA> onFlush() {
-
-        final ReentrantLock lock = mLock;
-
-        lock.lock();
-
-        try {
-
-            mIsOnFlush = true;
-            mAvailableCondition = null;
-
-        } finally {
-
-            lock.unlock();
-        }
+        getBasin().max(maxCount);
 
         return this;
     }
@@ -337,359 +117,272 @@ class DamBasin<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA>, CollectorBasin
     @Override
     public DATA pull() {
 
-        final ReentrantLock lock = mLock;
-
-        lock.lock();
-
-        try {
-
-            waitForData();
-
-            final List<List<DATA>> dropLists = mDrops;
-
-            for (final List<DATA> drops : dropLists) {
-
-                if (!drops.isEmpty()) {
-
-                    return drops.remove(0);
-                }
-            }
-
-        } finally {
-
-            lock.unlock();
-        }
-
-        throw new IndexOutOfBoundsException(); // TODO
+        return getBasin().pull();
     }
 
     @Override
     public DATA pull(final int streamNumber) {
 
-        final ReentrantLock lock = mLock;
-
-        lock.lock();
-
-        try {
-
-            return mDrops.get(streamNumber).remove(0);
-
-        } finally {
-
-            lock.unlock();
-        }
+        return getBasin().pull(streamNumber);
     }
 
     @Override
     public Throwable pullUnhandled() {
 
-        final ReentrantLock lock = mLock;
-
-        lock.lock();
-
-        try {
-
-            waitForThrowable();
-
-            final List<List<Throwable>> throwableLists = mThrowables;
-
-            for (final List<Throwable> throwables : throwableLists) {
-
-                if (!throwables.isEmpty()) {
-
-                    return throwables.remove(0);
-                }
-            }
-
-        } finally {
-
-            lock.unlock();
-        }
-
-        throw new IndexOutOfBoundsException(); // TODO
+        return getBasin().pullUnhandled();
     }
 
     @Override
     public Throwable pullUnhandled(final int streamNumber) {
 
-        final ReentrantLock lock = mLock;
-
-        lock.lock();
-
-        try {
-
-            return mThrowables.get(streamNumber).remove(0);
-
-        } finally {
-
-            lock.unlock();
-        }
+        return getBasin().pullUnhandled(streamNumber);
     }
 
     @Override
+    public void drain() {
+
+        mOutWaterfall.drain(false);
+    }
+
+    @Override
+    public void drain(final int streamNumber) {
+
+        mOutWaterfall.drain(streamNumber, false);
+    }
+
+    @Override
+    public void dryUp() {
+
+        mOutWaterfall.dryUp(false);
+    }
+
+    @Override
+    public void dryUp(final int streamNumber) {
+
+        mOutWaterfall.dryUp(streamNumber, false);
+    }
+
+    @Override
+    public DamBasin<SOURCE, DATA> flush(final int streamNumber) {
+
+        super.flush(streamNumber);
+
+        return this;
+    }
+
+    @Override
+    public DamBasin<SOURCE, DATA> flush() {
+
+        super.flush();
+
+        return this;
+    }
+
+    @Override
+    public DamBasin<SOURCE, DATA> forward(final Throwable throwable) {
+
+        super.forward(throwable);
+
+        return this;
+    }
+
+    @Override
+    public DamBasin<SOURCE, DATA> push(final SOURCE... drops) {
+
+        super.push(drops);
+
+        return this;
+    }
+
+    @Override
+    public DamBasin<SOURCE, DATA> push(final Iterable<? extends SOURCE> drops) {
+
+        super.push(drops);
+
+        return this;
+    }
+
+    @Override
+    public DamBasin<SOURCE, DATA> push(final SOURCE drop) {
+
+        super.push(drop);
+
+        return this;
+    }
+
+    @Override
+    public DamBasin<SOURCE, DATA> pushAfter(final long delay, final TimeUnit timeUnit,
+            final Iterable<? extends SOURCE> drops) {
+
+        super.pushAfter(delay, timeUnit, drops);
+
+        return this;
+    }
+
+    @Override
+    public DamBasin<SOURCE, DATA> pushAfter(final long delay, final TimeUnit timeUnit,
+            final SOURCE drop) {
+
+        super.pushAfter(delay, timeUnit, drop);
+
+        return this;
+    }
+
+    @Override
+    public DamBasin<SOURCE, DATA> pushAfter(final long delay, final TimeUnit timeUnit,
+            final SOURCE... drops) {
+
+        super.pushAfter(delay, timeUnit, drops);
+
+        return this;
+    }
+
+    @Override
+    public DamBasin<SOURCE, DATA> forward(final int streamNumber, final Throwable throwable) {
+
+        super.forward(streamNumber, throwable);
+
+        return this;
+    }
+
+    @Override
+    public DamBasin<SOURCE, DATA> push(final int streamNumber, final SOURCE... drops) {
+
+        super.push(streamNumber, drops);
+
+        return this;
+    }
+
+    @Override
+    public DamBasin<SOURCE, DATA> push(final int streamNumber,
+            final Iterable<? extends SOURCE> drops) {
+
+        super.push(streamNumber, drops);
+
+        return this;
+    }
+
+    @Override
+    public DamBasin<SOURCE, DATA> push(final int streamNumber, final SOURCE drop) {
+
+        super.push(streamNumber, drop);
+
+        return this;
+    }
+
+    @Override
+    public DamBasin<SOURCE, DATA> pushAfter(final int streamNumber, final long delay,
+            final TimeUnit timeUnit, final Iterable<? extends SOURCE> drops) {
+
+        super.pushAfter(streamNumber, delay, timeUnit, drops);
+
+        return this;
+    }
+
+    @Override
+    public DamBasin<SOURCE, DATA> pushAfter(final int streamNumber, final long delay,
+            final TimeUnit timeUnit, final SOURCE drop) {
+
+        super.pushAfter(streamNumber, delay, timeUnit, drop);
+
+        return this;
+    }
+
+    @Override
+    public DamBasin<SOURCE, DATA> pushAfter(final int streamNumber, final long delay,
+            final TimeUnit timeUnit, final SOURCE... drops) {
+
+        super.pushAfter(streamNumber, delay, timeUnit, drops);
+
+        return this;
+    }
+
+    public DamBasin<SOURCE, DATA> eventuallyThrow(final RuntimeException exception) {
+
+        getReflection().eventuallyThrow(exception);
+
+        return this;
+    }
+
+    public DamBasin<SOURCE, DATA> immediately() {
+
+        getReflection().afterMax(0, TimeUnit.MILLISECONDS);
+
+        return this;
+    }
+
+    public DamBasin<SOURCE, DATA> on(final BasinEvaluator<DATA> evaluator) {
+
+        getEvaluatorBuilder().on(evaluator);
+
+        return this;
+    }
+
+    public DamBasin<SOURCE, DATA> onDataAvailable() {
+
+        getEvaluatorBuilder().onDataAvailable();
+
+        return this;
+    }
+
+    public DamBasin<SOURCE, DATA> onFlush() {
+
+        getEvaluatorBuilder().onFlush();
+
+        return this;
+    }
+
+    public DamBasin<SOURCE, DATA> onThrowableAvailable() {
+
+        getEvaluatorBuilder().onThrowableAvailable();
+
+        return this;
+    }
+
     public Waterfall<SOURCE, DATA, DATA> release() {
 
-        return mWaterfall;
+        mOutWaterfall.drain();
+
+        return mInWaterfall;
     }
 
-    @Override
-    public CollectorBasin<SOURCE, DATA> when(final Condition<SOURCE, DATA> condition) {
+    public DamBasin<SOURCE, DATA> whenAvailable() {
 
-        final ReentrantLock lock = mLock;
-
-        lock.lock();
-
-        try {
-
-            mIsOnFlush = false;
-            mAvailableCondition = condition;
-
-        } finally {
-
-            lock.unlock();
-        }
+        getReflection().eventually();
 
         return this;
     }
 
-    @Override
-    public CollectorBasin<SOURCE, DATA> whenAvailable() {
+    private CollectorBasin<SOURCE, DATA> getBasin() {
 
-        final ReentrantLock lock = mLock;
+        if (mBasin == null) {
 
-        lock.lock();
-
-        try {
-
-            mTimeoutMs = -1;
-            mIsOnFlush = false;
-            mAvailableCondition = null;
-
-        } finally {
-
-            lock.unlock();
+            mBasin = mReflection.matches(mEvaluatorBuilder.match()).perform();
+            mReflection = null;
         }
 
-        return this;
+        return mBasin;
     }
 
-    @Override
-    public void onFlush(final River<SOURCE, DATA> upRiver, final River<SOURCE, DATA> downRiver,
-            final int fallNumber) {
+    private DamEvaluatorBuilder<SOURCE, DATA> getEvaluatorBuilder() {
 
-        final ReentrantLock lock = mLock;
+        if (mEvaluatorBuilder == null) {
 
-        lock.lock();
-
-        try {
-
-            ++mFlushCount;
-
-            mCondition.signalAll();
-
-        } finally {
-
-            lock.unlock();
+            mEvaluatorBuilder = mDam.evaluator();
         }
+
+        return mEvaluatorBuilder;
     }
 
-    @Override
-    public void onPush(final River<SOURCE, DATA> upRiver, final River<SOURCE, DATA> downRiver,
-            final int fallNumber, final DATA drop) {
+    private Reflection<CollectorBasin<SOURCE, DATA>> getReflection() {
 
-        final ReentrantLock lock = mLock;
+        if (mReflection == null) {
 
-        lock.lock();
-
-        try {
-
-            mDrops.get(fallNumber).add(drop);
-
-            mCondition.signalAll();
-
-        } finally {
-
-            lock.unlock();
-        }
-    }
-
-    @Override
-    public void onUnhandled(final River<SOURCE, DATA> upRiver, final River<SOURCE, DATA> downRiver,
-            final int fallNumber, final Throwable throwable) {
-
-        final ReentrantLock lock = mLock;
-
-        lock.lock();
-
-        try {
-
-            mThrowables.get(fallNumber).add(throwable);
-
-            mCondition.signalAll();
-
-        } finally {
-
-            lock.unlock();
-        }
-    }
-
-    private boolean matchesDataCondition() {
-
-        if (mAvailableCondition != null) {
-
-            return mAvailableCondition.matches(this, mDrops, mThrowables);
+            mBasin = null;
+            mEvaluatorBuilder = null;
+            mReflection = mOutWaterfall.when(new Glass<CollectorBasin<SOURCE, DATA>>() {});
         }
 
-        if (mIsOnFlush) {
-
-            return (mFlushCount > 0);
-        }
-
-        return !mDrops.isEmpty();
-    }
-
-    private boolean matchesThrowableCondition() {
-
-        if (mAvailableCondition != null) {
-
-            return mAvailableCondition.matches(this, mDrops, mThrowables);
-        }
-
-        if (mIsOnFlush) {
-
-            return (mFlushCount > 0);
-        }
-
-        return !mThrowables.isEmpty();
-    }
-
-    private void waitForData() {
-
-        long currentTimeout = mTimeoutMs;
-
-        if (currentTimeout == 0) {
-
-            return;
-        }
-
-        boolean isTimeout = false;
-
-        RuntimeException exception = null;
-
-        try {
-
-            if (matchesDataCondition()) {
-
-                return;
-            }
-
-            exception = mTimeoutException;
-
-            final long startTime = System.currentTimeMillis();
-
-            final long endTime = startTime + currentTimeout;
-
-            do {
-
-                if (currentTimeout >= 0) {
-
-                    mCondition.await(currentTimeout, TimeUnit.MILLISECONDS);
-
-                    currentTimeout = endTime - System.currentTimeMillis();
-
-                    if (!matchesDataCondition() && (currentTimeout <= 0)) {
-
-                        isTimeout = true;
-
-                        break;
-                    }
-
-                } else {
-
-                    mCondition.await();
-                }
-
-            } while (!matchesDataCondition());
-
-        } catch (final InterruptedException e) {
-
-            Thread.currentThread().interrupt();
-
-            throw new DelayInterruptedException(e);
-
-        } finally {
-
-            mFlushCount = 0;
-        }
-
-        if (isTimeout && (exception != null)) {
-
-            throw exception;
-        }
-    }
-
-    private void waitForThrowable() {
-
-        long currentTimeout = mTimeoutMs;
-
-        if (currentTimeout == 0) {
-
-            return;
-        }
-
-        boolean isTimeout = false;
-
-        RuntimeException exception = null;
-
-        try {
-
-            if (matchesThrowableCondition()) {
-
-                return;
-            }
-
-            exception = mTimeoutException;
-
-            final long startTime = System.currentTimeMillis();
-
-            final long endTime = startTime + currentTimeout;
-
-            do {
-
-                if (currentTimeout >= 0) {
-
-                    mCondition.await(currentTimeout, TimeUnit.MILLISECONDS);
-
-                    currentTimeout = endTime - System.currentTimeMillis();
-
-                    if (!matchesThrowableCondition() && (currentTimeout <= 0)) {
-
-                        isTimeout = true;
-
-                        break;
-                    }
-
-                } else {
-
-                    mCondition.await();
-                }
-
-            } while (!matchesThrowableCondition());
-
-        } catch (final InterruptedException e) {
-
-            Thread.currentThread().interrupt();
-
-            throw new DelayInterruptedException(e);
-
-        } finally {
-
-            mFlushCount = 0;
-        }
-
-        if (isTimeout && (exception != null)) {
-
-            throw exception;
-        }
+        return mReflection;
     }
 }

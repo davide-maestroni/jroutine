@@ -13,6 +13,8 @@
  */
 package com.bmd.wtf.fll;
 
+import com.bmd.wtf.flw.Glass;
+import com.bmd.wtf.flw.Reflection;
 import com.bmd.wtf.flw.River;
 
 import java.util.concurrent.TimeUnit;
@@ -407,15 +409,15 @@ class LockRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public <GLASS> GLASS when(final Class<GLASS> glass) {
-
-        return mRiver.when(glass);
-    }
-
-    @Override
     public River<SOURCE, SOURCE> source() {
 
         return mRiver.source();
+    }
+
+    @Override
+    public <CLASS> Reflection<CLASS> when(final Glass<CLASS> glass) {
+
+        return mRiver.when(glass);
     }
 
     void close() {

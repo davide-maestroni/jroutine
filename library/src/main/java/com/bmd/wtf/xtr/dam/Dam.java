@@ -13,48 +13,63 @@
  */
 package com.bmd.wtf.xtr.dam;
 
-import com.bmd.wtf.fll.UpstreamRiver;
 import com.bmd.wtf.fll.Waterfall;
+import com.bmd.wtf.flw.Reflection.Evaluator;
+import com.bmd.wtf.flw.River;
+import com.bmd.wtf.lps.Leap;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
- * Created by davide on 6/11/14.
+ * Created by davide on 6/12/14.
  */
-public class Dam<SOURCE, DATA> extends UpstreamRiver<SOURCE, SOURCE>
-        implements CollectorBasin<SOURCE, DATA> {
+public class Dam<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA>, CollectorBasin<SOURCE, DATA> {
 
-    private final DamBasin<SOURCE, DATA> mBasin;
+    private final List<List<DATA>> mDrops;
 
-    private final Waterfall<SOURCE, DATA, DATA> mWaterfall;
+    private final List<List<Throwable>> mThrowables;
 
-    private Dam(final Waterfall<SOURCE, DATA, DATA> waterfall) {
+    private int mFlushCount;
 
-        super(waterfall.source());
+    private int mMaxCount = Integer.MAX_VALUE;
 
-        mBasin = new DamBasin<SOURCE, DATA>(waterfall);
-        mWaterfall = waterfall.chain(mBasin);
+    public Dam(final int fallCount) {
+
+        //noinspection unchecked
+        final List<DATA>[] dropLists = new ArrayList[fallCount];
+
+        for (int i = 0; i < fallCount; i++) {
+
+            dropLists[i] = new ArrayList<DATA>();
+        }
+
+        //noinspection unchecked
+        mDrops = Arrays.asList(dropLists);
+
+        //noinspection unchecked
+        final List<Throwable>[] throwableLists = new ArrayList[fallCount];
+
+        for (int i = 0; i < fallCount; i++) {
+
+            throwableLists[i] = new ArrayList<Throwable>();
+        }
+
+        //noinspection unchecked
+        mThrowables = Arrays.asList(throwableLists);
     }
 
-    public static <SOURCE, DATA> Dam<SOURCE, DATA> build(
+    public static <SOURCE, DATA> DamBasin<SOURCE, DATA> build(
             final Waterfall<SOURCE, DATA, DATA> waterfall) {
 
-        return new Dam<SOURCE, DATA>(waterfall);
-    }
-
-    @Override
-    public Dam<SOURCE, DATA> afterMax(final long maxDelay, final TimeUnit timeUnit) {
-
-        mBasin.afterMax(maxDelay, timeUnit);
-
-        return this;
+        return new DamBasin<SOURCE, DATA>(waterfall);
     }
 
     @Override
     public Dam<SOURCE, DATA> all() {
 
-        mBasin.all();
+        mMaxCount = Integer.MAX_VALUE;
 
         return this;
     }
@@ -62,15 +77,33 @@ public class Dam<SOURCE, DATA> extends UpstreamRiver<SOURCE, SOURCE>
     @Override
     public Dam<SOURCE, DATA> collect(final List<DATA> bucket) {
 
-        mBasin.collect(bucket);
+        final int maxCount = mMaxCount;
+
+        final List<List<DATA>> dropLists = mDrops;
+
+        for (final List<DATA> drops : dropLists) {
+
+            final List<DATA> subList =
+                    drops.subList(0, Math.max(0, Math.min(maxCount, drops.size())));
+
+            bucket.addAll(subList);
+
+            subList.clear();
+        }
 
         return this;
     }
 
     @Override
-    public CollectorBasin<SOURCE, DATA> collect(final int streamNumber, final List<DATA> bucket) {
+    public Dam<SOURCE, DATA> collect(final int streamNumber, final List<DATA> bucket) {
 
-        mBasin.collect(streamNumber, bucket);
+        final List<DATA> drops = mDrops.get(streamNumber);
+
+        final List<DATA> subList = drops.subList(0, Math.max(0, Math.min(mMaxCount, drops.size())));
+
+        bucket.addAll(subList);
+
+        subList.clear();
 
         return this;
     }
@@ -78,16 +111,35 @@ public class Dam<SOURCE, DATA> extends UpstreamRiver<SOURCE, SOURCE>
     @Override
     public Dam<SOURCE, DATA> collectUnhandled(final List<Throwable> bucket) {
 
-        mBasin.collectUnhandled(bucket);
+        final int maxCount = mMaxCount;
+
+        final List<List<Throwable>> throwableLists = mThrowables;
+
+        for (final List<Throwable> throwables : throwableLists) {
+
+            final List<Throwable> subList =
+                    throwables.subList(0, Math.max(0, Math.min(maxCount, throwables.size())));
+
+            bucket.addAll(subList);
+
+            subList.clear();
+        }
 
         return this;
     }
 
     @Override
-    public CollectorBasin<SOURCE, DATA> collectUnhandled(final int streamNumber,
+    public Dam<SOURCE, DATA> collectUnhandled(final int streamNumber,
             final List<Throwable> bucket) {
 
-        mBasin.collectUnhandled(streamNumber, bucket);
+        final List<Throwable> throwables = mThrowables.get(streamNumber);
+
+        final List<Throwable> subList =
+                throwables.subList(0, Math.max(0, Math.min(mMaxCount, throwables.size())));
+
+        bucket.addAll(subList);
+
+        subList.clear();
 
         return this;
     }
@@ -95,23 +147,8 @@ public class Dam<SOURCE, DATA> extends UpstreamRiver<SOURCE, SOURCE>
     @Override
     public Dam<SOURCE, DATA> empty() {
 
-        mBasin.empty();
-
-        return this;
-    }
-
-    @Override
-    public Dam<SOURCE, DATA> eventuallyThrow(final RuntimeException exception) {
-
-        mBasin.eventuallyThrow(exception);
-
-        return this;
-    }
-
-    @Override
-    public Dam<SOURCE, DATA> immediately() {
-
-        mBasin.immediately();
+        mDrops.clear();
+        mThrowables.clear();
 
         return this;
     }
@@ -119,15 +156,7 @@ public class Dam<SOURCE, DATA> extends UpstreamRiver<SOURCE, SOURCE>
     @Override
     public Dam<SOURCE, DATA> max(final int maxCount) {
 
-        mBasin.max(maxCount);
-
-        return this;
-    }
-
-    @Override
-    public Dam<SOURCE, DATA> onFlush() {
-
-        mBasin.onFlush();
+        mMaxCount = maxCount;
 
         return this;
     }
@@ -135,204 +164,193 @@ public class Dam<SOURCE, DATA> extends UpstreamRiver<SOURCE, SOURCE>
     @Override
     public DATA pull() {
 
-        return mBasin.pull();
+        final List<List<DATA>> dropLists = mDrops;
+
+        for (final List<DATA> drops : dropLists) {
+
+            if (!drops.isEmpty()) {
+
+                return drops.remove(0);
+            }
+        }
+
+        throw new IndexOutOfBoundsException(); // TODO
     }
 
     @Override
     public DATA pull(final int streamNumber) {
 
-        return mBasin.pull(streamNumber);
+        return mDrops.get(streamNumber).remove(0);
     }
 
     @Override
     public Throwable pullUnhandled() {
 
-        return mBasin.pullUnhandled();
+        final List<List<Throwable>> throwableLists = mThrowables;
+
+        for (final List<Throwable> throwables : throwableLists) {
+
+            if (!throwables.isEmpty()) {
+
+                return throwables.remove(0);
+            }
+        }
+
+        throw new IndexOutOfBoundsException(); // TODO
     }
 
     @Override
     public Throwable pullUnhandled(final int streamNumber) {
 
-        return mBasin.pullUnhandled(streamNumber);
+        return mThrowables.get(streamNumber).remove(0);
+    }
+
+    public DamEvaluatorBuilder<SOURCE, DATA> evaluator() {
+
+        return new DamEvaluatorBuilder<SOURCE, DATA>(this);
     }
 
     @Override
-    public Waterfall<SOURCE, DATA, DATA> release() {
+    public void onFlush(final River<SOURCE, DATA> upRiver, final River<SOURCE, DATA> downRiver,
+            final int fallNumber) {
 
-        return mBasin.release();
+        ++mFlushCount;
     }
 
     @Override
-    public Dam<SOURCE, DATA> when(final Condition<SOURCE, DATA> condition) {
+    public void onPush(final River<SOURCE, DATA> upRiver, final River<SOURCE, DATA> downRiver,
+            final int fallNumber, final DATA drop) {
 
-        mBasin.when(condition);
-
-        return this;
+        mDrops.get(fallNumber).add(drop);
     }
 
     @Override
-    public Dam<SOURCE, DATA> whenAvailable() {
+    public void onUnhandled(final River<SOURCE, DATA> upRiver, final River<SOURCE, DATA> downRiver,
+            final int fallNumber, final Throwable throwable) {
 
-        mBasin.whenAvailable();
-
-        return this;
+        mThrowables.get(fallNumber).add(throwable);
     }
 
-    @Override
-    public void drain() {
+    public interface BasinEvaluator<DATA> {
 
-        mWaterfall.drain(false);
+        public boolean isSatisfied(List<List<DATA>> drops, List<List<Throwable>> throwables);
     }
 
-    @Override
-    public void drain(final int streamNumber) {
+    public static class DamEvaluator<SOURCE, DATA>
+            implements Evaluator<CollectorBasin<SOURCE, DATA>> {
 
-        mWaterfall.drain(streamNumber, false);
+        private final Dam<SOURCE, DATA> mDam;
+
+        private BasinEvaluator<DATA> mEvaluator;
+
+        private boolean mIsOnData;
+
+        private boolean mIsOnFlush;
+
+        private boolean mIsOnThrowable;
+
+        private DamEvaluator(final Dam<SOURCE, DATA> dam, final BasinEvaluator<DATA> evaluator,
+                final boolean onFlush, final boolean onData, final boolean onThrowable) {
+
+            mDam = dam;
+            mEvaluator = evaluator;
+            mIsOnFlush = onFlush;
+            mIsOnData = onData;
+            mIsOnThrowable = onThrowable;
+        }
+
+        @Override
+        public <GLASS extends CollectorBasin<SOURCE, DATA>> boolean isSatisfied(final GLASS glass) {
+
+            final Dam<SOURCE, DATA> dam = mDam;
+
+            final BasinEvaluator<DATA> evaluator = mEvaluator;
+
+            if (evaluator != null) {
+
+                if (!evaluator.isSatisfied(dam.mDrops, dam.mThrowables)) {
+
+                    return false;
+                }
+            }
+
+            if (mIsOnFlush) {
+
+                if (dam.mFlushCount <= 0) {
+
+                    return false;
+                }
+            }
+
+            if (mIsOnData) {
+
+                if (dam.mDrops.isEmpty()) {
+
+                    return false;
+                }
+            }
+
+            if (mIsOnThrowable) {
+
+                if (dam.mThrowables.isEmpty()) {
+
+                    return false;
+                }
+            }
+
+            return true;
+        }
     }
 
-    @Override
-    public void dryUp() {
+    public static class DamEvaluatorBuilder<SOURCE, DATA> {
 
-        mWaterfall.dryUp(false);
-    }
+        private final Dam<SOURCE, DATA> mDam;
 
-    @Override
-    public void dryUp(final int streamNumber) {
+        private BasinEvaluator<DATA> mEvaluator;
 
-        mWaterfall.dryUp(streamNumber, false);
-    }
+        private boolean mIsOnData;
 
-    @Override
-    public Dam<SOURCE, DATA> flush(final int streamNumber) {
+        private boolean mIsOnFlush;
 
-        super.flush(streamNumber);
+        private boolean mIsOnThrowable;
 
-        return this;
-    }
+        private DamEvaluatorBuilder(final Dam<SOURCE, DATA> dam) {
 
-    @Override
-    public Dam<SOURCE, DATA> flush() {
+            mDam = dam;
+        }
 
-        super.flush();
+        public Evaluator<CollectorBasin<SOURCE, DATA>> match() {
 
-        return this;
-    }
+            return new DamEvaluator<SOURCE, DATA>(mDam, mEvaluator, mIsOnFlush, mIsOnData,
+                                                  mIsOnThrowable);
+        }
 
-    @Override
-    public Dam<SOURCE, DATA> forward(final Throwable throwable) {
+        public DamEvaluatorBuilder<SOURCE, DATA> on(final BasinEvaluator<DATA> evaluator) {
 
-        super.forward(throwable);
+            mEvaluator = evaluator;
 
-        return this;
-    }
+            return this;
+        }
 
-    @Override
-    public Dam<SOURCE, DATA> push(final SOURCE... drops) {
+        public DamEvaluatorBuilder<SOURCE, DATA> onDataAvailable() {
 
-        super.push(drops);
+            mIsOnData = true;
 
-        return this;
-    }
+            return this;
+        }
 
-    @Override
-    public Dam<SOURCE, DATA> push(final Iterable<? extends SOURCE> drops) {
+        public DamEvaluatorBuilder<SOURCE, DATA> onFlush() {
 
-        super.push(drops);
+            mIsOnFlush = true;
 
-        return this;
-    }
+            return this;
+        }
 
-    @Override
-    public Dam<SOURCE, DATA> push(final SOURCE drop) {
+        public DamEvaluatorBuilder<SOURCE, DATA> onThrowableAvailable() {
 
-        super.push(drop);
+            mIsOnThrowable = true;
 
-        return this;
-    }
-
-    @Override
-    public Dam<SOURCE, DATA> pushAfter(final long delay, final TimeUnit timeUnit,
-            final Iterable<? extends SOURCE> drops) {
-
-        super.pushAfter(delay, timeUnit, drops);
-
-        return this;
-    }
-
-    @Override
-    public Dam<SOURCE, DATA> pushAfter(final long delay, final TimeUnit timeUnit,
-            final SOURCE drop) {
-
-        super.pushAfter(delay, timeUnit, drop);
-
-        return this;
-    }
-
-    @Override
-    public Dam<SOURCE, DATA> pushAfter(final long delay, final TimeUnit timeUnit,
-            final SOURCE... drops) {
-
-        super.pushAfter(delay, timeUnit, drops);
-
-        return this;
-    }
-
-    @Override
-    public Dam<SOURCE, DATA> forward(final int streamNumber, final Throwable throwable) {
-
-        super.forward(streamNumber, throwable);
-
-        return this;
-    }
-
-    @Override
-    public Dam<SOURCE, DATA> push(final int streamNumber, final SOURCE... drops) {
-
-        super.push(streamNumber, drops);
-
-        return this;
-    }
-
-    @Override
-    public Dam<SOURCE, DATA> push(final int streamNumber, final Iterable<? extends SOURCE> drops) {
-
-        super.push(streamNumber, drops);
-
-        return this;
-    }
-
-    @Override
-    public Dam<SOURCE, DATA> push(final int streamNumber, final SOURCE drop) {
-
-        super.push(streamNumber, drop);
-
-        return this;
-    }
-
-    @Override
-    public Dam<SOURCE, DATA> pushAfter(final int streamNumber, final long delay,
-            final TimeUnit timeUnit, final Iterable<? extends SOURCE> drops) {
-
-        super.pushAfter(streamNumber, delay, timeUnit, drops);
-
-        return this;
-    }
-
-    @Override
-    public Dam<SOURCE, DATA> pushAfter(final int streamNumber, final long delay,
-            final TimeUnit timeUnit, final SOURCE drop) {
-
-        super.pushAfter(streamNumber, delay, timeUnit, drop);
-
-        return this;
-    }
-
-    @Override
-    public Dam<SOURCE, DATA> pushAfter(final int streamNumber, final long delay,
-            final TimeUnit timeUnit, final SOURCE... drops) {
-
-        super.pushAfter(streamNumber, delay, timeUnit, drops);
-
-        return this;
+            return this;
+        }
     }
 }

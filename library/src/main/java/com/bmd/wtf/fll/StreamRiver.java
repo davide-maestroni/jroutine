@@ -13,6 +13,8 @@
  */
 package com.bmd.wtf.fll;
 
+import com.bmd.wtf.flw.Glass;
+import com.bmd.wtf.flw.Reflection;
 import com.bmd.wtf.flw.River;
 
 import java.util.List;
@@ -32,12 +34,6 @@ class StreamRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
 
         mStreams = streams;
         mWaterfall = waterfall;
-    }
-
-    @Override
-    public <GLASS> GLASS when(final Class<GLASS> glass) {
-
-        return mWaterfall.when(glass);
     }
 
     @Override
@@ -239,5 +235,11 @@ class StreamRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     public River<SOURCE, SOURCE> source() {
 
         return mWaterfall.source();
+    }
+
+    @Override
+    public <CLASS> Reflection<CLASS> when(final Glass<CLASS> glass) {
+
+        return mWaterfall.when(glass);
     }
 }

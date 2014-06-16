@@ -20,8 +20,6 @@ import java.util.concurrent.TimeUnit;
  */
 public interface River<SOURCE, DATA> extends Stream<DATA> {
 
-    public <GLASS> GLASS when(Class<GLASS> glass);
-
     public void drain();
 
     public void drain(int streamNumber);
@@ -76,7 +74,7 @@ public interface River<SOURCE, DATA> extends Stream<DATA> {
 
     public int size();
 
-    public <GLASS> GLASS when(Class<GLASS> glass);
-
     public River<SOURCE, SOURCE> source();
+
+    public <CLASS> Reflection<CLASS> when(Glass<CLASS> glass);
 }

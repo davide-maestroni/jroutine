@@ -13,17 +13,12 @@
  */
 package com.bmd.wtf.xtr.dam;
 
-import com.bmd.wtf.fll.Waterfall;
-
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by davide on 6/11/14.
  */
 public interface CollectorBasin<SOURCE, DATA> {
-
-    public CollectorBasin<SOURCE, DATA> afterMax(long maxDelay, TimeUnit timeUnit);
 
     public CollectorBasin<SOURCE, DATA> all();
 
@@ -37,13 +32,7 @@ public interface CollectorBasin<SOURCE, DATA> {
 
     public CollectorBasin<SOURCE, DATA> empty();
 
-    public CollectorBasin<SOURCE, DATA> eventuallyThrow(RuntimeException exception);
-
-    public CollectorBasin<SOURCE, DATA> immediately();
-
     public CollectorBasin<SOURCE, DATA> max(int maxCount);
-
-    public CollectorBasin<SOURCE, DATA> onFlush();
 
     public DATA pull();
 
@@ -52,16 +41,4 @@ public interface CollectorBasin<SOURCE, DATA> {
     public Throwable pullUnhandled();
 
     public Throwable pullUnhandled(int streamNumber);
-
-    public Waterfall<SOURCE, DATA, DATA> release();
-
-    public CollectorBasin<SOURCE, DATA> when(Condition<SOURCE, DATA> condition);
-
-    public CollectorBasin<SOURCE, DATA> whenAvailable();
-
-    public interface Condition<SOURCE, DATA> {
-
-        public boolean matches(CollectorBasin<SOURCE, DATA> basin, List<List<DATA>> data,
-                List<List<Throwable>> unhandled);
-    }
 }

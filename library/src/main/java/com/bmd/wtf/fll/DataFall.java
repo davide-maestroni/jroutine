@@ -80,7 +80,7 @@ class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
         mNumber = number;
         mLock = new ReentrantLock();
         mCondition = mLock.newCondition();
-        mInRiver = new LockRiver<SOURCE, IN>(new UpstreamRiver<SOURCE, IN>(waterfall));
+        mInRiver = new LockRiver<SOURCE, IN>(new WaterfallRiver<SOURCE, IN>(waterfall, false));
         mOutRiver =
                 new LockRiver<SOURCE, OUT>(new StreamRiver<SOURCE, OUT>(outputStreams, waterfall));
     }

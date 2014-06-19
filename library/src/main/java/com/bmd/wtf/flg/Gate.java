@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.wtf.flw;
+package com.bmd.wtf.flg;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -20,16 +20,29 @@ import java.lang.reflect.WildcardType;
 /**
  * Created by davide on 6/14/14.
  */
-public abstract class Glass<CLASS> {
+public abstract class Gate<TYPE> {
 
     private Class<?> mRawType;
 
     private Type mType;
 
-    public final CLASS cast(final Object object) {
+    public static <CLASS> Gate<CLASS> from(final Class<CLASS> rawType) {
+
+        if (rawType == null) {
+
+            throw new IllegalArgumentException("the gate type cannot be null");
+        }
+
+        final Gate<CLASS> gate = new Gate<CLASS>() {};
+        gate.mRawType = rawType;
+
+        return gate;
+    }
+
+    public final TYPE cast(final Object object) {
 
         //noinspection unchecked
-        return (CLASS) object;
+        return (TYPE) object;
     }
 
     public final Class<?> getRawType() {
@@ -60,7 +73,7 @@ public abstract class Glass<CLASS> {
             Class<?> subClass = getClass();
             Class<?> superClass = subClass.getSuperclass();
 
-            while (!Glass.class.equals(superClass)) {
+            while (!Gate.class.equals(superClass)) {
 
                 subClass = superClass;
                 superClass = subClass.getSuperclass();
@@ -106,14 +119,19 @@ public abstract class Glass<CLASS> {
             return true;
         }
 
-        if (!(o instanceof Glass)) {
+        if (!(o instanceof Gate)) {
 
             return false;
         }
 
-        final Glass glass = (Glass) o;
+        final Gate gate = (Gate) o;
 
-        return getType().equals(glass.getType());
+        return getType().equals(gate.getType());
+    }
+
+    public final boolean isAssignableFrom(final Gate<?> other) {
+
+        return getRawType().isAssignableFrom(other.getRawType());
     }
 
     public final boolean isInterface() {

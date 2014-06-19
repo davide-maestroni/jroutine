@@ -13,8 +13,8 @@
  */
 package com.bmd.wtf.fll;
 
-import com.bmd.wtf.flw.Glass;
-import com.bmd.wtf.flw.Reflection;
+import com.bmd.wtf.flg.Gate;
+import com.bmd.wtf.flg.GateControl;
 import com.bmd.wtf.flw.River;
 
 import java.util.concurrent.TimeUnit;
@@ -22,37 +22,40 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by davide on 6/7/14.
  */
-public class UpstreamRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
+public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
+
+    private final boolean mIsDownstream;
 
     private final Waterfall<SOURCE, DATA, ?> mWaterfall;
 
-    public UpstreamRiver(final Waterfall<SOURCE, DATA, ?> waterfall) {
+    public WaterfallRiver(final Waterfall<SOURCE, DATA, ?> waterfall, final boolean isDownstream) {
 
         mWaterfall = waterfall;
+        mIsDownstream = isDownstream;
     }
 
     @Override
     public void drain() {
 
-        mWaterfall.drain(false);
+        mWaterfall.drain(mIsDownstream);
     }
 
     @Override
     public void drain(final int streamNumber) {
 
-        mWaterfall.drain(streamNumber, false);
+        mWaterfall.drain(streamNumber, mIsDownstream);
     }
 
     @Override
     public void dryUp() {
 
-        mWaterfall.dryUp(false);
+        mWaterfall.dryUp(mIsDownstream);
     }
 
     @Override
     public void dryUp(final int streamNumber) {
 
-        mWaterfall.dryUp(streamNumber, false);
+        mWaterfall.dryUp(streamNumber, mIsDownstream);
     }
 
     @Override
@@ -202,8 +205,8 @@ public class UpstreamRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public <CLASS> Reflection<CLASS> when(final Glass<CLASS> glass) {
+    public <TYPE> GateControl<TYPE> when(final Gate<TYPE> gate) {
 
-        return mWaterfall.when(glass);
+        return mWaterfall.when(gate);
     }
 }

@@ -23,7 +23,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * Created by davide on 6/13/14.
  */
-class GlassLeap<SOURCE, IN, OUT> extends LeapDecorator<SOURCE, IN, OUT> {
+class GateLeap<SOURCE, IN, OUT> extends LeapDecorator<SOURCE, IN, OUT> {
 
     final Condition condition;
 
@@ -31,7 +31,7 @@ class GlassLeap<SOURCE, IN, OUT> extends LeapDecorator<SOURCE, IN, OUT> {
 
     final ReentrantLock lock;
 
-    public GlassLeap(final Leap<SOURCE, IN, OUT> wrapped) {
+    public GateLeap(final Leap<SOURCE, IN, OUT> wrapped) {
 
         super(wrapped);
 

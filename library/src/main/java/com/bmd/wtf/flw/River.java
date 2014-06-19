@@ -13,6 +13,9 @@
  */
 package com.bmd.wtf.flw;
 
+import com.bmd.wtf.flg.Gate;
+import com.bmd.wtf.flg.GateControl;
+
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -76,5 +79,5 @@ public interface River<SOURCE, DATA> extends Stream<DATA> {
 
     public River<SOURCE, SOURCE> source();
 
-    public <CLASS> Reflection<CLASS> when(Glass<CLASS> glass);
+    public <TYPE> GateControl<TYPE> when(Gate<TYPE> gate);
 }

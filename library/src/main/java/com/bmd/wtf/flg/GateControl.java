@@ -11,26 +11,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.wtf.flw;
+package com.bmd.wtf.flg;
 
 import java.util.concurrent.TimeUnit;
 
 /**
  * Created by davide on 6/13/14.
  */
-public interface Reflection<CLASS> {
+public interface GateControl<TYPE> {
 
-    public Reflection<CLASS> afterMax(long maxDelay, TimeUnit timeUnit);
+    public GateControl<TYPE> afterMax(long maxDelay, TimeUnit timeUnit);
 
-    public Reflection<CLASS> eventually();
+    public GateControl<TYPE> eventually();
 
-    public Reflection<CLASS> eventuallyThrow(RuntimeException exception);
+    public GateControl<TYPE> eventuallyThrow(RuntimeException exception);
 
-    public Reflection<CLASS> matches(Evaluator<CLASS> evaluator);
+    public GateControl<TYPE> meets(ConditionEvaluator<TYPE> evaluator);
 
-    public CLASS perform();
+    public <RESULT> RESULT perform(Action<RESULT, TYPE> action, Object... args);
 
-    public interface Evaluator<CLASS> {
+    public interface Action<RESULT, TYPE> {
+
+        public RESULT doOn(TYPE gate, Object... args);
+    }
+
+    public interface ConditionEvaluator<CLASS> {
 
         public boolean isSatisfied(CLASS glass);
     }

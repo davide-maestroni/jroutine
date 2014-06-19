@@ -16,14 +16,13 @@ package com.bmd.wtf.fll;
 import com.bmd.wtf.crr.Current;
 import com.bmd.wtf.crr.CurrentGenerator;
 import com.bmd.wtf.crr.Currents;
-import com.bmd.wtf.flw.Glass;
-import com.bmd.wtf.flw.Reflection;
+import com.bmd.wtf.flg.Gate;
+import com.bmd.wtf.flg.GateControl;
 import com.bmd.wtf.flw.River;
 import com.bmd.wtf.lps.FreeLeap;
 import com.bmd.wtf.lps.Leap;
 import com.bmd.wtf.lps.LeapGenerator;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -41,6 +40,8 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
     private static final DataFall[] NO_FALL = new DataFall[0];
 
+    private static final Gate<Void> SELF_GATE = new Gate<Void>() {};
+
     private static final WeakHashMap<Leap<?, ?, ?>, Void> sLeaps =
             new WeakHashMap<Leap<?, ?, ?>, Void>();
 
@@ -54,23 +55,23 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
     private final DataFall<SOURCE, IN, OUT>[] mFalls;
 
-    private final Class<?> mGlass;
+    private final Gate<?> mGate;
 
-    private final Map<Class<?>, GlassLeap<?, ?, ?>> mGlassMap;
+    private final Map<Gate<?>, GateLeap<?, ?, ?>> mGateMap;
 
     private final int mSize;
 
     private final Waterfall<SOURCE, SOURCE, ?> mSource;
 
     private Waterfall(final Waterfall<SOURCE, SOURCE, ?> source,
-            final Map<Class<?>, GlassLeap<?, ?, ?>> glassMap, final Class<?> glass,
+            final Map<Gate<?>, GateLeap<?, ?, ?>> gateMap, final Gate<?> gate,
             final Barrage<SOURCE, ?> barrage, final int size, final Current current,
             final CurrentGenerator generator, final DataFall<SOURCE, IN, OUT>... falls) {
 
         //noinspection unchecked
         mSource = (source != null) ? source : (Waterfall<SOURCE, SOURCE, ?>) this;
-        mGlassMap = glassMap;
-        mGlass = glass;
+        mGateMap = gateMap;
+        mGate = gate;
         mBarrage = barrage;
         mSize = size;
         mCurrent = current;
@@ -79,13 +80,13 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
     }
 
     private Waterfall(final Waterfall<SOURCE, SOURCE, ?> source,
-            final Map<Class<?>, GlassLeap<?, ?, ?>> glassMap, final Class<?> glass,
+            final Map<Gate<?>, GateLeap<?, ?, ?>> gateMap, final Gate<?> gate,
             final Barrage<SOURCE, ?> barrage, final int size, final Current current,
             final CurrentGenerator generator, final Leap<SOURCE, IN, OUT>... leaps) {
 
         //noinspection unchecked
         mSource = (source != null) ? source : (Waterfall<SOURCE, SOURCE, ?>) this;
-        mGlass = null;
+        mGate = null;
         mSize = size;
         mCurrent = current;
         mCurrentGenerator = generator;
@@ -103,9 +104,9 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
             mBarrage = barrage;
         }
 
-        if (glass == null) {
+        if (gate == null) {
 
-            mGlassMap = glassMap;
+            mGateMap = gateMap;
 
             final Barrage<SOURCE, ?> fallBarrage = mBarrage;
 
@@ -138,43 +139,42 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
         } else {
 
-            final HashMap<Class<?>, GlassLeap<?, ?, ?>> fallGlassMap =
-                    new HashMap<Class<?>, GlassLeap<?, ?, ?>>(glassMap);
+            final HashMap<Gate<?>, GateLeap<?, ?, ?>> fallGateMap =
+                    new HashMap<Gate<?>, GateLeap<?, ?, ?>>(gateMap);
 
-            mGlassMap = fallGlassMap;
+            mGateMap = fallGateMap;
 
             final Barrage<SOURCE, ?> fallBarrage = mBarrage;
 
-            final boolean isSelf = Reflection.class.equals(glass);
+            final boolean isSelf = (SELF_GATE == gate);
 
-            final HashMap<Leap<?, ?, ?>, GlassLeap<?, ?, ?>> leapMap =
-                    new HashMap<Leap<?, ?, ?>, GlassLeap<?, ?, ?>>();
+            final HashMap<Leap<?, ?, ?>, GateLeap<?, ?, ?>> leapMap =
+                    new HashMap<Leap<?, ?, ?>, GateLeap<?, ?, ?>>();
 
             for (int i = 0; i < length; i++) {
 
                 final Leap<SOURCE, IN, OUT> leap = leaps[i];
 
                 //noinspection unchecked
-                GlassLeap<SOURCE, IN, OUT> glassLeap =
-                        (GlassLeap<SOURCE, IN, OUT>) leapMap.get(leap);
+                GateLeap<SOURCE, IN, OUT> gateLeap = (GateLeap<SOURCE, IN, OUT>) leapMap.get(leap);
 
-                if (glassLeap == null) {
+                if (gateLeap == null) {
 
-                    glassLeap = new GlassLeap<SOURCE, IN, OUT>(leap);
-                    leapMap.put(leap, glassLeap);
+                    gateLeap = new GateLeap<SOURCE, IN, OUT>(leap);
+                    leapMap.put(leap, gateLeap);
 
-                    exposeGlass(fallGlassMap, (isSelf) ? leap.getClass() : glass, glassLeap);
+                    mapGate(fallGateMap, (isSelf) ? Gate.from(leap.getClass()) : gate, gateLeap);
                 }
 
                 final Leap<SOURCE, IN, OUT> fallLeap;
 
                 if (fallBarrage != null) {
 
-                    fallLeap = new BarrageLeap<SOURCE, IN, OUT>(glassLeap, fallBarrage, i);
+                    fallLeap = new BarrageLeap<SOURCE, IN, OUT>(gateLeap, fallBarrage, i);
 
                 } else {
 
-                    fallLeap = glassLeap;
+                    fallLeap = gateLeap;
                 }
 
                 final Current fallCurrent;
@@ -198,10 +198,10 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
     public static Waterfall<Object, Object, Object> create() {
 
-        final Map<Class<?>, GlassLeap<?, ?, ?>> glassMap = Collections.emptyMap();
+        final Map<Gate<?>, GateLeap<?, ?, ?>> gateMap = Collections.emptyMap();
 
         //noinspection unchecked
-        return new Waterfall<Object, Object, Object>(null, glassMap, null, null, 1,
+        return new Waterfall<Object, Object, Object>(null, gateMap, null, null, 1,
                                                      Currents.straight(), null, NO_FALL);
     }
 
@@ -239,26 +239,26 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         sLeaps.put(leap, null);
     }
 
-    public Waterfall<SOURCE, IN, OUT> as(final Class<?> glass) {
+    public Waterfall<SOURCE, IN, OUT> as(final Class<?> gateType) {
 
-        if (glass == null) {
+        return as(Gate.from(gateType));
+    }
 
-            throw new IllegalArgumentException("the glass class cannot be null");
-        }
+    public Waterfall<SOURCE, IN, OUT> as(final Gate<?> gate) {
 
-        if (!glass.isInterface()) {
+        if (gate == null) {
 
-            throw new IllegalArgumentException("the glass must be an interface");
+            throw new IllegalArgumentException("the gate cannot be null");
         }
 
         //noinspection unchecked
-        return new Waterfall<SOURCE, IN, OUT>(mSource, mGlassMap, glass, mBarrage, mSize, mCurrent,
+        return new Waterfall<SOURCE, IN, OUT>(mSource, mGateMap, gate, mBarrage, mSize, mCurrent,
                                               mCurrentGenerator, mFalls);
     }
 
-    public Waterfall<SOURCE, IN, OUT> asGlass() {
+    public Waterfall<SOURCE, IN, OUT> asGate() {
 
-        return as(Reflection.class);
+        return as(SELF_GATE);
     }
 
     public void chain(final Waterfall<?, OUT, ?> waterfall) {
@@ -335,20 +335,15 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
     }
 
     public <NOUT> Waterfall<SOURCE, OUT, NOUT> chain(
-            Class<? extends Leap<SOURCE, OUT, NOUT>> glass) {
-
-        if (!glass.isInterface()) {
-
-            throw new IllegalArgumentException("the glass must be an interface");
-        }
+            final Gate<? extends Leap<SOURCE, OUT, NOUT>> gate) {
 
         //noinspection unchecked
-        final Leap<SOURCE, OUT, NOUT> leap = (Leap<SOURCE, OUT, NOUT>) findBestMatch(glass);
+        final Leap<SOURCE, OUT, NOUT> leap = (Leap<SOURCE, OUT, NOUT>) findBestMatch(gate);
 
         if (leap == null) {
 
             throw new IllegalArgumentException(
-                    "the waterfall does not retain any reflection implementing " + glass);
+                    "the waterfall does not retain any gate of type " + gate);
         }
 
         final DataFall<SOURCE, IN, OUT>[] falls = mFalls;
@@ -359,7 +354,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
             //noinspection unchecked
             final Waterfall<SOURCE, OUT, NOUT> waterfall =
-                    new Waterfall<SOURCE, OUT, NOUT>(mSource, mGlassMap, mGlass, mBarrage, 1,
+                    new Waterfall<SOURCE, OUT, NOUT>(mSource, mGateMap, mGate, mBarrage, 1,
                                                      mCurrent, mCurrentGenerator, leap);
 
             final DataFall<SOURCE, OUT, NOUT> outFall = waterfall.mFalls[0];
@@ -391,8 +386,8 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
         //noinspection unchecked
         final Waterfall<SOURCE, OUT, NOUT> waterfall =
-                new Waterfall<SOURCE, OUT, NOUT>(inWaterfall.mSource, inWaterfall.mGlassMap,
-                                                 inWaterfall.mGlass, mBarrage, size,
+                new Waterfall<SOURCE, OUT, NOUT>(inWaterfall.mSource, inWaterfall.mGateMap,
+                                                 inWaterfall.mGate, mBarrage, size,
                                                  inWaterfall.mCurrent,
                                                  inWaterfall.mCurrentGenerator, leaps);
 
@@ -438,8 +433,8 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
             //noinspection unchecked
             final Waterfall<SOURCE, OUT, OUT> waterfall =
-                    new Waterfall<SOURCE, OUT, OUT>(mSource, mGlassMap, mGlass, mBarrage, 1,
-                                                    mCurrent, mCurrentGenerator, leap);
+                    new Waterfall<SOURCE, OUT, OUT>(mSource, mGateMap, mGate, mBarrage, 1, mCurrent,
+                                                    mCurrentGenerator, leap);
 
             final DataFall<SOURCE, OUT, OUT> outFall = waterfall.mFalls[0];
 
@@ -470,8 +465,8 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
         //noinspection unchecked
         final Waterfall<SOURCE, OUT, OUT> waterfall =
-                new Waterfall<SOURCE, OUT, OUT>(inWaterfall.mSource, inWaterfall.mGlassMap,
-                                                inWaterfall.mGlass, mBarrage, size,
+                new Waterfall<SOURCE, OUT, OUT>(inWaterfall.mSource, inWaterfall.mGateMap,
+                                                inWaterfall.mGate, mBarrage, size,
                                                 inWaterfall.mCurrent, inWaterfall.mCurrentGenerator,
                                                 leaps);
 
@@ -522,7 +517,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
             //noinspection unchecked
             final Waterfall<SOURCE, OUT, NOUT> waterfall =
-                    new Waterfall<SOURCE, OUT, NOUT>(mSource, mGlassMap, mGlass, mBarrage, 1,
+                    new Waterfall<SOURCE, OUT, NOUT>(mSource, mGateMap, mGate, mBarrage, 1,
                                                      mCurrent, mCurrentGenerator, leap);
 
             final DataFall<SOURCE, OUT, NOUT> outFall = waterfall.mFalls[0];
@@ -556,8 +551,8 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
         //noinspection unchecked
         final Waterfall<SOURCE, OUT, NOUT> waterfall =
-                new Waterfall<SOURCE, OUT, NOUT>(inWaterfall.mSource, inWaterfall.mGlassMap,
-                                                 inWaterfall.mGlass, mBarrage, size,
+                new Waterfall<SOURCE, OUT, NOUT>(inWaterfall.mSource, inWaterfall.mGateMap,
+                                                 inWaterfall.mGate, mBarrage, size,
                                                  inWaterfall.mCurrent,
                                                  inWaterfall.mCurrentGenerator, leaps);
 
@@ -611,7 +606,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
             //noinspection unchecked
             final Waterfall<SOURCE, OUT, NOUT> waterfall =
-                    new Waterfall<SOURCE, OUT, NOUT>(mSource, mGlassMap, mGlass, mBarrage, 1,
+                    new Waterfall<SOURCE, OUT, NOUT>(mSource, mGateMap, mGate, mBarrage, 1,
                                                      mCurrent, mCurrentGenerator, leap);
 
             final DataFall<SOURCE, OUT, NOUT> outFall = waterfall.mFalls[0];
@@ -650,8 +645,8 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
         //noinspection unchecked
         final Waterfall<SOURCE, OUT, NOUT> waterfall =
-                new Waterfall<SOURCE, OUT, NOUT>(inWaterfall.mSource, inWaterfall.mGlassMap,
-                                                 inWaterfall.mGlass, mBarrage, size,
+                new Waterfall<SOURCE, OUT, NOUT>(inWaterfall.mSource, inWaterfall.mGateMap,
+                                                 inWaterfall.mGate, mBarrage, size,
                                                  inWaterfall.mCurrent,
                                                  inWaterfall.mCurrentGenerator, leaps);
 
@@ -986,24 +981,17 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
     }
 
     @Override
-    public <CLASS> Reflection<CLASS> when(final Glass<CLASS> glass) {
+    public <TYPE> GateControl<TYPE> when(final Gate<TYPE> gate) {
 
-        if (!glass.isInterface()) {
-
-            throw new IllegalArgumentException("the glass must represent an interface");
-        }
-
-        final GlassLeap<?, ?, ?> leap = findBestMatch(glass.getRawType());
+        final GateLeap<?, ?, ?> leap = findBestMatch(gate);
 
         if (leap == null) {
 
             throw new IllegalArgumentException(
-                    "the waterfall does not retain any reflection implementing " + glass
-                            .getRawType()
-            );
+                    "the waterfall does not retain any gate of type " + gate);
         }
 
-        return new DataReflection<CLASS>(leap, glass);
+        return new DataGateControl<TYPE>(leap, gate);
     }
 
     public void dryUp(final boolean downStream) {
@@ -1041,23 +1029,23 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         }
     }
 
-    public <CLASS> Waterfall<SOURCE, IN, OUT> forget(final CLASS glass) {
+    public <TYPE> Waterfall<SOURCE, IN, OUT> forget(final TYPE gate) {
 
-        if (glass == null) {
+        if (gate == null) {
 
             return this;
         }
 
         boolean isChanged = false;
 
-        final HashMap<Class<?>, GlassLeap<?, ?, ?>> glassMap =
-                new HashMap<Class<?>, GlassLeap<?, ?, ?>>(mGlassMap);
+        final HashMap<Gate<?>, GateLeap<?, ?, ?>> gateMap =
+                new HashMap<Gate<?>, GateLeap<?, ?, ?>>(mGateMap);
 
-        final Iterator<GlassLeap<?, ?, ?>> iterator = glassMap.values().iterator();
+        final Iterator<GateLeap<?, ?, ?>> iterator = gateMap.values().iterator();
 
         while (iterator.hasNext()) {
 
-            if (glass == iterator.next()) {
+            if (gate == iterator.next()) {
 
                 iterator.remove();
 
@@ -1071,13 +1059,13 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         }
 
         //noinspection unchecked
-        return new Waterfall<SOURCE, IN, OUT>(mSource, glassMap, mGlass, mBarrage, mSize, mCurrent,
+        return new Waterfall<SOURCE, IN, OUT>(mSource, gateMap, mGate, mBarrage, mSize, mCurrent,
                                               mCurrentGenerator, mFalls);
     }
 
-    public <CLASS> Waterfall<SOURCE, IN, OUT> forget(final Glass<CLASS> glass) {
+    public <TYPE> Waterfall<SOURCE, IN, OUT> forget(final Gate<TYPE> gate) {
 
-        return forget(when(glass));
+        return forget(when(gate));
     }
 
     public Waterfall<SOURCE, IN, OUT> in(final CurrentGenerator generator) {
@@ -1088,7 +1076,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         }
 
         //noinspection unchecked
-        return new Waterfall<SOURCE, IN, OUT>(mSource, mGlassMap, mGlass, mBarrage, mSize, null,
+        return new Waterfall<SOURCE, IN, OUT>(mSource, mGateMap, mGate, mBarrage, mSize, null,
                                               generator, mFalls);
     }
 
@@ -1100,7 +1088,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         }
 
         //noinspection unchecked
-        return new Waterfall<SOURCE, IN, OUT>(mSource, mGlassMap, mGlass, mBarrage, fallCount,
+        return new Waterfall<SOURCE, IN, OUT>(mSource, mGateMap, mGate, mBarrage, fallCount,
                                               mCurrent, mCurrentGenerator, mFalls);
     }
 
@@ -1112,14 +1100,14 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         }
 
         //noinspection unchecked
-        return new Waterfall<SOURCE, IN, OUT>(mSource, mGlassMap, mGlass, mBarrage, mSize, current,
+        return new Waterfall<SOURCE, IN, OUT>(mSource, mGateMap, mGate, mBarrage, mSize, current,
                                               null, mFalls);
     }
 
     public Waterfall<SOURCE, IN, OUT> inBackground(final int poolSize) {
 
         //noinspection unchecked
-        return new Waterfall<SOURCE, IN, OUT>(mSource, mGlassMap, mGlass, mBarrage, mSize,
+        return new Waterfall<SOURCE, IN, OUT>(mSource, mGateMap, mGate, mBarrage, mSize,
                                               Currents.pool(poolSize), null, mFalls);
     }
 
@@ -1151,14 +1139,14 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
         Arrays.fill(leaps, leap);
 
-        final Map<Class<?>, GlassLeap<?, ?, ?>> glassMap = Collections.emptyMap();
+        final Map<Gate<?>, GateLeap<?, ?, ?>> gateMap = Collections.emptyMap();
 
         //noinspection unchecked
-        return new Waterfall<OUT, OUT, OUT>(null, glassMap, null, null, size, mCurrent,
+        return new Waterfall<OUT, OUT, OUT>(null, gateMap, null, null, size, mCurrent,
                                             mCurrentGenerator, leaps);
     }
 
-    public <DATA> Waterfall<DATA, DATA, DATA> start(final Class<DATA> type) {
+    public <DATA> Waterfall<DATA, DATA, DATA> start(final Class<DATA> dataType) {
 
         final int size = mSize;
 
@@ -1168,28 +1156,28 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
         Arrays.fill(leaps, leap);
 
-        final Map<Class<?>, GlassLeap<?, ?, ?>> glassMap = Collections.emptyMap();
+        final Map<Gate<?>, GateLeap<?, ?, ?>> gateMap = Collections.emptyMap();
 
         //noinspection unchecked
-        return new Waterfall<DATA, DATA, DATA>(null, glassMap, null, null, size, mCurrent,
+        return new Waterfall<DATA, DATA, DATA>(null, gateMap, null, null, size, mCurrent,
                                                mCurrentGenerator, leaps);
     }
 
-    public <CLASS> Waterfall<CLASS, CLASS, CLASS> start(final Glass<CLASS> type) {
+    public <TYPE> Waterfall<TYPE, TYPE, TYPE> start(final Gate<TYPE> gate) {
 
         final int size = mSize;
 
-        final FreeLeap<CLASS, CLASS> leap = freeLeap();
+        final FreeLeap<TYPE, TYPE> leap = freeLeap();
 
         final Leap[] leaps = new Leap[size];
 
         Arrays.fill(leaps, leap);
 
-        final Map<Class<?>, GlassLeap<?, ?, ?>> glassMap = Collections.emptyMap();
+        final Map<Gate<?>, GateLeap<?, ?, ?>> gateMap = Collections.emptyMap();
 
         //noinspection unchecked
-        return new Waterfall<CLASS, CLASS, CLASS>(null, glassMap, null, null, size, mCurrent,
-                                                  mCurrentGenerator, leaps);
+        return new Waterfall<TYPE, TYPE, TYPE>(null, gateMap, null, null, size, mCurrent,
+                                               mCurrentGenerator, leaps);
     }
 
     public <NIN, NOUT> Waterfall<NIN, NIN, NOUT> start(
@@ -1200,7 +1188,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
             throw new IllegalArgumentException("the waterfall generator cannot be null");
         }
 
-        final Map<Class<?>, GlassLeap<?, ?, ?>> glassMap = Collections.emptyMap();
+        final Map<Gate<?>, GateLeap<?, ?, ?>> gateMap = Collections.emptyMap();
 
         final int size = mSize;
 
@@ -1211,7 +1199,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
             registerLeap(leap);
 
             //noinspection unchecked
-            return new Waterfall<NIN, NIN, NOUT>(null, glassMap, mGlass, null, 1, mCurrent,
+            return new Waterfall<NIN, NIN, NOUT>(null, gateMap, mGate, null, 1, mCurrent,
                                                  mCurrentGenerator, leap);
         }
 
@@ -1227,7 +1215,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         }
 
         //noinspection unchecked
-        return new Waterfall<NIN, NIN, NOUT>(null, glassMap, mGlass, null, size, mCurrent,
+        return new Waterfall<NIN, NIN, NOUT>(null, gateMap, mGate, null, size, mCurrent,
                                              mCurrentGenerator, leaps);
     }
 
@@ -1240,10 +1228,10 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
         registerLeap(leap);
 
-        final Map<Class<?>, GlassLeap<?, ?, ?>> glassMap = Collections.emptyMap();
+        final Map<Gate<?>, GateLeap<?, ?, ?>> gateMap = Collections.emptyMap();
 
         //noinspection unchecked
-        return new Waterfall<NIN, NIN, NOUT>(null, glassMap, mGlass, null, mSize, mCurrent,
+        return new Waterfall<NIN, NIN, NOUT>(null, gateMap, mGate, null, mSize, mCurrent,
                                              mCurrentGenerator, leap);
     }
 
@@ -1252,87 +1240,49 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         final Waterfall<SOURCE, OUT, OUT> waterfall = chain(barrage);
 
         //noinspection unchecked
-        return new Waterfall<SOURCE, OUT, OUT>(waterfall.mSource, waterfall.mGlassMap,
-                                               waterfall.mGlass, barrage, waterfall.mSize,
+        return new Waterfall<SOURCE, OUT, OUT>(waterfall.mSource, waterfall.mGateMap,
+                                               waterfall.mGate, barrage, waterfall.mSize,
                                                waterfall.mCurrent, waterfall.mCurrentGenerator,
                                                waterfall.mFalls);
     }
 
-    private void exposeGlass(final HashMap<Class<?>, GlassLeap<?, ?, ?>> glassMap,
-            final Class<?> glass, final GlassLeap<?, ?, ?> leap) {
+    private GateLeap<?, ?, ?> findBestMatch(final Gate<?> gate) {
 
-        final Class[] glasses = extractInterfaces(glassMap, glass);
+        final Map<Gate<?>, GateLeap<?, ?, ?>> gateMap = mGateMap;
 
-        for (final Class<?> aClass : glasses) {
-
-            glassMap.put(aClass, leap);
-        }
-    }
-
-    private Class[] extractInterfaces(final HashMap<Class<?>, GlassLeap<?, ?, ?>> glassMap,
-            final Class<?> glass) {
-
-        if (glass.isInterface()) {
-
-            if (Leap.class.equals(glass)) {
-
-                throw new IllegalArgumentException("the glass class cannot be " + Leap.class);
-            }
-
-            if (glassMap.containsKey(glass)) {
-
-                throw new IllegalArgumentException("the glass class is already present");
-            }
-
-            return new Class[]{glass};
-        }
-
-        final ArrayList<Class<?>> interfaces = new ArrayList<Class<?>>();
-
-        for (final Class<?> itf : glass.getInterfaces()) {
-
-            if (Leap.class.equals(itf)) {
-
-                continue;
-            }
-
-            if (glassMap.containsKey(itf)) {
-
-                throw new IllegalArgumentException("the glass class is already present");
-            }
-
-            interfaces.add(itf);
-        }
-
-        return interfaces.toArray(new Class[interfaces.size()]);
-    }
-
-    private GlassLeap<?, ?, ?> findBestMatch(final Class<?> glass) {
-
-        final Map<Class<?>, GlassLeap<?, ?, ?>> glassMap = mGlassMap;
-
-        GlassLeap<?, ?, ?> leap = glassMap.get(glass);
+        GateLeap<?, ?, ?> leap = gateMap.get(gate);
 
         if (leap == null) {
 
-            Class<?> bestMatch = null;
+            Gate<?> bestMatch = null;
 
-            for (final Entry<Class<?>, GlassLeap<?, ?, ?>> entry : glassMap.entrySet()) {
+            for (final Entry<Gate<?>, GateLeap<?, ?, ?>> entry : gateMap.entrySet()) {
 
-                final Class<?> itf = entry.getKey();
+                final Gate<?> type = entry.getKey();
 
-                if (glass.isAssignableFrom(itf)) {
+                if (gate.isAssignableFrom(type)) {
 
-                    if ((bestMatch == null) || itf.isAssignableFrom(bestMatch)) {
+                    if ((bestMatch == null) || type.isAssignableFrom(bestMatch)) {
 
                         leap = entry.getValue();
 
-                        bestMatch = itf;
+                        bestMatch = type;
                     }
                 }
             }
         }
 
         return leap;
+    }
+
+    private void mapGate(final HashMap<Gate<?>, GateLeap<?, ?, ?>> gateMap, final Gate<?> gate,
+            final GateLeap<?, ?, ?> leap) {
+
+        if (gateMap.containsKey(gate)) {
+
+            throw new IllegalArgumentException("the gate type is already present");
+        }
+
+        gateMap.put(gate, leap);
     }
 }

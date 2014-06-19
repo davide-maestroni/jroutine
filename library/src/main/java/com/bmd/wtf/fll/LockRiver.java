@@ -13,8 +13,8 @@
  */
 package com.bmd.wtf.fll;
 
-import com.bmd.wtf.flw.Glass;
-import com.bmd.wtf.flw.Reflection;
+import com.bmd.wtf.flg.Gate;
+import com.bmd.wtf.flg.GateControl;
 import com.bmd.wtf.flw.River;
 
 import java.util.concurrent.TimeUnit;
@@ -415,9 +415,9 @@ class LockRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public <CLASS> Reflection<CLASS> when(final Glass<CLASS> glass) {
+    public <TYPE> GateControl<TYPE> when(final Gate<TYPE> gate) {
 
-        return mRiver.when(glass);
+        return mRiver.when(gate);
     }
 
     void close() {

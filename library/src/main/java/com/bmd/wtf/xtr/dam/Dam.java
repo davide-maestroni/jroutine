@@ -28,202 +28,171 @@ import java.util.concurrent.TimeUnit;
  */
 public class Dam<SOURCE, DATA> extends WaterfallRiver<SOURCE, SOURCE> {
 
-    private static final Action<Void, DamBasin<?, ?>> AFTER_MAX =
-            new Action<Void, DamBasin<?, ?>>() {
+    private static final int AFTER_MAX = 0;
+
+    private static final int ALL = 1;
+
+    private static final int COLLECT_DATA = 2;
+
+    private static final int COLLECT_UNHANDLED = 3;
+
+    private static final int EMPTY = 4;
+
+    private static final int EVENTUALLY_THROW = 5;
+
+    private static final int MAX = 6;
+
+    private static final int ON = 7;
+
+    private static final int ON_DATA = 8;
+
+    private static final int ON_FLUSH = 9;
+
+    private static final int ON_THROWABLE = 10;
+
+    private static final int PULL_DATA = 11;
+
+    private static final int PULL_UNHANDLED = 12;
+
+    private static final int SETUP_CONTROL = 13;
+
+    private static final int WHEN_AVAILABLE = 14;
+
+    private final Action<Object, DamBasin<SOURCE, DATA>> mAction =
+            new Action<Object, DamBasin<SOURCE, DATA>>() {
 
                 @Override
-                public Void doOn(final DamBasin<?, ?> basin, final Object... args) {
+                public Object doOn(final DamBasin<SOURCE, DATA> basin, final Object... args) {
 
-                    basin.afterMax((Long) args[0], (TimeUnit) args[1]);
+                    final int actionType = (Integer) args[0];
 
-                    return null;
-                }
-            };
+                    switch (actionType) {
 
-    private static final Action<Void, DamBasin<?, ?>> ALL = new Action<Void, DamBasin<?, ?>>() {
+                        case AFTER_MAX: {
 
-        @Override
-        public Void doOn(final DamBasin<?, ?> basin, final Object... args) {
+                            basin.afterMax((Long) args[1], (TimeUnit) args[2]);
+                            break;
+                        }
 
-            basin.all();
+                        case ALL: {
 
-            return null;
-        }
-    };
+                            basin.all();
+                            break;
+                        }
 
-    private static final Action<Void, DamBasin<?, ?>> COLLECT_DATA =
-            new Action<Void, DamBasin<?, ?>>() {
+                        case COLLECT_DATA: {
 
-                @Override
-                public Void doOn(final DamBasin<?, ?> basin, final Object... args) {
+                            if (args.length == 2) {
 
-                    if (args.length == 1) {
+                                //noinspection unchecked
+                                basin.collectData((List<DATA>) args[1]);
 
-                        //noinspection unchecked
-                        basin.collectData((List) args[0]);
+                            } else {
 
-                    } else {
+                                //noinspection unchecked
+                                basin.collectData((Integer) args[1], (List) args[2]);
+                            }
 
-                        //noinspection unchecked
-                        basin.collectData((Integer) args[0], (List) args[1]);
+                            break;
+                        }
+
+                        case COLLECT_UNHANDLED: {
+
+                            if (args.length == 2) {
+
+                                //noinspection unchecked
+                                basin.collectUnhandled((List<Throwable>) args[1]);
+
+                            } else {
+
+                                //noinspection unchecked
+                                basin.collectUnhandled((Integer) args[1], (List) args[2]);
+                            }
+
+                            break;
+                        }
+
+                        case EMPTY: {
+
+                            basin.empty();
+                            break;
+                        }
+
+                        case EVENTUALLY_THROW: {
+
+                            basin.eventuallyThrow((RuntimeException) args[1]);
+                            break;
+                        }
+
+                        case MAX: {
+
+                            basin.max((Integer) args[1]);
+                            break;
+                        }
+
+                        case ON: {
+
+                            //noinspection unchecked
+                            basin.on(((BasinEvaluator<DATA>) args[1]));
+                            break;
+                        }
+
+                        case ON_DATA: {
+
+                            basin.onDataAvailable();
+                            break;
+                        }
+
+                        case ON_FLUSH: {
+
+                            basin.onFlush();
+                            break;
+                        }
+
+                        case ON_THROWABLE: {
+
+                            basin.onThrowableAvailable();
+                            break;
+                        }
+
+                        case PULL_DATA: {
+
+                            if (args.length == 1) {
+
+                                return basin.pullData();
+                            }
+
+                            return basin.pullData((Integer) args[1]);
+                        }
+
+                        case PULL_UNHANDLED: {
+
+                            if (args.length == 1) {
+
+                                return basin.pullUnhandled();
+                            }
+
+                            return basin.pullUnhandled((Integer) args[1]);
+                        }
+
+                        case SETUP_CONTROL: {
+
+                            //noinspection unchecked
+                            basin.setUpControl((GateControl<DamBasin<SOURCE, DATA>>) args[1]);
+                            break;
+                        }
+
+                        case WHEN_AVAILABLE: {
+
+                            basin.whenAvailable();
+                            break;
+                        }
+
+                        default: {
+
+                            break;
+                        }
                     }
-
-                    return null;
-                }
-            };
-
-    private static final Action<Void, DamBasin<?, ?>> COLLECT_UNHANDLED =
-            new Action<Void, DamBasin<?, ?>>() {
-
-                @Override
-                public Void doOn(final DamBasin<?, ?> basin, final Object... args) {
-
-                    if (args.length == 1) {
-
-                        //noinspection unchecked
-                        basin.collectUnhandled((List) args[0]);
-
-                    } else {
-
-                        //noinspection unchecked
-                        basin.collectUnhandled((Integer) args[0], (List) args[1]);
-                    }
-
-                    return null;
-                }
-            };
-
-    private static final Action<Void, DamBasin<?, ?>> EMPTY = new Action<Void, DamBasin<?, ?>>() {
-
-        @Override
-        public Void doOn(final DamBasin<?, ?> basin, final Object... args) {
-
-            basin.empty();
-
-            return null;
-        }
-    };
-
-    private static final Action<Void, DamBasin<?, ?>> EVENTUALLY_THROW =
-            new Action<Void, DamBasin<?, ?>>() {
-
-                @Override
-                public Void doOn(final DamBasin<?, ?> basin, final Object... args) {
-
-                    basin.eventuallyThrow((RuntimeException) args[0]);
-
-                    return null;
-                }
-            };
-
-    private static final Action<Void, DamBasin<?, ?>> MAX = new Action<Void, DamBasin<?, ?>>() {
-
-        @Override
-        public Void doOn(final DamBasin<?, ?> basin, final Object... args) {
-
-            basin.max((Integer) args[0]);
-
-            return null;
-        }
-    };
-
-    private static final Action<Void, DamBasin<?, ?>> ON = new Action<Void, DamBasin<?, ?>>() {
-
-        @Override
-        public Void doOn(final DamBasin<?, ?> basin, final Object... args) {
-
-            //noinspection unchecked
-            basin.on(((BasinEvaluator) args[0]));
-
-            return null;
-        }
-    };
-
-    private static final Action<Void, DamBasin<?, ?>> ON_DATA = new Action<Void, DamBasin<?, ?>>() {
-
-        @Override
-        public Void doOn(final DamBasin<?, ?> basin, final Object... args) {
-
-            basin.onDataAvailable();
-
-            return null;
-        }
-    };
-
-    private static final Action<Void, DamBasin<?, ?>> ON_FLUSH =
-            new Action<Void, DamBasin<?, ?>>() {
-
-                @Override
-                public Void doOn(final DamBasin<?, ?> basin, final Object... args) {
-
-                    basin.onFlush();
-
-                    return null;
-                }
-            };
-
-    private static final Action<Void, DamBasin<?, ?>> ON_THROWABLE =
-            new Action<Void, DamBasin<?, ?>>() {
-
-                @Override
-                public Void doOn(final DamBasin<?, ?> basin, final Object... args) {
-
-                    basin.onThrowableAvailable();
-
-                    return null;
-                }
-            };
-
-    private static final Action<Object, DamBasin<?, ?>> PULL_DATA =
-            new Action<Object, DamBasin<?, ?>>() {
-
-                @Override
-                public Object doOn(final DamBasin<?, ?> basin, final Object... args) {
-
-                    if (args.length == 0) {
-
-                        return basin.pullData();
-                    }
-
-                    return basin.pullData((Integer) args[0]);
-                }
-            };
-
-    private static final Action<Throwable, DamBasin<?, ?>> PULL_UNHANDLED =
-            new Action<Throwable, DamBasin<?, ?>>() {
-
-                @Override
-                public Throwable doOn(final DamBasin<?, ?> basin, final Object... args) {
-
-                    if (args.length == 0) {
-
-                        return basin.pullUnhandled();
-                    }
-
-                    return basin.pullUnhandled((Integer) args[0]);
-                }
-            };
-
-    private static final Action<Void, DamBasin<?, ?>> SETUP_CONTORL =
-            new Action<Void, DamBasin<?, ?>>() {
-
-                @Override
-                public Void doOn(final DamBasin<?, ?> basin, final Object... args) {
-
-                    //noinspection unchecked
-                    basin.setUpControl((GateControl) args[0]);
-
-                    return null;
-                }
-            };
-
-    private static final Action<Void, DamBasin<?, ?>> WHEN_AVAILABLE =
-            new Action<Void, DamBasin<?, ?>>() {
-
-                @Override
-                public Void doOn(final DamBasin<?, ?> basin, final Object... args) {
-
-                    basin.whenAvailable();
 
                     return null;
                 }
@@ -252,40 +221,35 @@ public class Dam<SOURCE, DATA> extends WaterfallRiver<SOURCE, SOURCE> {
 
     public Dam<SOURCE, DATA> afterMax(final long maxDelay, final TimeUnit timeUnit) {
 
-        //noinspection unchecked
-        mControl.perform((Action) AFTER_MAX, maxDelay, timeUnit);
+        mControl.perform(mAction, AFTER_MAX, maxDelay, timeUnit);
 
         return this;
     }
 
     public Dam<SOURCE, DATA> all() {
 
-        //noinspection unchecked
-        getControl().perform((Action) ALL);
+        setupControl().perform(mAction, ALL);
 
         return this;
     }
 
     public Dam<SOURCE, DATA> collectData(final List<DATA> bucket) {
 
-        //noinspection unchecked
-        getControl().perform((Action) COLLECT_DATA, bucket);
+        setupControl().perform(mAction, COLLECT_DATA, bucket);
 
         return this;
     }
 
     public Dam<SOURCE, DATA> collectData(final int streamNumber, final List<DATA> bucket) {
 
-        //noinspection unchecked
-        getControl().perform((Action) COLLECT_DATA, streamNumber, bucket);
+        setupControl().perform(mAction, COLLECT_DATA, streamNumber, bucket);
 
         return this;
     }
 
     public Dam<SOURCE, DATA> collectUnhandled(final List<Throwable> bucket) {
 
-        //noinspection unchecked
-        getControl().perform((Action) COLLECT_UNHANDLED, bucket);
+        setupControl().perform(mAction, COLLECT_UNHANDLED, bucket);
 
         return this;
     }
@@ -293,8 +257,7 @@ public class Dam<SOURCE, DATA> extends WaterfallRiver<SOURCE, SOURCE> {
     public Dam<SOURCE, DATA> collectUnhandled(final int streamNumber,
             final List<Throwable> bucket) {
 
-        //noinspection unchecked
-        getControl().perform((Action) COLLECT_UNHANDLED, streamNumber, bucket);
+        setupControl().perform(mAction, COLLECT_UNHANDLED, streamNumber, bucket);
 
         return this;
     }
@@ -459,64 +422,56 @@ public class Dam<SOURCE, DATA> extends WaterfallRiver<SOURCE, SOURCE> {
 
     public Dam<SOURCE, DATA> empty() {
 
-        //noinspection unchecked
-        getControl().perform((Action) EMPTY);
+        setupControl().perform(mAction, EMPTY);
 
         return this;
     }
 
     public Dam<SOURCE, DATA> eventuallyThrow(final RuntimeException exception) {
 
-        //noinspection unchecked
-        mControl.perform((Action) EVENTUALLY_THROW, exception);
+        mControl.perform(mAction, EVENTUALLY_THROW, exception);
 
         return this;
     }
 
     public Dam<SOURCE, DATA> immediately() {
 
-        //noinspection unchecked
-        mControl.perform((Action) AFTER_MAX, 0, TimeUnit.MILLISECONDS);
+        mControl.perform(mAction, AFTER_MAX, 0, TimeUnit.MILLISECONDS);
 
         return this;
     }
 
     public Dam<SOURCE, DATA> max(final int maxCount) {
 
-        //noinspection unchecked
-        getControl().perform((Action) MAX, maxCount);
+        setupControl().perform(mAction, MAX, maxCount);
 
         return this;
     }
 
     public Dam<SOURCE, DATA> on(final BasinEvaluator<DATA> evaluator) {
 
-        //noinspection unchecked
-        mControl.perform((Action) ON, evaluator);
+        mControl.perform(mAction, ON, evaluator);
 
         return this;
     }
 
     public Dam<SOURCE, DATA> onDataAvailable() {
 
-        //noinspection unchecked
-        mControl.perform((Action) ON_DATA);
+        mControl.perform(mAction, ON_DATA);
 
         return this;
     }
 
     public Dam<SOURCE, DATA> onFlush() {
 
-        //noinspection unchecked
-        mControl.perform((Action) ON_FLUSH);
+        mControl.perform(mAction, ON_FLUSH);
 
         return this;
     }
 
     public Dam<SOURCE, DATA> onThrowableAvailable() {
 
-        //noinspection unchecked
-        mControl.perform((Action) ON_THROWABLE);
+        mControl.perform(mAction, ON_THROWABLE);
 
         return this;
     }
@@ -524,25 +479,23 @@ public class Dam<SOURCE, DATA> extends WaterfallRiver<SOURCE, SOURCE> {
     public DATA pullData() {
 
         //noinspection unchecked
-        return (DATA) getControl().perform((Action) PULL_DATA);
+        return (DATA) setupControl().perform(mAction, PULL_DATA);
     }
 
     public DATA pullData(final int streamNumber) {
 
         //noinspection unchecked
-        return (DATA) getControl().perform((Action) PULL_DATA, streamNumber);
+        return (DATA) setupControl().perform(mAction, PULL_DATA, streamNumber);
     }
 
     public Throwable pullUnhandled() {
 
-        //noinspection unchecked
-        return (Throwable) getControl().perform((Action) PULL_UNHANDLED);
+        return (Throwable) setupControl().perform(mAction, PULL_UNHANDLED);
     }
 
     public Throwable pullUnhandled(final int streamNumber) {
 
-        //noinspection unchecked
-        return (Throwable) getControl().perform((Action) PULL_UNHANDLED, streamNumber);
+        return (Throwable) setupControl().perform(mAction, PULL_UNHANDLED, streamNumber);
     }
 
     public Waterfall<SOURCE, DATA, DATA> release() {
@@ -554,16 +507,14 @@ public class Dam<SOURCE, DATA> extends WaterfallRiver<SOURCE, SOURCE> {
 
     public Dam<SOURCE, DATA> whenAvailable() {
 
-        //noinspection unchecked
-        mControl.perform((Action) WHEN_AVAILABLE);
+        mControl.perform(mAction, WHEN_AVAILABLE);
 
         return this;
     }
 
-    private GateControl<DamBasin<SOURCE, DATA>> getControl() {
+    private GateControl<DamBasin<SOURCE, DATA>> setupControl() {
 
-        //noinspection unchecked
-        mControl.perform((Action) SETUP_CONTORL, mControl);
+        mControl.perform(mAction, SETUP_CONTROL, mControl);
 
         return mControl;
     }

@@ -227,8 +227,6 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         return stream;
     }
 
-    // TODO: Rapids.generator(Class)
-
     private static void registerLeap(final Leap<?, ?, ?> leap) {
 
         if (sLeaps.containsKey(leap)) {
@@ -259,6 +257,45 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
     public Waterfall<SOURCE, IN, OUT> asGate() {
 
         return as(SELF_GATE);
+    }
+
+    public <TYPE> Waterfall<SOURCE, IN, OUT> breakDown(final Gate<TYPE> gate) {
+
+        return breakDown(when(gate));
+    }
+
+    public <TYPE> Waterfall<SOURCE, IN, OUT> breakDown(final TYPE gate) {
+
+        if (gate == null) {
+
+            return this;
+        }
+
+        boolean isChanged = false;
+
+        final HashMap<Gate<?>, GateLeap<?, ?, ?>> gateMap =
+                new HashMap<Gate<?>, GateLeap<?, ?, ?>>(mGateMap);
+
+        final Iterator<GateLeap<?, ?, ?>> iterator = gateMap.values().iterator();
+
+        while (iterator.hasNext()) {
+
+            if (gate == iterator.next()) {
+
+                iterator.remove();
+
+                isChanged = true;
+            }
+        }
+
+        if (!isChanged) {
+
+            return this;
+        }
+
+        //noinspection unchecked
+        return new Waterfall<SOURCE, IN, OUT>(mSource, gateMap, mGate, mBarrage, mSize, mCurrent,
+                                              mCurrentGenerator, mFalls);
     }
 
     public void chain(final Waterfall<?, OUT, ?> waterfall) {
@@ -1027,45 +1064,6 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
                 stream.dryUp(false);
             }
         }
-    }
-
-    public <TYPE> Waterfall<SOURCE, IN, OUT> forget(final TYPE gate) {
-
-        if (gate == null) {
-
-            return this;
-        }
-
-        boolean isChanged = false;
-
-        final HashMap<Gate<?>, GateLeap<?, ?, ?>> gateMap =
-                new HashMap<Gate<?>, GateLeap<?, ?, ?>>(mGateMap);
-
-        final Iterator<GateLeap<?, ?, ?>> iterator = gateMap.values().iterator();
-
-        while (iterator.hasNext()) {
-
-            if (gate == iterator.next()) {
-
-                iterator.remove();
-
-                isChanged = true;
-            }
-        }
-
-        if (!isChanged) {
-
-            return this;
-        }
-
-        //noinspection unchecked
-        return new Waterfall<SOURCE, IN, OUT>(mSource, gateMap, mGate, mBarrage, mSize, mCurrent,
-                                              mCurrentGenerator, mFalls);
-    }
-
-    public <TYPE> Waterfall<SOURCE, IN, OUT> forget(final Gate<TYPE> gate) {
-
-        return forget(when(gate));
     }
 
     public Waterfall<SOURCE, IN, OUT> in(final CurrentGenerator generator) {

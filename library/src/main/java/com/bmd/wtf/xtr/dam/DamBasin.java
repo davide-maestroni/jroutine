@@ -87,9 +87,9 @@ class DamBasin<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA> {
 
         final int maxCount = mMaxCount;
 
-        all();
-
         final List<List<DATA>> dropLists = mDrops;
+
+        resetWhat();
 
         for (final List<DATA> drops : dropLists) {
 
@@ -106,9 +106,9 @@ class DamBasin<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA> {
 
         final int maxCount = mMaxCount;
 
-        all();
-
         final List<DATA> drops = mDrops.get(streamNumber);
+
+        resetWhat();
 
         final List<DATA> subList = drops.subList(0, Math.max(0, Math.min(maxCount, drops.size())));
 
@@ -121,9 +121,9 @@ class DamBasin<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA> {
 
         final int maxCount = mMaxCount;
 
-        all();
-
         final List<List<Throwable>> throwableLists = mThrowables;
+
+        resetWhat();
 
         for (final List<Throwable> throwables : throwableLists) {
 
@@ -140,9 +140,9 @@ class DamBasin<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA> {
 
         final int maxCount = mMaxCount;
 
-        all();
-
         final List<Throwable> throwables = mThrowables.get(streamNumber);
+
+        resetWhat();
 
         final List<Throwable> subList =
                 throwables.subList(0, Math.max(0, Math.min(maxCount, throwables.size())));
@@ -154,10 +154,10 @@ class DamBasin<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA> {
 
     public void empty() {
 
-        all();
-
         mDrops.clear();
         mThrowables.clear();
+
+        resetWhat();
     }
 
     public void eventuallyThrow(final RuntimeException exception) {
@@ -213,9 +213,9 @@ class DamBasin<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA> {
 
     public DATA pullData() {
 
-        all();
-
         final List<List<DATA>> dropLists = mDrops;
+
+        resetWhat();
 
         for (final List<DATA> drops : dropLists) {
 
@@ -225,21 +225,23 @@ class DamBasin<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA> {
             }
         }
 
-        throw new IndexOutOfBoundsException(); // TODO
+        throw new IndexOutOfBoundsException("no data available");
     }
 
     public DATA pullData(final int streamNumber) {
 
-        all();
+        final List<List<DATA>> dropLists = mDrops;
 
-        return mDrops.get(streamNumber).remove(0);
+        resetWhat();
+
+        return dropLists.get(streamNumber).remove(0);
     }
 
     public Throwable pullUnhandled() {
 
-        all();
-
         final List<List<Throwable>> throwableLists = mThrowables;
+
+        resetWhat();
 
         for (final List<Throwable> throwables : throwableLists) {
 
@@ -249,14 +251,16 @@ class DamBasin<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA> {
             }
         }
 
-        throw new IndexOutOfBoundsException(); // TODO
+        throw new IndexOutOfBoundsException("no throwable available");
     }
 
     public Throwable pullUnhandled(final int streamNumber) {
 
-        all();
+        final List<List<Throwable>> throwableLists = mThrowables;
 
-        return mThrowables.get(streamNumber).remove(0);
+        resetWhat();
+
+        return throwableLists.get(streamNumber).remove(0);
     }
 
     public void setUpControl(final GateControl<DamBasin<SOURCE, DATA>> control) {
@@ -274,7 +278,7 @@ class DamBasin<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA> {
                .meets(new DamConditionEvaluator<SOURCE, DATA>(mEvaluator, mIsOnFlush, mIsOnData,
                                                               mIsOnThrowable));
 
-        reset();
+        resetWhen();
     }
 
     public void whenAvailable() {
@@ -282,7 +286,12 @@ class DamBasin<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA> {
         mTimeoutMs = -1;
     }
 
-    private void reset() {
+    private void resetWhat() {
+
+        mMaxCount = Integer.MAX_VALUE;
+    }
+
+    private void resetWhen() {
 
         mTimeoutMs = 0;
         mTimeoutException = null;
@@ -298,7 +307,7 @@ class DamBasin<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA> {
                 int flushCount);
     }
 
-    public static class DamConditionEvaluator<SOURCE, DATA>
+    private static class DamConditionEvaluator<SOURCE, DATA>
             implements ConditionEvaluator<DamBasin<SOURCE, DATA>> {
 
         private BasinEvaluator<DATA> mEvaluator;
@@ -321,28 +330,52 @@ class DamBasin<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA> {
         @Override
         public boolean isSatisfied(final DamBasin<SOURCE, DATA> dam) {
 
-            final List<List<DATA>> drops = dam.mDrops;
-            final List<List<Throwable>> throwables = dam.mThrowables;
+            final List<List<DATA>> dropLists = dam.mDrops;
+            final List<List<Throwable>> throwableLists = dam.mThrowables;
             final int flushCount = dam.mFlushCount;
 
             final BasinEvaluator<DATA> evaluator = mEvaluator;
 
-            if (evaluator != null) {
+            if ((evaluator != null) && !evaluator
+                    .isSatisfied(dropLists, throwableLists, flushCount)) {
 
-                if (!evaluator.isSatisfied(drops, throwables, flushCount)) {
+                return false;
+            }
+
+            if (mIsOnData) {
+
+                boolean isEmpty = false;
+
+                for (final List<DATA> drops : dropLists) {
+
+                    if (!drops.isEmpty()) {
+
+                        isEmpty = true;
+                    }
+                }
+
+                if (isEmpty) {
 
                     return false;
                 }
             }
 
-            if (mIsOnData && drops.isEmpty()) {
+            if (mIsOnThrowable && throwableLists.isEmpty()) {
 
-                return false;
-            }
+                boolean isEmpty = false;
 
-            if (mIsOnThrowable && throwables.isEmpty()) {
+                for (final List<Throwable> throwables : throwableLists) {
 
-                return false;
+                    if (!throwables.isEmpty()) {
+
+                        isEmpty = true;
+                    }
+                }
+
+                if (isEmpty) {
+
+                    return false;
+                }
             }
 
             //noinspection RedundantIfStatement

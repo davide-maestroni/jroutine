@@ -13,7 +13,7 @@
  */
 package com.bmd.wtf.xtr.rpd;
 
-import com.bmd.wtf.flg.Gate;
+import com.bmd.wtf.fll.Classification;
 import com.bmd.wtf.lps.Leap;
 import com.bmd.wtf.lps.LeapGenerator;
 import com.bmd.wtf.xtr.rpd.Rapids.Generator;
@@ -30,10 +30,12 @@ class RapidGenerators {
     }
 
     public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> generator(
-            final Gate<? extends Leap<SOURCE, IN, OUT>> gate, final Object... contextArgs) {
+            final Classification<? extends Leap<SOURCE, IN, OUT>> classification,
+            final Object... contextArgs) {
 
         //noinspection unchecked
-        return generator((Class<? extends Leap<SOURCE, IN, OUT>>) gate.getRawType(), contextArgs);
+        return generator((Class<? extends Leap<SOURCE, IN, OUT>>) classification.getRawType(),
+                         contextArgs);
     }
 
     public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> generator(
@@ -182,10 +184,10 @@ class RapidGenerators {
     }
 
     public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> generator(
-            final Gate<? extends Leap<SOURCE, IN, OUT>> gate) {
+            final Classification<? extends Leap<SOURCE, IN, OUT>> classification) {
 
         //noinspection unchecked
-        return generator((Class<? extends Leap<SOURCE, IN, OUT>>) gate.getRawType());
+        return generator((Class<? extends Leap<SOURCE, IN, OUT>>) classification.getRawType());
     }
 
     private static Constructor<?> findConstructor(final Constructor<?>[] constructors) {

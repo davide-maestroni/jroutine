@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.wtf.flg;
+package com.bmd.wtf.fll;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -20,23 +20,23 @@ import java.lang.reflect.WildcardType;
 /**
  * Created by davide on 6/14/14.
  */
-public abstract class Gate<TYPE> {
+public abstract class Classification<TYPE> {
 
     private Class<?> mRawType;
 
     private Type mType;
 
-    public static <CLASS> Gate<CLASS> from(final Class<CLASS> rawType) {
+    public static <CLASS> Classification<CLASS> from(final Class<CLASS> rawType) {
 
         if (rawType == null) {
 
             throw new IllegalArgumentException("the gate type cannot be null");
         }
 
-        final Gate<CLASS> gate = new Gate<CLASS>() {};
-        gate.mRawType = rawType;
+        final Classification<CLASS> classification = new Classification<CLASS>() {};
+        classification.mRawType = rawType;
 
-        return gate;
+        return classification;
     }
 
     public final TYPE cast(final Object object) {
@@ -73,7 +73,7 @@ public abstract class Gate<TYPE> {
             Class<?> subClass = getClass();
             Class<?> superClass = subClass.getSuperclass();
 
-            while (!Gate.class.equals(superClass)) {
+            while (!Classification.class.equals(superClass)) {
 
                 subClass = superClass;
                 superClass = subClass.getSuperclass();
@@ -119,17 +119,17 @@ public abstract class Gate<TYPE> {
             return true;
         }
 
-        if (!(o instanceof Gate)) {
+        if (!(o instanceof Classification)) {
 
             return false;
         }
 
-        final Gate gate = (Gate) o;
+        final Classification classification = (Classification) o;
 
-        return getType().equals(gate.getType());
+        return getType().equals(classification.getType());
     }
 
-    public final boolean isAssignableFrom(final Gate<?> other) {
+    public final boolean isAssignableFrom(final Classification<?> other) {
 
         return getRawType().isAssignableFrom(other.getRawType());
     }

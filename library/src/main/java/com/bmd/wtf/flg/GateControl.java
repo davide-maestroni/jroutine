@@ -35,8 +35,8 @@ public interface GateControl<TYPE> {
         public RESULT doOn(TYPE gate, Object... args);
     }
 
-    public interface ConditionEvaluator<CLASS> {
+    public interface ConditionEvaluator<TYPE> {
 
-        public boolean isSatisfied(CLASS glass);
+        public boolean isSatisfied(TYPE gate);
     }
 }

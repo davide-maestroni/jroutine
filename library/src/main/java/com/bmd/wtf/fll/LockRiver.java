@@ -13,7 +13,6 @@
  */
 package com.bmd.wtf.fll;
 
-import com.bmd.wtf.flg.Gate;
 import com.bmd.wtf.flg.GateControl;
 import com.bmd.wtf.flw.River;
 
@@ -415,7 +414,7 @@ class LockRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public <TYPE> GateControl<TYPE> when(final Gate<TYPE> gate) {
+    public <TYPE> GateControl<TYPE> when(final Classification<TYPE> gate) {
 
         return mRiver.when(gate);
     }

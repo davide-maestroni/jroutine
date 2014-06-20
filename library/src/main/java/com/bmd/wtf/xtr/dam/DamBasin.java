@@ -328,11 +328,11 @@ class DamBasin<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA> {
         }
 
         @Override
-        public boolean isSatisfied(final DamBasin<SOURCE, DATA> dam) {
+        public boolean isSatisfied(final DamBasin<SOURCE, DATA> basin) {
 
-            final List<List<DATA>> dropLists = dam.mDrops;
-            final List<List<Throwable>> throwableLists = dam.mThrowables;
-            final int flushCount = dam.mFlushCount;
+            final List<List<DATA>> dropLists = basin.mDrops;
+            final List<List<Throwable>> throwableLists = basin.mThrowables;
+            final int flushCount = basin.mFlushCount;
 
             final BasinEvaluator<DATA> evaluator = mEvaluator;
 

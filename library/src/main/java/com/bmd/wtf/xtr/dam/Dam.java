@@ -13,9 +13,9 @@
  */
 package com.bmd.wtf.xtr.dam;
 
-import com.bmd.wtf.flg.Gate;
 import com.bmd.wtf.flg.GateControl;
 import com.bmd.wtf.flg.GateControl.Action;
+import com.bmd.wtf.fll.Classification;
 import com.bmd.wtf.fll.Waterfall;
 import com.bmd.wtf.fll.WaterfallRiver;
 import com.bmd.wtf.xtr.dam.DamBasin.BasinEvaluator;
@@ -210,7 +210,7 @@ public class Dam<SOURCE, DATA> extends WaterfallRiver<SOURCE, SOURCE> {
 
         mInWaterfall = waterfall;
         mOutWaterfall = waterfall.asGate().chain(new DamBasin<SOURCE, DATA>(waterfall.size()));
-        mControl = mOutWaterfall.when(new Gate<DamBasin<SOURCE, DATA>>() {});
+        mControl = mOutWaterfall.when(new Classification<DamBasin<SOURCE, DATA>>() {});
     }
 
     public static <SOURCE, DATA> Dam<SOURCE, DATA> on(

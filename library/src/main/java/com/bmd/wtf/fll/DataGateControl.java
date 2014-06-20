@@ -13,7 +13,6 @@
  */
 package com.bmd.wtf.fll;
 
-import com.bmd.wtf.flg.Gate;
 import com.bmd.wtf.flg.GateControl;
 import com.bmd.wtf.lps.Leap;
 
@@ -28,7 +27,7 @@ class DataGateControl<TYPE> implements GateControl<TYPE> {
 
     private final Condition mCondition;
 
-    private final Gate<TYPE> mGate;
+    private final Classification<TYPE> mGate;
 
     private final Leap<?, ?, ?> mLeap;
 
@@ -40,7 +39,7 @@ class DataGateControl<TYPE> implements GateControl<TYPE> {
 
     private volatile long mTimeoutMs;
 
-    public DataGateControl(final GateLeap<?, ?, ?> leap, final Gate<TYPE> gate) {
+    public DataGateControl(final GateLeap<?, ?, ?> leap, final Classification<TYPE> gate) {
 
         mGate = gate;
         mLeap = leap.leap;

@@ -13,7 +13,7 @@
  */
 package com.bmd.wtf.xtr.rpd;
 
-import com.bmd.wtf.flg.Gate;
+import com.bmd.wtf.fll.Classification;
 import com.bmd.wtf.lps.Leap;
 import com.bmd.wtf.lps.LeapGenerator;
 
@@ -32,9 +32,10 @@ public class Rapids {
     }
 
     public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> generator(
-            final Gate<? extends Leap<SOURCE, IN, OUT>> gate, final Object... contextArgs) {
+            final Classification<? extends Leap<SOURCE, IN, OUT>> classification,
+            final Object... contextArgs) {
 
-        return RapidGenerators.generator(gate, contextArgs);
+        return RapidGenerators.generator(classification, contextArgs);
     }
 
     public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> generator(
@@ -56,9 +57,9 @@ public class Rapids {
     }
 
     public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> generator(
-            final Gate<? extends Leap<SOURCE, IN, OUT>> gate) {
+            final Classification<? extends Leap<SOURCE, IN, OUT>> classification) {
 
-        return RapidGenerators.generator(gate);
+        return RapidGenerators.generator(classification);
     }
 
     @Target({ElementType.CONSTRUCTOR})

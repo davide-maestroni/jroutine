@@ -1,7 +1,5 @@
 package com.bmd.wtf.fll;
 
-import com.bmd.wtf.flg.Gate;
-
 import junit.framework.TestCase;
 
 import java.util.ArrayList;
@@ -16,28 +14,30 @@ public class GlassTest extends TestCase {
 
     public void testType() {
 
-        final Gate<String> gate1 = new Gate<String>() {};
+        final Classification<String> classification1 = new Classification<String>() {};
 
-        assertThat(gate1.getType()).isEqualTo(String.class);
-        assertThat(String.class.equals(gate1.getRawType())).isTrue();
-        assertThat(gate1.isInterface()).isFalse();
+        assertThat(classification1.getType()).isEqualTo(String.class);
+        assertThat(String.class.equals(classification1.getRawType())).isTrue();
+        assertThat(classification1.isInterface()).isFalse();
 
-        final Gate<ArrayList<String>> gate2 = new Gate<ArrayList<String>>() {};
+        final Classification<ArrayList<String>> classification2 =
+                new Classification<ArrayList<String>>() {};
 
-        assertThat(gate2.getType()).isNotEqualTo(ArrayList.class);
-        assertThat(ArrayList.class.equals(gate2.getRawType())).isTrue();
-        assertThat(gate1.isInterface()).isFalse();
+        assertThat(classification2.getType()).isNotEqualTo(ArrayList.class);
+        assertThat(ArrayList.class.equals(classification2.getRawType())).isTrue();
+        assertThat(classification1.isInterface()).isFalse();
 
-        final Gate<List<String>> gate3 = new Gate<List<String>>() {};
+        final Classification<List<String>> classification3 = new Classification<List<String>>() {};
 
-        assertThat(gate3.getType()).isNotEqualTo(List.class);
-        assertThat(List.class.equals(gate3.getRawType())).isTrue();
-        assertThat(gate3.isInterface()).isTrue();
+        assertThat(classification3.getType()).isNotEqualTo(List.class);
+        assertThat(List.class.equals(classification3.getRawType())).isTrue();
+        assertThat(classification3.isInterface()).isTrue();
 
-        final Gate<List<ArrayList<String>>> gate4 = new Gate<List<ArrayList<String>>>() {};
+        final Classification<List<ArrayList<String>>> classification4 =
+                new Classification<List<ArrayList<String>>>() {};
 
-        assertThat(gate4.getType()).isNotEqualTo(List.class);
-        assertThat(List.class.equals(gate4.getRawType())).isTrue();
-        assertThat(gate4.isInterface()).isTrue();
+        assertThat(classification4.getType()).isNotEqualTo(List.class);
+        assertThat(List.class.equals(classification4.getRawType())).isTrue();
+        assertThat(classification4.isInterface()).isTrue();
     }
 }

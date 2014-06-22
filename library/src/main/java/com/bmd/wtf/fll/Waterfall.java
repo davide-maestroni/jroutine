@@ -1018,6 +1018,12 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
     }
 
     @Override
+    public <TYPE> GateControl<TYPE> when(final Class<TYPE> type) {
+
+        return when(Classification.from(type));
+    }
+
+    @Override
     public <TYPE> GateControl<TYPE> when(final Classification<TYPE> gate) {
 
         final GateLeap<?, ?, ?> leap = findBestMatch(gate);
@@ -1146,36 +1152,13 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
     public <DATA> Waterfall<DATA, DATA, DATA> start(final Class<DATA> dataType) {
 
-        final int size = mSize;
-
-        final FreeLeap<DATA, DATA> leap = freeLeap();
-
-        final Leap[] leaps = new Leap[size];
-
-        Arrays.fill(leaps, leap);
-
-        final Map<Classification<?>, GateLeap<?, ?, ?>> gateMap = Collections.emptyMap();
-
-        //noinspection unchecked
-        return new Waterfall<DATA, DATA, DATA>(null, gateMap, null, null, size, mCurrent,
-                                               mCurrentGenerator, leaps);
+        return start(Classification.from(dataType));
     }
 
-    public <TYPE> Waterfall<TYPE, TYPE, TYPE> start(final Classification<TYPE> classification) {
-
-        final int size = mSize;
-
-        final FreeLeap<TYPE, TYPE> leap = freeLeap();
-
-        final Leap[] leaps = new Leap[size];
-
-        Arrays.fill(leaps, leap);
-
-        final Map<Classification<?>, GateLeap<?, ?, ?>> gateMap = Collections.emptyMap();
+    public <DATA> Waterfall<DATA, DATA, DATA> start(final Classification<DATA> classification) {
 
         //noinspection unchecked
-        return new Waterfall<TYPE, TYPE, TYPE>(null, gateMap, null, null, size, mCurrent,
-                                               mCurrentGenerator, leaps);
+        return (Waterfall<DATA, DATA, DATA>) start();
     }
 
     public <NIN, NOUT> Waterfall<NIN, NIN, NOUT> start(

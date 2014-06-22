@@ -34,6 +34,8 @@ public class Drops<DATA> implements List<DATA> {
         mList = list;
     }
 
+    //TODO: generator
+
     public static Drops<Boolean> asList(final boolean... data) {
 
         if (data == null) {
@@ -329,7 +331,6 @@ public class Drops<DATA> implements List<DATA> {
 
             final Number number = (Number) data;
 
-            // TODO: double and float?
             newList.add(number.longValue() != 0);
         }
 

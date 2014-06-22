@@ -79,5 +79,7 @@ public interface River<SOURCE, DATA> extends Stream<DATA> {
 
     public River<SOURCE, SOURCE> source();
 
+    public <TYPE> GateControl<TYPE> when(Class<TYPE> type);
+
     public <TYPE> GateControl<TYPE> when(Classification<TYPE> gate);
 }

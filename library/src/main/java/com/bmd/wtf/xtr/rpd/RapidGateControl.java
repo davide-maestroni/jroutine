@@ -16,6 +16,8 @@ package com.bmd.wtf.xtr.rpd;
 import com.bmd.wtf.flg.GateControl;
 import com.bmd.wtf.fll.Classification;
 import com.bmd.wtf.fll.Waterfall;
+import com.bmd.wtf.fll.WaterfallRiver;
+import com.bmd.wtf.xtr.rpd.Rapids.Condition;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -26,146 +28,232 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by davide on 6/20/14.
  */
-public class RapidGateControl<TYPE> implements RapidControl<TYPE> {
+public class RapidGateControl<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallRiver<SOURCE, IN>
+        implements RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> {
 
     private final ConditionEvaluator<TYPE> mEvaluator;
 
     private final Classification<TYPE> mGate;
 
+    private final Waterfall<SOURCE, MOUTH, OUT> mMouthWaterfall;
+
+    private final Waterfall<SOURCE, SOURCE, ?> mSourceWaterfall;
+
     private final RuntimeException mTimeoutException;
 
     private final long mTimeoutMs;
 
-    private final Waterfall<?, ?, ?> mWaterfall;
+    RapidGateControl(final Waterfall<SOURCE, MOUTH, OUT> waterfall) {
 
-    RapidGateControl(final Waterfall<?, ?, ?> waterfall) {
+        //noinspection unchecked
+        super((Waterfall<SOURCE, IN, OUT>) waterfall, true);
 
-        mWaterfall = waterfall;
+        mSourceWaterfall = waterfall.source();
+        mMouthWaterfall = waterfall;
         mGate = null;
         mTimeoutMs = 0;
         mTimeoutException = null;
         mEvaluator = null;
     }
 
-    private RapidGateControl(final Waterfall<?, ?, ?> waterfall, final Classification<TYPE> gate,
-            final long timeoutMs, final RuntimeException exception,
+    private RapidGateControl(final Waterfall<SOURCE, MOUTH, OUT> waterfall,
+            final Classification<TYPE> gate, final long timeoutMs, final RuntimeException exception,
             final ConditionEvaluator<TYPE> evaluator) {
 
-        mWaterfall = waterfall;
+        //noinspection unchecked
+        super((Waterfall<SOURCE, IN, OUT>) waterfall, true);
+
+        mSourceWaterfall = waterfall.source();
+        mMouthWaterfall = waterfall;
         mGate = gate;
         mTimeoutMs = timeoutMs;
         mTimeoutException = exception;
         mEvaluator = evaluator;
     }
 
+    private RapidGateControl(final Waterfall<SOURCE, SOURCE, ?> sourceWaterfall,
+            final Waterfall<SOURCE, MOUTH, OUT> mouthWaterfall, final Classification<TYPE> gate,
+            final long timeoutMs, final RuntimeException exception,
+            final ConditionEvaluator<TYPE> evaluator) {
+
+        //noinspection unchecked
+        super((Waterfall<SOURCE, IN, ?>) sourceWaterfall, true);
+
+        mSourceWaterfall = sourceWaterfall;
+        mMouthWaterfall = mouthWaterfall;
+        mGate = gate;
+        mTimeoutMs = timeoutMs;
+        mTimeoutException = exception;
+        mEvaluator = evaluator;
+    }
+
+    private static Method findCondition(final Method[] methods, final Object[] args) {
+
+        Method annotatedConditionMethod = null;
+        Method conditionMethod = null;
+
+        final int length = args.length;
+
+        for (final Method method : methods) {
+
+            if (boolean.class.equals(method.getReturnType())) {
+
+                final Class<?>[] params = method.getParameterTypes();
+
+                if (length != params.length) {
+
+                    continue;
+                }
+
+                boolean isMatching = true;
+
+                for (int i = 0; i < length && isMatching; i++) {
+
+                    final Object arg = args[i];
+                    final Class<?> param = params[i];
+
+                    if (arg == null) {
+
+                        if (param.isPrimitive()) {
+
+                            isMatching = false;
+                        }
+
+                    } else if (!arg.getClass().equals(param)) {
+
+                        isMatching = false;
+                    }
+                }
+
+                if (isMatching) {
+
+                    if (method.isAnnotationPresent(Condition.class)) {
+
+                        annotatedConditionMethod = method;
+
+                    } else {
+
+                        conditionMethod = method;
+                    }
+                }
+            }
+        }
+
+        if (annotatedConditionMethod != null) {
+
+            return annotatedConditionMethod;
+        }
+
+        return conditionMethod;
+    }
+
     @Override
-    public RapidControl<TYPE> afterMax(final long maxDelay, final TimeUnit timeUnit) {
+    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> afterDrain() {
+
+        drain();
+
+        return this;
+    }
+
+    @Override
+    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> afterDrain(final int streamNumber) {
+
+        drain(streamNumber);
+
+        return this;
+    }
+
+    @Override
+    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> afterDryUp() {
+
+        dryUp();
+
+        return this;
+    }
+
+    @Override
+    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> afterDryUp(final int streamNumber) {
+
+        dryUp(streamNumber);
+
+        return this;
+    }
+
+    @Override
+    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> afterMax(final long maxDelay,
+            final TimeUnit timeUnit) {
 
         final long timeoutMs = Math.max(0, timeUnit.toMillis(maxDelay));
 
         if (mTimeoutMs != timeoutMs) {
 
-            return new RapidGateControl<TYPE>(mWaterfall, mGate, timeoutMs, mTimeoutException,
-                                              mEvaluator);
+            return new RapidGateControl<SOURCE, MOUTH, IN, OUT, TYPE>(mMouthWaterfall, mGate,
+                                                                      timeoutMs, mTimeoutException,
+                                                                      mEvaluator);
         }
 
         return this;
     }
 
     @Override
-    public RapidControl<TYPE> eventually() {
+    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> eventually() {
 
         if (mTimeoutMs != -1) {
 
-            return new RapidGateControl<TYPE>(mWaterfall, mGate, -1, mTimeoutException, mEvaluator);
+            return new RapidGateControl<SOURCE, MOUTH, IN, OUT, TYPE>(mMouthWaterfall, mGate, -1,
+                                                                      mTimeoutException,
+                                                                      mEvaluator);
         }
 
         return this;
     }
 
     @Override
-    public RapidControl<TYPE> eventuallyThrow(final RuntimeException exception) {
+    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> eventuallyThrow(
+            final RuntimeException exception) {
 
         final RuntimeException timeoutException = mTimeoutException;
 
         if ((timeoutException == null) ? (exception != null)
                 : !timeoutException.equals(exception)) {
 
-            return new RapidGateControl<TYPE>(mWaterfall, mGate, mTimeoutMs, exception, mEvaluator);
+            return new RapidGateControl<SOURCE, MOUTH, IN, OUT, TYPE>(mMouthWaterfall, mGate,
+                                                                      mTimeoutMs, exception,
+                                                                      mEvaluator);
         }
 
         return this;
     }
 
     @Override
-    public RapidControl<TYPE> meets(final ConditionEvaluator<TYPE> evaluator) {
+    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> meets(
+            final ConditionEvaluator<TYPE> evaluator) {
 
         final ConditionEvaluator<TYPE> currentEvaluator = mEvaluator;
 
         if ((currentEvaluator == null) ? (evaluator != null)
                 : !currentEvaluator.equals(evaluator)) {
 
-            return new RapidGateControl<TYPE>(mWaterfall, mGate, mTimeoutMs, mTimeoutException,
-                                              evaluator);
+            return new RapidGateControl<SOURCE, MOUTH, IN, OUT, TYPE>(mMouthWaterfall, mGate,
+                                                                      mTimeoutMs, mTimeoutException,
+                                                                      evaluator);
         }
 
         return this;
     }
 
     @Override
-    public <NTYPE> RapidControl<NTYPE> as(final Class<NTYPE> gateType) {
+    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> meetsCondition(final Object... args) {
 
-        final Classification<TYPE> currentGate = mGate;
-
-        if ((currentGate == null) ? (gateType != null)
-                : !currentGate.getRawType().equals(gateType)) {
-
-            final Classification<NTYPE> gate = Classification.from(gateType);
-
-            final ConditionEvaluator<NTYPE> evaluator;
-
-            if ((currentGate == null) || currentGate.isAssignableFrom(gate)) {
-
-                //noinspection unchecked
-                evaluator = (ConditionEvaluator<NTYPE>) mEvaluator;
-
-            } else {
-
-                evaluator = null;
-            }
-
-            return new RapidGateControl<NTYPE>(mWaterfall, gate, mTimeoutMs, mTimeoutException,
-                                               evaluator);
-        }
-
-        //noinspection unchecked
-        return (RapidControl<NTYPE>) this;
+        return meets(new GateConditionEvaluator<TYPE>(args));
     }
 
     @Override
-    public <NTYPE> RapidControl<NTYPE> as(final Classification<NTYPE> gate) {
+    public RapidControl<SOURCE, MOUTH, MOUTH, OUT, TYPE> mouth() {
 
-        final Classification<TYPE> currentGate = mGate;
-
-        if ((currentGate == null) ? (gate != null) : !currentGate.equals(gate)) {
-            final ConditionEvaluator<NTYPE> evaluator;
-
-            if ((currentGate == null) || currentGate.isAssignableFrom(gate)) {
-
-                //noinspection unchecked
-                evaluator = (ConditionEvaluator<NTYPE>) mEvaluator;
-
-            } else {
-
-                evaluator = null;
-            }
-
-            return new RapidGateControl<NTYPE>(mWaterfall, gate, mTimeoutMs, mTimeoutException,
-                                               evaluator);
-        }
-
-        //noinspection unchecked
-        return (RapidControl<NTYPE>) this;
+        return new RapidGateControl<SOURCE, MOUTH, MOUTH, OUT, TYPE>(mMouthWaterfall, mGate,
+                                                                     mTimeoutMs, mTimeoutException,
+                                                                     mEvaluator);
     }
 
     @Override
@@ -180,6 +268,199 @@ public class RapidGateControl<TYPE> implements RapidControl<TYPE> {
     }
 
     @Override
+    public Waterfall<SOURCE, MOUTH, OUT> waterfall() {
+
+        return mMouthWaterfall;
+    }
+
+    @Override
+    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> flush(final int streamNumber) {
+
+        super.flush(streamNumber);
+
+        return this;
+    }
+
+    @Override
+    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> flush() {
+
+        super.flush();
+
+        return this;
+    }
+
+    @Override
+    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> forward(final Throwable throwable) {
+
+        super.forward(throwable);
+
+        return this;
+    }
+
+    @Override
+    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> push(final IN... drops) {
+
+        super.push(drops);
+
+        return this;
+    }
+
+    @Override
+    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> push(final Iterable<? extends IN> drops) {
+
+        super.push(drops);
+
+        return this;
+    }
+
+    @Override
+    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> push(final IN drop) {
+
+        super.push(drop);
+
+        return this;
+    }
+
+    @Override
+    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> pushAfter(final long delay,
+            final TimeUnit timeUnit, final Iterable<? extends IN> drops) {
+
+        super.pushAfter(delay, timeUnit, drops);
+
+        return this;
+    }
+
+    @Override
+    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> pushAfter(final long delay,
+            final TimeUnit timeUnit, final IN drop) {
+
+        super.pushAfter(delay, timeUnit, drop);
+
+        return this;
+    }
+
+    @Override
+    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> pushAfter(final long delay,
+            final TimeUnit timeUnit, final IN... drops) {
+
+        super.pushAfter(delay, timeUnit, drops);
+
+        return this;
+    }
+
+    @Override
+    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> forward(final int streamNumber,
+            final Throwable throwable) {
+
+        super.forward(streamNumber, throwable);
+
+        return this;
+    }
+
+    @Override
+    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> push(final int streamNumber,
+            final IN... drops) {
+
+        super.push(streamNumber, drops);
+
+        return this;
+    }
+
+    @Override
+    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> push(final int streamNumber,
+            final Iterable<? extends IN> drops) {
+
+        super.push(streamNumber, drops);
+
+        return this;
+    }
+
+    @Override
+    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> push(final int streamNumber, final IN drop) {
+
+        super.push(streamNumber, drop);
+
+        return this;
+    }
+
+    @Override
+    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> pushAfter(final int streamNumber,
+            final long delay, final TimeUnit timeUnit, final Iterable<? extends IN> drops) {
+
+        super.pushAfter(streamNumber, delay, timeUnit, drops);
+
+        return this;
+    }
+
+    @Override
+    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> pushAfter(final int streamNumber,
+            final long delay, final TimeUnit timeUnit, final IN drop) {
+
+        super.pushAfter(streamNumber, delay, timeUnit, drop);
+
+        return this;
+    }
+
+    @Override
+    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> pushAfter(final int streamNumber,
+            final long delay, final TimeUnit timeUnit, final IN... drops) {
+
+        super.pushAfter(streamNumber, delay, timeUnit, drops);
+
+        return this;
+    }
+
+    @Override
+    public RapidControl<SOURCE, MOUTH, SOURCE, OUT, TYPE> source() {
+
+        return new RapidGateControl<SOURCE, MOUTH, SOURCE, OUT, TYPE>(mSourceWaterfall,
+                                                                      mMouthWaterfall, mGate,
+                                                                      mTimeoutMs, mTimeoutException,
+                                                                      mEvaluator);
+    }
+
+    @Override
+    public <NTYPE> RapidControl<SOURCE, MOUTH, IN, OUT, NTYPE> when(final Class<NTYPE> type) {
+
+        return when(Classification.from(type));
+    }
+
+    @Override
+    public <NTYPE> RapidControl<SOURCE, MOUTH, IN, OUT, NTYPE> when(
+            final Classification<NTYPE> gate) {
+
+        if (!gate.isInterface()) {
+
+            throw new IllegalArgumentException("the gate must be an interface");
+        }
+
+        final Classification<TYPE> currentGate = mGate;
+
+        if ((currentGate == null) || !currentGate.equals(gate)) {
+
+            final ConditionEvaluator<NTYPE> evaluator;
+
+            if ((currentGate == null) || currentGate.isAssignableFrom(gate)) {
+
+                //noinspection unchecked
+                evaluator = (ConditionEvaluator<NTYPE>) mEvaluator;
+
+            } else {
+
+                evaluator = null;
+            }
+
+            return new RapidGateControl<SOURCE, MOUTH, IN, OUT, NTYPE>(mMouthWaterfall, gate,
+                                                                       mTimeoutMs,
+                                                                       mTimeoutException,
+                                                                       evaluator);
+        }
+
+        //noinspection unchecked
+        return (RapidControl<SOURCE, MOUTH, IN, OUT, NTYPE>) this;
+    }
+
+    @Override
     public <RESULT> RESULT perform(final Action<RESULT, TYPE> action, final Object... args) {
 
         return getControl().perform(action, args);
@@ -190,7 +471,7 @@ public class RapidGateControl<TYPE> implements RapidControl<TYPE> {
         final long timeoutMs = mTimeoutMs;
 
         final GateControl<TYPE> gateControl =
-                mWaterfall.when(mGate).meets(mEvaluator).eventuallyThrow(mTimeoutException);
+                mMouthWaterfall.when(mGate).meets(mEvaluator).eventuallyThrow(mTimeoutException);
 
         if (timeoutMs < 0) {
 
@@ -204,7 +485,65 @@ public class RapidGateControl<TYPE> implements RapidControl<TYPE> {
         return gateControl;
     }
 
-    private static class GateInvocationHandler<TYPE> implements InvocationHandler {
+    private static class GateConditionEvaluator<TYPE> implements ConditionEvaluator<TYPE> {
+
+        private final Object[] mArgs;
+
+        private volatile Method mCondition;
+
+        public GateConditionEvaluator(final Object[] args) {
+
+            mArgs = args.clone();
+        }
+
+        @Override
+        public boolean isSatisfied(final TYPE gate) {
+
+            try {
+
+                return (Boolean) getCondition(gate).invoke(gate, mArgs);
+
+            } catch (final Throwable t) {
+
+                throw new UndeclaredThrowableException(t);
+            }
+        }
+
+        private Method getCondition(final TYPE gate) {
+
+            if (mCondition == null) {
+
+                final Object[] args = mArgs;
+
+                final Class<?> type = gate.getClass();
+
+                Method condition = findCondition(type.getMethods(), args);
+
+                if (condition == null) {
+
+                    condition = findCondition(type.getDeclaredMethods(), args);
+
+                    if (condition == null) {
+
+                        throw new IllegalArgumentException(
+                                "no suitable method found for type " + type);
+                    }
+                }
+
+                if (!condition.isAccessible()) {
+
+                    condition.setAccessible(true);
+                }
+
+                mCondition = condition;
+            }
+
+            return mCondition;
+        }
+    }
+
+    private static class GateInvocationHandler<TYPE>
+            implements InvocationHandler, Action<Object, TYPE> {
 
         private final GateControl<TYPE> mControl;
 
@@ -214,24 +553,23 @@ public class RapidGateControl<TYPE> implements RapidControl<TYPE> {
         }
 
         @Override
-        public Object invoke(final Object o, final Method method, final Object[] objects) throws
+        public Object doOn(final TYPE gate, final Object... args) {
+
+            try {
+
+                return ((Method) args[0]).invoke(gate, (Object[]) args[1]);
+
+            } catch (final Throwable t) {
+
+                throw new UndeclaredThrowableException(t);
+            }
+        }
+
+        @Override
+        public Object invoke(final Object proxy, final Method method, final Object[] args) throws
                 Throwable {
 
-            return mControl.perform(new Action<Object, TYPE>() {
-
-                @Override
-                public Object doOn(final TYPE gate, final Object... args) {
-
-                    try {
-
-                        return method.invoke(gate, objects);
-
-                    } catch (final Throwable t) {
-
-                        throw new UndeclaredThrowableException(t);
-                    }
-                }
-            });
+            return mControl.perform(this, method, args);
         }
     }
 }

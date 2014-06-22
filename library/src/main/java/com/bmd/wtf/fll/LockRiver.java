@@ -414,6 +414,12 @@ class LockRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
+    public <TYPE> GateControl<TYPE> when(final Class<TYPE> type) {
+
+        return mRiver.when(type);
+    }
+
+    @Override
     public <TYPE> GateControl<TYPE> when(final Classification<TYPE> gate) {
 
         return mRiver.when(gate);

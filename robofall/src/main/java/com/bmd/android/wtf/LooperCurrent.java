@@ -17,7 +17,7 @@ import android.os.Handler;
 import android.os.Looper;
 
 import com.bmd.wtf.crr.Current;
-import com.bmd.wtf.src.Pool;
+import com.bmd.wtf.flw.Fall;
 
 import java.util.concurrent.TimeUnit;
 
@@ -42,20 +42,46 @@ class LooperCurrent implements Current {
     }
 
     @Override
-    public <DATA> void discharge(final Pool<DATA> pool, final DATA drop) {
+    public void flush(final Fall<?> fall) {
 
         mHandler.post(new Runnable() {
 
             @Override
             public void run() {
 
-                pool.discharge(drop);
+                fall.flush();
             }
         });
     }
 
     @Override
-    public <DATA> void dischargeAfter(final Pool<DATA> pool, final long delay, final TimeUnit timeUnit,
+    public void forward(final Fall<?> fall, final Throwable throwable) {
+
+        mHandler.post(new Runnable() {
+
+            @Override
+            public void run() {
+
+                fall.forward(throwable);
+            }
+        });
+    }
+
+    @Override
+    public <DATA> void push(final Fall<DATA> fall, final DATA drop) {
+
+        mHandler.post(new Runnable() {
+
+            @Override
+            public void run() {
+
+                fall.push(drop);
+            }
+        });
+    }
+
+    @Override
+    public <DATA> void pushAfter(final Fall<DATA> fall, final long delay, final TimeUnit timeUnit,
             final DATA drop) {
 
         mHandler.postDelayed(new Runnable() {
@@ -63,67 +89,29 @@ class LooperCurrent implements Current {
             @Override
             public void run() {
 
-                pool.discharge(drop);
+                fall.push(drop);
             }
 
         }, timeUnit.toMillis(delay));
     }
 
     @Override
-    public <DATA> void dischargeAfter(final Pool<DATA> pool, final long delay, final TimeUnit timeUnit,
+    public <DATA> void pushAfter(final Fall<DATA> fall, final long delay, final TimeUnit timeUnit,
             final Iterable<? extends DATA> drops) {
 
-        mHandler.postDelayed(new Runnable() {
+        final long delayMillis = timeUnit.toMillis(delay);
 
-            @Override
-            public void run() {
+        for (final DATA drop : drops) {
 
-                for (final DATA drop : drops) {
+            mHandler.postDelayed(new Runnable() {
 
-                    pool.discharge(drop);
+                @Override
+                public void run() {
+
+                    fall.push(drop);
                 }
-            }
 
-        }, timeUnit.toMillis(delay));
-    }
-
-    @Override
-    public void drop(final Pool<?> pool, final Object debris) {
-
-        mHandler.post(new Runnable() {
-
-            @Override
-            public void run() {
-
-                pool.drop(debris);
-            }
-        });
-    }
-
-    @Override
-    public void dropAfter(final Pool<?> pool, final long delay, final TimeUnit timeUnit, final Object debris) {
-
-        mHandler.postDelayed(new Runnable() {
-
-            @Override
-            public void run() {
-
-                pool.drop(debris);
-            }
-
-        }, timeUnit.toMillis(delay));
-    }
-
-    @Override
-    public void flush(final Pool<?> pool) {
-
-        mHandler.post(new Runnable() {
-
-            @Override
-            public void run() {
-
-                pool.flush();
-            }
-        });
+            }, delayMillis);
+        }
     }
 }

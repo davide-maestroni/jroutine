@@ -14,6 +14,7 @@
 package com.bmd.wtf.xtr.rpd;
 
 import com.bmd.wtf.fll.Classification;
+import com.bmd.wtf.fll.Waterfall;
 import com.bmd.wtf.lps.Leap;
 import com.bmd.wtf.lps.LeapGenerator;
 
@@ -31,40 +32,65 @@ public class Rapids {
 
     }
 
-    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> generator(
+    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> asLeapGenerator(
+            final Leap<SOURCE, IN, OUT>... leaps) {
+
+        return RapidGenerators.leapGenerator(leaps);
+    }
+
+    public static <SOURCE, MOUTH, IN, OUT, TYPE> RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> control(
+            final Waterfall<SOURCE, MOUTH, OUT> waterfall) {
+
+        return new RapidGateControl<SOURCE, MOUTH, IN, OUT, TYPE>(waterfall);
+    }
+
+    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> leapGenerator(
+            final Object generator,
+            final Classification<? extends Leap<SOURCE, IN, OUT>> classification,
+            final Object... args) {
+
+        return RapidGenerators.leapGenerator(generator, classification, args);
+    }
+
+    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> leapGenerator(
+            final Leap<SOURCE, IN, OUT> leap, final Object... contextArgs) {
+
+        //noinspection unchecked
+        return RapidGenerators
+                .leapGenerator((Class<? extends Leap<SOURCE, IN, OUT>>) leap.getClass(),
+                               contextArgs);
+    }
+
+    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> leapGenerator(
             final Classification<? extends Leap<SOURCE, IN, OUT>> classification,
             final Object... contextArgs) {
 
-        return RapidGenerators.generator(classification, contextArgs);
+        return RapidGenerators.leapGenerator(classification, contextArgs);
     }
 
-    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> generator(
-            final Leap<SOURCE, IN, OUT>... leaps) {
-
-        return RapidGenerators.generator(leaps);
-    }
-
-    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> generator(
+    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> leapGenerator(
             final Class<? extends Leap<SOURCE, IN, OUT>> type, final Object... contextArgs) {
 
-        return RapidGenerators.generator(type, contextArgs);
+        return RapidGenerators.leapGenerator(type, contextArgs);
     }
 
-    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> generator(
+    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> leapGenerator(
             final Class<? extends Leap<SOURCE, IN, OUT>> type) {
 
-        return RapidGenerators.generator(type);
+        return RapidGenerators.leapGenerator(type);
     }
 
-    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> generator(
+    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> leapGenerator(
             final Classification<? extends Leap<SOURCE, IN, OUT>> classification) {
 
-        return RapidGenerators.generator(classification);
+        return RapidGenerators.leapGenerator(classification);
     }
 
-    @Target({ElementType.CONSTRUCTOR})
+    @Target({ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
-    public @interface Generator {
+    public @interface Condition {}
 
-    }
+    @Target({ElementType.CONSTRUCTOR, ElementType.METHOD})
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface Generator {}
 }

@@ -19,6 +19,7 @@ import com.bmd.wtf.lps.LeapGenerator;
 import com.bmd.wtf.xtr.rpd.Rapids.Generator;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 
 /**
  * Created by davide on 6/19/14.
@@ -29,16 +30,16 @@ class RapidGenerators {
 
     }
 
-    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> generator(
+    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> leapGenerator(
             final Classification<? extends Leap<SOURCE, IN, OUT>> classification,
             final Object... contextArgs) {
 
         //noinspection unchecked
-        return generator((Class<? extends Leap<SOURCE, IN, OUT>>) classification.getRawType(),
-                         contextArgs);
+        return leapGenerator((Class<? extends Leap<SOURCE, IN, OUT>>) classification.getRawType(),
+                             contextArgs);
     }
 
-    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> generator(
+    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> leapGenerator(
             final Leap<SOURCE, IN, OUT>... leaps) {
 
         final Leap<SOURCE, IN, OUT>[] leapList = leaps.clone();
@@ -53,7 +54,79 @@ class RapidGenerators {
         };
     }
 
-    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> generator(
+    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> leapGenerator(
+            final Object generator,
+            final Classification<? extends Leap<SOURCE, IN, OUT>> classification,
+            final Object... args) {
+
+        final Class<?> type = classification.getRawType();
+
+        Method bestMatch = findMethod(generator.getClass().getMethods(), type, args);
+
+        if (bestMatch == null) {
+
+            bestMatch = findMethod(generator.getClass().getDeclaredMethods(), type, args);
+
+            if (bestMatch == null) {
+
+                throw new IllegalArgumentException("no suitable method found for type " + type);
+            }
+        }
+
+        if (!bestMatch.isAccessible()) {
+
+            bestMatch.setAccessible(true);
+        }
+
+        final Method method = bestMatch;
+
+        final int length = method.getParameterTypes().length;
+
+        if (length > args.length) {
+
+            return new LeapGenerator<SOURCE, IN, OUT>() {
+
+                @Override
+                public Leap<SOURCE, IN, OUT> start(final int fallNumber) {
+
+                    try {
+
+                        final Object[] args = new Object[length];
+
+                        System.arraycopy(args, 0, args, 0, length - 1);
+
+                        args[length - 1] = fallNumber;
+
+                        //noinspection unchecked
+                        return (Leap<SOURCE, IN, OUT>) method.invoke(generator, args);
+
+                    } catch (final Throwable t) {
+
+                        throw new RuntimeException(t);
+                    }
+                }
+            };
+        }
+
+        return new LeapGenerator<SOURCE, IN, OUT>() {
+
+            @Override
+            public Leap<SOURCE, IN, OUT> start(final int fallNumber) {
+
+                try {
+
+                    //noinspection unchecked
+                    return (Leap<SOURCE, IN, OUT>) method.invoke(generator, args);
+
+                } catch (final Throwable t) {
+
+                    throw new RuntimeException(t);
+                }
+            }
+        };
+    }
+
+    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> leapGenerator(
             final Class<? extends Leap<SOURCE, IN, OUT>> type, final Object... contextArgs) {
 
         Constructor<?> bestMatch = findContextConstructor(type.getConstructors(), contextArgs);
@@ -67,11 +140,11 @@ class RapidGenerators {
                 throw new IllegalArgumentException(
                         "no suitable constructor found for type " + type);
             }
+        }
 
-            if (!bestMatch.isAccessible()) {
+        if (!bestMatch.isAccessible()) {
 
-                bestMatch.setAccessible(true);
-            }
+            bestMatch.setAccessible(true);
         }
 
         final Constructor<?> constructor = bestMatch;
@@ -122,7 +195,7 @@ class RapidGenerators {
         };
     }
 
-    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> generator(
+    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> leapGenerator(
             final Class<? extends Leap<SOURCE, IN, OUT>> type) {
 
         Constructor<?> bestMatch = findConstructor(type.getConstructors());
@@ -136,11 +209,11 @@ class RapidGenerators {
                 throw new IllegalArgumentException(
                         "no suitable constructor found for type " + type);
             }
+        }
 
-            if (!bestMatch.isAccessible()) {
+        if (!bestMatch.isAccessible()) {
 
-                bestMatch.setAccessible(true);
-            }
+            bestMatch.setAccessible(true);
         }
 
         final Constructor<?> constructor = bestMatch;
@@ -183,11 +256,11 @@ class RapidGenerators {
         };
     }
 
-    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> generator(
+    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> leapGenerator(
             final Classification<? extends Leap<SOURCE, IN, OUT>> classification) {
 
         //noinspection unchecked
-        return generator((Class<? extends Leap<SOURCE, IN, OUT>>) classification.getRawType());
+        return leapGenerator((Class<? extends Leap<SOURCE, IN, OUT>>) classification.getRawType());
     }
 
     private static Constructor<?> findConstructor(final Constructor<?>[] constructors) {
@@ -294,13 +367,6 @@ class RapidGenerators {
 
         final int argsLength = contextArgs.length;
 
-        final Class<?>[] contextClasses = new Class[argsLength];
-
-        for (int i = 0; i < argsLength; i++) {
-
-            contextClasses[i] = contextArgs[i].getClass();
-        }
-
         Constructor<?> annotatedIntConstructor = null;
         Constructor<?> annotatedIntegerConstructor = null;
         Constructor<?> annotatedDefaultConstructor = null;
@@ -323,7 +389,11 @@ class RapidGenerators {
 
                     for (int i = 0; i < argsLength; i++) {
 
-                        if (!params[i].equals(contextClasses[i])) {
+                        final Object contextArg = contextArgs[i];
+                        final Class<?> param = params[i];
+
+                        if ((contextArg != null) ? !param.isInstance(contextArg)
+                                : param.isPrimitive()) {
 
                             isValid = false;
 
@@ -376,7 +446,11 @@ class RapidGenerators {
 
                     for (int i = 0; i < argsLength; i++) {
 
-                        if (!params[i].equals(contextClasses[i])) {
+                        final Object contextArg = contextArgs[i];
+                        final Class<?> param = params[i];
+
+                        if ((contextArg != null) ? !param.isInstance(contextArg)
+                                : param.isPrimitive()) {
 
                             isValid = false;
 
@@ -432,5 +506,276 @@ class RapidGenerators {
         }
 
         return defaultConstructor;
+    }
+
+    private static Method findMethod(final Method[] methods, final Class<?> resultType,
+            final Object[] args) {
+
+        final int argsLength = args.length;
+
+        final Class<?>[] argClasses = new Class[argsLength];
+
+        for (int i = 0; i < argsLength; i++) {
+
+            argClasses[i] = args[i].getClass();
+        }
+
+        Class<?> annotatedBestMatch = null;
+        Class<?> bestMatch = null;
+
+        for (final Method method : methods) {
+
+            final Class<?> returnType = method.getReturnType();
+
+            if (!resultType.isAssignableFrom(returnType)) {
+
+                continue;
+            }
+
+            final Class<?>[] params = method.getParameterTypes();
+
+            if (method.isAnnotationPresent(Generator.class)) {
+
+                final int length = params.length;
+
+                boolean isValid = (length >= argsLength);
+
+                if (isValid) {
+
+                    for (int i = 0; i < argsLength; i++) {
+
+                        if (!params[i].equals(argClasses[i])) {
+
+                            isValid = false;
+
+                            break;
+                        }
+                    }
+                }
+
+                if (isValid) {
+
+                    if (length > (argsLength + 1)) {
+
+                        isValid = false;
+
+                    } else if (length == (argsLength + 1)) {
+
+                        final Class<?> param = params[argsLength];
+
+                        if (!param.equals(int.class) && !param.equals(Integer.class)) {
+
+                            isValid = false;
+                        }
+                    }
+
+                    if (isValid) {
+
+                        if ((annotatedBestMatch == null) || returnType
+                                .isAssignableFrom(annotatedBestMatch)) {
+
+                            annotatedBestMatch = returnType;
+                        }
+                    }
+                }
+
+            } else {
+
+                final int length = params.length;
+
+                boolean isValid = (length >= argsLength);
+
+                if (isValid) {
+
+                    for (int i = 0; i < argsLength; i++) {
+
+                        if (!params[i].equals(argClasses[i])) {
+
+                            isValid = false;
+
+                            break;
+                        }
+                    }
+                }
+
+                if (isValid) {
+
+                    if (length > (argsLength + 1)) {
+
+                        isValid = false;
+
+                    } else if (length == (argsLength + 1)) {
+
+                        final Class<?> param = params[argsLength];
+
+                        if (!param.equals(int.class) && !param.equals(Integer.class)) {
+
+                            isValid = false;
+                        }
+                    }
+
+                    if (isValid) {
+
+                        if ((bestMatch == null) || returnType.isAssignableFrom(bestMatch)) {
+
+                            bestMatch = returnType;
+                        }
+                    }
+                }
+            }
+        }
+
+        final Class<?> methodReturnType;
+
+        if ((annotatedBestMatch != null) && ((bestMatch == null) || annotatedBestMatch
+                .isAssignableFrom(bestMatch))) {
+
+            methodReturnType = annotatedBestMatch;
+
+        } else if (bestMatch != null) {
+
+            methodReturnType = bestMatch;
+
+        } else {
+
+            return null;
+        }
+
+        Method annotatedIntMethod = null;
+        Method annotatedIntegerMethod = null;
+        Method annotatedDefaultMethod = null;
+
+        Method intMethod = null;
+        Method integerMethod = null;
+        Method defaultMethod = null;
+
+        for (final Method method : methods) {
+
+            if (!methodReturnType.equals(method.getReturnType())) {
+
+                continue;
+            }
+
+            final Class<?>[] params = method.getParameterTypes();
+
+            if (method.isAnnotationPresent(Generator.class)) {
+
+                final int length = params.length;
+
+                boolean isValid = (length >= argsLength);
+
+                if (isValid) {
+
+                    for (int i = 0; i < argsLength; i++) {
+
+                        if (!params[i].equals(argClasses[i])) {
+
+                            isValid = false;
+
+                            break;
+                        }
+                    }
+                }
+
+                if (isValid) {
+
+                    if (length == argsLength) {
+
+                        annotatedDefaultMethod = method;
+
+                    } else if (length == (argsLength + 1)) {
+
+                        final Class<?> param = params[argsLength];
+
+                        if (param.equals(int.class)) {
+
+                            annotatedIntMethod = method;
+
+                        } else if (param.equals(Integer.class)) {
+
+                            annotatedIntegerMethod = method;
+
+                        } else {
+
+                            isValid = false;
+                        }
+
+                    } else {
+
+                        isValid = false;
+                    }
+                }
+
+                if (!isValid) {
+
+                    throw new IllegalArgumentException("annotated constructor is not valid");
+                }
+
+            } else {
+
+                final int length = params.length;
+
+                boolean isValid = (length >= argsLength);
+
+                if (isValid) {
+
+                    for (int i = 0; i < argsLength; i++) {
+
+                        if (!params[i].equals(argClasses[i])) {
+
+                            isValid = false;
+
+                            break;
+                        }
+                    }
+                }
+
+                if (!isValid) {
+
+                    continue;
+                }
+
+                if (length == argsLength) {
+
+                    defaultMethod = method;
+
+                } else if (length == (argsLength + 1)) {
+
+                    final Class<?> param = params[argsLength];
+
+                    if (param.equals(int.class)) {
+
+                        intMethod = method;
+
+                    } else if (param.equals(Integer.class)) {
+
+                        integerMethod = method;
+                    }
+                }
+            }
+        }
+
+        if (annotatedIntMethod != null) {
+
+            return annotatedIntMethod;
+
+        } else if (annotatedIntegerMethod != null) {
+
+            return annotatedIntegerMethod;
+
+        } else if (annotatedDefaultMethod != null) {
+
+            return annotatedDefaultMethod;
+
+        } else if (intMethod != null) {
+
+            return intMethod;
+
+        } else if (integerMethod != null) {
+
+            return integerMethod;
+        }
+
+        return defaultMethod;
     }
 }

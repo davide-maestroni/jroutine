@@ -204,6 +204,12 @@ public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
+    public <TYPE> GateControl<TYPE> when(final Class<TYPE> type) {
+
+        return mWaterfall.when(type);
+    }
+
+    @Override
     public <TYPE> GateControl<TYPE> when(final Classification<TYPE> gate) {
 
         return mWaterfall.when(gate);

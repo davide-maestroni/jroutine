@@ -13,6 +13,8 @@
  */
 package com.bmd.wtf.xtr.rpd;
 
+import com.bmd.wtf.crr.Current;
+import com.bmd.wtf.crr.CurrentGenerator;
 import com.bmd.wtf.fll.Classification;
 import com.bmd.wtf.fll.Waterfall;
 import com.bmd.wtf.lps.Leap;
@@ -32,10 +34,50 @@ public class Rapids {
 
     }
 
-    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> asLeapGenerator(
+    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> asGenerator(
             final Leap<SOURCE, IN, OUT>... leaps) {
 
         return RapidGenerators.leapGenerator(leaps);
+    }
+
+    public static CurrentGenerator asGenerator(final Current... currents) {
+
+        return RapidGenerators.currentGenerator(currents);
+    }
+
+    public static CurrentGenerator currentGenerator(final Object generator,
+            final Classification<? extends Current> classification, final Object... args) {
+
+        return RapidGenerators.currentGenerator(generator, classification, args);
+    }
+
+    public static CurrentGenerator currentGenerator(final Current current,
+            final Object... contextArgs) {
+
+        return RapidGenerators.currentGenerator(current.getClass(), contextArgs);
+    }
+
+    public static CurrentGenerator currentGenerator(
+            final Classification<? extends Current> classification, final Object... contextArgs) {
+
+        return RapidGenerators.currentGenerator(classification, contextArgs);
+    }
+
+    public static CurrentGenerator currentGenerator(final Class<? extends Current> type,
+            final Object... contextArgs) {
+
+        return RapidGenerators.currentGenerator(type, contextArgs);
+    }
+
+    public static CurrentGenerator currentGenerator(final Class<? extends Current> type) {
+
+        return RapidGenerators.currentGenerator(type);
+    }
+
+    public static CurrentGenerator currentGenerator(
+            final Classification<? extends Current> classification) {
+
+        return RapidGenerators.currentGenerator(classification);
     }
 
     public static <SOURCE, MOUTH, IN, OUT, TYPE> RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> gate(

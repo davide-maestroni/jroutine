@@ -13,6 +13,8 @@
  */
 package com.bmd.wtf.xtr.rpd;
 
+import com.bmd.wtf.crr.Current;
+import com.bmd.wtf.crr.CurrentGenerator;
 import com.bmd.wtf.fll.Classification;
 import com.bmd.wtf.lps.Leap;
 import com.bmd.wtf.lps.LeapGenerator;
@@ -28,6 +30,228 @@ class RapidGenerators {
 
     private RapidGenerators() {
 
+    }
+
+    public static CurrentGenerator currentGenerator(final Current... currents) {
+
+        final Current[] currentList = currents.clone();
+
+        return new CurrentGenerator() {
+
+            @Override
+            public Current create(final int fallNumber) {
+
+                return currentList[fallNumber];
+            }
+        };
+    }
+
+    public static CurrentGenerator currentGenerator(
+            final Classification<? extends Current> classification, final Object... contextArgs) {
+
+        //noinspection unchecked
+        return currentGenerator((Class<? extends Current>) classification.getRawType(),
+                                contextArgs);
+    }
+
+    public static CurrentGenerator currentGenerator(final Class<? extends Current> type,
+            final Object... contextArgs) {
+
+        Constructor<?> bestMatch = findContextConstructor(type.getConstructors(), contextArgs);
+
+        if (bestMatch == null) {
+
+            bestMatch = findContextConstructor(type.getDeclaredConstructors(), contextArgs);
+
+            if (bestMatch == null) {
+
+                throw new IllegalArgumentException(
+                        "no suitable constructor found for type " + type);
+            }
+        }
+
+        if (!bestMatch.isAccessible()) {
+
+            bestMatch.setAccessible(true);
+        }
+
+        final Constructor<?> constructor = bestMatch;
+
+        final int length = constructor.getParameterTypes().length;
+
+        if (length > contextArgs.length) {
+
+            return new CurrentGenerator() {
+
+                @Override
+                public Current create(final int fallNumber) {
+
+                    try {
+
+                        final Object[] args = new Object[length];
+
+                        System.arraycopy(contextArgs, 0, args, 0, length - 1);
+
+                        args[length - 1] = fallNumber;
+
+                        return (Current) constructor.newInstance(args);
+
+                    } catch (final Throwable t) {
+
+                        throw new RuntimeException(t);
+                    }
+                }
+            };
+        }
+
+        return new CurrentGenerator() {
+
+            @Override
+            public Current create(final int fallNumber) {
+
+                try {
+
+                    return (Current) constructor.newInstance(contextArgs);
+
+                } catch (final Throwable t) {
+
+                    throw new RuntimeException(t);
+                }
+            }
+        };
+    }
+
+    public static CurrentGenerator currentGenerator(final Object generator,
+            final Classification<? extends Current> classification, final Object... args) {
+
+        final Class<?> type = classification.getRawType();
+
+        Method bestMatch = findMethod(generator.getClass().getMethods(), type, args);
+
+        if (bestMatch == null) {
+
+            bestMatch = findMethod(generator.getClass().getDeclaredMethods(), type, args);
+
+            if (bestMatch == null) {
+
+                throw new IllegalArgumentException("no suitable method found for type " + type);
+            }
+        }
+
+        if (!bestMatch.isAccessible()) {
+
+            bestMatch.setAccessible(true);
+        }
+
+        final Method method = bestMatch;
+
+        final int length = method.getParameterTypes().length;
+
+        if (length > args.length) {
+
+            return new CurrentGenerator() {
+
+                @Override
+                public Current create(final int fallNumber) {
+
+                    try {
+
+                        final Object[] args = new Object[length];
+
+                        System.arraycopy(args, 0, args, 0, length - 1);
+
+                        args[length - 1] = fallNumber;
+
+                        return (Current) method.invoke(generator, args);
+
+                    } catch (final Throwable t) {
+
+                        throw new RuntimeException(t);
+                    }
+                }
+            };
+        }
+
+        return new CurrentGenerator() {
+
+            @Override
+            public Current create(final int fallNumber) {
+
+                try {
+
+                    return (Current) method.invoke(generator, args);
+
+                } catch (final Throwable t) {
+
+                    throw new RuntimeException(t);
+                }
+            }
+        };
+    }
+
+    public static CurrentGenerator currentGenerator(final Class<? extends Current> type) {
+
+        Constructor<?> bestMatch = findConstructor(type.getConstructors());
+
+        if (bestMatch == null) {
+
+            bestMatch = findConstructor(type.getDeclaredConstructors());
+
+            if (bestMatch == null) {
+
+                throw new IllegalArgumentException(
+                        "no suitable constructor found for type " + type);
+            }
+        }
+
+        if (!bestMatch.isAccessible()) {
+
+            bestMatch.setAccessible(true);
+        }
+
+        final Constructor<?> constructor = bestMatch;
+
+        if (constructor.getParameterTypes().length > 0) {
+
+            return new CurrentGenerator() {
+
+                @Override
+                public Current create(final int fallNumber) {
+
+                    try {
+
+                        return (Current) constructor.newInstance(fallNumber);
+
+                    } catch (final Throwable t) {
+
+                        throw new RuntimeException(t);
+                    }
+                }
+            };
+        }
+
+        return new CurrentGenerator() {
+
+            @Override
+            public Current create(final int fallNumber) {
+
+                try {
+
+                    return (Current) constructor.newInstance();
+
+                } catch (final Throwable t) {
+
+                    throw new RuntimeException(t);
+                }
+            }
+        };
+    }
+
+    public static CurrentGenerator currentGenerator(
+            final Classification<? extends Current> classification) {
+
+        //noinspection unchecked
+        return currentGenerator((Class<? extends Current>) classification.getRawType());
     }
 
     public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> leapGenerator(
@@ -263,6 +487,7 @@ class RapidGenerators {
         return leapGenerator((Class<? extends Leap<SOURCE, IN, OUT>>) classification.getRawType());
     }
 
+    @SuppressWarnings("ConstantConditions")
     private static Constructor<?> findConstructor(final Constructor<?>[] constructors) {
 
         Constructor<?> annotatedIntConstructor = null;
@@ -362,6 +587,7 @@ class RapidGenerators {
         return defaultConstructor;
     }
 
+    @SuppressWarnings("ConstantConditions")
     private static Constructor<?> findContextConstructor(final Constructor<?>[] constructors,
             final Object[] contextArgs) {
 
@@ -508,6 +734,7 @@ class RapidGenerators {
         return defaultConstructor;
     }
 
+    @SuppressWarnings("ConstantConditions")
     private static Method findMethod(final Method[] methods, final Class<?> resultType,
             final Object[] args) {
 

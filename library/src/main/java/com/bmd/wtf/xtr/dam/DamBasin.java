@@ -13,8 +13,8 @@
  */
 package com.bmd.wtf.xtr.dam;
 
-import com.bmd.wtf.flg.GateControl;
-import com.bmd.wtf.flg.GateControl.ConditionEvaluator;
+import com.bmd.wtf.flg.Gate;
+import com.bmd.wtf.flg.Gate.ConditionEvaluator;
 import com.bmd.wtf.flw.River;
 import com.bmd.wtf.lps.Leap;
 
@@ -263,20 +263,20 @@ class DamBasin<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA> {
         return throwableLists.get(streamNumber).remove(0);
     }
 
-    public void setUpControl(final GateControl<DamBasin<SOURCE, DATA>> control) {
+    public void setupGate(final Gate<DamBasin<SOURCE, DATA>> gate) {
 
         if (mTimeoutMs >= 0) {
 
-            control.afterMax(mTimeoutMs, TimeUnit.MILLISECONDS);
+            gate.afterMax(mTimeoutMs, TimeUnit.MILLISECONDS);
 
         } else {
 
-            control.eventually();
+            gate.eventually();
         }
 
-        control.eventuallyThrow(mTimeoutException)
-               .meets(new DamConditionEvaluator<SOURCE, DATA>(mEvaluator, mIsOnFlush, mIsOnData,
-                                                              mIsOnThrowable));
+        gate.eventuallyThrow(mTimeoutException)
+            .meets(new DamConditionEvaluator<SOURCE, DATA>(mEvaluator, mIsOnFlush, mIsOnData,
+                                                           mIsOnThrowable));
 
         resetWhen();
     }

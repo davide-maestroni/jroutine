@@ -13,7 +13,7 @@
  */
 package com.bmd.wtf.fll;
 
-import com.bmd.wtf.flg.GateControl;
+import com.bmd.wtf.flg.Gate;
 import com.bmd.wtf.lps.Leap;
 
 import java.util.concurrent.TimeUnit;
@@ -23,34 +23,32 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * Created by davide on 6/13/14.
  */
-class DataGateControl<TYPE> implements GateControl<TYPE> {
+class DataGate<TYPE> implements Gate<TYPE> {
+
+    private final Classification<TYPE> mClassifictation;
 
     private final Condition mCondition;
-
-    private final Classification<TYPE> mGate;
 
     private final Leap<?, ?, ?> mLeap;
 
     private final ReentrantLock mLock;
 
-    private volatile ConditionEvaluator<TYPE> mEvaluator;
+    private volatile ConditionEvaluator<? super TYPE> mEvaluator;
 
     private volatile RuntimeException mTimeoutException;
 
     private volatile long mTimeoutMs;
 
-    public DataGateControl(final GateLeap<?, ?, ?> leap, final Classification<TYPE> gate) {
+    public DataGate(final GateLeap<?, ?, ?> leap, final Classification<TYPE> classification) {
 
-        mGate = gate;
+        mClassifictation = classification;
         mLeap = leap.leap;
         mLock = leap.lock;
         mCondition = leap.condition;
-
-        reset();
     }
 
     @Override
-    public GateControl<TYPE> afterMax(final long maxDelay, final TimeUnit timeUnit) {
+    public Gate<TYPE> afterMax(final long maxDelay, final TimeUnit timeUnit) {
 
         mTimeoutMs = timeUnit.toMillis(Math.max(0, maxDelay));
 
@@ -58,7 +56,7 @@ class DataGateControl<TYPE> implements GateControl<TYPE> {
     }
 
     @Override
-    public GateControl<TYPE> eventually() {
+    public Gate<TYPE> eventually() {
 
         mTimeoutMs = -1;
 
@@ -66,7 +64,7 @@ class DataGateControl<TYPE> implements GateControl<TYPE> {
     }
 
     @Override
-    public GateControl<TYPE> eventuallyThrow(final RuntimeException exception) {
+    public Gate<TYPE> eventuallyThrow(final RuntimeException exception) {
 
         mTimeoutException = exception;
 
@@ -74,7 +72,7 @@ class DataGateControl<TYPE> implements GateControl<TYPE> {
     }
 
     @Override
-    public GateControl<TYPE> meets(final ConditionEvaluator<TYPE> evaluator) {
+    public Gate<TYPE> meets(final ConditionEvaluator<? super TYPE> evaluator) {
 
         mEvaluator = evaluator;
 
@@ -82,7 +80,8 @@ class DataGateControl<TYPE> implements GateControl<TYPE> {
     }
 
     @Override
-    public <RESULT> RESULT perform(final Action<RESULT, TYPE> action, final Object... args) {
+    public <RESULT> RESULT perform(final Action<RESULT, ? super TYPE> action,
+            final Object... args) {
 
         final ReentrantLock lock = mLock;
 
@@ -90,12 +89,12 @@ class DataGateControl<TYPE> implements GateControl<TYPE> {
 
         try {
 
-            final TYPE gate = mGate.cast(mLeap);
+            final TYPE leap = mClassifictation.cast(mLeap);
 
             //noinspection unchecked
-            waitForCondition(gate);
+            waitForCondition(leap);
 
-            return action.doOn(gate, args);
+            return action.doOn(leap, args);
 
         } finally {
 
@@ -103,29 +102,21 @@ class DataGateControl<TYPE> implements GateControl<TYPE> {
         }
     }
 
-    private boolean meetsCondition(final ConditionEvaluator<TYPE> evaluator, final TYPE gate) {
+    private boolean meetsCondition(final ConditionEvaluator<? super TYPE> evaluator,
+            final TYPE leap) {
 
-        return (evaluator == null) || evaluator.isSatisfied(gate);
+        return (evaluator == null) || evaluator.isSatisfied(leap);
     }
 
-    private void reset() {
-
-        mTimeoutMs = 0;
-        mTimeoutException = null;
-        mEvaluator = null;
-    }
-
-    private void waitForCondition(final TYPE gate) {
+    private void waitForCondition(final TYPE leap) {
 
         long currentTimeout = mTimeoutMs;
 
         final RuntimeException timeoutException = mTimeoutException;
 
-        final ConditionEvaluator<TYPE> evaluator = mEvaluator;
+        final ConditionEvaluator<? super TYPE> evaluator = mEvaluator;
 
-        reset();
-
-        if ((currentTimeout == 0) || meetsCondition(evaluator, gate)) {
+        if ((currentTimeout == 0) || meetsCondition(evaluator, leap)) {
 
             return;
         }
@@ -148,7 +139,7 @@ class DataGateControl<TYPE> implements GateControl<TYPE> {
 
                     currentTimeout = endTime - System.currentTimeMillis();
 
-                    if (!meetsCondition(evaluator, gate) && (currentTimeout <= 0)) {
+                    if (!meetsCondition(evaluator, leap) && (currentTimeout <= 0)) {
 
                         isTimeout = true;
 
@@ -160,7 +151,7 @@ class DataGateControl<TYPE> implements GateControl<TYPE> {
                     condition.await();
                 }
 
-            } while (!meetsCondition(evaluator, gate));
+            } while (!meetsCondition(evaluator, leap));
 
         } catch (final InterruptedException e) {
 

@@ -13,7 +13,7 @@
  */
 package com.bmd.wtf.flw;
 
-import com.bmd.wtf.flg.GateControl;
+import com.bmd.wtf.flg.Gate;
 import com.bmd.wtf.fll.Classification;
 
 import java.util.concurrent.TimeUnit;
@@ -23,13 +23,13 @@ import java.util.concurrent.TimeUnit;
  */
 public interface River<SOURCE, DATA> extends Stream<DATA> {
 
+    public void deviate();
+
+    public void deviate(int streamNumber);
+
     public void drain();
 
     public void drain(int streamNumber);
-
-    public void dryUp();
-
-    public void dryUp(int streamNumber);
 
     public River<SOURCE, DATA> flush(int streamNumber);
 
@@ -79,7 +79,7 @@ public interface River<SOURCE, DATA> extends Stream<DATA> {
 
     public River<SOURCE, SOURCE> source();
 
-    public <TYPE> GateControl<TYPE> when(Class<TYPE> type);
+    public <TYPE> Gate<TYPE> when(Class<TYPE> gateType);
 
-    public <TYPE> GateControl<TYPE> when(Classification<TYPE> gate);
+    public <TYPE> Gate<TYPE> when(Classification<TYPE> gateClassification);
 }

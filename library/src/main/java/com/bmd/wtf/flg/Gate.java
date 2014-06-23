@@ -18,25 +18,25 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by davide on 6/13/14.
  */
-public interface GateControl<TYPE> {
+public interface Gate<TYPE> {
 
-    public GateControl<TYPE> afterMax(long maxDelay, TimeUnit timeUnit);
+    public Gate<TYPE> afterMax(long maxDelay, TimeUnit timeUnit);
 
-    public GateControl<TYPE> eventually();
+    public Gate<TYPE> eventually();
 
-    public GateControl<TYPE> eventuallyThrow(RuntimeException exception);
+    public Gate<TYPE> eventuallyThrow(RuntimeException exception);
 
-    public GateControl<TYPE> meets(ConditionEvaluator<TYPE> evaluator);
+    public Gate<TYPE> meets(ConditionEvaluator<? super TYPE> evaluator);
 
-    public <RESULT> RESULT perform(Action<RESULT, TYPE> action, Object... args);
+    public <RESULT> RESULT perform(Action<RESULT, ? super TYPE> action, Object... args);
 
     public interface Action<RESULT, TYPE> {
 
-        public RESULT doOn(TYPE gate, Object... args);
+        public RESULT doOn(TYPE leap, Object... args);
     }
 
     public interface ConditionEvaluator<TYPE> {
 
-        public boolean isSatisfied(TYPE gate);
+        public boolean isSatisfied(TYPE leap);
     }
 }

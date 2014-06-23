@@ -38,10 +38,10 @@ public class Rapids {
         return RapidGenerators.leapGenerator(leaps);
     }
 
-    public static <SOURCE, MOUTH, IN, OUT, TYPE> RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> control(
+    public static <SOURCE, MOUTH, IN, OUT, TYPE> RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> gate(
             final Waterfall<SOURCE, MOUTH, OUT> waterfall) {
 
-        return new RapidGateControl<SOURCE, MOUTH, IN, OUT, TYPE>(waterfall);
+        return new WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE>(waterfall);
     }
 
     public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> leapGenerator(

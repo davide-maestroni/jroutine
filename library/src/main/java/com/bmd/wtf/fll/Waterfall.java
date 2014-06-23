@@ -16,7 +16,8 @@ package com.bmd.wtf.fll;
 import com.bmd.wtf.crr.Current;
 import com.bmd.wtf.crr.CurrentGenerator;
 import com.bmd.wtf.crr.Currents;
-import com.bmd.wtf.flg.GateControl;
+import com.bmd.wtf.flg.Gate;
+import com.bmd.wtf.flw.Collector;
 import com.bmd.wtf.flw.River;
 import com.bmd.wtf.lps.FreeLeap;
 import com.bmd.wtf.lps.Leap;
@@ -63,14 +64,15 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
     private final Waterfall<SOURCE, SOURCE, ?> mSource;
 
     private Waterfall(final Waterfall<SOURCE, SOURCE, ?> source,
-            final Map<Classification<?>, GateLeap<?, ?, ?>> gateMap, final Classification<?> gate,
-            final Barrage<SOURCE, ?> barrage, final int size, final Current current,
-            final CurrentGenerator generator, final DataFall<SOURCE, IN, OUT>... falls) {
+            final Map<Classification<?>, GateLeap<?, ?, ?>> gateMap,
+            final Classification<?> gateClassification, final Barrage<SOURCE, ?> barrage,
+            final int size, final Current current, final CurrentGenerator generator,
+            final DataFall<SOURCE, IN, OUT>... falls) {
 
         //noinspection unchecked
         mSource = (source != null) ? source : (Waterfall<SOURCE, SOURCE, ?>) this;
         mGateMap = gateMap;
-        mGate = gate;
+        mGate = gateClassification;
         mBarrage = barrage;
         mSize = size;
         mCurrent = current;
@@ -79,9 +81,10 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
     }
 
     private Waterfall(final Waterfall<SOURCE, SOURCE, ?> source,
-            final Map<Classification<?>, GateLeap<?, ?, ?>> gateMap, final Classification<?> gate,
-            final Barrage<SOURCE, ?> barrage, final int size, final Current current,
-            final CurrentGenerator generator, final Leap<SOURCE, IN, OUT>... leaps) {
+            final Map<Classification<?>, GateLeap<?, ?, ?>> gateMap,
+            final Classification<?> gateClassification, final Barrage<SOURCE, ?> barrage,
+            final int size, final Current current, final CurrentGenerator generator,
+            final Leap<SOURCE, IN, OUT>... leaps) {
 
         //noinspection unchecked
         mSource = (source != null) ? source : (Waterfall<SOURCE, SOURCE, ?>) this;
@@ -103,7 +106,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
             mBarrage = barrage;
         }
 
-        if (gate == null) {
+        if (gateClassification == null) {
 
             mGateMap = gateMap;
 
@@ -145,7 +148,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
             final Barrage<SOURCE, ?> fallBarrage = mBarrage;
 
-            final boolean isSelf = (SELF_CLASSIFICATION == gate);
+            final boolean isSelf = (SELF_CLASSIFICATION == gateClassification);
 
             final HashMap<Leap<?, ?, ?>, GateLeap<?, ?, ?>> leapMap =
                     new HashMap<Leap<?, ?, ?>, GateLeap<?, ?, ?>>();
@@ -162,7 +165,8 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
                     gateLeap = new GateLeap<SOURCE, IN, OUT>(leap);
                     leapMap.put(leap, gateLeap);
 
-                    mapGate(fallGateMap, (isSelf) ? Classification.from(leap.getClass()) : gate,
+                    mapGate(fallGateMap,
+                            (isSelf) ? Classification.from(leap.getClass()) : gateClassification,
                             gateLeap);
                 }
 
@@ -242,16 +246,16 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         return as(Classification.from(gateType));
     }
 
-    public Waterfall<SOURCE, IN, OUT> as(final Classification<?> gate) {
+    public Waterfall<SOURCE, IN, OUT> as(final Classification<?> gateClassification) {
 
-        if (gate == null) {
+        if (gateClassification == null) {
 
-            throw new IllegalArgumentException("the gate cannot be null");
+            throw new IllegalArgumentException("the gate classification cannot be null");
         }
 
         //noinspection unchecked
-        return new Waterfall<SOURCE, IN, OUT>(mSource, mGateMap, gate, mBarrage, mSize, mCurrent,
-                                              mCurrentGenerator, mFalls);
+        return new Waterfall<SOURCE, IN, OUT>(mSource, mGateMap, gateClassification, mBarrage,
+                                              mSize, mCurrent, mCurrentGenerator, mFalls);
     }
 
     public Waterfall<SOURCE, IN, OUT> asGate() {
@@ -259,14 +263,15 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         return as(SELF_CLASSIFICATION);
     }
 
-    public <TYPE> Waterfall<SOURCE, IN, OUT> breakDown(final Classification<TYPE> gate) {
+    public <TYPE> Waterfall<SOURCE, IN, OUT> breakDown(
+            final Classification<TYPE> gateClassification) {
 
-        return breakDown(when(gate));
+        return breakDown(when(gateClassification));
     }
 
-    public <TYPE> Waterfall<SOURCE, IN, OUT> breakDown(final TYPE gate) {
+    public <TYPE> Waterfall<SOURCE, IN, OUT> breakDown(final TYPE gateType) {
 
-        if (gate == null) {
+        if (gateType == null) {
 
             return this;
         }
@@ -280,7 +285,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
         while (iterator.hasNext()) {
 
-            if (gate == iterator.next()) {
+            if (gateType == iterator.next()) {
 
                 iterator.remove();
 
@@ -372,15 +377,18 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
     }
 
     public <NOUT> Waterfall<SOURCE, OUT, NOUT> chain(
-            final Classification<? extends Leap<SOURCE, OUT, NOUT>> gate) {
+            final Classification<? extends Leap<SOURCE, OUT, NOUT>> gateClassification) {
 
         //noinspection unchecked
-        final Leap<SOURCE, OUT, NOUT> leap = (Leap<SOURCE, OUT, NOUT>) findBestMatch(gate);
+        final Leap<SOURCE, OUT, NOUT> leap =
+                (Leap<SOURCE, OUT, NOUT>) findBestMatch(gateClassification);
 
         if (leap == null) {
 
             throw new IllegalArgumentException(
-                    "the waterfall does not retain any gate of type " + gate);
+                    "the waterfall does not retain any gate of classification type "
+                            + gateClassification
+            );
         }
 
         final DataFall<SOURCE, IN, OUT>[] falls = mFalls;
@@ -711,63 +719,8 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         return waterfall;
     }
 
-    public Waterfall<SOURCE, OUT, OUT> distribute() {
-
-        final DataFall<SOURCE, IN, OUT>[] falls = mFalls;
-
-        if (falls == NO_FALL) {
-
-            //noinspection unchecked
-            return (Waterfall<SOURCE, OUT, OUT>) start().distribute();
-        }
-
-        final int size = mSize;
-
-        if (size == 1) {
-
-            return chain();
-        }
-
-        return in(1).chainBarrage(new Barrage<SOURCE, OUT>(size)).in(size);
-    }
-
-    public void drain(final boolean downStream) {
-
-        if (downStream) {
-
-            drain();
-
-        } else {
-
-            for (final DataFall<SOURCE, IN, OUT> fall : mFalls) {
-
-                for (final DataStream<IN> stream : fall.inputStreams) {
-
-                    stream.drain();
-                }
-            }
-        }
-    }
-
-    public void drain(final int streamNumber, final boolean downStream) {
-
-        if (downStream) {
-
-            drain(streamNumber);
-
-        } else {
-
-            final DataFall<SOURCE, IN, OUT> fall = mFalls[streamNumber];
-
-            for (final DataStream<IN> stream : fall.inputStreams) {
-
-                stream.drain();
-            }
-        }
-    }
-
     @Override
-    public void drain() {
+    public void deviate() {
 
         for (final DataFall<SOURCE, IN, OUT> fall : mFalls) {
 
@@ -779,7 +732,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
     }
 
     @Override
-    public void drain(final int streamNumber) {
+    public void deviate(final int streamNumber) {
 
         final DataFall<SOURCE, IN, OUT> fall = mFalls[streamNumber];
 
@@ -790,7 +743,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
     }
 
     @Override
-    public void dryUp() {
+    public void drain() {
 
         for (final DataFall<SOURCE, IN, OUT> fall : mFalls) {
 
@@ -802,7 +755,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
     }
 
     @Override
-    public void dryUp(final int streamNumber) {
+    public void drain(final int streamNumber) {
 
         final DataFall<SOURCE, IN, OUT> fall = mFalls[streamNumber];
 
@@ -1018,30 +971,87 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
     }
 
     @Override
-    public <TYPE> GateControl<TYPE> when(final Class<TYPE> type) {
+    public <TYPE> Gate<TYPE> when(final Class<TYPE> gateType) {
 
-        return when(Classification.from(type));
+        return when(Classification.from(gateType));
     }
 
     @Override
-    public <TYPE> GateControl<TYPE> when(final Classification<TYPE> gate) {
+    public <TYPE> Gate<TYPE> when(final Classification<TYPE> gateClassification) {
 
-        final GateLeap<?, ?, ?> leap = findBestMatch(gate);
+        final GateLeap<?, ?, ?> leap = findBestMatch(gateClassification);
 
         if (leap == null) {
 
             throw new IllegalArgumentException(
-                    "the waterfall does not retain any gate of type " + gate);
+                    "the waterfall does not retain any gate of classification type "
+                            + gateClassification
+            );
         }
 
-        return new DataGateControl<TYPE>(leap, gate);
+        return new DataGate<TYPE>(leap, gateClassification);
     }
 
-    public void dryUp(final boolean downStream) {
+    public void deviate(final boolean downStream) {
 
         if (downStream) {
 
-            dryUp();
+            deviate();
+
+        } else {
+
+            for (final DataFall<SOURCE, IN, OUT> fall : mFalls) {
+
+                for (final DataStream<IN> stream : fall.inputStreams) {
+
+                    stream.drain();
+                }
+            }
+        }
+    }
+
+    public void deviate(final int streamNumber, final boolean downStream) {
+
+        if (downStream) {
+
+            deviate(streamNumber);
+
+        } else {
+
+            final DataFall<SOURCE, IN, OUT> fall = mFalls[streamNumber];
+
+            for (final DataStream<IN> stream : fall.inputStreams) {
+
+                stream.drain();
+            }
+        }
+    }
+
+    public Waterfall<SOURCE, OUT, OUT> distribute() {
+
+        final DataFall<SOURCE, IN, OUT>[] falls = mFalls;
+
+        if (falls == NO_FALL) {
+
+            //noinspection unchecked
+            return (Waterfall<SOURCE, OUT, OUT>) start().distribute();
+        }
+
+        final int size = mSize;
+
+        if (size == 1) {
+
+            return chain();
+        }
+
+        return in(1).chainBarrage(new Barrage<SOURCE, OUT>(size)).in(size);
+    }
+
+    public void drain(final boolean downStream) {
+
+        if (downStream) {
+
+            drain();
 
         } else {
 
@@ -1055,11 +1065,11 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         }
     }
 
-    public void dryUp(final int streamNumber, final boolean downStream) {
+    public void drain(final int streamNumber, final boolean downStream) {
 
         if (downStream) {
 
-            dryUp(streamNumber);
+            drain(streamNumber);
 
         } else {
 
@@ -1131,6 +1141,46 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         }
 
         return inBackground(poolSize);
+    }
+
+    public Collector<OUT> pull() {
+
+        final CollectorLeap<SOURCE, OUT> collectorLeap = new CollectorLeap<SOURCE, OUT>();
+        final GateLeap<SOURCE, OUT, OUT> gateLeap = new GateLeap<SOURCE, OUT, OUT>(collectorLeap);
+
+        chain(gateLeap).source().flush();
+
+        return new DataCollector<SOURCE, OUT>(gateLeap, collectorLeap);
+    }
+
+    public Collector<OUT> pull(final SOURCE source) {
+
+        final CollectorLeap<SOURCE, OUT> collectorLeap = new CollectorLeap<SOURCE, OUT>();
+        final GateLeap<SOURCE, OUT, OUT> gateLeap = new GateLeap<SOURCE, OUT, OUT>(collectorLeap);
+
+        chain(gateLeap).source().push(source).flush();
+
+        return new DataCollector<SOURCE, OUT>(gateLeap, collectorLeap);
+    }
+
+    public Collector<OUT> pull(final SOURCE... sources) {
+
+        final CollectorLeap<SOURCE, OUT> collectorLeap = new CollectorLeap<SOURCE, OUT>();
+        final GateLeap<SOURCE, OUT, OUT> gateLeap = new GateLeap<SOURCE, OUT, OUT>(collectorLeap);
+
+        chain(gateLeap).source().push(sources).flush();
+
+        return new DataCollector<SOURCE, OUT>(gateLeap, collectorLeap);
+    }
+
+    public Collector<OUT> pull(final Iterable<SOURCE> sources) {
+
+        final CollectorLeap<SOURCE, OUT> collectorLeap = new CollectorLeap<SOURCE, OUT>();
+        final GateLeap<SOURCE, OUT, OUT> gateLeap = new GateLeap<SOURCE, OUT, OUT>(collectorLeap);
+
+        chain(gateLeap).source().push(sources).flush();
+
+        return new DataCollector<SOURCE, OUT>(gateLeap, collectorLeap);
     }
 
     public Waterfall<OUT, OUT, OUT> start() {
@@ -1227,11 +1277,11 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
                                                waterfall.mFalls);
     }
 
-    private GateLeap<?, ?, ?> findBestMatch(final Classification<?> gate) {
+    private GateLeap<?, ?, ?> findBestMatch(final Classification<?> gateClassification) {
 
         final Map<Classification<?>, GateLeap<?, ?, ?>> gateMap = mGateMap;
 
-        GateLeap<?, ?, ?> leap = gateMap.get(gate);
+        GateLeap<?, ?, ?> leap = gateMap.get(gateClassification);
 
         if (leap == null) {
 
@@ -1241,7 +1291,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
                 final Classification<?> type = entry.getKey();
 
-                if (gate.isAssignableFrom(type)) {
+                if (gateClassification.isAssignableFrom(type)) {
 
                     if ((bestMatch == null) || type.isAssignableFrom(bestMatch)) {
 
@@ -1257,13 +1307,13 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
     }
 
     private void mapGate(final HashMap<Classification<?>, GateLeap<?, ?, ?>> gateMap,
-            final Classification<?> gate, final GateLeap<?, ?, ?> leap) {
+            final Classification<?> gateClassification, final GateLeap<?, ?, ?> leap) {
 
-        if (gateMap.containsKey(gate)) {
+        if (gateMap.containsKey(gateClassification)) {
 
-            throw new IllegalArgumentException("the gate type is already present");
+            throw new IllegalArgumentException("the gate classification type is already present");
         }
 
-        gateMap.put(gate, leap);
+        gateMap.put(gateClassification, leap);
     }
 }

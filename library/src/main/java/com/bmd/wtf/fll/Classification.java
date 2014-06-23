@@ -26,14 +26,14 @@ public abstract class Classification<TYPE> {
 
     private Type mType;
 
-    public static <CLASS> Classification<CLASS> from(final Class<CLASS> rawType) {
+    public static <RTYPE> Classification<RTYPE> from(final Class<RTYPE> rawType) {
 
         if (rawType == null) {
 
-            throw new IllegalArgumentException("the gate type cannot be null");
+            throw new IllegalArgumentException("the classification type cannot be null");
         }
 
-        final Classification<CLASS> classification = new Classification<CLASS>() {};
+        final Classification<RTYPE> classification = new Classification<RTYPE>() {};
         classification.mRawType = rawType;
 
         return classification;

@@ -13,8 +13,8 @@
  */
 package com.bmd.wtf.xtr.dam;
 
-import com.bmd.wtf.flg.GateControl;
-import com.bmd.wtf.flg.GateControl.Action;
+import com.bmd.wtf.flg.Gate;
+import com.bmd.wtf.flg.Gate.Action;
 import com.bmd.wtf.fll.Classification;
 import com.bmd.wtf.fll.Waterfall;
 import com.bmd.wtf.fll.WaterfallRiver;
@@ -54,7 +54,7 @@ public class Dam<SOURCE, DATA> extends WaterfallRiver<SOURCE, SOURCE> {
 
     private static final int PULL_UNHANDLED = 12;
 
-    private static final int SETUP_CONTROL = 13;
+    private static final int SETUP_GATE = 13;
 
     private static final int WHEN_AVAILABLE = 14;
 
@@ -175,10 +175,10 @@ public class Dam<SOURCE, DATA> extends WaterfallRiver<SOURCE, SOURCE> {
                             return basin.pullUnhandled((Integer) args[1]);
                         }
 
-                        case SETUP_CONTROL: {
+                        case SETUP_GATE: {
 
                             //noinspection unchecked
-                            basin.setUpControl((GateControl<DamBasin<SOURCE, DATA>>) args[1]);
+                            basin.setupGate((Gate<DamBasin<SOURCE, DATA>>) args[1]);
                             break;
                         }
 
@@ -202,7 +202,7 @@ public class Dam<SOURCE, DATA> extends WaterfallRiver<SOURCE, SOURCE> {
 
     private final Waterfall<SOURCE, DATA, DATA> mOutWaterfall;
 
-    private GateControl<DamBasin<SOURCE, DATA>> mControl;
+    private Gate<DamBasin<SOURCE, DATA>> mGate;
 
     private Dam(final Waterfall<SOURCE, DATA, DATA> waterfall) {
 
@@ -210,7 +210,7 @@ public class Dam<SOURCE, DATA> extends WaterfallRiver<SOURCE, SOURCE> {
 
         mInWaterfall = waterfall;
         mOutWaterfall = waterfall.asGate().chain(new DamBasin<SOURCE, DATA>(waterfall.size()));
-        mControl = mOutWaterfall.when(new Classification<DamBasin<SOURCE, DATA>>() {});
+        mGate = mOutWaterfall.when(new Classification<DamBasin<SOURCE, DATA>>() {});
     }
 
     public static <SOURCE, DATA> Dam<SOURCE, DATA> on(
@@ -221,35 +221,35 @@ public class Dam<SOURCE, DATA> extends WaterfallRiver<SOURCE, SOURCE> {
 
     public Dam<SOURCE, DATA> afterMax(final long maxDelay, final TimeUnit timeUnit) {
 
-        mControl.perform(mAction, AFTER_MAX, maxDelay, timeUnit);
+        mGate.perform(mAction, AFTER_MAX, maxDelay, timeUnit);
 
         return this;
     }
 
     public Dam<SOURCE, DATA> all() {
 
-        setupControl().perform(mAction, ALL);
+        setupGate().perform(mAction, ALL);
 
         return this;
     }
 
     public Dam<SOURCE, DATA> collectData(final List<DATA> bucket) {
 
-        setupControl().perform(mAction, COLLECT_DATA, bucket);
+        setupGate().perform(mAction, COLLECT_DATA, bucket);
 
         return this;
     }
 
     public Dam<SOURCE, DATA> collectData(final int streamNumber, final List<DATA> bucket) {
 
-        setupControl().perform(mAction, COLLECT_DATA, streamNumber, bucket);
+        setupGate().perform(mAction, COLLECT_DATA, streamNumber, bucket);
 
         return this;
     }
 
     public Dam<SOURCE, DATA> collectUnhandled(final List<Throwable> bucket) {
 
-        setupControl().perform(mAction, COLLECT_UNHANDLED, bucket);
+        setupGate().perform(mAction, COLLECT_UNHANDLED, bucket);
 
         return this;
     }
@@ -257,9 +257,21 @@ public class Dam<SOURCE, DATA> extends WaterfallRiver<SOURCE, SOURCE> {
     public Dam<SOURCE, DATA> collectUnhandled(final int streamNumber,
             final List<Throwable> bucket) {
 
-        setupControl().perform(mAction, COLLECT_UNHANDLED, streamNumber, bucket);
+        setupGate().perform(mAction, COLLECT_UNHANDLED, streamNumber, bucket);
 
         return this;
+    }
+
+    @Override
+    public void deviate() {
+
+        mOutWaterfall.deviate(false);
+    }
+
+    @Override
+    public void deviate(final int streamNumber) {
+
+        mOutWaterfall.deviate(streamNumber, false);
     }
 
     @Override
@@ -272,18 +284,6 @@ public class Dam<SOURCE, DATA> extends WaterfallRiver<SOURCE, SOURCE> {
     public void drain(final int streamNumber) {
 
         mOutWaterfall.drain(streamNumber, false);
-    }
-
-    @Override
-    public void dryUp() {
-
-        mOutWaterfall.dryUp(false);
-    }
-
-    @Override
-    public void dryUp(final int streamNumber) {
-
-        mOutWaterfall.dryUp(streamNumber, false);
     }
 
     @Override
@@ -422,56 +422,56 @@ public class Dam<SOURCE, DATA> extends WaterfallRiver<SOURCE, SOURCE> {
 
     public Dam<SOURCE, DATA> empty() {
 
-        setupControl().perform(mAction, EMPTY);
+        setupGate().perform(mAction, EMPTY);
 
         return this;
     }
 
     public Dam<SOURCE, DATA> eventuallyThrow(final RuntimeException exception) {
 
-        mControl.perform(mAction, EVENTUALLY_THROW, exception);
+        mGate.perform(mAction, EVENTUALLY_THROW, exception);
 
         return this;
     }
 
     public Dam<SOURCE, DATA> immediately() {
 
-        mControl.perform(mAction, AFTER_MAX, 0, TimeUnit.MILLISECONDS);
+        mGate.perform(mAction, AFTER_MAX, 0, TimeUnit.MILLISECONDS);
 
         return this;
     }
 
     public Dam<SOURCE, DATA> max(final int maxCount) {
 
-        setupControl().perform(mAction, MAX, maxCount);
+        setupGate().perform(mAction, MAX, maxCount);
 
         return this;
     }
 
     public Dam<SOURCE, DATA> on(final BasinEvaluator<DATA> evaluator) {
 
-        mControl.perform(mAction, ON, evaluator);
+        mGate.perform(mAction, ON, evaluator);
 
         return this;
     }
 
     public Dam<SOURCE, DATA> onDataAvailable() {
 
-        mControl.perform(mAction, ON_DATA);
+        mGate.perform(mAction, ON_DATA);
 
         return this;
     }
 
     public Dam<SOURCE, DATA> onFlush() {
 
-        mControl.perform(mAction, ON_FLUSH);
+        mGate.perform(mAction, ON_FLUSH);
 
         return this;
     }
 
     public Dam<SOURCE, DATA> onThrowableAvailable() {
 
-        mControl.perform(mAction, ON_THROWABLE);
+        mGate.perform(mAction, ON_THROWABLE);
 
         return this;
     }
@@ -479,43 +479,43 @@ public class Dam<SOURCE, DATA> extends WaterfallRiver<SOURCE, SOURCE> {
     public DATA pullData() {
 
         //noinspection unchecked
-        return (DATA) setupControl().perform(mAction, PULL_DATA);
+        return (DATA) setupGate().perform(mAction, PULL_DATA);
     }
 
     public DATA pullData(final int streamNumber) {
 
         //noinspection unchecked
-        return (DATA) setupControl().perform(mAction, PULL_DATA, streamNumber);
+        return (DATA) setupGate().perform(mAction, PULL_DATA, streamNumber);
     }
 
     public Throwable pullUnhandled() {
 
-        return (Throwable) setupControl().perform(mAction, PULL_UNHANDLED);
+        return (Throwable) setupGate().perform(mAction, PULL_UNHANDLED);
     }
 
     public Throwable pullUnhandled(final int streamNumber) {
 
-        return (Throwable) setupControl().perform(mAction, PULL_UNHANDLED, streamNumber);
+        return (Throwable) setupGate().perform(mAction, PULL_UNHANDLED, streamNumber);
     }
 
     public Waterfall<SOURCE, DATA, DATA> release() {
 
-        drain();
+        deviate();
 
         return mInWaterfall;
     }
 
     public Dam<SOURCE, DATA> whenAvailable() {
 
-        mControl.perform(mAction, WHEN_AVAILABLE);
+        mGate.perform(mAction, WHEN_AVAILABLE);
 
         return this;
     }
 
-    private GateControl<DamBasin<SOURCE, DATA>> setupControl() {
+    private Gate<DamBasin<SOURCE, DATA>> setupGate() {
 
-        mControl.perform(mAction, SETUP_CONTROL, mControl);
+        mGate.perform(mAction, SETUP_GATE, mGate);
 
-        return mControl;
+        return mGate;
     }
 }

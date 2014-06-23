@@ -13,7 +13,7 @@
  */
 package com.bmd.wtf.xtr.rpd;
 
-import com.bmd.wtf.flg.GateControl;
+import com.bmd.wtf.flg.Gate;
 import com.bmd.wtf.fll.Classification;
 import com.bmd.wtf.fll.Waterfall;
 import com.bmd.wtf.fll.WaterfallRiver;
@@ -28,12 +28,12 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by davide on 6/20/14.
  */
-public class RapidGateControl<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallRiver<SOURCE, IN>
-        implements RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> {
+public class WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallRiver<SOURCE, IN>
+        implements RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> {
 
-    private final ConditionEvaluator<TYPE> mEvaluator;
+    private final Classification<TYPE> mClassification;
 
-    private final Classification<TYPE> mGate;
+    private final ConditionEvaluator<? super TYPE> mEvaluator;
 
     private final Waterfall<SOURCE, MOUTH, OUT> mMouthWaterfall;
 
@@ -43,45 +43,29 @@ public class RapidGateControl<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallRiv
 
     private final long mTimeoutMs;
 
-    RapidGateControl(final Waterfall<SOURCE, MOUTH, OUT> waterfall) {
+    WaterfallRapidGate(final Waterfall<SOURCE, MOUTH, OUT> waterfall) {
 
-        //noinspection unchecked
-        super((Waterfall<SOURCE, IN, OUT>) waterfall, true);
-
-        mSourceWaterfall = waterfall.source();
-        mMouthWaterfall = waterfall;
-        mGate = null;
-        mTimeoutMs = 0;
-        mTimeoutException = null;
-        mEvaluator = null;
+        this(waterfall.source(), waterfall, null, 0, null, null);
     }
 
-    private RapidGateControl(final Waterfall<SOURCE, MOUTH, OUT> waterfall,
-            final Classification<TYPE> gate, final long timeoutMs, final RuntimeException exception,
-            final ConditionEvaluator<TYPE> evaluator) {
+    private WaterfallRapidGate(final Waterfall<SOURCE, MOUTH, OUT> waterfall,
+            final Classification<TYPE> classification, final long timeoutMs,
+            final RuntimeException exception, final ConditionEvaluator<? super TYPE> evaluator) {
 
-        //noinspection unchecked
-        super((Waterfall<SOURCE, IN, OUT>) waterfall, true);
-
-        mSourceWaterfall = waterfall.source();
-        mMouthWaterfall = waterfall;
-        mGate = gate;
-        mTimeoutMs = timeoutMs;
-        mTimeoutException = exception;
-        mEvaluator = evaluator;
+        this(waterfall.source(), waterfall, classification, timeoutMs, exception, evaluator);
     }
 
-    private RapidGateControl(final Waterfall<SOURCE, SOURCE, ?> sourceWaterfall,
-            final Waterfall<SOURCE, MOUTH, OUT> mouthWaterfall, final Classification<TYPE> gate,
-            final long timeoutMs, final RuntimeException exception,
-            final ConditionEvaluator<TYPE> evaluator) {
+    private WaterfallRapidGate(final Waterfall<SOURCE, SOURCE, ?> sourceWaterfall,
+            final Waterfall<SOURCE, MOUTH, OUT> mouthWaterfall,
+            final Classification<TYPE> classification, final long timeoutMs,
+            final RuntimeException exception, final ConditionEvaluator<? super TYPE> evaluator) {
 
         //noinspection unchecked
         super((Waterfall<SOURCE, IN, ?>) sourceWaterfall, true);
 
         mSourceWaterfall = sourceWaterfall;
         mMouthWaterfall = mouthWaterfall;
-        mGate = gate;
+        mClassification = classification;
         mTimeoutMs = timeoutMs;
         mTimeoutException = exception;
         mEvaluator = evaluator;
@@ -148,7 +132,23 @@ public class RapidGateControl<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallRiv
     }
 
     @Override
-    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> afterDrain() {
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> afterDrain() {
+
+        deviate();
+
+        return this;
+    }
+
+    @Override
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> afterDrain(final int streamNumber) {
+
+        deviate(streamNumber);
+
+        return this;
+    }
+
+    @Override
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> afterDryUp() {
 
         drain();
 
@@ -156,7 +156,7 @@ public class RapidGateControl<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallRiv
     }
 
     @Override
-    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> afterDrain(final int streamNumber) {
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> afterDryUp(final int streamNumber) {
 
         drain(streamNumber);
 
@@ -164,52 +164,38 @@ public class RapidGateControl<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallRiv
     }
 
     @Override
-    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> afterDryUp() {
-
-        dryUp();
-
-        return this;
-    }
-
-    @Override
-    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> afterDryUp(final int streamNumber) {
-
-        dryUp(streamNumber);
-
-        return this;
-    }
-
-    @Override
-    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> afterMax(final long maxDelay,
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> afterMax(final long maxDelay,
             final TimeUnit timeUnit) {
 
         final long timeoutMs = Math.max(0, timeUnit.toMillis(maxDelay));
 
         if (mTimeoutMs != timeoutMs) {
 
-            return new RapidGateControl<SOURCE, MOUTH, IN, OUT, TYPE>(mMouthWaterfall, mGate,
-                                                                      timeoutMs, mTimeoutException,
-                                                                      mEvaluator);
+            return new WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE>(mMouthWaterfall,
+                                                                        mClassification, timeoutMs,
+                                                                        mTimeoutException,
+                                                                        mEvaluator);
         }
 
         return this;
     }
 
     @Override
-    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> eventually() {
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> eventually() {
 
         if (mTimeoutMs != -1) {
 
-            return new RapidGateControl<SOURCE, MOUTH, IN, OUT, TYPE>(mMouthWaterfall, mGate, -1,
-                                                                      mTimeoutException,
-                                                                      mEvaluator);
+            return new WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE>(mMouthWaterfall,
+                                                                        mClassification, -1,
+                                                                        mTimeoutException,
+                                                                        mEvaluator);
         }
 
         return this;
     }
 
     @Override
-    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> eventuallyThrow(
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> eventuallyThrow(
             final RuntimeException exception) {
 
         final RuntimeException timeoutException = mTimeoutException;
@@ -217,54 +203,56 @@ public class RapidGateControl<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallRiv
         if ((timeoutException == null) ? (exception != null)
                 : !timeoutException.equals(exception)) {
 
-            return new RapidGateControl<SOURCE, MOUTH, IN, OUT, TYPE>(mMouthWaterfall, mGate,
-                                                                      mTimeoutMs, exception,
-                                                                      mEvaluator);
+            return new WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE>(mMouthWaterfall,
+                                                                        mClassification, mTimeoutMs,
+                                                                        exception, mEvaluator);
         }
 
         return this;
     }
 
     @Override
-    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> meets(
-            final ConditionEvaluator<TYPE> evaluator) {
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> meets(
+            final ConditionEvaluator<? super TYPE> evaluator) {
 
-        final ConditionEvaluator<TYPE> currentEvaluator = mEvaluator;
+        final ConditionEvaluator<? super TYPE> currentEvaluator = mEvaluator;
 
         if ((currentEvaluator == null) ? (evaluator != null)
                 : !currentEvaluator.equals(evaluator)) {
 
-            return new RapidGateControl<SOURCE, MOUTH, IN, OUT, TYPE>(mMouthWaterfall, mGate,
-                                                                      mTimeoutMs, mTimeoutException,
-                                                                      evaluator);
+            return new WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE>(mMouthWaterfall,
+                                                                        mClassification, mTimeoutMs,
+                                                                        mTimeoutException,
+                                                                        evaluator);
         }
 
         return this;
     }
 
     @Override
-    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> meetsCondition(final Object... args) {
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> meetsCondition(final Object... args) {
 
         return meets(new GateConditionEvaluator<TYPE>(args));
     }
 
     @Override
-    public RapidControl<SOURCE, MOUTH, MOUTH, OUT, TYPE> mouth() {
+    public RapidGate<SOURCE, MOUTH, MOUTH, OUT, TYPE> mouth() {
 
-        return new RapidGateControl<SOURCE, MOUTH, MOUTH, OUT, TYPE>(mMouthWaterfall, mGate,
-                                                                     mTimeoutMs, mTimeoutException,
-                                                                     mEvaluator);
+        return new WaterfallRapidGate<SOURCE, MOUTH, MOUTH, OUT, TYPE>(mMouthWaterfall,
+                                                                       mClassification, mTimeoutMs,
+                                                                       mTimeoutException,
+                                                                       mEvaluator);
     }
 
     @Override
     public TYPE perform() {
 
-        final Classification<TYPE> gate = mGate;
+        final Classification<TYPE> classification = mClassification;
 
         //noinspection unchecked
-        return (TYPE) Proxy
-                .newProxyInstance(gate.getClass().getClassLoader(), new Class[]{gate.getRawType()},
-                                  new GateInvocationHandler(getControl()));
+        return (TYPE) Proxy.newProxyInstance(classification.getClass().getClassLoader(),
+                                             new Class[]{classification.getRawType()},
+                                             new GateInvocationHandler(getGate()));
     }
 
     @Override
@@ -274,7 +262,7 @@ public class RapidGateControl<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallRiv
     }
 
     @Override
-    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> flush(final int streamNumber) {
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> flush(final int streamNumber) {
 
         super.flush(streamNumber);
 
@@ -282,7 +270,7 @@ public class RapidGateControl<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallRiv
     }
 
     @Override
-    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> flush() {
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> flush() {
 
         super.flush();
 
@@ -290,7 +278,7 @@ public class RapidGateControl<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallRiv
     }
 
     @Override
-    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> forward(final Throwable throwable) {
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> forward(final Throwable throwable) {
 
         super.forward(throwable);
 
@@ -298,7 +286,7 @@ public class RapidGateControl<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallRiv
     }
 
     @Override
-    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> push(final IN... drops) {
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> push(final IN... drops) {
 
         super.push(drops);
 
@@ -306,7 +294,7 @@ public class RapidGateControl<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallRiv
     }
 
     @Override
-    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> push(final Iterable<? extends IN> drops) {
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> push(final Iterable<? extends IN> drops) {
 
         super.push(drops);
 
@@ -314,7 +302,7 @@ public class RapidGateControl<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallRiv
     }
 
     @Override
-    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> push(final IN drop) {
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> push(final IN drop) {
 
         super.push(drop);
 
@@ -322,7 +310,7 @@ public class RapidGateControl<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallRiv
     }
 
     @Override
-    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> pushAfter(final long delay,
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> pushAfter(final long delay,
             final TimeUnit timeUnit, final Iterable<? extends IN> drops) {
 
         super.pushAfter(delay, timeUnit, drops);
@@ -331,7 +319,7 @@ public class RapidGateControl<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallRiv
     }
 
     @Override
-    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> pushAfter(final long delay,
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> pushAfter(final long delay,
             final TimeUnit timeUnit, final IN drop) {
 
         super.pushAfter(delay, timeUnit, drop);
@@ -340,7 +328,7 @@ public class RapidGateControl<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallRiv
     }
 
     @Override
-    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> pushAfter(final long delay,
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> pushAfter(final long delay,
             final TimeUnit timeUnit, final IN... drops) {
 
         super.pushAfter(delay, timeUnit, drops);
@@ -349,7 +337,7 @@ public class RapidGateControl<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallRiv
     }
 
     @Override
-    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> forward(final int streamNumber,
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> forward(final int streamNumber,
             final Throwable throwable) {
 
         super.forward(streamNumber, throwable);
@@ -358,8 +346,7 @@ public class RapidGateControl<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallRiv
     }
 
     @Override
-    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> push(final int streamNumber,
-            final IN... drops) {
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> push(final int streamNumber, final IN... drops) {
 
         super.push(streamNumber, drops);
 
@@ -367,7 +354,7 @@ public class RapidGateControl<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallRiv
     }
 
     @Override
-    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> push(final int streamNumber,
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> push(final int streamNumber,
             final Iterable<? extends IN> drops) {
 
         super.push(streamNumber, drops);
@@ -376,7 +363,7 @@ public class RapidGateControl<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallRiv
     }
 
     @Override
-    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> push(final int streamNumber, final IN drop) {
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> push(final int streamNumber, final IN drop) {
 
         super.push(streamNumber, drop);
 
@@ -384,7 +371,7 @@ public class RapidGateControl<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallRiv
     }
 
     @Override
-    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> pushAfter(final int streamNumber,
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> pushAfter(final int streamNumber,
             final long delay, final TimeUnit timeUnit, final Iterable<? extends IN> drops) {
 
         super.pushAfter(streamNumber, delay, timeUnit, drops);
@@ -393,7 +380,7 @@ public class RapidGateControl<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallRiv
     }
 
     @Override
-    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> pushAfter(final int streamNumber,
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> pushAfter(final int streamNumber,
             final long delay, final TimeUnit timeUnit, final IN drop) {
 
         super.pushAfter(streamNumber, delay, timeUnit, drop);
@@ -402,7 +389,7 @@ public class RapidGateControl<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallRiv
     }
 
     @Override
-    public RapidControl<SOURCE, MOUTH, IN, OUT, TYPE> pushAfter(final int streamNumber,
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> pushAfter(final int streamNumber,
             final long delay, final TimeUnit timeUnit, final IN... drops) {
 
         super.pushAfter(streamNumber, delay, timeUnit, drops);
@@ -411,36 +398,39 @@ public class RapidGateControl<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallRiv
     }
 
     @Override
-    public RapidControl<SOURCE, MOUTH, SOURCE, OUT, TYPE> source() {
+    public RapidGate<SOURCE, MOUTH, SOURCE, OUT, TYPE> source() {
 
-        return new RapidGateControl<SOURCE, MOUTH, SOURCE, OUT, TYPE>(mSourceWaterfall,
-                                                                      mMouthWaterfall, mGate,
-                                                                      mTimeoutMs, mTimeoutException,
-                                                                      mEvaluator);
+        return new WaterfallRapidGate<SOURCE, MOUTH, SOURCE, OUT, TYPE>(mSourceWaterfall,
+                                                                        mMouthWaterfall,
+                                                                        mClassification, mTimeoutMs,
+                                                                        mTimeoutException,
+                                                                        mEvaluator);
     }
 
     @Override
-    public <NTYPE> RapidControl<SOURCE, MOUTH, IN, OUT, NTYPE> when(final Class<NTYPE> type) {
+    public <NTYPE> RapidGate<SOURCE, MOUTH, IN, OUT, NTYPE> when(final Class<NTYPE> gateType) {
 
-        return when(Classification.from(type));
+        return when(Classification.from(gateType));
     }
 
     @Override
-    public <NTYPE> RapidControl<SOURCE, MOUTH, IN, OUT, NTYPE> when(
-            final Classification<NTYPE> gate) {
+    public <NTYPE> RapidGate<SOURCE, MOUTH, IN, OUT, NTYPE> when(
+            final Classification<NTYPE> gateClassification) {
 
-        if (!gate.isInterface()) {
+        if (!gateClassification.isInterface()) {
 
-            throw new IllegalArgumentException("the gate must be an interface");
+            throw new IllegalArgumentException(
+                    "the gate classification must represent an interface");
         }
 
-        final Classification<TYPE> currentGate = mGate;
+        final Classification<TYPE> currentClassification = mClassification;
 
-        if ((currentGate == null) || !currentGate.equals(gate)) {
+        if ((currentClassification == null) || !currentClassification.equals(gateClassification)) {
 
             final ConditionEvaluator<NTYPE> evaluator;
 
-            if ((currentGate == null) || currentGate.isAssignableFrom(gate)) {
+            if ((currentClassification == null) || currentClassification
+                    .isAssignableFrom(gateClassification)) {
 
                 //noinspection unchecked
                 evaluator = (ConditionEvaluator<NTYPE>) mEvaluator;
@@ -450,39 +440,41 @@ public class RapidGateControl<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallRiv
                 evaluator = null;
             }
 
-            return new RapidGateControl<SOURCE, MOUTH, IN, OUT, NTYPE>(mMouthWaterfall, gate,
-                                                                       mTimeoutMs,
-                                                                       mTimeoutException,
-                                                                       evaluator);
+            return new WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, NTYPE>(mMouthWaterfall,
+                                                                         gateClassification,
+                                                                         mTimeoutMs,
+                                                                         mTimeoutException,
+                                                                         evaluator);
         }
 
         //noinspection unchecked
-        return (RapidControl<SOURCE, MOUTH, IN, OUT, NTYPE>) this;
+        return (RapidGate<SOURCE, MOUTH, IN, OUT, NTYPE>) this;
     }
 
     @Override
-    public <RESULT> RESULT perform(final Action<RESULT, TYPE> action, final Object... args) {
+    public <RESULT> RESULT perform(final Action<RESULT, ? super TYPE> action,
+            final Object... args) {
 
-        return getControl().perform(action, args);
+        return getGate().perform(action, args);
     }
 
-    private GateControl<TYPE> getControl() {
+    private Gate<TYPE> getGate() {
 
         final long timeoutMs = mTimeoutMs;
 
-        final GateControl<TYPE> gateControl =
-                mMouthWaterfall.when(mGate).meets(mEvaluator).eventuallyThrow(mTimeoutException);
+        final Gate<TYPE> gate = mMouthWaterfall.when(mClassification).meets(mEvaluator)
+                                               .eventuallyThrow(mTimeoutException);
 
         if (timeoutMs < 0) {
 
-            gateControl.eventually();
+            gate.eventually();
 
         } else {
 
-            gateControl.afterMax(timeoutMs, TimeUnit.MILLISECONDS);
+            gate.afterMax(timeoutMs, TimeUnit.MILLISECONDS);
         }
 
-        return gateControl;
+        return gate;
     }
 
     private static class GateConditionEvaluator<TYPE> implements ConditionEvaluator<TYPE> {
@@ -497,11 +489,11 @@ public class RapidGateControl<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallRiv
         }
 
         @Override
-        public boolean isSatisfied(final TYPE gate) {
+        public boolean isSatisfied(final TYPE leap) {
 
             try {
 
-                return (Boolean) getCondition(gate).invoke(gate, mArgs);
+                return (Boolean) getCondition(leap).invoke(leap, mArgs);
 
             } catch (final Throwable t) {
 
@@ -509,13 +501,13 @@ public class RapidGateControl<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallRiv
             }
         }
 
-        private Method getCondition(final TYPE gate) {
+        private Method getCondition(final TYPE leap) {
 
             if (mCondition == null) {
 
                 final Object[] args = mArgs;
 
-                final Class<?> type = gate.getClass();
+                final Class<?> type = leap.getClass();
 
                 Method condition = findCondition(type.getMethods(), args);
 
@@ -545,19 +537,19 @@ public class RapidGateControl<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallRiv
     private static class GateInvocationHandler<TYPE>
             implements InvocationHandler, Action<Object, TYPE> {
 
-        private final GateControl<TYPE> mControl;
+        private final Gate<TYPE> mControl;
 
-        public GateInvocationHandler(final GateControl<TYPE> control) {
+        public GateInvocationHandler(final Gate<TYPE> control) {
 
             mControl = control;
         }
 
         @Override
-        public Object doOn(final TYPE gate, final Object... args) {
+        public Object doOn(final TYPE leap, final Object... args) {
 
             try {
 
-                return ((Method) args[0]).invoke(gate, (Object[]) args[1]);
+                return ((Method) args[0]).invoke(leap, (Object[]) args[1]);
 
             } catch (final Throwable t) {
 

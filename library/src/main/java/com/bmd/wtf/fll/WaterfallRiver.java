@@ -13,7 +13,7 @@
  */
 package com.bmd.wtf.fll;
 
-import com.bmd.wtf.flg.GateControl;
+import com.bmd.wtf.flg.Gate;
 import com.bmd.wtf.flw.River;
 
 import java.util.concurrent.TimeUnit;
@@ -34,6 +34,18 @@ public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
+    public void deviate() {
+
+        mWaterfall.deviate(mIsDownstream);
+    }
+
+    @Override
+    public void deviate(final int streamNumber) {
+
+        mWaterfall.deviate(streamNumber, mIsDownstream);
+    }
+
+    @Override
     public void drain() {
 
         mWaterfall.drain(mIsDownstream);
@@ -43,18 +55,6 @@ public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     public void drain(final int streamNumber) {
 
         mWaterfall.drain(streamNumber, mIsDownstream);
-    }
-
-    @Override
-    public void dryUp() {
-
-        mWaterfall.dryUp(mIsDownstream);
-    }
-
-    @Override
-    public void dryUp(final int streamNumber) {
-
-        mWaterfall.dryUp(streamNumber, mIsDownstream);
     }
 
     @Override
@@ -204,14 +204,14 @@ public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public <TYPE> GateControl<TYPE> when(final Class<TYPE> type) {
+    public <TYPE> Gate<TYPE> when(final Class<TYPE> gateType) {
 
-        return mWaterfall.when(type);
+        return mWaterfall.when(gateType);
     }
 
     @Override
-    public <TYPE> GateControl<TYPE> when(final Classification<TYPE> gate) {
+    public <TYPE> Gate<TYPE> when(final Classification<TYPE> gateClassification) {
 
-        return mWaterfall.when(gate);
+        return mWaterfall.when(gateClassification);
     }
 }

@@ -13,7 +13,7 @@
  */
 package com.bmd.wtf.fll;
 
-import com.bmd.wtf.flg.GateControl;
+import com.bmd.wtf.flg.Gate;
 import com.bmd.wtf.flw.River;
 
 import java.util.List;
@@ -36,7 +36,7 @@ class StreamRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public void drain() {
+    public void deviate() {
 
         for (final DataStream<DATA> stream : mStreams) {
 
@@ -45,13 +45,13 @@ class StreamRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public void drain(final int streamNumber) {
+    public void deviate(final int streamNumber) {
 
         mStreams.get(streamNumber).drain();
     }
 
     @Override
-    public void dryUp() {
+    public void drain() {
 
 
         for (final DataStream<DATA> stream : mStreams) {
@@ -61,7 +61,7 @@ class StreamRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public void dryUp(final int streamNumber) {
+    public void drain(final int streamNumber) {
 
         mStreams.get(streamNumber).dryUp(true);
     }
@@ -237,14 +237,14 @@ class StreamRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public <TYPE> GateControl<TYPE> when(final Class<TYPE> type) {
+    public <TYPE> Gate<TYPE> when(final Class<TYPE> gateType) {
 
-        return mWaterfall.when(type);
+        return mWaterfall.when(gateType);
     }
 
     @Override
-    public <TYPE> GateControl<TYPE> when(final Classification<TYPE> gate) {
+    public <TYPE> Gate<TYPE> when(final Classification<TYPE> gateClassification) {
 
-        return mWaterfall.when(gate);
+        return mWaterfall.when(gateClassification);
     }
 }

@@ -13,7 +13,7 @@
  */
 package com.bmd.wtf.fll;
 
-import com.bmd.wtf.flg.GateControl;
+import com.bmd.wtf.flg.Gate;
 import com.bmd.wtf.flw.River;
 
 import java.util.concurrent.TimeUnit;
@@ -36,6 +36,18 @@ class LockRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
+    public void deviate() {
+
+        mRiver.deviate();
+    }
+
+    @Override
+    public void deviate(final int streamNumber) {
+
+        mRiver.deviate(streamNumber);
+    }
+
+    @Override
     public void drain() {
 
         mRiver.drain();
@@ -45,18 +57,6 @@ class LockRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     public void drain(final int streamNumber) {
 
         mRiver.drain(streamNumber);
-    }
-
-    @Override
-    public void dryUp() {
-
-        mRiver.dryUp();
-    }
-
-    @Override
-    public void dryUp(final int streamNumber) {
-
-        mRiver.dryUp(streamNumber);
     }
 
     @Override
@@ -414,15 +414,15 @@ class LockRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public <TYPE> GateControl<TYPE> when(final Class<TYPE> type) {
+    public <TYPE> Gate<TYPE> when(final Class<TYPE> gateType) {
 
-        return mRiver.when(type);
+        return mRiver.when(gateType);
     }
 
     @Override
-    public <TYPE> GateControl<TYPE> when(final Classification<TYPE> gate) {
+    public <TYPE> Gate<TYPE> when(final Classification<TYPE> gateClassification) {
 
-        return mRiver.when(gate);
+        return mRiver.when(gateClassification);
     }
 
     void close() {

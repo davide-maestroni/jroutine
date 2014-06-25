@@ -82,18 +82,18 @@ class WeakLeap<SOURCE, IN, OUT> implements Leap<SOURCE, IN, OUT> {
     }
 
     @Override
-    public void onFlush(final River<SOURCE, IN> upRiver, final River<SOURCE, OUT> downRiver,
+    public void onDischarge(final River<SOURCE, IN> upRiver, final River<SOURCE, OUT> downRiver,
             final int fallNumber) {
 
         final Leap<SOURCE, IN, OUT> leap = mLeap.get();
 
         if (leap != null) {
 
-            leap.onFlush(upRiver, downRiver, fallNumber);
+            leap.onDischarge(upRiver, downRiver, fallNumber);
 
         } else if (mFreeWhenVanished) {
 
-            downRiver.flush();
+            downRiver.discharge();
         }
     }
 

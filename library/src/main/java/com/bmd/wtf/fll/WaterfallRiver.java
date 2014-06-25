@@ -46,29 +46,9 @@ public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public void drain() {
+    public River<SOURCE, DATA> discharge() {
 
-        mWaterfall.drain(mIsDownstream);
-    }
-
-    @Override
-    public void drain(final int streamNumber) {
-
-        mWaterfall.drain(streamNumber, mIsDownstream);
-    }
-
-    @Override
-    public River<SOURCE, DATA> flush(final int streamNumber) {
-
-        mWaterfall.flush(streamNumber);
-
-        return this;
-    }
-
-    @Override
-    public River<SOURCE, DATA> flush() {
-
-        mWaterfall.flush();
+        mWaterfall.discharge();
 
         return this;
     }
@@ -130,6 +110,26 @@ public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
         mWaterfall.pushAfter(delay, timeUnit, drops);
 
         return this;
+    }
+
+    @Override
+    public River<SOURCE, DATA> discharge(final int streamNumber) {
+
+        mWaterfall.discharge(streamNumber);
+
+        return this;
+    }
+
+    @Override
+    public void drain() {
+
+        mWaterfall.drain(mIsDownstream);
+    }
+
+    @Override
+    public void drain(final int streamNumber) {
+
+        mWaterfall.drain(streamNumber, mIsDownstream);
     }
 
     @Override

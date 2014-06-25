@@ -40,46 +40,22 @@ class StreamRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
 
         for (final DataStream<DATA> stream : mStreams) {
 
-            stream.drain();
+            stream.deviate();
         }
     }
 
     @Override
     public void deviate(final int streamNumber) {
 
-        mStreams.get(streamNumber).drain();
+        mStreams.get(streamNumber).deviate();
     }
 
     @Override
-    public void drain() {
-
+    public River<SOURCE, DATA> discharge() {
 
         for (final DataStream<DATA> stream : mStreams) {
 
-            stream.dryUp(true);
-        }
-    }
-
-    @Override
-    public void drain(final int streamNumber) {
-
-        mStreams.get(streamNumber).dryUp(true);
-    }
-
-    @Override
-    public River<SOURCE, DATA> flush(final int streamNumber) {
-
-        mStreams.get(streamNumber).flush();
-
-        return this;
-    }
-
-    @Override
-    public River<SOURCE, DATA> flush() {
-
-        for (final DataStream<DATA> stream : mStreams) {
-
-            stream.flush();
+            stream.discharge();
         }
 
         return this;
@@ -163,6 +139,29 @@ class StreamRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
         }
 
         return this;
+    }
+
+    @Override
+    public River<SOURCE, DATA> discharge(final int streamNumber) {
+
+        mStreams.get(streamNumber).discharge();
+
+        return this;
+    }
+
+    @Override
+    public void drain() {
+
+        for (final DataStream<DATA> stream : mStreams) {
+
+            stream.drain(true);
+        }
+    }
+
+    @Override
+    public void drain(final int streamNumber) {
+
+        mStreams.get(streamNumber).drain(true);
     }
 
     @Override

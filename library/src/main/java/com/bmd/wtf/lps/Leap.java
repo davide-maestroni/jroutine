@@ -20,7 +20,8 @@ import com.bmd.wtf.flw.River;
  */
 public interface Leap<SOURCE, IN, OUT> {
 
-    public void onFlush(River<SOURCE, IN> upRiver, River<SOURCE, OUT> downRiver, int fallNumber);
+    public void onDischarge(River<SOURCE, IN> upRiver, River<SOURCE, OUT> downRiver,
+            int fallNumber);
 
     public void onPush(River<SOURCE, IN> upRiver, River<SOURCE, OUT> downRiver, int fallNumber,
             IN drop);

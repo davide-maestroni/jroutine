@@ -20,11 +20,6 @@ import com.bmd.wtf.fll.Waterfall;
 import com.bmd.wtf.lps.Leap;
 import com.bmd.wtf.lps.LeapGenerator;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 /**
  * Created by davide on 6/19/14.
  */
@@ -127,12 +122,4 @@ public class Rapids {
 
         return RapidGenerators.leapGenerator(classification);
     }
-
-    @Target({ElementType.METHOD})
-    @Retention(RetentionPolicy.RUNTIME)
-    public @interface Condition {}
-
-    @Target({ElementType.CONSTRUCTOR, ElementType.METHOD})
-    @Retention(RetentionPolicy.RUNTIME)
-    public @interface Generator {}
 }

@@ -56,10 +56,10 @@ public class LeapDecorator<SOURCE, IN, OUT> implements Leap<SOURCE, IN, OUT> {
     }
 
     @Override
-    public void onFlush(final River<SOURCE, IN> upRiver, final River<SOURCE, OUT> downRiver,
+    public void onDischarge(final River<SOURCE, IN> upRiver, final River<SOURCE, OUT> downRiver,
             final int fallNumber) {
 
-        mLeap.onFlush(upRiver, downRiver, fallNumber);
+        mLeap.onDischarge(upRiver, downRiver, fallNumber);
     }
 
     @Override

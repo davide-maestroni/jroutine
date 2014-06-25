@@ -25,13 +25,13 @@ import java.util.concurrent.TimeUnit;
  */
 public interface RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends Gate<TYPE>, River<SOURCE, IN> {
 
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> afterDeviate();
+
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> afterDeviate(int streamNumber);
+
     public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> afterDrain();
 
     public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> afterDrain(int streamNumber);
-
-    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> afterDryUp();
-
-    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> afterDryUp(int streamNumber);
 
     @Override
     public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> afterMax(long maxDelay, TimeUnit timeUnit);
@@ -47,10 +47,7 @@ public interface RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends Gate<TYPE>, Riv
             ConditionEvaluator<? super TYPE> evaluator);
 
     @Override
-    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> flush(int streamNumber);
-
-    @Override
-    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> flush();
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> discharge();
 
     @Override
     public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> forward(Throwable throwable);
@@ -75,6 +72,9 @@ public interface RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends Gate<TYPE>, Riv
     @Override
     public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> pushAfter(long delay, TimeUnit timeUnit,
             IN... drops);
+
+    @Override
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> discharge(int streamNumber);
 
     @Override
     public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> forward(int streamNumber, Throwable throwable);

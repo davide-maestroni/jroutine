@@ -25,7 +25,7 @@ class DataLock {
 
     private static final int DEFAULT_INITIAL_CAPACITY = 10;
 
-    private static final Fluid FLUSH = new Fluid() {
+    private static final Fluid DISCHARGE = new Fluid() {
 
         @Override
         public <DATA> void push(final River<?, DATA> river, final int streamNumber,
@@ -34,11 +34,11 @@ class DataLock {
 
             if (streamNumber < 0) {
 
-                river.flush();
+                river.discharge();
 
             } else {
 
-                river.flush(streamNumber);
+                river.discharge(streamNumber);
             }
         }
     };
@@ -248,14 +248,14 @@ class DataLock {
         return (delay - timeUnit.convert(System.nanoTime() - pushTimeNs, TimeUnit.NANOSECONDS));
     }
 
-    public void flush(final River<?, ?> river) {
+    public void discharge(final River<?, ?> river) {
 
-        add(FLUSH, river, -1, 0, TimeUnit.MILLISECONDS, 0, null);
+        add(DISCHARGE, river, -1, 0, TimeUnit.MILLISECONDS, 0, null);
     }
 
-    public void flush(final River<?, ?> river, final int streamNumber) {
+    public void discharge(final River<?, ?> river, final int streamNumber) {
 
-        add(FLUSH, river, streamNumber, 0, TimeUnit.MILLISECONDS, 0, null);
+        add(DISCHARGE, river, streamNumber, 0, TimeUnit.MILLISECONDS, 0, null);
     }
 
     public void forward(final River<?, ?> river, final Throwable throwable) {

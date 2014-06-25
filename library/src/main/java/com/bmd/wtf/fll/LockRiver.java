@@ -48,42 +48,15 @@ class LockRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public void drain() {
-
-        mRiver.drain();
-    }
-
-    @Override
-    public void drain(final int streamNumber) {
-
-        mRiver.drain(streamNumber);
-    }
-
-    @Override
-    public River<SOURCE, DATA> flush(final int streamNumber) {
+    public River<SOURCE, DATA> discharge() {
 
         if (isOpen()) {
 
-            mDataLock.flush(mRiver, streamNumber);
+            mDataLock.discharge(mRiver);
 
         } else {
 
-            mRiver.flush(streamNumber);
-        }
-
-        return this;
-    }
-
-    @Override
-    public River<SOURCE, DATA> flush() {
-
-        if (isOpen()) {
-
-            mDataLock.flush(mRiver);
-
-        } else {
-
-            mRiver.flush();
+            mRiver.discharge();
         }
 
         return this;
@@ -243,6 +216,33 @@ class LockRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
         }
 
         return this;
+    }
+
+    @Override
+    public River<SOURCE, DATA> discharge(final int streamNumber) {
+
+        if (isOpen()) {
+
+            mDataLock.discharge(mRiver, streamNumber);
+
+        } else {
+
+            mRiver.discharge(streamNumber);
+        }
+
+        return this;
+    }
+
+    @Override
+    public void drain() {
+
+        mRiver.drain();
+    }
+
+    @Override
+    public void drain(final int streamNumber) {
+
+        mRiver.drain(streamNumber);
     }
 
     @Override

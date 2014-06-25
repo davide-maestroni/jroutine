@@ -42,14 +42,14 @@ class LooperCurrent implements Current {
     }
 
     @Override
-    public void flush(final Fall<?> fall) {
+    public void discharge(final Fall<?> fall) {
 
         mHandler.post(new Runnable() {
 
             @Override
             public void run() {
 
-                fall.flush();
+                fall.discharge();
             }
         });
     }

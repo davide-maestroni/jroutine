@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
  */
 public interface Current {
 
-    public void flush(Fall<?> fall);
+    public void discharge(Fall<?> fall);
 
     public void forward(Fall<?> fall, Throwable throwable);
 

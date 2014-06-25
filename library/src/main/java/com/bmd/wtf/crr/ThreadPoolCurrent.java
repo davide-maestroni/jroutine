@@ -41,14 +41,14 @@ public class ThreadPoolCurrent implements Current {
     }
 
     @Override
-    public void flush(final Fall<?> fall) {
+    public void discharge(final Fall<?> fall) {
 
         mService.execute(new Runnable() {
 
             @Override
             public void run() {
 
-                fall.flush();
+                fall.discharge();
             }
         });
     }

@@ -32,13 +32,13 @@ class DamBasin<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA> {
 
     private final List<List<Throwable>> mThrowables;
 
-    private BasinEvaluator<DATA> mEvaluator;
+    private int mDischargeCount;
 
-    private int mFlushCount;
+    private BasinEvaluator<DATA> mEvaluator;
 
     private boolean mIsOnData;
 
-    private boolean mIsOnFlush;
+    private boolean mIsOnDischarge;
 
     private boolean mIsOnThrowable;
 
@@ -180,16 +180,16 @@ class DamBasin<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA> {
         mIsOnData = true;
     }
 
-    public void onFlush() {
+    public void onDischarge() {
 
-        mIsOnFlush = true;
+        mIsOnDischarge = true;
     }
 
     @Override
-    public void onFlush(final River<SOURCE, DATA> upRiver, final River<SOURCE, DATA> downRiver,
+    public void onDischarge(final River<SOURCE, DATA> upRiver, final River<SOURCE, DATA> downRiver,
             final int fallNumber) {
 
-        ++mFlushCount;
+        ++mDischargeCount;
     }
 
     @Override
@@ -275,7 +275,7 @@ class DamBasin<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA> {
         }
 
         gate.eventuallyThrow(mTimeoutException)
-            .meets(new DamConditionEvaluator<SOURCE, DATA>(mEvaluator, mIsOnFlush, mIsOnData,
+            .meets(new DamConditionEvaluator<SOURCE, DATA>(mEvaluator, mIsOnDischarge, mIsOnData,
                                                            mIsOnThrowable));
 
         resetWhen();
@@ -297,14 +297,14 @@ class DamBasin<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA> {
         mTimeoutException = null;
         mEvaluator = null;
         mIsOnData = false;
-        mIsOnFlush = false;
+        mIsOnDischarge = false;
         mIsOnThrowable = false;
     }
 
     public interface BasinEvaluator<DATA> {
 
         public boolean isSatisfied(List<List<DATA>> drops, List<List<Throwable>> throwables,
-                int flushCount);
+                int dischargeCount);
     }
 
     private static class DamConditionEvaluator<SOURCE, DATA>
@@ -314,15 +314,15 @@ class DamBasin<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA> {
 
         private boolean mIsOnData;
 
-        private boolean mIsOnFlush;
+        private boolean mIsOnDischarge;
 
         private boolean mIsOnThrowable;
 
-        private DamConditionEvaluator(final BasinEvaluator<DATA> evaluator, final boolean onFlush,
-                final boolean onData, final boolean onThrowable) {
+        private DamConditionEvaluator(final BasinEvaluator<DATA> evaluator,
+                final boolean onDischarge, final boolean onData, final boolean onThrowable) {
 
             mEvaluator = evaluator;
-            mIsOnFlush = onFlush;
+            mIsOnDischarge = onDischarge;
             mIsOnData = onData;
             mIsOnThrowable = onThrowable;
         }
@@ -332,12 +332,12 @@ class DamBasin<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA> {
 
             final List<List<DATA>> dropLists = basin.mDrops;
             final List<List<Throwable>> throwableLists = basin.mThrowables;
-            final int flushCount = basin.mFlushCount;
+            final int dischargeCount = basin.mDischargeCount;
 
             final BasinEvaluator<DATA> evaluator = mEvaluator;
 
             if ((evaluator != null) && !evaluator
-                    .isSatisfied(dropLists, throwableLists, flushCount)) {
+                    .isSatisfied(dropLists, throwableLists, dischargeCount)) {
 
                 return false;
             }
@@ -379,7 +379,7 @@ class DamBasin<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA> {
             }
 
             //noinspection RedundantIfStatement
-            if (mIsOnFlush && (flushCount <= 0)) {
+            if (mIsOnDischarge && (dischargeCount <= 0)) {
 
                 return false;
             }

@@ -34,8 +34,6 @@ public class Drops<DATA> implements List<DATA> {
         mList = list;
     }
 
-    //TODO: generator
-
     public static Drops<Boolean> asList(final boolean... data) {
 
         if (data == null) {
@@ -305,7 +303,7 @@ public class Drops<DATA> implements List<DATA> {
     }
 
     @Override
-    public List<DATA> subList(final int fromIndex, final int toIndex) {
+    public Drops<DATA> subList(final int fromIndex, final int toIndex) {
 
         return new Drops<DATA>(mType, mList.subList(fromIndex, toIndex));
     }
@@ -581,6 +579,11 @@ public class Drops<DATA> implements List<DATA> {
         }
 
         return new Drops<Long>(long.class, newList);
+    }
+
+    public List<Object> toObjects() {
+
+        return new ArrayList<Object>(mList);
     }
 
     public Drops<Short> toShorts() {

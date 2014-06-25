@@ -17,7 +17,7 @@ import com.bmd.wtf.flg.Gate;
 import com.bmd.wtf.fll.Classification;
 import com.bmd.wtf.fll.Waterfall;
 import com.bmd.wtf.fll.WaterfallRiver;
-import com.bmd.wtf.xtr.rpd.Rapids.Condition;
+import com.bmd.wtf.xtr.rpd.RapidAnnotations.Condition;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -132,7 +132,7 @@ public class WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallR
     }
 
     @Override
-    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> afterDrain() {
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> afterDeviate() {
 
         deviate();
 
@@ -140,7 +140,7 @@ public class WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallR
     }
 
     @Override
-    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> afterDrain(final int streamNumber) {
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> afterDeviate(final int streamNumber) {
 
         deviate(streamNumber);
 
@@ -148,7 +148,7 @@ public class WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallR
     }
 
     @Override
-    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> afterDryUp() {
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> afterDrain() {
 
         drain();
 
@@ -156,7 +156,7 @@ public class WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallR
     }
 
     @Override
-    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> afterDryUp(final int streamNumber) {
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> afterDrain(final int streamNumber) {
 
         drain(streamNumber);
 
@@ -262,17 +262,17 @@ public class WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallR
     }
 
     @Override
-    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> flush(final int streamNumber) {
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> discharge(final int streamNumber) {
 
-        super.flush(streamNumber);
+        super.discharge(streamNumber);
 
         return this;
     }
 
     @Override
-    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> flush() {
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> discharge() {
 
-        super.flush();
+        super.discharge();
 
         return this;
     }

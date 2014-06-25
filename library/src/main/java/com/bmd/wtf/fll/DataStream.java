@@ -56,21 +56,21 @@ public class DataStream<DATA> implements Stream<DATA> {
     }
 
     @Override
-    public Stream<DATA> flush() {
+    public Stream<DATA> discharge() {
 
         final DataFall<?, DATA, ?> fall = mDownstreamFall;
 
-        fall.waitEmpty();
+        fall.waitDry(this);
 
         if (mPassThrough) {
 
-            fall.flush();
+            fall.discharge();
 
         } else {
 
             final Current inputCurrent = fall.inputCurrent;
 
-            inputCurrent.flush(fall);
+            inputCurrent.discharge(fall);
         }
 
         return this;
@@ -303,19 +303,19 @@ public class DataStream<DATA> implements Stream<DATA> {
         return !ride(true, visitor);
     }
 
-    void drain() {
+    void deviate() {
 
         mUpstreamFall.outputStreams.remove(this);
         mDownstreamFall.inputStreams.remove(this);
     }
 
-    void dryUp(final boolean downstream) {
+    void drain(final boolean downstream) {
 
-        final DryUpVisitor visitor = new DryUpVisitor(this);
+        final DrainVisitor visitor = new DrainVisitor(this);
 
         ride(downstream, visitor);
 
-        visitor.dryUp();
+        visitor.drain();
     }
 
     private boolean ride(final boolean downstream, final WaterfallVisitor visitor) {
@@ -421,24 +421,24 @@ public class DataStream<DATA> implements Stream<DATA> {
      * Implementation of a {@link WaterfallVisitor} used to drain the streams up or down the
      * waterfall.
      */
-    private static class DryUpVisitor implements WaterfallVisitor {
+    private static class DrainVisitor implements WaterfallVisitor {
 
         private final HashSet<DataStream<?>> mDryStreams = new HashSet<DataStream<?>>();
 
         private final DataStream<?> mOriginStream;
 
-        public DryUpVisitor(final DataStream<?> originStream) {
+        public DrainVisitor(final DataStream<?> originStream) {
 
             mOriginStream = originStream;
 
             mDryStreams.add(originStream);
         }
 
-        public void dryUp() {
+        public void drain() {
 
             for (final DataStream<?> stream : mDryStreams) {
 
-                stream.drain();
+                stream.deviate();
             }
         }
 

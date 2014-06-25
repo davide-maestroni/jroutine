@@ -726,7 +726,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
             for (final DataStream<OUT> stream : fall.outputStreams) {
 
-                stream.drain();
+                stream.deviate();
             }
         }
     }
@@ -738,49 +738,16 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
         for (final DataStream<OUT> stream : fall.outputStreams) {
 
-            stream.drain();
+            stream.deviate();
         }
     }
 
     @Override
-    public void drain() {
+    public Waterfall<SOURCE, IN, OUT> discharge() {
 
         for (final DataFall<SOURCE, IN, OUT> fall : mFalls) {
 
-            for (final DataStream<OUT> stream : fall.outputStreams) {
-
-                stream.dryUp(true);
-            }
-        }
-    }
-
-    @Override
-    public void drain(final int streamNumber) {
-
-        final DataFall<SOURCE, IN, OUT> fall = mFalls[streamNumber];
-
-        for (final DataStream<OUT> stream : fall.outputStreams) {
-
-            stream.dryUp(true);
-        }
-    }
-
-    @Override
-    public Waterfall<SOURCE, IN, OUT> flush(final int streamNumber) {
-
-        final DataFall<SOURCE, IN, OUT> fall = mFalls[streamNumber];
-
-        fall.inputCurrent.flush(fall);
-
-        return this;
-    }
-
-    @Override
-    public Waterfall<SOURCE, IN, OUT> flush() {
-
-        for (final DataFall<SOURCE, IN, OUT> fall : mFalls) {
-
-            fall.inputCurrent.flush(fall);
+            fall.inputCurrent.discharge(fall);
         }
 
         return this;
@@ -876,6 +843,39 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         }
 
         return this;
+    }
+
+    @Override
+    public Waterfall<SOURCE, IN, OUT> discharge(final int streamNumber) {
+
+        final DataFall<SOURCE, IN, OUT> fall = mFalls[streamNumber];
+
+        fall.inputCurrent.discharge(fall);
+
+        return this;
+    }
+
+    @Override
+    public void drain() {
+
+        for (final DataFall<SOURCE, IN, OUT> fall : mFalls) {
+
+            for (final DataStream<OUT> stream : fall.outputStreams) {
+
+                stream.drain(true);
+            }
+        }
+    }
+
+    @Override
+    public void drain(final int streamNumber) {
+
+        final DataFall<SOURCE, IN, OUT> fall = mFalls[streamNumber];
+
+        for (final DataStream<OUT> stream : fall.outputStreams) {
+
+            stream.drain(true);
+        }
     }
 
     @Override
@@ -1004,7 +1004,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
                 for (final DataStream<IN> stream : fall.inputStreams) {
 
-                    stream.drain();
+                    stream.deviate();
                 }
             }
         }
@@ -1022,7 +1022,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
             for (final DataStream<IN> stream : fall.inputStreams) {
 
-                stream.drain();
+                stream.deviate();
             }
         }
     }
@@ -1059,7 +1059,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
                 for (final DataStream<IN> stream : fall.inputStreams) {
 
-                    stream.dryUp(false);
+                    stream.drain(false);
                 }
             }
         }
@@ -1077,7 +1077,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
             for (final DataStream<IN> stream : fall.inputStreams) {
 
-                stream.dryUp(false);
+                stream.drain(false);
             }
         }
     }
@@ -1148,7 +1148,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         final CollectorLeap<SOURCE, OUT> collectorLeap = new CollectorLeap<SOURCE, OUT>();
         final GateLeap<SOURCE, OUT, OUT> gateLeap = new GateLeap<SOURCE, OUT, OUT>(collectorLeap);
 
-        chain(gateLeap).source().flush();
+        chain(gateLeap).source().discharge();
 
         return new DataCollector<SOURCE, OUT>(gateLeap, collectorLeap);
     }
@@ -1158,7 +1158,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         final CollectorLeap<SOURCE, OUT> collectorLeap = new CollectorLeap<SOURCE, OUT>();
         final GateLeap<SOURCE, OUT, OUT> gateLeap = new GateLeap<SOURCE, OUT, OUT>(collectorLeap);
 
-        chain(gateLeap).source().push(source).flush();
+        chain(gateLeap).source().push(source).discharge();
 
         return new DataCollector<SOURCE, OUT>(gateLeap, collectorLeap);
     }
@@ -1168,7 +1168,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         final CollectorLeap<SOURCE, OUT> collectorLeap = new CollectorLeap<SOURCE, OUT>();
         final GateLeap<SOURCE, OUT, OUT> gateLeap = new GateLeap<SOURCE, OUT, OUT>(collectorLeap);
 
-        chain(gateLeap).source().push(sources).flush();
+        chain(gateLeap).source().push(sources).discharge();
 
         return new DataCollector<SOURCE, OUT>(gateLeap, collectorLeap);
     }
@@ -1178,7 +1178,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         final CollectorLeap<SOURCE, OUT> collectorLeap = new CollectorLeap<SOURCE, OUT>();
         final GateLeap<SOURCE, OUT, OUT> gateLeap = new GateLeap<SOURCE, OUT, OUT>(collectorLeap);
 
-        chain(gateLeap).source().push(sources).flush();
+        chain(gateLeap).source().push(sources).discharge();
 
         return new DataCollector<SOURCE, OUT>(gateLeap, collectorLeap);
     }

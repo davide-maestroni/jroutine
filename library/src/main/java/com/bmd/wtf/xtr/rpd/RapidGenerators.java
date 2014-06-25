@@ -18,7 +18,7 @@ import com.bmd.wtf.crr.CurrentGenerator;
 import com.bmd.wtf.fll.Classification;
 import com.bmd.wtf.lps.Leap;
 import com.bmd.wtf.lps.LeapGenerator;
-import com.bmd.wtf.xtr.rpd.Rapids.Generator;
+import com.bmd.wtf.xtr.rpd.RapidAnnotations.Generator;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;

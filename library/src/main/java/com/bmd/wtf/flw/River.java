@@ -27,14 +27,8 @@ public interface River<SOURCE, DATA> extends Stream<DATA> {
 
     public void deviate(int streamNumber);
 
-    public void drain();
-
-    public void drain(int streamNumber);
-
-    public River<SOURCE, DATA> flush(int streamNumber);
-
     @Override
-    public River<SOURCE, DATA> flush();
+    public River<SOURCE, DATA> discharge();
 
     @Override
     public River<SOURCE, DATA> forward(Throwable throwable);
@@ -57,6 +51,12 @@ public interface River<SOURCE, DATA> extends Stream<DATA> {
 
     @Override
     public River<SOURCE, DATA> pushAfter(long delay, TimeUnit timeUnit, DATA... drops);
+
+    public River<SOURCE, DATA> discharge(int streamNumber);
+
+    public void drain();
+
+    public void drain(int streamNumber);
 
     public River<SOURCE, DATA> forward(int streamNumber, Throwable throwable);
 

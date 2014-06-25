@@ -18,7 +18,7 @@ package com.bmd.wtf.flw;
  */
 public interface Fall<DATA> {
 
-    public void flush();
+    public void discharge();
 
     public void forward(Throwable throwable);
 

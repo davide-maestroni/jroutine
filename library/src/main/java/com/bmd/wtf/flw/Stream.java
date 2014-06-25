@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
  */
 public interface Stream<DATA> {
 
-    public Stream<DATA> flush();
+    public Stream<DATA> discharge();
 
     public Stream<DATA> forward(Throwable throwable);
 

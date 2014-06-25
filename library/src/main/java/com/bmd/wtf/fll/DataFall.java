@@ -17,6 +17,7 @@ import com.bmd.wtf.crr.Current;
 import com.bmd.wtf.flw.Fall;
 import com.bmd.wtf.lps.Leap;
 
+import java.util.HashSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
@@ -46,6 +47,8 @@ class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
             new CopyOnWriteArrayList<DataStream<OUT>>();
 
     private final Condition mCondition;
+
+    private final HashSet<DataStream<IN>> mDryStreams = new HashSet<DataStream<IN>>();
 
     private final LockRiver<SOURCE, IN> mInRiver;
 
@@ -86,7 +89,29 @@ class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
     }
 
     @Override
-    public void flush() {
+    public void discharge() {
+
+        final ReentrantLock lock = mLock;
+
+        lock.lock();
+
+        try {
+
+            final HashSet<DataStream<IN>> dryStreams = mDryStreams;
+
+            if (!dryStreams.containsAll(inputStreams)) {
+
+                lowerLevel();
+
+                return;
+            }
+
+            dryStreams.clear();
+
+        } finally {
+
+            lock.unlock();
+        }
 
         final DataLock dataLock = sLock.get();
 
@@ -98,7 +123,7 @@ class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
 
         try {
 
-            leap.onFlush(inRiver, outRiver, mNumber);
+            leap.onDischarge(inRiver, outRiver, mNumber);
 
         } catch (final Throwable t) {
 
@@ -179,7 +204,7 @@ class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
         }
     }
 
-    void waitEmpty() {
+    void waitDry(final DataStream<IN> stream) {
 
         final ReentrantLock lock = mLock;
 
@@ -207,6 +232,8 @@ class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
         } finally {
 
             mWaterline = 0;
+
+            mDryStreams.add(stream);
 
             lock.unlock();
         }

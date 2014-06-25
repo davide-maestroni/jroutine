@@ -46,7 +46,7 @@ public class Dam<SOURCE, DATA> extends WaterfallRiver<SOURCE, SOURCE> {
 
     private static final int ON_DATA = 8;
 
-    private static final int ON_FLUSH = 9;
+    private static final int ON_DISCHARGE = 9;
 
     private static final int ON_THROWABLE = 10;
 
@@ -143,9 +143,9 @@ public class Dam<SOURCE, DATA> extends WaterfallRiver<SOURCE, SOURCE> {
                             break;
                         }
 
-                        case ON_FLUSH: {
+                        case ON_DISCHARGE: {
 
-                            basin.onFlush();
+                            basin.onDischarge();
                             break;
                         }
 
@@ -287,17 +287,17 @@ public class Dam<SOURCE, DATA> extends WaterfallRiver<SOURCE, SOURCE> {
     }
 
     @Override
-    public Dam<SOURCE, DATA> flush(final int streamNumber) {
+    public Dam<SOURCE, DATA> discharge(final int streamNumber) {
 
-        super.flush(streamNumber);
+        super.discharge(streamNumber);
 
         return this;
     }
 
     @Override
-    public Dam<SOURCE, DATA> flush() {
+    public Dam<SOURCE, DATA> discharge() {
 
-        super.flush();
+        super.discharge();
 
         return this;
     }
@@ -462,9 +462,9 @@ public class Dam<SOURCE, DATA> extends WaterfallRiver<SOURCE, SOURCE> {
         return this;
     }
 
-    public Dam<SOURCE, DATA> onFlush() {
+    public Dam<SOURCE, DATA> onDischarge() {
 
-        mGate.perform(mAction, ON_FLUSH);
+        mGate.perform(mAction, ON_DISCHARGE);
 
         return this;
     }

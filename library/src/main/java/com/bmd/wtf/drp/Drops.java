@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.ListIterator;
 
 /**
+ * Helper class providing utility methods to convert native arrays in object lists.
+ * <p/>
  * Created by davide on 6/12/14.
  */
 public class Drops<DATA> implements List<DATA> {
@@ -34,9 +36,15 @@ public class Drops<DATA> implements List<DATA> {
         mList = list;
     }
 
+    /**
+     * Returns a drop list containing the specified native data.
+     *
+     * @param data The data to fill the list with.
+     * @return The newly created drop list.
+     */
     public static Drops<Boolean> asList(final boolean... data) {
 
-        if (data == null) {
+        if ((data == null) || (data.length == 0)) {
 
             return new Drops<Boolean>(boolean.class, new ArrayList<Boolean>(0));
         }
@@ -51,9 +59,15 @@ public class Drops<DATA> implements List<DATA> {
         return new Drops<Boolean>(boolean.class, list);
     }
 
+    /**
+     * Returns a drop list containing the specified native data.
+     *
+     * @param data The data to fill the list with.
+     * @return The newly created drop list.
+     */
     public static Drops<Byte> asList(final byte... data) {
 
-        if (data == null) {
+        if ((data == null) || (data.length == 0)) {
 
             return new Drops<Byte>(byte.class, new ArrayList<Byte>(0));
         }
@@ -68,9 +82,15 @@ public class Drops<DATA> implements List<DATA> {
         return new Drops<Byte>(byte.class, list);
     }
 
+    /**
+     * Returns a drop list containing the specified native data.
+     *
+     * @param data The data to fill the list with.
+     * @return The newly created drop list.
+     */
     public static Drops<Character> asList(final char... data) {
 
-        if (data == null) {
+        if ((data == null) || (data.length == 0)) {
 
             return new Drops<Character>(char.class, new ArrayList<Character>(0));
         }
@@ -85,9 +105,15 @@ public class Drops<DATA> implements List<DATA> {
         return new Drops<Character>(char.class, list);
     }
 
+    /**
+     * Returns a drop list containing the specified native data.
+     *
+     * @param data The data to fill the list with.
+     * @return The newly created drop list.
+     */
     public static Drops<Double> asList(final double... data) {
 
-        if (data == null) {
+        if ((data == null) || (data.length == 0)) {
 
             return new Drops<Double>(double.class, new ArrayList<Double>(0));
         }
@@ -102,9 +128,15 @@ public class Drops<DATA> implements List<DATA> {
         return new Drops<Double>(double.class, list);
     }
 
+    /**
+     * Returns a drop list containing the specified native data.
+     *
+     * @param data The data to fill the list with.
+     * @return The newly created drop list.
+     */
     public static Drops<Float> asList(final float... data) {
 
-        if (data == null) {
+        if ((data == null) || (data.length == 0)) {
 
             return new Drops<Float>(float.class, new ArrayList<Float>(0));
         }
@@ -119,9 +151,15 @@ public class Drops<DATA> implements List<DATA> {
         return new Drops<Float>(float.class, list);
     }
 
+    /**
+     * Returns a drop list containing the specified native data.
+     *
+     * @param data The data to fill the list with.
+     * @return The newly created drop list.
+     */
     public static Drops<Integer> asList(final int... data) {
 
-        if (data == null) {
+        if ((data == null) || (data.length == 0)) {
 
             return new Drops<Integer>(int.class, new ArrayList<Integer>(0));
         }
@@ -136,9 +174,15 @@ public class Drops<DATA> implements List<DATA> {
         return new Drops<Integer>(int.class, list);
     }
 
+    /**
+     * Returns a drop list containing the specified native data.
+     *
+     * @param data The data to fill the list with.
+     * @return The newly created drop list.
+     */
     public static Drops<Long> asList(final long... data) {
 
-        if (data == null) {
+        if ((data == null) || (data.length == 0)) {
 
             return new Drops<Long>(long.class, new ArrayList<Long>(0));
         }
@@ -153,9 +197,15 @@ public class Drops<DATA> implements List<DATA> {
         return new Drops<Long>(long.class, list);
     }
 
+    /**
+     * Returns a drop list containing the specified native data.
+     *
+     * @param data The data to fill the list with.
+     * @return The newly created drop list.
+     */
     public static Drops<Short> asList(final short... data) {
 
-        if (data == null) {
+        if ((data == null) || (data.length == 0)) {
 
             return new Drops<Short>(short.class, new ArrayList<Short>(0));
         }
@@ -189,20 +239,24 @@ public class Drops<DATA> implements List<DATA> {
     }
 
     @Override
+    @SuppressWarnings("NullableProblems")
     public Iterator<DATA> iterator() {
 
         return mList.iterator();
     }
 
     @Override
+    @SuppressWarnings("NullableProblems")
     public Object[] toArray() {
 
         return mList.toArray();
     }
 
     @Override
+    @SuppressWarnings("NullableProblems")
     public <T> T[] toArray(final T[] a) {
 
+        //noinspection SuspiciousToArrayCall
         return mList.toArray(a);
     }
 
@@ -219,30 +273,35 @@ public class Drops<DATA> implements List<DATA> {
     }
 
     @Override
+    @SuppressWarnings("NullableProblems")
     public boolean containsAll(final Collection<?> c) {
 
         return mList.containsAll(c);
     }
 
     @Override
+    @SuppressWarnings("NullableProblems")
     public boolean addAll(final Collection<? extends DATA> c) {
 
         return mList.addAll(c);
     }
 
     @Override
+    @SuppressWarnings("NullableProblems")
     public boolean addAll(final int index, final Collection<? extends DATA> c) {
 
         return mList.addAll(index, c);
     }
 
     @Override
+    @SuppressWarnings("NullableProblems")
     public boolean removeAll(final Collection<?> c) {
 
         return mList.removeAll(c);
     }
 
     @Override
+    @SuppressWarnings("NullableProblems")
     public boolean retainAll(final Collection<?> c) {
 
         return mList.retainAll(c);
@@ -291,29 +350,38 @@ public class Drops<DATA> implements List<DATA> {
     }
 
     @Override
+    @SuppressWarnings("NullableProblems")
     public ListIterator<DATA> listIterator() {
 
         return mList.listIterator();
     }
 
     @Override
+    @SuppressWarnings("NullableProblems")
     public ListIterator<DATA> listIterator(final int index) {
 
         return mList.listIterator(index);
     }
 
     @Override
+    @SuppressWarnings("NullableProblems")
     public Drops<DATA> subList(final int fromIndex, final int toIndex) {
 
         return new Drops<DATA>(mType, mList.subList(fromIndex, toIndex));
     }
 
+    /**
+     * Transforms this list in a list of booleans by making a copy of it.
+     *
+     * @return A list of booleans.
+     */
     public Drops<Boolean> toBooleans() {
 
         if (boolean.class.equals(mType)) {
 
             //noinspection unchecked
-            return (Drops<Boolean>) this;
+            return new Drops<Boolean>(boolean.class, new ArrayList<Boolean>(
+                    (Collection<? extends Boolean>) mList));
         }
 
         final List<DATA> list = mList;
@@ -335,6 +403,11 @@ public class Drops<DATA> implements List<DATA> {
         return new Drops<Boolean>(boolean.class, newList);
     }
 
+    /**
+     * Transforms this list in a list of bytes by making a copy of it.
+     *
+     * @return A list of bytes.
+     */
     public Drops<Byte> toBytes() {
 
         final Class<DATA> type = mType;
@@ -342,7 +415,8 @@ public class Drops<DATA> implements List<DATA> {
         if (byte.class.equals(type)) {
 
             //noinspection unchecked
-            return (Drops<Byte>) this;
+            return new Drops<Byte>(byte.class,
+                                   new ArrayList<Byte>((Collection<? extends Byte>) mList));
         }
 
         final List<DATA> list = mList;
@@ -376,6 +450,11 @@ public class Drops<DATA> implements List<DATA> {
         return new Drops<Byte>(byte.class, newList);
     }
 
+    /**
+     * Transforms this list in a list of chars by making a copy of it.
+     *
+     * @return A list of chars.
+     */
     public Drops<Character> toCharacters() {
 
         final Class<DATA> type = mType;
@@ -383,7 +462,8 @@ public class Drops<DATA> implements List<DATA> {
         if (char.class.equals(type)) {
 
             //noinspection unchecked
-            return (Drops<Character>) this;
+            return new Drops<Character>(char.class, new ArrayList<Character>(
+                    (Collection<? extends Character>) mList));
         }
 
         final List<DATA> list = mList;
@@ -417,6 +497,11 @@ public class Drops<DATA> implements List<DATA> {
         return new Drops<Character>(char.class, newList);
     }
 
+    /**
+     * Transforms this list in a list of doubles by making a copy of it.
+     *
+     * @return A list of doubles.
+     */
     public Drops<Double> toDoubles() {
 
         final Class<DATA> type = mType;
@@ -424,7 +509,8 @@ public class Drops<DATA> implements List<DATA> {
         if (double.class.equals(type)) {
 
             //noinspection unchecked
-            return (Drops<Double>) this;
+            return new Drops<Double>(double.class,
+                                     new ArrayList<Double>((Collection<? extends Double>) mList));
         }
 
         final List<DATA> list = mList;
@@ -458,6 +544,11 @@ public class Drops<DATA> implements List<DATA> {
         return new Drops<Double>(double.class, newList);
     }
 
+    /**
+     * Transforms this list in a list of floats by making a copy of it.
+     *
+     * @return A list of floats.
+     */
     public Drops<Float> toFloats() {
 
         final Class<DATA> type = mType;
@@ -465,7 +556,8 @@ public class Drops<DATA> implements List<DATA> {
         if (float.class.equals(type)) {
 
             //noinspection unchecked
-            return (Drops<Float>) this;
+            return new Drops<Float>(float.class,
+                                    new ArrayList<Float>((Collection<? extends Float>) mList));
         }
 
         final List<DATA> list = mList;
@@ -499,6 +591,11 @@ public class Drops<DATA> implements List<DATA> {
         return new Drops<Float>(float.class, newList);
     }
 
+    /**
+     * Transforms this list in a list of integers by making a copy of it.
+     *
+     * @return A list of ints.
+     */
     public Drops<Integer> toIntegers() {
 
         final Class<DATA> type = mType;
@@ -506,7 +603,8 @@ public class Drops<DATA> implements List<DATA> {
         if (int.class.equals(type)) {
 
             //noinspection unchecked
-            return (Drops<Integer>) this;
+            return new Drops<Integer>(int.class, new ArrayList<Integer>(
+                    (Collection<? extends Integer>) mList));
         }
 
         final List<DATA> list = mList;
@@ -540,6 +638,11 @@ public class Drops<DATA> implements List<DATA> {
         return new Drops<Integer>(int.class, newList);
     }
 
+    /**
+     * Transforms this list in a list of longs by making a copy of it.
+     *
+     * @return A list of longs.
+     */
     public Drops<Long> toLongs() {
 
         final Class<DATA> type = mType;
@@ -547,7 +650,8 @@ public class Drops<DATA> implements List<DATA> {
         if (long.class.equals(type)) {
 
             //noinspection unchecked
-            return (Drops<Long>) this;
+            return new Drops<Long>(long.class,
+                                   new ArrayList<Long>((Collection<? extends Long>) mList));
         }
 
         final List<DATA> list = mList;
@@ -581,11 +685,21 @@ public class Drops<DATA> implements List<DATA> {
         return new Drops<Long>(long.class, newList);
     }
 
+    /**
+     * Transforms this list in a list of objects by making a copy of it.
+     *
+     * @return A list of objects.
+     */
     public List<Object> toObjects() {
 
         return new ArrayList<Object>(mList);
     }
 
+    /**
+     * Transforms this list in a list of shorts by making a copy of it.
+     *
+     * @return A list of shorts.
+     */
     public Drops<Short> toShorts() {
 
         final Class<DATA> type = mType;
@@ -593,7 +707,8 @@ public class Drops<DATA> implements List<DATA> {
         if (short.class.equals(type)) {
 
             //noinspection unchecked
-            return (Drops<Short>) this;
+            return new Drops<Short>(short.class,
+                                    new ArrayList<Short>((Collection<? extends Short>) mList));
         }
 
         final List<DATA> list = mList;

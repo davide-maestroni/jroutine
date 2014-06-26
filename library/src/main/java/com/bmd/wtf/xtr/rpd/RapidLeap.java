@@ -33,6 +33,8 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
 
     //TODO: proguard rule
 
+    private final boolean mIsAnnotatedOnly;
+
     private final HashMap<Class<?>, Method> mMethodMap = new HashMap<Class<?>, Method>();
 
     private final Object mTarget;
@@ -47,23 +49,30 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
 
     private River<SOURCE, Object> mUpRiver;
 
-    public RapidLeap() {
+    public RapidLeap(final boolean annotatedOnly) {
 
         mTarget = this;
+        mIsAnnotatedOnly = annotatedOnly;
 
         fillMethods();
     }
 
-    private RapidLeap(final Object wrapped) {
+    public RapidLeap() {
+
+        this(false);
+    }
+
+    private RapidLeap(final Object wrapped, final boolean annotatedOnly) {
 
         mTarget = wrapped;
+        mIsAnnotatedOnly = annotatedOnly;
 
         fillMethods();
     }
 
     public static <SOURCE> RapidLeap<SOURCE> from(final Object wrapped) {
 
-        return new RapidLeap<SOURCE>(wrapped) {};
+        return new RapidLeap<SOURCE>(wrapped, false) {};
     }
 
     public static <SOURCE> RapidLeap<SOURCE> from(final Object wrapped,
@@ -76,6 +85,23 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
             final Classification<SOURCE> sourceClassification) {
 
         return from(wrapped);
+    }
+
+    public static <SOURCE> RapidLeap<SOURCE> fromAnnotated(final Object wrapped) {
+
+        return new RapidLeap<SOURCE>(wrapped, true) {};
+    }
+
+    public static <SOURCE> RapidLeap<SOURCE> fromAnnotated(final Object wrapped,
+            final Class<SOURCE> sourceType) {
+
+        return fromAnnotated(wrapped);
+    }
+
+    public static <SOURCE> RapidLeap<SOURCE> fromAnnotated(final Object wrapped,
+            final Classification<SOURCE> sourceClassification) {
+
+        return fromAnnotated(wrapped);
     }
 
     @Override
@@ -101,7 +127,7 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
 
             } catch (final Throwable t) {
 
-                throw new RuntimeException(t);
+                throw new RapidException(t);
             }
 
         } else {
@@ -135,7 +161,7 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
 
                 } catch (final Throwable t) {
 
-                    throw new RuntimeException(t);
+                    throw new RapidException(t);
                 }
 
             } else {
@@ -167,7 +193,7 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
 
             } catch (final Throwable t) {
 
-                throw new RuntimeException(t);
+                throw new RapidException(t);
             }
         }
     }
@@ -198,8 +224,7 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
 
                 } catch (final Throwable t) {
 
-                    //TODO: special exception?
-                    throw new RuntimeException(t);
+                    throw new RapidException(t);
                 }
 
             } else {
@@ -231,7 +256,7 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
 
             } catch (final Throwable t) {
 
-                throw new RuntimeException(t);
+                throw new RapidException(t);
             }
         }
     }
@@ -458,6 +483,8 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
 
     private void fillOnData(final Method[] methods) {
 
+        final boolean isAnnotatedOnly = mIsAnnotatedOnly;
+
         final HashMap<Class<?>, Method> methodMap = mMethodMap;
 
         for (final Method method : methods) {
@@ -479,6 +506,11 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
             }
 
             if (!isAnnotated) {
+
+                if (isAnnotatedOnly) {
+
+                    continue;
+                }
 
                 final String methodName = method.getName();
 
@@ -518,6 +550,8 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
 
     private void fillOnDischarge(final Method[] methods) {
 
+        final boolean isAnnotatedOnly = mIsAnnotatedOnly;
+
         for (final Method method : methods) {
 
             final Class<?>[] parameterTypes = method.getParameterTypes();
@@ -536,7 +570,7 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
                 }
             }
 
-            if (!isAnnotated && !method.getName().equals("onDischarge")) {
+            if (!isAnnotated && (isAnnotatedOnly || !method.getName().equals("onDischarge"))) {
 
                 continue;
             }
@@ -559,6 +593,8 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
 
     private void fillOnNull(final Method[] methods) {
 
+        final boolean isAnnotatedOnly = mIsAnnotatedOnly;
+
         for (final Method method : methods) {
 
             final Class<?>[] parameterTypes = method.getParameterTypes();
@@ -577,7 +613,7 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
                 }
             }
 
-            if (!isAnnotated && !method.getName().equals("onNull")) {
+            if (!isAnnotated && (isAnnotatedOnly || !method.getName().equals("onNull"))) {
 
                 continue;
             }

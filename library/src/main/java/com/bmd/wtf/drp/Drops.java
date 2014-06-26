@@ -393,11 +393,21 @@ public class Drops<DATA> implements List<DATA> {
 
         final ArrayList<Boolean> newList = new ArrayList<Boolean>(list.size());
 
-        for (final DATA data : list) {
+        if (char.class.equals(mType)) {
 
-            final Number number = (Number) data;
+            for (final DATA data : list) {
 
-            newList.add(number.longValue() != 0);
+                newList.add(((Character) data) != 0);
+            }
+
+        } else {
+
+            for (final DATA data : list) {
+
+                final Number number = (Number) data;
+
+                newList.add(number.longValue() != 0);
+            }
         }
 
         return new Drops<Boolean>(boolean.class, newList);
@@ -435,6 +445,13 @@ public class Drops<DATA> implements List<DATA> {
                 final Boolean bool = (Boolean) data;
 
                 newList.add((byte) (bool ? 1 : 0));
+            }
+
+        } else if (char.class.equals(mType)) {
+
+            for (final DATA data : list) {
+
+                newList.add((byte) ((Character) data).charValue());
             }
 
         } else {
@@ -531,6 +548,13 @@ public class Drops<DATA> implements List<DATA> {
                 newList.add((double) (bool ? 1 : 0));
             }
 
+        } else if (char.class.equals(mType)) {
+
+            for (final DATA data : list) {
+
+                newList.add((double) ((Character) data));
+            }
+
         } else {
 
             for (final DATA data : list) {
@@ -576,6 +600,13 @@ public class Drops<DATA> implements List<DATA> {
                 final Boolean bool = (Boolean) data;
 
                 newList.add((float) (bool ? 1 : 0));
+            }
+
+        } else if (char.class.equals(mType)) {
+
+            for (final DATA data : list) {
+
+                newList.add((float) ((Character) data));
             }
 
         } else {
@@ -625,6 +656,13 @@ public class Drops<DATA> implements List<DATA> {
                 newList.add(bool ? 1 : 0);
             }
 
+        } else if (char.class.equals(mType)) {
+
+            for (final DATA data : list) {
+
+                newList.add((int) ((Character) data));
+            }
+
         } else {
 
             for (final DATA data : list) {
@@ -670,6 +708,13 @@ public class Drops<DATA> implements List<DATA> {
                 final Boolean bool = (Boolean) data;
 
                 newList.add((long) (bool ? 1 : 0));
+            }
+
+        } else if (char.class.equals(mType)) {
+
+            for (final DATA data : list) {
+
+                newList.add((long) ((Character) data));
             }
 
         } else {
@@ -727,6 +772,13 @@ public class Drops<DATA> implements List<DATA> {
                 final Boolean bool = (Boolean) data;
 
                 newList.add((short) (bool ? 1 : 0));
+            }
+
+        } else if (char.class.equals(mType)) {
+
+            for (final DATA data : list) {
+
+                newList.add((short) ((Character) data).charValue());
             }
 
         } else {

@@ -40,36 +40,35 @@ public class Rapids {
         return RapidGenerators.currentGenerator(currents);
     }
 
-    public static CurrentGenerator currentGenerator(final Object generator,
+    public static CurrentGenerator currents(final Object generator,
             final Classification<? extends Current> classification, final Object... args) {
 
         return RapidGenerators.currentGenerator(generator, classification, args);
     }
 
-    public static CurrentGenerator currentGenerator(final Current current,
-            final Object... contextArgs) {
+    public static CurrentGenerator currents(final Current current, final Object... contextArgs) {
 
         return RapidGenerators.currentGenerator(current.getClass(), contextArgs);
     }
 
-    public static CurrentGenerator currentGenerator(
-            final Classification<? extends Current> classification, final Object... contextArgs) {
+    public static CurrentGenerator currents(final Classification<? extends Current> classification,
+            final Object... contextArgs) {
 
         return RapidGenerators.currentGenerator(classification, contextArgs);
     }
 
-    public static CurrentGenerator currentGenerator(final Class<? extends Current> type,
+    public static CurrentGenerator currents(final Class<? extends Current> type,
             final Object... contextArgs) {
 
         return RapidGenerators.currentGenerator(type, contextArgs);
     }
 
-    public static CurrentGenerator currentGenerator(final Class<? extends Current> type) {
+    public static CurrentGenerator currents(final Class<? extends Current> type) {
 
         return RapidGenerators.currentGenerator(type);
     }
 
-    public static CurrentGenerator currentGenerator(
+    public static CurrentGenerator currents(
             final Classification<? extends Current> classification) {
 
         return RapidGenerators.currentGenerator(classification);
@@ -81,15 +80,14 @@ public class Rapids {
         return new WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE>(waterfall);
     }
 
-    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> leapGenerator(
-            final Object generator,
+    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> leaps(final Object generator,
             final Classification<? extends Leap<SOURCE, IN, OUT>> classification,
             final Object... args) {
 
         return RapidGenerators.leapGenerator(generator, classification, args);
     }
 
-    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> leapGenerator(
+    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> leaps(
             final Leap<SOURCE, IN, OUT> leap, final Object... contextArgs) {
 
         //noinspection unchecked
@@ -98,26 +96,26 @@ public class Rapids {
                                contextArgs);
     }
 
-    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> leapGenerator(
+    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> leaps(
             final Classification<? extends Leap<SOURCE, IN, OUT>> classification,
             final Object... contextArgs) {
 
         return RapidGenerators.leapGenerator(classification, contextArgs);
     }
 
-    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> leapGenerator(
+    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> leaps(
             final Class<? extends Leap<SOURCE, IN, OUT>> type, final Object... contextArgs) {
 
         return RapidGenerators.leapGenerator(type, contextArgs);
     }
 
-    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> leapGenerator(
+    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> leaps(
             final Class<? extends Leap<SOURCE, IN, OUT>> type) {
 
         return RapidGenerators.leapGenerator(type);
     }
 
-    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> leapGenerator(
+    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> leaps(
             final Classification<? extends Leap<SOURCE, IN, OUT>> classification) {
 
         return RapidGenerators.leapGenerator(classification);

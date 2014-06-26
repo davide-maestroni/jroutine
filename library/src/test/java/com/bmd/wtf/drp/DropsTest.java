@@ -109,6 +109,8 @@ public class DropsTest extends TestCase {
 
         booleans.clear();
         testAllEmpty(booleans);
+
+        testAllEmpty(Drops.asList(new boolean[0]));
     }
 
     public void testBytes() {
@@ -195,6 +197,8 @@ public class DropsTest extends TestCase {
 
         bytes.clear();
         testAllEmpty(bytes);
+
+        testAllEmpty(Drops.asList(new byte[0]));
     }
 
     public void testChars() {
@@ -281,6 +285,8 @@ public class DropsTest extends TestCase {
 
         chars.clear();
         testAllEmpty(chars);
+
+        testAllEmpty(Drops.asList(new char[0]));
     }
 
     public void testDoubles() {
@@ -368,6 +374,8 @@ public class DropsTest extends TestCase {
 
         doubles.clear();
         testAllEmpty(doubles);
+
+        testAllEmpty(Drops.asList(new double[0]));
     }
 
     public void testFloats() {
@@ -454,6 +462,8 @@ public class DropsTest extends TestCase {
 
         floats.clear();
         testAllEmpty(floats);
+
+        testAllEmpty(Drops.asList(new float[0]));
     }
 
     public void testIntegers() {
@@ -536,6 +546,8 @@ public class DropsTest extends TestCase {
 
         integers.clear();
         testAllEmpty(integers);
+
+        testAllEmpty(Drops.asList(new int[0]));
     }
 
     public void testLongs() {
@@ -622,6 +634,8 @@ public class DropsTest extends TestCase {
 
         longs.clear();
         testAllEmpty(longs);
+
+        testAllEmpty(Drops.asList(new long[0]));
     }
 
     public void testShorts() {
@@ -708,6 +722,8 @@ public class DropsTest extends TestCase {
 
         shorts.clear();
         testAllEmpty(shorts);
+
+        testAllEmpty(Drops.asList(new short[0]));
     }
 
     private void testAllConversions(final Drops<?> drops, final Object... data) {
@@ -739,11 +755,14 @@ public class DropsTest extends TestCase {
 
     private void testBooleans(final Drops<Boolean> drops, final Boolean... data) {
 
+        final Object[] objects = new Object[data.length];
+        System.arraycopy(data, 0, objects, 0, data.length);
+
         assertThat(drops).containsExactly(data);
         assertThat(drops.size()).isEqualTo(data.length);
         assertThat(drops.isEmpty()).isEqualTo(data.length == 0);
         assertThat(drops.contains(data[0])).isTrue();
-        assertThat(drops.toArray()).containsExactly(data);
+        assertThat(drops.toArray()).containsExactly(objects);
         assertThat(drops.toArray(new Boolean[data.length])).containsExactly(data);
         assertThat(drops.containsAll(Arrays.asList(data))).isTrue();
         assertThat(drops.indexOf(data[0])).isEqualTo(0);
@@ -780,11 +799,14 @@ public class DropsTest extends TestCase {
 
     private void testBytes(final Drops<Byte> drops, final Byte... data) {
 
+        final Object[] objects = new Object[data.length];
+        System.arraycopy(data, 0, objects, 0, data.length);
+
         assertThat(drops).containsExactly(data);
         assertThat(drops.size()).isEqualTo(data.length);
         assertThat(drops.isEmpty()).isEqualTo(data.length == 0);
         assertThat(drops.contains(data[0])).isTrue();
-        assertThat(drops.toArray()).containsExactly(data);
+        assertThat(drops.toArray()).containsExactly(objects);
         assertThat(drops.toArray(new Byte[data.length])).containsExactly(data);
         assertThat(drops.containsAll(Arrays.asList(data))).isTrue();
         assertThat(drops.indexOf(data[0])).isEqualTo(0);
@@ -821,11 +843,14 @@ public class DropsTest extends TestCase {
 
     private void testCharacters(final Drops<Character> drops, final Character... data) {
 
+        final Object[] objects = new Object[data.length];
+        System.arraycopy(data, 0, objects, 0, data.length);
+
         assertThat(drops).containsExactly(data);
         assertThat(drops.size()).isEqualTo(data.length);
         assertThat(drops.isEmpty()).isEqualTo(data.length == 0);
         assertThat(drops.contains(data[0])).isTrue();
-        assertThat(drops.toArray()).containsExactly(data);
+        assertThat(drops.toArray()).containsExactly(objects);
         assertThat(drops.toArray(new Character[data.length])).containsExactly(data);
         assertThat(drops.containsAll(Arrays.asList(data))).isTrue();
         assertThat(drops.indexOf(data[0])).isEqualTo(0);
@@ -862,11 +887,14 @@ public class DropsTest extends TestCase {
 
     private void testDoubles(final Drops<Double> drops, final Double... data) {
 
+        final Object[] objects = new Object[data.length];
+        System.arraycopy(data, 0, objects, 0, data.length);
+
         assertThat(drops).containsExactly(data);
         assertThat(drops.size()).isEqualTo(data.length);
         assertThat(drops.isEmpty()).isEqualTo(data.length == 0);
         assertThat(drops.contains(data[0])).isTrue();
-        assertThat(drops.toArray()).containsExactly(data);
+        assertThat(drops.toArray()).containsExactly(objects);
         assertThat(drops.toArray(new Double[data.length])).containsExactly(data);
         assertThat(drops.containsAll(Arrays.asList(data))).isTrue();
         assertThat(drops.indexOf(data[0])).isEqualTo(0);
@@ -912,11 +940,14 @@ public class DropsTest extends TestCase {
 
     private void testFloats(final Drops<Float> drops, final Float... data) {
 
+        final Object[] objects = new Object[data.length];
+        System.arraycopy(data, 0, objects, 0, data.length);
+
         assertThat(drops).containsExactly(data);
         assertThat(drops.size()).isEqualTo(data.length);
         assertThat(drops.isEmpty()).isEqualTo(data.length == 0);
         assertThat(drops.contains(data[0])).isTrue();
-        assertThat(drops.toArray()).containsExactly(data);
+        assertThat(drops.toArray()).containsExactly(objects);
         assertThat(drops.toArray(new Float[data.length])).containsExactly(data);
         assertThat(drops.containsAll(Arrays.asList(data))).isTrue();
         assertThat(drops.indexOf(data[0])).isEqualTo(0);
@@ -953,11 +984,14 @@ public class DropsTest extends TestCase {
 
     private void testIntegers(final Drops<Integer> drops, final Integer... data) {
 
+        final Object[] objects = new Object[data.length];
+        System.arraycopy(data, 0, objects, 0, data.length);
+
         assertThat(drops).containsExactly(data);
         assertThat(drops.size()).isEqualTo(data.length);
         assertThat(drops.isEmpty()).isEqualTo(data.length == 0);
         assertThat(drops.contains(data[0])).isTrue();
-        assertThat(drops.toArray()).containsExactly(data);
+        assertThat(drops.toArray()).containsExactly(objects);
         assertThat(drops.toArray(new Integer[data.length])).containsExactly(data);
         assertThat(drops.containsAll(Arrays.asList(data))).isTrue();
         assertThat(drops.indexOf(data[0])).isEqualTo(0);
@@ -994,11 +1028,14 @@ public class DropsTest extends TestCase {
 
     private void testLongs(final Drops<Long> drops, final Long... data) {
 
+        final Object[] objects = new Object[data.length];
+        System.arraycopy(data, 0, objects, 0, data.length);
+
         assertThat(drops).containsExactly(data);
         assertThat(drops.size()).isEqualTo(data.length);
         assertThat(drops.isEmpty()).isEqualTo(data.length == 0);
         assertThat(drops.contains(data[0])).isTrue();
-        assertThat(drops.toArray()).containsExactly(data);
+        assertThat(drops.toArray()).containsExactly(objects);
         assertThat(drops.toArray(new Long[data.length])).containsExactly(data);
         assertThat(drops.containsAll(Arrays.asList(data))).isTrue();
         assertThat(drops.indexOf(data[0])).isEqualTo(0);
@@ -1035,11 +1072,14 @@ public class DropsTest extends TestCase {
 
     private void testObjects(final List<Object> drops, final Object... data) {
 
+        final Object[] objects = new Object[data.length];
+        System.arraycopy(data, 0, objects, 0, data.length);
+
         assertThat(drops).containsExactly(data);
         assertThat(drops.size()).isEqualTo(data.length);
         assertThat(drops.isEmpty()).isEqualTo(data.length == 0);
         assertThat(drops.contains(data[0])).isTrue();
-        assertThat(drops.toArray()).containsExactly(data);
+        assertThat(drops.toArray()).containsExactly(objects);
         assertThat(drops.toArray(new Object[data.length])).containsExactly(data);
         assertThat(drops.containsAll(Arrays.asList(data))).isTrue();
         assertThat(drops.indexOf(data[0])).isEqualTo(0);
@@ -1076,11 +1116,14 @@ public class DropsTest extends TestCase {
 
     private void testShorts(final Drops<Short> drops, final Short... data) {
 
+        final Object[] objects = new Object[data.length];
+        System.arraycopy(data, 0, objects, 0, data.length);
+
         assertThat(drops).containsExactly(data);
         assertThat(drops.size()).isEqualTo(data.length);
         assertThat(drops.isEmpty()).isEqualTo(data.length == 0);
         assertThat(drops.contains(data[0])).isTrue();
-        assertThat(drops.toArray()).containsExactly(data);
+        assertThat(drops.toArray()).containsExactly(objects);
         assertThat(drops.toArray(new Short[data.length])).containsExactly(data);
         assertThat(drops.containsAll(Arrays.asList(data))).isTrue();
         assertThat(drops.indexOf(data[0])).isEqualTo(0);

@@ -12,8 +12,8 @@
  * limitations under the License.
  */
 /**
- * Package containing helper classes for handling data drops.
+ * Package containing current related classes and definitions.
  * <p/>
- * Created by davide on 6/25/14.
+ * Created by davide on 6/26/14.
  */
-package com.bmd.wtf.drp;
+package com.bmd.wtf.crr;

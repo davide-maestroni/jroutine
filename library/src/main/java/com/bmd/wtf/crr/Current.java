@@ -18,6 +18,13 @@ import com.bmd.wtf.flw.Fall;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * Basic component of a {@link com.bmd.wtf.fll.Waterfall}.
+ * <p/>
+ * A current is responsible for transporting a flow of data feeding a {@link com.bmd.wtf.flw.Fall}.
+ * <p/>
+ * Its implementation may be synchronous or employ one or more separate threads. For this reason
+ * it should always be thread safe.
+ * <p/>
  * Created by davide on 6/7/14.
  */
 public interface Current {

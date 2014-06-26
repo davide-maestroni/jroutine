@@ -14,6 +14,8 @@
 package com.bmd.wtf.crr;
 
 /**
+ * A generator of {@link com.bmd.wtf.crr.Current} instances.
+ * <p/>
  * Created by davide on 6/10/14.
  */
 public interface CurrentGenerator {

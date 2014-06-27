@@ -72,6 +72,14 @@ class DataGate<TYPE> implements Gate<TYPE> {
     }
 
     @Override
+    public Gate<TYPE> immediately() {
+
+        mTimeoutMs = 0;
+
+        return this;
+    }
+
+    @Override
     public Gate<TYPE> meets(final ConditionEvaluator<? super TYPE> evaluator) {
 
         mEvaluator = evaluator;

@@ -92,7 +92,9 @@ class WeakLeap<SOURCE, IN, OUT> implements Leap<SOURCE, IN, OUT> {
             return false;
         }
 
-        return mLeap.equals(weakLeap.mLeap);
+        final Leap leap = mLeap.get();
+
+        return (leap == null) ? (weakLeap.mLeap.get() == null) : leap.equals(weakLeap.mLeap.get());
     }
 
     @Override

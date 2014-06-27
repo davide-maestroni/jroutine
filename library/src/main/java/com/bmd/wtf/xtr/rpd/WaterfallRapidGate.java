@@ -212,6 +212,20 @@ public class WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallR
     }
 
     @Override
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> immediately() {
+
+        if (mTimeoutMs != 0) {
+
+            return new WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE>(mMouthWaterfall,
+                                                                        mClassification, 0,
+                                                                        mTimeoutException,
+                                                                        mEvaluator);
+        }
+
+        return this;
+    }
+
+    @Override
     public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> meets(
             final ConditionEvaluator<? super TYPE> evaluator) {
 

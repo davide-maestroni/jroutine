@@ -43,6 +43,9 @@ public interface RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends Gate<TYPE>, Riv
     public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> eventuallyThrow(RuntimeException exception);
 
     @Override
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> immediately();
+
+    @Override
     public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> meets(
             ConditionEvaluator<? super TYPE> evaluator);
 

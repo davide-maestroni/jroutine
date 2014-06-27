@@ -53,6 +53,13 @@ public interface Gate<TYPE> {
     public Gate<TYPE> eventuallyThrow(RuntimeException exception);
 
     /**
+     * Tells the collector to fail if the condition is not immediately met.
+     *
+     * @return This collector.
+     */
+    public Gate<TYPE> immediately();
+
+    /**
      * Sets the condition to be met by the leap backing this gate.
      * <p/>
      * A null condition (as by default) is always immediately met.

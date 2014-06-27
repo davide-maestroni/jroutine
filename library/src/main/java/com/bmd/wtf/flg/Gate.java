@@ -16,27 +16,93 @@ package com.bmd.wtf.flg;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * A gate instance allows to access a leap instance chained to the waterfall in a thread safe way.
+ * <p/>
  * Created by davide on 6/13/14.
+ *
+ * @param <TYPE> The backed leap type.
  */
 public interface Gate<TYPE> {
 
+    /**
+     * Tells the gate to fail if the condition is not met before the specified time has elapsed.
+     *
+     * @param maxDelay The maximum delay in the specified time unit.
+     * @param timeUnit The delay time unit.
+     * @return This gate.
+     * @see #meets(ConditionEvaluator)
+     */
     public Gate<TYPE> afterMax(long maxDelay, TimeUnit timeUnit);
 
+    /**
+     * Tells the gate to wait indefinitely for the condition to be met.
+     *
+     * @return This gate.
+     * @see #meets(ConditionEvaluator)
+     */
     public Gate<TYPE> eventually();
 
+    /**
+     * Tells the gate to throw the specified exception if the maximum delay elapses before the
+     * condition is met.
+     *
+     * @param exception The exception to be thrown.
+     * @return This gate.
+     * @see #meets(ConditionEvaluator)
+     */
     public Gate<TYPE> eventuallyThrow(RuntimeException exception);
 
+    /**
+     * Sets the condition to be met by the leap backing this gate.
+     * <p/>
+     * A null condition (as by default) is always immediately met.
+     *
+     * @param evaluator The condition evaluator.
+     * @return This gate.
+     */
     public Gate<TYPE> meets(ConditionEvaluator<? super TYPE> evaluator);
 
+    /**
+     * Performs the specified action by passing the variadic arguments as parameters.
+     *
+     * @param action   The action to perform on the leap backing this gate.
+     * @param args     The action arguments.
+     * @param <RESULT> The result type.
+     * @return The action result.
+     */
     public <RESULT> RESULT perform(Action<RESULT, ? super TYPE> action, Object... args);
 
+    /**
+     * Interface defining an action to be performed on the backed leap.
+     *
+     * @param <RESULT> The result type.
+     * @param <TYPE>   The leap type.
+     */
     public interface Action<RESULT, TYPE> {
 
+        /**
+         * Performs this action on the specified leap.
+         *
+         * @param leap The leap instance.
+         * @param args The action arguments.
+         * @return The action result.
+         */
         public RESULT doOn(TYPE leap, Object... args);
     }
 
+    /**
+     * Condition evaluator.
+     *
+     * @param <TYPE> The leap type.
+     */
     public interface ConditionEvaluator<TYPE> {
 
+        /**
+         * Checks if this condition is satisfied by the specified leap.
+         *
+         * @param leap The leap instance.
+         * @return Whether the condition is satisfied.
+         */
         public boolean isSatisfied(TYPE leap);
     }
 }

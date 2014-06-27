@@ -8,9 +8,11 @@ import java.util.List;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
+ * Unit tests for classification objects.
+ * <p/>
  * Created by davide on 6/15/14.
  */
-public class GlassTest extends TestCase {
+public class ClassificationTest extends TestCase {
 
     public void testType() {
 

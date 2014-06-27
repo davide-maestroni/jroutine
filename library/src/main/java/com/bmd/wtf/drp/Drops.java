@@ -23,6 +23,8 @@ import java.util.ListIterator;
  * Helper class providing utility methods to convert native arrays in object lists.
  * <p/>
  * Created by davide on 6/12/14.
+ *
+ * @param <DATA> The list element type.
  */
 public class Drops<DATA> implements List<DATA> {
 

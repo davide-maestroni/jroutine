@@ -16,7 +16,7 @@ package com.bmd.wtf.flw;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Basic component of the {@link com.bmd.wtf.fll.Waterfall}.
+ * Basic component of the waterfall.
  * <p/>
  * A stream defines the way the data are fed into the waterfall, and it represents the link
  * between to falls.

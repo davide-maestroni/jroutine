@@ -18,7 +18,7 @@ import com.bmd.wtf.flw.Fall;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Basic component of a {@link com.bmd.wtf.fll.Waterfall}.
+ * Basic component of a waterfall.
  * <p/>
  * A current is responsible for transporting a flow of data feeding a {@link com.bmd.wtf.flw.Fall}.
  * <p/>

@@ -13,9 +13,9 @@
  */
 package com.bmd.wtf.xtr.rpd;
 
-import com.bmd.wtf.flg.Gate;
 import com.bmd.wtf.fll.Classification;
 import com.bmd.wtf.fll.Waterfall;
+import com.bmd.wtf.flw.Gate;
 import com.bmd.wtf.flw.River;
 
 import java.util.concurrent.TimeUnit;

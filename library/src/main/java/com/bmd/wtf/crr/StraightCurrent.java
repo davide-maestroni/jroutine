@@ -19,7 +19,7 @@ import com.bmd.wtf.flw.Fall;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Synchronous implementation of a {@link com.bmd.wtf.crr.Current}.
+ * Synchronous implementation of a {@link Current}.
  * <p/>
  * Since the calls are synchronous, delayed operations makes the calling thread to sleep for the
  * required time.

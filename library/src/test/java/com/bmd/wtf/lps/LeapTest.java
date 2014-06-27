@@ -11,9 +11,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.bmd.wtf.lps;
+
+import junit.framework.TestCase;
+
 /**
- * Package containing floodgate classes and definitions.
+ * Unit tests for leap classes.
  * <p/>
  * Created by davide on 6/27/14.
  */
-package com.bmd.wtf.flg;
+public class LeapTest extends TestCase {
+
+}

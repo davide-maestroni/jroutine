@@ -27,7 +27,7 @@ import static org.fest.assertions.api.Assertions.assertThat;
  * <p/>
  * Created by davide on 6/25/14.
  */
-public class DropsTest extends TestCase {
+public class DropTest extends TestCase {
 
     public void testBooleans() {
 

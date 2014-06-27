@@ -14,11 +14,13 @@
 package com.bmd.wtf.lps;
 
 /**
- * Utility class for creating {@link com.bmd.wtf.lps.Leap} instances.
+ * Utility class for creating {@link Leap} instances.
  * <p/>
  * Created by davide on 6/8/14.
  */
 public class Leaps {
+
+    private static FreeLeap<?, ?> sFreeLeap;
 
     /**
      * Protected constructor to avoid direct instantiation.
@@ -27,11 +29,31 @@ public class Leaps {
 
     }
 
+    /**
+     * Creates and returns a leap retaining the specified instance through a weak reference.
+     *
+     * @param leap     The wrapped leap instance.
+     * @param <SOURCE> The river source data type.
+     * @param <IN>     The input data type.
+     * @param <OUT>    The output data type.
+     * @return The wrapping leap.
+     */
     public static <SOURCE, IN, OUT> Leap<SOURCE, IN, OUT> weak(final Leap<SOURCE, IN, OUT> leap) {
 
         return new WeakLeap<SOURCE, IN, OUT>(leap);
     }
 
+    /**
+     * Creates and returns a leap retaining the specified instance through a weak reference.
+     *
+     * @param leap             The wrapped leap instance.
+     * @param freeWhenVanished Whether the wrapping leap must behave like a free one after the
+     *                         retained instance has vanished.
+     * @param <SOURCE>         The river source data type.
+     * @param <IN>             The input data type.
+     * @param <OUT>            The output data type.
+     * @return The wrapping leap.
+     */
     public static <SOURCE, IN, OUT> Leap<SOURCE, IN, OUT> weak(final Leap<SOURCE, IN, OUT> leap,
             final boolean freeWhenVanished) {
 

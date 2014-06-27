@@ -16,12 +16,23 @@ package com.bmd.wtf.lps;
 import com.bmd.wtf.flw.River;
 
 /**
+ * {@link Leap} decorator class.
+ * <p/>
  * Created by davide on 6/8/14.
+ *
+ * @param <SOURCE> The river source data type.
+ * @param <IN>     The input data type.
+ * @param <OUT>    The output data type.
  */
 public class LeapDecorator<SOURCE, IN, OUT> implements Leap<SOURCE, IN, OUT> {
 
     private final Leap<SOURCE, IN, OUT> mLeap;
 
+    /**
+     * Default constructor.
+     *
+     * @param wrapped The decorated instance.
+     */
     public LeapDecorator(final Leap<SOURCE, IN, OUT> wrapped) {
 
         if (wrapped == null) {

@@ -13,8 +13,8 @@
  */
 package com.bmd.wtf.xtr.dam;
 
-import com.bmd.wtf.flg.Gate;
-import com.bmd.wtf.flg.Gate.ConditionEvaluator;
+import com.bmd.wtf.flw.Gate;
+import com.bmd.wtf.flw.Gate.ConditionEvaluator;
 import com.bmd.wtf.flw.River;
 import com.bmd.wtf.lps.Leap;
 

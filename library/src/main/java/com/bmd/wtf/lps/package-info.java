@@ -13,8 +13,8 @@
  */
 
 /**
- * Package containing helper classes for handling data drops.
+ * Package containing classes and definitions related to waterfall leaps.
  * <p/>
- * Created by davide on 6/25/14.
+ * Created by davide on 6/27/14.
  */
-package com.bmd.wtf.drp;
+package com.bmd.wtf.lps;

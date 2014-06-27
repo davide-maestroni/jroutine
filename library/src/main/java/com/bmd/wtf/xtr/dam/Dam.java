@@ -13,11 +13,11 @@
  */
 package com.bmd.wtf.xtr.dam;
 
-import com.bmd.wtf.flg.Gate;
-import com.bmd.wtf.flg.Gate.Action;
 import com.bmd.wtf.fll.Classification;
 import com.bmd.wtf.fll.Waterfall;
 import com.bmd.wtf.fll.WaterfallRiver;
+import com.bmd.wtf.flw.Gate;
+import com.bmd.wtf.flw.Gate.Action;
 import com.bmd.wtf.xtr.dam.DamBasin.BasinEvaluator;
 
 import java.util.List;
@@ -275,26 +275,6 @@ public class Dam<SOURCE, DATA> extends WaterfallRiver<SOURCE, SOURCE> {
     }
 
     @Override
-    public void drain() {
-
-        mOutWaterfall.drain(false);
-    }
-
-    @Override
-    public void drain(final int streamNumber) {
-
-        mOutWaterfall.drain(streamNumber, false);
-    }
-
-    @Override
-    public Dam<SOURCE, DATA> discharge(final int streamNumber) {
-
-        super.discharge(streamNumber);
-
-        return this;
-    }
-
-    @Override
     public Dam<SOURCE, DATA> discharge() {
 
         super.discharge();
@@ -359,6 +339,26 @@ public class Dam<SOURCE, DATA> extends WaterfallRiver<SOURCE, SOURCE> {
         super.pushAfter(delay, timeUnit, drops);
 
         return this;
+    }
+
+    @Override
+    public Dam<SOURCE, DATA> discharge(final int streamNumber) {
+
+        super.discharge(streamNumber);
+
+        return this;
+    }
+
+    @Override
+    public void drain() {
+
+        mOutWaterfall.drain(false);
+    }
+
+    @Override
+    public void drain(final int streamNumber) {
+
+        mOutWaterfall.drain(streamNumber, false);
     }
 
     @Override

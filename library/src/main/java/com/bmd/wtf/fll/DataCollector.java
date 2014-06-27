@@ -13,9 +13,9 @@
  */
 package com.bmd.wtf.fll;
 
-import com.bmd.wtf.flg.Gate;
-import com.bmd.wtf.flg.Gate.ConditionEvaluator;
 import com.bmd.wtf.flw.Collector;
+import com.bmd.wtf.flw.Gate;
+import com.bmd.wtf.flw.Gate.ConditionEvaluator;
 
 import java.util.ArrayList;
 import java.util.List;

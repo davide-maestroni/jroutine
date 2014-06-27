@@ -14,11 +14,19 @@
 package com.bmd.wtf.crr;
 
 /**
- * A generator of {@link com.bmd.wtf.crr.Current} instances.
+ * A generator of {@link Current} instances.
  * <p/>
  * Created by davide on 6/10/14.
  */
 public interface CurrentGenerator {
 
+    /**
+     * Returns the current for the specified fall.
+     * <p/>
+     * Note that the same instance can be returned for different falls.
+     *
+     * @param fallNumber The number identifying the fall.
+     * @return The current.
+     */
     public Current create(int fallNumber);
 }

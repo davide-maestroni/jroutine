@@ -13,8 +13,8 @@
  */
 package com.bmd.wtf.xtr.rpd;
 
-import com.bmd.wtf.flg.Gate;
 import com.bmd.wtf.fll.Classification;
+import com.bmd.wtf.flw.Gate;
 import com.bmd.wtf.flw.River;
 import com.bmd.wtf.lps.Leap;
 import com.bmd.wtf.xtr.rpd.RapidAnnotations.OnData;
@@ -497,7 +497,10 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
 
                 if (isAnnotated) {
 
-                    throw new IllegalArgumentException(); //TODO
+                    throw new IllegalArgumentException(
+                            "invalid annotated method: " + method + "\nAn " + OnData.class
+                                    .getSimpleName() + " method must take a single parameter"
+                    );
 
                 } else {
 
@@ -536,7 +539,10 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
 
             if ((currentMethod != null) && !currentMethod.equals(method)) {
 
-                throw new IllegalArgumentException(); //TODO
+                throw new IllegalArgumentException(
+                        "cannot override a method already handling data of type: " + parameterType
+                                .getSimpleName()
+                );
             }
 
             if (!method.isAccessible()) {
@@ -562,7 +568,10 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
 
                 if (isAnnotated) {
 
-                    throw new IllegalArgumentException(); //TODO
+                    throw new IllegalArgumentException(
+                            "invalid annotated method: " + method + "\nAn " + OnDischarge.class
+                                    .getSimpleName() + " method must take no parameters"
+                    );
 
                 } else {
 
@@ -579,7 +588,8 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
 
             if ((onDischarge != null) && !onDischarge.equals(method)) {
 
-                throw new IllegalArgumentException(); //TODO
+                throw new IllegalArgumentException(
+                        "cannot override a method already handling data discharge");
             }
 
             if (!method.isAccessible()) {
@@ -605,7 +615,10 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
 
                 if (isAnnotated) {
 
-                    throw new IllegalArgumentException(); //TODO
+                    throw new IllegalArgumentException(
+                            "invalid annotated method: " + method + "\nAn " + OnData.class
+                                    .getSimpleName() + " method must take a single parameter"
+                    );
 
                 } else {
 
@@ -622,7 +635,8 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
 
             if ((onNull != null) && !onNull.equals(method)) {
 
-                throw new IllegalArgumentException(); //TODO
+                throw new IllegalArgumentException(
+                        "cannot override a method already handling null data");
             }
 
             if (!method.isAccessible()) {

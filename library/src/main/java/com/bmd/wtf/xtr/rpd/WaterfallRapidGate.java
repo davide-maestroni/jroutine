@@ -13,10 +13,10 @@
  */
 package com.bmd.wtf.xtr.rpd;
 
-import com.bmd.wtf.flg.Gate;
 import com.bmd.wtf.fll.Classification;
 import com.bmd.wtf.fll.Waterfall;
 import com.bmd.wtf.fll.WaterfallRiver;
+import com.bmd.wtf.flw.Gate;
 import com.bmd.wtf.xtr.rpd.RapidAnnotations.Condition;
 
 import java.lang.reflect.InvocationHandler;
@@ -262,14 +262,6 @@ public class WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallR
     }
 
     @Override
-    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> discharge(final int streamNumber) {
-
-        super.discharge(streamNumber);
-
-        return this;
-    }
-
-    @Override
     public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> discharge() {
 
         super.discharge();
@@ -332,6 +324,14 @@ public class WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallR
             final TimeUnit timeUnit, final IN... drops) {
 
         super.pushAfter(delay, timeUnit, drops);
+
+        return this;
+    }
+
+    @Override
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> discharge(final int streamNumber) {
+
+        super.discharge(streamNumber);
 
         return this;
     }

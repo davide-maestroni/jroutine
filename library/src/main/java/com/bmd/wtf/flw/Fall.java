@@ -14,8 +14,8 @@
 package com.bmd.wtf.flw;
 
 /**
- * A pool instance gives a {@link com.bmd.wtf.crr.Current} a way to discharge data into the
- * {@link com.bmd.wtf.fll.Waterfall} flow.
+ * A fall instance gives a {@link com.bmd.wtf.crr.Current} a way to discharge data into the
+ * waterfall flow.
  * <p/>
  * Its methods must be called as a result of the invocation of the relative current ones, inside
  * the thread or queue handled by the specific implementation.

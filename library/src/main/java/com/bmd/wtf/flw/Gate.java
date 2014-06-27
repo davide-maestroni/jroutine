@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.wtf.flg;
+package com.bmd.wtf.flw;
 
 import java.util.concurrent.TimeUnit;
 

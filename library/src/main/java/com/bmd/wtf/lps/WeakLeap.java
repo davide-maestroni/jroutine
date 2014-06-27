@@ -18,6 +18,8 @@ import com.bmd.wtf.flw.River;
 import java.lang.ref.WeakReference;
 
 /**
+ * {@link Leap} implementation which retains a weak reference of the wrapped instance.
+ * <p/>
  * Created by davide on 6/8/14.
  */
 class WeakLeap<SOURCE, IN, OUT> implements Leap<SOURCE, IN, OUT> {
@@ -26,11 +28,23 @@ class WeakLeap<SOURCE, IN, OUT> implements Leap<SOURCE, IN, OUT> {
 
     private final WeakReference<Leap<SOURCE, IN, OUT>> mLeap;
 
+    /**
+     * Default constructor.
+     *
+     * @param wrapped The wrapped leap.
+     */
     public WeakLeap(final Leap<SOURCE, IN, OUT> wrapped) {
 
         this(wrapped, true);
     }
 
+    /**
+     * Parametrized constructor.
+     *
+     * @param wrapped          The wrapped leap.
+     * @param freeWhenVanished Whether this instance must behave like a free leap after the
+     *                         wrapped instance is garbage collected.
+     */
     public WeakLeap(final Leap<SOURCE, IN, OUT> wrapped, final boolean freeWhenVanished) {
 
         if (wrapped == null) {

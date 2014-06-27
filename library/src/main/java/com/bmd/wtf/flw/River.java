@@ -13,18 +13,36 @@
  */
 package com.bmd.wtf.flw;
 
-import com.bmd.wtf.flg.Gate;
 import com.bmd.wtf.fll.Classification;
 
 import java.util.concurrent.TimeUnit;
 
 /**
+ * A river object represents a collection of streams merging the same waterfall into or originating
+ * from the same fall.
+ * <p/>
  * Created by davide on 6/7/14.
+ *
+ * @param <SOURCE> The source data type.
+ * @param <DATA>   The data type.
  */
 public interface River<SOURCE, DATA> extends Stream<DATA> {
 
+    /**
+     * Deviates the flow of the river by effectively preventing any coming data to be pushed
+     * further downstream.
+     *
+     * @see #deviate(int)
+     */
     public void deviate();
 
+    /**
+     * Deviates the flow of the specified river stream by effectively preventing any coming data
+     * to be pushed further downstream.
+     *
+     * @param streamNumber The number identifying the target stream.
+     * @see #deviate()
+     */
     public void deviate(int streamNumber);
 
     @Override
@@ -52,34 +70,135 @@ public interface River<SOURCE, DATA> extends Stream<DATA> {
     @Override
     public River<SOURCE, DATA> pushAfter(long delay, TimeUnit timeUnit, DATA... drops);
 
+    /**
+     * Discharges the specific river stream, that is, it informs the fed fall that no more data
+     * drops are likely to come.
+     * <p/>
+     * Be aware that the call may block until the fall discharges all the data drops, including
+     * the delayed ones.
+     *
+     * @param streamNumber The number identifying the target stream.
+     * @return This river.
+     */
     public River<SOURCE, DATA> discharge(int streamNumber);
 
+    /**
+     * Drains the river by removing from the waterfall all the falls and rivers fed only by this
+     * one.
+     */
     public void drain();
 
+    /**
+     * Drains the specified river stream by removing from the waterfall all the falls and rivers
+     * fed only by the specific stream.
+     *
+     * @param streamNumber The number identifying the target stream.
+     */
     public void drain(int streamNumber);
 
+    /**
+     * Forwards the specified unhandled exception into the specific river stream flow.
+     *
+     * @param streamNumber The number identifying the target stream.
+     * @param throwable    The thrown exception.
+     * @return This river.
+     */
     public River<SOURCE, DATA> forward(int streamNumber, Throwable throwable);
 
+    /**
+     * Pushes the specified data into the specific river stream flow.
+     *
+     * @param streamNumber The number identifying the target stream.
+     * @param drops        The data drops.
+     * @return This stream.
+     */
     public River<SOURCE, DATA> push(int streamNumber, DATA... drops);
 
+    /**
+     * Pushes the data returned by the specified iterable into the specific river stream flow.
+     *
+     * @param streamNumber The number identifying the target stream.
+     * @param drops        The data drops iterable.
+     * @return This stream.
+     */
     public River<SOURCE, DATA> push(int streamNumber, Iterable<? extends DATA> drops);
 
+    /**
+     * Pushes the specified data into the specific river stream flow.
+     *
+     * @param streamNumber The number identifying the target stream.
+     * @param drop         The data drop.
+     * @return This stream.
+     */
     public River<SOURCE, DATA> push(int streamNumber, DATA drop);
 
+    /**
+     * Pushes the data returned by the specified iterable into the specific river stream flow,
+     * after the specified time has elapsed.
+     *
+     * @param streamNumber The number identifying the target stream.
+     * @param delay        The delay in <code>timeUnit</code> time units.
+     * @param timeUnit     The delay time unit.
+     * @param drops        The data drops iterable.
+     * @return This stream.
+     */
     public River<SOURCE, DATA> pushAfter(int streamNumber, long delay, TimeUnit timeUnit,
             Iterable<? extends DATA> drops);
 
+    /**
+     * Pushes the specified data into the specific river stream flow, after the specified time has
+     * elapsed.
+     *
+     * @param streamNumber The number identifying the target stream.
+     * @param delay        The delay in <code>timeUnit</code> time units.
+     * @param timeUnit     The delay time unit.
+     * @param drop         The data drop.
+     * @return This stream.
+     */
     public River<SOURCE, DATA> pushAfter(int streamNumber, long delay, TimeUnit timeUnit,
             DATA drop);
 
+    /**
+     * Pushes the specified data into the specific river stream flow, after the specified time has
+     * elapsed.
+     *
+     * @param streamNumber The number identifying the target stream.
+     * @param delay        The delay in <code>timeUnit</code> time units.
+     * @param timeUnit     The delay time unit.
+     * @param drops        The data drops.
+     * @return This stream.
+     */
     public River<SOURCE, DATA> pushAfter(int streamNumber, long delay, TimeUnit timeUnit,
             DATA... drops);
 
     public int size();
 
+    /**
+     * Returns the river source.
+     *
+     * @return The river source.
+     */
     public River<SOURCE, SOURCE> source();
 
+    /**
+     * Returns a gate handling a specific leap.
+     * <p/>
+     * If no gate can be created an exception will be thrown.
+     *
+     * @param gateType The gate type.
+     * @param <TYPE>   The leap type.
+     * @return The gate.
+     */
     public <TYPE> Gate<TYPE> when(Class<TYPE> gateType);
 
+    /**
+     * Returns a gate handling a specific leap.
+     * <p/>
+     * If no gate can be created an exception will be thrown.
+     *
+     * @param gateClassification The gate classification.
+     * @param <TYPE>             The leap type.
+     * @return The gate.
+     */
     public <TYPE> Gate<TYPE> when(Classification<TYPE> gateClassification);
 }

@@ -14,7 +14,7 @@
 package com.bmd.wtf.crr;
 
 /**
- * Utility class for {@link com.bmd.wtf.crr.Current} instances.
+ * Utility class for {@link Current} instances.
  * <p/>
  * Created by davide on 6/8/14.
  */
@@ -30,7 +30,7 @@ public class Currents {
     }
 
     /**
-     * Returns a new {@link com.bmd.wtf.crr.ThreadPoolCurrent} instance.
+     * Returns a new {@link ThreadPoolCurrent} instance.
      *
      * @param poolSize The maximum size of the thread pool.
      * @return The new instance.
@@ -41,7 +41,7 @@ public class Currents {
     }
 
     /**
-     * Returns the default {@link com.bmd.wtf.crr.StraightCurrent} instance.
+     * Returns the default {@link StraightCurrent} instance.
      *
      * @return The instance.
      */

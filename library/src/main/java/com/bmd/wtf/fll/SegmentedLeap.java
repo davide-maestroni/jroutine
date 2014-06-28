@@ -20,7 +20,7 @@ import com.bmd.wtf.lps.LeapDecorator;
 /**
  * Created by davide on 6/14/14.
  */
-public class SegmentedLeap<SOURCE, IN, OUT> extends LeapDecorator<SOURCE, IN, OUT> {
+class SegmentedLeap<SOURCE, IN, OUT> extends LeapDecorator<SOURCE, IN, OUT> {
 
     private final Object mMutex = new Object();
 

@@ -34,7 +34,16 @@ import java.util.WeakHashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * Here is where everything starts.
+ * <p/>
+ * Each waterfall instance retains a reference to its source so to be available during the building
+ * chain.
+ * <p/>
  * Created by davide on 6/4/14.
+ *
+ * @param <SOURCE> The waterfall source data type.
+ * @param <IN>     The input data type.
+ * @param <OUT>    The output data type.
  */
 public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
@@ -200,6 +209,11 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         mFalls = (DataFall<SOURCE, IN, OUT>[]) falls;
     }
 
+    /**
+     * Creates and returns a new waterfall composed by a single synchronous stream.
+     *
+     * @return The newly created waterfall.
+     */
     public static Waterfall<Object, Object, Object> create() {
 
         final Map<Classification<?>, GateLeap<?, ?, ?>> gateMap = Collections.emptyMap();
@@ -209,6 +223,13 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
                                                      Currents.straight(), null, NO_FALL);
     }
 
+    /**
+     * Lazily creates and return a singleton free leap instance.
+     *
+     * @param <SOURCE> The source data type.
+     * @param <DATA>   The data type.
+     * @return The free leap instance.
+     */
     private static <SOURCE, DATA> FreeLeap<SOURCE, DATA> freeLeap() {
 
         if (sFreeLeap == null) {
@@ -220,6 +241,14 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         return (FreeLeap<SOURCE, DATA>) sFreeLeap;
     }
 
+    /**
+     * Links an input and an output fall through a data stream.
+     *
+     * @param inFall  The input fall.
+     * @param outFall The output fall.
+     * @param <DATA>  The data type.
+     * @return The data stream running between the two falls.
+     */
     private static <DATA> DataStream<DATA> link(final DataFall<?, ?, DATA> inFall,
             final DataFall<?, DATA, ?> outFall) {
 
@@ -231,6 +260,12 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         return stream;
     }
 
+    /**
+     * Registers the specified leap instance by making sure it is unique among all the created
+     * waterfalls.
+     *
+     * @param leap The leap to register.
+     */
     private static void registerLeap(final Leap<?, ?, ?> leap) {
 
         if (sLeaps.containsKey(leap)) {
@@ -241,11 +276,24 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         sLeaps.put(leap, null);
     }
 
+    /**
+     * Tells the waterfall to build a gate of the specified type around the next leap chained to it.
+     *
+     * @param gateType The gate type.
+     * @return The newly created waterfall.
+     */
     public Waterfall<SOURCE, IN, OUT> as(final Class<?> gateType) {
 
         return as(Classification.from(gateType));
     }
 
+    /**
+     * Tells the waterfall to build a gate of the specified classification type around the next
+     * leap chained to it.
+     *
+     * @param gateClassification The gate classification.
+     * @return The newly created waterfall.
+     */
     public Waterfall<SOURCE, IN, OUT> as(final Classification<?> gateClassification) {
 
         if (gateClassification == null) {
@@ -258,20 +306,41 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
                                               mSize, mCurrent, mCurrentGenerator, mFalls);
     }
 
+    /**
+     * Tells the waterfall to build a gate around the next leap chained to it.
+     * <p/>
+     * The gate type will be the same as the leap raw type.
+     *
+     * @return The newly created waterfall.
+     */
     public Waterfall<SOURCE, IN, OUT> asGate() {
 
         return as(SELF_CLASSIFICATION);
     }
 
+    /**
+     * Tells the waterfall to break the gate of the specified classification type.
+     *
+     * @param gateClassification The gate classification.
+     * @param <TYPE>             The gate type.
+     * @return The newly created waterfall.
+     */
     public <TYPE> Waterfall<SOURCE, IN, OUT> breakDown(
             final Classification<TYPE> gateClassification) {
 
         return breakDown(when(gateClassification));
     }
 
-    public <TYPE> Waterfall<SOURCE, IN, OUT> breakDown(final TYPE gateType) {
+    /**
+     * Tells the waterfall to break the specified gate.
+     *
+     * @param gate   The gate.
+     * @param <TYPE> The gate type.
+     * @return The newly created waterfall.
+     */
+    public <TYPE> Waterfall<SOURCE, IN, OUT> breakDown(final TYPE gate) {
 
-        if (gateType == null) {
+        if (gate == null) {
 
             return this;
         }
@@ -285,7 +354,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
         while (iterator.hasNext()) {
 
-            if (gateType == iterator.next()) {
+            if (gate == iterator.next()) {
 
                 iterator.remove();
 
@@ -303,6 +372,12 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
                                               mCurrentGenerator, mFalls);
     }
 
+    /**
+     * Chains the specified waterfall to this one. After the call, all the data flowing through
+     * this waterfall will be pushed into the target one.
+     *
+     * @param waterfall The waterfall to chain.
+     */
     public void chain(final Waterfall<?, OUT, ?> waterfall) {
 
         if (this == waterfall) {
@@ -381,6 +456,17 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         }
     }
 
+    /**
+     * Chains the leap protected by the gate of the specified classification type to this
+     * waterfall.
+     * <p/>
+     * Note that contrary to common leap, the ones protected by a gate can be added several times
+     * to the same waterfall.
+     *
+     * @param gateClassification The gate classification.
+     * @param <NOUT>             The new output data type.
+     * @return The newly created waterfall.
+     */
     public <NOUT> Waterfall<SOURCE, OUT, NOUT> chain(
             final Classification<? extends Leap<SOURCE, OUT, NOUT>> gateClassification) {
 
@@ -465,6 +551,11 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         return waterfall;
     }
 
+    /**
+     * Chains a free leap to this waterfall.
+     *
+     * @return The newly created waterfall.
+     */
     public Waterfall<SOURCE, OUT, OUT> chain() {
 
         final DataFall<SOURCE, IN, OUT>[] falls = mFalls;
@@ -544,6 +635,16 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         return waterfall;
     }
 
+    /**
+     * Chains the specified leap to this waterfall.
+     * <p/>
+     * Note that in case this waterfall is composed by more then one data stream, all the data
+     * flowing through them will be passed to the specified leap.
+     *
+     * @param leap   The leap instance.
+     * @param <NOUT> The new output data type.
+     * @return The newly created waterfall.
+     */
     public <NOUT> Waterfall<SOURCE, OUT, NOUT> chain(final Leap<SOURCE, OUT, NOUT> leap) {
 
         if (leap == null) {
@@ -630,6 +731,16 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         return waterfall;
     }
 
+    /**
+     * Chains the leaps returned by the specified generator to this waterfall.
+     * <p/>
+     * Note that in case this waterfall is composed by more then one data stream, each leap created
+     * by the generator will handle a single stream.
+     *
+     * @param generator The leap generator.
+     * @param <NOUT>    The new output data type.
+     * @return The newly created waterfall.
+     */
     public <NOUT> Waterfall<SOURCE, OUT, NOUT> chain(
             final LeapGenerator<SOURCE, OUT, NOUT> generator) {
 
@@ -997,6 +1108,13 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         return new DataGate<TYPE>(leap, gateClassification);
     }
 
+    /**
+     * Deviates the flow of this waterfall, either downstream or upstream, by effectively
+     * preventing any coming data to be pushed further.
+     *
+     * @param downStream Whether the waterfall must be deviated downstream.
+     * @see #deviate(int, boolean)
+     */
     public void deviate(final boolean downStream) {
 
         if (downStream) {
@@ -1015,6 +1133,14 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         }
     }
 
+    /**
+     * Deviates the flow of the specified waterfall stream, either downstream or upstream, by
+     * effectively preventing any coming data to be pushed further.
+     *
+     * @param streamNumber The number identifying the target stream.
+     * @param downStream   Whether the waterfall must be deviated downstream.
+     * @see #deviate(boolean)
+     */
     public void deviate(final int streamNumber, final boolean downStream) {
 
         if (downStream) {
@@ -1032,6 +1158,12 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         }
     }
 
+    /**
+     * Equally distributes all the data flowing through this waterfall in the different output
+     * streams.
+     *
+     * @return The newly created waterfall.
+     */
     public Waterfall<SOURCE, OUT, OUT> distribute() {
 
         final DataFall<SOURCE, IN, OUT>[] falls = mFalls;
@@ -1052,6 +1184,13 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         return in(1).chainBarrage(new Barrage<SOURCE, OUT>(size)).in(size);
     }
 
+    /**
+     * Drains the waterfall, either downstream or upstream, by removing all the falls and rivers
+     * fed only by this waterfall streams.
+     *
+     * @param downStream Whether the waterfall must be deviated downstream.
+     * @see #drain(int, boolean)
+     */
     public void drain(final boolean downStream) {
 
         if (downStream) {
@@ -1070,6 +1209,14 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         }
     }
 
+    /**
+     * Drains the specified waterfall stream, either downstream or upstream, by removing from all
+     * the falls and rivers fed only by the specific stream.
+     *
+     * @param streamNumber The number identifying the target stream.
+     * @param downStream   Whether the waterfall must be deviated downstream.
+     * @see #drain(boolean)
+     */
     public void drain(final int streamNumber, final boolean downStream) {
 
         if (downStream) {
@@ -1087,11 +1234,17 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         }
     }
 
+    /**
+     * Makes the waterfall streams flow through the currents returned by the specified generator.
+     *
+     * @param generator The current generator
+     * @return The newly created waterfall.
+     */
     public Waterfall<SOURCE, IN, OUT> in(final CurrentGenerator generator) {
 
         if (generator == null) {
 
-            throw new IllegalArgumentException("the waterfalll current generator cannot be null");
+            throw new IllegalArgumentException("the waterfall current generator cannot be null");
         }
 
         //noinspection unchecked
@@ -1099,6 +1252,12 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
                                               generator, mFalls);
     }
 
+    /**
+     * Splits the waterfall in the specified number of streams.
+     *
+     * @param fallCount The total fall count generating the waterfall.
+     * @return The newly created waterfall.
+     */
     public Waterfall<SOURCE, IN, OUT> in(final int fallCount) {
 
         if (fallCount <= 0) {
@@ -1111,6 +1270,12 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
                                               mCurrent, mCurrentGenerator, mFalls);
     }
 
+    /**
+     * Makes the waterfall streams flow through the specified current.
+     *
+     * @param current The current.
+     * @return The newly created waterfall.
+     */
     public Waterfall<SOURCE, IN, OUT> in(final Current current) {
 
         if (current == null) {
@@ -1123,6 +1288,13 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
                                               null, mFalls);
     }
 
+    /**
+     * Makes the waterfall streams flow through a background current with the specified thread pool
+     * size.
+     *
+     * @param poolSize The pool size.
+     * @return The newly created waterfall.
+     */
     public Waterfall<SOURCE, IN, OUT> inBackground(final int poolSize) {
 
         //noinspection unchecked
@@ -1130,6 +1302,14 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
                                               Currents.pool(poolSize), null, mFalls);
     }
 
+    /**
+     * Makes the waterfall streams flow through a background current.
+     * <p/>
+     * The optimum thead pool size will be automatically computed based on the available resources
+     * and the waterfall size.
+     *
+     * @return The newly created waterfall.
+     */
     public Waterfall<SOURCE, IN, OUT> inBackground() {
 
         final int processors = Runtime.getRuntime().availableProcessors();
@@ -1148,6 +1328,11 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         return inBackground(poolSize);
     }
 
+    /**
+     * Creates and returns a new data collector after discharging this waterfall source.
+     *
+     * @return The collector.
+     */
     public Collector<OUT> pull() {
 
         final CollectorLeap<SOURCE, OUT> collectorLeap = new CollectorLeap<SOURCE, OUT>();
@@ -1158,6 +1343,13 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         return new DataCollector<SOURCE, OUT>(gateLeap, collectorLeap);
     }
 
+    /**
+     * Creates and returns a new data collector after pushing the specified data into this
+     * waterfall source and then discharging it.
+     *
+     * @param source The source data.
+     * @return The collector.
+     */
     public Collector<OUT> pull(final SOURCE source) {
 
         final CollectorLeap<SOURCE, OUT> collectorLeap = new CollectorLeap<SOURCE, OUT>();
@@ -1168,6 +1360,13 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         return new DataCollector<SOURCE, OUT>(gateLeap, collectorLeap);
     }
 
+    /**
+     * Creates and returns a new data collector after pushing the specified data into this
+     * waterfall source and then discharging it.
+     *
+     * @param sources The source data.
+     * @return The collector.
+     */
     public Collector<OUT> pull(final SOURCE... sources) {
 
         final CollectorLeap<SOURCE, OUT> collectorLeap = new CollectorLeap<SOURCE, OUT>();
@@ -1178,6 +1377,13 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         return new DataCollector<SOURCE, OUT>(gateLeap, collectorLeap);
     }
 
+    /**
+     * Creates and returns a new data collector after pushing the data returned by the specified
+     * iterable into this waterfall source and then discharging it.
+     *
+     * @param sources The source data iterable.
+     * @return The collector.
+     */
     public Collector<OUT> pull(final Iterable<SOURCE> sources) {
 
         final CollectorLeap<SOURCE, OUT> collectorLeap = new CollectorLeap<SOURCE, OUT>();
@@ -1188,6 +1394,11 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         return new DataCollector<SOURCE, OUT>(gateLeap, collectorLeap);
     }
 
+    /**
+     * Creates and returns a new waterfall with the same size of this one.
+     *
+     * @return The newly created waterfall.
+     */
     public Waterfall<OUT, OUT, OUT> start() {
 
         final int size = mSize;
@@ -1205,11 +1416,25 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
                                             mCurrentGenerator, leaps);
     }
 
+    /**
+     * Creates and returns a new waterfall with the same size of this one.
+     *
+     * @param dataType The data type.
+     * @param <DATA>   The data type.
+     * @return The newly created waterfall.
+     */
     public <DATA> Waterfall<DATA, DATA, DATA> start(final Class<DATA> dataType) {
 
         return start(Classification.from(dataType));
     }
 
+    /**
+     * Creates and returns a new waterfall with the same size of this one.
+     *
+     * @param classification The data classification.
+     * @param <DATA>         The data type.
+     * @return The newly created waterfall.
+     */
     public <DATA> Waterfall<DATA, DATA, DATA> start(final Classification<DATA> classification) {
 
         if (classification == null) {
@@ -1221,6 +1446,15 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         return (Waterfall<DATA, DATA, DATA>) start();
     }
 
+    /**
+     * Creates and returns a new waterfall with the same size of this one and chained to the leaps
+     * returned by the specified generator.
+     *
+     * @param generator The leap generator.
+     * @param <NIN>     The new input data type.
+     * @param <NOUT>    The new output data type.
+     * @return The newly created waterfall.
+     */
     public <NIN, NOUT> Waterfall<NIN, NIN, NOUT> start(
             final LeapGenerator<NIN, NIN, NOUT> generator) {
 
@@ -1260,6 +1494,15 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
                                              mCurrentGenerator, leaps);
     }
 
+    /**
+     * Creates and returns a new waterfall with the same size of this one and chained to the
+     * specified leap.
+     *
+     * @param leap   The leap instance.
+     * @param <NIN>  The new input data type.
+     * @param <NOUT> The new output data type.
+     * @return The newly created waterfall.
+     */
     public <NIN, NOUT> Waterfall<NIN, NIN, NOUT> start(final Leap<NIN, NIN, NOUT> leap) {
 
         if (leap == null) {

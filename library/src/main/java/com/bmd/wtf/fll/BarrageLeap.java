@@ -20,7 +20,7 @@ import com.bmd.wtf.lps.LeapDecorator;
 /**
  * Created by davide on 6/10/14.
  */
-public class BarrageLeap<SOURCE, IN, OUT> extends LeapDecorator<SOURCE, IN, OUT> {
+class BarrageLeap<SOURCE, IN, OUT> extends LeapDecorator<SOURCE, IN, OUT> {
 
     private final Barrage mBarrage;
 

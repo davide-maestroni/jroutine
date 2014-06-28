@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by davide on 6/7/14.
  */
-public class DataStream<DATA> implements Stream<DATA> {
+class DataStream<DATA> implements Stream<DATA> {
 
     private final DataFall<?, DATA, ?> mDownstreamFall;
 
@@ -36,7 +36,8 @@ public class DataStream<DATA> implements Stream<DATA> {
 
     private final DataFall<?, ?, DATA> mUpstreamFall;
 
-    DataStream(final DataFall<?, ?, DATA> upstreamFall, final DataFall<?, DATA, ?> downstreamFall) {
+    public DataStream(final DataFall<?, ?, DATA> upstreamFall,
+            final DataFall<?, DATA, ?> downstreamFall) {
 
         if (upstreamFall == null) {
 

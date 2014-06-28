@@ -72,11 +72,6 @@ class CollectorLeap<SOURCE, DATA> extends FreeLeap<SOURCE, DATA> {
         return mIsComplete;
     }
 
-    public boolean isEmpty() {
-
-        return (mData.isEmpty() && mIsComplete);
-    }
-
     public Action<Boolean, CollectorLeap<?, ?>> isEmptyAction() {
 
         return ACTION_EMPTY;
@@ -122,5 +117,10 @@ class CollectorLeap<SOURCE, DATA> extends FreeLeap<SOURCE, DATA> {
     public int size() {
 
         return mData.size();
+    }
+
+    private boolean isEmpty() {
+
+        return (mData.isEmpty() && mIsComplete);
     }
 }

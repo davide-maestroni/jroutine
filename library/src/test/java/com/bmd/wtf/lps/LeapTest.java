@@ -268,43 +268,43 @@ public class LeapTest extends TestCase {
 
         assertThat(waterfall1.pull("discharge").next()).isEqualTo("discharge");
         assertThat(waterfall2.pull("discharge").next()).isEqualTo("discharge");
-        assertThat(waterfall3.pull("discharge").immediately().all()).isEmpty();
+        assertThat(waterfall3.pull("discharge").now().all()).isEmpty();
 
         assertThat(waterfall1.pull("discharge1").all()).isEmpty();
         assertThat(waterfall2.pull("discharge1").all()).isEmpty();
-        assertThat(waterfall3.pull("discharge1").immediately().all()).isEmpty();
+        assertThat(waterfall3.pull("discharge1").now().all()).isEmpty();
 
         assertThat(waterfall1.pull("discharge2").all()).containsExactly("discharge2");
         assertThat(waterfall2.pull("discharge2").all()).isEmpty();
-        assertThat(waterfall3.pull("discharge2").immediately().all()).isEmpty();
+        assertThat(waterfall3.pull("discharge2").now().all()).isEmpty();
 
         assertThat(waterfall1.pull("flush1").next()).isEqualTo("flush1");
         assertThat(waterfall2.pull("flush1").all()).containsExactly("flush1");
-        assertThat(waterfall3.pull("flush1").immediately().all()).isEmpty();
+        assertThat(waterfall3.pull("flush1").now().all()).isEmpty();
 
         assertThat(waterfall1.pull("flush2").all()).containsExactly("flush2");
         assertThat(waterfall2.pull("flush2").next()).isEqualTo("flush2");
-        assertThat(waterfall3.pull("flush2").immediately().all()).isEmpty();
+        assertThat(waterfall3.pull("flush2").now().all()).isEmpty();
 
         assertThat(waterfall1.pull("push").all()).isEmpty();
         assertThat(waterfall2.pull("push").all()).isEmpty();
-        assertThat(waterfall3.pull("push").immediately().all()).isEmpty();
+        assertThat(waterfall3.pull("push").now().all()).isEmpty();
 
         assertThat(waterfall1.pull("push1").all()).isEmpty();
         assertThat(waterfall2.pull("push1").all()).isEmpty();
-        assertThat(waterfall3.pull("push1").immediately().all()).isEmpty();
+        assertThat(waterfall3.pull("push1").now().all()).isEmpty();
 
         assertThat(waterfall1.pull("push2").all()).isEmpty();
         assertThat(waterfall2.pull("push2").all()).isEmpty();
-        assertThat(waterfall3.pull("push2").immediately().all()).isEmpty();
+        assertThat(waterfall3.pull("push2").now().all()).isEmpty();
 
         assertThat(waterfall1.pull("pull").next()).isEqualTo("pull");
         assertThat(waterfall2.pull("pull").all()).isEmpty();
-        assertThat(waterfall3.pull("pull").immediately().all()).isEmpty();
+        assertThat(waterfall3.pull("pull").now().all()).isEmpty();
 
         assertThat(waterfall1.pull("pull1").all()).containsExactly("pull1");
         assertThat(waterfall2.pull("pull1").all()).isEmpty();
-        assertThat(waterfall3.pull("pull1").immediately().all()).isEmpty();
+        assertThat(waterfall3.pull("pull1").now().all()).isEmpty();
 
         //noinspection UnusedAssignment
         leap2 = null;
@@ -314,43 +314,43 @@ public class LeapTest extends TestCase {
 
         assertThat(waterfall1.pull("discharge").next()).isEqualTo("discharge");
         assertThat(waterfall2.pull("discharge").all()).isEmpty();
-        assertThat(waterfall3.pull("discharge").immediately().all()).isEmpty();
+        assertThat(waterfall3.pull("discharge").now().all()).isEmpty();
 
         assertThat(waterfall1.pull("discharge1").all()).isEmpty();
         assertThat(waterfall2.pull("discharge1").all()).isEmpty();
-        assertThat(waterfall3.pull("discharge1").immediately().all()).isEmpty();
+        assertThat(waterfall3.pull("discharge1").now().all()).isEmpty();
 
         assertThat(waterfall1.pull("discharge2").all()).containsExactly("discharge2");
         assertThat(waterfall2.pull("discharge2").all()).isEmpty();
-        assertThat(waterfall3.pull("discharge2").immediately().all()).isEmpty();
+        assertThat(waterfall3.pull("discharge2").now().all()).isEmpty();
 
         assertThat(waterfall1.pull("flush1").next()).isEqualTo("flush1");
         assertThat(waterfall2.pull("flush1").all()).isEmpty();
-        assertThat(waterfall3.pull("flush1").immediately().all()).isEmpty();
+        assertThat(waterfall3.pull("flush1").now().all()).isEmpty();
 
         assertThat(waterfall1.pull("flush2").all()).containsExactly("flush2");
         assertThat(waterfall2.pull("flush2").all()).isEmpty();
-        assertThat(waterfall3.pull("flush2").immediately().all()).isEmpty();
+        assertThat(waterfall3.pull("flush2").now().all()).isEmpty();
 
         assertThat(waterfall1.pull("push").all()).isEmpty();
         assertThat(waterfall2.pull("push").all()).isEmpty();
-        assertThat(waterfall3.pull("push").immediately().all()).isEmpty();
+        assertThat(waterfall3.pull("push").now().all()).isEmpty();
 
         assertThat(waterfall1.pull("push1").all()).isEmpty();
         assertThat(waterfall2.pull("push1").all()).isEmpty();
-        assertThat(waterfall3.pull("push1").immediately().all()).isEmpty();
+        assertThat(waterfall3.pull("push1").now().all()).isEmpty();
 
         assertThat(waterfall1.pull("push2").all()).isEmpty();
         assertThat(waterfall2.pull("push2").all()).isEmpty();
-        assertThat(waterfall3.pull("push2").immediately().all()).isEmpty();
+        assertThat(waterfall3.pull("push2").now().all()).isEmpty();
 
         assertThat(waterfall1.pull("pull").next()).isEqualTo("pull");
         assertThat(waterfall2.pull("pull").all()).isEmpty();
-        assertThat(waterfall3.pull("pull").immediately().all()).isEmpty();
+        assertThat(waterfall3.pull("pull").now().all()).isEmpty();
 
         assertThat(waterfall1.pull("pull1").all()).containsExactly("pull1");
         assertThat(waterfall2.pull("pull1").all()).isEmpty();
-        assertThat(waterfall3.pull("pull1").immediately().all()).isEmpty();
+        assertThat(waterfall3.pull("pull1").now().all()).isEmpty();
 
         //noinspection UnusedAssignment
         leap1 = null;
@@ -358,45 +358,45 @@ public class LeapTest extends TestCase {
         System.gc();
         System.gc();
 
-        assertThat(waterfall1.pull("discharge").immediately().all()).isEmpty();
-        assertThat(waterfall2.pull("discharge").immediately().all()).isEmpty();
-        assertThat(waterfall3.pull("discharge").immediately().all()).isEmpty();
+        assertThat(waterfall1.pull("discharge").now().all()).isEmpty();
+        assertThat(waterfall2.pull("discharge").now().all()).isEmpty();
+        assertThat(waterfall3.pull("discharge").now().all()).isEmpty();
 
-        assertThat(waterfall1.pull("discharge1").immediately().all()).isEmpty();
-        assertThat(waterfall2.pull("discharge1").immediately().all()).isEmpty();
-        assertThat(waterfall3.pull("discharge1").immediately().all()).isEmpty();
+        assertThat(waterfall1.pull("discharge1").now().all()).isEmpty();
+        assertThat(waterfall2.pull("discharge1").now().all()).isEmpty();
+        assertThat(waterfall3.pull("discharge1").now().all()).isEmpty();
 
-        assertThat(waterfall1.pull("discharge2").immediately().all()).isEmpty();
-        assertThat(waterfall2.pull("discharge2").immediately().all()).isEmpty();
-        assertThat(waterfall3.pull("discharge2").immediately().all()).isEmpty();
+        assertThat(waterfall1.pull("discharge2").now().all()).isEmpty();
+        assertThat(waterfall2.pull("discharge2").now().all()).isEmpty();
+        assertThat(waterfall3.pull("discharge2").now().all()).isEmpty();
 
-        assertThat(waterfall1.pull("flush1").immediately().all()).isEmpty();
-        assertThat(waterfall2.pull("flush1").immediately().all()).isEmpty();
-        assertThat(waterfall3.pull("flush1").immediately().all()).isEmpty();
+        assertThat(waterfall1.pull("flush1").now().all()).isEmpty();
+        assertThat(waterfall2.pull("flush1").now().all()).isEmpty();
+        assertThat(waterfall3.pull("flush1").now().all()).isEmpty();
 
-        assertThat(waterfall1.pull("flush2").immediately().all()).isEmpty();
-        assertThat(waterfall2.pull("flush2").immediately().all()).isEmpty();
-        assertThat(waterfall3.pull("flush2").immediately().all()).isEmpty();
+        assertThat(waterfall1.pull("flush2").now().all()).isEmpty();
+        assertThat(waterfall2.pull("flush2").now().all()).isEmpty();
+        assertThat(waterfall3.pull("flush2").now().all()).isEmpty();
 
-        assertThat(waterfall1.pull("push").immediately().all()).isEmpty();
-        assertThat(waterfall2.pull("push").immediately().all()).isEmpty();
-        assertThat(waterfall3.pull("push").immediately().all()).isEmpty();
+        assertThat(waterfall1.pull("push").now().all()).isEmpty();
+        assertThat(waterfall2.pull("push").now().all()).isEmpty();
+        assertThat(waterfall3.pull("push").now().all()).isEmpty();
 
-        assertThat(waterfall1.pull("push1").immediately().all()).isEmpty();
-        assertThat(waterfall2.pull("push1").immediately().all()).isEmpty();
-        assertThat(waterfall3.pull("push1").immediately().all()).isEmpty();
+        assertThat(waterfall1.pull("push1").now().all()).isEmpty();
+        assertThat(waterfall2.pull("push1").now().all()).isEmpty();
+        assertThat(waterfall3.pull("push1").now().all()).isEmpty();
 
-        assertThat(waterfall1.pull("push2").immediately().all()).isEmpty();
-        assertThat(waterfall2.pull("push2").immediately().all()).isEmpty();
-        assertThat(waterfall3.pull("push2").immediately().all()).isEmpty();
+        assertThat(waterfall1.pull("push2").now().all()).isEmpty();
+        assertThat(waterfall2.pull("push2").now().all()).isEmpty();
+        assertThat(waterfall3.pull("push2").now().all()).isEmpty();
 
-        assertThat(waterfall1.pull("pull").immediately().all()).isEmpty();
-        assertThat(waterfall2.pull("pull").immediately().all()).isEmpty();
-        assertThat(waterfall3.pull("pull").immediately().all()).isEmpty();
+        assertThat(waterfall1.pull("pull").now().all()).isEmpty();
+        assertThat(waterfall2.pull("pull").now().all()).isEmpty();
+        assertThat(waterfall3.pull("pull").now().all()).isEmpty();
 
-        assertThat(waterfall1.pull("pull1").immediately().all()).isEmpty();
-        assertThat(waterfall2.pull("pull1").immediately().all()).isEmpty();
-        assertThat(waterfall3.pull("pull1").immediately().all()).isEmpty();
+        assertThat(waterfall1.pull("pull1").now().all()).isEmpty();
+        assertThat(waterfall2.pull("pull1").now().all()).isEmpty();
+        assertThat(waterfall3.pull("pull1").now().all()).isEmpty();
 
         try {
 

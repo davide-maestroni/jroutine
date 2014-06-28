@@ -427,18 +427,23 @@ class LockRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
 
     void close() {
 
-        if (!mLock.isHeldByCurrentThread()) {
+        final ReentrantLock lock = mLock;
+
+        if (!lock.isHeldByCurrentThread()) {
 
             throw new IllegalStateException("an open lock cannot be closed in a different thread");
         }
 
-        final DataLock lock = mDataLock;
+        final DataLock dataLock = mDataLock;
 
         mDataLock = null;
 
-        mLock.unlock();
+        lock.unlock();
 
-        lock.release();
+        if (dataLock != null) {
+
+            dataLock.release();
+        }
     }
 
     void open(final DataLock lock) {

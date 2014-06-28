@@ -73,17 +73,17 @@ public interface Collector<DATA> extends Iterator<DATA> {
     public Collector<DATA> eventuallyThrow(RuntimeException exception);
 
     /**
-     * Tells the collector to fail if no data is immediately available.
-     *
-     * @return This collector.
-     */
-    public Collector<DATA> immediately();
-
-    /**
      * Collects the first available data drop by adding it to the specified list.
      *
      * @param data The list to fill.
      * @return This collector.
      */
     public Collector<DATA> nextInto(List<DATA> data);
+
+    /**
+     * Tells the collector to fail if no data is immediately available.
+     *
+     * @return This collector.
+     */
+    public Collector<DATA> now();
 }

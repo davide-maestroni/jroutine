@@ -305,6 +305,11 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
     public void chain(final Waterfall<?, OUT, ?> waterfall) {
 
+        if (this == waterfall) {
+
+            throw new IllegalArgumentException("cannot chain a waterfall to itself");
+        }
+
         final int size = mSize;
 
         final DataFall<SOURCE, IN, OUT>[] falls = mFalls;
@@ -1196,7 +1201,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         final Map<Classification<?>, GateLeap<?, ?, ?>> gateMap = Collections.emptyMap();
 
         //noinspection unchecked
-        return new Waterfall<OUT, OUT, OUT>(null, gateMap, null, null, size, mCurrent,
+        return new Waterfall<OUT, OUT, OUT>(null, gateMap, mGate, null, size, mCurrent,
                                             mCurrentGenerator, leaps);
     }
 
@@ -1206,6 +1211,11 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
     }
 
     public <DATA> Waterfall<DATA, DATA, DATA> start(final Classification<DATA> classification) {
+
+        if (classification == null) {
+
+            throw new IllegalArgumentException("the waterfall classification cannot be null");
+        }
 
         //noinspection unchecked
         return (Waterfall<DATA, DATA, DATA>) start();
@@ -1308,6 +1318,12 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
     private void mapGate(final HashMap<Classification<?>, GateLeap<?, ?, ?>> gateMap,
             final Classification<?> gateClassification, final GateLeap<?, ?, ?> leap) {
+
+        if (!gateClassification.getRawType().isInstance(leap)) {
+
+            throw new IllegalArgumentException(
+                    "the leap does not implement the gate classification type");
+        }
 
         if (gateMap.containsKey(gateClassification)) {
 

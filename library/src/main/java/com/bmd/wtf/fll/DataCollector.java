@@ -107,17 +107,17 @@ class DataCollector<SOURCE, DATA> implements Collector<DATA> {
     }
 
     @Override
-    public Collector<DATA> immediately() {
+    public Collector<DATA> nextInto(final List<DATA> data) {
 
-        mDataGate.immediately();
+        data.add(next());
 
         return this;
     }
 
     @Override
-    public Collector<DATA> nextInto(final List<DATA> data) {
+    public Collector<DATA> now() {
 
-        data.add(next());
+        mDataGate.immediately();
 
         return this;
     }

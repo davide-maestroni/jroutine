@@ -19,6 +19,11 @@ import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * This class maintains a queue of commands in a lightweight circular buffer structure and executes
+ * them in a non-recursive way.<br/>
+ * It is used to ensure that commands issued inside a fall are later executed in the expected
+ * order.
+ * <p/>
  * Created by davide on 6/7/14.
  */
 class DataLock {

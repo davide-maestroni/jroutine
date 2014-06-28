@@ -424,7 +424,7 @@ public class WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallR
     @Override
     public <NTYPE> RapidGate<SOURCE, MOUTH, IN, OUT, NTYPE> when(final Class<NTYPE> gateType) {
 
-        return when(Classification.from(gateType));
+        return when(Classification.ofType(gateType));
     }
 
     @Override

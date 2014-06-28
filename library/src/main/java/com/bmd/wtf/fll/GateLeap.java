@@ -21,7 +21,13 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
+ * Leap decorator used to protect a common leap with a gate.
+ * <p/>
  * Created by davide on 6/13/14.
+ *
+ * @param <SOURCE> The source data type.
+ * @param <IN>     The input data type.
+ * @param <OUT>    The output data type.
  */
 class GateLeap<SOURCE, IN, OUT> extends LeapDecorator<SOURCE, IN, OUT> {
 

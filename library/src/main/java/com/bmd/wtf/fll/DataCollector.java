@@ -22,7 +22,12 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * {@link com.bmd.wtf.flw.Collector} implementation.
+ * <p/>
  * Created by davide on 6/7/14.
+ *
+ * @param <SOURCE> The source data type.
+ * @param <DATA>   The data type.
  */
 class DataCollector<SOURCE, DATA> implements Collector<DATA> {
 

@@ -24,7 +24,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * This class implements the connection between falls and it constitutes one of the fundamental
+ * building piece which makes up the data waterfall.
+ * <p/>
  * Created by davide on 6/7/14.
+ *
+ * @param <DATA> The data type.
  */
 class DataStream<DATA> implements Stream<DATA> {
 

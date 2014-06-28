@@ -18,7 +18,14 @@ import com.bmd.wtf.lps.Leap;
 import com.bmd.wtf.lps.LeapDecorator;
 
 /**
+ * Leap decorator used to lower the level of the related barrage when data flow through the stream.
+ * <p/>
  * Created by davide on 6/10/14.
+ *
+ * @param <SOURCE> The source data type.
+ * @param <IN>     The input data type.
+ * @param <OUT>    The output data type.
+ * @see Barrage
  */
 class BarrageLeap<SOURCE, IN, OUT> extends LeapDecorator<SOURCE, IN, OUT> {
 

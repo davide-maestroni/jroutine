@@ -22,38 +22,6 @@ package com.bmd.wtf.fll;
 public class DelayInterruptedException extends RuntimeException {
 
     /**
-     * Overrides {@link RuntimeException#RuntimeException()}.
-     */
-    public DelayInterruptedException() {
-
-    }
-
-    /**
-     * Overrides {@link RuntimeException#RuntimeException(String)}.
-     */
-    public DelayInterruptedException(final String detailMessage) {
-
-        super(detailMessage);
-    }
-
-    /**
-     * Overrides {@link RuntimeException#RuntimeException(String, Throwable)}.
-     */
-    public DelayInterruptedException(final String detailMessage, final Throwable throwable) {
-
-        super(detailMessage, throwable);
-    }
-
-    /**
-     * Overrides {@link RuntimeException#RuntimeException(String, Throwable, boolean, boolean)}.
-     */
-    public DelayInterruptedException(final String message, final Throwable cause,
-            final boolean enableSuppression, final boolean writableStackTrace) {
-
-        super(message, cause, enableSuppression, writableStackTrace);
-    }
-
-    /**
      * Overrides {@link RuntimeException#RuntimeException(Throwable)}.
      */
     public DelayInterruptedException(final Throwable throwable) {

@@ -175,7 +175,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
                     leapMap.put(leap, gateLeap);
 
                     mapGate(fallGateMap,
-                            (isSelf) ? Classification.from(leap.getClass()) : gateClassification,
+                            (isSelf) ? Classification.ofType(leap.getClass()) : gateClassification,
                             gateLeap);
                 }
 
@@ -284,7 +284,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
      */
     public Waterfall<SOURCE, IN, OUT> as(final Class<?> gateType) {
 
-        return as(Classification.from(gateType));
+        return as(Classification.ofType(gateType));
     }
 
     /**
@@ -1089,7 +1089,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
     @Override
     public <TYPE> Gate<TYPE> when(final Class<TYPE> gateType) {
 
-        return when(Classification.from(gateType));
+        return when(Classification.ofType(gateType));
     }
 
     @Override
@@ -1159,7 +1159,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
     }
 
     /**
-     * Equally distributes all the data flowing through this waterfall in the different output
+     * Uniformly distributes all the data flowing through this waterfall in the different output
      * streams.
      *
      * @return The newly created waterfall.
@@ -1425,7 +1425,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
      */
     public <DATA> Waterfall<DATA, DATA, DATA> start(final Class<DATA> dataType) {
 
-        return start(Classification.from(dataType));
+        return start(Classification.ofType(dataType));
     }
 
     /**

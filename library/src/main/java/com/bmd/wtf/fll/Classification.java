@@ -18,7 +18,17 @@ import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
 
 /**
+ * Utility abstract class used to overcome Java type erasure.
+ * <p/>
+ * By using class objects is impossible to distinguish between two different generic classes. For
+ * example there is no way to declare a <code>Class&lt;List&lt;String&gt;&gt;</code> as opposed to
+ * <code>Class&lt;List&lt;Integer&gt;&gt;</code>.<br/>
+ * The workaround here is to force to inherit from a special generic class then inspected via
+ * reflection in order to obtain the generic type rather than the class object.
+ * <p/>
  * Created by davide on 6/14/14.
+ *
+ * @param <TYPE> The generic type.
  */
 public abstract class Classification<TYPE> {
 
@@ -26,7 +36,14 @@ public abstract class Classification<TYPE> {
 
     private Type mType;
 
-    public static <RTYPE> Classification<RTYPE> from(final Class<RTYPE> rawType) {
+    /**
+     * Creates a new classification from the specified raw type.
+     *
+     * @param rawType The raw type.
+     * @param <RTYPE> The type.
+     * @return The newly created classification.
+     */
+    public static <RTYPE> Classification<RTYPE> ofType(final Class<RTYPE> rawType) {
 
         if (rawType == null) {
 
@@ -39,12 +56,25 @@ public abstract class Classification<TYPE> {
         return classification;
     }
 
+    /**
+     * Casts the specified object to this classification type.
+     * <p/>
+     * Note that the cast is unsafe and may raise an exception.
+     *
+     * @param object The object to cast.
+     * @return The casted object.
+     */
     public final TYPE cast(final Object object) {
 
         //noinspection unchecked
         return (TYPE) object;
     }
 
+    /**
+     * Gets the classification raw type.
+     *
+     * @return The raw type.
+     */
     public final Class<?> getRawType() {
 
         if (mRawType == null) {
@@ -66,6 +96,11 @@ public abstract class Classification<TYPE> {
         return mRawType;
     }
 
+    /**
+     * Gets the classification type.
+     *
+     * @return The generic type.
+     */
     public final Type getType() {
 
         if (mType == null) {
@@ -129,11 +164,22 @@ public abstract class Classification<TYPE> {
         return getType().equals(classification.getType());
     }
 
+    /**
+     * Checks if this classification is equal to or is a super class of the specified one.
+     *
+     * @param other The classification to compare.
+     * @return Whether this classification is equal to or is a super class.
+     */
     public final boolean isAssignableFrom(final Classification<?> other) {
 
         return getRawType().isAssignableFrom(other.getRawType());
     }
 
+    /**
+     * Checks if this classification represent an interface.
+     *
+     * @return Whether this classification is an interface.
+     */
     public final boolean isInterface() {
 
         return getRawType().isInterface();

@@ -20,7 +20,12 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * Implementation of a river composed by a list of data stream.
+ * <p/>
  * Created by davide on 6/7/14.
+ *
+ * @param <SOURCE> The source data type.
+ * @param <DATA>   The data type.
  */
 class StreamRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
 

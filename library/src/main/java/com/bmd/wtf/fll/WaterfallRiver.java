@@ -19,7 +19,12 @@ import com.bmd.wtf.flw.River;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * Implementation of a river wrapping a waterfall instance.
+ * <p/>
  * Created by davide on 6/7/14.
+ *
+ * @param <SOURCE> The source data type.
+ * @param <DATA>   The data type.
  */
 public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
 

@@ -18,7 +18,14 @@ import com.bmd.wtf.lps.Leap;
 import com.bmd.wtf.lps.LeapDecorator;
 
 /**
+ * Leap decorator used to protect a leap when the same instance is used to handle different
+ * streams.
+ * <p/>
  * Created by davide on 6/14/14.
+ *
+ * @param <SOURCE> The river source data type.
+ * @param <IN>     The input data type.
+ * @param <OUT>    The output data type.
  */
 class SegmentedLeap<SOURCE, IN, OUT> extends LeapDecorator<SOURCE, IN, OUT> {
 

@@ -21,7 +21,11 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
+ * Implementation of a {@link com.bmd.wtf.flw.Gate}.
+ * <p/>
  * Created by davide on 6/13/14.
+ *
+ * @param <TYPE> The gate type.
  */
 class DataGate<TYPE> implements Gate<TYPE> {
 

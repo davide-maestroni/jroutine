@@ -20,7 +20,15 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
+ * River decorator using a lock to postpone commands when the fall method complete its execution.
+ * <p/>
+ * In case the river is called outside a fall, the command is immediately delegated to the wrapped
+ * instance.
+ * <p/>
  * Created by davide on 6/7/14.
+ *
+ * @param <SOURCE> The river source data type.
+ * @param <DATA>   The data type.
  */
 class LockRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
 
@@ -30,9 +38,9 @@ class LockRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
 
     private volatile DataLock mDataLock;
 
-    public LockRiver(final River<SOURCE, DATA> river) {
+    public LockRiver(final River<SOURCE, DATA> wrapped) {
 
-        mRiver = river;
+        mRiver = wrapped;
     }
 
     @Override

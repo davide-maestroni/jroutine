@@ -23,7 +23,22 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
+ * Instances of this class implement {@link com.bmd.wtf.flw.Fall}s by managing internally stored
+ * {@link com.bmd.wtf.lps.Leap}s. Each instance has a single input {@link com.bmd.wtf.crr.Current},
+ * shared by all the input {@link com.bmd.wtf.flw.Stream}s which feed the fall with data and
+ * objects.
+ * <p/>
+ * This class ensures that the internal leap is always accessed in a thread safe way, so that the
+ * implementer does not have to worry about concurrency issues.
+ * <p/>
+ * Besides, each instance keeps trace of the streams discharging through the fall, so to propagate
+ * the discharge only when all the feeding streams have no more data to push.
+ * <p/>
  * Created by davide on 6/7/14.
+ *
+ * @param <SOURCE> The river source data type.
+ * @param <IN>     The input data type.
+ * @param <OUT>    The output data type.
  */
 class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
 

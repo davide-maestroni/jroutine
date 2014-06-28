@@ -21,7 +21,12 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
+ * Leap implementation used to collect data pulled from a waterfall.
+ * <p/>
  * Created by davide on 6/13/14.
+ *
+ * @param <SOURCE> The source data type.
+ * @param <DATA>   The data type.
  */
 class CollectorLeap<SOURCE, DATA> extends FreeLeap<SOURCE, DATA> {
 

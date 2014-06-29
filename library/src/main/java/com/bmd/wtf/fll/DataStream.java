@@ -317,7 +317,7 @@ class DataStream<DATA> implements Stream<DATA> {
 
     void drain(final boolean downstream) {
 
-        final DrainVisitor visitor = new DrainVisitor(this);
+        final DrainVisitor visitor = new DrainVisitor();
 
         ride(downstream, visitor);
 
@@ -431,15 +431,6 @@ class DataStream<DATA> implements Stream<DATA> {
 
         private final HashSet<DataStream<?>> mDryStreams = new HashSet<DataStream<?>>();
 
-        private final DataStream<?> mOriginStream;
-
-        public DrainVisitor(final DataStream<?> originStream) {
-
-            mOriginStream = originStream;
-
-            mDryStreams.add(originStream);
-        }
-
         public void drain() {
 
             for (final DataStream<?> stream : mDryStreams) {
@@ -451,16 +442,12 @@ class DataStream<DATA> implements Stream<DATA> {
         @Override
         public boolean stopVisit() {
 
-            return false;
+            //TODO: remove it?
+            return true;
         }
 
         @Override
         public boolean visit(final boolean downstream, final DataStream<?> stream) {
-
-            if (stream == mOriginStream) {
-
-                return true;
-            }
 
             mDryStreams.add(stream);
 

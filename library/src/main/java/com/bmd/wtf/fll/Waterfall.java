@@ -835,6 +835,28 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         return waterfall;
     }
 
+    //TODO
+    public Collector<OUT> collect() {
+
+        final CollectorLeap<SOURCE, OUT> collectorLeap = new CollectorLeap<SOURCE, OUT>();
+        final GateLeap<SOURCE, OUT, OUT> gateLeap = new GateLeap<SOURCE, OUT, OUT>(collectorLeap);
+
+        final Waterfall<SOURCE, IN, OUT> waterfall;
+
+        if (mSize != 1) {
+
+            waterfall = in(1);
+
+        } else {
+
+            waterfall = this;
+        }
+
+        waterfall.chain(gateLeap);
+
+        return new DataCollector<SOURCE, OUT>(gateLeap, collectorLeap);
+    }
+
     @Override
     public void deviate() {
 
@@ -863,6 +885,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
         for (final DataFall<SOURCE, IN, OUT> fall : mFalls) {
 
+            fall.dryUp();
             fall.inputCurrent.discharge(fall);
         }
 
@@ -966,6 +989,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
         final DataFall<SOURCE, IN, OUT> fall = mFalls[streamNumber];
 
+        fall.dryUp();
         fall.inputCurrent.discharge(fall);
 
         return this;
@@ -1298,7 +1322,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
     public Waterfall<SOURCE, IN, OUT> inBackground(final int poolSize) {
 
         //noinspection unchecked
-        return new Waterfall<SOURCE, IN, OUT>(mSource, mGateMap, mGate, mBarrage, mSize,
+        return new Waterfall<SOURCE, IN, OUT>(mSource, mGateMap, mGate, mBarrage, poolSize,
                                               Currents.pool(poolSize), null, mFalls);
     }
 
@@ -1335,12 +1359,11 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
      */
     public Collector<OUT> pull() {
 
-        final CollectorLeap<SOURCE, OUT> collectorLeap = new CollectorLeap<SOURCE, OUT>();
-        final GateLeap<SOURCE, OUT, OUT> gateLeap = new GateLeap<SOURCE, OUT, OUT>(collectorLeap);
+        final Collector<OUT> collector = collect();
 
-        chain(gateLeap).source().discharge();
+        source().discharge();
 
-        return new DataCollector<SOURCE, OUT>(gateLeap, collectorLeap);
+        return collector;
     }
 
     /**
@@ -1352,12 +1375,11 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
      */
     public Collector<OUT> pull(final SOURCE source) {
 
-        final CollectorLeap<SOURCE, OUT> collectorLeap = new CollectorLeap<SOURCE, OUT>();
-        final GateLeap<SOURCE, OUT, OUT> gateLeap = new GateLeap<SOURCE, OUT, OUT>(collectorLeap);
+        final Collector<OUT> collector = collect();
 
-        chain(gateLeap).source().push(source).discharge();
+        source().push(source).discharge();
 
-        return new DataCollector<SOURCE, OUT>(gateLeap, collectorLeap);
+        return collector;
     }
 
     /**
@@ -1369,12 +1391,11 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
      */
     public Collector<OUT> pull(final SOURCE... sources) {
 
-        final CollectorLeap<SOURCE, OUT> collectorLeap = new CollectorLeap<SOURCE, OUT>();
-        final GateLeap<SOURCE, OUT, OUT> gateLeap = new GateLeap<SOURCE, OUT, OUT>(collectorLeap);
+        final Collector<OUT> collector = collect();
 
-        chain(gateLeap).source().push(sources).discharge();
+        source().push(sources).discharge();
 
-        return new DataCollector<SOURCE, OUT>(gateLeap, collectorLeap);
+        return collector;
     }
 
     /**
@@ -1386,12 +1407,11 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
      */
     public Collector<OUT> pull(final Iterable<SOURCE> sources) {
 
-        final CollectorLeap<SOURCE, OUT> collectorLeap = new CollectorLeap<SOURCE, OUT>();
-        final GateLeap<SOURCE, OUT, OUT> gateLeap = new GateLeap<SOURCE, OUT, OUT>(collectorLeap);
+        final Collector<OUT> collector = collect();
 
-        chain(gateLeap).source().push(sources).discharge();
+        source().push(sources).discharge();
 
-        return new DataCollector<SOURCE, OUT>(gateLeap, collectorLeap);
+        return collector;
     }
 
     /**

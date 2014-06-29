@@ -13,6 +13,8 @@
  */
 package com.bmd.wtf.fll;
 
+import com.bmd.wtf.drp.Drops;
+import com.bmd.wtf.flw.Collector;
 import com.bmd.wtf.flw.River;
 import com.bmd.wtf.lps.AbstractLeap;
 import com.bmd.wtf.lps.FreeLeap;
@@ -21,7 +23,10 @@ import com.bmd.wtf.lps.LeapGenerator;
 
 import junit.framework.TestCase;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static org.fest.assertions.api.Assertions.assertThat;
@@ -32,6 +37,189 @@ import static org.fest.assertions.api.Assertions.assertThat;
  * Created by davide on 6/28/14.
  */
 public class WaterfallTest extends TestCase {
+
+    public void testBarrage() {
+
+        final ArrayList<String> output = new ArrayList<String>();
+
+        final Waterfall<String, List<String>, String> fall =
+                Waterfall.create().start(new FreeLeap<String, String>() {
+
+                    @Override
+                    public void onPush(final River<String, String> upRiver,
+                            final River<String, String> downRiver, final int fallNumber,
+                            final String drop) {
+
+                        if ("test".equals(drop)) {
+
+                            throw new IllegalArgumentException();
+                        }
+
+                        super.onPush(upRiver, downRiver, fallNumber, drop);
+                    }
+                }).in(2).chain(new FreeLeap<String, String>() {
+
+                    @Override
+                    public void onPush(final River<String, String> upRiver,
+                            final River<String, String> downRiver, final int fallNumber,
+                            final String drop) {
+
+                        if ((drop.length() == 0) || drop.toLowerCase().charAt(0) < 'm') {
+
+                            if (fallNumber == 0) {
+
+                                downRiver.push(drop);
+                            }
+
+                        } else if (fallNumber == 1) {
+
+                            downRiver.push(drop);
+                        }
+                    }
+                }).chain(new LeapGenerator<String, String, List<String>>() {
+
+                    @Override
+                    public Leap<String, String, List<String>> start(final int fallNumber) {
+
+                        if (fallNumber == 0) {
+
+                            return new AbstractLeap<String, String, List<String>>() {
+
+                                private final ArrayList<String> mWords = new ArrayList<String>();
+
+                                @Override
+                                public void onPush(final River<String, String> upRiver,
+                                        final River<String, List<String>> downRiver,
+                                        final int fallNumber, final String drop) {
+
+                                    if ("atest".equals(drop)) {
+
+                                        throw new IllegalStateException();
+                                    }
+
+                                    mWords.add(drop);
+                                }
+
+                                @Override
+                                public void onDischarge(final River<String, String> upRiver,
+                                        final River<String, List<String>> downRiver,
+                                        final int fallNumber) {
+
+                                    Collections.sort(mWords);
+                                    downRiver.push(new ArrayList<String>(mWords)).discharge();
+                                    mWords.clear();
+                                }
+                            };
+                        }
+
+                        return new AbstractLeap<String, String, List<String>>() {
+
+                            private final ArrayList<String> mWords = new ArrayList<String>();
+
+                            @Override
+                            public void onPush(final River<String, String> upRiver,
+                                    final River<String, List<String>> downRiver,
+                                    final int fallNumber, final String drop) {
+
+                                mWords.add(drop);
+                            }
+
+                            @Override
+                            public void onDischarge(final River<String, String> upRiver,
+                                    final River<String, List<String>> downRiver,
+                                    final int fallNumber) {
+
+                                Collections.sort(mWords, Collections.reverseOrder());
+                                downRiver.push(new ArrayList<String>(mWords)).discharge();
+                                mWords.clear();
+                            }
+                        };
+                    }
+                }).in(1).chain(new AbstractLeap<String, List<String>, String>() {
+
+                    private int mCount;
+
+                    private ArrayList<String> mList = new ArrayList<String>();
+
+                    @Override
+                    public void onPush(final River<String, List<String>> upRiver,
+                            final River<String, String> downRiver, final int fallNumber,
+                            final List<String> drop) {
+
+                        if (mList.isEmpty() || drop.isEmpty()) {
+
+                            mList.addAll(drop);
+
+                        } else {
+
+                            final String first = drop.get(0);
+
+                            if ((first.length() == 0) || first.toLowerCase().charAt(0) < 'm') {
+
+                                mList.addAll(0, drop);
+
+                            } else {
+
+                                mList.addAll(drop);
+                            }
+                        }
+
+                        if (++mCount == 2) {
+
+                            downRiver.push(new ArrayList<String>(mList)).discharge();
+                            mList.clear();
+                            mCount = 0;
+                        }
+                    }
+                });
+
+        fall.pull("Ciao", "This", "zOO", null, "is", "a", "3", "test", "1111", "CAPITAL", "atest")
+            .allInto(output);
+
+        assertThat(output).isEmpty();
+
+        fall.pull("Ciao", "This", "zOO", "is", "a", "3", "1111", "CAPITAL").allInto(output);
+
+        assertThat(output)
+                .containsExactly("1111", "3", "CAPITAL", "Ciao", "a", "is", "zOO", "This");
+
+        assertThat(fall.pull("test").all()).isEmpty();
+
+        final Waterfall<Integer, Integer, Integer> fall0 = Waterfall.create().start(Integer.class);
+        final Waterfall<Integer, Integer, Integer> fall1 = Waterfall.create().start(Integer.class);
+        final Waterfall<Integer, Integer, Integer> fall2 = Waterfall.create().start(Integer.class);
+        final Waterfall<Integer, Integer, Integer> fall3 = Waterfall.create().start(Integer.class);
+
+        fall1.chain(fall0);
+        fall2.chain(fall0);
+        fall3.chain(fall0);
+
+        final Collector<Integer> collector = fall0.collect();
+
+        fall1.push(1).discharge();
+        fall2.push(1).discharge();
+        fall3.push(1).discharge();
+
+        int i = 0;
+
+        while (collector.hasNext()) {
+
+            ++i;
+            assertThat(collector.next()).isEqualTo(1);
+        }
+
+        assertThat(i).isEqualTo(3);
+
+        assertThat(Waterfall.create().in(3).start(Integer.class).pull(1).all())
+                .containsExactly(1, 1, 1);
+        assertThat(Waterfall.create().in(3).start(Integer.class).in(1).pull(1).all())
+                .containsExactly(1, 1, 1);
+
+        assertThat(Waterfall.create().inBackground(3).start(Integer.class).pull(1).all())
+                .containsExactly(1, 1, 1);
+        assertThat(Waterfall.create().inBackground(3).start(Integer.class).in(1).pull(1).all())
+                .containsExactly(1, 1, 1);
+    }
 
     public void testDeviate() {
 
@@ -642,5 +830,108 @@ public class WaterfallTest extends TestCase {
 
             fail();
         }
+    }
+
+    public void testJoin() {
+
+        final Waterfall<Character, Integer, Integer> fall0 =
+                Waterfall.create().start(new AbstractLeap<Character, Character, Integer>() {
+
+                    private final StringBuffer mBuffer = new StringBuffer();
+
+                    @Override
+                    public void onPush(final River<Character, Character> upRiver,
+                            final River<Character, Integer> downRiver, final int fallNumber,
+                            final Character drop) {
+
+                        mBuffer.append(drop);
+                    }
+
+                    @Override
+                    public void onDischarge(final River<Character, Character> upRiver,
+                            final River<Character, Integer> downRiver, final int fallNumber) {
+
+                        downRiver.push(Integer.valueOf(mBuffer.toString())).discharge();
+
+                        mBuffer.setLength(0);
+                    }
+                }).chain();
+
+        final Waterfall<Character, Integer, Integer> fall1 =
+                fall0.chain(new FreeLeap<Character, Integer>() {
+
+                    private int mSum;
+
+                    @Override
+                    public void onPush(final River<Character, Integer> upRiver,
+                            final River<Character, Integer> downRiver, final int fallNumber,
+                            final Integer drop) {
+
+                        mSum += drop;
+                    }
+
+                    @Override
+                    public void onDischarge(final River<Character, Integer> upRiver,
+                            final River<Character, Integer> downRiver, final int fallNumber) {
+
+                        downRiver.push(new Integer[]{mSum}).discharge();
+
+                        mSum = 0;
+                    }
+                });
+
+        final Waterfall<Integer, Integer, Integer> fall2 = Waterfall.create().start(Integer.class);
+        fall2.chain(fall0);
+        fall2.source().push(Drops.asList(0, 1, 2, 3)).discharge();
+
+        final ArrayList<Integer> output = new ArrayList<Integer>(1);
+
+        fall1.pull('0', '1', '2', '3').nextInto(output);
+        assertThat(output).containsExactly(129);
+
+        fall2.source().drain();
+
+        final Waterfall<Integer, Integer, Integer> fall3 = Waterfall.create().start(Integer.class);
+
+        fall1.source().push(Drops.asList('0', '1', '2', '3'));
+        fall3.chain(fall0);
+        fall3.source().push(Drops.asList(4, 5, -4)).discharge();
+        fall2.source().push(77).discharge();
+
+        output.clear();
+        fall1.pull().allInto(output);
+
+        assertThat(output).containsExactly(128);
+
+        final Waterfall<Integer, Integer, Integer> fall4 =
+                Waterfall.create().start(new FreeLeap<Integer, Integer>() {
+
+                    private int mAbsSum;
+
+                    @Override
+                    public void onPush(final River<Integer, Integer> upRiver,
+                            final River<Integer, Integer> downRiver, final int fallNumber,
+                            final Integer drop) {
+
+                        mAbsSum += Math.abs(drop);
+                    }
+
+                    @Override
+                    public void onDischarge(final River<Integer, Integer> upRiver,
+                            final River<Integer, Integer> downRiver, final int fallNumber) {
+
+                        downRiver.push(mAbsSum).discharge();
+                    }
+                });
+
+        fall0.chain(fall4);
+
+        fall3.source().push(Arrays.asList(4, 5, -4)).discharge();
+
+        output.clear();
+        fall1.pull(Drops.asList('0', '1', '2', '3')).allInto(output);
+        fall4.pull().nextInto(output);
+
+        assertThat(output).containsExactly(128, 136);
     }
 }

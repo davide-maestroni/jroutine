@@ -203,6 +203,23 @@ class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
         lowerLevel();
     }
 
+    void dryUp() {
+
+        final ReentrantLock lock = mLock;
+
+        lock.lock();
+
+        try {
+
+            //TODO: pass as discharge parameter?
+            mDryStreams.addAll(inputStreams);
+
+        } finally {
+
+            lock.unlock();
+        }
+    }
+
     void raiseLevel(final int count) {
 
         final ReentrantLock lock = mLock;
@@ -248,6 +265,7 @@ class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
 
             mWaterline = 0;
 
+            //TODO: pass as discharge parameter?
             mDryStreams.add(stream);
 
             lock.unlock();

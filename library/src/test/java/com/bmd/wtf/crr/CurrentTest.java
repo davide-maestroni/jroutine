@@ -14,6 +14,7 @@
 package com.bmd.wtf.crr;
 
 import com.bmd.wtf.flw.Fall;
+import com.bmd.wtf.flw.Stream;
 
 import junit.framework.TestCase;
 
@@ -58,6 +59,8 @@ public class CurrentTest extends TestCase {
         fall.reset();
         current.pushAfter(fall, 1, TimeUnit.SECONDS, Arrays.asList("delay1", "delay2", "delay3"));
         fall.waitCall();
+        fall.waitCall();
+        fall.waitCall();
         assertThat(fall.getTime()).isGreaterThanOrEqualTo(now + 1000);
         assertThat(fall.getDrop()).isEqualTo("delay3");
 
@@ -69,7 +72,7 @@ public class CurrentTest extends TestCase {
         assertThat(fall.getThrowable()).isNull();
 
         fall.reset();
-        current.discharge(fall);
+        current.discharge(fall, null);
         fall.waitCall();
         assertThat(fall.getDrop()).isEqualTo("test");
         assertThat(fall.isDischarged()).isTrue();
@@ -113,7 +116,7 @@ public class CurrentTest extends TestCase {
         assertThat(fall.isDischarged()).isFalse();
         assertThat(fall.getThrowable()).isNull();
 
-        current.discharge(fall);
+        current.discharge(fall, null);
         assertThat(fall.getDrop()).isEqualTo("test");
         assertThat(fall.isDischarged()).isTrue();
         assertThat(fall.getThrowable()).isNull();
@@ -139,7 +142,7 @@ public class CurrentTest extends TestCase {
         private long mTime;
 
         @Override
-        public void discharge() {
+        public void discharge(final Stream<String> origin) {
 
             mDischarge = true;
             mTime = System.currentTimeMillis();

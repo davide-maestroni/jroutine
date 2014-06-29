@@ -18,6 +18,7 @@ import android.os.Looper;
 
 import com.bmd.wtf.crr.Current;
 import com.bmd.wtf.flw.Fall;
+import com.bmd.wtf.flw.Stream;
 
 import java.util.concurrent.TimeUnit;
 
@@ -42,14 +43,14 @@ class LooperCurrent implements Current {
     }
 
     @Override
-    public void discharge(final Fall<?> fall) {
+    public <DATA> void discharge(final Fall<DATA> fall, final Stream<DATA> origin) {
 
         mHandler.post(new Runnable() {
 
             @Override
             public void run() {
 
-                fall.discharge();
+                fall.discharge(origin);
             }
         });
     }

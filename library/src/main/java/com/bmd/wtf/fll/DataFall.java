@@ -15,6 +15,7 @@ package com.bmd.wtf.fll;
 
 import com.bmd.wtf.crr.Current;
 import com.bmd.wtf.flw.Fall;
+import com.bmd.wtf.flw.Stream;
 import com.bmd.wtf.lps.Leap;
 
 import java.util.HashSet;
@@ -63,7 +64,7 @@ class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
 
     private final Condition mCondition;
 
-    private final HashSet<DataStream<IN>> mDryStreams = new HashSet<DataStream<IN>>();
+    private final HashSet<Stream<IN>> mDryStreams = new HashSet<Stream<IN>>();
 
     private final LockRiver<SOURCE, IN> mInRiver;
 
@@ -104,7 +105,7 @@ class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
     }
 
     @Override
-    public void discharge() {
+    public void discharge(final Stream<IN> origin) {
 
         final ReentrantLock lock = mLock;
 
@@ -112,13 +113,18 @@ class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
 
         try {
 
-            final HashSet<DataStream<IN>> dryStreams = mDryStreams;
+            final HashSet<Stream<IN>> dryStreams = mDryStreams;
 
-            if (!dryStreams.containsAll(inputStreams)) {
+            if (origin != null) {
 
-                lowerLevel();
+                dryStreams.add(origin);
 
-                return;
+                if (!dryStreams.containsAll(inputStreams)) {
+
+                    lowerLevel();
+
+                    return;
+                }
             }
 
             dryStreams.clear();
@@ -201,23 +207,6 @@ class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
         inRiver.close();
 
         lowerLevel();
-    }
-
-    void dryUp() {
-
-        final ReentrantLock lock = mLock;
-
-        lock.lock();
-
-        try {
-
-            //TODO: pass as discharge parameter?
-            mDryStreams.addAll(inputStreams);
-
-        } finally {
-
-            lock.unlock();
-        }
     }
 
     void raiseLevel(final int count) {

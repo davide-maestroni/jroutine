@@ -32,8 +32,10 @@ public interface Fall<DATA> {
      * <p/>
      * Be aware that the call may block until the fall discharges all the data drops, including
      * the delayed ones.
+     *
+     * @param origin The origin stream.
      */
-    public void discharge();
+    public void discharge(Stream<DATA> origin);
 
     /**
      * Forwards the specified unhandled exception into the waterfall flow.

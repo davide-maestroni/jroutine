@@ -14,6 +14,7 @@
 package com.bmd.wtf.crr;
 
 import com.bmd.wtf.flw.Fall;
+import com.bmd.wtf.flw.Stream;
 
 import java.util.concurrent.TimeUnit;
 
@@ -29,14 +30,48 @@ import java.util.concurrent.TimeUnit;
  */
 public interface Current {
 
-    public void discharge(Fall<?> fall);
+    /**
+     * This method is called when data must be discharged through the current.
+     *
+     * @param fall   The fall instance to be used to push data into the waterfall.
+     * @param origin The origin stream.
+     * @param <DATA> The data type.
+     */
+    public <DATA> void discharge(Fall<DATA> fall, Stream<DATA> origin);
 
     public void forward(Fall<?> fall, Throwable throwable);
 
+    /**
+     * This method is called when a data drop must be pushed through the current.
+     *
+     * @param fall   The fall instance to be used to push data into the waterfall.
+     * @param drop   The data drop.
+     * @param <DATA> The data type.
+     */
     public <DATA> void push(Fall<DATA> fall, DATA drop);
 
+    /**
+     * This method is called when a data drop must be pushed through the current, after the
+     * specified time has elapsed.
+     *
+     * @param fall     The fall instance to be used to push data into the waterfall.
+     * @param delay    The delay in <code>timeUnit</code> time units.
+     * @param timeUnit The delay time unit.
+     * @param drop     The data drop.
+     * @param <DATA>   The data type.
+     */
     public <DATA> void pushAfter(Fall<DATA> fall, long delay, TimeUnit timeUnit, DATA drop);
 
+    /**
+     * This method is called when data drops must be pushed through the current, after the
+     * specified time has elapsed.
+     *
+     * @param fall     The fall instance to be used to push data into the waterfall.
+     * @param delay    The delay in <code>timeUnit</code> time units.
+     * @param timeUnit The delay time unit.
+     * @param drops    The data drop iterable.
+     * @param <DATA>   The data type.
+     */
     public <DATA> void pushAfter(Fall<DATA> fall, long delay, TimeUnit timeUnit,
             Iterable<? extends DATA> drops);
 }

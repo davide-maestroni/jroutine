@@ -70,13 +70,13 @@ class DataStream<DATA> implements Stream<DATA> {
 
         if (mPassThrough) {
 
-            fall.discharge();
+            fall.discharge(this);
 
         } else {
 
             final Current inputCurrent = fall.inputCurrent;
 
-            inputCurrent.discharge(fall);
+            inputCurrent.discharge(fall, this);
         }
 
         return this;
@@ -328,10 +328,7 @@ class DataStream<DATA> implements Stream<DATA> {
 
         if (!visitor.visit(downstream, this)) {
 
-            if (visitor.stopVisit()) {
-
-                return false;
-            }
+            return false;
         }
 
         final DataFall<?, ?, ?> fall = downstream ? mDownstreamFall : mUpstreamFall;
@@ -442,8 +439,7 @@ class DataStream<DATA> implements Stream<DATA> {
         @Override
         public boolean stopVisit() {
 
-            //TODO: remove it?
-            return true;
+            return false;
         }
 
         @Override

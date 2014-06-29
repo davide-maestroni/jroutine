@@ -885,8 +885,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
         for (final DataFall<SOURCE, IN, OUT> fall : mFalls) {
 
-            fall.dryUp();
-            fall.inputCurrent.discharge(fall);
+            fall.inputCurrent.discharge(fall, null);
         }
 
         return this;
@@ -989,8 +988,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
         final DataFall<SOURCE, IN, OUT> fall = mFalls[streamNumber];
 
-        fall.dryUp();
-        fall.inputCurrent.discharge(fall);
+        fall.inputCurrent.discharge(fall, null);
 
         return this;
     }

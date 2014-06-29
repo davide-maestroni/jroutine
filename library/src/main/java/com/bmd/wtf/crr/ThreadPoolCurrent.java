@@ -14,6 +14,7 @@
 package com.bmd.wtf.crr;
 
 import com.bmd.wtf.flw.Fall;
+import com.bmd.wtf.flw.Stream;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -41,14 +42,14 @@ public class ThreadPoolCurrent implements Current {
     }
 
     @Override
-    public void discharge(final Fall<?> fall) {
+    public <DATA> void discharge(final Fall<DATA> fall, final Stream<DATA> origin) {
 
         mService.execute(new Runnable() {
 
             @Override
             public void run() {
 
-                fall.discharge();
+                fall.discharge(origin);
             }
         });
     }

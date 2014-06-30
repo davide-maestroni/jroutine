@@ -1321,7 +1321,8 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
         //noinspection unchecked
         return new Waterfall<SOURCE, IN, OUT>(mSource, mGateMap, mGate, mBarrage, poolSize,
-                                              Currents.pool(poolSize), null, mFalls);
+                                              Currents.pool(Math.min(poolSize, getBestPoolSize())),
+                                              null, mFalls);
     }
 
     /**
@@ -1334,20 +1335,11 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
      */
     public Waterfall<SOURCE, IN, OUT> inBackground() {
 
-        final int processors = Runtime.getRuntime().availableProcessors();
+        final int poolSize = getBestPoolSize();
 
-        final int poolSize;
-
-        if (processors < 4) {
-
-            poolSize = Math.max(1, Math.min(mSize, processors - 1));
-
-        } else {
-
-            poolSize = Math.min(mSize, processors / 2);
-        }
-
-        return inBackground(poolSize);
+        //noinspection unchecked
+        return new Waterfall<SOURCE, IN, OUT>(mSource, mGateMap, mGate, mBarrage, poolSize,
+                                              Currents.pool(poolSize), null, mFalls);
     }
 
     /**
@@ -1575,6 +1567,18 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         }
 
         return leap;
+    }
+
+    private int getBestPoolSize() {
+
+        final int processors = Runtime.getRuntime().availableProcessors();
+
+        if (processors < 4) {
+
+            return Math.max(1, processors - 1);
+        }
+
+        return (processors / 2);
     }
 
     private void mapGate(final HashMap<Classification<?>, GateLeap<?, ?, ?>> gateMap,

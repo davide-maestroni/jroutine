@@ -171,14 +171,18 @@ public class WaterfallTest extends TestCase {
                             mCount = 0;
                         }
                     }
+
+                    @Override
+                    public void onUnhandled(final River<String, List<String>> upRiver,
+                            final River<String, String> downRiver, final int fallNumber,
+                            final Throwable throwable) {
+
+                        //just ignore it
+                    }
                 });
 
         fall.pull("Ciao", "This", "zOO", null, "is", "a", "3", "test", "1111", "CAPITAL", "atest")
             .allInto(output);
-
-        assertThat(output).isEmpty();
-
-        fall.pull("Ciao", "This", "zOO", "is", "a", "3", "1111", "CAPITAL").allInto(output);
 
         assertThat(output)
                 .containsExactly("1111", "3", "CAPITAL", "Ciao", "a", "is", "zOO", "This");
@@ -292,6 +296,31 @@ public class WaterfallTest extends TestCase {
 
         assertThat(fall4.pull(0).now().all()).isEmpty();
         assertThat(fall4.pull(1).now().all()).isEmpty();
+    }
+
+    public void testDistribute() {
+
+        final TestLeap leap = new TestLeap();
+
+        final Waterfall<String, String, ?> source =
+                Waterfall.create().start(String.class).in(4).distribute().chain(leap).source();
+
+        final ArrayList<String> data = new ArrayList<String>();
+
+        for (int i = 0; i < 30; i++) {
+
+            data.add(Integer.toString(i));
+        }
+
+        source.push(data);
+        assertThat(leap.getData()).contains(data.toArray(new String[data.size()]));
+
+        final IllegalStateException exception = new IllegalStateException();
+        source.forward(exception);
+        assertThat(leap.getUnhandled()).containsExactly(exception, exception, exception, exception);
+
+        source.discharge();
+        assertThat(leap.getDischarges()).isEqualTo(4);
     }
 
     public void testError() {
@@ -933,5 +962,57 @@ public class WaterfallTest extends TestCase {
         fall4.pull().nextInto(output);
 
         assertThat(output).containsExactly(128, 136);
+    }
+
+    private class TestLeap extends FreeLeap<String, String> {
+
+        private final ArrayList<String> mData = new ArrayList<String>();
+
+        private final ArrayList<Throwable> mThrows = new ArrayList<Throwable>();
+
+        private int mDischargeCount;
+
+        public List<String> getData() {
+
+            return mData;
+        }
+
+        public int getDischarges() {
+
+            return mDischargeCount;
+        }
+
+        public List<Throwable> getUnhandled() {
+
+            return mThrows;
+        }
+
+        @Override
+        public void onDischarge(final River<String, String> upRiver,
+                final River<String, String> downRiver, final int fallNumber) {
+
+            ++mDischargeCount;
+
+            super.onDischarge(upRiver, downRiver, fallNumber);
+        }
+
+        @Override
+        public void onPush(final River<String, String> upRiver,
+                final River<String, String> downRiver, final int fallNumber, final String drop) {
+
+            mData.add(drop);
+
+            super.onPush(upRiver, downRiver, fallNumber, drop);
+        }
+
+        @Override
+        public void onUnhandled(final River<String, String> upRiver,
+                final River<String, String> downRiver, final int fallNumber,
+                final Throwable throwable) {
+
+            mThrows.add(throwable);
+
+            super.onUnhandled(upRiver, downRiver, fallNumber, throwable);
+        }
     }
 }

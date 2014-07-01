@@ -404,7 +404,7 @@ public class LeapTest extends TestCase {
 
             fail();
 
-        } catch (final IllegalArgumentException ignore) {
+        } catch (final IllegalArgumentException ignored) {
 
         }
 
@@ -414,7 +414,7 @@ public class LeapTest extends TestCase {
 
             fail();
 
-        } catch (final IllegalArgumentException ignore) {
+        } catch (final IllegalArgumentException ignored) {
 
         }
 
@@ -424,7 +424,7 @@ public class LeapTest extends TestCase {
 
             fail();
 
-        } catch (final IllegalArgumentException ignore) {
+        } catch (final IllegalArgumentException ignored) {
 
         }
     }

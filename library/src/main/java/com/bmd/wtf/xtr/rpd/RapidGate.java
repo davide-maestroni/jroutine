@@ -46,7 +46,7 @@ public interface RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends Gate<TYPE>, Riv
     public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> immediately();
 
     @Override
-    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> meets(
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> meeting(
             ConditionEvaluator<? super TYPE> evaluator);
 
     @Override
@@ -83,6 +83,13 @@ public interface RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends Gate<TYPE>, Riv
     public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> forward(int streamNumber, Throwable throwable);
 
     @Override
+    public <NTYPE> RapidGate<SOURCE, MOUTH, IN, OUT, NTYPE> on(Class<NTYPE> gateType);
+
+    @Override
+    public <NTYPE> RapidGate<SOURCE, MOUTH, IN, OUT, NTYPE> on(
+            Classification<NTYPE> gateClassification);
+
+    @Override
     public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> push(int streamNumber, IN... drops);
 
     @Override
@@ -106,13 +113,6 @@ public interface RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends Gate<TYPE>, Riv
 
     @Override
     public RapidGate<SOURCE, MOUTH, SOURCE, OUT, TYPE> source();
-
-    @Override
-    public <NTYPE> RapidGate<SOURCE, MOUTH, IN, OUT, NTYPE> when(Class<NTYPE> gateType);
-
-    @Override
-    public <NTYPE> RapidGate<SOURCE, MOUTH, IN, OUT, NTYPE> when(
-            Classification<NTYPE> gateClassification);
 
     public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> meetsCondition(Object... args);
 

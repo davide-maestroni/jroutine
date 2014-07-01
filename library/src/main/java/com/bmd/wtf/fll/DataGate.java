@@ -84,7 +84,7 @@ class DataGate<TYPE> implements Gate<TYPE> {
     }
 
     @Override
-    public Gate<TYPE> meets(final ConditionEvaluator<? super TYPE> evaluator) {
+    public Gate<TYPE> meeting(final ConditionEvaluator<? super TYPE> evaluator) {
 
         mEvaluator = evaluator;
 
@@ -109,6 +109,8 @@ class DataGate<TYPE> implements Gate<TYPE> {
             return action.doOn(leap, args);
 
         } finally {
+
+            mCondition.signalAll();
 
             lock.unlock();
         }

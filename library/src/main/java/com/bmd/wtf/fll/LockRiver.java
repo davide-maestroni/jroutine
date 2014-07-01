@@ -269,6 +269,18 @@ class LockRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
+    public <TYPE> Gate<TYPE> on(final Class<TYPE> gateType) {
+
+        return mRiver.on(gateType);
+    }
+
+    @Override
+    public <TYPE> Gate<TYPE> on(final Classification<TYPE> gateClassification) {
+
+        return mRiver.on(gateClassification);
+    }
+
+    @Override
     public River<SOURCE, DATA> push(final int streamNumber, final DATA... drops) {
 
         if ((drops == null) || (drops.length == 0)) {
@@ -421,18 +433,6 @@ class LockRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
         return mRiver.source();
     }
 
-    @Override
-    public <TYPE> Gate<TYPE> when(final Class<TYPE> gateType) {
-
-        return mRiver.when(gateType);
-    }
-
-    @Override
-    public <TYPE> Gate<TYPE> when(final Classification<TYPE> gateClassification) {
-
-        return mRiver.when(gateClassification);
-    }
-
     void close() {
 
         final ReentrantLock lock = mLock;
@@ -444,7 +444,7 @@ class LockRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
 
         final DataLock dataLock = mDataLock;
 
-        mDataLock = null;
+        //mDataLock = null;
 
         lock.unlock();
 

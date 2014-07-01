@@ -90,7 +90,7 @@ class DataCollector<SOURCE, DATA> implements Collector<DATA> {
     @Override
     public Collector<DATA> allInto(final List<DATA> data) {
 
-        mDataGate.meets(IS_COMPLETE).perform(mCollectorLeap.pullAllAction(), data);
+        mDataGate.meeting(IS_COMPLETE).perform(mCollectorLeap.pullAllAction(), data);
 
         return this;
     }
@@ -136,7 +136,7 @@ class DataCollector<SOURCE, DATA> implements Collector<DATA> {
     @Override
     public DATA next() {
 
-        return mDataGate.meets(HAS_DATA).perform(mCollectorLeap.pullAction());
+        return mDataGate.meeting(HAS_DATA).perform(mCollectorLeap.pullAction());
     }
 
     @Override

@@ -15,7 +15,6 @@ package com.bmd.wtf.fll;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.lang.reflect.WildcardType;
 
 /**
  * Utility abstract class used to overcome Java type erasure.
@@ -90,6 +89,11 @@ public abstract class Classification<TYPE> {
 
                 //noinspection unchecked
                 mRawType = ((Class<?>) ((ParameterizedType) type).getRawType());
+
+            } else {
+
+                throw new IllegalStateException(
+                        "the class does not correctly extends classification: " + getClass());
             }
         }
 
@@ -122,18 +126,10 @@ public abstract class Classification<TYPE> {
 
                 mType = paramType.getActualTypeArguments()[0];
 
-            } else if (type instanceof WildcardType) {
+            } else {
 
-                final Type[] bounds = ((WildcardType) type).getUpperBounds();
-
-                if ((bounds == null) || (bounds.length == 0)) {
-
-                    mType = Object.class;
-
-                } else {
-
-                    mType = bounds[0];
-                }
+                throw new IllegalStateException(
+                        "the class does not correctly extends classification: " + getClass());
             }
         }
 

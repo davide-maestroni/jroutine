@@ -27,6 +27,53 @@ import static org.fest.assertions.api.Assertions.assertThat;
  */
 public class ClassificationTest extends TestCase {
 
+    public void testEquals() {
+
+        final Classification<String> classification1 = new Classification<String>() {};
+
+        assertThat(classification1).isEqualTo(classification1);
+        assertThat(classification1).isEqualTo(new StringClassification());
+        assertThat(classification1).isEqualTo(new SubStringClassification());
+        //noinspection ObjectEqualsNull
+        assertThat(classification1.equals(null)).isFalse();
+
+        final Classification<List<String>> classification2 = new Classification<List<String>>() {};
+
+        assertThat(classification2).isNotEqualTo(new TestClassification<List<String>>());
+        assertThat(classification2.equals(new TestClassification<List<Integer>>())).isFalse();
+        assertThat(classification2.equals(new TestClassification<ArrayList<String>>())).isFalse();
+
+        assertThat(
+                classification2.isAssignableFrom(new Classification<List<String>>() {})).isTrue();
+        assertThat(
+                classification2.isAssignableFrom(new Classification<List<Integer>>() {})).isTrue();
+        assertThat(classification2.isAssignableFrom(
+                new Classification<ArrayList<String>>() {})).isTrue();
+    }
+
+    public void testError() {
+
+        try {
+
+            new TestClassification<List<Integer>>().getRawType();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            new SubTestClassification().getRawType();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+    }
+
     public void testType() {
 
         final Classification<String> classification1 = new Classification<String>() {};
@@ -54,5 +101,21 @@ public class ClassificationTest extends TestCase {
         assertThat(classification4.getType()).isNotEqualTo(List.class);
         assertThat(List.class.equals(classification4.getRawType())).isTrue();
         assertThat(classification4.isInterface()).isTrue();
+    }
+
+    private static class StringClassification extends Classification<String> {
+
+    }
+
+    private static class SubStringClassification extends StringClassification {
+
+    }
+
+    private static class SubTestClassification extends TestClassification<List<Integer>> {
+
+    }
+
+    private static class TestClassification<TEST extends List> extends Classification<TEST> {
+
     }
 }

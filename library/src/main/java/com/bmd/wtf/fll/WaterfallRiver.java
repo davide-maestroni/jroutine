@@ -146,6 +146,18 @@ public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
+    public <TYPE> Gate<TYPE> on(final Class<TYPE> gateType) {
+
+        return mWaterfall.on(gateType);
+    }
+
+    @Override
+    public <TYPE> Gate<TYPE> on(final Classification<TYPE> gateClassification) {
+
+        return mWaterfall.on(gateClassification);
+    }
+
+    @Override
     public River<SOURCE, DATA> push(final int streamNumber, final DATA... drops) {
 
         mWaterfall.push(streamNumber, drops);
@@ -206,17 +218,5 @@ public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     public River<SOURCE, SOURCE> source() {
 
         return mWaterfall.source();
-    }
-
-    @Override
-    public <TYPE> Gate<TYPE> when(final Class<TYPE> gateType) {
-
-        return mWaterfall.when(gateType);
-    }
-
-    @Override
-    public <TYPE> Gate<TYPE> when(final Classification<TYPE> gateClassification) {
-
-        return mWaterfall.when(gateClassification);
     }
 }

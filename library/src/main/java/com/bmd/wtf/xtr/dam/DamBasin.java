@@ -275,8 +275,8 @@ class DamBasin<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA> {
         }
 
         gate.eventuallyThrow(mTimeoutException)
-            .meets(new DamConditionEvaluator<SOURCE, DATA>(mEvaluator, mIsOnDischarge, mIsOnData,
-                                                           mIsOnThrowable));
+            .meeting(new DamConditionEvaluator<SOURCE, DATA>(mEvaluator, mIsOnDischarge, mIsOnData,
+                                                             mIsOnThrowable));
 
         resetWhen();
     }
@@ -336,8 +336,8 @@ class DamBasin<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA> {
 
             final BasinEvaluator<DATA> evaluator = mEvaluator;
 
-            if ((evaluator != null) && !evaluator
-                    .isSatisfied(dropLists, throwableLists, dischargeCount)) {
+            if ((evaluator != null) && !evaluator.isSatisfied(dropLists, throwableLists,
+                                                              dischargeCount)) {
 
                 return false;
             }

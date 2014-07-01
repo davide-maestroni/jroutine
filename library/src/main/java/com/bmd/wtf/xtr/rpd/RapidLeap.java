@@ -456,12 +456,12 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
 
     protected final <TYPE> Gate<TYPE> when(Class<TYPE> gateType) {
 
-        return mUpRiver.when(gateType);
+        return mUpRiver.on(gateType);
     }
 
     protected final <TYPE> Gate<TYPE> when(Classification<TYPE> gateClassification) {
 
-        return mUpRiver.when(gateClassification);
+        return mUpRiver.on(gateClassification);
     }
 
     private void fillMethods() {
@@ -498,8 +498,9 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
                 if (isAnnotated) {
 
                     throw new IllegalArgumentException(
-                            "invalid annotated method: " + method + "\nAn " + OnData.class
-                                    .getSimpleName() + " method must take a single parameter"
+                            "invalid annotated method: " + method + "\nAn "
+                                    + OnData.class.getSimpleName()
+                                    + " method must take a single parameter"
                     );
 
                 } else {
@@ -540,8 +541,8 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
             if ((currentMethod != null) && !currentMethod.equals(method)) {
 
                 throw new IllegalArgumentException(
-                        "cannot override a method already handling data of type: " + parameterType
-                                .getSimpleName()
+                        "cannot override a method already handling data of type: "
+                                + parameterType.getSimpleName()
                 );
             }
 
@@ -569,8 +570,9 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
                 if (isAnnotated) {
 
                     throw new IllegalArgumentException(
-                            "invalid annotated method: " + method + "\nAn " + OnDischarge.class
-                                    .getSimpleName() + " method must take no parameters"
+                            "invalid annotated method: " + method + "\nAn "
+                                    + OnDischarge.class.getSimpleName()
+                                    + " method must take no parameters"
                     );
 
                 } else {
@@ -616,8 +618,9 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
                 if (isAnnotated) {
 
                     throw new IllegalArgumentException(
-                            "invalid annotated method: " + method + "\nAn " + OnData.class
-                                    .getSimpleName() + " method must take a single parameter"
+                            "invalid annotated method: " + method + "\nAn "
+                                    + OnData.class.getSimpleName()
+                                    + " method must take a single parameter"
                     );
 
                 } else {

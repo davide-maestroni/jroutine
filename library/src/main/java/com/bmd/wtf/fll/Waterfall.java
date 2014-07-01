@@ -328,7 +328,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
     public <TYPE> Waterfall<SOURCE, IN, OUT> breakDown(
             final Classification<TYPE> gateClassification) {
 
-        return breakDown(when(gateClassification));
+        return breakDown(on(gateClassification));
     }
 
     /**
@@ -896,6 +896,8 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
         for (final DataFall<SOURCE, IN, OUT> fall : mFalls) {
 
+            fall.raiseLevel(1);
+
             fall.inputCurrent.forward(fall, throwable);
         }
 
@@ -905,11 +907,18 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
     @Override
     public Waterfall<SOURCE, IN, OUT> push(final IN... drops) {
 
+        if ((drops == null) || (drops.length == 0)) {
+
+            return this;
+        }
+
         final DataFall<SOURCE, IN, OUT>[] falls = mFalls;
 
         for (final IN drop : drops) {
 
             for (final DataFall<SOURCE, IN, OUT> fall : falls) {
+
+                fall.raiseLevel(1);
 
                 fall.inputCurrent.push(fall, drop);
             }
@@ -921,11 +930,18 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
     @Override
     public Waterfall<SOURCE, IN, OUT> push(final Iterable<? extends IN> drops) {
 
+        if (drops == null) {
+
+            return this;
+        }
+
         final DataFall<SOURCE, IN, OUT>[] falls = mFalls;
 
         for (final IN drop : drops) {
 
             for (final DataFall<SOURCE, IN, OUT> fall : falls) {
+
+                fall.raiseLevel(1);
 
                 fall.inputCurrent.push(fall, drop);
             }
@@ -939,6 +955,8 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
         for (final DataFall<SOURCE, IN, OUT> fall : mFalls) {
 
+            fall.raiseLevel(1);
+
             fall.inputCurrent.push(fall, drop);
         }
 
@@ -949,9 +967,26 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
     public Waterfall<SOURCE, IN, OUT> pushAfter(final long delay, final TimeUnit timeUnit,
             final Iterable<? extends IN> drops) {
 
-        for (final DataFall<SOURCE, IN, OUT> fall : mFalls) {
+        if (drops == null) {
 
-            fall.inputCurrent.pushAfter(fall, delay, timeUnit, drops);
+            return this;
+        }
+
+        int size = 0;
+
+        for (final IN ignored : drops) {
+
+            ++size;
+        }
+
+        if (size > 0) {
+
+            for (final DataFall<SOURCE, IN, OUT> fall : mFalls) {
+
+                fall.raiseLevel(size);
+
+                fall.inputCurrent.pushAfter(fall, delay, timeUnit, drops);
+            }
         }
 
         return this;
@@ -963,6 +998,8 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
         for (final DataFall<SOURCE, IN, OUT> fall : mFalls) {
 
+            fall.raiseLevel(1);
+
             fall.inputCurrent.pushAfter(fall, delay, timeUnit, drop);
         }
 
@@ -973,9 +1010,16 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
     public Waterfall<SOURCE, IN, OUT> pushAfter(final long delay, final TimeUnit timeUnit,
             final IN... drops) {
 
+        if ((drops == null) || (drops.length == 0)) {
+
+            return this;
+        }
+
         final List<IN> list = Arrays.asList(drops);
 
         for (final DataFall<SOURCE, IN, OUT> fall : mFalls) {
+
+            fall.raiseLevel(drops.length);
 
             fall.inputCurrent.pushAfter(fall, delay, timeUnit, list);
         }
@@ -1021,15 +1065,46 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
         final DataFall<SOURCE, IN, OUT> fall = mFalls[streamNumber];
 
+        fall.raiseLevel(1);
+
         fall.inputCurrent.forward(fall, throwable);
 
         return this;
     }
 
     @Override
+    public <TYPE> Gate<TYPE> on(final Class<TYPE> gateType) {
+
+        return on(Classification.ofType(gateType));
+    }
+
+    @Override
+    public <TYPE> Gate<TYPE> on(final Classification<TYPE> gateClassification) {
+
+        final GateLeap<?, ?, ?> leap = findBestMatch(gateClassification);
+
+        if (leap == null) {
+
+            throw new IllegalArgumentException(
+                    "the waterfall does not retain any gate of classification type "
+                            + gateClassification
+            );
+        }
+
+        return new DataGate<TYPE>(leap, gateClassification);
+    }
+
+    @Override
     public Waterfall<SOURCE, IN, OUT> push(final int streamNumber, final IN... drops) {
 
+        if ((drops == null) || (drops.length == 0)) {
+
+            return this;
+        }
+
         final DataFall<SOURCE, IN, OUT> fall = mFalls[streamNumber];
+
+        fall.raiseLevel(drops.length);
 
         for (final IN drop : drops) {
 
@@ -1043,11 +1118,28 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
     public Waterfall<SOURCE, IN, OUT> push(final int streamNumber,
             final Iterable<? extends IN> drops) {
 
-        final DataFall<SOURCE, IN, OUT> fall = mFalls[streamNumber];
+        if (drops == null) {
 
-        for (final IN drop : drops) {
+            return this;
+        }
 
-            fall.inputCurrent.push(fall, drop);
+        int size = 0;
+
+        for (final IN ignored : drops) {
+
+            ++size;
+        }
+
+        if (size > 0) {
+
+            final DataFall<SOURCE, IN, OUT> fall = mFalls[streamNumber];
+
+            fall.raiseLevel(size);
+
+            for (final IN drop : drops) {
+
+                fall.inputCurrent.push(fall, drop);
+            }
         }
 
         return this;
@@ -1058,6 +1150,8 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
         final DataFall<SOURCE, IN, OUT> fall = mFalls[streamNumber];
 
+        fall.raiseLevel(1);
+
         fall.inputCurrent.push(fall, drop);
 
         return this;
@@ -1067,9 +1161,26 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
     public Waterfall<SOURCE, IN, OUT> pushAfter(final int streamNumber, final long delay,
             final TimeUnit timeUnit, final Iterable<? extends IN> drops) {
 
-        final DataFall<SOURCE, IN, OUT> fall = mFalls[streamNumber];
+        if (drops == null) {
 
-        fall.inputCurrent.pushAfter(fall, delay, timeUnit, drops);
+            return this;
+        }
+
+        int size = 0;
+
+        for (final IN ignored : drops) {
+
+            ++size;
+        }
+
+        if (size > 0) {
+
+            final DataFall<SOURCE, IN, OUT> fall = mFalls[streamNumber];
+
+            fall.raiseLevel(size);
+
+            fall.inputCurrent.pushAfter(fall, delay, timeUnit, drops);
+        }
 
         return this;
     }
@@ -1080,6 +1191,8 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
         final DataFall<SOURCE, IN, OUT> fall = mFalls[streamNumber];
 
+        fall.raiseLevel(1);
+
         fall.inputCurrent.pushAfter(fall, delay, timeUnit, drop);
 
         return this;
@@ -1089,7 +1202,14 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
     public Waterfall<SOURCE, IN, OUT> pushAfter(final int streamNumber, final long delay,
             final TimeUnit timeUnit, final IN... drops) {
 
+        if ((drops == null) || (drops.length == 0)) {
+
+            return this;
+        }
+
         final DataFall<SOURCE, IN, OUT> fall = mFalls[streamNumber];
+
+        fall.raiseLevel(drops.length);
 
         fall.inputCurrent.pushAfter(fall, delay, timeUnit, Arrays.asList(drops));
 
@@ -1106,28 +1226,6 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
     public Waterfall<SOURCE, SOURCE, ?> source() {
 
         return mSource;
-    }
-
-    @Override
-    public <TYPE> Gate<TYPE> when(final Class<TYPE> gateType) {
-
-        return when(Classification.ofType(gateType));
-    }
-
-    @Override
-    public <TYPE> Gate<TYPE> when(final Classification<TYPE> gateClassification) {
-
-        final GateLeap<?, ?, ?> leap = findBestMatch(gateClassification);
-
-        if (leap == null) {
-
-            throw new IllegalArgumentException(
-                    "the waterfall does not retain any gate of classification type "
-                            + gateClassification
-            );
-        }
-
-        return new DataGate<TYPE>(leap, gateClassification);
     }
 
     /**
@@ -1584,7 +1682,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
     private void mapGate(final HashMap<Classification<?>, GateLeap<?, ?, ?>> gateMap,
             final Classification<?> gateClassification, final GateLeap<?, ?, ?> leap) {
 
-        if (!gateClassification.getRawType().isInstance(leap)) {
+        if (!gateClassification.getRawType().isInstance(leap.leap)) {
 
             throw new IllegalArgumentException(
                     "the leap does not implement the gate classification type");

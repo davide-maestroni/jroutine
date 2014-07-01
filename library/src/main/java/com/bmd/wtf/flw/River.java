@@ -106,6 +106,28 @@ public interface River<SOURCE, DATA> extends Stream<DATA> {
     public River<SOURCE, DATA> forward(int streamNumber, Throwable throwable);
 
     /**
+     * Returns a gate handling a specific leap.
+     * <p/>
+     * If no gate can be created an exception will be thrown.
+     *
+     * @param gateType The gate type.
+     * @param <TYPE>   The leap type.
+     * @return The gate.
+     */
+    public <TYPE> Gate<TYPE> on(Class<TYPE> gateType);
+
+    /**
+     * Returns a gate handling a specific leap.
+     * <p/>
+     * If no gate can be created an exception will be thrown.
+     *
+     * @param gateClassification The gate classification.
+     * @param <TYPE>             The leap type.
+     * @return The gate.
+     */
+    public <TYPE> Gate<TYPE> on(Classification<TYPE> gateClassification);
+
+    /**
      * Pushes the specified data into the specific river stream flow.
      *
      * @param streamNumber The number identifying the target stream.
@@ -179,26 +201,4 @@ public interface River<SOURCE, DATA> extends Stream<DATA> {
      * @return The river source.
      */
     public River<SOURCE, SOURCE> source();
-
-    /**
-     * Returns a gate handling a specific leap.
-     * <p/>
-     * If no gate can be created an exception will be thrown.
-     *
-     * @param gateType The gate type.
-     * @param <TYPE>   The leap type.
-     * @return The gate.
-     */
-    public <TYPE> Gate<TYPE> when(Class<TYPE> gateType);
-
-    /**
-     * Returns a gate handling a specific leap.
-     * <p/>
-     * If no gate can be created an exception will be thrown.
-     *
-     * @param gateClassification The gate classification.
-     * @param <TYPE>             The leap type.
-     * @return The gate.
-     */
-    public <TYPE> Gate<TYPE> when(Classification<TYPE> gateClassification);
 }

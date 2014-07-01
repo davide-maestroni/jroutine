@@ -15,6 +15,8 @@ package com.bmd.wtf.fll;
 
 import com.bmd.wtf.drp.Drops;
 import com.bmd.wtf.flw.Collector;
+import com.bmd.wtf.flw.Gate.Action;
+import com.bmd.wtf.flw.Gate.ConditionEvaluator;
 import com.bmd.wtf.flw.River;
 import com.bmd.wtf.lps.AbstractLeap;
 import com.bmd.wtf.lps.FreeLeap;
@@ -184,8 +186,8 @@ public class WaterfallTest extends TestCase {
         fall.pull("Ciao", "This", "zOO", null, "is", "a", "3", "test", "1111", "CAPITAL", "atest")
             .allInto(output);
 
-        assertThat(output)
-                .containsExactly("1111", "3", "CAPITAL", "Ciao", "a", "is", "zOO", "This");
+        assertThat(output).containsExactly("1111", "3", "CAPITAL", "Ciao", "a", "is", "zOO",
+                                           "This");
 
         assertThat(fall.pull("test").all()).isEmpty();
 
@@ -214,15 +216,111 @@ public class WaterfallTest extends TestCase {
 
         assertThat(i).isEqualTo(3);
 
-        assertThat(Waterfall.create().in(3).start(Integer.class).pull(1).all())
-                .containsExactly(1, 1, 1);
-        assertThat(Waterfall.create().in(3).start(Integer.class).in(1).pull(1).all())
-                .containsExactly(1, 1, 1);
+        assertThat(Waterfall.create().in(3).start(Integer.class).pull(1).all()).containsExactly(1,
+                                                                                                1,
+                                                                                                1);
+        assertThat(
+                Waterfall.create().in(3).start(Integer.class).in(1).pull(1).all()).containsExactly(
+                1, 1, 1);
 
-        assertThat(Waterfall.create().inBackground(3).start(Integer.class).pull(1).all())
-                .containsExactly(1, 1, 1);
-        assertThat(Waterfall.create().inBackground(3).start(Integer.class).in(1).pull(1).all())
-                .containsExactly(1, 1, 1);
+        assertThat(Waterfall.create()
+                            .inBackground(3)
+                            .start(Integer.class)
+                            .pull(1)
+                            .all()).containsExactly(1, 1, 1);
+        assertThat(Waterfall.create()
+                            .inBackground(3)
+                            .start(Integer.class)
+                            .in(1)
+                            .pull(1)
+                            .all()).containsExactly(1, 1, 1);
+    }
+
+    public void testCollect() {
+
+        final Waterfall<String, String, String> fall =
+                Waterfall.create().inBackground(1).start(String.class);
+        Collector<String> collector = fall.collect();
+
+        fall.source().push("test").discharge();
+
+        assertThat(collector.next()).isEqualTo("test");
+
+        collector = fall.collect();
+        fall.source().pushAfter(2, TimeUnit.SECONDS, "test").discharge();
+
+        try {
+
+            collector.now().next();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        assertThat(collector.now().all()).isEmpty();
+        assertThat(collector.eventually().all()).containsExactly("test");
+
+        collector = fall.collect();
+        fall.source().pushAfter(2, TimeUnit.SECONDS, "test").discharge();
+
+        try {
+
+            collector.afterMax(100, TimeUnit.MILLISECONDS).next();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        assertThat(collector.afterMax(100, TimeUnit.MILLISECONDS).all()).isEmpty();
+        assertThat(collector.eventually().all()).containsExactly("test");
+
+        collector = fall.collect();
+        fall.source().pushAfter(2, TimeUnit.SECONDS, "test").discharge();
+
+        try {
+
+            collector.afterMax(100, TimeUnit.MILLISECONDS)
+                     .eventuallyThrow(new IllegalStateException())
+                     .next();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            collector.afterMax(100, TimeUnit.MILLISECONDS)
+                     .eventuallyThrow(new IllegalStateException())
+                     .all();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        assertThat(collector.eventually().all()).containsExactly("test");
+
+        collector = fall.collect();
+        fall.source().push("test").discharge();
+
+        collector.next();
+
+        try {
+
+            collector.remove();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
     }
 
     public void testDeviate() {
@@ -298,6 +396,79 @@ public class WaterfallTest extends TestCase {
         assertThat(fall4.pull(1).now().all()).isEmpty();
     }
 
+    public void testDeviateStream() {
+
+        final Waterfall<Integer, Integer, Integer> fall1 = Waterfall.create().start(Integer.class);
+        final Waterfall<Integer, Integer, Integer> fall2 =
+                fall1.chain(new AbstractLeap<Integer, Integer, Integer>() {
+
+                    @Override
+                    public void onPush(final River<Integer, Integer> upRiver,
+                            final River<Integer, Integer> downRiver, final int fallNumber,
+                            final Integer drop) {
+
+                        downRiver.push(drop - 1);
+
+                        if (drop == 0) {
+
+                            upRiver.deviate(0);
+                            downRiver.deviate(0);
+                        }
+                    }
+                });
+        final Waterfall<Integer, Integer, String> fall3 =
+                fall2.chain(new AbstractLeap<Integer, Integer, String>() {
+
+                    @Override
+                    public void onPush(final River<Integer, Integer> upRiver,
+                            final River<Integer, String> downRiver, final int fallNumber,
+                            final Integer drop) {
+
+                        downRiver.push(drop.toString());
+                    }
+                });
+        final Waterfall<Integer, String, String> fall4 = fall3.chain();
+
+        assertThat(fall4.pull(1).now().next()).isEqualTo("0");
+        assertThat(fall4.pull(0).now().all()).isEmpty();
+        assertThat(fall4.pull(1).now().all()).isEmpty();
+
+        fall1.chain(new AbstractLeap<Integer, Integer, Integer>() {
+
+            @Override
+            public void onPush(final River<Integer, Integer> upRiver,
+                    final River<Integer, Integer> downRiver, final int fallNumber,
+                    final Integer drop) {
+
+                downRiver.push(drop);
+
+                if (drop == -1) {
+
+                    upRiver.drain(0);
+                    downRiver.drain(0);
+                }
+            }
+        }).chain(fall3);
+
+        assertThat(fall4.pull(1).now().next()).isEqualTo("1");
+        assertThat(fall4.pull(-1).now().all()).isEmpty();
+        assertThat(fall4.pull(0).now().all()).isEmpty();
+
+        fall1.chain(new AbstractLeap<Integer, Integer, Integer>() {
+
+            @Override
+            public void onPush(final River<Integer, Integer> upRiver,
+                    final River<Integer, Integer> downRiver, final int fallNumber,
+                    final Integer drop) {
+
+                downRiver.push(drop);
+            }
+        }).chain(fall3);
+
+        assertThat(fall4.pull(0).now().all()).isEmpty();
+        assertThat(fall4.pull(1).now().all()).isEmpty();
+    }
+
     public void testDistribute() {
 
         final TestLeap leap = new TestLeap();
@@ -323,7 +494,7 @@ public class WaterfallTest extends TestCase {
         assertThat(leap.getDischarges()).isEqualTo(4);
     }
 
-    public void testError() {
+    public void testError() throws InterruptedException {
 
         try {
 
@@ -334,7 +505,6 @@ public class WaterfallTest extends TestCase {
         } catch (final Exception ignored) {
 
         }
-
 
         try {
 
@@ -604,29 +774,120 @@ public class WaterfallTest extends TestCase {
 
         }
 
-        final boolean[] fail = new boolean[1];
+        final LatchLeap latchLeap = new LatchLeap();
 
-        Waterfall.create().start(new FreeLeap<Object, Object>() {
+        final FreeLeap<Object, Object> testLeap = new FreeLeap<Object, Object>() {
 
-            public boolean mFlushed;
+            public boolean mDischarged;
+
+            public boolean mPushed;
+
+            public boolean mThrown;
 
             @Override
             public void onDischarge(final River<Object, Object> upRiver,
                     final River<Object, Object> downRiver, final int fallNumber) {
 
-                if (fail[0] || mFlushed) {
+                if (isFailed(upRiver) || mDischarged) {
 
                     return;
                 }
 
-                mFlushed = true;
+                mDischarged = true;
 
-                fail[0] = true;
+                try {
 
-                downRiver.push((Object) null).push((Object[]) null).push((Iterable<Object>) null)
-                         .push(new Object[0]).push(Arrays.asList()).push("push")
-                         .push(new Object[]{"push"}).push(new Object[]{"push", "push"})
-                         .push(Arrays.asList("push")).push(Arrays.asList("push", "push"))
+                    test(upRiver, downRiver);
+
+                    new Thread(new Runnable() {
+
+                        @Override
+                        public void run() {
+
+                            try {
+
+                                test(upRiver, downRiver);
+
+                            } catch (final Throwable ignored) {
+
+                                setFailed(downRiver);
+
+                            } finally {
+
+                                incCount(downRiver);
+                            }
+                        }
+                    }).start();
+
+                } catch (final Throwable ignored) {
+
+                    setFailed(downRiver);
+                }
+            }
+
+            private void incCount(final River<Object, Object> river) {
+
+                river.on(LatchLeap.class).immediately().perform(new Action<Void, LatchLeap>() {
+
+                                                                    @Override
+                                                                    public Void doOn(
+                                                                            final LatchLeap leap,
+                                                                            final Object... args) {
+
+                                                                        leap.incCount();
+
+                                                                        return null;
+                                                                    }
+                                                                }
+                );
+            }
+
+            private boolean isFailed(final River<Object, Object> river) {
+
+                return river.on(LatchLeap.class)
+                            .immediately()
+                            .perform(new Action<Boolean, LatchLeap>() {
+
+                                         @Override
+                                         public Boolean doOn(final LatchLeap leap,
+                                                 final Object... args) {
+
+                                             return leap.isFailed();
+                                         }
+                                     }
+                            );
+            }
+
+            private void setFailed(final River<Object, Object> river) {
+
+                river.on(LatchLeap.class).immediately().perform(new Action<Void, LatchLeap>() {
+
+                                                                    @Override
+                                                                    public Void doOn(
+                                                                            final LatchLeap leap,
+                                                                            final Object... args) {
+
+                                                                        leap.setFailed();
+
+                                                                        return null;
+                                                                    }
+                                                                }
+                );
+            }
+
+            private void test(final River<Object, Object> upRiver,
+                    final River<Object, Object> downRiver) {
+
+                downRiver.push((Object) null)
+                         .push((Object[]) null)
+                         .push((Iterable<Object>) null)
+                         .push(new Object[0])
+                         .push(Arrays.asList())
+                         .push("push")
+                         .push(new Object[]{"push"})
+                         .push(new Object[]{"push", "push"})
+                         .push(Arrays.asList("push"))
+                         .push(Arrays.asList("push", "push"))
                          .pushAfter(0, TimeUnit.MILLISECONDS, (Object) null)
                          .pushAfter(0, TimeUnit.MILLISECONDS, (Object[]) null)
                          .pushAfter(0, TimeUnit.MILLISECONDS, (Iterable<Object>) null)
@@ -637,12 +898,19 @@ public class WaterfallTest extends TestCase {
                          .pushAfter(0, TimeUnit.MILLISECONDS, new Object[]{"push", "push"})
                          .pushAfter(0, TimeUnit.MILLISECONDS, Arrays.asList("push"))
                          .pushAfter(0, TimeUnit.MILLISECONDS, Arrays.asList("push", "push"))
-                         .forward(null).forward(new RuntimeException()).discharge();
+                         .forward(null)
+                         .forward(new RuntimeException("test"))
+                         .discharge();
 
-                downRiver.push(0, (Object) null).push(0, (Object[]) null)
-                         .push(0, (Iterable<Object>) null).push(0, new Object[0])
-                         .push(0, Arrays.asList()).push(0, "push").push(0, new Object[]{"push"})
-                         .push(0, new Object[]{"push", "push"}).push(0, Arrays.asList("push"))
+                downRiver.push(0, (Object) null)
+                         .push(0, (Object[]) null)
+                         .push(0, (Iterable<Object>) null)
+                         .push(0, new Object[0])
+                         .push(0, Arrays.asList())
+                         .push(0, "push")
+                         .push(0, new Object[]{"push"})
+                         .push(0, new Object[]{"push", "push"})
+                         .push(0, Arrays.asList("push"))
                          .push(0, Arrays.asList("push", "push"))
                          .pushAfter(0, 0, TimeUnit.MILLISECONDS, (Object) null)
                          .pushAfter(0, 0, TimeUnit.MILLISECONDS, (Object[]) null)
@@ -654,12 +922,20 @@ public class WaterfallTest extends TestCase {
                          .pushAfter(0, 0, TimeUnit.MILLISECONDS, new Object[]{"push", "push"})
                          .pushAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList("push"))
                          .pushAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList("push", "push"))
-                         .forward(0, null).forward(0, new RuntimeException()).discharge(0);
+                         .forward(0, null)
+                         .forward(0, new RuntimeException("test"))
+                         .discharge(0);
 
-                upRiver.push((Object) null).push((Object[]) null).push((Iterable<Object>) null)
-                       .push(new Object[0]).push(Arrays.asList()).push("push")
-                       .push(new Object[]{"push"}).push(new Object[]{"push", "push"})
-                       .push(Arrays.asList("push")).push(Arrays.asList("push", "push"))
+                upRiver.push((Object) null)
+                       .push((Object[]) null)
+                       .push((Iterable<Object>) null)
+                       .push(new Object[0])
+                       .push(Arrays.asList())
+                       .push("push")
+                       .push(new Object[]{"push"})
+                       .push(new Object[]{"push", "push"})
+                       .push(Arrays.asList("push"))
+                       .push(Arrays.asList("push", "push"))
                        .pushAfter(0, TimeUnit.MILLISECONDS, (Object) null)
                        .pushAfter(0, TimeUnit.MILLISECONDS, (Object[]) null)
                        .pushAfter(0, TimeUnit.MILLISECONDS, (Iterable<Object>) null)
@@ -670,12 +946,19 @@ public class WaterfallTest extends TestCase {
                        .pushAfter(0, TimeUnit.MILLISECONDS, new Object[]{"push", "push"})
                        .pushAfter(0, TimeUnit.MILLISECONDS, Arrays.asList("push"))
                        .pushAfter(0, TimeUnit.MILLISECONDS, Arrays.asList("push", "push"))
-                       .forward(null).forward(new RuntimeException()).discharge();
+                       .forward(null)
+                       .forward(new RuntimeException("test"))
+                       .discharge();
 
-                upRiver.push(0, (Object) null).push(0, (Object[]) null)
-                       .push(0, (Iterable<Object>) null).push(0, new Object[0])
-                       .push(0, Arrays.asList()).push(0, "push").push(0, new Object[]{"push"})
-                       .push(0, new Object[]{"push", "push"}).push(0, Arrays.asList("push"))
+                upRiver.push(0, (Object) null)
+                       .push(0, (Object[]) null)
+                       .push(0, (Iterable<Object>) null)
+                       .push(0, new Object[0])
+                       .push(0, Arrays.asList())
+                       .push(0, "push")
+                       .push(0, new Object[]{"push"})
+                       .push(0, new Object[]{"push", "push"})
+                       .push(0, Arrays.asList("push"))
                        .push(0, Arrays.asList("push", "push"))
                        .pushAfter(0, 0, TimeUnit.MILLISECONDS, (Object) null)
                        .pushAfter(0, 0, TimeUnit.MILLISECONDS, (Object[]) null)
@@ -687,9 +970,14 @@ public class WaterfallTest extends TestCase {
                        .pushAfter(0, 0, TimeUnit.MILLISECONDS, new Object[]{"push", "push"})
                        .pushAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList("push"))
                        .pushAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList("push", "push"))
-                       .forward(0, null).forward(0, new RuntimeException()).discharge(0);
+                       .forward(0, null)
+                       .forward(0, new RuntimeException("test"))
+                       .discharge(0);
 
-                fail[0] = false;
+                assertThat(downRiver.source()).isNotNull();
+                assertThat(downRiver.size()).isEqualTo(1);
+                assertThat(upRiver.source()).isNotNull();
+                assertThat(upRiver.size()).isEqualTo(1);
             }
 
             @Override
@@ -697,80 +985,41 @@ public class WaterfallTest extends TestCase {
                     final River<Object, Object> downRiver, final int fallNumber,
                     final Object drop) {
 
-                if (fail[0] || !"test".equals(drop)) {
+                if (isFailed(downRiver) || mPushed) {
 
                     return;
                 }
 
-                fail[0] = true;
+                mPushed = true;
 
-                downRiver.push((Object) null).push((Object[]) null).push((Iterable<Object>) null)
-                         .push(new Object[0]).push(Arrays.asList()).push("push")
-                         .push(new Object[]{"push"}).push(new Object[]{"push", "push"})
-                         .push(Arrays.asList("push")).push(Arrays.asList("push", "push"))
-                         .pushAfter(0, TimeUnit.MILLISECONDS, (Object) null)
-                         .pushAfter(0, TimeUnit.MILLISECONDS, (Object[]) null)
-                         .pushAfter(0, TimeUnit.MILLISECONDS, (Iterable<Object>) null)
-                         .pushAfter(0, TimeUnit.MILLISECONDS, new Object[0])
-                         .pushAfter(0, TimeUnit.MILLISECONDS, Arrays.asList())
-                         .pushAfter(0, TimeUnit.MILLISECONDS, "push")
-                         .pushAfter(0, TimeUnit.MILLISECONDS, new Object[]{"push"})
-                         .pushAfter(0, TimeUnit.MILLISECONDS, new Object[]{"push", "push"})
-                         .pushAfter(0, TimeUnit.MILLISECONDS, Arrays.asList("push"))
-                         .pushAfter(0, TimeUnit.MILLISECONDS, Arrays.asList("push", "push"))
-                         .forward(null).forward(new RuntimeException()).discharge();
+                try {
 
-                downRiver.push(0, (Object) null).push(0, (Object[]) null)
-                         .push(0, (Iterable<Object>) null).push(0, new Object[0])
-                         .push(0, Arrays.asList()).push(0, "push").push(0, new Object[]{"push"})
-                         .push(0, new Object[]{"push", "push"}).push(0, Arrays.asList("push"))
-                         .push(0, Arrays.asList("push", "push"))
-                         .pushAfter(0, 0, TimeUnit.MILLISECONDS, (Object) null)
-                         .pushAfter(0, 0, TimeUnit.MILLISECONDS, (Object[]) null)
-                         .pushAfter(0, 0, TimeUnit.MILLISECONDS, (Iterable<Object>) null)
-                         .pushAfter(0, 0, TimeUnit.MILLISECONDS, new Object[0])
-                         .pushAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList())
-                         .pushAfter(0, 0, TimeUnit.MILLISECONDS, "push")
-                         .pushAfter(0, 0, TimeUnit.MILLISECONDS, new Object[]{"push"})
-                         .pushAfter(0, 0, TimeUnit.MILLISECONDS, new Object[]{"push", "push"})
-                         .pushAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList("push"))
-                         .pushAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList("push", "push"))
-                         .forward(0, null).forward(0, new RuntimeException()).discharge(0);
+                    test(upRiver, downRiver);
 
-                upRiver.push((Object) null).push((Object[]) null).push((Iterable<Object>) null)
-                       .push(new Object[0]).push(Arrays.asList()).push("push")
-                       .push(new Object[]{"push"}).push(new Object[]{"push", "push"})
-                       .push(Arrays.asList("push")).push(Arrays.asList("push", "push"))
-                       .pushAfter(0, TimeUnit.MILLISECONDS, (Object) null)
-                       .pushAfter(0, TimeUnit.MILLISECONDS, (Object[]) null)
-                       .pushAfter(0, TimeUnit.MILLISECONDS, (Iterable<Object>) null)
-                       .pushAfter(0, TimeUnit.MILLISECONDS, new Object[0])
-                       .pushAfter(0, TimeUnit.MILLISECONDS, Arrays.asList())
-                       .pushAfter(0, TimeUnit.MILLISECONDS, "push")
-                       .pushAfter(0, TimeUnit.MILLISECONDS, new Object[]{"push"})
-                       .pushAfter(0, TimeUnit.MILLISECONDS, new Object[]{"push", "push"})
-                       .pushAfter(0, TimeUnit.MILLISECONDS, Arrays.asList("push"))
-                       .pushAfter(0, TimeUnit.MILLISECONDS, Arrays.asList("push", "push"))
-                       .forward(null).forward(new RuntimeException()).discharge();
+                    new Thread(new Runnable() {
 
-                upRiver.push(0, (Object) null).push(0, (Object[]) null)
-                       .push(0, (Iterable<Object>) null).push(0, new Object[0])
-                       .push(0, Arrays.asList()).push(0, "push").push(0, new Object[]{"push"})
-                       .push(0, new Object[]{"push", "push"}).push(0, Arrays.asList("push"))
-                       .push(0, Arrays.asList("push", "push"))
-                       .pushAfter(0, 0, TimeUnit.MILLISECONDS, (Object) null)
-                       .pushAfter(0, 0, TimeUnit.MILLISECONDS, (Object[]) null)
-                       .pushAfter(0, 0, TimeUnit.MILLISECONDS, (Iterable<Object>) null)
-                       .pushAfter(0, 0, TimeUnit.MILLISECONDS, new Object[0])
-                       .pushAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList())
-                       .pushAfter(0, 0, TimeUnit.MILLISECONDS, "push")
-                       .pushAfter(0, 0, TimeUnit.MILLISECONDS, new Object[]{"push"})
-                       .pushAfter(0, 0, TimeUnit.MILLISECONDS, new Object[]{"push", "push"})
-                       .pushAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList("push"))
-                       .pushAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList("push", "push"))
-                       .forward(0, null).forward(0, new RuntimeException()).discharge(0);
+                        @Override
+                        public void run() {
 
-                fail[0] = false;
+                            try {
+
+                                test(upRiver, downRiver);
+
+                            } catch (final Throwable ignored) {
+
+                                setFailed(upRiver);
+
+                            } finally {
+
+                                incCount(upRiver);
+                            }
+                        }
+                    }).start();
+
+                } catch (final Throwable ignored) {
+
+                    setFailed(downRiver);
+                }
             }
 
             @Override
@@ -778,87 +1027,108 @@ public class WaterfallTest extends TestCase {
                     final River<Object, Object> downRiver, final int fallNumber,
                     final Throwable throwable) {
 
-                if (fail[0] || !"test".equals(throwable.getMessage())) {
+                if (isFailed(upRiver) || mThrown) {
 
                     return;
                 }
 
-                fail[0] = true;
+                mThrown = true;
 
-                downRiver.push((Object) null).push((Object[]) null).push((Iterable<Object>) null)
-                         .push(new Object[0]).push(Arrays.asList()).push("push")
-                         .push(new Object[]{"push"}).push(new Object[]{"push", "push"})
-                         .push(Arrays.asList("push")).push(Arrays.asList("push", "push"))
-                         .pushAfter(0, TimeUnit.MILLISECONDS, (Object) null)
-                         .pushAfter(0, TimeUnit.MILLISECONDS, (Object[]) null)
-                         .pushAfter(0, TimeUnit.MILLISECONDS, (Iterable<Object>) null)
-                         .pushAfter(0, TimeUnit.MILLISECONDS, new Object[0])
-                         .pushAfter(0, TimeUnit.MILLISECONDS, Arrays.asList())
-                         .pushAfter(0, TimeUnit.MILLISECONDS, "push")
-                         .pushAfter(0, TimeUnit.MILLISECONDS, new Object[]{"push"})
-                         .pushAfter(0, TimeUnit.MILLISECONDS, new Object[]{"push", "push"})
-                         .pushAfter(0, TimeUnit.MILLISECONDS, Arrays.asList("push"))
-                         .pushAfter(0, TimeUnit.MILLISECONDS, Arrays.asList("push", "push"))
-                         .forward(null).forward(new RuntimeException()).discharge();
+                try {
 
-                downRiver.push(0, (Object) null).push(0, (Object[]) null)
-                         .push(0, (Iterable<Object>) null).push(0, new Object[0])
-                         .push(0, Arrays.asList()).push(0, "push").push(0, new Object[]{"push"})
-                         .push(0, new Object[]{"push", "push"}).push(0, Arrays.asList("push"))
-                         .push(0, Arrays.asList("push", "push"))
-                         .pushAfter(0, 0, TimeUnit.MILLISECONDS, (Object) null)
-                         .pushAfter(0, 0, TimeUnit.MILLISECONDS, (Object[]) null)
-                         .pushAfter(0, 0, TimeUnit.MILLISECONDS, (Iterable<Object>) null)
-                         .pushAfter(0, 0, TimeUnit.MILLISECONDS, new Object[0])
-                         .pushAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList())
-                         .pushAfter(0, 0, TimeUnit.MILLISECONDS, "push")
-                         .pushAfter(0, 0, TimeUnit.MILLISECONDS, new Object[]{"push"})
-                         .pushAfter(0, 0, TimeUnit.MILLISECONDS, new Object[]{"push", "push"})
-                         .pushAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList("push"))
-                         .pushAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList("push", "push"))
-                         .forward(0, null).forward(0, new RuntimeException()).discharge(0);
+                    test(upRiver, downRiver);
 
-                upRiver.push((Object) null).push((Object[]) null).push((Iterable<Object>) null)
-                       .push(new Object[0]).push(Arrays.asList()).push("push")
-                       .push(new Object[]{"push"}).push(new Object[]{"push", "push"})
-                       .push(Arrays.asList("push")).push(Arrays.asList("push", "push"))
-                       .pushAfter(0, TimeUnit.MILLISECONDS, (Object) null)
-                       .pushAfter(0, TimeUnit.MILLISECONDS, (Object[]) null)
-                       .pushAfter(0, TimeUnit.MILLISECONDS, (Iterable<Object>) null)
-                       .pushAfter(0, TimeUnit.MILLISECONDS, new Object[0])
-                       .pushAfter(0, TimeUnit.MILLISECONDS, Arrays.asList())
-                       .pushAfter(0, TimeUnit.MILLISECONDS, "push")
-                       .pushAfter(0, TimeUnit.MILLISECONDS, new Object[]{"push"})
-                       .pushAfter(0, TimeUnit.MILLISECONDS, new Object[]{"push", "push"})
-                       .pushAfter(0, TimeUnit.MILLISECONDS, Arrays.asList("push"))
-                       .pushAfter(0, TimeUnit.MILLISECONDS, Arrays.asList("push", "push"))
-                       .forward(null).forward(new RuntimeException()).discharge();
+                    new Thread(new Runnable() {
 
-                upRiver.push(0, (Object) null).push(0, (Object[]) null)
-                       .push(0, (Iterable<Object>) null).push(0, new Object[0])
-                       .push(0, Arrays.asList()).push(0, "push").push(0, new Object[]{"push"})
-                       .push(0, new Object[]{"push", "push"}).push(0, Arrays.asList("push"))
-                       .push(0, Arrays.asList("push", "push"))
-                       .pushAfter(0, 0, TimeUnit.MILLISECONDS, (Object) null)
-                       .pushAfter(0, 0, TimeUnit.MILLISECONDS, (Object[]) null)
-                       .pushAfter(0, 0, TimeUnit.MILLISECONDS, (Iterable<Object>) null)
-                       .pushAfter(0, 0, TimeUnit.MILLISECONDS, new Object[0])
-                       .pushAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList())
-                       .pushAfter(0, 0, TimeUnit.MILLISECONDS, "push")
-                       .pushAfter(0, 0, TimeUnit.MILLISECONDS, new Object[]{"push"})
-                       .pushAfter(0, 0, TimeUnit.MILLISECONDS, new Object[]{"push", "push"})
-                       .pushAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList("push"))
-                       .pushAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList("push", "push"))
-                       .forward(0, null).forward(0, new RuntimeException()).discharge(0);
+                        @Override
+                        public void run() {
 
-                fail[0] = false;
+                            try {
+
+                                test(upRiver, downRiver);
+
+                            } catch (final Throwable ignored) {
+
+                                setFailed(downRiver);
+
+                            } finally {
+
+                                incCount(downRiver);
+                            }
+                        }
+                    }).start();
+
+                } catch (final Throwable ignored) {
+
+                    setFailed(upRiver);
+                }
             }
-        }).source().push("test", "push");
+        };
 
-        if (fail[0]) {
+        final Waterfall<Object, Object, Object> fall = Waterfall.create()
+                                                                .asGate()
+                                                                .start(latchLeap)
+                                                                .chain(testLeap)
+                                                                .chain(new FreeLeap<Object, Object>() {
 
-            fail();
-        }
+                                                                    @Override
+                                                                    public void onUnhandled(
+                                                                            final River<Object, Object> upRiver,
+                                                                            final River<Object, Object> downRiver,
+                                                                            final int fallNumber,
+                                                                            final Throwable throwable) {
+
+                                                                        if ((throwable != null)
+                                                                                && !"test".equals(
+                                                                                throwable.getMessage())) {
+
+                                                                            downRiver.on(
+                                                                                    LatchLeap.class)
+                                                                                     .immediately()
+                                                                                     .perform(
+                                                                                             new Action<Void, LatchLeap>() {
+
+                                                                                                 @Override
+                                                                                                 public Void doOn(
+                                                                                                         final LatchLeap leap,
+                                                                                                         final Object... args) {
+
+                                                                                                     leap.setFailed();
+
+                                                                                                     return null;
+                                                                                                 }
+                                                                                             }
+                                                                                     );
+                                                                        }
+                                                                    }
+                                                                });
+
+        fall.source().push("test");
+
+        fall.on(LatchLeap.class)
+            .afterMax(3, TimeUnit.SECONDS)
+            .eventuallyThrow(new IllegalStateException())
+            .meeting(new ConditionEvaluator<LatchLeap>() {
+
+                @Override
+                public boolean isSatisfied(final LatchLeap leap) {
+
+                    return (leap.getCount() == 3);
+                }
+            })
+            .perform(new Action<Void, LatchLeap>() {
+
+                @Override
+                public Void doOn(final LatchLeap leap, final Object... args) {
+
+                    if (leap.isFailed()) {
+
+                        fail();
+                    }
+
+                    return null;
+                }
+            });
     }
 
     public void testJoin() {
@@ -962,6 +1232,33 @@ public class WaterfallTest extends TestCase {
         fall4.pull().nextInto(output);
 
         assertThat(output).containsExactly(128, 136);
+    }
+
+    private static class LatchLeap extends FreeLeap<Object, Object> {
+
+        private int mCount;
+
+        private boolean mFailed;
+
+        public int getCount() {
+
+            return mCount;
+        }
+
+        public void incCount() {
+
+            ++mCount;
+        }
+
+        public boolean isFailed() {
+
+            return mFailed;
+        }
+
+        public void setFailed() {
+
+            mFailed = true;
+        }
     }
 
     private class TestLeap extends FreeLeap<String, String> {

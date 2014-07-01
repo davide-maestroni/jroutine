@@ -210,7 +210,7 @@ public class Dam<SOURCE, DATA> extends WaterfallRiver<SOURCE, SOURCE> {
 
         mInWaterfall = waterfall;
         mOutWaterfall = waterfall.asGate().chain(new DamBasin<SOURCE, DATA>(waterfall.size()));
-        mGate = mOutWaterfall.when(new Classification<DamBasin<SOURCE, DATA>>() {});
+        mGate = mOutWaterfall.on(new Classification<DamBasin<SOURCE, DATA>>() {});
     }
 
     public static <SOURCE, DATA> Dam<SOURCE, DATA> on(

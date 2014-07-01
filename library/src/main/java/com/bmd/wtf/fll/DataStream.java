@@ -66,8 +66,6 @@ class DataStream<DATA> implements Stream<DATA> {
 
         final DataFall<?, DATA, ?> fall = mDownstreamFall;
 
-        fall.waitDry(this);
-
         if (mPassThrough) {
 
             fall.discharge(this);

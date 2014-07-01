@@ -74,6 +74,8 @@ class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
 
     private final LockRiver<SOURCE, OUT> mOutRiver;
 
+    private boolean mIsDischarge;
+
     private int mWaterline;
 
     public DataFall(final Waterfall<SOURCE, IN, OUT> waterfall, final Current inputCurrent,
@@ -119,13 +121,19 @@ class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
 
                 dryStreams.add(origin);
 
-                if (!dryStreams.containsAll(inputStreams)) {
+                mIsDischarge = dryStreams.containsAll(inputStreams);
 
-                    lowerLevel();
+            } else {
 
-                    return;
-                }
+                mIsDischarge = true;
             }
+
+            if (!mIsDischarge || (mWaterline > 0)) {
+
+                return;
+            }
+
+            mIsDischarge = false;
 
             dryStreams.clear();
 
@@ -149,12 +157,12 @@ class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
         } catch (final Throwable t) {
 
             outRiver.forward(t);
+
+        } finally {
+
+            outRiver.close();
+            inRiver.close();
         }
-
-        outRiver.close();
-        inRiver.close();
-
-        lowerLevel();
     }
 
     @Override
@@ -175,16 +183,20 @@ class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
         } catch (final Throwable t) {
 
             outRiver.forward(t);
+
+        } finally {
+
+            outRiver.close();
+            inRiver.close();
+
+            lowerLevel();
         }
-
-        outRiver.close();
-        inRiver.close();
-
-        lowerLevel();
     }
 
     @Override
     public void push(final IN drop) {
+
+        //TODO: remove dry stream?
 
         final DataLock dataLock = sLock.get();
 
@@ -201,12 +213,14 @@ class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
         } catch (final Throwable t) {
 
             outRiver.forward(t);
+
+        } finally {
+
+            outRiver.close();
+            inRiver.close();
+
+            lowerLevel();
         }
-
-        outRiver.close();
-        inRiver.close();
-
-        lowerLevel();
     }
 
     void raiseLevel(final int count) {
@@ -225,43 +239,9 @@ class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
         }
     }
 
-    void waitDry(final DataStream<IN> stream) {
-
-        final ReentrantLock lock = mLock;
-
-        lock.lock();
-
-        try {
-
-            if (mWaterline <= 0) {
-
-                return;
-            }
-
-            do {
-
-                mCondition.await();
-
-            } while (mWaterline > 0);
-
-        } catch (final InterruptedException e) {
-
-            Thread.currentThread().interrupt();
-
-            throw new DelayInterruptedException(e);
-
-        } finally {
-
-            mWaterline = 0;
-
-            //TODO: pass as discharge parameter?
-            mDryStreams.add(stream);
-
-            lock.unlock();
-        }
-    }
-
     private void lowerLevel() {
+
+        boolean discharge = false;
 
         final ReentrantLock lock = mLock;
 
@@ -271,12 +251,17 @@ class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
 
             if (--mWaterline <= 0) {
 
-                mCondition.signalAll();
+                discharge = mIsDischarge;
             }
 
         } finally {
 
             lock.unlock();
+        }
+
+        if (discharge) {
+
+            discharge(null);
         }
     }
 }

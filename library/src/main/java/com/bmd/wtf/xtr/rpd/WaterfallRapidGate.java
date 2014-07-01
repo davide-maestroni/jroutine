@@ -226,7 +226,7 @@ public class WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallR
     }
 
     @Override
-    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> meets(
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> meeting(
             final ConditionEvaluator<? super TYPE> evaluator) {
 
         final ConditionEvaluator<? super TYPE> currentEvaluator = mEvaluator;
@@ -246,7 +246,7 @@ public class WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallR
     @Override
     public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> meetsCondition(final Object... args) {
 
-        return meets(new GateConditionEvaluator<TYPE>(args));
+        return meeting(new GateConditionEvaluator<TYPE>(args));
     }
 
     @Override
@@ -360,6 +360,50 @@ public class WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallR
     }
 
     @Override
+    public <NTYPE> RapidGate<SOURCE, MOUTH, IN, OUT, NTYPE> on(final Class<NTYPE> gateType) {
+
+        return on(Classification.ofType(gateType));
+    }
+
+    @Override
+    public <NTYPE> RapidGate<SOURCE, MOUTH, IN, OUT, NTYPE> on(
+            final Classification<NTYPE> gateClassification) {
+
+        if (!gateClassification.isInterface()) {
+
+            throw new IllegalArgumentException(
+                    "the gate classification must represent an interface");
+        }
+
+        final Classification<TYPE> currentClassification = mClassification;
+
+        if ((currentClassification == null) || !currentClassification.equals(gateClassification)) {
+
+            final ConditionEvaluator<NTYPE> evaluator;
+
+            if ((currentClassification == null) || currentClassification.isAssignableFrom(
+                    gateClassification)) {
+
+                //noinspection unchecked
+                evaluator = (ConditionEvaluator<NTYPE>) mEvaluator;
+
+            } else {
+
+                evaluator = null;
+            }
+
+            return new WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, NTYPE>(mMouthWaterfall,
+                                                                         gateClassification,
+                                                                         mTimeoutMs,
+                                                                         mTimeoutException,
+                                                                         evaluator);
+        }
+
+        //noinspection unchecked
+        return (RapidGate<SOURCE, MOUTH, IN, OUT, NTYPE>) this;
+    }
+
+    @Override
     public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> push(final int streamNumber, final IN... drops) {
 
         super.push(streamNumber, drops);
@@ -422,50 +466,6 @@ public class WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallR
     }
 
     @Override
-    public <NTYPE> RapidGate<SOURCE, MOUTH, IN, OUT, NTYPE> when(final Class<NTYPE> gateType) {
-
-        return when(Classification.ofType(gateType));
-    }
-
-    @Override
-    public <NTYPE> RapidGate<SOURCE, MOUTH, IN, OUT, NTYPE> when(
-            final Classification<NTYPE> gateClassification) {
-
-        if (!gateClassification.isInterface()) {
-
-            throw new IllegalArgumentException(
-                    "the gate classification must represent an interface");
-        }
-
-        final Classification<TYPE> currentClassification = mClassification;
-
-        if ((currentClassification == null) || !currentClassification.equals(gateClassification)) {
-
-            final ConditionEvaluator<NTYPE> evaluator;
-
-            if ((currentClassification == null) || currentClassification
-                    .isAssignableFrom(gateClassification)) {
-
-                //noinspection unchecked
-                evaluator = (ConditionEvaluator<NTYPE>) mEvaluator;
-
-            } else {
-
-                evaluator = null;
-            }
-
-            return new WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, NTYPE>(mMouthWaterfall,
-                                                                         gateClassification,
-                                                                         mTimeoutMs,
-                                                                         mTimeoutException,
-                                                                         evaluator);
-        }
-
-        //noinspection unchecked
-        return (RapidGate<SOURCE, MOUTH, IN, OUT, NTYPE>) this;
-    }
-
-    @Override
     public <RESULT> RESULT perform(final Action<RESULT, ? super TYPE> action,
             final Object... args) {
 
@@ -476,7 +476,8 @@ public class WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallR
 
         final long timeoutMs = mTimeoutMs;
 
-        final Gate<TYPE> gate = mMouthWaterfall.when(mClassification).meets(mEvaluator)
+        final Gate<TYPE> gate = mMouthWaterfall.on(mClassification)
+                                               .meeting(mEvaluator)
                                                .eventuallyThrow(mTimeoutException);
 
         if (timeoutMs < 0) {

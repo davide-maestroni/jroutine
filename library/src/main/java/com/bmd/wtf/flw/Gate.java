@@ -30,7 +30,7 @@ public interface Gate<TYPE> {
      * @param maxDelay The maximum delay in the specified time unit.
      * @param timeUnit The delay time unit.
      * @return This gate.
-     * @see #meets(ConditionEvaluator)
+     * @see #meeting(ConditionEvaluator)
      */
     public Gate<TYPE> afterMax(long maxDelay, TimeUnit timeUnit);
 
@@ -38,7 +38,7 @@ public interface Gate<TYPE> {
      * Tells the gate to wait indefinitely for the condition to be met.
      *
      * @return This gate.
-     * @see #meets(ConditionEvaluator)
+     * @see #meeting(ConditionEvaluator)
      */
     public Gate<TYPE> eventually();
 
@@ -48,7 +48,7 @@ public interface Gate<TYPE> {
      *
      * @param exception The exception to be thrown.
      * @return This gate.
-     * @see #meets(ConditionEvaluator)
+     * @see #meeting(ConditionEvaluator)
      */
     public Gate<TYPE> eventuallyThrow(RuntimeException exception);
 
@@ -67,7 +67,7 @@ public interface Gate<TYPE> {
      * @param evaluator The condition evaluator.
      * @return This gate.
      */
-    public Gate<TYPE> meets(ConditionEvaluator<? super TYPE> evaluator);
+    public Gate<TYPE> meeting(ConditionEvaluator<? super TYPE> evaluator);
 
     /**
      * Performs the specified action by passing the variadic arguments as parameters.

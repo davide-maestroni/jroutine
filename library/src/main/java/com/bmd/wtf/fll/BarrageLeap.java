@@ -33,6 +33,13 @@ class BarrageLeap<SOURCE, IN, OUT> extends LeapDecorator<SOURCE, IN, OUT> {
 
     private final int mStreamNumber;
 
+    /**
+     * Constructor.
+     *
+     * @param wrapped      The wrapped leap instance.
+     * @param barrage      The related barrage.
+     * @param streamNumber The number identifying the stream.
+     */
     public BarrageLeap(final Leap<SOURCE, IN, OUT> wrapped, final Barrage barrage,
             final int streamNumber) {
 

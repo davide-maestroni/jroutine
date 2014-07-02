@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
- * {@link com.bmd.wtf.flw.Collector} implementation.
+ * Collector implementation.
  * <p/>
  * Created by davide on 6/7/14.
  *
@@ -57,6 +57,12 @@ class DataCollector<SOURCE, DATA> implements Collector<DATA> {
 
     private final DataGate<CollectorLeap<SOURCE, DATA>> mSizeGate;
 
+    /**
+     * Constructor.
+     *
+     * @param gateLeap      The associated gate leap.
+     * @param collectorLeap The associated collector leap.
+     */
     public DataCollector(final GateLeap<?, DATA, DATA> gateLeap,
             final CollectorLeap<SOURCE, DATA> collectorLeap) {
 

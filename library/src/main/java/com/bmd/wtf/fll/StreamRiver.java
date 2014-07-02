@@ -50,7 +50,7 @@ class StreamRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public void deviate(final int streamNumber) {
+    public void deviateStream(final int streamNumber) {
 
         mStreams.get(streamNumber).deviate();
     }
@@ -147,7 +147,7 @@ class StreamRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public River<SOURCE, DATA> discharge(final int streamNumber) {
+    public River<SOURCE, DATA> dischargeStream(final int streamNumber) {
 
         mStreams.get(streamNumber).discharge();
 
@@ -164,13 +164,13 @@ class StreamRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public void drain(final int streamNumber) {
+    public void drainStream(final int streamNumber) {
 
         mStreams.get(streamNumber).drain(true);
     }
 
     @Override
-    public River<SOURCE, DATA> forward(final int streamNumber, final Throwable throwable) {
+    public River<SOURCE, DATA> forwardStream(final int streamNumber, final Throwable throwable) {
 
         mStreams.get(streamNumber).forward(throwable);
 
@@ -190,7 +190,7 @@ class StreamRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public River<SOURCE, DATA> push(final int streamNumber, final DATA... drops) {
+    public River<SOURCE, DATA> pushStream(final int streamNumber, final DATA... drops) {
 
         mStreams.get(streamNumber).push(drops);
 
@@ -198,7 +198,8 @@ class StreamRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public River<SOURCE, DATA> push(final int streamNumber, final Iterable<? extends DATA> drops) {
+    public River<SOURCE, DATA> pushStream(final int streamNumber,
+            final Iterable<? extends DATA> drops) {
 
         mStreams.get(streamNumber).push(drops);
 
@@ -206,7 +207,7 @@ class StreamRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public River<SOURCE, DATA> push(final int streamNumber, final DATA drop) {
+    public River<SOURCE, DATA> pushStream(final int streamNumber, final DATA drop) {
 
         mStreams.get(streamNumber).push(drop);
 
@@ -214,7 +215,7 @@ class StreamRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public River<SOURCE, DATA> pushAfter(final int streamNumber, final long delay,
+    public River<SOURCE, DATA> pushStreamAfter(final int streamNumber, final long delay,
             final TimeUnit timeUnit, final Iterable<? extends DATA> drops) {
 
         mStreams.get(streamNumber).pushAfter(delay, timeUnit, drops);
@@ -223,7 +224,7 @@ class StreamRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public River<SOURCE, DATA> pushAfter(final int streamNumber, final long delay,
+    public River<SOURCE, DATA> pushStreamAfter(final int streamNumber, final long delay,
             final TimeUnit timeUnit, final DATA drop) {
 
         mStreams.get(streamNumber).pushAfter(delay, timeUnit, drop);
@@ -232,7 +233,7 @@ class StreamRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public River<SOURCE, DATA> pushAfter(final int streamNumber, final long delay,
+    public River<SOURCE, DATA> pushStreamAfter(final int streamNumber, final long delay,
             final TimeUnit timeUnit, final DATA... drops) {
 
         mStreams.get(streamNumber).pushAfter(delay, timeUnit, drops);

@@ -13,6 +13,7 @@
  */
 package com.bmd.wtf.fll;
 
+import com.bmd.wtf.crr.Currents;
 import com.bmd.wtf.drp.Drops;
 import com.bmd.wtf.flw.Collector;
 import com.bmd.wtf.flw.Gate.Action;
@@ -411,8 +412,8 @@ public class WaterfallTest extends TestCase {
 
                         if (drop == 0) {
 
-                            upRiver.deviate(0);
-                            downRiver.deviate(0);
+                            upRiver.deviateStream(0);
+                            downRiver.deviateStream(0);
                         }
                     }
                 });
@@ -444,8 +445,8 @@ public class WaterfallTest extends TestCase {
 
                 if (drop == -1) {
 
-                    upRiver.drain(0);
-                    downRiver.drain(0);
+                    upRiver.drainStream(0);
+                    downRiver.drainStream(0);
                 }
             }
         }).chain(fall3);
@@ -471,7 +472,7 @@ public class WaterfallTest extends TestCase {
 
     public void testDistribute() {
 
-        final TestLeap leap = new TestLeap();
+        final TraceLeap leap = new TraceLeap();
 
         final Waterfall<String, String, ?> source =
                 Waterfall.create().start(String.class).in(4).distribute().chain(leap).source();
@@ -495,6 +496,68 @@ public class WaterfallTest extends TestCase {
     }
 
     public void testError() throws InterruptedException {
+
+        try {
+
+            new DataStream<Object>(null,
+                                   new DataFall<Object, Object, Object>(Waterfall.create().start(),
+                                                                        Currents.straight(),
+                                                                        new FreeLeap<Object, Object>(),
+                                                                        0)
+            );
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            new DataStream<Object>(new DataFall<Object, Object, Object>(Waterfall.create().start(),
+                                                                        Currents.straight(),
+                                                                        new FreeLeap<Object, Object>(),
+                                                                        0), null
+            );
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            new DataFall<Object, Object, Object>(null, Currents.straight(),
+                                                 new FreeLeap<Object, Object>(), 0);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            new DataFall<Object, Object, Object>(Waterfall.create().start(), null,
+                                                 new FreeLeap<Object, Object>(), 0);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            new DataFall<Object, Object, Object>(Waterfall.create().start(), Currents.straight(),
+                                                 null, 0);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
 
         try {
 
@@ -774,361 +837,138 @@ public class WaterfallTest extends TestCase {
 
         }
 
-        final LatchLeap latchLeap = new LatchLeap();
+        final Waterfall<Object, Object, Object> fall1 = Waterfall.create()
+                                                                 .asGate()
+                                                                 .start(new LatchLeap())
+                                                                 .inBackground(1)
+                                                                 .chain(new TestLeap())
+                                                                 .chain(new FreeLeap<Object, Object>() {
+
+                                                                     @Override
+                                                                     public void onUnhandled(
+                                                                             final River<Object, Object> upRiver,
+                                                                             final River<Object, Object> downRiver,
+                                                                             final int fallNumber,
+                                                                             final Throwable throwable) {
+
+                                                                         if ((throwable != null)
+                                                                                 && !"test".equals(
+                                                                                 throwable.getMessage())) {
+
+                                                                             downRiver.on(
+                                                                                     LatchLeap.class)
+                                                                                      .immediately()
+                                                                                      .perform(
+                                                                                              new Action<Void, LatchLeap>() {
+
+                                                                                                  @Override
+                                                                                                  public Void doOn(
+                                                                                                          final LatchLeap leap,
+                                                                                                          final Object... args) {
+
+                                                                                                      leap.setFailed();
+
+                                                                                                      return null;
+                                                                                                  }
+                                                                                              }
+                                                                                      );
+                                                                         }
+                                                                     }
+                                                                 });
+
+        fall1.source().push("test");
+
+        fall1.on(LatchLeap.class)
+             .afterMax(3, TimeUnit.SECONDS)
+             .eventuallyThrow(new IllegalStateException())
+             .meeting(new ConditionEvaluator<LatchLeap>() {
+
+                 @Override
+                 public boolean isSatisfied(final LatchLeap leap) {
+
+                     return (leap.getCount() == 3);
+                 }
+             })
+             .perform(new Action<Void, LatchLeap>() {
+
+                 @Override
+                 public Void doOn(final LatchLeap leap, final Object... args) {
+
+                     if (leap.isFailed()) {
+
+                         fail();
+                     }
+
+                     return null;
+                 }
+             });
+
+        final Waterfall<Object, Object, Object> fall2 = Waterfall.create()
+                                                                 .asGate()
+                                                                 .start(new LatchLeap())
+                                                                 .inBackground(1)
+                                                                 .chain(new TestLeap())
+                                                                 .inBackground(1)
+                                                                 .chain(new FreeLeap<Object, Object>() {
+
+                                                                     @Override
+                                                                     public void onUnhandled(
+                                                                             final River<Object, Object> upRiver,
+                                                                             final River<Object, Object> downRiver,
+                                                                             final int fallNumber,
+                                                                             final Throwable throwable) {
+
+                                                                         if ((throwable != null)
+                                                                                 && !"test".equals(
+                                                                                 throwable.getMessage())) {
+
+                                                                             downRiver.on(
+                                                                                     LatchLeap.class)
+                                                                                      .immediately()
+                                                                                      .perform(
+                                                                                              new Action<Void, LatchLeap>() {
+
+                                                                                                  @Override
+                                                                                                  public Void doOn(
+                                                                                                          final LatchLeap leap,
+                                                                                                          final Object... args) {
+
+                                                                                                      leap.setFailed();
+
+                                                                                                      return null;
+                                                                                                  }
+                                                                                              }
+                                                                                      );
+                                                                         }
+                                                                     }
+                                                                 });
 
-        final FreeLeap<Object, Object> testLeap = new FreeLeap<Object, Object>() {
+        fall2.source().push("test");
 
-            public boolean mDischarged;
+        fall2.on(LatchLeap.class)
+             .afterMax(3, TimeUnit.SECONDS)
+             .eventuallyThrow(new IllegalStateException())
+             .meeting(new ConditionEvaluator<LatchLeap>() {
 
-            public boolean mPushed;
+                 @Override
+                 public boolean isSatisfied(final LatchLeap leap) {
 
-            public boolean mThrown;
+                     return (leap.getCount() == 3);
+                 }
+             })
+             .perform(new Action<Void, LatchLeap>() {
 
-            @Override
-            public void onDischarge(final River<Object, Object> upRiver,
-                    final River<Object, Object> downRiver, final int fallNumber) {
+                 @Override
+                 public Void doOn(final LatchLeap leap, final Object... args) {
 
-                if (isFailed(upRiver) || mDischarged) {
+                     if (leap.isFailed()) {
 
-                    return;
-                }
+                         fail();
+                     }
 
-                mDischarged = true;
-
-                try {
-
-                    test(upRiver, downRiver);
-
-                    new Thread(new Runnable() {
-
-                        @Override
-                        public void run() {
-
-                            try {
-
-                                test(upRiver, downRiver);
-
-                            } catch (final Throwable ignored) {
-
-                                setFailed(downRiver);
-
-                            } finally {
-
-                                incCount(downRiver);
-                            }
-                        }
-                    }).start();
-
-                } catch (final Throwable ignored) {
-
-                    setFailed(downRiver);
-                }
-            }
-
-            private void incCount(final River<Object, Object> river) {
-
-                river.on(LatchLeap.class).immediately().perform(new Action<Void, LatchLeap>() {
-
-                                                                    @Override
-                                                                    public Void doOn(
-                                                                            final LatchLeap leap,
-                                                                            final Object... args) {
-
-                                                                        leap.incCount();
-
-                                                                        return null;
-                                                                    }
-                                                                }
-                );
-            }
-
-            private boolean isFailed(final River<Object, Object> river) {
-
-                return river.on(LatchLeap.class)
-                            .immediately()
-                            .perform(new Action<Boolean, LatchLeap>() {
-
-                                         @Override
-                                         public Boolean doOn(final LatchLeap leap,
-                                                 final Object... args) {
-
-                                             return leap.isFailed();
-                                         }
-                                     }
-                            );
-            }
-
-            private void setFailed(final River<Object, Object> river) {
-
-                river.on(LatchLeap.class).immediately().perform(new Action<Void, LatchLeap>() {
-
-                                                                    @Override
-                                                                    public Void doOn(
-                                                                            final LatchLeap leap,
-                                                                            final Object... args) {
-
-                                                                        leap.setFailed();
-
-                                                                        return null;
-                                                                    }
-                                                                }
-                );
-            }
-
-            private void test(final River<Object, Object> upRiver,
-                    final River<Object, Object> downRiver) {
-
-                downRiver.push((Object) null)
-                         .push((Object[]) null)
-                         .push((Iterable<Object>) null)
-                         .push(new Object[0])
-                         .push(Arrays.asList())
-                         .push("push")
-                         .push(new Object[]{"push"})
-                         .push(new Object[]{"push", "push"})
-                         .push(Arrays.asList("push"))
-                         .push(Arrays.asList("push", "push"))
-                         .pushAfter(0, TimeUnit.MILLISECONDS, (Object) null)
-                         .pushAfter(0, TimeUnit.MILLISECONDS, (Object[]) null)
-                         .pushAfter(0, TimeUnit.MILLISECONDS, (Iterable<Object>) null)
-                         .pushAfter(0, TimeUnit.MILLISECONDS, new Object[0])
-                         .pushAfter(0, TimeUnit.MILLISECONDS, Arrays.asList())
-                         .pushAfter(0, TimeUnit.MILLISECONDS, "push")
-                         .pushAfter(0, TimeUnit.MILLISECONDS, new Object[]{"push"})
-                         .pushAfter(0, TimeUnit.MILLISECONDS, new Object[]{"push", "push"})
-                         .pushAfter(0, TimeUnit.MILLISECONDS, Arrays.asList("push"))
-                         .pushAfter(0, TimeUnit.MILLISECONDS, Arrays.asList("push", "push"))
-                         .forward(null)
-                         .forward(new RuntimeException("test"))
-                         .discharge();
-
-                downRiver.push(0, (Object) null)
-                         .push(0, (Object[]) null)
-                         .push(0, (Iterable<Object>) null)
-                         .push(0, new Object[0])
-                         .push(0, Arrays.asList())
-                         .push(0, "push")
-                         .push(0, new Object[]{"push"})
-                         .push(0, new Object[]{"push", "push"})
-                         .push(0, Arrays.asList("push"))
-                         .push(0, Arrays.asList("push", "push"))
-                         .pushAfter(0, 0, TimeUnit.MILLISECONDS, (Object) null)
-                         .pushAfter(0, 0, TimeUnit.MILLISECONDS, (Object[]) null)
-                         .pushAfter(0, 0, TimeUnit.MILLISECONDS, (Iterable<Object>) null)
-                         .pushAfter(0, 0, TimeUnit.MILLISECONDS, new Object[0])
-                         .pushAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList())
-                         .pushAfter(0, 0, TimeUnit.MILLISECONDS, "push")
-                         .pushAfter(0, 0, TimeUnit.MILLISECONDS, new Object[]{"push"})
-                         .pushAfter(0, 0, TimeUnit.MILLISECONDS, new Object[]{"push", "push"})
-                         .pushAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList("push"))
-                         .pushAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList("push", "push"))
-                         .forward(0, null)
-                         .forward(0, new RuntimeException("test"))
-                         .discharge(0);
-
-                upRiver.push((Object) null)
-                       .push((Object[]) null)
-                       .push((Iterable<Object>) null)
-                       .push(new Object[0])
-                       .push(Arrays.asList())
-                       .push("push")
-                       .push(new Object[]{"push"})
-                       .push(new Object[]{"push", "push"})
-                       .push(Arrays.asList("push"))
-                       .push(Arrays.asList("push", "push"))
-                       .pushAfter(0, TimeUnit.MILLISECONDS, (Object) null)
-                       .pushAfter(0, TimeUnit.MILLISECONDS, (Object[]) null)
-                       .pushAfter(0, TimeUnit.MILLISECONDS, (Iterable<Object>) null)
-                       .pushAfter(0, TimeUnit.MILLISECONDS, new Object[0])
-                       .pushAfter(0, TimeUnit.MILLISECONDS, Arrays.asList())
-                       .pushAfter(0, TimeUnit.MILLISECONDS, "push")
-                       .pushAfter(0, TimeUnit.MILLISECONDS, new Object[]{"push"})
-                       .pushAfter(0, TimeUnit.MILLISECONDS, new Object[]{"push", "push"})
-                       .pushAfter(0, TimeUnit.MILLISECONDS, Arrays.asList("push"))
-                       .pushAfter(0, TimeUnit.MILLISECONDS, Arrays.asList("push", "push"))
-                       .forward(null)
-                       .forward(new RuntimeException("test"))
-                       .discharge();
-
-                upRiver.push(0, (Object) null)
-                       .push(0, (Object[]) null)
-                       .push(0, (Iterable<Object>) null)
-                       .push(0, new Object[0])
-                       .push(0, Arrays.asList())
-                       .push(0, "push")
-                       .push(0, new Object[]{"push"})
-                       .push(0, new Object[]{"push", "push"})
-                       .push(0, Arrays.asList("push"))
-                       .push(0, Arrays.asList("push", "push"))
-                       .pushAfter(0, 0, TimeUnit.MILLISECONDS, (Object) null)
-                       .pushAfter(0, 0, TimeUnit.MILLISECONDS, (Object[]) null)
-                       .pushAfter(0, 0, TimeUnit.MILLISECONDS, (Iterable<Object>) null)
-                       .pushAfter(0, 0, TimeUnit.MILLISECONDS, new Object[0])
-                       .pushAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList())
-                       .pushAfter(0, 0, TimeUnit.MILLISECONDS, "push")
-                       .pushAfter(0, 0, TimeUnit.MILLISECONDS, new Object[]{"push"})
-                       .pushAfter(0, 0, TimeUnit.MILLISECONDS, new Object[]{"push", "push"})
-                       .pushAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList("push"))
-                       .pushAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList("push", "push"))
-                       .forward(0, null)
-                       .forward(0, new RuntimeException("test"))
-                       .discharge(0);
-
-                assertThat(downRiver.source()).isNotNull();
-                assertThat(downRiver.size()).isEqualTo(1);
-                assertThat(upRiver.source()).isNotNull();
-                assertThat(upRiver.size()).isEqualTo(1);
-            }
-
-            @Override
-            public void onPush(final River<Object, Object> upRiver,
-                    final River<Object, Object> downRiver, final int fallNumber,
-                    final Object drop) {
-
-                if (isFailed(downRiver) || mPushed) {
-
-                    return;
-                }
-
-                mPushed = true;
-
-                try {
-
-                    test(upRiver, downRiver);
-
-                    new Thread(new Runnable() {
-
-                        @Override
-                        public void run() {
-
-                            try {
-
-                                test(upRiver, downRiver);
-
-                            } catch (final Throwable ignored) {
-
-                                setFailed(upRiver);
-
-                            } finally {
-
-                                incCount(upRiver);
-                            }
-                        }
-                    }).start();
-
-                } catch (final Throwable ignored) {
-
-                    setFailed(downRiver);
-                }
-            }
-
-            @Override
-            public void onUnhandled(final River<Object, Object> upRiver,
-                    final River<Object, Object> downRiver, final int fallNumber,
-                    final Throwable throwable) {
-
-                if (isFailed(upRiver) || mThrown) {
-
-                    return;
-                }
-
-                mThrown = true;
-
-                try {
-
-                    test(upRiver, downRiver);
-
-                    new Thread(new Runnable() {
-
-                        @Override
-                        public void run() {
-
-                            try {
-
-                                test(upRiver, downRiver);
-
-                            } catch (final Throwable ignored) {
-
-                                setFailed(downRiver);
-
-                            } finally {
-
-                                incCount(downRiver);
-                            }
-                        }
-                    }).start();
-
-                } catch (final Throwable ignored) {
-
-                    setFailed(upRiver);
-                }
-            }
-        };
-
-        final Waterfall<Object, Object, Object> fall = Waterfall.create()
-                                                                .asGate()
-                                                                .start(latchLeap)
-                                                                .chain(testLeap)
-                                                                .chain(new FreeLeap<Object, Object>() {
-
-                                                                    @Override
-                                                                    public void onUnhandled(
-                                                                            final River<Object, Object> upRiver,
-                                                                            final River<Object, Object> downRiver,
-                                                                            final int fallNumber,
-                                                                            final Throwable throwable) {
-
-                                                                        if ((throwable != null)
-                                                                                && !"test".equals(
-                                                                                throwable.getMessage())) {
-
-                                                                            downRiver.on(
-                                                                                    LatchLeap.class)
-                                                                                     .immediately()
-                                                                                     .perform(
-                                                                                             new Action<Void, LatchLeap>() {
-
-                                                                                                 @Override
-                                                                                                 public Void doOn(
-                                                                                                         final LatchLeap leap,
-                                                                                                         final Object... args) {
-
-                                                                                                     leap.setFailed();
-
-                                                                                                     return null;
-                                                                                                 }
-                                                                                             }
-                                                                                     );
-                                                                        }
-                                                                    }
-                                                                });
-
-        fall.source().push("test");
-
-        fall.on(LatchLeap.class)
-            .afterMax(3, TimeUnit.SECONDS)
-            .eventuallyThrow(new IllegalStateException())
-            .meeting(new ConditionEvaluator<LatchLeap>() {
-
-                @Override
-                public boolean isSatisfied(final LatchLeap leap) {
-
-                    return (leap.getCount() == 3);
-                }
-            })
-            .perform(new Action<Void, LatchLeap>() {
-
-                @Override
-                public Void doOn(final LatchLeap leap, final Object... args) {
-
-                    if (leap.isFailed()) {
-
-                        fail();
-                    }
-
-                    return null;
-                }
-            });
+                     return null;
+                 }
+             });
     }
 
     public void testJoin() {
@@ -1261,7 +1101,295 @@ public class WaterfallTest extends TestCase {
         }
     }
 
-    private class TestLeap extends FreeLeap<String, String> {
+    private static class TestLeap extends FreeLeap<Object, Object> {
+
+        public boolean mDischarged;
+
+        public boolean mPushed;
+
+        public boolean mThrown;
+
+        @Override
+        public void onDischarge(final River<Object, Object> upRiver,
+                final River<Object, Object> downRiver, final int fallNumber) {
+
+            if (isFailed(upRiver) || mDischarged) {
+
+                return;
+            }
+
+            mDischarged = true;
+
+            try {
+
+                test(upRiver, downRiver);
+
+                new Thread(new Runnable() {
+
+                    @Override
+                    public void run() {
+
+                        try {
+
+                            test(upRiver, downRiver);
+
+                        } catch (final Throwable ignored) {
+
+                            setFailed(downRiver);
+
+                        } finally {
+
+                            incCount(downRiver);
+                        }
+                    }
+                }).start();
+
+            } catch (final Throwable ignored) {
+
+                setFailed(downRiver);
+            }
+        }
+
+        private void incCount(final River<Object, Object> river) {
+
+            river.on(LatchLeap.class).immediately().perform(new Action<Void, LatchLeap>() {
+
+                                                                @Override
+                                                                public Void doOn(
+                                                                        final LatchLeap leap,
+                                                                        final Object... args) {
+
+                                                                    leap.incCount();
+
+                                                                    return null;
+                                                                }
+                                                            }
+            );
+        }
+
+        private boolean isFailed(final River<Object, Object> river) {
+
+            return river.on(LatchLeap.class)
+                        .immediately()
+                        .perform(new Action<Boolean, LatchLeap>() {
+
+                                     @Override
+                                     public Boolean doOn(final LatchLeap leap,
+                                             final Object... args) {
+
+                                         return leap.isFailed();
+                                     }
+                                 }
+                        );
+        }
+
+        private void setFailed(final River<Object, Object> river) {
+
+            river.on(LatchLeap.class).immediately().perform(new Action<Void, LatchLeap>() {
+
+                                                                @Override
+                                                                public Void doOn(
+                                                                        final LatchLeap leap,
+                                                                        final Object... args) {
+
+                                                                    leap.setFailed();
+
+                                                                    return null;
+                                                                }
+                                                            }
+            );
+        }
+
+        private void test(final River<Object, Object> upRiver,
+                final River<Object, Object> downRiver) {
+
+            downRiver.push((Object) null)
+                     .push((Object[]) null)
+                     .push((Iterable<Object>) null)
+                     .push(new Object[0])
+                     .push(Arrays.asList())
+                     .push("push")
+                     .push(new Object[]{"push"})
+                     .push(new Object[]{"push", "push"})
+                     .push(Arrays.asList("push"))
+                     .push(Arrays.asList("push", "push"))
+                     .pushAfter(0, TimeUnit.MILLISECONDS, (Object) null)
+                     .pushAfter(0, TimeUnit.MILLISECONDS, (Object[]) null)
+                     .pushAfter(0, TimeUnit.MILLISECONDS, (Iterable<Object>) null)
+                     .pushAfter(0, TimeUnit.MILLISECONDS, new Object[0])
+                     .pushAfter(0, TimeUnit.MILLISECONDS, Arrays.asList())
+                     .pushAfter(0, TimeUnit.MILLISECONDS, "push")
+                     .pushAfter(0, TimeUnit.MILLISECONDS, new Object[]{"push"})
+                     .pushAfter(0, TimeUnit.MILLISECONDS, new Object[]{"push", "push"})
+                     .pushAfter(0, TimeUnit.MILLISECONDS, Arrays.asList("push"))
+                     .pushAfter(0, TimeUnit.MILLISECONDS, Arrays.asList("push", "push"))
+                     .forward(null)
+                     .forward(new RuntimeException("test"))
+                     .discharge();
+
+            downRiver.pushStream(0, (Object) null)
+                     .pushStream(0, (Object[]) null)
+                     .pushStream(0, (Iterable<Object>) null)
+                     .pushStream(0)
+                     .pushStream(0, Arrays.asList())
+                     .pushStream(0, "push")
+                     .pushStream(0, new Object[]{"push"})
+                     .pushStream(0, "push", "push")
+                     .pushStream(0, Arrays.asList("push"))
+                     .pushStream(0, Arrays.asList("push", "push"))
+                     .pushStreamAfter(0, 0, TimeUnit.MILLISECONDS, (Object) null)
+                     .pushStreamAfter(0, 0, TimeUnit.MILLISECONDS, (Object[]) null)
+                     .pushStreamAfter(0, 0, TimeUnit.MILLISECONDS, (Iterable<Object>) null)
+                     .pushStreamAfter(0, 0, TimeUnit.MILLISECONDS)
+                     .pushStreamAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList())
+                     .pushStreamAfter(0, 0, TimeUnit.MILLISECONDS, "push")
+                     .pushStreamAfter(0, 0, TimeUnit.MILLISECONDS, new Object[]{"push"})
+                     .pushStreamAfter(0, 0, TimeUnit.MILLISECONDS, "push", "push")
+                     .pushStreamAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList("push"))
+                     .pushStreamAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList("push", "push"))
+                     .forwardStream(0, null)
+                     .forwardStream(0, new RuntimeException("test"))
+                     .dischargeStream(0);
+
+            upRiver.push((Object) null)
+                   .push((Object[]) null)
+                   .push((Iterable<Object>) null)
+                   .push(new Object[0])
+                   .push(Arrays.asList())
+                   .push("push")
+                   .push(new Object[]{"push"})
+                   .push(new Object[]{"push", "push"})
+                   .push(Arrays.asList("push"))
+                   .push(Arrays.asList("push", "push"))
+                   .pushAfter(0, TimeUnit.MILLISECONDS, (Object) null)
+                   .pushAfter(0, TimeUnit.MILLISECONDS, (Object[]) null)
+                   .pushAfter(0, TimeUnit.MILLISECONDS, (Iterable<Object>) null)
+                   .pushAfter(0, TimeUnit.MILLISECONDS, new Object[0])
+                   .pushAfter(0, TimeUnit.MILLISECONDS, Arrays.asList())
+                   .pushAfter(0, TimeUnit.MILLISECONDS, "push")
+                   .pushAfter(0, TimeUnit.MILLISECONDS, new Object[]{"push"})
+                   .pushAfter(0, TimeUnit.MILLISECONDS, new Object[]{"push", "push"})
+                   .pushAfter(0, TimeUnit.MILLISECONDS, Arrays.asList("push"))
+                   .pushAfter(0, TimeUnit.MILLISECONDS, Arrays.asList("push", "push"))
+                   .forward(null)
+                   .forward(new RuntimeException("test"))
+                   .discharge();
+
+            upRiver.pushStream(0, (Object) null)
+                   .pushStream(0, (Object[]) null)
+                   .pushStream(0, (Iterable<Object>) null)
+                   .pushStream(0)
+                   .pushStream(0, Arrays.asList())
+                   .pushStream(0, "push")
+                   .pushStream(0, new Object[]{"push"})
+                   .pushStream(0, "push", "push")
+                   .pushStream(0, Arrays.asList("push"))
+                   .pushStream(0, Arrays.asList("push", "push"))
+                   .pushStreamAfter(0, 0, TimeUnit.MILLISECONDS, (Object) null)
+                   .pushStreamAfter(0, 0, TimeUnit.MILLISECONDS, (Object[]) null)
+                   .pushStreamAfter(0, 0, TimeUnit.MILLISECONDS, (Iterable<Object>) null)
+                   .pushStreamAfter(0, 0, TimeUnit.MILLISECONDS)
+                   .pushStreamAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList())
+                   .pushStreamAfter(0, 0, TimeUnit.MILLISECONDS, "push")
+                   .pushStreamAfter(0, 0, TimeUnit.MILLISECONDS, new Object[]{"push"})
+                   .pushStreamAfter(0, 0, TimeUnit.MILLISECONDS, "push", "push")
+                   .pushStreamAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList("push"))
+                   .pushStreamAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList("push", "push"))
+                   .forwardStream(0, null)
+                   .forwardStream(0, new RuntimeException("test"))
+                   .dischargeStream(0);
+
+            assertThat(downRiver.source()).isNotNull();
+            assertThat(downRiver.size()).isEqualTo(1);
+            assertThat(upRiver.source()).isNotNull();
+            assertThat(upRiver.size()).isEqualTo(1);
+        }
+
+        @Override
+        public void onPush(final River<Object, Object> upRiver,
+                final River<Object, Object> downRiver, final int fallNumber, final Object drop) {
+
+            if (isFailed(downRiver) || mPushed) {
+
+                return;
+            }
+
+            mPushed = true;
+
+            try {
+
+                test(upRiver, downRiver);
+
+                new Thread(new Runnable() {
+
+                    @Override
+                    public void run() {
+
+                        try {
+
+                            test(upRiver, downRiver);
+
+                        } catch (final Throwable ignored) {
+
+                            setFailed(upRiver);
+
+                        } finally {
+
+                            incCount(upRiver);
+                        }
+                    }
+                }).start();
+
+            } catch (final Throwable ignored) {
+
+                setFailed(downRiver);
+            }
+        }
+
+        @Override
+        public void onUnhandled(final River<Object, Object> upRiver,
+                final River<Object, Object> downRiver, final int fallNumber,
+                final Throwable throwable) {
+
+            if (isFailed(upRiver) || mThrown) {
+
+                return;
+            }
+
+            mThrown = true;
+
+            try {
+
+                test(upRiver, downRiver);
+
+                new Thread(new Runnable() {
+
+                    @Override
+                    public void run() {
+
+                        try {
+
+                            test(upRiver, downRiver);
+
+                        } catch (final Throwable ignored) {
+
+                            setFailed(downRiver);
+
+                        } finally {
+
+                            incCount(downRiver);
+                        }
+                    }
+                }).start();
+
+            } catch (final Throwable ignored) {
+
+                setFailed(upRiver);
+            }
+        }
+    }
+
+    private class TraceLeap extends FreeLeap<String, String> {
 
         private final ArrayList<String> mData = new ArrayList<String>();
 

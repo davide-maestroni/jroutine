@@ -142,7 +142,7 @@ public class WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallR
     @Override
     public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> afterDeviate(final int streamNumber) {
 
-        deviate(streamNumber);
+        deviateStream(streamNumber);
 
         return this;
     }
@@ -158,7 +158,7 @@ public class WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallR
     @Override
     public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> afterDrain(final int streamNumber) {
 
-        drain(streamNumber);
+        drainStream(streamNumber);
 
         return this;
     }
@@ -343,18 +343,18 @@ public class WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallR
     }
 
     @Override
-    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> discharge(final int streamNumber) {
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> dischargeStream(final int streamNumber) {
 
-        super.discharge(streamNumber);
+        super.dischargeStream(streamNumber);
 
         return this;
     }
 
     @Override
-    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> forward(final int streamNumber,
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> forwardStream(final int streamNumber,
             final Throwable throwable) {
 
-        super.forward(streamNumber, throwable);
+        super.forwardStream(streamNumber, throwable);
 
         return this;
     }
@@ -404,53 +404,55 @@ public class WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallR
     }
 
     @Override
-    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> push(final int streamNumber, final IN... drops) {
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> pushStream(final int streamNumber,
+            final IN... drops) {
 
-        super.push(streamNumber, drops);
+        super.pushStream(streamNumber, drops);
 
         return this;
     }
 
     @Override
-    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> push(final int streamNumber,
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> pushStream(final int streamNumber,
             final Iterable<? extends IN> drops) {
 
-        super.push(streamNumber, drops);
+        super.pushStream(streamNumber, drops);
 
         return this;
     }
 
     @Override
-    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> push(final int streamNumber, final IN drop) {
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> pushStream(final int streamNumber,
+            final IN drop) {
 
-        super.push(streamNumber, drop);
+        super.pushStream(streamNumber, drop);
 
         return this;
     }
 
     @Override
-    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> pushAfter(final int streamNumber,
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> pushStreamAfter(final int streamNumber,
             final long delay, final TimeUnit timeUnit, final Iterable<? extends IN> drops) {
 
-        super.pushAfter(streamNumber, delay, timeUnit, drops);
+        super.pushStreamAfter(streamNumber, delay, timeUnit, drops);
 
         return this;
     }
 
     @Override
-    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> pushAfter(final int streamNumber,
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> pushStreamAfter(final int streamNumber,
             final long delay, final TimeUnit timeUnit, final IN drop) {
 
-        super.pushAfter(streamNumber, delay, timeUnit, drop);
+        super.pushStreamAfter(streamNumber, delay, timeUnit, drop);
 
         return this;
     }
 
     @Override
-    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> pushAfter(final int streamNumber,
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> pushStreamAfter(final int streamNumber,
             final long delay, final TimeUnit timeUnit, final IN... drops) {
 
-        super.pushAfter(streamNumber, delay, timeUnit, drops);
+        super.pushStreamAfter(streamNumber, delay, timeUnit, drops);
 
         return this;
     }

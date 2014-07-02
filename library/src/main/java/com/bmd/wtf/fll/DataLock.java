@@ -43,7 +43,7 @@ class DataLock {
 
             } else {
 
-                river.discharge(streamNumber);
+                river.dischargeStream(streamNumber);
             }
         }
     };
@@ -64,7 +64,7 @@ class DataLock {
 
             } else {
 
-                river.forward(streamNumber, exception);
+                river.forwardStream(streamNumber, exception);
             }
         }
     };
@@ -85,7 +85,7 @@ class DataLock {
 
             } else {
 
-                river.push(streamNumber, out);
+                river.pushStream(streamNumber, out);
             }
         }
     };
@@ -109,7 +109,7 @@ class DataLock {
 
             } else {
 
-                river.pushAfter(streamNumber, currentDelay, timeUnit, out);
+                river.pushStreamAfter(streamNumber, currentDelay, timeUnit, out);
             }
         }
     };
@@ -134,7 +134,7 @@ class DataLock {
             } else {
 
                 //noinspection unchecked
-                river.pushAfter(streamNumber, currentDelay, timeUnit, outs);
+                river.pushStreamAfter(streamNumber, currentDelay, timeUnit, outs);
             }
         }
     };
@@ -157,7 +157,7 @@ class DataLock {
 
             } else {
 
-                river.pushAfter(streamNumber, currentDelay, timeUnit, outs);
+                river.pushStreamAfter(streamNumber, currentDelay, timeUnit, outs);
             }
         }
     };
@@ -180,7 +180,7 @@ class DataLock {
             } else {
 
                 //noinspection unchecked
-                river.push(streamNumber, outs);
+                river.pushStream(streamNumber, outs);
             }
         }
     };
@@ -201,7 +201,7 @@ class DataLock {
 
             } else {
 
-                river.push(streamNumber, outs);
+                river.pushStream(streamNumber, outs);
             }
         }
     };

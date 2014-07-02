@@ -14,7 +14,7 @@
 package com.bmd.wtf.crr;
 
 /**
- * Utility class for {@link Current} instances.
+ * Utility class for handling current objects.
  * <p/>
  * Created by davide on 6/8/14.
  */

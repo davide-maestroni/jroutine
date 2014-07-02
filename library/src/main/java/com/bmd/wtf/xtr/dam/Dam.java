@@ -269,7 +269,7 @@ public class Dam<SOURCE, DATA> extends WaterfallRiver<SOURCE, SOURCE> {
     }
 
     @Override
-    public void deviate(final int streamNumber) {
+    public void deviateStream(final int streamNumber) {
 
         mOutWaterfall.deviate(streamNumber, false);
     }
@@ -342,9 +342,9 @@ public class Dam<SOURCE, DATA> extends WaterfallRiver<SOURCE, SOURCE> {
     }
 
     @Override
-    public Dam<SOURCE, DATA> discharge(final int streamNumber) {
+    public Dam<SOURCE, DATA> dischargeStream(final int streamNumber) {
 
-        super.discharge(streamNumber);
+        super.dischargeStream(streamNumber);
 
         return this;
     }
@@ -356,66 +356,67 @@ public class Dam<SOURCE, DATA> extends WaterfallRiver<SOURCE, SOURCE> {
     }
 
     @Override
-    public void drain(final int streamNumber) {
+    public void drainStream(final int streamNumber) {
 
         mOutWaterfall.drain(streamNumber, false);
     }
 
     @Override
-    public Dam<SOURCE, DATA> forward(final int streamNumber, final Throwable throwable) {
+    public Dam<SOURCE, DATA> forwardStream(final int streamNumber, final Throwable throwable) {
 
-        super.forward(streamNumber, throwable);
-
-        return this;
-    }
-
-    @Override
-    public Dam<SOURCE, DATA> push(final int streamNumber, final SOURCE... drops) {
-
-        super.push(streamNumber, drops);
+        super.forwardStream(streamNumber, throwable);
 
         return this;
     }
 
     @Override
-    public Dam<SOURCE, DATA> push(final int streamNumber, final Iterable<? extends SOURCE> drops) {
+    public Dam<SOURCE, DATA> pushStream(final int streamNumber, final SOURCE... drops) {
 
-        super.push(streamNumber, drops);
-
-        return this;
-    }
-
-    @Override
-    public Dam<SOURCE, DATA> push(final int streamNumber, final SOURCE drop) {
-
-        super.push(streamNumber, drop);
+        super.pushStream(streamNumber, drops);
 
         return this;
     }
 
     @Override
-    public Dam<SOURCE, DATA> pushAfter(final int streamNumber, final long delay,
+    public Dam<SOURCE, DATA> pushStream(final int streamNumber,
+            final Iterable<? extends SOURCE> drops) {
+
+        super.pushStream(streamNumber, drops);
+
+        return this;
+    }
+
+    @Override
+    public Dam<SOURCE, DATA> pushStream(final int streamNumber, final SOURCE drop) {
+
+        super.pushStream(streamNumber, drop);
+
+        return this;
+    }
+
+    @Override
+    public Dam<SOURCE, DATA> pushStreamAfter(final int streamNumber, final long delay,
             final TimeUnit timeUnit, final Iterable<? extends SOURCE> drops) {
 
-        super.pushAfter(streamNumber, delay, timeUnit, drops);
+        super.pushStreamAfter(streamNumber, delay, timeUnit, drops);
 
         return this;
     }
 
     @Override
-    public Dam<SOURCE, DATA> pushAfter(final int streamNumber, final long delay,
+    public Dam<SOURCE, DATA> pushStreamAfter(final int streamNumber, final long delay,
             final TimeUnit timeUnit, final SOURCE drop) {
 
-        super.pushAfter(streamNumber, delay, timeUnit, drop);
+        super.pushStreamAfter(streamNumber, delay, timeUnit, drop);
 
         return this;
     }
 
     @Override
-    public Dam<SOURCE, DATA> pushAfter(final int streamNumber, final long delay,
+    public Dam<SOURCE, DATA> pushStreamAfter(final int streamNumber, final long delay,
             final TimeUnit timeUnit, final SOURCE... drops) {
 
-        super.pushAfter(streamNumber, delay, timeUnit, drops);
+        super.pushStreamAfter(streamNumber, delay, timeUnit, drops);
 
         return this;
     }

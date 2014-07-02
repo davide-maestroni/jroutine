@@ -835,7 +835,11 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         return waterfall;
     }
 
-    //TODO
+    /**
+     * Creates and returns a new data collector.
+     *
+     * @return The collector.
+     */
     public Collector<OUT> collect() {
 
         final CollectorLeap<SOURCE, OUT> collectorLeap = new CollectorLeap<SOURCE, OUT>();
@@ -870,7 +874,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
     }
 
     @Override
-    public void deviate(final int streamNumber) {
+    public void deviateStream(final int streamNumber) {
 
         final DataFall<SOURCE, IN, OUT> fall = mFalls[streamNumber];
 
@@ -1028,7 +1032,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
     }
 
     @Override
-    public Waterfall<SOURCE, IN, OUT> discharge(final int streamNumber) {
+    public Waterfall<SOURCE, IN, OUT> dischargeStream(final int streamNumber) {
 
         final DataFall<SOURCE, IN, OUT> fall = mFalls[streamNumber];
 
@@ -1050,7 +1054,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
     }
 
     @Override
-    public void drain(final int streamNumber) {
+    public void drainStream(final int streamNumber) {
 
         final DataFall<SOURCE, IN, OUT> fall = mFalls[streamNumber];
 
@@ -1061,7 +1065,8 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
     }
 
     @Override
-    public Waterfall<SOURCE, IN, OUT> forward(final int streamNumber, final Throwable throwable) {
+    public Waterfall<SOURCE, IN, OUT> forwardStream(final int streamNumber,
+            final Throwable throwable) {
 
         final DataFall<SOURCE, IN, OUT> fall = mFalls[streamNumber];
 
@@ -1095,7 +1100,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
     }
 
     @Override
-    public Waterfall<SOURCE, IN, OUT> push(final int streamNumber, final IN... drops) {
+    public Waterfall<SOURCE, IN, OUT> pushStream(final int streamNumber, final IN... drops) {
 
         if ((drops == null) || (drops.length == 0)) {
 
@@ -1115,7 +1120,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
     }
 
     @Override
-    public Waterfall<SOURCE, IN, OUT> push(final int streamNumber,
+    public Waterfall<SOURCE, IN, OUT> pushStream(final int streamNumber,
             final Iterable<? extends IN> drops) {
 
         if (drops == null) {
@@ -1146,7 +1151,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
     }
 
     @Override
-    public Waterfall<SOURCE, IN, OUT> push(final int streamNumber, final IN drop) {
+    public Waterfall<SOURCE, IN, OUT> pushStream(final int streamNumber, final IN drop) {
 
         final DataFall<SOURCE, IN, OUT> fall = mFalls[streamNumber];
 
@@ -1158,7 +1163,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
     }
 
     @Override
-    public Waterfall<SOURCE, IN, OUT> pushAfter(final int streamNumber, final long delay,
+    public Waterfall<SOURCE, IN, OUT> pushStreamAfter(final int streamNumber, final long delay,
             final TimeUnit timeUnit, final Iterable<? extends IN> drops) {
 
         if (drops == null) {
@@ -1186,7 +1191,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
     }
 
     @Override
-    public Waterfall<SOURCE, IN, OUT> pushAfter(final int streamNumber, final long delay,
+    public Waterfall<SOURCE, IN, OUT> pushStreamAfter(final int streamNumber, final long delay,
             final TimeUnit timeUnit, final IN drop) {
 
         final DataFall<SOURCE, IN, OUT> fall = mFalls[streamNumber];
@@ -1199,7 +1204,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
     }
 
     @Override
-    public Waterfall<SOURCE, IN, OUT> pushAfter(final int streamNumber, final long delay,
+    public Waterfall<SOURCE, IN, OUT> pushStreamAfter(final int streamNumber, final long delay,
             final TimeUnit timeUnit, final IN... drops) {
 
         if ((drops == null) || (drops.length == 0)) {
@@ -1265,7 +1270,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
         if (downStream) {
 
-            deviate(streamNumber);
+            deviateStream(streamNumber);
 
         } else {
 
@@ -1341,7 +1346,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
         if (downStream) {
 
-            drain(streamNumber);
+            drainStream(streamNumber);
 
         } else {
 

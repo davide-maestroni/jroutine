@@ -32,10 +32,16 @@ public class Drops<DATA> implements List<DATA> {
 
     private final Class<DATA> mType;
 
-    private Drops(final Class<DATA> type, final List<DATA> list) {
+    /**
+     * Avoid direct instantiation.
+     *
+     * @param type    The list element type.
+     * @param wrapped The wrapped list.
+     */
+    private Drops(final Class<DATA> type, final List<DATA> wrapped) {
 
         mType = type;
-        mList = list;
+        mList = wrapped;
     }
 
     /**
@@ -373,9 +379,9 @@ public class Drops<DATA> implements List<DATA> {
     }
 
     /**
-     * Transforms this list in a list of booleans by making a copy of it.
+     * Transforms this list in a list of booleans.
      *
-     * @return A list of booleans.
+     * @return A newly created list of booleans.
      */
     public Drops<Boolean> toBooleans() {
 
@@ -416,9 +422,9 @@ public class Drops<DATA> implements List<DATA> {
     }
 
     /**
-     * Transforms this list in a list of bytes by making a copy of it.
+     * Transforms this list in a list of bytes.
      *
-     * @return A list of bytes.
+     * @return A newly created list of bytes.
      */
     public Drops<Byte> toBytes() {
 
@@ -470,9 +476,9 @@ public class Drops<DATA> implements List<DATA> {
     }
 
     /**
-     * Transforms this list in a list of chars by making a copy of it.
+     * Transforms this list in a list of chars.
      *
-     * @return A list of chars.
+     * @return A newly created list of chars.
      */
     public Drops<Character> toCharacters() {
 
@@ -517,9 +523,9 @@ public class Drops<DATA> implements List<DATA> {
     }
 
     /**
-     * Transforms this list in a list of doubles by making a copy of it.
+     * Transforms this list in a list of doubles.
      *
-     * @return A list of doubles.
+     * @return A newly created list of doubles.
      */
     public Drops<Double> toDoubles() {
 
@@ -571,9 +577,9 @@ public class Drops<DATA> implements List<DATA> {
     }
 
     /**
-     * Transforms this list in a list of floats by making a copy of it.
+     * Transforms this list in a list of floats.
      *
-     * @return A list of floats.
+     * @return A newly created list of floats.
      */
     public Drops<Float> toFloats() {
 
@@ -625,9 +631,9 @@ public class Drops<DATA> implements List<DATA> {
     }
 
     /**
-     * Transforms this list in a list of integers by making a copy of it.
+     * Transforms this list in a list of integers.
      *
-     * @return A list of ints.
+     * @return A newly created list of integers.
      */
     public Drops<Integer> toIntegers() {
 
@@ -679,9 +685,9 @@ public class Drops<DATA> implements List<DATA> {
     }
 
     /**
-     * Transforms this list in a list of longs by making a copy of it.
+     * Transforms this list in a list of longs.
      *
-     * @return A list of longs.
+     * @return A newly created list of longs.
      */
     public Drops<Long> toLongs() {
 
@@ -733,9 +739,9 @@ public class Drops<DATA> implements List<DATA> {
     }
 
     /**
-     * Transforms this list in a list of objects by making a copy of it.
+     * Transforms this list in a list of objects.
      *
-     * @return A list of objects.
+     * @return A newly created list of objects.
      */
     public List<Object> toObjects() {
 
@@ -743,9 +749,9 @@ public class Drops<DATA> implements List<DATA> {
     }
 
     /**
-     * Transforms this list in a list of shorts by making a copy of it.
+     * Transforms this list in a list of shorts.
      *
-     * @return A list of shorts.
+     * @return A newly created list of shorts.
      */
     public Drops<Short> toShorts() {
 

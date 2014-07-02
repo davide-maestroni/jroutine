@@ -268,7 +268,7 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
 
     protected final void deviate(final boolean downStream, final int streamNumber) {
 
-        river(downStream).deviate(streamNumber);
+        river(downStream).deviateStream(streamNumber);
     }
 
     protected final void discharge(final boolean downStream) {
@@ -278,7 +278,7 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
 
     protected final void discharge(final boolean downStream, final int streamNumber) {
 
-        river(downStream).discharge(streamNumber);
+        river(downStream).dischargeStream(streamNumber);
     }
 
     protected final void drain(final boolean downStream) {
@@ -288,7 +288,7 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
 
     protected final void drain(final boolean downStream, final int streamNumber) {
 
-        river(downStream).drain(streamNumber);
+        river(downStream).drainStream(streamNumber);
     }
 
     protected final void dryUp() {
@@ -310,7 +310,7 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
 
     protected final void loopBack(final int fallNumber, final Iterable<Object> drops) {
 
-        mUpRiver.push(fallNumber, drops);
+        mUpRiver.pushStream(fallNumber, drops);
     }
 
     protected final void loopBack(final Iterable<Object> drops) {
@@ -320,7 +320,7 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
 
     protected final void loopBack(final int fallNumber, final Object... drops) {
 
-        mUpRiver.push(fallNumber, drops);
+        mUpRiver.pushStream(fallNumber, drops);
     }
 
     protected final void loopBack(final Object... drops) {
@@ -330,7 +330,7 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
 
     protected final void loopBack(final int fallNumber, final Object drop) {
 
-        mUpRiver.push(fallNumber, drop);
+        mUpRiver.pushStream(fallNumber, drop);
     }
 
     protected final void loopBack(final Object drop) {
@@ -376,7 +376,7 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
 
     protected final void push(final int streamNumber, final Iterable<Object> drops) {
 
-        mDownRiver.push(streamNumber, drops);
+        mDownRiver.pushStream(streamNumber, drops);
     }
 
     protected final void push(final Iterable<Object> drops) {
@@ -386,7 +386,7 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
 
     protected final void push(final int streamNumber, final Object... drops) {
 
-        mDownRiver.push(streamNumber, drops);
+        mDownRiver.pushStream(streamNumber, drops);
     }
 
     protected final void push(final Object... drops) {
@@ -396,7 +396,7 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
 
     protected final void push(final int streamNumber, final Object drop) {
 
-        mDownRiver.push(streamNumber, drop);
+        mDownRiver.pushStream(streamNumber, drop);
     }
 
     protected final void push(final Object drop) {

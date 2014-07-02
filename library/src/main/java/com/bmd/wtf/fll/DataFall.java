@@ -20,14 +20,11 @@ import com.bmd.wtf.lps.Leap;
 
 import java.util.HashSet;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Instances of this class implement {@link com.bmd.wtf.flw.Fall}s by managing internally stored
- * {@link com.bmd.wtf.lps.Leap}s. Each instance has a single input {@link com.bmd.wtf.crr.Current},
- * shared by all the input {@link com.bmd.wtf.flw.Stream}s which feed the fall with data and
- * objects.
+ * Instances of this class implement a fall by managing internally stored leaps. Each instance has
+ * a single input current, shared by all the input streams which feed the fall.
  * <p/>
  * This class ensures that the internal leap is always accessed in a thread safe way, so that the
  * implementer does not have to worry about concurrency issues.
@@ -62,8 +59,6 @@ class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
     final CopyOnWriteArrayList<DataStream<OUT>> outputStreams =
             new CopyOnWriteArrayList<DataStream<OUT>>();
 
-    private final Condition mCondition;
-
     private final HashSet<Stream<IN>> mDryStreams = new HashSet<Stream<IN>>();
 
     private final LockRiver<SOURCE, IN> mInRiver;
@@ -74,10 +69,18 @@ class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
 
     private final LockRiver<SOURCE, OUT> mOutRiver;
 
-    private boolean mIsDischarge;
+    private int mDischargeCount;
 
     private int mWaterline;
 
+    /**
+     * Constructor.
+     *
+     * @param waterfall    The containing waterfall.
+     * @param inputCurrent The input current.
+     * @param leap         The wrapped leap.
+     * @param number       The number identifying this fall.
+     */
     public DataFall(final Waterfall<SOURCE, IN, OUT> waterfall, final Current inputCurrent,
             final Leap<SOURCE, IN, OUT> leap, final int number) {
 
@@ -100,7 +103,6 @@ class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
         this.leap = leap;
         mNumber = number;
         mLock = new ReentrantLock();
-        mCondition = mLock.newCondition();
         mInRiver = new LockRiver<SOURCE, IN>(new WaterfallRiver<SOURCE, IN>(waterfall, false));
         mOutRiver =
                 new LockRiver<SOURCE, OUT>(new StreamRiver<SOURCE, OUT>(outputStreams, waterfall));
@@ -121,19 +123,22 @@ class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
 
                 dryStreams.add(origin);
 
-                mIsDischarge = dryStreams.containsAll(inputStreams);
+                if (dryStreams.containsAll(inputStreams)) {
+
+                    ++mDischargeCount;
+                }
 
             } else {
 
-                mIsDischarge = true;
+                ++mDischargeCount;
             }
 
-            if (!mIsDischarge || (mWaterline > 0)) {
+            if ((mDischargeCount == 0) || (mWaterline > 0)) {
 
                 return;
             }
 
-            mIsDischarge = false;
+            --mDischargeCount;
 
             dryStreams.clear();
 
@@ -241,7 +246,7 @@ class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
 
     private void lowerLevel() {
 
-        boolean discharge = false;
+        int dischargeCount = 0;
 
         final ReentrantLock lock = mLock;
 
@@ -251,7 +256,9 @@ class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
 
             if (--mWaterline <= 0) {
 
-                discharge = mIsDischarge;
+                dischargeCount = mDischargeCount;
+
+                mDischargeCount = 0;
             }
 
         } finally {
@@ -259,7 +266,7 @@ class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
             lock.unlock();
         }
 
-        if (discharge) {
+        for (int i = 0; i < dischargeCount; i++) {
 
             discharge(null);
         }

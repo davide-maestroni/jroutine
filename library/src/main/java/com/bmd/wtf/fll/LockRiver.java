@@ -50,9 +50,9 @@ class LockRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public void deviate(final int streamNumber) {
+    public void deviateStream(final int streamNumber) {
 
-        mRiver.deviate(streamNumber);
+        mRiver.deviateStream(streamNumber);
     }
 
     @Override
@@ -227,7 +227,7 @@ class LockRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public River<SOURCE, DATA> discharge(final int streamNumber) {
+    public River<SOURCE, DATA> dischargeStream(final int streamNumber) {
 
         if (isOpen()) {
 
@@ -235,7 +235,7 @@ class LockRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
 
         } else {
 
-            mRiver.discharge(streamNumber);
+            mRiver.dischargeStream(streamNumber);
         }
 
         return this;
@@ -248,13 +248,13 @@ class LockRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public void drain(final int streamNumber) {
+    public void drainStream(final int streamNumber) {
 
-        mRiver.drain(streamNumber);
+        mRiver.drainStream(streamNumber);
     }
 
     @Override
-    public River<SOURCE, DATA> forward(final int streamNumber, final Throwable throwable) {
+    public River<SOURCE, DATA> forwardStream(final int streamNumber, final Throwable throwable) {
 
         if (isOpen()) {
 
@@ -262,7 +262,7 @@ class LockRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
 
         } else {
 
-            mRiver.forward(streamNumber, throwable);
+            mRiver.forwardStream(streamNumber, throwable);
         }
 
         return this;
@@ -281,7 +281,7 @@ class LockRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public River<SOURCE, DATA> push(final int streamNumber, final DATA... drops) {
+    public River<SOURCE, DATA> pushStream(final int streamNumber, final DATA... drops) {
 
         if ((drops == null) || (drops.length == 0)) {
 
@@ -303,11 +303,11 @@ class LockRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
 
             if (drops.length == 1) {
 
-                mRiver.push(streamNumber, drops[0]);
+                mRiver.pushStream(streamNumber, drops[0]);
 
             } else {
 
-                mRiver.push(streamNumber, drops);
+                mRiver.pushStream(streamNumber, drops);
             }
         }
 
@@ -315,7 +315,8 @@ class LockRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public River<SOURCE, DATA> push(final int streamNumber, final Iterable<? extends DATA> drops) {
+    public River<SOURCE, DATA> pushStream(final int streamNumber,
+            final Iterable<? extends DATA> drops) {
 
         if (drops == null) {
 
@@ -328,14 +329,14 @@ class LockRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
 
         } else {
 
-            mRiver.push(streamNumber, drops);
+            mRiver.pushStream(streamNumber, drops);
         }
 
         return this;
     }
 
     @Override
-    public River<SOURCE, DATA> push(final int streamNumber, final DATA drop) {
+    public River<SOURCE, DATA> pushStream(final int streamNumber, final DATA drop) {
 
         if (isOpen()) {
 
@@ -343,14 +344,14 @@ class LockRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
 
         } else {
 
-            mRiver.push(streamNumber, drop);
+            mRiver.pushStream(streamNumber, drop);
         }
 
         return this;
     }
 
     @Override
-    public River<SOURCE, DATA> pushAfter(final int streamNumber, final long delay,
+    public River<SOURCE, DATA> pushStreamAfter(final int streamNumber, final long delay,
             final TimeUnit timeUnit, final Iterable<? extends DATA> drops) {
 
         if (drops == null) {
@@ -364,14 +365,14 @@ class LockRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
 
         } else {
 
-            mRiver.pushAfter(streamNumber, delay, timeUnit, drops);
+            mRiver.pushStreamAfter(streamNumber, delay, timeUnit, drops);
         }
 
         return this;
     }
 
     @Override
-    public River<SOURCE, DATA> pushAfter(final int streamNumber, final long delay,
+    public River<SOURCE, DATA> pushStreamAfter(final int streamNumber, final long delay,
             final TimeUnit timeUnit, final DATA drop) {
 
         if (isOpen()) {
@@ -380,14 +381,14 @@ class LockRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
 
         } else {
 
-            mRiver.pushAfter(streamNumber, delay, timeUnit, drop);
+            mRiver.pushStreamAfter(streamNumber, delay, timeUnit, drop);
         }
 
         return this;
     }
 
     @Override
-    public River<SOURCE, DATA> pushAfter(final int streamNumber, final long delay,
+    public River<SOURCE, DATA> pushStreamAfter(final int streamNumber, final long delay,
             final TimeUnit timeUnit, final DATA... drops) {
 
         if ((drops == null) || (drops.length == 0)) {
@@ -410,11 +411,11 @@ class LockRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
 
             if (drops.length == 1) {
 
-                mRiver.pushAfter(streamNumber, delay, timeUnit, drops[0]);
+                mRiver.pushStreamAfter(streamNumber, delay, timeUnit, drops[0]);
 
             } else {
 
-                mRiver.pushAfter(streamNumber, delay, timeUnit, drops);
+                mRiver.pushStreamAfter(streamNumber, delay, timeUnit, drops);
             }
         }
 

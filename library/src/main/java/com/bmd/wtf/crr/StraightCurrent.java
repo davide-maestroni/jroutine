@@ -20,9 +20,9 @@ import com.bmd.wtf.flw.Stream;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Synchronous implementation of a {@link Current}.
+ * Synchronous implementation of a current.
  * <p/>
- * Since the calls are synchronous, delayed operations makes the calling thread to sleep for the
+ * Since the calls are synchronous, delayed operations makes the calling thread sleep for the
  * required time.
  * <p/>
  * Created by davide on 6/7/14.

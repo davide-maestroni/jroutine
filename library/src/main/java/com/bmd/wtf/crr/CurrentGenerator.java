@@ -14,7 +14,7 @@
 package com.bmd.wtf.crr;
 
 /**
- * A generator of {@link Current} instances.
+ * A generator of current instances.
  * <p/>
  * Created by davide on 6/10/14.
  */

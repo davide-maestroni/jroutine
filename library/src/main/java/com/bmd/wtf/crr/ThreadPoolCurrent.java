@@ -21,9 +21,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Implementation of a {@link Current} employing a
- * {@link java.util.concurrent.ScheduledExecutorService} to run the commands in a pool of
- * threads.
+ * Implementation of a current employing a {@link java.util.concurrent.ScheduledExecutorService} to
+ * run the commands through a pool of threads.
  * <p/>
  * Created by davide on 6/8/14.
  */

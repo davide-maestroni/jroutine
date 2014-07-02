@@ -21,10 +21,10 @@ import java.util.concurrent.TimeUnit;
 /**
  * Basic component of a waterfall.
  * <p/>
- * A current is responsible for transporting a flow of data feeding a {@link com.bmd.wtf.flw.Fall}.
+ * A current is responsible for transporting a flow of data feeding a fall.
  * <p/>
- * Its implementation may be synchronous or employ one or more separate threads. For this reason
- * it should always be thread safe.
+ * The specific implementation may be synchronous or employ one or more separate threads. For this
+ * reason its methods should always be thread safe.
  * <p/>
  * Created by davide on 6/7/14.
  */
@@ -39,6 +39,12 @@ public interface Current {
      */
     public <DATA> void discharge(Fall<DATA> fall, Stream<DATA> origin);
 
+    /**
+     * This method is called when an unhandled exception must be forwarded through the current.
+     *
+     * @param fall      The fall instance to be used to push data into the waterfall.
+     * @param throwable The unhandled exception.
+     */
     public void forward(Fall<?> fall, Throwable throwable);
 
     /**
@@ -63,7 +69,7 @@ public interface Current {
     public <DATA> void pushAfter(Fall<DATA> fall, long delay, TimeUnit timeUnit, DATA drop);
 
     /**
-     * This method is called when data drops must be pushed through the current, after the
+     * This method is called when several data drops must be pushed through the current, after the
      * specified time has elapsed.
      *
      * @param fall     The fall instance to be used to push data into the waterfall.

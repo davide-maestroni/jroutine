@@ -32,7 +32,7 @@ public interface River<SOURCE, DATA> extends Stream<DATA> {
      * Deviates the flow of the river by effectively preventing any coming data to be pushed
      * further downstream.
      *
-     * @see #deviate(int)
+     * @see #deviateStream(int)
      */
     public void deviate();
 
@@ -43,7 +43,7 @@ public interface River<SOURCE, DATA> extends Stream<DATA> {
      * @param streamNumber The number identifying the target stream.
      * @see #deviate()
      */
-    public void deviate(int streamNumber);
+    public void deviateStream(int streamNumber);
 
     @Override
     public River<SOURCE, DATA> discharge();
@@ -74,13 +74,13 @@ public interface River<SOURCE, DATA> extends Stream<DATA> {
      * Discharges the specific river stream, that is, it informs the fed fall that no more data
      * drops are likely to come.
      * <p/>
-     * Be aware that the call may block until the fall discharges all the data drops, including
-     * the delayed ones.
+     * Be aware that the call may be postponed until the fall discharges all the data drops,
+     * including the delayed ones.
      *
      * @param streamNumber The number identifying the target stream.
      * @return This river.
      */
-    public River<SOURCE, DATA> discharge(int streamNumber);
+    public River<SOURCE, DATA> dischargeStream(int streamNumber);
 
     /**
      * Drains the river by removing from the waterfall all the falls and rivers fed only by this
@@ -94,7 +94,7 @@ public interface River<SOURCE, DATA> extends Stream<DATA> {
      *
      * @param streamNumber The number identifying the target stream.
      */
-    public void drain(int streamNumber);
+    public void drainStream(int streamNumber);
 
     /**
      * Forwards the specified unhandled exception into the specific river stream flow.
@@ -103,7 +103,7 @@ public interface River<SOURCE, DATA> extends Stream<DATA> {
      * @param throwable    The thrown exception.
      * @return This river.
      */
-    public River<SOURCE, DATA> forward(int streamNumber, Throwable throwable);
+    public River<SOURCE, DATA> forwardStream(int streamNumber, Throwable throwable);
 
     /**
      * Returns a gate handling a specific leap.
@@ -134,7 +134,7 @@ public interface River<SOURCE, DATA> extends Stream<DATA> {
      * @param drops        The data drops.
      * @return This stream.
      */
-    public River<SOURCE, DATA> push(int streamNumber, DATA... drops);
+    public River<SOURCE, DATA> pushStream(int streamNumber, DATA... drops);
 
     /**
      * Pushes the data returned by the specified iterable into the specific river stream flow.
@@ -143,7 +143,7 @@ public interface River<SOURCE, DATA> extends Stream<DATA> {
      * @param drops        The data drops iterable.
      * @return This stream.
      */
-    public River<SOURCE, DATA> push(int streamNumber, Iterable<? extends DATA> drops);
+    public River<SOURCE, DATA> pushStream(int streamNumber, Iterable<? extends DATA> drops);
 
     /**
      * Pushes the specified data into the specific river stream flow.
@@ -152,7 +152,7 @@ public interface River<SOURCE, DATA> extends Stream<DATA> {
      * @param drop         The data drop.
      * @return This stream.
      */
-    public River<SOURCE, DATA> push(int streamNumber, DATA drop);
+    public River<SOURCE, DATA> pushStream(int streamNumber, DATA drop);
 
     /**
      * Pushes the data returned by the specified iterable into the specific river stream flow,
@@ -164,7 +164,7 @@ public interface River<SOURCE, DATA> extends Stream<DATA> {
      * @param drops        The data drops iterable.
      * @return This stream.
      */
-    public River<SOURCE, DATA> pushAfter(int streamNumber, long delay, TimeUnit timeUnit,
+    public River<SOURCE, DATA> pushStreamAfter(int streamNumber, long delay, TimeUnit timeUnit,
             Iterable<? extends DATA> drops);
 
     /**
@@ -177,7 +177,7 @@ public interface River<SOURCE, DATA> extends Stream<DATA> {
      * @param drop         The data drop.
      * @return This stream.
      */
-    public River<SOURCE, DATA> pushAfter(int streamNumber, long delay, TimeUnit timeUnit,
+    public River<SOURCE, DATA> pushStreamAfter(int streamNumber, long delay, TimeUnit timeUnit,
             DATA drop);
 
     /**
@@ -190,7 +190,7 @@ public interface River<SOURCE, DATA> extends Stream<DATA> {
      * @param drops        The data drops.
      * @return This stream.
      */
-    public River<SOURCE, DATA> pushAfter(int streamNumber, long delay, TimeUnit timeUnit,
+    public River<SOURCE, DATA> pushStreamAfter(int streamNumber, long delay, TimeUnit timeUnit,
             DATA... drops);
 
     public int size();

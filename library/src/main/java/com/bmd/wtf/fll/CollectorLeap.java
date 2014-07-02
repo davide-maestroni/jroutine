@@ -17,8 +17,8 @@ import com.bmd.wtf.flw.Gate.Action;
 import com.bmd.wtf.flw.River;
 import com.bmd.wtf.lps.FreeLeap;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Leap implementation used to collect data pulled from a waterfall.
@@ -51,7 +51,7 @@ class CollectorLeap<SOURCE, DATA> extends FreeLeap<SOURCE, DATA> {
                 }
             };
 
-    private final CopyOnWriteArrayList<DATA> mData = new CopyOnWriteArrayList<DATA>();
+    private final ArrayList<DATA> mData = new ArrayList<DATA>();
 
     private static final Action<Void, CollectorLeap<?, ?>> ACTION_PULL_ALL =
             new Action<Void, CollectorLeap<?, ?>>() {
@@ -59,7 +59,7 @@ class CollectorLeap<SOURCE, DATA> extends FreeLeap<SOURCE, DATA> {
                 @Override
                 public Void doOn(final CollectorLeap<?, ?> collector, final Object... args) {
 
-                    final CopyOnWriteArrayList<?> data = collector.mData;
+                    final ArrayList<?> data = collector.mData;
 
                     //noinspection unchecked
                     ((List) args[0]).addAll(data);
@@ -72,11 +72,21 @@ class CollectorLeap<SOURCE, DATA> extends FreeLeap<SOURCE, DATA> {
 
     private boolean mIsComplete;
 
+    /**
+     * Checks if the collection is complete, that is, if data have been discharged.
+     *
+     * @return Whether collection is complete.
+     */
     public boolean isComplete() {
 
         return mIsComplete;
     }
 
+    /**
+     * Returns an action to check if the internal data collection is empty.
+     *
+     * @return The action.
+     */
     public Action<Boolean, CollectorLeap<?, ?>> isEmptyAction() {
 
         return ACTION_EMPTY;
@@ -109,16 +119,31 @@ class CollectorLeap<SOURCE, DATA> extends FreeLeap<SOURCE, DATA> {
         mIsComplete = true;
     }
 
+    /**
+     * Returns an action to pull the next element from the internal collection.
+     *
+     * @return The action.
+     */
     public Action<DATA, CollectorLeap<SOURCE, DATA>> pullAction() {
 
         return ACTION_PULL;
     }
 
+    /**
+     * Returns an action to pull all the elements of the internal collection.
+     *
+     * @return The action.
+     */
     public Action<Void, CollectorLeap<?, ?>> pullAllAction() {
 
         return ACTION_PULL_ALL;
     }
 
+    /**
+     * Returns the size of the internal collection.
+     *
+     * @return The size.
+     */
     public int size() {
 
         return mData.size();

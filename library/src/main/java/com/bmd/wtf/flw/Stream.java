@@ -31,8 +31,8 @@ public interface Stream<DATA> {
      * Discharges the stream, that is, it informs the fed fall that no more data drops are likely
      * to come.
      * <p/>
-     * Be aware that the call may block until the fall discharges all the data drops, including
-     * the delayed ones.
+     * Be aware that the call may be postponed until the fall discharges all the data drops,
+     * including the delayed ones.
      *
      * @return This stream.
      */

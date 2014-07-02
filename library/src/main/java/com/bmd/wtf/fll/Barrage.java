@@ -17,10 +17,10 @@ import com.bmd.wtf.flw.River;
 import com.bmd.wtf.lps.Leap;
 
 /**
- * Leap implementation used to uniformly distribute data flow among the waterfall streams.
+ * Leap implementation used to uniformly distribute the flow of data among the waterfall streams.
  * <p/>
- * The level of each stream is raised and lowered based on the number of data drop entering and
- * then flowing through it.<b/>
+ * The level of each stream is raised and lowered based on the number of data drop flowing through
+ * it.<b/>
  * The next coming data are pushed into the stream with the lower level at that moment.
  * <p/>
  * Created by davide on 6/10/14.
@@ -36,11 +36,21 @@ class Barrage<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA> {
 
     private int mUpdateCount;
 
+    /**
+     * Constructor.
+     *
+     * @param streamCount The total number of streams.
+     */
     public Barrage(final int streamCount) {
 
         mStreamLevels = new int[streamCount];
     }
 
+    /**
+     * Lowers the level of the stream identified by the specified number.
+     *
+     * @param streamNumber The stream number.
+     */
     public void lowerLevel(final int streamNumber) {
 
         --mStreamLevels[streamNumber];
@@ -65,7 +75,7 @@ class Barrage<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA> {
 
         normalizeLevels();
 
-        downRiver.push(streamNumber, drop);
+        downRiver.pushStream(streamNumber, drop);
     }
 
     @Override

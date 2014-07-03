@@ -39,6 +39,65 @@ public interface Stream<DATA> {
     public Stream<DATA> discharge();
 
     /**
+     * Pushes the specified data into the waterfall flow and then discharge it.
+     *
+     * @param drops The data drops.
+     * @return This stream.
+     */
+    public Stream<DATA> discharge(DATA... drops);
+
+    /**
+     * Pushes the data returned by the specified iterable into the waterfall flowand then discharge
+     * it.
+     *
+     * @param drops The data drops iterable.
+     * @return This stream.
+     */
+    public Stream<DATA> discharge(Iterable<? extends DATA> drops);
+
+    /**
+     * Pushes the specified data into the waterfall flow and then discharge it.
+     *
+     * @param drop The data drop.
+     * @return This stream.
+     */
+    public Stream<DATA> discharge(DATA drop);
+
+    /**
+     * Pushes the data returned by the specified iterable into the waterfall flow, after the
+     * specified time has elapsed, and then discharge it.
+     *
+     * @param delay    The delay in <code>timeUnit</code> time units.
+     * @param timeUnit The delay time unit.
+     * @param drops    The data drops iterable.
+     * @return This stream.
+     */
+    public Stream<DATA> dischargeAfter(long delay, TimeUnit timeUnit,
+            Iterable<? extends DATA> drops);
+
+    /**
+     * Pushes the specified data into the waterfall flow, after the specified time has elapsed, and
+     * then discharge it.
+     *
+     * @param delay    The delay in <code>timeUnit</code> time units.
+     * @param timeUnit The delay time unit.
+     * @param drop     The data drop.
+     * @return This stream.
+     */
+    public Stream<DATA> dischargeAfter(long delay, TimeUnit timeUnit, DATA drop);
+
+    /**
+     * Pushes the specified data into the waterfall flow, after the specified time has elapsed, and
+     * then discharge it.
+     *
+     * @param delay    The delay in <code>timeUnit</code> time units.
+     * @param timeUnit The delay time unit.
+     * @param drops    The data drops.
+     * @return This stream.
+     */
+    public Stream<DATA> dischargeAfter(long delay, TimeUnit timeUnit, DATA... drops);
+
+    /**
      * Forwards the specified unhandled exception into the waterfall flow.
      *
      * @param throwable The thrown exception.

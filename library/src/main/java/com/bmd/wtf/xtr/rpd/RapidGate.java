@@ -89,6 +89,27 @@ public interface RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends Gate<TYPE>, Riv
     public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> discharge();
 
     @Override
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> discharge(IN... drops);
+
+    @Override
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> discharge(Iterable<? extends IN> drops);
+
+    @Override
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> discharge(IN drop);
+
+    @Override
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> dischargeAfter(long delay, TimeUnit timeUnit,
+            Iterable<? extends IN> drops);
+
+    @Override
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> dischargeAfter(long delay, TimeUnit timeUnit,
+            IN drop);
+
+    @Override
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> dischargeAfter(long delay, TimeUnit timeUnit,
+            IN... drops);
+
+    @Override
     public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> forward(Throwable throwable);
 
     @Override
@@ -114,6 +135,28 @@ public interface RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends Gate<TYPE>, Riv
 
     @Override
     public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> dischargeStream(int streamNumber);
+
+    @Override
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> dischargeStream(int streamNumber, IN... drops);
+
+    @Override
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> dischargeStream(int streamNumber,
+            Iterable<? extends IN> drops);
+
+    @Override
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> dischargeStream(int streamNumber, IN drop);
+
+    @Override
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> dischargeStreamAfter(int streamNumber,
+            long delay, TimeUnit timeUnit, Iterable<? extends IN> drops);
+
+    @Override
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> dischargeStreamAfter(int streamNumber,
+            long delay, TimeUnit timeUnit, IN drop);
+
+    @Override
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> dischargeStreamAfter(int streamNumber,
+            long delay, TimeUnit timeUnit, IN... drops);
 
     @Override
     public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> forwardStream(int streamNumber,

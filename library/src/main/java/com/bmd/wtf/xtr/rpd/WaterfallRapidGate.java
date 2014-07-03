@@ -363,6 +363,57 @@ public class WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallR
     }
 
     @Override
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> discharge(final IN... drops) {
+
+        super.discharge(drops);
+
+        return this;
+    }
+
+    @Override
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> discharge(final Iterable<? extends IN> drops) {
+
+        super.discharge(drops);
+
+        return this;
+    }
+
+    @Override
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> discharge(final IN drop) {
+
+        super.discharge(drop);
+
+        return this;
+    }
+
+    @Override
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> dischargeAfter(final long delay,
+            final TimeUnit timeUnit, final Iterable<? extends IN> drops) {
+
+        super.dischargeAfter(delay, timeUnit, drops);
+
+        return this;
+    }
+
+    @Override
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> dischargeAfter(final long delay,
+            final TimeUnit timeUnit, final IN drop) {
+
+        super.dischargeAfter(delay, timeUnit, drop);
+
+        return this;
+    }
+
+    @Override
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> dischargeAfter(final long delay,
+            final TimeUnit timeUnit, final IN... drops) {
+
+        super.dischargeAfter(delay, timeUnit, drops);
+
+        return this;
+    }
+
+    @Override
     public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> forward(final Throwable throwable) {
 
         super.forward(throwable);
@@ -425,6 +476,60 @@ public class WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallR
     public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> dischargeStream(final int streamNumber) {
 
         super.dischargeStream(streamNumber);
+
+        return this;
+    }
+
+    @Override
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> dischargeStream(final int streamNumber,
+            final IN... drops) {
+
+        super.dischargeStream(streamNumber, drops);
+
+        return this;
+    }
+
+    @Override
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> dischargeStream(final int streamNumber,
+            final Iterable<? extends IN> drops) {
+
+        super.dischargeStream(streamNumber, drops);
+
+        return this;
+    }
+
+    @Override
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> dischargeStream(final int streamNumber,
+            final IN drop) {
+
+        super.dischargeStream(streamNumber, drop);
+
+        return this;
+    }
+
+    @Override
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> dischargeStreamAfter(final int streamNumber,
+            final long delay, final TimeUnit timeUnit, final Iterable<? extends IN> drops) {
+
+        super.dischargeStreamAfter(streamNumber, delay, timeUnit, drops);
+
+        return this;
+    }
+
+    @Override
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> dischargeStreamAfter(final int streamNumber,
+            final long delay, final TimeUnit timeUnit, final IN drop) {
+
+        super.dischargeStreamAfter(streamNumber, delay, timeUnit, drop);
+
+        return this;
+    }
+
+    @Override
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> dischargeStreamAfter(final int streamNumber,
+            final long delay, final TimeUnit timeUnit, final IN... drops) {
+
+        super.dischargeStreamAfter(streamNumber, delay, timeUnit, drops);
 
         return this;
     }

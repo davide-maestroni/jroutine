@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
  * @param <SOURCE> The source data type.
  * @param <DATA>   The data type.
  */
-class StreamRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
+class StreamRiver<SOURCE, DATA> extends AbstractRiver<SOURCE, DATA> {
 
     private final List<DataStream<DATA>> mStreams;
 
@@ -273,5 +273,57 @@ class StreamRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     public River<SOURCE, SOURCE> source() {
 
         return mWaterfall.source();
+    }
+
+    @Override
+    public River<SOURCE, DATA> dischargeStream(final int streamNumber, final DATA... drops) {
+
+        mStreams.get(streamNumber).push(drops).discharge();
+
+        return this;
+    }
+
+    @Override
+    public River<SOURCE, DATA> dischargeStream(final int streamNumber,
+            final Iterable<? extends DATA> drops) {
+
+        mStreams.get(streamNumber).push(drops).discharge();
+
+        return this;
+    }
+
+    @Override
+    public River<SOURCE, DATA> dischargeStream(final int streamNumber, final DATA drop) {
+
+        mStreams.get(streamNumber).push(drop).discharge();
+
+        return this;
+    }
+
+    @Override
+    public River<SOURCE, DATA> dischargeStreamAfter(final int streamNumber, final long delay,
+            final TimeUnit timeUnit, final Iterable<? extends DATA> drops) {
+
+        mStreams.get(streamNumber).pushAfter(delay, timeUnit, drops).discharge();
+
+        return this;
+    }
+
+    @Override
+    public River<SOURCE, DATA> dischargeStreamAfter(final int streamNumber, final long delay,
+            final TimeUnit timeUnit, final DATA drop) {
+
+        mStreams.get(streamNumber).pushAfter(delay, timeUnit, drop).discharge();
+
+        return this;
+    }
+
+    @Override
+    public River<SOURCE, DATA> dischargeStreamAfter(final int streamNumber, final long delay,
+            final TimeUnit timeUnit, final DATA... drops) {
+
+        mStreams.get(streamNumber).pushAfter(delay, timeUnit, drops).discharge();
+
+        return this;
     }
 }

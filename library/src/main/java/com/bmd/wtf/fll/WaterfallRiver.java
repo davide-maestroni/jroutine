@@ -70,6 +70,57 @@ public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
+    public River<SOURCE, DATA> discharge(final DATA... drops) {
+
+        mWaterfall.discharge(drops);
+
+        return this;
+    }
+
+    @Override
+    public River<SOURCE, DATA> discharge(final Iterable<? extends DATA> drops) {
+
+        mWaterfall.discharge(drops);
+
+        return this;
+    }
+
+    @Override
+    public River<SOURCE, DATA> discharge(final DATA drop) {
+
+        mWaterfall.discharge(drop);
+
+        return this;
+    }
+
+    @Override
+    public River<SOURCE, DATA> dischargeAfter(final long delay, final TimeUnit timeUnit,
+            final Iterable<? extends DATA> drops) {
+
+        mWaterfall.dischargeAfter(delay, timeUnit, drops);
+
+        return this;
+    }
+
+    @Override
+    public River<SOURCE, DATA> dischargeAfter(final long delay, final TimeUnit timeUnit,
+            final DATA drop) {
+
+        mWaterfall.dischargeAfter(delay, timeUnit, drop);
+
+        return this;
+    }
+
+    @Override
+    public River<SOURCE, DATA> dischargeAfter(final long delay, final TimeUnit timeUnit,
+            final DATA... drops) {
+
+        mWaterfall.dischargeAfter(delay, timeUnit, drops);
+
+        return this;
+    }
+
+    @Override
     public River<SOURCE, DATA> forward(final Throwable throwable) {
 
         mWaterfall.forward(throwable);
@@ -132,6 +183,58 @@ public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     public River<SOURCE, DATA> dischargeStream(final int streamNumber) {
 
         mWaterfall.dischargeStream(streamNumber);
+
+        return this;
+    }
+
+    @Override
+    public River<SOURCE, DATA> dischargeStream(final int streamNumber, final DATA... drops) {
+
+        mWaterfall.dischargeStream(streamNumber, drops);
+
+        return this;
+    }
+
+    @Override
+    public River<SOURCE, DATA> dischargeStream(final int streamNumber,
+            final Iterable<? extends DATA> drops) {
+
+        mWaterfall.dischargeStream(streamNumber, drops);
+
+        return this;
+    }
+
+    @Override
+    public River<SOURCE, DATA> dischargeStream(final int streamNumber, final DATA drop) {
+
+        mWaterfall.dischargeStream(streamNumber, drop);
+
+        return this;
+    }
+
+    @Override
+    public River<SOURCE, DATA> dischargeStreamAfter(final int streamNumber, final long delay,
+            final TimeUnit timeUnit, final Iterable<? extends DATA> drops) {
+
+        mWaterfall.dischargeStreamAfter(streamNumber, delay, timeUnit, drops);
+
+        return this;
+    }
+
+    @Override
+    public River<SOURCE, DATA> dischargeStreamAfter(final int streamNumber, final long delay,
+            final TimeUnit timeUnit, final DATA drop) {
+
+        mWaterfall.dischargeStreamAfter(streamNumber, delay, timeUnit, drop);
+
+        return this;
+    }
+
+    @Override
+    public River<SOURCE, DATA> dischargeStreamAfter(final int streamNumber, final long delay,
+            final TimeUnit timeUnit, final DATA... drops) {
+
+        mWaterfall.dischargeStreamAfter(streamNumber, delay, timeUnit, drops);
 
         return this;
     }

@@ -81,6 +81,123 @@ class LockRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
+    public River<SOURCE, DATA> discharge(final DATA... drops) {
+
+        if (isOpen()) {
+
+            mDataLock.discharge(mRiver, drops);
+
+        } else {
+
+            mRiver.discharge(drops);
+        }
+
+        return this;
+    }
+
+    @Override
+    public River<SOURCE, DATA> discharge(final Iterable<? extends DATA> drops) {
+
+        if (isOpen()) {
+
+            mDataLock.discharge(mRiver, drops);
+
+        } else {
+
+            mRiver.discharge(drops);
+        }
+
+        return this;
+    }
+
+    @Override
+    public River<SOURCE, DATA> discharge(final DATA drop) {
+
+        if (isOpen()) {
+
+            mDataLock.discharge(mRiver, drop);
+
+        } else {
+
+            mRiver.discharge(drop);
+        }
+
+        return this;
+    }
+
+    @Override
+    public River<SOURCE, DATA> dischargeAfter(final long delay, final TimeUnit timeUnit,
+            final Iterable<? extends DATA> drops) {
+
+        if (drops == null) {
+
+            return this;
+        }
+
+        if (isOpen()) {
+
+            mDataLock.dischargeAfter(mRiver, delay, timeUnit, drops);
+
+        } else {
+
+            mRiver.dischargeAfter(delay, timeUnit, drops);
+        }
+
+        return this;
+    }
+
+    @Override
+    public River<SOURCE, DATA> dischargeAfter(final long delay, final TimeUnit timeUnit,
+            final DATA drop) {
+
+        if (isOpen()) {
+
+            mDataLock.dischargeAfter(mRiver, delay, timeUnit, drop);
+
+        } else {
+
+            mRiver.dischargeAfter(delay, timeUnit, drop);
+        }
+
+        return this;
+    }
+
+    @Override
+    public River<SOURCE, DATA> dischargeAfter(final long delay, final TimeUnit timeUnit,
+            final DATA... drops) {
+
+        if ((drops == null) || (drops.length == 0)) {
+
+            return this;
+        }
+
+        if (isOpen()) {
+
+            if (drops.length == 1) {
+
+                mDataLock.dischargeAfter(mRiver, delay, timeUnit, drops[0]);
+
+            } else {
+
+                mDataLock.dischargeAfter(mRiver, delay, timeUnit, drops);
+            }
+
+        } else {
+
+            if (drops.length == 1) {
+
+                mRiver.dischargeAfter(delay, timeUnit, drops[0]);
+
+            } else {
+
+                mRiver.dischargeAfter(delay, timeUnit, drops);
+            }
+        }
+
+        return this;
+    }
+
+    @Override
     public River<SOURCE, DATA> forward(final Throwable throwable) {
 
         if (isOpen()) {
@@ -246,6 +363,148 @@ class LockRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
         } else {
 
             mRiver.dischargeStream(streamNumber);
+        }
+
+        return this;
+    }
+
+    @Override
+    public River<SOURCE, DATA> dischargeStream(final int streamNumber, final DATA... drops) {
+
+        if ((drops == null) || (drops.length == 0)) {
+
+            return this;
+        }
+
+        if (isOpen()) {
+
+            if (drops.length == 1) {
+
+                mDataLock.dischargeStream(mRiver, streamNumber, drops[0]);
+
+            } else {
+
+                mDataLock.dischargeStream(mRiver, streamNumber, drops);
+            }
+
+        } else {
+
+            if (drops.length == 1) {
+
+                mRiver.dischargeStream(streamNumber, drops[0]);
+
+            } else {
+
+                mRiver.dischargeStream(streamNumber, drops);
+            }
+        }
+
+        return this;
+    }
+
+    @Override
+    public River<SOURCE, DATA> dischargeStream(final int streamNumber,
+            final Iterable<? extends DATA> drops) {
+
+        if (drops == null) {
+
+            return this;
+        }
+
+        if (isOpen()) {
+
+            mDataLock.dischargeStream(mRiver, streamNumber, drops);
+
+        } else {
+
+            mRiver.dischargeStream(streamNumber, drops);
+        }
+
+        return this;
+    }
+
+    @Override
+    public River<SOURCE, DATA> dischargeStream(final int streamNumber, final DATA drop) {
+
+        if (isOpen()) {
+
+            mDataLock.dischargeStream(mRiver, streamNumber, drop);
+
+        } else {
+
+            mRiver.dischargeStream(streamNumber, drop);
+        }
+
+        return this;
+    }
+
+    @Override
+    public River<SOURCE, DATA> dischargeStreamAfter(final int streamNumber, final long delay,
+            final TimeUnit timeUnit, final Iterable<? extends DATA> drops) {
+
+        if (drops == null) {
+
+            return this;
+        }
+
+        if (isOpen()) {
+
+            mDataLock.dischargeStreamAfter(mRiver, streamNumber, delay, timeUnit, drops);
+
+        } else {
+
+            mRiver.dischargeStreamAfter(streamNumber, delay, timeUnit, drops);
+        }
+
+        return this;
+    }
+
+    @Override
+    public River<SOURCE, DATA> dischargeStreamAfter(final int streamNumber, final long delay,
+            final TimeUnit timeUnit, final DATA drop) {
+
+        if (isOpen()) {
+
+            mDataLock.dischargeStreamAfter(mRiver, streamNumber, delay, timeUnit, drop);
+
+        } else {
+
+            mRiver.dischargeStreamAfter(streamNumber, delay, timeUnit, drop);
+        }
+
+        return this;
+    }
+
+    @Override
+    public River<SOURCE, DATA> dischargeStreamAfter(final int streamNumber, final long delay,
+            final TimeUnit timeUnit, final DATA... drops) {
+
+        if ((drops == null) || (drops.length == 0)) {
+
+            return this;
+        }
+
+        if (isOpen()) {
+
+            if (drops.length == 1) {
+
+                mDataLock.dischargeStreamAfter(mRiver, streamNumber, delay, timeUnit, drops[0]);
+
+            } else {
+
+                mDataLock.dischargeStreamAfter(mRiver, streamNumber, delay, timeUnit, drops);
+            }
+
+        } else {
+
+            if (drops.length == 1) {
+
+                mRiver.dischargeStreamAfter(streamNumber, delay, timeUnit, drops[0]);
+
+            } else {
+
+                mRiver.dischargeStreamAfter(streamNumber, delay, timeUnit, drops);
+            }
         }
 
         return this;

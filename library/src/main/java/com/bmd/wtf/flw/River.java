@@ -49,6 +49,25 @@ public interface River<SOURCE, DATA> extends Stream<DATA> {
     public River<SOURCE, DATA> discharge();
 
     @Override
+    public River<SOURCE, DATA> discharge(DATA... drops);
+
+    @Override
+    public River<SOURCE, DATA> discharge(Iterable<? extends DATA> drops);
+
+    @Override
+    public River<SOURCE, DATA> discharge(DATA drop);
+
+    @Override
+    public River<SOURCE, DATA> dischargeAfter(long delay, TimeUnit timeUnit,
+            Iterable<? extends DATA> drops);
+
+    @Override
+    public River<SOURCE, DATA> dischargeAfter(long delay, TimeUnit timeUnit, DATA drop);
+
+    @Override
+    public River<SOURCE, DATA> dischargeAfter(long delay, TimeUnit timeUnit, DATA... drops);
+
+    @Override
     public River<SOURCE, DATA> forward(Throwable throwable);
 
     @Override
@@ -81,6 +100,73 @@ public interface River<SOURCE, DATA> extends Stream<DATA> {
      * @return This river.
      */
     public River<SOURCE, DATA> dischargeStream(int streamNumber);
+
+    /**
+     * Pushes the specified data into the specific river stream flow and then discharge it.
+     *
+     * @param streamNumber The number identifying the target stream.
+     * @param drops        The data drops.
+     * @return This river.
+     */
+    public River<SOURCE, DATA> dischargeStream(int streamNumber, DATA... drops);
+
+    /**
+     * Pushes the data returned by the specified iterable into the specific river stream flow and
+     * then discharge it.
+     *
+     * @param streamNumber The number identifying the target stream.
+     * @param drops        The data drops iterable.
+     * @return This river.
+     */
+    public River<SOURCE, DATA> dischargeStream(int streamNumber, Iterable<? extends DATA> drops);
+
+    /**
+     * Pushes the specified data into the specific river stream flow and then discharge it.
+     *
+     * @param streamNumber The number identifying the target stream.
+     * @param drop         The data drop.
+     * @return This river.
+     */
+    public River<SOURCE, DATA> dischargeStream(int streamNumber, DATA drop);
+
+    /**
+     * Pushes the data returned by the specified iterable into the specific river stream flow,
+     * after the specified time has elapsed, and then discharge it.
+     *
+     * @param streamNumber The number identifying the target stream.
+     * @param delay        The delay in <code>timeUnit</code> time units.
+     * @param timeUnit     The delay time unit.
+     * @param drops        The data drops iterable.
+     * @return This river.
+     */
+    public River<SOURCE, DATA> dischargeStreamAfter(int streamNumber, long delay, TimeUnit timeUnit,
+            Iterable<? extends DATA> drops);
+
+    /**
+     * Pushes the specified data into the specific river stream flow, after the specified time has
+     * elapsed, and then discharge it.
+     *
+     * @param streamNumber The number identifying the target stream.
+     * @param delay        The delay in <code>timeUnit</code> time units.
+     * @param timeUnit     The delay time unit.
+     * @param drop         The data drop.
+     * @return This river.
+     */
+    public River<SOURCE, DATA> dischargeStreamAfter(int streamNumber, long delay, TimeUnit timeUnit,
+            DATA drop);
+
+    /**
+     * Pushes the specified data into the specific river stream flow, after the specified time has
+     * elapsed, and then discharge it.
+     *
+     * @param streamNumber The number identifying the target stream.
+     * @param delay        The delay in <code>timeUnit</code> time units.
+     * @param timeUnit     The delay time unit.
+     * @param drops        The data drops.
+     * @return This river.
+     */
+    public River<SOURCE, DATA> dischargeStreamAfter(int streamNumber, long delay, TimeUnit timeUnit,
+            DATA... drops);
 
     /**
      * Drains the river by removing from the waterfall all the falls and rivers fed only by this

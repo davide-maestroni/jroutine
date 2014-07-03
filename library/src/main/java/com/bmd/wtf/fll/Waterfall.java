@@ -18,7 +18,6 @@ import com.bmd.wtf.crr.CurrentGenerator;
 import com.bmd.wtf.crr.Currents;
 import com.bmd.wtf.flw.Collector;
 import com.bmd.wtf.flw.Gate;
-import com.bmd.wtf.flw.River;
 import com.bmd.wtf.lps.FreeLeap;
 import com.bmd.wtf.lps.Leap;
 import com.bmd.wtf.lps.LeapGenerator;
@@ -45,7 +44,7 @@ import java.util.concurrent.TimeUnit;
  * @param <IN>     The input data type.
  * @param <OUT>    The output data type.
  */
-public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
+public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
 
     private static final DataFall[] NO_FALL = new DataFall[0];
 

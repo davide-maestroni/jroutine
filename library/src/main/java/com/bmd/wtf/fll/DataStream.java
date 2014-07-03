@@ -87,6 +87,44 @@ class DataStream<DATA> implements Stream<DATA> {
     }
 
     @Override
+    public Stream<DATA> discharge(final DATA... drops) {
+
+        return push(drops).discharge();
+    }
+
+    @Override
+    public Stream<DATA> discharge(final Iterable<? extends DATA> drops) {
+
+        return push(drops).discharge();
+    }
+
+    @Override
+    public Stream<DATA> discharge(final DATA drop) {
+
+        return push(drop).discharge();
+    }
+
+    @Override
+    public Stream<DATA> dischargeAfter(final long delay, final TimeUnit timeUnit,
+            final Iterable<? extends DATA> drops) {
+
+        return pushAfter(delay, timeUnit, drops).discharge();
+    }
+
+    @Override
+    public Stream<DATA> dischargeAfter(final long delay, final TimeUnit timeUnit, final DATA drop) {
+
+        return pushAfter(delay, timeUnit, drop).discharge();
+    }
+
+    @Override
+    public Stream<DATA> dischargeAfter(final long delay, final TimeUnit timeUnit,
+            final DATA... drops) {
+
+        return pushAfter(delay, timeUnit, drops).discharge();
+    }
+
+    @Override
     public Stream<DATA> forward(final Throwable throwable) {
 
         final DataFall<?, DATA, ?> fall = mDownstreamFall;

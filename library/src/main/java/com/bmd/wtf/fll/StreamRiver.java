@@ -33,8 +33,24 @@ class StreamRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
 
     private final Waterfall<SOURCE, ?, ?> mWaterfall;
 
+    /**
+     * Constructor.
+     *
+     * @param streams   The list of streams.
+     * @param waterfall The source waterfall.
+     */
     public StreamRiver(final List<DataStream<DATA>> streams,
             final Waterfall<SOURCE, ?, ?> waterfall) {
+
+        if (streams == null) {
+
+            throw new IllegalArgumentException("the list of streams cannot be null");
+        }
+
+        if (waterfall == null) {
+
+            throw new IllegalArgumentException("the source waterfall cannot be null");
+        }
 
         mStreams = streams;
         mWaterfall = waterfall;
@@ -181,6 +197,12 @@ class StreamRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     public <TYPE> Gate<TYPE> on(final Class<TYPE> gateType) {
 
         return mWaterfall.on(gateType);
+    }
+
+    @Override
+    public <TYPE> Gate<TYPE> on(final TYPE leap) {
+
+        return mWaterfall.on(leap);
     }
 
     @Override

@@ -53,7 +53,7 @@ class DamBasin<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA> {
         //noinspection unchecked
         final List<DATA>[] dropLists = new ArrayList[fallCount];
 
-        for (int i = 0; i < fallCount; i++) {
+        for (int i = 0; i < fallCount; ++i) {
 
             dropLists[i] = new ArrayList<DATA>();
         }
@@ -64,7 +64,7 @@ class DamBasin<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA> {
         //noinspection unchecked
         final List<Throwable>[] throwableLists = new ArrayList[fallCount];
 
-        for (int i = 0; i < fallCount; i++) {
+        for (int i = 0; i < fallCount; ++i) {
 
             throwableLists[i] = new ArrayList<Throwable>();
         }
@@ -275,8 +275,8 @@ class DamBasin<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA> {
         }
 
         gate.eventuallyThrow(mTimeoutException)
-            .meeting(new DamConditionEvaluator<SOURCE, DATA>(mEvaluator, mIsOnDischarge, mIsOnData,
-                                                             mIsOnThrowable));
+            .when(new DamConditionEvaluator<SOURCE, DATA>(mEvaluator, mIsOnDischarge, mIsOnData,
+                                                          mIsOnThrowable));
 
         resetWhen();
     }

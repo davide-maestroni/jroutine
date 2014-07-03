@@ -37,6 +37,11 @@ class GateLeap<SOURCE, IN, OUT> extends LeapDecorator<SOURCE, IN, OUT> {
 
     final ReentrantLock lock;
 
+    /**
+     * Constructor.
+     *
+     * @param wrapped The wrapped leap.
+     */
     public GateLeap(final Leap<SOURCE, IN, OUT> wrapped) {
 
         super(wrapped);

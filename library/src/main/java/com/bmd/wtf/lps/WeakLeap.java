@@ -18,7 +18,7 @@ import com.bmd.wtf.flw.River;
 import java.lang.ref.WeakReference;
 
 /**
- * {@link Leap} implementation which retains a weak reference of the wrapped instance.
+ * Implementation of a leap decorator which retains a weak reference of the wrapped instance.
  * <p/>
  * Created by davide on 6/8/14.
  */

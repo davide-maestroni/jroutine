@@ -23,10 +23,19 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.UndeclaredThrowableException;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * Default implementation of a rapid gate.
+ * <p/>
  * Created by davide on 6/20/14.
+ *
+ * @param <SOURCE> The source data type.
+ * @param <MOUTH>  The mouth data type.
+ * @param <IN>     The input data type.
+ * @param <OUT>    The output data type.
+ * @param <TYPE>   The gate type.
  */
 public class WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallRiver<SOURCE, IN>
         implements RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> {
@@ -34,6 +43,8 @@ public class WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallR
     private final Classification<TYPE> mClassification;
 
     private final ConditionEvaluator<? super TYPE> mEvaluator;
+
+    private final TYPE mGateLeap;
 
     private final Waterfall<SOURCE, MOUTH, OUT> mMouthWaterfall;
 
@@ -43,21 +54,27 @@ public class WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallR
 
     private final long mTimeoutMs;
 
+    /**
+     * Constructor.
+     *
+     * @param waterfall The wrapped waterfall.
+     */
     WaterfallRapidGate(final Waterfall<SOURCE, MOUTH, OUT> waterfall) {
 
-        this(waterfall.source(), waterfall, null, 0, null, null);
+        this(waterfall.source(), waterfall, null, null, 0, null, null);
     }
 
     private WaterfallRapidGate(final Waterfall<SOURCE, MOUTH, OUT> waterfall,
-            final Classification<TYPE> classification, final long timeoutMs,
+            final Classification<TYPE> classification, final TYPE gateLeap, final long timeoutMs,
             final RuntimeException exception, final ConditionEvaluator<? super TYPE> evaluator) {
 
-        this(waterfall.source(), waterfall, classification, timeoutMs, exception, evaluator);
+        this(waterfall.source(), waterfall, classification, gateLeap, timeoutMs, exception,
+             evaluator);
     }
 
     private WaterfallRapidGate(final Waterfall<SOURCE, SOURCE, ?> sourceWaterfall,
             final Waterfall<SOURCE, MOUTH, OUT> mouthWaterfall,
-            final Classification<TYPE> classification, final long timeoutMs,
+            final Classification<TYPE> classification, final TYPE gateLeap, final long timeoutMs,
             final RuntimeException exception, final ConditionEvaluator<? super TYPE> evaluator) {
 
         //noinspection unchecked
@@ -66,17 +83,30 @@ public class WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallR
         mSourceWaterfall = sourceWaterfall;
         mMouthWaterfall = mouthWaterfall;
         mClassification = classification;
+        mGateLeap = gateLeap;
         mTimeoutMs = timeoutMs;
         mTimeoutException = exception;
         mEvaluator = evaluator;
     }
 
+    @SuppressWarnings("ConstantConditions")
     private static Method findCondition(final Method[] methods, final Object[] args) {
 
-        Method annotatedConditionMethod = null;
         Method conditionMethod = null;
 
+        boolean isAnnotated = false;
+        boolean isClashing = false;
+
+        int confidenceLevel = -1;
+
         final int length = args.length;
+
+        final Class<?>[] argClasses = new Class[length];
+
+        for (int i = 0; i < length; ++i) {
+
+            argClasses[i] = args[i].getClass();
+        }
 
         for (final Method method : methods) {
 
@@ -91,41 +121,80 @@ public class WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallR
 
                 boolean isMatching = true;
 
-                for (int i = 0; i < length && isMatching; i++) {
+                for (int i = 0; i < length && isMatching; ++i) {
 
-                    final Object arg = args[i];
+                    final Class<?> argClass = argClasses[i];
                     final Class<?> param = params[i];
 
-                    if (arg == null) {
-
-                        if (param.isPrimitive()) {
-
-                            isMatching = false;
-                        }
-
-                    } else if (!arg.getClass().equals(param)) {
+                    if ((argClass != null) ? !param.isAssignableFrom(argClass)
+                            : param.isPrimitive()) {
 
                         isMatching = false;
+
+                        break;
                     }
                 }
 
                 if (isMatching) {
 
-                    if (method.isAnnotationPresent(Condition.class)) {
-
-                        annotatedConditionMethod = method;
-
-                    } else {
+                    if (conditionMethod == null) {
 
                         conditionMethod = method;
+
+                        isAnnotated = method.isAnnotationPresent(Condition.class);
+
+                        continue;
+
+                    } else if (isAnnotated) {
+
+                        if (!method.isAnnotationPresent(Condition.class)) {
+
+                            continue;
+                        }
+
+                    } else if (method.isAnnotationPresent(Condition.class)) {
+
+                        conditionMethod = method;
+
+                        isAnnotated = true;
+                        isClashing = false;
+
+                        confidenceLevel = -1;
+
+                        continue;
+                    }
+
+                    int confidence = 0;
+
+                    for (int i = 0; i < length && isMatching; ++i) {
+
+                        final Class<?> argClass = argClasses[i];
+                        final Class<?> param = params[i];
+
+                        if ((argClass != null) && param.equals(argClass)) {
+
+                            ++confidence;
+                        }
+                    }
+
+                    if (confidence > confidenceLevel) {
+
+                        conditionMethod = method;
+
+                        confidenceLevel = confidence;
+
+                    } else if (confidence == confidenceLevel) {
+
+                        isClashing = true;
                     }
                 }
             }
         }
 
-        if (annotatedConditionMethod != null) {
+        if (isClashing) {
 
-            return annotatedConditionMethod;
+            throw new IllegalArgumentException(
+                    "more than one condition method found for arguments: " + Arrays.toString(args));
         }
 
         return conditionMethod;
@@ -172,7 +241,8 @@ public class WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallR
         if (mTimeoutMs != timeoutMs) {
 
             return new WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE>(mMouthWaterfall,
-                                                                        mClassification, timeoutMs,
+                                                                        mClassification, mGateLeap,
+                                                                        timeoutMs,
                                                                         mTimeoutException,
                                                                         mEvaluator);
         }
@@ -186,8 +256,8 @@ public class WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallR
         if (mTimeoutMs != -1) {
 
             return new WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE>(mMouthWaterfall,
-                                                                        mClassification, -1,
-                                                                        mTimeoutException,
+                                                                        mClassification, mGateLeap,
+                                                                        -1, mTimeoutException,
                                                                         mEvaluator);
         }
 
@@ -204,8 +274,9 @@ public class WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallR
                 : !timeoutException.equals(exception)) {
 
             return new WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE>(mMouthWaterfall,
-                                                                        mClassification, mTimeoutMs,
-                                                                        exception, mEvaluator);
+                                                                        mClassification, mGateLeap,
+                                                                        mTimeoutMs, exception,
+                                                                        mEvaluator);
         }
 
         return this;
@@ -217,8 +288,8 @@ public class WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallR
         if (mTimeoutMs != 0) {
 
             return new WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE>(mMouthWaterfall,
-                                                                        mClassification, 0,
-                                                                        mTimeoutException,
+                                                                        mClassification, mGateLeap,
+                                                                        0, mTimeoutException,
                                                                         mEvaluator);
         }
 
@@ -226,7 +297,7 @@ public class WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallR
     }
 
     @Override
-    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> meeting(
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> when(
             final ConditionEvaluator<? super TYPE> evaluator) {
 
         final ConditionEvaluator<? super TYPE> currentEvaluator = mEvaluator;
@@ -235,7 +306,8 @@ public class WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallR
                 : !currentEvaluator.equals(evaluator)) {
 
             return new WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE>(mMouthWaterfall,
-                                                                        mClassification, mTimeoutMs,
+                                                                        mClassification, mGateLeap,
+                                                                        mTimeoutMs,
                                                                         mTimeoutException,
                                                                         evaluator);
         }
@@ -244,16 +316,11 @@ public class WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallR
     }
 
     @Override
-    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> meetsCondition(final Object... args) {
-
-        return meeting(new GateConditionEvaluator<TYPE>(args));
-    }
-
-    @Override
     public RapidGate<SOURCE, MOUTH, MOUTH, OUT, TYPE> mouth() {
 
         return new WaterfallRapidGate<SOURCE, MOUTH, MOUTH, OUT, TYPE>(mMouthWaterfall,
-                                                                       mClassification, mTimeoutMs,
+                                                                       mClassification, mGateLeap,
+                                                                       mTimeoutMs,
                                                                        mTimeoutException,
                                                                        mEvaluator);
     }
@@ -262,6 +329,12 @@ public class WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallR
     public TYPE perform() {
 
         final Classification<TYPE> classification = mClassification;
+
+        if ((classification == null) || !classification.isInterface()) {
+
+            throw new IllegalArgumentException(
+                    "the gate classification must represent an interface");
+        }
 
         //noinspection unchecked
         return (TYPE) Proxy.newProxyInstance(classification.getClass().getClassLoader(),
@@ -273,6 +346,12 @@ public class WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallR
     public Waterfall<SOURCE, MOUTH, OUT> waterfall() {
 
         return mMouthWaterfall;
+    }
+
+    @Override
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> when(final Object... args) {
+
+        return when(new GateConditionEvaluator<TYPE>(args));
     }
 
     @Override
@@ -366,13 +445,31 @@ public class WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallR
     }
 
     @Override
+    public <NTYPE> RapidGate<SOURCE, MOUTH, IN, OUT, NTYPE> on(NTYPE leap) {
+
+        if (leap == null) {
+
+            throw new IllegalArgumentException("the gate leap cannot be null");
+        }
+
+        if (leap != mGateLeap) {
+
+            return new WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, NTYPE>(mMouthWaterfall, null,
+                                                                         leap, mTimeoutMs,
+                                                                         mTimeoutException, null);
+        }
+
+        //noinspection unchecked
+        return (RapidGate<SOURCE, MOUTH, IN, OUT, NTYPE>) this;
+    }
+
+    @Override
     public <NTYPE> RapidGate<SOURCE, MOUTH, IN, OUT, NTYPE> on(
             final Classification<NTYPE> gateClassification) {
 
-        if (!gateClassification.isInterface()) {
+        if (gateClassification == null) {
 
-            throw new IllegalArgumentException(
-                    "the gate classification must represent an interface");
+            throw new IllegalArgumentException("the gate classification cannot be null");
         }
 
         final Classification<TYPE> currentClassification = mClassification;
@@ -393,7 +490,7 @@ public class WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallR
             }
 
             return new WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, NTYPE>(mMouthWaterfall,
-                                                                         gateClassification,
+                                                                         gateClassification, null,
                                                                          mTimeoutMs,
                                                                          mTimeoutException,
                                                                          evaluator);
@@ -462,7 +559,8 @@ public class WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallR
 
         return new WaterfallRapidGate<SOURCE, MOUTH, SOURCE, OUT, TYPE>(mSourceWaterfall,
                                                                         mMouthWaterfall,
-                                                                        mClassification, mTimeoutMs,
+                                                                        mClassification, mGateLeap,
+                                                                        mTimeoutMs,
                                                                         mTimeoutException,
                                                                         mEvaluator);
     }
@@ -476,11 +574,22 @@ public class WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallR
 
     private Gate<TYPE> getGate() {
 
+        final TYPE gateLeap = mGateLeap;
+
         final long timeoutMs = mTimeoutMs;
 
-        final Gate<TYPE> gate = mMouthWaterfall.on(mClassification)
-                                               .meeting(mEvaluator)
-                                               .eventuallyThrow(mTimeoutException);
+        final Gate<TYPE> gate;
+
+        if (gateLeap == null) {
+
+            gate = mMouthWaterfall.on(mClassification)
+                                  .when(mEvaluator)
+                                  .eventuallyThrow(mTimeoutException);
+
+        } else {
+
+            gate = mMouthWaterfall.on(gateLeap).when(mEvaluator).eventuallyThrow(mTimeoutException);
+        }
 
         if (timeoutMs < 0) {
 

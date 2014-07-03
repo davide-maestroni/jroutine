@@ -18,8 +18,7 @@ import com.bmd.wtf.lps.Leap;
 import com.bmd.wtf.lps.LeapDecorator;
 
 /**
- * Leap decorator used to protect a leap when the same instance is used to handle different
- * streams.
+ * Leap decorator used to protect a leap when the same instance handles different streams.
  * <p/>
  * Created by davide on 6/14/14.
  *
@@ -31,6 +30,11 @@ class SegmentedLeap<SOURCE, IN, OUT> extends LeapDecorator<SOURCE, IN, OUT> {
 
     private final Object mMutex = new Object();
 
+    /**
+     * Constructor.
+     *
+     * @param wrapped The wrapped leap.
+     */
     public SegmentedLeap(final Leap<SOURCE, IN, OUT> wrapped) {
 
         super(wrapped);

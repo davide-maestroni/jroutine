@@ -41,6 +41,12 @@ class DataStream<DATA> implements Stream<DATA> {
 
     private final DataFall<?, ?, DATA> mUpstreamFall;
 
+    /**
+     * Constructor.
+     *
+     * @param upstreamFall   The upstream fall.
+     * @param downstreamFall The downstream fall.
+     */
     public DataStream(final DataFall<?, ?, DATA> upstreamFall,
             final DataFall<?, DATA, ?> downstreamFall) {
 
@@ -419,8 +425,7 @@ class DataStream<DATA> implements Stream<DATA> {
     }
 
     /**
-     * Implementation of a {@link WaterfallVisitor} used to drain the streams up or down the
-     * waterfall.
+     * Implementation of a waterfall visitor used to drain the streams up or down the waterfall.
      */
     private static class DrainVisitor implements WaterfallVisitor {
 
@@ -455,8 +460,7 @@ class DataStream<DATA> implements Stream<DATA> {
     }
 
     /**
-     * Implementation of a {@link WaterfallVisitor} used to verify whether a target stream is
-     * reachable.
+     * Implementation of a waterfall visitor used to verify whether a target stream is reachable.
      */
     private static class ReachabilityVisitor implements WaterfallVisitor {
 

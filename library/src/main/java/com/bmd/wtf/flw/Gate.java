@@ -30,7 +30,7 @@ public interface Gate<TYPE> {
      * @param maxDelay The maximum delay in the specified time unit.
      * @param timeUnit The delay time unit.
      * @return This gate.
-     * @see #meeting(ConditionEvaluator)
+     * @see #when(ConditionEvaluator)
      */
     public Gate<TYPE> afterMax(long maxDelay, TimeUnit timeUnit);
 
@@ -38,7 +38,7 @@ public interface Gate<TYPE> {
      * Tells the gate to wait indefinitely for the condition to be met.
      *
      * @return This gate.
-     * @see #meeting(ConditionEvaluator)
+     * @see #when(ConditionEvaluator)
      */
     public Gate<TYPE> eventually();
 
@@ -48,7 +48,7 @@ public interface Gate<TYPE> {
      *
      * @param exception The exception to be thrown.
      * @return This gate.
-     * @see #meeting(ConditionEvaluator)
+     * @see #when(ConditionEvaluator)
      */
     public Gate<TYPE> eventuallyThrow(RuntimeException exception);
 
@@ -60,16 +60,6 @@ public interface Gate<TYPE> {
     public Gate<TYPE> immediately();
 
     /**
-     * Sets the condition to be met by the leap backing this gate.
-     * <p/>
-     * A null condition (as by default) is always immediately met.
-     *
-     * @param evaluator The condition evaluator.
-     * @return This gate.
-     */
-    public Gate<TYPE> meeting(ConditionEvaluator<? super TYPE> evaluator);
-
-    /**
      * Performs the specified action by passing the variadic arguments as parameters.
      *
      * @param action   The action to perform on the leap backing this gate.
@@ -78,6 +68,16 @@ public interface Gate<TYPE> {
      * @return The action result.
      */
     public <RESULT> RESULT perform(Action<RESULT, ? super TYPE> action, Object... args);
+
+    /**
+     * Sets the condition to be met by the leap backing this gate.
+     * <p/>
+     * A null condition (as by default) is always immediately met.
+     *
+     * @param evaluator The condition evaluator.
+     * @return This gate.
+     */
+    public Gate<TYPE> when(ConditionEvaluator<? super TYPE> evaluator);
 
     /**
      * Interface defining an action to be performed on the backed leap.

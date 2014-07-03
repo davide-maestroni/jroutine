@@ -21,16 +21,53 @@ import com.bmd.wtf.flw.River;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * Interface with the functionalities of both a gate and a river.
+ * <p/>
+ * Note however that, unlikely gate or river objects, as a result of a method call a new instance
+ * might be returned.
+ * <p/>
  * Created by davide on 6/20/14.
+ *
+ * @param <SOURCE> The source data type.
+ * @param <MOUTH>  The mouth data type.
+ * @param <IN>     The input data type.
+ * @param <OUT>    The output data type.
+ * @param <TYPE>   The gate type.
  */
 public interface RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends Gate<TYPE>, River<SOURCE, IN> {
 
+    /**
+     * Deviates the river and return this instance.
+     *
+     * @return The rapid gate.
+     * @see #deviate()
+     */
     public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> afterDeviate();
 
+    /**
+     * Deviates the specified river stream and return this instance.
+     *
+     * @param streamNumber The number identifying the target stream.
+     * @return The rapid gate.
+     * @see #deviateStream(int)
+     */
     public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> afterDeviate(int streamNumber);
 
+    /**
+     * Drains the river and return this instance.
+     *
+     * @return The rapid gate.
+     * @see #drain()
+     */
     public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> afterDrain();
 
+    /**
+     * Drains the specified river stream and return this instance.
+     *
+     * @param streamNumber The number identifying the target stream.
+     * @return The rapid gate.
+     * @see #drainStream(int)
+     */
     public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> afterDrain(int streamNumber);
 
     @Override
@@ -46,8 +83,7 @@ public interface RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends Gate<TYPE>, Riv
     public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> immediately();
 
     @Override
-    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> meeting(
-            ConditionEvaluator<? super TYPE> evaluator);
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> when(ConditionEvaluator<? super TYPE> evaluator);
 
     @Override
     public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> discharge();
@@ -87,6 +123,9 @@ public interface RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends Gate<TYPE>, Riv
     public <NTYPE> RapidGate<SOURCE, MOUTH, IN, OUT, NTYPE> on(Class<NTYPE> gateType);
 
     @Override
+    public <NTYPE> RapidGate<SOURCE, MOUTH, IN, OUT, NTYPE> on(NTYPE leap);
+
+    @Override
     public <NTYPE> RapidGate<SOURCE, MOUTH, IN, OUT, NTYPE> on(
             Classification<NTYPE> gateClassification);
 
@@ -115,11 +154,41 @@ public interface RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> extends Gate<TYPE>, Riv
     @Override
     public RapidGate<SOURCE, MOUTH, SOURCE, OUT, TYPE> source();
 
-    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> meetsCondition(Object... args);
-
+    /**
+     * Returns the river mouth.
+     *
+     * @return The river mouth.
+     */
     public RapidGate<SOURCE, MOUTH, MOUTH, OUT, TYPE> mouth();
 
+    /**
+     * Returns the gate of type set by calling {@link #on(com.bmd.wtf.fll.Classification)} or
+     * {@link #on(Class)} methods wrapped so to be accessed in a thread safe way.
+     * <p/>
+     * Note that, in order to correctly work, the specified gate type must be an interface.
+     *
+     * @return The wrapped gate.
+     */
     public TYPE perform();
 
+    /**
+     * Returns the backing waterfall.
+     *
+     * @return The waterfall.
+     */
     public Waterfall<SOURCE, MOUTH, OUT> waterfall();
+
+    /**
+     * Sets the condition to be met by this gate by searching a suitable method via reflection.
+     * <p/>
+     * A suitable method is identified among the ones taking the specified arguments and returning
+     * a boolean value. The methods annotated with {@link RapidAnnotations.Condition} are analyzed
+     * first.<br/>
+     * If more than one method matching the above requirements is found, an exception will be
+     * thrown.
+     *
+     * @param args The arguments to be passed to the method.
+     * @return The rapid gate.
+     */
+    public RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> when(Object... args);
 }

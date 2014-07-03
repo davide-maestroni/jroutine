@@ -14,10 +14,15 @@
 package com.bmd.wtf.xtr.rpd;
 
 /**
+ * This exception wraps an unexpected one thrown during a rapid class execution.
+ * <p/>
  * Created by davide on 6/26/14.
  */
 public class RapidException extends RuntimeException {
 
+    /**
+     * Overrides {@link RuntimeException#RuntimeException(Throwable)}.
+     */
     public RapidException(final Throwable cause) {
 
         super(cause);

@@ -95,7 +95,7 @@ class Barrage<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA> {
 
         final int length = levels.length;
 
-        for (int i = 0; i < length; i++) {
+        for (int i = 0; i < length; ++i) {
 
             final int level = levels[i];
 
@@ -125,14 +125,14 @@ class Barrage<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA> {
         final int length = levels.length;
 
         //noinspection ForLoopReplaceableByForEach
-        for (int i = 0; i < length; i++) {
+        for (int i = 0; i < length; ++i) {
 
             sum += levels[i];
         }
 
         final long mean = sum / length;
 
-        for (int i = 0; i < length; i++) {
+        for (int i = 0; i < length; ++i) {
 
             levels[i] -= mean;
         }

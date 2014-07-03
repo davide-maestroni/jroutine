@@ -14,8 +14,7 @@
 package com.bmd.wtf.flw;
 
 /**
- * A fall instance gives a {@link com.bmd.wtf.crr.Current} a way to discharge data into the
- * waterfall flow.
+ * A fall instance gives a current a way to discharge data into the waterfall flow.
  * <p/>
  * Its methods must be called as a result of the invocation of the relative current ones, inside
  * the thread or queue handled by the specific implementation.
@@ -29,9 +28,6 @@ public interface Fall<DATA> {
     /**
      * Discharges the fall flow, that is, it informs the fed streams that no more data drops are
      * likely to come.
-     * <p/>
-     * Be aware that the call may block until the fall discharges all the data drops, including
-     * the delayed ones.
      *
      * @param origin The origin stream.
      */

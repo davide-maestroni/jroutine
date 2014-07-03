@@ -479,7 +479,7 @@ public class WaterfallTest extends TestCase {
 
         final ArrayList<String> data = new ArrayList<String>();
 
-        for (int i = 0; i < 30; i++) {
+        for (int i = 0; i < 30; ++i) {
 
             data.add(Integer.toString(i));
         }
@@ -804,7 +804,8 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            Waterfall.create().as(new Classification<Integer>() {})
+            Waterfall.create()
+                     .as(new Classification<Integer>() {})
                      .chain(new FreeLeap<Object, Object>());
 
             fail();
@@ -881,7 +882,7 @@ public class WaterfallTest extends TestCase {
         fall1.on(LatchLeap.class)
              .afterMax(3, TimeUnit.SECONDS)
              .eventuallyThrow(new IllegalStateException())
-             .meeting(new ConditionEvaluator<LatchLeap>() {
+             .when(new ConditionEvaluator<LatchLeap>() {
 
                  @Override
                  public boolean isSatisfied(final LatchLeap leap) {
@@ -948,7 +949,7 @@ public class WaterfallTest extends TestCase {
         fall2.on(LatchLeap.class)
              .afterMax(3, TimeUnit.SECONDS)
              .eventuallyThrow(new IllegalStateException())
-             .meeting(new ConditionEvaluator<LatchLeap>() {
+             .when(new ConditionEvaluator<LatchLeap>() {
 
                  @Override
                  public boolean isSatisfied(final LatchLeap leap) {

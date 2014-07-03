@@ -266,7 +266,7 @@ class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
             lock.unlock();
         }
 
-        for (int i = 0; i < dischargeCount; i++) {
+        for (int i = 0; i < dischargeCount; ++i) {
 
             discharge(null);
         }

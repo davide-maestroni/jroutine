@@ -14,16 +14,14 @@
 package com.bmd.wtf.lps;
 
 /**
- * Utility class for creating {@link Leap} instances.
+ * Utility class for creating leap instances.
  * <p/>
  * Created by davide on 6/8/14.
  */
 public class Leaps {
 
-    private static FreeLeap<?, ?> sFreeLeap;
-
     /**
-     * Protected constructor to avoid direct instantiation.
+     * Avoid direct instantiation.
      */
     protected Leaps() {
 

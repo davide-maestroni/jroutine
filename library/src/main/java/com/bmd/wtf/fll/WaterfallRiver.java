@@ -32,7 +32,18 @@ public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
 
     private final Waterfall<SOURCE, DATA, ?> mWaterfall;
 
+    /**
+     * Constructor.
+     *
+     * @param waterfall    The wrapped waterfall.
+     * @param isDownstream Whether the river direction is downstream.
+     */
     public WaterfallRiver(final Waterfall<SOURCE, DATA, ?> waterfall, final boolean isDownstream) {
+
+        if (waterfall == null) {
+
+            throw new IllegalArgumentException("the wrapped waterfall cannot be null");
+        }
 
         mWaterfall = waterfall;
         mIsDownstream = isDownstream;
@@ -149,6 +160,12 @@ public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     public <TYPE> Gate<TYPE> on(final Class<TYPE> gateType) {
 
         return mWaterfall.on(gateType);
+    }
+
+    @Override
+    public <TYPE> Gate<TYPE> on(final TYPE leap) {
+
+        return mWaterfall.on(leap);
     }
 
     @Override

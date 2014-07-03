@@ -16,7 +16,7 @@ package com.bmd.wtf.lps;
 import com.bmd.wtf.flw.River;
 
 /**
- * {@link Leap} decorator class.
+ * Leap decorator class.
  * <p/>
  * Created by davide on 6/8/14.
  *

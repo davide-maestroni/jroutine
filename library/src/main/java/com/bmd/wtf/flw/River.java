@@ -18,7 +18,7 @@ import com.bmd.wtf.fll.Classification;
 import java.util.concurrent.TimeUnit;
 
 /**
- * A river object represents a collection of streams merging the same waterfall into or originating
+ * A river object represents a collection of streams merging into the same waterfall or originating
  * from the same fall.
  * <p/>
  * Created by davide on 6/7/14.
@@ -106,9 +106,9 @@ public interface River<SOURCE, DATA> extends Stream<DATA> {
     public River<SOURCE, DATA> forwardStream(int streamNumber, Throwable throwable);
 
     /**
-     * Returns a gate handling a specific leap.
+     * Returns a gate handling a leap of the specified type.
      * <p/>
-     * If no gate can be created an exception will be thrown.
+     * If no leap of that type is not found inside the waterfall an exception will be thrown.
      *
      * @param gateType The gate type.
      * @param <TYPE>   The leap type.
@@ -117,9 +117,20 @@ public interface River<SOURCE, DATA> extends Stream<DATA> {
     public <TYPE> Gate<TYPE> on(Class<TYPE> gateType);
 
     /**
-     * Returns a gate handling a specific leap.
+     * Returns a gate handling the specified leap.
      * <p/>
-     * If no gate can be created an exception will be thrown.
+     * If the leap is not found inside the waterfall an exception will be thrown.
+     *
+     * @param leap   The leap instance.
+     * @param <TYPE> The leap type.
+     * @return The gate.
+     */
+    public <TYPE> Gate<TYPE> on(TYPE leap);
+
+    /**
+     * Returns a gate handling a leap of the specified type.
+     * <p/>
+     * If the leap is not found inside the waterfall an exception will be thrown.
      *
      * @param gateClassification The gate classification.
      * @param <TYPE>             The leap type.
@@ -132,7 +143,7 @@ public interface River<SOURCE, DATA> extends Stream<DATA> {
      *
      * @param streamNumber The number identifying the target stream.
      * @param drops        The data drops.
-     * @return This stream.
+     * @return This river.
      */
     public River<SOURCE, DATA> pushStream(int streamNumber, DATA... drops);
 
@@ -141,7 +152,7 @@ public interface River<SOURCE, DATA> extends Stream<DATA> {
      *
      * @param streamNumber The number identifying the target stream.
      * @param drops        The data drops iterable.
-     * @return This stream.
+     * @return This river.
      */
     public River<SOURCE, DATA> pushStream(int streamNumber, Iterable<? extends DATA> drops);
 
@@ -150,7 +161,7 @@ public interface River<SOURCE, DATA> extends Stream<DATA> {
      *
      * @param streamNumber The number identifying the target stream.
      * @param drop         The data drop.
-     * @return This stream.
+     * @return This river.
      */
     public River<SOURCE, DATA> pushStream(int streamNumber, DATA drop);
 
@@ -162,7 +173,7 @@ public interface River<SOURCE, DATA> extends Stream<DATA> {
      * @param delay        The delay in <code>timeUnit</code> time units.
      * @param timeUnit     The delay time unit.
      * @param drops        The data drops iterable.
-     * @return This stream.
+     * @return This river.
      */
     public River<SOURCE, DATA> pushStreamAfter(int streamNumber, long delay, TimeUnit timeUnit,
             Iterable<? extends DATA> drops);
@@ -175,7 +186,7 @@ public interface River<SOURCE, DATA> extends Stream<DATA> {
      * @param delay        The delay in <code>timeUnit</code> time units.
      * @param timeUnit     The delay time unit.
      * @param drop         The data drop.
-     * @return This stream.
+     * @return This river.
      */
     public River<SOURCE, DATA> pushStreamAfter(int streamNumber, long delay, TimeUnit timeUnit,
             DATA drop);
@@ -188,11 +199,16 @@ public interface River<SOURCE, DATA> extends Stream<DATA> {
      * @param delay        The delay in <code>timeUnit</code> time units.
      * @param timeUnit     The delay time unit.
      * @param drops        The data drops.
-     * @return This stream.
+     * @return This river.
      */
     public River<SOURCE, DATA> pushStreamAfter(int streamNumber, long delay, TimeUnit timeUnit,
             DATA... drops);
 
+    /**
+     * Returns the size of this river, that is the number of streams which compose it.
+     *
+     * @return The river size.
+     */
     public int size();
 
     /**

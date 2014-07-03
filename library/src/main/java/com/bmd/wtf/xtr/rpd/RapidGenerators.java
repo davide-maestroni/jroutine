@@ -24,14 +24,25 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
 /**
+ * Utility class providing a factory of current generators.
+ * <p/>
  * Created by davide on 6/19/14.
  */
 class RapidGenerators {
 
+    /**
+     * Avoid direct instantiation.
+     */
     private RapidGenerators() {
 
     }
 
+    /**
+     * Creates and returns a current generator from the specified current instances.
+     *
+     * @param currents The currents to return.
+     * @return The newly created current generator.
+     */
     public static CurrentGenerator currentGenerator(final Current... currents) {
 
         final Current[] currentList = currents.clone();
@@ -46,14 +57,22 @@ class RapidGenerators {
         };
     }
 
-    public static CurrentGenerator currentGenerator(
-            final Classification<? extends Current> classification, final Object... contextArgs) {
-
-        //noinspection unchecked
-        return currentGenerator((Class<? extends Current>) classification.getRawType(),
-                                contextArgs);
-    }
-
+    /**
+     * Creates and returns a current generator which instantiates objects of the specified
+     * type through a constructor taking the specified parameters. A constructor taking
+     * an additional Integer parameter (that is, the fall number) is preferred to the default one.
+     * A one taking a primitive int is preferred to the Integer. Finally, a constructor annotated
+     * with {@link RapidAnnotations.Generator} is preferred to the not annotated one.<br/>
+     * In case a suitable constructor is not found, an exception will be thrown.
+     * <p/>
+     * Note that a constructor might need to be made accessible in order to be called via
+     * reflection. That means that, in case a {@link java.lang.SecurityManager} is installed, a
+     * security exception might be raised based on the specific policy implemented.
+     *
+     * @param type        The current type.
+     * @param contextArgs The arguments to be passed to the constructor.
+     * @return The newly created current generator.
+     */
     public static CurrentGenerator currentGenerator(final Class<? extends Current> type,
             final Object... contextArgs) {
 
@@ -121,6 +140,23 @@ class RapidGenerators {
         };
     }
 
+    /**
+     * Creates and returns a current generator which instantiates objects of the specified
+     * classification through a method taking the specified parameters. A method taking
+     * an additional Integer parameter (that is, the fall number) is preferred to the default one.
+     * A one taking a primitive int is preferred to the Integer. Finally, a method annotated
+     * with {@link RapidAnnotations.Generator} is preferred to the not annotated one.<br/>
+     * In case a suitable method is not found, an exception will be thrown.
+     * <p/>
+     * Note that a method might need to be made accessible in order to be called via
+     * reflection. That means that, in case a {@link java.lang.SecurityManager} is installed, a
+     * security exception might be raised based on the specific policy implemented.
+     *
+     * @param generator      The generator object whose method will be called.
+     * @param classification The current classification.
+     * @param args           The arguments to be passed to the method.
+     * @return The newly created current generator.
+     */
     public static CurrentGenerator currentGenerator(final Object generator,
             final Classification<? extends Current> classification, final Object... args) {
 
@@ -189,6 +225,21 @@ class RapidGenerators {
         };
     }
 
+    /**
+     * Creates and returns a current generator which instantiates objects of the specified
+     * type through a constructor. A constructor taking an Integer parameter (that is, the fall
+     * number) is preferred to the default one. A one taking a primitive int is preferred to the
+     * Integer. Finally, a constructor annotated with {@link RapidAnnotations.Generator} is
+     * preferred to the not annotated one.<br/>
+     * In case a suitable constructor is not found, an exception will be thrown.
+     * <p/>
+     * Note that a constructor might need to be made accessible in order to be called via
+     * reflection. That means that, in case a {@link java.lang.SecurityManager} is installed, a
+     * security exception might be raised based on the specific policy implemented.
+     *
+     * @param type The current type.
+     * @return The newly created current generator.
+     */
     public static CurrentGenerator currentGenerator(final Class<? extends Current> type) {
 
         Constructor<?> bestMatch = findConstructor(type.getConstructors());
@@ -247,22 +298,12 @@ class RapidGenerators {
         };
     }
 
-    public static CurrentGenerator currentGenerator(
-            final Classification<? extends Current> classification) {
-
-        //noinspection unchecked
-        return currentGenerator((Class<? extends Current>) classification.getRawType());
-    }
-
-    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> leapGenerator(
-            final Classification<? extends Leap<SOURCE, IN, OUT>> classification,
-            final Object... contextArgs) {
-
-        //noinspection unchecked
-        return leapGenerator((Class<? extends Leap<SOURCE, IN, OUT>>) classification.getRawType(),
-                             contextArgs);
-    }
-
+    /**
+     * Creates and returns a leap generator from the specified leap instances.
+     *
+     * @param leaps The leaps to return.
+     * @return The newly created leap generator.
+     */
     public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> leapGenerator(
             final Leap<SOURCE, IN, OUT>... leaps) {
 
@@ -278,6 +319,23 @@ class RapidGenerators {
         };
     }
 
+    /**
+     * Creates and returns a leap generator which instantiates objects of the specified
+     * classification through a method taking the specified parameters. A method taking
+     * an additional Integer parameter (that is, the fall number) is preferred to the default one.
+     * A one taking a primitive int is preferred to the Integer. Finally, a method annotated
+     * with {@link RapidAnnotations.Generator} is preferred to the not annotated one.<br/>
+     * In case a suitable method is not found, an exception will be thrown.
+     * <p/>
+     * Note that a method might need to be made accessible in order to be called via
+     * reflection. That means that, in case a {@link java.lang.SecurityManager} is installed, a
+     * security exception might be raised based on the specific policy implemented.
+     *
+     * @param generator      The generator object whose method will be called.
+     * @param classification The leap classification.
+     * @param args           The arguments to be passed to the method.
+     * @return The newly created leap generator.
+     */
     public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> leapGenerator(
             final Object generator,
             final Classification<? extends Leap<SOURCE, IN, OUT>> classification,
@@ -350,6 +408,22 @@ class RapidGenerators {
         };
     }
 
+    /**
+     * Creates and returns a leap generator which instantiates objects of the specified
+     * type through a constructor taking the specified parameters. A constructor taking
+     * an additional Integer parameter (that is, the fall number) is preferred to the default one.
+     * A one taking a primitive int is preferred to the Integer. Finally, a constructor annotated
+     * with {@link RapidAnnotations.Generator} is preferred to the not annotated one.<br/>
+     * In case a suitable constructor is not found, an exception will be thrown.
+     * <p/>
+     * Note that a constructor might need to be made accessible in order to be called via
+     * reflection. That means that, in case a {@link java.lang.SecurityManager} is installed, a
+     * security exception might be raised based on the specific policy implemented.
+     *
+     * @param type        The leap type.
+     * @param contextArgs The arguments to be passed to the constructor.
+     * @return The newly created leap generator.
+     */
     public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> leapGenerator(
             final Class<? extends Leap<SOURCE, IN, OUT>> type, final Object... contextArgs) {
 
@@ -419,6 +493,21 @@ class RapidGenerators {
         };
     }
 
+    /**
+     * Creates and returns a leap generator which instantiates objects of the specified
+     * type through a constructor. A constructor taking an Integer parameter (that is, the fall
+     * number) is preferred to the default one. A one taking a primitive int is preferred to the
+     * Integer. Finally, a constructor annotated with {@link RapidAnnotations.Generator} is
+     * preferred to the not annotated one.<br/>
+     * In case a suitable constructor is not found, an exception will be thrown.
+     * <p/>
+     * Note that a constructor might need to be made accessible in order to be called via
+     * reflection. That means that, in case a {@link java.lang.SecurityManager} is installed, a
+     * security exception might be raised based on the specific policy implemented.
+     *
+     * @param type The leap type.
+     * @return The newly created leap generator.
+     */
     public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> leapGenerator(
             final Class<? extends Leap<SOURCE, IN, OUT>> type) {
 
@@ -478,13 +567,6 @@ class RapidGenerators {
                 }
             }
         };
-    }
-
-    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> leapGenerator(
-            final Classification<? extends Leap<SOURCE, IN, OUT>> classification) {
-
-        //noinspection unchecked
-        return leapGenerator((Class<? extends Leap<SOURCE, IN, OUT>>) classification.getRawType());
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -613,7 +695,7 @@ class RapidGenerators {
 
                 if (isValid) {
 
-                    for (int i = 0; i < argsLength; i++) {
+                    for (int i = 0; i < argsLength; ++i) {
 
                         final Object contextArg = contextArgs[i];
                         final Class<?> param = params[i];
@@ -670,7 +752,7 @@ class RapidGenerators {
 
                 if (isValid) {
 
-                    for (int i = 0; i < argsLength; i++) {
+                    for (int i = 0; i < argsLength; ++i) {
 
                         final Object contextArg = contextArgs[i];
                         final Class<?> param = params[i];
@@ -742,7 +824,7 @@ class RapidGenerators {
 
         final Class<?>[] argClasses = new Class[argsLength];
 
-        for (int i = 0; i < argsLength; i++) {
+        for (int i = 0; i < argsLength; ++i) {
 
             argClasses[i] = args[i].getClass();
         }
@@ -769,7 +851,7 @@ class RapidGenerators {
 
                 if (isValid) {
 
-                    for (int i = 0; i < argsLength; i++) {
+                    for (int i = 0; i < argsLength; ++i) {
 
                         if (!params[i].equals(argClasses[i])) {
 
@@ -798,8 +880,8 @@ class RapidGenerators {
 
                     if (isValid) {
 
-                        if ((annotatedBestMatch == null) || returnType
-                                .isAssignableFrom(annotatedBestMatch)) {
+                        if ((annotatedBestMatch == null) || returnType.isAssignableFrom(
+                                annotatedBestMatch)) {
 
                             annotatedBestMatch = returnType;
                         }
@@ -814,7 +896,7 @@ class RapidGenerators {
 
                 if (isValid) {
 
-                    for (int i = 0; i < argsLength; i++) {
+                    for (int i = 0; i < argsLength; ++i) {
 
                         if (!params[i].equals(argClasses[i])) {
 
@@ -854,8 +936,8 @@ class RapidGenerators {
 
         final Class<?> methodReturnType;
 
-        if ((annotatedBestMatch != null) && ((bestMatch == null) || annotatedBestMatch
-                .isAssignableFrom(bestMatch))) {
+        if ((annotatedBestMatch != null) && ((bestMatch == null)
+                || annotatedBestMatch.isAssignableFrom(bestMatch))) {
 
             methodReturnType = annotatedBestMatch;
 
@@ -893,7 +975,7 @@ class RapidGenerators {
 
                 if (isValid) {
 
-                    for (int i = 0; i < argsLength; i++) {
+                    for (int i = 0; i < argsLength; ++i) {
 
                         if (!params[i].equals(argClasses[i])) {
 
@@ -946,7 +1028,7 @@ class RapidGenerators {
 
                 if (isValid) {
 
-                    for (int i = 0; i < argsLength; i++) {
+                    for (int i = 0; i < argsLength; ++i) {
 
                         if (!params[i].equals(argClasses[i])) {
 

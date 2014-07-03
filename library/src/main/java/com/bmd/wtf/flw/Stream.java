@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
  * Basic component of the waterfall.
  * <p/>
  * A stream defines the way the data are fed into the waterfall, and it represents the link
- * between to falls.
+ * between the falls.
  * <p/>
  * Created by davide on 6/7/14.
  *

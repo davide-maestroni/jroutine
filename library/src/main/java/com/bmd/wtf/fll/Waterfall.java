@@ -121,7 +121,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
             final Barrage<SOURCE, ?> fallBarrage = mBarrage;
 
-            for (int i = 0; i < length; i++) {
+            for (int i = 0; i < length; ++i) {
 
                 final Leap<SOURCE, IN, OUT> fallLeap;
 
@@ -162,7 +162,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
             final HashMap<Leap<?, ?, ?>, GateLeap<?, ?, ?>> leapMap =
                     new HashMap<Leap<?, ?, ?>, GateLeap<?, ?, ?>>();
 
-            for (int i = 0; i < length; i++) {
+            for (int i = 0; i < length; ++i) {
 
                 final Leap<SOURCE, IN, OUT> leap = leaps[i];
 
@@ -322,23 +322,13 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
      * Tells the waterfall to break the gate of the specified classification type.
      *
      * @param gateClassification The gate classification.
-     * @param <TYPE>             The gate type.
+     * @param <TYPE>             The leap type.
      * @return The newly created waterfall.
      */
     public <TYPE> Waterfall<SOURCE, IN, OUT> breakDown(
             final Classification<TYPE> gateClassification) {
 
-        return breakDown(on(gateClassification));
-    }
-
-    /**
-     * Tells the waterfall to break the specified gate.
-     *
-     * @param gate   The gate.
-     * @param <TYPE> The gate type.
-     * @return The newly created waterfall.
-     */
-    public <TYPE> Waterfall<SOURCE, IN, OUT> breakDown(final TYPE gate) {
+        final GateLeap<?, ?, ?> gate = findBestMatch(gateClassification);
 
         if (gate == null) {
 
@@ -355,6 +345,47 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
         while (iterator.hasNext()) {
 
             if (gate == iterator.next()) {
+
+                iterator.remove();
+
+                isChanged = true;
+            }
+        }
+
+        if (!isChanged) {
+
+            return this;
+        }
+
+        //noinspection unchecked
+        return new Waterfall<SOURCE, IN, OUT>(mSource, gateMap, mGate, mBarrage, mSize, mCurrent,
+                                              mCurrentGenerator, mFalls);
+    }
+
+    /**
+     * Tells the waterfall to break the gate handling the specified leap.
+     *
+     * @param leap   The leap instance.
+     * @param <TYPE> The leap type.
+     * @return The newly created waterfall.
+     */
+    public <TYPE> Waterfall<SOURCE, IN, OUT> breakDown(final TYPE leap) {
+
+        if (leap == null) {
+
+            return this;
+        }
+
+        boolean isChanged = false;
+
+        final HashMap<Classification<?>, GateLeap<?, ?, ?>> gateMap =
+                new HashMap<Classification<?>, GateLeap<?, ?, ?>>(mGateMap);
+
+        final Iterator<GateLeap<?, ?, ?>> iterator = gateMap.values().iterator();
+
+        while (iterator.hasNext()) {
+
+            if (leap == iterator.next().leap) {
 
                 iterator.remove();
 
@@ -447,7 +478,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
                 } else {
 
-                    for (int i = 0; i < size; i++) {
+                    for (int i = 0; i < size; ++i) {
 
                         link(inFalls[i], outFalls[i]);
                     }
@@ -542,7 +573,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
         } else {
 
-            for (int i = 0; i < size; i++) {
+            for (int i = 0; i < size; ++i) {
 
                 link(inFalls[i], outFalls[i]);
             }
@@ -626,7 +657,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
         } else {
 
-            for (int i = 0; i < size; i++) {
+            for (int i = 0; i < size; ++i) {
 
                 link(inFalls[i], outFalls[i]);
             }
@@ -722,7 +753,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
         } else {
 
-            for (int i = 0; i < size; i++) {
+            for (int i = 0; i < size; ++i) {
 
                 link(inFalls[i], outFalls[i]);
             }
@@ -795,7 +826,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
         final Leap[] leaps = new Leap[size];
 
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < size; ++i) {
 
             final Leap<SOURCE, OUT, NOUT> leap = generator.start(i);
 
@@ -826,7 +857,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
         } else {
 
-            for (int i = 0; i < size; i++) {
+            for (int i = 0; i < size; ++i) {
 
                 link(inFalls[i], outFalls[i]);
             }
@@ -1084,11 +1115,41 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
     }
 
     @Override
-    public <TYPE> Gate<TYPE> on(final Classification<TYPE> gateClassification) {
-
-        final GateLeap<?, ?, ?> leap = findBestMatch(gateClassification);
+    public <TYPE> Gate<TYPE> on(final TYPE leap) {
 
         if (leap == null) {
+
+            throw new IllegalArgumentException("the gate leap cannot be null");
+        }
+
+        GateLeap<?, ?, ?> gate = null;
+
+        final Map<Classification<?>, GateLeap<?, ?, ?>> gateMap = mGateMap;
+
+        for (final GateLeap<?, ?, ?> gateLeap : gateMap.values()) {
+
+            if (gateLeap.leap == leap) {
+
+                gate = gateLeap;
+
+                break;
+            }
+        }
+
+        if (gate == null) {
+
+            throw new IllegalArgumentException("the waterfall does not retain the gate " + leap);
+        }
+
+        return new DataGate<TYPE>(gate, new Classification<TYPE>() {});
+    }
+
+    @Override
+    public <TYPE> Gate<TYPE> on(final Classification<TYPE> gateClassification) {
+
+        final GateLeap<?, ?, ?> gate = findBestMatch(gateClassification);
+
+        if (gate == null) {
 
             throw new IllegalArgumentException(
                     "the waterfall does not retain any gate of classification type "
@@ -1096,7 +1157,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
             );
         }
 
-        return new DataGate<TYPE>(leap, gateClassification);
+        return new DataGate<TYPE>(gate, gateClassification);
     }
 
     @Override
@@ -1593,7 +1654,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
         final Leap[] leaps = new Leap[size];
 
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < size; ++i) {
 
             final Leap<NIN, NIN, NOUT> leap = generator.start(i);
 

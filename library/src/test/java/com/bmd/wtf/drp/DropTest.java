@@ -770,7 +770,7 @@ public class DropTest extends TestCase {
         assertThat(drops.retainAll(Arrays.asList(data))).isFalse();
         assertThat(drops).containsExactly(data);
 
-        for (int i = 0; i < data.length; i++) {
+        for (int i = 0; i < data.length; ++i) {
 
             assertThat(drops.get(i)).isEqualTo(data[i]);
         }
@@ -790,7 +790,7 @@ public class DropTest extends TestCase {
         assertThat(listIterator.hasNext()).isFalse();
 
         final ListIterator<Boolean> indexIterator = drops.listIterator(1);
-        for (int i = 1; i < data.length; i++) {
+        for (int i = 1; i < data.length; ++i) {
 
             assertThat(indexIterator.next()).isEqualTo(data[i]);
         }
@@ -814,7 +814,7 @@ public class DropTest extends TestCase {
         assertThat(drops.retainAll(Arrays.asList(data))).isFalse();
         assertThat(drops).containsExactly(data);
 
-        for (int i = 0; i < data.length; i++) {
+        for (int i = 0; i < data.length; ++i) {
 
             assertThat(drops.get(i)).isEqualTo(data[i]);
         }
@@ -834,7 +834,7 @@ public class DropTest extends TestCase {
         assertThat(listIterator.hasNext()).isFalse();
 
         final ListIterator<Byte> indexIterator = drops.listIterator(1);
-        for (int i = 1; i < data.length; i++) {
+        for (int i = 1; i < data.length; ++i) {
 
             assertThat(indexIterator.next()).isEqualTo(data[i]);
         }
@@ -858,7 +858,7 @@ public class DropTest extends TestCase {
         assertThat(drops.retainAll(Arrays.asList(data))).isFalse();
         assertThat(drops).containsExactly(data);
 
-        for (int i = 0; i < data.length; i++) {
+        for (int i = 0; i < data.length; ++i) {
 
             assertThat(drops.get(i)).isEqualTo(data[i]);
         }
@@ -878,7 +878,7 @@ public class DropTest extends TestCase {
         assertThat(listIterator.hasNext()).isFalse();
 
         final ListIterator<Character> indexIterator = drops.listIterator(1);
-        for (int i = 1; i < data.length; i++) {
+        for (int i = 1; i < data.length; ++i) {
 
             assertThat(indexIterator.next()).isEqualTo(data[i]);
         }
@@ -902,7 +902,7 @@ public class DropTest extends TestCase {
         assertThat(drops.retainAll(Arrays.asList(data))).isFalse();
         assertThat(drops).containsExactly(data);
 
-        for (int i = 0; i < data.length; i++) {
+        for (int i = 0; i < data.length; ++i) {
 
             assertThat(drops.get(i)).isEqualTo(data[i]);
         }
@@ -922,7 +922,7 @@ public class DropTest extends TestCase {
         assertThat(listIterator.hasNext()).isFalse();
 
         final ListIterator<Double> indexIterator = drops.listIterator(1);
-        for (int i = 1; i < data.length; i++) {
+        for (int i = 1; i < data.length; ++i) {
 
             assertThat(indexIterator.next()).isEqualTo(data[i]);
         }
@@ -955,7 +955,7 @@ public class DropTest extends TestCase {
         assertThat(drops.retainAll(Arrays.asList(data))).isFalse();
         assertThat(drops).containsExactly(data);
 
-        for (int i = 0; i < data.length; i++) {
+        for (int i = 0; i < data.length; ++i) {
 
             assertThat(drops.get(i)).isEqualTo(data[i]);
         }
@@ -975,7 +975,7 @@ public class DropTest extends TestCase {
         assertThat(listIterator.hasNext()).isFalse();
 
         final ListIterator<Float> indexIterator = drops.listIterator(1);
-        for (int i = 1; i < data.length; i++) {
+        for (int i = 1; i < data.length; ++i) {
 
             assertThat(indexIterator.next()).isEqualTo(data[i]);
         }
@@ -999,7 +999,7 @@ public class DropTest extends TestCase {
         assertThat(drops.retainAll(Arrays.asList(data))).isFalse();
         assertThat(drops).containsExactly(data);
 
-        for (int i = 0; i < data.length; i++) {
+        for (int i = 0; i < data.length; ++i) {
 
             assertThat(drops.get(i)).isEqualTo(data[i]);
         }
@@ -1019,7 +1019,7 @@ public class DropTest extends TestCase {
         assertThat(listIterator.hasNext()).isFalse();
 
         final ListIterator<Integer> indexIterator = drops.listIterator(1);
-        for (int i = 1; i < data.length; i++) {
+        for (int i = 1; i < data.length; ++i) {
 
             assertThat(indexIterator.next()).isEqualTo(data[i]);
         }
@@ -1043,7 +1043,7 @@ public class DropTest extends TestCase {
         assertThat(drops.retainAll(Arrays.asList(data))).isFalse();
         assertThat(drops).containsExactly(data);
 
-        for (int i = 0; i < data.length; i++) {
+        for (int i = 0; i < data.length; ++i) {
 
             assertThat(drops.get(i)).isEqualTo(data[i]);
         }
@@ -1063,7 +1063,7 @@ public class DropTest extends TestCase {
         assertThat(listIterator.hasNext()).isFalse();
 
         final ListIterator<Long> indexIterator = drops.listIterator(1);
-        for (int i = 1; i < data.length; i++) {
+        for (int i = 1; i < data.length; ++i) {
 
             assertThat(indexIterator.next()).isEqualTo(data[i]);
         }
@@ -1087,7 +1087,7 @@ public class DropTest extends TestCase {
         assertThat(drops.retainAll(Arrays.asList(data))).isFalse();
         assertThat(drops).containsExactly(data);
 
-        for (int i = 0; i < data.length; i++) {
+        for (int i = 0; i < data.length; ++i) {
 
             assertThat(drops.get(i)).isEqualTo(data[i]);
         }
@@ -1107,7 +1107,7 @@ public class DropTest extends TestCase {
         assertThat(listIterator.hasNext()).isFalse();
 
         final ListIterator<Object> indexIterator = drops.listIterator(1);
-        for (int i = 1; i < data.length; i++) {
+        for (int i = 1; i < data.length; ++i) {
 
             assertThat(indexIterator.next()).isEqualTo(data[i]);
         }
@@ -1131,7 +1131,7 @@ public class DropTest extends TestCase {
         assertThat(drops.retainAll(Arrays.asList(data))).isFalse();
         assertThat(drops).containsExactly(data);
 
-        for (int i = 0; i < data.length; i++) {
+        for (int i = 0; i < data.length; ++i) {
 
             assertThat(drops.get(i)).isEqualTo(data[i]);
         }
@@ -1151,7 +1151,7 @@ public class DropTest extends TestCase {
         assertThat(listIterator.hasNext()).isFalse();
 
         final ListIterator<Short> indexIterator = drops.listIterator(1);
-        for (int i = 1; i < data.length; i++) {
+        for (int i = 1; i < data.length; ++i) {
 
             assertThat(indexIterator.next()).isEqualTo(data[i]);
         }
@@ -1164,7 +1164,7 @@ public class DropTest extends TestCase {
 
         final Boolean[] booleans = new Boolean[length];
 
-        for (int i = 0; i < length; i++) {
+        for (int i = 0; i < length; ++i) {
 
             if (data[i] instanceof Number) {
 
@@ -1189,7 +1189,7 @@ public class DropTest extends TestCase {
 
         final Byte[] bytes = new Byte[length];
 
-        for (int i = 0; i < length; i++) {
+        for (int i = 0; i < length; ++i) {
 
             if (data[i] instanceof Number) {
 
@@ -1214,7 +1214,7 @@ public class DropTest extends TestCase {
 
         final Character[] chars = new Character[length];
 
-        for (int i = 0; i < length; i++) {
+        for (int i = 0; i < length; ++i) {
 
             if (data[i] instanceof Number) {
 
@@ -1239,7 +1239,7 @@ public class DropTest extends TestCase {
 
         final Double[] doubles = new Double[length];
 
-        for (int i = 0; i < length; i++) {
+        for (int i = 0; i < length; ++i) {
 
             if (data[i] instanceof Number) {
 
@@ -1264,7 +1264,7 @@ public class DropTest extends TestCase {
 
         final Float[] floats = new Float[length];
 
-        for (int i = 0; i < length; i++) {
+        for (int i = 0; i < length; ++i) {
 
             if (data[i] instanceof Number) {
 
@@ -1289,7 +1289,7 @@ public class DropTest extends TestCase {
 
         final Integer[] ints = new Integer[length];
 
-        for (int i = 0; i < length; i++) {
+        for (int i = 0; i < length; ++i) {
 
             if (data[i] instanceof Number) {
 
@@ -1314,7 +1314,7 @@ public class DropTest extends TestCase {
 
         final Long[] longs = new Long[length];
 
-        for (int i = 0; i < length; i++) {
+        for (int i = 0; i < length; ++i) {
 
             if (data[i] instanceof Number) {
 
@@ -1339,7 +1339,7 @@ public class DropTest extends TestCase {
 
         final Short[] shorts = new Short[length];
 
-        for (int i = 0; i < length; i++) {
+        for (int i = 0; i < length; ++i) {
 
             if (data[i] instanceof Number) {
 

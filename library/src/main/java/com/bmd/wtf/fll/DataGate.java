@@ -21,7 +21,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Implementation of a {@link com.bmd.wtf.flw.Gate}.
+ * Default implementation of a gate.
  * <p/>
  * Created by davide on 6/13/14.
  *
@@ -29,7 +29,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 class DataGate<TYPE> implements Gate<TYPE> {
 
-    private final Classification<TYPE> mClassifictation;
+    private final Classification<TYPE> mClassification;
 
     private final Condition mCondition;
 
@@ -43,9 +43,20 @@ class DataGate<TYPE> implements Gate<TYPE> {
 
     private volatile long mTimeoutMs;
 
+    /**
+     * Constructor.
+     *
+     * @param leap           The gate leap.
+     * @param classification The gate classification.
+     */
     public DataGate(final GateLeap<?, ?, ?> leap, final Classification<TYPE> classification) {
 
-        mClassifictation = classification;
+        if (classification == null) {
+
+            throw new IllegalArgumentException("the gate classification cannot be null");
+        }
+
+        mClassification = classification;
         mLeap = leap.leap;
         mLock = leap.lock;
         mCondition = leap.condition;
@@ -84,14 +95,6 @@ class DataGate<TYPE> implements Gate<TYPE> {
     }
 
     @Override
-    public Gate<TYPE> meeting(final ConditionEvaluator<? super TYPE> evaluator) {
-
-        mEvaluator = evaluator;
-
-        return this;
-    }
-
-    @Override
     public <RESULT> RESULT perform(final Action<RESULT, ? super TYPE> action,
             final Object... args) {
 
@@ -101,7 +104,7 @@ class DataGate<TYPE> implements Gate<TYPE> {
 
         try {
 
-            final TYPE leap = mClassifictation.cast(mLeap);
+            final TYPE leap = mClassification.cast(mLeap);
 
             //noinspection unchecked
             waitForCondition(leap);
@@ -114,6 +117,14 @@ class DataGate<TYPE> implements Gate<TYPE> {
 
             lock.unlock();
         }
+    }
+
+    @Override
+    public Gate<TYPE> when(final ConditionEvaluator<? super TYPE> evaluator) {
+
+        mEvaluator = evaluator;
+
+        return this;
     }
 
     private boolean meetsCondition(final ConditionEvaluator<? super TYPE> evaluator,

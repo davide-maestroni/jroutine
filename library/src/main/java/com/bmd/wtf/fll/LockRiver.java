@@ -38,7 +38,17 @@ class LockRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
 
     private volatile DataLock mDataLock;
 
+    /**
+     * Constructor.
+     *
+     * @param wrapped The wrapped river.
+     */
     public LockRiver(final River<SOURCE, DATA> wrapped) {
+
+        if (wrapped == null) {
+
+            throw new IllegalArgumentException("the river cannot be null");
+        }
 
         mRiver = wrapped;
     }
@@ -231,7 +241,7 @@ class LockRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
 
         if (isOpen()) {
 
-            mDataLock.discharge(mRiver, streamNumber);
+            mDataLock.dischargeStream(mRiver, streamNumber);
 
         } else {
 
@@ -258,7 +268,7 @@ class LockRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
 
         if (isOpen()) {
 
-            mDataLock.forward(mRiver, streamNumber, throwable);
+            mDataLock.forwardStream(mRiver, streamNumber, throwable);
 
         } else {
 
@@ -272,6 +282,12 @@ class LockRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     public <TYPE> Gate<TYPE> on(final Class<TYPE> gateType) {
 
         return mRiver.on(gateType);
+    }
+
+    @Override
+    public <TYPE> Gate<TYPE> on(final TYPE leap) {
+
+        return mRiver.on(leap);
     }
 
     @Override
@@ -292,11 +308,11 @@ class LockRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
 
             if (drops.length == 1) {
 
-                mDataLock.push(mRiver, streamNumber, drops[0]);
+                mDataLock.pushStream(mRiver, streamNumber, drops[0]);
 
             } else {
 
-                mDataLock.push(mRiver, streamNumber, drops);
+                mDataLock.pushStream(mRiver, streamNumber, drops);
             }
 
         } else {
@@ -325,7 +341,7 @@ class LockRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
 
         if (isOpen()) {
 
-            mDataLock.push(mRiver, streamNumber, drops);
+            mDataLock.pushStream(mRiver, streamNumber, drops);
 
         } else {
 
@@ -340,7 +356,7 @@ class LockRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
 
         if (isOpen()) {
 
-            mDataLock.push(mRiver, streamNumber, drop);
+            mDataLock.pushStream(mRiver, streamNumber, drop);
 
         } else {
 
@@ -361,7 +377,7 @@ class LockRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
 
         if (isOpen()) {
 
-            mDataLock.pushAfter(mRiver, streamNumber, delay, timeUnit, drops);
+            mDataLock.pushStreamAfter(mRiver, streamNumber, delay, timeUnit, drops);
 
         } else {
 
@@ -377,7 +393,7 @@ class LockRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
 
         if (isOpen()) {
 
-            mDataLock.pushAfter(mRiver, streamNumber, delay, timeUnit, drop);
+            mDataLock.pushStreamAfter(mRiver, streamNumber, delay, timeUnit, drop);
 
         } else {
 
@@ -400,11 +416,11 @@ class LockRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
 
             if (drops.length == 1) {
 
-                mDataLock.pushAfter(mRiver, streamNumber, delay, timeUnit, drops[0]);
+                mDataLock.pushStreamAfter(mRiver, streamNumber, delay, timeUnit, drops[0]);
 
             } else {
 
-                mDataLock.pushAfter(mRiver, streamNumber, delay, timeUnit, drops);
+                mDataLock.pushStreamAfter(mRiver, streamNumber, delay, timeUnit, drops);
             }
 
         } else {
@@ -445,7 +461,7 @@ class LockRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
 
         final DataLock dataLock = mDataLock;
 
-        //mDataLock = null;
+        mDataLock = null;
 
         lock.unlock();
 

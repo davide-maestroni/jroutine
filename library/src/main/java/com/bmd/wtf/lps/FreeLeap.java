@@ -16,8 +16,7 @@ package com.bmd.wtf.lps;
 import com.bmd.wtf.flw.River;
 
 /**
- * Implementation of a free {@link Leap} which lets all the data and objects flow downstream
- * unmodified.
+ * Implementation of a free leap which lets all the data and objects flow downstream unmodified.
  * <p/>
  * Created by davide on 6/8/14.
  *

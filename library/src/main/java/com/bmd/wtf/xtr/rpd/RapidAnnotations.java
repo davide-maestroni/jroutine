@@ -19,27 +19,39 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * This interface groups all the definitions of the rapid annotations.
+ * <p/>
  * Created by davide on 6/23/14.
  */
 public interface RapidAnnotations {
 
     @Target({ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
-    @interface Condition {}
+    @interface Condition {
+
+    }
 
     @Target({ElementType.CONSTRUCTOR, ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
-    @interface Generator {}
+    @interface Generator {
+
+    }
 
     @Target({ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
-    public @interface OnData {}
+    public @interface OnData {
+
+    }
 
     @Target({ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
-    public @interface OnDischarge {}
+    public @interface OnDischarge {
+
+    }
 
     @Target({ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
-    public @interface OnNull {}
+    public @interface OnNull {
+
+    }
 }

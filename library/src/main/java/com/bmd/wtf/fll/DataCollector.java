@@ -66,6 +66,11 @@ class DataCollector<SOURCE, DATA> implements Collector<DATA> {
     public DataCollector(final GateLeap<?, DATA, DATA> gateLeap,
             final CollectorLeap<SOURCE, DATA> collectorLeap) {
 
+        if (collectorLeap == null) {
+
+            throw new IllegalArgumentException("the collector leap cannot be null");
+        }
+
         mCollectorLeap = collectorLeap;
 
         final Classification<CollectorLeap<SOURCE, DATA>> classification =
@@ -96,7 +101,7 @@ class DataCollector<SOURCE, DATA> implements Collector<DATA> {
     @Override
     public Collector<DATA> allInto(final List<DATA> data) {
 
-        mDataGate.meeting(IS_COMPLETE).perform(mCollectorLeap.pullAllAction(), data);
+        mDataGate.when(IS_COMPLETE).perform(mCollectorLeap.pullAllAction(), data);
 
         return this;
     }
@@ -142,7 +147,7 @@ class DataCollector<SOURCE, DATA> implements Collector<DATA> {
     @Override
     public DATA next() {
 
-        return mDataGate.meeting(HAS_DATA).perform(mCollectorLeap.pullAction());
+        return mDataGate.when(HAS_DATA).perform(mCollectorLeap.pullAction());
     }
 
     @Override

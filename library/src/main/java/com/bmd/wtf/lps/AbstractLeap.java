@@ -16,13 +16,14 @@ package com.bmd.wtf.lps;
 import com.bmd.wtf.flw.River;
 
 /**
- * Base abstract implementation of a {@link Leap}. It behaves like a {@link FreeLeap}.
+ * Base abstract implementation of a leap. By default it behaves like a free leap.
  * <p/>
  * Created by davide on 6/9/14.
  *
  * @param <SOURCE> The river source data type.
  * @param <IN>     The input data type.
  * @param <OUT>    The output data type.
+ * @see FreeLeap
  */
 public abstract class AbstractLeap<SOURCE, IN, OUT> implements Leap<SOURCE, IN, OUT> {
 

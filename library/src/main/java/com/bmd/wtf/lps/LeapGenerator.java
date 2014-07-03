@@ -14,7 +14,7 @@
 package com.bmd.wtf.lps;
 
 /**
- * A generator of {@link Leap} instances.
+ * A generator of leap instances.
  * <p/>
  * Created by davide on 6/8/14.
  *

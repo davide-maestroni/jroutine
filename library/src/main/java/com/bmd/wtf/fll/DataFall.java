@@ -201,8 +201,6 @@ class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
     @Override
     public void push(final IN drop) {
 
-        //TODO: remove dry stream?
-
         final DataLock dataLock = sLock.get();
 
         final LockRiver<SOURCE, IN> inRiver = mInRiver;

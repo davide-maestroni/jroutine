@@ -211,18 +211,18 @@ class DataStream<DATA> implements Stream<DATA> {
 
         final DataFall<?, DATA, ?> fall = mDownstreamFall;
 
-        int size = 0;
+        final ArrayList<DATA> list = new ArrayList<DATA>();
 
-        for (final DATA ignored : drops) {
+        for (final DATA drop : drops) {
 
-            ++size;
+            list.add(drop);
         }
 
-        if (size > 0) {
+        if (!list.isEmpty()) {
 
-            fall.raiseLevel(size);
+            fall.raiseLevel(list.size());
 
-            fall.inputCurrent.pushAfter(fall, delay, timeUnit, drops);
+            fall.inputCurrent.pushAfter(fall, delay, timeUnit, list);
         }
 
         return this;
@@ -252,7 +252,8 @@ class DataStream<DATA> implements Stream<DATA> {
 
         fall.raiseLevel(drops.length);
 
-        fall.inputCurrent.pushAfter(fall, delay, timeUnit, Arrays.asList(drops));
+        fall.inputCurrent.pushAfter(fall, delay, timeUnit,
+                                    new ArrayList<DATA>(Arrays.asList(drops)));
 
         return this;
     }

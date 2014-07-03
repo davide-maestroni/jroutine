@@ -23,11 +23,21 @@ import com.bmd.wtf.xtr.rpd.RapidAnnotations.OnNull;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * This class provides a different way to filter and transform data inside a leap.
+ * <p/>
+ * The two main ways to use it is to inherit the class or to wrap an object inside a rapid leap.
+ * <br/>
+ * In both the case the object must implements specific methods to handle the data flowing through
+ * the leap.
+ * <p/>
  * Created by davide on 6/23/14.
+ *
+ * @param <SOURCE> The source data type.
  */
 public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> {
 
@@ -374,19 +384,9 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
         mUpRiver.pushAfter(delay, timeUnit, drop);
     }
 
-    protected final void push(final int streamNumber, final Iterable<Object> drops) {
-
-        mDownRiver.pushStream(streamNumber, drops);
-    }
-
     protected final void push(final Iterable<Object> drops) {
 
         mDownRiver.push(drops);
-    }
-
-    protected final void push(final int streamNumber, final Object... drops) {
-
-        mDownRiver.pushStream(streamNumber, drops);
     }
 
     protected final void push(final Object... drops) {
@@ -394,20 +394,9 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
         mDownRiver.push(drops);
     }
 
-    protected final void push(final int streamNumber, final Object drop) {
-
-        mDownRiver.pushStream(streamNumber, drop);
-    }
-
     protected final void push(final Object drop) {
 
         mDownRiver.push(drop);
-    }
-
-    protected final void pushAfter(final long delay, final TimeUnit timeUnit,
-            final int streamNumber, final Iterable<Object> drops) {
-
-        mDownRiver.pushAfter(delay, timeUnit, streamNumber, drops);
     }
 
     protected final void pushAfter(final long delay, final TimeUnit timeUnit,
@@ -417,26 +406,47 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
     }
 
     protected final void pushAfter(final long delay, final TimeUnit timeUnit,
-            final int streamNumber, final Object... drops) {
-
-        mDownRiver.pushAfter(delay, timeUnit, streamNumber, drops);
-    }
-
-    protected final void pushAfter(final long delay, final TimeUnit timeUnit,
             final Object... drops) {
 
         mDownRiver.pushAfter(delay, timeUnit, drops);
     }
 
-    protected final void pushAfter(final long delay, final TimeUnit timeUnit,
-            final int streamNumber, final Object drop) {
-
-        mDownRiver.pushAfter(delay, timeUnit, streamNumber, drop);
-    }
-
     protected final void pushAfter(final long delay, final TimeUnit timeUnit, final Object drop) {
 
         mDownRiver.pushAfter(delay, timeUnit, drop);
+    }
+
+    protected final void pushStream(final int streamNumber, final Iterable<Object> drops) {
+
+        mDownRiver.pushStream(streamNumber, drops);
+    }
+
+    protected final void pushStream(final int streamNumber, final Object... drops) {
+
+        mDownRiver.pushStream(streamNumber, drops);
+    }
+
+    protected final void pushStream(final int streamNumber, final Object drop) {
+
+        mDownRiver.pushStream(streamNumber, drop);
+    }
+
+    protected final void pushStreamAfter(final int streamNumber, final long delay,
+            final TimeUnit timeUnit, final Object drop) {
+
+        mDownRiver.pushStreamAfter(streamNumber, delay, timeUnit, drop);
+    }
+
+    protected final void pushStreamAfter(final int streamNumber, final long delay,
+            final TimeUnit timeUnit, final Iterable<Object> drops) {
+
+        mDownRiver.pushStreamAfter(streamNumber, delay, timeUnit, drops);
+    }
+
+    protected final void pushStreamAfter(final int streamNumber, final long delay,
+            final TimeUnit timeUnit, final Object... drops) {
+
+        mDownRiver.pushStreamAfter(streamNumber, delay, timeUnit, drops);
     }
 
     protected final River<SOURCE, Object> river(final boolean downStream) {
@@ -469,23 +479,79 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
         final Class<?> objectClass = mTarget.getClass();
 
         final Method[] methods = objectClass.getMethods();
-
-        fillOnData(methods);
-        fillOnNull(methods);
-        fillOnDischarge(methods);
-
         final Method[] declaredMethods = objectClass.getDeclaredMethods();
 
-        fillOnData(declaredMethods);
-        fillOnNull(declaredMethods);
-        fillOnDischarge(declaredMethods);
+        final HashMap<Class<?>, Method> methodMap = mMethodMap;
+
+        fillOnData(methods, methodMap);
+
+        for (final Method method : methodMap.values()) {
+
+            if (!method.isAccessible()) {
+
+                method.setAccessible(true);
+            }
+        }
+
+        final HashMap<Class<?>, Method> declaredMethodMap = new HashMap<Class<?>, Method>();
+
+        fillOnData(declaredMethods, declaredMethodMap);
+
+        for (final Entry<Class<?>, Method> entry : declaredMethodMap.entrySet()) {
+
+            final Class<?> key = entry.getKey();
+
+            if (!methodMap.containsKey(key)) {
+
+                final Method method = entry.getValue();
+
+                if (!method.isAccessible()) {
+
+                    method.setAccessible(true);
+                }
+
+                methodMap.put(key, method);
+            }
+        }
+
+        Method onNull = fillOnNull(methods);
+
+        if (onNull == null) {
+
+            onNull = fillOnNull(declaredMethods);
+        }
+
+        if (onNull != null) {
+
+            if (!onNull.isAccessible()) {
+
+                onNull.setAccessible(true);
+            }
+
+            mOnNull = onNull;
+        }
+
+        Method onDischarge = fillOnDischarge(methods);
+
+        if (onDischarge == null) {
+
+            onDischarge = fillOnDischarge(declaredMethods);
+        }
+
+        if (onDischarge != null) {
+
+            if (!onDischarge.isAccessible()) {
+
+                onDischarge.setAccessible(true);
+            }
+
+            mOnDischarge = onDischarge;
+        }
     }
 
-    private void fillOnData(final Method[] methods) {
+    private void fillOnData(final Method[] methods, final Map<Class<?>, Method> methodMap) {
 
         final boolean isAnnotatedOnly = mIsAnnotatedOnly;
-
-        final HashMap<Class<?>, Method> methodMap = mMethodMap;
 
         for (final Method method : methods) {
 
@@ -546,16 +612,13 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
                 );
             }
 
-            if (!method.isAccessible()) {
-
-                method.setAccessible(true);
-            }
-
             methodMap.put(parameterType, method);
         }
     }
 
-    private void fillOnDischarge(final Method[] methods) {
+    private Method fillOnDischarge(final Method[] methods) {
+
+        Method onDischarge = null;
 
         final boolean isAnnotatedOnly = mIsAnnotatedOnly;
 
@@ -586,24 +649,21 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
                 continue;
             }
 
-            final Method onDischarge = mOnDischarge;
-
             if ((onDischarge != null) && !onDischarge.equals(method)) {
 
                 throw new IllegalArgumentException(
                         "cannot override a method already handling data discharge");
             }
 
-            if (!method.isAccessible()) {
-
-                method.setAccessible(true);
-            }
-
-            mOnDischarge = method;
+            onDischarge = method;
         }
+
+        return onDischarge;
     }
 
-    private void fillOnNull(final Method[] methods) {
+    private Method fillOnNull(final Method[] methods) {
+
+        Method onNull = null;
 
         final boolean isAnnotatedOnly = mIsAnnotatedOnly;
 
@@ -634,21 +694,16 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
                 continue;
             }
 
-            final Method onNull = mOnNull;
-
             if ((onNull != null) && !onNull.equals(method)) {
 
                 throw new IllegalArgumentException(
                         "cannot override a method already handling null data");
             }
 
-            if (!method.isAccessible()) {
-
-                method.setAccessible(true);
-            }
-
-            mOnNull = method;
+            onNull = method;
         }
+
+        return onNull;
     }
 
     private Method findMethod(final Object drop) {

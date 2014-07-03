@@ -23,11 +23,11 @@ import com.bmd.wtf.lps.FreeLeap;
 import com.bmd.wtf.lps.Leap;
 import com.bmd.wtf.lps.LeapGenerator;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.WeakHashMap;
@@ -1007,20 +1007,22 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
             return this;
         }
 
-        int size = 0;
+        final ArrayList<IN> list = new ArrayList<IN>();
 
-        for (final IN ignored : drops) {
+        for (final IN drop : drops) {
 
-            ++size;
+            list.add(drop);
         }
 
-        if (size > 0) {
+        if (!list.isEmpty()) {
+
+            final int size = list.size();
 
             for (final DataFall<SOURCE, IN, OUT> fall : mFalls) {
 
                 fall.raiseLevel(size);
 
-                fall.inputCurrent.pushAfter(fall, delay, timeUnit, drops);
+                fall.inputCurrent.pushAfter(fall, delay, timeUnit, list);
             }
         }
 
@@ -1050,7 +1052,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
             return this;
         }
 
-        final List<IN> list = Arrays.asList(drops);
+        final ArrayList<IN> list = new ArrayList<IN>(Arrays.asList(drops));
 
         for (final DataFall<SOURCE, IN, OUT> fall : mFalls) {
 
@@ -1232,20 +1234,20 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
             return this;
         }
 
-        int size = 0;
+        final ArrayList<IN> list = new ArrayList<IN>();
 
-        for (final IN ignored : drops) {
+        for (final IN drop : drops) {
 
-            ++size;
+            list.add(drop);
         }
 
-        if (size > 0) {
+        if (!list.isEmpty()) {
 
             final DataFall<SOURCE, IN, OUT> fall = mFalls[streamNumber];
 
-            fall.raiseLevel(size);
+            fall.raiseLevel(list.size());
 
-            fall.inputCurrent.pushAfter(fall, delay, timeUnit, drops);
+            fall.inputCurrent.pushAfter(fall, delay, timeUnit, list);
         }
 
         return this;
@@ -1277,7 +1279,7 @@ public class Waterfall<SOURCE, IN, OUT> implements River<SOURCE, IN> {
 
         fall.raiseLevel(drops.length);
 
-        fall.inputCurrent.pushAfter(fall, delay, timeUnit, Arrays.asList(drops));
+        fall.inputCurrent.pushAfter(fall, delay, timeUnit, new ArrayList<IN>(Arrays.asList(drops)));
 
         return this;
     }

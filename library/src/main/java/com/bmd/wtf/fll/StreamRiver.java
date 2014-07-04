@@ -194,9 +194,9 @@ class StreamRiver<SOURCE, DATA> extends AbstractRiver<SOURCE, DATA> {
     }
 
     @Override
-    public <TYPE> Gate<TYPE> on(final Class<TYPE> gateType) {
+    public <TYPE> Gate<TYPE> on(final Class<TYPE> gateClass) {
 
-        return mWaterfall.on(gateType);
+        return mWaterfall.on(gateClass);
     }
 
     @Override
@@ -278,7 +278,7 @@ class StreamRiver<SOURCE, DATA> extends AbstractRiver<SOURCE, DATA> {
     @Override
     public River<SOURCE, DATA> dischargeStream(final int streamNumber, final DATA... drops) {
 
-        mStreams.get(streamNumber).push(drops).discharge();
+        mStreams.get(streamNumber).discharge(drops);
 
         return this;
     }
@@ -287,7 +287,7 @@ class StreamRiver<SOURCE, DATA> extends AbstractRiver<SOURCE, DATA> {
     public River<SOURCE, DATA> dischargeStream(final int streamNumber,
             final Iterable<? extends DATA> drops) {
 
-        mStreams.get(streamNumber).push(drops).discharge();
+        mStreams.get(streamNumber).discharge(drops);
 
         return this;
     }
@@ -295,7 +295,7 @@ class StreamRiver<SOURCE, DATA> extends AbstractRiver<SOURCE, DATA> {
     @Override
     public River<SOURCE, DATA> dischargeStream(final int streamNumber, final DATA drop) {
 
-        mStreams.get(streamNumber).push(drop).discharge();
+        mStreams.get(streamNumber).discharge(drop);
 
         return this;
     }
@@ -304,7 +304,7 @@ class StreamRiver<SOURCE, DATA> extends AbstractRiver<SOURCE, DATA> {
     public River<SOURCE, DATA> dischargeStreamAfter(final int streamNumber, final long delay,
             final TimeUnit timeUnit, final Iterable<? extends DATA> drops) {
 
-        mStreams.get(streamNumber).pushAfter(delay, timeUnit, drops).discharge();
+        mStreams.get(streamNumber).dischargeAfter(delay, timeUnit, drops);
 
         return this;
     }
@@ -313,7 +313,7 @@ class StreamRiver<SOURCE, DATA> extends AbstractRiver<SOURCE, DATA> {
     public River<SOURCE, DATA> dischargeStreamAfter(final int streamNumber, final long delay,
             final TimeUnit timeUnit, final DATA drop) {
 
-        mStreams.get(streamNumber).pushAfter(delay, timeUnit, drop).discharge();
+        mStreams.get(streamNumber).dischargeAfter(delay, timeUnit, drop);
 
         return this;
     }
@@ -322,7 +322,7 @@ class StreamRiver<SOURCE, DATA> extends AbstractRiver<SOURCE, DATA> {
     public River<SOURCE, DATA> dischargeStreamAfter(final int streamNumber, final long delay,
             final TimeUnit timeUnit, final DATA... drops) {
 
-        mStreams.get(streamNumber).pushAfter(delay, timeUnit, drops).discharge();
+        mStreams.get(streamNumber).dischargeAfter(delay, timeUnit, drops);
 
         return this;
     }

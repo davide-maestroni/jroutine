@@ -18,7 +18,12 @@ import com.bmd.wtf.flw.River;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * Base abstract implementation of a river.
+ * <p/>
  * Created by davide on 7/3/14.
+ *
+ * @param <SOURCE> The source data type.
+ * @param <DATA>   The data type.
  */
 public abstract class AbstractRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
 

@@ -260,9 +260,9 @@ public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public <TYPE> Gate<TYPE> on(final Class<TYPE> gateType) {
+    public <TYPE> Gate<TYPE> on(final Class<TYPE> gateClass) {
 
-        return mWaterfall.on(gateType);
+        return mWaterfall.on(gateClass);
     }
 
     @Override

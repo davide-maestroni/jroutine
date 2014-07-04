@@ -41,6 +41,116 @@ import static org.fest.assertions.api.Assertions.assertThat;
  */
 public class WaterfallTest extends TestCase {
 
+    private static void testRiver(final River<Object, Object> river) {
+
+        river.push((Object) null)
+             .push((Object[]) null)
+             .push((Iterable<Object>) null)
+             .push(new Object[0])
+             .push(Arrays.asList())
+             .push("push")
+             .push(new Object[]{"push"})
+             .push(new Object[]{"push", "push"})
+             .push(Arrays.asList("push"))
+             .push(Arrays.asList("push", "push"))
+             .pushAfter(0, TimeUnit.MILLISECONDS, (Object) null)
+             .pushAfter(0, TimeUnit.MILLISECONDS, (Object[]) null)
+             .pushAfter(0, TimeUnit.MILLISECONDS, (Iterable<Object>) null)
+             .pushAfter(0, TimeUnit.MILLISECONDS, new Object[0])
+             .pushAfter(0, TimeUnit.MILLISECONDS, Arrays.asList())
+             .pushAfter(0, TimeUnit.MILLISECONDS, "push")
+             .pushAfter(0, TimeUnit.MILLISECONDS, new Object[]{"push"})
+             .pushAfter(0, TimeUnit.MILLISECONDS, new Object[]{"push", "push"})
+             .pushAfter(0, TimeUnit.MILLISECONDS, Arrays.asList("push"))
+             .pushAfter(0, TimeUnit.MILLISECONDS, Arrays.asList("push", "push"))
+             .forward(null)
+             .forward(new RuntimeException("test"));
+
+        river.discharge((Object) null)
+             .discharge((Object[]) null)
+             .discharge((Iterable<Object>) null)
+             .discharge(new Object[0])
+             .discharge(Arrays.asList())
+             .discharge("push")
+             .discharge(new Object[]{"push"})
+             .discharge(new Object[]{"push", "push"})
+             .discharge(Arrays.asList("push"))
+             .discharge(Arrays.asList("push", "push"))
+             .dischargeAfter(0, TimeUnit.MILLISECONDS, (Object) null)
+             .dischargeAfter(0, TimeUnit.MILLISECONDS, (Object[]) null)
+             .dischargeAfter(0, TimeUnit.MILLISECONDS, (Iterable<Object>) null)
+             .dischargeAfter(0, TimeUnit.MILLISECONDS, new Object[0])
+             .dischargeAfter(0, TimeUnit.MILLISECONDS, Arrays.asList())
+             .dischargeAfter(0, TimeUnit.MILLISECONDS, "push")
+             .dischargeAfter(0, TimeUnit.MILLISECONDS, new Object[]{"push"})
+             .dischargeAfter(0, TimeUnit.MILLISECONDS, new Object[]{"push", "push"})
+             .dischargeAfter(0, TimeUnit.MILLISECONDS, Arrays.asList("push"))
+             .dischargeAfter(0, TimeUnit.MILLISECONDS, Arrays.asList("push", "push"))
+             .discharge();
+    }
+
+    private static void testRivers(final River<Object, Object> upRiver,
+            final River<Object, Object> downRiver) {
+
+        testRiver(downRiver);
+        testStream(downRiver);
+        testRiver(upRiver);
+        testStream(upRiver);
+
+        assertThat(downRiver.source()).isNotNull();
+        assertThat(downRiver.size()).isEqualTo(1);
+        assertThat(upRiver.source()).isNotNull();
+        assertThat(upRiver.size()).isEqualTo(1);
+    }
+
+    private static void testStream(final River<Object, Object> river) {
+
+        river.pushStream(0, (Object) null)
+             .pushStream(0, (Object[]) null)
+             .pushStream(0, (Iterable<Object>) null)
+             .pushStream(0)
+             .pushStream(0, Arrays.asList())
+             .pushStream(0, "push")
+             .pushStream(0, new Object[]{"push"})
+             .pushStream(0, "push", "push")
+             .pushStream(0, Arrays.asList("push"))
+             .pushStream(0, Arrays.asList("push", "push"))
+             .pushStreamAfter(0, 0, TimeUnit.MILLISECONDS, (Object) null)
+             .pushStreamAfter(0, 0, TimeUnit.MILLISECONDS, (Object[]) null)
+             .pushStreamAfter(0, 0, TimeUnit.MILLISECONDS, (Iterable<Object>) null)
+             .pushStreamAfter(0, 0, TimeUnit.MILLISECONDS)
+             .pushStreamAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList())
+             .pushStreamAfter(0, 0, TimeUnit.MILLISECONDS, "push")
+             .pushStreamAfter(0, 0, TimeUnit.MILLISECONDS, new Object[]{"push"})
+             .pushStreamAfter(0, 0, TimeUnit.MILLISECONDS, "push", "push")
+             .pushStreamAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList("push"))
+             .pushStreamAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList("push", "push"))
+             .forwardStream(0, null)
+             .forwardStream(0, new RuntimeException("test"));
+
+        river.dischargeStream(0, (Object) null)
+             .dischargeStream(0, (Object[]) null)
+             .dischargeStream(0, (Iterable<Object>) null)
+             .dischargeStream(0)
+             .dischargeStream(0, Arrays.asList())
+             .dischargeStream(0, "push")
+             .dischargeStream(0, new Object[]{"push"})
+             .dischargeStream(0, "push", "push")
+             .dischargeStream(0, Arrays.asList("push"))
+             .dischargeStream(0, Arrays.asList("push", "push"))
+             .dischargeStreamAfter(0, 0, TimeUnit.MILLISECONDS, (Object) null)
+             .dischargeStreamAfter(0, 0, TimeUnit.MILLISECONDS, (Object[]) null)
+             .dischargeStreamAfter(0, 0, TimeUnit.MILLISECONDS, (Iterable<Object>) null)
+             .dischargeStreamAfter(0, 0, TimeUnit.MILLISECONDS)
+             .dischargeStreamAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList())
+             .dischargeStreamAfter(0, 0, TimeUnit.MILLISECONDS, "push")
+             .dischargeStreamAfter(0, 0, TimeUnit.MILLISECONDS, new Object[]{"push"})
+             .dischargeStreamAfter(0, 0, TimeUnit.MILLISECONDS, "push", "push")
+             .dischargeStreamAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList("push"))
+             .dischargeStreamAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList("push", "push"))
+             .dischargeStream(0);
+    }
+
     public void testBarrage() {
 
         final ArrayList<String> output = new ArrayList<String>();
@@ -395,6 +505,8 @@ public class WaterfallTest extends TestCase {
 
         assertThat(fall4.pull(0).now().all()).isEmpty();
         assertThat(fall4.pull(1).now().all()).isEmpty();
+
+        //TODO: waterfall.deviate
     }
 
     public void testDeviateStream() {
@@ -493,6 +605,14 @@ public class WaterfallTest extends TestCase {
 
         source.discharge();
         assertThat(leap.getDischarges()).isEqualTo(4);
+
+        assertThat(Waterfall.create().distribute().pull("test").all()).containsExactly("test");
+        assertThat(
+                Waterfall.create().start().in(1).distribute().pull("test").all()).containsExactly(
+                "test");
+        assertThat(
+                Waterfall.create().start().in(3).distribute().pull("test").all()).containsExactly(
+                "test");
     }
 
     public void testError() throws InterruptedException {
@@ -858,6 +978,72 @@ public class WaterfallTest extends TestCase {
 
         }
 
+        try {
+
+            final Waterfall<Object, Object, Object> waterfall = Waterfall.create().start();
+
+            waterfall.on((Class) null);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            final Waterfall<Object, Object, Object> waterfall = Waterfall.create().start();
+
+            waterfall.on((Classification) null);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            final Waterfall<Object, Object, Object> waterfall = Waterfall.create().start();
+
+            waterfall.on((Object) null);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            final Waterfall<Object, Object, Object> waterfall = Waterfall.create().start();
+
+            waterfall.on(String.class);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            Waterfall.create().collect();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        testRiver(Waterfall.create());
+        testRiver(Waterfall.create().in(1));
+        testRiver(Waterfall.create().distribute());
+        testRiver(Waterfall.create().start());
+        testStream(Waterfall.create().start());
+        testRiver(Waterfall.create().chain());
+        testStream(Waterfall.create().chain());
+
         final Waterfall<Object, Object, Object> fall1 = Waterfall.create()
                                                                  .asGate()
                                                                  .start(new LatchLeap())
@@ -899,7 +1085,8 @@ public class WaterfallTest extends TestCase {
 
         fall1.source().push("test");
 
-        fall1.on(LatchLeap.class).afterMax(30, TimeUnit.SECONDS)
+        fall1.on(LatchLeap.class)
+             .afterMax(30, TimeUnit.SECONDS)
              .eventuallyThrow(new IllegalStateException())
              .when(new ConditionEvaluator<LatchLeap>() {
 
@@ -1092,6 +1279,18 @@ public class WaterfallTest extends TestCase {
         fall4.pull().nextInto(output);
 
         assertThat(output).containsExactly(128, 136);
+
+        try {
+
+            final Waterfall<Object, Object, Object> fall = Waterfall.create().start();
+
+            Waterfall.create().chain(fall);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
     }
 
     private static class LatchLeap extends FreeLeap<Object, Object> {
@@ -1142,7 +1341,7 @@ public class WaterfallTest extends TestCase {
 
             try {
 
-                test(upRiver, downRiver);
+                testRivers(upRiver, downRiver);
 
                 new Thread(new Runnable() {
 
@@ -1151,7 +1350,7 @@ public class WaterfallTest extends TestCase {
 
                         try {
 
-                            test(upRiver, downRiver);
+                            testRivers(upRiver, downRiver);
 
                         } catch (final Throwable ignored) {
 
@@ -1220,111 +1419,6 @@ public class WaterfallTest extends TestCase {
             );
         }
 
-        private void test(final River<Object, Object> upRiver,
-                final River<Object, Object> downRiver) {
-
-            testRiver(downRiver);
-            testRiver(upRiver);
-
-            assertThat(downRiver.source()).isNotNull();
-            assertThat(downRiver.size()).isEqualTo(1);
-            assertThat(upRiver.source()).isNotNull();
-            assertThat(upRiver.size()).isEqualTo(1);
-        }
-
-        private void testRiver(final River<Object, Object> river) {
-
-            river.push((Object) null)
-                 .push((Object[]) null)
-                 .push((Iterable<Object>) null)
-                 .push(new Object[0])
-                 .push(Arrays.asList())
-                 .push("push")
-                 .push(new Object[]{"push"})
-                 .push(new Object[]{"push", "push"})
-                 .push(Arrays.asList("push"))
-                 .push(Arrays.asList("push", "push"))
-                 .pushAfter(0, TimeUnit.MILLISECONDS, (Object) null)
-                 .pushAfter(0, TimeUnit.MILLISECONDS, (Object[]) null)
-                 .pushAfter(0, TimeUnit.MILLISECONDS, (Iterable<Object>) null)
-                 .pushAfter(0, TimeUnit.MILLISECONDS, new Object[0])
-                 .pushAfter(0, TimeUnit.MILLISECONDS, Arrays.asList())
-                 .pushAfter(0, TimeUnit.MILLISECONDS, "push")
-                 .pushAfter(0, TimeUnit.MILLISECONDS, new Object[]{"push"})
-                 .pushAfter(0, TimeUnit.MILLISECONDS, new Object[]{"push", "push"})
-                 .pushAfter(0, TimeUnit.MILLISECONDS, Arrays.asList("push"))
-                 .pushAfter(0, TimeUnit.MILLISECONDS, Arrays.asList("push", "push"))
-                 .forward(null)
-                 .forward(new RuntimeException("test"));
-
-            river.discharge((Object) null)
-                 .discharge((Object[]) null)
-                 .discharge((Iterable<Object>) null)
-                 .discharge(new Object[0])
-                 .discharge(Arrays.asList())
-                 .discharge("push")
-                 .discharge(new Object[]{"push"})
-                 .discharge(new Object[]{"push", "push"})
-                 .discharge(Arrays.asList("push"))
-                 .discharge(Arrays.asList("push", "push"))
-                 .dischargeAfter(0, TimeUnit.MILLISECONDS, (Object) null)
-                 .dischargeAfter(0, TimeUnit.MILLISECONDS, (Object[]) null)
-                 .dischargeAfter(0, TimeUnit.MILLISECONDS, (Iterable<Object>) null)
-                 .dischargeAfter(0, TimeUnit.MILLISECONDS, new Object[0])
-                 .dischargeAfter(0, TimeUnit.MILLISECONDS, Arrays.asList())
-                 .dischargeAfter(0, TimeUnit.MILLISECONDS, "push")
-                 .dischargeAfter(0, TimeUnit.MILLISECONDS, new Object[]{"push"})
-                 .dischargeAfter(0, TimeUnit.MILLISECONDS, new Object[]{"push", "push"})
-                 .dischargeAfter(0, TimeUnit.MILLISECONDS, Arrays.asList("push"))
-                 .dischargeAfter(0, TimeUnit.MILLISECONDS, Arrays.asList("push", "push"))
-                 .discharge();
-
-            river.pushStream(0, (Object) null)
-                 .pushStream(0, (Object[]) null)
-                 .pushStream(0, (Iterable<Object>) null)
-                 .pushStream(0)
-                 .pushStream(0, Arrays.asList())
-                 .pushStream(0, "push")
-                 .pushStream(0, new Object[]{"push"})
-                 .pushStream(0, "push", "push")
-                 .pushStream(0, Arrays.asList("push"))
-                 .pushStream(0, Arrays.asList("push", "push"))
-                 .pushStreamAfter(0, 0, TimeUnit.MILLISECONDS, (Object) null)
-                 .pushStreamAfter(0, 0, TimeUnit.MILLISECONDS, (Object[]) null)
-                 .pushStreamAfter(0, 0, TimeUnit.MILLISECONDS, (Iterable<Object>) null)
-                 .pushStreamAfter(0, 0, TimeUnit.MILLISECONDS)
-                 .pushStreamAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList())
-                 .pushStreamAfter(0, 0, TimeUnit.MILLISECONDS, "push")
-                 .pushStreamAfter(0, 0, TimeUnit.MILLISECONDS, new Object[]{"push"})
-                 .pushStreamAfter(0, 0, TimeUnit.MILLISECONDS, "push", "push")
-                 .pushStreamAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList("push"))
-                 .pushStreamAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList("push", "push"))
-                 .forwardStream(0, null)
-                 .forwardStream(0, new RuntimeException("test"));
-
-            river.dischargeStream(0, (Object) null)
-                 .dischargeStream(0, (Object[]) null)
-                 .dischargeStream(0, (Iterable<Object>) null)
-                 .dischargeStream(0)
-                 .dischargeStream(0, Arrays.asList())
-                 .dischargeStream(0, "push")
-                 .dischargeStream(0, new Object[]{"push"})
-                 .dischargeStream(0, "push", "push")
-                 .dischargeStream(0, Arrays.asList("push"))
-                 .dischargeStream(0, Arrays.asList("push", "push"))
-                 .dischargeStreamAfter(0, 0, TimeUnit.MILLISECONDS, (Object) null)
-                 .dischargeStreamAfter(0, 0, TimeUnit.MILLISECONDS, (Object[]) null)
-                 .dischargeStreamAfter(0, 0, TimeUnit.MILLISECONDS, (Iterable<Object>) null)
-                 .dischargeStreamAfter(0, 0, TimeUnit.MILLISECONDS)
-                 .dischargeStreamAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList())
-                 .dischargeStreamAfter(0, 0, TimeUnit.MILLISECONDS, "push")
-                 .dischargeStreamAfter(0, 0, TimeUnit.MILLISECONDS, new Object[]{"push"})
-                 .dischargeStreamAfter(0, 0, TimeUnit.MILLISECONDS, "push", "push")
-                 .dischargeStreamAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList("push"))
-                 .dischargeStreamAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList("push", "push"))
-                 .dischargeStream(0);
-        }
-
         @Override
         public void onPush(final River<Object, Object> upRiver,
                 final River<Object, Object> downRiver, final int fallNumber, final Object drop) {
@@ -1338,7 +1432,7 @@ public class WaterfallTest extends TestCase {
 
             try {
 
-                test(upRiver, downRiver);
+                testRivers(upRiver, downRiver);
 
                 new Thread(new Runnable() {
 
@@ -1347,7 +1441,7 @@ public class WaterfallTest extends TestCase {
 
                         try {
 
-                            test(upRiver, downRiver);
+                            testRivers(upRiver, downRiver);
 
                         } catch (final Throwable ignored) {
 
@@ -1380,7 +1474,7 @@ public class WaterfallTest extends TestCase {
 
             try {
 
-                test(upRiver, downRiver);
+                testRivers(upRiver, downRiver);
 
                 new Thread(new Runnable() {
 
@@ -1389,7 +1483,7 @@ public class WaterfallTest extends TestCase {
 
                         try {
 
-                            test(upRiver, downRiver);
+                            testRivers(upRiver, downRiver);
 
                         } catch (final Throwable ignored) {
 

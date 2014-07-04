@@ -17,6 +17,7 @@ import com.bmd.wtf.crr.Current;
 import com.bmd.wtf.crr.CurrentGenerator;
 import com.bmd.wtf.fll.Classification;
 import com.bmd.wtf.fll.Waterfall;
+import com.bmd.wtf.flw.Gate;
 import com.bmd.wtf.lps.Leap;
 import com.bmd.wtf.lps.LeapGenerator;
 
@@ -128,9 +129,7 @@ public class Rapids {
     public static CurrentGenerator currents(final Classification<? extends Current> classification,
             final Object... contextArgs) {
 
-        //noinspection unchecked
-        return RapidGenerators.currentGenerator(
-                (Class<? extends Current>) classification.getRawType(), contextArgs);
+        return RapidGenerators.currentGenerator(classification.getRawType(), contextArgs);
     }
 
     /**
@@ -193,9 +192,7 @@ public class Rapids {
     public static CurrentGenerator currents(
             final Classification<? extends Current> classification) {
 
-        //noinspection unchecked
-        return RapidGenerators.currentGenerator(
-                (Class<? extends Current>) classification.getRawType());
+        return RapidGenerators.currentGenerator(classification.getRawType());
     }
 
     /**
@@ -209,10 +206,22 @@ public class Rapids {
      * @param <TYPE>    The gate type.
      * @return The newly created rapid gate.
      */
-    public static <SOURCE, MOUTH, IN, OUT, TYPE> RapidGate<SOURCE, MOUTH, IN, OUT, TYPE> gate(
+    public static <SOURCE, MOUTH, IN, OUT, TYPE> RapidRiver<SOURCE, MOUTH, IN, OUT, TYPE> gate(
             final Waterfall<SOURCE, MOUTH, OUT> waterfall) {
 
-        return new WaterfallRapidGate<SOURCE, MOUTH, IN, OUT, TYPE>(waterfall);
+        return new DefaultRapidRiver<SOURCE, MOUTH, IN, OUT, TYPE>(waterfall);
+    }
+
+    /**
+     * Creates and returns a rapid gate wrapping the specified gate.
+     *
+     * @param gate   The waterfall to wrap.
+     * @param <TYPE> The gate type.
+     * @return The newly created rapid gate.
+     */
+    public static <TYPE> RapidGate<TYPE> gate(final Gate<TYPE> gate) {
+
+        return new DefaultRapidGate<TYPE>(gate);
     }
 
     /**
@@ -283,9 +292,7 @@ public class Rapids {
             final Classification<? extends Leap<SOURCE, IN, OUT>> classification,
             final Object... contextArgs) {
 
-        //noinspection unchecked
-        return RapidGenerators.leapGenerator(
-                (Class<? extends Leap<SOURCE, IN, OUT>>) classification.getRawType(), contextArgs);
+        return RapidGenerators.leapGenerator(classification.getRawType(), contextArgs);
     }
 
     /**
@@ -349,8 +356,6 @@ public class Rapids {
     public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> leaps(
             final Classification<? extends Leap<SOURCE, IN, OUT>> classification) {
 
-        //noinspection unchecked
-        return RapidGenerators.leapGenerator(
-                (Class<? extends Leap<SOURCE, IN, OUT>>) classification.getRawType());
+        return RapidGenerators.leapGenerator(classification.getRawType());
     }
 }

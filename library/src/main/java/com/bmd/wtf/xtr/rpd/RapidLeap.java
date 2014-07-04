@@ -14,7 +14,6 @@
 package com.bmd.wtf.xtr.rpd;
 
 import com.bmd.wtf.fll.Classification;
-import com.bmd.wtf.flw.Gate;
 import com.bmd.wtf.flw.River;
 import com.bmd.wtf.lps.Leap;
 import com.bmd.wtf.xtr.rpd.RapidAnnotations.OnData;
@@ -25,7 +24,6 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.TimeUnit;
 
 /**
  * This class provides a different way to filter and transform data inside a leap.
@@ -271,207 +269,47 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
         }
     }
 
-    protected final void deviate(final boolean downStream) {
+    protected River<SOURCE, Object> downRiver() {
 
-        river(downStream).deviate();
+        return mDownRiver;
     }
 
-    protected final void deviate(final boolean downStream, final int streamNumber) {
-
-        river(downStream).deviateStream(streamNumber);
-    }
-
-    protected final void discharge(final boolean downStream) {
-
-        river(downStream).discharge();
-    }
-
-    protected final void discharge(final boolean downStream, final int streamNumber) {
-
-        river(downStream).dischargeStream(streamNumber);
-    }
-
-    protected final void drain(final boolean downStream) {
-
-        river(downStream).drain();
-    }
-
-    protected final void drain(final boolean downStream, final int streamNumber) {
-
-        river(downStream).drainStream(streamNumber);
-    }
-
-    protected final void dryUp() {
+    protected void dryUp() {
 
         mUpRiver.drain();
         mDownRiver.drain();
     }
 
-    protected final int fallNumber() {
+    protected int fallNumber() {
 
         return mFallNumber;
     }
 
-    protected final void isolate() {
+    protected void isolate() {
 
         mUpRiver.deviate();
         mDownRiver.deviate();
     }
 
-    protected final void loopBack(final int fallNumber, final Iterable<Object> drops) {
-
-        mUpRiver.pushStream(fallNumber, drops);
-    }
-
-    protected final void loopBack(final Iterable<Object> drops) {
-
-        mUpRiver.push(drops);
-    }
-
-    protected final void loopBack(final int fallNumber, final Object... drops) {
-
-        mUpRiver.pushStream(fallNumber, drops);
-    }
-
-    protected final void loopBack(final Object... drops) {
-
-        mUpRiver.push(drops);
-    }
-
-    protected final void loopBack(final int fallNumber, final Object drop) {
-
-        mUpRiver.pushStream(fallNumber, drop);
-    }
-
-    protected final void loopBack(final Object drop) {
-
-        mUpRiver.push(drop);
-    }
-
-    protected final void loopBackAfter(final long delay, final TimeUnit timeUnit,
-            final int fallNumber, final Iterable<Object> drops) {
-
-        mUpRiver.pushAfter(delay, timeUnit, fallNumber, drops);
-    }
-
-    protected final void loopBackAfter(final long delay, final TimeUnit timeUnit,
-            final Iterable<Object> drops) {
-
-        mUpRiver.pushAfter(delay, timeUnit, drops);
-    }
-
-    protected final void loopBackAfter(final long delay, final TimeUnit timeUnit,
-            final int fallNumber, final Object... drops) {
-
-        mUpRiver.pushAfter(delay, timeUnit, fallNumber, drops);
-    }
-
-    protected final void loopBackAfter(final long delay, final TimeUnit timeUnit,
-            final Object... drops) {
-
-        mUpRiver.pushAfter(delay, timeUnit, drops);
-    }
-
-    protected final void loopBackAfter(final long delay, final TimeUnit timeUnit,
-            final int fallNumber, final Object drop) {
-
-        mUpRiver.pushAfter(delay, timeUnit, fallNumber, drop);
-    }
-
-    protected final void loopBackAfter(final long delay, final TimeUnit timeUnit,
-            final Object drop) {
-
-        mUpRiver.pushAfter(delay, timeUnit, drop);
-    }
-
-    protected final void push(final Iterable<Object> drops) {
-
-        mDownRiver.push(drops);
-    }
-
-    protected final void push(final Object... drops) {
-
-        mDownRiver.push(drops);
-    }
-
-    protected final void push(final Object drop) {
-
-        mDownRiver.push(drop);
-    }
-
-    protected final void pushAfter(final long delay, final TimeUnit timeUnit,
-            final Iterable<Object> drops) {
-
-        mDownRiver.pushAfter(delay, timeUnit, drops);
-    }
-
-    protected final void pushAfter(final long delay, final TimeUnit timeUnit,
-            final Object... drops) {
-
-        mDownRiver.pushAfter(delay, timeUnit, drops);
-    }
-
-    protected final void pushAfter(final long delay, final TimeUnit timeUnit, final Object drop) {
-
-        mDownRiver.pushAfter(delay, timeUnit, drop);
-    }
-
-    protected final void pushStream(final int streamNumber, final Iterable<Object> drops) {
-
-        mDownRiver.pushStream(streamNumber, drops);
-    }
-
-    protected final void pushStream(final int streamNumber, final Object... drops) {
-
-        mDownRiver.pushStream(streamNumber, drops);
-    }
-
-    protected final void pushStream(final int streamNumber, final Object drop) {
-
-        mDownRiver.pushStream(streamNumber, drop);
-    }
-
-    protected final void pushStreamAfter(final int streamNumber, final long delay,
-            final TimeUnit timeUnit, final Object drop) {
-
-        mDownRiver.pushStreamAfter(streamNumber, delay, timeUnit, drop);
-    }
-
-    protected final void pushStreamAfter(final int streamNumber, final long delay,
-            final TimeUnit timeUnit, final Iterable<Object> drops) {
-
-        mDownRiver.pushStreamAfter(streamNumber, delay, timeUnit, drops);
-    }
-
-    protected final void pushStreamAfter(final int streamNumber, final long delay,
-            final TimeUnit timeUnit, final Object... drops) {
-
-        mDownRiver.pushStreamAfter(streamNumber, delay, timeUnit, drops);
-    }
-
-    protected final River<SOURCE, Object> river(final boolean downStream) {
-
-        return (downStream) ? mDownRiver : mUpRiver;
-    }
-
-    protected final int size(final boolean downStream) {
-
-        return river(downStream).size();
-    }
-
-    protected final River<SOURCE, SOURCE> source() {
+    protected River<SOURCE, SOURCE> source() {
 
         return mUpRiver.source();
     }
 
-    protected final <TYPE> Gate<TYPE> when(Class<TYPE> gateType) {
+    protected River<SOURCE, Object> upRiver() {
 
-        return mUpRiver.on(gateType);
+        return mUpRiver;
     }
 
-    protected final <TYPE> Gate<TYPE> when(Classification<TYPE> gateClassification) {
+    protected <TYPE> RapidGate<TYPE> when(Class<TYPE> gateClass) {
 
-        return mUpRiver.on(gateClassification);
+        return new DefaultRapidGate<TYPE>(mUpRiver.on(gateClass), gateClass);
+    }
+
+    protected <TYPE> RapidGate<TYPE> when(Classification<TYPE> gateClassification) {
+
+        return new DefaultRapidGate<TYPE>(mUpRiver.on(gateClassification),
+                                          gateClassification.getRawType());
     }
 
     private void fillMethods() {

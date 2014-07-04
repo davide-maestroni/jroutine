@@ -278,12 +278,12 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
     /**
      * Tells the waterfall to build a gate of the specified type around the next leap chained to it.
      *
-     * @param gateType The gate type.
+     * @param gateClass The gate class.
      * @return The newly created waterfall.
      */
-    public Waterfall<SOURCE, IN, OUT> as(final Class<?> gateType) {
+    public Waterfall<SOURCE, IN, OUT> as(final Class<?> gateClass) {
 
-        return as(Classification.ofType(gateType));
+        return as(Classification.ofType(gateClass));
     }
 
     /**
@@ -415,17 +415,17 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
             throw new IllegalArgumentException("cannot chain a waterfall to itself");
         }
 
-        final int size = mSize;
-
         final DataFall<SOURCE, IN, OUT>[] falls = mFalls;
-
-        final int length = falls.length;
 
         if (falls == NO_FALL) {
 
-            start().chain(waterfall);
+            throw new IllegalStateException("cannot chain a not started waterfall to another one");
 
         } else {
+
+            final int size = mSize;
+
+            final int length = falls.length;
 
             final DataFall<?, OUT, ?>[] outFalls = waterfall.mFalls;
 
@@ -872,6 +872,11 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
      */
     public Collector<OUT> collect() {
 
+        if (mFalls == NO_FALL) {
+
+            throw new IllegalStateException("cannot collect data from a not started waterfall");
+        }
+
         final CollectorLeap<SOURCE, OUT> collectorLeap = new CollectorLeap<SOURCE, OUT>();
         final GateLeap<SOURCE, OUT, OUT> gateLeap = new GateLeap<SOURCE, OUT, OUT>(collectorLeap);
 
@@ -1110,9 +1115,9 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
     }
 
     @Override
-    public <TYPE> Gate<TYPE> on(final Class<TYPE> gateType) {
+    public <TYPE> Gate<TYPE> on(final Class<TYPE> gateClass) {
 
-        return on(Classification.ofType(gateType));
+        return on(Classification.ofType(gateClass));
     }
 
     @Override

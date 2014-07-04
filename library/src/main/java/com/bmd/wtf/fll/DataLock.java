@@ -15,7 +15,6 @@ package com.bmd.wtf.fll;
 
 import com.bmd.wtf.flw.River;
 
-import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -248,6 +247,30 @@ class DataLock {
         mTimeUnits = new TimeUnit[initialCapacity];
         mPushTimeNs = new long[initialCapacity];
         mData = new Object[initialCapacity];
+    }
+
+    private static <E> void resizeArray(final E[] src, final E[] dst, final int first) {
+
+        final int remainder = src.length - first;
+
+        System.arraycopy(src, 0, dst, 0, first);
+        System.arraycopy(src, first, dst, dst.length - remainder, remainder);
+    }
+
+    private static void resizeArray(final int[] src, final int[] dst, final int first) {
+
+        final int remainder = src.length - first;
+
+        System.arraycopy(src, 0, dst, 0, first);
+        System.arraycopy(src, first, dst, dst.length - remainder, remainder);
+    }
+
+    private static void resizeArray(final long[] src, final long[] dst, final int first) {
+
+        final int remainder = src.length - first;
+
+        System.arraycopy(src, 0, dst, 0, first);
+        System.arraycopy(src, first, dst, dst.length - remainder, remainder);
     }
 
     private static long updateDelay(final long delay, final TimeUnit timeUnit,
@@ -556,76 +579,39 @@ class DataLock {
 
         final int last = mLast;
 
-        if (first < last) {
+        final Fluid[] newFluids = new Fluid[newSize];
+        resizeArray(mFluids, newFluids, first);
 
-            mFluids = Arrays.copyOf(mFluids, newSize);
-            mRivers = Arrays.copyOf(mRivers, newSize);
-            mStreamNumbers = Arrays.copyOf(mStreamNumbers, newSize);
-            mDelays = Arrays.copyOf(mDelays, newSize);
-            mTimeUnits = Arrays.copyOf(mTimeUnits, newSize);
-            mPushTimeNs = Arrays.copyOf(mPushTimeNs, newSize);
-            mData = Arrays.copyOf(mData, newSize);
+        final River<?, ?>[] newRivers = new River[newSize];
+        resizeArray(mRivers, newRivers, first);
 
-        } else {
+        final int[] newNumbers = new int[newSize];
+        resizeArray(mStreamNumbers, newNumbers, first);
 
-            final int shift = newSize - size;
+        final long[] newDelays = new long[newSize];
+        resizeArray(mDelays, newDelays, first);
 
-            final int newFirst = first + shift;
+        final TimeUnit[] newTimeUnits = new TimeUnit[newSize];
+        resizeArray(mTimeUnits, newTimeUnits, first);
 
-            final int length = size - first;
+        final long[] newPushTimeNs = new long[newSize];
+        resizeArray(mPushTimeNs, newPushTimeNs, first);
 
-            final Fluid[] fluids = mFluids;
-            final Fluid[] newFluids = new Fluid[newSize];
+        final Object[] newData = new Object[newSize];
+        resizeArray(mData, newData, first);
 
-            System.arraycopy(fluids, 0, newFluids, 0, last);
-            System.arraycopy(fluids, first, newFluids, newFirst, length);
+        mFluids = newFluids;
+        mRivers = newRivers;
+        mStreamNumbers = newNumbers;
+        mDelays = newDelays;
+        mTimeUnits = newTimeUnits;
+        mPushTimeNs = newPushTimeNs;
+        mData = newData;
 
-            final River<?, ?>[] rivers = mRivers;
-            final River<?, ?>[] newRivers = new River[newSize];
+        final int shift = newSize - size;
 
-            System.arraycopy(rivers, 0, newRivers, 0, last);
-            System.arraycopy(rivers, first, newRivers, newFirst, length);
-
-            final int[] numbers = mStreamNumbers;
-            final int[] newNumbers = new int[newSize];
-
-            System.arraycopy(numbers, 0, newNumbers, 0, last);
-            System.arraycopy(numbers, first, newNumbers, newFirst, length);
-
-            final long[] delays = mDelays;
-            final long[] newDelays = new long[newSize];
-
-            System.arraycopy(delays, 0, newDelays, 0, last);
-            System.arraycopy(delays, first, newDelays, newFirst, length);
-
-            final TimeUnit[] timeUnits = mTimeUnits;
-            final TimeUnit[] newTimeUnits = new TimeUnit[newSize];
-
-            System.arraycopy(timeUnits, 0, newTimeUnits, 0, last);
-            System.arraycopy(timeUnits, first, newTimeUnits, newFirst, length);
-
-            final long[] dischargeTimeNs = mPushTimeNs;
-            final long[] newDischargeTimeNs = new long[newSize];
-
-            System.arraycopy(dischargeTimeNs, 0, newDischargeTimeNs, 0, last);
-            System.arraycopy(dischargeTimeNs, first, newDischargeTimeNs, newFirst, length);
-
-            final Object[] data = mData;
-            final Object[] newData = new Object[newSize];
-
-            System.arraycopy(data, 0, newData, 0, last);
-            System.arraycopy(data, first, newData, newFirst, length);
-
-            mFluids = newFluids;
-            mRivers = newRivers;
-            mStreamNumbers = newNumbers;
-            mDelays = newDelays;
-            mTimeUnits = newTimeUnits;
-            mPushTimeNs = newDischargeTimeNs;
-            mData = newData;
-
-            mFirst = newFirst;
-        }
+        mFirst = first + shift;
+        mLast = (last < first) ? last : last + shift;
     }
 
     private interface Fluid {

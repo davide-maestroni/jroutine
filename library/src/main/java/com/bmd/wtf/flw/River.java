@@ -196,11 +196,11 @@ public interface River<SOURCE, DATA> extends Stream<DATA> {
      * <p/>
      * If no leap of that type is not found inside the waterfall an exception will be thrown.
      *
-     * @param gateType The gate type.
-     * @param <TYPE>   The leap type.
+     * @param gateClass The gate class.
+     * @param <TYPE>    The leap type.
      * @return The gate.
      */
-    public <TYPE> Gate<TYPE> on(Class<TYPE> gateType);
+    public <TYPE> Gate<TYPE> on(Class<TYPE> gateClass);
 
     /**
      * Returns a gate handling the specified leap.

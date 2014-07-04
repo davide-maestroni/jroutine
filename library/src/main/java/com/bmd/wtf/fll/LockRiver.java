@@ -538,9 +538,9 @@ class LockRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public <TYPE> Gate<TYPE> on(final Class<TYPE> gateType) {
+    public <TYPE> Gate<TYPE> on(final Class<TYPE> gateClass) {
 
-        return mRiver.on(gateType);
+        return mRiver.on(gateClass);
     }
 
     @Override

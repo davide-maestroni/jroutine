@@ -31,7 +31,7 @@ import java.lang.reflect.Type;
  */
 public abstract class Classification<TYPE> {
 
-    private Class<?> mRawType;
+    private Class<TYPE> mRawType;
 
     private Type mType;
 
@@ -74,7 +74,7 @@ public abstract class Classification<TYPE> {
      *
      * @return The raw type.
      */
-    public final Class<?> getRawType() {
+    public final Class<TYPE> getRawType() {
 
         if (mRawType == null) {
 
@@ -83,12 +83,12 @@ public abstract class Classification<TYPE> {
             if (type instanceof Class) {
 
                 //noinspection unchecked
-                mRawType = ((Class<?>) type);
+                mRawType = ((Class<TYPE>) type);
 
             } else if (type instanceof ParameterizedType) {
 
                 //noinspection unchecked
-                mRawType = ((Class<?>) ((ParameterizedType) type).getRawType());
+                mRawType = ((Class<TYPE>) ((ParameterizedType) type).getRawType());
 
             } else {
 

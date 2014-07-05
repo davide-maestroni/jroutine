@@ -18,6 +18,7 @@ import com.bmd.wtf.flw.River;
 
 import junit.framework.TestCase;
 
+import static com.bmd.wtf.fll.Waterfall.fall;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
@@ -156,8 +157,7 @@ public class LeapTest extends TestCase {
 
 
         };
-        final Waterfall<Object, Object, Object> waterfall1 =
-                Waterfall.create().start(Leaps.weak(leap1, false));
+        final Waterfall<Object, Object, Object> waterfall1 = fall().start(Leaps.weak(leap1, false));
         Leap<Object, Object, Object> leap2 = new AbstractLeap<Object, Object, Object>() {
 
             private Object mLast;

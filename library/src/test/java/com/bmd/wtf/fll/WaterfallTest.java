@@ -13,6 +13,8 @@
  */
 package com.bmd.wtf.fll;
 
+import com.bmd.wtf.crr.Current;
+import com.bmd.wtf.crr.CurrentGenerator;
 import com.bmd.wtf.crr.Currents;
 import com.bmd.wtf.drp.Drops;
 import com.bmd.wtf.flw.Collector;
@@ -32,6 +34,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static com.bmd.wtf.fll.Waterfall.fall;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
@@ -156,7 +159,7 @@ public class WaterfallTest extends TestCase {
         final ArrayList<String> output = new ArrayList<String>();
 
         final Waterfall<String, List<String>, String> fall =
-                Waterfall.create().start(new FreeLeap<String, String>() {
+                fall().start(new FreeLeap<String, String>() {
 
                     @Override
                     public void onPush(final River<String, String> upRiver,
@@ -302,10 +305,10 @@ public class WaterfallTest extends TestCase {
 
         assertThat(fall.pull("test").all()).isEmpty();
 
-        final Waterfall<Integer, Integer, Integer> fall0 = Waterfall.create().start(Integer.class);
-        final Waterfall<Integer, Integer, Integer> fall1 = Waterfall.create().start(Integer.class);
-        final Waterfall<Integer, Integer, Integer> fall2 = Waterfall.create().start(Integer.class);
-        final Waterfall<Integer, Integer, Integer> fall3 = Waterfall.create().start(Integer.class);
+        final Waterfall<Integer, Integer, Integer> fall0 = fall().start(Integer.class);
+        final Waterfall<Integer, Integer, Integer> fall1 = fall().start(Integer.class);
+        final Waterfall<Integer, Integer, Integer> fall2 = fall().start(Integer.class);
+        final Waterfall<Integer, Integer, Integer> fall3 = fall().start(Integer.class);
 
         fall1.chain(fall0);
         fall2.chain(fall0);
@@ -327,30 +330,18 @@ public class WaterfallTest extends TestCase {
 
         assertThat(i).isEqualTo(3);
 
-        assertThat(Waterfall.create().in(3).start(Integer.class).pull(1).all()).containsExactly(1,
-                                                                                                1,
-                                                                                                1);
-        assertThat(
-                Waterfall.create().in(3).start(Integer.class).in(1).pull(1).all()).containsExactly(
-                1, 1, 1);
+        assertThat(fall().in(3).start(Integer.class).pull(1).all()).containsExactly(1, 1, 1);
+        assertThat(fall().in(3).start(Integer.class).in(1).pull(1).all()).containsExactly(1, 1, 1);
 
-        assertThat(Waterfall.create()
-                            .inBackground(3)
-                            .start(Integer.class)
-                            .pull(1)
-                            .all()).containsExactly(1, 1, 1);
-        assertThat(Waterfall.create()
-                            .inBackground(3)
-                            .start(Integer.class)
-                            .in(1)
-                            .pull(1)
-                            .all()).containsExactly(1, 1, 1);
+        assertThat(fall().inBackground(3).start(Integer.class).pull(1).all()).containsExactly(1, 1,
+                                                                                              1);
+        assertThat(fall().inBackground(3).start(Integer.class).in(1).pull(1).all()).containsExactly(
+                1, 1, 1);
     }
 
     public void testCollect() {
 
-        final Waterfall<String, String, String> fall =
-                Waterfall.create().inBackground(1).start(String.class);
+        final Waterfall<String, String, String> fall = fall().inBackground(1).start(String.class);
         Collector<String> collector = fall.collect();
 
         fall.source().discharge("test");
@@ -436,7 +427,7 @@ public class WaterfallTest extends TestCase {
 
     public void testDeviate() {
 
-        final Waterfall<Integer, Integer, Integer> fall1 = Waterfall.create().start(Integer.class);
+        final Waterfall<Integer, Integer, Integer> fall1 = fall().start(Integer.class);
         final Waterfall<Integer, Integer, Integer> fall2 =
                 fall1.chain(new AbstractLeap<Integer, Integer, Integer>() {
 
@@ -507,11 +498,100 @@ public class WaterfallTest extends TestCase {
         assertThat(fall4.pull(1).now().all()).isEmpty();
 
         //TODO: waterfall.deviate
+        final Waterfall<Object, Object, Object> fall5 = fall().start();
+        final Waterfall<Object, Object, Object> fall6 = fall5.chain();
+        final Waterfall<Object, Object, Object> fall7 = fall6.chain();
+
+        assertThat(fall7.pull("test").all()).containsExactly("test");
+
+        fall6.deviate();
+        assertThat(fall6.pull("test").all()).containsExactly("test");
+        assertThat(fall7.pull("test").afterMax(100, TimeUnit.MILLISECONDS).all()).isEmpty();
+
+        fall6.chain(fall7);
+        assertThat(fall7.pull("test").all()).containsExactly("test");
+
+        fall6.deviate(true);
+        assertThat(fall6.pull("test").all()).containsExactly("test");
+        assertThat(fall7.pull("test").afterMax(100, TimeUnit.MILLISECONDS).all()).isEmpty();
+
+        fall6.chain(fall7);
+        assertThat(fall7.pull("test").all()).containsExactly("test");
+
+        fall6.deviate(false);
+        assertThat(fall6.pull("test").afterMax(100, TimeUnit.MILLISECONDS).all()).isEmpty();
+        assertThat(fall7.pull("test").afterMax(100, TimeUnit.MILLISECONDS).all()).isEmpty();
+
+        fall5.chain(fall6);
+        assertThat(fall7.pull("test").all()).containsExactly("test");
+
+        fall6.deviateStream(0);
+        assertThat(fall6.pull("test").all()).containsExactly("test");
+        assertThat(fall7.pull("test").afterMax(100, TimeUnit.MILLISECONDS).all()).isEmpty();
+
+        fall6.chain(fall7);
+        assertThat(fall7.pull("test").all()).containsExactly("test");
+
+        fall6.deviateStream(0, true);
+        assertThat(fall6.pull("test").all()).containsExactly("test");
+        assertThat(fall7.pull("test").afterMax(100, TimeUnit.MILLISECONDS).all()).isEmpty();
+
+        fall6.chain(fall7);
+        assertThat(fall7.pull("test").all()).containsExactly("test");
+
+        fall6.deviateStream(0, false);
+        assertThat(fall6.pull("test").afterMax(100, TimeUnit.MILLISECONDS).all()).isEmpty();
+        assertThat(fall7.pull("test").afterMax(100, TimeUnit.MILLISECONDS).all()).isEmpty();
+
+        fall5.chain(fall6);
+        assertThat(fall7.pull("test").all()).containsExactly("test");
+
+        fall6.drain();
+        assertThat(fall6.pull("test").all()).containsExactly("test");
+        assertThat(fall7.pull("test").afterMax(100, TimeUnit.MILLISECONDS).all()).isEmpty();
+
+        fall6.chain(fall7);
+        assertThat(fall7.pull("test").all()).containsExactly("test");
+
+        fall6.drain(true);
+        assertThat(fall6.pull("test").all()).containsExactly("test");
+        assertThat(fall7.pull("test").afterMax(100, TimeUnit.MILLISECONDS).all()).isEmpty();
+
+        fall6.chain(fall7);
+        assertThat(fall7.pull("test").all()).containsExactly("test");
+
+        fall6.drain(false);
+        assertThat(fall6.pull("test").afterMax(100, TimeUnit.MILLISECONDS).all()).isEmpty();
+        assertThat(fall7.pull("test").afterMax(100, TimeUnit.MILLISECONDS).all()).isEmpty();
+
+        fall5.chain(fall6);
+        assertThat(fall7.pull("test").all()).containsExactly("test");
+
+        fall6.drainStream(0);
+        assertThat(fall6.pull("test").all()).containsExactly("test");
+        assertThat(fall7.pull("test").afterMax(100, TimeUnit.MILLISECONDS).all()).isEmpty();
+
+        fall6.chain(fall7);
+        assertThat(fall7.pull("test").all()).containsExactly("test");
+
+        fall6.drainStream(0, true);
+        assertThat(fall6.pull("test").all()).containsExactly("test");
+        assertThat(fall7.pull("test").afterMax(100, TimeUnit.MILLISECONDS).all()).isEmpty();
+
+        fall6.chain(fall7);
+        assertThat(fall7.pull("test").all()).containsExactly("test");
+
+        fall6.drainStream(0, false);
+        assertThat(fall6.pull("test").afterMax(100, TimeUnit.MILLISECONDS).all()).isEmpty();
+        assertThat(fall7.pull("test").afterMax(100, TimeUnit.MILLISECONDS).all()).isEmpty();
+
+        fall5.chain(fall6);
+        assertThat(fall7.pull("test").all()).containsExactly("test");
     }
 
     public void testDeviateStream() {
 
-        final Waterfall<Integer, Integer, Integer> fall1 = Waterfall.create().start(Integer.class);
+        final Waterfall<Integer, Integer, Integer> fall1 = fall().start(Integer.class);
         final Waterfall<Integer, Integer, Integer> fall2 =
                 fall1.chain(new AbstractLeap<Integer, Integer, Integer>() {
 
@@ -587,7 +667,7 @@ public class WaterfallTest extends TestCase {
         final TraceLeap leap = new TraceLeap();
 
         final Waterfall<String, String, ?> source =
-                Waterfall.create().start(String.class).in(4).distribute().chain(leap).source();
+                fall().start(String.class).in(4).distribute().chain(leap).source();
 
         final ArrayList<String> data = new ArrayList<String>();
 
@@ -606,24 +686,19 @@ public class WaterfallTest extends TestCase {
         source.discharge();
         assertThat(leap.getDischarges()).isEqualTo(4);
 
-        assertThat(Waterfall.create().distribute().pull("test").all()).containsExactly("test");
-        assertThat(
-                Waterfall.create().start().in(1).distribute().pull("test").all()).containsExactly(
-                "test");
-        assertThat(
-                Waterfall.create().start().in(3).distribute().pull("test").all()).containsExactly(
-                "test");
+        assertThat(fall().distribute().pull("test").all()).containsExactly("test");
+        assertThat(fall().start().in(1).distribute().pull("test").all()).containsExactly("test");
+        assertThat(fall().start().in(3).distribute().pull("test").all()).containsExactly("test");
     }
 
     public void testError() throws InterruptedException {
 
         try {
 
-            new DataStream<Object>(null,
-                                   new DataFall<Object, Object, Object>(Waterfall.create().start(),
-                                                                        Currents.straight(),
-                                                                        new FreeLeap<Object, Object>(),
-                                                                        0)
+            new DataStream<Object>(null, new DataFall<Object, Object, Object>(fall().start(),
+                                                                              Currents.straight(),
+                                                                              new FreeLeap<Object, Object>(),
+                                                                              0)
             );
 
             fail();
@@ -634,10 +709,9 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            new DataStream<Object>(new DataFall<Object, Object, Object>(Waterfall.create().start(),
-                                                                        Currents.straight(),
-                                                                        new FreeLeap<Object, Object>(),
-                                                                        0), null
+            new DataStream<Object>(
+                    new DataFall<Object, Object, Object>(fall().start(), Currents.straight(),
+                                                         new FreeLeap<Object, Object>(), 0), null
             );
 
             fail();
@@ -659,7 +733,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            new DataFall<Object, Object, Object>(Waterfall.create().start(), null,
+            new DataFall<Object, Object, Object>(fall().start(), null,
                                                  new FreeLeap<Object, Object>(), 0);
 
             fail();
@@ -670,8 +744,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            new DataFall<Object, Object, Object>(Waterfall.create().start(), Currents.straight(),
-                                                 null, 0);
+            new DataFall<Object, Object, Object>(fall().start(), Currents.straight(), null, 0);
 
             fail();
 
@@ -701,7 +774,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            Waterfall.create().start((Class) null);
+            fall().start((Class) null);
 
             fail();
 
@@ -711,7 +784,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            Waterfall.create().start((Classification) null);
+            fall().start((Classification) null);
 
             fail();
 
@@ -721,7 +794,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            Waterfall.create().start((Leap) null);
+            fall().start((Leap) null);
 
             fail();
 
@@ -731,7 +804,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            Waterfall.create().start((LeapGenerator) null);
+            fall().start((LeapGenerator) null);
 
             fail();
 
@@ -741,7 +814,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            Waterfall.create().chain((Leap<Object, Object, Object>) null);
+            fall().chain((Leap<Object, Object, Object>) null);
 
             fail();
 
@@ -751,7 +824,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            Waterfall.create().chain((LeapGenerator<Object, Object, Object>) null);
+            fall().chain((LeapGenerator<Object, Object, Object>) null);
 
             fail();
 
@@ -761,7 +834,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            Waterfall.create().chain((Classification<Leap<Object, Object, Object>>) null);
+            fall().chain((Classification<Leap<Object, Object, Object>>) null);
 
             fail();
 
@@ -771,7 +844,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            Waterfall.create().chain(new Classification<Leap<Object, Object, Object>>() {});
+            fall().chain(new Classification<Leap<Object, Object, Object>>() {});
 
             fail();
 
@@ -781,19 +854,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            Waterfall.create().chain((Waterfall<Object, Object, Object>) null);
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            final FreeLeap<Object, Object> leap = new FreeLeap<Object, Object>();
-
-            Waterfall.create().start(leap).chain(leap);
+            fall().chain((Waterfall<Object, Object, Object>) null);
 
             fail();
 
@@ -805,7 +866,7 @@ public class WaterfallTest extends TestCase {
 
             final FreeLeap<Object, Object> leap = new FreeLeap<Object, Object>();
 
-            Waterfall.create().chain(leap).chain(leap);
+            fall().start(leap).chain(leap);
 
             fail();
 
@@ -817,7 +878,7 @@ public class WaterfallTest extends TestCase {
 
             final FreeLeap<Object, Object> leap = new FreeLeap<Object, Object>();
 
-            Waterfall.create().start(leap).start((Class) null);
+            fall().chain(leap).chain(leap);
 
             fail();
 
@@ -829,7 +890,7 @@ public class WaterfallTest extends TestCase {
 
             final FreeLeap<Object, Object> leap = new FreeLeap<Object, Object>();
 
-            Waterfall.create().start(leap).start((Classification) null);
+            fall().start(leap).start((Class) null);
 
             fail();
 
@@ -841,7 +902,7 @@ public class WaterfallTest extends TestCase {
 
             final FreeLeap<Object, Object> leap = new FreeLeap<Object, Object>();
 
-            Waterfall.create().start(leap).start((Leap) null);
+            fall().start(leap).start((Classification) null);
 
             fail();
 
@@ -853,7 +914,19 @@ public class WaterfallTest extends TestCase {
 
             final FreeLeap<Object, Object> leap = new FreeLeap<Object, Object>();
 
-            Waterfall.create().start(leap).start((LeapGenerator) null);
+            fall().start(leap).start((Leap) null);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            final FreeLeap<Object, Object> leap = new FreeLeap<Object, Object>();
+
+            fall().start(leap).start((LeapGenerator) null);
 
             fail();
 
@@ -864,7 +937,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            Waterfall.create().start().chain((Leap<Object, Object, Object>) null);
+            fall().start().chain((Leap<Object, Object, Object>) null);
 
             fail();
 
@@ -874,7 +947,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            Waterfall.create().start().chain((LeapGenerator<Object, Object, Object>) null);
+            fall().start().chain((LeapGenerator<Object, Object, Object>) null);
 
             fail();
 
@@ -884,7 +957,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            Waterfall.create().start().chain((Classification<Leap<Object, Object, Object>>) null);
+            fall().start().chain((Classification<Leap<Object, Object, Object>>) null);
 
             fail();
 
@@ -894,7 +967,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            Waterfall.create().start().chain(new Classification<Leap<Object, Object, Object>>() {});
+            fall().start().chain(new Classification<Leap<Object, Object, Object>>() {});
 
             fail();
 
@@ -904,7 +977,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            Waterfall.create().start().chain((Waterfall<Object, Object, Object>) null);
+            fall().start().chain((Waterfall<Object, Object, Object>) null);
 
             fail();
 
@@ -914,7 +987,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            Waterfall.create().as((Class) null);
+            fall().as((Class) null);
 
             fail();
 
@@ -924,7 +997,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            Waterfall.create().as((Classification) null);
+            fall().as((Classification) null);
 
             fail();
 
@@ -934,7 +1007,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            Waterfall.create().as(Integer.class).chain(new FreeLeap<Object, Object>());
+            fall().as(Integer.class).chain(new FreeLeap<Object, Object>());
 
             fail();
 
@@ -944,9 +1017,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            Waterfall.create()
-                     .as(new Classification<Integer>() {})
-                     .chain(new FreeLeap<Object, Object>());
+            fall().as(new Classification<Integer>() {}).chain(new FreeLeap<Object, Object>());
 
             fail();
 
@@ -956,7 +1027,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            final Waterfall<Object, Object, Object> waterfall = Waterfall.create().start();
+            final Waterfall<Object, Object, Object> waterfall = fall().start();
 
             waterfall.chain(waterfall);
 
@@ -968,7 +1039,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            final Waterfall<Object, Object, Object> waterfall = Waterfall.create().start();
+            final Waterfall<Object, Object, Object> waterfall = fall().start();
 
             waterfall.chain().chain(waterfall);
 
@@ -980,7 +1051,47 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            final Waterfall<Object, Object, Object> waterfall = Waterfall.create().start();
+            fall().in((CurrentGenerator) null);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            fall().in((Current) null);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            fall().in(-1);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            fall().inBackground(-1);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            final Waterfall<Object, Object, Object> waterfall = fall().start();
 
             waterfall.on((Class) null);
 
@@ -992,7 +1103,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            final Waterfall<Object, Object, Object> waterfall = Waterfall.create().start();
+            final Waterfall<Object, Object, Object> waterfall = fall().start();
 
             waterfall.on((Classification) null);
 
@@ -1004,7 +1115,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            final Waterfall<Object, Object, Object> waterfall = Waterfall.create().start();
+            final Waterfall<Object, Object, Object> waterfall = fall().start();
 
             waterfall.on((Object) null);
 
@@ -1016,7 +1127,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            final Waterfall<Object, Object, Object> waterfall = Waterfall.create().start();
+            final Waterfall<Object, Object, Object> waterfall = fall().start();
 
             waterfall.on(String.class);
 
@@ -1028,7 +1139,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            Waterfall.create().collect();
+            fall().collect();
 
             fail();
 
@@ -1036,52 +1147,51 @@ public class WaterfallTest extends TestCase {
 
         }
 
-        testRiver(Waterfall.create());
-        testRiver(Waterfall.create().in(1));
-        testRiver(Waterfall.create().distribute());
-        testRiver(Waterfall.create().start());
-        testStream(Waterfall.create().start());
-        testRiver(Waterfall.create().chain());
-        testStream(Waterfall.create().chain());
+        testRiver(fall());
+        testRiver(fall().in(1));
+        testRiver(fall().distribute());
+        testRiver(fall().start());
+        testStream(fall().start());
+        testRiver(fall().chain());
+        testStream(fall().chain());
 
-        final Waterfall<Object, Object, Object> fall1 = Waterfall.create()
-                                                                 .asGate()
-                                                                 .start(new LatchLeap())
-                                                                 .inBackground(1)
-                                                                 .chain(new TestLeap())
-                                                                 .chain(new FreeLeap<Object, Object>() {
+        final Waterfall<Object, Object, Object> fall1 = fall().asGate()
+                                                              .start(new LatchLeap())
+                                                              .inBackground(1)
+                                                              .chain(new TestLeap())
+                                                              .chain(new FreeLeap<Object, Object>() {
 
-                                                                     @Override
-                                                                     public void onUnhandled(
-                                                                             final River<Object, Object> upRiver,
-                                                                             final River<Object, Object> downRiver,
-                                                                             final int fallNumber,
-                                                                             final Throwable throwable) {
+                                                                  @Override
+                                                                  public void onUnhandled(
+                                                                          final River<Object, Object> upRiver,
+                                                                          final River<Object, Object> downRiver,
+                                                                          final int fallNumber,
+                                                                          final Throwable throwable) {
 
-                                                                         if ((throwable != null)
-                                                                                 && !"test".equals(
-                                                                                 throwable.getMessage())) {
+                                                                      if ((throwable != null)
+                                                                              && !"test".equals(
+                                                                              throwable.getMessage())) {
 
-                                                                             downRiver.on(
-                                                                                     LatchLeap.class)
-                                                                                      .immediately()
-                                                                                      .perform(
-                                                                                              new Action<Void, LatchLeap>() {
+                                                                          downRiver.on(
+                                                                                  LatchLeap.class)
+                                                                                   .immediately()
+                                                                                   .perform(
+                                                                                           new Action<Void, LatchLeap>() {
 
-                                                                                                  @Override
-                                                                                                  public Void doOn(
-                                                                                                          final LatchLeap leap,
-                                                                                                          final Object... args) {
+                                                                                               @Override
+                                                                                               public Void doOn(
+                                                                                                       final LatchLeap leap,
+                                                                                                       final Object... args) {
 
-                                                                                                      leap.setFailed();
+                                                                                                   leap.setFailed();
 
-                                                                                                      return null;
-                                                                                                  }
-                                                                                              }
-                                                                                      );
-                                                                         }
-                                                                     }
-                                                                 });
+                                                                                                   return null;
+                                                                                               }
+                                                                                           }
+                                                                                   );
+                                                                      }
+                                                                  }
+                                                              });
 
         fall1.source().push("test");
 
@@ -1110,45 +1220,44 @@ public class WaterfallTest extends TestCase {
                  }
              });
 
-        final Waterfall<Object, Object, Object> fall2 = Waterfall.create()
-                                                                 .asGate()
-                                                                 .start(new LatchLeap())
-                                                                 .inBackground(1)
-                                                                 .chain(new TestLeap())
-                                                                 .inBackground(1)
-                                                                 .chain(new FreeLeap<Object, Object>() {
+        final Waterfall<Object, Object, Object> fall2 = fall().asGate()
+                                                              .start(new LatchLeap())
+                                                              .inBackground(1)
+                                                              .chain(new TestLeap())
+                                                              .inBackground(1)
+                                                              .chain(new FreeLeap<Object, Object>() {
 
-                                                                     @Override
-                                                                     public void onUnhandled(
-                                                                             final River<Object, Object> upRiver,
-                                                                             final River<Object, Object> downRiver,
-                                                                             final int fallNumber,
-                                                                             final Throwable throwable) {
+                                                                  @Override
+                                                                  public void onUnhandled(
+                                                                          final River<Object, Object> upRiver,
+                                                                          final River<Object, Object> downRiver,
+                                                                          final int fallNumber,
+                                                                          final Throwable throwable) {
 
-                                                                         if ((throwable != null)
-                                                                                 && !"test".equals(
-                                                                                 throwable.getMessage())) {
+                                                                      if ((throwable != null)
+                                                                              && !"test".equals(
+                                                                              throwable.getMessage())) {
 
-                                                                             downRiver.on(
-                                                                                     LatchLeap.class)
-                                                                                      .immediately()
-                                                                                      .perform(
-                                                                                              new Action<Void, LatchLeap>() {
+                                                                          downRiver.on(
+                                                                                  LatchLeap.class)
+                                                                                   .immediately()
+                                                                                   .perform(
+                                                                                           new Action<Void, LatchLeap>() {
 
-                                                                                                  @Override
-                                                                                                  public Void doOn(
-                                                                                                          final LatchLeap leap,
-                                                                                                          final Object... args) {
+                                                                                               @Override
+                                                                                               public Void doOn(
+                                                                                                       final LatchLeap leap,
+                                                                                                       final Object... args) {
 
-                                                                                                      leap.setFailed();
+                                                                                                   leap.setFailed();
 
-                                                                                                      return null;
-                                                                                                  }
-                                                                                              }
-                                                                                      );
-                                                                         }
-                                                                     }
-                                                                 });
+                                                                                                   return null;
+                                                                                               }
+                                                                                           }
+                                                                                   );
+                                                                      }
+                                                                  }
+                                                              });
 
         fall2.source().push("test");
 
@@ -1181,7 +1290,7 @@ public class WaterfallTest extends TestCase {
     public void testJoin() {
 
         final Waterfall<Character, Integer, Integer> fall0 =
-                Waterfall.create().start(new AbstractLeap<Character, Character, Integer>() {
+                fall().start(new AbstractLeap<Character, Character, Integer>() {
 
                     private final StringBuffer mBuffer = new StringBuffer();
 
@@ -1226,7 +1335,7 @@ public class WaterfallTest extends TestCase {
                     }
                 });
 
-        final Waterfall<Integer, Integer, Integer> fall2 = Waterfall.create().start(Integer.class);
+        final Waterfall<Integer, Integer, Integer> fall2 = fall().start(Integer.class);
         fall2.chain(fall0);
         fall2.source().discharge(Drops.asList(0, 1, 2, 3));
 
@@ -1237,7 +1346,7 @@ public class WaterfallTest extends TestCase {
 
         fall2.source().drain();
 
-        final Waterfall<Integer, Integer, Integer> fall3 = Waterfall.create().start(Integer.class);
+        final Waterfall<Integer, Integer, Integer> fall3 = fall().start(Integer.class);
 
         fall1.source().push(Drops.asList('0', '1', '2', '3'));
         fall3.chain(fall0);
@@ -1250,7 +1359,7 @@ public class WaterfallTest extends TestCase {
         assertThat(output).containsExactly(128);
 
         final Waterfall<Integer, Integer, Integer> fall4 =
-                Waterfall.create().start(new FreeLeap<Integer, Integer>() {
+                fall().start(new FreeLeap<Integer, Integer>() {
 
                     private int mAbsSum;
 
@@ -1282,9 +1391,9 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            final Waterfall<Object, Object, Object> fall = Waterfall.create().start();
+            final Waterfall<Object, Object, Object> fall = fall().start();
 
-            Waterfall.create().chain(fall);
+            fall().chain(fall);
 
             fail();
 

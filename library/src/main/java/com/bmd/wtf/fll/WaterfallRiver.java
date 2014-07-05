@@ -58,7 +58,7 @@ public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     @Override
     public void deviateStream(final int streamNumber) {
 
-        mWaterfall.deviate(streamNumber, mIsDownstream);
+        mWaterfall.deviateStream(streamNumber, mIsDownstream);
     }
 
     @Override
@@ -248,7 +248,7 @@ public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     @Override
     public void drainStream(final int streamNumber) {
 
-        mWaterfall.drain(streamNumber, mIsDownstream);
+        mWaterfall.drainStream(streamNumber, mIsDownstream);
     }
 
     @Override

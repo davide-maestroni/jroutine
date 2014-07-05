@@ -213,7 +213,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
      *
      * @return The newly created waterfall.
      */
-    public static Waterfall<Object, Object, Object> create() {
+    public static Waterfall<Object, Object, Object> fall() {
 
         final Map<Classification<?>, GateLeap<?, ?, ?>> gateMap = Collections.emptyMap();
 
@@ -1305,7 +1305,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
      * preventing any coming data to be pushed further.
      *
      * @param downStream Whether the waterfall must be deviated downstream.
-     * @see #deviate(int, boolean)
+     * @see #deviateStream(int, boolean)
      */
     public void deviate(final boolean downStream) {
 
@@ -1333,7 +1333,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
      * @param downStream   Whether the waterfall must be deviated downstream.
      * @see #deviate(boolean)
      */
-    public void deviate(final int streamNumber, final boolean downStream) {
+    public void deviateStream(final int streamNumber, final boolean downStream) {
 
         if (downStream) {
 
@@ -1381,7 +1381,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
      * fed only by this waterfall streams.
      *
      * @param downStream Whether the waterfall must be deviated downstream.
-     * @see #drain(int, boolean)
+     * @see #drainStream(int, boolean)
      */
     public void drain(final boolean downStream) {
 
@@ -1409,7 +1409,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
      * @param downStream   Whether the waterfall must be deviated downstream.
      * @see #drain(boolean)
      */
-    public void drain(final int streamNumber, final boolean downStream) {
+    public void drainStream(final int streamNumber, final boolean downStream) {
 
         if (downStream) {
 
@@ -1488,6 +1488,11 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
      * @return The newly created waterfall.
      */
     public Waterfall<SOURCE, IN, OUT> inBackground(final int poolSize) {
+
+        if (poolSize <= 0) {
+
+            throw new IllegalArgumentException("the pool size cannot be negative or zero");
+        }
 
         //noinspection unchecked
         return new Waterfall<SOURCE, IN, OUT>(mSource, mGateMap, mGate, mBarrage, poolSize,

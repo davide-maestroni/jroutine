@@ -14,7 +14,7 @@
 package com.bmd.wtf.fll;
 
 import com.bmd.wtf.flw.River;
-import com.bmd.wtf.lps.Leap;
+import com.bmd.wtf.lps.AbstractLeap;
 
 /**
  * Leap implementation used to uniformly distribute the flow of data among the waterfall streams.
@@ -28,11 +28,15 @@ import com.bmd.wtf.lps.Leap;
  * @param <SOURCE> The source data type.
  * @param <DATA>   The data type.
  */
-class Barrage<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA> {
+class Barrage<SOURCE, DATA> extends AbstractLeap<SOURCE, DATA, DATA> {
 
     private static final int REFRESH_INTERVAL = Integer.MAX_VALUE >> 1;
 
+    private final Object mMutex = new Object();
+
     private final int[] mStreamLevels;
+
+    private int mStartStream;
 
     private int mUpdateCount;
 
@@ -53,65 +57,69 @@ class Barrage<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA> {
      */
     public void lowerLevel(final int streamNumber) {
 
-        --mStreamLevels[streamNumber];
+        synchronized (mMutex) {
 
-        normalizeLevels();
-    }
+            --mStreamLevels[streamNumber];
 
-    @Override
-    public void onDischarge(final River<SOURCE, DATA> upRiver, final River<SOURCE, DATA> downRiver,
-            final int fallNumber) {
-
-        downRiver.discharge();
+            normalizeLevels(1);
+        }
     }
 
     @Override
     public void onPush(final River<SOURCE, DATA> upRiver, final River<SOURCE, DATA> downRiver,
             final int fallNumber, final DATA drop) {
 
-        final int streamNumber = findMinLevel();
-
-        ++mStreamLevels[streamNumber];
-
-        normalizeLevels();
-
-        downRiver.pushStream(streamNumber, drop);
+        downRiver.pushStream(findMinLevel(), drop);
     }
 
-    @Override
-    public void onUnhandled(final River<SOURCE, DATA> upRiver, final River<SOURCE, DATA> downRiver,
-            final int fallNumber, final Throwable throwable) {
+    /**
+     * Raises the level of the stream identified by the specified number by the specified count.
+     *
+     * @param streamNumber The stream number.
+     * @param count        The number of level to raise.
+     */
+    public void raiseLevel(final int streamNumber, final int count) {
 
-        downRiver.forward(throwable);
+        synchronized (mMutex) {
+
+            mStreamLevels[streamNumber] += count;
+
+            normalizeLevels(count);
+        }
     }
 
     private int findMinLevel() {
 
-        int min = 0;
+        synchronized (mMutex) {
 
-        int minLevel = Integer.MAX_VALUE;
+            int stream = mStartStream;
 
-        final int[] levels = mStreamLevels;
+            final int[] levels = mStreamLevels;
 
-        final int length = levels.length;
+            int minLevel = levels[stream];
 
-        for (int i = 0; i < length; ++i) {
+            final int length = levels.length;
 
-            final int level = levels[i];
+            mStartStream = (stream + 1) % length;
 
-            if (level < minLevel) {
+            for (int i = 0; i < length; ++i) {
 
-                minLevel = level;
-                min = i;
+                final int level = levels[i];
+
+                if (level < minLevel) {
+
+                    minLevel = level;
+                    stream = i;
+                }
             }
-        }
 
-        return min;
+            return stream;
+        }
     }
 
-    private void normalizeLevels() {
+    private void normalizeLevels(final int count) {
 
-        if (++mUpdateCount < REFRESH_INTERVAL) {
+        if ((mUpdateCount += count) < REFRESH_INTERVAL) {
 
             return;
         }

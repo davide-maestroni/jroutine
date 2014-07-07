@@ -226,23 +226,7 @@ class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
         }
     }
 
-    void raiseLevel(final int count) {
-
-        final ReentrantLock lock = mLock;
-
-        lock.lock();
-
-        try {
-
-            mWaterline += count;
-
-        } finally {
-
-            lock.unlock();
-        }
-    }
-
-    private void lowerLevel() {
+    void lowerLevel() {
 
         int dischargeCount = 0;
 
@@ -257,6 +241,8 @@ class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
                 dischargeCount = mDischargeCount;
 
                 mDischargeCount = 0;
+
+                mWaterline = 0;
             }
 
         } finally {
@@ -267,6 +253,22 @@ class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
         for (int i = 0; i < dischargeCount; ++i) {
 
             discharge(null);
+        }
+    }
+
+    void raiseLevel(final int count) {
+
+        final ReentrantLock lock = mLock;
+
+        lock.lock();
+
+        try {
+
+            mWaterline += count;
+
+        } finally {
+
+            lock.unlock();
         }
     }
 }

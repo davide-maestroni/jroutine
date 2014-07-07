@@ -122,17 +122,6 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
 
             for (int i = 0; i < length; ++i) {
 
-                final Leap<SOURCE, IN, OUT> fallLeap;
-
-                if (fallBarrage != null) {
-
-                    fallLeap = new BarrageLeap<SOURCE, IN, OUT>(leaps[i], fallBarrage, i);
-
-                } else {
-
-                    fallLeap = leaps[i];
-                }
-
                 final Current fallCurrent;
 
                 if (current == null) {
@@ -144,7 +133,15 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
                     fallCurrent = current;
                 }
 
-                falls[i] = new DataFall<SOURCE, IN, OUT>(this, fallCurrent, fallLeap, i);
+                if (fallBarrage != null) {
+
+                    falls[i] = new BarrageFall<SOURCE, IN, OUT>(this, fallCurrent, leaps[i], i,
+                                                                fallBarrage);
+
+                } else {
+
+                    falls[i] = new DataFall<SOURCE, IN, OUT>(this, fallCurrent, leaps[i], i);
+                }
             }
 
         } else {
@@ -178,17 +175,6 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
                             gateLeap);
                 }
 
-                final Leap<SOURCE, IN, OUT> fallLeap;
-
-                if (fallBarrage != null) {
-
-                    fallLeap = new BarrageLeap<SOURCE, IN, OUT>(gateLeap, fallBarrage, i);
-
-                } else {
-
-                    fallLeap = gateLeap;
-                }
-
                 final Current fallCurrent;
 
                 if (current == null) {
@@ -200,7 +186,15 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
                     fallCurrent = current;
                 }
 
-                falls[i] = new DataFall<SOURCE, IN, OUT>(this, fallCurrent, fallLeap, i);
+                if (fallBarrage != null) {
+
+                    falls[i] = new BarrageFall<SOURCE, IN, OUT>(this, fallCurrent, gateLeap, i,
+                                                                fallBarrage);
+
+                } else {
+
+                    falls[i] = new DataFall<SOURCE, IN, OUT>(this, fallCurrent, gateLeap, i);
+                }
             }
         }
 

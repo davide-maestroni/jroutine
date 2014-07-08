@@ -103,9 +103,43 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
 
         final int length = leaps.length;
 
-        final DataFall[] falls = new DataFall[length];
+        final Leap<SOURCE, IN, OUT> wrappedLeap;
 
-        if (length == 1) {
+        if (gateClassification != null) {
+
+            final Leap<SOURCE, IN, OUT> leap = leaps[0];
+
+            final HashMap<Classification<?>, GateLeap<?, ?, ?>> fallGateMap =
+                    new HashMap<Classification<?>, GateLeap<?, ?, ?>>(gateMap);
+
+            final GateLeap<SOURCE, IN, OUT> gateLeap = new GateLeap<SOURCE, IN, OUT>(leap);
+
+            mapGate(fallGateMap,
+                    (SELF_CLASSIFICATION == gateClassification) ? Classification.ofType(
+                            leap.getClass()) : gateClassification, gateLeap
+            );
+
+            mGateMap = fallGateMap;
+
+            wrappedLeap = gateLeap;
+
+        } else {
+
+            if (size != length) {
+
+                wrappedLeap = new SegmentedLeap<SOURCE, IN, OUT>(leaps[0]);
+
+            } else {
+
+                wrappedLeap = null;
+            }
+
+            mGateMap = gateMap;
+        }
+
+        final DataFall[] falls = new DataFall[size];
+
+        if (size == 1) {
 
             mBarrage = null;
 
@@ -114,87 +148,31 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
             mBarrage = barrage;
         }
 
-        if (gateClassification == null) {
+        final Barrage<SOURCE, ?> fallBarrage = mBarrage;
 
-            mGateMap = gateMap;
+        for (int i = 0; i < size; ++i) {
 
-            final Barrage<SOURCE, ?> fallBarrage = mBarrage;
+            final Leap<SOURCE, IN, OUT> leap = (wrappedLeap != null) ? wrappedLeap : leaps[i];
 
-            for (int i = 0; i < length; ++i) {
+            final Current fallCurrent;
 
-                final Current fallCurrent;
+            if (current == null) {
 
-                if (current == null) {
+                fallCurrent = generator.create(i);
 
-                    fallCurrent = generator.create(i);
+            } else {
 
-                } else {
-
-                    fallCurrent = current;
-                }
-
-                if (fallBarrage != null) {
-
-                    falls[i] = new BarrageFall<SOURCE, IN, OUT>(this, fallCurrent, leaps[i], i,
-                                                                fallBarrage);
-
-                } else {
-
-                    falls[i] = new DataFall<SOURCE, IN, OUT>(this, fallCurrent, leaps[i], i);
-                }
+                fallCurrent = current;
             }
 
-        } else {
+            if (fallBarrage != null) {
 
-            final HashMap<Classification<?>, GateLeap<?, ?, ?>> fallGateMap =
-                    new HashMap<Classification<?>, GateLeap<?, ?, ?>>(gateMap);
+                falls[i] =
+                        new BarrageFall<SOURCE, IN, OUT>(this, fallCurrent, leap, i, fallBarrage);
 
-            mGateMap = fallGateMap;
+            } else {
 
-            final Barrage<SOURCE, ?> fallBarrage = mBarrage;
-
-            final boolean isSelf = (SELF_CLASSIFICATION == gateClassification);
-
-            final HashMap<Leap<?, ?, ?>, GateLeap<?, ?, ?>> leapMap =
-                    new HashMap<Leap<?, ?, ?>, GateLeap<?, ?, ?>>();
-
-            for (int i = 0; i < length; ++i) {
-
-                final Leap<SOURCE, IN, OUT> leap = leaps[i];
-
-                //noinspection unchecked
-                GateLeap<SOURCE, IN, OUT> gateLeap = (GateLeap<SOURCE, IN, OUT>) leapMap.get(leap);
-
-                if (gateLeap == null) {
-
-                    gateLeap = new GateLeap<SOURCE, IN, OUT>(leap);
-                    leapMap.put(leap, gateLeap);
-
-                    mapGate(fallGateMap,
-                            (isSelf) ? Classification.ofType(leap.getClass()) : gateClassification,
-                            gateLeap);
-                }
-
-                final Current fallCurrent;
-
-                if (current == null) {
-
-                    fallCurrent = generator.create(i);
-
-                } else {
-
-                    fallCurrent = current;
-                }
-
-                if (fallBarrage != null) {
-
-                    falls[i] = new BarrageFall<SOURCE, IN, OUT>(this, fallCurrent, gateLeap, i,
-                                                                fallBarrage);
-
-                } else {
-
-                    falls[i] = new DataFall<SOURCE, IN, OUT>(this, fallCurrent, gateLeap, i);
-                }
+                falls[i] = new DataFall<SOURCE, IN, OUT>(this, fallCurrent, leap, i);
             }
         }
 
@@ -328,8 +306,6 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
             return this;
         }
 
-        boolean isChanged = false;
-
         final HashMap<Classification<?>, GateLeap<?, ?, ?>> gateMap =
                 new HashMap<Classification<?>, GateLeap<?, ?, ?>>(mGateMap);
 
@@ -340,14 +316,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
             if (gate == iterator.next()) {
 
                 iterator.remove();
-
-                isChanged = true;
             }
-        }
-
-        if (!isChanged) {
-
-            return this;
         }
 
         //noinspection unchecked
@@ -362,7 +331,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
      * @param <TYPE> The leap type.
      * @return The newly created waterfall.
      */
-    public <TYPE> Waterfall<SOURCE, IN, OUT> breakDown(final TYPE leap) {
+    public <TYPE extends Leap<?, ?, ?>> Waterfall<SOURCE, IN, OUT> breakDown(final TYPE leap) {
 
         if (leap == null) {
 
@@ -411,13 +380,13 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
 
         final DataFall<SOURCE, IN, OUT>[] falls = mFalls;
 
-        if (falls == NO_FALL) {
+        if ((falls == NO_FALL) || (waterfall.mFalls == NO_FALL)) {
 
             throw new IllegalStateException("cannot chain a not started waterfall to another one");
 
         } else {
 
-            final int size = mSize;
+            final int size = waterfall.mSize;
 
             final int length = falls.length;
 
@@ -681,7 +650,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
         if (falls == NO_FALL) {
 
             //noinspection unchecked
-            return ((Waterfall<SOURCE, OUT, OUT>) start()).chain(leap);
+            return (Waterfall<SOURCE, OUT, NOUT>) start((Leap<OUT, OUT, NOUT>) leap);
         }
 
         final int size = mSize;
@@ -720,16 +689,12 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
 
         registerLeap(leap);
 
-        final Leap[] leaps = new Leap[size];
-
-        Arrays.fill(leaps, new SegmentedLeap<SOURCE, OUT, NOUT>(leap));
-
         //noinspection unchecked
         final Waterfall<SOURCE, OUT, NOUT> waterfall =
                 new Waterfall<SOURCE, OUT, NOUT>(inWaterfall.mSource, inWaterfall.mGateMap,
                                                  inWaterfall.mGate, mBarrage, size,
                                                  inWaterfall.mCurrent,
-                                                 inWaterfall.mCurrentGenerator, leaps);
+                                                 inWaterfall.mCurrentGenerator, leap);
 
         final DataFall<SOURCE, ?, OUT>[] inFalls = inWaterfall.mFalls;
 
@@ -778,7 +743,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
         if (falls == NO_FALL) {
 
             //noinspection unchecked
-            return ((Waterfall<SOURCE, OUT, OUT>) start()).chain(generator);
+            return (Waterfall<SOURCE, OUT, NOUT>) start((LeapGenerator<OUT, OUT, NOUT>) generator);
         }
 
         final int size = mSize;
@@ -802,6 +767,11 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
             }
 
             return waterfall;
+        }
+
+        if (mGate != null) {
+
+            throw new IllegalStateException("cannot make a gate from more than one leap");
         }
 
         final int length = falls.length;
@@ -1655,6 +1625,11 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
             //noinspection unchecked
             return new Waterfall<NIN, NIN, NOUT>(null, gateMap, mGate, null, 1, mCurrent,
                                                  mCurrentGenerator, leap);
+        }
+
+        if (mGate != null) {
+
+            throw new IllegalStateException("cannot make a gate from more than one leap");
         }
 
         final Leap[] leaps = new Leap[size];

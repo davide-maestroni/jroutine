@@ -139,7 +139,9 @@ public abstract class Classification<TYPE> {
     @Override
     public final int hashCode() {
 
-        return getType().hashCode();
+        int result = getType().hashCode();
+
+        return 31 * result + getRawType().hashCode();
     }
 
     @Override
@@ -157,7 +159,13 @@ public abstract class Classification<TYPE> {
 
         final Classification classification = (Classification) o;
 
-        return getType().equals(classification.getType());
+        //noinspection SimplifiableIfStatement
+        if (!getType().equals(classification.getType())) {
+
+            return false;
+        }
+
+        return getRawType().equals(classification.getRawType());
     }
 
     /**

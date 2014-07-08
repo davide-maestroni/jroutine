@@ -339,6 +339,220 @@ public class WaterfallTest extends TestCase {
                 1, 1, 1);
     }
 
+    public void testChain() {
+
+        assertThat(fall().chain().pull("test").all()).containsExactly("test");
+
+        assertThat(fall().chain(new FreeLeap<Object, Object>()).pull("test").all()).containsExactly(
+                "test");
+
+        assertThat(fall().chain(new LeapGenerator<Object, Object, String>() {
+
+            @Override
+            public Leap<Object, Object, String> start(final int fallNumber) {
+
+                return new AbstractLeap<Object, Object, String>() {
+
+                    @Override
+                    public void onPush(final River<Object, Object> upRiver,
+                            final River<Object, String> downRiver, final int fallNumber,
+                            final Object drop) {
+
+                        downRiver.push(drop.toString());
+                    }
+                };
+            }
+        }).pull("test").all()).containsExactly("test");
+
+        assertThat(fall().in(3).chain(new LeapGenerator<Object, Object, String>() {
+
+            @Override
+            public Leap<Object, Object, String> start(final int fallNumber) {
+
+                return new AbstractLeap<Object, Object, String>() {
+
+                    @Override
+                    public void onPush(final River<Object, Object> upRiver,
+                            final River<Object, String> downRiver, final int fallNumber,
+                            final Object drop) {
+
+                        downRiver.push(drop.toString());
+                    }
+                };
+            }
+        }).pull("test").all()).containsExactly("test", "test", "test");
+
+        assertThat(fall().start().chain().pull("test").all()).containsExactly("test");
+
+        assertThat(fall().start()
+                         .chain(new FreeLeap<Object, Object>())
+                         .pull("test")
+                         .all()).containsExactly("test");
+
+        assertThat(fall().start().chain(new LeapGenerator<Object, Object, String>() {
+
+            @Override
+            public Leap<Object, Object, String> start(final int fallNumber) {
+
+                return new AbstractLeap<Object, Object, String>() {
+
+                    @Override
+                    public void onPush(final River<Object, Object> upRiver,
+                            final River<Object, String> downRiver, final int fallNumber,
+                            final Object drop) {
+
+                        downRiver.push(drop.toString());
+                    }
+                };
+            }
+        }).pull("test").all()).containsExactly("test");
+
+        assertThat(fall().start().in(3).chain(new LeapGenerator<Object, Object, String>() {
+
+            @Override
+            public Leap<Object, Object, String> start(final int fallNumber) {
+
+                return new AbstractLeap<Object, Object, String>() {
+
+                    @Override
+                    public void onPush(final River<Object, Object> upRiver,
+                            final River<Object, String> downRiver, final int fallNumber,
+                            final Object drop) {
+
+                        downRiver.push(drop.toString());
+                    }
+                };
+            }
+        }).pull("test").all()).containsExactly("test", "test", "test");
+
+        assertThat(fall().in(2).start().chain().pull("test").all()).containsExactly("test", "test");
+
+        assertThat(fall().in(2)
+                         .start()
+                         .chain(new FreeLeap<Object, Object>())
+                         .pull("test")
+                         .all()).containsExactly("test", "test");
+
+        assertThat(fall().in(2).start().chain(new LeapGenerator<Object, Object, String>() {
+
+            @Override
+            public Leap<Object, Object, String> start(final int fallNumber) {
+
+                return new AbstractLeap<Object, Object, String>() {
+
+                    @Override
+                    public void onPush(final River<Object, Object> upRiver,
+                            final River<Object, String> downRiver, final int fallNumber,
+                            final Object drop) {
+
+                        downRiver.push(drop.toString());
+                    }
+                };
+            }
+        }).pull("test").all()).containsExactly("test", "test");
+
+        assertThat(fall().in(2).start().in(3).chain(new LeapGenerator<Object, Object, String>() {
+
+            @Override
+            public Leap<Object, Object, String> start(final int fallNumber) {
+
+                return new AbstractLeap<Object, Object, String>() {
+
+                    @Override
+                    public void onPush(final River<Object, Object> upRiver,
+                            final River<Object, String> downRiver, final int fallNumber,
+                            final Object drop) {
+
+                        downRiver.push(drop.toString());
+                    }
+                };
+            }
+        }).pull("test").all()).containsExactly("test", "test", "test", "test", "test", "test");
+
+        assertThat(
+                fall().in(2).start().in(3).chain(new FreeLeap<Object, Object>()).pull("test").all())
+                .containsExactly("test", "test", "test", "test", "test", "test");
+
+        assertThat(fall().in(2).start().in(3).chain().pull("test").all()).containsExactly("test",
+                                                                                          "test",
+                                                                                          "test",
+                                                                                          "test",
+                                                                                          "test",
+                                                                                          "test");
+
+        assertThat(fall().start().in(3).chain().pull("test").all()).containsExactly("test", "test",
+                                                                                    "test");
+
+        assertThat(fall().asGate()
+                         .chain()
+                         .chain(new Classification<Leap<Object, Object, Object>>() {})
+                         .pull("test")
+                         .all()).containsExactly("test");
+
+        assertThat(fall().in(3)
+                         .asGate()
+                         .chain()
+                         .in(1)
+                         .chain(new Classification<Leap<Object, Object, Object>>() {})
+                         .pull("test")
+                         .all()).containsExactly("test", "test", "test");
+
+        assertThat(fall().in(2)
+                         .asGate()
+                         .chain()
+                         .chain(new Classification<Leap<Object, Object, Object>>() {})
+                         .pull("test")
+                         .all()).containsExactly("test", "test");
+
+        assertThat(fall().in(2)
+                         .asGate()
+                         .chain()
+                         .in(3)
+                         .chain(new Classification<Leap<Object, Object, Object>>() {})
+                         .pull("test")
+                         .all()).containsExactly("test", "test", "test", "test", "test", "test");
+
+        assertThat(fall().asGate()
+                         .chain()
+                         .in(2)
+                         .chain(new Classification<Leap<Object, Object, Object>>() {})
+                         .pull("test")
+                         .all()).containsExactly("test", "test");
+
+        final Waterfall<Object, Object, Object> fall0 = fall().start();
+        final Waterfall<Object, Object, Object> fall1 = fall().in(2).start();
+        fall1.chain(fall0);
+
+        final Collector<Object> collector0 = fall0.collect();
+        fall1.discharge("test");
+        assertThat(collector0.all()).containsExactly("test", "test");
+
+        final Waterfall<Object, Object, Object> fall2 = fall().in(2).start();
+        final Waterfall<Object, Object, Object> fall3 = fall().in(2).start();
+        fall3.chain(fall2);
+
+        final Collector<Object> collector2 = fall2.collect();
+        fall3.discharge("test");
+        assertThat(collector2.all()).containsExactly("test", "test");
+
+        final Waterfall<Object, Object, Object> fall4 = fall().in(2).start();
+        final Waterfall<Object, Object, Object> fall5 = fall().in(3).start();
+        fall5.chain(fall4);
+
+        final Collector<Object> collector4 = fall4.collect();
+        fall5.discharge("test");
+        assertThat(collector4.all()).containsExactly("test", "test", "test", "test", "test",
+                                                     "test");
+
+        final Waterfall<Object, Object, Object> fall6 = fall().in(2).start();
+        final Waterfall<Object, Object, Object> fall7 = fall().start();
+        fall7.chain(fall6);
+
+        final Collector<Object> collector6 = fall6.collect();
+        fall7.discharge("test");
+        assertThat(collector6.all()).containsExactly("test", "test");
+    }
+
     public void testCollect() {
 
         final Waterfall<String, String, String> fall = fall().inBackground(1).start(String.class);
@@ -987,6 +1201,16 @@ public class WaterfallTest extends TestCase {
 
         try {
 
+            fall().start().chain(fall());
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
             fall().as((Class) null);
 
             fail();
@@ -1018,6 +1242,72 @@ public class WaterfallTest extends TestCase {
         try {
 
             fall().as(new Classification<Integer>() {}).chain(new FreeLeap<Object, Object>());
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            fall().in(2).asGate().start(new LeapGenerator<Object, Object, Object>() {
+
+                @Override
+                public Leap<Object, Object, Object> start(final int fallNumber) {
+
+                    return new FreeLeap<Object, Object>();
+                }
+            });
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            fall().in(2).asGate().chain(new LeapGenerator<Object, Object, Object>() {
+
+                @Override
+                public Leap<Object, Object, Object> start(final int fallNumber) {
+
+                    return new FreeLeap<Object, Object>();
+                }
+            });
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            fall().in(2).start().asGate().chain(new LeapGenerator<Object, Object, Object>() {
+
+                @Override
+                public Leap<Object, Object, Object> start(final int fallNumber) {
+
+                    return new FreeLeap<Object, Object>();
+                }
+            });
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            final Waterfall<Object, Object, Object> waterfall = fall().start();
+
+            waterfall.as(Leap.class)
+                     .chain(new FreeLeap<Object, Object>())
+                     .as(Leap.class)
+                     .chain(new FreeLeap<Object, Object>());
 
             fail();
 
@@ -1118,6 +1408,18 @@ public class WaterfallTest extends TestCase {
             final Waterfall<Object, Object, Object> waterfall = fall().start();
 
             waterfall.on((Object) null);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            final Waterfall<Object, Object, Object> waterfall = fall().start();
+
+            waterfall.on(new FreeLeap<String, Integer>());
 
             fail();
 
@@ -1287,6 +1589,151 @@ public class WaterfallTest extends TestCase {
              });
     }
 
+    public void testGate() {
+
+        final GateLeap2 gateLeap = new GateLeap2(1);
+
+        final Waterfall<Object, Object, Object> fall = fall().as(GateLeap2.class).chain(gateLeap);
+
+        assertThat(fall.on(GateLeap.class).immediately().perform(new Action<Integer, GateLeap>() {
+
+            @Override
+            public Integer doOn(final GateLeap leap, final Object... args) {
+
+                return leap.getId();
+            }
+        })).isEqualTo(1);
+
+        assertThat(fall.on(Classification.ofType(GateLeap2.class))
+                       .immediately()
+                       .perform(new Action<Integer, GateLeap>() {
+
+                           @Override
+                           public Integer doOn(final GateLeap leap, final Object... args) {
+
+                               return leap.getId();
+                           }
+                       })).isEqualTo(1);
+
+        assertThat(fall.on(gateLeap).immediately().perform(new Action<Integer, GateLeap>() {
+
+            @Override
+            public Integer doOn(final GateLeap leap, final Object... args) {
+
+                return leap.getId();
+            }
+        })).isEqualTo(1);
+
+        final Waterfall<Object, Object, Object> fall1 = fall.breakDown((Leap) null)
+                                                            .breakDown(
+                                                                    new FreeLeap<Object, Object>())
+                                                            .breakDown(gateLeap)
+                                                            .as(Classification.ofType(
+                                                                    GateLeap.class))
+                                                            .chain(new GateLeap());
+
+        assertThat(fall1.on(GateLeap.class).immediately().perform(new Action<Integer, GateLeap>() {
+
+            @Override
+            public Integer doOn(final GateLeap leap, final Object... args) {
+
+                return leap.getId();
+            }
+        })).isEqualTo(0);
+
+        try {
+
+            fall1.on(GateLeap2.class);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        final Waterfall<Object, Object, Object> fall2 =
+                fall1.breakDown(Classification.ofType(String.class))
+                     .breakDown(Classification.ofType(GateLeap.class))
+                     .asGate()
+                     .chain(new GateLeap2(2));
+
+        assertThat(fall2.on(GateLeap.class).immediately().perform(new Action<Integer, GateLeap>() {
+
+            @Override
+            public Integer doOn(final GateLeap leap, final Object... args) {
+
+                return leap.getId();
+            }
+        })).isEqualTo(2);
+
+        assertThat(fall2.on(Classification.ofType(GateLeap2.class))
+                        .immediately()
+                        .perform(new Action<Integer, GateLeap>() {
+
+                            @Override
+                            public Integer doOn(final GateLeap leap, final Object... args) {
+
+                                return leap.getId();
+                            }
+                        })).isEqualTo(2);
+
+        assertThat(
+                fall2.breakDown(Classification.ofType(GateLeap2.class))
+                     .in(new CurrentGenerator() {
+
+                         @Override
+                         public Current create(final int fallNumber) {
+
+                             return Currents.straight();
+                         }
+                     })
+                     .in(3)
+                     .asGate()
+                     .chain(new GateLeap2(3))
+                     .on(GateLeap2.class)
+                     .immediately()
+                     .perform(new Action<Integer, GateLeap>() {
+
+                         @Override
+                         public Integer doOn(final GateLeap leap, final Object... args) {
+
+                             return leap.getId();
+                         }
+                     })
+        ).isEqualTo(3);
+    }
+
+    public void testIn() {
+
+        assertThat(fall().in(1).in(Currents.straight()).chain().in(new CurrentGenerator() {
+
+            @Override
+            public Current create(final int fallNumber) {
+
+                return Currents.straight();
+            }
+        }).chain().pull("test").all()).containsExactly("test");
+
+        assertThat(fall().in(3).in(Currents.straight()).chain().in(new CurrentGenerator() {
+
+            @Override
+            public Current create(final int fallNumber) {
+
+                return Currents.straight();
+            }
+        }).chain().pull("test").all()).containsExactly("test", "test", "test");
+
+        assertThat(fall().in(3)
+                         .in(Currents.straight())
+                         .chain()
+                         .inBackground(2)
+                         .chain()
+                         .pull("test")
+                         .all()).containsExactly("test", "test", "test", "test", "test", "test");
+
+        assertThat(fall().in(3).inBackground().chain().pull("test").all()).contains("test");
+    }
+
     public void testJoin() {
 
         final Waterfall<Character, Integer, Integer> fall0 =
@@ -1399,6 +1846,80 @@ public class WaterfallTest extends TestCase {
 
         } catch (final Exception ignored) {
 
+        }
+    }
+
+    public void testStart() {
+
+        assertThat(fall().start().pull("test").all()).containsExactly("test");
+
+        assertThat(fall().start(String.class).pull("test").all()).containsExactly("test");
+
+        assertThat(
+                fall().start(new Classification<String>() {}).pull("test").all()).containsExactly(
+                "test");
+
+        assertThat(fall().start(new FreeLeap<String, String>()).pull("test").all()).containsExactly(
+                "test");
+
+        assertThat(fall().start(new LeapGenerator<String, String, Object>() {
+
+            @Override
+            public Leap<String, String, Object> start(final int fallNumber) {
+
+                return new AbstractLeap<String, String, Object>() {
+
+                    @Override
+                    public void onPush(final River<String, String> upRiver,
+                            final River<String, Object> downRiver, final int fallNumber,
+                            final String drop) {
+
+                        downRiver.push(drop);
+                    }
+                };
+            }
+        }).pull("test").all()).containsExactly("test");
+
+        assertThat(fall().in(3).start(new LeapGenerator<String, String, Object>() {
+
+            @Override
+            public Leap<String, String, Object> start(final int fallNumber) {
+
+                return new AbstractLeap<String, String, Object>() {
+
+                    @Override
+                    public void onPush(final River<String, String> upRiver,
+                            final River<String, Object> downRiver, final int fallNumber,
+                            final String drop) {
+
+                        downRiver.push(drop);
+                    }
+                };
+            }
+        }).pull("test").all()).containsExactly("test", "test", "test");
+    }
+
+    private static class GateLeap extends FreeLeap<Object, Object> {
+
+        public int getId() {
+
+            return 0;
+        }
+    }
+
+    private static class GateLeap2 extends GateLeap {
+
+        private int mId;
+
+        public GateLeap2(final int id) {
+
+            mId = id;
+        }
+
+        @Override
+        public int getId() {
+
+            return mId;
         }
     }
 

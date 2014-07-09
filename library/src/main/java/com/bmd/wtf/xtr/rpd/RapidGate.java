@@ -61,7 +61,7 @@ public interface RapidGate<TYPE> extends Gate<TYPE> {
     public <NTYPE> RapidGate<NTYPE> as(Classification<NTYPE> gateClassification);
 
     /**
-     * Returns the leap of this type wrapped so to be accessed in a thread safe way.
+     * Returns the gate leap wrapped so to be accessed in a thread safe way.
      * <p/>
      * Note that, in order to correctly work, the specified gate type must be an interface.
      *

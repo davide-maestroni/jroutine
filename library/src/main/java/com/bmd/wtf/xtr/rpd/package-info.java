@@ -13,8 +13,9 @@
  */
 
 /**
- * Package containing extra classes building additional functionalities on top of the core ones.
+ * Package containing classes providing easier access to the library functionalities by employing
+ * reflection.
  * <p/>
- * Created by davide on 4/16/14.
+ * Created by davide on 7/8/14.
  */
-package com.bmd.wtf.xtr;
+package com.bmd.wtf.xtr.rpd;

@@ -38,31 +38,11 @@ class RapidGenerators {
     }
 
     /**
-     * Creates and returns a current generator from the specified current instances.
-     *
-     * @param currents The currents to return.
-     * @return The newly created current generator.
-     */
-    public static CurrentGenerator currentGenerator(final Current... currents) {
-
-        final Current[] currentList = currents.clone();
-
-        return new CurrentGenerator() {
-
-            @Override
-            public Current create(final int fallNumber) {
-
-                return currentList[fallNumber];
-            }
-        };
-    }
-
-    /**
      * Creates and returns a current generator which instantiates objects of the specified
      * type through a constructor taking the specified parameters. A constructor taking
      * an additional Integer parameter (that is, the fall number) is preferred to the default one.
      * A one taking a primitive int is preferred to the Integer. Finally, a constructor annotated
-     * with {@link RapidAnnotations.Generator} is preferred to the not annotated one.<br/>
+     * with {@link RapidAnnotations.Generator} is preferred to the not annotated ones.<br/>
      * In case a suitable constructor is not found, an exception will be thrown.
      * <p/>
      * Note that a constructor might need to be made accessible in order to be called via
@@ -145,7 +125,7 @@ class RapidGenerators {
      * classification through a method taking the specified parameters. A method taking
      * an additional Integer parameter (that is, the fall number) is preferred to the default one.
      * A one taking a primitive int is preferred to the Integer. Finally, a method annotated
-     * with {@link RapidAnnotations.Generator} is preferred to the not annotated one.<br/>
+     * with {@link RapidAnnotations.Generator} is preferred to the not annotated ones.<br/>
      * In case a suitable method is not found, an exception will be thrown.
      * <p/>
      * Note that a method might need to be made accessible in order to be called via
@@ -226,105 +206,11 @@ class RapidGenerators {
     }
 
     /**
-     * Creates and returns a current generator which instantiates objects of the specified
-     * type through a constructor. A constructor taking an Integer parameter (that is, the fall
-     * number) is preferred to the default one. A one taking a primitive int is preferred to the
-     * Integer. Finally, a constructor annotated with {@link RapidAnnotations.Generator} is
-     * preferred to the not annotated one.<br/>
-     * In case a suitable constructor is not found, an exception will be thrown.
-     * <p/>
-     * Note that a constructor might need to be made accessible in order to be called via
-     * reflection. That means that, in case a {@link java.lang.SecurityManager} is installed, a
-     * security exception might be raised based on the specific policy implemented.
-     *
-     * @param type The current type.
-     * @return The newly created current generator.
-     */
-    public static CurrentGenerator currentGenerator(final Class<? extends Current> type) {
-
-        Constructor<?> bestMatch = findConstructor(type.getConstructors());
-
-        if (bestMatch == null) {
-
-            bestMatch = findConstructor(type.getDeclaredConstructors());
-
-            if (bestMatch == null) {
-
-                throw new IllegalArgumentException(
-                        "no suitable constructor found for type " + type);
-            }
-        }
-
-        if (!bestMatch.isAccessible()) {
-
-            bestMatch.setAccessible(true);
-        }
-
-        final Constructor<?> constructor = bestMatch;
-
-        if (constructor.getParameterTypes().length > 0) {
-
-            return new CurrentGenerator() {
-
-                @Override
-                public Current create(final int fallNumber) {
-
-                    try {
-
-                        return (Current) constructor.newInstance(fallNumber);
-
-                    } catch (final Throwable t) {
-
-                        throw new RuntimeException(t);
-                    }
-                }
-            };
-        }
-
-        return new CurrentGenerator() {
-
-            @Override
-            public Current create(final int fallNumber) {
-
-                try {
-
-                    return (Current) constructor.newInstance();
-
-                } catch (final Throwable t) {
-
-                    throw new RuntimeException(t);
-                }
-            }
-        };
-    }
-
-    /**
-     * Creates and returns a leap generator from the specified leap instances.
-     *
-     * @param leaps The leaps to return.
-     * @return The newly created leap generator.
-     */
-    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> leapGenerator(
-            final Leap<SOURCE, IN, OUT>... leaps) {
-
-        final Leap<SOURCE, IN, OUT>[] leapList = leaps.clone();
-
-        return new LeapGenerator<SOURCE, IN, OUT>() {
-
-            @Override
-            public Leap<SOURCE, IN, OUT> start(final int fallNumber) {
-
-                return leapList[fallNumber];
-            }
-        };
-    }
-
-    /**
      * Creates and returns a leap generator which instantiates objects of the specified
      * classification through a method taking the specified parameters. A method taking
      * an additional Integer parameter (that is, the fall number) is preferred to the default one.
      * A one taking a primitive int is preferred to the Integer. Finally, a method annotated
-     * with {@link RapidAnnotations.Generator} is preferred to the not annotated one.<br/>
+     * with {@link RapidAnnotations.Generator} is preferred to the not annotated ones.<br/>
      * In case a suitable method is not found, an exception will be thrown.
      * <p/>
      * Note that a method might need to be made accessible in order to be called via
@@ -413,7 +299,7 @@ class RapidGenerators {
      * type through a constructor taking the specified parameters. A constructor taking
      * an additional Integer parameter (that is, the fall number) is preferred to the default one.
      * A one taking a primitive int is preferred to the Integer. Finally, a constructor annotated
-     * with {@link RapidAnnotations.Generator} is preferred to the not annotated one.<br/>
+     * with {@link RapidAnnotations.Generator} is preferred to the not annotated ones.<br/>
      * In case a suitable constructor is not found, an exception will be thrown.
      * <p/>
      * Note that a constructor might need to be made accessible in order to be called via
@@ -493,327 +379,172 @@ class RapidGenerators {
         };
     }
 
-    /**
-     * Creates and returns a leap generator which instantiates objects of the specified
-     * type through a constructor. A constructor taking an Integer parameter (that is, the fall
-     * number) is preferred to the default one. A one taking a primitive int is preferred to the
-     * Integer. Finally, a constructor annotated with {@link RapidAnnotations.Generator} is
-     * preferred to the not annotated one.<br/>
-     * In case a suitable constructor is not found, an exception will be thrown.
-     * <p/>
-     * Note that a constructor might need to be made accessible in order to be called via
-     * reflection. That means that, in case a {@link java.lang.SecurityManager} is installed, a
-     * security exception might be raised based on the specific policy implemented.
-     *
-     * @param type The leap type.
-     * @return The newly created leap generator.
-     */
-    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> leapGenerator(
-            final Class<? extends Leap<SOURCE, IN, OUT>> type) {
-
-        Constructor<?> bestMatch = findConstructor(type.getConstructors());
-
-        if (bestMatch == null) {
-
-            bestMatch = findConstructor(type.getDeclaredConstructors());
-
-            if (bestMatch == null) {
-
-                throw new IllegalArgumentException(
-                        "no suitable constructor found for type " + type);
-            }
-        }
-
-        if (!bestMatch.isAccessible()) {
-
-            bestMatch.setAccessible(true);
-        }
-
-        final Constructor<?> constructor = bestMatch;
-
-        if (constructor.getParameterTypes().length > 0) {
-
-            return new LeapGenerator<SOURCE, IN, OUT>() {
-
-                @Override
-                public Leap<SOURCE, IN, OUT> start(final int fallNumber) {
-
-                    try {
-
-                        //noinspection unchecked
-                        return (Leap<SOURCE, IN, OUT>) constructor.newInstance(fallNumber);
-
-                    } catch (final Throwable t) {
-
-                        throw new RuntimeException(t);
-                    }
-                }
-            };
-        }
-
-        return new LeapGenerator<SOURCE, IN, OUT>() {
-
-            @Override
-            public Leap<SOURCE, IN, OUT> start(final int fallNumber) {
-
-                try {
-
-                    //noinspection unchecked
-                    return (Leap<SOURCE, IN, OUT>) constructor.newInstance();
-
-                } catch (final Throwable t) {
-
-                    throw new RuntimeException(t);
-                }
-            }
-        };
-    }
-
-    @SuppressWarnings("ConstantConditions")
-    private static Constructor<?> findConstructor(final Constructor<?>[] constructors) {
-
-        Constructor<?> annotatedIntConstructor = null;
-        Constructor<?> annotatedIntegerConstructor = null;
-        Constructor<?> annotatedDefaultConstructor = null;
-
-        Constructor<?> intConstructor = null;
-        Constructor<?> integerConstructor = null;
-        Constructor<?> defaultConstructor = null;
-
-        for (final Constructor<?> constructor : constructors) {
-
-            final Class<?>[] params = constructor.getParameterTypes();
-
-            if (constructor.isAnnotationPresent(Generator.class)) {
-
-                boolean isValid = true;
-
-                final int length = params.length;
-
-                if (length == 0) {
-
-                    annotatedDefaultConstructor = constructor;
-
-                } else if (length == 1) {
-
-                    final Class<?> param = params[0];
-
-                    if (param.equals(int.class)) {
-
-                        annotatedIntConstructor = constructor;
-
-                    } else if (param.equals(Integer.class)) {
-
-                        annotatedIntegerConstructor = constructor;
-
-                    } else {
-
-                        isValid = false;
-                    }
-
-                } else {
-
-                    isValid = false;
-                }
-
-                if (!isValid) {
-
-                    throw new IllegalArgumentException("annotated constructor is not valid");
-                }
-
-            } else {
-
-                final int length = params.length;
-
-                if (length == 0) {
-
-                    defaultConstructor = constructor;
-
-                } else if (length == 1) {
-
-                    final Class<?> param = params[0];
-
-                    if (param.equals(int.class)) {
-
-                        intConstructor = constructor;
-
-                    } else if (param.equals(Integer.class)) {
-
-                        integerConstructor = constructor;
-                    }
-                }
-            }
-        }
-
-        if (annotatedIntConstructor != null) {
-
-            return annotatedIntConstructor;
-
-        } else if (annotatedIntegerConstructor != null) {
-
-            return annotatedIntegerConstructor;
-
-        } else if (annotatedDefaultConstructor != null) {
-
-            return annotatedDefaultConstructor;
-
-        } else if (intConstructor != null) {
-
-            return intConstructor;
-
-        } else if (integerConstructor != null) {
-
-            return integerConstructor;
-        }
-
-        return defaultConstructor;
-    }
-
     @SuppressWarnings("ConstantConditions")
     private static Constructor<?> findContextConstructor(final Constructor<?>[] constructors,
             final Object[] contextArgs) {
 
         final int argsLength = contextArgs.length;
 
-        Constructor<?> annotatedIntConstructor = null;
-        Constructor<?> annotatedIntegerConstructor = null;
-        Constructor<?> annotatedDefaultConstructor = null;
+        Constructor<?> annotatedIntCtor = null;
+        Constructor<?> annotatedIntegerCtor = null;
+        Constructor<?> annotatedDefaultCtor = null;
 
-        Constructor<?> intConstructor = null;
-        Constructor<?> integerConstructor = null;
-        Constructor<?> defaultConstructor = null;
+        int annotatedIntCtorConfidence = 0;
+        int annotatedIntegerCtorConfidence = 0;
+        int annotatedDefaultCtorConfidence = 0;
+
+        Constructor<?> intCtor = null;
+        Constructor<?> integerCtor = null;
+        Constructor<?> defaultCtor = null;
+
+        int intCtorConfidence = 0;
+        int integerCtorConfidence = 0;
+        int defaultCtorConfidence = 0;
 
         for (final Constructor<?> constructor : constructors) {
 
             final Class<?>[] params = constructor.getParameterTypes();
 
-            if (constructor.isAnnotationPresent(Generator.class)) {
+            final int length = params.length;
 
-                final int length = params.length;
+            int confidence = 0;
 
-                boolean isValid = (length >= argsLength);
+            boolean isValid = (length >= argsLength);
 
-                if (isValid) {
+            if (!isValid) {
 
-                    for (int i = 0; i < argsLength; ++i) {
+                continue;
+            }
 
-                        final Object contextArg = contextArgs[i];
-                        final Class<?> param = params[i];
+            for (int i = 0; i < argsLength; ++i) {
 
-                        if ((contextArg != null) ? !param.isInstance(contextArg)
-                                : param.isPrimitive()) {
+                final Object contextArg = contextArgs[i];
+                final Class<?> param = params[i];
 
-                            isValid = false;
+                if (contextArg != null) {
 
-                            break;
-                        }
+                    if (!param.isInstance(contextArg)) {
+
+                        isValid = false;
+
+                        break;
+                    }
+
+                    if (param.equals(contextArg.getClass())) {
+
+                        ++confidence;
+                    }
+
+                } else if (param.isPrimitive()) {
+
+                    isValid = false;
+
+                    break;
+                }
+            }
+
+            if (!isValid) {
+
+                continue;
+            }
+
+            final boolean isAnnotated = constructor.isAnnotationPresent(Generator.class);
+
+            if (length == argsLength) {
+
+                if (isAnnotated) {
+
+                    if ((annotatedDefaultCtor == null) || (confidence
+                            > annotatedDefaultCtorConfidence)) {
+
+                        annotatedDefaultCtor = constructor;
+
+                        annotatedDefaultCtorConfidence = confidence;
+                    }
+
+                } else {
+
+                    if ((defaultCtor == null) || (confidence > defaultCtorConfidence)) {
+
+                        defaultCtor = constructor;
+
+                        defaultCtorConfidence = confidence;
                     }
                 }
 
-                if (isValid) {
+            } else if (length == (argsLength + 1)) {
 
-                    if (length == argsLength) {
+                final Class<?> param = params[argsLength];
 
-                        annotatedDefaultConstructor = constructor;
+                if (param.equals(int.class)) {
 
-                    } else if (length == (argsLength + 1)) {
+                    if (isAnnotated) {
 
-                        final Class<?> param = params[argsLength];
+                        if ((annotatedIntCtor == null) || (confidence
+                                > annotatedIntCtorConfidence)) {
 
-                        if (param.equals(int.class)) {
+                            annotatedIntCtor = constructor;
 
-                            annotatedIntConstructor = constructor;
-
-                        } else if (param.equals(Integer.class)) {
-
-                            annotatedIntegerConstructor = constructor;
-
-                        } else {
-
-                            isValid = false;
+                            annotatedIntCtorConfidence = confidence;
                         }
 
                     } else {
 
-                        isValid = false;
-                    }
-                }
+                        if ((intCtor == null) || (confidence > intCtorConfidence)) {
 
-                if (!isValid) {
+                            intCtor = constructor;
 
-                    throw new IllegalArgumentException("annotated constructor is not valid");
-                }
-
-            } else {
-
-                final int length = params.length;
-
-                boolean isValid = (length >= argsLength);
-
-                if (isValid) {
-
-                    for (int i = 0; i < argsLength; ++i) {
-
-                        final Object contextArg = contextArgs[i];
-                        final Class<?> param = params[i];
-
-                        if ((contextArg != null) ? !param.isInstance(contextArg)
-                                : param.isPrimitive()) {
-
-                            isValid = false;
-
-                            break;
+                            intCtorConfidence = confidence;
                         }
                     }
-                }
 
-                if (!isValid) {
+                } else if (param.equals(Integer.class)) {
 
-                    continue;
-                }
+                    if (isAnnotated) {
 
-                if (length == argsLength) {
+                        if ((annotatedIntegerCtor == null) || (confidence
+                                > annotatedIntegerCtorConfidence)) {
 
-                    defaultConstructor = constructor;
+                            annotatedIntegerCtor = constructor;
 
-                } else if (length == (argsLength + 1)) {
+                            annotatedIntegerCtorConfidence = confidence;
+                        }
 
-                    final Class<?> param = params[argsLength];
+                    } else {
 
-                    if (param.equals(int.class)) {
+                        if ((integerCtor == null) || (confidence > integerCtorConfidence)) {
 
-                        intConstructor = constructor;
+                            integerCtor = constructor;
 
-                    } else if (param.equals(Integer.class)) {
-
-                        integerConstructor = constructor;
+                            integerCtorConfidence = confidence;
+                        }
                     }
                 }
             }
         }
 
-        if (annotatedIntConstructor != null) {
+        if (annotatedIntCtor != null) {
 
-            return annotatedIntConstructor;
+            return annotatedIntCtor;
 
-        } else if (annotatedIntegerConstructor != null) {
+        } else if (annotatedIntegerCtor != null) {
 
-            return annotatedIntegerConstructor;
+            return annotatedIntegerCtor;
 
-        } else if (annotatedDefaultConstructor != null) {
+        } else if (annotatedDefaultCtor != null) {
 
-            return annotatedDefaultConstructor;
+            return annotatedDefaultCtor;
 
-        } else if (intConstructor != null) {
+        } else if (intCtor != null) {
 
-            return intConstructor;
+            return intCtor;
 
-        } else if (integerConstructor != null) {
+        } else if (integerCtor != null) {
 
-            return integerConstructor;
+            return integerCtor;
         }
 
-        return defaultConstructor;
+        return defaultCtor;
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -822,15 +553,21 @@ class RapidGenerators {
 
         final int argsLength = args.length;
 
-        final Class<?>[] argClasses = new Class[argsLength];
+        Method annotatedIntMethod = null;
+        Method annotatedIntegerMethod = null;
+        Method annotatedDefaultMethod = null;
 
-        for (int i = 0; i < argsLength; ++i) {
+        int annotatedIntMethodConfidence = 0;
+        int annotatedIntegerMethodConfidence = 0;
+        int annotatedDefaultMethodConfidence = 0;
 
-            argClasses[i] = args[i].getClass();
-        }
+        Method intMethod = null;
+        Method integerMethod = null;
+        Method defaultMethod = null;
 
-        Class<?> annotatedBestMatch = null;
-        Class<?> bestMatch = null;
+        int intMethodConfidence = 0;
+        int integerMethodConfidence = 0;
+        int defaultMethodConfidence = 0;
 
         for (final Method method : methods) {
 
@@ -843,222 +580,119 @@ class RapidGenerators {
 
             final Class<?>[] params = method.getParameterTypes();
 
-            if (method.isAnnotationPresent(Generator.class)) {
+            final int length = params.length;
 
-                final int length = params.length;
+            int confidence = 0;
 
-                boolean isValid = (length >= argsLength);
+            boolean isValid = (length >= argsLength);
 
-                if (isValid) {
-
-                    for (int i = 0; i < argsLength; ++i) {
-
-                        if (!params[i].equals(argClasses[i])) {
-
-                            isValid = false;
-
-                            break;
-                        }
-                    }
-                }
-
-                if (isValid) {
-
-                    if (length > (argsLength + 1)) {
-
-                        isValid = false;
-
-                    } else if (length == (argsLength + 1)) {
-
-                        final Class<?> param = params[argsLength];
-
-                        if (!param.equals(int.class) && !param.equals(Integer.class)) {
-
-                            isValid = false;
-                        }
-                    }
-
-                    if (isValid) {
-
-                        if ((annotatedBestMatch == null) || returnType.isAssignableFrom(
-                                annotatedBestMatch)) {
-
-                            annotatedBestMatch = returnType;
-                        }
-                    }
-                }
-
-            } else {
-
-                final int length = params.length;
-
-                boolean isValid = (length >= argsLength);
-
-                if (isValid) {
-
-                    for (int i = 0; i < argsLength; ++i) {
-
-                        if (!params[i].equals(argClasses[i])) {
-
-                            isValid = false;
-
-                            break;
-                        }
-                    }
-                }
-
-                if (isValid) {
-
-                    if (length > (argsLength + 1)) {
-
-                        isValid = false;
-
-                    } else if (length == (argsLength + 1)) {
-
-                        final Class<?> param = params[argsLength];
-
-                        if (!param.equals(int.class) && !param.equals(Integer.class)) {
-
-                            isValid = false;
-                        }
-                    }
-
-                    if (isValid) {
-
-                        if ((bestMatch == null) || returnType.isAssignableFrom(bestMatch)) {
-
-                            bestMatch = returnType;
-                        }
-                    }
-                }
-            }
-        }
-
-        final Class<?> methodReturnType;
-
-        if ((annotatedBestMatch != null) && ((bestMatch == null)
-                || annotatedBestMatch.isAssignableFrom(bestMatch))) {
-
-            methodReturnType = annotatedBestMatch;
-
-        } else if (bestMatch != null) {
-
-            methodReturnType = bestMatch;
-
-        } else {
-
-            return null;
-        }
-
-        Method annotatedIntMethod = null;
-        Method annotatedIntegerMethod = null;
-        Method annotatedDefaultMethod = null;
-
-        Method intMethod = null;
-        Method integerMethod = null;
-        Method defaultMethod = null;
-
-        for (final Method method : methods) {
-
-            if (!methodReturnType.equals(method.getReturnType())) {
+            if (!isValid) {
 
                 continue;
             }
 
-            final Class<?>[] params = method.getParameterTypes();
+            for (int i = 0; i < argsLength; ++i) {
 
-            if (method.isAnnotationPresent(Generator.class)) {
+                final Object contextArg = args[i];
+                final Class<?> param = params[i];
 
-                final int length = params.length;
+                if (contextArg != null) {
 
-                boolean isValid = (length >= argsLength);
+                    if (!param.isInstance(contextArg)) {
 
-                if (isValid) {
+                        isValid = false;
 
-                    for (int i = 0; i < argsLength; ++i) {
-
-                        if (!params[i].equals(argClasses[i])) {
-
-                            isValid = false;
-
-                            break;
-                        }
+                        break;
                     }
+
+                    if (param.equals(contextArg.getClass())) {
+
+                        ++confidence;
+                    }
+
+                } else if (param.isPrimitive()) {
+
+                    isValid = false;
+
+                    break;
                 }
+            }
 
-                if (isValid) {
+            if (!isValid) {
 
-                    if (length == argsLength) {
+                continue;
+            }
+
+            final boolean isAnnotated = method.isAnnotationPresent(Generator.class);
+
+            if (length == argsLength) {
+
+                if (isAnnotated) {
+
+                    if ((annotatedDefaultMethod == null) || (confidence
+                            > annotatedDefaultMethodConfidence)) {
 
                         annotatedDefaultMethod = method;
 
-                    } else if (length == (argsLength + 1)) {
+                        annotatedDefaultMethodConfidence = confidence;
+                    }
 
-                        final Class<?> param = params[argsLength];
+                } else {
 
-                        if (param.equals(int.class)) {
+                    if ((defaultMethod == null) || (confidence > defaultMethodConfidence)) {
+
+                        defaultMethod = method;
+
+                        defaultMethodConfidence = confidence;
+                    }
+                }
+
+            } else if (length == (argsLength + 1)) {
+
+                final Class<?> param = params[argsLength];
+
+                if (param.equals(int.class)) {
+
+                    if (isAnnotated) {
+
+                        if ((annotatedIntMethod == null) || (confidence
+                                > annotatedIntMethodConfidence)) {
 
                             annotatedIntMethod = method;
 
-                        } else if (param.equals(Integer.class)) {
-
-                            annotatedIntegerMethod = method;
-
-                        } else {
-
-                            isValid = false;
+                            annotatedIntMethodConfidence = confidence;
                         }
 
                     } else {
 
-                        isValid = false;
-                    }
-                }
+                        if ((intMethod == null) || (confidence > intMethodConfidence)) {
 
-                if (!isValid) {
+                            intMethod = method;
 
-                    throw new IllegalArgumentException("annotated constructor is not valid");
-                }
-
-            } else {
-
-                final int length = params.length;
-
-                boolean isValid = (length >= argsLength);
-
-                if (isValid) {
-
-                    for (int i = 0; i < argsLength; ++i) {
-
-                        if (!params[i].equals(argClasses[i])) {
-
-                            isValid = false;
-
-                            break;
+                            intMethodConfidence = confidence;
                         }
                     }
-                }
 
-                if (!isValid) {
+                } else if (param.equals(Integer.class)) {
 
-                    continue;
-                }
+                    if (isAnnotated) {
 
-                if (length == argsLength) {
+                        if ((annotatedIntegerMethod == null) || (confidence
+                                > annotatedIntegerMethodConfidence)) {
 
-                    defaultMethod = method;
+                            annotatedIntegerMethod = method;
 
-                } else if (length == (argsLength + 1)) {
+                            annotatedIntegerMethodConfidence = confidence;
+                        }
 
-                    final Class<?> param = params[argsLength];
+                    } else {
 
-                    if (param.equals(int.class)) {
+                        if ((integerMethod == null) || (confidence > integerMethodConfidence)) {
 
-                        intMethod = method;
+                            integerMethod = method;
 
-                    } else if (param.equals(Integer.class)) {
-
-                        integerMethod = method;
+                            integerMethodConfidence = confidence;
+                        }
                     }
                 }
             }

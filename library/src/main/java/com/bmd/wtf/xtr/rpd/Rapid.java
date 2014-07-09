@@ -34,36 +34,13 @@ import com.bmd.wtf.lps.LeapGenerator;
  * <p/>
  * Created by davide on 6/19/14.
  */
-public class Rapids {
+public class Rapid {
 
     /**
      * Avoid direct instantiation.
      */
-    private Rapids() {
+    private Rapid() {
 
-    }
-
-    /**
-     * Creates and returns a leap generator from the specified leap instances.
-     *
-     * @param leaps The leaps to return.
-     * @return The newly created leap generator.
-     */
-    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> asGenerator(
-            final Leap<SOURCE, IN, OUT>... leaps) {
-
-        return RapidGenerators.leapGenerator(leaps);
-    }
-
-    /**
-     * Creates and returns a current generator from the specified current instances.
-     *
-     * @param currents The currents to return.
-     * @return The newly created current generator.
-     */
-    public static CurrentGenerator asGenerator(final Current... currents) {
-
-        return RapidGenerators.currentGenerator(currents);
     }
 
     /**
@@ -71,7 +48,7 @@ public class Rapids {
      * classification through a method taking the specified parameters. A method taking
      * an additional Integer parameter (that is, the fall number) is preferred to the default one.
      * A one taking a primitive int is preferred to the Integer. Finally, a method annotated
-     * with {@link RapidAnnotations.Generator} is preferred to the not annotated one.<br/>
+     * with {@link RapidAnnotations.Generator} is preferred to the not annotated ones.<br/>
      * In case a suitable method is not found, an exception will be thrown.
      * <p/>
      * Note that a method might need to be made accessible in order to be called via
@@ -83,7 +60,7 @@ public class Rapids {
      * @param args           The arguments to be passed to the method.
      * @return The newly created current generator.
      */
-    public static CurrentGenerator currents(final Object generator,
+    public static CurrentGenerator currentGenerator(final Object generator,
             final Classification<? extends Current> classification, final Object... args) {
 
         return RapidGenerators.currentGenerator(generator, classification, args);
@@ -91,10 +68,33 @@ public class Rapids {
 
     /**
      * Creates and returns a current generator which instantiates objects of the specified
+     * type through a method taking the specified parameters. A method taking
+     * an additional Integer parameter (that is, the fall number) is preferred to the default one.
+     * A one taking a primitive int is preferred to the Integer. Finally, a method annotated
+     * with {@link RapidAnnotations.Generator} is preferred to the not annotated ones.<br/>
+     * In case a suitable method is not found, an exception will be thrown.
+     * <p/>
+     * Note that a method might need to be made accessible in order to be called via
+     * reflection. That means that, in case a {@link java.lang.SecurityManager} is installed, a
+     * security exception might be raised based on the specific policy implemented.
+     *
+     * @param generator The generator object whose method will be called.
+     * @param type      The current type.
+     * @param args      The arguments to be passed to the method.
+     * @return The newly created current generator.
+     */
+    public static CurrentGenerator currentGenerator(final Object generator,
+            final Class<? extends Current> type, final Object... args) {
+
+        return RapidGenerators.currentGenerator(generator, Classification.ofType(type), args);
+    }
+
+    /**
+     * Creates and returns a current generator which instantiates objects of the specified
      * type through a constructor taking the specified parameters. A constructor taking
      * an additional Integer parameter (that is, the fall number) is preferred to the default one.
      * A one taking a primitive int is preferred to the Integer. Finally, a constructor annotated
-     * with {@link RapidAnnotations.Generator} is preferred to the not annotated one.<br/>
+     * with {@link RapidAnnotations.Generator} is preferred to the not annotated ones.<br/>
      * In case a suitable constructor is not found, an exception will be thrown.
      * <p/>
      * Note that a constructor might need to be made accessible in order to be called via
@@ -105,7 +105,8 @@ public class Rapids {
      * @param contextArgs The arguments to be passed to the constructor.
      * @return The newly created current generator.
      */
-    public static CurrentGenerator currents(final Current current, final Object... contextArgs) {
+    public static CurrentGenerator currentGenerator(final Current current,
+            final Object... contextArgs) {
 
         return RapidGenerators.currentGenerator(current.getClass(), contextArgs);
     }
@@ -115,7 +116,7 @@ public class Rapids {
      * classification through a constructor taking the specified parameters. A constructor taking
      * an additional Integer parameter (that is, the fall number) is preferred to the default one.
      * A one taking a primitive int is preferred to the Integer. Finally, a constructor annotated
-     * with {@link RapidAnnotations.Generator} is preferred to the not annotated one.<br/>
+     * with {@link RapidAnnotations.Generator} is preferred to the not annotated ones.<br/>
      * In case a suitable constructor is not found, an exception will be thrown.
      * <p/>
      * Note that a constructor might need to be made accessible in order to be called via
@@ -126,8 +127,8 @@ public class Rapids {
      * @param contextArgs    The arguments to be passed to the constructor.
      * @return The newly created current generator.
      */
-    public static CurrentGenerator currents(final Classification<? extends Current> classification,
-            final Object... contextArgs) {
+    public static CurrentGenerator currentGenerator(
+            final Classification<? extends Current> classification, final Object... contextArgs) {
 
         return RapidGenerators.currentGenerator(classification.getRawType(), contextArgs);
     }
@@ -137,7 +138,7 @@ public class Rapids {
      * type through a constructor taking the specified parameters. A constructor taking
      * an additional Integer parameter (that is, the fall number) is preferred to the default one.
      * A one taking a primitive int is preferred to the Integer. Finally, a constructor annotated
-     * with {@link RapidAnnotations.Generator} is preferred to the not annotated one.<br/>
+     * with {@link RapidAnnotations.Generator} is preferred to the not annotated ones.<br/>
      * In case a suitable constructor is not found, an exception will be thrown.
      * <p/>
      * Note that a constructor might need to be made accessible in order to be called via
@@ -148,51 +149,10 @@ public class Rapids {
      * @param contextArgs The arguments to be passed to the constructor.
      * @return The newly created current generator.
      */
-    public static CurrentGenerator currents(final Class<? extends Current> type,
+    public static CurrentGenerator currentGenerator(final Class<? extends Current> type,
             final Object... contextArgs) {
 
         return RapidGenerators.currentGenerator(type, contextArgs);
-    }
-
-    /**
-     * Creates and returns a current generator which instantiates objects of the specified
-     * type through a constructor. A constructor taking an Integer parameter (that is, the fall
-     * number) is preferred to the default one. A one taking a primitive int is preferred to the
-     * Integer. Finally, a constructor annotated with {@link RapidAnnotations.Generator} is
-     * preferred to the not annotated one.<br/>
-     * In case a suitable constructor is not found, an exception will be thrown.
-     * <p/>
-     * Note that a constructor might need to be made accessible in order to be called via
-     * reflection. That means that, in case a {@link java.lang.SecurityManager} is installed, a
-     * security exception might be raised based on the specific policy implemented.
-     *
-     * @param type The current type.
-     * @return The newly created current generator.
-     */
-    public static CurrentGenerator currents(final Class<? extends Current> type) {
-
-        return RapidGenerators.currentGenerator(type);
-    }
-
-    /**
-     * Creates and returns a current generator which instantiates objects of the specified
-     * classification through a constructor. A constructor taking an Integer parameter (that is,
-     * the fall number) is preferred to the default one. A one taking a primitive int is preferred
-     * to the Integer. Finally, a constructor annotated with {@link RapidAnnotations.Generator} is
-     * preferred to the not annotated one.<br/>
-     * In case a suitable constructor is not found, an exception will be thrown.
-     * <p/>
-     * Note that a constructor might need to be made accessible in order to be called via
-     * reflection. That means that, in case a {@link java.lang.SecurityManager} is installed, a
-     * security exception might be raised based on the specific policy implemented.
-     *
-     * @param classification The current classification.
-     * @return The newly created current generator.
-     */
-    public static CurrentGenerator currents(
-            final Classification<? extends Current> classification) {
-
-        return RapidGenerators.currentGenerator(classification.getRawType());
     }
 
     /**
@@ -229,7 +189,7 @@ public class Rapids {
      * classification through a method taking the specified parameters. A method taking
      * an additional Integer parameter (that is, the fall number) is preferred to the default one.
      * A one taking a primitive int is preferred to the Integer. Finally, a method annotated
-     * with {@link RapidAnnotations.Generator} is preferred to the not annotated one.<br/>
+     * with {@link RapidAnnotations.Generator} is preferred to the not annotated ones.<br/>
      * In case a suitable method is not found, an exception will be thrown.
      * <p/>
      * Note that a method might need to be made accessible in order to be called via
@@ -241,7 +201,8 @@ public class Rapids {
      * @param args           The arguments to be passed to the method.
      * @return The newly created leap generator.
      */
-    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> leaps(final Object generator,
+    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> leapGenerator(
+            final Object generator,
             final Classification<? extends Leap<SOURCE, IN, OUT>> classification,
             final Object... args) {
 
@@ -253,7 +214,7 @@ public class Rapids {
      * type through a constructor taking the specified parameters. A constructor taking
      * an additional Integer parameter (that is, the fall number) is preferred to the default one.
      * A one taking a primitive int is preferred to the Integer. Finally, a constructor annotated
-     * with {@link RapidAnnotations.Generator} is preferred to the not annotated one.<br/>
+     * with {@link RapidAnnotations.Generator} is preferred to the not annotated ones.<br/>
      * In case a suitable constructor is not found, an exception will be thrown.
      * <p/>
      * Note that a constructor might need to be made accessible in order to be called via
@@ -264,7 +225,7 @@ public class Rapids {
      * @param contextArgs The arguments to be passed to the constructor.
      * @return The newly created leap generator.
      */
-    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> leaps(
+    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> leapGenerator(
             final Leap<SOURCE, IN, OUT> leap, final Object... contextArgs) {
 
         //noinspection unchecked
@@ -277,7 +238,7 @@ public class Rapids {
      * classification through a constructor taking the specified parameters. A constructor taking
      * an additional Integer parameter (that is, the fall number) is preferred to the default one.
      * A one taking a primitive int is preferred to the Integer. Finally, a constructor annotated
-     * with {@link RapidAnnotations.Generator} is preferred to the not annotated one.<br/>
+     * with {@link RapidAnnotations.Generator} is preferred to the not annotated ones.<br/>
      * In case a suitable constructor is not found, an exception will be thrown.
      * <p/>
      * Note that a constructor might need to be made accessible in order to be called via
@@ -288,7 +249,7 @@ public class Rapids {
      * @param contextArgs    The arguments to be passed to the constructor.
      * @return The newly created leap generator.
      */
-    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> leaps(
+    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> leapGenerator(
             final Classification<? extends Leap<SOURCE, IN, OUT>> classification,
             final Object... contextArgs) {
 
@@ -300,7 +261,7 @@ public class Rapids {
      * type through a constructor taking the specified parameters. A constructor taking
      * an additional Integer parameter (that is, the fall number) is preferred to the default one.
      * A one taking a primitive int is preferred to the Integer. Finally, a constructor annotated
-     * with {@link RapidAnnotations.Generator} is preferred to the not annotated one.<br/>
+     * with {@link RapidAnnotations.Generator} is preferred to the not annotated ones.<br/>
      * In case a suitable constructor is not found, an exception will be thrown.
      * <p/>
      * Note that a constructor might need to be made accessible in order to be called via
@@ -311,51 +272,9 @@ public class Rapids {
      * @param contextArgs The arguments to be passed to the constructor.
      * @return The newly created leap generator.
      */
-    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> leaps(
+    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> leapGenerator(
             final Class<? extends Leap<SOURCE, IN, OUT>> type, final Object... contextArgs) {
 
         return RapidGenerators.leapGenerator(type, contextArgs);
-    }
-
-    /**
-     * Creates and returns a leap generator which instantiates objects of the specified
-     * type through a constructor. A constructor taking an Integer parameter (that is, the fall
-     * number) is preferred to the default one. A one taking a primitive int is preferred to the
-     * Integer. Finally, a constructor annotated with {@link RapidAnnotations.Generator} is
-     * preferred to the not annotated one.<br/>
-     * In case a suitable constructor is not found, an exception will be thrown.
-     * <p/>
-     * Note that a constructor might need to be made accessible in order to be called via
-     * reflection. That means that, in case a {@link java.lang.SecurityManager} is installed, a
-     * security exception might be raised based on the specific policy implemented.
-     *
-     * @param type The leap type.
-     * @return The newly created leap generator.
-     */
-    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> leaps(
-            final Class<? extends Leap<SOURCE, IN, OUT>> type) {
-
-        return RapidGenerators.leapGenerator(type);
-    }
-
-    /**
-     * Creates and returns a leap generator which instantiates objects of the specified
-     * classification through a constructor. A constructor taking an Integer parameter (that is, the fall
-     * number) is preferred to the default one. A one taking a primitive int is preferred to the
-     * Integer. Finally, a constructor annotated with {@link RapidAnnotations.Generator} is
-     * preferred to the not annotated one.<br/>
-     * In case a suitable constructor is not found, an exception will be thrown.
-     * <p/>
-     * Note that a constructor might need to be made accessible in order to be called via
-     * reflection. That means that, in case a {@link java.lang.SecurityManager} is installed, a
-     * security exception might be raised based on the specific policy implemented.
-     *
-     * @param classification The leap classification.
-     * @return The newly created leap generator.
-     */
-    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> leaps(
-            final Classification<? extends Leap<SOURCE, IN, OUT>> classification) {
-
-        return RapidGenerators.leapGenerator(classification.getRawType());
     }
 }

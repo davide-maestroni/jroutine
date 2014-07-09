@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @param <TYPE> The backed leap type.
  */
-public class DefaultRapidGate<TYPE> implements RapidGate<TYPE> {
+class DefaultRapidGate<TYPE> implements RapidGate<TYPE> {
 
     private final Gate<TYPE> mGate;
 
@@ -37,7 +37,7 @@ public class DefaultRapidGate<TYPE> implements RapidGate<TYPE> {
      *
      * @param wrapped The wrapped gate.
      */
-    DefaultRapidGate(final Gate<?> wrapped) {
+    public DefaultRapidGate(final Gate<?> wrapped) {
 
         this(wrapped, null);
     }
@@ -48,7 +48,7 @@ public class DefaultRapidGate<TYPE> implements RapidGate<TYPE> {
      * @param wrapped   The wrapped gate.
      * @param gateClass The gate class.
      */
-    DefaultRapidGate(final Gate<?> wrapped, final Class<TYPE> gateClass) {
+    public DefaultRapidGate(final Gate<?> wrapped, final Class<TYPE> gateClass) {
 
         if (wrapped == null) {
 
@@ -103,13 +103,13 @@ public class DefaultRapidGate<TYPE> implements RapidGate<TYPE> {
     @Override
     public <NTYPE> RapidGate<NTYPE> as(final Class<NTYPE> gateClass) {
 
-        return null;
+        return new DefaultRapidGate<NTYPE>(mGate, gateClass);
     }
 
     @Override
     public <NTYPE> RapidGate<NTYPE> as(final Classification<NTYPE> gateClassification) {
 
-        return new DefaultRapidGate<NTYPE>(mGate, gateClassification.getRawType());
+        return as(gateClassification.getRawType());
     }
 
     @Override

@@ -21,12 +21,21 @@ import java.lang.reflect.Method;
 import java.lang.reflect.UndeclaredThrowableException;
 
 /**
+ * Invocation handler used to handle a gate proxy method invocations.
+ * <p/>
  * Created by davide on 7/4/14.
+ *
+ * @param <TYPE> The leap type.
  */
 class GateInvocationHandler<TYPE> implements InvocationHandler, Action<Object, TYPE> {
 
     private final Gate<TYPE> mGate;
 
+    /**
+     * Constructor.
+     *
+     * @param gate The gate instance.
+     */
     public GateInvocationHandler(final Gate<TYPE> gate) {
 
         mGate = gate;
@@ -41,6 +50,7 @@ class GateInvocationHandler<TYPE> implements InvocationHandler, Action<Object, T
 
         } catch (final Throwable t) {
 
+            //TODO: test if we can let exceptions pass through
             throw new UndeclaredThrowableException(t);
         }
     }

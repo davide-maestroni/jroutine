@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit;
  * @param <OUT>    The output data type.
  * @param <TYPE>   The gate type.
  */
-public class DefaultRapidRiver<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallRiver<SOURCE, IN>
+class DefaultRapidRiver<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallRiver<SOURCE, IN>
         implements RapidRiver<SOURCE, MOUTH, IN, OUT, TYPE> {
 
     private final Classification<TYPE> mClassification;
@@ -58,7 +58,7 @@ public class DefaultRapidRiver<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallRi
      *
      * @param waterfall The wrapped waterfall.
      */
-    DefaultRapidRiver(final Waterfall<SOURCE, MOUTH, OUT> waterfall) {
+    public DefaultRapidRiver(final Waterfall<SOURCE, MOUTH, OUT> waterfall) {
 
         this(waterfall.source(), waterfall, null, null, 0, null, null);
     }
@@ -78,8 +78,6 @@ public class DefaultRapidRiver<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallRi
 
         //noinspection unchecked
         super((Waterfall<SOURCE, IN, ?>) sourceWaterfall, true);
-
-        //TODO: exceptions
 
         mSourceWaterfall = sourceWaterfall;
         mMouthWaterfall = mouthWaterfall;

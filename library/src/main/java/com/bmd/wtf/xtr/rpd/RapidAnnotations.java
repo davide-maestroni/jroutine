@@ -19,7 +19,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This interface groups all the definitions of the rapid annotations.
+ * This interface groups all the definitions of rapid annotations.
  * <p/>
  * Created by davide on 6/23/14.
  */
@@ -27,13 +27,13 @@ public interface RapidAnnotations {
 
     @Target({ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
-    @interface Condition {
+    public @interface Condition {
 
     }
 
     @Target({ElementType.CONSTRUCTOR, ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
-    @interface Generator {
+    public @interface Generator {
 
     }
 

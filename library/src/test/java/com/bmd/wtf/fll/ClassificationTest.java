@@ -49,6 +49,8 @@ public class ClassificationTest extends TestCase {
                 classification2.isAssignableFrom(new Classification<List<Integer>>() {})).isTrue();
         assertThat(classification2.isAssignableFrom(
                 new Classification<ArrayList<String>>() {})).isTrue();
+
+        assertThat(Classification.ofType(List.class)).isEqualTo(new Classification<List>() {});
     }
 
     public void testError() {

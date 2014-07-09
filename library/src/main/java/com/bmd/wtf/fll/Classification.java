@@ -50,6 +50,7 @@ public abstract class Classification<TYPE> {
         }
 
         final Classification<RTYPE> classification = new Classification<RTYPE>() {};
+        classification.mType = rawType;
         classification.mRawType = rawType;
 
         return classification;

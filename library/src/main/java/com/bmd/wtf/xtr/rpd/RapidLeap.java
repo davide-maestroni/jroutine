@@ -125,7 +125,6 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
             try {
 
                 final Object result = onDischarge.invoke(this);
-
                 final Class<?> returnType = onDischarge.getReturnType();
 
                 if (!returnType.equals(void.class)) {
@@ -159,7 +158,6 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
                 try {
 
                     final Object result = onNull.invoke(this);
-
                     final Class<?> returnType = onNull.getReturnType();
 
                     if (!returnType.equals(void.class)) {
@@ -191,7 +189,6 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
             try {
 
                 final Object result = method.invoke(this, drop);
-
                 final Class<?> returnType = method.getReturnType();
 
                 if (!returnType.equals(void.class)) {
@@ -222,7 +219,6 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
                 try {
 
                     final Object result = onNull.invoke(this);
-
                     final Class<?> returnType = onNull.getReturnType();
 
                     if (!returnType.equals(void.class)) {
@@ -254,7 +250,6 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
             try {
 
                 final Object result = method.invoke(this, throwable);
-
                 final Class<?> returnType = method.getReturnType();
 
                 if (!returnType.equals(void.class)) {
@@ -315,7 +310,6 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
     private void fillMethods() {
 
         final Class<?> objectClass = mTarget.getClass();
-
         final Method[] methods = objectClass.getMethods();
         final Method[] declaredMethods = objectClass.getDeclaredMethods();
 
@@ -394,7 +388,6 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
         for (final Method method : methods) {
 
             final Class<?>[] parameterTypes = method.getParameterTypes();
-
             final boolean isAnnotated = method.isAnnotationPresent(OnData.class);
 
             if (parameterTypes.length != 1) {
@@ -439,7 +432,6 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
             }
 
             final Class<?> parameterType = parameterTypes[0];
-
             final Method currentMethod = methodMap.get(parameterType);
 
             if ((currentMethod != null) && !currentMethod.equals(method)) {
@@ -463,7 +455,6 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
         for (final Method method : methods) {
 
             final Class<?>[] parameterTypes = method.getParameterTypes();
-
             final boolean isAnnotated = method.isAnnotationPresent(OnDischarge.class);
 
             if (parameterTypes.length != 0) {
@@ -508,7 +499,6 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
         for (final Method method : methods) {
 
             final Class<?>[] parameterTypes = method.getParameterTypes();
-
             final boolean isAnnotated = method.isAnnotationPresent(OnNull.class);
 
             if (parameterTypes.length != 0) {

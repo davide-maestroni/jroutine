@@ -99,7 +99,6 @@ class DataGate<TYPE> implements Gate<TYPE> {
             final Object... args) {
 
         final ReentrantLock lock = mLock;
-
         lock.lock();
 
         try {
@@ -153,7 +152,6 @@ class DataGate<TYPE> implements Gate<TYPE> {
             final Condition condition = mCondition;
 
             final long startTime = System.currentTimeMillis();
-
             final long endTime = startTime + currentTimeout;
 
             do {

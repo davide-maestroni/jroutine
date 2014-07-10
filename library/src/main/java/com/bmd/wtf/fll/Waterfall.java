@@ -111,7 +111,6 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
 
             final HashMap<Classification<?>, GateLeap<?, ?, ?>> fallGateMap =
                     new HashMap<Classification<?>, GateLeap<?, ?, ?>>(gateMap);
-
             final GateLeap<SOURCE, IN, OUT> gateLeap = new GateLeap<SOURCE, IN, OUT>(leap);
 
             mapGate(fallGateMap,
@@ -153,7 +152,6 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
         for (int i = 0; i < size; ++i) {
 
             final Leap<SOURCE, IN, OUT> leap = (wrappedLeap != null) ? wrappedLeap : leaps[i];
-
             final Current fallCurrent;
 
             if (current == null) {
@@ -387,7 +385,6 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
         } else {
 
             final int size = waterfall.mSize;
-
             final int length = falls.length;
 
             final DataFall<?, OUT, ?>[] outFalls = waterfall.mFalls;
@@ -476,7 +473,6 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
         }
 
         final DataFall<SOURCE, IN, OUT>[] falls = mFalls;
-
         final int size = mSize;
 
         if (size == 1) {
@@ -497,7 +493,6 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
         }
 
         final int length = falls.length;
-
         final Waterfall<SOURCE, ?, OUT> inWaterfall;
 
         if ((length != 1) && (length != size)) {
@@ -521,7 +516,6 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
                                                  inWaterfall.mCurrentGenerator, leaps);
 
         final DataFall<SOURCE, ?, OUT>[] inFalls = inWaterfall.mFalls;
-
         final DataFall<SOURCE, OUT, NOUT>[] outFalls = waterfall.mFalls;
 
         if (inFalls.length == 1) {
@@ -560,7 +554,6 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
         }
 
         final int size = mSize;
-
         final FreeLeap<SOURCE, OUT> leap = freeLeap();
 
         if (size == 1) {
@@ -581,7 +574,6 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
         }
 
         final int length = falls.length;
-
         final Waterfall<SOURCE, ?, OUT> inWaterfall;
 
         if ((length != 1) && (length != size)) {
@@ -605,7 +597,6 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
                                                 leaps);
 
         final DataFall<SOURCE, ?, OUT>[] inFalls = inWaterfall.mFalls;
-
         final DataFall<SOURCE, OUT, OUT>[] outFalls = waterfall.mFalls;
 
         if (inFalls.length == 1) {
@@ -675,7 +666,6 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
         }
 
         final int length = falls.length;
-
         final Waterfall<SOURCE, ?, OUT> inWaterfall;
 
         if ((length != 1) && (length != size)) {
@@ -697,7 +687,6 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
                                                  inWaterfall.mCurrentGenerator, leap);
 
         final DataFall<SOURCE, ?, OUT>[] inFalls = inWaterfall.mFalls;
-
         final DataFall<SOURCE, OUT, NOUT>[] outFalls = waterfall.mFalls;
 
         if (inFalls.length == 1) {
@@ -775,7 +764,6 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
         }
 
         final int length = falls.length;
-
         final Waterfall<SOURCE, ?, OUT> inWaterfall;
 
         if ((length != 1) && (length != size)) {
@@ -806,7 +794,6 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
                                                  inWaterfall.mCurrentGenerator, leaps);
 
         final DataFall<SOURCE, ?, OUT>[] inFalls = inWaterfall.mFalls;
-
         final DataFall<SOURCE, OUT, NOUT>[] outFalls = waterfall.mFalls;
 
         if (inFalls.length == 1) {
@@ -1553,7 +1540,6 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
         final int size = mSize;
 
         final FreeLeap<OUT, OUT> leap = freeLeap();
-
         final Leap[] leaps = new Leap[size];
 
         Arrays.fill(leaps, leap);

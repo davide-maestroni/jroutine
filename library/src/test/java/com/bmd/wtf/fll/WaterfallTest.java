@@ -711,7 +711,6 @@ public class WaterfallTest extends TestCase {
         assertThat(fall4.pull(0).now().all()).isEmpty();
         assertThat(fall4.pull(1).now().all()).isEmpty();
 
-        //TODO: waterfall.deviate
         final Waterfall<Object, Object, Object> fall5 = fall().start();
         final Waterfall<Object, Object, Object> fall6 = fall5.chain();
         final Waterfall<Object, Object, Object> fall7 = fall6.chain();

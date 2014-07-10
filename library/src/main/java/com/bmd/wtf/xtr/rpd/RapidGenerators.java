@@ -75,7 +75,6 @@ class RapidGenerators {
         }
 
         final Constructor<?> constructor = bestMatch;
-
         final int length = constructor.getParameterTypes().length;
 
         if (length > contextArgs.length) {
@@ -160,7 +159,6 @@ class RapidGenerators {
         }
 
         final Method method = bestMatch;
-
         final int length = method.getParameterTypes().length;
 
         if (length > args.length) {
@@ -247,7 +245,6 @@ class RapidGenerators {
         }
 
         final Method method = bestMatch;
-
         final int length = method.getParameterTypes().length;
 
         if (length > args.length) {
@@ -332,7 +329,6 @@ class RapidGenerators {
         }
 
         final Constructor<?> constructor = bestMatch;
-
         final int length = constructor.getParameterTypes().length;
 
         if (length > contextArgs.length) {
@@ -404,7 +400,6 @@ class RapidGenerators {
         for (final Constructor<?> constructor : constructors) {
 
             final Class<?>[] params = constructor.getParameterTypes();
-
             final int length = params.length;
 
             int confidence = 0;
@@ -458,7 +453,6 @@ class RapidGenerators {
                             > annotatedDefaultCtorConfidence)) {
 
                         annotatedDefaultCtor = constructor;
-
                         annotatedDefaultCtorConfidence = confidence;
                     }
 
@@ -467,7 +461,6 @@ class RapidGenerators {
                     if ((defaultCtor == null) || (confidence > defaultCtorConfidence)) {
 
                         defaultCtor = constructor;
-
                         defaultCtorConfidence = confidence;
                     }
                 }
@@ -484,7 +477,6 @@ class RapidGenerators {
                                 > annotatedIntCtorConfidence)) {
 
                             annotatedIntCtor = constructor;
-
                             annotatedIntCtorConfidence = confidence;
                         }
 
@@ -493,7 +485,6 @@ class RapidGenerators {
                         if ((intCtor == null) || (confidence > intCtorConfidence)) {
 
                             intCtor = constructor;
-
                             intCtorConfidence = confidence;
                         }
                     }
@@ -506,7 +497,6 @@ class RapidGenerators {
                                 > annotatedIntegerCtorConfidence)) {
 
                             annotatedIntegerCtor = constructor;
-
                             annotatedIntegerCtorConfidence = confidence;
                         }
 
@@ -515,7 +505,6 @@ class RapidGenerators {
                         if ((integerCtor == null) || (confidence > integerCtorConfidence)) {
 
                             integerCtor = constructor;
-
                             integerCtorConfidence = confidence;
                         }
                     }
@@ -579,7 +568,6 @@ class RapidGenerators {
             }
 
             final Class<?>[] params = method.getParameterTypes();
-
             final int length = params.length;
 
             int confidence = 0;
@@ -633,7 +621,6 @@ class RapidGenerators {
                             > annotatedDefaultMethodConfidence)) {
 
                         annotatedDefaultMethod = method;
-
                         annotatedDefaultMethodConfidence = confidence;
                     }
 
@@ -642,7 +629,6 @@ class RapidGenerators {
                     if ((defaultMethod == null) || (confidence > defaultMethodConfidence)) {
 
                         defaultMethod = method;
-
                         defaultMethodConfidence = confidence;
                     }
                 }
@@ -659,7 +645,6 @@ class RapidGenerators {
                                 > annotatedIntMethodConfidence)) {
 
                             annotatedIntMethod = method;
-
                             annotatedIntMethodConfidence = confidence;
                         }
 
@@ -668,7 +653,6 @@ class RapidGenerators {
                         if ((intMethod == null) || (confidence > intMethodConfidence)) {
 
                             intMethod = method;
-
                             intMethodConfidence = confidence;
                         }
                     }
@@ -681,7 +665,6 @@ class RapidGenerators {
                                 > annotatedIntegerMethodConfidence)) {
 
                             annotatedIntegerMethod = method;
-
                             annotatedIntegerMethodConfidence = confidence;
                         }
 
@@ -690,7 +673,6 @@ class RapidGenerators {
                         if ((integerMethod == null) || (confidence > integerMethodConfidence)) {
 
                             integerMethod = method;
-
                             integerMethodConfidence = confidence;
                         }
                     }

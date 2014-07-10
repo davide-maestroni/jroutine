@@ -92,13 +92,11 @@ class Barrage<SOURCE, DATA> extends AbstractLeap<SOURCE, DATA, DATA> {
 
         synchronized (mMutex) {
 
-            int stream = mStartStream;
-
             final int[] levels = mStreamLevels;
-
-            int minLevel = levels[stream];
-
             final int length = levels.length;
+
+            int stream = mStartStream;
+            int minLevel = levels[stream];
 
             mStartStream = (stream + 1) % length;
 
@@ -129,7 +127,6 @@ class Barrage<SOURCE, DATA> extends AbstractLeap<SOURCE, DATA, DATA> {
         long sum = 0;
 
         final int[] levels = mStreamLevels;
-
         final int length = levels.length;
 
         //noinspection ForLoopReplaceableByForEach

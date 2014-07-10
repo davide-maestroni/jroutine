@@ -719,7 +719,6 @@ class LockRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
         }
 
         final DataLock dataLock = mDataLock;
-
         mDataLock = null;
 
         lock.unlock();
@@ -733,7 +732,6 @@ class LockRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     void open(final DataLock lock) {
 
         mLock.lock();
-
         mDataLock = lock;
     }
 

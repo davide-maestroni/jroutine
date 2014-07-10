@@ -99,7 +99,6 @@ class DefaultRapidRiver<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallRiver<SOU
         int confidenceLevel = -1;
 
         final int length = args.length;
-
         final Class<?>[] argClasses = new Class[length];
 
         for (int i = 0; i < length; ++i) {
@@ -179,7 +178,6 @@ class DefaultRapidRiver<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallRiver<SOU
                     if (confidence > confidenceLevel) {
 
                         conditionMethod = method;
-
                         confidenceLevel = confidence;
 
                     } else if (confidence == confidenceLevel) {
@@ -677,7 +675,6 @@ class DefaultRapidRiver<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallRiver<SOU
     private Gate<TYPE> getGate() {
 
         final TYPE gateLeap = mGateLeap;
-
         final long timeoutMs = mTimeoutMs;
 
         final Gate<TYPE> gate;
@@ -734,7 +731,6 @@ class DefaultRapidRiver<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallRiver<SOU
             if (mCondition == null) {
 
                 final Object[] args = mArgs;
-
                 final Class<?> type = leap.getClass();
 
                 Method condition = findCondition(type.getMethods(), args);

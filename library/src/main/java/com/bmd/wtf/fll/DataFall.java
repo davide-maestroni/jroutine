@@ -112,7 +112,6 @@ class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
     public void discharge(final Stream<IN> origin) {
 
         final ReentrantLock lock = mLock;
-
         lock.lock();
 
         try {
@@ -231,7 +230,6 @@ class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
         int dischargeCount = 0;
 
         final ReentrantLock lock = mLock;
-
         lock.lock();
 
         try {
@@ -259,7 +257,6 @@ class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
     void raiseLevel(final int count) {
 
         final ReentrantLock lock = mLock;
-
         lock.lock();
 
         try {

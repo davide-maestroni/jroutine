@@ -55,9 +55,8 @@ class GateLeap<SOURCE, IN, OUT> extends LeapDecorator<SOURCE, IN, OUT> {
     public void onDischarge(final River<SOURCE, IN> upRiver, final River<SOURCE, OUT> downRiver,
             final int fallNumber) {
 
-        final ReentrantLock gateLock = lock;
-
-        gateLock.lock();
+        final ReentrantLock lock = this.lock;
+        lock.lock();
 
         try {
 
@@ -67,7 +66,7 @@ class GateLeap<SOURCE, IN, OUT> extends LeapDecorator<SOURCE, IN, OUT> {
 
             condition.signalAll();
 
-            gateLock.unlock();
+            lock.unlock();
         }
     }
 
@@ -75,9 +74,8 @@ class GateLeap<SOURCE, IN, OUT> extends LeapDecorator<SOURCE, IN, OUT> {
     public void onPush(final River<SOURCE, IN> upRiver, final River<SOURCE, OUT> downRiver,
             final int fallNumber, final IN drop) {
 
-        final ReentrantLock gateLock = lock;
-
-        gateLock.lock();
+        final ReentrantLock lock = this.lock;
+        lock.lock();
 
         try {
 
@@ -87,7 +85,7 @@ class GateLeap<SOURCE, IN, OUT> extends LeapDecorator<SOURCE, IN, OUT> {
 
             condition.signalAll();
 
-            gateLock.unlock();
+            lock.unlock();
         }
     }
 
@@ -95,9 +93,8 @@ class GateLeap<SOURCE, IN, OUT> extends LeapDecorator<SOURCE, IN, OUT> {
     public void onUnhandled(final River<SOURCE, IN> upRiver, final River<SOURCE, OUT> downRiver,
             final int fallNumber, final Throwable throwable) {
 
-        final ReentrantLock gateLock = lock;
-
-        gateLock.lock();
+        final ReentrantLock lock = this.lock;
+        lock.lock();
 
         try {
 
@@ -107,7 +104,7 @@ class GateLeap<SOURCE, IN, OUT> extends LeapDecorator<SOURCE, IN, OUT> {
 
             condition.signalAll();
 
-            gateLock.unlock();
+            lock.unlock();
         }
     }
 }

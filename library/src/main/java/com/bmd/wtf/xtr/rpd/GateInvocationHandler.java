@@ -18,7 +18,6 @@ import com.bmd.wtf.flw.Gate.Action;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.lang.reflect.UndeclaredThrowableException;
 
 /**
  * Invocation handler used to handle a gate proxy method invocations.
@@ -48,10 +47,9 @@ class GateInvocationHandler<TYPE> implements InvocationHandler, Action<Object, T
 
             return ((Method) args[0]).invoke(leap, (Object[]) args[1]);
 
-        } catch (final Throwable t) {
+        } catch (final ReflectiveOperationException e) {
 
-            //TODO: test if we can let exceptions pass through
-            throw new UndeclaredThrowableException(t);
+            throw new RapidException(e);
         }
     }
 

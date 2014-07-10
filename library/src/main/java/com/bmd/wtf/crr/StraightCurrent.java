@@ -63,7 +63,6 @@ public class StraightCurrent implements Current {
             long timeToWait = timeUnit.toMillis(delay);
 
             final long startTime = System.currentTimeMillis();
-
             final long endTime = startTime + timeToWait;
 
             do {
@@ -93,7 +92,6 @@ public class StraightCurrent implements Current {
             long timeToWait = timeUnit.toMillis(delay);
 
             final long startTime = System.currentTimeMillis();
-
             final long endTime = startTime + timeToWait;
 
             do {

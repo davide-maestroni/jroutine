@@ -248,7 +248,6 @@ class DataStream<DATA> implements Stream<DATA> {
         }
 
         final DataFall<?, DATA, ?> fall = mDownstreamFall;
-
         final ArrayList<DATA> list = new ArrayList<DATA>();
 
         for (final DATA drop : drops) {

@@ -21,6 +21,7 @@ import com.bmd.wtf.lps.LeapGenerator;
 import com.bmd.wtf.xtr.rpd.RapidAnnotations.Generator;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
@@ -178,9 +179,13 @@ class RapidGenerators {
 
                         return (Current) method.invoke(generator, args);
 
-                    } catch (final Throwable t) {
+                    } catch (final InvocationTargetException e) {
 
-                        throw new RuntimeException(t);
+                        throw new RapidException(e.getCause());
+
+                    } catch (final IllegalAccessException e) {
+
+                        throw new RapidException(e);
                     }
                 }
             };
@@ -195,9 +200,13 @@ class RapidGenerators {
 
                     return (Current) method.invoke(generator, args);
 
-                } catch (final Throwable t) {
+                } catch (final InvocationTargetException e) {
 
-                    throw new RuntimeException(t);
+                    throw new RapidException(e.getCause());
+
+                } catch (final IllegalAccessException e) {
+
+                    throw new RapidException(e);
                 }
             }
         };
@@ -265,9 +274,13 @@ class RapidGenerators {
                         //noinspection unchecked
                         return (Leap<SOURCE, IN, OUT>) method.invoke(generator, args);
 
-                    } catch (final Throwable t) {
+                    } catch (final InvocationTargetException e) {
 
-                        throw new RuntimeException(t);
+                        throw new RapidException(e.getCause());
+
+                    } catch (final IllegalAccessException e) {
+
+                        throw new RapidException(e);
                     }
                 }
             };
@@ -283,9 +296,13 @@ class RapidGenerators {
                     //noinspection unchecked
                     return (Leap<SOURCE, IN, OUT>) method.invoke(generator, args);
 
-                } catch (final Throwable t) {
+                } catch (final InvocationTargetException e) {
 
-                    throw new RuntimeException(t);
+                    throw new RapidException(e.getCause());
+
+                } catch (final IllegalAccessException e) {
+
+                    throw new RapidException(e);
                 }
             }
         };

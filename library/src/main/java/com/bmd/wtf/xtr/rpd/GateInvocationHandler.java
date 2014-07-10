@@ -17,6 +17,7 @@ import com.bmd.wtf.flw.Gate;
 import com.bmd.wtf.flw.Gate.Action;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
@@ -47,7 +48,11 @@ class GateInvocationHandler<TYPE> implements InvocationHandler, Action<Object, T
 
             return ((Method) args[0]).invoke(leap, (Object[]) args[1]);
 
-        } catch (final ReflectiveOperationException e) {
+        } catch (final InvocationTargetException e) {
+
+            throw new RapidException(e.getCause());
+
+        } catch (final IllegalAccessException e) {
 
             throw new RapidException(e);
         }

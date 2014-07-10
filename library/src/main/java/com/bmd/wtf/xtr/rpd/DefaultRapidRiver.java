@@ -19,9 +19,9 @@ import com.bmd.wtf.fll.WaterfallRiver;
 import com.bmd.wtf.flw.Gate;
 import com.bmd.wtf.xtr.rpd.RapidAnnotations.Condition;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.lang.reflect.UndeclaredThrowableException;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
@@ -720,9 +720,13 @@ class DefaultRapidRiver<SOURCE, MOUTH, IN, OUT, TYPE> extends WaterfallRiver<SOU
 
                 return (Boolean) getCondition(leap).invoke(leap, mArgs);
 
-            } catch (final Throwable t) {
+            } catch (final InvocationTargetException e) {
 
-                throw new UndeclaredThrowableException(t);
+                throw new RapidException(e.getCause());
+
+            } catch (final IllegalAccessException e) {
+
+                throw new RapidException(e);
             }
         }
 

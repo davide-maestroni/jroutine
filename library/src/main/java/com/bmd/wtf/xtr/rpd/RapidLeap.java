@@ -17,10 +17,10 @@ import com.bmd.wtf.fll.Classification;
 import com.bmd.wtf.flw.River;
 import com.bmd.wtf.lps.Leap;
 import com.bmd.wtf.xtr.rpd.RapidAnnotations.OnData;
-import com.bmd.wtf.xtr.rpd.RapidAnnotations.OnDischarge;
-import com.bmd.wtf.xtr.rpd.RapidAnnotations.OnNull;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -50,10 +50,6 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
     private River<SOURCE, Object> mDownRiver;
 
     private int mFallNumber;
-
-    private Method mOnDischarge;
-
-    private Method mOnNull;
 
     private River<SOURCE, Object> mUpRiver;
 
@@ -118,23 +114,23 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
 
         setup(upRiver, downRiver, fallNumber);
 
-        final Method onDischarge = mOnDischarge;
+        final Method method = mMethodMap.get(Discharge.class);
 
-        if (onDischarge != null) {
+        if (method != null) {
 
             try {
 
-                final Object result = onDischarge.invoke(this);
-                final Class<?> returnType = onDischarge.getReturnType();
+                final Object result = method.invoke(mTarget, (Discharge) null);
 
-                if (!returnType.equals(void.class)) {
+                propagateResult(downRiver, method.getReturnType(), result);
 
-                    downRiver.push(result).discharge();
-                }
+            } catch (final InvocationTargetException e) {
 
-            } catch (final Throwable t) {
+                throw new RapidException(e.getCause());
 
-                throw new RapidException(t);
+            } catch (final IllegalAccessException e) {
+
+                throw new RapidException(e);
             }
 
         } else {
@@ -149,57 +145,37 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
 
         setup(upRiver, downRiver, fallNumber);
 
-        if (drop == null) {
+        final Method method;
 
-            final Method onNull = mOnNull;
+        if (drop != null) {
 
-            if (onNull != null) {
-
-                try {
-
-                    final Object result = onNull.invoke(this);
-                    final Class<?> returnType = onNull.getReturnType();
-
-                    if (!returnType.equals(void.class)) {
-
-                        downRiver.push(result);
-                    }
-
-                } catch (final Throwable t) {
-
-                    throw new RapidException(t);
-                }
-
-            } else {
-
-                downRiver.push((Object) null);
-            }
-
-            return;
-        }
-
-        final Method method = findMethod(drop);
-
-        if (method == null) {
-
-            downRiver.push(drop);
+            method = findMethod(drop.getClass());
 
         } else {
 
+            method = mMethodMap.get(Void.class);
+        }
+
+        if (method != null) {
+
             try {
 
-                final Object result = method.invoke(this, drop);
-                final Class<?> returnType = method.getReturnType();
+                final Object result = method.invoke(mTarget, drop);
 
-                if (!returnType.equals(void.class)) {
+                propagateResult(downRiver, method.getReturnType(), result);
 
-                    downRiver.push(result);
-                }
+            } catch (final InvocationTargetException e) {
 
-            } catch (final Throwable t) {
+                throw new RapidException(e.getCause());
 
-                throw new RapidException(t);
+            } catch (final IllegalAccessException e) {
+
+                throw new RapidException(e);
             }
+
+        } else {
+
+            downRiver.push(drop);
         }
     }
 
@@ -210,57 +186,37 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
 
         setup(upRiver, downRiver, fallNumber);
 
-        if (throwable == null) {
+        final Method method;
 
-            final Method onNull = mOnNull;
+        if (throwable != null) {
 
-            if (onNull != null) {
-
-                try {
-
-                    final Object result = onNull.invoke(this);
-                    final Class<?> returnType = onNull.getReturnType();
-
-                    if (!returnType.equals(void.class)) {
-
-                        downRiver.push(result);
-                    }
-
-                } catch (final Throwable t) {
-
-                    throw new RapidException(t);
-                }
-
-            } else {
-
-                downRiver.forward(null);
-            }
-
-            return;
-        }
-
-        final Method method = findMethod(throwable);
-
-        if (method == null) {
-
-            downRiver.forward(throwable);
+            method = findMethod(throwable.getClass());
 
         } else {
 
+            method = mMethodMap.get(Void.class);
+        }
+
+        if (method != null) {
+
             try {
 
-                final Object result = method.invoke(this, throwable);
-                final Class<?> returnType = method.getReturnType();
+                final Object result = method.invoke(mTarget, throwable);
 
-                if (!returnType.equals(void.class)) {
+                propagateResult(downRiver, method.getReturnType(), result);
 
-                    downRiver.push(result);
-                }
+            } catch (final InvocationTargetException e) {
 
-            } catch (final Throwable t) {
+                throw new RapidException(e.getCause());
 
-                throw new RapidException(t);
+            } catch (final IllegalAccessException e) {
+
+                throw new RapidException(e);
             }
+
+        } else {
+
+            downRiver.forward(throwable);
         }
     }
 
@@ -309,79 +265,80 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
 
     private void fillMethods() {
 
-        final Class<?> objectClass = mTarget.getClass();
-        final Method[] methods = objectClass.getMethods();
-        final Method[] declaredMethods = objectClass.getDeclaredMethods();
+        final Class<RapidLeap> rapidLeapClass = RapidLeap.class;
+        final Class<Object> objectClass = Object.class;
 
-        final HashMap<Class<?>, Method> methodMap = mMethodMap;
+        final HashMap<Class<?>, Method> globalMap = mMethodMap;
 
-        fillOnData(methods, methodMap);
+        Class<?> type = mTarget.getClass();
 
-        for (final Method method : methodMap.values()) {
+        while (!rapidLeapClass.equals(type) && !objectClass.equals(type)) {
 
-            if (!method.isAccessible()) {
+            final Method[] methods = type.getDeclaredMethods();
 
-                method.setAccessible(true);
-            }
-        }
+            for (Entry<Class<?>, Method> entry : getMethods(methods).entrySet()) {
 
-        final HashMap<Class<?>, Method> declaredMethodMap = new HashMap<Class<?>, Method>();
+                final Class<?> dropType = entry.getKey();
 
-        fillOnData(declaredMethods, declaredMethodMap);
+                if (globalMap.containsKey(dropType)) {
 
-        for (final Entry<Class<?>, Method> entry : declaredMethodMap.entrySet()) {
-
-            final Class<?> key = entry.getKey();
-
-            if (!methodMap.containsKey(key)) {
+                    continue;
+                }
 
                 final Method method = entry.getValue();
 
                 if (!method.isAccessible()) {
 
-                    method.setAccessible(true);
+                    if (method.isAnnotationPresent(OnData.class) || (
+                            (method.getModifiers() & Modifier.PUBLIC) != 0)) {
+
+                        method.setAccessible(true);
+
+                    } else {
+
+                        continue;
+                    }
                 }
 
-                methodMap.put(key, method);
-            }
-        }
-
-        Method onNull = fillOnNull(methods);
-
-        if (onNull == null) {
-
-            onNull = fillOnNull(declaredMethods);
-        }
-
-        if (onNull != null) {
-
-            if (!onNull.isAccessible()) {
-
-                onNull.setAccessible(true);
+                globalMap.put(dropType, method);
             }
 
-            mOnNull = onNull;
-        }
-
-        Method onDischarge = fillOnDischarge(methods);
-
-        if (onDischarge == null) {
-
-            onDischarge = fillOnDischarge(declaredMethods);
-        }
-
-        if (onDischarge != null) {
-
-            if (!onDischarge.isAccessible()) {
-
-                onDischarge.setAccessible(true);
-            }
-
-            mOnDischarge = onDischarge;
+            type = type.getSuperclass();
         }
     }
 
-    private void fillOnData(final Method[] methods, final Map<Class<?>, Method> methodMap) {
+    private Method findMethod(final Class<?> dropType) {
+
+        final HashMap<Class<?>, Method> methodMap = mMethodMap;
+
+        Method method = methodMap.get(dropType);
+
+        if (method == null) {
+
+            Class<?> bestMatch = null;
+
+            for (final Entry<Class<?>, Method> entry : methodMap.entrySet()) {
+
+                final Class<?> type = entry.getKey();
+
+                if (type.isAssignableFrom(dropType)) {
+
+                    if ((bestMatch == null) || bestMatch.isAssignableFrom(type)) {
+
+                        method = entry.getValue();
+
+                        bestMatch = type;
+                    }
+                }
+            }
+        }
+
+        return method;
+    }
+
+    private Map<Class<?>, Method> getMethods(final Method[] methods) {
+
+        final HashMap<Class<?>, Method> methodMap = new HashMap<Class<?>, Method>(methods.length);
 
         final boolean isAnnotatedOnly = mIsAnnotatedOnly;
 
@@ -406,29 +363,9 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
                 }
             }
 
-            if (!isAnnotated) {
+            if (!isAnnotated && isAnnotatedOnly) {
 
-                if (isAnnotatedOnly) {
-
-                    continue;
-                }
-
-                final String methodName = method.getName();
-
-                if (!methodName.startsWith("on")) {
-
-                    continue;
-                }
-
-                if (methodName.length() > 2) {
-
-                    final char c = methodName.charAt(2);
-
-                    if (!Character.isDigit(c) && !Character.isUpperCase(c)) {
-
-                        continue;
-                    }
-                }
+                continue;
             }
 
             final Class<?> parameterType = parameterTypes[0];
@@ -438,126 +375,36 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
 
                 throw new IllegalArgumentException(
                         "cannot override a method already handling data of type: "
-                                + parameterType.getSimpleName()
+                                + parameterType.getCanonicalName()
                 );
             }
 
             methodMap.put(parameterType, method);
         }
+
+        return methodMap;
     }
 
-    private Method fillOnDischarge(final Method[] methods) {
+    private void propagateResult(final River<SOURCE, Object> downRiver, final Class<?> returnType,
+            final Object result) {
 
-        Method onDischarge = null;
+        if (!returnType.equals(void.class)) {
 
-        final boolean isAnnotatedOnly = mIsAnnotatedOnly;
+            final Class<Throwable> throwableClass = Throwable.class;
 
-        for (final Method method : methods) {
+            if (throwableClass.isAssignableFrom(returnType)) {
 
-            final Class<?>[] parameterTypes = method.getParameterTypes();
-            final boolean isAnnotated = method.isAnnotationPresent(OnDischarge.class);
+                downRiver.forward(throwableClass.cast(result));
 
-            if (parameterTypes.length != 0) {
+            } else if (Discharge.class.isAssignableFrom(returnType)) {
 
-                if (isAnnotated) {
+                downRiver.discharge();
 
-                    throw new IllegalArgumentException(
-                            "invalid annotated method: " + method + "\nAn "
-                                    + OnDischarge.class.getSimpleName()
-                                    + " method must take no parameters"
-                    );
+            } else {
 
-                } else {
-
-                    continue;
-                }
-            }
-
-            if (!isAnnotated && (isAnnotatedOnly || !method.getName().equals("onDischarge"))) {
-
-                continue;
-            }
-
-            if ((onDischarge != null) && !onDischarge.equals(method)) {
-
-                throw new IllegalArgumentException(
-                        "cannot override a method already handling data discharge");
-            }
-
-            onDischarge = method;
-        }
-
-        return onDischarge;
-    }
-
-    private Method fillOnNull(final Method[] methods) {
-
-        Method onNull = null;
-
-        final boolean isAnnotatedOnly = mIsAnnotatedOnly;
-
-        for (final Method method : methods) {
-
-            final Class<?>[] parameterTypes = method.getParameterTypes();
-            final boolean isAnnotated = method.isAnnotationPresent(OnNull.class);
-
-            if (parameterTypes.length != 0) {
-
-                if (isAnnotated) {
-
-                    throw new IllegalArgumentException(
-                            "invalid annotated method: " + method + "\nAn "
-                                    + OnData.class.getSimpleName()
-                                    + " method must take a single parameter"
-                    );
-
-                } else {
-
-                    continue;
-                }
-            }
-
-            if (!isAnnotated && (isAnnotatedOnly || !method.getName().equals("onNull"))) {
-
-                continue;
-            }
-
-            if ((onNull != null) && !onNull.equals(method)) {
-
-                throw new IllegalArgumentException(
-                        "cannot override a method already handling null data");
-            }
-
-            onNull = method;
-        }
-
-        return onNull;
-    }
-
-    private Method findMethod(final Object drop) {
-
-        final Class<?> dropClass = drop.getClass();
-
-        Method method = null;
-
-        Class<?> bestMatch = null;
-
-        for (final Entry<Class<?>, Method> entry : mMethodMap.entrySet()) {
-
-            final Class<?> type = entry.getKey();
-
-            if (dropClass.isAssignableFrom(type)) {
-
-                if ((bestMatch == null) || type.isAssignableFrom(bestMatch)) {
-
-                    method = entry.getValue();
-
-                    bestMatch = type;
-                }
+                downRiver.push(result);
             }
         }
-
-        return method;
     }
 
     private void setup(final River<SOURCE, Object> upRiver, final River<SOURCE, Object> downRiver,
@@ -566,5 +413,15 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
         mUpRiver = upRiver;
         mDownRiver = downRiver;
         mFallNumber = fallNumber;
+    }
+
+    /**
+     * Non-instantiable class used to identified the method responsible for handling discharge notifications.
+     */
+    public static final class Discharge {
+
+        private Discharge() {
+
+        }
     }
 }

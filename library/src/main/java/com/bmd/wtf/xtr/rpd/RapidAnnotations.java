@@ -42,16 +42,4 @@ public interface RapidAnnotations {
     public @interface OnData {
 
     }
-
-    @Target({ElementType.METHOD})
-    @Retention(RetentionPolicy.RUNTIME)
-    public @interface OnDischarge {
-
-    }
-
-    @Target({ElementType.METHOD})
-    @Retention(RetentionPolicy.RUNTIME)
-    public @interface OnNull {
-
-    }
 }

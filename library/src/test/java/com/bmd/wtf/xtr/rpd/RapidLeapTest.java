@@ -13,6 +13,7 @@
  */
 package com.bmd.wtf.xtr.rpd;
 
+import com.bmd.wtf.fll.Classification;
 import com.bmd.wtf.fll.Waterfall;
 import com.bmd.wtf.flw.Collector;
 import com.bmd.wtf.flw.River;
@@ -82,6 +83,58 @@ public class RapidLeapTest extends TestCase {
 
             assertThat(((RapidException) e).getCause()).isEqualTo(new MyException());
         }
+
+        try {
+
+            fall().start(RapidLeap.from(new RapidLeapError1()));
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            fall().start(RapidLeap.from(new RapidLeapError2()));
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            fall().start(RapidLeap.from(new RapidLeapError3()));
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        final Waterfall<Object, Object, Object> fall2 =
+                fall().start(RapidLeap.from(new RapidLeapError4()))
+                      .chain(new FreeLeap<Object, Object>() {
+
+                                 @Override
+                                 public void onUnhandled(final River<Object, Object> upRiver,
+                                         final River<Object, Object> downRiver,
+                                         final int fallNumber, final Throwable throwable) {
+
+                                     downRiver.push(throwable);
+                                 }
+                             }
+                      );
+        final Collector<Object> collector2 = fall2.collect();
+
+        fall2.source().push("11", null).forward(new IllegalArgumentException()).discharge();
+
+        for (final Object e : collector2.now().all()) {
+
+            assertThat(((RapidException) e).getCause()).isEqualTo(new MyException());
+        }
     }
 
     public void testInherit() {
@@ -133,6 +186,76 @@ public class RapidLeapTest extends TestCase {
                         downRiver.push(throwable);
                     }
                 });
+        final Collector<Object> collector4 = fall2.collect();
+
+        fall2.source().forward(new IllegalArgumentException()).discharge();
+        assertThat(collector4.next()).isExactlyInstanceOf(IllegalArgumentException.class);
+    }
+
+    public void testWrap() {
+
+        assertThat(fall().start(RapidLeap.from(new RapidLeapTest1(), Object.class))
+                         .pull("11", 27, 37.1, null)
+                         .all()).containsExactly(11, "27", "37.1", null);
+        assertThat(fall().start(
+                RapidLeap.from(new RapidLeapTest2(), Classification.ofType(Object.class)))
+                         .pull("11", 27, 37.1, null)
+                         .all()).containsExactly(13, "-27", "37.1", "");
+        assertThat(
+                fall().start(RapidLeap.from(new RapidLeapTest3())).pull("11", 27, 37.1, null).all())
+                .containsExactly(11, "27", "37.1", null);
+        assertThat(fall().start(RapidLeap.fromAnnotated(new RapidLeapTest3()))
+                         .pull("11", 27, 37.1, null)
+                         .all()).containsExactly(11, "27", 37.1, null);
+        assertThat(fall().start(RapidLeap.fromAnnotated(new RapidLeapTest3(), Object.class))
+                         .pull("11", 27, 37.1, null)
+                         .all()).containsExactly(11, "27", 37.1, null);
+        assertThat(fall().start(
+                RapidLeap.fromAnnotated(new RapidLeapTest3(), Classification.ofType(Object.class)))
+                         .pull("11", 27, 37.1, null)
+                         .all()).containsExactly(11, "27", 37.1, null);
+
+        final Waterfall<Object, Object, Object> fall1 =
+                fall().start(RapidLeap.from(new RapidLeapTest4()))
+                      .chain(new FreeLeap<Object, Object>() {
+
+                                 @Override
+                                 public void onUnhandled(final River<Object, Object> upRiver,
+                                         final River<Object, Object> downRiver,
+                                         final int fallNumber, final Throwable throwable) {
+
+                                     downRiver.push(throwable);
+                                 }
+                             }
+                      );
+        final Collector<Object> collector1 = fall1.collect();
+
+        fall1.source().push("11", 27, 37.1, null);
+        assertThat(collector1.all()).containsExactly(13, new MyException(), "37.1");
+
+        final Collector<Object> collector2 = fall1.collect();
+
+        fall1.source().forward(new IllegalArgumentException()).discharge();
+        assertThat(collector2.all()).containsExactly(new MyException());
+
+        final Collector<Object> collector3 = fall1.collect();
+
+        fall1.source().forward(null);
+        assertThat(collector3.all()).isEmpty();
+
+        final Waterfall<Object, Object, Object> fall2 =
+                fall().start(RapidLeap.from(new RapidLeapTest5()))
+                      .chain(new FreeLeap<Object, Object>() {
+
+                                 @Override
+                                 public void onUnhandled(final River<Object, Object> upRiver,
+                                         final River<Object, Object> downRiver,
+                                         final int fallNumber, final Throwable throwable) {
+
+                                     downRiver.push(throwable);
+                                 }
+                             }
+                      );
         final Collector<Object> collector4 = fall2.collect();
 
         fall2.source().forward(new IllegalArgumentException()).discharge();

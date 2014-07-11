@@ -23,6 +23,7 @@ import com.bmd.wtf.xtr.rpd.RapidAnnotations.Generator;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 
 /**
  * Utility class providing a factory of current generators.
@@ -30,6 +31,23 @@ import java.lang.reflect.Method;
  * Created by davide on 6/19/14.
  */
 class RapidGenerators {
+
+    private static final HashMap<Class<?>, Class<?>> sBoxMap = new HashMap<Class<?>, Class<?>>(9);
+
+    static {
+
+        final HashMap<Class<?>, Class<?>> boxMap = sBoxMap;
+
+        boxMap.put(boolean.class, Boolean.class);
+        boxMap.put(byte.class, Byte.class);
+        boxMap.put(char.class, Character.class);
+        boxMap.put(double.class, Double.class);
+        boxMap.put(float.class, Float.class);
+        boxMap.put(int.class, Integer.class);
+        boxMap.put(long.class, Long.class);
+        boxMap.put(short.class, Short.class);
+        boxMap.put(void.class, Void.class);
+    }
 
     /**
      * Avoid direct instantiation.
@@ -95,9 +113,17 @@ class RapidGenerators {
 
                         return (Current) constructor.newInstance(args);
 
-                    } catch (final Throwable t) {
+                    } catch (final InstantiationException e) {
 
-                        throw new RuntimeException(t);
+                        throw new RapidException(e);
+
+                    } catch (final InvocationTargetException e) {
+
+                        throw new RapidException(e.getCause());
+
+                    } catch (final IllegalAccessException e) {
+
+                        throw new RapidException(e);
                     }
                 }
             };
@@ -112,9 +138,17 @@ class RapidGenerators {
 
                     return (Current) constructor.newInstance(contextArgs);
 
-                } catch (final Throwable t) {
+                } catch (final InstantiationException e) {
 
-                    throw new RuntimeException(t);
+                    throw new RapidException(e);
+
+                } catch (final InvocationTargetException e) {
+
+                    throw new RapidException(e.getCause());
+
+                } catch (final IllegalAccessException e) {
+
+                    throw new RapidException(e);
                 }
             }
         };
@@ -366,9 +400,17 @@ class RapidGenerators {
                         //noinspection unchecked
                         return (Leap<SOURCE, IN, OUT>) constructor.newInstance(args);
 
-                    } catch (final Throwable t) {
+                    } catch (final InstantiationException e) {
 
-                        throw new RuntimeException(t);
+                        throw new RapidException(e);
+
+                    } catch (final InvocationTargetException e) {
+
+                        throw new RapidException(e.getCause());
+
+                    } catch (final IllegalAccessException e) {
+
+                        throw new RapidException(e);
                     }
                 }
             };
@@ -384,12 +426,30 @@ class RapidGenerators {
                     //noinspection unchecked
                     return (Leap<SOURCE, IN, OUT>) constructor.newInstance(contextArgs);
 
-                } catch (final Throwable t) {
+                } catch (final InstantiationException e) {
 
-                    throw new RuntimeException(t);
+                    throw new RapidException(e);
+
+                } catch (final InvocationTargetException e) {
+
+                    throw new RapidException(e.getCause());
+
+                } catch (final IllegalAccessException e) {
+
+                    throw new RapidException(e);
                 }
             }
         };
+    }
+
+    private static Class<?> boxedClass(final Class<?> type) {
+
+        if (!type.isPrimitive()) {
+
+            return type;
+        }
+
+        return sBoxMap.get(type);
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -435,7 +495,7 @@ class RapidGenerators {
 
                 if (contextArg != null) {
 
-                    if (!param.isInstance(contextArg)) {
+                    if (!boxedClass(param).isInstance(contextArg)) {
 
                         isValid = false;
 
@@ -603,7 +663,7 @@ class RapidGenerators {
 
                 if (contextArg != null) {
 
-                    if (!param.isInstance(contextArg)) {
+                    if (!boxedClass(param).isInstance(contextArg)) {
 
                         isValid = false;
 

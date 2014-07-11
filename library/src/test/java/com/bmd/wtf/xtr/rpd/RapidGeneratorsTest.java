@@ -122,10 +122,14 @@ public class RapidGeneratorsTest extends TestCase {
         assertThat(((CurrentX) Rapid.currentGenerator(CurrentX.class, this, new ArrayList<Object>(),
                                                       null, 2).create(1)).getNumber()
         ).isEqualTo(46);
+        assertThat(
+                ((Current2) Rapid.currentGenerator(CurrentX1.class, this, new ArrayList<Object>(),
+                                                   null, 4).create(1)).getNumber()
+        ).isEqualTo(81);
 
         try {
 
-            Rapid.currentGenerator(CurrentX1.class, this, new ArrayList<Object>(), null, 4);
+            Rapid.currentGenerator(CurrentX1.class, this, new ArrayList<Object>(), null, 4, "test");
 
             fail();
 
@@ -256,10 +260,14 @@ public class RapidGeneratorsTest extends TestCase {
         assertThat(((LeapX) Rapid.leapGenerator(LeapX.class, this, new ArrayList<Object>(), null, 2)
                                  .start(1)).getNumber()
         ).isEqualTo(46);
+        assertThat(
+                ((Leap2) Rapid.leapGenerator(LeapX1.class, this, new ArrayList<Object>(), null, 4)
+                              .start(1)).getNumber()
+        ).isEqualTo(81);
 
         try {
 
-            Rapid.leapGenerator(LeapX1.class, this, new ArrayList<Object>(), null, 4);
+            Rapid.leapGenerator(LeapX1.class, this, new ArrayList<Object>(), null, 4, "test");
 
             fail();
 

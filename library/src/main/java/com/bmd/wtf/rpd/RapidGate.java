@@ -14,53 +14,33 @@
 package com.bmd.wtf.rpd;
 
 import com.bmd.wtf.fll.Classification;
-import com.bmd.wtf.flw.Gate.ConditionEvaluator;
+import com.bmd.wtf.flw.Gate;
 
 import java.util.concurrent.TimeUnit;
 
 /**
- * Interface extending a gate. TODo
+ * Interface extending a gate. TODO
  * <p/>
  * Created by davide on 7/4/14.
  *
  * @param <TYPE> The backed leap type.
  */
-public interface RapidGate<TYPE> {
+public interface RapidGate<TYPE> extends Gate<TYPE> {
 
-    /**
-     * Tells the gate to fail if the condition is not met before the specified time has elapsed.
-     *
-     * @param maxDelay The maximum delay in the specified time unit.
-     * @param timeUnit The delay time unit.
-     * @return This gate.
-     * @see #when(ConditionEvaluator)
-     */
+    @Override
     public RapidGate<TYPE> afterMax(long maxDelay, TimeUnit timeUnit);
 
-    /**
-     * Tells the gate to wait indefinitely for the condition to be met.
-     *
-     * @return This gate.
-     * @see #when(ConditionEvaluator)
-     */
+    @Override
     public RapidGate<TYPE> eventually();
 
-    /**
-     * Tells the gate to throw the specified exception if the maximum delay elapses before the
-     * condition is met.
-     *
-     * @param exception The exception to be thrown.
-     * @return This gate.
-     * @see #when(ConditionEvaluator)
-     */
+    @Override
     public RapidGate<TYPE> eventuallyThrow(RuntimeException exception);
 
-    /**
-     * Tells the collector to fail if the condition is not immediately met.
-     *
-     * @return This collector.
-     */
+    @Override
     public RapidGate<TYPE> immediately();
+
+    @Override
+    public RapidGate<TYPE> when(final ConditionEvaluator<? super TYPE> evaluator);
 
     /**
      * Returns the gate wrapped so to be accessed in a thread safe way.
@@ -92,16 +72,6 @@ public interface RapidGate<TYPE> {
      * @return The wrapped gate.
      */
     public <NTYPE> NTYPE performAs(Classification<NTYPE> gateClassification);
-
-    /**
-     * Sets the condition to be met by the leap backing this gate.
-     * <p/>
-     * A null condition (as by default) is always immediately met.
-     *
-     * @param evaluator The condition evaluator.
-     * @return This gate.
-     */
-    public RapidGate<TYPE> when(final ConditionEvaluator<? super TYPE> evaluator);
 
     /**
      * Sets the condition to be met by this gate by searching a suitable method via reflection.

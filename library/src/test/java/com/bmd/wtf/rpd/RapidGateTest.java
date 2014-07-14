@@ -15,6 +15,7 @@ package com.bmd.wtf.rpd;
 
 import com.bmd.wtf.fll.Classification;
 import com.bmd.wtf.fll.Waterfall;
+import com.bmd.wtf.flw.Gate.Action;
 import com.bmd.wtf.flw.Gate.ConditionEvaluator;
 import com.bmd.wtf.lps.FreeLeap;
 import com.bmd.wtf.rpd.RapidAnnotations.Condition;
@@ -207,6 +208,22 @@ public class RapidGateTest extends TestCase {
                         .whenSatisfies(44)
                         .performAs(GateId.class)
                         .getId()
+        ).isEqualTo(71);
+
+        assertThat(Rapid.gate(fall().inBackground()
+                                    .asGate()
+                                    .start(new GateLeap4())
+                                    .on(GateLeap2.class))
+                        .eventually()
+                        .whenSatisfies(44)
+                        .perform(new Action<Integer, GateLeap2>() {
+
+                            @Override
+                            public Integer doOn(final GateLeap2 leap, final Object... args) {
+
+                                return leap.getId();
+                            }
+                        })
         ).isEqualTo(71);
     }
 

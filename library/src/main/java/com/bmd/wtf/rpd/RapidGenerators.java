@@ -23,6 +23,7 @@ import com.bmd.wtf.rpd.RapidAnnotations.Generator;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
 /**
  * Utility class providing a factory of current generators.
@@ -438,6 +439,10 @@ class RapidGenerators {
         int annotatedIntegerCtorConfidence = 0;
         int annotatedDefaultCtorConfidence = 0;
 
+        boolean annotatedIntCtorClashing = false;
+        boolean annotatedIntegerCtorClashing = false;
+        boolean annotatedDefaultCtorClashing = false;
+
         Constructor<?> intCtor = null;
         Constructor<?> integerCtor = null;
         Constructor<?> defaultCtor = null;
@@ -445,6 +450,10 @@ class RapidGenerators {
         int intCtorConfidence = 0;
         int integerCtorConfidence = 0;
         int defaultCtorConfidence = 0;
+
+        boolean intCtorClashing = false;
+        boolean integerCtorClashing = false;
+        boolean defaultCtorClashing = false;
 
         for (final Constructor<?> constructor : constructors) {
 
@@ -505,6 +514,11 @@ class RapidGenerators {
 
                         annotatedDefaultCtor = constructor;
                         annotatedDefaultCtorConfidence = confidence;
+                        annotatedDefaultCtorClashing = false;
+
+                    } else if (confidence == annotatedDefaultCtorConfidence) {
+
+                        annotatedDefaultCtorClashing = true;
                     }
 
                 } else {
@@ -513,6 +527,11 @@ class RapidGenerators {
 
                         defaultCtor = constructor;
                         defaultCtorConfidence = confidence;
+                        defaultCtorClashing = false;
+
+                    } else if (confidence == defaultCtorConfidence) {
+
+                        defaultCtorClashing = true;
                     }
                 }
 
@@ -529,6 +548,11 @@ class RapidGenerators {
 
                             annotatedIntCtor = constructor;
                             annotatedIntCtorConfidence = confidence;
+                            annotatedIntCtorClashing = false;
+
+                        } else if (confidence == annotatedIntCtorConfidence) {
+
+                            annotatedIntCtorClashing = true;
                         }
 
                     } else {
@@ -537,6 +561,11 @@ class RapidGenerators {
 
                             intCtor = constructor;
                             intCtorConfidence = confidence;
+                            intCtorClashing = false;
+
+                        } else if (confidence == intCtorConfidence) {
+
+                            intCtorClashing = true;
                         }
                     }
 
@@ -549,6 +578,11 @@ class RapidGenerators {
 
                             annotatedIntegerCtor = constructor;
                             annotatedIntegerCtorConfidence = confidence;
+                            annotatedIntegerCtorClashing = false;
+
+                        } else if (confidence == annotatedIntegerCtorConfidence) {
+
+                            annotatedIntegerCtorClashing = true;
                         }
 
                     } else {
@@ -557,6 +591,11 @@ class RapidGenerators {
 
                             integerCtor = constructor;
                             integerCtorConfidence = confidence;
+                            integerCtorClashing = false;
+
+                        } else if (confidence == integerCtorConfidence) {
+
+                            integerCtorClashing = true;
                         }
                     }
                 }
@@ -565,23 +604,53 @@ class RapidGenerators {
 
         if (annotatedIntCtor != null) {
 
+            if (annotatedIntCtorClashing) {
+
+                throwClashingException(true, contextArgs);
+            }
+
             return annotatedIntCtor;
 
         } else if (annotatedIntegerCtor != null) {
+
+            if (annotatedIntegerCtorClashing) {
+
+                throwClashingException(true, contextArgs);
+            }
 
             return annotatedIntegerCtor;
 
         } else if (annotatedDefaultCtor != null) {
 
+            if (annotatedDefaultCtorClashing) {
+
+                throwClashingException(true, contextArgs);
+            }
+
             return annotatedDefaultCtor;
 
         } else if (intCtor != null) {
+
+            if (intCtorClashing) {
+
+                throwClashingException(true, contextArgs);
+            }
 
             return intCtor;
 
         } else if (integerCtor != null) {
 
+            if (integerCtorClashing) {
+
+                throwClashingException(true, contextArgs);
+            }
+
             return integerCtor;
+        }
+
+        if (defaultCtorClashing) {
+
+            throwClashingException(true, contextArgs);
         }
 
         return defaultCtor;
@@ -601,6 +670,10 @@ class RapidGenerators {
         int annotatedIntegerMethodConfidence = 0;
         int annotatedDefaultMethodConfidence = 0;
 
+        boolean annotatedIntMethodClashing = false;
+        boolean annotatedIntegerMethodClashing = false;
+        boolean annotatedDefaultMethodClashing = false;
+
         Method intMethod = null;
         Method integerMethod = null;
         Method defaultMethod = null;
@@ -608,6 +681,10 @@ class RapidGenerators {
         int intMethodConfidence = 0;
         int integerMethodConfidence = 0;
         int defaultMethodConfidence = 0;
+
+        boolean intMethodClashing = false;
+        boolean integerMethodClashing = false;
+        boolean defaultMethodClashing = false;
 
         for (final Method method : methods) {
 
@@ -675,6 +752,11 @@ class RapidGenerators {
 
                         annotatedDefaultMethod = method;
                         annotatedDefaultMethodConfidence = confidence;
+                        annotatedDefaultMethodClashing = false;
+
+                    } else if (confidence == annotatedDefaultMethodConfidence) {
+
+                        annotatedDefaultMethodClashing = true;
                     }
 
                 } else {
@@ -683,6 +765,11 @@ class RapidGenerators {
 
                         defaultMethod = method;
                         defaultMethodConfidence = confidence;
+                        defaultMethodClashing = false;
+
+                    } else if (confidence == defaultMethodConfidence) {
+
+                        defaultMethodClashing = true;
                     }
                 }
 
@@ -699,6 +786,11 @@ class RapidGenerators {
 
                             annotatedIntMethod = method;
                             annotatedIntMethodConfidence = confidence;
+                            annotatedIntMethodClashing = false;
+
+                        } else if (confidence == annotatedIntMethodConfidence) {
+
+                            annotatedIntMethodClashing = true;
                         }
 
                     } else {
@@ -707,6 +799,11 @@ class RapidGenerators {
 
                             intMethod = method;
                             intMethodConfidence = confidence;
+                            intMethodClashing = false;
+
+                        } else if (confidence == intMethodConfidence) {
+
+                            intMethodClashing = true;
                         }
                     }
 
@@ -719,6 +816,11 @@ class RapidGenerators {
 
                             annotatedIntegerMethod = method;
                             annotatedIntegerMethodConfidence = confidence;
+                            annotatedIntegerMethodClashing = false;
+
+                        } else if (confidence == annotatedIntegerMethodConfidence) {
+
+                            annotatedIntegerMethodClashing = true;
                         }
 
                     } else {
@@ -727,6 +829,11 @@ class RapidGenerators {
 
                             integerMethod = method;
                             integerMethodConfidence = confidence;
+                            integerMethodClashing = false;
+
+                        } else if (confidence == integerMethodConfidence) {
+
+                            integerMethodClashing = true;
                         }
                     }
                 }
@@ -735,25 +842,63 @@ class RapidGenerators {
 
         if (annotatedIntMethod != null) {
 
+            if (annotatedIntMethodClashing) {
+
+                throwClashingException(false, args);
+            }
+
             return annotatedIntMethod;
 
         } else if (annotatedIntegerMethod != null) {
+
+            if (annotatedIntegerMethodClashing) {
+
+                throwClashingException(false, args);
+            }
 
             return annotatedIntegerMethod;
 
         } else if (annotatedDefaultMethod != null) {
 
+            if (annotatedDefaultMethodClashing) {
+
+                throwClashingException(false, args);
+            }
+
             return annotatedDefaultMethod;
 
         } else if (intMethod != null) {
+
+            if (intMethodClashing) {
+
+                throwClashingException(false, args);
+            }
 
             return intMethod;
 
         } else if (integerMethod != null) {
 
+            if (integerMethodClashing) {
+
+                throwClashingException(false, args);
+            }
+
             return integerMethod;
         }
 
+        if (defaultMethodClashing) {
+
+            throwClashingException(false, args);
+        }
+
         return defaultMethod;
+    }
+
+    private static void throwClashingException(final boolean isContructor, final Object[] args) {
+
+        throw new IllegalArgumentException(
+                "more than one " + ((isContructor) ? "constructor" : "method")
+                        + " found for arguments: " + Arrays.toString(args)
+        );
     }
 }

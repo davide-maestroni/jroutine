@@ -38,6 +38,135 @@ import static org.fest.assertions.api.Assertions.assertThat;
  */
 public class RapidGeneratorsTest extends TestCase {
 
+    public void testClashing() {
+
+        try {
+
+            Rapid.leapGenerator(LeapError1.class, 2);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            Rapid.leapGenerator(LeapError2.class, 2);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            Rapid.leapGenerator(LeapError3.class, 2);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            Rapid.leapGenerator(LeapError4.class, 2);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            Rapid.leapGenerator(LeapError5.class, 2);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            Rapid.leapGenerator(LeapError6.class, 2);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            Rapid.leapGenerator(new LeapGeneratorError1(),
+                                new Classification<Leap<Object, Object, Object>>() {}, 2);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            Rapid.leapGenerator(new LeapGeneratorError2(),
+                                new Classification<Leap<Object, Object, Object>>() {}, 2);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            Rapid.leapGenerator(new LeapGeneratorError3(),
+                                new Classification<Leap<Object, Object, Object>>() {}, 2);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            Rapid.leapGenerator(new LeapGeneratorError4(),
+                                new Classification<Leap<Object, Object, Object>>() {}, 2);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            Rapid.leapGenerator(new LeapGeneratorError5(),
+                                new Classification<Leap<Object, Object, Object>>() {}, 2);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            Rapid.leapGenerator(new LeapGeneratorError6(),
+                                new Classification<Leap<Object, Object, Object>>() {}, 2);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+    }
+
     public void testCurrentGenerator() {
 
         assertThat(Rapid.currentGenerator(Current1.class).create(1)).isExactlyInstanceOf(
@@ -112,9 +241,6 @@ public class RapidGeneratorsTest extends TestCase {
         assertThat(((CurrentX) Rapid.currentGenerator(CurrentX.class, this,
                                                       new CopyOnWriteArrayList<Object>(), null)
                                     .create(1)).getNumber()).isEqualTo(12);
-        assertThat(((CurrentX) Rapid.currentGenerator(CurrentX.class, this,
-                                                      new CopyOnWriteArrayList<Object>(), null, 4)
-                                    .create(1)).getNumber()).isEqualTo(37);
         assertThat(
                 ((CurrentX) Rapid.currentGenerator(CurrentX.class, this, new LinkedList<Object>(),
                                                    null, 2).create(1)).getNumber()
@@ -126,6 +252,17 @@ public class RapidGeneratorsTest extends TestCase {
                 ((Current2) Rapid.currentGenerator(CurrentX1.class, this, new ArrayList<Object>(),
                                                    null, 4).create(1)).getNumber()
         ).isEqualTo(81);
+
+        try {
+
+            Rapid.currentGenerator(CurrentX.class, this, new CopyOnWriteArrayList<Object>(), null,
+                                   4);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
 
         try {
 
@@ -250,10 +387,6 @@ public class RapidGeneratorsTest extends TestCase {
                                              null).start(1)).getNumber()
         ).isEqualTo(12);
         assertThat(
-                ((LeapX) Rapid.leapGenerator(LeapX.class, this, new CopyOnWriteArrayList<Object>(),
-                                             null, 4).start(1)).getNumber()
-        ).isEqualTo(37);
-        assertThat(
                 ((LeapX) Rapid.leapGenerator(LeapX.class, this, new LinkedList<Object>(), null, 2)
                               .start(1)).getNumber()
         ).isEqualTo(24);
@@ -264,6 +397,16 @@ public class RapidGeneratorsTest extends TestCase {
                 ((Leap2) Rapid.leapGenerator(LeapX1.class, this, new ArrayList<Object>(), null, 4)
                               .start(1)).getNumber()
         ).isEqualTo(81);
+
+        try {
+
+            Rapid.leapGenerator(LeapX.class, this, new CopyOnWriteArrayList<Object>(), null, 4);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
 
         try {
 
@@ -715,6 +858,78 @@ public class RapidGeneratorsTest extends TestCase {
         }
     }
 
+    public static class LeapError1 extends Leap1 {
+
+        @Generator
+        public LeapError1(final int ignored) {
+
+        }
+
+        @Generator
+        public LeapError1(final Integer ignored) {
+
+        }
+    }
+
+    public static class LeapError2 extends Leap1 {
+
+        @Generator
+        public LeapError2(final int ignored, final int number) {
+
+        }
+
+        @Generator
+        public LeapError2(final Integer ignored, final int number) {
+
+        }
+    }
+
+    public static class LeapError3 extends Leap1 {
+
+        @Generator
+        public LeapError3(final int ignored, final Integer number) {
+
+        }
+
+        @Generator
+        public LeapError3(final Integer ignored, final Integer number) {
+
+        }
+    }
+
+    public static class LeapError4 extends Leap1 {
+
+        public LeapError4(final int ignored) {
+
+        }
+
+        public LeapError4(final Integer ignored) {
+
+        }
+    }
+
+    public static class LeapError5 extends Leap1 {
+
+        public LeapError5(final int ignored, final int number) {
+
+        }
+
+        public LeapError5(final Integer ignored, final int number) {
+
+        }
+    }
+
+    public static class LeapError6 extends Leap1 {
+
+        public LeapError6(final int ignored, final Integer number) {
+
+        }
+
+        public LeapError6(final Integer ignored, final Integer number) {
+
+        }
+    }
+
     public static class LeapGenerator1 {
 
         public Leap generate() {
@@ -821,6 +1036,90 @@ public class RapidGeneratorsTest extends TestCase {
         public Leap generate1(List<?> list, String text, Integer number) {
 
             return new Leap2(number);
+        }
+    }
+
+    public static class LeapGeneratorError1 {
+
+        @Generator
+        public Leap generate(final int ignored) {
+
+            return new Leap1();
+        }
+
+        @Generator
+        public Leap generate(final Integer ignored) {
+
+            return new Leap1();
+        }
+    }
+
+    public static class LeapGeneratorError2 {
+
+        @Generator
+        public Leap generate(final int ignored, final int number) {
+
+            return new Leap1();
+        }
+
+        @Generator
+        public Leap generate(final Integer ignored, final int number) {
+
+            return new Leap1();
+        }
+    }
+
+    public static class LeapGeneratorError3 {
+
+        @Generator
+        public Leap generate(final int ignored, final Integer number) {
+
+            return new Leap1();
+        }
+
+        @Generator
+        public Leap generate(final Integer ignored, final Integer number) {
+
+            return new Leap1();
+        }
+    }
+
+    public static class LeapGeneratorError4 {
+
+        public Leap generate(final int ignored) {
+
+            return new Leap1();
+        }
+
+        public Leap generate(final Integer ignored) {
+
+            return new Leap1();
+        }
+    }
+
+    public static class LeapGeneratorError5 {
+
+        public Leap generate(final int ignored, final int number) {
+
+            return new Leap1();
+        }
+
+        public Leap generate(final Integer ignored, final int number) {
+
+            return new Leap1();
+        }
+    }
+
+    public static class LeapGeneratorError6 {
+
+        public Leap generate(final int ignored, final Integer number) {
+
+            return new Leap1();
+        }
+
+        public Leap generate(final Integer ignored, final Integer number) {
+
+            return new Leap1();
         }
     }
 

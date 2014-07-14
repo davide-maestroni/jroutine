@@ -11,12 +11,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.wtf.xtr.rpd;
+package com.bmd.wtf.rpd;
 
 import com.bmd.wtf.fll.Classification;
 import com.bmd.wtf.flw.River;
 import com.bmd.wtf.lps.Leap;
-import com.bmd.wtf.xtr.rpd.RapidAnnotations.OnData;
+import com.bmd.wtf.rpd.RapidAnnotations.Flow;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -242,6 +242,17 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
         mDownRiver.deviate();
     }
 
+    protected <TYPE> RapidGate<TYPE> on(Class<TYPE> gateClass) {
+
+        return new DefaultRapidGate<TYPE>(mUpRiver.on(gateClass), gateClass);
+    }
+
+    protected <TYPE> RapidGate<TYPE> on(Classification<TYPE> gateClassification) {
+
+        return new DefaultRapidGate<TYPE>(mUpRiver.on(gateClassification),
+                                          gateClassification.getRawType());
+    }
+
     protected River<SOURCE, SOURCE> source() {
 
         return mUpRiver.source();
@@ -250,17 +261,6 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
     protected River<SOURCE, Object> upRiver() {
 
         return mUpRiver;
-    }
-
-    protected <TYPE> RapidGate<TYPE> when(Class<TYPE> gateClass) {
-
-        return new DefaultRapidGate<TYPE>(mUpRiver.on(gateClass), gateClass);
-    }
-
-    protected <TYPE> RapidGate<TYPE> when(Classification<TYPE> gateClassification) {
-
-        return new DefaultRapidGate<TYPE>(mUpRiver.on(gateClassification),
-                                          gateClassification.getRawType());
     }
 
     private void fillMethods() {
@@ -289,7 +289,7 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
 
                 if (!method.isAccessible()) {
 
-                    if (method.isAnnotationPresent(OnData.class) || (
+                    if (method.isAnnotationPresent(Flow.class) || (
                             (method.getModifiers() & Modifier.PUBLIC) != 0)) {
 
                         method.setAccessible(true);
@@ -345,7 +345,7 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
         for (final Method method : methods) {
 
             final Class<?>[] parameterTypes = method.getParameterTypes();
-            final boolean isAnnotated = method.isAnnotationPresent(OnData.class);
+            final boolean isAnnotated = method.isAnnotationPresent(Flow.class);
 
             if (parameterTypes.length != 1) {
 
@@ -353,7 +353,7 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
 
                     throw new IllegalArgumentException(
                             "invalid annotated method: " + method + "\nAn "
-                                    + OnData.class.getSimpleName()
+                                    + Flow.class.getSimpleName()
                                     + " method must take a single parameter"
                     );
 

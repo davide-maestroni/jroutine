@@ -288,82 +288,6 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
     }
 
     /**
-     * Tells the waterfall to break the gate of the specified classification type.
-     *
-     * @param gateClassification The gate classification.
-     * @param <TYPE>             The leap type.
-     * @return The newly created waterfall.
-     */
-    public <TYPE> Waterfall<SOURCE, IN, OUT> breakDown(
-            final Classification<TYPE> gateClassification) {
-
-        final GateLeap<?, ?, ?> gate = findBestMatch(gateClassification);
-
-        if (gate == null) {
-
-            return this;
-        }
-
-        final HashMap<Classification<?>, GateLeap<?, ?, ?>> gateMap =
-                new HashMap<Classification<?>, GateLeap<?, ?, ?>>(mGateMap);
-
-        final Iterator<GateLeap<?, ?, ?>> iterator = gateMap.values().iterator();
-
-        while (iterator.hasNext()) {
-
-            if (gate == iterator.next()) {
-
-                iterator.remove();
-            }
-        }
-
-        //noinspection unchecked
-        return new Waterfall<SOURCE, IN, OUT>(mSource, gateMap, mGate, mBarrage, mSize, mCurrent,
-                                              mCurrentGenerator, mFalls);
-    }
-
-    /**
-     * Tells the waterfall to break the gate handling the specified leap.
-     *
-     * @param leap   The leap instance.
-     * @param <TYPE> The leap type.
-     * @return The newly created waterfall.
-     */
-    public <TYPE extends Leap<?, ?, ?>> Waterfall<SOURCE, IN, OUT> breakDown(final TYPE leap) {
-
-        if (leap == null) {
-
-            return this;
-        }
-
-        boolean isChanged = false;
-
-        final HashMap<Classification<?>, GateLeap<?, ?, ?>> gateMap =
-                new HashMap<Classification<?>, GateLeap<?, ?, ?>>(mGateMap);
-
-        final Iterator<GateLeap<?, ?, ?>> iterator = gateMap.values().iterator();
-
-        while (iterator.hasNext()) {
-
-            if (leap == iterator.next().leap) {
-
-                iterator.remove();
-
-                isChanged = true;
-            }
-        }
-
-        if (!isChanged) {
-
-            return this;
-        }
-
-        //noinspection unchecked
-        return new Waterfall<SOURCE, IN, OUT>(mSource, gateMap, mGate, mBarrage, mSize, mCurrent,
-                                              mCurrentGenerator, mFalls);
-    }
-
-    /**
      * Chains the specified waterfall to this one. After the call, all the data flowing through
      * this waterfall will be pushed into the target one.
      *
@@ -1466,6 +1390,83 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
         //noinspection unchecked
         return new Waterfall<SOURCE, IN, OUT>(mSource, mGateMap, mGate, mBarrage, poolSize,
                                               Currents.pool(poolSize), null, mFalls);
+    }
+
+    /**
+     * Tells the waterfall to lock the gate of the specified classification type, that is, the gate
+     * will not be accessible anymore to the ones requiring it.
+     *
+     * @param gateClassification The gate classification.
+     * @param <TYPE>             The leap type.
+     * @return The newly created waterfall.
+     */
+    public <TYPE> Waterfall<SOURCE, IN, OUT> lock(final Classification<TYPE> gateClassification) {
+
+        final GateLeap<?, ?, ?> gate = findBestMatch(gateClassification);
+
+        if (gate == null) {
+
+            return this;
+        }
+
+        final HashMap<Classification<?>, GateLeap<?, ?, ?>> gateMap =
+                new HashMap<Classification<?>, GateLeap<?, ?, ?>>(mGateMap);
+
+        final Iterator<GateLeap<?, ?, ?>> iterator = gateMap.values().iterator();
+
+        while (iterator.hasNext()) {
+
+            if (gate == iterator.next()) {
+
+                iterator.remove();
+            }
+        }
+
+        //noinspection unchecked
+        return new Waterfall<SOURCE, IN, OUT>(mSource, gateMap, mGate, mBarrage, mSize, mCurrent,
+                                              mCurrentGenerator, mFalls);
+    }
+
+    /**
+     * Tells the waterfall to lock the gate handling the specified leap, that is, the gate
+     * will not be accessible anymore to the ones requiring it..
+     *
+     * @param leap   The leap instance.
+     * @param <TYPE> The leap type.
+     * @return The newly created waterfall.
+     */
+    public <TYPE extends Leap<?, ?, ?>> Waterfall<SOURCE, IN, OUT> lock(final TYPE leap) {
+
+        if (leap == null) {
+
+            return this;
+        }
+
+        boolean isChanged = false;
+
+        final HashMap<Classification<?>, GateLeap<?, ?, ?>> gateMap =
+                new HashMap<Classification<?>, GateLeap<?, ?, ?>>(mGateMap);
+
+        final Iterator<GateLeap<?, ?, ?>> iterator = gateMap.values().iterator();
+
+        while (iterator.hasNext()) {
+
+            if (leap == iterator.next().leap) {
+
+                iterator.remove();
+
+                isChanged = true;
+            }
+        }
+
+        if (!isChanged) {
+
+            return this;
+        }
+
+        //noinspection unchecked
+        return new Waterfall<SOURCE, IN, OUT>(mSource, gateMap, mGate, mBarrage, mSize, mCurrent,
+                                              mCurrentGenerator, mFalls);
     }
 
     /**

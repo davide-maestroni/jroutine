@@ -11,12 +11,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.wtf.xtr.rpd;
+package com.bmd.wtf.rpd;
 
 import com.bmd.wtf.crr.Current;
 import com.bmd.wtf.crr.CurrentGenerator;
 import com.bmd.wtf.fll.Classification;
-import com.bmd.wtf.fll.Waterfall;
 import com.bmd.wtf.flw.Gate;
 import com.bmd.wtf.lps.Leap;
 import com.bmd.wtf.lps.LeapGenerator;
@@ -153,23 +152,6 @@ public class Rapid {
             final Object... contextArgs) {
 
         return RapidGenerators.currentGenerator(type, contextArgs);
-    }
-
-    /**
-     * Creates and returns a rapid gate wrapping the specified waterfall.
-     *
-     * @param waterfall The waterfall to wrap.
-     * @param <SOURCE>  The source data type.
-     * @param <MOUTH>   The mouth data type.
-     * @param <IN>      The input data type.
-     * @param <OUT>     The output data type.
-     * @param <TYPE>    The gate type.
-     * @return The newly created rapid gate.
-     */
-    public static <SOURCE, MOUTH, IN, OUT, TYPE> RapidRiver<SOURCE, MOUTH, IN, OUT, TYPE> gate(
-            final Waterfall<SOURCE, MOUTH, OUT> waterfall) {
-
-        return new DefaultRapidRiver<SOURCE, MOUTH, IN, OUT, TYPE>(waterfall);
     }
 
     /**

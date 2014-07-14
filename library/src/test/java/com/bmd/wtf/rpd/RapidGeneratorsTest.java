@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.wtf.xtr.rpd;
+package com.bmd.wtf.rpd;
 
 import com.bmd.wtf.crr.Current;
 import com.bmd.wtf.fll.Classification;
@@ -19,7 +19,7 @@ import com.bmd.wtf.flw.Fall;
 import com.bmd.wtf.flw.Stream;
 import com.bmd.wtf.lps.FreeLeap;
 import com.bmd.wtf.lps.Leap;
-import com.bmd.wtf.xtr.rpd.RapidAnnotations.Generator;
+import com.bmd.wtf.rpd.RapidAnnotations.Generator;
 
 import junit.framework.TestCase;
 
@@ -118,7 +118,7 @@ public class RapidGeneratorsTest extends TestCase {
         assertThat(
                 ((CurrentX) Rapid.currentGenerator(CurrentX.class, this, new LinkedList<Object>(),
                                                    null, 2).create(1)).getNumber()
-        ).isEqualTo(35);
+        ).isEqualTo(24);
         assertThat(((CurrentX) Rapid.currentGenerator(CurrentX.class, this, new ArrayList<Object>(),
                                                       null, 2).create(1)).getNumber()
         ).isEqualTo(46);
@@ -256,7 +256,7 @@ public class RapidGeneratorsTest extends TestCase {
         assertThat(
                 ((LeapX) Rapid.leapGenerator(LeapX.class, this, new LinkedList<Object>(), null, 2)
                               .start(1)).getNumber()
-        ).isEqualTo(35);
+        ).isEqualTo(24);
         assertThat(((LeapX) Rapid.leapGenerator(LeapX.class, this, new ArrayList<Object>(), null, 2)
                                  .start(1)).getNumber()
         ).isEqualTo(46);

@@ -1623,10 +1623,9 @@ public class WaterfallTest extends TestCase {
             }
         })).isEqualTo(1);
 
-        final Waterfall<Object, Object, Object> fall1 = fall.breakDown((Leap) null)
-                                                            .breakDown(
-                                                                    new FreeLeap<Object, Object>())
-                                                            .breakDown(gateLeap)
+        final Waterfall<Object, Object, Object> fall1 = fall.lock((Leap) null)
+                                                            .lock(new FreeLeap<Object, Object>())
+                                                            .lock(gateLeap)
                                                             .as(Classification.ofType(
                                                                     GateLeap.class))
                                                             .chain(new GateLeap());
@@ -1651,8 +1650,8 @@ public class WaterfallTest extends TestCase {
         }
 
         final Waterfall<Object, Object, Object> fall2 =
-                fall1.breakDown(Classification.ofType(String.class))
-                     .breakDown(Classification.ofType(GateLeap.class))
+                fall1.lock(Classification.ofType(String.class))
+                     .lock(Classification.ofType(GateLeap.class))
                      .asGate()
                      .chain(new GateLeap2(2));
 
@@ -1676,29 +1675,28 @@ public class WaterfallTest extends TestCase {
                             }
                         })).isEqualTo(2);
 
-        assertThat(
-                fall2.breakDown(Classification.ofType(GateLeap2.class))
-                     .in(new CurrentGenerator() {
+        assertThat(fall2.lock(Classification.ofType(GateLeap2.class))
+                        .in(new CurrentGenerator() {
 
-                         @Override
-                         public Current create(final int fallNumber) {
+                            @Override
+                            public Current create(final int fallNumber) {
 
-                             return Currents.straight();
-                         }
-                     })
-                     .in(3)
-                     .asGate()
-                     .chain(new GateLeap2(3))
-                     .on(GateLeap2.class)
-                     .immediately()
-                     .perform(new Action<Integer, GateLeap>() {
+                                return Currents.straight();
+                            }
+                        })
+                        .in(3)
+                        .asGate()
+                        .chain(new GateLeap2(3))
+                        .on(GateLeap2.class)
+                        .immediately()
+                        .perform(new Action<Integer, GateLeap>() {
 
-                         @Override
-                         public Integer doOn(final GateLeap leap, final Object... args) {
+                            @Override
+                            public Integer doOn(final GateLeap leap, final Object... args) {
 
-                             return leap.getId();
-                         }
-                     })
+                                return leap.getId();
+                            }
+                        })
         ).isEqualTo(3);
     }
 

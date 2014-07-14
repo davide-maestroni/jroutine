@@ -11,10 +11,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.bmd.wtf.rpd;
 
 /**
- * Package containing extra classes building additional functionalities on top of the core ones.
+ * This exception wraps an unexpected one thrown during a rapid class execution.
  * <p/>
- * Created by davide on 4/16/14.
+ * Created by davide on 6/26/14.
  */
-package com.bmd.wtf.xtr;
+public class RapidException extends RuntimeException {
+
+    /**
+     * Overrides {@link RuntimeException#RuntimeException(Throwable)}.
+     */
+    public RapidException(final Throwable cause) {
+
+        super(cause);
+    }
+}

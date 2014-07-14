@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.wtf.xtr.rpd;
+package com.bmd.wtf.rpd;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -31,15 +31,15 @@ public interface RapidAnnotations {
 
     }
 
-    @Target({ElementType.CONSTRUCTOR, ElementType.METHOD})
+    @Target({ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
-    public @interface Generator {
+    public @interface Flow {
 
     }
 
-    @Target({ElementType.METHOD})
+    @Target({ElementType.CONSTRUCTOR, ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
-    public @interface OnData {
+    public @interface Generator {
 
     }
 }

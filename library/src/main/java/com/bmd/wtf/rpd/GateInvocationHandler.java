@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.wtf.xtr.rpd;
+package com.bmd.wtf.rpd;
 
 import com.bmd.wtf.flw.Gate;
 import com.bmd.wtf.flw.Gate.Action;

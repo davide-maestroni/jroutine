@@ -11,19 +11,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.wtf.xtr.rpd;
+package com.bmd.wtf.rpd;
 
 import com.bmd.wtf.crr.Current;
 import com.bmd.wtf.crr.CurrentGenerator;
 import com.bmd.wtf.fll.Classification;
 import com.bmd.wtf.lps.Leap;
 import com.bmd.wtf.lps.LeapGenerator;
-import com.bmd.wtf.xtr.rpd.RapidAnnotations.Generator;
+import com.bmd.wtf.rpd.RapidAnnotations.Generator;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
 
 /**
  * Utility class providing a factory of current generators.
@@ -31,23 +30,6 @@ import java.util.HashMap;
  * Created by davide on 6/19/14.
  */
 class RapidGenerators {
-
-    private static final HashMap<Class<?>, Class<?>> sBoxMap = new HashMap<Class<?>, Class<?>>(9);
-
-    static {
-
-        final HashMap<Class<?>, Class<?>> boxMap = sBoxMap;
-
-        boxMap.put(boolean.class, Boolean.class);
-        boxMap.put(byte.class, Byte.class);
-        boxMap.put(char.class, Character.class);
-        boxMap.put(double.class, Double.class);
-        boxMap.put(float.class, Float.class);
-        boxMap.put(int.class, Integer.class);
-        boxMap.put(long.class, Long.class);
-        boxMap.put(short.class, Short.class);
-        boxMap.put(void.class, Void.class);
-    }
 
     /**
      * Avoid direct instantiation.
@@ -442,16 +424,6 @@ class RapidGenerators {
         };
     }
 
-    private static Class<?> boxedClass(final Class<?> type) {
-
-        if (!type.isPrimitive()) {
-
-            return type;
-        }
-
-        return sBoxMap.get(type);
-    }
-
     @SuppressWarnings("ConstantConditions")
     private static Constructor<?> findContextConstructor(final Constructor<?>[] constructors,
             final Object[] contextArgs) {
@@ -495,14 +467,16 @@ class RapidGenerators {
 
                 if (contextArg != null) {
 
-                    if (!boxedClass(param).isInstance(contextArg)) {
+                    final Class<?> boxedClass = Rapids.boxedClass(param);
+
+                    if (!boxedClass.isInstance(contextArg)) {
 
                         isValid = false;
 
                         break;
                     }
 
-                    if (param.equals(contextArg.getClass())) {
+                    if (boxedClass.equals(contextArg.getClass())) {
 
                         ++confidence;
                     }
@@ -663,14 +637,16 @@ class RapidGenerators {
 
                 if (contextArg != null) {
 
-                    if (!boxedClass(param).isInstance(contextArg)) {
+                    final Class<?> boxedClass = Rapids.boxedClass(param);
+
+                    if (!boxedClass.isInstance(contextArg)) {
 
                         isValid = false;
 
                         break;
                     }
 
-                    if (param.equals(contextArg.getClass())) {
+                    if (boxedClass.equals(contextArg.getClass())) {
 
                         ++confidence;
                     }

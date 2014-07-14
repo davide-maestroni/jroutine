@@ -11,14 +11,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.wtf.xtr.rpd;
+package com.bmd.wtf.rpd;
 
 import com.bmd.wtf.fll.Classification;
 import com.bmd.wtf.fll.Waterfall;
 import com.bmd.wtf.flw.Collector;
 import com.bmd.wtf.flw.River;
+import com.bmd.wtf.lps.AbstractLeap;
 import com.bmd.wtf.lps.FreeLeap;
-import com.bmd.wtf.xtr.rpd.RapidAnnotations.OnData;
+import com.bmd.wtf.rpd.RapidAnnotations.Flow;
 
 import junit.framework.TestCase;
 
@@ -31,6 +32,61 @@ import static org.fest.assertions.api.Assertions.assertThat;
  * Created by davide on 7/10/14.
  */
 public class RapidLeapTest extends TestCase {
+
+    public void testDeviateStream() {
+
+        final Waterfall<Object, Object, Object> fall1 = fall().start();
+        final Waterfall<Object, Object, Object> fall2 = fall1.chain(new RapidLeap<Object>() {
+
+            public Integer dec(final Integer num) {
+
+                if (num == 0) {
+
+                    isolate();
+                }
+
+                return num - 1;
+            }
+        });
+        final Waterfall<Object, Object, String> fall3 =
+                fall2.chain(new AbstractLeap<Object, Object, String>() {
+
+                    @Override
+                    public void onPush(final River<Object, Object> upRiver,
+                            final River<Object, String> downRiver, final int fallNumber,
+                            final Object drop) {
+
+                        downRiver.push(drop.toString());
+                    }
+                });
+        final Waterfall<Object, String, String> fall4 = fall3.chain();
+
+        assertThat(fall4.pull(1).now().next()).isEqualTo("0");
+        assertThat(fall4.pull(0).now().all()).isEmpty();
+        assertThat(fall4.pull(1).now().all()).isEmpty();
+
+        fall1.chain(new RapidLeap<Object>() {
+
+            public Integer same(final Integer num) {
+
+                if (num == -1) {
+
+                    dryUp();
+                }
+
+                return num;
+            }
+        }).chain(fall3);
+
+        assertThat(fall4.pull(1).now().next()).isEqualTo("1");
+        assertThat(fall4.pull(-1).now().all()).isEmpty();
+        assertThat(fall4.pull(0).now().all()).isEmpty();
+
+        fall1.chain().chain(fall3);
+
+        assertThat(fall4.pull(0).now().all()).isEmpty();
+        assertThat(fall4.pull(1).now().all()).isEmpty();
+    }
 
     public void testError() {
 
@@ -135,6 +191,47 @@ public class RapidLeapTest extends TestCase {
 
             assertThat(((RapidException) e).getCause()).isEqualTo(new MyException());
         }
+    }
+
+    public void testFlow() {
+
+        assertThat(fall().start(new RapidLeap<Object>() {
+
+            public void integerToString(final Integer data) {
+
+                downRiver().push(data.toString());
+            }
+
+            public void floatToString(final Float data) {
+
+                upRiver().push(data.toString());
+            }
+
+            public void doubleToStirng(final Double data) {
+
+                source().push(data.toString());
+            }
+        }).pull(11, 22f, 33d).all()).containsExactly("11", "22.0", "33.0");
+
+        assertThat(fall().in(3)
+                         .start(Rapid.leapGenerator(RapidLeapFlow.class))
+                         .pull("test")
+                         .all()).containsExactly("test", "test", "test");
+    }
+
+    public void testGate() {
+
+        assertThat(fall().asGate().start(new TestLeapGate()).chain(new RapidLeap<Object>() {
+
+            public Object obj(final Object obj) {
+
+                assertThat(on(LeapGate.class).perform().getInt()).isEqualTo(111);
+                assertThat(on(Classification.ofType(LeapGate.class)).perform().getInt()).isEqualTo(
+                        111);
+
+                return obj;
+            }
+        }).pull("test").next()).isEqualTo("test");
     }
 
     public void testInherit() {
@@ -262,6 +359,11 @@ public class RapidLeapTest extends TestCase {
         assertThat(collector4.next()).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
+    public interface LeapGate {
+
+        public int getInt();
+    }
+
     public static class MyException extends Exception {
 
         @Override
@@ -292,13 +394,13 @@ public class RapidLeapTest extends TestCase {
 
     public static class RapidLeapError2 extends RapidLeap<Object> {
 
-        @OnData
+        @Flow
         public String method1(final String text) {
 
             return text;
         }
 
-        @OnData
+        @Flow
         public Integer method2(final String text) {
 
             return Integer.parseInt(text);
@@ -307,7 +409,7 @@ public class RapidLeapTest extends TestCase {
 
     public static class RapidLeapError3 extends RapidLeap<Object> {
 
-        @OnData
+        @Flow
         public String method1(final String text, final int ignored) {
 
             return text;
@@ -334,6 +436,23 @@ public class RapidLeapTest extends TestCase {
         public void error(final Throwable ignored) throws MyException {
 
             throw new MyException();
+        }
+    }
+
+    public static class RapidLeapFlow extends RapidLeap<Object> {
+
+        private final int mNumber;
+
+        public RapidLeapFlow(final int number) {
+
+            mNumber = number;
+        }
+
+        public Object obj(final Object obj) {
+
+            assertThat(fallNumber()).isEqualTo(mNumber);
+
+            return obj;
         }
     }
 
@@ -381,7 +500,7 @@ public class RapidLeapTest extends TestCase {
             super(true);
         }
 
-        @OnData
+        @Flow
         public void discharge(final Discharge ignored) {
 
             downRiver().discharge("test");
@@ -392,13 +511,13 @@ public class RapidLeapTest extends TestCase {
             return data.toString();
         }
 
-        @OnData
+        @Flow
         public Integer parse(final String text) {
 
             return Integer.parseInt(text);
         }
 
-        @OnData
+        @Flow
         public String serialize(final Integer integer) {
 
             return integer.toString();
@@ -431,5 +550,14 @@ public class RapidLeapTest extends TestCase {
 
     public static class RapidLeapTest5 extends RapidLeap<Object> {
 
+    }
+
+    public static class TestLeapGate extends FreeLeap<Object, Object> implements LeapGate {
+
+        @Override
+        public int getInt() {
+
+            return 111;
+        }
     }
 }

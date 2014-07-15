@@ -30,8 +30,19 @@ import java.util.Map.Entry;
  * <p/>
  * The two main ways to use it is to inherit the class or to wrap an object inside a rapid leap.
  * <br/>
- * In both the case the object must implements specific methods to handle the data flowing through
- * the leap.
+ * In both cases the object instance is analyzed searching for methods taking a single object as
+ * parameter.<br/>
+ * Every time a data drop flows through the leap, the method whose parameter closely match the
+ * drop type is called. In order to properly handle null objects and discharge command, the
+ * inheriting class can implement e method taking a parameter of type <code>Void</code> and a one
+ * taking a parameter of type <code>Discharge</code> respectively.<br/>
+ * In a dual way, a method returning a <code>Throwable</code> object will cause a forward of an
+ * unhandled exception, while a one returning a <code>Discharge</code> will cause a discharge of
+ * the downstream river. Finally, if a method does not return any result, nothing will be
+ * propagated downstream.
+ * <p/>
+ * The inheriting class may also makes use of the protected method provided by this class to access
+ * the downstream and upstream rivers, and the waterfall gates.
  * <p/>
  * Created by davide on 6/23/14.
  *
@@ -53,6 +64,12 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
 
     private River<SOURCE, Object> mUpRiver;
 
+    /**
+     * Constructor.
+     *
+     * @param annotatedOnly Whether only the annotated methods must be called when data flow
+     *                      through this leap.
+     */
     public RapidLeap(final boolean annotatedOnly) {
 
         mTarget = this;
@@ -61,11 +78,25 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
         fillMethods();
     }
 
+    /**
+     * Constructor.
+     * <p/>
+     * By default all methods are analyzed.
+     *
+     * @see #RapidLeap(boolean)
+     */
     public RapidLeap() {
 
         this(false);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param wrapped       The wrapped object.
+     * @param annotatedOnly Whether only the annotated methods of the wrapped object must be called
+     *                      when data flow through this leap.
+     */
     private RapidLeap(final Object wrapped, final boolean annotatedOnly) {
 
         mTarget = wrapped;
@@ -74,36 +105,88 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
         fillMethods();
     }
 
+    /**
+     * Creates and returns a rapid leap wrapping the specified object.
+     *
+     * @param wrapped  The wrapped object.
+     * @param <SOURCE> The source data type.
+     * @return The new rapid leap.
+     */
     public static <SOURCE> RapidLeap<SOURCE> from(final Object wrapped) {
 
         return new RapidLeap<SOURCE>(wrapped, false) {};
     }
 
+    /**
+     * Creates and returns a rapid leap wrapping the specified object.
+     *
+     * @param wrapped    The wrapped object.
+     * @param sourceType The source data class.
+     * @param <SOURCE>   The source data type.
+     * @return The new rapid leap.
+     */
     public static <SOURCE> RapidLeap<SOURCE> from(final Object wrapped,
-            final Class<SOURCE> sourceType) {
+            @SuppressWarnings("UnusedParameters") final Class<SOURCE> sourceType) {
 
         return from(wrapped);
     }
 
-    public static <SOURCE> RapidLeap<SOURCE> from(final Object wrapped,
-            final Classification<SOURCE> sourceClassification) {
+    /**
+     * Creates and returns a rapid leap wrapping the specified object.
+     *
+     * @param wrapped              The wrapped object.
+     * @param sourceClassification The source data classification.
+     * @param <SOURCE>             The source data type.
+     * @return The new rapid leap.
+     */
+    public static <SOURCE> RapidLeap<SOURCE> from(final Object wrapped, @SuppressWarnings(
+            "UnusedParameters") final Classification<SOURCE> sourceClassification) {
 
         return from(wrapped);
     }
 
+    /**
+     * Creates and returns a rapid leap wrapping the specified object.
+     * <p/>
+     * Note that only the annotated method will be considered when handling flowing data.
+     *
+     * @param wrapped  The wrapped object.
+     * @param <SOURCE> The source data type.
+     * @return The new rapid leap.
+     */
     public static <SOURCE> RapidLeap<SOURCE> fromAnnotated(final Object wrapped) {
 
         return new RapidLeap<SOURCE>(wrapped, true) {};
     }
 
+    /**
+     * Creates and returns a rapid leap wrapping the specified object.
+     * <p/>
+     * Note that only the annotated method will be considered when handling flowing data.
+     *
+     * @param wrapped    The wrapped object.
+     * @param sourceType The source data class.
+     * @param <SOURCE>   The source data type.
+     * @return The new rapid leap.
+     */
     public static <SOURCE> RapidLeap<SOURCE> fromAnnotated(final Object wrapped,
-            final Class<SOURCE> sourceType) {
+            @SuppressWarnings("UnusedParameters") final Class<SOURCE> sourceType) {
 
         return fromAnnotated(wrapped);
     }
 
-    public static <SOURCE> RapidLeap<SOURCE> fromAnnotated(final Object wrapped,
-            final Classification<SOURCE> sourceClassification) {
+    /**
+     * Creates and returns a rapid leap wrapping the specified object.
+     * <p/>
+     * Note that only the annotated method will be considered when handling flowing data.
+     *
+     * @param wrapped              The wrapped object.
+     * @param sourceClassification The source data classification.
+     * @param <SOURCE>             The source data type.
+     * @return The new rapid leap.
+     */
+    public static <SOURCE> RapidLeap<SOURCE> fromAnnotated(final Object wrapped, @SuppressWarnings(
+            "UnusedParameters") final Classification<SOURCE> sourceClassification) {
 
         return fromAnnotated(wrapped);
     }
@@ -220,44 +303,92 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
         }
     }
 
+    /**
+     * Returns the downstream river instance.
+     *
+     * @return The river instance.
+     */
     protected River<SOURCE, Object> downRiver() {
 
         return mDownRiver;
     }
 
+    /**
+     * Dries up this leap by draining both the downstream and upstream rivers.
+     *
+     * @see com.bmd.wtf.flw.River#drain()
+     */
     protected void dryUp() {
 
         mUpRiver.drain();
         mDownRiver.drain();
     }
 
+    /**
+     * Returns the number identifying the fall formed by this leap.
+     *
+     * @return The fall number.
+     */
     protected int fallNumber() {
 
         return mFallNumber;
     }
 
+    /**
+     * Isolates this leap by deviating both the downstream and upstream rivers.
+     *
+     * @see com.bmd.wtf.flw.River#deviate()
+     */
     protected void isolate() {
 
         mUpRiver.deviate();
         mDownRiver.deviate();
     }
 
-    protected <TYPE> RapidGate<TYPE> on(Class<TYPE> gateClass) {
+    /**
+     * Returns a rapid gate handling a leap of the specified type.
+     * <p/>
+     * If no leap of that type is not found inside the waterfall an exception will be thrown.
+     *
+     * @param gateClass The gate class.
+     * @param <TYPE>    The leap type.
+     * @return The gate.
+     */
+    protected <TYPE> RapidGate<TYPE> on(final Class<TYPE> gateClass) {
 
         return new DefaultRapidGate<TYPE>(mUpRiver.on(gateClass), gateClass);
     }
 
-    protected <TYPE> RapidGate<TYPE> on(Classification<TYPE> gateClassification) {
+    /**
+     * Returns a rapid gate handling a leap of the specified type.
+     * <p/>
+     * If the leap is not found inside the waterfall an exception will be thrown.
+     *
+     * @param gateClassification The gate classification.
+     * @param <TYPE>             The leap type.
+     * @return The gate.
+     */
+    protected <TYPE> RapidGate<TYPE> on(final Classification<TYPE> gateClassification) {
 
         return new DefaultRapidGate<TYPE>(mUpRiver.on(gateClassification),
                                           gateClassification.getRawType());
     }
 
+    /**
+     * Returns the source river instance.
+     *
+     * @return The river instance.
+     */
     protected River<SOURCE, SOURCE> source() {
 
         return mUpRiver.source();
     }
 
+    /**
+     * Returns the upstream river instance.
+     *
+     * @return The river instance.
+     */
     protected River<SOURCE, Object> upRiver() {
 
         return mUpRiver;

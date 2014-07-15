@@ -19,7 +19,12 @@ import com.bmd.wtf.flw.Gate;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Interface extending a gate. TODO
+ * Interface extending a gate.
+ * <p/>
+ * The implementing class provides methods to access the gate leap via reflection by wrapping it in
+ * a proxy object so to make every call thread safe.<br/>
+ * In order for that to correctly work, the leap instance must be accessed only through the
+ * implemented interface methods.
  * <p/>
  * Created by davide on 7/4/14.
  *
@@ -45,7 +50,7 @@ public interface RapidGate<TYPE> extends Gate<TYPE> {
     /**
      * Returns the gate wrapped so to be accessed in a thread safe way.
      * <p/>
-     * Note that, in order to correctly work, the specified gate type must be an interface.
+     * Note that the gate type must be an interface. An exception will be thrown otherwise.
      *
      * @return The wrapped gate.
      */
@@ -54,7 +59,8 @@ public interface RapidGate<TYPE> extends Gate<TYPE> {
     /**
      * Returns the gate wrapped so to be accessed in a thread safe way.
      * <p/>
-     * Note that, in order to correctly work, the specified gate type must be an interface.
+     * Note that the specified gate type must be an interface. An exception will be thrown
+     * otherwise.
      *
      * @param gateClass The gate class.
      * @param <NTYPE>   The new gate type.
@@ -65,7 +71,8 @@ public interface RapidGate<TYPE> extends Gate<TYPE> {
     /**
      * Returns the gate wrapped so to be accessed in a thread safe way.
      * <p/>
-     * Note that, in order to correctly work, the specified gate type must be an interface.
+     * Note that the specified gate type must be an interface. An exception will be thrown
+     * otherwise.
      *
      * @param gateClassification The gate classification.
      * @param <NTYPE>            The new gate type.
@@ -76,9 +83,9 @@ public interface RapidGate<TYPE> extends Gate<TYPE> {
     /**
      * Sets the condition to be met by this gate by searching a suitable method via reflection.
      * <p/>
-     * A suitable method is identified among the ones taking the specified arguments and returning
-     * a boolean value. The methods annotated with {@link RapidAnnotations.Condition} are analyzed
-     * first.<br/>
+     * A suitable method is identified among the ones taking the specified arguments as parameters
+     * and returning a boolean value. The methods annotated with {@link RapidAnnotations.Condition}
+     * are analyzed first.<br/>
      * If more than one method matching the above requirements is found, an exception will be
      * thrown.
      *

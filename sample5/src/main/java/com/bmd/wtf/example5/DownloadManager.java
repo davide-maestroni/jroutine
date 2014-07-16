@@ -18,7 +18,6 @@ import com.bmd.wtf.example1.DownloadUtils;
 import com.bmd.wtf.example2.DownloadObserver;
 import com.bmd.wtf.example2.UriObserver;
 import com.bmd.wtf.example3.RetryPolicy;
-import com.bmd.wtf.example4.DownloadAbort;
 import com.bmd.wtf.fll.Classification;
 import com.bmd.wtf.fll.Waterfall;
 import com.bmd.wtf.rpd.Rapid;

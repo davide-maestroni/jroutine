@@ -13,24 +13,14 @@
  */
 package com.bmd.wtf.example4;
 
+import com.bmd.wtf.example2.UriObserver;
+
 import java.net.URI;
 
 /**
- * Download abort.
+ * Observer of downloaded urls supporting the abort of the download.
  */
-public class DownloadAbort {
+public interface UriAbortObserver extends UriObserver {
 
-    public static final String ABORT_ERROR = "abort_error";
-
-    private final URI mUri;
-
-    public DownloadAbort(final URI uri) {
-
-        mUri = uri;
-    }
-
-    public URI getUri() {
-
-        return mUri;
-    }
+    public void abort(URI uri);
 }

@@ -17,7 +17,6 @@ import com.bmd.wtf.example1.Download;
 import com.bmd.wtf.example1.DownloadFailure;
 import com.bmd.wtf.example1.DownloadSuccess;
 import com.bmd.wtf.example2.DownloadObserver;
-import com.bmd.wtf.rpd.RapidAnnotations.FlowPath;
 
 import java.net.URI;
 import java.util.HashSet;
@@ -26,14 +25,17 @@ import java.util.HashSet;
  * Observer of downloaded urls supporting abort operation by remembering the ongoing donwloads and
  * then cancel them when completed.
  */
-public class AbortObserver extends DownloadObserver {
+public class AbortObserver extends DownloadObserver implements UriAbortObserver {
 
     private final HashSet<URI> mAbortedDownloads = new HashSet<URI>();
 
-    @FlowPath
-    public void onAbort(final DownloadAbort download) {
+    @Override
+    public void abort(final URI uri) {
 
-        mAbortedDownloads.add(download.getUri());
+        if (!isDownloaded(uri)) {
+
+            mAbortedDownloads.add(uri);
+        }
     }
 
     @Override
@@ -63,7 +65,7 @@ public class AbortObserver extends DownloadObserver {
 
         } else {
 
-            super.onFailure(new DownloadFailure(download, DownloadAbort.ABORT_ERROR));
+            super.onFailure(new DownloadFailure(download, new AbortException()));
         }
     }
 }

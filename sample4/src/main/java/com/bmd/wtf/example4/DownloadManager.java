@@ -16,7 +16,6 @@ package com.bmd.wtf.example4;
 import com.bmd.wtf.example1.Download;
 import com.bmd.wtf.example1.DownloadUtils;
 import com.bmd.wtf.example1.Downloader;
-import com.bmd.wtf.example2.UriObserver;
 import com.bmd.wtf.example3.RetryPolicy;
 import com.bmd.wtf.fll.Classification;
 import com.bmd.wtf.fll.Waterfall;
@@ -36,7 +35,7 @@ public class DownloadManager {
 
     private final File mDownloadDir;
 
-    private final UriObserver mGate;
+    private final UriAbortObserver mGate;
 
     private final Waterfall<Object, Object, Object> mWaterfall;
 
@@ -59,7 +58,7 @@ public class DownloadManager {
         // merge the streams and finally chain the observer
         mGate = Rapid.gate(mWaterfall.in(1)
                                      .chain(Classification.ofType(AbortObserver.class))
-                                     .on(AbortObserver.class)).performAs(UriObserver.class);
+                                     .on(AbortObserver.class)).performAs(UriAbortObserver.class);
     }
 
     public static void main(final String args[]) throws IOException, URISyntaxException {
@@ -78,7 +77,7 @@ public class DownloadManager {
 
     public void abort(final URI uri) {
 
-        mWaterfall.source().push(new DownloadAbort(uri));
+        mGate.abort(uri);
     }
 
     public void download(final URI uri) throws URISyntaxException {

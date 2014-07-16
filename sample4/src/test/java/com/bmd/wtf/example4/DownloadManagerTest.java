@@ -218,26 +218,9 @@ public class DownloadManagerTest extends TestCase {
         assertThat(outFile).doesNotExist();
 
         mDownloadManager.download(uri);
+        mDownloadManager.abort(uri);
 
         final long startTime = System.currentTimeMillis();
-
-        while (!outFile.exists()) {
-
-            try {
-
-                Thread.sleep(100);
-
-            } catch (final InterruptedException ignored) {
-
-            }
-
-            if ((System.currentTimeMillis() - startTime) > 20000) {
-
-                throw new IOException();
-            }
-        }
-
-        mDownloadManager.abort(uri);
 
         waitFor(uri, startTime, 20000);
 

@@ -16,7 +16,7 @@ package com.bmd.wtf.example5;
 import com.bmd.wtf.example1.Download;
 import com.bmd.wtf.example1.DownloadFailure;
 import com.bmd.wtf.example1.DownloadSuccess;
-import com.bmd.wtf.example4.DownloadAbort;
+import com.bmd.wtf.example4.AbortException;
 import com.bmd.wtf.rpd.RapidLeap;
 
 import java.io.IOException;
@@ -85,7 +85,7 @@ public class CancelableDownloader extends RapidLeap<Object> {
 
             downloading.remove(uri);
 
-            downRiver().push(new DownloadFailure(handler, DownloadAbort.ABORT_ERROR));
+            downRiver().push(new DownloadFailure(handler, new AbortException()));
 
         } else {
 

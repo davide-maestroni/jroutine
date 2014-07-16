@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @param <DATA> The data type.
  */
+//TODO Dam?
 public interface Collector<DATA> extends Iterator<DATA> {
 
     /**

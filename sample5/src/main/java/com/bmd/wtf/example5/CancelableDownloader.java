@@ -13,100 +13,100 @@
  */
 package com.bmd.wtf.example5;
 
-import com.bmd.wtf.bdr.FloatingException;
-import com.bmd.wtf.dam.OpenDam;
-import com.bmd.wtf.example1.DownloadUtils;
-import com.bmd.wtf.example4.AbortException;
-import com.bmd.wtf.src.Floodgate;
+import com.bmd.wtf.example1.Download;
+import com.bmd.wtf.example1.DownloadFailure;
+import com.bmd.wtf.example1.DownloadSuccess;
+import com.bmd.wtf.example4.DownloadAbort;
+import com.bmd.wtf.rpd.RapidLeap;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
 import java.util.HashSet;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Class responsible for the handling of download operations.
  */
-public class CancelableDownloader extends OpenDam<String> {
+public class CancelableDownloader extends RapidLeap<Object> {
 
     private static final int CHUNK_SIZE = 1024;
 
     private final byte[] mBuffer = new byte[CHUNK_SIZE];
 
-    private final HashSet<String> mAborted = new HashSet<String>();
+    private final HashSet<URI> mAborted = new HashSet<URI>();
 
-    private final File mDir;
+    private final HashSet<URI> mDownloading = new HashSet<URI>();
 
-    private final HashSet<String> mDownloading = new HashSet<String>();
+    @SuppressWarnings("UnusedDeclaration")
+    public void onAbort(final DownloadAbort download) {
 
-    public CancelableDownloader(final File downloadDir) {
+        final URI uri = download.getUri();
 
-        mDir = downloadDir;
-    }
+        if (mDownloading.contains(uri)) {
 
-    @Override
-    public void onDischarge(final Floodgate<String, String> gate, final String drop) {
-
-        gate.redropAfter(0, TimeUnit.MILLISECONDS, new Download(drop));
-    }
-
-    @Override
-    public void onDrop(final Floodgate<String, String> gate, final Object debris) {
-
-        if (debris instanceof Download) {
-
-            onDownload(gate, (Download) debris);
-
-        } else if (debris instanceof AbortException) {
-
-            final String url = ((AbortException) debris).getMessage();
-
-            if (mDownloading.contains(url)) {
-
-                mAborted.add(url);
-            }
-
-        } else {
-
-            super.onDrop(gate, debris);
+            mAborted.add(uri);
         }
     }
 
-    private void onDownload(final Floodgate<String, String> gate, final Download download) {
+    @SuppressWarnings("UnusedDeclaration")
+    public void onDownload(final Download download) {
 
-        final String url = download.getUrl();
+        try {
 
-        if (mAborted.remove(url)) {
+            final DownloadHandler handler = new DownloadHandler(download);
 
-            download.abort();
+            final int error = handler.getError();
 
-            mDownloading.remove(url);
+            if (error != 0) {
 
-            gate.drop(new AbortException(url));
+                downRiver().push(new DownloadFailure(download, error));
+
+            } else {
+
+                mDownloading.add(download.getUri());
+
+                upRiver().push(handler);
+            }
+
+        } catch (final IOException e) {
+
+            downRiver().push(new DownloadFailure(download, e));
+        }
+    }
+
+    @SuppressWarnings("UnusedDeclaration")
+    public void onHandler(final DownloadHandler handler) {
+
+        final URI uri = handler.getUri();
+        final HashSet<URI> downloading = mDownloading;
+
+        if (mAborted.remove(uri)) {
+
+            handler.abort();
+
+            downloading.remove(uri);
+
+            downRiver().push(new DownloadFailure(handler, DownloadAbort.ABORT_ERROR));
 
         } else {
 
-            mDownloading.add(url);
+            downloading.add(uri);
 
             try {
 
-                if (download.tranferBytes(new File(mDir, DownloadUtils.getFileName(new URL(url))), mBuffer)) {
+                if (handler.transferBytes(mBuffer)) {
 
-                    gate.redropAfter(0, TimeUnit.MILLISECONDS, download);
+                    upRiver().push(handler);
 
                 } else {
 
-                    mDownloading.remove(url);
-
-                    gate.discharge(url);
+                    downRiver().push(new DownloadSuccess(handler));
                 }
 
             } catch (final IOException e) {
 
-                download.abort();
+                downloading.remove(uri);
 
-                throw new FloatingException(url, e);
+                downRiver().push(new DownloadFailure(handler, e));
             }
         }
     }

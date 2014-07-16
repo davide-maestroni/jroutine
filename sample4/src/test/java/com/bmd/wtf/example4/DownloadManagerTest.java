@@ -20,7 +20,8 @@ import junit.framework.TestCase;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
@@ -50,12 +51,17 @@ public class DownloadManagerTest extends TestCase {
         mDownloadManager = new DownloadManager(2, new File(mTmpDirPath));
     }
 
-    public void testAll() throws IOException {
+    public void testAll() throws IOException, URISyntaxException {
 
-        final String fileName = DownloadUtils.getFileName(new URL(FAIL_URL));
-        final String fileName1 = DownloadUtils.getFileName(new URL(SMALL_FILE_URL1));
-        final String fileName2 = DownloadUtils.getFileName(new URL(SMALL_FILE_URL2));
-        final String fileName3 = DownloadUtils.getFileName(new URL(SMALL_FILE_URL3));
+        final URI uri = new URI(FAIL_URL);
+        final URI uri1 = new URI(SMALL_FILE_URL1);
+        final URI uri2 = new URI(SMALL_FILE_URL2);
+        final URI uri3 = new URI(SMALL_FILE_URL3);
+
+        final String fileName = DownloadUtils.getFileName(uri);
+        final String fileName1 = DownloadUtils.getFileName(uri1);
+        final String fileName2 = DownloadUtils.getFileName(uri2);
+        final String fileName3 = DownloadUtils.getFileName(uri3);
 
         final File outFile = new File(mTmpDirPath, fileName);
         final File outFile1 = new File(mTmpDirPath, fileName1);
@@ -67,141 +73,151 @@ public class DownloadManagerTest extends TestCase {
         assertThat(outFile2).doesNotExist();
         assertThat(outFile3).doesNotExist();
 
-        mDownloadManager.download(SMALL_FILE_URL3);
-        mDownloadManager.download(FAIL_URL);
-        mDownloadManager.download(SMALL_FILE_URL1);
-        mDownloadManager.download(SMALL_FILE_URL2);
+        mDownloadManager.download(uri3);
+        mDownloadManager.download(uri);
+        mDownloadManager.download(uri1);
+        mDownloadManager.download(uri2);
 
         final long startTime = System.currentTimeMillis();
 
-        waitFor(FAIL_URL, startTime, 30000);
-        waitFor(SMALL_FILE_URL1, startTime, 30000);
-        waitFor(SMALL_FILE_URL2, startTime, 30000);
-        waitFor(SMALL_FILE_URL3, startTime, 30000);
+        waitFor(uri, startTime, 30000);
+        waitFor(uri1, startTime, 30000);
+        waitFor(uri2, startTime, 30000);
+        waitFor(uri3, startTime, 30000);
 
-        assertThat(mDownloadManager.isDownloaded(FAIL_URL)).isFalse();
-        assertThat(mDownloadManager.isDownloaded(SMALL_FILE_URL1)).isTrue();
-        assertThat(mDownloadManager.isDownloaded(SMALL_FILE_URL2)).isTrue();
-        assertThat(mDownloadManager.isDownloaded(SMALL_FILE_URL3)).isTrue();
+        assertThat(mDownloadManager.isDownloaded(uri)).isFalse();
+        assertThat(mDownloadManager.isDownloaded(uri1)).isTrue();
+        assertThat(mDownloadManager.isDownloaded(uri2)).isTrue();
+        assertThat(mDownloadManager.isDownloaded(uri3)).isTrue();
 
         assertThat(outFile1).exists();
         assertThat(outFile2).exists();
         assertThat(outFile3).exists();
         assertThat(outFile).doesNotExist();
 
-        mDownloadManager.abort(SMALL_FILE_URL1);
-        mDownloadManager.abort(SMALL_FILE_URL2);
-        mDownloadManager.abort(SMALL_FILE_URL3);
+        mDownloadManager.abort(uri1);
+        mDownloadManager.abort(uri2);
+        mDownloadManager.abort(uri3);
 
-        assertThat(outFile1).doesNotExist();
-        assertThat(outFile2).doesNotExist();
-        assertThat(outFile3).doesNotExist();
+        assertThat(outFile1).exists();
+        assertThat(outFile2).exists();
+        assertThat(outFile3).exists();
     }
 
-    public void testDownload() throws IOException {
+    public void testDownload() throws IOException, URISyntaxException {
 
-        final String fileName1 = DownloadUtils.getFileName(new URL(SMALL_FILE_URL1));
-        final String fileName2 = DownloadUtils.getFileName(new URL(SMALL_FILE_URL2));
-        final String fileName3 = DownloadUtils.getFileName(new URL(SMALL_FILE_URL3));
+        final URI uri1 = new URI(SMALL_FILE_URL1);
+        final URI uri2 = new URI(SMALL_FILE_URL2);
+        final URI uri3 = new URI(SMALL_FILE_URL3);
+
+        final String fileName1 = DownloadUtils.getFileName(uri1);
+        final String fileName2 = DownloadUtils.getFileName(uri2);
+        final String fileName3 = DownloadUtils.getFileName(uri3);
 
         final File outFile1 = new File(mTmpDirPath, fileName1);
         final File outFile2 = new File(mTmpDirPath, fileName2);
         final File outFile3 = new File(mTmpDirPath, fileName3);
 
-        mDownloadManager.abort(SMALL_FILE_URL1);
-        mDownloadManager.abort(SMALL_FILE_URL2);
-        mDownloadManager.abort(SMALL_FILE_URL3);
+        mDownloadManager.abort(uri1);
+        mDownloadManager.abort(uri2);
+        mDownloadManager.abort(uri3);
 
         assertThat(outFile1).doesNotExist();
         assertThat(outFile2).doesNotExist();
         assertThat(outFile3).doesNotExist();
 
-        mDownloadManager.download(SMALL_FILE_URL1);
-        mDownloadManager.download(SMALL_FILE_URL2);
-        mDownloadManager.download(SMALL_FILE_URL3);
+        mDownloadManager.download(uri1);
+        mDownloadManager.download(uri2);
+        mDownloadManager.download(uri3);
 
         final long startTime = System.currentTimeMillis();
 
-        waitFor(SMALL_FILE_URL1, startTime, 30000);
-        waitFor(SMALL_FILE_URL2, startTime, 30000);
-        waitFor(SMALL_FILE_URL3, startTime, 30000);
+        waitFor(uri1, startTime, 30000);
+        waitFor(uri2, startTime, 30000);
+        waitFor(uri3, startTime, 30000);
 
-        assertThat(mDownloadManager.isDownloaded(SMALL_FILE_URL1)).isTrue();
-        assertThat(mDownloadManager.isDownloaded(SMALL_FILE_URL2)).isTrue();
-        assertThat(mDownloadManager.isDownloaded(SMALL_FILE_URL3)).isTrue();
+        assertThat(mDownloadManager.isDownloaded(uri1)).isTrue();
+        assertThat(mDownloadManager.isDownloaded(uri2)).isTrue();
+        assertThat(mDownloadManager.isDownloaded(uri3)).isTrue();
 
         assertThat(outFile1).exists();
         assertThat(outFile2).exists();
         assertThat(outFile3).exists();
 
-        mDownloadManager.abort(SMALL_FILE_URL1);
-        mDownloadManager.abort(SMALL_FILE_URL2);
-        mDownloadManager.abort(SMALL_FILE_URL3);
+        mDownloadManager.abort(uri1);
+        mDownloadManager.abort(uri2);
+        mDownloadManager.abort(uri3);
 
-        assertThat(outFile1).doesNotExist();
-        assertThat(outFile2).doesNotExist();
-        assertThat(outFile3).doesNotExist();
+        assertThat(outFile1).exists();
+        assertThat(outFile2).exists();
+        assertThat(outFile3).exists();
     }
 
-    public void testFail() throws IOException {
+    public void testFail() throws IOException, URISyntaxException {
 
-        final String fileName = DownloadUtils.getFileName(new URL(FAIL_URL));
+        final URI uri = new URI(FAIL_URL);
+
+        final String fileName = DownloadUtils.getFileName(uri);
 
         final File outFile = new File(mTmpDirPath, fileName);
 
         assertThat(outFile).doesNotExist();
 
-        mDownloadManager.download(FAIL_URL);
+        mDownloadManager.download(uri);
 
         final long startTime = System.currentTimeMillis();
 
-        waitFor(FAIL_URL, startTime, 5000);
+        waitFor(uri, startTime, 5000);
 
-        assertThat(mDownloadManager.isDownloaded(FAIL_URL)).isFalse();
+        assertThat(mDownloadManager.isDownloaded(uri)).isFalse();
 
         assertThat(outFile).doesNotExist();
     }
 
-    public void testRepeatedAbort() throws IOException {
+    public void testRepeatedAbort() throws IOException, URISyntaxException {
 
-        final String fileName = DownloadUtils.getFileName(new URL(SMALL_FILE_URL1));
+        final URI uri = new URI(SMALL_FILE_URL1);
+
+        final String fileName = DownloadUtils.getFileName(uri);
 
         final File outFile = new File(mTmpDirPath, fileName);
 
-        mDownloadManager.abort(SMALL_FILE_URL1);
+        mDownloadManager.abort(uri);
 
         assertThat(outFile).doesNotExist();
 
         for (int i = 0; i < 10; i++) {
 
-            mDownloadManager.download(SMALL_FILE_URL1);
-            mDownloadManager.abort(SMALL_FILE_URL1);
+            mDownloadManager.download(uri);
+            mDownloadManager.abort(uri);
         }
 
-        mDownloadManager.abort(SMALL_FILE_URL1);
-        mDownloadManager.download(SMALL_FILE_URL1);
-        mDownloadManager.abort(SMALL_FILE_URL1);
+        mDownloadManager.abort(uri);
+        mDownloadManager.download(uri);
+        mDownloadManager.abort(uri);
 
         final long startTime = System.currentTimeMillis();
 
-        waitFor(SMALL_FILE_URL1, startTime, 20000);
+        waitFor(uri, startTime, 20000);
 
-        assertThat(mDownloadManager.isDownloaded(SMALL_FILE_URL1)).isFalse();
+        assertThat(mDownloadManager.isDownloaded(uri)).isFalse();
 
         assertThat(outFile).doesNotExist();
     }
 
-    public void testSimpleAbort() throws IOException {
+    public void testSimpleAbort() throws IOException, URISyntaxException {
 
-        final String fileName = DownloadUtils.getFileName(new URL(SMALL_FILE_URL1));
+        final URI uri = new URI(SMALL_FILE_URL1);
+
+        final String fileName = DownloadUtils.getFileName(uri);
 
         final File outFile = new File(mTmpDirPath, fileName);
 
-        mDownloadManager.abort(SMALL_FILE_URL1);
+        mDownloadManager.abort(uri);
 
         assertThat(outFile).doesNotExist();
 
-        mDownloadManager.download(SMALL_FILE_URL1);
+        mDownloadManager.download(uri);
 
         final long startTime = System.currentTimeMillis();
 
@@ -221,11 +237,11 @@ public class DownloadManagerTest extends TestCase {
             }
         }
 
-        mDownloadManager.abort(SMALL_FILE_URL1);
+        mDownloadManager.abort(uri);
 
-        waitFor(SMALL_FILE_URL1, startTime, 20000);
+        waitFor(uri, startTime, 20000);
 
-        assertThat(mDownloadManager.isDownloaded(SMALL_FILE_URL1)).isFalse();
+        assertThat(mDownloadManager.isDownloaded(uri)).isFalse();
 
         assertThat(outFile).doesNotExist();
     }
@@ -240,14 +256,15 @@ public class DownloadManagerTest extends TestCase {
         delete(SMALL_FILE_URL3);
     }
 
-    private boolean delete(final String url) throws MalformedURLException {
+    private boolean delete(final String url) throws MalformedURLException, URISyntaxException {
 
-        return new File(mTmpDirPath, DownloadUtils.getFileName(new URL(url))).delete();
+        return new File(mTmpDirPath, DownloadUtils.getFileName(new URI(url))).delete();
     }
 
-    private void waitFor(final String url, final long startTime, final long timeoutMs) throws IOException {
+    private void waitFor(final URI uri, final long startTime, final long timeoutMs) throws
+            IOException {
 
-        while (!mDownloadManager.isComplete(url)) {
+        while (!mDownloadManager.isComplete(uri)) {
 
             try {
 

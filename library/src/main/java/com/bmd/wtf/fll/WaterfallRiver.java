@@ -28,17 +28,17 @@ import java.util.concurrent.TimeUnit;
  */
 public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
 
-    private final boolean mIsDownstream;
+    private final Direction mDirection;
 
     private final Waterfall<SOURCE, DATA, ?> mWaterfall;
 
     /**
      * Constructor.
      *
-     * @param waterfall    The wrapped waterfall.
-     * @param isDownstream Whether the river direction is downstream.
+     * @param waterfall The wrapped waterfall.
+     * @param direction Whether the river direction is downstream or upstream.
      */
-    public WaterfallRiver(final Waterfall<SOURCE, DATA, ?> waterfall, final boolean isDownstream) {
+    public WaterfallRiver(final Waterfall<SOURCE, DATA, ?> waterfall, final Direction direction) {
 
         if (waterfall == null) {
 
@@ -46,19 +46,19 @@ public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
         }
 
         mWaterfall = waterfall;
-        mIsDownstream = isDownstream;
+        mDirection = direction;
     }
 
     @Override
     public void deviate() {
 
-        mWaterfall.deviate(mIsDownstream);
+        mWaterfall.deviate(mDirection);
     }
 
     @Override
     public void deviateStream(final int streamNumber) {
 
-        mWaterfall.deviateStream(streamNumber, mIsDownstream);
+        mWaterfall.deviateStream(streamNumber, mDirection);
     }
 
     @Override
@@ -242,13 +242,13 @@ public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     @Override
     public void drain() {
 
-        mWaterfall.drain(mIsDownstream);
+        mWaterfall.drain(mDirection);
     }
 
     @Override
     public void drainStream(final int streamNumber) {
 
-        mWaterfall.drainStream(streamNumber, mIsDownstream);
+        mWaterfall.drainStream(streamNumber, mDirection);
     }
 
     @Override

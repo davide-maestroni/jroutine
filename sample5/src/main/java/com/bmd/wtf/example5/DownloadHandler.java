@@ -13,77 +13,69 @@
  */
 package com.bmd.wtf.example5;
 
-import com.bmd.wtf.bdr.FloatingException;
+import com.bmd.wtf.example1.Download;
 import com.bmd.wtf.example1.DownloadUtils;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.URI;
 import java.net.URLConnection;
 
 /**
  * Class actually handling the initial connection and the downloading of data.
  */
-public class Download {
+public class DownloadHandler extends Download {
+
+    private int mError;
 
     private InputStream mInputStream;
 
-    private File mOutputFile;
-
     private FileOutputStream mOutputStream;
 
-    private String mUrl;
+    public DownloadHandler(final Download download) throws IOException {
 
-    public Download(final String url) {
+        super(download.getUri(), download.getFile());
 
         resetConnection();
 
         try {
 
-            setupConnection(url);
-
-            mUrl = url;
+            setupConnection(download.getUri());
 
         } catch (final IOException e) {
 
             resetConnection();
 
-            throw new FloatingException(url, e);
+            throw e;
         }
     }
 
     public void abort() {
 
-        resetOutput(true);
+        resetOutput();
 
         resetConnection();
     }
 
-    public String getUrl() {
+    public int getError() {
 
-        return mUrl;
+        return mError;
     }
 
-    public boolean tranferBytes(final File outFile, final byte[] buffer) {
+    public boolean transferBytes(final byte[] buffer) throws IOException {
 
-        if ((outFile == null) || (buffer == null) || (mInputStream == null)) {
+        if ((buffer == null) || (mInputStream == null)) {
 
-            throw new FloatingException(mUrl);
+            throw new IOException();
         }
 
         try {
 
-            if (!outFile.equals(mOutputFile)) {
-
-                resetOutput(false);
-            }
-
             if (mOutputStream == null) {
 
-                setupOutput(outFile);
+                setupOutput();
 
                 return true;
 
@@ -103,11 +95,11 @@ public class Download {
 
         } catch (final IOException e) {
 
-            resetOutput(true);
+            resetOutput();
 
             resetConnection();
 
-            throw new FloatingException(mUrl, e);
+            throw e;
         }
     }
 
@@ -118,26 +110,21 @@ public class Download {
         mInputStream = null;
     }
 
-    private void resetOutput(final boolean deleteFile) {
+    private void resetOutput() {
 
         DownloadUtils.safeClose(mOutputStream);
 
         mOutputStream = null;
 
-        if (deleteFile && (mOutputFile != null)) {
-
-            //noinspection ResultOfMethodCallIgnored
-            mOutputFile.delete();
-
-            mOutputFile = null;
-        }
+        //noinspection ResultOfMethodCallIgnored
+        getFile().delete();
     }
 
-    private void setupConnection(final String url) throws IOException {
+    private void setupConnection(final URI uri) throws IOException {
 
         mInputStream = null;
 
-        final URLConnection connection = new URL(url).openConnection();
+        final URLConnection connection = uri.toURL().openConnection();
 
         // Open the input stream
 
@@ -151,20 +138,17 @@ public class Download {
 
                 // The request has failed...
 
-                throw new FloatingException(mUrl, responseCode);
+                mError = responseCode;
             }
         }
 
         mInputStream = inputStream;
     }
 
-    private void setupOutput(final File outFile) throws IOException {
+    private void setupOutput() throws IOException {
 
         mOutputStream = null;
 
-        outFile.deleteOnExit();
-
-        mOutputStream = new FileOutputStream(outFile);
-        mOutputFile = outFile;
+        mOutputStream = new FileOutputStream(getFile());
     }
 }

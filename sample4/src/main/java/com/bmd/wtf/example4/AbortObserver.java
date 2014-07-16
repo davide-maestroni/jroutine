@@ -13,10 +13,13 @@
  */
 package com.bmd.wtf.example4;
 
-import com.bmd.wtf.example1.DownloadObserver;
-import com.bmd.wtf.src.Floodgate;
+import com.bmd.wtf.example1.Download;
+import com.bmd.wtf.example1.DownloadFailure;
+import com.bmd.wtf.example1.DownloadSuccess;
+import com.bmd.wtf.example2.DownloadObserver;
+import com.bmd.wtf.rpd.RapidAnnotations.FlowPath;
 
-import java.io.File;
+import java.net.URI;
 import java.util.HashSet;
 
 /**
@@ -25,57 +28,42 @@ import java.util.HashSet;
  */
 public class AbortObserver extends DownloadObserver {
 
-    private final HashSet<String> mAbortedDownloadUrls = new HashSet<String>();
+    private final HashSet<URI> mAbortedDownloads = new HashSet<URI>();
 
-    public AbortObserver(final File downloadDir) {
+    @FlowPath
+    public void onAbort(final DownloadAbort download) {
 
-        super(downloadDir);
+        mAbortedDownloads.add(download.getUri());
     }
 
     @Override
-    public void onDischarge(final Floodgate<String, String> gate, final String drop) {
+    public void onDownload(final Download download) {
 
         // A new download is requested so we remove the url from the aborted ones
 
-        mAbortedDownloadUrls.remove(drop);
+        mAbortedDownloads.remove(download.getUri());
 
-        super.onDischarge(gate, drop);
+        super.onDownload(download);
     }
 
     @Override
-    public void onDrop(final Floodgate<String, String> gate, final Object debris) {
+    public void onFailure(final DownloadFailure download) {
 
-        if (debris instanceof AbortException) {
+        mAbortedDownloads.remove(download.getUri());
 
-            final AbortException error = (AbortException) debris;
-
-            final String url = error.getMessage();
-
-            if (isDownloaded(url)) {
-
-                onFailure(url, error);
-
-            } else if (isDownloading(url)) {
-
-                mAbortedDownloadUrls.add(url);
-            }
-
-        } else {
-
-            super.onDrop(gate, debris);
-        }
+        super.onFailure(download);
     }
 
     @Override
-    protected void onComplete(final String url) {
+    public void onSuccess(final DownloadSuccess download) {
 
-        if (mAbortedDownloadUrls.remove(url)) {
+        if (!mAbortedDownloads.remove(download.getUri())) {
 
-            onFailure(url, new AbortException(url));
+            super.onSuccess(download);
 
         } else {
 
-            super.onComplete(url);
+            super.onFailure(new DownloadFailure(download, DownloadAbort.ABORT_ERROR));
         }
     }
 }

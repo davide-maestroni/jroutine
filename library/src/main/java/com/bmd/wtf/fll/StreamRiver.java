@@ -175,14 +175,14 @@ class StreamRiver<SOURCE, DATA> extends AbstractRiver<SOURCE, DATA> {
 
         for (final DataStream<DATA> stream : mStreams) {
 
-            stream.drain(true);
+            stream.drain(Direction.DOWNSTREAM);
         }
     }
 
     @Override
     public void drainStream(final int streamNumber) {
 
-        mStreams.get(streamNumber).drain(true);
+        mStreams.get(streamNumber).drain(Direction.DOWNSTREAM);
     }
 
     @Override

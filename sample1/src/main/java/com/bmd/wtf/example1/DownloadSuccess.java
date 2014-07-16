@@ -11,15 +11,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.wtf.example4;
+package com.bmd.wtf.example1;
 
 /**
- * Exception used to signal a download aborting operation.
+ * Download success.
  */
-public class AbortException extends RuntimeException {
+public class DownloadSuccess extends Download {
 
-    public AbortException(final String message) {
+    public DownloadSuccess(final Download download) {
 
-        super(message);
+        super(download.getUri(), download.getFile());
     }
 }

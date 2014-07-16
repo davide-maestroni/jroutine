@@ -14,7 +14,7 @@
 package com.bmd.wtf.rpd;
 
 import com.bmd.wtf.flw.Gate.ConditionEvaluator;
-import com.bmd.wtf.rpd.RapidAnnotations.Condition;
+import com.bmd.wtf.rpd.RapidAnnotations.GateCondition;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -25,7 +25,7 @@ import java.util.Arrays;
  * specified arguments.
  * <p/>
  * A suitable method is identified among the ones taking the specified arguments and returning
- * a boolean value. The methods annotated with {@link RapidAnnotations.Condition} are analyzed
+ * a boolean value. The methods annotated with {@link com.bmd.wtf.rpd.RapidAnnotations.GateCondition} are analyzed
  * first.<br/>
  * If more than one method matching the above requirements is found, an exception will be
  * thrown.
@@ -93,16 +93,16 @@ class GateConditionEvaluator<TYPE> implements ConditionEvaluator<TYPE> {
 
                     if (conditionMethod == null) {
 
-                        isAnnotated = method.isAnnotationPresent(Condition.class);
+                        isAnnotated = method.isAnnotationPresent(GateCondition.class);
 
                     } else if (isAnnotated) {
 
-                        if (!method.isAnnotationPresent(Condition.class)) {
+                        if (!method.isAnnotationPresent(GateCondition.class)) {
 
                             continue;
                         }
 
-                    } else if (method.isAnnotationPresent(Condition.class)) {
+                    } else if (method.isAnnotationPresent(GateCondition.class)) {
 
                         conditionMethod = null;
 

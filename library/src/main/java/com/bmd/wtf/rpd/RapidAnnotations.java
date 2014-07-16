@@ -25,15 +25,16 @@ import java.lang.annotation.Target;
  */
 public interface RapidAnnotations {
 
-    @Target({ElementType.METHOD})
+    @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
-    public @interface Condition {
+    public @interface FlowPath {
 
+        Class<?>[] value() default {};
     }
 
-    @Target({ElementType.METHOD})
+    @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
-    public @interface Flow {
+    public @interface GateCondition {
 
     }
 

@@ -19,9 +19,12 @@ import com.bmd.wtf.flw.Collector;
 import com.bmd.wtf.flw.River;
 import com.bmd.wtf.lps.AbstractLeap;
 import com.bmd.wtf.lps.FreeLeap;
-import com.bmd.wtf.rpd.RapidAnnotations.Flow;
+import com.bmd.wtf.rpd.RapidAnnotations.FlowPath;
 
 import junit.framework.TestCase;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.bmd.wtf.fll.Waterfall.fall;
 import static org.fest.assertions.api.Assertions.assertThat;
@@ -38,6 +41,7 @@ public class RapidLeapTest extends TestCase {
         final Waterfall<Object, Object, Object> fall1 = fall().start();
         final Waterfall<Object, Object, Object> fall2 = fall1.chain(new RapidLeap<Object>() {
 
+            @SuppressWarnings("UnusedDeclaration")
             public Integer dec(final Integer num) {
 
                 if (num == 0) {
@@ -67,6 +71,7 @@ public class RapidLeapTest extends TestCase {
 
         fall1.chain(new RapidLeap<Object>() {
 
+            @SuppressWarnings("UnusedDeclaration")
             public Integer same(final Integer num) {
 
                 if (num == -1) {
@@ -142,6 +147,26 @@ public class RapidLeapTest extends TestCase {
 
         try {
 
+            fall().start(new RapidLeapError5());
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            fall().start(new RapidLeapError6());
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
             fall().start(RapidLeap.from(new RapidLeapError1()));
 
             fail();
@@ -191,22 +216,45 @@ public class RapidLeapTest extends TestCase {
 
             assertThat(((RapidException) e).getCause()).isEqualTo(new MyException());
         }
+
+        try {
+
+            fall().start(RapidLeap.from(new RapidLeapError5()));
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            fall().start(RapidLeap.from(new RapidLeapError6()));
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
     }
 
     public void testFlow() {
 
         assertThat(fall().start(new RapidLeap<Object>() {
 
+            @SuppressWarnings("UnusedDeclaration")
             public void integerToString(final Integer data) {
 
                 downRiver().push(data.toString());
             }
 
+            @SuppressWarnings("UnusedDeclaration")
             public void floatToString(final Float data) {
 
                 upRiver().push(data.toString());
             }
 
+            @SuppressWarnings("UnusedDeclaration")
             public void doubleToStirng(final Double data) {
 
                 source().push(data.toString());
@@ -223,6 +271,7 @@ public class RapidLeapTest extends TestCase {
 
         assertThat(fall().asGate().start(new TestLeapGate()).chain(new RapidLeap<Object>() {
 
+            @SuppressWarnings("UnusedDeclaration")
             public Object obj(final Object obj) {
 
                 assertThat(on(LeapGate.class).perform().getInt()).isEqualTo(111);
@@ -381,11 +430,13 @@ public class RapidLeapTest extends TestCase {
 
     public static class RapidLeapError1 extends RapidLeap<Object> {
 
+        @SuppressWarnings("UnusedDeclaration")
         public String method1(final String text) {
 
             return text;
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public Integer method2(final String text) {
 
             return Integer.parseInt(text);
@@ -394,13 +445,13 @@ public class RapidLeapTest extends TestCase {
 
     public static class RapidLeapError2 extends RapidLeap<Object> {
 
-        @Flow
+        @FlowPath
         public String method1(final String text) {
 
             return text;
         }
 
-        @Flow
+        @FlowPath
         public Integer method2(final String text) {
 
             return Integer.parseInt(text);
@@ -409,7 +460,7 @@ public class RapidLeapTest extends TestCase {
 
     public static class RapidLeapError3 extends RapidLeap<Object> {
 
-        @Flow
+        @FlowPath
         public String method1(final String text, final int ignored) {
 
             return text;
@@ -418,24 +469,52 @@ public class RapidLeapTest extends TestCase {
 
     public static class RapidLeapError4 extends RapidLeap<Object> {
 
+        @SuppressWarnings("UnusedDeclaration")
         public void error(final String text) throws MyException {
 
             throw new MyException();
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public void error(final Void ignored) throws MyException {
 
             throw new MyException();
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public void error(final Discharge ignored) throws MyException {
 
             throw new MyException();
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public void error(final Throwable ignored) throws MyException {
 
             throw new MyException();
+        }
+    }
+
+    public static class RapidLeapError5 extends RapidLeap<Object> {
+
+        @FlowPath(Integer.class)
+        public String method1(final String text) {
+
+            return text;
+        }
+    }
+
+    public static class RapidLeapError6 extends RapidLeap<Object> {
+
+        @FlowPath
+        public String method1(final ArrayList<?> list) {
+
+            return list.toString();
+        }
+
+        @FlowPath(ArrayList.class)
+        public String method2(final List<?> list) {
+
+            return list.toString();
         }
     }
 
@@ -448,6 +527,7 @@ public class RapidLeapTest extends TestCase {
             mNumber = number;
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public Object obj(final Object obj) {
 
             assertThat(fallNumber()).isEqualTo(mNumber);
@@ -458,16 +538,19 @@ public class RapidLeapTest extends TestCase {
 
     public static class RapidLeapTest1 extends RapidLeap<Object> {
 
+        @SuppressWarnings("UnusedDeclaration")
         public String onObject(final Object data) {
 
             return data.toString();
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public Integer parse(final String text) {
 
             return Integer.parseInt(text);
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public String serialize(final Integer integer) {
 
             return integer.toString();
@@ -476,11 +559,13 @@ public class RapidLeapTest extends TestCase {
 
     public static class RapidLeapTest2 extends RapidLeapTest1 {
 
+        @SuppressWarnings("UnusedDeclaration")
         public String minusSerialize(final Integer integer) {
 
             return "-" + integer.toString();
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public String onNull(final Void data) {
 
             return "";
@@ -497,27 +582,28 @@ public class RapidLeapTest extends TestCase {
 
         public RapidLeapTest3() {
 
-            super(true);
+            super(ValidPaths.ANNOTATED_ONLY);
         }
 
-        @Flow
+        @FlowPath
         public void discharge(final Discharge ignored) {
 
             downRiver().discharge("test");
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public String onObject(final Object data) {
 
             return data.toString();
         }
 
-        @Flow
+        @FlowPath
         public Integer parse(final String text) {
 
             return Integer.parseInt(text);
         }
 
-        @Flow
+        @FlowPath
         public String serialize(final Integer integer) {
 
             return integer.toString();
@@ -526,16 +612,19 @@ public class RapidLeapTest extends TestCase {
 
     public static class RapidLeapTest4 extends RapidLeapTest1 {
 
+        @SuppressWarnings("UnusedDeclaration")
         public MyException error(final Throwable ignored) {
 
             return new MyException();
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public MyException error(final Integer ignored) {
 
             return new MyException();
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public Discharge onNull(final Void ignored) {
 
             return null;

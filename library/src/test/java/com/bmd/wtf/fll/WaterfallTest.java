@@ -21,6 +21,7 @@ import com.bmd.wtf.flw.Collector;
 import com.bmd.wtf.flw.Gate.Action;
 import com.bmd.wtf.flw.Gate.ConditionEvaluator;
 import com.bmd.wtf.flw.River;
+import com.bmd.wtf.flw.Stream.Direction;
 import com.bmd.wtf.lps.AbstractLeap;
 import com.bmd.wtf.lps.FreeLeap;
 import com.bmd.wtf.lps.Leap;
@@ -293,7 +294,7 @@ public class WaterfallTest extends TestCase {
                             final River<String, String> downRiver, final int fallNumber,
                             final Throwable throwable) {
 
-                        //just ignore it
+                        // just ignore it
                     }
                 });
 
@@ -724,14 +725,14 @@ public class WaterfallTest extends TestCase {
         fall6.chain(fall7);
         assertThat(fall7.pull("test").all()).containsExactly("test");
 
-        fall6.deviate(true);
+        fall6.deviate(Direction.DOWNSTREAM);
         assertThat(fall6.pull("test").all()).containsExactly("test");
         assertThat(fall7.pull("test").afterMax(100, TimeUnit.MILLISECONDS).all()).isEmpty();
 
         fall6.chain(fall7);
         assertThat(fall7.pull("test").all()).containsExactly("test");
 
-        fall6.deviate(false);
+        fall6.deviate(Direction.UPSTREAM);
         assertThat(fall6.pull("test").afterMax(100, TimeUnit.MILLISECONDS).all()).isEmpty();
         assertThat(fall7.pull("test").afterMax(100, TimeUnit.MILLISECONDS).all()).isEmpty();
 
@@ -745,14 +746,14 @@ public class WaterfallTest extends TestCase {
         fall6.chain(fall7);
         assertThat(fall7.pull("test").all()).containsExactly("test");
 
-        fall6.deviateStream(0, true);
+        fall6.deviateStream(0, Direction.DOWNSTREAM);
         assertThat(fall6.pull("test").all()).containsExactly("test");
         assertThat(fall7.pull("test").afterMax(100, TimeUnit.MILLISECONDS).all()).isEmpty();
 
         fall6.chain(fall7);
         assertThat(fall7.pull("test").all()).containsExactly("test");
 
-        fall6.deviateStream(0, false);
+        fall6.deviateStream(0, Direction.UPSTREAM);
         assertThat(fall6.pull("test").afterMax(100, TimeUnit.MILLISECONDS).all()).isEmpty();
         assertThat(fall7.pull("test").afterMax(100, TimeUnit.MILLISECONDS).all()).isEmpty();
 
@@ -766,14 +767,14 @@ public class WaterfallTest extends TestCase {
         fall6.chain(fall7);
         assertThat(fall7.pull("test").all()).containsExactly("test");
 
-        fall6.drain(true);
+        fall6.drain(Direction.DOWNSTREAM);
         assertThat(fall6.pull("test").all()).containsExactly("test");
         assertThat(fall7.pull("test").afterMax(100, TimeUnit.MILLISECONDS).all()).isEmpty();
 
         fall6.chain(fall7);
         assertThat(fall7.pull("test").all()).containsExactly("test");
 
-        fall6.drain(false);
+        fall6.drain(Direction.UPSTREAM);
         assertThat(fall6.pull("test").afterMax(100, TimeUnit.MILLISECONDS).all()).isEmpty();
         assertThat(fall7.pull("test").afterMax(100, TimeUnit.MILLISECONDS).all()).isEmpty();
 
@@ -787,14 +788,14 @@ public class WaterfallTest extends TestCase {
         fall6.chain(fall7);
         assertThat(fall7.pull("test").all()).containsExactly("test");
 
-        fall6.drainStream(0, true);
+        fall6.drainStream(0, Direction.DOWNSTREAM);
         assertThat(fall6.pull("test").all()).containsExactly("test");
         assertThat(fall7.pull("test").afterMax(100, TimeUnit.MILLISECONDS).all()).isEmpty();
 
         fall6.chain(fall7);
         assertThat(fall7.pull("test").all()).containsExactly("test");
 
-        fall6.drainStream(0, false);
+        fall6.drainStream(0, Direction.UPSTREAM);
         assertThat(fall6.pull("test").afterMax(100, TimeUnit.MILLISECONDS).all()).isEmpty();
         assertThat(fall7.pull("test").afterMax(100, TimeUnit.MILLISECONDS).all()).isEmpty();
 
@@ -967,7 +968,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            new WaterfallRiver<Object, Object>(null, true);
+            new WaterfallRiver<Object, Object>(null, Direction.DOWNSTREAM);
 
             fail();
 
@@ -977,7 +978,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            new WaterfallRiver<Object, Object>(null, false);
+            new WaterfallRiver<Object, Object>(null, Direction.UPSTREAM);
 
             fail();
 
@@ -1292,21 +1293,6 @@ public class WaterfallTest extends TestCase {
                     return new FreeLeap<Object, Object>();
                 }
             });
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            final Waterfall<Object, Object, Object> waterfall = fall().start();
-
-            waterfall.as(Leap.class)
-                     .chain(new FreeLeap<Object, Object>())
-                     .as(Leap.class)
-                     .chain(new FreeLeap<Object, Object>());
 
             fail();
 

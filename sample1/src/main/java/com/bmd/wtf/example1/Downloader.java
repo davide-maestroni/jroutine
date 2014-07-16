@@ -13,9 +13,7 @@
  */
 package com.bmd.wtf.example1;
 
-import com.bmd.wtf.bdr.FloatingException;
-import com.bmd.wtf.dam.OpenDam;
-import com.bmd.wtf.src.Floodgate;
+import com.bmd.wtf.rpd.RapidLeap;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -28,17 +26,10 @@ import java.net.URLConnection;
 /**
  * Class responsible for the actual downloading of data.
  */
-public class Downloader extends OpenDam<String> {
+public class Downloader extends RapidLeap<Object> {
 
-    private final File mDir;
-
-    public Downloader(final File downloadDir) {
-
-        mDir = downloadDir;
-    }
-
-    @Override
-    public void onDischarge(final Floodgate<String, String> gate, final String drop) {
+    @SuppressWarnings("UnusedDeclaration")
+    public void onDownload(final Download download) {
 
         InputStream inputStream = null;
 
@@ -46,9 +37,9 @@ public class Downloader extends OpenDam<String> {
 
         try {
 
-            final URL url = new URL(drop);
+            final URL url = download.getUri().toURL();
 
-            final File outFile = new File(mDir, DownloadUtils.getFileName(url));
+            final File outFile = download.getFile();
             outFile.deleteOnExit();
 
             final URLConnection connection = url.openConnection();
@@ -65,7 +56,9 @@ public class Downloader extends OpenDam<String> {
 
                     // The request has failed...
 
-                    throw new FloatingException(drop, responseCode);
+                    downRiver().push(new DownloadFailure(download, responseCode));
+
+                    return;
                 }
             }
 
@@ -84,11 +77,11 @@ public class Downloader extends OpenDam<String> {
 
             // Discharge the url if everything worked as expected
 
-            super.onDischarge(gate, drop);
+            downRiver().push(new DownloadSuccess(download));
 
         } catch (final IOException e) {
 
-            throw new FloatingException(drop, e);
+            downRiver().push(new DownloadFailure(download, e));
 
         } finally {
 

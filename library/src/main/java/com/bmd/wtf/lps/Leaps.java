@@ -13,6 +13,8 @@
  */
 package com.bmd.wtf.lps;
 
+import com.bmd.wtf.lps.WeakLeap.WhenVanished;
+
 /**
  * Utility class for creating leap instances.
  * <p/>
@@ -44,17 +46,17 @@ public class Leaps {
     /**
      * Creates and returns a leap retaining the specified instance through a weak reference.
      *
-     * @param leap             The wrapped leap instance.
-     * @param freeWhenVanished Whether the wrapping leap must behave like a free one after the
-     *                         retained instance has vanished.
-     * @param <SOURCE>         The river source data type.
-     * @param <IN>             The input data type.
-     * @param <OUT>            The output data type.
+     * @param leap         The wrapped leap instance.
+     * @param whenVanished Whether the wrapping leap must behave like a free one or not after the
+     *                     retained instance has vanished.
+     * @param <SOURCE>     The river source data type.
+     * @param <IN>         The input data type.
+     * @param <OUT>        The output data type.
      * @return The wrapping leap.
      */
     public static <SOURCE, IN, OUT> Leap<SOURCE, IN, OUT> weak(final Leap<SOURCE, IN, OUT> leap,
-            final boolean freeWhenVanished) {
+            final WhenVanished whenVanished) {
 
-        return new WeakLeap<SOURCE, IN, OUT>(leap, freeWhenVanished);
+        return new WeakLeap<SOURCE, IN, OUT>(leap, whenVanished);
     }
 }

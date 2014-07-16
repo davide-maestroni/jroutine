@@ -44,29 +44,6 @@ public class Rapid {
 
     /**
      * Creates and returns a current generator which instantiates objects of the specified
-     * classification through a method taking the specified parameters. A method taking
-     * an additional Integer parameter (that is, the fall number) is preferred to the default one.
-     * A one taking a primitive int is preferred to the Integer. Finally, a method annotated
-     * with {@link RapidAnnotations.Generator} is preferred to the not annotated ones.<br/>
-     * In case a suitable method is not found, an exception will be thrown.
-     * <p/>
-     * Note that a method might need to be made accessible in order to be called via
-     * reflection. That means that, in case a {@link java.lang.SecurityManager} is installed, a
-     * security exception might be raised based on the specific policy implemented.
-     *
-     * @param generator      The generator object whose method will be called.
-     * @param classification The current classification.
-     * @param args           The arguments to be passed to the method.
-     * @return The newly created current generator.
-     */
-    public static CurrentGenerator currentGenerator(final Object generator,
-            final Classification<? extends Current> classification, final Object... args) {
-
-        return RapidGenerators.currentGenerator(generator, classification, args);
-    }
-
-    /**
-     * Creates and returns a current generator which instantiates objects of the specified
      * type through a method taking the specified parameters. A method taking
      * an additional Integer parameter (that is, the fall number) is preferred to the default one.
      * A one taking a primitive int is preferred to the Integer. Finally, a method annotated

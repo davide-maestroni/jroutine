@@ -13,24 +13,19 @@
  */
 package com.bmd.wtf.example2;
 
-import com.bmd.wtf.Waterfall;
-import com.bmd.wtf.crr.Currents;
-import com.bmd.wtf.dam.Dam;
-import com.bmd.wtf.dam.OpenDam;
-import com.bmd.wtf.example1.DownloadObserver;
+import com.bmd.wtf.example1.Download;
+import com.bmd.wtf.example1.DownloadUtils;
 import com.bmd.wtf.example1.Downloader;
-import com.bmd.wtf.example1.UrlObserver;
-import com.bmd.wtf.src.Floodgate;
-import com.bmd.wtf.src.Spring;
-import com.bmd.wtf.xtr.arr.CurrentFactories;
-import com.bmd.wtf.xtr.arr.DamFactory;
-import com.bmd.wtf.xtr.arr.WaterfallArray;
-import com.bmd.wtf.xtr.fld.FloodControl;
-import com.bmd.wtf.xtr.qdc.Aqueduct;
-import com.bmd.wtf.xtr.qdc.RotatingArchway;
+import com.bmd.wtf.fll.Classification;
+import com.bmd.wtf.fll.Waterfall;
+import com.bmd.wtf.rpd.Rapid;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import static com.bmd.wtf.fll.Waterfall.fall;
 
 /**
  * Optimized download manager.<br/>
@@ -38,42 +33,32 @@ import java.io.IOException;
  */
 public class DownloadManager {
 
-    private final FloodControl<String, String, UrlObserver> mControl =
-            new FloodControl<String, String, UrlObserver>(UrlObserver.class);
+    private final File mDownloadDir;
 
-    private final Spring<String> mSpring;
+    private final UriObserver mGate;
+
+    private final Waterfall<Object, Object, Object> mWaterfall;
 
     public DownloadManager(final int maxThreads, final File downloadDir) throws IOException {
 
         if (!downloadDir.isDirectory() && !downloadDir.mkdirs()) {
 
-            throw new IOException("Could not create temp directory: " + downloadDir.getAbsolutePath());
+            throw new IOException(
+                    "Could not create temp directory: " + downloadDir.getAbsolutePath());
         }
 
-        final DownloadObserver downloadObserver = new DownloadObserver(downloadDir);
-
-        mSpring = WaterfallArray.formingFrom(
-                Aqueduct.fedBy(Waterfall.fallingFrom(mControl.leveeControlledBy(downloadObserver)))
-                        .thenSeparatingIn(maxThreads).thenFlowingThrough(new RotatingArchway<String>())
-        ).thenFlowingInto(CurrentFactories.singletonCurrentFactory(Currents.threadPoolCurrent(maxThreads)))
-                                .thenFallingThrough(new DamFactory<String, String>() {
-
-                                    @Override
-                                    public Dam<String, String> createForStream(final int streamNumber) {
-
-                                        return new Downloader(downloadDir);
-                                    }
-                                }).thenMergingThrough(new OpenDam<String>() {
-
-                    @Override
-                    public void onDischarge(final Floodgate<String, String> gate, final String drop) {
-
-                        gate.drop(drop);
-                    }
-                }).thenFallingThrough(mControl.leveeControlledBy(downloadObserver)).backToSource();
+        mDownloadDir = downloadDir;
+        mWaterfall = fall().asGate()
+                           .start(new DownloadObserver())
+                           .inBackground(maxThreads)
+                           .distribute()
+                           .chain(Rapid.leapGenerator(Downloader.class))
+                           .in(1)
+                           .chain(Classification.ofType(DownloadObserver.class));
+        mGate = Rapid.gate(mWaterfall.on(DownloadObserver.class)).performAs(UriObserver.class);
     }
 
-    public static void main(final String args[]) throws IOException {
+    public static void main(final String args[]) throws IOException, URISyntaxException {
 
         final int maxThreads = Integer.parseInt(args[0]);
 
@@ -83,22 +68,23 @@ public class DownloadManager {
 
         for (int i = 2; i < args.length; i++) {
 
-            manager.download(args[i]);
+            manager.download(new URI(args[i]));
         }
     }
 
-    public void download(final String url) {
+    public void download(final URI uri) throws URISyntaxException {
 
-        mSpring.discharge(url);
+        mWaterfall.source()
+                  .push(new Download(uri, new File(mDownloadDir, DownloadUtils.getFileName(uri))));
     }
 
-    public boolean isComplete(final String url) {
+    public boolean isComplete(final URI uri) {
 
-        return !mControl.controller().isDownloading(url);
+        return !mGate.isDownloading(uri);
     }
 
-    public boolean isDownloaded(final String url) {
+    public boolean isDownloaded(final URI uri) {
 
-        return mControl.controller().isDownloaded(url);
+        return mGate.isDownloaded(uri);
     }
 }

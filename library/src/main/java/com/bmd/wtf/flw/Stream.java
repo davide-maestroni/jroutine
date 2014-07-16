@@ -159,4 +159,13 @@ public interface Stream<DATA> {
      * @return This stream.
      */
     public Stream<DATA> pushAfter(long delay, TimeUnit timeUnit, DATA... drops);
+
+    /**
+     * Stream direction.
+     */
+    public enum Direction {
+
+        DOWNSTREAM,
+        UPSTREAM
+    }
 }

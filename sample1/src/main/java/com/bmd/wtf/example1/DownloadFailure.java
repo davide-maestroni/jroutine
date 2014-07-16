@@ -13,14 +13,22 @@
  */
 package com.bmd.wtf.example1;
 
-import com.bmd.wtf.xtr.fld.FloodObserver;
-
 /**
- * Observer of downloaded urls.
+ * Download failure data.
  */
-public interface UrlObserver extends FloodObserver<String, String> {
+public class DownloadFailure extends Download {
 
-    public boolean isDownloaded(String url);
+    private final Object mReason;
 
-    public boolean isDownloading(String url);
+    public DownloadFailure(final Download download, final Object reason) {
+
+        super(download.getUri(), download.getFile());
+
+        mReason = reason;
+    }
+
+    public Object getReason() {
+
+        return mReason;
+    }
 }

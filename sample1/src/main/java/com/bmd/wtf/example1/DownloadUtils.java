@@ -13,10 +13,9 @@
  */
 package com.bmd.wtf.example1;
 
+import java.io.Closeable;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URL;
+import java.net.URI;
 
 /**
  * Utility class.
@@ -30,12 +29,12 @@ public class DownloadUtils {
     /**
      * Extracts the downloaded file name from the download URL.
      *
-     * @param url The URL of the resource to download.
+     * @param uri The URI of the resource to download.
      * @return The downloaded file name.
      */
-    public static String getFileName(final URL url) {
+    public static String getFileName(final URI uri) {
 
-        final String path = url.getPath();
+        final String path = uri.getPath();
 
         final String fileName = path.substring(path.lastIndexOf('/') + 1);
 
@@ -48,36 +47,17 @@ public class DownloadUtils {
     }
 
     /**
-     * Closes the specified input stream in a safe way.
+     * Closes the specified stream in a safe way.
      *
-     * @param inputStream The input stream to close.
+     * @param closeable The stream to close.
      */
-    public static void safeClose(final InputStream inputStream) {
+    public static void safeClose(final Closeable closeable) {
 
-        if (inputStream != null) {
+        if (closeable != null) {
 
             try {
 
-                inputStream.close();
-
-            } catch (final IOException ignored) {
-
-            }
-        }
-    }
-
-    /**
-     * Closes the specified output stream in a safe way.
-     *
-     * @param outputStream The output stream to close.
-     */
-    public static void safeClose(final OutputStream outputStream) {
-
-        if (outputStream != null) {
-
-            try {
-
-                outputStream.close();
+                closeable.close();
 
             } catch (final IOException ignored) {
 

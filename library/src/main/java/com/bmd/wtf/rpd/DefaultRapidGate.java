@@ -161,7 +161,8 @@ class DefaultRapidGate<TYPE> implements RapidGate<TYPE> {
         return buildGate(mType).perform(action, args);
     }
 
-    private <NTYPE> Gate<NTYPE> buildGate(final Class<NTYPE> gateClass) {
+    private <NTYPE> Gate<NTYPE> buildGate(
+            @SuppressWarnings("UnusedParameters") final Class<NTYPE> gateClass) {
 
         final long timeoutMs = mTimeoutMs;
         final RuntimeException timeoutException = mTimeoutException;

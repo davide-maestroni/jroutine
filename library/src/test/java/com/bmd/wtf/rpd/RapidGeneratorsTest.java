@@ -531,6 +531,7 @@ public class RapidGeneratorsTest extends TestCase {
             super(number + 1);
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public Current3(final String ignored, final Integer number) {
 
             super(number + 11);
@@ -544,6 +545,7 @@ public class RapidGeneratorsTest extends TestCase {
             super(number + 3);
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public Current4(final Integer number) {
 
             super(number + 2);
@@ -563,6 +565,7 @@ public class RapidGeneratorsTest extends TestCase {
             super(number + 2);
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public Current5(final Integer number) {
 
             super(number + 1);
@@ -571,6 +574,7 @@ public class RapidGeneratorsTest extends TestCase {
 
     public static class Current6 extends Current2 {
 
+        @SuppressWarnings("UnusedDeclaration")
         public Current6() {
 
             super(77);
@@ -581,6 +585,7 @@ public class RapidGeneratorsTest extends TestCase {
             super(number + 2);
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public Current6(final Integer number) {
 
             super(number + 1);
@@ -589,6 +594,7 @@ public class RapidGeneratorsTest extends TestCase {
 
     public static class Current7 extends Current2 {
 
+        @SuppressWarnings("UnusedDeclaration")
         public Current7() {
 
             super(77);
@@ -629,6 +635,7 @@ public class RapidGeneratorsTest extends TestCase {
 
     public static class CurrentGenerator1 {
 
+        @SuppressWarnings("UnusedDeclaration")
         public Current generate() {
 
             return new Current1();
@@ -637,16 +644,19 @@ public class RapidGeneratorsTest extends TestCase {
 
     public static class CurrentGenerator2 {
 
+        @SuppressWarnings("UnusedDeclaration")
         public Current generate() {
 
             return new Current1();
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public Current generate(final int number) {
 
             return new Current2(number);
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public Current2 generate(final Integer number) {
 
             return new Current2(number + 2);
@@ -655,6 +665,7 @@ public class RapidGeneratorsTest extends TestCase {
 
     public static class CurrentGenerator3 {
 
+        @SuppressWarnings("UnusedDeclaration")
         Current generate() {
 
             return new Current1();
@@ -663,21 +674,25 @@ public class RapidGeneratorsTest extends TestCase {
 
     public static class CurrentGenerator4 {
 
+        @SuppressWarnings("UnusedDeclaration")
         public Current generate() {
 
             return new Current1();
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public Current generate(ArrayList<?> list, int ignored, Integer number) {
 
             return new Current2(number + 3);
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public Current generate(ArrayList<?> list, String text, Integer number) {
 
             return new Current2(number + 2);
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public Current generate1(List<?> list, String text, Integer number) {
 
             return new Current2(number);
@@ -704,6 +719,7 @@ public class RapidGeneratorsTest extends TestCase {
             return new Current2(number + 2);
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public Current generate1(List<?> list, String text, Integer number) {
 
             return new Current2(number);
@@ -730,6 +746,7 @@ public class RapidGeneratorsTest extends TestCase {
             return new Current2(number + 2);
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public Current generate1(List<?> list, String text, Integer number) {
 
             return new Current2(number);
@@ -762,6 +779,7 @@ public class RapidGeneratorsTest extends TestCase {
             super(number + 1);
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public Leap3(final String ignored, final Integer number) {
 
             super(number + 11);
@@ -775,6 +793,7 @@ public class RapidGeneratorsTest extends TestCase {
             super(number + 3);
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public Leap4(final Integer number) {
 
             super(number + 2);
@@ -794,6 +813,7 @@ public class RapidGeneratorsTest extends TestCase {
             super(number + 2);
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public Leap5(final Integer number) {
 
             super(number + 1);
@@ -802,6 +822,7 @@ public class RapidGeneratorsTest extends TestCase {
 
     public static class Leap6 extends Leap2 {
 
+        @SuppressWarnings("UnusedDeclaration")
         public Leap6() {
 
             super(77);
@@ -812,6 +833,7 @@ public class RapidGeneratorsTest extends TestCase {
             super(number + 2);
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public Leap6(final Integer number) {
 
             super(number + 1);
@@ -820,6 +842,7 @@ public class RapidGeneratorsTest extends TestCase {
 
     public static class Leap7 extends Leap2 {
 
+        @SuppressWarnings("UnusedDeclaration")
         public Leap7() {
 
             super(77);
@@ -899,10 +922,12 @@ public class RapidGeneratorsTest extends TestCase {
 
     public static class LeapError4 extends Leap1 {
 
+        @SuppressWarnings("UnusedDeclaration")
         public LeapError4(final int ignored) {
 
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public LeapError4(final Integer ignored) {
 
         }
@@ -910,10 +935,12 @@ public class RapidGeneratorsTest extends TestCase {
 
     public static class LeapError5 extends Leap1 {
 
+        @SuppressWarnings("UnusedDeclaration")
         public LeapError5(final int ignored, final int number) {
 
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public LeapError5(final Integer ignored, final int number) {
 
         }
@@ -921,10 +948,12 @@ public class RapidGeneratorsTest extends TestCase {
 
     public static class LeapError6 extends Leap1 {
 
+        @SuppressWarnings("UnusedDeclaration")
         public LeapError6(final int ignored, final Integer number) {
 
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public LeapError6(final Integer ignored, final Integer number) {
 
         }
@@ -932,6 +961,7 @@ public class RapidGeneratorsTest extends TestCase {
 
     public static class LeapGenerator1 {
 
+        @SuppressWarnings("UnusedDeclaration")
         public Leap generate() {
 
             return new Leap1();
@@ -940,16 +970,19 @@ public class RapidGeneratorsTest extends TestCase {
 
     public static class LeapGenerator2 {
 
+        @SuppressWarnings("UnusedDeclaration")
         public Leap generate() {
 
             return new Leap1();
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public Leap generate(final int number) {
 
             return new Leap2(number);
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public Leap2 generate(final Integer number) {
 
             return new Leap2(number + 2);
@@ -958,6 +991,7 @@ public class RapidGeneratorsTest extends TestCase {
 
     public static class LeapGenerator3 {
 
+        @SuppressWarnings("UnusedDeclaration")
         Leap generate() {
 
             return new Leap1();
@@ -966,21 +1000,25 @@ public class RapidGeneratorsTest extends TestCase {
 
     public static class LeapGenerator4 {
 
+        @SuppressWarnings("UnusedDeclaration")
         public Leap generate() {
 
             return new Leap1();
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public Leap generate(ArrayList<?> list, int ignored, Integer number) {
 
             return new Leap2(number + 3);
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public Leap generate(ArrayList<?> list, String text, Integer number) {
 
             return new Leap2(number + 2);
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public Leap generate1(List<?> list, String text, Integer number) {
 
             return new Leap2(number);
@@ -1007,6 +1045,7 @@ public class RapidGeneratorsTest extends TestCase {
             return new Leap2(number + 2);
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public Leap generate1(List<?> list, String text, Integer number) {
 
             return new Leap2(number);
@@ -1033,6 +1072,7 @@ public class RapidGeneratorsTest extends TestCase {
             return new Leap2(number + 2);
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public Leap generate1(List<?> list, String text, Integer number) {
 
             return new Leap2(number);
@@ -1086,11 +1126,13 @@ public class RapidGeneratorsTest extends TestCase {
 
     public static class LeapGeneratorError4 {
 
+        @SuppressWarnings("UnusedDeclaration")
         public Leap generate(final int ignored) {
 
             return new Leap1();
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public Leap generate(final Integer ignored) {
 
             return new Leap1();
@@ -1099,11 +1141,13 @@ public class RapidGeneratorsTest extends TestCase {
 
     public static class LeapGeneratorError5 {
 
+        @SuppressWarnings("UnusedDeclaration")
         public Leap generate(final int ignored, final int number) {
 
             return new Leap1();
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public Leap generate(final Integer ignored, final int number) {
 
             return new Leap1();
@@ -1112,11 +1156,13 @@ public class RapidGeneratorsTest extends TestCase {
 
     public static class LeapGeneratorError6 {
 
+        @SuppressWarnings("UnusedDeclaration")
         public Leap generate(final int ignored, final Integer number) {
 
             return new Leap1();
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public Leap generate(final Integer ignored, final Integer number) {
 
             return new Leap1();
@@ -1125,21 +1171,25 @@ public class RapidGeneratorsTest extends TestCase {
 
     public class CurrentX extends Current2 {
 
+        @SuppressWarnings("UnusedDeclaration")
         public CurrentX(List<?> list, String text, int number) {
 
             super(11 + number);
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public CurrentX(LinkedList<?> list, String text, int number) {
 
             super(22 + number);
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public CurrentX(List<?> list, String text, Integer number) {
 
             super(33 + ((number != null) ? number : 0));
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public CurrentX(ArrayList<?> list, String text, Integer number) {
 
             super(44 + ((number != null) ? number : 0));
@@ -1148,11 +1198,13 @@ public class RapidGeneratorsTest extends TestCase {
 
     public class CurrentX1 extends Current2 {
 
+        @SuppressWarnings("UnusedDeclaration")
         public CurrentX1(List<?> list, String text, int number) {
 
             super(77 + number);
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public CurrentX1(int number) {
 
             super(99 + number);
@@ -1170,21 +1222,25 @@ public class RapidGeneratorsTest extends TestCase {
 
     public class LeapX extends Leap2 {
 
+        @SuppressWarnings("UnusedDeclaration")
         public LeapX(List<?> list, String text, int number) {
 
             super(11 + number);
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public LeapX(LinkedList<?> list, String text, int number) {
 
             super(22 + number);
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public LeapX(List<?> list, String text, Integer number) {
 
             super(33 + ((number != null) ? number : 0));
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public LeapX(ArrayList<?> list, String text, Integer number) {
 
             super(44 + ((number != null) ? number : 0));
@@ -1193,11 +1249,13 @@ public class RapidGeneratorsTest extends TestCase {
 
     public class LeapX1 extends Leap2 {
 
+        @SuppressWarnings("UnusedDeclaration")
         public LeapX1(List<?> list, String text, int number) {
 
             super(77 + number);
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public LeapX1(int number) {
 
             super(99 + number);

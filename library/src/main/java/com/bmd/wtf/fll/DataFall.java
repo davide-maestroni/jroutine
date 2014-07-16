@@ -16,6 +16,7 @@ package com.bmd.wtf.fll;
 import com.bmd.wtf.crr.Current;
 import com.bmd.wtf.flw.Fall;
 import com.bmd.wtf.flw.Stream;
+import com.bmd.wtf.flw.Stream.Direction;
 import com.bmd.wtf.lps.Leap;
 
 import java.util.HashSet;
@@ -103,7 +104,8 @@ class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
         this.leap = leap;
         mNumber = number;
         mLock = new ReentrantLock();
-        mInRiver = new LockRiver<SOURCE, IN>(new WaterfallRiver<SOURCE, IN>(waterfall, false));
+        mInRiver = new LockRiver<SOURCE, IN>(
+                new WaterfallRiver<SOURCE, IN>(waterfall, Direction.UPSTREAM));
         mOutRiver =
                 new LockRiver<SOURCE, OUT>(new StreamRiver<SOURCE, OUT>(outputStreams, waterfall));
     }

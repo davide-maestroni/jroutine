@@ -24,9 +24,9 @@ import java.lang.ref.WeakReference;
  */
 class WeakLeap<SOURCE, IN, OUT> implements Leap<SOURCE, IN, OUT> {
 
-    private final boolean mFreeWhenVanished;
-
     private final WeakReference<Leap<SOURCE, IN, OUT>> mLeap;
+
+    private final WhenVanished mWhenVanished;
 
     /**
      * Default constructor.
@@ -35,17 +35,17 @@ class WeakLeap<SOURCE, IN, OUT> implements Leap<SOURCE, IN, OUT> {
      */
     public WeakLeap(final Leap<SOURCE, IN, OUT> wrapped) {
 
-        this(wrapped, true);
+        this(wrapped, WhenVanished.OPEN);
     }
 
     /**
      * Parametrized constructor.
      *
-     * @param wrapped          The wrapped leap.
-     * @param freeWhenVanished Whether this instance must behave like a free leap after the
-     *                         wrapped instance is garbage collected.
+     * @param wrapped      The wrapped leap.
+     * @param whenVanished Whether this instance must behave like a free leap or not after the
+     *                     wrapped instance is garbage collected.
      */
-    public WeakLeap(final Leap<SOURCE, IN, OUT> wrapped, final boolean freeWhenVanished) {
+    public WeakLeap(final Leap<SOURCE, IN, OUT> wrapped, final WhenVanished whenVanished) {
 
         if (wrapped == null) {
 
@@ -53,13 +53,13 @@ class WeakLeap<SOURCE, IN, OUT> implements Leap<SOURCE, IN, OUT> {
         }
 
         mLeap = new WeakReference<Leap<SOURCE, IN, OUT>>(wrapped);
-        mFreeWhenVanished = freeWhenVanished;
+        mWhenVanished = whenVanished;
     }
 
     @Override
     public int hashCode() {
 
-        int result = (mFreeWhenVanished ? 1 : 0);
+        int result = mWhenVanished.hashCode();
 
         final Leap<SOURCE, IN, OUT> leap = mLeap.get();
 
@@ -87,7 +87,7 @@ class WeakLeap<SOURCE, IN, OUT> implements Leap<SOURCE, IN, OUT> {
         final WeakLeap weakLeap = (WeakLeap) obj;
 
         //noinspection SimplifiableIfStatement
-        if (mFreeWhenVanished != weakLeap.mFreeWhenVanished) {
+        if (mWhenVanished != weakLeap.mWhenVanished) {
 
             return false;
         }
@@ -107,7 +107,7 @@ class WeakLeap<SOURCE, IN, OUT> implements Leap<SOURCE, IN, OUT> {
 
             leap.onDischarge(upRiver, downRiver, fallNumber);
 
-        } else if (mFreeWhenVanished) {
+        } else if (mWhenVanished == WhenVanished.OPEN) {
 
             downRiver.discharge();
         }
@@ -135,9 +135,18 @@ class WeakLeap<SOURCE, IN, OUT> implements Leap<SOURCE, IN, OUT> {
 
             leap.onUnhandled(upRiver, downRiver, fallNumber, throwable);
 
-        } else if (mFreeWhenVanished) {
+        } else if (mWhenVanished == WhenVanished.OPEN) {
 
             downRiver.forward(throwable);
         }
+    }
+
+    /**
+     * How the leap must behaved when the wrapped instance is garbage collected.
+     */
+    public enum WhenVanished {
+
+        CLOSE,
+        OPEN
     }
 }

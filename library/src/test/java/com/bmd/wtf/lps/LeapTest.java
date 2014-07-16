@@ -15,6 +15,7 @@ package com.bmd.wtf.lps;
 
 import com.bmd.wtf.fll.Waterfall;
 import com.bmd.wtf.flw.River;
+import com.bmd.wtf.lps.WeakLeap.WhenVanished;
 
 import junit.framework.TestCase;
 
@@ -72,7 +73,7 @@ public class LeapTest extends TestCase {
         assertThat(weak1.equals("test")).isFalse();
         assertThat(weak1.hashCode()).isEqualTo(weak2.hashCode());
 
-        final Leap<Object, Object, Object> weak3 = Leaps.weak(freeLeap, false);
+        final Leap<Object, Object, Object> weak3 = Leaps.weak(freeLeap, WhenVanished.CLOSE);
 
         assertThat(weak1).isNotEqualTo(weak3);
         assertThat(weak2).isNotEqualTo(weak3);
@@ -89,8 +90,6 @@ public class LeapTest extends TestCase {
         assertThat(weak2).isNotEqualTo(weak3);
 
         freeLeap = new FreeLeap<Object, Object>();
-
-        final Leap<Object, Object, Object> weak4 = Leaps.weak(freeLeap);
 
         assertThat(weak1).isNotEqualTo(weak3);
         assertThat(weak2).isNotEqualTo(weak3);
@@ -157,7 +156,8 @@ public class LeapTest extends TestCase {
 
 
         };
-        final Waterfall<Object, Object, Object> waterfall1 = fall().start(Leaps.weak(leap1, false));
+        final Waterfall<Object, Object, Object> waterfall1 =
+                fall().start(Leaps.weak(leap1, WhenVanished.CLOSE));
         Leap<Object, Object, Object> leap2 = new AbstractLeap<Object, Object, Object>() {
 
             private Object mLast;
@@ -213,12 +213,12 @@ public class LeapTest extends TestCase {
             }
         };
         final Waterfall<Object, Object, Object> waterfall2 =
-                waterfall1.chain(Leaps.weak(leap2, true));
+                waterfall1.chain(Leaps.weak(leap2, WhenVanished.OPEN));
 
         freeLeap = new FreeLeap<Object, Object>();
 
         final Waterfall<Object, Object, Object> waterfall3 =
-                waterfall2.chain(Leaps.weak(freeLeap, false));
+                waterfall2.chain(Leaps.weak(freeLeap, WhenVanished.CLOSE));
 
         assertThat(waterfall1.pull("discharge").next()).isEqualTo("discharge");
         assertThat(waterfall2.pull("discharge").next()).isEqualTo("discharge");
@@ -410,7 +410,7 @@ public class LeapTest extends TestCase {
 
         try {
 
-            Leaps.weak(null, true);
+            Leaps.weak(null, WhenVanished.OPEN);
 
             fail();
 
@@ -420,7 +420,7 @@ public class LeapTest extends TestCase {
 
         try {
 
-            Leaps.weak(null, false);
+            Leaps.weak(null, WhenVanished.CLOSE);
 
             fail();
 

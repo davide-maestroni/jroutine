@@ -348,7 +348,7 @@ class DataStream<DATA> implements Stream<DATA> {
 
         final ReachabilityVisitor visitor = new ReachabilityVisitor(falls);
 
-        return !ride(true, visitor);
+        return !ride(Direction.DOWNSTREAM, visitor);
     }
 
     void deviate() {
@@ -357,26 +357,27 @@ class DataStream<DATA> implements Stream<DATA> {
         mDownstreamFall.inputStreams.remove(this);
     }
 
-    void drain(final boolean downstream) {
+    void drain(final Direction direction) {
 
         final DrainVisitor visitor = new DrainVisitor();
 
-        ride(downstream, visitor);
+        ride(direction, visitor);
 
         visitor.drain();
     }
 
-    private boolean ride(final boolean downstream, final WaterfallVisitor visitor) {
+    private boolean ride(final Direction direction, final WaterfallVisitor visitor) {
 
-        if (!visitor.visit(downstream, this)) {
+        if (!visitor.visit(direction, this)) {
 
             return false;
         }
 
-        final DataFall<?, ?, ?> fall = downstream ? mDownstreamFall : mUpstreamFall;
+        final boolean isDownstream = (direction == Direction.DOWNSTREAM);
 
+        final DataFall<?, ?, ?> fall = isDownstream ? mDownstreamFall : mUpstreamFall;
         final CopyOnWriteArrayList<? extends DataStream<?>> poolStreams =
-                (downstream ? fall.outputStreams : fall.inputStreams);
+                (isDownstream ? fall.outputStreams : fall.inputStreams);
 
         if (poolStreams.isEmpty()) {
 
@@ -395,7 +396,7 @@ class DataStream<DATA> implements Stream<DATA> {
             final int currIndex = indexStack.get(indexStack.size() - 1);
 
             final CopyOnWriteArrayList<? extends DataStream<?>> streams =
-                    (downstream ? currStream.mDownstreamFall.outputStreams
+                    (isDownstream ? currStream.mDownstreamFall.outputStreams
                             : currStream.mUpstreamFall.inputStreams);
 
             int i = 0;
@@ -416,7 +417,7 @@ class DataStream<DATA> implements Stream<DATA> {
 
                 final boolean goOn;
 
-                if (!visitor.visit(downstream, nextStream)) {
+                if (!visitor.visit(direction, nextStream)) {
 
                     if (visitor.stopVisit()) {
 
@@ -428,7 +429,7 @@ class DataStream<DATA> implements Stream<DATA> {
                 } else {
 
                     final CopyOnWriteArrayList<? extends DataStream<?>> nextStreams =
-                            (downstream ? fall.outputStreams : fall.inputStreams);
+                            (isDownstream ? fall.outputStreams : fall.inputStreams);
 
                     goOn = !nextStreams.isEmpty();
                 }
@@ -459,7 +460,7 @@ class DataStream<DATA> implements Stream<DATA> {
 
         public boolean stopVisit();
 
-        public boolean visit(boolean downstream, DataStream<?> stream);
+        public boolean visit(Direction direction, DataStream<?> stream);
     }
 
     /**
@@ -484,11 +485,11 @@ class DataStream<DATA> implements Stream<DATA> {
         }
 
         @Override
-        public boolean visit(final boolean downstream, final DataStream<?> stream) {
+        public boolean visit(final Direction direction, final DataStream<?> stream) {
 
             mDryStreams.add(stream);
 
-            if (downstream) {
+            if (direction == Direction.DOWNSTREAM) {
 
                 return (stream.mDownstreamFall.inputStreams.size() < 2);
             }
@@ -510,7 +511,7 @@ class DataStream<DATA> implements Stream<DATA> {
         }
 
         @Override
-        public boolean visit(final boolean downstream, final DataStream<?> stream) {
+        public boolean visit(final Direction direction, final DataStream<?> stream) {
 
             return !mFalls.contains(stream.mDownstreamFall);
         }

@@ -13,15 +13,16 @@
  */
 package com.bmd.wtf.example1;
 
-import com.bmd.wtf.Waterfall;
 import com.bmd.wtf.crr.Current;
 import com.bmd.wtf.crr.Currents;
-import com.bmd.wtf.dam.OpenDam;
-import com.bmd.wtf.src.Floodgate;
-import com.bmd.wtf.xtr.fld.FloodControl;
+import com.bmd.wtf.rpd.RapidLeap;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import static com.bmd.wtf.fll.Waterfall.fall;
 
 /**
  * Simple download manager implementation.<br/>
@@ -29,28 +30,23 @@ import java.io.IOException;
  */
 public class DownloadManager {
 
-    private final FloodControl<String, String, UrlObserver> mControl =
-            new FloodControl<String, String, UrlObserver>(UrlObserver.class);
-
     private final Current mCurrent;
 
     private final File mDownloadDir;
-
-    private final DownloadObserver mDownloaded;
 
     public DownloadManager(final int maxThreads, final File downloadDir) throws IOException {
 
         if (!downloadDir.isDirectory() && !downloadDir.mkdirs()) {
 
-            throw new IOException("Could not create temp directory: " + downloadDir.getAbsolutePath());
+            throw new IOException(
+                    "Could not create temp directory: " + downloadDir.getAbsolutePath());
         }
 
-        mDownloaded = new DownloadObserver(downloadDir);
         mDownloadDir = downloadDir;
-        mCurrent = Currents.threadPoolCurrent(maxThreads);
+        mCurrent = Currents.pool(maxThreads);
     }
 
-    public static void main(final String args[]) throws IOException {
+    public static void main(final String args[]) throws IOException, URISyntaxException {
 
         final int maxThreads = Integer.parseInt(args[0]);
 
@@ -60,33 +56,29 @@ public class DownloadManager {
 
         for (int i = 2; i < args.length; i++) {
 
-            manager.download(args[i]);
+            manager.download(new URI(args[i]));
         }
     }
 
-    public void download(final String url) {
+    public boolean download(final URI uri) throws URISyntaxException {
 
-        Waterfall.fallingFrom(mControl.leveeControlledBy(mDownloaded)).thenFlowingInto(mCurrent)
-                 .thenFallingThrough(new Downloader(mDownloadDir)).thenFallingThrough(new OpenDam<String>() {
+        final Download download =
+                new Download(uri, new File(mDownloadDir, DownloadUtils.getFileName(uri)));
 
-                                                                                          @Override
-                                                                                          public void onDischarge(
-                                                                                                  final Floodgate<String, String> gate,
-                                                                                                  final String drop) {
+        return (Boolean) fall().in(mCurrent).chain(new Downloader()).chain(new RapidLeap<Object>() {
 
-                                                                                              gate.drop(drop);
-                                                                                          }
-                                                                                      }
-        ).thenFallingThrough(mControl.leveeControlledBy(mDownloaded)).backToSource().discharge(url);
-    }
+            @SuppressWarnings("UnusedDeclaration")
+            public boolean onSuccess(final DownloadSuccess ignored) {
 
-    public boolean isComplete(final String url) {
+                return true;
+            }
 
-        return !mControl.controller().isDownloading(url);
-    }
+            @SuppressWarnings("UnusedDeclaration")
+            public boolean onFailure(final DownloadFailure ignored) {
 
-    public boolean isDownloaded(final String url) {
+                return false;
+            }
 
-        return mControl.controller().isDownloaded(url);
+        }).pull(download).next();
     }
 }

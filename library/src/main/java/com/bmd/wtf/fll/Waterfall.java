@@ -960,7 +960,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
 
             for (final DataStream<OUT> stream : fall.outputStreams) {
 
-                stream.drain(true);
+                stream.drain(Direction.DOWNSTREAM);
             }
         }
     }
@@ -972,7 +972,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
 
         for (final DataStream<OUT> stream : fall.outputStreams) {
 
-            stream.drain(true);
+            stream.drain(Direction.DOWNSTREAM);
         }
     }
 
@@ -1179,12 +1179,12 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
      * Deviates the flow of this waterfall, either downstream or upstream, by effectively
      * preventing any coming data to be pushed further.
      *
-     * @param downStream Whether the waterfall must be deviated downstream.
-     * @see #deviateStream(int, boolean)
+     * @param direction Whether the waterfall must be deviated downstream or upstream.
+     * @see #deviateStream(int, Direction)
      */
-    public void deviate(final boolean downStream) {
+    public void deviate(final Direction direction) {
 
-        if (downStream) {
+        if (direction == Direction.DOWNSTREAM) {
 
             deviate();
 
@@ -1205,12 +1205,12 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
      * effectively preventing any coming data to be pushed further.
      *
      * @param streamNumber The number identifying the target stream.
-     * @param downStream   Whether the waterfall must be deviated downstream.
-     * @see #deviate(boolean)
+     * @param direction    Whether the waterfall must be deviated downstream or upstream.
+     * @see #deviate(Direction)
      */
-    public void deviateStream(final int streamNumber, final boolean downStream) {
+    public void deviateStream(final int streamNumber, final Direction direction) {
 
-        if (downStream) {
+        if (direction == Direction.DOWNSTREAM) {
 
             deviateStream(streamNumber);
 
@@ -1255,12 +1255,12 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
      * Drains the waterfall, either downstream or upstream, by removing all the falls and rivers
      * fed only by this waterfall streams.
      *
-     * @param downStream Whether the waterfall must be deviated downstream.
-     * @see #drainStream(int, boolean)
+     * @param direction Whether the waterfall must be deviated downstream or upstream.
+     * @see #drainStream(int, Direction)
      */
-    public void drain(final boolean downStream) {
+    public void drain(final Direction direction) {
 
-        if (downStream) {
+        if (direction == Direction.DOWNSTREAM) {
 
             drain();
 
@@ -1270,7 +1270,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
 
                 for (final DataStream<IN> stream : fall.inputStreams) {
 
-                    stream.drain(false);
+                    stream.drain(direction);
                 }
             }
         }
@@ -1281,12 +1281,12 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
      * the falls and rivers fed only by the specific stream.
      *
      * @param streamNumber The number identifying the target stream.
-     * @param downStream   Whether the waterfall must be deviated downstream.
-     * @see #drain(boolean)
+     * @param direction    Whether the waterfall must be deviated downstream or upstream.
+     * @see #drain(Direction)
      */
-    public void drainStream(final int streamNumber, final boolean downStream) {
+    public void drainStream(final int streamNumber, final Direction direction) {
 
-        if (downStream) {
+        if (direction == Direction.DOWNSTREAM) {
 
             drainStream(streamNumber);
 
@@ -1296,7 +1296,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
 
             for (final DataStream<IN> stream : fall.inputStreams) {
 
-                stream.drain(false);
+                stream.drain(direction);
             }
         }
     }
@@ -1378,7 +1378,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
     /**
      * Makes the waterfall streams flow through a background current.
      * <p/>
-     * The optimum thead pool size will be automatically computed based on the available resources
+     * The optimum thread pool size will be automatically computed based on the available resources
      * and the waterfall size.
      *
      * @return The newly created waterfall.
@@ -1631,7 +1631,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
         }
 
         //noinspection unchecked
-        return new Waterfall<NIN, NIN, NOUT>(null, gateMap, mGate, null, size, mCurrent,
+        return new Waterfall<NIN, NIN, NOUT>(null, gateMap, null, null, size, mCurrent,
                                              mCurrentGenerator, leaps);
     }
 
@@ -1702,6 +1702,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
 
     private int getBestPoolSize() {
 
+        // the returned value might change over time, so we keep calling the method every time
         final int processors = Runtime.getRuntime().availableProcessors();
 
         if (processors < 4) {
@@ -1719,11 +1720,6 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
 
             throw new IllegalArgumentException(
                     "the leap does not implement the gate classification type");
-        }
-
-        if (gateMap.containsKey(gateClassification)) {
-
-            throw new IllegalArgumentException("the gate classification type is already present");
         }
 
         gateMap.put(gateClassification, leap);

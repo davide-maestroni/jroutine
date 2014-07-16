@@ -18,7 +18,7 @@ import com.bmd.wtf.fll.Waterfall;
 import com.bmd.wtf.flw.Gate.Action;
 import com.bmd.wtf.flw.Gate.ConditionEvaluator;
 import com.bmd.wtf.lps.FreeLeap;
-import com.bmd.wtf.rpd.RapidAnnotations.Condition;
+import com.bmd.wtf.rpd.RapidAnnotations.GateCondition;
 
 import junit.framework.TestCase;
 
@@ -256,6 +256,7 @@ public class RapidGateTest extends TestCase {
             return mId;
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public boolean hasId(final int id) {
 
             return mId == id;
@@ -269,23 +270,25 @@ public class RapidGateTest extends TestCase {
             super(17);
         }
 
+        @SuppressWarnings({"UnusedDeclaration", "BooleanParameter"})
         public boolean condition(final int id, final boolean isEqual) {
 
             return (isEqual) ? getId() == id : notId(id);
         }
 
+        @SuppressWarnings({"UnusedDeclaration", "BooleanParameter"})
         public boolean condition(final String id, final boolean isEqual) {
 
             return (isEqual) ? Integer.toString(getId()).equals(id) : notId(id);
         }
 
-        @Condition
+        @GateCondition
         public boolean notId(final int id) {
 
             return getId() != id;
         }
 
-        @Condition
+        @GateCondition
         public boolean notId(final String id) {
 
             return !Integer.toString(getId()).equals(id);
@@ -299,17 +302,19 @@ public class RapidGateTest extends TestCase {
             super(71);
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public boolean conditionFalse(final int id) {
 
             return false;
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public boolean conditionTrue(final int id) {
 
             return true;
         }
 
-        @Condition
+        @GateCondition
         public boolean notId(final int id) {
 
             return getId() != id;
@@ -323,11 +328,13 @@ public class RapidGateTest extends TestCase {
             super(19);
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public boolean isId(final int id) {
 
             return getId() == id;
         }
 
+        @SuppressWarnings("UnusedDeclaration")
         public boolean notId(final int id) {
 
             return getId() != id;
@@ -341,13 +348,13 @@ public class RapidGateTest extends TestCase {
             super(23);
         }
 
-        @Condition
+        @GateCondition
         public boolean isId(final int id) {
 
             return getId() == id;
         }
 
-        @Condition
+        @GateCondition
         public boolean notId(final int id) {
 
             return getId() != id;

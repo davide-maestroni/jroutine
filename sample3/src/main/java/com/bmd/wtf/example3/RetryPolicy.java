@@ -13,66 +13,58 @@
  */
 package com.bmd.wtf.example3;
 
-import com.bmd.wtf.dam.OpenDam;
-import com.bmd.wtf.src.Floodgate;
-import com.bmd.wtf.src.Spring;
+import com.bmd.wtf.example1.Download;
+import com.bmd.wtf.example1.DownloadFailure;
+import com.bmd.wtf.example1.DownloadSuccess;
+import com.bmd.wtf.flw.River;
+import com.bmd.wtf.rpd.RapidLeap;
 
+import java.net.URI;
 import java.util.HashMap;
 
 /**
  * This class is meant to retry the discharge of data in case an error occurred.
  */
-public class RetryPolicy extends OpenDam<String> {
+public class RetryPolicy extends RapidLeap<Object> {
 
     private final int mMaxCount;
 
-    private final HashMap<String, Integer> mRetryCounts = new HashMap<String, Integer>();
+    private final HashMap<URI, Integer> mRetryCounts = new HashMap<URI, Integer>();
 
-    private final Spring<String> mSpring;
+    private final River<Object, Object> mRiver;
 
-    public RetryPolicy(final Spring<String> spring, final int maxCount) {
+    public RetryPolicy(final River<Object, Object> river, final int maxCount) {
 
-        mSpring = spring;
+        mRiver = river;
         mMaxCount = maxCount;
     }
 
-    @Override
-    public void onDischarge(final Floodgate<String, String> gate, final String drop) {
+    @SuppressWarnings("UnusedDeclaration")
+    public void onFailure(final DownloadFailure download) {
 
-        // Reset the count
+        final URI uri = download.getUri();
 
-        onReset(drop);
+        final Integer count = mRetryCounts.get(uri);
 
-        super.onDischarge(gate, drop);
-    }
+        final int currentCount = (count != null) ? count : 0;
 
-    @Override
-    public void onDrop(final Floodgate<String, String> gate, final Object debris) {
+        if (currentCount < mMaxCount) {
 
-        if (debris instanceof Throwable) {
+            mRetryCounts.put(uri, currentCount + 1);
+            mRiver.push(new Download(uri, download.getFile()));
 
-            final String url = ((Throwable) debris).getMessage();
+        } else {
 
-            final Integer count = mRetryCounts.get(url);
-
-            final int currentCount = (count != null) ? count : 0;
-
-            if (currentCount < mMaxCount) {
-
-                mRetryCounts.put(url, currentCount + 1);
-                mSpring.discharge(url);
-
-                return;
-            }
-
-            mRetryCounts.remove(url);
+            mRetryCounts.remove(uri);
+            downRiver().push(download);
         }
-
-        super.onDrop(gate, debris);
     }
 
-    protected void onReset(final String url) {
+    @SuppressWarnings("UnusedDeclaration")
+    public DownloadSuccess onSuccess(final DownloadSuccess download) {
 
-        mRetryCounts.remove(url);
+        mRetryCounts.remove(download.getUri());
+
+        return download;
     }
 }

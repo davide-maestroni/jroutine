@@ -84,7 +84,7 @@ public interface RapidGate<TYPE> extends Gate<TYPE> {
      * Sets the condition to be met by this gate by searching a suitable method via reflection.
      * <p/>
      * A suitable method is identified among the ones taking the specified arguments as parameters
-     * and returning a boolean value. The methods annotated with {@link RapidAnnotations.Condition}
+     * and returning a boolean value. The methods annotated with {@link com.bmd.wtf.rpd.RapidAnnotations.GateCondition}
      * are analyzed first.<br/>
      * If more than one method matching the above requirements is found, an exception will be
      * thrown.

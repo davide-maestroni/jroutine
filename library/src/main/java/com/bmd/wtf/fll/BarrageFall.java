@@ -17,7 +17,7 @@ import com.bmd.wtf.crr.Current;
 import com.bmd.wtf.lps.Leap;
 
 /**
- * Extension of a data fall used to notify a barrage about the flowing of data drops.
+ * Extension of a data fall used to notify a barrage leap about the flowing of data drops.
  * <p/>
  * Created by davide on 7/6/14.
  *
@@ -27,7 +27,7 @@ import com.bmd.wtf.lps.Leap;
  */
 public class BarrageFall<SOURCE, IN, OUT> extends DataFall<SOURCE, IN, OUT> {
 
-    private final Barrage mBarrage;
+    private final BarrageLeap mBarrage;
 
     private final int mFallNumber;
 
@@ -38,14 +38,14 @@ public class BarrageFall<SOURCE, IN, OUT> extends DataFall<SOURCE, IN, OUT> {
      * @param inputCurrent The input current.
      * @param leap         The wrapped leap.
      * @param number       The number identifying this fall.
-     * @param barrage      The related barrage.
+     * @param barrageLeap  The related barrage.
      */
     public BarrageFall(final Waterfall<SOURCE, IN, OUT> waterfall, final Current inputCurrent,
-            final Leap<SOURCE, IN, OUT> leap, final int number, final Barrage barrage) {
+            final Leap<SOURCE, IN, OUT> leap, final int number, final BarrageLeap barrageLeap) {
 
         super(waterfall, inputCurrent, leap, number);
 
-        mBarrage = barrage;
+        mBarrage = barrageLeap;
         mFallNumber = number;
     }
 

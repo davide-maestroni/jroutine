@@ -17,6 +17,7 @@ import com.bmd.wtf.crr.Current;
 import com.bmd.wtf.crr.CurrentGenerator;
 import com.bmd.wtf.crr.Currents;
 import com.bmd.wtf.drp.Drops;
+import com.bmd.wtf.flw.Barrage;
 import com.bmd.wtf.flw.Collector;
 import com.bmd.wtf.flw.Gate.Action;
 import com.bmd.wtf.flw.Gate.ConditionEvaluator;
@@ -878,10 +879,10 @@ public class WaterfallTest extends TestCase {
 
     public void testDistribute() {
 
-        final TraceLeap leap = new TraceLeap();
+        final TraceLeap leap1 = new TraceLeap();
 
-        final Waterfall<String, String, ?> source =
-                fall().start(String.class).in(4).distribute().chain(leap).source();
+        final Waterfall<String, String, ?> source1 =
+                fall().start(String.class).in(4).distribute().chain(leap1).source();
 
         final ArrayList<String> data = new ArrayList<String>();
 
@@ -890,19 +891,107 @@ public class WaterfallTest extends TestCase {
             data.add(Integer.toString(i));
         }
 
-        source.push(data);
-        assertThat(leap.getData()).contains(data.toArray(new String[data.size()]));
+        source1.push(data);
+        assertThat(leap1.getData()).contains(data.toArray(new String[data.size()]));
 
         final IllegalStateException exception = new IllegalStateException();
-        source.forward(exception);
-        assertThat(leap.getUnhandled()).containsExactly(exception, exception, exception, exception);
+        source1.forward(exception);
+        assertThat(leap1.getUnhandled()).containsExactly(exception, exception, exception,
+                                                         exception);
 
-        source.discharge();
-        assertThat(leap.getDischarges()).isEqualTo(4);
+        source1.discharge();
+        assertThat(leap1.getDischarges()).isEqualTo(4);
 
-        assertThat(fall().distribute().pull("test").all()).containsExactly("test");
-        assertThat(fall().start().in(1).distribute().pull("test").all()).containsExactly("test");
-        assertThat(fall().start().in(3).distribute().pull("test").all()).containsExactly("test");
+        assertThat(fall().distribute().pull("test", "test").all()).containsExactly("test", "test");
+        assertThat(fall().start().in(1).distribute().pull("test", "test").all()).containsExactly(
+                "test", "test");
+        assertThat(fall().start().in(3).distribute().pull("test", "test").all()).containsExactly(
+                "test", "test");
+
+        final TraceLeap leap2 = new TraceLeap();
+
+        final Waterfall<String, String, ?> source2 =
+                fall().start(String.class).in(4).distribute(new Barrage<String>() {
+
+                    @Override
+                    public int onPush(final String drop) {
+
+                        try {
+
+                            return (Integer.parseInt(drop) % 4);
+
+                        } catch (final NumberFormatException ignored) {
+
+                        }
+
+                        return DEFAULT_STREAM;
+                    }
+                }).chain(leap2).source();
+
+        source2.push(data);
+        assertThat(leap2.getData()).contains(data.toArray(new String[data.size()]));
+
+        source2.forward(exception);
+        assertThat(leap2.getUnhandled()).containsExactly(exception, exception, exception,
+                                                         exception);
+
+        source2.discharge();
+        assertThat(leap2.getDischarges()).isEqualTo(4);
+
+        assertThat(fall().distribute(new Barrage<Object>() {
+
+            @Override
+            public int onPush(final Object drop) {
+
+                if (drop.equals("stop")) {
+
+                    return NO_STREAM;
+                }
+
+                if (drop.equals("all")) {
+
+                    return ALL_STREAMS;
+                }
+
+                return DEFAULT_STREAM;
+            }
+        }).pull("test", "stop").all()).containsExactly("test", "stop");
+        assertThat(fall().start().in(1).distribute(new Barrage<Object>() {
+
+            @Override
+            public int onPush(final Object drop) {
+
+                if (drop.equals("stop")) {
+
+                    return NO_STREAM;
+                }
+
+                if (drop.equals("all")) {
+
+                    return ALL_STREAMS;
+                }
+
+                return DEFAULT_STREAM;
+            }
+        }).pull("test", "stop", "all").all()).containsExactly("test", "stop", "all");
+        assertThat(fall().start().in(3).distribute(new Barrage<Object>() {
+
+            @Override
+            public int onPush(final Object drop) {
+
+                if (drop.equals("stop")) {
+
+                    return NO_STREAM;
+                }
+
+                if (drop.equals("all")) {
+
+                    return ALL_STREAMS;
+                }
+
+                return DEFAULT_STREAM;
+            }
+        }).pull("all", "test", "stop").all()).containsExactly("all", "all", "all", "test");
     }
 
     public void testError() throws InterruptedException {
@@ -912,8 +1001,7 @@ public class WaterfallTest extends TestCase {
             new DataStream<Object>(null, new DataFall<Object, Object, Object>(fall().start(),
                                                                               Currents.straight(),
                                                                               new FreeLeap<Object, Object>(),
-                                                                              0)
-            );
+                                                                              0));
 
             fail();
 
@@ -925,8 +1013,7 @@ public class WaterfallTest extends TestCase {
 
             new DataStream<Object>(
                     new DataFall<Object, Object, Object>(fall().start(), Currents.straight(),
-                                                         new FreeLeap<Object, Object>(), 0), null
-            );
+                                                         new FreeLeap<Object, Object>(), 0), null);
 
             fail();
 
@@ -1474,8 +1561,7 @@ public class WaterfallTest extends TestCase {
 
                                                                                                    return null;
                                                                                                }
-                                                                                           }
-                                                                                   );
+                                                                                           });
                                                                       }
                                                                   }
                                                               });
@@ -1540,8 +1626,7 @@ public class WaterfallTest extends TestCase {
 
                                                                                                    return null;
                                                                                                }
-                                                                                           }
-                                                                                   );
+                                                                                           });
                                                                       }
                                                                   }
                                                               });
@@ -1682,8 +1767,7 @@ public class WaterfallTest extends TestCase {
 
                                 return leap.getId();
                             }
-                        })
-        ).isEqualTo(3);
+                        })).isEqualTo(3);
     }
 
     public void testIn() {
@@ -1986,17 +2070,14 @@ public class WaterfallTest extends TestCase {
 
             river.on(LatchLeap.class).immediately().perform(new Action<Void, LatchLeap>() {
 
-                                                                @Override
-                                                                public Void doOn(
-                                                                        final LatchLeap leap,
-                                                                        final Object... args) {
+                @Override
+                public Void doOn(final LatchLeap leap, final Object... args) {
 
-                                                                    leap.incCount();
+                    leap.incCount();
 
-                                                                    return null;
-                                                                }
-                                                            }
-            );
+                    return null;
+                }
+            });
         }
 
         private boolean isFailed(final River<Object, Object> river) {
@@ -2005,31 +2086,26 @@ public class WaterfallTest extends TestCase {
                         .immediately()
                         .perform(new Action<Boolean, LatchLeap>() {
 
-                                     @Override
-                                     public Boolean doOn(final LatchLeap leap,
-                                             final Object... args) {
+                            @Override
+                            public Boolean doOn(final LatchLeap leap, final Object... args) {
 
-                                         return leap.isFailed();
-                                     }
-                                 }
-                        );
+                                return leap.isFailed();
+                            }
+                        });
         }
 
         private void setFailed(final River<Object, Object> river) {
 
             river.on(LatchLeap.class).immediately().perform(new Action<Void, LatchLeap>() {
 
-                                                                @Override
-                                                                public Void doOn(
-                                                                        final LatchLeap leap,
-                                                                        final Object... args) {
+                @Override
+                public Void doOn(final LatchLeap leap, final Object... args) {
 
-                                                                    leap.setFailed();
+                    leap.setFailed();
 
-                                                                    return null;
-                                                                }
-                                                            }
-            );
+                    return null;
+                }
+            });
         }
 
         @Override

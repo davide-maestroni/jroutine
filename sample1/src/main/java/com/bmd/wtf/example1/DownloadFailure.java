@@ -27,6 +27,7 @@ public class DownloadFailure extends Download {
         mReason = reason;
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     public Object getReason() {
 
         return mReason;

@@ -34,14 +34,14 @@ import java.util.Map.Entry;
  * parameter.<br/>
  * Every time a data drop flows through the leap, the method whose parameter closely match the
  * drop type is called. In order to properly handle null objects and discharge command, the
- * inheriting class can implement e method taking a parameter of type <code>Void</code> and a one
+ * inheriting class can implement a method taking a parameter of type <code>Void</code> and a one
  * taking a parameter of type <code>Discharge</code> respectively.<br/>
  * In a dual way, a method returning a <code>Throwable</code> object will cause a forward of an
  * unhandled exception, while a one returning a <code>Discharge</code> will cause a discharge of
  * the downstream river. Finally, if a method does not return any result, nothing will be
  * propagated downstream.
  * <p/>
- * The inheriting class may also makes use of the protected method provided by this class to access
+ * The inheriting class may also make use of the protected method provided by this class to access
  * the downstream and upstream rivers, and the waterfall gates.
  * <p/>
  * Created by davide on 6/23/14.

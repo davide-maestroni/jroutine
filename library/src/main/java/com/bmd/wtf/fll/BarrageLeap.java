@@ -13,6 +13,7 @@
  */
 package com.bmd.wtf.fll;
 
+import com.bmd.wtf.flw.Barrage;
 import com.bmd.wtf.flw.River;
 import com.bmd.wtf.lps.AbstractLeap;
 
@@ -28,9 +29,11 @@ import com.bmd.wtf.lps.AbstractLeap;
  * @param <SOURCE> The source data type.
  * @param <DATA>   The data type.
  */
-class Barrage<SOURCE, DATA> extends AbstractLeap<SOURCE, DATA, DATA> {
+class BarrageLeap<SOURCE, DATA> extends AbstractLeap<SOURCE, DATA, DATA> implements Barrage<DATA> {
 
     private static final int REFRESH_INTERVAL = Integer.MAX_VALUE >> 1;
+
+    private final Barrage<DATA> mBarrage;
 
     private final Object mMutex = new Object();
 
@@ -42,12 +45,57 @@ class Barrage<SOURCE, DATA> extends AbstractLeap<SOURCE, DATA, DATA> {
 
     /**
      * Constructor.
+     * <p/>
+     * When no barrage is specified the drops of data will always be pushed into the default
+     * stream.
      *
      * @param streamCount The total number of streams.
      */
-    public Barrage(final int streamCount) {
+    public BarrageLeap(final int streamCount) {
 
+        mBarrage = this;
         mStreamLevels = new int[streamCount];
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param barrage     The barrage.
+     * @param streamCount The total number of streams.
+     */
+    public BarrageLeap(final Barrage<DATA> barrage, final int streamCount) {
+
+        if (barrage == null) {
+
+            throw new IllegalArgumentException("the barrage cannot be null");
+        }
+
+        mBarrage = barrage;
+        mStreamLevels = new int[streamCount];
+    }
+
+    @Override
+    public int hashCode() {
+
+        return (mBarrage == this) ? super.hashCode() : mBarrage.hashCode();
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+
+        if (this == o) {
+
+            return true;
+        }
+
+        if (!(o instanceof BarrageLeap)) {
+
+            return false;
+        }
+
+        final BarrageLeap that = (BarrageLeap) o;
+
+        return (mBarrage == this) ? super.equals(that.mBarrage) : mBarrage.equals(that.mBarrage);
     }
 
     /**
@@ -69,7 +117,26 @@ class Barrage<SOURCE, DATA> extends AbstractLeap<SOURCE, DATA, DATA> {
     public void onPush(final River<SOURCE, DATA> upRiver, final River<SOURCE, DATA> downRiver,
             final int fallNumber, final DATA drop) {
 
-        downRiver.pushStream(findMinLevel(), drop);
+        final int streamNumber = mBarrage.onPush(drop);
+
+        if (streamNumber == DEFAULT_STREAM) {
+
+            downRiver.pushStream(findMinLevel(), drop);
+
+        } else if (streamNumber == ALL_STREAMS) {
+
+            downRiver.push(drop);
+
+        } else if (streamNumber != NO_STREAM) {
+
+            downRiver.pushStream(streamNumber, drop);
+        }
+    }
+
+    @Override
+    public int onPush(final DATA drop) {
+
+        return DEFAULT_STREAM;
     }
 
     /**

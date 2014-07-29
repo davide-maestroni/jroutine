@@ -16,6 +16,7 @@ package com.bmd.wtf.fll;
 import com.bmd.wtf.crr.Current;
 import com.bmd.wtf.crr.CurrentGenerator;
 import com.bmd.wtf.crr.Currents;
+import com.bmd.wtf.flw.Barrage;
 import com.bmd.wtf.flw.Collector;
 import com.bmd.wtf.flw.Gate;
 import com.bmd.wtf.lps.FreeLeap;
@@ -55,7 +56,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
 
     private static FreeLeap<?, ?> sFreeLeap;
 
-    private final Barrage<SOURCE, ?> mBarrage;
+    private final BarrageLeap<SOURCE, ?> mBarrage;
 
     private final Current mCurrent;
 
@@ -73,7 +74,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
 
     private Waterfall(final Waterfall<SOURCE, SOURCE, ?> source,
             final Map<Classification<?>, GateLeap<?, ?, ?>> gateMap,
-            final Classification<?> gateClassification, final Barrage<SOURCE, ?> barrage,
+            final Classification<?> gateClassification, final BarrageLeap<SOURCE, ?> barrageLeap,
             final int size, final Current current, final CurrentGenerator generator,
             final DataFall<SOURCE, IN, OUT>... falls) {
 
@@ -81,7 +82,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
         mSource = (source != null) ? source : (Waterfall<SOURCE, SOURCE, ?>) this;
         mGateMap = gateMap;
         mGate = gateClassification;
-        mBarrage = barrage;
+        mBarrage = barrageLeap;
         mSize = size;
         mCurrent = current;
         mCurrentGenerator = generator;
@@ -90,7 +91,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
 
     private Waterfall(final Waterfall<SOURCE, SOURCE, ?> source,
             final Map<Classification<?>, GateLeap<?, ?, ?>> gateMap,
-            final Classification<?> gateClassification, final Barrage<SOURCE, ?> barrage,
+            final Classification<?> gateClassification, final BarrageLeap<SOURCE, ?> barrageLeap,
             final int size, final Current current, final CurrentGenerator generator,
             final Leap<SOURCE, IN, OUT>... leaps) {
 
@@ -115,8 +116,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
 
             mapGate(fallGateMap,
                     (SELF_CLASSIFICATION == gateClassification) ? Classification.ofType(
-                            leap.getClass()) : gateClassification, gateLeap
-            );
+                            leap.getClass()) : gateClassification, gateLeap);
 
             mGateMap = fallGateMap;
 
@@ -144,10 +144,10 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
 
         } else {
 
-            mBarrage = barrage;
+            mBarrage = barrageLeap;
         }
 
-        final Barrage<SOURCE, ?> fallBarrage = mBarrage;
+        final BarrageLeap<SOURCE, ?> fallBarrage = mBarrage;
 
         for (int i = 0; i < size; ++i) {
 
@@ -392,8 +392,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
 
             throw new IllegalArgumentException(
                     "the waterfall does not retain any gate of classification type "
-                            + gateClassification
-            );
+                            + gateClassification);
         }
 
         final DataFall<SOURCE, IN, OUT>[] falls = mFalls;
@@ -1034,8 +1033,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
 
             throw new IllegalArgumentException(
                     "the waterfall does not retain any gate of classification type "
-                            + gateClassification
-            );
+                            + gateClassification);
         }
 
         return new DataGate<TYPE>(gate, gateClassification);
@@ -1248,7 +1246,38 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
             return chain();
         }
 
-        return in(1).chainBarrage(new Barrage<SOURCE, OUT>(size)).in(size);
+        return in(1).chainBarrage(new BarrageLeap<SOURCE, OUT>(size)).in(size).chain();
+    }
+
+    /**
+     * Distributes all the data flowing through this waterfall in the different output streams by
+     * means of the specified barrage.
+     *
+     * @return The newly created waterfall.
+     */
+    public Waterfall<SOURCE, OUT, OUT> distribute(final Barrage<OUT> barrage) {
+
+        if (barrage == null) {
+
+            throw new IllegalArgumentException("the waterfall barrage cannot be null");
+        }
+
+        final DataFall<SOURCE, IN, OUT>[] falls = mFalls;
+
+        if (falls == NO_FALL) {
+
+            //noinspection unchecked
+            return (Waterfall<SOURCE, OUT, OUT>) start().distribute(barrage);
+        }
+
+        final int size = mSize;
+
+        if (size == 1) {
+
+            return chain();
+        }
+
+        return in(1).chainBarrage(new BarrageLeap<SOURCE, OUT>(barrage, size)).in(size).chain();
     }
 
     /**
@@ -1660,13 +1689,13 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
                                              mCurrentGenerator, leap);
     }
 
-    private Waterfall<SOURCE, OUT, OUT> chainBarrage(final Barrage<SOURCE, OUT> barrage) {
+    private Waterfall<SOURCE, OUT, OUT> chainBarrage(final BarrageLeap<SOURCE, OUT> barrageLeap) {
 
-        final Waterfall<SOURCE, OUT, OUT> waterfall = chain(barrage);
+        final Waterfall<SOURCE, OUT, OUT> waterfall = chain(barrageLeap);
 
         //noinspection unchecked
         return new Waterfall<SOURCE, OUT, OUT>(waterfall.mSource, waterfall.mGateMap,
-                                               waterfall.mGate, barrage, waterfall.mSize,
+                                               waterfall.mGate, barrageLeap, waterfall.mSize,
                                                waterfall.mCurrent, waterfall.mCurrentGenerator,
                                                waterfall.mFalls);
     }

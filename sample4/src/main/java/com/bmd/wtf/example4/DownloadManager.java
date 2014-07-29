@@ -48,17 +48,17 @@ public class DownloadManager {
         }
 
         mDownloadDir = downloadDir;
-        mWaterfall = fall().asGate()
-                           .start(new AbortObserver())
-                           .inBackground(maxThreads)
-                           .distribute()
-                           .chain(Rapid.leapGenerator(Downloader.class));
+        final Waterfall<Object, Object, Object> waterfall = fall().asGate()
+                                                                  .start(new AbortObserver())
+                                                                  .inBackground(maxThreads)
+                                                                  .distribute()
+                                                                  .chain(Rapid.leapGenerator(
+                                                                          Downloader.class));
         // chain the retry leap
-        mWaterfall.chain(Rapid.leapGenerator(RetryPolicy.class, mWaterfall));
+        waterfall.chain(Rapid.leapGenerator(RetryPolicy.class, waterfall));
         // merge the streams and finally chain the observer
-        mGate = Rapid.gate(mWaterfall.in(1)
-                                     .chain(Classification.ofType(AbortObserver.class))
-                                     .on(AbortObserver.class)).performAs(UriAbortObserver.class);
+        mWaterfall = waterfall.in(1).chain(Classification.ofType(AbortObserver.class));
+        mGate = Rapid.gate(waterfall.on(AbortObserver.class)).performAs(UriAbortObserver.class);
     }
 
     public static void main(final String args[]) throws IOException, URISyntaxException {

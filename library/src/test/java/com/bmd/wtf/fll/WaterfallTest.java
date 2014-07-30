@@ -1075,6 +1075,33 @@ public class WaterfallTest extends TestCase {
 
         try {
 
+            new BarrageLeap<Object, Object>(null, 1);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            new BarrageLeap<Object, Object>(new Barrage<Object>() {
+
+                @Override
+                public int onPush(final Object drop) {
+
+                    return 0;
+                }
+            }, -1);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
             fall().start((Class) null);
 
             fail();
@@ -1180,6 +1207,25 @@ public class WaterfallTest extends TestCase {
             final FreeLeap<Object, Object> leap = new FreeLeap<Object, Object>();
 
             fall().chain(leap).chain(leap);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            final Barrage<Object> barrage = new Barrage<Object>() {
+
+                @Override
+                public int onPush(final Object drop) {
+
+                    return 0;
+                }
+            };
+
+            fall().start().in(2).distribute(barrage).distribute(barrage);
 
             fail();
 

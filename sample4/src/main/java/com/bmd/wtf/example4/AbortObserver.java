@@ -41,19 +41,28 @@ public class AbortObserver extends DownloadObserver implements UriAbortObserver 
     @Override
     public void onDownload(final Download download) {
 
-        // A new download is requested so we remove the url from the aborted ones
-
-        mAbortedDownloads.remove(download.getUri());
-
         super.onDownload(download);
+
+        final URI uri = download.getUri();
+
+        if (isDownloading(uri)) {
+
+            // A new download is requested so we remove the url from the aborted ones
+            mAbortedDownloads.remove(uri);
+        }
     }
 
     @Override
     public void onFailure(final DownloadFailure download) {
 
-        mAbortedDownloads.remove(download.getUri());
-
         super.onFailure(download);
+
+        final URI uri = download.getUri();
+
+        if (!isDownloading(uri)) {
+
+            mAbortedDownloads.remove(uri);
+        }
     }
 
     @Override
@@ -65,7 +74,7 @@ public class AbortObserver extends DownloadObserver implements UriAbortObserver 
 
         } else {
 
-            super.onFailure(new DownloadFailure(download, new AbortException()));
+            super.onFailure(new DownloadFailure(download.getDownload(), new AbortException()));
         }
     }
 }

@@ -18,8 +18,17 @@ package com.bmd.wtf.example1;
  */
 public class DownloadSuccess extends Download {
 
+    private final Download mDownload;
+
     public DownloadSuccess(final Download download) {
 
         super(download.getUri(), download.getFile());
+
+        mDownload = download;
+    }
+
+    public Download getDownload() {
+
+        return mDownload;
     }
 }

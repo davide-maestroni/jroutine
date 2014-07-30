@@ -53,10 +53,11 @@ public class DownloadObserver extends RapidLeap<Object> implements UriObserver {
     public void onDownload(final Download download) {
 
         final URI uri = download.getUri();
+        final HashMap<URI, Download> downloading = mDownloading;
 
-        if (!mDownloading.containsKey(uri)) {
+        if (!downloading.containsKey(uri)) {
 
-            mDownloading.put(uri, download);
+            downloading.put(uri, download);
             mDownloaded.remove(uri);
 
             downRiver().push(download);
@@ -67,10 +68,13 @@ public class DownloadObserver extends RapidLeap<Object> implements UriObserver {
     public void onFailure(final DownloadFailure download) {
 
         final URI uri = download.getUri();
+        final HashMap<URI, Download> downloading = mDownloading;
 
-        if (mDownloading.remove(uri) != null) {
+        if (downloading.get(uri) == download.getDownload()) {
 
             System.out.println("Download failed: " + uri);
+
+            downloading.remove(uri);
 
             delete(download.getFile());
         }
@@ -80,10 +84,13 @@ public class DownloadObserver extends RapidLeap<Object> implements UriObserver {
     public void onSuccess(final DownloadSuccess download) {
 
         final URI uri = download.getUri();
+        final HashMap<URI, Download> downloading = mDownloading;
 
-        if (mDownloading.remove(uri) != null) {
+        if (downloading.get(uri) == download.getDownload()) {
 
             System.out.println("Download complete: " + uri);
+
+            downloading.remove(uri);
 
             mDownloaded.put(uri, download);
         }

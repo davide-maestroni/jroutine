@@ -85,7 +85,7 @@ public class CancelableDownloader extends RapidLeap<Object> {
 
             downloading.remove(uri);
 
-            downRiver().push(new DownloadFailure(handler, new AbortException()));
+            downRiver().push(new DownloadFailure(handler.getDownload(), new AbortException()));
 
         } else {
 
@@ -99,14 +99,14 @@ public class CancelableDownloader extends RapidLeap<Object> {
 
                 } else {
 
-                    downRiver().push(new DownloadSuccess(handler));
+                    downRiver().push(new DownloadSuccess(handler.getDownload()));
                 }
 
             } catch (final IOException e) {
 
                 downloading.remove(uri);
 
-                downRiver().push(new DownloadFailure(handler, e));
+                downRiver().push(new DownloadFailure(handler.getDownload(), e));
             }
         }
     }

@@ -28,6 +28,8 @@ import java.net.URLConnection;
  */
 public class DownloadHandler extends Download {
 
+    private final Download mDownload;
+
     private int mError;
 
     private InputStream mInputStream;
@@ -37,6 +39,8 @@ public class DownloadHandler extends Download {
     public DownloadHandler(final Download download) throws IOException {
 
         super(download.getUri(), download.getFile());
+
+        mDownload = download;
 
         resetConnection();
 
@@ -57,6 +61,11 @@ public class DownloadHandler extends Download {
         resetOutput();
 
         resetConnection();
+    }
+
+    public Download getDownload() {
+
+        return mDownload;
     }
 
     public int getError() {

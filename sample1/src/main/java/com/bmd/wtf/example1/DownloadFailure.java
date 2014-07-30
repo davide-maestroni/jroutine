@@ -18,13 +18,21 @@ package com.bmd.wtf.example1;
  */
 public class DownloadFailure extends Download {
 
+    private final Download mDownload;
+
     private final Object mReason;
 
     public DownloadFailure(final Download download, final Object reason) {
 
         super(download.getUri(), download.getFile());
 
+        mDownload = download;
         mReason = reason;
+    }
+
+    public Download getDownload() {
+
+        return mDownload;
     }
 
     @SuppressWarnings("UnusedDeclaration")

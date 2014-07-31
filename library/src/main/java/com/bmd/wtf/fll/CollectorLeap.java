@@ -40,6 +40,12 @@ class CollectorLeap<SOURCE, DATA> extends FreeLeap<SOURCE, DATA> {
                 }
             };
 
+    private final ArrayList<DATA> mData = new ArrayList<DATA>();
+
+    private boolean mIsComplete;
+
+    private Throwable mUnhandled;
+
     private final Action<DATA, CollectorLeap<SOURCE, DATA>> ACTION_PULL =
             new Action<DATA, CollectorLeap<SOURCE, DATA>>() {
 
@@ -47,17 +53,29 @@ class CollectorLeap<SOURCE, DATA> extends FreeLeap<SOURCE, DATA> {
                 public DATA doOn(final CollectorLeap<SOURCE, DATA> collector,
                         final Object... args) {
 
+                    final Throwable throwable = collector.mUnhandled;
+
+                    if (throwable != null) {
+
+                        throw new FloatingException(throwable);
+                    }
+
                     return collector.mData.remove(0);
                 }
             };
-
-    private final ArrayList<DATA> mData = new ArrayList<DATA>();
 
     private static final Action<Void, CollectorLeap<?, ?>> ACTION_PULL_ALL =
             new Action<Void, CollectorLeap<?, ?>>() {
 
                 @Override
                 public Void doOn(final CollectorLeap<?, ?> collector, final Object... args) {
+
+                    final Throwable throwable = collector.mUnhandled;
+
+                    if (throwable != null) {
+
+                        throw new FloatingException(throwable);
+                    }
 
                     final ArrayList<?> data = collector.mData;
 
@@ -69,8 +87,6 @@ class CollectorLeap<SOURCE, DATA> extends FreeLeap<SOURCE, DATA> {
                     return null;
                 }
             };
-
-    private boolean mIsComplete;
 
     /**
      * Checks if the collection is complete, that is, if data have been discharged.
@@ -115,6 +131,8 @@ class CollectorLeap<SOURCE, DATA> extends FreeLeap<SOURCE, DATA> {
 
         upRiver.deviate();
         downRiver.deviate();
+
+        mUnhandled = throwable;
 
         mIsComplete = true;
     }

@@ -199,15 +199,14 @@ public class RapidLeapTest extends TestCase {
                 fall().start(RapidLeap.from(new RapidLeapError4()))
                       .chain(new FreeLeap<Object, Object>() {
 
-                                 @Override
-                                 public void onUnhandled(final River<Object, Object> upRiver,
-                                         final River<Object, Object> downRiver,
-                                         final int fallNumber, final Throwable throwable) {
+                          @Override
+                          public void onUnhandled(final River<Object, Object> upRiver,
+                                  final River<Object, Object> downRiver, final int fallNumber,
+                                  final Throwable throwable) {
 
-                                     downRiver.push(throwable);
-                                 }
-                             }
-                      );
+                              downRiver.push(throwable);
+                          }
+                      });
         final Collector<Object> collector2 = fall2.collect();
 
         fall2.source().push("11", null).forward(new IllegalArgumentException()).discharge();
@@ -347,17 +346,57 @@ public class RapidLeapTest extends TestCase {
                 RapidLeap.from(new RapidLeapTest2(), Classification.ofType(Object.class)))
                          .pull("11", 27, 37.1, null)
                          .all()).containsExactly(13, "-27", "37.1", "");
-        assertThat(
-                fall().start(RapidLeap.from(new RapidLeapTest3())).pull("11", 27, 37.1, null).all())
-                .containsExactly(11, "27", "37.1", null);
+        assertThat(fall().start(RapidLeap.from(new RapidLeapTest3()))
+                         .chain(new FreeLeap<Object, Object>() {
+
+                             @Override
+                             public void onUnhandled(final River<Object, Object> upRiver,
+                                     final River<Object, Object> downRiver, final int fallNumber,
+                                     final Throwable throwable) {
+
+                                 downRiver.discharge();
+                             }
+                         })
+                         .pull("11", 27, 37.1, null)
+                         .all()).containsExactly(11, "27", "37.1", null);
         assertThat(fall().start(RapidLeap.fromAnnotated(new RapidLeapTest3()))
+                         .chain(new FreeLeap<Object, Object>() {
+
+                             @Override
+                             public void onUnhandled(final River<Object, Object> upRiver,
+                                     final River<Object, Object> downRiver, final int fallNumber,
+                                     final Throwable throwable) {
+
+                                 downRiver.discharge();
+                             }
+                         })
                          .pull("11", 27, 37.1, null)
                          .all()).containsExactly(11, "27", 37.1, null);
         assertThat(fall().start(RapidLeap.fromAnnotated(new RapidLeapTest3(), Object.class))
+                         .chain(new FreeLeap<Object, Object>() {
+
+                             @Override
+                             public void onUnhandled(final River<Object, Object> upRiver,
+                                     final River<Object, Object> downRiver, final int fallNumber,
+                                     final Throwable throwable) {
+
+                                 downRiver.discharge();
+                             }
+                         })
                          .pull("11", 27, 37.1, null)
                          .all()).containsExactly(11, "27", 37.1, null);
         assertThat(fall().start(
                 RapidLeap.fromAnnotated(new RapidLeapTest3(), Classification.ofType(Object.class)))
+                         .chain(new FreeLeap<Object, Object>() {
+
+                             @Override
+                             public void onUnhandled(final River<Object, Object> upRiver,
+                                     final River<Object, Object> downRiver, final int fallNumber,
+                                     final Throwable throwable) {
+
+                                 downRiver.discharge();
+                             }
+                         })
                          .pull("11", 27, 37.1, null)
                          .all()).containsExactly(11, "27", 37.1, null);
 
@@ -365,15 +404,14 @@ public class RapidLeapTest extends TestCase {
                 fall().start(RapidLeap.from(new RapidLeapTest4()))
                       .chain(new FreeLeap<Object, Object>() {
 
-                                 @Override
-                                 public void onUnhandled(final River<Object, Object> upRiver,
-                                         final River<Object, Object> downRiver,
-                                         final int fallNumber, final Throwable throwable) {
+                          @Override
+                          public void onUnhandled(final River<Object, Object> upRiver,
+                                  final River<Object, Object> downRiver, final int fallNumber,
+                                  final Throwable throwable) {
 
-                                     downRiver.push(throwable);
-                                 }
-                             }
-                      );
+                              downRiver.push(throwable);
+                          }
+                      });
         final Collector<Object> collector1 = fall1.collect();
 
         fall1.source().push("11", 27, 37.1, null);
@@ -393,15 +431,14 @@ public class RapidLeapTest extends TestCase {
                 fall().start(RapidLeap.from(new RapidLeapTest5()))
                       .chain(new FreeLeap<Object, Object>() {
 
-                                 @Override
-                                 public void onUnhandled(final River<Object, Object> upRiver,
-                                         final River<Object, Object> downRiver,
-                                         final int fallNumber, final Throwable throwable) {
+                          @Override
+                          public void onUnhandled(final River<Object, Object> upRiver,
+                                  final River<Object, Object> downRiver, final int fallNumber,
+                                  final Throwable throwable) {
 
-                                     downRiver.push(throwable);
-                                 }
-                             }
-                      );
+                              downRiver.push(throwable);
+                          }
+                      });
         final Collector<Object> collector4 = fall2.collect();
 
         fall2.source().forward(new IllegalArgumentException()).discharge();

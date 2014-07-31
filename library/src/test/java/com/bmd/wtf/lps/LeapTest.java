@@ -19,6 +19,8 @@ import com.bmd.wtf.lps.WeakLeap.WhenVanished;
 
 import junit.framework.TestCase;
 
+import java.util.ArrayList;
+
 import static com.bmd.wtf.fll.Waterfall.fall;
 import static org.fest.assertions.api.Assertions.assertThat;
 
@@ -224,41 +226,197 @@ public class LeapTest extends TestCase {
         assertThat(waterfall2.pull("discharge").next()).isEqualTo("discharge");
         assertThat(waterfall3.pull("discharge").next()).isEqualTo("discharge");
 
-        assertThat(waterfall1.pull("discharge1").all()).isEmpty();
-        assertThat(waterfall2.pull("discharge1").all()).isEmpty();
-        assertThat(waterfall3.pull("discharge1").all()).isEmpty();
+        try {
+
+            waterfall1.pull("discharge1").all();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+        try {
+
+            waterfall2.pull("discharge1").all();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+        try {
+
+            waterfall3.pull("discharge1").allInto(new ArrayList<Object>());
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
 
         assertThat(waterfall1.pull("discharge2").all()).containsExactly("discharge2");
-        assertThat(waterfall2.pull("discharge2").all()).isEmpty();
-        assertThat(waterfall3.pull("discharge2").all()).isEmpty();
+        try {
 
-        assertThat(waterfall1.pull("flush1").next()).isEqualTo("flush1");
-        assertThat(waterfall2.pull("flush1").all()).containsExactly("flush1");
-        assertThat(waterfall3.pull("flush1").all()).containsExactly("flush1");
+            waterfall2.pull("discharge2").next();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+        try {
+
+            waterfall2.pull("discharge2").nextInto(new ArrayList<Object>());
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            waterfall1.pull("flush1").next();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+        try {
+
+            waterfall2.pull("flush1").next();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+        try {
+
+            waterfall3.pull("flush1").next();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
 
         assertThat(waterfall1.pull("flush2").all()).containsExactly("flush2");
-        assertThat(waterfall2.pull("flush2").next()).isEqualTo("flush2");
-        assertThat(waterfall3.pull("flush2").next()).isEqualTo("flush2");
+        try {
 
-        assertThat(waterfall1.pull("push").all()).isEmpty();
-        assertThat(waterfall2.pull("push").all()).isEmpty();
-        assertThat(waterfall3.pull("push").all()).isEmpty();
+            waterfall2.pull("flush2").all();
 
-        assertThat(waterfall1.pull("push1").all()).isEmpty();
-        assertThat(waterfall2.pull("push1").all()).isEmpty();
-        assertThat(waterfall3.pull("push1").all()).isEmpty();
+            fail();
 
-        assertThat(waterfall1.pull("push2").all()).isEmpty();
-        assertThat(waterfall2.pull("push2").all()).isEmpty();
-        assertThat(waterfall3.pull("push2").all()).isEmpty();
+        } catch (final Exception ignored) {
+
+        }
+        try {
+
+            waterfall3.pull("flush2").next();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            waterfall1.pull("push").all();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+        try {
+
+            waterfall2.pull("push").all();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+        try {
+
+            waterfall3.pull("push").all();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            waterfall1.pull("push1").all();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+        try {
+
+            waterfall2.pull("push1").all();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+        try {
+
+            waterfall3.pull("push1").all();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
 
         assertThat(waterfall1.pull("pull").next()).isEqualTo("pull");
-        assertThat(waterfall2.pull("pull").all()).isEmpty();
-        assertThat(waterfall3.pull("pull").all()).isEmpty();
+        try {
+
+            waterfall2.pull("pull").all();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+        try {
+
+            waterfall3.pull("pull").all();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
 
         assertThat(waterfall1.pull("pull1").all()).containsExactly("pull1");
-        assertThat(waterfall2.pull("pull1").all()).isEmpty();
-        assertThat(waterfall3.pull("pull1").all()).isEmpty();
+        try {
+
+            waterfall2.pull("pull1").all();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+        try {
+
+            waterfall3.pull("pull1").all();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
 
         //noinspection UnusedAssignment
         freeLeap = null;
@@ -270,40 +428,132 @@ public class LeapTest extends TestCase {
         assertThat(waterfall2.pull("discharge").next()).isEqualTo("discharge");
         assertThat(waterfall3.pull("discharge").now().all()).isEmpty();
 
-        assertThat(waterfall1.pull("discharge1").all()).isEmpty();
-        assertThat(waterfall2.pull("discharge1").all()).isEmpty();
+        try {
+
+            waterfall1.pull("discharge1").all();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+        try {
+
+            waterfall2.pull("discharge1").all();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
         assertThat(waterfall3.pull("discharge1").now().all()).isEmpty();
 
         assertThat(waterfall1.pull("discharge2").all()).containsExactly("discharge2");
-        assertThat(waterfall2.pull("discharge2").all()).isEmpty();
+        try {
+
+            waterfall2.pull("discharge2").all();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
         assertThat(waterfall3.pull("discharge2").now().all()).isEmpty();
 
-        assertThat(waterfall1.pull("flush1").next()).isEqualTo("flush1");
-        assertThat(waterfall2.pull("flush1").all()).containsExactly("flush1");
+        try {
+
+            waterfall1.pull("flush1").all();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+        try {
+
+            waterfall2.pull("flush1").all();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
         assertThat(waterfall3.pull("flush1").now().all()).isEmpty();
 
         assertThat(waterfall1.pull("flush2").all()).containsExactly("flush2");
-        assertThat(waterfall2.pull("flush2").next()).isEqualTo("flush2");
+        try {
+
+            waterfall2.pull("flush2").next();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
         assertThat(waterfall3.pull("flush2").now().all()).isEmpty();
 
-        assertThat(waterfall1.pull("push").all()).isEmpty();
-        assertThat(waterfall2.pull("push").all()).isEmpty();
+        try {
+
+            waterfall1.pull("push").all();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+        try {
+
+            waterfall2.pull("push").all();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
         assertThat(waterfall3.pull("push").now().all()).isEmpty();
 
-        assertThat(waterfall1.pull("push1").all()).isEmpty();
-        assertThat(waterfall2.pull("push1").all()).isEmpty();
+        try {
+
+            waterfall1.pull("push1").all();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+        try {
+
+            waterfall2.pull("push1").all();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
         assertThat(waterfall3.pull("push1").now().all()).isEmpty();
 
-        assertThat(waterfall1.pull("push2").all()).isEmpty();
-        assertThat(waterfall2.pull("push2").all()).isEmpty();
-        assertThat(waterfall3.pull("push2").now().all()).isEmpty();
-
         assertThat(waterfall1.pull("pull").next()).isEqualTo("pull");
-        assertThat(waterfall2.pull("pull").all()).isEmpty();
+        try {
+
+            waterfall2.pull("pull").all();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
         assertThat(waterfall3.pull("pull").now().all()).isEmpty();
 
         assertThat(waterfall1.pull("pull1").all()).containsExactly("pull1");
-        assertThat(waterfall2.pull("pull1").all()).isEmpty();
+        try {
+
+            waterfall2.pull("pull1").all();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
         assertThat(waterfall3.pull("pull1").now().all()).isEmpty();
 
         //noinspection UnusedAssignment
@@ -316,33 +566,93 @@ public class LeapTest extends TestCase {
         assertThat(waterfall2.pull("discharge").all()).isEmpty();
         assertThat(waterfall3.pull("discharge").now().all()).isEmpty();
 
-        assertThat(waterfall1.pull("discharge1").all()).isEmpty();
-        assertThat(waterfall2.pull("discharge1").all()).isEmpty();
+        try {
+
+            waterfall1.pull("discharge1").all();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+        try {
+
+            waterfall2.pull("discharge1").all();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
         assertThat(waterfall3.pull("discharge1").now().all()).isEmpty();
 
         assertThat(waterfall1.pull("discharge2").all()).containsExactly("discharge2");
         assertThat(waterfall2.pull("discharge2").all()).isEmpty();
         assertThat(waterfall3.pull("discharge2").now().all()).isEmpty();
 
-        assertThat(waterfall1.pull("flush1").next()).isEqualTo("flush1");
-        assertThat(waterfall2.pull("flush1").all()).isEmpty();
+        try {
+
+            waterfall1.pull("flush1").all();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+        try {
+
+            waterfall2.pull("flush1").all();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
         assertThat(waterfall3.pull("flush1").now().all()).isEmpty();
 
         assertThat(waterfall1.pull("flush2").all()).containsExactly("flush2");
         assertThat(waterfall2.pull("flush2").all()).isEmpty();
         assertThat(waterfall3.pull("flush2").now().all()).isEmpty();
 
-        assertThat(waterfall1.pull("push").all()).isEmpty();
-        assertThat(waterfall2.pull("push").all()).isEmpty();
+        try {
+
+            waterfall1.pull("push").all();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+        try {
+
+            waterfall2.pull("push").all();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
         assertThat(waterfall3.pull("push").now().all()).isEmpty();
 
-        assertThat(waterfall1.pull("push1").all()).isEmpty();
-        assertThat(waterfall2.pull("push1").all()).isEmpty();
-        assertThat(waterfall3.pull("push1").now().all()).isEmpty();
+        try {
 
-        assertThat(waterfall1.pull("push2").all()).isEmpty();
-        assertThat(waterfall2.pull("push2").all()).isEmpty();
-        assertThat(waterfall3.pull("push2").now().all()).isEmpty();
+            waterfall1.pull("push1").all();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+        try {
+
+            waterfall2.pull("push1").all();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+        assertThat(waterfall3.pull("push1").now().all()).isEmpty();
 
         assertThat(waterfall1.pull("pull").next()).isEqualTo("pull");
         assertThat(waterfall2.pull("pull").all()).isEmpty();

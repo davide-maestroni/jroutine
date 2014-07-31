@@ -37,7 +37,7 @@ class DataCollector<SOURCE, DATA> implements Collector<DATA> {
                 @Override
                 public boolean isSatisfied(final CollectorLeap<?, ?> leap) {
 
-                    return (leap.size() > 0);
+                    return (leap.size() > 0) || leap.isComplete();
                 }
             };
 

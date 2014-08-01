@@ -26,7 +26,7 @@ import java.util.HashSet;
 /**
  * Class responsible for the handling of download operations.
  */
-public class CancelableDownloader extends RapidLeap<Object> {
+public class CancelableDownloader extends RapidLeap {
 
     private static final int CHUNK_SIZE = 1024;
 

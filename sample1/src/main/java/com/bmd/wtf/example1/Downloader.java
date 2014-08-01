@@ -26,7 +26,7 @@ import java.net.URLConnection;
 /**
  * Class responsible for the actual downloading of data.
  */
-public class Downloader extends RapidLeap<Object> {
+public class Downloader extends RapidLeap {
 
     @SuppressWarnings("UnusedDeclaration")
     public void onDownload(final Download download) {

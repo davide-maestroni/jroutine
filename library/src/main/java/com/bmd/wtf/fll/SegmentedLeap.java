@@ -22,11 +22,10 @@ import com.bmd.wtf.lps.LeapDecorator;
  * <p/>
  * Created by davide on 6/14/14.
  *
- * @param <SOURCE> The river source data type.
- * @param <IN>     The input data type.
- * @param <OUT>    The output data type.
+ * @param <IN>  The input data type.
+ * @param <OUT> The output data type.
  */
-class SegmentedLeap<SOURCE, IN, OUT> extends LeapDecorator<SOURCE, IN, OUT> {
+class SegmentedLeap<IN, OUT> extends LeapDecorator<IN, OUT> {
 
     private final Object mMutex = new Object();
 
@@ -35,13 +34,13 @@ class SegmentedLeap<SOURCE, IN, OUT> extends LeapDecorator<SOURCE, IN, OUT> {
      *
      * @param wrapped The wrapped leap.
      */
-    public SegmentedLeap(final Leap<SOURCE, IN, OUT> wrapped) {
+    public SegmentedLeap(final Leap<IN, OUT> wrapped) {
 
         super(wrapped);
     }
 
     @Override
-    public void onDischarge(final River<SOURCE, IN> upRiver, final River<SOURCE, OUT> downRiver,
+    public void onDischarge(final River<IN> upRiver, final River<OUT> downRiver,
             final int fallNumber) {
 
         synchronized (mMutex) {
@@ -51,8 +50,8 @@ class SegmentedLeap<SOURCE, IN, OUT> extends LeapDecorator<SOURCE, IN, OUT> {
     }
 
     @Override
-    public void onPush(final River<SOURCE, IN> upRiver, final River<SOURCE, OUT> downRiver,
-            final int fallNumber, final IN drop) {
+    public void onPush(final River<IN> upRiver, final River<OUT> downRiver, final int fallNumber,
+            final IN drop) {
 
         synchronized (mMutex) {
 
@@ -61,7 +60,7 @@ class SegmentedLeap<SOURCE, IN, OUT> extends LeapDecorator<SOURCE, IN, OUT> {
     }
 
     @Override
-    public void onUnhandled(final River<SOURCE, IN> upRiver, final River<SOURCE, OUT> downRiver,
+    public void onUnhandled(final River<IN> upRiver, final River<OUT> downRiver,
             final int fallNumber, final Throwable throwable) {
 
         synchronized (mMutex) {

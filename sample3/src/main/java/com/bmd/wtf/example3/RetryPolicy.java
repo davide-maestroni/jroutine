@@ -25,15 +25,15 @@ import java.util.HashMap;
 /**
  * This class is meant to retry the discharge of data in case an error occurred.
  */
-public class RetryPolicy extends RapidLeap<Object> {
+public class RetryPolicy extends RapidLeap {
 
     private final int mMaxCount;
 
     private final HashMap<URI, Integer> mRetryCounts = new HashMap<URI, Integer>();
 
-    private final River<Object, Object> mRiver;
+    private final River<Object> mRiver;
 
-    public RetryPolicy(final River<Object, Object> river, final int maxCount) {
+    public RetryPolicy(final River<Object> river, final int maxCount) {
 
         mRiver = river;
         mMaxCount = maxCount;

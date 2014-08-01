@@ -39,7 +39,7 @@ public class RapidLeapTest extends TestCase {
     public void testDeviateStream() {
 
         final Waterfall<Object, Object, Object> fall1 = fall().start();
-        final Waterfall<Object, Object, Object> fall2 = fall1.chain(new RapidLeap<Object>() {
+        final Waterfall<Object, Object, Object> fall2 = fall1.chain(new RapidLeap() {
 
             @SuppressWarnings("UnusedDeclaration")
             public Integer dec(final Integer num) {
@@ -53,12 +53,11 @@ public class RapidLeapTest extends TestCase {
             }
         });
         final Waterfall<Object, Object, String> fall3 =
-                fall2.chain(new AbstractLeap<Object, Object, String>() {
+                fall2.chain(new AbstractLeap<Object, String>() {
 
                     @Override
-                    public void onPush(final River<Object, Object> upRiver,
-                            final River<Object, String> downRiver, final int fallNumber,
-                            final Object drop) {
+                    public void onPush(final River<Object> upRiver, final River<String> downRiver,
+                            final int fallNumber, final Object drop) {
 
                         downRiver.push(drop.toString());
                     }
@@ -69,7 +68,7 @@ public class RapidLeapTest extends TestCase {
         assertThat(fall4.pull(0).now().all()).isEmpty();
         assertThat(fall4.pull(1).now().all()).isEmpty();
 
-        fall1.chain(new RapidLeap<Object>() {
+        fall1.chain(new RapidLeap() {
 
             @SuppressWarnings("UnusedDeclaration")
             public Integer same(final Integer num) {
@@ -126,11 +125,11 @@ public class RapidLeapTest extends TestCase {
         }
 
         final Waterfall<Object, Object, Object> fall1 =
-                fall().start(new RapidLeapError4()).chain(new FreeLeap<Object, Object>() {
+                fall().start(new RapidLeapError4()).chain(new FreeLeap<Object>() {
 
                     @Override
-                    public void onUnhandled(final River<Object, Object> upRiver,
-                            final River<Object, Object> downRiver, final int fallNumber,
+                    public void onUnhandled(final River<Object> upRiver,
+                            final River<Object> downRiver, final int fallNumber,
                             final Throwable throwable) {
 
                         downRiver.push(throwable);
@@ -196,17 +195,16 @@ public class RapidLeapTest extends TestCase {
         }
 
         final Waterfall<Object, Object, Object> fall2 =
-                fall().start(RapidLeap.from(new RapidLeapError4()))
-                      .chain(new FreeLeap<Object, Object>() {
+                fall().start(RapidLeap.from(new RapidLeapError4())).chain(new FreeLeap<Object>() {
 
-                          @Override
-                          public void onUnhandled(final River<Object, Object> upRiver,
-                                  final River<Object, Object> downRiver, final int fallNumber,
-                                  final Throwable throwable) {
+                    @Override
+                    public void onUnhandled(final River<Object> upRiver,
+                            final River<Object> downRiver, final int fallNumber,
+                            final Throwable throwable) {
 
-                              downRiver.push(throwable);
-                          }
-                      });
+                        downRiver.push(throwable);
+                    }
+                });
         final Collector<Object> collector2 = fall2.collect();
 
         fall2.source().push("11", null).forward(new IllegalArgumentException()).discharge();
@@ -239,7 +237,7 @@ public class RapidLeapTest extends TestCase {
 
     public void testFlow() {
 
-        assertThat(fall().start(new RapidLeap<Object>() {
+        assertThat(fall().start(new RapidLeap() {
 
             @SuppressWarnings("UnusedDeclaration")
             public void integerToString(final Integer data) {
@@ -256,7 +254,7 @@ public class RapidLeapTest extends TestCase {
             @SuppressWarnings("UnusedDeclaration")
             public void doubleToStirng(final Double data) {
 
-                source().push(data.toString());
+                upRiver().push(data.toString());
             }
         }).pull(11, 22f, 33d).all()).containsExactly("11", "22.0", "33.0");
 
@@ -268,7 +266,7 @@ public class RapidLeapTest extends TestCase {
 
     public void testGate() {
 
-        assertThat(fall().asGate().start(new TestLeapGate()).chain(new RapidLeap<Object>() {
+        assertThat(fall().asGate().start(new TestLeapGate()).chain(new RapidLeap() {
 
             @SuppressWarnings("UnusedDeclaration")
             public Object obj(final Object obj) {
@@ -295,11 +293,11 @@ public class RapidLeapTest extends TestCase {
                          .all()).containsExactly(11, "27", 37.1, null, "test");
 
         final Waterfall<Object, Object, Object> fall1 =
-                fall().start(new RapidLeapTest4()).chain(new FreeLeap<Object, Object>() {
+                fall().start(new RapidLeapTest4()).chain(new FreeLeap<Object>() {
 
                     @Override
-                    public void onUnhandled(final River<Object, Object> upRiver,
-                            final River<Object, Object> downRiver, final int fallNumber,
+                    public void onUnhandled(final River<Object> upRiver,
+                            final River<Object> downRiver, final int fallNumber,
                             final Throwable throwable) {
 
                         downRiver.push(throwable);
@@ -321,11 +319,11 @@ public class RapidLeapTest extends TestCase {
         assertThat(collector3.all()).isEmpty();
 
         final Waterfall<Object, Object, Object> fall2 =
-                fall().start(new RapidLeapTest5()).chain(new FreeLeap<Object, Object>() {
+                fall().start(new RapidLeapTest5()).chain(new FreeLeap<Object>() {
 
                     @Override
-                    public void onUnhandled(final River<Object, Object> upRiver,
-                            final River<Object, Object> downRiver, final int fallNumber,
+                    public void onUnhandled(final River<Object> upRiver,
+                            final River<Object> downRiver, final int fallNumber,
                             final Throwable throwable) {
 
                         downRiver.push(throwable);
@@ -339,32 +337,27 @@ public class RapidLeapTest extends TestCase {
 
     public void testWrap() {
 
-        assertThat(fall().start(RapidLeap.from(new RapidLeapTest1(), Object.class))
-                         .pull("11", 27, 37.1, null)
-                         .all()).containsExactly(11, "27", "37.1", null);
-        assertThat(fall().start(
-                RapidLeap.from(new RapidLeapTest2(), Classification.ofType(Object.class)))
-                         .pull("11", 27, 37.1, null)
-                         .all()).containsExactly(13, "-27", "37.1", "");
-        assertThat(fall().start(RapidLeap.from(new RapidLeapTest3()))
-                         .chain(new FreeLeap<Object, Object>() {
+        assertThat(
+                fall().start(RapidLeap.from(new RapidLeapTest1())).pull("11", 27, 37.1, null).all())
+                .containsExactly(11, "27", "37.1", null);
+        assertThat(
+                fall().start(RapidLeap.from(new RapidLeapTest2())).pull("11", 27, 37.1, null).all())
+                .containsExactly(13, "-27", "37.1", "");
+        assertThat(fall().start(RapidLeap.from(new RapidLeapTest3())).chain(new FreeLeap<Object>() {
 
-                             @Override
-                             public void onUnhandled(final River<Object, Object> upRiver,
-                                     final River<Object, Object> downRiver, final int fallNumber,
-                                     final Throwable throwable) {
+            @Override
+            public void onUnhandled(final River<Object> upRiver, final River<Object> downRiver,
+                    final int fallNumber, final Throwable throwable) {
 
-                                 downRiver.discharge();
-                             }
-                         })
-                         .pull("11", 27, 37.1, null)
-                         .all()).containsExactly(11, "27", "37.1", null);
+                downRiver.discharge();
+            }
+        }).pull("11", 27, 37.1, null).all()).containsExactly(11, "27", "37.1", null);
         assertThat(fall().start(RapidLeap.fromAnnotated(new RapidLeapTest3()))
-                         .chain(new FreeLeap<Object, Object>() {
+                         .chain(new FreeLeap<Object>() {
 
                              @Override
-                             public void onUnhandled(final River<Object, Object> upRiver,
-                                     final River<Object, Object> downRiver, final int fallNumber,
+                             public void onUnhandled(final River<Object> upRiver,
+                                     final River<Object> downRiver, final int fallNumber,
                                      final Throwable throwable) {
 
                                  downRiver.discharge();
@@ -372,12 +365,12 @@ public class RapidLeapTest extends TestCase {
                          })
                          .pull("11", 27, 37.1, null)
                          .all()).containsExactly(11, "27", 37.1, null);
-        assertThat(fall().start(RapidLeap.fromAnnotated(new RapidLeapTest3(), Object.class))
-                         .chain(new FreeLeap<Object, Object>() {
+        assertThat(fall().start(RapidLeap.fromAnnotated(new RapidLeapTest3()))
+                         .chain(new FreeLeap<Object>() {
 
                              @Override
-                             public void onUnhandled(final River<Object, Object> upRiver,
-                                     final River<Object, Object> downRiver, final int fallNumber,
+                             public void onUnhandled(final River<Object> upRiver,
+                                     final River<Object> downRiver, final int fallNumber,
                                      final Throwable throwable) {
 
                                  downRiver.discharge();
@@ -385,13 +378,12 @@ public class RapidLeapTest extends TestCase {
                          })
                          .pull("11", 27, 37.1, null)
                          .all()).containsExactly(11, "27", 37.1, null);
-        assertThat(fall().start(
-                RapidLeap.fromAnnotated(new RapidLeapTest3(), Classification.ofType(Object.class)))
-                         .chain(new FreeLeap<Object, Object>() {
+        assertThat(fall().start(RapidLeap.fromAnnotated(new RapidLeapTest3()))
+                         .chain(new FreeLeap<Object>() {
 
                              @Override
-                             public void onUnhandled(final River<Object, Object> upRiver,
-                                     final River<Object, Object> downRiver, final int fallNumber,
+                             public void onUnhandled(final River<Object> upRiver,
+                                     final River<Object> downRiver, final int fallNumber,
                                      final Throwable throwable) {
 
                                  downRiver.discharge();
@@ -401,17 +393,16 @@ public class RapidLeapTest extends TestCase {
                          .all()).containsExactly(11, "27", 37.1, null);
 
         final Waterfall<Object, Object, Object> fall1 =
-                fall().start(RapidLeap.from(new RapidLeapTest4()))
-                      .chain(new FreeLeap<Object, Object>() {
+                fall().start(RapidLeap.from(new RapidLeapTest4())).chain(new FreeLeap<Object>() {
 
-                          @Override
-                          public void onUnhandled(final River<Object, Object> upRiver,
-                                  final River<Object, Object> downRiver, final int fallNumber,
-                                  final Throwable throwable) {
+                    @Override
+                    public void onUnhandled(final River<Object> upRiver,
+                            final River<Object> downRiver, final int fallNumber,
+                            final Throwable throwable) {
 
-                              downRiver.push(throwable);
-                          }
-                      });
+                        downRiver.push(throwable);
+                    }
+                });
         final Collector<Object> collector1 = fall1.collect();
 
         fall1.source().push("11", 27, 37.1, null);
@@ -428,17 +419,16 @@ public class RapidLeapTest extends TestCase {
         assertThat(collector3.all()).isEmpty();
 
         final Waterfall<Object, Object, Object> fall2 =
-                fall().start(RapidLeap.from(new RapidLeapTest5()))
-                      .chain(new FreeLeap<Object, Object>() {
+                fall().start(RapidLeap.from(new RapidLeapTest5())).chain(new FreeLeap<Object>() {
 
-                          @Override
-                          public void onUnhandled(final River<Object, Object> upRiver,
-                                  final River<Object, Object> downRiver, final int fallNumber,
-                                  final Throwable throwable) {
+                    @Override
+                    public void onUnhandled(final River<Object> upRiver,
+                            final River<Object> downRiver, final int fallNumber,
+                            final Throwable throwable) {
 
-                              downRiver.push(throwable);
-                          }
-                      });
+                        downRiver.push(throwable);
+                    }
+                });
         final Collector<Object> collector4 = fall2.collect();
 
         fall2.source().forward(new IllegalArgumentException()).discharge();
@@ -465,7 +455,7 @@ public class RapidLeapTest extends TestCase {
         }
     }
 
-    public static class RapidLeapError1 extends RapidLeap<Object> {
+    public static class RapidLeapError1 extends RapidLeap {
 
         @SuppressWarnings("UnusedDeclaration")
         public String method1(final String text) {
@@ -480,7 +470,7 @@ public class RapidLeapTest extends TestCase {
         }
     }
 
-    public static class RapidLeapError2 extends RapidLeap<Object> {
+    public static class RapidLeapError2 extends RapidLeap {
 
         @FlowPath
         public String method1(final String text) {
@@ -495,7 +485,7 @@ public class RapidLeapTest extends TestCase {
         }
     }
 
-    public static class RapidLeapError3 extends RapidLeap<Object> {
+    public static class RapidLeapError3 extends RapidLeap {
 
         @FlowPath
         public String method1(final String text, final int ignored) {
@@ -504,7 +494,7 @@ public class RapidLeapTest extends TestCase {
         }
     }
 
-    public static class RapidLeapError4 extends RapidLeap<Object> {
+    public static class RapidLeapError4 extends RapidLeap {
 
         @SuppressWarnings("UnusedDeclaration")
         public void error(final String text) throws MyException {
@@ -531,7 +521,7 @@ public class RapidLeapTest extends TestCase {
         }
     }
 
-    public static class RapidLeapError5 extends RapidLeap<Object> {
+    public static class RapidLeapError5 extends RapidLeap {
 
         @FlowPath(Integer.class)
         public String method1(final String text) {
@@ -540,7 +530,7 @@ public class RapidLeapTest extends TestCase {
         }
     }
 
-    public static class RapidLeapError6 extends RapidLeap<Object> {
+    public static class RapidLeapError6 extends RapidLeap {
 
         @FlowPath
         public String method1(final ArrayList<?> list) {
@@ -555,7 +545,7 @@ public class RapidLeapTest extends TestCase {
         }
     }
 
-    public static class RapidLeapFlow extends RapidLeap<Object> {
+    public static class RapidLeapFlow extends RapidLeap {
 
         private final int mNumber;
 
@@ -573,7 +563,7 @@ public class RapidLeapTest extends TestCase {
         }
     }
 
-    public static class RapidLeapTest1 extends RapidLeap<Object> {
+    public static class RapidLeapTest1 extends RapidLeap {
 
         @SuppressWarnings("UnusedDeclaration")
         public String onObject(final Object data) {
@@ -615,7 +605,7 @@ public class RapidLeapTest extends TestCase {
         }
     }
 
-    public static class RapidLeapTest3 extends RapidLeap<Object> {
+    public static class RapidLeapTest3 extends RapidLeap {
 
         public RapidLeapTest3() {
 
@@ -674,11 +664,11 @@ public class RapidLeapTest extends TestCase {
         }
     }
 
-    public static class RapidLeapTest5 extends RapidLeap<Object> {
+    public static class RapidLeapTest5 extends RapidLeap {
 
     }
 
-    public static class TestLeapGate extends FreeLeap<Object, Object> implements LeapGate {
+    public static class TestLeapGate extends FreeLeap<Object> implements LeapGate {
 
         @Override
         public int getInt() {

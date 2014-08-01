@@ -20,27 +20,26 @@ import com.bmd.wtf.flw.River;
  * <p/>
  * Created by davide on 6/8/14.
  *
- * @param <SOURCE> The river source data type.
- * @param <DATA>   The data type.
+ * @param <DATA> The data type.
  */
-public class FreeLeap<SOURCE, DATA> implements Leap<SOURCE, DATA, DATA> {
+public class FreeLeap<DATA> implements Leap<DATA, DATA> {
 
     @Override
-    public void onDischarge(final River<SOURCE, DATA> upRiver, final River<SOURCE, DATA> downRiver,
+    public void onDischarge(final River<DATA> upRiver, final River<DATA> downRiver,
             final int fallNumber) {
 
         downRiver.discharge();
     }
 
     @Override
-    public void onPush(final River<SOURCE, DATA> upRiver, final River<SOURCE, DATA> downRiver,
-            final int fallNumber, final DATA drop) {
+    public void onPush(final River<DATA> upRiver, final River<DATA> downRiver, final int fallNumber,
+            final DATA drop) {
 
         downRiver.push(drop);
     }
 
     @Override
-    public void onUnhandled(final River<SOURCE, DATA> upRiver, final River<SOURCE, DATA> downRiver,
+    public void onUnhandled(final River<DATA> upRiver, final River<DATA> downRiver,
             final int fallNumber, final Throwable throwable) {
 
         downRiver.forward(throwable);

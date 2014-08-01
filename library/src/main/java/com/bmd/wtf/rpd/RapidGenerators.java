@@ -244,12 +244,12 @@ class RapidGenerators {
      * @param generator      The generator object whose method will be called.
      * @param classification The leap classification.
      * @param args           The arguments to be passed to the method.
+     * @param <IN>           The input data type.
+     * @param <OUT>          The output data type.
      * @return The newly created leap generator.
      */
-    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> leapGenerator(
-            final Object generator,
-            final Classification<? extends Leap<SOURCE, IN, OUT>> classification,
-            final Object... args) {
+    public static <IN, OUT> LeapGenerator<IN, OUT> leapGenerator(final Object generator,
+            final Classification<? extends Leap<IN, OUT>> classification, final Object... args) {
 
         final Class<?> type = classification.getRawType();
 
@@ -275,10 +275,10 @@ class RapidGenerators {
 
         if (length > args.length) {
 
-            return new LeapGenerator<SOURCE, IN, OUT>() {
+            return new LeapGenerator<IN, OUT>() {
 
                 @Override
-                public Leap<SOURCE, IN, OUT> start(final int fallNumber) {
+                public Leap<IN, OUT> start(final int fallNumber) {
 
                     try {
 
@@ -289,7 +289,7 @@ class RapidGenerators {
                         args[length - 1] = fallNumber;
 
                         //noinspection unchecked
-                        return (Leap<SOURCE, IN, OUT>) method.invoke(generator, args);
+                        return (Leap<IN, OUT>) method.invoke(generator, args);
 
                     } catch (final InvocationTargetException e) {
 
@@ -303,15 +303,15 @@ class RapidGenerators {
             };
         }
 
-        return new LeapGenerator<SOURCE, IN, OUT>() {
+        return new LeapGenerator<IN, OUT>() {
 
             @Override
-            public Leap<SOURCE, IN, OUT> start(final int fallNumber) {
+            public Leap<IN, OUT> start(final int fallNumber) {
 
                 try {
 
                     //noinspection unchecked
-                    return (Leap<SOURCE, IN, OUT>) method.invoke(generator, args);
+                    return (Leap<IN, OUT>) method.invoke(generator, args);
 
                 } catch (final InvocationTargetException e) {
 
@@ -339,10 +339,12 @@ class RapidGenerators {
      *
      * @param type        The leap type.
      * @param contextArgs The arguments to be passed to the constructor.
+     * @param <IN>        The input data type.
+     * @param <OUT>       The output data type.
      * @return The newly created leap generator.
      */
-    public static <SOURCE, IN, OUT> LeapGenerator<SOURCE, IN, OUT> leapGenerator(
-            final Class<? extends Leap<SOURCE, IN, OUT>> type, final Object... contextArgs) {
+    public static <IN, OUT> LeapGenerator<IN, OUT> leapGenerator(
+            final Class<? extends Leap<IN, OUT>> type, final Object... contextArgs) {
 
         Constructor<?> bestMatch = findContextConstructor(type.getConstructors(), contextArgs);
 
@@ -367,10 +369,10 @@ class RapidGenerators {
 
         if (length > contextArgs.length) {
 
-            return new LeapGenerator<SOURCE, IN, OUT>() {
+            return new LeapGenerator<IN, OUT>() {
 
                 @Override
-                public Leap<SOURCE, IN, OUT> start(final int fallNumber) {
+                public Leap<IN, OUT> start(final int fallNumber) {
 
                     try {
 
@@ -381,7 +383,7 @@ class RapidGenerators {
                         args[length - 1] = fallNumber;
 
                         //noinspection unchecked
-                        return (Leap<SOURCE, IN, OUT>) constructor.newInstance(args);
+                        return (Leap<IN, OUT>) constructor.newInstance(args);
 
                     } catch (final InstantiationException e) {
 
@@ -399,15 +401,15 @@ class RapidGenerators {
             };
         }
 
-        return new LeapGenerator<SOURCE, IN, OUT>() {
+        return new LeapGenerator<IN, OUT>() {
 
             @Override
-            public Leap<SOURCE, IN, OUT> start(final int fallNumber) {
+            public Leap<IN, OUT> start(final int fallNumber) {
 
                 try {
 
                     //noinspection unchecked
-                    return (Leap<SOURCE, IN, OUT>) constructor.newInstance(contextArgs);
+                    return (Leap<IN, OUT>) constructor.newInstance(contextArgs);
 
                 } catch (final InstantiationException e) {
 
@@ -898,7 +900,6 @@ class RapidGenerators {
 
         throw new IllegalArgumentException(
                 "more than one " + ((isContructor) ? "constructor" : "method")
-                        + " found for arguments: " + Arrays.toString(args)
-        );
+                        + " found for arguments: " + Arrays.toString(args));
     }
 }

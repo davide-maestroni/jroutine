@@ -45,38 +45,37 @@ import java.util.concurrent.TimeUnit;
  * @param <IN>     The input data type.
  * @param <OUT>    The output data type.
  */
-public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
+public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
     private static final DataFall[] NO_FALL = new DataFall[0];
 
     private static final Classification<Void> SELF_CLASSIFICATION = new Classification<Void>() {};
 
-    private static final WeakHashMap<Leap<?, ?, ?>, Void> sLeaps =
-            new WeakHashMap<Leap<?, ?, ?>, Void>();
+    private static final WeakHashMap<Leap<?, ?>, Void> sLeaps = new WeakHashMap<Leap<?, ?>, Void>();
 
-    private static FreeLeap<?, ?> sFreeLeap;
+    private static FreeLeap<?> sFreeLeap;
 
-    private final BarrageLeap<SOURCE, ?> mBarrage;
+    private final BarrageLeap<?> mBarrage;
 
     private final Current mCurrent;
 
     private final CurrentGenerator mCurrentGenerator;
 
-    private final DataFall<SOURCE, IN, OUT>[] mFalls;
+    private final DataFall<IN, OUT>[] mFalls;
 
     private final Classification<?> mGate;
 
-    private final Map<Classification<?>, GateLeap<?, ?, ?>> mGateMap;
+    private final Map<Classification<?>, GateLeap<?, ?>> mGateMap;
 
     private final int mSize;
 
     private final Waterfall<SOURCE, SOURCE, ?> mSource;
 
     private Waterfall(final Waterfall<SOURCE, SOURCE, ?> source,
-            final Map<Classification<?>, GateLeap<?, ?, ?>> gateMap,
-            final Classification<?> gateClassification, final BarrageLeap<SOURCE, ?> barrageLeap,
+            final Map<Classification<?>, GateLeap<?, ?>> gateMap,
+            final Classification<?> gateClassification, final BarrageLeap<?> barrageLeap,
             final int size, final Current current, final CurrentGenerator generator,
-            final DataFall<SOURCE, IN, OUT>... falls) {
+            final DataFall<IN, OUT>... falls) {
 
         //noinspection unchecked
         mSource = (source != null) ? source : (Waterfall<SOURCE, SOURCE, ?>) this;
@@ -90,10 +89,10 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
     }
 
     private Waterfall(final Waterfall<SOURCE, SOURCE, ?> source,
-            final Map<Classification<?>, GateLeap<?, ?, ?>> gateMap,
-            final Classification<?> gateClassification, final BarrageLeap<SOURCE, ?> barrageLeap,
+            final Map<Classification<?>, GateLeap<?, ?>> gateMap,
+            final Classification<?> gateClassification, final BarrageLeap<?> barrageLeap,
             final int size, final Current current, final CurrentGenerator generator,
-            final Leap<SOURCE, IN, OUT>... leaps) {
+            final Leap<IN, OUT>... leaps) {
 
         //noinspection unchecked
         mSource = (source != null) ? source : (Waterfall<SOURCE, SOURCE, ?>) this;
@@ -104,15 +103,15 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
 
         final int length = leaps.length;
 
-        final Leap<SOURCE, IN, OUT> wrappedLeap;
+        final Leap<IN, OUT> wrappedLeap;
 
         if (gateClassification != null) {
 
-            final Leap<SOURCE, IN, OUT> leap = leaps[0];
+            final Leap<IN, OUT> leap = leaps[0];
 
-            final HashMap<Classification<?>, GateLeap<?, ?, ?>> fallGateMap =
-                    new HashMap<Classification<?>, GateLeap<?, ?, ?>>(gateMap);
-            final GateLeap<SOURCE, IN, OUT> gateLeap = new GateLeap<SOURCE, IN, OUT>(leap);
+            final HashMap<Classification<?>, GateLeap<?, ?>> fallGateMap =
+                    new HashMap<Classification<?>, GateLeap<?, ?>>(gateMap);
+            final GateLeap<IN, OUT> gateLeap = new GateLeap<IN, OUT>(leap);
 
             mapGate(fallGateMap,
                     (SELF_CLASSIFICATION == gateClassification) ? Classification.ofType(
@@ -126,7 +125,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
 
             if (size != length) {
 
-                wrappedLeap = new SegmentedLeap<SOURCE, IN, OUT>(leaps[0]);
+                wrappedLeap = new SegmentedLeap<IN, OUT>(leaps[0]);
 
             } else {
 
@@ -147,11 +146,11 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
             mBarrage = barrageLeap;
         }
 
-        final BarrageLeap<SOURCE, ?> fallBarrage = mBarrage;
+        final BarrageLeap<?> fallBarrage = mBarrage;
 
         for (int i = 0; i < size; ++i) {
 
-            final Leap<SOURCE, IN, OUT> leap = (wrappedLeap != null) ? wrappedLeap : leaps[i];
+            final Leap<IN, OUT> leap = (wrappedLeap != null) ? wrappedLeap : leaps[i];
             final Current fallCurrent;
 
             if (current == null) {
@@ -170,12 +169,12 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
 
             } else {
 
-                falls[i] = new DataFall<SOURCE, IN, OUT>(this, fallCurrent, leap, i);
+                falls[i] = new DataFall<IN, OUT>(this, fallCurrent, leap, i);
             }
         }
 
         //noinspection unchecked
-        mFalls = (DataFall<SOURCE, IN, OUT>[]) falls;
+        mFalls = (DataFall<IN, OUT>[]) falls;
     }
 
     /**
@@ -185,7 +184,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
      */
     public static Waterfall<Object, Object, Object> fall() {
 
-        final Map<Classification<?>, GateLeap<?, ?, ?>> gateMap = Collections.emptyMap();
+        final Map<Classification<?>, GateLeap<?, ?>> gateMap = Collections.emptyMap();
 
         //noinspection unchecked
         return new Waterfall<Object, Object, Object>(null, gateMap, null, null, 1,
@@ -195,19 +194,18 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
     /**
      * Lazily creates and return a singleton free leap instance.
      *
-     * @param <SOURCE> The source data type.
-     * @param <DATA>   The data type.
+     * @param <DATA> The data type.
      * @return The free leap instance.
      */
-    private static <SOURCE, DATA> FreeLeap<SOURCE, DATA> freeLeap() {
+    private static <DATA> FreeLeap<DATA> freeLeap() {
 
         if (sFreeLeap == null) {
 
-            sFreeLeap = new FreeLeap<Object, Object>();
+            sFreeLeap = new FreeLeap<Object>();
         }
 
         //noinspection unchecked
-        return (FreeLeap<SOURCE, DATA>) sFreeLeap;
+        return (FreeLeap<DATA>) sFreeLeap;
     }
 
     /**
@@ -218,8 +216,8 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
      * @param <DATA>  The data type.
      * @return The data stream running between the two falls.
      */
-    private static <DATA> DataStream<DATA> link(final DataFall<?, ?, DATA> inFall,
-            final DataFall<?, DATA, ?> outFall) {
+    private static <DATA> DataStream<DATA> link(final DataFall<?, DATA> inFall,
+            final DataFall<DATA, ?> outFall) {
 
         final DataStream<DATA> stream = new DataStream<DATA>(inFall, outFall);
 
@@ -235,7 +233,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
      *
      * @param leap The leap to register.
      */
-    private static void registerLeap(final Leap<?, ?, ?> leap) {
+    private static void registerLeap(final Leap<?, ?> leap) {
 
         if (sLeaps.containsKey(leap)) {
 
@@ -300,7 +298,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
             throw new IllegalArgumentException("cannot chain a waterfall to itself");
         }
 
-        final DataFall<SOURCE, IN, OUT>[] falls = mFalls;
+        final DataFall<IN, OUT>[] falls = mFalls;
 
         if ((falls == NO_FALL) || (waterfall.mFalls == NO_FALL)) {
 
@@ -311,9 +309,9 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
             final int size = waterfall.mSize;
             final int length = falls.length;
 
-            final DataFall<?, OUT, ?>[] outFalls = waterfall.mFalls;
+            final DataFall<OUT, ?>[] outFalls = waterfall.mFalls;
 
-            for (final DataFall<?, OUT, ?> outFall : outFalls) {
+            for (final DataFall<OUT, ?> outFall : outFalls) {
 
                 for (final DataStream<?> outputStream : outFall.outputStreams) {
 
@@ -328,9 +326,9 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
 
             if (size == 1) {
 
-                final DataFall<?, OUT, ?> outFall = outFalls[0];
+                final DataFall<OUT, ?> outFall = outFalls[0];
 
-                for (final DataFall<SOURCE, IN, OUT> fall : falls) {
+                for (final DataFall<IN, OUT> fall : falls) {
 
                     link(fall, outFall);
                 }
@@ -348,13 +346,13 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
                     inWaterfall = this;
                 }
 
-                final DataFall<SOURCE, ?, OUT>[] inFalls = inWaterfall.mFalls;
+                final DataFall<?, OUT>[] inFalls = inWaterfall.mFalls;
 
                 if (inFalls.length == 1) {
 
-                    final DataFall<SOURCE, ?, OUT> inFall = inFalls[0];
+                    final DataFall<?, OUT> inFall = inFalls[0];
 
-                    for (final DataFall<?, OUT, ?> outFall : outFalls) {
+                    for (final DataFall<OUT, ?> outFall : outFalls) {
 
                         link(inFall, outFall);
                     }
@@ -382,11 +380,10 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
      * @return The newly created waterfall.
      */
     public <NOUT> Waterfall<SOURCE, OUT, NOUT> chain(
-            final Classification<? extends Leap<SOURCE, OUT, NOUT>> gateClassification) {
+            final Classification<? extends Leap<OUT, NOUT>> gateClassification) {
 
         //noinspection unchecked
-        final Leap<SOURCE, OUT, NOUT> leap =
-                (Leap<SOURCE, OUT, NOUT>) findBestMatch(gateClassification);
+        final Leap<OUT, NOUT> leap = (Leap<OUT, NOUT>) findBestMatch(gateClassification);
 
         if (leap == null) {
 
@@ -395,7 +392,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
                             + gateClassification);
         }
 
-        final DataFall<SOURCE, IN, OUT>[] falls = mFalls;
+        final DataFall<IN, OUT>[] falls = mFalls;
         final int size = mSize;
 
         if (size == 1) {
@@ -405,9 +402,9 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
                     new Waterfall<SOURCE, OUT, NOUT>(mSource, mGateMap, mGate, mBarrage, 1,
                                                      mCurrent, mCurrentGenerator, leap);
 
-            final DataFall<SOURCE, OUT, NOUT> outFall = waterfall.mFalls[0];
+            final DataFall<OUT, NOUT> outFall = waterfall.mFalls[0];
 
-            for (final DataFall<SOURCE, IN, OUT> fall : falls) {
+            for (final DataFall<IN, OUT> fall : falls) {
 
                 link(fall, outFall);
             }
@@ -438,14 +435,14 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
                                                  inWaterfall.mCurrent,
                                                  inWaterfall.mCurrentGenerator, leaps);
 
-        final DataFall<SOURCE, ?, OUT>[] inFalls = inWaterfall.mFalls;
-        final DataFall<SOURCE, OUT, NOUT>[] outFalls = waterfall.mFalls;
+        final DataFall<?, OUT>[] inFalls = inWaterfall.mFalls;
+        final DataFall<OUT, NOUT>[] outFalls = waterfall.mFalls;
 
         if (inFalls.length == 1) {
 
-            final DataFall<SOURCE, ?, OUT> inFall = inFalls[0];
+            final DataFall<?, OUT> inFall = inFalls[0];
 
-            for (final DataFall<SOURCE, OUT, NOUT> outFall : outFalls) {
+            for (final DataFall<OUT, NOUT> outFall : outFalls) {
 
                 link(inFall, outFall);
             }
@@ -468,7 +465,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
      */
     public Waterfall<SOURCE, OUT, OUT> chain() {
 
-        final DataFall<SOURCE, IN, OUT>[] falls = mFalls;
+        final DataFall<IN, OUT>[] falls = mFalls;
 
         if (falls == NO_FALL) {
 
@@ -477,7 +474,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
         }
 
         final int size = mSize;
-        final FreeLeap<SOURCE, OUT> leap = freeLeap();
+        final FreeLeap<OUT> leap = freeLeap();
 
         if (size == 1) {
 
@@ -486,9 +483,9 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
                     new Waterfall<SOURCE, OUT, OUT>(mSource, mGateMap, mGate, mBarrage, 1, mCurrent,
                                                     mCurrentGenerator, leap);
 
-            final DataFall<SOURCE, OUT, OUT> outFall = waterfall.mFalls[0];
+            final DataFall<OUT, OUT> outFall = waterfall.mFalls[0];
 
-            for (final DataFall<SOURCE, IN, OUT> fall : falls) {
+            for (final DataFall<IN, OUT> fall : falls) {
 
                 link(fall, outFall);
             }
@@ -519,14 +516,14 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
                                                 inWaterfall.mCurrent, inWaterfall.mCurrentGenerator,
                                                 leaps);
 
-        final DataFall<SOURCE, ?, OUT>[] inFalls = inWaterfall.mFalls;
-        final DataFall<SOURCE, OUT, OUT>[] outFalls = waterfall.mFalls;
+        final DataFall<?, OUT>[] inFalls = inWaterfall.mFalls;
+        final DataFall<OUT, OUT>[] outFalls = waterfall.mFalls;
 
         if (inFalls.length == 1) {
 
-            final DataFall<SOURCE, ?, OUT> inFall = inFalls[0];
+            final DataFall<?, OUT> inFall = inFalls[0];
 
-            for (final DataFall<SOURCE, OUT, OUT> outFall : outFalls) {
+            for (final DataFall<OUT, OUT> outFall : outFalls) {
 
                 link(inFall, outFall);
             }
@@ -552,19 +549,19 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
      * @param <NOUT> The new output data type.
      * @return The newly created waterfall.
      */
-    public <NOUT> Waterfall<SOURCE, OUT, NOUT> chain(final Leap<SOURCE, OUT, NOUT> leap) {
+    public <NOUT> Waterfall<SOURCE, OUT, NOUT> chain(final Leap<OUT, NOUT> leap) {
 
         if (leap == null) {
 
             throw new IllegalArgumentException("the waterfall leap cannot be null");
         }
 
-        final DataFall<SOURCE, IN, OUT>[] falls = mFalls;
+        final DataFall<IN, OUT>[] falls = mFalls;
 
         if (falls == NO_FALL) {
 
             //noinspection unchecked
-            return (Waterfall<SOURCE, OUT, NOUT>) start((Leap<OUT, OUT, NOUT>) leap);
+            return (Waterfall<SOURCE, OUT, NOUT>) start(leap);
         }
 
         final int size = mSize;
@@ -578,9 +575,9 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
                     new Waterfall<SOURCE, OUT, NOUT>(mSource, mGateMap, mGate, mBarrage, 1,
                                                      mCurrent, mCurrentGenerator, leap);
 
-            final DataFall<SOURCE, OUT, NOUT> outFall = waterfall.mFalls[0];
+            final DataFall<OUT, NOUT> outFall = waterfall.mFalls[0];
 
-            for (final DataFall<SOURCE, IN, OUT> fall : falls) {
+            for (final DataFall<IN, OUT> fall : falls) {
 
                 link(fall, outFall);
             }
@@ -609,14 +606,14 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
                                                  inWaterfall.mCurrent,
                                                  inWaterfall.mCurrentGenerator, leap);
 
-        final DataFall<SOURCE, ?, OUT>[] inFalls = inWaterfall.mFalls;
-        final DataFall<SOURCE, OUT, NOUT>[] outFalls = waterfall.mFalls;
+        final DataFall<?, OUT>[] inFalls = inWaterfall.mFalls;
+        final DataFall<OUT, NOUT>[] outFalls = waterfall.mFalls;
 
         if (inFalls.length == 1) {
 
-            final DataFall<SOURCE, ?, OUT> inFall = inFalls[0];
+            final DataFall<?, OUT> inFall = inFalls[0];
 
-            for (final DataFall<SOURCE, OUT, NOUT> outFall : outFalls) {
+            for (final DataFall<OUT, NOUT> outFall : outFalls) {
 
                 link(inFall, outFall);
             }
@@ -642,27 +639,26 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
      * @param <NOUT>    The new output data type.
      * @return The newly created waterfall.
      */
-    public <NOUT> Waterfall<SOURCE, OUT, NOUT> chain(
-            final LeapGenerator<SOURCE, OUT, NOUT> generator) {
+    public <NOUT> Waterfall<SOURCE, OUT, NOUT> chain(final LeapGenerator<OUT, NOUT> generator) {
 
         if (generator == null) {
 
             throw new IllegalArgumentException("the waterfall generator cannot be null");
         }
 
-        final DataFall<SOURCE, IN, OUT>[] falls = mFalls;
+        final DataFall<IN, OUT>[] falls = mFalls;
 
         if (falls == NO_FALL) {
 
             //noinspection unchecked
-            return (Waterfall<SOURCE, OUT, NOUT>) start((LeapGenerator<OUT, OUT, NOUT>) generator);
+            return (Waterfall<SOURCE, OUT, NOUT>) start(generator);
         }
 
         final int size = mSize;
 
         if (size == 1) {
 
-            final Leap<SOURCE, OUT, NOUT> leap = generator.start(0);
+            final Leap<OUT, NOUT> leap = generator.start(0);
 
             registerLeap(leap);
 
@@ -671,9 +667,9 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
                     new Waterfall<SOURCE, OUT, NOUT>(mSource, mGateMap, mGate, mBarrage, 1,
                                                      mCurrent, mCurrentGenerator, leap);
 
-            final DataFall<SOURCE, OUT, NOUT> outFall = waterfall.mFalls[0];
+            final DataFall<OUT, NOUT> outFall = waterfall.mFalls[0];
 
-            for (final DataFall<SOURCE, IN, OUT> fall : falls) {
+            for (final DataFall<IN, OUT> fall : falls) {
 
                 link(fall, outFall);
             }
@@ -702,7 +698,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
 
         for (int i = 0; i < size; ++i) {
 
-            final Leap<SOURCE, OUT, NOUT> leap = generator.start(i);
+            final Leap<OUT, NOUT> leap = generator.start(i);
 
             registerLeap(leap);
 
@@ -716,14 +712,14 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
                                                  inWaterfall.mCurrent,
                                                  inWaterfall.mCurrentGenerator, leaps);
 
-        final DataFall<SOURCE, ?, OUT>[] inFalls = inWaterfall.mFalls;
-        final DataFall<SOURCE, OUT, NOUT>[] outFalls = waterfall.mFalls;
+        final DataFall<?, OUT>[] inFalls = inWaterfall.mFalls;
+        final DataFall<OUT, NOUT>[] outFalls = waterfall.mFalls;
 
         if (inFalls.length == 1) {
 
-            final DataFall<SOURCE, ?, OUT> inFall = inFalls[0];
+            final DataFall<?, OUT> inFall = inFalls[0];
 
-            for (final DataFall<SOURCE, OUT, NOUT> outFall : outFalls) {
+            for (final DataFall<OUT, NOUT> outFall : outFalls) {
 
                 link(inFall, outFall);
             }
@@ -751,8 +747,8 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
             throw new IllegalStateException("cannot collect data from a not started waterfall");
         }
 
-        final CollectorLeap<SOURCE, OUT> collectorLeap = new CollectorLeap<SOURCE, OUT>();
-        final GateLeap<SOURCE, OUT, OUT> gateLeap = new GateLeap<SOURCE, OUT, OUT>(collectorLeap);
+        final CollectorLeap<OUT> collectorLeap = new CollectorLeap<OUT>();
+        final GateLeap<OUT, OUT> gateLeap = new GateLeap<OUT, OUT>(collectorLeap);
 
         final Waterfall<SOURCE, IN, OUT> waterfall;
 
@@ -767,13 +763,13 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
 
         waterfall.chain(gateLeap);
 
-        return new DataCollector<SOURCE, OUT>(gateLeap, collectorLeap);
+        return new DataCollector<OUT>(gateLeap, collectorLeap);
     }
 
     @Override
     public void deviate() {
 
-        for (final DataFall<SOURCE, IN, OUT> fall : mFalls) {
+        for (final DataFall<IN, OUT> fall : mFalls) {
 
             for (final DataStream<OUT> stream : fall.outputStreams) {
 
@@ -785,7 +781,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
     @Override
     public void deviateStream(final int streamNumber) {
 
-        final DataFall<SOURCE, IN, OUT> fall = mFalls[streamNumber];
+        final DataFall<IN, OUT> fall = mFalls[streamNumber];
 
         for (final DataStream<OUT> stream : fall.outputStreams) {
 
@@ -796,7 +792,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
     @Override
     public Waterfall<SOURCE, IN, OUT> discharge() {
 
-        for (final DataFall<SOURCE, IN, OUT> fall : mFalls) {
+        for (final DataFall<IN, OUT> fall : mFalls) {
 
             fall.inputCurrent.discharge(fall, null);
         }
@@ -807,7 +803,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
     @Override
     public Waterfall<SOURCE, IN, OUT> forward(final Throwable throwable) {
 
-        for (final DataFall<SOURCE, IN, OUT> fall : mFalls) {
+        for (final DataFall<IN, OUT> fall : mFalls) {
 
             fall.raiseLevel(1);
 
@@ -825,11 +821,11 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
             return this;
         }
 
-        final DataFall<SOURCE, IN, OUT>[] falls = mFalls;
+        final DataFall<IN, OUT>[] falls = mFalls;
 
         for (final IN drop : drops) {
 
-            for (final DataFall<SOURCE, IN, OUT> fall : falls) {
+            for (final DataFall<IN, OUT> fall : falls) {
 
                 fall.raiseLevel(1);
 
@@ -848,11 +844,11 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
             return this;
         }
 
-        final DataFall<SOURCE, IN, OUT>[] falls = mFalls;
+        final DataFall<IN, OUT>[] falls = mFalls;
 
         for (final IN drop : drops) {
 
-            for (final DataFall<SOURCE, IN, OUT> fall : falls) {
+            for (final DataFall<IN, OUT> fall : falls) {
 
                 fall.raiseLevel(1);
 
@@ -866,7 +862,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
     @Override
     public Waterfall<SOURCE, IN, OUT> push(final IN drop) {
 
-        for (final DataFall<SOURCE, IN, OUT> fall : mFalls) {
+        for (final DataFall<IN, OUT> fall : mFalls) {
 
             fall.raiseLevel(1);
 
@@ -896,7 +892,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
 
             final int size = list.size();
 
-            for (final DataFall<SOURCE, IN, OUT> fall : mFalls) {
+            for (final DataFall<IN, OUT> fall : mFalls) {
 
                 fall.raiseLevel(size);
 
@@ -911,7 +907,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
     public Waterfall<SOURCE, IN, OUT> pushAfter(final long delay, final TimeUnit timeUnit,
             final IN drop) {
 
-        for (final DataFall<SOURCE, IN, OUT> fall : mFalls) {
+        for (final DataFall<IN, OUT> fall : mFalls) {
 
             fall.raiseLevel(1);
 
@@ -932,7 +928,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
 
         final ArrayList<IN> list = new ArrayList<IN>(Arrays.asList(drops));
 
-        for (final DataFall<SOURCE, IN, OUT> fall : mFalls) {
+        for (final DataFall<IN, OUT> fall : mFalls) {
 
             fall.raiseLevel(drops.length);
 
@@ -945,7 +941,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
     @Override
     public Waterfall<SOURCE, IN, OUT> dischargeStream(final int streamNumber) {
 
-        final DataFall<SOURCE, IN, OUT> fall = mFalls[streamNumber];
+        final DataFall<IN, OUT> fall = mFalls[streamNumber];
 
         fall.inputCurrent.discharge(fall, null);
 
@@ -955,7 +951,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
     @Override
     public void drain() {
 
-        for (final DataFall<SOURCE, IN, OUT> fall : mFalls) {
+        for (final DataFall<IN, OUT> fall : mFalls) {
 
             for (final DataStream<OUT> stream : fall.outputStreams) {
 
@@ -967,7 +963,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
     @Override
     public void drainStream(final int streamNumber) {
 
-        final DataFall<SOURCE, IN, OUT> fall = mFalls[streamNumber];
+        final DataFall<IN, OUT> fall = mFalls[streamNumber];
 
         for (final DataStream<OUT> stream : fall.outputStreams) {
 
@@ -979,7 +975,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
     public Waterfall<SOURCE, IN, OUT> forwardStream(final int streamNumber,
             final Throwable throwable) {
 
-        final DataFall<SOURCE, IN, OUT> fall = mFalls[streamNumber];
+        final DataFall<IN, OUT> fall = mFalls[streamNumber];
 
         fall.raiseLevel(1);
 
@@ -1002,11 +998,11 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
             throw new IllegalArgumentException("the gate leap cannot be null");
         }
 
-        GateLeap<?, ?, ?> gate = null;
+        GateLeap<?, ?> gate = null;
 
-        final Map<Classification<?>, GateLeap<?, ?, ?>> gateMap = mGateMap;
+        final Map<Classification<?>, GateLeap<?, ?>> gateMap = mGateMap;
 
-        for (final GateLeap<?, ?, ?> gateLeap : gateMap.values()) {
+        for (final GateLeap<?, ?> gateLeap : gateMap.values()) {
 
             if (gateLeap.leap == leap) {
 
@@ -1027,7 +1023,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
     @Override
     public <TYPE> Gate<TYPE> on(final Classification<TYPE> gateClassification) {
 
-        final GateLeap<?, ?, ?> gate = findBestMatch(gateClassification);
+        final GateLeap<?, ?> gate = findBestMatch(gateClassification);
 
         if (gate == null) {
 
@@ -1047,7 +1043,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
             return this;
         }
 
-        final DataFall<SOURCE, IN, OUT> fall = mFalls[streamNumber];
+        final DataFall<IN, OUT> fall = mFalls[streamNumber];
 
         fall.raiseLevel(drops.length);
 
@@ -1077,7 +1073,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
 
         if (size > 0) {
 
-            final DataFall<SOURCE, IN, OUT> fall = mFalls[streamNumber];
+            final DataFall<IN, OUT> fall = mFalls[streamNumber];
 
             fall.raiseLevel(size);
 
@@ -1093,7 +1089,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
     @Override
     public Waterfall<SOURCE, IN, OUT> pushStream(final int streamNumber, final IN drop) {
 
-        final DataFall<SOURCE, IN, OUT> fall = mFalls[streamNumber];
+        final DataFall<IN, OUT> fall = mFalls[streamNumber];
 
         fall.raiseLevel(1);
 
@@ -1120,7 +1116,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
 
         if (!list.isEmpty()) {
 
-            final DataFall<SOURCE, IN, OUT> fall = mFalls[streamNumber];
+            final DataFall<IN, OUT> fall = mFalls[streamNumber];
 
             fall.raiseLevel(list.size());
 
@@ -1134,7 +1130,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
     public Waterfall<SOURCE, IN, OUT> pushStreamAfter(final int streamNumber, final long delay,
             final TimeUnit timeUnit, final IN drop) {
 
-        final DataFall<SOURCE, IN, OUT> fall = mFalls[streamNumber];
+        final DataFall<IN, OUT> fall = mFalls[streamNumber];
 
         fall.raiseLevel(1);
 
@@ -1152,7 +1148,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
             return this;
         }
 
-        final DataFall<SOURCE, IN, OUT> fall = mFalls[streamNumber];
+        final DataFall<IN, OUT> fall = mFalls[streamNumber];
 
         fall.raiseLevel(drops.length);
 
@@ -1165,12 +1161,6 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
     public int size() {
 
         return mFalls.length;
-    }
-
-    @Override
-    public Waterfall<SOURCE, SOURCE, ?> source() {
-
-        return mSource;
     }
 
     /**
@@ -1188,7 +1178,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
 
         } else {
 
-            for (final DataFall<SOURCE, IN, OUT> fall : mFalls) {
+            for (final DataFall<IN, OUT> fall : mFalls) {
 
                 for (final DataStream<IN> stream : fall.inputStreams) {
 
@@ -1214,7 +1204,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
 
         } else {
 
-            final DataFall<SOURCE, IN, OUT> fall = mFalls[streamNumber];
+            final DataFall<IN, OUT> fall = mFalls[streamNumber];
 
             for (final DataStream<IN> stream : fall.inputStreams) {
 
@@ -1231,7 +1221,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
      */
     public Waterfall<SOURCE, OUT, OUT> distribute() {
 
-        final DataFall<SOURCE, IN, OUT>[] falls = mFalls;
+        final DataFall<IN, OUT>[] falls = mFalls;
 
         if (falls == NO_FALL) {
 
@@ -1246,7 +1236,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
             return chain();
         }
 
-        return in(1).chainBarrage(new BarrageLeap<SOURCE, OUT>(size)).in(size).chain();
+        return in(1).chainBarrage(new BarrageLeap<OUT>(size)).in(size).chain();
     }
 
     /**
@@ -1262,7 +1252,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
             throw new IllegalArgumentException("the waterfall barrage cannot be null");
         }
 
-        final DataFall<SOURCE, IN, OUT>[] falls = mFalls;
+        final DataFall<IN, OUT>[] falls = mFalls;
 
         if (falls == NO_FALL) {
 
@@ -1277,7 +1267,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
             return chain();
         }
 
-        return in(1).chainBarrage(new BarrageLeap<SOURCE, OUT>(barrage, size)).in(size).chain();
+        return in(1).chainBarrage(new BarrageLeap<OUT>(barrage, size)).in(size).chain();
     }
 
     /**
@@ -1295,7 +1285,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
 
         } else {
 
-            for (final DataFall<SOURCE, IN, OUT> fall : mFalls) {
+            for (final DataFall<IN, OUT> fall : mFalls) {
 
                 for (final DataStream<IN> stream : fall.inputStreams) {
 
@@ -1321,7 +1311,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
 
         } else {
 
-            final DataFall<SOURCE, IN, OUT> fall = mFalls[streamNumber];
+            final DataFall<IN, OUT> fall = mFalls[streamNumber];
 
             for (final DataStream<IN> stream : fall.inputStreams) {
 
@@ -1431,17 +1421,17 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
      */
     public <TYPE> Waterfall<SOURCE, IN, OUT> lock(final Classification<TYPE> gateClassification) {
 
-        final GateLeap<?, ?, ?> gate = findBestMatch(gateClassification);
+        final GateLeap<?, ?> gate = findBestMatch(gateClassification);
 
         if (gate == null) {
 
             return this;
         }
 
-        final HashMap<Classification<?>, GateLeap<?, ?, ?>> gateMap =
-                new HashMap<Classification<?>, GateLeap<?, ?, ?>>(mGateMap);
+        final HashMap<Classification<?>, GateLeap<?, ?>> gateMap =
+                new HashMap<Classification<?>, GateLeap<?, ?>>(mGateMap);
 
-        final Iterator<GateLeap<?, ?, ?>> iterator = gateMap.values().iterator();
+        final Iterator<GateLeap<?, ?>> iterator = gateMap.values().iterator();
 
         while (iterator.hasNext()) {
 
@@ -1464,7 +1454,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
      * @param <TYPE> The leap type.
      * @return The newly created waterfall.
      */
-    public <TYPE extends Leap<?, ?, ?>> Waterfall<SOURCE, IN, OUT> lock(final TYPE leap) {
+    public <TYPE extends Leap<?, ?>> Waterfall<SOURCE, IN, OUT> lock(final TYPE leap) {
 
         if (leap == null) {
 
@@ -1473,10 +1463,10 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
 
         boolean isChanged = false;
 
-        final HashMap<Classification<?>, GateLeap<?, ?, ?>> gateMap =
-                new HashMap<Classification<?>, GateLeap<?, ?, ?>>(mGateMap);
+        final HashMap<Classification<?>, GateLeap<?, ?>> gateMap =
+                new HashMap<Classification<?>, GateLeap<?, ?>>(mGateMap);
 
-        final Iterator<GateLeap<?, ?, ?>> iterator = gateMap.values().iterator();
+        final Iterator<GateLeap<?, ?>> iterator = gateMap.values().iterator();
 
         while (iterator.hasNext()) {
 
@@ -1560,6 +1550,11 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
         return collector;
     }
 
+    public Waterfall<SOURCE, SOURCE, ?> source() {
+
+        return mSource;
+    }
+
     /**
      * Creates and returns a new waterfall with the same size of this one.
      *
@@ -1569,12 +1564,12 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
 
         final int size = mSize;
 
-        final FreeLeap<OUT, OUT> leap = freeLeap();
+        final FreeLeap<OUT> leap = freeLeap();
         final Leap[] leaps = new Leap[size];
 
         Arrays.fill(leaps, leap);
 
-        final Map<Classification<?>, GateLeap<?, ?, ?>> gateMap = Collections.emptyMap();
+        final Map<Classification<?>, GateLeap<?, ?>> gateMap = Collections.emptyMap();
 
         //noinspection unchecked
         return new Waterfall<OUT, OUT, OUT>(null, gateMap, mGate, null, size, mCurrent,
@@ -1620,21 +1615,20 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
      * @param <NOUT>    The new output data type.
      * @return The newly created waterfall.
      */
-    public <NIN, NOUT> Waterfall<NIN, NIN, NOUT> start(
-            final LeapGenerator<NIN, NIN, NOUT> generator) {
+    public <NIN, NOUT> Waterfall<NIN, NIN, NOUT> start(final LeapGenerator<NIN, NOUT> generator) {
 
         if (generator == null) {
 
             throw new IllegalArgumentException("the waterfall generator cannot be null");
         }
 
-        final Map<Classification<?>, GateLeap<?, ?, ?>> gateMap = Collections.emptyMap();
+        final Map<Classification<?>, GateLeap<?, ?>> gateMap = Collections.emptyMap();
 
         final int size = mSize;
 
         if (size == 1) {
 
-            final Leap<NIN, NIN, NOUT> leap = generator.start(0);
+            final Leap<NIN, NOUT> leap = generator.start(0);
 
             registerLeap(leap);
 
@@ -1652,7 +1646,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
 
         for (int i = 0; i < size; ++i) {
 
-            final Leap<NIN, NIN, NOUT> leap = generator.start(i);
+            final Leap<NIN, NOUT> leap = generator.start(i);
 
             registerLeap(leap);
 
@@ -1673,7 +1667,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
      * @param <NOUT> The new output data type.
      * @return The newly created waterfall.
      */
-    public <NIN, NOUT> Waterfall<NIN, NIN, NOUT> start(final Leap<NIN, NIN, NOUT> leap) {
+    public <NIN, NOUT> Waterfall<NIN, NIN, NOUT> start(final Leap<NIN, NOUT> leap) {
 
         if (leap == null) {
 
@@ -1682,14 +1676,14 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
 
         registerLeap(leap);
 
-        final Map<Classification<?>, GateLeap<?, ?, ?>> gateMap = Collections.emptyMap();
+        final Map<Classification<?>, GateLeap<?, ?>> gateMap = Collections.emptyMap();
 
         //noinspection unchecked
         return new Waterfall<NIN, NIN, NOUT>(null, gateMap, mGate, null, mSize, mCurrent,
                                              mCurrentGenerator, leap);
     }
 
-    private Waterfall<SOURCE, OUT, OUT> chainBarrage(final BarrageLeap<SOURCE, OUT> barrageLeap) {
+    private Waterfall<SOURCE, OUT, OUT> chainBarrage(final BarrageLeap<OUT> barrageLeap) {
 
         final Waterfall<SOURCE, OUT, OUT> waterfall = chain(barrageLeap);
 
@@ -1700,17 +1694,17 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
                                                waterfall.mFalls);
     }
 
-    private GateLeap<?, ?, ?> findBestMatch(final Classification<?> gateClassification) {
+    private GateLeap<?, ?> findBestMatch(final Classification<?> gateClassification) {
 
-        final Map<Classification<?>, GateLeap<?, ?, ?>> gateMap = mGateMap;
+        final Map<Classification<?>, GateLeap<?, ?>> gateMap = mGateMap;
 
-        GateLeap<?, ?, ?> leap = gateMap.get(gateClassification);
+        GateLeap<?, ?> leap = gateMap.get(gateClassification);
 
         if (leap == null) {
 
             Classification<?> bestMatch = null;
 
-            for (final Entry<Classification<?>, GateLeap<?, ?, ?>> entry : gateMap.entrySet()) {
+            for (final Entry<Classification<?>, GateLeap<?, ?>> entry : gateMap.entrySet()) {
 
                 final Classification<?> type = entry.getKey();
 
@@ -1742,8 +1736,8 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<SOURCE, IN> {
         return (processors / 2);
     }
 
-    private void mapGate(final HashMap<Classification<?>, GateLeap<?, ?, ?>> gateMap,
-            final Classification<?> gateClassification, final GateLeap<?, ?, ?> leap) {
+    private void mapGate(final HashMap<Classification<?>, GateLeap<?, ?>> gateMap,
+            final Classification<?> gateClassification, final GateLeap<?, ?> leap) {
 
         if (!gateClassification.getRawType().isInstance(leap.leap)) {
 

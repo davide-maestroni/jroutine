@@ -45,10 +45,8 @@ import java.util.Map.Entry;
  * the downstream and upstream rivers, and the waterfall gates.
  * <p/>
  * Created by davide on 6/23/14.
- *
- * @param <SOURCE> The source data type.
  */
-public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> {
+public abstract class RapidLeap implements Leap<Object, Object> {
 
     //TODO: proguard rule
 
@@ -58,11 +56,11 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
 
     private final ValidPaths mValidPaths;
 
-    private River<SOURCE, Object> mDownRiver;
+    private River<Object> mDownRiver;
 
     private int mFallNumber;
 
-    private River<SOURCE, Object> mUpRiver;
+    private River<Object> mUpRiver;
 
     /**
      * Constructor.
@@ -108,41 +106,12 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
     /**
      * Creates and returns a rapid leap wrapping the specified object.
      *
-     * @param wrapped  The wrapped object.
-     * @param <SOURCE> The source data type.
+     * @param wrapped The wrapped object.
      * @return The new rapid leap.
      */
-    public static <SOURCE> RapidLeap<SOURCE> from(final Object wrapped) {
+    public static RapidLeap from(final Object wrapped) {
 
-        return new RapidLeap<SOURCE>(wrapped, ValidPaths.ALL) {};
-    }
-
-    /**
-     * Creates and returns a rapid leap wrapping the specified object.
-     *
-     * @param wrapped    The wrapped object.
-     * @param sourceType The source data class.
-     * @param <SOURCE>   The source data type.
-     * @return The new rapid leap.
-     */
-    public static <SOURCE> RapidLeap<SOURCE> from(final Object wrapped,
-            @SuppressWarnings("UnusedParameters") final Class<SOURCE> sourceType) {
-
-        return from(wrapped);
-    }
-
-    /**
-     * Creates and returns a rapid leap wrapping the specified object.
-     *
-     * @param wrapped              The wrapped object.
-     * @param sourceClassification The source data classification.
-     * @param <SOURCE>             The source data type.
-     * @return The new rapid leap.
-     */
-    public static <SOURCE> RapidLeap<SOURCE> from(final Object wrapped, @SuppressWarnings(
-            "UnusedParameters") final Classification<SOURCE> sourceClassification) {
-
-        return from(wrapped);
+        return new RapidLeap(wrapped, ValidPaths.ALL) {};
     }
 
     /**
@@ -150,45 +119,12 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
      * <p/>
      * Note that only the annotated method will be considered when handling flowing data.
      *
-     * @param wrapped  The wrapped object.
-     * @param <SOURCE> The source data type.
+     * @param wrapped The wrapped object.
      * @return The new rapid leap.
      */
-    public static <SOURCE> RapidLeap<SOURCE> fromAnnotated(final Object wrapped) {
+    public static RapidLeap fromAnnotated(final Object wrapped) {
 
-        return new RapidLeap<SOURCE>(wrapped, ValidPaths.ANNOTATED_ONLY) {};
-    }
-
-    /**
-     * Creates and returns a rapid leap wrapping the specified object.
-     * <p/>
-     * Note that only the annotated method will be considered when handling flowing data.
-     *
-     * @param wrapped    The wrapped object.
-     * @param sourceType The source data class.
-     * @param <SOURCE>   The source data type.
-     * @return The new rapid leap.
-     */
-    public static <SOURCE> RapidLeap<SOURCE> fromAnnotated(final Object wrapped,
-            @SuppressWarnings("UnusedParameters") final Class<SOURCE> sourceType) {
-
-        return fromAnnotated(wrapped);
-    }
-
-    /**
-     * Creates and returns a rapid leap wrapping the specified object.
-     * <p/>
-     * Note that only the annotated method will be considered when handling flowing data.
-     *
-     * @param wrapped              The wrapped object.
-     * @param sourceClassification The source data classification.
-     * @param <SOURCE>             The source data type.
-     * @return The new rapid leap.
-     */
-    public static <SOURCE> RapidLeap<SOURCE> fromAnnotated(final Object wrapped, @SuppressWarnings(
-            "UnusedParameters") final Classification<SOURCE> sourceClassification) {
-
-        return fromAnnotated(wrapped);
+        return new RapidLeap(wrapped, ValidPaths.ANNOTATED_ONLY) {};
     }
 
     private static void fillMethodMap(final HashMap<Class<?>, Method> methodMap,
@@ -200,16 +136,15 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
 
             throw new IllegalArgumentException(
                     "cannot override a method already handling data of type: "
-                            + parameterType.getCanonicalName()
-            );
+                            + parameterType.getCanonicalName());
         }
 
         methodMap.put(parameterType, method);
     }
 
     @Override
-    public final void onDischarge(final River<SOURCE, Object> upRiver,
-            final River<SOURCE, Object> downRiver, final int fallNumber) {
+    public final void onDischarge(final River<Object> upRiver, final River<Object> downRiver,
+            final int fallNumber) {
 
         setup(upRiver, downRiver, fallNumber);
 
@@ -239,8 +174,8 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
     }
 
     @Override
-    public final void onPush(final River<SOURCE, Object> upRiver,
-            final River<SOURCE, Object> downRiver, final int fallNumber, final Object drop) {
+    public final void onPush(final River<Object> upRiver, final River<Object> downRiver,
+            final int fallNumber, final Object drop) {
 
         setup(upRiver, downRiver, fallNumber);
 
@@ -279,9 +214,8 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
     }
 
     @Override
-    public final void onUnhandled(final River<SOURCE, Object> upRiver,
-            final River<SOURCE, Object> downRiver, final int fallNumber,
-            final Throwable throwable) {
+    public final void onUnhandled(final River<Object> upRiver, final River<Object> downRiver,
+            final int fallNumber, final Throwable throwable) {
 
         setup(upRiver, downRiver, fallNumber);
 
@@ -324,7 +258,7 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
      *
      * @return The river instance.
      */
-    protected River<SOURCE, Object> downRiver() {
+    protected River<Object> downRiver() {
 
         return mDownRiver;
     }
@@ -391,21 +325,11 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
     }
 
     /**
-     * Returns the source river instance.
-     *
-     * @return The river instance.
-     */
-    protected River<SOURCE, SOURCE> source() {
-
-        return mUpRiver.source();
-    }
-
-    /**
      * Returns the upstream river instance.
      *
      * @return The river instance.
      */
-    protected River<SOURCE, Object> upRiver() {
+    protected River<Object> upRiver() {
 
         return mUpRiver;
     }
@@ -526,8 +450,7 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
                     throw new IllegalArgumentException(
                             "invalid annotated method: " + method + "\nAn "
                                     + FlowPath.class.getSimpleName()
-                                    + " method must take a single parameter"
-                    );
+                                    + " method must take a single parameter");
                 }
 
                 if (annotationTypes.length > 0) {
@@ -546,7 +469,7 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
         return methodMap;
     }
 
-    private void propagateResult(final River<SOURCE, Object> downRiver, final Class<?> returnType,
+    private void propagateResult(final River<Object> downRiver, final Class<?> returnType,
             final Object result) {
 
         if (!returnType.equals(void.class)) {
@@ -568,7 +491,7 @@ public abstract class RapidLeap<SOURCE> implements Leap<SOURCE, Object, Object> 
         }
     }
 
-    private void setup(final River<SOURCE, Object> upRiver, final River<SOURCE, Object> downRiver,
+    private void setup(final River<Object> upRiver, final River<Object> downRiver,
             final int fallNumber) {
 
         mUpRiver = upRiver;

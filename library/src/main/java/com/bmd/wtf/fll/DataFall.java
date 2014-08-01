@@ -35,11 +35,10 @@ import java.util.concurrent.locks.ReentrantLock;
  * <p/>
  * Created by davide on 6/7/14.
  *
- * @param <SOURCE> The river source data type.
- * @param <IN>     The input data type.
- * @param <OUT>    The output data type.
+ * @param <IN>  The input data type.
+ * @param <OUT> The output data type.
  */
-class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
+class DataFall<IN, OUT> implements Fall<IN> {
 
     private static final ThreadLocal<DataLock> sLock = new ThreadLocal<DataLock>() {
 
@@ -55,20 +54,20 @@ class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
     final CopyOnWriteArrayList<DataStream<IN>> inputStreams =
             new CopyOnWriteArrayList<DataStream<IN>>();
 
-    final Leap<SOURCE, IN, OUT> leap;
+    final Leap<IN, OUT> leap;
 
     final CopyOnWriteArrayList<DataStream<OUT>> outputStreams =
             new CopyOnWriteArrayList<DataStream<OUT>>();
 
     private final HashSet<Stream<IN>> mDryStreams = new HashSet<Stream<IN>>();
 
-    private final LockRiver<SOURCE, IN> mInRiver;
+    private final LockRiver<IN> mInRiver;
 
     private final ReentrantLock mLock;
 
     private final int mNumber;
 
-    private final LockRiver<SOURCE, OUT> mOutRiver;
+    private final LockRiver<OUT> mOutRiver;
 
     private int mDischargeCount;
 
@@ -82,8 +81,8 @@ class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
      * @param leap         The wrapped leap.
      * @param number       The number identifying this fall.
      */
-    public DataFall(final Waterfall<SOURCE, IN, OUT> waterfall, final Current inputCurrent,
-            final Leap<SOURCE, IN, OUT> leap, final int number) {
+    public DataFall(final Waterfall<?, IN, OUT> waterfall, final Current inputCurrent,
+            final Leap<IN, OUT> leap, final int number) {
 
         if (waterfall == null) {
 
@@ -104,10 +103,8 @@ class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
         this.leap = leap;
         mNumber = number;
         mLock = new ReentrantLock();
-        mInRiver = new LockRiver<SOURCE, IN>(
-                new WaterfallRiver<SOURCE, IN>(waterfall, Direction.UPSTREAM));
-        mOutRiver =
-                new LockRiver<SOURCE, OUT>(new StreamRiver<SOURCE, OUT>(outputStreams, waterfall));
+        mInRiver = new LockRiver<IN>(new WaterfallRiver<IN>(waterfall, Direction.UPSTREAM));
+        mOutRiver = new LockRiver<OUT>(new StreamRiver<OUT>(outputStreams, waterfall));
     }
 
     @Override
@@ -150,8 +147,8 @@ class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
 
         final DataLock dataLock = sLock.get();
 
-        final LockRiver<SOURCE, IN> inRiver = mInRiver;
-        final LockRiver<SOURCE, OUT> outRiver = mOutRiver;
+        final LockRiver<IN> inRiver = mInRiver;
+        final LockRiver<OUT> outRiver = mOutRiver;
 
         inRiver.open(dataLock);
         outRiver.open(dataLock);
@@ -176,8 +173,8 @@ class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
 
         final DataLock dataLock = sLock.get();
 
-        final LockRiver<SOURCE, IN> inRiver = mInRiver;
-        final LockRiver<SOURCE, OUT> outRiver = mOutRiver;
+        final LockRiver<IN> inRiver = mInRiver;
+        final LockRiver<OUT> outRiver = mOutRiver;
 
         inRiver.open(dataLock);
         outRiver.open(dataLock);
@@ -204,8 +201,8 @@ class DataFall<SOURCE, IN, OUT> implements Fall<IN> {
 
         final DataLock dataLock = sLock.get();
 
-        final LockRiver<SOURCE, IN> inRiver = mInRiver;
-        final LockRiver<SOURCE, OUT> outRiver = mOutRiver;
+        final LockRiver<IN> inRiver = mInRiver;
+        final LockRiver<OUT> outRiver = mOutRiver;
 
         inRiver.open(dataLock);
         outRiver.open(dataLock);

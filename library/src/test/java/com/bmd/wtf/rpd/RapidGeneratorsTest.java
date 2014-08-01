@@ -103,7 +103,7 @@ public class RapidGeneratorsTest extends TestCase {
         try {
 
             Rapid.leapGenerator(new LeapGeneratorError1(),
-                                new Classification<Leap<Object, Object, Object>>() {}, 2);
+                                new Classification<Leap<Object, Object>>() {}, 2);
 
             fail();
 
@@ -114,7 +114,7 @@ public class RapidGeneratorsTest extends TestCase {
         try {
 
             Rapid.leapGenerator(new LeapGeneratorError2(),
-                                new Classification<Leap<Object, Object, Object>>() {}, 2);
+                                new Classification<Leap<Object, Object>>() {}, 2);
 
             fail();
 
@@ -125,7 +125,7 @@ public class RapidGeneratorsTest extends TestCase {
         try {
 
             Rapid.leapGenerator(new LeapGeneratorError3(),
-                                new Classification<Leap<Object, Object, Object>>() {}, 2);
+                                new Classification<Leap<Object, Object>>() {}, 2);
 
             fail();
 
@@ -136,7 +136,7 @@ public class RapidGeneratorsTest extends TestCase {
         try {
 
             Rapid.leapGenerator(new LeapGeneratorError4(),
-                                new Classification<Leap<Object, Object, Object>>() {}, 2);
+                                new Classification<Leap<Object, Object>>() {}, 2);
 
             fail();
 
@@ -147,7 +147,7 @@ public class RapidGeneratorsTest extends TestCase {
         try {
 
             Rapid.leapGenerator(new LeapGeneratorError5(),
-                                new Classification<Leap<Object, Object, Object>>() {}, 2);
+                                new Classification<Leap<Object, Object>>() {}, 2);
 
             fail();
 
@@ -158,7 +158,7 @@ public class RapidGeneratorsTest extends TestCase {
         try {
 
             Rapid.leapGenerator(new LeapGeneratorError6(),
-                                new Classification<Leap<Object, Object, Object>>() {}, 2);
+                                new Classification<Leap<Object, Object>>() {}, 2);
 
             fail();
 
@@ -190,32 +190,25 @@ public class RapidGeneratorsTest extends TestCase {
                         .create(1)).isExactlyInstanceOf(Current1.class);
         assertThat(
                 ((Current2) Rapid.currentGenerator(Classification.ofType(Current2.class)).create(1))
-                        .getNumber()
-        ).isEqualTo(1);
+                        .getNumber()).isEqualTo(1);
         assertThat(
                 ((Current3) Rapid.currentGenerator(Classification.ofType(Current3.class)).create(1))
-                        .getNumber()
-        ).isEqualTo(2);
+                        .getNumber()).isEqualTo(2);
         assertThat(
                 ((Current4) Rapid.currentGenerator(Classification.ofType(Current4.class)).create(1))
-                        .getNumber()
-        ).isEqualTo(4);
+                        .getNumber()).isEqualTo(4);
         assertThat(
                 ((Current5) Rapid.currentGenerator(Classification.ofType(Current5.class)).create(1))
-                        .getNumber()
-        ).isEqualTo(77);
+                        .getNumber()).isEqualTo(77);
         assertThat(
                 ((Current6) Rapid.currentGenerator(Classification.ofType(Current6.class)).create(3))
-                        .getNumber()
-        ).isEqualTo(5);
+                        .getNumber()).isEqualTo(5);
         assertThat(
                 ((Current7) Rapid.currentGenerator(Classification.ofType(Current7.class)).create(3))
-                        .getNumber()
-        ).isEqualTo(4);
+                        .getNumber()).isEqualTo(4);
         assertThat(
                 ((Current8) Rapid.currentGenerator(Classification.ofType(Current8.class)).create(3))
-                        .getNumber()
-        ).isEqualTo(5);
+                        .getNumber()).isEqualTo(5);
 
         assertThat(Rapid.currentGenerator(new Current1()).create(1)).isExactlyInstanceOf(
                 Current1.class);
@@ -243,15 +236,13 @@ public class RapidGeneratorsTest extends TestCase {
                                     .create(1)).getNumber()).isEqualTo(12);
         assertThat(
                 ((CurrentX) Rapid.currentGenerator(CurrentX.class, this, new LinkedList<Object>(),
-                                                   null, 2).create(1)).getNumber()
-        ).isEqualTo(24);
+                                                   null, 2).create(1)).getNumber()).isEqualTo(24);
         assertThat(((CurrentX) Rapid.currentGenerator(CurrentX.class, this, new ArrayList<Object>(),
-                                                      null, 2).create(1)).getNumber()
-        ).isEqualTo(46);
+                                                      null, 2).create(1)).getNumber()).isEqualTo(
+                46);
         assertThat(
                 ((Current2) Rapid.currentGenerator(CurrentX1.class, this, new ArrayList<Object>(),
-                                                   null, 4).create(1)).getNumber()
-        ).isEqualTo(81);
+                                                   null, 4).create(1)).getNumber()).isEqualTo(81);
 
         try {
 
@@ -346,26 +337,19 @@ public class RapidGeneratorsTest extends TestCase {
         assertThat(Rapid.leapGenerator(Classification.ofType(Leap1.class))
                         .start(1)).isExactlyInstanceOf(Leap1.class);
         assertThat(((Leap2) Rapid.leapGenerator(Classification.ofType(Leap2.class))
-                                 .start(1)).getNumber()
-        ).isEqualTo(1);
+                                 .start(1)).getNumber()).isEqualTo(1);
         assertThat(((Leap3) Rapid.leapGenerator(Classification.ofType(Leap3.class))
-                                 .start(1)).getNumber()
-        ).isEqualTo(2);
+                                 .start(1)).getNumber()).isEqualTo(2);
         assertThat(((Leap4) Rapid.leapGenerator(Classification.ofType(Leap4.class))
-                                 .start(1)).getNumber()
-        ).isEqualTo(4);
+                                 .start(1)).getNumber()).isEqualTo(4);
         assertThat(((Leap5) Rapid.leapGenerator(Classification.ofType(Leap5.class))
-                                 .start(1)).getNumber()
-        ).isEqualTo(77);
+                                 .start(1)).getNumber()).isEqualTo(77);
         assertThat(((Leap6) Rapid.leapGenerator(Classification.ofType(Leap6.class))
-                                 .start(3)).getNumber()
-        ).isEqualTo(5);
+                                 .start(3)).getNumber()).isEqualTo(5);
         assertThat(((Leap7) Rapid.leapGenerator(Classification.ofType(Leap7.class))
-                                 .start(3)).getNumber()
-        ).isEqualTo(4);
+                                 .start(3)).getNumber()).isEqualTo(4);
         assertThat(((Leap8) Rapid.leapGenerator(Classification.ofType(Leap8.class))
-                                 .start(3)).getNumber()
-        ).isEqualTo(5);
+                                 .start(3)).getNumber()).isEqualTo(5);
 
         assertThat(Rapid.leapGenerator(new Leap1()).start(1)).isExactlyInstanceOf(Leap1.class);
         assertThat(((Leap2) Rapid.leapGenerator(new Leap2(22)).start(1)).getNumber()).isEqualTo(1);
@@ -377,26 +361,21 @@ public class RapidGeneratorsTest extends TestCase {
 
         assertThat(
                 ((LeapX) Rapid.leapGenerator(LeapX.class, this, new CopyOnWriteArrayList<Object>(),
-                                             null, null).start(1)).getNumber()
-        ).isEqualTo(33);
+                                             null, null).start(1)).getNumber()).isEqualTo(33);
         assertThat(((LeapX) Rapid.leapGenerator(new LeapX(null, null, 11), this,
                                                 new CopyOnWriteArrayList<Object>(), null, null)
                                  .start(1)).getNumber()).isEqualTo(33);
         assertThat(
                 ((LeapX) Rapid.leapGenerator(LeapX.class, this, new CopyOnWriteArrayList<Object>(),
-                                             null).start(1)).getNumber()
-        ).isEqualTo(12);
+                                             null).start(1)).getNumber()).isEqualTo(12);
         assertThat(
                 ((LeapX) Rapid.leapGenerator(LeapX.class, this, new LinkedList<Object>(), null, 2)
-                              .start(1)).getNumber()
-        ).isEqualTo(24);
+                              .start(1)).getNumber()).isEqualTo(24);
         assertThat(((LeapX) Rapid.leapGenerator(LeapX.class, this, new ArrayList<Object>(), null, 2)
-                                 .start(1)).getNumber()
-        ).isEqualTo(46);
+                                 .start(1)).getNumber()).isEqualTo(46);
         assertThat(
                 ((Leap2) Rapid.leapGenerator(LeapX1.class, this, new ArrayList<Object>(), null, 4)
-                              .start(1)).getNumber()
-        ).isEqualTo(81);
+                              .start(1)).getNumber()).isEqualTo(81);
 
         try {
 
@@ -428,8 +407,8 @@ public class RapidGeneratorsTest extends TestCase {
 
         }
 
-        final Classification<Leap<Object, Object, Object>> classification =
-                new Classification<Leap<Object, Object, Object>>() {};
+        final Classification<Leap<Object, Object>> classification =
+                new Classification<Leap<Object, Object>>() {};
 
         assertThat(Rapid.leapGenerator(new LeapGenerator1(), classification)
                         .start(1)).isExactlyInstanceOf(Leap1.class);
@@ -753,7 +732,7 @@ public class RapidGeneratorsTest extends TestCase {
         }
     }
 
-    public static class Leap1 extends FreeLeap<Object, Object> {
+    public static class Leap1 extends FreeLeap<Object> {
 
     }
 

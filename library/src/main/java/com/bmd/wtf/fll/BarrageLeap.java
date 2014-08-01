@@ -26,10 +26,9 @@ import com.bmd.wtf.lps.AbstractLeap;
  * <p/>
  * Created by davide on 6/10/14.
  *
- * @param <SOURCE> The source data type.
- * @param <DATA>   The data type.
+ * @param <DATA> The data type.
  */
-class BarrageLeap<SOURCE, DATA> extends AbstractLeap<SOURCE, DATA, DATA> implements Barrage<DATA> {
+class BarrageLeap<DATA> extends AbstractLeap<DATA, DATA> implements Barrage<DATA> {
 
     private static final int REFRESH_INTERVAL = Integer.MAX_VALUE >> 1;
 
@@ -114,8 +113,8 @@ class BarrageLeap<SOURCE, DATA> extends AbstractLeap<SOURCE, DATA, DATA> impleme
     }
 
     @Override
-    public void onPush(final River<SOURCE, DATA> upRiver, final River<SOURCE, DATA> downRiver,
-            final int fallNumber, final DATA drop) {
+    public void onPush(final River<DATA> upRiver, final River<DATA> downRiver, final int fallNumber,
+            final DATA drop) {
 
         final int streamNumber = mBarrage.onPush(drop);
 

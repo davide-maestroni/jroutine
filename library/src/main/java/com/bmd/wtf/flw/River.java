@@ -23,10 +23,9 @@ import java.util.concurrent.TimeUnit;
  * <p/>
  * Created by davide on 6/7/14.
  *
- * @param <SOURCE> The source data type.
- * @param <DATA>   The data type.
+ * @param <DATA> The data type.
  */
-public interface River<SOURCE, DATA> extends Stream<DATA> {
+public interface River<DATA> extends Stream<DATA> {
 
     /**
      * Deviates the flow of the river by effectively preventing any coming data to be pushed
@@ -46,48 +45,47 @@ public interface River<SOURCE, DATA> extends Stream<DATA> {
     public void deviateStream(int streamNumber);
 
     @Override
-    public River<SOURCE, DATA> discharge();
+    public River<DATA> discharge();
 
     @Override
-    public River<SOURCE, DATA> discharge(DATA... drops);
+    public River<DATA> discharge(DATA... drops);
 
     @Override
-    public River<SOURCE, DATA> discharge(Iterable<? extends DATA> drops);
+    public River<DATA> discharge(Iterable<? extends DATA> drops);
 
     @Override
-    public River<SOURCE, DATA> discharge(DATA drop);
+    public River<DATA> discharge(DATA drop);
 
     @Override
-    public River<SOURCE, DATA> dischargeAfter(long delay, TimeUnit timeUnit,
+    public River<DATA> dischargeAfter(long delay, TimeUnit timeUnit,
             Iterable<? extends DATA> drops);
 
     @Override
-    public River<SOURCE, DATA> dischargeAfter(long delay, TimeUnit timeUnit, DATA drop);
+    public River<DATA> dischargeAfter(long delay, TimeUnit timeUnit, DATA drop);
 
     @Override
-    public River<SOURCE, DATA> dischargeAfter(long delay, TimeUnit timeUnit, DATA... drops);
+    public River<DATA> dischargeAfter(long delay, TimeUnit timeUnit, DATA... drops);
 
     @Override
-    public River<SOURCE, DATA> forward(Throwable throwable);
+    public River<DATA> forward(Throwable throwable);
 
     @Override
-    public River<SOURCE, DATA> push(DATA... drops);
+    public River<DATA> push(DATA... drops);
 
     @Override
-    public River<SOURCE, DATA> push(Iterable<? extends DATA> drops);
+    public River<DATA> push(Iterable<? extends DATA> drops);
 
     @Override
-    public River<SOURCE, DATA> push(DATA drop);
+    public River<DATA> push(DATA drop);
 
     @Override
-    public River<SOURCE, DATA> pushAfter(long delay, TimeUnit timeUnit,
-            Iterable<? extends DATA> drops);
+    public River<DATA> pushAfter(long delay, TimeUnit timeUnit, Iterable<? extends DATA> drops);
 
     @Override
-    public River<SOURCE, DATA> pushAfter(long delay, TimeUnit timeUnit, DATA drop);
+    public River<DATA> pushAfter(long delay, TimeUnit timeUnit, DATA drop);
 
     @Override
-    public River<SOURCE, DATA> pushAfter(long delay, TimeUnit timeUnit, DATA... drops);
+    public River<DATA> pushAfter(long delay, TimeUnit timeUnit, DATA... drops);
 
     /**
      * Discharges the specific river stream, that is, it informs the fed fall that no more data
@@ -99,7 +97,7 @@ public interface River<SOURCE, DATA> extends Stream<DATA> {
      * @param streamNumber The number identifying the target stream.
      * @return This river.
      */
-    public River<SOURCE, DATA> dischargeStream(int streamNumber);
+    public River<DATA> dischargeStream(int streamNumber);
 
     /**
      * Pushes the specified data into the specific river stream flow and then discharge it.
@@ -108,7 +106,7 @@ public interface River<SOURCE, DATA> extends Stream<DATA> {
      * @param drops        The data drops.
      * @return This river.
      */
-    public River<SOURCE, DATA> dischargeStream(int streamNumber, DATA... drops);
+    public River<DATA> dischargeStream(int streamNumber, DATA... drops);
 
     /**
      * Pushes the data returned by the specified iterable into the specific river stream flow and
@@ -118,7 +116,7 @@ public interface River<SOURCE, DATA> extends Stream<DATA> {
      * @param drops        The data drops iterable.
      * @return This river.
      */
-    public River<SOURCE, DATA> dischargeStream(int streamNumber, Iterable<? extends DATA> drops);
+    public River<DATA> dischargeStream(int streamNumber, Iterable<? extends DATA> drops);
 
     /**
      * Pushes the specified data into the specific river stream flow and then discharge it.
@@ -127,7 +125,7 @@ public interface River<SOURCE, DATA> extends Stream<DATA> {
      * @param drop         The data drop.
      * @return This river.
      */
-    public River<SOURCE, DATA> dischargeStream(int streamNumber, DATA drop);
+    public River<DATA> dischargeStream(int streamNumber, DATA drop);
 
     /**
      * Pushes the data returned by the specified iterable into the specific river stream flow,
@@ -139,7 +137,7 @@ public interface River<SOURCE, DATA> extends Stream<DATA> {
      * @param drops        The data drops iterable.
      * @return This river.
      */
-    public River<SOURCE, DATA> dischargeStreamAfter(int streamNumber, long delay, TimeUnit timeUnit,
+    public River<DATA> dischargeStreamAfter(int streamNumber, long delay, TimeUnit timeUnit,
             Iterable<? extends DATA> drops);
 
     /**
@@ -152,7 +150,7 @@ public interface River<SOURCE, DATA> extends Stream<DATA> {
      * @param drop         The data drop.
      * @return This river.
      */
-    public River<SOURCE, DATA> dischargeStreamAfter(int streamNumber, long delay, TimeUnit timeUnit,
+    public River<DATA> dischargeStreamAfter(int streamNumber, long delay, TimeUnit timeUnit,
             DATA drop);
 
     /**
@@ -165,7 +163,7 @@ public interface River<SOURCE, DATA> extends Stream<DATA> {
      * @param drops        The data drops.
      * @return This river.
      */
-    public River<SOURCE, DATA> dischargeStreamAfter(int streamNumber, long delay, TimeUnit timeUnit,
+    public River<DATA> dischargeStreamAfter(int streamNumber, long delay, TimeUnit timeUnit,
             DATA... drops);
 
     /**
@@ -189,7 +187,7 @@ public interface River<SOURCE, DATA> extends Stream<DATA> {
      * @param throwable    The thrown exception.
      * @return This river.
      */
-    public River<SOURCE, DATA> forwardStream(int streamNumber, Throwable throwable);
+    public River<DATA> forwardStream(int streamNumber, Throwable throwable);
 
     /**
      * Returns a gate handling a leap of the specified type.
@@ -231,7 +229,7 @@ public interface River<SOURCE, DATA> extends Stream<DATA> {
      * @param drops        The data drops.
      * @return This river.
      */
-    public River<SOURCE, DATA> pushStream(int streamNumber, DATA... drops);
+    public River<DATA> pushStream(int streamNumber, DATA... drops);
 
     /**
      * Pushes the data returned by the specified iterable into the specific river stream flow.
@@ -240,7 +238,7 @@ public interface River<SOURCE, DATA> extends Stream<DATA> {
      * @param drops        The data drops iterable.
      * @return This river.
      */
-    public River<SOURCE, DATA> pushStream(int streamNumber, Iterable<? extends DATA> drops);
+    public River<DATA> pushStream(int streamNumber, Iterable<? extends DATA> drops);
 
     /**
      * Pushes the specified data into the specific river stream flow.
@@ -249,7 +247,7 @@ public interface River<SOURCE, DATA> extends Stream<DATA> {
      * @param drop         The data drop.
      * @return This river.
      */
-    public River<SOURCE, DATA> pushStream(int streamNumber, DATA drop);
+    public River<DATA> pushStream(int streamNumber, DATA drop);
 
     /**
      * Pushes the data returned by the specified iterable into the specific river stream flow,
@@ -261,7 +259,7 @@ public interface River<SOURCE, DATA> extends Stream<DATA> {
      * @param drops        The data drops iterable.
      * @return This river.
      */
-    public River<SOURCE, DATA> pushStreamAfter(int streamNumber, long delay, TimeUnit timeUnit,
+    public River<DATA> pushStreamAfter(int streamNumber, long delay, TimeUnit timeUnit,
             Iterable<? extends DATA> drops);
 
     /**
@@ -274,8 +272,7 @@ public interface River<SOURCE, DATA> extends Stream<DATA> {
      * @param drop         The data drop.
      * @return This river.
      */
-    public River<SOURCE, DATA> pushStreamAfter(int streamNumber, long delay, TimeUnit timeUnit,
-            DATA drop);
+    public River<DATA> pushStreamAfter(int streamNumber, long delay, TimeUnit timeUnit, DATA drop);
 
     /**
      * Pushes the specified data into the specific river stream flow, after the specified time has
@@ -287,7 +284,7 @@ public interface River<SOURCE, DATA> extends Stream<DATA> {
      * @param drops        The data drops.
      * @return This river.
      */
-    public River<SOURCE, DATA> pushStreamAfter(int streamNumber, long delay, TimeUnit timeUnit,
+    public River<DATA> pushStreamAfter(int streamNumber, long delay, TimeUnit timeUnit,
             DATA... drops);
 
     /**
@@ -296,11 +293,4 @@ public interface River<SOURCE, DATA> extends Stream<DATA> {
      * @return The river size.
      */
     public int size();
-
-    /**
-     * Returns the river source.
-     *
-     * @return The river source.
-     */
-    public River<SOURCE, SOURCE> source();
 }

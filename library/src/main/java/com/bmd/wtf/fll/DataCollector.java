@@ -26,36 +26,35 @@ import java.util.concurrent.TimeUnit;
  * <p/>
  * Created by davide on 6/7/14.
  *
- * @param <SOURCE> The source data type.
- * @param <DATA>   The data type.
+ * @param <DATA> The data type.
  */
-class DataCollector<SOURCE, DATA> implements Collector<DATA> {
+class DataCollector<DATA> implements Collector<DATA> {
 
-    private static final ConditionEvaluator<CollectorLeap<?, ?>> HAS_DATA =
-            new ConditionEvaluator<CollectorLeap<?, ?>>() {
+    private static final ConditionEvaluator<CollectorLeap<?>> HAS_DATA =
+            new ConditionEvaluator<CollectorLeap<?>>() {
 
                 @Override
-                public boolean isSatisfied(final CollectorLeap<?, ?> leap) {
+                public boolean isSatisfied(final CollectorLeap<?> leap) {
 
                     return (leap.size() > 0) || leap.isComplete();
                 }
             };
 
-    private static final ConditionEvaluator<CollectorLeap<?, ?>> IS_COMPLETE =
-            new ConditionEvaluator<CollectorLeap<?, ?>>() {
+    private static final ConditionEvaluator<CollectorLeap<?>> IS_COMPLETE =
+            new ConditionEvaluator<CollectorLeap<?>>() {
 
                 @Override
-                public boolean isSatisfied(final CollectorLeap<?, ?> leap) {
+                public boolean isSatisfied(final CollectorLeap<?> leap) {
 
                     return leap.isComplete();
                 }
             };
 
-    private final CollectorLeap<SOURCE, DATA> mCollectorLeap;
+    private final CollectorLeap<DATA> mCollectorLeap;
 
-    private final Gate<CollectorLeap<SOURCE, DATA>> mDataGate;
+    private final Gate<CollectorLeap<DATA>> mDataGate;
 
-    private final DataGate<CollectorLeap<SOURCE, DATA>> mSizeGate;
+    private final DataGate<CollectorLeap<DATA>> mSizeGate;
 
     /**
      * Constructor.
@@ -63,8 +62,8 @@ class DataCollector<SOURCE, DATA> implements Collector<DATA> {
      * @param gateLeap      The associated gate leap.
      * @param collectorLeap The associated collector leap.
      */
-    public DataCollector(final GateLeap<?, DATA, DATA> gateLeap,
-            final CollectorLeap<SOURCE, DATA> collectorLeap) {
+    public DataCollector(final GateLeap<DATA, DATA> gateLeap,
+            final CollectorLeap<DATA> collectorLeap) {
 
         if (collectorLeap == null) {
 
@@ -73,11 +72,10 @@ class DataCollector<SOURCE, DATA> implements Collector<DATA> {
 
         mCollectorLeap = collectorLeap;
 
-        final Classification<CollectorLeap<SOURCE, DATA>> classification =
-                new Classification<CollectorLeap<SOURCE, DATA>>() {};
-        mSizeGate = new DataGate<CollectorLeap<SOURCE, DATA>>(gateLeap, classification);
-        mDataGate =
-                new DataGate<CollectorLeap<SOURCE, DATA>>(gateLeap, classification).eventually();
+        final Classification<CollectorLeap<DATA>> classification =
+                new Classification<CollectorLeap<DATA>>() {};
+        mSizeGate = new DataGate<CollectorLeap<DATA>>(gateLeap, classification);
+        mDataGate = new DataGate<CollectorLeap<DATA>>(gateLeap, classification).eventually();
     }
 
     @Override

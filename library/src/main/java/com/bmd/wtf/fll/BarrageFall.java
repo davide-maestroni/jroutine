@@ -25,7 +25,7 @@ import com.bmd.wtf.lps.Leap;
  * @param <IN>     The input data type.
  * @param <OUT>    The output data type.
  */
-public class BarrageFall<SOURCE, IN, OUT> extends DataFall<SOURCE, IN, OUT> {
+public class BarrageFall<SOURCE, IN, OUT> extends DataFall<IN, OUT> {
 
     private final BarrageLeap mBarrage;
 
@@ -41,7 +41,7 @@ public class BarrageFall<SOURCE, IN, OUT> extends DataFall<SOURCE, IN, OUT> {
      * @param barrageLeap  The related barrage.
      */
     public BarrageFall(final Waterfall<SOURCE, IN, OUT> waterfall, final Current inputCurrent,
-            final Leap<SOURCE, IN, OUT> leap, final int number, final BarrageLeap barrageLeap) {
+            final Leap<IN, OUT> leap, final int number, final BarrageLeap barrageLeap) {
 
         super(waterfall, inputCurrent, leap, number);
 

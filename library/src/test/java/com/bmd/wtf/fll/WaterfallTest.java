@@ -46,7 +46,7 @@ import static org.fest.assertions.api.Assertions.assertThat;
  */
 public class WaterfallTest extends TestCase {
 
-    private static void testRiver(final River<Object, Object> river) {
+    private static void testRiver(final River<Object> river) {
 
         river.push((Object) null)
              .push((Object[]) null)
@@ -94,21 +94,18 @@ public class WaterfallTest extends TestCase {
              .discharge();
     }
 
-    private static void testRivers(final River<Object, Object> upRiver,
-            final River<Object, Object> downRiver) {
+    private static void testRivers(final River<Object> upRiver, final River<Object> downRiver) {
 
         testRiver(downRiver);
         testStream(downRiver);
         testRiver(upRiver);
         testStream(upRiver);
 
-        assertThat(downRiver.source()).isNotNull();
         assertThat(downRiver.size()).isEqualTo(1);
-        assertThat(upRiver.source()).isNotNull();
         assertThat(upRiver.size()).isEqualTo(1);
     }
 
-    private static void testStream(final River<Object, Object> river) {
+    private static void testStream(final River<Object> river) {
 
         river.pushStream(0, (Object) null)
              .pushStream(0, (Object[]) null)
@@ -160,144 +157,138 @@ public class WaterfallTest extends TestCase {
 
         final ArrayList<String> output = new ArrayList<String>();
 
-        final Waterfall<String, List<String>, String> fall =
-                fall().start(new FreeLeap<String, String>() {
+        final Waterfall<String, List<String>, String> fall = fall().start(new FreeLeap<String>() {
+
+            @Override
+            public void onPush(final River<String> upRiver, final River<String> downRiver,
+                    final int fallNumber, final String drop) {
+
+                if ("test".equals(drop)) {
+
+                    throw new IllegalArgumentException();
+                }
+
+                super.onPush(upRiver, downRiver, fallNumber, drop);
+            }
+        }).in(2).chain(new FreeLeap<String>() {
+
+            @Override
+            public void onPush(final River<String> upRiver, final River<String> downRiver,
+                    final int fallNumber, final String drop) {
+
+                if ((drop.length() == 0) || drop.toLowerCase().charAt(0) < 'm') {
+
+                    if (fallNumber == 0) {
+
+                        downRiver.push(drop);
+                    }
+
+                } else if (fallNumber == 1) {
+
+                    downRiver.push(drop);
+                }
+            }
+        }).chain(new LeapGenerator<String, List<String>>() {
+
+            @Override
+            public Leap<String, List<String>> start(final int fallNumber) {
+
+                if (fallNumber == 0) {
+
+                    return new AbstractLeap<String, List<String>>() {
+
+                        private final ArrayList<String> mWords = new ArrayList<String>();
+
+                        @Override
+                        public void onPush(final River<String> upRiver,
+                                final River<List<String>> downRiver, final int fallNumber,
+                                final String drop) {
+
+                            if ("atest".equals(drop)) {
+
+                                throw new IllegalStateException();
+                            }
+
+                            mWords.add(drop);
+                        }
+
+                        @Override
+                        public void onDischarge(final River<String> upRiver,
+                                final River<List<String>> downRiver, final int fallNumber) {
+
+                            Collections.sort(mWords);
+                            downRiver.discharge(new ArrayList<String>(mWords));
+                            mWords.clear();
+                        }
+                    };
+                }
+
+                return new AbstractLeap<String, List<String>>() {
+
+                    private final ArrayList<String> mWords = new ArrayList<String>();
 
                     @Override
-                    public void onPush(final River<String, String> upRiver,
-                            final River<String, String> downRiver, final int fallNumber,
+                    public void onPush(final River<String> upRiver,
+                            final River<List<String>> downRiver, final int fallNumber,
                             final String drop) {
 
-                        if ("test".equals(drop)) {
-
-                            throw new IllegalArgumentException();
-                        }
-
-                        super.onPush(upRiver, downRiver, fallNumber, drop);
-                    }
-                }).in(2).chain(new FreeLeap<String, String>() {
-
-                    @Override
-                    public void onPush(final River<String, String> upRiver,
-                            final River<String, String> downRiver, final int fallNumber,
-                            final String drop) {
-
-                        if ((drop.length() == 0) || drop.toLowerCase().charAt(0) < 'm') {
-
-                            if (fallNumber == 0) {
-
-                                downRiver.push(drop);
-                            }
-
-                        } else if (fallNumber == 1) {
-
-                            downRiver.push(drop);
-                        }
-                    }
-                }).chain(new LeapGenerator<String, String, List<String>>() {
-
-                    @Override
-                    public Leap<String, String, List<String>> start(final int fallNumber) {
-
-                        if (fallNumber == 0) {
-
-                            return new AbstractLeap<String, String, List<String>>() {
-
-                                private final ArrayList<String> mWords = new ArrayList<String>();
-
-                                @Override
-                                public void onPush(final River<String, String> upRiver,
-                                        final River<String, List<String>> downRiver,
-                                        final int fallNumber, final String drop) {
-
-                                    if ("atest".equals(drop)) {
-
-                                        throw new IllegalStateException();
-                                    }
-
-                                    mWords.add(drop);
-                                }
-
-                                @Override
-                                public void onDischarge(final River<String, String> upRiver,
-                                        final River<String, List<String>> downRiver,
-                                        final int fallNumber) {
-
-                                    Collections.sort(mWords);
-                                    downRiver.discharge(new ArrayList<String>(mWords));
-                                    mWords.clear();
-                                }
-                            };
-                        }
-
-                        return new AbstractLeap<String, String, List<String>>() {
-
-                            private final ArrayList<String> mWords = new ArrayList<String>();
-
-                            @Override
-                            public void onPush(final River<String, String> upRiver,
-                                    final River<String, List<String>> downRiver,
-                                    final int fallNumber, final String drop) {
-
-                                mWords.add(drop);
-                            }
-
-                            @Override
-                            public void onDischarge(final River<String, String> upRiver,
-                                    final River<String, List<String>> downRiver,
-                                    final int fallNumber) {
-
-                                Collections.sort(mWords, Collections.reverseOrder());
-                                downRiver.discharge(new ArrayList<String>(mWords));
-                                mWords.clear();
-                            }
-                        };
-                    }
-                }).in(1).chain(new AbstractLeap<String, List<String>, String>() {
-
-                    private int mCount;
-
-                    private ArrayList<String> mList = new ArrayList<String>();
-
-                    @Override
-                    public void onPush(final River<String, List<String>> upRiver,
-                            final River<String, String> downRiver, final int fallNumber,
-                            final List<String> drop) {
-
-                        if (mList.isEmpty() || drop.isEmpty()) {
-
-                            mList.addAll(drop);
-
-                        } else {
-
-                            final String first = drop.get(0);
-
-                            if ((first.length() == 0) || first.toLowerCase().charAt(0) < 'm') {
-
-                                mList.addAll(0, drop);
-
-                            } else {
-
-                                mList.addAll(drop);
-                            }
-                        }
-
-                        if (++mCount == 2) {
-
-                            downRiver.discharge(new ArrayList<String>(mList));
-                            mList.clear();
-                            mCount = 0;
-                        }
+                        mWords.add(drop);
                     }
 
                     @Override
-                    public void onUnhandled(final River<String, List<String>> upRiver,
-                            final River<String, String> downRiver, final int fallNumber,
-                            final Throwable throwable) {
+                    public void onDischarge(final River<String> upRiver,
+                            final River<List<String>> downRiver, final int fallNumber) {
 
-                        // just ignore it
+                        Collections.sort(mWords, Collections.reverseOrder());
+                        downRiver.discharge(new ArrayList<String>(mWords));
+                        mWords.clear();
                     }
-                });
+                };
+            }
+        }).in(1).chain(new AbstractLeap<List<String>, String>() {
+
+            private int mCount;
+
+            private ArrayList<String> mList = new ArrayList<String>();
+
+            @Override
+            public void onPush(final River<List<String>> upRiver, final River<String> downRiver,
+                    final int fallNumber, final List<String> drop) {
+
+                if (mList.isEmpty() || drop.isEmpty()) {
+
+                    mList.addAll(drop);
+
+                } else {
+
+                    final String first = drop.get(0);
+
+                    if ((first.length() == 0) || first.toLowerCase().charAt(0) < 'm') {
+
+                        mList.addAll(0, drop);
+
+                    } else {
+
+                        mList.addAll(drop);
+                    }
+                }
+
+                if (++mCount == 2) {
+
+                    downRiver.discharge(new ArrayList<String>(mList));
+                    mList.clear();
+                    mCount = 0;
+                }
+            }
+
+            @Override
+            public void onUnhandled(final River<List<String>> upRiver,
+                    final River<String> downRiver, final int fallNumber,
+                    final Throwable throwable) {
+
+                // just ignore it
+            }
+        });
 
         fall.pull("Ciao", "This", "zOO", null, "is", "a", "3", "test", "1111", "CAPITAL", "atest")
             .allInto(output);
@@ -345,20 +336,18 @@ public class WaterfallTest extends TestCase {
 
         assertThat(fall().chain().pull("test").all()).containsExactly("test");
 
-        assertThat(fall().chain(new FreeLeap<Object, Object>()).pull("test").all()).containsExactly(
-                "test");
+        assertThat(fall().chain(new FreeLeap<Object>()).pull("test").all()).containsExactly("test");
 
-        assertThat(fall().chain(new LeapGenerator<Object, Object, String>() {
+        assertThat(fall().chain(new LeapGenerator<Object, String>() {
 
             @Override
-            public Leap<Object, Object, String> start(final int fallNumber) {
+            public Leap<Object, String> start(final int fallNumber) {
 
-                return new AbstractLeap<Object, Object, String>() {
+                return new AbstractLeap<Object, String>() {
 
                     @Override
-                    public void onPush(final River<Object, Object> upRiver,
-                            final River<Object, String> downRiver, final int fallNumber,
-                            final Object drop) {
+                    public void onPush(final River<Object> upRiver, final River<String> downRiver,
+                            final int fallNumber, final Object drop) {
 
                         downRiver.push(drop.toString());
                     }
@@ -366,17 +355,16 @@ public class WaterfallTest extends TestCase {
             }
         }).pull("test").all()).containsExactly("test");
 
-        assertThat(fall().in(3).chain(new LeapGenerator<Object, Object, String>() {
+        assertThat(fall().in(3).chain(new LeapGenerator<Object, String>() {
 
             @Override
-            public Leap<Object, Object, String> start(final int fallNumber) {
+            public Leap<Object, String> start(final int fallNumber) {
 
-                return new AbstractLeap<Object, Object, String>() {
+                return new AbstractLeap<Object, String>() {
 
                     @Override
-                    public void onPush(final River<Object, Object> upRiver,
-                            final River<Object, String> downRiver, final int fallNumber,
-                            final Object drop) {
+                    public void onPush(final River<Object> upRiver, final River<String> downRiver,
+                            final int fallNumber, final Object drop) {
 
                         downRiver.push(drop.toString());
                     }
@@ -386,22 +374,19 @@ public class WaterfallTest extends TestCase {
 
         assertThat(fall().start().chain().pull("test").all()).containsExactly("test");
 
-        assertThat(fall().start()
-                         .chain(new FreeLeap<Object, Object>())
-                         .pull("test")
-                         .all()).containsExactly("test");
+        assertThat(fall().start().chain(new FreeLeap<Object>()).pull("test").all()).containsExactly(
+                "test");
 
-        assertThat(fall().start().chain(new LeapGenerator<Object, Object, String>() {
+        assertThat(fall().start().chain(new LeapGenerator<Object, String>() {
 
             @Override
-            public Leap<Object, Object, String> start(final int fallNumber) {
+            public Leap<Object, String> start(final int fallNumber) {
 
-                return new AbstractLeap<Object, Object, String>() {
+                return new AbstractLeap<Object, String>() {
 
                     @Override
-                    public void onPush(final River<Object, Object> upRiver,
-                            final River<Object, String> downRiver, final int fallNumber,
-                            final Object drop) {
+                    public void onPush(final River<Object> upRiver, final River<String> downRiver,
+                            final int fallNumber, final Object drop) {
 
                         downRiver.push(drop.toString());
                     }
@@ -409,17 +394,16 @@ public class WaterfallTest extends TestCase {
             }
         }).pull("test").all()).containsExactly("test");
 
-        assertThat(fall().start().in(3).chain(new LeapGenerator<Object, Object, String>() {
+        assertThat(fall().start().in(3).chain(new LeapGenerator<Object, String>() {
 
             @Override
-            public Leap<Object, Object, String> start(final int fallNumber) {
+            public Leap<Object, String> start(final int fallNumber) {
 
-                return new AbstractLeap<Object, Object, String>() {
+                return new AbstractLeap<Object, String>() {
 
                     @Override
-                    public void onPush(final River<Object, Object> upRiver,
-                            final River<Object, String> downRiver, final int fallNumber,
-                            final Object drop) {
+                    public void onPush(final River<Object> upRiver, final River<String> downRiver,
+                            final int fallNumber, final Object drop) {
 
                         downRiver.push(drop.toString());
                     }
@@ -431,21 +415,20 @@ public class WaterfallTest extends TestCase {
 
         assertThat(fall().in(2)
                          .start()
-                         .chain(new FreeLeap<Object, Object>())
+                         .chain(new FreeLeap<Object>())
                          .pull("test")
                          .all()).containsExactly("test", "test");
 
-        assertThat(fall().in(2).start().chain(new LeapGenerator<Object, Object, String>() {
+        assertThat(fall().in(2).start().chain(new LeapGenerator<Object, String>() {
 
             @Override
-            public Leap<Object, Object, String> start(final int fallNumber) {
+            public Leap<Object, String> start(final int fallNumber) {
 
-                return new AbstractLeap<Object, Object, String>() {
+                return new AbstractLeap<Object, String>() {
 
                     @Override
-                    public void onPush(final River<Object, Object> upRiver,
-                            final River<Object, String> downRiver, final int fallNumber,
-                            final Object drop) {
+                    public void onPush(final River<Object> upRiver, final River<String> downRiver,
+                            final int fallNumber, final Object drop) {
 
                         downRiver.push(drop.toString());
                     }
@@ -453,17 +436,16 @@ public class WaterfallTest extends TestCase {
             }
         }).pull("test").all()).containsExactly("test", "test");
 
-        assertThat(fall().in(2).start().in(3).chain(new LeapGenerator<Object, Object, String>() {
+        assertThat(fall().in(2).start().in(3).chain(new LeapGenerator<Object, String>() {
 
             @Override
-            public Leap<Object, Object, String> start(final int fallNumber) {
+            public Leap<Object, String> start(final int fallNumber) {
 
-                return new AbstractLeap<Object, Object, String>() {
+                return new AbstractLeap<Object, String>() {
 
                     @Override
-                    public void onPush(final River<Object, Object> upRiver,
-                            final River<Object, String> downRiver, final int fallNumber,
-                            final Object drop) {
+                    public void onPush(final River<Object> upRiver, final River<String> downRiver,
+                            final int fallNumber, final Object drop) {
 
                         downRiver.push(drop.toString());
                     }
@@ -471,9 +453,12 @@ public class WaterfallTest extends TestCase {
             }
         }).pull("test").all()).containsExactly("test", "test", "test", "test", "test", "test");
 
-        assertThat(
-                fall().in(2).start().in(3).chain(new FreeLeap<Object, Object>()).pull("test").all())
-                .containsExactly("test", "test", "test", "test", "test", "test");
+        assertThat(fall().in(2)
+                         .start()
+                         .in(3)
+                         .chain(new FreeLeap<Object>())
+                         .pull("test")
+                         .all()).containsExactly("test", "test", "test", "test", "test", "test");
 
         assertThat(fall().in(2).start().in(3).chain().pull("test").all()).containsExactly("test",
                                                                                           "test",
@@ -487,7 +472,7 @@ public class WaterfallTest extends TestCase {
 
         assertThat(fall().asGate()
                          .chain()
-                         .chain(new Classification<Leap<Object, Object, Object>>() {})
+                         .chain(new Classification<Leap<Object, Object>>() {})
                          .pull("test")
                          .all()).containsExactly("test");
 
@@ -495,14 +480,14 @@ public class WaterfallTest extends TestCase {
                          .asGate()
                          .chain()
                          .in(1)
-                         .chain(new Classification<Leap<Object, Object, Object>>() {})
+                         .chain(new Classification<Leap<Object, Object>>() {})
                          .pull("test")
                          .all()).containsExactly("test", "test", "test");
 
         assertThat(fall().in(2)
                          .asGate()
                          .chain()
-                         .chain(new Classification<Leap<Object, Object, Object>>() {})
+                         .chain(new Classification<Leap<Object, Object>>() {})
                          .pull("test")
                          .all()).containsExactly("test", "test");
 
@@ -510,14 +495,14 @@ public class WaterfallTest extends TestCase {
                          .asGate()
                          .chain()
                          .in(3)
-                         .chain(new Classification<Leap<Object, Object, Object>>() {})
+                         .chain(new Classification<Leap<Object, Object>>() {})
                          .pull("test")
                          .all()).containsExactly("test", "test", "test", "test", "test", "test");
 
         assertThat(fall().asGate()
                          .chain()
                          .in(2)
-                         .chain(new Classification<Leap<Object, Object, Object>>() {})
+                         .chain(new Classification<Leap<Object, Object>>() {})
                          .pull("test")
                          .all()).containsExactly("test", "test");
 
@@ -645,12 +630,11 @@ public class WaterfallTest extends TestCase {
 
         final Waterfall<Integer, Integer, Integer> fall1 = fall().start(Integer.class);
         final Waterfall<Integer, Integer, Integer> fall2 =
-                fall1.chain(new AbstractLeap<Integer, Integer, Integer>() {
+                fall1.chain(new AbstractLeap<Integer, Integer>() {
 
                     @Override
-                    public void onPush(final River<Integer, Integer> upRiver,
-                            final River<Integer, Integer> downRiver, final int fallNumber,
-                            final Integer drop) {
+                    public void onPush(final River<Integer> upRiver, final River<Integer> downRiver,
+                            final int fallNumber, final Integer drop) {
 
                         downRiver.push(drop - 1);
 
@@ -662,12 +646,11 @@ public class WaterfallTest extends TestCase {
                     }
                 });
         final Waterfall<Integer, Integer, String> fall3 =
-                fall2.chain(new AbstractLeap<Integer, Integer, String>() {
+                fall2.chain(new AbstractLeap<Integer, String>() {
 
                     @Override
-                    public void onPush(final River<Integer, Integer> upRiver,
-                            final River<Integer, String> downRiver, final int fallNumber,
-                            final Integer drop) {
+                    public void onPush(final River<Integer> upRiver, final River<String> downRiver,
+                            final int fallNumber, final Integer drop) {
 
                         downRiver.push(drop.toString());
                     }
@@ -678,12 +661,11 @@ public class WaterfallTest extends TestCase {
         assertThat(fall4.pull(0).now().all()).isEmpty();
         assertThat(fall4.pull(1).now().all()).isEmpty();
 
-        fall1.chain(new AbstractLeap<Integer, Integer, Integer>() {
+        fall1.chain(new AbstractLeap<Integer, Integer>() {
 
             @Override
-            public void onPush(final River<Integer, Integer> upRiver,
-                    final River<Integer, Integer> downRiver, final int fallNumber,
-                    final Integer drop) {
+            public void onPush(final River<Integer> upRiver, final River<Integer> downRiver,
+                    final int fallNumber, final Integer drop) {
 
                 downRiver.push(drop);
 
@@ -699,12 +681,11 @@ public class WaterfallTest extends TestCase {
         assertThat(fall4.pull(-1).now().all()).isEmpty();
         assertThat(fall4.pull(0).now().all()).isEmpty();
 
-        fall1.chain(new AbstractLeap<Integer, Integer, Integer>() {
+        fall1.chain(new AbstractLeap<Integer, Integer>() {
 
             @Override
-            public void onPush(final River<Integer, Integer> upRiver,
-                    final River<Integer, Integer> downRiver, final int fallNumber,
-                    final Integer drop) {
+            public void onPush(final River<Integer> upRiver, final River<Integer> downRiver,
+                    final int fallNumber, final Integer drop) {
 
                 downRiver.push(drop);
             }
@@ -808,12 +789,11 @@ public class WaterfallTest extends TestCase {
 
         final Waterfall<Integer, Integer, Integer> fall1 = fall().start(Integer.class);
         final Waterfall<Integer, Integer, Integer> fall2 =
-                fall1.chain(new AbstractLeap<Integer, Integer, Integer>() {
+                fall1.chain(new AbstractLeap<Integer, Integer>() {
 
                     @Override
-                    public void onPush(final River<Integer, Integer> upRiver,
-                            final River<Integer, Integer> downRiver, final int fallNumber,
-                            final Integer drop) {
+                    public void onPush(final River<Integer> upRiver, final River<Integer> downRiver,
+                            final int fallNumber, final Integer drop) {
 
                         downRiver.push(drop - 1);
 
@@ -825,12 +805,11 @@ public class WaterfallTest extends TestCase {
                     }
                 });
         final Waterfall<Integer, Integer, String> fall3 =
-                fall2.chain(new AbstractLeap<Integer, Integer, String>() {
+                fall2.chain(new AbstractLeap<Integer, String>() {
 
                     @Override
-                    public void onPush(final River<Integer, Integer> upRiver,
-                            final River<Integer, String> downRiver, final int fallNumber,
-                            final Integer drop) {
+                    public void onPush(final River<Integer> upRiver, final River<String> downRiver,
+                            final int fallNumber, final Integer drop) {
 
                         downRiver.push(drop.toString());
                     }
@@ -841,12 +820,11 @@ public class WaterfallTest extends TestCase {
         assertThat(fall4.pull(0).now().all()).isEmpty();
         assertThat(fall4.pull(1).now().all()).isEmpty();
 
-        fall1.chain(new AbstractLeap<Integer, Integer, Integer>() {
+        fall1.chain(new AbstractLeap<Integer, Integer>() {
 
             @Override
-            public void onPush(final River<Integer, Integer> upRiver,
-                    final River<Integer, Integer> downRiver, final int fallNumber,
-                    final Integer drop) {
+            public void onPush(final River<Integer> upRiver, final River<Integer> downRiver,
+                    final int fallNumber, final Integer drop) {
 
                 downRiver.push(drop);
 
@@ -862,12 +840,11 @@ public class WaterfallTest extends TestCase {
         assertThat(fall4.pull(-1).now().all()).isEmpty();
         assertThat(fall4.pull(0).now().all()).isEmpty();
 
-        fall1.chain(new AbstractLeap<Integer, Integer, Integer>() {
+        fall1.chain(new AbstractLeap<Integer, Integer>() {
 
             @Override
-            public void onPush(final River<Integer, Integer> upRiver,
-                    final River<Integer, Integer> downRiver, final int fallNumber,
-                    final Integer drop) {
+            public void onPush(final River<Integer> upRiver, final River<Integer> downRiver,
+                    final int fallNumber, final Integer drop) {
 
                 downRiver.push(drop);
             }
@@ -998,10 +975,9 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            new DataStream<Object>(null, new DataFall<Object, Object, Object>(fall().start(),
-                                                                              Currents.straight(),
-                                                                              new FreeLeap<Object, Object>(),
-                                                                              0));
+            new DataStream<Object>(null,
+                                   new DataFall<Object, Object>(fall().start(), Currents.straight(),
+                                                                new FreeLeap<Object>(), 0));
 
             fail();
 
@@ -1011,9 +987,8 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            new DataStream<Object>(
-                    new DataFall<Object, Object, Object>(fall().start(), Currents.straight(),
-                                                         new FreeLeap<Object, Object>(), 0), null);
+            new DataStream<Object>(new DataFall<Object, Object>(fall().start(), Currents.straight(),
+                                                                new FreeLeap<Object>(), 0), null);
 
             fail();
 
@@ -1023,8 +998,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            new DataFall<Object, Object, Object>(null, Currents.straight(),
-                                                 new FreeLeap<Object, Object>(), 0);
+            new DataFall<Object, Object>(null, Currents.straight(), new FreeLeap<Object>(), 0);
 
             fail();
 
@@ -1034,8 +1008,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            new DataFall<Object, Object, Object>(fall().start(), null,
-                                                 new FreeLeap<Object, Object>(), 0);
+            new DataFall<Object, Object>(fall().start(), null, new FreeLeap<Object>(), 0);
 
             fail();
 
@@ -1045,7 +1018,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            new DataFall<Object, Object, Object>(fall().start(), Currents.straight(), null, 0);
+            new DataFall<Object, Object>(fall().start(), Currents.straight(), null, 0);
 
             fail();
 
@@ -1055,7 +1028,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            new WaterfallRiver<Object, Object>(null, Direction.DOWNSTREAM);
+            new WaterfallRiver<Object>(null, Direction.DOWNSTREAM);
 
             fail();
 
@@ -1065,7 +1038,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            new WaterfallRiver<Object, Object>(null, Direction.UPSTREAM);
+            new WaterfallRiver<Object>(null, Direction.UPSTREAM);
 
             fail();
 
@@ -1075,7 +1048,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            new BarrageLeap<Object, Object>(null, 1);
+            new BarrageLeap<Object>(null, 1);
 
             fail();
 
@@ -1085,7 +1058,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            new BarrageLeap<Object, Object>(new Barrage<Object>() {
+            new BarrageLeap<Object>(new Barrage<Object>() {
 
                 @Override
                 public int onPush(final Object drop) {
@@ -1142,7 +1115,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            fall().chain((Leap<Object, Object, Object>) null);
+            fall().chain((Leap<Object, Object>) null);
 
             fail();
 
@@ -1152,7 +1125,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            fall().chain((LeapGenerator<Object, Object, Object>) null);
+            fall().chain((LeapGenerator<Object, Object>) null);
 
             fail();
 
@@ -1162,7 +1135,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            fall().chain((Classification<Leap<Object, Object, Object>>) null);
+            fall().chain((Classification<Leap<Object, Object>>) null);
 
             fail();
 
@@ -1172,7 +1145,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            fall().chain(new Classification<Leap<Object, Object, Object>>() {});
+            fall().chain(new Classification<Leap<Object, Object>>() {});
 
             fail();
 
@@ -1192,7 +1165,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            final FreeLeap<Object, Object> leap = new FreeLeap<Object, Object>();
+            final FreeLeap<Object> leap = new FreeLeap<Object>();
 
             fall().start(leap).chain(leap);
 
@@ -1204,7 +1177,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            final FreeLeap<Object, Object> leap = new FreeLeap<Object, Object>();
+            final FreeLeap<Object> leap = new FreeLeap<Object>();
 
             fall().chain(leap).chain(leap);
 
@@ -1235,7 +1208,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            final FreeLeap<Object, Object> leap = new FreeLeap<Object, Object>();
+            final FreeLeap<Object> leap = new FreeLeap<Object>();
 
             fall().start(leap).start((Class) null);
 
@@ -1247,7 +1220,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            final FreeLeap<Object, Object> leap = new FreeLeap<Object, Object>();
+            final FreeLeap<Object> leap = new FreeLeap<Object>();
 
             fall().start(leap).start((Classification) null);
 
@@ -1259,7 +1232,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            final FreeLeap<Object, Object> leap = new FreeLeap<Object, Object>();
+            final FreeLeap<Object> leap = new FreeLeap<Object>();
 
             fall().start(leap).start((Leap) null);
 
@@ -1271,7 +1244,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            final FreeLeap<Object, Object> leap = new FreeLeap<Object, Object>();
+            final FreeLeap<Object> leap = new FreeLeap<Object>();
 
             fall().start(leap).start((LeapGenerator) null);
 
@@ -1284,7 +1257,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            fall().start().chain((Leap<Object, Object, Object>) null);
+            fall().start().chain((Leap<Object, Object>) null);
 
             fail();
 
@@ -1294,7 +1267,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            fall().start().chain((LeapGenerator<Object, Object, Object>) null);
+            fall().start().chain((LeapGenerator<Object, Object>) null);
 
             fail();
 
@@ -1304,7 +1277,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            fall().start().chain((Classification<Leap<Object, Object, Object>>) null);
+            fall().start().chain((Classification<Leap<Object, Object>>) null);
 
             fail();
 
@@ -1314,7 +1287,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            fall().start().chain(new Classification<Leap<Object, Object, Object>>() {});
+            fall().start().chain(new Classification<Leap<Object, Object>>() {});
 
             fail();
 
@@ -1364,7 +1337,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            fall().as(Integer.class).chain(new FreeLeap<Object, Object>());
+            fall().as(Integer.class).chain(new FreeLeap<Object>());
 
             fail();
 
@@ -1374,7 +1347,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            fall().as(new Classification<Integer>() {}).chain(new FreeLeap<Object, Object>());
+            fall().as(new Classification<Integer>() {}).chain(new FreeLeap<Object>());
 
             fail();
 
@@ -1384,12 +1357,12 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            fall().in(2).asGate().start(new LeapGenerator<Object, Object, Object>() {
+            fall().in(2).asGate().start(new LeapGenerator<Object, Object>() {
 
                 @Override
-                public Leap<Object, Object, Object> start(final int fallNumber) {
+                public Leap<Object, Object> start(final int fallNumber) {
 
-                    return new FreeLeap<Object, Object>();
+                    return new FreeLeap<Object>();
                 }
             });
 
@@ -1401,12 +1374,12 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            fall().in(2).asGate().chain(new LeapGenerator<Object, Object, Object>() {
+            fall().in(2).asGate().chain(new LeapGenerator<Object, Object>() {
 
                 @Override
-                public Leap<Object, Object, Object> start(final int fallNumber) {
+                public Leap<Object, Object> start(final int fallNumber) {
 
-                    return new FreeLeap<Object, Object>();
+                    return new FreeLeap<Object>();
                 }
             });
 
@@ -1418,12 +1391,12 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            fall().in(2).start().asGate().chain(new LeapGenerator<Object, Object, Object>() {
+            fall().in(2).start().asGate().chain(new LeapGenerator<Object, Object>() {
 
                 @Override
-                public Leap<Object, Object, Object> start(final int fallNumber) {
+                public Leap<Object, Object> start(final int fallNumber) {
 
-                    return new FreeLeap<Object, Object>();
+                    return new FreeLeap<Object>();
                 }
             });
 
@@ -1537,7 +1510,7 @@ public class WaterfallTest extends TestCase {
 
             final Waterfall<Object, Object, Object> waterfall = fall().start();
 
-            waterfall.on(new FreeLeap<String, Integer>());
+            waterfall.on(new FreeLeap<Integer>());
 
             fail();
 
@@ -1579,12 +1552,12 @@ public class WaterfallTest extends TestCase {
                                                               .start(new LatchLeap())
                                                               .inBackground(1)
                                                               .chain(new TestLeap())
-                                                              .chain(new FreeLeap<Object, Object>() {
+                                                              .chain(new FreeLeap<Object>() {
 
                                                                   @Override
                                                                   public void onUnhandled(
-                                                                          final River<Object, Object> upRiver,
-                                                                          final River<Object, Object> downRiver,
+                                                                          final River<Object> upRiver,
+                                                                          final River<Object> downRiver,
                                                                           final int fallNumber,
                                                                           final Throwable throwable) {
 
@@ -1644,12 +1617,12 @@ public class WaterfallTest extends TestCase {
                                                               .inBackground(1)
                                                               .chain(new TestLeap())
                                                               .inBackground(1)
-                                                              .chain(new FreeLeap<Object, Object>() {
+                                                              .chain(new FreeLeap<Object>() {
 
                                                                   @Override
                                                                   public void onUnhandled(
-                                                                          final River<Object, Object> upRiver,
-                                                                          final River<Object, Object> downRiver,
+                                                                          final River<Object> upRiver,
+                                                                          final River<Object> downRiver,
                                                                           final int fallNumber,
                                                                           final Throwable throwable) {
 
@@ -1741,7 +1714,7 @@ public class WaterfallTest extends TestCase {
         })).isEqualTo(1);
 
         final Waterfall<Object, Object, Object> fall1 = fall.lock((Leap) null)
-                                                            .lock(new FreeLeap<Object, Object>())
+                                                            .lock(new FreeLeap<Object>())
                                                             .lock(gateLeap)
                                                             .as(Classification.ofType(
                                                                     GateLeap.class))
@@ -1850,21 +1823,21 @@ public class WaterfallTest extends TestCase {
     public void testJoin() {
 
         final Waterfall<Character, Integer, Integer> fall0 =
-                fall().start(new AbstractLeap<Character, Character, Integer>() {
+                fall().start(new AbstractLeap<Character, Integer>() {
 
                     private final StringBuffer mBuffer = new StringBuffer();
 
                     @Override
-                    public void onPush(final River<Character, Character> upRiver,
-                            final River<Character, Integer> downRiver, final int fallNumber,
+                    public void onPush(final River<Character> upRiver,
+                            final River<Integer> downRiver, final int fallNumber,
                             final Character drop) {
 
                         mBuffer.append(drop);
                     }
 
                     @Override
-                    public void onDischarge(final River<Character, Character> upRiver,
-                            final River<Character, Integer> downRiver, final int fallNumber) {
+                    public void onDischarge(final River<Character> upRiver,
+                            final River<Integer> downRiver, final int fallNumber) {
 
                         downRiver.discharge(Integer.valueOf(mBuffer.toString()));
 
@@ -1872,28 +1845,26 @@ public class WaterfallTest extends TestCase {
                     }
                 }).chain();
 
-        final Waterfall<Character, Integer, Integer> fall1 =
-                fall0.chain(new FreeLeap<Character, Integer>() {
+        final Waterfall<Character, Integer, Integer> fall1 = fall0.chain(new FreeLeap<Integer>() {
 
-                    private int mSum;
+            private int mSum;
 
-                    @Override
-                    public void onPush(final River<Character, Integer> upRiver,
-                            final River<Character, Integer> downRiver, final int fallNumber,
-                            final Integer drop) {
+            @Override
+            public void onPush(final River<Integer> upRiver, final River<Integer> downRiver,
+                    final int fallNumber, final Integer drop) {
 
-                        mSum += drop;
-                    }
+                mSum += drop;
+            }
 
-                    @Override
-                    public void onDischarge(final River<Character, Integer> upRiver,
-                            final River<Character, Integer> downRiver, final int fallNumber) {
+            @Override
+            public void onDischarge(final River<Integer> upRiver, final River<Integer> downRiver,
+                    final int fallNumber) {
 
-                        downRiver.discharge(new Integer[]{mSum});
+                downRiver.discharge(new Integer[]{mSum});
 
-                        mSum = 0;
-                    }
-                });
+                mSum = 0;
+            }
+        });
 
         final Waterfall<Integer, Integer, Integer> fall2 = fall().start(Integer.class);
         fall2.chain(fall0);
@@ -1918,26 +1889,24 @@ public class WaterfallTest extends TestCase {
 
         assertThat(output).containsExactly(128);
 
-        final Waterfall<Integer, Integer, Integer> fall4 =
-                fall().start(new FreeLeap<Integer, Integer>() {
+        final Waterfall<Integer, Integer, Integer> fall4 = fall().start(new FreeLeap<Integer>() {
 
-                    private int mAbsSum;
+            private int mAbsSum;
 
-                    @Override
-                    public void onPush(final River<Integer, Integer> upRiver,
-                            final River<Integer, Integer> downRiver, final int fallNumber,
-                            final Integer drop) {
+            @Override
+            public void onPush(final River<Integer> upRiver, final River<Integer> downRiver,
+                    final int fallNumber, final Integer drop) {
 
-                        mAbsSum += Math.abs(drop);
-                    }
+                mAbsSum += Math.abs(drop);
+            }
 
-                    @Override
-                    public void onDischarge(final River<Integer, Integer> upRiver,
-                            final River<Integer, Integer> downRiver, final int fallNumber) {
+            @Override
+            public void onDischarge(final River<Integer> upRiver, final River<Integer> downRiver,
+                    final int fallNumber) {
 
-                        downRiver.discharge(mAbsSum);
-                    }
-                });
+                downRiver.discharge(mAbsSum);
+            }
+        });
 
         fall0.chain(fall4);
 
@@ -1972,20 +1941,18 @@ public class WaterfallTest extends TestCase {
                 fall().start(new Classification<String>() {}).pull("test").all()).containsExactly(
                 "test");
 
-        assertThat(fall().start(new FreeLeap<String, String>()).pull("test").all()).containsExactly(
-                "test");
+        assertThat(fall().start(new FreeLeap<String>()).pull("test").all()).containsExactly("test");
 
-        assertThat(fall().start(new LeapGenerator<String, String, Object>() {
+        assertThat(fall().start(new LeapGenerator<String, Object>() {
 
             @Override
-            public Leap<String, String, Object> start(final int fallNumber) {
+            public Leap<String, Object> start(final int fallNumber) {
 
-                return new AbstractLeap<String, String, Object>() {
+                return new AbstractLeap<String, Object>() {
 
                     @Override
-                    public void onPush(final River<String, String> upRiver,
-                            final River<String, Object> downRiver, final int fallNumber,
-                            final String drop) {
+                    public void onPush(final River<String> upRiver, final River<Object> downRiver,
+                            final int fallNumber, final String drop) {
 
                         downRiver.push(drop);
                     }
@@ -1993,17 +1960,16 @@ public class WaterfallTest extends TestCase {
             }
         }).pull("test").all()).containsExactly("test");
 
-        assertThat(fall().in(3).start(new LeapGenerator<String, String, Object>() {
+        assertThat(fall().in(3).start(new LeapGenerator<String, Object>() {
 
             @Override
-            public Leap<String, String, Object> start(final int fallNumber) {
+            public Leap<String, Object> start(final int fallNumber) {
 
-                return new AbstractLeap<String, String, Object>() {
+                return new AbstractLeap<String, Object>() {
 
                     @Override
-                    public void onPush(final River<String, String> upRiver,
-                            final River<String, Object> downRiver, final int fallNumber,
-                            final String drop) {
+                    public void onPush(final River<String> upRiver, final River<Object> downRiver,
+                            final int fallNumber, final String drop) {
 
                         downRiver.push(drop);
                     }
@@ -2012,7 +1978,7 @@ public class WaterfallTest extends TestCase {
         }).pull("test").all()).containsExactly("test", "test", "test");
     }
 
-    private static class GateLeap extends FreeLeap<Object, Object> {
+    private static class GateLeap extends FreeLeap<Object> {
 
         public int getId() {
 
@@ -2036,7 +2002,7 @@ public class WaterfallTest extends TestCase {
         }
     }
 
-    private static class LatchLeap extends FreeLeap<Object, Object> {
+    private static class LatchLeap extends FreeLeap<Object> {
 
         private int mCount;
 
@@ -2063,7 +2029,7 @@ public class WaterfallTest extends TestCase {
         }
     }
 
-    private static class TestLeap extends FreeLeap<Object, Object> {
+    private static class TestLeap extends FreeLeap<Object> {
 
         public boolean mDischarged;
 
@@ -2072,8 +2038,8 @@ public class WaterfallTest extends TestCase {
         public boolean mThrown;
 
         @Override
-        public void onDischarge(final River<Object, Object> upRiver,
-                final River<Object, Object> downRiver, final int fallNumber) {
+        public void onDischarge(final River<Object> upRiver, final River<Object> downRiver,
+                final int fallNumber) {
 
             if (isFailed(upRiver) || mDischarged) {
 
@@ -2112,7 +2078,7 @@ public class WaterfallTest extends TestCase {
             }
         }
 
-        private void incCount(final River<Object, Object> river) {
+        private void incCount(final River<Object> river) {
 
             river.on(LatchLeap.class).immediately().perform(new Action<Void, LatchLeap>() {
 
@@ -2126,7 +2092,7 @@ public class WaterfallTest extends TestCase {
             });
         }
 
-        private boolean isFailed(final River<Object, Object> river) {
+        private boolean isFailed(final River<Object> river) {
 
             return river.on(LatchLeap.class)
                         .immediately()
@@ -2140,7 +2106,7 @@ public class WaterfallTest extends TestCase {
                         });
         }
 
-        private void setFailed(final River<Object, Object> river) {
+        private void setFailed(final River<Object> river) {
 
             river.on(LatchLeap.class).immediately().perform(new Action<Void, LatchLeap>() {
 
@@ -2155,8 +2121,8 @@ public class WaterfallTest extends TestCase {
         }
 
         @Override
-        public void onPush(final River<Object, Object> upRiver,
-                final River<Object, Object> downRiver, final int fallNumber, final Object drop) {
+        public void onPush(final River<Object> upRiver, final River<Object> downRiver,
+                final int fallNumber, final Object drop) {
 
             if (isFailed(downRiver) || mPushed) {
 
@@ -2196,9 +2162,8 @@ public class WaterfallTest extends TestCase {
         }
 
         @Override
-        public void onUnhandled(final River<Object, Object> upRiver,
-                final River<Object, Object> downRiver, final int fallNumber,
-                final Throwable throwable) {
+        public void onUnhandled(final River<Object> upRiver, final River<Object> downRiver,
+                final int fallNumber, final Throwable throwable) {
 
             if (isFailed(upRiver) || mThrown) {
 
@@ -2238,7 +2203,7 @@ public class WaterfallTest extends TestCase {
         }
     }
 
-    private class TraceLeap extends FreeLeap<String, String> {
+    private class TraceLeap extends FreeLeap<String> {
 
         private final ArrayList<String> mData = new ArrayList<String>();
 
@@ -2262,8 +2227,8 @@ public class WaterfallTest extends TestCase {
         }
 
         @Override
-        public void onDischarge(final River<String, String> upRiver,
-                final River<String, String> downRiver, final int fallNumber) {
+        public void onDischarge(final River<String> upRiver, final River<String> downRiver,
+                final int fallNumber) {
 
             ++mDischargeCount;
 
@@ -2271,8 +2236,8 @@ public class WaterfallTest extends TestCase {
         }
 
         @Override
-        public void onPush(final River<String, String> upRiver,
-                final River<String, String> downRiver, final int fallNumber, final String drop) {
+        public void onPush(final River<String> upRiver, final River<String> downRiver,
+                final int fallNumber, final String drop) {
 
             mData.add(drop);
 
@@ -2280,9 +2245,8 @@ public class WaterfallTest extends TestCase {
         }
 
         @Override
-        public void onUnhandled(final River<String, String> upRiver,
-                final River<String, String> downRiver, final int fallNumber,
-                final Throwable throwable) {
+        public void onUnhandled(final River<String> upRiver, final River<String> downRiver,
+                final int fallNumber, final Throwable throwable) {
 
             mThrows.add(throwable);
 

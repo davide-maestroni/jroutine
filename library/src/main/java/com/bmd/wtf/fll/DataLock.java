@@ -32,9 +32,8 @@ class DataLock {
     private static final Fluid DISCHARGE = new Fluid() {
 
         @Override
-        public <DATA> void push(final River<?, DATA> river, final int streamNumber,
-                final long delay, final TimeUnit timeUnit, final long pushTimeNs,
-                final Object drop) {
+        public <DATA> void push(final River<DATA> river, final int streamNumber, final long delay,
+                final TimeUnit timeUnit, final long pushTimeNs, final Object drop) {
 
             if (streamNumber < 0) {
 
@@ -50,9 +49,8 @@ class DataLock {
     private static final Fluid FORWARD = new Fluid() {
 
         @Override
-        public <DATA> void push(final River<?, DATA> river, final int streamNumber,
-                final long delay, final TimeUnit timeUnit, final long pushTimeNs,
-                final Object drop) {
+        public <DATA> void push(final River<DATA> river, final int streamNumber, final long delay,
+                final TimeUnit timeUnit, final long pushTimeNs, final Object drop) {
 
             //noinspection unchecked
             final Throwable exception = (Throwable) drop;
@@ -71,9 +69,8 @@ class DataLock {
     private static final Fluid PUSH = new Fluid() {
 
         @Override
-        public <DATA> void push(final River<?, DATA> river, final int streamNumber,
-                final long delay, final TimeUnit timeUnit, final long pushTimeNs,
-                final Object drop) {
+        public <DATA> void push(final River<DATA> river, final int streamNumber, final long delay,
+                final TimeUnit timeUnit, final long pushTimeNs, final Object drop) {
 
             //noinspection unchecked
             final DATA out = (DATA) drop;
@@ -92,9 +89,8 @@ class DataLock {
     private static final Fluid PUSH_AFTER = new Fluid() {
 
         @Override
-        public <DATA> void push(final River<?, DATA> river, final int streamNumber,
-                final long delay, final TimeUnit timeUnit, final long pushTimeNs,
-                final Object drop) {
+        public <DATA> void push(final River<DATA> river, final int streamNumber, final long delay,
+                final TimeUnit timeUnit, final long pushTimeNs, final Object drop) {
 
 
             //noinspection unchecked
@@ -116,9 +112,8 @@ class DataLock {
     private static final Fluid PUSH_AFTER_ARRAY = new Fluid() {
 
         @Override
-        public <DATA> void push(final River<?, DATA> river, final int streamNumber,
-                final long delay, final TimeUnit timeUnit, final long pushTimeNs,
-                final Object drops) {
+        public <DATA> void push(final River<DATA> river, final int streamNumber, final long delay,
+                final TimeUnit timeUnit, final long pushTimeNs, final Object drops) {
 
             //noinspection unchecked
             final DATA[] outs = (DATA[]) drops;
@@ -141,9 +136,8 @@ class DataLock {
     private static final Fluid PUSH_AFTER_ITERABLE = new Fluid() {
 
         @Override
-        public <DATA> void push(final River<?, DATA> river, final int streamNumber,
-                final long delay, final TimeUnit timeUnit, final long pushTimeNs,
-                final Object drops) {
+        public <DATA> void push(final River<DATA> river, final int streamNumber, final long delay,
+                final TimeUnit timeUnit, final long pushTimeNs, final Object drops) {
 
             //noinspection unchecked
             final Iterable<DATA> outs = (Iterable<DATA>) drops;
@@ -164,9 +158,8 @@ class DataLock {
     private static final Fluid PUSH_ARRAY = new Fluid() {
 
         @Override
-        public <DATA> void push(final River<?, DATA> river, final int streamNumber,
-                final long delay, final TimeUnit timeUnit, final long pushTimeNs,
-                final Object drops) {
+        public <DATA> void push(final River<DATA> river, final int streamNumber, final long delay,
+                final TimeUnit timeUnit, final long pushTimeNs, final Object drops) {
 
             //noinspection unchecked
             final DATA[] outs = (DATA[]) drops;
@@ -187,9 +180,8 @@ class DataLock {
     private static final Fluid PUSH_ITERABLE = new Fluid() {
 
         @Override
-        public <DATA> void push(final River<?, DATA> river, final int streamNumber,
-                final long delay, final TimeUnit timeUnit, final long pushTimeNs,
-                final Object drops) {
+        public <DATA> void push(final River<DATA> river, final int streamNumber, final long delay,
+                final TimeUnit timeUnit, final long pushTimeNs, final Object drops) {
 
             //noinspection unchecked
             final Iterable<DATA> outs = (Iterable<DATA>) drops;
@@ -219,7 +211,7 @@ class DataLock {
 
     private long[] mPushTimeNs;
 
-    private River<?, ?>[] mRivers;
+    private River<?>[] mRivers;
 
     private int[] mStreamNumbers;
 
@@ -284,171 +276,170 @@ class DataLock {
         return (delay - timeUnit.convert(System.nanoTime() - pushTimeNs, TimeUnit.NANOSECONDS));
     }
 
-    public void discharge(final River<?, ?> river) {
+    public void discharge(final River<?> river) {
 
         add(DISCHARGE, river, -1, 0, TimeUnit.MILLISECONDS, 0, null);
     }
 
-    public <OUT> void discharge(final River<?, ?> river, final OUT... drops) {
+    public <OUT> void discharge(final River<?> river, final OUT... drops) {
 
         add(PUSH_ARRAY, river, -1, 0, TimeUnit.MILLISECONDS, 0, drops);
         discharge(river);
     }
 
-    public <OUT> void discharge(final River<?, ?> river, final Iterable<? extends OUT> drops) {
+    public <OUT> void discharge(final River<?> river, final Iterable<? extends OUT> drops) {
 
         add(PUSH_ITERABLE, river, -1, 0, TimeUnit.MILLISECONDS, 0, drops);
         discharge(river);
     }
 
-    public <OUT> void discharge(final River<?, ?> river, final OUT drop) {
+    public <OUT> void discharge(final River<?> river, final OUT drop) {
 
         add(PUSH, river, -1, 0, TimeUnit.MILLISECONDS, 0, drop);
         discharge(river);
     }
 
-    public <OUT> void dischargeAfter(final River<?, ?> river, final long delay,
+    public <OUT> void dischargeAfter(final River<?> river, final long delay,
             final TimeUnit timeUnit, final OUT drop) {
 
         add(PUSH_AFTER, river, -1, delay, timeUnit, System.nanoTime(), drop);
         discharge(river);
     }
 
-    public <OUT> void dischargeAfter(final River<?, ?> river, final long delay,
+    public <OUT> void dischargeAfter(final River<?> river, final long delay,
             final TimeUnit timeUnit, final OUT... drops) {
 
         add(PUSH_AFTER_ARRAY, river, -1, delay, timeUnit, System.nanoTime(), drops);
         discharge(river);
     }
 
-    public <OUT> void dischargeAfter(final River<?, ?> river, final long delay,
+    public <OUT> void dischargeAfter(final River<?> river, final long delay,
             final TimeUnit timeUnit, final Iterable<? extends OUT> drops) {
 
         add(PUSH_AFTER_ITERABLE, river, -1, delay, timeUnit, System.nanoTime(), drops);
         discharge(river);
     }
 
-    public void dischargeStream(final River<?, ?> river, final int streamNumber) {
+    public void dischargeStream(final River<?> river, final int streamNumber) {
 
         add(DISCHARGE, river, streamNumber, 0, TimeUnit.MILLISECONDS, 0, null);
     }
 
-    public <OUT> void dischargeStream(final River<?, ?> river, final int streamNumber,
+    public <OUT> void dischargeStream(final River<?> river, final int streamNumber,
             final OUT... drops) {
 
         add(PUSH_ARRAY, river, streamNumber, 0, TimeUnit.MILLISECONDS, 0, drops);
         discharge(river, streamNumber);
     }
 
-    public <OUT> void dischargeStream(final River<?, ?> river, final int streamNumber,
+    public <OUT> void dischargeStream(final River<?> river, final int streamNumber,
             final Iterable<? extends OUT> drops) {
 
         add(PUSH_ITERABLE, river, streamNumber, 0, TimeUnit.MILLISECONDS, 0, drops);
         discharge(river, streamNumber);
     }
 
-    public <OUT> void dischargeStream(final River<?, ?> river, final int streamNumber,
+    public <OUT> void dischargeStream(final River<?> river, final int streamNumber,
             final OUT drop) {
 
         add(PUSH, river, streamNumber, 0, TimeUnit.MILLISECONDS, 0, drop);
         discharge(river, streamNumber);
     }
 
-    public <OUT> void dischargeStreamAfter(final River<?, ?> river, final int streamNumber,
+    public <OUT> void dischargeStreamAfter(final River<?> river, final int streamNumber,
             final long delay, final TimeUnit timeUnit, final OUT drop) {
 
         add(PUSH_AFTER, river, streamNumber, delay, timeUnit, System.nanoTime(), drop);
         discharge(river, streamNumber);
     }
 
-    public <OUT> void dischargeStreamAfter(final River<?, ?> river, final int streamNumber,
+    public <OUT> void dischargeStreamAfter(final River<?> river, final int streamNumber,
             final long delay, final TimeUnit timeUnit, final OUT... drops) {
 
         add(PUSH_AFTER_ARRAY, river, streamNumber, delay, timeUnit, System.nanoTime(), drops);
         discharge(river, streamNumber);
     }
 
-    public <OUT> void dischargeStreamAfter(final River<?, ?> river, final int streamNumber,
+    public <OUT> void dischargeStreamAfter(final River<?> river, final int streamNumber,
             final long delay, final TimeUnit timeUnit, final Iterable<? extends OUT> drops) {
 
         add(PUSH_AFTER_ITERABLE, river, streamNumber, delay, timeUnit, System.nanoTime(), drops);
         discharge(river, streamNumber);
     }
 
-    public void forward(final River<?, ?> river, final Throwable throwable) {
+    public void forward(final River<?> river, final Throwable throwable) {
 
         add(FORWARD, river, -1, 0, TimeUnit.MILLISECONDS, 0, throwable);
     }
 
-    public void forwardStream(final River<?, ?> river, final int streamNumber,
+    public void forwardStream(final River<?> river, final int streamNumber,
             final Throwable throwable) {
 
         add(FORWARD, river, streamNumber, 0, TimeUnit.MILLISECONDS, 0, throwable);
     }
 
-    public <OUT> void push(final River<?, ?> river, final OUT... drops) {
+    public <OUT> void push(final River<?> river, final OUT... drops) {
 
         add(PUSH_ARRAY, river, -1, 0, TimeUnit.MILLISECONDS, 0, drops);
     }
 
-    public <OUT> void push(final River<?, ?> river, final Iterable<? extends OUT> drops) {
+    public <OUT> void push(final River<?> river, final Iterable<? extends OUT> drops) {
 
         add(PUSH_ITERABLE, river, -1, 0, TimeUnit.MILLISECONDS, 0, drops);
     }
 
-    public <OUT> void push(final River<?, ?> river, final OUT drop) {
+    public <OUT> void push(final River<?> river, final OUT drop) {
 
         add(PUSH, river, -1, 0, TimeUnit.MILLISECONDS, 0, drop);
     }
 
-    public <OUT> void pushAfter(final River<?, ?> river, final long delay, final TimeUnit timeUnit,
+    public <OUT> void pushAfter(final River<?> river, final long delay, final TimeUnit timeUnit,
             final OUT drop) {
 
         add(PUSH_AFTER, river, -1, delay, timeUnit, System.nanoTime(), drop);
     }
 
-    public <OUT> void pushAfter(final River<?, ?> river, final long delay, final TimeUnit timeUnit,
+    public <OUT> void pushAfter(final River<?> river, final long delay, final TimeUnit timeUnit,
             final OUT... drops) {
 
         add(PUSH_AFTER_ARRAY, river, -1, delay, timeUnit, System.nanoTime(), drops);
     }
 
-    public <OUT> void pushAfter(final River<?, ?> river, final long delay, final TimeUnit timeUnit,
+    public <OUT> void pushAfter(final River<?> river, final long delay, final TimeUnit timeUnit,
             final Iterable<? extends OUT> drops) {
 
         add(PUSH_AFTER_ITERABLE, river, -1, delay, timeUnit, System.nanoTime(), drops);
     }
 
-    public <OUT> void pushStream(final River<?, ?> river, final int streamNumber,
-            final OUT... drops) {
+    public <OUT> void pushStream(final River<?> river, final int streamNumber, final OUT... drops) {
 
         add(PUSH_ARRAY, river, streamNumber, 0, TimeUnit.MILLISECONDS, 0, drops);
     }
 
-    public <OUT> void pushStream(final River<?, ?> river, final int streamNumber,
+    public <OUT> void pushStream(final River<?> river, final int streamNumber,
             final Iterable<? extends OUT> drops) {
 
         add(PUSH_ITERABLE, river, streamNumber, 0, TimeUnit.MILLISECONDS, 0, drops);
     }
 
-    public <OUT> void pushStream(final River<?, ?> river, final int streamNumber, final OUT drop) {
+    public <OUT> void pushStream(final River<?> river, final int streamNumber, final OUT drop) {
 
         add(PUSH, river, streamNumber, 0, TimeUnit.MILLISECONDS, 0, drop);
     }
 
-    public <OUT> void pushStreamAfter(final River<?, ?> river, final int streamNumber,
+    public <OUT> void pushStreamAfter(final River<?> river, final int streamNumber,
             final long delay, final TimeUnit timeUnit, final OUT drop) {
 
         add(PUSH_AFTER, river, streamNumber, delay, timeUnit, System.nanoTime(), drop);
     }
 
-    public <OUT> void pushStreamAfter(final River<?, ?> river, final int streamNumber,
+    public <OUT> void pushStreamAfter(final River<?> river, final int streamNumber,
             final long delay, final TimeUnit timeUnit, final OUT... drops) {
 
         add(PUSH_AFTER_ARRAY, river, streamNumber, delay, timeUnit, System.nanoTime(), drops);
     }
 
-    public <OUT> void pushStreamAfter(final River<?, ?> river, final int streamNumber,
+    public <OUT> void pushStreamAfter(final River<?> river, final int streamNumber,
             final long delay, final TimeUnit timeUnit, final Iterable<? extends OUT> drops) {
 
         add(PUSH_AFTER_ITERABLE, river, streamNumber, delay, timeUnit, System.nanoTime(), drops);
@@ -469,7 +460,7 @@ class DataLock {
 
                 final int i = mFirst;
 
-                final River<?, ?> river = mRivers[i];
+                final River<?> river = mRivers[i];
 
                 try {
 
@@ -513,7 +504,7 @@ class DataLock {
         }
     }
 
-    private void add(final Fluid fluid, final River<?, ?> river, final int streamNumber,
+    private void add(final Fluid fluid, final River<?> river, final int streamNumber,
             final long delay, final TimeUnit timeUnit, final long pushTimeNs, final Object drop) {
 
         if (mData.length == 0) {
@@ -582,7 +573,7 @@ class DataLock {
         final Fluid[] newFluids = new Fluid[newSize];
         resizeArray(mFluids, newFluids, first);
 
-        final River<?, ?>[] newRivers = new River[newSize];
+        final River<?>[] newRivers = new River[newSize];
         resizeArray(mRivers, newRivers, first);
 
         final int[] newNumbers = new int[newSize];
@@ -616,7 +607,7 @@ class DataLock {
 
     private interface Fluid {
 
-        public <DATA> void push(River<?, DATA> river, int streamNumber, long delay,
-                TimeUnit timeUnit, long pushTimeNs, Object drop);
+        public <DATA> void push(River<DATA> river, int streamNumber, long delay, TimeUnit timeUnit,
+                long pushTimeNs, Object drop);
     }
 }

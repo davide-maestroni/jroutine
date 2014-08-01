@@ -20,20 +20,19 @@ import com.bmd.wtf.flw.River;
  * <p/>
  * Created by davide on 6/8/14.
  *
- * @param <SOURCE> The river source data type.
- * @param <IN>     The input data type.
- * @param <OUT>    The output data type.
+ * @param <IN>  The input data type.
+ * @param <OUT> The output data type.
  */
-public class LeapDecorator<SOURCE, IN, OUT> implements Leap<SOURCE, IN, OUT> {
+public class LeapDecorator<IN, OUT> implements Leap<IN, OUT> {
 
-    private final Leap<SOURCE, IN, OUT> mLeap;
+    private final Leap<IN, OUT> mLeap;
 
     /**
      * Default constructor.
      *
      * @param wrapped The decorated instance.
      */
-    public LeapDecorator(final Leap<SOURCE, IN, OUT> wrapped) {
+    public LeapDecorator(final Leap<IN, OUT> wrapped) {
 
         if (wrapped == null) {
 
@@ -67,21 +66,21 @@ public class LeapDecorator<SOURCE, IN, OUT> implements Leap<SOURCE, IN, OUT> {
     }
 
     @Override
-    public void onDischarge(final River<SOURCE, IN> upRiver, final River<SOURCE, OUT> downRiver,
+    public void onDischarge(final River<IN> upRiver, final River<OUT> downRiver,
             final int fallNumber) {
 
         mLeap.onDischarge(upRiver, downRiver, fallNumber);
     }
 
     @Override
-    public void onPush(final River<SOURCE, IN> upRiver, final River<SOURCE, OUT> downRiver,
-            final int fallNumber, final IN drop) {
+    public void onPush(final River<IN> upRiver, final River<OUT> downRiver, final int fallNumber,
+            final IN drop) {
 
         mLeap.onPush(upRiver, downRiver, fallNumber, drop);
     }
 
     @Override
-    public void onUnhandled(final River<SOURCE, IN> upRiver, final River<SOURCE, OUT> downRiver,
+    public void onUnhandled(final River<IN> upRiver, final River<OUT> downRiver,
             final int fallNumber, final Throwable throwable) {
 
         mLeap.onUnhandled(upRiver, downRiver, fallNumber, throwable);

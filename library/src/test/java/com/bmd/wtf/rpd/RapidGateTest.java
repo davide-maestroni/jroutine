@@ -69,8 +69,7 @@ public class RapidGateTest extends TestCase {
 
         try {
 
-            Rapid.gate(fall().asGate().start(new FreeLeap<Object, Object>()).on(FreeLeap.class))
-                 .perform();
+            Rapid.gate(fall().asGate().start(new FreeLeap<Object>()).on(FreeLeap.class)).perform();
 
             fail();
 
@@ -80,7 +79,7 @@ public class RapidGateTest extends TestCase {
 
         try {
 
-            Rapid.gate(fall().asGate().start(new FreeLeap<Object, Object>()).on(FreeLeap.class))
+            Rapid.gate(fall().asGate().start(new FreeLeap<Object>()).on(FreeLeap.class))
                  .performAs(FreeLeap.class);
 
             fail();
@@ -91,7 +90,7 @@ public class RapidGateTest extends TestCase {
 
         try {
 
-            Rapid.gate(fall().asGate().start(new FreeLeap<Object, Object>()).on(FreeLeap.class))
+            Rapid.gate(fall().asGate().start(new FreeLeap<Object>()).on(FreeLeap.class))
                  .performAs(Classification.ofType(FreeLeap.class));
 
             fail();
@@ -131,7 +130,7 @@ public class RapidGateTest extends TestCase {
         try {
 
             new DefaultRapidGate<FreeLeap>(
-                    fall().asGate().start(new FreeLeap<Object, Object>()).on(FreeLeap.class),
+                    fall().asGate().start(new FreeLeap<Object>()).on(FreeLeap.class),
                     FreeLeap.class).performAs(List.class);
 
             fail();
@@ -173,10 +172,8 @@ public class RapidGateTest extends TestCase {
                         .performAs(GateId.class)
                         .getId()).isEqualTo(1);
 
-        assertThat(Rapid.gate(fall().inBackground()
-                                    .asGate()
-                                    .start(new GateLeap2(33))
-                                    .on(GateLeap2.class))
+        assertThat(Rapid.gate(
+                fall().inBackground().asGate().start(new GateLeap2(33)).on(GateLeap2.class))
                         .eventually()
                         .when(new ConditionEvaluator<GateId>() {
 
@@ -187,33 +184,24 @@ public class RapidGateTest extends TestCase {
                             }
                         })
                         .performAs(GateId.class)
-                        .getId()
-        ).isEqualTo(33);
+                        .getId()).isEqualTo(33);
 
-        assertThat(Rapid.gate(fall().inBackground()
-                                    .asGate()
-                                    .start(new GateLeap3())
-                                    .on(GateLeap2.class))
+        assertThat(Rapid.gate(
+                fall().inBackground().asGate().start(new GateLeap3()).on(GateLeap2.class))
                         .eventually()
                         .whenSatisfies(44)
                         .performAs(GateId.class)
-                        .getId()
-        ).isEqualTo(17);
+                        .getId()).isEqualTo(17);
 
-        assertThat(Rapid.gate(fall().inBackground()
-                                    .asGate()
-                                    .start(new GateLeap4())
-                                    .on(GateLeap2.class))
+        assertThat(Rapid.gate(
+                fall().inBackground().asGate().start(new GateLeap4()).on(GateLeap2.class))
                         .eventually()
                         .whenSatisfies(44)
                         .performAs(GateId.class)
-                        .getId()
-        ).isEqualTo(71);
+                        .getId()).isEqualTo(71);
 
-        assertThat(Rapid.gate(fall().inBackground()
-                                    .asGate()
-                                    .start(new GateLeap4())
-                                    .on(GateLeap2.class))
+        assertThat(Rapid.gate(
+                fall().inBackground().asGate().start(new GateLeap4()).on(GateLeap2.class))
                         .eventually()
                         .whenSatisfies(44)
                         .perform(new Action<Integer, GateLeap2>() {
@@ -223,8 +211,7 @@ public class RapidGateTest extends TestCase {
 
                                 return leap.getId();
                             }
-                        })
-        ).isEqualTo(71);
+                        })).isEqualTo(71);
     }
 
     public interface GateId {
@@ -232,7 +219,7 @@ public class RapidGateTest extends TestCase {
         public int getId();
     }
 
-    public static class GateLeap extends FreeLeap<Object, Object> implements GateId {
+    public static class GateLeap extends FreeLeap<Object> implements GateId {
 
         @Override
         public int getId() {

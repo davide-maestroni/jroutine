@@ -20,22 +20,21 @@ import com.bmd.wtf.flw.River;
  * <p/>
  * Created by davide on 6/9/14.
  *
- * @param <SOURCE> The river source data type.
- * @param <IN>     The input data type.
- * @param <OUT>    The output data type.
+ * @param <IN>  The input data type.
+ * @param <OUT> The output data type.
  * @see FreeLeap
  */
-public abstract class AbstractLeap<SOURCE, IN, OUT> implements Leap<SOURCE, IN, OUT> {
+public abstract class AbstractLeap<IN, OUT> implements Leap<IN, OUT> {
 
     @Override
-    public void onDischarge(final River<SOURCE, IN> upRiver, final River<SOURCE, OUT> downRiver,
+    public void onDischarge(final River<IN> upRiver, final River<OUT> downRiver,
             final int fallNumber) {
 
         downRiver.discharge();
     }
 
     @Override
-    public void onUnhandled(final River<SOURCE, IN> upRiver, final River<SOURCE, OUT> downRiver,
+    public void onUnhandled(final River<IN> upRiver, final River<OUT> downRiver,
             final int fallNumber, final Throwable throwable) {
 
         downRiver.forward(throwable);

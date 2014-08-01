@@ -33,7 +33,7 @@ class DataGate<TYPE> implements Gate<TYPE> {
 
     private final Condition mCondition;
 
-    private final Leap<?, ?, ?> mLeap;
+    private final Leap<?, ?> mLeap;
 
     private final ReentrantLock mLock;
 
@@ -49,7 +49,7 @@ class DataGate<TYPE> implements Gate<TYPE> {
      * @param leap           The gate leap.
      * @param classification The gate classification.
      */
-    public DataGate(final GateLeap<?, ?, ?> leap, final Classification<TYPE> classification) {
+    public DataGate(final GateLeap<?, ?> leap, final Classification<TYPE> classification) {
 
         if (classification == null) {
 

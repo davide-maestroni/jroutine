@@ -26,7 +26,7 @@ import java.util.HashMap;
 /**
  * Observer of downloaded urls filtering the ones already in progress.
  */
-public class DownloadObserver extends RapidLeap<Object> implements UriObserver {
+public class DownloadObserver extends RapidLeap implements UriObserver {
 
     private final HashMap<URI, Download> mDownloaded = new HashMap<URI, Download>();
 

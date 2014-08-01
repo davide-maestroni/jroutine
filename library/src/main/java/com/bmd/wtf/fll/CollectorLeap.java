@@ -25,16 +25,15 @@ import java.util.List;
  * <p/>
  * Created by davide on 6/13/14.
  *
- * @param <SOURCE> The source data type.
- * @param <DATA>   The data type.
+ * @param <DATA> The data type.
  */
-class CollectorLeap<SOURCE, DATA> extends FreeLeap<SOURCE, DATA> {
+class CollectorLeap<DATA> extends FreeLeap<DATA> {
 
-    private static final Action<Boolean, CollectorLeap<?, ?>> ACTION_EMPTY =
-            new Action<Boolean, CollectorLeap<?, ?>>() {
+    private static final Action<Boolean, CollectorLeap<?>> ACTION_EMPTY =
+            new Action<Boolean, CollectorLeap<?>>() {
 
                 @Override
-                public Boolean doOn(final CollectorLeap<?, ?> collector, final Object... args) {
+                public Boolean doOn(final CollectorLeap<?> collector, final Object... args) {
 
                     return collector.isEmpty();
                 }
@@ -46,12 +45,11 @@ class CollectorLeap<SOURCE, DATA> extends FreeLeap<SOURCE, DATA> {
 
     private Throwable mUnhandled;
 
-    private final Action<DATA, CollectorLeap<SOURCE, DATA>> ACTION_PULL =
-            new Action<DATA, CollectorLeap<SOURCE, DATA>>() {
+    private final Action<DATA, CollectorLeap<DATA>> ACTION_PULL =
+            new Action<DATA, CollectorLeap<DATA>>() {
 
                 @Override
-                public DATA doOn(final CollectorLeap<SOURCE, DATA> collector,
-                        final Object... args) {
+                public DATA doOn(final CollectorLeap<DATA> collector, final Object... args) {
 
                     final Throwable throwable = collector.mUnhandled;
 
@@ -64,11 +62,11 @@ class CollectorLeap<SOURCE, DATA> extends FreeLeap<SOURCE, DATA> {
                 }
             };
 
-    private static final Action<Void, CollectorLeap<?, ?>> ACTION_PULL_ALL =
-            new Action<Void, CollectorLeap<?, ?>>() {
+    private static final Action<Void, CollectorLeap<?>> ACTION_PULL_ALL =
+            new Action<Void, CollectorLeap<?>>() {
 
                 @Override
-                public Void doOn(final CollectorLeap<?, ?> collector, final Object... args) {
+                public Void doOn(final CollectorLeap<?> collector, final Object... args) {
 
                     final Throwable throwable = collector.mUnhandled;
 
@@ -103,13 +101,13 @@ class CollectorLeap<SOURCE, DATA> extends FreeLeap<SOURCE, DATA> {
      *
      * @return The action.
      */
-    public Action<Boolean, CollectorLeap<?, ?>> isEmptyAction() {
+    public Action<Boolean, CollectorLeap<?>> isEmptyAction() {
 
         return ACTION_EMPTY;
     }
 
     @Override
-    public void onDischarge(final River<SOURCE, DATA> upRiver, final River<SOURCE, DATA> downRiver,
+    public void onDischarge(final River<DATA> upRiver, final River<DATA> downRiver,
             final int fallNumber) {
 
         upRiver.deviate();
@@ -119,14 +117,14 @@ class CollectorLeap<SOURCE, DATA> extends FreeLeap<SOURCE, DATA> {
     }
 
     @Override
-    public void onPush(final River<SOURCE, DATA> upRiver, final River<SOURCE, DATA> downRiver,
-            final int fallNumber, final DATA drop) {
+    public void onPush(final River<DATA> upRiver, final River<DATA> downRiver, final int fallNumber,
+            final DATA drop) {
 
         mData.add(drop);
     }
 
     @Override
-    public void onUnhandled(final River<SOURCE, DATA> upRiver, final River<SOURCE, DATA> downRiver,
+    public void onUnhandled(final River<DATA> upRiver, final River<DATA> downRiver,
             final int fallNumber, final Throwable throwable) {
 
         upRiver.deviate();
@@ -142,7 +140,7 @@ class CollectorLeap<SOURCE, DATA> extends FreeLeap<SOURCE, DATA> {
      *
      * @return The action.
      */
-    public Action<DATA, CollectorLeap<SOURCE, DATA>> pullAction() {
+    public Action<DATA, CollectorLeap<DATA>> pullAction() {
 
         return ACTION_PULL;
     }
@@ -152,7 +150,7 @@ class CollectorLeap<SOURCE, DATA> extends FreeLeap<SOURCE, DATA> {
      *
      * @return The action.
      */
-    public Action<Void, CollectorLeap<?, ?>> pullAllAction() {
+    public Action<Void, CollectorLeap<?>> pullAllAction() {
 
         return ACTION_PULL_ALL;
     }

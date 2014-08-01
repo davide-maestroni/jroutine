@@ -33,13 +33,13 @@ import java.util.concurrent.TimeUnit;
  */
 class DataStream<DATA> implements Stream<DATA> {
 
-    private final DataFall<?, DATA, ?> mDownstreamFall;
+    private final DataFall<DATA, ?> mDownstreamFall;
 
     private final Current mOutCurrent;
 
     private final boolean mPassThrough;
 
-    private final DataFall<?, ?, DATA> mUpstreamFall;
+    private final DataFall<?, DATA> mUpstreamFall;
 
     /**
      * Constructor.
@@ -47,8 +47,8 @@ class DataStream<DATA> implements Stream<DATA> {
      * @param upstreamFall   The upstream fall.
      * @param downstreamFall The downstream fall.
      */
-    public DataStream(final DataFall<?, ?, DATA> upstreamFall,
-            final DataFall<?, DATA, ?> downstreamFall) {
+    public DataStream(final DataFall<?, DATA> upstreamFall,
+            final DataFall<DATA, ?> downstreamFall) {
 
         if (upstreamFall == null) {
 
@@ -70,7 +70,7 @@ class DataStream<DATA> implements Stream<DATA> {
     @Override
     public Stream<DATA> discharge() {
 
-        final DataFall<?, DATA, ?> fall = mDownstreamFall;
+        final DataFall<DATA, ?> fall = mDownstreamFall;
 
         if (mPassThrough) {
 
@@ -127,7 +127,7 @@ class DataStream<DATA> implements Stream<DATA> {
     @Override
     public Stream<DATA> forward(final Throwable throwable) {
 
-        final DataFall<?, DATA, ?> fall = mDownstreamFall;
+        final DataFall<DATA, ?> fall = mDownstreamFall;
 
         fall.raiseLevel(1);
 
@@ -153,7 +153,7 @@ class DataStream<DATA> implements Stream<DATA> {
             return this;
         }
 
-        final DataFall<?, DATA, ?> fall = mDownstreamFall;
+        final DataFall<DATA, ?> fall = mDownstreamFall;
 
         fall.raiseLevel(drops.length);
 
@@ -185,7 +185,7 @@ class DataStream<DATA> implements Stream<DATA> {
             return this;
         }
 
-        final DataFall<?, DATA, ?> fall = mDownstreamFall;
+        final DataFall<DATA, ?> fall = mDownstreamFall;
 
         int size = 0;
 
@@ -222,7 +222,7 @@ class DataStream<DATA> implements Stream<DATA> {
     @Override
     public Stream<DATA> push(final DATA drop) {
 
-        final DataFall<?, DATA, ?> fall = mDownstreamFall;
+        final DataFall<DATA, ?> fall = mDownstreamFall;
 
         fall.raiseLevel(1);
 
@@ -247,7 +247,7 @@ class DataStream<DATA> implements Stream<DATA> {
             return this;
         }
 
-        final DataFall<?, DATA, ?> fall = mDownstreamFall;
+        final DataFall<DATA, ?> fall = mDownstreamFall;
         final ArrayList<DATA> list = new ArrayList<DATA>();
 
         for (final DATA drop : drops) {
@@ -268,7 +268,7 @@ class DataStream<DATA> implements Stream<DATA> {
     @Override
     public Stream<DATA> pushAfter(final long delay, final TimeUnit timeUnit, final DATA drop) {
 
-        final DataFall<?, DATA, ?> fall = mDownstreamFall;
+        final DataFall<DATA, ?> fall = mDownstreamFall;
 
         fall.raiseLevel(1);
 
@@ -285,7 +285,7 @@ class DataStream<DATA> implements Stream<DATA> {
             return this;
         }
 
-        final DataFall<?, DATA, ?> fall = mDownstreamFall;
+        final DataFall<DATA, ?> fall = mDownstreamFall;
 
         fall.raiseLevel(drops.length);
 
@@ -344,7 +344,7 @@ class DataStream<DATA> implements Stream<DATA> {
         return true;
     }
 
-    boolean canReach(final Collection<? extends DataFall<?, ?, ?>> falls) {
+    boolean canReach(final Collection<? extends DataFall<?, ?>> falls) {
 
         final ReachabilityVisitor visitor = new ReachabilityVisitor(falls);
 
@@ -375,7 +375,7 @@ class DataStream<DATA> implements Stream<DATA> {
 
         final boolean isDownstream = (direction == Direction.DOWNSTREAM);
 
-        final DataFall<?, ?, ?> fall = isDownstream ? mDownstreamFall : mUpstreamFall;
+        final DataFall<?, ?> fall = isDownstream ? mDownstreamFall : mUpstreamFall;
         final CopyOnWriteArrayList<? extends DataStream<?>> poolStreams =
                 (isDownstream ? fall.outputStreams : fall.inputStreams);
 
@@ -503,9 +503,9 @@ class DataStream<DATA> implements Stream<DATA> {
      */
     private static class ReachabilityVisitor implements WaterfallVisitor {
 
-        private final Collection<? extends DataFall<?, ?, ?>> mFalls;
+        private final Collection<? extends DataFall<?, ?>> mFalls;
 
-        public ReachabilityVisitor(final Collection<? extends DataFall<?, ?, ?>> falls) {
+        public ReachabilityVisitor(final Collection<? extends DataFall<?, ?>> falls) {
 
             mFalls = falls;
         }

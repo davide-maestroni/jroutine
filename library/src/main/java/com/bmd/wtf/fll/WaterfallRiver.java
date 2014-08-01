@@ -23,14 +23,13 @@ import java.util.concurrent.TimeUnit;
  * <p/>
  * Created by davide on 6/7/14.
  *
- * @param <SOURCE> The source data type.
- * @param <DATA>   The data type.
+ * @param <DATA> The data type.
  */
-public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
+public class WaterfallRiver<DATA> implements River<DATA> {
 
     private final Direction mDirection;
 
-    private final Waterfall<SOURCE, DATA, ?> mWaterfall;
+    private final Waterfall<?, DATA, ?> mWaterfall;
 
     /**
      * Constructor.
@@ -38,7 +37,7 @@ public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
      * @param waterfall The wrapped waterfall.
      * @param direction Whether the river direction is downstream or upstream.
      */
-    public WaterfallRiver(final Waterfall<SOURCE, DATA, ?> waterfall, final Direction direction) {
+    public WaterfallRiver(final Waterfall<?, DATA, ?> waterfall, final Direction direction) {
 
         if (waterfall == null) {
 
@@ -62,7 +61,7 @@ public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public River<SOURCE, DATA> discharge() {
+    public River<DATA> discharge() {
 
         mWaterfall.discharge();
 
@@ -70,7 +69,7 @@ public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public River<SOURCE, DATA> discharge(final DATA... drops) {
+    public River<DATA> discharge(final DATA... drops) {
 
         mWaterfall.discharge(drops);
 
@@ -78,7 +77,7 @@ public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public River<SOURCE, DATA> discharge(final Iterable<? extends DATA> drops) {
+    public River<DATA> discharge(final Iterable<? extends DATA> drops) {
 
         mWaterfall.discharge(drops);
 
@@ -86,7 +85,7 @@ public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public River<SOURCE, DATA> discharge(final DATA drop) {
+    public River<DATA> discharge(final DATA drop) {
 
         mWaterfall.discharge(drop);
 
@@ -94,7 +93,7 @@ public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public River<SOURCE, DATA> dischargeAfter(final long delay, final TimeUnit timeUnit,
+    public River<DATA> dischargeAfter(final long delay, final TimeUnit timeUnit,
             final Iterable<? extends DATA> drops) {
 
         mWaterfall.dischargeAfter(delay, timeUnit, drops);
@@ -103,8 +102,7 @@ public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public River<SOURCE, DATA> dischargeAfter(final long delay, final TimeUnit timeUnit,
-            final DATA drop) {
+    public River<DATA> dischargeAfter(final long delay, final TimeUnit timeUnit, final DATA drop) {
 
         mWaterfall.dischargeAfter(delay, timeUnit, drop);
 
@@ -112,7 +110,7 @@ public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public River<SOURCE, DATA> dischargeAfter(final long delay, final TimeUnit timeUnit,
+    public River<DATA> dischargeAfter(final long delay, final TimeUnit timeUnit,
             final DATA... drops) {
 
         mWaterfall.dischargeAfter(delay, timeUnit, drops);
@@ -121,7 +119,7 @@ public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public River<SOURCE, DATA> forward(final Throwable throwable) {
+    public River<DATA> forward(final Throwable throwable) {
 
         mWaterfall.forward(throwable);
 
@@ -129,7 +127,7 @@ public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public River<SOURCE, DATA> push(final DATA... drops) {
+    public River<DATA> push(final DATA... drops) {
 
         mWaterfall.push(drops);
 
@@ -137,7 +135,7 @@ public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public River<SOURCE, DATA> push(final Iterable<? extends DATA> drops) {
+    public River<DATA> push(final Iterable<? extends DATA> drops) {
 
         mWaterfall.push(drops);
 
@@ -145,7 +143,7 @@ public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public River<SOURCE, DATA> push(final DATA drop) {
+    public River<DATA> push(final DATA drop) {
 
         mWaterfall.push(drop);
 
@@ -153,7 +151,7 @@ public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public River<SOURCE, DATA> pushAfter(final long delay, final TimeUnit timeUnit,
+    public River<DATA> pushAfter(final long delay, final TimeUnit timeUnit,
             final Iterable<? extends DATA> drops) {
 
         mWaterfall.pushAfter(delay, timeUnit, drops);
@@ -162,8 +160,7 @@ public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public River<SOURCE, DATA> pushAfter(final long delay, final TimeUnit timeUnit,
-            final DATA drop) {
+    public River<DATA> pushAfter(final long delay, final TimeUnit timeUnit, final DATA drop) {
 
         mWaterfall.pushAfter(delay, timeUnit, drop);
 
@@ -171,8 +168,7 @@ public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public River<SOURCE, DATA> pushAfter(final long delay, final TimeUnit timeUnit,
-            final DATA... drops) {
+    public River<DATA> pushAfter(final long delay, final TimeUnit timeUnit, final DATA... drops) {
 
         mWaterfall.pushAfter(delay, timeUnit, drops);
 
@@ -180,7 +176,7 @@ public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public River<SOURCE, DATA> dischargeStream(final int streamNumber) {
+    public River<DATA> dischargeStream(final int streamNumber) {
 
         mWaterfall.dischargeStream(streamNumber);
 
@@ -188,7 +184,7 @@ public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public River<SOURCE, DATA> dischargeStream(final int streamNumber, final DATA... drops) {
+    public River<DATA> dischargeStream(final int streamNumber, final DATA... drops) {
 
         mWaterfall.dischargeStream(streamNumber, drops);
 
@@ -196,7 +192,7 @@ public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public River<SOURCE, DATA> dischargeStream(final int streamNumber,
+    public River<DATA> dischargeStream(final int streamNumber,
             final Iterable<? extends DATA> drops) {
 
         mWaterfall.dischargeStream(streamNumber, drops);
@@ -205,7 +201,7 @@ public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public River<SOURCE, DATA> dischargeStream(final int streamNumber, final DATA drop) {
+    public River<DATA> dischargeStream(final int streamNumber, final DATA drop) {
 
         mWaterfall.dischargeStream(streamNumber, drop);
 
@@ -213,7 +209,7 @@ public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public River<SOURCE, DATA> dischargeStreamAfter(final int streamNumber, final long delay,
+    public River<DATA> dischargeStreamAfter(final int streamNumber, final long delay,
             final TimeUnit timeUnit, final Iterable<? extends DATA> drops) {
 
         mWaterfall.dischargeStreamAfter(streamNumber, delay, timeUnit, drops);
@@ -222,7 +218,7 @@ public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public River<SOURCE, DATA> dischargeStreamAfter(final int streamNumber, final long delay,
+    public River<DATA> dischargeStreamAfter(final int streamNumber, final long delay,
             final TimeUnit timeUnit, final DATA drop) {
 
         mWaterfall.dischargeStreamAfter(streamNumber, delay, timeUnit, drop);
@@ -231,7 +227,7 @@ public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public River<SOURCE, DATA> dischargeStreamAfter(final int streamNumber, final long delay,
+    public River<DATA> dischargeStreamAfter(final int streamNumber, final long delay,
             final TimeUnit timeUnit, final DATA... drops) {
 
         mWaterfall.dischargeStreamAfter(streamNumber, delay, timeUnit, drops);
@@ -252,7 +248,7 @@ public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public River<SOURCE, DATA> forwardStream(final int streamNumber, final Throwable throwable) {
+    public River<DATA> forwardStream(final int streamNumber, final Throwable throwable) {
 
         mWaterfall.forwardStream(streamNumber, throwable);
 
@@ -278,7 +274,7 @@ public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public River<SOURCE, DATA> pushStream(final int streamNumber, final DATA... drops) {
+    public River<DATA> pushStream(final int streamNumber, final DATA... drops) {
 
         mWaterfall.pushStream(streamNumber, drops);
 
@@ -286,8 +282,7 @@ public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public River<SOURCE, DATA> pushStream(final int streamNumber,
-            final Iterable<? extends DATA> drops) {
+    public River<DATA> pushStream(final int streamNumber, final Iterable<? extends DATA> drops) {
 
         mWaterfall.pushStream(streamNumber, drops);
 
@@ -295,7 +290,7 @@ public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public River<SOURCE, DATA> pushStream(final int streamNumber, final DATA drop) {
+    public River<DATA> pushStream(final int streamNumber, final DATA drop) {
 
         mWaterfall.pushStream(streamNumber, drop);
 
@@ -303,7 +298,7 @@ public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public River<SOURCE, DATA> pushStreamAfter(final int streamNumber, final long delay,
+    public River<DATA> pushStreamAfter(final int streamNumber, final long delay,
             final TimeUnit timeUnit, final Iterable<? extends DATA> drops) {
 
         mWaterfall.pushStreamAfter(streamNumber, delay, timeUnit, drops);
@@ -312,7 +307,7 @@ public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public River<SOURCE, DATA> pushStreamAfter(final int streamNumber, final long delay,
+    public River<DATA> pushStreamAfter(final int streamNumber, final long delay,
             final TimeUnit timeUnit, final DATA drop) {
 
         mWaterfall.pushStreamAfter(streamNumber, delay, timeUnit, drop);
@@ -321,7 +316,7 @@ public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     }
 
     @Override
-    public River<SOURCE, DATA> pushStreamAfter(final int streamNumber, final long delay,
+    public River<DATA> pushStreamAfter(final int streamNumber, final long delay,
             final TimeUnit timeUnit, final DATA... drops) {
 
         mWaterfall.pushStreamAfter(streamNumber, delay, timeUnit, drops);
@@ -333,11 +328,5 @@ public class WaterfallRiver<SOURCE, DATA> implements River<SOURCE, DATA> {
     public int size() {
 
         return mWaterfall.size();
-    }
-
-    @Override
-    public River<SOURCE, SOURCE> source() {
-
-        return mWaterfall.source();
     }
 }

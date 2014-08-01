@@ -25,15 +25,14 @@ import java.util.concurrent.locks.ReentrantLock;
  * <p/>
  * Created by davide on 6/13/14.
  *
- * @param <SOURCE> The source data type.
- * @param <IN>     The input data type.
- * @param <OUT>    The output data type.
+ * @param <IN>  The input data type.
+ * @param <OUT> The output data type.
  */
-class GateLeap<SOURCE, IN, OUT> extends LeapDecorator<SOURCE, IN, OUT> {
+class GateLeap<IN, OUT> extends LeapDecorator<IN, OUT> {
 
     final Condition condition;
 
-    final Leap<SOURCE, IN, OUT> leap;
+    final Leap<IN, OUT> leap;
 
     final ReentrantLock lock;
 
@@ -42,7 +41,7 @@ class GateLeap<SOURCE, IN, OUT> extends LeapDecorator<SOURCE, IN, OUT> {
      *
      * @param wrapped The wrapped leap.
      */
-    public GateLeap(final Leap<SOURCE, IN, OUT> wrapped) {
+    public GateLeap(final Leap<IN, OUT> wrapped) {
 
         super(wrapped);
 
@@ -52,7 +51,7 @@ class GateLeap<SOURCE, IN, OUT> extends LeapDecorator<SOURCE, IN, OUT> {
     }
 
     @Override
-    public void onDischarge(final River<SOURCE, IN> upRiver, final River<SOURCE, OUT> downRiver,
+    public void onDischarge(final River<IN> upRiver, final River<OUT> downRiver,
             final int fallNumber) {
 
         final ReentrantLock lock = this.lock;
@@ -71,8 +70,8 @@ class GateLeap<SOURCE, IN, OUT> extends LeapDecorator<SOURCE, IN, OUT> {
     }
 
     @Override
-    public void onPush(final River<SOURCE, IN> upRiver, final River<SOURCE, OUT> downRiver,
-            final int fallNumber, final IN drop) {
+    public void onPush(final River<IN> upRiver, final River<OUT> downRiver, final int fallNumber,
+            final IN drop) {
 
         final ReentrantLock lock = this.lock;
         lock.lock();
@@ -90,7 +89,7 @@ class GateLeap<SOURCE, IN, OUT> extends LeapDecorator<SOURCE, IN, OUT> {
     }
 
     @Override
-    public void onUnhandled(final River<SOURCE, IN> upRiver, final River<SOURCE, OUT> downRiver,
+    public void onUnhandled(final River<IN> upRiver, final River<OUT> downRiver,
             final int fallNumber, final Throwable throwable) {
 
         final ReentrantLock lock = this.lock;

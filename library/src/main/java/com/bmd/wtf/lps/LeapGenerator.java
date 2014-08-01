@@ -18,11 +18,10 @@ package com.bmd.wtf.lps;
  * <p/>
  * Created by davide on 6/8/14.
  *
- * @param <SOURCE> The river source data type.
- * @param <IN>     The input data type.
- * @param <OUT>    The output data type.
+ * @param <IN>  The input data type.
+ * @param <OUT> The output data type.
  */
-public interface LeapGenerator<SOURCE, IN, OUT> {
+public interface LeapGenerator<IN, OUT> {
 
     /**
      * Creates and returns the leap forming the specified fall.
@@ -30,5 +29,5 @@ public interface LeapGenerator<SOURCE, IN, OUT> {
      * @param fallNumber The number identifying the fall.
      * @return The leap.
      */
-    public Leap<SOURCE, IN, OUT> start(int fallNumber);
+    public Leap<IN, OUT> start(int fallNumber);
 }

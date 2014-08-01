@@ -33,26 +33,23 @@ public class LeapTest extends TestCase {
 
     public void testDecorator() {
 
-        final Leap<Object, Object, Object> dam1 = new FreeLeap<Object, Object>();
-        final Leap<Object, Object, Object> dam2 = new FreeLeap<Object, Object>();
+        final Leap<Object, Object> dam1 = new FreeLeap<Object>();
+        final Leap<Object, Object> dam2 = new FreeLeap<Object>();
 
-        final LeapDecorator<Object, Object, Object> decorator1 =
-                new LeapDecorator<Object, Object, Object>(dam1);
-        final LeapDecorator<Object, Object, Object> decorator2 =
-                new LeapDecorator<Object, Object, Object>(dam1);
-        final LeapDecorator<Object, Object, Object> decorator3 =
-                new LeapDecorator<Object, Object, Object>(dam2);
+        final LeapDecorator<Object, Object> decorator1 = new LeapDecorator<Object, Object>(dam1);
+        final LeapDecorator<Object, Object> decorator2 = new LeapDecorator<Object, Object>(dam1);
+        final LeapDecorator<Object, Object> decorator3 = new LeapDecorator<Object, Object>(dam2);
 
         assertThat(decorator1).isEqualTo(decorator1);
         assertThat(decorator1).isEqualTo(decorator2);
         assertThat(decorator1.hashCode()).isEqualTo(decorator2.hashCode());
-        assertThat(decorator1).isNotEqualTo(new LeapDecorator<Object, Object, Object>(decorator1));
+        assertThat(decorator1).isNotEqualTo(new LeapDecorator<Object, Object>(decorator1));
         assertThat(decorator1).isNotEqualTo(null);
         assertThat(decorator1).isNotEqualTo(decorator3);
 
         try {
 
-            new LeapDecorator<Object, Object, Object>(null);
+            new LeapDecorator<Object, Object>(null);
 
             fail();
 
@@ -63,9 +60,9 @@ public class LeapTest extends TestCase {
 
     public void testWeak() {
 
-        FreeLeap<Object, Object> freeLeap = new FreeLeap<Object, Object>();
-        final Leap<Object, Object, Object> weak1 = Leaps.weak(freeLeap);
-        final Leap<Object, Object, Object> weak2 = Leaps.weak(freeLeap);
+        FreeLeap<Object> freeLeap = new FreeLeap<Object>();
+        final Leap<Object, Object> weak1 = Leaps.weak(freeLeap);
+        final Leap<Object, Object> weak2 = Leaps.weak(freeLeap);
 
         assertThat(weak1).isEqualTo(weak1);
         assertThat(weak1).isEqualTo(weak2);
@@ -75,7 +72,7 @@ public class LeapTest extends TestCase {
         assertThat(weak1.equals("test")).isFalse();
         assertThat(weak1.hashCode()).isEqualTo(weak2.hashCode());
 
-        final Leap<Object, Object, Object> weak3 = Leaps.weak(freeLeap, WhenVanished.CLOSE);
+        final Leap<Object, Object> weak3 = Leaps.weak(freeLeap, WhenVanished.CLOSE);
 
         assertThat(weak1).isNotEqualTo(weak3);
         assertThat(weak2).isNotEqualTo(weak3);
@@ -91,7 +88,8 @@ public class LeapTest extends TestCase {
         assertThat(weak1).isNotEqualTo(weak3);
         assertThat(weak2).isNotEqualTo(weak3);
 
-        freeLeap = new FreeLeap<Object, Object>();
+        //noinspection UnusedAssignment
+        freeLeap = new FreeLeap<Object>();
 
         assertThat(weak1).isNotEqualTo(weak3);
         assertThat(weak2).isNotEqualTo(weak3);
@@ -105,13 +103,13 @@ public class LeapTest extends TestCase {
         assertThat(weak1).isNotEqualTo(weak3);
         assertThat(weak2).isNotEqualTo(weak3);
 
-        Leap<Object, Object, Object> leap1 = new AbstractLeap<Object, Object, Object>() {
+        Leap<Object, Object> leap1 = new AbstractLeap<Object, Object>() {
 
             private Object mLast;
 
             @Override
-            public void onDischarge(final River<Object, Object> upRiver,
-                    final River<Object, Object> downRiver, final int fallNumber) {
+            public void onDischarge(final River<Object> upRiver, final River<Object> downRiver,
+                    final int fallNumber) {
 
                 if ("flush1".equals(mLast)) {
 
@@ -122,9 +120,8 @@ public class LeapTest extends TestCase {
             }
 
             @Override
-            public void onPush(final River<Object, Object> upRiver,
-                    final River<Object, Object> downRiver, final int fallNumber,
-                    final Object drop) {
+            public void onPush(final River<Object> upRiver, final River<Object> downRiver,
+                    final int fallNumber, final Object drop) {
 
                 mLast = drop;
 
@@ -144,9 +141,8 @@ public class LeapTest extends TestCase {
             }
 
             @Override
-            public void onUnhandled(final River<Object, Object> upRiver,
-                    final River<Object, Object> downRiver, final int fallNumber,
-                    final Throwable throwable) {
+            public void onUnhandled(final River<Object> upRiver, final River<Object> downRiver,
+                    final int fallNumber, final Throwable throwable) {
 
                 if ("push1".equals(throwable.getMessage())) {
 
@@ -160,13 +156,13 @@ public class LeapTest extends TestCase {
         };
         final Waterfall<Object, Object, Object> waterfall1 =
                 fall().start(Leaps.weak(leap1, WhenVanished.CLOSE));
-        Leap<Object, Object, Object> leap2 = new AbstractLeap<Object, Object, Object>() {
+        Leap<Object, Object> leap2 = new AbstractLeap<Object, Object>() {
 
             private Object mLast;
 
             @Override
-            public void onDischarge(final River<Object, Object> upRiver,
-                    final River<Object, Object> downRiver, final int fallNumber) {
+            public void onDischarge(final River<Object> upRiver, final River<Object> downRiver,
+                    final int fallNumber) {
 
                 if ("flush2".equals(mLast)) {
 
@@ -177,9 +173,8 @@ public class LeapTest extends TestCase {
             }
 
             @Override
-            public void onPush(final River<Object, Object> upRiver,
-                    final River<Object, Object> downRiver, final int fallNumber,
-                    final Object drop) {
+            public void onPush(final River<Object> upRiver, final River<Object> downRiver,
+                    final int fallNumber, final Object drop) {
 
                 mLast = drop;
 
@@ -202,9 +197,8 @@ public class LeapTest extends TestCase {
 
 
             @Override
-            public void onUnhandled(final River<Object, Object> upRiver,
-                    final River<Object, Object> downRiver, final int fallNumber,
-                    final Throwable throwable) {
+            public void onUnhandled(final River<Object> upRiver, final River<Object> downRiver,
+                    final int fallNumber, final Throwable throwable) {
 
                 if ("push2".equals((throwable).getMessage())) {
 
@@ -217,7 +211,7 @@ public class LeapTest extends TestCase {
         final Waterfall<Object, Object, Object> waterfall2 =
                 waterfall1.chain(Leaps.weak(leap2, WhenVanished.OPEN));
 
-        freeLeap = new FreeLeap<Object, Object>();
+        freeLeap = new FreeLeap<Object>();
 
         final Waterfall<Object, Object, Object> waterfall3 =
                 waterfall2.chain(Leaps.weak(freeLeap, WhenVanished.CLOSE));

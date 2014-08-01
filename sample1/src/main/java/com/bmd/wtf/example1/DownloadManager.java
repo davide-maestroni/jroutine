@@ -65,7 +65,7 @@ public class DownloadManager {
         final Download download =
                 new Download(uri, new File(mDownloadDir, DownloadUtils.getFileName(uri)));
 
-        return (Boolean) fall().in(mCurrent).chain(new Downloader()).chain(new RapidLeap<Object>() {
+        return (Boolean) fall().in(mCurrent).chain(new Downloader()).chain(new RapidLeap() {
 
             @SuppressWarnings("UnusedDeclaration")
             public boolean onSuccess(final DownloadSuccess ignored) {

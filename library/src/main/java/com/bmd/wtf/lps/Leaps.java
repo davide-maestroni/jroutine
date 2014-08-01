@@ -32,15 +32,14 @@ public class Leaps {
     /**
      * Creates and returns a leap retaining the specified instance through a weak reference.
      *
-     * @param leap     The wrapped leap instance.
-     * @param <SOURCE> The river source data type.
-     * @param <IN>     The input data type.
-     * @param <OUT>    The output data type.
+     * @param leap  The wrapped leap instance.
+     * @param <IN>  The input data type.
+     * @param <OUT> The output data type.
      * @return The wrapping leap.
      */
-    public static <SOURCE, IN, OUT> Leap<SOURCE, IN, OUT> weak(final Leap<SOURCE, IN, OUT> leap) {
+    public static <IN, OUT> Leap<IN, OUT> weak(final Leap<IN, OUT> leap) {
 
-        return new WeakLeap<SOURCE, IN, OUT>(leap);
+        return new WeakLeap<IN, OUT>(leap);
     }
 
     /**
@@ -49,14 +48,13 @@ public class Leaps {
      * @param leap         The wrapped leap instance.
      * @param whenVanished Whether the wrapping leap must behave like a free one or not after the
      *                     retained instance has vanished.
-     * @param <SOURCE>     The river source data type.
      * @param <IN>         The input data type.
      * @param <OUT>        The output data type.
      * @return The wrapping leap.
      */
-    public static <SOURCE, IN, OUT> Leap<SOURCE, IN, OUT> weak(final Leap<SOURCE, IN, OUT> leap,
+    public static <IN, OUT> Leap<IN, OUT> weak(final Leap<IN, OUT> leap,
             final WhenVanished whenVanished) {
 
-        return new WeakLeap<SOURCE, IN, OUT>(leap, whenVanished);
+        return new WeakLeap<IN, OUT>(leap, whenVanished);
     }
 }

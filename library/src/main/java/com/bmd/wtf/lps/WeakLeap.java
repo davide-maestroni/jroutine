@@ -22,9 +22,9 @@ import java.lang.ref.WeakReference;
  * <p/>
  * Created by davide on 6/8/14.
  */
-class WeakLeap<SOURCE, IN, OUT> implements Leap<SOURCE, IN, OUT> {
+class WeakLeap<IN, OUT> implements Leap<IN, OUT> {
 
-    private final WeakReference<Leap<SOURCE, IN, OUT>> mLeap;
+    private final WeakReference<Leap<IN, OUT>> mLeap;
 
     private final WhenVanished mWhenVanished;
 
@@ -33,7 +33,7 @@ class WeakLeap<SOURCE, IN, OUT> implements Leap<SOURCE, IN, OUT> {
      *
      * @param wrapped The wrapped leap.
      */
-    public WeakLeap(final Leap<SOURCE, IN, OUT> wrapped) {
+    public WeakLeap(final Leap<IN, OUT> wrapped) {
 
         this(wrapped, WhenVanished.OPEN);
     }
@@ -45,14 +45,14 @@ class WeakLeap<SOURCE, IN, OUT> implements Leap<SOURCE, IN, OUT> {
      * @param whenVanished Whether this instance must behave like a free leap or not after the
      *                     wrapped instance is garbage collected.
      */
-    public WeakLeap(final Leap<SOURCE, IN, OUT> wrapped, final WhenVanished whenVanished) {
+    public WeakLeap(final Leap<IN, OUT> wrapped, final WhenVanished whenVanished) {
 
         if (wrapped == null) {
 
             throw new IllegalArgumentException("wrapped leap cannot be null");
         }
 
-        mLeap = new WeakReference<Leap<SOURCE, IN, OUT>>(wrapped);
+        mLeap = new WeakReference<Leap<IN, OUT>>(wrapped);
         mWhenVanished = whenVanished;
     }
 
@@ -61,7 +61,7 @@ class WeakLeap<SOURCE, IN, OUT> implements Leap<SOURCE, IN, OUT> {
 
         int result = mWhenVanished.hashCode();
 
-        final Leap<SOURCE, IN, OUT> leap = mLeap.get();
+        final Leap<IN, OUT> leap = mLeap.get();
 
         if (leap != null) {
 
@@ -98,10 +98,10 @@ class WeakLeap<SOURCE, IN, OUT> implements Leap<SOURCE, IN, OUT> {
     }
 
     @Override
-    public void onDischarge(final River<SOURCE, IN> upRiver, final River<SOURCE, OUT> downRiver,
+    public void onDischarge(final River<IN> upRiver, final River<OUT> downRiver,
             final int fallNumber) {
 
-        final Leap<SOURCE, IN, OUT> leap = mLeap.get();
+        final Leap<IN, OUT> leap = mLeap.get();
 
         if (leap != null) {
 
@@ -114,10 +114,10 @@ class WeakLeap<SOURCE, IN, OUT> implements Leap<SOURCE, IN, OUT> {
     }
 
     @Override
-    public void onPush(final River<SOURCE, IN> upRiver, final River<SOURCE, OUT> downRiver,
-            final int fallNumber, final IN drop) {
+    public void onPush(final River<IN> upRiver, final River<OUT> downRiver, final int fallNumber,
+            final IN drop) {
 
-        final Leap<SOURCE, IN, OUT> leap = mLeap.get();
+        final Leap<IN, OUT> leap = mLeap.get();
 
         if (leap != null) {
 
@@ -126,10 +126,10 @@ class WeakLeap<SOURCE, IN, OUT> implements Leap<SOURCE, IN, OUT> {
     }
 
     @Override
-    public void onUnhandled(final River<SOURCE, IN> upRiver, final River<SOURCE, OUT> downRiver,
+    public void onUnhandled(final River<IN> upRiver, final River<OUT> downRiver,
             final int fallNumber, final Throwable throwable) {
 
-        final Leap<SOURCE, IN, OUT> leap = mLeap.get();
+        final Leap<IN, OUT> leap = mLeap.get();
 
         if (leap != null) {
 

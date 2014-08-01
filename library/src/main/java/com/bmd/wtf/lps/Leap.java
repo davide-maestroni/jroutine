@@ -28,11 +28,10 @@ import com.bmd.wtf.flw.River;
  * <p/>
  * Created by davide on 6/7/14.
  *
- * @param <SOURCE> The river source data type.
- * @param <IN>     The input data type.
- * @param <OUT>    The output data type.
+ * @param <IN>  The input data type.
+ * @param <OUT> The output data type.
  */
-public interface Leap<SOURCE, IN, OUT> {
+public interface Leap<IN, OUT> {
 
     /**
      * This method is called when data are discharged through the leap.
@@ -41,8 +40,7 @@ public interface Leap<SOURCE, IN, OUT> {
      * @param downRiver  The downstream river instance.
      * @param fallNumber The number identifying the fall formed by this leap.
      */
-    public void onDischarge(River<SOURCE, IN> upRiver, River<SOURCE, OUT> downRiver,
-            int fallNumber);
+    public void onDischarge(River<IN> upRiver, River<OUT> downRiver, int fallNumber);
 
     /**
      * This method is called when a data drop is pushed through the leap.
@@ -52,8 +50,7 @@ public interface Leap<SOURCE, IN, OUT> {
      * @param fallNumber The number identifying the fall formed by this leap.
      * @param drop       The drop of data.
      */
-    public void onPush(River<SOURCE, IN> upRiver, River<SOURCE, OUT> downRiver, int fallNumber,
-            IN drop);
+    public void onPush(River<IN> upRiver, River<OUT> downRiver, int fallNumber, IN drop);
 
     /**
      * This method is called when an unhandled exception is pushed downstream through the leap.
@@ -63,6 +60,6 @@ public interface Leap<SOURCE, IN, OUT> {
      * @param fallNumber The number identifying the fall formed by this leap.
      * @param throwable  The unhandled exception.
      */
-    public void onUnhandled(River<SOURCE, IN> upRiver, River<SOURCE, OUT> downRiver, int fallNumber,
+    public void onUnhandled(River<IN> upRiver, River<OUT> downRiver, int fallNumber,
             Throwable throwable);
 }

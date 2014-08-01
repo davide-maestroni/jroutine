@@ -80,12 +80,12 @@ public class RapidBarrageTest extends TestCase {
         final Waterfall<Object, Object, Object> fall1 = fall().start()
                                                               .in(2)
                                                               .distribute(new RapidBarrageError5())
-                                                              .chain(new FreeLeap<Object, Object>() {
+                                                              .chain(new FreeLeap<Object>() {
 
                                                                   @Override
                                                                   public void onUnhandled(
-                                                                          final River<Object, Object> upRiver,
-                                                                          final River<Object, Object> downRiver,
+                                                                          final River<Object> upRiver,
+                                                                          final River<Object> downRiver,
                                                                           final int fallNumber,
                                                                           final Throwable throwable) {
 
@@ -165,12 +165,12 @@ public class RapidBarrageTest extends TestCase {
                                                               .in(2)
                                                               .distribute(RapidBarrage.from(
                                                                       new RapidBarrageError5()))
-                                                              .chain(new FreeLeap<Object, Object>() {
+                                                              .chain(new FreeLeap<Object>() {
 
                                                                   @Override
                                                                   public void onUnhandled(
-                                                                          final River<Object, Object> upRiver,
-                                                                          final River<Object, Object> downRiver,
+                                                                          final River<Object> upRiver,
+                                                                          final River<Object> downRiver,
                                                                           final int fallNumber,
                                                                           final Throwable throwable) {
 
@@ -258,12 +258,12 @@ public class RapidBarrageTest extends TestCase {
         final Waterfall<Object, Object, Object> fall1 = fall().start()
                                                               .in(4)
                                                               .distribute(new RapidBarrageTest4())
-                                                              .chain(new FreeLeap<Object, Object>() {
+                                                              .chain(new FreeLeap<Object>() {
 
                                                                   @Override
                                                                   public void onUnhandled(
-                                                                          final River<Object, Object> upRiver,
-                                                                          final River<Object, Object> downRiver,
+                                                                          final River<Object> upRiver,
+                                                                          final River<Object> downRiver,
                                                                           final int fallNumber,
                                                                           final Throwable throwable) {
 
@@ -284,12 +284,12 @@ public class RapidBarrageTest extends TestCase {
         final Waterfall<Object, Object, Object> fall2 = fall().start()
                                                               .in(4)
                                                               .distribute(new RapidBarrageTest5())
-                                                              .chain(new FreeLeap<Object, Object>() {
+                                                              .chain(new FreeLeap<Object>() {
 
                                                                   @Override
                                                                   public void onUnhandled(
-                                                                          final River<Object, Object> upRiver,
-                                                                          final River<Object, Object> downRiver,
+                                                                          final River<Object> upRiver,
+                                                                          final River<Object> downRiver,
                                                                           final int fallNumber,
                                                                           final Throwable throwable) {
 
@@ -324,12 +324,12 @@ public class RapidBarrageTest extends TestCase {
                                                               .in(4)
                                                               .distribute(RapidBarrage.from(
                                                                       new RapidBarrageTest4()))
-                                                              .chain(new FreeLeap<Object, Object>() {
+                                                              .chain(new FreeLeap<Object>() {
 
                                                                   @Override
                                                                   public void onUnhandled(
-                                                                          final River<Object, Object> upRiver,
-                                                                          final River<Object, Object> downRiver,
+                                                                          final River<Object> upRiver,
+                                                                          final River<Object> downRiver,
                                                                           final int fallNumber,
                                                                           final Throwable throwable) {
 
@@ -351,12 +351,12 @@ public class RapidBarrageTest extends TestCase {
                                                               .in(4)
                                                               .distribute(RapidBarrage.from(
                                                                       new RapidBarrageTest5()))
-                                                              .chain(new FreeLeap<Object, Object>() {
+                                                              .chain(new FreeLeap<Object>() {
 
                                                                   @Override
                                                                   public void onUnhandled(
-                                                                          final River<Object, Object> upRiver,
-                                                                          final River<Object, Object> downRiver,
+                                                                          final River<Object> upRiver,
+                                                                          final River<Object> downRiver,
                                                                           final int fallNumber,
                                                                           final Throwable throwable) {
 

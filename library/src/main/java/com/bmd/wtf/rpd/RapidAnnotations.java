@@ -27,7 +27,7 @@ public interface RapidAnnotations {
 
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
-    public @interface FlowPath {
+    public @interface DataFlow {
 
         Class<?>[] value() default {};
     }

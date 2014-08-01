@@ -17,8 +17,8 @@ import com.bmd.wtf.fll.Waterfall;
 import com.bmd.wtf.flw.Collector;
 import com.bmd.wtf.flw.River;
 import com.bmd.wtf.lps.FreeLeap;
-import com.bmd.wtf.rpd.RapidAnnotations.FlowPath;
-import com.bmd.wtf.rpd.RapidLeap.ValidPaths;
+import com.bmd.wtf.rpd.RapidAnnotations.DataFlow;
+import com.bmd.wtf.rpd.RapidLeap.ValidFlows;
 
 import junit.framework.TestCase;
 
@@ -401,13 +401,13 @@ public class RapidBarrageTest extends TestCase {
 
     public static class RapidBarrageError2 extends RapidBarrage {
 
-        @FlowPath
+        @DataFlow
         public int method1(final String text) {
 
             return 0;
         }
 
-        @FlowPath
+        @DataFlow
         public int method2(final String text) {
 
             return Integer.parseInt(text);
@@ -416,7 +416,7 @@ public class RapidBarrageTest extends TestCase {
 
     public static class RapidBarrageError3 extends RapidBarrage {
 
-        @FlowPath
+        @DataFlow
         public int method1(final String text, final int number) {
 
             return number;
@@ -425,7 +425,7 @@ public class RapidBarrageTest extends TestCase {
 
     public static class RapidBarrageError4 extends RapidBarrage {
 
-        @FlowPath
+        @DataFlow
         public String method1(final String text) {
 
             return text;
@@ -449,7 +449,7 @@ public class RapidBarrageTest extends TestCase {
 
     public static class RapidBarrageError6 extends RapidBarrage {
 
-        @FlowPath(Integer.class)
+        @DataFlow(Integer.class)
         public int method1(final String text) {
 
             return 0;
@@ -458,13 +458,13 @@ public class RapidBarrageTest extends TestCase {
 
     public static class RapidBarrageError7 extends RapidBarrage {
 
-        @FlowPath
+        @DataFlow
         public int method1(final ArrayList<?> list) {
 
             return 0;
         }
 
-        @FlowPath(ArrayList.class)
+        @DataFlow(ArrayList.class)
         public int method2(final List<?> list) {
 
             return 0;
@@ -517,10 +517,10 @@ public class RapidBarrageTest extends TestCase {
 
         public RapidBarrageTest3() {
 
-            super(ValidPaths.ANNOTATED_ONLY);
+            super(ValidFlows.ANNOTATED_ONLY);
         }
 
-        @FlowPath
+        @DataFlow
         public int onInt(final Integer integer) {
 
             return integer;
@@ -532,7 +532,7 @@ public class RapidBarrageTest extends TestCase {
             return onText(data.toString());
         }
 
-        @FlowPath
+        @DataFlow
         public int onText(final String text) {
 
             return Integer.parseInt(text);

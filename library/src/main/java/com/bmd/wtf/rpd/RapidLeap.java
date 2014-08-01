@@ -16,7 +16,7 @@ package com.bmd.wtf.rpd;
 import com.bmd.wtf.fll.Classification;
 import com.bmd.wtf.flw.River;
 import com.bmd.wtf.lps.Leap;
-import com.bmd.wtf.rpd.RapidAnnotations.FlowPath;
+import com.bmd.wtf.rpd.RapidAnnotations.DataFlow;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -54,7 +54,7 @@ public abstract class RapidLeap implements Leap<Object, Object> {
 
     private final Object mTarget;
 
-    private final ValidPaths mValidPaths;
+    private final ValidFlows mValidFlows;
 
     private River<Object> mDownRiver;
 
@@ -65,13 +65,13 @@ public abstract class RapidLeap implements Leap<Object, Object> {
     /**
      * Constructor.
      *
-     * @param validPaths Whether only the annotated methods must be called when data flow through
+     * @param validFlows Whether only the annotated methods must be called when data flow through
      *                   this leap.
      */
-    public RapidLeap(final ValidPaths validPaths) {
+    public RapidLeap(final ValidFlows validFlows) {
 
         mTarget = this;
-        mValidPaths = validPaths;
+        mValidFlows = validFlows;
 
         fillMethods();
     }
@@ -81,24 +81,24 @@ public abstract class RapidLeap implements Leap<Object, Object> {
      * <p/>
      * By default all methods are analyzed.
      *
-     * @see #RapidLeap(com.bmd.wtf.rpd.RapidLeap.ValidPaths)
+     * @see #RapidLeap(com.bmd.wtf.rpd.RapidLeap.ValidFlows)
      */
     public RapidLeap() {
 
-        this(ValidPaths.ALL);
+        this(ValidFlows.ALL);
     }
 
     /**
      * Constructor.
      *
      * @param wrapped    The wrapped object.
-     * @param validPaths Whether only the annotated methods must be called when data flow through
+     * @param validFlows Whether only the annotated methods must be called when data flow through
      *                   this leap.
      */
-    private RapidLeap(final Object wrapped, final ValidPaths validPaths) {
+    private RapidLeap(final Object wrapped, final ValidFlows validFlows) {
 
         mTarget = wrapped;
-        mValidPaths = validPaths;
+        mValidFlows = validFlows;
 
         fillMethods();
     }
@@ -111,7 +111,7 @@ public abstract class RapidLeap implements Leap<Object, Object> {
      */
     public static RapidLeap from(final Object wrapped) {
 
-        return new RapidLeap(wrapped, ValidPaths.ALL) {};
+        return new RapidLeap(wrapped, ValidFlows.ALL) {};
     }
 
     /**
@@ -124,7 +124,7 @@ public abstract class RapidLeap implements Leap<Object, Object> {
      */
     public static RapidLeap fromAnnotated(final Object wrapped) {
 
-        return new RapidLeap(wrapped, ValidPaths.ANNOTATED_ONLY) {};
+        return new RapidLeap(wrapped, ValidFlows.ANNOTATED_ONLY) {};
     }
 
     private static void fillMethodMap(final HashMap<Class<?>, Method> methodMap,
@@ -360,7 +360,7 @@ public abstract class RapidLeap implements Leap<Object, Object> {
 
                 if (!method.isAccessible()) {
 
-                    if (method.isAnnotationPresent(FlowPath.class) || (
+                    if (method.isAnnotationPresent(DataFlow.class) || (
                             (method.getModifiers() & Modifier.PUBLIC) != 0)) {
 
                         method.setAccessible(true);
@@ -395,7 +395,7 @@ public abstract class RapidLeap implements Leap<Object, Object> {
                 if (type.isAssignableFrom(dropType)) {
 
                     final Method candidate = entry.getValue();
-                    final FlowPath annotation = candidate.getAnnotation(FlowPath.class);
+                    final DataFlow annotation = candidate.getAnnotation(DataFlow.class);
 
                     if (((annotation == null) || (annotation.value().length == 0) || type.equals(
                             dropType)) && ((bestMatch == null) || bestMatch.isAssignableFrom(
@@ -415,12 +415,12 @@ public abstract class RapidLeap implements Leap<Object, Object> {
 
         final HashMap<Class<?>, Method> methodMap = new HashMap<Class<?>, Method>(methods.length);
 
-        final boolean isAnnotatedOnly = (mValidPaths == ValidPaths.ANNOTATED_ONLY);
+        final boolean isAnnotatedOnly = (mValidFlows == ValidFlows.ANNOTATED_ONLY);
 
         for (final Method method : methods) {
 
             final Class<?>[] parameterTypes = method.getParameterTypes();
-            final FlowPath annotation = method.getAnnotation(FlowPath.class);
+            final DataFlow annotation = method.getAnnotation(DataFlow.class);
 
             boolean validMethod = (parameterTypes.length == 1);
 
@@ -449,7 +449,7 @@ public abstract class RapidLeap implements Leap<Object, Object> {
 
                     throw new IllegalArgumentException(
                             "invalid annotated method: " + method + "\nAn "
-                                    + FlowPath.class.getSimpleName()
+                                    + DataFlow.class.getSimpleName()
                                     + " method must take a single parameter");
                 }
 
@@ -500,9 +500,9 @@ public abstract class RapidLeap implements Leap<Object, Object> {
     }
 
     /**
-     * The rule to decide whether a method is a valid flow path or not.
+     * The rule to decide whether a method is a valid flow or not.
      */
-    public enum ValidPaths {
+    public enum ValidFlows {
 
         ANNOTATED_ONLY,
         ALL

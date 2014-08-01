@@ -19,7 +19,7 @@ import com.bmd.wtf.flw.Collector;
 import com.bmd.wtf.flw.River;
 import com.bmd.wtf.lps.AbstractLeap;
 import com.bmd.wtf.lps.FreeLeap;
-import com.bmd.wtf.rpd.RapidAnnotations.FlowPath;
+import com.bmd.wtf.rpd.RapidAnnotations.DataFlow;
 
 import junit.framework.TestCase;
 
@@ -472,13 +472,13 @@ public class RapidLeapTest extends TestCase {
 
     public static class RapidLeapError2 extends RapidLeap {
 
-        @FlowPath
+        @DataFlow
         public String method1(final String text) {
 
             return text;
         }
 
-        @FlowPath
+        @DataFlow
         public Integer method2(final String text) {
 
             return Integer.parseInt(text);
@@ -487,7 +487,7 @@ public class RapidLeapTest extends TestCase {
 
     public static class RapidLeapError3 extends RapidLeap {
 
-        @FlowPath
+        @DataFlow
         public String method1(final String text, final int ignored) {
 
             return text;
@@ -523,7 +523,7 @@ public class RapidLeapTest extends TestCase {
 
     public static class RapidLeapError5 extends RapidLeap {
 
-        @FlowPath(Integer.class)
+        @DataFlow(Integer.class)
         public String method1(final String text) {
 
             return text;
@@ -532,13 +532,13 @@ public class RapidLeapTest extends TestCase {
 
     public static class RapidLeapError6 extends RapidLeap {
 
-        @FlowPath
+        @DataFlow
         public String method1(final ArrayList<?> list) {
 
             return list.toString();
         }
 
-        @FlowPath(ArrayList.class)
+        @DataFlow(ArrayList.class)
         public String method2(final List<?> list) {
 
             return list.toString();
@@ -609,10 +609,10 @@ public class RapidLeapTest extends TestCase {
 
         public RapidLeapTest3() {
 
-            super(ValidPaths.ANNOTATED_ONLY);
+            super(ValidFlows.ANNOTATED_ONLY);
         }
 
-        @FlowPath
+        @DataFlow
         public void discharge(final Discharge ignored) {
 
             downRiver().discharge("test");
@@ -624,13 +624,13 @@ public class RapidLeapTest extends TestCase {
             return data.toString();
         }
 
-        @FlowPath
+        @DataFlow
         public Integer parse(final String text) {
 
             return Integer.parseInt(text);
         }
 
-        @FlowPath
+        @DataFlow
         public String serialize(final Integer integer) {
 
             return integer.toString();

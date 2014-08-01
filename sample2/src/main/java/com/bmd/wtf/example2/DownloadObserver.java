@@ -16,7 +16,7 @@ package com.bmd.wtf.example2;
 import com.bmd.wtf.example1.Download;
 import com.bmd.wtf.example1.DownloadFailure;
 import com.bmd.wtf.example1.DownloadSuccess;
-import com.bmd.wtf.rpd.RapidAnnotations.FlowPath;
+import com.bmd.wtf.rpd.RapidAnnotations.DataFlow;
 import com.bmd.wtf.rpd.RapidLeap;
 
 import java.io.File;
@@ -34,7 +34,7 @@ public class DownloadObserver extends RapidLeap implements UriObserver {
 
     public DownloadObserver() {
 
-        super(ValidPaths.ANNOTATED_ONLY);
+        super(ValidFlows.ANNOTATED_ONLY);
     }
 
     @Override
@@ -49,7 +49,7 @@ public class DownloadObserver extends RapidLeap implements UriObserver {
         return mDownloading.containsKey(uri);
     }
 
-    @FlowPath
+    @DataFlow
     public void onDownload(final Download download) {
 
         final URI uri = download.getUri();
@@ -64,7 +64,7 @@ public class DownloadObserver extends RapidLeap implements UriObserver {
         }
     }
 
-    @FlowPath
+    @DataFlow
     public void onFailure(final DownloadFailure download) {
 
         final URI uri = download.getUri();
@@ -80,7 +80,7 @@ public class DownloadObserver extends RapidLeap implements UriObserver {
         }
     }
 
-    @FlowPath
+    @DataFlow
     public void onSuccess(final DownloadSuccess download) {
 
         final URI uri = download.getUri();

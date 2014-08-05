@@ -7,8 +7,7 @@ Cool and funny parallel programming.
 <h2>Usage examples</h2>
 <b>Example 1:</b> Root mean square:
 <p>
-    The code below shows how it is possible to implement the computation of the root mean square of
-    some input data by distributing them in a predefined number of background threads.
+The code below shows how it is possible to implement the computation of the root mean square of some input data by distributing them in a predefined number of background threads.
 </p>
 <pre>
     <code>
@@ -22,8 +21,8 @@ Cool and funny parallel programming.
 
         for (final float sample : input) {
 
-        final double d = sample;
-        sum += (d * d);
+            final double d = sample;
+            sum += (d * d);
         }
 
         final double sRms = Math.sqrt(sum / input.length);
@@ -31,45 +30,45 @@ Cool and funny parallel programming.
         // Parallel
 
         final Double pRms = (Double) fall().start()
-        // Let the optimum number of threads be automatically computed
-        .inBackground()
-        // Equally distribute the load among them
-        .distribute()
-        // Compute the square of each sample
-        .chain(Rapid.leapGenerator(new RapidLeap() {
+                                            // Let the optimum number of threads be automatically computed
+                                            .inBackground()
+                                            // Equally distribute the load among them
+                                            .distribute()
+                                            // Compute the square of each sample
+                                            .chain(Rapid.leapGenerator(new RapidLeap() {
 
-        public Double onSample(final Float sample) {
+                                                public Double onSample(final Float sample) {
 
-        final double d = sample;
-        return (d * d);
-        }
+                                                    final double d = sample;
+                                                    return (d * d);
+                                                }
 
-        }, this))
-        // Merge the results in a single thread
-        .inBackground(1)
-        // Accumulate the sum and then calculate the square root mean
-        .chain(new RapidLeap() {
+                                            }, this))
+                                            // Merge the results in a single thread
+                                            .inBackground(1)
+                                            // Accumulate the sum and then calculate the square root mean
+                                            .chain(new RapidLeap() {
 
-        private int mCount;
+                                                private int mCount;
 
-        private double mSum;
+                                                private double mSum;
 
-        public void onSquare(final Double square) {
+                                                public void onSquare(final Double square) {
 
-        mSum += square;
-        ++mCount;
-        }
+                                                    mSum += square;
+                                                    ++mCount;
+                                                }
 
-        public Double onComplete(final Discharge ignored) {
+                                                public Double onComplete(final Discharge ignored) {
 
-        return Math.sqrt(mSum / mCount);
-        }
+                                                    return Math.sqrt(mSum / mCount);
+                                                }
 
-        })
-        // Pull the input data along the flow...
-        .pull(Drops.asList(input).toObjects())
-        // ...and finally collect the result
-        .next();
+                                            })
+                                            // Pull the input data along the flow...
+                                            .pull(Drops.asList(input).toObjects())
+                                            // ...and finally collect the result
+                                            .next();
 
         assert pRms == sRms;
     </code>

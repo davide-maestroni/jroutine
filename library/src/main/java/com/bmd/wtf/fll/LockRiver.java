@@ -698,6 +698,11 @@ class LockRiver<DATA> implements River<DATA> {
         return mRiver.size();
     }
 
+    /**
+     * Closes the river lock.
+     * <p/>
+     * The accumulated data are released as a result.
+     */
     void close() {
 
         final ReentrantLock lock = mLock;
@@ -718,6 +723,11 @@ class LockRiver<DATA> implements River<DATA> {
         }
     }
 
+    /**
+     * Opens the river lock.
+     *
+     * @param lock The lock instance.
+     */
     void open(final DataLock lock) {
 
         mLock.lock();

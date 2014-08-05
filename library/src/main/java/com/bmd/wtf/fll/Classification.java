@@ -17,12 +17,12 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
 /**
- * Utility abstract class used to overcome Java type erasure.
+ * Utility abstract class used to work around Java type erasure.
  * <p/>
- * By using class objects is impossible to distinguish between two different generic classes. For
- * example there is no way to declare a <code>Class&lt;List&lt;String&gt;&gt;</code> as opposed to
- * <code>Class&lt;List&lt;Integer&gt;&gt;</code>.<br/>
- * The workaround here is to force to inherit from a special generic class then inspected via
+ * By using class objects it is impossible to distinguish between two different generic classes.
+ * For example there is no way to declare a <code>Class&lt;List&lt;String&gt;&gt;</code> as
+ * opposed to <code>Class&lt;List&lt;Integer&gt;&gt;</code>.<br/>
+ * The workaround here is to force the inheritance from a special generic class, then inspected via
  * reflection in order to obtain the generic type rather than the class object.
  * <p/>
  * Created by davide on 6/14/14.

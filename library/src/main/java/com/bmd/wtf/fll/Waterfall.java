@@ -55,6 +55,10 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
     private static FreeLeap<?> sFreeLeap;
 
+    private final Current mBackgroundCurrent;
+
+    private final int mBackgroundPoolSize;
+
     private final BarrageLeap<?> mBarrage;
 
     private final Current mCurrent;
@@ -73,14 +77,17 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
     private Waterfall(final Waterfall<SOURCE, SOURCE, ?> source,
             final Map<Classification<?>, GateLeap<?, ?>> gateMap,
-            final Classification<?> gateClassification, final BarrageLeap<?> barrageLeap,
-            final int size, final Current current, final CurrentGenerator generator,
+            final Classification<?> gateClassification, final int backgroundPoolSize,
+            final Current backgroundCurrent, final BarrageLeap<?> barrageLeap, final int size,
+            final Current current, final CurrentGenerator generator,
             final DataFall<IN, OUT>... falls) {
 
         //noinspection unchecked
         mSource = (source != null) ? source : (Waterfall<SOURCE, SOURCE, ?>) this;
         mGateMap = gateMap;
         mGate = gateClassification;
+        mBackgroundPoolSize = backgroundPoolSize;
+        mBackgroundCurrent = backgroundCurrent;
         mBarrage = barrageLeap;
         mSize = size;
         mCurrent = current;
@@ -90,13 +97,15 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
     private Waterfall(final Waterfall<SOURCE, SOURCE, ?> source,
             final Map<Classification<?>, GateLeap<?, ?>> gateMap,
-            final Classification<?> gateClassification, final BarrageLeap<?> barrageLeap,
-            final int size, final Current current, final CurrentGenerator generator,
-            final Leap<IN, OUT>... leaps) {
+            final Classification<?> gateClassification, final int backgroundPoolSize,
+            final Current backgroundCurrent, final BarrageLeap<?> barrageLeap, final int size,
+            final Current current, final CurrentGenerator generator, final Leap<IN, OUT>... leaps) {
 
         //noinspection unchecked
         mSource = (source != null) ? source : (Waterfall<SOURCE, SOURCE, ?>) this;
         mGate = null;
+        mBackgroundPoolSize = backgroundPoolSize;
+        mBackgroundCurrent = backgroundCurrent;
         mSize = size;
         mCurrent = current;
         mCurrentGenerator = generator;
@@ -187,7 +196,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
         final Map<Classification<?>, GateLeap<?, ?>> gateMap = Collections.emptyMap();
 
         //noinspection unchecked
-        return new Waterfall<Object, Object, Object>(null, gateMap, null, null, 1,
+        return new Waterfall<Object, Object, Object>(null, gateMap, null, 0, null, null, 1,
                                                      Currents.straight(), null, NO_FALL);
     }
 
@@ -269,7 +278,8 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
         }
 
         //noinspection unchecked
-        return new Waterfall<SOURCE, IN, OUT>(mSource, mGateMap, gateClassification, mBarrage,
+        return new Waterfall<SOURCE, IN, OUT>(mSource, mGateMap, gateClassification,
+                                              mBackgroundPoolSize, mBackgroundCurrent, mBarrage,
                                               mSize, mCurrent, mCurrentGenerator, mFalls);
     }
 
@@ -399,8 +409,9 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
             //noinspection unchecked
             final Waterfall<SOURCE, OUT, NOUT> waterfall =
-                    new Waterfall<SOURCE, OUT, NOUT>(mSource, mGateMap, mGate, mBarrage, 1,
-                                                     mCurrent, mCurrentGenerator, leap);
+                    new Waterfall<SOURCE, OUT, NOUT>(mSource, mGateMap, mGate, mBackgroundPoolSize,
+                                                     mBackgroundCurrent, mBarrage, 1, mCurrent,
+                                                     mCurrentGenerator, leap);
 
             final DataFall<OUT, NOUT> outFall = waterfall.mFalls[0];
 
@@ -431,7 +442,8 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
         //noinspection unchecked
         final Waterfall<SOURCE, OUT, NOUT> waterfall =
                 new Waterfall<SOURCE, OUT, NOUT>(inWaterfall.mSource, inWaterfall.mGateMap,
-                                                 inWaterfall.mGate, mBarrage, size,
+                                                 inWaterfall.mGate, mBackgroundPoolSize,
+                                                 mBackgroundCurrent, mBarrage, size,
                                                  inWaterfall.mCurrent,
                                                  inWaterfall.mCurrentGenerator, leaps);
 
@@ -480,7 +492,8 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
             //noinspection unchecked
             final Waterfall<SOURCE, OUT, OUT> waterfall =
-                    new Waterfall<SOURCE, OUT, OUT>(mSource, mGateMap, mGate, mBarrage, 1, mCurrent,
+                    new Waterfall<SOURCE, OUT, OUT>(mSource, mGateMap, mGate, mBackgroundPoolSize,
+                                                    mBackgroundCurrent, mBarrage, 1, mCurrent,
                                                     mCurrentGenerator, leap);
 
             final DataFall<OUT, OUT> outFall = waterfall.mFalls[0];
@@ -512,7 +525,8 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
         //noinspection unchecked
         final Waterfall<SOURCE, OUT, OUT> waterfall =
                 new Waterfall<SOURCE, OUT, OUT>(inWaterfall.mSource, inWaterfall.mGateMap,
-                                                inWaterfall.mGate, mBarrage, size,
+                                                inWaterfall.mGate, mBackgroundPoolSize,
+                                                mBackgroundCurrent, mBarrage, size,
                                                 inWaterfall.mCurrent, inWaterfall.mCurrentGenerator,
                                                 leaps);
 
@@ -572,8 +586,9 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
             //noinspection unchecked
             final Waterfall<SOURCE, OUT, NOUT> waterfall =
-                    new Waterfall<SOURCE, OUT, NOUT>(mSource, mGateMap, mGate, mBarrage, 1,
-                                                     mCurrent, mCurrentGenerator, leap);
+                    new Waterfall<SOURCE, OUT, NOUT>(mSource, mGateMap, mGate, mBackgroundPoolSize,
+                                                     mBackgroundCurrent, mBarrage, 1, mCurrent,
+                                                     mCurrentGenerator, leap);
 
             final DataFall<OUT, NOUT> outFall = waterfall.mFalls[0];
 
@@ -602,7 +617,8 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
         //noinspection unchecked
         final Waterfall<SOURCE, OUT, NOUT> waterfall =
                 new Waterfall<SOURCE, OUT, NOUT>(inWaterfall.mSource, inWaterfall.mGateMap,
-                                                 inWaterfall.mGate, mBarrage, size,
+                                                 inWaterfall.mGate, mBackgroundPoolSize,
+                                                 mBackgroundCurrent, mBarrage, size,
                                                  inWaterfall.mCurrent,
                                                  inWaterfall.mCurrentGenerator, leap);
 
@@ -664,8 +680,9 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
             //noinspection unchecked
             final Waterfall<SOURCE, OUT, NOUT> waterfall =
-                    new Waterfall<SOURCE, OUT, NOUT>(mSource, mGateMap, mGate, mBarrage, 1,
-                                                     mCurrent, mCurrentGenerator, leap);
+                    new Waterfall<SOURCE, OUT, NOUT>(mSource, mGateMap, mGate, mBackgroundPoolSize,
+                                                     mBackgroundCurrent, mBarrage, 1, mCurrent,
+                                                     mCurrentGenerator, leap);
 
             final DataFall<OUT, NOUT> outFall = waterfall.mFalls[0];
 
@@ -708,7 +725,8 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
         //noinspection unchecked
         final Waterfall<SOURCE, OUT, NOUT> waterfall =
                 new Waterfall<SOURCE, OUT, NOUT>(inWaterfall.mSource, inWaterfall.mGateMap,
-                                                 inWaterfall.mGate, mBarrage, size,
+                                                 inWaterfall.mGate, mBackgroundPoolSize,
+                                                 mBackgroundCurrent, mBarrage, size,
                                                  inWaterfall.mCurrent,
                                                  inWaterfall.mCurrentGenerator, leaps);
 
@@ -1168,7 +1186,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * preventing any coming data to be pushed further.
      *
      * @param direction Whether the waterfall must be deviated downstream or upstream.
-     * @see #deviateStream(int, Direction)
+     * @see #deviateStream(int, com.bmd.wtf.flw.Stream.Direction)
      */
     public void deviate(final Direction direction) {
 
@@ -1194,7 +1212,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      *
      * @param streamNumber The number identifying the target stream.
      * @param direction    Whether the waterfall must be deviated downstream or upstream.
-     * @see #deviate(Direction)
+     * @see #deviate(com.bmd.wtf.flw.Stream.Direction)
      */
     public void deviateStream(final int streamNumber, final Direction direction) {
 
@@ -1275,7 +1293,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * fed only by this waterfall streams.
      *
      * @param direction Whether the waterfall must be deviated downstream or upstream.
-     * @see #drainStream(int, Direction)
+     * @see #drainStream(int, com.bmd.wtf.flw.Stream.Direction)
      */
     public void drain(final Direction direction) {
 
@@ -1301,7 +1319,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      *
      * @param streamNumber The number identifying the target stream.
      * @param direction    Whether the waterfall must be deviated downstream or upstream.
-     * @see #drain(Direction)
+     * @see #drain(com.bmd.wtf.flw.Stream.Direction)
      */
     public void drainStream(final int streamNumber, final Direction direction) {
 
@@ -1334,8 +1352,9 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
         }
 
         //noinspection unchecked
-        return new Waterfall<SOURCE, IN, OUT>(mSource, mGateMap, mGate, mBarrage, mSize, null,
-                                              generator, mFalls);
+        return new Waterfall<SOURCE, IN, OUT>(mSource, mGateMap, mGate, mBackgroundPoolSize,
+                                              mBackgroundCurrent, mBarrage, mSize, null, generator,
+                                              mFalls);
     }
 
     /**
@@ -1352,8 +1371,9 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
         }
 
         //noinspection unchecked
-        return new Waterfall<SOURCE, IN, OUT>(mSource, mGateMap, mGate, mBarrage, fallCount,
-                                              mCurrent, mCurrentGenerator, mFalls);
+        return new Waterfall<SOURCE, IN, OUT>(mSource, mGateMap, mGate, mBackgroundPoolSize,
+                                              mBackgroundCurrent, mBarrage, fallCount, mCurrent,
+                                              mCurrentGenerator, mFalls);
     }
 
     /**
@@ -1370,28 +1390,9 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
         }
 
         //noinspection unchecked
-        return new Waterfall<SOURCE, IN, OUT>(mSource, mGateMap, mGate, mBarrage, mSize, current,
-                                              null, mFalls);
-    }
-
-    /**
-     * Makes the waterfall streams flow through a background current with the specified thread pool
-     * size.
-     *
-     * @param poolSize The pool size.
-     * @return The newly created waterfall.
-     */
-    public Waterfall<SOURCE, IN, OUT> inBackground(final int poolSize) {
-
-        if (poolSize <= 0) {
-
-            throw new IllegalArgumentException("the pool size cannot be negative or zero");
-        }
-
-        //noinspection unchecked
-        return new Waterfall<SOURCE, IN, OUT>(mSource, mGateMap, mGate, mBarrage, poolSize,
-                                              Currents.pool(Math.min(poolSize, getBestPoolSize())),
-                                              null, mFalls);
+        return new Waterfall<SOURCE, IN, OUT>(mSource, mGateMap, mGate, mBackgroundPoolSize,
+                                              mBackgroundCurrent, mBarrage, mSize, current, null,
+                                              mFalls);
     }
 
     /**
@@ -1399,16 +1400,68 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * <p/>
      * The optimum thread pool size will be automatically computed based on the available resources
      * and the waterfall size.
+     * <p/>
+     * Note also that the same background current will be retained through the waterfall.
+     *
+     * @param fallCount The total fall count generating the waterfall.
+     * @return The newly created waterfall.
+     */
+    public Waterfall<SOURCE, IN, OUT> inBackground(final int fallCount) {
+
+        if (fallCount <= 0) {
+
+            throw new IllegalArgumentException("the fall count cannot be negative or zero");
+        }
+
+        final int poolSize;
+        final Current backgroundCurrent;
+
+        if (mBackgroundCurrent == null) {
+
+            poolSize = getBestPoolSize();
+            backgroundCurrent = Currents.pool(poolSize);
+
+        } else {
+
+            poolSize = mBackgroundPoolSize;
+            backgroundCurrent = mBackgroundCurrent;
+        }
+
+        //noinspection unchecked
+        return new Waterfall<SOURCE, IN, OUT>(mSource, mGateMap, mGate, poolSize, backgroundCurrent,
+                                              mBarrage, fallCount, backgroundCurrent, null, mFalls);
+    }
+
+    /**
+     * Makes the waterfall streams flow through a background current.
+     * <p/>
+     * The optimum thread pool size will be automatically computed based on the available resources
+     * and the waterfall size, and the total fall count of the resulting waterfall will be
+     * accordingly dimensioned.
+     * <p/>
+     * Note also that the same background current will be retained through the waterfall.
      *
      * @return The newly created waterfall.
      */
     public Waterfall<SOURCE, IN, OUT> inBackground() {
 
-        final int poolSize = getBestPoolSize();
+        final int poolSize;
+        final Current backgroundCurrent;
+
+        if (mBackgroundCurrent == null) {
+
+            poolSize = getBestPoolSize();
+            backgroundCurrent = Currents.pool(poolSize);
+
+        } else {
+
+            poolSize = mBackgroundPoolSize;
+            backgroundCurrent = mBackgroundCurrent;
+        }
 
         //noinspection unchecked
-        return new Waterfall<SOURCE, IN, OUT>(mSource, mGateMap, mGate, mBarrage, poolSize,
-                                              Currents.pool(poolSize), null, mFalls);
+        return new Waterfall<SOURCE, IN, OUT>(mSource, mGateMap, mGate, poolSize, backgroundCurrent,
+                                              mBarrage, poolSize, backgroundCurrent, null, mFalls);
     }
 
     /**
@@ -1442,7 +1495,8 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
         }
 
         //noinspection unchecked
-        return new Waterfall<SOURCE, IN, OUT>(mSource, gateMap, mGate, mBarrage, mSize, mCurrent,
+        return new Waterfall<SOURCE, IN, OUT>(mSource, gateMap, mGate, mBackgroundPoolSize,
+                                              mBackgroundCurrent, mBarrage, mSize, mCurrent,
                                               mCurrentGenerator, mFalls);
     }
 
@@ -1484,7 +1538,8 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
         }
 
         //noinspection unchecked
-        return new Waterfall<SOURCE, IN, OUT>(mSource, gateMap, mGate, mBarrage, mSize, mCurrent,
+        return new Waterfall<SOURCE, IN, OUT>(mSource, gateMap, mGate, mBackgroundPoolSize,
+                                              mBackgroundCurrent, mBarrage, mSize, mCurrent,
                                               mCurrentGenerator, mFalls);
     }
 
@@ -1550,13 +1605,20 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
         return collector;
     }
 
+    /**
+     * Gets the waterfall source.
+     *
+     * @return The source.
+     */
     public Waterfall<SOURCE, SOURCE, ?> source() {
 
         return mSource;
     }
 
     /**
-     * Creates and returns a new waterfall with the same size of this one.
+     * Creates and returns a new waterfall generating from this one.
+     * <p/>
+     * Note that the gates, the size and the currents of this waterfall will be retained.
      *
      * @return The newly created waterfall.
      */
@@ -1572,12 +1634,15 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
         final Map<Classification<?>, GateLeap<?, ?>> gateMap = Collections.emptyMap();
 
         //noinspection unchecked
-        return new Waterfall<OUT, OUT, OUT>(null, gateMap, mGate, null, size, mCurrent,
+        return new Waterfall<OUT, OUT, OUT>(null, gateMap, mGate, mBackgroundPoolSize,
+                                            mBackgroundCurrent, null, size, mCurrent,
                                             mCurrentGenerator, leaps);
     }
 
     /**
-     * Creates and returns a new waterfall with the same size of this one.
+     * Creates and returns a new waterfall generating from this one.
+     * <p/>
+     * Note that the gates, the size and the currents of this waterfall will be retained.
      *
      * @param dataType The data type.
      * @param <DATA>   The data type.
@@ -1589,7 +1654,9 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
     }
 
     /**
-     * Creates and returns a new waterfall with the same size of this one.
+     * Creates and returns a new waterfall generating from this one.
+     * <p/>
+     * Note that the gates, the size and the currents of this waterfall will be retained.
      *
      * @param classification The data classification.
      * @param <DATA>         The data type.
@@ -1607,8 +1674,10 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
     }
 
     /**
-     * Creates and returns a new waterfall with the same size of this one and chained to the leaps
-     * returned by the specified generator.
+     * Creates and returns a new waterfall chained to the leaps returned by the specified
+     * generator.
+     * <p/>
+     * Note that the gates, the size and the currents of this waterfall will be retained.
      *
      * @param generator The leap generator.
      * @param <NIN>     The new input data type.
@@ -1633,7 +1702,8 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
             registerLeap(leap);
 
             //noinspection unchecked
-            return new Waterfall<NIN, NIN, NOUT>(null, gateMap, mGate, null, 1, mCurrent,
+            return new Waterfall<NIN, NIN, NOUT>(null, gateMap, mGate, mBackgroundPoolSize,
+                                                 mBackgroundCurrent, null, 1, mCurrent,
                                                  mCurrentGenerator, leap);
         }
 
@@ -1654,13 +1724,15 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
         }
 
         //noinspection unchecked
-        return new Waterfall<NIN, NIN, NOUT>(null, gateMap, null, null, size, mCurrent,
+        return new Waterfall<NIN, NIN, NOUT>(null, gateMap, null, mBackgroundPoolSize,
+                                             mBackgroundCurrent, null, size, mCurrent,
                                              mCurrentGenerator, leaps);
     }
 
     /**
-     * Creates and returns a new waterfall with the same size of this one and chained to the
-     * specified leap.
+     * Creates and returns a new waterfall chained to the specified leap.
+     * <p/>
+     * Note that the gates, the size and the currents of this waterfall will be retained.
      *
      * @param leap   The leap instance.
      * @param <NIN>  The new input data type.
@@ -1679,7 +1751,8 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
         final Map<Classification<?>, GateLeap<?, ?>> gateMap = Collections.emptyMap();
 
         //noinspection unchecked
-        return new Waterfall<NIN, NIN, NOUT>(null, gateMap, mGate, null, mSize, mCurrent,
+        return new Waterfall<NIN, NIN, NOUT>(null, gateMap, mGate, mBackgroundPoolSize,
+                                             mBackgroundCurrent, null, mSize, mCurrent,
                                              mCurrentGenerator, leap);
     }
 
@@ -1689,7 +1762,8 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
         //noinspection unchecked
         return new Waterfall<SOURCE, OUT, OUT>(waterfall.mSource, waterfall.mGateMap,
-                                               waterfall.mGate, barrageLeap, waterfall.mSize,
+                                               waterfall.mGate, mBackgroundPoolSize,
+                                               mBackgroundCurrent, barrageLeap, waterfall.mSize,
                                                waterfall.mCurrent, waterfall.mCurrentGenerator,
                                                waterfall.mFalls);
     }
@@ -1725,7 +1799,6 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
     private int getBestPoolSize() {
 
-        // the returned value might change over time, so we keep calling the method every time
         final int processors = Runtime.getRuntime().availableProcessors();
 
         if (processors < 4) {

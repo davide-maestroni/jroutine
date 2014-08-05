@@ -25,7 +25,7 @@ import java.util.Arrays;
  * specified arguments.
  * <p/>
  * A suitable method is identified among the ones taking the specified arguments and returning
- * a boolean value. The methods annotated with {@link com.bmd.wtf.rpd.RapidAnnotations.GateCondition} are analyzed
+ * a boolean value. The methods annotated with {@link RapidAnnotations.GateCondition} are analyzed
  * first.<br/>
  * If more than one method matching the above requirements is found, an exception will be
  * thrown.

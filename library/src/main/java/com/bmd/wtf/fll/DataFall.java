@@ -224,6 +224,9 @@ class DataFall<IN, OUT> implements Fall<IN> {
         }
     }
 
+    /**
+     * Lowers the water level of this fall.
+     */
     void lowerLevel() {
 
         int dischargeCount = 0;
@@ -253,6 +256,11 @@ class DataFall<IN, OUT> implements Fall<IN> {
         }
     }
 
+    /**
+     * Raises the water level of this fall by the specified data count.
+     *
+     * @param count The drop count.
+     */
     void raiseLevel(final int count) {
 
         final ReentrantLock lock = mLock;

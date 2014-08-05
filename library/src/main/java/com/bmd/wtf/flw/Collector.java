@@ -39,6 +39,9 @@ public interface Collector<DATA> extends Iterator<DATA> {
     /**
      * Collects all the available data and return them into an arrival ordered list.
      * <p/>
+     * In case an unhandled exception is collected, the same will be re-thrown inside a
+     * {@link com.bmd.wtf.fll.FloatingException}.
+     * <p/>
      * Note that the function will block until all the expected data are available or the maximum
      * delay has elapsed.
      *
@@ -48,6 +51,9 @@ public interface Collector<DATA> extends Iterator<DATA> {
 
     /**
      * Collects all the available data by filling the specified list in arrival order.
+     * <p/>
+     * In case an unhandled exception is collected, the same will be re-thrown inside a
+     * {@link com.bmd.wtf.fll.FloatingException}.
      * <p/>
      * Note that the function will block until all the expected data are available or the maximum
      * delay has elapsed.
@@ -75,6 +81,12 @@ public interface Collector<DATA> extends Iterator<DATA> {
 
     /**
      * Collects the first available data drop by adding it to the specified list.
+     * <p/>
+     * In case an unhandled exception is collected, the same will be re-thrown inside a
+     * {@link com.bmd.wtf.fll.FloatingException}.
+     * <p/>
+     * Note that the function will block until at least a drop of data is available, all data has
+     * been collected, or the maximum delay has elapsed.
      *
      * @param data The list to fill.
      * @return This collector.

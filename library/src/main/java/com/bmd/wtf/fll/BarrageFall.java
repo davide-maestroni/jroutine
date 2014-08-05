@@ -25,7 +25,7 @@ import com.bmd.wtf.lps.Leap;
  * @param <IN>     The input data type.
  * @param <OUT>    The output data type.
  */
-public class BarrageFall<SOURCE, IN, OUT> extends DataFall<IN, OUT> {
+class BarrageFall<SOURCE, IN, OUT> extends DataFall<IN, OUT> {
 
     private final BarrageLeap mBarrage;
 

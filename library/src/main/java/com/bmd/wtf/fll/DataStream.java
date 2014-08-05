@@ -344,19 +344,36 @@ class DataStream<DATA> implements Stream<DATA> {
         return true;
     }
 
-    boolean canReach(final Collection<? extends DataFall<?, ?>> falls) {
+    /**
+     * Checks if this stream can reach, directly or though other streams, the specified fall.
+     *
+     * @param fall The target fall.
+     * @return Whether this stream can reach the target fall.
+     */
+    boolean canReach(final Collection<? extends DataFall<?, ?>> fall) {
 
-        final ReachabilityVisitor visitor = new ReachabilityVisitor(falls);
+        final ReachabilityVisitor visitor = new ReachabilityVisitor(fall);
 
         return !ride(Direction.DOWNSTREAM, visitor);
     }
 
+    /**
+     * Deviates the flow of this stream.
+     *
+     * @see com.bmd.wtf.flw.River#deviate()
+     */
     void deviate() {
 
         mUpstreamFall.outputStreams.remove(this);
         mDownstreamFall.inputStreams.remove(this);
     }
 
+    /**
+     * Drains the stream.
+     *
+     * @param direction The direction of the drain.
+     * @see com.bmd.wtf.flw.River#drain()
+     */
     void drain(final Direction direction) {
 
         final DrainVisitor visitor = new DrainVisitor();

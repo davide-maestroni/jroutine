@@ -11,20 +11,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.wtf.fll;
 
 /**
- * This exception is thrown when an internal exception escapes the waterfall.
+ * Package containing the core classes implementing the waterfall structure.
  * <p/>
- * Created by davide on 6/30/14.
+ * Created by davide on 8/5/14.
  */
-public class FloatingException extends RuntimeException {
-
-    /**
-     * Overrides {@link RuntimeException#RuntimeException(Throwable)}.
-     */
-    public FloatingException(final Throwable throwable) {
-
-        super(throwable);
-    }
-}
+package com.bmd.wtf.fll;

@@ -160,7 +160,7 @@ public class Rapid {
      * @param args           The arguments to be passed to the method.
      * @return The newly created leap generator.
      */
-    public static <SOURCE, IN, OUT> LeapGenerator<IN, OUT> leapGenerator(final Object generator,
+    public static <IN, OUT> LeapGenerator<IN, OUT> leapGenerator(final Object generator,
             final Classification<? extends Leap<IN, OUT>> classification, final Object... args) {
 
         return RapidGenerators.leapGenerator(generator, classification, args);
@@ -182,7 +182,7 @@ public class Rapid {
      * @param contextArgs The arguments to be passed to the constructor.
      * @return The newly created leap generator.
      */
-    public static <SOURCE, IN, OUT> LeapGenerator<IN, OUT> leapGenerator(final Leap<IN, OUT> leap,
+    public static <IN, OUT> LeapGenerator<IN, OUT> leapGenerator(final Leap<IN, OUT> leap,
             final Object... contextArgs) {
 
         //noinspection unchecked
@@ -206,7 +206,7 @@ public class Rapid {
      * @param contextArgs    The arguments to be passed to the constructor.
      * @return The newly created leap generator.
      */
-    public static <SOURCE, IN, OUT> LeapGenerator<IN, OUT> leapGenerator(
+    public static <IN, OUT> LeapGenerator<IN, OUT> leapGenerator(
             final Classification<? extends Leap<IN, OUT>> classification,
             final Object... contextArgs) {
 
@@ -229,7 +229,7 @@ public class Rapid {
      * @param contextArgs The arguments to be passed to the constructor.
      * @return The newly created leap generator.
      */
-    public static <SOURCE, IN, OUT> LeapGenerator<IN, OUT> leapGenerator(
+    public static <IN, OUT> LeapGenerator<IN, OUT> leapGenerator(
             final Class<? extends Leap<IN, OUT>> type, final Object... contextArgs) {
 
         return RapidGenerators.leapGenerator(type, contextArgs);

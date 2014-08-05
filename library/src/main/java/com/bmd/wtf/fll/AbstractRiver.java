@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @param <DATA> The data type.
  */
-public abstract class AbstractRiver<DATA> implements River<DATA> {
+abstract class AbstractRiver<DATA> implements River<DATA> {
 
     @Override
     public River<DATA> discharge(final DATA... drops) {

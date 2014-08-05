@@ -43,15 +43,17 @@ public interface Stream<DATA> {
      *
      * @param drops The data drops.
      * @return This stream.
+     * @see #discharge()
      */
     public Stream<DATA> discharge(DATA... drops);
 
     /**
-     * Pushes the data returned by the specified iterable into the waterfall flowand then discharge
-     * it.
+     * Pushes the data returned by the specified iterable into the waterfall flow and then
+     * discharge it.
      *
      * @param drops The data drops iterable.
      * @return This stream.
+     * @see #discharge()
      */
     public Stream<DATA> discharge(Iterable<? extends DATA> drops);
 
@@ -60,6 +62,7 @@ public interface Stream<DATA> {
      *
      * @param drop The data drop.
      * @return This stream.
+     * @see #discharge()
      */
     public Stream<DATA> discharge(DATA drop);
 
@@ -71,6 +74,7 @@ public interface Stream<DATA> {
      * @param timeUnit The delay time unit.
      * @param drops    The data drops iterable.
      * @return This stream.
+     * @see #discharge()
      */
     public Stream<DATA> dischargeAfter(long delay, TimeUnit timeUnit,
             Iterable<? extends DATA> drops);
@@ -83,6 +87,7 @@ public interface Stream<DATA> {
      * @param timeUnit The delay time unit.
      * @param drop     The data drop.
      * @return This stream.
+     * @see #discharge()
      */
     public Stream<DATA> dischargeAfter(long delay, TimeUnit timeUnit, DATA drop);
 
@@ -94,6 +99,7 @@ public interface Stream<DATA> {
      * @param timeUnit The delay time unit.
      * @param drops    The data drops.
      * @return This stream.
+     * @see #discharge()
      */
     public Stream<DATA> dischargeAfter(long delay, TimeUnit timeUnit, DATA... drops);
 

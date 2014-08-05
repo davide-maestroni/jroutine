@@ -22,7 +22,7 @@ import com.bmd.wtf.lps.AbstractLeap;
  * <p/>
  * The level of each stream is raised and lowered based on the number of data drop flowing through
  * it.<b/>
- * The next coming data are pushed into the stream with the lower level at that moment.
+ * By default, the next coming data are pushed into the stream with the lower level at that moment.
  * <p/>
  * Created by davide on 6/10/14.
  *

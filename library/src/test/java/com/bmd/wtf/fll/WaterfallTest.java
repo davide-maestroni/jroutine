@@ -1189,6 +1189,16 @@ public class WaterfallTest extends TestCase {
 
         try {
 
+            fall().distribute(null);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
             final Barrage<Object> barrage = new Barrage<Object>() {
 
                 @Override
@@ -1198,7 +1208,7 @@ public class WaterfallTest extends TestCase {
                 }
             };
 
-            fall().start().in(2).distribute(barrage).distribute(barrage);
+            fall().in(2).distribute(barrage).distribute(barrage);
 
             fail();
 

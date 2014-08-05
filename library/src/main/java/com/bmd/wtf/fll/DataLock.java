@@ -205,9 +205,9 @@ class DataLock {
 
     private Fluid[] mFluids;
 
-    private int mLast;
+    private boolean mIsOpen;
 
-    private boolean mPumping;
+    private int mLast;
 
     private long[] mPushTimeNs;
 
@@ -447,12 +447,12 @@ class DataLock {
 
     public void release() {
 
-        if (mPumping) {
+        if (mIsOpen) {
 
             return;
         }
 
-        mPumping = true;
+        mIsOpen = true;
 
         try {
 
@@ -500,7 +500,7 @@ class DataLock {
 
         } finally {
 
-            mPumping = false;
+            mIsOpen = false;
         }
     }
 

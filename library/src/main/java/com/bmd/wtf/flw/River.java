@@ -192,7 +192,7 @@ public interface River<DATA> extends Stream<DATA> {
     /**
      * Returns a gate handling a leap of the specified type.
      * <p/>
-     * If no leap of that type is not found inside the waterfall an exception will be thrown.
+     * If no leap of that type is found along the river path an exception will be thrown.
      *
      * @param gateClass The gate class.
      * @param <TYPE>    The leap type.
@@ -203,7 +203,7 @@ public interface River<DATA> extends Stream<DATA> {
     /**
      * Returns a gate handling the specified leap.
      * <p/>
-     * If the leap is not found inside the waterfall an exception will be thrown.
+     * If no leap of that type is found along the river path an exception will be thrown.
      *
      * @param leap   The leap instance.
      * @param <TYPE> The leap type.
@@ -214,7 +214,7 @@ public interface River<DATA> extends Stream<DATA> {
     /**
      * Returns a gate handling a leap of the specified type.
      * <p/>
-     * If the leap is not found inside the waterfall an exception will be thrown.
+     * If no leap of that type is found along the river path an exception will be thrown.
      *
      * @param gateClassification The gate classification.
      * @param <TYPE>             The leap type.

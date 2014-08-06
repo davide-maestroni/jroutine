@@ -28,7 +28,7 @@ import java.util.ListIterator;
  */
 public class Drops<DATA> implements List<DATA> {
 
-    private final List<DATA> mList;
+    private final List<Object> mList;
 
     private final Class<DATA> mType;
 
@@ -38,7 +38,7 @@ public class Drops<DATA> implements List<DATA> {
      * @param type    The list element type.
      * @param wrapped The wrapped list.
      */
-    private Drops(final Class<DATA> type, final List<DATA> wrapped) {
+    private Drops(final Class<DATA> type, final List<Object> wrapped) {
 
         mType = type;
         mList = wrapped;
@@ -52,19 +52,7 @@ public class Drops<DATA> implements List<DATA> {
      */
     public static Drops<Boolean> asList(final boolean... data) {
 
-        if ((data == null) || (data.length == 0)) {
-
-            return new Drops<Boolean>(boolean.class, new ArrayList<Boolean>(0));
-        }
-
-        final ArrayList<Boolean> list = new ArrayList<Boolean>(data.length);
-
-        for (final boolean b : data) {
-
-            list.add(b);
-        }
-
-        return new Drops<Boolean>(boolean.class, list);
+        return new Drops<Boolean>(boolean.class, asObjects(data));
     }
 
     /**
@@ -75,19 +63,7 @@ public class Drops<DATA> implements List<DATA> {
      */
     public static Drops<Byte> asList(final byte... data) {
 
-        if ((data == null) || (data.length == 0)) {
-
-            return new Drops<Byte>(byte.class, new ArrayList<Byte>(0));
-        }
-
-        final ArrayList<Byte> list = new ArrayList<Byte>(data.length);
-
-        for (final byte b : data) {
-
-            list.add(b);
-        }
-
-        return new Drops<Byte>(byte.class, list);
+        return new Drops<Byte>(byte.class, asObjects(data));
     }
 
     /**
@@ -98,19 +74,7 @@ public class Drops<DATA> implements List<DATA> {
      */
     public static Drops<Character> asList(final char... data) {
 
-        if ((data == null) || (data.length == 0)) {
-
-            return new Drops<Character>(char.class, new ArrayList<Character>(0));
-        }
-
-        final ArrayList<Character> list = new ArrayList<Character>(data.length);
-
-        for (final char c : data) {
-
-            list.add(c);
-        }
-
-        return new Drops<Character>(char.class, list);
+        return new Drops<Character>(char.class, asObjects(data));
     }
 
     /**
@@ -121,19 +85,7 @@ public class Drops<DATA> implements List<DATA> {
      */
     public static Drops<Double> asList(final double... data) {
 
-        if ((data == null) || (data.length == 0)) {
-
-            return new Drops<Double>(double.class, new ArrayList<Double>(0));
-        }
-
-        final ArrayList<Double> list = new ArrayList<Double>(data.length);
-
-        for (final double d : data) {
-
-            list.add(d);
-        }
-
-        return new Drops<Double>(double.class, list);
+        return new Drops<Double>(double.class, asObjects(data));
     }
 
     /**
@@ -144,19 +96,7 @@ public class Drops<DATA> implements List<DATA> {
      */
     public static Drops<Float> asList(final float... data) {
 
-        if ((data == null) || (data.length == 0)) {
-
-            return new Drops<Float>(float.class, new ArrayList<Float>(0));
-        }
-
-        final ArrayList<Float> list = new ArrayList<Float>(data.length);
-
-        for (final float f : data) {
-
-            list.add(f);
-        }
-
-        return new Drops<Float>(float.class, list);
+        return new Drops<Float>(float.class, asObjects(data));
     }
 
     /**
@@ -167,19 +107,7 @@ public class Drops<DATA> implements List<DATA> {
      */
     public static Drops<Integer> asList(final int... data) {
 
-        if ((data == null) || (data.length == 0)) {
-
-            return new Drops<Integer>(int.class, new ArrayList<Integer>(0));
-        }
-
-        final ArrayList<Integer> list = new ArrayList<Integer>(data.length);
-
-        for (final int i : data) {
-
-            list.add(i);
-        }
-
-        return new Drops<Integer>(int.class, list);
+        return new Drops<Integer>(int.class, asObjects(data));
     }
 
     /**
@@ -190,19 +118,7 @@ public class Drops<DATA> implements List<DATA> {
      */
     public static Drops<Long> asList(final long... data) {
 
-        if ((data == null) || (data.length == 0)) {
-
-            return new Drops<Long>(long.class, new ArrayList<Long>(0));
-        }
-
-        final ArrayList<Long> list = new ArrayList<Long>(data.length);
-
-        for (final long l : data) {
-
-            list.add(l);
-        }
-
-        return new Drops<Long>(long.class, list);
+        return new Drops<Long>(long.class, asObjects(data));
     }
 
     /**
@@ -213,19 +129,191 @@ public class Drops<DATA> implements List<DATA> {
      */
     public static Drops<Short> asList(final short... data) {
 
+        return new Drops<Short>(short.class, asObjects(data));
+    }
+
+    /**
+     * Returns a list containing the specified native data.
+     *
+     * @param data The data to fill the list with.
+     * @return The newly created list.
+     */
+    public static List<Object> asObjects(final long... data) {
+
         if ((data == null) || (data.length == 0)) {
 
-            return new Drops<Short>(short.class, new ArrayList<Short>(0));
+            return new ArrayList<Object>(0);
         }
 
-        final ArrayList<Short> list = new ArrayList<Short>(data.length);
+        final ArrayList<Object> list = new ArrayList<Object>(data.length);
+
+        for (final long l : data) {
+
+            list.add(l);
+        }
+
+        return list;
+    }
+
+    /**
+     * Returns a list containing the specified native data.
+     *
+     * @param data The data to fill the list with.
+     * @return The newly created list.
+     */
+    public static List<Object> asObjects(final short... data) {
+
+        if ((data == null) || (data.length == 0)) {
+
+            return new ArrayList<Object>(0);
+        }
+
+        final ArrayList<Object> list = new ArrayList<Object>(data.length);
 
         for (final short s : data) {
 
             list.add(s);
         }
 
-        return new Drops<Short>(short.class, list);
+        return list;
+    }
+
+    /**
+     * Returns a list containing the specified native data.
+     *
+     * @param data The data to fill the list with.
+     * @return The newly created list.
+     */
+    public static List<Object> asObjects(final byte... data) {
+
+        if ((data == null) || (data.length == 0)) {
+
+            return new ArrayList<Object>(0);
+        }
+
+        final ArrayList<Object> list = new ArrayList<Object>(data.length);
+
+        for (final byte b : data) {
+
+            list.add(b);
+        }
+
+        return list;
+    }
+
+    /**
+     * Returns a list containing the specified native data.
+     *
+     * @param data The data to fill the list with.
+     * @return The newly created list.
+     */
+    public static List<Object> asObjects(final char... data) {
+
+        if ((data == null) || (data.length == 0)) {
+
+            return new ArrayList<Object>(0);
+        }
+
+        final ArrayList<Object> list = new ArrayList<Object>(data.length);
+
+        for (final char c : data) {
+
+            list.add(c);
+        }
+
+        return list;
+    }
+
+    /**
+     * Returns a list containing the specified native data.
+     *
+     * @param data The data to fill the list with.
+     * @return The newly created list.
+     */
+    public static List<Object> asObjects(final double... data) {
+
+        if ((data == null) || (data.length == 0)) {
+
+            return new ArrayList<Object>(0);
+        }
+
+        final ArrayList<Object> list = new ArrayList<Object>(data.length);
+
+        for (final double d : data) {
+
+            list.add(d);
+        }
+
+        return list;
+    }
+
+    /**
+     * Returns a list containing the specified native data.
+     *
+     * @param data The data to fill the list with.
+     * @return The newly created list.
+     */
+    public static List<Object> asObjects(final float... data) {
+
+        if ((data == null) || (data.length == 0)) {
+
+            return new ArrayList<Object>(0);
+        }
+
+        final ArrayList<Object> list = new ArrayList<Object>(data.length);
+
+        for (final float f : data) {
+
+            list.add(f);
+        }
+
+        return list;
+    }
+
+    /**
+     * Returns a list containing the specified native data.
+     *
+     * @param data The data to fill the list with.
+     * @return The newly created list.
+     */
+    public static List<Object> asObjects(final int... data) {
+
+        if ((data == null) || (data.length == 0)) {
+
+            return new ArrayList<Object>(0);
+        }
+
+        final ArrayList<Object> list = new ArrayList<Object>(data.length);
+
+        for (final int i : data) {
+
+            list.add(i);
+        }
+
+        return list;
+    }
+
+    /**
+     * Returns a list containing the specified native data.
+     *
+     * @param data The data to fill the list with.
+     * @return The newly created list.
+     */
+    public static List<Object> asObjects(final boolean... data) {
+
+        if ((data == null) || (data.length == 0)) {
+
+            return new ArrayList<Object>(0);
+        }
+
+        final ArrayList<Object> list = new ArrayList<Object>(data.length);
+
+        for (final boolean b : data) {
+
+            list.add(b);
+        }
+
+        return list;
     }
 
     @Override
@@ -250,7 +338,8 @@ public class Drops<DATA> implements List<DATA> {
     @SuppressWarnings("NullableProblems")
     public Iterator<DATA> iterator() {
 
-        return mList.iterator();
+        //noinspection unchecked
+        return (Iterator<DATA>) mList.iterator();
     }
 
     @Override
@@ -324,13 +413,15 @@ public class Drops<DATA> implements List<DATA> {
     @Override
     public DATA get(final int index) {
 
-        return mList.get(index);
+        //noinspection unchecked
+        return (DATA) mList.get(index);
     }
 
     @Override
     public DATA set(final int index, final DATA element) {
 
-        return mList.set(index, element);
+        //noinspection unchecked
+        return (DATA) mList.set(index, element);
     }
 
     @Override
@@ -342,7 +433,8 @@ public class Drops<DATA> implements List<DATA> {
     @Override
     public DATA remove(final int index) {
 
-        return mList.remove(index);
+        //noinspection unchecked
+        return (DATA) mList.remove(index);
     }
 
     @Override
@@ -361,14 +453,16 @@ public class Drops<DATA> implements List<DATA> {
     @SuppressWarnings("NullableProblems")
     public ListIterator<DATA> listIterator() {
 
-        return mList.listIterator();
+        //noinspection unchecked
+        return (ListIterator<DATA>) mList.listIterator();
     }
 
     @Override
     @SuppressWarnings("NullableProblems")
     public ListIterator<DATA> listIterator(final int index) {
 
-        return mList.listIterator(index);
+        //noinspection unchecked
+        return (ListIterator<DATA>) mList.listIterator(index);
     }
 
     @Override
@@ -388,29 +482,28 @@ public class Drops<DATA> implements List<DATA> {
         if (boolean.class.equals(mType)) {
 
             //noinspection unchecked
-            return new Drops<Boolean>(boolean.class, new ArrayList<Boolean>(
-                    (Collection<? extends Boolean>) mList));
+            return new Drops<Boolean>(boolean.class, new ArrayList<Object>(mList));
         }
 
-        final List<DATA> list = mList;
+        final List<Object> list = mList;
 
         if (list.isEmpty()) {
 
-            return new Drops<Boolean>(boolean.class, new ArrayList<Boolean>(0));
+            return new Drops<Boolean>(boolean.class, new ArrayList<Object>(0));
         }
 
-        final ArrayList<Boolean> newList = new ArrayList<Boolean>(list.size());
+        final ArrayList<Object> newList = new ArrayList<Object>(list.size());
 
         if (char.class.equals(mType)) {
 
-            for (final DATA data : list) {
+            for (final Object data : list) {
 
                 newList.add(((Character) data) != 0);
             }
 
         } else {
 
-            for (final DATA data : list) {
+            for (final Object data : list) {
 
                 final Number number = (Number) data;
 
@@ -433,22 +526,21 @@ public class Drops<DATA> implements List<DATA> {
         if (byte.class.equals(type)) {
 
             //noinspection unchecked
-            return new Drops<Byte>(byte.class,
-                                   new ArrayList<Byte>((Collection<? extends Byte>) mList));
+            return new Drops<Byte>(byte.class, new ArrayList<Object>(mList));
         }
 
-        final List<DATA> list = mList;
+        final List<Object> list = mList;
 
         if (list.isEmpty()) {
 
-            return new Drops<Byte>(byte.class, new ArrayList<Byte>(0));
+            return new Drops<Byte>(byte.class, new ArrayList<Object>(0));
         }
 
-        final ArrayList<Byte> newList = new ArrayList<Byte>(list.size());
+        final ArrayList<Object> newList = new ArrayList<Object>(list.size());
 
         if (boolean.class.equals(type)) {
 
-            for (final DATA data : list) {
+            for (final Object data : list) {
 
                 final Boolean bool = (Boolean) data;
 
@@ -457,14 +549,14 @@ public class Drops<DATA> implements List<DATA> {
 
         } else if (char.class.equals(mType)) {
 
-            for (final DATA data : list) {
+            for (final Object data : list) {
 
                 newList.add((byte) ((Character) data).charValue());
             }
 
         } else {
 
-            for (final DATA data : list) {
+            for (final Object data : list) {
 
                 final Number number = (Number) data;
 
@@ -487,22 +579,21 @@ public class Drops<DATA> implements List<DATA> {
         if (char.class.equals(type)) {
 
             //noinspection unchecked
-            return new Drops<Character>(char.class, new ArrayList<Character>(
-                    (Collection<? extends Character>) mList));
+            return new Drops<Character>(char.class, new ArrayList<Object>(mList));
         }
 
-        final List<DATA> list = mList;
+        final List<Object> list = mList;
 
         if (list.isEmpty()) {
 
-            return new Drops<Character>(char.class, new ArrayList<Character>(0));
+            return new Drops<Character>(char.class, new ArrayList<Object>(0));
         }
 
-        final ArrayList<Character> newList = new ArrayList<Character>(list.size());
+        final ArrayList<Object> newList = new ArrayList<Object>(list.size());
 
         if (boolean.class.equals(type)) {
 
-            for (final DATA data : list) {
+            for (final Object data : list) {
 
                 final Boolean bool = (Boolean) data;
 
@@ -511,7 +602,7 @@ public class Drops<DATA> implements List<DATA> {
 
         } else {
 
-            for (final DATA data : list) {
+            for (final Object data : list) {
 
                 final Number number = (Number) data;
 
@@ -534,22 +625,21 @@ public class Drops<DATA> implements List<DATA> {
         if (double.class.equals(type)) {
 
             //noinspection unchecked
-            return new Drops<Double>(double.class,
-                                     new ArrayList<Double>((Collection<? extends Double>) mList));
+            return new Drops<Double>(double.class, new ArrayList<Object>(mList));
         }
 
-        final List<DATA> list = mList;
+        final List<Object> list = mList;
 
         if (list.isEmpty()) {
 
-            return new Drops<Double>(double.class, new ArrayList<Double>(0));
+            return new Drops<Double>(double.class, new ArrayList<Object>(0));
         }
 
-        final ArrayList<Double> newList = new ArrayList<Double>(list.size());
+        final ArrayList<Object> newList = new ArrayList<Object>(list.size());
 
         if (boolean.class.equals(type)) {
 
-            for (final DATA data : list) {
+            for (final Object data : list) {
 
                 final Boolean bool = (Boolean) data;
 
@@ -558,14 +648,14 @@ public class Drops<DATA> implements List<DATA> {
 
         } else if (char.class.equals(mType)) {
 
-            for (final DATA data : list) {
+            for (final Object data : list) {
 
                 newList.add((double) ((Character) data));
             }
 
         } else {
 
-            for (final DATA data : list) {
+            for (final Object data : list) {
 
                 final Number number = (Number) data;
 
@@ -588,22 +678,21 @@ public class Drops<DATA> implements List<DATA> {
         if (float.class.equals(type)) {
 
             //noinspection unchecked
-            return new Drops<Float>(float.class,
-                                    new ArrayList<Float>((Collection<? extends Float>) mList));
+            return new Drops<Float>(float.class, new ArrayList<Object>(mList));
         }
 
-        final List<DATA> list = mList;
+        final List<Object> list = mList;
 
         if (list.isEmpty()) {
 
-            return new Drops<Float>(float.class, new ArrayList<Float>(0));
+            return new Drops<Float>(float.class, new ArrayList<Object>(0));
         }
 
-        final ArrayList<Float> newList = new ArrayList<Float>(list.size());
+        final ArrayList<Object> newList = new ArrayList<Object>(list.size());
 
         if (boolean.class.equals(type)) {
 
-            for (final DATA data : list) {
+            for (final Object data : list) {
 
                 final Boolean bool = (Boolean) data;
 
@@ -612,14 +701,14 @@ public class Drops<DATA> implements List<DATA> {
 
         } else if (char.class.equals(mType)) {
 
-            for (final DATA data : list) {
+            for (final Object data : list) {
 
                 newList.add((float) ((Character) data));
             }
 
         } else {
 
-            for (final DATA data : list) {
+            for (final Object data : list) {
 
                 final Number number = (Number) data;
 
@@ -642,22 +731,21 @@ public class Drops<DATA> implements List<DATA> {
         if (int.class.equals(type)) {
 
             //noinspection unchecked
-            return new Drops<Integer>(int.class, new ArrayList<Integer>(
-                    (Collection<? extends Integer>) mList));
+            return new Drops<Integer>(int.class, new ArrayList<Object>(mList));
         }
 
-        final List<DATA> list = mList;
+        final List<Object> list = mList;
 
         if (list.isEmpty()) {
 
-            return new Drops<Integer>(int.class, new ArrayList<Integer>(0));
+            return new Drops<Integer>(int.class, new ArrayList<Object>(0));
         }
 
-        final ArrayList<Integer> newList = new ArrayList<Integer>(list.size());
+        final ArrayList<Object> newList = new ArrayList<Object>(list.size());
 
         if (boolean.class.equals(type)) {
 
-            for (final DATA data : list) {
+            for (final Object data : list) {
 
                 final Boolean bool = (Boolean) data;
 
@@ -666,14 +754,14 @@ public class Drops<DATA> implements List<DATA> {
 
         } else if (char.class.equals(mType)) {
 
-            for (final DATA data : list) {
+            for (final Object data : list) {
 
                 newList.add((int) ((Character) data));
             }
 
         } else {
 
-            for (final DATA data : list) {
+            for (final Object data : list) {
 
                 final Number number = (Number) data;
 
@@ -696,22 +784,21 @@ public class Drops<DATA> implements List<DATA> {
         if (long.class.equals(type)) {
 
             //noinspection unchecked
-            return new Drops<Long>(long.class,
-                                   new ArrayList<Long>((Collection<? extends Long>) mList));
+            return new Drops<Long>(long.class, new ArrayList<Object>(mList));
         }
 
-        final List<DATA> list = mList;
+        final List<Object> list = mList;
 
         if (list.isEmpty()) {
 
-            return new Drops<Long>(long.class, new ArrayList<Long>(0));
+            return new Drops<Long>(long.class, new ArrayList<Object>(0));
         }
 
-        final ArrayList<Long> newList = new ArrayList<Long>(list.size());
+        final ArrayList<Object> newList = new ArrayList<Object>(list.size());
 
         if (boolean.class.equals(type)) {
 
-            for (final DATA data : list) {
+            for (final Object data : list) {
 
                 final Boolean bool = (Boolean) data;
 
@@ -720,14 +807,14 @@ public class Drops<DATA> implements List<DATA> {
 
         } else if (char.class.equals(mType)) {
 
-            for (final DATA data : list) {
+            for (final Object data : list) {
 
                 newList.add((long) ((Character) data));
             }
 
         } else {
 
-            for (final DATA data : list) {
+            for (final Object data : list) {
 
                 final Number number = (Number) data;
 
@@ -760,22 +847,21 @@ public class Drops<DATA> implements List<DATA> {
         if (short.class.equals(type)) {
 
             //noinspection unchecked
-            return new Drops<Short>(short.class,
-                                    new ArrayList<Short>((Collection<? extends Short>) mList));
+            return new Drops<Short>(short.class, new ArrayList<Object>(mList));
         }
 
-        final List<DATA> list = mList;
+        final List<Object> list = mList;
 
         if (list.isEmpty()) {
 
-            return new Drops<Short>(short.class, new ArrayList<Short>(0));
+            return new Drops<Short>(short.class, new ArrayList<Object>(0));
         }
 
-        final ArrayList<Short> newList = new ArrayList<Short>(list.size());
+        final ArrayList<Object> newList = new ArrayList<Object>(list.size());
 
         if (boolean.class.equals(type)) {
 
-            for (final DATA data : list) {
+            for (final Object data : list) {
 
                 final Boolean bool = (Boolean) data;
 
@@ -784,14 +870,14 @@ public class Drops<DATA> implements List<DATA> {
 
         } else if (char.class.equals(mType)) {
 
-            for (final DATA data : list) {
+            for (final Object data : list) {
 
                 newList.add((short) ((Character) data).charValue());
             }
 
         } else {
 
-            for (final DATA data : list) {
+            for (final Object data : list) {
 
                 final Number number = (Number) data;
 

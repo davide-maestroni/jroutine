@@ -1075,7 +1075,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            fall().start((Class) null);
+            fall().start((Class<?>) null);
 
             fail();
 
@@ -1085,7 +1085,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            fall().start((Classification) null);
+            fall().start((Classification<?>) null);
 
             fail();
 
@@ -1095,7 +1095,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            fall().start((Leap) null);
+            fall().start((Leap<?, ?>) null);
 
             fail();
 
@@ -1105,7 +1105,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            fall().start((LeapGenerator) null);
+            fall().start((LeapGenerator<?, ?>) null);
 
             fail();
 
@@ -1220,7 +1220,7 @@ public class WaterfallTest extends TestCase {
 
             final FreeLeap<Object> leap = new FreeLeap<Object>();
 
-            fall().start(leap).start((Class) null);
+            fall().start(leap).start((Class<?>) null);
 
             fail();
 
@@ -1232,7 +1232,7 @@ public class WaterfallTest extends TestCase {
 
             final FreeLeap<Object> leap = new FreeLeap<Object>();
 
-            fall().start(leap).start((Classification) null);
+            fall().start(leap).start((Classification<?>) null);
 
             fail();
 
@@ -1244,7 +1244,7 @@ public class WaterfallTest extends TestCase {
 
             final FreeLeap<Object> leap = new FreeLeap<Object>();
 
-            fall().start(leap).start((Leap) null);
+            fall().start(leap).start((Leap<?, ?>) null);
 
             fail();
 
@@ -1256,7 +1256,7 @@ public class WaterfallTest extends TestCase {
 
             final FreeLeap<Object> leap = new FreeLeap<Object>();
 
-            fall().start(leap).start((LeapGenerator) null);
+            fall().start(leap).start((LeapGenerator<?, ?>) null);
 
             fail();
 
@@ -1484,7 +1484,7 @@ public class WaterfallTest extends TestCase {
 
             final Waterfall<Object, Object, Object> waterfall = fall().start();
 
-            waterfall.on((Class) null);
+            waterfall.on((Class<?>) null);
 
             fail();
 
@@ -1496,7 +1496,7 @@ public class WaterfallTest extends TestCase {
 
             final Waterfall<Object, Object, Object> waterfall = fall().start();
 
-            waterfall.on((Classification) null);
+            waterfall.on((Classification<?>) null);
 
             fail();
 

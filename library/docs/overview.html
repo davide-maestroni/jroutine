@@ -66,7 +66,7 @@ The code below shows how it is possible to implement the computation of the root
 
                                             })
                                             // Pull the input data along the flow...
-                                            .pull(Drops.asList(input).toObjects())
+                                            .pull(Drops.asObjects(input))
                                             // ...and finally collect the result
                                             .next();
 

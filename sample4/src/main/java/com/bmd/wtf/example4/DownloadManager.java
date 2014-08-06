@@ -19,7 +19,7 @@ import com.bmd.wtf.example1.Downloader;
 import com.bmd.wtf.example3.RetryPolicy;
 import com.bmd.wtf.fll.Classification;
 import com.bmd.wtf.fll.Waterfall;
-import com.bmd.wtf.rpd.Rapid;
+import com.bmd.wtf.xtr.rpd.Rapid;
 
 import java.io.File;
 import java.io.IOException;

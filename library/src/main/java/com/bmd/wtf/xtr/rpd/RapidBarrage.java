@@ -11,11 +11,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.wtf.rpd;
+package com.bmd.wtf.xtr.rpd;
 
 import com.bmd.wtf.flw.Barrage;
-import com.bmd.wtf.rpd.RapidAnnotations.DataFlow;
-import com.bmd.wtf.rpd.RapidLeap.ValidFlows;
+import com.bmd.wtf.xtr.rpd.RapidAnnotations.DataFlow;
+import com.bmd.wtf.xtr.rpd.RapidLeap.ValidFlows;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -66,7 +66,7 @@ public abstract class RapidBarrage implements Barrage<Object> {
      * <p/>
      * By default all methods are analyzed.
      *
-     * @see #RapidBarrage(com.bmd.wtf.rpd.RapidLeap.ValidFlows)
+     * @see #RapidBarrage(RapidLeap.ValidFlows)
      */
     public RapidBarrage() {
 

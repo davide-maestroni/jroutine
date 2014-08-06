@@ -20,8 +20,8 @@ import com.bmd.wtf.example2.UriObserver;
 import com.bmd.wtf.example3.RetryPolicy;
 import com.bmd.wtf.fll.Classification;
 import com.bmd.wtf.fll.Waterfall;
-import com.bmd.wtf.rpd.Rapid;
-import com.bmd.wtf.rpd.RapidBarrage;
+import com.bmd.wtf.xtr.rpd.Rapid;
+import com.bmd.wtf.xtr.rpd.RapidBarrage;
 
 import java.io.File;
 import java.io.IOException;

@@ -17,7 +17,7 @@ import com.bmd.wtf.example1.Download;
 import com.bmd.wtf.example1.DownloadFailure;
 import com.bmd.wtf.example1.DownloadSuccess;
 import com.bmd.wtf.flw.River;
-import com.bmd.wtf.rpd.RapidLeap;
+import com.bmd.wtf.xtr.rpd.RapidLeap;
 
 import java.net.URI;
 import java.util.HashMap;

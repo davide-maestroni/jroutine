@@ -11,14 +11,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.wtf.rpd;
+package com.bmd.wtf.xtr.rpd;
 
 import com.bmd.wtf.crr.Current;
 import com.bmd.wtf.crr.CurrentGenerator;
 import com.bmd.wtf.fll.Classification;
 import com.bmd.wtf.lps.Leap;
 import com.bmd.wtf.lps.LeapGenerator;
-import com.bmd.wtf.rpd.RapidAnnotations.Generator;
+import com.bmd.wtf.xtr.rpd.RapidAnnotations.Generator;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;

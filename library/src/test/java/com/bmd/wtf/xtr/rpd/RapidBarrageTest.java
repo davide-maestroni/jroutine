@@ -11,14 +11,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.wtf.rpd;
+package com.bmd.wtf.xtr.rpd;
 
 import com.bmd.wtf.fll.Waterfall;
 import com.bmd.wtf.flw.Collector;
 import com.bmd.wtf.flw.River;
 import com.bmd.wtf.lps.FreeLeap;
-import com.bmd.wtf.rpd.RapidAnnotations.DataFlow;
-import com.bmd.wtf.rpd.RapidLeap.ValidFlows;
+import com.bmd.wtf.xtr.rpd.RapidAnnotations.DataFlow;
+import com.bmd.wtf.xtr.rpd.RapidLeap.ValidFlows;
 
 import junit.framework.TestCase;
 

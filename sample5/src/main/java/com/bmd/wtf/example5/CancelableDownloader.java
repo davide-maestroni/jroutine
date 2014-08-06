@@ -17,7 +17,7 @@ import com.bmd.wtf.example1.Download;
 import com.bmd.wtf.example1.DownloadFailure;
 import com.bmd.wtf.example1.DownloadSuccess;
 import com.bmd.wtf.example4.AbortException;
-import com.bmd.wtf.rpd.RapidLeap;
+import com.bmd.wtf.xtr.rpd.RapidLeap;
 
 import java.io.IOException;
 import java.net.URI;

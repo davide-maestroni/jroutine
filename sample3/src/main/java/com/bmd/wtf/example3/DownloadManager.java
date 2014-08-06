@@ -20,7 +20,7 @@ import com.bmd.wtf.example2.DownloadObserver;
 import com.bmd.wtf.example2.UriObserver;
 import com.bmd.wtf.fll.Classification;
 import com.bmd.wtf.fll.Waterfall;
-import com.bmd.wtf.rpd.Rapid;
+import com.bmd.wtf.xtr.rpd.Rapid;
 
 import java.io.File;
 import java.io.IOException;

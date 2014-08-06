@@ -11,12 +11,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.wtf.rpd;
+package com.bmd.wtf.xtr.rpd;
 
 import com.bmd.wtf.fll.Classification;
 import com.bmd.wtf.flw.River;
 import com.bmd.wtf.lps.Leap;
-import com.bmd.wtf.rpd.RapidAnnotations.DataFlow;
+import com.bmd.wtf.xtr.rpd.RapidAnnotations.DataFlow;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -81,7 +81,7 @@ public abstract class RapidLeap implements Leap<Object, Object> {
      * <p/>
      * By default all methods are analyzed.
      *
-     * @see #RapidLeap(com.bmd.wtf.rpd.RapidLeap.ValidFlows)
+     * @see #RapidLeap(RapidLeap.ValidFlows)
      */
     public RapidLeap() {
 

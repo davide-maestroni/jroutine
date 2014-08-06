@@ -13,7 +13,7 @@
  */
 package com.bmd.wtf.example1;
 
-import com.bmd.wtf.rpd.RapidLeap;
+import com.bmd.wtf.xtr.rpd.RapidLeap;
 
 import java.io.File;
 import java.io.FileOutputStream;

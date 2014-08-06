@@ -13,9 +13,8 @@
  */
 
 /**
- * Package containing classes providing easier access to the library functionalities by employing
- * reflection.
+ * Package containing classes implementing functionalities built on top of the core ones.
  * <p/>
- * Created by davide on 7/8/14.
+ * Created by davide on 8/6/14.
  */
-package com.bmd.wtf.rpd;
+package com.bmd.wtf.xtr;

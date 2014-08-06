@@ -16,8 +16,8 @@ package com.bmd.wtf.example2;
 import com.bmd.wtf.example1.Download;
 import com.bmd.wtf.example1.DownloadFailure;
 import com.bmd.wtf.example1.DownloadSuccess;
-import com.bmd.wtf.rpd.RapidAnnotations.DataFlow;
-import com.bmd.wtf.rpd.RapidLeap;
+import com.bmd.wtf.xtr.rpd.RapidAnnotations.DataFlow;
+import com.bmd.wtf.xtr.rpd.RapidLeap;
 
 import java.io.File;
 import java.net.URI;

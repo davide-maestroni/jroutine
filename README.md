@@ -1,4 +1,4 @@
 javafall
 ========
 
-Command chain reinvented
+Cool and funny parallel programming.

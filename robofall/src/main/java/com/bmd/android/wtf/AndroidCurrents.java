@@ -13,6 +13,7 @@
  */
 package com.bmd.android.wtf;
 
+import android.os.HandlerThread;
 import android.os.Looper;
 
 import com.bmd.wtf.crr.Current;
@@ -34,11 +35,25 @@ public class AndroidCurrents {
     }
 
     /**
-     * Creates a current running in the specified looper.
+     * Creates a current running in the specified handler thread.
+     * <p/>
+     * Note that the thread must be already started.
      *
+     * @param thread The handler thread instance.
      * @return The newly created current.
      */
-    public static Current looperCurrentOf(final Looper looper) {
+    public static Current currentOf(final HandlerThread thread) {
+
+        return new LooperCurrent(thread.getLooper());
+    }
+
+    /**
+     * Creates a current running in the specified looper.
+     *
+     * @param looper The looper instance.
+     * @return The newly created current.
+     */
+    public static Current currentOf(final Looper looper) {
 
         return new LooperCurrent(looper);
     }

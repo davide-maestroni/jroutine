@@ -25,6 +25,9 @@ import java.lang.annotation.Target;
  */
 public interface RapidAnnotations {
 
+    /**
+     * Annotation identifying the methods handling the flow of data through a rapid leap.
+     */
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
     public @interface DataFlow {
@@ -32,12 +35,19 @@ public interface RapidAnnotations {
         Class<?>[] value() default {};
     }
 
+    /**
+     * Annotation identifying the methods representing a gate condition.
+     */
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
     public @interface GateCondition {
 
     }
 
+    /**
+     * Annotation identifying the methods or constructors to be called for generating leaps or
+     * currents.
+     */
     @Target({ElementType.CONSTRUCTOR, ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
     public @interface Generator {

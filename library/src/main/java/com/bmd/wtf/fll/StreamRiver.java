@@ -70,11 +70,26 @@ class StreamRiver<DATA> extends AbstractRiver<DATA> {
     }
 
     @Override
-    public River<DATA> discharge() {
+    public void drain() {
 
         for (final DataStream<DATA> stream : mStreams) {
 
-            stream.discharge();
+            stream.drain(Direction.DOWNSTREAM);
+        }
+    }
+
+    @Override
+    public void drainStream(final int streamNumber) {
+
+        mStreams.get(streamNumber).drain(Direction.DOWNSTREAM);
+    }
+
+    @Override
+    public River<DATA> flush() {
+
+        for (final DataStream<DATA> stream : mStreams) {
+
+            stream.flush();
         }
 
         return this;
@@ -159,26 +174,11 @@ class StreamRiver<DATA> extends AbstractRiver<DATA> {
     }
 
     @Override
-    public River<DATA> dischargeStream(final int streamNumber) {
+    public River<DATA> flushStream(final int streamNumber) {
 
-        mStreams.get(streamNumber).discharge();
+        mStreams.get(streamNumber).flush();
 
         return this;
-    }
-
-    @Override
-    public void drain() {
-
-        for (final DataStream<DATA> stream : mStreams) {
-
-            stream.drain(Direction.DOWNSTREAM);
-        }
-    }
-
-    @Override
-    public void drainStream(final int streamNumber) {
-
-        mStreams.get(streamNumber).drain(Direction.DOWNSTREAM);
     }
 
     @Override
@@ -265,53 +265,52 @@ class StreamRiver<DATA> extends AbstractRiver<DATA> {
     }
 
     @Override
-    public River<DATA> dischargeStream(final int streamNumber, final DATA... drops) {
+    public River<DATA> flushStream(final int streamNumber, final DATA... drops) {
 
-        mStreams.get(streamNumber).discharge(drops);
-
-        return this;
-    }
-
-    @Override
-    public River<DATA> dischargeStream(final int streamNumber,
-            final Iterable<? extends DATA> drops) {
-
-        mStreams.get(streamNumber).discharge(drops);
+        mStreams.get(streamNumber).flush(drops);
 
         return this;
     }
 
     @Override
-    public River<DATA> dischargeStream(final int streamNumber, final DATA drop) {
+    public River<DATA> flushStream(final int streamNumber, final Iterable<? extends DATA> drops) {
 
-        mStreams.get(streamNumber).discharge(drop);
+        mStreams.get(streamNumber).flush(drops);
 
         return this;
     }
 
     @Override
-    public River<DATA> dischargeStreamAfter(final int streamNumber, final long delay,
+    public River<DATA> flushStream(final int streamNumber, final DATA drop) {
+
+        mStreams.get(streamNumber).flush(drop);
+
+        return this;
+    }
+
+    @Override
+    public River<DATA> flushStreamAfter(final int streamNumber, final long delay,
             final TimeUnit timeUnit, final Iterable<? extends DATA> drops) {
 
-        mStreams.get(streamNumber).dischargeAfter(delay, timeUnit, drops);
+        mStreams.get(streamNumber).flushAfter(delay, timeUnit, drops);
 
         return this;
     }
 
     @Override
-    public River<DATA> dischargeStreamAfter(final int streamNumber, final long delay,
+    public River<DATA> flushStreamAfter(final int streamNumber, final long delay,
             final TimeUnit timeUnit, final DATA drop) {
 
-        mStreams.get(streamNumber).dischargeAfter(delay, timeUnit, drop);
+        mStreams.get(streamNumber).flushAfter(delay, timeUnit, drop);
 
         return this;
     }
 
     @Override
-    public River<DATA> dischargeStreamAfter(final int streamNumber, final long delay,
+    public River<DATA> flushStreamAfter(final int streamNumber, final long delay,
             final TimeUnit timeUnit, final DATA... drops) {
 
-        mStreams.get(streamNumber).dischargeAfter(delay, timeUnit, drops);
+        mStreams.get(streamNumber).flushAfter(delay, timeUnit, drops);
 
         return this;
     }

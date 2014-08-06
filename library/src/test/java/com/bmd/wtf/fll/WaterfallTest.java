@@ -71,27 +71,27 @@ public class WaterfallTest extends TestCase {
              .forward(null)
              .forward(new RuntimeException("test"));
 
-        river.discharge((Object) null)
-             .discharge((Object[]) null)
-             .discharge((Iterable<Object>) null)
-             .discharge(new Object[0])
-             .discharge(Arrays.asList())
-             .discharge("push")
-             .discharge(new Object[]{"push"})
-             .discharge(new Object[]{"push", "push"})
-             .discharge(Arrays.asList("push"))
-             .discharge(Arrays.asList("push", "push"))
-             .dischargeAfter(0, TimeUnit.MILLISECONDS, (Object) null)
-             .dischargeAfter(0, TimeUnit.MILLISECONDS, (Object[]) null)
-             .dischargeAfter(0, TimeUnit.MILLISECONDS, (Iterable<Object>) null)
-             .dischargeAfter(0, TimeUnit.MILLISECONDS, new Object[0])
-             .dischargeAfter(0, TimeUnit.MILLISECONDS, Arrays.asList())
-             .dischargeAfter(0, TimeUnit.MILLISECONDS, "push")
-             .dischargeAfter(0, TimeUnit.MILLISECONDS, new Object[]{"push"})
-             .dischargeAfter(0, TimeUnit.MILLISECONDS, new Object[]{"push", "push"})
-             .dischargeAfter(0, TimeUnit.MILLISECONDS, Arrays.asList("push"))
-             .dischargeAfter(0, TimeUnit.MILLISECONDS, Arrays.asList("push", "push"))
-             .discharge();
+        river.flush((Object) null)
+             .flush((Object[]) null)
+             .flush((Iterable<Object>) null)
+             .flush(new Object[0])
+             .flush(Arrays.asList())
+             .flush("push")
+             .flush(new Object[]{"push"})
+             .flush(new Object[]{"push", "push"})
+             .flush(Arrays.asList("push"))
+             .flush(Arrays.asList("push", "push"))
+             .flushAfter(0, TimeUnit.MILLISECONDS, (Object) null)
+             .flushAfter(0, TimeUnit.MILLISECONDS, (Object[]) null)
+             .flushAfter(0, TimeUnit.MILLISECONDS, (Iterable<Object>) null)
+             .flushAfter(0, TimeUnit.MILLISECONDS, new Object[0])
+             .flushAfter(0, TimeUnit.MILLISECONDS, Arrays.asList())
+             .flushAfter(0, TimeUnit.MILLISECONDS, "push")
+             .flushAfter(0, TimeUnit.MILLISECONDS, new Object[]{"push"})
+             .flushAfter(0, TimeUnit.MILLISECONDS, new Object[]{"push", "push"})
+             .flushAfter(0, TimeUnit.MILLISECONDS, Arrays.asList("push"))
+             .flushAfter(0, TimeUnit.MILLISECONDS, Arrays.asList("push", "push"))
+             .flush();
     }
 
     private static void testRivers(final River<Object> upRiver, final River<Object> downRiver) {
@@ -130,27 +130,27 @@ public class WaterfallTest extends TestCase {
              .forwardStream(0, null)
              .forwardStream(0, new RuntimeException("test"));
 
-        river.dischargeStream(0, (Object) null)
-             .dischargeStream(0, (Object[]) null)
-             .dischargeStream(0, (Iterable<Object>) null)
-             .dischargeStream(0)
-             .dischargeStream(0, Arrays.asList())
-             .dischargeStream(0, "push")
-             .dischargeStream(0, new Object[]{"push"})
-             .dischargeStream(0, "push", "push")
-             .dischargeStream(0, Arrays.asList("push"))
-             .dischargeStream(0, Arrays.asList("push", "push"))
-             .dischargeStreamAfter(0, 0, TimeUnit.MILLISECONDS, (Object) null)
-             .dischargeStreamAfter(0, 0, TimeUnit.MILLISECONDS, (Object[]) null)
-             .dischargeStreamAfter(0, 0, TimeUnit.MILLISECONDS, (Iterable<Object>) null)
-             .dischargeStreamAfter(0, 0, TimeUnit.MILLISECONDS)
-             .dischargeStreamAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList())
-             .dischargeStreamAfter(0, 0, TimeUnit.MILLISECONDS, "push")
-             .dischargeStreamAfter(0, 0, TimeUnit.MILLISECONDS, new Object[]{"push"})
-             .dischargeStreamAfter(0, 0, TimeUnit.MILLISECONDS, "push", "push")
-             .dischargeStreamAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList("push"))
-             .dischargeStreamAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList("push", "push"))
-             .dischargeStream(0);
+        river.flushStream(0, (Object) null)
+             .flushStream(0, (Object[]) null)
+             .flushStream(0, (Iterable<Object>) null)
+             .flushStream(0)
+             .flushStream(0, Arrays.asList())
+             .flushStream(0, "push")
+             .flushStream(0, new Object[]{"push"})
+             .flushStream(0, "push", "push")
+             .flushStream(0, Arrays.asList("push"))
+             .flushStream(0, Arrays.asList("push", "push"))
+             .flushStreamAfter(0, 0, TimeUnit.MILLISECONDS, (Object) null)
+             .flushStreamAfter(0, 0, TimeUnit.MILLISECONDS, (Object[]) null)
+             .flushStreamAfter(0, 0, TimeUnit.MILLISECONDS, (Iterable<Object>) null)
+             .flushStreamAfter(0, 0, TimeUnit.MILLISECONDS)
+             .flushStreamAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList())
+             .flushStreamAfter(0, 0, TimeUnit.MILLISECONDS, "push")
+             .flushStreamAfter(0, 0, TimeUnit.MILLISECONDS, new Object[]{"push"})
+             .flushStreamAfter(0, 0, TimeUnit.MILLISECONDS, "push", "push")
+             .flushStreamAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList("push"))
+             .flushStreamAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList("push", "push"))
+             .flushStream(0);
     }
 
     public void testBarrage() {
@@ -213,11 +213,11 @@ public class WaterfallTest extends TestCase {
                         }
 
                         @Override
-                        public void onDischarge(final River<String> upRiver,
+                        public void onFlush(final River<String> upRiver,
                                 final River<List<String>> downRiver, final int fallNumber) {
 
                             Collections.sort(mWords);
-                            downRiver.discharge(new ArrayList<String>(mWords));
+                            downRiver.flush(new ArrayList<String>(mWords));
                             mWords.clear();
                         }
                     };
@@ -236,11 +236,11 @@ public class WaterfallTest extends TestCase {
                     }
 
                     @Override
-                    public void onDischarge(final River<String> upRiver,
+                    public void onFlush(final River<String> upRiver,
                             final River<List<String>> downRiver, final int fallNumber) {
 
                         Collections.sort(mWords, Collections.reverseOrder());
-                        downRiver.discharge(new ArrayList<String>(mWords));
+                        downRiver.flush(new ArrayList<String>(mWords));
                         mWords.clear();
                     }
                 };
@@ -275,7 +275,7 @@ public class WaterfallTest extends TestCase {
 
                 if (++mCount == 2) {
 
-                    downRiver.discharge(new ArrayList<String>(mList));
+                    downRiver.flush(new ArrayList<String>(mList));
                     mList.clear();
                     mCount = 0;
                 }
@@ -309,9 +309,9 @@ public class WaterfallTest extends TestCase {
 
         final Collector<Integer> collector = fall0.collect();
 
-        fall1.discharge(1);
-        fall2.discharge(1);
-        fall3.discharge(1);
+        fall1.flush(1);
+        fall2.flush(1);
+        fall3.flush(1);
 
         int i = 0;
 
@@ -511,7 +511,7 @@ public class WaterfallTest extends TestCase {
         fall1.chain(fall0);
 
         final Collector<Object> collector0 = fall0.collect();
-        fall1.discharge("test");
+        fall1.flush("test");
         assertThat(collector0.all()).containsExactly("test", "test");
 
         final Waterfall<Object, Object, Object> fall2 = fall().in(2).start();
@@ -519,7 +519,7 @@ public class WaterfallTest extends TestCase {
         fall3.chain(fall2);
 
         final Collector<Object> collector2 = fall2.collect();
-        fall3.discharge("test");
+        fall3.flush("test");
         assertThat(collector2.all()).containsExactly("test", "test");
 
         final Waterfall<Object, Object, Object> fall4 = fall().in(2).start();
@@ -527,7 +527,7 @@ public class WaterfallTest extends TestCase {
         fall5.chain(fall4);
 
         final Collector<Object> collector4 = fall4.collect();
-        fall5.discharge("test");
+        fall5.flush("test");
         assertThat(collector4.all()).containsExactly("test", "test", "test", "test", "test",
                                                      "test");
 
@@ -536,7 +536,7 @@ public class WaterfallTest extends TestCase {
         fall7.chain(fall6);
 
         final Collector<Object> collector6 = fall6.collect();
-        fall7.discharge("test");
+        fall7.flush("test");
         assertThat(collector6.all()).containsExactly("test", "test");
     }
 
@@ -545,12 +545,12 @@ public class WaterfallTest extends TestCase {
         final Waterfall<String, String, String> fall = fall().inBackground(1).start(String.class);
         Collector<String> collector = fall.collect();
 
-        fall.source().discharge("test");
+        fall.source().flush("test");
 
         assertThat(collector.next()).isEqualTo("test");
 
         collector = fall.collect();
-        fall.source().dischargeAfter(2, TimeUnit.SECONDS, "test");
+        fall.source().flushAfter(2, TimeUnit.SECONDS, "test");
 
         try {
 
@@ -566,7 +566,7 @@ public class WaterfallTest extends TestCase {
         assertThat(collector.eventually().all()).containsExactly("test");
 
         collector = fall.collect();
-        fall.source().dischargeAfter(2, TimeUnit.SECONDS, "test");
+        fall.source().flushAfter(2, TimeUnit.SECONDS, "test");
 
         try {
 
@@ -582,7 +582,7 @@ public class WaterfallTest extends TestCase {
         assertThat(collector.eventually().all()).containsExactly("test");
 
         collector = fall.collect();
-        fall.source().dischargeAfter(2, TimeUnit.SECONDS, "test");
+        fall.source().flushAfter(2, TimeUnit.SECONDS, "test");
 
         try {
 
@@ -611,7 +611,7 @@ public class WaterfallTest extends TestCase {
         assertThat(collector.eventually().all()).containsExactly("test");
 
         collector = fall.collect();
-        fall.source().discharge("test");
+        fall.source().flush("test");
 
         collector.next();
 
@@ -876,7 +876,7 @@ public class WaterfallTest extends TestCase {
         assertThat(leap1.getUnhandled()).containsExactly(exception, exception, exception,
                                                          exception);
 
-        source1.discharge();
+        source1.flush();
         assertThat(leap1.getDischarges()).isEqualTo(4);
 
         assertThat(fall().distribute().pull("test", "test").all()).containsExactly("test", "test");
@@ -912,7 +912,7 @@ public class WaterfallTest extends TestCase {
         assertThat(leap2.getUnhandled()).containsExactly(exception, exception, exception,
                                                          exception);
 
-        source2.discharge();
+        source2.flush();
         assertThat(leap2.getDischarges()).isEqualTo(4);
 
         assertThat(fall().distribute(new Barrage<Object>() {
@@ -1846,10 +1846,10 @@ public class WaterfallTest extends TestCase {
                     }
 
                     @Override
-                    public void onDischarge(final River<Character> upRiver,
+                    public void onFlush(final River<Character> upRiver,
                             final River<Integer> downRiver, final int fallNumber) {
 
-                        downRiver.discharge(Integer.valueOf(mBuffer.toString()));
+                        downRiver.flush(Integer.valueOf(mBuffer.toString()));
 
                         mBuffer.setLength(0);
                     }
@@ -1867,10 +1867,10 @@ public class WaterfallTest extends TestCase {
             }
 
             @Override
-            public void onDischarge(final River<Integer> upRiver, final River<Integer> downRiver,
+            public void onFlush(final River<Integer> upRiver, final River<Integer> downRiver,
                     final int fallNumber) {
 
-                downRiver.discharge(new Integer[]{mSum});
+                downRiver.flush(new Integer[]{mSum});
 
                 mSum = 0;
             }
@@ -1878,7 +1878,7 @@ public class WaterfallTest extends TestCase {
 
         final Waterfall<Integer, Integer, Integer> fall2 = fall().start(Integer.class);
         fall2.chain(fall0);
-        fall2.source().discharge(Drops.asList(0, 1, 2, 3));
+        fall2.source().flush(Drops.asList(0, 1, 2, 3));
 
         final ArrayList<Integer> output = new ArrayList<Integer>(1);
 
@@ -1891,8 +1891,8 @@ public class WaterfallTest extends TestCase {
 
         fall1.source().push(Drops.asList('0', '1', '2', '3'));
         fall3.chain(fall0);
-        fall3.source().discharge(Drops.asList(4, 5, -4));
-        fall2.source().discharge(77);
+        fall3.source().flush(Drops.asList(4, 5, -4));
+        fall2.source().flush(77);
 
         output.clear();
         fall1.pull().allInto(output);
@@ -1911,16 +1911,16 @@ public class WaterfallTest extends TestCase {
             }
 
             @Override
-            public void onDischarge(final River<Integer> upRiver, final River<Integer> downRiver,
+            public void onFlush(final River<Integer> upRiver, final River<Integer> downRiver,
                     final int fallNumber) {
 
-                downRiver.discharge(mAbsSum);
+                downRiver.flush(mAbsSum);
             }
         });
 
         fall0.chain(fall4);
 
-        fall3.source().discharge(Arrays.asList(4, 5, -4));
+        fall3.source().flush(Arrays.asList(4, 5, -4));
 
         output.clear();
         fall1.pull(Drops.asList('0', '1', '2', '3')).allInto(output);
@@ -2048,7 +2048,7 @@ public class WaterfallTest extends TestCase {
         public boolean mThrown;
 
         @Override
-        public void onDischarge(final River<Object> upRiver, final River<Object> downRiver,
+        public void onFlush(final River<Object> upRiver, final River<Object> downRiver,
                 final int fallNumber) {
 
             if (isFailed(upRiver) || mDischarged) {
@@ -2237,12 +2237,12 @@ public class WaterfallTest extends TestCase {
         }
 
         @Override
-        public void onDischarge(final River<String> upRiver, final River<String> downRiver,
+        public void onFlush(final River<String> upRiver, final River<String> downRiver,
                 final int fallNumber) {
 
             ++mDischargeCount;
 
-            super.onDischarge(upRiver, downRiver, fallNumber);
+            super.onFlush(upRiver, downRiver, fallNumber);
         }
 
         @Override

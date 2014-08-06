@@ -87,7 +87,7 @@ class CollectorLeap<DATA> extends FreeLeap<DATA> {
             };
 
     /**
-     * Checks if the collection is complete, that is, if data have been discharged.
+     * Checks if the collection is complete, that is, if data have been flushed.
      *
      * @return Whether collection is complete.
      */
@@ -107,7 +107,7 @@ class CollectorLeap<DATA> extends FreeLeap<DATA> {
     }
 
     @Override
-    public void onDischarge(final River<DATA> upRiver, final River<DATA> downRiver,
+    public void onFlush(final River<DATA> upRiver, final River<DATA> downRiver,
             final int fallNumber) {
 
         upRiver.deviate();

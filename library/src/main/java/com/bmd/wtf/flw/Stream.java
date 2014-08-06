@@ -28,80 +28,79 @@ import java.util.concurrent.TimeUnit;
 public interface Stream<DATA> {
 
     /**
-     * Discharges the stream, that is, it informs the fed fall that no more data drops are likely
-     * to come.
+     * Flushes the stream, that is, it informs the fed fall that no more data drops are likely to
+     * come.
      * <p/>
-     * Be aware that the call may be postponed until the fall discharges all the data drops,
+     * Be aware that the call may be postponed until the fall flushes all the data drops,
      * including the delayed ones.
      *
      * @return This stream.
      */
-    public Stream<DATA> discharge();
+    public Stream<DATA> flush();
 
     /**
-     * Pushes the specified data into the waterfall flow and then discharge it.
+     * Pushes the specified data into the waterfall flow and then flushes it.
      *
      * @param drops The data drops.
      * @return This stream.
-     * @see #discharge()
+     * @see #flush()
      */
-    public Stream<DATA> discharge(DATA... drops);
+    public Stream<DATA> flush(DATA... drops);
 
     /**
      * Pushes the data returned by the specified iterable into the waterfall flow and then
-     * discharge it.
+     * flushes it.
      *
      * @param drops The data drops iterable.
      * @return This stream.
-     * @see #discharge()
+     * @see #flush()
      */
-    public Stream<DATA> discharge(Iterable<? extends DATA> drops);
+    public Stream<DATA> flush(Iterable<? extends DATA> drops);
 
     /**
-     * Pushes the specified data into the waterfall flow and then discharge it.
+     * Pushes the specified data into the waterfall flow and then flushes it.
      *
      * @param drop The data drop.
      * @return This stream.
-     * @see #discharge()
+     * @see #flush()
      */
-    public Stream<DATA> discharge(DATA drop);
+    public Stream<DATA> flush(DATA drop);
 
     /**
      * Pushes the data returned by the specified iterable into the waterfall flow, after the
-     * specified time has elapsed, and then discharge it.
+     * specified time has elapsed, and then flushes it.
      *
      * @param delay    The delay in <code>timeUnit</code> time units.
      * @param timeUnit The delay time unit.
      * @param drops    The data drops iterable.
      * @return This stream.
-     * @see #discharge()
+     * @see #flush()
      */
-    public Stream<DATA> dischargeAfter(long delay, TimeUnit timeUnit,
-            Iterable<? extends DATA> drops);
+    public Stream<DATA> flushAfter(long delay, TimeUnit timeUnit, Iterable<? extends DATA> drops);
 
     /**
      * Pushes the specified data into the waterfall flow, after the specified time has elapsed, and
-     * then discharge it.
+     * then flushes it.
      *
      * @param delay    The delay in <code>timeUnit</code> time units.
      * @param timeUnit The delay time unit.
      * @param drop     The data drop.
      * @return This stream.
-     * @see #discharge()
+     * @see #flush()
      */
-    public Stream<DATA> dischargeAfter(long delay, TimeUnit timeUnit, DATA drop);
+    public Stream<DATA> flushAfter(long delay, TimeUnit timeUnit, DATA drop);
 
     /**
      * Pushes the specified data into the waterfall flow, after the specified time has elapsed, and
-     * then discharge it.
+     * then flushes it.
      *
      * @param delay    The delay in <code>timeUnit</code> time units.
      * @param timeUnit The delay time unit.
      * @param drops    The data drops.
      * @return This stream.
-     * @see #discharge()
+     * @see #flush()
      */
-    public Stream<DATA> dischargeAfter(long delay, TimeUnit timeUnit, DATA... drops);
+    public Stream<DATA> flushAfter(long delay, TimeUnit timeUnit, DATA... drops);
 
     /**
      * Forwards the specified unhandled exception into the waterfall flow.

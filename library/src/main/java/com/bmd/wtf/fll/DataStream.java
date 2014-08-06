@@ -68,60 +68,59 @@ class DataStream<DATA> implements Stream<DATA> {
     }
 
     @Override
-    public Stream<DATA> discharge() {
+    public Stream<DATA> flush() {
 
         final DataFall<DATA, ?> fall = mDownstreamFall;
 
         if (mPassThrough) {
 
-            fall.discharge(this);
+            fall.flush(this);
 
         } else {
 
             final Current inputCurrent = fall.inputCurrent;
 
-            inputCurrent.discharge(fall, this);
+            inputCurrent.flush(fall, this);
         }
 
         return this;
     }
 
     @Override
-    public Stream<DATA> discharge(final DATA... drops) {
+    public Stream<DATA> flush(final DATA... drops) {
 
-        return push(drops).discharge();
+        return push(drops).flush();
     }
 
     @Override
-    public Stream<DATA> discharge(final Iterable<? extends DATA> drops) {
+    public Stream<DATA> flush(final Iterable<? extends DATA> drops) {
 
-        return push(drops).discharge();
+        return push(drops).flush();
     }
 
     @Override
-    public Stream<DATA> discharge(final DATA drop) {
+    public Stream<DATA> flush(final DATA drop) {
 
-        return push(drop).discharge();
+        return push(drop).flush();
     }
 
     @Override
-    public Stream<DATA> dischargeAfter(final long delay, final TimeUnit timeUnit,
+    public Stream<DATA> flushAfter(final long delay, final TimeUnit timeUnit,
             final Iterable<? extends DATA> drops) {
 
-        return pushAfter(delay, timeUnit, drops).discharge();
+        return pushAfter(delay, timeUnit, drops).flush();
     }
 
     @Override
-    public Stream<DATA> dischargeAfter(final long delay, final TimeUnit timeUnit, final DATA drop) {
+    public Stream<DATA> flushAfter(final long delay, final TimeUnit timeUnit, final DATA drop) {
 
-        return pushAfter(delay, timeUnit, drop).discharge();
+        return pushAfter(delay, timeUnit, drop).flush();
     }
 
     @Override
-    public Stream<DATA> dischargeAfter(final long delay, final TimeUnit timeUnit,
-            final DATA... drops) {
+    public Stream<DATA> flushAfter(final long delay, final TimeUnit timeUnit, final DATA... drops) {
 
-        return pushAfter(delay, timeUnit, drops).discharge();
+        return pushAfter(delay, timeUnit, drops).flush();
     }
 
     @Override

@@ -72,7 +72,7 @@ public class CurrentTest extends TestCase {
         assertThat(fall.getThrowable()).isNull();
 
         fall.reset();
-        current.discharge(fall, null);
+        current.flush(fall, null);
         fall.waitCall();
         assertThat(fall.getDrop()).isEqualTo("test");
         assertThat(fall.isDischarged()).isTrue();
@@ -116,7 +116,7 @@ public class CurrentTest extends TestCase {
         assertThat(fall.isDischarged()).isFalse();
         assertThat(fall.getThrowable()).isNull();
 
-        current.discharge(fall, null);
+        current.flush(fall, null);
         assertThat(fall.getDrop()).isEqualTo("test");
         assertThat(fall.isDischarged()).isTrue();
         assertThat(fall.getThrowable()).isNull();
@@ -142,7 +142,7 @@ public class CurrentTest extends TestCase {
         private long mTime;
 
         @Override
-        public void discharge(final Stream<String> origin) {
+        public void flush(final Stream<String> origin) {
 
             mDischarge = true;
             mTime = System.currentTimeMillis();

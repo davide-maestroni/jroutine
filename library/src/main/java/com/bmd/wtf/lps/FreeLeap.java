@@ -25,10 +25,10 @@ import com.bmd.wtf.flw.River;
 public class FreeLeap<DATA> implements Leap<DATA, DATA> {
 
     @Override
-    public void onDischarge(final River<DATA> upRiver, final River<DATA> downRiver,
+    public void onFlush(final River<DATA> upRiver, final River<DATA> downRiver,
             final int fallNumber) {
 
-        downRiver.discharge();
+        downRiver.flush();
     }
 
     @Override

@@ -108,7 +108,7 @@ public class LeapTest extends TestCase {
             private Object mLast;
 
             @Override
-            public void onDischarge(final River<Object> upRiver, final River<Object> downRiver,
+            public void onFlush(final River<Object> upRiver, final River<Object> downRiver,
                     final int fallNumber) {
 
                 if ("flush1".equals(mLast)) {
@@ -116,7 +116,7 @@ public class LeapTest extends TestCase {
                     throw new IllegalArgumentException("flush1");
                 }
 
-                super.onDischarge(upRiver, downRiver, fallNumber);
+                super.onFlush(upRiver, downRiver, fallNumber);
             }
 
             @Override
@@ -161,7 +161,7 @@ public class LeapTest extends TestCase {
             private Object mLast;
 
             @Override
-            public void onDischarge(final River<Object> upRiver, final River<Object> downRiver,
+            public void onFlush(final River<Object> upRiver, final River<Object> downRiver,
                     final int fallNumber) {
 
                 if ("flush2".equals(mLast)) {
@@ -169,7 +169,7 @@ public class LeapTest extends TestCase {
                     throw new IllegalArgumentException("flush2");
                 }
 
-                super.onDischarge(upRiver, downRiver, fallNumber);
+                super.onFlush(upRiver, downRiver, fallNumber);
             }
 
             @Override

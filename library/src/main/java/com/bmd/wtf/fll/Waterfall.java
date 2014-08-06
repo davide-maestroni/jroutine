@@ -808,11 +808,34 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
     }
 
     @Override
-    public Waterfall<SOURCE, IN, OUT> discharge() {
+    public void drain() {
 
         for (final DataFall<IN, OUT> fall : mFalls) {
 
-            fall.inputCurrent.discharge(fall, null);
+            for (final DataStream<OUT> stream : fall.outputStreams) {
+
+                stream.drain(Direction.DOWNSTREAM);
+            }
+        }
+    }
+
+    @Override
+    public void drainStream(final int streamNumber) {
+
+        final DataFall<IN, OUT> fall = mFalls[streamNumber];
+
+        for (final DataStream<OUT> stream : fall.outputStreams) {
+
+            stream.drain(Direction.DOWNSTREAM);
+        }
+    }
+
+    @Override
+    public Waterfall<SOURCE, IN, OUT> flush() {
+
+        for (final DataFall<IN, OUT> fall : mFalls) {
+
+            fall.inputCurrent.flush(fall, null);
         }
 
         return this;
@@ -957,36 +980,13 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
     }
 
     @Override
-    public Waterfall<SOURCE, IN, OUT> dischargeStream(final int streamNumber) {
+    public Waterfall<SOURCE, IN, OUT> flushStream(final int streamNumber) {
 
         final DataFall<IN, OUT> fall = mFalls[streamNumber];
 
-        fall.inputCurrent.discharge(fall, null);
+        fall.inputCurrent.flush(fall, null);
 
         return this;
-    }
-
-    @Override
-    public void drain() {
-
-        for (final DataFall<IN, OUT> fall : mFalls) {
-
-            for (final DataStream<OUT> stream : fall.outputStreams) {
-
-                stream.drain(Direction.DOWNSTREAM);
-            }
-        }
-    }
-
-    @Override
-    public void drainStream(final int streamNumber) {
-
-        final DataFall<IN, OUT> fall = mFalls[streamNumber];
-
-        for (final DataStream<OUT> stream : fall.outputStreams) {
-
-            stream.drain(Direction.DOWNSTREAM);
-        }
     }
 
     @Override
@@ -1552,7 +1552,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
         final Collector<OUT> collector = collect();
 
-        source().discharge();
+        source().flush();
 
         return collector;
     }
@@ -1568,7 +1568,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
         final Collector<OUT> collector = collect();
 
-        source().push(source).discharge();
+        source().push(source).flush();
 
         return collector;
     }
@@ -1584,7 +1584,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
         final Collector<OUT> collector = collect();
 
-        source().push(sources).discharge();
+        source().push(sources).flush();
 
         return collector;
     }
@@ -1600,7 +1600,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
         final Collector<OUT> collector = collect();
 
-        source().push(sources).discharge();
+        source().push(sources).flush();
 
         return collector;
     }

@@ -34,13 +34,13 @@ import com.bmd.wtf.flw.River;
 public interface Leap<IN, OUT> {
 
     /**
-     * This method is called when data are discharged through the leap.
+     * This method is called when data are flushed through the leap.
      *
      * @param upRiver    The upstream river instance.
      * @param downRiver  The downstream river instance.
      * @param fallNumber The number identifying the fall formed by this leap.
      */
-    public void onDischarge(River<IN> upRiver, River<OUT> downRiver, int fallNumber);
+    public void onFlush(River<IN> upRiver, River<OUT> downRiver, int fallNumber);
 
     /**
      * This method is called when a data drop is pushed through the leap.

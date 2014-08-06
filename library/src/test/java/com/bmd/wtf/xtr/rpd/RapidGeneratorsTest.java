@@ -461,7 +461,7 @@ public class RapidGeneratorsTest extends TestCase {
     public static class Current1 implements Current {
 
         @Override
-        public <DATA> void discharge(final Fall<DATA> fall, final Stream<DATA> origin) {
+        public <DATA> void flush(final Fall<DATA> fall, final Stream<DATA> origin) {
 
         }
 

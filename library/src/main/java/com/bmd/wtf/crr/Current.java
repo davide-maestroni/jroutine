@@ -31,13 +31,13 @@ import java.util.concurrent.TimeUnit;
 public interface Current {
 
     /**
-     * This method is called when data must be discharged through the current.
+     * This method is called when data must be flushed through the current.
      *
      * @param fall   The fall instance to be used to push data into the waterfall.
      * @param origin The origin stream.
      * @param <DATA> The data type.
      */
-    public <DATA> void discharge(Fall<DATA> fall, Stream<DATA> origin);
+    public <DATA> void flush(Fall<DATA> fall, Stream<DATA> origin);
 
     /**
      * This method is called when an unhandled exception must be forwarded through the current.

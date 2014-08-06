@@ -27,10 +27,9 @@ import com.bmd.wtf.flw.River;
 public abstract class AbstractLeap<IN, OUT> implements Leap<IN, OUT> {
 
     @Override
-    public void onDischarge(final River<IN> upRiver, final River<OUT> downRiver,
-            final int fallNumber) {
+    public void onFlush(final River<IN> upRiver, final River<OUT> downRiver, final int fallNumber) {
 
-        downRiver.discharge();
+        downRiver.flush();
     }
 
     @Override

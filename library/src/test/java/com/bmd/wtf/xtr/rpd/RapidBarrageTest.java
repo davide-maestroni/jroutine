@@ -94,7 +94,7 @@ public class RapidBarrageTest extends TestCase {
                                                               });
         final Collector<Object> collector1 = fall1.collect();
 
-        fall1.source().push("11", null).discharge();
+        fall1.source().push("11", null).flush();
 
         for (final Object e : collector1.now().all()) {
 
@@ -179,7 +179,7 @@ public class RapidBarrageTest extends TestCase {
                                                               });
         final Collector<Object> collector2 = fall2.collect();
 
-        fall2.source().push("11", null).discharge();
+        fall2.source().push("11", null).flush();
 
         for (final Object e : collector2.now().all()) {
 
@@ -272,12 +272,12 @@ public class RapidBarrageTest extends TestCase {
                                                               });
         final Collector<Object> collector1 = fall1.collect();
 
-        fall1.source().discharge("1", 2, 3.0, null);
+        fall1.source().flush("1", 2, 3.0, null);
         assertThat(collector1.all()).containsExactly("1", 2, 3.0, null);
 
         final Collector<Object> collector2 = fall1.collect();
 
-        fall1.source().forward(new MyException()).discharge();
+        fall1.source().forward(new MyException()).flush();
         assertThat(collector2.all()).containsExactly(new MyException(), new MyException(),
                                                      new MyException(), new MyException());
 
@@ -298,7 +298,7 @@ public class RapidBarrageTest extends TestCase {
                                                               });
         final Collector<Object> collector3 = fall2.collect();
 
-        fall2.source().discharge(new IllegalArgumentException()).discharge();
+        fall2.source().flush(new IllegalArgumentException()).flush();
         assertThat(collector3.next()).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
@@ -338,12 +338,12 @@ public class RapidBarrageTest extends TestCase {
                                                               });
         final Collector<Object> collector1 = fall1.collect();
 
-        fall1.source().discharge("1", 2, 3.0, null);
+        fall1.source().flush("1", 2, 3.0, null);
         assertThat(collector1.all()).containsExactly("1", 2, 3.0, null);
 
         final Collector<Object> collector2 = fall1.collect();
 
-        fall1.source().forward(new MyException()).discharge();
+        fall1.source().forward(new MyException()).flush();
         assertThat(collector2.all()).containsExactly(new MyException(), new MyException(),
                                                      new MyException(), new MyException());
 
@@ -365,7 +365,7 @@ public class RapidBarrageTest extends TestCase {
                                                               });
         final Collector<Object> collector3 = fall2.collect();
 
-        fall2.source().discharge(new IllegalArgumentException()).discharge();
+        fall2.source().flush(new IllegalArgumentException()).flush();
         assertThat(collector3.next()).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 

@@ -51,15 +51,14 @@ class GateLeap<IN, OUT> extends LeapDecorator<IN, OUT> {
     }
 
     @Override
-    public void onDischarge(final River<IN> upRiver, final River<OUT> downRiver,
-            final int fallNumber) {
+    public void onFlush(final River<IN> upRiver, final River<OUT> downRiver, final int fallNumber) {
 
         final ReentrantLock lock = this.lock;
         lock.lock();
 
         try {
 
-            super.onDischarge(upRiver, downRiver, fallNumber);
+            super.onFlush(upRiver, downRiver, fallNumber);
 
         } finally {
 

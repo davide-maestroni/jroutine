@@ -40,12 +40,11 @@ class SegmentedLeap<IN, OUT> extends LeapDecorator<IN, OUT> {
     }
 
     @Override
-    public void onDischarge(final River<IN> upRiver, final River<OUT> downRiver,
-            final int fallNumber) {
+    public void onFlush(final River<IN> upRiver, final River<OUT> downRiver, final int fallNumber) {
 
         synchronized (mMutex) {
 
-            super.onDischarge(upRiver, downRiver, fallNumber);
+            super.onFlush(upRiver, downRiver, fallNumber);
         }
     }
 

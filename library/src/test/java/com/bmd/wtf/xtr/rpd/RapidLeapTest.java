@@ -137,7 +137,7 @@ public class RapidLeapTest extends TestCase {
                 });
         final Collector<Object> collector1 = fall1.collect();
 
-        fall1.source().push("11", null).forward(new IllegalArgumentException()).discharge();
+        fall1.source().push("11", null).forward(new IllegalArgumentException()).flush();
 
         for (final Object e : collector1.now().all()) {
 
@@ -207,7 +207,7 @@ public class RapidLeapTest extends TestCase {
                 });
         final Collector<Object> collector2 = fall2.collect();
 
-        fall2.source().push("11", null).forward(new IllegalArgumentException()).discharge();
+        fall2.source().push("11", null).forward(new IllegalArgumentException()).flush();
 
         for (final Object e : collector2.now().all()) {
 
@@ -310,7 +310,7 @@ public class RapidLeapTest extends TestCase {
 
         final Collector<Object> collector2 = fall1.collect();
 
-        fall1.source().forward(new IllegalArgumentException()).discharge();
+        fall1.source().forward(new IllegalArgumentException()).flush();
         assertThat(collector2.all()).containsExactly(new MyException());
 
         final Collector<Object> collector3 = fall1.collect();
@@ -331,7 +331,7 @@ public class RapidLeapTest extends TestCase {
                 });
         final Collector<Object> collector4 = fall2.collect();
 
-        fall2.source().forward(new IllegalArgumentException()).discharge();
+        fall2.source().forward(new IllegalArgumentException()).flush();
         assertThat(collector4.next()).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
@@ -349,7 +349,7 @@ public class RapidLeapTest extends TestCase {
             public void onUnhandled(final River<Object> upRiver, final River<Object> downRiver,
                     final int fallNumber, final Throwable throwable) {
 
-                downRiver.discharge();
+                downRiver.flush();
             }
         }).pull("11", 27, 37.1, null).all()).containsExactly(11, "27", "37.1", null);
         assertThat(fall().start(RapidLeap.fromAnnotated(new RapidLeapTest3()))
@@ -360,7 +360,7 @@ public class RapidLeapTest extends TestCase {
                                      final River<Object> downRiver, final int fallNumber,
                                      final Throwable throwable) {
 
-                                 downRiver.discharge();
+                                 downRiver.flush();
                              }
                          })
                          .pull("11", 27, 37.1, null)
@@ -373,7 +373,7 @@ public class RapidLeapTest extends TestCase {
                                      final River<Object> downRiver, final int fallNumber,
                                      final Throwable throwable) {
 
-                                 downRiver.discharge();
+                                 downRiver.flush();
                              }
                          })
                          .pull("11", 27, 37.1, null)
@@ -386,7 +386,7 @@ public class RapidLeapTest extends TestCase {
                                      final River<Object> downRiver, final int fallNumber,
                                      final Throwable throwable) {
 
-                                 downRiver.discharge();
+                                 downRiver.flush();
                              }
                          })
                          .pull("11", 27, 37.1, null)
@@ -410,7 +410,7 @@ public class RapidLeapTest extends TestCase {
 
         final Collector<Object> collector2 = fall1.collect();
 
-        fall1.source().forward(new IllegalArgumentException()).discharge();
+        fall1.source().forward(new IllegalArgumentException()).flush();
         assertThat(collector2.all()).containsExactly(new MyException());
 
         final Collector<Object> collector3 = fall1.collect();
@@ -431,7 +431,7 @@ public class RapidLeapTest extends TestCase {
                 });
         final Collector<Object> collector4 = fall2.collect();
 
-        fall2.source().forward(new IllegalArgumentException()).discharge();
+        fall2.source().forward(new IllegalArgumentException()).flush();
         assertThat(collector4.next()).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
@@ -509,7 +509,7 @@ public class RapidLeapTest extends TestCase {
         }
 
         @SuppressWarnings("UnusedDeclaration")
-        public void error(final Discharge ignored) throws MyException {
+        public void error(final Flush ignored) throws MyException {
 
             throw new MyException();
         }
@@ -613,9 +613,9 @@ public class RapidLeapTest extends TestCase {
         }
 
         @DataFlow
-        public void discharge(final Discharge ignored) {
+        public void flush(final Flush ignored) {
 
-            downRiver().discharge("test");
+            downRiver().flush("test");
         }
 
         @SuppressWarnings("UnusedDeclaration")
@@ -652,7 +652,7 @@ public class RapidLeapTest extends TestCase {
         }
 
         @SuppressWarnings("UnusedDeclaration")
-        public Discharge onNull(final Void ignored) {
+        public Flush onNull(final Void ignored) {
 
             return null;
         }

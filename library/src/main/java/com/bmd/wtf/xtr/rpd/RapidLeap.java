@@ -33,13 +33,13 @@ import java.util.Map.Entry;
  * In both cases the object instance is analyzed searching for methods taking a single object as
  * parameter.<br/>
  * Every time a data drop flows through the leap, the method whose parameter closely match the
- * drop type is called. In order to properly handle null objects and discharge command, the
- * inheriting class can implement a method taking a parameter of type <code>Void</code> and a one
- * taking a parameter of type <code>Discharge</code> respectively.<br/>
+ * drop type is called. In order to properly handle null objects and flush command, the inheriting
+ * class can implement a method taking a parameter of type <code>Void</code> and a one taking a
+ * parameter of type <code>Flush</code> respectively.<br/>
  * In a dual way, a method returning a <code>Throwable</code> object will cause a forward of an
- * unhandled exception, while a one returning a <code>Discharge</code> will cause a discharge of
- * the downstream river. Finally, if a method does not return any result, nothing will be
- * propagated downstream.
+ * unhandled exception, while a one returning a <code>Flush</code> will cause a flush of the
+ * downstream river. Finally, if a method does not return any result, nothing will be propagated
+ * downstream.
  * <p/>
  * The inheriting class may also make use of the protected method provided by this class to access
  * the downstream and upstream rivers, and the waterfall gates.
@@ -143,18 +143,18 @@ public abstract class RapidLeap implements Leap<Object, Object> {
     }
 
     @Override
-    public final void onDischarge(final River<Object> upRiver, final River<Object> downRiver,
+    public final void onFlush(final River<Object> upRiver, final River<Object> downRiver,
             final int fallNumber) {
 
         setup(upRiver, downRiver, fallNumber);
 
-        final Method method = mMethodMap.get(Discharge.class);
+        final Method method = mMethodMap.get(Flush.class);
 
         if (method != null) {
 
             try {
 
-                final Object result = method.invoke(mTarget, (Discharge) null);
+                final Object result = method.invoke(mTarget, (Flush) null);
 
                 propagateResult(downRiver, method.getReturnType(), result);
 
@@ -169,7 +169,7 @@ public abstract class RapidLeap implements Leap<Object, Object> {
 
         } else {
 
-            downRiver.discharge();
+            downRiver.flush();
         }
     }
 
@@ -480,9 +480,9 @@ public abstract class RapidLeap implements Leap<Object, Object> {
 
                 downRiver.forward(throwableClass.cast(result));
 
-            } else if (Discharge.class.isAssignableFrom(returnType)) {
+            } else if (Flush.class.isAssignableFrom(returnType)) {
 
-                downRiver.discharge();
+                downRiver.flush();
 
             } else {
 
@@ -509,11 +509,11 @@ public abstract class RapidLeap implements Leap<Object, Object> {
     }
 
     /**
-     * Non-instantiable class used to identified the method responsible for handling discharge notifications.
+     * Non-instantiable class used to identified the method responsible for handling flush notifications.
      */
-    public static final class Discharge {
+    public static final class Flush {
 
-        private Discharge() {
+        private Flush() {
 
         }
     }

@@ -61,59 +61,70 @@ public class WaterfallRiver<DATA> implements River<DATA> {
     }
 
     @Override
-    public River<DATA> discharge() {
+    public void drain() {
 
-        mWaterfall.discharge();
+        mWaterfall.drain(mDirection);
+    }
+
+    @Override
+    public void drainStream(final int streamNumber) {
+
+        mWaterfall.drainStream(streamNumber, mDirection);
+    }
+
+    @Override
+    public River<DATA> flush() {
+
+        mWaterfall.flush();
 
         return this;
     }
 
     @Override
-    public River<DATA> discharge(final DATA... drops) {
+    public River<DATA> flush(final DATA... drops) {
 
-        mWaterfall.discharge(drops);
-
-        return this;
-    }
-
-    @Override
-    public River<DATA> discharge(final Iterable<? extends DATA> drops) {
-
-        mWaterfall.discharge(drops);
+        mWaterfall.flush(drops);
 
         return this;
     }
 
     @Override
-    public River<DATA> discharge(final DATA drop) {
+    public River<DATA> flush(final Iterable<? extends DATA> drops) {
 
-        mWaterfall.discharge(drop);
+        mWaterfall.flush(drops);
 
         return this;
     }
 
     @Override
-    public River<DATA> dischargeAfter(final long delay, final TimeUnit timeUnit,
+    public River<DATA> flush(final DATA drop) {
+
+        mWaterfall.flush(drop);
+
+        return this;
+    }
+
+    @Override
+    public River<DATA> flushAfter(final long delay, final TimeUnit timeUnit,
             final Iterable<? extends DATA> drops) {
 
-        mWaterfall.dischargeAfter(delay, timeUnit, drops);
+        mWaterfall.flushAfter(delay, timeUnit, drops);
 
         return this;
     }
 
     @Override
-    public River<DATA> dischargeAfter(final long delay, final TimeUnit timeUnit, final DATA drop) {
+    public River<DATA> flushAfter(final long delay, final TimeUnit timeUnit, final DATA drop) {
 
-        mWaterfall.dischargeAfter(delay, timeUnit, drop);
+        mWaterfall.flushAfter(delay, timeUnit, drop);
 
         return this;
     }
 
     @Override
-    public River<DATA> dischargeAfter(final long delay, final TimeUnit timeUnit,
-            final DATA... drops) {
+    public River<DATA> flushAfter(final long delay, final TimeUnit timeUnit, final DATA... drops) {
 
-        mWaterfall.dischargeAfter(delay, timeUnit, drops);
+        mWaterfall.flushAfter(delay, timeUnit, drops);
 
         return this;
     }
@@ -176,75 +187,62 @@ public class WaterfallRiver<DATA> implements River<DATA> {
     }
 
     @Override
-    public River<DATA> dischargeStream(final int streamNumber) {
+    public River<DATA> flushStream(final int streamNumber) {
 
-        mWaterfall.dischargeStream(streamNumber);
-
-        return this;
-    }
-
-    @Override
-    public River<DATA> dischargeStream(final int streamNumber, final DATA... drops) {
-
-        mWaterfall.dischargeStream(streamNumber, drops);
+        mWaterfall.flushStream(streamNumber);
 
         return this;
     }
 
     @Override
-    public River<DATA> dischargeStream(final int streamNumber,
-            final Iterable<? extends DATA> drops) {
+    public River<DATA> flushStream(final int streamNumber, final DATA... drops) {
 
-        mWaterfall.dischargeStream(streamNumber, drops);
-
-        return this;
-    }
-
-    @Override
-    public River<DATA> dischargeStream(final int streamNumber, final DATA drop) {
-
-        mWaterfall.dischargeStream(streamNumber, drop);
+        mWaterfall.flushStream(streamNumber, drops);
 
         return this;
     }
 
     @Override
-    public River<DATA> dischargeStreamAfter(final int streamNumber, final long delay,
-            final TimeUnit timeUnit, final Iterable<? extends DATA> drops) {
+    public River<DATA> flushStream(final int streamNumber, final Iterable<? extends DATA> drops) {
 
-        mWaterfall.dischargeStreamAfter(streamNumber, delay, timeUnit, drops);
-
-        return this;
-    }
-
-    @Override
-    public River<DATA> dischargeStreamAfter(final int streamNumber, final long delay,
-            final TimeUnit timeUnit, final DATA drop) {
-
-        mWaterfall.dischargeStreamAfter(streamNumber, delay, timeUnit, drop);
+        mWaterfall.flushStream(streamNumber, drops);
 
         return this;
     }
 
     @Override
-    public River<DATA> dischargeStreamAfter(final int streamNumber, final long delay,
+    public River<DATA> flushStream(final int streamNumber, final DATA drop) {
+
+        mWaterfall.flushStream(streamNumber, drop);
+
+        return this;
+    }
+
+    @Override
+    public River<DATA> flushStreamAfter(final int streamNumber, final long delay,
             final TimeUnit timeUnit, final DATA... drops) {
 
-        mWaterfall.dischargeStreamAfter(streamNumber, delay, timeUnit, drops);
+        mWaterfall.flushStreamAfter(streamNumber, delay, timeUnit, drops);
 
         return this;
     }
 
     @Override
-    public void drain() {
+    public River<DATA> flushStreamAfter(final int streamNumber, final long delay,
+            final TimeUnit timeUnit, final Iterable<? extends DATA> drops) {
 
-        mWaterfall.drain(mDirection);
+        mWaterfall.flushStreamAfter(streamNumber, delay, timeUnit, drops);
+
+        return this;
     }
 
     @Override
-    public void drainStream(final int streamNumber) {
+    public River<DATA> flushStreamAfter(final int streamNumber, final long delay,
+            final TimeUnit timeUnit, final DATA drop) {
 
-        mWaterfall.drainStream(streamNumber, mDirection);
+        mWaterfall.flushStreamAfter(streamNumber, delay, timeUnit, drop);
+
+        return this;
     }
 
     @Override

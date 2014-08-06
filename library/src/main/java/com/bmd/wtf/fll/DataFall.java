@@ -30,8 +30,8 @@ import java.util.concurrent.locks.ReentrantLock;
  * This class ensures that the internal leap is always accessed in a thread safe way, so that the
  * implementer does not have to worry about concurrency issues.
  * <p/>
- * Besides, each instance keeps trace of the streams discharging through the fall, so to propagate
- * the discharge only when all the feeding streams have no more data to push.
+ * Besides, each instance keeps trace of the streams flushing through the fall, so to propagate
+ * the flush only when all the feeding streams have no more data to push.
  * <p/>
  * Created by davide on 6/7/14.
  *
@@ -69,7 +69,7 @@ class DataFall<IN, OUT> implements Fall<IN> {
 
     private final LockRiver<OUT> mOutRiver;
 
-    private int mDischargeCount;
+    private int mFlushCount;
 
     private int mWaterline;
 
@@ -108,7 +108,7 @@ class DataFall<IN, OUT> implements Fall<IN> {
     }
 
     @Override
-    public void discharge(final Stream<IN> origin) {
+    public void flush(final Stream<IN> origin) {
 
         final ReentrantLock lock = mLock;
         lock.lock();
@@ -123,20 +123,20 @@ class DataFall<IN, OUT> implements Fall<IN> {
 
                 if (dryStreams.containsAll(inputStreams)) {
 
-                    ++mDischargeCount;
+                    ++mFlushCount;
                 }
 
             } else {
 
-                ++mDischargeCount;
+                ++mFlushCount;
             }
 
-            if ((mDischargeCount == 0) || (mWaterline > 0)) {
+            if ((mFlushCount == 0) || (mWaterline > 0)) {
 
                 return;
             }
 
-            --mDischargeCount;
+            --mFlushCount;
 
             dryStreams.clear();
 
@@ -155,7 +155,7 @@ class DataFall<IN, OUT> implements Fall<IN> {
 
         try {
 
-            leap.onDischarge(inRiver, outRiver, mNumber);
+            leap.onFlush(inRiver, outRiver, mNumber);
 
         } catch (final Throwable t) {
 
@@ -229,7 +229,7 @@ class DataFall<IN, OUT> implements Fall<IN> {
      */
     void lowerLevel() {
 
-        int dischargeCount = 0;
+        int flushCount = 0;
 
         final ReentrantLock lock = mLock;
         lock.lock();
@@ -238,9 +238,9 @@ class DataFall<IN, OUT> implements Fall<IN> {
 
             if (--mWaterline <= 0) {
 
-                dischargeCount = mDischargeCount;
+                flushCount = mFlushCount;
 
-                mDischargeCount = 0;
+                mFlushCount = 0;
 
                 mWaterline = 0;
             }
@@ -250,9 +250,9 @@ class DataFall<IN, OUT> implements Fall<IN> {
             lock.unlock();
         }
 
-        for (int i = 0; i < dischargeCount; ++i) {
+        for (int i = 0; i < flushCount; ++i) {
 
-            discharge(null);
+            flush(null);
         }
     }
 

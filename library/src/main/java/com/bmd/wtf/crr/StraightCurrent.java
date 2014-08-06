@@ -37,9 +37,9 @@ public class StraightCurrent implements Current {
     }
 
     @Override
-    public <DATA> void discharge(final Fall<DATA> fall, final Stream<DATA> origin) {
+    public <DATA> void flush(final Fall<DATA> fall, final Stream<DATA> origin) {
 
-        fall.discharge(origin);
+        fall.flush(origin);
     }
 
     @Override

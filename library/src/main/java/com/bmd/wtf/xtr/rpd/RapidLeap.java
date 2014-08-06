@@ -509,7 +509,8 @@ public abstract class RapidLeap implements Leap<Object, Object> {
     }
 
     /**
-     * Non-instantiable class used to identified the method responsible for handling flush notifications.
+     * Non-instantiable class used to identify the method responsible for handling flush
+     * notifications.
      */
     public static final class Flush {
 

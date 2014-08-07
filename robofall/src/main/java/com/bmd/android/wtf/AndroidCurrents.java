@@ -37,12 +37,17 @@ public class AndroidCurrents {
     /**
      * Creates a current running in the specified handler thread.
      * <p/>
-     * Note that the thread must be already started.
+     * Note that the thread might be started as a result of this call.
      *
      * @param thread The handler thread instance.
      * @return The newly created current.
      */
     public static Current currentOf(final HandlerThread thread) {
+
+        if (!thread.isAlive()) {
+
+            thread.start();
+        }
 
         return new LooperCurrent(thread.getLooper());
     }

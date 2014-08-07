@@ -478,7 +478,7 @@ class RapidGenerators {
 
                 if (contextArg != null) {
 
-                    final Class<?> boxedClass = Rapids.boxedClass(param);
+                    final Class<?> boxedClass = RapidUtils.boxedClass(param);
 
                     if (!boxedClass.isInstance(contextArg)) {
 
@@ -716,7 +716,7 @@ class RapidGenerators {
 
                 if (contextArg != null) {
 
-                    final Class<?> boxedClass = Rapids.boxedClass(param);
+                    final Class<?> boxedClass = RapidUtils.boxedClass(param);
 
                     if (!boxedClass.isInstance(contextArg)) {
 

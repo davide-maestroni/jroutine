@@ -131,7 +131,6 @@ class CollectorLeap<DATA> extends FreeLeap<DATA> {
         downRiver.deviate();
 
         mUnhandled = throwable;
-
         mIsComplete = true;
     }
 

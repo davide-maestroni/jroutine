@@ -21,14 +21,14 @@ import com.bmd.wtf.lps.Leap;
 import com.bmd.wtf.lps.LeapGenerator;
 
 /**
- * This class is meant to provide utility method for employing rapid classes which use reflection
+ * This class is meant to provide utility methods for employing rapid classes, which use reflection
  * to simplify the building of the waterfall chain at the expense of a small performance loss.
  * <p/>
  * Even if the use of reflection in Java may slow down code execution
  * (see <a href="http://docs.oracle.com/javase/tutorial/reflect/index.html">The Reflection API</a>),
  * it is also true that this library has been designed to support parallel programming, which
  * usually involve long running tasks (such as network, disk IO, heavy processing, etc.). In such
- * cases the overhead brought by reflection does not have any significant impact on the overall
+ * cases the reflection intrinsic overhead will not have any significant impact on the overall
  * performance.
  * <p/>
  * Created by davide on 6/19/14.

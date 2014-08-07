@@ -21,8 +21,8 @@ import java.util.concurrent.TimeUnit;
 /**
  * Interface extending a gate.
  * <p/>
- * The implementing class provides methods to access the gate leap via reflection by wrapping it in
- * a proxy object so to make every call thread safe.<br/>
+ * The implementing class provides methods to access the gate leap via reflection, by wrapping it
+ * in a proxy object, so to make every call thread safe.<br/>
  * In order for that to correctly work, the leap instance must be accessed only through the
  * implemented interface methods.
  * <p/>

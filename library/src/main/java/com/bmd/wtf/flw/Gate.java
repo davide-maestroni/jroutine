@@ -16,7 +16,7 @@ package com.bmd.wtf.flw;
 import java.util.concurrent.TimeUnit;
 
 /**
- * A gate instance allows to access a leap instance chained to the waterfall in a thread safe way.
+ * A gate allows to access a leap instance chained to the waterfall in a thread safe way.
  * <p/>
  * Created by davide on 6/13/14.
  *
@@ -53,9 +53,9 @@ public interface Gate<TYPE> {
     public Gate<TYPE> eventuallyThrow(RuntimeException exception);
 
     /**
-     * Tells the collector to fail if the condition is not immediately met.
+     * Tells the gate to fail if the condition is not immediately met.
      *
-     * @return This collector.
+     * @return This gate.
      */
     public Gate<TYPE> immediately();
 

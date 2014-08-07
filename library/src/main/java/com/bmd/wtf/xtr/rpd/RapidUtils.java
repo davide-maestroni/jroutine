@@ -20,7 +20,7 @@ import java.util.HashMap;
  * <p/>
  * Created by davide on 7/11/14.
  */
-public class Rapids {
+class RapidUtils {
 
     private static final HashMap<Class<?>, Class<?>> sBoxMap = new HashMap<Class<?>, Class<?>>(9);
 
@@ -42,7 +42,7 @@ public class Rapids {
     /**
      * Avoid direct instantiation.
      */
-    private Rapids() {
+    private RapidUtils() {
 
     }
 

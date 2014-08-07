@@ -80,7 +80,7 @@ class GateConditionEvaluator<TYPE> implements ConditionEvaluator<TYPE> {
                     final Object arg = args[i];
                     final Class<?> param = params[i];
 
-                    if ((arg != null) ? !Rapids.boxedClass(param).isInstance(arg)
+                    if ((arg != null) ? !RapidUtils.boxedClass(param).isInstance(arg)
                             : param.isPrimitive()) {
 
                         isMatching = false;
@@ -117,7 +117,7 @@ class GateConditionEvaluator<TYPE> implements ConditionEvaluator<TYPE> {
                         final Object arg = args[i];
                         final Class<?> param = params[i];
 
-                        if ((arg != null) && Rapids.boxedClass(param).equals(arg.getClass())) {
+                        if ((arg != null) && RapidUtils.boxedClass(param).equals(arg.getClass())) {
 
                             ++confidence;
                         }

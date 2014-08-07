@@ -22,8 +22,8 @@ import com.bmd.wtf.lps.LeapDecorator;
  * <p/>
  * Created by davide on 6/14/14.
  *
- * @param <IN>  The input data type.
- * @param <OUT> The output data type.
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
 class SegmentedLeap<IN, OUT> extends LeapDecorator<IN, OUT> {
 
@@ -32,7 +32,7 @@ class SegmentedLeap<IN, OUT> extends LeapDecorator<IN, OUT> {
     /**
      * Constructor.
      *
-     * @param wrapped The wrapped leap.
+     * @param wrapped the wrapped leap.
      */
     public SegmentedLeap(final Leap<IN, OUT> wrapped) {
 

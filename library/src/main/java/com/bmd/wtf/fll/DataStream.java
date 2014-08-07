@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
  * <p/>
  * Created by davide on 6/7/14.
  *
- * @param <DATA> The data type.
+ * @param <DATA> the data type.
  */
 class DataStream<DATA> implements Stream<DATA> {
 
@@ -44,8 +44,8 @@ class DataStream<DATA> implements Stream<DATA> {
     /**
      * Constructor.
      *
-     * @param upstreamFall   The upstream fall.
-     * @param downstreamFall The downstream fall.
+     * @param upstreamFall   the upstream fall.
+     * @param downstreamFall the downstream fall.
      */
     public DataStream(final DataFall<?, DATA> upstreamFall,
             final DataFall<DATA, ?> downstreamFall) {
@@ -346,8 +346,8 @@ class DataStream<DATA> implements Stream<DATA> {
     /**
      * Checks if this stream can reach, directly or though other streams, the specified fall.
      *
-     * @param fall The target fall.
-     * @return Whether this stream can reach the target fall.
+     * @param fall the target fall.
+     * @return whether this stream can reach the target fall.
      */
     boolean canReach(final Collection<? extends DataFall<?, ?>> fall) {
 
@@ -370,7 +370,7 @@ class DataStream<DATA> implements Stream<DATA> {
     /**
      * Drains the stream.
      *
-     * @param direction The direction of the drain.
+     * @param direction the direction of the drain.
      * @see com.bmd.wtf.flw.River#drain()
      */
     void drain(final Direction direction) {

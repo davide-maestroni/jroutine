@@ -20,8 +20,8 @@ import com.bmd.wtf.flw.River;
  * <p/>
  * Created by davide on 6/9/14.
  *
- * @param <IN>  The input data type.
- * @param <OUT> The output data type.
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  * @see FreeLeap
  */
 public abstract class AbstractLeap<IN, OUT> implements Leap<IN, OUT> {

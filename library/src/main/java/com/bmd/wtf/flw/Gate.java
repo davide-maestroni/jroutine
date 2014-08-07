@@ -20,16 +20,16 @@ import java.util.concurrent.TimeUnit;
  * <p/>
  * Created by davide on 6/13/14.
  *
- * @param <TYPE> The backed leap type.
+ * @param <TYPE> the backed leap type.
  */
 public interface Gate<TYPE> {
 
     /**
      * Tells the gate to fail if the condition is not met before the specified time has elapsed.
      *
-     * @param maxDelay The maximum delay in the specified time unit.
-     * @param timeUnit The delay time unit.
-     * @return This gate.
+     * @param maxDelay the maximum delay in the specified time unit.
+     * @param timeUnit the delay time unit.
+     * @return this gate.
      * @see #when(ConditionEvaluator)
      */
     public Gate<TYPE> afterMax(long maxDelay, TimeUnit timeUnit);
@@ -37,7 +37,7 @@ public interface Gate<TYPE> {
     /**
      * Tells the gate to wait indefinitely for the condition to be met.
      *
-     * @return This gate.
+     * @return this gate.
      * @see #when(ConditionEvaluator)
      */
     public Gate<TYPE> eventually();
@@ -46,8 +46,8 @@ public interface Gate<TYPE> {
      * Tells the gate to throw the specified exception if the maximum delay elapses before the
      * condition is met.
      *
-     * @param exception The exception to be thrown.
-     * @return This gate.
+     * @param exception the exception to be thrown.
+     * @return this gate.
      * @see #when(ConditionEvaluator)
      */
     public Gate<TYPE> eventuallyThrow(RuntimeException exception);
@@ -55,17 +55,18 @@ public interface Gate<TYPE> {
     /**
      * Tells the gate to fail if the condition is not immediately met.
      *
-     * @return This gate.
+     * @return this gate.
      */
     public Gate<TYPE> immediately();
 
     /**
      * Performs the specified action by passing the variadic arguments as parameters.
      *
-     * @param action   The action to perform on the leap backing this gate.
-     * @param args     The action arguments.
-     * @param <RESULT> The result type.
-     * @return The action result.
+     * @param action   the action to perform on the leap backing this gate.
+     * @param args     the action arguments.
+     * @param <RESULT> the result type.
+     * @return the action result.
+     * @throws DelayInterruptedException if the calling thread is interrupted.
      */
     public <RESULT> RESULT perform(Action<RESULT, ? super TYPE> action, Object... args);
 
@@ -74,25 +75,25 @@ public interface Gate<TYPE> {
      * <p/>
      * A null condition (as by default) is always immediately met.
      *
-     * @param evaluator The condition evaluator.
-     * @return This gate.
+     * @param evaluator the condition evaluator.
+     * @return this gate.
      */
     public Gate<TYPE> when(ConditionEvaluator<? super TYPE> evaluator);
 
     /**
      * Interface defining an action to be performed on the backed leap.
      *
-     * @param <RESULT> The result type.
-     * @param <TYPE>   The leap type.
+     * @param <RESULT> the result type.
+     * @param <TYPE>   the leap type.
      */
     public interface Action<RESULT, TYPE> {
 
         /**
          * Performs this action on the specified leap.
          *
-         * @param leap The leap instance.
-         * @param args The action arguments.
-         * @return The action result.
+         * @param leap the leap instance.
+         * @param args the action arguments.
+         * @return the action result.
          */
         public RESULT doOn(TYPE leap, Object... args);
     }
@@ -100,15 +101,15 @@ public interface Gate<TYPE> {
     /**
      * Condition evaluator.
      *
-     * @param <TYPE> The leap type.
+     * @param <TYPE> the leap type.
      */
     public interface ConditionEvaluator<TYPE> {
 
         /**
          * Checks if this condition is satisfied by the specified leap.
          *
-         * @param leap The leap instance.
-         * @return Whether the condition is satisfied.
+         * @param leap the leap instance.
+         * @return whether the condition is satisfied.
          */
         public boolean isSatisfied(TYPE leap);
     }

@@ -228,7 +228,7 @@ class DataLock {
     /**
      * Constructor.
      *
-     * @param initialCapacity The initial capacity.
+     * @param initialCapacity the initial capacity.
      */
     public DataLock(final int initialCapacity) {
 

@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * This class provides a different way to filter and transform data inside a leap.
+ * This class provides an alternative way to filter and transform data inside a leap.
  * <p/>
  * The two main ways to use it is to inherit the class or to wrap an object inside a rapid leap.
  * <br/>
@@ -43,12 +43,21 @@ import java.util.Map.Entry;
  * <p/>
  * The inheriting class may also make use of the protected method provided by this class to access
  * the downstream and upstream rivers, and the waterfall gates.
+ * <b>Warning:</b> when employing annotation remember to add the proper rules to your Proguard
+ * file:
+ * <pre>
+ *     <code>
+ *         -keepattributes RuntimeVisibleAnnotations
+ *
+ *         -keepclassmembers class ** {
+ *              &#64;com.bmd.wtf.xtr.rpd.RapidAnnotations$DataFlow *;
+ *         }
+ *     </code>
+ * </pre>
  * <p/>
  * Created by davide on 6/23/14.
  */
 public abstract class RapidLeap implements Leap<Object, Object> {
-
-    //TODO: proguard rule
 
     private final HashMap<Class<?>, Method> mMethodMap = new HashMap<Class<?>, Method>();
 
@@ -65,7 +74,7 @@ public abstract class RapidLeap implements Leap<Object, Object> {
     /**
      * Constructor.
      *
-     * @param validFlows Whether only the annotated methods must be called when data flow through
+     * @param validFlows whether only the annotated methods must be called when data flow through
      *                   this leap.
      */
     public RapidLeap(final ValidFlows validFlows) {
@@ -91,8 +100,8 @@ public abstract class RapidLeap implements Leap<Object, Object> {
     /**
      * Constructor.
      *
-     * @param wrapped    The wrapped object.
-     * @param validFlows Whether only the annotated methods must be called when data flow through
+     * @param wrapped    the wrapped object.
+     * @param validFlows whether only the annotated methods must be called when data flow through
      *                   this leap.
      */
     private RapidLeap(final Object wrapped, final ValidFlows validFlows) {
@@ -106,8 +115,8 @@ public abstract class RapidLeap implements Leap<Object, Object> {
     /**
      * Creates and returns a rapid leap wrapping the specified object.
      *
-     * @param wrapped The wrapped object.
-     * @return The new rapid leap.
+     * @param wrapped the wrapped object.
+     * @return the new rapid leap.
      */
     public static RapidLeap from(final Object wrapped) {
 
@@ -119,8 +128,8 @@ public abstract class RapidLeap implements Leap<Object, Object> {
      * <p/>
      * Note that only the annotated method will be considered when handling flowing data.
      *
-     * @param wrapped The wrapped object.
-     * @return The new rapid leap.
+     * @param wrapped the wrapped object.
+     * @return the new rapid leap.
      */
     public static RapidLeap fromAnnotated(final Object wrapped) {
 
@@ -256,7 +265,7 @@ public abstract class RapidLeap implements Leap<Object, Object> {
     /**
      * Returns the downstream river instance.
      *
-     * @return The river instance.
+     * @return the river instance.
      */
     protected River<Object> downRiver() {
 
@@ -277,7 +286,7 @@ public abstract class RapidLeap implements Leap<Object, Object> {
     /**
      * Returns the number identifying the fall formed by this leap.
      *
-     * @return The fall number.
+     * @return the fall number.
      */
     protected int fallNumber() {
 
@@ -300,9 +309,9 @@ public abstract class RapidLeap implements Leap<Object, Object> {
      * <p/>
      * If no leap of that type is not found inside the waterfall an exception will be thrown.
      *
-     * @param gateClass The gate class.
-     * @param <TYPE>    The leap type.
-     * @return The gate.
+     * @param gateClass the gate class.
+     * @param <TYPE>    the leap type.
+     * @return the gate.
      */
     protected <TYPE> RapidGate<TYPE> on(final Class<TYPE> gateClass) {
 
@@ -314,9 +323,9 @@ public abstract class RapidLeap implements Leap<Object, Object> {
      * <p/>
      * If the leap is not found inside the waterfall an exception will be thrown.
      *
-     * @param gateClassification The gate classification.
-     * @param <TYPE>             The leap type.
-     * @return The gate.
+     * @param gateClassification the gate classification.
+     * @param <TYPE>             the leap type.
+     * @return the gate.
      */
     protected <TYPE> RapidGate<TYPE> on(final Classification<TYPE> gateClassification) {
 
@@ -327,7 +336,7 @@ public abstract class RapidLeap implements Leap<Object, Object> {
     /**
      * Returns the upstream river instance.
      *
-     * @return The river instance.
+     * @return the river instance.
      */
     protected River<Object> upRiver() {
 

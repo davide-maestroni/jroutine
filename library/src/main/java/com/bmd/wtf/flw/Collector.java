@@ -22,17 +22,16 @@ import java.util.concurrent.TimeUnit;
  * <p/>
  * Created by davide on 6/7/14.
  *
- * @param <DATA> The data type.
+ * @param <DATA> the data type.
  */
-//TODO Dam?
 public interface Collector<DATA> extends Iterator<DATA> {
 
     /**
      * Tells the collector to fail if no data is available before the specified time has elapsed.
      *
-     * @param maxDelay The maximum delay in the specified time unit.
-     * @param timeUnit The delay time unit.
-     * @return This collector.
+     * @param maxDelay the maximum delay in the specified time unit.
+     * @param timeUnit the delay time unit.
+     * @return this collector.
      */
     public Collector<DATA> afterMax(long maxDelay, TimeUnit timeUnit);
 
@@ -40,12 +39,14 @@ public interface Collector<DATA> extends Iterator<DATA> {
      * Collects all the available data and return them into an arrival ordered list.
      * <p/>
      * In case an unhandled exception is collected, the same will be re-thrown inside a
-     * {@link com.bmd.wtf.fll.FloatingException}.
+     * {@link FloatingException}.
      * <p/>
      * Note that the function will block until all the expected data are available or the maximum
      * delay has elapsed.
      *
-     * @return The list of collected data.
+     * @return the list of collected data.
+     * @throws FloatingException if an unhandled exception flows down the waterfall into this
+     *                           collector.
      */
     public List<DATA> all();
 
@@ -53,20 +54,22 @@ public interface Collector<DATA> extends Iterator<DATA> {
      * Collects all the available data by filling the specified list in arrival order.
      * <p/>
      * In case an unhandled exception is collected, the same will be re-thrown inside a
-     * {@link com.bmd.wtf.fll.FloatingException}.
+     * {@link FloatingException}.
      * <p/>
      * Note that the function will block until all the expected data are available or the maximum
      * delay has elapsed.
      *
-     * @param data The list to fill.
-     * @return This collector.
+     * @param data the list to fill.
+     * @return this collector.
+     * @throws FloatingException if an unhandled exception flows down the waterfall into this
+     *                           collector.
      */
     public Collector<DATA> allInto(List<DATA> data);
 
     /**
      * Tells the collector to wait indefinitely for data to be available.
      *
-     * @return This collector.
+     * @return this collector.
      */
     public Collector<DATA> eventually();
 
@@ -74,29 +77,40 @@ public interface Collector<DATA> extends Iterator<DATA> {
      * Tells the collector to throw the specified exception if the maximum delay elapses before any
      * data is available.
      *
-     * @param exception The exception to be thrown.
-     * @return This collector.
+     * @param exception the exception to be thrown.
+     * @return this collector.
      */
     public Collector<DATA> eventuallyThrow(RuntimeException exception);
+
+    /**
+     * Overrides parent class method.
+     *
+     * @throws FloatingException if an unhandled exception flows down the waterfall into this
+     *                           collector.
+     */
+    @Override
+    public DATA next();
 
     /**
      * Collects the first available data drop by adding it to the specified list.
      * <p/>
      * In case an unhandled exception is collected, the same will be re-thrown inside a
-     * {@link com.bmd.wtf.fll.FloatingException}.
+     * {@link FloatingException}.
      * <p/>
      * Note that the function will block until at least a drop of data is available, all data has
      * been collected, or the maximum delay has elapsed.
      *
-     * @param data The list to fill.
-     * @return This collector.
+     * @param data the list to fill.
+     * @return this collector.
+     * @throws FloatingException if an unhandled exception flows down the waterfall into this
+     *                           collector.
      */
     public Collector<DATA> nextInto(List<DATA> data);
 
     /**
      * Tells the collector to fail if no data is immediately available.
      *
-     * @return This collector.
+     * @return this collector.
      */
     public Collector<DATA> now();
 }

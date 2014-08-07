@@ -18,16 +18,16 @@ package com.bmd.wtf.lps;
  * <p/>
  * Created by davide on 6/8/14.
  *
- * @param <IN>  The input data type.
- * @param <OUT> The output data type.
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
 public interface LeapGenerator<IN, OUT> {
 
     /**
      * Creates and returns the leap forming the specified fall.
      *
-     * @param fallNumber The number identifying the fall.
-     * @return The leap.
+     * @param fallNumber the number identifying the fall.
+     * @return the leap.
      */
     public Leap<IN, OUT> start(int fallNumber);
 }

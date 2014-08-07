@@ -33,7 +33,7 @@ public class ThreadPoolCurrent implements Current {
     /**
      * Avoid instantiation outside the package.
      *
-     * @param threadPoolSize The maximum size of the thread pool.
+     * @param threadPoolSize the maximum size of the thread pool.
      */
     ThreadPoolCurrent(final int threadPoolSize) {
 

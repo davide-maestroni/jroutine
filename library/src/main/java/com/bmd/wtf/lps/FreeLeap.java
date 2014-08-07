@@ -20,7 +20,7 @@ import com.bmd.wtf.flw.River;
  * <p/>
  * Created by davide on 6/8/14.
  *
- * @param <DATA> The data type.
+ * @param <DATA> the data type.
  */
 public class FreeLeap<DATA> implements Leap<DATA, DATA> {
 

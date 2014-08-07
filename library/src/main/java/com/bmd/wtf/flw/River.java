@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
  * <p/>
  * Created by davide on 6/7/14.
  *
- * @param <DATA> The data type.
+ * @param <DATA> the data type.
  */
 public interface River<DATA> extends Stream<DATA> {
 
@@ -39,7 +39,7 @@ public interface River<DATA> extends Stream<DATA> {
      * Deviates the flow of the specified river stream by effectively preventing any coming data
      * to be pushed further downstream.
      *
-     * @param streamNumber The number identifying the target stream.
+     * @param streamNumber the number identifying the target stream.
      * @see #deviate()
      */
     public void deviateStream(int streamNumber);
@@ -54,7 +54,7 @@ public interface River<DATA> extends Stream<DATA> {
      * Drains the specified river stream by removing from the waterfall all the falls and rivers
      * fed only by the specific stream.
      *
-     * @param streamNumber The number identifying the target stream.
+     * @param streamNumber the number identifying the target stream.
      */
     public void drainStream(int streamNumber);
 
@@ -107,17 +107,17 @@ public interface River<DATA> extends Stream<DATA> {
      * Be aware that the call may be postponed until the fall flushes all the data drops,
      * including the delayed ones.
      *
-     * @param streamNumber The number identifying the target stream.
-     * @return This river.
+     * @param streamNumber the number identifying the target stream.
+     * @return this river.
      */
     public River<DATA> flushStream(int streamNumber);
 
     /**
      * Pushes the specified data into the specific river stream flow and then flushes it.
      *
-     * @param streamNumber The number identifying the target stream.
-     * @param drops        The data drops.
-     * @return This river.
+     * @param streamNumber the number identifying the target stream.
+     * @param drops        the data drops.
+     * @return this river.
      */
     public River<DATA> flushStream(int streamNumber, DATA... drops);
 
@@ -125,18 +125,18 @@ public interface River<DATA> extends Stream<DATA> {
      * Pushes the data returned by the specified iterable into the specific river stream flow and
      * then flushes it.
      *
-     * @param streamNumber The number identifying the target stream.
-     * @param drops        The data drops iterable.
-     * @return This river.
+     * @param streamNumber the number identifying the target stream.
+     * @param drops        the data drops iterable.
+     * @return this river.
      */
     public River<DATA> flushStream(int streamNumber, Iterable<? extends DATA> drops);
 
     /**
      * Pushes the specified data into the specific river stream flow and then flushes it.
      *
-     * @param streamNumber The number identifying the target stream.
-     * @param drop         The data drop.
-     * @return This river.
+     * @param streamNumber the number identifying the target stream.
+     * @param drop         the data drop.
+     * @return this river.
      */
     public River<DATA> flushStream(int streamNumber, DATA drop);
 
@@ -144,11 +144,11 @@ public interface River<DATA> extends Stream<DATA> {
      * Pushes the specified data into the specific river stream flow, after the specified time has
      * elapsed, and then flushes it.
      *
-     * @param streamNumber The number identifying the target stream.
-     * @param delay        The delay in <code>timeUnit</code> time units.
-     * @param timeUnit     The delay time unit.
-     * @param drops        The data drops.
-     * @return This river.
+     * @param streamNumber the number identifying the target stream.
+     * @param delay        the delay in <code>timeUnit</code> time units.
+     * @param timeUnit     the delay time unit.
+     * @param drops        the data drops.
+     * @return this river.
      */
     public River<DATA> flushStreamAfter(int streamNumber, long delay, TimeUnit timeUnit,
             DATA... drops);
@@ -157,11 +157,11 @@ public interface River<DATA> extends Stream<DATA> {
      * Pushes the data returned by the specified iterable into the specific river stream flow,
      * after the specified time has elapsed, and then flushes it.
      *
-     * @param streamNumber The number identifying the target stream.
-     * @param delay        The delay in <code>timeUnit</code> time units.
-     * @param timeUnit     The delay time unit.
-     * @param drops        The data drops iterable.
-     * @return This river.
+     * @param streamNumber the number identifying the target stream.
+     * @param delay        the delay in <code>timeUnit</code> time units.
+     * @param timeUnit     the delay time unit.
+     * @param drops        the data drops iterable.
+     * @return this river.
      */
     public River<DATA> flushStreamAfter(int streamNumber, long delay, TimeUnit timeUnit,
             Iterable<? extends DATA> drops);
@@ -170,20 +170,20 @@ public interface River<DATA> extends Stream<DATA> {
      * Pushes the specified data into the specific river stream flow, after the specified time has
      * elapsed, and then flushes it.
      *
-     * @param streamNumber The number identifying the target stream.
-     * @param delay        The delay in <code>timeUnit</code> time units.
-     * @param timeUnit     The delay time unit.
-     * @param drop         The data drop.
-     * @return This river.
+     * @param streamNumber the number identifying the target stream.
+     * @param delay        the delay in <code>timeUnit</code> time units.
+     * @param timeUnit     the delay time unit.
+     * @param drop         the data drop.
+     * @return this river.
      */
     public River<DATA> flushStreamAfter(int streamNumber, long delay, TimeUnit timeUnit, DATA drop);
 
     /**
      * Forwards the specified unhandled exception into the specific river stream flow.
      *
-     * @param streamNumber The number identifying the target stream.
-     * @param throwable    The thrown exception.
-     * @return This river.
+     * @param streamNumber the number identifying the target stream.
+     * @param throwable    the thrown exception.
+     * @return this river.
      */
     public River<DATA> forwardStream(int streamNumber, Throwable throwable);
 
@@ -192,9 +192,9 @@ public interface River<DATA> extends Stream<DATA> {
      * <p/>
      * If no leap of that type is found along the river path an exception will be thrown.
      *
-     * @param gateClass The gate class.
-     * @param <TYPE>    The leap type.
-     * @return The gate.
+     * @param gateClass the gate class.
+     * @param <TYPE>    the leap type.
+     * @return the gate.
      */
     public <TYPE> Gate<TYPE> on(Class<TYPE> gateClass);
 
@@ -203,9 +203,9 @@ public interface River<DATA> extends Stream<DATA> {
      * <p/>
      * If no leap of that type is found along the river path an exception will be thrown.
      *
-     * @param leap   The leap instance.
-     * @param <TYPE> The leap type.
-     * @return The gate.
+     * @param leap   the leap instance.
+     * @param <TYPE> the leap type.
+     * @return the gate.
      */
     public <TYPE> Gate<TYPE> on(TYPE leap);
 
@@ -214,36 +214,36 @@ public interface River<DATA> extends Stream<DATA> {
      * <p/>
      * If no leap of that type is found along the river path an exception will be thrown.
      *
-     * @param gateClassification The gate classification.
-     * @param <TYPE>             The leap type.
-     * @return The gate.
+     * @param gateClassification the gate classification.
+     * @param <TYPE>             the leap type.
+     * @return the gate.
      */
     public <TYPE> Gate<TYPE> on(Classification<TYPE> gateClassification);
 
     /**
      * Pushes the specified data into the specific river stream flow.
      *
-     * @param streamNumber The number identifying the target stream.
-     * @param drops        The data drops.
-     * @return This river.
+     * @param streamNumber the number identifying the target stream.
+     * @param drops        the data drops.
+     * @return this river.
      */
     public River<DATA> pushStream(int streamNumber, DATA... drops);
 
     /**
      * Pushes the data returned by the specified iterable into the specific river stream flow.
      *
-     * @param streamNumber The number identifying the target stream.
-     * @param drops        The data drops iterable.
-     * @return This river.
+     * @param streamNumber the number identifying the target stream.
+     * @param drops        the data drops iterable.
+     * @return this river.
      */
     public River<DATA> pushStream(int streamNumber, Iterable<? extends DATA> drops);
 
     /**
      * Pushes the specified data into the specific river stream flow.
      *
-     * @param streamNumber The number identifying the target stream.
-     * @param drop         The data drop.
-     * @return This river.
+     * @param streamNumber the number identifying the target stream.
+     * @param drop         the data drop.
+     * @return this river.
      */
     public River<DATA> pushStream(int streamNumber, DATA drop);
 
@@ -251,11 +251,11 @@ public interface River<DATA> extends Stream<DATA> {
      * Pushes the data returned by the specified iterable into the specific river stream flow,
      * after the specified time has elapsed.
      *
-     * @param streamNumber The number identifying the target stream.
-     * @param delay        The delay in <code>timeUnit</code> time units.
-     * @param timeUnit     The delay time unit.
-     * @param drops        The data drops iterable.
-     * @return This river.
+     * @param streamNumber the number identifying the target stream.
+     * @param delay        the delay in <code>timeUnit</code> time units.
+     * @param timeUnit     the delay time unit.
+     * @param drops        the data drops iterable.
+     * @return this river.
      */
     public River<DATA> pushStreamAfter(int streamNumber, long delay, TimeUnit timeUnit,
             Iterable<? extends DATA> drops);
@@ -264,11 +264,11 @@ public interface River<DATA> extends Stream<DATA> {
      * Pushes the specified data into the specific river stream flow, after the specified time has
      * elapsed.
      *
-     * @param streamNumber The number identifying the target stream.
-     * @param delay        The delay in <code>timeUnit</code> time units.
-     * @param timeUnit     The delay time unit.
-     * @param drop         The data drop.
-     * @return This river.
+     * @param streamNumber the number identifying the target stream.
+     * @param delay        the delay in <code>timeUnit</code> time units.
+     * @param timeUnit     the delay time unit.
+     * @param drop         the data drop.
+     * @return this river.
      */
     public River<DATA> pushStreamAfter(int streamNumber, long delay, TimeUnit timeUnit, DATA drop);
 
@@ -276,11 +276,11 @@ public interface River<DATA> extends Stream<DATA> {
      * Pushes the specified data into the specific river stream flow, after the specified time has
      * elapsed.
      *
-     * @param streamNumber The number identifying the target stream.
-     * @param delay        The delay in <code>timeUnit</code> time units.
-     * @param timeUnit     The delay time unit.
-     * @param drops        The data drops.
-     * @return This river.
+     * @param streamNumber the number identifying the target stream.
+     * @param delay        the delay in <code>timeUnit</code> time units.
+     * @param timeUnit     the delay time unit.
+     * @param drops        the data drops.
+     * @return this river.
      */
     public River<DATA> pushStreamAfter(int streamNumber, long delay, TimeUnit timeUnit,
             DATA... drops);
@@ -288,7 +288,7 @@ public interface River<DATA> extends Stream<DATA> {
     /**
      * Returns the size of this river, that is the number of streams which compose it.
      *
-     * @return The river size.
+     * @return the river size.
      */
     public int size();
 }

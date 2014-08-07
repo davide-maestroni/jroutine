@@ -26,7 +26,7 @@ import com.bmd.wtf.lps.AbstractLeap;
  * <p/>
  * Created by davide on 6/10/14.
  *
- * @param <DATA> The data type.
+ * @param <DATA> the data type.
  */
 class BarrageLeap<DATA> extends AbstractLeap<DATA, DATA> implements Barrage<DATA> {
 
@@ -48,7 +48,7 @@ class BarrageLeap<DATA> extends AbstractLeap<DATA, DATA> implements Barrage<DATA
      * When no barrage is specified the drops of data will always be pushed into the default
      * stream.
      *
-     * @param streamCount The total number of streams.
+     * @param streamCount the total number of streams.
      */
     public BarrageLeap(final int streamCount) {
 
@@ -59,8 +59,8 @@ class BarrageLeap<DATA> extends AbstractLeap<DATA, DATA> implements Barrage<DATA
     /**
      * Constructor.
      *
-     * @param barrage     The barrage.
-     * @param streamCount The total number of streams.
+     * @param barrage     the barrage.
+     * @param streamCount the total number of streams.
      */
     public BarrageLeap(final Barrage<DATA> barrage, final int streamCount) {
 
@@ -100,7 +100,7 @@ class BarrageLeap<DATA> extends AbstractLeap<DATA, DATA> implements Barrage<DATA
     /**
      * Lowers the level of the stream identified by the specified number.
      *
-     * @param streamNumber The stream number.
+     * @param streamNumber the stream number.
      */
     public void lowerLevel(final int streamNumber) {
 
@@ -141,8 +141,8 @@ class BarrageLeap<DATA> extends AbstractLeap<DATA, DATA> implements Barrage<DATA
     /**
      * Raises the level of the stream identified by the specified number by the specified count.
      *
-     * @param streamNumber The stream number.
-     * @param count        The number of level to raise.
+     * @param streamNumber the stream number.
+     * @param count        the number of level to raise.
      */
     public void raiseLevel(final int streamNumber, final int count) {
 

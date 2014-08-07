@@ -25,7 +25,7 @@ import java.lang.reflect.Method;
  * <p/>
  * Created by davide on 7/4/14.
  *
- * @param <TYPE> The leap type.
+ * @param <TYPE> the leap type.
  */
 class GateInvocationHandler<TYPE> implements InvocationHandler, Action<Object, TYPE> {
 
@@ -34,7 +34,7 @@ class GateInvocationHandler<TYPE> implements InvocationHandler, Action<Object, T
     /**
      * Constructor.
      *
-     * @param gate The gate instance.
+     * @param gate the gate instance.
      */
     public GateInvocationHandler(final Gate<TYPE> gate) {
 

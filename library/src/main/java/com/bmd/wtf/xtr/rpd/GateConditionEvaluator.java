@@ -32,7 +32,7 @@ import java.util.Arrays;
  * <p/>
  * Created by davide on 7/11/14.
  *
- * @param <TYPE> The gate type.
+ * @param <TYPE> the gate type.
  */
 class GateConditionEvaluator<TYPE> implements ConditionEvaluator<TYPE> {
 
@@ -43,7 +43,7 @@ class GateConditionEvaluator<TYPE> implements ConditionEvaluator<TYPE> {
     /**
      * Constructor.
      *
-     * @param args The arguments to be passed to the gate method.
+     * @param args the arguments to be passed to the gate method.
      */
     public GateConditionEvaluator(final Object[] args) {
 

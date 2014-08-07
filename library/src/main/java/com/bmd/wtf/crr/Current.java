@@ -33,26 +33,26 @@ public interface Current {
     /**
      * This method is called when data must be flushed through the current.
      *
-     * @param fall   The fall instance to be used to push data into the waterfall.
-     * @param origin The origin stream.
-     * @param <DATA> The data type.
+     * @param fall   the fall instance to be used to push data into the waterfall.
+     * @param origin the origin stream.
+     * @param <DATA> the data type.
      */
     public <DATA> void flush(Fall<DATA> fall, Stream<DATA> origin);
 
     /**
      * This method is called when an unhandled exception must be forwarded through the current.
      *
-     * @param fall      The fall instance to be used to push data into the waterfall.
-     * @param throwable The unhandled exception.
+     * @param fall      the fall instance to be used to push data into the waterfall.
+     * @param throwable the unhandled exception.
      */
     public void forward(Fall<?> fall, Throwable throwable);
 
     /**
      * This method is called when a data drop must be pushed through the current.
      *
-     * @param fall   The fall instance to be used to push data into the waterfall.
-     * @param drop   The data drop.
-     * @param <DATA> The data type.
+     * @param fall   the fall instance to be used to push data into the waterfall.
+     * @param drop   the data drop.
+     * @param <DATA> the data type.
      */
     public <DATA> void push(Fall<DATA> fall, DATA drop);
 
@@ -60,11 +60,11 @@ public interface Current {
      * This method is called when a data drop must be pushed through the current, after the
      * specified time has elapsed.
      *
-     * @param fall     The fall instance to be used to push data into the waterfall.
-     * @param delay    The delay in <code>timeUnit</code> time units.
-     * @param timeUnit The delay time unit.
-     * @param drop     The data drop.
-     * @param <DATA>   The data type.
+     * @param fall     the fall instance to be used to push data into the waterfall.
+     * @param delay    the delay in <code>timeUnit</code> time units.
+     * @param timeUnit the delay time unit.
+     * @param drop     the data drop.
+     * @param <DATA>   the data type.
      */
     public <DATA> void pushAfter(Fall<DATA> fall, long delay, TimeUnit timeUnit, DATA drop);
 
@@ -72,11 +72,11 @@ public interface Current {
      * This method is called when several data drops must be pushed through the current, after the
      * specified time has elapsed.
      *
-     * @param fall     The fall instance to be used to push data into the waterfall.
-     * @param delay    The delay in <code>timeUnit</code> time units.
-     * @param timeUnit The delay time unit.
-     * @param drops    The data drop iterable.
-     * @param <DATA>   The data type.
+     * @param fall     the fall instance to be used to push data into the waterfall.
+     * @param delay    the delay in <code>timeUnit</code> time units.
+     * @param timeUnit the delay time unit.
+     * @param drops    the data drop iterable.
+     * @param <DATA>   the data type.
      */
     public <DATA> void pushAfter(Fall<DATA> fall, long delay, TimeUnit timeUnit,
             Iterable<? extends DATA> drops);

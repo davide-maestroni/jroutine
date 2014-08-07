@@ -21,9 +21,9 @@ import com.bmd.wtf.lps.Leap;
  * <p/>
  * Created by davide on 7/6/14.
  *
- * @param <SOURCE> The river source data type.
- * @param <IN>     The input data type.
- * @param <OUT>    The output data type.
+ * @param <SOURCE> the river source data type.
+ * @param <IN>     the input data type.
+ * @param <OUT>    the output data type.
  */
 class BarrageFall<SOURCE, IN, OUT> extends DataFall<IN, OUT> {
 
@@ -34,11 +34,11 @@ class BarrageFall<SOURCE, IN, OUT> extends DataFall<IN, OUT> {
     /**
      * Constructor.
      *
-     * @param waterfall    The containing waterfall.
-     * @param inputCurrent The input current.
-     * @param leap         The wrapped leap.
-     * @param number       The number identifying this fall.
-     * @param barrageLeap  The related barrage.
+     * @param waterfall    the containing waterfall.
+     * @param inputCurrent the input current.
+     * @param leap         the wrapped leap.
+     * @param number       the number identifying this fall.
+     * @param barrageLeap  the related barrage.
      */
     public BarrageFall(final Waterfall<SOURCE, IN, OUT> waterfall, final Current inputCurrent,
             final Leap<IN, OUT> leap, final int number, final BarrageLeap barrageLeap) {

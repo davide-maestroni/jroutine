@@ -53,11 +53,23 @@ public class Rapid {
      * Note that a method might need to be made accessible in order to be called via
      * reflection. That means that, in case a {@link java.lang.SecurityManager} is installed, a
      * security exception might be raised based on the specific policy implemented.
+     * <p/>
+     * <b>Warning:</b> when employing annotation remember to add the proper rules to your Proguard
+     * file:
+     * <pre>
+     *     <code>
+     *         -keepattributes RuntimeVisibleAnnotations
      *
-     * @param generator The generator object whose method will be called.
-     * @param type      The current type.
-     * @param args      The arguments to be passed to the method.
-     * @return The newly created current generator.
+     *         -keepclassmembers class ** {
+     *              &#64;com.bmd.wtf.xtr.rpd.RapidAnnotations$Generator *;
+     *         }
+     *     </code>
+     * </pre>
+     *
+     * @param generator the generator object whose method will be called.
+     * @param type      the current type.
+     * @param args      the arguments to be passed to the method.
+     * @return the newly created current generator.
      */
     public static CurrentGenerator currentGenerator(final Object generator,
             final Class<? extends Current> type, final Object... args) {
@@ -76,10 +88,22 @@ public class Rapid {
      * Note that a constructor might need to be made accessible in order to be called via
      * reflection. That means that, in case a {@link java.lang.SecurityManager} is installed, a
      * security exception might be raised based on the specific policy implemented.
+     * <p/>
+     * <b>Warning:</b> when employing annotation remember to add the proper rules to your Proguard
+     * file:
+     * <pre>
+     *     <code>
+     *         -keepattributes RuntimeVisibleAnnotations
      *
-     * @param current     The current object to instantiate.
-     * @param contextArgs The arguments to be passed to the constructor.
-     * @return The newly created current generator.
+     *         -keepclassmembers class ** {
+     *              &#64;com.bmd.wtf.xtr.rpd.RapidAnnotations$Generator *;
+     *         }
+     *     </code>
+     * </pre>
+     *
+     * @param current     the current object to instantiate.
+     * @param contextArgs the arguments to be passed to the constructor.
+     * @return the newly created current generator.
      */
     public static CurrentGenerator currentGenerator(final Current current,
             final Object... contextArgs) {
@@ -98,10 +122,22 @@ public class Rapid {
      * Note that a constructor might need to be made accessible in order to be called via
      * reflection. That means that, in case a {@link java.lang.SecurityManager} is installed, a
      * security exception might be raised based on the specific policy implemented.
+     * <p/>
+     * <b>Warning:</b> when employing annotation remember to add the proper rules to your Proguard
+     * file:
+     * <pre>
+     *     <code>
+     *         -keepattributes RuntimeVisibleAnnotations
      *
-     * @param classification The current classification.
-     * @param contextArgs    The arguments to be passed to the constructor.
-     * @return The newly created current generator.
+     *         -keepclassmembers class ** {
+     *              &#64;com.bmd.wtf.xtr.rpd.RapidAnnotations$Generator *;
+     *         }
+     *     </code>
+     * </pre>
+     *
+     * @param classification the current classification.
+     * @param contextArgs    the arguments to be passed to the constructor.
+     * @return the newly created current generator.
      */
     public static CurrentGenerator currentGenerator(
             final Classification<? extends Current> classification, final Object... contextArgs) {
@@ -120,10 +156,22 @@ public class Rapid {
      * Note that a constructor might need to be made accessible in order to be called via
      * reflection. That means that, in case a {@link java.lang.SecurityManager} is installed, a
      * security exception might be raised based on the specific policy implemented.
+     * <p/>
+     * <b>Warning:</b> when employing annotation remember to add the proper rules to your Proguard
+     * file:
+     * <pre>
+     *     <code>
+     *         -keepattributes RuntimeVisibleAnnotations
      *
-     * @param type        The current type.
-     * @param contextArgs The arguments to be passed to the constructor.
-     * @return The newly created current generator.
+     *         -keepclassmembers class ** {
+     *              &#64;com.bmd.wtf.xtr.rpd.RapidAnnotations$Generator *;
+     *         }
+     *     </code>
+     * </pre>
+     *
+     * @param type        the current type.
+     * @param contextArgs the arguments to be passed to the constructor.
+     * @return the newly created current generator.
      */
     public static CurrentGenerator currentGenerator(final Class<? extends Current> type,
             final Object... contextArgs) {
@@ -134,9 +182,9 @@ public class Rapid {
     /**
      * Creates and returns a rapid gate wrapping the specified gate.
      *
-     * @param gate   The waterfall to wrap.
-     * @param <TYPE> The gate type.
-     * @return The newly created rapid gate.
+     * @param gate   the waterfall to wrap.
+     * @param <TYPE> the gate type.
+     * @return the newly created rapid gate.
      */
     public static <TYPE> RapidGate<TYPE> gate(final Gate<TYPE> gate) {
 
@@ -154,11 +202,23 @@ public class Rapid {
      * Note that a method might need to be made accessible in order to be called via
      * reflection. That means that, in case a {@link java.lang.SecurityManager} is installed, a
      * security exception might be raised based on the specific policy implemented.
+     * <p/>
+     * <b>Warning:</b> when employing annotation remember to add the proper rules to your Proguard
+     * file:
+     * <pre>
+     *     <code>
+     *         -keepattributes RuntimeVisibleAnnotations
      *
-     * @param generator      The generator object whose method will be called.
-     * @param classification The leap classification.
-     * @param args           The arguments to be passed to the method.
-     * @return The newly created leap generator.
+     *         -keepclassmembers class ** {
+     *              &#64;com.bmd.wtf.xtr.rpd.RapidAnnotations$Generator *;
+     *         }
+     *     </code>
+     * </pre>
+     *
+     * @param generator      the generator object whose method will be called.
+     * @param classification the leap classification.
+     * @param args           the arguments to be passed to the method.
+     * @return the newly created leap generator.
      */
     public static <IN, OUT> LeapGenerator<IN, OUT> leapGenerator(final Object generator,
             final Classification<? extends Leap<IN, OUT>> classification, final Object... args) {
@@ -177,10 +237,22 @@ public class Rapid {
      * Note that a constructor might need to be made accessible in order to be called via
      * reflection. That means that, in case a {@link java.lang.SecurityManager} is installed, a
      * security exception might be raised based on the specific policy implemented.
+     * <p/>
+     * <b>Warning:</b> when employing annotation remember to add the proper rules to your Proguard
+     * file:
+     * <pre>
+     *     <code>
+     *         -keepattributes RuntimeVisibleAnnotations
      *
-     * @param leap        The leap object to instantiate.
-     * @param contextArgs The arguments to be passed to the constructor.
-     * @return The newly created leap generator.
+     *         -keepclassmembers class ** {
+     *              &#64;com.bmd.wtf.xtr.rpd.RapidAnnotations$Generator *;
+     *         }
+     *     </code>
+     * </pre>
+     *
+     * @param leap        the leap object to instantiate.
+     * @param contextArgs the arguments to be passed to the constructor.
+     * @return the newly created leap generator.
      */
     public static <IN, OUT> LeapGenerator<IN, OUT> leapGenerator(final Leap<IN, OUT> leap,
             final Object... contextArgs) {
@@ -201,10 +273,22 @@ public class Rapid {
      * Note that a constructor might need to be made accessible in order to be called via
      * reflection. That means that, in case a {@link java.lang.SecurityManager} is installed, a
      * security exception might be raised based on the specific policy implemented.
+     * <p/>
+     * <b>Warning:</b> when employing annotation remember to add the proper rules to your Proguard
+     * file:
+     * <pre>
+     *     <code>
+     *         -keepattributes RuntimeVisibleAnnotations
      *
-     * @param classification The leap classification.
-     * @param contextArgs    The arguments to be passed to the constructor.
-     * @return The newly created leap generator.
+     *         -keepclassmembers class ** {
+     *              &#64;com.bmd.wtf.xtr.rpd.RapidAnnotations$Generator *;
+     *         }
+     *     </code>
+     * </pre>
+     *
+     * @param classification the leap classification.
+     * @param contextArgs    the arguments to be passed to the constructor.
+     * @return the newly created leap generator.
      */
     public static <IN, OUT> LeapGenerator<IN, OUT> leapGenerator(
             final Classification<? extends Leap<IN, OUT>> classification,
@@ -224,10 +308,22 @@ public class Rapid {
      * Note that a constructor might need to be made accessible in order to be called via
      * reflection. That means that, in case a {@link java.lang.SecurityManager} is installed, a
      * security exception might be raised based on the specific policy implemented.
+     * <p/>
+     * <b>Warning:</b> when employing annotation remember to add the proper rules to your Proguard
+     * file:
+     * <pre>
+     *     <code>
+     *         -keepattributes RuntimeVisibleAnnotations
      *
-     * @param type        The leap type.
-     * @param contextArgs The arguments to be passed to the constructor.
-     * @return The newly created leap generator.
+     *         -keepclassmembers class ** {
+     *              &#64;com.bmd.wtf.xtr.rpd.RapidAnnotations$Generator *;
+     *         }
+     *     </code>
+     * </pre>
+     *
+     * @param type        the leap type.
+     * @param contextArgs the arguments to be passed to the constructor.
+     * @return the newly created leap generator.
      */
     public static <IN, OUT> LeapGenerator<IN, OUT> leapGenerator(
             final Class<? extends Leap<IN, OUT>> type, final Object... contextArgs) {

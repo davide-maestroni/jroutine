@@ -13,6 +13,7 @@
  */
 package com.bmd.wtf.fll;
 
+import com.bmd.wtf.flw.DelayInterruptedException;
 import com.bmd.wtf.flw.Gate;
 import com.bmd.wtf.lps.Leap;
 
@@ -25,7 +26,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * <p/>
  * Created by davide on 6/13/14.
  *
- * @param <TYPE> The gate type.
+ * @param <TYPE> the gate type.
  */
 class DataGate<TYPE> implements Gate<TYPE> {
 
@@ -46,8 +47,8 @@ class DataGate<TYPE> implements Gate<TYPE> {
     /**
      * Constructor.
      *
-     * @param leap           The gate leap.
-     * @param classification The gate classification.
+     * @param leap           the gate leap.
+     * @param classification the gate classification.
      */
     public DataGate(final GateLeap<?, ?> leap, final Classification<TYPE> classification) {
 

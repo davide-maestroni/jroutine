@@ -21,6 +21,9 @@ import java.lang.ref.WeakReference;
  * Implementation of a leap decorator which retains a weak reference of the wrapped instance.
  * <p/>
  * Created by davide on 6/8/14.
+ *
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
 class WeakLeap<IN, OUT> implements Leap<IN, OUT> {
 
@@ -31,7 +34,7 @@ class WeakLeap<IN, OUT> implements Leap<IN, OUT> {
     /**
      * Default constructor.
      *
-     * @param wrapped The wrapped leap.
+     * @param wrapped the wrapped leap.
      */
     public WeakLeap(final Leap<IN, OUT> wrapped) {
 
@@ -41,8 +44,8 @@ class WeakLeap<IN, OUT> implements Leap<IN, OUT> {
     /**
      * Parametrized constructor.
      *
-     * @param wrapped      The wrapped leap.
-     * @param whenVanished Whether this instance must behave like a free leap or not after the
+     * @param wrapped      the wrapped leap.
+     * @param whenVanished whether this instance must behave like a free leap or not after the
      *                     wrapped instance is garbage collected.
      */
     public WeakLeap(final Leap<IN, OUT> wrapped, final WhenVanished whenVanished) {

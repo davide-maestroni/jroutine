@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
  * <p/>
  * Created by davide on 7/4/14.
  *
- * @param <TYPE> The backed leap type.
+ * @param <TYPE> the backed leap type.
  */
 public interface RapidGate<TYPE> extends Gate<TYPE> {
 
@@ -52,7 +52,7 @@ public interface RapidGate<TYPE> extends Gate<TYPE> {
      * <p/>
      * Note that the gate type must be an interface. An exception will be thrown otherwise.
      *
-     * @return The wrapped gate.
+     * @return the wrapped gate.
      */
     public TYPE perform();
 
@@ -62,9 +62,9 @@ public interface RapidGate<TYPE> extends Gate<TYPE> {
      * Note that the specified gate type must be an interface. An exception will be thrown
      * otherwise.
      *
-     * @param gateClass The gate class.
-     * @param <NTYPE>   The new gate type.
-     * @return The wrapped gate.
+     * @param gateClass the gate class.
+     * @param <NTYPE>   the new gate type.
+     * @return the wrapped gate.
      */
     public <NTYPE> NTYPE performAs(Class<NTYPE> gateClass);
 
@@ -74,9 +74,9 @@ public interface RapidGate<TYPE> extends Gate<TYPE> {
      * Note that the specified gate type must be an interface. An exception will be thrown
      * otherwise.
      *
-     * @param gateClassification The gate classification.
-     * @param <NTYPE>            The new gate type.
-     * @return The wrapped gate.
+     * @param gateClassification the gate classification.
+     * @param <NTYPE>            the new gate type.
+     * @return the wrapped gate.
      */
     public <NTYPE> NTYPE performAs(Classification<NTYPE> gateClassification);
 
@@ -88,9 +88,22 @@ public interface RapidGate<TYPE> extends Gate<TYPE> {
      * {@link RapidAnnotations.GateCondition} are analyzed first.<br/>
      * If more than one method matching the above requirements is found, an exception will be
      * thrown.
+     * <p/>
+     * <b>Warning:</b> when employing annotation remember to add the proper rules to your Proguard
+     * file:
+     * <pre>
+     *     <code>
+     *         -keepattributes RuntimeVisibleAnnotations
      *
-     * @param args The arguments to be passed to the method.
-     * @return The rapid gate.
+     *         -keepclassmembers class ** {
+     *              &#64;com.bmd.wtf.xtr.rpd.RapidAnnotations$GateCondition *;
+     *         }
+     *     </code>
+     * </pre>
+     * <p/>
+     *
+     * @param args the arguments to be passed to the method.
+     * @return the rapid gate.
      */
     public RapidGate<TYPE> whenSatisfies(final Object... args);
 }

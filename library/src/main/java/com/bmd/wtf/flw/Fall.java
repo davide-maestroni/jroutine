@@ -21,7 +21,7 @@ package com.bmd.wtf.flw;
  * <p/>
  * Created by davide on 6/7/14.
  *
- * @param <DATA> The data type.
+ * @param <DATA> the data type.
  */
 public interface Fall<DATA> {
 
@@ -29,21 +29,21 @@ public interface Fall<DATA> {
      * Flushes the fall flow, that is, it informs the fed streams that no more data drops are
      * likely to come.
      *
-     * @param origin The origin stream.
+     * @param origin the origin stream.
      */
     public void flush(Stream<DATA> origin);
 
     /**
      * Forwards the specified unhandled exception into the waterfall flow.
      *
-     * @param throwable The thrown exception.
+     * @param throwable the thrown exception.
      */
     public void forward(Throwable throwable);
 
     /**
      * Pushes the specified data into the waterfall flow.
      *
-     * @param drop The data drop.
+     * @param drop the data drop.
      */
     public void push(DATA drop);
 }

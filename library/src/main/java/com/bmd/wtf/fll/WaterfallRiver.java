@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
  * <p/>
  * Created by davide on 6/7/14.
  *
- * @param <DATA> The data type.
+ * @param <DATA> the data type.
  */
 public class WaterfallRiver<DATA> implements River<DATA> {
 
@@ -34,8 +34,8 @@ public class WaterfallRiver<DATA> implements River<DATA> {
     /**
      * Constructor.
      *
-     * @param waterfall The wrapped waterfall.
-     * @param direction Whether the river direction is downstream or upstream.
+     * @param waterfall the wrapped waterfall.
+     * @param direction whether the river direction is downstream or upstream.
      */
     public WaterfallRiver(final Waterfall<?, DATA, ?> waterfall, final Direction direction) {
 

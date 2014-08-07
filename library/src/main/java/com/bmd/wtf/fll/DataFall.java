@@ -35,8 +35,8 @@ import java.util.concurrent.locks.ReentrantLock;
  * <p/>
  * Created by davide on 6/7/14.
  *
- * @param <IN>  The input data type.
- * @param <OUT> The output data type.
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
 class DataFall<IN, OUT> implements Fall<IN> {
 
@@ -76,10 +76,10 @@ class DataFall<IN, OUT> implements Fall<IN> {
     /**
      * Constructor.
      *
-     * @param waterfall    The containing waterfall.
-     * @param inputCurrent The input current.
-     * @param leap         The wrapped leap.
-     * @param number       The number identifying this fall.
+     * @param waterfall    the containing waterfall.
+     * @param inputCurrent the input current.
+     * @param leap         the wrapped leap.
+     * @param number       the number identifying this fall.
      */
     public DataFall(final Waterfall<?, IN, OUT> waterfall, final Current inputCurrent,
             final Leap<IN, OUT> leap, final int number) {
@@ -259,7 +259,7 @@ class DataFall<IN, OUT> implements Fall<IN> {
     /**
      * Raises the water level of this fall by the specified data count.
      *
-     * @param count The drop count.
+     * @param count the drop count.
      */
     void raiseLevel(final int count) {
 

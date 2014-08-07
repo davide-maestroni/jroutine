@@ -28,37 +28,37 @@ import com.bmd.wtf.flw.River;
  * <p/>
  * Created by davide on 6/7/14.
  *
- * @param <IN>  The input data type.
- * @param <OUT> The output data type.
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
 public interface Leap<IN, OUT> {
 
     /**
      * This method is called when data are flushed through the leap.
      *
-     * @param upRiver    The upstream river instance.
-     * @param downRiver  The downstream river instance.
-     * @param fallNumber The number identifying the fall formed by this leap.
+     * @param upRiver    the upstream river instance.
+     * @param downRiver  the downstream river instance.
+     * @param fallNumber the number identifying the fall formed by this leap.
      */
     public void onFlush(River<IN> upRiver, River<OUT> downRiver, int fallNumber);
 
     /**
      * This method is called when a data drop is pushed through the leap.
      *
-     * @param upRiver    The upstream river instance.
-     * @param downRiver  The downstream river instance.
-     * @param fallNumber The number identifying the fall formed by this leap.
-     * @param drop       The drop of data.
+     * @param upRiver    the upstream river instance.
+     * @param downRiver  the downstream river instance.
+     * @param fallNumber the number identifying the fall formed by this leap.
+     * @param drop       the drop of data.
      */
     public void onPush(River<IN> upRiver, River<OUT> downRiver, int fallNumber, IN drop);
 
     /**
      * This method is called when an unhandled exception is pushed downstream through the leap.
      *
-     * @param upRiver    The upstream river instance.
-     * @param downRiver  The downstream river instance.
-     * @param fallNumber The number identifying the fall formed by this leap.
-     * @param throwable  The unhandled exception.
+     * @param upRiver    the upstream river instance.
+     * @param downRiver  the downstream river instance.
+     * @param fallNumber the number identifying the fall formed by this leap.
+     * @param throwable  the unhandled exception.
      */
     public void onUnhandled(River<IN> upRiver, River<OUT> downRiver, int fallNumber,
             Throwable throwable);

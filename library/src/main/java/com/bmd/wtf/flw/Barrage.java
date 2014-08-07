@@ -18,7 +18,7 @@ package com.bmd.wtf.flw;
  * <p/>
  * Created by davide on 7/29/14.
  *
- * @param <DATA> The data type.
+ * @param <DATA> the data type.
  */
 public interface Barrage<DATA> {
 
@@ -40,8 +40,8 @@ public interface Barrage<DATA> {
     /**
      * This method is called when a data drop is pushed through the barrage.
      *
-     * @param drop The drop of data.
-     * @return The stream number to push the drop into or one of the constants defining the default
+     * @param drop the drop of data.
+     * @return the stream number to push the drop into or one of the constants defining the default
      * stream (that is, the one processing less data), all the streams or none of them.
      */
     public int onPush(DATA drop);

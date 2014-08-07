@@ -32,8 +32,8 @@ public class Currents {
     /**
      * Returns a new {@link ThreadPoolCurrent} instance.
      *
-     * @param poolSize The maximum size of the thread pool.
-     * @return The new instance.
+     * @param poolSize the maximum size of the thread pool.
+     * @return the new instance.
      */
     public static Current pool(final int poolSize) {
 
@@ -43,7 +43,7 @@ public class Currents {
     /**
      * Returns the default {@link StraightCurrent} instance.
      *
-     * @return The instance.
+     * @return the instance.
      */
     public static Current straight() {
 

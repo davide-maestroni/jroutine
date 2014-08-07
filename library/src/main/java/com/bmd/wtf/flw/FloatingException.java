@@ -11,20 +11,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.wtf.fll;
+package com.bmd.wtf.flw;
 
 /**
- * This exception is thrown when a thread waiting on a data flow delay is interrupted by an
- * {@link InterruptedException}.
+ * This exception is thrown when an internal exception escapes the waterfall.
  * <p/>
- * Created by davide on 6/7/14.
+ * Created by davide on 6/30/14.
  */
-public class DelayInterruptedException extends RuntimeException {
+public class FloatingException extends RuntimeException {
 
     /**
      * Overrides {@link RuntimeException#RuntimeException(Throwable)}.
      */
-    public DelayInterruptedException(final Throwable throwable) {
+    public FloatingException(final Throwable throwable) {
 
         super(throwable);
     }

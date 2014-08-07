@@ -35,7 +35,7 @@ class LooperCurrent implements Current {
     /**
      * Constructor.
      *
-     * @param looper The looper to employ.
+     * @param looper the looper to employ.
      */
     public LooperCurrent(final Looper looper) {
 

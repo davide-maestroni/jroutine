@@ -51,9 +51,9 @@ class RapidGenerators {
      * reflection. That means that, in case a {@link java.lang.SecurityManager} is installed, a
      * security exception might be raised based on the specific policy implemented.
      *
-     * @param type        The current type.
-     * @param contextArgs The arguments to be passed to the constructor.
-     * @return The newly created current generator.
+     * @param type        the current type.
+     * @param contextArgs the arguments to be passed to the constructor.
+     * @return the newly created current generator.
      */
     public static CurrentGenerator currentGenerator(final Class<? extends Current> type,
             final Object... contextArgs) {
@@ -149,10 +149,10 @@ class RapidGenerators {
      * reflection. That means that, in case a {@link java.lang.SecurityManager} is installed, a
      * security exception might be raised based on the specific policy implemented.
      *
-     * @param generator      The generator object whose method will be called.
-     * @param classification The current classification.
-     * @param args           The arguments to be passed to the method.
-     * @return The newly created current generator.
+     * @param generator      the generator object whose method will be called.
+     * @param classification the current classification.
+     * @param args           the arguments to be passed to the method.
+     * @return the newly created current generator.
      */
     public static CurrentGenerator currentGenerator(final Object generator,
             final Classification<? extends Current> classification, final Object... args) {
@@ -241,12 +241,12 @@ class RapidGenerators {
      * reflection. That means that, in case a {@link java.lang.SecurityManager} is installed, a
      * security exception might be raised based on the specific policy implemented.
      *
-     * @param generator      The generator object whose method will be called.
-     * @param classification The leap classification.
-     * @param args           The arguments to be passed to the method.
-     * @param <IN>           The input data type.
-     * @param <OUT>          The output data type.
-     * @return The newly created leap generator.
+     * @param generator      the generator object whose method will be called.
+     * @param classification the leap classification.
+     * @param args           the arguments to be passed to the method.
+     * @param <IN>           the input data type.
+     * @param <OUT>          the output data type.
+     * @return the newly created leap generator.
      */
     public static <IN, OUT> LeapGenerator<IN, OUT> leapGenerator(final Object generator,
             final Classification<? extends Leap<IN, OUT>> classification, final Object... args) {
@@ -337,11 +337,11 @@ class RapidGenerators {
      * reflection. That means that, in case a {@link java.lang.SecurityManager} is installed, a
      * security exception might be raised based on the specific policy implemented.
      *
-     * @param type        The leap type.
-     * @param contextArgs The arguments to be passed to the constructor.
-     * @param <IN>        The input data type.
-     * @param <OUT>       The output data type.
-     * @return The newly created leap generator.
+     * @param type        the leap type.
+     * @param contextArgs the arguments to be passed to the constructor.
+     * @param <IN>        the input data type.
+     * @param <OUT>       the output data type.
+     * @return the newly created leap generator.
      */
     public static <IN, OUT> LeapGenerator<IN, OUT> leapGenerator(
             final Class<? extends Leap<IN, OUT>> type, final Object... contextArgs) {

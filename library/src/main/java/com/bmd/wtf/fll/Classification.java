@@ -27,7 +27,7 @@ import java.lang.reflect.Type;
  * <p/>
  * Created by davide on 6/14/14.
  *
- * @param <TYPE> The generic type.
+ * @param <TYPE> the generic type.
  */
 public abstract class Classification<TYPE> {
 
@@ -38,9 +38,9 @@ public abstract class Classification<TYPE> {
     /**
      * Creates a new classification from the specified raw type.
      *
-     * @param rawType The raw type.
-     * @param <RTYPE> The type.
-     * @return The newly created classification.
+     * @param rawType the raw type.
+     * @param <RTYPE> the type.
+     * @return the newly created classification.
      */
     public static <RTYPE> Classification<RTYPE> ofType(final Class<RTYPE> rawType) {
 
@@ -61,8 +61,8 @@ public abstract class Classification<TYPE> {
      * <p/>
      * Note that the cast is unsafe and may raise an exception.
      *
-     * @param object The object to cast.
-     * @return The casted object.
+     * @param object the object to cast.
+     * @return the casted object.
      */
     public final TYPE cast(final Object object) {
 
@@ -73,7 +73,7 @@ public abstract class Classification<TYPE> {
     /**
      * Gets the classification raw type.
      *
-     * @return The raw type.
+     * @return the raw type.
      */
     public final Class<TYPE> getRawType() {
 
@@ -104,7 +104,7 @@ public abstract class Classification<TYPE> {
     /**
      * Gets the classification type.
      *
-     * @return The generic type.
+     * @return the generic type.
      */
     public final Type getType() {
 
@@ -172,8 +172,8 @@ public abstract class Classification<TYPE> {
     /**
      * Checks if this classification is equal to or is a super class of the specified one.
      *
-     * @param other The classification to compare.
-     * @return Whether this classification is equal to or is a super class.
+     * @param other the classification to compare.
+     * @return whether this classification is equal to or is a super class.
      */
     public final boolean isAssignableFrom(final Classification<?> other) {
 
@@ -183,7 +183,7 @@ public abstract class Classification<TYPE> {
     /**
      * Checks if this classification represent an interface.
      *
-     * @return Whether this classification is an interface.
+     * @return whether this classification is an interface.
      */
     public final boolean isInterface() {
 

@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
  * <p/>
  * Created by davide on 7/4/14.
  *
- * @param <TYPE> The backed leap type.
+ * @param <TYPE> the backed leap type.
  */
 class DefaultRapidGate<TYPE> implements RapidGate<TYPE> {
 
@@ -41,7 +41,7 @@ class DefaultRapidGate<TYPE> implements RapidGate<TYPE> {
     /**
      * Constructor.
      *
-     * @param wrapped The wrapped gate.
+     * @param wrapped the wrapped gate.
      */
     public DefaultRapidGate(final Gate<?> wrapped) {
 
@@ -51,8 +51,8 @@ class DefaultRapidGate<TYPE> implements RapidGate<TYPE> {
     /**
      * Constructor.
      *
-     * @param wrapped   The wrapped gate.
-     * @param gateClass The gate class.
+     * @param wrapped   the wrapped gate.
+     * @param gateClass the gate class.
      */
     public DefaultRapidGate(final Gate<?> wrapped, final Class<TYPE> gateClass) {
 

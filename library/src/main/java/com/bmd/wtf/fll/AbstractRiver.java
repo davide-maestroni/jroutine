@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
  * <p/>
  * Created by davide on 7/3/14.
  *
- * @param <DATA> The data type.
+ * @param <DATA> the data type.
  */
 abstract class AbstractRiver<DATA> implements River<DATA> {
 

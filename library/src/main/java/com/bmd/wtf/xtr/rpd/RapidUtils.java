@@ -51,8 +51,8 @@ class RapidUtils {
      * <p/>
      * If the passed class does not represent a primitive type the same class is returned.
      *
-     * @param type The primitive type.
-     * @return The boxing class.
+     * @param type the primitive type.
+     * @return the boxing class.
      */
     public static Class<?> boxedClass(final Class<?> type) {
 

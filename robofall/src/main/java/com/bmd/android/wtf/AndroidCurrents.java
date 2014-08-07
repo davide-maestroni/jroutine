@@ -39,8 +39,8 @@ public class AndroidCurrents {
      * <p/>
      * Note that the thread might be started as a result of this call.
      *
-     * @param thread The handler thread instance.
-     * @return The newly created current.
+     * @param thread the handler thread instance.
+     * @return the newly created current.
      */
     public static Current currentOf(final HandlerThread thread) {
 
@@ -55,8 +55,8 @@ public class AndroidCurrents {
     /**
      * Creates a current running in the specified looper.
      *
-     * @param looper The looper instance.
-     * @return The newly created current.
+     * @param looper the looper instance.
+     * @return the newly created current.
      */
     public static Current currentOf(final Looper looper) {
 
@@ -66,7 +66,7 @@ public class AndroidCurrents {
     /**
      * Returns the default current implementation running in the main looper.
      *
-     * @return The default current instance.
+     * @return the default current instance.
      */
     public static Current mainLooperCurrent() {
 
@@ -81,7 +81,7 @@ public class AndroidCurrents {
     /**
      * Creates a current running in the current thread looper.
      *
-     * @return The newly created current.
+     * @return the newly created current.
      */
     public static Current thisLooperCurrent() {
 

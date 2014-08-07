@@ -13,7 +13,7 @@
  */
 package com.bmd.wtf.crr;
 
-import com.bmd.wtf.fll.DelayInterruptedException;
+import com.bmd.wtf.flw.DelayInterruptedException;
 import com.bmd.wtf.flw.Fall;
 import com.bmd.wtf.flw.Stream;
 

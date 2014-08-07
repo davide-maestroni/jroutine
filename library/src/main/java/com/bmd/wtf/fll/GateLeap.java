@@ -25,8 +25,8 @@ import java.util.concurrent.locks.ReentrantLock;
  * <p/>
  * Created by davide on 6/13/14.
  *
- * @param <IN>  The input data type.
- * @param <OUT> The output data type.
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
 class GateLeap<IN, OUT> extends LeapDecorator<IN, OUT> {
 
@@ -39,7 +39,7 @@ class GateLeap<IN, OUT> extends LeapDecorator<IN, OUT> {
     /**
      * Constructor.
      *
-     * @param wrapped The wrapped leap.
+     * @param wrapped the wrapped leap.
      */
     public GateLeap(final Leap<IN, OUT> wrapped) {
 

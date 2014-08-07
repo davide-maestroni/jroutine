@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
  * <p/>
  * Created by davide on 6/7/14.
  *
- * @param <DATA> The data type.
+ * @param <DATA> the data type.
  */
 class DataCollector<DATA> implements Collector<DATA> {
 
@@ -59,8 +59,8 @@ class DataCollector<DATA> implements Collector<DATA> {
     /**
      * Constructor.
      *
-     * @param gateLeap      The associated gate leap.
-     * @param collectorLeap The associated collector leap.
+     * @param gateLeap      the associated gate leap.
+     * @param collectorLeap the associated collector leap.
      */
     public DataCollector(final GateLeap<DATA, DATA> gateLeap,
             final CollectorLeap<DATA> collectorLeap) {
@@ -121,6 +121,12 @@ class DataCollector<DATA> implements Collector<DATA> {
     }
 
     @Override
+    public DATA next() {
+
+        return mDataGate.when(HAS_DATA).perform(mCollectorLeap.pullAction());
+    }
+
+    @Override
     public Collector<DATA> nextInto(final List<DATA> data) {
 
         data.add(next());
@@ -140,12 +146,6 @@ class DataCollector<DATA> implements Collector<DATA> {
     public boolean hasNext() {
 
         return !mSizeGate.perform(mCollectorLeap.isEmptyAction());
-    }
-
-    @Override
-    public DATA next() {
-
-        return mDataGate.when(HAS_DATA).perform(mCollectorLeap.pullAction());
     }
 
     @Override

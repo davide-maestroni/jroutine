@@ -24,7 +24,7 @@ import java.util.ListIterator;
  * <p/>
  * Created by davide on 6/12/14.
  *
- * @param <DATA> The list element type.
+ * @param <DATA> the list element type.
  */
 public class Drops<DATA> implements List<DATA> {
 
@@ -35,8 +35,8 @@ public class Drops<DATA> implements List<DATA> {
     /**
      * Avoid direct instantiation.
      *
-     * @param type    The list element type.
-     * @param wrapped The wrapped list.
+     * @param type    the list element type.
+     * @param wrapped the wrapped list.
      */
     private Drops(final Class<DATA> type, final List<Object> wrapped) {
 
@@ -47,8 +47,8 @@ public class Drops<DATA> implements List<DATA> {
     /**
      * Returns a drop list containing the specified native data.
      *
-     * @param data The data to fill the list with.
-     * @return The newly created drop list.
+     * @param data the data to fill the list with.
+     * @return the newly created drop list.
      */
     public static Drops<Boolean> asList(final boolean... data) {
 
@@ -58,8 +58,8 @@ public class Drops<DATA> implements List<DATA> {
     /**
      * Returns a drop list containing the specified native data.
      *
-     * @param data The data to fill the list with.
-     * @return The newly created drop list.
+     * @param data the data to fill the list with.
+     * @return the newly created drop list.
      */
     public static Drops<Byte> asList(final byte... data) {
 
@@ -69,8 +69,8 @@ public class Drops<DATA> implements List<DATA> {
     /**
      * Returns a drop list containing the specified native data.
      *
-     * @param data The data to fill the list with.
-     * @return The newly created drop list.
+     * @param data the data to fill the list with.
+     * @return the newly created drop list.
      */
     public static Drops<Character> asList(final char... data) {
 
@@ -80,8 +80,8 @@ public class Drops<DATA> implements List<DATA> {
     /**
      * Returns a drop list containing the specified native data.
      *
-     * @param data The data to fill the list with.
-     * @return The newly created drop list.
+     * @param data the data to fill the list with.
+     * @return the newly created drop list.
      */
     public static Drops<Double> asList(final double... data) {
 
@@ -91,8 +91,8 @@ public class Drops<DATA> implements List<DATA> {
     /**
      * Returns a drop list containing the specified native data.
      *
-     * @param data The data to fill the list with.
-     * @return The newly created drop list.
+     * @param data the data to fill the list with.
+     * @return the newly created drop list.
      */
     public static Drops<Float> asList(final float... data) {
 
@@ -102,8 +102,8 @@ public class Drops<DATA> implements List<DATA> {
     /**
      * Returns a drop list containing the specified native data.
      *
-     * @param data The data to fill the list with.
-     * @return The newly created drop list.
+     * @param data the data to fill the list with.
+     * @return the newly created drop list.
      */
     public static Drops<Integer> asList(final int... data) {
 
@@ -113,8 +113,8 @@ public class Drops<DATA> implements List<DATA> {
     /**
      * Returns a drop list containing the specified native data.
      *
-     * @param data The data to fill the list with.
-     * @return The newly created drop list.
+     * @param data the data to fill the list with.
+     * @return the newly created drop list.
      */
     public static Drops<Long> asList(final long... data) {
 
@@ -124,8 +124,8 @@ public class Drops<DATA> implements List<DATA> {
     /**
      * Returns a drop list containing the specified native data.
      *
-     * @param data The data to fill the list with.
-     * @return The newly created drop list.
+     * @param data the data to fill the list with.
+     * @return the newly created drop list.
      */
     public static Drops<Short> asList(final short... data) {
 
@@ -135,8 +135,8 @@ public class Drops<DATA> implements List<DATA> {
     /**
      * Returns a list containing the specified native data.
      *
-     * @param data The data to fill the list with.
-     * @return The newly created list.
+     * @param data the data to fill the list with.
+     * @return the newly created list.
      */
     public static List<Object> asObjects(final long... data) {
 
@@ -158,8 +158,8 @@ public class Drops<DATA> implements List<DATA> {
     /**
      * Returns a list containing the specified native data.
      *
-     * @param data The data to fill the list with.
-     * @return The newly created list.
+     * @param data the data to fill the list with.
+     * @return the newly created list.
      */
     public static List<Object> asObjects(final short... data) {
 
@@ -181,8 +181,8 @@ public class Drops<DATA> implements List<DATA> {
     /**
      * Returns a list containing the specified native data.
      *
-     * @param data The data to fill the list with.
-     * @return The newly created list.
+     * @param data the data to fill the list with.
+     * @return the newly created list.
      */
     public static List<Object> asObjects(final byte... data) {
 
@@ -204,8 +204,8 @@ public class Drops<DATA> implements List<DATA> {
     /**
      * Returns a list containing the specified native data.
      *
-     * @param data The data to fill the list with.
-     * @return The newly created list.
+     * @param data the data to fill the list with.
+     * @return the newly created list.
      */
     public static List<Object> asObjects(final char... data) {
 
@@ -227,8 +227,8 @@ public class Drops<DATA> implements List<DATA> {
     /**
      * Returns a list containing the specified native data.
      *
-     * @param data The data to fill the list with.
-     * @return The newly created list.
+     * @param data the data to fill the list with.
+     * @return the newly created list.
      */
     public static List<Object> asObjects(final double... data) {
 
@@ -250,8 +250,8 @@ public class Drops<DATA> implements List<DATA> {
     /**
      * Returns a list containing the specified native data.
      *
-     * @param data The data to fill the list with.
-     * @return The newly created list.
+     * @param data the data to fill the list with.
+     * @return the newly created list.
      */
     public static List<Object> asObjects(final float... data) {
 
@@ -273,8 +273,8 @@ public class Drops<DATA> implements List<DATA> {
     /**
      * Returns a list containing the specified native data.
      *
-     * @param data The data to fill the list with.
-     * @return The newly created list.
+     * @param data the data to fill the list with.
+     * @return the newly created list.
      */
     public static List<Object> asObjects(final int... data) {
 
@@ -296,8 +296,8 @@ public class Drops<DATA> implements List<DATA> {
     /**
      * Returns a list containing the specified native data.
      *
-     * @param data The data to fill the list with.
-     * @return The newly created list.
+     * @param data the data to fill the list with.
+     * @return the newly created list.
      */
     public static List<Object> asObjects(final boolean... data) {
 
@@ -475,7 +475,7 @@ public class Drops<DATA> implements List<DATA> {
     /**
      * Transforms this list in a list of booleans.
      *
-     * @return A newly created list of booleans.
+     * @return a newly created list of booleans.
      */
     public Drops<Boolean> toBooleans() {
 
@@ -517,7 +517,7 @@ public class Drops<DATA> implements List<DATA> {
     /**
      * Transforms this list in a list of bytes.
      *
-     * @return A newly created list of bytes.
+     * @return a newly created list of bytes.
      */
     public Drops<Byte> toBytes() {
 
@@ -570,7 +570,7 @@ public class Drops<DATA> implements List<DATA> {
     /**
      * Transforms this list in a list of chars.
      *
-     * @return A newly created list of chars.
+     * @return a newly created list of chars.
      */
     public Drops<Character> toCharacters() {
 
@@ -616,7 +616,7 @@ public class Drops<DATA> implements List<DATA> {
     /**
      * Transforms this list in a list of doubles.
      *
-     * @return A newly created list of doubles.
+     * @return a newly created list of doubles.
      */
     public Drops<Double> toDoubles() {
 
@@ -669,7 +669,7 @@ public class Drops<DATA> implements List<DATA> {
     /**
      * Transforms this list in a list of floats.
      *
-     * @return A newly created list of floats.
+     * @return a newly created list of floats.
      */
     public Drops<Float> toFloats() {
 
@@ -722,7 +722,7 @@ public class Drops<DATA> implements List<DATA> {
     /**
      * Transforms this list in a list of integers.
      *
-     * @return A newly created list of integers.
+     * @return a newly created list of integers.
      */
     public Drops<Integer> toIntegers() {
 
@@ -775,7 +775,7 @@ public class Drops<DATA> implements List<DATA> {
     /**
      * Transforms this list in a list of longs.
      *
-     * @return A newly created list of longs.
+     * @return a newly created list of longs.
      */
     public Drops<Long> toLongs() {
 
@@ -828,7 +828,7 @@ public class Drops<DATA> implements List<DATA> {
     /**
      * Transforms this list in a list of objects.
      *
-     * @return A newly created list of objects.
+     * @return a newly created list of objects.
      */
     public List<Object> toObjects() {
 
@@ -838,7 +838,7 @@ public class Drops<DATA> implements List<DATA> {
     /**
      * Transforms this list in a list of shorts.
      *
-     * @return A newly created list of shorts.
+     * @return a newly created list of shorts.
      */
     public Drops<Short> toShorts() {
 

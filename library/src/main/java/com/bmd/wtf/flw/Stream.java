@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
  * <p/>
  * Created by davide on 6/7/14.
  *
- * @param <DATA> The data type.
+ * @param <DATA> the data type.
  */
 public interface Stream<DATA> {
 
@@ -34,15 +34,15 @@ public interface Stream<DATA> {
      * Be aware that the call may be postponed until the fall flushes all the data drops,
      * including the delayed ones.
      *
-     * @return This stream.
+     * @return this stream.
      */
     public Stream<DATA> flush();
 
     /**
      * Pushes the specified data into the waterfall flow and then flushes it.
      *
-     * @param drops The data drops.
-     * @return This stream.
+     * @param drops the data drops.
+     * @return this stream.
      * @see #flush()
      */
     public Stream<DATA> flush(DATA... drops);
@@ -51,8 +51,8 @@ public interface Stream<DATA> {
      * Pushes the data returned by the specified iterable into the waterfall flow and then
      * flushes it.
      *
-     * @param drops The data drops iterable.
-     * @return This stream.
+     * @param drops the data drops iterable.
+     * @return this stream.
      * @see #flush()
      */
     public Stream<DATA> flush(Iterable<? extends DATA> drops);
@@ -60,8 +60,8 @@ public interface Stream<DATA> {
     /**
      * Pushes the specified data into the waterfall flow and then flushes it.
      *
-     * @param drop The data drop.
-     * @return This stream.
+     * @param drop the data drop.
+     * @return this stream.
      * @see #flush()
      */
     public Stream<DATA> flush(DATA drop);
@@ -70,10 +70,10 @@ public interface Stream<DATA> {
      * Pushes the data returned by the specified iterable into the waterfall flow, after the
      * specified time has elapsed, and then flushes it.
      *
-     * @param delay    The delay in <code>timeUnit</code> time units.
-     * @param timeUnit The delay time unit.
-     * @param drops    The data drops iterable.
-     * @return This stream.
+     * @param delay    the delay in <code>timeUnit</code> time units.
+     * @param timeUnit the delay time unit.
+     * @param drops    the data drops iterable.
+     * @return this stream.
      * @see #flush()
      */
     public Stream<DATA> flushAfter(long delay, TimeUnit timeUnit, Iterable<? extends DATA> drops);
@@ -82,10 +82,10 @@ public interface Stream<DATA> {
      * Pushes the specified data into the waterfall flow, after the specified time has elapsed, and
      * then flushes it.
      *
-     * @param delay    The delay in <code>timeUnit</code> time units.
-     * @param timeUnit The delay time unit.
-     * @param drop     The data drop.
-     * @return This stream.
+     * @param delay    the delay in <code>timeUnit</code> time units.
+     * @param timeUnit the delay time unit.
+     * @param drop     the data drop.
+     * @return this stream.
      * @see #flush()
      */
     public Stream<DATA> flushAfter(long delay, TimeUnit timeUnit, DATA drop);
@@ -94,10 +94,10 @@ public interface Stream<DATA> {
      * Pushes the specified data into the waterfall flow, after the specified time has elapsed, and
      * then flushes it.
      *
-     * @param delay    The delay in <code>timeUnit</code> time units.
-     * @param timeUnit The delay time unit.
-     * @param drops    The data drops.
-     * @return This stream.
+     * @param delay    the delay in <code>timeUnit</code> time units.
+     * @param timeUnit the delay time unit.
+     * @param drops    the data drops.
+     * @return this stream.
      * @see #flush()
      */
     public Stream<DATA> flushAfter(long delay, TimeUnit timeUnit, DATA... drops);
@@ -105,32 +105,32 @@ public interface Stream<DATA> {
     /**
      * Forwards the specified unhandled exception into the waterfall flow.
      *
-     * @param throwable The thrown exception.
-     * @return This stream.
+     * @param throwable the thrown exception.
+     * @return this stream.
      */
     public Stream<DATA> forward(Throwable throwable);
 
     /**
      * Pushes the specified data into the waterfall flow.
      *
-     * @param drops The data drops.
-     * @return This stream.
+     * @param drops the data drops.
+     * @return this stream.
      */
     public Stream<DATA> push(DATA... drops);
 
     /**
      * Pushes the data returned by the specified iterable into the waterfall flow.
      *
-     * @param drops The data drops iterable.
-     * @return This stream.
+     * @param drops the data drops iterable.
+     * @return this stream.
      */
     public Stream<DATA> push(Iterable<? extends DATA> drops);
 
     /**
      * Pushes the specified data into the waterfall flow.
      *
-     * @param drop The data drop.
-     * @return This stream.
+     * @param drop the data drop.
+     * @return this stream.
      */
     public Stream<DATA> push(DATA drop);
 
@@ -138,30 +138,30 @@ public interface Stream<DATA> {
      * Pushes the data returned by the specified iterable into the waterfall flow, after the
      * specified time has elapsed.
      *
-     * @param delay    The delay in <code>timeUnit</code> time units.
-     * @param timeUnit The delay time unit.
-     * @param drops    The data drops iterable.
-     * @return This stream.
+     * @param delay    the delay in <code>timeUnit</code> time units.
+     * @param timeUnit the delay time unit.
+     * @param drops    the data drops iterable.
+     * @return this stream.
      */
     public Stream<DATA> pushAfter(long delay, TimeUnit timeUnit, Iterable<? extends DATA> drops);
 
     /**
      * Pushes the specified data into the waterfall flow, after the specified time has elapsed.
      *
-     * @param delay    The delay in <code>timeUnit</code> time units.
-     * @param timeUnit The delay time unit.
-     * @param drop     The data drop.
-     * @return This stream.
+     * @param delay    the delay in <code>timeUnit</code> time units.
+     * @param timeUnit the delay time unit.
+     * @param drop     the data drop.
+     * @return this stream.
      */
     public Stream<DATA> pushAfter(long delay, TimeUnit timeUnit, DATA drop);
 
     /**
      * Pushes the specified data into the waterfall flow, after the specified time has elapsed.
      *
-     * @param delay    The delay in <code>timeUnit</code> time units.
-     * @param timeUnit The delay time unit.
-     * @param drops    The data drops.
-     * @return This stream.
+     * @param delay    the delay in <code>timeUnit</code> time units.
+     * @param timeUnit the delay time unit.
+     * @param drops    the data drops.
+     * @return this stream.
      */
     public Stream<DATA> pushAfter(long delay, TimeUnit timeUnit, DATA... drops);
 

@@ -13,6 +13,7 @@
  */
 package com.bmd.wtf.fll;
 
+import com.bmd.wtf.flw.FloatingException;
 import com.bmd.wtf.flw.Gate.Action;
 import com.bmd.wtf.flw.River;
 import com.bmd.wtf.lps.FreeLeap;

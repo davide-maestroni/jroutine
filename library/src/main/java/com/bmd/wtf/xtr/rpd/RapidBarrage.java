@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * This class provides a different way to distribute data inside a barrage.
+ * This class provides an alternative way to distribute data inside a barrage.
  * <p/>
  * The two main ways to use it is to inherit the class or to wrap an object inside a rapid barrage.
  * <br/>
@@ -35,11 +35,21 @@ import java.util.Map.Entry;
  * drop type is called. In order to properly handle null objects, the inheriting class can implement
  * a method taking a parameter of type <code>Void</code>.
  * <p/>
+ * <b>Warning:</b> when employing annotation remember to add the proper rules to your Proguard
+ * file:
+ * <pre>
+ *     <code>
+ *         -keepattributes RuntimeVisibleAnnotations
+ *
+ *         -keepclassmembers class ** {
+ *              &#64;com.bmd.wtf.xtr.rpd.RapidAnnotations$DataFlow *;
+ *         }
+ *     </code>
+ * </pre>
+ * <p/>
  * Created by davide on 6/23/14.
  */
 public abstract class RapidBarrage implements Barrage<Object> {
-
-    //TODO: proguard rule
 
     private final HashMap<Class<?>, Method> mMethodMap = new HashMap<Class<?>, Method>();
 
@@ -50,7 +60,7 @@ public abstract class RapidBarrage implements Barrage<Object> {
     /**
      * Constructor.
      *
-     * @param validFlows Whether only the annotated methods must be called when data flow through
+     * @param validFlows whether only the annotated methods must be called when data flow through
      *                   this barrage.
      */
     public RapidBarrage(final ValidFlows validFlows) {
@@ -76,8 +86,8 @@ public abstract class RapidBarrage implements Barrage<Object> {
     /**
      * Constructor.
      *
-     * @param wrapped    The wrapped object.
-     * @param validFlows Whether only the annotated methods must be called when data flow through
+     * @param wrapped    the wrapped object.
+     * @param validFlows whether only the annotated methods must be called when data flow through
      *                   this barrage.
      */
     private RapidBarrage(final Object wrapped, final ValidFlows validFlows) {
@@ -91,8 +101,8 @@ public abstract class RapidBarrage implements Barrage<Object> {
     /**
      * Creates and returns a rapid barrage wrapping the specified object.
      *
-     * @param wrapped The wrapped object.
-     * @return The new rapid barrage.
+     * @param wrapped the wrapped object.
+     * @return the new rapid barrage.
      */
     public static RapidBarrage from(final Object wrapped) {
 
@@ -104,8 +114,8 @@ public abstract class RapidBarrage implements Barrage<Object> {
      * <p/>
      * Note that only the annotated method will be considered when handling flowing data.
      *
-     * @param wrapped The wrapped object.
-     * @return The new rapid barrage.
+     * @param wrapped the wrapped object.
+     * @return the new rapid barrage.
      */
     public static RapidBarrage fromAnnotated(final Object wrapped) {
 

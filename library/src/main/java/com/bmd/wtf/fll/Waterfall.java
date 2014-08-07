@@ -41,9 +41,9 @@ import java.util.concurrent.TimeUnit;
  * <p/>
  * Created by davide on 6/4/14.
  *
- * @param <SOURCE> The waterfall source data type.
- * @param <IN>     The input data type.
- * @param <OUT>    The output data type.
+ * @param <SOURCE> the waterfall source data type.
+ * @param <IN>     the input data type.
+ * @param <OUT>    the output data type.
  */
 public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
@@ -189,7 +189,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
     /**
      * Creates and returns a new waterfall composed by a single synchronous stream.
      *
-     * @return The newly created waterfall.
+     * @return the newly created waterfall.
      */
     public static Waterfall<Object, Object, Object> fall() {
 
@@ -203,8 +203,8 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
     /**
      * Lazily creates and return a singleton free leap instance.
      *
-     * @param <DATA> The data type.
-     * @return The free leap instance.
+     * @param <DATA> the data type.
+     * @return the free leap instance.
      */
     private static <DATA> FreeLeap<DATA> freeLeap() {
 
@@ -220,10 +220,10 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
     /**
      * Links an input and an output fall through a data stream.
      *
-     * @param inFall  The input fall.
-     * @param outFall The output fall.
-     * @param <DATA>  The data type.
-     * @return The data stream running between the two falls.
+     * @param inFall  the input fall.
+     * @param outFall the output fall.
+     * @param <DATA>  the data type.
+     * @return the data stream running between the two falls.
      */
     private static <DATA> DataStream<DATA> link(final DataFall<?, DATA> inFall,
             final DataFall<DATA, ?> outFall) {
@@ -240,7 +240,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * Registers the specified leap instance by making sure it is unique among all the created
      * waterfalls.
      *
-     * @param leap The leap to register.
+     * @param leap the leap to register.
      */
     private static void registerLeap(final Leap<?, ?> leap) {
 
@@ -255,8 +255,8 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
     /**
      * Tells the waterfall to build a gate of the specified type around the next leap chained to it.
      *
-     * @param gateClass The gate class.
-     * @return The newly created waterfall.
+     * @param gateClass the gate class.
+     * @return the newly created waterfall.
      */
     public Waterfall<SOURCE, IN, OUT> as(final Class<?> gateClass) {
 
@@ -267,8 +267,8 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * Tells the waterfall to build a gate of the specified classification type around the next
      * leap chained to it.
      *
-     * @param gateClassification The gate classification.
-     * @return The newly created waterfall.
+     * @param gateClassification the gate classification.
+     * @return the newly created waterfall.
      */
     public Waterfall<SOURCE, IN, OUT> as(final Classification<?> gateClassification) {
 
@@ -288,7 +288,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * <p/>
      * The gate type will be the same as the leap raw type.
      *
-     * @return The newly created waterfall.
+     * @return the newly created waterfall.
      */
     public Waterfall<SOURCE, IN, OUT> asGate() {
 
@@ -299,7 +299,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * Chains the specified waterfall to this one. After the call, all the data flowing through
      * this waterfall will be pushed into the target one.
      *
-     * @param waterfall The waterfall to chain.
+     * @param waterfall the waterfall to chain.
      */
     public void chain(final Waterfall<?, OUT, ?> waterfall) {
 
@@ -385,9 +385,9 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * Note that contrary to common leap, the ones protected by a gate can be added several times
      * to the same waterfall.
      *
-     * @param gateClassification The gate classification.
-     * @param <NOUT>             The new output data type.
-     * @return The newly created waterfall.
+     * @param gateClassification the gate classification.
+     * @param <NOUT>             the new output data type.
+     * @return the newly created waterfall.
      */
     public <NOUT> Waterfall<SOURCE, OUT, NOUT> chain(
             final Classification<? extends Leap<OUT, NOUT>> gateClassification) {
@@ -473,7 +473,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
     /**
      * Chains a free leap to this waterfall.
      *
-     * @return The newly created waterfall.
+     * @return the newly created waterfall.
      */
     public Waterfall<SOURCE, OUT, OUT> chain() {
 
@@ -559,9 +559,9 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * Note that in case this waterfall is composed by more then one data stream, all the data
      * flowing through them will be passed to the specified leap.
      *
-     * @param leap   The leap instance.
-     * @param <NOUT> The new output data type.
-     * @return The newly created waterfall.
+     * @param leap   the leap instance.
+     * @param <NOUT> the new output data type.
+     * @return the newly created waterfall.
      */
     public <NOUT> Waterfall<SOURCE, OUT, NOUT> chain(final Leap<OUT, NOUT> leap) {
 
@@ -651,9 +651,9 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * Note that in case this waterfall is composed by more then one data stream, each leap created
      * by the generator will handle a single stream.
      *
-     * @param generator The leap generator.
-     * @param <NOUT>    The new output data type.
-     * @return The newly created waterfall.
+     * @param generator the leap generator.
+     * @param <NOUT>    the new output data type.
+     * @return the newly created waterfall.
      */
     public <NOUT> Waterfall<SOURCE, OUT, NOUT> chain(final LeapGenerator<OUT, NOUT> generator) {
 
@@ -756,7 +756,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
     /**
      * Creates and returns a new data collector.
      *
-     * @return The collector.
+     * @return the collector.
      */
     public Collector<OUT> collect() {
 
@@ -1185,7 +1185,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * Deviates the flow of this waterfall, either downstream or upstream, by effectively
      * preventing any coming data to be pushed further.
      *
-     * @param direction Whether the waterfall must be deviated downstream or upstream.
+     * @param direction whether the waterfall must be deviated downstream or upstream.
      * @see #deviateStream(int, com.bmd.wtf.flw.Stream.Direction)
      */
     public void deviate(final Direction direction) {
@@ -1210,8 +1210,8 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * Deviates the flow of the specified waterfall stream, either downstream or upstream, by
      * effectively preventing any coming data to be pushed further.
      *
-     * @param streamNumber The number identifying the target stream.
-     * @param direction    Whether the waterfall must be deviated downstream or upstream.
+     * @param streamNumber the number identifying the target stream.
+     * @param direction    whether the waterfall must be deviated downstream or upstream.
      * @see #deviate(com.bmd.wtf.flw.Stream.Direction)
      */
     public void deviateStream(final int streamNumber, final Direction direction) {
@@ -1235,7 +1235,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * Uniformly distributes all the data flowing through this waterfall in the different output
      * streams.
      *
-     * @return The newly created waterfall.
+     * @return the newly created waterfall.
      */
     public Waterfall<SOURCE, OUT, OUT> distribute() {
 
@@ -1261,7 +1261,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * Distributes all the data flowing through this waterfall in the different output streams by
      * means of the specified barrage.
      *
-     * @return The newly created waterfall.
+     * @return the newly created waterfall.
      */
     public Waterfall<SOURCE, OUT, OUT> distribute(final Barrage<OUT> barrage) {
 
@@ -1292,7 +1292,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * Drains the waterfall, either downstream or upstream, by removing all the falls and rivers
      * fed only by this waterfall streams.
      *
-     * @param direction Whether the waterfall must be deviated downstream or upstream.
+     * @param direction whether the waterfall must be deviated downstream or upstream.
      * @see #drainStream(int, com.bmd.wtf.flw.Stream.Direction)
      */
     public void drain(final Direction direction) {
@@ -1317,8 +1317,8 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * Drains the specified waterfall stream, either downstream or upstream, by removing from all
      * the falls and rivers fed only by the specific stream.
      *
-     * @param streamNumber The number identifying the target stream.
-     * @param direction    Whether the waterfall must be deviated downstream or upstream.
+     * @param streamNumber the number identifying the target stream.
+     * @param direction    whether the waterfall must be deviated downstream or upstream.
      * @see #drain(com.bmd.wtf.flw.Stream.Direction)
      */
     public void drainStream(final int streamNumber, final Direction direction) {
@@ -1341,8 +1341,8 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
     /**
      * Makes the waterfall streams flow through the currents returned by the specified generator.
      *
-     * @param generator The current generator
-     * @return The newly created waterfall.
+     * @param generator the current generator
+     * @return the newly created waterfall.
      */
     public Waterfall<SOURCE, IN, OUT> in(final CurrentGenerator generator) {
 
@@ -1360,8 +1360,8 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
     /**
      * Splits the waterfall in the specified number of streams.
      *
-     * @param fallCount The total fall count generating the waterfall.
-     * @return The newly created waterfall.
+     * @param fallCount the total fall count generating the waterfall.
+     * @return the newly created waterfall.
      */
     public Waterfall<SOURCE, IN, OUT> in(final int fallCount) {
 
@@ -1379,8 +1379,8 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
     /**
      * Makes the waterfall streams flow through the specified current.
      *
-     * @param current The current.
-     * @return The newly created waterfall.
+     * @param current the current.
+     * @return the newly created waterfall.
      */
     public Waterfall<SOURCE, IN, OUT> in(final Current current) {
 
@@ -1403,8 +1403,8 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * <p/>
      * Note also that the same background current will be retained through the waterfall.
      *
-     * @param fallCount The total fall count generating the waterfall.
-     * @return The newly created waterfall.
+     * @param fallCount the total fall count generating the waterfall.
+     * @return the newly created waterfall.
      */
     public Waterfall<SOURCE, IN, OUT> inBackground(final int fallCount) {
 
@@ -1441,7 +1441,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * <p/>
      * Note also that the same background current will be retained through the waterfall.
      *
-     * @return The newly created waterfall.
+     * @return the newly created waterfall.
      */
     public Waterfall<SOURCE, IN, OUT> inBackground() {
 
@@ -1468,9 +1468,9 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * Tells the waterfall to lock the gate of the specified classification type, that is, the gate
      * will not be accessible anymore to the ones requiring it.
      *
-     * @param gateClassification The gate classification.
-     * @param <TYPE>             The leap type.
-     * @return The newly created waterfall.
+     * @param gateClassification the gate classification.
+     * @param <TYPE>             the leap type.
+     * @return the newly created waterfall.
      */
     public <TYPE> Waterfall<SOURCE, IN, OUT> lock(final Classification<TYPE> gateClassification) {
 
@@ -1504,9 +1504,9 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * Tells the waterfall to lock the gate handling the specified leap, that is, the gate
      * will not be accessible anymore to the ones requiring it..
      *
-     * @param leap   The leap instance.
-     * @param <TYPE> The leap type.
-     * @return The newly created waterfall.
+     * @param leap   the leap instance.
+     * @param <TYPE> the leap type.
+     * @return the newly created waterfall.
      */
     public <TYPE extends Leap<?, ?>> Waterfall<SOURCE, IN, OUT> lock(final TYPE leap) {
 
@@ -1546,7 +1546,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
     /**
      * Creates and returns a new data collector after discharging this waterfall source.
      *
-     * @return The collector.
+     * @return the collector.
      */
     public Collector<OUT> pull() {
 
@@ -1561,8 +1561,8 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * Creates and returns a new data collector after pushing the specified data into this
      * waterfall source and then discharging it.
      *
-     * @param source The source data.
-     * @return The collector.
+     * @param source the source data.
+     * @return the collector.
      */
     public Collector<OUT> pull(final SOURCE source) {
 
@@ -1577,8 +1577,8 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * Creates and returns a new data collector after pushing the specified data into this
      * waterfall source and then discharging it.
      *
-     * @param sources The source data.
-     * @return The collector.
+     * @param sources the source data.
+     * @return the collector.
      */
     public Collector<OUT> pull(final SOURCE... sources) {
 
@@ -1593,8 +1593,8 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * Creates and returns a new data collector after pushing the data returned by the specified
      * iterable into this waterfall source and then discharging it.
      *
-     * @param sources The source data iterable.
-     * @return The collector.
+     * @param sources the source data iterable.
+     * @return the collector.
      */
     public Collector<OUT> pull(final Iterable<SOURCE> sources) {
 
@@ -1608,7 +1608,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
     /**
      * Gets the waterfall source.
      *
-     * @return The source.
+     * @return the source.
      */
     public Waterfall<SOURCE, SOURCE, ?> source() {
 
@@ -1620,7 +1620,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * <p/>
      * Note that the gates, the size and the currents of this waterfall will be retained.
      *
-     * @return The newly created waterfall.
+     * @return the newly created waterfall.
      */
     public Waterfall<OUT, OUT, OUT> start() {
 
@@ -1644,9 +1644,9 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * <p/>
      * Note that the gates, the size and the currents of this waterfall will be retained.
      *
-     * @param dataType The data type.
-     * @param <DATA>   The data type.
-     * @return The newly created waterfall.
+     * @param dataType the data type.
+     * @param <DATA>   the data type.
+     * @return the newly created waterfall.
      */
     public <DATA> Waterfall<DATA, DATA, DATA> start(final Class<DATA> dataType) {
 
@@ -1658,9 +1658,9 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * <p/>
      * Note that the gates, the size and the currents of this waterfall will be retained.
      *
-     * @param classification The data classification.
-     * @param <DATA>         The data type.
-     * @return The newly created waterfall.
+     * @param classification the data classification.
+     * @param <DATA>         the data type.
+     * @return the newly created waterfall.
      */
     public <DATA> Waterfall<DATA, DATA, DATA> start(final Classification<DATA> classification) {
 
@@ -1679,10 +1679,10 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * <p/>
      * Note that the gates, the size and the currents of this waterfall will be retained.
      *
-     * @param generator The leap generator.
-     * @param <NIN>     The new input data type.
-     * @param <NOUT>    The new output data type.
-     * @return The newly created waterfall.
+     * @param generator the leap generator.
+     * @param <NIN>     the new input data type.
+     * @param <NOUT>    the new output data type.
+     * @return the newly created waterfall.
      */
     public <NIN, NOUT> Waterfall<NIN, NIN, NOUT> start(final LeapGenerator<NIN, NOUT> generator) {
 
@@ -1734,10 +1734,10 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * <p/>
      * Note that the gates, the size and the currents of this waterfall will be retained.
      *
-     * @param leap   The leap instance.
-     * @param <NIN>  The new input data type.
-     * @param <NOUT> The new output data type.
-     * @return The newly created waterfall.
+     * @param leap   the leap instance.
+     * @param <NIN>  the new input data type.
+     * @param <NOUT> the new output data type.
+     * @return the newly created waterfall.
      */
     public <NIN, NOUT> Waterfall<NIN, NIN, NOUT> start(final Leap<NIN, NOUT> leap) {
 

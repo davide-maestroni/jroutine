@@ -25,8 +25,8 @@ public interface CurrentGenerator {
      * <p/>
      * Note that the same instance can be returned for different falls.
      *
-     * @param fallNumber The number identifying the fall.
-     * @return The current.
+     * @param fallNumber the number identifying the fall.
+     * @return the current.
      */
     public Current create(int fallNumber);
 }

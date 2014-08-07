@@ -27,7 +27,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * <p/>
  * Created by davide on 6/7/14.
  *
- * @param <DATA> The data type.
+ * @param <DATA> the data type.
  */
 class LockRiver<DATA> implements River<DATA> {
 
@@ -40,7 +40,7 @@ class LockRiver<DATA> implements River<DATA> {
     /**
      * Constructor.
      *
-     * @param wrapped The wrapped river.
+     * @param wrapped the wrapped river.
      */
     public LockRiver(final River<DATA> wrapped) {
 
@@ -724,7 +724,7 @@ class LockRiver<DATA> implements River<DATA> {
     /**
      * Opens the river lock.
      *
-     * @param lock The lock instance.
+     * @param lock the lock instance.
      */
     void open(final DataLock lock) {
 

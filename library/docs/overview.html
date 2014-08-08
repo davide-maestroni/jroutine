@@ -35,7 +35,7 @@ The code below shows how it is possible to implement the computation of the root
                                             // Equally distribute the load among them
                                             .distribute()
                                             // Compute the square of each sample
-                                            .chain(Rapid.leapGenerator(new RapidLeap() {
+                                            .chain(Rapid.gateGenerator(new RapidGate() {
 
                                                 public Double onSample(final Float sample) {
 
@@ -47,7 +47,7 @@ The code below shows how it is possible to implement the computation of the root
                                             // Merge the results in a single thread
                                             .inBackground(1)
                                             // Accumulate the sum and then calculate the square root mean
-                                            .chain(new RapidLeap() {
+                                            .chain(new RapidGate() {
 
                                                 private int mCount;
 

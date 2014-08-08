@@ -14,21 +14,21 @@
 package com.bmd.wtf.xtr.rpd;
 
 import com.bmd.wtf.fll.Classification;
-import com.bmd.wtf.flw.Gate;
+import com.bmd.wtf.flw.Dam;
 
 import java.lang.reflect.Proxy;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Default rapid gate implementation.
+ * Default rapid dam implementation.
  * <p/>
  * Created by davide on 7/4/14.
  *
- * @param <TYPE> the backed leap type.
+ * @param <TYPE> the backed gate type.
  */
-class DefaultRapidGate<TYPE> implements RapidGate<TYPE> {
+class DefaultRapidDam<TYPE> implements RapidDam<TYPE> {
 
-    private final Gate<TYPE> mGate;
+    private final Dam<TYPE> mDam;
 
     private final Class<TYPE> mType;
 
@@ -41,9 +41,9 @@ class DefaultRapidGate<TYPE> implements RapidGate<TYPE> {
     /**
      * Constructor.
      *
-     * @param wrapped the wrapped gate.
+     * @param wrapped the wrapped dam.
      */
-    public DefaultRapidGate(final Gate<?> wrapped) {
+    public DefaultRapidDam(final Dam<?> wrapped) {
 
         this(wrapped, null);
     }
@@ -51,23 +51,23 @@ class DefaultRapidGate<TYPE> implements RapidGate<TYPE> {
     /**
      * Constructor.
      *
-     * @param wrapped   the wrapped gate.
-     * @param gateClass the gate class.
+     * @param wrapped  the wrapped dam.
+     * @param damClass the dam class.
      */
-    public DefaultRapidGate(final Gate<?> wrapped, final Class<TYPE> gateClass) {
+    public DefaultRapidDam(final Dam<?> wrapped, final Class<TYPE> damClass) {
 
         if (wrapped == null) {
 
-            throw new IllegalArgumentException("the wrapped gate cannot be null");
+            throw new IllegalArgumentException("the wrapped dam cannot be null");
         }
 
         //noinspection unchecked
-        mGate = (Gate<TYPE>) wrapped;
-        mType = gateClass;
+        mDam = (Dam<TYPE>) wrapped;
+        mType = damClass;
     }
 
     @Override
-    public RapidGate<TYPE> afterMax(final long maxDelay, final TimeUnit timeUnit) {
+    public RapidDam<TYPE> afterMax(final long maxDelay, final TimeUnit timeUnit) {
 
         mTimeoutMs = timeUnit.toMillis(maxDelay);
 
@@ -75,7 +75,7 @@ class DefaultRapidGate<TYPE> implements RapidGate<TYPE> {
     }
 
     @Override
-    public RapidGate<TYPE> eventually() {
+    public RapidDam<TYPE> eventually() {
 
         mTimeoutMs = -1;
 
@@ -83,7 +83,7 @@ class DefaultRapidGate<TYPE> implements RapidGate<TYPE> {
     }
 
     @Override
-    public RapidGate<TYPE> eventuallyThrow(final RuntimeException exception) {
+    public RapidDam<TYPE> eventuallyThrow(final RuntimeException exception) {
 
         mTimeoutException = exception;
 
@@ -91,7 +91,7 @@ class DefaultRapidGate<TYPE> implements RapidGate<TYPE> {
     }
 
     @Override
-    public RapidGate<TYPE> immediately() {
+    public RapidDam<TYPE> immediately() {
 
         mTimeoutMs = 0;
 
@@ -99,7 +99,7 @@ class DefaultRapidGate<TYPE> implements RapidGate<TYPE> {
     }
 
     @Override
-    public RapidGate<TYPE> when(final ConditionEvaluator<? super TYPE> evaluator) {
+    public RapidDam<TYPE> when(final ConditionEvaluator<? super TYPE> evaluator) {
 
         mEvaluator = evaluator;
 
@@ -113,79 +113,79 @@ class DefaultRapidGate<TYPE> implements RapidGate<TYPE> {
 
         if (type == null) {
 
-            throw new IllegalStateException("the gate type is not specified");
+            throw new IllegalStateException("the dam type is not specified");
         }
 
         return performAs(type);
     }
 
     @Override
-    public <NTYPE> NTYPE performAs(final Class<NTYPE> gateClass) {
+    public <NTYPE> NTYPE performAs(final Class<NTYPE> damClass) {
 
-        if (!gateClass.isInterface()) {
+        if (!damClass.isInterface()) {
 
-            throw new IllegalArgumentException("the gate type does not represent an interface");
+            throw new IllegalArgumentException("the dam type does not represent an interface");
         }
 
         final Class<TYPE> type = mType;
 
-        if ((type != null) && !gateClass.isAssignableFrom(type)) {
+        if ((type != null) && !damClass.isAssignableFrom(type)) {
 
             throw new IllegalArgumentException(
-                    "the gate is not of the specified type: " + gateClass.getCanonicalName());
+                    "the dam is not of the specified type: " + damClass.getCanonicalName());
         }
 
-        final Gate<NTYPE> gate = buildGate(gateClass);
+        final Dam<NTYPE> dam = buildDam(damClass);
 
         //noinspection unchecked
-        return (NTYPE) Proxy.newProxyInstance(gateClass.getClassLoader(), new Class[]{gateClass},
-                                              new GateInvocationHandler(gate));
+        return (NTYPE) Proxy.newProxyInstance(damClass.getClassLoader(), new Class[]{damClass},
+                                              new DamInvocationHandler(dam));
     }
 
     @Override
-    public <NTYPE> NTYPE performAs(final Classification<NTYPE> gateClassification) {
+    public <NTYPE> NTYPE performAs(final Classification<NTYPE> damClassification) {
 
-        return performAs(gateClassification.getRawType());
+        return performAs(damClassification.getRawType());
     }
 
     @Override
-    public RapidGate<TYPE> whenSatisfies(final Object... args) {
+    public RapidDam<TYPE> whenSatisfies(final Object... args) {
 
-        return when(new GateConditionEvaluator<TYPE>(args));
+        return when(new DamConditionEvaluator<TYPE>(args));
     }
 
     @Override
     public <RESULT> RESULT perform(final Action<RESULT, ? super TYPE> action,
             final Object... args) {
 
-        return buildGate(mType).perform(action, args);
+        return buildDam(mType).perform(action, args);
     }
 
-    private <NTYPE> Gate<NTYPE> buildGate(
-            @SuppressWarnings("UnusedParameters") final Class<NTYPE> gateClass) {
+    private <NTYPE> Dam<NTYPE> buildDam(
+            @SuppressWarnings("UnusedParameters") final Class<NTYPE> damClass) {
 
         final long timeoutMs = mTimeoutMs;
         final RuntimeException timeoutException = mTimeoutException;
         final ConditionEvaluator<? super TYPE> conditionEvaluator = mEvaluator;
 
         //noinspection unchecked
-        final Gate<NTYPE> gate = (Gate<NTYPE>) mGate;
+        final Dam<NTYPE> dam = (Dam<NTYPE>) mDam;
 
         if (timeoutMs < 0) {
 
-            gate.eventually();
+            dam.eventually();
 
         } else if (timeoutMs == 0) {
 
-            gate.immediately();
+            dam.immediately();
 
         } else {
 
-            gate.afterMax(timeoutMs, TimeUnit.MILLISECONDS);
+            dam.afterMax(timeoutMs, TimeUnit.MILLISECONDS);
         }
 
         //noinspection unchecked
-        return gate.eventuallyThrow(timeoutException)
-                   .when((ConditionEvaluator<? super NTYPE>) conditionEvaluator);
+        return dam.eventuallyThrow(timeoutException)
+                  .when((ConditionEvaluator<? super NTYPE>) conditionEvaluator);
     }
 }

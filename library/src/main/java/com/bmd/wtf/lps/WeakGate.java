@@ -18,25 +18,25 @@ import com.bmd.wtf.flw.River;
 import java.lang.ref.WeakReference;
 
 /**
- * Implementation of a leap decorator which retains a weak reference of the wrapped instance.
+ * Implementation of a gate decorator which retains a weak reference of the wrapped instance.
  * <p/>
  * Created by davide on 6/8/14.
  *
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class WeakLeap<IN, OUT> implements Leap<IN, OUT> {
+class WeakGate<IN, OUT> implements Gate<IN, OUT> {
 
-    private final WeakReference<Leap<IN, OUT>> mLeap;
+    private final WeakReference<Gate<IN, OUT>> mGate;
 
     private final WhenVanished mWhenVanished;
 
     /**
      * Default constructor.
      *
-     * @param wrapped the wrapped leap.
+     * @param wrapped the wrapped gate.
      */
-    public WeakLeap(final Leap<IN, OUT> wrapped) {
+    public WeakGate(final Gate<IN, OUT> wrapped) {
 
         this(wrapped, WhenVanished.OPEN);
     }
@@ -44,18 +44,18 @@ class WeakLeap<IN, OUT> implements Leap<IN, OUT> {
     /**
      * Parametrized constructor.
      *
-     * @param wrapped      the wrapped leap.
-     * @param whenVanished whether this instance must behave like a free leap or not after the
+     * @param wrapped      the wrapped gate.
+     * @param whenVanished whether this instance must behave like a free gate or not after the
      *                     wrapped instance is garbage collected.
      */
-    public WeakLeap(final Leap<IN, OUT> wrapped, final WhenVanished whenVanished) {
+    public WeakGate(final Gate<IN, OUT> wrapped, final WhenVanished whenVanished) {
 
         if (wrapped == null) {
 
-            throw new IllegalArgumentException("wrapped leap cannot be null");
+            throw new IllegalArgumentException("wrapped gate cannot be null");
         }
 
-        mLeap = new WeakReference<Leap<IN, OUT>>(wrapped);
+        mGate = new WeakReference<Gate<IN, OUT>>(wrapped);
         mWhenVanished = whenVanished;
     }
 
@@ -64,11 +64,11 @@ class WeakLeap<IN, OUT> implements Leap<IN, OUT> {
 
         int result = mWhenVanished.hashCode();
 
-        final Leap<IN, OUT> leap = mLeap.get();
+        final Gate<IN, OUT> gate = mGate.get();
 
-        if (leap != null) {
+        if (gate != null) {
 
-            result = 31 * result + leap.hashCode();
+            result = 31 * result + gate.hashCode();
         }
 
         return result;
@@ -82,32 +82,32 @@ class WeakLeap<IN, OUT> implements Leap<IN, OUT> {
             return true;
         }
 
-        if (!(obj instanceof WeakLeap)) {
+        if (!(obj instanceof WeakGate)) {
 
             return false;
         }
 
-        final WeakLeap weakLeap = (WeakLeap) obj;
+        final WeakGate weakGate = (WeakGate) obj;
 
         //noinspection SimplifiableIfStatement
-        if (mWhenVanished != weakLeap.mWhenVanished) {
+        if (mWhenVanished != weakGate.mWhenVanished) {
 
             return false;
         }
 
-        final Leap leap = mLeap.get();
+        final Gate gate = mGate.get();
 
-        return (leap == null) ? (weakLeap.mLeap.get() == null) : leap.equals(weakLeap.mLeap.get());
+        return (gate == null) ? (weakGate.mGate.get() == null) : gate.equals(weakGate.mGate.get());
     }
 
     @Override
     public void onFlush(final River<IN> upRiver, final River<OUT> downRiver, final int fallNumber) {
 
-        final Leap<IN, OUT> leap = mLeap.get();
+        final Gate<IN, OUT> gate = mGate.get();
 
-        if (leap != null) {
+        if (gate != null) {
 
-            leap.onFlush(upRiver, downRiver, fallNumber);
+            gate.onFlush(upRiver, downRiver, fallNumber);
 
         } else if (mWhenVanished == WhenVanished.OPEN) {
 
@@ -119,11 +119,11 @@ class WeakLeap<IN, OUT> implements Leap<IN, OUT> {
     public void onPush(final River<IN> upRiver, final River<OUT> downRiver, final int fallNumber,
             final IN drop) {
 
-        final Leap<IN, OUT> leap = mLeap.get();
+        final Gate<IN, OUT> gate = mGate.get();
 
-        if (leap != null) {
+        if (gate != null) {
 
-            leap.onPush(upRiver, downRiver, fallNumber, drop);
+            gate.onPush(upRiver, downRiver, fallNumber, drop);
         }
     }
 
@@ -131,11 +131,11 @@ class WeakLeap<IN, OUT> implements Leap<IN, OUT> {
     public void onUnhandled(final River<IN> upRiver, final River<OUT> downRiver,
             final int fallNumber, final Throwable throwable) {
 
-        final Leap<IN, OUT> leap = mLeap.get();
+        final Gate<IN, OUT> gate = mGate.get();
 
-        if (leap != null) {
+        if (gate != null) {
 
-            leap.onUnhandled(upRiver, downRiver, fallNumber, throwable);
+            gate.onUnhandled(upRiver, downRiver, fallNumber, throwable);
 
         } else if (mWhenVanished == WhenVanished.OPEN) {
 
@@ -144,7 +144,7 @@ class WeakLeap<IN, OUT> implements Leap<IN, OUT> {
     }
 
     /**
-     * How the leap must behaved when the wrapped instance is garbage collected.
+     * How the gate must behaved when the wrapped instance is garbage collected.
      */
     public enum WhenVanished {
 

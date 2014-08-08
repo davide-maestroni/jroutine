@@ -13,7 +13,7 @@
  */
 package com.bmd.wtf.fll;
 
-import com.bmd.wtf.flw.Gate;
+import com.bmd.wtf.flw.Dam;
 import com.bmd.wtf.flw.River;
 
 import java.util.concurrent.TimeUnit;
@@ -254,21 +254,21 @@ public class WaterfallRiver<DATA> implements River<DATA> {
     }
 
     @Override
-    public <TYPE> Gate<TYPE> on(final Class<TYPE> gateClass) {
+    public <TYPE> Dam<TYPE> on(final Class<TYPE> damClass) {
 
-        return mWaterfall.on(gateClass);
+        return mWaterfall.on(damClass);
     }
 
     @Override
-    public <TYPE> Gate<TYPE> on(final TYPE leap) {
+    public <TYPE> Dam<TYPE> on(final TYPE gate) {
 
-        return mWaterfall.on(leap);
+        return mWaterfall.on(gate);
     }
 
     @Override
-    public <TYPE> Gate<TYPE> on(final Classification<TYPE> gateClassification) {
+    public <TYPE> Dam<TYPE> on(final Classification<TYPE> damClassification) {
 
-        return mWaterfall.on(gateClassification);
+        return mWaterfall.on(damClassification);
     }
 
     @Override

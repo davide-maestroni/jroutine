@@ -16,8 +16,8 @@ package com.bmd.wtf.xtr.rpd;
 import com.bmd.wtf.crr.Current;
 import com.bmd.wtf.crr.CurrentGenerator;
 import com.bmd.wtf.fll.Classification;
-import com.bmd.wtf.lps.Leap;
-import com.bmd.wtf.lps.LeapGenerator;
+import com.bmd.wtf.lps.Gate;
+import com.bmd.wtf.lps.GateGenerator;
 import com.bmd.wtf.xtr.rpd.RapidAnnotations.Generator;
 
 import java.lang.reflect.Constructor;
@@ -230,7 +230,7 @@ class RapidGenerators {
     }
 
     /**
-     * Creates and returns a leap generator which instantiates objects of the specified
+     * Creates and returns a gate generator which instantiates objects of the specified
      * classification through a method taking the specified parameters. A method taking
      * an additional Integer parameter (that is, the fall number) is preferred to the default one.
      * A one taking a primitive int is preferred to the Integer. Finally, a method annotated
@@ -242,14 +242,14 @@ class RapidGenerators {
      * security exception might be raised based on the specific policy implemented.
      *
      * @param generator      the generator object whose method will be called.
-     * @param classification the leap classification.
+     * @param classification the gate classification.
      * @param args           the arguments to be passed to the method.
      * @param <IN>           the input data type.
      * @param <OUT>          the output data type.
-     * @return the newly created leap generator.
+     * @return the newly created gate generator.
      */
-    public static <IN, OUT> LeapGenerator<IN, OUT> leapGenerator(final Object generator,
-            final Classification<? extends Leap<IN, OUT>> classification, final Object... args) {
+    public static <IN, OUT> GateGenerator<IN, OUT> gateGenerator(final Object generator,
+            final Classification<? extends Gate<IN, OUT>> classification, final Object... args) {
 
         final Class<?> type = classification.getRawType();
 
@@ -275,10 +275,10 @@ class RapidGenerators {
 
         if (length > args.length) {
 
-            return new LeapGenerator<IN, OUT>() {
+            return new GateGenerator<IN, OUT>() {
 
                 @Override
-                public Leap<IN, OUT> start(final int fallNumber) {
+                public Gate<IN, OUT> start(final int fallNumber) {
 
                     try {
 
@@ -289,7 +289,7 @@ class RapidGenerators {
                         args[length - 1] = fallNumber;
 
                         //noinspection unchecked
-                        return (Leap<IN, OUT>) method.invoke(generator, args);
+                        return (Gate<IN, OUT>) method.invoke(generator, args);
 
                     } catch (final InvocationTargetException e) {
 
@@ -303,15 +303,15 @@ class RapidGenerators {
             };
         }
 
-        return new LeapGenerator<IN, OUT>() {
+        return new GateGenerator<IN, OUT>() {
 
             @Override
-            public Leap<IN, OUT> start(final int fallNumber) {
+            public Gate<IN, OUT> start(final int fallNumber) {
 
                 try {
 
                     //noinspection unchecked
-                    return (Leap<IN, OUT>) method.invoke(generator, args);
+                    return (Gate<IN, OUT>) method.invoke(generator, args);
 
                 } catch (final InvocationTargetException e) {
 
@@ -326,7 +326,7 @@ class RapidGenerators {
     }
 
     /**
-     * Creates and returns a leap generator which instantiates objects of the specified
+     * Creates and returns a gate generator which instantiates objects of the specified
      * type through a constructor taking the specified parameters. A constructor taking
      * an additional Integer parameter (that is, the fall number) is preferred to the default one.
      * A one taking a primitive int is preferred to the Integer. Finally, a constructor annotated
@@ -337,14 +337,14 @@ class RapidGenerators {
      * reflection. That means that, in case a {@link java.lang.SecurityManager} is installed, a
      * security exception might be raised based on the specific policy implemented.
      *
-     * @param type        the leap type.
+     * @param type        the gate type.
      * @param contextArgs the arguments to be passed to the constructor.
      * @param <IN>        the input data type.
      * @param <OUT>       the output data type.
-     * @return the newly created leap generator.
+     * @return the newly created gate generator.
      */
-    public static <IN, OUT> LeapGenerator<IN, OUT> leapGenerator(
-            final Class<? extends Leap<IN, OUT>> type, final Object... contextArgs) {
+    public static <IN, OUT> GateGenerator<IN, OUT> gateGenerator(
+            final Class<? extends Gate<IN, OUT>> type, final Object... contextArgs) {
 
         Constructor<?> bestMatch = findContextConstructor(type.getConstructors(), contextArgs);
 
@@ -369,10 +369,10 @@ class RapidGenerators {
 
         if (length > contextArgs.length) {
 
-            return new LeapGenerator<IN, OUT>() {
+            return new GateGenerator<IN, OUT>() {
 
                 @Override
-                public Leap<IN, OUT> start(final int fallNumber) {
+                public Gate<IN, OUT> start(final int fallNumber) {
 
                     try {
 
@@ -383,7 +383,7 @@ class RapidGenerators {
                         args[length - 1] = fallNumber;
 
                         //noinspection unchecked
-                        return (Leap<IN, OUT>) constructor.newInstance(args);
+                        return (Gate<IN, OUT>) constructor.newInstance(args);
 
                     } catch (final InstantiationException e) {
 
@@ -401,15 +401,15 @@ class RapidGenerators {
             };
         }
 
-        return new LeapGenerator<IN, OUT>() {
+        return new GateGenerator<IN, OUT>() {
 
             @Override
-            public Leap<IN, OUT> start(final int fallNumber) {
+            public Gate<IN, OUT> start(final int fallNumber) {
 
                 try {
 
                     //noinspection unchecked
-                    return (Leap<IN, OUT>) constructor.newInstance(contextArgs);
+                    return (Gate<IN, OUT>) constructor.newInstance(contextArgs);
 
                 } catch (final InstantiationException e) {
 

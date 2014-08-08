@@ -13,7 +13,7 @@
  */
 package com.bmd.wtf.example1;
 
-import com.bmd.wtf.xtr.rpd.RapidLeap;
+import com.bmd.wtf.xtr.rpd.RapidGate;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -26,7 +26,7 @@ import java.net.URLConnection;
 /**
  * Class responsible for the actual downloading of data.
  */
-public class Downloader extends RapidLeap {
+public class Downloader extends RapidGate {
 
     @SuppressWarnings("UnusedDeclaration")
     public void onDownload(final Download download) {

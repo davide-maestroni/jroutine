@@ -17,17 +17,17 @@ import com.bmd.wtf.crr.Current;
 import com.bmd.wtf.flw.Fall;
 import com.bmd.wtf.flw.Stream;
 import com.bmd.wtf.flw.Stream.Direction;
-import com.bmd.wtf.lps.Leap;
+import com.bmd.wtf.lps.Gate;
 
 import java.util.HashSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Instances of this class implement a fall by managing internally stored leaps. Each instance has
+ * Instances of this class implement a fall by managing internally stored gates. Each instance has
  * a single input current, shared by all the input streams which feed the fall.
  * <p/>
- * This class ensures that the internal leap is always accessed in a thread safe way, so that the
+ * This class ensures that the internal gate is always accessed in a thread safe way, so that the
  * implementer does not have to worry about concurrency issues.
  * <p/>
  * Besides, each instance keeps trace of the streams flushing through the fall, so to propagate
@@ -49,12 +49,12 @@ class DataFall<IN, OUT> implements Fall<IN> {
         }
     };
 
+    final Gate<IN, OUT> gate;
+
     final Current inputCurrent;
 
     final CopyOnWriteArrayList<DataStream<IN>> inputStreams =
             new CopyOnWriteArrayList<DataStream<IN>>();
-
-    final Leap<IN, OUT> leap;
 
     final CopyOnWriteArrayList<DataStream<OUT>> outputStreams =
             new CopyOnWriteArrayList<DataStream<OUT>>();
@@ -78,11 +78,11 @@ class DataFall<IN, OUT> implements Fall<IN> {
      *
      * @param waterfall    the containing waterfall.
      * @param inputCurrent the input current.
-     * @param leap         the wrapped leap.
+     * @param gate         the wrapped gate.
      * @param number       the number identifying this fall.
      */
     public DataFall(final Waterfall<?, IN, OUT> waterfall, final Current inputCurrent,
-            final Leap<IN, OUT> leap, final int number) {
+            final Gate<IN, OUT> gate, final int number) {
 
         if (waterfall == null) {
 
@@ -94,13 +94,13 @@ class DataFall<IN, OUT> implements Fall<IN> {
             throw new IllegalArgumentException("the fall input current cannot be null");
         }
 
-        if (leap == null) {
+        if (gate == null) {
 
-            throw new IllegalArgumentException("the fall output leap cannot be null");
+            throw new IllegalArgumentException("the fall output gate cannot be null");
         }
 
         this.inputCurrent = inputCurrent;
-        this.leap = leap;
+        this.gate = gate;
         mNumber = number;
         mLock = new ReentrantLock();
         mInRiver = new LockRiver<IN>(new WaterfallRiver<IN>(waterfall, Direction.UPSTREAM));
@@ -155,7 +155,7 @@ class DataFall<IN, OUT> implements Fall<IN> {
 
         try {
 
-            leap.onFlush(inRiver, outRiver, mNumber);
+            gate.onFlush(inRiver, outRiver, mNumber);
 
         } catch (final Throwable t) {
 
@@ -181,7 +181,7 @@ class DataFall<IN, OUT> implements Fall<IN> {
 
         try {
 
-            leap.onUnhandled(inRiver, outRiver, mNumber, throwable);
+            gate.onUnhandled(inRiver, outRiver, mNumber, throwable);
 
         } catch (final Throwable t) {
 
@@ -209,7 +209,7 @@ class DataFall<IN, OUT> implements Fall<IN> {
 
         try {
 
-            leap.onPush(inRiver, outRiver, mNumber, drop);
+            gate.onPush(inRiver, outRiver, mNumber, drop);
 
         } catch (final Throwable t) {
 

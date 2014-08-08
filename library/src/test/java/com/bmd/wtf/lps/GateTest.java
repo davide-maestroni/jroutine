@@ -15,7 +15,7 @@ package com.bmd.wtf.lps;
 
 import com.bmd.wtf.fll.Waterfall;
 import com.bmd.wtf.flw.River;
-import com.bmd.wtf.lps.WeakLeap.WhenVanished;
+import com.bmd.wtf.lps.WeakGate.WhenVanished;
 
 import junit.framework.TestCase;
 
@@ -25,31 +25,31 @@ import static com.bmd.wtf.fll.Waterfall.fall;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
- * Unit tests for leap classes.
+ * Unit tests for gate classes.
  * <p/>
  * Created by davide on 6/27/14.
  */
-public class LeapTest extends TestCase {
+public class GateTest extends TestCase {
 
     public void testDecorator() {
 
-        final Leap<Object, Object> dam1 = new FreeLeap<Object>();
-        final Leap<Object, Object> dam2 = new FreeLeap<Object>();
+        final Gate<Object, Object> dam1 = new OpenGate<Object>();
+        final Gate<Object, Object> dam2 = new OpenGate<Object>();
 
-        final LeapDecorator<Object, Object> decorator1 = new LeapDecorator<Object, Object>(dam1);
-        final LeapDecorator<Object, Object> decorator2 = new LeapDecorator<Object, Object>(dam1);
-        final LeapDecorator<Object, Object> decorator3 = new LeapDecorator<Object, Object>(dam2);
+        final GateDecorator<Object, Object> decorator1 = new GateDecorator<Object, Object>(dam1);
+        final GateDecorator<Object, Object> decorator2 = new GateDecorator<Object, Object>(dam1);
+        final GateDecorator<Object, Object> decorator3 = new GateDecorator<Object, Object>(dam2);
 
         assertThat(decorator1).isEqualTo(decorator1);
         assertThat(decorator1).isEqualTo(decorator2);
         assertThat(decorator1.hashCode()).isEqualTo(decorator2.hashCode());
-        assertThat(decorator1).isNotEqualTo(new LeapDecorator<Object, Object>(decorator1));
+        assertThat(decorator1).isNotEqualTo(new GateDecorator<Object, Object>(decorator1));
         assertThat(decorator1).isNotEqualTo(null);
         assertThat(decorator1).isNotEqualTo(decorator3);
 
         try {
 
-            new LeapDecorator<Object, Object>(null);
+            new GateDecorator<Object, Object>(null);
 
             fail();
 
@@ -60,25 +60,25 @@ public class LeapTest extends TestCase {
 
     public void testWeak() {
 
-        FreeLeap<Object> freeLeap = new FreeLeap<Object>();
-        final Leap<Object, Object> weak1 = Leaps.weak(freeLeap);
-        final Leap<Object, Object> weak2 = Leaps.weak(freeLeap);
+        OpenGate<Object> openGate = new OpenGate<Object>();
+        final Gate<Object, Object> weak1 = Gates.weak(openGate);
+        final Gate<Object, Object> weak2 = Gates.weak(openGate);
 
         assertThat(weak1).isEqualTo(weak1);
         assertThat(weak1).isEqualTo(weak2);
-        assertThat(weak1).isNotEqualTo(freeLeap);
+        assertThat(weak1).isNotEqualTo(openGate);
         assertThat(weak1).isNotEqualTo(null);
         //noinspection EqualsBetweenInconvertibleTypes
         assertThat(weak1.equals("test")).isFalse();
         assertThat(weak1.hashCode()).isEqualTo(weak2.hashCode());
 
-        final Leap<Object, Object> weak3 = Leaps.weak(freeLeap, WhenVanished.CLOSE);
+        final Gate<Object, Object> weak3 = Gates.weak(openGate, WhenVanished.CLOSE);
 
         assertThat(weak1).isNotEqualTo(weak3);
         assertThat(weak2).isNotEqualTo(weak3);
 
         //noinspection UnusedAssignment
-        freeLeap = null;
+        openGate = null;
 
         System.gc();
         System.gc();
@@ -89,13 +89,13 @@ public class LeapTest extends TestCase {
         assertThat(weak2).isNotEqualTo(weak3);
 
         //noinspection UnusedAssignment
-        freeLeap = new FreeLeap<Object>();
+        openGate = new OpenGate<Object>();
 
         assertThat(weak1).isNotEqualTo(weak3);
         assertThat(weak2).isNotEqualTo(weak3);
 
         //noinspection UnusedAssignment
-        freeLeap = null;
+        openGate = null;
 
         System.gc();
         System.gc();
@@ -103,7 +103,7 @@ public class LeapTest extends TestCase {
         assertThat(weak1).isNotEqualTo(weak3);
         assertThat(weak2).isNotEqualTo(weak3);
 
-        Leap<Object, Object> leap1 = new AbstractLeap<Object, Object>() {
+        Gate<Object, Object> gate1 = new AbstractGate<Object, Object>() {
 
             private Object mLast;
 
@@ -155,8 +155,8 @@ public class LeapTest extends TestCase {
 
         };
         final Waterfall<Object, Object, Object> waterfall1 =
-                fall().start(Leaps.weak(leap1, WhenVanished.CLOSE));
-        Leap<Object, Object> leap2 = new AbstractLeap<Object, Object>() {
+                fall().start(Gates.weak(gate1, WhenVanished.CLOSE));
+        Gate<Object, Object> gate2 = new AbstractGate<Object, Object>() {
 
             private Object mLast;
 
@@ -209,12 +209,12 @@ public class LeapTest extends TestCase {
             }
         };
         final Waterfall<Object, Object, Object> waterfall2 =
-                waterfall1.chain(Leaps.weak(leap2, WhenVanished.OPEN));
+                waterfall1.chain(Gates.weak(gate2, WhenVanished.OPEN));
 
-        freeLeap = new FreeLeap<Object>();
+        openGate = new OpenGate<Object>();
 
         final Waterfall<Object, Object, Object> waterfall3 =
-                waterfall2.chain(Leaps.weak(freeLeap, WhenVanished.CLOSE));
+                waterfall2.chain(Gates.weak(openGate, WhenVanished.CLOSE));
 
         assertThat(waterfall1.pull("discharge").next()).isEqualTo("discharge");
         assertThat(waterfall2.pull("discharge").next()).isEqualTo("discharge");
@@ -413,7 +413,7 @@ public class LeapTest extends TestCase {
         }
 
         //noinspection UnusedAssignment
-        freeLeap = null;
+        openGate = null;
 
         System.gc();
         System.gc();
@@ -551,7 +551,7 @@ public class LeapTest extends TestCase {
         assertThat(waterfall3.pull("pull1").now().all()).isEmpty();
 
         //noinspection UnusedAssignment
-        leap2 = null;
+        gate2 = null;
 
         System.gc();
         System.gc();
@@ -657,7 +657,7 @@ public class LeapTest extends TestCase {
         assertThat(waterfall3.pull("pull1").now().all()).isEmpty();
 
         //noinspection UnusedAssignment
-        leap1 = null;
+        gate1 = null;
 
         System.gc();
         System.gc();
@@ -704,7 +704,7 @@ public class LeapTest extends TestCase {
 
         try {
 
-            Leaps.weak(null);
+            Gates.weak(null);
 
             fail();
 
@@ -714,7 +714,7 @@ public class LeapTest extends TestCase {
 
         try {
 
-            Leaps.weak(null, WhenVanished.OPEN);
+            Gates.weak(null, WhenVanished.OPEN);
 
             fail();
 
@@ -724,7 +724,7 @@ public class LeapTest extends TestCase {
 
         try {
 
-            Leaps.weak(null, WhenVanished.CLOSE);
+            Gates.weak(null, WhenVanished.CLOSE);
 
             fail();
 

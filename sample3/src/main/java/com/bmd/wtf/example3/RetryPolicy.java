@@ -17,7 +17,7 @@ import com.bmd.wtf.example1.Download;
 import com.bmd.wtf.example1.DownloadFailure;
 import com.bmd.wtf.example1.DownloadSuccess;
 import com.bmd.wtf.flw.River;
-import com.bmd.wtf.xtr.rpd.RapidLeap;
+import com.bmd.wtf.xtr.rpd.RapidGate;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -25,7 +25,7 @@ import java.util.HashMap;
 /**
  * This class is meant to retry the discharge of data in case an error occurred.
  */
-public class RetryPolicy extends RapidLeap {
+public class RetryPolicy extends RapidGate {
 
     private final int mMaxCount;
 

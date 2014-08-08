@@ -48,14 +48,14 @@ public class DownloadManager {
         }
 
         mDownloadDir = downloadDir;
-        mWaterfall = fall().asGate()
+        mWaterfall = fall().dam()
                            .start(new DownloadObserver())
                            .inBackground(maxThreads)
                            .distribute()
-                           .chain(Rapid.leapGenerator(Downloader.class))
+                           .chain(Rapid.gateGenerator(Downloader.class))
                            .in(1)
                            .chain(Classification.ofType(DownloadObserver.class));
-        mGate = Rapid.gate(mWaterfall.on(DownloadObserver.class)).performAs(UriObserver.class);
+        mGate = Rapid.dam(mWaterfall.on(DownloadObserver.class)).performAs(UriObserver.class);
     }
 
     public static void main(final String args[]) throws IOException, URISyntaxException {

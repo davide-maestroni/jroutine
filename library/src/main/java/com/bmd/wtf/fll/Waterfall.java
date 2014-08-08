@@ -16,12 +16,12 @@ package com.bmd.wtf.fll;
 import com.bmd.wtf.crr.Current;
 import com.bmd.wtf.crr.CurrentGenerator;
 import com.bmd.wtf.crr.Currents;
-import com.bmd.wtf.flw.Barrage;
 import com.bmd.wtf.flw.Collector;
-import com.bmd.wtf.flw.Gate;
-import com.bmd.wtf.lps.FreeLeap;
-import com.bmd.wtf.lps.Leap;
-import com.bmd.wtf.lps.LeapGenerator;
+import com.bmd.wtf.flw.Dam;
+import com.bmd.wtf.flw.Pump;
+import com.bmd.wtf.lps.Gate;
+import com.bmd.wtf.lps.GateGenerator;
+import com.bmd.wtf.lps.OpenGate;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,44 +51,44 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
     private static final Classification<Void> SELF_CLASSIFICATION = new Classification<Void>() {};
 
-    private static final WeakHashMap<Leap<?, ?>, Void> sLeaps = new WeakHashMap<Leap<?, ?>, Void>();
+    private static final WeakHashMap<Gate<?, ?>, Void> sGates = new WeakHashMap<Gate<?, ?>, Void>();
 
-    private static FreeLeap<?> sFreeLeap;
+    private static OpenGate<?> sOpenGate;
 
     private final Current mBackgroundCurrent;
 
     private final int mBackgroundPoolSize;
 
-    private final BarrageLeap<?> mBarrage;
-
     private final Current mCurrent;
 
     private final CurrentGenerator mCurrentGenerator;
 
+    private final Classification<?> mDamClassification;
+
+    private final Map<Classification<?>, DamGate<?, ?>> mDamMap;
+
     private final DataFall<IN, OUT>[] mFalls;
 
-    private final Classification<?> mGate;
-
-    private final Map<Classification<?>, GateLeap<?, ?>> mGateMap;
+    private final PumpGate<?> mPump;
 
     private final int mSize;
 
     private final Waterfall<SOURCE, SOURCE, ?> mSource;
 
     private Waterfall(final Waterfall<SOURCE, SOURCE, ?> source,
-            final Map<Classification<?>, GateLeap<?, ?>> gateMap,
-            final Classification<?> gateClassification, final int backgroundPoolSize,
-            final Current backgroundCurrent, final BarrageLeap<?> barrageLeap, final int size,
+            final Map<Classification<?>, DamGate<?, ?>> damMap,
+            final Classification<?> damClassification, final int backgroundPoolSize,
+            final Current backgroundCurrent, final PumpGate<?> pumpGate, final int size,
             final Current current, final CurrentGenerator generator,
             final DataFall<IN, OUT>... falls) {
 
         //noinspection unchecked
         mSource = (source != null) ? source : (Waterfall<SOURCE, SOURCE, ?>) this;
-        mGateMap = gateMap;
-        mGate = gateClassification;
+        mDamMap = damMap;
+        mDamClassification = damClassification;
         mBackgroundPoolSize = backgroundPoolSize;
         mBackgroundCurrent = backgroundCurrent;
-        mBarrage = barrageLeap;
+        mPump = pumpGate;
         mSize = size;
         mCurrent = current;
         mCurrentGenerator = generator;
@@ -96,70 +96,69 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
     }
 
     private Waterfall(final Waterfall<SOURCE, SOURCE, ?> source,
-            final Map<Classification<?>, GateLeap<?, ?>> gateMap,
-            final Classification<?> gateClassification, final int backgroundPoolSize,
-            final Current backgroundCurrent, final BarrageLeap<?> barrageLeap, final int size,
-            final Current current, final CurrentGenerator generator, final Leap<IN, OUT>... leaps) {
+            final Map<Classification<?>, DamGate<?, ?>> damMap,
+            final Classification<?> damClassification, final int backgroundPoolSize,
+            final Current backgroundCurrent, final PumpGate<?> pumpGate, final int size,
+            final Current current, final CurrentGenerator generator, final Gate<IN, OUT>... gates) {
 
         //noinspection unchecked
         mSource = (source != null) ? source : (Waterfall<SOURCE, SOURCE, ?>) this;
-        mGate = null;
+        mDamClassification = null;
         mBackgroundPoolSize = backgroundPoolSize;
         mBackgroundCurrent = backgroundCurrent;
         mSize = size;
         mCurrent = current;
         mCurrentGenerator = generator;
 
-        final int length = leaps.length;
+        final int length = gates.length;
 
-        final Leap<IN, OUT> wrappedLeap;
+        final Gate<IN, OUT> wrappedGate;
 
-        if (gateClassification != null) {
+        if (damClassification != null) {
 
-            final Leap<IN, OUT> leap = leaps[0];
+            final Gate<IN, OUT> gate = gates[0];
 
-            final HashMap<Classification<?>, GateLeap<?, ?>> fallGateMap =
-                    new HashMap<Classification<?>, GateLeap<?, ?>>(gateMap);
-            final GateLeap<IN, OUT> gateLeap = new GateLeap<IN, OUT>(leap);
+            final HashMap<Classification<?>, DamGate<?, ?>> fallDamMap =
+                    new HashMap<Classification<?>, DamGate<?, ?>>(damMap);
+            final DamGate<IN, OUT> damGate = new DamGate<IN, OUT>(gate);
 
-            mapGate(fallGateMap,
-                    (SELF_CLASSIFICATION == gateClassification) ? Classification.ofType(
-                            leap.getClass()) : gateClassification, gateLeap);
+            mapDam(fallDamMap, (SELF_CLASSIFICATION == damClassification) ? Classification.ofType(
+                    gate.getClass()) : damClassification, damGate);
 
-            mGateMap = fallGateMap;
+            mDamMap = fallDamMap;
 
-            wrappedLeap = gateLeap;
+            wrappedGate = damGate;
 
         } else {
 
             if (size != length) {
 
-                wrappedLeap = new SegmentedLeap<IN, OUT>(leaps[0]);
+                wrappedGate = new BarrageGate<IN, OUT>(gates[0]);
 
             } else {
 
-                wrappedLeap = null;
+                wrappedGate = null;
             }
 
-            mGateMap = gateMap;
+            mDamMap = damMap;
         }
 
         final DataFall[] falls = new DataFall[size];
 
         if (size == 1) {
 
-            mBarrage = null;
+            mPump = null;
 
         } else {
 
-            mBarrage = barrageLeap;
+            mPump = pumpGate;
         }
 
-        final BarrageLeap<?> fallBarrage = mBarrage;
+        final PumpGate<?> fallPump = mPump;
 
         for (int i = 0; i < size; ++i) {
 
-            final Leap<IN, OUT> leap = (wrappedLeap != null) ? wrappedLeap : leaps[i];
+            final Gate<IN, OUT> gate = (wrappedGate != null) ? wrappedGate : gates[i];
             final Current fallCurrent;
 
             if (current == null) {
@@ -171,14 +170,13 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
                 fallCurrent = current;
             }
 
-            if (fallBarrage != null) {
+            if (fallPump != null) {
 
-                falls[i] =
-                        new BarrageFall<SOURCE, IN, OUT>(this, fallCurrent, leap, i, fallBarrage);
+                falls[i] = new PumpFall<SOURCE, IN, OUT>(this, fallCurrent, gate, i, fallPump);
 
             } else {
 
-                falls[i] = new DataFall<IN, OUT>(this, fallCurrent, leap, i);
+                falls[i] = new DataFall<IN, OUT>(this, fallCurrent, gate, i);
             }
         }
 
@@ -193,28 +191,11 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      */
     public static Waterfall<Object, Object, Object> fall() {
 
-        final Map<Classification<?>, GateLeap<?, ?>> gateMap = Collections.emptyMap();
+        final Map<Classification<?>, DamGate<?, ?>> damMap = Collections.emptyMap();
 
         //noinspection unchecked
-        return new Waterfall<Object, Object, Object>(null, gateMap, null, 0, null, null, 1,
+        return new Waterfall<Object, Object, Object>(null, damMap, null, 0, null, null, 1,
                                                      Currents.straight(), null, NO_FALL);
-    }
-
-    /**
-     * Lazily creates and return a singleton free leap instance.
-     *
-     * @param <DATA> the data type.
-     * @return the free leap instance.
-     */
-    private static <DATA> FreeLeap<DATA> freeLeap() {
-
-        if (sFreeLeap == null) {
-
-            sFreeLeap = new FreeLeap<Object>();
-        }
-
-        //noinspection unchecked
-        return (FreeLeap<DATA>) sFreeLeap;
     }
 
     /**
@@ -237,62 +218,36 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
     }
 
     /**
-     * Registers the specified leap instance by making sure it is unique among all the created
-     * waterfalls.
+     * Lazily creates and return a singleton open gate instance.
      *
-     * @param leap the leap to register.
+     * @param <DATA> the data type.
+     * @return the open gate instance.
      */
-    private static void registerLeap(final Leap<?, ?> leap) {
+    private static <DATA> OpenGate<DATA> openGate() {
 
-        if (sLeaps.containsKey(leap)) {
+        if (sOpenGate == null) {
 
-            throw new IllegalArgumentException("the waterfall already contains the leap: " + leap);
-        }
-
-        sLeaps.put(leap, null);
-    }
-
-    /**
-     * Tells the waterfall to build a gate of the specified type around the next leap chained to it.
-     *
-     * @param gateClass the gate class.
-     * @return the newly created waterfall.
-     */
-    public Waterfall<SOURCE, IN, OUT> as(final Class<?> gateClass) {
-
-        return as(Classification.ofType(gateClass));
-    }
-
-    /**
-     * Tells the waterfall to build a gate of the specified classification type around the next
-     * leap chained to it.
-     *
-     * @param gateClassification the gate classification.
-     * @return the newly created waterfall.
-     */
-    public Waterfall<SOURCE, IN, OUT> as(final Classification<?> gateClassification) {
-
-        if (gateClassification == null) {
-
-            throw new IllegalArgumentException("the gate classification cannot be null");
+            sOpenGate = new OpenGate<Object>();
         }
 
         //noinspection unchecked
-        return new Waterfall<SOURCE, IN, OUT>(mSource, mGateMap, gateClassification,
-                                              mBackgroundPoolSize, mBackgroundCurrent, mBarrage,
-                                              mSize, mCurrent, mCurrentGenerator, mFalls);
+        return (OpenGate<DATA>) sOpenGate;
     }
 
     /**
-     * Tells the waterfall to build a gate around the next leap chained to it.
-     * <p/>
-     * The gate type will be the same as the leap raw type.
+     * Registers the specified gate instance by making sure it is unique among all the created
+     * waterfalls.
      *
-     * @return the newly created waterfall.
+     * @param gate the gate to register.
      */
-    public Waterfall<SOURCE, IN, OUT> asGate() {
+    private static void registerGate(final Gate<?, ?> gate) {
 
-        return as(SELF_CLASSIFICATION);
+        if (sGates.containsKey(gate)) {
+
+            throw new IllegalArgumentException("the waterfall already contains the gate: " + gate);
+        }
+
+        sGates.put(gate, null);
     }
 
     /**
@@ -379,27 +334,27 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
     }
 
     /**
-     * Chains the leap protected by the gate of the specified classification type to this
+     * Chains the gate protected by the dam of the specified classification type to this
      * waterfall.
      * <p/>
-     * Note that contrary to common leap, the ones protected by a gate can be added several times
+     * Note that contrary to common gate, the ones protected by a dam can be added several times
      * to the same waterfall.
      *
-     * @param gateClassification the gate classification.
-     * @param <NOUT>             the new output data type.
+     * @param damClassification the dam classification.
+     * @param <NOUT>            the new output data type.
      * @return the newly created waterfall.
      */
     public <NOUT> Waterfall<SOURCE, OUT, NOUT> chain(
-            final Classification<? extends Leap<OUT, NOUT>> gateClassification) {
+            final Classification<? extends Gate<OUT, NOUT>> damClassification) {
 
         //noinspection unchecked
-        final Leap<OUT, NOUT> leap = (Leap<OUT, NOUT>) findBestMatch(gateClassification);
+        final Gate<OUT, NOUT> gate = (Gate<OUT, NOUT>) findBestMatch(damClassification);
 
-        if (leap == null) {
+        if (gate == null) {
 
             throw new IllegalArgumentException(
-                    "the waterfall does not retain any gate of classification type "
-                            + gateClassification);
+                    "the waterfall does not retain any dam of classification type "
+                            + damClassification);
         }
 
         final DataFall<IN, OUT>[] falls = mFalls;
@@ -409,9 +364,9 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
             //noinspection unchecked
             final Waterfall<SOURCE, OUT, NOUT> waterfall =
-                    new Waterfall<SOURCE, OUT, NOUT>(mSource, mGateMap, mGate, mBackgroundPoolSize,
-                                                     mBackgroundCurrent, mBarrage, 1, mCurrent,
-                                                     mCurrentGenerator, leap);
+                    new Waterfall<SOURCE, OUT, NOUT>(mSource, mDamMap, mDamClassification,
+                                                     mBackgroundPoolSize, mBackgroundCurrent, mPump,
+                                                     1, mCurrent, mCurrentGenerator, gate);
 
             final DataFall<OUT, NOUT> outFall = waterfall.mFalls[0];
 
@@ -435,17 +390,17 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
             inWaterfall = this;
         }
 
-        final Leap[] leaps = new Leap[size];
+        final Gate[] gates = new Gate[size];
 
-        Arrays.fill(leaps, leap);
+        Arrays.fill(gates, gate);
 
         //noinspection unchecked
         final Waterfall<SOURCE, OUT, NOUT> waterfall =
-                new Waterfall<SOURCE, OUT, NOUT>(inWaterfall.mSource, inWaterfall.mGateMap,
-                                                 inWaterfall.mGate, mBackgroundPoolSize,
-                                                 mBackgroundCurrent, mBarrage, size,
-                                                 inWaterfall.mCurrent,
-                                                 inWaterfall.mCurrentGenerator, leaps);
+                new Waterfall<SOURCE, OUT, NOUT>(inWaterfall.mSource, inWaterfall.mDamMap,
+                                                 inWaterfall.mDamClassification,
+                                                 mBackgroundPoolSize, mBackgroundCurrent, mPump,
+                                                 size, inWaterfall.mCurrent,
+                                                 inWaterfall.mCurrentGenerator, gates);
 
         final DataFall<?, OUT>[] inFalls = inWaterfall.mFalls;
         final DataFall<OUT, NOUT>[] outFalls = waterfall.mFalls;
@@ -471,7 +426,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
     }
 
     /**
-     * Chains a free leap to this waterfall.
+     * Chains a free gate to this waterfall.
      *
      * @return the newly created waterfall.
      */
@@ -486,15 +441,15 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
         }
 
         final int size = mSize;
-        final FreeLeap<OUT> leap = freeLeap();
+        final OpenGate<OUT> gate = openGate();
 
         if (size == 1) {
 
             //noinspection unchecked
             final Waterfall<SOURCE, OUT, OUT> waterfall =
-                    new Waterfall<SOURCE, OUT, OUT>(mSource, mGateMap, mGate, mBackgroundPoolSize,
-                                                    mBackgroundCurrent, mBarrage, 1, mCurrent,
-                                                    mCurrentGenerator, leap);
+                    new Waterfall<SOURCE, OUT, OUT>(mSource, mDamMap, mDamClassification,
+                                                    mBackgroundPoolSize, mBackgroundCurrent, mPump,
+                                                    1, mCurrent, mCurrentGenerator, gate);
 
             final DataFall<OUT, OUT> outFall = waterfall.mFalls[0];
 
@@ -518,17 +473,17 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
             inWaterfall = this;
         }
 
-        final Leap[] leaps = new Leap[size];
+        final Gate[] gates = new Gate[size];
 
-        Arrays.fill(leaps, leap);
+        Arrays.fill(gates, gate);
 
         //noinspection unchecked
         final Waterfall<SOURCE, OUT, OUT> waterfall =
-                new Waterfall<SOURCE, OUT, OUT>(inWaterfall.mSource, inWaterfall.mGateMap,
-                                                inWaterfall.mGate, mBackgroundPoolSize,
-                                                mBackgroundCurrent, mBarrage, size,
+                new Waterfall<SOURCE, OUT, OUT>(inWaterfall.mSource, inWaterfall.mDamMap,
+                                                inWaterfall.mDamClassification, mBackgroundPoolSize,
+                                                mBackgroundCurrent, mPump, size,
                                                 inWaterfall.mCurrent, inWaterfall.mCurrentGenerator,
-                                                leaps);
+                                                gates);
 
         final DataFall<?, OUT>[] inFalls = inWaterfall.mFalls;
         final DataFall<OUT, OUT>[] outFalls = waterfall.mFalls;
@@ -554,20 +509,20 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
     }
 
     /**
-     * Chains the specified leap to this waterfall.
+     * Chains the specified gate to this waterfall.
      * <p/>
      * Note that in case this waterfall is composed by more then one data stream, all the data
-     * flowing through them will be passed to the specified leap.
+     * flowing through them will be passed to the specified gate.
      *
-     * @param leap   the leap instance.
+     * @param gate   the gate instance.
      * @param <NOUT> the new output data type.
      * @return the newly created waterfall.
      */
-    public <NOUT> Waterfall<SOURCE, OUT, NOUT> chain(final Leap<OUT, NOUT> leap) {
+    public <NOUT> Waterfall<SOURCE, OUT, NOUT> chain(final Gate<OUT, NOUT> gate) {
 
-        if (leap == null) {
+        if (gate == null) {
 
-            throw new IllegalArgumentException("the waterfall leap cannot be null");
+            throw new IllegalArgumentException("the waterfall gate cannot be null");
         }
 
         final DataFall<IN, OUT>[] falls = mFalls;
@@ -575,20 +530,20 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
         if (falls == NO_FALL) {
 
             //noinspection unchecked
-            return (Waterfall<SOURCE, OUT, NOUT>) start(leap);
+            return (Waterfall<SOURCE, OUT, NOUT>) start(gate);
         }
 
         final int size = mSize;
 
         if (size == 1) {
 
-            registerLeap(leap);
+            registerGate(gate);
 
             //noinspection unchecked
             final Waterfall<SOURCE, OUT, NOUT> waterfall =
-                    new Waterfall<SOURCE, OUT, NOUT>(mSource, mGateMap, mGate, mBackgroundPoolSize,
-                                                     mBackgroundCurrent, mBarrage, 1, mCurrent,
-                                                     mCurrentGenerator, leap);
+                    new Waterfall<SOURCE, OUT, NOUT>(mSource, mDamMap, mDamClassification,
+                                                     mBackgroundPoolSize, mBackgroundCurrent, mPump,
+                                                     1, mCurrent, mCurrentGenerator, gate);
 
             final DataFall<OUT, NOUT> outFall = waterfall.mFalls[0];
 
@@ -612,15 +567,15 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
             inWaterfall = this;
         }
 
-        registerLeap(leap);
+        registerGate(gate);
 
         //noinspection unchecked
         final Waterfall<SOURCE, OUT, NOUT> waterfall =
-                new Waterfall<SOURCE, OUT, NOUT>(inWaterfall.mSource, inWaterfall.mGateMap,
-                                                 inWaterfall.mGate, mBackgroundPoolSize,
-                                                 mBackgroundCurrent, mBarrage, size,
-                                                 inWaterfall.mCurrent,
-                                                 inWaterfall.mCurrentGenerator, leap);
+                new Waterfall<SOURCE, OUT, NOUT>(inWaterfall.mSource, inWaterfall.mDamMap,
+                                                 inWaterfall.mDamClassification,
+                                                 mBackgroundPoolSize, mBackgroundCurrent, mPump,
+                                                 size, inWaterfall.mCurrent,
+                                                 inWaterfall.mCurrentGenerator, gate);
 
         final DataFall<?, OUT>[] inFalls = inWaterfall.mFalls;
         final DataFall<OUT, NOUT>[] outFalls = waterfall.mFalls;
@@ -646,16 +601,16 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
     }
 
     /**
-     * Chains the leaps returned by the specified generator to this waterfall.
+     * Chains the gates returned by the specified generator to this waterfall.
      * <p/>
-     * Note that in case this waterfall is composed by more then one data stream, each leap created
+     * Note that in case this waterfall is composed by more then one data stream, each gate created
      * by the generator will handle a single stream.
      *
-     * @param generator the leap generator.
+     * @param generator the gate generator.
      * @param <NOUT>    the new output data type.
      * @return the newly created waterfall.
      */
-    public <NOUT> Waterfall<SOURCE, OUT, NOUT> chain(final LeapGenerator<OUT, NOUT> generator) {
+    public <NOUT> Waterfall<SOURCE, OUT, NOUT> chain(final GateGenerator<OUT, NOUT> generator) {
 
         if (generator == null) {
 
@@ -674,15 +629,15 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
         if (size == 1) {
 
-            final Leap<OUT, NOUT> leap = generator.start(0);
+            final Gate<OUT, NOUT> gate = generator.start(0);
 
-            registerLeap(leap);
+            registerGate(gate);
 
             //noinspection unchecked
             final Waterfall<SOURCE, OUT, NOUT> waterfall =
-                    new Waterfall<SOURCE, OUT, NOUT>(mSource, mGateMap, mGate, mBackgroundPoolSize,
-                                                     mBackgroundCurrent, mBarrage, 1, mCurrent,
-                                                     mCurrentGenerator, leap);
+                    new Waterfall<SOURCE, OUT, NOUT>(mSource, mDamMap, mDamClassification,
+                                                     mBackgroundPoolSize, mBackgroundCurrent, mPump,
+                                                     1, mCurrent, mCurrentGenerator, gate);
 
             final DataFall<OUT, NOUT> outFall = waterfall.mFalls[0];
 
@@ -694,9 +649,9 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
             return waterfall;
         }
 
-        if (mGate != null) {
+        if (mDamClassification != null) {
 
-            throw new IllegalStateException("cannot make a gate from more than one leap");
+            throw new IllegalStateException("cannot make a dam from more than one gate");
         }
 
         final int length = falls.length;
@@ -711,24 +666,24 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
             inWaterfall = this;
         }
 
-        final Leap[] leaps = new Leap[size];
+        final Gate[] gates = new Gate[size];
 
         for (int i = 0; i < size; ++i) {
 
-            final Leap<OUT, NOUT> leap = generator.start(i);
+            final Gate<OUT, NOUT> gate = generator.start(i);
 
-            registerLeap(leap);
+            registerGate(gate);
 
-            leaps[i] = leap;
+            gates[i] = gate;
         }
 
         //noinspection unchecked
         final Waterfall<SOURCE, OUT, NOUT> waterfall =
-                new Waterfall<SOURCE, OUT, NOUT>(inWaterfall.mSource, inWaterfall.mGateMap,
-                                                 inWaterfall.mGate, mBackgroundPoolSize,
-                                                 mBackgroundCurrent, mBarrage, size,
-                                                 inWaterfall.mCurrent,
-                                                 inWaterfall.mCurrentGenerator, leaps);
+                new Waterfall<SOURCE, OUT, NOUT>(inWaterfall.mSource, inWaterfall.mDamMap,
+                                                 inWaterfall.mDamClassification,
+                                                 mBackgroundPoolSize, mBackgroundCurrent, mPump,
+                                                 size, inWaterfall.mCurrent,
+                                                 inWaterfall.mCurrentGenerator, gates);
 
         final DataFall<?, OUT>[] inFalls = inWaterfall.mFalls;
         final DataFall<OUT, NOUT>[] outFalls = waterfall.mFalls;
@@ -754,6 +709,85 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
     }
 
     /**
+     * Tells the waterfall to close the dam handling the specified gate, that is, the dam
+     * will not be accessible anymore to the ones requiring it.
+     *
+     * @param gate   the gate instance.
+     * @param <TYPE> the gate type.
+     * @return the newly created waterfall.
+     */
+    public <TYPE extends Gate<?, ?>> Waterfall<SOURCE, IN, OUT> close(final TYPE gate) {
+
+        if (gate == null) {
+
+            return this;
+        }
+
+        boolean isChanged = false;
+
+        final HashMap<Classification<?>, DamGate<?, ?>> damMap =
+                new HashMap<Classification<?>, DamGate<?, ?>>(mDamMap);
+
+        final Iterator<DamGate<?, ?>> iterator = damMap.values().iterator();
+
+        while (iterator.hasNext()) {
+
+            if (gate == iterator.next().gate) {
+
+                iterator.remove();
+
+                isChanged = true;
+            }
+        }
+
+        if (!isChanged) {
+
+            return this;
+        }
+
+        //noinspection unchecked
+        return new Waterfall<SOURCE, IN, OUT>(mSource, damMap, mDamClassification,
+                                              mBackgroundPoolSize, mBackgroundCurrent, mPump, mSize,
+                                              mCurrent, mCurrentGenerator, mFalls);
+    }
+
+    /**
+     * Tells the waterfall to close the dam of the specified classification type, that is, the dam
+     * will not be accessible anymore to the ones requiring it.
+     *
+     * @param damClassification the dam classification.
+     * @param <TYPE>            the gate type.
+     * @return the newly created waterfall.
+     */
+    public <TYPE> Waterfall<SOURCE, IN, OUT> close(final Classification<TYPE> damClassification) {
+
+        final DamGate<?, ?> dam = findBestMatch(damClassification);
+
+        if (dam == null) {
+
+            return this;
+        }
+
+        final HashMap<Classification<?>, DamGate<?, ?>> damMap =
+                new HashMap<Classification<?>, DamGate<?, ?>>(mDamMap);
+
+        final Iterator<DamGate<?, ?>> iterator = damMap.values().iterator();
+
+        while (iterator.hasNext()) {
+
+            if (dam == iterator.next()) {
+
+                iterator.remove();
+            }
+        }
+
+        //noinspection unchecked
+        return new Waterfall<SOURCE, IN, OUT>(mSource, damMap, mDamClassification,
+                                              mBackgroundPoolSize, mBackgroundCurrent, mPump, mSize,
+                                              mCurrent, mCurrentGenerator, mFalls);
+    }
+
+    /**
      * Creates and returns a new data collector.
      *
      * @return the collector.
@@ -765,8 +799,8 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
             throw new IllegalStateException("cannot collect data from a not started waterfall");
         }
 
-        final CollectorLeap<OUT> collectorLeap = new CollectorLeap<OUT>();
-        final GateLeap<OUT, OUT> gateLeap = new GateLeap<OUT, OUT>(collectorLeap);
+        final CollectorGate<OUT> collectorGate = new CollectorGate<OUT>();
+        final DamGate<OUT, OUT> damGate = new DamGate<OUT, OUT>(collectorGate);
 
         final Waterfall<SOURCE, IN, OUT> waterfall;
 
@@ -779,9 +813,52 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
             waterfall = this;
         }
 
-        waterfall.chain(gateLeap);
+        waterfall.chain(damGate);
 
-        return new DataCollector<OUT>(gateLeap, collectorLeap);
+        return new DataCollector<OUT>(damGate, collectorGate);
+    }
+
+    /**
+     * Tells the waterfall to build a dam around the next gate chained to it.
+     * <p/>
+     * The dam type will be the same as the gate raw type.
+     *
+     * @return the newly created waterfall.
+     */
+    public Waterfall<SOURCE, IN, OUT> dam() {
+
+        return dam(SELF_CLASSIFICATION);
+    }
+
+    /**
+     * Tells the waterfall to build a dam of the specified type around the next gate chained to it.
+     *
+     * @param damClass the dam class.
+     * @return the newly created waterfall.
+     */
+    public Waterfall<SOURCE, IN, OUT> dam(final Class<?> damClass) {
+
+        return dam(Classification.ofType(damClass));
+    }
+
+    /**
+     * Tells the waterfall to build a dam of the specified classification type around the next
+     * gate chained to it.
+     *
+     * @param damClassification the dam classification.
+     * @return the newly created waterfall.
+     */
+    public Waterfall<SOURCE, IN, OUT> dam(final Classification<?> damClassification) {
+
+        if (damClassification == null) {
+
+            throw new IllegalArgumentException("the dam classification cannot be null");
+        }
+
+        //noinspection unchecked
+        return new Waterfall<SOURCE, IN, OUT>(mSource, mDamMap, damClassification,
+                                              mBackgroundPoolSize, mBackgroundCurrent, mPump, mSize,
+                                              mCurrent, mCurrentGenerator, mFalls);
     }
 
     @Override
@@ -1003,54 +1080,54 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
     }
 
     @Override
-    public <TYPE> Gate<TYPE> on(final Class<TYPE> gateClass) {
+    public <TYPE> Dam<TYPE> on(final Class<TYPE> damClass) {
 
-        return on(Classification.ofType(gateClass));
+        return on(Classification.ofType(damClass));
     }
 
     @Override
-    public <TYPE> Gate<TYPE> on(final TYPE leap) {
+    public <TYPE> Dam<TYPE> on(final TYPE gate) {
 
-        if (leap == null) {
+        if (gate == null) {
 
-            throw new IllegalArgumentException("the gate leap cannot be null");
+            throw new IllegalArgumentException("the dam gate cannot be null");
         }
 
-        GateLeap<?, ?> gate = null;
+        DamGate<?, ?> dam = null;
 
-        final Map<Classification<?>, GateLeap<?, ?>> gateMap = mGateMap;
+        final Map<Classification<?>, DamGate<?, ?>> damMap = mDamMap;
 
-        for (final GateLeap<?, ?> gateLeap : gateMap.values()) {
+        for (final DamGate<?, ?> damGate : damMap.values()) {
 
-            if (gateLeap.leap == leap) {
+            if (damGate.gate == gate) {
 
-                gate = gateLeap;
+                dam = damGate;
 
                 break;
             }
         }
 
-        if (gate == null) {
+        if (dam == null) {
 
-            throw new IllegalArgumentException("the waterfall does not retain the gate " + leap);
+            throw new IllegalArgumentException("the waterfall does not retain the dam " + gate);
         }
 
-        return new DataGate<TYPE>(gate, new Classification<TYPE>() {});
+        return new DataDam<TYPE>(dam, new Classification<TYPE>() {});
     }
 
     @Override
-    public <TYPE> Gate<TYPE> on(final Classification<TYPE> gateClassification) {
+    public <TYPE> Dam<TYPE> on(final Classification<TYPE> damClassification) {
 
-        final GateLeap<?, ?> gate = findBestMatch(gateClassification);
+        final DamGate<?, ?> dam = findBestMatch(damClassification);
 
-        if (gate == null) {
+        if (dam == null) {
 
             throw new IllegalArgumentException(
-                    "the waterfall does not retain any gate of classification type "
-                            + gateClassification);
+                    "the waterfall does not retain any dam of classification type "
+                            + damClassification);
         }
 
-        return new DataGate<TYPE>(gate, gateClassification);
+        return new DataDam<TYPE>(dam, damClassification);
     }
 
     @Override
@@ -1254,20 +1331,20 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
             return chain();
         }
 
-        return in(1).chainBarrage(new BarrageLeap<OUT>(size)).in(size).chain();
+        return in(1).chainPump(new PumpGate<OUT>(size)).in(size).chain();
     }
 
     /**
      * Distributes all the data flowing through this waterfall in the different output streams by
-     * means of the specified barrage.
+     * means of the specified pump.
      *
      * @return the newly created waterfall.
      */
-    public Waterfall<SOURCE, OUT, OUT> distribute(final Barrage<OUT> barrage) {
+    public Waterfall<SOURCE, OUT, OUT> distribute(final Pump<OUT> pump) {
 
-        if (barrage == null) {
+        if (pump == null) {
 
-            throw new IllegalArgumentException("the waterfall barrage cannot be null");
+            throw new IllegalArgumentException("the waterfall pump cannot be null");
         }
 
         final DataFall<IN, OUT>[] falls = mFalls;
@@ -1275,7 +1352,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
         if (falls == NO_FALL) {
 
             //noinspection unchecked
-            return (Waterfall<SOURCE, OUT, OUT>) start().distribute(barrage);
+            return (Waterfall<SOURCE, OUT, OUT>) start().distribute(pump);
         }
 
         final int size = mSize;
@@ -1285,7 +1362,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
             return chain();
         }
 
-        return in(1).chainBarrage(new BarrageLeap<OUT>(barrage, size)).in(size).chain();
+        return in(1).chainPump(new PumpGate<OUT>(pump, size)).in(size).chain();
     }
 
     /**
@@ -1352,9 +1429,9 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
         }
 
         //noinspection unchecked
-        return new Waterfall<SOURCE, IN, OUT>(mSource, mGateMap, mGate, mBackgroundPoolSize,
-                                              mBackgroundCurrent, mBarrage, mSize, null, generator,
-                                              mFalls);
+        return new Waterfall<SOURCE, IN, OUT>(mSource, mDamMap, mDamClassification,
+                                              mBackgroundPoolSize, mBackgroundCurrent, mPump, mSize,
+                                              null, generator, mFalls);
     }
 
     /**
@@ -1371,9 +1448,9 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
         }
 
         //noinspection unchecked
-        return new Waterfall<SOURCE, IN, OUT>(mSource, mGateMap, mGate, mBackgroundPoolSize,
-                                              mBackgroundCurrent, mBarrage, fallCount, mCurrent,
-                                              mCurrentGenerator, mFalls);
+        return new Waterfall<SOURCE, IN, OUT>(mSource, mDamMap, mDamClassification,
+                                              mBackgroundPoolSize, mBackgroundCurrent, mPump,
+                                              fallCount, mCurrent, mCurrentGenerator, mFalls);
     }
 
     /**
@@ -1390,9 +1467,9 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
         }
 
         //noinspection unchecked
-        return new Waterfall<SOURCE, IN, OUT>(mSource, mGateMap, mGate, mBackgroundPoolSize,
-                                              mBackgroundCurrent, mBarrage, mSize, current, null,
-                                              mFalls);
+        return new Waterfall<SOURCE, IN, OUT>(mSource, mDamMap, mDamClassification,
+                                              mBackgroundPoolSize, mBackgroundCurrent, mPump, mSize,
+                                              current, null, mFalls);
     }
 
     /**
@@ -1428,8 +1505,9 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
         }
 
         //noinspection unchecked
-        return new Waterfall<SOURCE, IN, OUT>(mSource, mGateMap, mGate, poolSize, backgroundCurrent,
-                                              mBarrage, fallCount, backgroundCurrent, null, mFalls);
+        return new Waterfall<SOURCE, IN, OUT>(mSource, mDamMap, mDamClassification, poolSize,
+                                              backgroundCurrent, mPump, fallCount,
+                                              backgroundCurrent, null, mFalls);
     }
 
     /**
@@ -1460,87 +1538,9 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
         }
 
         //noinspection unchecked
-        return new Waterfall<SOURCE, IN, OUT>(mSource, mGateMap, mGate, poolSize, backgroundCurrent,
-                                              mBarrage, poolSize, backgroundCurrent, null, mFalls);
-    }
-
-    /**
-     * Tells the waterfall to lock the gate of the specified classification type, that is, the gate
-     * will not be accessible anymore to the ones requiring it.
-     *
-     * @param gateClassification the gate classification.
-     * @param <TYPE>             the leap type.
-     * @return the newly created waterfall.
-     */
-    public <TYPE> Waterfall<SOURCE, IN, OUT> lock(final Classification<TYPE> gateClassification) {
-
-        final GateLeap<?, ?> gate = findBestMatch(gateClassification);
-
-        if (gate == null) {
-
-            return this;
-        }
-
-        final HashMap<Classification<?>, GateLeap<?, ?>> gateMap =
-                new HashMap<Classification<?>, GateLeap<?, ?>>(mGateMap);
-
-        final Iterator<GateLeap<?, ?>> iterator = gateMap.values().iterator();
-
-        while (iterator.hasNext()) {
-
-            if (gate == iterator.next()) {
-
-                iterator.remove();
-            }
-        }
-
-        //noinspection unchecked
-        return new Waterfall<SOURCE, IN, OUT>(mSource, gateMap, mGate, mBackgroundPoolSize,
-                                              mBackgroundCurrent, mBarrage, mSize, mCurrent,
-                                              mCurrentGenerator, mFalls);
-    }
-
-    /**
-     * Tells the waterfall to lock the gate handling the specified leap, that is, the gate
-     * will not be accessible anymore to the ones requiring it..
-     *
-     * @param leap   the leap instance.
-     * @param <TYPE> the leap type.
-     * @return the newly created waterfall.
-     */
-    public <TYPE extends Leap<?, ?>> Waterfall<SOURCE, IN, OUT> lock(final TYPE leap) {
-
-        if (leap == null) {
-
-            return this;
-        }
-
-        boolean isChanged = false;
-
-        final HashMap<Classification<?>, GateLeap<?, ?>> gateMap =
-                new HashMap<Classification<?>, GateLeap<?, ?>>(mGateMap);
-
-        final Iterator<GateLeap<?, ?>> iterator = gateMap.values().iterator();
-
-        while (iterator.hasNext()) {
-
-            if (leap == iterator.next().leap) {
-
-                iterator.remove();
-
-                isChanged = true;
-            }
-        }
-
-        if (!isChanged) {
-
-            return this;
-        }
-
-        //noinspection unchecked
-        return new Waterfall<SOURCE, IN, OUT>(mSource, gateMap, mGate, mBackgroundPoolSize,
-                                              mBackgroundCurrent, mBarrage, mSize, mCurrent,
-                                              mCurrentGenerator, mFalls);
+        return new Waterfall<SOURCE, IN, OUT>(mSource, mDamMap, mDamClassification, poolSize,
+                                              backgroundCurrent, mPump, poolSize, backgroundCurrent,
+                                              null, mFalls);
     }
 
     /**
@@ -1618,7 +1618,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
     /**
      * Creates and returns a new waterfall generating from this one.
      * <p/>
-     * Note that the gates, the size and the currents of this waterfall will be retained.
+     * Note that the dams, the size and the currents of this waterfall will be retained.
      *
      * @return the newly created waterfall.
      */
@@ -1626,23 +1626,23 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
         final int size = mSize;
 
-        final FreeLeap<OUT> leap = freeLeap();
-        final Leap[] leaps = new Leap[size];
+        final OpenGate<OUT> gate = openGate();
+        final Gate[] gates = new Gate[size];
 
-        Arrays.fill(leaps, leap);
+        Arrays.fill(gates, gate);
 
-        final Map<Classification<?>, GateLeap<?, ?>> gateMap = Collections.emptyMap();
+        final Map<Classification<?>, DamGate<?, ?>> damMap = Collections.emptyMap();
 
         //noinspection unchecked
-        return new Waterfall<OUT, OUT, OUT>(null, gateMap, mGate, mBackgroundPoolSize,
+        return new Waterfall<OUT, OUT, OUT>(null, damMap, mDamClassification, mBackgroundPoolSize,
                                             mBackgroundCurrent, null, size, mCurrent,
-                                            mCurrentGenerator, leaps);
+                                            mCurrentGenerator, gates);
     }
 
     /**
      * Creates and returns a new waterfall generating from this one.
      * <p/>
-     * Note that the gates, the size and the currents of this waterfall will be retained.
+     * Note that the dams, the size and the currents of this waterfall will be retained.
      *
      * @param dataType the data type.
      * @param <DATA>   the data type.
@@ -1656,7 +1656,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
     /**
      * Creates and returns a new waterfall generating from this one.
      * <p/>
-     * Note that the gates, the size and the currents of this waterfall will be retained.
+     * Note that the dams, the size and the currents of this waterfall will be retained.
      *
      * @param classification the data classification.
      * @param <DATA>         the data type.
@@ -1674,119 +1674,119 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
     }
 
     /**
-     * Creates and returns a new waterfall chained to the leaps returned by the specified
+     * Creates and returns a new waterfall chained to the gates returned by the specified
      * generator.
      * <p/>
-     * Note that the gates, the size and the currents of this waterfall will be retained.
+     * Note that the dams, the size and the currents of this waterfall will be retained.
      *
-     * @param generator the leap generator.
+     * @param generator the gate generator.
      * @param <NIN>     the new input data type.
      * @param <NOUT>    the new output data type.
      * @return the newly created waterfall.
      */
-    public <NIN, NOUT> Waterfall<NIN, NIN, NOUT> start(final LeapGenerator<NIN, NOUT> generator) {
+    public <NIN, NOUT> Waterfall<NIN, NIN, NOUT> start(final GateGenerator<NIN, NOUT> generator) {
 
         if (generator == null) {
 
             throw new IllegalArgumentException("the waterfall generator cannot be null");
         }
 
-        final Map<Classification<?>, GateLeap<?, ?>> gateMap = Collections.emptyMap();
+        final Map<Classification<?>, DamGate<?, ?>> damMap = Collections.emptyMap();
 
         final int size = mSize;
 
         if (size == 1) {
 
-            final Leap<NIN, NOUT> leap = generator.start(0);
+            final Gate<NIN, NOUT> gate = generator.start(0);
 
-            registerLeap(leap);
+            registerGate(gate);
 
             //noinspection unchecked
-            return new Waterfall<NIN, NIN, NOUT>(null, gateMap, mGate, mBackgroundPoolSize,
-                                                 mBackgroundCurrent, null, 1, mCurrent,
-                                                 mCurrentGenerator, leap);
+            return new Waterfall<NIN, NIN, NOUT>(null, damMap, mDamClassification,
+                                                 mBackgroundPoolSize, mBackgroundCurrent, null, 1,
+                                                 mCurrent, mCurrentGenerator, gate);
         }
 
-        if (mGate != null) {
+        if (mDamClassification != null) {
 
-            throw new IllegalStateException("cannot make a gate from more than one leap");
+            throw new IllegalStateException("cannot make a dam from more than one gate");
         }
 
-        final Leap[] leaps = new Leap[size];
+        final Gate[] gates = new Gate[size];
 
         for (int i = 0; i < size; ++i) {
 
-            final Leap<NIN, NOUT> leap = generator.start(i);
+            final Gate<NIN, NOUT> gate = generator.start(i);
 
-            registerLeap(leap);
+            registerGate(gate);
 
-            leaps[i] = leap;
+            gates[i] = gate;
         }
 
         //noinspection unchecked
-        return new Waterfall<NIN, NIN, NOUT>(null, gateMap, null, mBackgroundPoolSize,
+        return new Waterfall<NIN, NIN, NOUT>(null, damMap, null, mBackgroundPoolSize,
                                              mBackgroundCurrent, null, size, mCurrent,
-                                             mCurrentGenerator, leaps);
+                                             mCurrentGenerator, gates);
     }
 
     /**
-     * Creates and returns a new waterfall chained to the specified leap.
+     * Creates and returns a new waterfall chained to the specified gate.
      * <p/>
-     * Note that the gates, the size and the currents of this waterfall will be retained.
+     * Note that the dams, the size and the currents of this waterfall will be retained.
      *
-     * @param leap   the leap instance.
+     * @param gate   the gate instance.
      * @param <NIN>  the new input data type.
      * @param <NOUT> the new output data type.
      * @return the newly created waterfall.
      */
-    public <NIN, NOUT> Waterfall<NIN, NIN, NOUT> start(final Leap<NIN, NOUT> leap) {
+    public <NIN, NOUT> Waterfall<NIN, NIN, NOUT> start(final Gate<NIN, NOUT> gate) {
 
-        if (leap == null) {
+        if (gate == null) {
 
-            throw new IllegalArgumentException("the waterfall leap cannot be null");
+            throw new IllegalArgumentException("the waterfall gate cannot be null");
         }
 
-        registerLeap(leap);
+        registerGate(gate);
 
-        final Map<Classification<?>, GateLeap<?, ?>> gateMap = Collections.emptyMap();
+        final Map<Classification<?>, DamGate<?, ?>> damMap = Collections.emptyMap();
 
         //noinspection unchecked
-        return new Waterfall<NIN, NIN, NOUT>(null, gateMap, mGate, mBackgroundPoolSize,
+        return new Waterfall<NIN, NIN, NOUT>(null, damMap, mDamClassification, mBackgroundPoolSize,
                                              mBackgroundCurrent, null, mSize, mCurrent,
-                                             mCurrentGenerator, leap);
+                                             mCurrentGenerator, gate);
     }
 
-    private Waterfall<SOURCE, OUT, OUT> chainBarrage(final BarrageLeap<OUT> barrageLeap) {
+    private Waterfall<SOURCE, OUT, OUT> chainPump(final PumpGate<OUT> pumpGate) {
 
-        final Waterfall<SOURCE, OUT, OUT> waterfall = chain(barrageLeap);
+        final Waterfall<SOURCE, OUT, OUT> waterfall = chain(pumpGate);
 
         //noinspection unchecked
-        return new Waterfall<SOURCE, OUT, OUT>(waterfall.mSource, waterfall.mGateMap,
-                                               waterfall.mGate, mBackgroundPoolSize,
-                                               mBackgroundCurrent, barrageLeap, waterfall.mSize,
+        return new Waterfall<SOURCE, OUT, OUT>(waterfall.mSource, waterfall.mDamMap,
+                                               waterfall.mDamClassification, mBackgroundPoolSize,
+                                               mBackgroundCurrent, pumpGate, waterfall.mSize,
                                                waterfall.mCurrent, waterfall.mCurrentGenerator,
                                                waterfall.mFalls);
     }
 
-    private GateLeap<?, ?> findBestMatch(final Classification<?> gateClassification) {
+    private DamGate<?, ?> findBestMatch(final Classification<?> damClassification) {
 
-        final Map<Classification<?>, GateLeap<?, ?>> gateMap = mGateMap;
+        final Map<Classification<?>, DamGate<?, ?>> damMap = mDamMap;
 
-        GateLeap<?, ?> leap = gateMap.get(gateClassification);
+        DamGate<?, ?> gate = damMap.get(damClassification);
 
-        if (leap == null) {
+        if (gate == null) {
 
             Classification<?> bestMatch = null;
 
-            for (final Entry<Classification<?>, GateLeap<?, ?>> entry : gateMap.entrySet()) {
+            for (final Entry<Classification<?>, DamGate<?, ?>> entry : damMap.entrySet()) {
 
                 final Classification<?> type = entry.getKey();
 
-                if (gateClassification.isAssignableFrom(type)) {
+                if (damClassification.isAssignableFrom(type)) {
 
                     if ((bestMatch == null) || type.isAssignableFrom(bestMatch)) {
 
-                        leap = entry.getValue();
+                        gate = entry.getValue();
 
                         bestMatch = type;
                     }
@@ -1794,7 +1794,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
             }
         }
 
-        return leap;
+        return gate;
     }
 
     private int getBestPoolSize() {
@@ -1809,15 +1809,15 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
         return (processors / 2);
     }
 
-    private void mapGate(final HashMap<Classification<?>, GateLeap<?, ?>> gateMap,
-            final Classification<?> gateClassification, final GateLeap<?, ?> leap) {
+    private void mapDam(final HashMap<Classification<?>, DamGate<?, ?>> damMap,
+            final Classification<?> damClassification, final DamGate<?, ?> gate) {
 
-        if (!gateClassification.getRawType().isInstance(leap.leap)) {
+        if (!damClassification.getRawType().isInstance(gate.gate)) {
 
             throw new IllegalArgumentException(
-                    "the leap does not implement the gate classification type");
+                    "the gate does not implement the dam classification type");
         }
 
-        gateMap.put(gateClassification, leap);
+        damMap.put(damClassification, gate);
     }
 }

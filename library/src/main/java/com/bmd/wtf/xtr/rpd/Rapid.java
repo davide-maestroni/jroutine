@@ -16,9 +16,9 @@ package com.bmd.wtf.xtr.rpd;
 import com.bmd.wtf.crr.Current;
 import com.bmd.wtf.crr.CurrentGenerator;
 import com.bmd.wtf.fll.Classification;
-import com.bmd.wtf.flw.Gate;
-import com.bmd.wtf.lps.Leap;
-import com.bmd.wtf.lps.LeapGenerator;
+import com.bmd.wtf.flw.Dam;
+import com.bmd.wtf.lps.Gate;
+import com.bmd.wtf.lps.GateGenerator;
 
 /**
  * This class is meant to provide utility methods for employing rapid classes, which use reflection
@@ -180,19 +180,19 @@ public class Rapid {
     }
 
     /**
-     * Creates and returns a rapid gate wrapping the specified gate.
+     * Creates and returns a rapid dam wrapping the specified gate.
      *
-     * @param gate   the waterfall to wrap.
+     * @param dam    the waterfall to wrap.
      * @param <TYPE> the gate type.
      * @return the newly created rapid gate.
      */
-    public static <TYPE> RapidGate<TYPE> gate(final Gate<TYPE> gate) {
+    public static <TYPE> RapidDam<TYPE> dam(final Dam<TYPE> dam) {
 
-        return new DefaultRapidGate<TYPE>(gate);
+        return new DefaultRapidDam<TYPE>(dam);
     }
 
     /**
-     * Creates and returns a leap generator which instantiates objects of the specified
+     * Creates and returns a gate generator which instantiates objects of the specified
      * classification through a method taking the specified parameters. A method taking
      * an additional Integer parameter (that is, the fall number) is preferred to the default one.
      * A one taking a primitive int is preferred to the Integer. Finally, a method annotated
@@ -216,18 +216,18 @@ public class Rapid {
      * </pre>
      *
      * @param generator      the generator object whose method will be called.
-     * @param classification the leap classification.
+     * @param classification the gate classification.
      * @param args           the arguments to be passed to the method.
-     * @return the newly created leap generator.
+     * @return the newly created gate generator.
      */
-    public static <IN, OUT> LeapGenerator<IN, OUT> leapGenerator(final Object generator,
-            final Classification<? extends Leap<IN, OUT>> classification, final Object... args) {
+    public static <IN, OUT> GateGenerator<IN, OUT> gateGenerator(final Object generator,
+            final Classification<? extends Gate<IN, OUT>> classification, final Object... args) {
 
-        return RapidGenerators.leapGenerator(generator, classification, args);
+        return RapidGenerators.gateGenerator(generator, classification, args);
     }
 
     /**
-     * Creates and returns a leap generator which instantiates objects of the specified
+     * Creates and returns a gate generator which instantiates objects of the specified
      * type through a constructor taking the specified parameters. A constructor taking
      * an additional Integer parameter (that is, the fall number) is preferred to the default one.
      * A one taking a primitive int is preferred to the Integer. Finally, a constructor annotated
@@ -250,20 +250,20 @@ public class Rapid {
      *     </code>
      * </pre>
      *
-     * @param leap        the leap object to instantiate.
+     * @param gate        the gate object to instantiate.
      * @param contextArgs the arguments to be passed to the constructor.
-     * @return the newly created leap generator.
+     * @return the newly created gate generator.
      */
-    public static <IN, OUT> LeapGenerator<IN, OUT> leapGenerator(final Leap<IN, OUT> leap,
+    public static <IN, OUT> GateGenerator<IN, OUT> gateGenerator(final Gate<IN, OUT> gate,
             final Object... contextArgs) {
 
         //noinspection unchecked
-        return RapidGenerators.leapGenerator((Class<? extends Leap<IN, OUT>>) leap.getClass(),
+        return RapidGenerators.gateGenerator((Class<? extends Gate<IN, OUT>>) gate.getClass(),
                                              contextArgs);
     }
 
     /**
-     * Creates and returns a leap generator which instantiates objects of the specified
+     * Creates and returns a gate generator which instantiates objects of the specified
      * classification through a constructor taking the specified parameters. A constructor taking
      * an additional Integer parameter (that is, the fall number) is preferred to the default one.
      * A one taking a primitive int is preferred to the Integer. Finally, a constructor annotated
@@ -286,19 +286,19 @@ public class Rapid {
      *     </code>
      * </pre>
      *
-     * @param classification the leap classification.
+     * @param classification the gate classification.
      * @param contextArgs    the arguments to be passed to the constructor.
-     * @return the newly created leap generator.
+     * @return the newly created gate generator.
      */
-    public static <IN, OUT> LeapGenerator<IN, OUT> leapGenerator(
-            final Classification<? extends Leap<IN, OUT>> classification,
+    public static <IN, OUT> GateGenerator<IN, OUT> gateGenerator(
+            final Classification<? extends Gate<IN, OUT>> classification,
             final Object... contextArgs) {
 
-        return RapidGenerators.leapGenerator(classification.getRawType(), contextArgs);
+        return RapidGenerators.gateGenerator(classification.getRawType(), contextArgs);
     }
 
     /**
-     * Creates and returns a leap generator which instantiates objects of the specified
+     * Creates and returns a gate generator which instantiates objects of the specified
      * type through a constructor taking the specified parameters. A constructor taking
      * an additional Integer parameter (that is, the fall number) is preferred to the default one.
      * A one taking a primitive int is preferred to the Integer. Finally, a constructor annotated
@@ -321,13 +321,13 @@ public class Rapid {
      *     </code>
      * </pre>
      *
-     * @param type        the leap type.
+     * @param type        the gate type.
      * @param contextArgs the arguments to be passed to the constructor.
-     * @return the newly created leap generator.
+     * @return the newly created gate generator.
      */
-    public static <IN, OUT> LeapGenerator<IN, OUT> leapGenerator(
-            final Class<? extends Leap<IN, OUT>> type, final Object... contextArgs) {
+    public static <IN, OUT> GateGenerator<IN, OUT> gateGenerator(
+            final Class<? extends Gate<IN, OUT>> type, final Object... contextArgs) {
 
-        return RapidGenerators.leapGenerator(type, contextArgs);
+        return RapidGenerators.gateGenerator(type, contextArgs);
     }
 }

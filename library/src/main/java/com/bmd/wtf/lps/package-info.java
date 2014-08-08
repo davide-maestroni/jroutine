@@ -13,7 +13,7 @@
  */
 
 /**
- * Package containing classes and definitions related to waterfall leaps.
+ * Package containing classes and definitions related to waterfall gates.
  * <p/>
  * Created by davide on 6/27/14.
  */

@@ -14,57 +14,37 @@
 package com.bmd.wtf.fll;
 
 import com.bmd.wtf.flw.River;
-import com.bmd.wtf.lps.Leap;
-import com.bmd.wtf.lps.LeapDecorator;
-
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
+import com.bmd.wtf.lps.Gate;
+import com.bmd.wtf.lps.GateDecorator;
 
 /**
- * Leap decorator used to protect a common leap with a gate.
+ * Gate decorator used to protect a gate when the same instance handles different streams.
  * <p/>
- * Created by davide on 6/13/14.
+ * Created by davide on 6/14/14.
  *
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class GateLeap<IN, OUT> extends LeapDecorator<IN, OUT> {
+class BarrageGate<IN, OUT> extends GateDecorator<IN, OUT> {
 
-    final Condition condition;
-
-    final Leap<IN, OUT> leap;
-
-    final ReentrantLock lock;
+    private final Object mMutex = new Object();
 
     /**
      * Constructor.
      *
-     * @param wrapped the wrapped leap.
+     * @param wrapped the wrapped gate.
      */
-    public GateLeap(final Leap<IN, OUT> wrapped) {
+    public BarrageGate(final Gate<IN, OUT> wrapped) {
 
         super(wrapped);
-
-        leap = wrapped;
-        lock = new ReentrantLock();
-        condition = lock.newCondition();
     }
 
     @Override
     public void onFlush(final River<IN> upRiver, final River<OUT> downRiver, final int fallNumber) {
 
-        final ReentrantLock lock = this.lock;
-        lock.lock();
-
-        try {
+        synchronized (mMutex) {
 
             super.onFlush(upRiver, downRiver, fallNumber);
-
-        } finally {
-
-            condition.signalAll();
-
-            lock.unlock();
         }
     }
 
@@ -72,18 +52,9 @@ class GateLeap<IN, OUT> extends LeapDecorator<IN, OUT> {
     public void onPush(final River<IN> upRiver, final River<OUT> downRiver, final int fallNumber,
             final IN drop) {
 
-        final ReentrantLock lock = this.lock;
-        lock.lock();
-
-        try {
+        synchronized (mMutex) {
 
             super.onPush(upRiver, downRiver, fallNumber, drop);
-
-        } finally {
-
-            condition.signalAll();
-
-            lock.unlock();
         }
     }
 
@@ -91,18 +62,9 @@ class GateLeap<IN, OUT> extends LeapDecorator<IN, OUT> {
     public void onUnhandled(final River<IN> upRiver, final River<OUT> downRiver,
             final int fallNumber, final Throwable throwable) {
 
-        final ReentrantLock lock = this.lock;
-        lock.lock();
-
-        try {
+        synchronized (mMutex) {
 
             super.onUnhandled(upRiver, downRiver, fallNumber, throwable);
-
-        } finally {
-
-            condition.signalAll();
-
-            lock.unlock();
         }
     }
 }

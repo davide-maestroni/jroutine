@@ -17,8 +17,8 @@ import com.bmd.wtf.crr.Current;
 import com.bmd.wtf.fll.Classification;
 import com.bmd.wtf.flw.Fall;
 import com.bmd.wtf.flw.Stream;
-import com.bmd.wtf.lps.FreeLeap;
-import com.bmd.wtf.lps.Leap;
+import com.bmd.wtf.lps.Gate;
+import com.bmd.wtf.lps.OpenGate;
 import com.bmd.wtf.xtr.rpd.RapidAnnotations.Generator;
 
 import junit.framework.TestCase;
@@ -42,7 +42,7 @@ public class RapidGeneratorsTest extends TestCase {
 
         try {
 
-            Rapid.leapGenerator(LeapError1.class, 2);
+            Rapid.gateGenerator(GateError1.class, 2);
 
             fail();
 
@@ -52,7 +52,7 @@ public class RapidGeneratorsTest extends TestCase {
 
         try {
 
-            Rapid.leapGenerator(LeapError2.class, 2);
+            Rapid.gateGenerator(GateError2.class, 2);
 
             fail();
 
@@ -62,7 +62,7 @@ public class RapidGeneratorsTest extends TestCase {
 
         try {
 
-            Rapid.leapGenerator(LeapError3.class, 2);
+            Rapid.gateGenerator(GateError3.class, 2);
 
             fail();
 
@@ -72,7 +72,7 @@ public class RapidGeneratorsTest extends TestCase {
 
         try {
 
-            Rapid.leapGenerator(LeapError4.class, 2);
+            Rapid.gateGenerator(GateError4.class, 2);
 
             fail();
 
@@ -82,7 +82,7 @@ public class RapidGeneratorsTest extends TestCase {
 
         try {
 
-            Rapid.leapGenerator(LeapError5.class, 2);
+            Rapid.gateGenerator(GateError5.class, 2);
 
             fail();
 
@@ -92,7 +92,7 @@ public class RapidGeneratorsTest extends TestCase {
 
         try {
 
-            Rapid.leapGenerator(LeapError6.class, 2);
+            Rapid.gateGenerator(GateError6.class, 2);
 
             fail();
 
@@ -102,8 +102,8 @@ public class RapidGeneratorsTest extends TestCase {
 
         try {
 
-            Rapid.leapGenerator(new LeapGeneratorError1(),
-                                new Classification<Leap<Object, Object>>() {}, 2);
+            Rapid.gateGenerator(new GateGeneratorError1(),
+                                new Classification<Gate<Object, Object>>() {}, 2);
 
             fail();
 
@@ -113,8 +113,8 @@ public class RapidGeneratorsTest extends TestCase {
 
         try {
 
-            Rapid.leapGenerator(new LeapGeneratorError2(),
-                                new Classification<Leap<Object, Object>>() {}, 2);
+            Rapid.gateGenerator(new GateGeneratorError2(),
+                                new Classification<Gate<Object, Object>>() {}, 2);
 
             fail();
 
@@ -124,8 +124,8 @@ public class RapidGeneratorsTest extends TestCase {
 
         try {
 
-            Rapid.leapGenerator(new LeapGeneratorError3(),
-                                new Classification<Leap<Object, Object>>() {}, 2);
+            Rapid.gateGenerator(new GateGeneratorError3(),
+                                new Classification<Gate<Object, Object>>() {}, 2);
 
             fail();
 
@@ -135,8 +135,8 @@ public class RapidGeneratorsTest extends TestCase {
 
         try {
 
-            Rapid.leapGenerator(new LeapGeneratorError4(),
-                                new Classification<Leap<Object, Object>>() {}, 2);
+            Rapid.gateGenerator(new GateGeneratorError4(),
+                                new Classification<Gate<Object, Object>>() {}, 2);
 
             fail();
 
@@ -146,8 +146,8 @@ public class RapidGeneratorsTest extends TestCase {
 
         try {
 
-            Rapid.leapGenerator(new LeapGeneratorError5(),
-                                new Classification<Leap<Object, Object>>() {}, 2);
+            Rapid.gateGenerator(new GateGeneratorError5(),
+                                new Classification<Gate<Object, Object>>() {}, 2);
 
             fail();
 
@@ -157,8 +157,8 @@ public class RapidGeneratorsTest extends TestCase {
 
         try {
 
-            Rapid.leapGenerator(new LeapGeneratorError6(),
-                                new Classification<Leap<Object, Object>>() {}, 2);
+            Rapid.gateGenerator(new GateGeneratorError6(),
+                                new Classification<Gate<Object, Object>>() {}, 2);
 
             fail();
 
@@ -323,63 +323,63 @@ public class RapidGeneratorsTest extends TestCase {
         }
     }
 
-    public void testLeapGenerator() {
+    public void testGateGenerator() {
 
-        assertThat(Rapid.leapGenerator(Leap1.class).start(1)).isExactlyInstanceOf(Leap1.class);
-        assertThat(((Leap2) Rapid.leapGenerator(Leap2.class).start(1)).getNumber()).isEqualTo(1);
-        assertThat(((Leap3) Rapid.leapGenerator(Leap3.class).start(1)).getNumber()).isEqualTo(2);
-        assertThat(((Leap4) Rapid.leapGenerator(Leap4.class).start(1)).getNumber()).isEqualTo(4);
-        assertThat(((Leap5) Rapid.leapGenerator(Leap5.class).start(1)).getNumber()).isEqualTo(77);
-        assertThat(((Leap6) Rapid.leapGenerator(Leap6.class).start(3)).getNumber()).isEqualTo(5);
-        assertThat(((Leap7) Rapid.leapGenerator(Leap7.class).start(3)).getNumber()).isEqualTo(4);
-        assertThat(((Leap8) Rapid.leapGenerator(Leap8.class).start(3)).getNumber()).isEqualTo(5);
+        assertThat(Rapid.gateGenerator(Gate1.class).start(1)).isExactlyInstanceOf(Gate1.class);
+        assertThat(((Gate2) Rapid.gateGenerator(Gate2.class).start(1)).getNumber()).isEqualTo(1);
+        assertThat(((Gate3) Rapid.gateGenerator(Gate3.class).start(1)).getNumber()).isEqualTo(2);
+        assertThat(((Gate4) Rapid.gateGenerator(Gate4.class).start(1)).getNumber()).isEqualTo(4);
+        assertThat(((Gate5) Rapid.gateGenerator(Gate5.class).start(1)).getNumber()).isEqualTo(77);
+        assertThat(((Gate6) Rapid.gateGenerator(Gate6.class).start(3)).getNumber()).isEqualTo(5);
+        assertThat(((Gate7) Rapid.gateGenerator(Gate7.class).start(3)).getNumber()).isEqualTo(4);
+        assertThat(((Gate8) Rapid.gateGenerator(Gate8.class).start(3)).getNumber()).isEqualTo(5);
 
-        assertThat(Rapid.leapGenerator(Classification.ofType(Leap1.class))
-                        .start(1)).isExactlyInstanceOf(Leap1.class);
-        assertThat(((Leap2) Rapid.leapGenerator(Classification.ofType(Leap2.class))
+        assertThat(Rapid.gateGenerator(Classification.ofType(Gate1.class))
+                        .start(1)).isExactlyInstanceOf(Gate1.class);
+        assertThat(((Gate2) Rapid.gateGenerator(Classification.ofType(Gate2.class))
                                  .start(1)).getNumber()).isEqualTo(1);
-        assertThat(((Leap3) Rapid.leapGenerator(Classification.ofType(Leap3.class))
+        assertThat(((Gate3) Rapid.gateGenerator(Classification.ofType(Gate3.class))
                                  .start(1)).getNumber()).isEqualTo(2);
-        assertThat(((Leap4) Rapid.leapGenerator(Classification.ofType(Leap4.class))
+        assertThat(((Gate4) Rapid.gateGenerator(Classification.ofType(Gate4.class))
                                  .start(1)).getNumber()).isEqualTo(4);
-        assertThat(((Leap5) Rapid.leapGenerator(Classification.ofType(Leap5.class))
+        assertThat(((Gate5) Rapid.gateGenerator(Classification.ofType(Gate5.class))
                                  .start(1)).getNumber()).isEqualTo(77);
-        assertThat(((Leap6) Rapid.leapGenerator(Classification.ofType(Leap6.class))
+        assertThat(((Gate6) Rapid.gateGenerator(Classification.ofType(Gate6.class))
                                  .start(3)).getNumber()).isEqualTo(5);
-        assertThat(((Leap7) Rapid.leapGenerator(Classification.ofType(Leap7.class))
+        assertThat(((Gate7) Rapid.gateGenerator(Classification.ofType(Gate7.class))
                                  .start(3)).getNumber()).isEqualTo(4);
-        assertThat(((Leap8) Rapid.leapGenerator(Classification.ofType(Leap8.class))
+        assertThat(((Gate8) Rapid.gateGenerator(Classification.ofType(Gate8.class))
                                  .start(3)).getNumber()).isEqualTo(5);
 
-        assertThat(Rapid.leapGenerator(new Leap1()).start(1)).isExactlyInstanceOf(Leap1.class);
-        assertThat(((Leap2) Rapid.leapGenerator(new Leap2(22)).start(1)).getNumber()).isEqualTo(1);
-        assertThat(((Leap3) Rapid.leapGenerator(new Leap3(33)).start(1)).getNumber()).isEqualTo(2);
-        assertThat(((Leap4) Rapid.leapGenerator(new Leap4(44)).start(1)).getNumber()).isEqualTo(4);
-        assertThat(((Leap5) Rapid.leapGenerator(new Leap5(55)).start(1)).getNumber()).isEqualTo(77);
-        assertThat(((Leap6) Rapid.leapGenerator(new Leap6(66)).start(3)).getNumber()).isEqualTo(5);
-        assertThat(((Leap7) Rapid.leapGenerator(new Leap7(77)).start(3)).getNumber()).isEqualTo(4);
+        assertThat(Rapid.gateGenerator(new Gate1()).start(1)).isExactlyInstanceOf(Gate1.class);
+        assertThat(((Gate2) Rapid.gateGenerator(new Gate2(22)).start(1)).getNumber()).isEqualTo(1);
+        assertThat(((Gate3) Rapid.gateGenerator(new Gate3(33)).start(1)).getNumber()).isEqualTo(2);
+        assertThat(((Gate4) Rapid.gateGenerator(new Gate4(44)).start(1)).getNumber()).isEqualTo(4);
+        assertThat(((Gate5) Rapid.gateGenerator(new Gate5(55)).start(1)).getNumber()).isEqualTo(77);
+        assertThat(((Gate6) Rapid.gateGenerator(new Gate6(66)).start(3)).getNumber()).isEqualTo(5);
+        assertThat(((Gate7) Rapid.gateGenerator(new Gate7(77)).start(3)).getNumber()).isEqualTo(4);
 
         assertThat(
-                ((LeapX) Rapid.leapGenerator(LeapX.class, this, new CopyOnWriteArrayList<Object>(),
+                ((GateX) Rapid.gateGenerator(GateX.class, this, new CopyOnWriteArrayList<Object>(),
                                              null, null).start(1)).getNumber()).isEqualTo(33);
-        assertThat(((LeapX) Rapid.leapGenerator(new LeapX(null, null, 11), this,
+        assertThat(((GateX) Rapid.gateGenerator(new GateX(null, null, 11), this,
                                                 new CopyOnWriteArrayList<Object>(), null, null)
                                  .start(1)).getNumber()).isEqualTo(33);
         assertThat(
-                ((LeapX) Rapid.leapGenerator(LeapX.class, this, new CopyOnWriteArrayList<Object>(),
+                ((GateX) Rapid.gateGenerator(GateX.class, this, new CopyOnWriteArrayList<Object>(),
                                              null).start(1)).getNumber()).isEqualTo(12);
         assertThat(
-                ((LeapX) Rapid.leapGenerator(LeapX.class, this, new LinkedList<Object>(), null, 2)
+                ((GateX) Rapid.gateGenerator(GateX.class, this, new LinkedList<Object>(), null, 2)
                               .start(1)).getNumber()).isEqualTo(24);
-        assertThat(((LeapX) Rapid.leapGenerator(LeapX.class, this, new ArrayList<Object>(), null, 2)
+        assertThat(((GateX) Rapid.gateGenerator(GateX.class, this, new ArrayList<Object>(), null, 2)
                                  .start(1)).getNumber()).isEqualTo(46);
         assertThat(
-                ((Leap2) Rapid.leapGenerator(LeapX1.class, this, new ArrayList<Object>(), null, 4)
+                ((Gate2) Rapid.gateGenerator(GateX1.class, this, new ArrayList<Object>(), null, 4)
                               .start(1)).getNumber()).isEqualTo(81);
 
         try {
 
-            Rapid.leapGenerator(LeapX.class, this, new CopyOnWriteArrayList<Object>(), null, 4);
+            Rapid.gateGenerator(GateX.class, this, new CopyOnWriteArrayList<Object>(), null, 4);
 
             fail();
 
@@ -389,7 +389,7 @@ public class RapidGeneratorsTest extends TestCase {
 
         try {
 
-            Rapid.leapGenerator(LeapX1.class, this, new ArrayList<Object>(), null, 4, "test");
+            Rapid.gateGenerator(GateX1.class, this, new ArrayList<Object>(), null, 4, "test");
 
             fail();
 
@@ -399,7 +399,7 @@ public class RapidGeneratorsTest extends TestCase {
 
         try {
 
-            Rapid.leapGenerator(LeapX2.class, this, new ArrayList<Object>(), 2);
+            Rapid.gateGenerator(GateX2.class, this, new ArrayList<Object>(), 2);
 
             fail();
 
@@ -407,49 +407,49 @@ public class RapidGeneratorsTest extends TestCase {
 
         }
 
-        final Classification<Leap<Object, Object>> classification =
-                new Classification<Leap<Object, Object>>() {};
+        final Classification<Gate<Object, Object>> classification =
+                new Classification<Gate<Object, Object>>() {};
 
-        assertThat(Rapid.leapGenerator(new LeapGenerator1(), classification)
-                        .start(1)).isExactlyInstanceOf(Leap1.class);
-        assertThat(((Leap2) Rapid.leapGenerator(new LeapGenerator2(), classification)
+        assertThat(Rapid.gateGenerator(new GateGenerator1(), classification)
+                        .start(1)).isExactlyInstanceOf(Gate1.class);
+        assertThat(((Gate2) Rapid.gateGenerator(new GateGenerator2(), classification)
                                  .start(1)).getNumber()).isEqualTo(1);
-        assertThat(((Leap2) Rapid.leapGenerator(new LeapGenerator2(),
-                                                Classification.ofType(Leap2.class))
+        assertThat(((Gate2) Rapid.gateGenerator(new GateGenerator2(),
+                                                Classification.ofType(Gate2.class))
                                  .start(1)).getNumber()).isEqualTo(3);
-        assertThat(Rapid.leapGenerator(new LeapGenerator3(), classification)
-                        .start(1)).isExactlyInstanceOf(Leap1.class);
-        assertThat(((Leap2) Rapid.leapGenerator(new LeapGenerator4(), classification,
+        assertThat(Rapid.gateGenerator(new GateGenerator3(), classification)
+                        .start(1)).isExactlyInstanceOf(Gate1.class);
+        assertThat(((Gate2) Rapid.gateGenerator(new GateGenerator4(), classification,
                                                 new LinkedList<Object>(), null, 2)
                                  .start(1)).getNumber()).isEqualTo(2);
-        assertThat(((Leap2) Rapid.leapGenerator(new LeapGenerator4(), classification,
+        assertThat(((Gate2) Rapid.gateGenerator(new GateGenerator4(), classification,
                                                 new LinkedList<Object>(), null)
                                  .start(1)).getNumber()).isEqualTo(1);
-        assertThat(((Leap2) Rapid.leapGenerator(new LeapGenerator4(), classification,
+        assertThat(((Gate2) Rapid.gateGenerator(new GateGenerator4(), classification,
                                                 new ArrayList<Object>(), null)
                                  .start(1)).getNumber()).isEqualTo(3);
-        assertThat(((Leap2) Rapid.leapGenerator(new LeapGenerator5(), classification,
+        assertThat(((Gate2) Rapid.gateGenerator(new GateGenerator5(), classification,
                                                 new LinkedList<Object>(), null, 2)
                                  .start(1)).getNumber()).isEqualTo(2);
-        assertThat(((Leap2) Rapid.leapGenerator(new LeapGenerator5(), classification,
+        assertThat(((Gate2) Rapid.gateGenerator(new GateGenerator5(), classification,
                                                 new LinkedList<Object>(), null)
                                  .start(1)).getNumber()).isEqualTo(1);
-        assertThat(((Leap2) Rapid.leapGenerator(new LeapGenerator5(), classification,
+        assertThat(((Gate2) Rapid.gateGenerator(new GateGenerator5(), classification,
                                                 new ArrayList<Object>(), null)
                                  .start(1)).getNumber()).isEqualTo(3);
-        assertThat(((Leap2) Rapid.leapGenerator(new LeapGenerator6(), classification,
+        assertThat(((Gate2) Rapid.gateGenerator(new GateGenerator6(), classification,
                                                 new LinkedList<Object>(), null, 2)
                                  .start(1)).getNumber()).isEqualTo(2);
-        assertThat(((Leap2) Rapid.leapGenerator(new LeapGenerator6(), classification,
+        assertThat(((Gate2) Rapid.gateGenerator(new GateGenerator6(), classification,
                                                 new LinkedList<Object>(), null)
                                  .start(1)).getNumber()).isEqualTo(44);
-        assertThat(((Leap2) Rapid.leapGenerator(new LeapGenerator6(), classification,
+        assertThat(((Gate2) Rapid.gateGenerator(new GateGenerator6(), classification,
                                                 new ArrayList<Object>(), null)
                                  .start(1)).getNumber()).isEqualTo(4);
 
         try {
 
-            Rapid.leapGenerator(new LeapGenerator6(), classification, new ArrayList<Object>(), 2);
+            Rapid.gateGenerator(new GateGenerator6(), classification, new ArrayList<Object>(), 2);
 
             fail();
 
@@ -732,15 +732,15 @@ public class RapidGeneratorsTest extends TestCase {
         }
     }
 
-    public static class Leap1 extends FreeLeap<Object> {
+    public static class Gate1 extends OpenGate<Object> {
 
     }
 
-    public static class Leap2 extends Leap1 {
+    public static class Gate2 extends Gate1 {
 
         private final int mNumber;
 
-        public Leap2(final int number) {
+        public Gate2(final int number) {
 
             mNumber = number;
         }
@@ -751,400 +751,400 @@ public class RapidGeneratorsTest extends TestCase {
         }
     }
 
-    public static class Leap3 extends Leap2 {
+    public static class Gate3 extends Gate2 {
 
-        public Leap3(final Integer number) {
+        public Gate3(final Integer number) {
 
             super(number + 1);
         }
 
         @SuppressWarnings("UnusedDeclaration")
-        public Leap3(final String ignored, final Integer number) {
+        public Gate3(final String ignored, final Integer number) {
 
             super(number + 11);
         }
     }
 
-    public static class Leap4 extends Leap2 {
+    public static class Gate4 extends Gate2 {
 
-        public Leap4(final int number) {
+        public Gate4(final int number) {
 
             super(number + 3);
         }
 
         @SuppressWarnings("UnusedDeclaration")
-        public Leap4(final Integer number) {
+        public Gate4(final Integer number) {
 
             super(number + 2);
         }
     }
 
-    public static class Leap5 extends Leap2 {
+    public static class Gate5 extends Gate2 {
 
         @Generator
-        public Leap5() {
+        public Gate5() {
 
             super(77);
         }
 
-        public Leap5(final int number) {
+        public Gate5(final int number) {
 
             super(number + 2);
         }
 
         @SuppressWarnings("UnusedDeclaration")
-        public Leap5(final Integer number) {
+        public Gate5(final Integer number) {
 
             super(number + 1);
         }
     }
 
-    public static class Leap6 extends Leap2 {
+    public static class Gate6 extends Gate2 {
 
         @SuppressWarnings("UnusedDeclaration")
-        public Leap6() {
+        public Gate6() {
 
             super(77);
         }
 
-        public Leap6(final int number) {
+        public Gate6(final int number) {
 
             super(number + 2);
         }
 
         @SuppressWarnings("UnusedDeclaration")
-        public Leap6(final Integer number) {
+        public Gate6(final Integer number) {
 
             super(number + 1);
         }
     }
 
-    public static class Leap7 extends Leap2 {
+    public static class Gate7 extends Gate2 {
 
         @SuppressWarnings("UnusedDeclaration")
-        public Leap7() {
+        public Gate7() {
 
             super(77);
         }
 
-        public Leap7(final int number) {
+        public Gate7(final int number) {
 
             super(number + 2);
         }
 
         @Generator
-        public Leap7(final Integer number) {
+        public Gate7(final Integer number) {
 
             super(number + 1);
         }
     }
 
-    public static class Leap8 extends Leap2 {
+    public static class Gate8 extends Gate2 {
 
         @Generator
-        public Leap8() {
+        public Gate8() {
 
             super(88);
         }
 
         @Generator
-        public Leap8(final int number) {
+        public Gate8(final int number) {
 
             super(number + 2);
         }
 
         @Generator
-        public Leap8(final Integer number) {
+        public Gate8(final Integer number) {
 
             super(number + 1);
         }
     }
 
-    public static class LeapError1 extends Leap1 {
+    public static class GateError1 extends Gate1 {
 
         @Generator
-        public LeapError1(final int ignored) {
+        public GateError1(final int ignored) {
 
         }
 
         @Generator
-        public LeapError1(final Integer ignored) {
+        public GateError1(final Integer ignored) {
 
         }
     }
 
-    public static class LeapError2 extends Leap1 {
+    public static class GateError2 extends Gate1 {
 
         @Generator
-        public LeapError2(final int ignored, final int number) {
-
-        }
-
-        @Generator
-        public LeapError2(final Integer ignored, final int number) {
-
-        }
-    }
-
-    public static class LeapError3 extends Leap1 {
-
-        @Generator
-        public LeapError3(final int ignored, final Integer number) {
+        public GateError2(final int ignored, final int number) {
 
         }
 
         @Generator
-        public LeapError3(final Integer ignored, final Integer number) {
+        public GateError2(final Integer ignored, final int number) {
 
         }
     }
 
-    public static class LeapError4 extends Leap1 {
-
-        @SuppressWarnings("UnusedDeclaration")
-        public LeapError4(final int ignored) {
-
-        }
-
-        @SuppressWarnings("UnusedDeclaration")
-        public LeapError4(final Integer ignored) {
-
-        }
-    }
-
-    public static class LeapError5 extends Leap1 {
-
-        @SuppressWarnings("UnusedDeclaration")
-        public LeapError5(final int ignored, final int number) {
-
-        }
-
-        @SuppressWarnings("UnusedDeclaration")
-        public LeapError5(final Integer ignored, final int number) {
-
-        }
-    }
-
-    public static class LeapError6 extends Leap1 {
-
-        @SuppressWarnings("UnusedDeclaration")
-        public LeapError6(final int ignored, final Integer number) {
-
-        }
-
-        @SuppressWarnings("UnusedDeclaration")
-        public LeapError6(final Integer ignored, final Integer number) {
-
-        }
-    }
-
-    public static class LeapGenerator1 {
-
-        @SuppressWarnings("UnusedDeclaration")
-        public Leap generate() {
-
-            return new Leap1();
-        }
-    }
-
-    public static class LeapGenerator2 {
-
-        @SuppressWarnings("UnusedDeclaration")
-        public Leap generate() {
-
-            return new Leap1();
-        }
-
-        @SuppressWarnings("UnusedDeclaration")
-        public Leap generate(final int number) {
-
-            return new Leap2(number);
-        }
-
-        @SuppressWarnings("UnusedDeclaration")
-        public Leap2 generate(final Integer number) {
-
-            return new Leap2(number + 2);
-        }
-    }
-
-    public static class LeapGenerator3 {
-
-        @SuppressWarnings("UnusedDeclaration")
-        Leap generate() {
-
-            return new Leap1();
-        }
-    }
-
-    public static class LeapGenerator4 {
-
-        @SuppressWarnings("UnusedDeclaration")
-        public Leap generate() {
-
-            return new Leap1();
-        }
-
-        @SuppressWarnings("UnusedDeclaration")
-        public Leap generate(ArrayList<?> list, int ignored, Integer number) {
-
-            return new Leap2(number + 3);
-        }
-
-        @SuppressWarnings("UnusedDeclaration")
-        public Leap generate(ArrayList<?> list, String text, Integer number) {
-
-            return new Leap2(number + 2);
-        }
-
-        @SuppressWarnings("UnusedDeclaration")
-        public Leap generate1(List<?> list, String text, Integer number) {
-
-            return new Leap2(number);
-        }
-    }
-
-    public static class LeapGenerator5 {
+    public static class GateError3 extends Gate1 {
 
         @Generator
-        public Leap generate() {
+        public GateError3(final int ignored, final Integer number) {
 
-            return new Leap1();
         }
 
         @Generator
-        public Leap generate(ArrayList<?> list, int ignored, Integer number) {
+        public GateError3(final Integer ignored, final Integer number) {
 
-            return new Leap2(number + 3);
-        }
-
-        @Generator
-        public Leap generate(ArrayList<?> list, String text, Integer number) {
-
-            return new Leap2(number + 2);
-        }
-
-        @SuppressWarnings("UnusedDeclaration")
-        public Leap generate1(List<?> list, String text, Integer number) {
-
-            return new Leap2(number);
         }
     }
 
-    public static class LeapGenerator6 {
+    public static class GateError4 extends Gate1 {
 
-        @Generator
-        public Leap generate(List<?> list, String text) {
+        @SuppressWarnings("UnusedDeclaration")
+        public GateError4(final int ignored) {
 
-            return new Leap2(44);
-        }
-
-        @Generator
-        public Leap generate(ArrayList<?> list, String text, int number) {
-
-            return new Leap2(number + 3);
-        }
-
-        @Generator
-        public Leap generate(ArrayList<?> list, String text, Integer number) {
-
-            return new Leap2(number + 2);
         }
 
         @SuppressWarnings("UnusedDeclaration")
-        public Leap generate1(List<?> list, String text, Integer number) {
+        public GateError4(final Integer ignored) {
 
-            return new Leap2(number);
         }
     }
 
-    public static class LeapGeneratorError1 {
+    public static class GateError5 extends Gate1 {
 
-        @Generator
-        public Leap generate(final int ignored) {
+        @SuppressWarnings("UnusedDeclaration")
+        public GateError5(final int ignored, final int number) {
 
-            return new Leap1();
         }
 
-        @Generator
-        public Leap generate(final Integer ignored) {
+        @SuppressWarnings("UnusedDeclaration")
+        public GateError5(final Integer ignored, final int number) {
 
-            return new Leap1();
         }
     }
 
-    public static class LeapGeneratorError2 {
+    public static class GateError6 extends Gate1 {
 
-        @Generator
-        public Leap generate(final int ignored, final int number) {
+        @SuppressWarnings("UnusedDeclaration")
+        public GateError6(final int ignored, final Integer number) {
 
-            return new Leap1();
         }
 
-        @Generator
-        public Leap generate(final Integer ignored, final int number) {
+        @SuppressWarnings("UnusedDeclaration")
+        public GateError6(final Integer ignored, final Integer number) {
 
-            return new Leap1();
         }
     }
 
-    public static class LeapGeneratorError3 {
+    public static class GateGenerator1 {
+
+        @SuppressWarnings("UnusedDeclaration")
+        public Gate generate() {
+
+            return new Gate1();
+        }
+    }
+
+    public static class GateGenerator2 {
+
+        @SuppressWarnings("UnusedDeclaration")
+        public Gate generate() {
+
+            return new Gate1();
+        }
+
+        @SuppressWarnings("UnusedDeclaration")
+        public Gate generate(final int number) {
+
+            return new Gate2(number);
+        }
+
+        @SuppressWarnings("UnusedDeclaration")
+        public Gate2 generate(final Integer number) {
+
+            return new Gate2(number + 2);
+        }
+    }
+
+    public static class GateGenerator3 {
+
+        @SuppressWarnings("UnusedDeclaration")
+        Gate generate() {
+
+            return new Gate1();
+        }
+    }
+
+    public static class GateGenerator4 {
+
+        @SuppressWarnings("UnusedDeclaration")
+        public Gate generate() {
+
+            return new Gate1();
+        }
+
+        @SuppressWarnings("UnusedDeclaration")
+        public Gate generate(ArrayList<?> list, int ignored, Integer number) {
+
+            return new Gate2(number + 3);
+        }
+
+        @SuppressWarnings("UnusedDeclaration")
+        public Gate generate(ArrayList<?> list, String text, Integer number) {
+
+            return new Gate2(number + 2);
+        }
+
+        @SuppressWarnings("UnusedDeclaration")
+        public Gate generate1(List<?> list, String text, Integer number) {
+
+            return new Gate2(number);
+        }
+    }
+
+    public static class GateGenerator5 {
 
         @Generator
-        public Leap generate(final int ignored, final Integer number) {
+        public Gate generate() {
 
-            return new Leap1();
+            return new Gate1();
         }
 
         @Generator
-        public Leap generate(final Integer ignored, final Integer number) {
+        public Gate generate(ArrayList<?> list, int ignored, Integer number) {
 
-            return new Leap1();
+            return new Gate2(number + 3);
+        }
+
+        @Generator
+        public Gate generate(ArrayList<?> list, String text, Integer number) {
+
+            return new Gate2(number + 2);
+        }
+
+        @SuppressWarnings("UnusedDeclaration")
+        public Gate generate1(List<?> list, String text, Integer number) {
+
+            return new Gate2(number);
         }
     }
 
-    public static class LeapGeneratorError4 {
+    public static class GateGenerator6 {
 
-        @SuppressWarnings("UnusedDeclaration")
-        public Leap generate(final int ignored) {
+        @Generator
+        public Gate generate(List<?> list, String text) {
 
-            return new Leap1();
+            return new Gate2(44);
+        }
+
+        @Generator
+        public Gate generate(ArrayList<?> list, String text, int number) {
+
+            return new Gate2(number + 3);
+        }
+
+        @Generator
+        public Gate generate(ArrayList<?> list, String text, Integer number) {
+
+            return new Gate2(number + 2);
         }
 
         @SuppressWarnings("UnusedDeclaration")
-        public Leap generate(final Integer ignored) {
+        public Gate generate1(List<?> list, String text, Integer number) {
 
-            return new Leap1();
-        }
-    }
-
-    public static class LeapGeneratorError5 {
-
-        @SuppressWarnings("UnusedDeclaration")
-        public Leap generate(final int ignored, final int number) {
-
-            return new Leap1();
-        }
-
-        @SuppressWarnings("UnusedDeclaration")
-        public Leap generate(final Integer ignored, final int number) {
-
-            return new Leap1();
+            return new Gate2(number);
         }
     }
 
-    public static class LeapGeneratorError6 {
+    public static class GateGeneratorError1 {
+
+        @Generator
+        public Gate generate(final int ignored) {
+
+            return new Gate1();
+        }
+
+        @Generator
+        public Gate generate(final Integer ignored) {
+
+            return new Gate1();
+        }
+    }
+
+    public static class GateGeneratorError2 {
+
+        @Generator
+        public Gate generate(final int ignored, final int number) {
+
+            return new Gate1();
+        }
+
+        @Generator
+        public Gate generate(final Integer ignored, final int number) {
+
+            return new Gate1();
+        }
+    }
+
+    public static class GateGeneratorError3 {
+
+        @Generator
+        public Gate generate(final int ignored, final Integer number) {
+
+            return new Gate1();
+        }
+
+        @Generator
+        public Gate generate(final Integer ignored, final Integer number) {
+
+            return new Gate1();
+        }
+    }
+
+    public static class GateGeneratorError4 {
 
         @SuppressWarnings("UnusedDeclaration")
-        public Leap generate(final int ignored, final Integer number) {
+        public Gate generate(final int ignored) {
 
-            return new Leap1();
+            return new Gate1();
         }
 
         @SuppressWarnings("UnusedDeclaration")
-        public Leap generate(final Integer ignored, final Integer number) {
+        public Gate generate(final Integer ignored) {
 
-            return new Leap1();
+            return new Gate1();
+        }
+    }
+
+    public static class GateGeneratorError5 {
+
+        @SuppressWarnings("UnusedDeclaration")
+        public Gate generate(final int ignored, final int number) {
+
+            return new Gate1();
+        }
+
+        @SuppressWarnings("UnusedDeclaration")
+        public Gate generate(final Integer ignored, final int number) {
+
+            return new Gate1();
+        }
+    }
+
+    public static class GateGeneratorError6 {
+
+        @SuppressWarnings("UnusedDeclaration")
+        public Gate generate(final int ignored, final Integer number) {
+
+            return new Gate1();
+        }
+
+        @SuppressWarnings("UnusedDeclaration")
+        public Gate generate(final Integer ignored, final Integer number) {
+
+            return new Gate1();
         }
     }
 
@@ -1199,52 +1199,52 @@ public class RapidGeneratorsTest extends TestCase {
         }
     }
 
-    public class LeapX extends Leap2 {
+    public class GateX extends Gate2 {
 
         @SuppressWarnings("UnusedDeclaration")
-        public LeapX(List<?> list, String text, int number) {
+        public GateX(List<?> list, String text, int number) {
 
             super(11 + number);
         }
 
         @SuppressWarnings("UnusedDeclaration")
-        public LeapX(LinkedList<?> list, String text, int number) {
+        public GateX(LinkedList<?> list, String text, int number) {
 
             super(22 + number);
         }
 
         @SuppressWarnings("UnusedDeclaration")
-        public LeapX(List<?> list, String text, Integer number) {
+        public GateX(List<?> list, String text, Integer number) {
 
             super(33 + ((number != null) ? number : 0));
         }
 
         @SuppressWarnings("UnusedDeclaration")
-        public LeapX(ArrayList<?> list, String text, Integer number) {
+        public GateX(ArrayList<?> list, String text, Integer number) {
 
             super(44 + ((number != null) ? number : 0));
         }
     }
 
-    public class LeapX1 extends Leap2 {
+    public class GateX1 extends Gate2 {
 
         @SuppressWarnings("UnusedDeclaration")
-        public LeapX1(List<?> list, String text, int number) {
+        public GateX1(List<?> list, String text, int number) {
 
             super(77 + number);
         }
 
         @SuppressWarnings("UnusedDeclaration")
-        public LeapX1(int number) {
+        public GateX1(int number) {
 
             super(99 + number);
         }
     }
 
-    public class LeapX2 extends Leap2 {
+    public class GateX2 extends Gate2 {
 
         @Generator
-        public LeapX2(List<?> list, String text, int number) {
+        public GateX2(List<?> list, String text, int number) {
 
             super(777 + number);
         }

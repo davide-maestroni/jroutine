@@ -15,15 +15,16 @@ package com.bmd.wtf.xtr.rpd;
 
 import com.bmd.wtf.fll.Classification;
 import com.bmd.wtf.fll.Waterfall;
-import com.bmd.wtf.flw.Gate.Action;
-import com.bmd.wtf.flw.Gate.ConditionEvaluator;
-import com.bmd.wtf.lps.FreeLeap;
-import com.bmd.wtf.xtr.rpd.RapidAnnotations.GateCondition;
+import com.bmd.wtf.flw.Collector;
+import com.bmd.wtf.flw.River;
+import com.bmd.wtf.lps.AbstractGate;
+import com.bmd.wtf.lps.OpenGate;
+import com.bmd.wtf.xtr.rpd.RapidAnnotations.DataFlow;
 
 import junit.framework.TestCase;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import static com.bmd.wtf.fll.Waterfall.fall;
 import static org.fest.assertions.api.Assertions.assertThat;
@@ -35,11 +36,83 @@ import static org.fest.assertions.api.Assertions.assertThat;
  */
 public class RapidGateTest extends TestCase {
 
+    public void testDam() {
+
+        assertThat(fall().dam().start(new TestGateDam()).chain(new RapidGate() {
+
+            @SuppressWarnings("UnusedDeclaration")
+            public Object obj(final Object obj) {
+
+                assertThat(on(GateDam.class).perform().getInt()).isEqualTo(111);
+                assertThat(on(Classification.ofType(GateDam.class)).perform().getInt()).isEqualTo(
+                        111);
+
+                return obj;
+            }
+        }).pull("test").next()).isEqualTo("test");
+    }
+
+    public void testDeviateStream() {
+
+        final Waterfall<Object, Object, Object> fall1 = fall().start();
+        final Waterfall<Object, Object, Object> fall2 = fall1.chain(new RapidGate() {
+
+            @SuppressWarnings("UnusedDeclaration")
+            public Integer dec(final Integer num) {
+
+                if (num == 0) {
+
+                    isolate();
+                }
+
+                return num - 1;
+            }
+        });
+        final Waterfall<Object, Object, String> fall3 =
+                fall2.chain(new AbstractGate<Object, String>() {
+
+                    @Override
+                    public void onPush(final River<Object> upRiver, final River<String> downRiver,
+                            final int fallNumber, final Object drop) {
+
+                        downRiver.push(drop.toString());
+                    }
+                });
+        final Waterfall<Object, String, String> fall4 = fall3.chain();
+
+        assertThat(fall4.pull(1).now().next()).isEqualTo("0");
+        assertThat(fall4.pull(0).now().all()).isEmpty();
+        assertThat(fall4.pull(1).now().all()).isEmpty();
+
+        fall1.chain(new RapidGate() {
+
+            @SuppressWarnings("UnusedDeclaration")
+            public Integer same(final Integer num) {
+
+                if (num == -1) {
+
+                    dryUp();
+                }
+
+                return num;
+            }
+        }).chain(fall3);
+
+        assertThat(fall4.pull(1).now().next()).isEqualTo("1");
+        assertThat(fall4.pull(-1).now().all()).isEmpty();
+        assertThat(fall4.pull(0).now().all()).isEmpty();
+
+        fall1.chain().chain(fall3);
+
+        assertThat(fall4.pull(0).now().all()).isEmpty();
+        assertThat(fall4.pull(1).now().all()).isEmpty();
+    }
+
     public void testError() {
 
         try {
 
-            new DefaultRapidGate<Object>(null);
+            fall().start(new RapidGateError1());
 
             fail();
 
@@ -49,7 +122,7 @@ public class RapidGateTest extends TestCase {
 
         try {
 
-            new DefaultRapidGate<Object>(null, null);
+            fall().start(new RapidGateError2());
 
             fail();
 
@@ -59,7 +132,37 @@ public class RapidGateTest extends TestCase {
 
         try {
 
-            new DefaultRapidGate<Object>(null, Object.class);
+            fall().start(new RapidGateError3());
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        final Waterfall<Object, Object, Object> fall1 =
+                fall().start(new RapidGateError4()).chain(new OpenGate<Object>() {
+
+                    @Override
+                    public void onUnhandled(final River<Object> upRiver,
+                            final River<Object> downRiver, final int fallNumber,
+                            final Throwable throwable) {
+
+                        downRiver.push(throwable);
+                    }
+                });
+        final Collector<Object> collector1 = fall1.collect();
+
+        fall1.source().push("11", null).forward(new IllegalArgumentException()).flush();
+
+        for (final Object e : collector1.now().all()) {
+
+            assertThat(((RapidException) e).getCause()).isEqualTo(new MyException());
+        }
+
+        try {
+
+            fall().start(new RapidGateError5());
 
             fail();
 
@@ -69,7 +172,7 @@ public class RapidGateTest extends TestCase {
 
         try {
 
-            Rapid.gate(fall().asGate().start(new FreeLeap<Object>()).on(FreeLeap.class)).perform();
+            fall().start(new RapidGateError6());
 
             fail();
 
@@ -79,8 +182,7 @@ public class RapidGateTest extends TestCase {
 
         try {
 
-            Rapid.gate(fall().asGate().start(new FreeLeap<Object>()).on(FreeLeap.class))
-                 .performAs(FreeLeap.class);
+            fall().start(RapidGate.from(new RapidGateError1()));
 
             fail();
 
@@ -90,8 +192,7 @@ public class RapidGateTest extends TestCase {
 
         try {
 
-            Rapid.gate(fall().asGate().start(new FreeLeap<Object>()).on(FreeLeap.class))
-                 .performAs(Classification.ofType(FreeLeap.class));
+            fall().start(RapidGate.from(new RapidGateError2()));
 
             fail();
 
@@ -101,11 +202,37 @@ public class RapidGateTest extends TestCase {
 
         try {
 
-            Rapid.gate(fall().asGate().start(new GateLeapError1()).on(FreeLeap.class))
-                 .whenSatisfies(31)
-                 .eventually()
-                 .performAs(GateId.class)
-                 .getId();
+            fall().start(RapidGate.from(new RapidGateError3()));
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        final Waterfall<Object, Object, Object> fall2 =
+                fall().start(RapidGate.from(new RapidGateError4())).chain(new OpenGate<Object>() {
+
+                    @Override
+                    public void onUnhandled(final River<Object> upRiver,
+                            final River<Object> downRiver, final int fallNumber,
+                            final Throwable throwable) {
+
+                        downRiver.push(throwable);
+                    }
+                });
+        final Collector<Object> collector2 = fall2.collect();
+
+        fall2.source().push("11", null).forward(new IllegalArgumentException()).flush();
+
+        for (final Object e : collector2.now().all()) {
+
+            assertThat(((RapidException) e).getCause()).isEqualTo(new MyException());
+        }
+
+        try {
+
+            fall().start(RapidGate.from(new RapidGateError5()));
 
             fail();
 
@@ -115,23 +242,7 @@ public class RapidGateTest extends TestCase {
 
         try {
 
-            Rapid.gate(fall().asGate().start(new GateLeapError2()).on(FreeLeap.class))
-                 .whenSatisfies(31)
-                 .eventually()
-                 .performAs(GateId.class)
-                 .getId();
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            new DefaultRapidGate<FreeLeap>(
-                    fall().asGate().start(new FreeLeap<Object>()).on(FreeLeap.class),
-                    FreeLeap.class).performAs(List.class);
+            fall().start(RapidGate.from(new RapidGateError6()));
 
             fail();
 
@@ -140,211 +251,429 @@ public class RapidGateTest extends TestCase {
         }
     }
 
-    public void testGate() {
+    public void testFlow() {
 
-        final GateLeap2 gateLeap = new GateLeap2(1);
+        assertThat(fall().start(new RapidGate() {
 
-        final Waterfall<Object, Object, Object> fall = fall().as(GateLeap2.class).chain(gateLeap);
+            @SuppressWarnings("UnusedDeclaration")
+            public void integerToString(final Integer data) {
 
-        assertThat(Rapid.gate(fall.on(GateLeap.class))
-                        .immediately()
-                        .performAs(GateId.class)
-                        .getId()).isEqualTo(1);
+                downRiver().push(data.toString());
+            }
 
-        assertThat(Rapid.gate(fall.on(Classification.ofType(GateLeap2.class)))
-                        .immediately()
-                        .performAs(Classification.ofType(GateId.class))
-                        .getId()).isEqualTo(1);
+            @SuppressWarnings("UnusedDeclaration")
+            public void floatToString(final Float data) {
 
-        assertThat(Rapid.gate(fall.on(gateLeap))
-                        .immediately()
-                        .performAs(GateId.class)
-                        .getId()).isEqualTo(1);
+                upRiver().push(data.toString());
+            }
 
-        assertThat(Rapid.gate(fall.on(gateLeap))
-                        .immediately()
-                        .performAs(Classification.ofType(GateId.class))
-                        .getId()).isEqualTo(1);
+            @SuppressWarnings("UnusedDeclaration")
+            public void doubleToStirng(final Double data) {
 
-        assertThat(Rapid.gate(fall.on(gateLeap))
-                        .eventuallyThrow(new IllegalStateException())
-                        .afterMax(1, TimeUnit.SECONDS)
-                        .performAs(GateId.class)
-                        .getId()).isEqualTo(1);
+                upRiver().push(data.toString());
+            }
+        }).pull(11, 22f, 33d).all()).containsExactly("11", "22.0", "33.0");
 
-        assertThat(Rapid.gate(
-                fall().inBackground().asGate().start(new GateLeap2(33)).on(GateLeap2.class))
-                        .eventually()
-                        .when(new ConditionEvaluator<GateId>() {
-
-                            @Override
-                            public boolean isSatisfied(final GateId leap) {
-
-                                return (leap.getId() == 33);
-                            }
-                        })
-                        .performAs(GateId.class)
-                        .getId()).isEqualTo(33);
-
-        assertThat(Rapid.gate(
-                fall().inBackground().asGate().start(new GateLeap3()).on(GateLeap2.class))
-                        .eventually()
-                        .whenSatisfies(44)
-                        .performAs(GateId.class)
-                        .getId()).isEqualTo(17);
-
-        assertThat(Rapid.gate(
-                fall().inBackground().asGate().start(new GateLeap4()).on(GateLeap2.class))
-                        .eventually()
-                        .whenSatisfies(44)
-                        .performAs(GateId.class)
-                        .getId()).isEqualTo(71);
-
-        assertThat(Rapid.gate(
-                fall().inBackground().asGate().start(new GateLeap4()).on(GateLeap2.class))
-                        .eventually()
-                        .whenSatisfies(44)
-                        .perform(new Action<Integer, GateLeap2>() {
-
-                            @Override
-                            public Integer doOn(final GateLeap2 leap, final Object... args) {
-
-                                return leap.getId();
-                            }
-                        })).isEqualTo(71);
+        assertThat(fall().in(3)
+                         .start(Rapid.gateGenerator(RapidGateFlow.class))
+                         .pull("test")
+                         .all()).containsExactly("test", "test", "test");
     }
 
-    public interface GateId {
+    public void testInherit() {
 
-        public int getId();
+        assertThat(fall().start(new RapidGateTest1())
+                         .pull("11", 27, 37.1, null)
+                         .all()).containsExactly(11, "27", "37.1", null);
+        assertThat(fall().start(new RapidGateTest2())
+                         .pull("11", 27, 37.1, null)
+                         .all()).containsExactly(13, "-27", "37.1", "");
+        assertThat(fall().start(new RapidGateTest3())
+                         .pull("11", 27, 37.1, null)
+                         .all()).containsExactly(11, "27", 37.1, null, "test");
+
+        final Waterfall<Object, Object, Object> fall1 =
+                fall().start(new RapidGateTest4()).chain(new OpenGate<Object>() {
+
+                    @Override
+                    public void onUnhandled(final River<Object> upRiver,
+                            final River<Object> downRiver, final int fallNumber,
+                            final Throwable throwable) {
+
+                        downRiver.push(throwable);
+                    }
+                });
+        final Collector<Object> collector1 = fall1.collect();
+
+        fall1.source().push("11", 27, 37.1, null);
+        assertThat(collector1.all()).containsExactly(13, new MyException(), "37.1");
+
+        final Collector<Object> collector2 = fall1.collect();
+
+        fall1.source().forward(new IllegalArgumentException()).flush();
+        assertThat(collector2.all()).containsExactly(new MyException());
+
+        final Collector<Object> collector3 = fall1.collect();
+
+        fall1.source().forward(null);
+        assertThat(collector3.all()).isEmpty();
+
+        final Waterfall<Object, Object, Object> fall2 =
+                fall().start(new RapidGateTest5()).chain(new OpenGate<Object>() {
+
+                    @Override
+                    public void onUnhandled(final River<Object> upRiver,
+                            final River<Object> downRiver, final int fallNumber,
+                            final Throwable throwable) {
+
+                        downRiver.push(throwable);
+                    }
+                });
+        final Collector<Object> collector4 = fall2.collect();
+
+        fall2.source().forward(new IllegalArgumentException()).flush();
+        assertThat(collector4.next()).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
-    public static class GateLeap extends FreeLeap<Object> implements GateId {
+    public void testWrap() {
+
+        assertThat(
+                fall().start(RapidGate.from(new RapidGateTest1())).pull("11", 27, 37.1, null).all())
+                .containsExactly(11, "27", "37.1", null);
+        assertThat(
+                fall().start(RapidGate.from(new RapidGateTest2())).pull("11", 27, 37.1, null).all())
+                .containsExactly(13, "-27", "37.1", "");
+        assertThat(fall().start(RapidGate.from(new RapidGateTest3())).chain(new OpenGate<Object>() {
+
+            @Override
+            public void onUnhandled(final River<Object> upRiver, final River<Object> downRiver,
+                    final int fallNumber, final Throwable throwable) {
+
+                downRiver.flush();
+            }
+        }).pull("11", 27, 37.1, null).all()).containsExactly(11, "27", "37.1", null);
+        assertThat(fall().start(RapidGate.fromAnnotated(new RapidGateTest3()))
+                         .chain(new OpenGate<Object>() {
+
+                             @Override
+                             public void onUnhandled(final River<Object> upRiver,
+                                     final River<Object> downRiver, final int fallNumber,
+                                     final Throwable throwable) {
+
+                                 downRiver.flush();
+                             }
+                         })
+                         .pull("11", 27, 37.1, null)
+                         .all()).containsExactly(11, "27", 37.1, null);
+        assertThat(fall().start(RapidGate.fromAnnotated(new RapidGateTest3()))
+                         .chain(new OpenGate<Object>() {
+
+                             @Override
+                             public void onUnhandled(final River<Object> upRiver,
+                                     final River<Object> downRiver, final int fallNumber,
+                                     final Throwable throwable) {
+
+                                 downRiver.flush();
+                             }
+                         })
+                         .pull("11", 27, 37.1, null)
+                         .all()).containsExactly(11, "27", 37.1, null);
+        assertThat(fall().start(RapidGate.fromAnnotated(new RapidGateTest3()))
+                         .chain(new OpenGate<Object>() {
+
+                             @Override
+                             public void onUnhandled(final River<Object> upRiver,
+                                     final River<Object> downRiver, final int fallNumber,
+                                     final Throwable throwable) {
+
+                                 downRiver.flush();
+                             }
+                         })
+                         .pull("11", 27, 37.1, null)
+                         .all()).containsExactly(11, "27", 37.1, null);
+
+        final Waterfall<Object, Object, Object> fall1 =
+                fall().start(RapidGate.from(new RapidGateTest4())).chain(new OpenGate<Object>() {
+
+                    @Override
+                    public void onUnhandled(final River<Object> upRiver,
+                            final River<Object> downRiver, final int fallNumber,
+                            final Throwable throwable) {
+
+                        downRiver.push(throwable);
+                    }
+                });
+        final Collector<Object> collector1 = fall1.collect();
+
+        fall1.source().push("11", 27, 37.1, null);
+        assertThat(collector1.all()).containsExactly(13, new MyException(), "37.1");
+
+        final Collector<Object> collector2 = fall1.collect();
+
+        fall1.source().forward(new IllegalArgumentException()).flush();
+        assertThat(collector2.all()).containsExactly(new MyException());
+
+        final Collector<Object> collector3 = fall1.collect();
+
+        fall1.source().forward(null);
+        assertThat(collector3.all()).isEmpty();
+
+        final Waterfall<Object, Object, Object> fall2 =
+                fall().start(RapidGate.from(new RapidGateTest5())).chain(new OpenGate<Object>() {
+
+                    @Override
+                    public void onUnhandled(final River<Object> upRiver,
+                            final River<Object> downRiver, final int fallNumber,
+                            final Throwable throwable) {
+
+                        downRiver.push(throwable);
+                    }
+                });
+        final Collector<Object> collector4 = fall2.collect();
+
+        fall2.source().forward(new IllegalArgumentException()).flush();
+        assertThat(collector4.next()).isExactlyInstanceOf(IllegalArgumentException.class);
+    }
+
+    public interface GateDam {
+
+        public int getInt();
+    }
+
+    public static class MyException extends Exception {
 
         @Override
-        public int getId() {
+        public int hashCode() {
 
-            return 0;
-        }
-    }
-
-    public static class GateLeap2 extends GateLeap {
-
-        private int mId;
-
-        public GateLeap2(final int id) {
-
-            mId = id;
+            return 111;
         }
 
         @Override
-        public int getId() {
+        public boolean equals(final Object obj) {
 
-            return mId;
-        }
-
-        @SuppressWarnings("UnusedDeclaration")
-        public boolean hasId(final int id) {
-
-            return mId == id;
+            return (obj instanceof MyException);
         }
     }
 
-    public static class GateLeap3 extends GateLeap2 {
+    public static class RapidGateError1 extends RapidGate {
 
-        public GateLeap3() {
+        @SuppressWarnings("UnusedDeclaration")
+        public String method1(final String text) {
 
-            super(17);
+            return text;
         }
 
-        @SuppressWarnings({"UnusedDeclaration", "BooleanParameter"})
-        public boolean condition(final int id, final boolean isEqual) {
+        @SuppressWarnings("UnusedDeclaration")
+        public Integer method2(final String text) {
 
-            return (isEqual) ? getId() == id : notId(id);
-        }
-
-        @SuppressWarnings({"UnusedDeclaration", "BooleanParameter"})
-        public boolean condition(final String id, final boolean isEqual) {
-
-            return (isEqual) ? Integer.toString(getId()).equals(id) : notId(id);
-        }
-
-        @GateCondition
-        public boolean notId(final int id) {
-
-            return getId() != id;
-        }
-
-        @GateCondition
-        public boolean notId(final String id) {
-
-            return !Integer.toString(getId()).equals(id);
+            return Integer.parseInt(text);
         }
     }
 
-    public static class GateLeap4 extends GateLeap2 {
+    public static class RapidGateError2 extends RapidGate {
 
-        public GateLeap4() {
+        @DataFlow
+        public String method1(final String text) {
 
-            super(71);
+            return text;
         }
 
-        @SuppressWarnings("UnusedDeclaration")
-        public boolean conditionFalse(final int id) {
+        @DataFlow
+        public Integer method2(final String text) {
 
-            return false;
-        }
-
-        @SuppressWarnings("UnusedDeclaration")
-        public boolean conditionTrue(final int id) {
-
-            return true;
-        }
-
-        @GateCondition
-        public boolean notId(final int id) {
-
-            return getId() != id;
+            return Integer.parseInt(text);
         }
     }
 
-    public static class GateLeapError1 extends GateLeap2 {
+    public static class RapidGateError3 extends RapidGate {
 
-        public GateLeapError1() {
+        @DataFlow
+        public String method1(final String text, final int ignored) {
 
-            super(19);
-        }
-
-        @SuppressWarnings("UnusedDeclaration")
-        public boolean isId(final int id) {
-
-            return getId() == id;
-        }
-
-        @SuppressWarnings("UnusedDeclaration")
-        public boolean notId(final int id) {
-
-            return getId() != id;
+            return text;
         }
     }
 
-    public static class GateLeapError2 extends GateLeap2 {
+    public static class RapidGateError4 extends RapidGate {
 
-        public GateLeapError2() {
+        @SuppressWarnings("UnusedDeclaration")
+        public void error(final String text) throws MyException {
 
-            super(23);
+            throw new MyException();
         }
 
-        @GateCondition
-        public boolean isId(final int id) {
+        @SuppressWarnings("UnusedDeclaration")
+        public void error(final Void ignored) throws MyException {
 
-            return getId() == id;
+            throw new MyException();
         }
 
-        @GateCondition
-        public boolean notId(final int id) {
+        @SuppressWarnings("UnusedDeclaration")
+        public void error(final Flush ignored) throws MyException {
 
-            return getId() != id;
+            throw new MyException();
+        }
+
+        @SuppressWarnings("UnusedDeclaration")
+        public void error(final Throwable ignored) throws MyException {
+
+            throw new MyException();
+        }
+    }
+
+    public static class RapidGateError5 extends RapidGate {
+
+        @DataFlow(Integer.class)
+        public String method1(final String text) {
+
+            return text;
+        }
+    }
+
+    public static class RapidGateError6 extends RapidGate {
+
+        @DataFlow
+        public String method1(final ArrayList<?> list) {
+
+            return list.toString();
+        }
+
+        @DataFlow(ArrayList.class)
+        public String method2(final List<?> list) {
+
+            return list.toString();
+        }
+    }
+
+    public static class RapidGateFlow extends RapidGate {
+
+        private final int mNumber;
+
+        public RapidGateFlow(final int number) {
+
+            mNumber = number;
+        }
+
+        @SuppressWarnings("UnusedDeclaration")
+        public Object obj(final Object obj) {
+
+            assertThat(fallNumber()).isEqualTo(mNumber);
+
+            return obj;
+        }
+    }
+
+    public static class RapidGateTest1 extends RapidGate {
+
+        @SuppressWarnings("UnusedDeclaration")
+        public String onObject(final Object data) {
+
+            return data.toString();
+        }
+
+        @SuppressWarnings("UnusedDeclaration")
+        public Integer parse(final String text) {
+
+            return Integer.parseInt(text);
+        }
+
+        @SuppressWarnings("UnusedDeclaration")
+        public String serialize(final Integer integer) {
+
+            return integer.toString();
+        }
+    }
+
+    public static class RapidGateTest2 extends RapidGateTest1 {
+
+        @SuppressWarnings("UnusedDeclaration")
+        public String minusSerialize(final Integer integer) {
+
+            return "-" + integer.toString();
+        }
+
+        @SuppressWarnings("UnusedDeclaration")
+        public String onNull(final Void data) {
+
+            return "";
+        }
+
+        @Override
+        public Integer parse(final String text) {
+
+            return Integer.parseInt(text) + 2;
+        }
+    }
+
+    public static class RapidGateTest3 extends RapidGate {
+
+        public RapidGateTest3() {
+
+            super(ValidFlows.ANNOTATED_ONLY);
+        }
+
+        @DataFlow
+        public void flush(final Flush ignored) {
+
+            downRiver().flush("test");
+        }
+
+        @SuppressWarnings("UnusedDeclaration")
+        public String onObject(final Object data) {
+
+            return data.toString();
+        }
+
+        @DataFlow
+        public Integer parse(final String text) {
+
+            return Integer.parseInt(text);
+        }
+
+        @DataFlow
+        public String serialize(final Integer integer) {
+
+            return integer.toString();
+        }
+    }
+
+    public static class RapidGateTest4 extends RapidGateTest1 {
+
+        @SuppressWarnings("UnusedDeclaration")
+        public MyException error(final Throwable ignored) {
+
+            return new MyException();
+        }
+
+        @SuppressWarnings("UnusedDeclaration")
+        public MyException error(final Integer ignored) {
+
+            return new MyException();
+        }
+
+        @SuppressWarnings("UnusedDeclaration")
+        public Flush onNull(final Void ignored) {
+
+            return null;
+        }
+
+        @Override
+        public Integer parse(final String text) {
+
+            return Integer.parseInt(text) + 2;
+        }
+    }
+
+    public static class RapidGateTest5 extends RapidGate {
+
+    }
+
+    public static class TestGateDam extends OpenGate<Object> implements GateDam {
+
+        @Override
+        public int getInt() {
+
+            return 111;
         }
     }
 }

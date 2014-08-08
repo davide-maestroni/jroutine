@@ -188,37 +188,37 @@ public interface River<DATA> extends Stream<DATA> {
     public River<DATA> forwardStream(int streamNumber, Throwable throwable);
 
     /**
-     * Returns a gate handling a leap of the specified type.
+     * Returns a dam handling a gate of the specified type.
      * <p/>
-     * If no leap of that type is found along the river path an exception will be thrown.
+     * If no gate of that type is found along the river path an exception will be thrown.
      *
-     * @param gateClass the gate class.
-     * @param <TYPE>    the leap type.
-     * @return the gate.
+     * @param damClass the dam class.
+     * @param <TYPE>   the gate type.
+     * @return the dam.
      */
-    public <TYPE> Gate<TYPE> on(Class<TYPE> gateClass);
+    public <TYPE> Dam<TYPE> on(Class<TYPE> damClass);
 
     /**
-     * Returns a gate handling the specified leap.
+     * Returns a dam handling the specified gate.
      * <p/>
-     * If no leap of that type is found along the river path an exception will be thrown.
+     * If no gate of that type is found along the river path an exception will be thrown.
      *
-     * @param leap   the leap instance.
-     * @param <TYPE> the leap type.
-     * @return the gate.
+     * @param gate   the gate instance.
+     * @param <TYPE> the gate type.
+     * @return the dam.
      */
-    public <TYPE> Gate<TYPE> on(TYPE leap);
+    public <TYPE> Dam<TYPE> on(TYPE gate);
 
     /**
-     * Returns a gate handling a leap of the specified type.
+     * Returns a dam handling a gate of the specified type.
      * <p/>
-     * If no leap of that type is found along the river path an exception will be thrown.
+     * If no gate of that type is found along the river path an exception will be thrown.
      *
-     * @param gateClassification the gate classification.
-     * @param <TYPE>             the leap type.
-     * @return the gate.
+     * @param damClassification the dam classification.
+     * @param <TYPE>            the gate type.
+     * @return the dam.
      */
-    public <TYPE> Gate<TYPE> on(Classification<TYPE> gateClassification);
+    public <TYPE> Dam<TYPE> on(Classification<TYPE> damClassification);
 
     /**
      * Pushes the specified data into the specific river stream flow.

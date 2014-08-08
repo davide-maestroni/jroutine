@@ -16,9 +16,9 @@ package com.bmd.wtf.xtr.rpd;
 import com.bmd.wtf.fll.Waterfall;
 import com.bmd.wtf.flw.Collector;
 import com.bmd.wtf.flw.River;
-import com.bmd.wtf.lps.FreeLeap;
+import com.bmd.wtf.lps.OpenGate;
 import com.bmd.wtf.xtr.rpd.RapidAnnotations.DataFlow;
-import com.bmd.wtf.xtr.rpd.RapidLeap.ValidFlows;
+import com.bmd.wtf.xtr.rpd.RapidGate.ValidFlows;
 
 import junit.framework.TestCase;
 
@@ -29,17 +29,17 @@ import static com.bmd.wtf.fll.Waterfall.fall;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
- * Unit tests for rapid leap objects.
+ * Unit tests for rapid pump objects.
  * <p/>
  * Created by davide on 7/10/14.
  */
-public class RapidBarrageTest extends TestCase {
+public class RapidPumpTest extends TestCase {
 
     public void testError() {
 
         try {
 
-            fall().start().distribute(new RapidBarrageError1());
+            fall().start().distribute(new RapidPumpError1());
 
             fail();
 
@@ -49,7 +49,7 @@ public class RapidBarrageTest extends TestCase {
 
         try {
 
-            fall().start().distribute(new RapidBarrageError2());
+            fall().start().distribute(new RapidPumpError2());
 
             fail();
 
@@ -59,7 +59,7 @@ public class RapidBarrageTest extends TestCase {
 
         try {
 
-            fall().start().distribute(new RapidBarrageError3());
+            fall().start().distribute(new RapidPumpError3());
 
             fail();
 
@@ -69,7 +69,7 @@ public class RapidBarrageTest extends TestCase {
 
         try {
 
-            fall().start().distribute(new RapidBarrageError4());
+            fall().start().distribute(new RapidPumpError4());
 
             fail();
 
@@ -79,8 +79,8 @@ public class RapidBarrageTest extends TestCase {
 
         final Waterfall<Object, Object, Object> fall1 = fall().start()
                                                               .in(2)
-                                                              .distribute(new RapidBarrageError5())
-                                                              .chain(new FreeLeap<Object>() {
+                                                              .distribute(new RapidPumpError5())
+                                                              .chain(new OpenGate<Object>() {
 
                                                                   @Override
                                                                   public void onUnhandled(
@@ -103,7 +103,7 @@ public class RapidBarrageTest extends TestCase {
 
         try {
 
-            fall().start().distribute(new RapidBarrageError6());
+            fall().start().distribute(new RapidPumpError6());
 
             fail();
 
@@ -113,7 +113,7 @@ public class RapidBarrageTest extends TestCase {
 
         try {
 
-            fall().start().distribute(new RapidBarrageError7());
+            fall().start().distribute(new RapidPumpError7());
 
             fail();
 
@@ -123,7 +123,7 @@ public class RapidBarrageTest extends TestCase {
 
         try {
 
-            fall().start().distribute(RapidBarrage.from(new RapidBarrageError1()));
+            fall().start().distribute(RapidPump.from(new RapidPumpError1()));
 
             fail();
 
@@ -133,7 +133,7 @@ public class RapidBarrageTest extends TestCase {
 
         try {
 
-            fall().start().distribute(RapidBarrage.from(new RapidBarrageError2()));
+            fall().start().distribute(RapidPump.from(new RapidPumpError2()));
 
             fail();
 
@@ -143,7 +143,7 @@ public class RapidBarrageTest extends TestCase {
 
         try {
 
-            fall().start().distribute(RapidBarrage.from(new RapidBarrageError3()));
+            fall().start().distribute(RapidPump.from(new RapidPumpError3()));
 
             fail();
 
@@ -153,7 +153,7 @@ public class RapidBarrageTest extends TestCase {
 
         try {
 
-            fall().start().distribute(RapidBarrage.from(new RapidBarrageError4()));
+            fall().start().distribute(RapidPump.from(new RapidPumpError4()));
 
             fail();
 
@@ -163,9 +163,9 @@ public class RapidBarrageTest extends TestCase {
 
         final Waterfall<Object, Object, Object> fall2 = fall().start()
                                                               .in(2)
-                                                              .distribute(RapidBarrage.from(
-                                                                      new RapidBarrageError5()))
-                                                              .chain(new FreeLeap<Object>() {
+                                                              .distribute(RapidPump.from(
+                                                                      new RapidPumpError5()))
+                                                              .chain(new OpenGate<Object>() {
 
                                                                   @Override
                                                                   public void onUnhandled(
@@ -188,7 +188,7 @@ public class RapidBarrageTest extends TestCase {
 
         try {
 
-            fall().start().distribute(RapidBarrage.from(new RapidBarrageError6()));
+            fall().start().distribute(RapidPump.from(new RapidPumpError6()));
 
             fail();
 
@@ -198,7 +198,7 @@ public class RapidBarrageTest extends TestCase {
 
         try {
 
-            fall().start().distribute(RapidBarrage.from(new RapidBarrageError7()));
+            fall().start().distribute(RapidPump.from(new RapidPumpError7()));
 
             fail();
 
@@ -209,7 +209,7 @@ public class RapidBarrageTest extends TestCase {
 
     public void testFlow() {
 
-        assertThat(fall().start().in(3).distribute(new RapidBarrage() {
+        assertThat(fall().start().in(3).distribute(new RapidPump() {
 
             @SuppressWarnings("UnusedDeclaration")
             public int onShort(final Short data) {
@@ -239,37 +239,27 @@ public class RapidBarrageTest extends TestCase {
 
     public void testInherit() {
 
-        assertThat(fall().start()
-                         .in(4)
-                         .distribute(new RapidBarrageTest1())
-                         .pull("1", 2, 3.0, null)
-                         .all()).containsExactly("1", 2, 3.0, null);
-        assertThat(fall().start()
-                         .in(4)
-                         .distribute(new RapidBarrageTest2())
-                         .pull("1", 2, 3.0, null)
-                         .all()).containsExactly("1", 2, 3.0, null);
-        assertThat(fall().start()
-                         .in(4)
-                         .distribute(new RapidBarrageTest3())
-                         .pull("1", 2, 3.0, null)
-                         .all()).containsExactly("1", 2, 3.0, null);
+        assertThat(
+                fall().start().in(4).distribute(new RapidPumpTest1()).pull("1", 2, 3.0, null).all())
+                .containsExactly("1", 2, 3.0, null);
+        assertThat(
+                fall().start().in(4).distribute(new RapidPumpTest2()).pull("1", 2, 3.0, null).all())
+                .containsExactly("1", 2, 3.0, null);
+        assertThat(
+                fall().start().in(4).distribute(new RapidPumpTest3()).pull("1", 2, 3.0, null).all())
+                .containsExactly("1", 2, 3.0, null);
 
-        final Waterfall<Object, Object, Object> fall1 = fall().start()
-                                                              .in(4)
-                                                              .distribute(new RapidBarrageTest4())
-                                                              .chain(new FreeLeap<Object>() {
+        final Waterfall<Object, Object, Object> fall1 =
+                fall().start().in(4).distribute(new RapidPumpTest4()).chain(new OpenGate<Object>() {
 
-                                                                  @Override
-                                                                  public void onUnhandled(
-                                                                          final River<Object> upRiver,
-                                                                          final River<Object> downRiver,
-                                                                          final int fallNumber,
-                                                                          final Throwable throwable) {
+                    @Override
+                    public void onUnhandled(final River<Object> upRiver,
+                            final River<Object> downRiver, final int fallNumber,
+                            final Throwable throwable) {
 
-                                                                      downRiver.push(throwable);
-                                                                  }
-                                                              });
+                        downRiver.push(throwable);
+                    }
+                });
         final Collector<Object> collector1 = fall1.collect();
 
         fall1.source().flush("1", 2, 3.0, null);
@@ -281,21 +271,17 @@ public class RapidBarrageTest extends TestCase {
         assertThat(collector2.all()).containsExactly(new MyException(), new MyException(),
                                                      new MyException(), new MyException());
 
-        final Waterfall<Object, Object, Object> fall2 = fall().start()
-                                                              .in(4)
-                                                              .distribute(new RapidBarrageTest5())
-                                                              .chain(new FreeLeap<Object>() {
+        final Waterfall<Object, Object, Object> fall2 =
+                fall().start().in(4).distribute(new RapidPumpTest5()).chain(new OpenGate<Object>() {
 
-                                                                  @Override
-                                                                  public void onUnhandled(
-                                                                          final River<Object> upRiver,
-                                                                          final River<Object> downRiver,
-                                                                          final int fallNumber,
-                                                                          final Throwable throwable) {
+                    @Override
+                    public void onUnhandled(final River<Object> upRiver,
+                            final River<Object> downRiver, final int fallNumber,
+                            final Throwable throwable) {
 
-                                                                      downRiver.push(throwable);
-                                                                  }
-                                                              });
+                        downRiver.push(throwable);
+                    }
+                });
         final Collector<Object> collector3 = fall2.collect();
 
         fall2.source().flush(new IllegalArgumentException()).flush();
@@ -306,25 +292,25 @@ public class RapidBarrageTest extends TestCase {
 
         assertThat(fall().start()
                          .in(4)
-                         .distribute(RapidBarrage.from(new RapidBarrageTest1()))
+                         .distribute(RapidPump.from(new RapidPumpTest1()))
                          .pull("1", 2, 3.0, null)
                          .all()).containsExactly("1", 2, 3.0, null);
         assertThat(fall().start()
                          .in(4)
-                         .distribute(RapidBarrage.from(new RapidBarrageTest2()))
+                         .distribute(RapidPump.from(new RapidPumpTest2()))
                          .pull("1", 2, 3.0, null)
                          .all()).containsExactly("1", 2, 3.0, null);
         assertThat(fall().start()
                          .in(4)
-                         .distribute(RapidBarrage.fromAnnotated(new RapidBarrageTest3()))
+                         .distribute(RapidPump.fromAnnotated(new RapidPumpTest3()))
                          .pull("1", 2, 3.0, null)
                          .all()).containsExactly("1", 2, 3.0, null);
 
         final Waterfall<Object, Object, Object> fall1 = fall().start()
                                                               .in(4)
-                                                              .distribute(RapidBarrage.from(
-                                                                      new RapidBarrageTest4()))
-                                                              .chain(new FreeLeap<Object>() {
+                                                              .distribute(RapidPump.from(
+                                                                      new RapidPumpTest4()))
+                                                              .chain(new OpenGate<Object>() {
 
                                                                   @Override
                                                                   public void onUnhandled(
@@ -349,9 +335,9 @@ public class RapidBarrageTest extends TestCase {
 
         final Waterfall<Object, Object, Object> fall2 = fall().start()
                                                               .in(4)
-                                                              .distribute(RapidBarrage.from(
-                                                                      new RapidBarrageTest5()))
-                                                              .chain(new FreeLeap<Object>() {
+                                                              .distribute(RapidPump.from(
+                                                                      new RapidPumpTest5()))
+                                                              .chain(new OpenGate<Object>() {
 
                                                                   @Override
                                                                   public void onUnhandled(
@@ -384,7 +370,7 @@ public class RapidBarrageTest extends TestCase {
         }
     }
 
-    public static class RapidBarrageError1 extends RapidBarrage {
+    public static class RapidPumpError1 extends RapidPump {
 
         @SuppressWarnings("UnusedDeclaration")
         public int method1(final String text) {
@@ -399,7 +385,7 @@ public class RapidBarrageTest extends TestCase {
         }
     }
 
-    public static class RapidBarrageError2 extends RapidBarrage {
+    public static class RapidPumpError2 extends RapidPump {
 
         @DataFlow
         public int method1(final String text) {
@@ -414,7 +400,7 @@ public class RapidBarrageTest extends TestCase {
         }
     }
 
-    public static class RapidBarrageError3 extends RapidBarrage {
+    public static class RapidPumpError3 extends RapidPump {
 
         @DataFlow
         public int method1(final String text, final int number) {
@@ -423,7 +409,7 @@ public class RapidBarrageTest extends TestCase {
         }
     }
 
-    public static class RapidBarrageError4 extends RapidBarrage {
+    public static class RapidPumpError4 extends RapidPump {
 
         @DataFlow
         public String method1(final String text) {
@@ -432,7 +418,7 @@ public class RapidBarrageTest extends TestCase {
         }
     }
 
-    public static class RapidBarrageError5 extends RapidBarrage {
+    public static class RapidPumpError5 extends RapidPump {
 
         @SuppressWarnings("UnusedDeclaration")
         public int error(final String text) throws MyException {
@@ -447,7 +433,7 @@ public class RapidBarrageTest extends TestCase {
         }
     }
 
-    public static class RapidBarrageError6 extends RapidBarrage {
+    public static class RapidPumpError6 extends RapidPump {
 
         @DataFlow(Integer.class)
         public int method1(final String text) {
@@ -456,7 +442,7 @@ public class RapidBarrageTest extends TestCase {
         }
     }
 
-    public static class RapidBarrageError7 extends RapidBarrage {
+    public static class RapidPumpError7 extends RapidPump {
 
         @DataFlow
         public int method1(final ArrayList<?> list) {
@@ -471,7 +457,7 @@ public class RapidBarrageTest extends TestCase {
         }
     }
 
-    public static class RapidBarrageTest1 extends RapidBarrage {
+    public static class RapidPumpTest1 extends RapidPump {
 
         @SuppressWarnings("UnusedDeclaration")
         public int onInt(final Integer integer) {
@@ -492,7 +478,7 @@ public class RapidBarrageTest extends TestCase {
         }
     }
 
-    public static class RapidBarrageTest2 extends RapidBarrageTest1 {
+    public static class RapidPumpTest2 extends RapidPumpTest1 {
 
         @SuppressWarnings("UnusedDeclaration")
         public int minusInt(final Integer integer) {
@@ -513,9 +499,9 @@ public class RapidBarrageTest extends TestCase {
         }
     }
 
-    public static class RapidBarrageTest3 extends RapidBarrage {
+    public static class RapidPumpTest3 extends RapidPump {
 
-        public RapidBarrageTest3() {
+        public RapidPumpTest3() {
 
             super(ValidFlows.ANNOTATED_ONLY);
         }
@@ -539,7 +525,7 @@ public class RapidBarrageTest extends TestCase {
         }
     }
 
-    public static class RapidBarrageTest4 extends RapidBarrageTest1 {
+    public static class RapidPumpTest4 extends RapidPumpTest1 {
 
         @SuppressWarnings("UnusedDeclaration")
         public int onNull(final Void ignored) {
@@ -554,7 +540,7 @@ public class RapidBarrageTest extends TestCase {
         }
     }
 
-    public static class RapidBarrageTest5 extends RapidBarrage {
+    public static class RapidPumpTest5 extends RapidPump {
 
     }
 }

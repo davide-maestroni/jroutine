@@ -16,30 +16,24 @@ package com.bmd.wtf.lps;
 import com.bmd.wtf.flw.River;
 
 /**
- * Implementation of a free leap which lets all the data and objects flow downstream unmodified.
+ * Base abstract implementation of a gate. By default it behaves like a open gate.
  * <p/>
- * Created by davide on 6/8/14.
+ * Created by davide on 6/9/14.
  *
- * @param <DATA> the data type.
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
+ * @see OpenGate
  */
-public class FreeLeap<DATA> implements Leap<DATA, DATA> {
+public abstract class AbstractGate<IN, OUT> implements Gate<IN, OUT> {
 
     @Override
-    public void onFlush(final River<DATA> upRiver, final River<DATA> downRiver,
-            final int fallNumber) {
+    public void onFlush(final River<IN> upRiver, final River<OUT> downRiver, final int fallNumber) {
 
         downRiver.flush();
     }
 
     @Override
-    public void onPush(final River<DATA> upRiver, final River<DATA> downRiver, final int fallNumber,
-            final DATA drop) {
-
-        downRiver.push(drop);
-    }
-
-    @Override
-    public void onUnhandled(final River<DATA> upRiver, final River<DATA> downRiver,
+    public void onUnhandled(final River<IN> upRiver, final River<OUT> downRiver,
             final int fallNumber, final Throwable throwable) {
 
         downRiver.forward(throwable);

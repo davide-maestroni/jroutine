@@ -13,28 +13,28 @@
  */
 package com.bmd.wtf.fll;
 
+import com.bmd.wtf.flw.Dam.Action;
 import com.bmd.wtf.flw.FloatingException;
-import com.bmd.wtf.flw.Gate.Action;
 import com.bmd.wtf.flw.River;
-import com.bmd.wtf.lps.FreeLeap;
+import com.bmd.wtf.lps.OpenGate;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Leap implementation used to collect data pulled from a waterfall.
+ * Gate implementation used to collect data pulled from a waterfall.
  * <p/>
  * Created by davide on 6/13/14.
  *
  * @param <DATA> The data type.
  */
-class CollectorLeap<DATA> extends FreeLeap<DATA> {
+class CollectorGate<DATA> extends OpenGate<DATA> {
 
-    private static final Action<Boolean, CollectorLeap<?>> ACTION_EMPTY =
-            new Action<Boolean, CollectorLeap<?>>() {
+    private static final Action<Boolean, CollectorGate<?>> ACTION_EMPTY =
+            new Action<Boolean, CollectorGate<?>>() {
 
                 @Override
-                public Boolean doOn(final CollectorLeap<?> collector, final Object... args) {
+                public Boolean doOn(final CollectorGate<?> collector, final Object... args) {
 
                     return collector.isEmpty();
                 }
@@ -46,11 +46,11 @@ class CollectorLeap<DATA> extends FreeLeap<DATA> {
 
     private Throwable mUnhandled;
 
-    private final Action<DATA, CollectorLeap<DATA>> ACTION_PULL =
-            new Action<DATA, CollectorLeap<DATA>>() {
+    private final Action<DATA, CollectorGate<DATA>> ACTION_PULL =
+            new Action<DATA, CollectorGate<DATA>>() {
 
                 @Override
-                public DATA doOn(final CollectorLeap<DATA> collector, final Object... args) {
+                public DATA doOn(final CollectorGate<DATA> collector, final Object... args) {
 
                     final Throwable throwable = collector.mUnhandled;
 
@@ -63,11 +63,11 @@ class CollectorLeap<DATA> extends FreeLeap<DATA> {
                 }
             };
 
-    private static final Action<Void, CollectorLeap<?>> ACTION_PULL_ALL =
-            new Action<Void, CollectorLeap<?>>() {
+    private static final Action<Void, CollectorGate<?>> ACTION_PULL_ALL =
+            new Action<Void, CollectorGate<?>>() {
 
                 @Override
-                public Void doOn(final CollectorLeap<?> collector, final Object... args) {
+                public Void doOn(final CollectorGate<?> collector, final Object... args) {
 
                     final Throwable throwable = collector.mUnhandled;
 
@@ -102,7 +102,7 @@ class CollectorLeap<DATA> extends FreeLeap<DATA> {
      *
      * @return The action.
      */
-    public Action<Boolean, CollectorLeap<?>> isEmptyAction() {
+    public Action<Boolean, CollectorGate<?>> isEmptyAction() {
 
         return ACTION_EMPTY;
     }
@@ -140,7 +140,7 @@ class CollectorLeap<DATA> extends FreeLeap<DATA> {
      *
      * @return The action.
      */
-    public Action<DATA, CollectorLeap<DATA>> pullAction() {
+    public Action<DATA, CollectorGate<DATA>> pullAction() {
 
         return ACTION_PULL;
     }
@@ -150,7 +150,7 @@ class CollectorLeap<DATA> extends FreeLeap<DATA> {
      *
      * @return The action.
      */
-    public Action<Void, CollectorLeap<?>> pullAllAction() {
+    public Action<Void, CollectorGate<?>> pullAllAction() {
 
         return ACTION_PULL_ALL;
     }

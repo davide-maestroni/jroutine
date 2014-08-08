@@ -14,10 +14,10 @@
 package com.bmd.wtf.fll;
 
 import com.bmd.wtf.crr.Current;
-import com.bmd.wtf.lps.Leap;
+import com.bmd.wtf.lps.Gate;
 
 /**
- * Extension of a data fall used to notify a barrage leap about the flowing of data drops.
+ * Extension of a data fall used to notify a pump gate about the flowing of data drops.
  * <p/>
  * Created by davide on 7/6/14.
  *
@@ -25,27 +25,27 @@ import com.bmd.wtf.lps.Leap;
  * @param <IN>     the input data type.
  * @param <OUT>    the output data type.
  */
-class BarrageFall<SOURCE, IN, OUT> extends DataFall<IN, OUT> {
-
-    private final BarrageLeap mBarrage;
+class PumpFall<SOURCE, IN, OUT> extends DataFall<IN, OUT> {
 
     private final int mFallNumber;
+
+    private final PumpGate mPump;
 
     /**
      * Constructor.
      *
      * @param waterfall    the containing waterfall.
      * @param inputCurrent the input current.
-     * @param leap         the wrapped leap.
+     * @param gate         the wrapped gate.
      * @param number       the number identifying this fall.
-     * @param barrageLeap  the related barrage.
+     * @param pumpGate     the related pump.
      */
-    public BarrageFall(final Waterfall<SOURCE, IN, OUT> waterfall, final Current inputCurrent,
-            final Leap<IN, OUT> leap, final int number, final BarrageLeap barrageLeap) {
+    public PumpFall(final Waterfall<SOURCE, IN, OUT> waterfall, final Current inputCurrent,
+            final Gate<IN, OUT> gate, final int number, final PumpGate pumpGate) {
 
-        super(waterfall, inputCurrent, leap, number);
+        super(waterfall, inputCurrent, gate, number);
 
-        mBarrage = barrageLeap;
+        mPump = pumpGate;
         mFallNumber = number;
     }
 
@@ -54,13 +54,13 @@ class BarrageFall<SOURCE, IN, OUT> extends DataFall<IN, OUT> {
 
         super.lowerLevel();
 
-        mBarrage.lowerLevel(mFallNumber);
+        mPump.lowerLevel(mFallNumber);
     }
 
     @Override
     void raiseLevel(final int count) {
 
-        mBarrage.raiseLevel(mFallNumber, count);
+        mPump.raiseLevel(mFallNumber, count);
 
         super.raiseLevel(count);
     }

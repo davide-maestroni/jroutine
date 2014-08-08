@@ -14,8 +14,8 @@
 package com.bmd.wtf.fll;
 
 import com.bmd.wtf.flw.Collector;
-import com.bmd.wtf.flw.Gate;
-import com.bmd.wtf.flw.Gate.ConditionEvaluator;
+import com.bmd.wtf.flw.Dam;
+import com.bmd.wtf.flw.Dam.ConditionEvaluator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,58 +30,58 @@ import java.util.concurrent.TimeUnit;
  */
 class DataCollector<DATA> implements Collector<DATA> {
 
-    private static final ConditionEvaluator<CollectorLeap<?>> HAS_DATA =
-            new ConditionEvaluator<CollectorLeap<?>>() {
+    private static final ConditionEvaluator<CollectorGate<?>> HAS_DATA =
+            new ConditionEvaluator<CollectorGate<?>>() {
 
                 @Override
-                public boolean isSatisfied(final CollectorLeap<?> leap) {
+                public boolean isSatisfied(final CollectorGate<?> gate) {
 
-                    return (leap.size() > 0) || leap.isComplete();
+                    return (gate.size() > 0) || gate.isComplete();
                 }
             };
 
-    private static final ConditionEvaluator<CollectorLeap<?>> IS_COMPLETE =
-            new ConditionEvaluator<CollectorLeap<?>>() {
+    private static final ConditionEvaluator<CollectorGate<?>> IS_COMPLETE =
+            new ConditionEvaluator<CollectorGate<?>>() {
 
                 @Override
-                public boolean isSatisfied(final CollectorLeap<?> leap) {
+                public boolean isSatisfied(final CollectorGate<?> gate) {
 
-                    return leap.isComplete();
+                    return gate.isComplete();
                 }
             };
 
-    private final CollectorLeap<DATA> mCollectorLeap;
+    private final CollectorGate<DATA> mCollectorGate;
 
-    private final Gate<CollectorLeap<DATA>> mDataGate;
+    private final Dam<CollectorGate<DATA>> mDataDam;
 
-    private final DataGate<CollectorLeap<DATA>> mSizeGate;
+    private final DataDam<CollectorGate<DATA>> mSizeDam;
 
     /**
      * Constructor.
      *
-     * @param gateLeap      the associated gate leap.
-     * @param collectorLeap the associated collector leap.
+     * @param damGate       the associated dam gate.
+     * @param collectorGate the associated collector gate.
      */
-    public DataCollector(final GateLeap<DATA, DATA> gateLeap,
-            final CollectorLeap<DATA> collectorLeap) {
+    public DataCollector(final DamGate<DATA, DATA> damGate,
+            final CollectorGate<DATA> collectorGate) {
 
-        if (collectorLeap == null) {
+        if (collectorGate == null) {
 
-            throw new IllegalArgumentException("the collector leap cannot be null");
+            throw new IllegalArgumentException("the collector gate cannot be null");
         }
 
-        mCollectorLeap = collectorLeap;
+        mCollectorGate = collectorGate;
 
-        final Classification<CollectorLeap<DATA>> classification =
-                new Classification<CollectorLeap<DATA>>() {};
-        mSizeGate = new DataGate<CollectorLeap<DATA>>(gateLeap, classification);
-        mDataGate = new DataGate<CollectorLeap<DATA>>(gateLeap, classification).eventually();
+        final Classification<CollectorGate<DATA>> classification =
+                new Classification<CollectorGate<DATA>>() {};
+        mSizeDam = new DataDam<CollectorGate<DATA>>(damGate, classification);
+        mDataDam = new DataDam<CollectorGate<DATA>>(damGate, classification).eventually();
     }
 
     @Override
     public Collector<DATA> afterMax(final long maxDelay, final TimeUnit timeUnit) {
 
-        mDataGate.afterMax(maxDelay, timeUnit);
+        mDataDam.afterMax(maxDelay, timeUnit);
 
         return this;
     }
@@ -99,7 +99,7 @@ class DataCollector<DATA> implements Collector<DATA> {
     @Override
     public Collector<DATA> allInto(final List<DATA> data) {
 
-        mDataGate.when(IS_COMPLETE).perform(mCollectorLeap.pullAllAction(), data);
+        mDataDam.when(IS_COMPLETE).perform(mCollectorGate.pullAllAction(), data);
 
         return this;
     }
@@ -107,7 +107,7 @@ class DataCollector<DATA> implements Collector<DATA> {
     @Override
     public Collector<DATA> eventually() {
 
-        mDataGate.eventually();
+        mDataDam.eventually();
 
         return this;
     }
@@ -115,7 +115,7 @@ class DataCollector<DATA> implements Collector<DATA> {
     @Override
     public Collector<DATA> eventuallyThrow(final RuntimeException exception) {
 
-        mDataGate.eventuallyThrow(exception);
+        mDataDam.eventuallyThrow(exception);
 
         return this;
     }
@@ -123,7 +123,7 @@ class DataCollector<DATA> implements Collector<DATA> {
     @Override
     public DATA next() {
 
-        return mDataGate.when(HAS_DATA).perform(mCollectorLeap.pullAction());
+        return mDataDam.when(HAS_DATA).perform(mCollectorGate.pullAction());
     }
 
     @Override
@@ -137,7 +137,7 @@ class DataCollector<DATA> implements Collector<DATA> {
     @Override
     public Collector<DATA> now() {
 
-        mDataGate.immediately();
+        mDataDam.immediately();
 
         return this;
     }
@@ -145,7 +145,7 @@ class DataCollector<DATA> implements Collector<DATA> {
     @Override
     public boolean hasNext() {
 
-        return !mSizeGate.perform(mCollectorLeap.isEmptyAction());
+        return !mSizeDam.perform(mCollectorGate.isEmptyAction());
     }
 
     @Override

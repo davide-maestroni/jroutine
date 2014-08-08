@@ -13,29 +13,21 @@
  */
 package com.bmd.wtf.lps;
 
-import com.bmd.wtf.flw.River;
-
 /**
- * Base abstract implementation of a leap. By default it behaves like a free leap.
+ * A generator of gate instances.
  * <p/>
- * Created by davide on 6/9/14.
+ * Created by davide on 6/8/14.
  *
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
- * @see FreeLeap
  */
-public abstract class AbstractLeap<IN, OUT> implements Leap<IN, OUT> {
+public interface GateGenerator<IN, OUT> {
 
-    @Override
-    public void onFlush(final River<IN> upRiver, final River<OUT> downRiver, final int fallNumber) {
-
-        downRiver.flush();
-    }
-
-    @Override
-    public void onUnhandled(final River<IN> upRiver, final River<OUT> downRiver,
-            final int fallNumber, final Throwable throwable) {
-
-        downRiver.forward(throwable);
-    }
+    /**
+     * Creates and returns the gate forming the specified fall.
+     *
+     * @param fallNumber the number identifying the fall.
+     * @return the gate.
+     */
+    public Gate<IN, OUT> start(int fallNumber);
 }

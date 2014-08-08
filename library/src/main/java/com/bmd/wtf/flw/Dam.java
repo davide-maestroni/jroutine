@@ -16,53 +16,53 @@ package com.bmd.wtf.flw;
 import java.util.concurrent.TimeUnit;
 
 /**
- * A gate allows to access a leap instance chained to the waterfall in a thread safe way.
+ * A dam allows to access a gate instance from outside the waterfall in a thread safe way.
  * <p/>
  * Created by davide on 6/13/14.
  *
- * @param <TYPE> the backed leap type.
+ * @param <TYPE> the backed gate type.
  */
-public interface Gate<TYPE> {
+public interface Dam<TYPE> {
 
     /**
-     * Tells the gate to fail if the condition is not met before the specified time has elapsed.
+     * Tells the dam to fail if the condition is not met before the specified time has elapsed.
      *
      * @param maxDelay the maximum delay in the specified time unit.
      * @param timeUnit the delay time unit.
-     * @return this gate.
+     * @return this dam.
      * @see #when(ConditionEvaluator)
      */
-    public Gate<TYPE> afterMax(long maxDelay, TimeUnit timeUnit);
+    public Dam<TYPE> afterMax(long maxDelay, TimeUnit timeUnit);
 
     /**
-     * Tells the gate to wait indefinitely for the condition to be met.
+     * Tells the dam to wait indefinitely for the condition to be met.
      *
-     * @return this gate.
+     * @return this dam.
      * @see #when(ConditionEvaluator)
      */
-    public Gate<TYPE> eventually();
+    public Dam<TYPE> eventually();
 
     /**
-     * Tells the gate to throw the specified exception if the maximum delay elapses before the
+     * Tells the dam to throw the specified exception if the maximum delay elapses before the
      * condition is met.
      *
      * @param exception the exception to be thrown.
-     * @return this gate.
+     * @return this dam.
      * @see #when(ConditionEvaluator)
      */
-    public Gate<TYPE> eventuallyThrow(RuntimeException exception);
+    public Dam<TYPE> eventuallyThrow(RuntimeException exception);
 
     /**
-     * Tells the gate to fail if the condition is not immediately met.
+     * Tells the dam to fail if the condition is not immediately met.
      *
-     * @return this gate.
+     * @return this dam.
      */
-    public Gate<TYPE> immediately();
+    public Dam<TYPE> immediately();
 
     /**
      * Performs the specified action by passing the variadic arguments as parameters.
      *
-     * @param action   the action to perform on the leap backing this gate.
+     * @param action   the action to perform on the gate backing this dam.
      * @param args     the action arguments.
      * @param <RESULT> the result type.
      * @return the action result.
@@ -71,46 +71,46 @@ public interface Gate<TYPE> {
     public <RESULT> RESULT perform(Action<RESULT, ? super TYPE> action, Object... args);
 
     /**
-     * Sets the condition to be met by the leap backing this gate.
+     * Sets the condition to be met by the gate backing this dam.
      * <p/>
      * A null condition (as by default) is always immediately met.
      *
      * @param evaluator the condition evaluator.
-     * @return this gate.
+     * @return this dam.
      */
-    public Gate<TYPE> when(ConditionEvaluator<? super TYPE> evaluator);
+    public Dam<TYPE> when(ConditionEvaluator<? super TYPE> evaluator);
 
     /**
-     * Interface defining an action to be performed on the backed leap.
+     * Interface defining an action to be performed on the backed gate.
      *
      * @param <RESULT> the result type.
-     * @param <TYPE>   the leap type.
+     * @param <TYPE>   the gate type.
      */
     public interface Action<RESULT, TYPE> {
 
         /**
-         * Performs this action on the specified leap.
+         * Performs this action on the specified gate.
          *
-         * @param leap the leap instance.
+         * @param gate the gate instance.
          * @param args the action arguments.
          * @return the action result.
          */
-        public RESULT doOn(TYPE leap, Object... args);
+        public RESULT doOn(TYPE gate, Object... args);
     }
 
     /**
      * Condition evaluator.
      *
-     * @param <TYPE> the leap type.
+     * @param <TYPE> the gate type.
      */
     public interface ConditionEvaluator<TYPE> {
 
         /**
-         * Checks if this condition is satisfied by the specified leap.
+         * Checks if this condition is satisfied by the specified gate.
          *
-         * @param leap the leap instance.
+         * @param gate the gate instance.
          * @return whether the condition is satisfied.
          */
-        public boolean isSatisfied(TYPE leap);
+        public boolean isSatisfied(TYPE gate);
     }
 }

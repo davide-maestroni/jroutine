@@ -14,13 +14,13 @@
 package com.bmd.wtf.flw;
 
 /**
- * A barrage manages the way in which the data drops are distributed among a number of streams.
+ * A pump manages the way in which the data drops are distributed among a number of streams.
  * <p/>
  * Created by davide on 7/29/14.
  *
  * @param <DATA> the data type.
  */
-public interface Barrage<DATA> {
+public interface Pump<DATA> {
 
     /**
      * Indicates that the data drop must be pushed to all the downstream streams.
@@ -38,7 +38,7 @@ public interface Barrage<DATA> {
     public static final int NO_STREAM = -3;
 
     /**
-     * This method is called when a data drop is pushed through the barrage.
+     * This method is called when a data drop is pushed through the pump.
      *
      * @param drop the drop of data.
      * @return the stream number to push the drop into or one of the constants defining the default

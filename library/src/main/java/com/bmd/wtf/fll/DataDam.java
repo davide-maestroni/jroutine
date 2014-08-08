@@ -13,28 +13,28 @@
  */
 package com.bmd.wtf.fll;
 
+import com.bmd.wtf.flw.Dam;
 import com.bmd.wtf.flw.DelayInterruptedException;
-import com.bmd.wtf.flw.Gate;
-import com.bmd.wtf.lps.Leap;
+import com.bmd.wtf.lps.Gate;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Default implementation of a gate.
+ * Default implementation of a dam.
  * <p/>
  * Created by davide on 6/13/14.
  *
- * @param <TYPE> the gate type.
+ * @param <TYPE> the dam type.
  */
-class DataGate<TYPE> implements Gate<TYPE> {
+class DataDam<TYPE> implements Dam<TYPE> {
 
     private final Classification<TYPE> mClassification;
 
     private final Condition mCondition;
 
-    private final Leap<?, ?> mLeap;
+    private final Gate<?, ?> mGate;
 
     private final ReentrantLock mLock;
 
@@ -47,24 +47,24 @@ class DataGate<TYPE> implements Gate<TYPE> {
     /**
      * Constructor.
      *
-     * @param leap           the gate leap.
-     * @param classification the gate classification.
+     * @param gate           the dam gate.
+     * @param classification the dam classification.
      */
-    public DataGate(final GateLeap<?, ?> leap, final Classification<TYPE> classification) {
+    public DataDam(final DamGate<?, ?> gate, final Classification<TYPE> classification) {
 
         if (classification == null) {
 
-            throw new IllegalArgumentException("the gate classification cannot be null");
+            throw new IllegalArgumentException("the dam classification cannot be null");
         }
 
         mClassification = classification;
-        mLeap = leap.leap;
-        mLock = leap.lock;
-        mCondition = leap.condition;
+        mGate = gate.gate;
+        mLock = gate.lock;
+        mCondition = gate.condition;
     }
 
     @Override
-    public Gate<TYPE> afterMax(final long maxDelay, final TimeUnit timeUnit) {
+    public Dam<TYPE> afterMax(final long maxDelay, final TimeUnit timeUnit) {
 
         mTimeoutMs = timeUnit.toMillis(Math.max(0, maxDelay));
 
@@ -72,7 +72,7 @@ class DataGate<TYPE> implements Gate<TYPE> {
     }
 
     @Override
-    public Gate<TYPE> eventually() {
+    public Dam<TYPE> eventually() {
 
         mTimeoutMs = -1;
 
@@ -80,7 +80,7 @@ class DataGate<TYPE> implements Gate<TYPE> {
     }
 
     @Override
-    public Gate<TYPE> eventuallyThrow(final RuntimeException exception) {
+    public Dam<TYPE> eventuallyThrow(final RuntimeException exception) {
 
         mTimeoutException = exception;
 
@@ -88,7 +88,7 @@ class DataGate<TYPE> implements Gate<TYPE> {
     }
 
     @Override
-    public Gate<TYPE> immediately() {
+    public Dam<TYPE> immediately() {
 
         mTimeoutMs = 0;
 
@@ -104,12 +104,12 @@ class DataGate<TYPE> implements Gate<TYPE> {
 
         try {
 
-            final TYPE leap = mClassification.cast(mLeap);
+            final TYPE gate = mClassification.cast(mGate);
 
             //noinspection unchecked
-            waitForCondition(leap);
+            waitForCondition(gate);
 
-            return action.doOn(leap, args);
+            return action.doOn(gate, args);
 
         } finally {
 
@@ -120,7 +120,7 @@ class DataGate<TYPE> implements Gate<TYPE> {
     }
 
     @Override
-    public Gate<TYPE> when(final ConditionEvaluator<? super TYPE> evaluator) {
+    public Dam<TYPE> when(final ConditionEvaluator<? super TYPE> evaluator) {
 
         mEvaluator = evaluator;
 
@@ -128,12 +128,12 @@ class DataGate<TYPE> implements Gate<TYPE> {
     }
 
     private boolean meetsCondition(final ConditionEvaluator<? super TYPE> evaluator,
-            final TYPE leap) {
+            final TYPE gate) {
 
-        return (evaluator == null) || evaluator.isSatisfied(leap);
+        return (evaluator == null) || evaluator.isSatisfied(gate);
     }
 
-    private void waitForCondition(final TYPE leap) {
+    private void waitForCondition(final TYPE gate) {
 
         long currentTimeout = mTimeoutMs;
 
@@ -141,7 +141,7 @@ class DataGate<TYPE> implements Gate<TYPE> {
 
         final ConditionEvaluator<? super TYPE> evaluator = mEvaluator;
 
-        if ((currentTimeout == 0) || meetsCondition(evaluator, leap)) {
+        if ((currentTimeout == 0) || meetsCondition(evaluator, gate)) {
 
             return;
         }
@@ -163,7 +163,7 @@ class DataGate<TYPE> implements Gate<TYPE> {
 
                     currentTimeout = endTime - System.currentTimeMillis();
 
-                    if (!meetsCondition(evaluator, leap) && (currentTimeout <= 0)) {
+                    if (!meetsCondition(evaluator, gate) && (currentTimeout <= 0)) {
 
                         isTimeout = true;
 
@@ -175,7 +175,7 @@ class DataGate<TYPE> implements Gate<TYPE> {
                     condition.await();
                 }
 
-            } while (!meetsCondition(evaluator, leap));
+            } while (!meetsCondition(evaluator, gate));
 
         } catch (final InterruptedException e) {
 

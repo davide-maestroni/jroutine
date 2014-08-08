@@ -15,7 +15,7 @@ package com.bmd.wtf.example1;
 
 import com.bmd.wtf.crr.Current;
 import com.bmd.wtf.crr.Currents;
-import com.bmd.wtf.xtr.rpd.RapidLeap;
+import com.bmd.wtf.xtr.rpd.RapidGate;
 
 import java.io.File;
 import java.io.IOException;
@@ -65,7 +65,7 @@ public class DownloadManager {
         final Download download =
                 new Download(uri, new File(mDownloadDir, DownloadUtils.getFileName(uri)));
 
-        return (Boolean) fall().in(mCurrent).chain(new Downloader()).chain(new RapidLeap() {
+        return (Boolean) fall().in(mCurrent).chain(new Downloader()).chain(new RapidGate() {
 
             @SuppressWarnings("UnusedDeclaration")
             public boolean onSuccess(final DownloadSuccess ignored) {

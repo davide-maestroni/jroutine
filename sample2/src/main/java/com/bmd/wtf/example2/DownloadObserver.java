@@ -17,7 +17,7 @@ import com.bmd.wtf.example1.Download;
 import com.bmd.wtf.example1.DownloadFailure;
 import com.bmd.wtf.example1.DownloadSuccess;
 import com.bmd.wtf.xtr.rpd.RapidAnnotations.DataFlow;
-import com.bmd.wtf.xtr.rpd.RapidLeap;
+import com.bmd.wtf.xtr.rpd.RapidGate;
 
 import java.io.File;
 import java.net.URI;
@@ -26,7 +26,7 @@ import java.util.HashMap;
 /**
  * Observer of downloaded urls filtering the ones already in progress.
  */
-public class DownloadObserver extends RapidLeap implements UriObserver {
+public class DownloadObserver extends RapidGate implements UriObserver {
 
     private final HashMap<URI, Download> mDownloaded = new HashMap<URI, Download>();
 

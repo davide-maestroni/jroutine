@@ -17,7 +17,7 @@ import com.bmd.wtf.example1.Download;
 import com.bmd.wtf.example1.DownloadFailure;
 import com.bmd.wtf.example1.DownloadSuccess;
 import com.bmd.wtf.example4.AbortException;
-import com.bmd.wtf.xtr.rpd.RapidLeap;
+import com.bmd.wtf.xtr.rpd.RapidGate;
 
 import java.io.IOException;
 import java.net.URI;
@@ -26,7 +26,7 @@ import java.util.HashSet;
 /**
  * Class responsible for the handling of download operations.
  */
-public class CancelableDownloader extends RapidLeap {
+public class CancelableDownloader extends RapidGate {
 
     private static final int CHUNK_SIZE = 1024;
 

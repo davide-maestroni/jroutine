@@ -13,7 +13,7 @@
  */
 package com.bmd.wtf.xtr.rpd;
 
-import com.bmd.wtf.flw.Gate.ConditionEvaluator;
+import com.bmd.wtf.flw.Dam.ConditionEvaluator;
 import com.bmd.wtf.xtr.rpd.RapidAnnotations.GateCondition;
 
 import java.lang.reflect.InvocationTargetException;
@@ -32,9 +32,9 @@ import java.util.Arrays;
  * <p/>
  * Created by davide on 7/11/14.
  *
- * @param <TYPE> the gate type.
+ * @param <TYPE> the dam type.
  */
-class GateConditionEvaluator<TYPE> implements ConditionEvaluator<TYPE> {
+class DamConditionEvaluator<TYPE> implements ConditionEvaluator<TYPE> {
 
     private final Object[] mArgs;
 
@@ -43,9 +43,9 @@ class GateConditionEvaluator<TYPE> implements ConditionEvaluator<TYPE> {
     /**
      * Constructor.
      *
-     * @param args the arguments to be passed to the gate method.
+     * @param args the arguments to be passed to the dam method.
      */
-    public GateConditionEvaluator(final Object[] args) {
+    public DamConditionEvaluator(final Object[] args) {
 
         mArgs = args.clone();
     }
@@ -146,11 +146,11 @@ class GateConditionEvaluator<TYPE> implements ConditionEvaluator<TYPE> {
     }
 
     @Override
-    public boolean isSatisfied(final TYPE leap) {
+    public boolean isSatisfied(final TYPE gate) {
 
         try {
 
-            return (Boolean) getCondition(leap).invoke(leap, mArgs);
+            return (Boolean) getCondition(gate).invoke(gate, mArgs);
 
         } catch (final InvocationTargetException e) {
 
@@ -162,12 +162,12 @@ class GateConditionEvaluator<TYPE> implements ConditionEvaluator<TYPE> {
         }
     }
 
-    private Method getCondition(final TYPE leap) {
+    private Method getCondition(final TYPE gate) {
 
         if (mCondition == null) {
 
             final Object[] args = mArgs;
-            final Class<?> type = leap.getClass();
+            final Class<?> type = gate.getClass();
 
             Method condition = findCondition(type.getMethods(), args);
 

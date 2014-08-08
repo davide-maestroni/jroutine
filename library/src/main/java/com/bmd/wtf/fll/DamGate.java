@@ -14,37 +14,57 @@
 package com.bmd.wtf.fll;
 
 import com.bmd.wtf.flw.River;
-import com.bmd.wtf.lps.Leap;
-import com.bmd.wtf.lps.LeapDecorator;
+import com.bmd.wtf.lps.Gate;
+import com.bmd.wtf.lps.GateDecorator;
+
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Leap decorator used to protect a leap when the same instance handles different streams.
+ * Gate decorator used to protect a common gate with a dam.
  * <p/>
- * Created by davide on 6/14/14.
+ * Created by davide on 6/13/14.
  *
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class SegmentedLeap<IN, OUT> extends LeapDecorator<IN, OUT> {
+class DamGate<IN, OUT> extends GateDecorator<IN, OUT> {
 
-    private final Object mMutex = new Object();
+    final Condition condition;
+
+    final Gate<IN, OUT> gate;
+
+    final ReentrantLock lock;
 
     /**
      * Constructor.
      *
-     * @param wrapped the wrapped leap.
+     * @param wrapped the wrapped gate.
      */
-    public SegmentedLeap(final Leap<IN, OUT> wrapped) {
+    public DamGate(final Gate<IN, OUT> wrapped) {
 
         super(wrapped);
+
+        gate = wrapped;
+        lock = new ReentrantLock();
+        condition = lock.newCondition();
     }
 
     @Override
     public void onFlush(final River<IN> upRiver, final River<OUT> downRiver, final int fallNumber) {
 
-        synchronized (mMutex) {
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+
+        try {
 
             super.onFlush(upRiver, downRiver, fallNumber);
+
+        } finally {
+
+            condition.signalAll();
+
+            lock.unlock();
         }
     }
 
@@ -52,9 +72,18 @@ class SegmentedLeap<IN, OUT> extends LeapDecorator<IN, OUT> {
     public void onPush(final River<IN> upRiver, final River<OUT> downRiver, final int fallNumber,
             final IN drop) {
 
-        synchronized (mMutex) {
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+
+        try {
 
             super.onPush(upRiver, downRiver, fallNumber, drop);
+
+        } finally {
+
+            condition.signalAll();
+
+            lock.unlock();
         }
     }
 
@@ -62,9 +91,18 @@ class SegmentedLeap<IN, OUT> extends LeapDecorator<IN, OUT> {
     public void onUnhandled(final River<IN> upRiver, final River<OUT> downRiver,
             final int fallNumber, final Throwable throwable) {
 
-        synchronized (mMutex) {
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+
+        try {
 
             super.onUnhandled(upRiver, downRiver, fallNumber, throwable);
+
+        } finally {
+
+            condition.signalAll();
+
+            lock.unlock();
         }
     }
 }

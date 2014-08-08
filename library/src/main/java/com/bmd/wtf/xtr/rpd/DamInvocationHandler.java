@@ -13,40 +13,40 @@
  */
 package com.bmd.wtf.xtr.rpd;
 
-import com.bmd.wtf.flw.Gate;
-import com.bmd.wtf.flw.Gate.Action;
+import com.bmd.wtf.flw.Dam;
+import com.bmd.wtf.flw.Dam.Action;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
- * Invocation handler used to handle a gate proxy method invocations.
+ * Invocation handler used to handle a dam proxy method invocations.
  * <p/>
  * Created by davide on 7/4/14.
  *
- * @param <TYPE> the leap type.
+ * @param <TYPE> the gate type.
  */
-class GateInvocationHandler<TYPE> implements InvocationHandler, Action<Object, TYPE> {
+class DamInvocationHandler<TYPE> implements InvocationHandler, Action<Object, TYPE> {
 
-    private final Gate<TYPE> mGate;
+    private final Dam<TYPE> mDam;
 
     /**
      * Constructor.
      *
-     * @param gate the gate instance.
+     * @param dam the dam instance.
      */
-    public GateInvocationHandler(final Gate<TYPE> gate) {
+    public DamInvocationHandler(final Dam<TYPE> dam) {
 
-        mGate = gate;
+        mDam = dam;
     }
 
     @Override
-    public Object doOn(final TYPE leap, final Object... args) {
+    public Object doOn(final TYPE gate, final Object... args) {
 
         try {
 
-            return ((Method) args[0]).invoke(leap, (Object[]) args[1]);
+            return ((Method) args[0]).invoke(gate, (Object[]) args[1]);
 
         } catch (final InvocationTargetException e) {
 
@@ -62,6 +62,6 @@ class GateInvocationHandler<TYPE> implements InvocationHandler, Action<Object, T
     public Object invoke(final Object proxy, final Method method, final Object[] args) throws
             Throwable {
 
-        return mGate.perform(this, method, args);
+        return mDam.perform(this, method, args);
     }
 }

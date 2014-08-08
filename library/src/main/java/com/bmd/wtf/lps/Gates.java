@@ -13,48 +13,48 @@
  */
 package com.bmd.wtf.lps;
 
-import com.bmd.wtf.lps.WeakLeap.WhenVanished;
+import com.bmd.wtf.lps.WeakGate.WhenVanished;
 
 /**
- * Utility class for creating leap instances.
+ * Utility class for creating gate instances.
  * <p/>
  * Created by davide on 6/8/14.
  */
-public class Leaps {
+public class Gates {
 
     /**
      * Avoid direct instantiation.
      */
-    protected Leaps() {
+    protected Gates() {
 
     }
 
     /**
-     * Creates and returns a leap retaining the specified instance through a weak reference.
+     * Creates and returns a gate retaining the specified instance through a weak reference.
      *
-     * @param leap  the wrapped leap instance.
+     * @param gate  the wrapped gate instance.
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
-     * @return the wrapping leap.
+     * @return the wrapping gate.
      */
-    public static <IN, OUT> Leap<IN, OUT> weak(final Leap<IN, OUT> leap) {
+    public static <IN, OUT> Gate<IN, OUT> weak(final Gate<IN, OUT> gate) {
 
-        return new WeakLeap<IN, OUT>(leap);
+        return new WeakGate<IN, OUT>(gate);
     }
 
     /**
-     * Creates and returns a leap retaining the specified instance through a weak reference.
+     * Creates and returns a gate retaining the specified instance through a weak reference.
      *
-     * @param leap         the wrapped leap instance.
-     * @param whenVanished whether the wrapping leap must behave like a free one or not after the
+     * @param gate         the wrapped gate instance.
+     * @param whenVanished whether the wrapping gate must behave like a free one or not after the
      *                     retained instance has vanished.
      * @param <IN>         the input data type.
      * @param <OUT>        the output data type.
-     * @return the wrapping leap.
+     * @return the wrapping gate.
      */
-    public static <IN, OUT> Leap<IN, OUT> weak(final Leap<IN, OUT> leap,
+    public static <IN, OUT> Gate<IN, OUT> weak(final Gate<IN, OUT> gate,
             final WhenVanished whenVanished) {
 
-        return new WeakLeap<IN, OUT>(leap, whenVanished);
+        return new WeakGate<IN, OUT>(gate, whenVanished);
     }
 }

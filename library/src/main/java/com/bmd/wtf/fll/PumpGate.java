@@ -13,12 +13,12 @@
  */
 package com.bmd.wtf.fll;
 
-import com.bmd.wtf.flw.Barrage;
+import com.bmd.wtf.flw.Pump;
 import com.bmd.wtf.flw.River;
-import com.bmd.wtf.lps.AbstractLeap;
+import com.bmd.wtf.lps.AbstractGate;
 
 /**
- * Leap implementation used to uniformly distribute the flow of data among the waterfall streams.
+ * Gate implementation used to uniformly distribute the flow of data among the waterfall streams.
  * <p/>
  * The level of each stream is raised and lowered based on the number of data drop flowing through
  * it.<b/>
@@ -28,13 +28,13 @@ import com.bmd.wtf.lps.AbstractLeap;
  *
  * @param <DATA> the data type.
  */
-class BarrageLeap<DATA> extends AbstractLeap<DATA, DATA> implements Barrage<DATA> {
+class PumpGate<DATA> extends AbstractGate<DATA, DATA> implements Pump<DATA> {
 
     private static final int REFRESH_INTERVAL = Integer.MAX_VALUE >> 1;
 
-    private final Barrage<DATA> mBarrage;
-
     private final Object mMutex = new Object();
+
+    private final Pump<DATA> mPump;
 
     private final int[] mStreamLevels;
 
@@ -45,38 +45,38 @@ class BarrageLeap<DATA> extends AbstractLeap<DATA, DATA> implements Barrage<DATA
     /**
      * Constructor.
      * <p/>
-     * When no barrage is specified the drops of data will always be pushed into the default
+     * When no pump is specified the drops of data will always be pushed into the default
      * stream.
      *
      * @param streamCount the total number of streams.
      */
-    public BarrageLeap(final int streamCount) {
+    public PumpGate(final int streamCount) {
 
-        mBarrage = this;
+        mPump = this;
         mStreamLevels = new int[streamCount];
     }
 
     /**
      * Constructor.
      *
-     * @param barrage     the barrage.
+     * @param pump        the pump.
      * @param streamCount the total number of streams.
      */
-    public BarrageLeap(final Barrage<DATA> barrage, final int streamCount) {
+    public PumpGate(final Pump<DATA> pump, final int streamCount) {
 
-        if (barrage == null) {
+        if (pump == null) {
 
-            throw new IllegalArgumentException("the barrage cannot be null");
+            throw new IllegalArgumentException("the pump cannot be null");
         }
 
-        mBarrage = barrage;
+        mPump = pump;
         mStreamLevels = new int[streamCount];
     }
 
     @Override
     public int hashCode() {
 
-        return (mBarrage == this) ? super.hashCode() : mBarrage.hashCode();
+        return (mPump == this) ? super.hashCode() : mPump.hashCode();
     }
 
     @Override
@@ -87,14 +87,14 @@ class BarrageLeap<DATA> extends AbstractLeap<DATA, DATA> implements Barrage<DATA
             return true;
         }
 
-        if (!(o instanceof BarrageLeap)) {
+        if (!(o instanceof PumpGate)) {
 
             return false;
         }
 
-        final BarrageLeap that = (BarrageLeap) o;
+        final PumpGate that = (PumpGate) o;
 
-        return (mBarrage == this) ? super.equals(that.mBarrage) : mBarrage.equals(that.mBarrage);
+        return (mPump == this) ? super.equals(that.mPump) : mPump.equals(that.mPump);
     }
 
     /**
@@ -116,7 +116,7 @@ class BarrageLeap<DATA> extends AbstractLeap<DATA, DATA> implements Barrage<DATA
     public void onPush(final River<DATA> upRiver, final River<DATA> downRiver, final int fallNumber,
             final DATA drop) {
 
-        final int streamNumber = mBarrage.onPush(drop);
+        final int streamNumber = mPump.onPush(drop);
 
         if (streamNumber == DEFAULT_STREAM) {
 

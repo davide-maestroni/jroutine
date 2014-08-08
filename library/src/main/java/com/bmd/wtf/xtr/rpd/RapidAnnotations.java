@@ -26,7 +26,7 @@ import java.lang.annotation.Target;
 public interface RapidAnnotations {
 
     /**
-     * Annotation identifying the methods handling the flow of data through a rapid leap.
+     * Annotation identifying the methods handling the flow of data through a rapid gate.
      */
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
@@ -45,7 +45,7 @@ public interface RapidAnnotations {
     }
 
     /**
-     * Annotation identifying the methods or constructors to be called for generating leaps or
+     * Annotation identifying the methods or constructors to be called for generating gates or
      * currents.
      */
     @Target({ElementType.CONSTRUCTOR, ElementType.METHOD})

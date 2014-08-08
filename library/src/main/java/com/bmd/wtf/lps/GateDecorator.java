@@ -16,36 +16,36 @@ package com.bmd.wtf.lps;
 import com.bmd.wtf.flw.River;
 
 /**
- * Leap decorator class.
+ * Gate decorator class.
  * <p/>
  * Created by davide on 6/8/14.
  *
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public class LeapDecorator<IN, OUT> implements Leap<IN, OUT> {
+public class GateDecorator<IN, OUT> implements Gate<IN, OUT> {
 
-    private final Leap<IN, OUT> mLeap;
+    private final Gate<IN, OUT> mGate;
 
     /**
      * Default constructor.
      *
      * @param wrapped the decorated instance.
      */
-    public LeapDecorator(final Leap<IN, OUT> wrapped) {
+    public GateDecorator(final Gate<IN, OUT> wrapped) {
 
         if (wrapped == null) {
 
-            throw new IllegalArgumentException("wrapped leap cannot be null");
+            throw new IllegalArgumentException("wrapped gate cannot be null");
         }
 
-        mLeap = wrapped;
+        mGate = wrapped;
     }
 
     @Override
     public int hashCode() {
 
-        return mLeap.hashCode();
+        return mGate.hashCode();
     }
 
     @Override
@@ -57,31 +57,31 @@ public class LeapDecorator<IN, OUT> implements Leap<IN, OUT> {
         }
 
         //noinspection SimplifiableIfStatement
-        if (!(obj instanceof LeapDecorator)) {
+        if (!(obj instanceof GateDecorator)) {
 
             return false;
         }
 
-        return mLeap.equals(((LeapDecorator) obj).mLeap);
+        return mGate.equals(((GateDecorator) obj).mGate);
     }
 
     @Override
     public void onFlush(final River<IN> upRiver, final River<OUT> downRiver, final int fallNumber) {
 
-        mLeap.onFlush(upRiver, downRiver, fallNumber);
+        mGate.onFlush(upRiver, downRiver, fallNumber);
     }
 
     @Override
     public void onPush(final River<IN> upRiver, final River<OUT> downRiver, final int fallNumber,
             final IN drop) {
 
-        mLeap.onPush(upRiver, downRiver, fallNumber, drop);
+        mGate.onPush(upRiver, downRiver, fallNumber, drop);
     }
 
     @Override
     public void onUnhandled(final River<IN> upRiver, final River<OUT> downRiver,
             final int fallNumber, final Throwable throwable) {
 
-        mLeap.onUnhandled(upRiver, downRiver, fallNumber, throwable);
+        mGate.onUnhandled(upRiver, downRiver, fallNumber, throwable);
     }
 }

@@ -16,10 +16,10 @@ package com.bmd.wtf.example2;
 import com.bmd.wtf.example1.Download;
 import com.bmd.wtf.example1.DownloadFailure;
 import com.bmd.wtf.example1.DownloadSuccess;
+import com.bmd.wtf.example1.DownloadUtils;
 import com.bmd.wtf.xtr.rpd.RapidAnnotations.DataFlow;
 import com.bmd.wtf.xtr.rpd.RapidGate;
 
-import java.io.File;
 import java.net.URI;
 import java.util.HashMap;
 
@@ -76,7 +76,7 @@ public class DownloadObserver extends RapidGate implements UriObserver {
 
             downloading.remove(uri);
 
-            delete(download.getFile());
+            DownloadUtils.safeDelete(download.getFile());
         }
     }
 
@@ -94,10 +94,5 @@ public class DownloadObserver extends RapidGate implements UriObserver {
 
             mDownloaded.put(uri, download);
         }
-    }
-
-    private boolean delete(final File file) {
-
-        return file.delete();
     }
 }

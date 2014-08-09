@@ -125,8 +125,7 @@ public class DownloadHandler extends Download {
 
         mOutputStream = null;
 
-        //noinspection ResultOfMethodCallIgnored
-        getFile().delete();
+        DownloadUtils.safeDelete(getFile());
     }
 
     private void setupConnection(final URI uri) throws IOException {

@@ -74,7 +74,9 @@ public class DownloadManager {
             }
 
             @SuppressWarnings("UnusedDeclaration")
-            public boolean onFailure(final DownloadFailure ignored) {
+            public boolean onFailure(final DownloadFailure download) {
+
+                DownloadUtils.safeDelete(download.getFile());
 
                 return false;
             }

@@ -14,6 +14,7 @@
 package com.bmd.wtf.example1;
 
 import java.io.Closeable;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 
@@ -29,8 +30,8 @@ public class DownloadUtils {
     /**
      * Extracts the downloaded file name from the download URL.
      *
-     * @param uri The URI of the resource to download.
-     * @return The downloaded file name.
+     * @param uri the URI of the resource to download.
+     * @return the downloaded file name.
      */
     public static String getFileName(final URI uri) {
 
@@ -49,7 +50,7 @@ public class DownloadUtils {
     /**
      * Closes the specified stream in a safe way.
      *
-     * @param closeable The stream to close.
+     * @param closeable the stream to close.
      */
     public static void safeClose(final Closeable closeable) {
 
@@ -63,5 +64,16 @@ public class DownloadUtils {
 
             }
         }
+    }
+
+    /**
+     * Deletes the specified file in a safe way.
+     *
+     * @param file the file to delete.
+     * @return whether the file was successfully deleted.
+     */
+    public static boolean safeDelete(final File file) {
+
+        return (file != null) && file.delete();
     }
 }

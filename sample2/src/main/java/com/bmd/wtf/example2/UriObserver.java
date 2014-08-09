@@ -16,7 +16,7 @@ package com.bmd.wtf.example2;
 import java.net.URI;
 
 /**
- * Observer of downloaded urls.
+ * Observer of downloaded URIs.
  */
 public interface UriObserver {
 

@@ -15,7 +15,7 @@ package com.bmd.wtf.fll;
 
 import com.bmd.wtf.flw.Pump;
 import com.bmd.wtf.flw.River;
-import com.bmd.wtf.lps.AbstractGate;
+import com.bmd.wtf.gts.AbstractGate;
 
 /**
  * Gate implementation used to uniformly distribute the flow of data among the waterfall streams.

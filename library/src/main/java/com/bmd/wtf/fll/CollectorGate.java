@@ -16,7 +16,7 @@ package com.bmd.wtf.fll;
 import com.bmd.wtf.flw.Dam.Action;
 import com.bmd.wtf.flw.FloatingException;
 import com.bmd.wtf.flw.River;
-import com.bmd.wtf.lps.OpenGate;
+import com.bmd.wtf.gts.OpenGate;
 
 import java.util.ArrayList;
 import java.util.List;

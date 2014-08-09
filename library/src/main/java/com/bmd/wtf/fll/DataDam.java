@@ -15,7 +15,7 @@ package com.bmd.wtf.fll;
 
 import com.bmd.wtf.flw.Dam;
 import com.bmd.wtf.flw.DelayInterruptedException;
-import com.bmd.wtf.lps.Gate;
+import com.bmd.wtf.gts.Gate;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;

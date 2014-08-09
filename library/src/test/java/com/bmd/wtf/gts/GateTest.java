@@ -11,11 +11,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.wtf.lps;
+package com.bmd.wtf.gts;
 
 import com.bmd.wtf.fll.Waterfall;
 import com.bmd.wtf.flw.River;
-import com.bmd.wtf.lps.WeakGate.WhenVanished;
+import com.bmd.wtf.gts.WeakGate.WhenVanished;
 
 import junit.framework.TestCase;
 

@@ -11,9 +11,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.wtf.lps;
+package com.bmd.wtf.gts;
 
-import com.bmd.wtf.lps.WeakGate.WhenVanished;
+import com.bmd.wtf.gts.WeakGate.WhenVanished;
 
 /**
  * Utility class for creating gate instances.
@@ -46,7 +46,7 @@ public class Gates {
      * Creates and returns a gate retaining the specified instance through a weak reference.
      *
      * @param gate         the wrapped gate instance.
-     * @param whenVanished whether the wrapping gate must behave like a free one or not after the
+     * @param whenVanished whether the wrapping gate must behave like an open one or not after the
      *                     retained instance has vanished.
      * @param <IN>         the input data type.
      * @param <OUT>        the output data type.

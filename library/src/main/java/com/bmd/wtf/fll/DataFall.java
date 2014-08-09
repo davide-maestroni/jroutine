@@ -17,7 +17,7 @@ import com.bmd.wtf.crr.Current;
 import com.bmd.wtf.flw.Fall;
 import com.bmd.wtf.flw.Stream;
 import com.bmd.wtf.flw.Stream.Direction;
-import com.bmd.wtf.lps.Gate;
+import com.bmd.wtf.gts.Gate;
 
 import java.util.HashSet;
 import java.util.concurrent.CopyOnWriteArrayList;

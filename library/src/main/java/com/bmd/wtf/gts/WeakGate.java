@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.wtf.lps;
+package com.bmd.wtf.gts;
 
 import com.bmd.wtf.flw.River;
 
@@ -45,7 +45,7 @@ class WeakGate<IN, OUT> implements Gate<IN, OUT> {
      * Parametrized constructor.
      *
      * @param wrapped      the wrapped gate.
-     * @param whenVanished whether this instance must behave like a free gate or not after the
+     * @param whenVanished whether this instance must behave like an open gate or not after the
      *                     wrapped instance is garbage collected.
      */
     public WeakGate(final Gate<IN, OUT> wrapped, final WhenVanished whenVanished) {

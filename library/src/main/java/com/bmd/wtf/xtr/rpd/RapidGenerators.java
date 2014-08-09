@@ -16,8 +16,8 @@ package com.bmd.wtf.xtr.rpd;
 import com.bmd.wtf.crr.Current;
 import com.bmd.wtf.crr.CurrentGenerator;
 import com.bmd.wtf.fll.Classification;
-import com.bmd.wtf.lps.Gate;
-import com.bmd.wtf.lps.GateGenerator;
+import com.bmd.wtf.gts.Gate;
+import com.bmd.wtf.gts.GateGenerator;
 import com.bmd.wtf.xtr.rpd.RapidAnnotations.Generator;
 
 import java.lang.reflect.Constructor;

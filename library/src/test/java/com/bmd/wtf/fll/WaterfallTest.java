@@ -23,10 +23,10 @@ import com.bmd.wtf.flw.Dam.ConditionEvaluator;
 import com.bmd.wtf.flw.Pump;
 import com.bmd.wtf.flw.River;
 import com.bmd.wtf.flw.Stream.Direction;
-import com.bmd.wtf.lps.AbstractGate;
-import com.bmd.wtf.lps.Gate;
-import com.bmd.wtf.lps.GateGenerator;
-import com.bmd.wtf.lps.OpenGate;
+import com.bmd.wtf.gts.AbstractGate;
+import com.bmd.wtf.gts.Gate;
+import com.bmd.wtf.gts.GateGenerator;
+import com.bmd.wtf.gts.OpenGate;
 
 import junit.framework.TestCase;
 

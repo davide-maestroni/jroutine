@@ -14,7 +14,7 @@
 package com.bmd.wtf.fll;
 
 import com.bmd.wtf.crr.Current;
-import com.bmd.wtf.lps.Gate;
+import com.bmd.wtf.gts.Gate;
 
 /**
  * Extension of a data fall used to notify a pump gate about the flowing of data drops.

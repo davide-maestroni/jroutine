@@ -14,8 +14,8 @@
 package com.bmd.wtf.fll;
 
 import com.bmd.wtf.flw.River;
-import com.bmd.wtf.lps.Gate;
-import com.bmd.wtf.lps.GateDecorator;
+import com.bmd.wtf.gts.Gate;
+import com.bmd.wtf.gts.GateDecorator;
 
 /**
  * Gate decorator used to protect a gate when the same instance handles different streams.

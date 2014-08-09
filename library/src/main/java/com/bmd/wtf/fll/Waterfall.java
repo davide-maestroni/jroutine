@@ -19,9 +19,9 @@ import com.bmd.wtf.crr.Currents;
 import com.bmd.wtf.flw.Collector;
 import com.bmd.wtf.flw.Dam;
 import com.bmd.wtf.flw.Pump;
-import com.bmd.wtf.lps.Gate;
-import com.bmd.wtf.lps.GateGenerator;
-import com.bmd.wtf.lps.OpenGate;
+import com.bmd.wtf.gts.Gate;
+import com.bmd.wtf.gts.GateGenerator;
+import com.bmd.wtf.gts.OpenGate;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -426,7 +426,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
     }
 
     /**
-     * Chains a free gate to this waterfall.
+     * Chains an open gate to this waterfall.
      *
      * @return the newly created waterfall.
      */

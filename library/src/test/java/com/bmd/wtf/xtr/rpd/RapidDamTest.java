@@ -17,7 +17,7 @@ import com.bmd.wtf.fll.Classification;
 import com.bmd.wtf.fll.Waterfall;
 import com.bmd.wtf.flw.Dam.Action;
 import com.bmd.wtf.flw.Dam.ConditionEvaluator;
-import com.bmd.wtf.lps.OpenGate;
+import com.bmd.wtf.gts.OpenGate;
 import com.bmd.wtf.xtr.rpd.RapidAnnotations.GateCondition;
 
 import junit.framework.TestCase;

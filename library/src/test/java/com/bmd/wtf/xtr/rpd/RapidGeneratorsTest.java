@@ -17,8 +17,8 @@ import com.bmd.wtf.crr.Current;
 import com.bmd.wtf.fll.Classification;
 import com.bmd.wtf.flw.Fall;
 import com.bmd.wtf.flw.Stream;
-import com.bmd.wtf.lps.Gate;
-import com.bmd.wtf.lps.OpenGate;
+import com.bmd.wtf.gts.Gate;
+import com.bmd.wtf.gts.OpenGate;
 import com.bmd.wtf.xtr.rpd.RapidAnnotations.Generator;
 
 import junit.framework.TestCase;

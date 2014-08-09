@@ -15,7 +15,7 @@ package com.bmd.wtf.xtr.rpd;
 
 import com.bmd.wtf.fll.Classification;
 import com.bmd.wtf.flw.River;
-import com.bmd.wtf.lps.Gate;
+import com.bmd.wtf.gts.Gate;
 import com.bmd.wtf.xtr.rpd.RapidAnnotations.DataFlow;
 
 import java.lang.reflect.InvocationTargetException;

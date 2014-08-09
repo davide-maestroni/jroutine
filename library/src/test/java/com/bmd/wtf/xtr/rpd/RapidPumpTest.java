@@ -16,7 +16,7 @@ package com.bmd.wtf.xtr.rpd;
 import com.bmd.wtf.fll.Waterfall;
 import com.bmd.wtf.flw.Collector;
 import com.bmd.wtf.flw.River;
-import com.bmd.wtf.lps.OpenGate;
+import com.bmd.wtf.gts.OpenGate;
 import com.bmd.wtf.xtr.rpd.RapidAnnotations.DataFlow;
 import com.bmd.wtf.xtr.rpd.RapidGate.ValidFlows;
 

@@ -17,8 +17,8 @@ import com.bmd.wtf.fll.Classification;
 import com.bmd.wtf.fll.Waterfall;
 import com.bmd.wtf.flw.Collector;
 import com.bmd.wtf.flw.River;
-import com.bmd.wtf.lps.AbstractGate;
-import com.bmd.wtf.lps.OpenGate;
+import com.bmd.wtf.gts.AbstractGate;
+import com.bmd.wtf.gts.OpenGate;
 import com.bmd.wtf.xtr.rpd.RapidAnnotations.DataFlow;
 
 import junit.framework.TestCase;

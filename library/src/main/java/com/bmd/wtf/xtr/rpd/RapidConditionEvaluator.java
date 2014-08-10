@@ -34,7 +34,7 @@ import java.util.Arrays;
  *
  * @param <TYPE> the dam type.
  */
-class DamConditionEvaluator<TYPE> implements ConditionEvaluator<TYPE> {
+class RapidConditionEvaluator<TYPE> implements ConditionEvaluator<TYPE> {
 
     private final Object[] mArgs;
 
@@ -45,7 +45,7 @@ class DamConditionEvaluator<TYPE> implements ConditionEvaluator<TYPE> {
      *
      * @param args the arguments to be passed to the dam method.
      */
-    public DamConditionEvaluator(final Object[] args) {
+    public RapidConditionEvaluator(final Object[] args) {
 
         mArgs = args.clone();
     }

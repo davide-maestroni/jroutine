@@ -151,7 +151,7 @@ class DefaultRapidDam<TYPE> implements RapidDam<TYPE> {
     @Override
     public RapidDam<TYPE> whenSatisfies(final Object... args) {
 
-        return when(new DamConditionEvaluator<TYPE>(args));
+        return when(new RapidConditionEvaluator<TYPE>(args));
     }
 
     @Override

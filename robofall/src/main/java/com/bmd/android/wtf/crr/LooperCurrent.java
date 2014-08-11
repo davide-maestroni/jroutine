@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.android.wtf;
+package com.bmd.android.wtf.crr;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -23,8 +23,8 @@ import com.bmd.wtf.flw.Stream;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Implementation of {@link com.bmd.wtf.crr.Current} employing the Android
- * {@link android.os.Looper} queue to execute the waterfall commands.
+ * Implementation of a current employing the Android {@link android.os.Looper} queue to execute
+ * the waterfall commands.
  * <p/>
  * Created by davide on 3/5/14.
  */

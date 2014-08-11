@@ -44,7 +44,7 @@ public class Downloader extends RapidGate {
 
             final URLConnection connection = url.openConnection();
 
-            // Open the input stream
+            // open the input stream
 
             inputStream = connection.getInputStream();
 
@@ -54,7 +54,7 @@ public class Downloader extends RapidGate {
 
                 if (responseCode < 200 || responseCode >= 300) {
 
-                    // The request has failed...
+                    // the request has failed...
 
                     downRiver().push(new DownloadFailure(download, responseCode));
 
@@ -62,7 +62,7 @@ public class Downloader extends RapidGate {
                 }
             }
 
-            // Open the output stream
+            // open the output stream
 
             outputStream = new FileOutputStream(outFile);
 
@@ -75,7 +75,7 @@ public class Downloader extends RapidGate {
                 outputStream.write(buffer, 0, b);
             }
 
-            // Discharge the url if everything worked as expected
+            // push the url if everything worked as expected
 
             downRiver().push(new DownloadSuccess(download));
 
@@ -85,7 +85,7 @@ public class Downloader extends RapidGate {
 
         } finally {
 
-            // Clean up
+            // clean up
 
             DownloadUtils.safeClose(outputStream);
             DownloadUtils.safeClose(inputStream);

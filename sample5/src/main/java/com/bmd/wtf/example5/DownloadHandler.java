@@ -59,7 +59,6 @@ public class DownloadHandler extends Download {
     public void abort() {
 
         resetOutput();
-
         resetConnection();
     }
 
@@ -105,7 +104,6 @@ public class DownloadHandler extends Download {
         } catch (final IOException e) {
 
             resetOutput();
-
             resetConnection();
 
             throw e;

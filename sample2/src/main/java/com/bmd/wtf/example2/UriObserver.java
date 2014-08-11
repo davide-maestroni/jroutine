@@ -20,7 +20,19 @@ import java.net.URI;
  */
 public interface UriObserver {
 
+    /**
+     * Checks if the download of the specified URI has successfully completed.
+     *
+     * @param uri the URI.
+     * @return whether the download was successful.
+     */
     public boolean isDownloaded(URI uri);
 
+    /**
+     * Checks if the specified URI is being currently downloaded.
+     *
+     * @param uri the URI.
+     * @return whether the download is in progress.
+     */
     public boolean isDownloading(URI uri);
 }

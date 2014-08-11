@@ -22,5 +22,10 @@ import java.net.URI;
  */
 public interface UriAbortObserver extends UriObserver {
 
+    /**
+     * Aborts the downloading of the specified URI.
+     *
+     * @param uri the URI.
+     */
     public void abort(URI uri);
 }

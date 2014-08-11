@@ -68,23 +68,23 @@ public class CurrentTest extends TestCase {
         current.push(fall, "test");
         fall.waitCall();
         assertThat(fall.getDrop()).isEqualTo("test");
-        assertThat(fall.isDischarged()).isFalse();
+        assertThat(fall.isFlushed()).isFalse();
         assertThat(fall.getThrowable()).isNull();
 
         fall.reset();
         current.flush(fall, null);
         fall.waitCall();
         assertThat(fall.getDrop()).isEqualTo("test");
-        assertThat(fall.isDischarged()).isTrue();
+        assertThat(fall.isFlushed()).isTrue();
         assertThat(fall.getThrowable()).isNull();
 
-        fall.setDischarge(false);
+        fall.setFlush(false);
 
         fall.reset();
         current.forward(fall, new IllegalArgumentException());
         fall.waitCall();
         assertThat(fall.getDrop()).isEqualTo("test");
-        assertThat(fall.isDischarged()).isFalse();
+        assertThat(fall.isFlushed()).isFalse();
         assertThat(fall.getThrowable()).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
@@ -113,19 +113,19 @@ public class CurrentTest extends TestCase {
 
         current.push(fall, "test");
         assertThat(fall.getDrop()).isEqualTo("test");
-        assertThat(fall.isDischarged()).isFalse();
+        assertThat(fall.isFlushed()).isFalse();
         assertThat(fall.getThrowable()).isNull();
 
         current.flush(fall, null);
         assertThat(fall.getDrop()).isEqualTo("test");
-        assertThat(fall.isDischarged()).isTrue();
+        assertThat(fall.isFlushed()).isTrue();
         assertThat(fall.getThrowable()).isNull();
 
-        fall.setDischarge(false);
+        fall.setFlush(false);
 
         current.forward(fall, new IllegalArgumentException());
         assertThat(fall.getDrop()).isEqualTo("test");
-        assertThat(fall.isDischarged()).isFalse();
+        assertThat(fall.isFlushed()).isFalse();
         assertThat(fall.getThrowable()).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
@@ -133,9 +133,9 @@ public class CurrentTest extends TestCase {
 
         private final Semaphore mSemaphore = new Semaphore(0);
 
-        private boolean mDischarge;
-
         private String mDrop;
+
+        private boolean mFlush;
 
         private Object mThrowable;
 
@@ -144,7 +144,7 @@ public class CurrentTest extends TestCase {
         @Override
         public void flush(final Stream<String> origin) {
 
-            mDischarge = true;
+            mFlush = true;
             mTime = System.currentTimeMillis();
             mSemaphore.release();
         }
@@ -180,9 +180,9 @@ public class CurrentTest extends TestCase {
             return mTime;
         }
 
-        public boolean isDischarged() {
+        public boolean isFlushed() {
 
-            return mDischarge;
+            return mFlush;
         }
 
         public void reset() {
@@ -190,9 +190,9 @@ public class CurrentTest extends TestCase {
             mSemaphore.drainPermits();
         }
 
-        public void setDischarge(final boolean flush) {
+        public void setFlush(final boolean flush) {
 
-            mDischarge = flush;
+            mFlush = flush;
         }
 
         public void waitCall() throws InterruptedException {

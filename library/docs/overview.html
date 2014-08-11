@@ -30,11 +30,11 @@ The code below shows how it is possible to implement the computation of the root
         // Parallel
 
         final Double pRms = (Double) fall().start()
-                                            // Let the optimum number of threads be automatically computed
+                                            // let the optimum number of threads be automatically computed
                                             .inBackground()
-                                            // Equally distribute the load among them
+                                            // equally distribute the load among them
                                             .distribute()
-                                            // Compute the square of each sample
+                                            // compute the square of each sample
                                             .chain(Rapid.gateGenerator(new RapidGate() {
 
                                                 public Double onSample(final Float sample) {
@@ -44,9 +44,9 @@ The code below shows how it is possible to implement the computation of the root
                                                 }
 
                                             }, this))
-                                            // Merge the results in a single thread
+                                            // merge the results in a single thread
                                             .inBackground(1)
-                                            // Accumulate the sum and then calculate the square root mean
+                                            // accumulate the sum and then calculate the square root mean
                                             .chain(new RapidGate() {
 
                                                 private int mCount;
@@ -65,7 +65,7 @@ The code below shows how it is possible to implement the computation of the root
                                                 }
 
                                             })
-                                            // Pull the input data along the flow...
+                                            // pull the input data along the flow...
                                             .pull(Drops.asObjects(input))
                                             // ...and finally collect the result
                                             .next();

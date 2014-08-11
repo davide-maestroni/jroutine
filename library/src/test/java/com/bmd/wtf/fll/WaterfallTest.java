@@ -809,7 +809,7 @@ public class WaterfallTest extends TestCase {
                                                          exception);
 
         source1.flush();
-        assertThat(gate1.getDischarges()).isEqualTo(4);
+        assertThat(gate1.getFlushes()).isEqualTo(4);
 
         assertThat(fall().distribute().pull("test", "test").all()).containsExactly("test", "test");
         assertThat(fall().start().in(1).distribute().pull("test", "test").all()).containsExactly(
@@ -845,7 +845,7 @@ public class WaterfallTest extends TestCase {
                                                          exception);
 
         source2.flush();
-        assertThat(gate2.getDischarges()).isEqualTo(4);
+        assertThat(gate2.getFlushes()).isEqualTo(4);
 
         assertThat(fall().distribute(new Pump<Object>() {
 
@@ -2041,7 +2041,7 @@ public class WaterfallTest extends TestCase {
 
     private static class TestGate extends OpenGate<Object> {
 
-        public boolean mDischarged;
+        public boolean mFlushed;
 
         public boolean mPushed;
 
@@ -2051,12 +2051,12 @@ public class WaterfallTest extends TestCase {
         public void onFlush(final River<Object> upRiver, final River<Object> downRiver,
                 final int fallNumber) {
 
-            if (isFailed(upRiver) || mDischarged) {
+            if (isFailed(upRiver) || mFlushed) {
 
                 return;
             }
 
-            mDischarged = true;
+            mFlushed = true;
 
             try {
 
@@ -2219,16 +2219,16 @@ public class WaterfallTest extends TestCase {
 
         private final ArrayList<Throwable> mThrows = new ArrayList<Throwable>();
 
-        private int mDischargeCount;
+        private int mFlushCount;
 
         public List<String> getData() {
 
             return mData;
         }
 
-        public int getDischarges() {
+        public int getFlushes() {
 
-            return mDischargeCount;
+            return mFlushCount;
         }
 
         public List<Throwable> getUnhandled() {
@@ -2240,7 +2240,7 @@ public class WaterfallTest extends TestCase {
         public void onFlush(final River<String> upRiver, final River<String> downRiver,
                 final int fallNumber) {
 
-            ++mDischargeCount;
+            ++mFlushCount;
 
             super.onFlush(upRiver, downRiver, fallNumber);
         }

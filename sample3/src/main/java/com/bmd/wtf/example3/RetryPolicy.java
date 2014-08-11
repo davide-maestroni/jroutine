@@ -23,7 +23,7 @@ import java.net.URI;
 import java.util.HashMap;
 
 /**
- * This class is meant to retry the discharge of data in case an error occurred.
+ * This class is meant to retry the push of data in case an error occurred.
  */
 public class RetryPolicy extends RapidGate {
 

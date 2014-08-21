@@ -54,7 +54,7 @@ public class DownloadManager {
                                                                   .distribute()
                                                                   .chain(Rapid.gateGenerator(
                                                                           Downloader.class));
-        // chain the retry leap
+        // chain the retry gates
         waterfall.chain(Rapid.gateGenerator(RetryPolicy.class, waterfall));
         // merge the streams and finally chain the observer
         mWaterfall = waterfall.in(1).chain(Classification.ofType(AbortObserver.class));

@@ -278,7 +278,7 @@ class RapidGenerators {
             return new GateGenerator<IN, OUT>() {
 
                 @Override
-                public Gate<IN, OUT> start(final int fallNumber) {
+                public Gate<IN, OUT> create(final int fallNumber) {
 
                     try {
 
@@ -306,7 +306,7 @@ class RapidGenerators {
         return new GateGenerator<IN, OUT>() {
 
             @Override
-            public Gate<IN, OUT> start(final int fallNumber) {
+            public Gate<IN, OUT> create(final int fallNumber) {
 
                 try {
 
@@ -372,7 +372,7 @@ class RapidGenerators {
             return new GateGenerator<IN, OUT>() {
 
                 @Override
-                public Gate<IN, OUT> start(final int fallNumber) {
+                public Gate<IN, OUT> create(final int fallNumber) {
 
                     try {
 
@@ -404,7 +404,7 @@ class RapidGenerators {
         return new GateGenerator<IN, OUT>() {
 
             @Override
-            public Gate<IN, OUT> start(final int fallNumber) {
+            public Gate<IN, OUT> create(final int fallNumber) {
 
                 try {
 

@@ -162,7 +162,7 @@ public class WaterfallTest extends TestCase {
         assertThat(fall().chain(new GateGenerator<Object, String>() {
 
             @Override
-            public Gate<Object, String> start(final int fallNumber) {
+            public Gate<Object, String> create(final int fallNumber) {
 
                 return new AbstractGate<Object, String>() {
 
@@ -179,7 +179,7 @@ public class WaterfallTest extends TestCase {
         assertThat(fall().in(3).chain(new GateGenerator<Object, String>() {
 
             @Override
-            public Gate<Object, String> start(final int fallNumber) {
+            public Gate<Object, String> create(final int fallNumber) {
 
                 return new AbstractGate<Object, String>() {
 
@@ -201,7 +201,7 @@ public class WaterfallTest extends TestCase {
         assertThat(fall().start().chain(new GateGenerator<Object, String>() {
 
             @Override
-            public Gate<Object, String> start(final int fallNumber) {
+            public Gate<Object, String> create(final int fallNumber) {
 
                 return new AbstractGate<Object, String>() {
 
@@ -218,7 +218,7 @@ public class WaterfallTest extends TestCase {
         assertThat(fall().start().in(3).chain(new GateGenerator<Object, String>() {
 
             @Override
-            public Gate<Object, String> start(final int fallNumber) {
+            public Gate<Object, String> create(final int fallNumber) {
 
                 return new AbstractGate<Object, String>() {
 
@@ -243,7 +243,7 @@ public class WaterfallTest extends TestCase {
         assertThat(fall().in(2).start().chain(new GateGenerator<Object, String>() {
 
             @Override
-            public Gate<Object, String> start(final int fallNumber) {
+            public Gate<Object, String> create(final int fallNumber) {
 
                 return new AbstractGate<Object, String>() {
 
@@ -260,7 +260,7 @@ public class WaterfallTest extends TestCase {
         assertThat(fall().in(2).start().in(3).chain(new GateGenerator<Object, String>() {
 
             @Override
-            public Gate<Object, String> start(final int fallNumber) {
+            public Gate<Object, String> create(final int fallNumber) {
 
                 return new AbstractGate<Object, String>() {
 
@@ -1302,7 +1302,7 @@ public class WaterfallTest extends TestCase {
             fall().in(2).dam().start(new GateGenerator<Object, Object>() {
 
                 @Override
-                public Gate<Object, Object> start(final int fallNumber) {
+                public Gate<Object, Object> create(final int fallNumber) {
 
                     return new OpenGate<Object>();
                 }
@@ -1319,7 +1319,7 @@ public class WaterfallTest extends TestCase {
             fall().in(2).dam().chain(new GateGenerator<Object, Object>() {
 
                 @Override
-                public Gate<Object, Object> start(final int fallNumber) {
+                public Gate<Object, Object> create(final int fallNumber) {
 
                     return new OpenGate<Object>();
                 }
@@ -1336,7 +1336,7 @@ public class WaterfallTest extends TestCase {
             fall().in(2).start().dam().chain(new GateGenerator<Object, Object>() {
 
                 @Override
-                public Gate<Object, Object> start(final int fallNumber) {
+                public Gate<Object, Object> create(final int fallNumber) {
 
                     return new OpenGate<Object>();
                 }
@@ -1800,7 +1800,7 @@ public class WaterfallTest extends TestCase {
         }).chain(new GateGenerator<String, List<String>>() {
 
             @Override
-            public Gate<String, List<String>> start(final int fallNumber) {
+            public Gate<String, List<String>> create(final int fallNumber) {
 
                 if (fallNumber == 0) {
 
@@ -1956,7 +1956,7 @@ public class WaterfallTest extends TestCase {
         assertThat(fall().start(new GateGenerator<String, Object>() {
 
             @Override
-            public Gate<String, Object> start(final int fallNumber) {
+            public Gate<String, Object> create(final int fallNumber) {
 
                 return new AbstractGate<String, Object>() {
 
@@ -1973,7 +1973,7 @@ public class WaterfallTest extends TestCase {
         assertThat(fall().in(3).start(new GateGenerator<String, Object>() {
 
             @Override
-            public Gate<String, Object> start(final int fallNumber) {
+            public Gate<String, Object> create(final int fallNumber) {
 
                 return new AbstractGate<String, Object>() {
 

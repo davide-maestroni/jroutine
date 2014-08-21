@@ -325,57 +325,57 @@ public class RapidGeneratorsTest extends TestCase {
 
     public void testGateGenerator() {
 
-        assertThat(Rapid.gateGenerator(Gate1.class).start(1)).isExactlyInstanceOf(Gate1.class);
-        assertThat(((Gate2) Rapid.gateGenerator(Gate2.class).start(1)).getNumber()).isEqualTo(1);
-        assertThat(((Gate3) Rapid.gateGenerator(Gate3.class).start(1)).getNumber()).isEqualTo(2);
-        assertThat(((Gate4) Rapid.gateGenerator(Gate4.class).start(1)).getNumber()).isEqualTo(4);
-        assertThat(((Gate5) Rapid.gateGenerator(Gate5.class).start(1)).getNumber()).isEqualTo(77);
-        assertThat(((Gate6) Rapid.gateGenerator(Gate6.class).start(3)).getNumber()).isEqualTo(5);
-        assertThat(((Gate7) Rapid.gateGenerator(Gate7.class).start(3)).getNumber()).isEqualTo(4);
-        assertThat(((Gate8) Rapid.gateGenerator(Gate8.class).start(3)).getNumber()).isEqualTo(5);
+        assertThat(Rapid.gateGenerator(Gate1.class).create(1)).isExactlyInstanceOf(Gate1.class);
+        assertThat(((Gate2) Rapid.gateGenerator(Gate2.class).create(1)).getNumber()).isEqualTo(1);
+        assertThat(((Gate3) Rapid.gateGenerator(Gate3.class).create(1)).getNumber()).isEqualTo(2);
+        assertThat(((Gate4) Rapid.gateGenerator(Gate4.class).create(1)).getNumber()).isEqualTo(4);
+        assertThat(((Gate5) Rapid.gateGenerator(Gate5.class).create(1)).getNumber()).isEqualTo(77);
+        assertThat(((Gate6) Rapid.gateGenerator(Gate6.class).create(3)).getNumber()).isEqualTo(5);
+        assertThat(((Gate7) Rapid.gateGenerator(Gate7.class).create(3)).getNumber()).isEqualTo(4);
+        assertThat(((Gate8) Rapid.gateGenerator(Gate8.class).create(3)).getNumber()).isEqualTo(5);
 
         assertThat(Rapid.gateGenerator(Classification.ofType(Gate1.class))
-                        .start(1)).isExactlyInstanceOf(Gate1.class);
+                        .create(1)).isExactlyInstanceOf(Gate1.class);
         assertThat(((Gate2) Rapid.gateGenerator(Classification.ofType(Gate2.class))
-                                 .start(1)).getNumber()).isEqualTo(1);
+                                 .create(1)).getNumber()).isEqualTo(1);
         assertThat(((Gate3) Rapid.gateGenerator(Classification.ofType(Gate3.class))
-                                 .start(1)).getNumber()).isEqualTo(2);
+                                 .create(1)).getNumber()).isEqualTo(2);
         assertThat(((Gate4) Rapid.gateGenerator(Classification.ofType(Gate4.class))
-                                 .start(1)).getNumber()).isEqualTo(4);
+                                 .create(1)).getNumber()).isEqualTo(4);
         assertThat(((Gate5) Rapid.gateGenerator(Classification.ofType(Gate5.class))
-                                 .start(1)).getNumber()).isEqualTo(77);
+                                 .create(1)).getNumber()).isEqualTo(77);
         assertThat(((Gate6) Rapid.gateGenerator(Classification.ofType(Gate6.class))
-                                 .start(3)).getNumber()).isEqualTo(5);
+                                 .create(3)).getNumber()).isEqualTo(5);
         assertThat(((Gate7) Rapid.gateGenerator(Classification.ofType(Gate7.class))
-                                 .start(3)).getNumber()).isEqualTo(4);
+                                 .create(3)).getNumber()).isEqualTo(4);
         assertThat(((Gate8) Rapid.gateGenerator(Classification.ofType(Gate8.class))
-                                 .start(3)).getNumber()).isEqualTo(5);
+                                 .create(3)).getNumber()).isEqualTo(5);
 
-        assertThat(Rapid.gateGenerator(new Gate1()).start(1)).isExactlyInstanceOf(Gate1.class);
-        assertThat(((Gate2) Rapid.gateGenerator(new Gate2(22)).start(1)).getNumber()).isEqualTo(1);
-        assertThat(((Gate3) Rapid.gateGenerator(new Gate3(33)).start(1)).getNumber()).isEqualTo(2);
-        assertThat(((Gate4) Rapid.gateGenerator(new Gate4(44)).start(1)).getNumber()).isEqualTo(4);
-        assertThat(((Gate5) Rapid.gateGenerator(new Gate5(55)).start(1)).getNumber()).isEqualTo(77);
-        assertThat(((Gate6) Rapid.gateGenerator(new Gate6(66)).start(3)).getNumber()).isEqualTo(5);
-        assertThat(((Gate7) Rapid.gateGenerator(new Gate7(77)).start(3)).getNumber()).isEqualTo(4);
+        assertThat(Rapid.gateGenerator(new Gate1()).create(1)).isExactlyInstanceOf(Gate1.class);
+        assertThat(((Gate2) Rapid.gateGenerator(new Gate2(22)).create(1)).getNumber()).isEqualTo(1);
+        assertThat(((Gate3) Rapid.gateGenerator(new Gate3(33)).create(1)).getNumber()).isEqualTo(2);
+        assertThat(((Gate4) Rapid.gateGenerator(new Gate4(44)).create(1)).getNumber()).isEqualTo(4);
+        assertThat(((Gate5) Rapid.gateGenerator(new Gate5(55)).create(1)).getNumber()).isEqualTo(77);
+        assertThat(((Gate6) Rapid.gateGenerator(new Gate6(66)).create(3)).getNumber()).isEqualTo(5);
+        assertThat(((Gate7) Rapid.gateGenerator(new Gate7(77)).create(3)).getNumber()).isEqualTo(4);
 
         assertThat(
                 ((GateX) Rapid.gateGenerator(GateX.class, this, new CopyOnWriteArrayList<Object>(),
-                                             null, null).start(1)).getNumber()).isEqualTo(33);
+                                             null, null).create(1)).getNumber()).isEqualTo(33);
         assertThat(((GateX) Rapid.gateGenerator(new GateX(null, null, 11), this,
                                                 new CopyOnWriteArrayList<Object>(), null, null)
-                                 .start(1)).getNumber()).isEqualTo(33);
+                                 .create(1)).getNumber()).isEqualTo(33);
         assertThat(
                 ((GateX) Rapid.gateGenerator(GateX.class, this, new CopyOnWriteArrayList<Object>(),
-                                             null).start(1)).getNumber()).isEqualTo(12);
+                                             null).create(1)).getNumber()).isEqualTo(12);
         assertThat(
                 ((GateX) Rapid.gateGenerator(GateX.class, this, new LinkedList<Object>(), null, 2)
-                              .start(1)).getNumber()).isEqualTo(24);
+                              .create(1)).getNumber()).isEqualTo(24);
         assertThat(((GateX) Rapid.gateGenerator(GateX.class, this, new ArrayList<Object>(), null, 2)
-                                 .start(1)).getNumber()).isEqualTo(46);
+                                 .create(1)).getNumber()).isEqualTo(46);
         assertThat(
                 ((Gate2) Rapid.gateGenerator(GateX1.class, this, new ArrayList<Object>(), null, 4)
-                              .start(1)).getNumber()).isEqualTo(81);
+                              .create(1)).getNumber()).isEqualTo(81);
 
         try {
 
@@ -411,41 +411,41 @@ public class RapidGeneratorsTest extends TestCase {
                 new Classification<Gate<Object, Object>>() {};
 
         assertThat(Rapid.gateGenerator(new GateGenerator1(), classification)
-                        .start(1)).isExactlyInstanceOf(Gate1.class);
+                        .create(1)).isExactlyInstanceOf(Gate1.class);
         assertThat(((Gate2) Rapid.gateGenerator(new GateGenerator2(), classification)
-                                 .start(1)).getNumber()).isEqualTo(1);
+                                 .create(1)).getNumber()).isEqualTo(1);
         assertThat(((Gate2) Rapid.gateGenerator(new GateGenerator2(),
                                                 Classification.ofType(Gate2.class))
-                                 .start(1)).getNumber()).isEqualTo(3);
+                                 .create(1)).getNumber()).isEqualTo(3);
         assertThat(Rapid.gateGenerator(new GateGenerator3(), classification)
-                        .start(1)).isExactlyInstanceOf(Gate1.class);
+                        .create(1)).isExactlyInstanceOf(Gate1.class);
         assertThat(((Gate2) Rapid.gateGenerator(new GateGenerator4(), classification,
                                                 new LinkedList<Object>(), null, 2)
-                                 .start(1)).getNumber()).isEqualTo(2);
+                                 .create(1)).getNumber()).isEqualTo(2);
         assertThat(((Gate2) Rapid.gateGenerator(new GateGenerator4(), classification,
                                                 new LinkedList<Object>(), null)
-                                 .start(1)).getNumber()).isEqualTo(1);
+                                 .create(1)).getNumber()).isEqualTo(1);
         assertThat(((Gate2) Rapid.gateGenerator(new GateGenerator4(), classification,
                                                 new ArrayList<Object>(), null)
-                                 .start(1)).getNumber()).isEqualTo(3);
+                                 .create(1)).getNumber()).isEqualTo(3);
         assertThat(((Gate2) Rapid.gateGenerator(new GateGenerator5(), classification,
                                                 new LinkedList<Object>(), null, 2)
-                                 .start(1)).getNumber()).isEqualTo(2);
+                                 .create(1)).getNumber()).isEqualTo(2);
         assertThat(((Gate2) Rapid.gateGenerator(new GateGenerator5(), classification,
                                                 new LinkedList<Object>(), null)
-                                 .start(1)).getNumber()).isEqualTo(1);
+                                 .create(1)).getNumber()).isEqualTo(1);
         assertThat(((Gate2) Rapid.gateGenerator(new GateGenerator5(), classification,
                                                 new ArrayList<Object>(), null)
-                                 .start(1)).getNumber()).isEqualTo(3);
+                                 .create(1)).getNumber()).isEqualTo(3);
         assertThat(((Gate2) Rapid.gateGenerator(new GateGenerator6(), classification,
                                                 new LinkedList<Object>(), null, 2)
-                                 .start(1)).getNumber()).isEqualTo(2);
+                                 .create(1)).getNumber()).isEqualTo(2);
         assertThat(((Gate2) Rapid.gateGenerator(new GateGenerator6(), classification,
                                                 new LinkedList<Object>(), null)
-                                 .start(1)).getNumber()).isEqualTo(44);
+                                 .create(1)).getNumber()).isEqualTo(44);
         assertThat(((Gate2) Rapid.gateGenerator(new GateGenerator6(), classification,
                                                 new ArrayList<Object>(), null)
-                                 .start(1)).getNumber()).isEqualTo(4);
+                                 .create(1)).getNumber()).isEqualTo(4);
 
         try {
 

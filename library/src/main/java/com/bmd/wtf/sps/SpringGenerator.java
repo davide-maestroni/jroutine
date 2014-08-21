@@ -11,23 +11,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.wtf.gts;
+package com.bmd.wtf.sps;
 
 /**
  * A generator of gate instances.
  * <p/>
- * Created by davide on 6/8/14.
+ * Created by davide on 8/20/14.
  *
- * @param <IN>  the input data type.
- * @param <OUT> the output data type.
+ * @param <DATA> the spring data type.
  */
-public interface GateGenerator<IN, OUT> {
+public interface SpringGenerator<DATA> {
 
     /**
-     * Creates and returns the gate forming the specified fall.
+     * Creates and returns the spring flowing from the specified fall.
      *
      * @param fallNumber the number identifying the fall.
-     * @return the gate.
+     * @return the spring.
      */
-    public Gate<IN, OUT> create(int fallNumber);
+    public Spring<DATA> create(int fallNumber);
 }

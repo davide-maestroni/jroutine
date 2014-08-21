@@ -11,23 +11,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.wtf.gts;
+package com.bmd.wtf.sps;
 
 /**
- * A generator of gate instances.
+ * A spring represents a generator of data to be pushed into a waterfall.
  * <p/>
- * Created by davide on 6/8/14.
+ * Created by davide on 8/16/14.
  *
- * @param <IN>  the input data type.
- * @param <OUT> the output data type.
+ * @param <DATA> the generated data type.
  */
-public interface GateGenerator<IN, OUT> {
+public interface Spring<DATA> {
 
     /**
-     * Creates and returns the gate forming the specified fall.
+     * Checks if the spring has more data drops.
      *
-     * @param fallNumber the number identifying the fall.
-     * @return the gate.
+     * @return whether the spring has any data to push.
      */
-    public Gate<IN, OUT> create(int fallNumber);
+    public boolean hasDrops();
+
+    /**
+     * Gets the next data drop to push into the waterfall.
+     * <p/>
+     * Note that this method is expected to return data until {@link #hasDrops()} returns true.
+     *
+     * @return the drop.
+     */
+    public DATA nextDrop();
 }

@@ -22,6 +22,8 @@ import com.bmd.wtf.flw.Pump;
 import com.bmd.wtf.gts.Gate;
 import com.bmd.wtf.gts.GateGenerator;
 import com.bmd.wtf.gts.OpenGate;
+import com.bmd.wtf.sps.Spring;
+import com.bmd.wtf.sps.SpringGenerator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,6 +48,8 @@ import java.util.concurrent.TimeUnit;
  * @param <OUT>    the output data type.
  */
 public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
+
+    // TODO: springs, bridge, linq(?)
 
     private static final DataFall[] NO_FALL = new DataFall[0];
 
@@ -242,6 +246,11 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      */
     private static void registerGate(final Gate<?, ?> gate) {
 
+        if (gate == null) {
+
+            throw new IllegalArgumentException("the waterfall gate cannot be null");
+        }
+
         if (sGates.containsKey(gate)) {
 
             throw new IllegalArgumentException("the waterfall already contains the gate: " + gate);
@@ -251,12 +260,18 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
     }
 
     /**
-     * Chains the specified waterfall to this one. After the call, all the data flowing through
-     * this waterfall will be pushed into the target one.
+     * Chains the stream identified by the specified number to this waterfall. After the call, all
+     * the data flowing through this waterfall will be pushed into the target stream.
      *
-     * @param waterfall the waterfall to chain.
+     * @param streamNumber the number identifying the target stream.
+     * @param waterfall    the target waterfall.
      */
-    public void chain(final Waterfall<?, OUT, ?> waterfall) {
+    public void chain(final int streamNumber, final Waterfall<?, OUT, ?> waterfall) {
+
+        if (waterfall == null) {
+
+            throw new IllegalArgumentException("the waterfall cannot be null");
+        }
 
         if (this == waterfall) {
 
@@ -268,66 +283,107 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
         if ((falls == NO_FALL) || (waterfall.mFalls == NO_FALL)) {
 
             throw new IllegalStateException("cannot chain a not started waterfall to another one");
+        }
+
+        final DataFall<OUT, ?> outFall = waterfall.mFalls[streamNumber];
+
+        for (final DataStream<?> outputStream : outFall.outputStreams) {
+
+            //noinspection unchecked
+            if (outputStream.canReach(Arrays.asList(falls))) {
+
+                throw new IllegalArgumentException(
+                        "a possible loop in the waterfall chain has been detected");
+            }
+        }
+
+        for (final DataFall<IN, OUT> fall : falls) {
+
+            link(fall, outFall);
+        }
+    }
+
+    /**
+     * Chains the specified waterfall to this one. After the call, all the data flowing through
+     * this waterfall will be pushed into the target one.
+     *
+     * @param waterfall the waterfall to chain.
+     */
+    public void chain(final Waterfall<?, OUT, ?> waterfall) {
+
+        if (waterfall == null) {
+
+            throw new IllegalArgumentException("the waterfall cannot be null");
+        }
+
+        if (this == waterfall) {
+
+            throw new IllegalArgumentException("cannot chain a waterfall to itself");
+        }
+
+        final DataFall<IN, OUT>[] falls = mFalls;
+
+        if ((falls == NO_FALL) || (waterfall.mFalls == NO_FALL)) {
+
+            throw new IllegalStateException("cannot chain a not started waterfall to another one");
+        }
+
+        final int size = waterfall.mSize;
+        final int length = falls.length;
+
+        final DataFall<OUT, ?>[] outFalls = waterfall.mFalls;
+
+        for (final DataFall<OUT, ?> outFall : outFalls) {
+
+            for (final DataStream<?> outputStream : outFall.outputStreams) {
+
+                //noinspection unchecked
+                if (outputStream.canReach(Arrays.asList(falls))) {
+
+                    throw new IllegalArgumentException(
+                            "a possible loop in the waterfall chain has been detected");
+                }
+            }
+        }
+
+        if (size == 1) {
+
+            final DataFall<OUT, ?> outFall = outFalls[0];
+
+            for (final DataFall<IN, OUT> fall : falls) {
+
+                link(fall, outFall);
+            }
 
         } else {
 
-            final int size = waterfall.mSize;
-            final int length = falls.length;
+            final Waterfall<SOURCE, ?, OUT> inWaterfall;
 
-            final DataFall<OUT, ?>[] outFalls = waterfall.mFalls;
+            if ((length != 1) && (length != size)) {
 
-            for (final DataFall<OUT, ?> outFall : outFalls) {
+                inWaterfall = in(1).chain();
 
-                for (final DataStream<?> outputStream : outFall.outputStreams) {
+            } else {
 
-                    //noinspection unchecked
-                    if (outputStream.canReach(Arrays.asList(falls))) {
-
-                        throw new IllegalArgumentException(
-                                "a possible loop in the waterfall chain has been detected");
-                    }
-                }
+                inWaterfall = this;
             }
 
-            if (size == 1) {
+            final DataFall<?, OUT>[] inFalls = inWaterfall.mFalls;
 
-                final DataFall<OUT, ?> outFall = outFalls[0];
+            if (inFalls.length == 1) {
 
-                for (final DataFall<IN, OUT> fall : falls) {
+                final DataFall<?, OUT> inFall = inFalls[0];
 
-                    link(fall, outFall);
+                for (final DataFall<OUT, ?> outFall : outFalls) {
+
+                    link(inFall, outFall);
                 }
 
             } else {
 
-                final Waterfall<SOURCE, ?, OUT> inWaterfall;
+                for (int i = 0; i < size; ++i) {
 
-                if ((length != 1) && (length != size)) {
-
-                    inWaterfall = in(1).chain();
-
-                } else {
-
-                    inWaterfall = this;
-                }
-
-                final DataFall<?, OUT>[] inFalls = inWaterfall.mFalls;
-
-                if (inFalls.length == 1) {
-
-                    final DataFall<?, OUT> inFall = inFalls[0];
-
-                    for (final DataFall<OUT, ?> outFall : outFalls) {
-
-                        link(inFall, outFall);
-                    }
-
-                } else {
-
-                    for (int i = 0; i < size; ++i) {
-
-                        link(inFalls[i], outFalls[i]);
-                    }
+                    link(inFalls[i], outFalls[i]);
                 }
             }
         }
@@ -509,6 +565,45 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
     }
 
     /**
+     * Chains the specified gates to this waterfall.
+     * <p/>
+     * Note that calling this method will have the same effect as calling first
+     * <code>in(gates.length)</code>.
+     *
+     * @param gates  the gate instances.
+     * @param <NOUT> the new output data type.
+     * @return the newly created waterfall.
+     */
+    public <NOUT> Waterfall<SOURCE, OUT, NOUT> chain(final Gate<OUT, NOUT>... gates) {
+
+        if (gates == null) {
+
+            throw new IllegalArgumentException("the waterfall gate array cannot be null");
+        }
+
+        final int length = gates.length;
+        final Waterfall<SOURCE, IN, OUT> waterfall;
+
+        if (mSize == length) {
+
+            waterfall = this;
+
+        } else {
+
+            waterfall = in(length);
+        }
+
+        return waterfall.chain(new GateGenerator<OUT, NOUT>() {
+
+            @Override
+            public Gate<OUT, NOUT> create(final int fallNumber) {
+
+                return gates[fallNumber];
+            }
+        });
+    }
+
+    /**
      * Chains the specified gate to this waterfall.
      * <p/>
      * Note that in case this waterfall is composed by more then one data stream, all the data
@@ -519,11 +614,6 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * @return the newly created waterfall.
      */
     public <NOUT> Waterfall<SOURCE, OUT, NOUT> chain(final Gate<OUT, NOUT> gate) {
-
-        if (gate == null) {
-
-            throw new IllegalArgumentException("the waterfall gate cannot be null");
-        }
 
         final DataFall<IN, OUT>[] falls = mFalls;
 
@@ -629,7 +719,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
         if (size == 1) {
 
-            final Gate<OUT, NOUT> gate = generator.start(0);
+            final Gate<OUT, NOUT> gate = generator.create(0);
 
             registerGate(gate);
 
@@ -670,7 +760,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
         for (int i = 0; i < size; ++i) {
 
-            final Gate<OUT, NOUT> gate = generator.start(i);
+            final Gate<OUT, NOUT> gate = generator.create(i);
 
             registerGate(gate);
 
@@ -1688,16 +1778,16 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
         if (generator == null) {
 
-            throw new IllegalArgumentException("the waterfall generator cannot be null");
+            throw new IllegalArgumentException("the waterfall gate generator cannot be null");
         }
 
         final Map<Classification<?>, DamGate<?, ?>> damMap = Collections.emptyMap();
 
         final int size = mSize;
 
-        if (size == 1) {
+        if (size <= 1) {
 
-            final Gate<NIN, NOUT> gate = generator.start(0);
+            final Gate<NIN, NOUT> gate = generator.create(0);
 
             registerGate(gate);
 
@@ -1716,7 +1806,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
         for (int i = 0; i < size; ++i) {
 
-            final Gate<NIN, NOUT> gate = generator.start(i);
+            final Gate<NIN, NOUT> gate = generator.create(i);
 
             registerGate(gate);
 
@@ -1730,6 +1820,103 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
     }
 
     /**
+     * Creates and returns a new waterfall chained to the specified gates.
+     * <p/>
+     * Note that the dams and the currents of this waterfall will be retained, while the size will
+     * be equal to the one of the specified array.
+     *
+     * @param gates  the gate instances.
+     * @param <NIN>  the new input data type.
+     * @param <NOUT> the new output data type.
+     * @return the newly created waterfall.
+     */
+    public <NIN, NOUT> Waterfall<NIN, NIN, NOUT> start(final Gate<NIN, NOUT>... gates) {
+
+        if (gates == null) {
+
+            throw new IllegalArgumentException("the waterfall gate array cannot be null");
+        }
+
+        final int length = gates.length;
+
+        if (length == 0) {
+
+            throw new IllegalArgumentException("the waterfall gate array cannot be empty");
+        }
+
+        final Waterfall<SOURCE, IN, OUT> waterfall;
+
+        if (mSize == length) {
+
+            waterfall = this;
+
+        } else {
+
+            waterfall = in(length);
+        }
+
+        return waterfall.start(new GateGenerator<NIN, NOUT>() {
+
+            @Override
+            public Gate<NIN, NOUT> create(final int fallNumber) {
+
+                return gates[fallNumber];
+            }
+        });
+    }
+
+    /**
+     * Creates and returns a new waterfall fed by to the springs returned by the specified
+     * generator.
+     * <p/>
+     * Note that the dams, the size and the currents of this waterfall will be retained.
+     *
+     * @param generator the spring generator.
+     * @param <DATA>    the spring data type.
+     * @return the newly created waterfall.
+     */
+    public <DATA> Waterfall<Void, Void, DATA> start(final SpringGenerator<DATA> generator) {
+
+        return start(new GateGenerator<Void, DATA>() {
+
+            @Override
+            public Gate<Void, DATA> create(final int fallNumber) {
+
+                return new SpringGate<DATA>(generator.create(fallNumber));
+            }
+        });
+    }
+
+    /**
+     * Creates and returns a new waterfall fed by the specified springs.
+     * <p/>
+     * Note that the dams and the currents of this waterfall will be retained, while the size will
+     * be equal to the one of the specified array.
+     *
+     * @param springs the spring instances
+     * @param <DATA>  the spring data type.
+     * @return the newly created waterfall.
+     */
+    public <DATA> Waterfall<Void, Void, DATA> start(final Spring<DATA>... springs) {
+
+        if (springs == null) {
+
+            throw new IllegalArgumentException("the waterfall spring array cannot be null");
+        }
+
+        final int length = springs.length;
+        final Gate[] gates = new Gate[length];
+
+        for (int i = 0; i < length; i++) {
+
+            gates[i] = new SpringGate<DATA>(springs[i]);
+        }
+
+        //noinspection unchecked
+        return start(gates);
+    }
+
+    /**
      * Creates and returns a new waterfall chained to the specified gate.
      * <p/>
      * Note that the dams, the size and the currents of this waterfall will be retained.
@@ -1740,11 +1927,6 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * @return the newly created waterfall.
      */
     public <NIN, NOUT> Waterfall<NIN, NIN, NOUT> start(final Gate<NIN, NOUT> gate) {
-
-        if (gate == null) {
-
-            throw new IllegalArgumentException("the waterfall gate cannot be null");
-        }
 
         registerGate(gate);
 

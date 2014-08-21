@@ -11,23 +11,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.wtf.gts;
 
 /**
- * A generator of gate instances.
+ * Package containing classes and definitions related to waterfall springs.
  * <p/>
- * Created by davide on 6/8/14.
- *
- * @param <IN>  the input data type.
- * @param <OUT> the output data type.
+ * Created by davide on 6/27/14.
  */
-public interface GateGenerator<IN, OUT> {
-
-    /**
-     * Creates and returns the gate forming the specified fall.
-     *
-     * @param fallNumber the number identifying the fall.
-     * @return the gate.
-     */
-    public Gate<IN, OUT> create(int fallNumber);
-}
+package com.bmd.wtf.sps;

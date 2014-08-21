@@ -11,30 +11,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.wtf.sps;
+package com.bmd.wtf.spr;
 
 /**
- * A spring represents a generator of data to be pushed into a waterfall.
+ * A generator of gate instances.
  * <p/>
- * Created by davide on 8/16/14.
+ * Created by davide on 8/20/14.
  *
- * @param <DATA> the generated data type.
+ * @param <DATA> the spring data type.
  */
-public interface Spring<DATA> {
+public interface SpringGenerator<DATA> {
 
     /**
-     * Checks if the spring has more data drops.
+     * Creates and returns the spring flowing from the specified fall.
      *
-     * @return whether the spring has any data to push.
+     * @param fallNumber the number identifying the fall.
+     * @return the spring.
      */
-    public boolean hasDrops();
-
-    /**
-     * Gets the next data drop to push into the waterfall.
-     * <p/>
-     * Note that this method is expected to return data until {@link #hasDrops()} returns true.
-     *
-     * @return the drop.
-     */
-    public DATA nextDrop();
+    public Spring<DATA> create(int fallNumber);
 }

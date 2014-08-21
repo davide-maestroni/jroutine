@@ -22,8 +22,8 @@ import com.bmd.wtf.flw.Pump;
 import com.bmd.wtf.gts.Gate;
 import com.bmd.wtf.gts.GateGenerator;
 import com.bmd.wtf.gts.OpenGate;
-import com.bmd.wtf.sps.Spring;
-import com.bmd.wtf.sps.SpringGenerator;
+import com.bmd.wtf.spr.Spring;
+import com.bmd.wtf.spr.SpringGenerator;
 
 import java.util.ArrayList;
 import java.util.Arrays;

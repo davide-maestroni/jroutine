@@ -15,7 +15,7 @@ package com.bmd.wtf.fll;
 
 import com.bmd.wtf.flw.River;
 import com.bmd.wtf.gts.AbstractGate;
-import com.bmd.wtf.sps.Spring;
+import com.bmd.wtf.spr.Spring;
 
 /**
  * Gate wrapping a spring.

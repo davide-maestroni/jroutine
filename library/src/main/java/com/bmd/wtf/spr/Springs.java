@@ -11,8 +11,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.wtf.sps;
+package com.bmd.wtf.spr;
 
+import com.bmd.wtf.fll.Waterfall;
+import com.bmd.wtf.flw.Collector;
 import com.bmd.wtf.flw.FloatingException;
 
 import java.io.BufferedReader;
@@ -29,13 +31,213 @@ import java.util.NoSuchElementException;
  */
 public class Springs {
 
-    // TODO: dec, random, etc.
+    // TODO: random, etc.
 
     /**
      * Avoid direct instantiation.
      */
     protected Springs() {
 
+    }
+
+    /**
+     * Creates a spring generating a sequence of bytes starting from the specified first value and
+     * decreasing it by the specified number of times.
+     *
+     * @param first the first value.
+     * @param count the iteration count.
+     * @return the new spring.
+     */
+    public static Spring<Byte> dec(final byte first, final byte count) {
+
+        if ((count < 0) || ((Byte.MIN_VALUE + count) > (first + 1))) {
+
+            throw new IllegalArgumentException();
+        }
+
+        return new Spring<Byte>() {
+
+            private byte mNext = first;
+
+            private final byte mLast = (byte) (first - count);
+
+            @Override
+            public boolean hasDrops() {
+
+                return (mNext != mLast);
+            }
+
+            @Override
+            public Byte nextDrop() {
+
+                if (!hasDrops()) {
+
+                    throw new NoSuchElementException();
+                }
+
+                return mNext--;
+            }
+        };
+    }
+
+    /**
+     * Creates a spring generating a sequence of chars starting from the specified first value and
+     * decreasing it by the specified number of times.
+     *
+     * @param first the first value.
+     * @param count the iteration count.
+     * @return the new spring.
+     */
+    public static Spring<Character> dec(final char first, final char count) {
+
+        if ((count < 0) || ((Character.MAX_VALUE + count) > (first + 1))) {
+
+            throw new IllegalArgumentException();
+        }
+
+        return new Spring<Character>() {
+
+            private char mNext = first;
+
+            private final char mLast = (char) (first - count);
+
+            @Override
+            public boolean hasDrops() {
+
+                return (mNext != mLast);
+            }
+
+            @Override
+            public Character nextDrop() {
+
+                if (!hasDrops()) {
+
+                    throw new NoSuchElementException();
+                }
+
+                return mNext--;
+            }
+        };
+    }
+
+    /**
+     * Creates a spring generating a sequence of ints starting from the specified first value and
+     * decreasing it by the specified number of times.
+     *
+     * @param first the first value.
+     * @param count the iteration count.
+     * @return the new spring.
+     */
+    public static Spring<Integer> dec(final int first, final int count) {
+
+        if ((count < 0) || ((Integer.MAX_VALUE + count) > (first + 1))) {
+
+            throw new IllegalArgumentException();
+        }
+
+        return new Spring<Integer>() {
+
+            private int mNext = first;
+
+            private final int mLast = first - count;
+
+            @Override
+            public boolean hasDrops() {
+
+                return (mNext != mLast);
+            }
+
+            @Override
+            public Integer nextDrop() {
+
+                if (!hasDrops()) {
+
+                    throw new NoSuchElementException();
+                }
+
+                return mNext--;
+            }
+        };
+    }
+
+    /**
+     * Creates a spring generating a sequence of longs starting from the specified first value and
+     * decreasing it by the specified number of times.
+     *
+     * @param first the first value.
+     * @param count the iteration count.
+     * @return the new spring.
+     */
+    public static Spring<Long> dec(final long first, final long count) {
+
+        if ((count < 0) || ((Long.MAX_VALUE + count) > (first + 1))) {
+
+            throw new IllegalArgumentException();
+        }
+
+        return new Spring<Long>() {
+
+            private long mNext = first;
+
+            private final long mLast = first - count;
+
+            @Override
+            public boolean hasDrops() {
+
+                return (mNext != mLast);
+            }
+
+            @Override
+            public Long nextDrop() {
+
+                if (!hasDrops()) {
+
+                    throw new NoSuchElementException();
+                }
+
+                return mNext--;
+            }
+        };
+    }
+
+    /**
+     * Creates a spring generating a sequence of shorts starting from the specified first value and
+     * decreasing it by the specified number of times.
+     *
+     * @param first the first value.
+     * @param count the iteration count.
+     * @return the new spring.
+     */
+    public static Spring<Short> dec(final short first, final short count) {
+
+        if ((count < 0) || ((Short.MAX_VALUE + count) > (first + 1))) {
+
+            throw new IllegalArgumentException();
+        }
+
+        return new Spring<Short>() {
+
+            private short mNext = first;
+
+            private final short mLast = (short) (first - count);
+
+            @Override
+            public boolean hasDrops() {
+
+                return (mNext != mLast);
+            }
+
+            @Override
+            public Short nextDrop() {
+
+                if (!hasDrops()) {
+
+                    throw new NoSuchElementException();
+                }
+
+                return mNext--;
+            }
+        };
     }
 
     /**
@@ -119,6 +321,48 @@ public class Springs {
 
                     throw new FloatingException(e);
                 }
+            }
+        };
+    }
+
+    /**
+     * Creates and returns a spring starting from the specified waterfall.
+     *
+     * @param waterfall the input waterfall.
+     * @param <DATA>    the data type.
+     * @return the new spring.
+     */
+    public static <DATA> Spring<DATA> from(final Waterfall<?, ?, DATA> waterfall) {
+
+        if (waterfall == null) {
+
+            throw new IllegalArgumentException("the spring waterfall cannot be null");
+        }
+
+        return new Spring<DATA>() {
+
+            private Collector<DATA> mCollector;
+
+            @Override
+            public boolean hasDrops() {
+
+                if (mCollector == null) {
+
+                    mCollector = waterfall.pull();
+                }
+
+                return mCollector.hasNext();
+            }
+
+            @Override
+            public DATA nextDrop() {
+
+                if (!hasDrops()) {
+
+                    throw new NoSuchElementException();
+                }
+
+                return mCollector.next();
             }
         };
     }
@@ -340,7 +584,8 @@ public class Springs {
     /**
      * Creates and returns a spring starting from the specified data drops.
      *
-     * @param drops the drops of data.
+     * @param drops  the drops of data.
+     * @param <DATA> the data type.
      * @return the new spring.
      */
     public static <DATA> Spring<DATA> from(final DATA... drops) {
@@ -378,7 +623,8 @@ public class Springs {
     /**
      * Creates and returns a spring starting from the specified data drops iterator.
      *
-     * @param drops the iterator returning the drops of data.
+     * @param drops  the iterator returning the drops of data.
+     * @param <DATA> the data type.
      * @return the new spring.
      */
     public static <DATA> Spring<DATA> from(final Iterator<DATA> drops) {
@@ -428,7 +674,7 @@ public class Springs {
             @Override
             public boolean hasDrops() {
 
-                return (mNext < mLast);
+                return (mNext != mLast);
             }
 
             @Override
@@ -468,7 +714,7 @@ public class Springs {
             @Override
             public boolean hasDrops() {
 
-                return (mNext < mLast);
+                return (mNext != mLast);
             }
 
             @Override
@@ -508,7 +754,7 @@ public class Springs {
             @Override
             public boolean hasDrops() {
 
-                return (mNext < mLast);
+                return (mNext != mLast);
             }
 
             @Override
@@ -548,7 +794,7 @@ public class Springs {
             @Override
             public boolean hasDrops() {
 
-                return (mNext < mLast);
+                return (mNext != mLast);
             }
 
             @Override
@@ -588,7 +834,7 @@ public class Springs {
             @Override
             public boolean hasDrops() {
 
-                return (mNext < mLast);
+                return (mNext != mLast);
             }
 
             @Override

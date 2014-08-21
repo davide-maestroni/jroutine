@@ -17,4 +17,4 @@
  * <p/>
  * Created by davide on 6/27/14.
  */
-package com.bmd.wtf.sps;
+package com.bmd.wtf.spr;

@@ -48,9 +48,9 @@ public class Springs {
      * @param count the iteration count.
      * @return the new spring.
      */
-    public static Spring<Byte> dec(final byte first, final byte count) {
+    public static Spring<Byte> decFrom(final byte first, final byte count) {
 
-        if ((count < 0) || ((Byte.MIN_VALUE + count) > (first + 1))) {
+        if ((count < 0) || ((count != 0) && ((Byte.MIN_VALUE + count - 1) > first))) {
 
             throw new IllegalArgumentException();
         }
@@ -88,9 +88,9 @@ public class Springs {
      * @param count the iteration count.
      * @return the new spring.
      */
-    public static Spring<Character> dec(final char first, final char count) {
+    public static Spring<Character> decFrom(final char first, final char count) {
 
-        if ((count < 0) || ((Character.MAX_VALUE + count) > (first + 1))) {
+        if ((count < 0) || ((count != 0) && ((Character.MIN_VALUE + count - 1) > first))) {
 
             throw new IllegalArgumentException();
         }
@@ -128,9 +128,9 @@ public class Springs {
      * @param count the iteration count.
      * @return the new spring.
      */
-    public static Spring<Integer> dec(final int first, final int count) {
+    public static Spring<Integer> decFrom(final int first, final int count) {
 
-        if ((count < 0) || ((Integer.MAX_VALUE + count) > (first + 1))) {
+        if ((count < 0) || ((count != 0) && ((Integer.MIN_VALUE + count - 1) > first))) {
 
             throw new IllegalArgumentException();
         }
@@ -168,9 +168,9 @@ public class Springs {
      * @param count the iteration count.
      * @return the new spring.
      */
-    public static Spring<Long> dec(final long first, final long count) {
+    public static Spring<Long> decFrom(final long first, final long count) {
 
-        if ((count < 0) || ((Long.MAX_VALUE + count) > (first + 1))) {
+        if ((count < 0) || ((count != 0) && ((Long.MIN_VALUE + count - 1) > first))) {
 
             throw new IllegalArgumentException();
         }
@@ -208,9 +208,9 @@ public class Springs {
      * @param count the iteration count.
      * @return the new spring.
      */
-    public static Spring<Short> dec(final short first, final short count) {
+    public static Spring<Short> decFrom(final short first, final short count) {
 
-        if ((count < 0) || ((Short.MAX_VALUE + count) > (first + 1))) {
+        if ((count < 0) || ((count != 0) && ((Short.MIN_VALUE + count - 1) > first))) {
 
             throw new IllegalArgumentException();
         }
@@ -658,9 +658,9 @@ public class Springs {
      * @param count the iteration count.
      * @return the new spring.
      */
-    public static Spring<Byte> inc(final byte first, final byte count) {
+    public static Spring<Byte> incFrom(final byte first, final byte count) {
 
-        if ((count < 0) || ((Byte.MAX_VALUE - count) < (first - 1))) {
+        if ((count < 0) || ((count != 0) && ((Byte.MAX_VALUE - count + 1) < first))) {
 
             throw new IllegalArgumentException();
         }
@@ -698,9 +698,9 @@ public class Springs {
      * @param count the iteration count.
      * @return the new spring.
      */
-    public static Spring<Character> inc(final char first, final char count) {
+    public static Spring<Character> incFrom(final char first, final char count) {
 
-        if ((count < 0) || ((Character.MAX_VALUE - count) < (first - 1))) {
+        if ((count < 0) || ((count != 0) && ((Character.MAX_VALUE - count + 1) < first))) {
 
             throw new IllegalArgumentException();
         }
@@ -738,9 +738,9 @@ public class Springs {
      * @param count the iteration count.
      * @return the new spring.
      */
-    public static Spring<Integer> inc(final int first, final int count) {
+    public static Spring<Integer> incFrom(final int first, final int count) {
 
-        if ((count < 0) || ((Integer.MAX_VALUE - count) < (first - 1))) {
+        if ((count < 0) || ((count != 0) && ((Integer.MAX_VALUE - count + 1) < first))) {
 
             throw new IllegalArgumentException();
         }
@@ -778,9 +778,9 @@ public class Springs {
      * @param count the iteration count.
      * @return the new spring.
      */
-    public static Spring<Long> inc(final long first, final long count) {
+    public static Spring<Long> incFrom(final long first, final long count) {
 
-        if ((count < 0) || ((Long.MAX_VALUE - count) < (first - 1))) {
+        if ((count < 0) || ((count != 0) && ((Long.MAX_VALUE - count + 1) < first))) {
 
             throw new IllegalArgumentException();
         }
@@ -818,9 +818,9 @@ public class Springs {
      * @param count the iteration count.
      * @return the new spring.
      */
-    public static Spring<Short> inc(final short first, final short count) {
+    public static Spring<Short> incFrom(final short first, final short count) {
 
-        if ((count < 0) || ((Short.MAX_VALUE - count) < (first - 1))) {
+        if ((count < 0) || ((count != 0) && ((Short.MAX_VALUE - count + 1) < first))) {
 
             throw new IllegalArgumentException();
         }

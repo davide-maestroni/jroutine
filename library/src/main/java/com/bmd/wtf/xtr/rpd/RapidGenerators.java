@@ -18,6 +18,8 @@ import com.bmd.wtf.crr.CurrentGenerator;
 import com.bmd.wtf.fll.Classification;
 import com.bmd.wtf.gts.Gate;
 import com.bmd.wtf.gts.GateGenerator;
+import com.bmd.wtf.spr.Spring;
+import com.bmd.wtf.spr.SpringGenerator;
 import com.bmd.wtf.xtr.rpd.RapidAnnotations.Generator;
 
 import java.lang.reflect.Constructor;
@@ -58,11 +60,11 @@ class RapidGenerators {
     public static CurrentGenerator currentGenerator(final Class<? extends Current> type,
             final Object... contextArgs) {
 
-        Constructor<?> bestMatch = findContextConstructor(type.getConstructors(), contextArgs);
+        Constructor<?> bestMatch = findConstructor(type.getConstructors(), contextArgs);
 
         if (bestMatch == null) {
 
-            bestMatch = findContextConstructor(type.getDeclaredConstructors(), contextArgs);
+            bestMatch = findConstructor(type.getDeclaredConstructors(), contextArgs);
 
             if (bestMatch == null) {
 
@@ -346,11 +348,11 @@ class RapidGenerators {
     public static <IN, OUT> GateGenerator<IN, OUT> gateGenerator(
             final Class<? extends Gate<IN, OUT>> type, final Object... contextArgs) {
 
-        Constructor<?> bestMatch = findContextConstructor(type.getConstructors(), contextArgs);
+        Constructor<?> bestMatch = findConstructor(type.getConstructors(), contextArgs);
 
         if (bestMatch == null) {
 
-            bestMatch = findContextConstructor(type.getDeclaredConstructors(), contextArgs);
+            bestMatch = findConstructor(type.getDeclaredConstructors(), contextArgs);
 
             if (bestMatch == null) {
 
@@ -427,8 +429,204 @@ class RapidGenerators {
         };
     }
 
+    /**
+     * Creates and returns a spring generator which instantiates objects of the specified
+     * classification through a method taking the specified parameters. A method taking
+     * an additional Integer parameter (that is, the fall number) is preferred to the default one.
+     * A one taking a primitive int is preferred to the Integer. Finally, a method annotated
+     * with {@link RapidAnnotations.Generator} is preferred to the not annotated ones.<br/>
+     * In case a suitable method is not found, an exception will be thrown.
+     * <p/>
+     * Note that a method might need to be made accessible in order to be called via
+     * reflection. That means that, in case a {@link java.lang.SecurityManager} is installed, a
+     * security exception might be raised based on the specific policy implemented.
+     *
+     * @param generator      the generator object whose method will be called.
+     * @param classification the spring classification.
+     * @param args           the arguments to be passed to the method.
+     * @param <DATA>         the data type.
+     * @return the newly created spring generator.
+     */
+    public static <DATA> SpringGenerator<DATA> springGenerator(final Object generator,
+            final Classification<? extends Spring<DATA>> classification, final Object... args) {
+
+        final Class<?> type = classification.getRawType();
+
+        Method bestMatch = findMethod(generator.getClass().getMethods(), type, args);
+
+        if (bestMatch == null) {
+
+            bestMatch = findMethod(generator.getClass().getDeclaredMethods(), type, args);
+
+            if (bestMatch == null) {
+
+                throw new IllegalArgumentException("no suitable method found for type " + type);
+            }
+        }
+
+        if (!bestMatch.isAccessible()) {
+
+            bestMatch.setAccessible(true);
+        }
+
+        final Method method = bestMatch;
+        final int length = method.getParameterTypes().length;
+
+        if (length > args.length) {
+
+            return new SpringGenerator<DATA>() {
+
+                @Override
+                public Spring<DATA> create(final int fallNumber) {
+
+                    try {
+
+                        final Object[] args = new Object[length];
+
+                        System.arraycopy(args, 0, args, 0, length - 1);
+
+                        args[length - 1] = fallNumber;
+
+                        //noinspection unchecked
+                        return (Spring<DATA>) method.invoke(generator, args);
+
+                    } catch (final InvocationTargetException e) {
+
+                        throw new RapidException(e.getCause());
+
+                    } catch (final IllegalAccessException e) {
+
+                        throw new RapidException(e);
+                    }
+                }
+            };
+        }
+
+        return new SpringGenerator<DATA>() {
+
+            @Override
+            public Spring<DATA> create(final int fallNumber) {
+
+                try {
+
+                    //noinspection unchecked
+                    return (Spring<DATA>) method.invoke(generator, args);
+
+                } catch (final InvocationTargetException e) {
+
+                    throw new RapidException(e.getCause());
+
+                } catch (final IllegalAccessException e) {
+
+                    throw new RapidException(e);
+                }
+            }
+        };
+    }
+
+    /**
+     * Creates and returns a spring generator which instantiates objects of the specified
+     * type through a constructor taking the specified parameters. A constructor taking
+     * an additional Integer parameter (that is, the fall number) is preferred to the default one.
+     * A one taking a primitive int is preferred to the Integer. Finally, a constructor annotated
+     * with {@link RapidAnnotations.Generator} is preferred to the not annotated ones.<br/>
+     * In case a suitable constructor is not found, an exception will be thrown.
+     * <p/>
+     * Note that a constructor might need to be made accessible in order to be called via
+     * reflection. That means that, in case a {@link java.lang.SecurityManager} is installed, a
+     * security exception might be raised based on the specific policy implemented.
+     *
+     * @param type        the spring type.
+     * @param contextArgs the arguments to be passed to the constructor.
+     * @param <DATA>      the data type.
+     * @return the newly created gate generator.
+     */
+    public static <DATA> SpringGenerator<DATA> springGenerator(
+            final Class<? extends Spring<DATA>> type, final Object... contextArgs) {
+
+        Constructor<?> bestMatch = findConstructor(type.getConstructors(), contextArgs);
+
+        if (bestMatch == null) {
+
+            bestMatch = findConstructor(type.getDeclaredConstructors(), contextArgs);
+
+            if (bestMatch == null) {
+
+                throw new IllegalArgumentException(
+                        "no suitable constructor found for type " + type);
+            }
+        }
+
+        if (!bestMatch.isAccessible()) {
+
+            bestMatch.setAccessible(true);
+        }
+
+        final Constructor<?> constructor = bestMatch;
+        final int length = constructor.getParameterTypes().length;
+
+        if (length > contextArgs.length) {
+
+            return new SpringGenerator<DATA>() {
+
+                @Override
+                public Spring<DATA> create(final int fallNumber) {
+
+                    try {
+
+                        final Object[] args = new Object[length];
+
+                        System.arraycopy(contextArgs, 0, args, 0, length - 1);
+
+                        args[length - 1] = fallNumber;
+
+                        //noinspection unchecked
+                        return (Spring<DATA>) constructor.newInstance(args);
+
+                    } catch (final InstantiationException e) {
+
+                        throw new RapidException(e);
+
+                    } catch (final InvocationTargetException e) {
+
+                        throw new RapidException(e.getCause());
+
+                    } catch (final IllegalAccessException e) {
+
+                        throw new RapidException(e);
+                    }
+                }
+            };
+        }
+
+        return new SpringGenerator<DATA>() {
+
+            @Override
+            public Spring<DATA> create(final int fallNumber) {
+
+                try {
+
+                    //noinspection unchecked
+                    return (Spring<DATA>) constructor.newInstance(contextArgs);
+
+                } catch (final InstantiationException e) {
+
+                    throw new RapidException(e);
+
+                } catch (final InvocationTargetException e) {
+
+                    throw new RapidException(e.getCause());
+
+                } catch (final IllegalAccessException e) {
+
+                    throw new RapidException(e);
+                }
+            }
+        };
+    }
+
     @SuppressWarnings("ConstantConditions")
-    private static Constructor<?> findContextConstructor(final Constructor<?>[] constructors,
+    private static Constructor<?> findConstructor(final Constructor<?>[] constructors,
             final Object[] contextArgs) {
 
         final int argsLength = contextArgs.length;

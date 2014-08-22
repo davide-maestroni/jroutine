@@ -19,6 +19,8 @@ import com.bmd.wtf.fll.Classification;
 import com.bmd.wtf.flw.Dam;
 import com.bmd.wtf.gts.Gate;
 import com.bmd.wtf.gts.GateGenerator;
+import com.bmd.wtf.spr.Spring;
+import com.bmd.wtf.spr.SpringGenerator;
 
 /**
  * This class is meant to provide utility methods for employing rapid classes, which use reflection
@@ -218,6 +220,8 @@ public class Rapid {
      * @param generator      the generator object whose method will be called.
      * @param classification the gate classification.
      * @param args           the arguments to be passed to the method.
+     * @param <IN>           the input data type.
+     * @param <OUT>          the output data type.
      * @return the newly created gate generator.
      */
     public static <IN, OUT> GateGenerator<IN, OUT> gateGenerator(final Object generator,
@@ -252,6 +256,8 @@ public class Rapid {
      *
      * @param gate        the gate object to instantiate.
      * @param contextArgs the arguments to be passed to the constructor.
+     * @param <IN>        the input data type.
+     * @param <OUT>       the output data type.
      * @return the newly created gate generator.
      */
     public static <IN, OUT> GateGenerator<IN, OUT> gateGenerator(final Gate<IN, OUT> gate,
@@ -288,6 +294,8 @@ public class Rapid {
      *
      * @param classification the gate classification.
      * @param contextArgs    the arguments to be passed to the constructor.
+     * @param <IN>           the input data type.
+     * @param <OUT>          the output data type.
      * @return the newly created gate generator.
      */
     public static <IN, OUT> GateGenerator<IN, OUT> gateGenerator(
@@ -323,11 +331,157 @@ public class Rapid {
      *
      * @param type        the gate type.
      * @param contextArgs the arguments to be passed to the constructor.
+     * @param <IN>        the input data type.
+     * @param <OUT>       the output data type.
      * @return the newly created gate generator.
      */
     public static <IN, OUT> GateGenerator<IN, OUT> gateGenerator(
             final Class<? extends Gate<IN, OUT>> type, final Object... contextArgs) {
 
         return RapidGenerators.gateGenerator(type, contextArgs);
+    }
+
+    /**
+     * Creates and returns a spring generator which instantiates objects of the specified
+     * classification through a method taking the specified parameters. A method taking
+     * an additional Integer parameter (that is, the fall number) is preferred to the default one.
+     * A one taking a primitive int is preferred to the Integer. Finally, a method annotated
+     * with {@link RapidAnnotations.Generator} is preferred to the not annotated ones.<br/>
+     * In case a suitable method is not found, an exception will be thrown.
+     * <p/>
+     * Note that a method might need to be made accessible in order to be called via
+     * reflection. That means that, in case a {@link java.lang.SecurityManager} is installed, a
+     * security exception might be raised based on the specific policy implemented.
+     * <p/>
+     * <b>Warning:</b> when employing annotation remember to add the proper rules to your Proguard
+     * file:
+     * <pre>
+     *     <code>
+     *         -keepattributes RuntimeVisibleAnnotations
+     *
+     *         -keepclassmembers class ** {
+     *              &#64;com.bmd.wtf.xtr.rpd.RapidAnnotations$Generator *;
+     *         }
+     *     </code>
+     * </pre>
+     *
+     * @param generator      the generator object whose method will be called.
+     * @param classification the spring classification.
+     * @param args           the arguments to be passed to the method.
+     * @param <DATA>         the data type.
+     * @return the newly created spring generator.
+     */
+    public static <DATA> SpringGenerator<DATA> springGenerator(final Object generator,
+            final Classification<? extends Spring<DATA>> classification, final Object... args) {
+
+        return RapidGenerators.springGenerator(generator, classification, args);
+    }
+
+    /**
+     * Creates and returns a spring generator which instantiates objects of the specified
+     * type through a constructor taking the specified parameters. A constructor taking
+     * an additional Integer parameter (that is, the fall number) is preferred to the default one.
+     * A one taking a primitive int is preferred to the Integer. Finally, a constructor annotated
+     * with {@link RapidAnnotations.Generator} is preferred to the not annotated ones.<br/>
+     * In case a suitable constructor is not found, an exception will be thrown.
+     * <p/>
+     * Note that a constructor might need to be made accessible in order to be called via
+     * reflection. That means that, in case a {@link java.lang.SecurityManager} is installed, a
+     * security exception might be raised based on the specific policy implemented.
+     * <p/>
+     * <b>Warning:</b> when employing annotation remember to add the proper rules to your Proguard
+     * file:
+     * <pre>
+     *     <code>
+     *         -keepattributes RuntimeVisibleAnnotations
+     *
+     *         -keepclassmembers class ** {
+     *              &#64;com.bmd.wtf.xtr.rpd.RapidAnnotations$Generator *;
+     *         }
+     *     </code>
+     * </pre>
+     *
+     * @param spring      the spring object to instantiate.
+     * @param contextArgs the arguments to be passed to the constructor.
+     * @param <DATA>      the data type.
+     * @return the newly created spring generator.
+     */
+    public static <DATA> SpringGenerator<DATA> springGenerator(final Spring<DATA> spring,
+            final Object... contextArgs) {
+
+        //noinspection unchecked
+        return RapidGenerators.springGenerator((Class<? extends Spring<DATA>>) spring.getClass(),
+                                               contextArgs);
+    }
+
+    /**
+     * Creates and returns a spring generator which instantiates objects of the specified
+     * classification through a constructor taking the specified parameters. A constructor taking
+     * an additional Integer parameter (that is, the fall number) is preferred to the default one.
+     * A one taking a primitive int is preferred to the Integer. Finally, a constructor annotated
+     * with {@link RapidAnnotations.Generator} is preferred to the not annotated ones.<br/>
+     * In case a suitable constructor is not found, an exception will be thrown.
+     * <p/>
+     * Note that a constructor might need to be made accessible in order to be called via
+     * reflection. That means that, in case a {@link java.lang.SecurityManager} is installed, a
+     * security exception might be raised based on the specific policy implemented.
+     * <p/>
+     * <b>Warning:</b> when employing annotation remember to add the proper rules to your Proguard
+     * file:
+     * <pre>
+     *     <code>
+     *         -keepattributes RuntimeVisibleAnnotations
+     *
+     *         -keepclassmembers class ** {
+     *              &#64;com.bmd.wtf.xtr.rpd.RapidAnnotations$Generator *;
+     *         }
+     *     </code>
+     * </pre>
+     *
+     * @param classification the spring classification.
+     * @param contextArgs    the arguments to be passed to the constructor.
+     * @param <DATA>         the data type.
+     * @return the newly created spring generator.
+     */
+    public static <DATA> SpringGenerator<DATA> springGenerator(
+            final Classification<? extends Spring<DATA>> classification,
+            final Object... contextArgs) {
+
+        return RapidGenerators.springGenerator(classification.getRawType(), contextArgs);
+    }
+
+    /**
+     * Creates and returns a spring generator which instantiates objects of the specified
+     * type through a constructor taking the specified parameters. A constructor taking
+     * an additional Integer parameter (that is, the fall number) is preferred to the default one.
+     * A one taking a primitive int is preferred to the Integer. Finally, a constructor annotated
+     * with {@link RapidAnnotations.Generator} is preferred to the not annotated ones.<br/>
+     * In case a suitable constructor is not found, an exception will be thrown.
+     * <p/>
+     * Note that a constructor might need to be made accessible in order to be called via
+     * reflection. That means that, in case a {@link java.lang.SecurityManager} is installed, a
+     * security exception might be raised based on the specific policy implemented.
+     * <p/>
+     * <b>Warning:</b> when employing annotation remember to add the proper rules to your Proguard
+     * file:
+     * <pre>
+     *     <code>
+     *         -keepattributes RuntimeVisibleAnnotations
+     *
+     *         -keepclassmembers class ** {
+     *              &#64;com.bmd.wtf.xtr.rpd.RapidAnnotations$Generator *;
+     *         }
+     *     </code>
+     * </pre>
+     *
+     * @param type        the spring type.
+     * @param contextArgs the arguments to be passed to the constructor.
+     * @param <DATA>      the data type.
+     * @return the newly created spring generator.
+     */
+    public static <DATA> SpringGenerator<DATA> springGenerator(
+            final Class<? extends Spring<DATA>> type, final Object... contextArgs) {
+
+        return RapidGenerators.springGenerator(type, contextArgs);
     }
 }

@@ -13,7 +13,7 @@
  */
 
 /**
- * Package containing classes implementing functionalities built on top of the core ones.
+ * Package containing classes implementing extra functionalities built on top of the core ones.
  * <p/>
  * Created by davide on 8/6/14.
  */

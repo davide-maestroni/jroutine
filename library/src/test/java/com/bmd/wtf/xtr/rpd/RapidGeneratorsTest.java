@@ -19,6 +19,7 @@ import com.bmd.wtf.flw.Fall;
 import com.bmd.wtf.flw.Stream;
 import com.bmd.wtf.gts.Gate;
 import com.bmd.wtf.gts.OpenGate;
+import com.bmd.wtf.spr.Spring;
 import com.bmd.wtf.xtr.rpd.RapidAnnotations.Generator;
 
 import junit.framework.TestCase;
@@ -37,135 +38,6 @@ import static org.fest.assertions.api.Assertions.assertThat;
  * Created by davide on 7/9/14.
  */
 public class RapidGeneratorsTest extends TestCase {
-
-    public void testClashing() {
-
-        try {
-
-            Rapid.gateGenerator(GateError1.class, 2);
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            Rapid.gateGenerator(GateError2.class, 2);
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            Rapid.gateGenerator(GateError3.class, 2);
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            Rapid.gateGenerator(GateError4.class, 2);
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            Rapid.gateGenerator(GateError5.class, 2);
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            Rapid.gateGenerator(GateError6.class, 2);
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            Rapid.gateGenerator(new GateGeneratorError1(),
-                                new Classification<Gate<Object, Object>>() {}, 2);
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            Rapid.gateGenerator(new GateGeneratorError2(),
-                                new Classification<Gate<Object, Object>>() {}, 2);
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            Rapid.gateGenerator(new GateGeneratorError3(),
-                                new Classification<Gate<Object, Object>>() {}, 2);
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            Rapid.gateGenerator(new GateGeneratorError4(),
-                                new Classification<Gate<Object, Object>>() {}, 2);
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            Rapid.gateGenerator(new GateGeneratorError5(),
-                                new Classification<Gate<Object, Object>>() {}, 2);
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            Rapid.gateGenerator(new GateGeneratorError6(),
-                                new Classification<Gate<Object, Object>>() {}, 2);
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-    }
 
     public void testCurrentGenerator() {
 
@@ -323,6 +195,135 @@ public class RapidGeneratorsTest extends TestCase {
         }
     }
 
+    public void testGateClashing() {
+
+        try {
+
+            Rapid.gateGenerator(GateError1.class, 2);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            Rapid.gateGenerator(GateError2.class, 2);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            Rapid.gateGenerator(GateError3.class, 2);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            Rapid.gateGenerator(GateError4.class, 2);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            Rapid.gateGenerator(GateError5.class, 2);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            Rapid.gateGenerator(GateError6.class, 2);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            Rapid.gateGenerator(new GateGeneratorError1(),
+                                new Classification<Gate<Object, Object>>() {}, 2);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            Rapid.gateGenerator(new GateGeneratorError2(),
+                                new Classification<Gate<Object, Object>>() {}, 2);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            Rapid.gateGenerator(new GateGeneratorError3(),
+                                new Classification<Gate<Object, Object>>() {}, 2);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            Rapid.gateGenerator(new GateGeneratorError4(),
+                                new Classification<Gate<Object, Object>>() {}, 2);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            Rapid.gateGenerator(new GateGeneratorError5(),
+                                new Classification<Gate<Object, Object>>() {}, 2);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            Rapid.gateGenerator(new GateGeneratorError6(),
+                                new Classification<Gate<Object, Object>>() {}, 2);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+    }
+
     public void testGateGenerator() {
 
         assertThat(Rapid.gateGenerator(Gate1.class).create(1)).isExactlyInstanceOf(Gate1.class);
@@ -355,7 +356,8 @@ public class RapidGeneratorsTest extends TestCase {
         assertThat(((Gate2) Rapid.gateGenerator(new Gate2(22)).create(1)).getNumber()).isEqualTo(1);
         assertThat(((Gate3) Rapid.gateGenerator(new Gate3(33)).create(1)).getNumber()).isEqualTo(2);
         assertThat(((Gate4) Rapid.gateGenerator(new Gate4(44)).create(1)).getNumber()).isEqualTo(4);
-        assertThat(((Gate5) Rapid.gateGenerator(new Gate5(55)).create(1)).getNumber()).isEqualTo(77);
+        assertThat(((Gate5) Rapid.gateGenerator(new Gate5(55)).create(1)).getNumber()).isEqualTo(
+                77);
         assertThat(((Gate6) Rapid.gateGenerator(new Gate6(66)).create(3)).getNumber()).isEqualTo(5);
         assertThat(((Gate7) Rapid.gateGenerator(new Gate7(77)).create(3)).getNumber()).isEqualTo(4);
 
@@ -450,6 +452,298 @@ public class RapidGeneratorsTest extends TestCase {
         try {
 
             Rapid.gateGenerator(new GateGenerator6(), classification, new ArrayList<Object>(), 2);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+    }
+
+    public void testSpringClashing() {
+
+        try {
+
+            Rapid.springGenerator(SpringError1.class, 2);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            Rapid.springGenerator(SpringError2.class, 2);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            Rapid.springGenerator(SpringError3.class, 2);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            Rapid.springGenerator(SpringError4.class, 2);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            Rapid.springGenerator(SpringError5.class, 2);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            Rapid.springGenerator(SpringError6.class, 2);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            Rapid.springGenerator(new SpringGeneratorError1(),
+                                  new Classification<Spring<Object>>() {}, 2);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            Rapid.springGenerator(new SpringGeneratorError2(),
+                                  new Classification<Spring<Object>>() {}, 2);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            Rapid.springGenerator(new SpringGeneratorError3(),
+                                  new Classification<Spring<Object>>() {}, 2);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            Rapid.springGenerator(new SpringGeneratorError4(),
+                                  new Classification<Spring<Object>>() {}, 2);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            Rapid.springGenerator(new SpringGeneratorError5(),
+                                  new Classification<Spring<Object>>() {}, 2);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            Rapid.springGenerator(new SpringGeneratorError6(),
+                                  new Classification<Spring<Object>>() {}, 2);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+    }
+
+    public void testSpringGenerator() {
+
+        assertThat(Rapid.springGenerator(Spring1.class).create(1)).isExactlyInstanceOf(
+                Spring1.class);
+        assertThat(
+                ((Spring2) Rapid.springGenerator(Spring2.class).create(1)).getNumber()).isEqualTo(
+                1);
+        assertThat(
+                ((Spring3) Rapid.springGenerator(Spring3.class).create(1)).getNumber()).isEqualTo(
+                2);
+        assertThat(
+                ((Spring4) Rapid.springGenerator(Spring4.class).create(1)).getNumber()).isEqualTo(
+                4);
+        assertThat(
+                ((Spring5) Rapid.springGenerator(Spring5.class).create(1)).getNumber()).isEqualTo(
+                77);
+        assertThat(
+                ((Spring6) Rapid.springGenerator(Spring6.class).create(3)).getNumber()).isEqualTo(
+                5);
+        assertThat(
+                ((Spring7) Rapid.springGenerator(Spring7.class).create(3)).getNumber()).isEqualTo(
+                4);
+        assertThat(
+                ((Spring8) Rapid.springGenerator(Spring8.class).create(3)).getNumber()).isEqualTo(
+                5);
+
+        assertThat(Rapid.springGenerator(Classification.ofType(Spring1.class))
+                        .create(1)).isExactlyInstanceOf(Spring1.class);
+        assertThat(((Spring2) Rapid.springGenerator(Classification.ofType(Spring2.class))
+                                   .create(1)).getNumber()).isEqualTo(1);
+        assertThat(((Spring3) Rapid.springGenerator(Classification.ofType(Spring3.class))
+                                   .create(1)).getNumber()).isEqualTo(2);
+        assertThat(((Spring4) Rapid.springGenerator(Classification.ofType(Spring4.class))
+                                   .create(1)).getNumber()).isEqualTo(4);
+        assertThat(((Spring5) Rapid.springGenerator(Classification.ofType(Spring5.class))
+                                   .create(1)).getNumber()).isEqualTo(77);
+        assertThat(((Spring6) Rapid.springGenerator(Classification.ofType(Spring6.class))
+                                   .create(3)).getNumber()).isEqualTo(5);
+        assertThat(((Spring7) Rapid.springGenerator(Classification.ofType(Spring7.class))
+                                   .create(3)).getNumber()).isEqualTo(4);
+        assertThat(((Spring8) Rapid.springGenerator(Classification.ofType(Spring8.class))
+                                   .create(3)).getNumber()).isEqualTo(5);
+
+        assertThat(Rapid.springGenerator(new Spring1()).create(1)).isExactlyInstanceOf(
+                Spring1.class);
+        assertThat(
+                ((Spring2) Rapid.springGenerator(new Spring2(22)).create(1)).getNumber()).isEqualTo(
+                1);
+        assertThat(
+                ((Spring3) Rapid.springGenerator(new Spring3(33)).create(1)).getNumber()).isEqualTo(
+                2);
+        assertThat(
+                ((Spring4) Rapid.springGenerator(new Spring4(44)).create(1)).getNumber()).isEqualTo(
+                4);
+        assertThat(
+                ((Spring5) Rapid.springGenerator(new Spring5(55)).create(1)).getNumber()).isEqualTo(
+                77);
+        assertThat(
+                ((Spring6) Rapid.springGenerator(new Spring6(66)).create(3)).getNumber()).isEqualTo(
+                5);
+        assertThat(
+                ((Spring7) Rapid.springGenerator(new Spring7(77)).create(3)).getNumber()).isEqualTo(
+                4);
+
+        assertThat(((SpringX) Rapid.springGenerator(SpringX.class, this,
+                                                    new CopyOnWriteArrayList<Object>(), null, null)
+                                   .create(1)).getNumber()).isEqualTo(33);
+        assertThat(((SpringX) Rapid.springGenerator(new SpringX(null, null, 11), this,
+                                                    new CopyOnWriteArrayList<Object>(), null, null)
+                                   .create(1)).getNumber()).isEqualTo(33);
+        assertThat(((SpringX) Rapid.springGenerator(SpringX.class, this,
+                                                    new CopyOnWriteArrayList<Object>(), null)
+                                   .create(1)).getNumber()).isEqualTo(12);
+        assertThat(((SpringX) Rapid.springGenerator(SpringX.class, this, new LinkedList<Object>(),
+                                                    null, 2).create(1)).getNumber()).isEqualTo(24);
+        assertThat(
+                ((SpringX) Rapid.springGenerator(SpringX.class, this, new ArrayList<Object>(), null,
+                                                 2).create(1)).getNumber()).isEqualTo(46);
+        assertThat(((Spring2) Rapid.springGenerator(SpringX1.class, this, new ArrayList<Object>(),
+                                                    null, 4).create(1)).getNumber()).isEqualTo(81);
+
+        try {
+
+            Rapid.springGenerator(SpringX.class, this, new CopyOnWriteArrayList<Object>(), null, 4);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            Rapid.springGenerator(SpringX1.class, this, new ArrayList<Object>(), null, 4, "test");
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            Rapid.springGenerator(SpringX2.class, this, new ArrayList<Object>(), 2);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        final Classification<Spring<Object>> classification =
+                new Classification<Spring<Object>>() {};
+
+        assertThat(Rapid.springGenerator(new SpringGenerator1(), classification)
+                        .create(1)).isExactlyInstanceOf(Spring1.class);
+        assertThat(((Spring2) Rapid.springGenerator(new SpringGenerator2(), classification)
+                                   .create(1)).getNumber()).isEqualTo(1);
+        assertThat(((Spring2) Rapid.springGenerator(new SpringGenerator2(),
+                                                    Classification.ofType(Spring2.class)).create(1))
+                           .getNumber()).isEqualTo(3);
+        assertThat(Rapid.springGenerator(new SpringGenerator3(), classification)
+                        .create(1)).isExactlyInstanceOf(Spring1.class);
+        assertThat(((Spring2) Rapid.springGenerator(new SpringGenerator4(), classification,
+                                                    new LinkedList<Object>(), null, 2)
+                                   .create(1)).getNumber()).isEqualTo(2);
+        assertThat(((Spring2) Rapid.springGenerator(new SpringGenerator4(), classification,
+                                                    new LinkedList<Object>(), null)
+                                   .create(1)).getNumber()).isEqualTo(1);
+        assertThat(((Spring2) Rapid.springGenerator(new SpringGenerator4(), classification,
+                                                    new ArrayList<Object>(), null)
+                                   .create(1)).getNumber()).isEqualTo(3);
+        assertThat(((Spring2) Rapid.springGenerator(new SpringGenerator5(), classification,
+                                                    new LinkedList<Object>(), null, 2)
+                                   .create(1)).getNumber()).isEqualTo(2);
+        assertThat(((Spring2) Rapid.springGenerator(new SpringGenerator5(), classification,
+                                                    new LinkedList<Object>(), null)
+                                   .create(1)).getNumber()).isEqualTo(1);
+        assertThat(((Spring2) Rapid.springGenerator(new SpringGenerator5(), classification,
+                                                    new ArrayList<Object>(), null)
+                                   .create(1)).getNumber()).isEqualTo(3);
+        assertThat(((Spring2) Rapid.springGenerator(new SpringGenerator6(), classification,
+                                                    new LinkedList<Object>(), null, 2)
+                                   .create(1)).getNumber()).isEqualTo(2);
+        assertThat(((Spring2) Rapid.springGenerator(new SpringGenerator6(), classification,
+                                                    new LinkedList<Object>(), null)
+                                   .create(1)).getNumber()).isEqualTo(44);
+        assertThat(((Spring2) Rapid.springGenerator(new SpringGenerator6(), classification,
+                                                    new ArrayList<Object>(), null)
+                                   .create(1)).getNumber()).isEqualTo(4);
+
+        try {
+
+            Rapid.springGenerator(new SpringGenerator6(), classification, new ArrayList<Object>(),
+                                  2);
 
             fail();
 
@@ -1148,6 +1442,433 @@ public class RapidGeneratorsTest extends TestCase {
         }
     }
 
+    public static class Spring1 implements Spring<Object> {
+
+        @Override
+        public boolean hasDrops() {
+
+            return false;
+        }
+
+        @Override
+        public Object nextDrop() {
+
+            return null;
+        }
+    }
+
+    public static class Spring2 extends Spring1 {
+
+        private final int mNumber;
+
+        public Spring2(final int number) {
+
+            mNumber = number;
+        }
+
+        public int getNumber() {
+
+            return mNumber;
+        }
+    }
+
+    public static class Spring3 extends Spring2 {
+
+        public Spring3(final Integer number) {
+
+            super(number + 1);
+        }
+
+        @SuppressWarnings("UnusedDeclaration")
+        public Spring3(final String ignored, final Integer number) {
+
+            super(number + 11);
+        }
+    }
+
+    public static class Spring4 extends Spring2 {
+
+        public Spring4(final int number) {
+
+            super(number + 3);
+        }
+
+        @SuppressWarnings("UnusedDeclaration")
+        public Spring4(final Integer number) {
+
+            super(number + 2);
+        }
+    }
+
+    public static class Spring5 extends Spring2 {
+
+        @Generator
+        public Spring5() {
+
+            super(77);
+        }
+
+        public Spring5(final int number) {
+
+            super(number + 2);
+        }
+
+        @SuppressWarnings("UnusedDeclaration")
+        public Spring5(final Integer number) {
+
+            super(number + 1);
+        }
+    }
+
+    public static class Spring6 extends Spring2 {
+
+        @SuppressWarnings("UnusedDeclaration")
+        public Spring6() {
+
+            super(77);
+        }
+
+        public Spring6(final int number) {
+
+            super(number + 2);
+        }
+
+        @SuppressWarnings("UnusedDeclaration")
+        public Spring6(final Integer number) {
+
+            super(number + 1);
+        }
+    }
+
+    public static class Spring7 extends Spring2 {
+
+        @SuppressWarnings("UnusedDeclaration")
+        public Spring7() {
+
+            super(77);
+        }
+
+        public Spring7(final int number) {
+
+            super(number + 2);
+        }
+
+        @Generator
+        public Spring7(final Integer number) {
+
+            super(number + 1);
+        }
+    }
+
+    public static class Spring8 extends Spring2 {
+
+        @Generator
+        public Spring8() {
+
+            super(88);
+        }
+
+        @Generator
+        public Spring8(final int number) {
+
+            super(number + 2);
+        }
+
+        @Generator
+        public Spring8(final Integer number) {
+
+            super(number + 1);
+        }
+    }
+
+    public static class SpringError1 extends Spring1 {
+
+        @Generator
+        public SpringError1(final int ignored) {
+
+        }
+
+        @Generator
+        public SpringError1(final Integer ignored) {
+
+        }
+    }
+
+    public static class SpringError2 extends Spring1 {
+
+        @Generator
+        public SpringError2(final int ignored, final int number) {
+
+        }
+
+        @Generator
+        public SpringError2(final Integer ignored, final int number) {
+
+        }
+    }
+
+    public static class SpringError3 extends Spring1 {
+
+        @Generator
+        public SpringError3(final int ignored, final Integer number) {
+
+        }
+
+        @Generator
+        public SpringError3(final Integer ignored, final Integer number) {
+
+        }
+    }
+
+    public static class SpringError4 extends Spring1 {
+
+        @SuppressWarnings("UnusedDeclaration")
+        public SpringError4(final int ignored) {
+
+        }
+
+        @SuppressWarnings("UnusedDeclaration")
+        public SpringError4(final Integer ignored) {
+
+        }
+    }
+
+    public static class SpringError5 extends Spring1 {
+
+        @SuppressWarnings("UnusedDeclaration")
+        public SpringError5(final int ignored, final int number) {
+
+        }
+
+        @SuppressWarnings("UnusedDeclaration")
+        public SpringError5(final Integer ignored, final int number) {
+
+        }
+    }
+
+    public static class SpringError6 extends Spring1 {
+
+        @SuppressWarnings("UnusedDeclaration")
+        public SpringError6(final int ignored, final Integer number) {
+
+        }
+
+        @SuppressWarnings("UnusedDeclaration")
+        public SpringError6(final Integer ignored, final Integer number) {
+
+        }
+    }
+
+    public static class SpringGenerator1 {
+
+        @SuppressWarnings("UnusedDeclaration")
+        public Spring<Object> generate() {
+
+            return new Spring1();
+        }
+    }
+
+    public static class SpringGenerator2 {
+
+        @SuppressWarnings("UnusedDeclaration")
+        public Spring<Object> generate() {
+
+            return new Spring1();
+        }
+
+        @SuppressWarnings("UnusedDeclaration")
+        public Spring<Object> generate(final int number) {
+
+            return new Spring2(number);
+        }
+
+        @SuppressWarnings("UnusedDeclaration")
+        public Spring2 generate(final Integer number) {
+
+            return new Spring2(number + 2);
+        }
+    }
+
+    public static class SpringGenerator3 {
+
+        @SuppressWarnings("UnusedDeclaration")
+        Spring<Object> generate() {
+
+            return new Spring1();
+        }
+    }
+
+    public static class SpringGenerator4 {
+
+        @SuppressWarnings("UnusedDeclaration")
+        public Spring<Object> generate() {
+
+            return new Spring1();
+        }
+
+        @SuppressWarnings("UnusedDeclaration")
+        public Spring<Object> generate(ArrayList<?> list, int ignored, Integer number) {
+
+            return new Spring2(number + 3);
+        }
+
+        @SuppressWarnings("UnusedDeclaration")
+        public Spring<Object> generate(ArrayList<?> list, String text, Integer number) {
+
+            return new Spring2(number + 2);
+        }
+
+        @SuppressWarnings("UnusedDeclaration")
+        public Spring<Object> generate1(List<?> list, String text, Integer number) {
+
+            return new Spring2(number);
+        }
+    }
+
+    public static class SpringGenerator5 {
+
+        @Generator
+        public Spring<Object> generate() {
+
+            return new Spring1();
+        }
+
+        @Generator
+        public Spring<Object> generate(ArrayList<?> list, int ignored, Integer number) {
+
+            return new Spring2(number + 3);
+        }
+
+        @Generator
+        public Spring<Object> generate(ArrayList<?> list, String text, Integer number) {
+
+            return new Spring2(number + 2);
+        }
+
+        @SuppressWarnings("UnusedDeclaration")
+        public Spring<Object> generate1(List<?> list, String text, Integer number) {
+
+            return new Spring2(number);
+        }
+    }
+
+    public static class SpringGenerator6 {
+
+        @Generator
+        public Spring<Object> generate(List<?> list, String text) {
+
+            return new Spring2(44);
+        }
+
+        @Generator
+        public Spring<Object> generate(ArrayList<?> list, String text, int number) {
+
+            return new Spring2(number + 3);
+        }
+
+        @Generator
+        public Spring<Object> generate(ArrayList<?> list, String text, Integer number) {
+
+            return new Spring2(number + 2);
+        }
+
+        @SuppressWarnings("UnusedDeclaration")
+        public Spring<Object> generate1(List<?> list, String text, Integer number) {
+
+            return new Spring2(number);
+        }
+    }
+
+    public static class SpringGeneratorError1 {
+
+        @Generator
+        public Spring<Object> generate(final int ignored) {
+
+            return new Spring1();
+        }
+
+        @Generator
+        public Spring<Object> generate(final Integer ignored) {
+
+            return new Spring1();
+        }
+    }
+
+    public static class SpringGeneratorError2 {
+
+        @Generator
+        public Spring<Object> generate(final int ignored, final int number) {
+
+            return new Spring1();
+        }
+
+        @Generator
+        public Spring<Object> generate(final Integer ignored, final int number) {
+
+            return new Spring1();
+        }
+    }
+
+    public static class SpringGeneratorError3 {
+
+        @Generator
+        public Spring<Object> generate(final int ignored, final Integer number) {
+
+            return new Spring1();
+        }
+
+        @Generator
+        public Spring<Object> generate(final Integer ignored, final Integer number) {
+
+            return new Spring1();
+        }
+    }
+
+    public static class SpringGeneratorError4 {
+
+        @SuppressWarnings("UnusedDeclaration")
+        public Spring<Object> generate(final int ignored) {
+
+            return new Spring1();
+        }
+
+        @SuppressWarnings("UnusedDeclaration")
+        public Spring<Object> generate(final Integer ignored) {
+
+            return new Spring1();
+        }
+    }
+
+    public static class SpringGeneratorError5 {
+
+        @SuppressWarnings("UnusedDeclaration")
+        public Spring<Object> generate(final int ignored, final int number) {
+
+            return new Spring1();
+        }
+
+        @SuppressWarnings("UnusedDeclaration")
+        public Spring<Object> generate(final Integer ignored, final int number) {
+
+            return new Spring1();
+        }
+    }
+
+    public static class SpringGeneratorError6 {
+
+        @SuppressWarnings("UnusedDeclaration")
+        public Spring<Object> generate(final int ignored, final Integer number) {
+
+            return new Spring1();
+        }
+
+        @SuppressWarnings("UnusedDeclaration")
+        public Spring<Object> generate(final Integer ignored, final Integer number) {
+
+            return new Spring1();
+        }
+    }
+
     public class CurrentX extends Current2 {
 
         @SuppressWarnings("UnusedDeclaration")
@@ -1245,6 +1966,57 @@ public class RapidGeneratorsTest extends TestCase {
 
         @Generator
         public GateX2(List<?> list, String text, int number) {
+
+            super(777 + number);
+        }
+    }
+
+    public class SpringX extends Spring2 {
+
+        @SuppressWarnings("UnusedDeclaration")
+        public SpringX(List<?> list, String text, int number) {
+
+            super(11 + number);
+        }
+
+        @SuppressWarnings("UnusedDeclaration")
+        public SpringX(LinkedList<?> list, String text, int number) {
+
+            super(22 + number);
+        }
+
+        @SuppressWarnings("UnusedDeclaration")
+        public SpringX(List<?> list, String text, Integer number) {
+
+            super(33 + ((number != null) ? number : 0));
+        }
+
+        @SuppressWarnings("UnusedDeclaration")
+        public SpringX(ArrayList<?> list, String text, Integer number) {
+
+            super(44 + ((number != null) ? number : 0));
+        }
+    }
+
+    public class SpringX1 extends Spring2 {
+
+        @SuppressWarnings("UnusedDeclaration")
+        public SpringX1(List<?> list, String text, int number) {
+
+            super(77 + number);
+        }
+
+        @SuppressWarnings("UnusedDeclaration")
+        public SpringX1(int number) {
+
+            super(99 + number);
+        }
+    }
+
+    public class SpringX2 extends Spring2 {
+
+        @Generator
+        public SpringX2(List<?> list, String text, int number) {
 
             super(777 + number);
         }

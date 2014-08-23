@@ -1213,7 +1213,8 @@ public class SpringTest extends TestCase {
     public void testFrom() {
 
         //noinspection unchecked
-        final Waterfall<Void, Void, Integer> fall = fall().start(Springs.sequence(1, 3));
+        final Waterfall<Void, Void, Integer> fall =
+                fall().spring(Collections.singleton(Springs.sequence(1, 3)));
         assertThat(readData(Springs.from(fall))).containsExactly(1, 2, 3, 4);
 
         final byte[] bytes = new byte[]{-1, 1, 33};

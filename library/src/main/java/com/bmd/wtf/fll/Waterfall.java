@@ -27,6 +27,7 @@ import com.bmd.wtf.spr.SpringGenerator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -84,7 +85,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
             final Classification<?> damClassification, final int backgroundPoolSize,
             final Current backgroundCurrent, final PumpGate<?> pumpGate, final int size,
             final Current current, final CurrentGenerator generator,
-            final DataFall<IN, OUT>... falls) {
+            final DataFall<IN, OUT>[] falls) {
 
         //noinspection unchecked
         mSource = (source != null) ? source : (Waterfall<SOURCE, SOURCE, ?>) this;
@@ -103,7 +104,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
             final Map<Classification<?>, DamGate<?, ?>> damMap,
             final Classification<?> damClassification, final int backgroundPoolSize,
             final Current backgroundCurrent, final PumpGate<?> pumpGate, final int size,
-            final Current current, final CurrentGenerator generator, final Gate<IN, OUT>... gates) {
+            final Current current, final CurrentGenerator generator, final Gate<IN, OUT>[] gates) {
 
         //noinspection unchecked
         mSource = (source != null) ? source : (Waterfall<SOURCE, SOURCE, ?>) this;
@@ -416,13 +417,17 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
         final DataFall<IN, OUT>[] falls = mFalls;
         final int size = mSize;
 
+        //noinspection unchecked
+        final Gate<OUT, NOUT>[] gates = new Gate[size];
+
         if (size == 1) {
 
-            //noinspection unchecked
+            gates[0] = gate;
+
             final Waterfall<SOURCE, OUT, NOUT> waterfall =
                     new Waterfall<SOURCE, OUT, NOUT>(mSource, mDamMap, mDamClassification,
                                                      mBackgroundPoolSize, mBackgroundCurrent, mPump,
-                                                     1, mCurrent, mCurrentGenerator, gate);
+                                                     1, mCurrent, mCurrentGenerator, gates);
 
             final DataFall<OUT, NOUT> outFall = waterfall.mFalls[0];
 
@@ -446,11 +451,8 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
             inWaterfall = this;
         }
 
-        final Gate[] gates = new Gate[size];
-
         Arrays.fill(gates, gate);
 
-        //noinspection unchecked
         final Waterfall<SOURCE, OUT, NOUT> waterfall =
                 new Waterfall<SOURCE, OUT, NOUT>(inWaterfall.mSource, inWaterfall.mDamMap,
                                                  inWaterfall.mDamClassification,
@@ -499,13 +501,17 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
         final int size = mSize;
         final OpenGate<OUT> gate = openGate();
 
+        //noinspection unchecked
+        final Gate<OUT, OUT>[] gates = new Gate[size];
+
         if (size == 1) {
 
-            //noinspection unchecked
+            gates[0] = gate;
+
             final Waterfall<SOURCE, OUT, OUT> waterfall =
                     new Waterfall<SOURCE, OUT, OUT>(mSource, mDamMap, mDamClassification,
                                                     mBackgroundPoolSize, mBackgroundCurrent, mPump,
-                                                    1, mCurrent, mCurrentGenerator, gate);
+                                                    1, mCurrent, mCurrentGenerator, gates);
 
             final DataFall<OUT, OUT> outFall = waterfall.mFalls[0];
 
@@ -529,11 +535,8 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
             inWaterfall = this;
         }
 
-        final Gate[] gates = new Gate[size];
-
         Arrays.fill(gates, gate);
 
-        //noinspection unchecked
         final Waterfall<SOURCE, OUT, OUT> waterfall =
                 new Waterfall<SOURCE, OUT, OUT>(inWaterfall.mSource, inWaterfall.mDamMap,
                                                 inWaterfall.mDamClassification, mBackgroundPoolSize,
@@ -574,14 +577,21 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * @param <NOUT> the new output data type.
      * @return the newly created waterfall.
      */
-    public <NOUT> Waterfall<SOURCE, OUT, NOUT> chain(final Gate<OUT, NOUT>... gates) {
+    public <NOUT> Waterfall<SOURCE, OUT, NOUT> chain(
+            final Collection<? extends Gate<OUT, NOUT>> gates) {
 
         if (gates == null) {
 
-            throw new IllegalArgumentException("the waterfall gate array cannot be null");
+            throw new IllegalArgumentException("the waterfall gate collection cannot be null");
         }
 
-        final int length = gates.length;
+        final int length = gates.size();
+
+        if (length == 0) {
+
+            throw new IllegalArgumentException("the waterfall gate array cannot be empty");
+        }
+
         final Waterfall<SOURCE, IN, OUT> waterfall;
 
         if (mSize == length) {
@@ -593,12 +603,14 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
             waterfall = in(length);
         }
 
+        final Iterator<? extends Gate<OUT, NOUT>> iterator = gates.iterator();
+
         return waterfall.chain(new GateGenerator<OUT, NOUT>() {
 
             @Override
             public Gate<OUT, NOUT> create(final int fallNumber) {
 
-                return gates[fallNumber];
+                return iterator.next();
             }
         });
     }
@@ -625,15 +637,17 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
         final int size = mSize;
 
+        //noinspection unchecked
+        final Gate<OUT, NOUT>[] gates = new Gate[]{gate};
+
         if (size == 1) {
 
             registerGate(gate);
 
-            //noinspection unchecked
             final Waterfall<SOURCE, OUT, NOUT> waterfall =
                     new Waterfall<SOURCE, OUT, NOUT>(mSource, mDamMap, mDamClassification,
                                                      mBackgroundPoolSize, mBackgroundCurrent, mPump,
-                                                     1, mCurrent, mCurrentGenerator, gate);
+                                                     1, mCurrent, mCurrentGenerator, gates);
 
             final DataFall<OUT, NOUT> outFall = waterfall.mFalls[0];
 
@@ -659,13 +673,12 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
         registerGate(gate);
 
-        //noinspection unchecked
         final Waterfall<SOURCE, OUT, NOUT> waterfall =
                 new Waterfall<SOURCE, OUT, NOUT>(inWaterfall.mSource, inWaterfall.mDamMap,
                                                  inWaterfall.mDamClassification,
                                                  mBackgroundPoolSize, mBackgroundCurrent, mPump,
                                                  size, inWaterfall.mCurrent,
-                                                 inWaterfall.mCurrentGenerator, gate);
+                                                 inWaterfall.mCurrentGenerator, gates);
 
         final DataFall<?, OUT>[] inFalls = inWaterfall.mFalls;
         final DataFall<OUT, NOUT>[] outFalls = waterfall.mFalls;
@@ -717,17 +730,21 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
         final int size = mSize;
 
+        //noinspection unchecked
+        final Gate<OUT, NOUT>[] gates = new Gate[size];
+
         if (size == 1) {
 
             final Gate<OUT, NOUT> gate = generator.create(0);
 
             registerGate(gate);
 
-            //noinspection unchecked
+            gates[0] = gate;
+
             final Waterfall<SOURCE, OUT, NOUT> waterfall =
                     new Waterfall<SOURCE, OUT, NOUT>(mSource, mDamMap, mDamClassification,
                                                      mBackgroundPoolSize, mBackgroundCurrent, mPump,
-                                                     1, mCurrent, mCurrentGenerator, gate);
+                                                     1, mCurrent, mCurrentGenerator, gates);
 
             final DataFall<OUT, NOUT> outFall = waterfall.mFalls[0];
 
@@ -756,8 +773,6 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
             inWaterfall = this;
         }
 
-        final Gate[] gates = new Gate[size];
-
         for (int i = 0; i < size; ++i) {
 
             final Gate<OUT, NOUT> gate = generator.create(i);
@@ -767,7 +782,6 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
             gates[i] = gate;
         }
 
-        //noinspection unchecked
         final Waterfall<SOURCE, OUT, NOUT> waterfall =
                 new Waterfall<SOURCE, OUT, NOUT>(inWaterfall.mSource, inWaterfall.mDamMap,
                                                  inWaterfall.mDamClassification,
@@ -835,7 +849,6 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
             return this;
         }
 
-        //noinspection unchecked
         return new Waterfall<SOURCE, IN, OUT>(mSource, damMap, mDamClassification,
                                               mBackgroundPoolSize, mBackgroundCurrent, mPump, mSize,
                                               mCurrent, mCurrentGenerator, mFalls);
@@ -871,7 +884,6 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
             }
         }
 
-        //noinspection unchecked
         return new Waterfall<SOURCE, IN, OUT>(mSource, damMap, mDamClassification,
                                               mBackgroundPoolSize, mBackgroundCurrent, mPump, mSize,
                                               mCurrent, mCurrentGenerator, mFalls);
@@ -945,7 +957,6 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
             throw new IllegalArgumentException("the dam classification cannot be null");
         }
 
-        //noinspection unchecked
         return new Waterfall<SOURCE, IN, OUT>(mSource, mDamMap, damClassification,
                                               mBackgroundPoolSize, mBackgroundCurrent, mPump, mSize,
                                               mCurrent, mCurrentGenerator, mFalls);
@@ -1518,7 +1529,6 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
             throw new IllegalArgumentException("the waterfall current generator cannot be null");
         }
 
-        //noinspection unchecked
         return new Waterfall<SOURCE, IN, OUT>(mSource, mDamMap, mDamClassification,
                                               mBackgroundPoolSize, mBackgroundCurrent, mPump, mSize,
                                               null, generator, mFalls);
@@ -1537,7 +1547,6 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
             throw new IllegalArgumentException("the fall count cannot be negative or zero");
         }
 
-        //noinspection unchecked
         return new Waterfall<SOURCE, IN, OUT>(mSource, mDamMap, mDamClassification,
                                               mBackgroundPoolSize, mBackgroundCurrent, mPump,
                                               fallCount, mCurrent, mCurrentGenerator, mFalls);
@@ -1556,7 +1565,6 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
             throw new IllegalArgumentException("the waterfall current cannot be null");
         }
 
-        //noinspection unchecked
         return new Waterfall<SOURCE, IN, OUT>(mSource, mDamMap, mDamClassification,
                                               mBackgroundPoolSize, mBackgroundCurrent, mPump, mSize,
                                               current, null, mFalls);
@@ -1594,7 +1602,6 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
             backgroundCurrent = mBackgroundCurrent;
         }
 
-        //noinspection unchecked
         return new Waterfall<SOURCE, IN, OUT>(mSource, mDamMap, mDamClassification, poolSize,
                                               backgroundCurrent, mPump, fallCount,
                                               backgroundCurrent, null, mFalls);
@@ -1627,7 +1634,6 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
             backgroundCurrent = mBackgroundCurrent;
         }
 
-        //noinspection unchecked
         return new Waterfall<SOURCE, IN, OUT>(mSource, mDamMap, mDamClassification, poolSize,
                                               backgroundCurrent, mPump, poolSize, backgroundCurrent,
                                               null, mFalls);
@@ -1706,6 +1712,62 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
     }
 
     /**
+     * Creates and returns a new waterfall fed by to the springs returned by the specified
+     * generator.
+     * <p/>
+     * Note that the dams, the size and the currents of this waterfall will be retained.
+     *
+     * @param generator the spring generator.
+     * @param <DATA>    the spring data type.
+     * @return the newly created waterfall.
+     */
+    public <DATA> Waterfall<Void, Void, DATA> spring(final SpringGenerator<DATA> generator) {
+
+        if (generator == null) {
+
+            throw new IllegalArgumentException("the waterfall spring generator cannot be null");
+        }
+
+        return start(new GateGenerator<Void, DATA>() {
+
+            @Override
+            public Gate<Void, DATA> create(final int fallNumber) {
+
+                return new SpringGate<DATA>(generator.create(fallNumber));
+            }
+        });
+    }
+
+    /**
+     * Creates and returns a new waterfall fed by the specified springs.
+     * <p/>
+     * Note that the dams and the currents of this waterfall will be retained, while the size will
+     * be equal to the one of the specified array.
+     *
+     * @param springs the spring instances
+     * @param <DATA>  the spring data type.
+     * @return the newly created waterfall.
+     */
+    public <DATA> Waterfall<Void, Void, DATA> spring(
+            final Collection<? extends Spring<DATA>> springs) {
+
+        if (springs == null) {
+
+            throw new IllegalArgumentException("the waterfall spring array cannot be null");
+        }
+
+        final int length = springs.size();
+        final ArrayList<SpringGate<DATA>> gates = new ArrayList<SpringGate<DATA>>(length);
+
+        for (final Spring<DATA> spring : springs) {
+
+            gates.add(new SpringGate<DATA>(spring));
+        }
+
+        return start(gates);
+    }
+
+    /**
      * Creates and returns a new waterfall generating from this one.
      * <p/>
      * Note that the dams, the size and the currents of this waterfall will be retained.
@@ -1716,14 +1778,12 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
         final int size = mSize;
 
-        final OpenGate<OUT> gate = openGate();
-        final Gate[] gates = new Gate[size];
-
-        Arrays.fill(gates, gate);
+        //noinspection unchecked
+        final Gate<OUT, OUT>[] gates = new Gate[size];
+        Arrays.fill(gates, openGate());
 
         final Map<Classification<?>, DamGate<?, ?>> damMap = Collections.emptyMap();
 
-        //noinspection unchecked
         return new Waterfall<OUT, OUT, OUT>(null, damMap, mDamClassification, mBackgroundPoolSize,
                                             mBackgroundCurrent, null, size, mCurrent,
                                             mCurrentGenerator, gates);
@@ -1785,24 +1845,26 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
         final int size = mSize;
 
+        //noinspection unchecked
+        final Gate<NIN, NOUT>[] gates = new Gate[size];
+
         if (size <= 1) {
 
             final Gate<NIN, NOUT> gate = generator.create(0);
 
             registerGate(gate);
 
-            //noinspection unchecked
+            gates[0] = gate;
+
             return new Waterfall<NIN, NIN, NOUT>(null, damMap, mDamClassification,
                                                  mBackgroundPoolSize, mBackgroundCurrent, null, 1,
-                                                 mCurrent, mCurrentGenerator, gate);
+                                                 mCurrent, mCurrentGenerator, gates);
         }
 
         if (mDamClassification != null) {
 
             throw new IllegalStateException("cannot make a dam from more than one gate");
         }
-
-        final Gate[] gates = new Gate[size];
 
         for (int i = 0; i < size; ++i) {
 
@@ -1813,7 +1875,6 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
             gates[i] = gate;
         }
 
-        //noinspection unchecked
         return new Waterfall<NIN, NIN, NOUT>(null, damMap, null, mBackgroundPoolSize,
                                              mBackgroundCurrent, null, size, mCurrent,
                                              mCurrentGenerator, gates);
@@ -1830,14 +1891,15 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * @param <NOUT> the new output data type.
      * @return the newly created waterfall.
      */
-    public <NIN, NOUT> Waterfall<NIN, NIN, NOUT> start(final Gate<NIN, NOUT>... gates) {
+    public <NIN, NOUT> Waterfall<NIN, NIN, NOUT> start(
+            final Collection<? extends Gate<NIN, NOUT>> gates) {
 
         if (gates == null) {
 
             throw new IllegalArgumentException("the waterfall gate array cannot be null");
         }
 
-        final int length = gates.length;
+        final int length = gates.size();
 
         if (length == 0) {
 
@@ -1855,65 +1917,16 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
             waterfall = in(length);
         }
 
+        final Iterator<? extends Gate<NIN, NOUT>> iterator = gates.iterator();
+
         return waterfall.start(new GateGenerator<NIN, NOUT>() {
 
             @Override
             public Gate<NIN, NOUT> create(final int fallNumber) {
 
-                return gates[fallNumber];
+                return iterator.next();
             }
         });
-    }
-
-    /**
-     * Creates and returns a new waterfall fed by to the springs returned by the specified
-     * generator.
-     * <p/>
-     * Note that the dams, the size and the currents of this waterfall will be retained.
-     *
-     * @param generator the spring generator.
-     * @param <DATA>    the spring data type.
-     * @return the newly created waterfall.
-     */
-    public <DATA> Waterfall<Void, Void, DATA> start(final SpringGenerator<DATA> generator) {
-
-        return start(new GateGenerator<Void, DATA>() {
-
-            @Override
-            public Gate<Void, DATA> create(final int fallNumber) {
-
-                return new SpringGate<DATA>(generator.create(fallNumber));
-            }
-        });
-    }
-
-    /**
-     * Creates and returns a new waterfall fed by the specified springs.
-     * <p/>
-     * Note that the dams and the currents of this waterfall will be retained, while the size will
-     * be equal to the one of the specified array.
-     *
-     * @param springs the spring instances
-     * @param <DATA>  the spring data type.
-     * @return the newly created waterfall.
-     */
-    public <DATA> Waterfall<Void, Void, DATA> start(final Spring<DATA>... springs) {
-
-        if (springs == null) {
-
-            throw new IllegalArgumentException("the waterfall spring array cannot be null");
-        }
-
-        final int length = springs.length;
-        final Gate[] gates = new Gate[length];
-
-        for (int i = 0; i < length; i++) {
-
-            gates[i] = new SpringGate<DATA>(springs[i]);
-        }
-
-        //noinspection unchecked
-        return start(gates);
     }
 
     /**
@@ -1933,16 +1946,17 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
         final Map<Classification<?>, DamGate<?, ?>> damMap = Collections.emptyMap();
 
         //noinspection unchecked
+        final Gate<NIN, NOUT>[] gates = new Gate[]{gate};
+
         return new Waterfall<NIN, NIN, NOUT>(null, damMap, mDamClassification, mBackgroundPoolSize,
                                              mBackgroundCurrent, null, mSize, mCurrent,
-                                             mCurrentGenerator, gate);
+                                             mCurrentGenerator, gates);
     }
 
     private Waterfall<SOURCE, OUT, OUT> chainPump(final PumpGate<OUT> pumpGate) {
 
         final Waterfall<SOURCE, OUT, OUT> waterfall = chain(pumpGate);
 
-        //noinspection unchecked
         return new Waterfall<SOURCE, OUT, OUT>(waterfall.mSource, waterfall.mDamMap,
                                                waterfall.mDamClassification, mBackgroundPoolSize,
                                                mBackgroundCurrent, pumpGate, waterfall.mSize,

@@ -27,11 +27,15 @@ import com.bmd.wtf.gts.AbstractGate;
 import com.bmd.wtf.gts.Gate;
 import com.bmd.wtf.gts.GateGenerator;
 import com.bmd.wtf.gts.OpenGate;
+import com.bmd.wtf.spr.Spring;
+import com.bmd.wtf.spr.SpringGenerator;
+import com.bmd.wtf.spr.Springs;
 
 import junit.framework.TestCase;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -766,7 +770,7 @@ public class WaterfallTest extends TestCase {
                     downRiver.drainStream(0);
                 }
             }
-        }).chain(fall3);
+        }).chain(0, fall3);
 
         assertThat(fall4.pull(1).now().next()).isEqualTo("1");
         assertThat(fall4.pull(-1).now().all()).isEmpty();
@@ -780,7 +784,7 @@ public class WaterfallTest extends TestCase {
 
                 downRiver.push(drop);
             }
-        }).chain(fall3);
+        }).chain(0, fall3);
 
         assertThat(fall4.pull(0).now().all()).isEmpty();
         assertThat(fall4.pull(1).now().all()).isEmpty();
@@ -1047,6 +1051,58 @@ public class WaterfallTest extends TestCase {
 
         try {
 
+            fall().start((Collection<Gate<Object, Object>>) null);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            final List<Gate<Object, Object>> gates = Collections.emptyList();
+            fall().start(gates);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            fall().spring((SpringGenerator<?>) null);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            fall().spring((Collection<Spring<Object>>) null);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            final List<Spring<Object>> springs = Collections.emptyList();
+            fall().spring(springs);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
             fall().chain((Gate<Object, Object>) null);
 
             fail();
@@ -1058,6 +1114,28 @@ public class WaterfallTest extends TestCase {
         try {
 
             fall().chain((GateGenerator<Object, Object>) null);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            //noinspection unchecked
+            fall().chain((Collection<Gate<Object, Object>>) null);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            final List<Gate<Object, Object>> gates = Collections.emptyList();
+            fall().chain(gates);
 
             fail();
 
@@ -1088,6 +1166,26 @@ public class WaterfallTest extends TestCase {
         try {
 
             fall().chain((Waterfall<Object, Object, Object>) null);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            fall().chain(0, null);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            fall().chain(1, fall().start());
 
             fail();
 
@@ -1259,6 +1357,26 @@ public class WaterfallTest extends TestCase {
 
         try {
 
+            fall().start().chain(0, fall());
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            fall().start().chain(1, fall());
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
             fall().dam((Class) null);
 
             fail();
@@ -1364,7 +1482,55 @@ public class WaterfallTest extends TestCase {
 
             final Waterfall<Object, Object, Object> waterfall = fall().start();
 
+            waterfall.chain(0, waterfall);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            final Waterfall<Object, Object, Object> waterfall = fall().start();
+
+            waterfall.chain(1, waterfall);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            final Waterfall<Object, Object, Object> waterfall = fall().start();
+
             waterfall.chain().chain(waterfall);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            final Waterfall<Object, Object, Object> waterfall = fall().start();
+
+            waterfall.chain().chain(0, waterfall);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            final Waterfall<Object, Object, Object> waterfall = fall().start();
+
+            waterfall.chain().chain(1, waterfall);
 
             fail();
 
@@ -1766,6 +1932,7 @@ public class WaterfallTest extends TestCase {
 
         final ArrayList<String> output = new ArrayList<String>();
 
+        //noinspection unchecked
         final Waterfall<String, List<String>, String> fall = fall().start(new OpenGate<String>() {
 
             @Override
@@ -1797,64 +1964,56 @@ public class WaterfallTest extends TestCase {
                     downRiver.push(drop);
                 }
             }
-        }).chain(new GateGenerator<String, List<String>>() {
+        }).chain(Arrays.asList(new AbstractGate<String, List<String>>() {
 
-            @Override
-            public Gate<String, List<String>> create(final int fallNumber) {
+                                   private final ArrayList<String> mWords = new ArrayList<String>();
 
-                if (fallNumber == 0) {
+                                   @Override
+                                   public void onPush(final River<String> upRiver,
+                                           final River<List<String>> downRiver,
+                                           final int fallNumber, final String drop) {
 
-                    return new AbstractGate<String, List<String>>() {
+                                       if ("atest".equals(drop)) {
 
-                        private final ArrayList<String> mWords = new ArrayList<String>();
+                                           throw new IllegalStateException();
+                                       }
 
-                        @Override
-                        public void onPush(final River<String> upRiver,
-                                final River<List<String>> downRiver, final int fallNumber,
-                                final String drop) {
+                                       mWords.add(drop);
+                                   }
 
-                            if ("atest".equals(drop)) {
+                                   @Override
+                                   public void onFlush(final River<String> upRiver,
+                                           final River<List<String>> downRiver,
+                                           final int fallNumber) {
 
-                                throw new IllegalStateException();
-                            }
+                                       Collections.sort(mWords);
+                                       downRiver.flush(new ArrayList<String>(mWords));
+                                       mWords.clear();
+                                   }
+                               },
 
-                            mWords.add(drop);
-                        }
+                               new AbstractGate<String, List<String>>() {
 
-                        @Override
-                        public void onFlush(final River<String> upRiver,
-                                final River<List<String>> downRiver, final int fallNumber) {
+                                   private final ArrayList<String> mWords = new ArrayList<String>();
 
-                            Collections.sort(mWords);
-                            downRiver.flush(new ArrayList<String>(mWords));
-                            mWords.clear();
-                        }
-                    };
-                }
+                                   @Override
+                                   public void onPush(final River<String> upRiver,
+                                           final River<List<String>> downRiver,
+                                           final int fallNumber, final String drop) {
 
-                return new AbstractGate<String, List<String>>() {
+                                       mWords.add(drop);
+                                   }
 
-                    private final ArrayList<String> mWords = new ArrayList<String>();
+                                   @Override
+                                   public void onFlush(final River<String> upRiver,
+                                           final River<List<String>> downRiver,
+                                           final int fallNumber) {
 
-                    @Override
-                    public void onPush(final River<String> upRiver,
-                            final River<List<String>> downRiver, final int fallNumber,
-                            final String drop) {
-
-                        mWords.add(drop);
-                    }
-
-                    @Override
-                    public void onFlush(final River<String> upRiver,
-                            final River<List<String>> downRiver, final int fallNumber) {
-
-                        Collections.sort(mWords, Collections.reverseOrder());
-                        downRiver.flush(new ArrayList<String>(mWords));
-                        mWords.clear();
-                    }
-                };
-            }
-        }).in(1).chain(new AbstractGate<List<String>, String>() {
+                                       Collections.sort(mWords, Collections.reverseOrder());
+                                       downRiver.flush(new ArrayList<String>(mWords));
+                                       mWords.clear();
+                                   }
+                               })).in(1).chain(new AbstractGate<List<String>, String>() {
 
             private int mCount;
 
@@ -1939,6 +2098,35 @@ public class WaterfallTest extends TestCase {
                                                                                               1);
         assertThat(fall().inBackground(3).start(Integer.class).in(1).pull(1).all()).containsExactly(
                 1, 1, 1);
+    }
+
+    public void testSpring() {
+
+        //noinspection unchecked
+        assertThat(fall().spring(Arrays.asList(Springs.sequence(0, 2), Springs.sequence(3, 2)))
+                         .pull()
+                         .all()).containsExactly(0, 1, 2, 3, 4, 5);
+        //noinspection unchecked
+        assertThat(fall().in(3)
+                         .spring(Arrays.asList(Springs.sequence(0, 2), Springs.sequence(3, 2)))
+                         .pull()
+                         .all()).containsExactly(0, 1, 2, 3, 4, 5);
+        assertThat(fall().spring(new SpringGenerator<Integer>() {
+
+            @Override
+            public Spring<Integer> create(final int fallNumber) {
+
+                return Springs.sequence(fallNumber, 2);
+            }
+        }).pull().all()).containsExactly(0, 1, 2);
+        assertThat(fall().in(2).spring(new SpringGenerator<Integer>() {
+
+            @Override
+            public Spring<Integer> create(final int fallNumber) {
+
+                return Springs.sequence(fallNumber, 2);
+            }
+        }).pull().all()).containsExactly(0, 1, 2, 1, 2, 3);
     }
 
     public void testStart() {

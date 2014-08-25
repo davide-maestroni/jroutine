@@ -1011,6 +1011,16 @@ public class WaterfallTest extends TestCase {
 
         try {
 
+            new SpringGate<Object>(null);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
             fall().start((Class<?>) null);
 
             fail();
@@ -2104,13 +2114,15 @@ public class WaterfallTest extends TestCase {
 
         //noinspection unchecked
         assertThat(fall().spring(Arrays.asList(Springs.sequence(0, 2), Springs.sequence(3, 2)))
+                         .concat()
                          .pull()
                          .all()).containsExactly(0, 1, 2, 3, 4, 5);
         //noinspection unchecked
         assertThat(fall().in(3)
                          .spring(Arrays.asList(Springs.sequence(0, 2), Springs.sequence(3, 2)))
+                         .interleave()
                          .pull()
-                         .all()).containsExactly(0, 1, 2, 3, 4, 5);
+                         .all()).containsExactly(0, 3, 1, 4, 2, 5);
         assertThat(fall().spring(new SpringGenerator<Integer>() {
 
             @Override

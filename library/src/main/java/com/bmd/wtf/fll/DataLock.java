@@ -15,6 +15,7 @@ package com.bmd.wtf.fll;
 
 import com.bmd.wtf.flw.River;
 
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -241,6 +242,36 @@ class DataLock {
         mData = new Object[initialCapacity];
     }
 
+    private static <DATA> DATA[] clone(final DATA... data) {
+
+        return (data != null) ? data.clone() : null;
+    }
+
+    private static <DATA> ArrayList<DATA> clone(final Iterable<? extends DATA> data) {
+
+        if (data == null) {
+
+            return null;
+        }
+
+        final ArrayList<DATA> clone = new ArrayList<DATA>();
+
+        for (final DATA datum : data) {
+
+            clone.add(datum);
+        }
+
+        return clone;
+    }
+
+    private static void resizeArray(final long[] src, final long[] dst, final int first) {
+
+        final int remainder = src.length - first;
+
+        System.arraycopy(src, 0, dst, 0, first);
+        System.arraycopy(src, first, dst, dst.length - remainder, remainder);
+    }
+
     private static <E> void resizeArray(final E[] src, final E[] dst, final int first) {
 
         final int remainder = src.length - first;
@@ -250,14 +281,6 @@ class DataLock {
     }
 
     private static void resizeArray(final int[] src, final int[] dst, final int first) {
-
-        final int remainder = src.length - first;
-
-        System.arraycopy(src, 0, dst, 0, first);
-        System.arraycopy(src, first, dst, dst.length - remainder, remainder);
-    }
-
-    private static void resizeArray(final long[] src, final long[] dst, final int first) {
 
         final int remainder = src.length - first;
 
@@ -283,13 +306,13 @@ class DataLock {
 
     public <OUT> void flush(final River<?> river, final OUT... drops) {
 
-        add(PUSH_ARRAY, river, -1, 0, TimeUnit.MILLISECONDS, 0, drops);
+        add(PUSH_ARRAY, river, -1, 0, TimeUnit.MILLISECONDS, 0, clone(drops));
         flush(river);
     }
 
     public <OUT> void flush(final River<?> river, final Iterable<? extends OUT> drops) {
 
-        add(PUSH_ITERABLE, river, -1, 0, TimeUnit.MILLISECONDS, 0, drops);
+        add(PUSH_ITERABLE, river, -1, 0, TimeUnit.MILLISECONDS, 0, clone(drops));
         flush(river);
     }
 
@@ -309,14 +332,14 @@ class DataLock {
     public <OUT> void flushAfter(final River<?> river, final long delay, final TimeUnit timeUnit,
             final OUT... drops) {
 
-        add(PUSH_AFTER_ARRAY, river, -1, delay, timeUnit, System.nanoTime(), drops);
+        add(PUSH_AFTER_ARRAY, river, -1, delay, timeUnit, System.nanoTime(), clone(drops));
         flush(river);
     }
 
     public <OUT> void flushAfter(final River<?> river, final long delay, final TimeUnit timeUnit,
             final Iterable<? extends OUT> drops) {
 
-        add(PUSH_AFTER_ITERABLE, river, -1, delay, timeUnit, System.nanoTime(), drops);
+        add(PUSH_AFTER_ITERABLE, river, -1, delay, timeUnit, System.nanoTime(), clone(drops));
         flush(river);
     }
 
@@ -328,14 +351,14 @@ class DataLock {
     public <OUT> void flushStream(final River<?> river, final int streamNumber,
             final OUT... drops) {
 
-        add(PUSH_ARRAY, river, streamNumber, 0, TimeUnit.MILLISECONDS, 0, drops);
+        add(PUSH_ARRAY, river, streamNumber, 0, TimeUnit.MILLISECONDS, 0, clone(drops));
         flush(river, streamNumber);
     }
 
     public <OUT> void flushStream(final River<?> river, final int streamNumber,
             final Iterable<? extends OUT> drops) {
 
-        add(PUSH_ITERABLE, river, streamNumber, 0, TimeUnit.MILLISECONDS, 0, drops);
+        add(PUSH_ITERABLE, river, streamNumber, 0, TimeUnit.MILLISECONDS, 0, clone(drops));
         flush(river, streamNumber);
     }
 
@@ -355,14 +378,16 @@ class DataLock {
     public <OUT> void flushStreamAfter(final River<?> river, final int streamNumber,
             final long delay, final TimeUnit timeUnit, final OUT... drops) {
 
-        add(PUSH_AFTER_ARRAY, river, streamNumber, delay, timeUnit, System.nanoTime(), drops);
+        add(PUSH_AFTER_ARRAY, river, streamNumber, delay, timeUnit, System.nanoTime(),
+            clone(drops));
         flush(river, streamNumber);
     }
 
     public <OUT> void flushStreamAfter(final River<?> river, final int streamNumber,
             final long delay, final TimeUnit timeUnit, final Iterable<? extends OUT> drops) {
 
-        add(PUSH_AFTER_ITERABLE, river, streamNumber, delay, timeUnit, System.nanoTime(), drops);
+        add(PUSH_AFTER_ITERABLE, river, streamNumber, delay, timeUnit, System.nanoTime(),
+            clone(drops));
         flush(river, streamNumber);
     }
 
@@ -379,12 +404,12 @@ class DataLock {
 
     public <OUT> void push(final River<?> river, final OUT... drops) {
 
-        add(PUSH_ARRAY, river, -1, 0, TimeUnit.MILLISECONDS, 0, drops);
+        add(PUSH_ARRAY, river, -1, 0, TimeUnit.MILLISECONDS, 0, clone(drops));
     }
 
     public <OUT> void push(final River<?> river, final Iterable<? extends OUT> drops) {
 
-        add(PUSH_ITERABLE, river, -1, 0, TimeUnit.MILLISECONDS, 0, drops);
+        add(PUSH_ITERABLE, river, -1, 0, TimeUnit.MILLISECONDS, 0, clone(drops));
     }
 
     public <OUT> void push(final River<?> river, final OUT drop) {
@@ -401,24 +426,24 @@ class DataLock {
     public <OUT> void pushAfter(final River<?> river, final long delay, final TimeUnit timeUnit,
             final OUT... drops) {
 
-        add(PUSH_AFTER_ARRAY, river, -1, delay, timeUnit, System.nanoTime(), drops);
+        add(PUSH_AFTER_ARRAY, river, -1, delay, timeUnit, System.nanoTime(), clone(drops));
     }
 
     public <OUT> void pushAfter(final River<?> river, final long delay, final TimeUnit timeUnit,
             final Iterable<? extends OUT> drops) {
 
-        add(PUSH_AFTER_ITERABLE, river, -1, delay, timeUnit, System.nanoTime(), drops);
+        add(PUSH_AFTER_ITERABLE, river, -1, delay, timeUnit, System.nanoTime(), clone(drops));
     }
 
     public <OUT> void pushStream(final River<?> river, final int streamNumber, final OUT... drops) {
 
-        add(PUSH_ARRAY, river, streamNumber, 0, TimeUnit.MILLISECONDS, 0, drops);
+        add(PUSH_ARRAY, river, streamNumber, 0, TimeUnit.MILLISECONDS, 0, clone(drops));
     }
 
     public <OUT> void pushStream(final River<?> river, final int streamNumber,
             final Iterable<? extends OUT> drops) {
 
-        add(PUSH_ITERABLE, river, streamNumber, 0, TimeUnit.MILLISECONDS, 0, drops);
+        add(PUSH_ITERABLE, river, streamNumber, 0, TimeUnit.MILLISECONDS, 0, clone(drops));
     }
 
     public <OUT> void pushStream(final River<?> river, final int streamNumber, final OUT drop) {
@@ -435,13 +460,15 @@ class DataLock {
     public <OUT> void pushStreamAfter(final River<?> river, final int streamNumber,
             final long delay, final TimeUnit timeUnit, final OUT... drops) {
 
-        add(PUSH_AFTER_ARRAY, river, streamNumber, delay, timeUnit, System.nanoTime(), drops);
+        add(PUSH_AFTER_ARRAY, river, streamNumber, delay, timeUnit, System.nanoTime(),
+            clone(drops));
     }
 
     public <OUT> void pushStreamAfter(final River<?> river, final int streamNumber,
             final long delay, final TimeUnit timeUnit, final Iterable<? extends OUT> drops) {
 
-        add(PUSH_AFTER_ITERABLE, river, streamNumber, delay, timeUnit, System.nanoTime(), drops);
+        add(PUSH_AFTER_ITERABLE, river, streamNumber, delay, timeUnit, System.nanoTime(),
+            clone(drops));
     }
 
     public void release() {

@@ -126,6 +126,9 @@ public class Springs {
 
     /**
      * Creates and returns a spring starting from the specified waterfall.
+     * <p/>
+     * Note that data will be pulled from the waterfall when needed. If data are pushed instead
+     * into the waterfall, consider calling <code>from(waterfall.collect())</code>.
      *
      * @param waterfall the input waterfall.
      * @param <DATA>    the data type.
@@ -138,19 +141,23 @@ public class Springs {
             throw new IllegalArgumentException("the spring waterfall cannot be null");
         }
 
+        final Collector<DATA> collector = waterfall.collect();
+
         return new Spring<DATA>() {
 
-            private Collector<DATA> mCollector;
+            private boolean mFirst = true;
 
             @Override
             public boolean hasDrops() {
 
-                if (mCollector == null) {
+                if (mFirst) {
 
-                    mCollector = waterfall.pull();
+                    mFirst = false;
+
+                    waterfall.source().flush();
                 }
 
-                return mCollector.hasNext();
+                return collector.hasNext();
             }
 
             @Override
@@ -161,7 +168,7 @@ public class Springs {
                     throw new NoSuchElementException();
                 }
 
-                return mCollector.next();
+                return collector.next();
             }
         };
     }

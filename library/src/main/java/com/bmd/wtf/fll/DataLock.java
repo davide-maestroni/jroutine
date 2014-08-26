@@ -296,7 +296,8 @@ class DataLock {
             return 0;
         }
 
-        return (delay - timeUnit.convert(System.nanoTime() - pushTimeNs, TimeUnit.NANOSECONDS));
+        return Math.max(0, (delay - timeUnit.convert(System.nanoTime() - pushTimeNs,
+                                                     TimeUnit.NANOSECONDS)));
     }
 
     public void flush(final River<?> river) {

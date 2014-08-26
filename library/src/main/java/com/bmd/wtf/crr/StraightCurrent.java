@@ -65,13 +65,12 @@ public class StraightCurrent implements Current {
             final long startTime = System.currentTimeMillis();
             final long endTime = startTime + timeToWait;
 
-            do {
+            while (timeToWait > 0) {
 
                 Thread.sleep(timeToWait);
 
                 timeToWait = endTime - System.currentTimeMillis();
-
-            } while (timeToWait > 0);
+            }
 
             fall.push(drop);
 
@@ -94,13 +93,12 @@ public class StraightCurrent implements Current {
             final long startTime = System.currentTimeMillis();
             final long endTime = startTime + timeToWait;
 
-            do {
+            while (timeToWait > 0) {
 
                 Thread.sleep(timeToWait);
 
                 timeToWait = endTime - System.currentTimeMillis();
-
-            } while (timeToWait > 0);
+            }
 
             for (final DATA drop : drops) {
 

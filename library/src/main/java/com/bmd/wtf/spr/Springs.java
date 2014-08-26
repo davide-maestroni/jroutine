@@ -894,6 +894,7 @@ public class Springs {
      * @param count the iteration count: increasing if positive and decreasing if negative.
      * @return the new spring.
      */
+    // TODO: inc
     public static Spring<Byte> sequence(final byte first, final long count) {
 
         if (count < 0) {

@@ -99,16 +99,16 @@ public class ThreadPoolCurrent implements Current {
 
         final ScheduledExecutorService service = mService;
 
-        for (final DATA drop : drops) {
+        service.schedule(new Runnable() {
 
-            service.schedule(new Runnable() {
+            @Override
+            public void run() {
 
-                @Override
-                public void run() {
+                for (final DATA drop : drops) {
 
                     fall.push(drop);
                 }
-            }, delay, timeUnit);
-        }
+            }
+        }, delay, timeUnit);
     }
 }

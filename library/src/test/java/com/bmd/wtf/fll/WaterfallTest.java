@@ -2139,6 +2139,52 @@ public class WaterfallTest extends TestCase {
                 return Springs.sequence(fallNumber, 2);
             }
         }).pull().all()).containsExactly(0, 1, 2, 1, 2, 3);
+        //noinspection unchecked
+        assertThat(fall().inBackground()
+                         .spring(Arrays.asList(Springs.sequence(0, 2), Springs.sequence(3, 2)))
+                         .concat()
+                         .pull()
+                         .all()).containsExactly(0, 1, 2, 3, 4, 5);
+        //noinspection unchecked
+        assertThat(fall().inBackground(3)
+                         .spring(Arrays.asList(Springs.sequence(0, 2), Springs.sequence(3, 2)))
+                         .interleave()
+                         .pull()
+                         .all()).containsExactly(0, 3, 1, 4, 2, 5);
+        assertThat(fall().inBackground(1).spring(new SpringGenerator<Integer>() {
+
+            @Override
+            public Spring<Integer> create(final int fallNumber) {
+
+                return Springs.sequence(fallNumber, 2);
+            }
+        }).pull().all()).containsExactly(0, 1, 2);
+        assertThat(fall().inBackground(2).spring(new SpringGenerator<Integer>() {
+
+            @Override
+            public Spring<Integer> create(final int fallNumber) {
+
+                return Springs.sequence(fallNumber, 2);
+            }
+        }).concat().pull().all()).containsExactly(0, 1, 2, 1, 2, 3);
+
+        assertThat(fall().spring(Springs.sequence(0, 2))
+                         .delay(200, TimeUnit.MILLISECONDS)
+                         .throwOnTimeout(1, TimeUnit.SECONDS, new IllegalArgumentException("test"))
+                         .pull()
+                         .all()).containsExactly(0, 1, 2);
+        assertThat(fall().inBackground(1)
+                         .spring(Springs.sequence(0, 2))
+                         .delay(200, TimeUnit.MILLISECONDS)
+                         .throwOnTimeout(1, TimeUnit.SECONDS, new IllegalArgumentException("test"))
+                         .pull()
+                         .all()).containsExactly(0, 1, 2);
+        assertThat(fall().spring(Springs.sequence(0, 2))
+                         .inBackground(1)
+                         .delay(200, TimeUnit.MILLISECONDS)
+                         .throwOnTimeout(1, TimeUnit.SECONDS, new IllegalArgumentException("test"))
+                         .pull()
+                         .all()).containsExactly(0, 1, 2);
     }
 
     public void testStart() {

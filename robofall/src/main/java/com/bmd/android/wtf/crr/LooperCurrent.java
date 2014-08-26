@@ -92,7 +92,6 @@ class LooperCurrent implements Current {
 
                 fall.push(drop);
             }
-
         }, timeUnit.toMillis(delay));
     }
 
@@ -102,17 +101,16 @@ class LooperCurrent implements Current {
 
         final long delayMillis = timeUnit.toMillis(delay);
 
-        for (final DATA drop : drops) {
+        mHandler.postDelayed(new Runnable() {
 
-            mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
 
-                @Override
-                public void run() {
+                for (final DATA drop : drops) {
 
                     fall.push(drop);
                 }
-
-            }, delayMillis);
-        }
+            }
+        }, delayMillis);
     }
 }

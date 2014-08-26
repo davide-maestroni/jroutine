@@ -206,14 +206,14 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
     }
 
     /**
-     * Links an input and an output fall through a data stream.
+     * Connects an input and an output fall through a data stream.
      *
      * @param inFall  the input fall.
      * @param outFall the output fall.
      * @param <DATA>  the data type.
      * @return the data stream running between the two falls.
      */
-    private static <DATA> DataStream<DATA> link(final DataFall<?, DATA> inFall,
+    private static <DATA> DataStream<DATA> connect(final DataFall<?, DATA> inFall,
             final DataFall<DATA, ?> outFall) {
 
         final DataStream<DATA> stream = new DataStream<DATA>(inFall, outFall);
@@ -302,7 +302,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
         for (final DataFall<IN, OUT> fall : falls) {
 
-            link(fall, outFall);
+            connect(fall, outFall);
         }
     }
 
@@ -355,7 +355,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
             for (final DataFall<IN, OUT> fall : falls) {
 
-                link(fall, outFall);
+                connect(fall, outFall);
             }
 
         } else {
@@ -379,14 +379,14 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
                 for (final DataFall<OUT, ?> outFall : outFalls) {
 
-                    link(inFall, outFall);
+                    connect(inFall, outFall);
                 }
 
             } else {
 
                 for (int i = 0; i < size; ++i) {
 
-                    link(inFalls[i], outFalls[i]);
+                    connect(inFalls[i], outFalls[i]);
                 }
             }
         }
@@ -435,7 +435,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
             for (final DataFall<IN, OUT> fall : falls) {
 
-                link(fall, outFall);
+                connect(fall, outFall);
             }
 
             return waterfall;
@@ -471,14 +471,14 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
             for (final DataFall<OUT, NOUT> outFall : outFalls) {
 
-                link(inFall, outFall);
+                connect(inFall, outFall);
             }
 
         } else {
 
             for (int i = 0; i < size; ++i) {
 
-                link(inFalls[i], outFalls[i]);
+                connect(inFalls[i], outFalls[i]);
             }
         }
 
@@ -519,7 +519,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
             for (final DataFall<IN, OUT> fall : falls) {
 
-                link(fall, outFall);
+                connect(fall, outFall);
             }
 
             return waterfall;
@@ -555,14 +555,14 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
             for (final DataFall<OUT, OUT> outFall : outFalls) {
 
-                link(inFall, outFall);
+                connect(inFall, outFall);
             }
 
         } else {
 
             for (int i = 0; i < size; ++i) {
 
-                link(inFalls[i], outFalls[i]);
+                connect(inFalls[i], outFalls[i]);
             }
         }
 
@@ -655,7 +655,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
             for (final DataFall<IN, OUT> fall : falls) {
 
-                link(fall, outFall);
+                connect(fall, outFall);
             }
 
             return waterfall;
@@ -691,14 +691,14 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
             for (final DataFall<OUT, NOUT> outFall : outFalls) {
 
-                link(inFall, outFall);
+                connect(inFall, outFall);
             }
 
         } else {
 
             for (int i = 0; i < size; ++i) {
 
-                link(inFalls[i], outFalls[i]);
+                connect(inFalls[i], outFalls[i]);
             }
         }
 
@@ -752,7 +752,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
             for (final DataFall<IN, OUT> fall : falls) {
 
-                link(fall, outFall);
+                connect(fall, outFall);
             }
 
             return waterfall;
@@ -800,14 +800,14 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
             for (final DataFall<OUT, NOUT> outFall : outFalls) {
 
-                link(inFall, outFall);
+                connect(inFall, outFall);
             }
 
         } else {
 
             for (int i = 0; i < size; ++i) {
 
-                link(inFalls[i], outFalls[i]);
+                connect(inFalls[i], outFalls[i]);
             }
         }
 
@@ -1026,18 +1026,29 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      */
     public Waterfall<SOURCE, OUT, OUT> delay(final long delay, final TimeUnit timeUnit) {
 
-        return chain(new OpenGate<OUT>() {
+        return merge().chain(new OpenGate<OUT>() {
+
+            private final ArrayList<OUT> mData = new ArrayList<OUT>();
 
             @Override
             public void onPush(final River<OUT> upRiver, final River<OUT> downRiver,
                     final int fallNumber, final OUT drop) {
 
-                downRiver.pushAfter(delay, timeUnit, drop);
+                mData.add(drop);
+            }
+
+            @Override
+            public void onFlush(final River<OUT> upRiver, final River<OUT> downRiver,
+                    final int fallNumber) {
+
+                downRiver.pushAfter(delay, timeUnit, mData);
+
+                mData.clear();
+
+                super.onFlush(upRiver, downRiver, fallNumber);
             }
         });
     }
-
-    // TODO: timeout?
 
     @Override
     public void deviate() {
@@ -1787,7 +1798,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * @param waterfall the waterfall to join.
      * @return the newly created waterfall.
      */
-    public Waterfall<SOURCE, OUT, OUT> join(final Waterfall<?, ?, OUT> waterfall) {
+    public Waterfall<OUT, OUT, OUT> join(final Waterfall<?, ?, OUT> waterfall) {
 
         if (waterfall == null) {
 
@@ -1806,7 +1817,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * @param waterfalls the collection of the waterfall to join.
      * @return the newly created waterfall.
      */
-    public Waterfall<SOURCE, OUT, OUT> join(
+    public Waterfall<OUT, OUT, OUT> join(
             final Collection<? extends Waterfall<?, ?, OUT>> waterfalls) {
 
         if (waterfalls == null) {
@@ -1818,7 +1829,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
         if (size == 1) {
 
-            return chain();
+            return start();
         }
 
         final OpenGate<OUT> gate = openGate();
@@ -1828,16 +1839,16 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
         Arrays.fill(gates, gate);
 
-        final Waterfall<SOURCE, OUT, OUT> waterfall =
-                new Waterfall<SOURCE, OUT, OUT>(mSource, mDamMap, mDamClassification,
-                                                mBackgroundPoolSize, mBackgroundCurrent, mPump,
-                                                size, mCurrent, mCurrentGenerator, gates);
+        final Waterfall<OUT, OUT, OUT> waterfall =
+                new Waterfall<OUT, OUT, OUT>(null, mDamMap, mDamClassification, mBackgroundPoolSize,
+                                             mBackgroundCurrent, mPump, size, mCurrent,
+                                             mCurrentGenerator, gates);
 
         final DataFall<OUT, OUT>[] outFalls = waterfall.mFalls;
 
         for (final DataFall<IN, OUT> fall : mFalls) {
 
-            link(fall, outFalls[0]);
+            connect(fall, outFalls[0]);
         }
 
         int number = 0;
@@ -1848,7 +1859,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
             for (final DataFall<?, OUT> fall : inWaterfall.mFalls) {
 
-                link(fall, outFalls[number]);
+                connect(fall, outFalls[number]);
             }
         }
 
@@ -1973,12 +1984,27 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
     }
 
     /**
+     * Creates and returns a new waterfall fed by the specified spring.
+     * <p/>
+     * Note that the dams and the currents of this waterfall will be retained, while the size will
+     * be equal to 1.
+     *
+     * @param spring the spring instance.
+     * @param <DATA> the spring data type.
+     * @return the newly created waterfall.
+     */
+    public <DATA> Waterfall<Void, Void, DATA> spring(final Spring<DATA> spring) {
+
+        return spring(Collections.singleton(spring));
+    }
+
+    /**
      * Creates and returns a new waterfall fed by the specified springs.
      * <p/>
      * Note that the dams and the currents of this waterfall will be retained, while the size will
-     * be equal to the one of the specified array.
+     * be equal to the one of the specified collection.
      *
-     * @param springs the spring instances
+     * @param springs the spring instances.
      * @param <DATA>  the spring data type.
      * @return the newly created waterfall.
      */
@@ -2201,6 +2227,13 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
         return new Waterfall<NIN, NIN, NOUT>(null, damMap, mDamClassification, mBackgroundPoolSize,
                                              mBackgroundCurrent, null, mSize, mCurrent,
                                              mCurrentGenerator, gates);
+    }
+
+    // TODO: timeout?
+    public Waterfall<SOURCE, OUT, OUT> throwOnTimeout(final long delay, final TimeUnit timeUnit,
+            final RuntimeException exception) {
+
+        return chain(new TimeoutGate<OUT>(this, delay, timeUnit, exception));
     }
 
     private Waterfall<SOURCE, OUT, OUT> chainPump(final PumpGate<OUT> pumpGate) {

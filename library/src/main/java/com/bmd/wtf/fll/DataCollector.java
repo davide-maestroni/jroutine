@@ -54,8 +54,6 @@ class DataCollector<DATA> implements Collector<DATA> {
 
     private final Dam<CollectorGate<DATA>> mDataDam;
 
-    private final DataDam<CollectorGate<DATA>> mSizeDam;
-
     /**
      * Constructor.
      *
@@ -74,7 +72,6 @@ class DataCollector<DATA> implements Collector<DATA> {
 
         final Classification<CollectorGate<DATA>> classification =
                 new Classification<CollectorGate<DATA>>() {};
-        mSizeDam = new DataDam<CollectorGate<DATA>>(damGate, classification);
         mDataDam = new DataDam<CollectorGate<DATA>>(damGate, classification).eventually();
     }
 
@@ -145,7 +142,7 @@ class DataCollector<DATA> implements Collector<DATA> {
     @Override
     public boolean hasNext() {
 
-        return !mSizeDam.perform(mCollectorGate.isEmptyAction());
+        return !mDataDam.when(HAS_DATA).perform(mCollectorGate.isEmptyAction());
     }
 
     @Override

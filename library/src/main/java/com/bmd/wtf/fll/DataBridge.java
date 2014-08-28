@@ -13,7 +13,7 @@
  */
 package com.bmd.wtf.fll;
 
-import com.bmd.wtf.flw.Dam;
+import com.bmd.wtf.flw.Bridge;
 import com.bmd.wtf.flw.DelayInterruptedException;
 import com.bmd.wtf.gts.Gate;
 
@@ -22,13 +22,13 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Default implementation of a dam.
+ * Default implementation of a bridge.
  * <p/>
  * Created by davide on 6/13/14.
  *
- * @param <TYPE> the dam type.
+ * @param <TYPE> the bridge type.
  */
-class DataDam<TYPE> implements Dam<TYPE> {
+class DataBridge<TYPE> implements Bridge<TYPE> {
 
     private final Classification<TYPE> mClassification;
 
@@ -47,14 +47,14 @@ class DataDam<TYPE> implements Dam<TYPE> {
     /**
      * Constructor.
      *
-     * @param gate           the dam gate.
-     * @param classification the dam classification.
+     * @param gate           the bridge gate.
+     * @param classification the bridge classification.
      */
-    public DataDam(final DamGate<?, ?> gate, final Classification<TYPE> classification) {
+    public DataBridge(final BridgeGate<?, ?> gate, final Classification<TYPE> classification) {
 
         if (classification == null) {
 
-            throw new IllegalArgumentException("the dam classification cannot be null");
+            throw new IllegalArgumentException("the bridge classification cannot be null");
         }
 
         mClassification = classification;
@@ -64,7 +64,7 @@ class DataDam<TYPE> implements Dam<TYPE> {
     }
 
     @Override
-    public Dam<TYPE> afterMax(final long maxDelay, final TimeUnit timeUnit) {
+    public Bridge<TYPE> afterMax(final long maxDelay, final TimeUnit timeUnit) {
 
         mTimeoutMs = timeUnit.toMillis(Math.max(0, maxDelay));
 
@@ -72,7 +72,7 @@ class DataDam<TYPE> implements Dam<TYPE> {
     }
 
     @Override
-    public Dam<TYPE> eventually() {
+    public Bridge<TYPE> eventually() {
 
         mTimeoutMs = -1;
 
@@ -80,7 +80,7 @@ class DataDam<TYPE> implements Dam<TYPE> {
     }
 
     @Override
-    public Dam<TYPE> eventuallyThrow(final RuntimeException exception) {
+    public Bridge<TYPE> eventuallyThrow(final RuntimeException exception) {
 
         mTimeoutException = exception;
 
@@ -88,7 +88,7 @@ class DataDam<TYPE> implements Dam<TYPE> {
     }
 
     @Override
-    public Dam<TYPE> immediately() {
+    public Bridge<TYPE> immediately() {
 
         mTimeoutMs = 0;
 
@@ -120,7 +120,7 @@ class DataDam<TYPE> implements Dam<TYPE> {
     }
 
     @Override
-    public Dam<TYPE> when(final ConditionEvaluator<? super TYPE> evaluator) {
+    public Bridge<TYPE> when(final ConditionEvaluator<? super TYPE> evaluator) {
 
         mEvaluator = evaluator;
 

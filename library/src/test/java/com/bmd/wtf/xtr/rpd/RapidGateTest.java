@@ -36,15 +36,16 @@ import static org.fest.assertions.api.Assertions.assertThat;
  */
 public class RapidGateTest extends TestCase {
 
-    public void testDam() {
+    public void testBridge() {
 
-        assertThat(fall().dam().start(new TestGateDam()).chain(new RapidGate() {
+        assertThat(fall().bridge().start(new TestGateBridge()).chain(new RapidGate() {
 
             @SuppressWarnings("UnusedDeclaration")
             public Object obj(final Object obj) {
 
-                assertThat(on(GateDam.class).perform().getInt()).isEqualTo(111);
-                assertThat(on(Classification.ofType(GateDam.class)).perform().getInt()).isEqualTo(
+                assertThat(on(GateBridge.class).perform().getInt()).isEqualTo(111);
+                assertThat(
+                        on(Classification.ofType(GateBridge.class)).perform().getInt()).isEqualTo(
                         111);
 
                 return obj;
@@ -435,7 +436,7 @@ public class RapidGateTest extends TestCase {
         assertThat(collector4.next()).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
-    public interface GateDam {
+    public interface GateBridge {
 
         public int getInt();
     }
@@ -668,7 +669,7 @@ public class RapidGateTest extends TestCase {
 
     }
 
-    public static class TestGateDam extends OpenGate<Object> implements GateDam {
+    public static class TestGateBridge extends OpenGate<Object> implements GateBridge {
 
         @Override
         public int getInt() {

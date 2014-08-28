@@ -21,14 +21,14 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Gate decorator used to protect a common gate with a dam.
+ * Gate decorator used to protect a common gate with a bridge.
  * <p/>
  * Created by davide on 6/13/14.
  *
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class DamGate<IN, OUT> extends GateDecorator<IN, OUT> {
+class BridgeGate<IN, OUT> extends GateDecorator<IN, OUT> {
 
     final Condition condition;
 
@@ -41,13 +41,32 @@ class DamGate<IN, OUT> extends GateDecorator<IN, OUT> {
      *
      * @param wrapped the wrapped gate.
      */
-    public DamGate(final Gate<IN, OUT> wrapped) {
+    public BridgeGate(final Gate<IN, OUT> wrapped) {
 
         super(wrapped);
 
         gate = wrapped;
         lock = new ReentrantLock();
         condition = lock.newCondition();
+    }
+
+    @Override
+    public void onException(final River<IN> upRiver, final River<OUT> downRiver,
+            final int fallNumber, final Throwable throwable) {
+
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+
+        try {
+
+            super.onException(upRiver, downRiver, fallNumber, throwable);
+
+        } finally {
+
+            condition.signalAll();
+
+            lock.unlock();
+        }
     }
 
     @Override
@@ -78,25 +97,6 @@ class DamGate<IN, OUT> extends GateDecorator<IN, OUT> {
         try {
 
             super.onPush(upRiver, downRiver, fallNumber, drop);
-
-        } finally {
-
-            condition.signalAll();
-
-            lock.unlock();
-        }
-    }
-
-    @Override
-    public void onException(final River<IN> upRiver, final River<OUT> downRiver,
-            final int fallNumber, final Throwable throwable) {
-
-        final ReentrantLock lock = this.lock;
-        lock.lock();
-
-        try {
-
-            super.onException(upRiver, downRiver, fallNumber, throwable);
 
         } finally {
 

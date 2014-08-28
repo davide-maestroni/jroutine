@@ -16,7 +16,7 @@ package com.bmd.wtf.xtr.rpd;
 import com.bmd.wtf.crr.Current;
 import com.bmd.wtf.crr.CurrentGenerator;
 import com.bmd.wtf.fll.Classification;
-import com.bmd.wtf.flw.Dam;
+import com.bmd.wtf.flw.Bridge;
 import com.bmd.wtf.gts.Gate;
 import com.bmd.wtf.gts.GateGenerator;
 import com.bmd.wtf.spr.Spring;
@@ -42,6 +42,18 @@ public class Rapid {
      */
     private Rapid() {
 
+    }
+
+    /**
+     * Creates and returns a rapid bridge wrapping the specified gate.
+     *
+     * @param bridge the waterfall to wrap.
+     * @param <TYPE> the gate type.
+     * @return the newly created rapid gate.
+     */
+    public static <TYPE> RapidBridge<TYPE> bridge(final Bridge<TYPE> bridge) {
+
+        return new DefaultRapidBridge<TYPE>(bridge);
     }
 
     /**
@@ -179,18 +191,6 @@ public class Rapid {
             final Object... contextArgs) {
 
         return RapidGenerators.currentGenerator(type, contextArgs);
-    }
-
-    /**
-     * Creates and returns a rapid dam wrapping the specified gate.
-     *
-     * @param dam    the waterfall to wrap.
-     * @param <TYPE> the gate type.
-     * @return the newly created rapid gate.
-     */
-    public static <TYPE> RapidDam<TYPE> dam(final Dam<TYPE> dam) {
-
-        return new DefaultRapidDam<TYPE>(dam);
     }
 
     /**

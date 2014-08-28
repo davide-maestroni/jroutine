@@ -14,14 +14,14 @@
 package com.bmd.wtf.xtr.rpd;
 
 import com.bmd.wtf.fll.Classification;
-import com.bmd.wtf.flw.Dam;
+import com.bmd.wtf.flw.Bridge;
 
 import java.util.concurrent.TimeUnit;
 
 /**
- * Interface extending a dam.
+ * Interface extending a bridge.
  * <p/>
- * The implementing class provides methods to access the dam gate via reflection, by wrapping it
+ * The implementing class provides methods to access the bridge gate via reflection, by wrapping it
  * in a proxy object, so to make every call thread safe.<br/>
  * In order for that to correctly work, the gate instance must be accessed only through the
  * implemented interface methods.
@@ -30,22 +30,22 @@ import java.util.concurrent.TimeUnit;
  *
  * @param <TYPE> the backed gate type.
  */
-public interface RapidDam<TYPE> extends Dam<TYPE> {
+public interface RapidBridge<TYPE> extends Bridge<TYPE> {
 
     @Override
-    public RapidDam<TYPE> afterMax(long maxDelay, TimeUnit timeUnit);
+    public RapidBridge<TYPE> afterMax(long maxDelay, TimeUnit timeUnit);
 
     @Override
-    public RapidDam<TYPE> eventually();
+    public RapidBridge<TYPE> eventually();
 
     @Override
-    public RapidDam<TYPE> eventuallyThrow(RuntimeException exception);
+    public RapidBridge<TYPE> eventuallyThrow(RuntimeException exception);
 
     @Override
-    public RapidDam<TYPE> immediately();
+    public RapidBridge<TYPE> immediately();
 
     @Override
-    public RapidDam<TYPE> when(final ConditionEvaluator<? super TYPE> evaluator);
+    public RapidBridge<TYPE> when(final ConditionEvaluator<? super TYPE> evaluator);
 
     /**
      * Returns the gate wrapped so to be accessed in a thread safe way.
@@ -103,7 +103,7 @@ public interface RapidDam<TYPE> extends Dam<TYPE> {
      * <p/>
      *
      * @param args the arguments to be passed to the method.
-     * @return the rapid dam.
+     * @return the rapid bridge.
      */
-    public RapidDam<TYPE> whenSatisfies(final Object... args);
+    public RapidBridge<TYPE> whenSatisfies(final Object... args);
 }

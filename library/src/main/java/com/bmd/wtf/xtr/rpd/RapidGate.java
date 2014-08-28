@@ -42,7 +42,7 @@ import java.util.Map.Entry;
  * downstream.
  * <p/>
  * The inheriting class may also make use of the protected method provided by this class to access
- * the downstream and upstream rivers, and the waterfall dams.
+ * the downstream and upstream rivers, and the waterfall bridges.
  * <b>Warning:</b> when employing annotation remember to add the proper rules to your Proguard
  * file:
  * <pre>
@@ -305,32 +305,32 @@ public abstract class RapidGate implements Gate<Object, Object> {
     }
 
     /**
-     * Returns a rapid dam handling a gate of the specified type.
+     * Returns a rapid bridge handling a gate of the specified type.
      * <p/>
      * If no gate of that type is not found inside the waterfall an exception will be thrown.
      *
-     * @param damClass the dam class.
-     * @param <TYPE>   the gate type.
-     * @return the dam.
+     * @param bridgeClass the bridge class.
+     * @param <TYPE>      the gate type.
+     * @return the bridge.
      */
-    protected <TYPE> RapidDam<TYPE> on(final Class<TYPE> damClass) {
+    protected <TYPE> RapidBridge<TYPE> on(final Class<TYPE> bridgeClass) {
 
-        return new DefaultRapidDam<TYPE>(mUpRiver.on(damClass), damClass);
+        return new DefaultRapidBridge<TYPE>(mUpRiver.on(bridgeClass), bridgeClass);
     }
 
     /**
-     * Returns a rapid dam handling a gate of the specified type.
+     * Returns a rapid bridge handling a gate of the specified type.
      * <p/>
      * If the gate is not found inside the waterfall an exception will be thrown.
      *
-     * @param damClassification the dam classification.
-     * @param <TYPE>            the gate type.
-     * @return the dam.
+     * @param bridgeClassification the bridge classification.
+     * @param <TYPE>               the gate type.
+     * @return the bridge.
      */
-    protected <TYPE> RapidDam<TYPE> on(final Classification<TYPE> damClassification) {
+    protected <TYPE> RapidBridge<TYPE> on(final Classification<TYPE> bridgeClassification) {
 
-        return new DefaultRapidDam<TYPE>(mUpRiver.on(damClassification),
-                                         damClassification.getRawType());
+        return new DefaultRapidBridge<TYPE>(mUpRiver.on(bridgeClassification),
+                                            bridgeClassification.getRawType());
     }
 
     /**

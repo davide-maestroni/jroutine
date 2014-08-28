@@ -179,37 +179,37 @@ public interface River<DATA> extends Stream<DATA> {
     public River<DATA> flushStreamAfter(int streamNumber, long delay, TimeUnit timeUnit, DATA drop);
 
     /**
-     * Returns a dam handling a gate of the specified type.
+     * Returns a bridge handling a gate of the specified type.
      * <p/>
      * If no gate of that type is found along the river path an exception will be thrown.
      *
-     * @param damClass the dam class.
-     * @param <TYPE>   the gate type.
-     * @return the dam.
+     * @param bridgeClass the bridge class.
+     * @param <TYPE>      the gate type.
+     * @return the bridge.
      */
-    public <TYPE> Dam<TYPE> on(Class<TYPE> damClass);
+    public <TYPE> Bridge<TYPE> on(Class<TYPE> bridgeClass);
 
     /**
-     * Returns a dam handling the specified gate.
+     * Returns a bridge handling the specified gate.
      * <p/>
      * If no gate of that type is found along the river path an exception will be thrown.
      *
      * @param gate   the gate instance.
      * @param <TYPE> the gate type.
-     * @return the dam.
+     * @return the bridge.
      */
-    public <TYPE> Dam<TYPE> on(TYPE gate);
+    public <TYPE> Bridge<TYPE> on(TYPE gate);
 
     /**
-     * Returns a dam handling a gate of the specified type.
+     * Returns a bridge handling a gate of the specified type.
      * <p/>
      * If no gate of that type is found along the river path an exception will be thrown.
      *
-     * @param damClassification the dam classification.
-     * @param <TYPE>            the gate type.
-     * @return the dam.
+     * @param bridgeClassification the bridge classification.
+     * @param <TYPE>               the gate type.
+     * @return the bridge.
      */
-    public <TYPE> Dam<TYPE> on(Classification<TYPE> damClassification);
+    public <TYPE> Bridge<TYPE> on(Classification<TYPE> bridgeClassification);
 
     /**
      * Pushes the specified data into the specific river stream flow.

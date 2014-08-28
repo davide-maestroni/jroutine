@@ -33,12 +33,12 @@ public class GateTest extends TestCase {
 
     public void testDecorator() {
 
-        final Gate<Object, Object> dam1 = new OpenGate<Object>();
-        final Gate<Object, Object> dam2 = new OpenGate<Object>();
+        final Gate<Object, Object> gate1 = new OpenGate<Object>();
+        final Gate<Object, Object> gate2 = new OpenGate<Object>();
 
-        final GateDecorator<Object, Object> decorator1 = new GateDecorator<Object, Object>(dam1);
-        final GateDecorator<Object, Object> decorator2 = new GateDecorator<Object, Object>(dam1);
-        final GateDecorator<Object, Object> decorator3 = new GateDecorator<Object, Object>(dam2);
+        final GateDecorator<Object, Object> decorator1 = new GateDecorator<Object, Object>(gate1);
+        final GateDecorator<Object, Object> decorator2 = new GateDecorator<Object, Object>(gate1);
+        final GateDecorator<Object, Object> decorator3 = new GateDecorator<Object, Object>(gate2);
 
         assertThat(decorator1).isEqualTo(decorator1);
         assertThat(decorator1).isEqualTo(decorator2);
@@ -108,15 +108,15 @@ public class GateTest extends TestCase {
             private Object mLast;
 
             @Override
-            public void onFlush(final River<Object> upRiver, final River<Object> downRiver,
-                    final int fallNumber) {
+            public void onException(final River<Object> upRiver, final River<Object> downRiver,
+                    final int fallNumber, final Throwable throwable) {
 
-                if ("flush1".equals(mLast)) {
+                if ("push1".equals(throwable.getMessage())) {
 
-                    throw new IllegalArgumentException("flush1");
+                    throw new IllegalArgumentException("push1");
                 }
 
-                super.onFlush(upRiver, downRiver, fallNumber);
+                super.onException(upRiver, downRiver, fallNumber, throwable);
             }
 
             @Override
@@ -141,15 +141,15 @@ public class GateTest extends TestCase {
             }
 
             @Override
-            public void onException(final River<Object> upRiver, final River<Object> downRiver,
-                    final int fallNumber, final Throwable throwable) {
+            public void onFlush(final River<Object> upRiver, final River<Object> downRiver,
+                    final int fallNumber) {
 
-                if ("push1".equals(throwable.getMessage())) {
+                if ("flush1".equals(mLast)) {
 
-                    throw new IllegalArgumentException("push1");
+                    throw new IllegalArgumentException("flush1");
                 }
 
-                super.onException(upRiver, downRiver, fallNumber, throwable);
+                super.onFlush(upRiver, downRiver, fallNumber);
             }
 
 

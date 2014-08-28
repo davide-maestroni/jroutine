@@ -16,69 +16,70 @@ package com.bmd.wtf.flw;
 import java.util.concurrent.TimeUnit;
 
 /**
- * A dam allows to access a gate instance from outside the waterfall in a thread safe way.
+ * A bridge allows to access a gate instance from outside the waterfall in a thread safe way.
  * <p/>
  * Created by davide on 6/13/14.
  *
  * @param <TYPE> the backed gate type.
  */
-public interface Dam<TYPE> {
+public interface Bridge<TYPE> {
 
     /**
-     * Tells the dam to fail if the condition is not met before the specified time has elapsed.
+     * Tells the bridge to fail if the condition is not met before the specified time has elapsed.
      *
      * @param maxDelay the maximum delay in the specified time unit.
      * @param timeUnit the delay time unit.
-     * @return this dam.
+     * @return this bridge.
      * @see #when(ConditionEvaluator)
      */
-    public Dam<TYPE> afterMax(long maxDelay, TimeUnit timeUnit);
+    public Bridge<TYPE> afterMax(long maxDelay, TimeUnit timeUnit);
 
     /**
-     * Tells the dam to wait indefinitely for the condition to be met.
+     * Tells the bridge to wait indefinitely for the condition to be met.
      *
-     * @return this dam.
+     * @return this bridge.
      * @see #when(ConditionEvaluator)
      */
-    public Dam<TYPE> eventually();
+    public Bridge<TYPE> eventually();
 
     /**
-     * Tells the dam to throw the specified exception if the maximum delay elapses before the
+     * Tells the bridge to throw the specified exception if the maximum delay elapses before the
      * condition is met.
      *
      * @param exception the exception to be thrown.
-     * @return this dam.
+     * @return this bridge.
      * @see #when(ConditionEvaluator)
      */
-    public Dam<TYPE> eventuallyThrow(RuntimeException exception);
+    public Bridge<TYPE> eventuallyThrow(RuntimeException exception);
 
     /**
-     * Tells the dam to fail if the condition is not immediately met.
+     * Tells the bridge to fail if the condition is not immediately met.
      *
-     * @return this dam.
+     * @return this bridge.
      */
-    public Dam<TYPE> immediately();
+    public Bridge<TYPE> immediately();
 
     /**
      * Performs the specified action by passing the variadic arguments as parameters.
      *
-     * @param action   the action to perform on the gate backing this dam.
+     * @param action   the action to perform on the gate backing this bridge.
      * @param args     the action arguments.
      * @param <RESULT> the result type.
      * @return the action result.
      * @throws DelayInterruptedException if the calling thread is interrupted.
      */
+    //TODO: visit
     public <RESULT> RESULT perform(Action<RESULT, ? super TYPE> action, Object... args);
 
     /**
-     * Sets the condition to be met by the gate backing this dam.
+     * Sets the condition to be met by the gate backing this bridge.
      * <p/>
      * A null condition (as by default) is always immediately met.
      *
      * @param evaluator the condition evaluator.
-     * @return this dam.
+     * @return this bridge.
      */
-    public Dam<TYPE> when(ConditionEvaluator<? super TYPE> evaluator);
+    public Bridge<TYPE> when(ConditionEvaluator<? super TYPE> evaluator);
 
     /**
      * Interface defining an action to be performed on the backed gate.

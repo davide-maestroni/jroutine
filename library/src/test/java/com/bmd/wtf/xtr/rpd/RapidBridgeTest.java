@@ -15,8 +15,8 @@ package com.bmd.wtf.xtr.rpd;
 
 import com.bmd.wtf.fll.Classification;
 import com.bmd.wtf.fll.Waterfall;
-import com.bmd.wtf.flw.Dam.Action;
-import com.bmd.wtf.flw.Dam.ConditionEvaluator;
+import com.bmd.wtf.flw.Bridge.Action;
+import com.bmd.wtf.flw.Bridge.ConditionEvaluator;
 import com.bmd.wtf.gts.OpenGate;
 import com.bmd.wtf.xtr.rpd.RapidAnnotations.GateCondition;
 
@@ -29,75 +29,72 @@ import static com.bmd.wtf.fll.Waterfall.fall;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
- * Unit tests for rapid dam objects.
+ * Unit tests for rapid bridge objects.
  * <p/>
  * Created by davide on 7/10/14.
  */
-public class RapidDamTest extends TestCase {
+public class RapidBridgeTest extends TestCase {
 
-    public void testDam() {
+    public void testBridge() {
 
-        final DamGate2 damGate = new DamGate2(1);
+        final BridgeGate2 bridgeGate = new BridgeGate2(1);
 
-        final Waterfall<Object, Object, Object> fall = fall().dam(DamGate2.class).chain(damGate);
+        final Waterfall<Object, Object, Object> fall =
+                fall().bridge(BridgeGate2.class).chain(bridgeGate);
 
-        assertThat(Rapid.dam(fall.on(DamGate.class))
-                        .immediately()
-                        .performAs(DamId.class)
+        assertThat(Rapid.bridge(fall.on(BridgeGate.class))
+                        .immediately().performAs(BridgeId.class)
                         .getId()).isEqualTo(1);
 
-        assertThat(Rapid.dam(fall.on(Classification.ofType(DamGate2.class)))
-                        .immediately()
-                        .performAs(Classification.ofType(DamId.class))
+        assertThat(Rapid.bridge(fall.on(Classification.ofType(BridgeGate2.class)))
+                        .immediately().performAs(Classification.ofType(BridgeId.class))
                         .getId()).isEqualTo(1);
 
-        assertThat(
-                Rapid.dam(fall.on(damGate)).immediately().performAs(DamId.class).getId()).isEqualTo(
-                1);
-
-        assertThat(Rapid.dam(fall.on(damGate))
+        assertThat(Rapid.bridge(fall.on(bridgeGate))
                         .immediately()
-                        .performAs(Classification.ofType(DamId.class))
+                        .performAs(BridgeId.class)
                         .getId()).isEqualTo(1);
 
-        assertThat(Rapid.dam(fall.on(damGate))
+        assertThat(Rapid.bridge(fall.on(bridgeGate))
+                        .immediately().performAs(Classification.ofType(BridgeId.class))
+                        .getId()).isEqualTo(1);
+
+        assertThat(Rapid.bridge(fall.on(bridgeGate))
                         .eventuallyThrow(new IllegalStateException())
-                        .afterMax(1, TimeUnit.SECONDS)
-                        .performAs(DamId.class)
+                        .afterMax(1, TimeUnit.SECONDS).performAs(BridgeId.class)
                         .getId()).isEqualTo(1);
 
-        assertThat(Rapid.dam(fall().inBackground().dam().start(new DamGate2(33)).on(DamGate2.class))
-                        .eventually()
-                        .when(new ConditionEvaluator<DamId>() {
+        assertThat(Rapid.bridge(
+                fall().inBackground().bridge().start(new BridgeGate2(33)).on(BridgeGate2.class))
+                        .eventually().when(new ConditionEvaluator<BridgeId>() {
 
                             @Override
-                            public boolean isSatisfied(final DamId gate) {
+                            public boolean isSatisfied(final BridgeId gate) {
 
                                 return (gate.getId() == 33);
                             }
-                        })
-                        .performAs(DamId.class)
+                        }).performAs(BridgeId.class)
                         .getId()).isEqualTo(33);
 
-        assertThat(Rapid.dam(fall().inBackground().dam().start(new DamGate3()).on(DamGate2.class))
+        assertThat(Rapid.bridge(
+                fall().inBackground().bridge().start(new BridgeGate3()).on(BridgeGate2.class))
                         .eventually()
-                        .whenSatisfies(44)
-                        .performAs(DamId.class)
+                        .whenSatisfies(44).performAs(BridgeId.class)
                         .getId()).isEqualTo(17);
 
-        assertThat(Rapid.dam(fall().inBackground().dam().start(new DamGate4()).on(DamGate2.class))
+        assertThat(Rapid.bridge(
+                fall().inBackground().bridge().start(new BridgeGate4()).on(BridgeGate2.class))
                         .eventually()
-                        .whenSatisfies(44)
-                        .performAs(DamId.class)
+                        .whenSatisfies(44).performAs(BridgeId.class)
                         .getId()).isEqualTo(71);
 
-        assertThat(Rapid.dam(fall().inBackground().dam().start(new DamGate4()).on(DamGate2.class))
+        assertThat(Rapid.bridge(
+                fall().inBackground().bridge().start(new BridgeGate4()).on(BridgeGate2.class))
                         .eventually()
-                        .whenSatisfies(44)
-                        .perform(new Action<Integer, DamGate2>() {
+                        .whenSatisfies(44).perform(new Action<Integer, BridgeGate2>() {
 
                             @Override
-                            public Integer doOn(final DamGate2 gate, final Object... args) {
+                            public Integer doOn(final BridgeGate2 gate, final Object... args) {
 
                                 return gate.getId();
                             }
@@ -108,7 +105,7 @@ public class RapidDamTest extends TestCase {
 
         try {
 
-            new DefaultRapidDam<Object>(null);
+            new DefaultRapidBridge<Object>(null);
 
             fail();
 
@@ -118,7 +115,7 @@ public class RapidDamTest extends TestCase {
 
         try {
 
-            new DefaultRapidDam<Object>(null, null);
+            new DefaultRapidBridge<Object>(null, null);
 
             fail();
 
@@ -128,7 +125,7 @@ public class RapidDamTest extends TestCase {
 
         try {
 
-            new DefaultRapidDam<Object>(null, Object.class);
+            new DefaultRapidBridge<Object>(null, Object.class);
 
             fail();
 
@@ -138,7 +135,8 @@ public class RapidDamTest extends TestCase {
 
         try {
 
-            Rapid.dam(fall().dam().start(new OpenGate<Object>()).on(OpenGate.class)).perform();
+            Rapid.bridge(fall().bridge().start(new OpenGate<Object>()).on(OpenGate.class))
+                 .perform();
 
             fail();
 
@@ -148,7 +146,7 @@ public class RapidDamTest extends TestCase {
 
         try {
 
-            Rapid.dam(fall().dam().start(new OpenGate<Object>()).on(OpenGate.class))
+            Rapid.bridge(fall().bridge().start(new OpenGate<Object>()).on(OpenGate.class))
                  .performAs(OpenGate.class);
 
             fail();
@@ -159,7 +157,7 @@ public class RapidDamTest extends TestCase {
 
         try {
 
-            Rapid.dam(fall().dam().start(new OpenGate<Object>()).on(OpenGate.class))
+            Rapid.bridge(fall().bridge().start(new OpenGate<Object>()).on(OpenGate.class))
                  .performAs(Classification.ofType(OpenGate.class));
 
             fail();
@@ -170,10 +168,9 @@ public class RapidDamTest extends TestCase {
 
         try {
 
-            Rapid.dam(fall().dam().start(new DamGateError1()).on(OpenGate.class))
+            Rapid.bridge(fall().bridge().start(new BridgeGateError1()).on(OpenGate.class))
                  .whenSatisfies(31)
-                 .eventually()
-                 .performAs(DamId.class)
+                 .eventually().performAs(BridgeId.class)
                  .getId();
 
             fail();
@@ -184,10 +181,9 @@ public class RapidDamTest extends TestCase {
 
         try {
 
-            Rapid.dam(fall().dam().start(new DamGateError2()).on(OpenGate.class))
+            Rapid.bridge(fall().bridge().start(new BridgeGateError2()).on(OpenGate.class))
                  .whenSatisfies(31)
-                 .eventually()
-                 .performAs(DamId.class)
+                 .eventually().performAs(BridgeId.class)
                  .getId();
 
             fail();
@@ -198,8 +194,8 @@ public class RapidDamTest extends TestCase {
 
         try {
 
-            new DefaultRapidDam<OpenGate>(
-                    fall().dam().start(new OpenGate<Object>()).on(OpenGate.class),
+            new DefaultRapidBridge<OpenGate>(
+                    fall().bridge().start(new OpenGate<Object>()).on(OpenGate.class),
                     OpenGate.class).performAs(List.class);
 
             fail();
@@ -209,12 +205,12 @@ public class RapidDamTest extends TestCase {
         }
     }
 
-    public interface DamId {
+    public interface BridgeId {
 
         public int getId();
     }
 
-    public static class DamGate extends OpenGate<Object> implements DamId {
+    public static class BridgeGate extends OpenGate<Object> implements BridgeId {
 
         @Override
         public int getId() {
@@ -223,11 +219,11 @@ public class RapidDamTest extends TestCase {
         }
     }
 
-    public static class DamGate2 extends DamGate {
+    public static class BridgeGate2 extends BridgeGate {
 
         private int mId;
 
-        public DamGate2(final int id) {
+        public BridgeGate2(final int id) {
 
             mId = id;
         }
@@ -245,9 +241,9 @@ public class RapidDamTest extends TestCase {
         }
     }
 
-    public static class DamGate3 extends DamGate2 {
+    public static class BridgeGate3 extends BridgeGate2 {
 
-        public DamGate3() {
+        public BridgeGate3() {
 
             super(17);
         }
@@ -277,9 +273,9 @@ public class RapidDamTest extends TestCase {
         }
     }
 
-    public static class DamGate4 extends DamGate2 {
+    public static class BridgeGate4 extends BridgeGate2 {
 
-        public DamGate4() {
+        public BridgeGate4() {
 
             super(71);
         }
@@ -303,9 +299,9 @@ public class RapidDamTest extends TestCase {
         }
     }
 
-    public static class DamGateError1 extends DamGate2 {
+    public static class BridgeGateError1 extends BridgeGate2 {
 
-        public DamGateError1() {
+        public BridgeGateError1() {
 
             super(19);
         }
@@ -323,9 +319,9 @@ public class RapidDamTest extends TestCase {
         }
     }
 
-    public static class DamGateError2 extends DamGate2 {
+    public static class BridgeGateError2 extends BridgeGate2 {
 
-        public DamGateError2() {
+        public BridgeGateError2() {
 
             super(23);
         }

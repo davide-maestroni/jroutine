@@ -13,32 +13,32 @@
  */
 package com.bmd.wtf.xtr.rpd;
 
-import com.bmd.wtf.flw.Dam;
-import com.bmd.wtf.flw.Dam.Action;
+import com.bmd.wtf.flw.Bridge;
+import com.bmd.wtf.flw.Bridge.Action;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
- * Invocation handler used to handle a dam proxy method invocations.
+ * Invocation handler used to handle a bridge proxy method invocations.
  * <p/>
  * Created by davide on 7/4/14.
  *
  * @param <TYPE> the gate type.
  */
-class DamInvocationHandler<TYPE> implements InvocationHandler, Action<Object, TYPE> {
+class BridgeInvocationHandler<TYPE> implements InvocationHandler, Action<Object, TYPE> {
 
-    private final Dam<TYPE> mDam;
+    private final Bridge<TYPE> mBridge;
 
     /**
      * Constructor.
      *
-     * @param dam the dam instance.
+     * @param bridge the bridge instance.
      */
-    public DamInvocationHandler(final Dam<TYPE> dam) {
+    public BridgeInvocationHandler(final Bridge<TYPE> bridge) {
 
-        mDam = dam;
+        mBridge = bridge;
     }
 
     @Override
@@ -62,6 +62,6 @@ class DamInvocationHandler<TYPE> implements InvocationHandler, Action<Object, TY
     public Object invoke(final Object proxy, final Method method, final Object[] args) throws
             Throwable {
 
-        return mDam.perform(this, method, args);
+        return mBridge.perform(this, method, args);
     }
 }

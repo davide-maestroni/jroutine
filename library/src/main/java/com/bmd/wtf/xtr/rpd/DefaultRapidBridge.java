@@ -14,21 +14,21 @@
 package com.bmd.wtf.xtr.rpd;
 
 import com.bmd.wtf.fll.Classification;
-import com.bmd.wtf.flw.Dam;
+import com.bmd.wtf.flw.Bridge;
 
 import java.lang.reflect.Proxy;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Default rapid dam implementation.
+ * Default rapid bridge implementation.
  * <p/>
  * Created by davide on 7/4/14.
  *
  * @param <TYPE> the backed gate type.
  */
-class DefaultRapidDam<TYPE> implements RapidDam<TYPE> {
+class DefaultRapidBridge<TYPE> implements RapidBridge<TYPE> {
 
-    private final Dam<TYPE> mDam;
+    private final Bridge<TYPE> mBridge;
 
     private final Class<TYPE> mType;
 
@@ -41,9 +41,9 @@ class DefaultRapidDam<TYPE> implements RapidDam<TYPE> {
     /**
      * Constructor.
      *
-     * @param wrapped the wrapped dam.
+     * @param wrapped the wrapped bridge.
      */
-    public DefaultRapidDam(final Dam<?> wrapped) {
+    public DefaultRapidBridge(final Bridge<?> wrapped) {
 
         this(wrapped, null);
     }
@@ -51,23 +51,23 @@ class DefaultRapidDam<TYPE> implements RapidDam<TYPE> {
     /**
      * Constructor.
      *
-     * @param wrapped  the wrapped dam.
-     * @param damClass the dam class.
+     * @param wrapped     the wrapped bridge.
+     * @param bridgeClass the bridge class.
      */
-    public DefaultRapidDam(final Dam<?> wrapped, final Class<TYPE> damClass) {
+    public DefaultRapidBridge(final Bridge<?> wrapped, final Class<TYPE> bridgeClass) {
 
         if (wrapped == null) {
 
-            throw new IllegalArgumentException("the wrapped dam cannot be null");
+            throw new IllegalArgumentException("the wrapped bridge cannot be null");
         }
 
         //noinspection unchecked
-        mDam = (Dam<TYPE>) wrapped;
-        mType = damClass;
+        mBridge = (Bridge<TYPE>) wrapped;
+        mType = bridgeClass;
     }
 
     @Override
-    public RapidDam<TYPE> afterMax(final long maxDelay, final TimeUnit timeUnit) {
+    public RapidBridge<TYPE> afterMax(final long maxDelay, final TimeUnit timeUnit) {
 
         mTimeoutMs = timeUnit.toMillis(maxDelay);
 
@@ -75,7 +75,7 @@ class DefaultRapidDam<TYPE> implements RapidDam<TYPE> {
     }
 
     @Override
-    public RapidDam<TYPE> eventually() {
+    public RapidBridge<TYPE> eventually() {
 
         mTimeoutMs = -1;
 
@@ -83,7 +83,7 @@ class DefaultRapidDam<TYPE> implements RapidDam<TYPE> {
     }
 
     @Override
-    public RapidDam<TYPE> eventuallyThrow(final RuntimeException exception) {
+    public RapidBridge<TYPE> eventuallyThrow(final RuntimeException exception) {
 
         mTimeoutException = exception;
 
@@ -91,7 +91,7 @@ class DefaultRapidDam<TYPE> implements RapidDam<TYPE> {
     }
 
     @Override
-    public RapidDam<TYPE> immediately() {
+    public RapidBridge<TYPE> immediately() {
 
         mTimeoutMs = 0;
 
@@ -99,7 +99,7 @@ class DefaultRapidDam<TYPE> implements RapidDam<TYPE> {
     }
 
     @Override
-    public RapidDam<TYPE> when(final ConditionEvaluator<? super TYPE> evaluator) {
+    public RapidBridge<TYPE> when(final ConditionEvaluator<? super TYPE> evaluator) {
 
         mEvaluator = evaluator;
 
@@ -113,43 +113,44 @@ class DefaultRapidDam<TYPE> implements RapidDam<TYPE> {
 
         if (type == null) {
 
-            throw new IllegalStateException("the dam type is not specified");
+            throw new IllegalStateException("the bridge type is not specified");
         }
 
         return performAs(type);
     }
 
     @Override
-    public <NTYPE> NTYPE performAs(final Class<NTYPE> damClass) {
+    public <NTYPE> NTYPE performAs(final Class<NTYPE> bridgeClass) {
 
-        if (!damClass.isInterface()) {
+        if (!bridgeClass.isInterface()) {
 
-            throw new IllegalArgumentException("the dam type does not represent an interface");
+            throw new IllegalArgumentException("the bridge type does not represent an interface");
         }
 
         final Class<TYPE> type = mType;
 
-        if ((type != null) && !damClass.isAssignableFrom(type)) {
+        if ((type != null) && !bridgeClass.isAssignableFrom(type)) {
 
             throw new IllegalArgumentException(
-                    "the dam is not of the specified type: " + damClass.getCanonicalName());
+                    "the bridge is not of the specified type: " + bridgeClass.getCanonicalName());
         }
 
-        final Dam<NTYPE> dam = buildDam(damClass);
+        final Bridge<NTYPE> bridge = buildBridge(bridgeClass);
 
         //noinspection unchecked
-        return (NTYPE) Proxy.newProxyInstance(damClass.getClassLoader(), new Class[]{damClass},
-                                              new DamInvocationHandler(dam));
+        return (NTYPE) Proxy.newProxyInstance(bridgeClass.getClassLoader(),
+                                              new Class[]{bridgeClass},
+                                              new BridgeInvocationHandler(bridge));
     }
 
     @Override
-    public <NTYPE> NTYPE performAs(final Classification<NTYPE> damClassification) {
+    public <NTYPE> NTYPE performAs(final Classification<NTYPE> bridgeClassification) {
 
-        return performAs(damClassification.getRawType());
+        return performAs(bridgeClassification.getRawType());
     }
 
     @Override
-    public RapidDam<TYPE> whenSatisfies(final Object... args) {
+    public RapidBridge<TYPE> whenSatisfies(final Object... args) {
 
         return when(new RapidConditionEvaluator<TYPE>(args));
     }
@@ -158,34 +159,34 @@ class DefaultRapidDam<TYPE> implements RapidDam<TYPE> {
     public <RESULT> RESULT perform(final Action<RESULT, ? super TYPE> action,
             final Object... args) {
 
-        return buildDam(mType).perform(action, args);
+        return buildBridge(mType).perform(action, args);
     }
 
-    private <NTYPE> Dam<NTYPE> buildDam(
-            @SuppressWarnings("UnusedParameters") final Class<NTYPE> damClass) {
+    private <NTYPE> Bridge<NTYPE> buildBridge(
+            @SuppressWarnings("UnusedParameters") final Class<NTYPE> bridgeClass) {
 
         final long timeoutMs = mTimeoutMs;
         final RuntimeException timeoutException = mTimeoutException;
         final ConditionEvaluator<? super TYPE> conditionEvaluator = mEvaluator;
 
         //noinspection unchecked
-        final Dam<NTYPE> dam = (Dam<NTYPE>) mDam;
+        final Bridge<NTYPE> bridge = (Bridge<NTYPE>) mBridge;
 
         if (timeoutMs < 0) {
 
-            dam.eventually();
+            bridge.eventually();
 
         } else if (timeoutMs == 0) {
 
-            dam.immediately();
+            bridge.immediately();
 
         } else {
 
-            dam.afterMax(timeoutMs, TimeUnit.MILLISECONDS);
+            bridge.afterMax(timeoutMs, TimeUnit.MILLISECONDS);
         }
 
         //noinspection unchecked
-        return dam.eventuallyThrow(timeoutException)
-                  .when((ConditionEvaluator<? super NTYPE>) conditionEvaluator);
+        return bridge.eventuallyThrow(timeoutException)
+                     .when((ConditionEvaluator<? super NTYPE>) conditionEvaluator);
     }
 }

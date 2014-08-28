@@ -13,9 +13,9 @@
  */
 package com.bmd.wtf.fll;
 
+import com.bmd.wtf.flw.Bridge;
+import com.bmd.wtf.flw.Bridge.ConditionEvaluator;
 import com.bmd.wtf.flw.Collector;
-import com.bmd.wtf.flw.Dam;
-import com.bmd.wtf.flw.Dam.ConditionEvaluator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,15 +52,15 @@ class DataCollector<DATA> implements Collector<DATA> {
 
     private final CollectorGate<DATA> mCollectorGate;
 
-    private final Dam<CollectorGate<DATA>> mDataDam;
+    private final Bridge<CollectorGate<DATA>> mDataBridge;
 
     /**
      * Constructor.
      *
-     * @param damGate       the associated dam gate.
+     * @param bridgeGate    the associated bridge gate.
      * @param collectorGate the associated collector gate.
      */
-    public DataCollector(final DamGate<DATA, DATA> damGate,
+    public DataCollector(final BridgeGate<DATA, DATA> bridgeGate,
             final CollectorGate<DATA> collectorGate) {
 
         if (collectorGate == null) {
@@ -72,13 +72,13 @@ class DataCollector<DATA> implements Collector<DATA> {
 
         final Classification<CollectorGate<DATA>> classification =
                 new Classification<CollectorGate<DATA>>() {};
-        mDataDam = new DataDam<CollectorGate<DATA>>(damGate, classification).eventually();
+        mDataBridge = new DataBridge<CollectorGate<DATA>>(bridgeGate, classification).eventually();
     }
 
     @Override
     public Collector<DATA> afterMax(final long maxDelay, final TimeUnit timeUnit) {
 
-        mDataDam.afterMax(maxDelay, timeUnit);
+        mDataBridge.afterMax(maxDelay, timeUnit);
 
         return this;
     }
@@ -96,7 +96,7 @@ class DataCollector<DATA> implements Collector<DATA> {
     @Override
     public Collector<DATA> allInto(final List<DATA> data) {
 
-        mDataDam.when(IS_COMPLETE).perform(mCollectorGate.pullAllAction(), data);
+        mDataBridge.when(IS_COMPLETE).perform(mCollectorGate.pullAllAction(), data);
 
         return this;
     }
@@ -104,7 +104,7 @@ class DataCollector<DATA> implements Collector<DATA> {
     @Override
     public Collector<DATA> eventually() {
 
-        mDataDam.eventually();
+        mDataBridge.eventually();
 
         return this;
     }
@@ -112,7 +112,7 @@ class DataCollector<DATA> implements Collector<DATA> {
     @Override
     public Collector<DATA> eventuallyThrow(final RuntimeException exception) {
 
-        mDataDam.eventuallyThrow(exception);
+        mDataBridge.eventuallyThrow(exception);
 
         return this;
     }
@@ -120,7 +120,7 @@ class DataCollector<DATA> implements Collector<DATA> {
     @Override
     public DATA next() {
 
-        return mDataDam.when(HAS_DATA).perform(mCollectorGate.pullAction());
+        return mDataBridge.when(HAS_DATA).perform(mCollectorGate.pullAction());
     }
 
     @Override
@@ -134,7 +134,7 @@ class DataCollector<DATA> implements Collector<DATA> {
     @Override
     public Collector<DATA> now() {
 
-        mDataDam.immediately();
+        mDataBridge.immediately();
 
         return this;
     }
@@ -142,7 +142,7 @@ class DataCollector<DATA> implements Collector<DATA> {
     @Override
     public boolean hasNext() {
 
-        return !mDataDam.when(HAS_DATA).perform(mCollectorGate.isEmptyAction());
+        return !mDataBridge.when(HAS_DATA).perform(mCollectorGate.isEmptyAction());
     }
 
     @Override

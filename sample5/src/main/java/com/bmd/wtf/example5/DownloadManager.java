@@ -50,7 +50,7 @@ public class DownloadManager {
         }
 
         mDownloadDir = downloadDir;
-        final Waterfall<Object, Object, Object> waterfall = fall().dam()
+        final Waterfall<Object, Object, Object> waterfall = fall().bridge()
                                                                   .start(new DownloadObserver())
                                                                   .inBackground(maxThreads)
                                                                   .distribute(new RapidPump() {
@@ -67,7 +67,7 @@ public class DownloadManager {
         waterfall.chain(Rapid.gateGenerator(RetryPolicy.class, waterfall));
         // merge the streams and finally chain the observer
         mWaterfall = waterfall.in(1).chain(Classification.ofType(DownloadObserver.class));
-        mGate = Rapid.dam(waterfall.on(DownloadObserver.class)).performAs(UriObserver.class);
+        mGate = Rapid.bridge(waterfall.on(DownloadObserver.class)).performAs(UriObserver.class);
     }
 
     public static void main(final String args[]) throws IOException, URISyntaxException {

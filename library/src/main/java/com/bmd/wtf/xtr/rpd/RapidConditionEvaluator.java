@@ -13,7 +13,7 @@
  */
 package com.bmd.wtf.xtr.rpd;
 
-import com.bmd.wtf.flw.Dam.ConditionEvaluator;
+import com.bmd.wtf.flw.Bridge.ConditionEvaluator;
 import com.bmd.wtf.xtr.rpd.RapidAnnotations.GateCondition;
 
 import java.lang.reflect.InvocationTargetException;
@@ -32,7 +32,7 @@ import java.util.Arrays;
  * <p/>
  * Created by davide on 7/11/14.
  *
- * @param <TYPE> the dam type.
+ * @param <TYPE> the bridge type.
  */
 class RapidConditionEvaluator<TYPE> implements ConditionEvaluator<TYPE> {
 
@@ -43,7 +43,7 @@ class RapidConditionEvaluator<TYPE> implements ConditionEvaluator<TYPE> {
     /**
      * Constructor.
      *
-     * @param args the arguments to be passed to the dam method.
+     * @param args the arguments to be passed to the bridge method.
      */
     public RapidConditionEvaluator(final Object[] args) {
 

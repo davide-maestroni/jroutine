@@ -49,6 +49,7 @@ public class Currents {
      *
      * @param poolSize the maximum size of the thread pool.
      * @return the new instance.
+     * @throws java.lang.IllegalArgumentException if the pool size is negative.
      */
     public static Current pool(final int poolSize) {
 

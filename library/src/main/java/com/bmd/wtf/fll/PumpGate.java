@@ -49,6 +49,7 @@ class PumpGate<DATA> extends AbstractGate<DATA, DATA> implements Pump<DATA> {
      * stream.
      *
      * @param streamCount the total number of streams.
+     * @throws java.lang.NegativeArraySizeException if the stream count is negative.
      */
     public PumpGate(final int streamCount) {
 
@@ -61,6 +62,8 @@ class PumpGate<DATA> extends AbstractGate<DATA, DATA> implements Pump<DATA> {
      *
      * @param pump        the pump.
      * @param streamCount the total number of streams.
+     * @throws java.lang.NegativeArraySizeException if the pump is null or the stream count is
+     *                                              negative.
      */
     public PumpGate(final Pump<DATA> pump, final int streamCount) {
 

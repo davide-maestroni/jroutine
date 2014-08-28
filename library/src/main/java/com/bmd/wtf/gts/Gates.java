@@ -36,6 +36,7 @@ public class Gates {
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      * @return the wrapping gate.
+     * @throws IllegalArgumentException if the gate is null.
      */
     public static <IN, OUT> Gate<IN, OUT> weak(final Gate<IN, OUT> gate) {
 
@@ -51,6 +52,7 @@ public class Gates {
      * @param <IN>         the input data type.
      * @param <OUT>        the output data type.
      * @return the wrapping gate.
+     * @throws IllegalArgumentException if the gate is null.
      */
     public static <IN, OUT> Gate<IN, OUT> weak(final Gate<IN, OUT> gate,
             final WhenVanished whenVanished) {

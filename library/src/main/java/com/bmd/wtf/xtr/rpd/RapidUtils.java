@@ -56,6 +56,11 @@ class RapidUtils {
      */
     public static Class<?> boxedClass(final Class<?> type) {
 
+        if (type == null) {
+
+            return Void.class;
+        }
+
         if (!type.isPrimitive()) {
 
             return type;

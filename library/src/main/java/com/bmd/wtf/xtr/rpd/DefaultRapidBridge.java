@@ -42,6 +42,7 @@ class DefaultRapidBridge<TYPE> implements RapidBridge<TYPE> {
      * Constructor.
      *
      * @param wrapped the wrapped bridge.
+     * @throws IllegalArgumentException if the wrapped bridge is null.
      */
     public DefaultRapidBridge(final Bridge<?> wrapped) {
 
@@ -53,6 +54,7 @@ class DefaultRapidBridge<TYPE> implements RapidBridge<TYPE> {
      *
      * @param wrapped     the wrapped bridge.
      * @param bridgeClass the bridge class.
+     * @throws IllegalArgumentException if the wrapped bridge is null.
      */
     public DefaultRapidBridge(final Bridge<?> wrapped, final Class<TYPE> bridgeClass) {
 

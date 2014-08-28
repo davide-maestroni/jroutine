@@ -36,6 +36,7 @@ public class WaterfallRiver<DATA> implements River<DATA> {
      *
      * @param waterfall the wrapped waterfall.
      * @param direction whether the river direction is downstream or upstream.
+     * @throws IllegalArgumentException if the waterfall is null.
      */
     public WaterfallRiver(final Waterfall<?, DATA, ?> waterfall, final Direction direction) {
 

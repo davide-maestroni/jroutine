@@ -49,8 +49,14 @@ class DataBridge<TYPE> implements Bridge<TYPE> {
      *
      * @param gate           the bridge gate.
      * @param classification the bridge classification.
+     * @throws IllegalArgumentException if the gate or the classification are null.
      */
     public DataBridge(final BridgeGate<?, ?> gate, final Classification<TYPE> classification) {
+
+        if (gate == null) {
+
+            throw new IllegalArgumentException("the bridge gate cannot be null");
+        }
 
         if (classification == null) {
 

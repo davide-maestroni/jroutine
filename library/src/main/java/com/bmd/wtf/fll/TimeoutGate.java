@@ -47,6 +47,7 @@ class TimeoutGate<DATA> extends OpenGate<DATA> {
      * @param delay     the delay in <code>timeUnit</code> time units.
      * @param timeUnit  the delay time unit.
      * @param exception the exception to be thrown.
+     * @throws IllegalArgumentException if the waterfall is null.
      */
     public TimeoutGate(final Waterfall<?, ?, ?> waterfall, final long delay,
             final TimeUnit timeUnit, final RuntimeException exception) {

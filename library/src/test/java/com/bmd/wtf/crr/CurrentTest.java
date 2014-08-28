@@ -31,6 +31,19 @@ import static org.fest.assertions.api.Assertions.assertThat;
  */
 public class CurrentTest extends TestCase {
 
+    public void testError() {
+
+        try {
+
+            Currents.pool(-1);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+    }
+
     public void testFall() throws InterruptedException {
 
         final TestFall fall = new TestFall();

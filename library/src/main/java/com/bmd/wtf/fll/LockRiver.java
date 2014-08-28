@@ -41,6 +41,7 @@ class LockRiver<DATA> implements River<DATA> {
      * Constructor.
      *
      * @param wrapped the wrapped river.
+     * @throws IllegalArgumentException if the wrapped river is null.
      */
     public LockRiver(final River<DATA> wrapped) {
 
@@ -700,6 +701,8 @@ class LockRiver<DATA> implements River<DATA> {
      * Closes the river lock.
      * <p/>
      * The accumulated data are released as a result.
+     *
+     * @throws IllegalStateException if the lock is not held by the calling thread.
      */
     void close() {
 

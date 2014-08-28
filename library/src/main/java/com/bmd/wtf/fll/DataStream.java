@@ -46,6 +46,7 @@ class DataStream<DATA> implements Stream<DATA> {
      *
      * @param upstreamFall   the upstream fall.
      * @param downstreamFall the downstream fall.
+     * @throws IllegalArgumentException if the upstream or the downstream fall are null.
      */
     public DataStream(final DataFall<?, DATA> upstreamFall,
             final DataFall<DATA, ?> downstreamFall) {

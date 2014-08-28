@@ -34,6 +34,7 @@ public class ThreadPoolCurrent implements Current {
      * Avoid instantiation outside the package.
      *
      * @param threadPoolSize the maximum size of the thread pool.
+     * @throws java.lang.IllegalArgumentException if the pool size is negative.
      */
     ThreadPoolCurrent(final int threadPoolSize) {
 

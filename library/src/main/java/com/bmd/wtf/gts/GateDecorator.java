@@ -31,6 +31,7 @@ public class GateDecorator<IN, OUT> implements Gate<IN, OUT> {
      * Default constructor.
      *
      * @param wrapped the decorated instance.
+     * @throws IllegalArgumentException if the wrapped instance is null.
      */
     public GateDecorator(final Gate<IN, OUT> wrapped) {
 

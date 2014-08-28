@@ -59,9 +59,15 @@ class DataCollector<DATA> implements Collector<DATA> {
      *
      * @param bridgeGate    the associated bridge gate.
      * @param collectorGate the associated collector gate.
+     * @throws IllegalArgumentException if the bridge or the collector are null.
      */
     public DataCollector(final BridgeGate<DATA, DATA> bridgeGate,
             final CollectorGate<DATA> collectorGate) {
+
+        if (bridgeGate == null) {
+
+            throw new IllegalArgumentException("the bridge gate cannot be null");
+        }
 
         if (collectorGate == null) {
 

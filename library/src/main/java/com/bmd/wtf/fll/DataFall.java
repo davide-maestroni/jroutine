@@ -80,6 +80,7 @@ class DataFall<IN, OUT> implements Fall<IN> {
      * @param inputCurrent the input current.
      * @param gate         the wrapped gate.
      * @param number       the number identifying this fall.
+     * @throws IllegalArgumentException if the waterfall, the current or the gate are null.
      */
     public DataFall(final Waterfall<?, IN, OUT> waterfall, final Current inputCurrent,
             final Gate<IN, OUT> gate, final int number) {

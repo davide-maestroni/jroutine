@@ -33,10 +33,21 @@ class BarrageGate<IN, OUT> extends GateDecorator<IN, OUT> {
      * Constructor.
      *
      * @param wrapped the wrapped gate.
+     * @throws java.lang.IllegalArgumentException if the wrapped instance is null.
      */
     public BarrageGate(final Gate<IN, OUT> wrapped) {
 
         super(wrapped);
+    }
+
+    @Override
+    public void onException(final River<IN> upRiver, final River<OUT> downRiver,
+            final int fallNumber, final Throwable throwable) {
+
+        synchronized (mMutex) {
+
+            super.onException(upRiver, downRiver, fallNumber, throwable);
+        }
     }
 
     @Override
@@ -55,16 +66,6 @@ class BarrageGate<IN, OUT> extends GateDecorator<IN, OUT> {
         synchronized (mMutex) {
 
             super.onPush(upRiver, downRiver, fallNumber, drop);
-        }
-    }
-
-    @Override
-    public void onException(final River<IN> upRiver, final River<OUT> downRiver,
-            final int fallNumber, final Throwable throwable) {
-
-        synchronized (mMutex) {
-
-            super.onException(upRiver, downRiver, fallNumber, throwable);
         }
     }
 }

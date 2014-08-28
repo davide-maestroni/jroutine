@@ -41,6 +41,7 @@ public abstract class Classification<TYPE> {
      * @param rawType the raw type.
      * @param <RTYPE> the type.
      * @return the newly created classification.
+     * @throws IllegalArgumentException if the raw type is null.
      */
     public static <RTYPE> Classification<RTYPE> ofType(final Class<RTYPE> rawType) {
 

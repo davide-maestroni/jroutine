@@ -39,6 +39,7 @@ class PumpFall<SOURCE, IN, OUT> extends DataFall<IN, OUT> {
      * @param gate         the wrapped gate.
      * @param number       the number identifying this fall.
      * @param pumpGate     the related pump.
+     * @throws IllegalArgumentException if the waterfall, the current or the gate are null.
      */
     public PumpFall(final Waterfall<SOURCE, IN, OUT> waterfall, final Current inputCurrent,
             final Gate<IN, OUT> gate, final int number, final PumpGate pumpGate) {

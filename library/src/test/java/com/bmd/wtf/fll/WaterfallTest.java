@@ -2621,6 +2621,34 @@ public class WaterfallTest extends TestCase {
             });
         }
 
+        private boolean isFailed(final River<Object> river) {
+
+            return river.on(LatchGate.class)
+                        .immediately()
+                        .perform(new Action<Boolean, LatchGate>() {
+
+                            @Override
+                            public Boolean doOn(final LatchGate gate, final Object... args) {
+
+                                return gate.isFailed();
+                            }
+                        });
+        }
+
+        private void setFailed(final River<Object> river) {
+
+            river.on(LatchGate.class).immediately().perform(new Action<Void, LatchGate>() {
+
+                @Override
+                public Void doOn(final LatchGate gate, final Object... args) {
+
+                    gate.setFailed();
+
+                    return null;
+                }
+            });
+        }
+
         @Override
         public void onFlush(final River<Object> upRiver, final River<Object> downRiver,
                 final int fallNumber) {
@@ -2660,34 +2688,6 @@ public class WaterfallTest extends TestCase {
 
                 setFailed(downRiver);
             }
-        }
-
-        private boolean isFailed(final River<Object> river) {
-
-            return river.on(LatchGate.class)
-                        .immediately()
-                        .perform(new Action<Boolean, LatchGate>() {
-
-                            @Override
-                            public Boolean doOn(final LatchGate gate, final Object... args) {
-
-                                return gate.isFailed();
-                            }
-                        });
-        }
-
-        private void setFailed(final River<Object> river) {
-
-            river.on(LatchGate.class).immediately().perform(new Action<Void, LatchGate>() {
-
-                @Override
-                public Void doOn(final LatchGate gate, final Object... args) {
-
-                    gate.setFailed();
-
-                    return null;
-                }
-            });
         }
 
 

@@ -37,6 +37,7 @@ class StreamRiver<DATA> extends AbstractRiver<DATA> {
      *
      * @param streams   The list of streams.
      * @param waterfall The source waterfall.
+     * @throws IllegalArgumentException if the list of streams or the waterfall are null.
      */
     public StreamRiver(final List<DataStream<DATA>> streams, final Waterfall<?, ?, ?> waterfall) {
 

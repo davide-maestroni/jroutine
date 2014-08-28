@@ -50,6 +50,7 @@ public class Rapid {
      * @param bridge the waterfall to wrap.
      * @param <TYPE> the gate type.
      * @return the newly created rapid gate.
+     * @throws IllegalArgumentException if the wrapped bridge is null.
      */
     public static <TYPE> RapidBridge<TYPE> bridge(final Bridge<TYPE> bridge) {
 

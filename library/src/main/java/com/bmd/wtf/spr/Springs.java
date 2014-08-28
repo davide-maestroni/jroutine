@@ -47,6 +47,7 @@ public class Springs {
      *
      * @param input the input stream.
      * @return the new spring.
+     * @throws IllegalArgumentException if the input stream is null.
      */
     public static Spring<Byte> from(final InputStream input) {
 
@@ -133,6 +134,7 @@ public class Springs {
      * @param waterfall the input waterfall.
      * @param <DATA>    the data type.
      * @return the new spring.
+     * @throws IllegalArgumentException if the waterfall is null.
      */
     public static <DATA> Spring<DATA> from(final Waterfall<?, ?, DATA> waterfall) {
 
@@ -181,6 +183,7 @@ public class Springs {
      *
      * @param input the input reader.
      * @return the new spring.
+     * @throws IllegalArgumentException if the input reader is null.
      */
     public static Spring<String> from(final BufferedReader input) {
 
@@ -270,6 +273,7 @@ public class Springs {
      *
      * @param input the input reader.
      * @return the new spring.
+     * @throws IllegalArgumentException if the input reader is null.
      */
     public static Spring<Character> from(final Reader input) {
 
@@ -356,6 +360,7 @@ public class Springs {
      *
      * @param input the input sequence.
      * @return the new spring.
+     * @throws IllegalArgumentException if the input sequence is null.
      */
     public static Spring<Character> from(final CharSequence input) {
 
@@ -393,6 +398,7 @@ public class Springs {
      * @param drops  the drops of data.
      * @param <DATA> the data type.
      * @return the new spring.
+     * @throws IllegalArgumentException if the input is null.
      */
     public static <DATA> Spring<DATA> from(final DATA... drops) {
 
@@ -432,6 +438,7 @@ public class Springs {
      * @param drops  the iterable returning the drops of data.
      * @param <DATA> the data type.
      * @return the new spring.
+     * @throws IllegalArgumentException if the iterable is null.
      */
     public static <DATA> Spring<DATA> from(final Iterable<DATA> drops) {
 
@@ -449,6 +456,7 @@ public class Springs {
      * @param drops  the iterator returning the drops of data.
      * @param <DATA> the data type.
      * @return the new spring.
+     * @throws IllegalArgumentException if the iterator is null.
      */
     public static <DATA> Spring<DATA> from(final Iterator<DATA> drops) {
 
@@ -479,6 +487,7 @@ public class Springs {
      * @param random the random instance to be used.
      * @param count  the iteration count.
      * @return the new spring.
+     * @throws IllegalArgumentException if the random instance is null.
      * @see java.util.Random#nextBoolean()
      */
     public static Spring<Boolean> randomBools(final Random random, final long count) {
@@ -522,6 +531,7 @@ public class Springs {
      * @param random the random instance to be used.
      * @param count  the iteration count.
      * @return the new spring.
+     * @throws IllegalArgumentException if the random instance is null.
      * @see java.util.Random#nextBytes(byte[])
      */
     public static Spring<Byte> randomBytes(final Random random, final long count) {
@@ -571,6 +581,7 @@ public class Springs {
      * @param random the random instance to be used.
      * @param count  the iteration count.
      * @return the new spring.
+     * @throws IllegalArgumentException if the random instance is null.
      * @see java.util.Random#nextDouble()
      */
     public static Spring<Double> randomDoubles(final Random random, final long count) {
@@ -614,6 +625,7 @@ public class Springs {
      * @param random the random instance to be used.
      * @param count  the iteration count.
      * @return the new spring.
+     * @throws IllegalArgumentException if the random instance is null.
      * @see java.util.Random#nextFloat()
      */
     public static Spring<Float> randomFloats(final Random random, final long count) {
@@ -657,6 +669,7 @@ public class Springs {
      * @param random the random instance to be used.
      * @param count  the iteration count.
      * @return the new spring.
+     * @throws IllegalArgumentException if the random instance is null.
      * @see java.util.Random#nextGaussian()
      */
     public static Spring<Double> randomGaussian(final Random random, final long count) {
@@ -700,6 +713,7 @@ public class Springs {
      * @param random the random instance to be used.
      * @param count  the iteration count.
      * @return the new spring.
+     * @throws IllegalArgumentException if the random instance is null.
      */
     public static Spring<Integer> randomInts(final Random random, final long count) {
 
@@ -741,6 +755,7 @@ public class Springs {
      * @param random the random instance to be used.
      * @param count  the iteration count.
      * @return the new spring.
+     * @throws IllegalArgumentException if the random instance is null.
      */
     public static Spring<Long> randomLongs(final Random random, final long count) {
 
@@ -785,6 +800,7 @@ public class Springs {
      * @param count  the sequence element count.
      * @param <DATA> the data type.
      * @return the new spring.
+     * @throws IllegalArgumentException if the increment is null or the count is negative.
      */
     public static <DATA> Spring<DATA> sequence(final SequenceIncrement<DATA> inc,
             final long count) {
@@ -1085,6 +1101,7 @@ public class Springs {
          *
          * @param inc   the sequence increment.
          * @param count the sequence element count.
+         * @throws IllegalArgumentException if the increment is null or the count is negative.
          */
         public SequenceSpring(final SequenceIncrement<DATA> inc, final long count) {
 

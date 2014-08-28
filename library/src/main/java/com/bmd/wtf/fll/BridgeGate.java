@@ -40,6 +40,7 @@ class BridgeGate<IN, OUT> extends GateDecorator<IN, OUT> {
      * Constructor.
      *
      * @param wrapped the wrapped gate.
+     * @throws java.lang.IllegalArgumentException if the wrapped instance is null.
      */
     public BridgeGate(final Gate<IN, OUT> wrapped) {
 

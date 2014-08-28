@@ -35,6 +35,7 @@ class WeakGate<IN, OUT> implements Gate<IN, OUT> {
      * Default constructor.
      *
      * @param wrapped the wrapped gate.
+     * @throws IllegalArgumentException if the wrapped gate is null.
      */
     public WeakGate(final Gate<IN, OUT> wrapped) {
 
@@ -47,6 +48,7 @@ class WeakGate<IN, OUT> implements Gate<IN, OUT> {
      * @param wrapped      the wrapped gate.
      * @param whenVanished whether this instance must behave like an open gate or not after the
      *                     wrapped instance is garbage collected.
+     * @throws IllegalArgumentException if the wrapped gate is null.
      */
     public WeakGate(final Gate<IN, OUT> wrapped, final WhenVanished whenVanished) {
 

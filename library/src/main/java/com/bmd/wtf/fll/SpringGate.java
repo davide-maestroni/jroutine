@@ -32,6 +32,7 @@ class SpringGate<DATA> extends AbstractGate<Void, DATA> {
      * Constructor.
      *
      * @param spring the wrapped spring instance.
+     * @throws IllegalArgumentException if the spring is null.
      */
     public SpringGate(final Spring<DATA> spring) {
 

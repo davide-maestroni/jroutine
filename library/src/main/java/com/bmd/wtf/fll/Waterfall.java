@@ -272,7 +272,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
     }
 
     /**
-     * Tells the waterfall to build a bridge above the next gate chained to it.
+     * Tells the waterfall to build a bridge on top of the next gate chained to it.
      * <p/>
      * The bridge type will be the same as the gate raw type.
      *
@@ -284,7 +284,8 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
     }
 
     /**
-     * Tells the waterfall to build a bridge of the specified type above the next gate chained to it.
+     * Tells the waterfall to build a bridge of the specified type on top of the next gate chained
+     * to it.
      *
      * @param bridgeClass the bridge class.
      * @return the newly created waterfall.
@@ -296,8 +297,8 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
     }
 
     /**
-     * Tells the waterfall to build a bridge of the specified classification type above the next
-     * gate chained to it.
+     * Tells the waterfall to build a bridge of the specified classification type on top of the
+     * next gate chained to it.
      *
      * @param bridgeClassification the bridge classification.
      * @return the newly created waterfall.

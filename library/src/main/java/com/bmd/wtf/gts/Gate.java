@@ -34,6 +34,17 @@ import com.bmd.wtf.flw.River;
 public interface Gate<IN, OUT> {
 
     /**
+     * This method is called when an unhandled exception is pushed downstream through the gate.
+     *
+     * @param upRiver    the upstream river instance.
+     * @param downRiver  the downstream river instance.
+     * @param fallNumber the number identifying the fall formed by this gate.
+     * @param throwable  the unhandled exception.
+     */
+    public void onException(River<IN> upRiver, River<OUT> downRiver, int fallNumber,
+            Throwable throwable);
+
+    /**
      * This method is called when data are flushed through the gate.
      *
      * @param upRiver    the upstream river instance.
@@ -51,15 +62,4 @@ public interface Gate<IN, OUT> {
      * @param drop       the drop of data.
      */
     public void onPush(River<IN> upRiver, River<OUT> downRiver, int fallNumber, IN drop);
-
-    /**
-     * This method is called when an unhandled exception is pushed downstream through the gate.
-     *
-     * @param upRiver    the upstream river instance.
-     * @param downRiver  the downstream river instance.
-     * @param fallNumber the number identifying the fall formed by this gate.
-     * @param throwable  the unhandled exception.
-     */
-    public void onUnhandled(River<IN> upRiver, River<OUT> downRiver, int fallNumber,
-            Throwable throwable);
 }

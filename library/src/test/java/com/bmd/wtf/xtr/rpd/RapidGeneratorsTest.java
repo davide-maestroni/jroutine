@@ -755,12 +755,12 @@ public class RapidGeneratorsTest extends TestCase {
     public static class Current1 implements Current {
 
         @Override
-        public <DATA> void flush(final Fall<DATA> fall, final Stream<DATA> origin) {
+        public void exception(final Fall<?> fall, final Throwable throwable) {
 
         }
 
         @Override
-        public void forward(final Fall<?> fall, final Throwable throwable) {
+        public <DATA> void flush(final Fall<DATA> fall, final Stream<DATA> origin) {
 
         }
 

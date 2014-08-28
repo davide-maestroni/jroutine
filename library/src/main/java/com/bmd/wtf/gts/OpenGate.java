@@ -25,6 +25,13 @@ import com.bmd.wtf.flw.River;
 public class OpenGate<DATA> implements Gate<DATA, DATA> {
 
     @Override
+    public void onException(final River<DATA> upRiver, final River<DATA> downRiver,
+            final int fallNumber, final Throwable throwable) {
+
+        downRiver.exception(throwable);
+    }
+
+    @Override
     public void onFlush(final River<DATA> upRiver, final River<DATA> downRiver,
             final int fallNumber) {
 
@@ -36,12 +43,5 @@ public class OpenGate<DATA> implements Gate<DATA, DATA> {
             final DATA drop) {
 
         downRiver.push(drop);
-    }
-
-    @Override
-    public void onUnhandled(final River<DATA> upRiver, final River<DATA> downRiver,
-            final int fallNumber, final Throwable throwable) {
-
-        downRiver.forward(throwable);
     }
 }

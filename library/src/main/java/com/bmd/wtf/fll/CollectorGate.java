@@ -42,9 +42,7 @@ class CollectorGate<DATA> extends OpenGate<DATA> {
 
     private final ArrayList<DATA> mData = new ArrayList<DATA>();
 
-    private boolean mIsComplete;
-
-    private Throwable mUnhandled;
+    private Throwable mException;
 
     private final Action<DATA, CollectorGate<DATA>> ACTION_PULL =
             new Action<DATA, CollectorGate<DATA>>() {
@@ -52,7 +50,7 @@ class CollectorGate<DATA> extends OpenGate<DATA> {
                 @Override
                 public DATA doOn(final CollectorGate<DATA> collector, final Object... args) {
 
-                    final Throwable throwable = collector.mUnhandled;
+                    final Throwable throwable = collector.mException;
 
                     if (throwable != null) {
 
@@ -69,7 +67,7 @@ class CollectorGate<DATA> extends OpenGate<DATA> {
                 @Override
                 public Void doOn(final CollectorGate<?> collector, final Object... args) {
 
-                    final Throwable throwable = collector.mUnhandled;
+                    final Throwable throwable = collector.mException;
 
                     if (throwable != null) {
 
@@ -86,6 +84,8 @@ class CollectorGate<DATA> extends OpenGate<DATA> {
                     return null;
                 }
             };
+
+    private boolean mIsComplete;
 
     /**
      * Checks if the collection is complete, that is, if data have been flushed.
@@ -108,6 +108,17 @@ class CollectorGate<DATA> extends OpenGate<DATA> {
     }
 
     @Override
+    public void onException(final River<DATA> upRiver, final River<DATA> downRiver,
+            final int fallNumber, final Throwable throwable) {
+
+        upRiver.deviate();
+        downRiver.deviate();
+
+        mException = throwable;
+        mIsComplete = true;
+    }
+
+    @Override
     public void onFlush(final River<DATA> upRiver, final River<DATA> downRiver,
             final int fallNumber) {
 
@@ -122,17 +133,6 @@ class CollectorGate<DATA> extends OpenGate<DATA> {
             final DATA drop) {
 
         mData.add(drop);
-    }
-
-    @Override
-    public void onUnhandled(final River<DATA> upRiver, final River<DATA> downRiver,
-            final int fallNumber, final Throwable throwable) {
-
-        upRiver.deviate();
-        downRiver.deviate();
-
-        mUnhandled = throwable;
-        mIsComplete = true;
     }
 
     /**

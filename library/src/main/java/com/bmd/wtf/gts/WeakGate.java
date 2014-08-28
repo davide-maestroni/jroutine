@@ -101,6 +101,22 @@ class WeakGate<IN, OUT> implements Gate<IN, OUT> {
     }
 
     @Override
+    public void onException(final River<IN> upRiver, final River<OUT> downRiver,
+            final int fallNumber, final Throwable throwable) {
+
+        final Gate<IN, OUT> gate = mGate.get();
+
+        if (gate != null) {
+
+            gate.onException(upRiver, downRiver, fallNumber, throwable);
+
+        } else if (mWhenVanished == WhenVanished.OPEN) {
+
+            downRiver.exception(throwable);
+        }
+    }
+
+    @Override
     public void onFlush(final River<IN> upRiver, final River<OUT> downRiver, final int fallNumber) {
 
         final Gate<IN, OUT> gate = mGate.get();
@@ -124,22 +140,6 @@ class WeakGate<IN, OUT> implements Gate<IN, OUT> {
         if (gate != null) {
 
             gate.onPush(upRiver, downRiver, fallNumber, drop);
-        }
-    }
-
-    @Override
-    public void onUnhandled(final River<IN> upRiver, final River<OUT> downRiver,
-            final int fallNumber, final Throwable throwable) {
-
-        final Gate<IN, OUT> gate = mGate.get();
-
-        if (gate != null) {
-
-            gate.onUnhandled(upRiver, downRiver, fallNumber, throwable);
-
-        } else if (mWhenVanished == WhenVanished.OPEN) {
-
-            downRiver.forward(throwable);
         }
     }
 

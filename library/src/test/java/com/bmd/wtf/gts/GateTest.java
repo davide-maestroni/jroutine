@@ -141,7 +141,7 @@ public class GateTest extends TestCase {
             }
 
             @Override
-            public void onUnhandled(final River<Object> upRiver, final River<Object> downRiver,
+            public void onException(final River<Object> upRiver, final River<Object> downRiver,
                     final int fallNumber, final Throwable throwable) {
 
                 if ("push1".equals(throwable.getMessage())) {
@@ -149,7 +149,7 @@ public class GateTest extends TestCase {
                     throw new IllegalArgumentException("push1");
                 }
 
-                super.onUnhandled(upRiver, downRiver, fallNumber, throwable);
+                super.onException(upRiver, downRiver, fallNumber, throwable);
             }
 
 
@@ -197,7 +197,7 @@ public class GateTest extends TestCase {
 
 
             @Override
-            public void onUnhandled(final River<Object> upRiver, final River<Object> downRiver,
+            public void onException(final River<Object> upRiver, final River<Object> downRiver,
                     final int fallNumber, final Throwable throwable) {
 
                 if ("push2".equals((throwable).getMessage())) {
@@ -205,7 +205,7 @@ public class GateTest extends TestCase {
                     throw new IllegalArgumentException("push2");
                 }
 
-                super.onUnhandled(upRiver, downRiver, fallNumber, throwable);
+                super.onException(upRiver, downRiver, fallNumber, throwable);
             }
         };
         final Waterfall<Object, Object, Object> waterfall2 =

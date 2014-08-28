@@ -28,6 +28,14 @@ import java.util.concurrent.TimeUnit;
 public interface Stream<DATA> {
 
     /**
+     * Forwards the specified unhandled exception into the waterfall flow.
+     *
+     * @param throwable the thrown exception.
+     * @return this stream.
+     */
+    public Stream<DATA> exception(Throwable throwable);
+
+    /**
      * Flushes the stream, that is, it informs the fed fall that no more data drops are likely to
      * come.
      * <p/>
@@ -101,14 +109,6 @@ public interface Stream<DATA> {
      * @see #flush()
      */
     public Stream<DATA> flushAfter(long delay, TimeUnit timeUnit, DATA... drops);
-
-    /**
-     * Forwards the specified unhandled exception into the waterfall flow.
-     *
-     * @param throwable the thrown exception.
-     * @return this stream.
-     */
-    public Stream<DATA> forward(Throwable throwable);
 
     /**
      * Pushes the specified data into the waterfall flow.

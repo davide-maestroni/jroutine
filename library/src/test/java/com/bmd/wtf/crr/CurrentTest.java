@@ -81,17 +81,17 @@ public class CurrentTest extends TestCase {
         fall.setFlush(false);
 
         fall.reset();
-        current.forward(fall, new IllegalArgumentException());
+        current.exception(fall, new IllegalArgumentException());
         fall.waitCall();
         assertThat(fall.getDrop()).isEqualTo("test");
         assertThat(fall.isFlushed()).isFalse();
         assertThat(fall.getThrowable()).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
-    public void testStraight() {
+    public void testPassThrough() {
 
         final TestFall fall = new TestFall();
-        final Current current = Currents.straight();
+        final Current current = Currents.passThrough();
 
         current.push(fall, "test");
         assertThat(fall.getDrop()).isEqualTo("test");
@@ -123,7 +123,7 @@ public class CurrentTest extends TestCase {
 
         fall.setFlush(false);
 
-        current.forward(fall, new IllegalArgumentException());
+        current.exception(fall, new IllegalArgumentException());
         assertThat(fall.getDrop()).isEqualTo("test");
         assertThat(fall.isFlushed()).isFalse();
         assertThat(fall.getThrowable()).isExactlyInstanceOf(IllegalArgumentException.class);
@@ -142,17 +142,17 @@ public class CurrentTest extends TestCase {
         private long mTime;
 
         @Override
-        public void flush(final Stream<String> origin) {
+        public void exception(final Throwable throwable) {
 
-            mFlush = true;
+            mThrowable = throwable;
             mTime = System.currentTimeMillis();
             mSemaphore.release();
         }
 
         @Override
-        public void forward(final Throwable throwable) {
+        public void flush(final Stream<String> origin) {
 
-            mThrowable = throwable;
+            mFlush = true;
             mTime = System.currentTimeMillis();
             mSemaphore.release();
         }

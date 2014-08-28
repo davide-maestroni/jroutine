@@ -52,49 +52,83 @@ public class SpringTest extends TestCase {
 
     public void testDec() {
 
-        assertThat(readData(Springs.sequence(Byte.MIN_VALUE, 0))).containsExactly(Byte.MIN_VALUE);
-        assertThat(readData(Springs.sequence((byte) (Byte.MIN_VALUE + 1), -1))).containsExactly(
+        assertThat(readData(Springs.sequence(Byte.MIN_VALUE, Byte.MIN_VALUE))).containsExactly(
+                Byte.MIN_VALUE);
+        assertThat(readData(
+                Springs.sequence((byte) (Byte.MIN_VALUE + 1), Byte.MIN_VALUE))).containsExactly(
                 (byte) (Byte.MIN_VALUE + 1), Byte.MIN_VALUE);
         assertThat(Springs.sequence((byte) 0, Byte.MIN_VALUE).nextDrop()).isEqualTo((byte) 0);
-        assertThat(Springs.sequence(Byte.MAX_VALUE, -Byte.MAX_VALUE * 2).nextDrop()).isEqualTo(
+        assertThat(Springs.sequence(Byte.MAX_VALUE, Byte.MIN_VALUE).nextDrop()).isEqualTo(
                 Byte.MAX_VALUE);
-        assertThat(readData(Springs.sequence((byte) 3, -7))).containsExactly((byte) 3, (byte) 2,
-                                                                             (byte) 1, (byte) 0,
-                                                                             (byte) -1, (byte) -2,
-                                                                             (byte) -3, (byte) -4);
+        assertThat(readData(Springs.sequence((byte) 3, (byte) -4))).containsExactly((byte) 3,
+                                                                                    (byte) 2,
+                                                                                    (byte) 1,
+                                                                                    (byte) 0,
+                                                                                    (byte) -1,
+                                                                                    (byte) -2,
+                                                                                    (byte) -3,
+                                                                                    (byte) -4);
 
-        assertThat(readData(Springs.sequence(Integer.MIN_VALUE, 0))).containsExactly(
+        assertThat(readData(
+                Springs.sequence(Character.MIN_VALUE, Character.MIN_VALUE))).containsExactly(
+                Character.MIN_VALUE);
+        assertThat(readData(Springs.sequence((char) (Character.MIN_VALUE + 1),
+                                             Character.MIN_VALUE))).containsExactly(
+                (char) (Character.MIN_VALUE + 1), Character.MIN_VALUE);
+        assertThat(Springs.sequence((char) 0, Character.MIN_VALUE).nextDrop()).isEqualTo((char) 0);
+        assertThat(Springs.sequence(Character.MAX_VALUE, Character.MIN_VALUE).nextDrop()).isEqualTo(
+                Character.MAX_VALUE);
+        assertThat(readData(Springs.sequence((char) 9, (char) 2))).containsExactly((char) 9,
+                                                                                   (char) 8,
+                                                                                   (char) 7,
+                                                                                   (char) 6,
+                                                                                   (char) 5,
+                                                                                   (char) 4,
+                                                                                   (char) 3,
+                                                                                   (char) 2);
+
+        assertThat(
+                readData(Springs.sequence(Integer.MIN_VALUE, Integer.MIN_VALUE))).containsExactly(
                 Integer.MIN_VALUE);
-        assertThat(readData(Springs.sequence(Integer.MIN_VALUE + 1, -1))).containsExactly(
+        assertThat(readData(
+                Springs.sequence(Integer.MIN_VALUE + 1, Integer.MIN_VALUE))).containsExactly(
                 Integer.MIN_VALUE + 1, Integer.MIN_VALUE);
         assertThat(Springs.sequence(0, Integer.MIN_VALUE).nextDrop()).isEqualTo(0);
-        assertThat(Springs.sequence(Integer.MAX_VALUE, (long) -Integer.MAX_VALUE * 2)
-                          .nextDrop()).isEqualTo(Integer.MAX_VALUE);
-        assertThat(readData(Springs.sequence(3, -7))).containsExactly(3, 2, 1, 0, -1, -2, -3, -4);
+        assertThat(Springs.sequence(Integer.MAX_VALUE, Integer.MIN_VALUE).nextDrop()).isEqualTo(
+                Integer.MAX_VALUE);
+        assertThat(readData(Springs.sequence(3, -4))).containsExactly(3, 2, 1, 0, -1, -2, -3, -4);
 
-        assertThat(readData(Springs.sequence(Long.MIN_VALUE, 0))).containsExactly(Long.MIN_VALUE);
-        assertThat(readData(Springs.sequence(Long.MIN_VALUE + 1, -1))).containsExactly(
+        assertThat(readData(Springs.sequence(Long.MIN_VALUE, Long.MIN_VALUE))).containsExactly(
+                Long.MIN_VALUE);
+        assertThat(readData(Springs.sequence(Long.MIN_VALUE + 1, Long.MIN_VALUE))).containsExactly(
                 Long.MIN_VALUE + 1, Long.MIN_VALUE);
-        assertThat(Springs.sequence((long) 0, Long.MIN_VALUE).nextDrop()).isEqualTo((long) 0);
-        assertThat(Springs.sequence(Long.MAX_VALUE, Long.MIN_VALUE).nextDrop()).isEqualTo(
-                Long.MAX_VALUE);
-        assertThat(readData(Springs.sequence((long) 3, -7))).containsExactly((long) 3, (long) 2,
-                                                                             (long) 1, (long) 0,
-                                                                             (long) -1, (long) -2,
-                                                                             (long) -3, (long) -4);
+        assertThat(Springs.sequence((long) 0, Long.MIN_VALUE + 2).nextDrop()).isEqualTo((long) 0);
+        assertThat(Springs.sequence(Long.MAX_VALUE, 1).nextDrop()).isEqualTo(Long.MAX_VALUE);
+        assertThat(readData(Springs.sequence((long) 3, (long) -4))).containsExactly((long) 3,
+                                                                                    (long) 2,
+                                                                                    (long) 1,
+                                                                                    (long) 0,
+                                                                                    (long) -1,
+                                                                                    (long) -2,
+                                                                                    (long) -3,
+                                                                                    (long) -4);
 
-        assertThat(readData(Springs.sequence(Short.MIN_VALUE, 0))).containsExactly(Short.MIN_VALUE);
-        assertThat(readData(Springs.sequence((short) (Short.MIN_VALUE + 1), -1))).containsExactly(
+        assertThat(readData(Springs.sequence(Short.MIN_VALUE, Short.MIN_VALUE))).containsExactly(
+                Short.MIN_VALUE);
+        assertThat(readData(
+                Springs.sequence((short) (Short.MIN_VALUE + 1), Short.MIN_VALUE))).containsExactly(
                 (short) (Short.MIN_VALUE + 1), Short.MIN_VALUE);
         assertThat(Springs.sequence((short) 0, Short.MIN_VALUE).nextDrop()).isEqualTo((short) 0);
-        assertThat(Springs.sequence(Short.MAX_VALUE, -Short.MAX_VALUE * 2).nextDrop()).isEqualTo(
+        assertThat(Springs.sequence(Short.MAX_VALUE, Short.MIN_VALUE).nextDrop()).isEqualTo(
                 Short.MAX_VALUE);
-        assertThat(readData(Springs.sequence((short) 3, -7))).containsExactly((short) 3, (short) 2,
-                                                                              (short) 1, (short) 0,
-                                                                              (short) -1,
-                                                                              (short) -2,
-                                                                              (short) -3,
-                                                                              (short) -4);
+        assertThat(readData(Springs.sequence((short) 3, (short) -4))).containsExactly((short) 3,
+                                                                                      (short) 2,
+                                                                                      (short) 1,
+                                                                                      (short) 0,
+                                                                                      (short) -1,
+                                                                                      (short) -2,
+                                                                                      (short) -3,
+                                                                                      (short) -4);
     }
 
     public void testError() {
@@ -661,47 +695,7 @@ public class SpringTest extends TestCase {
 
         try {
 
-            Springs.sequence(Byte.MIN_VALUE, -1);
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            Springs.sequence((byte) (Byte.MIN_VALUE + 5), -6);
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            Springs.sequence(Byte.MAX_VALUE, 1);
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            Springs.sequence((byte) (Byte.MAX_VALUE - 5), 6);
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            final Spring<Byte> spring = Springs.sequence((byte) 0, 0);
+            final Spring<Byte> spring = Springs.sequence((byte) 0, (byte) 0);
             spring.nextDrop();
             spring.nextDrop();
 
@@ -713,7 +707,7 @@ public class SpringTest extends TestCase {
 
         try {
 
-            final Spring<Byte> spring = Springs.sequence((byte) 0, 1);
+            final Spring<Byte> spring = Springs.sequence((byte) 0, (byte) 1);
             spring.nextDrop();
             spring.nextDrop();
             spring.nextDrop();
@@ -726,7 +720,7 @@ public class SpringTest extends TestCase {
 
         try {
 
-            final Spring<Byte> spring = Springs.sequence((byte) 0, -1);
+            final Spring<Byte> spring = Springs.sequence((byte) 0, (byte) -1);
             spring.nextDrop();
             spring.nextDrop();
             spring.nextDrop();
@@ -739,47 +733,7 @@ public class SpringTest extends TestCase {
 
         try {
 
-            Springs.sequence(Character.MIN_VALUE, -1);
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            Springs.sequence((char) (Character.MIN_VALUE + 5), -6);
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            Springs.sequence(Character.MAX_VALUE, 1);
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            Springs.sequence((char) (Character.MAX_VALUE - 5), 6);
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            final Spring<Character> spring = Springs.sequence((char) 0, 0);
+            final Spring<Character> spring = Springs.sequence((char) 0, (char) 0);
             spring.nextDrop();
             spring.nextDrop();
 
@@ -791,63 +745,10 @@ public class SpringTest extends TestCase {
 
         try {
 
-            final Spring<Character> spring = Springs.sequence((char) 0, 1);
+            final Spring<Character> spring = Springs.sequence((char) 0, (char) 1);
             spring.nextDrop();
             spring.nextDrop();
             spring.nextDrop();
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            final Spring<Character> spring = Springs.sequence((char) 0, -1);
-            spring.nextDrop();
-            spring.nextDrop();
-            spring.nextDrop();
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            Springs.sequence(Integer.MIN_VALUE, -1);
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            Springs.sequence(Integer.MIN_VALUE + 5, -6);
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            Springs.sequence(Integer.MAX_VALUE, 1);
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            Springs.sequence(Integer.MAX_VALUE - 5, 6);
 
             fail();
 
@@ -895,7 +796,7 @@ public class SpringTest extends TestCase {
 
         try {
 
-            Springs.sequence(Long.MIN_VALUE, -1);
+            Springs.sequence(Long.MIN_VALUE, 0);
 
             fail();
 
@@ -905,7 +806,7 @@ public class SpringTest extends TestCase {
 
         try {
 
-            Springs.sequence(Long.MIN_VALUE + 5, -6);
+            Springs.sequence((long) 0, Long.MAX_VALUE);
 
             fail();
 
@@ -915,7 +816,7 @@ public class SpringTest extends TestCase {
 
         try {
 
-            Springs.sequence(Long.MAX_VALUE, 1);
+            Springs.sequence((long) 1, Long.MIN_VALUE);
 
             fail();
 
@@ -925,7 +826,7 @@ public class SpringTest extends TestCase {
 
         try {
 
-            Springs.sequence(Long.MAX_VALUE - 5, 6);
+            Springs.sequence((long) -1, Long.MIN_VALUE);
 
             fail();
 
@@ -935,7 +836,7 @@ public class SpringTest extends TestCase {
 
         try {
 
-            final Spring<Long> spring = Springs.sequence((long) 0, 0);
+            final Spring<Long> spring = Springs.sequence((long) 0, (long) 0);
             spring.nextDrop();
             spring.nextDrop();
 
@@ -947,20 +848,7 @@ public class SpringTest extends TestCase {
 
         try {
 
-            final Spring<Long> spring = Springs.sequence((long) 0, 1);
-            spring.nextDrop();
-            spring.nextDrop();
-            spring.nextDrop();
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            final Spring<Long> spring = Springs.sequence((long) 0, -1);
+            final Spring<Long> spring = Springs.sequence((long) 0, (long) 1);
             spring.nextDrop();
             spring.nextDrop();
             spring.nextDrop();
@@ -973,59 +861,7 @@ public class SpringTest extends TestCase {
 
         try {
 
-            Springs.sequence(Short.MIN_VALUE, -1);
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            Springs.sequence((short) (Short.MIN_VALUE + 5), -6);
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            Springs.sequence(Short.MAX_VALUE, 1);
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            Springs.sequence((short) (Short.MAX_VALUE - 5), 6);
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            final Spring<Short> spring = Springs.sequence((short) 0, 0);
-            spring.nextDrop();
-            spring.nextDrop();
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            final Spring<Short> spring = Springs.sequence((short) 0, 1);
+            final Spring<Long> spring = Springs.sequence((long) 0, (long) -1);
             spring.nextDrop();
             spring.nextDrop();
             spring.nextDrop();
@@ -1038,7 +874,32 @@ public class SpringTest extends TestCase {
 
         try {
 
-            final Spring<Short> spring = Springs.sequence((short) 0, -1);
+            final Spring<Short> spring = Springs.sequence((short) 0, (short) 0);
+            spring.nextDrop();
+            spring.nextDrop();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            final Spring<Short> spring = Springs.sequence((short) 0, (short) 1);
+            spring.nextDrop();
+            spring.nextDrop();
+            spring.nextDrop();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            final Spring<Short> spring = Springs.sequence((short) 0, (short) -1);
             spring.nextDrop();
             spring.nextDrop();
             spring.nextDrop();
@@ -1215,7 +1076,7 @@ public class SpringTest extends TestCase {
         //noinspection unchecked
         final Waterfall<Void, Void, Integer> fall =
                 fall().spring(Collections.singleton(Springs.sequence(1, 3)));
-        assertThat(readData(Springs.from(fall))).containsExactly(1, 2, 3, 4);
+        assertThat(readData(Springs.from(fall))).containsExactly(1, 2, 3);
 
         final byte[] bytes = new byte[]{-1, 1, 33};
         final ByteArrayInputStream stream = new ByteArrayInputStream(bytes);
@@ -1243,60 +1104,83 @@ public class SpringTest extends TestCase {
 
     public void testInc() {
 
-        assertThat(readData(Springs.sequence(Byte.MAX_VALUE, 0))).containsExactly(Byte.MAX_VALUE);
-        assertThat(readData(Springs.sequence((byte) (Byte.MAX_VALUE - 1), 1))).containsExactly(
+        assertThat(readData(Springs.sequence(Byte.MAX_VALUE, Byte.MAX_VALUE))).containsExactly(
+                Byte.MAX_VALUE);
+        assertThat(readData(
+                Springs.sequence((byte) (Byte.MAX_VALUE - 1), Byte.MAX_VALUE))).containsExactly(
                 (byte) (Byte.MAX_VALUE - 1), Byte.MAX_VALUE);
         assertThat(Springs.sequence((byte) 0, Byte.MAX_VALUE).nextDrop()).isEqualTo((byte) 0);
-        assertThat(Springs.sequence(Byte.MIN_VALUE, Byte.MAX_VALUE * 2).nextDrop()).isEqualTo(
+        assertThat(Springs.sequence(Byte.MIN_VALUE, Byte.MAX_VALUE).nextDrop()).isEqualTo(
                 Byte.MIN_VALUE);
-        assertThat(readData(Springs.sequence((byte) -3, 7))).containsExactly((byte) -3, (byte) -2,
-                                                                             (byte) -1, (byte) 0,
-                                                                             (byte) 1, (byte) 2,
-                                                                             (byte) 3, (byte) 4);
+        assertThat(readData(Springs.sequence((byte) -3, (byte) 4))).containsExactly((byte) -3,
+                                                                                    (byte) -2,
+                                                                                    (byte) -1,
+                                                                                    (byte) 0,
+                                                                                    (byte) 1,
+                                                                                    (byte) 2,
+                                                                                    (byte) 3,
+                                                                                    (byte) 4);
 
-        assertThat(readData(Springs.sequence(Character.MAX_VALUE, 0))).containsExactly(
+        assertThat(readData(
+                Springs.sequence(Character.MAX_VALUE, Character.MAX_VALUE))).containsExactly(
                 Character.MAX_VALUE);
-        assertThat(readData(Springs.sequence((char) (Character.MAX_VALUE - 1), 1))).containsExactly(
+        assertThat(readData(Springs.sequence((char) (Character.MAX_VALUE - 1),
+                                             Character.MAX_VALUE))).containsExactly(
                 (char) (Character.MAX_VALUE - 1), Character.MAX_VALUE);
         assertThat(Springs.sequence((char) 0, Character.MAX_VALUE).nextDrop()).isEqualTo((char) 0);
         assertThat(Springs.sequence(Character.MIN_VALUE, Character.MAX_VALUE).nextDrop()).isEqualTo(
                 Character.MIN_VALUE);
-        assertThat(readData(Springs.sequence((char) 2, 7))).containsExactly((char) 2, (char) 3,
-                                                                            (char) 4, (char) 5,
-                                                                            (char) 6, (char) 7,
-                                                                            (char) 8, (char) 9);
+        assertThat(readData(Springs.sequence((char) 2, (char) 9))).containsExactly((char) 2,
+                                                                                   (char) 3,
+                                                                                   (char) 4,
+                                                                                   (char) 5,
+                                                                                   (char) 6,
+                                                                                   (char) 7,
+                                                                                   (char) 8,
+                                                                                   (char) 9);
 
-        assertThat(readData(Springs.sequence(Integer.MAX_VALUE, 0))).containsExactly(
+        assertThat(
+                readData(Springs.sequence(Integer.MAX_VALUE, Integer.MAX_VALUE))).containsExactly(
                 Integer.MAX_VALUE);
-        assertThat(readData(Springs.sequence(Integer.MAX_VALUE - 1, 1))).containsExactly(
+        assertThat(readData(
+                Springs.sequence(Integer.MAX_VALUE - 1, Integer.MAX_VALUE))).containsExactly(
                 Integer.MAX_VALUE - 1, Integer.MAX_VALUE);
         assertThat(Springs.sequence(0, Integer.MAX_VALUE).nextDrop()).isEqualTo(0);
-        assertThat(Springs.sequence(Integer.MIN_VALUE, (long) Integer.MAX_VALUE * 2)
-                          .nextDrop()).isEqualTo(Integer.MIN_VALUE);
-        assertThat(readData(Springs.sequence(-3, 7))).containsExactly(-3, -2, -1, 0, 1, 2, 3, 4);
+        assertThat(Springs.sequence(Integer.MIN_VALUE, Integer.MAX_VALUE).nextDrop()).isEqualTo(
+                Integer.MIN_VALUE);
+        assertThat(readData(Springs.sequence(-3, 4))).containsExactly(-3, -2, -1, 0, 1, 2, 3, 4);
 
-        assertThat(readData(Springs.sequence(Long.MAX_VALUE, 0))).containsExactly(Long.MAX_VALUE);
-        assertThat(readData(Springs.sequence(Long.MAX_VALUE - 1, 1))).containsExactly(
+        assertThat(readData(Springs.sequence(Long.MAX_VALUE, Long.MAX_VALUE))).containsExactly(
+                Long.MAX_VALUE);
+        assertThat(readData(Springs.sequence(Long.MAX_VALUE - 1, Long.MAX_VALUE))).containsExactly(
                 Long.MAX_VALUE - 1, Long.MAX_VALUE);
-        assertThat(Springs.sequence((long) 0, Long.MAX_VALUE).nextDrop()).isEqualTo((long) 0);
-        assertThat(Springs.sequence(Long.MIN_VALUE, Long.MAX_VALUE).nextDrop()).isEqualTo(
-                Long.MIN_VALUE);
-        assertThat(readData(Springs.sequence((long) -3, 7))).containsExactly((long) -3, (long) -2,
-                                                                             (long) -1, (long) 0,
-                                                                             (long) 1, (long) 2,
-                                                                             (long) 3, (long) 4);
+        assertThat(Springs.sequence((long) 1, Long.MAX_VALUE).nextDrop()).isEqualTo((long) 1);
+        assertThat(Springs.sequence(Long.MIN_VALUE, -2).nextDrop()).isEqualTo(Long.MIN_VALUE);
+        assertThat(readData(Springs.sequence((long) -3, (long) 4))).containsExactly((long) -3,
+                                                                                    (long) -2,
+                                                                                    (long) -1,
+                                                                                    (long) 0,
+                                                                                    (long) 1,
+                                                                                    (long) 2,
+                                                                                    (long) 3,
+                                                                                    (long) 4);
 
-        assertThat(readData(Springs.sequence(Short.MAX_VALUE, 0))).containsExactly(Short.MAX_VALUE);
-        assertThat(readData(Springs.sequence((short) (Short.MAX_VALUE - 1), 1))).containsExactly(
+        assertThat(readData(Springs.sequence(Short.MAX_VALUE, Short.MAX_VALUE))).containsExactly(
+                Short.MAX_VALUE);
+        assertThat(readData(
+                Springs.sequence((short) (Short.MAX_VALUE - 1), Short.MAX_VALUE))).containsExactly(
                 (short) (Short.MAX_VALUE - 1), Short.MAX_VALUE);
         assertThat(Springs.sequence((short) 0, Short.MAX_VALUE).nextDrop()).isEqualTo((short) 0);
-        assertThat(Springs.sequence(Short.MIN_VALUE, Short.MAX_VALUE * 2).nextDrop()).isEqualTo(
+        assertThat(Springs.sequence(Short.MIN_VALUE, Short.MAX_VALUE).nextDrop()).isEqualTo(
                 Short.MIN_VALUE);
-        assertThat(readData(Springs.sequence((short) -3, 7))).containsExactly((short) -3,
-                                                                              (short) -2,
-                                                                              (short) -1, (short) 0,
-                                                                              (short) 1, (short) 2,
-                                                                              (short) 3, (short) 4);
+        assertThat(readData(Springs.sequence((short) -3, (short) 4))).containsExactly((short) -3,
+                                                                                      (short) -2,
+                                                                                      (short) -1,
+                                                                                      (short) 0,
+                                                                                      (short) 1,
+                                                                                      (short) 2,
+                                                                                      (short) 3,
+                                                                                      (short) 4);
     }
 
     public void testRandom() {

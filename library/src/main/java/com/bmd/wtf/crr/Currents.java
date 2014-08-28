@@ -20,13 +20,28 @@ package com.bmd.wtf.crr;
  */
 public class Currents {
 
-    private static volatile StraightCurrent sStraight;
+    private static volatile PassThroughCurrent sPassThrough;
 
     /**
      * Avoid direct instantiation.
      */
     protected Currents() {
 
+    }
+
+    /**
+     * Returns the default {@link PassThroughCurrent} instance.
+     *
+     * @return the instance.
+     */
+    public static Current passThrough() {
+
+        if (sPassThrough == null) {
+
+            sPassThrough = new PassThroughCurrent();
+        }
+
+        return sPassThrough;
     }
 
     /**
@@ -38,20 +53,5 @@ public class Currents {
     public static Current pool(final int poolSize) {
 
         return new ThreadPoolCurrent(poolSize);
-    }
-
-    /**
-     * Returns the default {@link StraightCurrent} instance.
-     *
-     * @return the instance.
-     */
-    public static Current straight() {
-
-        if (sStraight == null) {
-
-            sStraight = new StraightCurrent();
-        }
-
-        return sStraight;
     }
 }

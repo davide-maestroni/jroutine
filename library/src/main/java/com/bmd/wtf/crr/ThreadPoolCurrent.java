@@ -41,6 +41,19 @@ public class ThreadPoolCurrent implements Current {
     }
 
     @Override
+    public void exception(final Fall<?> fall, final Throwable throwable) {
+
+        mService.execute(new Runnable() {
+
+            @Override
+            public void run() {
+
+                fall.exception(throwable);
+            }
+        });
+    }
+
+    @Override
     public <DATA> void flush(final Fall<DATA> fall, final Stream<DATA> origin) {
 
         mService.execute(new Runnable() {
@@ -49,19 +62,6 @@ public class ThreadPoolCurrent implements Current {
             public void run() {
 
                 fall.flush(origin);
-            }
-        });
-    }
-
-    @Override
-    public void forward(final Fall<?> fall, final Throwable throwable) {
-
-        mService.execute(new Runnable() {
-
-            @Override
-            public void run() {
-
-                fall.forward(throwable);
             }
         });
     }

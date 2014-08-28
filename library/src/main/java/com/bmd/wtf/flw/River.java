@@ -59,6 +59,9 @@ public interface River<DATA> extends Stream<DATA> {
     public void drainStream(int streamNumber);
 
     @Override
+    public River<DATA> exception(Throwable throwable);
+
+    @Override
     public River<DATA> flush();
 
     @Override
@@ -78,9 +81,6 @@ public interface River<DATA> extends Stream<DATA> {
 
     @Override
     public River<DATA> flushAfter(long delay, TimeUnit timeUnit, DATA... drops);
-
-    @Override
-    public River<DATA> forward(Throwable throwable);
 
     @Override
     public River<DATA> push(DATA... drops);
@@ -177,15 +177,6 @@ public interface River<DATA> extends Stream<DATA> {
      * @return this river.
      */
     public River<DATA> flushStreamAfter(int streamNumber, long delay, TimeUnit timeUnit, DATA drop);
-
-    /**
-     * Forwards the specified unhandled exception into the specific river stream flow.
-     *
-     * @param streamNumber the number identifying the target stream.
-     * @param throwable    the thrown exception.
-     * @return this river.
-     */
-    public River<DATA> forwardStream(int streamNumber, Throwable throwable);
 
     /**
      * Returns a dam handling a gate of the specified type.
@@ -291,4 +282,13 @@ public interface River<DATA> extends Stream<DATA> {
      * @return the river size.
      */
     public int size();
+
+    /**
+     * Forwards the specified unhandled exception into the specific river stream flow.
+     *
+     * @param streamNumber the number identifying the target stream.
+     * @param throwable    the thrown exception.
+     * @return this river.
+     */
+    public River<DATA> streamException(int streamNumber, Throwable throwable);
 }

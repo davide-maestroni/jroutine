@@ -152,6 +152,46 @@ public abstract class RapidGate implements Gate<Object, Object> {
     }
 
     @Override
+    public final void onException(final River<Object> upRiver, final River<Object> downRiver,
+            final int fallNumber, final Throwable throwable) {
+
+        setup(upRiver, downRiver, fallNumber);
+
+        final Method method;
+
+        if (throwable != null) {
+
+            method = findMethod(throwable.getClass());
+
+        } else {
+
+            method = mMethodMap.get(Void.class);
+        }
+
+        if (method != null) {
+
+            try {
+
+                final Object result = method.invoke(mTarget, throwable);
+
+                propagateResult(downRiver, method.getReturnType(), result);
+
+            } catch (final InvocationTargetException e) {
+
+                throw new RapidException(e.getCause());
+
+            } catch (final IllegalAccessException e) {
+
+                throw new RapidException(e);
+            }
+
+        } else {
+
+            downRiver.exception(throwable);
+        }
+    }
+
+    @Override
     public final void onFlush(final River<Object> upRiver, final River<Object> downRiver,
             final int fallNumber) {
 
@@ -219,46 +259,6 @@ public abstract class RapidGate implements Gate<Object, Object> {
         } else {
 
             downRiver.push(drop);
-        }
-    }
-
-    @Override
-    public final void onUnhandled(final River<Object> upRiver, final River<Object> downRiver,
-            final int fallNumber, final Throwable throwable) {
-
-        setup(upRiver, downRiver, fallNumber);
-
-        final Method method;
-
-        if (throwable != null) {
-
-            method = findMethod(throwable.getClass());
-
-        } else {
-
-            method = mMethodMap.get(Void.class);
-        }
-
-        if (method != null) {
-
-            try {
-
-                final Object result = method.invoke(mTarget, throwable);
-
-                propagateResult(downRiver, method.getReturnType(), result);
-
-            } catch (final InvocationTargetException e) {
-
-                throw new RapidException(e.getCause());
-
-            } catch (final IllegalAccessException e) {
-
-                throw new RapidException(e);
-            }
-
-        } else {
-
-            downRiver.forward(throwable);
         }
     }
 
@@ -487,7 +487,7 @@ public abstract class RapidGate implements Gate<Object, Object> {
 
             if (throwableClass.isAssignableFrom(returnType)) {
 
-                downRiver.forward(throwableClass.cast(result));
+                downRiver.exception(throwableClass.cast(result));
 
             } else if (Flush.class.isAssignableFrom(returnType)) {
 

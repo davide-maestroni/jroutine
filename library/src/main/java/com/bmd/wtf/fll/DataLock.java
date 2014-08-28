@@ -58,11 +58,11 @@ class DataLock {
 
             if (streamNumber < 0) {
 
-                river.forward(exception);
+                river.exception(exception);
 
             } else {
 
-                river.forwardStream(streamNumber, exception);
+                river.streamException(streamNumber, exception);
             }
         }
     };
@@ -499,7 +499,7 @@ class DataLock {
 
                     try {
 
-                        river.forward(t);
+                        river.exception(t);
 
                     } catch (final Throwable ignored) {
 
@@ -555,21 +555,23 @@ class DataLock {
         mPushTimeNs[i] = pushTimeNs;
         mData[i] = drop;
 
-        final int newLast = i + 1;
+        final int newLast;
 
-        if (newLast >= mData.length) {
+        if ((i >= (mData.length - 1)) || (i == Integer.MAX_VALUE)) {
 
-            mLast = 0;
+            newLast = 0;
 
         } else {
 
-            mLast = newLast;
+            newLast = i + 1;
         }
 
-        if (mFirst == mLast) {
+        if (mFirst == newLast) {
 
             ensureCapacity(mData.length + 1);
         }
+
+        mLast = newLast;
     }
 
     private void ensureCapacity(final int capacity) {

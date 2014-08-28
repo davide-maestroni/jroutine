@@ -59,12 +59,12 @@ class BarrageGate<IN, OUT> extends GateDecorator<IN, OUT> {
     }
 
     @Override
-    public void onUnhandled(final River<IN> upRiver, final River<OUT> downRiver,
+    public void onException(final River<IN> upRiver, final River<OUT> downRiver,
             final int fallNumber, final Throwable throwable) {
 
         synchronized (mMutex) {
 
-            super.onUnhandled(upRiver, downRiver, fallNumber, throwable);
+            super.onException(upRiver, downRiver, fallNumber, throwable);
         }
     }
 }

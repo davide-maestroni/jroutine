@@ -31,6 +31,14 @@ import java.util.concurrent.TimeUnit;
 public interface Current {
 
     /**
+     * This method is called when an unhandled exception must be forwarded through the current.
+     *
+     * @param fall      the fall instance to be used to push data into the waterfall.
+     * @param throwable the unhandled exception.
+     */
+    public void exception(Fall<?> fall, Throwable throwable);
+
+    /**
      * This method is called when data must be flushed through the current.
      *
      * @param fall   the fall instance to be used to push data into the waterfall.
@@ -38,14 +46,6 @@ public interface Current {
      * @param <DATA> the data type.
      */
     public <DATA> void flush(Fall<DATA> fall, Stream<DATA> origin);
-
-    /**
-     * This method is called when an unhandled exception must be forwarded through the current.
-     *
-     * @param fall      the fall instance to be used to push data into the waterfall.
-     * @param throwable the unhandled exception.
-     */
-    public void forward(Fall<?> fall, Throwable throwable);
 
     /**
      * This method is called when a data drop must be pushed through the current.

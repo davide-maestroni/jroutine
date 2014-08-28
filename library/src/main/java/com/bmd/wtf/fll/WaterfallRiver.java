@@ -73,6 +73,14 @@ public class WaterfallRiver<DATA> implements River<DATA> {
     }
 
     @Override
+    public River<DATA> exception(final Throwable throwable) {
+
+        mWaterfall.exception(throwable);
+
+        return this;
+    }
+
+    @Override
     public River<DATA> flush() {
 
         mWaterfall.flush();
@@ -125,14 +133,6 @@ public class WaterfallRiver<DATA> implements River<DATA> {
     public River<DATA> flushAfter(final long delay, final TimeUnit timeUnit, final DATA... drops) {
 
         mWaterfall.flushAfter(delay, timeUnit, drops);
-
-        return this;
-    }
-
-    @Override
-    public River<DATA> forward(final Throwable throwable) {
-
-        mWaterfall.forward(throwable);
 
         return this;
     }
@@ -246,14 +246,6 @@ public class WaterfallRiver<DATA> implements River<DATA> {
     }
 
     @Override
-    public River<DATA> forwardStream(final int streamNumber, final Throwable throwable) {
-
-        mWaterfall.forwardStream(streamNumber, throwable);
-
-        return this;
-    }
-
-    @Override
     public <TYPE> Dam<TYPE> on(final Class<TYPE> damClass) {
 
         return mWaterfall.on(damClass);
@@ -326,5 +318,13 @@ public class WaterfallRiver<DATA> implements River<DATA> {
     public int size() {
 
         return mWaterfall.size();
+    }
+
+    @Override
+    public River<DATA> streamException(final int streamNumber, final Throwable throwable) {
+
+        mWaterfall.streamException(streamNumber, throwable);
+
+        return this;
     }
 }

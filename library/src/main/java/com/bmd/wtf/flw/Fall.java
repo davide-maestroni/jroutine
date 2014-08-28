@@ -26,19 +26,19 @@ package com.bmd.wtf.flw;
 public interface Fall<DATA> {
 
     /**
+     * Forwards the specified unhandled exception into the waterfall flow.
+     *
+     * @param throwable the thrown exception.
+     */
+    public void exception(Throwable throwable);
+
+    /**
      * Flushes the fall flow, that is, it informs the fed streams that no more data drops are
      * likely to come.
      *
      * @param origin the origin stream.
      */
     public void flush(Stream<DATA> origin);
-
-    /**
-     * Forwards the specified unhandled exception into the waterfall flow.
-     *
-     * @param throwable the thrown exception.
-     */
-    public void forward(Throwable throwable);
 
     /**
      * Pushes the specified data into the waterfall flow.

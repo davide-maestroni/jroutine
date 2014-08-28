@@ -83,7 +83,7 @@ public class RapidPumpTest extends TestCase {
                                                               .chain(new OpenGate<Object>() {
 
                                                                   @Override
-                                                                  public void onUnhandled(
+                                                                  public void onException(
                                                                           final River<Object> upRiver,
                                                                           final River<Object> downRiver,
                                                                           final int fallNumber,
@@ -168,7 +168,7 @@ public class RapidPumpTest extends TestCase {
                                                               .chain(new OpenGate<Object>() {
 
                                                                   @Override
-                                                                  public void onUnhandled(
+                                                                  public void onException(
                                                                           final River<Object> upRiver,
                                                                           final River<Object> downRiver,
                                                                           final int fallNumber,
@@ -253,7 +253,7 @@ public class RapidPumpTest extends TestCase {
                 fall().start().in(4).distribute(new RapidPumpTest4()).chain(new OpenGate<Object>() {
 
                     @Override
-                    public void onUnhandled(final River<Object> upRiver,
+                    public void onException(final River<Object> upRiver,
                             final River<Object> downRiver, final int fallNumber,
                             final Throwable throwable) {
 
@@ -267,7 +267,7 @@ public class RapidPumpTest extends TestCase {
 
         final Collector<Object> collector2 = fall1.collect();
 
-        fall1.source().forward(new MyException()).flush();
+        fall1.source().exception(new MyException()).flush();
         assertThat(collector2.all()).containsExactly(new MyException(), new MyException(),
                                                      new MyException(), new MyException());
 
@@ -275,7 +275,7 @@ public class RapidPumpTest extends TestCase {
                 fall().start().in(4).distribute(new RapidPumpTest5()).chain(new OpenGate<Object>() {
 
                     @Override
-                    public void onUnhandled(final River<Object> upRiver,
+                    public void onException(final River<Object> upRiver,
                             final River<Object> downRiver, final int fallNumber,
                             final Throwable throwable) {
 
@@ -313,7 +313,7 @@ public class RapidPumpTest extends TestCase {
                                                               .chain(new OpenGate<Object>() {
 
                                                                   @Override
-                                                                  public void onUnhandled(
+                                                                  public void onException(
                                                                           final River<Object> upRiver,
                                                                           final River<Object> downRiver,
                                                                           final int fallNumber,
@@ -329,7 +329,7 @@ public class RapidPumpTest extends TestCase {
 
         final Collector<Object> collector2 = fall1.collect();
 
-        fall1.source().forward(new MyException()).flush();
+        fall1.source().exception(new MyException()).flush();
         assertThat(collector2.all()).containsExactly(new MyException(), new MyException(),
                                                      new MyException(), new MyException());
 
@@ -340,7 +340,7 @@ public class RapidPumpTest extends TestCase {
                                                               .chain(new OpenGate<Object>() {
 
                                                                   @Override
-                                                                  public void onUnhandled(
+                                                                  public void onException(
                                                                           final River<Object> upRiver,
                                                                           final River<Object> downRiver,
                                                                           final int fallNumber,

@@ -96,13 +96,13 @@ public class RapidGateTest extends TestCase {
 
                 return num;
             }
-        }).chain(fall3);
+        }).feed(fall3);
 
         assertThat(fall4.pull(1).now().next()).isEqualTo("1");
         assertThat(fall4.pull(-1).now().all()).isEmpty();
         assertThat(fall4.pull(0).now().all()).isEmpty();
 
-        fall1.chain().chain(fall3);
+        fall1.chain().feed(fall3);
 
         assertThat(fall4.pull(0).now().all()).isEmpty();
         assertThat(fall4.pull(1).now().all()).isEmpty();
@@ -144,7 +144,7 @@ public class RapidGateTest extends TestCase {
                 fall().start(new RapidGateError4()).chain(new OpenGate<Object>() {
 
                     @Override
-                    public void onUnhandled(final River<Object> upRiver,
+                    public void onException(final River<Object> upRiver,
                             final River<Object> downRiver, final int fallNumber,
                             final Throwable throwable) {
 
@@ -153,7 +153,7 @@ public class RapidGateTest extends TestCase {
                 });
         final Collector<Object> collector1 = fall1.collect();
 
-        fall1.source().push("11", null).forward(new IllegalArgumentException()).flush();
+        fall1.source().push("11", null).exception(new IllegalArgumentException()).flush();
 
         for (final Object e : collector1.now().all()) {
 
@@ -214,7 +214,7 @@ public class RapidGateTest extends TestCase {
                 fall().start(RapidGate.from(new RapidGateError4())).chain(new OpenGate<Object>() {
 
                     @Override
-                    public void onUnhandled(final River<Object> upRiver,
+                    public void onException(final River<Object> upRiver,
                             final River<Object> downRiver, final int fallNumber,
                             final Throwable throwable) {
 
@@ -223,7 +223,7 @@ public class RapidGateTest extends TestCase {
                 });
         final Collector<Object> collector2 = fall2.collect();
 
-        fall2.source().push("11", null).forward(new IllegalArgumentException()).flush();
+        fall2.source().push("11", null).exception(new IllegalArgumentException()).flush();
 
         for (final Object e : collector2.now().all()) {
 
@@ -296,7 +296,7 @@ public class RapidGateTest extends TestCase {
                 fall().start(new RapidGateTest4()).chain(new OpenGate<Object>() {
 
                     @Override
-                    public void onUnhandled(final River<Object> upRiver,
+                    public void onException(final River<Object> upRiver,
                             final River<Object> downRiver, final int fallNumber,
                             final Throwable throwable) {
 
@@ -310,19 +310,19 @@ public class RapidGateTest extends TestCase {
 
         final Collector<Object> collector2 = fall1.collect();
 
-        fall1.source().forward(new IllegalArgumentException()).flush();
+        fall1.source().exception(new IllegalArgumentException()).flush();
         assertThat(collector2.all()).containsExactly(new MyException());
 
         final Collector<Object> collector3 = fall1.collect();
 
-        fall1.source().forward(null);
+        fall1.source().exception(null);
         assertThat(collector3.all()).isEmpty();
 
         final Waterfall<Object, Object, Object> fall2 =
                 fall().start(new RapidGateTest5()).chain(new OpenGate<Object>() {
 
                     @Override
-                    public void onUnhandled(final River<Object> upRiver,
+                    public void onException(final River<Object> upRiver,
                             final River<Object> downRiver, final int fallNumber,
                             final Throwable throwable) {
 
@@ -331,7 +331,7 @@ public class RapidGateTest extends TestCase {
                 });
         final Collector<Object> collector4 = fall2.collect();
 
-        fall2.source().forward(new IllegalArgumentException()).flush();
+        fall2.source().exception(new IllegalArgumentException()).flush();
         assertThat(collector4.next()).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
@@ -346,7 +346,7 @@ public class RapidGateTest extends TestCase {
         assertThat(fall().start(RapidGate.from(new RapidGateTest3())).chain(new OpenGate<Object>() {
 
             @Override
-            public void onUnhandled(final River<Object> upRiver, final River<Object> downRiver,
+            public void onException(final River<Object> upRiver, final River<Object> downRiver,
                     final int fallNumber, final Throwable throwable) {
 
                 downRiver.flush();
@@ -356,7 +356,7 @@ public class RapidGateTest extends TestCase {
                          .chain(new OpenGate<Object>() {
 
                              @Override
-                             public void onUnhandled(final River<Object> upRiver,
+                             public void onException(final River<Object> upRiver,
                                      final River<Object> downRiver, final int fallNumber,
                                      final Throwable throwable) {
 
@@ -369,7 +369,7 @@ public class RapidGateTest extends TestCase {
                          .chain(new OpenGate<Object>() {
 
                              @Override
-                             public void onUnhandled(final River<Object> upRiver,
+                             public void onException(final River<Object> upRiver,
                                      final River<Object> downRiver, final int fallNumber,
                                      final Throwable throwable) {
 
@@ -382,7 +382,7 @@ public class RapidGateTest extends TestCase {
                          .chain(new OpenGate<Object>() {
 
                              @Override
-                             public void onUnhandled(final River<Object> upRiver,
+                             public void onException(final River<Object> upRiver,
                                      final River<Object> downRiver, final int fallNumber,
                                      final Throwable throwable) {
 
@@ -396,7 +396,7 @@ public class RapidGateTest extends TestCase {
                 fall().start(RapidGate.from(new RapidGateTest4())).chain(new OpenGate<Object>() {
 
                     @Override
-                    public void onUnhandled(final River<Object> upRiver,
+                    public void onException(final River<Object> upRiver,
                             final River<Object> downRiver, final int fallNumber,
                             final Throwable throwable) {
 
@@ -410,19 +410,19 @@ public class RapidGateTest extends TestCase {
 
         final Collector<Object> collector2 = fall1.collect();
 
-        fall1.source().forward(new IllegalArgumentException()).flush();
+        fall1.source().exception(new IllegalArgumentException()).flush();
         assertThat(collector2.all()).containsExactly(new MyException());
 
         final Collector<Object> collector3 = fall1.collect();
 
-        fall1.source().forward(null);
+        fall1.source().exception(null);
         assertThat(collector3.all()).isEmpty();
 
         final Waterfall<Object, Object, Object> fall2 =
                 fall().start(RapidGate.from(new RapidGateTest5())).chain(new OpenGate<Object>() {
 
                     @Override
-                    public void onUnhandled(final River<Object> upRiver,
+                    public void onException(final River<Object> upRiver,
                             final River<Object> downRiver, final int fallNumber,
                             final Throwable throwable) {
 
@@ -431,7 +431,7 @@ public class RapidGateTest extends TestCase {
                 });
         final Collector<Object> collector4 = fall2.collect();
 
-        fall2.source().forward(new IllegalArgumentException()).flush();
+        fall2.source().exception(new IllegalArgumentException()).flush();
         assertThat(collector4.next()).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 

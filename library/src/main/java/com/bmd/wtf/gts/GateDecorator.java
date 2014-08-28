@@ -66,6 +66,13 @@ public class GateDecorator<IN, OUT> implements Gate<IN, OUT> {
     }
 
     @Override
+    public void onException(final River<IN> upRiver, final River<OUT> downRiver,
+            final int fallNumber, final Throwable throwable) {
+
+        mGate.onException(upRiver, downRiver, fallNumber, throwable);
+    }
+
+    @Override
     public void onFlush(final River<IN> upRiver, final River<OUT> downRiver, final int fallNumber) {
 
         mGate.onFlush(upRiver, downRiver, fallNumber);
@@ -76,12 +83,5 @@ public class GateDecorator<IN, OUT> implements Gate<IN, OUT> {
             final IN drop) {
 
         mGate.onPush(upRiver, downRiver, fallNumber, drop);
-    }
-
-    @Override
-    public void onUnhandled(final River<IN> upRiver, final River<OUT> downRiver,
-            final int fallNumber, final Throwable throwable) {
-
-        mGate.onUnhandled(upRiver, downRiver, fallNumber, throwable);
     }
 }

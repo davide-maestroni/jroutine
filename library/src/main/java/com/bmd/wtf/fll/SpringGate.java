@@ -85,6 +85,6 @@ class SpringGate<DATA> extends AbstractGate<Void, DATA> {
     public void onPush(final River<Void> upRiver, final River<DATA> downRiver, final int fallNumber,
             final Void drop) {
 
-        downRiver.forward(new IllegalStateException());
+        downRiver.exception(new IllegalStateException());
     }
 }

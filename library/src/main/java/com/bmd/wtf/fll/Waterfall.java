@@ -31,8 +31,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.WeakHashMap;
@@ -52,7 +54,11 @@ import java.util.concurrent.TimeUnit;
  */
 public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
-    // TODO: springs, bridge, linq(?)
+    // TODO: bridge, linq(?)
+    // TODO: exception javadoc
+
+    private static final Comparator<?> NATURAL_COMPARATOR =
+            Collections.reverseOrder(Collections.reverseOrder());
 
     private static final DataFall[] NO_FALL = new DataFall[0];
 
@@ -202,7 +208,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
         //noinspection unchecked
         return new Waterfall<Object, Object, Object>(null, damMap, null, 0, null, null, 1,
-                                                     Currents.straight(), null, NO_FALL);
+                                                     Currents.passThrough(), null, NO_FALL);
     }
 
     /**
@@ -212,6 +218,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * @param outFall the output fall.
      * @param <DATA>  the data type.
      * @return the data stream running between the two falls.
+     * @throws IllegalArgumentException if the input or the output fall are null.
      */
     private static <DATA> DataStream<DATA> connect(final DataFall<?, DATA> inFall,
             final DataFall<DATA, ?> outFall) {
@@ -246,6 +253,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * waterfalls.
      *
      * @param gate the gate to register.
+     * @throws IllegalArgumentException if the gate is null or is already registered.
      */
     private static void registerGate(final Gate<?, ?> gate) {
 
@@ -263,136 +271,6 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
     }
 
     /**
-     * Chains the stream identified by the specified number to this waterfall. After the call, all
-     * the data flowing through this waterfall will be pushed into the target stream.
-     *
-     * @param streamNumber the number identifying the target stream.
-     * @param waterfall    the target waterfall.
-     */
-    public void chain(final int streamNumber, final Waterfall<?, OUT, ?> waterfall) {
-
-        if (waterfall == null) {
-
-            throw new IllegalArgumentException("the waterfall cannot be null");
-        }
-
-        if (this == waterfall) {
-
-            throw new IllegalArgumentException("cannot chain a waterfall to itself");
-        }
-
-        final DataFall<IN, OUT>[] falls = mFalls;
-
-        if ((falls == NO_FALL) || (waterfall.mFalls == NO_FALL)) {
-
-            throw new IllegalStateException("cannot chain a not started waterfall to another one");
-        }
-
-        final DataFall<OUT, ?> outFall = waterfall.mFalls[streamNumber];
-
-        for (final DataStream<?> outputStream : outFall.outputStreams) {
-
-            //noinspection unchecked
-            if (outputStream.canReach(Arrays.asList(falls))) {
-
-                throw new IllegalArgumentException(
-                        "a possible loop in the waterfall chain has been detected");
-            }
-        }
-
-        for (final DataFall<IN, OUT> fall : falls) {
-
-            connect(fall, outFall);
-        }
-    }
-
-    /**
-     * Chains the specified waterfall to this one. After the call, all the data flowing through
-     * this waterfall will be pushed into the target one.
-     *
-     * @param waterfall the waterfall to chain.
-     */
-    public void chain(final Waterfall<?, OUT, ?> waterfall) {
-
-        if (waterfall == null) {
-
-            throw new IllegalArgumentException("the waterfall cannot be null");
-        }
-
-        if (this == waterfall) {
-
-            throw new IllegalArgumentException("cannot chain a waterfall to itself");
-        }
-
-        final DataFall<IN, OUT>[] falls = mFalls;
-
-        if ((falls == NO_FALL) || (waterfall.mFalls == NO_FALL)) {
-
-            throw new IllegalStateException("cannot chain a not started waterfall to another one");
-        }
-
-        final int size = waterfall.mSize;
-        final int length = falls.length;
-
-        final DataFall<OUT, ?>[] outFalls = waterfall.mFalls;
-
-        for (final DataFall<OUT, ?> outFall : outFalls) {
-
-            for (final DataStream<?> outputStream : outFall.outputStreams) {
-
-                //noinspection unchecked
-                if (outputStream.canReach(Arrays.asList(falls))) {
-
-                    throw new IllegalArgumentException(
-                            "a possible loop in the waterfall chain has been detected");
-                }
-            }
-        }
-
-        if (size == 1) {
-
-            final DataFall<OUT, ?> outFall = outFalls[0];
-
-            for (final DataFall<IN, OUT> fall : falls) {
-
-                connect(fall, outFall);
-            }
-
-        } else {
-
-            final Waterfall<SOURCE, ?, OUT> inWaterfall;
-
-            if ((length != 1) && (length != size)) {
-
-                inWaterfall = merge();
-
-            } else {
-
-                inWaterfall = this;
-            }
-
-            final DataFall<?, OUT>[] inFalls = inWaterfall.mFalls;
-
-            if (inFalls.length == 1) {
-
-                final DataFall<?, OUT> inFall = inFalls[0];
-
-                for (final DataFall<OUT, ?> outFall : outFalls) {
-
-                    connect(inFall, outFall);
-                }
-
-            } else {
-
-                for (int i = 0; i < size; ++i) {
-
-                    connect(inFalls[i], outFalls[i]);
-                }
-            }
-        }
-    }
-
-    /**
      * Chains the gate protected by the dam of the specified classification type to this
      * waterfall.
      * <p/>
@@ -402,6 +280,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * @param damClassification the dam classification.
      * @param <NOUT>            the new output data type.
      * @return the newly created waterfall.
+     * @throws IllegalArgumentException if no protected gate is found.
      */
     public <NOUT> Waterfall<SOURCE, OUT, NOUT> chain(
             final Classification<? extends Gate<OUT, NOUT>> damClassification) {
@@ -578,6 +457,9 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * @param gates  the gate instances.
      * @param <NOUT> the new output data type.
      * @return the newly created waterfall.
+     * @throws IllegalArgumentException if the gate collection is null, empty or contains null
+     *                                  instances or instances already chained to this or another
+     *                                  waterfall.
      */
     public <NOUT> Waterfall<SOURCE, OUT, NOUT> chain(
             final Collection<? extends Gate<OUT, NOUT>> gates) {
@@ -626,6 +508,8 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * @param gate   the gate instance.
      * @param <NOUT> the new output data type.
      * @return the newly created waterfall.
+     * @throws IllegalArgumentException if the gate is null or already chained to this or another
+     *                                  waterfall.
      */
     public <NOUT> Waterfall<SOURCE, OUT, NOUT> chain(final Gate<OUT, NOUT> gate) {
 
@@ -714,6 +598,8 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * @param generator the gate generator.
      * @param <NOUT>    the new output data type.
      * @return the newly created waterfall.
+     * @throws IllegalArgumentException if the generator is null or returns a null gate or one
+     *                                  already chained to this or another waterfall.
      */
     public <NOUT> Waterfall<SOURCE, OUT, NOUT> chain(final GateGenerator<OUT, NOUT> generator) {
 
@@ -895,6 +781,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * Creates and returns a new data collector.
      *
      * @return the collector.
+     * @throws IllegalStateException if this waterfall was not started.
      */
     public Collector<OUT> collect() {
 
@@ -925,52 +812,28 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
     /**
      * Causes the data drops flowing through this waterfall streams to be concatenated, so that all
      * the data coming from the stream number 0 will come before the ones coming from the stream
-     * number 1, and so on.
+     * number 1, and so on.<br/>
+     * The resulting waterfall will have size equal to 1.
      * <p/>
-     * Note that the resulting waterfall will have size equal to 1.
+     * Note that the returned waterfall internally cache the data pushed through it and then
+     * discharge them on the first flush.
      *
      * @return the newly created waterfall.
      */
     public Waterfall<SOURCE, OUT, OUT> concat() {
 
-        final int length = Math.max(size(), 1);
-
-        //noinspection unchecked
-        final ArrayList<OUT>[] lists = new ArrayList[length];
-
-        for (int i = 0; i < lists.length; i++) {
-
-            lists[i] = new ArrayList<OUT>();
-        }
-
-        return chain(new OpenGate<OUT>() {
-
-            private int mFlushes;
+        return chain(new CumulativeCacheGate<OUT, OUT>(size()) {
 
             @Override
-            public void onPush(final River<OUT> upRiver, final River<OUT> downRiver,
-                    final int fallNumber, final OUT drop) {
+            protected void onClear(final List<List<OUT>> cache, final River<OUT> upRiver,
+                    final River<OUT> downRiver) {
 
-                lists[fallNumber].add(drop);
-            }
+                for (final List<OUT> data : cache) {
 
-            @Override
-            public void onFlush(final River<OUT> upRiver, final River<OUT> downRiver,
-                    final int fallNumber) {
-
-                if (++mFlushes >= length) {
-
-                    mFlushes = 0;
-
-                    for (final ArrayList<OUT> list : lists) {
-
-                        downRiver.push(list);
-
-                        list.clear();
-                    }
+                    downRiver.push(data);
                 }
 
-                super.onFlush(upRiver, downRiver, fallNumber);
+                super.onClear(cache, upRiver, downRiver);
             }
         }).merge();
     }
@@ -992,6 +855,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      *
      * @param damClass the dam class.
      * @return the newly created waterfall.
+     * @throws IllegalArgumentException if the dam class is null.
      */
     public Waterfall<SOURCE, IN, OUT> dam(final Class<?> damClass) {
 
@@ -1004,6 +868,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      *
      * @param damClassification the dam classification.
      * @return the newly created waterfall.
+     * @throws IllegalArgumentException if the dam classification is null.
      */
     public Waterfall<SOURCE, IN, OUT> dam(final Classification<?> damClassification) {
 
@@ -1019,6 +884,9 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
     /**
      * Causes the data drops flowing through this waterfall to be delayed of the specified time.
+     * <p/>
+     * Note that the returned waterfall internally cache the data pushed through it and then
+     * discharge them on the first flush.
      *
      * @param delay    the delay in <code>timeUnit</code> time units.
      * @param timeUnit the delay time unit.
@@ -1026,26 +894,15 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      */
     public Waterfall<SOURCE, OUT, OUT> delay(final long delay, final TimeUnit timeUnit) {
 
-        return merge().chain(new OpenGate<OUT>() {
-
-            private final ArrayList<OUT> mData = new ArrayList<OUT>();
+        return chain(new CacheGate<OUT, OUT>(size()) {
 
             @Override
-            public void onPush(final River<OUT> upRiver, final River<OUT> downRiver,
-                    final int fallNumber, final OUT drop) {
+            protected void onClear(final List<OUT> cache, final int streamNumber,
+                    final River<OUT> upRiver, final River<OUT> downRiver) {
 
-                mData.add(drop);
-            }
+                downRiver.pushAfter(delay, timeUnit, cache);
 
-            @Override
-            public void onFlush(final River<OUT> upRiver, final River<OUT> downRiver,
-                    final int fallNumber) {
-
-                downRiver.pushAfter(delay, timeUnit, mData);
-
-                mData.clear();
-
-                super.onFlush(upRiver, downRiver, fallNumber);
+                super.onClear(cache, streamNumber, upRiver, downRiver);
             }
         });
     }
@@ -1097,24 +954,24 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
     }
 
     @Override
-    public Waterfall<SOURCE, IN, OUT> flush() {
+    public Waterfall<SOURCE, IN, OUT> exception(final Throwable throwable) {
 
         for (final DataFall<IN, OUT> fall : mFalls) {
 
-            fall.inputCurrent.flush(fall, null);
+            fall.raiseLevel(1);
+
+            fall.inputCurrent.exception(fall, throwable);
         }
 
         return this;
     }
 
     @Override
-    public Waterfall<SOURCE, IN, OUT> forward(final Throwable throwable) {
+    public Waterfall<SOURCE, IN, OUT> flush() {
 
         for (final DataFall<IN, OUT> fall : mFalls) {
 
-            fall.raiseLevel(1);
-
-            fall.inputCurrent.forward(fall, throwable);
+            fall.inputCurrent.flush(fall, null);
         }
 
         return this;
@@ -1251,19 +1108,6 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
         final DataFall<IN, OUT> fall = mFalls[streamNumber];
 
         fall.inputCurrent.flush(fall, null);
-
-        return this;
-    }
-
-    @Override
-    public Waterfall<SOURCE, IN, OUT> forwardStream(final int streamNumber,
-            final Throwable throwable) {
-
-        final DataFall<IN, OUT> fall = mFalls[streamNumber];
-
-        fall.raiseLevel(1);
-
-        fall.inputCurrent.forward(fall, throwable);
 
         return this;
     }
@@ -1447,6 +1291,19 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
         return mFalls.length;
     }
 
+    @Override
+    public Waterfall<SOURCE, IN, OUT> streamException(final int streamNumber,
+            final Throwable throwable) {
+
+        final DataFall<IN, OUT> fall = mFalls[streamNumber];
+
+        fall.raiseLevel(1);
+
+        fall.inputCurrent.exception(fall, throwable);
+
+        return this;
+    }
+
     /**
      * Deviates the flow of this waterfall, either downstream or upstream, by effectively
      * preventing any coming data to be pushed further.
@@ -1528,6 +1385,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * means of the specified pump.
      *
      * @return the newly created waterfall.
+     * @throws IllegalArgumentException if the pump is null.
      */
     public Waterfall<SOURCE, OUT, OUT> distribute(final Pump<OUT> pump) {
 
@@ -1605,10 +1463,238 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
     }
 
     /**
+     * Filters the data flowing through this waterfall by retaining only the specified count of
+     * drops, starting from the last minus the specified offset and discarding the other ones.
+     * <p/>
+     * Note that the returned waterfall internally cache the data pushed through it and then
+     * discharge them on the first flush.
+     *
+     * @param endOffset the offset from the last data drop before a flush.
+     * @param count     the count of the element in the range.
+     * @return the newly created waterfall.
+     * @throws IllegalArgumentException if the offset is negative, the count is negative or equal
+     *                                  to zero or is greater than the offset + 1.
+     */
+    public Waterfall<SOURCE, OUT, OUT> endRange(final int endOffset, final int count) {
+
+        if ((endOffset < 0) || (count <= 0) || (count > (endOffset + 1))) {
+
+            throw new IllegalArgumentException("invalid range indexes");
+        }
+
+        final long maxSize = (long) endOffset + 1;
+
+        final int length = Math.max(size(), 1);
+        final long[] counts = new long[length];
+
+        //noinspection unchecked
+        final ArrayList<OUT>[] lists = new ArrayList[length];
+
+        for (int i = 0; i < lists.length; i++) {
+
+            lists[i] = new ArrayList<OUT>();
+        }
+
+        return chain(new OpenGate<OUT>() {
+
+            @Override
+            public void onPush(final River<OUT> upRiver, final River<OUT> downRiver,
+                    final int fallNumber, final OUT drop) {
+
+                ++counts[fallNumber];
+
+                final ArrayList<OUT> list = lists[fallNumber];
+
+                list.add(drop);
+
+                if (list.size() > maxSize) {
+
+                    list.remove(0);
+                }
+            }
+
+            @Override
+            public void onFlush(final River<OUT> upRiver, final River<OUT> downRiver,
+                    final int fallNumber) {
+
+                final long index = counts[fallNumber];
+                final ArrayList<OUT> list = lists[fallNumber];
+
+                if (index > (maxSize - count)) {
+
+                    downRiver.push(list.subList(0, count + (int) Math.min(0, index - maxSize)));
+                }
+
+                list.clear();
+
+                super.onFlush(upRiver, downRiver, fallNumber);
+            }
+        });
+    }
+
+    /**
+     * Makes this waterfall feed the specified one. After the call, all the data flowing through
+     * this waterfall will be pushed into the target one.
+     *
+     * @param waterfall the waterfall to chain.
+     * @throws IllegalArgumentException if the waterfall is null or equal to this one, or this or
+     *                                  the target one was not started, or if a possible closed
+     *                                  loop in the waterfall chain is detected.
+     */
+    public void feed(final Waterfall<?, OUT, ?> waterfall) {
+
+        if (waterfall == null) {
+
+            throw new IllegalArgumentException("the waterfall cannot be null");
+        }
+
+        if (this == waterfall) {
+
+            throw new IllegalArgumentException("cannot feed a waterfall with itself");
+        }
+
+        final DataFall<IN, OUT>[] falls = mFalls;
+
+        if ((falls == NO_FALL) || (waterfall.mFalls == NO_FALL)) {
+
+            throw new IllegalStateException("cannot feed a not started waterfall");
+        }
+
+        final int size = waterfall.mSize;
+        final int length = falls.length;
+
+        final DataFall<OUT, ?>[] outFalls = waterfall.mFalls;
+
+        for (final DataFall<OUT, ?> outFall : outFalls) {
+
+            for (final DataStream<?> outputStream : outFall.outputStreams) {
+
+                //noinspection unchecked
+                if (outputStream.canReach(Arrays.asList(falls))) {
+
+                    throw new IllegalArgumentException(
+                            "a possible loop in the waterfall chain has been detected");
+                }
+            }
+        }
+
+        if (size == 1) {
+
+            final DataFall<OUT, ?> outFall = outFalls[0];
+
+            for (final DataFall<IN, OUT> fall : falls) {
+
+                connect(fall, outFall);
+            }
+
+        } else {
+
+            final Waterfall<SOURCE, ?, OUT> inWaterfall;
+
+            if ((length != 1) && (length != size)) {
+
+                inWaterfall = merge();
+
+            } else {
+
+                inWaterfall = this;
+            }
+
+            final DataFall<?, OUT>[] inFalls = inWaterfall.mFalls;
+
+            if (inFalls.length == 1) {
+
+                final DataFall<?, OUT> inFall = inFalls[0];
+
+                for (final DataFall<OUT, ?> outFall : outFalls) {
+
+                    connect(inFall, outFall);
+                }
+
+            } else {
+
+                for (int i = 0; i < size; ++i) {
+
+                    connect(inFalls[i], outFalls[i]);
+                }
+            }
+        }
+    }
+
+    /**
+     * Makes this waterfall feed the stream identified by the specified number. After the call, all
+     * the data flowing through this waterfall will be pushed into the target stream.
+     *
+     * @param streamNumber the number identifying the target stream.
+     * @param waterfall    the target waterfall.
+     * @throws IllegalArgumentException if the waterfall is null or equal to this one, or this or
+     *                                  the target one was not started, or if a possible closed
+     *                                  loop in the waterfall chain is detected.
+     */
+    public void feedStream(final int streamNumber, final Waterfall<?, OUT, ?> waterfall) {
+
+        if (waterfall == null) {
+
+            throw new IllegalArgumentException("the waterfall cannot be null");
+        }
+
+        if (this == waterfall) {
+
+            throw new IllegalArgumentException("cannot feed a waterfall with itself");
+        }
+
+        final DataFall<IN, OUT>[] falls = mFalls;
+
+        if ((falls == NO_FALL) || (waterfall.mFalls == NO_FALL)) {
+
+            throw new IllegalStateException("cannot feed a waterfall with a not started one");
+        }
+
+        final DataFall<OUT, ?> outFall = waterfall.mFalls[streamNumber];
+
+        for (final DataStream<?> outputStream : outFall.outputStreams) {
+
+            //noinspection unchecked
+            if (outputStream.canReach(Arrays.asList(falls))) {
+
+                throw new IllegalArgumentException(
+                        "a possible loop in the waterfall chain has been detected");
+            }
+        }
+
+        for (final DataFall<IN, OUT> fall : falls) {
+
+            connect(fall, outFall);
+        }
+    }
+
+    /**
+     * Causes the data drops flowing through this waterfall streams to be merged into a single
+     * collection.
+     *
+     * @return the newly created waterfall.
+     */
+    public Waterfall<SOURCE, OUT, List<OUT>> flat() {
+
+        return chain(new CacheGate<OUT, List<OUT>>(size()) {
+
+            @Override
+            protected void onClear(final List<OUT> cache, final int streamNumber,
+                    final River<OUT> upRiver, final River<List<OUT>> downRiver) {
+
+                downRiver.push(new ArrayList<OUT>(cache));
+
+                super.onClear(cache, streamNumber, upRiver, downRiver);
+            }
+        });
+    }
+
+    /**
      * Makes the waterfall streams flow through the currents returned by the specified generator.
      *
      * @param generator the current generator
      * @return the newly created waterfall.
+     * @throws IllegalArgumentException if the generator is null or returns a null current.
      */
     public Waterfall<SOURCE, IN, OUT> in(final CurrentGenerator generator) {
 
@@ -1627,6 +1713,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      *
      * @param fallCount the total fall count generating the waterfall.
      * @return the newly created waterfall.
+     * @throws IllegalArgumentException if the fall count is negative or 0.
      */
     public Waterfall<SOURCE, IN, OUT> in(final int fallCount) {
 
@@ -1645,6 +1732,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      *
      * @param current the current.
      * @return the newly created waterfall.
+     * @throws IllegalArgumentException if the current is null.
      */
     public Waterfall<SOURCE, IN, OUT> in(final Current current) {
 
@@ -1668,6 +1756,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      *
      * @param fallCount the total fall count generating the waterfall.
      * @return the newly created waterfall.
+     * @throws IllegalArgumentException if the fall count is negative or 0.
      */
     public Waterfall<SOURCE, IN, OUT> inBackground(final int fallCount) {
 
@@ -1730,73 +1819,57 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
     /**
      * Causes the data drops flowing through this waterfall streams to be interleaved, so that the
      * first drop coming from the stream number 0 will come before the first one coming from the
-     * stream number 1, and so on.
+     * stream number 1, and so on.<br/>
+     * The resulting waterfall will have size equal to 1.
      * <p/>
-     * Note that the resulting waterfall will have size equal to 1.
+     * Note that the returned waterfall internally cache the data pushed through it and then
+     * discharge them on the first flush.
      *
      * @return the newly created waterfall.
      */
     public Waterfall<SOURCE, OUT, OUT> interleave() {
 
-        final int length = Math.max(size(), 1);
-
-        //noinspection unchecked
-        final ArrayList<OUT>[] lists = new ArrayList[length];
-
-        for (int i = 0; i < lists.length; i++) {
-
-            lists[i] = new ArrayList<OUT>();
-        }
-
-        return chain(new OpenGate<OUT>() {
-
-            private int mFlushes;
+        return chain(new CumulativeCacheGate<OUT, OUT>(size()) {
 
             @Override
-            public void onPush(final River<OUT> upRiver, final River<OUT> downRiver,
-                    final int fallNumber, final OUT drop) {
+            protected void onClear(final List<List<OUT>> cache, final River<OUT> upRiver,
+                    final River<OUT> downRiver) {
 
-                lists[fallNumber].add(drop);
-            }
+                boolean empty = false;
 
-            @Override
-            public void onFlush(final River<OUT> upRiver, final River<OUT> downRiver,
-                    final int fallNumber) {
+                while (!empty) {
 
-                if (++mFlushes >= length) {
+                    empty = true;
 
-                    mFlushes = 0;
+                    for (final List<OUT> data : cache) {
 
-                    boolean empty = false;
+                        if (!data.isEmpty()) {
 
-                    while (!empty) {
+                            empty = false;
 
-                        empty = true;
-
-                        for (final ArrayList<OUT> list : lists) {
-
-                            if (!list.isEmpty()) {
-
-                                empty = false;
-
-                                downRiver.push(list.remove(0));
-                            }
+                            downRiver.push(data.remove(0));
                         }
                     }
                 }
 
-                super.onFlush(upRiver, downRiver, fallNumber);
+                super.onClear(cache, upRiver, downRiver);
             }
         }).merge();
     }
 
     /**
-     * Makes this waterfall to join the specified one, so that all the data coming from this
-     * waterfall streams will flow through the stream number 0 of the resulting waterfall, and the
-     * ones coming from the specified waterfall streams will flow through the stream number 1.
+     * Makes this waterfall join the specified one, so that all the data coming from this
+     * waterfall N streams will flow through the first N streams of the resulting waterfall, and
+     * the ones coming from the specified waterfall streams will flow through the streams N + 1, N
+     * + 2, ..., etc.
+     * <p/>
+     * TODO how to handle the bridges?
+     * <p/>
+     * Note that the dams, the size and the currents of this waterfall will be retained.
      *
      * @param waterfall the waterfall to join.
      * @return the newly created waterfall.
+     * @throws IllegalArgumentException if the waterfall is null.
      */
     public Waterfall<OUT, OUT, OUT> join(final Waterfall<?, ?, OUT> waterfall) {
 
@@ -1809,13 +1882,19 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
     }
 
     /**
-     * Makes this waterfall to join the specified ones, so that all the data coming from this
-     * waterfall streams will flow through the stream number 0 of the resulting waterfall, the
+     * Makes this waterfall join the specified ones, so that all the data coming from this
+     * waterfall N streams will flow through the first N streams of the resulting waterfall, the
      * ones coming from the streams of the first waterfall in the specified collection will flow
-     * through the stream number 1, and so on.
+     * through the streams N + 1, N + 2, ..., etc., and so on.
+     * <p/>
+     * TODO how to handle the bridges?
+     * <p/>
+     * Note that the dams, the size and the currents of this waterfall will be retained.
      *
      * @param waterfalls the collection of the waterfall to join.
      * @return the newly created waterfall.
+     * @throws IllegalArgumentException if the waterfall collection is null or contains null
+     *                                  waterfalls.
      */
     public Waterfall<OUT, OUT, OUT> join(
             final Collection<? extends Waterfall<?, ?, OUT>> waterfalls) {
@@ -1825,41 +1904,61 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
             throw new IllegalArgumentException("the waterfall collection cannot be null");
         }
 
-        final int size = waterfalls.size() + 1;
+        final ArrayList<Waterfall<?, ?, OUT>> inWaterfalls =
+                new ArrayList<Waterfall<?, ?, OUT>>(waterfalls.size() + 1);
 
-        if (size == 1) {
+        int totSize = 0;
 
-            return start();
+        if (mFalls == NO_FALL) {
+
+            totSize += 1;
+
+            inWaterfalls.add(start());
+
+        } else {
+
+            totSize += size();
+
+            inWaterfalls.add(this);
+        }
+
+        for (final Waterfall<?, ?, OUT> waterfall : waterfalls) {
+
+            if (waterfall.mFalls == NO_FALL) {
+
+                totSize += 1;
+
+                inWaterfalls.add(waterfall.start());
+
+            } else {
+
+                totSize += waterfall.size();
+
+                inWaterfalls.add(waterfall);
+            }
         }
 
         final OpenGate<OUT> gate = openGate();
 
         //noinspection unchecked
-        final Gate<OUT, OUT>[] gates = new Gate[size];
+        final Gate<OUT, OUT>[] gates = new Gate[totSize];
 
         Arrays.fill(gates, gate);
 
         final Waterfall<OUT, OUT, OUT> waterfall =
                 new Waterfall<OUT, OUT, OUT>(null, mDamMap, mDamClassification, mBackgroundPoolSize,
-                                             mBackgroundCurrent, mPump, size, mCurrent,
+                                             mBackgroundCurrent, mPump, totSize, mCurrent,
                                              mCurrentGenerator, gates);
-
-        final DataFall<OUT, OUT>[] outFalls = waterfall.mFalls;
-
-        for (final DataFall<IN, OUT> fall : mFalls) {
-
-            connect(fall, outFalls[0]);
-        }
 
         int number = 0;
 
-        for (final Waterfall<?, ?, OUT> inWaterfall : waterfalls) {
+        final DataFall<OUT, OUT>[] outFalls = waterfall.mFalls;
 
-            ++number;
+        for (final Waterfall<?, ?, OUT> inWaterfall : inWaterfalls) {
 
-            for (final DataFall<?, OUT> fall : inWaterfall.mFalls) {
+            for (final DataFall<?, OUT> inFall : inWaterfall.mFalls) {
 
-                connect(fall, outFalls[number]);
+                connect(inFall, outFalls[number++]);
             }
         }
 
@@ -1868,9 +1967,8 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
     /**
      * Causes the data drops flowing through this waterfall streams to be merged into a single
-     * stream.
-     * <p/>
-     * Note that the resulting waterfall will have size equal to 1.
+     * stream.<br/>
+     * The resulting waterfall will have size equal to 1.
      *
      * @return the newly created waterfall.
      */
@@ -1885,9 +1983,10 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
     }
 
     /**
-     * Creates and returns a new data collector after discharging this waterfall source.
+     * Creates and returns a new data collector after flushing this waterfall source.
      *
      * @return the collector.
+     * @throws IllegalStateException if this waterfall was not started.
      */
     public Collector<OUT> pull() {
 
@@ -1900,10 +1999,11 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
     /**
      * Creates and returns a new data collector after pushing the specified data into this
-     * waterfall source and then discharging it.
+     * waterfall source and then flushing it.
      *
      * @param source the source data.
      * @return the collector.
+     * @throws IllegalStateException if this waterfall was not started.
      */
     public Collector<OUT> pull(final SOURCE source) {
 
@@ -1916,10 +2016,11 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
     /**
      * Creates and returns a new data collector after pushing the specified data into this
-     * waterfall source and then discharging it.
+     * waterfall source and then flushing it.
      *
      * @param sources the source data.
      * @return the collector.
+     * @throws IllegalStateException if this waterfall was not started.
      */
     public Collector<OUT> pull(final SOURCE... sources) {
 
@@ -1932,10 +2033,11 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
     /**
      * Creates and returns a new data collector after pushing the data returned by the specified
-     * iterable into this waterfall source and then discharging it.
+     * iterable into this waterfall source and then flushing it.
      *
      * @param sources the source data iterable.
      * @return the collector.
+     * @throws IllegalStateException if this waterfall was not started.
      */
     public Collector<OUT> pull(final Iterable<SOURCE> sources) {
 
@@ -1944,6 +2046,144 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
         source().push(sources).flush();
 
         return collector;
+    }
+
+    /**
+     * Filters the data flowing through this waterfall by retaining only the specified count of
+     * drops, starting from the specified offset and discarding the other ones.
+     * <p/>
+     * Note that the returned waterfall internally cache the data pushed through it and then
+     * discharge them on the first flush.
+     *
+     * @param offset the offset from the first data drop.
+     * @param count  the count of the element in the range.
+     * @return the newly created waterfall.
+     * @throws IllegalArgumentException if the offset is negative, the count is negative or equal
+     *                                  to zero.
+     */
+    public Waterfall<SOURCE, OUT, OUT> range(final int offset, final int count) {
+
+        if ((offset < 0) || (count <= 0)) {
+
+            throw new IllegalArgumentException("invalid range indexes");
+        }
+
+        final long last = (long) offset + (long) count;
+
+        final int length = Math.max(size(), 1);
+        final long[] counts = new long[length];
+
+        //noinspection unchecked
+        final ArrayList<OUT>[] lists = new ArrayList[length];
+
+        for (int i = 0; i < lists.length; i++) {
+
+            lists[i] = new ArrayList<OUT>();
+        }
+
+        return chain(new OpenGate<OUT>() {
+
+            @Override
+            public void onPush(final River<OUT> upRiver, final River<OUT> downRiver,
+                    final int fallNumber, final OUT drop) {
+
+                final long index = counts[fallNumber];
+
+                if (index < last) {
+
+                    counts[fallNumber] = index + 1;
+
+                    if (index >= offset) {
+
+                        lists[fallNumber].add(drop);
+                    }
+                }
+            }
+
+            @Override
+            public void onFlush(final River<OUT> upRiver, final River<OUT> downRiver,
+                    final int fallNumber) {
+
+                final ArrayList<OUT> list = lists[fallNumber];
+
+                downRiver.push(list);
+                list.clear();
+
+                super.onFlush(upRiver, downRiver, fallNumber);
+            }
+        });
+    }
+
+    /**
+     * Causes the data drops flowing through this waterfall streams to flow down in the reverse
+     * order.
+     * <p/>
+     * Note that the returned waterfall internally cache the data pushed through it and then
+     * discharge them on the first flush.
+     *
+     * @return the newly created waterfall.
+     */
+    public Waterfall<SOURCE, OUT, OUT> revert() {
+
+        return chain(new CacheGate<OUT, OUT>(size()) {
+
+            @Override
+            protected void onClear(final List<OUT> cache, final int streamNumber,
+                    final River<OUT> upRiver, final River<OUT> downRiver) {
+
+                Collections.reverse(cache);
+                downRiver.push(cache);
+
+                super.onClear(cache, streamNumber, upRiver, downRiver);
+            }
+        });
+    }
+
+    /**
+     * Causes the data drops flowing through this waterfall streams to flow down sorted in the
+     * natural order.
+     * <p/>
+     * Note that the returned waterfall internally cache the data pushed through it and then
+     * discharge them on the first flush.
+     *
+     * @return the newly created waterfall.
+     */
+    public Waterfall<SOURCE, OUT, OUT> sort() {
+
+        //noinspection unchecked
+        return sort((Comparator<? super OUT>) NATURAL_COMPARATOR);
+    }
+
+    /**
+     * Causes the data drops flowing through this waterfall streams to flow down sorted in the
+     * order decided by the specified comparator.
+     * <p/>
+     * Note that the returned waterfall internally cache the data pushed through it and then
+     * discharge them on the first flush.
+     *
+     * @param comparator the comparator.
+     * @return the newly created waterfall.
+     * @throws IllegalArgumentException if the comparator is null.
+     */
+    public Waterfall<SOURCE, OUT, OUT> sort(final Comparator<? super OUT> comparator) {
+
+        if (comparator == null) {
+
+            throw new IllegalArgumentException("the data comparator cannot be null");
+        }
+
+        return chain(new CacheGate<OUT, OUT>(size()) {
+
+            @Override
+            protected void onClear(final List<OUT> cache, final int streamNumber,
+                    final River<OUT> upRiver, final River<OUT> downRiver) {
+
+                Collections.sort(cache, comparator);
+                downRiver.push(cache);
+
+                super.onClear(cache, streamNumber, upRiver, downRiver);
+            }
+        });
     }
 
     /**
@@ -1965,6 +2205,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * @param generator the spring generator.
      * @param <DATA>    the spring data type.
      * @return the newly created waterfall.
+     * @throws IllegalArgumentException if the generator is null or returns a null spring.
      */
     public <DATA> Waterfall<Void, Void, DATA> spring(final SpringGenerator<DATA> generator) {
 
@@ -1992,6 +2233,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * @param spring the spring instance.
      * @param <DATA> the spring data type.
      * @return the newly created waterfall.
+     * @throws IllegalArgumentException if the spring is null.
      */
     public <DATA> Waterfall<Void, Void, DATA> spring(final Spring<DATA> spring) {
 
@@ -2007,6 +2249,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * @param springs the spring instances.
      * @param <DATA>  the spring data type.
      * @return the newly created waterfall.
+     * @throws IllegalArgumentException if the spring collection is null or contains a null spring.
      */
     public <DATA> Waterfall<Void, Void, DATA> spring(
             final Collection<? extends Spring<DATA>> springs) {
@@ -2026,14 +2269,44 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
         return start(gates);
     }
 
-    // TODO
-    public Waterfall<Void, Void, OUT> sprout(final Spring<OUT> spring) {
+    /**
+     * Creates and returns a new waterfall fed by both this waterfall as a spring and the specified
+     * one.
+     * <p/>
+     * Note that the dams and the currents of this waterfall will be retained, while the size will
+     * be equal to the one of the specified collection.
+     *
+     * @param spring the spring instance.
+     * @return the newly created waterfall.
+     * @throws IllegalArgumentException if the spring is null.
+     */
+    public Waterfall<Void, Void, OUT> springWith(final Spring<OUT> spring) {
 
-        return sprout(Collections.singleton(spring));
+        if (spring == null) {
+
+            throw new IllegalArgumentException("the spring cannot be null");
+        }
+
+        return springWith(Collections.singleton(spring));
     }
 
-    // TODO
-    public Waterfall<Void, Void, OUT> sprout(final Collection<? extends Spring<OUT>> springs) {
+    /**
+     * Creates and returns a new waterfall fed by this waterfall as a spring and all the specified
+     * ones.
+     * <p/>
+     * Note that the dams and the currents of this waterfall will be retained, while the size will
+     * be equal to the one of the specified collection.
+     *
+     * @param springs the spring collection.
+     * @return the newly created waterfall.
+     * @throws IllegalArgumentException if the spring collection is null or contains a null spring.
+     */
+    public Waterfall<Void, Void, OUT> springWith(final Collection<? extends Spring<OUT>> springs) {
+
+        if (springs == null) {
+
+            throw new IllegalArgumentException("the spring collection cannot be null");
+        }
 
         final ArrayList<Spring<OUT>> list = new ArrayList<Spring<OUT>>(springs.size() + 1);
 
@@ -2073,6 +2346,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * @param dataType the data type.
      * @param <DATA>   the data type.
      * @return the newly created waterfall.
+     * @throws IllegalArgumentException if the data type is null.
      */
     public <DATA> Waterfall<DATA, DATA, DATA> start(final Class<DATA> dataType) {
 
@@ -2087,6 +2361,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * @param classification the data classification.
      * @param <DATA>         the data type.
      * @return the newly created waterfall.
+     * @throws IllegalArgumentException if the data classification is null.
      */
     public <DATA> Waterfall<DATA, DATA, DATA> start(final Classification<DATA> classification) {
 
@@ -2109,6 +2384,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * @param <NIN>     the new input data type.
      * @param <NOUT>    the new output data type.
      * @return the newly created waterfall.
+     * @throws IllegalArgumentException if the generator is null or returns a null gate.
      */
     public <NIN, NOUT> Waterfall<NIN, NIN, NOUT> start(final GateGenerator<NIN, NOUT> generator) {
 
@@ -2166,6 +2442,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * @param <NIN>  the new input data type.
      * @param <NOUT> the new output data type.
      * @return the newly created waterfall.
+     * @throws IllegalArgumentException if the gate collection is null or contains a null gate.
      */
     public <NIN, NOUT> Waterfall<NIN, NIN, NOUT> start(
             final Collection<? extends Gate<NIN, NOUT>> gates) {
@@ -2214,6 +2491,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * @param <NIN>  the new input data type.
      * @param <NOUT> the new output data type.
      * @return the newly created waterfall.
+     * @throws IllegalArgumentException if the gate is null.
      */
     public <NIN, NOUT> Waterfall<NIN, NIN, NOUT> start(final Gate<NIN, NOUT> gate) {
 
@@ -2229,11 +2507,21 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
                                              mCurrentGenerator, gates);
     }
 
-    // TODO: timeout?
-    public Waterfall<SOURCE, OUT, OUT> throwOnTimeout(final long delay, final TimeUnit timeUnit,
+    /**
+     * Makes this waterfall forward an exception in case the specified timeout elapses before at
+     * least one data drop is pushed through it.
+     * <p/>
+     * TODO: starts immediately
+     *
+     * @param timeout   the timeout in <code>timeUnit</code> time units.
+     * @param timeUnit  the delay time unit.
+     * @param exception the exception to forward.
+     * @return the newly created waterfall.
+     */
+    public Waterfall<SOURCE, OUT, OUT> throwOnTimeout(final long timeout, final TimeUnit timeUnit,
             final RuntimeException exception) {
 
-        return chain(new TimeoutGate<OUT>(this, delay, timeUnit, exception));
+        return chain(new TimeoutGate<OUT>(this, timeout, timeUnit, exception));
     }
 
     private Waterfall<SOURCE, OUT, OUT> chainPump(final PumpGate<OUT> pumpGate) {

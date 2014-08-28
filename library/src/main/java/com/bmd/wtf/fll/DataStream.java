@@ -68,6 +68,27 @@ class DataStream<DATA> implements Stream<DATA> {
     }
 
     @Override
+    public Stream<DATA> exception(final Throwable throwable) {
+
+        final DataFall<DATA, ?> fall = mDownstreamFall;
+
+        fall.raiseLevel(1);
+
+        if (mPassThrough) {
+
+            fall.exception(throwable);
+
+        } else {
+
+            final Current inputCurrent = fall.inputCurrent;
+
+            inputCurrent.exception(fall, throwable);
+        }
+
+        return this;
+    }
+
+    @Override
     public Stream<DATA> flush() {
 
         final DataFall<DATA, ?> fall = mDownstreamFall;
@@ -121,27 +142,6 @@ class DataStream<DATA> implements Stream<DATA> {
     public Stream<DATA> flushAfter(final long delay, final TimeUnit timeUnit, final DATA... drops) {
 
         return pushAfter(delay, timeUnit, drops).flush();
-    }
-
-    @Override
-    public Stream<DATA> forward(final Throwable throwable) {
-
-        final DataFall<DATA, ?> fall = mDownstreamFall;
-
-        fall.raiseLevel(1);
-
-        if (mPassThrough) {
-
-            fall.forward(throwable);
-
-        } else {
-
-            final Current inputCurrent = fall.inputCurrent;
-
-            inputCurrent.forward(fall, throwable);
-        }
-
-        return this;
     }
 
     @Override

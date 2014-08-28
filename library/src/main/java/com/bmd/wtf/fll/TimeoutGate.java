@@ -64,6 +64,15 @@ class TimeoutGate<DATA> extends OpenGate<DATA> {
     }
 
     @Override
+    public void onException(final River<DATA> upRiver, final River<DATA> downRiver,
+            final int fallNumber, final Throwable throwable) {
+
+        cancel();
+
+        super.onException(upRiver, downRiver, fallNumber, throwable);
+    }
+
+    @Override
     public void onFlush(final River<DATA> upRiver, final River<DATA> downRiver,
             final int fallNumber) {
 
@@ -79,15 +88,6 @@ class TimeoutGate<DATA> extends OpenGate<DATA> {
         schedule();
 
         super.onPush(upRiver, downRiver, fallNumber, drop);
-    }
-
-    @Override
-    public void onUnhandled(final River<DATA> upRiver, final River<DATA> downRiver,
-            final int fallNumber, final Throwable throwable) {
-
-        cancel();
-
-        super.onUnhandled(upRiver, downRiver, fallNumber, throwable);
     }
 
     private void cancel() {
@@ -108,7 +108,7 @@ class TimeoutGate<DATA> extends OpenGate<DATA> {
             @Override
             public void run() {
 
-                mWaterfall.forward(mException);
+                mWaterfall.exception(mException);
             }
         };
 

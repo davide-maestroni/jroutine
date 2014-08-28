@@ -108,6 +108,34 @@ class DataFall<IN, OUT> implements Fall<IN> {
     }
 
     @Override
+    public void exception(final Throwable throwable) {
+
+        final DataLock dataLock = sLock.get();
+
+        final LockRiver<IN> inRiver = mInRiver;
+        final LockRiver<OUT> outRiver = mOutRiver;
+
+        inRiver.open(dataLock);
+        outRiver.open(dataLock);
+
+        try {
+
+            gate.onException(inRiver, outRiver, mNumber, throwable);
+
+        } catch (final Throwable t) {
+
+            outRiver.exception(t);
+
+        } finally {
+
+            outRiver.close();
+            inRiver.close();
+
+            lowerLevel();
+        }
+    }
+
+    @Override
     public void flush(final Stream<IN> origin) {
 
         final ReentrantLock lock = mLock;
@@ -159,40 +187,12 @@ class DataFall<IN, OUT> implements Fall<IN> {
 
         } catch (final Throwable t) {
 
-            outRiver.forward(t);
+            outRiver.exception(t);
 
         } finally {
 
             outRiver.close();
             inRiver.close();
-        }
-    }
-
-    @Override
-    public void forward(final Throwable throwable) {
-
-        final DataLock dataLock = sLock.get();
-
-        final LockRiver<IN> inRiver = mInRiver;
-        final LockRiver<OUT> outRiver = mOutRiver;
-
-        inRiver.open(dataLock);
-        outRiver.open(dataLock);
-
-        try {
-
-            gate.onUnhandled(inRiver, outRiver, mNumber, throwable);
-
-        } catch (final Throwable t) {
-
-            outRiver.forward(t);
-
-        } finally {
-
-            outRiver.close();
-            inRiver.close();
-
-            lowerLevel();
         }
     }
 
@@ -213,7 +213,7 @@ class DataFall<IN, OUT> implements Fall<IN> {
 
         } catch (final Throwable t) {
 
-            outRiver.forward(t);
+            outRiver.exception(t);
 
         } finally {
 

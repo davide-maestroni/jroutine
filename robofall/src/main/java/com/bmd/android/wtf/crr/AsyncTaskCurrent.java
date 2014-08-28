@@ -53,15 +53,15 @@ class AsyncTaskCurrent implements Current {
     }
 
     @Override
-    public <DATA> void flush(final Fall<DATA> fall, final Stream<DATA> origin) {
+    public void exception(final Fall<?> fall, final Throwable throwable) {
 
-        mHandler.post(new FlushTask<DATA>(mExecutor, fall, origin));
+        mHandler.post(new ForwardTask(mExecutor, fall, throwable));
     }
 
     @Override
-    public void forward(final Fall<?> fall, final Throwable throwable) {
+    public <DATA> void flush(final Fall<DATA> fall, final Stream<DATA> origin) {
 
-        mHandler.post(new ForwardTask(mExecutor, fall, throwable));
+        mHandler.post(new FlushTask<DATA>(mExecutor, fall, origin));
     }
 
     @Override
@@ -145,7 +145,7 @@ class AsyncTaskCurrent implements Current {
         @Override
         protected Void doInBackground(final Void... voids) {
 
-            mFall.forward(mThrowable);
+            mFall.exception(mThrowable);
 
             return null;
         }

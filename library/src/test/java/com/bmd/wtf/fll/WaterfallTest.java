@@ -72,8 +72,8 @@ public class WaterfallTest extends TestCase {
              .pushAfter(0, TimeUnit.MILLISECONDS, new Object[]{"push", "push"})
              .pushAfter(0, TimeUnit.MILLISECONDS, Arrays.asList("push"))
              .pushAfter(0, TimeUnit.MILLISECONDS, Arrays.asList("push", "push"))
-             .forward(null)
-             .forward(new RuntimeException("test"));
+             .exception(null)
+             .exception(new RuntimeException("test"));
 
         river.flush((Object) null)
              .flush((Object[]) null)
@@ -131,8 +131,8 @@ public class WaterfallTest extends TestCase {
              .pushStreamAfter(0, 0, TimeUnit.MILLISECONDS, "push", "push")
              .pushStreamAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList("push"))
              .pushStreamAfter(0, 0, TimeUnit.MILLISECONDS, Arrays.asList("push", "push"))
-             .forwardStream(0, null)
-             .forwardStream(0, new RuntimeException("test"));
+             .streamException(0, null)
+             .streamException(0, new RuntimeException("test"));
 
         river.flushStream(0, (Object) null)
              .flushStream(0, (Object[]) null)
@@ -333,7 +333,7 @@ public class WaterfallTest extends TestCase {
 
         final Waterfall<Object, Object, Object> fall0 = fall().start();
         final Waterfall<Object, Object, Object> fall1 = fall().in(2).start();
-        fall1.chain(fall0);
+        fall1.feed(fall0);
 
         final Collector<Object> collector0 = fall0.collect();
         fall1.flush("test");
@@ -341,7 +341,7 @@ public class WaterfallTest extends TestCase {
 
         final Waterfall<Object, Object, Object> fall2 = fall().in(2).start();
         final Waterfall<Object, Object, Object> fall3 = fall().in(2).start();
-        fall3.chain(fall2);
+        fall3.feed(fall2);
 
         final Collector<Object> collector2 = fall2.collect();
         fall3.flush("test");
@@ -349,7 +349,7 @@ public class WaterfallTest extends TestCase {
 
         final Waterfall<Object, Object, Object> fall4 = fall().in(2).start();
         final Waterfall<Object, Object, Object> fall5 = fall().in(3).start();
-        fall5.chain(fall4);
+        fall5.feed(fall4);
 
         final Collector<Object> collector4 = fall4.collect();
         fall5.flush("test");
@@ -358,7 +358,7 @@ public class WaterfallTest extends TestCase {
 
         final Waterfall<Object, Object, Object> fall6 = fall().in(2).start();
         final Waterfall<Object, Object, Object> fall7 = fall().start();
-        fall7.chain(fall6);
+        fall7.feed(fall6);
 
         final Collector<Object> collector6 = fall6.collect();
         fall7.flush("test");
@@ -544,7 +544,7 @@ public class WaterfallTest extends TestCase {
                             @Override
                             public Current create(final int fallNumber) {
 
-                                return Currents.straight();
+                                return Currents.passThrough();
                             }
                         })
                         .in(3)
@@ -611,7 +611,7 @@ public class WaterfallTest extends TestCase {
                     downRiver.drain();
                 }
             }
-        }).chain(fall3);
+        }).feed(fall3);
 
         assertThat(fall4.pull(1).now().next()).isEqualTo("1");
         assertThat(fall4.pull(-1).now().all()).isEmpty();
@@ -625,7 +625,7 @@ public class WaterfallTest extends TestCase {
 
                 downRiver.push(drop);
             }
-        }).chain(fall3);
+        }).feed(fall3);
 
         assertThat(fall4.pull(0).now().all()).isEmpty();
         assertThat(fall4.pull(1).now().all()).isEmpty();
@@ -640,84 +640,84 @@ public class WaterfallTest extends TestCase {
         assertThat(fall6.pull("test").all()).containsExactly("test");
         assertThat(fall7.pull("test").afterMax(100, TimeUnit.MILLISECONDS).all()).isEmpty();
 
-        fall6.chain(fall7);
+        fall6.feed(fall7);
         assertThat(fall7.pull("test").all()).containsExactly("test");
 
         fall6.deviate(Direction.DOWNSTREAM);
         assertThat(fall6.pull("test").all()).containsExactly("test");
         assertThat(fall7.pull("test").afterMax(100, TimeUnit.MILLISECONDS).all()).isEmpty();
 
-        fall6.chain(fall7);
+        fall6.feed(fall7);
         assertThat(fall7.pull("test").all()).containsExactly("test");
 
         fall6.deviate(Direction.UPSTREAM);
         assertThat(fall6.pull("test").afterMax(100, TimeUnit.MILLISECONDS).all()).isEmpty();
         assertThat(fall7.pull("test").afterMax(100, TimeUnit.MILLISECONDS).all()).isEmpty();
 
-        fall5.chain(fall6);
+        fall5.feed(fall6);
         assertThat(fall7.pull("test").all()).containsExactly("test");
 
         fall6.deviateStream(0);
         assertThat(fall6.pull("test").all()).containsExactly("test");
         assertThat(fall7.pull("test").afterMax(100, TimeUnit.MILLISECONDS).all()).isEmpty();
 
-        fall6.chain(fall7);
+        fall6.feed(fall7);
         assertThat(fall7.pull("test").all()).containsExactly("test");
 
         fall6.deviateStream(0, Direction.DOWNSTREAM);
         assertThat(fall6.pull("test").all()).containsExactly("test");
         assertThat(fall7.pull("test").afterMax(100, TimeUnit.MILLISECONDS).all()).isEmpty();
 
-        fall6.chain(fall7);
+        fall6.feed(fall7);
         assertThat(fall7.pull("test").all()).containsExactly("test");
 
         fall6.deviateStream(0, Direction.UPSTREAM);
         assertThat(fall6.pull("test").afterMax(100, TimeUnit.MILLISECONDS).all()).isEmpty();
         assertThat(fall7.pull("test").afterMax(100, TimeUnit.MILLISECONDS).all()).isEmpty();
 
-        fall5.chain(fall6);
+        fall5.feed(fall6);
         assertThat(fall7.pull("test").all()).containsExactly("test");
 
         fall6.drain();
         assertThat(fall6.pull("test").all()).containsExactly("test");
         assertThat(fall7.pull("test").afterMax(100, TimeUnit.MILLISECONDS).all()).isEmpty();
 
-        fall6.chain(fall7);
+        fall6.feed(fall7);
         assertThat(fall7.pull("test").all()).containsExactly("test");
 
         fall6.drain(Direction.DOWNSTREAM);
         assertThat(fall6.pull("test").all()).containsExactly("test");
         assertThat(fall7.pull("test").afterMax(100, TimeUnit.MILLISECONDS).all()).isEmpty();
 
-        fall6.chain(fall7);
+        fall6.feed(fall7);
         assertThat(fall7.pull("test").all()).containsExactly("test");
 
         fall6.drain(Direction.UPSTREAM);
         assertThat(fall6.pull("test").afterMax(100, TimeUnit.MILLISECONDS).all()).isEmpty();
         assertThat(fall7.pull("test").afterMax(100, TimeUnit.MILLISECONDS).all()).isEmpty();
 
-        fall5.chain(fall6);
+        fall5.feed(fall6);
         assertThat(fall7.pull("test").all()).containsExactly("test");
 
         fall6.drainStream(0);
         assertThat(fall6.pull("test").all()).containsExactly("test");
         assertThat(fall7.pull("test").afterMax(100, TimeUnit.MILLISECONDS).all()).isEmpty();
 
-        fall6.chain(fall7);
+        fall6.feed(fall7);
         assertThat(fall7.pull("test").all()).containsExactly("test");
 
         fall6.drainStream(0, Direction.DOWNSTREAM);
         assertThat(fall6.pull("test").all()).containsExactly("test");
         assertThat(fall7.pull("test").afterMax(100, TimeUnit.MILLISECONDS).all()).isEmpty();
 
-        fall6.chain(fall7);
+        fall6.feed(fall7);
         assertThat(fall7.pull("test").all()).containsExactly("test");
 
         fall6.drainStream(0, Direction.UPSTREAM);
         assertThat(fall6.pull("test").afterMax(100, TimeUnit.MILLISECONDS).all()).isEmpty();
         assertThat(fall7.pull("test").afterMax(100, TimeUnit.MILLISECONDS).all()).isEmpty();
 
-        fall5.chain(fall6);
+        fall5.feed(fall6);
         assertThat(fall7.pull("test").all()).containsExactly("test");
     }
 
@@ -770,7 +770,7 @@ public class WaterfallTest extends TestCase {
                     downRiver.drainStream(0);
                 }
             }
-        }).chain(0, fall3);
+        }).feedStream(0, fall3);
 
         assertThat(fall4.pull(1).now().next()).isEqualTo("1");
         assertThat(fall4.pull(-1).now().all()).isEmpty();
@@ -784,7 +784,7 @@ public class WaterfallTest extends TestCase {
 
                 downRiver.push(drop);
             }
-        }).chain(0, fall3);
+        }).feedStream(0, fall3);
 
         assertThat(fall4.pull(0).now().all()).isEmpty();
         assertThat(fall4.pull(1).now().all()).isEmpty();
@@ -808,8 +808,8 @@ public class WaterfallTest extends TestCase {
         assertThat(gate1.getData()).contains(data.toArray(new String[data.size()]));
 
         final IllegalStateException exception = new IllegalStateException();
-        source1.forward(exception);
-        assertThat(gate1.getUnhandled()).containsExactly(exception, exception, exception,
+        source1.exception(exception);
+        assertThat(gate1.getException()).containsExactly(exception, exception, exception,
                                                          exception);
 
         source1.flush();
@@ -844,8 +844,8 @@ public class WaterfallTest extends TestCase {
         source2.push(data);
         assertThat(gate2.getData()).contains(data.toArray(new String[data.size()]));
 
-        source2.forward(exception);
-        assertThat(gate2.getUnhandled()).containsExactly(exception, exception, exception,
+        source2.exception(exception);
+        assertThat(gate2.getException()).containsExactly(exception, exception, exception,
                                                          exception);
 
         source2.flush();
@@ -911,9 +911,9 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            new DataStream<Object>(null,
-                                   new DataFall<Object, Object>(fall().start(), Currents.straight(),
-                                                                new OpenGate<Object>(), 0));
+            new DataStream<Object>(null, new DataFall<Object, Object>(fall().start(),
+                                                                      Currents.passThrough(),
+                                                                      new OpenGate<Object>(), 0));
 
             fail();
 
@@ -923,8 +923,9 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            new DataStream<Object>(new DataFall<Object, Object>(fall().start(), Currents.straight(),
-                                                                new OpenGate<Object>(), 0), null);
+            new DataStream<Object>(
+                    new DataFall<Object, Object>(fall().start(), Currents.passThrough(),
+                                                 new OpenGate<Object>(), 0), null);
 
             fail();
 
@@ -934,7 +935,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            new DataFall<Object, Object>(null, Currents.straight(), new OpenGate<Object>(), 0);
+            new DataFall<Object, Object>(null, Currents.passThrough(), new OpenGate<Object>(), 0);
 
             fail();
 
@@ -954,7 +955,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            new DataFall<Object, Object>(fall().start(), Currents.straight(), null, 0);
+            new DataFall<Object, Object>(fall().start(), Currents.passThrough(), null, 0);
 
             fail();
 
@@ -1175,7 +1176,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            fall().chain((Waterfall<Object, Object, Object>) null);
+            fall().feed(null);
 
             fail();
 
@@ -1185,7 +1186,9 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            fall().chain(0, null);
+            final Waterfall<Object, Object, Object> fall = fall().start();
+
+            fall().feed(fall);
 
             fail();
 
@@ -1195,7 +1198,57 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            fall().chain(1, fall().start());
+            fall().feedStream(0, null);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            fall().feedStream(1, fall().start());
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            fall().join((Waterfall<Object, Object, Object>) null);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            fall().join((Collection<Waterfall<Object, Object, Object>>) null);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            fall().springWith((Spring<Object>) null);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            fall().springWith((Collection<Spring<Object>>) null);
 
             fail();
 
@@ -1347,7 +1400,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            fall().start().chain((Waterfall<Object, Object, Object>) null);
+            fall().start().feed(null);
 
             fail();
 
@@ -1357,7 +1410,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            fall().start().chain(fall());
+            fall().start().feed(fall());
 
             fail();
 
@@ -1367,7 +1420,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            fall().start().chain(0, fall());
+            fall().start().feedStream(0, fall());
 
             fail();
 
@@ -1377,7 +1430,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            fall().start().chain(1, fall());
+            fall().start().feedStream(1, fall());
 
             fail();
 
@@ -1480,7 +1533,7 @@ public class WaterfallTest extends TestCase {
 
             final Waterfall<Object, Object, Object> waterfall = fall().start();
 
-            waterfall.chain(waterfall);
+            waterfall.feed(waterfall);
 
             fail();
 
@@ -1492,7 +1545,7 @@ public class WaterfallTest extends TestCase {
 
             final Waterfall<Object, Object, Object> waterfall = fall().start();
 
-            waterfall.chain(0, waterfall);
+            waterfall.feedStream(0, waterfall);
 
             fail();
 
@@ -1504,7 +1557,7 @@ public class WaterfallTest extends TestCase {
 
             final Waterfall<Object, Object, Object> waterfall = fall().start();
 
-            waterfall.chain(1, waterfall);
+            waterfall.feedStream(1, waterfall);
 
             fail();
 
@@ -1516,7 +1569,7 @@ public class WaterfallTest extends TestCase {
 
             final Waterfall<Object, Object, Object> waterfall = fall().start();
 
-            waterfall.chain().chain(waterfall);
+            waterfall.chain().feed(waterfall);
 
             fail();
 
@@ -1528,7 +1581,7 @@ public class WaterfallTest extends TestCase {
 
             final Waterfall<Object, Object, Object> waterfall = fall().start();
 
-            waterfall.chain().chain(0, waterfall);
+            waterfall.chain().feedStream(0, waterfall);
 
             fail();
 
@@ -1540,7 +1593,7 @@ public class WaterfallTest extends TestCase {
 
             final Waterfall<Object, Object, Object> waterfall = fall().start();
 
-            waterfall.chain().chain(1, waterfall);
+            waterfall.chain().feedStream(1, waterfall);
 
             fail();
 
@@ -1658,6 +1711,86 @@ public class WaterfallTest extends TestCase {
 
         }
 
+        try {
+
+            fall().range(0, 0);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            fall().range(-1, 1);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            fall().range(1, -1);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            fall().endRange(0, 0);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            fall().endRange(-1, 1);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            fall().endRange(1, -1);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            fall().endRange(1, 3);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            fall().sort(null);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
         testRiver(fall());
         testRiver(fall().in(1));
         testRiver(fall().distribute());
@@ -1673,7 +1806,7 @@ public class WaterfallTest extends TestCase {
                                                               .chain(new OpenGate<Object>() {
 
                                                                   @Override
-                                                                  public void onUnhandled(
+                                                                  public void onException(
                                                                           final River<Object> upRiver,
                                                                           final River<Object> downRiver,
                                                                           final int fallNumber,
@@ -1738,7 +1871,7 @@ public class WaterfallTest extends TestCase {
                                                               .chain(new OpenGate<Object>() {
 
                                                                   @Override
-                                                                  public void onUnhandled(
+                                                                  public void onException(
                                                                           final River<Object> upRiver,
                                                                           final River<Object> downRiver,
                                                                           final int fallNumber,
@@ -1796,38 +1929,7 @@ public class WaterfallTest extends TestCase {
              });
     }
 
-    public void testIn() {
-
-        assertThat(fall().in(1).in(Currents.straight()).chain().in(new CurrentGenerator() {
-
-            @Override
-            public Current create(final int fallNumber) {
-
-                return Currents.straight();
-            }
-        }).chain().pull("test").all()).containsExactly("test");
-
-        assertThat(fall().in(3).in(Currents.straight()).chain().in(new CurrentGenerator() {
-
-            @Override
-            public Current create(final int fallNumber) {
-
-                return Currents.straight();
-            }
-        }).chain().pull("test").all()).containsExactly("test", "test", "test");
-
-        assertThat(fall().in(3)
-                         .in(Currents.straight())
-                         .chain()
-                         .inBackground(2)
-                         .chain()
-                         .pull("test")
-                         .all()).containsExactly("test", "test", "test", "test", "test", "test");
-
-        assertThat(fall().in(3).inBackground().chain().pull("test").all()).contains("test");
-    }
-
-    public void testJoin() {
+    public void testFeed() {
 
         final Waterfall<Character, Integer, Integer> fall0 =
                 fall().start(new AbstractGate<Character, Integer>() {
@@ -1874,7 +1976,7 @@ public class WaterfallTest extends TestCase {
         });
 
         final Waterfall<Integer, Integer, Integer> fall2 = fall().start(Integer.class);
-        fall2.chain(fall0);
+        fall2.feed(fall0);
         fall2.source().flush(Drops.asList(0, 1, 2, 3));
 
         final ArrayList<Integer> output = new ArrayList<Integer>(1);
@@ -1887,7 +1989,7 @@ public class WaterfallTest extends TestCase {
         final Waterfall<Integer, Integer, Integer> fall3 = fall().start(Integer.class);
 
         fall1.source().push(Drops.asList('0', '1', '2', '3'));
-        fall3.chain(fall0);
+        fall3.feed(fall0);
         fall3.source().flush(Drops.asList(4, 5, -4));
         fall2.source().flush(77);
 
@@ -1915,7 +2017,7 @@ public class WaterfallTest extends TestCase {
             }
         });
 
-        fall0.chain(fall4);
+        fall0.feed(fall4);
 
         fall3.source().flush(Arrays.asList(4, 5, -4));
 
@@ -1924,18 +2026,137 @@ public class WaterfallTest extends TestCase {
         fall4.pull().nextInto(output);
 
         assertThat(output).containsExactly(128, 136);
+    }
 
-        try {
+    public void testFlat() {
 
-            final Waterfall<Object, Object, Object> fall = fall().start();
+        //noinspection unchecked
+        assertThat(fall().spring(Springs.sequence(0, 4))
+                         .springWith(Springs.sequence(4, 0))
+                         .flat()
+                         .concat()
+                         .pull()
+                         .all()).containsExactly(Arrays.asList(0, 1, 2, 3, 4),
+                                                 Arrays.asList(4, 3, 2, 1, 0));
+    }
 
-            fall().chain(fall);
+    public void testIn() {
 
-            fail();
+        assertThat(fall().in(1).in(Currents.passThrough()).chain().in(new CurrentGenerator() {
 
-        } catch (final Exception ignored) {
+            @Override
+            public Current create(final int fallNumber) {
 
-        }
+                return Currents.passThrough();
+            }
+        }).chain().pull("test").all()).containsExactly("test");
+
+        assertThat(fall().in(3).in(Currents.passThrough()).chain().in(new CurrentGenerator() {
+
+            @Override
+            public Current create(final int fallNumber) {
+
+                return Currents.passThrough();
+            }
+        }).chain().pull("test").all()).containsExactly("test", "test", "test");
+
+        assertThat(fall().in(3)
+                         .in(Currents.passThrough())
+                         .chain()
+                         .inBackground(2)
+                         .chain()
+                         .pull("test")
+                         .all()).containsExactly("test", "test", "test", "test", "test", "test");
+
+        assertThat(fall().in(3).inBackground().chain().pull("test").all()).contains("test");
+    }
+
+    public void testJoin() {
+
+        final Waterfall<Void, Void, Integer> fall1 = fall().spring(Springs.sequence(0, 2));
+        final Waterfall<Void, Void, Integer> fall2 = fall().spring(Springs.sequence(3, 5));
+
+        final Collector<Integer> collector = fall1.join(fall2).concat().collect();
+
+        fall1.pull();
+        fall2.pull();
+
+        assertThat(collector.all()).containsExactly(0, 1, 2, 3, 4, 5);
+
+        final Waterfall<Void, Void, Integer> fall11 = fall().spring(Springs.sequence(0, 2));
+        final Waterfall<Void, Void, Integer> fall12 = fall().spring(Springs.sequence(3, 5));
+        final Waterfall<Void, Void, Integer> fall13 = fall().spring(Springs.sequence(6, 8));
+
+        final Collector<Integer> collector1 = fall11.join(fall12).join(fall13).concat().collect();
+
+        fall11.pull();
+        fall12.pull();
+        fall13.pull();
+
+        assertThat(collector1.all()).containsExactly(0, 1, 2, 3, 4, 5, 6, 7, 8);
+
+        final Waterfall<Void, Void, Integer> fall21 = fall().spring(Springs.sequence(0, 2));
+        final Waterfall<Void, Void, Integer> fall22 = fall().spring(Springs.sequence(3, 5));
+        final Waterfall<Void, Void, Integer> fall23 = fall().spring(Springs.sequence(6, 8));
+
+        //noinspection unchecked
+        final Collector<Integer> collector2 =
+                fall21.join(Arrays.asList(fall22, fall23)).concat().collect();
+
+        fall21.pull();
+        fall22.pull();
+        fall23.pull();
+
+        assertThat(collector2.all()).containsExactly(0, 1, 2, 3, 4, 5, 6, 7, 8);
+
+        final Waterfall<Void, Void, Integer> fall31 = fall().spring(Springs.sequence(0, 2));
+        final Waterfall<Void, Void, Integer> fall32 = fall().spring(Springs.sequence(3, 5));
+        final Waterfall<Void, Void, Integer> fall33 = fall().spring(Springs.sequence(6, 8));
+
+        //noinspection unchecked
+        final Collector<Integer> collector3 = fall31.join(fall32.join(fall33)).concat().collect();
+
+        fall31.pull();
+        fall32.pull();
+        fall33.pull();
+
+        assertThat(collector3.all()).containsExactly(0, 1, 2, 3, 4, 5, 6, 7, 8);
+
+        final Waterfall<Void, Void, Integer> fall4 = fall().spring(Springs.sequence(0, 2));
+        final List<Waterfall<?, ?, Integer>> falls4 = Collections.emptyList();
+
+        final Collector<Integer> collector4 = fall4.join(falls4).collect();
+
+        fall4.pull();
+
+        assertThat(collector4.all()).containsExactly(0, 1, 2);
+    }
+
+    public void testJoinFrom() {
+
+        assertThat(fall().spring(Springs.sequence(0, 2))
+                         .springWith(Springs.sequence(3, 5))
+                         .concat()
+                         .pull()
+                         .all()).containsExactly(0, 1, 2, 3, 4, 5);
+        assertThat(fall().spring(Springs.sequence(0, 2))
+                         .springWith(Springs.sequence(3, 5))
+                         .springWith(Springs.sequence(6, 8))
+                         .concat()
+                         .pull()
+                         .all()).containsExactly(0, 1, 2, 3, 4, 5, 6, 7, 8);
+        //noinspection unchecked
+        assertThat(fall().spring(Springs.sequence(0, 2))
+                         .springWith(Arrays.asList(Springs.sequence(3, 5), Springs.sequence(6, 8)))
+                         .concat()
+                         .pull()
+                         .all()).containsExactly(0, 1, 2, 3, 4, 5, 6, 7, 8);
+        assertThat(fall().spring(Springs.sequence(0, 2))
+                         .springWith(Springs.from(fall().spring(Springs.sequence(3, 5))
+                                                        .springWith(Springs.sequence(6, 8))))
+                         .concat()
+                         .pull()
+                         .all()).containsExactly(0, 1, 2, 3, 4, 5, 6, 7, 8);
     }
 
     public void testPump() {
@@ -2060,7 +2281,7 @@ public class WaterfallTest extends TestCase {
             }
 
             @Override
-            public void onUnhandled(final River<List<String>> upRiver,
+            public void onException(final River<List<String>> upRiver,
                     final River<String> downRiver, final int fallNumber,
                     final Throwable throwable) {
 
@@ -2081,9 +2302,9 @@ public class WaterfallTest extends TestCase {
         final Waterfall<Integer, Integer, Integer> fall2 = fall().start(Integer.class);
         final Waterfall<Integer, Integer, Integer> fall3 = fall().start(Integer.class);
 
-        fall1.chain(fall0);
-        fall2.chain(fall0);
-        fall3.chain(fall0);
+        fall1.feed(fall0);
+        fall2.feed(fall0);
+        fall3.feed(fall0);
 
         final Collector<Integer> collector = fall0.collect();
 
@@ -2110,16 +2331,62 @@ public class WaterfallTest extends TestCase {
                 1, 1, 1);
     }
 
+    public void testRange() {
+
+        assertThat(fall().spring(Springs.sequence(0, 9)).range(2, 3).pull().all()).containsExactly(
+                2, 3, 4);
+        assertThat(fall().spring(Springs.sequence(0, 9)).range(7, 5).pull().all()).containsExactly(
+                7, 8, 9);
+        assertThat(
+                fall().spring(Springs.sequence(0, 9)).endRange(5, 3).pull().all()).containsExactly(
+                4, 5, 6);
+        assertThat(
+                fall().spring(Springs.sequence(0, 9)).endRange(10, 5).pull().all()).containsExactly(
+                0, 1, 2, 3);
+        assertThat(fall().spring(Springs.sequence(0, 2)).range(3, 3).pull().all()).isEmpty();
+        assertThat(fall().spring(Springs.sequence(0, 2)).endRange(10, 5).pull().all()).isEmpty();
+    }
+
+    public void testRevert() {
+
+        assertThat(fall().spring(Springs.sequence(0, 9)).revert().pull().all()).containsExactly(9,
+                                                                                                8,
+                                                                                                7,
+                                                                                                6,
+                                                                                                5,
+                                                                                                4,
+                                                                                                3,
+                                                                                                2,
+                                                                                                1,
+                                                                                                0);
+        assertThat(fall().spring(Springs.sequence(0, 9)).revert().pull().all()).containsExactly(
+                fall().spring(Springs.sequence(9, 0)).pull().all().toArray(new Integer[10]));
+        assertThat(fall().spring(Springs.from(2, 4, -7, 0, 0, 12, -13)).revert()
+                         .pull().all()).containsExactly(-13, 12, 0, 0, -7, 4, 2);
+    }
+
+    public void testSort() {
+
+        assertThat(fall().spring(Springs.from(2, 4, -7, 0, 0, 12, -13))
+                         .sort()
+                         .pull()
+                         .all()).containsExactly(-13, -7, 0, 0, 2, 4, 12);
+        assertThat(fall().spring(Springs.from(2, 4, -7, 0, 0, 12, -13))
+                         .sort(Collections.reverseOrder())
+                         .pull()
+                         .all()).containsExactly(12, 4, 2, 0, 0, -7, -13);
+    }
+
     public void testSpring() {
 
         //noinspection unchecked
-        assertThat(fall().spring(Arrays.asList(Springs.sequence(0, 2), Springs.sequence(3, 2)))
+        assertThat(fall().spring(Arrays.asList(Springs.sequence(0, 2), Springs.sequence(3, 5)))
                          .concat()
                          .pull()
                          .all()).containsExactly(0, 1, 2, 3, 4, 5);
         //noinspection unchecked
         assertThat(fall().in(3)
-                         .spring(Arrays.asList(Springs.sequence(0, 2), Springs.sequence(3, 2)))
+                         .spring(Arrays.asList(Springs.sequence(0, 2), Springs.sequence(3, 5)))
                          .interleave()
                          .pull()
                          .all()).containsExactly(0, 3, 1, 4, 2, 5);
@@ -2136,18 +2403,18 @@ public class WaterfallTest extends TestCase {
             @Override
             public Spring<Integer> create(final int fallNumber) {
 
-                return Springs.sequence(fallNumber, 2);
+                return Springs.sequence(fallNumber, fallNumber + 2);
             }
         }).pull().all()).containsExactly(0, 1, 2, 1, 2, 3);
         //noinspection unchecked
         assertThat(fall().inBackground()
-                         .spring(Arrays.asList(Springs.sequence(0, 2), Springs.sequence(3, 2)))
+                         .spring(Arrays.asList(Springs.sequence(0, 2), Springs.sequence(3, 5)))
                          .concat()
                          .pull()
                          .all()).containsExactly(0, 1, 2, 3, 4, 5);
         //noinspection unchecked
         assertThat(fall().inBackground(3)
-                         .spring(Arrays.asList(Springs.sequence(0, 2), Springs.sequence(3, 2)))
+                         .spring(Arrays.asList(Springs.sequence(0, 2), Springs.sequence(3, 5)))
                          .interleave()
                          .pull()
                          .all()).containsExactly(0, 3, 1, 4, 2, 5);
@@ -2156,7 +2423,7 @@ public class WaterfallTest extends TestCase {
             @Override
             public Spring<Integer> create(final int fallNumber) {
 
-                return Springs.sequence(fallNumber, 2);
+                return Springs.sequence(fallNumber, fallNumber + 2);
             }
         }).pull().all()).containsExactly(0, 1, 2);
         assertThat(fall().inBackground(2).spring(new SpringGenerator<Integer>() {
@@ -2164,7 +2431,7 @@ public class WaterfallTest extends TestCase {
             @Override
             public Spring<Integer> create(final int fallNumber) {
 
-                return Springs.sequence(fallNumber, 2);
+                return Springs.sequence(fallNumber, fallNumber + 2);
             }
         }).concat().pull().all()).containsExactly(0, 1, 2, 1, 2, 3);
 
@@ -2418,7 +2685,7 @@ public class WaterfallTest extends TestCase {
         }
 
         @Override
-        public void onUnhandled(final River<Object> upRiver, final River<Object> downRiver,
+        public void onException(final River<Object> upRiver, final River<Object> downRiver,
                 final int fallNumber, final Throwable throwable) {
 
             if (isFailed(upRiver) || mThrown) {
@@ -2472,14 +2739,14 @@ public class WaterfallTest extends TestCase {
             return mData;
         }
 
+        public List<Throwable> getException() {
+
+            return mThrows;
+        }
+
         public int getFlushes() {
 
             return mFlushCount;
-        }
-
-        public List<Throwable> getUnhandled() {
-
-            return mThrows;
         }
 
         @Override
@@ -2501,12 +2768,12 @@ public class WaterfallTest extends TestCase {
         }
 
         @Override
-        public void onUnhandled(final River<String> upRiver, final River<String> downRiver,
+        public void onException(final River<String> upRiver, final River<String> downRiver,
                 final int fallNumber, final Throwable throwable) {
 
             mThrows.add(throwable);
 
-            super.onUnhandled(upRiver, downRiver, fallNumber, throwable);
+            super.onException(upRiver, downRiver, fallNumber, throwable);
         }
     }
 }

@@ -27,15 +27,15 @@ import com.bmd.wtf.flw.River;
 public abstract class AbstractGate<IN, OUT> implements Gate<IN, OUT> {
 
     @Override
-    public void onFlush(final River<IN> upRiver, final River<OUT> downRiver, final int fallNumber) {
+    public void onException(final River<IN> upRiver, final River<OUT> downRiver,
+            final int fallNumber, final Throwable throwable) {
 
-        downRiver.flush();
+        downRiver.exception(throwable);
     }
 
     @Override
-    public void onUnhandled(final River<IN> upRiver, final River<OUT> downRiver,
-            final int fallNumber, final Throwable throwable) {
+    public void onFlush(final River<IN> upRiver, final River<OUT> downRiver, final int fallNumber) {
 
-        downRiver.forward(throwable);
+        downRiver.flush();
     }
 }

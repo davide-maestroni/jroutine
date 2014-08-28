@@ -27,25 +27,25 @@ import java.util.concurrent.TimeUnit;
  * <p/>
  * Created by davide on 6/7/14.
  */
-public class StraightCurrent implements Current {
+public class PassThroughCurrent implements Current {
 
     /**
      * Avoid instantiation outside the package.
      */
-    StraightCurrent() {
+    PassThroughCurrent() {
 
+    }
+
+    @Override
+    public void exception(final Fall<?> fall, final Throwable throwable) {
+
+        fall.exception(throwable);
     }
 
     @Override
     public <DATA> void flush(final Fall<DATA> fall, final Stream<DATA> origin) {
 
         fall.flush(origin);
-    }
-
-    @Override
-    public void forward(final Fall<?> fall, final Throwable throwable) {
-
-        fall.forward(throwable);
     }
 
     @Override

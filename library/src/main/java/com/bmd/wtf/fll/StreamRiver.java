@@ -85,22 +85,22 @@ class StreamRiver<DATA> extends AbstractRiver<DATA> {
     }
 
     @Override
-    public River<DATA> flush() {
+    public River<DATA> exception(final Throwable throwable) {
 
         for (final DataStream<DATA> stream : mStreams) {
 
-            stream.flush();
+            stream.exception(throwable);
         }
 
         return this;
     }
 
     @Override
-    public River<DATA> forward(final Throwable throwable) {
+    public River<DATA> flush() {
 
         for (final DataStream<DATA> stream : mStreams) {
 
-            stream.forward(throwable);
+            stream.flush();
         }
 
         return this;
@@ -182,14 +182,6 @@ class StreamRiver<DATA> extends AbstractRiver<DATA> {
     }
 
     @Override
-    public River<DATA> forwardStream(final int streamNumber, final Throwable throwable) {
-
-        mStreams.get(streamNumber).forward(throwable);
-
-        return this;
-    }
-
-    @Override
     public <TYPE> Dam<TYPE> on(final Class<TYPE> damClass) {
 
         return mWaterfall.on(damClass);
@@ -262,6 +254,14 @@ class StreamRiver<DATA> extends AbstractRiver<DATA> {
     public int size() {
 
         return mStreams.size();
+    }
+
+    @Override
+    public River<DATA> streamException(final int streamNumber, final Throwable throwable) {
+
+        mStreams.get(streamNumber).exception(throwable);
+
+        return this;
     }
 
     @Override

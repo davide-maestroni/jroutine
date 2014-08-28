@@ -481,43 +481,27 @@ public class Springs {
      * @return the new spring.
      * @see java.util.Random#nextBoolean()
      */
-    public static Spring<Boolean> randomBools(final Random random, final int count) {
+    public static Spring<Boolean> randomBools(final Random random, final long count) {
 
         if (random == null) {
 
             throw new IllegalArgumentException("the spring input cannot be null");
         }
 
-        if (count < 0) {
-
-            throw new IllegalArgumentException("the iteration count cannot be negative");
-        }
-
-        return new Spring<Boolean>() {
-
-            private int mCount;
+        return sequence(new SequenceIncrement<Boolean>() {
 
             @Override
-            public boolean hasDrops() {
+            public Boolean first() {
 
-                return (mCount < count);
+                return random.nextBoolean();
             }
 
             @Override
-            public Boolean nextDrop() {
+            public Boolean next(final Boolean prev) {
 
-                if (!hasDrops()) {
-
-                    throw new NoSuchElementException();
-                }
-
-                final boolean next = random.nextBoolean();
-
-                ++mCount;
-
-                return next;
+                return first();
             }
-        };
+        }, count);
     }
 
     /**
@@ -527,7 +511,7 @@ public class Springs {
      * @return the new spring.
      * @see java.util.Random#nextBoolean()
      */
-    public static Spring<Boolean> randomBools(final int count) {
+    public static Spring<Boolean> randomBools(final long count) {
 
         return randomBools(new Random(), count);
     }
@@ -540,47 +524,33 @@ public class Springs {
      * @return the new spring.
      * @see java.util.Random#nextBytes(byte[])
      */
-    public static Spring<Byte> randomBytes(final Random random, final int count) {
+    public static Spring<Byte> randomBytes(final Random random, final long count) {
 
         if (random == null) {
 
             throw new IllegalArgumentException("the spring input cannot be null");
         }
 
-        if (count < 0) {
-
-            throw new IllegalArgumentException("the iteration count cannot be negative");
-        }
-
-        return new Spring<Byte>() {
+        return sequence(new SequenceIncrement<Byte>() {
 
             private final byte[] mBytes = new byte[1];
 
-            private int mCount;
-
             @Override
-            public boolean hasDrops() {
-
-                return (mCount < count);
-            }
-
-            @Override
-            public Byte nextDrop() {
-
-                if (!hasDrops()) {
-
-                    throw new NoSuchElementException();
-                }
+            public Byte first() {
 
                 final byte[] bytes = mBytes;
 
                 random.nextBytes(bytes);
 
-                ++mCount;
-
                 return bytes[0];
             }
-        };
+
+            @Override
+            public Byte next(final Byte prev) {
+
+                return first();
+            }
+        }, count);
     }
 
     /**
@@ -590,7 +560,7 @@ public class Springs {
      * @return the new spring.
      * @see java.util.Random#nextBytes(byte[])
      */
-    public static Spring<Byte> randomBytes(final int count) {
+    public static Spring<Byte> randomBytes(final long count) {
 
         return randomBytes(new Random(), count);
     }
@@ -603,43 +573,27 @@ public class Springs {
      * @return the new spring.
      * @see java.util.Random#nextDouble()
      */
-    public static Spring<Double> randomDoubles(final Random random, final int count) {
+    public static Spring<Double> randomDoubles(final Random random, final long count) {
 
         if (random == null) {
 
             throw new IllegalArgumentException("the spring input cannot be null");
         }
 
-        if (count < 0) {
-
-            throw new IllegalArgumentException("the iteration count cannot be negative");
-        }
-
-        return new Spring<Double>() {
-
-            private int mCount;
+        return sequence(new SequenceIncrement<Double>() {
 
             @Override
-            public boolean hasDrops() {
+            public Double first() {
 
-                return (mCount < count);
+                return random.nextDouble();
             }
 
             @Override
-            public Double nextDrop() {
+            public Double next(final Double prev) {
 
-                if (!hasDrops()) {
-
-                    throw new NoSuchElementException();
-                }
-
-                final double next = random.nextDouble();
-
-                ++mCount;
-
-                return next;
+                return first();
             }
-        };
+        }, count);
     }
 
     /**
@@ -649,7 +603,7 @@ public class Springs {
      * @return the new spring.
      * @see java.util.Random#nextDouble()
      */
-    public static Spring<Double> randomDoubles(final int count) {
+    public static Spring<Double> randomDoubles(final long count) {
 
         return randomDoubles(new Random(), count);
     }
@@ -662,43 +616,27 @@ public class Springs {
      * @return the new spring.
      * @see java.util.Random#nextFloat()
      */
-    public static Spring<Float> randomFloats(final Random random, final int count) {
+    public static Spring<Float> randomFloats(final Random random, final long count) {
 
         if (random == null) {
 
             throw new IllegalArgumentException("the spring input cannot be null");
         }
 
-        if (count < 0) {
-
-            throw new IllegalArgumentException("the iteration count cannot be negative");
-        }
-
-        return new Spring<Float>() {
-
-            private int mCount;
+        return sequence(new SequenceIncrement<Float>() {
 
             @Override
-            public boolean hasDrops() {
+            public Float first() {
 
-                return (mCount < count);
+                return random.nextFloat();
             }
 
             @Override
-            public Float nextDrop() {
+            public Float next(final Float prev) {
 
-                if (!hasDrops()) {
-
-                    throw new NoSuchElementException();
-                }
-
-                final float next = random.nextFloat();
-
-                ++mCount;
-
-                return next;
+                return first();
             }
-        };
+        }, count);
     }
 
     /**
@@ -708,7 +646,7 @@ public class Springs {
      * @return the new spring.
      * @see java.util.Random#nextFloat()
      */
-    public static Spring<Float> randomFloats(final int count) {
+    public static Spring<Float> randomFloats(final long count) {
 
         return randomFloats(new Random(), count);
     }
@@ -721,43 +659,27 @@ public class Springs {
      * @return the new spring.
      * @see java.util.Random#nextGaussian()
      */
-    public static Spring<Double> randomGaussian(final Random random, final int count) {
+    public static Spring<Double> randomGaussian(final Random random, final long count) {
 
         if (random == null) {
 
             throw new IllegalArgumentException("the spring input cannot be null");
         }
 
-        if (count < 0) {
-
-            throw new IllegalArgumentException("the iteration count cannot be negative");
-        }
-
-        return new Spring<Double>() {
-
-            private int mCount;
+        return sequence(new SequenceIncrement<Double>() {
 
             @Override
-            public boolean hasDrops() {
+            public Double first() {
 
-                return (mCount < count);
+                return random.nextGaussian();
             }
 
             @Override
-            public Double nextDrop() {
+            public Double next(final Double prev) {
 
-                if (!hasDrops()) {
-
-                    throw new NoSuchElementException();
-                }
-
-                final double next = random.nextGaussian();
-
-                ++mCount;
-
-                return next;
+                return first();
             }
-        };
+        }, count);
     }
 
     /**
@@ -767,7 +689,7 @@ public class Springs {
      * @return the new spring.
      * @see java.util.Random#nextGaussian()
      */
-    public static Spring<Double> randomGaussian(final int count) {
+    public static Spring<Double> randomGaussian(final long count) {
 
         return randomGaussian(new Random(), count);
     }
@@ -779,43 +701,27 @@ public class Springs {
      * @param count  the iteration count.
      * @return the new spring.
      */
-    public static Spring<Integer> randomInts(final Random random, final int count) {
+    public static Spring<Integer> randomInts(final Random random, final long count) {
 
         if (random == null) {
 
             throw new IllegalArgumentException("the spring input cannot be null");
         }
 
-        if (count < 0) {
-
-            throw new IllegalArgumentException("the iteration count cannot be negative");
-        }
-
-        return new Spring<Integer>() {
-
-            private int mCount;
+        return sequence(new SequenceIncrement<Integer>() {
 
             @Override
-            public boolean hasDrops() {
+            public Integer first() {
 
-                return (mCount < count);
+                return random.nextInt();
             }
 
             @Override
-            public Integer nextDrop() {
+            public Integer next(final Integer prev) {
 
-                if (!hasDrops()) {
-
-                    throw new NoSuchElementException();
-                }
-
-                final int next = random.nextInt();
-
-                ++mCount;
-
-                return next;
+                return first();
             }
-        };
+        }, count);
     }
 
     /**
@@ -824,7 +730,7 @@ public class Springs {
      * @param count the iteration count.
      * @return the new spring.
      */
-    public static Spring<Integer> randomInts(final int count) {
+    public static Spring<Integer> randomInts(final long count) {
 
         return randomInts(new Random(), count);
     }
@@ -836,43 +742,27 @@ public class Springs {
      * @param count  the iteration count.
      * @return the new spring.
      */
-    public static Spring<Long> randomLongs(final Random random, final int count) {
+    public static Spring<Long> randomLongs(final Random random, final long count) {
 
         if (random == null) {
 
             throw new IllegalArgumentException("the spring input cannot be null");
         }
 
-        if (count < 0) {
-
-            throw new IllegalArgumentException("the iteration count cannot be negative");
-        }
-
-        return new Spring<Long>() {
-
-            private int mCount;
+        return sequence(new SequenceIncrement<Long>() {
 
             @Override
-            public boolean hasDrops() {
+            public Long first() {
 
-                return (mCount < count);
+                return random.nextLong();
             }
 
             @Override
-            public Long nextDrop() {
+            public Long next(final Long prev) {
 
-                if (!hasDrops()) {
-
-                    throw new NoSuchElementException();
-                }
-
-                final long next = random.nextLong();
-
-                ++mCount;
-
-                return next;
+                return first();
             }
-        };
+        }, count);
     }
 
     /**
@@ -881,459 +771,365 @@ public class Springs {
      * @param count the iteration count.
      * @return the new spring.
      */
-    public static Spring<Long> randomLongs(final int count) {
+    public static Spring<Long> randomLongs(final long count) {
 
         return randomLongs(new Random(), count);
     }
 
     /**
-     * Creates a spring generating a sequence of bytes starting from the specified first value and
-     * increasing or decreasing it by the specified number of times.
+     * Creates a spring generating a sequence of data based on the specified sequence increment.
+     * <p/>
+     * Note that the element count cannot be negative.
      *
-     * @param first the first value.
-     * @param count the iteration count: increasing if positive and decreasing if negative.
+     * @param inc    the sequence increment.
+     * @param count  the sequence element count.
+     * @param <DATA> the data type.
      * @return the new spring.
      */
-    // TODO: inc
-    public static Spring<Byte> sequence(final byte first, final long count) {
+    public static <DATA> Spring<DATA> sequence(final SequenceIncrement<DATA> inc,
+            final long count) {
 
-        if (count < 0) {
+        return new SequenceSpring<DATA>(inc, count);
+    }
 
-            if ((Byte.MIN_VALUE - count) > first) {
+    /**
+     * Creates a spring generating a sequence of bytes starting from the specified first value and
+     * ending with the last one.
+     * <p/>
+     * Note that the last value can be less than the first one. In such case the sequence will be
+     * in decreasing order.
+     *
+     * @param first the first value.
+     * @param last  the last value.
+     * @return the new spring.
+     */
+    public static Spring<Byte> sequence(final byte first, final byte last) {
 
-                throw new IllegalArgumentException();
-            }
+        if (first > last) {
 
-            return new Spring<Byte>() {
-
-                private boolean mIsLast = false;
-
-                private byte mNext = first;
-
-                private final byte mLast = (byte) (first + count);
+            return sequence(new SequenceIncrement<Byte>() {
 
                 @Override
-                public boolean hasDrops() {
+                public Byte first() {
 
-                    if (mIsLast) {
-
-                        return (mNext == mLast);
-                    }
-
-                    mIsLast = (mNext == mLast);
-
-                    return true;
+                    return first;
                 }
 
                 @Override
-                public Byte nextDrop() {
+                public Byte next(final Byte prev) {
 
-                    if (!hasDrops()) {
-
-                        throw new NoSuchElementException();
-                    }
-
-                    return mNext--;
+                    return (byte) (prev - 1);
                 }
-            };
+            }, (long) first - (long) last + 1);
         }
 
-        if ((count != 0) && ((Byte.MAX_VALUE - count) < first)) {
-
-            throw new IllegalArgumentException();
-        }
-
-        return new Spring<Byte>() {
-
-            private boolean mIsLast = false;
-
-            private byte mNext = first;
-
-            private final byte mLast = (byte) (first + count);
+        return sequence(new SequenceIncrement<Byte>() {
 
             @Override
-            public boolean hasDrops() {
+            public Byte first() {
 
-                if (mIsLast) {
-
-                    return (mNext == mLast);
-                }
-
-                mIsLast = (mNext == mLast);
-
-                return true;
+                return first;
             }
 
             @Override
-            public Byte nextDrop() {
+            public Byte next(final Byte prev) {
 
-                if (!hasDrops()) {
-
-                    throw new NoSuchElementException();
-                }
-
-                return mNext++;
+                return (byte) (prev + 1);
             }
-        };
+        }, (long) last - (long) first + 1);
     }
 
     /**
      * Creates a spring generating a sequence of chars starting from the specified first value and
-     * increasing or decreasing it by the specified number of times.
+     * ending with the last one.
+     * <p/>
+     * Note that the last value can be less than the first one. In such case the sequence will be
+     * in decreasing order.
      *
      * @param first the first value.
-     * @param count the iteration count: increasing if positive and decreasing if negative.
+     * @param last  the last value.
      * @return the new spring.
      */
-    public static Spring<Character> sequence(final char first, final long count) {
+    public static Spring<Character> sequence(final char first, final char last) {
 
-        if (count < 0) {
+        if (first > last) {
 
-            if ((Character.MIN_VALUE - count) > first) {
-
-                throw new IllegalArgumentException();
-            }
-
-            return new Spring<Character>() {
-
-                private boolean mIsLast = false;
-
-                private char mNext = first;
-
-                private final char mLast = (char) (first + count);
+            return sequence(new SequenceIncrement<Character>() {
 
                 @Override
-                public boolean hasDrops() {
+                public Character first() {
 
-                    if (mIsLast) {
-
-                        return (mNext == mLast);
-                    }
-
-                    mIsLast = (mNext == mLast);
-
-                    return true;
+                    return first;
                 }
 
                 @Override
-                public Character nextDrop() {
+                public Character next(final Character prev) {
 
-                    if (!hasDrops()) {
-
-                        throw new NoSuchElementException();
-                    }
-
-                    return mNext--;
+                    return (char) (prev - 1);
                 }
-            };
+            }, (long) first - (long) last + 1);
         }
 
-        if ((count != 0) && ((Character.MAX_VALUE - count) < first)) {
-
-            throw new IllegalArgumentException();
-        }
-
-        return new Spring<Character>() {
-
-            private boolean mIsLast = false;
-
-            private char mNext = first;
-
-            private final char mLast = (char) (first + count);
+        return sequence(new SequenceIncrement<Character>() {
 
             @Override
-            public boolean hasDrops() {
+            public Character first() {
 
-                if (mIsLast) {
-
-                    return (mNext == mLast);
-                }
-
-                mIsLast = (mNext == mLast);
-
-                return true;
+                return first;
             }
 
             @Override
-            public Character nextDrop() {
+            public Character next(final Character prev) {
 
-                if (!hasDrops()) {
-
-                    throw new NoSuchElementException();
-                }
-
-                return mNext++;
+                return (char) (prev + 1);
             }
-        };
+        }, (long) last - (long) first + 1);
     }
 
     /**
      * Creates a spring generating a sequence of ints starting from the specified first value and
-     * increasing or decreasing it by the specified number of times.
+     * ending with the last one.
+     * <p/>
+     * Note that the last value can be less than the first one. In such case the sequence will be
+     * in decreasing order.
      *
      * @param first the first value.
-     * @param count the iteration count: increasing if positive and decreasing if negative.
+     * @param last  the last value.
      * @return the new spring.
      */
-    public static Spring<Integer> sequence(final int first, final long count) {
+    public static Spring<Integer> sequence(final int first, final int last) {
 
-        if (count < 0) {
+        if (first > last) {
 
-            if ((Integer.MIN_VALUE - count) > first) {
-
-                throw new IllegalArgumentException();
-            }
-
-            return new Spring<Integer>() {
-
-                private boolean mIsLast = false;
-
-                private int mNext = first;
-
-                private final int mLast = (int) (first + count);
+            return sequence(new SequenceIncrement<Integer>() {
 
                 @Override
-                public boolean hasDrops() {
+                public Integer first() {
 
-                    if (mIsLast) {
-
-                        return (mNext == mLast);
-                    }
-
-                    mIsLast = (mNext == mLast);
-
-                    return true;
+                    return first;
                 }
 
                 @Override
-                public Integer nextDrop() {
+                public Integer next(final Integer prev) {
 
-                    if (!hasDrops()) {
-
-                        throw new NoSuchElementException();
-                    }
-
-                    return mNext--;
+                    return (prev - 1);
                 }
-            };
+            }, (long) first - (long) last + 1);
         }
 
-        if ((count != 0) && ((Integer.MAX_VALUE - count) < first)) {
-
-            throw new IllegalArgumentException();
-        }
-
-        return new Spring<Integer>() {
-
-            private boolean mIsLast = false;
-
-            private int mNext = first;
-
-            private final int mLast = (int) (first + count);
+        return sequence(new SequenceIncrement<Integer>() {
 
             @Override
-            public boolean hasDrops() {
+            public Integer first() {
 
-                if (mIsLast) {
-
-                    return (mNext == mLast);
-                }
-
-                mIsLast = (mNext == mLast);
-
-                return true;
+                return first;
             }
 
             @Override
-            public Integer nextDrop() {
+            public Integer next(final Integer prev) {
 
-                if (!hasDrops()) {
-
-                    throw new NoSuchElementException();
-                }
-
-                return mNext++;
+                return (prev + 1);
             }
-        };
+        }, (long) last - (long) first + 1);
     }
 
     /**
      * Creates a spring generating a sequence of longs starting from the specified first value and
-     * increasing or decreasing it by the specified number of times.
+     * ending with the last one.
+     * <p/>
+     * Note that the last value can be less than the first one. In such case the sequence will be
+     * in decreasing order.
      *
      * @param first the first value.
-     * @param count the iteration count: increasing if positive and decreasing if negative.
+     * @param last  the last value.
      * @return the new spring.
      */
-    public static Spring<Long> sequence(final long first, final long count) {
+    public static Spring<Long> sequence(final long first, final long last) {
 
-        if (count < 0) {
+        if (first > 0) {
 
-            if ((Long.MIN_VALUE - count) > first) {
+            if ((last <= 1) && (last < (first - Long.MAX_VALUE + 1))) {
 
-                throw new IllegalArgumentException();
+                throw new IllegalArgumentException("the count is out of range");
             }
 
-            return new Spring<Long>() {
+        } else {
 
-                private boolean mIsLast = false;
+            if ((last >= -2) && (first < (last - Long.MAX_VALUE + 1))) {
 
-                private long mNext = first;
+                throw new IllegalArgumentException("the count is out of range");
+            }
+        }
 
-                private final long mLast = (long) (first + count);
+        if (first > last) {
+
+            return sequence(new SequenceIncrement<Long>() {
 
                 @Override
-                public boolean hasDrops() {
+                public Long first() {
 
-                    if (mIsLast) {
-
-                        return (mNext == mLast);
-                    }
-
-                    mIsLast = (mNext == mLast);
-
-                    return true;
+                    return first;
                 }
 
                 @Override
-                public Long nextDrop() {
+                public Long next(final Long prev) {
 
-                    if (!hasDrops()) {
-
-                        throw new NoSuchElementException();
-                    }
-
-                    return mNext--;
+                    return (prev - 1);
                 }
-            };
+            }, first - last + 1);
         }
 
-        if ((count != 0) && ((Long.MAX_VALUE - count) < first)) {
-
-            throw new IllegalArgumentException();
-        }
-
-        return new Spring<Long>() {
-
-            private boolean mIsLast = false;
-
-            private long mNext = first;
-
-            private final long mLast = (long) (first + count);
+        return sequence(new SequenceIncrement<Long>() {
 
             @Override
-            public boolean hasDrops() {
+            public Long first() {
 
-                if (mIsLast) {
-
-                    return (mNext == mLast);
-                }
-
-                mIsLast = (mNext == mLast);
-
-                return true;
+                return first;
             }
 
             @Override
-            public Long nextDrop() {
+            public Long next(final Long prev) {
 
-                if (!hasDrops()) {
-
-                    throw new NoSuchElementException();
-                }
-
-                return mNext++;
+                return (prev + 1);
             }
-        };
+        }, last - first + 1);
     }
 
     /**
      * Creates a spring generating a sequence of shorts starting from the specified first value and
-     * increasing or decreasing it by the specified number of times.
+     * ending with the last one.
+     * <p/>
+     * Note that the last value can be less than the first one. In such case the sequence will be
+     * in decreasing order.
      *
      * @param first the first value.
-     * @param count the iteration count: increasing if positive and decreasing if negative.
+     * @param last  the last value.
      * @return the new spring.
      */
-    public static Spring<Short> sequence(final short first, final long count) {
+    public static Spring<Short> sequence(final short first, final short last) {
 
-        if (count < 0) {
+        if (first > last) {
 
-            if ((Short.MIN_VALUE - count) > first) {
-
-                throw new IllegalArgumentException();
-            }
-
-            return new Spring<Short>() {
-
-                private boolean mIsLast = false;
-
-                private short mNext = first;
-
-                private final short mLast = (short) (first + count);
+            return sequence(new SequenceIncrement<Short>() {
 
                 @Override
-                public boolean hasDrops() {
+                public Short first() {
 
-                    if (mIsLast) {
-
-                        return (mNext == mLast);
-                    }
-
-                    mIsLast = (mNext == mLast);
-
-                    return true;
+                    return first;
                 }
 
                 @Override
-                public Short nextDrop() {
+                public Short next(final Short prev) {
 
-                    if (!hasDrops()) {
-
-                        throw new NoSuchElementException();
-                    }
-
-                    return mNext--;
+                    return (short) (prev - 1);
                 }
-            };
+            }, (long) first - (long) last + 1);
         }
 
-        if ((count != 0) && ((Short.MAX_VALUE - count) < first)) {
-
-            throw new IllegalArgumentException();
-        }
-
-        return new Spring<Short>() {
-
-            private boolean mIsLast = false;
-
-            private short mNext = first;
-
-            private final short mLast = (short) (first + count);
+        return sequence(new SequenceIncrement<Short>() {
 
             @Override
-            public boolean hasDrops() {
+            public Short first() {
 
-                if (mIsLast) {
-
-                    return (mNext == mLast);
-                }
-
-                mIsLast = (mNext == mLast);
-
-                return true;
+                return first;
             }
 
             @Override
-            public Short nextDrop() {
+            public Short next(final Short prev) {
 
-                if (!hasDrops()) {
-
-                    throw new NoSuchElementException();
-                }
-
-                return mNext++;
+                return (short) (prev + 1);
             }
-        };
+        }, (long) last - (long) first + 1);
+    }
+
+    /**
+     * Interface defining the increment of a sequence.
+     *
+     * @param <E> the element type.
+     */
+    public interface SequenceIncrement<E> {
+
+        /**
+         * Returns the first element in the sequence.
+         *
+         * @return the first element.
+         */
+        public E first();
+
+        /**
+         * Returns the next element in the sequence.
+         *
+         * @param prev the previous element.
+         * @return the next element.
+         */
+        public E next(E prev);
+    }
+
+    /**
+     * Spring implementation producing data out of the elements of a sequence.
+     *
+     * @param <DATA> the data type.
+     */
+    private static class SequenceSpring<DATA> implements Spring<DATA> {
+
+        private final SequenceIncrement<DATA> mInc;
+
+        private long mCount;
+
+        private DATA mDrop;
+
+        private boolean mFirst = true;
+
+        /**
+         * Constructor.
+         *
+         * @param inc   the sequence increment.
+         * @param count the sequence element count.
+         */
+        public SequenceSpring(final SequenceIncrement<DATA> inc, final long count) {
+
+            if (inc == null) {
+
+                throw new IllegalArgumentException("the sequence increment cannot be null");
+            }
+
+            if (count < 0) {
+
+                throw new IllegalArgumentException("the iteration count cannot be negative");
+            }
+
+            mInc = inc;
+            mCount = count;
+        }
+
+        @Override
+        public boolean hasDrops() {
+
+            return (mCount > 0);
+        }
+
+        @Override
+        public DATA nextDrop() {
+
+            if (!hasDrops()) {
+
+                throw new NoSuchElementException();
+            }
+
+            if (mFirst) {
+
+                mFirst = false;
+
+                mDrop = mInc.first();
+
+            } else {
+
+                mDrop = mInc.next(mDrop);
+            }
+
+            --mCount;
+
+            return mDrop;
+        }
     }
 }

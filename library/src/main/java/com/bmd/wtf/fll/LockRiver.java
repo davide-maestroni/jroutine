@@ -77,6 +77,21 @@ class LockRiver<DATA> implements River<DATA> {
     }
 
     @Override
+    public River<DATA> exception(final Throwable throwable) {
+
+        if (isOpen()) {
+
+            mDataLock.forward(mRiver, throwable);
+
+        } else {
+
+            mRiver.exception(throwable);
+        }
+
+        return this;
+    }
+
+    @Override
     public River<DATA> flush() {
 
         if (isOpen()) {
@@ -201,21 +216,6 @@ class LockRiver<DATA> implements River<DATA> {
 
                 mRiver.flushAfter(delay, timeUnit, drops);
             }
-        }
-
-        return this;
-    }
-
-    @Override
-    public River<DATA> forward(final Throwable throwable) {
-
-        if (isOpen()) {
-
-            mDataLock.forward(mRiver, throwable);
-
-        } else {
-
-            mRiver.forward(throwable);
         }
 
         return this;
@@ -517,21 +517,6 @@ class LockRiver<DATA> implements River<DATA> {
     }
 
     @Override
-    public River<DATA> forwardStream(final int streamNumber, final Throwable throwable) {
-
-        if (isOpen()) {
-
-            mDataLock.forwardStream(mRiver, streamNumber, throwable);
-
-        } else {
-
-            mRiver.forwardStream(streamNumber, throwable);
-        }
-
-        return this;
-    }
-
-    @Override
     public <TYPE> Dam<TYPE> on(final Class<TYPE> damClass) {
 
         return mRiver.on(damClass);
@@ -694,6 +679,21 @@ class LockRiver<DATA> implements River<DATA> {
     public int size() {
 
         return mRiver.size();
+    }
+
+    @Override
+    public River<DATA> streamException(final int streamNumber, final Throwable throwable) {
+
+        if (isOpen()) {
+
+            mDataLock.forwardStream(mRiver, streamNumber, throwable);
+
+        } else {
+
+            mRiver.streamException(streamNumber, throwable);
+        }
+
+        return this;
     }
 
     /**

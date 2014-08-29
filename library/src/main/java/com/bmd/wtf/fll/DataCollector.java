@@ -99,7 +99,7 @@ class DataCollector<DATA> implements Collector<DATA> {
     @Override
     public Collector<DATA> allInto(final List<DATA> data) {
 
-        mDataBridge.when(IS_COMPLETE).perform(mCollectorGate.pullAllAction(), data);
+        mDataBridge.when(IS_COMPLETE).visit(mCollectorGate.pullAllVisitor(), data);
 
         return this;
     }
@@ -123,7 +123,7 @@ class DataCollector<DATA> implements Collector<DATA> {
     @Override
     public DATA next() {
 
-        return mDataBridge.when(HAS_DATA).perform(mCollectorGate.pullAction());
+        return mDataBridge.when(HAS_DATA).visit(mCollectorGate.pullVisitor());
     }
 
     @Override
@@ -145,7 +145,7 @@ class DataCollector<DATA> implements Collector<DATA> {
     @Override
     public boolean hasNext() {
 
-        return !mDataBridge.when(HAS_DATA).perform(mCollectorGate.isEmptyAction());
+        return !mDataBridge.when(HAS_DATA).visit(mCollectorGate.isEmptyVisitor());
     }
 
     @Override

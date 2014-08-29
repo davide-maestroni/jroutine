@@ -13,7 +13,7 @@
  */
 package com.bmd.wtf.fll;
 
-import com.bmd.wtf.flw.Bridge.Action;
+import com.bmd.wtf.flw.Bridge.Visitor;
 import com.bmd.wtf.flw.FloatingException;
 import com.bmd.wtf.flw.River;
 import com.bmd.wtf.gts.OpenGate;
@@ -26,15 +26,15 @@ import java.util.List;
  * <p/>
  * Created by davide on 6/13/14.
  *
- * @param <DATA> The data type.
+ * @param <DATA> the data type.
  */
 class CollectorGate<DATA> extends OpenGate<DATA> {
 
-    private static final Action<Boolean, CollectorGate<?>> ACTION_EMPTY =
-            new Action<Boolean, CollectorGate<?>>() {
+    private static final Visitor<Boolean, CollectorGate<?>> EMPTY_VISITOR =
+            new Visitor<Boolean, CollectorGate<?>>() {
 
                 @Override
-                public Boolean doOn(final CollectorGate<?> collector, final Object... args) {
+                public Boolean doInspect(final CollectorGate<?> collector, final Object... args) {
 
                     return collector.isEmpty();
                 }
@@ -44,11 +44,11 @@ class CollectorGate<DATA> extends OpenGate<DATA> {
 
     private Throwable mException;
 
-    private final Action<DATA, CollectorGate<DATA>> ACTION_PULL =
-            new Action<DATA, CollectorGate<DATA>>() {
+    private final Visitor<DATA, CollectorGate<DATA>> PULL_VISITOR =
+            new Visitor<DATA, CollectorGate<DATA>>() {
 
                 @Override
-                public DATA doOn(final CollectorGate<DATA> collector, final Object... args) {
+                public DATA doInspect(final CollectorGate<DATA> collector, final Object... args) {
 
                     final Throwable throwable = collector.mException;
 
@@ -61,11 +61,11 @@ class CollectorGate<DATA> extends OpenGate<DATA> {
                 }
             };
 
-    private static final Action<Void, CollectorGate<?>> ACTION_PULL_ALL =
-            new Action<Void, CollectorGate<?>>() {
+    private static final Visitor<Void, CollectorGate<?>> PULL_ALL_VISITOR =
+            new Visitor<Void, CollectorGate<?>>() {
 
                 @Override
-                public Void doOn(final CollectorGate<?> collector, final Object... args) {
+                public Void doInspect(final CollectorGate<?> collector, final Object... args) {
 
                     final Throwable throwable = collector.mException;
 
@@ -90,7 +90,7 @@ class CollectorGate<DATA> extends OpenGate<DATA> {
     /**
      * Checks if the collection is complete, that is, if data have been flushed.
      *
-     * @return Whether collection is complete.
+     * @return whether collection is complete.
      */
     public boolean isComplete() {
 
@@ -98,13 +98,13 @@ class CollectorGate<DATA> extends OpenGate<DATA> {
     }
 
     /**
-     * Returns an action to check if the internal data collection is empty.
+     * Returns a visitor checking if the internal data collection is empty.
      *
-     * @return The action.
+     * @return the visitor.
      */
-    public Action<Boolean, CollectorGate<?>> isEmptyAction() {
+    public Visitor<Boolean, CollectorGate<?>> isEmptyVisitor() {
 
-        return ACTION_EMPTY;
+        return EMPTY_VISITOR;
     }
 
     @Override
@@ -136,29 +136,29 @@ class CollectorGate<DATA> extends OpenGate<DATA> {
     }
 
     /**
-     * Returns an action to pull the next element from the internal collection.
+     * Returns a visitor pulling all the elements of the internal collection.
      *
-     * @return The action.
+     * @return the visitor.
      */
-    public Action<DATA, CollectorGate<DATA>> pullAction() {
+    public Visitor<Void, CollectorGate<?>> pullAllVisitor() {
 
-        return ACTION_PULL;
+        return PULL_ALL_VISITOR;
     }
 
     /**
-     * Returns an action to pull all the elements of the internal collection.
+     * Returns a visitor pulling the next element from the internal collection.
      *
-     * @return The action.
+     * @return the visitor.
      */
-    public Action<Void, CollectorGate<?>> pullAllAction() {
+    public Visitor<DATA, CollectorGate<DATA>> pullVisitor() {
 
-        return ACTION_PULL_ALL;
+        return PULL_VISITOR;
     }
 
     /**
      * Returns the size of the internal collection.
      *
-     * @return The size.
+     * @return the size.
      */
     public int size() {
 

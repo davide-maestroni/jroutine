@@ -128,7 +128,7 @@ class DataBridge<TYPE> implements Bridge<TYPE> {
     }
 
     @Override
-    public <RESULT> RESULT perform(final Action<RESULT, ? super TYPE> action,
+    public <RESULT> RESULT visit(final Visitor<RESULT, ? super TYPE> visitor,
             final Object... args) {
 
         final ReentrantLock lock = mLock;
@@ -141,7 +141,7 @@ class DataBridge<TYPE> implements Bridge<TYPE> {
             //noinspection unchecked
             waitForCondition(gate);
 
-            return action.doOn(gate, args);
+            return visitor.doInspect(gate, args);
 
         } finally {
 

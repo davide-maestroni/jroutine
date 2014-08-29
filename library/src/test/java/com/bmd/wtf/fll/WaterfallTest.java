@@ -17,8 +17,8 @@ import com.bmd.wtf.crr.Current;
 import com.bmd.wtf.crr.CurrentGenerator;
 import com.bmd.wtf.crr.Currents;
 import com.bmd.wtf.drp.Drops;
-import com.bmd.wtf.flw.Bridge.Action;
 import com.bmd.wtf.flw.Bridge.ConditionEvaluator;
+import com.bmd.wtf.flw.Bridge.Visitor;
 import com.bmd.wtf.flw.Collector;
 import com.bmd.wtf.flw.Pump;
 import com.bmd.wtf.flw.River;
@@ -166,10 +166,10 @@ public class WaterfallTest extends TestCase {
 
         assertThat(fall.bridge(BridgeGate.class)
                        .immediately()
-                       .perform(new Action<Integer, BridgeGate>() {
+                       .visit(new Visitor<Integer, BridgeGate>() {
 
                            @Override
-                           public Integer doOn(final BridgeGate gate, final Object... args) {
+                           public Integer doInspect(final BridgeGate gate, final Object... args) {
 
                                return gate.getId();
                            }
@@ -177,19 +177,19 @@ public class WaterfallTest extends TestCase {
 
         assertThat(fall.bridge(Classification.ofType(BridgeGate2.class))
                        .immediately()
-                       .perform(new Action<Integer, BridgeGate>() {
+                       .visit(new Visitor<Integer, BridgeGate>() {
 
                            @Override
-                           public Integer doOn(final BridgeGate gate, final Object... args) {
+                           public Integer doInspect(final BridgeGate gate, final Object... args) {
 
                                return gate.getId();
                            }
                        })).isEqualTo(1);
 
-        assertThat(fall.bridge().immediately().perform(new Action<Integer, Gate<Object, Object>>() {
+        assertThat(fall.bridge().immediately().visit(new Visitor<Integer, Gate<Object, Object>>() {
 
             @Override
-            public Integer doOn(final Gate<Object, Object> gate, final Object... args) {
+            public Integer doInspect(final Gate<Object, Object> gate, final Object... args) {
 
                 return ((BridgeGate) gate).getId();
             }
@@ -219,10 +219,10 @@ public class WaterfallTest extends TestCase {
                          .chain(new BridgeGate2(3))
                          .bridge(BridgeGate2.class)
                          .immediately()
-                         .perform(new Action<Integer, BridgeGate>() {
+                         .visit(new Visitor<Integer, BridgeGate>() {
 
                              @Override
-                             public Integer doOn(final BridgeGate gate, final Object... args) {
+                             public Integer doInspect(final BridgeGate gate, final Object... args) {
 
                                  return gate.getId();
                              }
@@ -246,39 +246,40 @@ public class WaterfallTest extends TestCase {
 
         assertThat(fall2.bridge(BridgeGate2.class)
                         .immediately()
-                        .perform(new Action<Integer, BridgeGate>() {
+                        .visit(new Visitor<Integer, BridgeGate>() {
 
                             @Override
-                            public Integer doOn(final BridgeGate gate, final Object... args) {
+                            public Integer doInspect(final BridgeGate gate, final Object... args) {
 
                                 return gate.getId();
                             }
                         })).isEqualTo(0);
         assertThat(fall2.bridge(0, BridgeGate2.class)
                         .immediately()
-                        .perform(new Action<Integer, BridgeGate>() {
+                        .visit(new Visitor<Integer, BridgeGate>() {
 
                             @Override
-                            public Integer doOn(final BridgeGate gate, final Object... args) {
+                            public Integer doInspect(final BridgeGate gate, final Object... args) {
 
                                 return gate.getId();
                             }
                         })).isEqualTo(0);
         assertThat(fall2.bridge(1, Classification.ofType(BridgeGate2.class))
                         .immediately()
-                        .perform(new Action<Integer, BridgeGate>() {
+                        .visit(new Visitor<Integer, BridgeGate>() {
 
                             @Override
-                            public Integer doOn(final BridgeGate gate, final Object... args) {
+                            public Integer doInspect(final BridgeGate gate, final Object... args) {
 
                                 return gate.getId();
                             }
                         })).isEqualTo(1);
         assertThat(
-                fall2.bridge(2).immediately().perform(new Action<Integer, Gate<Object, Object>>() {
+                fall2.bridge(2).immediately().visit(new Visitor<Integer, Gate<Object, Object>>() {
 
                     @Override
-                    public Integer doOn(final Gate<Object, Object> gate, final Object... args) {
+                    public Integer doInspect(final Gate<Object, Object> gate,
+                            final Object... args) {
 
                         return ((BridgeGate) gate).getId();
                     }
@@ -1794,10 +1795,10 @@ public class WaterfallTest extends TestCase {
 
                     fall1.bridge(LatchGate.class)
                          .immediately()
-                         .perform(new Action<Void, LatchGate>() {
+                         .visit(new Visitor<Void, LatchGate>() {
 
                              @Override
-                             public Void doOn(final LatchGate gate, final Object... args) {
+                             public Void doInspect(final LatchGate gate, final Object... args) {
 
                                  gate.setFailed();
 
@@ -1821,10 +1822,10 @@ public class WaterfallTest extends TestCase {
                      return (gate.getCount() == 3);
                  }
              })
-             .perform(new Action<Void, LatchGate>() {
+             .visit(new Visitor<Void, LatchGate>() {
 
                  @Override
-                 public Void doOn(final LatchGate gate, final Object... args) {
+                 public Void doInspect(final LatchGate gate, final Object... args) {
 
                      if (gate.isFailed()) {
 
@@ -1849,10 +1850,11 @@ public class WaterfallTest extends TestCase {
 
                          fall2.bridge(LatchGate.class)
                               .immediately()
-                              .perform(new Action<Void, LatchGate>() {
+                              .visit(new Visitor<Void, LatchGate>() {
 
                                   @Override
-                                  public Void doOn(final LatchGate gate, final Object... args) {
+                                  public Void doInspect(final LatchGate gate,
+                                          final Object... args) {
 
                                       gate.setFailed();
 
@@ -1876,10 +1878,10 @@ public class WaterfallTest extends TestCase {
                      return (gate.getCount() == 3);
                  }
              })
-             .perform(new Action<Void, LatchGate>() {
+             .visit(new Visitor<Void, LatchGate>() {
 
                  @Override
-                 public Void doOn(final LatchGate gate, final Object... args) {
+                 public Void doInspect(final LatchGate gate, final Object... args) {
 
                      if (gate.isFailed()) {
 
@@ -2533,10 +2535,10 @@ public class WaterfallTest extends TestCase {
 
         private void incCount(final Waterfall<?, ?, ?> waterfall) {
 
-            waterfall.bridge(LatchGate.class).immediately().perform(new Action<Void, LatchGate>() {
+            waterfall.bridge(LatchGate.class).immediately().visit(new Visitor<Void, LatchGate>() {
 
                 @Override
-                public Void doOn(final LatchGate gate, final Object... args) {
+                public Void doInspect(final LatchGate gate, final Object... args) {
 
                     gate.incCount();
 
@@ -2549,10 +2551,11 @@ public class WaterfallTest extends TestCase {
 
             return waterfall.bridge(LatchGate.class)
                             .immediately()
-                            .perform(new Action<Boolean, LatchGate>() {
+                            .visit(new Visitor<Boolean, LatchGate>() {
 
                                 @Override
-                                public Boolean doOn(final LatchGate gate, final Object... args) {
+                                public Boolean doInspect(final LatchGate gate,
+                                        final Object... args) {
 
                                     return gate.isFailed();
                                 }
@@ -2561,10 +2564,10 @@ public class WaterfallTest extends TestCase {
 
         private void setFailed(final Waterfall<?, ?, ?> waterfall) {
 
-            waterfall.bridge(LatchGate.class).immediately().perform(new Action<Void, LatchGate>() {
+            waterfall.bridge(LatchGate.class).immediately().visit(new Visitor<Void, LatchGate>() {
 
                 @Override
-                public Void doOn(final LatchGate gate, final Object... args) {
+                public Void doInspect(final LatchGate gate, final Object... args) {
 
                     gate.setFailed();
 

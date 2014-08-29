@@ -139,10 +139,10 @@ class DefaultRapidBridge<TYPE> implements RapidBridge<TYPE> {
     }
 
     @Override
-    public <RESULT> RESULT perform(final Action<RESULT, ? super TYPE> action,
+    public <RESULT> RESULT visit(final Visitor<RESULT, ? super TYPE> visitor,
             final Object... args) {
 
-        return buildBridge(mBridge.getClassification().getRawType()).perform(action, args);
+        return buildBridge(mBridge.getClassification().getRawType()).visit(visitor, args);
     }
 
     private <NTYPE> Bridge<NTYPE> buildBridge(

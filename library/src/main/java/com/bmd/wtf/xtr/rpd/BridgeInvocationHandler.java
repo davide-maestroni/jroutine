@@ -14,7 +14,7 @@
 package com.bmd.wtf.xtr.rpd;
 
 import com.bmd.wtf.flw.Bridge;
-import com.bmd.wtf.flw.Bridge.Action;
+import com.bmd.wtf.flw.Bridge.Visitor;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -27,7 +27,7 @@ import java.lang.reflect.Method;
  *
  * @param <TYPE> the gate type.
  */
-class BridgeInvocationHandler<TYPE> implements InvocationHandler, Action<Object, TYPE> {
+class BridgeInvocationHandler<TYPE> implements InvocationHandler, Visitor<Object, TYPE> {
 
     private final Bridge<TYPE> mBridge;
 
@@ -42,7 +42,7 @@ class BridgeInvocationHandler<TYPE> implements InvocationHandler, Action<Object,
     }
 
     @Override
-    public Object doOn(final TYPE gate, final Object... args) {
+    public Object doInspect(final TYPE gate, final Object... args) {
 
         try {
 
@@ -62,6 +62,6 @@ class BridgeInvocationHandler<TYPE> implements InvocationHandler, Action<Object,
     public Object invoke(final Object proxy, final Method method, final Object[] args) throws
             Throwable {
 
-        return mBridge.perform(this, method, args);
+        return mBridge.visit(this, method, args);
     }
 }

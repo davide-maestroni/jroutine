@@ -15,8 +15,8 @@ package com.bmd.wtf.xtr.rpd;
 
 import com.bmd.wtf.fll.Classification;
 import com.bmd.wtf.fll.Waterfall;
-import com.bmd.wtf.flw.Bridge.Action;
 import com.bmd.wtf.flw.Bridge.ConditionEvaluator;
+import com.bmd.wtf.flw.Bridge.Visitor;
 import com.bmd.wtf.gts.OpenGate;
 import com.bmd.wtf.xtr.rpd.RapidAnnotations.GateCondition;
 
@@ -101,10 +101,10 @@ public class RapidBridgeTest extends TestCase {
                 fall().inBackground().start(new BridgeGate4()).bridge(BridgeGate2.class))
                         .eventually()
                         .whenSatisfies(44)
-                        .perform(new Action<Integer, BridgeGate2>() {
+                        .visit(new Visitor<Integer, BridgeGate2>() {
 
                             @Override
-                            public Integer doOn(final BridgeGate2 gate, final Object... args) {
+                            public Integer doInspect(final BridgeGate2 gate, final Object... args) {
 
                                 return gate.getId();
                             }

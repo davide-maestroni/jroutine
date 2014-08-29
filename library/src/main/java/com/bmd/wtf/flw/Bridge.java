@@ -69,16 +69,16 @@ public interface Bridge<TYPE> {
     public Bridge<TYPE> immediately();
 
     /**
-     * Performs the specified action by passing the variadic arguments as parameters.
+     * Visits this bridge with the specified visitor by passing the variadic arguments as
+     * parameters.
      *
-     * @param action   the action to perform on the gate backing this bridge.
-     * @param args     the action arguments.
+     * @param visitor  the visitor.
+     * @param args     the visitor arguments.
      * @param <RESULT> the result type.
-     * @return the action result.
+     * @return the visitor result.
      * @throws DelayInterruptedException if the calling thread is interrupted.
      */
-    //TODO: visit
-    public <RESULT> RESULT perform(Action<RESULT, ? super TYPE> action, Object... args);
+    public <RESULT> RESULT visit(Visitor<RESULT, ? super TYPE> visitor, Object... args);
 
     /**
      * Sets the condition to be met by the gate backing this bridge.
@@ -89,24 +89,6 @@ public interface Bridge<TYPE> {
      * @return this bridge.
      */
     public Bridge<TYPE> when(ConditionEvaluator<? super TYPE> evaluator);
-
-    /**
-     * Interface defining an action to be performed on the backed gate.
-     *
-     * @param <RESULT> the result type.
-     * @param <TYPE>   the gate type.
-     */
-    public interface Action<RESULT, TYPE> {
-
-        /**
-         * Performs this action on the specified gate.
-         *
-         * @param gate the gate instance.
-         * @param args the action arguments.
-         * @return the action result.
-         */
-        public RESULT doOn(TYPE gate, Object... args);
-    }
 
     /**
      * Condition evaluator.
@@ -122,5 +104,23 @@ public interface Bridge<TYPE> {
          * @return whether the condition is satisfied.
          */
         public boolean isSatisfied(TYPE gate);
+    }
+
+    /**
+     * Interface defining a bridge visitor.
+     *
+     * @param <RESULT> the result type.
+     * @param <TYPE>   the gate type.
+     */
+    public interface Visitor<RESULT, TYPE> {
+
+        /**
+         * Makes this visitor inspect the specified gate.
+         *
+         * @param gate the gate instance.
+         * @param args the inspection arguments.
+         * @return the inspection result.
+         */
+        public RESULT doInspect(TYPE gate, Object... args);
     }
 }

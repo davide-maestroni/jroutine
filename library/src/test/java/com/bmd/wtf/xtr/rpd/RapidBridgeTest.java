@@ -41,6 +41,8 @@ public class RapidBridgeTest extends TestCase {
 
         final Waterfall<Object, Object, Object> fall = fall().chain(bridgeGate);
 
+        assertThat(fall.bridge().getClassification()).isEqualTo(
+                Rapid.bridge(fall.bridge()).getClassification());
         assertThat(Rapid.bridge(fall.bridge(BridgeGate.class))
                         .immediately()
                         .performAs(BridgeId.class)
@@ -123,26 +125,6 @@ public class RapidBridgeTest extends TestCase {
 
         try {
 
-            new DefaultRapidBridge<Object>(null, null);
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            new DefaultRapidBridge<Object>(null, Object.class);
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
             Rapid.bridge(fall().start(new OpenGate<Object>()).bridge(OpenGate.class)).perform();
 
             fail();
@@ -204,8 +186,8 @@ public class RapidBridgeTest extends TestCase {
         try {
 
             new DefaultRapidBridge<OpenGate>(
-                    fall().start(new OpenGate<Object>()).bridge(OpenGate.class),
-                    OpenGate.class).performAs(List.class);
+                    fall().start(new OpenGate<Object>()).bridge(OpenGate.class)).performAs(
+                    List.class);
 
             fail();
 

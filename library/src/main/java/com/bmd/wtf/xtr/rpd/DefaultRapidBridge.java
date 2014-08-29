@@ -30,8 +30,6 @@ class DefaultRapidBridge<TYPE> implements RapidBridge<TYPE> {
 
     private final Bridge<TYPE> mBridge;
 
-    private final Class<TYPE> mType;
-
     private volatile ConditionEvaluator<? super TYPE> mEvaluator;
 
     private volatile RuntimeException mTimeoutException;
@@ -44,28 +42,14 @@ class DefaultRapidBridge<TYPE> implements RapidBridge<TYPE> {
      * @param wrapped the wrapped bridge.
      * @throws IllegalArgumentException if the wrapped bridge is null.
      */
-    public DefaultRapidBridge(final Bridge<?> wrapped) {
-
-        this(wrapped, null);
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param wrapped     the wrapped bridge.
-     * @param bridgeClass the bridge class.
-     * @throws IllegalArgumentException if the wrapped bridge is null.
-     */
-    public DefaultRapidBridge(final Bridge<?> wrapped, final Class<TYPE> bridgeClass) {
+    public DefaultRapidBridge(final Bridge<TYPE> wrapped) {
 
         if (wrapped == null) {
 
             throw new IllegalArgumentException("the wrapped bridge cannot be null");
         }
 
-        //noinspection unchecked
-        mBridge = (Bridge<TYPE>) wrapped;
-        mType = bridgeClass;
+        mBridge = wrapped;
     }
 
     @Override
@@ -111,14 +95,7 @@ class DefaultRapidBridge<TYPE> implements RapidBridge<TYPE> {
     @Override
     public TYPE perform() {
 
-        final Class<TYPE> type = mType;
-
-        if (type == null) {
-
-            throw new IllegalStateException("the bridge type is not specified");
-        }
-
-        return performAs(type);
+        return performAs(mBridge.getClassification().getRawType());
     }
 
     @Override
@@ -129,9 +106,7 @@ class DefaultRapidBridge<TYPE> implements RapidBridge<TYPE> {
             throw new IllegalArgumentException("the bridge type does not represent an interface");
         }
 
-        final Class<TYPE> type = mType;
-
-        if ((type != null) && !bridgeClass.isAssignableFrom(type)) {
+        if (!bridgeClass.isAssignableFrom(mBridge.getClassification().getRawType())) {
 
             throw new IllegalArgumentException(
                     "the bridge is not of type: " + bridgeClass.getCanonicalName());
@@ -158,10 +133,16 @@ class DefaultRapidBridge<TYPE> implements RapidBridge<TYPE> {
     }
 
     @Override
+    public Classification<TYPE> getClassification() {
+
+        return mBridge.getClassification();
+    }
+
+    @Override
     public <RESULT> RESULT perform(final Action<RESULT, ? super TYPE> action,
             final Object... args) {
 
-        return buildBridge(mType).perform(action, args);
+        return buildBridge(mBridge.getClassification().getRawType()).perform(action, args);
     }
 
     private <NTYPE> Bridge<NTYPE> buildBridge(

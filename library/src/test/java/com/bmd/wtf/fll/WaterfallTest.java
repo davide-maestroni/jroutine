@@ -39,6 +39,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static com.bmd.wtf.fll.Waterfall.fall;
 import static org.fest.assertions.api.Assertions.assertThat;
@@ -196,7 +197,6 @@ public class WaterfallTest extends TestCase {
 
         final Waterfall<Object, Object, Object> fall1 = fall().chain(new BridgeGate());
 
-
         try {
 
             fall1.bridge(BridgeGate2.class);
@@ -227,6 +227,62 @@ public class WaterfallTest extends TestCase {
                                  return gate.getId();
                              }
                          })).isEqualTo(3);
+
+        final Waterfall<Object, Object, Object> fall2 = fall().in(new CurrentGenerator() {
+
+            @Override
+            public Current create(final int fallNumber) {
+
+                return Currents.passThrough();
+            }
+        }).in(3).chain(new GateGenerator<Object, Object>() {
+
+            @Override
+            public Gate<Object, Object> create(final int fallNumber) {
+
+                return new BridgeGate2(fallNumber);
+            }
+        });
+
+        assertThat(fall2.bridge(BridgeGate2.class)
+                        .immediately()
+                        .perform(new Action<Integer, BridgeGate>() {
+
+                            @Override
+                            public Integer doOn(final BridgeGate gate, final Object... args) {
+
+                                return gate.getId();
+                            }
+                        })).isEqualTo(0);
+        assertThat(fall2.bridge(0, BridgeGate2.class)
+                        .immediately()
+                        .perform(new Action<Integer, BridgeGate>() {
+
+                            @Override
+                            public Integer doOn(final BridgeGate gate, final Object... args) {
+
+                                return gate.getId();
+                            }
+                        })).isEqualTo(0);
+        assertThat(fall2.bridge(1, Classification.ofType(BridgeGate2.class))
+                        .immediately()
+                        .perform(new Action<Integer, BridgeGate>() {
+
+                            @Override
+                            public Integer doOn(final BridgeGate gate, final Object... args) {
+
+                                return gate.getId();
+                            }
+                        })).isEqualTo(1);
+        assertThat(
+                fall2.bridge(2).immediately().perform(new Action<Integer, Gate<Object, Object>>() {
+
+                    @Override
+                    public Integer doOn(final Gate<Object, Object> gate, final Object... args) {
+
+                        return ((BridgeGate) gate).getId();
+                    }
+                })).isEqualTo(2);
     }
 
     public void testChain() {
@@ -890,6 +946,46 @@ public class WaterfallTest extends TestCase {
 
         try {
 
+            new LockRiver<Object>(null, null);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            new LockRiver<Object>(fall(), null);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            new LockRiver<Object>(null, new ReentrantLock());
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            new StreamRiver<Object>(null);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
             new WaterfallRiver<Object>(null, Direction.DOWNSTREAM);
 
             fail();
@@ -901,6 +997,16 @@ public class WaterfallTest extends TestCase {
         try {
 
             new WaterfallRiver<Object>(null, Direction.UPSTREAM);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            new TimeoutGate<Object>(null, 0, TimeUnit.MILLISECONDS, new RuntimeException());
 
             fail();
 
@@ -938,6 +1044,120 @@ public class WaterfallTest extends TestCase {
         try {
 
             new SpringGate<Object>(null);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            new DataBridge<Object>(null, null, null, null);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            final CollectorGate<Object> gate = new CollectorGate<Object>();
+            final ReentrantLock lock = new ReentrantLock();
+
+            new DataBridge<Object>(null, gate, lock, lock.newCondition());
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            final ReentrantLock lock = new ReentrantLock();
+
+            new DataBridge<Object>(new Classification<Object>() {}, null, lock,
+                                   lock.newCondition());
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            final CollectorGate<Object> gate = new CollectorGate<Object>();
+            final ReentrantLock lock = new ReentrantLock();
+
+            new DataBridge<Object>(new Classification<Object>() {}, gate, null,
+                                   lock.newCondition());
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            final CollectorGate<Object> gate = new CollectorGate<Object>();
+            final ReentrantLock lock = new ReentrantLock();
+
+            new DataBridge<Object>(new Classification<Object>() {}, gate, lock, null);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            final CollectorGate<Object> gate = new CollectorGate<Object>();
+            final ReentrantLock lock = new ReentrantLock();
+
+            new DataBridge<Integer>(new Classification<Integer>() {}, gate, lock,
+                                    lock.newCondition());
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            new DataCollector<Object>(null, null);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            final CollectorGate<Object> gate = new CollectorGate<Object>();
+            final ReentrantLock lock = new ReentrantLock();
+
+            new DataCollector<Object>(new DataBridge<CollectorGate<Object>>(
+                    new Classification<CollectorGate<Object>>() {}, gate, lock,
+                    lock.newCondition()), null);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            final CollectorGate<Object> gate = new CollectorGate<Object>();
+
+            new DataCollector<Object>(null, gate);
 
             fail();
 
@@ -1576,14 +1796,14 @@ public class WaterfallTest extends TestCase {
                          .immediately()
                          .perform(new Action<Void, LatchGate>() {
 
-                                      @Override
-                                      public Void doOn(final LatchGate gate, final Object... args) {
+                             @Override
+                             public Void doOn(final LatchGate gate, final Object... args) {
 
-                                          gate.setFailed();
+                                 gate.setFailed();
 
-                                          return null;
-                                      }
-                                  });
+                                 return null;
+                             }
+                         });
                 }
             }
         });
@@ -1631,15 +1851,14 @@ public class WaterfallTest extends TestCase {
                               .immediately()
                               .perform(new Action<Void, LatchGate>() {
 
-                                           @Override
-                                           public Void doOn(final LatchGate gate,
-                                                   final Object... args) {
+                                  @Override
+                                  public Void doOn(final LatchGate gate, final Object... args) {
 
-                                               gate.setFailed();
+                                      gate.setFailed();
 
-                                               return null;
-                                           }
-                                       });
+                                      return null;
+                                  }
+                              });
                      }
                  }
              });
@@ -2326,6 +2545,34 @@ public class WaterfallTest extends TestCase {
             });
         }
 
+        private boolean isFailed(final Waterfall<?, ?, ?> waterfall) {
+
+            return waterfall.bridge(LatchGate.class)
+                            .immediately()
+                            .perform(new Action<Boolean, LatchGate>() {
+
+                                @Override
+                                public Boolean doOn(final LatchGate gate, final Object... args) {
+
+                                    return gate.isFailed();
+                                }
+                            });
+        }
+
+        private void setFailed(final Waterfall<?, ?, ?> waterfall) {
+
+            waterfall.bridge(LatchGate.class).immediately().perform(new Action<Void, LatchGate>() {
+
+                @Override
+                public Void doOn(final LatchGate gate, final Object... args) {
+
+                    gate.setFailed();
+
+                    return null;
+                }
+            });
+        }
+
         @Override
         public void onException(final River<Object> upRiver, final River<Object> downRiver,
                 final int fallNumber, final Throwable throwable) {
@@ -2365,34 +2612,6 @@ public class WaterfallTest extends TestCase {
 
                 setFailed(mWaterfall);
             }
-        }
-
-        private boolean isFailed(final Waterfall<?, ?, ?> waterfall) {
-
-            return waterfall.bridge(LatchGate.class)
-                            .immediately()
-                            .perform(new Action<Boolean, LatchGate>() {
-
-                                @Override
-                                public Boolean doOn(final LatchGate gate, final Object... args) {
-
-                                    return gate.isFailed();
-                                }
-                            });
-        }
-
-        private void setFailed(final Waterfall<?, ?, ?> waterfall) {
-
-            waterfall.bridge(LatchGate.class).immediately().perform(new Action<Void, LatchGate>() {
-
-                @Override
-                public Void doOn(final LatchGate gate, final Object... args) {
-
-                    gate.setFailed();
-
-                    return null;
-                }
-            });
         }
 
 

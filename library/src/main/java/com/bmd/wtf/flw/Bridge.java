@@ -13,6 +13,8 @@
  */
 package com.bmd.wtf.flw;
 
+import com.bmd.wtf.fll.Classification;
+
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -51,6 +53,13 @@ public interface Bridge<TYPE> {
      * @see #when(ConditionEvaluator)
      */
     public Bridge<TYPE> eventuallyThrow(RuntimeException exception);
+
+    /**
+     * Gets the bridge classification.
+     *
+     * @return the bridge classification.
+     */
+    public Classification<TYPE> getClassification();
 
     /**
      * Tells the bridge to fail if the condition is not immediately met.

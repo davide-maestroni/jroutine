@@ -51,9 +51,6 @@ import java.util.concurrent.TimeUnit;
  */
 public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
-    // TODO: bridge, linq(?)
-    // TODO: exception javadoc
-
     private static final Comparator<?> NATURAL_COMPARATOR =
             Collections.reverseOrder(Collections.reverseOrder());
 
@@ -368,6 +365,8 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
     /**
      * Builds and returns a new bridge.
+     * <p/>
+     * TODO: which gate?
      *
      * @return the bridge instance.
      */

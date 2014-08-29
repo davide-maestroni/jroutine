@@ -21,6 +21,7 @@ import com.bmd.wtf.gts.Gate;
 
 import java.util.HashSet;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -40,21 +41,14 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 class DataFall<IN, OUT> implements Fall<IN> {
 
-    private static final ThreadLocal<DataLock> sLock = new ThreadLocal<DataLock>() {
-
-        @Override
-        protected DataLock initialValue() {
-
-            return new DataLock();
-        }
-    };
-
     final Gate<IN, OUT> gate;
 
     final Current inputCurrent;
 
     final CopyOnWriteArrayList<DataStream<IN>> inputStreams =
             new CopyOnWriteArrayList<DataStream<IN>>();
+
+    final ReentrantLock lock;
 
     final CopyOnWriteArrayList<DataStream<OUT>> outputStreams =
             new CopyOnWriteArrayList<DataStream<OUT>>();
@@ -63,11 +57,13 @@ class DataFall<IN, OUT> implements Fall<IN> {
 
     private final LockRiver<IN> mInRiver;
 
-    private final ReentrantLock mLock;
+    private final ReentrantLock mLevelLock;
 
     private final int mNumber;
 
     private final LockRiver<OUT> mOutRiver;
+
+    private Condition mCondition;
 
     private int mFlushCount;
 
@@ -102,24 +98,23 @@ class DataFall<IN, OUT> implements Fall<IN> {
 
         this.inputCurrent = inputCurrent;
         this.gate = gate;
+        this.lock = new ReentrantLock();
         mNumber = number;
-        mLock = new ReentrantLock();
-        mInRiver = new LockRiver<IN>(new WaterfallRiver<IN>(waterfall, Direction.UPSTREAM));
-        mOutRiver = new LockRiver<OUT>(new StreamRiver<OUT>(outputStreams, waterfall));
+        mLevelLock = new ReentrantLock();
+        mInRiver = new LockRiver<IN>(new WaterfallRiver<IN>(waterfall, Direction.UPSTREAM), lock);
+        mOutRiver = new LockRiver<OUT>(new StreamRiver<OUT>(outputStreams), lock);
     }
 
     @Override
     public void exception(final Throwable throwable) {
 
-        final DataLock dataLock = sLock.get();
-
         final LockRiver<IN> inRiver = mInRiver;
         final LockRiver<OUT> outRiver = mOutRiver;
 
-        inRiver.open(dataLock);
-        outRiver.open(dataLock);
-
         try {
+
+            inRiver.open();
+            outRiver.open();
 
             gate.onException(inRiver, outRiver, mNumber, throwable);
 
@@ -128,6 +123,13 @@ class DataFall<IN, OUT> implements Fall<IN> {
             outRiver.exception(t);
 
         } finally {
+
+            final Condition condition = mCondition;
+
+            if (condition != null) {
+
+                condition.signalAll();
+            }
 
             outRiver.close();
             inRiver.close();
@@ -139,7 +141,7 @@ class DataFall<IN, OUT> implements Fall<IN> {
     @Override
     public void flush(final Stream<IN> origin) {
 
-        final ReentrantLock lock = mLock;
+        final ReentrantLock lock = mLevelLock;
         lock.lock();
 
         try {
@@ -174,15 +176,13 @@ class DataFall<IN, OUT> implements Fall<IN> {
             lock.unlock();
         }
 
-        final DataLock dataLock = sLock.get();
-
         final LockRiver<IN> inRiver = mInRiver;
         final LockRiver<OUT> outRiver = mOutRiver;
 
-        inRiver.open(dataLock);
-        outRiver.open(dataLock);
-
         try {
+
+            inRiver.open();
+            outRiver.open();
 
             gate.onFlush(inRiver, outRiver, mNumber);
 
@@ -192,6 +192,13 @@ class DataFall<IN, OUT> implements Fall<IN> {
 
         } finally {
 
+            final Condition condition = mCondition;
+
+            if (condition != null) {
+
+                condition.signalAll();
+            }
+
             outRiver.close();
             inRiver.close();
         }
@@ -200,15 +207,13 @@ class DataFall<IN, OUT> implements Fall<IN> {
     @Override
     public void push(final IN drop) {
 
-        final DataLock dataLock = sLock.get();
-
         final LockRiver<IN> inRiver = mInRiver;
         final LockRiver<OUT> outRiver = mOutRiver;
 
-        inRiver.open(dataLock);
-        outRiver.open(dataLock);
-
         try {
+
+            inRiver.open();
+            outRiver.open();
 
             gate.onPush(inRiver, outRiver, mNumber, drop);
 
@@ -218,10 +223,42 @@ class DataFall<IN, OUT> implements Fall<IN> {
 
         } finally {
 
+            final Condition condition = mCondition;
+
+            if (condition != null) {
+
+                condition.signalAll();
+            }
+
             outRiver.close();
             inRiver.close();
 
             lowerLevel();
+        }
+    }
+
+    /**
+     * Returns the condition linked to the fall lock.
+     *
+     * @return the condition.
+     */
+    Condition getCondition() {
+
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+
+        try {
+
+            if (mCondition == null) {
+
+                mCondition = lock.newCondition();
+            }
+
+            return mCondition;
+
+        } finally {
+
+            lock.unlock();
         }
     }
 
@@ -232,7 +269,7 @@ class DataFall<IN, OUT> implements Fall<IN> {
 
         int flushCount = 0;
 
-        final ReentrantLock lock = mLock;
+        final ReentrantLock lock = mLevelLock;
         lock.lock();
 
         try {
@@ -264,7 +301,7 @@ class DataFall<IN, OUT> implements Fall<IN> {
      */
     void raiseLevel(final int count) {
 
-        final ReentrantLock lock = mLock;
+        final ReentrantLock lock = mLevelLock;
         lock.lock();
 
         try {

@@ -51,7 +51,8 @@ class DataBridge<TYPE> implements Bridge<TYPE> {
      * @param gate           the bridge gate.
      * @param lock           the gate lock.
      * @param condition      the gate condition.
-     * @throws IllegalArgumentException if the gate or the classification are null.
+     * @throws IllegalArgumentException if the gate or the classification are null, or the gate is
+     *                                  not of the specified classification.
      */
     public DataBridge(final Classification<TYPE> classification, final Gate<?, ?> gate,
             final ReentrantLock lock, final Condition condition) {
@@ -64,6 +65,12 @@ class DataBridge<TYPE> implements Bridge<TYPE> {
         if (gate == null) {
 
             throw new IllegalArgumentException("the bridge fall cannot be null");
+        }
+
+        if (!classification.getRawType().isInstance(gate)) {
+
+            throw new IllegalArgumentException(
+                    "the gate is not of type: " + classification.getRawType().getCanonicalName());
         }
 
         mClassification = classification;

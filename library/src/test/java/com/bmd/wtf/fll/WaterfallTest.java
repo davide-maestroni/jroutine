@@ -161,20 +161,9 @@ public class WaterfallTest extends TestCase {
 
         final BridgeGate2 bridgeGate = new BridgeGate2(1);
 
-        final Waterfall<Object, Object, Object> fall =
-                fall().bridge(BridgeGate2.class).chain(bridgeGate);
+        final Waterfall<Object, Object, Object> fall = fall().chain(bridgeGate);
 
-        assertThat(
-                fall.on(BridgeGate.class).immediately().perform(new Action<Integer, BridgeGate>() {
-
-                    @Override
-                    public Integer doOn(final BridgeGate gate, final Object... args) {
-
-                        return gate.getId();
-                    }
-                })).isEqualTo(1);
-
-        assertThat(fall.on(Classification.ofType(BridgeGate2.class))
+        assertThat(fall.bridge(BridgeGate.class)
                        .immediately()
                        .perform(new Action<Integer, BridgeGate>() {
 
@@ -185,35 +174,32 @@ public class WaterfallTest extends TestCase {
                            }
                        })).isEqualTo(1);
 
-        assertThat(fall.on(bridgeGate).immediately().perform(new Action<Integer, BridgeGate>() {
+        assertThat(fall.bridge(Classification.ofType(BridgeGate2.class))
+                       .immediately()
+                       .perform(new Action<Integer, BridgeGate>() {
+
+                           @Override
+                           public Integer doOn(final BridgeGate gate, final Object... args) {
+
+                               return gate.getId();
+                           }
+                       })).isEqualTo(1);
+
+        assertThat(fall.bridge().immediately().perform(new Action<Integer, Gate<Object, Object>>() {
 
             @Override
-            public Integer doOn(final BridgeGate gate, final Object... args) {
+            public Integer doOn(final Gate<Object, Object> gate, final Object... args) {
 
-                return gate.getId();
+                return ((BridgeGate) gate).getId();
             }
         })).isEqualTo(1);
 
-        final Waterfall<Object, Object, Object> fall1 = fall.close((Gate) null)
-                                                            .close(new OpenGate<Object>())
-                                                            .close(bridgeGate)
-                                                            .bridge(Classification.ofType(
-                                                                    BridgeGate.class))
-                                                            .chain(new BridgeGate());
+        final Waterfall<Object, Object, Object> fall1 = fall().chain(new BridgeGate());
 
-        assertThat(
-                fall1.on(BridgeGate.class).immediately().perform(new Action<Integer, BridgeGate>() {
-
-                    @Override
-                    public Integer doOn(final BridgeGate gate, final Object... args) {
-
-                        return gate.getId();
-                    }
-                })).isEqualTo(0);
 
         try {
 
-            fall1.on(BridgeGate2.class);
+            fall1.bridge(BridgeGate2.class);
 
             fail();
 
@@ -221,55 +207,26 @@ public class WaterfallTest extends TestCase {
 
         }
 
-        final Waterfall<Object, Object, Object> fall2 =
-                fall1.close(Classification.ofType(String.class))
-                     .close(Classification.ofType(BridgeGate.class))
-                     .bridge()
-                     .chain(new BridgeGate2(2));
+        assertThat(fall().in(new CurrentGenerator() {
 
-        assertThat(
-                fall2.on(BridgeGate.class).immediately().perform(new Action<Integer, BridgeGate>() {
+            @Override
+            public Current create(final int fallNumber) {
 
-                    @Override
-                    public Integer doOn(final BridgeGate gate, final Object... args) {
+                return Currents.passThrough();
+            }
+        })
+                         .in(3)
+                         .chain(new BridgeGate2(3))
+                         .bridge(BridgeGate2.class)
+                         .immediately()
+                         .perform(new Action<Integer, BridgeGate>() {
 
-                        return gate.getId();
-                    }
-                })).isEqualTo(2);
+                             @Override
+                             public Integer doOn(final BridgeGate gate, final Object... args) {
 
-        assertThat(fall2.on(Classification.ofType(BridgeGate2.class))
-                        .immediately()
-                        .perform(new Action<Integer, BridgeGate>() {
-
-                            @Override
-                            public Integer doOn(final BridgeGate gate, final Object... args) {
-
-                                return gate.getId();
-                            }
-                        })).isEqualTo(2);
-
-        assertThat(fall2.close(Classification.ofType(BridgeGate2.class))
-                        .in(new CurrentGenerator() {
-
-                            @Override
-                            public Current create(final int fallNumber) {
-
-                                return Currents.passThrough();
-                            }
-                        })
-                        .in(3)
-                        .bridge()
-                        .chain(new BridgeGate2(3))
-                        .on(BridgeGate2.class)
-                        .immediately()
-                        .perform(new Action<Integer, BridgeGate>() {
-
-                            @Override
-                            public Integer doOn(final BridgeGate gate, final Object... args) {
-
-                                return gate.getId();
-                            }
-                        })).isEqualTo(3);
+                                 return gate.getId();
+                             }
+                         })).isEqualTo(3);
     }
 
     public void testChain() {
@@ -409,42 +366,6 @@ public class WaterfallTest extends TestCase {
 
         assertThat(fall().start().in(3).chain().pull("test").all()).containsExactly("test", "test",
                                                                                     "test");
-
-        assertThat(fall().bridge()
-                         .chain()
-                         .chain(new Classification<Gate<Object, Object>>() {})
-                         .pull("test")
-                         .all()).containsExactly("test");
-
-        assertThat(fall().in(3)
-                         .bridge()
-                         .chain()
-                         .in(1)
-                         .chain(new Classification<Gate<Object, Object>>() {})
-                         .pull("test")
-                         .all()).containsExactly("test", "test", "test");
-
-        assertThat(fall().in(2)
-                         .bridge()
-                         .chain()
-                         .chain(new Classification<Gate<Object, Object>>() {})
-                         .pull("test")
-                         .all()).containsExactly("test", "test");
-
-        assertThat(fall().in(2)
-                         .bridge()
-                         .chain()
-                         .in(3)
-                         .chain(new Classification<Gate<Object, Object>>() {})
-                         .pull("test")
-                         .all()).containsExactly("test", "test", "test", "test", "test", "test");
-
-        assertThat(fall().bridge()
-                         .chain()
-                         .in(2)
-                         .chain(new Classification<Gate<Object, Object>>() {})
-                         .pull("test")
-                         .all()).containsExactly("test", "test");
 
         final Waterfall<Object, Object, Object> fall0 = fall().start();
         final Waterfall<Object, Object, Object> fall1 = fall().in(2).start();
@@ -1160,26 +1081,6 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            fall().chain((Classification<Gate<Object, Object>>) null);
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            fall().chain(new Classification<Gate<Object, Object>>() {});
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
             fall().feed(null);
 
             fail();
@@ -1384,26 +1285,6 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            fall().start().chain((Classification<Gate<Object, Object>>) null);
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            fall().start().chain(new Classification<Gate<Object, Object>>() {});
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
             fall().start().feed(null);
 
             fail();
@@ -1464,7 +1345,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            fall().bridge(Integer.class).chain(new OpenGate<Object>());
+            fall().chain(new OpenGate<Object>()).bridge(Integer.class);
 
             fail();
 
@@ -1474,58 +1355,7 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            fall().bridge(new Classification<Integer>() {}).chain(new OpenGate<Object>());
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            fall().in(2).bridge().start(new GateGenerator<Object, Object>() {
-
-                @Override
-                public Gate<Object, Object> create(final int fallNumber) {
-
-                    return new OpenGate<Object>();
-                }
-            });
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            fall().in(2).bridge().chain(new GateGenerator<Object, Object>() {
-
-                @Override
-                public Gate<Object, Object> create(final int fallNumber) {
-
-                    return new OpenGate<Object>();
-                }
-            });
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            fall().in(2).start().bridge().chain(new GateGenerator<Object, Object>() {
-
-                @Override
-                public Gate<Object, Object> create(final int fallNumber) {
-
-                    return new OpenGate<Object>();
-                }
-            });
+            fall().chain(new OpenGate<Object>()).bridge(new Classification<Integer>() {});
 
             fail();
 
@@ -1647,76 +1477,6 @@ public class WaterfallTest extends TestCase {
 
         try {
 
-            final Waterfall<Object, Object, Object> waterfall = fall().start();
-
-            waterfall.on((Class<?>) null);
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            final Waterfall<Object, Object, Object> waterfall = fall().start();
-
-            waterfall.on((Classification<?>) null);
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            final Waterfall<Object, Object, Object> waterfall = fall().start();
-
-            waterfall.on((Object) null);
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            final Waterfall<Object, Object, Object> waterfall = fall().start();
-
-            waterfall.on(new OpenGate<Integer>());
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            final Waterfall<Object, Object, Object> waterfall = fall().start();
-
-            waterfall.on(String.class);
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            fall().collect();
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
             fall().range(0, 0);
 
             fail();
@@ -1803,46 +1563,34 @@ public class WaterfallTest extends TestCase {
         testRiver(fall().chain());
         testStream(fall().chain());
 
-        final Waterfall<Object, Object, Object> fall1 = fall().bridge()
-                                                              .start(new LatchGate())
-                                                              .inBackground(1)
-                                                              .chain(new TestGate())
-                                                              .chain(new OpenGate<Object>() {
+        final Waterfall<Object, Object, Object> fall1 = fall().start(new LatchGate());
+        fall1.inBackground(1).chain(new TestGate(fall1)).chain(new OpenGate<Object>() {
 
-                                                                  @Override
-                                                                  public void onException(
-                                                                          final River<Object> upRiver,
-                                                                          final River<Object> downRiver,
-                                                                          final int fallNumber,
-                                                                          final Throwable throwable) {
+            @Override
+            public void onException(final River<Object> upRiver, final River<Object> downRiver,
+                    final int fallNumber, final Throwable throwable) {
 
-                                                                      if ((throwable != null)
-                                                                              && !"test".equals(
-                                                                              throwable.getMessage())) {
+                if ((throwable != null) && !"test".equals(throwable.getMessage())) {
 
-                                                                          downRiver.on(
-                                                                                  LatchGate.class)
-                                                                                   .immediately()
-                                                                                   .perform(
-                                                                                           new Action<Void, LatchGate>() {
+                    fall1.bridge(LatchGate.class)
+                         .immediately()
+                         .perform(new Action<Void, LatchGate>() {
 
-                                                                                               @Override
-                                                                                               public Void doOn(
-                                                                                                       final LatchGate gate,
-                                                                                                       final Object... args) {
+                                      @Override
+                                      public Void doOn(final LatchGate gate, final Object... args) {
 
-                                                                                                   gate.setFailed();
+                                          gate.setFailed();
 
-                                                                                                   return null;
-                                                                                               }
-                                                                                           });
-                                                                      }
-                                                                  }
-                                                              });
+                                          return null;
+                                      }
+                                  });
+                }
+            }
+        });
 
         fall1.source().push("test");
 
-        fall1.on(LatchGate.class)
+        fall1.bridge(LatchGate.class)
              .afterMax(30, TimeUnit.SECONDS)
              .eventuallyThrow(new IllegalStateException())
              .when(new ConditionEvaluator<LatchGate>() {
@@ -1867,47 +1615,38 @@ public class WaterfallTest extends TestCase {
                  }
              });
 
-        final Waterfall<Object, Object, Object> fall2 = fall().bridge()
-                                                              .start(new LatchGate())
-                                                              .inBackground(1)
-                                                              .chain(new TestGate())
-                                                              .inBackground(1)
-                                                              .chain(new OpenGate<Object>() {
+        final Waterfall<Object, Object, Object> fall2 = fall().start(new LatchGate());
+        fall2.inBackground(1)
+             .chain(new TestGate(fall2))
+             .inBackground(1)
+             .chain(new OpenGate<Object>() {
 
-                                                                  @Override
-                                                                  public void onException(
-                                                                          final River<Object> upRiver,
-                                                                          final River<Object> downRiver,
-                                                                          final int fallNumber,
-                                                                          final Throwable throwable) {
+                 @Override
+                 public void onException(final River<Object> upRiver, final River<Object> downRiver,
+                         final int fallNumber, final Throwable throwable) {
 
-                                                                      if ((throwable != null)
-                                                                              && !"test".equals(
-                                                                              throwable.getMessage())) {
+                     if ((throwable != null) && !"test".equals(throwable.getMessage())) {
 
-                                                                          downRiver.on(
-                                                                                  LatchGate.class)
-                                                                                   .immediately()
-                                                                                   .perform(
-                                                                                           new Action<Void, LatchGate>() {
+                         fall2.bridge(LatchGate.class)
+                              .immediately()
+                              .perform(new Action<Void, LatchGate>() {
 
-                                                                                               @Override
-                                                                                               public Void doOn(
-                                                                                                       final LatchGate gate,
-                                                                                                       final Object... args) {
+                                           @Override
+                                           public Void doOn(final LatchGate gate,
+                                                   final Object... args) {
 
-                                                                                                   gate.setFailed();
+                                               gate.setFailed();
 
-                                                                                                   return null;
-                                                                                               }
-                                                                                           });
-                                                                      }
-                                                                  }
-                                                              });
+                                               return null;
+                                           }
+                                       });
+                     }
+                 }
+             });
 
         fall2.source().push("test");
 
-        fall2.on(LatchGate.class)
+        fall2.bridge(LatchGate.class)
              .afterMax(3, TimeUnit.SECONDS)
              .eventuallyThrow(new IllegalStateException())
              .when(new ConditionEvaluator<LatchGate>() {
@@ -2560,17 +2299,38 @@ public class WaterfallTest extends TestCase {
 
     private static class TestGate extends OpenGate<Object> {
 
+        private final Waterfall<?, ?, ?> mWaterfall;
+
         public boolean mFlushed;
 
         public boolean mPushed;
 
         public boolean mThrown;
 
+        public TestGate(final Waterfall<?, ?, ?> waterfall) {
+
+            mWaterfall = waterfall;
+        }
+
+        private void incCount(final Waterfall<?, ?, ?> waterfall) {
+
+            waterfall.bridge(LatchGate.class).immediately().perform(new Action<Void, LatchGate>() {
+
+                @Override
+                public Void doOn(final LatchGate gate, final Object... args) {
+
+                    gate.incCount();
+
+                    return null;
+                }
+            });
+        }
+
         @Override
         public void onException(final River<Object> upRiver, final River<Object> downRiver,
                 final int fallNumber, final Throwable throwable) {
 
-            if (isFailed(upRiver) || mThrown) {
+            if (isFailed(mWaterfall) || mThrown) {
 
                 return;
             }
@@ -2592,52 +2352,38 @@ public class WaterfallTest extends TestCase {
 
                         } catch (final Throwable ignored) {
 
-                            setFailed(downRiver);
+                            setFailed(mWaterfall);
 
                         } finally {
 
-                            incCount(downRiver);
+                            incCount(mWaterfall);
                         }
                     }
                 }).start();
 
             } catch (final Throwable ignored) {
 
-                setFailed(upRiver);
+                setFailed(mWaterfall);
             }
         }
 
-        private void incCount(final River<Object> river) {
+        private boolean isFailed(final Waterfall<?, ?, ?> waterfall) {
 
-            river.on(LatchGate.class).immediately().perform(new Action<Void, LatchGate>() {
+            return waterfall.bridge(LatchGate.class)
+                            .immediately()
+                            .perform(new Action<Boolean, LatchGate>() {
 
-                @Override
-                public Void doOn(final LatchGate gate, final Object... args) {
+                                @Override
+                                public Boolean doOn(final LatchGate gate, final Object... args) {
 
-                    gate.incCount();
-
-                    return null;
-                }
-            });
+                                    return gate.isFailed();
+                                }
+                            });
         }
 
-        private boolean isFailed(final River<Object> river) {
+        private void setFailed(final Waterfall<?, ?, ?> waterfall) {
 
-            return river.on(LatchGate.class)
-                        .immediately()
-                        .perform(new Action<Boolean, LatchGate>() {
-
-                            @Override
-                            public Boolean doOn(final LatchGate gate, final Object... args) {
-
-                                return gate.isFailed();
-                            }
-                        });
-        }
-
-        private void setFailed(final River<Object> river) {
-
-            river.on(LatchGate.class).immediately().perform(new Action<Void, LatchGate>() {
+            waterfall.bridge(LatchGate.class).immediately().perform(new Action<Void, LatchGate>() {
 
                 @Override
                 public Void doOn(final LatchGate gate, final Object... args) {
@@ -2649,11 +2395,12 @@ public class WaterfallTest extends TestCase {
             });
         }
 
+
         @Override
         public void onFlush(final River<Object> upRiver, final River<Object> downRiver,
                 final int fallNumber) {
 
-            if (isFailed(upRiver) || mFlushed) {
+            if (isFailed(mWaterfall) || mFlushed) {
 
                 return;
             }
@@ -2675,18 +2422,18 @@ public class WaterfallTest extends TestCase {
 
                         } catch (final Throwable ignored) {
 
-                            setFailed(downRiver);
+                            setFailed(mWaterfall);
 
                         } finally {
 
-                            incCount(downRiver);
+                            incCount(mWaterfall);
                         }
                     }
                 }).start();
 
             } catch (final Throwable ignored) {
 
-                setFailed(downRiver);
+                setFailed(mWaterfall);
             }
         }
 
@@ -2695,7 +2442,7 @@ public class WaterfallTest extends TestCase {
         public void onPush(final River<Object> upRiver, final River<Object> downRiver,
                 final int fallNumber, final Object drop) {
 
-            if (isFailed(downRiver) || mPushed) {
+            if (isFailed(mWaterfall) || mPushed) {
 
                 return;
             }
@@ -2717,18 +2464,18 @@ public class WaterfallTest extends TestCase {
 
                         } catch (final Throwable ignored) {
 
-                            setFailed(upRiver);
+                            setFailed(mWaterfall);
 
                         } finally {
 
-                            incCount(upRiver);
+                            incCount(mWaterfall);
                         }
                     }
                 }).start();
 
             } catch (final Throwable ignored) {
 
-                setFailed(downRiver);
+                setFailed(mWaterfall);
             }
         }
 

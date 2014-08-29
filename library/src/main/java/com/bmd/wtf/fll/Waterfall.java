@@ -32,11 +32,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.WeakHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -62,8 +59,6 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
     private static final DataFall[] NO_FALL = new DataFall[0];
 
-    private static final Classification<Void> SELF_CLASSIFICATION = new Classification<Void>() {};
-
     private static final WeakHashMap<Gate<?, ?>, Void> sGates = new WeakHashMap<Gate<?, ?>, Void>();
 
     private static OpenGate<?> sOpenGate;
@@ -71,10 +66,6 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
     private final Current mBackgroundCurrent;
 
     private final int mBackgroundPoolSize;
-
-    private final Classification<?> mBridgeClassification;
-
-    private final Map<Classification<?>, BridgeGate<?, ?>> mBridgeMap;
 
     private final Current mCurrent;
 
@@ -88,17 +79,13 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
     private final Waterfall<SOURCE, SOURCE, ?> mSource;
 
-    private Waterfall(final Waterfall<SOURCE, SOURCE, ?> source,
-            final Map<Classification<?>, BridgeGate<?, ?>> bridgeMap,
-            final Classification<?> bridgeClassification, final int backgroundPoolSize,
+    private Waterfall(final Waterfall<SOURCE, SOURCE, ?> source, final int backgroundPoolSize,
             final Current backgroundCurrent, final PumpGate<?> pumpGate, final int size,
             final Current current, final CurrentGenerator generator,
             final DataFall<IN, OUT>[] falls) {
 
         //noinspection unchecked
         mSource = (source != null) ? source : (Waterfall<SOURCE, SOURCE, ?>) this;
-        mBridgeMap = bridgeMap;
-        mBridgeClassification = bridgeClassification;
         mBackgroundPoolSize = backgroundPoolSize;
         mBackgroundCurrent = backgroundCurrent;
         mPump = pumpGate;
@@ -108,15 +95,12 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
         mFalls = falls;
     }
 
-    private Waterfall(final Waterfall<SOURCE, SOURCE, ?> source,
-            final Map<Classification<?>, BridgeGate<?, ?>> bridgeMap,
-            final Classification<?> bridgeClassification, final int backgroundPoolSize,
+    private Waterfall(final Waterfall<SOURCE, SOURCE, ?> source, final int backgroundPoolSize,
             final Current backgroundCurrent, final PumpGate<?> pumpGate, final int size,
             final Current current, final CurrentGenerator generator, final Gate<IN, OUT>[] gates) {
 
         //noinspection unchecked
         mSource = (source != null) ? source : (Waterfall<SOURCE, SOURCE, ?>) this;
-        mBridgeClassification = null;
         mBackgroundPoolSize = backgroundPoolSize;
         mBackgroundCurrent = backgroundCurrent;
         mSize = size;
@@ -127,34 +111,13 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
         final Gate<IN, OUT> wrappedGate;
 
-        if (bridgeClassification != null) {
+        if (size != length) {
 
-            final Gate<IN, OUT> gate = gates[0];
-
-            final HashMap<Classification<?>, BridgeGate<?, ?>> fallBridgeMap =
-                    new HashMap<Classification<?>, BridgeGate<?, ?>>(bridgeMap);
-            final BridgeGate<IN, OUT> bridgeGate = new BridgeGate<IN, OUT>(gate);
-
-            mapBridge(fallBridgeMap,
-                      (SELF_CLASSIFICATION == bridgeClassification) ? Classification.ofType(
-                              gate.getClass()) : bridgeClassification, bridgeGate);
-
-            mBridgeMap = fallBridgeMap;
-
-            wrappedGate = bridgeGate;
+            wrappedGate = new BarrageGate<IN, OUT>(gates[0]);
 
         } else {
 
-            if (size != length) {
-
-                wrappedGate = new BarrageGate<IN, OUT>(gates[0]);
-
-            } else {
-
-                wrappedGate = null;
-            }
-
-            mBridgeMap = bridgeMap;
+            wrappedGate = null;
         }
 
         final DataFall[] falls = new DataFall[size];
@@ -205,11 +168,9 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      */
     public static Waterfall<Object, Object, Object> fall() {
 
-        final Map<Classification<?>, BridgeGate<?, ?>> bridgeMap = Collections.emptyMap();
-
         //noinspection unchecked
-        return new Waterfall<Object, Object, Object>(null, bridgeMap, null, 0, null, null, 1,
-                                                     Currents.passThrough(), null, NO_FALL);
+        return new Waterfall<Object, Object, Object>(null, 0, null, null, 1, Currents.passThrough(),
+                                                     null, NO_FALL);
     }
 
     /**
@@ -230,6 +191,37 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
         inFall.outputStreams.add(stream);
 
         return stream;
+    }
+
+    /**
+     * Computes and returns the optimum thread pool size.
+     *
+     * @return the pool size.
+     */
+    private static int getBestPoolSize() {
+
+        final int processors = Runtime.getRuntime().availableProcessors();
+
+        if (processors < 4) {
+
+            return Math.max(1, processors - 1);
+        }
+
+        return (processors / 2);
+    }
+
+    /**
+     * Gets the gate instance specified by the user.
+     *
+     * @param gate  the target gate.
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
+     * @return the user gate.
+     */
+    private static <IN, OUT> Gate<IN, OUT> getUserGate(final Gate<IN, OUT> gate) {
+
+        //noinspection unchecked
+        return ((gate instanceof BarrageGate) ? ((BarrageGate) gate).gate : gate);
     }
 
     /**
@@ -272,142 +264,118 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
     }
 
     /**
-     * Tells the waterfall to build a bridge on top of the next gate chained to it.
-     * <p/>
-     * The bridge type will be the same as the gate raw type.
+     * Builds and returns a new bridge of the specified type over the stream identified by the
+     * specified number.
      *
-     * @return the newly created waterfall.
+     * @param streamNumber the stream number.
+     * @param type         the bridge type.
+     * @param <TYPE>       the gate type.
+     * @return the bridge instance.
      */
-    public Waterfall<SOURCE, IN, OUT> bridge() {
+    public <TYPE> Bridge<TYPE> bridge(final int streamNumber, final Class<TYPE> type) {
 
-        return bridge(SELF_CLASSIFICATION);
+        return bridge(streamNumber, Classification.ofType(type));
     }
 
     /**
-     * Tells the waterfall to build a bridge of the specified type on top of the next gate chained
-     * to it.
+     * Builds and returns a new bridge of the specified classification over the stream identified
+     * by the specified number.
      *
-     * @param bridgeClass the bridge class.
-     * @return the newly created waterfall.
-     * @throws IllegalArgumentException if the bridge class is null.
+     * @param streamNumber   the stream number.
+     * @param classification the bridge classification.
+     * @param <TYPE>         the gate type.
+     * @return the bridge instance.
      */
-    public Waterfall<SOURCE, IN, OUT> bridge(final Class<?> bridgeClass) {
-
-        return bridge(Classification.ofType(bridgeClass));
-    }
-
-    /**
-     * Tells the waterfall to build a bridge of the specified classification type on top of the
-     * next gate chained to it.
-     *
-     * @param bridgeClassification the bridge classification.
-     * @return the newly created waterfall.
-     * @throws IllegalArgumentException if the bridge classification is null.
-     */
-    public Waterfall<SOURCE, IN, OUT> bridge(final Classification<?> bridgeClassification) {
-
-        if (bridgeClassification == null) {
-
-            throw new IllegalArgumentException("the bridge classification cannot be null");
-        }
-
-        return new Waterfall<SOURCE, IN, OUT>(mSource, mBridgeMap, bridgeClassification,
-                                              mBackgroundPoolSize, mBackgroundCurrent, mPump, mSize,
-                                              mCurrent, mCurrentGenerator, mFalls);
-    }
-
-    /**
-     * Chains the gate protected by the bridge of the specified classification type to this
-     * waterfall.
-     * <p/>
-     * Note that contrary to common gate, the ones protected by a bridge can be added several times
-     * to the same waterfall.
-     *
-     * @param bridgeClassification the bridge classification.
-     * @param <NOUT>               the new output data type.
-     * @return the newly created waterfall.
-     * @throws IllegalArgumentException if no protected gate is found.
-     */
-    public <NOUT> Waterfall<SOURCE, OUT, NOUT> chain(
-            final Classification<? extends Gate<OUT, NOUT>> bridgeClassification) {
-
-        //noinspection unchecked
-        final Gate<OUT, NOUT> gate = (Gate<OUT, NOUT>) findBestMatch(bridgeClassification);
-
-        if (gate == null) {
-
-            throw new IllegalArgumentException(
-                    "the waterfall does not retain any bridge of classification type "
-                            + bridgeClassification);
-        }
+    public <TYPE> Bridge<TYPE> bridge(final int streamNumber,
+            final Classification<TYPE> classification) {
 
         final DataFall<IN, OUT>[] falls = mFalls;
-        final int size = mSize;
 
-        //noinspection unchecked
-        final Gate<OUT, NOUT>[] gates = new Gate[size];
+        if (falls == NO_FALL) {
 
-        if (size == 1) {
-
-            gates[0] = gate;
-
-            final Waterfall<SOURCE, OUT, NOUT> waterfall =
-                    new Waterfall<SOURCE, OUT, NOUT>(mSource, mBridgeMap, mBridgeClassification,
-                                                     mBackgroundPoolSize, mBackgroundCurrent, mPump,
-                                                     1, mCurrent, mCurrentGenerator, gates);
-
-            final DataFall<OUT, NOUT> outFall = waterfall.mFalls[0];
-
-            for (final DataFall<IN, OUT> fall : falls) {
-
-                connect(fall, outFall);
-            }
-
-            return waterfall;
+            return start().bridge(streamNumber, classification);
         }
 
-        final int length = falls.length;
-        final Waterfall<SOURCE, ?, OUT> inWaterfall;
+        final DataFall<IN, OUT> bridgeFall = falls[streamNumber];
 
-        if ((length != 1) && (length != size)) {
+        return new DataBridge<TYPE>(classification, getUserGate(bridgeFall.gate), bridgeFall.lock,
+                                    bridgeFall.getCondition());
+    }
 
-            inWaterfall = merge();
+    /**
+     * Builds and returns a new bridge over the stream identified by the specified number.
+     *
+     * @param streamNumber the stream number.
+     * @return the bridge instance.
+     */
+    public Bridge<Gate<IN, OUT>> bridge(final int streamNumber) {
 
-        } else {
+        final Classification<Gate<IN, OUT>> classification = new Classification<Gate<IN, OUT>>() {};
 
-            inWaterfall = this;
+        return bridge(streamNumber, classification);
+    }
+
+    /**
+     * Builds and returns a new bridge of the specified type.
+     *
+     * @param type   the bridge type.
+     * @param <TYPE> the gate type.
+     * @return the bridge instance.
+     */
+    public <TYPE> Bridge<TYPE> bridge(final Class<TYPE> type) {
+
+        return bridge(Classification.ofType(type));
+    }
+
+    /**
+     * Builds and returns a new bridge of the specified classification.
+     *
+     * @param classification the bridge classification.
+     * @param <TYPE>         the gate type.
+     * @return the bridge instance.
+     * @throws IllegalArgumentException if no compatible gate is found.
+     */
+    public <TYPE> Bridge<TYPE> bridge(final Classification<TYPE> classification) {
+
+        final DataFall<IN, OUT>[] falls = mFalls;
+
+        if (falls == NO_FALL) {
+
+            return start().bridge(classification);
         }
 
-        Arrays.fill(gates, gate);
+        final Class<TYPE> bridgeType = classification.getRawType();
+        DataFall<IN, OUT> bridgeFall = null;
 
-        final Waterfall<SOURCE, OUT, NOUT> waterfall =
-                new Waterfall<SOURCE, OUT, NOUT>(inWaterfall.mSource, inWaterfall.mBridgeMap,
-                                                 inWaterfall.mBridgeClassification,
-                                                 mBackgroundPoolSize, mBackgroundCurrent, mPump,
-                                                 size, inWaterfall.mCurrent,
-                                                 inWaterfall.mCurrentGenerator, gates);
+        for (DataFall<IN, OUT> fall : falls) {
 
-        final DataFall<?, OUT>[] inFalls = inWaterfall.mFalls;
-        final DataFall<OUT, NOUT>[] outFalls = waterfall.mFalls;
+            if (bridgeType.isInstance(getUserGate(fall.gate))) {
 
-        if (inFalls.length == 1) {
-
-            final DataFall<?, OUT> inFall = inFalls[0];
-
-            for (final DataFall<OUT, NOUT> outFall : outFalls) {
-
-                connect(inFall, outFall);
-            }
-
-        } else {
-
-            for (int i = 0; i < size; ++i) {
-
-                connect(inFalls[i], outFalls[i]);
+                bridgeFall = fall;
+                break;
             }
         }
 
-        return waterfall;
+        if (bridgeFall == null) {
+
+            throw new IllegalArgumentException(
+                    "cannot build a bridge of type: " + bridgeType.getCanonicalName());
+        }
+
+        return new DataBridge<TYPE>(classification, getUserGate(bridgeFall.gate), bridgeFall.lock,
+                                    bridgeFall.getCondition());
+    }
+
+    /**
+     * Builds and returns a new bridge.
+     *
+     * @return the bridge instance.
+     */
+    public Bridge<Gate<IN, OUT>> bridge() {
+
+        final Classification<Gate<IN, OUT>> classification = new Classification<Gate<IN, OUT>>() {};
+
+        return bridge(classification);
     }
 
     /**
@@ -436,9 +404,9 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
             gates[0] = gate;
 
             final Waterfall<SOURCE, OUT, OUT> waterfall =
-                    new Waterfall<SOURCE, OUT, OUT>(mSource, mBridgeMap, mBridgeClassification,
-                                                    mBackgroundPoolSize, mBackgroundCurrent, mPump,
-                                                    1, mCurrent, mCurrentGenerator, gates);
+                    new Waterfall<SOURCE, OUT, OUT>(mSource, mBackgroundPoolSize,
+                                                    mBackgroundCurrent, mPump, 1, mCurrent,
+                                                    mCurrentGenerator, gates);
 
             final DataFall<OUT, OUT> outFall = waterfall.mFalls[0];
 
@@ -465,11 +433,10 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
         Arrays.fill(gates, gate);
 
         final Waterfall<SOURCE, OUT, OUT> waterfall =
-                new Waterfall<SOURCE, OUT, OUT>(inWaterfall.mSource, inWaterfall.mBridgeMap,
-                                                inWaterfall.mBridgeClassification,
-                                                mBackgroundPoolSize, mBackgroundCurrent, mPump,
-                                                size, inWaterfall.mCurrent,
-                                                inWaterfall.mCurrentGenerator, gates);
+                new Waterfall<SOURCE, OUT, OUT>(inWaterfall.mSource, mBackgroundPoolSize,
+                                                mBackgroundCurrent, mPump, size,
+                                                inWaterfall.mCurrent, inWaterfall.mCurrentGenerator,
+                                                gates);
 
         final DataFall<?, OUT>[] inFalls = inWaterfall.mFalls;
         final DataFall<OUT, OUT>[] outFalls = waterfall.mFalls;
@@ -577,9 +544,9 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
             registerGate(gate);
 
             final Waterfall<SOURCE, OUT, NOUT> waterfall =
-                    new Waterfall<SOURCE, OUT, NOUT>(mSource, mBridgeMap, mBridgeClassification,
-                                                     mBackgroundPoolSize, mBackgroundCurrent, mPump,
-                                                     1, mCurrent, mCurrentGenerator, gates);
+                    new Waterfall<SOURCE, OUT, NOUT>(mSource, mBackgroundPoolSize,
+                                                     mBackgroundCurrent, mPump, 1, mCurrent,
+                                                     mCurrentGenerator, gates);
 
             final DataFall<OUT, NOUT> outFall = waterfall.mFalls[0];
 
@@ -606,10 +573,9 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
         registerGate(gate);
 
         final Waterfall<SOURCE, OUT, NOUT> waterfall =
-                new Waterfall<SOURCE, OUT, NOUT>(inWaterfall.mSource, inWaterfall.mBridgeMap,
-                                                 inWaterfall.mBridgeClassification,
-                                                 mBackgroundPoolSize, mBackgroundCurrent, mPump,
-                                                 size, inWaterfall.mCurrent,
+                new Waterfall<SOURCE, OUT, NOUT>(inWaterfall.mSource, mBackgroundPoolSize,
+                                                 mBackgroundCurrent, mPump, size,
+                                                 inWaterfall.mCurrent,
                                                  inWaterfall.mCurrentGenerator, gates);
 
         final DataFall<?, OUT>[] inFalls = inWaterfall.mFalls;
@@ -676,9 +642,9 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
             gates[0] = gate;
 
             final Waterfall<SOURCE, OUT, NOUT> waterfall =
-                    new Waterfall<SOURCE, OUT, NOUT>(mSource, mBridgeMap, mBridgeClassification,
-                                                     mBackgroundPoolSize, mBackgroundCurrent, mPump,
-                                                     1, mCurrent, mCurrentGenerator, gates);
+                    new Waterfall<SOURCE, OUT, NOUT>(mSource, mBackgroundPoolSize,
+                                                     mBackgroundCurrent, mPump, 1, mCurrent,
+                                                     mCurrentGenerator, gates);
 
             final DataFall<OUT, NOUT> outFall = waterfall.mFalls[0];
 
@@ -688,11 +654,6 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
             }
 
             return waterfall;
-        }
-
-        if (mBridgeClassification != null) {
-
-            throw new IllegalStateException("cannot make a bridge from more than one gate");
         }
 
         final int length = falls.length;
@@ -717,10 +678,9 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
         }
 
         final Waterfall<SOURCE, OUT, NOUT> waterfall =
-                new Waterfall<SOURCE, OUT, NOUT>(inWaterfall.mSource, inWaterfall.mBridgeMap,
-                                                 inWaterfall.mBridgeClassification,
-                                                 mBackgroundPoolSize, mBackgroundCurrent, mPump,
-                                                 size, inWaterfall.mCurrent,
+                new Waterfall<SOURCE, OUT, NOUT>(inWaterfall.mSource, mBackgroundPoolSize,
+                                                 mBackgroundCurrent, mPump, size,
+                                                 inWaterfall.mCurrent,
                                                  inWaterfall.mCurrentGenerator, gates);
 
         final DataFall<?, OUT>[] inFalls = inWaterfall.mFalls;
@@ -747,98 +707,18 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
     }
 
     /**
-     * Tells the waterfall to close the bridge handling the specified gate, that is, the bridge
-     * will not be accessible anymore to the ones requiring it.
-     *
-     * @param gate   the gate instance.
-     * @param <TYPE> the gate type.
-     * @return the newly created waterfall.
-     */
-    public <TYPE extends Gate<?, ?>> Waterfall<SOURCE, IN, OUT> close(final TYPE gate) {
-
-        if (gate == null) {
-
-            return this;
-        }
-
-        boolean isChanged = false;
-
-        final HashMap<Classification<?>, BridgeGate<?, ?>> bridgeMap =
-                new HashMap<Classification<?>, BridgeGate<?, ?>>(mBridgeMap);
-
-        final Iterator<BridgeGate<?, ?>> iterator = bridgeMap.values().iterator();
-
-        while (iterator.hasNext()) {
-
-            if (gate == iterator.next().gate) {
-
-                iterator.remove();
-
-                isChanged = true;
-            }
-        }
-
-        if (!isChanged) {
-
-            return this;
-        }
-
-        return new Waterfall<SOURCE, IN, OUT>(mSource, bridgeMap, mBridgeClassification,
-                                              mBackgroundPoolSize, mBackgroundCurrent, mPump, mSize,
-                                              mCurrent, mCurrentGenerator, mFalls);
-    }
-
-    /**
-     * Tells the waterfall to close the bridge of the specified classification type, that is, the bridge
-     * will not be accessible anymore to the ones requiring it.
-     *
-     * @param bridgeClassification the bridge classification.
-     * @param <TYPE>               the gate type.
-     * @return the newly created waterfall.
-     */
-    public <TYPE> Waterfall<SOURCE, IN, OUT> close(
-            final Classification<TYPE> bridgeClassification) {
-
-        final BridgeGate<?, ?> bridge = findBestMatch(bridgeClassification);
-
-        if (bridge == null) {
-
-            return this;
-        }
-
-        final HashMap<Classification<?>, BridgeGate<?, ?>> bridgeMap =
-                new HashMap<Classification<?>, BridgeGate<?, ?>>(mBridgeMap);
-
-        final Iterator<BridgeGate<?, ?>> iterator = bridgeMap.values().iterator();
-
-        while (iterator.hasNext()) {
-
-            if (bridge == iterator.next()) {
-
-                iterator.remove();
-            }
-        }
-
-        return new Waterfall<SOURCE, IN, OUT>(mSource, bridgeMap, mBridgeClassification,
-                                              mBackgroundPoolSize, mBackgroundCurrent, mPump, mSize,
-                                              mCurrent, mCurrentGenerator, mFalls);
-    }
-
-    /**
      * Creates and returns a new data collector.
      *
      * @return the collector.
-     * @throws IllegalStateException if this waterfall was not started.
      */
     public Collector<OUT> collect() {
 
         if (mFalls == NO_FALL) {
 
-            throw new IllegalStateException("cannot collect data from a not started waterfall");
+            return start().collect();
         }
 
         final CollectorGate<OUT> collectorGate = new CollectorGate<OUT>();
-        final BridgeGate<OUT, OUT> bridgeGate = new BridgeGate<OUT, OUT>(collectorGate);
 
         final Waterfall<SOURCE, IN, OUT> waterfall;
 
@@ -851,9 +731,11 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
             waterfall = this;
         }
 
-        waterfall.chain(bridgeGate);
+        final Classification<CollectorGate<OUT>> classification =
+                new Classification<CollectorGate<OUT>>() {};
 
-        return new DataCollector<OUT>(bridgeGate, collectorGate);
+        return new DataCollector<OUT>(waterfall.chain(collectorGate).bridge(classification),
+                                      collectorGate);
     }
 
     /**
@@ -1113,57 +995,6 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
         fall.inputCurrent.flush(fall, null);
 
         return this;
-    }
-
-    @Override
-    public <TYPE> Bridge<TYPE> on(final Class<TYPE> bridgeClass) {
-
-        return on(Classification.ofType(bridgeClass));
-    }
-
-    @Override
-    public <TYPE> Bridge<TYPE> on(final TYPE gate) {
-
-        if (gate == null) {
-
-            throw new IllegalArgumentException("the bridge gate cannot be null");
-        }
-
-        BridgeGate<?, ?> bridge = null;
-
-        final Map<Classification<?>, BridgeGate<?, ?>> bridgeMap = mBridgeMap;
-
-        for (final BridgeGate<?, ?> bridgeGate : bridgeMap.values()) {
-
-            if (bridgeGate.gate == gate) {
-
-                bridge = bridgeGate;
-
-                break;
-            }
-        }
-
-        if (bridge == null) {
-
-            throw new IllegalArgumentException("the waterfall does not retain the bridge " + gate);
-        }
-
-        return new DataBridge<TYPE>(bridge, new Classification<TYPE>() {});
-    }
-
-    @Override
-    public <TYPE> Bridge<TYPE> on(final Classification<TYPE> bridgeClassification) {
-
-        final BridgeGate<?, ?> bridge = findBestMatch(bridgeClassification);
-
-        if (bridge == null) {
-
-            throw new IllegalArgumentException(
-                    "the waterfall does not retain any bridge of classification type "
-                            + bridgeClassification);
-        }
-
-        return new DataBridge<TYPE>(bridge, bridgeClassification);
     }
 
     @Override
@@ -1706,9 +1537,8 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
             throw new IllegalArgumentException("the waterfall current generator cannot be null");
         }
 
-        return new Waterfall<SOURCE, IN, OUT>(mSource, mBridgeMap, mBridgeClassification,
-                                              mBackgroundPoolSize, mBackgroundCurrent, mPump, mSize,
-                                              null, generator, mFalls);
+        return new Waterfall<SOURCE, IN, OUT>(mSource, mBackgroundPoolSize, mBackgroundCurrent,
+                                              mPump, mSize, null, generator, mFalls);
     }
 
     /**
@@ -1725,9 +1555,9 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
             throw new IllegalArgumentException("the fall count cannot be negative or zero");
         }
 
-        return new Waterfall<SOURCE, IN, OUT>(mSource, mBridgeMap, mBridgeClassification,
-                                              mBackgroundPoolSize, mBackgroundCurrent, mPump,
-                                              fallCount, mCurrent, mCurrentGenerator, mFalls);
+        return new Waterfall<SOURCE, IN, OUT>(mSource, mBackgroundPoolSize, mBackgroundCurrent,
+                                              mPump, fallCount, mCurrent, mCurrentGenerator,
+                                              mFalls);
     }
 
     /**
@@ -1744,9 +1574,8 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
             throw new IllegalArgumentException("the waterfall current cannot be null");
         }
 
-        return new Waterfall<SOURCE, IN, OUT>(mSource, mBridgeMap, mBridgeClassification,
-                                              mBackgroundPoolSize, mBackgroundCurrent, mPump, mSize,
-                                              current, null, mFalls);
+        return new Waterfall<SOURCE, IN, OUT>(mSource, mBackgroundPoolSize, mBackgroundCurrent,
+                                              mPump, mSize, current, null, mFalls);
     }
 
     /**
@@ -1782,9 +1611,8 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
             backgroundCurrent = mBackgroundCurrent;
         }
 
-        return new Waterfall<SOURCE, IN, OUT>(mSource, mBridgeMap, mBridgeClassification, poolSize,
-                                              backgroundCurrent, mPump, fallCount,
-                                              backgroundCurrent, null, mFalls);
+        return new Waterfall<SOURCE, IN, OUT>(mSource, poolSize, backgroundCurrent, mPump,
+                                              fallCount, backgroundCurrent, null, mFalls);
     }
 
     /**
@@ -1814,9 +1642,8 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
             backgroundCurrent = mBackgroundCurrent;
         }
 
-        return new Waterfall<SOURCE, IN, OUT>(mSource, mBridgeMap, mBridgeClassification, poolSize,
-                                              backgroundCurrent, mPump, poolSize, backgroundCurrent,
-                                              null, mFalls);
+        return new Waterfall<SOURCE, IN, OUT>(mSource, poolSize, backgroundCurrent, mPump, poolSize,
+                                              backgroundCurrent, null, mFalls);
     }
 
     /**
@@ -1866,8 +1693,6 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * the ones coming from the specified waterfall streams will flow through the streams N + 1, N
      * + 2, ..., etc.
      * <p/>
-     * TODO how to handle the bridges?
-     * <p/>
      * Note that the bridges, the size and the currents of this waterfall will be retained.
      *
      * @param waterfall the waterfall to join.
@@ -1889,8 +1714,6 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
      * waterfall N streams will flow through the first N streams of the resulting waterfall, the
      * ones coming from the streams of the first waterfall in the specified collection will flow
      * through the streams N + 1, N + 2, ..., etc., and so on.
-     * <p/>
-     * TODO how to handle the bridges?
      * <p/>
      * Note that the bridges, the size and the currents of this waterfall will be retained.
      *
@@ -1949,8 +1772,7 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
         Arrays.fill(gates, gate);
 
         final Waterfall<OUT, OUT, OUT> waterfall =
-                new Waterfall<OUT, OUT, OUT>(null, mBridgeMap, mBridgeClassification,
-                                             mBackgroundPoolSize, mBackgroundCurrent, mPump,
+                new Waterfall<OUT, OUT, OUT>(null, mBackgroundPoolSize, mBackgroundCurrent, mPump,
                                              totSize, mCurrent, mCurrentGenerator, gates);
 
         int number = 0;
@@ -2334,11 +2156,8 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
         final Gate<OUT, OUT>[] gates = new Gate[size];
         Arrays.fill(gates, openGate());
 
-        final Map<Classification<?>, BridgeGate<?, ?>> bridgeMap = Collections.emptyMap();
-
-        return new Waterfall<OUT, OUT, OUT>(null, bridgeMap, mBridgeClassification,
-                                            mBackgroundPoolSize, mBackgroundCurrent, null, size,
-                                            mCurrent, mCurrentGenerator, gates);
+        return new Waterfall<OUT, OUT, OUT>(null, mBackgroundPoolSize, mBackgroundCurrent, null,
+                                            size, mCurrent, mCurrentGenerator, gates);
     }
 
     /**
@@ -2396,8 +2215,6 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
             throw new IllegalArgumentException("the waterfall gate generator cannot be null");
         }
 
-        final Map<Classification<?>, BridgeGate<?, ?>> bridgeMap = Collections.emptyMap();
-
         final int size = mSize;
 
         //noinspection unchecked
@@ -2411,14 +2228,8 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
             gates[0] = gate;
 
-            return new Waterfall<NIN, NIN, NOUT>(null, bridgeMap, mBridgeClassification,
-                                                 mBackgroundPoolSize, mBackgroundCurrent, null, 1,
-                                                 mCurrent, mCurrentGenerator, gates);
-        }
-
-        if (mBridgeClassification != null) {
-
-            throw new IllegalStateException("cannot make a bridge from more than one gate");
+            return new Waterfall<NIN, NIN, NOUT>(null, mBackgroundPoolSize, mBackgroundCurrent,
+                                                 null, 1, mCurrent, mCurrentGenerator, gates);
         }
 
         for (int i = 0; i < size; ++i) {
@@ -2430,9 +2241,8 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
             gates[i] = gate;
         }
 
-        return new Waterfall<NIN, NIN, NOUT>(null, bridgeMap, null, mBackgroundPoolSize,
-                                             mBackgroundCurrent, null, size, mCurrent,
-                                             mCurrentGenerator, gates);
+        return new Waterfall<NIN, NIN, NOUT>(null, mBackgroundPoolSize, mBackgroundCurrent, null,
+                                             size, mCurrent, mCurrentGenerator, gates);
     }
 
     /**
@@ -2500,14 +2310,11 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
         registerGate(gate);
 
-        final Map<Classification<?>, BridgeGate<?, ?>> bridgeMap = Collections.emptyMap();
-
         //noinspection unchecked
         final Gate<NIN, NOUT>[] gates = new Gate[]{gate};
 
-        return new Waterfall<NIN, NIN, NOUT>(null, bridgeMap, mBridgeClassification,
-                                             mBackgroundPoolSize, mBackgroundCurrent, null, mSize,
-                                             mCurrent, mCurrentGenerator, gates);
+        return new Waterfall<NIN, NIN, NOUT>(null, mBackgroundPoolSize, mBackgroundCurrent, null,
+                                             mSize, mCurrent, mCurrentGenerator, gates);
     }
 
     /**
@@ -2531,63 +2338,9 @@ public class Waterfall<SOURCE, IN, OUT> extends AbstractRiver<IN> {
 
         final Waterfall<SOURCE, OUT, OUT> waterfall = chain(pumpGate);
 
-        return new Waterfall<SOURCE, OUT, OUT>(waterfall.mSource, waterfall.mBridgeMap,
-                                               waterfall.mBridgeClassification, mBackgroundPoolSize,
+        return new Waterfall<SOURCE, OUT, OUT>(waterfall.mSource, mBackgroundPoolSize,
                                                mBackgroundCurrent, pumpGate, waterfall.mSize,
                                                waterfall.mCurrent, waterfall.mCurrentGenerator,
                                                waterfall.mFalls);
-    }
-
-    private BridgeGate<?, ?> findBestMatch(final Classification<?> bridgeClassification) {
-
-        final Map<Classification<?>, BridgeGate<?, ?>> bridgeMap = mBridgeMap;
-
-        BridgeGate<?, ?> gate = bridgeMap.get(bridgeClassification);
-
-        if (gate == null) {
-
-            Classification<?> bestMatch = null;
-
-            for (final Entry<Classification<?>, BridgeGate<?, ?>> entry : bridgeMap.entrySet()) {
-
-                final Classification<?> type = entry.getKey();
-
-                if (bridgeClassification.isAssignableFrom(type)) {
-
-                    if ((bestMatch == null) || type.isAssignableFrom(bestMatch)) {
-
-                        gate = entry.getValue();
-
-                        bestMatch = type;
-                    }
-                }
-            }
-        }
-
-        return gate;
-    }
-
-    private int getBestPoolSize() {
-
-        final int processors = Runtime.getRuntime().availableProcessors();
-
-        if (processors < 4) {
-
-            return Math.max(1, processors - 1);
-        }
-
-        return (processors / 2);
-    }
-
-    private void mapBridge(final HashMap<Classification<?>, BridgeGate<?, ?>> bridgeMap,
-            final Classification<?> bridgeClassification, final BridgeGate<?, ?> gate) {
-
-        if (!bridgeClassification.getRawType().isInstance(gate.gate)) {
-
-            throw new IllegalArgumentException(
-                    "the gate does not implement the bridge classification type");
-        }
-
-        bridgeMap.put(bridgeClassification, gate);
     }
 }

@@ -134,7 +134,7 @@ class DefaultRapidBridge<TYPE> implements RapidBridge<TYPE> {
         if ((type != null) && !bridgeClass.isAssignableFrom(type)) {
 
             throw new IllegalArgumentException(
-                    "the bridge is not of the specified type: " + bridgeClass.getCanonicalName());
+                    "the bridge is not of type: " + bridgeClass.getCanonicalName());
         }
 
         final Bridge<NTYPE> bridge = buildBridge(bridgeClass);

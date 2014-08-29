@@ -38,15 +38,19 @@ public class RapidGateTest extends TestCase {
 
     public void testBridge() {
 
-        assertThat(fall().bridge().start(new TestGateBridge()).chain(new RapidGate() {
+        final Waterfall<Object, Object, Object> fall = fall().start(new TestGateBridge());
+
+        assertThat(fall.chain(new RapidGate() {
 
             @SuppressWarnings("UnusedDeclaration")
             public Object obj(final Object obj) {
 
-                assertThat(on(GateBridge.class).perform().getInt()).isEqualTo(111);
-                assertThat(
-                        on(Classification.ofType(GateBridge.class)).perform().getInt()).isEqualTo(
-                        111);
+                assertThat(Rapid.bridge(fall.bridge(GateBridge.class))
+                                .performAs(GateBridge.class)
+                                .getInt()).isEqualTo(111);
+                assertThat(Rapid.bridge(fall.bridge(Classification.ofType(GateBridge.class)))
+                                .performAs(GateBridge.class)
+                                .getInt()).isEqualTo(111);
 
                 return obj;
             }

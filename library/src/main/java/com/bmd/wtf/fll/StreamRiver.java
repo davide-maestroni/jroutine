@@ -13,7 +13,6 @@
  */
 package com.bmd.wtf.fll;
 
-import com.bmd.wtf.flw.Bridge;
 import com.bmd.wtf.flw.River;
 
 import java.util.List;
@@ -30,29 +29,20 @@ class StreamRiver<DATA> extends AbstractRiver<DATA> {
 
     private final List<DataStream<DATA>> mStreams;
 
-    private final Waterfall<?, ?, ?> mWaterfall;
-
     /**
      * Constructor.
      *
-     * @param streams   The list of streams.
-     * @param waterfall The source waterfall.
+     * @param streams The list of streams.
      * @throws IllegalArgumentException if the list of streams or the waterfall are null.
      */
-    public StreamRiver(final List<DataStream<DATA>> streams, final Waterfall<?, ?, ?> waterfall) {
+    public StreamRiver(final List<DataStream<DATA>> streams) {
 
         if (streams == null) {
 
             throw new IllegalArgumentException("the list of streams cannot be null");
         }
 
-        if (waterfall == null) {
-
-            throw new IllegalArgumentException("the source waterfall cannot be null");
-        }
-
         mStreams = streams;
-        mWaterfall = waterfall;
     }
 
     @Override
@@ -180,24 +170,6 @@ class StreamRiver<DATA> extends AbstractRiver<DATA> {
         mStreams.get(streamNumber).flush();
 
         return this;
-    }
-
-    @Override
-    public <TYPE> Bridge<TYPE> on(final Class<TYPE> bridgeClass) {
-
-        return mWaterfall.on(bridgeClass);
-    }
-
-    @Override
-    public <TYPE> Bridge<TYPE> on(final TYPE gate) {
-
-        return mWaterfall.on(gate);
-    }
-
-    @Override
-    public <TYPE> Bridge<TYPE> on(final Classification<TYPE> bridgeClassification) {
-
-        return mWaterfall.on(bridgeClassification);
     }
 
     @Override

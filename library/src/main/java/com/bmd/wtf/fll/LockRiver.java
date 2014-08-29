@@ -13,7 +13,6 @@
  */
 package com.bmd.wtf.fll;
 
-import com.bmd.wtf.flw.Bridge;
 import com.bmd.wtf.flw.River;
 
 import java.util.concurrent.TimeUnit;
@@ -31,7 +30,16 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 class LockRiver<DATA> implements River<DATA> {
 
-    private final ReentrantLock mLock = new ReentrantLock();
+    private static final ThreadLocal<DataLock> sLock = new ThreadLocal<DataLock>() {
+
+        @Override
+        protected DataLock initialValue() {
+
+            return new DataLock();
+        }
+    };
+
+    private final ReentrantLock mLock;
 
     private final River<DATA> mRiver;
 
@@ -41,16 +49,23 @@ class LockRiver<DATA> implements River<DATA> {
      * Constructor.
      *
      * @param wrapped the wrapped river.
+     * @param lock    the lock instance.
      * @throws IllegalArgumentException if the wrapped river is null.
      */
-    public LockRiver(final River<DATA> wrapped) {
+    public LockRiver(final River<DATA> wrapped, final ReentrantLock lock) {
 
         if (wrapped == null) {
 
             throw new IllegalArgumentException("the river cannot be null");
         }
 
+        if (lock == null) {
+
+            throw new IllegalArgumentException("the lock cannot be null");
+        }
+
         mRiver = wrapped;
+        mLock = lock;
     }
 
     @Override
@@ -518,24 +533,6 @@ class LockRiver<DATA> implements River<DATA> {
     }
 
     @Override
-    public <TYPE> Bridge<TYPE> on(final Class<TYPE> bridgeClass) {
-
-        return mRiver.on(bridgeClass);
-    }
-
-    @Override
-    public <TYPE> Bridge<TYPE> on(final TYPE gate) {
-
-        return mRiver.on(gate);
-    }
-
-    @Override
-    public <TYPE> Bridge<TYPE> on(final Classification<TYPE> bridgeClassification) {
-
-        return mRiver.on(bridgeClassification);
-    }
-
-    @Override
     public River<DATA> pushStream(final int streamNumber, final DATA... drops) {
 
         if ((drops == null) || (drops.length == 0)) {
@@ -713,7 +710,8 @@ class LockRiver<DATA> implements River<DATA> {
             throw new IllegalStateException("an open lock cannot be closed in a different thread");
         }
 
-        final DataLock dataLock = mDataLock;
+        // release the data only if this the last holder of the lock
+        final DataLock dataLock = (lock.getHoldCount() == 1) ? mDataLock : null;
         mDataLock = null;
 
         lock.unlock();
@@ -726,13 +724,11 @@ class LockRiver<DATA> implements River<DATA> {
 
     /**
      * Opens the river lock.
-     *
-     * @param lock the lock instance.
      */
-    void open(final DataLock lock) {
+    void open() {
 
         mLock.lock();
-        mDataLock = lock;
+        mDataLock = sLock.get();
     }
 
     private boolean isOpen() {

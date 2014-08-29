@@ -13,7 +13,6 @@
  */
 package com.bmd.wtf.fll;
 
-import com.bmd.wtf.flw.Bridge;
 import com.bmd.wtf.flw.River;
 
 import java.util.concurrent.TimeUnit;
@@ -244,24 +243,6 @@ public class WaterfallRiver<DATA> implements River<DATA> {
         mWaterfall.flushStreamAfter(streamNumber, delay, timeUnit, drop);
 
         return this;
-    }
-
-    @Override
-    public <TYPE> Bridge<TYPE> on(final Class<TYPE> bridgeClass) {
-
-        return mWaterfall.on(bridgeClass);
-    }
-
-    @Override
-    public <TYPE> Bridge<TYPE> on(final TYPE gate) {
-
-        return mWaterfall.on(gate);
-    }
-
-    @Override
-    public <TYPE> Bridge<TYPE> on(final Classification<TYPE> bridgeClassification) {
-
-        return mWaterfall.on(bridgeClassification);
     }
 
     @Override

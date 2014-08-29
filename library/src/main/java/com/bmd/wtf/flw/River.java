@@ -13,8 +13,6 @@
  */
 package com.bmd.wtf.flw;
 
-import com.bmd.wtf.fll.Classification;
-
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -177,39 +175,6 @@ public interface River<DATA> extends Stream<DATA> {
      * @return this river.
      */
     public River<DATA> flushStreamAfter(int streamNumber, long delay, TimeUnit timeUnit, DATA drop);
-
-    /**
-     * Returns a bridge handling a gate of the specified type.
-     * <p/>
-     * If no gate of that type is found along the river path an exception will be thrown.
-     *
-     * @param bridgeClass the bridge class.
-     * @param <TYPE>      the gate type.
-     * @return the bridge.
-     */
-    public <TYPE> Bridge<TYPE> on(Class<TYPE> bridgeClass);
-
-    /**
-     * Returns a bridge handling the specified gate.
-     * <p/>
-     * If no gate of that type is found along the river path an exception will be thrown.
-     *
-     * @param gate   the gate instance.
-     * @param <TYPE> the gate type.
-     * @return the bridge.
-     */
-    public <TYPE> Bridge<TYPE> on(TYPE gate);
-
-    /**
-     * Returns a bridge handling a gate of the specified type.
-     * <p/>
-     * If no gate of that type is found along the river path an exception will be thrown.
-     *
-     * @param bridgeClassification the bridge classification.
-     * @param <TYPE>               the gate type.
-     * @return the bridge.
-     */
-    public <TYPE> Bridge<TYPE> on(Classification<TYPE> bridgeClassification);
 
     /**
      * Pushes the specified data into the specific river stream flow.

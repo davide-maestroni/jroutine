@@ -57,14 +57,14 @@ class DataCollector<DATA> implements Collector<DATA> {
     /**
      * Constructor.
      *
-     * @param bridgeGate    the associated bridge gate.
+     * @param bridge        the associated bridge.
      * @param collectorGate the associated collector gate.
      * @throws IllegalArgumentException if the bridge or the collector are null.
      */
-    public DataCollector(final BridgeGate<DATA, DATA> bridgeGate,
+    public DataCollector(final Bridge<CollectorGate<DATA>> bridge,
             final CollectorGate<DATA> collectorGate) {
 
-        if (bridgeGate == null) {
+        if (bridge == null) {
 
             throw new IllegalArgumentException("the bridge gate cannot be null");
         }
@@ -74,11 +74,8 @@ class DataCollector<DATA> implements Collector<DATA> {
             throw new IllegalArgumentException("the collector gate cannot be null");
         }
 
+        mDataBridge = bridge.eventually();
         mCollectorGate = collectorGate;
-
-        final Classification<CollectorGate<DATA>> classification =
-                new Classification<CollectorGate<DATA>>() {};
-        mDataBridge = new DataBridge<CollectorGate<DATA>>(bridgeGate, classification).eventually();
     }
 
     @Override

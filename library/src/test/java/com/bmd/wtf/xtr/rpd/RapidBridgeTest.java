@@ -39,37 +39,36 @@ public class RapidBridgeTest extends TestCase {
 
         final BridgeGate2 bridgeGate = new BridgeGate2(1);
 
-        final Waterfall<Object, Object, Object> fall =
-                fall().bridge(BridgeGate2.class).chain(bridgeGate);
+        final Waterfall<Object, Object, Object> fall = fall().chain(bridgeGate);
 
-        assertThat(Rapid.bridge(fall.on(BridgeGate.class))
+        assertThat(Rapid.bridge(fall.bridge(BridgeGate.class))
                         .immediately()
                         .performAs(BridgeId.class)
                         .getId()).isEqualTo(1);
 
-        assertThat(Rapid.bridge(fall.on(Classification.ofType(BridgeGate2.class)))
+        assertThat(Rapid.bridge(fall.bridge(Classification.ofType(BridgeGate2.class)))
                         .immediately()
                         .performAs(Classification.ofType(BridgeId.class))
                         .getId()).isEqualTo(1);
 
-        assertThat(Rapid.bridge(fall.on(bridgeGate))
+        assertThat(Rapid.bridge(fall.bridge(BridgeGate.class))
                         .immediately()
                         .performAs(BridgeId.class)
                         .getId()).isEqualTo(1);
 
-        assertThat(Rapid.bridge(fall.on(bridgeGate))
+        assertThat(Rapid.bridge(fall.bridge(BridgeGate.class))
                         .immediately()
                         .performAs(Classification.ofType(BridgeId.class))
                         .getId()).isEqualTo(1);
 
-        assertThat(Rapid.bridge(fall.on(bridgeGate))
+        assertThat(Rapid.bridge(fall.bridge(BridgeGate.class))
                         .eventuallyThrow(new IllegalStateException())
                         .afterMax(1, TimeUnit.SECONDS)
                         .performAs(BridgeId.class)
                         .getId()).isEqualTo(1);
 
         assertThat(Rapid.bridge(
-                fall().inBackground().bridge().start(new BridgeGate2(33)).on(BridgeGate2.class))
+                fall().inBackground().start(new BridgeGate2(33)).bridge(BridgeGate2.class))
                         .eventually()
                         .when(new ConditionEvaluator<BridgeId>() {
 
@@ -83,21 +82,21 @@ public class RapidBridgeTest extends TestCase {
                         .getId()).isEqualTo(33);
 
         assertThat(Rapid.bridge(
-                fall().inBackground().bridge().start(new BridgeGate3()).on(BridgeGate2.class))
+                fall().inBackground().start(new BridgeGate3()).bridge(BridgeGate2.class))
                         .eventually()
                         .whenSatisfies(44)
                         .performAs(BridgeId.class)
                         .getId()).isEqualTo(17);
 
         assertThat(Rapid.bridge(
-                fall().inBackground().bridge().start(new BridgeGate4()).on(BridgeGate2.class))
+                fall().inBackground().start(new BridgeGate4()).bridge(BridgeGate2.class))
                         .eventually()
                         .whenSatisfies(44)
                         .performAs(BridgeId.class)
                         .getId()).isEqualTo(71);
 
         assertThat(Rapid.bridge(
-                fall().inBackground().bridge().start(new BridgeGate4()).on(BridgeGate2.class))
+                fall().inBackground().start(new BridgeGate4()).bridge(BridgeGate2.class))
                         .eventually()
                         .whenSatisfies(44)
                         .perform(new Action<Integer, BridgeGate2>() {
@@ -144,8 +143,7 @@ public class RapidBridgeTest extends TestCase {
 
         try {
 
-            Rapid.bridge(fall().bridge().start(new OpenGate<Object>()).on(OpenGate.class))
-                 .perform();
+            Rapid.bridge(fall().start(new OpenGate<Object>()).bridge(OpenGate.class)).perform();
 
             fail();
 
@@ -155,7 +153,7 @@ public class RapidBridgeTest extends TestCase {
 
         try {
 
-            Rapid.bridge(fall().bridge().start(new OpenGate<Object>()).on(OpenGate.class))
+            Rapid.bridge(fall().start(new OpenGate<Object>()).bridge(OpenGate.class))
                  .performAs(OpenGate.class);
 
             fail();
@@ -166,7 +164,7 @@ public class RapidBridgeTest extends TestCase {
 
         try {
 
-            Rapid.bridge(fall().bridge().start(new OpenGate<Object>()).on(OpenGate.class))
+            Rapid.bridge(fall().start(new OpenGate<Object>()).bridge(OpenGate.class))
                  .performAs(Classification.ofType(OpenGate.class));
 
             fail();
@@ -177,7 +175,7 @@ public class RapidBridgeTest extends TestCase {
 
         try {
 
-            Rapid.bridge(fall().bridge().start(new BridgeGateError1()).on(OpenGate.class))
+            Rapid.bridge(fall().start(new BridgeGateError1()).bridge(OpenGate.class))
                  .whenSatisfies(31)
                  .eventually()
                  .performAs(BridgeId.class)
@@ -191,7 +189,7 @@ public class RapidBridgeTest extends TestCase {
 
         try {
 
-            Rapid.bridge(fall().bridge().start(new BridgeGateError2()).on(OpenGate.class))
+            Rapid.bridge(fall().start(new BridgeGateError2()).bridge(OpenGate.class))
                  .whenSatisfies(31)
                  .eventually()
                  .performAs(BridgeId.class)
@@ -206,7 +204,7 @@ public class RapidBridgeTest extends TestCase {
         try {
 
             new DefaultRapidBridge<OpenGate>(
-                    fall().bridge().start(new OpenGate<Object>()).on(OpenGate.class),
+                    fall().start(new OpenGate<Object>()).bridge(OpenGate.class),
                     OpenGate.class).performAs(List.class);
 
             fail();

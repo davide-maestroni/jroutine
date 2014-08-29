@@ -305,35 +305,6 @@ public abstract class RapidGate implements Gate<Object, Object> {
     }
 
     /**
-     * Returns a rapid bridge handling a gate of the specified type.
-     * <p/>
-     * If no gate of that type is not found inside the waterfall an exception will be thrown.
-     *
-     * @param bridgeClass the bridge class.
-     * @param <TYPE>      the gate type.
-     * @return the bridge.
-     */
-    protected <TYPE> RapidBridge<TYPE> on(final Class<TYPE> bridgeClass) {
-
-        return new DefaultRapidBridge<TYPE>(mUpRiver.on(bridgeClass), bridgeClass);
-    }
-
-    /**
-     * Returns a rapid bridge handling a gate of the specified type.
-     * <p/>
-     * If the gate is not found inside the waterfall an exception will be thrown.
-     *
-     * @param bridgeClassification the bridge classification.
-     * @param <TYPE>               the gate type.
-     * @return the bridge.
-     */
-    protected <TYPE> RapidBridge<TYPE> on(final Classification<TYPE> bridgeClassification) {
-
-        return new DefaultRapidBridge<TYPE>(mUpRiver.on(bridgeClassification),
-                                            bridgeClassification.getRawType());
-    }
-
-    /**
      * Returns the upstream river instance.
      *
      * @return the river instance.
@@ -347,6 +318,9 @@ public abstract class RapidGate implements Gate<Object, Object> {
 
         final Class<RapidGate> rapidGateClass = RapidGate.class;
         final Class<Object> objectClass = Object.class;
+
+
+
 
         final HashMap<Class<?>, Method> globalMap = mMethodMap;
 

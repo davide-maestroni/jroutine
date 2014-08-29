@@ -27,6 +27,8 @@ import com.bmd.wtf.gts.GateDecorator;
  */
 class BarrageGate<IN, OUT> extends GateDecorator<IN, OUT> {
 
+    final Gate<IN, OUT> gate;
+
     private final Object mMutex = new Object();
 
     /**
@@ -38,6 +40,8 @@ class BarrageGate<IN, OUT> extends GateDecorator<IN, OUT> {
     public BarrageGate(final Gate<IN, OUT> wrapped) {
 
         super(wrapped);
+
+        gate = wrapped;
     }
 
     @Override

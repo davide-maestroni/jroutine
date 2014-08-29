@@ -47,26 +47,29 @@ class DataBridge<TYPE> implements Bridge<TYPE> {
     /**
      * Constructor.
      *
-     * @param gate           the bridge gate.
      * @param classification the bridge classification.
+     * @param gate           the bridge gate.
+     * @param lock           the gate lock.
+     * @param condition      the gate condition.
      * @throws IllegalArgumentException if the gate or the classification are null.
      */
-    public DataBridge(final BridgeGate<?, ?> gate, final Classification<TYPE> classification) {
-
-        if (gate == null) {
-
-            throw new IllegalArgumentException("the bridge gate cannot be null");
-        }
+    public DataBridge(final Classification<TYPE> classification, final Gate<?, ?> gate,
+            final ReentrantLock lock, final Condition condition) {
 
         if (classification == null) {
 
             throw new IllegalArgumentException("the bridge classification cannot be null");
         }
 
+        if (gate == null) {
+
+            throw new IllegalArgumentException("the bridge fall cannot be null");
+        }
+
         mClassification = classification;
-        mGate = gate.gate;
-        mLock = gate.lock;
-        mCondition = gate.condition;
+        mGate = gate;
+        mLock = lock;
+        mCondition = condition;
     }
 
     @Override

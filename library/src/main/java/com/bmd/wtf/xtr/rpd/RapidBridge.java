@@ -54,7 +54,7 @@ public interface RapidBridge<TYPE> extends Bridge<TYPE> {
      *
      * @return the wrapped gate.
      */
-    public TYPE perform();
+    public TYPE visit();
 
     /**
      * Returns the gate wrapped so to be accessed in a thread safe way.
@@ -66,7 +66,7 @@ public interface RapidBridge<TYPE> extends Bridge<TYPE> {
      * @param <NTYPE>   the new gate type.
      * @return the wrapped gate.
      */
-    public <NTYPE> NTYPE performAs(Class<NTYPE> gateClass);
+    public <NTYPE> NTYPE visitAs(Class<NTYPE> gateClass);
 
     /**
      * Returns the gate wrapped so to be accessed in a thread safe way.
@@ -78,7 +78,7 @@ public interface RapidBridge<TYPE> extends Bridge<TYPE> {
      * @param <NTYPE>            the new gate type.
      * @return the wrapped gate.
      */
-    public <NTYPE> NTYPE performAs(Classification<NTYPE> gateClassification);
+    public <NTYPE> NTYPE visitAs(Classification<NTYPE> gateClassification);
 
     /**
      * Sets the condition to be met by the gate by searching a suitable method via reflection.

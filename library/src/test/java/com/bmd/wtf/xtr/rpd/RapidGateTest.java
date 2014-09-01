@@ -45,11 +45,10 @@ public class RapidGateTest extends TestCase {
             @SuppressWarnings("UnusedDeclaration")
             public Object obj(final Object obj) {
 
-                assertThat(
-                        Rapid.bridge(fall.bridge(GateBridge.class)).perform().getInt()).isEqualTo(
+                assertThat(Rapid.bridge(fall.bridge(GateBridge.class)).visit().getInt()).isEqualTo(
                         111);
                 assertThat(Rapid.bridge(fall.bridge(Classification.ofType(GateBridge.class)))
-                                .perform()
+                                .visit()
                                 .getInt()).isEqualTo(111);
 
                 return obj;

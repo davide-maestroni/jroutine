@@ -58,7 +58,7 @@ public class DownloadManager {
         waterfall.chain(Rapid.gateGenerator(RetryPolicy.class, waterfall));
         // merge the streams and finally chain the observer
         mWaterfall = waterfall.in(1).chain(Classification.ofType(AbortObserver.class));
-        mGate = Rapid.bridge(waterfall.on(AbortObserver.class)).performAs(UriAbortObserver.class);
+        mGate = Rapid.bridge(waterfall.on(AbortObserver.class)).visitAs(UriAbortObserver.class);
     }
 
     public static void main(final String args[]) throws IOException, URISyntaxException {

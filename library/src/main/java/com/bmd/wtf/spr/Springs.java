@@ -40,6 +40,173 @@ public class Springs {
     }
 
     /**
+     * Creates and returns a spring starting from the specified reader.
+     * <p/>
+     * Note that the input reader will be automatically closed when no more data are available or
+     * an error occurs.
+     *
+     * @param input the input reader.
+     * @return the new spring.
+     * @throws IllegalArgumentException if the input reader is null.
+     */
+    public static Spring<String> from(final BufferedReader input) {
+
+        if (input == null) {
+
+            throw new IllegalArgumentException("the spring input cannot be null");
+        }
+
+        return new Spring<String>() {
+
+            private boolean mFirst = true;
+
+            private String mLine;
+
+            @Override
+            public boolean hasDrops() {
+
+                if (mFirst) {
+
+                    mFirst = false;
+
+                    try {
+
+                        mLine = input.readLine();
+
+                    } catch (final IOException e) {
+
+                        close();
+
+                        throw new FloatingException(e);
+                    }
+                }
+
+                final boolean isExhausted = (mLine == null);
+
+                if (isExhausted) {
+
+                    close();
+                }
+
+                return !isExhausted;
+            }
+
+            @Override
+            public String nextDrop() {
+
+                if (!hasDrops()) {
+
+                    throw new NoSuchElementException();
+                }
+
+                final String drop = mLine;
+
+                try {
+
+                    mLine = input.readLine();
+
+                } catch (final IOException e) {
+
+                    close();
+
+                    throw new FloatingException(e);
+                }
+
+                return drop;
+            }
+
+            private void close() {
+
+                try {
+
+                    input.close();
+
+                } catch (final IOException e) {
+
+                    throw new FloatingException(e);
+                }
+            }
+        };
+    }
+
+    /**
+     * Creates and returns a spring starting from the specified char sequence.
+     *
+     * @param input the input sequence.
+     * @return the new spring.
+     * @throws IllegalArgumentException if the input sequence is null.
+     */
+    public static Spring<Character> from(final CharSequence input) {
+
+        if (input == null) {
+
+            throw new IllegalArgumentException("the spring input cannot be null");
+        }
+
+        return new Spring<Character>() {
+
+            private int mCount;
+
+            @Override
+            public boolean hasDrops() {
+
+                return (mCount < input.length());
+            }
+
+            @Override
+            public Character nextDrop() {
+
+                if (!hasDrops()) {
+
+                    throw new NoSuchElementException();
+                }
+
+                return input.charAt(mCount++);
+            }
+        };
+    }
+
+    /**
+     * Creates and returns a spring returning the specified data drops.
+     *
+     * @param data   the drops of data.
+     * @param <DATA> the data type.
+     * @return the new spring.
+     * @throws IllegalArgumentException if the input is null.
+     */
+    public static <DATA> Spring<DATA> from(final DATA... data) {
+
+        if (data == null) {
+
+            throw new IllegalArgumentException("the spring input cannot be null");
+        }
+
+        final int length = data.length;
+
+        return new Spring<DATA>() {
+
+            private int mCount;
+
+            @Override
+            public boolean hasDrops() {
+
+                return (mCount < length);
+            }
+
+            @Override
+            public DATA nextDrop() {
+
+                if (!hasDrops()) {
+
+                    throw new NoSuchElementException();
+                }
+
+                return data[mCount++];
+            }
+        };
+    }
+
+    /**
      * Creates and returns a spring starting from the specified input stream.
      * <p/>
      * Note that the input stream will be automatically closed when no more data are available or
@@ -126,141 +293,50 @@ public class Springs {
     }
 
     /**
-     * Creates and returns a spring starting from the specified waterfall.
-     * <p/>
-     * Note that data will be pulled from the waterfall when needed. If data are pushed instead
-     * into the waterfall, consider calling <code>from(waterfall.collect())</code>.
+     * Creates and returns a spring starting from the specified data drops iterable.
      *
-     * @param waterfall the input waterfall.
-     * @param <DATA>    the data type.
+     * @param data   the iterable returning the drops of data.
+     * @param <DATA> the data type.
      * @return the new spring.
-     * @throws IllegalArgumentException if the waterfall is null.
+     * @throws IllegalArgumentException if the iterable is null.
      */
-    public static <DATA> Spring<DATA> from(final Waterfall<?, ?, DATA> waterfall) {
+    public static <DATA> Spring<DATA> from(final Iterable<DATA> data) {
 
-        if (waterfall == null) {
+        if (data == null) {
 
-            throw new IllegalArgumentException("the spring waterfall cannot be null");
+            throw new IllegalArgumentException("the spring input cannot be null");
         }
 
-        final Collector<DATA> collector = waterfall.collect();
+        return from(data.iterator());
+    }
+
+    /**
+     * Creates and returns a spring starting from the specified data drops iterator.
+     *
+     * @param data   the iterator returning the drops of data.
+     * @param <DATA> the data type.
+     * @return the new spring.
+     * @throws IllegalArgumentException if the iterator is null.
+     */
+    public static <DATA> Spring<DATA> from(final Iterator<DATA> data) {
+
+        if (data == null) {
+
+            throw new IllegalArgumentException("the spring input cannot be null");
+        }
 
         return new Spring<DATA>() {
-
-            private boolean mFirst = true;
 
             @Override
             public boolean hasDrops() {
 
-                if (mFirst) {
-
-                    mFirst = false;
-
-                    waterfall.source().flush();
-                }
-
-                return collector.hasNext();
+                return data.hasNext();
             }
 
             @Override
             public DATA nextDrop() {
 
-                if (!hasDrops()) {
-
-                    throw new NoSuchElementException();
-                }
-
-                return collector.next();
-            }
-        };
-    }
-
-    /**
-     * Creates and returns a spring starting from the specified reader.
-     * <p/>
-     * Note that the input reader will be automatically closed when no more data are available or
-     * an error occurs.
-     *
-     * @param input the input reader.
-     * @return the new spring.
-     * @throws IllegalArgumentException if the input reader is null.
-     */
-    public static Spring<String> from(final BufferedReader input) {
-
-        if (input == null) {
-
-            throw new IllegalArgumentException("the spring input cannot be null");
-        }
-
-        return new Spring<String>() {
-
-            private boolean mFirst = true;
-
-            private String mLine;
-
-            @Override
-            public boolean hasDrops() {
-
-                if (mFirst) {
-
-                    mFirst = false;
-
-                    try {
-
-                        mLine = input.readLine();
-
-                    } catch (final IOException e) {
-
-                        close();
-
-                        throw new FloatingException(e);
-                    }
-                }
-
-                final boolean isExhausted = (mLine == null);
-
-                if (isExhausted) {
-
-                    close();
-                }
-
-                return !isExhausted;
-            }
-
-            @Override
-            public String nextDrop() {
-
-                if (!hasDrops()) {
-
-                    throw new NoSuchElementException();
-                }
-
-                final String drop = mLine;
-
-                try {
-
-                    mLine = input.readLine();
-
-                } catch (final IOException e) {
-
-                    close();
-
-                    throw new FloatingException(e);
-                }
-
-                return drop;
-            }
-
-            private void close() {
-
-                try {
-
-                    input.close();
-
-                } catch (final IOException e) {
-
-                    throw new FloatingException(e);
-                }
+                return data.next();
             }
         };
     }
@@ -356,67 +432,40 @@ public class Springs {
     }
 
     /**
-     * Creates and returns a spring starting from the specified char sequence.
+     * Creates and returns a spring starting from the specified waterfall.
+     * <p/>
+     * Note that data will be pulled from the waterfall when needed. If data are pushed instead
+     * into the waterfall, consider calling <code>from(waterfall.collect())</code>.
      *
-     * @param input the input sequence.
+     * @param waterfall the input waterfall.
+     * @param <DATA>    the data type.
      * @return the new spring.
-     * @throws IllegalArgumentException if the input sequence is null.
+     * @throws IllegalArgumentException if the waterfall is null.
      */
-    public static Spring<Character> from(final CharSequence input) {
+    public static <DATA> Spring<DATA> from(final Waterfall<?, ?, DATA> waterfall) {
 
-        if (input == null) {
+        if (waterfall == null) {
 
-            throw new IllegalArgumentException("the spring input cannot be null");
+            throw new IllegalArgumentException("the spring waterfall cannot be null");
         }
 
-        return new Spring<Character>() {
-
-            private int mCount;
-
-            @Override
-            public boolean hasDrops() {
-
-                return (mCount < input.length());
-            }
-
-            @Override
-            public Character nextDrop() {
-
-                if (!hasDrops()) {
-
-                    throw new NoSuchElementException();
-                }
-
-                return input.charAt(mCount++);
-            }
-        };
-    }
-
-    /**
-     * Creates and returns a spring starting from the specified data drops.
-     *
-     * @param drops  the drops of data.
-     * @param <DATA> the data type.
-     * @return the new spring.
-     * @throws IllegalArgumentException if the input is null.
-     */
-    public static <DATA> Spring<DATA> from(final DATA... drops) {
-
-        if (drops == null) {
-
-            throw new IllegalArgumentException("the spring input cannot be null");
-        }
-
-        final int length = drops.length;
+        final Collector<DATA> collector = waterfall.collect();
 
         return new Spring<DATA>() {
 
-            private int mCount;
+            private boolean mFirst = true;
 
             @Override
             public boolean hasDrops() {
 
-                return (mCount < length);
+                if (mFirst) {
+
+                    mFirst = false;
+
+                    waterfall.source().flush();
+                }
+
+                return collector.hasNext();
             }
 
             @Override
@@ -427,58 +476,21 @@ public class Springs {
                     throw new NoSuchElementException();
                 }
 
-                return drops[mCount++];
+                return collector.next();
             }
         };
     }
 
     /**
-     * Creates and returns a spring starting from the specified data drops iterable.
+     * Creates and returns a spring generating random booleans.
      *
-     * @param drops  the iterable returning the drops of data.
-     * @param <DATA> the data type.
+     * @param count the iteration count.
      * @return the new spring.
-     * @throws IllegalArgumentException if the iterable is null.
+     * @see java.util.Random#nextBoolean()
      */
-    public static <DATA> Spring<DATA> from(final Iterable<DATA> drops) {
+    public static Spring<Boolean> randomBools(final long count) {
 
-        if (drops == null) {
-
-            throw new IllegalArgumentException("the spring input cannot be null");
-        }
-
-        return from(drops.iterator());
-    }
-
-    /**
-     * Creates and returns a spring starting from the specified data drops iterator.
-     *
-     * @param drops  the iterator returning the drops of data.
-     * @param <DATA> the data type.
-     * @return the new spring.
-     * @throws IllegalArgumentException if the iterator is null.
-     */
-    public static <DATA> Spring<DATA> from(final Iterator<DATA> drops) {
-
-        if (drops == null) {
-
-            throw new IllegalArgumentException("the spring input cannot be null");
-        }
-
-        return new Spring<DATA>() {
-
-            @Override
-            public boolean hasDrops() {
-
-                return drops.hasNext();
-            }
-
-            @Override
-            public DATA nextDrop() {
-
-                return drops.next();
-            }
-        };
+        return randomBools(new Random(), count);
     }
 
     /**
@@ -514,15 +526,15 @@ public class Springs {
     }
 
     /**
-     * Creates and returns a spring generating random booleans.
+     * Creates and returns a spring generating random bytes.
      *
      * @param count the iteration count.
      * @return the new spring.
-     * @see java.util.Random#nextBoolean()
+     * @see java.util.Random#nextBytes(byte[])
      */
-    public static Spring<Boolean> randomBools(final long count) {
+    public static Spring<Byte> randomBytes(final long count) {
 
-        return randomBools(new Random(), count);
+        return randomBytes(new Random(), count);
     }
 
     /**
@@ -564,15 +576,15 @@ public class Springs {
     }
 
     /**
-     * Creates and returns a spring generating random bytes.
+     * Creates and returns a spring generating random doubles.
      *
      * @param count the iteration count.
      * @return the new spring.
-     * @see java.util.Random#nextBytes(byte[])
+     * @see java.util.Random#nextDouble()
      */
-    public static Spring<Byte> randomBytes(final long count) {
+    public static Spring<Double> randomDoubles(final long count) {
 
-        return randomBytes(new Random(), count);
+        return randomDoubles(new Random(), count);
     }
 
     /**
@@ -612,11 +624,11 @@ public class Springs {
      *
      * @param count the iteration count.
      * @return the new spring.
-     * @see java.util.Random#nextDouble()
+     * @see java.util.Random#nextFloat()
      */
-    public static Spring<Double> randomDoubles(final long count) {
+    public static Spring<Float> randomFloats(final long count) {
 
-        return randomDoubles(new Random(), count);
+        return randomFloats(new Random(), count);
     }
 
     /**
@@ -652,15 +664,15 @@ public class Springs {
     }
 
     /**
-     * Creates and returns a spring generating random doubles.
+     * Creates and returns a spring generating random gaussian values.
      *
      * @param count the iteration count.
      * @return the new spring.
-     * @see java.util.Random#nextFloat()
+     * @see java.util.Random#nextGaussian()
      */
-    public static Spring<Float> randomFloats(final long count) {
+    public static Spring<Double> randomGaussian(final long count) {
 
-        return randomFloats(new Random(), count);
+        return randomGaussian(new Random(), count);
     }
 
     /**
@@ -696,15 +708,14 @@ public class Springs {
     }
 
     /**
-     * Creates and returns a spring generating random gaussian values.
+     * Creates and returns a spring generating random integers.
      *
      * @param count the iteration count.
      * @return the new spring.
-     * @see java.util.Random#nextGaussian()
      */
-    public static Spring<Double> randomGaussian(final long count) {
+    public static Spring<Integer> randomInts(final long count) {
 
-        return randomGaussian(new Random(), count);
+        return randomInts(new Random(), count);
     }
 
     /**
@@ -739,14 +750,14 @@ public class Springs {
     }
 
     /**
-     * Creates and returns a spring generating random integers.
+     * Creates and returns a spring generating random longs.
      *
      * @param count the iteration count.
      * @return the new spring.
      */
-    public static Spring<Integer> randomInts(final long count) {
+    public static Spring<Long> randomLongs(final long count) {
 
-        return randomInts(new Random(), count);
+        return randomLongs(new Random(), count);
     }
 
     /**
@@ -778,34 +789,6 @@ public class Springs {
                 return first();
             }
         }, count);
-    }
-
-    /**
-     * Creates and returns a spring generating random longs.
-     *
-     * @param count the iteration count.
-     * @return the new spring.
-     */
-    public static Spring<Long> randomLongs(final long count) {
-
-        return randomLongs(new Random(), count);
-    }
-
-    /**
-     * Creates a spring generating a sequence of data based on the specified sequence increment.
-     * <p/>
-     * Note that the element count cannot be negative.
-     *
-     * @param inc    the sequence increment.
-     * @param count  the sequence element count.
-     * @param <DATA> the data type.
-     * @return the new spring.
-     * @throws IllegalArgumentException if the increment is null or the count is negative.
-     */
-    public static <DATA> Spring<DATA> sequence(final SequenceIncrement<DATA> inc,
-            final long count) {
-
-        return new SequenceSpring<DATA>(inc, count);
     }
 
     /**
@@ -1009,6 +992,23 @@ public class Springs {
                 return (prev + 1);
             }
         }, last - first + 1);
+    }
+
+    /**
+     * Creates a spring generating a sequence of data based on the specified sequence increment.
+     * <p/>
+     * Note that the element count cannot be negative.
+     *
+     * @param inc    the sequence increment.
+     * @param count  the sequence element count.
+     * @param <DATA> the data type.
+     * @return the new spring.
+     * @throws IllegalArgumentException if the increment is null or the count is negative.
+     */
+    public static <DATA> Spring<DATA> sequence(final SequenceIncrement<DATA> inc,
+            final long count) {
+
+        return new SequenceSpring<DATA>(inc, count);
     }
 
     /**

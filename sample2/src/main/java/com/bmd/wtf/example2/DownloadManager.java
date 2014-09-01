@@ -55,7 +55,7 @@ public class DownloadManager {
                            .chain(Rapid.gateGenerator(Downloader.class))
                            .in(1)
                            .chain(Classification.ofType(DownloadObserver.class));
-        mGate = Rapid.bridge(mWaterfall.on(DownloadObserver.class)).performAs(UriObserver.class);
+        mGate = Rapid.bridge(mWaterfall.on(DownloadObserver.class)).visitAs(UriObserver.class);
     }
 
     public static void main(final String args[]) throws IOException, URISyntaxException {

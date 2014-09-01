@@ -93,13 +93,13 @@ class DefaultRapidBridge<TYPE> implements RapidBridge<TYPE> {
     }
 
     @Override
-    public TYPE perform() {
+    public TYPE visit() {
 
-        return performAs(mBridge.getClassification().getRawType());
+        return visitAs(mBridge.getClassification().getRawType());
     }
 
     @Override
-    public <NTYPE> NTYPE performAs(final Class<NTYPE> bridgeClass) {
+    public <NTYPE> NTYPE visitAs(final Class<NTYPE> bridgeClass) {
 
         if (!bridgeClass.isInterface()) {
 
@@ -121,9 +121,9 @@ class DefaultRapidBridge<TYPE> implements RapidBridge<TYPE> {
     }
 
     @Override
-    public <NTYPE> NTYPE performAs(final Classification<NTYPE> bridgeClassification) {
+    public <NTYPE> NTYPE visitAs(final Classification<NTYPE> bridgeClassification) {
 
-        return performAs(bridgeClassification.getRawType());
+        return visitAs(bridgeClassification.getRawType());
     }
 
     @Override

@@ -18,7 +18,6 @@ import com.bmd.wtf.example1.DownloadUtils;
 import com.bmd.wtf.example1.Downloader;
 import com.bmd.wtf.fll.Waterfall;
 import com.bmd.wtf.xtr.rpd.Rapid;
-import com.bmd.wtf.xtr.rpd.RapidBridge;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,15 +49,13 @@ public class DownloadManager {
         mDownloadDir = downloadDir;
 
         final Waterfall<Object, Object, Object> waterfall = fall().start(new RapidDownloadFilter());
-        final RapidBridge<DownloadFilter> bridge =
-                Rapid.bridge(waterfall.bridge(DownloadFilter.class));
         mSource = waterfall.inBackground(maxThreads)
                            .distribute()
                            .chain(Rapid.gateGenerator(Downloader.class))
                            .in(1)
-                           .chain(new DownloadObserver(bridge))
+                           .chain(new DownloadObserver(waterfall.bridge(DownloadFilter.class)))
                            .source();
-        mGate = bridge.visit();
+        mGate = Rapid.bridge(waterfall.bridge(DownloadFilter.class)).visit();
     }
 
     public static void main(final String args[]) throws IOException, URISyntaxException {

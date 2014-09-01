@@ -18,10 +18,8 @@ import com.bmd.wtf.example1.DownloadUtils;
 import com.bmd.wtf.example2.DownloadFilter;
 import com.bmd.wtf.example2.DownloadObserver;
 import com.bmd.wtf.example2.RapidDownloadFilter;
-import com.bmd.wtf.example3.RetryPolicy;
 import com.bmd.wtf.fll.Waterfall;
 import com.bmd.wtf.xtr.rpd.Rapid;
-import com.bmd.wtf.xtr.rpd.RapidBridge;
 import com.bmd.wtf.xtr.rpd.RapidPump;
 
 import java.io.File;
@@ -52,21 +50,25 @@ public class DownloadManager {
 
         mDownloadDir = downloadDir;
 
-        Waterfall<Object, Object, Object> waterfall = fall().start(new RapidDownloadFilter());
-        final RapidBridge<DownloadFilter> bridge =
-                Rapid.bridge(waterfall.bridge(DownloadFilter.class));
-        waterfall = waterfall.inBackground(maxThreads).distribute(new RapidPump() {
+        final Waterfall<Object, Object, Object> waterfall = fall().start(new RapidDownloadFilter())
+                                                                  .inBackground(maxThreads)
+                                                                  .distribute(new RapidPump() {
 
-            public int onAbort(final DownloadAbort drop) {
+                                                                      public int onAbort(
+                                                                              final DownloadAbort drop) {
 
-                return ALL_STREAMS;
-            }
-        }).chain(Rapid.gateGenerator(CancelableDownloader.class));
-        // chain the retry gates
-        waterfall.chain(Rapid.gateGenerator(RetryPolicy.class, waterfall));
-        // merge the streams and finally chain the observer
-        mSource = waterfall.in(1).chain(new DownloadObserver(bridge)).source();
-        mGate = bridge.visit();
+                                                                          return ALL_STREAMS;
+                                                                      }
+                                                                  })
+                                                                  .chain(Rapid.gateGenerator(
+                                                                          CancelableDownloader.class));
+        // chain the retry gates then merge the streams and finally chain the observer
+        mSource = waterfall.chain(Rapid.gateGenerator(AbortRetryPolicy.class, waterfall, 3))
+                           .in(1)
+                           .chain(new DownloadObserver(
+                                   waterfall.source().bridge(DownloadFilter.class)))
+                           .source();
+        mGate = Rapid.bridge(waterfall.source().bridge(DownloadFilter.class)).visit();
     }
 
     public static void main(final String args[]) throws IOException, URISyntaxException {

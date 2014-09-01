@@ -13,7 +13,6 @@
  */
 package com.bmd.wtf.example3;
 
-import com.bmd.wtf.example1.Download;
 import com.bmd.wtf.example1.DownloadFailure;
 import com.bmd.wtf.example1.DownloadSuccess;
 import com.bmd.wtf.flw.River;
@@ -39,7 +38,6 @@ public class RetryPolicy extends RapidGate {
         mMaxCount = maxCount;
     }
 
-    @SuppressWarnings("UnusedDeclaration")
     public void onFailure(final DownloadFailure download) {
 
         final URI uri = download.getUri();
@@ -51,7 +49,7 @@ public class RetryPolicy extends RapidGate {
         if (currentCount < mMaxCount) {
 
             mRetryCounts.put(uri, currentCount + 1);
-            mRiver.push(new Download(uri, download.getFile()));
+            mRiver.push(download.getDownload());
 
         } else {
 

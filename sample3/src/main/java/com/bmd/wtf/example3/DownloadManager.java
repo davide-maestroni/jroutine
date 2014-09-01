@@ -21,7 +21,6 @@ import com.bmd.wtf.example2.DownloadObserver;
 import com.bmd.wtf.example2.RapidDownloadFilter;
 import com.bmd.wtf.fll.Waterfall;
 import com.bmd.wtf.xtr.rpd.Rapid;
-import com.bmd.wtf.xtr.rpd.RapidBridge;
 
 import java.io.File;
 import java.io.IOException;
@@ -52,17 +51,18 @@ public class DownloadManager {
 
         mDownloadDir = downloadDir;
 
-        Waterfall<Object, Object, Object> waterfall = fall().start(new RapidDownloadFilter());
-        final RapidBridge<DownloadFilter> bridge =
-                Rapid.bridge(waterfall.bridge(DownloadFilter.class));
-        waterfall = waterfall.inBackground(maxThreads)
-                             .distribute()
-                             .chain(Rapid.gateGenerator(Downloader.class));
-        // chain the retry gates
-        waterfall.chain(Rapid.gateGenerator(RetryPolicy.class, waterfall));
-        // merge the streams and finally chain the observer
-        mSource = waterfall.in(1).chain(new DownloadObserver(bridge)).source();
-        mGate = bridge.visit();
+        final Waterfall<Object, Object, Object> waterfall = fall().start(new RapidDownloadFilter())
+                                                                  .inBackground(maxThreads)
+                                                                  .distribute()
+                                                                  .chain(Rapid.gateGenerator(
+                                                                          Downloader.class));
+        // chain the retry gates then merge the streams and finally chain the observer
+        mSource = waterfall.chain(Rapid.gateGenerator(RetryPolicy.class, waterfall, 3))
+                           .in(1)
+                           .chain(new DownloadObserver(
+                                   waterfall.source().bridge(DownloadFilter.class)))
+                           .source();
+        mGate = Rapid.bridge(waterfall.source().bridge(DownloadFilter.class)).visit();
     }
 
     public static void main(final String args[]) throws IOException, URISyntaxException {

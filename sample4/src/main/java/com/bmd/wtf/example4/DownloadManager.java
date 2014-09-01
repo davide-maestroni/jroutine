@@ -19,7 +19,6 @@ import com.bmd.wtf.example1.Downloader;
 import com.bmd.wtf.example3.RetryPolicy;
 import com.bmd.wtf.fll.Waterfall;
 import com.bmd.wtf.xtr.rpd.Rapid;
-import com.bmd.wtf.xtr.rpd.RapidBridge;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,16 +48,18 @@ public class DownloadManager {
 
         mDownloadDir = downloadDir;
 
-        Waterfall<Object, Object, Object> waterfall = fall().start(new AbortDownloadFilter());
-        final RapidBridge<AbortFilter> bridge = Rapid.bridge(waterfall.bridge(AbortFilter.class));
-        waterfall = waterfall.inBackground(maxThreads)
-                             .distribute()
-                             .chain(Rapid.gateGenerator(Downloader.class));
-        // chain the retry gates
-        waterfall.chain(Rapid.gateGenerator(RetryPolicy.class, waterfall));
-        // merge the streams and finally chain the observer
-        mSource = waterfall.in(1).chain(new AbortDownloadObserver(bridge)).source();
-        mGate = bridge.visit();
+        final Waterfall<Object, Object, Object> waterfall = fall().start(new AbortDownloadFilter())
+                                                                  .inBackground(maxThreads)
+                                                                  .distribute()
+                                                                  .chain(Rapid.gateGenerator(
+                                                                          Downloader.class));
+        // chain the retry gates then merge the streams and finally chain the observer
+        mSource = waterfall.chain(Rapid.gateGenerator(RetryPolicy.class, waterfall, 3))
+                           .in(1)
+                           .chain(new AbortDownloadObserver(
+                                   waterfall.source().bridge(AbortFilter.class)))
+                           .source();
+        mGate = Rapid.bridge(waterfall.source().bridge(AbortFilter.class)).visit();
     }
 
     public static void main(final String args[]) throws IOException, URISyntaxException {

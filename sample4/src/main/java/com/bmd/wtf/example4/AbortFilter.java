@@ -11,28 +11,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.wtf.example2;
+package com.bmd.wtf.example4;
+
+import com.bmd.wtf.example2.DownloadFilter;
 
 import java.net.URI;
 
 /**
- * Observer of downloaded URIs.
+ * Filter of downloaded urls supporting the abort of the download.
  */
-public interface UriObserver {
+public interface AbortFilter extends DownloadFilter {
 
     /**
-     * Checks if the download of the specified URI has successfully completed.
+     * Aborts the downloading of the specified URI.
      *
      * @param uri the URI.
-     * @return whether the download was successful.
      */
-    public boolean isDownloaded(URI uri);
+    public void abort(URI uri);
 
     /**
-     * Checks if the specified URI is being currently downloaded.
+     * Resets the abort of the specified URI.
      *
      * @param uri the URI.
-     * @return whether the download is in progress.
+     * @return whether the downloading of the specified URI was flagged as aborted.
      */
-    public boolean isDownloading(URI uri);
+    public boolean reset(URI uri);
 }

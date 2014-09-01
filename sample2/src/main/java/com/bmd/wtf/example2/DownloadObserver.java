@@ -13,86 +13,79 @@
  */
 package com.bmd.wtf.example2;
 
-import com.bmd.wtf.example1.Download;
 import com.bmd.wtf.example1.DownloadFailure;
 import com.bmd.wtf.example1.DownloadSuccess;
 import com.bmd.wtf.example1.DownloadUtils;
+import com.bmd.wtf.flw.Bridge;
+import com.bmd.wtf.flw.Bridge.Visitor;
 import com.bmd.wtf.xtr.rpd.RapidAnnotations.DataFlow;
 import com.bmd.wtf.xtr.rpd.RapidGate;
 
 import java.net.URI;
-import java.util.HashMap;
 
 /**
- * Observer of downloaded urls filtering the ones already in progress.
+ * Observer of download results which updates the URIs filter through a bridge over it.
  */
-public class DownloadObserver extends RapidGate implements UriObserver {
+public class DownloadObserver extends RapidGate {
 
-    private final HashMap<URI, Download> mDownloaded = new HashMap<URI, Download>();
+    private final Bridge<? extends DownloadFilter> mBridge;
 
-    private final HashMap<URI, Download> mDownloading = new HashMap<URI, Download>();
+    private final Visitor<Void, DownloadFilter> mFailureVisitor =
+            new Visitor<Void, DownloadFilter>() {
 
-    public DownloadObserver() {
+                @Override
+                public Void doInspect(final DownloadFilter gate, final Object... args) {
 
-        super(ValidFlows.ANNOTATED_ONLY);
-    }
+                    final DownloadFailure download = (DownloadFailure) args[0];
+                    final URI uri = download.getUri();
 
-    @Override
-    public boolean isDownloaded(final URI uri) {
+                    if (gate.getDownload(uri) == download.getDownload()) {
 
-        return mDownloaded.containsKey(uri);
-    }
+                        System.out.println("Download failed: " + uri);
 
-    @Override
-    public boolean isDownloading(final URI uri) {
+                        gate.cancelDownload(uri);
 
-        return mDownloading.containsKey(uri);
-    }
+                        DownloadUtils.safeDelete(download.getFile());
+                    }
 
-    @DataFlow
-    public void onDownload(final Download download) {
+                    return null;
+                }
+            };
 
-        final URI uri = download.getUri();
-        final HashMap<URI, Download> downloading = mDownloading;
+    private final Visitor<Void, DownloadFilter> mSuccessVisitor =
+            new Visitor<Void, DownloadFilter>() {
 
-        if (!downloading.containsKey(uri)) {
+                @Override
+                public Void doInspect(final DownloadFilter gate, final Object... args) {
 
-            downloading.put(uri, download);
-            mDownloaded.remove(uri);
+                    final DownloadSuccess download = (DownloadSuccess) args[0];
+                    final URI uri = download.getUri();
 
-            downRiver().push(download);
-        }
+                    if (gate.getDownload(uri) == download.getDownload()) {
+
+                        System.out.println("Download complete: " + uri);
+
+                        gate.setDownloaded(download.getDownload());
+                    }
+
+                    return null;
+                }
+            };
+
+    public DownloadObserver(final Bridge<? extends DownloadFilter> bridge) {
+
+        mBridge = bridge;
     }
 
     @DataFlow
     public void onFailure(final DownloadFailure download) {
 
-        final URI uri = download.getUri();
-        final HashMap<URI, Download> downloading = mDownloading;
-
-        if (downloading.get(uri) == download.getDownload()) {
-
-            System.out.println("Download failed: " + uri);
-
-            downloading.remove(uri);
-
-            DownloadUtils.safeDelete(download.getFile());
-        }
+        mBridge.visit(mFailureVisitor, download);
     }
 
     @DataFlow
     public void onSuccess(final DownloadSuccess download) {
 
-        final URI uri = download.getUri();
-        final HashMap<URI, Download> downloading = mDownloading;
-
-        if (downloading.get(uri) == download.getDownload()) {
-
-            System.out.println("Download complete: " + uri);
-
-            downloading.remove(uri);
-
-            mDownloaded.put(uri, download);
-        }
+        mBridge.visit(mSuccessVisitor, download);
     }
 }

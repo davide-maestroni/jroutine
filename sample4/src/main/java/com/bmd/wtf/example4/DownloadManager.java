@@ -17,9 +17,9 @@ import com.bmd.wtf.example1.Download;
 import com.bmd.wtf.example1.DownloadUtils;
 import com.bmd.wtf.example1.Downloader;
 import com.bmd.wtf.example3.RetryPolicy;
-import com.bmd.wtf.fll.Classification;
 import com.bmd.wtf.fll.Waterfall;
 import com.bmd.wtf.xtr.rpd.Rapid;
+import com.bmd.wtf.xtr.rpd.RapidBridge;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,9 +35,9 @@ public class DownloadManager {
 
     private final File mDownloadDir;
 
-    private final UriAbortObserver mGate;
+    private final AbortFilter mGate;
 
-    private final Waterfall<Object, Object, Object> mWaterfall;
+    private final Waterfall<Object, Object, ?> mSource;
 
     public DownloadManager(final int maxThreads, final File downloadDir) throws IOException {
 
@@ -48,17 +48,17 @@ public class DownloadManager {
         }
 
         mDownloadDir = downloadDir;
-        final Waterfall<Object, Object, Object> waterfall = fall().bridge()
-                                                                  .start(new AbortObserver())
-                                                                  .inBackground(maxThreads)
-                                                                  .distribute()
-                                                                  .chain(Rapid.gateGenerator(
-                                                                          Downloader.class));
+
+        Waterfall<Object, Object, Object> waterfall = fall().start(new AbortDownloadFilter());
+        final RapidBridge<AbortFilter> bridge = Rapid.bridge(waterfall.bridge(AbortFilter.class));
+        waterfall = waterfall.inBackground(maxThreads)
+                             .distribute()
+                             .chain(Rapid.gateGenerator(Downloader.class));
         // chain the retry gates
         waterfall.chain(Rapid.gateGenerator(RetryPolicy.class, waterfall));
         // merge the streams and finally chain the observer
-        mWaterfall = waterfall.in(1).chain(Classification.ofType(AbortObserver.class));
-        mGate = Rapid.bridge(waterfall.on(AbortObserver.class)).visitAs(UriAbortObserver.class);
+        mSource = waterfall.in(1).chain(new AbortDownloadObserver(bridge)).source();
+        mGate = bridge.visit();
     }
 
     public static void main(final String args[]) throws IOException, URISyntaxException {
@@ -82,8 +82,7 @@ public class DownloadManager {
 
     public void download(final URI uri) throws URISyntaxException {
 
-        mWaterfall.source()
-                  .push(new Download(uri, new File(mDownloadDir, DownloadUtils.getFileName(uri))));
+        mSource.push(new Download(uri, new File(mDownloadDir, DownloadUtils.getFileName(uri))));
     }
 
     public boolean isComplete(final URI uri) {

@@ -16,9 +16,9 @@ package com.bmd.wtf.example2;
 import com.bmd.wtf.example1.Download;
 import com.bmd.wtf.example1.DownloadUtils;
 import com.bmd.wtf.example1.Downloader;
-import com.bmd.wtf.fll.Classification;
 import com.bmd.wtf.fll.Waterfall;
 import com.bmd.wtf.xtr.rpd.Rapid;
+import com.bmd.wtf.xtr.rpd.RapidBridge;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,9 +35,9 @@ public class DownloadManager {
 
     private final File mDownloadDir;
 
-    private final UriObserver mGate;
+    private final DownloadFilter mGate;
 
-    private final Waterfall<Object, Object, Object> mWaterfall;
+    private final Waterfall<Object, Object, ?> mSource;
 
     public DownloadManager(final int maxThreads, final File downloadDir) throws IOException {
 
@@ -48,14 +48,17 @@ public class DownloadManager {
         }
 
         mDownloadDir = downloadDir;
-        mWaterfall = fall().bridge()
-                           .start(new DownloadObserver())
-                           .inBackground(maxThreads)
+
+        final Waterfall<Object, Object, Object> waterfall = fall().start(new RapidDownloadFilter());
+        final RapidBridge<DownloadFilter> bridge =
+                Rapid.bridge(waterfall.bridge(DownloadFilter.class));
+        mSource = waterfall.inBackground(maxThreads)
                            .distribute()
                            .chain(Rapid.gateGenerator(Downloader.class))
                            .in(1)
-                           .chain(Classification.ofType(DownloadObserver.class));
-        mGate = Rapid.bridge(mWaterfall.on(DownloadObserver.class)).visitAs(UriObserver.class);
+                           .chain(new DownloadObserver(bridge))
+                           .source();
+        mGate = bridge.visit();
     }
 
     public static void main(final String args[]) throws IOException, URISyntaxException {
@@ -74,8 +77,7 @@ public class DownloadManager {
 
     public void download(final URI uri) throws URISyntaxException {
 
-        mWaterfall.source()
-                  .push(new Download(uri, new File(mDownloadDir, DownloadUtils.getFileName(uri))));
+        mSource.push(new Download(uri, new File(mDownloadDir, DownloadUtils.getFileName(uri))));
     }
 
     public boolean isComplete(final URI uri) {

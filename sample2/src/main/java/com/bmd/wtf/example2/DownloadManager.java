@@ -52,8 +52,7 @@ public class DownloadManager {
         mSource = waterfall.inBackground(maxThreads)
                            .distribute()
                            .chain(Rapid.gateGenerator(Downloader.class))
-                           .in(1)
-                           .chain(new DownloadObserver(waterfall.bridge(DownloadFilter.class)))
+                           .merge(new DownloadObserver(waterfall.bridge(DownloadFilter.class)))
                            .source();
         mGate = Rapid.bridge(waterfall.bridge(DownloadFilter.class)).visit();
     }

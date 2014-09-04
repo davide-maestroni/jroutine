@@ -64,8 +64,7 @@ public class DownloadManager {
                                                                           CancelableDownloader.class));
         // chain the retry gates then merge the streams and finally chain the observer
         mSource = waterfall.chain(Rapid.gateGenerator(AbortRetryPolicy.class, waterfall, 3))
-                           .in(1)
-                           .chain(new DownloadObserver(
+                           .merge(new DownloadObserver(
                                    waterfall.source().bridge(DownloadFilter.class)))
                            .source();
         mGate = Rapid.bridge(waterfall.source().bridge(DownloadFilter.class)).visit();

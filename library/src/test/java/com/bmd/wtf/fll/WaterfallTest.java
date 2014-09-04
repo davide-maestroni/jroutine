@@ -1312,6 +1312,16 @@ public class WaterfallTest extends TestCase {
 
         try {
 
+            fall().feed(fall());
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
             final Waterfall<Object, Object, Object> fall = fall().start();
 
             fall().feed(fall);
@@ -1517,6 +1527,26 @@ public class WaterfallTest extends TestCase {
         try {
 
             fall().start().feed(fall());
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            fall().start().feedStream(0, null);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            fall().start().feedStream(1, null);
 
             fail();
 
@@ -2208,7 +2238,7 @@ public class WaterfallTest extends TestCase {
                                        downRiver.flush(new ArrayList<String>(mWords));
                                        mWords.clear();
                                    }
-                               })).in(1).chain(new AbstractGate<List<String>, String>() {
+                               })).merge(new AbstractGate<List<String>, String>() {
 
             private int mCount;
 

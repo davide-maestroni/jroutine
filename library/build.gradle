@@ -83,12 +83,12 @@ uploadArchives {
                 name = archivesBaseName
                 packaging = 'jar'
                 description = 'Easily iterate through Android sparse collections'
-                url = 'http://davide-maestroni.github.io/javafall/'
+                url = 'http://davide-maestroni.github.io/jroutine/'
 
                 scm {
-                    url = 'git@github.com:davide-maestroni/javafall.git'
-                    connection = 'scm:git:git@github.com:davide-maestroni/javafall.git'
-                    developerConnection = 'scm:git:git@github.com:davide-maestroni/javafall.git'
+                    url = 'git@github.com:davide-maestroni/jroutine.git'
+                    connection = 'scm:git:git@github.com:davide-maestroni/jroutine.git'
+                    developerConnection = 'scm:git:git@github.com:davide-maestroni/jroutine.git'
                 }
 
                 licenses {

@@ -1,4 +1,4 @@
-javafall
+jroutine
 ========
 
-Cool and funny parallel programming.
+Parallel programming on the go.

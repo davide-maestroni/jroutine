@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 class SyncRunner implements Runner {
 
     @Override
-    public void onInput(final Processing processing, final long delay, final TimeUnit timeUnit) {
+    public void onInput(final Call call, final long delay, final TimeUnit timeUnit) {
 
         try {
 
@@ -37,7 +37,7 @@ class SyncRunner implements Runner {
                 //just wait...
             }
 
-            processing.onInput();
+            call.onInput();
 
         } catch (final InterruptedException e) {
 
@@ -48,8 +48,8 @@ class SyncRunner implements Runner {
     }
 
     @Override
-    public void onReset(final Processing processing) {
+    public void onReset(final Call call) {
 
-        processing.onReset();
+        call.onReset();
     }
 }

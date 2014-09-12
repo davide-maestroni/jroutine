@@ -13,27 +13,30 @@
  */
 package com.bmd.jrt.routine;
 
+import com.bmd.jrt.procedure.LoopProcedure;
+
 /**
  * Created by davide on 9/11/14.
  */
 class ResultFilterRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
 
-    private final AbstractRoutine<INPUT, OUTPUT> mRoutine;
+    private final FilteredResultPublisher<OUTPUT> mPublisher;
 
-    private final FilteredResultPublisher<OUTPUT> mWrapper;
+    private final AbstractRoutine<INPUT, OUTPUT> mRoutine;
 
     public ResultFilterRoutine(final AbstractRoutine<INPUT, OUTPUT> wrapped,
             final ResultFilter<OUTPUT> filter) {
 
-        super(wrapped.getRunner());
+        super(wrapped);
 
         mRoutine = wrapped;
-        mWrapper = new FilteredResultPublisher<OUTPUT>(filter);
+        mPublisher = new FilteredResultPublisher<OUTPUT>(filter);
     }
 
     @Override
-    protected RecyclableUnitProcessor<INPUT, OUTPUT> createProcessor() {
+    protected LoopProcedure<INPUT, OUTPUT> createProcedure(final boolean async) {
 
-        return new ResultFilterUnitProcessor<INPUT, OUTPUT>(mRoutine.createProcessor(), mWrapper);
+        return new ResultFilterLoopProcedure<INPUT, OUTPUT>(mRoutine.createProcedure(async),
+                                                            mPublisher);
     }
 }

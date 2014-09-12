@@ -13,33 +13,34 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.process.ResultPublisher;
+import com.bmd.jrt.procedure.LoopProcedure;
+import com.bmd.jrt.procedure.ResultPublisher;
 
 /**
  * Created by davide on 9/11/14.
  */
-class ResultFilterUnitProcessor<INPUT, OUTPUT> implements RecyclableUnitProcessor<INPUT, OUTPUT> {
+class ResultFilterLoopProcedure<INPUT, OUTPUT> implements LoopProcedure<INPUT, OUTPUT> {
 
-    private final RecyclableUnitProcessor<INPUT, OUTPUT> mProcessor;
+    private final LoopProcedure<INPUT, OUTPUT> mLoopProcedure;
 
     private final FilteredResultPublisher<OUTPUT> mResultPublisher;
 
-    public ResultFilterUnitProcessor(final RecyclableUnitProcessor<INPUT, OUTPUT> processor,
+    public ResultFilterLoopProcedure(final LoopProcedure<INPUT, OUTPUT> procedure,
             final FilteredResultPublisher<OUTPUT> resultPublisher) {
 
-        if (processor == null) {
+        if (procedure == null) {
 
             throw new IllegalArgumentException();
         }
 
-        mProcessor = processor;
+        mLoopProcedure = procedure;
         mResultPublisher = resultPublisher;
     }
 
     @Override
     public void onInput(final INPUT input, final ResultPublisher<OUTPUT> results) {
 
-        mProcessor.onInput(input, mResultPublisher.wrap(results));
+        mLoopProcedure.onInput(input, mResultPublisher.wrap(results));
     }
 
     @Override
@@ -49,7 +50,7 @@ class ResultFilterUnitProcessor<INPUT, OUTPUT> implements RecyclableUnitProcesso
 
         try {
 
-            mProcessor.onReset(resultPublisher.wrap(results));
+            mLoopProcedure.onReset(resultPublisher.wrap(results));
 
         } finally {
 
@@ -64,17 +65,11 @@ class ResultFilterUnitProcessor<INPUT, OUTPUT> implements RecyclableUnitProcesso
 
         try {
 
-            mProcessor.onResult(resultPublisher.wrap(results));
+            mLoopProcedure.onResult(resultPublisher.wrap(results));
 
         } finally {
 
             resultPublisher.end();
         }
-    }
-
-    @Override
-    public void recycle() {
-
-        mProcessor.recycle();
     }
 }

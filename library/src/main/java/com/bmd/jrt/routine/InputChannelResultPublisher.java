@@ -14,7 +14,7 @@
 package com.bmd.jrt.routine;
 
 import com.bmd.jrt.channel.InputChannel;
-import com.bmd.jrt.process.ResultPublisher;
+import com.bmd.jrt.procedure.ResultPublisher;
 
 /**
  * Created by davide on 9/11/14.

@@ -15,36 +15,54 @@ package com.bmd.jrt.routine;
 
 import com.bmd.jrt.channel.InputChannel;
 import com.bmd.jrt.channel.OutputChannel;
-import com.bmd.jrt.process.ResultPublisher;
-import com.bmd.jrt.runner.Processing;
+import com.bmd.jrt.procedure.LoopProcedure;
+import com.bmd.jrt.procedure.ResultPublisher;
+import com.bmd.jrt.runner.Call;
 import com.bmd.jrt.runner.Runner;
 import com.bmd.jrt.time.PositiveDuration;
 import com.bmd.jrt.util.RoutineInterruptedException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by davide on 9/8/14.
  */
 class DefaultRoutineChannel<INPUT, OUTPUT> implements InputChannel<INPUT, OUTPUT> {
 
+    private final Call mCall;
+
     private final Object mChannelMutex = new Object();
 
     private final LinkedList<INPUT> mInputQueue = new LinkedList<INPUT>();
 
+    private final HashMap<LoopProcedure<INPUT, OUTPUT>, ReentrantLock> mLockMap =
+            new HashMap<LoopProcedure<INPUT, OUTPUT>, ReentrantLock>();
+
+    private final int mMaxInstancePerCall;
+
     private final LinkedList<Object> mOutputQueue = new LinkedList<Object>();
 
-    private final RecyclableUnitProcessor<INPUT, OUTPUT> mProcessor;
+    private final HashMap<Thread, LoopProcedure<INPUT, OUTPUT>> mProcedureMap =
+            new HashMap<Thread, LoopProcedure<INPUT, OUTPUT>>();
 
-    private final Object mProcessorMutex = new Object();
+    private final Object mProcedureMutex = new Object();
+
+    private final LinkedList<LoopProcedure<INPUT, OUTPUT>> mProcedures =
+            new LinkedList<LoopProcedure<INPUT, OUTPUT>>();
+
+    private final ProcedureProvider<INPUT, OUTPUT> mProvider;
 
     private final Runner mRunner;
+
+    private int mActiveInstanceCount;
 
     private PositiveDuration mInputDelay = PositiveDuration.ZERO;
 
@@ -52,20 +70,18 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements InputChannel<INPUT, OUTPUT
 
     private PositiveDuration mOutputTimeout = PositiveDuration.INFINITE;
 
-    private int mPendingCount;
+    private int mPendingInputCount;
 
-    private Processing mProcessing;
-
-    private Throwable mProcessorException;
+    private Throwable mProcedureException;
 
     private RuntimeException mResetException;
 
     private ChannelState mState = ChannelState.INPUT;
 
-    public DefaultRoutineChannel(final RecyclableUnitProcessor<INPUT, OUTPUT> processor,
-            final Runner runner) {
+    public DefaultRoutineChannel(final ProcedureProvider<INPUT, OUTPUT> provider,
+            final Runner runner, final int maxPerCall) {
 
-        if (processor == null) {
+        if (provider == null) {
 
             throw new IllegalArgumentException();
         }
@@ -75,8 +91,15 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements InputChannel<INPUT, OUTPUT
             throw new IllegalArgumentException();
         }
 
-        mProcessor = processor;
+        if (maxPerCall < 1) {
+
+            throw new IllegalArgumentException();
+        }
+
+        mProvider = provider;
         mRunner = runner;
+        mMaxInstancePerCall = maxPerCall;
+        mCall = new DefaultCall(new DefaultPublisher());
     }
 
     @Override
@@ -113,7 +136,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements InputChannel<INPUT, OUTPUT
             mState = ChannelState.OUTPUT;
         }
 
-        mRunner.onInput(mProcessing, 0, TimeUnit.MILLISECONDS);
+        mRunner.onInput(mCall, 0, TimeUnit.MILLISECONDS);
 
         return new DefaultOutputChannel();
     }
@@ -147,24 +170,26 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements InputChannel<INPUT, OUTPUT
 
             if (delay.isZero()) {
 
+                final LinkedList<INPUT> inputQueue = mInputQueue;
+
                 for (final INPUT input : inputs) {
 
-                    mInputQueue.add(input);
+                    inputQueue.add(input);
                 }
 
             } else {
 
-                ++mPendingCount;
+                ++mPendingInputCount;
             }
         }
 
         if (delay.isZero()) {
 
-            mRunner.onInput(mProcessing, 0, TimeUnit.MILLISECONDS);
+            mRunner.onInput(mCall, 0, TimeUnit.MILLISECONDS);
 
         } else {
 
-            mRunner.onInput(new DelayedInputsProcessing(inputs), delay.time, delay.unit);
+            mRunner.onInput(new DelayedInputsCall(inputs), delay.time, delay.unit);
         }
 
         return this;
@@ -187,17 +212,17 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements InputChannel<INPUT, OUTPUT
 
             } else {
 
-                ++mPendingCount;
+                ++mPendingInputCount;
             }
         }
 
         if (delay.isZero()) {
 
-            mRunner.onInput(mProcessing, 0, TimeUnit.MILLISECONDS);
+            mRunner.onInput(mCall, 0, TimeUnit.MILLISECONDS);
 
         } else {
 
-            mRunner.onInput(new DelayedInputProcessing(input), delay.time, delay.unit);
+            mRunner.onInput(new DelayedInputCall(input), delay.time, delay.unit);
         }
 
         return this;
@@ -212,14 +237,9 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements InputChannel<INPUT, OUTPUT
         }
     }
 
-    protected Processing createProcessing() {
-
-        return new DefaultProcessing(new DefaultPublisher());
-    }
-
     private void verifyInput() {
 
-        final Throwable throwable = mProcessorException;
+        final Throwable throwable = mProcedureException;
 
         if (throwable != null) {
 
@@ -230,18 +250,6 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements InputChannel<INPUT, OUTPUT
 
             throw new IllegalStateException();
         }
-
-        if (mProcessing == null) {
-
-            final Processing processing = createProcessing();
-
-            if (processing == null) {
-
-                throw new IllegalStateException();
-            }
-
-            mProcessing = processing;
-        }
     }
 
     private static enum ChannelState {
@@ -251,6 +259,224 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements InputChannel<INPUT, OUTPUT
         RESULT,
         RESET,
         EXCEPTION
+    }
+
+    public interface ProcedureProvider<INPUT, OUTPUT> {
+
+        public LoopProcedure<INPUT, OUTPUT> create();
+    }
+
+    private class DefaultCall implements Call {
+
+        private final ResultPublisher<OUTPUT> mPublisher;
+
+        public DefaultCall(final ResultPublisher<OUTPUT> publisher) {
+
+            if (publisher == null) {
+
+                throw new IllegalArgumentException();
+            }
+
+            mPublisher = publisher;
+        }
+
+        @Override
+        public void onInput() {
+
+            final ResultPublisher<OUTPUT> publisher = mPublisher;
+            final LoopProcedure<INPUT, OUTPUT> procedure = acquireProcedure();
+
+            boolean isEnded = false;
+
+            try {
+
+                synchronized (mChannelMutex) {
+
+                    if ((mState == ChannelState.RESET) || (mState == ChannelState.EXCEPTION)) {
+
+                        return;
+                    }
+                }
+
+                INPUT input;
+
+                while (true) {
+
+                    synchronized (mChannelMutex) {
+
+                        final LinkedList<INPUT> inputQueue = mInputQueue;
+                        final boolean empty = inputQueue.isEmpty();
+
+                        if (!empty) {
+
+                            input = inputQueue.removeFirst();
+
+                        } else {
+
+                            break;
+                        }
+                    }
+
+                    procedure.onInput(input, publisher);
+                }
+
+                synchronized (mChannelMutex) {
+
+                    isEnded = (mState == ChannelState.OUTPUT) && (mPendingInputCount <= 0);
+                }
+
+                if (isEnded) {
+
+                    procedure.onResult(publisher);
+
+                    synchronized (mChannelMutex) {
+
+                        mState = ChannelState.RESULT;
+                    }
+                }
+
+            } catch (final Throwable t) {
+
+                publisher.publishException(t);
+
+            } finally {
+
+                releaseProcedure(procedure);
+
+                if (isEnded) {
+
+                    synchronized (mChannelMutex) {
+
+                        mChannelMutex.notifyAll();
+                    }
+                }
+            }
+        }
+
+        private LoopProcedure<INPUT, OUTPUT> acquireProcedure() {
+
+            synchronized (mProcedureMutex) {
+
+                final Thread currentThread = Thread.currentThread();
+
+                final HashMap<Thread, LoopProcedure<INPUT, OUTPUT>> procedureMap = mProcedureMap;
+                LoopProcedure<INPUT, OUTPUT> procedure = procedureMap.get(currentThread);
+
+                if (procedure == null) {
+
+                    final int maxCount = mMaxInstancePerCall;
+
+                    try {
+
+                        while (mActiveInstanceCount >= maxCount) {
+
+                            mProcedureMutex.wait();
+                        }
+
+                    } catch (final InterruptedException e) {
+
+                        Thread.currentThread().interrupt();
+
+                        throw new RoutineInterruptedException(e);
+                    }
+
+                    final LinkedList<LoopProcedure<INPUT, OUTPUT>> procedures = mProcedures;
+
+                    if (!procedures.isEmpty()) {
+
+                        procedure = procedures.removeFirst();
+
+                    } else {
+
+                        procedure = mProvider.create();
+                    }
+
+                    procedureMap.put(currentThread, procedure);
+
+                    ++mActiveInstanceCount;
+                }
+
+                final HashMap<LoopProcedure<INPUT, OUTPUT>, ReentrantLock> lockMap = mLockMap;
+                ReentrantLock lock = lockMap.get(procedure);
+
+                if (lock == null) {
+
+                    lock = new ReentrantLock();
+                    lockMap.put(procedure, lock);
+                }
+
+                lock.lock();
+
+                return procedure;
+            }
+        }
+
+        private void releaseProcedure(final LoopProcedure<INPUT, OUTPUT> procedure) {
+
+            synchronized (mProcedureMutex) {
+
+                final Thread currentThread = Thread.currentThread();
+
+                final HashMap<Thread, LoopProcedure<INPUT, OUTPUT>> procedureMap = mProcedureMap;
+
+                if (procedureMap.get(currentThread) != procedure) {
+
+                    throw new IllegalStateException();
+                }
+
+                final ReentrantLock lock = mLockMap.get(procedure);
+                final boolean isLast = (lock.getHoldCount() == 1);
+
+                lock.unlock();
+
+                if (isLast) {
+
+                    procedureMap.remove(currentThread);
+                    mProcedures.add(procedure);
+
+                    --mActiveInstanceCount;
+                    mProcedureMutex.notify();
+                }
+            }
+        }
+
+        @Override
+        public void onReset() {
+
+            final ResultPublisher<OUTPUT> publisher = mPublisher;
+            final LoopProcedure<INPUT, OUTPUT> procedure = acquireProcedure();
+
+            try {
+
+                synchronized (mChannelMutex) {
+
+                    if (mState == ChannelState.EXCEPTION) {
+
+                        return;
+                    }
+                }
+
+                procedure.onReset(publisher);
+
+                synchronized (mChannelMutex) {
+
+                    final RuntimeException resetException = mResetException;
+
+                    if (resetException != null) {
+
+                        publisher.publishException(resetException);
+                    }
+                }
+
+            } catch (final Throwable t) {
+
+                publisher.publishException(t);
+
+            } finally {
+
+                releaseProcedure(procedure);
+            }
+        }
     }
 
     private class DefaultIterator implements Iterator<OUTPUT> {
@@ -296,12 +522,12 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements InputChannel<INPUT, OUTPUT
 
                 try {
 
-                    final Object mutex = mChannelMutex;
                     final long startNanos = System.nanoTime();
 
                     do {
 
-                        if (!timeout.waitNanos(mutex, startNanos) && outputQueue.isEmpty()) {
+                        if (!timeout.waitNanos(mChannelMutex, startNanos)
+                                && outputQueue.isEmpty()) {
 
                             isTimeout = true;
 
@@ -415,12 +641,11 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements InputChannel<INPUT, OUTPUT
 
                 try {
 
-                    final Object mutex = mChannelMutex;
                     final long startNanos = System.nanoTime();
 
                     do {
 
-                        if (timeout.waitNanos(mutex, startNanos) && (mState
+                        if (timeout.waitNanos(mChannelMutex, startNanos) && (mState
                                 == ChannelState.OUTPUT)) {
 
                             isTimeout = true;
@@ -532,200 +757,24 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements InputChannel<INPUT, OUTPUT
                 mState = ChannelState.RESET;
             }
 
-            mRunner.onReset(mProcessing);
+            mRunner.onReset(mCall);
 
             return true;
         }
     }
 
-    private class DefaultProcessing implements Processing {
-
-        private final ScopedPublisher<OUTPUT> mPublisher;
-
-        public DefaultProcessing(final ScopedPublisher<OUTPUT> publisher) {
-
-            if (publisher == null) {
-
-                throw new IllegalArgumentException();
-            }
-
-            mPublisher = publisher;
-        }
-
-        @Override
-        public void onInput() {
-
-            final ScopedPublisher<OUTPUT> publisher = mPublisher;
-            final RecyclableUnitProcessor<INPUT, OUTPUT> processor = mProcessor;
-
-            boolean isEnded = false;
-
-            synchronized (mProcessorMutex) {
-
-                synchronized (mChannelMutex) {
-
-                    if ((mState == ChannelState.RESET) || (mState == ChannelState.EXCEPTION)) {
-
-                        return;
-                    }
-                }
-
-                publisher.enter();
-
-                try {
-
-                    INPUT input;
-
-                    while (true) {
-
-                        synchronized (mChannelMutex) {
-
-                            final boolean empty = mInputQueue.isEmpty();
-
-                            if (!empty) {
-
-                                input = mInputQueue.removeFirst();
-
-                            } else {
-
-                                break;
-                            }
-                        }
-
-                        processor.onInput(input, publisher);
-                    }
-
-                    synchronized (mChannelMutex) {
-
-                        isEnded = (mState == ChannelState.OUTPUT) && (mPendingCount <= 0);
-                    }
-
-                    if (isEnded) {
-
-                        processor.onResult(publisher);
-
-                        synchronized (mChannelMutex) {
-
-                            mState = ChannelState.RESULT;
-                        }
-
-                        processor.recycle();
-                    }
-
-                } catch (final Throwable t) {
-
-                    publisher.publishException(t);
-
-                    synchronized (mChannelMutex) {
-
-                        mInputQueue.clear();
-
-                        mProcessorException = t;
-                        mState = ChannelState.EXCEPTION;
-                    }
-
-                } finally {
-
-                    publisher.exit();
-
-                    if (isEnded) {
-
-                        synchronized (mChannelMutex) {
-
-                            mChannelMutex.notifyAll();
-                        }
-                    }
-                }
-            }
-        }
-
-        @Override
-        public void onReset() {
-
-            final ScopedPublisher<OUTPUT> publisher = mPublisher;
-            final RecyclableUnitProcessor<INPUT, OUTPUT> processor = mProcessor;
-
-            synchronized (mProcessorMutex) {
-
-                synchronized (mChannelMutex) {
-
-                    if (mState == ChannelState.EXCEPTION) {
-
-                        return;
-                    }
-                }
-
-                publisher.enter();
-
-                try {
-
-                    processor.onReset(publisher);
-                    processor.recycle();
-
-                    synchronized (mChannelMutex) {
-
-                        if (mResetException != null) {
-
-                            publisher.publishException(mOutputException);
-                        }
-                    }
-
-                } catch (final Throwable t) {
-
-                    publisher.publishException(t);
-
-                    synchronized (mChannelMutex) {
-
-                        mInputQueue.clear();
-
-                        mProcessorException = t;
-                        mState = ChannelState.EXCEPTION;
-                    }
-
-                } finally {
-
-                    publisher.exit();
-                }
-            }
-        }
-    }
-
-    private class DefaultPublisher implements ScopedPublisher<OUTPUT> {
-
-        private boolean mIsOpen = false;
-
-        @Override
-        public void enter() {
-
-            synchronized (mChannelMutex) {
-
-                if (mIsOpen) {
-
-                    throw new IllegalStateException();
-                }
-
-                mIsOpen = true;
-            }
-        }
-
-        @Override
-        public void exit() {
-
-            synchronized (mChannelMutex) {
-
-                mIsOpen = false;
-            }
-        }
+    private class DefaultPublisher implements ResultPublisher<OUTPUT> {
 
         @Override
         public ResultPublisher<OUTPUT> publish(final OUTPUT result) {
 
             synchronized (mChannelMutex) {
 
-                verifyOpen();
+                if (mState != ChannelState.EXCEPTION) {
 
-                mOutputQueue.add(result);
-                mChannelMutex.notifyAll();
+                    mOutputQueue.add(result);
+                    mChannelMutex.notifyAll();
+                }
             }
 
             return this;
@@ -735,8 +784,6 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements InputChannel<INPUT, OUTPUT
         public ResultPublisher<OUTPUT> publish(final OUTPUT... results) {
 
             synchronized (mChannelMutex) {
-
-                verifyOpen();
 
                 if (results == null) {
 
@@ -752,9 +799,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements InputChannel<INPUT, OUTPUT
 
             synchronized (mChannelMutex) {
 
-                verifyOpen();
-
-                if (results != null) {
+                if ((results != null) && (mState != ChannelState.EXCEPTION)) {
 
                     for (final OUTPUT result : results) {
 
@@ -773,29 +818,27 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements InputChannel<INPUT, OUTPUT
 
             synchronized (mChannelMutex) {
 
-                verifyOpen();
+                if (mState != ChannelState.EXCEPTION) {
 
-                mOutputQueue.add(RoutineExceptionWrapper.wrap(throwable));
-                mChannelMutex.notifyAll();
+                    mInputQueue.clear();
+
+                    mProcedureException = throwable;
+                    mState = ChannelState.EXCEPTION;
+
+                    mOutputQueue.add(RoutineExceptionWrapper.wrap(throwable));
+                    mChannelMutex.notifyAll();
+                }
             }
 
             return this;
         }
-
-        private void verifyOpen() {
-
-            if (!mIsOpen) {
-
-                throw new IllegalStateException();
-            }
-        }
     }
 
-    private class DelayedInputProcessing implements Processing {
+    private class DelayedInputCall implements Call {
 
         private final INPUT mInput;
 
-        public DelayedInputProcessing(final INPUT input) {
+        public DelayedInputCall(final INPUT input) {
 
             mInput = input;
         }
@@ -810,26 +853,25 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements InputChannel<INPUT, OUTPUT
                     return;
                 }
 
-                --mPendingCount;
-
+                --mPendingInputCount;
                 mInputQueue.add(mInput);
             }
 
-            mProcessing.onInput();
+            mCall.onInput();
         }
 
         @Override
         public void onReset() {
 
-            mProcessing.onReset();
+            mCall.onReset();
         }
     }
 
-    private class DelayedInputsProcessing implements Processing {
+    private class DelayedInputsCall implements Call {
 
         private final ArrayList<INPUT> mInputs;
 
-        public DelayedInputsProcessing(final Iterable<? extends INPUT> inputs) {
+        public DelayedInputsCall(final Iterable<? extends INPUT> inputs) {
 
             final ArrayList<INPUT> inputList = new ArrayList<INPUT>();
 
@@ -851,18 +893,17 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements InputChannel<INPUT, OUTPUT
                     return;
                 }
 
-                --mPendingCount;
-
+                --mPendingInputCount;
                 mInputQueue.addAll(mInputs);
             }
 
-            mProcessing.onInput();
+            mCall.onInput();
         }
 
         @Override
         public void onReset() {
 
-            mProcessing.onReset();
+            mCall.onReset();
         }
     }
 
@@ -888,7 +929,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements InputChannel<INPUT, OUTPUT
             mState = ChannelState.RESET;
         }
 
-        mRunner.onReset(mProcessing);
+        mRunner.onReset(mCall);
 
         return false;
     }

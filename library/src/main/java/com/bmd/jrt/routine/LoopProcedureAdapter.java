@@ -11,14 +11,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.process;
+package com.bmd.jrt.routine;
 
-import java.util.List;
+import com.bmd.jrt.procedure.LoopProcedure;
+import com.bmd.jrt.procedure.ResultPublisher;
 
 /**
- * Created by davide on 9/7/14.
+ * Created by davide on 9/11/14.
  */
-public interface Processor<INPUT, OUTPUT> {
+public abstract class LoopProcedureAdapter<INPUT, OUTPUT> implements LoopProcedure<INPUT, OUTPUT> {
 
-    public void onExecute(List<? extends INPUT> inputs, ResultPublisher<OUTPUT> results);
+    @Override
+    public void onInput(final INPUT input, final ResultPublisher<OUTPUT> results) {
+
+    }
+
+    @Override
+    public void onReset(final ResultPublisher<OUTPUT> results) {
+
+    }
+
+    @Override
+    public void onResult(final ResultPublisher<OUTPUT> results) {
+
+    }
 }

@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
  */
 public interface Runner {
 
-    public void onInput(Processing processing, long delay, TimeUnit timeUnit);
+    public void onInput(Call call, long delay, TimeUnit timeUnit);
 
-    public void onReset(Processing processing);
+    public void onReset(Call call);
 }

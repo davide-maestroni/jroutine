@@ -11,16 +11,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.process;
+package com.bmd.jrt.procedure;
 
 /**
  * Created by davide on 9/7/14.
  */
-public interface UnitProcessor<INPUT, OUTPUT> {
+public interface ResultPublisher<OUTPUT> {
 
-    public void onInput(INPUT input, ResultPublisher<OUTPUT> results);
+    public ResultPublisher<OUTPUT> publish(OUTPUT result);
 
-    public void onReset(ResultPublisher<OUTPUT> results);
+    public ResultPublisher<OUTPUT> publish(OUTPUT... results);
 
-    public void onResult(ResultPublisher<OUTPUT> results);
+    public ResultPublisher<OUTPUT> publish(Iterable<? extends OUTPUT> results);
+
+    public ResultPublisher<OUTPUT> publishException(Throwable throwable);
 }

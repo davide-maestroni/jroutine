@@ -13,7 +13,7 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.process.ResultPublisher;
+import com.bmd.jrt.procedure.ResultPublisher;
 import com.bmd.jrt.routine.Routine.ResultFilter;
 
 /**
@@ -53,11 +53,12 @@ class FilteredResultPublisher<OUTPUT> implements ResultPublisher<OUTPUT> {
 
         if (results != null) {
 
+            final ResultFilter<OUTPUT> filter = mFilter;
             final ResultPublisher<OUTPUT> resultPublisher = mResultPublisher;
 
             for (final OUTPUT result : results) {
 
-                mFilter.onResult(result, resultPublisher);
+                filter.onResult(result, resultPublisher);
             }
         }
 
@@ -69,11 +70,12 @@ class FilteredResultPublisher<OUTPUT> implements ResultPublisher<OUTPUT> {
 
         if (results != null) {
 
+            final ResultFilter<OUTPUT> filter = mFilter;
             final ResultPublisher<OUTPUT> resultPublisher = mResultPublisher;
 
             for (final OUTPUT result : results) {
 
-                mFilter.onResult(result, resultPublisher);
+                filter.onResult(result, resultPublisher);
             }
         }
 

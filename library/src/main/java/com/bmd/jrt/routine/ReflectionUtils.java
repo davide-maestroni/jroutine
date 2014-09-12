@@ -24,6 +24,8 @@ import java.util.HashMap;
  */
 class ReflectionUtils {
 
+    public static final Object[] NO_ARGS = new Object[0];
+
     private static final HashMap<Class<?>, Class<?>> sBoxMap = new HashMap<Class<?>, Class<?>>(9);
 
     static {
@@ -74,14 +76,39 @@ class ReflectionUtils {
     /**
      * TODO
      *
-     * @param constructors
-     * @param args
+     * @param type
+     * @param ctorArgs
      * @return
      */
-    public static Constructor<?> matchingConstructor(final Constructor<?>[] constructors,
-            final Object[] args) {
+    public static <TYPE> Constructor<TYPE> findMatchingConstructor(final Class<TYPE> type,
+            final Object... ctorArgs) {
 
-        final int argsLength = args.length;
+        Constructor<?> constructor = findMatchingConstructor(type.getConstructors(), ctorArgs);
+
+        if (constructor == null) {
+
+            constructor = findMatchingConstructor(type.getDeclaredConstructors(), ctorArgs);
+
+            if (constructor == null) {
+
+                throw new IllegalArgumentException(
+                        "no suitable constructor found for type " + type.getCanonicalName());
+            }
+        }
+
+        if (!constructor.isAccessible()) {
+
+            constructor.setAccessible(true);
+        }
+
+        //noinspection unchecked
+        return (Constructor<TYPE>) constructor;
+    }
+
+    private static Constructor<?> findMatchingConstructor(final Constructor<?>[] constructors,
+            final Object[] ctorArgs) {
+
+        final int argsLength = ctorArgs.length;
 
         Constructor<?> bestMatch = null;
         int maxConfidence = 0;
@@ -101,7 +128,7 @@ class ReflectionUtils {
 
             for (int i = 0; i < argsLength; ++i) {
 
-                final Object contextArg = args[i];
+                final Object contextArg = ctorArgs[i];
                 final Class<?> param = params[i];
 
                 if (contextArg != null) {
@@ -141,7 +168,8 @@ class ReflectionUtils {
             } else if (confidence == maxConfidence) {
 
                 throw new IllegalArgumentException(
-                        "more than one constructor found for arguments: " + Arrays.toString(args));
+                        "more than one constructor found for arguments: " + Arrays.toString(
+                                ctorArgs));
 
             }
         }

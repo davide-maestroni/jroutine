@@ -11,14 +11,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.routine;
-
-import com.bmd.jrt.process.UnitProcessor;
+package com.bmd.jrt.runner;
 
 /**
- * Created by davide on 9/9/14.
+ * Created by davide on 9/7/14.
  */
-interface RecyclableUnitProcessor<INPUT, OUTPUT> extends UnitProcessor<INPUT, OUTPUT> {
+public interface Call {
 
-    public void recycle();
+    public void onInput();
+
+    public void onReset();
 }

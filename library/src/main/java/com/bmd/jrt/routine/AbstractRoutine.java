@@ -15,9 +15,13 @@ package com.bmd.jrt.routine;
 
 import com.bmd.jrt.channel.InputChannel;
 import com.bmd.jrt.channel.OutputChannel;
+import com.bmd.jrt.procedure.LoopProcedure;
+import com.bmd.jrt.procedure.ResultPublisher;
+import com.bmd.jrt.routine.DefaultRoutineChannel.ProcedureProvider;
 import com.bmd.jrt.runner.Runner;
 import com.bmd.jrt.runner.Runners;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -25,13 +29,42 @@ import java.util.List;
  */
 public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, OUTPUT> {
 
-    protected static final Object[] NO_ARGS = new Object[0];
+    private final int mMaxInstancePerCall;
+
+    private final int mMaxInstanceRecycled;
+
+    private final Object mMutex = new Object();
 
     private final Runner mRunner;
 
-    public AbstractRoutine(final Runner runner) {
+    private LinkedList<RecyclableLoopProcedure> mProcedureList =
+            new LinkedList<RecyclableLoopProcedure>();
+
+    public AbstractRoutine(final Runner runner, final int maxPerCall, final int maxRecycled) {
+
+        if (runner == null) {
+
+            throw new IllegalArgumentException();
+        }
+
+        if (maxPerCall < 1) {
+
+            throw new IllegalArgumentException();
+        }
+
+        if (maxRecycled < 1) {
+
+            throw new IllegalArgumentException();
+        }
 
         mRunner = runner;
+        mMaxInstancePerCall = maxPerCall;
+        mMaxInstanceRecycled = maxRecycled;
+    }
+
+    public AbstractRoutine(final AbstractRoutine<?, ?> other) {
+
+        this(other.mRunner, other.mMaxInstancePerCall, other.mMaxInstanceRecycled);
     }
 
     @Override
@@ -85,7 +118,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
     @Override
     public InputChannel<INPUT, OUTPUT> asynStart() {
 
-        return start(mRunner);
+        return start(true);
     }
 
     @Override
@@ -113,16 +146,16 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
     }
 
     @Override
-    public Routine<INPUT, OUTPUT> onResults(final ResultFilter<OUTPUT> filter) {
+    public <TRANSFORMED> Routine<INPUT, TRANSFORMED> onResult(
+            final Routine<OUTPUT, TRANSFORMED> routine) {
 
-        return new ResultFilterRoutine<INPUT, OUTPUT>(this, filter);
+        return new ResultRoutine<INPUT, OUTPUT, TRANSFORMED>(this, routine);
     }
 
     @Override
-    public <TRANSFORMED> Routine<INPUT, TRANSFORMED> onResults(
-            final InputChannel<OUTPUT, TRANSFORMED> channel) {
+    public Routine<INPUT, OUTPUT> onResult(final ResultFilter<OUTPUT> filter) {
 
-        return new OutputChannelRoutine<INPUT, OUTPUT, TRANSFORMED>(this, channel);
+        return new ResultFilterRoutine<INPUT, OUTPUT>(this, filter);
     }
 
     @Override
@@ -152,18 +185,91 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
     @Override
     public InputChannel<INPUT, OUTPUT> start() {
 
-        return start(Runners.sync());
+        return start(false);
     }
 
-    protected abstract RecyclableUnitProcessor<INPUT, OUTPUT> createProcessor();
+    protected abstract LoopProcedure<INPUT, OUTPUT> createProcedure(final boolean async);
 
-    protected Runner getRunner() {
+    protected InputChannel<INPUT, OUTPUT> start(final boolean async) {
 
-        return mRunner;
+        return new DefaultRoutineChannel<INPUT, OUTPUT>(new RoutineProcedureProvider(async),
+                                                        (async) ? mRunner : Runners.sync(),
+                                                        mMaxInstancePerCall);
     }
 
-    protected InputChannel<INPUT, OUTPUT> start(final Runner runner) {
+    private RecyclableLoopProcedure getRecyclableProcedure(final boolean async) {
 
-        return new DefaultRoutineChannel<INPUT, OUTPUT>(createProcessor(), runner);
+        synchronized (mMutex) {
+
+            final LinkedList<RecyclableLoopProcedure> procedures = mProcedureList;
+
+            if (!procedures.isEmpty()) {
+
+                return procedures.removeFirst();
+            }
+
+            return new RecyclableLoopProcedure(createProcedure(async));
+        }
+    }
+
+    private class RecyclableLoopProcedure implements LoopProcedure<INPUT, OUTPUT> {
+
+        private final LoopProcedure<INPUT, OUTPUT> mProcedure;
+
+        public RecyclableLoopProcedure(final LoopProcedure<INPUT, OUTPUT> procedure) {
+
+            mProcedure = procedure;
+        }
+
+        @Override
+        public void onInput(final INPUT input, final ResultPublisher<OUTPUT> results) {
+
+            mProcedure.onInput(input, results);
+        }
+
+        @Override
+        public void onReset(final ResultPublisher<OUTPUT> results) {
+
+            mProcedure.onReset(results);
+
+            recycle();
+        }
+
+        @Override
+        public void onResult(final ResultPublisher<OUTPUT> results) {
+
+            mProcedure.onResult(results);
+
+            recycle();
+        }
+
+        private void recycle() {
+
+            synchronized (mMutex) {
+
+                final LinkedList<RecyclableLoopProcedure> instances = mProcedureList;
+
+                if (instances.size() < mMaxInstanceRecycled) {
+
+                    instances.add(this);
+                }
+            }
+        }
+    }
+
+    private class RoutineProcedureProvider implements ProcedureProvider<INPUT, OUTPUT> {
+
+        private final boolean mAsync;
+
+        private RoutineProcedureProvider(final boolean async) {
+
+            mAsync = async;
+        }
+
+        @Override
+        public LoopProcedure<INPUT, OUTPUT> create() {
+
+            return getRecyclableProcedure(mAsync);
+        }
     }
 }

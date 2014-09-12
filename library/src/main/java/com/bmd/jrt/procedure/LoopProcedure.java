@@ -11,14 +11,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.runner;
+package com.bmd.jrt.procedure;
 
 /**
  * Created by davide on 9/7/14.
  */
-public interface Processing {
+public interface LoopProcedure<INPUT, OUTPUT> {
 
-    public void onInput();
+    public void onInput(INPUT input, ResultPublisher<OUTPUT> results);
 
-    public void onReset();
+    public void onReset(ResultPublisher<OUTPUT> results);
+
+    public void onResult(ResultPublisher<OUTPUT> results);
 }

@@ -15,7 +15,7 @@ package com.bmd.jrt.routine;
 
 import com.bmd.jrt.channel.InputChannel;
 import com.bmd.jrt.channel.OutputChannel;
-import com.bmd.jrt.process.ResultPublisher;
+import com.bmd.jrt.procedure.ResultPublisher;
 
 import java.util.List;
 
@@ -50,10 +50,9 @@ public interface Routine<INPUT, OUTPUT> {
 
     public List<OUTPUT> call(Iterable<? extends INPUT> inputs);
 
-    public Routine<INPUT, OUTPUT> onResults(ResultFilter<OUTPUT> filter);
+    public <TRANSFORMED> Routine<INPUT, TRANSFORMED> onResult(Routine<OUTPUT, TRANSFORMED> routine);
 
-    public <TRANSFORMED> Routine<INPUT, TRANSFORMED> onResults(
-            InputChannel<OUTPUT, TRANSFORMED> channel);
+    public Routine<INPUT, OUTPUT> onResult(ResultFilter<OUTPUT> filter);
 
     public OutputChannel<OUTPUT> run();
 

@@ -30,14 +30,14 @@ class ThreadPoolRunner implements Runner {
     }
 
     @Override
-    public void onInput(final Processing processing, final long delay, final TimeUnit timeUnit) {
+    public void onInput(final Call call, final long delay, final TimeUnit timeUnit) {
 
         final Runnable runnable = new Runnable() {
 
             @Override
             public void run() {
 
-                processing.onInput();
+                call.onInput();
             }
         };
 
@@ -52,14 +52,14 @@ class ThreadPoolRunner implements Runner {
     }
 
     @Override
-    public void onReset(final Processing processing) {
+    public void onReset(final Call call) {
 
         mService.execute(new Runnable() {
 
             @Override
             public void run() {
 
-                processing.onReset();
+                call.onReset();
             }
         });
     }

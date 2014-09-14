@@ -13,8 +13,8 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.procedure.LoopProcedure;
 import com.bmd.jrt.runner.Runner;
+import com.bmd.jrt.subroutine.SubRoutineLoop;
 
 import java.lang.reflect.Constructor;
 
@@ -24,24 +24,23 @@ import static com.bmd.jrt.routine.ReflectionUtils.findMatchingConstructor;
 /**
  * Created by davide on 9/9/14.
  */
-class LoopProcedureRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
+class SubRoutineLoopRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
 
     private final Object[] mArgs;
 
-    private final Constructor<? extends LoopProcedure<INPUT, OUTPUT>> mConstructor;
+    private final Constructor<? extends SubRoutineLoop<INPUT, OUTPUT>> mConstructor;
 
-    public LoopProcedureRoutine(final Runner runner, final int maxRecycle, final int maxRetain,
-            final Class<? extends LoopProcedure<INPUT, OUTPUT>> procedureClass,
-            final Object... ctorArgs) {
+    public SubRoutineLoopRoutine(final Runner runner, final int maxParalle, final int maxRetained,
+            final Class<? extends SubRoutineLoop<INPUT, OUTPUT>> type, final Object... ctorArgs) {
 
-        super(runner, maxRecycle, maxRetain);
+        super(runner, maxParalle, maxRetained);
 
-        mConstructor = findMatchingConstructor(procedureClass, ctorArgs);
+        mConstructor = findMatchingConstructor(type, ctorArgs);
         mArgs = (ctorArgs == null) ? NO_ARGS : ctorArgs.clone();
     }
 
     @Override
-    protected LoopProcedure<INPUT, OUTPUT> createProcedure(final boolean async) {
+    protected SubRoutineLoop<INPUT, OUTPUT> createSubRoutine(final boolean async) {
 
         try {
 

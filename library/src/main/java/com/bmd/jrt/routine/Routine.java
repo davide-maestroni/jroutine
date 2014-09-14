@@ -15,7 +15,7 @@ package com.bmd.jrt.routine;
 
 import com.bmd.jrt.channel.InputChannel;
 import com.bmd.jrt.channel.OutputChannel;
-import com.bmd.jrt.procedure.ResultPublisher;
+import com.bmd.jrt.subroutine.ResultPublisher;
 
 import java.util.List;
 
@@ -52,7 +52,7 @@ public interface Routine<INPUT, OUTPUT> {
 
     public <TRANSFORMED> Routine<INPUT, TRANSFORMED> onResult(Routine<OUTPUT, TRANSFORMED> routine);
 
-    public Routine<INPUT, OUTPUT> onResult(ResultFilter<OUTPUT> filter);
+    public Routine<INPUT, OUTPUT> onResult(OutputFilter<OUTPUT> filter);
 
     public OutputChannel<OUTPUT> run();
 
@@ -64,14 +64,14 @@ public interface Routine<INPUT, OUTPUT> {
 
     public InputChannel<INPUT, OUTPUT> start();
 
-    public interface ResultFilter<RESULT> {
+    public interface OutputFilter<OUTPUT> {
 
-        public void onEnd(ResultPublisher<RESULT> results);
+        public void onEnd(ResultPublisher<OUTPUT> results);
 
-        public void onException(Throwable throwable, ResultPublisher<RESULT> results);
+        public void onException(Throwable throwable, ResultPublisher<OUTPUT> results);
 
-        public void onReset(ResultPublisher<RESULT> results);
+        public void onReset(ResultPublisher<OUTPUT> results);
 
-        public void onResult(RESULT result, ResultPublisher<RESULT> results);
+        public void onResult(OUTPUT result, ResultPublisher<OUTPUT> results);
     }
 }

@@ -13,10 +13,10 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.procedure.LoopProcedure;
-import com.bmd.jrt.procedure.Procedure;
 import com.bmd.jrt.runner.Runner;
 import com.bmd.jrt.runner.Runners;
+import com.bmd.jrt.subroutine.SubRoutine;
+import com.bmd.jrt.subroutine.SubRoutineLoop;
 import com.bmd.jrt.util.Classification;
 
 /**
@@ -30,58 +30,41 @@ public class JRoutine {
 
     private static volatile Runner sBackgroundRunner;
 
-    private final int mMaxInstancePerCall;
+    private final int mMaxParallel;
 
-    private final int mMaxInstanceRecycled;
+    private final int mMaxRetained;
 
     private final Runner mRunner;
 
-    private JRoutine(final Runner runner, final int maxPerCall, final int maxRecycled) {
+    private JRoutine(final Runner runner, final int maxParallel, final int maxRetained) {
 
         if (runner == null) {
 
             throw new IllegalArgumentException();
         }
 
-        if (maxPerCall < 1) {
+        if (maxParallel < 1) {
 
             throw new IllegalArgumentException();
         }
 
-        if (maxRecycled < 1) {
+        if (maxRetained < 1) {
 
             throw new IllegalArgumentException();
         }
 
         mRunner = runner;
-        mMaxInstancePerCall = maxPerCall;
-        mMaxInstanceRecycled = maxRecycled;
+        mMaxParallel = maxParallel;
+        mMaxRetained = maxRetained;
     }
 
     public static JRoutine jrt() {
 
-        if (sBackgroundRunner == null) {
-
-            sBackgroundRunner = Runners.pool(getBestPoolSize());
-        }
-
-        return new JRoutine(sBackgroundRunner, DEFAULT_RECYCLE, DEFAULT_RETAIN);
-    }
-
-    private static int getBestPoolSize() {
-
-        final int processors = Runtime.getRuntime().availableProcessors();
-
-        if (processors < 4) {
-
-            return Math.max(1, processors - 1);
-        }
-
-        return (processors / 2);
+        return new JRoutine(Runners.shared(), DEFAULT_RECYCLE, DEFAULT_RETAIN);
     }
 
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> exec(
-            final Classification<? extends Procedure<INPUT, OUTPUT>> classification,
+            final Classification<? extends SubRoutine<INPUT, OUTPUT>> classification,
             final Object... ctorArgs) {
 
         if (classification == null) {
@@ -89,18 +72,22 @@ public class JRoutine {
             throw new IllegalArgumentException();
         }
 
-        return new ProcedureRoutine<INPUT, OUTPUT>(mRunner, mMaxInstancePerCall,
-                                                   mMaxInstanceRecycled,
-                                                   classification.getRawType(), ctorArgs);
+        return new SubRoutineRoutine<INPUT, OUTPUT>(mRunner, mMaxParallel, mMaxRetained,
+                                                    classification.getRawType(), ctorArgs);
     }
 
     public JRoutine in(final Runner runner) {
 
-        return new JRoutine(runner, mMaxInstancePerCall, mMaxInstanceRecycled);
+        return new JRoutine(runner, mMaxParallel, mMaxRetained);
+    }
+
+    public JRoutine inBackground() {
+
+        return new JRoutine(Runners.pool(), mMaxParallel, mMaxRetained);
     }
 
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> loop(
-            final Classification<? extends LoopProcedure<INPUT, OUTPUT>> classification,
+            final Classification<? extends SubRoutineLoop<INPUT, OUTPUT>> classification,
             final Object... ctorArgs) {
 
         if (classification == null) {
@@ -108,18 +95,17 @@ public class JRoutine {
             throw new IllegalArgumentException();
         }
 
-        return new LoopProcedureRoutine<INPUT, OUTPUT>(mRunner, mMaxInstancePerCall,
-                                                       mMaxInstanceRecycled,
-                                                       classification.getRawType(), ctorArgs);
+        return new SubRoutineLoopRoutine<INPUT, OUTPUT>(mRunner, mMaxParallel, mMaxRetained,
+                                                        classification.getRawType(), ctorArgs);
     }
 
-    public JRoutine maxPerCall(final int instanceCount) {
+    public JRoutine maxParallel(final int instanceCount) {
 
-        return new JRoutine(mRunner, instanceCount, mMaxInstanceRecycled);
+        return new JRoutine(mRunner, instanceCount, mMaxRetained);
     }
 
-    public JRoutine maxRecycled(final int instanceCount) {
+    public JRoutine maxRetained(final int instanceCount) {
 
-        return new JRoutine(mRunner, mMaxInstancePerCall, instanceCount);
+        return new JRoutine(mRunner, mMaxParallel, instanceCount);
     }
 }

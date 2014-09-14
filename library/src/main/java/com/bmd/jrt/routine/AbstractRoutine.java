@@ -15,11 +15,10 @@ package com.bmd.jrt.routine;
 
 import com.bmd.jrt.channel.InputChannel;
 import com.bmd.jrt.channel.OutputChannel;
-import com.bmd.jrt.procedure.LoopProcedure;
-import com.bmd.jrt.procedure.ResultPublisher;
-import com.bmd.jrt.routine.DefaultRoutineChannel.ProcedureProvider;
+import com.bmd.jrt.routine.DefaultRoutineChannel.SubRoutineProvider;
 import com.bmd.jrt.runner.Runner;
 import com.bmd.jrt.runner.Runners;
+import com.bmd.jrt.subroutine.SubRoutineLoop;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -29,42 +28,42 @@ import java.util.List;
  */
 public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, OUTPUT> {
 
-    private final int mMaxInstancePerCall;
+    private final int mMaxParallel;
 
-    private final int mMaxInstanceRecycled;
+    private final int mMaxRetained;
 
     private final Object mMutex = new Object();
 
     private final Runner mRunner;
 
-    private LinkedList<RecyclableLoopProcedure> mProcedureList =
-            new LinkedList<RecyclableLoopProcedure>();
+    private LinkedList<SubRoutineLoop<INPUT, OUTPUT>> mSubRoutines =
+            new LinkedList<SubRoutineLoop<INPUT, OUTPUT>>();
 
-    public AbstractRoutine(final Runner runner, final int maxPerCall, final int maxRecycled) {
+    public AbstractRoutine(final Runner runner, final int maxParallel, final int maxRetained) {
 
         if (runner == null) {
 
             throw new IllegalArgumentException();
         }
 
-        if (maxPerCall < 1) {
+        if (maxParallel < 1) {
 
             throw new IllegalArgumentException();
         }
 
-        if (maxRecycled < 1) {
+        if (maxRetained < 1) {
 
             throw new IllegalArgumentException();
         }
 
         mRunner = runner;
-        mMaxInstancePerCall = maxPerCall;
-        mMaxInstanceRecycled = maxRecycled;
+        mMaxParallel = maxParallel;
+        mMaxRetained = maxRetained;
     }
 
     public AbstractRoutine(final AbstractRoutine<?, ?> other) {
 
-        this(other.mRunner, other.mMaxInstancePerCall, other.mMaxInstanceRecycled);
+        this(other.mRunner, other.mMaxParallel, other.mMaxRetained);
     }
 
     @Override
@@ -153,9 +152,9 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
     }
 
     @Override
-    public Routine<INPUT, OUTPUT> onResult(final ResultFilter<OUTPUT> filter) {
+    public Routine<INPUT, OUTPUT> onResult(final OutputFilter<OUTPUT> filter) {
 
-        return new ResultFilterRoutine<INPUT, OUTPUT>(this, filter);
+        return new OutputFilterRoutine<INPUT, OUTPUT>(this, filter);
     }
 
     @Override
@@ -188,88 +187,52 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
         return start(false);
     }
 
-    protected abstract LoopProcedure<INPUT, OUTPUT> createProcedure(final boolean async);
+    protected abstract SubRoutineLoop<INPUT, OUTPUT> createSubRoutine(final boolean async);
 
     protected InputChannel<INPUT, OUTPUT> start(final boolean async) {
 
-        return new DefaultRoutineChannel<INPUT, OUTPUT>(new RoutineProcedureProvider(async),
+        return new DefaultRoutineChannel<INPUT, OUTPUT>(new RoutineSubRoutineProvider(async),
                                                         (async) ? mRunner : Runners.sync(),
-                                                        mMaxInstancePerCall);
+                                                        mMaxParallel);
     }
 
-    private RecyclableLoopProcedure getRecyclableProcedure(final boolean async) {
-
-        synchronized (mMutex) {
-
-            final LinkedList<RecyclableLoopProcedure> procedures = mProcedureList;
-
-            if (!procedures.isEmpty()) {
-
-                return procedures.removeFirst();
-            }
-
-            return new RecyclableLoopProcedure(createProcedure(async));
-        }
-    }
-
-    private class RecyclableLoopProcedure implements LoopProcedure<INPUT, OUTPUT> {
-
-        private final LoopProcedure<INPUT, OUTPUT> mProcedure;
-
-        public RecyclableLoopProcedure(final LoopProcedure<INPUT, OUTPUT> procedure) {
-
-            mProcedure = procedure;
-        }
-
-        @Override
-        public void onInput(final INPUT input, final ResultPublisher<OUTPUT> results) {
-
-            mProcedure.onInput(input, results);
-        }
-
-        @Override
-        public void onReset(final ResultPublisher<OUTPUT> results) {
-
-            mProcedure.onReset(results);
-
-            recycle();
-        }
-
-        @Override
-        public void onResult(final ResultPublisher<OUTPUT> results) {
-
-            mProcedure.onResult(results);
-
-            recycle();
-        }
-
-        private void recycle() {
-
-            synchronized (mMutex) {
-
-                final LinkedList<RecyclableLoopProcedure> instances = mProcedureList;
-
-                if (instances.size() < mMaxInstanceRecycled) {
-
-                    instances.add(this);
-                }
-            }
-        }
-    }
-
-    private class RoutineProcedureProvider implements ProcedureProvider<INPUT, OUTPUT> {
+    private class RoutineSubRoutineProvider implements SubRoutineProvider<INPUT, OUTPUT> {
 
         private final boolean mAsync;
 
-        private RoutineProcedureProvider(final boolean async) {
+        private RoutineSubRoutineProvider(final boolean async) {
 
             mAsync = async;
         }
 
         @Override
-        public LoopProcedure<INPUT, OUTPUT> create() {
+        public SubRoutineLoop<INPUT, OUTPUT> create() {
 
-            return getRecyclableProcedure(mAsync);
+            synchronized (mMutex) {
+
+                final LinkedList<SubRoutineLoop<INPUT, OUTPUT>> routines = mSubRoutines;
+
+                if (!routines.isEmpty()) {
+
+                    return routines.removeFirst();
+                }
+
+                return createSubRoutine(mAsync);
+            }
+        }
+
+        @Override
+        public void recycle(final SubRoutineLoop<INPUT, OUTPUT> routine) {
+
+            synchronized (mMutex) {
+
+                final LinkedList<SubRoutineLoop<INPUT, OUTPUT>> routines = mSubRoutines;
+
+                if (routines.size() < mMaxRetained) {
+
+                    routines.add(routine);
+                }
+            }
         }
     }
 }

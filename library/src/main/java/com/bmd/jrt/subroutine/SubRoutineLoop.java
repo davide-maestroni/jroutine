@@ -11,16 +11,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.procedure;
+package com.bmd.jrt.subroutine;
 
 /**
  * Created by davide on 9/7/14.
  */
-public interface LoopProcedure<INPUT, OUTPUT> {
+public interface SubRoutineLoop<INPUT, OUTPUT> {
+
+    public void onInit();
 
     public void onInput(INPUT input, ResultPublisher<OUTPUT> results);
 
     public void onReset(ResultPublisher<OUTPUT> results);
 
     public void onResult(ResultPublisher<OUTPUT> results);
+
+    public void onReturn();
 }

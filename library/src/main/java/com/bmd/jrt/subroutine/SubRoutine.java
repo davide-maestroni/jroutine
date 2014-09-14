@@ -11,14 +11,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.procedure;
+package com.bmd.jrt.subroutine;
 
 import java.util.List;
 
 /**
  * Created by davide on 9/7/14.
  */
-public interface Procedure<INPUT, OUTPUT> {
+public interface SubRoutine<INPUT, OUTPUT> {
 
-    public void onRun(List<? extends INPUT> inputs, ResultPublisher<OUTPUT> results);
+    public void run(List<? extends INPUT> inputs, ResultPublisher<OUTPUT> results);
 }

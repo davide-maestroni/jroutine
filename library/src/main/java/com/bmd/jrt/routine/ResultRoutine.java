@@ -15,8 +15,8 @@ package com.bmd.jrt.routine;
 
 import com.bmd.jrt.channel.InputChannel;
 import com.bmd.jrt.channel.OutputChannel;
-import com.bmd.jrt.procedure.LoopProcedure;
-import com.bmd.jrt.procedure.ResultPublisher;
+import com.bmd.jrt.subroutine.ResultPublisher;
+import com.bmd.jrt.subroutine.SubRoutineLoop;
 import com.bmd.jrt.time.PositiveDuration;
 import com.bmd.jrt.util.RoutineInterruptedException;
 
@@ -45,26 +45,26 @@ class ResultRoutine<INPUT, OUTPUT, TRANSFORMED> extends AbstractRoutine<INPUT, T
     }
 
     @Override
-    protected LoopProcedure<INPUT, TRANSFORMED> createProcedure(final boolean async) {
+    protected SubRoutineLoop<INPUT, TRANSFORMED> createSubRoutine(final boolean async) {
 
         final Routine<OUTPUT, TRANSFORMED> resultRoutine = mResultRoutine;
 
-        return new OutputChannelLoopProcedure(mRoutine.createProcedure(async),
-                                              (async) ? resultRoutine.asynStart()
-                                                      : resultRoutine.start());
+        return new OutputChannelSubRoutineLoop(mRoutine.createSubRoutine(async),
+                                               (async) ? resultRoutine.asynStart()
+                                                       : resultRoutine.start());
     }
 
     @Override
     protected InputChannel<INPUT, TRANSFORMED> start(final boolean async) {
 
-        return new InputRoutineChannel(super.start(async));
+        return new InputChannelWrapper(super.start(async));
     }
 
-    private class InputRoutineChannel implements InputChannel<INPUT, TRANSFORMED> {
+    private class InputChannelWrapper implements InputChannel<INPUT, TRANSFORMED> {
 
         private final InputChannel<INPUT, TRANSFORMED> mInputChannel;
 
-        public InputRoutineChannel(final InputChannel<INPUT, TRANSFORMED> channel) {
+        public InputChannelWrapper(final InputChannel<INPUT, TRANSFORMED> channel) {
 
             mInputChannel = channel;
         }
@@ -153,26 +153,33 @@ class ResultRoutine<INPUT, OUTPUT, TRANSFORMED> extends AbstractRoutine<INPUT, T
         }
     }
 
-    private class OutputChannelLoopProcedure implements LoopProcedure<INPUT, TRANSFORMED> {
+    //TODO: cannot be reused...
+    private class OutputChannelSubRoutineLoop implements SubRoutineLoop<INPUT, TRANSFORMED> {
 
         private final InputChannel<OUTPUT, TRANSFORMED> mInputChannel;
 
-        private final LoopProcedure<INPUT, OUTPUT> mProcedure;
-
         private final InputChannelResultPublisher<OUTPUT> mResultPublisher;
 
-        public OutputChannelLoopProcedure(final LoopProcedure<INPUT, OUTPUT> procedure,
+        private final SubRoutineLoop<INPUT, OUTPUT> mRoutine;
+
+        public OutputChannelSubRoutineLoop(final SubRoutineLoop<INPUT, OUTPUT> routine,
                 final InputChannel<OUTPUT, TRANSFORMED> channel) {
 
-            mProcedure = procedure;
+            mRoutine = routine;
             mInputChannel = channel;
             mResultPublisher = new InputChannelResultPublisher<OUTPUT>(channel);
         }
 
         @Override
+        public void onInit() {
+
+            mRoutine.onInit();
+        }
+
+        @Override
         public void onInput(final INPUT input, final ResultPublisher<TRANSFORMED> results) {
 
-            mProcedure.onInput(input, mResultPublisher);
+            mRoutine.onInput(input, mResultPublisher);
         }
 
         @Override
@@ -180,7 +187,7 @@ class ResultRoutine<INPUT, OUTPUT, TRANSFORMED> extends AbstractRoutine<INPUT, T
 
             try {
 
-                mProcedure.onReset(mResultPublisher);
+                mRoutine.onReset(mResultPublisher);
 
             } finally {
 
@@ -193,7 +200,7 @@ class ResultRoutine<INPUT, OUTPUT, TRANSFORMED> extends AbstractRoutine<INPUT, T
 
             try {
 
-                mProcedure.onResult(mResultPublisher);
+                mRoutine.onResult(mResultPublisher);
 
             } finally {
 
@@ -205,6 +212,12 @@ class ResultRoutine<INPUT, OUTPUT, TRANSFORMED> extends AbstractRoutine<INPUT, T
                     mMutex.notifyAll();
                 }
             }
+        }
+
+        @Override
+        public void onReturn() {
+
+            mRoutine.onReturn();
         }
     }
 }

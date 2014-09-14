@@ -18,7 +18,9 @@ package com.bmd.jrt.runner;
  */
 public class Runners {
 
-    private static volatile SyncRunner sSyncRunner;
+    private static final SyncRunner sSyncRunner = new SyncRunner();
+
+    private static volatile Runner sSharedRunner;
 
     /**
      * Avoid direct instantiation.
@@ -27,18 +29,40 @@ public class Runners {
 
     }
 
+    public static Runner pool() {
+
+        return pool(getBestPoolSize());
+    }
+
     public static Runner pool(final int poolSize) {
 
         return new ThreadPoolRunner(poolSize);
     }
 
-    public static Runner sync() {
+    public static Runner shared() {
 
-        if (sSyncRunner == null) {
+        if (sSharedRunner == null) {
 
-            sSyncRunner = new SyncRunner();
+            sSharedRunner = Runners.pool();
         }
 
+        return sSharedRunner;
+    }
+
+    public static Runner sync() {
+
         return sSyncRunner;
+    }
+
+    private static int getBestPoolSize() {
+
+        final int processors = Runtime.getRuntime().availableProcessors();
+
+        if (processors < 4) {
+
+            return Math.max(1, processors - 1);
+        }
+
+        return (processors / 2);
     }
 }

@@ -31,7 +31,7 @@ public class RoutineExceptionWrapper {
 
         if (obj instanceof RoutineExceptionWrapper) {
 
-            ((RoutineExceptionWrapper) obj).raise();
+            throw ((RoutineExceptionWrapper) obj).raise();
         }
     }
 

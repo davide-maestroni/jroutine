@@ -11,15 +11,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.routine;
-
-import com.bmd.jrt.procedure.LoopProcedure;
-import com.bmd.jrt.procedure.ResultPublisher;
+package com.bmd.jrt.subroutine;
 
 /**
  * Created by davide on 9/11/14.
  */
-public abstract class LoopProcedureAdapter<INPUT, OUTPUT> implements LoopProcedure<INPUT, OUTPUT> {
+public abstract class SubRoutineLoopAdapter<INPUT, OUTPUT>
+        implements SubRoutineLoop<INPUT, OUTPUT> {
+
+    @Override
+    public void onInit() {
+
+    }
 
     @Override
     public void onInput(final INPUT input, final ResultPublisher<OUTPUT> results) {
@@ -33,6 +36,11 @@ public abstract class LoopProcedureAdapter<INPUT, OUTPUT> implements LoopProcedu
 
     @Override
     public void onResult(final ResultPublisher<OUTPUT> results) {
+
+    }
+
+    @Override
+    public void onReturn() {
 
     }
 }

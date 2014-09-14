@@ -13,13 +13,13 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.procedure.ResultPublisher;
-import com.bmd.jrt.routine.Routine.ResultFilter;
+import com.bmd.jrt.routine.Routine.OutputFilter;
+import com.bmd.jrt.subroutine.ResultPublisher;
 
 /**
  * Created by davide on 9/11/14.
  */
-public abstract class ResultFilterAdapter<RESULT> implements ResultFilter<RESULT> {
+public abstract class OutputFilterAdapter<RESULT> implements OutputFilter<RESULT> {
 
     @Override
     public void onEnd(final ResultPublisher<RESULT> results) {

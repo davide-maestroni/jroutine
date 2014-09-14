@@ -13,10 +13,11 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.procedure.LoopProcedure;
-import com.bmd.jrt.procedure.Procedure;
-import com.bmd.jrt.procedure.ResultPublisher;
 import com.bmd.jrt.runner.Runner;
+import com.bmd.jrt.subroutine.ResultPublisher;
+import com.bmd.jrt.subroutine.SubRoutine;
+import com.bmd.jrt.subroutine.SubRoutineLoop;
+import com.bmd.jrt.subroutine.SubRoutineLoopAdapter;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -27,27 +28,27 @@ import static com.bmd.jrt.routine.ReflectionUtils.findMatchingConstructor;
 /**
  * Created by davide on 9/9/14.
  */
-class ProcedureRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
+class SubRoutineRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
 
     private final Object[] mArgs;
 
-    private final Constructor<? extends Procedure<INPUT, OUTPUT>> mConstructor;
+    private final Constructor<? extends SubRoutine<INPUT, OUTPUT>> mConstructor;
 
-    public ProcedureRoutine(final Runner runner, final int maxRecycle, final int maxRetain,
-            final Class<? extends Procedure<INPUT, OUTPUT>> procedureClass,
-            final Object... ctorArgs) {
+    public SubRoutineRoutine(final Runner runner, final int maxParallel, final int maxRetained,
+            final Class<? extends SubRoutine<INPUT, OUTPUT>> type, final Object... ctorArgs) {
 
-        super(runner, maxRecycle, maxRetain);
+        super(runner, maxParallel, maxRetained);
 
-        mConstructor = findMatchingConstructor(procedureClass, ctorArgs);
+        mConstructor = findMatchingConstructor(type, ctorArgs);
         mArgs = (ctorArgs == null) ? NO_ARGS : ctorArgs.clone();
     }
 
     @Override
-    protected LoopProcedure<INPUT, OUTPUT> createProcedure(final boolean async) {
+    protected SubRoutineLoop<INPUT, OUTPUT> createSubRoutine(final boolean async) {
 
         try {
-            return new LoopProcedureWrapper(mConstructor.newInstance(mArgs));
+
+            return new SubRoutineLoopWrapper(mConstructor.newInstance(mArgs));
 
         } catch (final Throwable t) {
 
@@ -55,15 +56,15 @@ class ProcedureRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
         }
     }
 
-    private class LoopProcedureWrapper implements LoopProcedure<INPUT, OUTPUT> {
+    private class SubRoutineLoopWrapper extends SubRoutineLoopAdapter<INPUT, OUTPUT> {
 
-        private final Procedure<INPUT, OUTPUT> mProcedure;
+        private final SubRoutine<INPUT, OUTPUT> mSubRoutine;
 
         private ArrayList<INPUT> mInputs;
 
-        public LoopProcedureWrapper(final Procedure<INPUT, OUTPUT> procedure) {
+        public SubRoutineLoopWrapper(final SubRoutine<INPUT, OUTPUT> subRoutine) {
 
-            mProcedure = procedure;
+            mSubRoutine = subRoutine;
         }
 
         @Override
@@ -104,7 +105,7 @@ class ProcedureRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
                 inputs.clear();
             }
 
-            mProcedure.onRun(copy, results);
+            mSubRoutine.run(copy, results);
         }
     }
 }

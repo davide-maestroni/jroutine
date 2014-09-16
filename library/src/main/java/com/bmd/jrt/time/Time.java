@@ -18,66 +18,66 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by davide on 9/9/14.
  */
-public class Duration {
+public class Time {
 
-    public static final Duration ZERO = time(0, TimeUnit.MILLISECONDS);
+    public static final Time ZERO = from(0, TimeUnit.MILLISECONDS);
 
     public final long time;
 
     public final TimeUnit unit;
 
-    protected Duration(final long time, final TimeUnit unit) {
+    protected Time(final long time, final TimeUnit unit) {
 
         this.time = time;
         this.unit = unit;
     }
 
-    public static Duration days(final long days) {
+    public static Time days(final long days) {
 
-        return new Duration(days, TimeUnit.DAYS);
+        return new Time(days, TimeUnit.DAYS);
     }
 
-    public static Duration hours(final long hours) {
-
-        return new Duration(hours, TimeUnit.HOURS);
-    }
-
-    public static Duration micros(final long micros) {
-
-        return new Duration(micros, TimeUnit.MICROSECONDS);
-    }
-
-    public static Duration millis(final long millis) {
-
-        return new Duration(millis, TimeUnit.MILLISECONDS);
-    }
-
-    public static Duration minutes(final long minutes) {
-
-        return new Duration(minutes, TimeUnit.MINUTES);
-    }
-
-    public static Duration nanos(final long nanos) {
-
-        return new Duration(nanos, TimeUnit.NANOSECONDS);
-    }
-
-    public static Duration seconds(final long seconds) {
-
-        return new Duration(seconds, TimeUnit.SECONDS);
-    }
-
-    public static Duration time(final long time, TimeUnit unit) {
+    public static Time from(final long time, TimeUnit unit) {
 
         if (unit == null) {
 
             throw new IllegalArgumentException();
         }
 
-        return new Duration(time, unit);
+        return new Time(time, unit);
     }
 
-    public Duration daysDuration() {
+    public static Time hours(final long hours) {
+
+        return new Time(hours, TimeUnit.HOURS);
+    }
+
+    public static Time micros(final long micros) {
+
+        return new Time(micros, TimeUnit.MICROSECONDS);
+    }
+
+    public static Time millis(final long millis) {
+
+        return new Time(millis, TimeUnit.MILLISECONDS);
+    }
+
+    public static Time minutes(final long minutes) {
+
+        return new Time(minutes, TimeUnit.MINUTES);
+    }
+
+    public static Time nanos(final long nanos) {
+
+        return new Time(nanos, TimeUnit.NANOSECONDS);
+    }
+
+    public static Time seconds(final long seconds) {
+
+        return new Time(seconds, TimeUnit.SECONDS);
+    }
+
+    public Time daysTime() {
 
         return days(toDays());
     }
@@ -98,17 +98,17 @@ public class Duration {
             return true;
         }
 
-        if (!(o instanceof Duration)) {
+        if (!(o instanceof Time)) {
 
             return false;
         }
 
-        final Duration duration = (Duration) o;
+        final Time time = (Time) o;
 
-        return (time == duration.time) && (unit == duration.unit);
+        return (this.time == time.time) && (unit == time.unit);
     }
 
-    public Duration hoursDuration() {
+    public Time hoursTime() {
 
         return hours(toHours());
     }
@@ -118,27 +118,27 @@ public class Duration {
         return (time == 0);
     }
 
-    public Duration microsDuration() {
+    public Time microsTime() {
 
         return micros(toMicros());
     }
 
-    public Duration millisDuration() {
+    public Time millisTime() {
 
         return millis(toMillis());
     }
 
-    public Duration minutesDuration() {
+    public Time minutesTime() {
 
         return minutes(toMinutes());
     }
 
-    public Duration nanosDuration() {
+    public Time nanosTime() {
 
         return nanos(toNanos());
     }
 
-    public Duration secondsDuration() {
+    public Time secondsTime() {
 
         return seconds(toSeconds());
     }

@@ -13,9 +13,9 @@
  */
 package com.bmd.jrt;
 
-import com.bmd.jrt.channel.InputChannel;
+import com.bmd.jrt.channel.ResultChannel;
+import com.bmd.jrt.channel.RoutineChannel;
 import com.bmd.jrt.routine.Routine;
-import com.bmd.jrt.subroutine.ResultPublisher;
 import com.bmd.jrt.subroutine.SubRoutine;
 import com.bmd.jrt.subroutine.SubRoutineLoopAdapter;
 import com.bmd.jrt.util.Classification;
@@ -43,8 +43,10 @@ public class RoutineTest extends TestCase {
         final SubRoutine<Integer, Integer> sumSubRoutine = new SubRoutine<Integer, Integer>() {
 
             @Override
-            public void run(final List<? extends Integer> integers,
-                    final ResultPublisher<Integer> results) {
+            public void onRun(final List<? extends Integer> integers,
+                    final ResultChannel<Integer> results) {
+
+                System.out.println(">>>>>> SUM: " + this + " T: " + Thread.currentThread());
 
                 int sum = 0;
 
@@ -53,7 +55,7 @@ public class RoutineTest extends TestCase {
                     sum += integer;
                 }
 
-                results.publish(sum);
+                results.push(sum);
             }
         };
 
@@ -61,69 +63,92 @@ public class RoutineTest extends TestCase {
                 jrt().exec(Classification.of(sumSubRoutine), this);
 
         assertThat(sumRoutine.call(1, 2, 3, 4)).containsExactly(10);
-        assertThat(sumRoutine.asynCall(1, 2, 3, 4)).containsExactly(10);
+        assertThat(sumRoutine.callAsyn(1, 2, 3, 4)).containsExactly(10);
         assertThat(sumRoutine.run(1, 2, 3, 4).all()).containsExactly(10);
-        assertThat(sumRoutine.asynRun(1, 2, 3, 4).all()).containsExactly(10);
+        assertThat(sumRoutine.runAsyn(1, 2, 3, 4).all()).containsExactly(10);
 
         final SubRoutineLoopAdapter<Integer, Integer> squareSubRoutine =
                 new SubRoutineLoopAdapter<Integer, Integer>() {
 
                     @Override
                     public void onInput(final Integer integer,
-                            final ResultPublisher<Integer> results) {
+                            final ResultChannel<Integer> results) {
+
+                        System.out.println(">>>>>> SQUARE: " + integer + " I: " + this + " T: "
+                                                   + Thread.currentThread());
 
                         final int input = integer;
 
-                        results.publish(input * input);
+                        results.push(input * input);
                     }
                 };
 
         final Routine<Integer, Integer> squareRoutine =
                 jrt().loop(Classification.of(squareSubRoutine), this);
 
-        assertThat(squareRoutine.onResult(sumRoutine).call(1, 2, 3, 4)).containsExactly(30);
-        assertThat(squareRoutine.onResult(sumRoutine).asynCall(1, 2, 3, 4)).containsExactly(30);
-        assertThat(squareRoutine.onResult(sumRoutine).run(1, 2, 3, 4).all()).containsExactly(30);
-        assertThat(squareRoutine.onResult(sumRoutine).asynRun(1, 2, 3, 4).all()).containsExactly(
-                30);
+        assertThat(sumRoutine.call(squareRoutine.run(1, 2, 3, 4))).containsExactly(30);
+        assertThat(sumRoutine.callAsyn(squareRoutine.run(1, 2, 3, 4))).containsExactly(30);
+        assertThat(sumRoutine.run(squareRoutine.run(1, 2, 3, 4)).all()).containsExactly(30);
+        assertThat(sumRoutine.runAsyn(squareRoutine.run(1, 2, 3, 4)).all()).containsExactly(30);
+
+        assertThat(sumRoutine.call(squareRoutine.runAsyn(1, 2, 3, 4))).containsExactly(30);
+        assertThat(sumRoutine.callAsyn(squareRoutine.runAsyn(1, 2, 3, 4))).containsExactly(30);
+        assertThat(sumRoutine.run(squareRoutine.runAsyn(1, 2, 3, 4)).all()).containsExactly(30);
+        assertThat(sumRoutine.runAsyn(squareRoutine.runAsyn(1, 2, 3, 4)).all()).containsExactly(30);
 
         final SubRoutineLoopAdapter<Integer, Integer> squareSumSubRoutine =
                 new SubRoutineLoopAdapter<Integer, Integer>() {
 
-                    private InputChannel<Integer, Integer> mChannel;
+                    private RoutineChannel<Integer, Integer> mChannel;
 
                     @Override
                     public void onInit() {
 
-                        mChannel = sumRoutine.asynStart();
+                        System.out.println(
+                                ">>>>>> SS INIT I: " + this + " T: " + Thread.currentThread());
+
+                        mChannel = sumRoutine.startAsyn();
                     }
 
                     @Override
                     public void onInput(final Integer integer,
-                            final ResultPublisher<Integer> results) {
+                            final ResultChannel<Integer> results) {
 
-                        mChannel.push(squareRoutine.asynCall(integer));
+                        System.out.println(">>>>>> SS INPUT: " + integer + " I:" + this + " T: "
+                                                   + Thread.currentThread());
+
+                        mChannel.push(squareRoutine.runAsyn(integer));
                     }
 
                     @Override
-                    public void onReset(final ResultPublisher<Integer> results) {
+                    public void onReset(final Throwable throwable) {
 
-                        mChannel.reset();
+                        System.out.println(">>>>>> SS RESET: " + throwable + " I: " + this + " T: "
+                                                   + Thread.currentThread());
+
+                        mChannel.reset(throwable);
                     }
 
                     @Override
-                    public void onResult(final ResultPublisher<Integer> results) {
+                    public void onResult(final ResultChannel<Integer> results) {
 
-                        results.publish(mChannel.end());
+                        System.out.println(
+                                ">>>>>> SS RESULT: " + this + " T: " + Thread.currentThread());
+
+                        results.push(mChannel.close());
                     }
                 };
 
         final Routine<Integer, Integer> squareSumRoutine =
                 jrt().loop(Classification.of(squareSumSubRoutine), this, sumRoutine, squareRoutine);
 
+        System.out.println(">>>>>> SS TEST1");
         assertThat(squareSumRoutine.call(1, 2, 3, 4)).containsExactly(30);
-        assertThat(squareSumRoutine.asynCall(1, 2, 3, 4)).containsExactly(30);
+        System.out.println(">>>>>> SS TEST2");
+        assertThat(squareSumRoutine.callAsyn(1, 2, 3, 4)).containsExactly(30);
+        System.out.println(">>>>>> SS TEST3");
         assertThat(squareSumRoutine.run(1, 2, 3, 4).all()).containsExactly(30);
-        assertThat(squareSumRoutine.asynRun(1, 2, 3, 4).all()).containsExactly(30);
+        System.out.println(">>>>>> SS TEST4");
+        assertThat(squareSumRoutine.runAsyn(1, 2, 3, 4).all()).containsExactly(30);
     }
 }

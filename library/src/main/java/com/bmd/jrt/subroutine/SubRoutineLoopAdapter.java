@@ -13,6 +13,8 @@
  */
 package com.bmd.jrt.subroutine;
 
+import com.bmd.jrt.channel.ResultChannel;
+
 /**
  * Created by davide on 9/11/14.
  */
@@ -25,17 +27,17 @@ public abstract class SubRoutineLoopAdapter<INPUT, OUTPUT>
     }
 
     @Override
-    public void onInput(final INPUT input, final ResultPublisher<OUTPUT> results) {
+    public void onInput(final INPUT input, final ResultChannel<OUTPUT> results) {
 
     }
 
     @Override
-    public void onReset(final ResultPublisher<OUTPUT> results) {
+    public void onReset(final Throwable throwable) {
 
     }
 
     @Override
-    public void onResult(final ResultPublisher<OUTPUT> results) {
+    public void onResult(final ResultChannel<OUTPUT> results) {
 
     }
 

@@ -18,17 +18,17 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by davide on 9/9/14.
  */
-public class PositiveDuration extends Duration {
+public class TimeDuration extends Time {
 
-    public static final PositiveDuration INFINITE = days(Long.MAX_VALUE);
+    public static final TimeDuration INFINITE = days(Long.MAX_VALUE);
 
-    public static final PositiveDuration ZERO = time(0, TimeUnit.MILLISECONDS);
+    public static final TimeDuration ZERO = from(0, TimeUnit.MILLISECONDS);
 
     private static final long MILLI_DAYS_OVERFLOW = 106751991167L;
 
     private static final long NANO_DAYS_OVERFLOW = 106750L;
 
-    protected PositiveDuration(final long time, final TimeUnit unit) {
+    protected TimeDuration(final long time, final TimeUnit unit) {
 
         super(time, unit);
 
@@ -38,82 +38,82 @@ public class PositiveDuration extends Duration {
         }
     }
 
-    public static PositiveDuration days(final long days) {
+    public static TimeDuration days(final long days) {
 
-        return new PositiveDuration(days, TimeUnit.DAYS);
+        return new TimeDuration(days, TimeUnit.DAYS);
     }
 
-    public static PositiveDuration hours(final long hours) {
-
-        return new PositiveDuration(hours, TimeUnit.HOURS);
-    }
-
-    public static PositiveDuration micros(final long micros) {
-
-        return new PositiveDuration(micros, TimeUnit.MICROSECONDS);
-    }
-
-    public static PositiveDuration millis(final long millis) {
-
-        return new PositiveDuration(millis, TimeUnit.MILLISECONDS);
-    }
-
-    public static PositiveDuration minutes(final long minutes) {
-
-        return new PositiveDuration(minutes, TimeUnit.MINUTES);
-    }
-
-    public static PositiveDuration nanos(final long nanos) {
-
-        return new PositiveDuration(nanos, TimeUnit.NANOSECONDS);
-    }
-
-    public static PositiveDuration seconds(final long seconds) {
-
-        return new PositiveDuration(seconds, TimeUnit.SECONDS);
-    }
-
-    public static PositiveDuration time(final long time, final TimeUnit unit) {
+    public static TimeDuration from(final long time, final TimeUnit unit) {
 
         if (unit == null) {
 
             throw new IllegalArgumentException();
         }
 
-        return new PositiveDuration(time, unit);
+        return new TimeDuration(time, unit);
     }
 
-    public PositiveDuration daysDuration() {
+    public static TimeDuration hours(final long hours) {
+
+        return new TimeDuration(hours, TimeUnit.HOURS);
+    }
+
+    public static TimeDuration micros(final long micros) {
+
+        return new TimeDuration(micros, TimeUnit.MICROSECONDS);
+    }
+
+    public static TimeDuration millis(final long millis) {
+
+        return new TimeDuration(millis, TimeUnit.MILLISECONDS);
+    }
+
+    public static TimeDuration minutes(final long minutes) {
+
+        return new TimeDuration(minutes, TimeUnit.MINUTES);
+    }
+
+    public static TimeDuration nanos(final long nanos) {
+
+        return new TimeDuration(nanos, TimeUnit.NANOSECONDS);
+    }
+
+    public static TimeDuration seconds(final long seconds) {
+
+        return new TimeDuration(seconds, TimeUnit.SECONDS);
+    }
+
+    public TimeDuration daysTime() {
 
         return days(toDays());
     }
 
-    public PositiveDuration hoursDuration() {
+    public TimeDuration hoursTime() {
 
         return hours(toHours());
     }
 
-    public PositiveDuration microsDuration() {
+    public TimeDuration microsTime() {
 
         return micros(toMicros());
     }
 
-    public PositiveDuration millisDuration() {
+    public TimeDuration millisTime() {
 
         return millis(toMillis());
     }
 
-    public PositiveDuration minutesDuration() {
+    public TimeDuration minutesTime() {
 
         return minutes(toMinutes());
     }
 
-    public PositiveDuration nanosDuration() {
+    public TimeDuration nanosTime() {
 
         return nanos(toNanos());
     }
 
-    public PositiveDuration secondsDuration() {
+    public TimeDuration secondsTime() {
 
         return seconds(toSeconds());
     }
@@ -145,7 +145,7 @@ public class PositiveDuration extends Duration {
             throw new IllegalStateException();
         }
 
-        final long millisToSleep = System.currentTimeMillis() - fromMillis - toMillis();
+        final long millisToSleep = fromMillis - System.currentTimeMillis() + toMillis();
 
         if (millisToSleep <= 0) {
 
@@ -169,7 +169,7 @@ public class PositiveDuration extends Duration {
             throw new IllegalStateException();
         }
 
-        final long nanosToSleep = System.nanoTime() - fromNanos - toNanos();
+        final long nanosToSleep = fromNanos - System.nanoTime() + toNanos();
 
         if (nanosToSleep <= 0) {
 
@@ -213,7 +213,7 @@ public class PositiveDuration extends Duration {
             return true;
         }
 
-        final long millisToWait = System.currentTimeMillis() - fromMillis - toMillis();
+        final long millisToWait = fromMillis - System.currentTimeMillis() + toMillis();
 
         if (millisToWait <= 0) {
 
@@ -240,7 +240,7 @@ public class PositiveDuration extends Duration {
             return true;
         }
 
-        final long nanosToWait = System.nanoTime() - fromNanos - toNanos();
+        final long nanosToWait = fromNanos - System.nanoTime() + toNanos();
 
         if (nanosToWait <= 0) {
 

@@ -39,6 +39,23 @@ class SubRoutineLoopRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
         mArgs = (ctorArgs == null) ? NO_ARGS : ctorArgs.clone();
     }
 
+    private SubRoutineLoopRoutine(final Runner runner, final int maxParallel, final int maxRetained,
+            final Constructor<? extends SubRoutineLoop<INPUT, OUTPUT>> constructor,
+            final Object[] ctorArgs) {
+
+        super(runner, maxParallel, maxRetained);
+
+        mConstructor = constructor;
+        mArgs = ctorArgs;
+    }
+
+    @Override
+    public AbstractRoutine<INPUT, OUTPUT> inside(final Runner runner) {
+
+        return new SubRoutineLoopRoutine<INPUT, OUTPUT>(runner, getMaxParallel(), getMaxRetained(),
+                                                        mConstructor, mArgs);
+    }
+
     @Override
     protected SubRoutineLoop<INPUT, OUTPUT> createSubRoutine(final boolean async) {
 

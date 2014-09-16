@@ -13,24 +13,24 @@
  */
 package com.bmd.jrt.channel;
 
-import com.bmd.jrt.time.PositiveDuration;
+import com.bmd.jrt.time.TimeDuration;
 
 import java.util.concurrent.TimeUnit;
 
 /**
  * Created by davide on 9/4/14.
  */
-public interface InputChannel<INPUT, OUTPUT> extends Channel {
+public interface InputChannel<INPUT> extends Channel {
 
-    public InputChannel<INPUT, OUTPUT> after(PositiveDuration delay);
+    public InputChannel<INPUT> after(TimeDuration delay);
 
-    public InputChannel<INPUT, OUTPUT> after(long delay, TimeUnit timeUnit);
+    public InputChannel<INPUT> after(long delay, TimeUnit timeUnit);
 
-    public OutputChannel<OUTPUT> end();
+    public InputChannel<INPUT> push(OutputChannel<INPUT> channel);
 
-    public InputChannel<INPUT, OUTPUT> push(INPUT... inputs);
+    public InputChannel<INPUT> push(Iterable<? extends INPUT> inputs);
 
-    public InputChannel<INPUT, OUTPUT> push(Iterable<? extends INPUT> inputs);
+    public InputChannel<INPUT> push(INPUT input);
 
-    public InputChannel<INPUT, OUTPUT> push(INPUT input);
+    public InputChannel<INPUT> push(INPUT... inputs);
 }

@@ -13,6 +13,8 @@
  */
 package com.bmd.jrt.subroutine;
 
+import com.bmd.jrt.channel.ResultChannel;
+
 /**
  * Created by davide on 9/7/14.
  */
@@ -20,11 +22,11 @@ public interface SubRoutineLoop<INPUT, OUTPUT> {
 
     public void onInit();
 
-    public void onInput(INPUT input, ResultPublisher<OUTPUT> results);
+    public void onInput(INPUT input, ResultChannel<OUTPUT> results);
 
-    public void onReset(ResultPublisher<OUTPUT> results);
+    public void onReset(Throwable throwable);
 
-    public void onResult(ResultPublisher<OUTPUT> results);
+    public void onResult(ResultChannel<OUTPUT> results);
 
     public void onReturn();
 }

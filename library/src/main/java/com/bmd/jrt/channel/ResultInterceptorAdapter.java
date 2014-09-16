@@ -11,18 +11,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.subroutine;
+package com.bmd.jrt.channel;
 
 /**
- * Created by davide on 9/7/14.
+ * Created by davide on 9/16/14.
  */
-public interface ResultPublisher<OUTPUT> {
+public abstract class ResultInterceptorAdapter<OUTPUT> implements ResultInterceptor<OUTPUT> {
 
-    public ResultPublisher<OUTPUT> publish(OUTPUT result);
+    @Override
+    public void onReset(final Throwable throwable) {
 
-    public ResultPublisher<OUTPUT> publish(OUTPUT... results);
+    }
 
-    public ResultPublisher<OUTPUT> publish(Iterable<? extends OUTPUT> results);
+    @Override
+    public void onResult(final OUTPUT result) {
 
-    public ResultPublisher<OUTPUT> publishException(Throwable throwable);
+    }
+
+    @Override
+    public void onReturn() {
+
+    }
 }

@@ -15,28 +15,24 @@ package com.bmd.jrt.channel;
 
 import com.bmd.jrt.time.TimeDuration;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by davide on 9/4/14.
+ * Created by davide on 9/15/14.
  */
-public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
+public interface RoutineChannel<INPUT, OUTPUT> extends InputChannel<INPUT> {
 
-    public OutputChannel<OUTPUT> afterMax(TimeDuration timeout);
+    public RoutineChannel<INPUT, OUTPUT> after(TimeDuration delay);
 
-    public OutputChannel<OUTPUT> afterMax(long timeout, TimeUnit timeUnit);
+    public RoutineChannel<INPUT, OUTPUT> after(long delay, TimeUnit timeUnit);
 
-    public List<OUTPUT> all();
+    public RoutineChannel<INPUT, OUTPUT> push(OutputChannel<INPUT> channel);
 
-    public OutputChannel<OUTPUT> allInto(List<OUTPUT> results);
+    public RoutineChannel<INPUT, OUTPUT> push(Iterable<? extends INPUT> inputs);
 
-    //TODO: remove: default timeout (3 s)?
-    public OutputChannel<OUTPUT> eventually();
+    public RoutineChannel<INPUT, OUTPUT> push(INPUT input);
 
-    public OutputChannel<OUTPUT> eventuallyThrow(RuntimeException exception);
+    public RoutineChannel<INPUT, OUTPUT> push(INPUT... inputs);
 
-    public OutputChannel<OUTPUT> immediately();
-
-    public OutputChannel<OUTPUT> onResult(ResultInterceptor<OUTPUT> interceptor);
+    public OutputChannel<OUTPUT> close();
 }

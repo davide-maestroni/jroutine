@@ -28,8 +28,6 @@ public class JRoutine {
 
     private static final int DEFAULT_RETAIN = 10;
 
-    private static volatile Runner sBackgroundRunner;
-
     private final int mMaxParallel;
 
     private final int mMaxRetained;
@@ -76,16 +74,6 @@ public class JRoutine {
                                                     classification.getRawType(), ctorArgs);
     }
 
-    public JRoutine in(final Runner runner) {
-
-        return new JRoutine(runner, mMaxParallel, mMaxRetained);
-    }
-
-    public JRoutine inBackground() {
-
-        return new JRoutine(Runners.pool(), mMaxParallel, mMaxRetained);
-    }
-
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> loop(
             final Classification<? extends SubRoutineLoop<INPUT, OUTPUT>> classification,
             final Object... ctorArgs) {
@@ -97,15 +85,5 @@ public class JRoutine {
 
         return new SubRoutineLoopRoutine<INPUT, OUTPUT>(mRunner, mMaxParallel, mMaxRetained,
                                                         classification.getRawType(), ctorArgs);
-    }
-
-    public JRoutine maxParallel(final int instanceCount) {
-
-        return new JRoutine(mRunner, instanceCount, mMaxRetained);
-    }
-
-    public JRoutine maxRetained(final int instanceCount) {
-
-        return new JRoutine(mRunner, mMaxParallel, instanceCount);
     }
 }

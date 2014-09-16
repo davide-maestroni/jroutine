@@ -13,6 +13,8 @@
  */
 package com.bmd.jrt.subroutine;
 
+import com.bmd.jrt.channel.ResultChannel;
+
 import java.util.List;
 
 /**
@@ -20,5 +22,5 @@ import java.util.List;
  */
 public interface SubRoutine<INPUT, OUTPUT> {
 
-    public void run(List<? extends INPUT> inputs, ResultPublisher<OUTPUT> results);
+    public void onRun(List<? extends INPUT> inputs, ResultChannel<OUTPUT> results);
 }

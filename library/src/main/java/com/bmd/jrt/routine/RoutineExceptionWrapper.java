@@ -40,6 +40,18 @@ public class RoutineExceptionWrapper {
         return new RoutineExceptionWrapper(t);
     }
 
+    public Throwable getCause() {
+
+        final Throwable cause = mCause;
+
+        if (cause instanceof RoutineException) {
+
+            return cause.getCause();
+        }
+
+        return cause;
+    }
+
     public RoutineException raise() {
 
         final Throwable cause = mCause;

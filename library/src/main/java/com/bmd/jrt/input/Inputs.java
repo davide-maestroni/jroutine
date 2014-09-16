@@ -27,7 +27,7 @@ import java.util.ListIterator;
  *
  * @param <DATA> the list element type.
  */
-public class InputArray<DATA> implements List<DATA> {
+public class Inputs<DATA> implements List<DATA> {
 
     private final List<Object> mList;
 
@@ -39,7 +39,7 @@ public class InputArray<DATA> implements List<DATA> {
      * @param type    the list element type.
      * @param wrapped the wrapped list.
      */
-    private InputArray(final Class<DATA> type, final List<Object> wrapped) {
+    private Inputs(final Class<DATA> type, final List<Object> wrapped) {
 
         mType = type;
         mList = wrapped;
@@ -51,9 +51,9 @@ public class InputArray<DATA> implements List<DATA> {
      * @param inputs the data to fill the list with.
      * @return the newly created immutable input list.
      */
-    public static InputArray<Boolean> asList(final boolean... inputs) {
+    public static Inputs<Boolean> asList(final boolean... inputs) {
 
-        return new InputArray<Boolean>(boolean.class, asObjects(inputs));
+        return new Inputs<Boolean>(boolean.class, asObjects(inputs));
     }
 
     /**
@@ -62,9 +62,9 @@ public class InputArray<DATA> implements List<DATA> {
      * @param inputs the data to fill the list with.
      * @return the newly created immutable input list.
      */
-    public static InputArray<Byte> asList(final byte... inputs) {
+    public static Inputs<Byte> asList(final byte... inputs) {
 
-        return new InputArray<Byte>(byte.class, asObjects(inputs));
+        return new Inputs<Byte>(byte.class, asObjects(inputs));
     }
 
     /**
@@ -73,9 +73,9 @@ public class InputArray<DATA> implements List<DATA> {
      * @param inputs the data to fill the list with.
      * @return the newly created immutable input list.
      */
-    public static InputArray<Character> asList(final char... inputs) {
+    public static Inputs<Character> asList(final char... inputs) {
 
-        return new InputArray<Character>(char.class, asObjects(inputs));
+        return new Inputs<Character>(char.class, asObjects(inputs));
     }
 
     /**
@@ -84,9 +84,9 @@ public class InputArray<DATA> implements List<DATA> {
      * @param inputs the data to fill the list with.
      * @return the newly created immutable input list.
      */
-    public static InputArray<Double> asList(final double... inputs) {
+    public static Inputs<Double> asList(final double... inputs) {
 
-        return new InputArray<Double>(double.class, asObjects(inputs));
+        return new Inputs<Double>(double.class, asObjects(inputs));
     }
 
     /**
@@ -95,9 +95,9 @@ public class InputArray<DATA> implements List<DATA> {
      * @param inputs the data to fill the list with.
      * @return the newly created immutable input list.
      */
-    public static InputArray<Float> asList(final float... inputs) {
+    public static Inputs<Float> asList(final float... inputs) {
 
-        return new InputArray<Float>(float.class, asObjects(inputs));
+        return new Inputs<Float>(float.class, asObjects(inputs));
     }
 
     /**
@@ -106,9 +106,9 @@ public class InputArray<DATA> implements List<DATA> {
      * @param inputs the data to fill the list with.
      * @return the newly created immutable input list.
      */
-    public static InputArray<Integer> asList(final int... inputs) {
+    public static Inputs<Integer> asList(final int... inputs) {
 
-        return new InputArray<Integer>(int.class, asObjects(inputs));
+        return new Inputs<Integer>(int.class, asObjects(inputs));
     }
 
     /**
@@ -117,9 +117,9 @@ public class InputArray<DATA> implements List<DATA> {
      * @param inputs the data to fill the list with.
      * @return the newly created immutable input list.
      */
-    public static InputArray<Long> asList(final long... inputs) {
+    public static Inputs<Long> asList(final long... inputs) {
 
-        return new InputArray<Long>(long.class, asObjects(inputs));
+        return new Inputs<Long>(long.class, asObjects(inputs));
     }
 
     /**
@@ -128,9 +128,9 @@ public class InputArray<DATA> implements List<DATA> {
      * @param inputs the data to fill the list with.
      * @return the newly created immutable input list.
      */
-    public static InputArray<Short> asList(final short... inputs) {
+    public static Inputs<Short> asList(final short... inputs) {
 
-        return new InputArray<Short>(short.class, asObjects(inputs));
+        return new Inputs<Short>(short.class, asObjects(inputs));
     }
 
     /**
@@ -476,9 +476,9 @@ public class InputArray<DATA> implements List<DATA> {
 
     @Override
     @SuppressWarnings("NullableProblems")
-    public InputArray<DATA> subList(final int fromIndex, final int toIndex) {
+    public Inputs<DATA> subList(final int fromIndex, final int toIndex) {
 
-        return new InputArray<DATA>(mType, mList.subList(fromIndex, toIndex));
+        return new Inputs<DATA>(mType, mList.subList(fromIndex, toIndex));
     }
 
     /**
@@ -486,7 +486,7 @@ public class InputArray<DATA> implements List<DATA> {
      *
      * @return a newly created input list.
      */
-    public InputArray<Boolean> toBooleans() {
+    public Inputs<Boolean> toBooleans() {
 
         final List<Object> list = mList;
         final Class<DATA> type = mType;
@@ -494,7 +494,7 @@ public class InputArray<DATA> implements List<DATA> {
         if (boolean.class.equals(type) || list.isEmpty()) {
 
             //noinspection unchecked
-            return new InputArray<Boolean>(boolean.class, list);
+            return new Inputs<Boolean>(boolean.class, list);
         }
 
         final int size = list.size();
@@ -515,7 +515,7 @@ public class InputArray<DATA> implements List<DATA> {
             }
         }
 
-        return new InputArray<Boolean>(boolean.class, Arrays.asList(array));
+        return new Inputs<Boolean>(boolean.class, Arrays.asList(array));
     }
 
     /**
@@ -523,7 +523,7 @@ public class InputArray<DATA> implements List<DATA> {
      *
      * @return a newly created input list.
      */
-    public InputArray<Byte> toBytes() {
+    public Inputs<Byte> toBytes() {
 
         final List<Object> list = mList;
         final Class<DATA> type = mType;
@@ -531,7 +531,7 @@ public class InputArray<DATA> implements List<DATA> {
         if (byte.class.equals(type) || list.isEmpty()) {
 
             //noinspection unchecked
-            return new InputArray<Byte>(byte.class, list);
+            return new Inputs<Byte>(byte.class, list);
         }
 
         final int size = list.size();
@@ -559,7 +559,7 @@ public class InputArray<DATA> implements List<DATA> {
             }
         }
 
-        return new InputArray<Byte>(byte.class, Arrays.asList(array));
+        return new Inputs<Byte>(byte.class, Arrays.asList(array));
     }
 
     /**
@@ -567,7 +567,7 @@ public class InputArray<DATA> implements List<DATA> {
      *
      * @return a newly created input list.
      */
-    public InputArray<Character> toCharacters() {
+    public Inputs<Character> toCharacters() {
 
         final List<Object> list = mList;
         final Class<DATA> type = mType;
@@ -575,7 +575,7 @@ public class InputArray<DATA> implements List<DATA> {
         if (char.class.equals(type) || list.isEmpty()) {
 
             //noinspection unchecked
-            return new InputArray<Character>(char.class, list);
+            return new Inputs<Character>(char.class, list);
         }
 
         final int size = list.size();
@@ -596,7 +596,7 @@ public class InputArray<DATA> implements List<DATA> {
             }
         }
 
-        return new InputArray<Character>(char.class, Arrays.asList(array));
+        return new Inputs<Character>(char.class, Arrays.asList(array));
     }
 
     /**
@@ -604,7 +604,7 @@ public class InputArray<DATA> implements List<DATA> {
      *
      * @return a newly created input list.
      */
-    public InputArray<Double> toDoubles() {
+    public Inputs<Double> toDoubles() {
 
         final List<Object> list = mList;
         final Class<DATA> type = mType;
@@ -612,7 +612,7 @@ public class InputArray<DATA> implements List<DATA> {
         if (double.class.equals(type) || list.isEmpty()) {
 
             //noinspection unchecked
-            return new InputArray<Double>(double.class, list);
+            return new Inputs<Double>(double.class, list);
         }
 
         final int size = list.size();
@@ -640,7 +640,7 @@ public class InputArray<DATA> implements List<DATA> {
             }
         }
 
-        return new InputArray<Double>(double.class, Arrays.asList(array));
+        return new Inputs<Double>(double.class, Arrays.asList(array));
     }
 
     /**
@@ -648,7 +648,7 @@ public class InputArray<DATA> implements List<DATA> {
      *
      * @return a newly created input list.
      */
-    public InputArray<Float> toFloats() {
+    public Inputs<Float> toFloats() {
 
         final List<Object> list = mList;
         final Class<DATA> type = mType;
@@ -656,7 +656,7 @@ public class InputArray<DATA> implements List<DATA> {
         if (float.class.equals(type) || list.isEmpty()) {
 
             //noinspection unchecked
-            return new InputArray<Float>(float.class, list);
+            return new Inputs<Float>(float.class, list);
         }
 
         final int size = list.size();
@@ -684,7 +684,7 @@ public class InputArray<DATA> implements List<DATA> {
             }
         }
 
-        return new InputArray<Float>(float.class, Arrays.asList(array));
+        return new Inputs<Float>(float.class, Arrays.asList(array));
     }
 
     /**
@@ -692,7 +692,7 @@ public class InputArray<DATA> implements List<DATA> {
      *
      * @return a newly created input list.
      */
-    public InputArray<Integer> toIntegers() {
+    public Inputs<Integer> toIntegers() {
 
         final List<Object> list = mList;
         final Class<DATA> type = mType;
@@ -700,7 +700,7 @@ public class InputArray<DATA> implements List<DATA> {
         if (int.class.equals(type) || list.isEmpty()) {
 
             //noinspection unchecked
-            return new InputArray<Integer>(int.class, list);
+            return new Inputs<Integer>(int.class, list);
         }
 
         final int size = list.size();
@@ -728,7 +728,7 @@ public class InputArray<DATA> implements List<DATA> {
             }
         }
 
-        return new InputArray<Integer>(int.class, Arrays.asList(array));
+        return new Inputs<Integer>(int.class, Arrays.asList(array));
     }
 
     /**
@@ -736,7 +736,7 @@ public class InputArray<DATA> implements List<DATA> {
      *
      * @return a newly created input list.
      */
-    public InputArray<Long> toLongs() {
+    public Inputs<Long> toLongs() {
 
         final List<Object> list = mList;
         final Class<DATA> type = mType;
@@ -744,7 +744,7 @@ public class InputArray<DATA> implements List<DATA> {
         if (long.class.equals(type) || list.isEmpty()) {
 
             //noinspection unchecked
-            return new InputArray<Long>(long.class, list);
+            return new Inputs<Long>(long.class, list);
         }
 
         final int size = list.size();
@@ -772,7 +772,7 @@ public class InputArray<DATA> implements List<DATA> {
             }
         }
 
-        return new InputArray<Long>(long.class, Arrays.asList(array));
+        return new Inputs<Long>(long.class, Arrays.asList(array));
     }
 
     /**
@@ -790,7 +790,7 @@ public class InputArray<DATA> implements List<DATA> {
      *
      * @return a newly created input list.
      */
-    public InputArray<Short> toShorts() {
+    public Inputs<Short> toShorts() {
 
         final List<Object> list = mList;
         final Class<DATA> type = mType;
@@ -798,7 +798,7 @@ public class InputArray<DATA> implements List<DATA> {
         if (short.class.equals(type) || list.isEmpty()) {
 
             //noinspection unchecked
-            return new InputArray<Short>(short.class, list);
+            return new Inputs<Short>(short.class, list);
         }
 
         final int size = list.size();
@@ -826,6 +826,6 @@ public class InputArray<DATA> implements List<DATA> {
             }
         }
 
-        return new InputArray<Short>(short.class, Arrays.asList(array));
+        return new Inputs<Short>(short.class, Arrays.asList(array));
     }
 }

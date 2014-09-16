@@ -13,8 +13,8 @@
  */
 package com.bmd.jrt.routine;
 
+import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.runner.Runner;
-import com.bmd.jrt.subroutine.ResultPublisher;
 import com.bmd.jrt.subroutine.SubRoutine;
 import com.bmd.jrt.subroutine.SubRoutineLoop;
 import com.bmd.jrt.subroutine.SubRoutineLoopAdapter;
@@ -43,6 +43,23 @@ class SubRoutineRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
         mArgs = (ctorArgs == null) ? NO_ARGS : ctorArgs.clone();
     }
 
+    private SubRoutineRoutine(final Runner runner, final int maxParallel, final int maxRetained,
+            final Constructor<? extends SubRoutine<INPUT, OUTPUT>> constructor,
+            final Object[] ctorArgs) {
+
+        super(runner, maxParallel, maxRetained);
+
+        mConstructor = constructor;
+        mArgs = ctorArgs;
+    }
+
+    @Override
+    public AbstractRoutine<INPUT, OUTPUT> inside(final Runner runner) {
+
+        return new SubRoutineRoutine<INPUT, OUTPUT>(runner, getMaxParallel(), getMaxRetained(),
+                                                    mConstructor, mArgs);
+    }
+
     @Override
     protected SubRoutineLoop<INPUT, OUTPUT> createSubRoutine(final boolean async) {
 
@@ -68,7 +85,7 @@ class SubRoutineRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
         }
 
         @Override
-        public void onInput(final INPUT input, final ResultPublisher<OUTPUT> results) {
+        public void onInput(final INPUT input, final ResultChannel<OUTPUT> results) {
 
             if (mInputs == null) {
 
@@ -79,18 +96,7 @@ class SubRoutineRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
         }
 
         @Override
-        public void onReset(final ResultPublisher<OUTPUT> results) {
-
-            final ArrayList<INPUT> inputs = mInputs;
-
-            if (inputs != null) {
-
-                inputs.clear();
-            }
-        }
-
-        @Override
-        public void onResult(final ResultPublisher<OUTPUT> results) {
+        public void onResult(final ResultChannel<OUTPUT> results) {
 
             final ArrayList<INPUT> inputs = mInputs;
             final ArrayList<INPUT> copy;
@@ -102,10 +108,20 @@ class SubRoutineRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
             } else {
 
                 copy = new ArrayList<INPUT>(inputs);
-                inputs.clear();
             }
 
-            mSubRoutine.run(copy, results);
+            mSubRoutine.onRun(copy, results);
+        }
+
+        @Override
+        public void onReturn() {
+
+            final ArrayList<INPUT> inputs = mInputs;
+
+            if (inputs != null) {
+
+                inputs.clear();
+            }
         }
     }
 }

@@ -14,13 +14,13 @@
 package com.bmd.jrt.channel;
 
 /**
- * Created by davide on 9/9/14.
+ * Created by davide on 9/7/14.
  */
-public interface Channel {
+public interface ResultInterceptor<OUTPUT> {
 
-    public boolean isOpen();
+    public void onReset(Throwable throwable);
 
-    public boolean reset();
+    public void onResult(OUTPUT result);
 
-    public boolean reset(Throwable throwable);
+    public void onReturn();
 }

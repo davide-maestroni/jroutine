@@ -13,7 +13,7 @@
  */
 package com.bmd.jrt.runner;
 
-import com.bmd.jrt.time.PositiveDuration;
+import com.bmd.jrt.time.TimeDuration;
 import com.bmd.jrt.util.RoutineInterruptedException;
 
 import java.util.concurrent.TimeUnit;
@@ -28,11 +28,11 @@ class SyncRunner implements Runner {
 
         try {
 
-            final PositiveDuration duration = PositiveDuration.time(delay, timeUnit);
+            final TimeDuration time = TimeDuration.from(delay, timeUnit);
             final long startNanos = System.nanoTime();
 
             //noinspection StatementWithEmptyBody
-            while (duration.sleepNanos(startNanos)) {
+            while (time.sleepNanos(startNanos)) {
 
                 //just wait...
             }

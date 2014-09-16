@@ -58,7 +58,7 @@ class ReflectionUtils {
      * @param type the primitive type.
      * @return the boxing class.
      */
-    public static Class<?> boxedClass(final Class<?> type) {
+    public static Class<?> boxingClass(final Class<?> type) {
 
         if (type == null) {
 
@@ -133,7 +133,7 @@ class ReflectionUtils {
 
                 if (contextArg != null) {
 
-                    final Class<?> boxedClass = boxedClass(param);
+                    final Class<?> boxedClass = boxingClass(param);
 
                     if (!boxedClass.isInstance(contextArg)) {
 

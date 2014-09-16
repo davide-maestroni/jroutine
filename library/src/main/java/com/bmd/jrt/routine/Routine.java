@@ -13,9 +13,9 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.channel.InputChannel;
 import com.bmd.jrt.channel.OutputChannel;
-import com.bmd.jrt.subroutine.ResultPublisher;
+import com.bmd.jrt.channel.RoutineChannel;
+import com.bmd.jrt.runner.Runner;
 
 import java.util.List;
 
@@ -23,24 +23,6 @@ import java.util.List;
  * Created by davide on 9/7/14.
  */
 public interface Routine<INPUT, OUTPUT> {
-
-    public List<OUTPUT> asynCall();
-
-    public List<OUTPUT> asynCall(INPUT input);
-
-    public List<OUTPUT> asynCall(INPUT... inputs);
-
-    public List<OUTPUT> asynCall(Iterable<? extends INPUT> inputs);
-
-    public OutputChannel<OUTPUT> asynRun();
-
-    public OutputChannel<OUTPUT> asynRun(INPUT input);
-
-    public OutputChannel<OUTPUT> asynRun(INPUT... inputs);
-
-    public OutputChannel<OUTPUT> asynRun(Iterable<? extends INPUT> inputs);
-
-    public InputChannel<INPUT, OUTPUT> asynStart();
 
     public List<OUTPUT> call();
 
@@ -50,9 +32,21 @@ public interface Routine<INPUT, OUTPUT> {
 
     public List<OUTPUT> call(Iterable<? extends INPUT> inputs);
 
-    public <TRANSFORMED> Routine<INPUT, TRANSFORMED> onResult(Routine<OUTPUT, TRANSFORMED> routine);
+    public List<OUTPUT> call(OutputChannel<? extends INPUT> inputs);
 
-    public Routine<INPUT, OUTPUT> onResult(OutputFilter<OUTPUT> filter);
+    public List<OUTPUT> callAsyn();
+
+    public List<OUTPUT> callAsyn(INPUT input);
+
+    public List<OUTPUT> callAsyn(INPUT... inputs);
+
+    public List<OUTPUT> callAsyn(Iterable<? extends INPUT> inputs);
+
+    public List<OUTPUT> callAsyn(OutputChannel<? extends INPUT> inputs);
+
+    public Routine<INPUT, OUTPUT> inBackground();
+
+    public Routine<INPUT, OUTPUT> inside(Runner runner);
 
     public OutputChannel<OUTPUT> run();
 
@@ -62,16 +56,19 @@ public interface Routine<INPUT, OUTPUT> {
 
     public OutputChannel<OUTPUT> run(Iterable<? extends INPUT> inputs);
 
-    public InputChannel<INPUT, OUTPUT> start();
+    public OutputChannel<OUTPUT> run(OutputChannel<? extends INPUT> inputs);
 
-    public interface OutputFilter<OUTPUT> {
+    public OutputChannel<OUTPUT> runAsyn();
 
-        public void onEnd(ResultPublisher<OUTPUT> results);
+    public OutputChannel<OUTPUT> runAsyn(INPUT input);
 
-        public void onException(Throwable throwable, ResultPublisher<OUTPUT> results);
+    public OutputChannel<OUTPUT> runAsyn(INPUT... inputs);
 
-        public void onReset(ResultPublisher<OUTPUT> results);
+    public OutputChannel<OUTPUT> runAsyn(Iterable<? extends INPUT> inputs);
 
-        public void onResult(OUTPUT result, ResultPublisher<OUTPUT> results);
-    }
+    public OutputChannel<OUTPUT> runAsyn(OutputChannel<? extends INPUT> inputs);
+
+    public RoutineChannel<INPUT, OUTPUT> start();
+
+    public RoutineChannel<INPUT, OUTPUT> startAsyn();
 }

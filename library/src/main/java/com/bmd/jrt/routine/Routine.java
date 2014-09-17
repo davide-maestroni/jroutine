@@ -48,6 +48,10 @@ public interface Routine<INPUT, OUTPUT> {
 
     public Routine<INPUT, OUTPUT> inside(Runner runner);
 
+    public RoutineChannel<INPUT, OUTPUT> launch();
+
+    public RoutineChannel<INPUT, OUTPUT> launchAsyn();
+
     public OutputChannel<OUTPUT> run();
 
     public OutputChannel<OUTPUT> run(INPUT input);
@@ -67,8 +71,4 @@ public interface Routine<INPUT, OUTPUT> {
     public OutputChannel<OUTPUT> runAsyn(Iterable<? extends INPUT> inputs);
 
     public OutputChannel<OUTPUT> runAsyn(OutputChannel<? extends INPUT> inputs);
-
-    public RoutineChannel<INPUT, OUTPUT> start();
-
-    public RoutineChannel<INPUT, OUTPUT> startAsyn();
 }

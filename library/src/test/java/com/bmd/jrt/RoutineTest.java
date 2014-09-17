@@ -14,11 +14,16 @@
 package com.bmd.jrt;
 
 import com.bmd.jrt.channel.ResultChannel;
+import com.bmd.jrt.channel.ResultInterceptor;
+import com.bmd.jrt.channel.ResultInterceptorAdapter;
 import com.bmd.jrt.channel.RoutineChannel;
 import com.bmd.jrt.routine.Routine;
 import com.bmd.jrt.subroutine.SubRoutine;
+import com.bmd.jrt.subroutine.SubRoutineLoop;
 import com.bmd.jrt.subroutine.SubRoutineLoopAdapter;
+import com.bmd.jrt.time.TimeDuration;
 import com.bmd.jrt.util.Classification;
+import com.bmd.jrt.util.RoutineException;
 
 import junit.framework.TestCase;
 
@@ -28,7 +33,7 @@ import static com.bmd.jrt.routine.JRoutine.jrt;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
- * Unit test for
+ * Unit test for...
  * <p/>
  * Created by davide on 9/9/14.
  */
@@ -36,6 +41,247 @@ public class RoutineTest extends TestCase {
 
     public void testError() {
 
+        final SubRoutineLoop<String, String> testException1 =
+                new SubRoutineLoopAdapter<String, String>() {
+
+                    @Override
+                    public void onInit() {
+
+                        throw new NullPointerException("test1");
+                    }
+                };
+
+        final Routine<String, String> exceptionRoutine1 =
+                jrt().loop(Classification.of(testException1), this);
+
+        testException(exceptionRoutine1, "test", "test1");
+
+        final SubRoutineLoop<String, String> testException2 =
+                new SubRoutineLoopAdapter<String, String>() {
+
+                    @Override
+                    public void onInput(final String s, final ResultChannel<String> results) {
+
+                        throw new NullPointerException(s);
+                    }
+                };
+
+        final Routine<String, String> exceptionRoutine2 =
+                jrt().loop(Classification.of(testException2), this);
+
+        testException(exceptionRoutine2, "test2", "test2");
+
+        final SubRoutineLoop<String, String> testException3 =
+                new SubRoutineLoopAdapter<String, String>() {
+
+                    @Override
+                    public void onResult(final ResultChannel<String> results) {
+
+                        throw new NullPointerException("test3");
+                    }
+                };
+
+        final Routine<String, String> exceptionRoutine3 =
+                jrt().loop(Classification.of(testException3), this);
+
+        testException(exceptionRoutine3, "test", "test3");
+
+        final SubRoutineLoop<String, String> testException4 =
+                new SubRoutineLoopAdapter<String, String>() {
+
+                    @Override
+                    public void onInput(final String s, final ResultChannel<String> results) {
+
+                        results.push(s);
+                    }
+
+                    @Override
+                    public void onReturn() {
+
+                        throw new NullPointerException("test4");
+                    }
+                };
+
+        final Routine<String, String> exceptionRoutine4 =
+                jrt().loop(Classification.of(testException4), this);
+
+        assertThat(exceptionRoutine4.call("test")).containsExactly("test");
+        assertThat(exceptionRoutine4.callAsyn("test")).containsExactly("test");
+        assertThat(exceptionRoutine4.run("test").all()).containsExactly("test");
+        assertThat(exceptionRoutine4.runAsyn("test").all()).containsExactly("test");
+        assertThat(exceptionRoutine4.run("test").iterator().next()).isEqualTo("test");
+        assertThat(exceptionRoutine4.runAsyn("test").iterator().next()).isEqualTo("test");
+        assertThat(exceptionRoutine4.launch().push("test").close().all()).containsExactly("test");
+        assertThat(exceptionRoutine4.launchAsyn().push("test").close().all()).containsExactly(
+                "test");
+        assertThat(exceptionRoutine4.launch().push("test").close().iterator().next()).isEqualTo(
+                "test");
+        assertThat(exceptionRoutine4.launchAsyn().push("test").close().iterator().next()).isEqualTo(
+                "test");
+
+        final Routine<String, String> passThroughRoutine =
+                jrt().loop(Classification.ofType(PassThroughSubRoutine.class));
+
+        testChained(passThroughRoutine, exceptionRoutine1, "test", "test1");
+        testChained(exceptionRoutine1, passThroughRoutine, "test", "test1");
+        testChained(passThroughRoutine, exceptionRoutine2, "test2", "test2");
+        testChained(exceptionRoutine2, passThroughRoutine, "test2", "test2");
+        testChained(passThroughRoutine, exceptionRoutine3, "test", "test3");
+        testChained(exceptionRoutine3, passThroughRoutine, "test", "test3");
+
+        assertThat(passThroughRoutine.call(exceptionRoutine4.run("test"))).containsExactly("test");
+        assertThat(passThroughRoutine.callAsyn(exceptionRoutine4.run("test"))).containsExactly(
+                "test");
+        assertThat(passThroughRoutine.run(exceptionRoutine4.run("test")).all()).containsExactly(
+                "test");
+        assertThat(passThroughRoutine.runAsyn(exceptionRoutine4.run("test")).all()).containsExactly(
+                "test");
+        assertThat(
+                passThroughRoutine.run(exceptionRoutine4.run("test")).iterator().next()).isEqualTo(
+                "test");
+        assertThat(passThroughRoutine.runAsyn(exceptionRoutine4.run("test"))
+                                     .iterator()
+                                     .next()).isEqualTo("test");
+        assertThat(passThroughRoutine.launch()
+                                     .push(exceptionRoutine4.run("test"))
+                                     .close()
+                                     .all()).containsExactly("test");
+        assertThat(passThroughRoutine.launchAsyn()
+                                     .push(exceptionRoutine4.run("test"))
+                                     .close()
+                                     .all()).containsExactly("test");
+        assertThat(passThroughRoutine.launch()
+                                     .push(exceptionRoutine4.run("test"))
+                                     .close()
+                                     .iterator()
+                                     .next()).isEqualTo("test");
+        assertThat(passThroughRoutine.launchAsyn()
+                                     .push(exceptionRoutine4.run("test"))
+                                     .close()
+                                     .iterator()
+                                     .next()).isEqualTo("test");
+
+        assertThat(passThroughRoutine.call(exceptionRoutine4.runAsyn("test"))).containsExactly(
+                "test");
+        assertThat(passThroughRoutine.callAsyn(exceptionRoutine4.runAsyn("test"))).containsExactly(
+                "test");
+        assertThat(passThroughRoutine.run(exceptionRoutine4.runAsyn("test")).all()).containsExactly(
+                "test");
+        assertThat(passThroughRoutine.runAsyn(exceptionRoutine4.runAsyn("test"))
+                                     .all()).containsExactly("test");
+        assertThat(passThroughRoutine.run(exceptionRoutine4.runAsyn("test"))
+                                     .iterator()
+                                     .next()).isEqualTo("test");
+        assertThat(passThroughRoutine.runAsyn(exceptionRoutine4.runAsyn("test"))
+                                     .iterator()
+                                     .next()).isEqualTo("test");
+        assertThat(passThroughRoutine.launch()
+                                     .push(exceptionRoutine4.runAsyn("test"))
+                                     .close()
+                                     .all()).containsExactly("test");
+        assertThat(passThroughRoutine.launchAsyn()
+                                     .push(exceptionRoutine4.runAsyn("test"))
+                                     .close()
+                                     .all()).containsExactly("test");
+        assertThat(passThroughRoutine.launch()
+                                     .push(exceptionRoutine4.runAsyn("test"))
+                                     .close()
+                                     .iterator()
+                                     .next()).isEqualTo("test");
+        assertThat(passThroughRoutine.launchAsyn()
+                                     .push(exceptionRoutine4.runAsyn("test"))
+                                     .close()
+                                     .iterator()
+                                     .next()).isEqualTo("test");
+
+        assertThat(exceptionRoutine4.call(passThroughRoutine.run("test"))).containsExactly("test");
+        assertThat(exceptionRoutine4.callAsyn(passThroughRoutine.run("test"))).containsExactly(
+                "test");
+        assertThat(exceptionRoutine4.run(passThroughRoutine.run("test")).all()).containsExactly(
+                "test");
+        assertThat(exceptionRoutine4.runAsyn(passThroughRoutine.run("test")).all()).containsExactly(
+                "test");
+        assertThat(
+                exceptionRoutine4.run(passThroughRoutine.run("test")).iterator().next()).isEqualTo(
+                "test");
+        assertThat(exceptionRoutine4.runAsyn(passThroughRoutine.run("test"))
+                                    .iterator()
+                                    .next()).isEqualTo("test");
+        assertThat(exceptionRoutine4.launch()
+                                    .push(passThroughRoutine.run("test"))
+                                    .close()
+                                    .all()).containsExactly("test");
+        assertThat(exceptionRoutine4.launchAsyn()
+                                    .push(passThroughRoutine.run("test"))
+                                    .close()
+                                    .all()).containsExactly("test");
+        assertThat(exceptionRoutine4.launch()
+                                    .push(passThroughRoutine.run("test"))
+                                    .close()
+                                    .iterator()
+                                    .next()).isEqualTo("test");
+        assertThat(exceptionRoutine4.launchAsyn()
+                                    .push(passThroughRoutine.run("test"))
+                                    .close()
+                                    .iterator()
+                                    .next()).isEqualTo("test");
+
+        assertThat(exceptionRoutine4.call(passThroughRoutine.runAsyn("test"))).containsExactly(
+                "test");
+        assertThat(exceptionRoutine4.callAsyn(passThroughRoutine.runAsyn("test"))).containsExactly(
+                "test");
+        assertThat(exceptionRoutine4.run(passThroughRoutine.runAsyn("test")).all()).containsExactly(
+                "test");
+        assertThat(exceptionRoutine4.runAsyn(passThroughRoutine.runAsyn("test"))
+                                    .all()).containsExactly("test");
+        assertThat(exceptionRoutine4.run(passThroughRoutine.runAsyn("test"))
+                                    .iterator()
+                                    .next()).isEqualTo("test");
+        assertThat(exceptionRoutine4.runAsyn(passThroughRoutine.runAsyn("test"))
+                                    .iterator()
+                                    .next()).isEqualTo("test");
+        assertThat(exceptionRoutine4.launch()
+                                    .push(passThroughRoutine.runAsyn("test"))
+                                    .close()
+                                    .all()).containsExactly("test");
+        assertThat(exceptionRoutine4.launchAsyn()
+                                    .push(passThroughRoutine.runAsyn("test"))
+                                    .close()
+                                    .all()).containsExactly("test");
+        assertThat(exceptionRoutine4.launch()
+                                    .push(passThroughRoutine.runAsyn("test"))
+                                    .close()
+                                    .iterator()
+                                    .next()).isEqualTo("test");
+        assertThat(exceptionRoutine4.launchAsyn()
+                                    .push(passThroughRoutine.runAsyn("test"))
+                                    .close()
+                                    .iterator()
+                                    .next()).isEqualTo("test");
+
+        final ResultInterceptorAdapter<String> exceptionInterceptor1 =
+                new ResultInterceptorAdapter<String>() {
+
+                    @Override
+                    public void onResult(final String result) {
+
+                        throw new NullPointerException(result);
+                    }
+                };
+
+        testInterceptor(exceptionInterceptor1);
+
+        final ResultInterceptorAdapter<String> exceptionInterceptor2 =
+                new ResultInterceptorAdapter<String>() {
+
+                    @Override
+                    public void onReturn() {
+
+                        throw new NullPointerException("test2");
+                    }
+                };
+
+        testInterceptor(exceptionInterceptor2);
     }
 
     public void testRoutine() {
@@ -107,7 +353,7 @@ public class RoutineTest extends TestCase {
                         System.out.println(
                                 ">>>>>> SS INIT I: " + this + " T: " + Thread.currentThread());
 
-                        mChannel = sumRoutine.startAsyn();
+                        mChannel = sumRoutine.launchAsyn();
                     }
 
                     @Override
@@ -150,5 +396,394 @@ public class RoutineTest extends TestCase {
         assertThat(squareSumRoutine.run(1, 2, 3, 4).all()).containsExactly(30);
         System.out.println(">>>>>> SS TEST4");
         assertThat(squareSumRoutine.runAsyn(1, 2, 3, 4).all()).containsExactly(30);
+    }
+
+    private void testChained(final Routine<String, String> before,
+            final Routine<String, String> after, final String input, final String expected) {
+
+        try {
+
+            before.call(after.run(input));
+
+            fail();
+
+        } catch (final RoutineException e) {
+
+            assertThat(e.getCause().getMessage()).isEqualTo(expected);
+        }
+
+        try {
+
+            before.callAsyn(after.run(input));
+
+            fail();
+
+        } catch (final RoutineException e) {
+
+            assertThat(e.getCause().getMessage()).isEqualTo(expected);
+        }
+
+        try {
+
+            before.run(after.run(input)).all();
+
+            fail();
+
+        } catch (final RoutineException e) {
+
+            assertThat(e.getCause().getMessage()).isEqualTo(expected);
+        }
+
+        try {
+
+            before.run(after.run(input)).iterator().next();
+
+            fail();
+
+        } catch (final RoutineException e) {
+
+            assertThat(e.getCause().getMessage()).isEqualTo(expected);
+        }
+
+        try {
+
+            before.runAsyn(after.run(input)).all();
+
+            fail();
+
+        } catch (final RoutineException e) {
+
+            assertThat(e.getCause().getMessage()).isEqualTo(expected);
+        }
+
+        try {
+
+            before.runAsyn(after.run(input)).iterator().next();
+
+            fail();
+
+        } catch (final RoutineException e) {
+
+            assertThat(e.getCause().getMessage()).isEqualTo(expected);
+        }
+
+        try {
+
+            before.launch().push(after.run(input)).close().all();
+
+            fail();
+
+        } catch (final RoutineException e) {
+
+            assertThat(e.getCause().getMessage()).isEqualTo(expected);
+        }
+
+        try {
+
+            before.launch().push(after.run(input)).close().iterator().next();
+
+            fail();
+
+        } catch (final RoutineException e) {
+
+            assertThat(e.getCause().getMessage()).isEqualTo(expected);
+        }
+
+        try {
+
+            before.launchAsyn().push(after.run(input)).close().all();
+
+            fail();
+
+        } catch (final RoutineException e) {
+
+            assertThat(e.getCause().getMessage()).isEqualTo(expected);
+        }
+
+        try {
+
+            before.launchAsyn().push(after.run(input)).close().iterator().next();
+
+            fail();
+
+        } catch (final RoutineException e) {
+
+            assertThat(e.getCause().getMessage()).isEqualTo(expected);
+        }
+
+        try {
+
+            before.call(after.runAsyn(input));
+
+            fail();
+
+        } catch (final RoutineException e) {
+
+            assertThat(e.getCause().getMessage()).isEqualTo(expected);
+        }
+
+        try {
+
+            before.callAsyn(after.runAsyn(input));
+
+            fail();
+
+        } catch (final RoutineException e) {
+
+            assertThat(e.getCause().getMessage()).isEqualTo(expected);
+        }
+
+        try {
+
+            before.run(after.runAsyn(input)).all();
+
+            fail();
+
+        } catch (final RoutineException e) {
+
+            assertThat(e.getCause().getMessage()).isEqualTo(expected);
+        }
+
+        try {
+
+            before.run(after.runAsyn(input)).iterator().next();
+
+            fail();
+
+        } catch (final RoutineException e) {
+
+            assertThat(e.getCause().getMessage()).isEqualTo(expected);
+        }
+
+        try {
+
+            before.runAsyn(after.runAsyn(input)).all();
+
+            fail();
+
+        } catch (final RoutineException e) {
+
+            assertThat(e.getCause().getMessage()).isEqualTo(expected);
+        }
+
+        try {
+
+            before.runAsyn(after.runAsyn(input)).iterator().next();
+
+            fail();
+
+        } catch (final RoutineException e) {
+
+            assertThat(e.getCause().getMessage()).isEqualTo(expected);
+        }
+
+        try {
+
+            before.launch().push(after.runAsyn(input)).close().all();
+
+            fail();
+
+        } catch (final RoutineException e) {
+
+            assertThat(e.getCause().getMessage()).isEqualTo(expected);
+        }
+
+        try {
+
+            before.launch().push(after.runAsyn(input)).close().iterator().next();
+
+            fail();
+
+        } catch (final RoutineException e) {
+
+            assertThat(e.getCause().getMessage()).isEqualTo(expected);
+        }
+
+        try {
+
+            before.launchAsyn().push(after.runAsyn(input)).close().all();
+
+            fail();
+
+        } catch (final RoutineException e) {
+
+            assertThat(e.getCause().getMessage()).isEqualTo(expected);
+        }
+
+        try {
+
+            before.launchAsyn().push(after.runAsyn(input)).close().iterator().next();
+
+            fail();
+
+        } catch (final RoutineException e) {
+
+            assertThat(e.getCause().getMessage()).isEqualTo(expected);
+        }
+    }
+
+    private void testException(final Routine<String, String> routine, final String input,
+            final String expected) {
+
+        try {
+
+            routine.call(input);
+
+            fail();
+
+        } catch (final RoutineException e) {
+
+            assertThat(e.getCause().getMessage()).isEqualTo(expected);
+        }
+
+        try {
+
+            routine.callAsyn(input);
+
+            fail();
+
+        } catch (final RoutineException e) {
+
+            assertThat(e.getCause().getMessage()).isEqualTo(expected);
+        }
+
+        try {
+
+            routine.run(input).all();
+
+            fail();
+
+        } catch (final RoutineException e) {
+
+            assertThat(e.getCause().getMessage()).isEqualTo(expected);
+        }
+
+        try {
+
+            routine.run(input).iterator().next();
+
+            fail();
+
+        } catch (final RoutineException e) {
+
+            assertThat(e.getCause().getMessage()).isEqualTo(expected);
+        }
+
+        try {
+
+            routine.runAsyn(input).all();
+
+            fail();
+
+        } catch (final RoutineException e) {
+
+            assertThat(e.getCause().getMessage()).isEqualTo(expected);
+        }
+
+        try {
+
+            routine.runAsyn(input).iterator().next();
+
+            fail();
+
+        } catch (final RoutineException e) {
+
+            assertThat(e.getCause().getMessage()).isEqualTo(expected);
+        }
+
+        try {
+
+            routine.launch().push(input).close().all();
+
+            fail();
+
+        } catch (final RoutineException e) {
+
+            assertThat(e.getCause().getMessage()).isEqualTo(expected);
+        }
+
+        try {
+
+            routine.launch().push(input).close().iterator().next();
+
+            fail();
+
+        } catch (final RoutineException e) {
+
+            assertThat(e.getCause().getMessage()).isEqualTo(expected);
+        }
+
+        try {
+
+            routine.launchAsyn().push(input).close().all();
+
+            fail();
+
+        } catch (final RoutineException e) {
+
+            assertThat(e.getCause().getMessage()).isEqualTo(expected);
+        }
+
+        try {
+
+            routine.launchAsyn().push(input).close().iterator().next();
+
+            fail();
+
+        } catch (final RoutineException e) {
+
+            assertThat(e.getCause().getMessage()).isEqualTo(expected);
+        }
+    }
+
+    private void testInterceptor(final ResultInterceptor<String> interceptor) {
+
+        final String input = "test";
+        final Routine<String, String> routine =
+                jrt().loop(Classification.ofType(DelaySubRoutine.class), TimeDuration.millis(100));
+
+        assertThat(routine.run(input).bind(interceptor).all()).isEmpty();
+        assertThat(routine.run(input).bind(interceptor).iterator().hasNext()).isFalse();
+        assertThat(routine.runAsyn(input).bind(interceptor).all()).isEmpty();
+        assertThat(routine.runAsyn(input).bind(interceptor).iterator().hasNext()).isFalse();
+        assertThat(routine.launch().push(input).close().bind(interceptor).all()).isEmpty();
+        assertThat(routine.launch()
+                          .push(input)
+                          .close()
+                          .bind(interceptor)
+                          .iterator()
+                          .hasNext()).isFalse();
+        assertThat(routine.launchAsyn().push(input).close().bind(interceptor).all()).isEmpty();
+        assertThat(routine.launchAsyn()
+                          .push(input)
+                          .close()
+                          .bind(interceptor)
+                          .iterator()
+                          .hasNext()).isFalse();
+    }
+
+    private static class DelaySubRoutine extends SubRoutineLoopAdapter<String, String> {
+
+        private final TimeDuration mDelay;
+
+        public DelaySubRoutine(final TimeDuration delay) {
+
+            mDelay = delay;
+        }
+
+        @Override
+        public void onInput(final String s, final ResultChannel<String> results) {
+
+            results.after(mDelay).push(s);
+        }
+    }
+
+    private static class PassThroughSubRoutine extends SubRoutineLoopAdapter<String, String> {
+
+        @Override
+        public void onInput(final String s, final ResultChannel<String> results) {
+
+            results.push(s);
+        }
     }
 }

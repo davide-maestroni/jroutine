@@ -28,6 +28,8 @@ public class TimeDuration extends Time {
 
     private static final long NANO_DAYS_OVERFLOW = 106750L;
 
+    private static final long ONE_MILLIS_NANOS = millis(1).toNanos();
+
     protected TimeDuration(final long time, final TimeUnit unit) {
 
         super(time, unit);
@@ -198,6 +200,54 @@ public class TimeDuration extends Time {
         unit.timedWait(target, time);
     }
 
+    public boolean waitCondition(final Object target, final Check check) throws
+            InterruptedException {
+
+        if (isZero()) {
+
+            return check.isVerified();
+        }
+
+        if (isInfinite()) {
+
+            while (!check.isVerified()) {
+
+                target.wait();
+            }
+
+            return true;
+        }
+
+        if ((toNanos() % ONE_MILLIS_NANOS) == 0) {
+
+            final long startMillis = System.currentTimeMillis();
+
+            do {
+
+                if (!waitMillis(target, startMillis) && !check.isVerified()) {
+
+                    return false;
+                }
+
+            } while (!check.isVerified());
+
+        } else {
+
+            final long startNanos = System.nanoTime();
+
+            do {
+
+                if (!waitNanos(target, startNanos) && !check.isVerified()) {
+
+                    return false;
+                }
+
+            } while (!check.isVerified());
+        }
+
+        return true;
+    }
+
     public boolean waitMillis(final Object target, final long fromMillis) throws
             InterruptedException {
 
@@ -250,5 +300,10 @@ public class TimeDuration extends Time {
         TimeUnit.NANOSECONDS.timedWait(target, nanosToWait);
 
         return true;
+    }
+
+    public interface Check {
+
+        public boolean isVerified();
     }
 }

@@ -136,75 +136,75 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
     public abstract AbstractRoutine<INPUT, OUTPUT> inside(Runner runner);
 
     @Override
-    public OutputChannel<OUTPUT> run() {
-
-        return start().close();
-    }
-
-    @Override
-    public OutputChannel<OUTPUT> run(final INPUT input) {
-
-        return start().push(input).close();
-    }
-
-    @Override
-    public OutputChannel<OUTPUT> run(final INPUT... inputs) {
-
-        return start().push(inputs).close();
-    }
-
-    @Override
-    public OutputChannel<OUTPUT> run(final Iterable<? extends INPUT> inputs) {
-
-        return start().push(inputs).close();
-    }
-
-    @Override
-    public OutputChannel<OUTPUT> run(final OutputChannel<? extends INPUT> inputs) {
-
-        return start().push(inputs).close();
-    }
-
-    @Override
-    public OutputChannel<OUTPUT> runAsyn() {
-
-        return startAsyn().close();
-    }
-
-    @Override
-    public OutputChannel<OUTPUT> runAsyn(final INPUT input) {
-
-        return startAsyn().push(input).close();
-    }
-
-    @Override
-    public OutputChannel<OUTPUT> runAsyn(final INPUT... inputs) {
-
-        return startAsyn().push(inputs).close();
-    }
-
-    @Override
-    public OutputChannel<OUTPUT> runAsyn(final Iterable<? extends INPUT> inputs) {
-
-        return startAsyn().push(inputs).close();
-    }
-
-    @Override
-    public OutputChannel<OUTPUT> runAsyn(final OutputChannel<? extends INPUT> inputs) {
-
-        return startAsyn().push(inputs).close();
-    }
-
-    @Override
-    public RoutineChannel<INPUT, OUTPUT> start() {
+    public RoutineChannel<INPUT, OUTPUT> launch() {
 
         return start(false);
     }
 
     @Override
-    public RoutineChannel<INPUT, OUTPUT> startAsyn() {
+    public RoutineChannel<INPUT, OUTPUT> launchAsyn() {
 
         return start(true);
+    }
+
+    @Override
+    public OutputChannel<OUTPUT> run() {
+
+        return launch().close();
+    }
+
+    @Override
+    public OutputChannel<OUTPUT> run(final INPUT input) {
+
+        return launch().push(input).close();
+    }
+
+    @Override
+    public OutputChannel<OUTPUT> run(final INPUT... inputs) {
+
+        return launch().push(inputs).close();
+    }
+
+    @Override
+    public OutputChannel<OUTPUT> run(final Iterable<? extends INPUT> inputs) {
+
+        return launch().push(inputs).close();
+    }
+
+    @Override
+    public OutputChannel<OUTPUT> run(final OutputChannel<? extends INPUT> inputs) {
+
+        return launch().push(inputs).close();
+    }
+
+    @Override
+    public OutputChannel<OUTPUT> runAsyn() {
+
+        return launchAsyn().close();
+    }
+
+    @Override
+    public OutputChannel<OUTPUT> runAsyn(final INPUT input) {
+
+        return launchAsyn().push(input).close();
+    }
+
+    @Override
+    public OutputChannel<OUTPUT> runAsyn(final INPUT... inputs) {
+
+        return launchAsyn().push(inputs).close();
+    }
+
+    @Override
+    public OutputChannel<OUTPUT> runAsyn(final Iterable<? extends INPUT> inputs) {
+
+        return launchAsyn().push(inputs).close();
+    }
+
+    @Override
+    public OutputChannel<OUTPUT> runAsyn(final OutputChannel<? extends INPUT> inputs) {
+
+        return launchAsyn().push(inputs).close();
     }
 
     protected abstract SubRoutineLoop<INPUT, OUTPUT> createSubRoutine(final boolean async);

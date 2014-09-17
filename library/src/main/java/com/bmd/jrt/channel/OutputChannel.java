@@ -31,12 +31,12 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
 
     public OutputChannel<OUTPUT> allInto(List<OUTPUT> results);
 
+    public OutputChannel<OUTPUT> bind(ResultInterceptor<OUTPUT> interceptor);
+
     //TODO: remove: default timeout (3 s)?
     public OutputChannel<OUTPUT> eventually();
 
     public OutputChannel<OUTPUT> eventuallyThrow(RuntimeException exception);
 
     public OutputChannel<OUTPUT> immediately();
-
-    public OutputChannel<OUTPUT> onResult(ResultInterceptor<OUTPUT> interceptor);
 }

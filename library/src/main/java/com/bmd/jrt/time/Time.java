@@ -32,6 +32,11 @@ public class Time {
         this.unit = unit;
     }
 
+    public static Time current() {
+
+        return millis(System.currentTimeMillis());
+    }
+
     public static Time days(final long days) {
 
         return new Time(days, TimeUnit.DAYS);
@@ -65,6 +70,11 @@ public class Time {
     public static Time minutes(final long minutes) {
 
         return new Time(minutes, TimeUnit.MINUTES);
+    }
+
+    public static Time nano() {
+
+        return nanos(System.nanoTime());
     }
 
     public static Time nanos(final long nanos) {

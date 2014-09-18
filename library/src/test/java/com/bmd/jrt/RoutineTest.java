@@ -436,8 +436,6 @@ public class RoutineTest extends TestCase {
                     public void onRun(final List<? extends Integer> integers,
                             final ResultChannel<Integer> results) {
 
-                        System.out.println(">>>>>> SUM: " + this + " T: " + Thread.currentThread());
-
                         int sum = 0;
 
                         for (final Integer integer : integers) {
@@ -463,9 +461,6 @@ public class RoutineTest extends TestCase {
                     @Override
                     public void onInput(final Integer integer,
                             final ResultChannel<Integer> results) {
-
-                        System.out.println(">>>>>> SQUARE: " + integer + " I: " + this + " T: "
-                                                   + Thread.currentThread());
 
                         final int input = integer;
 
@@ -499,9 +494,6 @@ public class RoutineTest extends TestCase {
                     @Override
                     public void onInit() {
 
-                        System.out.println(
-                                ">>>>>> SS INIT I: " + this + " T: " + Thread.currentThread());
-
                         mChannel = sumRoutine.launchAsyn();
                     }
 
@@ -509,26 +501,17 @@ public class RoutineTest extends TestCase {
                     public void onInput(final Integer integer,
                             final ResultChannel<Integer> results) {
 
-                        System.out.println(">>>>>> SS INPUT: " + integer + " I:" + this + " T: "
-                                                   + Thread.currentThread());
-
                         mChannel.push(squareRoutine.runAsyn(integer));
                     }
 
                     @Override
                     public void onReset(final Throwable throwable) {
 
-                        System.out.println(">>>>>> SS RESET: " + throwable + " I: " + this + " T: "
-                                                   + Thread.currentThread());
-
                         mChannel.reset(throwable);
                     }
 
                     @Override
                     public void onResult(final ResultChannel<Integer> results) {
-
-                        System.out.println(
-                                ">>>>>> SS RESULT: " + this + " T: " + Thread.currentThread());
 
                         results.push(mChannel.close());
                     }
@@ -538,13 +521,9 @@ public class RoutineTest extends TestCase {
                 jrt().routineOf(Classification.of(squareSumSubRoutine), this, sumRoutine,
                                 squareRoutine);
 
-        System.out.println(">>>>>> SS TEST1");
         assertThat(squareSumRoutine.call(1, 2, 3, 4)).containsExactly(30);
-        System.out.println(">>>>>> SS TEST2");
         assertThat(squareSumRoutine.callAsyn(1, 2, 3, 4)).containsExactly(30);
-        System.out.println(">>>>>> SS TEST3");
         assertThat(squareSumRoutine.run(1, 2, 3, 4).all()).containsExactly(30);
-        System.out.println(">>>>>> SS TEST4");
         assertThat(squareSumRoutine.runAsyn(1, 2, 3, 4).all()).containsExactly(30);
     }
 
@@ -1089,7 +1068,7 @@ public class RoutineTest extends TestCase {
         final String input = "test";
         final Routine<String, String> routine =
                 jrt().routineOf(Classification.ofType(DelaySubRoutine.class),
-                                TimeDuration.millis(100));
+                                TimeDuration.millis(0));
 
         assertThat(routine.run(input).bind(interceptor).all()).isEmpty();
         assertThat(routine.run(input).bind(interceptor).iterator().hasNext()).isFalse();

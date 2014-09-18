@@ -205,12 +205,12 @@ public class TimeDuration extends Time {
 
         if (isZero()) {
 
-            return check.isVerified();
+            return check.isTrue();
         }
 
         if (isInfinite()) {
 
-            while (!check.isVerified()) {
+            while (!check.isTrue()) {
 
                 target.wait();
             }
@@ -224,12 +224,12 @@ public class TimeDuration extends Time {
 
             do {
 
-                if (!waitMillis(target, startMillis) && !check.isVerified()) {
+                if (!waitMillis(target, startMillis) && !check.isTrue()) {
 
                     return false;
                 }
 
-            } while (!check.isVerified());
+            } while (!check.isTrue());
 
         } else {
 
@@ -237,12 +237,12 @@ public class TimeDuration extends Time {
 
             do {
 
-                if (!waitNanos(target, startNanos) && !check.isVerified()) {
+                if (!waitNanos(target, startNanos) && !check.isTrue()) {
 
                     return false;
                 }
 
-            } while (!check.isVerified());
+            } while (!check.isTrue());
         }
 
         return true;
@@ -304,6 +304,6 @@ public class TimeDuration extends Time {
 
     public interface Check {
 
-        public boolean isVerified();
+        public boolean isTrue();
     }
 }

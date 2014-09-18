@@ -16,7 +16,7 @@ package com.bmd.jrt.channel;
 /**
  * Created by davide on 9/16/14.
  */
-public abstract class ResultInterceptorAdapter<OUTPUT> implements ResultInterceptor<OUTPUT> {
+public abstract class ResultConsumerAdapter<OUTPUT> implements ResultConsumer<OUTPUT> {
 
     @Override
     public void onReset(final Throwable throwable) {

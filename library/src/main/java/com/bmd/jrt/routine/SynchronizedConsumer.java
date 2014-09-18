@@ -13,20 +13,25 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.channel.ResultInterceptor;
+import com.bmd.jrt.channel.ResultConsumer;
 
 /**
  * Created by davide on 9/18/14.
  */
-class SynchronizedInterceptor<RESULT> implements ResultInterceptor<RESULT> {
+class SynchronizedConsumer<RESULT> implements ResultConsumer<RESULT> {
 
-    private final ResultInterceptor<RESULT> mInterceptor;
+    private final ResultConsumer<RESULT> mConsumer;
 
     private final Object mMutex = new Object();
 
-    public SynchronizedInterceptor(final ResultInterceptor<RESULT> wrapped) {
+    public SynchronizedConsumer(final ResultConsumer<RESULT> wrapped) {
 
-        mInterceptor = wrapped;
+        if (wrapped == null) {
+
+            throw new IllegalArgumentException();
+        }
+
+        mConsumer = wrapped;
     }
 
     @Override
@@ -34,7 +39,7 @@ class SynchronizedInterceptor<RESULT> implements ResultInterceptor<RESULT> {
 
         synchronized (mMutex) {
 
-            mInterceptor.onReset(throwable);
+            mConsumer.onReset(throwable);
         }
     }
 
@@ -43,7 +48,7 @@ class SynchronizedInterceptor<RESULT> implements ResultInterceptor<RESULT> {
 
         synchronized (mMutex) {
 
-            mInterceptor.onResult(result);
+            mConsumer.onResult(result);
         }
     }
 
@@ -52,7 +57,7 @@ class SynchronizedInterceptor<RESULT> implements ResultInterceptor<RESULT> {
 
         synchronized (mMutex) {
 
-            mInterceptor.onReturn();
+            mConsumer.onReturn();
         }
     }
 }

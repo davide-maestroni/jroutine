@@ -28,14 +28,7 @@ class SyncRunner implements Runner {
 
         try {
 
-            final TimeDuration time = TimeDuration.from(delay, timeUnit);
-            final long startNanos = System.nanoTime();
-
-            //noinspection StatementWithEmptyBody
-            while (time.sleepNanos(startNanos)) {
-
-                //just wait...
-            }
+            TimeDuration.from(delay, timeUnit).sleepAtLeast();
 
             call.onInput();
 

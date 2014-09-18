@@ -28,7 +28,7 @@ public class TimeDuration extends Time {
 
     private static final long NANO_DAYS_OVERFLOW = 106750L;
 
-    private static final long ONE_MILLIS_NANOS = millis(1).toNanos();
+    private static final long ONE_MILLI_NANOS = millis(1).toNanos();
 
     protected TimeDuration(final long time, final TimeUnit unit) {
 
@@ -135,6 +135,37 @@ public class TimeDuration extends Time {
         unit.sleep(time);
     }
 
+    public void sleepAtLeast() throws InterruptedException {
+
+        if (isZero()) {
+
+            return;
+        }
+
+        if (((toNanos() % ONE_MILLI_NANOS) == 0) || (toDays() > NANO_DAYS_OVERFLOW)) {
+
+            final long startMillis = System.currentTimeMillis();
+
+            while (true) {
+
+                if (!sleepMillis(startMillis)) {
+
+                    return;
+                }
+            }
+        }
+
+        final long startNanos = System.nanoTime();
+
+        while (true) {
+
+            if (!sleepNanos(startNanos)) {
+
+                return;
+            }
+        }
+    }
+
     public boolean sleepMillis(final long fromMillis) throws InterruptedException {
 
         if (isZero()) {
@@ -218,31 +249,29 @@ public class TimeDuration extends Time {
             return true;
         }
 
-        if ((toNanos() % ONE_MILLIS_NANOS) == 0) {
+        if ((toNanos() % ONE_MILLI_NANOS) == 0) {
 
             final long startMillis = System.currentTimeMillis();
 
-            do {
+            while (!check.isTrue()) {
 
-                if (!waitMillis(target, startMillis) && !check.isTrue()) {
+                if (!waitMillis(target, startMillis)) {
 
                     return false;
                 }
-
-            } while (!check.isTrue());
+            }
 
         } else {
 
             final long startNanos = System.nanoTime();
 
-            do {
+            while (!check.isTrue()) {
 
-                if (!waitNanos(target, startNanos) && !check.isTrue()) {
+                if (!waitNanos(target, startNanos)) {
 
                     return false;
                 }
-
-            } while (!check.isTrue());
+            }
         }
 
         return true;

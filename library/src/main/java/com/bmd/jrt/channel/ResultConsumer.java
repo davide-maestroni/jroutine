@@ -16,7 +16,7 @@ package com.bmd.jrt.channel;
 /**
  * Created by davide on 9/7/14.
  */
-public interface ResultInterceptor<OUTPUT> {
+public interface ResultConsumer<OUTPUT> {
 
     public void onReset(Throwable throwable);
 

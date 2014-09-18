@@ -27,16 +27,15 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
 
     public OutputChannel<OUTPUT> afterMax(long timeout, TimeUnit timeUnit);
 
-    public List<OUTPUT> all();
-
-    public OutputChannel<OUTPUT> allInto(List<OUTPUT> results);
-
-    public OutputChannel<OUTPUT> bind(ResultInterceptor<OUTPUT> interceptor);
-
-    //TODO: remove: default timeout (3 s)?
-    public OutputChannel<OUTPUT> eventually();
+    public OutputChannel<OUTPUT> bind(ResultConsumer<OUTPUT> consumer);
 
     public OutputChannel<OUTPUT> eventuallyThrow(RuntimeException exception);
 
     public OutputChannel<OUTPUT> immediately();
+
+    public List<OUTPUT> takeAll();
+
+    public OutputChannel<OUTPUT> takeAllInto(List<OUTPUT> results);
+
+    public boolean waitDone();
 }

@@ -56,61 +56,61 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
     @Override
     public List<OUTPUT> call() {
 
-        return run().all();
+        return run().takeAll();
     }
 
     @Override
     public List<OUTPUT> call(final INPUT input) {
 
-        return run(input).all();
+        return run(input).takeAll();
     }
 
     @Override
     public List<OUTPUT> call(final INPUT... inputs) {
 
-        return run(inputs).all();
+        return run(inputs).takeAll();
     }
 
     @Override
     public List<OUTPUT> call(final Iterable<? extends INPUT> inputs) {
 
-        return run(inputs).all();
+        return run(inputs).takeAll();
     }
 
     @Override
     public List<OUTPUT> call(final OutputChannel<? extends INPUT> inputs) {
 
-        return run(inputs).all();
+        return run(inputs).takeAll();
     }
 
     @Override
     public List<OUTPUT> callAsyn() {
 
-        return runAsyn().all();
+        return runAsyn().takeAll();
     }
 
     @Override
     public List<OUTPUT> callAsyn(final INPUT input) {
 
-        return runAsyn(input).all();
+        return runAsyn(input).takeAll();
     }
 
     @Override
     public List<OUTPUT> callAsyn(final INPUT... inputs) {
 
-        return runAsyn(inputs).all();
+        return runAsyn(inputs).takeAll();
     }
 
     @Override
     public List<OUTPUT> callAsyn(final Iterable<? extends INPUT> inputs) {
 
-        return runAsyn(inputs).all();
+        return runAsyn(inputs).takeAll();
     }
 
     @Override
     public List<OUTPUT> callAsyn(final OutputChannel<? extends INPUT> inputs) {
 
-        return runAsyn(inputs).all();
+        return runAsyn(inputs).takeAll();
     }
 
     @Override

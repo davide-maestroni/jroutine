@@ -80,14 +80,14 @@ class ReflectionUtils {
      * @param ctorArgs
      * @return
      */
-    public static <TYPE> Constructor<TYPE> findMatchingConstructor(final Class<TYPE> type,
+    public static <TYPE> Constructor<TYPE> findConstructor(final Class<TYPE> type,
             final Object... ctorArgs) {
 
-        Constructor<?> constructor = findMatchingConstructor(type.getConstructors(), ctorArgs);
+        Constructor<?> constructor = findBestMatchingConstructor(type.getConstructors(), ctorArgs);
 
         if (constructor == null) {
 
-            constructor = findMatchingConstructor(type.getDeclaredConstructors(), ctorArgs);
+            constructor = findBestMatchingConstructor(type.getDeclaredConstructors(), ctorArgs);
 
             if (constructor == null) {
 
@@ -105,7 +105,7 @@ class ReflectionUtils {
         return (Constructor<TYPE>) constructor;
     }
 
-    private static Constructor<?> findMatchingConstructor(final Constructor<?>[] constructors,
+    private static Constructor<?> findBestMatchingConstructor(final Constructor<?>[] constructors,
             final Object[] ctorArgs) {
 
         final int argsLength = ctorArgs.length;

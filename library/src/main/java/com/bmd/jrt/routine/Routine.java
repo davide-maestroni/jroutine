@@ -15,7 +15,6 @@ package com.bmd.jrt.routine;
 
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.RoutineChannel;
-import com.bmd.jrt.runner.Runner;
 
 import java.util.List;
 
@@ -44,13 +43,11 @@ public interface Routine<INPUT, OUTPUT> {
 
     public List<OUTPUT> callAsyn(OutputChannel<? extends INPUT> inputs);
 
-    public Routine<INPUT, OUTPUT> inBackground();
-
-    public Routine<INPUT, OUTPUT> inside(Runner runner);
-
     public RoutineChannel<INPUT, OUTPUT> launch();
 
     public RoutineChannel<INPUT, OUTPUT> launchAsyn();
+
+    public RoutineChannel<INPUT, OUTPUT> launchPar();
 
     public OutputChannel<OUTPUT> run();
 
@@ -71,4 +68,14 @@ public interface Routine<INPUT, OUTPUT> {
     public OutputChannel<OUTPUT> runAsyn(Iterable<? extends INPUT> inputs);
 
     public OutputChannel<OUTPUT> runAsyn(OutputChannel<? extends INPUT> inputs);
+
+    public OutputChannel<OUTPUT> runPar();
+
+    public OutputChannel<OUTPUT> runPar(INPUT input);
+
+    public OutputChannel<OUTPUT> runPar(INPUT... inputs);
+
+    public OutputChannel<OUTPUT> runPar(Iterable<? extends INPUT> inputs);
+
+    public OutputChannel<OUTPUT> runPar(OutputChannel<? extends INPUT> inputs);
 }

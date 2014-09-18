@@ -16,7 +16,6 @@ package com.bmd.jrt.routine;
 import com.bmd.jrt.runner.Runner;
 import com.bmd.jrt.runner.Runners;
 import com.bmd.jrt.subroutine.SubRoutine;
-import com.bmd.jrt.subroutine.SubRoutineLoop;
 import com.bmd.jrt.util.Classification;
 
 /**
@@ -24,24 +23,15 @@ import com.bmd.jrt.util.Classification;
  */
 public class JRoutine {
 
-    private static final int DEFAULT_RECYCLE = 1;
-
-    private static final int DEFAULT_RETAIN = 10;
-
-    private final int mMaxParallel;
+    private static final int DEFAULT_RETAIN_COUNT = 10;
 
     private final int mMaxRetained;
 
     private final Runner mRunner;
 
-    private JRoutine(final Runner runner, final int maxParallel, final int maxRetained) {
+    private JRoutine(final Runner runner, final int maxRetained) {
 
         if (runner == null) {
-
-            throw new IllegalArgumentException();
-        }
-
-        if (maxParallel < 1) {
 
             throw new IllegalArgumentException();
         }
@@ -52,16 +42,25 @@ public class JRoutine {
         }
 
         mRunner = runner;
-        mMaxParallel = maxParallel;
         mMaxRetained = maxRetained;
     }
 
     public static JRoutine jrt() {
 
-        return new JRoutine(Runners.shared(), DEFAULT_RECYCLE, DEFAULT_RETAIN);
+        return new JRoutine(Runners.shared(), DEFAULT_RETAIN_COUNT);
     }
 
-    public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> exec(
+    public JRoutine inside(final Runner runner) {
+
+        return new JRoutine(runner, mMaxRetained);
+    }
+
+    public JRoutine maxRetained(final int maxRetainedInstances) {
+
+        return new JRoutine(mRunner, maxRetainedInstances);
+    }
+
+    public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> routineOf(
             final Classification<? extends SubRoutine<INPUT, OUTPUT>> classification,
             final Object... ctorArgs) {
 
@@ -70,20 +69,7 @@ public class JRoutine {
             throw new IllegalArgumentException();
         }
 
-        return new SubRoutineRoutine<INPUT, OUTPUT>(mRunner, mMaxParallel, mMaxRetained,
-                                                    classification.getRawType(), ctorArgs);
-    }
-
-    public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> loop(
-            final Classification<? extends SubRoutineLoop<INPUT, OUTPUT>> classification,
-            final Object... ctorArgs) {
-
-        if (classification == null) {
-
-            throw new IllegalArgumentException();
-        }
-
-        return new SubRoutineLoopRoutine<INPUT, OUTPUT>(mRunner, mMaxParallel, mMaxRetained,
-                                                        classification.getRawType(), ctorArgs);
+        return new DefaultRoutine<INPUT, OUTPUT>(mRunner, mMaxRetained, classification.getRawType(),
+                                                 ctorArgs);
     }
 }

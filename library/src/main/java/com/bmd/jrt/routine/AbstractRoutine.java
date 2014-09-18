@@ -18,7 +18,7 @@ import com.bmd.jrt.channel.RoutineChannel;
 import com.bmd.jrt.routine.DefaultRoutineChannel.SubRoutineProvider;
 import com.bmd.jrt.runner.Runner;
 import com.bmd.jrt.runner.Runners;
-import com.bmd.jrt.subroutine.SubRoutineLoop;
+import com.bmd.jrt.subroutine.SubRoutine;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -28,25 +28,18 @@ import java.util.List;
  */
 public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, OUTPUT> {
 
-    private final int mMaxParallel;
-
     private final int mMaxRetained;
 
     private final Object mMutex = new Object();
 
     private final Runner mRunner;
 
-    private LinkedList<SubRoutineLoop<INPUT, OUTPUT>> mSubRoutines =
-            new LinkedList<SubRoutineLoop<INPUT, OUTPUT>>();
+    private LinkedList<SubRoutine<INPUT, OUTPUT>> mSubRoutines =
+            new LinkedList<SubRoutine<INPUT, OUTPUT>>();
 
-    public AbstractRoutine(final Runner runner, final int maxParallel, final int maxRetained) {
+    public AbstractRoutine(final Runner runner, final int maxRetained) {
 
         if (runner == null) {
-
-            throw new IllegalArgumentException();
-        }
-
-        if (maxParallel < 1) {
 
             throw new IllegalArgumentException();
         }
@@ -57,13 +50,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
         }
 
         mRunner = runner;
-        mMaxParallel = maxParallel;
         mMaxRetained = maxRetained;
-    }
-
-    public AbstractRoutine(final AbstractRoutine<?, ?> other) {
-
-        this(other.mRunner, other.mMaxParallel, other.mMaxRetained);
     }
 
     @Override
@@ -125,15 +112,6 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
 
         return runAsyn(inputs).all();
     }
-
-    @Override
-    public Routine<INPUT, OUTPUT> inBackground() {
-
-        return inside(Runners.pool());
-    }
-
-    @Override
-    public abstract AbstractRoutine<INPUT, OUTPUT> inside(Runner runner);
 
     @Override
     public RoutineChannel<INPUT, OUTPUT> launch() {
@@ -207,23 +185,52 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
         return launchAsyn().push(inputs).close();
     }
 
-    protected abstract SubRoutineLoop<INPUT, OUTPUT> createSubRoutine(final boolean async);
+    @Override
+    public OutputChannel<OUTPUT> runPar() {
 
-    protected int getMaxParallel() {
-
-        return mMaxParallel;
+        return launchPar().close();
     }
+
+    @Override
+    public OutputChannel<OUTPUT> runPar(final INPUT input) {
+
+        return launchPar().push(input).close();
+    }
+
+    @Override
+    public OutputChannel<OUTPUT> runPar(final INPUT... inputs) {
+
+        return launchPar().push(inputs).close();
+    }
+
+    @Override
+    public OutputChannel<OUTPUT> runPar(final Iterable<? extends INPUT> inputs) {
+
+        return launchPar().push(inputs).close();
+    }
+
+    @Override
+    public OutputChannel<OUTPUT> runPar(final OutputChannel<? extends INPUT> inputs) {
+
+        return launchPar().push(inputs).close();
+    }
+
+    protected abstract SubRoutine<INPUT, OUTPUT> createSubRoutine(final boolean async);
 
     protected int getMaxRetained() {
 
         return mMaxRetained;
     }
 
+    protected Runner getRunner() {
+
+        return mRunner;
+    }
+
     protected RoutineChannel<INPUT, OUTPUT> start(final boolean async) {
 
         return new DefaultRoutineChannel<INPUT, OUTPUT>(new RoutineSubRoutineProvider(async),
-                                                        (async) ? mRunner : Runners.sync(),
-                                                        mMaxParallel);
+                                                        (async) ? mRunner : Runners.sync());
     }
 
     private class RoutineSubRoutineProvider implements SubRoutineProvider<INPUT, OUTPUT> {
@@ -236,11 +243,11 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
         }
 
         @Override
-        public SubRoutineLoop<INPUT, OUTPUT> create() {
+        public SubRoutine<INPUT, OUTPUT> create() {
 
             synchronized (mMutex) {
 
-                final LinkedList<SubRoutineLoop<INPUT, OUTPUT>> routines = mSubRoutines;
+                final LinkedList<SubRoutine<INPUT, OUTPUT>> routines = mSubRoutines;
 
                 if (!routines.isEmpty()) {
 
@@ -252,11 +259,11 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
         }
 
         @Override
-        public void recycle(final SubRoutineLoop<INPUT, OUTPUT> routine) {
+        public void recycle(final SubRoutine<INPUT, OUTPUT> routine) {
 
             synchronized (mMutex) {
 
-                final LinkedList<SubRoutineLoop<INPUT, OUTPUT>> routines = mSubRoutines;
+                final LinkedList<SubRoutine<INPUT, OUTPUT>> routines = mSubRoutines;
 
                 if (routines.size() < mMaxRetained) {
 

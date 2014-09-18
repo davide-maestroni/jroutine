@@ -18,8 +18,7 @@ import com.bmd.jrt.channel.ResultChannel;
 /**
  * Created by davide on 9/11/14.
  */
-public abstract class SubRoutineLoopAdapter<INPUT, OUTPUT>
-        implements SubRoutineLoop<INPUT, OUTPUT> {
+public abstract class SubRoutineAdapter<INPUT, OUTPUT> implements SubRoutine<INPUT, OUTPUT> {
 
     @Override
     public void onInit() {

@@ -15,12 +15,18 @@ package com.bmd.jrt.subroutine;
 
 import com.bmd.jrt.channel.ResultChannel;
 
-import java.util.List;
-
 /**
  * Created by davide on 9/7/14.
  */
 public interface SubRoutine<INPUT, OUTPUT> {
 
-    public void onRun(List<? extends INPUT> inputs, ResultChannel<OUTPUT> results);
+    public void onInit();
+
+    public void onInput(INPUT input, ResultChannel<OUTPUT> results);
+
+    public void onReset(Throwable throwable);
+
+    public void onResult(ResultChannel<OUTPUT> results);
+
+    public void onReturn();
 }

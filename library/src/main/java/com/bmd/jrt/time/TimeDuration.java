@@ -22,7 +22,7 @@ public class TimeDuration extends Time {
 
     public static final TimeDuration INFINITE = days(Long.MAX_VALUE);
 
-    public static final TimeDuration ZERO = from(0, TimeUnit.MILLISECONDS);
+    public static final TimeDuration ZERO = fromUnit(0, TimeUnit.MILLISECONDS);
 
     private static final long MILLI_DAYS_OVERFLOW = 106751991167L;
 
@@ -45,7 +45,7 @@ public class TimeDuration extends Time {
         return new TimeDuration(days, TimeUnit.DAYS);
     }
 
-    public static TimeDuration from(final long time, final TimeUnit unit) {
+    public static TimeDuration fromUnit(final long time, final TimeUnit unit) {
 
         if (unit == null) {
 
@@ -148,7 +148,7 @@ public class TimeDuration extends Time {
 
             while (true) {
 
-                if (!sleepMillis(startMillis)) {
+                if (!sleepSinceMillis(startMillis)) {
 
                     return;
                 }
@@ -159,14 +159,14 @@ public class TimeDuration extends Time {
 
         while (true) {
 
-            if (!sleepNanos(startNanos)) {
+            if (!sleepSinceNanos(startNanos)) {
 
                 return;
             }
         }
     }
 
-    public boolean sleepMillis(final long fromMillis) throws InterruptedException {
+    public boolean sleepSinceMillis(final long milliTime) throws InterruptedException {
 
         if (isZero()) {
 
@@ -178,7 +178,7 @@ public class TimeDuration extends Time {
             throw new IllegalStateException();
         }
 
-        final long millisToSleep = fromMillis - System.currentTimeMillis() + toMillis();
+        final long millisToSleep = milliTime - System.currentTimeMillis() + toMillis();
 
         if (millisToSleep <= 0) {
 
@@ -190,7 +190,7 @@ public class TimeDuration extends Time {
         return true;
     }
 
-    public boolean sleepNanos(final long fromNanos) throws InterruptedException {
+    public boolean sleepSinceNanos(final long nanoTime) throws InterruptedException {
 
         if (isZero()) {
 
@@ -202,7 +202,7 @@ public class TimeDuration extends Time {
             throw new IllegalStateException();
         }
 
-        final long nanosToSleep = fromNanos - System.nanoTime() + toNanos();
+        final long nanosToSleep = nanoTime - System.nanoTime() + toNanos();
 
         if (nanosToSleep <= 0) {
 
@@ -231,8 +231,61 @@ public class TimeDuration extends Time {
         unit.timedWait(target, time);
     }
 
-    public boolean waitCondition(final Object target, final Check check) throws
+    public boolean waitSinceMillis(final Object target, final long milliTime) throws
             InterruptedException {
+
+        if (isZero()) {
+
+            return false;
+        }
+
+        if (isInfinite() || (toDays() > MILLI_DAYS_OVERFLOW)) {
+
+            target.wait();
+
+            return true;
+        }
+
+        final long millisToWait = milliTime - System.currentTimeMillis() + toMillis();
+
+        if (millisToWait <= 0) {
+
+            return false;
+        }
+
+        TimeUnit.MILLISECONDS.timedWait(target, millisToWait);
+
+        return true;
+    }
+
+    public boolean waitSinceNanos(final Object target, final long nanoTime) throws
+            InterruptedException {
+
+        if (isZero()) {
+
+            return false;
+        }
+
+        if (isInfinite() || (toDays() > NANO_DAYS_OVERFLOW)) {
+
+            target.wait();
+
+            return true;
+        }
+
+        final long nanosToWait = nanoTime - System.nanoTime() + toNanos();
+
+        if (nanosToWait <= 0) {
+
+            return false;
+        }
+
+        TimeUnit.NANOSECONDS.timedWait(target, nanosToWait);
+
+        return true;
+    }
+
+    public boolean waitTrue(final Object target, final Check check) throws InterruptedException {
 
         if (isZero()) {
 
@@ -255,7 +308,7 @@ public class TimeDuration extends Time {
 
             while (!check.isTrue()) {
 
-                if (!waitMillis(target, startMillis)) {
+                if (!waitSinceMillis(target, startMillis)) {
 
                     return false;
                 }
@@ -267,66 +320,12 @@ public class TimeDuration extends Time {
 
             while (!check.isTrue()) {
 
-                if (!waitNanos(target, startNanos)) {
+                if (!waitSinceNanos(target, startNanos)) {
 
                     return false;
                 }
             }
         }
-
-        return true;
-    }
-
-    public boolean waitMillis(final Object target, final long fromMillis) throws
-            InterruptedException {
-
-        if (isZero()) {
-
-            return false;
-        }
-
-        if (isInfinite() || (toDays() > MILLI_DAYS_OVERFLOW)) {
-
-            target.wait();
-
-            return true;
-        }
-
-        final long millisToWait = fromMillis - System.currentTimeMillis() + toMillis();
-
-        if (millisToWait <= 0) {
-
-            return false;
-        }
-
-        TimeUnit.MILLISECONDS.timedWait(target, millisToWait);
-
-        return true;
-    }
-
-    public boolean waitNanos(final Object target, final long fromNanos) throws
-            InterruptedException {
-
-        if (isZero()) {
-
-            return false;
-        }
-
-        if (isInfinite() || (toDays() > NANO_DAYS_OVERFLOW)) {
-
-            target.wait();
-
-            return true;
-        }
-
-        final long nanosToWait = fromNanos - System.nanoTime() + toNanos();
-
-        if (nanosToWait <= 0) {
-
-            return false;
-        }
-
-        TimeUnit.NANOSECONDS.timedWait(target, nanosToWait);
 
         return true;
     }

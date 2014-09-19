@@ -36,17 +36,17 @@ class LocalQueue {
 
     private long[] mCallTimeNs;
 
-    private Call[] mCalls;
-
     private TimeDuration[] mDelays;
 
     private int mFirst;
 
-    private boolean[] mInputs;
+    private Invocation[] mInvocations;
 
     private boolean mIsRunning;
 
     private int mLast;
+
+    private InvocationType[] mTypes;
 
     /**
      * Default constructor.
@@ -54,22 +54,24 @@ class LocalQueue {
     private LocalQueue() {
 
         mCallTimeNs = new long[INITIAL_CAPACITY];
-        mCalls = new Call[INITIAL_CAPACITY];
+        mInvocations = new Invocation[INITIAL_CAPACITY];
         mDelays = new TimeDuration[INITIAL_CAPACITY];
-        mInputs = new boolean[INITIAL_CAPACITY];
+        mTypes = new InvocationType[INITIAL_CAPACITY];
     }
 
-    public static void input(final Call call, final long delay, final TimeUnit timeUnit) {
+    public static void addInput(final Invocation invocation, final long delay,
+            final TimeUnit timeUnit) {
 
-        sQueue.get().runInput(call, delay, timeUnit);
+        sQueue.get().onInput(invocation, delay, timeUnit);
     }
 
-    public static void reset(final Call call) {
+    public static void addReset(final Invocation invocation) {
 
-        sQueue.get().runReset(call);
+        sQueue.get().onReset(invocation);
     }
 
-    private static void resizeArray(final Call[] src, final Call[] dst, final int first) {
+    private static void resizeArray(final Invocation[] src, final Invocation[] dst,
+            final int first) {
 
         final int remainder = src.length - first;
 
@@ -86,7 +88,8 @@ class LocalQueue {
         System.arraycopy(src, first, dst, dst.length - remainder, remainder);
     }
 
-    private static void resizeArray(final boolean[] src, final boolean[] dst, final int first) {
+    private static void resizeArray(final InvocationType[] src, final InvocationType[] dst,
+            final int first) {
 
         final int remainder = src.length - first;
 
@@ -102,26 +105,26 @@ class LocalQueue {
         System.arraycopy(src, first, dst, dst.length - remainder, remainder);
     }
 
-    private void add(final Call call, TimeDuration delay, boolean isInput) {
+    private void add(final Invocation invocation, TimeDuration delay, InvocationType type) {
 
-        if (mCalls.length == 0) {
+        if (mInvocations.length == 0) {
 
             mCallTimeNs = new long[1];
-            mCalls = new Call[1];
+            mInvocations = new Invocation[1];
             mDelays = new TimeDuration[1];
-            mInputs = new boolean[1];
+            mTypes = new InvocationType[1];
         }
 
         final int i = mLast;
 
         mCallTimeNs[i] = System.nanoTime();
-        mCalls[i] = call;
+        mInvocations[i] = invocation;
         mDelays[i] = delay;
-        mInputs[i] = isInput;
+        mTypes[i] = type;
 
         final int newLast;
 
-        if ((i >= (mCalls.length - 1)) || (i == Integer.MAX_VALUE)) {
+        if ((i >= (mInvocations.length - 1)) || (i == Integer.MAX_VALUE)) {
 
             newLast = 0;
 
@@ -132,7 +135,7 @@ class LocalQueue {
 
         if (mFirst == newLast) {
 
-            ensureCapacity(mCalls.length + 1);
+            ensureCapacity(mInvocations.length + 1);
         }
 
         mLast = newLast;
@@ -140,7 +143,7 @@ class LocalQueue {
 
     private void ensureCapacity(final int capacity) {
 
-        final int size = mCalls.length;
+        final int size = mInvocations.length;
 
         if (capacity <= size) {
 
@@ -166,24 +169,44 @@ class LocalQueue {
         final long[] newCallTimeNs = new long[newSize];
         resizeArray(mCallTimeNs, newCallTimeNs, first);
 
-        final Call[] newCalls = new Call[newSize];
-        resizeArray(mCalls, newCalls, first);
+        final Invocation[] newInvocations = new Invocation[newSize];
+        resizeArray(mInvocations, newInvocations, first);
 
         final TimeDuration[] newDelays = new TimeDuration[newSize];
         resizeArray(mDelays, newDelays, first);
 
-        final boolean[] newInputs = new boolean[newSize];
-        resizeArray(mInputs, newInputs, first);
+        final InvocationType[] newTypes = new InvocationType[newSize];
+        resizeArray(mTypes, newTypes, first);
 
         mCallTimeNs = newCallTimeNs;
-        mCalls = newCalls;
+        mInvocations = newInvocations;
         mDelays = newDelays;
-        mInputs = newInputs;
+        mTypes = newTypes;
 
         final int shift = newSize - size;
 
         mFirst = first + shift;
         mLast = (last < first) ? last : last + shift;
+    }
+
+    private void onInput(final Invocation invocation, final long delay, final TimeUnit timeUnit) {
+
+        add(invocation, TimeDuration.fromUnit(delay, timeUnit), InvocationType.INPUT);
+
+        if (!mIsRunning) {
+
+            run();
+        }
+    }
+
+    private void onReset(final Invocation invocation) {
+
+        add(invocation, TimeDuration.ZERO, InvocationType.RESET);
+
+        if (!mIsRunning) {
+
+            run();
+        }
     }
 
     private void run() {
@@ -197,21 +220,21 @@ class LocalQueue {
                 final int i = mFirst;
                 final int last = mLast;
                 final long[] callTimeNs = mCallTimeNs;
-                final Call[] calls = mCalls;
+                final Invocation[] invocations = mInvocations;
                 final TimeDuration[] delays = mDelays;
-                final boolean[] inputs = mInputs;
+                final InvocationType[] types = mTypes;
 
                 long timeNs = callTimeNs[i];
-                Call call = calls[i];
+                Invocation invocation = invocations[i];
                 TimeDuration delay = delays[i];
-                boolean input = inputs[i];
+                InvocationType type = types[i];
 
                 final long currentTimeNs = System.nanoTime();
                 long delayNs = timeNs - currentTimeNs + delay.toNanos();
 
                 if (delayNs > 0) {
 
-                    final int length = calls.length;
+                    final int length = invocations.length;
                     long minDelay = delayNs;
                     int s = i;
 
@@ -249,14 +272,14 @@ class LocalQueue {
                     if (s != i) {
 
                         timeNs = callTimeNs[s];
-                        call = calls[s];
+                        invocation = invocations[s];
                         delay = delays[s];
-                        input = inputs[s];
+                        type = types[s];
 
                         callTimeNs[s] = callTimeNs[i];
-                        calls[s] = calls[i];
+                        invocations[s] = invocations[i];
                         delays[s] = delays[i];
-                        inputs[s] = inputs[i];
+                        types[s] = types[i];
                     }
 
                     delayNs = timeNs - System.nanoTime() + delay.toNanos();
@@ -277,13 +300,13 @@ class LocalQueue {
                 try {
 
                     // This call could be re-entrant
-                    if (input) {
+                    if (type == InvocationType.INPUT) {
 
-                        call.onInput();
+                        invocation.onInput();
 
                     } else {
 
-                        call.onReset();
+                        invocation.onReset();
                     }
 
                 } catch (final RoutineInterruptedException e) {
@@ -297,12 +320,12 @@ class LocalQueue {
                 // Note that the field values may have changed here
                 final int n = mFirst;
 
-                mCalls[n] = null;
+                mInvocations[n] = null;
                 mDelays[n] = null;
 
                 final int newFirst = mFirst + 1;
 
-                if (newFirst >= mCalls.length) {
+                if (newFirst >= mInvocations.length) {
 
                     mFirst = 0;
 
@@ -318,23 +341,9 @@ class LocalQueue {
         }
     }
 
-    private void runInput(final Call call, final long delay, final TimeUnit timeUnit) {
+    private enum InvocationType {
 
-        add(call, TimeDuration.from(delay, timeUnit), true);
-
-        if (!mIsRunning) {
-
-            run();
-        }
-    }
-
-    private void runReset(final Call call) {
-
-        add(call, TimeDuration.ZERO, false);
-
-        if (!mIsRunning) {
-
-            run();
-        }
+        INPUT,
+        RESET
     }
 }

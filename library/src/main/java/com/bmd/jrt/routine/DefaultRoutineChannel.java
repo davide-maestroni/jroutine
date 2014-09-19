@@ -17,7 +17,7 @@ import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.channel.ResultConsumer;
 import com.bmd.jrt.channel.RoutineChannel;
-import com.bmd.jrt.runner.Call;
+import com.bmd.jrt.runner.Invocation;
 import com.bmd.jrt.runner.Runner;
 import com.bmd.jrt.subroutine.SubRoutine;
 import com.bmd.jrt.time.TimeDuration;
@@ -39,7 +39,7 @@ import static com.bmd.jrt.time.TimeDuration.seconds;
  */
 class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTPUT> {
 
-    private final DefaultCall mCall;
+    private final DefaultInvocation mCall;
 
     private final LinkedList<INPUT> mInputQueue = new LinkedList<INPUT>();
 
@@ -70,7 +70,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
         }
 
         mRunner = runner;
-        mCall = new DefaultCall(provider);
+        mCall = new DefaultInvocation(provider);
     }
 
     @Override
@@ -94,7 +94,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
     @Override
     public RoutineChannel<INPUT, OUTPUT> after(final long delay, final TimeUnit timeUnit) {
 
-        return after(TimeDuration.from(delay, timeUnit));
+        return after(TimeDuration.fromUnit(delay, timeUnit));
     }
 
     @Override
@@ -156,7 +156,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
 
         } else {
 
-            mRunner.onInput(new DelayedListInputCall(inputs), delay.time, delay.unit);
+            mRunner.onInput(new DelayedListInputInvocation(inputs), delay.time, delay.unit);
         }
 
         return this;
@@ -187,7 +187,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
 
         } else {
 
-            mRunner.onInput(new DelayedInputCall(input), delay.time, delay.unit);
+            mRunner.onInput(new DelayedInputInvocation(input), delay.time, delay.unit);
         }
 
         return this;
@@ -384,7 +384,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
         public void recycle(SubRoutine<INPUT, OUTPUT> routine);
     }
 
-    private class DefaultCall implements Call {
+    private class DefaultInvocation implements Invocation {
 
         private final Object mCallMutex = new Object();
 
@@ -394,7 +394,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
 
         private SubRoutine<INPUT, OUTPUT> mRoutine;
 
-        public DefaultCall(final SubRoutineProvider<INPUT, OUTPUT> provider) {
+        public DefaultInvocation(final SubRoutineProvider<INPUT, OUTPUT> provider) {
 
             if (provider == null) {
 
@@ -582,7 +582,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
 
                 try {
 
-                    isTimeout = !timeout.waitCondition(mMutex, mHasNext);
+                    isTimeout = !timeout.waitTrue(mMutex, mHasNext);
 
                 } catch (final InterruptedException e) {
 
@@ -633,7 +633,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
 
                 try {
 
-                    isTimeout = !timeout.waitCondition(mMutex, mOutputNotEmpty);
+                    isTimeout = !timeout.waitTrue(mMutex, mOutputNotEmpty);
 
                 } catch (final InterruptedException e) {
 
@@ -703,7 +703,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
         @Override
         public OutputChannel<OUTPUT> afterMax(final long timeout, final TimeUnit timeUnit) {
 
-            return afterMax(TimeDuration.from(timeout, timeUnit));
+            return afterMax(TimeDuration.fromUnit(timeout, timeUnit));
         }
 
         @Override
@@ -794,7 +794,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
 
                 try {
 
-                    isTimeout = !timeout.waitCondition(mMutex, new Check() {
+                    isTimeout = !timeout.waitTrue(mMutex, new Check() {
 
                         @Override
                         public boolean isTrue() {
@@ -847,7 +847,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
 
                 try {
 
-                    isDone = timeout.waitCondition(mMutex, new Check() {
+                    isDone = timeout.waitTrue(mMutex, new Check() {
 
                         @Override
                         public boolean isTrue() {
@@ -968,7 +968,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
         @Override
         public ResultChannel<OUTPUT> after(final long delay, final TimeUnit timeUnit) {
 
-            return after(TimeDuration.from(delay, timeUnit));
+            return after(TimeDuration.fromUnit(delay, timeUnit));
         }
 
         @Override
@@ -1032,7 +1032,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
 
             } else {
 
-                mRunner.onInput(new DelayedListOutputCall(outputs), delay.time, delay.unit);
+                mRunner.onInput(new DelayedListOutputInvocation(outputs), delay.time, delay.unit);
             }
 
             return this;
@@ -1065,7 +1065,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
 
             } else {
 
-                mRunner.onInput(new DelayedOutputCall(output), delay.time, delay.unit);
+                mRunner.onInput(new DelayedOutputInvocation(output), delay.time, delay.unit);
             }
 
             return this;
@@ -1168,11 +1168,11 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
         }
     }
 
-    private class DelayedInputCall implements Call {
+    private class DelayedInputInvocation implements Invocation {
 
         private final INPUT mInput;
 
-        public DelayedInputCall(final INPUT input) {
+        public DelayedInputInvocation(final INPUT input) {
 
             mInput = input;
         }
@@ -1200,11 +1200,11 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
         }
     }
 
-    private class DelayedListInputCall implements Call {
+    private class DelayedListInputInvocation implements Invocation {
 
         private final ArrayList<INPUT> mInputs;
 
-        public DelayedListInputCall(final Iterable<? extends INPUT> inputs) {
+        public DelayedListInputInvocation(final Iterable<? extends INPUT> inputs) {
 
             final ArrayList<INPUT> inputList = new ArrayList<INPUT>();
 
@@ -1239,11 +1239,11 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
         }
     }
 
-    private class DelayedListOutputCall implements Call {
+    private class DelayedListOutputInvocation implements Invocation {
 
         private final ArrayList<OUTPUT> mOutputs;
 
-        public DelayedListOutputCall(final Iterable<? extends OUTPUT> outputs) {
+        public DelayedListOutputInvocation(final Iterable<? extends OUTPUT> outputs) {
 
             final ArrayList<OUTPUT> outputList = new ArrayList<OUTPUT>();
 
@@ -1283,11 +1283,11 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
         }
     }
 
-    private class DelayedOutputCall implements Call {
+    private class DelayedOutputInvocation implements Invocation {
 
         private final OUTPUT mOutput;
 
-        public DelayedOutputCall(final OUTPUT output) {
+        public DelayedOutputInvocation(final OUTPUT output) {
 
             mOutput = output;
         }
@@ -1369,7 +1369,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
 
             } else {
 
-                mRunner.onInput(new DelayedInputCall(result), delay.time, delay.unit);
+                mRunner.onInput(new DelayedInputInvocation(result), delay.time, delay.unit);
             }
         }
 
@@ -1442,7 +1442,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
 
             } else {
 
-                mRunner.onInput(new DelayedOutputCall(result), delay.time, delay.unit);
+                mRunner.onInput(new DelayedOutputInvocation(result), delay.time, delay.unit);
             }
         }
 

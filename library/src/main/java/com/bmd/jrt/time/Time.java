@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class Time {
 
-    public static final Time ZERO = from(0, TimeUnit.MILLISECONDS);
+    public static final Time ZERO = fromUnit(0, TimeUnit.MILLISECONDS);
 
     public final long time;
 
@@ -42,7 +42,7 @@ public class Time {
         return new Time(days, TimeUnit.DAYS);
     }
 
-    public static Time from(final long time, TimeUnit unit) {
+    public static Time fromUnit(final long time, TimeUnit unit) {
 
         if (unit == null) {
 
@@ -97,6 +97,7 @@ public class Time {
 
         int result = (int) (time ^ (time >>> 32));
         result = 31 * result + unit.hashCode();
+
         return result;
     }
 

@@ -16,7 +16,7 @@ package com.bmd.jrt.runner;
 /**
  * Created by davide on 9/7/14.
  */
-public interface Call {
+public interface Invocation {
 
     public void onInput();
 

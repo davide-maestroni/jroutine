@@ -24,13 +24,13 @@ import java.util.concurrent.TimeUnit;
 class SequentialRunner implements Runner {
 
     @Override
-    public void onInput(final Call call, final long delay, final TimeUnit timeUnit) {
+    public void onInput(final Invocation invocation, final long delay, final TimeUnit timeUnit) {
 
         try {
 
-            TimeDuration.from(delay, timeUnit).sleepAtLeast();
+            TimeDuration.fromUnit(delay, timeUnit).sleepAtLeast();
 
-            call.onInput();
+            invocation.onInput();
 
         } catch (final InterruptedException e) {
 
@@ -39,8 +39,8 @@ class SequentialRunner implements Runner {
     }
 
     @Override
-    public void onReset(final Call call) {
+    public void onReset(final Invocation invocation) {
 
-        call.onReset();
+        invocation.onReset();
     }
 }

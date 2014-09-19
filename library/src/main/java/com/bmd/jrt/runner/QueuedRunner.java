@@ -11,26 +11,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.channel;
-
-import com.bmd.jrt.time.TimeDuration;
+package com.bmd.jrt.runner;
 
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by davide on 9/4/14.
+ * Created by davide on 9/18/14.
  */
-public interface InputChannel<INPUT> extends Channel {
+class QueuedRunner implements Runner {
 
-    public InputChannel<INPUT> after(TimeDuration delay);
+    @Override
+    public void onInput(final Call call, final long delay, final TimeUnit timeUnit) {
 
-    public InputChannel<INPUT> after(long delay, TimeUnit timeUnit);
+        LocalQueue.input(call, delay, timeUnit);
+    }
 
-    public InputChannel<INPUT> pass(OutputChannel<INPUT> channel);
+    @Override
+    public void onReset(final Call call) {
 
-    public InputChannel<INPUT> pass(Iterable<? extends INPUT> inputs);
-
-    public InputChannel<INPUT> pass(INPUT input);
-
-    public InputChannel<INPUT> pass(INPUT... inputs);
+        LocalQueue.reset(call);
+    }
 }

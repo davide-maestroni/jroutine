@@ -35,10 +35,10 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
     private final Class<ParallelSubRoutine<INPUT, OUTPUT>> mParallelType =
             new Classification<ParallelSubRoutine<INPUT, OUTPUT>>() {}.getRawType();
 
-    public DefaultRoutine(final Runner runner, final int maxRetained,
+    public DefaultRoutine(final Runner syncRunner, final Runner asyncRunner, final int maxRetained,
             final Class<? extends SubRoutine<INPUT, OUTPUT>> type, final Object... ctorArgs) {
 
-        super(runner, maxRetained);
+        super(syncRunner, asyncRunner, maxRetained);
 
         mConstructor = findConstructor(type, ctorArgs);
         mArgs = (ctorArgs == null) ? NO_ARGS : ctorArgs.clone();
@@ -48,8 +48,8 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
     public RoutineChannel<INPUT, OUTPUT> launchPar() {
 
         final DefaultRoutine<INPUT, OUTPUT> parallelRoutine =
-                new DefaultRoutine<INPUT, OUTPUT>(getRunner(), getMaxRetained(), mParallelType,
-                                                  this);
+                new DefaultRoutine<INPUT, OUTPUT>(getSyncRunner(), getAsyncRunner(),
+                                                  getMaxRetained(), mParallelType, this);
 
         return parallelRoutine.launchAsyn();
     }

@@ -43,39 +43,39 @@ public interface Routine<INPUT, OUTPUT> {
 
     public List<OUTPUT> callAsyn(OutputChannel<? extends INPUT> inputs);
 
+    public OutputChannel<OUTPUT> invoke();
+
+    public OutputChannel<OUTPUT> invoke(INPUT input);
+
+    public OutputChannel<OUTPUT> invoke(INPUT... inputs);
+
+    public OutputChannel<OUTPUT> invoke(Iterable<? extends INPUT> inputs);
+
+    public OutputChannel<OUTPUT> invoke(OutputChannel<? extends INPUT> inputs);
+
+    public OutputChannel<OUTPUT> invokeAsyn();
+
+    public OutputChannel<OUTPUT> invokeAsyn(INPUT input);
+
+    public OutputChannel<OUTPUT> invokeAsyn(INPUT... inputs);
+
+    public OutputChannel<OUTPUT> invokeAsyn(Iterable<? extends INPUT> inputs);
+
+    public OutputChannel<OUTPUT> invokeAsyn(OutputChannel<? extends INPUT> inputs);
+
+    public OutputChannel<OUTPUT> invokePar();
+
+    public OutputChannel<OUTPUT> invokePar(INPUT input);
+
+    public OutputChannel<OUTPUT> invokePar(INPUT... inputs);
+
+    public OutputChannel<OUTPUT> invokePar(Iterable<? extends INPUT> inputs);
+
+    public OutputChannel<OUTPUT> invokePar(OutputChannel<? extends INPUT> inputs);
+
     public RoutineChannel<INPUT, OUTPUT> launch();
 
     public RoutineChannel<INPUT, OUTPUT> launchAsyn();
 
     public RoutineChannel<INPUT, OUTPUT> launchPar();
-
-    public OutputChannel<OUTPUT> run();
-
-    public OutputChannel<OUTPUT> run(INPUT input);
-
-    public OutputChannel<OUTPUT> run(INPUT... inputs);
-
-    public OutputChannel<OUTPUT> run(Iterable<? extends INPUT> inputs);
-
-    public OutputChannel<OUTPUT> run(OutputChannel<? extends INPUT> inputs);
-
-    public OutputChannel<OUTPUT> runAsyn();
-
-    public OutputChannel<OUTPUT> runAsyn(INPUT input);
-
-    public OutputChannel<OUTPUT> runAsyn(INPUT... inputs);
-
-    public OutputChannel<OUTPUT> runAsyn(Iterable<? extends INPUT> inputs);
-
-    public OutputChannel<OUTPUT> runAsyn(OutputChannel<? extends INPUT> inputs);
-
-    public OutputChannel<OUTPUT> runPar();
-
-    public OutputChannel<OUTPUT> runPar(INPUT input);
-
-    public OutputChannel<OUTPUT> runPar(INPUT... inputs);
-
-    public OutputChannel<OUTPUT> runPar(Iterable<? extends INPUT> inputs);
-
-    public OutputChannel<OUTPUT> runPar(OutputChannel<? extends INPUT> inputs);
 }

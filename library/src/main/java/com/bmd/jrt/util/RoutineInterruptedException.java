@@ -22,4 +22,11 @@ public class RoutineInterruptedException extends RuntimeException {
 
         super(cause);
     }
+
+    public static void interrupt(final InterruptedException exception) {
+
+        Thread.currentThread().interrupt();
+
+        throw new RoutineInterruptedException(exception);
+    }
 }

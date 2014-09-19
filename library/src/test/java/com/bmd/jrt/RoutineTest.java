@@ -51,7 +51,7 @@ public class RoutineTest extends TestCase {
         };
 
         final Routine<String, String> exceptionRoutine1 =
-                jrt().routineOf(Classification.of(testException1), this);
+                jrt().withArgs(this).routineOf(Classification.of(testException1));
 
         testException(exceptionRoutine1, "test", "test1");
 
@@ -65,7 +65,7 @@ public class RoutineTest extends TestCase {
         };
 
         final Routine<String, String> exceptionRoutine2 =
-                jrt().routineOf(Classification.of(testException2), this);
+                jrt().withArgs(this).routineOf(Classification.of(testException2));
 
         testException(exceptionRoutine2, "test2", "test2");
 
@@ -79,7 +79,7 @@ public class RoutineTest extends TestCase {
         };
 
         final Routine<String, String> exceptionRoutine3 =
-                jrt().routineOf(Classification.of(testException3), this);
+                jrt().withArgs(this).routineOf(Classification.of(testException3));
 
         testException(exceptionRoutine3, "test", "test3");
 
@@ -88,7 +88,7 @@ public class RoutineTest extends TestCase {
             @Override
             public void onInput(final String s, final ResultChannel<String> results) {
 
-                results.push(s);
+                results.pass(s);
             }
 
             @Override
@@ -99,27 +99,27 @@ public class RoutineTest extends TestCase {
         };
 
         final Routine<String, String> exceptionRoutine4 =
-                jrt().routineOf(Classification.of(testException4), this);
+                jrt().withArgs(this).routineOf(Classification.of(testException4));
 
         assertThat(exceptionRoutine4.call("test")).containsExactly("test");
         assertThat(exceptionRoutine4.callAsyn("test")).containsExactly("test");
-        assertThat(exceptionRoutine4.run("test").takeAll()).containsExactly("test");
-        assertThat(exceptionRoutine4.runAsyn("test").takeAll()).containsExactly("test");
-        assertThat(exceptionRoutine4.runPar("test").takeAll()).containsExactly("test");
-        assertThat(exceptionRoutine4.run("test").iterator().next()).isEqualTo("test");
-        assertThat(exceptionRoutine4.runAsyn("test").iterator().next()).isEqualTo("test");
-        assertThat(exceptionRoutine4.runPar("test").iterator().next()).isEqualTo("test");
-        assertThat(exceptionRoutine4.launch().push("test").close().takeAll()).containsExactly(
+        assertThat(exceptionRoutine4.invoke("test").readAll()).containsExactly("test");
+        assertThat(exceptionRoutine4.invokeAsyn("test").readAll()).containsExactly("test");
+        assertThat(exceptionRoutine4.invokePar("test").readAll()).containsExactly("test");
+        assertThat(exceptionRoutine4.invoke("test").iterator().next()).isEqualTo("test");
+        assertThat(exceptionRoutine4.invokeAsyn("test").iterator().next()).isEqualTo("test");
+        assertThat(exceptionRoutine4.invokePar("test").iterator().next()).isEqualTo("test");
+        assertThat(exceptionRoutine4.launch().pass("test").close().readAll()).containsExactly(
                 "test");
-        assertThat(exceptionRoutine4.launchAsyn().push("test").close().takeAll()).containsExactly(
+        assertThat(exceptionRoutine4.launchAsyn().pass("test").close().readAll()).containsExactly(
                 "test");
-        assertThat(exceptionRoutine4.launchPar().push("test").close().takeAll()).containsExactly(
+        assertThat(exceptionRoutine4.launchPar().pass("test").close().readAll()).containsExactly(
                 "test");
-        assertThat(exceptionRoutine4.launch().push("test").close().iterator().next()).isEqualTo(
+        assertThat(exceptionRoutine4.launch().pass("test").close().iterator().next()).isEqualTo(
                 "test");
-        assertThat(exceptionRoutine4.launchAsyn().push("test").close().iterator().next()).isEqualTo(
+        assertThat(exceptionRoutine4.launchAsyn().pass("test").close().iterator().next()).isEqualTo(
                 "test");
-        assertThat(exceptionRoutine4.launchPar().push("test").close().iterator().next()).isEqualTo(
+        assertThat(exceptionRoutine4.launchPar().pass("test").close().iterator().next()).isEqualTo(
                 "test");
 
         final Routine<String, String> passThroughRoutine =
@@ -132,269 +132,252 @@ public class RoutineTest extends TestCase {
         testChained(passThroughRoutine, exceptionRoutine3, "test", "test3");
         testChained(exceptionRoutine3, passThroughRoutine, "test", "test3");
 
-        assertThat(passThroughRoutine.call(exceptionRoutine4.run("test"))).containsExactly("test");
-        assertThat(passThroughRoutine.callAsyn(exceptionRoutine4.run("test"))).containsExactly(
+        assertThat(passThroughRoutine.call(exceptionRoutine4.invoke("test"))).containsExactly(
                 "test");
-        assertThat(passThroughRoutine.run(exceptionRoutine4.run("test")).takeAll()).containsExactly(
+        assertThat(passThroughRoutine.callAsyn(exceptionRoutine4.invoke("test"))).containsExactly(
                 "test");
-        assertThat(passThroughRoutine.runAsyn(exceptionRoutine4.run("test"))
-                                     .takeAll()).containsExactly("test");
-        assertThat(
-                passThroughRoutine.runPar(exceptionRoutine4.run("test")).takeAll()).containsExactly(
+        assertThat(passThroughRoutine.invoke(exceptionRoutine4.invoke("test"))
+                                     .readAll()).containsExactly(
                 "test");
-        assertThat(
-                passThroughRoutine.run(exceptionRoutine4.run("test")).iterator().next()).isEqualTo(
+        assertThat(passThroughRoutine.invokeAsyn(exceptionRoutine4.invoke("test"))
+                                     .readAll()).containsExactly("test");
+        assertThat(passThroughRoutine.invokePar(exceptionRoutine4.invoke("test"))
+                                     .readAll()).containsExactly(
                 "test");
-        assertThat(passThroughRoutine.runAsyn(exceptionRoutine4.run("test"))
-                                     .iterator()
+        assertThat(passThroughRoutine.invoke(exceptionRoutine4.invoke("test"))
+                                     .iterator().next()).isEqualTo("test");
+        assertThat(passThroughRoutine.invokeAsyn(exceptionRoutine4.invoke("test")).iterator()
                                      .next()).isEqualTo("test");
-        assertThat(passThroughRoutine.runPar(exceptionRoutine4.run("test"))
+        assertThat(passThroughRoutine.invokePar(exceptionRoutine4.invoke("test"))
                                      .iterator()
                                      .next()).isEqualTo("test");
         assertThat(passThroughRoutine.launch()
-                                     .push(exceptionRoutine4.run("test"))
-                                     .close().takeAll()).containsExactly("test");
-        assertThat(passThroughRoutine.launchAsyn()
-                                     .push(exceptionRoutine4.run("test"))
-                                     .close().takeAll()).containsExactly("test");
-        assertThat(passThroughRoutine.launchPar()
-                                     .push(exceptionRoutine4.run("test"))
+                                     .pass(exceptionRoutine4.invoke("test"))
                                      .close()
-                                     .takeAll()).containsExactly("test");
-        assertThat(passThroughRoutine.launch()
-                                     .push(exceptionRoutine4.run("test"))
+                                     .readAll()).containsExactly("test");
+        assertThat(passThroughRoutine.launchAsyn().pass(exceptionRoutine4.invoke("test"))
+                                     .close().readAll()).containsExactly("test");
+        assertThat(passThroughRoutine.launchPar()
+                                     .pass(exceptionRoutine4.invoke("test"))
+                                     .close()
+                                     .readAll()).containsExactly("test");
+        assertThat(passThroughRoutine.launch().pass(exceptionRoutine4.invoke("test"))
                                      .close()
                                      .iterator()
                                      .next()).isEqualTo("test");
-        assertThat(passThroughRoutine.launchAsyn()
-                                     .push(exceptionRoutine4.run("test"))
+        assertThat(passThroughRoutine.launchAsyn().pass(exceptionRoutine4.invoke("test"))
                                      .close()
                                      .iterator()
                                      .next()).isEqualTo("test");
-        assertThat(passThroughRoutine.launchPar()
-                                     .push(exceptionRoutine4.run("test"))
+        assertThat(passThroughRoutine.launchPar().pass(exceptionRoutine4.invoke("test"))
                                      .close()
                                      .iterator()
                                      .next()).isEqualTo("test");
 
-        assertThat(passThroughRoutine.call(exceptionRoutine4.runAsyn("test"))).containsExactly(
+        assertThat(passThroughRoutine.call(exceptionRoutine4.invokeAsyn("test"))).containsExactly(
                 "test");
-        assertThat(passThroughRoutine.callAsyn(exceptionRoutine4.runAsyn("test"))).containsExactly(
+        assertThat(
+                passThroughRoutine.callAsyn(exceptionRoutine4.invokeAsyn("test"))).containsExactly(
                 "test");
-        assertThat(passThroughRoutine.run(exceptionRoutine4.runAsyn("test"))
-                                     .takeAll()).containsExactly("test");
-        assertThat(passThroughRoutine.runAsyn(exceptionRoutine4.runAsyn("test"))
-                                     .takeAll()).containsExactly("test");
-        assertThat(passThroughRoutine.runPar(exceptionRoutine4.runAsyn("test"))
-                                     .takeAll()).containsExactly("test");
-        assertThat(passThroughRoutine.run(exceptionRoutine4.runAsyn("test"))
+        assertThat(passThroughRoutine.invoke(exceptionRoutine4.invokeAsyn("test"))
+                                     .readAll()).containsExactly("test");
+        assertThat(passThroughRoutine.invokeAsyn(exceptionRoutine4.invokeAsyn("test"))
+                                     .readAll()).containsExactly("test");
+        assertThat(passThroughRoutine.invokePar(exceptionRoutine4.invokeAsyn("test"))
+                                     .readAll()).containsExactly("test");
+        assertThat(passThroughRoutine.invoke(exceptionRoutine4.invokeAsyn("test"))
                                      .iterator()
                                      .next()).isEqualTo("test");
-        assertThat(passThroughRoutine.runAsyn(exceptionRoutine4.runAsyn("test"))
+        assertThat(passThroughRoutine.invokeAsyn(exceptionRoutine4.invokeAsyn("test"))
                                      .iterator()
                                      .next()).isEqualTo("test");
-        assertThat(passThroughRoutine.runPar(exceptionRoutine4.runAsyn("test"))
+        assertThat(passThroughRoutine.invokePar(exceptionRoutine4.invokeAsyn("test"))
                                      .iterator()
                                      .next()).isEqualTo("test");
         assertThat(passThroughRoutine.launch()
-                                     .push(exceptionRoutine4.runAsyn("test"))
-                                     .close().takeAll()).containsExactly("test");
+                                     .pass(exceptionRoutine4.invokeAsyn("test"))
+                                     .close()
+                                     .readAll()).containsExactly("test");
         assertThat(passThroughRoutine.launchAsyn()
-                                     .push(exceptionRoutine4.runAsyn("test"))
-                                     .close().takeAll()).containsExactly("test");
-        assertThat(passThroughRoutine.launchPar()
-                                     .push(exceptionRoutine4.runAsyn("test"))
-                                     .close().takeAll()).containsExactly("test");
-        assertThat(passThroughRoutine.launch()
-                                     .push(exceptionRoutine4.runAsyn("test"))
+                                     .pass(exceptionRoutine4.invokeAsyn("test"))
+                                     .close()
+                                     .readAll()).containsExactly("test");
+        assertThat(passThroughRoutine.launchPar().pass(exceptionRoutine4.invokeAsyn("test"))
+                                     .close().readAll()).containsExactly("test");
+        assertThat(passThroughRoutine.launch().pass(exceptionRoutine4.invokeAsyn("test")).close()
+                                     .iterator()
+                                     .next()).isEqualTo("test");
+        assertThat(passThroughRoutine.launchAsyn().pass(exceptionRoutine4.invokeAsyn("test"))
                                      .close()
                                      .iterator()
                                      .next()).isEqualTo("test");
-        assertThat(passThroughRoutine.launchAsyn()
-                                     .push(exceptionRoutine4.runAsyn("test"))
-                                     .close()
-                                     .iterator()
-                                     .next()).isEqualTo("test");
-        assertThat(passThroughRoutine.launchPar()
-                                     .push(exceptionRoutine4.runAsyn("test"))
+        assertThat(passThroughRoutine.launchPar().pass(exceptionRoutine4.invokeAsyn("test"))
                                      .close()
                                      .iterator()
                                      .next()).isEqualTo("test");
 
-        assertThat(passThroughRoutine.call(exceptionRoutine4.runPar("test"))).containsExactly(
-                "test");
-        assertThat(passThroughRoutine.callAsyn(exceptionRoutine4.runPar("test"))).containsExactly(
+        assertThat(passThroughRoutine.call(exceptionRoutine4.invokePar("test"))).containsExactly(
                 "test");
         assertThat(
-                passThroughRoutine.run(exceptionRoutine4.runPar("test")).takeAll()).containsExactly(
+                passThroughRoutine.callAsyn(exceptionRoutine4.invokePar("test"))).containsExactly(
                 "test");
-        assertThat(passThroughRoutine.runAsyn(exceptionRoutine4.runPar("test"))
-                                     .takeAll()).containsExactly("test");
-        assertThat(passThroughRoutine.runPar(exceptionRoutine4.runPar("test"))
-                                     .takeAll()).containsExactly("test");
-        assertThat(passThroughRoutine.run(exceptionRoutine4.runPar("test"))
+        assertThat(passThroughRoutine.invoke(exceptionRoutine4.invokePar("test"))
+                                     .readAll()).containsExactly("test");
+        assertThat(passThroughRoutine.invokeAsyn(exceptionRoutine4.invokePar("test"))
+                                     .readAll()).containsExactly("test");
+        assertThat(passThroughRoutine.invokePar(exceptionRoutine4.invokePar("test"))
+                                     .readAll()).containsExactly("test");
+        assertThat(passThroughRoutine.invoke(exceptionRoutine4.invokePar("test"))
                                      .iterator()
                                      .next()).isEqualTo("test");
-        assertThat(passThroughRoutine.runAsyn(exceptionRoutine4.runPar("test"))
+        assertThat(passThroughRoutine.invokeAsyn(exceptionRoutine4.invokePar("test"))
                                      .iterator()
                                      .next()).isEqualTo("test");
-        assertThat(passThroughRoutine.runPar(exceptionRoutine4.runPar("test"))
+        assertThat(passThroughRoutine.invokePar(exceptionRoutine4.invokePar("test"))
                                      .iterator()
                                      .next()).isEqualTo("test");
         assertThat(passThroughRoutine.launch()
-                                     .push(exceptionRoutine4.runPar("test"))
+                                     .pass(exceptionRoutine4.invokePar("test"))
                                      .close()
-                                     .takeAll()).containsExactly("test");
-        assertThat(passThroughRoutine.launchAsyn()
-                                     .push(exceptionRoutine4.runPar("test"))
-                                     .close().takeAll()).containsExactly("test");
+                                     .readAll()).containsExactly("test");
+        assertThat(passThroughRoutine.launchAsyn().pass(exceptionRoutine4.invokePar("test"))
+                                     .close().readAll()).containsExactly("test");
         assertThat(passThroughRoutine.launchPar()
-                                     .push(exceptionRoutine4.runPar("test"))
+                                     .pass(exceptionRoutine4.invokePar("test"))
                                      .close()
-                                     .takeAll()).containsExactly("test");
-        assertThat(passThroughRoutine.launchAsyn()
-                                     .push(exceptionRoutine4.runPar("test"))
+                                     .readAll()).containsExactly("test");
+        assertThat(passThroughRoutine.launchAsyn().pass(exceptionRoutine4.invokePar("test"))
                                      .close()
                                      .iterator()
                                      .next()).isEqualTo("test");
-        assertThat(passThroughRoutine.launchPar()
-                                     .push(exceptionRoutine4.runPar("test"))
+        assertThat(passThroughRoutine.launchPar().pass(exceptionRoutine4.invokePar("test"))
                                      .close()
                                      .iterator()
                                      .next()).isEqualTo("test");
 
-        assertThat(exceptionRoutine4.call(passThroughRoutine.run("test"))).containsExactly("test");
-        assertThat(exceptionRoutine4.callAsyn(passThroughRoutine.run("test"))).containsExactly(
+        assertThat(exceptionRoutine4.call(passThroughRoutine.invoke("test"))).containsExactly(
                 "test");
-        assertThat(exceptionRoutine4.run(passThroughRoutine.run("test")).takeAll()).containsExactly(
+        assertThat(exceptionRoutine4.callAsyn(passThroughRoutine.invoke("test"))).containsExactly(
                 "test");
-        assertThat(exceptionRoutine4.runAsyn(passThroughRoutine.run("test"))
-                                    .takeAll()).containsExactly("test");
-        assertThat(
-                exceptionRoutine4.runPar(passThroughRoutine.run("test")).takeAll()).containsExactly(
+        assertThat(exceptionRoutine4.invoke(passThroughRoutine.invoke("test"))
+                                    .readAll()).containsExactly(
                 "test");
-        assertThat(
-                exceptionRoutine4.run(passThroughRoutine.run("test")).iterator().next()).isEqualTo(
+        assertThat(exceptionRoutine4.invokeAsyn(passThroughRoutine.invoke("test"))
+                                    .readAll()).containsExactly("test");
+        assertThat(exceptionRoutine4.invokePar(passThroughRoutine.invoke("test"))
+                                    .readAll()).containsExactly(
                 "test");
-        assertThat(exceptionRoutine4.runAsyn(passThroughRoutine.run("test"))
-                                    .iterator()
+        assertThat(exceptionRoutine4.invoke(passThroughRoutine.invoke("test"))
+                                    .iterator().next()).isEqualTo("test");
+        assertThat(exceptionRoutine4.invokeAsyn(passThroughRoutine.invoke("test")).iterator()
                                     .next()).isEqualTo("test");
-        assertThat(exceptionRoutine4.runPar(passThroughRoutine.run("test"))
+        assertThat(exceptionRoutine4.invokePar(passThroughRoutine.invoke("test"))
                                     .iterator()
                                     .next()).isEqualTo("test");
         assertThat(exceptionRoutine4.launch()
-                                    .push(passThroughRoutine.run("test"))
-                                    .close().takeAll()).containsExactly("test");
-        assertThat(exceptionRoutine4.launchAsyn()
-                                    .push(passThroughRoutine.run("test"))
-                                    .close().takeAll()).containsExactly("test");
-        assertThat(exceptionRoutine4.launchPar()
-                                    .push(passThroughRoutine.run("test"))
+                                    .pass(passThroughRoutine.invoke("test"))
                                     .close()
-                                    .takeAll()).containsExactly("test");
-        assertThat(exceptionRoutine4.launch()
-                                    .push(passThroughRoutine.run("test"))
+                                    .readAll()).containsExactly("test");
+        assertThat(exceptionRoutine4.launchAsyn().pass(passThroughRoutine.invoke("test"))
+                                    .close().readAll()).containsExactly("test");
+        assertThat(exceptionRoutine4.launchPar()
+                                    .pass(passThroughRoutine.invoke("test"))
+                                    .close()
+                                    .readAll()).containsExactly("test");
+        assertThat(exceptionRoutine4.launch().pass(passThroughRoutine.invoke("test"))
                                     .close()
                                     .iterator()
                                     .next()).isEqualTo("test");
-        assertThat(exceptionRoutine4.launchAsyn()
-                                    .push(passThroughRoutine.run("test"))
+        assertThat(exceptionRoutine4.launchAsyn().pass(passThroughRoutine.invoke("test"))
                                     .close()
                                     .iterator()
                                     .next()).isEqualTo("test");
-        assertThat(exceptionRoutine4.launchPar()
-                                    .push(passThroughRoutine.run("test"))
+        assertThat(exceptionRoutine4.launchPar().pass(passThroughRoutine.invoke("test"))
                                     .close()
                                     .iterator()
                                     .next()).isEqualTo("test");
 
-        assertThat(exceptionRoutine4.call(passThroughRoutine.runAsyn("test"))).containsExactly(
+        assertThat(exceptionRoutine4.call(passThroughRoutine.invokeAsyn("test"))).containsExactly(
                 "test");
-        assertThat(exceptionRoutine4.callAsyn(passThroughRoutine.runAsyn("test"))).containsExactly(
+        assertThat(
+                exceptionRoutine4.callAsyn(passThroughRoutine.invokeAsyn("test"))).containsExactly(
                 "test");
-        assertThat(exceptionRoutine4.run(passThroughRoutine.runAsyn("test"))
-                                    .takeAll()).containsExactly("test");
-        assertThat(exceptionRoutine4.runAsyn(passThroughRoutine.runAsyn("test"))
-                                    .takeAll()).containsExactly("test");
-        assertThat(exceptionRoutine4.runPar(passThroughRoutine.runAsyn("test"))
-                                    .takeAll()).containsExactly("test");
-        assertThat(exceptionRoutine4.run(passThroughRoutine.runAsyn("test"))
+        assertThat(exceptionRoutine4.invoke(passThroughRoutine.invokeAsyn("test"))
+                                    .readAll()).containsExactly("test");
+        assertThat(exceptionRoutine4.invokeAsyn(passThroughRoutine.invokeAsyn("test"))
+                                    .readAll()).containsExactly("test");
+        assertThat(exceptionRoutine4.invokePar(passThroughRoutine.invokeAsyn("test"))
+                                    .readAll()).containsExactly("test");
+        assertThat(exceptionRoutine4.invoke(passThroughRoutine.invokeAsyn("test"))
                                     .iterator()
                                     .next()).isEqualTo("test");
-        assertThat(exceptionRoutine4.runAsyn(passThroughRoutine.runAsyn("test"))
+        assertThat(exceptionRoutine4.invokeAsyn(passThroughRoutine.invokeAsyn("test"))
                                     .iterator()
                                     .next()).isEqualTo("test");
-        assertThat(exceptionRoutine4.runPar(passThroughRoutine.runAsyn("test"))
+        assertThat(exceptionRoutine4.invokePar(passThroughRoutine.invokeAsyn("test"))
                                     .iterator()
                                     .next()).isEqualTo("test");
         assertThat(exceptionRoutine4.launch()
-                                    .push(passThroughRoutine.runAsyn("test"))
-                                    .close().takeAll()).containsExactly("test");
+                                    .pass(passThroughRoutine.invokeAsyn("test"))
+                                    .close()
+                                    .readAll()).containsExactly("test");
         assertThat(exceptionRoutine4.launchAsyn()
-                                    .push(passThroughRoutine.runAsyn("test"))
-                                    .close().takeAll()).containsExactly("test");
-        assertThat(exceptionRoutine4.launchPar()
-                                    .push(passThroughRoutine.runAsyn("test"))
-                                    .close().takeAll()).containsExactly("test");
-        assertThat(exceptionRoutine4.launch()
-                                    .push(passThroughRoutine.runAsyn("test"))
+                                    .pass(passThroughRoutine.invokeAsyn("test"))
+                                    .close()
+                                    .readAll()).containsExactly("test");
+        assertThat(exceptionRoutine4.launchPar().pass(passThroughRoutine.invokeAsyn("test"))
+                                    .close().readAll()).containsExactly("test");
+        assertThat(exceptionRoutine4.launch().pass(passThroughRoutine.invokeAsyn("test")).close()
+                                    .iterator()
+                                    .next()).isEqualTo("test");
+        assertThat(exceptionRoutine4.launchAsyn().pass(passThroughRoutine.invokeAsyn("test"))
                                     .close()
                                     .iterator()
                                     .next()).isEqualTo("test");
-        assertThat(exceptionRoutine4.launchAsyn()
-                                    .push(passThroughRoutine.runAsyn("test"))
-                                    .close()
-                                    .iterator()
-                                    .next()).isEqualTo("test");
-        assertThat(exceptionRoutine4.launchPar()
-                                    .push(passThroughRoutine.runAsyn("test"))
+        assertThat(exceptionRoutine4.launchPar().pass(passThroughRoutine.invokeAsyn("test"))
                                     .close()
                                     .iterator()
                                     .next()).isEqualTo("test");
 
-        assertThat(exceptionRoutine4.call(passThroughRoutine.runPar("test"))).containsExactly(
-                "test");
-        assertThat(exceptionRoutine4.callAsyn(passThroughRoutine.runPar("test"))).containsExactly(
+        assertThat(exceptionRoutine4.call(passThroughRoutine.invokePar("test"))).containsExactly(
                 "test");
         assertThat(
-                exceptionRoutine4.run(passThroughRoutine.runPar("test")).takeAll()).containsExactly(
+                exceptionRoutine4.callAsyn(passThroughRoutine.invokePar("test"))).containsExactly(
                 "test");
-        assertThat(exceptionRoutine4.runAsyn(passThroughRoutine.runPar("test"))
-                                    .takeAll()).containsExactly("test");
-        assertThat(exceptionRoutine4.runPar(passThroughRoutine.runPar("test"))
-                                    .takeAll()).containsExactly("test");
-        assertThat(exceptionRoutine4.run(passThroughRoutine.runPar("test"))
+        assertThat(exceptionRoutine4.invoke(passThroughRoutine.invokePar("test"))
+                                    .readAll()).containsExactly("test");
+        assertThat(exceptionRoutine4.invokeAsyn(passThroughRoutine.invokePar("test"))
+                                    .readAll()).containsExactly("test");
+        assertThat(exceptionRoutine4.invokePar(passThroughRoutine.invokePar("test"))
+                                    .readAll()).containsExactly("test");
+        assertThat(exceptionRoutine4.invoke(passThroughRoutine.invokePar("test"))
                                     .iterator()
                                     .next()).isEqualTo("test");
-        assertThat(exceptionRoutine4.runAsyn(passThroughRoutine.runPar("test"))
+        assertThat(exceptionRoutine4.invokeAsyn(passThroughRoutine.invokePar("test"))
                                     .iterator()
                                     .next()).isEqualTo("test");
-        assertThat(exceptionRoutine4.runPar(passThroughRoutine.runPar("test"))
+        assertThat(exceptionRoutine4.invokePar(passThroughRoutine.invokePar("test"))
                                     .iterator()
                                     .next()).isEqualTo("test");
         assertThat(exceptionRoutine4.launch()
-                                    .push(passThroughRoutine.runPar("test"))
+                                    .pass(passThroughRoutine.invokePar("test"))
                                     .close()
-                                    .takeAll()).containsExactly("test");
-        assertThat(exceptionRoutine4.launchAsyn()
-                                    .push(passThroughRoutine.runPar("test"))
-                                    .close().takeAll()).containsExactly("test");
+                                    .readAll()).containsExactly("test");
+        assertThat(exceptionRoutine4.launchAsyn().pass(passThroughRoutine.invokePar("test"))
+                                    .close().readAll()).containsExactly("test");
         assertThat(exceptionRoutine4.launchPar()
-                                    .push(passThroughRoutine.runPar("test"))
+                                    .pass(passThroughRoutine.invokePar("test"))
                                     .close()
-                                    .takeAll()).containsExactly("test");
-        assertThat(exceptionRoutine4.launch()
-                                    .push(passThroughRoutine.runPar("test"))
+                                    .readAll()).containsExactly("test");
+        assertThat(exceptionRoutine4.launch().pass(passThroughRoutine.invokePar("test"))
                                     .close()
                                     .iterator()
                                     .next()).isEqualTo("test");
-        assertThat(exceptionRoutine4.launchAsyn()
-                                    .push(passThroughRoutine.runPar("test"))
+        assertThat(exceptionRoutine4.launchAsyn().pass(passThroughRoutine.invokePar("test"))
                                     .close()
                                     .iterator()
                                     .next()).isEqualTo("test");
-        assertThat(exceptionRoutine4.launchPar()
-                                    .push(passThroughRoutine.runPar("test"))
+        assertThat(exceptionRoutine4.launchPar().pass(passThroughRoutine.invokePar("test"))
                                     .close()
                                     .iterator()
                                     .next()).isEqualTo("test");
@@ -440,17 +423,17 @@ public class RoutineTest extends TestCase {
                             sum += integer;
                         }
 
-                        results.push(sum);
+                        results.pass(sum);
                     }
                 };
 
         final Routine<Integer, Integer> sumRoutine =
-                jrt().routineOf(Classification.of(sumSubRoutine), this);
+                jrt().withArgs(this).routineOf(Classification.of(sumSubRoutine));
 
         assertThat(sumRoutine.call(1, 2, 3, 4)).containsExactly(10);
         assertThat(sumRoutine.callAsyn(1, 2, 3, 4)).containsExactly(10);
-        assertThat(sumRoutine.run(1, 2, 3, 4).takeAll()).containsExactly(10);
-        assertThat(sumRoutine.runAsyn(1, 2, 3, 4).takeAll()).containsExactly(10);
+        assertThat(sumRoutine.invoke(1, 2, 3, 4).readAll()).containsExactly(10);
+        assertThat(sumRoutine.invokeAsyn(1, 2, 3, 4).readAll()).containsExactly(10);
 
         final SubRoutineAdapter<Integer, Integer> squareSubRoutine =
                 new SubRoutineAdapter<Integer, Integer>() {
@@ -461,29 +444,36 @@ public class RoutineTest extends TestCase {
 
                         final int input = integer;
 
-                        results.push(input * input);
+                        results.pass(input * input);
                     }
                 };
 
         final Routine<Integer, Integer> squareRoutine =
-                jrt().routineOf(Classification.of(squareSubRoutine), this);
+                jrt().withArgs(this).routineOf(Classification.of(squareSubRoutine));
 
-        assertThat(sumRoutine.call(squareRoutine.run(1, 2, 3, 4))).containsExactly(30);
-        assertThat(sumRoutine.callAsyn(squareRoutine.run(1, 2, 3, 4))).containsExactly(30);
-        assertThat(sumRoutine.run(squareRoutine.run(1, 2, 3, 4)).takeAll()).containsExactly(30);
-        assertThat(sumRoutine.runAsyn(squareRoutine.run(1, 2, 3, 4)).takeAll()).containsExactly(30);
-
-        assertThat(sumRoutine.call(squareRoutine.runAsyn(1, 2, 3, 4))).containsExactly(30);
-        assertThat(sumRoutine.callAsyn(squareRoutine.runAsyn(1, 2, 3, 4))).containsExactly(30);
-        assertThat(sumRoutine.run(squareRoutine.runAsyn(1, 2, 3, 4)).takeAll()).containsExactly(30);
-        assertThat(sumRoutine.runAsyn(squareRoutine.runAsyn(1, 2, 3, 4)).takeAll()).containsExactly(
+        assertThat(sumRoutine.call(squareRoutine.invoke(1, 2, 3, 4))).containsExactly(30);
+        assertThat(sumRoutine.callAsyn(squareRoutine.invoke(1, 2, 3, 4))).containsExactly(30);
+        assertThat(sumRoutine.invoke(squareRoutine.invoke(1, 2, 3, 4)).readAll()).containsExactly(
+                30);
+        assertThat(
+                sumRoutine.invokeAsyn(squareRoutine.invoke(1, 2, 3, 4)).readAll()).containsExactly(
                 30);
 
-        assertThat(sumRoutine.call(squareRoutine.runPar(1, 2, 3, 4))).containsExactly(30);
-        assertThat(sumRoutine.callAsyn(squareRoutine.runPar(1, 2, 3, 4))).containsExactly(30);
-        assertThat(sumRoutine.run(squareRoutine.runPar(1, 2, 3, 4)).takeAll()).containsExactly(30);
-        assertThat(sumRoutine.runAsyn(squareRoutine.runPar(1, 2, 3, 4)).takeAll()).containsExactly(
+        assertThat(sumRoutine.call(squareRoutine.invokeAsyn(1, 2, 3, 4))).containsExactly(30);
+        assertThat(sumRoutine.callAsyn(squareRoutine.invokeAsyn(1, 2, 3, 4))).containsExactly(30);
+        assertThat(
+                sumRoutine.invoke(squareRoutine.invokeAsyn(1, 2, 3, 4)).readAll()).containsExactly(
                 30);
+        assertThat(sumRoutine.invokeAsyn(squareRoutine.invokeAsyn(1, 2, 3, 4))
+                             .readAll()).containsExactly(30);
+
+        assertThat(sumRoutine.call(squareRoutine.invokePar(1, 2, 3, 4))).containsExactly(30);
+        assertThat(sumRoutine.callAsyn(squareRoutine.invokePar(1, 2, 3, 4))).containsExactly(30);
+        assertThat(
+                sumRoutine.invoke(squareRoutine.invokePar(1, 2, 3, 4)).readAll()).containsExactly(
+                30);
+        assertThat(sumRoutine.invokeAsyn(squareRoutine.invokePar(1, 2, 3, 4))
+                             .readAll()).containsExactly(30);
 
         final SubRoutineAdapter<Integer, Integer> squareSumSubRoutine =
                 new SubRoutineAdapter<Integer, Integer>() {
@@ -500,7 +490,7 @@ public class RoutineTest extends TestCase {
                     public void onInput(final Integer integer,
                             final ResultChannel<Integer> results) {
 
-                        mChannel.push(squareRoutine.runAsyn(integer));
+                        mChannel.pass(squareRoutine.invokeAsyn(integer));
                     }
 
                     @Override
@@ -512,18 +502,18 @@ public class RoutineTest extends TestCase {
                     @Override
                     public void onResult(final ResultChannel<Integer> results) {
 
-                        results.push(mChannel.close());
+                        results.pass(mChannel.close());
                     }
                 };
 
         final Routine<Integer, Integer> squareSumRoutine =
-                jrt().routineOf(Classification.of(squareSumSubRoutine), this, sumRoutine,
-                                squareRoutine);
+                jrt().withArgs(this, sumRoutine, squareRoutine)
+                     .routineOf(Classification.of(squareSumSubRoutine));
 
         assertThat(squareSumRoutine.call(1, 2, 3, 4)).containsExactly(30);
         assertThat(squareSumRoutine.callAsyn(1, 2, 3, 4)).containsExactly(30);
-        assertThat(squareSumRoutine.run(1, 2, 3, 4).takeAll()).containsExactly(30);
-        assertThat(squareSumRoutine.runAsyn(1, 2, 3, 4).takeAll()).containsExactly(30);
+        assertThat(squareSumRoutine.invoke(1, 2, 3, 4).readAll()).containsExactly(30);
+        assertThat(squareSumRoutine.invokeAsyn(1, 2, 3, 4).readAll()).containsExactly(30);
     }
 
     private void testChained(final Routine<String, String> before,
@@ -531,7 +521,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.call(after.run(input));
+            before.call(after.invoke(input));
 
             fail();
 
@@ -542,7 +532,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.callAsyn(after.run(input));
+            before.callAsyn(after.invoke(input));
 
             fail();
 
@@ -553,7 +543,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.run(after.run(input)).takeAll();
+            before.invoke(after.invoke(input)).readAll();
 
             fail();
 
@@ -564,7 +554,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.run(after.run(input)).iterator().next();
+            before.invoke(after.invoke(input)).iterator().next();
 
             fail();
 
@@ -575,7 +565,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.runAsyn(after.run(input)).takeAll();
+            before.invokeAsyn(after.invoke(input)).readAll();
 
             fail();
 
@@ -586,7 +576,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.runAsyn(after.run(input)).iterator().next();
+            before.invokeAsyn(after.invoke(input)).iterator().next();
 
             fail();
 
@@ -597,7 +587,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.runPar(after.run(input)).takeAll();
+            before.invokePar(after.invoke(input)).readAll();
 
             fail();
 
@@ -608,7 +598,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.runPar(after.run(input)).iterator().next();
+            before.invokePar(after.invoke(input)).iterator().next();
 
             fail();
 
@@ -619,7 +609,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.launch().push(after.run(input)).close().takeAll();
+            before.launch().pass(after.invoke(input)).close().readAll();
 
             fail();
 
@@ -630,7 +620,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.launch().push(after.run(input)).close().iterator().next();
+            before.launch().pass(after.invoke(input)).close().iterator().next();
 
             fail();
 
@@ -641,7 +631,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.launchAsyn().push(after.run(input)).close().takeAll();
+            before.launchAsyn().pass(after.invoke(input)).close().readAll();
 
             fail();
 
@@ -652,7 +642,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.launchAsyn().push(after.run(input)).close().iterator().next();
+            before.launchAsyn().pass(after.invoke(input)).close().iterator().next();
 
             fail();
 
@@ -663,7 +653,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.launchPar().push(after.run(input)).close().takeAll();
+            before.launchPar().pass(after.invoke(input)).close().readAll();
 
             fail();
 
@@ -674,7 +664,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.launchPar().push(after.run(input)).close().iterator().next();
+            before.launchPar().pass(after.invoke(input)).close().iterator().next();
 
             fail();
 
@@ -685,7 +675,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.call(after.runAsyn(input));
+            before.call(after.invokeAsyn(input));
 
             fail();
 
@@ -696,7 +686,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.callAsyn(after.runAsyn(input));
+            before.callAsyn(after.invokeAsyn(input));
 
             fail();
 
@@ -707,7 +697,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.run(after.runAsyn(input)).takeAll();
+            before.invoke(after.invokeAsyn(input)).readAll();
 
             fail();
 
@@ -718,7 +708,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.run(after.runAsyn(input)).iterator().next();
+            before.invoke(after.invokeAsyn(input)).iterator().next();
 
             fail();
 
@@ -729,7 +719,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.runAsyn(after.runAsyn(input)).takeAll();
+            before.invokeAsyn(after.invokeAsyn(input)).readAll();
 
             fail();
 
@@ -740,7 +730,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.runAsyn(after.runAsyn(input)).iterator().next();
+            before.invokeAsyn(after.invokeAsyn(input)).iterator().next();
 
             fail();
 
@@ -751,7 +741,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.launch().push(after.runAsyn(input)).close().takeAll();
+            before.launch().pass(after.invokeAsyn(input)).close().readAll();
 
             fail();
 
@@ -762,7 +752,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.launch().push(after.runAsyn(input)).close().iterator().next();
+            before.launch().pass(after.invokeAsyn(input)).close().iterator().next();
 
             fail();
 
@@ -773,7 +763,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.launchAsyn().push(after.runAsyn(input)).close().takeAll();
+            before.launchAsyn().pass(after.invokeAsyn(input)).close().readAll();
 
             fail();
 
@@ -784,7 +774,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.launchAsyn().push(after.runAsyn(input)).close().iterator().next();
+            before.launchAsyn().pass(after.invokeAsyn(input)).close().iterator().next();
 
             fail();
 
@@ -795,7 +785,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.call(after.runPar(input));
+            before.call(after.invokePar(input));
 
             fail();
 
@@ -806,7 +796,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.callAsyn(after.runPar(input));
+            before.callAsyn(after.invokePar(input));
 
             fail();
 
@@ -817,7 +807,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.run(after.runPar(input)).takeAll();
+            before.invoke(after.invokePar(input)).readAll();
 
             fail();
 
@@ -828,7 +818,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.run(after.runPar(input)).iterator().next();
+            before.invoke(after.invokePar(input)).iterator().next();
 
             fail();
 
@@ -839,7 +829,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.runAsyn(after.runPar(input)).takeAll();
+            before.invokeAsyn(after.invokePar(input)).readAll();
 
             fail();
 
@@ -850,7 +840,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.runAsyn(after.runPar(input)).iterator().next();
+            before.invokeAsyn(after.invokePar(input)).iterator().next();
 
             fail();
 
@@ -861,7 +851,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.launch().push(after.runPar(input)).close().takeAll();
+            before.launch().pass(after.invokePar(input)).close().readAll();
 
             fail();
 
@@ -872,7 +862,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.launch().push(after.runPar(input)).close().iterator().next();
+            before.launch().pass(after.invokePar(input)).close().iterator().next();
 
             fail();
 
@@ -883,7 +873,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.launchAsyn().push(after.runPar(input)).close().takeAll();
+            before.launchAsyn().pass(after.invokePar(input)).close().readAll();
 
             fail();
 
@@ -894,7 +884,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.launchAsyn().push(after.runPar(input)).close().iterator().next();
+            before.launchAsyn().pass(after.invokePar(input)).close().iterator().next();
 
             fail();
 
@@ -907,16 +897,16 @@ public class RoutineTest extends TestCase {
     private void testConsumer(final ResultConsumer<String> consumer) {
 
         final String input = "test";
-        final Routine<String, String> routine =
-                jrt().routineOf(Classification.ofType(DelaySubRoutine.class),
-                                TimeDuration.millis(0));
+        final Routine<String, String> routine = jrt().withArgs(TimeDuration.millis(0))
+                                                     .routineOf(Classification.ofType(
+                                                             DelaySubRoutine.class));
 
-        assertThat(routine.run(input).bind(consumer).waitDone()).isTrue();
-        assertThat(routine.runAsyn(input).bind(consumer).waitDone()).isTrue();
-        assertThat(routine.runPar(input).bind(consumer).waitDone()).isTrue();
-        assertThat(routine.launch().push(input).close().bind(consumer).waitDone()).isTrue();
-        assertThat(routine.launchAsyn().push(input).close().bind(consumer).waitDone()).isTrue();
-        assertThat(routine.launchPar().push(input).close().bind(consumer).waitDone()).isTrue();
+        assertThat(routine.invoke(input).bind(consumer).waitDone()).isTrue();
+        assertThat(routine.invokeAsyn(input).bind(consumer).waitDone()).isTrue();
+        assertThat(routine.invokePar(input).bind(consumer).waitDone()).isTrue();
+        assertThat(routine.launch().pass(input).close().bind(consumer).waitDone()).isTrue();
+        assertThat(routine.launchAsyn().pass(input).close().bind(consumer).waitDone()).isTrue();
+        assertThat(routine.launchPar().pass(input).close().bind(consumer).waitDone()).isTrue();
     }
 
     private void testException(final Routine<String, String> routine, final String input,
@@ -946,7 +936,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            routine.run(input).takeAll();
+            routine.invoke(input).readAll();
 
             fail();
 
@@ -957,7 +947,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            routine.run(input).iterator().next();
+            routine.invoke(input).iterator().next();
 
             fail();
 
@@ -968,7 +958,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            routine.runAsyn(input).takeAll();
+            routine.invokeAsyn(input).readAll();
 
             fail();
 
@@ -979,7 +969,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            routine.runAsyn(input).iterator().next();
+            routine.invokeAsyn(input).iterator().next();
 
             fail();
 
@@ -990,7 +980,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            routine.runPar(input).takeAll();
+            routine.invokePar(input).readAll();
 
             fail();
 
@@ -1001,7 +991,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            routine.runPar(input).iterator().next();
+            routine.invokePar(input).iterator().next();
 
             fail();
 
@@ -1012,7 +1002,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            routine.launch().push(input).close().takeAll();
+            routine.launch().pass(input).close().readAll();
 
             fail();
 
@@ -1023,7 +1013,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            routine.launch().push(input).close().iterator().next();
+            routine.launch().pass(input).close().iterator().next();
 
             fail();
 
@@ -1034,7 +1024,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            routine.launchAsyn().push(input).close().takeAll();
+            routine.launchAsyn().pass(input).close().readAll();
 
             fail();
 
@@ -1045,7 +1035,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            routine.launchAsyn().push(input).close().iterator().next();
+            routine.launchAsyn().pass(input).close().iterator().next();
 
             fail();
 
@@ -1056,7 +1046,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            routine.launchPar().push(input).close().takeAll();
+            routine.launchPar().pass(input).close().readAll();
 
             fail();
 
@@ -1067,7 +1057,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            routine.launchPar().push(input).close().iterator().next();
+            routine.launchPar().pass(input).close().iterator().next();
 
             fail();
 
@@ -1089,7 +1079,7 @@ public class RoutineTest extends TestCase {
         @Override
         public void onInput(final String s, final ResultChannel<String> results) {
 
-            results.after(mDelay).push(s);
+            results.after(mDelay).pass(s);
         }
     }
 
@@ -1098,7 +1088,7 @@ public class RoutineTest extends TestCase {
         @Override
         public void onInput(final String s, final ResultChannel<String> results) {
 
-            results.push(s);
+            results.pass(s);
         }
     }
 }

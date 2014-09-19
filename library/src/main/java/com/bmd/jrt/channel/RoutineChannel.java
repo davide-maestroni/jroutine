@@ -26,13 +26,13 @@ public interface RoutineChannel<INPUT, OUTPUT> extends InputChannel<INPUT> {
 
     public RoutineChannel<INPUT, OUTPUT> after(long delay, TimeUnit timeUnit);
 
-    public RoutineChannel<INPUT, OUTPUT> push(OutputChannel<INPUT> channel);
+    public RoutineChannel<INPUT, OUTPUT> pass(OutputChannel<INPUT> channel);
 
-    public RoutineChannel<INPUT, OUTPUT> push(Iterable<? extends INPUT> inputs);
+    public RoutineChannel<INPUT, OUTPUT> pass(Iterable<? extends INPUT> inputs);
 
-    public RoutineChannel<INPUT, OUTPUT> push(INPUT input);
+    public RoutineChannel<INPUT, OUTPUT> pass(INPUT input);
 
-    public RoutineChannel<INPUT, OUTPUT> push(INPUT... inputs);
+    public RoutineChannel<INPUT, OUTPUT> pass(INPUT... inputs);
 
     public OutputChannel<OUTPUT> close();
 }

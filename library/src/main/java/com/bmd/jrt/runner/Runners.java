@@ -18,7 +18,9 @@ package com.bmd.jrt.runner;
  */
 public class Runners {
 
-    private static final SyncRunner sSyncRunner = new SyncRunner();
+    private static final QueuedRunner sQueuedRunner = new QueuedRunner();
+
+    private static final SequentialRunner sSequentialRunner = new SequentialRunner();
 
     private static volatile Runner sSharedRunner;
 
@@ -39,19 +41,24 @@ public class Runners {
         return new ThreadPoolRunner(poolSize);
     }
 
+    public static Runner queued() {
+
+        return sQueuedRunner;
+    }
+
+    public static Runner sequential() {
+
+        return sSequentialRunner;
+    }
+
     public static Runner shared() {
 
         if (sSharedRunner == null) {
 
-            sSharedRunner = Runners.pool();
+            sSharedRunner = pool();
         }
 
         return sSharedRunner;
-    }
-
-    public static Runner sync() {
-
-        return sSyncRunner;
     }
 
     private static int getBestPoolSize() {

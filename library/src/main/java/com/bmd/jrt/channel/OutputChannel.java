@@ -33,9 +33,9 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
 
     public OutputChannel<OUTPUT> immediately();
 
-    public List<OUTPUT> takeAll();
+    public List<OUTPUT> readAll();
 
-    public OutputChannel<OUTPUT> takeAllInto(List<OUTPUT> results);
+    public OutputChannel<OUTPUT> readAllInto(List<OUTPUT> results);
 
     public boolean waitDone();
 }

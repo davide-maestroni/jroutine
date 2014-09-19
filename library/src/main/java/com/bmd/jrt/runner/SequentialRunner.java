@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by davide on 9/9/14.
  */
-class SyncRunner implements Runner {
+class SequentialRunner implements Runner {
 
     @Override
     public void onInput(final Call call, final long delay, final TimeUnit timeUnit) {
@@ -34,9 +34,7 @@ class SyncRunner implements Runner {
 
         } catch (final InterruptedException e) {
 
-            Thread.currentThread().interrupt();
-
-            throw new RoutineInterruptedException(e);
+            RoutineInterruptedException.interrupt(e);
         }
     }
 

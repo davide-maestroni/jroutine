@@ -40,18 +40,18 @@ public abstract class SubRoutineFunction<INPUT, OUTPUT> extends SubRoutineAdapte
     public void onResult(final ResultChannel<OUTPUT> results) {
 
         final ArrayList<INPUT> inputs = mInputs;
-        final ArrayList<INPUT> copy;
+        final ArrayList<INPUT> clone;
 
         if (inputs == null) {
 
-            copy = new ArrayList<INPUT>(0);
+            clone = new ArrayList<INPUT>(0);
 
         } else {
 
-            copy = new ArrayList<INPUT>(inputs);
+            clone = new ArrayList<INPUT>(inputs);
         }
 
-        onRun(copy, results);
+        onRun(clone, results);
     }
 
     @Override

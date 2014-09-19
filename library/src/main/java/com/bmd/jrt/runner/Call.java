@@ -18,8 +18,6 @@ package com.bmd.jrt.runner;
  */
 public interface Call {
 
-    //TODO: onRun(boolean) ?
-
     public void onInput();
 
     public void onReset();

@@ -37,7 +37,7 @@ class ParallelSubRoutine<INPUT, OUTPUT> extends SubRoutineAdapter<INPUT, OUTPUT>
     @Override
     public void onInput(final INPUT input, final ResultChannel<OUTPUT> results) {
 
-        results.push(mRoutine.runAsyn(input));
+        results.pass(mRoutine.invokeAsyn(input));
     }
 
     @Override

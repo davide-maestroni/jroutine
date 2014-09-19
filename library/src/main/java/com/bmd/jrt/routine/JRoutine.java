@@ -18,6 +18,8 @@ import com.bmd.jrt.runner.Runners;
 import com.bmd.jrt.subroutine.SubRoutine;
 import com.bmd.jrt.util.Classification;
 
+import static com.bmd.jrt.routine.ReflectionUtils.NO_ARGS;
+
 /**
  * Created by davide on 9/7/14.
  */
@@ -25,13 +27,23 @@ public class JRoutine {
 
     private static final int DEFAULT_RETAIN_COUNT = 10;
 
+    private final Object[] mArgs;
+
+    private final Runner mAsyncRunner;
+
     private final int mMaxRetained;
 
-    private final Runner mRunner;
+    private final Runner mSyncRunner;
 
-    private JRoutine(final Runner runner, final int maxRetained) {
+    private JRoutine(final Runner syncRunner, final Runner asyncRunner, final int maxRetained,
+            final Object[] args) {
 
-        if (runner == null) {
+        if (syncRunner == null) {
+
+            throw new IllegalArgumentException();
+        }
+
+        if (asyncRunner == null) {
 
             throw new IllegalArgumentException();
         }
@@ -41,35 +53,56 @@ public class JRoutine {
             throw new IllegalArgumentException();
         }
 
-        mRunner = runner;
+        mSyncRunner = syncRunner;
+        mAsyncRunner = asyncRunner;
         mMaxRetained = maxRetained;
+        mArgs = args;
     }
 
     public static JRoutine jrt() {
 
-        return new JRoutine(Runners.shared(), DEFAULT_RETAIN_COUNT);
+        return new JRoutine(Runners.queued(), Runners.shared(), DEFAULT_RETAIN_COUNT, NO_ARGS);
     }
 
     public JRoutine inside(final Runner runner) {
 
-        return new JRoutine(runner, mMaxRetained);
+        return new JRoutine(mSyncRunner, runner, mMaxRetained, mArgs);
     }
 
     public JRoutine maxRetained(final int maxRetainedInstances) {
 
-        return new JRoutine(mRunner, maxRetainedInstances);
+        return new JRoutine(mSyncRunner, mAsyncRunner, maxRetainedInstances, mArgs);
+    }
+
+    public JRoutine queued() {
+
+        return new JRoutine(Runners.queued(), mAsyncRunner, mMaxRetained, mArgs);
     }
 
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> routineOf(
-            final Classification<? extends SubRoutine<INPUT, OUTPUT>> classification,
-            final Object... ctorArgs) {
+            final Classification<? extends SubRoutine<INPUT, OUTPUT>> classification) {
 
         if (classification == null) {
 
             throw new IllegalArgumentException();
         }
 
-        return new DefaultRoutine<INPUT, OUTPUT>(mRunner, mMaxRetained, classification.getRawType(),
-                                                 ctorArgs);
+        return new DefaultRoutine<INPUT, OUTPUT>(mSyncRunner, mAsyncRunner, mMaxRetained,
+                                                 classification.getRawType(), mArgs);
+    }
+
+    public JRoutine sequential() {
+
+        return new JRoutine(Runners.sequential(), mAsyncRunner, mMaxRetained, mArgs);
+    }
+
+    public JRoutine withArgs(final Object... args) {
+
+        if (args == null) {
+
+            throw new IllegalArgumentException();
+        }
+
+        return new JRoutine(mSyncRunner, mAsyncRunner, mMaxRetained, args.clone());
     }
 }

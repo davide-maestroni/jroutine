@@ -17,7 +17,6 @@ import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.RoutineChannel;
 import com.bmd.jrt.routine.DefaultRoutineChannel.SubRoutineProvider;
 import com.bmd.jrt.runner.Runner;
-import com.bmd.jrt.runner.Runners;
 import com.bmd.jrt.subroutine.SubRoutine;
 
 import java.util.LinkedList;
@@ -28,18 +27,26 @@ import java.util.List;
  */
 public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, OUTPUT> {
 
+    private final Runner mAsyncRunner;
+
     private final int mMaxRetained;
 
     private final Object mMutex = new Object();
 
-    private final Runner mRunner;
+    private final Runner mSyncRunner;
 
     private LinkedList<SubRoutine<INPUT, OUTPUT>> mSubRoutines =
             new LinkedList<SubRoutine<INPUT, OUTPUT>>();
 
-    public AbstractRoutine(final Runner runner, final int maxRetained) {
+    public AbstractRoutine(final Runner syncRunner, final Runner asyncRunner,
+            final int maxRetained) {
 
-        if (runner == null) {
+        if (syncRunner == null) {
+
+            throw new IllegalArgumentException();
+        }
+
+        if (asyncRunner == null) {
 
             throw new IllegalArgumentException();
         }
@@ -49,188 +56,194 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
             throw new IllegalArgumentException();
         }
 
-        mRunner = runner;
+        mSyncRunner = syncRunner;
+        mAsyncRunner = asyncRunner;
         mMaxRetained = maxRetained;
     }
 
     @Override
     public List<OUTPUT> call() {
 
-        return run().takeAll();
+        return invoke().readAll();
     }
 
     @Override
     public List<OUTPUT> call(final INPUT input) {
 
-        return run(input).takeAll();
+        return invoke(input).readAll();
     }
 
     @Override
     public List<OUTPUT> call(final INPUT... inputs) {
 
-        return run(inputs).takeAll();
+        return invoke(inputs).readAll();
     }
 
     @Override
     public List<OUTPUT> call(final Iterable<? extends INPUT> inputs) {
 
-        return run(inputs).takeAll();
+        return invoke(inputs).readAll();
     }
 
     @Override
     public List<OUTPUT> call(final OutputChannel<? extends INPUT> inputs) {
 
-        return run(inputs).takeAll();
+        return invoke(inputs).readAll();
     }
 
     @Override
     public List<OUTPUT> callAsyn() {
 
-        return runAsyn().takeAll();
+        return invokeAsyn().readAll();
     }
 
     @Override
     public List<OUTPUT> callAsyn(final INPUT input) {
 
-        return runAsyn(input).takeAll();
+        return invokeAsyn(input).readAll();
     }
 
     @Override
     public List<OUTPUT> callAsyn(final INPUT... inputs) {
 
-        return runAsyn(inputs).takeAll();
+        return invokeAsyn(inputs).readAll();
     }
 
     @Override
     public List<OUTPUT> callAsyn(final Iterable<? extends INPUT> inputs) {
 
-        return runAsyn(inputs).takeAll();
+        return invokeAsyn(inputs).readAll();
     }
 
     @Override
     public List<OUTPUT> callAsyn(final OutputChannel<? extends INPUT> inputs) {
 
-        return runAsyn(inputs).takeAll();
+        return invokeAsyn(inputs).readAll();
     }
 
     @Override
-    public RoutineChannel<INPUT, OUTPUT> launch() {
-
-        return start(false);
-    }
-
-    @Override
-    public RoutineChannel<INPUT, OUTPUT> launchAsyn() {
-
-        return start(true);
-    }
-
-    @Override
-    public OutputChannel<OUTPUT> run() {
+    public OutputChannel<OUTPUT> invoke() {
 
         return launch().close();
     }
 
     @Override
-    public OutputChannel<OUTPUT> run(final INPUT input) {
+    public OutputChannel<OUTPUT> invoke(final INPUT input) {
 
-        return launch().push(input).close();
+        return launch().pass(input).close();
     }
 
     @Override
-    public OutputChannel<OUTPUT> run(final INPUT... inputs) {
+    public OutputChannel<OUTPUT> invoke(final INPUT... inputs) {
 
-        return launch().push(inputs).close();
+        return launch().pass(inputs).close();
     }
 
     @Override
-    public OutputChannel<OUTPUT> run(final Iterable<? extends INPUT> inputs) {
+    public OutputChannel<OUTPUT> invoke(final Iterable<? extends INPUT> inputs) {
 
-        return launch().push(inputs).close();
+        return launch().pass(inputs).close();
     }
 
     @Override
-    public OutputChannel<OUTPUT> run(final OutputChannel<? extends INPUT> inputs) {
+    public OutputChannel<OUTPUT> invoke(final OutputChannel<? extends INPUT> inputs) {
 
-        return launch().push(inputs).close();
+        return launch().pass(inputs).close();
     }
 
     @Override
-    public OutputChannel<OUTPUT> runAsyn() {
+    public OutputChannel<OUTPUT> invokeAsyn() {
 
         return launchAsyn().close();
     }
 
     @Override
-    public OutputChannel<OUTPUT> runAsyn(final INPUT input) {
+    public OutputChannel<OUTPUT> invokeAsyn(final INPUT input) {
 
-        return launchAsyn().push(input).close();
+        return launchAsyn().pass(input).close();
     }
 
     @Override
-    public OutputChannel<OUTPUT> runAsyn(final INPUT... inputs) {
+    public OutputChannel<OUTPUT> invokeAsyn(final INPUT... inputs) {
 
-        return launchAsyn().push(inputs).close();
+        return launchAsyn().pass(inputs).close();
     }
 
     @Override
-    public OutputChannel<OUTPUT> runAsyn(final Iterable<? extends INPUT> inputs) {
+    public OutputChannel<OUTPUT> invokeAsyn(final Iterable<? extends INPUT> inputs) {
 
-        return launchAsyn().push(inputs).close();
+        return launchAsyn().pass(inputs).close();
     }
 
     @Override
-    public OutputChannel<OUTPUT> runAsyn(final OutputChannel<? extends INPUT> inputs) {
+    public OutputChannel<OUTPUT> invokeAsyn(final OutputChannel<? extends INPUT> inputs) {
 
-        return launchAsyn().push(inputs).close();
+        return launchAsyn().pass(inputs).close();
     }
 
     @Override
-    public OutputChannel<OUTPUT> runPar() {
+    public OutputChannel<OUTPUT> invokePar() {
 
         return launchPar().close();
     }
 
     @Override
-    public OutputChannel<OUTPUT> runPar(final INPUT input) {
+    public OutputChannel<OUTPUT> invokePar(final INPUT input) {
 
-        return launchPar().push(input).close();
+        return launchPar().pass(input).close();
     }
 
     @Override
-    public OutputChannel<OUTPUT> runPar(final INPUT... inputs) {
+    public OutputChannel<OUTPUT> invokePar(final INPUT... inputs) {
 
-        return launchPar().push(inputs).close();
+        return launchPar().pass(inputs).close();
     }
 
     @Override
-    public OutputChannel<OUTPUT> runPar(final Iterable<? extends INPUT> inputs) {
+    public OutputChannel<OUTPUT> invokePar(final Iterable<? extends INPUT> inputs) {
 
-        return launchPar().push(inputs).close();
+        return launchPar().pass(inputs).close();
     }
 
     @Override
-    public OutputChannel<OUTPUT> runPar(final OutputChannel<? extends INPUT> inputs) {
+    public OutputChannel<OUTPUT> invokePar(final OutputChannel<? extends INPUT> inputs) {
 
-        return launchPar().push(inputs).close();
+        return launchPar().pass(inputs).close();
+    }
+
+    @Override
+    public RoutineChannel<INPUT, OUTPUT> launch() {
+
+        return launch(false);
+    }
+
+    @Override
+    public RoutineChannel<INPUT, OUTPUT> launchAsyn() {
+
+        return launch(true);
     }
 
     protected abstract SubRoutine<INPUT, OUTPUT> createSubRoutine(final boolean async);
+
+    protected Runner getAsyncRunner() {
+
+        return mAsyncRunner;
+    }
 
     protected int getMaxRetained() {
 
         return mMaxRetained;
     }
 
-    protected Runner getRunner() {
+    protected Runner getSyncRunner() {
 
-        return mRunner;
+        return mSyncRunner;
     }
 
-    protected RoutineChannel<INPUT, OUTPUT> start(final boolean async) {
+    protected RoutineChannel<INPUT, OUTPUT> launch(final boolean async) {
 
         return new DefaultRoutineChannel<INPUT, OUTPUT>(new RoutineSubRoutineProvider(async),
-                                                        (async) ? mRunner : Runners.sync());
+                                                        (async) ? mAsyncRunner : mSyncRunner);
     }
 
     private class RoutineSubRoutineProvider implements SubRoutineProvider<INPUT, OUTPUT> {

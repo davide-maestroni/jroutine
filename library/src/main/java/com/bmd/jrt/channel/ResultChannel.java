@@ -26,11 +26,11 @@ public interface ResultChannel<INPUT> extends InputChannel<INPUT> {
 
     public ResultChannel<INPUT> after(long delay, TimeUnit timeUnit);
 
-    public ResultChannel<INPUT> push(OutputChannel<INPUT> channel);
+    public ResultChannel<INPUT> pass(OutputChannel<INPUT> channel);
 
-    public ResultChannel<INPUT> push(Iterable<? extends INPUT> inputs);
+    public ResultChannel<INPUT> pass(Iterable<? extends INPUT> inputs);
 
-    public ResultChannel<INPUT> push(INPUT input);
+    public ResultChannel<INPUT> pass(INPUT input);
 
-    public ResultChannel<INPUT> push(INPUT... inputs);
+    public ResultChannel<INPUT> pass(INPUT... inputs);
 }

@@ -35,11 +35,11 @@ class SynchronizedConsumer<RESULT> implements ResultConsumer<RESULT> {
     }
 
     @Override
-    public void onReset(final Throwable throwable) {
+    public void onAbort(final Throwable throwable) {
 
         synchronized (mMutex) {
 
-            mConsumer.onReset(throwable);
+            mConsumer.onAbort(throwable);
         }
     }
 

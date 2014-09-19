@@ -182,33 +182,33 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
     }
 
     @Override
-    public OutputChannel<OUTPUT> invokePar() {
+    public OutputChannel<OUTPUT> invokeParall() {
 
-        return launchPar().close();
+        return launchParall().close();
     }
 
     @Override
-    public OutputChannel<OUTPUT> invokePar(final INPUT input) {
+    public OutputChannel<OUTPUT> invokeParall(final INPUT input) {
 
-        return launchPar().pass(input).close();
+        return launchParall().pass(input).close();
     }
 
     @Override
-    public OutputChannel<OUTPUT> invokePar(final INPUT... inputs) {
+    public OutputChannel<OUTPUT> invokeParall(final INPUT... inputs) {
 
-        return launchPar().pass(inputs).close();
+        return launchParall().pass(inputs).close();
     }
 
     @Override
-    public OutputChannel<OUTPUT> invokePar(final Iterable<? extends INPUT> inputs) {
+    public OutputChannel<OUTPUT> invokeParall(final Iterable<? extends INPUT> inputs) {
 
-        return launchPar().pass(inputs).close();
+        return launchParall().pass(inputs).close();
     }
 
     @Override
-    public OutputChannel<OUTPUT> invokePar(final OutputChannel<? extends INPUT> inputs) {
+    public OutputChannel<OUTPUT> invokeParall(final OutputChannel<? extends INPUT> inputs) {
 
-        return launchPar().pass(inputs).close();
+        return launchParall().pass(inputs).close();
     }
 
     @Override

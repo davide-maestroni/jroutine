@@ -18,7 +18,7 @@ package com.bmd.jrt.channel;
  */
 public interface ResultConsumer<OUTPUT> {
 
-    public void onReset(Throwable throwable);
+    public void onAbort(Throwable throwable);
 
     public void onResult(OUTPUT result);
 

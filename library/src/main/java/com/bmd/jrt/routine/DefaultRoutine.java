@@ -45,7 +45,7 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
     }
 
     @Override
-    public RoutineChannel<INPUT, OUTPUT> launchPar() {
+    public RoutineChannel<INPUT, OUTPUT> launchParall() {
 
         final DefaultRoutine<INPUT, OUTPUT> parallelRoutine =
                 new DefaultRoutine<INPUT, OUTPUT>(getSyncRunner(), getAsyncRunner(),

@@ -18,9 +18,9 @@ package com.bmd.jrt.channel;
  */
 public interface Channel {
 
+    public boolean abort();
+
+    public boolean abort(Throwable throwable);
+
     public boolean isOpen();
-
-    public boolean reset();
-
-    public boolean reset(Throwable throwable);
 }

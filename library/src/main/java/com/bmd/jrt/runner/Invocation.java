@@ -18,7 +18,7 @@ package com.bmd.jrt.runner;
  */
 public interface Invocation {
 
-    public void onInput();
+    public void onAbort();
 
-    public void onReset();
+    public void onInput();
 }

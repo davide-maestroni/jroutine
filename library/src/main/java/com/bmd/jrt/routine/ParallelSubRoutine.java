@@ -29,6 +29,12 @@ class ParallelSubRoutine<INPUT, OUTPUT> extends SubRoutineAdapter<INPUT, OUTPUT>
     }
 
     @Override
+    public void onAbort(final Throwable throwable) {
+
+        super.onAbort(throwable);
+    }
+
+    @Override
     public void onInit() {
 
         super.onInit();
@@ -38,12 +44,6 @@ class ParallelSubRoutine<INPUT, OUTPUT> extends SubRoutineAdapter<INPUT, OUTPUT>
     public void onInput(final INPUT input, final ResultChannel<OUTPUT> results) {
 
         results.pass(mRoutine.invokeAsyn(input));
-    }
-
-    @Override
-    public void onReset(final Throwable throwable) {
-
-        super.onReset(throwable);
     }
 
     @Override

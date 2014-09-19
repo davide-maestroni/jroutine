@@ -20,11 +20,11 @@ import com.bmd.jrt.channel.ResultChannel;
  */
 public interface SubRoutine<INPUT, OUTPUT> {
 
+    public void onAbort(Throwable throwable);
+
     public void onInit();
 
     public void onInput(INPUT input, ResultChannel<OUTPUT> results);
-
-    public void onReset(Throwable throwable);
 
     public void onResult(ResultChannel<OUTPUT> results);
 

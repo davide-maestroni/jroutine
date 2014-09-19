@@ -21,17 +21,17 @@ import com.bmd.jrt.channel.ResultChannel;
 public abstract class SubRoutineAdapter<INPUT, OUTPUT> implements SubRoutine<INPUT, OUTPUT> {
 
     @Override
+    public void onAbort(final Throwable throwable) {
+
+    }
+
+    @Override
     public void onInit() {
 
     }
 
     @Override
     public void onInput(final INPUT input, final ResultChannel<OUTPUT> results) {
-
-    }
-
-    @Override
-    public void onReset(final Throwable throwable) {
 
     }
 

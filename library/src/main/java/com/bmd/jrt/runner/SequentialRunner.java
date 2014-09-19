@@ -24,6 +24,12 @@ import java.util.concurrent.TimeUnit;
 class SequentialRunner implements Runner {
 
     @Override
+    public void onAbort(final Invocation invocation) {
+
+        invocation.onAbort();
+    }
+
+    @Override
     public void onInput(final Invocation invocation, final long delay, final TimeUnit timeUnit) {
 
         try {
@@ -36,11 +42,5 @@ class SequentialRunner implements Runner {
 
             RoutineInterruptedException.interrupt(e);
         }
-    }
-
-    @Override
-    public void onReset(final Invocation invocation) {
-
-        invocation.onReset();
     }
 }

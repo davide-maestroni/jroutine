@@ -19,7 +19,7 @@ package com.bmd.jrt.channel;
 public abstract class ResultConsumerAdapter<OUTPUT> implements ResultConsumer<OUTPUT> {
 
     @Override
-    public void onReset(final Throwable throwable) {
+    public void onAbort(final Throwable throwable) {
 
     }
 

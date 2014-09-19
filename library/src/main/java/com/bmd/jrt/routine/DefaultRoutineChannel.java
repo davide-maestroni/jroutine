@@ -39,9 +39,9 @@ import static com.bmd.jrt.time.TimeDuration.seconds;
  */
 class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTPUT> {
 
-    private final DefaultInvocation mCall;
-
     private final LinkedList<INPUT> mInputQueue = new LinkedList<INPUT>();
+
+    private final DefaultInvocation mInvocation;
 
     private final Object mMutex = new Object();
 
@@ -49,13 +49,13 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
 
     private final Runner mRunner;
 
+    private Throwable mAbortException;
+
     private TimeDuration mInputDelay = TimeDuration.ZERO;
 
     private int mPendingInputCount;
 
     private int mPendingOutputCount;
-
-    private Throwable mResetException;
 
     private ResultConsumer<OUTPUT> mResultConsumer;
 
@@ -70,7 +70,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
         }
 
         mRunner = runner;
-        mCall = new DefaultInvocation(provider);
+        mInvocation = new DefaultInvocation(provider);
     }
 
     @Override
@@ -152,7 +152,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
 
         if (delay.isZero()) {
 
-            mRunner.onInput(mCall, 0, TimeUnit.MILLISECONDS);
+            mRunner.onInput(mInvocation, 0, TimeUnit.MILLISECONDS);
 
         } else {
 
@@ -183,7 +183,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
 
         if (delay.isZero()) {
 
-            mRunner.onInput(mCall, 0, TimeUnit.MILLISECONDS);
+            mRunner.onInput(mInvocation, 0, TimeUnit.MILLISECONDS);
 
         } else {
 
@@ -221,18 +221,9 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
             ++mPendingInputCount;
         }
 
-        mRunner.onInput(mCall, 0, TimeUnit.MILLISECONDS);
+        mRunner.onInput(mInvocation, 0, TimeUnit.MILLISECONDS);
 
         return new DefaultOutputChannel();
-    }
-
-    @Override
-    public boolean isOpen() {
-
-        synchronized (mMutex) {
-
-            return (mState == ChannelState.INPUT);
-        }
     }
 
     private void flushOutput() {
@@ -267,7 +258,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
 
                     try {
 
-                        consumer.onReset(((RoutineExceptionWrapper) output).getCause());
+                        consumer.onAbort(((RoutineExceptionWrapper) output).getCause());
 
                     } catch (final RoutineInterruptedException e) {
 
@@ -304,7 +295,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
         } catch (final Throwable t) {
 
             boolean isFlush = false;
-            boolean isReset = false;
+            boolean isAbort = false;
 
             synchronized (mMutex) {
 
@@ -314,11 +305,11 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
 
                 } else if (mState != ChannelState.EXCEPTION) {
 
-                    isReset = true;
+                    isAbort = true;
 
                     mOutputQueue.clear();
 
-                    mResetException = t;
+                    mAbortException = t;
                     mState = ChannelState.EXCEPTION;
                 }
             }
@@ -327,21 +318,21 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
 
                 flushOutput();
 
-            } else if (isReset) {
+            } else if (isAbort) {
 
-                mRunner.onReset(mCall);
+                mRunner.onAbort(mInvocation);
             }
         }
     }
 
     private boolean isDone() {
 
-        return (mState == ChannelState.DONE) || (mState == ChannelState.RESET);
+        return (mState == ChannelState.DONE) || (mState == ChannelState.ABORT);
     }
 
     private boolean isError() {
 
-        return (mState == ChannelState.RESET) || (mState == ChannelState.EXCEPTION);
+        return (mState == ChannelState.ABORT) || (mState == ChannelState.EXCEPTION);
     }
 
     private void verifyBound() {
@@ -354,7 +345,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
 
     private void verifyInput() {
 
-        final Throwable throwable = mResetException;
+        final Throwable throwable = mAbortException;
 
         if (throwable != null) {
 
@@ -374,7 +365,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
         RESULT,
         DONE,
         EXCEPTION,
-        RESET
+        ABORT
     }
 
     public interface SubRoutineProvider<INPUT, OUTPUT> {
@@ -386,7 +377,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
 
     private class DefaultInvocation implements Invocation {
 
-        private final Object mCallMutex = new Object();
+        private final Object mInvocationMutex = new Object();
 
         private final DefaultResultChannel mResultChannel = new DefaultResultChannel();
 
@@ -405,9 +396,70 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
         }
 
         @Override
+        public void onAbort() {
+
+            synchronized (mInvocationMutex) {
+
+                final DefaultResultChannel resultChannel = mResultChannel;
+
+                try {
+
+                    final Throwable exception;
+
+                    synchronized (mMutex) {
+
+                        if (mState != ChannelState.EXCEPTION) {
+
+                            return;
+                        }
+
+                        exception = mAbortException;
+                    }
+
+                    final SubRoutine<INPUT, OUTPUT> routine = initRoutine();
+
+                    routine.onAbort(exception);
+                    resultChannel.abort(exception);
+
+                    routine.onReturn();
+                    mSubRoutineProvider.recycle(routine);
+
+                } catch (final Throwable t) {
+
+                    resultChannel.abort(t);
+
+                } finally {
+
+                    synchronized (mMutex) {
+
+                        mState = ChannelState.ABORT;
+                        mMutex.notifyAll();
+                    }
+                }
+            }
+        }
+
+        private SubRoutine<INPUT, OUTPUT> initRoutine() {
+
+            final SubRoutine<INPUT, OUTPUT> routine;
+
+            if (mRoutine != null) {
+
+                routine = mRoutine;
+
+            } else {
+
+                routine = (mRoutine = mSubRoutineProvider.create());
+                routine.onInit();
+            }
+
+            return routine;
+        }
+
+        @Override
         public void onInput() {
 
-            synchronized (mCallMutex) {
+            synchronized (mInvocationMutex) {
 
                 final DefaultResultChannel resultChannel = mResultChannel;
 
@@ -463,71 +515,12 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
 
                 } catch (final Throwable t) {
 
-                    resultChannel.reset(t);
+                    resultChannel.abort(t);
                 }
             }
         }
 
-        private SubRoutine<INPUT, OUTPUT> initRoutine() {
 
-            final SubRoutine<INPUT, OUTPUT> routine;
-
-            if (mRoutine != null) {
-
-                routine = mRoutine;
-
-            } else {
-
-                routine = (mRoutine = mSubRoutineProvider.create());
-                routine.onInit();
-            }
-
-            return routine;
-        }
-
-        @Override
-        public void onReset() {
-
-            synchronized (mCallMutex) {
-
-                final DefaultResultChannel resultChannel = mResultChannel;
-
-                try {
-
-                    final Throwable exception;
-
-                    synchronized (mMutex) {
-
-                        if (mState != ChannelState.EXCEPTION) {
-
-                            return;
-                        }
-
-                        exception = mResetException;
-                    }
-
-                    final SubRoutine<INPUT, OUTPUT> routine = initRoutine();
-
-                    routine.onReset(exception);
-                    resultChannel.reset(exception);
-
-                    routine.onReturn();
-                    mSubRoutineProvider.recycle(routine);
-
-                } catch (final Throwable t) {
-
-                    resultChannel.reset(t);
-
-                } finally {
-
-                    synchronized (mMutex) {
-
-                        mState = ChannelState.RESET;
-                        mMutex.notifyAll();
-                    }
-                }
-            }
-        }
     }
 
     private class DefaultIterator implements Iterator<OUTPUT> {
@@ -681,6 +674,12 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
         private TimeDuration mTimeout = seconds(3);
 
         private RuntimeException mTimeoutException;
+
+        @Override
+        public boolean abort() {
+
+            return abort(null);
+        }
 
         @Override
         public OutputChannel<OUTPUT> afterMax(final TimeDuration timeout) {
@@ -888,23 +887,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
         }
 
         @Override
-        public boolean isOpen() {
-
-            synchronized (mMutex) {
-
-                return !mOutputQueue.isEmpty() || ((mState != ChannelState.DONE) && (mState
-                        != ChannelState.RESET));
-            }
-        }
-
-        @Override
-        public boolean reset() {
-
-            return reset(null);
-        }
-
-        @Override
-        public boolean reset(final Throwable throwable) {
+        public boolean abort(final Throwable throwable) {
 
             boolean isFlush = false;
 
@@ -925,7 +908,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
 
                     mOutputQueue.clear();
 
-                    mResetException = throwable;
+                    mAbortException = throwable;
                     mState = ChannelState.EXCEPTION;
                 }
             }
@@ -936,10 +919,20 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
 
             } else {
 
-                mRunner.onReset(mCall);
+                mRunner.onAbort(mInvocation);
             }
 
             return true;
+        }
+
+        @Override
+        public boolean isOpen() {
+
+            synchronized (mMutex) {
+
+                return !mOutputQueue.isEmpty() || ((mState != ChannelState.DONE) && (mState
+                        != ChannelState.ABORT));
+            }
         }
     }
 
@@ -1116,22 +1109,13 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
         }
 
         @Override
-        public boolean isOpen() {
+        public boolean abort() {
 
-            synchronized (mMutex) {
-
-                return !isDone();
-            }
+            return abort(null);
         }
 
         @Override
-        public boolean reset() {
-
-            return reset(null);
-        }
-
-        @Override
-        public boolean reset(final Throwable throwable) {
+        public boolean abort(final Throwable throwable) {
 
             boolean isFlush = false;
 
@@ -1150,7 +1134,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
 
                 } else {
 
-                    mResetException = throwable;
+                    mAbortException = throwable;
                     mState = ChannelState.EXCEPTION;
                 }
             }
@@ -1162,9 +1146,18 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
                 return true;
             }
 
-            mRunner.onReset(mCall);
+            mRunner.onAbort(mInvocation);
 
             return false;
+        }
+
+        @Override
+        public boolean isOpen() {
+
+            synchronized (mMutex) {
+
+                return !isDone();
+            }
         }
     }
 
@@ -1190,13 +1183,13 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
                 mInputQueue.add(mInput);
             }
 
-            mCall.onInput();
+            mInvocation.onInput();
         }
 
         @Override
-        public void onReset() {
+        public void onAbort() {
 
-            mCall.onReset();
+            mInvocation.onAbort();
         }
     }
 
@@ -1229,13 +1222,13 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
                 mInputQueue.addAll(mInputs);
             }
 
-            mCall.onInput();
+            mInvocation.onInput();
         }
 
         @Override
-        public void onReset() {
+        public void onAbort() {
 
-            mCall.onReset();
+            mInvocation.onAbort();
         }
     }
 
@@ -1277,9 +1270,9 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
         }
 
         @Override
-        public void onReset() {
+        public void onAbort() {
 
-            mCall.onReset();
+            mInvocation.onAbort();
         }
     }
 
@@ -1314,9 +1307,9 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
         }
 
         @Override
-        public void onReset() {
+        public void onAbort() {
 
-            mCall.onReset();
+            mInvocation.onAbort();
         }
     }
 
@@ -1330,7 +1323,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
         }
 
         @Override
-        public void onReset(final Throwable throwable) {
+        public void onAbort(final Throwable throwable) {
 
             synchronized (mMutex) {
 
@@ -1341,11 +1334,11 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
 
                 mInputQueue.clear();
 
-                mResetException = throwable;
+                mAbortException = throwable;
                 mState = ChannelState.EXCEPTION;
             }
 
-            mRunner.onReset(mCall);
+            mRunner.onAbort(mInvocation);
         }
 
         @Override
@@ -1365,7 +1358,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
 
             if (delay.isZero()) {
 
-                mRunner.onInput(mCall, 0, TimeUnit.MILLISECONDS);
+                mRunner.onInput(mInvocation, 0, TimeUnit.MILLISECONDS);
 
             } else {
 
@@ -1376,7 +1369,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
         @Override
         public void onReturn() {
 
-            mRunner.onInput(mCall, 0, TimeUnit.MILLISECONDS);
+            mRunner.onInput(mInvocation, 0, TimeUnit.MILLISECONDS);
         }
     }
 
@@ -1390,7 +1383,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
         }
 
         @Override
-        public void onReset(final Throwable throwable) {
+        public void onAbort(final Throwable throwable) {
 
             boolean isFlush = false;
 
@@ -1404,7 +1397,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
 
                 } else {
 
-                    mResetException = throwable;
+                    mAbortException = throwable;
                     mState = ChannelState.EXCEPTION;
                 }
             }
@@ -1415,7 +1408,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
 
             } else {
 
-                mRunner.onReset(mCall);
+                mRunner.onAbort(mInvocation);
             }
         }
 
@@ -1478,13 +1471,13 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
     }
 
     @Override
-    public boolean reset() {
+    public boolean abort() {
 
-        return reset(null);
+        return abort(null);
     }
 
     @Override
-    public boolean reset(final Throwable throwable) {
+    public boolean abort(final Throwable throwable) {
 
         synchronized (mMutex) {
 
@@ -1495,12 +1488,21 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
 
             mInputQueue.clear();
 
-            mResetException = throwable;
+            mAbortException = throwable;
             mState = ChannelState.EXCEPTION;
         }
 
-        mRunner.onReset(mCall);
+        mRunner.onAbort(mInvocation);
 
         return false;
+    }
+
+    @Override
+    public boolean isOpen() {
+
+        synchronized (mMutex) {
+
+            return (mState == ChannelState.INPUT);
+        }
     }
 }

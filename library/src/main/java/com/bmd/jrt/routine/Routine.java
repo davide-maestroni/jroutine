@@ -63,19 +63,19 @@ public interface Routine<INPUT, OUTPUT> {
 
     public OutputChannel<OUTPUT> invokeAsyn(OutputChannel<? extends INPUT> inputs);
 
-    public OutputChannel<OUTPUT> invokePar();
+    public OutputChannel<OUTPUT> invokeParall();
 
-    public OutputChannel<OUTPUT> invokePar(INPUT input);
+    public OutputChannel<OUTPUT> invokeParall(INPUT input);
 
-    public OutputChannel<OUTPUT> invokePar(INPUT... inputs);
+    public OutputChannel<OUTPUT> invokeParall(INPUT... inputs);
 
-    public OutputChannel<OUTPUT> invokePar(Iterable<? extends INPUT> inputs);
+    public OutputChannel<OUTPUT> invokeParall(Iterable<? extends INPUT> inputs);
 
-    public OutputChannel<OUTPUT> invokePar(OutputChannel<? extends INPUT> inputs);
+    public OutputChannel<OUTPUT> invokeParall(OutputChannel<? extends INPUT> inputs);
 
     public RoutineChannel<INPUT, OUTPUT> launch();
 
     public RoutineChannel<INPUT, OUTPUT> launchAsyn();
 
-    public RoutineChannel<INPUT, OUTPUT> launchPar();
+    public RoutineChannel<INPUT, OUTPUT> launchParall();
 }

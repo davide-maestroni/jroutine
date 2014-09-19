@@ -18,13 +18,13 @@ import com.bmd.jrt.channel.ResultConsumer;
 /**
  * Created by davide on 9/18/14.
  */
-class SynchronizedConsumer<RESULT> implements ResultConsumer<RESULT> {
+class SynchronizedConsumer<OUTPUT> implements ResultConsumer<OUTPUT> {
 
-    private final ResultConsumer<RESULT> mConsumer;
+    private final ResultConsumer<OUTPUT> mConsumer;
 
     private final Object mMutex = new Object();
 
-    public SynchronizedConsumer(final ResultConsumer<RESULT> wrapped) {
+    public SynchronizedConsumer(final ResultConsumer<OUTPUT> wrapped) {
 
         if (wrapped == null) {
 
@@ -44,7 +44,7 @@ class SynchronizedConsumer<RESULT> implements ResultConsumer<RESULT> {
     }
 
     @Override
-    public void onResult(final RESULT result) {
+    public void onResult(final OUTPUT result) {
 
         synchronized (mMutex) {
 

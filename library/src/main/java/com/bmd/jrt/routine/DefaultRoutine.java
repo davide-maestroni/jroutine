@@ -16,6 +16,7 @@ package com.bmd.jrt.routine;
 import com.bmd.jrt.channel.RoutineChannel;
 import com.bmd.jrt.runner.Runner;
 import com.bmd.jrt.subroutine.SubRoutine;
+import com.bmd.jrt.time.TimeDuration;
 import com.bmd.wtf.fll.Classification;
 
 import java.lang.reflect.Constructor;
@@ -35,13 +36,15 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
     private final Class<ParallelSubRoutine<INPUT, OUTPUT>> mParallelType =
             new Classification<ParallelSubRoutine<INPUT, OUTPUT>>() {}.getRawType();
 
-    public DefaultRoutine(final Runner syncRunner, final Runner asyncRunner, final int maxRetained,
-            final Class<? extends SubRoutine<INPUT, OUTPUT>> type, final Object... ctorArgs) {
+    public DefaultRoutine(final Runner syncRunner, final Runner asyncRunner, final int maxRunning,
+            final int maxRetained, final TimeDuration availTimeout,
+            final Class<? extends SubRoutine<INPUT, OUTPUT>> subroutineClass,
+            final Object... subroutineArgs) {
 
-        super(syncRunner, asyncRunner, maxRetained);
+        super(syncRunner, asyncRunner, maxRunning, maxRetained, availTimeout);
 
-        mConstructor = findConstructor(type, ctorArgs);
-        mArgs = (ctorArgs == null) ? NO_ARGS : ctorArgs.clone();
+        mConstructor = findConstructor(subroutineClass, subroutineArgs);
+        mArgs = (subroutineArgs == null) ? NO_ARGS : subroutineArgs.clone();
     }
 
     @Override
@@ -49,7 +52,8 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
 
         final DefaultRoutine<INPUT, OUTPUT> parallelRoutine =
                 new DefaultRoutine<INPUT, OUTPUT>(getSyncRunner(), getAsyncRunner(),
-                                                  getMaxRetained(), mParallelType, this);
+                                                  getMaxRunning(), getMaxRetained(),
+                                                  getAvailTimeout(), mParallelType, this);
 
         return parallelRoutine.launchAsyn();
     }

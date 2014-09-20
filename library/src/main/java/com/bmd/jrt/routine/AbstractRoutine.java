@@ -18,6 +18,10 @@ import com.bmd.jrt.channel.RoutineChannel;
 import com.bmd.jrt.routine.DefaultRoutineChannel.SubRoutineProvider;
 import com.bmd.jrt.runner.Runner;
 import com.bmd.jrt.subroutine.SubRoutine;
+import com.bmd.jrt.time.TimeDuration;
+import com.bmd.jrt.time.TimeDuration.Check;
+import com.bmd.jrt.util.RoutineInterruptedException;
+import com.bmd.jrt.util.RoutineNotAvailableException;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -29,17 +33,23 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
 
     private final Runner mAsyncRunner;
 
+    private final TimeDuration mAvailTimeout;
+
     private final int mMaxRetained;
+
+    private final int mMaxRunning;
 
     private final Object mMutex = new Object();
 
     private final Runner mSyncRunner;
 
+    private int mRunningCount;
+
     private LinkedList<SubRoutine<INPUT, OUTPUT>> mSubRoutines =
             new LinkedList<SubRoutine<INPUT, OUTPUT>>();
 
-    public AbstractRoutine(final Runner syncRunner, final Runner asyncRunner,
-            final int maxRetained) {
+    public AbstractRoutine(final Runner syncRunner, final Runner asyncRunner, final int maxRunning,
+            final int maxRetained, final TimeDuration availTimeout) {
 
         if (syncRunner == null) {
 
@@ -51,14 +61,26 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
             throw new IllegalArgumentException();
         }
 
+        if (maxRunning < 1) {
+
+            throw new IllegalArgumentException();
+        }
+
         if (maxRetained < 1) {
+
+            throw new IllegalArgumentException();
+        }
+
+        if (availTimeout == null) {
 
             throw new IllegalArgumentException();
         }
 
         mSyncRunner = syncRunner;
         mAsyncRunner = asyncRunner;
+        mMaxRunning = maxRunning;
         mMaxRetained = maxRetained;
+        mAvailTimeout = availTimeout;
     }
 
     @Override
@@ -230,9 +252,19 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
         return mAsyncRunner;
     }
 
+    protected TimeDuration getAvailTimeout() {
+
+        return mAvailTimeout;
+    }
+
     protected int getMaxRetained() {
 
         return mMaxRetained;
+    }
+
+    protected int getMaxRunning() {
+
+        return mMaxRunning;
     }
 
     protected Runner getSyncRunner() {
@@ -260,6 +292,31 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
 
             synchronized (mMutex) {
 
+                boolean isTimeout = false;
+
+                try {
+
+                    isTimeout = !mAvailTimeout.waitTrue(mMutex, new Check() {
+
+                        @Override
+                        public boolean isTrue() {
+
+                            return mRunningCount < mMaxRunning;
+                        }
+                    });
+
+                } catch (final InterruptedException e) {
+
+                    RoutineInterruptedException.interrupt(e);
+                }
+
+                if (isTimeout) {
+
+                    throw new RoutineNotAvailableException();
+                }
+
+                ++mRunningCount;
+
                 final LinkedList<SubRoutine<INPUT, OUTPUT>> routines = mSubRoutines;
 
                 if (!routines.isEmpty()) {
@@ -268,6 +325,16 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
                 }
 
                 return createSubRoutine(mAsync);
+            }
+        }
+
+        @Override
+        public void discard(final SubRoutine<INPUT, OUTPUT> routine) {
+
+            synchronized (mMutex) {
+
+                --mRunningCount;
+                mMutex.notify();
             }
         }
 
@@ -282,6 +349,9 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
 
                     routines.add(routine);
                 }
+
+                --mRunningCount;
+                mMutex.notify();
             }
         }
     }

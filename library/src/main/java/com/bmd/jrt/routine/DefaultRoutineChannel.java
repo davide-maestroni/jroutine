@@ -372,6 +372,8 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
 
         public SubRoutine<INPUT, OUTPUT> create();
 
+        public void discard(SubRoutine<INPUT, OUTPUT> routine);
+
         public void recycle(SubRoutine<INPUT, OUTPUT> routine);
     }
 
@@ -401,22 +403,23 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
             synchronized (mInvocationMutex) {
 
                 final DefaultResultChannel resultChannel = mResultChannel;
+                SubRoutine<INPUT, OUTPUT> routine = null;
+
+                final Throwable exception;
+
+                synchronized (mMutex) {
+
+                    if (mState != ChannelState.EXCEPTION) {
+
+                        return;
+                    }
+
+                    exception = mAbortException;
+                }
 
                 try {
 
-                    final Throwable exception;
-
-                    synchronized (mMutex) {
-
-                        if (mState != ChannelState.EXCEPTION) {
-
-                            return;
-                        }
-
-                        exception = mAbortException;
-                    }
-
-                    final SubRoutine<INPUT, OUTPUT> routine = initRoutine();
+                    routine = initRoutine();
 
                     routine.onAbort(exception);
                     resultChannel.abort(exception);
@@ -425,6 +428,11 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
                     mSubRoutineProvider.recycle(routine);
 
                 } catch (final Throwable t) {
+
+                    if (routine != null) {
+
+                        mSubRoutineProvider.discard(routine);
+                    }
 
                     resultChannel.abort(t);
 

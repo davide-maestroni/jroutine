@@ -16,7 +16,7 @@ package com.bmd.jrt.routine;
 import com.bmd.jrt.runner.Runner;
 import com.bmd.jrt.runner.Runners;
 import com.bmd.jrt.subroutine.SubRoutine;
-import com.bmd.jrt.util.Classification;
+import com.bmd.jrt.util.ClassAdapter;
 
 import static com.bmd.jrt.routine.ReflectionUtils.NO_ARGS;
 
@@ -80,15 +80,15 @@ public class JRoutine {
     }
 
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> routineOf(
-            final Classification<? extends SubRoutine<INPUT, OUTPUT>> classification) {
+            final ClassAdapter<? extends SubRoutine<INPUT, OUTPUT>> classAdapter) {
 
-        if (classification == null) {
+        if (classAdapter == null) {
 
             throw new IllegalArgumentException();
         }
 
         return new DefaultRoutine<INPUT, OUTPUT>(mSyncRunner, mAsyncRunner, mMaxRetained,
-                                                 classification.getRawType(), mArgs);
+                                                 classAdapter.getRawClass(), mArgs);
     }
 
     public JRoutine sequential() {

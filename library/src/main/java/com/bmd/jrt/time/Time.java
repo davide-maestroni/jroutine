@@ -114,9 +114,9 @@ public class Time {
             return false;
         }
 
-        final Time time = (Time) o;
+        final Time that = (Time) o;
 
-        return (this.time == time.time) && (unit == time.unit);
+        return (time == that.time) && (unit == that.unit);
     }
 
     public Time hoursTime() {
@@ -154,9 +154,9 @@ public class Time {
         return seconds(toSeconds());
     }
 
-    public long to(final TimeUnit unit) {
+    public long to(final TimeUnit timeUnit) {
 
-        return this.unit.convert(time, unit);
+        return unit.convert(time, timeUnit);
     }
 
     public long toDays() {

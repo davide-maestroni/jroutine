@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class TimeDuration extends Time {
 
-    public static final TimeDuration INFINITE = days(Long.MAX_VALUE);
+    public static final TimeDuration INFINITY = days(Long.MAX_VALUE);
 
     public static final TimeDuration ZERO = fromUnit(0, TimeUnit.MILLISECONDS);
 
@@ -122,7 +122,7 @@ public class TimeDuration extends Time {
 
     public boolean isInfinite() {
 
-        return equals(INFINITE);
+        return equals(INFINITY);
     }
 
     public void join(final Thread target) throws InterruptedException {

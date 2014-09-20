@@ -175,9 +175,9 @@ public abstract class ClassAdapter<CLASS> {
             return false;
         }
 
-        final ClassAdapter adapter = (ClassAdapter) o;
+        final ClassAdapter that = (ClassAdapter) o;
 
-        return getRawClass().equals(adapter.getRawClass());
+        return getRawClass().equals(that.getRawClass());
     }
 
     /**

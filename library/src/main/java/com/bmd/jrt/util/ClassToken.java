@@ -50,7 +50,7 @@ public abstract class ClassToken<CLASS> {
         }
 
         //noinspection unchecked
-        return tokenOf((Class<CLASS>) object.getClass());
+        return token((Class<CLASS>) object.getClass());
     }
 
     /**
@@ -61,7 +61,7 @@ public abstract class ClassToken<CLASS> {
      * @return the newly created adapter.
      * @throws IllegalArgumentException if the raw class is null.
      */
-    public static <CLASS> ClassToken<CLASS> tokenOf(final Class<CLASS> rawClass) {
+    public static <CLASS> ClassToken<CLASS> token(final Class<CLASS> rawClass) {
 
         if (rawClass == null) {
 

@@ -228,7 +228,7 @@ public class RoutineTest extends TestCase {
         testException(exceptionRoutine, "test", "test1");
 
         final Routine<String, String> passThroughRoutine =
-                jrt().routineOf(ClassToken.tokenOf(PassThroughSubRoutine.class));
+                jrt().routineOf(ClassToken.token(PassThroughSubRoutine.class));
 
         testChained(passThroughRoutine, exceptionRoutine, "test", "test1");
         testChained(exceptionRoutine, passThroughRoutine, "test", "test1");
@@ -252,7 +252,7 @@ public class RoutineTest extends TestCase {
         testException(exceptionRoutine, "test2", "test2");
 
         final Routine<String, String> passThroughRoutine =
-                jrt().routineOf(ClassToken.tokenOf(PassThroughSubRoutine.class));
+                jrt().routineOf(ClassToken.token(PassThroughSubRoutine.class));
 
         testChained(passThroughRoutine, exceptionRoutine, "test2", "test2");
         testChained(exceptionRoutine, passThroughRoutine, "test2", "test2");
@@ -276,7 +276,7 @@ public class RoutineTest extends TestCase {
         testException(exceptionRoutine, "test", "test3");
 
         final Routine<String, String> passThroughRoutine =
-                jrt().routineOf(ClassToken.tokenOf(PassThroughSubRoutine.class));
+                jrt().routineOf(ClassToken.token(PassThroughSubRoutine.class));
 
         testChained(passThroughRoutine, exceptionRoutine, "test", "test3");
         testChained(exceptionRoutine, passThroughRoutine, "test", "test3");
@@ -326,7 +326,7 @@ public class RoutineTest extends TestCase {
                 "test");
 
         final Routine<String, String> passThroughRoutine =
-                jrt().routineOf(ClassToken.tokenOf(PassThroughSubRoutine.class));
+                jrt().routineOf(ClassToken.token(PassThroughSubRoutine.class));
 
         assertThat(passThroughRoutine.call(exceptionRoutine.invoke("test"))).containsExactly(
                 "test");
@@ -1073,7 +1073,7 @@ public class RoutineTest extends TestCase {
 
         final String input = "test";
         final Routine<String, String> routine = jrt().withArgs(TimeDuration.millis(0))
-                                                     .routineOf(ClassToken.tokenOf(
+                                                     .routineOf(ClassToken.token(
                                                              DelaySubRoutine.class));
 
         assertThat(routine.invoke(input).bind(consumer).waitDone()).isTrue();

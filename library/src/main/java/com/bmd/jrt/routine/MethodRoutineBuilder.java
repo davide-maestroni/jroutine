@@ -32,6 +32,8 @@ import java.util.WeakHashMap;
  */
 public class MethodRoutineBuilder {
 
+    //TODO: call(args) ?
+
     private static final WeakHashMap<Object, Object> sMutexMap = new WeakHashMap<Object, Object>();
 
     private static final WeakHashMap<Object, HashMap<RoutineInfo, Routine<Object, Object>>>
@@ -191,7 +193,7 @@ public class MethodRoutineBuilder {
             }
 
             routine = builder.withArgs(target, method, mutex)
-                             .routineOf(ClassToken.tokenOf(MethodSubRoutine.class));
+                             .routineOf(ClassToken.token(MethodSubRoutine.class));
             routineMap.put(routineInfo, routine);
         }
 
@@ -222,17 +224,19 @@ public class MethodRoutineBuilder {
 
             if (annotation != null) {
 
-                final String name = annotation.name();
+                String name = annotation.name();
 
-                if ((name != null) && !name.isEmpty()) {
+                if ((name == null) || (name.length() == 0)) {
 
-                    if (map.containsKey(name)) {
-
-                        throw new IllegalArgumentException();
-                    }
-
-                    map.put(name, method);
+                    name = method.getName();
                 }
+
+                if (map.containsKey(name)) {
+
+                    throw new IllegalArgumentException();
+                }
+
+                map.put(name, method);
             }
         }
     }

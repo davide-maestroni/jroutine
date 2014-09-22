@@ -104,7 +104,7 @@ public class InstanceRoutineBuilder extends MethodRoutineBuilder {
                         isSequential = annotation.sequential();
                     }
 
-                    if ((name == null) || name.isEmpty()) {
+                    if ((name == null) || (name.length() == 0)) {
 
                         name = method.getName();
                     }

@@ -39,6 +39,8 @@ import static com.bmd.jrt.time.TimeDuration.seconds;
  */
 class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTPUT> {
 
+    //TODO: context class with shared fields + lock => in channel, out channel, res channel, invocation...
+
     private final LinkedList<INPUT> mInputQueue = new LinkedList<INPUT>();
 
     private final DefaultInvocation mInvocation;

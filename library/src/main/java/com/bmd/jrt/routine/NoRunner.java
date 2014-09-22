@@ -13,27 +13,23 @@
  */
 package com.bmd.jrt.routine;
 
+import com.bmd.jrt.runner.Invocation;
+import com.bmd.jrt.runner.Runner;
+
+import java.util.concurrent.TimeUnit;
+
 /**
- * Created by davide on 9/7/14.
+ * Created by davide on 9/22/14.
  */
-public class JRoutine {
+class NoRunner implements Runner {
 
-    private JRoutine() {
+    @Override
+    public void onAbort(final Invocation invocation) {
 
     }
 
-    public static RoutineBuilder jrt() {
+    @Override
+    public void onInput(final Invocation invocation, final long delay, final TimeUnit timeUnit) {
 
-        return new RoutineBuilder();
-    }
-
-    public static MethodRoutineBuilder jrt(final Class<?> target) {
-
-        return new MethodRoutineBuilder(target);
-    }
-
-    public static InstanceRoutineBuilder jrt(final Object target) {
-
-        return new InstanceRoutineBuilder(target);
     }
 }

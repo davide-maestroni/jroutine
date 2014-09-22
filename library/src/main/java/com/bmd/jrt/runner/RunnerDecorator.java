@@ -11,29 +11,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.routine;
+package com.bmd.jrt.runner;
+
+import java.util.concurrent.TimeUnit;
 
 /**
- * Created by davide on 9/7/14.
+ * Created by davide on 9/22/14.
  */
-public class JRoutine {
+public class RunnerDecorator implements Runner {
 
-    private JRoutine() {
+    private final Runner mRunner;
 
+    public RunnerDecorator(final Runner wrapped) {
+
+        mRunner = wrapped;
     }
 
-    public static RoutineBuilder jrt() {
+    @Override
+    public void onAbort(final Invocation invocation) {
 
-        return new RoutineBuilder();
+        mRunner.onAbort(invocation);
     }
 
-    public static MethodRoutineBuilder jrt(final Class<?> target) {
+    @Override
+    public void onInput(final Invocation invocation, final long delay, final TimeUnit timeUnit) {
 
-        return new MethodRoutineBuilder(target);
-    }
-
-    public static InstanceRoutineBuilder jrt(final Object target) {
-
-        return new InstanceRoutineBuilder(target);
+        mRunner.onInput(invocation, delay, timeUnit);
     }
 }

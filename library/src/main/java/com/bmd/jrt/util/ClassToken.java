@@ -29,11 +29,29 @@ import java.lang.reflect.Type;
  *
  * @param <CLASS> the class type.
  */
-public abstract class ClassAdapter<CLASS> {
+public abstract class ClassToken<CLASS> {
 
     private Type mGenericType;
 
     private Class<CLASS> mRawClass;
+
+    /**
+     * TODO
+     *
+     * @param object
+     * @param <CLASS>
+     * @return
+     */
+    public static <CLASS> ClassToken<CLASS> classOf(final CLASS object) {
+
+        if (object == null) {
+
+            throw new IllegalArgumentException("the classification object cannot be null");
+        }
+
+        //noinspection unchecked
+        return tokenOf((Class<CLASS>) object.getClass());
+    }
 
     /**
      * Creates a new adapter from the specified raw class.
@@ -43,36 +61,18 @@ public abstract class ClassAdapter<CLASS> {
      * @return the newly created adapter.
      * @throws IllegalArgumentException if the raw class is null.
      */
-    public static <CLASS> ClassAdapter<CLASS> adapt(final Class<CLASS> rawClass) {
+    public static <CLASS> ClassToken<CLASS> tokenOf(final Class<CLASS> rawClass) {
 
         if (rawClass == null) {
 
             throw new IllegalArgumentException("the classification raw type cannot be null");
         }
 
-        final ClassAdapter<CLASS> classAdapter = new ClassAdapter<CLASS>() {};
-        classAdapter.mGenericType = rawClass;
-        classAdapter.mRawClass = rawClass;
+        final ClassToken<CLASS> classToken = new ClassToken<CLASS>() {};
+        classToken.mGenericType = rawClass;
+        classToken.mRawClass = rawClass;
 
-        return classAdapter;
-    }
-
-    /**
-     * TODO
-     *
-     * @param object
-     * @param <CLASS>
-     * @return
-     */
-    public static <CLASS> ClassAdapter<CLASS> classOf(final CLASS object) {
-
-        if (object == null) {
-
-            throw new IllegalArgumentException("the classification object cannot be null");
-        }
-
-        //noinspection unchecked
-        return adapt((Class<CLASS>) object.getClass());
+        return classToken;
     }
 
     /**
@@ -101,7 +101,7 @@ public abstract class ClassAdapter<CLASS> {
             Class<?> subClass = getClass();
             Class<?> superClass = subClass.getSuperclass();
 
-            while (!ClassAdapter.class.equals(superClass)) {
+            while (!ClassToken.class.equals(superClass)) {
 
                 subClass = superClass;
                 superClass = subClass.getSuperclass();
@@ -170,12 +170,12 @@ public abstract class ClassAdapter<CLASS> {
             return true;
         }
 
-        if (!(o instanceof ClassAdapter)) {
+        if (!(o instanceof ClassToken)) {
 
             return false;
         }
 
-        final ClassAdapter that = (ClassAdapter) o;
+        final ClassToken that = (ClassToken) o;
 
         return getRawClass().equals(that.getRawClass());
     }
@@ -186,7 +186,7 @@ public abstract class ClassAdapter<CLASS> {
      * @param other the adapter to compare.
      * @return whether this adapter raw class is equal to or is a super class.
      */
-    public final boolean isAssignableFrom(final ClassAdapter<?> other) {
+    public final boolean isAssignableFrom(final ClassToken<?> other) {
 
         return getRawClass().isAssignableFrom(other.getRawClass());
     }

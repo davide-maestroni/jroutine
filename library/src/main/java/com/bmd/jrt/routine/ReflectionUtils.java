@@ -133,16 +133,16 @@ class ReflectionUtils {
 
                 if (contextArg != null) {
 
-                    final Class<?> boxedClass = boxingClass(param);
+                    final Class<?> boxingClass = boxingClass(param);
 
-                    if (!boxedClass.isInstance(contextArg)) {
+                    if (!boxingClass.isInstance(contextArg)) {
 
                         isValid = false;
 
                         break;
                     }
 
-                    if (boxedClass.equals(contextArg.getClass())) {
+                    if (boxingClass.equals(contextArg.getClass())) {
 
                         ++confidence;
                     }

@@ -13,27 +13,25 @@
  */
 package com.bmd.jrt.routine;
 
+import com.bmd.jrt.runner.Runner;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
 /**
- * Created by davide on 9/7/14.
+ * Created by davide on 9/21/14.
  */
-public class JRoutine {
+@Inherited
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface AsynMethod {
 
-    private JRoutine() {
+    String name() default "";
 
-    }
+    Class<? extends Runner> runner() default NoRunner.class;
 
-    public static RoutineBuilder jrt() {
-
-        return new RoutineBuilder();
-    }
-
-    public static MethodRoutineBuilder jrt(final Class<?> target) {
-
-        return new MethodRoutineBuilder(target);
-    }
-
-    public static InstanceRoutineBuilder jrt(final Object target) {
-
-        return new InstanceRoutineBuilder(target);
-    }
+    boolean sequential() default false;
 }

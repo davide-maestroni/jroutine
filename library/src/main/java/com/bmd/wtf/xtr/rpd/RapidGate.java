@@ -13,7 +13,6 @@
  */
 package com.bmd.wtf.xtr.rpd;
 
-import com.bmd.wtf.fll.Classification;
 import com.bmd.wtf.flw.River;
 import com.bmd.wtf.gts.Gate;
 import com.bmd.wtf.xtr.rpd.RapidAnnotations.DataFlow;
@@ -318,9 +317,6 @@ public abstract class RapidGate implements Gate<Object, Object> {
 
         final Class<RapidGate> rapidGateClass = RapidGate.class;
         final Class<Object> objectClass = Object.class;
-
-
-
 
         final HashMap<Class<?>, Method> globalMap = mMethodMap;
 

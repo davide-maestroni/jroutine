@@ -53,6 +53,8 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
 
     private Throwable mAbortException;
 
+    private ArrayList<OutputChannel<?>> mBoundChannels = new ArrayList<OutputChannel<?>>();
+
     private TimeDuration mInputDelay = TimeDuration.ZERO;
 
     private int mPendingInputCount;
@@ -113,12 +115,13 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
                 return this;
             }
 
+            mBoundChannels.add(channel);
+
             delay = mInputDelay;
 
             ++mPendingInputCount;
         }
 
-        //TODO: channel.abort()
         channel.bind(new InputResultConsumer(delay));
 
         return this;
@@ -403,12 +406,12 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
         @Override
         public void onAbort() {
 
+            final Throwable exception;
+
             synchronized (mInvocationMutex) {
 
                 final DefaultResultChannel resultChannel = mResultChannel;
                 SubRoutine<INPUT, OUTPUT> routine = null;
-
-                final Throwable exception;
 
                 synchronized (mMutex) {
 
@@ -441,10 +444,20 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
 
                 } finally {
 
+                    final ArrayList<OutputChannel<?>> channels;
+
                     synchronized (mMutex) {
+
+                        channels = new ArrayList<OutputChannel<?>>(mBoundChannels);
+                        mBoundChannels.clear();
 
                         mState = ChannelState.ABORT;
                         mMutex.notifyAll();
+                    }
+
+                    for (final OutputChannel<?> channel : channels) {
+
+                        channel.abort(exception);
                     }
                 }
             }
@@ -989,12 +1002,13 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
                     return this;
                 }
 
+                mBoundChannels.add(channel);
+
                 delay = mInputDelay;
 
                 ++mPendingOutputCount;
             }
 
-            //TODO: channel.abort()
             channel.bind(new OutputResultConsumer(delay));
 
             return this;

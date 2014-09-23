@@ -32,8 +32,6 @@ import java.util.WeakHashMap;
  */
 public class MethodRoutineBuilder {
 
-    //TODO: call(args) ?
-
     private static final WeakHashMap<Object, Object> sMutexMap = new WeakHashMap<Object, Object>();
 
     private static final WeakHashMap<Object, HashMap<RoutineInfo, Routine<Object, Object>>>
@@ -45,6 +43,12 @@ public class MethodRoutineBuilder {
     private final HashMap<String, Method> mMethodMap = new HashMap<String, Method>();
 
     private final Object mTarget;
+
+    private final Class<?> mTargetClass;
+
+    private Boolean mIsSequential;
+
+    private Runner mRunner;
 
     MethodRoutineBuilder(final Object target) {
 
@@ -65,6 +69,8 @@ public class MethodRoutineBuilder {
             targetClass = target.getClass();
         }
 
+        mTargetClass = targetClass;
+
         final HashMap<String, Method> methodMap = mMethodMap;
         fillMap(methodMap, targetClass.getMethods());
 
@@ -83,7 +89,36 @@ public class MethodRoutineBuilder {
         }
     }
 
-    public Routine<Object, Object> method(final Method method) {
+    public Routine<Object, Object> classMethod(final String name,
+            final Class<?>... parameterTypes) {
+
+        final Class<?> targetClass = mTargetClass;
+        Method targetMethod = null;
+
+        try {
+
+            targetMethod = targetClass.getMethod(name, parameterTypes);
+
+        } catch (final NoSuchMethodException ignored) {
+
+        }
+
+        if (targetMethod == null) {
+
+            try {
+
+                targetMethod = targetClass.getDeclaredMethod(name, parameterTypes);
+
+            } catch (final NoSuchMethodException e) {
+
+                throw new RoutineException(e);
+            }
+        }
+
+        return classMethod(targetMethod);
+    }
+
+    public Routine<Object, Object> classMethod(final Method method) {
 
         if (method == null) {
 
@@ -95,32 +130,38 @@ public class MethodRoutineBuilder {
             method.setAccessible(true);
         }
 
-        Runner runner = null;
-        Boolean isSequential = null;
+        Runner runner = mRunner;
+        Boolean isSequential = mIsSequential;
 
         final AsynMethod annotation = method.getAnnotation(AsynMethod.class);
 
         if (annotation != null) {
 
-            final Class<? extends Runner> runnerClass = annotation.runner();
+            if (runner == null) {
 
-            if (runnerClass != NoRunner.class) {
+                final Class<? extends Runner> runnerClass = annotation.runner();
 
-                try {
+                if (runnerClass != NoRunner.class) {
 
-                    runner = runnerClass.newInstance();
+                    try {
 
-                } catch (final InstantiationException e) {
+                        runner = runnerClass.newInstance();
 
-                    throw new IllegalArgumentException(e);
+                    } catch (final InstantiationException e) {
 
-                } catch (IllegalAccessException e) {
+                        throw new IllegalArgumentException(e);
 
-                    throw new IllegalArgumentException(e);
+                    } catch (IllegalAccessException e) {
+
+                        throw new IllegalArgumentException(e);
+                    }
                 }
             }
 
-            isSequential = annotation.sequential();
+            if (mIsSequential == null) {
+
+                isSequential = annotation.sequential();
+            }
         }
 
         return getRoutine(method, runner, isSequential);
@@ -135,7 +176,28 @@ public class MethodRoutineBuilder {
             throw new IllegalArgumentException();
         }
 
-        return method(method);
+        return classMethod(method);
+    }
+
+    public MethodRoutineBuilder queued() {
+
+        mIsSequential = false;
+
+        return this;
+    }
+
+    public MethodRoutineBuilder runningOn(final Runner runner) {
+
+        mRunner = runner;
+
+        return this;
+    }
+
+    public MethodRoutineBuilder sequential() {
+
+        mIsSequential = true;
+
+        return this;
     }
 
     protected Routine<Object, Object> getRoutine(final Method method, final Runner runner,
@@ -173,11 +235,12 @@ public class MethodRoutineBuilder {
                 mutexMap.put(target, mutex);
             }
 
-            final RoutineBuilder builder = new RoutineBuilder();
+            final RoutineBuilder<Object, Object> builder =
+                    new RoutineBuilder<Object, Object>(ClassToken.token(MethodSubRoutine.class));
 
             if (runner != null) {
 
-                builder.inside(runner);
+                builder.runningOn(runner);
             }
 
             if (isSequential != null) {
@@ -192,8 +255,7 @@ public class MethodRoutineBuilder {
                 }
             }
 
-            routine = builder.withArgs(target, method, mutex)
-                             .routineOf(ClassToken.token(MethodSubRoutine.class));
+            routine = builder.withArgs(target, method, mutex).routine();
             routineMap.put(routineInfo, routine);
         }
 

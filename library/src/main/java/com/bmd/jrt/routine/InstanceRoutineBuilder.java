@@ -66,6 +66,30 @@ public class InstanceRoutineBuilder extends MethodRoutineBuilder {
         return itf.cast(proxy);
     }
 
+    @Override
+    public InstanceRoutineBuilder queued() {
+
+        super.queued();
+
+        return this;
+    }
+
+    @Override
+    public InstanceRoutineBuilder runningOn(final Runner runner) {
+
+        super.runningOn(runner);
+
+        return this;
+    }
+
+    @Override
+    public InstanceRoutineBuilder sequential() {
+
+        super.sequential();
+
+        return this;
+    }
+
     private class InterfaceInvocationHandler implements InvocationHandler {
 
         @Override
@@ -109,9 +133,11 @@ public class InstanceRoutineBuilder extends MethodRoutineBuilder {
                         name = method.getName();
                     }
 
+                    final Class<?>[] parameterTypes = method.getParameterTypes();
+
                     try {
 
-                        targetMethod = targetClass.getMethod(name, method.getParameterTypes());
+                        targetMethod = targetClass.getMethod(name, parameterTypes);
 
                     } catch (final NoSuchMethodException ignored) {
 
@@ -120,8 +146,7 @@ public class InstanceRoutineBuilder extends MethodRoutineBuilder {
                     if ((targetMethod == null) || !targetMethod.getReturnType()
                                                                .equals(returnType)) {
 
-                        targetMethod = targetClass.getDeclaredMethod(method.getName(),
-                                                                     method.getParameterTypes());
+                        targetMethod = targetClass.getDeclaredMethod(name, parameterTypes);
                     }
 
                     if (!targetMethod.getReturnType().equals(returnType)) {
@@ -151,7 +176,7 @@ public class InstanceRoutineBuilder extends MethodRoutineBuilder {
         public Object invoke(final Object proxy, final Method method, final Object[] args) throws
                 Throwable {
 
-            final OutputChannel<Object> outputChannel = method(method).invokeAsyn(args);
+            final OutputChannel<Object> outputChannel = classMethod(method).invokeAsyn(args);
 
             final Class<?> returnType = method.getReturnType();
 

@@ -13,6 +13,9 @@
  */
 package com.bmd.jrt.routine;
 
+import com.bmd.jrt.subroutine.SubRoutine;
+import com.bmd.jrt.util.ClassToken;
+
 /**
  * Created by davide on 9/7/14.
  */
@@ -22,9 +25,10 @@ public class JRoutine {
 
     }
 
-    public static RoutineBuilder jrt() {
+    public static <INPUT, OUTPUT> RoutineBuilder<INPUT, OUTPUT> jrt(
+            final ClassToken<? extends SubRoutine<INPUT, OUTPUT>> classToken) {
 
-        return new RoutineBuilder();
+        return new RoutineBuilder<INPUT, OUTPUT>(classToken);
     }
 
     public static MethodRoutineBuilder jrt(final Class<?> target) {

@@ -59,7 +59,7 @@ public class RoutineTest extends TestCase {
                 };
 
         final Routine<Integer, Integer> sumRoutine =
-                jrt().withArgs(this).routineOf(ClassToken.classOf(sumSubRoutine));
+                jrt(ClassToken.classOf(sumSubRoutine)).withArgs(this).routine();
 
         final SubRoutineAdapter<Integer, Integer> squareSubRoutine =
                 new SubRoutineAdapter<Integer, Integer>() {
@@ -75,7 +75,7 @@ public class RoutineTest extends TestCase {
                 };
 
         final Routine<Integer, Integer> squareRoutine =
-                jrt().withArgs(this).routineOf(ClassToken.classOf(squareSubRoutine));
+                jrt(ClassToken.classOf(squareSubRoutine)).withArgs(this).routine();
 
         assertThat(sumRoutine.call(squareRoutine.invoke(1, 2, 3, 4))).containsExactly(30);
         assertThat(sumRoutine.callAsyn(squareRoutine.invoke(1, 2, 3, 4))).containsExactly(30);
@@ -122,7 +122,7 @@ public class RoutineTest extends TestCase {
                 };
 
         final Routine<Integer, Integer> sumRoutine =
-                jrt().withArgs(this).routineOf(ClassToken.classOf(sumSubRoutine));
+                jrt(ClassToken.classOf(sumSubRoutine)).withArgs(this).routine();
 
         final SubRoutineAdapter<Integer, Integer> squareSubRoutine =
                 new SubRoutineAdapter<Integer, Integer>() {
@@ -138,7 +138,7 @@ public class RoutineTest extends TestCase {
                 };
 
         final Routine<Integer, Integer> squareRoutine =
-                jrt().withArgs(this).routineOf(ClassToken.classOf(squareSubRoutine));
+                jrt(ClassToken.classOf(squareSubRoutine)).withArgs(this).routine();
 
         final SubRoutineAdapter<Integer, Integer> squareSumSubRoutine =
                 new SubRoutineAdapter<Integer, Integer>() {
@@ -172,8 +172,8 @@ public class RoutineTest extends TestCase {
                 };
 
         final Routine<Integer, Integer> squareSumRoutine =
-                jrt().withArgs(this, sumRoutine, squareRoutine)
-                     .routineOf(ClassToken.classOf(squareSumSubRoutine));
+                jrt(ClassToken.classOf(squareSumSubRoutine)).withArgs(this, sumRoutine,
+                                                                      squareRoutine).routine();
 
         assertThat(squareSumRoutine.call(1, 2, 3, 4)).containsExactly(30);
         assertThat(squareSumRoutine.callAsyn(1, 2, 3, 4)).containsExactly(30);
@@ -223,12 +223,12 @@ public class RoutineTest extends TestCase {
         };
 
         final Routine<String, String> exceptionRoutine =
-                jrt().withArgs(this).routineOf(ClassToken.classOf(exceptionOnInit));
+                jrt(ClassToken.classOf(exceptionOnInit)).withArgs(this).routine();
 
         testException(exceptionRoutine, "test", "test1");
 
         final Routine<String, String> passThroughRoutine =
-                jrt().routineOf(ClassToken.token(PassThroughSubRoutine.class));
+                jrt(ClassToken.token(PassThroughSubRoutine.class)).routine();
 
         testChained(passThroughRoutine, exceptionRoutine, "test", "test1");
         testChained(exceptionRoutine, passThroughRoutine, "test", "test1");
@@ -247,12 +247,12 @@ public class RoutineTest extends TestCase {
                 };
 
         final Routine<String, String> exceptionRoutine =
-                jrt().withArgs(this).routineOf(ClassToken.classOf(exceptionOnInput));
+                jrt(ClassToken.classOf(exceptionOnInput)).withArgs(this).routine();
 
         testException(exceptionRoutine, "test2", "test2");
 
         final Routine<String, String> passThroughRoutine =
-                jrt().routineOf(ClassToken.token(PassThroughSubRoutine.class));
+                jrt(ClassToken.token(PassThroughSubRoutine.class)).routine();
 
         testChained(passThroughRoutine, exceptionRoutine, "test2", "test2");
         testChained(exceptionRoutine, passThroughRoutine, "test2", "test2");
@@ -271,12 +271,12 @@ public class RoutineTest extends TestCase {
                 };
 
         final Routine<String, String> exceptionRoutine =
-                jrt().withArgs(this).routineOf(ClassToken.classOf(exceptionOnResult));
+                jrt(ClassToken.classOf(exceptionOnResult)).withArgs(this).routine();
 
         testException(exceptionRoutine, "test", "test3");
 
         final Routine<String, String> passThroughRoutine =
-                jrt().routineOf(ClassToken.token(PassThroughSubRoutine.class));
+                jrt(ClassToken.token(PassThroughSubRoutine.class)).routine();
 
         testChained(passThroughRoutine, exceptionRoutine, "test", "test3");
         testChained(exceptionRoutine, passThroughRoutine, "test", "test3");
@@ -301,7 +301,7 @@ public class RoutineTest extends TestCase {
                 };
 
         final Routine<String, String> exceptionRoutine =
-                jrt().withArgs(this).routineOf(ClassToken.classOf(exceptionOnReturn));
+                jrt(ClassToken.classOf(exceptionOnReturn)).withArgs(this).routine();
 
         assertThat(exceptionRoutine.call("test")).containsExactly("test");
         assertThat(exceptionRoutine.callAsyn("test")).containsExactly("test");
@@ -326,7 +326,7 @@ public class RoutineTest extends TestCase {
                 "test");
 
         final Routine<String, String> passThroughRoutine =
-                jrt().routineOf(ClassToken.token(PassThroughSubRoutine.class));
+                jrt(ClassToken.token(PassThroughSubRoutine.class)).routine();
 
         assertThat(passThroughRoutine.call(exceptionRoutine.invoke("test"))).containsExactly(
                 "test");
@@ -606,8 +606,9 @@ public class RoutineTest extends TestCase {
 
     public void testMethod() throws NoSuchMethodException {
 
-        assertThat(jrt(new TestClass()).method(TestClass.class.getMethod("getOne"))
+        assertThat(jrt(new TestClass()).classMethod(TestClass.class.getMethod("getOne"))
                                        .call()).containsExactly(1);
+        assertThat(jrt(new TestClass()).classMethod("getOne").call()).containsExactly(1);
         assertThat(jrt(new TestClass()).method(TestClass.GET_METHOD).call()).containsExactly(1);
         assertThat(jrt(TestClass.class).method(TestClass.GET_METHOD).call(3)).containsExactly(3);
         assertThat(jrt(TestClass.class).method("get").callAsyn(-3)).containsExactly(-3);
@@ -653,7 +654,7 @@ public class RoutineTest extends TestCase {
                 };
 
         final Routine<Integer, Integer> squareRoutine =
-                jrt().withArgs(this).routineOf(ClassToken.classOf(squareSubRoutine));
+                jrt(ClassToken.classOf(squareSubRoutine)).withArgs(this).routine();
 
         assertThat(squareRoutine.call(1, 2, 3, 4)).containsExactly(1, 4, 9, 16);
         assertThat(squareRoutine.callAsyn(1, 2, 3, 4)).containsExactly(1, 4, 9, 16);
@@ -683,7 +684,7 @@ public class RoutineTest extends TestCase {
                 };
 
         final Routine<Integer, Integer> sumRoutine =
-                jrt().withArgs(this).routineOf(ClassToken.classOf(sumSubRoutine));
+                jrt(ClassToken.classOf(sumSubRoutine)).withArgs(this).routine();
 
         assertThat(sumRoutine.call(1, 2, 3, 4)).containsExactly(10);
         assertThat(sumRoutine.callAsyn(1, 2, 3, 4)).containsExactly(10);
@@ -1072,9 +1073,9 @@ public class RoutineTest extends TestCase {
     private void testConsumer(final ResultConsumer<String> consumer) {
 
         final String input = "test";
-        final Routine<String, String> routine = jrt().withArgs(TimeDuration.millis(0))
-                                                     .routineOf(ClassToken.token(
-                                                             DelaySubRoutine.class));
+        final Routine<String, String> routine =
+                jrt(ClassToken.token(DelaySubRoutine.class)).withArgs(TimeDuration.millis(0))
+                                                            .routine();
 
         assertThat(routine.invoke(input).bind(consumer).waitDone()).isTrue();
         assertThat(routine.invokeAsyn(input).bind(consumer).waitDone()).isTrue();

@@ -118,6 +118,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
             ++mPendingInputCount;
         }
 
+        //TODO: channel.abort()
         channel.bind(new InputResultConsumer(delay));
 
         return this;
@@ -993,6 +994,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
                 ++mPendingOutputCount;
             }
 
+            //TODO: channel.abort()
             channel.bind(new OutputResultConsumer(delay));
 
             return this;

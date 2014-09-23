@@ -26,40 +26,43 @@ import static com.bmd.jrt.routine.ReflectionUtils.NO_ARGS;
 /**
  * Created by davide on 9/21/14.
  */
-public class RoutineBuilder {
+public class RoutineBuilder<INPUT, OUTPUT> {
 
     private static final TimeDuration DEFAULT_AVAIL_TIMEOUT = TimeDuration.seconds(3);
 
+    private TimeDuration mAvailTimeout = DEFAULT_AVAIL_TIMEOUT;
+
     private static final int DEFAULT_RETAIN_COUNT = 10;
 
-    private Object[] mArgs;
+    private int mMaxRetained = DEFAULT_RETAIN_COUNT;
 
-    private Runner mAsyncRunner;
+    private final ClassToken<? extends SubRoutine<INPUT, OUTPUT>> mClassToken;
 
-    private TimeDuration mAvailTimeout;
+    private Object[] mArgs = NO_ARGS;
 
-    private int mMaxRetained;
+    private Runner mAsyncRunner = Runners.shared();
 
-    private int mMaxRunning;
+    private int mMaxRunning = Integer.MAX_VALUE;
 
-    private Runner mSyncRunner;
+    private Runner mSyncRunner = Runners.queued();
 
-    RoutineBuilder() {
+    RoutineBuilder(final ClassToken<? extends SubRoutine<INPUT, OUTPUT>> classToken) {
 
-        mSyncRunner = Runners.queued();
-        mAsyncRunner = Runners.shared();
-        mMaxRunning = Integer.MAX_VALUE;
-        mMaxRetained = DEFAULT_RETAIN_COUNT;
-        mAvailTimeout = DEFAULT_AVAIL_TIMEOUT;
-        mArgs = NO_ARGS;
+        if (classToken == null) {
+
+            throw new IllegalArgumentException();
+        }
+
+        mClassToken = classToken;
     }
 
-    public RoutineBuilder availableTimeout(final long timeout, final TimeUnit timeUnit) {
+    public RoutineBuilder<INPUT, OUTPUT> availableTimeout(final long timeout,
+            final TimeUnit timeUnit) {
 
         return availableTimeout(TimeDuration.fromUnit(timeout, timeUnit));
     }
 
-    public RoutineBuilder availableTimeout(final TimeDuration timeout) {
+    public RoutineBuilder<INPUT, OUTPUT> availableTimeout(final TimeDuration timeout) {
 
         if (timeout == null) {
 
@@ -71,14 +74,7 @@ public class RoutineBuilder {
         return this;
     }
 
-    public RoutineBuilder inside(final Runner runner) {
-
-        mAsyncRunner = runner;
-
-        return this;
-    }
-
-    public RoutineBuilder maxRetained(final int maxRetainedInstances) {
+    public RoutineBuilder<INPUT, OUTPUT> maxRetained(final int maxRetainedInstances) {
 
         if (maxRetainedInstances < 1) {
 
@@ -90,7 +86,7 @@ public class RoutineBuilder {
         return this;
     }
 
-    public RoutineBuilder maxRunning(final int maxRunningInstances) {
+    public RoutineBuilder<INPUT, OUTPUT> maxRunning(final int maxRunningInstances) {
 
         if (maxRunningInstances < 1) {
 
@@ -102,34 +98,35 @@ public class RoutineBuilder {
         return this;
     }
 
-    public RoutineBuilder queued() {
+    public RoutineBuilder<INPUT, OUTPUT> queued() {
 
         mSyncRunner = Runners.queued();
 
         return this;
     }
 
-    public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> routineOf(
-            final ClassToken<? extends SubRoutine<INPUT, OUTPUT>> classToken) {
-
-        if (classToken == null) {
-
-            throw new IllegalArgumentException();
-        }
+    public Routine<INPUT, OUTPUT> routine() {
 
         return new DefaultRoutine<INPUT, OUTPUT>(mSyncRunner, mAsyncRunner, mMaxRunning,
                                                  mMaxRetained, mAvailTimeout,
-                                                 classToken.getRawClass(), mArgs);
+                                                 mClassToken.getRawClass(), mArgs);
     }
 
-    public RoutineBuilder sequential() {
+    public RoutineBuilder<INPUT, OUTPUT> runningOn(final Runner runner) {
+
+        mAsyncRunner = runner;
+
+        return this;
+    }
+
+    public RoutineBuilder<INPUT, OUTPUT> sequential() {
 
         mSyncRunner = Runners.sequential();
 
         return this;
     }
 
-    public RoutineBuilder withArgs(final Object... args) {
+    public RoutineBuilder<INPUT, OUTPUT> withArgs(final Object... args) {
 
         if (args == null) {
 

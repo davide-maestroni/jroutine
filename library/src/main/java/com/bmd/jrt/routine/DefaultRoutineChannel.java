@@ -80,14 +80,14 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
     @Override
     public RoutineChannel<INPUT, OUTPUT> after(final TimeDuration delay) {
 
-        if (delay == null) {
-
-            throw new IllegalArgumentException();
-        }
-
         synchronized (mMutex) {
 
             verifyInput();
+
+            if (delay == null) {
+
+                throw new IllegalArgumentException();
+            }
 
             mInputDelay = delay;
         }
@@ -543,8 +543,6 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
                 }
             }
         }
-
-
     }
 
     private class DefaultIterator implements Iterator<OUTPUT> {
@@ -708,14 +706,14 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
         @Override
         public OutputChannel<OUTPUT> afterMax(final TimeDuration timeout) {
 
-            if (timeout == null) {
-
-                throw new IllegalArgumentException();
-            }
-
             synchronized (mMutex) {
 
                 verifyBound();
+
+                if (timeout == null) {
+
+                    throw new IllegalArgumentException();
+                }
 
                 mTimeout = timeout;
             }
@@ -732,14 +730,14 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
         @Override
         public OutputChannel<OUTPUT> bind(final ResultConsumer<OUTPUT> consumer) {
 
-            if (consumer == null) {
-
-                throw new IllegalArgumentException();
-            }
-
             synchronized (mMutex) {
 
                 verifyBound();
+
+                if (consumer == null) {
+
+                    throw new IllegalArgumentException();
+                }
 
                 mResultConsumer = new SynchronizedConsumer<OUTPUT>(consumer);
             }

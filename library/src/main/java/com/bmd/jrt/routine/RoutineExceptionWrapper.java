@@ -18,7 +18,7 @@ import com.bmd.jrt.util.RoutineException;
 /**
  * Created by davide on 9/8/14.
  */
-public class RoutineExceptionWrapper {
+class RoutineExceptionWrapper {
 
     private final Throwable mCause;
 

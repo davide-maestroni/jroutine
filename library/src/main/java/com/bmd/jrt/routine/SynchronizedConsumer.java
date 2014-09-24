@@ -13,18 +13,18 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.channel.ResultConsumer;
+import com.bmd.jrt.channel.OutputConsumer;
 
 /**
  * Created by davide on 9/18/14.
  */
-class SynchronizedConsumer<OUTPUT> implements ResultConsumer<OUTPUT> {
+class SynchronizedConsumer<OUTPUT> implements OutputConsumer<OUTPUT> {
 
-    private final ResultConsumer<OUTPUT> mConsumer;
+    private final OutputConsumer<OUTPUT> mConsumer;
 
     private final Object mMutex = new Object();
 
-    public SynchronizedConsumer(final ResultConsumer<OUTPUT> wrapped) {
+    public SynchronizedConsumer(final OutputConsumer<OUTPUT> wrapped) {
 
         if (wrapped == null) {
 
@@ -44,20 +44,20 @@ class SynchronizedConsumer<OUTPUT> implements ResultConsumer<OUTPUT> {
     }
 
     @Override
-    public void onResult(final OUTPUT result) {
+    public void onClose() {
 
         synchronized (mMutex) {
 
-            mConsumer.onResult(result);
+            mConsumer.onClose();
         }
     }
 
     @Override
-    public void onReturn() {
+    public void onOutput(final OUTPUT output) {
 
         synchronized (mMutex) {
 
-            mConsumer.onReturn();
+            mConsumer.onOutput(output);
         }
     }
 }

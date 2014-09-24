@@ -14,8 +14,8 @@
 package com.bmd.jrt.routine;
 
 import com.bmd.jrt.channel.RoutineChannel;
+import com.bmd.jrt.invocation.RoutineInvocation;
 import com.bmd.jrt.runner.Runner;
-import com.bmd.jrt.subroutine.SubRoutine;
 import com.bmd.jrt.time.TimeDuration;
 import com.bmd.wtf.fll.Classification;
 
@@ -31,20 +31,20 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
 
     private final Object[] mArgs;
 
-    private final Constructor<? extends SubRoutine<INPUT, OUTPUT>> mConstructor;
+    private final Constructor<? extends RoutineInvocation<INPUT, OUTPUT>> mConstructor;
 
-    private final Class<ParallelSubRoutine<INPUT, OUTPUT>> mParallelType =
-            new Classification<ParallelSubRoutine<INPUT, OUTPUT>>() {}.getRawType();
+    private final Class<ParallelRoutineInvocation<INPUT, OUTPUT>> mParallelType =
+            new Classification<ParallelRoutineInvocation<INPUT, OUTPUT>>() {}.getRawType();
 
     public DefaultRoutine(final Runner syncRunner, final Runner asyncRunner, final int maxRunning,
             final int maxRetained, final TimeDuration availTimeout,
-            final Class<? extends SubRoutine<INPUT, OUTPUT>> subroutineClass,
-            final Object... subroutineArgs) {
+            final Class<? extends RoutineInvocation<INPUT, OUTPUT>> invocationClass,
+            final Object... invocationArgs) {
 
         super(syncRunner, asyncRunner, maxRunning, maxRetained, availTimeout);
 
-        mConstructor = findConstructor(subroutineClass, subroutineArgs);
-        mArgs = (subroutineArgs == null) ? NO_ARGS : subroutineArgs.clone();
+        mConstructor = findConstructor(invocationClass, invocationArgs);
+        mArgs = (invocationArgs == null) ? NO_ARGS : invocationArgs.clone();
     }
 
     @Override
@@ -59,7 +59,7 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
     }
 
     @Override
-    protected SubRoutine<INPUT, OUTPUT> createSubRoutine(final boolean async) {
+    protected RoutineInvocation<INPUT, OUTPUT> createRoutineInvocation(final boolean async) {
 
         try {
 

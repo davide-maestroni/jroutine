@@ -24,18 +24,24 @@ public class RunnerDecorator implements Runner {
 
     public RunnerDecorator(final Runner wrapped) {
 
+        if (wrapped == null) {
+
+            throw new IllegalArgumentException();
+        }
+
         mRunner = wrapped;
     }
 
     @Override
-    public void onAbort(final Invocation invocation) {
+    public void run(final InvocationInstruction instruction, final long delay,
+            final TimeUnit timeUnit) {
 
-        mRunner.onAbort(invocation);
+        mRunner.run(instruction, delay, timeUnit);
     }
 
     @Override
-    public void onInput(final Invocation invocation, final long delay, final TimeUnit timeUnit) {
+    public void runAbort(final InvocationInstruction instruction) {
 
-        mRunner.onInput(invocation, delay, timeUnit);
+        mRunner.runAbort(instruction);
     }
 }

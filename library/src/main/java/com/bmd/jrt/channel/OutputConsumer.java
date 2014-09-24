@@ -11,37 +11,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.subroutine;
-
-import com.bmd.jrt.channel.ResultChannel;
+package com.bmd.jrt.channel;
 
 /**
- * Created by davide on 9/11/14.
+ * Created by davide on 9/7/14.
  */
-public abstract class SubRoutineAdapter<INPUT, OUTPUT> implements SubRoutine<INPUT, OUTPUT> {
+public interface OutputConsumer<OUTPUT> {
 
-    @Override
-    public void onAbort(final Throwable throwable) {
+    public void onAbort(Throwable throwable);
 
-    }
+    public void onClose();
 
-    @Override
-    public void onInit() {
-
-    }
-
-    @Override
-    public void onInput(final INPUT input, final ResultChannel<OUTPUT> results) {
-
-    }
-
-    @Override
-    public void onResult(final ResultChannel<OUTPUT> results) {
-
-    }
-
-    @Override
-    public void onReturn() {
-
-    }
+    public void onOutput(OUTPUT output);
 }

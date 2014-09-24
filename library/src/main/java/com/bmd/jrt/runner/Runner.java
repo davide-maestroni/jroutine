@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
  */
 public interface Runner {
 
-    public void onAbort(Invocation invocation);
+    public void run(InvocationInstruction instruction, long delay, TimeUnit timeUnit);
 
-    public void onInput(Invocation invocation, long delay, TimeUnit timeUnit);
+    public void runAbort(InvocationInstruction instruction);
 }

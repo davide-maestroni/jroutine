@@ -38,15 +38,15 @@ class LocalQueue {
 
     private int mFirst;
 
-    private long[] mInvocationTimeNs;
+    private InvocationInstruction[] mInstructions;
 
-    private Invocation[] mInvocations;
+    private long[] mInvocationTimeNs;
 
     private boolean mIsRunning;
 
     private int mLast;
 
-    private InvocationType[] mTypes;
+    private InstructionType[] mTypes;
 
     /**
      * Default constructor.
@@ -54,24 +54,24 @@ class LocalQueue {
     private LocalQueue() {
 
         mInvocationTimeNs = new long[INITIAL_CAPACITY];
-        mInvocations = new Invocation[INITIAL_CAPACITY];
+        mInstructions = new InvocationInstruction[INITIAL_CAPACITY];
         mDelays = new TimeDuration[INITIAL_CAPACITY];
-        mTypes = new InvocationType[INITIAL_CAPACITY];
+        mTypes = new InstructionType[INITIAL_CAPACITY];
     }
 
-    public static void addAbort(final Invocation invocation) {
-
-        sQueue.get().onAbort(invocation);
-    }
-
-    public static void addInput(final Invocation invocation, final long delay,
+    public static void run(final InvocationInstruction invocationInstruction, final long delay,
             final TimeUnit timeUnit) {
 
-        sQueue.get().onInput(invocation, delay, timeUnit);
+        sQueue.get().addRun(invocationInstruction, delay, timeUnit);
     }
 
-    private static void resizeArray(final Invocation[] src, final Invocation[] dst,
-            final int first) {
+    public static void runAbort(final InvocationInstruction invocationInstruction) {
+
+        sQueue.get().addAbort(invocationInstruction);
+    }
+
+    private static void resizeArray(final InvocationInstruction[] src,
+            final InvocationInstruction[] dst, final int first) {
 
         final int remainder = src.length - first;
 
@@ -88,7 +88,7 @@ class LocalQueue {
         System.arraycopy(src, first, dst, dst.length - remainder, remainder);
     }
 
-    private static void resizeArray(final InvocationType[] src, final InvocationType[] dst,
+    private static void resizeArray(final InstructionType[] src, final InstructionType[] dst,
             final int first) {
 
         final int remainder = src.length - first;
@@ -105,26 +105,27 @@ class LocalQueue {
         System.arraycopy(src, first, dst, dst.length - remainder, remainder);
     }
 
-    private void add(final Invocation invocation, TimeDuration delay, InvocationType type) {
+    private void add(final InvocationInstruction invocationInstruction, TimeDuration delay,
+            InstructionType type) {
 
-        if (mInvocations.length == 0) {
+        if (mInstructions.length == 0) {
 
             mInvocationTimeNs = new long[1];
-            mInvocations = new Invocation[1];
+            mInstructions = new InvocationInstruction[1];
             mDelays = new TimeDuration[1];
-            mTypes = new InvocationType[1];
+            mTypes = new InstructionType[1];
         }
 
         final int i = mLast;
 
         mInvocationTimeNs[i] = System.nanoTime();
-        mInvocations[i] = invocation;
+        mInstructions[i] = invocationInstruction;
         mDelays[i] = delay;
         mTypes[i] = type;
 
         final int newLast;
 
-        if ((i >= (mInvocations.length - 1)) || (i == Integer.MAX_VALUE)) {
+        if ((i >= (mInstructions.length - 1)) || (i == Integer.MAX_VALUE)) {
 
             newLast = 0;
 
@@ -135,15 +136,36 @@ class LocalQueue {
 
         if (mFirst == newLast) {
 
-            ensureCapacity(mInvocations.length + 1);
+            ensureCapacity(mInstructions.length + 1);
         }
 
         mLast = newLast;
     }
 
+    private void addAbort(final InvocationInstruction invocationInstruction) {
+
+        add(invocationInstruction, TimeDuration.ZERO, InstructionType.ABORT);
+
+        if (!mIsRunning) {
+
+            run();
+        }
+    }
+
+    private void addRun(final InvocationInstruction invocationInstruction, final long delay,
+            final TimeUnit timeUnit) {
+
+        add(invocationInstruction, TimeDuration.fromUnit(delay, timeUnit), InstructionType.RUN);
+
+        if (!mIsRunning) {
+
+            run();
+        }
+    }
+
     private void ensureCapacity(final int capacity) {
 
-        final int size = mInvocations.length;
+        final int size = mInstructions.length;
 
         if (capacity <= size) {
 
@@ -169,17 +191,18 @@ class LocalQueue {
         final long[] newInvocationTimeNs = new long[newSize];
         resizeArray(mInvocationTimeNs, newInvocationTimeNs, first);
 
-        final Invocation[] newInvocations = new Invocation[newSize];
-        resizeArray(mInvocations, newInvocations, first);
+        final InvocationInstruction[] newInvocationInstructions =
+                new InvocationInstruction[newSize];
+        resizeArray(mInstructions, newInvocationInstructions, first);
 
         final TimeDuration[] newDelays = new TimeDuration[newSize];
         resizeArray(mDelays, newDelays, first);
 
-        final InvocationType[] newTypes = new InvocationType[newSize];
+        final InstructionType[] newTypes = new InstructionType[newSize];
         resizeArray(mTypes, newTypes, first);
 
         mInvocationTimeNs = newInvocationTimeNs;
-        mInvocations = newInvocations;
+        mInstructions = newInvocationInstructions;
         mDelays = newDelays;
         mTypes = newTypes;
 
@@ -187,26 +210,6 @@ class LocalQueue {
 
         mFirst = first + shift;
         mLast = (last < first) ? last : last + shift;
-    }
-
-    private void onAbort(final Invocation invocation) {
-
-        add(invocation, TimeDuration.ZERO, InvocationType.ABORT);
-
-        if (!mIsRunning) {
-
-            run();
-        }
-    }
-
-    private void onInput(final Invocation invocation, final long delay, final TimeUnit timeUnit) {
-
-        add(invocation, TimeDuration.fromUnit(delay, timeUnit), InvocationType.INPUT);
-
-        if (!mIsRunning) {
-
-            run();
-        }
     }
 
     private void run() {
@@ -220,21 +223,21 @@ class LocalQueue {
                 final int i = mFirst;
                 final int last = mLast;
                 final long[] invocationTimeNs = mInvocationTimeNs;
-                final Invocation[] invocations = mInvocations;
+                final InvocationInstruction[] invocationInstructions = mInstructions;
                 final TimeDuration[] delays = mDelays;
-                final InvocationType[] types = mTypes;
+                final InstructionType[] types = mTypes;
 
                 long timeNs = invocationTimeNs[i];
-                Invocation invocation = invocations[i];
+                InvocationInstruction invocationInstruction = invocationInstructions[i];
                 TimeDuration delay = delays[i];
-                InvocationType type = types[i];
+                InstructionType type = types[i];
 
                 final long currentTimeNs = System.nanoTime();
                 long delayNs = timeNs - currentTimeNs + delay.toNanos();
 
                 if (delayNs > 0) {
 
-                    final int length = invocations.length;
+                    final int length = invocationInstructions.length;
                     long minDelay = delayNs;
                     int s = i;
 
@@ -272,12 +275,12 @@ class LocalQueue {
                     if (s != i) {
 
                         timeNs = invocationTimeNs[s];
-                        invocation = invocations[s];
+                        invocationInstruction = invocationInstructions[s];
                         delay = delays[s];
                         type = types[s];
 
                         invocationTimeNs[s] = invocationTimeNs[i];
-                        invocations[s] = invocations[i];
+                        invocationInstructions[s] = invocationInstructions[i];
                         delays[s] = delays[i];
                         types[s] = types[i];
                     }
@@ -300,13 +303,13 @@ class LocalQueue {
                 try {
 
                     // This call could be re-entrant
-                    if (type == InvocationType.INPUT) {
+                    if (type == InstructionType.RUN) {
 
-                        invocation.onInput();
+                        invocationInstruction.run();
 
                     } else {
 
-                        invocation.onAbort();
+                        invocationInstruction.abort();
                     }
 
                 } catch (final RoutineInterruptedException e) {
@@ -320,12 +323,12 @@ class LocalQueue {
                 // Note that the field values may have changed here
                 final int n = mFirst;
 
-                mInvocations[n] = null;
+                mInstructions[n] = null;
                 mDelays[n] = null;
 
                 final int newFirst = mFirst + 1;
 
-                if (newFirst >= mInvocations.length) {
+                if (newFirst >= mInstructions.length) {
 
                     mFirst = 0;
 
@@ -341,9 +344,9 @@ class LocalQueue {
         }
     }
 
-    private enum InvocationType {
+    private enum InstructionType {
 
-        INPUT,
+        RUN,
         ABORT
     }
 }

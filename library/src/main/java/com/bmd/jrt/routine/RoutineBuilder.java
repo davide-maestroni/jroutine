@@ -13,9 +13,9 @@
  */
 package com.bmd.jrt.routine;
 
+import com.bmd.jrt.invocation.RoutineInvocation;
 import com.bmd.jrt.runner.Runner;
 import com.bmd.jrt.runner.Runners;
-import com.bmd.jrt.subroutine.SubRoutine;
 import com.bmd.jrt.time.TimeDuration;
 import com.bmd.jrt.util.ClassToken;
 
@@ -36,7 +36,7 @@ public class RoutineBuilder<INPUT, OUTPUT> {
 
     private int mMaxRetained = DEFAULT_RETAIN_COUNT;
 
-    private final ClassToken<? extends SubRoutine<INPUT, OUTPUT>> mClassToken;
+    private final ClassToken<? extends RoutineInvocation<INPUT, OUTPUT>> mClassToken;
 
     private Object[] mArgs = NO_ARGS;
 
@@ -46,7 +46,7 @@ public class RoutineBuilder<INPUT, OUTPUT> {
 
     private Runner mSyncRunner = Runners.queued();
 
-    RoutineBuilder(final ClassToken<? extends SubRoutine<INPUT, OUTPUT>> classToken) {
+    RoutineBuilder(final ClassToken<? extends RoutineInvocation<INPUT, OUTPUT>> classToken) {
 
         if (classToken == null) {
 
@@ -76,7 +76,7 @@ public class RoutineBuilder<INPUT, OUTPUT> {
 
     public RoutineBuilder<INPUT, OUTPUT> maxRetained(final int maxRetainedInstances) {
 
-        if (maxRetainedInstances < 1) {
+        if (maxRetainedInstances < 0) {
 
             throw new IllegalArgumentException();
         }
@@ -112,7 +112,12 @@ public class RoutineBuilder<INPUT, OUTPUT> {
                                                  mClassToken.getRawClass(), mArgs);
     }
 
-    public RoutineBuilder<INPUT, OUTPUT> runningOn(final Runner runner) {
+    public RoutineBuilder<INPUT, OUTPUT> runBy(final Runner runner) {
+
+        if (runner == null) {
+
+            throw new IllegalArgumentException();
+        }
 
         mAsyncRunner = runner;
 

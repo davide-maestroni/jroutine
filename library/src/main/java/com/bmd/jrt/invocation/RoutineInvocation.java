@@ -11,16 +11,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.channel;
+package com.bmd.jrt.invocation;
+
+import com.bmd.jrt.channel.ResultChannel;
 
 /**
  * Created by davide on 9/7/14.
  */
-public interface ResultConsumer<OUTPUT> {
+public interface RoutineInvocation<INPUT, OUTPUT> {
 
     public void onAbort(Throwable throwable);
 
-    public void onResult(OUTPUT result);
+    public void onInit();
+
+    public void onInput(INPUT input, ResultChannel<OUTPUT> results);
+
+    public void onResult(ResultChannel<OUTPUT> results);
 
     public void onReturn();
 }

@@ -11,25 +11,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.channel;
+package com.bmd.jrt.routine;
+
+import com.bmd.jrt.invocation.RoutineInvocation;
 
 /**
- * Created by davide on 9/16/14.
+ * Created by davide on 9/24/14.
  */
-public abstract class ResultConsumerAdapter<OUTPUT> implements ResultConsumer<OUTPUT> {
+interface RoutineInvocationProvider<INPUT, OUTPUT> {
 
-    @Override
-    public void onAbort(final Throwable throwable) {
+    public RoutineInvocation<INPUT, OUTPUT> create();
 
-    }
+    public void discard(RoutineInvocation<INPUT, OUTPUT> invocation);
 
-    @Override
-    public void onResult(final OUTPUT result) {
-
-    }
-
-    @Override
-    public void onReturn() {
-
-    }
+    public void recycle(RoutineInvocation<INPUT, OUTPUT> invocation);
 }

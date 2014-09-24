@@ -24,23 +24,24 @@ import java.util.concurrent.TimeUnit;
 class SequentialRunner implements Runner {
 
     @Override
-    public void onAbort(final Invocation invocation) {
-
-        invocation.onAbort();
-    }
-
-    @Override
-    public void onInput(final Invocation invocation, final long delay, final TimeUnit timeUnit) {
+    public void run(final InvocationInstruction instruction, final long delay,
+            final TimeUnit timeUnit) {
 
         try {
 
             TimeDuration.fromUnit(delay, timeUnit).sleepAtLeast();
 
-            invocation.onInput();
+            instruction.run();
 
         } catch (final InterruptedException e) {
 
             RoutineInterruptedException.interrupt(e);
         }
+    }
+
+    @Override
+    public void runAbort(final InvocationInstruction instruction) {
+
+        instruction.abort();
     }
 }

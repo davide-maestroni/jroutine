@@ -14,47 +14,28 @@
 package com.bmd.jrt.routine;
 
 import com.bmd.jrt.channel.ResultChannel;
-import com.bmd.jrt.subroutine.SubRoutineAdapter;
+import com.bmd.jrt.invocation.RoutineInvocationAdapter;
 
 /**
  * Created by davide on 9/17/14.
  */
-class ParallelSubRoutine<INPUT, OUTPUT> extends SubRoutineAdapter<INPUT, OUTPUT> {
+class ParallelRoutineInvocation<INPUT, OUTPUT> extends RoutineInvocationAdapter<INPUT, OUTPUT> {
 
     private final Routine<INPUT, OUTPUT> mRoutine;
 
-    public ParallelSubRoutine(final Routine<INPUT, OUTPUT> routine) {
+    public ParallelRoutineInvocation(final Routine<INPUT, OUTPUT> routine) {
+
+        if (routine == null) {
+
+            throw new IllegalArgumentException();
+        }
 
         mRoutine = routine;
-    }
-
-    @Override
-    public void onAbort(final Throwable throwable) {
-
-        super.onAbort(throwable);
-    }
-
-    @Override
-    public void onInit() {
-
-        super.onInit();
     }
 
     @Override
     public void onInput(final INPUT input, final ResultChannel<OUTPUT> results) {
 
         results.pass(mRoutine.invokeAsyn(input));
-    }
-
-    @Override
-    public void onResult(final ResultChannel<OUTPUT> results) {
-
-        super.onResult(results);
-    }
-
-    @Override
-    public void onReturn() {
-
-        super.onReturn();
     }
 }

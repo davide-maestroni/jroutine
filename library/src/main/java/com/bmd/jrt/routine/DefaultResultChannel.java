@@ -14,7 +14,7 @@
 package com.bmd.jrt.routine;
 
 import com.bmd.jrt.channel.OutputChannel;
-import com.bmd.jrt.channel.RoutineChannel;
+import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.time.TimeDuration;
 
 import java.util.concurrent.TimeUnit;
@@ -22,11 +22,11 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by davide on 9/24/14.
  */
-class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTPUT> {
+class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
-    private final InvocationHandler<INPUT, OUTPUT> mHandler;
+    private final InvocationHandler<?, OUTPUT> mHandler;
 
-    public DefaultRoutineChannel(final InvocationHandler<INPUT, OUTPUT> handler) {
+    public DefaultResultChannel(final InvocationHandler<?, OUTPUT> handler) {
 
         if (handler == null) {
 
@@ -45,64 +45,58 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
     @Override
     public boolean abort(final Throwable throwable) {
 
-        return mHandler.inputAbort(throwable);
+        return mHandler.resultAbort(throwable);
     }
 
     @Override
     public boolean isOpen() {
 
-        return mHandler.isInputOpen();
+        return mHandler.isResultOpen();
     }
 
     @Override
-    public RoutineChannel<INPUT, OUTPUT> after(final TimeDuration delay) {
+    public ResultChannel<OUTPUT> after(final TimeDuration delay) {
 
-        mHandler.inputAfter(delay);
+        mHandler.resultAfter(delay);
 
         return this;
     }
 
     @Override
-    public RoutineChannel<INPUT, OUTPUT> after(final long delay, final TimeUnit timeUnit) {
+    public ResultChannel<OUTPUT> after(final long delay, final TimeUnit timeUnit) {
 
         return after(TimeDuration.fromUnit(delay, timeUnit));
     }
 
     @Override
-    public RoutineChannel<INPUT, OUTPUT> pass(final OutputChannel<INPUT> channel) {
+    public ResultChannel<OUTPUT> pass(final OutputChannel<OUTPUT> channel) {
 
-        mHandler.inputPass(channel);
-
-        return this;
-    }
-
-    @Override
-    public RoutineChannel<INPUT, OUTPUT> pass(final Iterable<? extends INPUT> inputs) {
-
-        mHandler.inputPass(inputs);
+        mHandler.resultPass(channel);
 
         return this;
     }
 
     @Override
-    public RoutineChannel<INPUT, OUTPUT> pass(final INPUT input) {
+    public ResultChannel<OUTPUT> pass(final Iterable<? extends OUTPUT> outputs) {
 
-        mHandler.inputPass(input);
-
-        return this;
-    }
-
-    @Override
-    public RoutineChannel<INPUT, OUTPUT> pass(final INPUT... inputs) {
-
-        mHandler.inputPass(inputs);
+        mHandler.resultPass(outputs);
 
         return this;
     }
 
     @Override
-    public OutputChannel<OUTPUT> close() {
+    public ResultChannel<OUTPUT> pass(final OUTPUT output) {
 
-        return mHandler.inputClose();
+        mHandler.resultPass(output);
+
+        return this;
+    }
+
+    @Override
+    public ResultChannel<OUTPUT> pass(final OUTPUT... outputs) {
+
+        mHandler.resultPass(outputs);
+
+        return this;
     }
 }

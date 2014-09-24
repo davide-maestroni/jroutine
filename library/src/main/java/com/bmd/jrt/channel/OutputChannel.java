@@ -27,7 +27,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
 
     public OutputChannel<OUTPUT> afterMax(long timeout, TimeUnit timeUnit);
 
-    public OutputChannel<OUTPUT> bind(ResultConsumer<OUTPUT> consumer);
+    public OutputChannel<OUTPUT> bind(OutputConsumer<OUTPUT> consumer);
 
     public OutputChannel<OUTPUT> eventuallyThrow(RuntimeException exception);
 

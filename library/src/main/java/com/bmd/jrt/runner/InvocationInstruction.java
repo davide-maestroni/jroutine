@@ -11,22 +11,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.subroutine;
-
-import com.bmd.jrt.channel.ResultChannel;
+package com.bmd.jrt.runner;
 
 /**
  * Created by davide on 9/7/14.
  */
-public interface SubRoutine<INPUT, OUTPUT> {
+public interface InvocationInstruction {
 
-    public void onAbort(Throwable throwable);
+    public void abort();
 
-    public void onInit();
-
-    public void onInput(INPUT input, ResultChannel<OUTPUT> results);
-
-    public void onResult(ResultChannel<OUTPUT> results);
-
-    public void onReturn();
+    public void run();
 }

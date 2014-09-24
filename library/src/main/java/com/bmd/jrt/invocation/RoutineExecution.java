@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.subroutine;
+package com.bmd.jrt.invocation;
 
 import com.bmd.jrt.channel.ResultChannel;
 
@@ -21,9 +21,12 @@ import java.util.List;
 /**
  * Created by davide on 9/7/14.
  */
-public abstract class SubRoutineFunction<INPUT, OUTPUT> extends SubRoutineAdapter<INPUT, OUTPUT> {
+public abstract class RoutineExecution<INPUT, OUTPUT>
+        extends RoutineInvocationAdapter<INPUT, OUTPUT> {
 
     private ArrayList<INPUT> mInputs;
+
+    public abstract void onExec(List<? extends INPUT> inputs, ResultChannel<OUTPUT> results);
 
     @Override
     public void onInput(final INPUT input, final ResultChannel<OUTPUT> results) {
@@ -51,7 +54,7 @@ public abstract class SubRoutineFunction<INPUT, OUTPUT> extends SubRoutineAdapte
             clone = new ArrayList<INPUT>(inputs);
         }
 
-        onRun(clone, results);
+        onExec(clone, results);
     }
 
     @Override
@@ -64,6 +67,4 @@ public abstract class SubRoutineFunction<INPUT, OUTPUT> extends SubRoutineAdapte
             inputs.clear();
         }
     }
-
-    public abstract void onRun(List<? extends INPUT> inputs, ResultChannel<OUTPUT> results);
 }

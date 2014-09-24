@@ -21,14 +21,15 @@ import java.util.concurrent.TimeUnit;
 class QueuedRunner implements Runner {
 
     @Override
-    public void onAbort(final Invocation invocation) {
+    public void run(final InvocationInstruction instruction, final long delay,
+            final TimeUnit timeUnit) {
 
-        LocalQueue.addAbort(invocation);
+        LocalQueue.run(instruction, delay, timeUnit);
     }
 
     @Override
-    public void onInput(final Invocation invocation, final long delay, final TimeUnit timeUnit) {
+    public void runAbort(final InvocationInstruction instruction) {
 
-        LocalQueue.addInput(invocation, delay, timeUnit);
+        LocalQueue.runAbort(instruction);
     }
 }

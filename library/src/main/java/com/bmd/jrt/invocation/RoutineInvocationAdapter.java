@@ -11,26 +11,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.routine;
+package com.bmd.jrt.invocation;
 
-import com.bmd.jrt.runner.InvocationInstruction;
-import com.bmd.jrt.runner.Runner;
-
-import java.util.concurrent.TimeUnit;
+import com.bmd.jrt.channel.ResultChannel;
 
 /**
- * Created by davide on 9/22/14.
+ * Created by davide on 9/11/14.
  */
-class NoRunner implements Runner {
+public abstract class RoutineInvocationAdapter<INPUT, OUTPUT>
+        implements RoutineInvocation<INPUT, OUTPUT> {
 
     @Override
-    public void run(final InvocationInstruction instruction, final long delay,
-            final TimeUnit timeUnit) {
+    public void onAbort(final Throwable throwable) {
 
     }
 
     @Override
-    public void runAbort(final InvocationInstruction instruction) {
+    public void onInit() {
+
+    }
+
+    @Override
+    public void onInput(final INPUT input, final ResultChannel<OUTPUT> results) {
+
+    }
+
+    @Override
+    public void onResult(final ResultChannel<OUTPUT> results) {
+
+    }
+
+    @Override
+    public void onReturn() {
 
     }
 }

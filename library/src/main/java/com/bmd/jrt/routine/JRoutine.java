@@ -13,7 +13,7 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.subroutine.SubRoutine;
+import com.bmd.jrt.invocation.RoutineInvocation;
 import com.bmd.jrt.util.ClassToken;
 
 /**
@@ -25,19 +25,19 @@ public class JRoutine {
 
     }
 
-    public static <INPUT, OUTPUT> RoutineBuilder<INPUT, OUTPUT> jrt(
-            final ClassToken<? extends SubRoutine<INPUT, OUTPUT>> classToken) {
+    public static ClassRoutineBuilder on(final Class<?> target) {
+
+        return new ClassRoutineBuilder(target);
+    }
+
+    public static <INPUT, OUTPUT> RoutineBuilder<INPUT, OUTPUT> on(
+            final ClassToken<? extends RoutineInvocation<INPUT, OUTPUT>> classToken) {
 
         return new RoutineBuilder<INPUT, OUTPUT>(classToken);
     }
 
-    public static MethodRoutineBuilder jrt(final Class<?> target) {
+    public static ObjectRoutineBuilder on(final Object target) {
 
-        return new MethodRoutineBuilder(target);
-    }
-
-    public static InstanceRoutineBuilder jrt(final Object target) {
-
-        return new InstanceRoutineBuilder(target);
+        return new ObjectRoutineBuilder(target);
     }
 }

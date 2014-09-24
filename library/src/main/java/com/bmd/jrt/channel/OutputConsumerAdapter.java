@@ -11,14 +11,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.runner;
+package com.bmd.jrt.channel;
 
 /**
- * Created by davide on 9/7/14.
+ * Created by davide on 9/16/14.
  */
-public interface Invocation {
+public abstract class OutputConsumerAdapter<OUTPUT> implements OutputConsumer<OUTPUT> {
 
-    public void onAbort();
+    @Override
+    public void onAbort(final Throwable throwable) {
 
-    public void onInput();
+    }
+
+    @Override
+    public void onClose() {
+
+    }
+
+    @Override
+    public void onOutput(final OUTPUT output) {
+
+    }
 }

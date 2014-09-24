@@ -15,9 +15,8 @@ package com.bmd.jrt.routine;
 
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.RoutineChannel;
-import com.bmd.jrt.routine.DefaultRoutineChannel.SubRoutineProvider;
+import com.bmd.jrt.invocation.RoutineInvocation;
 import com.bmd.jrt.runner.Runner;
-import com.bmd.jrt.subroutine.SubRoutine;
 import com.bmd.jrt.time.TimeDuration;
 import com.bmd.jrt.time.TimeDuration.Check;
 import com.bmd.jrt.util.RoutineInterruptedException;
@@ -43,10 +42,10 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
 
     private final Runner mSyncRunner;
 
-    private int mRunningCount;
+    private LinkedList<RoutineInvocation<INPUT, OUTPUT>> mRoutineInvocations =
+            new LinkedList<RoutineInvocation<INPUT, OUTPUT>>();
 
-    private LinkedList<SubRoutine<INPUT, OUTPUT>> mSubRoutines =
-            new LinkedList<SubRoutine<INPUT, OUTPUT>>();
+    private int mRunningCount;
 
     public AbstractRoutine(final Runner syncRunner, final Runner asyncRunner, final int maxRunning,
             final int maxRetained, final TimeDuration availTimeout) {
@@ -66,7 +65,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
             throw new IllegalArgumentException();
         }
 
-        if (maxRetained < 1) {
+        if (maxRetained < 0) {
 
             throw new IllegalArgumentException();
         }
@@ -141,6 +140,36 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
     public List<OUTPUT> callAsyn(final OutputChannel<? extends INPUT> inputs) {
 
         return invokeAsyn(inputs).readAll();
+    }
+
+    @Override
+    public List<OUTPUT> callParall() {
+
+        return invokeParall().readAll();
+    }
+
+    @Override
+    public List<OUTPUT> callParall(final INPUT input) {
+
+        return invokeParall(input).readAll();
+    }
+
+    @Override
+    public List<OUTPUT> callParall(final INPUT... inputs) {
+
+        return invokeParall(inputs).readAll();
+    }
+
+    @Override
+    public List<OUTPUT> callParall(final Iterable<? extends INPUT> inputs) {
+
+        return invokeParall(inputs).readAll();
+    }
+
+    @Override
+    public List<OUTPUT> callParall(final OutputChannel<? extends INPUT> inputs) {
+
+        return invokeParall(inputs).readAll();
     }
 
     @Override
@@ -245,7 +274,8 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
         return launch(true);
     }
 
-    protected abstract SubRoutine<INPUT, OUTPUT> createSubRoutine(final boolean async);
+    protected abstract RoutineInvocation<INPUT, OUTPUT> createRoutineInvocation(
+            final boolean async);
 
     protected Runner getAsyncRunner() {
 
@@ -274,21 +304,25 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
 
     protected RoutineChannel<INPUT, OUTPUT> launch(final boolean async) {
 
-        return new DefaultRoutineChannel<INPUT, OUTPUT>(new RoutineSubRoutineProvider(async),
-                                                        (async) ? mAsyncRunner : mSyncRunner);
+        final InvocationHandler<INPUT, OUTPUT> invocationHandler =
+                new InvocationHandler<INPUT, OUTPUT>(new DefaultRoutineInvocationProvider(async),
+                                                     (async) ? mAsyncRunner : mSyncRunner);
+
+        return new DefaultRoutineChannel<INPUT, OUTPUT>(invocationHandler);
     }
 
-    private class RoutineSubRoutineProvider implements SubRoutineProvider<INPUT, OUTPUT> {
+    private class DefaultRoutineInvocationProvider
+            implements RoutineInvocationProvider<INPUT, OUTPUT> {
 
         private final boolean mAsync;
 
-        private RoutineSubRoutineProvider(final boolean async) {
+        private DefaultRoutineInvocationProvider(final boolean async) {
 
             mAsync = async;
         }
 
         @Override
-        public SubRoutine<INPUT, OUTPUT> create() {
+        public RoutineInvocation<INPUT, OUTPUT> create() {
 
             synchronized (mMutex) {
 
@@ -296,12 +330,14 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
 
                 try {
 
+                    final int maxRunning = mMaxRunning;
+
                     isTimeout = !mAvailTimeout.waitTrue(mMutex, new Check() {
 
                         @Override
                         public boolean isTrue() {
 
-                            return mRunningCount < mMaxRunning;
+                            return mRunningCount < maxRunning;
                         }
                     });
 
@@ -317,19 +353,19 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
 
                 ++mRunningCount;
 
-                final LinkedList<SubRoutine<INPUT, OUTPUT>> routines = mSubRoutines;
+                final LinkedList<RoutineInvocation<INPUT, OUTPUT>> routines = mRoutineInvocations;
 
                 if (!routines.isEmpty()) {
 
                     return routines.removeFirst();
                 }
 
-                return createSubRoutine(mAsync);
+                return createRoutineInvocation(mAsync);
             }
         }
 
         @Override
-        public void discard(final SubRoutine<INPUT, OUTPUT> routine) {
+        public void discard(final RoutineInvocation<INPUT, OUTPUT> invocation) {
 
             synchronized (mMutex) {
 
@@ -339,15 +375,16 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
         }
 
         @Override
-        public void recycle(final SubRoutine<INPUT, OUTPUT> routine) {
+        public void recycle(final RoutineInvocation<INPUT, OUTPUT> invocation) {
 
             synchronized (mMutex) {
 
-                final LinkedList<SubRoutine<INPUT, OUTPUT>> routines = mSubRoutines;
+                final LinkedList<RoutineInvocation<INPUT, OUTPUT>> invocations =
+                        mRoutineInvocations;
 
-                if (routines.size() < mMaxRetained) {
+                if (invocations.size() < mMaxRetained) {
 
-                    routines.add(routine);
+                    invocations.add(invocation);
                 }
 
                 --mRunningCount;

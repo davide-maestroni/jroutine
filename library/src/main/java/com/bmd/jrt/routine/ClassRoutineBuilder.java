@@ -14,8 +14,8 @@
 package com.bmd.jrt.routine;
 
 import com.bmd.jrt.channel.ResultChannel;
+import com.bmd.jrt.invocation.RoutineExecution;
 import com.bmd.jrt.runner.Runner;
-import com.bmd.jrt.subroutine.SubRoutineFunction;
 import com.bmd.jrt.util.ClassToken;
 import com.bmd.jrt.util.RoutineException;
 
@@ -30,7 +30,7 @@ import java.util.WeakHashMap;
 /**
  * Created by davide on 9/21/14.
  */
-public class MethodRoutineBuilder {
+public class ClassRoutineBuilder {
 
     private static final WeakHashMap<Object, Object> sMutexMap = new WeakHashMap<Object, Object>();
 
@@ -50,7 +50,12 @@ public class MethodRoutineBuilder {
 
     private Runner mRunner;
 
-    MethodRoutineBuilder(final Object target) {
+    ClassRoutineBuilder(final Object target) {
+
+        if (target == null) {
+
+            throw new IllegalArgumentException();
+        }
 
         final Class<?> targetClass;
 
@@ -91,6 +96,16 @@ public class MethodRoutineBuilder {
 
     public Routine<Object, Object> classMethod(final String name,
             final Class<?>... parameterTypes) {
+
+        if (name == null) {
+
+            throw new IllegalArgumentException();
+        }
+
+        if (parameterTypes == null) {
+
+            throw new IllegalArgumentException();
+        }
 
         final Class<?> targetClass = mTargetClass;
         Method targetMethod = null;
@@ -158,7 +173,7 @@ public class MethodRoutineBuilder {
                 }
             }
 
-            if (mIsSequential == null) {
+            if (isSequential == null) {
 
                 isSequential = annotation.sequential();
             }
@@ -179,21 +194,21 @@ public class MethodRoutineBuilder {
         return classMethod(method);
     }
 
-    public MethodRoutineBuilder queued() {
+    public ClassRoutineBuilder queued() {
 
         mIsSequential = false;
 
         return this;
     }
 
-    public MethodRoutineBuilder runningOn(final Runner runner) {
+    public ClassRoutineBuilder runBy(final Runner runner) {
 
         mRunner = runner;
 
         return this;
     }
 
-    public MethodRoutineBuilder sequential() {
+    public ClassRoutineBuilder sequential() {
 
         mIsSequential = true;
 
@@ -235,12 +250,12 @@ public class MethodRoutineBuilder {
                 mutexMap.put(target, mutex);
             }
 
-            final RoutineBuilder<Object, Object> builder =
-                    new RoutineBuilder<Object, Object>(ClassToken.token(MethodSubRoutine.class));
+            final RoutineBuilder<Object, Object> builder = new RoutineBuilder<Object, Object>(
+                    ClassToken.token(MethodRoutineInvocation.class));
 
             if (runner != null) {
 
-                builder.runningOn(runner);
+                builder.runBy(runner);
             }
 
             if (isSequential != null) {
@@ -303,7 +318,7 @@ public class MethodRoutineBuilder {
         }
     }
 
-    private static class MethodSubRoutine extends SubRoutineFunction<Object, Object> {
+    private static class MethodRoutineInvocation extends RoutineExecution<Object, Object> {
 
         private final boolean mHasResult;
 
@@ -313,7 +328,8 @@ public class MethodRoutineBuilder {
 
         private final Object mTarget;
 
-        public MethodSubRoutine(final Object target, final Method method, final Object mutex) {
+        public MethodRoutineInvocation(final Object target, final Method method,
+                final Object mutex) {
 
             mTarget = target;
             mMethod = method;
@@ -324,7 +340,7 @@ public class MethodRoutineBuilder {
         }
 
         @Override
-        public void onRun(final List<?> objects, final ResultChannel<Object> results) {
+        public void onExec(final List<?> objects, final ResultChannel<Object> results) {
 
             synchronized (mMutex) {
 

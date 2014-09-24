@@ -24,13 +24,13 @@ import java.util.HashMap;
 /**
  * Created by davide on 9/21/14.
  */
-public class InstanceRoutineBuilder extends MethodRoutineBuilder {
+public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
     private static final HashMap<Method, Method> mMethodMap = new HashMap<Method, Method>();
 
     private final Class<?> mTargetClass;
 
-    InstanceRoutineBuilder(final Object target) {
+    ObjectRoutineBuilder(final Object target) {
 
         super(target);
 
@@ -67,7 +67,7 @@ public class InstanceRoutineBuilder extends MethodRoutineBuilder {
     }
 
     @Override
-    public InstanceRoutineBuilder queued() {
+    public ObjectRoutineBuilder queued() {
 
         super.queued();
 
@@ -75,15 +75,15 @@ public class InstanceRoutineBuilder extends MethodRoutineBuilder {
     }
 
     @Override
-    public InstanceRoutineBuilder runningOn(final Runner runner) {
+    public ObjectRoutineBuilder runBy(final Runner runner) {
 
-        super.runningOn(runner);
+        super.runBy(runner);
 
         return this;
     }
 
     @Override
-    public InstanceRoutineBuilder sequential() {
+    public ObjectRoutineBuilder sequential() {
 
         super.sequential();
 

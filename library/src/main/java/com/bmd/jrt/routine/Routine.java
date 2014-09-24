@@ -43,6 +43,16 @@ public interface Routine<INPUT, OUTPUT> {
 
     public List<OUTPUT> callAsyn(OutputChannel<? extends INPUT> inputs);
 
+    public List<OUTPUT> callParall();
+
+    public List<OUTPUT> callParall(INPUT input);
+
+    public List<OUTPUT> callParall(INPUT... inputs);
+
+    public List<OUTPUT> callParall(Iterable<? extends INPUT> inputs);
+
+    public List<OUTPUT> callParall(OutputChannel<? extends INPUT> inputs);
+
     public OutputChannel<OUTPUT> invoke();
 
     public OutputChannel<OUTPUT> invoke(INPUT input);

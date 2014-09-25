@@ -24,8 +24,7 @@ import java.util.concurrent.TimeUnit;
 class SequentialRunner implements Runner {
 
     @Override
-    public void run(final InvocationInstruction instruction, final long delay,
-            final TimeUnit timeUnit) {
+    public void run(final Invocation instruction, final long delay, final TimeUnit timeUnit) {
 
         try {
 
@@ -40,7 +39,7 @@ class SequentialRunner implements Runner {
     }
 
     @Override
-    public void runAbort(final InvocationInstruction instruction) {
+    public void runAbort(final Invocation instruction) {
 
         instruction.abort();
     }

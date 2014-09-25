@@ -14,13 +14,30 @@
 package com.bmd.jrt.channel;
 
 /**
+ * Interface defining an output consumer which can be bound to an output channel.
+ * <p/>
  * Created by davide on 9/7/14.
+ *
+ * @param <OUTPUT> the output type.
  */
 public interface OutputConsumer<OUTPUT> {
 
+    /**
+     * Called when the bounded channel transfer is aborted.
+     *
+     * @param throwable the reason of the abortion.
+     */
     public void onAbort(Throwable throwable);
 
+    /**
+     * Called when the channel closes after the routine completes its execution.
+     */
     public void onClose();
 
+    /**
+     * Called when an output is passed to the channel.
+     *
+     * @param output the output.
+     */
     public void onOutput(OUTPUT output);
 }

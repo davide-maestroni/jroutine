@@ -14,13 +14,38 @@
 package com.bmd.jrt.channel;
 
 /**
+ * Interface defining a basic communication channel with the routine.<br/>
+ * Channel instances are used to transfer data to and from the code executed inside the routine
+ * invocation.
+ * <p/>
  * Created by davide on 9/9/14.
  */
 public interface Channel {
 
+    /**
+     * Closes the channel and abort the transfer of data, thus aborting the routine invocation.
+     * <p/>
+     * Note that, in case the channel was already closed, the call to this method has no effect.
+     *
+     * @return whether the channel status changed as a result of the call.
+     */
     public boolean abort();
 
+    /**
+     * Closes the channel and abort the transfer of data, thus aborting the routine invocation and
+     * causing the specified throwable to be passed as the abortion reason.
+     * <p/>
+     * Note that, in case the channel was already closed, the call to this method has no effect.
+     *
+     * @param throwable the throwable object identifying the reason of the routine abortion.
+     * @return whether the channel status changed as a result of the call.
+     */
     public boolean abort(Throwable throwable);
 
+    /**
+     * Checks if the channel is open, that is, data can be written or read.
+     *
+     * @return whether the channel is open.
+     */
     public boolean isOpen();
 }

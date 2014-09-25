@@ -13,23 +13,29 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.runner.Invocation;
-import com.bmd.jrt.runner.Runner;
-
-import java.util.concurrent.TimeUnit;
+import com.bmd.jrt.channel.ResultChannel;
+import com.bmd.jrt.execution.ExecutionAdapter;
 
 /**
- * Created by davide on 9/22/14.
+ * Created by davide on 9/17/14.
  */
-class NoRunner implements Runner {
+class ParallelExecution<INPUT, OUTPUT> extends ExecutionAdapter<INPUT, OUTPUT> {
 
-    @Override
-    public void run(final Invocation instruction, final long delay, final TimeUnit timeUnit) {
+    private final Routine<INPUT, OUTPUT> mRoutine;
 
+    public ParallelExecution(final Routine<INPUT, OUTPUT> routine) {
+
+        if (routine == null) {
+
+            throw new IllegalArgumentException();
+        }
+
+        mRoutine = routine;
     }
 
     @Override
-    public void runAbort(final Invocation instruction) {
+    public void onInput(final INPUT input, final ResultChannel<OUTPUT> results) {
 
+        results.pass(mRoutine.invokeAsyn(input));
     }
 }

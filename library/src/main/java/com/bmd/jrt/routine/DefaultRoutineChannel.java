@@ -24,9 +24,9 @@ import java.util.concurrent.TimeUnit;
  */
 class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTPUT> {
 
-    private final InvocationHandler<INPUT, OUTPUT> mHandler;
+    private final ExecutionHandler<INPUT, OUTPUT> mHandler;
 
-    public DefaultRoutineChannel(final InvocationHandler<INPUT, OUTPUT> handler) {
+    public DefaultRoutineChannel(final ExecutionHandler<INPUT, OUTPUT> handler) {
 
         if (handler == null) {
 

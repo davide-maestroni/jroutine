@@ -13,16 +13,16 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.invocation.RoutineInvocation;
+import com.bmd.jrt.execution.Execution;
 
 /**
  * Created by davide on 9/24/14.
  */
 interface RoutineInvocationProvider<INPUT, OUTPUT> {
 
-    public RoutineInvocation<INPUT, OUTPUT> create();
+    public Execution<INPUT, OUTPUT> create();
 
-    public void discard(RoutineInvocation<INPUT, OUTPUT> invocation);
+    public void discard(Execution<INPUT, OUTPUT> invocation);
 
-    public void recycle(RoutineInvocation<INPUT, OUTPUT> invocation);
+    public void recycle(Execution<INPUT, OUTPUT> invocation);
 }

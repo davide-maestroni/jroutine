@@ -11,31 +11,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.routine;
+package com.bmd.jrt.execution;
 
 import com.bmd.jrt.channel.ResultChannel;
-import com.bmd.jrt.invocation.RoutineInvocationAdapter;
 
 /**
- * Created by davide on 9/17/14.
+ * Empty abstract implementation of a routine execution.
+ * <p/>
+ * Created by davide on 9/11/14.
+ *
+ * @param <INPUT>  the input type.
+ * @param <OUTPUT> the output type.
  */
-class ParallelRoutineInvocation<INPUT, OUTPUT> extends RoutineInvocationAdapter<INPUT, OUTPUT> {
+public abstract class ExecutionAdapter<INPUT, OUTPUT> implements Execution<INPUT, OUTPUT> {
 
-    private final Routine<INPUT, OUTPUT> mRoutine;
+    @Override
+    public void onAbort(final Throwable throwable) {
 
-    public ParallelRoutineInvocation(final Routine<INPUT, OUTPUT> routine) {
+    }
 
-        if (routine == null) {
+    @Override
+    public void onInit() {
 
-            throw new IllegalArgumentException();
-        }
-
-        mRoutine = routine;
     }
 
     @Override
     public void onInput(final INPUT input, final ResultChannel<OUTPUT> results) {
 
-        results.pass(mRoutine.invokeAsyn(input));
+    }
+
+    @Override
+    public void onResult(final ResultChannel<OUTPUT> results) {
+
+    }
+
+    @Override
+    public void onReturn() {
+
     }
 }

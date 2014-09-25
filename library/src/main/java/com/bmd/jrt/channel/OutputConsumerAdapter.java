@@ -14,7 +14,11 @@
 package com.bmd.jrt.channel;
 
 /**
+ * Empty abstract implementation of an output consumer.
+ * <p/>
  * Created by davide on 9/16/14.
+ *
+ * @param <OUTPUT> the output type.
  */
 public abstract class OutputConsumerAdapter<OUTPUT> implements OutputConsumer<OUTPUT> {
 

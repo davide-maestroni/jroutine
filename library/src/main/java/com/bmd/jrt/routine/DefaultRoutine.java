@@ -14,7 +14,7 @@
 package com.bmd.jrt.routine;
 
 import com.bmd.jrt.channel.RoutineChannel;
-import com.bmd.jrt.invocation.RoutineInvocation;
+import com.bmd.jrt.execution.Execution;
 import com.bmd.jrt.runner.Runner;
 import com.bmd.jrt.time.TimeDuration;
 import com.bmd.wtf.fll.Classification;
@@ -31,14 +31,14 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
 
     private final Object[] mArgs;
 
-    private final Constructor<? extends RoutineInvocation<INPUT, OUTPUT>> mConstructor;
+    private final Constructor<? extends Execution<INPUT, OUTPUT>> mConstructor;
 
-    private final Class<ParallelRoutineInvocation<INPUT, OUTPUT>> mParallelType =
-            new Classification<ParallelRoutineInvocation<INPUT, OUTPUT>>() {}.getRawType();
+    private final Class<ParallelExecution<INPUT, OUTPUT>> mParallelType =
+            new Classification<ParallelExecution<INPUT, OUTPUT>>() {}.getRawType();
 
     public DefaultRoutine(final Runner syncRunner, final Runner asyncRunner, final int maxRunning,
             final int maxRetained, final TimeDuration availTimeout,
-            final Class<? extends RoutineInvocation<INPUT, OUTPUT>> invocationClass,
+            final Class<? extends Execution<INPUT, OUTPUT>> invocationClass,
             final Object... invocationArgs) {
 
         super(syncRunner, asyncRunner, maxRunning, maxRetained, availTimeout);
@@ -59,7 +59,7 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
     }
 
     @Override
-    protected RoutineInvocation<INPUT, OUTPUT> createRoutineInvocation(final boolean async) {
+    protected Execution<INPUT, OUTPUT> createRoutineInvocation(final boolean async) {
 
         try {
 

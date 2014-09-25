@@ -27,9 +27,9 @@ import java.util.concurrent.TimeUnit;
  */
 class DefaultOutputChannel<OUTPUT> implements OutputChannel<OUTPUT> {
 
-    private final InvocationHandler<?, OUTPUT> mHandler;
+    private final ExecutionHandler<?, OUTPUT> mHandler;
 
-    public DefaultOutputChannel(final InvocationHandler<?, OUTPUT> handler) {
+    public DefaultOutputChannel(final ExecutionHandler<?, OUTPUT> handler) {
 
         if (handler == null) {
 

@@ -13,7 +13,7 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.invocation.RoutineInvocation;
+import com.bmd.jrt.execution.Execution;
 import com.bmd.jrt.runner.Runner;
 import com.bmd.jrt.runner.Runners;
 import com.bmd.jrt.time.TimeDuration;
@@ -36,7 +36,7 @@ public class RoutineBuilder<INPUT, OUTPUT> {
 
     private int mMaxRetained = DEFAULT_RETAIN_COUNT;
 
-    private final ClassToken<? extends RoutineInvocation<INPUT, OUTPUT>> mClassToken;
+    private final ClassToken<? extends Execution<INPUT, OUTPUT>> mClassToken;
 
     private Object[] mArgs = NO_ARGS;
 
@@ -46,7 +46,7 @@ public class RoutineBuilder<INPUT, OUTPUT> {
 
     private Runner mSyncRunner = Runners.queued();
 
-    RoutineBuilder(final ClassToken<? extends RoutineInvocation<INPUT, OUTPUT>> classToken) {
+    RoutineBuilder(final ClassToken<? extends Execution<INPUT, OUTPUT>> classToken) {
 
         if (classToken == null) {
 

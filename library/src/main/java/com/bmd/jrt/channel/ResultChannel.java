@@ -18,19 +18,30 @@ import com.bmd.jrt.time.TimeDuration;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * Interface defining a result channel, that is the channel used by the routine invocation to
+ * publish the results into the output channel.
+ * <p/>
  * Created by davide on 9/15/14.
+ *
+ * @param <OUTPUT> the output type.
  */
-public interface ResultChannel<INPUT> extends InputChannel<INPUT> {
+public interface ResultChannel<OUTPUT> extends InputChannel<OUTPUT> {
 
-    public ResultChannel<INPUT> after(TimeDuration delay);
+    @Override
+    public ResultChannel<OUTPUT> after(TimeDuration delay);
 
-    public ResultChannel<INPUT> after(long delay, TimeUnit timeUnit);
+    @Override
+    public ResultChannel<OUTPUT> after(long delay, TimeUnit timeUnit);
 
-    public ResultChannel<INPUT> pass(OutputChannel<INPUT> channel);
+    @Override
+    public ResultChannel<OUTPUT> pass(OutputChannel<OUTPUT> channel);
 
-    public ResultChannel<INPUT> pass(Iterable<? extends INPUT> inputs);
+    @Override
+    public ResultChannel<OUTPUT> pass(Iterable<? extends OUTPUT> outputs);
 
-    public ResultChannel<INPUT> pass(INPUT input);
+    @Override
+    public ResultChannel<OUTPUT> pass(OUTPUT output);
 
-    public ResultChannel<INPUT> pass(INPUT... inputs);
+    @Override
+    public ResultChannel<OUTPUT> pass(OUTPUT... outputs);
 }

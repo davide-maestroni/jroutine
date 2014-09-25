@@ -13,7 +13,7 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.invocation.RoutineInvocation;
+import com.bmd.jrt.execution.Execution;
 import com.bmd.jrt.util.ClassToken;
 
 /**
@@ -31,7 +31,7 @@ public class JRoutine {
     }
 
     public static <INPUT, OUTPUT> RoutineBuilder<INPUT, OUTPUT> on(
-            final ClassToken<? extends RoutineInvocation<INPUT, OUTPUT>> classToken) {
+            final ClassToken<? extends Execution<INPUT, OUTPUT>> classToken) {
 
         return new RoutineBuilder<INPUT, OUTPUT>(classToken);
     }

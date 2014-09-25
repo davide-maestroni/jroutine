@@ -11,14 +11,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.runner;
 
 /**
- * Created by davide on 9/7/14.
+ * Package containing routine interfaces and implementations.
+ * <p/>
+ * Created by davide on 9/25/14.
  */
-public interface InvocationInstruction {
-
-    public void abort();
-
-    public void run();
-}
+package com.bmd.jrt.execution;

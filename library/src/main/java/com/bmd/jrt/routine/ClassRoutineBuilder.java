@@ -14,7 +14,7 @@
 package com.bmd.jrt.routine;
 
 import com.bmd.jrt.channel.ResultChannel;
-import com.bmd.jrt.invocation.RoutineExecution;
+import com.bmd.jrt.execution.ExecutionBody;
 import com.bmd.jrt.runner.Runner;
 import com.bmd.jrt.util.ClassToken;
 import com.bmd.jrt.util.RoutineException;
@@ -250,8 +250,8 @@ public class ClassRoutineBuilder {
                 mutexMap.put(target, mutex);
             }
 
-            final RoutineBuilder<Object, Object> builder = new RoutineBuilder<Object, Object>(
-                    ClassToken.token(MethodRoutineInvocation.class));
+            final RoutineBuilder<Object, Object> builder =
+                    new RoutineBuilder<Object, Object>(ClassToken.token(MethodExecutionBody.class));
 
             if (runner != null) {
 
@@ -318,7 +318,7 @@ public class ClassRoutineBuilder {
         }
     }
 
-    private static class MethodRoutineInvocation extends RoutineExecution<Object, Object> {
+    private static class MethodExecutionBody extends ExecutionBody<Object, Object> {
 
         private final boolean mHasResult;
 
@@ -328,8 +328,7 @@ public class ClassRoutineBuilder {
 
         private final Object mTarget;
 
-        public MethodRoutineInvocation(final Object target, final Method method,
-                final Object mutex) {
+        public MethodExecutionBody(final Object target, final Method method, final Object mutex) {
 
             mTarget = target;
             mMethod = method;

@@ -18,21 +18,38 @@ import com.bmd.jrt.time.TimeDuration;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * Interface defining a routine input channel, that is the channel used to pass input data to the
+ * routine.
+ * <p/>
  * Created by davide on 9/15/14.
+ *
+ * @param <INPUT>  the input type.
+ * @param <OUTPUT> the output type.
  */
 public interface RoutineChannel<INPUT, OUTPUT> extends InputChannel<INPUT> {
 
+    @Override
     public RoutineChannel<INPUT, OUTPUT> after(TimeDuration delay);
 
+    @Override
     public RoutineChannel<INPUT, OUTPUT> after(long delay, TimeUnit timeUnit);
 
+    @Override
     public RoutineChannel<INPUT, OUTPUT> pass(OutputChannel<INPUT> channel);
 
+    @Override
     public RoutineChannel<INPUT, OUTPUT> pass(Iterable<? extends INPUT> inputs);
 
+    @Override
     public RoutineChannel<INPUT, OUTPUT> pass(INPUT input);
 
+    @Override
     public RoutineChannel<INPUT, OUTPUT> pass(INPUT... inputs);
 
+    /**
+     * Closes the input channel and returns the output one.
+     *
+     * @return the routine output channel.
+     */
     public OutputChannel<OUTPUT> close();
 }

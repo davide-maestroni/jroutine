@@ -13,15 +13,15 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.invocation.RoutineInvocation;
-import com.bmd.jrt.runner.InvocationInstruction;
+import com.bmd.jrt.execution.Execution;
+import com.bmd.jrt.runner.Invocation;
 
 /**
  * Created by davide on 9/24/14.
  */
-class DefaultInvocationInstruction<INPUT, OUTPUT> implements InvocationInstruction {
+class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
 
-    private final InvocationHandler<INPUT, OUTPUT> mHandler;
+    private final ExecutionHandler<INPUT, OUTPUT> mHandler;
 
     private final Object mInvocationMutex = new Object();
 
@@ -29,9 +29,9 @@ class DefaultInvocationInstruction<INPUT, OUTPUT> implements InvocationInstructi
 
     private final DefaultResultChannel<OUTPUT> mResultChannel;
 
-    private RoutineInvocation<INPUT, OUTPUT> mRoutine;
+    private Execution<INPUT, OUTPUT> mRoutine;
 
-    public DefaultInvocationInstruction(final InvocationHandler<INPUT, OUTPUT> handler,
+    public DefaultInvocation(final ExecutionHandler<INPUT, OUTPUT> handler,
             final RoutineInvocationProvider<INPUT, OUTPUT> provider) {
 
         if (provider == null) {
@@ -49,10 +49,10 @@ class DefaultInvocationInstruction<INPUT, OUTPUT> implements InvocationInstructi
 
         synchronized (mInvocationMutex) {
 
-            final InvocationHandler<INPUT, OUTPUT> handler = mHandler;
+            final ExecutionHandler<INPUT, OUTPUT> handler = mHandler;
             final RoutineInvocationProvider<INPUT, OUTPUT> provider = mInvocationProvider;
             final DefaultResultChannel<OUTPUT> resultChannel = mResultChannel;
-            RoutineInvocation<INPUT, OUTPUT> invocation = null;
+            Execution<INPUT, OUTPUT> invocation = null;
 
             if (!handler.isAborting()) {
 
@@ -92,7 +92,7 @@ class DefaultInvocationInstruction<INPUT, OUTPUT> implements InvocationInstructi
 
         synchronized (mInvocationMutex) {
 
-            final InvocationHandler<INPUT, OUTPUT> handler = mHandler;
+            final ExecutionHandler<INPUT, OUTPUT> handler = mHandler;
             final DefaultResultChannel<OUTPUT> resultChannel = mResultChannel;
 
             try {
@@ -102,7 +102,7 @@ class DefaultInvocationInstruction<INPUT, OUTPUT> implements InvocationInstructi
                     return;
                 }
 
-                final RoutineInvocation<INPUT, OUTPUT> invocation = initInvocation();
+                final Execution<INPUT, OUTPUT> invocation = initInvocation();
 
                 while (handler.hasInput()) {
 
@@ -125,9 +125,9 @@ class DefaultInvocationInstruction<INPUT, OUTPUT> implements InvocationInstructi
         }
     }
 
-    private RoutineInvocation<INPUT, OUTPUT> initInvocation() {
+    private Execution<INPUT, OUTPUT> initInvocation() {
 
-        final RoutineInvocation<INPUT, OUTPUT> invocation;
+        final Execution<INPUT, OUTPUT> invocation;
 
         if (mRoutine != null) {
 

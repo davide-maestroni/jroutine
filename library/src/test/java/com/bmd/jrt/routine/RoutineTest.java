@@ -17,9 +17,9 @@ import com.bmd.jrt.channel.OutputConsumer;
 import com.bmd.jrt.channel.OutputConsumerAdapter;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.channel.RoutineChannel;
-import com.bmd.jrt.invocation.RoutineExecution;
-import com.bmd.jrt.invocation.RoutineInvocation;
-import com.bmd.jrt.invocation.RoutineInvocationAdapter;
+import com.bmd.jrt.execution.Execution;
+import com.bmd.jrt.execution.ExecutionAdapter;
+import com.bmd.jrt.execution.ExecutionBody;
 import com.bmd.jrt.time.TimeDuration;
 import com.bmd.jrt.util.ClassToken;
 import com.bmd.jrt.util.RoutineException;
@@ -40,29 +40,28 @@ public class RoutineTest extends TestCase {
 
     public void testChainedRoutine() {
 
-        final RoutineExecution<Integer, Integer> execSum =
-                new RoutineExecution<Integer, Integer>() {
+        final ExecutionBody<Integer, Integer> execSum = new ExecutionBody<Integer, Integer>() {
 
-                    @Override
-                    public void onExec(final List<? extends Integer> integers,
-                            final ResultChannel<Integer> results) {
+            @Override
+            public void onExec(final List<? extends Integer> integers,
+                    final ResultChannel<Integer> results) {
 
-                        int sum = 0;
+                int sum = 0;
 
-                        for (final Integer integer : integers) {
+                for (final Integer integer : integers) {
 
-                            sum += integer;
-                        }
+                    sum += integer;
+                }
 
-                        results.pass(sum);
-                    }
-                };
+                results.pass(sum);
+            }
+        };
 
         final Routine<Integer, Integer> sumRoutine =
                 on(ClassToken.classOf(execSum)).withArgs(this).routine();
 
-        final RoutineInvocationAdapter<Integer, Integer> invokeSquare =
-                new RoutineInvocationAdapter<Integer, Integer>() {
+        final ExecutionAdapter<Integer, Integer> invokeSquare =
+                new ExecutionAdapter<Integer, Integer>() {
 
                     @Override
                     public void onInput(final Integer integer,
@@ -103,29 +102,28 @@ public class RoutineTest extends TestCase {
 
     public void testComposedRoutine() {
 
-        final RoutineExecution<Integer, Integer> execSum =
-                new RoutineExecution<Integer, Integer>() {
+        final ExecutionBody<Integer, Integer> execSum = new ExecutionBody<Integer, Integer>() {
 
-                    @Override
-                    public void onExec(final List<? extends Integer> integers,
-                            final ResultChannel<Integer> results) {
+            @Override
+            public void onExec(final List<? extends Integer> integers,
+                    final ResultChannel<Integer> results) {
 
-                        int sum = 0;
+                int sum = 0;
 
-                        for (final Integer integer : integers) {
+                for (final Integer integer : integers) {
 
-                            sum += integer;
-                        }
+                    sum += integer;
+                }
 
-                        results.pass(sum);
-                    }
-                };
+                results.pass(sum);
+            }
+        };
 
         final Routine<Integer, Integer> sumRoutine =
                 on(ClassToken.classOf(execSum)).withArgs(this).routine();
 
-        final RoutineInvocationAdapter<Integer, Integer> invokeSquare =
-                new RoutineInvocationAdapter<Integer, Integer>() {
+        final ExecutionAdapter<Integer, Integer> invokeSquare =
+                new ExecutionAdapter<Integer, Integer>() {
 
                     @Override
                     public void onInput(final Integer integer,
@@ -140,8 +138,8 @@ public class RoutineTest extends TestCase {
         final Routine<Integer, Integer> squareRoutine =
                 on(ClassToken.classOf(invokeSquare)).withArgs(this).routine();
 
-        final RoutineInvocationAdapter<Integer, Integer> invokeSquareSum =
-                new RoutineInvocationAdapter<Integer, Integer>() {
+        final ExecutionAdapter<Integer, Integer> invokeSquareSum =
+                new ExecutionAdapter<Integer, Integer>() {
 
                     private RoutineChannel<Integer, Integer> mChannel;
 
@@ -213,15 +211,14 @@ public class RoutineTest extends TestCase {
 
     public void testErrorOnInit() {
 
-        final RoutineInvocation<String, String> exceptionOnInit =
-                new RoutineInvocationAdapter<String, String>() {
+        final Execution<String, String> exceptionOnInit = new ExecutionAdapter<String, String>() {
 
-                    @Override
-                    public void onInit() {
+            @Override
+            public void onInit() {
 
-                        throw new NullPointerException("test1");
-                    }
-                };
+                throw new NullPointerException("test1");
+            }
+        };
 
         final Routine<String, String> exceptionRoutine =
                 on(ClassToken.classOf(exceptionOnInit)).withArgs(this).routine();
@@ -229,7 +226,7 @@ public class RoutineTest extends TestCase {
         testException(exceptionRoutine, "test", "test1");
 
         final Routine<String, String> passThroughRoutine =
-                on(ClassToken.token(PassThroughRoutineInvocation.class)).routine();
+                on(ClassToken.token(PassThroughExecution.class)).routine();
 
         testChained(passThroughRoutine, exceptionRoutine, "test", "test1");
         testChained(exceptionRoutine, passThroughRoutine, "test", "test1");
@@ -237,15 +234,14 @@ public class RoutineTest extends TestCase {
 
     public void testErrorOnInput() {
 
-        final RoutineInvocation<String, String> exceptionOnInput =
-                new RoutineInvocationAdapter<String, String>() {
+        final Execution<String, String> exceptionOnInput = new ExecutionAdapter<String, String>() {
 
-                    @Override
-                    public void onInput(final String s, final ResultChannel<String> results) {
+            @Override
+            public void onInput(final String s, final ResultChannel<String> results) {
 
-                        throw new NullPointerException(s);
-                    }
-                };
+                throw new NullPointerException(s);
+            }
+        };
 
         final Routine<String, String> exceptionRoutine =
                 on(ClassToken.classOf(exceptionOnInput)).withArgs(this).routine();
@@ -253,7 +249,7 @@ public class RoutineTest extends TestCase {
         testException(exceptionRoutine, "test2", "test2");
 
         final Routine<String, String> passThroughRoutine =
-                on(ClassToken.token(PassThroughRoutineInvocation.class)).routine();
+                on(ClassToken.token(PassThroughExecution.class)).routine();
 
         testChained(passThroughRoutine, exceptionRoutine, "test2", "test2");
         testChained(exceptionRoutine, passThroughRoutine, "test2", "test2");
@@ -261,15 +257,14 @@ public class RoutineTest extends TestCase {
 
     public void testErrorOnResult() {
 
-        final RoutineInvocation<String, String> exceptionOnResult =
-                new RoutineInvocationAdapter<String, String>() {
+        final Execution<String, String> exceptionOnResult = new ExecutionAdapter<String, String>() {
 
-                    @Override
-                    public void onResult(final ResultChannel<String> results) {
+            @Override
+            public void onResult(final ResultChannel<String> results) {
 
-                        throw new NullPointerException("test3");
-                    }
-                };
+                throw new NullPointerException("test3");
+            }
+        };
 
         final Routine<String, String> exceptionRoutine =
                 on(ClassToken.classOf(exceptionOnResult)).withArgs(this).routine();
@@ -277,7 +272,7 @@ public class RoutineTest extends TestCase {
         testException(exceptionRoutine, "test", "test3");
 
         final Routine<String, String> passThroughRoutine =
-                on(ClassToken.token(PassThroughRoutineInvocation.class)).routine();
+                on(ClassToken.token(PassThroughExecution.class)).routine();
 
         testChained(passThroughRoutine, exceptionRoutine, "test", "test3");
         testChained(exceptionRoutine, passThroughRoutine, "test", "test3");
@@ -285,21 +280,20 @@ public class RoutineTest extends TestCase {
 
     public void testErrorOnReturn() {
 
-        final RoutineInvocation<String, String> exceptionOnReturn =
-                new RoutineInvocationAdapter<String, String>() {
+        final Execution<String, String> exceptionOnReturn = new ExecutionAdapter<String, String>() {
 
-                    @Override
-                    public void onInput(final String s, final ResultChannel<String> results) {
+            @Override
+            public void onInput(final String s, final ResultChannel<String> results) {
 
-                        results.pass(s);
-                    }
+                results.pass(s);
+            }
 
-                    @Override
-                    public void onReturn() {
+            @Override
+            public void onReturn() {
 
-                        throw new NullPointerException("test4");
-                    }
-                };
+                throw new NullPointerException("test4");
+            }
+        };
 
         final Routine<String, String> exceptionRoutine =
                 on(ClassToken.classOf(exceptionOnReturn)).withArgs(this).routine();
@@ -328,7 +322,7 @@ public class RoutineTest extends TestCase {
                 "test");
 
         final Routine<String, String> passThroughRoutine =
-                on(ClassToken.token(PassThroughRoutineInvocation.class)).routine();
+                on(ClassToken.token(PassThroughExecution.class)).routine();
 
         assertThat(passThroughRoutine.call(exceptionRoutine.invoke("test"))).containsExactly(
                 "test");
@@ -659,8 +653,8 @@ public class RoutineTest extends TestCase {
 
     public void testRoutine() {
 
-        final RoutineInvocationAdapter<Integer, Integer> invokeSquare =
-                new RoutineInvocationAdapter<Integer, Integer>() {
+        final ExecutionAdapter<Integer, Integer> invokeSquare =
+                new ExecutionAdapter<Integer, Integer>() {
 
                     @Override
                     public void onInput(final Integer integer,
@@ -685,23 +679,22 @@ public class RoutineTest extends TestCase {
 
     public void testRoutineFunction() {
 
-        final RoutineExecution<Integer, Integer> execSum =
-                new RoutineExecution<Integer, Integer>() {
+        final ExecutionBody<Integer, Integer> execSum = new ExecutionBody<Integer, Integer>() {
 
-                    @Override
-                    public void onExec(final List<? extends Integer> integers,
-                            final ResultChannel<Integer> results) {
+            @Override
+            public void onExec(final List<? extends Integer> integers,
+                    final ResultChannel<Integer> results) {
 
-                        int sum = 0;
+                int sum = 0;
 
-                        for (final Integer integer : integers) {
+                for (final Integer integer : integers) {
 
-                            sum += integer;
-                        }
+                    sum += integer;
+                }
 
-                        results.pass(sum);
-                    }
-                };
+                results.pass(sum);
+            }
+        };
 
         final Routine<Integer, Integer> sumRoutine =
                 on(ClassToken.classOf(execSum)).withArgs(this).routine();
@@ -1127,8 +1120,8 @@ public class RoutineTest extends TestCase {
 
         final String input = "test";
         final Routine<String, String> routine =
-                on(ClassToken.token(DelayRoutineInvocation.class)).withArgs(TimeDuration.millis(0))
-                                                                  .routine();
+                on(ClassToken.token(DelayExecution.class)).withArgs(TimeDuration.millis(0))
+                                                          .routine();
 
         assertThat(routine.invoke(input).bind(consumer).waitDone()).isTrue();
         assertThat(routine.invokeAsyn(input).bind(consumer).waitDone()).isTrue();
@@ -1318,11 +1311,11 @@ public class RoutineTest extends TestCase {
         public int take(int i);
     }
 
-    private static class DelayRoutineInvocation extends RoutineInvocationAdapter<String, String> {
+    private static class DelayExecution extends ExecutionAdapter<String, String> {
 
         private final TimeDuration mDelay;
 
-        public DelayRoutineInvocation(final TimeDuration delay) {
+        public DelayExecution(final TimeDuration delay) {
 
             mDelay = delay;
         }
@@ -1334,8 +1327,7 @@ public class RoutineTest extends TestCase {
         }
     }
 
-    private static class PassThroughRoutineInvocation
-            extends RoutineInvocationAdapter<String, String> {
+    private static class PassThroughExecution extends ExecutionAdapter<String, String> {
 
         @Override
         public void onInput(final String s, final ResultChannel<String> results) {

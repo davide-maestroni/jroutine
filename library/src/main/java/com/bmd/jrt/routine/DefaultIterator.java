@@ -22,7 +22,7 @@ import java.util.Iterator;
  */
 class DefaultIterator<OUTPUT> implements Iterator<OUTPUT> {
 
-    private final InvocationHandler<?, OUTPUT> mHandler;
+    private final ExecutionHandler<?, OUTPUT> mHandler;
 
     private final TimeDuration mTimeout;
 
@@ -30,7 +30,7 @@ class DefaultIterator<OUTPUT> implements Iterator<OUTPUT> {
 
     private boolean mRemoved = true;
 
-    public DefaultIterator(final InvocationHandler<?, OUTPUT> handler, final TimeDuration timeout,
+    public DefaultIterator(final ExecutionHandler<?, OUTPUT> handler, final TimeDuration timeout,
             final RuntimeException timeoutException) {
 
         if (handler == null) {

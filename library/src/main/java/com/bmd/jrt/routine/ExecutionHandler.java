@@ -15,7 +15,7 @@ package com.bmd.jrt.routine;
 
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.OutputConsumer;
-import com.bmd.jrt.runner.InvocationInstruction;
+import com.bmd.jrt.runner.Invocation;
 import com.bmd.jrt.runner.Runner;
 import com.bmd.jrt.time.TimeDuration;
 import com.bmd.jrt.time.TimeDuration.Check;
@@ -34,11 +34,11 @@ import static com.bmd.jrt.time.TimeDuration.seconds;
 /**
  * Created by davide on 9/24/14.
  */
-class InvocationHandler<INPUT, OUTPUT> {
+class ExecutionHandler<INPUT, OUTPUT> {
 
     private final LinkedList<INPUT> mInputQueue = new LinkedList<INPUT>();
 
-    private final DefaultInvocationInstruction<INPUT, OUTPUT> mInvocationInstruction;
+    private final DefaultInvocation<INPUT, OUTPUT> mInvocationInstruction;
 
     private final Object mMutex = new Object();
 
@@ -70,7 +70,7 @@ class InvocationHandler<INPUT, OUTPUT> {
 
     private ChannelState mState = ChannelState.INPUT;
 
-    public InvocationHandler(final RoutineInvocationProvider<INPUT, OUTPUT> provider,
+    public ExecutionHandler(final RoutineInvocationProvider<INPUT, OUTPUT> provider,
             final Runner runner) {
 
         if (runner == null) {
@@ -79,7 +79,7 @@ class InvocationHandler<INPUT, OUTPUT> {
         }
 
         mRunner = runner;
-        mInvocationInstruction = new DefaultInvocationInstruction<INPUT, OUTPUT>(this, provider);
+        mInvocationInstruction = new DefaultInvocation<INPUT, OUTPUT>(this, provider);
     }
 
     public Throwable getAbortException() {
@@ -221,7 +221,7 @@ class InvocationHandler<INPUT, OUTPUT> {
 
         } else {
 
-            mRunner.run(new DelayedInputInvocationInstruction(input), delay.time, delay.unit);
+            mRunner.run(new DelayedInputInvocation(input), delay.time, delay.unit);
         }
     }
 
@@ -297,7 +297,7 @@ class InvocationHandler<INPUT, OUTPUT> {
 
         } else {
 
-            mRunner.run(new DelayedListInputInvocationInstruction(inputs), delay.time, delay.unit);
+            mRunner.run(new DelayedListInputInvocation(inputs), delay.time, delay.unit);
         }
     }
 
@@ -338,7 +338,7 @@ class InvocationHandler<INPUT, OUTPUT> {
 
         synchronized (mMutex) {
 
-            return !isDone();
+            return !isDone() && (mState != ChannelState.EXCEPTION);
         }
     }
 
@@ -657,7 +657,7 @@ class InvocationHandler<INPUT, OUTPUT> {
 
         synchronized (mMutex) {
 
-            if (!isResultOpen()) {
+            if (isDone()) {
 
                 return false;
             }
@@ -781,8 +781,7 @@ class InvocationHandler<INPUT, OUTPUT> {
 
         } else {
 
-            mRunner.run(new DelayedListOutputInvocationInstruction(outputs), delay.time,
-                        delay.unit);
+            mRunner.run(new DelayedListOutputInvocation(outputs), delay.time, delay.unit);
         }
     }
 
@@ -812,7 +811,7 @@ class InvocationHandler<INPUT, OUTPUT> {
 
         } else {
 
-            mRunner.run(new DelayedOutputInvocationInstruction(output), delay.time, delay.unit);
+            mRunner.run(new DelayedOutputInvocation(output), delay.time, delay.unit);
         }
     }
 
@@ -996,11 +995,11 @@ class InvocationHandler<INPUT, OUTPUT> {
         ABORT
     }
 
-    private class DelayedInputInvocationInstruction implements InvocationInstruction {
+    private class DelayedInputInvocation implements Invocation {
 
         private final INPUT mInput;
 
-        public DelayedInputInvocationInstruction(final INPUT input) {
+        public DelayedInputInvocation(final INPUT input) {
 
             mInput = input;
         }
@@ -1028,11 +1027,11 @@ class InvocationHandler<INPUT, OUTPUT> {
         }
     }
 
-    private class DelayedListInputInvocationInstruction implements InvocationInstruction {
+    private class DelayedListInputInvocation implements Invocation {
 
         private final ArrayList<INPUT> mInputs;
 
-        public DelayedListInputInvocationInstruction(final Iterable<? extends INPUT> inputs) {
+        public DelayedListInputInvocation(final Iterable<? extends INPUT> inputs) {
 
             final ArrayList<INPUT> inputList = new ArrayList<INPUT>();
 
@@ -1067,11 +1066,11 @@ class InvocationHandler<INPUT, OUTPUT> {
         }
     }
 
-    private class DelayedListOutputInvocationInstruction implements InvocationInstruction {
+    private class DelayedListOutputInvocation implements Invocation {
 
         private final ArrayList<OUTPUT> mOutputs;
 
-        public DelayedListOutputInvocationInstruction(final Iterable<? extends OUTPUT> outputs) {
+        public DelayedListOutputInvocation(final Iterable<? extends OUTPUT> outputs) {
 
             final ArrayList<OUTPUT> outputList = new ArrayList<OUTPUT>();
 
@@ -1111,11 +1110,11 @@ class InvocationHandler<INPUT, OUTPUT> {
         }
     }
 
-    private class DelayedOutputInvocationInstruction implements InvocationInstruction {
+    private class DelayedOutputInvocation implements Invocation {
 
         private final OUTPUT mOutput;
 
-        public DelayedOutputInvocationInstruction(final OUTPUT output) {
+        public DelayedOutputInvocation(final OUTPUT output) {
 
             mOutput = output;
         }
@@ -1215,7 +1214,7 @@ class InvocationHandler<INPUT, OUTPUT> {
 
             } else {
 
-                mRunner.run(new DelayedInputInvocationInstruction(output), delay.time, delay.unit);
+                mRunner.run(new DelayedInputInvocation(output), delay.time, delay.unit);
             }
         }
     }
@@ -1316,7 +1315,7 @@ class InvocationHandler<INPUT, OUTPUT> {
 
             } else {
 
-                mRunner.run(new DelayedOutputInvocationInstruction(output), delay.time, delay.unit);
+                mRunner.run(new DelayedOutputInvocation(output), delay.time, delay.unit);
             }
         }
     }

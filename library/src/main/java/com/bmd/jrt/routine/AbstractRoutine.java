@@ -15,7 +15,7 @@ package com.bmd.jrt.routine;
 
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.RoutineChannel;
-import com.bmd.jrt.invocation.RoutineInvocation;
+import com.bmd.jrt.execution.Execution;
 import com.bmd.jrt.runner.Runner;
 import com.bmd.jrt.time.TimeDuration;
 import com.bmd.jrt.time.TimeDuration.Check;
@@ -42,8 +42,8 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
 
     private final Runner mSyncRunner;
 
-    private LinkedList<RoutineInvocation<INPUT, OUTPUT>> mRoutineInvocations =
-            new LinkedList<RoutineInvocation<INPUT, OUTPUT>>();
+    private LinkedList<Execution<INPUT, OUTPUT>> mExecutions =
+            new LinkedList<Execution<INPUT, OUTPUT>>();
 
     private int mRunningCount;
 
@@ -274,8 +274,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
         return launch(true);
     }
 
-    protected abstract RoutineInvocation<INPUT, OUTPUT> createRoutineInvocation(
-            final boolean async);
+    protected abstract Execution<INPUT, OUTPUT> createRoutineInvocation(final boolean async);
 
     protected Runner getAsyncRunner() {
 
@@ -304,11 +303,11 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
 
     protected RoutineChannel<INPUT, OUTPUT> launch(final boolean async) {
 
-        final InvocationHandler<INPUT, OUTPUT> invocationHandler =
-                new InvocationHandler<INPUT, OUTPUT>(new DefaultRoutineInvocationProvider(async),
-                                                     (async) ? mAsyncRunner : mSyncRunner);
+        final ExecutionHandler<INPUT, OUTPUT> handler =
+                new ExecutionHandler<INPUT, OUTPUT>(new DefaultRoutineInvocationProvider(async),
+                                                    (async) ? mAsyncRunner : mSyncRunner);
 
-        return new DefaultRoutineChannel<INPUT, OUTPUT>(invocationHandler);
+        return new DefaultRoutineChannel<INPUT, OUTPUT>(handler);
     }
 
     private class DefaultRoutineInvocationProvider
@@ -322,7 +321,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
         }
 
         @Override
-        public RoutineInvocation<INPUT, OUTPUT> create() {
+        public Execution<INPUT, OUTPUT> create() {
 
             synchronized (mMutex) {
 
@@ -353,7 +352,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
 
                 ++mRunningCount;
 
-                final LinkedList<RoutineInvocation<INPUT, OUTPUT>> routines = mRoutineInvocations;
+                final LinkedList<Execution<INPUT, OUTPUT>> routines = mExecutions;
 
                 if (!routines.isEmpty()) {
 
@@ -365,7 +364,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
         }
 
         @Override
-        public void discard(final RoutineInvocation<INPUT, OUTPUT> invocation) {
+        public void discard(final Execution<INPUT, OUTPUT> invocation) {
 
             synchronized (mMutex) {
 
@@ -375,12 +374,11 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
         }
 
         @Override
-        public void recycle(final RoutineInvocation<INPUT, OUTPUT> invocation) {
+        public void recycle(final Execution<INPUT, OUTPUT> invocation) {
 
             synchronized (mMutex) {
 
-                final LinkedList<RoutineInvocation<INPUT, OUTPUT>> invocations =
-                        mRoutineInvocations;
+                final LinkedList<Execution<INPUT, OUTPUT>> invocations = mExecutions;
 
                 if (invocations.size() < mMaxRetained) {
 

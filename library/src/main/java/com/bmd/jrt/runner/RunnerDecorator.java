@@ -33,14 +33,13 @@ public class RunnerDecorator implements Runner {
     }
 
     @Override
-    public void run(final InvocationInstruction instruction, final long delay,
-            final TimeUnit timeUnit) {
+    public void run(final Invocation instruction, final long delay, final TimeUnit timeUnit) {
 
         mRunner.run(instruction, delay, timeUnit);
     }
 
     @Override
-    public void runAbort(final InvocationInstruction instruction) {
+    public void runAbort(final Invocation instruction) {
 
         mRunner.runAbort(instruction);
     }

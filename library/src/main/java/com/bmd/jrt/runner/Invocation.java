@@ -11,25 +11,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.routine;
-
-import com.bmd.jrt.runner.Invocation;
-import com.bmd.jrt.runner.Runner;
-
-import java.util.concurrent.TimeUnit;
+package com.bmd.jrt.runner;
 
 /**
- * Created by davide on 9/22/14.
+ * Created by davide on 9/7/14.
  */
-class NoRunner implements Runner {
+public interface Invocation {
 
-    @Override
-    public void run(final Invocation instruction, final long delay, final TimeUnit timeUnit) {
+    public void abort();
 
-    }
-
-    @Override
-    public void runAbort(final Invocation instruction) {
-
-    }
+    public void run();
 }

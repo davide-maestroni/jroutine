@@ -31,6 +31,8 @@ public interface InputChannel<INPUT> extends Channel {
      *
      * @param delay the delay.
      * @return this channel.
+     * @throws java.lang.IllegalArgumentException if the specified delay is null.
+     * @throws java.lang.IllegalStateException    if this channel is already closed.
      */
     public InputChannel<INPUT> after(TimeDuration delay);
 
@@ -40,6 +42,8 @@ public interface InputChannel<INPUT> extends Channel {
      * @param delay    the delay value.
      * @param timeUnit the delay time unit.
      * @return this channel.
+     * @throws java.lang.IllegalArgumentException if the specified delay is negative.
+     * @throws java.lang.IllegalStateException    if this channel is already closed.
      */
     public InputChannel<INPUT> after(long delay, TimeUnit timeUnit);
 
@@ -51,6 +55,8 @@ public interface InputChannel<INPUT> extends Channel {
      *
      * @param channel the output channel.
      * @return this channel.
+     * @throws java.lang.IllegalArgumentException if the specified channel is null.
+     * @throws java.lang.IllegalStateException    if this channel is already closed.
      * @see OutputChannel#bind(OutputConsumer)
      */
     public InputChannel<INPUT> pass(OutputChannel<INPUT> channel);
@@ -60,6 +66,7 @@ public interface InputChannel<INPUT> extends Channel {
      *
      * @param inputs the iterable returning the input data.
      * @return this channel.
+     * @throws java.lang.IllegalStateException if this channel is already closed.
      */
     public InputChannel<INPUT> pass(Iterable<? extends INPUT> inputs);
 
@@ -68,6 +75,7 @@ public interface InputChannel<INPUT> extends Channel {
      *
      * @param input the input.
      * @return this channel.
+     * @throws java.lang.IllegalStateException if this channel is already closed.
      */
     public InputChannel<INPUT> pass(INPUT input);
 
@@ -76,6 +84,7 @@ public interface InputChannel<INPUT> extends Channel {
      *
      * @param inputs the input data.
      * @return this channel.
+     * @throws java.lang.IllegalStateException if this channel is already closed.
      */
     public InputChannel<INPUT> pass(INPUT... inputs);
 }

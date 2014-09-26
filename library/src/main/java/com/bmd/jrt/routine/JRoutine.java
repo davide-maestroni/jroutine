@@ -17,11 +17,16 @@ import com.bmd.jrt.execution.Execution;
 import com.bmd.jrt.util.ClassToken;
 
 /**
+ * TODO
+ * <p/>
  * Created by davide on 9/7/14.
  */
 public class JRoutine {
 
-    private JRoutine() {
+    /**
+     * Avoid direct instantiation.
+     */
+    protected JRoutine() {
 
     }
 

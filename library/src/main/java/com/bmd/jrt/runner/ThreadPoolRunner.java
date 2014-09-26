@@ -30,14 +30,14 @@ class ThreadPoolRunner implements Runner {
     }
 
     @Override
-    public void run(final Invocation instruction, final long delay, final TimeUnit timeUnit) {
+    public void run(final Invocation invocation, final long delay, final TimeUnit timeUnit) {
 
         final Runnable runnable = new Runnable() {
 
             @Override
             public void run() {
 
-                instruction.run();
+                invocation.run();
             }
         };
 
@@ -52,14 +52,14 @@ class ThreadPoolRunner implements Runner {
     }
 
     @Override
-    public void runAbort(final Invocation instruction) {
+    public void runAbort(final Invocation invocation) {
 
         mService.execute(new Runnable() {
 
             @Override
             public void run() {
 
-                instruction.abort();
+                invocation.abort();
             }
         });
     }

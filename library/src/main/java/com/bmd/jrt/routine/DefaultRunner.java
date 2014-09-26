@@ -19,17 +19,20 @@ import com.bmd.jrt.runner.Runner;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * Empty runner implementation used to identify the default runner in a
+ * {@link com.bmd.jrt.routine.AsynMethod} annotation.
+ * <p/>
  * Created by davide on 9/22/14.
  */
-class NoRunner implements Runner {
+class DefaultRunner implements Runner {
 
     @Override
-    public void run(final Invocation instruction, final long delay, final TimeUnit timeUnit) {
+    public void run(final Invocation invocation, final long delay, final TimeUnit timeUnit) {
 
     }
 
     @Override
-    public void runAbort(final Invocation instruction) {
+    public void runAbort(final Invocation invocation) {
 
     }
 }

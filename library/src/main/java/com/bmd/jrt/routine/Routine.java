@@ -19,7 +19,12 @@ import com.bmd.jrt.channel.RoutineChannel;
 import java.util.List;
 
 /**
+ * TODO
+ * <p/>
  * Created by davide on 9/7/14.
+ *
+ * @param <INPUT>  the input type.
+ * @param <OUTPUT> the output type.
  */
 public interface Routine<INPUT, OUTPUT> {
 

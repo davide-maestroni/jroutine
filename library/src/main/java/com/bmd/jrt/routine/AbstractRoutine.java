@@ -26,7 +26,14 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * Basic abstract implementation of a routine.<b/>
+ * This class provides implementations for all the routine functionalities. The inheriting class
+ * just need to provide execution objects when required.
+ * <p/>
  * Created by davide on 9/7/14.
+ *
+ * @param <INPUT>  the input type.
+ * @param <OUTPUT> the output type.
  */
 public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, OUTPUT> {
 
@@ -47,32 +54,48 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
 
     private int mRunningCount;
 
+    /**
+     * Constructor.
+     *
+     * @param syncRunner   the runner used for synchronous invocation.
+     * @param asyncRunner  the runner used for asynchronous invocation.
+     * @param maxRunning   the maximum number of parallel running executions. Must be positive.
+     * @param maxRetained  the maximum number of retained execution instances. Must be 0 or a
+     *                     positive number.
+     * @param availTimeout the maximum timeout while waiting for an execution instance to be
+     *                     available.
+     * @throws java.lang.IllegalArgumentException if at least one of the parameter is null or
+     *                                            invalid.
+     */
     public AbstractRoutine(final Runner syncRunner, final Runner asyncRunner, final int maxRunning,
             final int maxRetained, final TimeDuration availTimeout) {
 
         if (syncRunner == null) {
 
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("the synchronous runner instance must not be null");
         }
 
         if (asyncRunner == null) {
 
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("the asynchronous runner instance must not be null");
         }
 
         if (maxRunning < 1) {
 
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(
+                    "the maximum number of parallel running execution must be a positive number");
         }
 
         if (maxRetained < 0) {
 
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(
+                    "the maximum number of retained execution instances must be 0 or positive");
         }
 
         if (availTimeout == null) {
 
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(
+                    "the timeout for available execution instances must not be null");
         }
 
         mSyncRunner = syncRunner;
@@ -274,48 +297,47 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
         return launch(true);
     }
 
-    protected abstract Execution<INPUT, OUTPUT> createRoutineInvocation(final boolean async);
+    @Override
+    public RoutineChannel<INPUT, OUTPUT> launchParall() {
 
-    protected Runner getAsyncRunner() {
+        final AbstractRoutine<INPUT, OUTPUT> parallelRoutine =
+                new AbstractRoutine<INPUT, OUTPUT>(mSyncRunner, mAsyncRunner, mMaxRunning,
+                                                   mMaxRetained, mAvailTimeout) {
 
-        return mAsyncRunner;
+                    @Override
+                    protected Execution<INPUT, OUTPUT> createExecution(final boolean async) {
+
+                        return new ParallelExecution<INPUT, OUTPUT>(AbstractRoutine.this);
+                    }
+                };
+
+        return parallelRoutine.launchAsyn();
     }
 
-    protected TimeDuration getAvailTimeout() {
+    /**
+     * Creates a new execution instance.
+     *
+     * @param async whether the execution is asynchronous.
+     * @return the execution instance.
+     */
+    protected abstract Execution<INPUT, OUTPUT> createExecution(final boolean async);
 
-        return mAvailTimeout;
+    private RoutineChannel<INPUT, OUTPUT> launch(final boolean async) {
+
+        return new DefaultRoutineChannel<INPUT, OUTPUT>(new DefaultExecutionProvider(async),
+                                                        (async) ? mAsyncRunner : mSyncRunner);
     }
 
-    protected int getMaxRetained() {
-
-        return mMaxRetained;
-    }
-
-    protected int getMaxRunning() {
-
-        return mMaxRunning;
-    }
-
-    protected Runner getSyncRunner() {
-
-        return mSyncRunner;
-    }
-
-    protected RoutineChannel<INPUT, OUTPUT> launch(final boolean async) {
-
-        final ExecutionHandler<INPUT, OUTPUT> handler =
-                new ExecutionHandler<INPUT, OUTPUT>(new DefaultRoutineInvocationProvider(async),
-                                                    (async) ? mAsyncRunner : mSyncRunner);
-
-        return new DefaultRoutineChannel<INPUT, OUTPUT>(handler);
-    }
-
-    private class DefaultRoutineInvocationProvider
-            implements RoutineInvocationProvider<INPUT, OUTPUT> {
+    /**
+     * Default implementation of an execution provider supporting recycling of execution
+     * instances.
+     */
+    private class DefaultExecutionProvider
+            implements DefaultRoutineChannel.ExecutionProvider<INPUT, OUTPUT> {
 
         private final boolean mAsync;
 
-        private DefaultRoutineInvocationProvider(final boolean async) {
+        private DefaultExecutionProvider(final boolean async) {
 
             mAsync = async;
         }
@@ -352,19 +374,19 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
 
                 ++mRunningCount;
 
-                final LinkedList<Execution<INPUT, OUTPUT>> routines = mExecutions;
+                final LinkedList<Execution<INPUT, OUTPUT>> executions = mExecutions;
 
-                if (!routines.isEmpty()) {
+                if (!executions.isEmpty()) {
 
-                    return routines.removeFirst();
+                    return executions.removeFirst();
                 }
 
-                return createRoutineInvocation(mAsync);
+                return createExecution(mAsync);
             }
         }
 
         @Override
-        public void discard(final Execution<INPUT, OUTPUT> invocation) {
+        public void discard(final Execution<INPUT, OUTPUT> execution) {
 
             synchronized (mMutex) {
 
@@ -374,15 +396,15 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
         }
 
         @Override
-        public void recycle(final Execution<INPUT, OUTPUT> invocation) {
+        public void recycle(final Execution<INPUT, OUTPUT> execution) {
 
             synchronized (mMutex) {
 
-                final LinkedList<Execution<INPUT, OUTPUT>> invocations = mExecutions;
+                final LinkedList<Execution<INPUT, OUTPUT>> executions = mExecutions;
 
-                if (invocations.size() < mMaxRetained) {
+                if (executions.size() < mMaxRetained) {
 
-                    invocations.add(invocation);
+                    executions.add(execution);
                 }
 
                 --mRunningCount;

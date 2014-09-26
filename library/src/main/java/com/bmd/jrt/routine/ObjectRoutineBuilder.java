@@ -22,6 +22,8 @@ import java.lang.reflect.Proxy;
 import java.util.HashMap;
 
 /**
+ * Class implementing a builder of a routine wrapping an object instance.
+ * <p/>
  * Created by davide on 9/21/14.
  */
 public class ObjectRoutineBuilder extends ClassRoutineBuilder {
@@ -30,6 +32,11 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
     private final Class<?> mTargetClass;
 
+    /**
+     * Constructor.
+     *
+     * @param target the target object instance.
+     */
     ObjectRoutineBuilder(final Object target) {
 
         super(target);
@@ -37,16 +44,32 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
         mTargetClass = target.getClass();
     }
 
+    /**
+     * Returns a proxy object enable the asynchronous call of the target instance methods.
+     * <p/>
+     * The routines used for calling the methods will honor the attributes specified in any
+     * optional {@link com.bmd.jrt.routine.AsynMethod} annotation. In case the target instance does
+     * not implement the specified interface, the name attribute will be used to bind the interface
+     * method with the instance ones. If no name is assigned the one of the interface method will
+     * be used instead.
+     *
+     * @param itf     the interface implemented by the return object.
+     * @param <CLASS> the interface type.
+     * @return the proxy object.
+     * @throws java.lang.IllegalArgumentException if the specified class is null or does not
+     *                                            represent an interface.
+     */
     public <CLASS> CLASS asyn(final Class<CLASS> itf) {
 
         if (itf == null) {
 
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("the interface type must be null");
         }
 
         if (!itf.isInterface()) {
 
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(
+                    "the specified class is not an interface: " + itf.getCanonicalName());
         }
 
         final InvocationHandler handler;
@@ -90,6 +113,9 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
         return this;
     }
 
+    /**
+     * Invocation handler adapting a different interface to the target object instance.
+     */
     private class InterfaceInvocationHandler implements InvocationHandler {
 
         @Override
@@ -120,7 +146,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
                         final Class<? extends Runner> runnerClass = annotation.runner();
 
-                        if (runnerClass != NoRunner.class) {
+                        if (runnerClass != DefaultRunner.class) {
 
                             runner = runnerClass.newInstance();
                         }
@@ -170,6 +196,9 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
         }
     }
 
+    /**
+     * Invocation handler wrapping the target object instance.
+     */
     private class ObjectInvocationHandler implements InvocationHandler {
 
         @Override

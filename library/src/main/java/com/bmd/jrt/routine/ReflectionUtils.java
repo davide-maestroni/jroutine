@@ -24,6 +24,9 @@ import java.util.HashMap;
  */
 class ReflectionUtils {
 
+    /**
+     * Constant defining an empty argument array for methods or constructors.
+     */
     public static final Object[] NO_ARGS = new Object[0];
 
     private static final HashMap<Class<?>, Class<?>> sBoxMap = new HashMap<Class<?>, Class<?>>(9);
@@ -74,11 +77,17 @@ class ReflectionUtils {
     }
 
     /**
-     * TODO
+     * Finds the constructor of the specified class best matching the passed arguments.
+     * <p/>
+     * Note that clashing of signature is automatically avoided, since constructors are not
+     * identified by their name. Hence the best match will be always unique in the class.
      *
-     * @param type
-     * @param ctorArgs
-     * @return
+     * @param type     the target class.
+     * @param ctorArgs the constructor arguments.
+     * @param <TYPE>   the target type.
+     * @return the best matching constructor.
+     * @throws java.lang.IllegalArgumentException if no constructor taking the specified object
+     *                                            as parameters is found.
      */
     public static <TYPE> Constructor<TYPE> findConstructor(final Class<TYPE> type,
             final Object... ctorArgs) {

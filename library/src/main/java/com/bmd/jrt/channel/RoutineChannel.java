@@ -50,6 +50,7 @@ public interface RoutineChannel<INPUT, OUTPUT> extends InputChannel<INPUT> {
      * Closes the input channel and returns the output one.
      *
      * @return the routine output channel.
+     * @throws java.lang.IllegalStateException if this channel is already closed.
      */
     public OutputChannel<OUTPUT> close();
 }

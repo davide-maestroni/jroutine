@@ -16,17 +16,31 @@ package com.bmd.jrt.routine;
 import com.bmd.jrt.util.RoutineException;
 
 /**
+ * Helper class handling routine exceptions to be transferred through the routine channels.
+ * <p/>
  * Created by davide on 9/8/14.
  */
 class RoutineExceptionWrapper {
 
     private final Throwable mCause;
 
+    /**
+     * Constructor.
+     *
+     * @param cause the cause exception.
+     */
     private RoutineExceptionWrapper(final Throwable cause) {
 
         mCause = cause;
     }
 
+    /**
+     * If the specified object is a wrapper instance, the wrapped routine exception is thrown.
+     *
+     * @param obj the object to check.
+     * @throws com.bmd.jrt.util.RoutineException if the specified object is an exception wrapper
+     *                                           instance.
+     */
     public static void raise(final Object obj) {
 
         if (obj instanceof RoutineExceptionWrapper) {
@@ -35,11 +49,22 @@ class RoutineExceptionWrapper {
         }
     }
 
+    /**
+     * Creates an instance wrapping the specified exception.
+     *
+     * @param t the throwable to wrap.
+     * @return the new wrapper instance.
+     */
     public static RoutineExceptionWrapper wrap(final Throwable t) {
 
         return new RoutineExceptionWrapper(t);
     }
 
+    /**
+     * Returns the cause exception.
+     *
+     * @return the cause.
+     */
     public Throwable getCause() {
 
         final Throwable cause = mCause;
@@ -52,6 +77,11 @@ class RoutineExceptionWrapper {
         return cause;
     }
 
+    /**
+     * Returns a routine exception wrapping the cause one.
+     *
+     * @return the routine exception.
+     */
     public RoutineException raise() {
 
         final Throwable cause = mCause;

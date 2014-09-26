@@ -16,7 +16,11 @@ package com.bmd.jrt.routine;
 import com.bmd.jrt.channel.OutputConsumer;
 
 /**
+ * Decorator of an output consumer instance which synchronizes the access to its methods.
+ * <p/>
  * Created by davide on 9/18/14.
+ *
+ * @param <OUTPUT> the output type.
  */
 class SynchronizedConsumer<OUTPUT> implements OutputConsumer<OUTPUT> {
 
@@ -24,11 +28,17 @@ class SynchronizedConsumer<OUTPUT> implements OutputConsumer<OUTPUT> {
 
     private final Object mMutex = new Object();
 
+    /**
+     * Constructor.
+     *
+     * @param wrapped the wrapped output consumer.
+     * @throws java.lang.IllegalArgumentException is the specified consumer is null.
+     */
     public SynchronizedConsumer(final OutputConsumer<OUTPUT> wrapped) {
 
         if (wrapped == null) {
 
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("the consumer instance must not be null");
         }
 
         mConsumer = wrapped;

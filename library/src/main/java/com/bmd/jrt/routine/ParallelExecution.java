@@ -17,17 +17,27 @@ import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.execution.ExecutionAdapter;
 
 /**
+ * Implementation of an execution handling parallel mode.
+ * <p/>
  * Created by davide on 9/17/14.
+ *
+ * @param <INPUT>  the input type.
+ * @param <OUTPUT> the output type.
  */
 class ParallelExecution<INPUT, OUTPUT> extends ExecutionAdapter<INPUT, OUTPUT> {
 
     private final Routine<INPUT, OUTPUT> mRoutine;
 
+    /**
+     * Constructor.
+     *
+     * @param routine the routine to launch in parallel mode.
+     */
     public ParallelExecution(final Routine<INPUT, OUTPUT> routine) {
 
         if (routine == null) {
 
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("the routine instance must not be null");
         }
 
         mRoutine = routine;

@@ -13,11 +13,9 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.channel.RoutineChannel;
 import com.bmd.jrt.execution.Execution;
 import com.bmd.jrt.runner.Runner;
 import com.bmd.jrt.time.TimeDuration;
-import com.bmd.wtf.fll.Classification;
 
 import java.lang.reflect.Constructor;
 
@@ -25,7 +23,12 @@ import static com.bmd.jrt.routine.ReflectionUtils.NO_ARGS;
 import static com.bmd.jrt.routine.ReflectionUtils.findConstructor;
 
 /**
+ * Default implementation of a routine object instantiating execution objects via reflection.
+ * <p/>
  * Created by davide on 9/9/14.
+ *
+ * @param <INPUT>  the input type.
+ * @param <OUTPUT> the output type.
  */
 class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
 
@@ -33,33 +36,36 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
 
     private final Constructor<? extends Execution<INPUT, OUTPUT>> mConstructor;
 
-    private final Class<ParallelExecution<INPUT, OUTPUT>> mParallelType =
-            new Classification<ParallelExecution<INPUT, OUTPUT>>() {}.getRawType();
-
+    /**
+     * Constructor.
+     *
+     * @param syncRunner     the runner used for synchronous invocation.
+     * @param asyncRunner    the runner used for asynchronous invocation.
+     * @param maxRunning     the maximum number of parallel running executions. Must be positive.
+     * @param maxRetained    the maximum number of retained execution instances. Must be 0 or a
+     *                       positive number.
+     * @param availTimeout   the maximum timeout while waiting for an execution instance to be
+     *                       available.
+     * @param executionClass the execution class.
+     * @param executionArgs  the execution constructor arguments.
+     * @throws java.lang.IllegalArgumentException if at least one of the parameter is null or
+     *                                            invalid, of no constructor matching the specified
+     *                                            arguments is found for the target execution
+     *                                            class.
+     */
     public DefaultRoutine(final Runner syncRunner, final Runner asyncRunner, final int maxRunning,
             final int maxRetained, final TimeDuration availTimeout,
-            final Class<? extends Execution<INPUT, OUTPUT>> invocationClass,
-            final Object... invocationArgs) {
+            final Class<? extends Execution<INPUT, OUTPUT>> executionClass,
+            final Object... executionArgs) {
 
         super(syncRunner, asyncRunner, maxRunning, maxRetained, availTimeout);
 
-        mConstructor = findConstructor(invocationClass, invocationArgs);
-        mArgs = (invocationArgs == null) ? NO_ARGS : invocationArgs.clone();
+        mConstructor = findConstructor(executionClass, executionArgs);
+        mArgs = (executionArgs == null) ? NO_ARGS : executionArgs.clone();
     }
 
     @Override
-    public RoutineChannel<INPUT, OUTPUT> launchParall() {
-
-        final DefaultRoutine<INPUT, OUTPUT> parallelRoutine =
-                new DefaultRoutine<INPUT, OUTPUT>(getSyncRunner(), getAsyncRunner(),
-                                                  getMaxRunning(), getMaxRetained(),
-                                                  getAvailTimeout(), mParallelType, this);
-
-        return parallelRoutine.launchAsyn();
-    }
-
-    @Override
-    protected Execution<INPUT, OUTPUT> createRoutineInvocation(final boolean async) {
+    protected Execution<INPUT, OUTPUT> createExecution(final boolean async) {
 
         try {
 

@@ -16,32 +16,57 @@ package com.bmd.jrt.routine;
 import com.bmd.jrt.execution.Execution;
 import com.bmd.jrt.runner.Invocation;
 
+import java.util.Iterator;
+
 /**
+ * Default implementation of an invocation object.
+ * <p/>
  * Created by davide on 9/24/14.
+ *
+ * @param <INPUT>  the input type.
+ * @param <OUTPUT> the output type.
  */
 class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
 
-    private final ExecutionHandler<INPUT, OUTPUT> mHandler;
+    private final InputIterator<INPUT> mInputIterator;
 
     private final Object mInvocationMutex = new Object();
 
-    private final RoutineInvocationProvider<INPUT, OUTPUT> mInvocationProvider;
+    private final DefaultRoutineChannel.ExecutionProvider<INPUT, OUTPUT> mInvocationProvider;
 
     private final DefaultResultChannel<OUTPUT> mResultChannel;
 
     private Execution<INPUT, OUTPUT> mRoutine;
 
-    public DefaultInvocation(final ExecutionHandler<INPUT, OUTPUT> handler,
-            final RoutineInvocationProvider<INPUT, OUTPUT> provider) {
+    /**
+     * Constructor.
+     *
+     * @param provider the execution provider.
+     * @param inputs   the input iterator.
+     * @param results  the result channel.
+     * @throws IllegalArgumentException if one of the parameters is null.
+     */
+    public DefaultInvocation(final DefaultRoutineChannel.ExecutionProvider<INPUT, OUTPUT> provider,
+            final InputIterator<INPUT> inputs, final DefaultResultChannel<OUTPUT> results) {
 
         if (provider == null) {
 
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("the execution provider must not be null");
         }
 
-        mHandler = handler;
+        if (inputs == null) {
+
+            throw new IllegalArgumentException("the input iterator must not be null");
+        }
+
+        if (results == null) {
+
+            throw new IllegalArgumentException("the result channel must not be null");
+        }
+
         mInvocationProvider = provider;
-        mResultChannel = new DefaultResultChannel<OUTPUT>(handler);
+        mInputIterator = inputs;
+        mResultChannel = results;
     }
 
     @Override
@@ -49,27 +74,29 @@ class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
 
         synchronized (mInvocationMutex) {
 
-            final ExecutionHandler<INPUT, OUTPUT> handler = mHandler;
-            final RoutineInvocationProvider<INPUT, OUTPUT> provider = mInvocationProvider;
+            final InputIterator<INPUT> inputIterator = mInputIterator;
+            final DefaultRoutineChannel.ExecutionProvider<INPUT, OUTPUT> provider =
+                    mInvocationProvider;
             final DefaultResultChannel<OUTPUT> resultChannel = mResultChannel;
             Execution<INPUT, OUTPUT> invocation = null;
 
-            if (!handler.isAborting()) {
+            if (!inputIterator.isAborting()) {
 
                 return;
             }
 
-            final Throwable exception = handler.getAbortException();
+            final Throwable exception = inputIterator.getAbortException();
 
             try {
 
                 invocation = initInvocation();
 
                 invocation.onAbort(exception);
-                resultChannel.abort(exception);
-
                 invocation.onReturn();
+
                 provider.recycle(invocation);
+
+                resultChannel.close(exception);
 
             } catch (final Throwable t) {
 
@@ -78,11 +105,11 @@ class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
                     provider.discard(invocation);
                 }
 
-                resultChannel.abort(t);
+                resultChannel.close(t);
 
             } finally {
 
-                handler.onAbortComplete();
+                inputIterator.onAbortComplete();
             }
         }
     }
@@ -92,30 +119,31 @@ class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
 
         synchronized (mInvocationMutex) {
 
-            final ExecutionHandler<INPUT, OUTPUT> handler = mHandler;
+            final InputIterator<INPUT> inputIterator = mInputIterator;
             final DefaultResultChannel<OUTPUT> resultChannel = mResultChannel;
 
             try {
 
-                if (!handler.onProcessInput()) {
+                if (!inputIterator.onConsumeInput()) {
 
                     return;
                 }
 
                 final Execution<INPUT, OUTPUT> invocation = initInvocation();
 
-                while (handler.hasInput()) {
+                while (inputIterator.hasNext()) {
 
-                    invocation.onInput(handler.nextInput(), resultChannel);
+                    invocation.onInput(inputIterator.next(), resultChannel);
                 }
 
-                if (handler.isResult()) {
+                if (inputIterator.isComplete()) {
 
                     invocation.onResult(resultChannel);
-                    handler.resultClose();
-
                     invocation.onReturn();
+
                     mInvocationProvider.recycle(invocation);
+
+                    resultChannel.close();
                 }
 
             } catch (final Throwable t) {
@@ -140,5 +168,46 @@ class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
         }
 
         return invocation;
+    }
+
+    /**
+     * Interface defining an iterator of input data.
+     *
+     * @param <INPUT>the input type.
+     */
+    public interface InputIterator<INPUT> extends Iterator<INPUT> {
+
+        /**
+         * Returns the exception identifying the abortion reason.
+         *
+         * @return the reason of the abortion.
+         */
+        public Throwable getAbortException();
+
+        /**
+         * Checks if the input channel is aborting the execution.
+         *
+         * @return whether the execution is aborting.
+         */
+        public boolean isAborting();
+
+        /**
+         * Checks if the input has completed, that is, all the inputs have been consumed.
+         *
+         * @return whether the input has completed.
+         */
+        public boolean isComplete();
+
+        /**
+         * Notifies that the execution abortion is complete.
+         */
+        public void onAbortComplete();
+
+        /**
+         * Notifies that the available inputs are about to be consumed.
+         *
+         * @return whether at least one input is available.
+         */
+        public boolean onConsumeInput();
     }
 }

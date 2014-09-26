@@ -22,13 +22,44 @@ import com.bmd.jrt.util.ClassToken;
 import java.util.concurrent.TimeUnit;
 
 import static com.bmd.jrt.routine.ReflectionUtils.NO_ARGS;
+import static com.bmd.jrt.time.TimeDuration.fromUnit;
+import static com.bmd.jrt.time.TimeDuration.seconds;
 
 /**
+ * Class implementing a builder of a routine object.
+ * <p/>
+ * A routine has a synchronous and an asynchronous runner associated. The synchronous
+ * implementation can only be chosen between queued (the default one) and sequential.<br/>
+ * The queued one maintains an internal buffer of invocations that are consumed only when the
+ * last one complete, thus avoiding overflowing the call stack because of nested calls to other
+ * routines.<br/>
+ * The sequential one simply executes the invocations as soon as they are run.<br/>
+ * In both cases the invocations are run inside the calling thread.<br/>
+ * The default asynchronous runner is shared among all the routines, but a custom one can be set
+ * through the builder.
+ * <p/>
+ * The built routine is based on an execution implementation specified by a class token.<br/>
+ * The execution instance is created only when needed, by passing the specified arguments to the
+ * constructor. Note that the arguments objects should be immutable or, in any case, never modified
+ * outside or inside the routine in order to avoid concurrency issues.<br/>
+ * Additionally, a recycling mechanism is provided so that, when an execution successfully
+ * completes, the instance is retained for future invocations. Moreover, the maximum running
+ * execution instances at one time can be limited by calling the specific builder method. When the
+ * limit is reached and an additional instance is needed, the call is blocked until one become
+ * available or the timeout set through the builder elapses.<br/>
+ * By default the timeout is set to a few seconds to avoid unexpected deadlocks.<br/>
+ * In case the timeout elapses before an execution instance becomes available, a
+ * {@link com.bmd.jrt.util.RoutineNotAvailableException} will be thrown.
+ * <p/>
  * Created by davide on 9/21/14.
+ *
+ * @param <INPUT>  the input type.
+ * @param <OUTPUT> the output type.
+ * @see com.bmd.jrt.runner.Runner
  */
 public class RoutineBuilder<INPUT, OUTPUT> {
 
-    private static final TimeDuration DEFAULT_AVAIL_TIMEOUT = TimeDuration.seconds(3);
+    private static final TimeDuration DEFAULT_AVAIL_TIMEOUT = seconds(5);
 
     private TimeDuration mAvailTimeout = DEFAULT_AVAIL_TIMEOUT;
 
@@ -46,6 +77,11 @@ public class RoutineBuilder<INPUT, OUTPUT> {
 
     private Runner mSyncRunner = Runners.queued();
 
+    /**
+     * Constructor.
+     *
+     * @param classToken the execution class token.
+     */
     RoutineBuilder(final ClassToken<? extends Execution<INPUT, OUTPUT>> classToken) {
 
         if (classToken == null) {
@@ -56,17 +92,32 @@ public class RoutineBuilder<INPUT, OUTPUT> {
         mClassToken = classToken;
     }
 
+    /**
+     * Sets the timeout for an execution instance to become available.
+     *
+     * @param timeout  the timeout.
+     * @param timeUnit the timeout time unit.
+     * @return this builder.
+     * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
+     */
     public RoutineBuilder<INPUT, OUTPUT> availableTimeout(final long timeout,
             final TimeUnit timeUnit) {
 
-        return availableTimeout(TimeDuration.fromUnit(timeout, timeUnit));
+        return availableTimeout(fromUnit(timeout, timeUnit));
     }
 
+    /**
+     * Sets the timeout for an execution instance to become available.
+     *
+     * @param timeout the timeout.
+     * @return this builder.
+     * @throws java.lang.IllegalArgumentException if the specified timeout is null.
+     */
     public RoutineBuilder<INPUT, OUTPUT> availableTimeout(final TimeDuration timeout) {
 
         if (timeout == null) {
 
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("the timeout must not be null");
         }
 
         mAvailTimeout = timeout;
@@ -74,11 +125,19 @@ public class RoutineBuilder<INPUT, OUTPUT> {
         return this;
     }
 
+    /**
+     * Sets the max number of retained instances.
+     *
+     * @param maxRetainedInstances the max number of instances.
+     * @return this builder.
+     * @throws java.lang.IllegalArgumentException if the number is negative.
+     */
     public RoutineBuilder<INPUT, OUTPUT> maxRetained(final int maxRetainedInstances) {
 
         if (maxRetainedInstances < 0) {
 
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(
+                    "the maximum number of retained instances cannot be negative");
         }
 
         mMaxRetained = maxRetainedInstances;
@@ -86,11 +145,19 @@ public class RoutineBuilder<INPUT, OUTPUT> {
         return this;
     }
 
+    /**
+     * Sets the max number of concurrently running instances.
+     *
+     * @param maxRunningInstances the max number of instances.
+     * @return this builder.
+     * @throws java.lang.IllegalArgumentException if the number is less than 1.
+     */
     public RoutineBuilder<INPUT, OUTPUT> maxRunning(final int maxRunningInstances) {
 
         if (maxRunningInstances < 1) {
 
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(
+                    "the maximum number of concurrently running instances cannot be less than 1");
         }
 
         mMaxRunning = maxRunningInstances;
@@ -98,6 +165,15 @@ public class RoutineBuilder<INPUT, OUTPUT> {
         return this;
     }
 
+    /**
+     * Sets the queued synchronous runner.<br/>
+     * The queued runner maintains an internal buffer of invocations that are consumed only when
+     * the last one complete, thus avoiding overflowing the call stack because of nested calls to
+     * other routines.<br/>
+     * The invocations are run inside the calling thread.
+     *
+     * @return this builder.
+     */
     public RoutineBuilder<INPUT, OUTPUT> queued() {
 
         mSyncRunner = Runners.queued();
@@ -105,6 +181,11 @@ public class RoutineBuilder<INPUT, OUTPUT> {
         return this;
     }
 
+    /**
+     * Builds and returns the routine instance.
+     *
+     * @return the newly created routine.
+     */
     public Routine<INPUT, OUTPUT> routine() {
 
         return new DefaultRoutine<INPUT, OUTPUT>(mSyncRunner, mAsyncRunner, mMaxRunning,
@@ -112,11 +193,18 @@ public class RoutineBuilder<INPUT, OUTPUT> {
                                                  mClassToken.getRawClass(), mArgs);
     }
 
+    /**
+     * Sets the asynchronous runner instance.
+     *
+     * @param runner the runner instance.
+     * @return this builder.
+     * @throws java.lang.IllegalArgumentException if the specified runner is null.
+     */
     public RoutineBuilder<INPUT, OUTPUT> runBy(final Runner runner) {
 
         if (runner == null) {
 
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("the runner instance must not be null");
         }
 
         mAsyncRunner = runner;
@@ -124,6 +212,13 @@ public class RoutineBuilder<INPUT, OUTPUT> {
         return this;
     }
 
+    /**
+     * Sets the sequential synchronous runner.<br/>
+     * The sequential one simply executes the invocations as soon as they are run.<br/>
+     * The invocations are run inside the calling thread.
+     *
+     * @return this builder.
+     */
     public RoutineBuilder<INPUT, OUTPUT> sequential() {
 
         mSyncRunner = Runners.sequential();
@@ -131,11 +226,18 @@ public class RoutineBuilder<INPUT, OUTPUT> {
         return this;
     }
 
+    /**
+     * Sets the arguments to be passed to the execution constructor.
+     *
+     * @param args the arguments.
+     * @return this builder.
+     * @throws java.lang.IllegalArgumentException if the specified arguments array is null.
+     */
     public RoutineBuilder<INPUT, OUTPUT> withArgs(final Object... args) {
 
         if (args == null) {
 
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("the arguments array must not be null");
         }
 
         mArgs = args;

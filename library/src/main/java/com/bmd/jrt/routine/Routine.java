@@ -14,7 +14,7 @@
 package com.bmd.jrt.routine;
 
 import com.bmd.jrt.channel.OutputChannel;
-import com.bmd.jrt.channel.RoutineChannel;
+import com.bmd.jrt.channel.ParameterChannel;
 
 import java.util.List;
 
@@ -88,9 +88,9 @@ public interface Routine<INPUT, OUTPUT> {
 
     public OutputChannel<OUTPUT> invokeParall(OutputChannel<? extends INPUT> inputs);
 
-    public RoutineChannel<INPUT, OUTPUT> launch();
+    public ParameterChannel<INPUT, OUTPUT> launch();
 
-    public RoutineChannel<INPUT, OUTPUT> launchAsyn();
+    public ParameterChannel<INPUT, OUTPUT> launchAsyn();
 
-    public RoutineChannel<INPUT, OUTPUT> launchParall();
+    public ParameterChannel<INPUT, OUTPUT> launchParall();
 }

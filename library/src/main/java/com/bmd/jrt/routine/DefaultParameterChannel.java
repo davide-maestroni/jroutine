@@ -15,7 +15,7 @@ package com.bmd.jrt.routine;
 
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.OutputConsumer;
-import com.bmd.jrt.channel.RoutineChannel;
+import com.bmd.jrt.channel.ParameterChannel;
 import com.bmd.jrt.execution.Execution;
 import com.bmd.jrt.routine.DefaultInvocation.InputIterator;
 import com.bmd.jrt.routine.DefaultResultChannel.AbortHandler;
@@ -31,14 +31,14 @@ import static com.bmd.jrt.time.TimeDuration.ZERO;
 import static com.bmd.jrt.time.TimeDuration.fromUnit;
 
 /**
- * Default implementation of a routine input channel.
+ * Default implementation of a parameter input channel.
  * <p/>
  * Created by davide on 9/24/14.
  *
  * @param <INPUT>  the input type.
  * @param <OUTPUT> the output type.
  */
-class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTPUT> {
+class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, OUTPUT> {
 
     private final SimpleQueue<INPUT> mInputQueue = new SimpleQueue<INPUT>();
 
@@ -67,7 +67,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
      * @param runner   the runner instance.
      * @throws java.lang.IllegalArgumentException if one of the parameters is null.
      */
-    public DefaultRoutineChannel(final ExecutionProvider<INPUT, OUTPUT> provider,
+    public DefaultParameterChannel(final ExecutionProvider<INPUT, OUTPUT> provider,
             final Runner runner) {
 
         mRunner = runner;
@@ -133,7 +133,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
     }
 
     @Override
-    public RoutineChannel<INPUT, OUTPUT> after(final TimeDuration delay) {
+    public ParameterChannel<INPUT, OUTPUT> after(final TimeDuration delay) {
 
         synchronized (mMutex) {
 
@@ -151,13 +151,13 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
     }
 
     @Override
-    public RoutineChannel<INPUT, OUTPUT> after(final long delay, final TimeUnit timeUnit) {
+    public ParameterChannel<INPUT, OUTPUT> after(final long delay, final TimeUnit timeUnit) {
 
         return after(fromUnit(delay, timeUnit));
     }
 
     @Override
-    public RoutineChannel<INPUT, OUTPUT> pass(final OutputChannel<INPUT> channel) {
+    public ParameterChannel<INPUT, OUTPUT> pass(final OutputChannel<INPUT> channel) {
 
         final TimeDuration delay;
 
@@ -183,7 +183,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
     }
 
     @Override
-    public RoutineChannel<INPUT, OUTPUT> pass(final Iterable<? extends INPUT> inputs) {
+    public ParameterChannel<INPUT, OUTPUT> pass(final Iterable<? extends INPUT> inputs) {
 
         final TimeDuration delay;
 
@@ -224,7 +224,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
     }
 
     @Override
-    public RoutineChannel<INPUT, OUTPUT> pass(final INPUT input) {
+    public ParameterChannel<INPUT, OUTPUT> pass(final INPUT input) {
 
         final TimeDuration delay;
 
@@ -255,7 +255,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
     }
 
     @Override
-    public RoutineChannel<INPUT, OUTPUT> pass(final INPUT... inputs) {
+    public ParameterChannel<INPUT, OUTPUT> pass(final INPUT... inputs) {
 
         synchronized (mMutex) {
 

@@ -14,6 +14,7 @@
 package com.bmd.jrt.routine;
 
 import com.bmd.jrt.execution.Execution;
+import com.bmd.jrt.routine.DefaultParameterChannel.ExecutionProvider;
 import com.bmd.jrt.runner.Invocation;
 
 import java.util.Iterator;
@@ -28,15 +29,15 @@ import java.util.Iterator;
  */
 class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
 
+    private final ExecutionProvider<INPUT, OUTPUT> mExecutionProvider;
+
     private final InputIterator<INPUT> mInputIterator;
 
-    private final Object mInvocationMutex = new Object();
-
-    private final DefaultRoutineChannel.ExecutionProvider<INPUT, OUTPUT> mInvocationProvider;
+    private final Object mMutex = new Object();
 
     private final DefaultResultChannel<OUTPUT> mResultChannel;
 
-    private Execution<INPUT, OUTPUT> mRoutine;
+    private Execution<INPUT, OUTPUT> mExecution;
 
     /**
      * Constructor.
@@ -46,7 +47,8 @@ class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
      * @param results  the result channel.
      * @throws IllegalArgumentException if one of the parameters is null.
      */
-    public DefaultInvocation(final DefaultRoutineChannel.ExecutionProvider<INPUT, OUTPUT> provider,
+    public DefaultInvocation(
+            final DefaultParameterChannel.ExecutionProvider<INPUT, OUTPUT> provider,
             final InputIterator<INPUT> inputs, final DefaultResultChannel<OUTPUT> results) {
 
         if (provider == null) {
@@ -64,7 +66,7 @@ class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
             throw new IllegalArgumentException("the result channel must not be null");
         }
 
-        mInvocationProvider = provider;
+        mExecutionProvider = provider;
         mInputIterator = inputs;
         mResultChannel = results;
     }
@@ -72,13 +74,12 @@ class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
     @Override
     public void abort() {
 
-        synchronized (mInvocationMutex) {
+        synchronized (mMutex) {
 
             final InputIterator<INPUT> inputIterator = mInputIterator;
-            final DefaultRoutineChannel.ExecutionProvider<INPUT, OUTPUT> provider =
-                    mInvocationProvider;
+            final ExecutionProvider<INPUT, OUTPUT> provider = mExecutionProvider;
             final DefaultResultChannel<OUTPUT> resultChannel = mResultChannel;
-            Execution<INPUT, OUTPUT> invocation = null;
+            Execution<INPUT, OUTPUT> execution = null;
 
             if (!inputIterator.isAborting()) {
 
@@ -89,20 +90,20 @@ class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
 
             try {
 
-                invocation = initInvocation();
+                execution = initExecution();
 
-                invocation.onAbort(exception);
-                invocation.onReturn();
+                execution.onAbort(exception);
+                execution.onReturn();
 
-                provider.recycle(invocation);
+                provider.recycle(execution);
 
                 resultChannel.close(exception);
 
             } catch (final Throwable t) {
 
-                if (invocation != null) {
+                if (execution != null) {
 
-                    provider.discard(invocation);
+                    provider.discard(execution);
                 }
 
                 resultChannel.close(t);
@@ -117,7 +118,7 @@ class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
     @Override
     public void run() {
 
-        synchronized (mInvocationMutex) {
+        synchronized (mMutex) {
 
             final InputIterator<INPUT> inputIterator = mInputIterator;
             final DefaultResultChannel<OUTPUT> resultChannel = mResultChannel;
@@ -129,19 +130,19 @@ class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
                     return;
                 }
 
-                final Execution<INPUT, OUTPUT> invocation = initInvocation();
+                final Execution<INPUT, OUTPUT> execution = initExecution();
 
                 while (inputIterator.hasNext()) {
 
-                    invocation.onInput(inputIterator.next(), resultChannel);
+                    execution.onInput(inputIterator.next(), resultChannel);
                 }
 
                 if (inputIterator.isComplete()) {
 
-                    invocation.onResult(resultChannel);
-                    invocation.onReturn();
+                    execution.onResult(resultChannel);
+                    execution.onReturn();
 
-                    mInvocationProvider.recycle(invocation);
+                    mExecutionProvider.recycle(execution);
 
                     resultChannel.close();
                 }
@@ -153,21 +154,21 @@ class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
         }
     }
 
-    private Execution<INPUT, OUTPUT> initInvocation() {
+    private Execution<INPUT, OUTPUT> initExecution() {
 
-        final Execution<INPUT, OUTPUT> invocation;
+        final Execution<INPUT, OUTPUT> execution;
 
-        if (mRoutine != null) {
+        if (mExecution != null) {
 
-            invocation = mRoutine;
+            execution = mExecution;
 
         } else {
 
-            invocation = (mRoutine = mInvocationProvider.create());
-            invocation.onInit();
+            execution = (mExecution = mExecutionProvider.create());
+            execution.onInit();
         }
 
-        return invocation;
+        return execution;
     }
 
     /**

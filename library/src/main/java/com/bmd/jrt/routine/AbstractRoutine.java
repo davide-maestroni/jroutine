@@ -14,7 +14,7 @@
 package com.bmd.jrt.routine;
 
 import com.bmd.jrt.channel.OutputChannel;
-import com.bmd.jrt.channel.RoutineChannel;
+import com.bmd.jrt.channel.ParameterChannel;
 import com.bmd.jrt.common.RoutineInterruptedException;
 import com.bmd.jrt.common.RoutineNotAvailableException;
 import com.bmd.jrt.execution.Execution;
@@ -286,19 +286,19 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
     }
 
     @Override
-    public RoutineChannel<INPUT, OUTPUT> launch() {
+    public ParameterChannel<INPUT, OUTPUT> launch() {
 
         return launch(false);
     }
 
     @Override
-    public RoutineChannel<INPUT, OUTPUT> launchAsyn() {
+    public ParameterChannel<INPUT, OUTPUT> launchAsyn() {
 
         return launch(true);
     }
 
     @Override
-    public RoutineChannel<INPUT, OUTPUT> launchParall() {
+    public ParameterChannel<INPUT, OUTPUT> launchParall() {
 
         final AbstractRoutine<INPUT, OUTPUT> parallelRoutine =
                 new AbstractRoutine<INPUT, OUTPUT>(mSyncRunner, mAsyncRunner, mMaxRunning,
@@ -322,10 +322,10 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
      */
     protected abstract Execution<INPUT, OUTPUT> createExecution(final boolean async);
 
-    private RoutineChannel<INPUT, OUTPUT> launch(final boolean async) {
+    private ParameterChannel<INPUT, OUTPUT> launch(final boolean async) {
 
-        return new DefaultRoutineChannel<INPUT, OUTPUT>(new DefaultExecutionProvider(async),
-                                                        (async) ? mAsyncRunner : mSyncRunner);
+        return new DefaultParameterChannel<INPUT, OUTPUT>(new DefaultExecutionProvider(async),
+                                                          (async) ? mAsyncRunner : mSyncRunner);
     }
 
     /**
@@ -333,7 +333,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
      * instances.
      */
     private class DefaultExecutionProvider
-            implements DefaultRoutineChannel.ExecutionProvider<INPUT, OUTPUT> {
+            implements DefaultParameterChannel.ExecutionProvider<INPUT, OUTPUT> {
 
         private final boolean mAsync;
 

@@ -23,7 +23,7 @@ package com.bmd.jrt.channel;
 public interface Channel {
 
     /**
-     * Closes the channel and abort the transfer of data, thus aborting the routine invocation.
+     * Closes the channel and abort the transfer of data, thus aborting the routine execution.
      * <p/>
      * Note that, in case the channel was already closed, the call to this method has no effect.
      *
@@ -32,7 +32,7 @@ public interface Channel {
     public boolean abort();
 
     /**
-     * Closes the channel and abort the transfer of data, thus aborting the routine invocation and
+     * Closes the channel and abort the transfer of data, thus aborting the routine execution and
      * causing the specified throwable to be passed as the abortion reason.
      * <p/>
      * Note that, in case the channel was already closed, the call to this method has no effect.

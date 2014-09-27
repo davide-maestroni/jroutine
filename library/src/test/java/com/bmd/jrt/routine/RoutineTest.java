@@ -15,8 +15,8 @@ package com.bmd.jrt.routine;
 
 import com.bmd.jrt.channel.OutputConsumer;
 import com.bmd.jrt.channel.OutputConsumerAdapter;
+import com.bmd.jrt.channel.ParameterChannel;
 import com.bmd.jrt.channel.ResultChannel;
-import com.bmd.jrt.channel.RoutineChannel;
 import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.common.RoutineException;
 import com.bmd.jrt.execution.Execution;
@@ -141,7 +141,7 @@ public class RoutineTest extends TestCase {
         final ExecutionAdapter<Integer, Integer> invokeSquareSum =
                 new ExecutionAdapter<Integer, Integer>() {
 
-                    private RoutineChannel<Integer, Integer> mChannel;
+                    private ParameterChannel<Integer, Integer> mChannel;
 
                     @Override
                     public void onAbort(final Throwable throwable) {

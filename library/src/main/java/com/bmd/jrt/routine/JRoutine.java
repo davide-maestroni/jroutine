@@ -13,13 +13,15 @@
  */
 package com.bmd.jrt.routine;
 
+import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.execution.Execution;
-import com.bmd.jrt.util.ClassToken;
 
 /**
  * TODO
  * <p/>
  * Created by davide on 9/7/14.
+ *
+ * @see com.bmd.jrt.routine.AsynMethod
  */
 public class JRoutine {
 

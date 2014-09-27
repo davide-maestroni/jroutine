@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.util;
+package com.bmd.jrt.common;
 
 import junit.framework.TestCase;
 

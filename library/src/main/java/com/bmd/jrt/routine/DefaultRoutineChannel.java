@@ -25,8 +25,10 @@ import com.bmd.jrt.time.TimeDuration;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
+
+import static com.bmd.jrt.time.TimeDuration.ZERO;
+import static com.bmd.jrt.time.TimeDuration.fromUnit;
 
 /**
  * Default implementation of a routine input channel.
@@ -38,7 +40,7 @@ import java.util.concurrent.TimeUnit;
  */
 class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTPUT> {
 
-    private final LinkedList<INPUT> mInputQueue = new LinkedList<INPUT>();
+    private final SimpleQueue<INPUT> mInputQueue = new SimpleQueue<INPUT>();
 
     private final DefaultInvocation<INPUT, OUTPUT> mInvocation;
 
@@ -52,7 +54,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
 
     private ArrayList<OutputChannel<?>> mBoundChannels = new ArrayList<OutputChannel<?>>();
 
-    private TimeDuration mInputDelay = TimeDuration.ZERO;
+    private TimeDuration mInputDelay = ZERO;
 
     private int mPendingInputCount;
 
@@ -151,7 +153,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
     @Override
     public RoutineChannel<INPUT, OUTPUT> after(final long delay, final TimeUnit timeUnit) {
 
-        return after(TimeDuration.fromUnit(delay, timeUnit));
+        return after(fromUnit(delay, timeUnit));
     }
 
     @Override
@@ -198,7 +200,7 @@ class DefaultRoutineChannel<INPUT, OUTPUT> implements RoutineChannel<INPUT, OUTP
 
             if (delay.isZero()) {
 
-                final LinkedList<INPUT> inputQueue = mInputQueue;
+                final SimpleQueue<INPUT> inputQueue = mInputQueue;
 
                 for (final INPUT input : inputs) {
 

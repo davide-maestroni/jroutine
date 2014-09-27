@@ -11,10 +11,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.bmd.jrt.common;
 
 /**
- * Package containing time related helper classes.
+ * Exception wrapping any throwable escaping a routine execution.
  * <p/>
- * Created by davide on 9/25/14.
+ * Created by davide on 9/8/14.
  */
-package com.bmd.jrt.util;
+public class RoutineException extends RuntimeException {
+
+    /**
+     * Constructor.
+     *
+     * @param cause the wrapped exception.
+     */
+    public RoutineException(final Throwable cause) {
+
+        super(cause);
+    }
+}

@@ -13,11 +13,11 @@
  */
 package com.bmd.jrt.routine;
 
+import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.execution.Execution;
 import com.bmd.jrt.runner.Runner;
 import com.bmd.jrt.runner.Runners;
 import com.bmd.jrt.time.TimeDuration;
-import com.bmd.jrt.util.ClassToken;
 
 import java.util.concurrent.TimeUnit;
 
@@ -49,7 +49,7 @@ import static com.bmd.jrt.time.TimeDuration.seconds;
  * available or the timeout set through the builder elapses.<br/>
  * By default the timeout is set to a few seconds to avoid unexpected deadlocks.<br/>
  * In case the timeout elapses before an execution instance becomes available, a
- * {@link com.bmd.jrt.util.RoutineNotAvailableException} will be thrown.
+ * {@link com.bmd.jrt.common.RoutineNotAvailableException} will be thrown.
  * <p/>
  * Created by davide on 9/21/14.
  *

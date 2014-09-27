@@ -344,10 +344,9 @@ public class Inputs<DATA> implements List<DATA> {
     }
 
     @Override
-    @SuppressWarnings("NullableProblems")
+    @SuppressWarnings({"NullableProblems", "unchecked"})
     public Iterator<DATA> iterator() {
 
-        //noinspection unchecked
         return (Iterator<DATA>) mList.iterator();
     }
 
@@ -359,10 +358,9 @@ public class Inputs<DATA> implements List<DATA> {
     }
 
     @Override
-    @SuppressWarnings("NullableProblems")
+    @SuppressWarnings({"NullableProblems", "SuspiciousToArrayCall"})
     public <T> T[] toArray(final T[] a) {
 
-        //noinspection SuspiciousToArrayCall
         return mList.toArray(a);
     }
 
@@ -420,16 +418,16 @@ public class Inputs<DATA> implements List<DATA> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public DATA get(final int index) {
 
-        //noinspection unchecked
         return (DATA) mList.get(index);
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public DATA set(final int index, final DATA element) {
 
-        //noinspection unchecked
         return (DATA) mList.set(index, element);
     }
 
@@ -440,9 +438,9 @@ public class Inputs<DATA> implements List<DATA> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public DATA remove(final int index) {
 
-        //noinspection unchecked
         return (DATA) mList.remove(index);
     }
 
@@ -459,18 +457,16 @@ public class Inputs<DATA> implements List<DATA> {
     }
 
     @Override
-    @SuppressWarnings("NullableProblems")
+    @SuppressWarnings({"NullableProblems", "unchecked"})
     public ListIterator<DATA> listIterator() {
 
-        //noinspection unchecked
         return (ListIterator<DATA>) mList.listIterator();
     }
 
     @Override
-    @SuppressWarnings("NullableProblems")
+    @SuppressWarnings({"NullableProblems", "unchecked"})
     public ListIterator<DATA> listIterator(final int index) {
 
-        //noinspection unchecked
         return (ListIterator<DATA>) mList.listIterator(index);
     }
 
@@ -493,7 +489,6 @@ public class Inputs<DATA> implements List<DATA> {
 
         if (boolean.class.equals(type) || list.isEmpty()) {
 
-            //noinspection unchecked
             return new Inputs<Boolean>(boolean.class, list);
         }
 
@@ -530,7 +525,6 @@ public class Inputs<DATA> implements List<DATA> {
 
         if (byte.class.equals(type) || list.isEmpty()) {
 
-            //noinspection unchecked
             return new Inputs<Byte>(byte.class, list);
         }
 
@@ -574,7 +568,6 @@ public class Inputs<DATA> implements List<DATA> {
 
         if (char.class.equals(type) || list.isEmpty()) {
 
-            //noinspection unchecked
             return new Inputs<Character>(char.class, list);
         }
 
@@ -611,7 +604,6 @@ public class Inputs<DATA> implements List<DATA> {
 
         if (double.class.equals(type) || list.isEmpty()) {
 
-            //noinspection unchecked
             return new Inputs<Double>(double.class, list);
         }
 
@@ -655,7 +647,6 @@ public class Inputs<DATA> implements List<DATA> {
 
         if (float.class.equals(type) || list.isEmpty()) {
 
-            //noinspection unchecked
             return new Inputs<Float>(float.class, list);
         }
 
@@ -699,7 +690,6 @@ public class Inputs<DATA> implements List<DATA> {
 
         if (int.class.equals(type) || list.isEmpty()) {
 
-            //noinspection unchecked
             return new Inputs<Integer>(int.class, list);
         }
 
@@ -743,7 +733,6 @@ public class Inputs<DATA> implements List<DATA> {
 
         if (long.class.equals(type) || list.isEmpty()) {
 
-            //noinspection unchecked
             return new Inputs<Long>(long.class, list);
         }
 
@@ -797,7 +786,6 @@ public class Inputs<DATA> implements List<DATA> {
 
         if (short.class.equals(type) || list.isEmpty()) {
 
-            //noinspection unchecked
             return new Inputs<Short>(short.class, list);
         }
 

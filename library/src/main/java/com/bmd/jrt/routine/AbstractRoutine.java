@@ -15,12 +15,12 @@ package com.bmd.jrt.routine;
 
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.RoutineChannel;
+import com.bmd.jrt.common.RoutineInterruptedException;
+import com.bmd.jrt.common.RoutineNotAvailableException;
 import com.bmd.jrt.execution.Execution;
 import com.bmd.jrt.runner.Runner;
 import com.bmd.jrt.time.TimeDuration;
 import com.bmd.jrt.time.TimeDuration.Check;
-import com.bmd.jrt.util.RoutineInterruptedException;
-import com.bmd.jrt.util.RoutineNotAvailableException;
 
 import java.util.LinkedList;
 import java.util.List;

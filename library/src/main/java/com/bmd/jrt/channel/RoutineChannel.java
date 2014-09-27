@@ -28,6 +28,8 @@ import java.util.concurrent.TimeUnit;
  */
 public interface RoutineChannel<INPUT, OUTPUT> extends InputChannel<INPUT> {
 
+    //TODO: rename
+
     @Override
     public RoutineChannel<INPUT, OUTPUT> after(TimeDuration delay);
 

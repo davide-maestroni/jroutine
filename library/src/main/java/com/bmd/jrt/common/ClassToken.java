@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.util;
+package com.bmd.jrt.common;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -36,36 +36,37 @@ public abstract class ClassToken<CLASS> {
     private Class<CLASS> mRawClass;
 
     /**
-     * TODO
+     * Creates a new token from the class specified object.
      *
-     * @param object
-     * @param <CLASS>
-     * @return
+     * @param object  the object.
+     * @param <CLASS> the class type.
+     * @return the newly created token.
+     * @throws IllegalArgumentException if the object is null.
      */
+    @SuppressWarnings("unchecked")
     public static <CLASS> ClassToken<CLASS> classOf(final CLASS object) {
 
         if (object == null) {
 
-            throw new IllegalArgumentException("the classification object cannot be null");
+            throw new IllegalArgumentException("the classification object must not be null");
         }
 
-        //noinspection unchecked
         return token((Class<CLASS>) object.getClass());
     }
 
     /**
-     * Creates a new adapter from the specified raw class.
+     * Creates a new token from the specified raw class.
      *
      * @param rawClass the raw class.
      * @param <CLASS>  the class type.
-     * @return the newly created adapter.
+     * @return the newly created token.
      * @throws IllegalArgumentException if the raw class is null.
      */
     public static <CLASS> ClassToken<CLASS> token(final Class<CLASS> rawClass) {
 
         if (rawClass == null) {
 
-            throw new IllegalArgumentException("the classification raw type cannot be null");
+            throw new IllegalArgumentException("the classification raw type must not be null");
         }
 
         final ClassToken<CLASS> classToken = new ClassToken<CLASS>() {};
@@ -76,23 +77,25 @@ public abstract class ClassToken<CLASS> {
     }
 
     /**
-     * Casts the specified object to this adapter raw class.
+     * Casts the specified object to this token raw class.
      * <p/>
      * Note that the cast is unsafe and may raise an exception.
      *
      * @param object the object to cast.
      * @return the casted object.
      */
+    @SuppressWarnings("unchecked")
     public final CLASS cast(final Object object) {
 
-        //noinspection unchecked
         return (CLASS) object;
     }
 
     /**
-     * Gets the generic type of this adapter.
+     * Gets the generic type of this token.
      *
      * @return the generic type.
+     * @throws java.lang.IllegalStateException if this class does not correctly extends a class
+     *                                         token.
      */
     public final Type getGenericType() {
 
@@ -117,8 +120,8 @@ public abstract class ClassToken<CLASS> {
 
             } else {
 
-                throw new IllegalStateException(
-                        "the class does not correctly extends classification: " + getClass());
+                throw new IllegalStateException("the class does not correctly extends class token: "
+                                                        + getClass().getCanonicalName());
             }
         }
 
@@ -126,10 +129,13 @@ public abstract class ClassToken<CLASS> {
     }
 
     /**
-     * Gets the raw class of this adapter.
+     * Gets the raw class of this token.
      *
      * @return the raw class.
+     * @throws java.lang.IllegalStateException if this class does not correctly extends a class
+     *                                         token.
      */
+    @SuppressWarnings("unchecked")
     public final Class<CLASS> getRawClass() {
 
         if (mRawClass == null) {
@@ -138,18 +144,17 @@ public abstract class ClassToken<CLASS> {
 
             if (type instanceof Class) {
 
-                //noinspection unchecked
                 mRawClass = ((Class<CLASS>) type);
 
             } else if (type instanceof ParameterizedType) {
 
-                //noinspection unchecked
                 mRawClass = ((Class<CLASS>) ((ParameterizedType) type).getRawType());
 
             } else {
 
                 throw new IllegalStateException(
-                        "the class does not correctly extends an adapter: " + getClass());
+                        "the class does not correctly extends a class token: "
+                                + getClass().getCanonicalName());
             }
         }
 
@@ -181,10 +186,12 @@ public abstract class ClassToken<CLASS> {
     }
 
     /**
-     * Checks if this adapter raw class is equal to or is a super class of the specified one.
+     * Checks if this token raw class is equal to or is a super class of the specified one.
      *
-     * @param other the adapter to compare.
-     * @return whether this adapter raw class is equal to or is a super class.
+     * @param other the class token to compare.
+     * @return whether this token raw class is equal to or is a super class.
+     * @throws java.lang.IllegalStateException if this class does not correctly extends a class
+     *                                         token.
      */
     public final boolean isAssignableFrom(final ClassToken<?> other) {
 
@@ -192,9 +199,11 @@ public abstract class ClassToken<CLASS> {
     }
 
     /**
-     * Checks if this adapter raw class represent an interface.
+     * Checks if this token raw class represent an interface.
      *
-     * @return whether this adapter raw class is an interface.
+     * @return whether this token raw class is an interface.
+     * @throws java.lang.IllegalStateException if this class does not correctly extends a class
+     *                                         token.
      */
     public final boolean isInterface() {
 

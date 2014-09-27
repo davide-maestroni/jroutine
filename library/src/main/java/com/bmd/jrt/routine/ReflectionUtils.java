@@ -89,6 +89,7 @@ class ReflectionUtils {
      * @throws java.lang.IllegalArgumentException if no constructor taking the specified object
      *                                            as parameters is found.
      */
+    @SuppressWarnings("unchecked")
     public static <TYPE> Constructor<TYPE> findConstructor(final Class<TYPE> type,
             final Object... ctorArgs) {
 
@@ -110,7 +111,6 @@ class ReflectionUtils {
             constructor.setAccessible(true);
         }
 
-        //noinspection unchecked
         return (Constructor<TYPE>) constructor;
     }
 

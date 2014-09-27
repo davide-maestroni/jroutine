@@ -20,7 +20,7 @@ import java.util.List;
 
 /**
  * This is a special abstract implementation that centralizes the routine execution inside a
- * single method which gets called only when all the inputs are available.
+ * single method, which gets called only when all the inputs are available.
  * <p/>
  * The implementing class may additionally override the execution callbacks to specifically handle
  * the object lifecycle. Note anyway that the super class must be invoked in order to properly

@@ -11,11 +11,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.util;
 
 /**
- * Created by davide on 9/20/14.
+ * Package containing time related helper classes.
+ * <p/>
+ * Created by davide on 9/25/14.
  */
-public class RoutineNotAvailableException extends RuntimeException {
-
-}
+package com.bmd.jrt.common;

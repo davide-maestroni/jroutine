@@ -16,16 +16,15 @@ package com.bmd.jrt.routine;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.OutputConsumer;
 import com.bmd.jrt.channel.ResultChannel;
+import com.bmd.jrt.common.RoutineInterruptedException;
 import com.bmd.jrt.runner.Invocation;
 import com.bmd.jrt.runner.Runner;
 import com.bmd.jrt.time.TimeDuration;
 import com.bmd.jrt.time.TimeDuration.Check;
-import com.bmd.jrt.util.RoutineInterruptedException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
@@ -51,8 +50,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
     private final Object mMutex = new Object();
 
-    private final LinkedList<Object> mOutputQueue = new LinkedList<Object>();
-
     private final Runner mRunner;
 
     private Throwable mAbortException;
@@ -66,6 +63,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     private Check mOutputHasNext;
 
     private Check mOutputNotEmpty;
+
+    private SimpleQueue<Object> mOutputQueue = new SimpleQueue<Object>();
 
     private TimeDuration mOutputTimeout = seconds(5);
 
@@ -174,7 +173,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             if (delay.isZero()) {
 
-                final LinkedList<Object> outputQueue = mOutputQueue;
+                final SimpleQueue<Object> outputQueue = mOutputQueue;
 
                 for (final OUTPUT output : outputs) {
 
@@ -309,6 +308,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         return new DefaultOutputChannel();
     }
 
+    @SuppressWarnings("unchecked")
     private void flushOutput() {
 
         try {
@@ -328,8 +328,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                     return;
                 }
 
-                outputs = new ArrayList<Object>(mOutputQueue);
-                mOutputQueue.clear();
+                outputs = new ArrayList<Object>();
+                mOutputQueue.moveTo(outputs);
                 state = mState;
 
                 mMutex.notifyAll();
@@ -355,7 +355,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 } else {
 
-                    //noinspection unchecked
                     consumer.onOutput((OUTPUT) output);
                 }
             }
@@ -517,7 +516,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                 final TimeDuration timeout = mTimeout;
                 final RuntimeException timeoutException = mTimeoutException;
 
-                final LinkedList<Object> outputQueue = mOutputQueue;
+                final SimpleQueue<Object> outputQueue = mOutputQueue;
 
                 if (timeout.isZero() || isDone()) {
 
@@ -560,6 +559,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         }
 
         @Override
+        @SuppressWarnings("unchecked")
         public OUTPUT next() {
 
             synchronized (mMutex) {
@@ -569,7 +569,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                 final TimeDuration timeout = mTimeout;
                 final RuntimeException timeoutException = mTimeoutException;
 
-                final LinkedList<Object> outputQueue = mOutputQueue;
+                final SimpleQueue<Object> outputQueue = mOutputQueue;
 
                 if (timeout.isZero() || !outputQueue.isEmpty()) {
 
@@ -584,7 +584,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                     mRemoved = false;
 
-                    //noinspection unchecked
                     return (OUTPUT) result;
                 }
 
@@ -625,7 +624,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 mRemoved = false;
 
-                //noinspection unchecked
                 return (OUTPUT) result;
             }
         }
@@ -725,6 +723,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         }
 
         @Override
+        @SuppressWarnings("unchecked")
         public OutputChannel<OUTPUT> readAllInto(final List<OUTPUT> results) {
 
             synchronized (mMutex) {
@@ -736,22 +735,18 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                     throw new IllegalArgumentException("the result list must not be null");
                 }
 
-                final LinkedList<Object> outputQueue = mOutputQueue;
+                final SimpleQueue<Object> outputQueue = mOutputQueue;
                 final TimeDuration timeout = mOutputTimeout;
                 final RuntimeException timeoutException = mOutputTimeoutException;
 
                 if (timeout.isZero() || isDone()) {
 
-                    final Iterator<Object> iterator = outputQueue.iterator();
+                    while (!outputQueue.isEmpty()) {
 
-                    while (iterator.hasNext()) {
-
-                        final Object result = iterator.next();
-                        iterator.remove();
+                        final Object result = outputQueue.removeFirst();
 
                         RoutineExceptionWrapper.raise(result);
 
-                        //noinspection unchecked
                         results.add((OUTPUT) result);
                     }
 
@@ -785,16 +780,12 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 } else {
 
-                    final Iterator<Object> iterator = outputQueue.iterator();
+                    while (!outputQueue.isEmpty()) {
 
-                    while (iterator.hasNext()) {
-
-                        final Object result = iterator.next();
-                        iterator.remove();
+                        final Object result = outputQueue.removeFirst();
 
                         RoutineExceptionWrapper.raise(result);
 
-                        //noinspection unchecked
                         results.add((OUTPUT) result);
                     }
                 }

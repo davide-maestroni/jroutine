@@ -11,18 +11,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.util;
+package com.bmd.jrt.common;
 
 /**
+ * Exception wrapping a thread interrupted exception catch inside a routine execution.
+ * <p/>
  * Created by davide on 9/8/14.
  */
-public class RoutineInterruptedException extends RuntimeException {
+public class RoutineInterruptedException extends RoutineException {
 
-    public RoutineInterruptedException(final Throwable cause) {
+    /**
+     * Constructor.
+     *
+     * @param cause the wrapped exception.
+     */
+    public RoutineInterruptedException(final InterruptedException cause) {
 
         super(cause);
     }
 
+    /**
+     * Sets the interrupt flag of the current thread and throws a wrapped exception.
+     *
+     * @param exception the thread interrupted exception.
+     * @throws com.bmd.jrt.common.RoutineInterruptedException always.
+     */
     public static void interrupt(final InterruptedException exception) {
 
         Thread.currentThread().interrupt();

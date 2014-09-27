@@ -13,10 +13,14 @@
  */
 package com.bmd.jrt.runner;
 
+import com.bmd.jrt.common.RoutineInterruptedException;
 import com.bmd.jrt.time.TimeDuration;
-import com.bmd.jrt.util.RoutineInterruptedException;
 
 import java.util.concurrent.TimeUnit;
+
+import static com.bmd.jrt.time.TimeDuration.ZERO;
+import static com.bmd.jrt.time.TimeDuration.fromUnit;
+import static com.bmd.jrt.time.TimeDuration.nanos;
 
 /**
  * Created by davide on 9/18/14.
@@ -69,26 +73,7 @@ class LocalQueue {
         sQueue.get().addAbort(invocation);
     }
 
-    private static void resizeArray(final Invocation[] src, final Invocation[] dst,
-            final int first) {
-
-        final int remainder = src.length - first;
-
-        System.arraycopy(src, 0, dst, 0, first);
-        System.arraycopy(src, first, dst, dst.length - remainder, remainder);
-    }
-
-    private static void resizeArray(final TimeDuration[] src, final TimeDuration[] dst,
-            final int first) {
-
-        final int remainder = src.length - first;
-
-        System.arraycopy(src, 0, dst, 0, first);
-        System.arraycopy(src, first, dst, dst.length - remainder, remainder);
-    }
-
-    private static void resizeArray(final InvocationType[] src, final InvocationType[] dst,
-            final int first) {
+    private static <T> void resizeArray(final T[] src, final T[] dst, final int first) {
 
         final int remainder = src.length - first;
 
@@ -142,7 +127,7 @@ class LocalQueue {
 
     private void addAbort(final Invocation invocation) {
 
-        add(invocation, TimeDuration.ZERO, InvocationType.ABORT);
+        add(invocation, ZERO, InvocationType.ABORT);
 
         if (!mIsRunning) {
 
@@ -152,7 +137,7 @@ class LocalQueue {
 
     private void addRun(final Invocation invocation, final long delay, final TimeUnit timeUnit) {
 
-        add(invocation, TimeDuration.fromUnit(delay, timeUnit), InvocationType.RUN);
+        add(invocation, fromUnit(delay, timeUnit), InvocationType.RUN);
 
         if (!mIsRunning) {
 
@@ -182,7 +167,6 @@ class LocalQueue {
         }
 
         final int first = mFirst;
-
         final int last = mLast;
 
         final long[] newInvocationTimeNs = new long[newSize];
@@ -288,7 +272,7 @@ class LocalQueue {
 
                     try {
 
-                        TimeDuration.nanos(delayNs).sleepAtLeast();
+                        nanos(delayNs).sleepAtLeast();
 
                     } catch (final InterruptedException e) {
 

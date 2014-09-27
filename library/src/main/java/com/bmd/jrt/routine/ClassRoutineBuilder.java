@@ -14,10 +14,10 @@
 package com.bmd.jrt.routine;
 
 import com.bmd.jrt.channel.ResultChannel;
+import com.bmd.jrt.common.ClassToken;
+import com.bmd.jrt.common.RoutineException;
 import com.bmd.jrt.execution.ExecutionBody;
 import com.bmd.jrt.runner.Runner;
-import com.bmd.jrt.util.ClassToken;
-import com.bmd.jrt.util.RoutineException;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -31,6 +31,8 @@ import java.util.WeakHashMap;
  * Class implementing a builder of a routine wrapping a class method.
  * <p/>
  * Created by davide on 9/21/14.
+ *
+ * @see com.bmd.jrt.routine.AsynMethod
  */
 public class ClassRoutineBuilder {
 
@@ -113,10 +115,10 @@ public class ClassRoutineBuilder {
      * @param name           the method name.
      * @param parameterTypes the method parameter types.
      * @return the routine.
-     * @throws java.lang.IllegalArgumentException if one of the parameter is null or no matching
-     *                                            method is found.
-     * @throws com.bmd.jrt.util.RoutineException  if an error occurred while instantiating the
-     *                                            optional runner or the routine.
+     * @throws java.lang.IllegalArgumentException  if one of the parameter is null or no matching
+     *                                             method is found.
+     * @throws com.bmd.jrt.common.RoutineException if an error occurred while instantiating the
+     *                                             optional runner or the routine.
      */
     public Routine<Object, Object> classMethod(final String name,
             final Class<?>... parameterTypes) {
@@ -166,9 +168,9 @@ public class ClassRoutineBuilder {
      *
      * @param method the method instance.
      * @return the routine.
-     * @throws java.lang.IllegalArgumentException if the specified method is null.
-     * @throws com.bmd.jrt.util.RoutineException  if an error occurred while instantiating the
-     *                                            optional runner or the routine.
+     * @throws java.lang.IllegalArgumentException  if the specified method is null.
+     * @throws com.bmd.jrt.common.RoutineException if an error occurred while instantiating the
+     *                                             optional runner or the routine.
      */
     public Routine<Object, Object> classMethod(final Method method) {
 
@@ -225,9 +227,9 @@ public class ClassRoutineBuilder {
      *
      * @param name the name specified in the annotation.
      * @return the routine.
-     * @throws java.lang.IllegalArgumentException if the specified method is not found.
-     * @throws com.bmd.jrt.util.RoutineException  if an error occurred while instantiating the
-     *                                            optional runner or the routine.
+     * @throws java.lang.IllegalArgumentException  if the specified method is not found.
+     * @throws com.bmd.jrt.common.RoutineException if an error occurred while instantiating the
+     *                                             optional runner or the routine.
      */
     public Routine<Object, Object> method(final String name) {
 
@@ -506,19 +508,9 @@ public class ClassRoutineBuilder {
 
             final RoutineInfo that = (RoutineInfo) o;
 
-            if ((mIsSequential != null) ? !mIsSequential.equals(that.mIsSequential)
-                    : (that.mIsSequential != null)) {
-
-                return false;
-            }
-
-            //noinspection SimplifiableIfStatement
-            if ((mRunner != null) ? !mRunner.equals(that.mRunner) : (that.mRunner != null)) {
-
-                return false;
-            }
-
-            return mMethod.equals(that.mMethod);
+            return !((mIsSequential != null) ? !mIsSequential.equals(that.mIsSequential)
+                    : (that.mIsSequential != null)) && !((mRunner != null) ? !mRunner.equals(
+                    that.mRunner) : (that.mRunner != null)) && mMethod.equals(that.mMethod);
         }
     }
 }

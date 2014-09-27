@@ -13,10 +13,11 @@
  */
 package com.bmd.jrt.runner;
 
-import com.bmd.jrt.time.TimeDuration;
-import com.bmd.jrt.util.RoutineInterruptedException;
+import com.bmd.jrt.common.RoutineInterruptedException;
 
 import java.util.concurrent.TimeUnit;
+
+import static com.bmd.jrt.time.TimeDuration.fromUnit;
 
 /**
  * Created by davide on 9/9/14.
@@ -28,7 +29,7 @@ class SequentialRunner implements Runner {
 
         try {
 
-            TimeDuration.fromUnit(delay, timeUnit).sleepAtLeast();
+            fromUnit(delay, timeUnit).sleepAtLeast();
 
             invocation.run();
 

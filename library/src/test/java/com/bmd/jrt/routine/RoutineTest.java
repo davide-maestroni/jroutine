@@ -17,12 +17,12 @@ import com.bmd.jrt.channel.OutputConsumer;
 import com.bmd.jrt.channel.OutputConsumerAdapter;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.channel.RoutineChannel;
+import com.bmd.jrt.common.ClassToken;
+import com.bmd.jrt.common.RoutineException;
 import com.bmd.jrt.execution.Execution;
 import com.bmd.jrt.execution.ExecutionAdapter;
 import com.bmd.jrt.execution.ExecutionBody;
 import com.bmd.jrt.time.TimeDuration;
-import com.bmd.jrt.util.ClassToken;
-import com.bmd.jrt.util.RoutineException;
 
 import junit.framework.TestCase;
 

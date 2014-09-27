@@ -25,6 +25,8 @@ import java.util.HashMap;
  * Class implementing a builder of a routine wrapping an object instance.
  * <p/>
  * Created by davide on 9/21/14.
+ *
+ * @see com.bmd.jrt.routine.AsynMethod
  */
 public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 

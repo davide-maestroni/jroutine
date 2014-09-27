@@ -16,7 +16,17 @@ package com.bmd.jrt.runner;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * Class implementing a queued synchronous runner.<br/>
+ * The runner maintains an internal buffer of invocations that are consumed only when the last one
+ * completes, thus avoiding overflowing the call stack because of nested calls to other routines.
+ * <br/>
+ * While it is more memory and CPU consuming than the sequential implementation, it avoids
+ * overflows of the call stack, and tries to prevent blocking the execution of the calling thread
+ * by reordering delayed invocations inside the queue.
+ * <p/>
  * Created by davide on 9/18/14.
+ *
+ * @see com.bmd.jrt.runner.SequentialRunner
  */
 class QueuedRunner implements Runner {
 

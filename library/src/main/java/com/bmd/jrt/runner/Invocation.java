@@ -14,11 +14,21 @@
 package com.bmd.jrt.runner;
 
 /**
+ * Interface defining a routine invocation.<br/>
+ * This interface is meant to be used by a runner to ensure that the routine execution will take
+ * place in the specific handled thread or threads.
+ * <p/>
  * Created by davide on 9/7/14.
  */
 public interface Invocation {
 
+    /**
+     * Called to abort the routine execution.
+     */
     public void abort();
 
+    /**
+     * Called to run the routine execution.
+     */
     public void run();
 }

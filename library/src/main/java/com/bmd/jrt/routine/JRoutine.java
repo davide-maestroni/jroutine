@@ -17,7 +17,25 @@ import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.execution.Execution;
 
 /**
- * TODO
+ * This utility class represents the entry point to the framework functionalities by acting as a
+ * factory of routine builders.
+ * <p/>
+ * Mainly there are two ways to create a routine object:
+ * <p/>
+ * <b>Routine by execution customization</b><br/>
+ * The first approach consists in implementing an execution object and build on its class token
+ * a routine object.
+ * <p/>
+ * <b>Routine by method invocation</b><br/>
+ * The second approach is based on the asynchronous invocation via reflection of a method of an
+ * existing class or object.<br/>
+ * It is possible to annotate selected methods to be asynchronously invoked, or to simply select
+ * a method through its signature. It is also possible to build a proxy object whose methods will
+ * in turn asynchronously invoke the target object ones.<br/>
+ * Note that a proxy object can be simply defined as an interface implemented by the target, but
+ * also as a completely unrelated one mirroring the target methods. In this way it is possible to
+ * apply the framework functionalities to objects defined by third party libraries which are not
+ * under direct control.
  * <p/>
  * Created by davide on 9/7/14.
  *
@@ -32,17 +50,42 @@ public class JRoutine {
 
     }
 
+    /**
+     * Returns a routine builder wrapping the specified target class.
+     *
+     * @param target the target class.
+     * @return the routine builder instance.
+     * @throws java.lang.IllegalArgumentException if the specified target is null, or a duplicate
+     *                                            name in the annotations is detected.
+     */
     public static ClassRoutineBuilder on(final Class<?> target) {
 
         return new ClassRoutineBuilder(target);
     }
 
+    /**
+     * Returns a routine builder wrapping the specified execution class token.
+     *
+     * @param classToken the execution class token.
+     * @param <INPUT>    the input type.
+     * @param <OUTPUT>   the output type.
+     * @return the routine builder instance.
+     * @throws java.lang.IllegalArgumentException if the class token is null.
+     */
     public static <INPUT, OUTPUT> RoutineBuilder<INPUT, OUTPUT> on(
             final ClassToken<? extends Execution<INPUT, OUTPUT>> classToken) {
 
         return new RoutineBuilder<INPUT, OUTPUT>(classToken);
     }
 
+    /**
+     * Returns a routine builder wrapping the specified target object.
+     *
+     * @param target the target object.
+     * @return the routine builder instance.
+     * @throws java.lang.IllegalArgumentException if the specified target is null, or a duplicate
+     *                                            name in the annotations is detected.
+     */
     public static ObjectRoutineBuilder on(final Object target) {
 
         return new ObjectRoutineBuilder(target);

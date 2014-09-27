@@ -16,17 +16,25 @@ package com.bmd.jrt.runner;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * Decorator implementation of a runner object.
+ * <p/>
  * Created by davide on 9/22/14.
  */
 public class RunnerDecorator implements Runner {
 
     private final Runner mRunner;
 
+    /**
+     * Constructor.
+     *
+     * @param wrapped the wrapped instance.
+     * @throws java.lang.IllegalArgumentException if the specified instance is null.
+     */
     public RunnerDecorator(final Runner wrapped) {
 
         if (wrapped == null) {
 
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("the wrapped runner must not be null");
         }
 
         mRunner = wrapped;

@@ -18,12 +18,19 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * Class implementing a runner employing a pool of background threads.
+ * <p/>
  * Created by davide on 9/9/14.
  */
 class ThreadPoolRunner implements Runner {
 
     private final ScheduledExecutorService mService;
 
+    /**
+     * Constructor.
+     *
+     * @param threadPoolSize the thread pool size.
+     */
     public ThreadPoolRunner(final int threadPoolSize) {
 
         mService = Executors.newScheduledThreadPool(threadPoolSize);

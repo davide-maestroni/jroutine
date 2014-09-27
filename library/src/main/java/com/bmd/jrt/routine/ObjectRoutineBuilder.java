@@ -38,6 +38,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * Constructor.
      *
      * @param target the target object instance.
+     * @throws java.lang.IllegalArgumentException if the specified target is null, or a duplicate
+     *                                            name in the annotations is detected.
      */
     ObjectRoutineBuilder(final Object target) {
 

@@ -23,6 +23,10 @@ import static com.bmd.jrt.time.TimeDuration.fromUnit;
 import static com.bmd.jrt.time.TimeDuration.nanos;
 
 /**
+ * Class maintaining a queue of invocations which is local to the calling thread.<br/>
+ * The implementation ensures that recursive invocations are broken into a consuming loop running
+ * in the same thread.
+ * <p/>
  * Created by davide on 9/18/14.
  */
 class LocalQueue {
@@ -63,11 +67,23 @@ class LocalQueue {
         mTypes = new InvocationType[INITIAL_CAPACITY];
     }
 
+    /**
+     * Runs the specified invocation.
+     *
+     * @param invocation the invocation.
+     * @param delay      the execution delay.
+     * @param timeUnit   the delay time unit.
+     */
     public static void run(final Invocation invocation, final long delay, final TimeUnit timeUnit) {
 
         sQueue.get().addRun(invocation, delay, timeUnit);
     }
 
+    /**
+     * Runs the specified abort invocation.
+     *
+     * @param invocation the invocation.
+     */
     public static void runAbort(final Invocation invocation) {
 
         sQueue.get().addAbort(invocation);

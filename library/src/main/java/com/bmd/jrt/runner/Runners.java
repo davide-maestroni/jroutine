@@ -14,6 +14,8 @@
 package com.bmd.jrt.runner;
 
 /**
+ * Utility class for creating and sharing runner instances.
+ * <p/>
  * Created by davide on 9/9/14.
  */
 public class Runners {
@@ -31,26 +33,52 @@ public class Runners {
 
     }
 
+    /**
+     * Returns a runner employing an optimum number of threads.
+     *
+     * @return the runner instance.
+     */
     public static Runner pool() {
 
         return pool(getBestPoolSize());
     }
 
+    /**
+     * Returns a runner employing the specified number of threads.
+     *
+     * @param poolSize the thread pool size.
+     * @return the runner instance.
+     */
     public static Runner pool(final int poolSize) {
 
         return new ThreadPoolRunner(poolSize);
     }
 
+    /**
+     * Returns the shared instance of a queued synchronous runner.
+     *
+     * @return the runner instance.
+     */
     public static Runner queued() {
 
         return sQueuedRunner;
     }
 
+    /**
+     * Returns the shared instance of a sequential synchronous runner.
+     *
+     * @return the runner instance.
+     */
     public static Runner sequential() {
 
         return sSequentialRunner;
     }
 
+    /**
+     * Returns the shared instance of a thread pool asynchronous runner.
+     *
+     * @return the runner instance.
+     */
     public static Runner shared() {
 
         if (sSharedRunner == null) {

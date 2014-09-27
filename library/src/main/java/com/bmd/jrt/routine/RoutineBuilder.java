@@ -31,9 +31,11 @@ import static com.bmd.jrt.time.TimeDuration.seconds;
  * A routine has a synchronous and an asynchronous runner associated. The synchronous
  * implementation can only be chosen between queued (the default one) and sequential.<br/>
  * The queued one maintains an internal buffer of invocations that are consumed only when the
- * last one complete, thus avoiding overflowing the call stack because of nested calls to other
+ * last one completes, thus avoiding overflowing the call stack because of nested calls to other
  * routines.<br/>
  * The sequential one simply executes the invocations as soon as they are run.<br/>
+ * While the latter is less memory and CPU consuming, it might greatly increase the depth of the
+ * call stack, and blocks execution of the calling thread during delayed invocations.<br/>
  * In both cases the invocations are run inside the calling thread.<br/>
  * The default asynchronous runner is shared among all the routines, but a custom one can be set
  * through the builder.
@@ -81,12 +83,13 @@ public class RoutineBuilder<INPUT, OUTPUT> {
      * Constructor.
      *
      * @param classToken the execution class token.
+     * @throws java.lang.IllegalArgumentException if the class token is null.
      */
     RoutineBuilder(final ClassToken<? extends Execution<INPUT, OUTPUT>> classToken) {
 
         if (classToken == null) {
 
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("the execution class token must not be null");
         }
 
         mClassToken = classToken;

@@ -27,28 +27,34 @@ import java.util.concurrent.TimeUnit;
  */
 public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
 
-    //TODO: default timeout
-
     /**
      * Tells the channel to wait at max the specified time duration for the next result to be
      * available.
+     * <p/>
+     * By default the timeout is set to a few seconds to avoid unexpected deadlocks.
      *
      * @param timeout the maximum timeout.
      * @return this channel.
-     * @throws java.lang.IllegalArgumentException if the specified timeout is null.
-     * @throws java.lang.IllegalStateException    if this channel is already bound to a consumer.
+     * @throws java.lang.IllegalArgumentException  if the specified timeout is null.
+     * @throws java.lang.IllegalStateException     if this channel is already bound to a consumer.
+     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
+     *                                             exception.
      */
     public OutputChannel<OUTPUT> afterMax(TimeDuration timeout);
 
     /**
      * Tells the channel to wait at max the specified time duration for the next result to be
      * available.
+     * <p/>
+     * By default the timeout is set to a few seconds to avoid unexpected deadlocks.
      *
      * @param timeout  the maximum timeout value.
      * @param timeUnit the timeout time unit.
      * @return this channel.
-     * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
-     * @throws java.lang.IllegalStateException    if this channel is already bound to a consumer.
+     * @throws java.lang.IllegalArgumentException  if the specified timeout is negative.
+     * @throws java.lang.IllegalStateException     if this channel is already bound to a consumer.
+     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
+     *                                             exception.
      */
     public OutputChannel<OUTPUT> afterMax(long timeout, TimeUnit timeUnit);
 
@@ -58,8 +64,10 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      *
      * @param consumer the consumer instance.
      * @return this channel.
-     * @throws java.lang.IllegalArgumentException if the specified consumer is null.
-     * @throws java.lang.IllegalStateException    if this channel is already bound to a consumer.
+     * @throws java.lang.IllegalArgumentException  if the specified consumer is null.
+     * @throws java.lang.IllegalStateException     if this channel is already bound to a consumer.
+     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
+     *                                             exception.
      */
     public OutputChannel<OUTPUT> bind(OutputConsumer<OUTPUT> consumer);
 
@@ -69,15 +77,21 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      *
      * @param exception the exception to throw.
      * @return this channel.
-     * @throws java.lang.IllegalStateException if this channel is already bound to a consumer.
+     * @throws java.lang.IllegalStateException     if this channel is already bound to a consumer.
+     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
+     *                                             exception.
      */
     public OutputChannel<OUTPUT> eventuallyThrow(RuntimeException exception);
 
     /**
      * Tells the channel to not wait for results to be available.
+     * <p/>
+     * By default the timeout is set to a few seconds to avoid unexpected deadlocks.
      *
      * @return this channel.
-     * @throws java.lang.IllegalStateException if this channel is already bound to a consumer.
+     * @throws java.lang.IllegalStateException     if this channel is already bound to a consumer.
+     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
+     *                                             exception.
      */
     public OutputChannel<OUTPUT> immediately();
 
@@ -86,7 +100,9 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * timeout.
      *
      * @return this channel.
-     * @throws java.lang.IllegalStateException if this channel is already bound to a consumer.
+     * @throws java.lang.IllegalStateException     if this channel is already bound to a consumer.
+     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
+     *                                             exception.
      * @see #afterMax(com.bmd.jrt.time.TimeDuration)
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
      */
@@ -98,8 +114,10 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      *
      * @param results the list to fill.
      * @return this channel.
-     * @throws java.lang.IllegalArgumentException if the specified list is null.
-     * @throws java.lang.IllegalStateException    if this channel is already bound to a consumer.
+     * @throws java.lang.IllegalArgumentException  if the specified list is null.
+     * @throws java.lang.IllegalStateException     if this channel is already bound to a consumer.
+     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
+     *                                             exception.
      * @see #afterMax(com.bmd.jrt.time.TimeDuration)
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
      */
@@ -107,6 +125,8 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
 
     /**
      * Waits for the routine to complete at the maximum for the set timeout.
+     * <p/>
+     * By default the timeout is set to a few seconds to avoid unexpected deadlocks.
      *
      * @return whether the routine execution has complete.
      */

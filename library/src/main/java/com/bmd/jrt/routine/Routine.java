@@ -19,12 +19,51 @@ import com.bmd.jrt.channel.ParameterChannel;
 import java.util.List;
 
 /**
- * TODO
+ * This interface defines the main component of this framework.
+ * <p/>
+ * The interface takes inspiration from the Go routines, where functions are executed
+ * asynchronously and communicate with the external world only through channels. Being Java a
+ * strictly non-functional programming language, the routine itself must be an object based on
+ * logic implemented in other objects.
+ * <p/>
+ * The framework provides a routine class which is based on the implementation of an execution
+ * interface. Execution objects are dynamically instantiated when needed, effectively mimicking
+ * the temporary scope of a function call.<br/>
+ * The advantage of this approach is that the execution flow can be run in steps, allowing for
+ * continuous streaming of the input data and for abortion in the middle of the execution, without
+ * blocking the running thread for the whole duration of the asynchronous invocation.
+ * <p/>
+ * The class implementation provides an automatic synchronization of the execution member fields,
+ * though, in order to avoid concurrency issues, data passed through the routine channels should
+ * be immutable or, at least, never shared inside and outside the routine.<br/>
+ * Moreover, it is possible to recursively call the same or another routine from inside a routine
+ * execution in a safe way. Nevertheless, it is always advisable to never perform blocking calls
+ * (such as: reading data from an output channel) in the middle of an execution, since the use
+ * of shared runner instances may lead to unexpected deadlocks. In facts, to prevent deadlock or
+ * starvation issues, it is encouraged the use of finite timeouts when performing blocking calls.
+ * <p/>
+ * The routine object provides three different ways to launch an execution:
+ * <p/>
+ * <b>Synchronous invocation</b><br/>
+ * The routine starts an execution employing a synchronous runner. The result is similar to a
+ * classic method call where the processing completes as soon as the function exits.
+ * <p/>
+ * <b>Asynchronous invocation</b><br/>
+ * The routine starts an execution employing an asynchronous runner. In this case the processing
+ * happens in a different thread, while the calling process may go on with its own execution and
+ * perform other tasks. The invocation results can be collected at any time through the output
+ * channel methods.
+ * <p/>
+ * <b>Parallel invocation</b><br/>
+ * Processing parallelization is the key to leverage the processing power of the modern multi-core
+ * machines. In order to achieve it, the input data must be...
  * <p/>
  * Created by davide on 9/7/14.
  *
  * @param <INPUT>  the input type.
  * @param <OUTPUT> the output type.
+ * @see com.bmd.jrt.execution.Execution
+ * @see com.bmd.jrt.runner.Runner
  */
 public interface Routine<INPUT, OUTPUT> {
 

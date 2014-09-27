@@ -42,8 +42,8 @@ import static com.bmd.jrt.time.TimeDuration.seconds;
  * <p/>
  * The built routine is based on an execution implementation specified by a class token.<br/>
  * The execution instance is created only when needed, by passing the specified arguments to the
- * constructor. Note that the arguments objects should be immutable or, in any case, never modified
- * outside or inside the routine in order to avoid concurrency issues.<br/>
+ * constructor. Note that the arguments objects should be immutable or, at least, never shared
+ * inside and outside the routine in order to avoid concurrency issues.<br/>
  * Additionally, a recycling mechanism is provided so that, when an execution successfully
  * completes, the instance is retained for future invocations. Moreover, the maximum running
  * execution instances at one time can be limited by calling the specific builder method. When the

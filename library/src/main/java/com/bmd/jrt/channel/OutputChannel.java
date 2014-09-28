@@ -96,7 +96,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
     public OutputChannel<OUTPUT> immediately();
 
     /**
-     * Reads all the results waiting for the routine to complete at the maximum for the set
+     * Reads all the results by waiting for the routine to complete at the maximum for the set
      * timeout.
      *
      * @return this channel.
@@ -109,7 +109,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
     public List<OUTPUT> readAll();
 
     /**
-     * Reads all the results waiting for the routine to complete at the maximum for the set
+     * Reads all the results by waiting for the routine to complete at the maximum for the set
      * timeout, and put them into the specified list.
      *
      * @param results the list to fill.

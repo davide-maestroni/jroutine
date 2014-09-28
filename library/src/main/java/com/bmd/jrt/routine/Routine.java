@@ -26,12 +26,18 @@ import java.util.List;
  * strictly non-functional programming language, the routine itself must be an object based on
  * logic implemented in other objects.
  * <p/>
- * The framework provides a routine class which is based on the implementation of an execution
- * interface. Execution objects are dynamically instantiated when needed, effectively mimicking
- * the temporary scope of a function call.<br/>
+ * The framework includes a routine class based on the implementation of an execution interface.
+ * Execution objects are dynamically instantiated when needed, effectively mimicking the temporary
+ * scope of a function call.<br/>
+ * The paradigm is based on input, result and output channels. The invocation of a routine returns
+ * an input channel through which the caller can pass the input parameters. When the input is
+ * closed, it returns the output channel from which to read the invocation results. At the same
+ * time a result channel is passed to the execution implementation, so that the output computed
+ * from the input parameters can be transferred outside.<br/>
  * The advantage of this approach is that the execution flow can be run in steps, allowing for
  * continuous streaming of the input data and for abortion in the middle of the execution, without
- * blocking the running thread for the whole duration of the asynchronous invocation.
+ * blocking the running thread for the whole duration of the asynchronous invocation.<br/>
+ * In fact, each channel can be abort the execution at any time by calling the exposed method.
  * <p/>
  * The class implementation provides an automatic synchronization of the execution member fields,
  * though, in order to avoid concurrency issues, data passed through the routine channels should
@@ -55,8 +61,15 @@ import java.util.List;
  * channel methods.
  * <p/>
  * <b>Parallel invocation</b><br/>
- * Processing parallelization is the key to leverage the processing power of the modern multi-core
- * machines. In order to achieve it, the input data must be...
+ * Processing parallelization is the key to leverage the power of multi-core machines. In order to
+ * achieve it, the input data must be divided into subsets which are then processed on different
+ * threads.<br/>
+ * A routine object provides a convenient way to start an execution which in turn spawns another
+ * invocation for each input passed. This particular type of invocation obviously produces
+ * meaningful results only for routines which takes a single input parameter and computes the
+ * relative output results.
+ * <p/>
+ * TODO: examples
  * <p/>
  * Created by davide on 9/7/14.
  *

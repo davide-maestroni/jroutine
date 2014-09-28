@@ -20,15 +20,15 @@ import com.bmd.jrt.execution.Execution;
  * This utility class represents the entry point to the framework functionalities by acting as a
  * factory of routine builders.
  * <p/>
- * Mainly there are two ways to create a routine object:
+ * There are mainly two ways to create a routine object:
  * <p/>
  * <b>Routine by execution customization</b><br/>
  * The first approach consists in implementing an execution object and build on its class token
- * a routine object.
+ * a routine instance.
  * <p/>
  * <b>Routine by method invocation</b><br/>
- * The second approach is based on the asynchronous invocation via reflection of a method of an
- * existing class or object.<br/>
+ * The second approach is based on the asynchronous invocation of a method of an existing class or
+ * object via reflection.<br/>
  * It is possible to annotate selected methods to be asynchronously invoked, or to simply select
  * a method through its signature. It is also possible to build a proxy object whose methods will
  * in turn asynchronously invoke the target object ones.<br/>

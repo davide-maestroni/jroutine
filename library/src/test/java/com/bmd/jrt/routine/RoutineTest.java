@@ -13,6 +13,7 @@
  */
 package com.bmd.jrt.routine;
 
+import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.OutputConsumer;
 import com.bmd.jrt.channel.OutputConsumerAdapter;
 import com.bmd.jrt.channel.ParameterChannel;
@@ -342,6 +343,9 @@ public class RoutineTest extends TestCase {
         }
 
         assertThat(on(new TestClass()).asyn(TestInterfaceAsyn.class).take(77)).isEqualTo(77);
+        assertThat(
+                on(new TestClass()).asyn(TestInterfaceAsyn.class).getOne().readFirst()).isEqualTo(
+                1);
     }
 
     public void testRoutine() {
@@ -1059,6 +1063,8 @@ public class RoutineTest extends TestCase {
     }
 
     private interface TestInterfaceAsyn {
+
+        public OutputChannel<Integer> getOne();
 
         @AsynMethod(name = "getInt")
         public int take(int i);

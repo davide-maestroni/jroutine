@@ -172,70 +172,70 @@ public class InputTest extends TestCase {
         testAllEmpty(Inputs.asList(new short[0]));
     }
 
-    private void testAllConversions(final Inputs<?> drops, final Object... data) {
+    private void testAllConversions(final Inputs<?> inputs, final Object... data) {
 
-        testBooleans(drops.toBooleans(), toBooleans(data));
-        testBytes(drops.toBytes(), toBytes(data));
-        testCharacters(drops.toCharacters(), toChars(data));
-        testDoubles(drops.toDoubles(), toDoubles(data));
-        testFloats(drops.toFloats(), toFloats(data));
-        testIntegers(drops.toIntegers(), toIntegers(data));
-        testLongs(drops.toLongs(), toLongs(data));
-        testShorts(drops.toShorts(), toShorts(data));
-        testObjects(drops.toObjects(), data);
+        testBooleans(inputs.toBooleans(), toBooleans(data));
+        testBytes(inputs.toBytes(), toBytes(data));
+        testCharacters(inputs.toCharacters(), toChars(data));
+        testDoubles(inputs.toDoubles(), toDoubles(data));
+        testFloats(inputs.toFloats(), toFloats(data));
+        testIntegers(inputs.toIntegers(), toIntegers(data));
+        testLongs(inputs.toLongs(), toLongs(data));
+        testShorts(inputs.toShorts(), toShorts(data));
+        testObjects(inputs.toObjects(), data);
     }
 
-    private void testAllEmpty(final Inputs<?> drops) {
+    private void testAllEmpty(final Inputs<?> inputs) {
 
-        testEmpty(drops);
-        testEmpty(drops.toBooleans());
-        testEmpty(drops.toBytes());
-        testEmpty(drops.toCharacters());
-        testEmpty(drops.toDoubles());
-        testEmpty(drops.toFloats());
-        testEmpty(drops.toIntegers());
-        testEmpty(drops.toLongs());
-        testEmpty(drops.toShorts());
-        testEmpty(drops.toObjects());
+        testEmpty(inputs);
+        testEmpty(inputs.toBooleans());
+        testEmpty(inputs.toBytes());
+        testEmpty(inputs.toCharacters());
+        testEmpty(inputs.toDoubles());
+        testEmpty(inputs.toFloats());
+        testEmpty(inputs.toIntegers());
+        testEmpty(inputs.toLongs());
+        testEmpty(inputs.toShorts());
+        testEmpty(inputs.toObjects());
     }
 
-    private void testBooleans(final Inputs<Boolean> drops, final Boolean... data) {
+    private void testBooleans(final Inputs<Boolean> inputs, final Boolean... data) {
 
         final Object[] objects = new Object[data.length];
         System.arraycopy(data, 0, objects, 0, data.length);
 
-        assertThat(drops).containsExactly(data);
-        assertThat(drops.size()).isEqualTo(data.length);
-        assertThat(drops.isEmpty()).isEqualTo(data.length == 0);
-        assertThat(drops.contains(data[0])).isTrue();
-        assertThat(drops.toArray()).containsExactly(objects);
-        assertThat(drops.toArray(new Boolean[data.length])).containsExactly(data);
-        assertThat(drops.containsAll(Arrays.asList(data))).isTrue();
-        assertThat(drops.indexOf(data[0])).isEqualTo(0);
-        assertThat(drops.lastIndexOf(data[0])).isEqualTo(Arrays.asList(data).lastIndexOf(data[0]));
-        assertThat(drops.retainAll(Arrays.asList(data))).isFalse();
-        assertThat(drops).containsExactly(data);
+        assertThat(inputs).containsExactly(data);
+        assertThat(inputs.size()).isEqualTo(data.length);
+        assertThat(inputs.isEmpty()).isEqualTo(data.length == 0);
+        assertThat(inputs.contains(data[0])).isTrue();
+        assertThat(inputs.toArray()).containsExactly(objects);
+        assertThat(inputs.toArray(new Boolean[data.length])).containsExactly(data);
+        assertThat(inputs.containsAll(Arrays.asList(data))).isTrue();
+        assertThat(inputs.indexOf(data[0])).isEqualTo(0);
+        assertThat(inputs.lastIndexOf(data[0])).isEqualTo(Arrays.asList(data).lastIndexOf(data[0]));
+        assertThat(inputs.retainAll(Arrays.asList(data))).isFalse();
+        assertThat(inputs).containsExactly(data);
 
         for (int i = 0; i < data.length; ++i) {
 
-            assertThat(drops.get(i)).isEqualTo(data[i]);
+            assertThat(inputs.get(i)).isEqualTo(data[i]);
         }
 
-        final Iterator<Boolean> iterator = drops.iterator();
+        final Iterator<Boolean> iterator = inputs.iterator();
         for (final Boolean datum : data) {
 
             assertThat(iterator.next()).isEqualTo(datum);
         }
         assertThat(iterator.hasNext()).isFalse();
 
-        final ListIterator<Boolean> listIterator = drops.listIterator();
+        final ListIterator<Boolean> listIterator = inputs.listIterator();
         for (final Boolean datum : data) {
 
             assertThat(listIterator.next()).isEqualTo(datum);
         }
         assertThat(listIterator.hasNext()).isFalse();
 
-        final ListIterator<Boolean> indexIterator = drops.listIterator(1);
+        final ListIterator<Boolean> indexIterator = inputs.listIterator(1);
         for (int i = 1; i < data.length; ++i) {
 
             assertThat(indexIterator.next()).isEqualTo(data[i]);
@@ -243,43 +243,43 @@ public class InputTest extends TestCase {
         assertThat(indexIterator.hasNext()).isFalse();
     }
 
-    private void testBytes(final Inputs<Byte> drops, final Byte... data) {
+    private void testBytes(final Inputs<Byte> inputs, final Byte... data) {
 
         final Object[] objects = new Object[data.length];
         System.arraycopy(data, 0, objects, 0, data.length);
 
-        assertThat(drops).containsExactly(data);
-        assertThat(drops.size()).isEqualTo(data.length);
-        assertThat(drops.isEmpty()).isEqualTo(data.length == 0);
-        assertThat(drops.contains(data[0])).isTrue();
-        assertThat(drops.toArray()).containsExactly(objects);
-        assertThat(drops.toArray(new Byte[data.length])).containsExactly(data);
-        assertThat(drops.containsAll(Arrays.asList(data))).isTrue();
-        assertThat(drops.indexOf(data[0])).isEqualTo(0);
-        assertThat(drops.lastIndexOf(data[0])).isEqualTo(Arrays.asList(data).lastIndexOf(data[0]));
-        assertThat(drops.retainAll(Arrays.asList(data))).isFalse();
-        assertThat(drops).containsExactly(data);
+        assertThat(inputs).containsExactly(data);
+        assertThat(inputs.size()).isEqualTo(data.length);
+        assertThat(inputs.isEmpty()).isEqualTo(data.length == 0);
+        assertThat(inputs.contains(data[0])).isTrue();
+        assertThat(inputs.toArray()).containsExactly(objects);
+        assertThat(inputs.toArray(new Byte[data.length])).containsExactly(data);
+        assertThat(inputs.containsAll(Arrays.asList(data))).isTrue();
+        assertThat(inputs.indexOf(data[0])).isEqualTo(0);
+        assertThat(inputs.lastIndexOf(data[0])).isEqualTo(Arrays.asList(data).lastIndexOf(data[0]));
+        assertThat(inputs.retainAll(Arrays.asList(data))).isFalse();
+        assertThat(inputs).containsExactly(data);
 
         for (int i = 0; i < data.length; ++i) {
 
-            assertThat(drops.get(i)).isEqualTo(data[i]);
+            assertThat(inputs.get(i)).isEqualTo(data[i]);
         }
 
-        final Iterator<Byte> iterator = drops.iterator();
+        final Iterator<Byte> iterator = inputs.iterator();
         for (final Byte datum : data) {
 
             assertThat(iterator.next()).isEqualTo(datum);
         }
         assertThat(iterator.hasNext()).isFalse();
 
-        final ListIterator<Byte> listIterator = drops.listIterator();
+        final ListIterator<Byte> listIterator = inputs.listIterator();
         for (final Byte datum : data) {
 
             assertThat(listIterator.next()).isEqualTo(datum);
         }
         assertThat(listIterator.hasNext()).isFalse();
 
-        final ListIterator<Byte> indexIterator = drops.listIterator(1);
+        final ListIterator<Byte> indexIterator = inputs.listIterator(1);
         for (int i = 1; i < data.length; ++i) {
 
             assertThat(indexIterator.next()).isEqualTo(data[i]);
@@ -287,43 +287,43 @@ public class InputTest extends TestCase {
         assertThat(indexIterator.hasNext()).isFalse();
     }
 
-    private void testCharacters(final Inputs<Character> drops, final Character... data) {
+    private void testCharacters(final Inputs<Character> inputs, final Character... data) {
 
         final Object[] objects = new Object[data.length];
         System.arraycopy(data, 0, objects, 0, data.length);
 
-        assertThat(drops).containsExactly(data);
-        assertThat(drops.size()).isEqualTo(data.length);
-        assertThat(drops.isEmpty()).isEqualTo(data.length == 0);
-        assertThat(drops.contains(data[0])).isTrue();
-        assertThat(drops.toArray()).containsExactly(objects);
-        assertThat(drops.toArray(new Character[data.length])).containsExactly(data);
-        assertThat(drops.containsAll(Arrays.asList(data))).isTrue();
-        assertThat(drops.indexOf(data[0])).isEqualTo(0);
-        assertThat(drops.lastIndexOf(data[0])).isEqualTo(Arrays.asList(data).lastIndexOf(data[0]));
-        assertThat(drops.retainAll(Arrays.asList(data))).isFalse();
-        assertThat(drops).containsExactly(data);
+        assertThat(inputs).containsExactly(data);
+        assertThat(inputs.size()).isEqualTo(data.length);
+        assertThat(inputs.isEmpty()).isEqualTo(data.length == 0);
+        assertThat(inputs.contains(data[0])).isTrue();
+        assertThat(inputs.toArray()).containsExactly(objects);
+        assertThat(inputs.toArray(new Character[data.length])).containsExactly(data);
+        assertThat(inputs.containsAll(Arrays.asList(data))).isTrue();
+        assertThat(inputs.indexOf(data[0])).isEqualTo(0);
+        assertThat(inputs.lastIndexOf(data[0])).isEqualTo(Arrays.asList(data).lastIndexOf(data[0]));
+        assertThat(inputs.retainAll(Arrays.asList(data))).isFalse();
+        assertThat(inputs).containsExactly(data);
 
         for (int i = 0; i < data.length; ++i) {
 
-            assertThat(drops.get(i)).isEqualTo(data[i]);
+            assertThat(inputs.get(i)).isEqualTo(data[i]);
         }
 
-        final Iterator<Character> iterator = drops.iterator();
+        final Iterator<Character> iterator = inputs.iterator();
         for (final Character datum : data) {
 
             assertThat(iterator.next()).isEqualTo(datum);
         }
         assertThat(iterator.hasNext()).isFalse();
 
-        final ListIterator<Character> listIterator = drops.listIterator();
+        final ListIterator<Character> listIterator = inputs.listIterator();
         for (final Character datum : data) {
 
             assertThat(listIterator.next()).isEqualTo(datum);
         }
         assertThat(listIterator.hasNext()).isFalse();
 
-        final ListIterator<Character> indexIterator = drops.listIterator(1);
+        final ListIterator<Character> indexIterator = inputs.listIterator(1);
         for (int i = 1; i < data.length; ++i) {
 
             assertThat(indexIterator.next()).isEqualTo(data[i]);
@@ -331,43 +331,43 @@ public class InputTest extends TestCase {
         assertThat(indexIterator.hasNext()).isFalse();
     }
 
-    private void testDoubles(final Inputs<Double> drops, final Double... data) {
+    private void testDoubles(final Inputs<Double> inputs, final Double... data) {
 
         final Object[] objects = new Object[data.length];
         System.arraycopy(data, 0, objects, 0, data.length);
 
-        assertThat(drops).containsExactly(data);
-        assertThat(drops.size()).isEqualTo(data.length);
-        assertThat(drops.isEmpty()).isEqualTo(data.length == 0);
-        assertThat(drops.contains(data[0])).isTrue();
-        assertThat(drops.toArray()).containsExactly(objects);
-        assertThat(drops.toArray(new Double[data.length])).containsExactly(data);
-        assertThat(drops.containsAll(Arrays.asList(data))).isTrue();
-        assertThat(drops.indexOf(data[0])).isEqualTo(0);
-        assertThat(drops.lastIndexOf(data[0])).isEqualTo(Arrays.asList(data).lastIndexOf(data[0]));
-        assertThat(drops.retainAll(Arrays.asList(data))).isFalse();
-        assertThat(drops).containsExactly(data);
+        assertThat(inputs).containsExactly(data);
+        assertThat(inputs.size()).isEqualTo(data.length);
+        assertThat(inputs.isEmpty()).isEqualTo(data.length == 0);
+        assertThat(inputs.contains(data[0])).isTrue();
+        assertThat(inputs.toArray()).containsExactly(objects);
+        assertThat(inputs.toArray(new Double[data.length])).containsExactly(data);
+        assertThat(inputs.containsAll(Arrays.asList(data))).isTrue();
+        assertThat(inputs.indexOf(data[0])).isEqualTo(0);
+        assertThat(inputs.lastIndexOf(data[0])).isEqualTo(Arrays.asList(data).lastIndexOf(data[0]));
+        assertThat(inputs.retainAll(Arrays.asList(data))).isFalse();
+        assertThat(inputs).containsExactly(data);
 
         for (int i = 0; i < data.length; ++i) {
 
-            assertThat(drops.get(i)).isEqualTo(data[i]);
+            assertThat(inputs.get(i)).isEqualTo(data[i]);
         }
 
-        final Iterator<Double> iterator = drops.iterator();
+        final Iterator<Double> iterator = inputs.iterator();
         for (final Double datum : data) {
 
             assertThat(iterator.next()).isEqualTo(datum);
         }
         assertThat(iterator.hasNext()).isFalse();
 
-        final ListIterator<Double> listIterator = drops.listIterator();
+        final ListIterator<Double> listIterator = inputs.listIterator();
         for (final Double datum : data) {
 
             assertThat(listIterator.next()).isEqualTo(datum);
         }
         assertThat(listIterator.hasNext()).isFalse();
 
-        final ListIterator<Double> indexIterator = drops.listIterator(1);
+        final ListIterator<Double> indexIterator = inputs.listIterator(1);
         for (int i = 1; i < data.length; ++i) {
 
             assertThat(indexIterator.next()).isEqualTo(data[i]);
@@ -375,52 +375,52 @@ public class InputTest extends TestCase {
         assertThat(indexIterator.hasNext()).isFalse();
     }
 
-    private void testEmpty(final List<?> drops) {
+    private void testEmpty(final List<?> inputs) {
 
-        assertThat(drops.size()).isEqualTo(0);
-        assertThat(drops.isEmpty()).isTrue();
-        assertThat(drops.toArray()).isEmpty();
-        assertThat(drops.iterator().hasNext()).isFalse();
-        assertThat(drops.listIterator().hasNext()).isFalse();
+        assertThat(inputs.size()).isEqualTo(0);
+        assertThat(inputs.isEmpty()).isTrue();
+        assertThat(inputs.toArray()).isEmpty();
+        assertThat(inputs.iterator().hasNext()).isFalse();
+        assertThat(inputs.listIterator().hasNext()).isFalse();
     }
 
-    private void testFloats(final Inputs<Float> drops, final Float... data) {
+    private void testFloats(final Inputs<Float> inputs, final Float... data) {
 
         final Object[] objects = new Object[data.length];
         System.arraycopy(data, 0, objects, 0, data.length);
 
-        assertThat(drops).containsExactly(data);
-        assertThat(drops.size()).isEqualTo(data.length);
-        assertThat(drops.isEmpty()).isEqualTo(data.length == 0);
-        assertThat(drops.contains(data[0])).isTrue();
-        assertThat(drops.toArray()).containsExactly(objects);
-        assertThat(drops.toArray(new Float[data.length])).containsExactly(data);
-        assertThat(drops.containsAll(Arrays.asList(data))).isTrue();
-        assertThat(drops.indexOf(data[0])).isEqualTo(0);
-        assertThat(drops.lastIndexOf(data[0])).isEqualTo(Arrays.asList(data).lastIndexOf(data[0]));
-        assertThat(drops.retainAll(Arrays.asList(data))).isFalse();
-        assertThat(drops).containsExactly(data);
+        assertThat(inputs).containsExactly(data);
+        assertThat(inputs.size()).isEqualTo(data.length);
+        assertThat(inputs.isEmpty()).isEqualTo(data.length == 0);
+        assertThat(inputs.contains(data[0])).isTrue();
+        assertThat(inputs.toArray()).containsExactly(objects);
+        assertThat(inputs.toArray(new Float[data.length])).containsExactly(data);
+        assertThat(inputs.containsAll(Arrays.asList(data))).isTrue();
+        assertThat(inputs.indexOf(data[0])).isEqualTo(0);
+        assertThat(inputs.lastIndexOf(data[0])).isEqualTo(Arrays.asList(data).lastIndexOf(data[0]));
+        assertThat(inputs.retainAll(Arrays.asList(data))).isFalse();
+        assertThat(inputs).containsExactly(data);
 
         for (int i = 0; i < data.length; ++i) {
 
-            assertThat(drops.get(i)).isEqualTo(data[i]);
+            assertThat(inputs.get(i)).isEqualTo(data[i]);
         }
 
-        final Iterator<Float> iterator = drops.iterator();
+        final Iterator<Float> iterator = inputs.iterator();
         for (final Float datum : data) {
 
             assertThat(iterator.next()).isEqualTo(datum);
         }
         assertThat(iterator.hasNext()).isFalse();
 
-        final ListIterator<Float> listIterator = drops.listIterator();
+        final ListIterator<Float> listIterator = inputs.listIterator();
         for (final Float datum : data) {
 
             assertThat(listIterator.next()).isEqualTo(datum);
         }
         assertThat(listIterator.hasNext()).isFalse();
 
-        final ListIterator<Float> indexIterator = drops.listIterator(1);
+        final ListIterator<Float> indexIterator = inputs.listIterator(1);
         for (int i = 1; i < data.length; ++i) {
 
             assertThat(indexIterator.next()).isEqualTo(data[i]);
@@ -428,43 +428,43 @@ public class InputTest extends TestCase {
         assertThat(indexIterator.hasNext()).isFalse();
     }
 
-    private void testIntegers(final Inputs<Integer> drops, final Integer... data) {
+    private void testIntegers(final Inputs<Integer> inputs, final Integer... data) {
 
         final Object[] objects = new Object[data.length];
         System.arraycopy(data, 0, objects, 0, data.length);
 
-        assertThat(drops).containsExactly(data);
-        assertThat(drops.size()).isEqualTo(data.length);
-        assertThat(drops.isEmpty()).isEqualTo(data.length == 0);
-        assertThat(drops.contains(data[0])).isTrue();
-        assertThat(drops.toArray()).containsExactly(objects);
-        assertThat(drops.toArray(new Integer[data.length])).containsExactly(data);
-        assertThat(drops.containsAll(Arrays.asList(data))).isTrue();
-        assertThat(drops.indexOf(data[0])).isEqualTo(0);
-        assertThat(drops.lastIndexOf(data[0])).isEqualTo(Arrays.asList(data).lastIndexOf(data[0]));
-        assertThat(drops.retainAll(Arrays.asList(data))).isFalse();
-        assertThat(drops).containsExactly(data);
+        assertThat(inputs).containsExactly(data);
+        assertThat(inputs.size()).isEqualTo(data.length);
+        assertThat(inputs.isEmpty()).isEqualTo(data.length == 0);
+        assertThat(inputs.contains(data[0])).isTrue();
+        assertThat(inputs.toArray()).containsExactly(objects);
+        assertThat(inputs.toArray(new Integer[data.length])).containsExactly(data);
+        assertThat(inputs.containsAll(Arrays.asList(data))).isTrue();
+        assertThat(inputs.indexOf(data[0])).isEqualTo(0);
+        assertThat(inputs.lastIndexOf(data[0])).isEqualTo(Arrays.asList(data).lastIndexOf(data[0]));
+        assertThat(inputs.retainAll(Arrays.asList(data))).isFalse();
+        assertThat(inputs).containsExactly(data);
 
         for (int i = 0; i < data.length; ++i) {
 
-            assertThat(drops.get(i)).isEqualTo(data[i]);
+            assertThat(inputs.get(i)).isEqualTo(data[i]);
         }
 
-        final Iterator<Integer> iterator = drops.iterator();
+        final Iterator<Integer> iterator = inputs.iterator();
         for (final Integer datum : data) {
 
             assertThat(iterator.next()).isEqualTo(datum);
         }
         assertThat(iterator.hasNext()).isFalse();
 
-        final ListIterator<Integer> listIterator = drops.listIterator();
+        final ListIterator<Integer> listIterator = inputs.listIterator();
         for (final Integer datum : data) {
 
             assertThat(listIterator.next()).isEqualTo(datum);
         }
         assertThat(listIterator.hasNext()).isFalse();
 
-        final ListIterator<Integer> indexIterator = drops.listIterator(1);
+        final ListIterator<Integer> indexIterator = inputs.listIterator(1);
         for (int i = 1; i < data.length; ++i) {
 
             assertThat(indexIterator.next()).isEqualTo(data[i]);
@@ -472,43 +472,43 @@ public class InputTest extends TestCase {
         assertThat(indexIterator.hasNext()).isFalse();
     }
 
-    private void testLongs(final Inputs<Long> drops, final Long... data) {
+    private void testLongs(final Inputs<Long> inputs, final Long... data) {
 
         final Object[] objects = new Object[data.length];
         System.arraycopy(data, 0, objects, 0, data.length);
 
-        assertThat(drops).containsExactly(data);
-        assertThat(drops.size()).isEqualTo(data.length);
-        assertThat(drops.isEmpty()).isEqualTo(data.length == 0);
-        assertThat(drops.contains(data[0])).isTrue();
-        assertThat(drops.toArray()).containsExactly(objects);
-        assertThat(drops.toArray(new Long[data.length])).containsExactly(data);
-        assertThat(drops.containsAll(Arrays.asList(data))).isTrue();
-        assertThat(drops.indexOf(data[0])).isEqualTo(0);
-        assertThat(drops.lastIndexOf(data[0])).isEqualTo(Arrays.asList(data).lastIndexOf(data[0]));
-        assertThat(drops.retainAll(Arrays.asList(data))).isFalse();
-        assertThat(drops).containsExactly(data);
+        assertThat(inputs).containsExactly(data);
+        assertThat(inputs.size()).isEqualTo(data.length);
+        assertThat(inputs.isEmpty()).isEqualTo(data.length == 0);
+        assertThat(inputs.contains(data[0])).isTrue();
+        assertThat(inputs.toArray()).containsExactly(objects);
+        assertThat(inputs.toArray(new Long[data.length])).containsExactly(data);
+        assertThat(inputs.containsAll(Arrays.asList(data))).isTrue();
+        assertThat(inputs.indexOf(data[0])).isEqualTo(0);
+        assertThat(inputs.lastIndexOf(data[0])).isEqualTo(Arrays.asList(data).lastIndexOf(data[0]));
+        assertThat(inputs.retainAll(Arrays.asList(data))).isFalse();
+        assertThat(inputs).containsExactly(data);
 
         for (int i = 0; i < data.length; ++i) {
 
-            assertThat(drops.get(i)).isEqualTo(data[i]);
+            assertThat(inputs.get(i)).isEqualTo(data[i]);
         }
 
-        final Iterator<Long> iterator = drops.iterator();
+        final Iterator<Long> iterator = inputs.iterator();
         for (final Long datum : data) {
 
             assertThat(iterator.next()).isEqualTo(datum);
         }
         assertThat(iterator.hasNext()).isFalse();
 
-        final ListIterator<Long> listIterator = drops.listIterator();
+        final ListIterator<Long> listIterator = inputs.listIterator();
         for (final Long datum : data) {
 
             assertThat(listIterator.next()).isEqualTo(datum);
         }
         assertThat(listIterator.hasNext()).isFalse();
 
-        final ListIterator<Long> indexIterator = drops.listIterator(1);
+        final ListIterator<Long> indexIterator = inputs.listIterator(1);
         for (int i = 1; i < data.length; ++i) {
 
             assertThat(indexIterator.next()).isEqualTo(data[i]);
@@ -516,43 +516,43 @@ public class InputTest extends TestCase {
         assertThat(indexIterator.hasNext()).isFalse();
     }
 
-    private void testObjects(final List<Object> drops, final Object... data) {
+    private void testObjects(final List<Object> inputs, final Object... data) {
 
         final Object[] objects = new Object[data.length];
         System.arraycopy(data, 0, objects, 0, data.length);
 
-        assertThat(drops).containsExactly(data);
-        assertThat(drops.size()).isEqualTo(data.length);
-        assertThat(drops.isEmpty()).isEqualTo(data.length == 0);
-        assertThat(drops.contains(data[0])).isTrue();
-        assertThat(drops.toArray()).containsExactly(objects);
-        assertThat(drops.toArray(new Object[data.length])).containsExactly(data);
-        assertThat(drops.containsAll(Arrays.asList(data))).isTrue();
-        assertThat(drops.indexOf(data[0])).isEqualTo(0);
-        assertThat(drops.lastIndexOf(data[0])).isEqualTo(Arrays.asList(data).lastIndexOf(data[0]));
-        assertThat(drops.retainAll(Arrays.asList(data))).isFalse();
-        assertThat(drops).containsExactly(data);
+        assertThat(inputs).containsExactly(data);
+        assertThat(inputs.size()).isEqualTo(data.length);
+        assertThat(inputs.isEmpty()).isEqualTo(data.length == 0);
+        assertThat(inputs.contains(data[0])).isTrue();
+        assertThat(inputs.toArray()).containsExactly(objects);
+        assertThat(inputs.toArray(new Object[data.length])).containsExactly(data);
+        assertThat(inputs.containsAll(Arrays.asList(data))).isTrue();
+        assertThat(inputs.indexOf(data[0])).isEqualTo(0);
+        assertThat(inputs.lastIndexOf(data[0])).isEqualTo(Arrays.asList(data).lastIndexOf(data[0]));
+        assertThat(inputs.retainAll(Arrays.asList(data))).isFalse();
+        assertThat(inputs).containsExactly(data);
 
         for (int i = 0; i < data.length; ++i) {
 
-            assertThat(drops.get(i)).isEqualTo(data[i]);
+            assertThat(inputs.get(i)).isEqualTo(data[i]);
         }
 
-        final Iterator<Object> iterator = drops.iterator();
+        final Iterator<Object> iterator = inputs.iterator();
         for (final Object datum : data) {
 
             assertThat(iterator.next()).isEqualTo(datum);
         }
         assertThat(iterator.hasNext()).isFalse();
 
-        final ListIterator<Object> listIterator = drops.listIterator();
+        final ListIterator<Object> listIterator = inputs.listIterator();
         for (final Object datum : data) {
 
             assertThat(listIterator.next()).isEqualTo(datum);
         }
         assertThat(listIterator.hasNext()).isFalse();
 
-        final ListIterator<Object> indexIterator = drops.listIterator(1);
+        final ListIterator<Object> indexIterator = inputs.listIterator(1);
         for (int i = 1; i < data.length; ++i) {
 
             assertThat(indexIterator.next()).isEqualTo(data[i]);
@@ -560,43 +560,43 @@ public class InputTest extends TestCase {
         assertThat(indexIterator.hasNext()).isFalse();
     }
 
-    private void testShorts(final Inputs<Short> drops, final Short... data) {
+    private void testShorts(final Inputs<Short> inputs, final Short... data) {
 
         final Object[] objects = new Object[data.length];
         System.arraycopy(data, 0, objects, 0, data.length);
 
-        assertThat(drops).containsExactly(data);
-        assertThat(drops.size()).isEqualTo(data.length);
-        assertThat(drops.isEmpty()).isEqualTo(data.length == 0);
-        assertThat(drops.contains(data[0])).isTrue();
-        assertThat(drops.toArray()).containsExactly(objects);
-        assertThat(drops.toArray(new Short[data.length])).containsExactly(data);
-        assertThat(drops.containsAll(Arrays.asList(data))).isTrue();
-        assertThat(drops.indexOf(data[0])).isEqualTo(0);
-        assertThat(drops.lastIndexOf(data[0])).isEqualTo(Arrays.asList(data).lastIndexOf(data[0]));
-        assertThat(drops.retainAll(Arrays.asList(data))).isFalse();
-        assertThat(drops).containsExactly(data);
+        assertThat(inputs).containsExactly(data);
+        assertThat(inputs.size()).isEqualTo(data.length);
+        assertThat(inputs.isEmpty()).isEqualTo(data.length == 0);
+        assertThat(inputs.contains(data[0])).isTrue();
+        assertThat(inputs.toArray()).containsExactly(objects);
+        assertThat(inputs.toArray(new Short[data.length])).containsExactly(data);
+        assertThat(inputs.containsAll(Arrays.asList(data))).isTrue();
+        assertThat(inputs.indexOf(data[0])).isEqualTo(0);
+        assertThat(inputs.lastIndexOf(data[0])).isEqualTo(Arrays.asList(data).lastIndexOf(data[0]));
+        assertThat(inputs.retainAll(Arrays.asList(data))).isFalse();
+        assertThat(inputs).containsExactly(data);
 
         for (int i = 0; i < data.length; ++i) {
 
-            assertThat(drops.get(i)).isEqualTo(data[i]);
+            assertThat(inputs.get(i)).isEqualTo(data[i]);
         }
 
-        final Iterator<Short> iterator = drops.iterator();
+        final Iterator<Short> iterator = inputs.iterator();
         for (final Short datum : data) {
 
             assertThat(iterator.next()).isEqualTo(datum);
         }
         assertThat(iterator.hasNext()).isFalse();
 
-        final ListIterator<Short> listIterator = drops.listIterator();
+        final ListIterator<Short> listIterator = inputs.listIterator();
         for (final Short datum : data) {
 
             assertThat(listIterator.next()).isEqualTo(datum);
         }
         assertThat(listIterator.hasNext()).isFalse();
 
-        final ListIterator<Short> indexIterator = drops.listIterator(1);
+        final ListIterator<Short> indexIterator = inputs.listIterator(1);
         for (int i = 1; i < data.length; ++i) {
 
             assertThat(indexIterator.next()).isEqualTo(data[i]);

@@ -124,6 +124,18 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
     public OutputChannel<OUTPUT> readAllInto(List<OUTPUT> results);
 
     /**
+     * Reads the first available result by waiting at the maximum for the set timeout.
+     *
+     * @return the first available result.
+     * @throws java.lang.IllegalStateException     if this channel is already bound to a consumer.
+     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
+     *                                             exception.
+     * @see #afterMax(com.bmd.jrt.time.TimeDuration)
+     * @see #afterMax(long, java.util.concurrent.TimeUnit)
+     */
+    public OUTPUT readFirst();
+
+    /**
      * Waits for the routine to complete at the maximum for the set timeout.
      * <p/>
      * By default the timeout is set to a few seconds to avoid unexpected deadlocks.

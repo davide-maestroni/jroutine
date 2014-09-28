@@ -30,7 +30,7 @@ import java.util.HashMap;
  */
 public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
-    private static final HashMap<Method, Method> mMethodMap = new HashMap<Method, Method>();
+    private static final HashMap<Method, Method> sMethodMap = new HashMap<Method, Method>();
 
     private final Class<?> mTargetClass;
 
@@ -133,9 +133,9 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
             Runner runner = null;
             Boolean isSequential = null;
 
-            synchronized (mMethodMap) {
+            synchronized (sMethodMap) {
 
-                final HashMap<Method, Method> methodMap = mMethodMap;
+                final HashMap<Method, Method> methodMap = sMethodMap;
 
                 targetMethod = methodMap.get(method);
 
@@ -173,15 +173,9 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
                     }
 
-                    if ((targetMethod == null) || !targetMethod.getReturnType()
-                                                               .equals(returnType)) {
+                    if (targetMethod == null) {
 
                         targetMethod = targetClass.getDeclaredMethod(name, parameterTypes);
-                    }
-
-                    if (!targetMethod.getReturnType().equals(returnType)) {
-
-                        throw new NoSuchMethodException();
                     }
 
                     methodMap.put(method, targetMethod);
@@ -193,7 +187,13 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
             if (!ReflectionUtils.boxingClass(returnType).equals(Void.class)) {
 
-                return outputChannel.iterator().next();
+                if (OutputChannel.class.isAssignableFrom(returnType) && !returnType.equals(
+                        targetMethod.getReturnType())) {
+
+                    return outputChannel;
+                }
+
+                return outputChannel.readFirst();
             }
 
             return null;
@@ -215,7 +215,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
             if (!ReflectionUtils.boxingClass(returnType).equals(Void.class)) {
 
-                return outputChannel.iterator().next();
+                return outputChannel.readFirst();
             }
 
             return null;

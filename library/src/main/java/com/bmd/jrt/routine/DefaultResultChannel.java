@@ -434,6 +434,68 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    private OUTPUT readQueue(final TimeDuration timeout, final RuntimeException timeoutException) {
+
+        synchronized (mMutex) {
+
+            verifyBound();
+
+            final SimpleQueue<Object> outputQueue = mOutputQueue;
+
+            if (timeout.isZero() || !outputQueue.isEmpty()) {
+
+                if (outputQueue.isEmpty()) {
+
+                    throw new NoSuchElementException();
+                }
+
+                final Object result = outputQueue.removeFirst();
+
+                RoutineExceptionWrapper.raise(result);
+
+                return (OUTPUT) result;
+            }
+
+            if (mOutputNotEmpty == null) {
+
+                mOutputNotEmpty = new Check() {
+
+                    @Override
+                    public boolean isTrue() {
+
+                        return !mOutputQueue.isEmpty();
+                    }
+                };
+            }
+
+            boolean isTimeout = false;
+
+            try {
+
+                isTimeout = !timeout.waitTrue(mMutex, mOutputNotEmpty);
+
+            } catch (final InterruptedException e) {
+
+                RoutineInterruptedException.interrupt(e);
+            }
+
+            if (isTimeout) {
+
+                if (timeoutException != null) {
+
+                    throw timeoutException;
+                }
+            }
+
+            final Object result = outputQueue.removeFirst();
+
+            RoutineExceptionWrapper.raise(result);
+
+            return (OUTPUT) result;
+        }
+    }
+
     private void verifyBound() {
 
         if (mOutputConsumer != null) {
@@ -559,72 +621,15 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         }
 
         @Override
-        @SuppressWarnings("unchecked")
         public OUTPUT next() {
 
             synchronized (mMutex) {
 
-                verifyBound();
-
-                final TimeDuration timeout = mTimeout;
-                final RuntimeException timeoutException = mTimeoutException;
-
-                final SimpleQueue<Object> outputQueue = mOutputQueue;
-
-                if (timeout.isZero() || !outputQueue.isEmpty()) {
-
-                    if (outputQueue.isEmpty()) {
-
-                        throw new NoSuchElementException();
-                    }
-
-                    final Object result = outputQueue.removeFirst();
-
-                    RoutineExceptionWrapper.raise(result);
-
-                    mRemoved = false;
-
-                    return (OUTPUT) result;
-                }
-
-                if (mOutputNotEmpty == null) {
-
-                    mOutputNotEmpty = new Check() {
-
-                        @Override
-                        public boolean isTrue() {
-
-                            return !mOutputQueue.isEmpty();
-                        }
-                    };
-                }
-
-                boolean isTimeout = false;
-
-                try {
-
-                    isTimeout = !timeout.waitTrue(mMutex, mOutputNotEmpty);
-
-                } catch (final InterruptedException e) {
-
-                    RoutineInterruptedException.interrupt(e);
-                }
-
-                if (isTimeout) {
-
-                    if (timeoutException != null) {
-
-                        throw timeoutException;
-                    }
-                }
-
-                final Object result = outputQueue.removeFirst();
-
-                RoutineExceptionWrapper.raise(result);
+                final OUTPUT next = readQueue(mTimeout, mTimeoutException);
 
                 mRemoved = false;
 
-                return (OUTPUT) result;
+                return next;
             }
         }
 
@@ -792,6 +797,12 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             }
 
             return this;
+        }
+
+        @Override
+        public OUTPUT readFirst() {
+
+            return readQueue(mOutputTimeout, mOutputTimeoutException);
         }
 
         @Override

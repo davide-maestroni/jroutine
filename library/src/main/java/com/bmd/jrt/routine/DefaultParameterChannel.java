@@ -40,7 +40,7 @@ import static com.bmd.jrt.time.TimeDuration.fromUnit;
  */
 class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, OUTPUT> {
 
-    private final SimpleQueue<INPUT> mInputQueue = new SimpleQueue<INPUT>();
+    private final NestedQueue<INPUT> mInputQueue;
 
     private final DefaultInvocation<INPUT, OUTPUT> mInvocation;
 
@@ -63,14 +63,18 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
     /**
      * Constructor.
      *
-     * @param provider the execution provider.
-     * @param runner   the runner instance.
-     * @throws java.lang.IllegalArgumentException if one of the parameters is null.
+     * @param provider      the execution provider.
+     * @param runner        the runner instance.
+     * @param orderedInput  whether the input data are forced to be delivered in insertion order.
+     * @param orderedOutput whether the output data are forced to be delivered in insertion order.
+     * @throws NullPointerException if one of the parameters is null.
      */
-    public DefaultParameterChannel(final ExecutionProvider<INPUT, OUTPUT> provider,
-            final Runner runner) {
+    DefaultParameterChannel(final ExecutionProvider<INPUT, OUTPUT> provider, final Runner runner,
+            final boolean orderedInput, final boolean orderedOutput) {
 
         mRunner = runner;
+        mInputQueue =
+                (orderedInput) ? new OrderedNestedQueue<INPUT>() : new SimpleNestedQueue<INPUT>();
         mResultChanel = new DefaultResultChannel<OUTPUT>(new AbortHandler() {
 
             @Override
@@ -91,7 +95,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
                 mRunner.runAbort(mInvocation);
             }
-        }, runner);
+        }, runner, orderedOutput);
         mInvocation = new DefaultInvocation<INPUT, OUTPUT>(provider, new DefaultInputIterator(),
                                                            mResultChanel);
     }
@@ -185,6 +189,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
     @Override
     public ParameterChannel<INPUT, OUTPUT> pass(final Iterable<? extends INPUT> inputs) {
 
+        NestedQueue<INPUT> inputQueue;
         final TimeDuration delay;
 
         synchronized (mMutex) {
@@ -196,16 +201,19 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
                 return this;
             }
 
+            inputQueue = mInputQueue;
             delay = mInputDelay;
 
             if (delay.isZero()) {
-
-                final SimpleQueue<INPUT> inputQueue = mInputQueue;
 
                 for (final INPUT input : inputs) {
 
                     inputQueue.add(input);
                 }
+
+            } else {
+
+                inputQueue = inputQueue.addNested();
             }
 
             ++mPendingInputCount;
@@ -217,7 +225,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
         } else {
 
-            mRunner.run(new DelayedListInputInvocation(inputs), delay.time, delay.unit);
+            mRunner.run(new DelayedListInputInvocation(inputQueue, inputs), delay.time, delay.unit);
         }
 
         return this;
@@ -226,17 +234,23 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
     @Override
     public ParameterChannel<INPUT, OUTPUT> pass(final INPUT input) {
 
+        NestedQueue<INPUT> inputQueue;
         final TimeDuration delay;
 
         synchronized (mMutex) {
 
             verifyInput();
 
+            inputQueue = mInputQueue;
             delay = mInputDelay;
 
             if (delay.isZero()) {
 
-                mInputQueue.add(input);
+                inputQueue.add(input);
+
+            } else {
+
+                inputQueue = inputQueue.addNested();
             }
 
             ++mPendingInputCount;
@@ -248,7 +262,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
         } else {
 
-            mRunner.run(new DelayedInputInvocation(input), delay.time, delay.unit);
+            mRunner.run(new DelayedInputInvocation(inputQueue, input), delay.time, delay.unit);
         }
 
         return this;
@@ -445,6 +459,8 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
         private final TimeDuration mDelay;
 
+        private final NestedQueue<INPUT> mQueue;
+
         /**
          * Constructor.
          *
@@ -453,6 +469,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
         public DefaultOutputConsumer(final TimeDuration delay) {
 
             mDelay = delay;
+            mQueue = mInputQueue.addNested();
         }
 
         @Override
@@ -477,12 +494,18 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
         @Override
         public void onClose() {
 
+            synchronized (mMutex) {
+
+                mQueue.close();
+            }
+
             mRunner.run(mInvocation, 0, TimeUnit.MILLISECONDS);
         }
 
         @Override
         public void onOutput(final INPUT output) {
 
+            NestedQueue<INPUT> inputQueue;
             final TimeDuration delay = mDelay;
 
             synchronized (mMutex) {
@@ -499,9 +522,15 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
                     throw new IllegalStateException();
                 }
 
+                inputQueue = mQueue;
+
                 if (delay.isZero()) {
 
-                    mInputQueue.add(output);
+                    inputQueue.add(output);
+
+                } else {
+
+                    inputQueue = inputQueue.addNested();
                 }
 
                 ++mPendingInputCount;
@@ -513,7 +542,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
             } else {
 
-                mRunner.run(new DelayedInputInvocation(output), delay.time, delay.unit);
+                mRunner.run(new DelayedInputInvocation(inputQueue, output), delay.time, delay.unit);
             }
         }
     }
@@ -525,13 +554,17 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
         private final INPUT mInput;
 
+        private final NestedQueue<INPUT> mQueue;
+
         /**
          * Constructor.
          *
+         * @param queue
          * @param input the input.
          */
-        public DelayedInputInvocation(final INPUT input) {
+        public DelayedInputInvocation(final NestedQueue<INPUT> queue, final INPUT input) {
 
+            mQueue = queue;
             mInput = input;
         }
 
@@ -551,7 +584,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
                     return;
                 }
 
-                mInputQueue.add(mInput);
+                mQueue.add(mInput).close();
             }
 
             mInvocation.run();
@@ -565,12 +598,16 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
         private final ArrayList<INPUT> mInputs;
 
+        private final NestedQueue<INPUT> mQueue;
+
         /**
          * Constructor.
          *
+         * @param queue
          * @param inputs the iterable returning the input data.
          */
-        public DelayedListInputInvocation(final Iterable<? extends INPUT> inputs) {
+        public DelayedListInputInvocation(final NestedQueue<INPUT> queue,
+                final Iterable<? extends INPUT> inputs) {
 
             final ArrayList<INPUT> inputList = new ArrayList<INPUT>();
 
@@ -580,6 +617,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
             }
 
             mInputs = inputList;
+            mQueue = queue;
         }
 
         @Override
@@ -598,7 +636,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
                     return;
                 }
 
-                mInputQueue.addAll(mInputs);
+                mQueue.addAll(mInputs).close();
             }
 
             mInvocation.run();

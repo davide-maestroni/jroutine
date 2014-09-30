@@ -43,7 +43,7 @@ public class TimeDuration extends Time {
      *
      * @param duration the time value.
      * @param unit     the time unit.
-     * @throws java.lang.IllegalArgumentException if the specified duration is negative.
+     * @throws IllegalArgumentException if the specified duration is negative.
      */
     protected TimeDuration(final long duration, final TimeUnit unit) {
 
@@ -60,7 +60,7 @@ public class TimeDuration extends Time {
      *
      * @param days the number of days.
      * @return the time instance.
-     * @throws java.lang.IllegalArgumentException if the specified duration is negative.
+     * @throws IllegalArgumentException if the specified duration is negative.
      */
     public static TimeDuration days(final long days) {
 
@@ -74,14 +74,14 @@ public class TimeDuration extends Time {
      * @param time the time value.
      * @param unit the time unit.
      * @return the time instance.
-     * @throws java.lang.IllegalArgumentException if the specified duration is negative or the time
-     *                                            unit is null.
+     * @throws NullPointerException     if the time unit is null.
+     * @throws IllegalArgumentException if the specified duration is negative.
      */
     public static TimeDuration fromUnit(final long time, final TimeUnit unit) {
 
         if (unit == null) {
 
-            throw new IllegalArgumentException("the time unit cannot be null");
+            throw new NullPointerException("the time unit cannot be null");
         }
 
         return new TimeDuration(time, unit);
@@ -92,7 +92,7 @@ public class TimeDuration extends Time {
      *
      * @param hours the number of hours
      * @return the time instance.
-     * @throws java.lang.IllegalArgumentException if the specified duration is negative.
+     * @throws IllegalArgumentException if the specified duration is negative.
      */
     public static TimeDuration hours(final long hours) {
 
@@ -104,7 +104,7 @@ public class TimeDuration extends Time {
      *
      * @param micros the number of microseconds.
      * @return the time duration instance.
-     * @throws java.lang.IllegalArgumentException if the specified duration is negative.
+     * @throws IllegalArgumentException if the specified duration is negative.
      */
     public static TimeDuration micros(final long micros) {
 
@@ -116,7 +116,7 @@ public class TimeDuration extends Time {
      *
      * @param millis the number of milliseconds.
      * @return the time duration instance.
-     * @throws java.lang.IllegalArgumentException if the specified duration is negative.
+     * @throws IllegalArgumentException if the specified duration is negative.
      */
     public static TimeDuration millis(final long millis) {
 
@@ -128,7 +128,7 @@ public class TimeDuration extends Time {
      *
      * @param minutes the number of minutes.
      * @return the time duration instance.
-     * @throws java.lang.IllegalArgumentException if the specified duration is negative.
+     * @throws IllegalArgumentException if the specified duration is negative.
      */
     public static TimeDuration minutes(final long minutes) {
 
@@ -140,7 +140,7 @@ public class TimeDuration extends Time {
      *
      * @param nanos the number of nanoseconds.
      * @return the time duration instance.
-     * @throws java.lang.IllegalArgumentException if the specified duration is negative.
+     * @throws IllegalArgumentException if the specified duration is negative.
      */
     public static TimeDuration nanos(final long nanos) {
 
@@ -152,7 +152,7 @@ public class TimeDuration extends Time {
      *
      * @param seconds the number of seconds.
      * @return the time duration instance.
-     * @throws java.lang.IllegalArgumentException if the specified duration is negative.
+     * @throws IllegalArgumentException if the specified duration is negative.
      */
     public static TimeDuration seconds(final long seconds) {
 

@@ -31,7 +31,7 @@ public interface InputChannel<INPUT> extends Channel {
      *
      * @param delay the delay.
      * @return this channel.
-     * @throws java.lang.IllegalArgumentException  if the specified delay is null.
+     * @throws java.lang.NullPointerException      if the specified delay is null.
      * @throws java.lang.IllegalStateException     if this channel is already closed.
      * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
      *                                             exception.
@@ -59,7 +59,7 @@ public interface InputChannel<INPUT> extends Channel {
      *
      * @param channel the output channel.
      * @return this channel.
-     * @throws java.lang.IllegalArgumentException  if the specified channel is null.
+     * @throws java.lang.NullPointerException      if the specified channel is null.
      * @throws java.lang.IllegalStateException     if this channel is already closed.
      * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
      *                                             exception.

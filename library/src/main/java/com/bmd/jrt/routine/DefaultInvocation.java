@@ -45,25 +45,24 @@ class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
      * @param provider the execution provider.
      * @param inputs   the input iterator.
      * @param results  the result channel.
-     * @throws IllegalArgumentException if one of the parameters is null.
+     * @throws NullPointerException if one of the parameters is null.
      */
-    public DefaultInvocation(
-            final DefaultParameterChannel.ExecutionProvider<INPUT, OUTPUT> provider,
+    DefaultInvocation(final DefaultParameterChannel.ExecutionProvider<INPUT, OUTPUT> provider,
             final InputIterator<INPUT> inputs, final DefaultResultChannel<OUTPUT> results) {
 
         if (provider == null) {
 
-            throw new IllegalArgumentException("the execution provider must not be null");
+            throw new NullPointerException("the execution provider must not be null");
         }
 
         if (inputs == null) {
 
-            throw new IllegalArgumentException("the input iterator must not be null");
+            throw new NullPointerException("the input iterator must not be null");
         }
 
         if (results == null) {
 
-            throw new IllegalArgumentException("the result channel must not be null");
+            throw new NullPointerException("the result channel must not be null");
         }
 
         mExecutionProvider = provider;

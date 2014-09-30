@@ -46,19 +46,23 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
      *                       positive number.
      * @param availTimeout   the maximum timeout while waiting for an execution instance to be
      *                       available.
+     * @param orderedInput   whether the input data are forced to be delivered in insertion order.
+     * @param orderedOutput  whether the output data are forced to be delivered in insertion order.
      * @param executionClass the execution class.
      * @param executionArgs  the execution constructor arguments.
-     * @throws java.lang.IllegalArgumentException if at least one of the parameter is null or
-     *                                            invalid, of no constructor matching the specified
-     *                                            arguments is found for the target execution
-     *                                            class.
+     * @throws NullPointerException     if at least one of the parameter is null
+     * @throws IllegalArgumentException if at least one of the parameter is invalid, of no
+     *                                  constructor matching the specified arguments is found for
+     *                                  the target execution class.
      */
-    public DefaultRoutine(final Runner syncRunner, final Runner asyncRunner, final int maxRunning,
-            final int maxRetained, final TimeDuration availTimeout,
+    DefaultRoutine(final Runner syncRunner, final Runner asyncRunner, final int maxRunning,
+            final int maxRetained, final TimeDuration availTimeout, final boolean orderedInput,
+            final boolean orderedOutput,
             final Class<? extends Execution<INPUT, OUTPUT>> executionClass,
             final Object... executionArgs) {
 
-        super(syncRunner, asyncRunner, maxRunning, maxRetained, availTimeout);
+        super(syncRunner, asyncRunner, maxRunning, maxRetained, availTimeout, orderedInput,
+              orderedOutput);
 
         mConstructor = findConstructor(executionClass, executionArgs);
         mArgs = (executionArgs == null) ? NO_ARGS : executionArgs.clone();

@@ -64,7 +64,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
     private Check mOutputNotEmpty;
 
-    private SimpleQueue<Object> mOutputQueue = new SimpleQueue<Object>();
+    private NestedQueue<Object> mOutputQueue;
 
     private TimeDuration mOutputTimeout = seconds(5);
 
@@ -79,24 +79,28 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     /**
      * Constructor.
      *
-     * @param handler the abort handler.
-     * @param runner  the runner instance.
-     * @throws java.lang.IllegalArgumentException if one of the parameters is null.
+     * @param handler       the abort handler.
+     * @param runner        the runner instance.
+     * @param orderedOutput whether the output data are forced to be delivered in insertion order.
+     * @throws NullPointerException if one of the parameters is null.
      */
-    public DefaultResultChannel(final AbortHandler handler, final Runner runner) {
+    DefaultResultChannel(final AbortHandler handler, final Runner runner,
+            final boolean orderedOutput) {
 
         if (handler == null) {
 
-            throw new IllegalArgumentException("the abort handler must not be null");
+            throw new NullPointerException("the abort handler must not be null");
         }
 
         if (runner == null) {
 
-            throw new IllegalArgumentException("the runner instance must not be null");
+            throw new NullPointerException("the runner instance must not be null");
         }
 
         mHandler = handler;
         mRunner = runner;
+        mOutputQueue = (orderedOutput) ? new OrderedNestedQueue<Object>()
+                : new SimpleNestedQueue<Object>();
     }
 
     @Override
@@ -158,6 +162,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     @Override
     public ResultChannel<OUTPUT> pass(final Iterable<? extends OUTPUT> outputs) {
 
+        NestedQueue<Object> outputQueue;
         final TimeDuration delay;
 
         synchronized (mMutex) {
@@ -169,11 +174,10 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                 return this;
             }
 
+            outputQueue = mOutputQueue;
             delay = mResultDelay;
 
             if (delay.isZero()) {
-
-                final SimpleQueue<Object> outputQueue = mOutputQueue;
 
                 for (final OUTPUT output : outputs) {
 
@@ -182,6 +186,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             } else {
 
+                outputQueue = outputQueue.addNested();
+
                 ++mPendingOutputCount;
             }
         }
@@ -192,7 +198,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         } else {
 
-            mRunner.run(new DelayedListOutputInvocation(outputs), delay.time, delay.unit);
+            mRunner.run(new DelayedListOutputInvocation(outputQueue, outputs), delay.time,
+                        delay.unit);
         }
 
         return this;
@@ -201,19 +208,23 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     @Override
     public ResultChannel<OUTPUT> pass(final OUTPUT output) {
 
+        NestedQueue<Object> outputQueue;
         final TimeDuration delay;
 
         synchronized (mMutex) {
 
             verifyOutput();
 
+            outputQueue = mOutputQueue;
             delay = mResultDelay;
 
             if (delay.isZero()) {
 
-                mOutputQueue.add(output);
+                outputQueue.add(output);
 
             } else {
+
+                outputQueue = outputQueue.addNested();
 
                 ++mPendingOutputCount;
             }
@@ -225,7 +236,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         } else {
 
-            mRunner.run(new DelayedOutputInvocation(output), delay.time, delay.unit);
+            mRunner.run(new DelayedOutputInvocation(outputQueue, output), delay.time, delay.unit);
         }
 
         return this;
@@ -280,9 +291,13 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
      */
     public void close() {
 
+        boolean isFlush = false;
+
         synchronized (mMutex) {
 
             if (mState == ChannelState.OUTPUT) {
+
+                isFlush = true;
 
                 if (mPendingOutputCount > 0) {
 
@@ -295,7 +310,10 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             }
         }
 
-        flushOutput();
+        if (isFlush) {
+
+            flushOutput();
+        }
     }
 
     /**
@@ -441,7 +459,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             verifyBound();
 
-            final SimpleQueue<Object> outputQueue = mOutputQueue;
+            final NestedQueue<Object> outputQueue = mOutputQueue;
 
             if (timeout.isZero() || !outputQueue.isEmpty()) {
 
@@ -464,7 +482,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                     @Override
                     public boolean isTrue() {
 
-                        return !mOutputQueue.isEmpty();
+                        return !outputQueue.isEmpty();
                     }
                 };
             }
@@ -577,8 +595,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 final TimeDuration timeout = mTimeout;
                 final RuntimeException timeoutException = mTimeoutException;
-
-                final SimpleQueue<Object> outputQueue = mOutputQueue;
+                final NestedQueue<Object> outputQueue = mOutputQueue;
 
                 if (timeout.isZero() || isDone()) {
 
@@ -592,7 +609,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                         @Override
                         public boolean isTrue() {
 
-                            return !mOutputQueue.isEmpty() || isDone();
+                            return !outputQueue.isEmpty() || isDone();
                         }
                     };
                 }
@@ -740,7 +757,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                     throw new IllegalArgumentException("the result list must not be null");
                 }
 
-                final SimpleQueue<Object> outputQueue = mOutputQueue;
+                final NestedQueue<Object> outputQueue = mOutputQueue;
                 final TimeDuration timeout = mOutputTimeout;
                 final RuntimeException timeoutException = mOutputTimeoutException;
 
@@ -904,6 +921,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         private final TimeDuration mDelay;
 
+        private final NestedQueue<Object> mQueue;
+
         /**
          * Constructor.
          *
@@ -912,6 +931,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         public DefaultOutputConsumer(final TimeDuration delay) {
 
             mDelay = delay;
+            mQueue = mOutputQueue.addNested();
         }
 
         @Override
@@ -945,6 +965,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 verifyOutput();
 
+                mQueue.close();
+
                 if ((--mPendingOutputCount == 0) && (mState == ChannelState.RESULT)) {
 
                     mState = ChannelState.DONE;
@@ -966,17 +988,22 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         @Override
         public void onOutput(final OUTPUT output) {
 
+            NestedQueue<Object> outputQueue;
             final TimeDuration delay = mDelay;
 
             synchronized (mMutex) {
 
                 verifyOutput();
 
+                outputQueue = mQueue;
+
                 if (delay.isZero()) {
 
-                    mOutputQueue.add(output);
+                    outputQueue.add(output);
 
                 } else {
+
+                    outputQueue = outputQueue.addNested();
 
                     ++mPendingOutputCount;
                 }
@@ -988,7 +1015,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             } else {
 
-                mRunner.run(new DelayedOutputInvocation(output), delay.time, delay.unit);
+                mRunner.run(new DelayedOutputInvocation(outputQueue, output), delay.time,
+                            delay.unit);
             }
         }
     }
@@ -1000,12 +1028,16 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         private final ArrayList<OUTPUT> mOutputs;
 
+        private final NestedQueue<Object> mQueue;
+
         /**
          * Constructor.
          *
+         * @param queue
          * @param outputs the iterable returning the output data.
          */
-        public DelayedListOutputInvocation(final Iterable<? extends OUTPUT> outputs) {
+        public DelayedListOutputInvocation(final NestedQueue<Object> queue,
+                final Iterable<? extends OUTPUT> outputs) {
 
             final ArrayList<OUTPUT> outputList = new ArrayList<OUTPUT>();
 
@@ -1015,6 +1047,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             }
 
             mOutputs = outputList;
+            mQueue = queue;
         }
 
         @Override
@@ -1038,7 +1071,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                     mState = ChannelState.DONE;
                 }
 
-                mOutputQueue.addAll(mOutputs);
+                mQueue.addAll(mOutputs).close();
             }
 
             flushOutput();
@@ -1052,13 +1085,17 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         private final OUTPUT mOutput;
 
+        private final NestedQueue<Object> mQueue;
+
         /**
          * Constructor.
          *
+         * @param queue
          * @param output the output.
          */
-        public DelayedOutputInvocation(final OUTPUT output) {
+        public DelayedOutputInvocation(final NestedQueue<Object> queue, final OUTPUT output) {
 
+            mQueue = queue;
             mOutput = output;
         }
 
@@ -1083,7 +1120,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                     mState = ChannelState.DONE;
                 }
 
-                mOutputQueue.add(mOutput);
+                mQueue.add(mOutput).close();
             }
 
             flushOutput();

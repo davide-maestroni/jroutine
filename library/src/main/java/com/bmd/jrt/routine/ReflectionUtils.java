@@ -86,8 +86,8 @@ class ReflectionUtils {
      * @param ctorArgs the constructor arguments.
      * @param <TYPE>   the target type.
      * @return the best matching constructor.
-     * @throws java.lang.IllegalArgumentException if no constructor taking the specified object
-     *                                            as parameters is found.
+     * @throws IllegalArgumentException if no constructor taking the specified object as parameters
+     *                                  was found.
      */
     @SuppressWarnings("unchecked")
     public static <TYPE> Constructor<TYPE> findConstructor(final Class<TYPE> type,

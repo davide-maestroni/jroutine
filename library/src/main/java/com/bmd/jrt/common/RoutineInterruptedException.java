@@ -34,7 +34,7 @@ public class RoutineInterruptedException extends RoutineException {
      * Sets the interrupt flag of the current thread and throws a wrapped exception.
      *
      * @param exception the thread interrupted exception.
-     * @throws com.bmd.jrt.common.RoutineInterruptedException always.
+     * @throws RoutineInterruptedException always.
      */
     public static void interrupt(final InterruptedException exception) {
 

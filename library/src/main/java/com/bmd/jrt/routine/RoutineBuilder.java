@@ -53,6 +53,11 @@ import static com.bmd.jrt.time.TimeDuration.seconds;
  * In case the timeout elapses before an execution instance becomes available, a
  * {@link com.bmd.jrt.common.RoutineNotAvailableException} will be thrown.
  * <p/>
+ * Finally, by default the order of input and output data is not guaranteed unless delay is set to
+ * 0 and the sources are synchronous, that is, no output channel is passed. Nevertheless, it is
+ * possible to force data to be delivered in insertion order, at the cost of a slightly increased
+ * memory usage and computation, by calling the proper methods.
+ * <p/>
  * Created by davide on 9/21/14.
  *
  * @param <INPUT>  the input type.
@@ -77,19 +82,23 @@ public class RoutineBuilder<INPUT, OUTPUT> {
 
     private int mMaxRunning = Integer.MAX_VALUE;
 
+    private boolean mOrderedInput;
+
+    private boolean mOrderedOutput;
+
     private Runner mSyncRunner = Runners.queued();
 
     /**
      * Constructor.
      *
      * @param classToken the execution class token.
-     * @throws java.lang.IllegalArgumentException if the class token is null.
+     * @throws NullPointerException if the class token is null.
      */
     RoutineBuilder(final ClassToken<? extends Execution<INPUT, OUTPUT>> classToken) {
 
         if (classToken == null) {
 
-            throw new IllegalArgumentException("the execution class token must not be null");
+            throw new NullPointerException("the execution class token must not be null");
         }
 
         mClassToken = classToken;
@@ -101,7 +110,7 @@ public class RoutineBuilder<INPUT, OUTPUT> {
      * @param timeout  the timeout.
      * @param timeUnit the timeout time unit.
      * @return this builder.
-     * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
+     * @throws IllegalArgumentException if the specified timeout is negative.
      */
     public RoutineBuilder<INPUT, OUTPUT> availableTimeout(final long timeout,
             final TimeUnit timeUnit) {
@@ -114,13 +123,13 @@ public class RoutineBuilder<INPUT, OUTPUT> {
      *
      * @param timeout the timeout.
      * @return this builder.
-     * @throws java.lang.IllegalArgumentException if the specified timeout is null.
+     * @throws NullPointerException if the specified timeout is null.
      */
     public RoutineBuilder<INPUT, OUTPUT> availableTimeout(final TimeDuration timeout) {
 
         if (timeout == null) {
 
-            throw new IllegalArgumentException("the timeout must not be null");
+            throw new NullPointerException("the timeout must not be null");
         }
 
         mAvailTimeout = timeout;
@@ -133,7 +142,7 @@ public class RoutineBuilder<INPUT, OUTPUT> {
      *
      * @param maxRetainedInstances the max number of instances.
      * @return this builder.
-     * @throws java.lang.IllegalArgumentException if the number is negative.
+     * @throws IllegalArgumentException if the number is negative.
      */
     public RoutineBuilder<INPUT, OUTPUT> maxRetained(final int maxRetainedInstances) {
 
@@ -153,7 +162,7 @@ public class RoutineBuilder<INPUT, OUTPUT> {
      *
      * @param maxRunningInstances the max number of instances.
      * @return this builder.
-     * @throws java.lang.IllegalArgumentException if the number is less than 1.
+     * @throws IllegalArgumentException if the number is less than 1.
      */
     public RoutineBuilder<INPUT, OUTPUT> maxRunning(final int maxRunningInstances) {
 
@@ -169,7 +178,33 @@ public class RoutineBuilder<INPUT, OUTPUT> {
     }
 
     /**
-     * Sets the queued synchronous runner.<br/>
+     * Forces the inputs to be ordered as they are passed to the input channel, independently from
+     * the source or the input delay.
+     *
+     * @return this builder.
+     */
+    public RoutineBuilder<INPUT, OUTPUT> orderedInput() {
+
+        mOrderedInput = true;
+
+        return this;
+    }
+
+    /**
+     * Forces the outputs to be ordered as they are passed to the result channel, independently
+     * from the source or the result delay.
+     *
+     * @return this builder.
+     */
+    public RoutineBuilder<INPUT, OUTPUT> orderedOutput() {
+
+        mOrderedOutput = true;
+
+        return this;
+    }
+
+    /**
+     * Sets the synchronous runner to the queued one.<br/>
      * The queued runner maintains an internal buffer of invocations that are consumed only when
      * the last one complete, thus avoiding overflowing the call stack because of nested calls to
      * other routines.<br/>
@@ -192,8 +227,8 @@ public class RoutineBuilder<INPUT, OUTPUT> {
     public Routine<INPUT, OUTPUT> routine() {
 
         return new DefaultRoutine<INPUT, OUTPUT>(mSyncRunner, mAsyncRunner, mMaxRunning,
-                                                 mMaxRetained, mAvailTimeout,
-                                                 mClassToken.getRawClass(), mArgs);
+                                                 mMaxRetained, mAvailTimeout, mOrderedInput,
+                                                 mOrderedOutput, mClassToken.getRawClass(), mArgs);
     }
 
     /**
@@ -201,13 +236,13 @@ public class RoutineBuilder<INPUT, OUTPUT> {
      *
      * @param runner the runner instance.
      * @return this builder.
-     * @throws java.lang.IllegalArgumentException if the specified runner is null.
+     * @throws NullPointerException if the specified runner is null.
      */
     public RoutineBuilder<INPUT, OUTPUT> runBy(final Runner runner) {
 
         if (runner == null) {
 
-            throw new IllegalArgumentException("the runner instance must not be null");
+            throw new NullPointerException("the runner instance must not be null");
         }
 
         mAsyncRunner = runner;
@@ -216,7 +251,7 @@ public class RoutineBuilder<INPUT, OUTPUT> {
     }
 
     /**
-     * Sets the sequential synchronous runner.<br/>
+     * Sets the synchronous runner to the sequential one.<br/>
      * The sequential one simply executes the invocations as soon as they are run.<br/>
      * The invocations are run inside the calling thread.
      *
@@ -234,13 +269,13 @@ public class RoutineBuilder<INPUT, OUTPUT> {
      *
      * @param args the arguments.
      * @return this builder.
-     * @throws java.lang.IllegalArgumentException if the specified arguments array is null.
+     * @throws NullPointerException if the specified arguments array is null.
      */
     public RoutineBuilder<INPUT, OUTPUT> withArgs(final Object... args) {
 
         if (args == null) {
 
-            throw new IllegalArgumentException("the arguments array must not be null");
+            throw new NullPointerException("the arguments array must not be null");
         }
 
         mArgs = args;

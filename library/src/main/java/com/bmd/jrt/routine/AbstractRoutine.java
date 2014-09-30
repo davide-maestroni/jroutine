@@ -47,6 +47,10 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
 
     private final Object mMutex = new Object();
 
+    private final boolean mOrderedInput;
+
+    private final boolean mOrderedOutput;
+
     private final Runner mSyncRunner;
 
     private LinkedList<Execution<INPUT, OUTPUT>> mExecutions =
@@ -57,27 +61,30 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
     /**
      * Constructor.
      *
-     * @param syncRunner   the runner used for synchronous invocation.
-     * @param asyncRunner  the runner used for asynchronous invocation.
-     * @param maxRunning   the maximum number of parallel running executions. Must be positive.
-     * @param maxRetained  the maximum number of retained execution instances. Must be 0 or a
-     *                     positive number.
-     * @param availTimeout the maximum timeout while waiting for an execution instance to be
-     *                     available.
-     * @throws java.lang.IllegalArgumentException if at least one of the parameter is null or
-     *                                            invalid.
+     * @param syncRunner    the runner used for synchronous invocation.
+     * @param asyncRunner   the runner used for asynchronous invocation.
+     * @param maxRunning    the maximum number of parallel running executions. Must be positive.
+     * @param maxRetained   the maximum number of retained execution instances. Must be 0 or a
+     *                      positive number.
+     * @param availTimeout  the maximum timeout while waiting for an execution instance to be
+     *                      available.
+     * @param orderedInput  whether the input data are forced to be delivered in insertion order.
+     * @param orderedOutput whether the output data are forced to be delivered in insertion order.
+     * @throws NullPointerException     if one of the specified runner or the timeout is null.
+     * @throws IllegalArgumentException if at least one of the parameter is invalid.
      */
-    public AbstractRoutine(final Runner syncRunner, final Runner asyncRunner, final int maxRunning,
-            final int maxRetained, final TimeDuration availTimeout) {
+    protected AbstractRoutine(final Runner syncRunner, final Runner asyncRunner,
+            final int maxRunning, final int maxRetained, final TimeDuration availTimeout,
+            final boolean orderedInput, final boolean orderedOutput) {
 
         if (syncRunner == null) {
 
-            throw new IllegalArgumentException("the synchronous runner instance must not be null");
+            throw new NullPointerException("the synchronous runner instance must not be null");
         }
 
         if (asyncRunner == null) {
 
-            throw new IllegalArgumentException("the asynchronous runner instance must not be null");
+            throw new NullPointerException("the asynchronous runner instance must not be null");
         }
 
         if (maxRunning < 1) {
@@ -103,6 +110,8 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
         mMaxRunning = maxRunning;
         mMaxRetained = maxRetained;
         mAvailTimeout = availTimeout;
+        mOrderedInput = orderedInput;
+        mOrderedOutput = orderedOutput;
     }
 
     @Override
@@ -302,7 +311,8 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
 
         final AbstractRoutine<INPUT, OUTPUT> parallelRoutine =
                 new AbstractRoutine<INPUT, OUTPUT>(mSyncRunner, mAsyncRunner, mMaxRunning,
-                                                   mMaxRetained, mAvailTimeout) {
+                                                   mMaxRetained, mAvailTimeout, mOrderedInput,
+                                                   mOrderedOutput) {
 
                     @Override
                     protected Execution<INPUT, OUTPUT> createExecution(final boolean async) {
@@ -325,7 +335,8 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
     private ParameterChannel<INPUT, OUTPUT> launch(final boolean async) {
 
         return new DefaultParameterChannel<INPUT, OUTPUT>(new DefaultExecutionProvider(async),
-                                                          (async) ? mAsyncRunner : mSyncRunner);
+                                                          (async) ? mAsyncRunner : mSyncRunner,
+                                                          mOrderedInput, mOrderedOutput);
     }
 
     /**

@@ -32,13 +32,13 @@ class SynchronizedConsumer<OUTPUT> implements OutputConsumer<OUTPUT> {
      * Constructor.
      *
      * @param wrapped the wrapped output consumer.
-     * @throws java.lang.IllegalArgumentException is the specified consumer is null.
+     * @throws NullPointerException is the specified consumer is null.
      */
-    public SynchronizedConsumer(final OutputConsumer<OUTPUT> wrapped) {
+    SynchronizedConsumer(final OutputConsumer<OUTPUT> wrapped) {
 
         if (wrapped == null) {
 
-            throw new IllegalArgumentException("the consumer instance must not be null");
+            throw new NullPointerException("the consumer instance must not be null");
         }
 
         mConsumer = wrapped;

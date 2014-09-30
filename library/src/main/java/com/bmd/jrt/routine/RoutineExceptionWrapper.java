@@ -38,8 +38,7 @@ class RoutineExceptionWrapper {
      * If the specified object is a wrapper instance, the wrapped routine exception is thrown.
      *
      * @param obj the object to check.
-     * @throws com.bmd.jrt.common.RoutineException if the specified object is an exception wrapper
-     *                                             instance.
+     * @throws RoutineException if the specified object is an exception wrapper instance.
      */
     public static void raise(final Object obj) {
 

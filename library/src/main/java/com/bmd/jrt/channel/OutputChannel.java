@@ -35,7 +35,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      *
      * @param timeout the maximum timeout.
      * @return this channel.
-     * @throws java.lang.IllegalArgumentException  if the specified timeout is null.
+     * @throws java.lang.NullPointerException      if the specified timeout is null.
      * @throws java.lang.IllegalStateException     if this channel is already bound to a consumer.
      * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
      *                                             exception.
@@ -64,7 +64,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      *
      * @param consumer the consumer instance.
      * @return this channel.
-     * @throws java.lang.IllegalArgumentException  if the specified consumer is null.
+     * @throws java.lang.NullPointerException      if the specified consumer is null.
      * @throws java.lang.IllegalStateException     if this channel is already bound to a consumer.
      * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
      *                                             exception.
@@ -114,7 +114,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      *
      * @param results the list to fill.
      * @return this channel.
-     * @throws java.lang.IllegalArgumentException  if the specified list is null.
+     * @throws java.lang.NullPointerException      if the specified list is null.
      * @throws java.lang.IllegalStateException     if this channel is already bound to a consumer.
      * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
      *                                             exception.

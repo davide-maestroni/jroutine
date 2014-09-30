@@ -31,7 +31,7 @@ class ThreadPoolRunner implements Runner {
      *
      * @param threadPoolSize the thread pool size.
      */
-    public ThreadPoolRunner(final int threadPoolSize) {
+    ThreadPoolRunner(final int threadPoolSize) {
 
         mService = Executors.newScheduledThreadPool(threadPoolSize);
     }

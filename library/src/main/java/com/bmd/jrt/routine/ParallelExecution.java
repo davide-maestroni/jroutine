@@ -33,7 +33,7 @@ class ParallelExecution<INPUT, OUTPUT> extends ExecutionAdapter<INPUT, OUTPUT> {
      *
      * @param routine the routine to launch in parallel mode.
      */
-    public ParallelExecution(final Routine<INPUT, OUTPUT> routine) {
+    ParallelExecution(final Routine<INPUT, OUTPUT> routine) {
 
         if (routine == null) {
 

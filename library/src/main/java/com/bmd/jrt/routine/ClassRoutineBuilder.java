@@ -30,6 +30,8 @@ import java.util.WeakHashMap;
 /**
  * Class implementing a builder of a routine wrapping a class method.
  * <p/>
+ * TODO: static, annotation, etc.
+ * <p/>
  * Created by davide on 9/21/14.
  *
  * @see com.bmd.jrt.routine.AsynMethod
@@ -58,14 +60,14 @@ public class ClassRoutineBuilder {
      * Constructor.
      *
      * @param target the target class or object.
-     * @throws java.lang.IllegalArgumentException if the specified target is null, or a duplicate
-     *                                            name in the annotations is detected.
+     * @throws NullPointerException     if the specified target is null.
+     * @throws IllegalArgumentException if a duplicate name in the annotations is detected.
      */
     ClassRoutineBuilder(final Object target) {
 
         if (target == null) {
 
-            throw new IllegalArgumentException("the target object must not be null");
+            throw new NullPointerException("the target object must not be null");
         }
 
         final Class<?> targetClass;
@@ -115,22 +117,22 @@ public class ClassRoutineBuilder {
      * @param name           the method name.
      * @param parameterTypes the method parameter types.
      * @return the routine.
-     * @throws java.lang.IllegalArgumentException  if one of the parameter is null or no matching
-     *                                             method is found.
-     * @throws com.bmd.jrt.common.RoutineException if an error occurred while instantiating the
-     *                                             optional runner or the routine.
+     * @throws NullPointerException     if one of the parameter is null.
+     * @throws IllegalArgumentException if no matching method is found.
+     * @throws RoutineException         if an error occurred while instantiating the optional
+     *                                  runner or the routine.
      */
     public Routine<Object, Object> classMethod(final String name,
             final Class<?>... parameterTypes) {
 
         if (name == null) {
 
-            throw new IllegalArgumentException("the method name must not be null");
+            throw new NullPointerException("the method name must not be null");
         }
 
         if (parameterTypes == null) {
 
-            throw new IllegalArgumentException("the list of parameter types must not be null");
+            throw new NullPointerException("the list of parameter types must not be null");
         }
 
         final Class<?> targetClass = mTargetClass;
@@ -168,15 +170,15 @@ public class ClassRoutineBuilder {
      *
      * @param method the method instance.
      * @return the routine.
-     * @throws java.lang.IllegalArgumentException  if the specified method is null.
-     * @throws com.bmd.jrt.common.RoutineException if an error occurred while instantiating the
-     *                                             optional runner or the routine.
+     * @throws NullPointerException if the specified method is null.
+     * @throws RoutineException     if an error occurred while instantiating the optional runner
+     *                              or the routine.
      */
     public Routine<Object, Object> classMethod(final Method method) {
 
         if (method == null) {
 
-            throw new IllegalArgumentException("the method must not be null");
+            throw new NullPointerException("the method must not be null");
         }
 
         if (!method.isAccessible()) {
@@ -227,9 +229,9 @@ public class ClassRoutineBuilder {
      *
      * @param name the name specified in the annotation.
      * @return the routine.
-     * @throws java.lang.IllegalArgumentException  if the specified method is not found.
-     * @throws com.bmd.jrt.common.RoutineException if an error occurred while instantiating the
-     *                                             optional runner or the routine.
+     * @throws IllegalArgumentException if the specified method is not found.
+     * @throws RoutineException         if an error occurred while instantiating the optional
+     *                                  runner or the routine.
      */
     public Routine<Object, Object> method(final String name) {
 
@@ -262,13 +264,13 @@ public class ClassRoutineBuilder {
      *
      * @param runner the runner instance.
      * @return this builder.
-     * @throws java.lang.IllegalArgumentException if the specified runner is null.
+     * @throws NullPointerException if the specified runner is null.
      */
     public ClassRoutineBuilder runBy(final Runner runner) {
 
         if (runner == null) {
 
-            throw new IllegalArgumentException("the runner instance must not be null");
+            throw new NullPointerException("the runner instance must not be null");
         }
 
         mRunner = runner;

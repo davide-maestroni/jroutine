@@ -60,6 +60,8 @@ import java.lang.annotation.Target;
  * Note however that the specified runner classes must declare a default constructor to be
  * instantiated via reflection.
  * <p/>
+ * TODO: input override
+ * <p/>
  * The same considerations apply to static class methods.
  * <p/>
  * Finally, be aware that a method might need to be made accessible in order to be called via

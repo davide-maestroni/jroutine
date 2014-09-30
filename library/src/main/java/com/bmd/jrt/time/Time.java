@@ -73,13 +73,13 @@ public class Time {
      * @param time the time value.
      * @param unit the time unit.
      * @return the time instance.
-     * @throws java.lang.IllegalArgumentException if the specified time unit is null.
+     * @throws NullPointerException if the specified time unit is null.
      */
     public static Time fromUnit(final long time, TimeUnit unit) {
 
         if (unit == null) {
 
-            throw new IllegalArgumentException("the time unit cannot be null");
+            throw new NullPointerException("the time unit cannot be null");
         }
 
         return new Time(time, unit);

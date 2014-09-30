@@ -116,10 +116,27 @@ class SimpleQueue<E> {
     }
 
     /**
+     * Peeks the first element added into the queue.
+     *
+     * @return the element.
+     * @throws NoSuchElementException if the queue is empty.
+     */
+    @SuppressWarnings("unchecked")
+    public E peekFirst() {
+
+        if (isEmpty()) {
+
+            throw new NoSuchElementException();
+        }
+
+        return (E) mQueue[mFirst];
+    }
+
+    /**
      * Removes the first element added into the queue.
      *
      * @return the element.
-     * @throws java.util.NoSuchElementException if the queue is empty.
+     * @throws NoSuchElementException if the queue is empty.
      */
     @SuppressWarnings("unchecked")
     public E removeFirst() {

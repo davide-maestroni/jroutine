@@ -35,7 +35,8 @@ import com.bmd.jrt.execution.Execution;
  * Note that a proxy object can be simply defined as an interface implemented by the target, but
  * also as a completely unrelated one mirroring the target methods. In this way it is possible to
  * apply the framework functionalities to objects defined by third party libraries which are not
- * under direct control.
+ * under direct control.<br/>
+ * TODO: output override, input override
  * <p/>
  * Created by davide on 9/7/14.
  *
@@ -55,8 +56,9 @@ public class JRoutine {
      *
      * @param target the target class.
      * @return the routine builder instance.
-     * @throws java.lang.IllegalArgumentException if the specified target is null, or a duplicate
-     *                                            name in the annotations is detected.
+     * @throws java.lang.NullPointerException     if the specified target is null.
+     * @throws java.lang.IllegalArgumentException if a duplicate name in the annotations is
+     *                                            detected.
      */
     public static ClassRoutineBuilder on(final Class<?> target) {
 
@@ -70,7 +72,7 @@ public class JRoutine {
      * @param <INPUT>    the input type.
      * @param <OUTPUT>   the output type.
      * @return the routine builder instance.
-     * @throws java.lang.IllegalArgumentException if the class token is null.
+     * @throws java.lang.NullPointerException if the class token is null.
      */
     public static <INPUT, OUTPUT> RoutineBuilder<INPUT, OUTPUT> on(
             final ClassToken<? extends Execution<INPUT, OUTPUT>> classToken) {
@@ -83,8 +85,9 @@ public class JRoutine {
      *
      * @param target the target object.
      * @return the routine builder instance.
-     * @throws java.lang.IllegalArgumentException if the specified target is null, or a duplicate
-     *                                            name in the annotations is detected.
+     * @throws java.lang.NullPointerException     if the specified target is null.
+     * @throws java.lang.IllegalArgumentException if a duplicate name in the annotations is
+     *                                            detected.
      */
     public static ObjectRoutineBuilder on(final Object target) {
 

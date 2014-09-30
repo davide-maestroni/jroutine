@@ -41,14 +41,14 @@ public abstract class ClassToken<CLASS> {
      * @param object  the object.
      * @param <CLASS> the class type.
      * @return the newly created token.
-     * @throws IllegalArgumentException if the object is null.
+     * @throws NullPointerException if the object is null.
      */
     @SuppressWarnings("unchecked")
     public static <CLASS> ClassToken<CLASS> classOf(final CLASS object) {
 
         if (object == null) {
 
-            throw new IllegalArgumentException("the classification object must not be null");
+            throw new NullPointerException("the classification object must not be null");
         }
 
         return token((Class<CLASS>) object.getClass());
@@ -60,13 +60,13 @@ public abstract class ClassToken<CLASS> {
      * @param rawClass the raw class.
      * @param <CLASS>  the class type.
      * @return the newly created token.
-     * @throws IllegalArgumentException if the raw class is null.
+     * @throws NullPointerException if the raw class is null.
      */
     public static <CLASS> ClassToken<CLASS> token(final Class<CLASS> rawClass) {
 
         if (rawClass == null) {
 
-            throw new IllegalArgumentException("the classification raw type must not be null");
+            throw new NullPointerException("the classification raw type must not be null");
         }
 
         final ClassToken<CLASS> classToken = new ClassToken<CLASS>() {};
@@ -94,8 +94,7 @@ public abstract class ClassToken<CLASS> {
      * Gets the generic type of this token.
      *
      * @return the generic type.
-     * @throws java.lang.IllegalStateException if this class does not correctly extends a class
-     *                                         token.
+     * @throws IllegalStateException if this class does not correctly extends a class token.
      */
     public final Type getGenericType() {
 
@@ -132,8 +131,7 @@ public abstract class ClassToken<CLASS> {
      * Gets the raw class of this token.
      *
      * @return the raw class.
-     * @throws java.lang.IllegalStateException if this class does not correctly extends a class
-     *                                         token.
+     * @throws IllegalStateException if this class does not correctly extends a class token.
      */
     @SuppressWarnings("unchecked")
     public final Class<CLASS> getRawClass() {
@@ -190,8 +188,7 @@ public abstract class ClassToken<CLASS> {
      *
      * @param other the class token to compare.
      * @return whether this token raw class is equal to or is a super class.
-     * @throws java.lang.IllegalStateException if this class does not correctly extends a class
-     *                                         token.
+     * @throws IllegalStateException if this class does not correctly extends a class token.
      */
     public final boolean isAssignableFrom(final ClassToken<?> other) {
 
@@ -202,8 +199,7 @@ public abstract class ClassToken<CLASS> {
      * Checks if this token raw class represent an interface.
      *
      * @return whether this token raw class is an interface.
-     * @throws java.lang.IllegalStateException if this class does not correctly extends a class
-     *                                         token.
+     * @throws IllegalStateException if this class does not correctly extends a class token.
      */
     public final boolean isInterface() {
 

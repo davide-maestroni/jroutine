@@ -28,13 +28,13 @@ public class RunnerDecorator implements Runner {
      * Constructor.
      *
      * @param wrapped the wrapped instance.
-     * @throws java.lang.IllegalArgumentException if the specified instance is null.
+     * @throws NullPointerException if the specified instance is null.
      */
     public RunnerDecorator(final Runner wrapped) {
 
         if (wrapped == null) {
 
-            throw new IllegalArgumentException("the wrapped runner must not be null");
+            throw new NullPointerException("the wrapped runner must not be null");
         }
 
         mRunner = wrapped;

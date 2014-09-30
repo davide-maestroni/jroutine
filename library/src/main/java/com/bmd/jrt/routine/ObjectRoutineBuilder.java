@@ -24,6 +24,8 @@ import java.util.HashMap;
 /**
  * Class implementing a builder of a routine wrapping an object instance.
  * <p/>
+ * TODO: annotation, output override, input override
+ * <p/>
  * Created by davide on 9/21/14.
  *
  * @see com.bmd.jrt.routine.AsynMethod
@@ -38,8 +40,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * Constructor.
      *
      * @param target the target object instance.
-     * @throws java.lang.IllegalArgumentException if the specified target is null, or a duplicate
-     *                                            name in the annotations is detected.
+     * @throws NullPointerException     if the specified target is null.
+     * @throws IllegalArgumentException if a duplicate name in the annotations is detected.
      */
     ObjectRoutineBuilder(final Object target) {
 
@@ -60,14 +62,14 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * @param itf     the interface implemented by the return object.
      * @param <CLASS> the interface type.
      * @return the proxy object.
-     * @throws java.lang.IllegalArgumentException if the specified class is null or does not
-     *                                            represent an interface.
+     * @throws NullPointerException     if the specified class is null.
+     * @throws IllegalArgumentException if the specified class does not represent an interface.
      */
     public <CLASS> CLASS asyn(final Class<CLASS> itf) {
 
         if (itf == null) {
 
-            throw new IllegalArgumentException("the interface type must be null");
+            throw new NullPointerException("the interface type must be null");
         }
 
         if (!itf.isInterface()) {

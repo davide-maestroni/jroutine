@@ -1033,7 +1033,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         /**
          * Constructor.
          *
-         * @param queue
+         * @param queue   the output queue.
          * @param outputs the iterable returning the output data.
          */
         public DelayedListOutputInvocation(final NestedQueue<Object> queue,
@@ -1090,7 +1090,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         /**
          * Constructor.
          *
-         * @param queue
+         * @param queue  the output queue.
          * @param output the output.
          */
         public DelayedOutputInvocation(final NestedQueue<Object> queue, final OUTPUT output) {

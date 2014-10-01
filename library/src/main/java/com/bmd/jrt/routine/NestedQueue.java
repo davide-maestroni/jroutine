@@ -16,23 +16,83 @@ package com.bmd.jrt.routine;
 import java.util.Collection;
 
 /**
+ * Interface defining a queue with the possibility to add nested queue with additional elements.
+ * <p/>
+ * This interface is used to abstract the handling of placeholders for asynchronously available
+ * data in order to support forced input and output ordering.
+ * <p/>
  * Created by davide on 9/30/14.
+ *
+ * @param <E> the element type.
  */
 interface NestedQueue<E> {
 
+    /**
+     * Adds the specified element to the queue.
+     * <p/>
+     * Note that the element can be null.
+     *
+     * @param element the element to add.
+     * @return this queue.
+     * @throws java.lang.IllegalStateException if the queue has been already closed.
+     */
     public NestedQueue<E> add(E element);
 
+    /**
+     * Adds all the elements returned by the specified iterable.
+     * <p/>
+     * Note that the any of the returned element can be null.
+     *
+     * @param elements the element iterable.
+     * @return this queue.
+     * @throws java.lang.IllegalStateException if the queue has been already closed.
+     */
     public NestedQueue<E> addAll(Iterable<? extends E> elements);
 
+    /**
+     * Adds a nested queue to this one.
+     *
+     * @return the newly added nested queue.
+     * @throws java.lang.IllegalStateException if the queue has been already closed.
+     */
     public NestedQueue<E> addNested();
 
+    /**
+     * Clears the queue.
+     *
+     * @return this queue.
+     */
     public NestedQueue<E> clear();
 
+    /**
+     * Closes this queue.<br/>
+     * After the method returns no more addition can be made to this queue. Though, elements can
+     * be safely removed.
+     *
+     * @return this queue.
+     */
     public NestedQueue<E> close();
 
+    /**
+     * Check if the queue does not contain any element.
+     *
+     * @return whether the queue is empty.
+     */
     public boolean isEmpty();
 
+    /**
+     * Moves all the elements to the specified collection.
+     *
+     * @param collection the collection to fill.
+     * @return this queue.
+     */
     public NestedQueue<E> moveTo(final Collection<? super E> collection);
 
+    /**
+     * Removes the first element added into the queue.
+     *
+     * @return the element.
+     * @throws java.util.NoSuchElementException if the queue is empty.
+     */
     public E removeFirst();
 }

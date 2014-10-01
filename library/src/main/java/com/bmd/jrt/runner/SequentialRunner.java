@@ -28,7 +28,7 @@ import static com.bmd.jrt.time.TimeDuration.fromUnit;
  * <p/>
  * Created by davide on 9/9/14.
  *
- * @see com.bmd.jrt.runner.QueuedRunner
+ * @see QueuedRunner
  */
 class SequentialRunner implements Runner {
 

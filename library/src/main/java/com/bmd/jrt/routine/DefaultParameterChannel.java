@@ -559,7 +559,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
         /**
          * Constructor.
          *
-         * @param queue
+         * @param queue the input queue.
          * @param input the input.
          */
         public DelayedInputInvocation(final NestedQueue<INPUT> queue, final INPUT input) {
@@ -603,7 +603,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
         /**
          * Constructor.
          *
-         * @param queue
+         * @param queue  the input queue.
          * @param inputs the iterable returning the input data.
          */
         public DelayedListInputInvocation(final NestedQueue<INPUT> queue,

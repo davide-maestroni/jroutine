@@ -22,7 +22,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation used to indicate methods which can be invoked in an asynchronous way.<br/>
+ * This annotation is used to indicate methods which can be invoked in an asynchronous way.<br/>
  * Note that the piece of code inside such methods will be automatically protected so to avoid
  * concurrency issue. Though, other parts of the code inside the same class will be not.
  * <p/>
@@ -60,8 +60,6 @@ import java.lang.annotation.Target;
  * Note however that the specified runner classes must declare a default constructor to be
  * instantiated via reflection.
  * <p/>
- * TODO: input override
- * <p/>
  * The same considerations apply to static class methods.
  * <p/>
  * Finally, be aware that a method might need to be made accessible in order to be called via
@@ -85,7 +83,7 @@ import java.lang.annotation.Target;
 @Inherited
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface AsynMethod {
+public @interface Async {
 
     /**
      * The name used to identify the method independently from its original signature.

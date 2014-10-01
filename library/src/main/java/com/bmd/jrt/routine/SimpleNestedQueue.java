@@ -16,7 +16,13 @@ package com.bmd.jrt.routine;
 import java.util.Collection;
 
 /**
+ * Basic implementation of a nested queue.
+ * <p/>
+ * No data ordering is guaranteed.
+ * <p/>
  * Created by davide on 9/30/14.
+ *
+ * @param <E> the element type.
  */
 class SimpleNestedQueue<E> implements NestedQueue<E> {
 
@@ -24,11 +30,19 @@ class SimpleNestedQueue<E> implements NestedQueue<E> {
 
     private boolean mClosed;
 
+    /**
+     * Default constructor.
+     */
     SimpleNestedQueue() {
 
         this(new SimpleQueue<E>());
     }
 
+    /**
+     * Constructor.
+     *
+     * @param queue the internal data queue.
+     */
     private SimpleNestedQueue(final SimpleQueue<E> queue) {
 
         mQueue = queue;

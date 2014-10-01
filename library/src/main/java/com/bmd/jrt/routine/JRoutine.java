@@ -40,7 +40,7 @@ import com.bmd.jrt.execution.Execution;
  * <p/>
  * Created by davide on 9/7/14.
  *
- * @see com.bmd.jrt.routine.AsynMethod
+ * @see Async
  */
 public class JRoutine {
 

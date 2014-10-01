@@ -34,7 +34,7 @@ import java.util.WeakHashMap;
  * <p/>
  * Created by davide on 9/21/14.
  *
- * @see com.bmd.jrt.routine.AsynMethod
+ * @see Async
  */
 public class ClassRoutineBuilder {
 
@@ -55,6 +55,8 @@ public class ClassRoutineBuilder {
     private Boolean mIsSequential;
 
     private Runner mRunner;
+
+    //TODO: onException
 
     /**
      * Constructor.
@@ -111,7 +113,7 @@ public class ClassRoutineBuilder {
      * Returns a routine used for calling the specified method.
      * <p/>
      * The method is searched via reflection ignoring an optional name specified in a
-     * {@link com.bmd.jrt.routine.AsynMethod} annotation. Though, the other annotation attributes
+     * {@link Async} annotation. Though, the other annotation attributes
      * will be honored.
      *
      * @param name           the method name.
@@ -165,7 +167,7 @@ public class ClassRoutineBuilder {
      * Returns a routine used for calling the specified method.
      * <p/>
      * The method is invoked ignoring an optional name specified in a
-     * {@link com.bmd.jrt.routine.AsynMethod} annotation. Though, the other annotation attributes
+     * {@link Async} annotation. Though, the other annotation attributes
      * will be honored.
      *
      * @param method the method instance.
@@ -189,7 +191,7 @@ public class ClassRoutineBuilder {
         Runner runner = mRunner;
         Boolean isSequential = mIsSequential;
 
-        final AsynMethod annotation = method.getAnnotation(AsynMethod.class);
+        final Async annotation = method.getAnnotation(Async.class);
 
         if (annotation != null) {
 
@@ -220,12 +222,12 @@ public class ClassRoutineBuilder {
             }
         }
 
-        return getRoutine(method, runner, isSequential);
+        return getRoutine(method, runner, isSequential, false);
     }
 
     /**
      * Returns a routine used for calling the method whose identifying name is specified in a
-     * {@link com.bmd.jrt.routine.AsynMethod} annotation.
+     * {@link Async} annotation.
      *
      * @param name the name specified in the annotation.
      * @return the routine.
@@ -296,10 +298,11 @@ public class ClassRoutineBuilder {
      * @param method       the method to wrap.
      * @param runner       the asynchronous runner instance.
      * @param isSequential whether a sequential runner must be used for synchronous invocations.
+     * @param orderedInput whether the input data are forced to be delivered in insertion order.
      * @return the routine instance.
      */
     protected Routine<Object, Object> getRoutine(final Method method, final Runner runner,
-            final Boolean isSequential) {
+            final Boolean isSequential, final boolean orderedInput) {
 
         final Object target = mTarget;
         Routine<Object, Object> routine;
@@ -316,7 +319,8 @@ public class ClassRoutineBuilder {
                 routineCache.put(target, routineMap);
             }
 
-            final RoutineInfo routineInfo = new RoutineInfo(method, runner, isSequential);
+            final RoutineInfo routineInfo =
+                    new RoutineInfo(method, runner, isSequential, orderedInput);
             routine = routineMap.get(routineInfo);
 
             if (routine != null) {
@@ -353,6 +357,11 @@ public class ClassRoutineBuilder {
                 }
             }
 
+            if (orderedInput) {
+
+                builder.orderedInput();
+            }
+
             routine = builder.withArgs(target, method, mutex).routine();
             routineMap.put(routineInfo, routine);
         }
@@ -380,7 +389,7 @@ public class ClassRoutineBuilder {
                 continue;
             }
 
-            final AsynMethod annotation = method.getAnnotation(AsynMethod.class);
+            final Async annotation = method.getAnnotation(Async.class);
 
             if (annotation != null) {
 
@@ -469,6 +478,8 @@ public class ClassRoutineBuilder {
 
         private final Method mMethod;
 
+        private final boolean mOrderedInput;
+
         private final Runner mRunner;
 
         /**
@@ -477,21 +488,24 @@ public class ClassRoutineBuilder {
          * @param method       the method to wrap.
          * @param runner       the runner instance.
          * @param isSequential whether a sequential runner must be used for synchronous
-         *                     invocations.
+         * @param orderedInput whether the input data are forced to be delivered in insertion order.
          */
-        public RoutineInfo(final Method method, final Runner runner, final Boolean isSequential) {
+        private RoutineInfo(final Method method, final Runner runner, final Boolean isSequential,
+                final boolean orderedInput) {
 
             mMethod = method;
             mRunner = runner;
             mIsSequential = isSequential;
+            mOrderedInput = orderedInput;
         }
 
         @Override
         public int hashCode() {
 
-            int result = (mIsSequential != null) ? mIsSequential.hashCode() : 0;
-            result = 31 * result + ((mRunner != null) ? mRunner.hashCode() : 0);
+            int result = mIsSequential != null ? mIsSequential.hashCode() : 0;
             result = 31 * result + mMethod.hashCode();
+            result = 31 * result + (mOrderedInput ? 1 : 0);
+            result = 31 * result + (mRunner != null ? mRunner.hashCode() : 0);
             return result;
         }
 
@@ -503,16 +517,17 @@ public class ClassRoutineBuilder {
                 return true;
             }
 
-            if ((o == null) || (getClass() != o.getClass())) {
+            if (!(o instanceof RoutineInfo)) {
 
                 return false;
             }
 
             final RoutineInfo that = (RoutineInfo) o;
 
-            return !((mIsSequential != null) ? !mIsSequential.equals(that.mIsSequential)
-                    : (that.mIsSequential != null)) && !((mRunner != null) ? !mRunner.equals(
-                    that.mRunner) : (that.mRunner != null)) && mMethod.equals(that.mMethod);
+            return mOrderedInput == that.mOrderedInput && !(mIsSequential != null
+                    ? !mIsSequential.equals(that.mIsSequential) : that.mIsSequential != null)
+                    && mMethod.equals(that.mMethod) && !(mRunner != null ? !mRunner.equals(
+                    that.mRunner) : that.mRunner != null);
         }
     }
 }

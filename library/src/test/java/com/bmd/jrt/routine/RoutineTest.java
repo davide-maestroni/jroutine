@@ -1066,7 +1066,7 @@ public class RoutineTest extends TestCase {
 
         public OutputChannel<Integer> getOne();
 
-        @AsynMethod(name = "getInt")
+        @Async(name = "getInt")
         public int take(int i);
     }
 
@@ -1099,7 +1099,7 @@ public class RoutineTest extends TestCase {
 
         public static final String GET_METHOD = "get";
 
-        @AsynMethod(name = GET_METHOD)
+        @Async(name = GET_METHOD)
         public static int get(final int i) {
 
             return i;
@@ -1111,7 +1111,7 @@ public class RoutineTest extends TestCase {
             return i;
         }
 
-        @AsynMethod(name = GET_METHOD)
+        @Async(name = GET_METHOD)
         public int getOne() {
 
             return 1;

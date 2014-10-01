@@ -16,7 +16,12 @@ package com.bmd.jrt.routine;
 import java.util.Collection;
 
 /**
+ * Implementation of a nested queue ensuring that data are returned in the same order as they are
+ * added, even if added later through a nested queue.
+ * <p/>
  * Created by davide on 9/30/14.
+ *
+ * @param <E> the element type.
  */
 class OrderedNestedQueue<E> implements NestedQueue<E> {
 
@@ -24,11 +29,19 @@ class OrderedNestedQueue<E> implements NestedQueue<E> {
 
     private boolean mClosed;
 
+    /**
+     * Default constructor.
+     */
     OrderedNestedQueue() {
 
         this(new SimpleQueue<Object>());
     }
 
+    /**
+     * Constructor.
+     *
+     * @param queue the internal queue.
+     */
     private OrderedNestedQueue(final SimpleQueue<Object> queue) {
 
         mQueue = queue;
@@ -37,6 +50,11 @@ class OrderedNestedQueue<E> implements NestedQueue<E> {
     private static void purge(final OrderedNestedQueue<?> queue) {
 
         final SimpleQueue<Object> simpleQueue = queue.mQueue;
+
+        if (simpleQueue.isEmpty()) {
+
+            return;
+        }
 
         Object element = simpleQueue.peekFirst();
 
@@ -122,14 +140,9 @@ class OrderedNestedQueue<E> implements NestedQueue<E> {
     @Override
     public boolean isEmpty() {
 
-        final SimpleQueue<Object> queue = mQueue;
-
-        if (queue.isEmpty()) {
-
-            return true;
-        }
-
         purge(this);
+
+        final SimpleQueue<Object> queue = mQueue;
 
         if (queue.isEmpty()) {
 
@@ -146,14 +159,9 @@ class OrderedNestedQueue<E> implements NestedQueue<E> {
     @SuppressWarnings("unchecked")
     public NestedQueue<E> moveTo(final Collection<? super E> collection) {
 
-        final SimpleQueue<Object> queue = mQueue;
-
-        if (queue.isEmpty()) {
-
-            return this;
-        }
-
         purge(this);
+
+        final SimpleQueue<Object> queue = mQueue;
 
         while (!queue.isEmpty()) {
 
@@ -165,14 +173,12 @@ class OrderedNestedQueue<E> implements NestedQueue<E> {
 
                 nested.moveTo(collection);
 
-                if (nested.mClosed && nested.mQueue.isEmpty()) {
-
-                    queue.removeFirst();
-
-                } else {
+                if (!nested.mClosed || !nested.mQueue.isEmpty()) {
 
                     return this;
                 }
+
+                queue.removeFirst();
 
             } else {
 

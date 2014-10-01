@@ -14,6 +14,7 @@
 package com.bmd.jrt.routine;
 
 import com.bmd.jrt.channel.OutputChannel;
+import com.bmd.jrt.channel.ParameterChannel;
 import com.bmd.jrt.runner.Runner;
 
 import java.lang.reflect.InvocationHandler;
@@ -28,7 +29,7 @@ import java.util.HashMap;
  * <p/>
  * Created by davide on 9/21/14.
  *
- * @see com.bmd.jrt.routine.AsynMethod
+ * @see Async
  */
 public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
@@ -54,7 +55,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * Returns a proxy object enable the asynchronous call of the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link com.bmd.jrt.routine.AsynMethod} annotation. In case the target instance does
+     * optional {@link Async} annotation. In case the target instance does
      * not implement the specified interface, the name attribute will be used to bind the interface
      * method with the instance ones. If no name is assigned the one of the interface method will
      * be used instead.
@@ -130,6 +131,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
             final Class<?> targetClass = mTargetClass;
             final Class<?> returnType = method.getReturnType();
+            final boolean isOverrideParameters;
 
             Method targetMethod;
             Runner runner = null;
@@ -138,13 +140,16 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
             synchronized (sMethodMap) {
 
                 final HashMap<Method, Method> methodMap = sMethodMap;
+                final AsyncParameters paramAnnotation = method.getAnnotation(AsyncParameters.class);
 
                 targetMethod = methodMap.get(method);
 
                 if (targetMethod == null) {
 
                     String name = null;
-                    final AsynMethod annotation = method.getAnnotation(AsynMethod.class);
+                    Class<?>[] parameterTypes = null;
+
+                    final Async annotation = method.getAnnotation(Async.class);
 
                     if (annotation != null) {
 
@@ -165,7 +170,36 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                         name = method.getName();
                     }
 
-                    final Class<?>[] parameterTypes = method.getParameterTypes();
+                    if (paramAnnotation != null) {
+
+                        parameterTypes = paramAnnotation.value();
+                        final Class<?>[] methodParameterTypes = method.getParameterTypes();
+
+                        if (parameterTypes.length != methodParameterTypes.length) {
+
+                            throw new IllegalArgumentException(
+                                    "the async parameters are not compatible");
+                        }
+
+                        final int length = parameterTypes.length;
+
+                        for (int i = 0; i < length; i++) {
+
+                            final Class<?> parameterType = methodParameterTypes[i];
+
+                            if (!OutputChannel.class.equals(parameterType)
+                                    && !parameterTypes[i].isAssignableFrom(parameterType)) {
+
+                                throw new IllegalArgumentException(
+                                        "the async parameters are not compatible");
+                            }
+                        }
+                    }
+
+                    if ((parameterTypes == null) || (parameterTypes.length == 0)) {
+
+                        parameterTypes = method.getParameterTypes();
+                    }
 
                     try {
 
@@ -182,10 +216,37 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
                     methodMap.put(method, targetMethod);
                 }
+
+                isOverrideParameters =
+                        (paramAnnotation != null) && (paramAnnotation.value().length > 0);
             }
 
-            final OutputChannel<Object> outputChannel =
-                    getRoutine(targetMethod, runner, isSequential).invokeAsyn(args);
+            final Routine<Object, Object> routine =
+                    getRoutine(targetMethod, runner, isSequential, isOverrideParameters);
+            final OutputChannel<Object> outputChannel;
+
+            if (isOverrideParameters) {
+
+                final ParameterChannel<Object, Object> parameterChannel = routine.launchAsyn();
+
+                for (final Object arg : args) {
+
+                    if (arg instanceof OutputChannel) {
+
+                        parameterChannel.pass((OutputChannel<?>) arg);
+
+                    } else {
+
+                        parameterChannel.pass(arg);
+                    }
+                }
+
+                outputChannel = parameterChannel.close();
+
+            } else {
+
+                outputChannel = routine.invokeAsyn(args);
+            }
 
             if (!ReflectionUtils.boxingClass(returnType).equals(Void.class)) {
 

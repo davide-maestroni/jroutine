@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
  * <p/>
  * Created by davide on 9/18/14.
  *
- * @see com.bmd.jrt.runner.SequentialRunner
+ * @see SequentialRunner
  */
 class QueuedRunner implements Runner {
 

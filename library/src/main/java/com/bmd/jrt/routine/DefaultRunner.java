@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Empty runner implementation used to identify the default runner in a
- * {@link com.bmd.jrt.routine.AsynMethod} annotation.
+ * {@link Async} annotation.
  * <p/>
  * Created by davide on 9/22/14.
  */

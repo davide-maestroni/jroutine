@@ -21,19 +21,28 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
+import java.util.WeakHashMap;
+
+import static com.bmd.jrt.routine.ReflectionUtils.boxingClass;
 
 /**
  * Class implementing a builder of a routine wrapping an object instance.
  * <p/>
- * TODO: annotation, output override, input override
+ * Note that only instance methods can be asynchronously invoked through the routines created by
+ * this builder.
  * <p/>
  * Created by davide on 9/21/14.
  *
  * @see Async
+ * @see AsyncParameters
+ * @see AsyncResult
  */
 public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
-    private static final HashMap<Method, Method> sMethodMap = new HashMap<Method, Method>();
+    private static final WeakHashMap<Object, HashMap<Method, Method>> sMethodCache =
+            new WeakHashMap<Object, HashMap<Method, Method>>();
+
+    private final Object mTarget;
 
     private final Class<?> mTargetClass;
 
@@ -48,6 +57,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
         super(target);
 
+        mTarget = target;
         mTargetClass = target.getClass();
     }
 
@@ -55,10 +65,12 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * Returns a proxy object enable the asynchronous call of the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link Async} annotation. In case the target instance does
-     * not implement the specified interface, the name attribute will be used to bind the interface
-     * method with the instance ones. If no name is assigned the one of the interface method will
-     * be used instead.
+     * optional {@link Async} annotation. If no name is assigned the one of the interface method
+     * will be used instead.<br/>
+     * In case the wrapped object does not implement the specified interface, the name attribute
+     * will be used to bind the interface method with the instance ones. The interface will be
+     * interpreted as a mirror of the target object methods, and the optional
+     * {@link AsyncParameters} and {@link AsyncResult} annotations will be honored.
      *
      * @param itf     the interface implemented by the return object.
      * @param <CLASS> the interface type.
@@ -66,7 +78,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * @throws NullPointerException     if the specified class is null.
      * @throws IllegalArgumentException if the specified class does not represent an interface.
      */
-    public <CLASS> CLASS asyn(final Class<CLASS> itf) {
+    public <CLASS> CLASS asAsyn(final Class<CLASS> itf) {
 
         if (itf == null) {
 
@@ -120,6 +132,14 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
         return this;
     }
 
+    @Override
+    public ObjectRoutineBuilder withinTry(final Catch catchClause) {
+
+        super.withinTry(catchClause);
+
+        return this;
+    }
+
     /**
      * Invocation handler adapting a different interface to the target object instance.
      */
@@ -129,17 +149,27 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
         public Object invoke(final Object proxy, final Method method, final Object[] args) throws
                 Throwable {
 
+            final Object target = mTarget;
             final Class<?> targetClass = mTargetClass;
             final Class<?> returnType = method.getReturnType();
             final boolean isOverrideParameters;
+            final boolean isOverrideReturn;
 
             Method targetMethod;
             Runner runner = null;
             Boolean isSequential = null;
 
-            synchronized (sMethodMap) {
+            synchronized (sMethodCache) {
 
-                final HashMap<Method, Method> methodMap = sMethodMap;
+                final WeakHashMap<Object, HashMap<Method, Method>> methodCache = sMethodCache;
+                HashMap<Method, Method> methodMap = methodCache.get(target);
+
+                if (methodMap == null) {
+
+                    methodMap = new HashMap<Method, Method>();
+                    methodCache.put(target, methodMap);
+                }
+
                 final AsyncParameters paramAnnotation = method.getAnnotation(AsyncParameters.class);
 
                 targetMethod = methodMap.get(method);
@@ -213,9 +243,18 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
                         targetMethod = targetClass.getDeclaredMethod(name, parameterTypes);
                     }
-
-                    methodMap.put(method, targetMethod);
                 }
+
+                isOverrideReturn = (method.getAnnotation(AsyncResult.class) != null)
+                        && OutputChannel.class.isAssignableFrom(returnType);
+
+                if (!isOverrideReturn && !returnType.isAssignableFrom(
+                        targetMethod.getReturnType())) {
+
+                    throw new IllegalArgumentException("the async return type is not compatible");
+                }
+
+                methodMap.put(method, targetMethod);
 
                 isOverrideParameters =
                         (paramAnnotation != null) && (paramAnnotation.value().length > 0);
@@ -227,7 +266,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
             if (isOverrideParameters) {
 
-                final ParameterChannel<Object, Object> parameterChannel = routine.launchAsyn();
+                final ParameterChannel<Object, Object> parameterChannel = routine.invokeAsyn();
 
                 for (final Object arg : args) {
 
@@ -245,13 +284,12 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
             } else {
 
-                outputChannel = routine.invokeAsyn(args);
+                outputChannel = routine.runAsyn(args);
             }
 
-            if (!ReflectionUtils.boxingClass(returnType).equals(Void.class)) {
+            if (!boxingClass(returnType).equals(Void.class)) {
 
-                if (OutputChannel.class.isAssignableFrom(returnType) && !returnType.equals(
-                        targetMethod.getReturnType())) {
+                if (isOverrideReturn) {
 
                     return outputChannel;
                 }
@@ -272,11 +310,11 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
         public Object invoke(final Object proxy, final Method method, final Object[] args) throws
                 Throwable {
 
-            final OutputChannel<Object> outputChannel = classMethod(method).invokeAsyn(args);
+            final OutputChannel<Object> outputChannel = classMethod(method).runAsyn(args);
 
             final Class<?> returnType = method.getReturnType();
 
-            if (!ReflectionUtils.boxingClass(returnType).equals(Void.class)) {
+            if (!boxingClass(returnType).equals(Void.class)) {
 
                 return outputChannel.readFirst();
             }

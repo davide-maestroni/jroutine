@@ -36,11 +36,14 @@ import com.bmd.jrt.execution.Execution;
  * also as a completely unrelated one mirroring the target methods. In this way it is possible to
  * apply the framework functionalities to objects defined by third party libraries which are not
  * under direct control.<br/>
- * TODO: output override, input override
+ * A mirror interface adds the possibility to override input and output parameters with output
+ * channels, so that data are transferred asynchronously avoiding the need to block waiting for
+ * them to be available.<br/>
  * <p/>
  * Created by davide on 9/7/14.
  *
  * @see Async
+ * @see AsyncParameters
  */
 public class JRoutine {
 

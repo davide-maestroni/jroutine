@@ -19,7 +19,6 @@ import com.bmd.jrt.common.RoutineException;
 import com.bmd.jrt.execution.ExecutionBody;
 import com.bmd.jrt.runner.Runner;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
@@ -27,10 +26,13 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.WeakHashMap;
 
+import static com.bmd.jrt.routine.ReflectionUtils.boxingClass;
+
 /**
  * Class implementing a builder of a routine wrapping a class method.
  * <p/>
- * TODO: static, annotation, etc.
+ * Note that only static methods can be asynchronously invoked through the routines created by
+ * this builder.
  * <p/>
  * Created by davide on 9/21/14.
  *
@@ -52,11 +54,11 @@ public class ClassRoutineBuilder {
 
     private final Class<?> mTargetClass;
 
+    private Catch mCatchClause = new RethrowCatch();
+
     private Boolean mIsSequential;
 
     private Runner mRunner;
-
-    //TODO: onException
 
     /**
      * Constructor.
@@ -113,8 +115,7 @@ public class ClassRoutineBuilder {
      * Returns a routine used for calling the specified method.
      * <p/>
      * The method is searched via reflection ignoring an optional name specified in a
-     * {@link Async} annotation. Though, the other annotation attributes
-     * will be honored.
+     * {@link Async} annotation. Though, the other annotation attributes will be honored.
      *
      * @param name           the method name.
      * @param parameterTypes the method parameter types.
@@ -166,9 +167,8 @@ public class ClassRoutineBuilder {
     /**
      * Returns a routine used for calling the specified method.
      * <p/>
-     * The method is invoked ignoring an optional name specified in a
-     * {@link Async} annotation. Though, the other annotation attributes
-     * will be honored.
+     * The method is invoked ignoring an optional name specified in a {@link Async} annotation.
+     * Though, the other annotation attributes will be honored.
      *
      * @param method the method instance.
      * @return the routine.
@@ -293,6 +293,25 @@ public class ClassRoutineBuilder {
     }
 
     /**
+     * Tells the builder to create a routine within the specified try/catch clause.
+     *
+     * @param catchClause the catch clause.
+     * @return this builder.
+     * @throws NullPointerException if the specified clause is null.
+     */
+    public ClassRoutineBuilder withinTry(final Catch catchClause) {
+
+        if (catchClause == null) {
+
+            throw new NullPointerException("the catch clause must not be null");
+        }
+
+        mCatchClause = catchClause;
+
+        return this;
+    }
+
+    /**
      * Creates the routine.
      *
      * @param method       the method to wrap.
@@ -362,7 +381,7 @@ public class ClassRoutineBuilder {
                 builder.orderedInput();
             }
 
-            routine = builder.withArgs(target, method, mutex).routine();
+            routine = builder.withArgs(target, method, mCatchClause, mutex).routine();
             routineMap.put(routineInfo, routine);
         }
 
@@ -413,9 +432,24 @@ public class ClassRoutineBuilder {
     }
 
     /**
+     * Interface defining a catch clause.
+     */
+    public interface Catch {
+
+        /**
+         * Called when an exception is caught.
+         *
+         * @param ex the exception.
+         */
+        public void exception(RoutineException ex);
+    }
+
+    /**
      * Implementation of an execution body wrapping the target method.
      */
     private static class MethodExecutionBody extends ExecutionBody<Object, Object> {
+
+        private final Catch mCatch;
 
         private final boolean mHasResult;
 
@@ -428,18 +462,21 @@ public class ClassRoutineBuilder {
         /**
          * Constructor.
          *
-         * @param target the target class or object.
-         * @param method the method to wrap.
-         * @param mutex  the mutex used for synchronization.
+         * @param target      the target class or object.
+         * @param method      the method to wrap.
+         * @param catchClause the catch clause.
+         * @param mutex       the mutex used for synchronization.
          */
-        public MethodExecutionBody(final Object target, final Method method, final Object mutex) {
+        public MethodExecutionBody(final Object target, final Method method,
+                final Catch catchClause, final Object mutex) {
 
             mTarget = target;
             mMethod = method;
+            mCatch = catchClause;
             mMutex = mutex;
 
             final Class<?> returnType = method.getReturnType();
-            mHasResult = !ReflectionUtils.boxingClass(returnType).equals(Void.class);
+            mHasResult = !boxingClass(returnType).equals(Void.class);
         }
 
         @Override
@@ -457,15 +494,23 @@ public class ClassRoutineBuilder {
                         results.pass(result);
                     }
 
-                } catch (final IllegalAccessException e) {
+                } catch (final Throwable t) {
 
-                    throw new RoutineException(e);
-
-                } catch (final InvocationTargetException e) {
-
-                    throw new RoutineException(e);
+                    mCatch.exception(new RoutineException(t));
                 }
             }
+        }
+    }
+
+    /**
+     * Implementation of a catch clause simply rethrowing the caught exception.
+     */
+    private static class RethrowCatch implements Catch {
+
+        @Override
+        public void exception(final RoutineException ex) {
+
+            throw ex;
         }
     }
 

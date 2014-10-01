@@ -38,7 +38,7 @@ import java.lang.annotation.Target;
  *
  *             public static final String GET_METHOD = "get";
  *
- *             &#64;AsynMethod(name = GET_METHOD)
+ *             &#64;Async(name = GET_METHOD)
  *             public int getOne() {
  *
  *                 return 1;

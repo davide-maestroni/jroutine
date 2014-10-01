@@ -27,13 +27,11 @@ import java.util.NoSuchElementException;
  */
 class SimpleQueue<E> {
 
-    private static final int INITIAL_CAPACITY = 8;
-
-    private Object[] mQueue = new Object[INITIAL_CAPACITY];
-
     private int mFirst;
 
     private int mLast;
+
+    private Object[] mQueue = new Object[8];
 
     private static <T> void resizeArray(final T[] src, final T[] dst, final int first) {
 

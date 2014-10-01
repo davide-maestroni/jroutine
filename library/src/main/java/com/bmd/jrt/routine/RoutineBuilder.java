@@ -66,19 +66,15 @@ import static com.bmd.jrt.time.TimeDuration.seconds;
  */
 public class RoutineBuilder<INPUT, OUTPUT> {
 
-    private static final TimeDuration DEFAULT_AVAIL_TIMEOUT = seconds(5);
-
-    private TimeDuration mAvailTimeout = DEFAULT_AVAIL_TIMEOUT;
-
-    private static final int DEFAULT_RETAIN_COUNT = 10;
-
-    private int mMaxRetained = DEFAULT_RETAIN_COUNT;
-
     private final ClassToken<? extends Execution<INPUT, OUTPUT>> mClassToken;
 
     private Object[] mArgs = NO_ARGS;
 
     private Runner mAsyncRunner = Runners.shared();
+
+    private TimeDuration mAvailTimeout = seconds(5);
+
+    private int mMaxRetained = 10;
 
     private int mMaxRunning = Integer.MAX_VALUE;
 

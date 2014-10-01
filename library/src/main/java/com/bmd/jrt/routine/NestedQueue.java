@@ -16,7 +16,7 @@ package com.bmd.jrt.routine;
 import java.util.Collection;
 
 /**
- * Interface defining a queue with the possibility to add nested queue with additional elements.
+ * Interface defining a queue with the possibility to add nested queues with additional elements.
  * <p/>
  * This interface is used to abstract the handling of placeholders for asynchronously available
  * data in order to support forced input and output ordering.

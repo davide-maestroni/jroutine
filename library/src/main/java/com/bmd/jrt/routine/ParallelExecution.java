@@ -31,7 +31,7 @@ class ParallelExecution<INPUT, OUTPUT> extends ExecutionAdapter<INPUT, OUTPUT> {
     /**
      * Constructor.
      *
-     * @param routine the routine to launch in parallel mode.
+     * @param routine the routine to invoke in parallel mode.
      */
     ParallelExecution(final Routine<INPUT, OUTPUT> routine) {
 
@@ -46,6 +46,6 @@ class ParallelExecution<INPUT, OUTPUT> extends ExecutionAdapter<INPUT, OUTPUT> {
     @Override
     public void onInput(final INPUT input, final ResultChannel<OUTPUT> results) {
 
-        results.pass(mRoutine.invokeAsyn(input));
+        results.pass(mRoutine.runAsyn(input));
     }
 }

@@ -48,7 +48,7 @@ import java.util.List;
  * of shared runner instances may lead to unexpected deadlocks. In facts, to prevent deadlock or
  * starvation issues, it is encouraged the use of finite timeouts when performing blocking calls.
  * <p/>
- * The routine object provides three different ways to launch an execution:
+ * The routine object provides three different ways to invoke an execution:
  * <p/>
  * <b>Synchronous invocation</b><br/>
  * The routine starts an execution employing a synchronous runner. The result is similar to a
@@ -81,14 +81,14 @@ import java.util.List;
 public interface Routine<INPUT, OUTPUT> {
 
     /**
-     * Short for <code>invoke().readAll()</code>.
+     * Short for <code>run().readAll()</code>.
      *
      * @return the list of output data.
      */
     public List<OUTPUT> call();
 
     /**
-     * Short for <code>invoke(input).readAll()</code>.
+     * Short for <code>run(input).readAll()</code>.
      *
      * @param input the input.
      * @return the list of output data.
@@ -96,7 +96,7 @@ public interface Routine<INPUT, OUTPUT> {
     public List<OUTPUT> call(INPUT input);
 
     /**
-     * Short for <code>invoke(inputs).readAll()</code>.
+     * Short for <code>run(inputs).readAll()</code>.
      *
      * @param inputs the input data.
      * @return the list of output data.
@@ -104,7 +104,7 @@ public interface Routine<INPUT, OUTPUT> {
     public List<OUTPUT> call(INPUT... inputs);
 
     /**
-     * Short for <code>invoke(inputs).readAll()</code>.
+     * Short for <code>run(inputs).readAll()</code>.
      *
      * @param inputs the iterable returning the input data.
      * @return the list of output data.
@@ -112,7 +112,7 @@ public interface Routine<INPUT, OUTPUT> {
     public List<OUTPUT> call(Iterable<? extends INPUT> inputs);
 
     /**
-     * Short for <code>invoke(inputs).readAll()</code>.
+     * Short for <code>run(inputs).readAll()</code>.
      *
      * @param inputs the output channel returning the input data.
      * @return the list of output data.
@@ -120,14 +120,14 @@ public interface Routine<INPUT, OUTPUT> {
     public List<OUTPUT> call(OutputChannel<? extends INPUT> inputs);
 
     /**
-     * Short for <code>invokeAsyn().readAll()</code>.
+     * Short for <code>runAsyn().readAll()</code>.
      *
      * @return the list of output data.
      */
     public List<OUTPUT> callAsyn();
 
     /**
-     * Short for <code>invokeAsyn(input).readAll()</code>.
+     * Short for <code>runAsyn(input).readAll()</code>.
      *
      * @param input the input.
      * @return the list of output data.
@@ -135,7 +135,7 @@ public interface Routine<INPUT, OUTPUT> {
     public List<OUTPUT> callAsyn(INPUT input);
 
     /**
-     * Short for <code>invokeAsyn(inputs).readAll()</code>.
+     * Short for <code>runAsyn(inputs).readAll()</code>.
      *
      * @param inputs the input data.
      * @return the list of output data.
@@ -143,7 +143,7 @@ public interface Routine<INPUT, OUTPUT> {
     public List<OUTPUT> callAsyn(INPUT... inputs);
 
     /**
-     * Short for <code>invokeAsyn(inputs).readAll()</code>.
+     * Short for <code>runAsyn(inputs).readAll()</code>.
      *
      * @param inputs the iterable returning the input data.
      * @return the list of output data.
@@ -151,7 +151,7 @@ public interface Routine<INPUT, OUTPUT> {
     public List<OUTPUT> callAsyn(Iterable<? extends INPUT> inputs);
 
     /**
-     * Short for <code>invokeAsyn(inputs).readAll()</code>.
+     * Short for <code>runAsyn(inputs).readAll()</code>.
      *
      * @param inputs the output channel returning the input data.
      * @return the list of output data.
@@ -159,14 +159,14 @@ public interface Routine<INPUT, OUTPUT> {
     public List<OUTPUT> callAsyn(OutputChannel<? extends INPUT> inputs);
 
     /**
-     * Short for <code>invokeParall().readAll()</code>.
+     * Short for <code>runParall().readAll()</code>.
      *
      * @return the list of output data.
      */
     public List<OUTPUT> callParall();
 
     /**
-     * Short for <code>invokeParall(input).readAll()</code>.
+     * Short for <code>runParall(input).readAll()</code>.
      *
      * @param input the input.
      * @return the list of output data.
@@ -174,7 +174,7 @@ public interface Routine<INPUT, OUTPUT> {
     public List<OUTPUT> callParall(INPUT input);
 
     /**
-     * Short for <code>invokeParall(inputs).readAll()</code>.
+     * Short for <code>runParall(inputs).readAll()</code>.
      *
      * @param inputs the input data.
      * @return the list of output data.
@@ -182,7 +182,7 @@ public interface Routine<INPUT, OUTPUT> {
     public List<OUTPUT> callParall(INPUT... inputs);
 
     /**
-     * Short for <code>invokeParall(inputs).readAll()</code>.
+     * Short for <code>runParall(inputs).readAll()</code>.
      *
      * @param inputs the iterable returning the input data.
      * @return the list of output data.
@@ -190,7 +190,7 @@ public interface Routine<INPUT, OUTPUT> {
     public List<OUTPUT> callParall(Iterable<? extends INPUT> inputs);
 
     /**
-     * Short for <code>invokeParall(inputs).readAll()</code>.
+     * Short for <code>runParall(inputs).readAll()</code>.
      *
      * @param inputs the output channel returning the input data.
      * @return the list of output data.
@@ -198,140 +198,140 @@ public interface Routine<INPUT, OUTPUT> {
     public List<OUTPUT> callParall(OutputChannel<? extends INPUT> inputs);
 
     /**
-     * Short for <code>launch().close()</code>.
+     * Invokes the execution of this routine in synchronous mode.
+     *
+     * @return the routine parameter channel.
+     */
+    public ParameterChannel<INPUT, OUTPUT> invoke();
+
+    /**
+     * Invokes the execution of this routine in asynchronous mode.
+     *
+     * @return the routine parameter channel.
+     */
+    public ParameterChannel<INPUT, OUTPUT> invokeAsyn();
+
+    /**
+     * Invokes the execution of this routine in parallel mode.
+     *
+     * @return the routine parameter channel.
+     */
+    public ParameterChannel<INPUT, OUTPUT> invokeParall();
+
+    /**
+     * Short for <code>invoke().close()</code>.
      *
      * @return the output channel.
      */
-    public OutputChannel<OUTPUT> invoke();
+    public OutputChannel<OUTPUT> run();
 
     /**
-     * Short for <code>launch(input).close()</code>.
+     * Short for <code>invoke(input).close()</code>.
      *
      * @param input the input.
      * @return the output channel.
      */
-    public OutputChannel<OUTPUT> invoke(INPUT input);
+    public OutputChannel<OUTPUT> run(INPUT input);
 
     /**
-     * Short for <code>launch(inputs).close()</code>.
+     * Short for <code>invoke(inputs).close()</code>.
      *
      * @param inputs the input data.
      * @return the output channel.
      */
-    public OutputChannel<OUTPUT> invoke(INPUT... inputs);
+    public OutputChannel<OUTPUT> run(INPUT... inputs);
 
     /**
-     * Short for <code>launch(inputs).close()</code>.
+     * Short for <code>invoke(inputs).close()</code>.
      *
      * @param inputs the iterable returning the input data.
      * @return the output channel.
      */
-    public OutputChannel<OUTPUT> invoke(Iterable<? extends INPUT> inputs);
+    public OutputChannel<OUTPUT> run(Iterable<? extends INPUT> inputs);
 
     /**
-     * Short for <code>launch(inputs).close()</code>.
+     * Short for <code>invoke(inputs).close()</code>.
      *
      * @param inputs the output channel returning the input data.
      * @return the output channel.
      */
-    public OutputChannel<OUTPUT> invoke(OutputChannel<? extends INPUT> inputs);
+    public OutputChannel<OUTPUT> run(OutputChannel<? extends INPUT> inputs);
 
     /**
-     * Short for <code>launchAsyn().close()</code>.
+     * Short for <code>invokeAsyn().close()</code>.
      *
      * @return the output channel.
      */
-    public OutputChannel<OUTPUT> invokeAsyn();
+    public OutputChannel<OUTPUT> runAsyn();
 
     /**
-     * Short for <code>launchAsyn(input).close()</code>.
+     * Short for <code>invokeAsyn(input).close()</code>.
      *
      * @param input the input.
      * @return the output channel.
      */
-    public OutputChannel<OUTPUT> invokeAsyn(INPUT input);
+    public OutputChannel<OUTPUT> runAsyn(INPUT input);
 
     /**
-     * Short for <code>launchAsyn(inputs).close()</code>.
+     * Short for <code>invokeAsyn(inputs).close()</code>.
      *
      * @param inputs the input data.
      * @return the output channel.
      */
-    public OutputChannel<OUTPUT> invokeAsyn(INPUT... inputs);
+    public OutputChannel<OUTPUT> runAsyn(INPUT... inputs);
 
     /**
-     * Short for <code>launchAsyn(inputs).close()</code>.
+     * Short for <code>invokeAsyn(inputs).close()</code>.
      *
      * @param inputs the iterable returning the input data.
      * @return the output channel.
      */
-    public OutputChannel<OUTPUT> invokeAsyn(Iterable<? extends INPUT> inputs);
+    public OutputChannel<OUTPUT> runAsyn(Iterable<? extends INPUT> inputs);
 
     /**
-     * Short for <code>launchAsyn(inputs).close()</code>.
+     * Short for <code>invokeAsyn(inputs).close()</code>.
      *
      * @param inputs the output channel returning the input data.
      * @return the output channel.
      */
-    public OutputChannel<OUTPUT> invokeAsyn(OutputChannel<? extends INPUT> inputs);
+    public OutputChannel<OUTPUT> runAsyn(OutputChannel<? extends INPUT> inputs);
 
     /**
-     * Short for <code>launchParall(input).close()</code>.
+     * Short for <code>invokeParall(input).close()</code>.
      *
      * @return the output channel.
      */
-    public OutputChannel<OUTPUT> invokeParall();
+    public OutputChannel<OUTPUT> runParall();
 
     /**
-     * Short for <code>launchParall(input).close()</code>.
+     * Short for <code>invokeParall(input).close()</code>.
      *
      * @param input the input.
      * @return the output channel.
      */
-    public OutputChannel<OUTPUT> invokeParall(INPUT input);
+    public OutputChannel<OUTPUT> runParall(INPUT input);
 
     /**
-     * Short for <code>launchParall(inputs).close()</code>.
+     * Short for <code>invokeParall(inputs).close()</code>.
      *
      * @param inputs the iterable returning the input data.
      * @return the output channel.
      */
-    public OutputChannel<OUTPUT> invokeParall(INPUT... inputs);
+    public OutputChannel<OUTPUT> runParall(INPUT... inputs);
 
     /**
-     * Short for <code>launchParall(inputs).close()</code>.
+     * Short for <code>invokeParall(inputs).close()</code>.
      *
      * @param inputs the output channel returning the input data.
      * @return the output channel.
      */
-    public OutputChannel<OUTPUT> invokeParall(Iterable<? extends INPUT> inputs);
+    public OutputChannel<OUTPUT> runParall(Iterable<? extends INPUT> inputs);
 
     /**
-     * Short for <code>launchParall(inputs).close()</code>.
+     * Short for <code>invokeParall(inputs).close()</code>.
      *
      * @param inputs the output channel returning the input data.
      * @return the output channel.
      */
-    public OutputChannel<OUTPUT> invokeParall(OutputChannel<? extends INPUT> inputs);
-
-    /**
-     * Launches the execution of this routine in synchronous mode.
-     *
-     * @return the routine parameter channel.
-     */
-    public ParameterChannel<INPUT, OUTPUT> launch();
-
-    /**
-     * Launches the execution of this routine in asynchronous mode.
-     *
-     * @return the routine parameter channel.
-     */
-    public ParameterChannel<INPUT, OUTPUT> launchAsyn();
-
-    /**
-     * Launches the execution of this routine in parallel mode.
-     *
-     * @return the routine parameter channel.
-     */
-    public ParameterChannel<INPUT, OUTPUT> launchParall();
+    public OutputChannel<OUTPUT> runParall(OutputChannel<? extends INPUT> inputs);
 }

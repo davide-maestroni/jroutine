@@ -22,13 +22,30 @@ import java.lang.annotation.Target;
 /**
  * This annotation is used to indicate methods whose parameters are passed asynchronously.<br/>
  * The only use case in which this annotation is useful, is when an interface is used as a mirror
- * of another class methods. The interface can take some parameters as output channels whose output
- * will be passed to the mirrored method when available.<br/>
+ * of another class methods. The interface can take some input parameters as output channels whose
+ * output will be passed to the mirrored method, only when available.<br/>
  * In this case, the specified types indicate the parameter types expected by the target method.
+ * <p/>
+ * For example, a method taking two integers:
+ * <p/>
+ * <pre>
+ *     <code>
+ *         public int sum(int i1, int i2);
+ *     </code>
+ * </pre>
+ * can be mirrored by a method defined as:
+ * <p/>
+ * <pre>
+ *     <code>
+ *         &#64;AsyncParameters({int.class, int.class})
+ *                public int sum(OutputChannel&lt;Integer&gt; i1, int i2);
+ *     </code>
+ * </pre>
  * <p/>
  * Created by davide on 10/1/14.
  *
  * @see Async
+ * @see AsyncResult
  */
 @Inherited
 @Target(ElementType.METHOD)

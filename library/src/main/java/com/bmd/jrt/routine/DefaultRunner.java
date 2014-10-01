@@ -19,8 +19,7 @@ import com.bmd.jrt.runner.Runner;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Empty runner implementation used to identify the default runner in a
- * {@link Async} annotation.
+ * Empty runner implementation used to identify the default runner in a {@link Async} annotation.
  * <p/>
  * Created by davide on 9/22/14.
  */

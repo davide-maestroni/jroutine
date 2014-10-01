@@ -69,6 +69,175 @@ public class SimpleNestedQueueTest extends TestCase {
         assertThat(queue.isEmpty()).isTrue();
     }
 
+    public void testError() {
+
+        final SimpleNestedQueue<Integer> queue = new SimpleNestedQueue<Integer>();
+
+        try {
+
+            queue.removeFirst();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        for (int i = 0; i < 7; i++) {
+
+            queue.add(i);
+        }
+
+        for (int i = 0; i < 7; i++) {
+
+            assertThat(queue.isEmpty()).isFalse();
+            assertThat(queue.removeFirst()).isEqualTo(i);
+        }
+
+        try {
+
+            queue.removeFirst();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        for (int i = 0; i < 7; i++) {
+
+            queue.add(i);
+        }
+
+        queue.clear();
+
+        try {
+
+            queue.removeFirst();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        queue.addNested();
+
+        try {
+
+            queue.removeFirst();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        queue.clear().addNested().addAll(Arrays.asList(1, 2, 3, 4)).close().clear();
+
+        try {
+
+            queue.removeFirst();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            queue.addNested().addNested().close().add(1);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            queue.addNested().addNested().close().addAll(Arrays.asList(1, 2, 3, 4));
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            queue.addNested().addNested().close().addNested();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            queue.addNested().close().add(1);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            queue.addNested().close().addAll(Arrays.asList(1, 2, 3, 4));
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            queue.addNested().close().addNested();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        queue.close();
+
+        try {
+
+            queue.add(1);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            queue.addAll(Arrays.asList(1, 2, 3, 4));
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            queue.addNested();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+    }
+
     public void testMove() {
 
         final SimpleNestedQueue<Integer> queue = new SimpleNestedQueue<Integer>();

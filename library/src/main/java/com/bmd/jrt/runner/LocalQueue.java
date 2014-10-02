@@ -107,14 +107,6 @@ class LocalQueue {
 
     private void add(final Invocation invocation, TimeDuration delay, InvocationType type) {
 
-        if (mInvocations.length == 0) {
-
-            mInvocationTimeNs = new long[1];
-            mInvocations = new Invocation[1];
-            mDelays = new TimeDuration[1];
-            mTypes = new InvocationType[1];
-        }
-
         final int i = mLast;
 
         mInvocationTimeNs[i] = System.nanoTime();

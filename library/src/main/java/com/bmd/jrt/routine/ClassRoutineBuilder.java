@@ -356,8 +356,8 @@ public class ClassRoutineBuilder {
                 mutexMap.put(target, mutex);
             }
 
-            final RoutineBuilder<Object, Object> builder =
-                    new RoutineBuilder<Object, Object>(ClassToken.token(MethodExecutionBody.class));
+            final RoutineBuilder<Object, Object> builder = new RoutineBuilder<Object, Object>(
+                    ClassToken.tokenOf(MethodExecutionBody.class));
 
             if (runner != null) {
 

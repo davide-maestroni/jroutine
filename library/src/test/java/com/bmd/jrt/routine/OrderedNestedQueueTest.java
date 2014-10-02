@@ -21,24 +21,28 @@ import java.util.Arrays;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
- * Simple nested queue unit tests.
+ * Ordered nested queue unit tests.
  * <p/>
- * Created by davide on 10/1/14.
+ * Created by davide on 10/2/14.
  */
-public class SimpleNestedQueueTest extends TestCase {
+public class OrderedNestedQueueTest extends TestCase {
 
     public void testAdd() {
 
-        final SimpleNestedQueue<Integer> queue = new SimpleNestedQueue<Integer>();
+        final OrderedNestedQueue<Integer> queue = new OrderedNestedQueue<Integer>();
 
         queue.add(13);
-        queue.addNested();
+        final NestedQueue<Integer> nested0 = queue.addNested();
         queue.add(7);
-        queue.addNested().addAll(Arrays.asList(11, 5)).addNested().add(-77).addNested().add(-33);
+        final NestedQueue<Integer> nested1 = queue.addNested().addAll(Arrays.asList(11, 5));
+        final NestedQueue<Integer> nested2 = nested1.addNested().add(-77);
+        final NestedQueue<Integer> nested3 = nested2.addNested().add(-33);
         queue.add(1);
 
         assertThat(queue.isEmpty()).isFalse();
         assertThat(queue.removeFirst()).isEqualTo(13);
+        assertThat(queue.isEmpty()).isTrue();
+        nested0.close();
         assertThat(queue.isEmpty()).isFalse();
         assertThat(queue.removeFirst()).isEqualTo(7);
         assertThat(queue.isEmpty()).isFalse();
@@ -49,6 +53,12 @@ public class SimpleNestedQueueTest extends TestCase {
         assertThat(queue.removeFirst()).isEqualTo(-77);
         assertThat(queue.isEmpty()).isFalse();
         assertThat(queue.removeFirst()).isEqualTo(-33);
+        assertThat(queue.isEmpty()).isTrue();
+        nested1.close();
+        assertThat(queue.isEmpty()).isTrue();
+        nested3.close();
+        assertThat(queue.isEmpty()).isTrue();
+        nested2.close();
         assertThat(queue.isEmpty()).isFalse();
         assertThat(queue.removeFirst()).isEqualTo(1);
         assertThat(queue.isEmpty()).isTrue();
@@ -56,22 +66,29 @@ public class SimpleNestedQueueTest extends TestCase {
 
     public void testClear() {
 
-        final SimpleNestedQueue<Integer> queue = new SimpleNestedQueue<Integer>();
+        final OrderedNestedQueue<Integer> queue = new OrderedNestedQueue<Integer>();
 
         queue.add(13);
         queue.addNested();
         queue.add(7);
-        queue.addNested().addAll(Arrays.asList(11, 5)).addNested().add(-77).addNested().add(-33);
+        final NestedQueue<Integer> nested = queue.addNested()
+                                                 .addAll(Arrays.asList(11, 5))
+                                                 .addNested()
+                                                 .add(-77)
+                                                 .addNested()
+                                                 .add(-33);
         queue.add(1);
 
-        queue.clear();
+        nested.close().clear();
+        assertThat(queue.isEmpty()).isFalse();
 
+        queue.clear();
         assertThat(queue.isEmpty()).isTrue();
     }
 
     public void testError() {
 
-        final SimpleNestedQueue<Integer> queue = new SimpleNestedQueue<Integer>();
+        final OrderedNestedQueue<Integer> queue = new OrderedNestedQueue<Integer>();
 
         try {
 
@@ -240,17 +257,60 @@ public class SimpleNestedQueueTest extends TestCase {
 
     public void testMove() {
 
-        final SimpleNestedQueue<Integer> queue = new SimpleNestedQueue<Integer>();
+        final OrderedNestedQueue<Integer> queue = new OrderedNestedQueue<Integer>();
 
         queue.add(13);
-        queue.addNested();
+        final NestedQueue<Integer> nested0 = queue.addNested();
         queue.add(7);
-        queue.addNested().add(11).add(5).addNested().add(-77).addNested().add(-33);
+        final NestedQueue<Integer> nested1 = queue.addNested().addAll(Arrays.asList(11, 5));
+        final NestedQueue<Integer> nested2 = nested1.addNested().add(-77);
+        final NestedQueue<Integer> nested3 = nested2.addNested().add(-33);
         queue.add(1);
 
         final ArrayList<Integer> list = new ArrayList<Integer>();
-        queue.moveTo(list);
 
+        queue.moveTo(list);
+        assertThat(list).containsExactly(13);
+
+        list.clear();
+        nested0.close();
+        queue.moveTo(list);
+        assertThat(list).containsExactly(7, 11, 5, -77, -33);
+
+        list.clear();
+        nested3.close();
+        queue.moveTo(list);
+        assertThat(list).isEmpty();
+
+        nested1.close();
+        queue.moveTo(list);
+        assertThat(list).isEmpty();
+
+        nested2.close();
+        queue.moveTo(list);
+        assertThat(list).containsExactly(1);
+    }
+
+    public void testMove2() {
+
+        final OrderedNestedQueue<Integer> queue = new OrderedNestedQueue<Integer>();
+
+        queue.add(13);
+        final NestedQueue<Integer> nested0 = queue.addNested();
+        queue.add(7);
+        final NestedQueue<Integer> nested1 = queue.addNested().addAll(Arrays.asList(11, 5));
+        final NestedQueue<Integer> nested2 = nested1.addNested().add(-77);
+        final NestedQueue<Integer> nested3 = nested2.addNested().add(-33);
+        queue.add(1);
+
+        nested0.close();
+        nested1.close();
+        nested2.close();
+        nested3.close();
+
+        final ArrayList<Integer> list = new ArrayList<Integer>();
+
+        queue.moveTo(list);
         assertThat(list).containsExactly(13, 7, 11, 5, -77, -33, 1);
     }
 }

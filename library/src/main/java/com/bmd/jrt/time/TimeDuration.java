@@ -244,6 +244,7 @@ public class TimeDuration extends Time {
      *
      * @param target the target thread.
      * @throws InterruptedException if the current thread is interrupted.
+     * @throws NullPointerException if the time unit is null.
      */
     public void join(final Thread target) throws InterruptedException {
 
@@ -303,7 +304,8 @@ public class TimeDuration extends Time {
      *
      * @param milliTime the starting system time in milliseconds.
      * @return whether the sleep happened at all.
-     * @throws InterruptedException if the current thread is interrupted.
+     * @throws InterruptedException  if the current thread is interrupted.
+     * @throws IllegalStateException if this duration overflows the maximum sleep time.
      * @see System#currentTimeMillis()
      */
     public boolean sleepSinceMillis(final long milliTime) throws InterruptedException {
@@ -315,7 +317,7 @@ public class TimeDuration extends Time {
 
         if (toDays() > MILLI_DAYS_OVERFLOW) {
 
-            throw new IllegalStateException();
+            throw new IllegalStateException("the duration overflows maximum sleep time");
         }
 
         final long millisToSleep = milliTime - System.currentTimeMillis() + toMillis();
@@ -337,6 +339,7 @@ public class TimeDuration extends Time {
      * @param nanoTime the starting system time in nanoseconds.
      * @return whether the sleep happened at all.
      * @throws InterruptedException if the current thread is interrupted.
+     * @throws IllegalStateException if this duration overflows the maximum sleep time.
      * @see System#nanoTime()
      */
     public boolean sleepSinceNanos(final long nanoTime) throws InterruptedException {
@@ -348,7 +351,7 @@ public class TimeDuration extends Time {
 
         if (toDays() > NANO_DAYS_OVERFLOW) {
 
-            throw new IllegalStateException();
+            throw new IllegalStateException("the duration overflows maximum sleep time");
         }
 
         final long nanosToSleep = nanoTime - System.nanoTime() + toNanos();
@@ -368,6 +371,7 @@ public class TimeDuration extends Time {
      *
      * @param target the target object.
      * @throws InterruptedException if the current thread is interrupted.
+     * @throws NullPointerException if the target object is null.
      */
     public void wait(final Object target) throws InterruptedException {
 
@@ -394,6 +398,7 @@ public class TimeDuration extends Time {
      * @param milliTime the starting system time in milliseconds.
      * @return whether the wait happened at all.
      * @throws InterruptedException if the current thread is interrupted.
+     * @throws NullPointerException if the target object is null.
      * @see System#currentTimeMillis()
      */
     public boolean waitSinceMillis(final Object target, final long milliTime) throws
@@ -431,6 +436,7 @@ public class TimeDuration extends Time {
      * @param nanoTime the starting system time in nanoseconds.
      * @return whether the wait happened at all.
      * @throws InterruptedException if the current thread is interrupted.
+     * @throws NullPointerException if the target object is null.
      * @see System#nanoTime()
      */
     public boolean waitSinceNanos(final Object target, final long nanoTime) throws
@@ -468,6 +474,7 @@ public class TimeDuration extends Time {
      * @param check  the check to verify.
      * @return whether the check became true before the timeout elapsed.
      * @throws InterruptedException if the current thread is interrupted.
+     * @throws NullPointerException if the target object or the specified check are null.
      */
     public boolean waitTrue(final Object target, final Check check) throws InterruptedException {
 

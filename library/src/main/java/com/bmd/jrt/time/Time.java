@@ -279,10 +279,11 @@ public class Time {
      * Converts this time in the specified unit.
      *
      * @return the time value in the specified unit.
+     * @throws NullPointerException if the specified time unit is null.
      */
     public long to(final TimeUnit timeUnit) {
 
-        return unit.convert(time, timeUnit);
+        return timeUnit.convert(time, unit);
     }
 
     /**

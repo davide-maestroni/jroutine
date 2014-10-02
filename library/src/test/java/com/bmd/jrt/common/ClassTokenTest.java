@@ -21,7 +21,7 @@ import java.util.List;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
- * Unit tests for classification objects.
+ * Class token unit tests.
  * <p/>
  * Created by davide on 6/15/14.
  */
@@ -43,13 +43,33 @@ public class ClassTokenTest extends TestCase {
         assertThat(classToken2.isAssignableFrom(new ClassToken<List<Integer>>() {})).isTrue();
         assertThat(classToken2.isAssignableFrom(new ClassToken<ArrayList<String>>() {})).isTrue();
 
-        assertThat(ClassToken.token(List.class)).isEqualTo(new ClassToken<List>() {});
+        assertThat(ClassToken.tokenOf(List.class)).isEqualTo(new ClassToken<List>() {});
         assertThat(ClassToken.classOf(new ArrayList())).isEqualTo(new ClassToken<ArrayList>() {});
         assertThat(ClassToken.classOf(new ArrayList<String>())).isEqualTo(
                 new ClassToken<ArrayList<String>>() {});
     }
 
     public void testError() {
+
+        try {
+
+            ClassToken.tokenOf(null);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            ClassToken.classOf(null);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
 
         try {
 

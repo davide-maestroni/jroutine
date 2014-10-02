@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
- * Simple queue unit test.
+ * Simple queue unit tests.
  * <p/>
  * Created by davide on 10/1/14.
  */

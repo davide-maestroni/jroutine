@@ -43,7 +43,7 @@ public class AndroidRunners {
      * @return the runner instance.
      * @throws java.lang.IllegalArgumentException if the specified looper is null.
      */
-    public Runner looper(final Looper looper) {
+    public static Runner looper(final Looper looper) {
 
         return new LooperRunner(looper);
     }
@@ -53,7 +53,7 @@ public class AndroidRunners {
      *
      * @return the runner instance.
      */
-    public Runner main() {
+    public static Runner main() {
 
         if (sMainRunner == null) {
 
@@ -68,7 +68,7 @@ public class AndroidRunners {
      *
      * @return the runner instance.
      */
-    public Runner my() {
+    public static Runner my() {
 
         return looper(Looper.myLooper());
     }
@@ -82,7 +82,7 @@ public class AndroidRunners {
      *
      * @return the runner instance.
      */
-    public Runner task() {
+    public static Runner task() {
 
         return task(null);
     }
@@ -97,7 +97,7 @@ public class AndroidRunners {
      * @param executor the executor.
      * @return the runner instance.
      */
-    public Runner task(final Executor executor) {
+    public static Runner task(final Executor executor) {
 
         return new AsyncTaskRunner(executor);
     }
@@ -109,7 +109,7 @@ public class AndroidRunners {
      * @return the runner instance.
      * @throws java.lang.IllegalArgumentException if the specified thread is null.
      */
-    public Runner thread(final HandlerThread thread) {
+    public static Runner thread(final HandlerThread thread) {
 
         if (thread == null) {
 

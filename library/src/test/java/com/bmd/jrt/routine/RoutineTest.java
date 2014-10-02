@@ -33,7 +33,7 @@ import static com.bmd.jrt.routine.JRoutine.on;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
- * Unit test for...
+ * Routine unit tests.
  * <p/>
  * Created by davide on 9/9/14.
  */
@@ -223,7 +223,7 @@ public class RoutineTest extends TestCase {
         testException(exceptionRoutine, "test", "test1");
 
         final Routine<String, String> passThroughRoutine =
-                on(ClassToken.token(PassThroughExecution.class)).routine();
+                on(ClassToken.tokenOf(PassThroughExecution.class)).routine();
 
         testChained(passThroughRoutine, exceptionRoutine, "test", "test1");
         testChained(exceptionRoutine, passThroughRoutine, "test", "test1");
@@ -246,7 +246,7 @@ public class RoutineTest extends TestCase {
         testException(exceptionRoutine, "test2", "test2");
 
         final Routine<String, String> passThroughRoutine =
-                on(ClassToken.token(PassThroughExecution.class)).routine();
+                on(ClassToken.tokenOf(PassThroughExecution.class)).routine();
 
         testChained(passThroughRoutine, exceptionRoutine, "test2", "test2");
         testChained(exceptionRoutine, passThroughRoutine, "test2", "test2");
@@ -269,7 +269,7 @@ public class RoutineTest extends TestCase {
         testException(exceptionRoutine, "test", "test3");
 
         final Routine<String, String> passThroughRoutine =
-                on(ClassToken.token(PassThroughExecution.class)).routine();
+                on(ClassToken.tokenOf(PassThroughExecution.class)).routine();
 
         testChained(passThroughRoutine, exceptionRoutine, "test", "test3");
         testChained(exceptionRoutine, passThroughRoutine, "test", "test3");
@@ -298,7 +298,7 @@ public class RoutineTest extends TestCase {
         testException(exceptionRoutine, "test", "test4");
 
         final Routine<String, String> passThroughRoutine =
-                on(ClassToken.token(PassThroughExecution.class)).routine();
+                on(ClassToken.tokenOf(PassThroughExecution.class)).routine();
 
         testChained(passThroughRoutine, exceptionRoutine, "test", "test4");
         testChained(exceptionRoutine, passThroughRoutine, "test", "test4");
@@ -342,6 +342,10 @@ public class RoutineTest extends TestCase {
         assertThat(
                 on(new TestClass()).asAsyn(TestInterfaceAsyn.class).getOne().readFirst()).isEqualTo(
                 1);
+
+        final TestInterfaceAsyn testInterfaceAsyn =
+                on(new TestClass()).asAsyn(TestInterfaceAsyn.class);
+        assertThat(testInterfaceAsyn.getInt(testInterfaceAsyn.getOne())).isEqualTo(1);
     }
 
     public void testRoutine() {
@@ -855,8 +859,8 @@ public class RoutineTest extends TestCase {
 
         final String input = "test";
         final Routine<String, String> routine =
-                on(ClassToken.token(DelayExecution.class)).withArgs(TimeDuration.millis(0))
-                                                          .routine();
+                on(ClassToken.tokenOf(DelayExecution.class)).withArgs(TimeDuration.millis(0))
+                                                            .routine();
 
         assertThat(routine.run(input).bind(consumer).waitDone()).isTrue();
         assertThat(routine.runAsyn(input).bind(consumer).waitDone()).isTrue();
@@ -1059,6 +1063,9 @@ public class RoutineTest extends TestCase {
     }
 
     private interface TestInterfaceAsyn {
+
+        @AsyncParameters({int.class})
+        public int getInt(OutputChannel<Integer> i);
 
         @AsyncResult
         public OutputChannel<Integer> getOne();

@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
  * <p/>
  * Created by davide on 9/28/14.
  */
-public class AsyncTaskRunner implements Runner {
+class AsyncTaskRunner implements Runner {
 
     private final Executor mExecutor;
 
@@ -48,7 +48,7 @@ public class AsyncTaskRunner implements Runner {
     public AsyncTaskRunner(final Executor executor) {
 
         mExecutor = executor;
-        // the handler must run in the main thread
+        // the handler is used to ensure that a task is always started in the main thread
         mHandler = new Handler(Looper.getMainLooper());
     }
 

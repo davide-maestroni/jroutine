@@ -23,7 +23,7 @@ import java.util.ListIterator;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
- * Unit tests for inputs utility classes.
+ * Inputs utility unit tests.
  * <p/>
  * Created by davide on 6/25/14.
  */

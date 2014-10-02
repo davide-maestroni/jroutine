@@ -51,7 +51,7 @@ public abstract class ClassToken<CLASS> {
             throw new NullPointerException("the classification object must not be null");
         }
 
-        return token((Class<CLASS>) object.getClass());
+        return tokenOf((Class<CLASS>) object.getClass());
     }
 
     /**
@@ -62,7 +62,7 @@ public abstract class ClassToken<CLASS> {
      * @return the newly created token.
      * @throws NullPointerException if the raw class is null.
      */
-    public static <CLASS> ClassToken<CLASS> token(final Class<CLASS> rawClass) {
+    public static <CLASS> ClassToken<CLASS> tokenOf(final Class<CLASS> rawClass) {
 
         if (rawClass == null) {
 

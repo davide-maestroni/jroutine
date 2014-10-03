@@ -69,7 +69,12 @@ import java.util.List;
  * meaningful results only for routines which takes a single input parameter and computes the
  * relative output results.
  * <p/>
+ * TODO: interface integration
  * TODO: examples
+ * TODO: call via reflection in real life (verify security issues...)
+ * TODO: routine exception declarations
+ * TODO: @Nonnull
+ * TODO: Log system
  * <p/>
  * Created by davide on 9/7/14.
  *
@@ -219,14 +224,14 @@ public interface Routine<INPUT, OUTPUT> {
     public ParameterChannel<INPUT, OUTPUT> invokeParall();
 
     /**
-     * Short for <code>invoke().close()</code>.
+     * Short for <code>invoke().results()</code>.
      *
      * @return the output channel.
      */
     public OutputChannel<OUTPUT> run();
 
     /**
-     * Short for <code>invoke(input).close()</code>.
+     * Short for <code>invoke(input).results()</code>.
      *
      * @param input the input.
      * @return the output channel.
@@ -234,7 +239,7 @@ public interface Routine<INPUT, OUTPUT> {
     public OutputChannel<OUTPUT> run(INPUT input);
 
     /**
-     * Short for <code>invoke(inputs).close()</code>.
+     * Short for <code>invoke(inputs).results()</code>.
      *
      * @param inputs the input data.
      * @return the output channel.
@@ -242,7 +247,7 @@ public interface Routine<INPUT, OUTPUT> {
     public OutputChannel<OUTPUT> run(INPUT... inputs);
 
     /**
-     * Short for <code>invoke(inputs).close()</code>.
+     * Short for <code>invoke(inputs).results()</code>.
      *
      * @param inputs the iterable returning the input data.
      * @return the output channel.
@@ -250,7 +255,7 @@ public interface Routine<INPUT, OUTPUT> {
     public OutputChannel<OUTPUT> run(Iterable<? extends INPUT> inputs);
 
     /**
-     * Short for <code>invoke(inputs).close()</code>.
+     * Short for <code>invoke(inputs).results()</code>.
      *
      * @param inputs the output channel returning the input data.
      * @return the output channel.
@@ -258,14 +263,14 @@ public interface Routine<INPUT, OUTPUT> {
     public OutputChannel<OUTPUT> run(OutputChannel<? extends INPUT> inputs);
 
     /**
-     * Short for <code>invokeAsyn().close()</code>.
+     * Short for <code>invokeAsyn().results()</code>.
      *
      * @return the output channel.
      */
     public OutputChannel<OUTPUT> runAsyn();
 
     /**
-     * Short for <code>invokeAsyn(input).close()</code>.
+     * Short for <code>invokeAsyn(input).results()</code>.
      *
      * @param input the input.
      * @return the output channel.
@@ -273,7 +278,7 @@ public interface Routine<INPUT, OUTPUT> {
     public OutputChannel<OUTPUT> runAsyn(INPUT input);
 
     /**
-     * Short for <code>invokeAsyn(inputs).close()</code>.
+     * Short for <code>invokeAsyn(inputs).results()</code>.
      *
      * @param inputs the input data.
      * @return the output channel.
@@ -281,7 +286,7 @@ public interface Routine<INPUT, OUTPUT> {
     public OutputChannel<OUTPUT> runAsyn(INPUT... inputs);
 
     /**
-     * Short for <code>invokeAsyn(inputs).close()</code>.
+     * Short for <code>invokeAsyn(inputs).results()</code>.
      *
      * @param inputs the iterable returning the input data.
      * @return the output channel.
@@ -289,7 +294,7 @@ public interface Routine<INPUT, OUTPUT> {
     public OutputChannel<OUTPUT> runAsyn(Iterable<? extends INPUT> inputs);
 
     /**
-     * Short for <code>invokeAsyn(inputs).close()</code>.
+     * Short for <code>invokeAsyn(inputs).results()</code>.
      *
      * @param inputs the output channel returning the input data.
      * @return the output channel.
@@ -297,14 +302,14 @@ public interface Routine<INPUT, OUTPUT> {
     public OutputChannel<OUTPUT> runAsyn(OutputChannel<? extends INPUT> inputs);
 
     /**
-     * Short for <code>invokeParall(input).close()</code>.
+     * Short for <code>invokeParall(input).results()</code>.
      *
      * @return the output channel.
      */
     public OutputChannel<OUTPUT> runParall();
 
     /**
-     * Short for <code>invokeParall(input).close()</code>.
+     * Short for <code>invokeParall(input).results()</code>.
      *
      * @param input the input.
      * @return the output channel.
@@ -312,7 +317,7 @@ public interface Routine<INPUT, OUTPUT> {
     public OutputChannel<OUTPUT> runParall(INPUT input);
 
     /**
-     * Short for <code>invokeParall(inputs).close()</code>.
+     * Short for <code>invokeParall(inputs).results()</code>.
      *
      * @param inputs the iterable returning the input data.
      * @return the output channel.
@@ -320,7 +325,7 @@ public interface Routine<INPUT, OUTPUT> {
     public OutputChannel<OUTPUT> runParall(INPUT... inputs);
 
     /**
-     * Short for <code>invokeParall(inputs).close()</code>.
+     * Short for <code>invokeParall(inputs).results()</code>.
      *
      * @param inputs the output channel returning the input data.
      * @return the output channel.
@@ -328,7 +333,7 @@ public interface Routine<INPUT, OUTPUT> {
     public OutputChannel<OUTPUT> runParall(Iterable<? extends INPUT> inputs);
 
     /**
-     * Short for <code>invokeParall(inputs).close()</code>.
+     * Short for <code>invokeParall(inputs).results()</code>.
      *
      * @param inputs the output channel returning the input data.
      * @return the output channel.

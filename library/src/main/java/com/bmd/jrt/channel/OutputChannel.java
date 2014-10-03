@@ -142,5 +142,5 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      *
      * @return whether the routine execution has complete.
      */
-    public boolean waitDone();
+    public boolean waitComplete();
 }

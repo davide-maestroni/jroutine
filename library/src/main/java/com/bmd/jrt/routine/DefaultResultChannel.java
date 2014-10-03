@@ -823,7 +823,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         }
 
         @Override
-        public boolean waitDone() {
+        public boolean waitComplete() {
 
             boolean isDone = false;
 

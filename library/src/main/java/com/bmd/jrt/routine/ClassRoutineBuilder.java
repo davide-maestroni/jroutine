@@ -19,6 +19,7 @@ import com.bmd.jrt.common.RoutineException;
 import com.bmd.jrt.execution.ExecutionBody;
 import com.bmd.jrt.runner.Runner;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
@@ -338,8 +339,9 @@ public class ClassRoutineBuilder {
                 routineCache.put(target, routineMap);
             }
 
+            final Catch catchClause = mCatchClause;
             final RoutineInfo routineInfo =
-                    new RoutineInfo(method, runner, isSequential, orderedInput);
+                    new RoutineInfo(method, runner, isSequential, orderedInput, catchClause);
             routine = routineMap.get(routineInfo);
 
             if (routine != null) {
@@ -381,7 +383,7 @@ public class ClassRoutineBuilder {
                 builder.orderedInput();
             }
 
-            routine = builder.withArgs(target, method, mCatchClause, mutex).routine();
+            routine = builder.withArgs(target, method, catchClause, mutex).routine();
             routineMap.put(routineInfo, routine);
         }
 
@@ -441,7 +443,7 @@ public class ClassRoutineBuilder {
          *
          * @param ex the exception.
          */
-        public void exception(RoutineException ex);
+        public void exception(RoutineInvocationException ex);
     }
 
     /**
@@ -494,9 +496,19 @@ public class ClassRoutineBuilder {
                         results.pass(result);
                     }
 
+                } catch (final InvocationTargetException e) {
+
+                    mCatch.exception(
+                            new RoutineInvocationException(e.getCause(), mTarget, mMethod));
+
+                } catch (final RoutineException e) {
+
+                    mCatch.exception(
+                            new RoutineInvocationException(e.getCause(), mTarget, mMethod));
+
                 } catch (final Throwable t) {
 
-                    mCatch.exception(new RoutineException(t));
+                    mCatch.exception(new RoutineInvocationException(t, mTarget, mMethod));
                 }
             }
         }
@@ -508,7 +520,7 @@ public class ClassRoutineBuilder {
     private static class RethrowCatch implements Catch {
 
         @Override
-        public void exception(final RoutineException ex) {
+        public void exception(final RoutineInvocationException ex) {
 
             throw ex;
         }
@@ -518,6 +530,8 @@ public class ClassRoutineBuilder {
      * Class used as key to identify a specific routine instance.
      */
     private static class RoutineInfo {
+
+        private final Catch mCatchClause;
 
         private final Boolean mIsSequential;
 
@@ -534,20 +548,23 @@ public class ClassRoutineBuilder {
          * @param runner       the runner instance.
          * @param isSequential whether a sequential runner must be used for synchronous
          * @param orderedInput whether the input data are forced to be delivered in insertion order.
+         * @param catchClause  the catch clause.
          */
         private RoutineInfo(final Method method, final Runner runner, final Boolean isSequential,
-                final boolean orderedInput) {
+                final boolean orderedInput, final Catch catchClause) {
 
             mMethod = method;
             mRunner = runner;
             mIsSequential = isSequential;
             mOrderedInput = orderedInput;
+            mCatchClause = catchClause;
         }
 
         @Override
         public int hashCode() {
 
-            int result = mIsSequential != null ? mIsSequential.hashCode() : 0;
+            int result = mCatchClause.hashCode();
+            result = 31 * result + (mIsSequential != null ? mIsSequential.hashCode() : 0);
             result = 31 * result + mMethod.hashCode();
             result = 31 * result + (mOrderedInput ? 1 : 0);
             result = 31 * result + (mRunner != null ? mRunner.hashCode() : 0);
@@ -569,10 +586,10 @@ public class ClassRoutineBuilder {
 
             final RoutineInfo that = (RoutineInfo) o;
 
-            return mOrderedInput == that.mOrderedInput && !(mIsSequential != null
-                    ? !mIsSequential.equals(that.mIsSequential) : that.mIsSequential != null)
-                    && mMethod.equals(that.mMethod) && !(mRunner != null ? !mRunner.equals(
-                    that.mRunner) : that.mRunner != null);
+            return mOrderedInput == that.mOrderedInput && mCatchClause.equals(that.mCatchClause)
+                    && !(mIsSequential != null ? !mIsSequential.equals(that.mIsSequential)
+                    : that.mIsSequential != null) && mMethod.equals(that.mMethod) && !(
+                    mRunner != null ? !mRunner.equals(that.mRunner) : that.mRunner != null);
         }
     }
 }

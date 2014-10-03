@@ -162,7 +162,7 @@ public class RoutineTest extends TestCase {
                     @Override
                     public void onResult(final ResultChannel<Integer> results) {
 
-                        results.pass(mChannel.close());
+                        results.pass(mChannel.results());
                     }
                 };
 
@@ -515,7 +515,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.invoke().pass(after.run(input)).close().readAll();
+            before.invoke().pass(after.run(input)).results().readAll();
 
             fail();
 
@@ -526,7 +526,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : before.invoke().pass(after.run(input)).close()) {
+            for (final String s : before.invoke().pass(after.run(input)).results()) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -540,7 +540,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.invokeAsyn().pass(after.run(input)).close().readAll();
+            before.invokeAsyn().pass(after.run(input)).results().readAll();
 
             fail();
 
@@ -551,7 +551,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : before.invokeAsyn().pass(after.run(input)).close()) {
+            for (final String s : before.invokeAsyn().pass(after.run(input)).results()) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -565,7 +565,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.invokeParall().pass(after.run(input)).close().readAll();
+            before.invokeParall().pass(after.run(input)).results().readAll();
 
             fail();
 
@@ -576,7 +576,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : before.invokeParall().pass(after.run(input)).close()) {
+            for (final String s : before.invokeParall().pass(after.run(input)).results()) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -673,7 +673,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.invoke().pass(after.runAsyn(input)).close().readAll();
+            before.invoke().pass(after.runAsyn(input)).results().readAll();
 
             fail();
 
@@ -684,7 +684,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : before.invoke().pass(after.runAsyn(input)).close()) {
+            for (final String s : before.invoke().pass(after.runAsyn(input)).results()) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -698,7 +698,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.invokeAsyn().pass(after.runAsyn(input)).close().readAll();
+            before.invokeAsyn().pass(after.runAsyn(input)).results().readAll();
 
             fail();
 
@@ -709,7 +709,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : before.invokeAsyn().pass(after.runAsyn(input)).close()) {
+            for (final String s : before.invokeAsyn().pass(after.runAsyn(input)).results()) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -806,7 +806,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.invoke().pass(after.runParall(input)).close().readAll();
+            before.invoke().pass(after.runParall(input)).results().readAll();
 
             fail();
 
@@ -817,7 +817,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : before.invoke().pass(after.runParall(input)).close()) {
+            for (final String s : before.invoke().pass(after.runParall(input)).results()) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -831,7 +831,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.invokeAsyn().pass(after.runParall(input)).close().readAll();
+            before.invokeAsyn().pass(after.runParall(input)).results().readAll();
 
             fail();
 
@@ -842,7 +842,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : before.invokeAsyn().pass(after.runParall(input)).close()) {
+            for (final String s : before.invokeAsyn().pass(after.runParall(input)).results()) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -862,12 +862,17 @@ public class RoutineTest extends TestCase {
                 on(ClassToken.tokenOf(DelayExecution.class)).withArgs(TimeDuration.millis(0))
                                                             .routine();
 
-        assertThat(routine.run(input).bind(consumer).waitDone()).isTrue();
-        assertThat(routine.runAsyn(input).bind(consumer).waitDone()).isTrue();
-        assertThat(routine.runParall(input).bind(consumer).waitDone()).isTrue();
-        assertThat(routine.invoke().pass(input).close().bind(consumer).waitDone()).isTrue();
-        assertThat(routine.invokeAsyn().pass(input).close().bind(consumer).waitDone()).isTrue();
-        assertThat(routine.invokeParall().pass(input).close().bind(consumer).waitDone()).isTrue();
+        assertThat(routine.run(input).bind(consumer).waitComplete()).isTrue();
+        assertThat(routine.runAsyn(input).bind(consumer).waitComplete()).isTrue();
+        assertThat(routine.runParall(input).bind(consumer).waitComplete()).isTrue();
+        assertThat(routine.invoke().pass(input).results().bind(consumer).waitComplete()).isTrue();
+        assertThat(
+                routine.invokeAsyn().pass(input).results().bind(consumer).waitComplete()).isTrue();
+        assertThat(routine.invokeParall()
+                          .pass(input)
+                          .results()
+                          .bind(consumer)
+                          .waitComplete()).isTrue();
     }
 
     private void testException(final Routine<String, String> routine, final String input,
@@ -983,7 +988,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            routine.invoke().pass(input).close().readAll();
+            routine.invoke().pass(input).results().readAll();
 
             fail();
 
@@ -994,7 +999,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : routine.invoke().pass(input).close()) {
+            for (final String s : routine.invoke().pass(input).results()) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -1008,7 +1013,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            routine.invokeAsyn().pass(input).close().readAll();
+            routine.invokeAsyn().pass(input).results().readAll();
 
             fail();
 
@@ -1019,7 +1024,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : routine.invokeAsyn().pass(input).close()) {
+            for (final String s : routine.invokeAsyn().pass(input).results()) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -1033,7 +1038,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            routine.invokeParall().pass(input).close().readAll();
+            routine.invokeParall().pass(input).results().readAll();
 
             fail();
 
@@ -1044,7 +1049,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : routine.invokeParall().pass(input).close()) {
+            for (final String s : routine.invokeParall().pass(input).results()) {
 
                 assertThat(s).isNotEmpty();
             }

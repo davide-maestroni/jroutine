@@ -52,9 +52,4 @@ public class ExceptionTest extends TestCase {
 
         }
     }
-
-    public void testRoutineNotAvailableException() {
-
-        assertThat(new RoutineNotAvailableException()).hasNoCause();
-    }
 }

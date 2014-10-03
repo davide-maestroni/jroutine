@@ -51,7 +51,7 @@ import static com.bmd.jrt.time.TimeDuration.seconds;
  * available or the timeout set through the builder elapses.<br/>
  * By default the timeout is set to a few seconds to avoid unexpected deadlocks.<br/>
  * In case the timeout elapses before an execution instance becomes available, a
- * {@link com.bmd.jrt.common.RoutineNotAvailableException} will be thrown.
+ * {@link RoutineNotAvailableException} will be thrown.
  * <p/>
  * Finally, by default the order of input and output data is not guaranteed unless delay is set to
  * 0 and the sources are synchronous, that is, no output channel is passed. Nevertheless, it is

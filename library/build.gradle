@@ -30,7 +30,7 @@ dependencies {
 javadoc {
     title = "${archivesBaseName} ${version}"
     options.links("http://docs.oracle.com/javase/7/docs/api/")
-    options.overview("${project.name}/docs/overview.html")
+    options.overview("${project.projectDir}/docs/overview.html")
     options.windowTitle("Javadoc - ${archivesBaseName}")
 }
 

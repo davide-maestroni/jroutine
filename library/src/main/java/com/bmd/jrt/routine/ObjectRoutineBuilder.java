@@ -280,7 +280,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                     }
                 }
 
-                outputChannel = parameterChannel.close();
+                outputChannel = parameterChannel.results();
 
             } else {
 

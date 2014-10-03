@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.bmd.android.wtf">
+    package="com.bmd.android.jrt">
 
     <application
         android:allowBackup="true"

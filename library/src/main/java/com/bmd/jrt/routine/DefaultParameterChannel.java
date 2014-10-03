@@ -285,7 +285,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
     }
 
     @Override
-    public OutputChannel<OUTPUT> close() {
+    public OutputChannel<OUTPUT> results() {
 
         synchronized (mMutex) {
 

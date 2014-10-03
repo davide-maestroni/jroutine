@@ -11,13 +11,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.common;
+package com.bmd.jrt.routine;
+
+import com.bmd.jrt.common.RoutineException;
 
 /**
  * Exception indicating that no execution instance became available before the timeout elapsed.
  * <p/>
  * Created by davide on 9/20/14.
  */
-public class RoutineNotAvailableException extends RuntimeException {
+public class RoutineNotAvailableException extends RoutineException {
 
+    /**
+     * Constructor.
+     */
+    public RoutineNotAvailableException() {
+
+        super(null);
+    }
 }

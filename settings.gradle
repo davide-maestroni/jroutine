@@ -1,1 +1,1 @@
-include 'sample', 'droutine', 'library'
+include 'library', 'androutine', 'sample'

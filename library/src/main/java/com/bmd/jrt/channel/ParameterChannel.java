@@ -54,5 +54,5 @@ public interface ParameterChannel<INPUT, OUTPUT> extends InputChannel<INPUT> {
      * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
      *                                             exception.
      */
-    public OutputChannel<OUTPUT> close();
+    public OutputChannel<OUTPUT> results();
 }

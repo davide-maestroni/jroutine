@@ -16,7 +16,6 @@ package com.bmd.jrt.routine;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ParameterChannel;
 import com.bmd.jrt.common.RoutineInterruptedException;
-import com.bmd.jrt.common.RoutineNotAvailableException;
 import com.bmd.jrt.execution.Execution;
 import com.bmd.jrt.runner.Runner;
 import com.bmd.jrt.time.TimeDuration;
@@ -237,91 +236,91 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
     @Override
     public OutputChannel<OUTPUT> run() {
 
-        return invoke().close();
+        return invoke().results();
     }
 
     @Override
     public OutputChannel<OUTPUT> run(final INPUT input) {
 
-        return invoke().pass(input).close();
+        return invoke().pass(input).results();
     }
 
     @Override
     public OutputChannel<OUTPUT> run(final INPUT... inputs) {
 
-        return invoke().pass(inputs).close();
+        return invoke().pass(inputs).results();
     }
 
     @Override
     public OutputChannel<OUTPUT> run(final Iterable<? extends INPUT> inputs) {
 
-        return invoke().pass(inputs).close();
+        return invoke().pass(inputs).results();
     }
 
     @Override
     public OutputChannel<OUTPUT> run(final OutputChannel<? extends INPUT> inputs) {
 
-        return invoke().pass(inputs).close();
+        return invoke().pass(inputs).results();
     }
 
     @Override
     public OutputChannel<OUTPUT> runAsyn() {
 
-        return invokeAsyn().close();
+        return invokeAsyn().results();
     }
 
     @Override
     public OutputChannel<OUTPUT> runAsyn(final INPUT input) {
 
-        return invokeAsyn().pass(input).close();
+        return invokeAsyn().pass(input).results();
     }
 
     @Override
     public OutputChannel<OUTPUT> runAsyn(final INPUT... inputs) {
 
-        return invokeAsyn().pass(inputs).close();
+        return invokeAsyn().pass(inputs).results();
     }
 
     @Override
     public OutputChannel<OUTPUT> runAsyn(final Iterable<? extends INPUT> inputs) {
 
-        return invokeAsyn().pass(inputs).close();
+        return invokeAsyn().pass(inputs).results();
     }
 
     @Override
     public OutputChannel<OUTPUT> runAsyn(final OutputChannel<? extends INPUT> inputs) {
 
-        return invokeAsyn().pass(inputs).close();
+        return invokeAsyn().pass(inputs).results();
     }
 
     @Override
     public OutputChannel<OUTPUT> runParall() {
 
-        return invokeParall().close();
+        return invokeParall().results();
     }
 
     @Override
     public OutputChannel<OUTPUT> runParall(final INPUT input) {
 
-        return invokeParall().pass(input).close();
+        return invokeParall().pass(input).results();
     }
 
     @Override
     public OutputChannel<OUTPUT> runParall(final INPUT... inputs) {
 
-        return invokeParall().pass(inputs).close();
+        return invokeParall().pass(inputs).results();
     }
 
     @Override
     public OutputChannel<OUTPUT> runParall(final Iterable<? extends INPUT> inputs) {
 
-        return invokeParall().pass(inputs).close();
+        return invokeParall().pass(inputs).results();
     }
 
     @Override
     public OutputChannel<OUTPUT> runParall(final OutputChannel<? extends INPUT> inputs) {
 
-        return invokeParall().pass(inputs).close();
+        return invokeParall().pass(inputs).results();
     }
 
     /**

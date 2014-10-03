@@ -17,6 +17,9 @@ import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.common.RoutineException;
 import com.bmd.jrt.execution.ExecutionBody;
+import com.bmd.jrt.log.Log;
+import com.bmd.jrt.log.Log.LogLevel;
+import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.runner.Runner;
 
 import java.lang.reflect.InvocationTargetException;
@@ -58,6 +61,10 @@ public class ClassRoutineBuilder {
     private Catch mCatchClause = new RethrowCatch();
 
     private Boolean mIsSequential;
+
+    private Log mLog = Logger.getLog();
+
+    private LogLevel mLogLevel = Logger.getLogLevel();
 
     private Runner mRunner;
 
@@ -227,6 +234,25 @@ public class ClassRoutineBuilder {
     }
 
     /**
+     * Sets the log instance.
+     *
+     * @param log the log instance.
+     * @return this builder.
+     * @throws NullPointerException if the log is null.
+     */
+    public ClassRoutineBuilder loggedBy(final Log log) {
+
+        if (log == null) {
+
+            throw new NullPointerException("the log instance must not be null");
+        }
+
+        mLog = log;
+
+        return this;
+    }
+
+    /**
      * Returns a routine used for calling the method whose identifying name is specified in a
      * {@link Async} annotation.
      *
@@ -294,6 +320,25 @@ public class ClassRoutineBuilder {
     }
 
     /**
+     * Sets the log level.
+     *
+     * @param level the log level.
+     * @return this builder.
+     * @throws NullPointerException if the log level is null.
+     */
+    public ClassRoutineBuilder withLogLevel(final LogLevel level) {
+
+        if (level == null) {
+
+            throw new NullPointerException("the log level must not be null");
+        }
+
+        mLogLevel = level;
+
+        return this;
+    }
+
+    /**
      * Tells the builder to create a routine within the specified try/catch clause.
      *
      * @param catchClause the catch clause.
@@ -329,6 +374,8 @@ public class ClassRoutineBuilder {
 
         synchronized (sMutexMap) {
 
+            final Log log = mLog;
+            final LogLevel logLevel = mLogLevel;
             final WeakHashMap<Object, HashMap<RoutineInfo, Routine<Object, Object>>> routineCache =
                     sRoutineCache;
             HashMap<RoutineInfo, Routine<Object, Object>> routineMap = routineCache.get(target);
@@ -341,7 +388,8 @@ public class ClassRoutineBuilder {
 
             final Catch catchClause = mCatchClause;
             final RoutineInfo routineInfo =
-                    new RoutineInfo(method, runner, isSequential, orderedInput, catchClause);
+                    new RoutineInfo(method, runner, isSequential, orderedInput, catchClause, log,
+                                    logLevel);
             routine = routineMap.get(routineInfo);
 
             if (routine != null) {
@@ -383,7 +431,10 @@ public class ClassRoutineBuilder {
                 builder.orderedInput();
             }
 
-            routine = builder.withArgs(target, method, catchClause, mutex).routine();
+            routine = builder.loggedBy(log)
+                             .withLogLevel(logLevel)
+                             .withArgs(target, method, catchClause, mutex)
+                             .routine();
             routineMap.put(routineInfo, routine);
         }
 
@@ -535,6 +586,10 @@ public class ClassRoutineBuilder {
 
         private final Boolean mIsSequential;
 
+        private final Log mLog;
+
+        private final LogLevel mLogLevel;
+
         private final Method mMethod;
 
         private final boolean mOrderedInput;
@@ -549,22 +604,29 @@ public class ClassRoutineBuilder {
          * @param isSequential whether a sequential runner must be used for synchronous
          * @param orderedInput whether the input data are forced to be delivered in insertion order.
          * @param catchClause  the catch clause.
+         * @param log          the log instance.
+         * @param level        the log level.
          */
         private RoutineInfo(final Method method, final Runner runner, final Boolean isSequential,
-                final boolean orderedInput, final Catch catchClause) {
+                final boolean orderedInput, final Catch catchClause, final Log log,
+                final LogLevel level) {
 
             mMethod = method;
             mRunner = runner;
             mIsSequential = isSequential;
             mOrderedInput = orderedInput;
             mCatchClause = catchClause;
+            mLog = log;
+            mLogLevel = level;
         }
 
         @Override
         public int hashCode() {
 
-            int result = mCatchClause.hashCode();
+            int result = mCatchClause != null ? mCatchClause.hashCode() : 0;
             result = 31 * result + (mIsSequential != null ? mIsSequential.hashCode() : 0);
+            result = 31 * result + mLog.hashCode();
+            result = 31 * result + mLogLevel.hashCode();
             result = 31 * result + mMethod.hashCode();
             result = 31 * result + (mOrderedInput ? 1 : 0);
             result = 31 * result + (mRunner != null ? mRunner.hashCode() : 0);
@@ -586,9 +648,11 @@ public class ClassRoutineBuilder {
 
             final RoutineInfo that = (RoutineInfo) o;
 
-            return mOrderedInput == that.mOrderedInput && mCatchClause.equals(that.mCatchClause)
-                    && !(mIsSequential != null ? !mIsSequential.equals(that.mIsSequential)
-                    : that.mIsSequential != null) && mMethod.equals(that.mMethod) && !(
+            return mOrderedInput == that.mOrderedInput && !(mCatchClause != null
+                    ? !mCatchClause.equals(that.mCatchClause) : that.mCatchClause != null) && !(
+                    mIsSequential != null ? !mIsSequential.equals(that.mIsSequential)
+                            : that.mIsSequential != null) && mLog.equals(that.mLog)
+                    && mLogLevel == that.mLogLevel && mMethod.equals(that.mMethod) && !(
                     mRunner != null ? !mRunner.equals(that.mRunner) : that.mRunner != null);
         }
     }

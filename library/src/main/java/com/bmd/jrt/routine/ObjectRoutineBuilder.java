@@ -15,6 +15,8 @@ package com.bmd.jrt.routine;
 
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ParameterChannel;
+import com.bmd.jrt.log.Log;
+import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.runner.Runner;
 
 import java.lang.reflect.InvocationHandler;
@@ -109,6 +111,14 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     }
 
     @Override
+    public ObjectRoutineBuilder loggedBy(final Log log) {
+
+        super.loggedBy(log);
+
+        return this;
+    }
+
+    @Override
     public ObjectRoutineBuilder queued() {
 
         super.queued();
@@ -128,6 +138,14 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     public ObjectRoutineBuilder sequential() {
 
         super.sequential();
+
+        return this;
+    }
+
+    @Override
+    public ObjectRoutineBuilder withLogLevel(final LogLevel level) {
+
+        super.withLogLevel(level);
 
         return this;
     }

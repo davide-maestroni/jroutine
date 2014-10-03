@@ -17,6 +17,7 @@ import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.OutputConsumer;
 import com.bmd.jrt.channel.ParameterChannel;
 import com.bmd.jrt.execution.Execution;
+import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.routine.DefaultInvocation.InputIterator;
 import com.bmd.jrt.routine.DefaultResultChannel.AbortHandler;
 import com.bmd.jrt.runner.Invocation;
@@ -44,6 +45,8 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
     private final DefaultInvocation<INPUT, OUTPUT> mInvocation;
 
+    private final Logger mLogger;
+
     private final Object mMutex = new Object();
 
     private final DefaultResultChannel<OUTPUT> mResultChanel;
@@ -67,11 +70,13 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
      * @param runner        the runner instance.
      * @param orderedInput  whether the input data are forced to be delivered in insertion order.
      * @param orderedOutput whether the output data are forced to be delivered in insertion order.
+     * @param logger        the logger.
      * @throws NullPointerException if one of the parameters is null.
      */
     DefaultParameterChannel(final ExecutionProvider<INPUT, OUTPUT> provider, final Runner runner,
-            final boolean orderedInput, final boolean orderedOutput) {
+            final boolean orderedInput, final boolean orderedOutput, final Logger logger) {
 
+        mLogger = logger;
         mRunner = runner;
         mInputQueue =
                 (orderedInput) ? new OrderedNestedQueue<INPUT>() : new SimpleNestedQueue<INPUT>();
@@ -84,8 +89,14 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
                     if (mState == ChannelState.EXCEPTION) {
 
+                        mLogger.wrn(
+                                "%s - avoiding aborting result channel since invocation is aborted",
+                                DefaultParameterChannel.this);
+
                         return;
                     }
+
+                    mLogger.dbg("%s - aborting result channel", DefaultParameterChannel.this);
 
                     mInputQueue.clear();
 
@@ -95,9 +106,9 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
                 mRunner.runAbort(mInvocation);
             }
-        }, runner, orderedOutput);
+        }, runner, orderedOutput, logger);
         mInvocation = new DefaultInvocation<INPUT, OUTPUT>(provider, new DefaultInputIterator(),
-                                                           mResultChanel);
+                                                           mResultChanel, logger);
     }
 
     @Override
@@ -113,8 +124,12 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
             if (!isOpen()) {
 
+                mLogger.dbg("%s - avoiding aborting since channel is closed: %s", this, throwable);
+
                 return false;
             }
+
+            mLogger.dbg("%s - aborting channel: %s", this, throwable);
 
             mInputQueue.clear();
 
@@ -145,7 +160,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
             if (delay == null) {
 
-                throw new IllegalArgumentException();
+                throw new IllegalArgumentException("the input delay must not be null");
             }
 
             mInputDelay = delay;
@@ -171,8 +186,12 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
             if (channel == null) {
 
+                mLogger.wrn("%s - passing null channel", this);
+
                 return this;
             }
+
+            mLogger.dbg("%s - passing channel [%d]: %s", this, mPendingInputCount + 1, channel);
 
             mBoundChannels.add(channel);
 
@@ -198,11 +217,16 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
             if (inputs == null) {
 
+                mLogger.wrn("%s - passing null iterable", this);
+
                 return this;
             }
 
             inputQueue = mInputQueue;
             delay = mInputDelay;
+
+            mLogger.dbg("%s - passing iterable [%d][%s]: %s", this, mPendingInputCount + 1, delay,
+                        inputs);
 
             if (delay.isZero()) {
 
@@ -244,6 +268,9 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
             inputQueue = mInputQueue;
             delay = mInputDelay;
 
+            mLogger.dbg("%s - passing input [%d][%s]: %s", this, mPendingInputCount + 1, delay,
+                        input);
+
             if (delay.isZero()) {
 
                 inputQueue.add(input);
@@ -277,6 +304,8 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
             if (inputs == null) {
 
+                mLogger.wrn("%s - passing null input array", this);
+
                 return this;
             }
         }
@@ -290,6 +319,8 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
         synchronized (mMutex) {
 
             verifyInput();
+
+            mLogger.dbg("%s - closing input channel", this);
 
             mState = ChannelState.OUTPUT;
 
@@ -307,12 +338,16 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
         if (throwable != null) {
 
+            mLogger.dbg("%s - abort exception: %s", this, throwable);
+
             throw RoutineExceptionWrapper.wrap(throwable).raise();
         }
 
         if (!isOpen()) {
 
-            throw new IllegalStateException();
+            mLogger.err("%s - invalid call on closed channel", this);
+
+            throw new IllegalStateException("the input channel is closed");
         }
     }
 
@@ -400,6 +435,9 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
                 exception = mAbortException;
 
+                mLogger.dbg("%s - aborting bound channels [%d]: %s", DefaultParameterChannel.this,
+                            mBoundChannels.size(), exception);
+
                 channels = new ArrayList<OutputChannel<?>>(mBoundChannels);
                 mBoundChannels.clear();
             }
@@ -417,8 +455,14 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
                 if ((mState != ChannelState.INPUT) && (mState != ChannelState.OUTPUT)) {
 
+                    mLogger.wrn("%s - avoiding consuming input since invocation is aborted [%d]",
+                                DefaultParameterChannel.this, mPendingInputCount);
+
                     return false;
                 }
+
+                mLogger.dbg("%s - consuming input [%d]", DefaultParameterChannel.this,
+                            mPendingInputCount);
 
                 --mPendingInputCount;
             }
@@ -440,12 +484,18 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
             synchronized (mMutex) {
 
-                return mInputQueue.removeFirst();
+                final INPUT input = mInputQueue.removeFirst();
+
+                mLogger.dbg("%s - reading input: %s", DefaultParameterChannel.this, input);
+
+                return input;
             }
         }
 
         @Override
         public void remove() {
+
+            mLogger.err("%s - invalid input remove", DefaultParameterChannel.this);
 
             throw new UnsupportedOperationException();
         }
@@ -479,8 +529,13 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
                 if (!isOpen() && (mState != ChannelState.OUTPUT)) {
 
+                    mLogger.wrn("%s - avoiding aborting consumer since channel is closed",
+                                DefaultParameterChannel.this);
+
                     return;
                 }
+
+                mLogger.dbg("%s - aborting consumer", DefaultParameterChannel.this);
 
                 mInputQueue.clear();
 
@@ -495,6 +550,8 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
         public void onClose() {
 
             synchronized (mMutex) {
+
+                mLogger.dbg("%s - closing consumer", DefaultParameterChannel.this);
 
                 mQueue.close();
             }
@@ -514,15 +571,24 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
                 if (throwable != null) {
 
+                    mLogger.dbg("%s - consumer abort exception: %s", DefaultParameterChannel.this,
+                                throwable);
+
                     throw RoutineExceptionWrapper.wrap(throwable).raise();
                 }
 
                 if (!isOpen() && (mState != ChannelState.OUTPUT)) {
 
-                    throw new IllegalStateException();
+                    mLogger.dbg("%s - consumer invalid call on closed channel",
+                                DefaultParameterChannel.this);
+
+                    throw new IllegalStateException("the input channel is closed");
                 }
 
                 inputQueue = mQueue;
+
+                mLogger.dbg("%s - consumer input [%s]: %s", DefaultParameterChannel.this, delay,
+                            output);
 
                 if (delay.isZero()) {
 
@@ -571,6 +637,9 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
         @Override
         public void abort() {
 
+            mLogger.err("%s - invalid abort of delayed input invocation: %s",
+                        DefaultParameterChannel.this, mInput);
+
             throw new UnsupportedOperationException();
         }
 
@@ -581,8 +650,15 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
                 if ((mState != ChannelState.INPUT) && (mState != ChannelState.OUTPUT)) {
 
+                    mLogger.dbg(
+                            "%s - avoiding delayed input invocation since channel is closed: %s",
+                            DefaultParameterChannel.this, mInput);
+
                     return;
                 }
+
+                mLogger.dbg("%s - delayed input invocation: %s", DefaultParameterChannel.this,
+                            mInput);
 
                 mQueue.add(mInput).close();
             }
@@ -623,6 +699,9 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
         @Override
         public void abort() {
 
+            mLogger.err("%s - invalid abort of delayed input invocation: %s",
+                        DefaultParameterChannel.this, mInputs);
+
             throw new UnsupportedOperationException();
         }
 
@@ -633,8 +712,15 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
                 if ((mState != ChannelState.INPUT) && (mState != ChannelState.OUTPUT)) {
 
+                    mLogger.dbg(
+                            "%s - avoiding delayed input invocation since channel is closed: %s",
+                            DefaultParameterChannel.this, mInputs);
+
                     return;
                 }
+
+                mLogger.dbg("%s - delayed input invocation: %s", DefaultParameterChannel.this,
+                            mInputs);
 
                 mQueue.addAll(mInputs).close();
             }

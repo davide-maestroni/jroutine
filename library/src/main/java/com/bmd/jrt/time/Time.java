@@ -205,6 +205,12 @@ public class Time {
         return (time == that.time);
     }
 
+    @Override
+    public String toString() {
+
+        return time + " " + unit.toString();
+    }
+
     /**
      * Converts this time in hours.
      *

@@ -15,6 +15,7 @@ apply plugin: 'java'
 apply plugin: 'jacoco'
 apply plugin: 'maven'
 apply plugin: 'signing'
+apply plugin: "findbugs"
 
 group = 'com.github.davide-maestroni'
 version = '1.0.0'
@@ -22,6 +23,7 @@ archivesBaseName = project.parent.name
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'findbugs:annotations:1.0.0'
 
     testCompile 'junit:junit:4.11'
     testCompile 'org.easytesting:fest-assert-core:2.0M10'
@@ -38,6 +40,19 @@ task("jacocoTest", dependsOn: 'test') {
     description = "Runs the tests and generates the JaCoCo report files."
 } << {
     tasks.jacocoTestReport.execute()
+}
+
+findbugs {
+    toolVersion = "2.0.1"
+    effort = "max"
+    reportLevel = "high"
+}
+
+tasks.withType(FindBugs) {
+    reports {
+        xml.enabled = false
+        html.enabled = true
+    }
 }
 
 artifacts {

@@ -14,6 +14,7 @@
 package com.bmd.jrt.routine;
 
 import com.bmd.jrt.execution.Execution;
+import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.routine.DefaultParameterChannel.ExecutionProvider;
 import com.bmd.jrt.runner.Invocation;
 
@@ -33,6 +34,8 @@ class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
 
     private final InputIterator<INPUT> mInputIterator;
 
+    private final Logger mLogger;
+
     private final Object mMutex = new Object();
 
     private final DefaultResultChannel<OUTPUT> mResultChannel;
@@ -45,10 +48,12 @@ class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
      * @param provider the execution provider.
      * @param inputs   the input iterator.
      * @param results  the result channel.
+     * @param logger   the logger instance.
      * @throws NullPointerException if one of the parameters is null.
      */
-    DefaultInvocation(final DefaultParameterChannel.ExecutionProvider<INPUT, OUTPUT> provider,
-            final InputIterator<INPUT> inputs, final DefaultResultChannel<OUTPUT> results) {
+    DefaultInvocation(final ExecutionProvider<INPUT, OUTPUT> provider,
+            final InputIterator<INPUT> inputs, final DefaultResultChannel<OUTPUT> results,
+            final Logger logger) {
 
         if (provider == null) {
 
@@ -65,9 +70,15 @@ class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
             throw new NullPointerException("the result channel must not be null");
         }
 
+        if (logger == null) {
+
+            throw new NullPointerException("the logger instance must not be null");
+        }
+
         mExecutionProvider = provider;
         mInputIterator = inputs;
         mResultChannel = results;
+        mLogger = logger;
     }
 
     @Override
@@ -82,10 +93,14 @@ class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
 
             if (!inputIterator.isAborting()) {
 
+                mLogger.wrn("%s - avoiding aborting since input is already aborted", this);
+
                 return;
             }
 
             final Throwable exception = inputIterator.getAbortException();
+
+            mLogger.dbg("%s - aborting invocation: %s", this, exception);
 
             try {
 
@@ -126,8 +141,12 @@ class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
 
                 if (!inputIterator.onConsumeInput()) {
 
+                    mLogger.wrn("%s - avoiding running invocation", this);
+
                     return;
                 }
+
+                mLogger.dbg("%s - running invocation", this);
 
                 final Execution<INPUT, OUTPUT> execution = initExecution();
 
@@ -164,6 +183,9 @@ class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
         } else {
 
             execution = (mExecution = mExecutionProvider.create());
+
+            mLogger.dbg("%s - initializing execution: %s", this, execution);
+
             execution.onInit();
         }
 

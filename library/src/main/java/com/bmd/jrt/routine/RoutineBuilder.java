@@ -15,6 +15,9 @@ package com.bmd.jrt.routine;
 
 import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.execution.Execution;
+import com.bmd.jrt.log.Log;
+import com.bmd.jrt.log.Log.LogLevel;
+import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.runner.Runner;
 import com.bmd.jrt.runner.Runners;
 import com.bmd.jrt.time.TimeDuration;
@@ -74,6 +77,10 @@ public class RoutineBuilder<INPUT, OUTPUT> {
 
     private TimeDuration mAvailTimeout = seconds(5);
 
+    private Log mLog = Logger.getLog();
+
+    private LogLevel mLogLevel = Logger.getLogLevel();
+
     private int mMaxRetained = 10;
 
     private int mMaxRunning = Integer.MAX_VALUE;
@@ -129,6 +136,25 @@ public class RoutineBuilder<INPUT, OUTPUT> {
         }
 
         mAvailTimeout = timeout;
+
+        return this;
+    }
+
+    /**
+     * Sets the log instance.
+     *
+     * @param log the log instance.
+     * @return this builder.
+     * @throws NullPointerException if the log is null.
+     */
+    public RoutineBuilder<INPUT, OUTPUT> loggedBy(final Log log) {
+
+        if (log == null) {
+
+            throw new NullPointerException("the log instance must not be null");
+        }
+
+        mLog = log;
 
         return this;
     }
@@ -224,7 +250,8 @@ public class RoutineBuilder<INPUT, OUTPUT> {
 
         return new DefaultRoutine<INPUT, OUTPUT>(mSyncRunner, mAsyncRunner, mMaxRunning,
                                                  mMaxRetained, mAvailTimeout, mOrderedInput,
-                                                 mOrderedOutput, mClassToken.getRawClass(), mArgs);
+                                                 mOrderedOutput, new Logger(mLog, mLogLevel),
+                                                 mClassToken.getRawClass(), mArgs);
     }
 
     /**
@@ -275,6 +302,25 @@ public class RoutineBuilder<INPUT, OUTPUT> {
         }
 
         mArgs = args;
+
+        return this;
+    }
+
+    /**
+     * Sets the log level.
+     *
+     * @param level the log level.
+     * @return this builder.
+     * @throws NullPointerException if the log level is null.
+     */
+    public RoutineBuilder<INPUT, OUTPUT> withLogLevel(final LogLevel level) {
+
+        if (level == null) {
+
+            throw new NullPointerException("the log level must not be null");
+        }
+
+        mLogLevel = level;
 
         return this;
     }

@@ -72,9 +72,7 @@ import java.util.List;
  * TODO: interface integration
  * TODO: examples
  * TODO: call via reflection in real life (verify security issues...)
- * TODO: routine exception declarations
  * TODO: @Nonnull
- * TODO: Log system
  * <p/>
  * Created by davide on 9/7/14.
  *

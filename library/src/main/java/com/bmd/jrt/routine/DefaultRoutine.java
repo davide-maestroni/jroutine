@@ -14,6 +14,7 @@
 package com.bmd.jrt.routine;
 
 import com.bmd.jrt.execution.Execution;
+import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.runner.Runner;
 import com.bmd.jrt.time.TimeDuration;
 
@@ -36,6 +37,8 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
 
     private final Constructor<? extends Execution<INPUT, OUTPUT>> mConstructor;
 
+    private final Logger mLogger;
+
     /**
      * Constructor.
      *
@@ -48,22 +51,23 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
      *                       available.
      * @param orderedInput   whether the input data are forced to be delivered in insertion order.
      * @param orderedOutput  whether the output data are forced to be delivered in insertion order.
+     * @param logger         the logger instance.
      * @param executionClass the execution class.
-     * @param executionArgs  the execution constructor arguments.
-     * @throws NullPointerException     if at least one of the parameter is null
+     * @param executionArgs  the execution constructor arguments.   @throws NullPointerException     if at least one of the parameter is null
      * @throws IllegalArgumentException if at least one of the parameter is invalid, of no
      *                                  constructor matching the specified arguments is found for
      *                                  the target execution class.
      */
     DefaultRoutine(final Runner syncRunner, final Runner asyncRunner, final int maxRunning,
             final int maxRetained, final TimeDuration availTimeout, final boolean orderedInput,
-            final boolean orderedOutput,
+            final boolean orderedOutput, final Logger logger,
             final Class<? extends Execution<INPUT, OUTPUT>> executionClass,
             final Object... executionArgs) {
 
         super(syncRunner, asyncRunner, maxRunning, maxRetained, availTimeout, orderedInput,
-              orderedOutput);
+              orderedOutput, logger);
 
+        mLogger = logger;
         mConstructor = findConstructor(executionClass, executionArgs);
         mArgs = (executionArgs == null) ? NO_ARGS : executionArgs.clone();
     }
@@ -73,9 +77,16 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
 
         try {
 
-            return mConstructor.newInstance(mArgs);
+            final Constructor<? extends Execution<INPUT, OUTPUT>> constructor = mConstructor;
+
+            mLogger.dbg("%s - creating a new instance of class: %s", this,
+                        constructor.getDeclaringClass());
+
+            return constructor.newInstance(mArgs);
 
         } catch (final Throwable t) {
+
+            mLogger.err(t, "%s - error creating the execution instance", this);
 
             throw RoutineExceptionWrapper.wrap(t).raise();
         }

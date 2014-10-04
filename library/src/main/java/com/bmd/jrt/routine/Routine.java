@@ -70,6 +70,7 @@ import java.util.List;
  * relative output results.
  * <p/>
  * TODO: interface integration
+ * TODO: explain synchronization
  * TODO: examples
  * TODO: call via reflection in real life (verify security issues...)
  * TODO: @Nonnull

@@ -34,6 +34,7 @@ import java.lang.annotation.Target;
  * For example, the following code:
  * <pre>
  *     <code>
+ *
  *         public class MyClass {
  *
  *             public static final String GET_METHOD = "get";
@@ -49,6 +50,7 @@ import java.lang.annotation.Target;
  * allows to asynchronously call the method independently from its original name like:
  * <pre>
  *     <code>
+ *
  *         JRoutine.on(new MyClass()).method(MyClass.GET_METHOD).callAsyn();
  *     </code>
  * </pre>
@@ -70,6 +72,7 @@ import java.lang.annotation.Target;
  * add the proper rules to your Proguard file if employing it for shrinking or obfuscation:
  * <pre>
  *     <code>
+ *
  *         -keepattributes RuntimeVisibleAnnotations
  *
  *         -keepclassmembers class ** {

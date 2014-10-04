@@ -11,18 +11,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.log;
 
 /**
- * Simple log implementation writing messages to the system output.
+ * Package containing log related classes and definitions.
  * <p/>
- * Created by davide on 10/3/14.
+ * Created by davide on 10/4/14.
  */
-public class SystemLog extends LogAdapter {
-
-    @Override
-    public void log(final String message) {
-
-        System.out.println(message);
-    }
-}
+package com.bmd.jrt.log;

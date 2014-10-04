@@ -234,13 +234,32 @@ public class ClassRoutineBuilder {
     }
 
     /**
+     * Sets the log level.
+     *
+     * @param level the log level.
+     * @return this builder.
+     * @throws NullPointerException if the log level is null.
+     */
+    public ClassRoutineBuilder logLevel(final LogLevel level) {
+
+        if (level == null) {
+
+            throw new NullPointerException("the log level must not be null");
+        }
+
+        mLogLevel = level;
+
+        return this;
+    }
+
+    /**
      * Sets the log instance.
      *
      * @param log the log instance.
      * @return this builder.
      * @throws NullPointerException if the log is null.
      */
-    public ClassRoutineBuilder loggedBy(final Log log) {
+    public ClassRoutineBuilder logWith(final Log log) {
 
         if (log == null) {
 
@@ -315,25 +334,6 @@ public class ClassRoutineBuilder {
     public ClassRoutineBuilder sequential() {
 
         mIsSequential = true;
-
-        return this;
-    }
-
-    /**
-     * Sets the log level.
-     *
-     * @param level the log level.
-     * @return this builder.
-     * @throws NullPointerException if the log level is null.
-     */
-    public ClassRoutineBuilder withLogLevel(final LogLevel level) {
-
-        if (level == null) {
-
-            throw new NullPointerException("the log level must not be null");
-        }
-
-        mLogLevel = level;
 
         return this;
     }
@@ -431,8 +431,8 @@ public class ClassRoutineBuilder {
                 builder.orderedInput();
             }
 
-            routine = builder.loggedBy(log)
-                             .withLogLevel(logLevel)
+            routine = builder.logWith(log)
+                             .logLevel(logLevel)
                              .withArgs(target, method, catchClause, mutex)
                              .routine();
             routineMap.put(routineInfo, routine);

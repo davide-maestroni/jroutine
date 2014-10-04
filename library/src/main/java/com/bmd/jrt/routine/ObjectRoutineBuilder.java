@@ -111,9 +111,17 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     }
 
     @Override
-    public ObjectRoutineBuilder loggedBy(final Log log) {
+    public ObjectRoutineBuilder logLevel(final LogLevel level) {
 
-        super.loggedBy(log);
+        super.logLevel(level);
+
+        return this;
+    }
+
+    @Override
+    public ObjectRoutineBuilder logWith(final Log log) {
+
+        super.logWith(log);
 
         return this;
     }
@@ -138,14 +146,6 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     public ObjectRoutineBuilder sequential() {
 
         super.sequential();
-
-        return this;
-    }
-
-    @Override
-    public ObjectRoutineBuilder withLogLevel(final LogLevel level) {
-
-        super.withLogLevel(level);
 
         return this;
     }

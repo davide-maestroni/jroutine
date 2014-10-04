@@ -14,15 +14,14 @@
 package com.bmd.jrt.log;
 
 /**
- * Simple log implementation writing messages to the system output.
+ * Log implementation simply discarding all messages.
  * <p/>
- * Created by davide on 10/3/14.
+ * Created by davide on 10/4/14.
  */
-public class SystemLog extends LogAdapter {
+public class NullLog extends LogAdapter {
 
     @Override
-    public void log(final String message) {
+    protected void log(final LogLevel level, final String message) {
 
-        System.out.println(message);
     }
 }

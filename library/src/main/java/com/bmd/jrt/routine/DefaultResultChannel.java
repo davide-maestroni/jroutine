@@ -237,7 +237,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             outputQueue = mOutputQueue;
             delay = mResultDelay;
 
-            mLogger.dbg("%s - passing input [%d][%s]: %s", this, mPendingOutputCount + 1, delay,
+            mLogger.dbg("%s - passing output [%d][%s]: %s", this, mPendingOutputCount + 1, delay,
                         output);
 
             if (delay.isZero()) {
@@ -357,6 +357,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     @SuppressWarnings("unchecked")
     private void flushOutput() {
 
+        final Logger logger = mLogger;
+
         try {
 
             final ArrayList<Object> outputs;
@@ -369,7 +371,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 if (consumer == null) {
 
-                    mLogger.dbg("%s - avoiding flushing output since channel is not bound", this);
+                    logger.dbg("%s - avoiding flushing output since channel is not bound", this);
 
                     mMutex.notifyAll();
 
@@ -389,7 +391,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                     try {
 
-                        mLogger.dbg("%s - aborting consumer: %s - %s", this, consumer, output);
+                        logger.dbg("%s - aborting consumer: %s - %s", this, consumer, output);
 
                         consumer.onAbort(((RoutineExceptionWrapper) output).getCause());
 
@@ -399,14 +401,14 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                     } catch (final Throwable t) {
 
-                        mLogger.wrn("%s - ignoring consumer exception: %s - %s", this, consumer, t);
+                        logger.wrn("%s - ignoring consumer exception: %s - %s", this, consumer, t);
                     }
 
                     break;
 
                 } else {
 
-                    mLogger.dbg("%s - output consumer: %s - %s", this, consumer, output);
+                    logger.dbg("%s - output consumer: %s - %s", this, consumer, output);
 
                     consumer.onOutput((OUTPUT) output);
                 }
@@ -416,7 +418,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 try {
 
-                    mLogger.dbg("%s - closing consumer: %s", this, consumer);
+                    logger.dbg("%s - closing consumer: %s", this, consumer);
 
                     consumer.onClose();
 
@@ -426,7 +428,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 } catch (final Throwable t) {
 
-                    mLogger.wrn("%s - ignoring consumer exception: %s - %s", this, consumer, t);
+                    logger.wrn("%s - ignoring consumer exception: %s - %s", this, consumer, t);
                 }
             }
 
@@ -435,7 +437,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             boolean isFlush = false;
             boolean isAbort = false;
 
-            mLogger.wrn("%s - consumer exception: %s - %s", this, mOutputConsumer, t);
+            logger.wrn("%s - consumer exception: %s - %s", this, mOutputConsumer, t);
 
             synchronized (mMutex) {
 
@@ -445,8 +447,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 } else if (mState != ChannelState.EXCEPTION) {
 
-                    mLogger.wrn("%s - aborting on consumer exception: %s - %s", this,
-                                mOutputConsumer, t);
+                    logger.wrn("%s - aborting on consumer exception: %s - %s", this,
+                               mOutputConsumer, t);
 
                     isAbort = true;
 
@@ -502,6 +504,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             verifyBound();
 
+            final Logger logger = mLogger;
             final NestedQueue<Object> outputQueue = mOutputQueue;
 
             if (timeout.isZero() || !outputQueue.isEmpty()) {
@@ -513,7 +516,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 final Object result = outputQueue.removeFirst();
 
-                mLogger.dbg("%s - reading output [%s]: %s", this, timeout, result);
+                logger.dbg("%s - reading output [%s]: %s", this, timeout, result);
 
                 RoutineExceptionWrapper.raise(result);
 
@@ -545,8 +548,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             if (isTimeout) {
 
-                mLogger.wrn("%s - reading output timeout [%s]: %s", this, timeout,
-                            timeoutException);
+                logger.wrn("%s - reading output timeout [%s]: %s", this, timeout, timeoutException);
 
                 if (timeoutException != null) {
 
@@ -556,7 +558,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             final Object result = outputQueue.removeFirst();
 
-            mLogger.dbg("%s - reading output [%s]: %s", this, timeout, result);
+            logger.dbg("%s - reading output [%s]: %s", this, timeout, result);
 
             RoutineExceptionWrapper.raise(result);
 
@@ -649,6 +651,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 verifyBound();
 
+                final Logger logger = mLogger;
                 final TimeDuration timeout = mTimeout;
                 final RuntimeException timeoutException = mTimeoutException;
                 final NestedQueue<Object> outputQueue = mOutputQueue;
@@ -657,8 +660,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                     final boolean hasNext = !outputQueue.isEmpty();
 
-                    mLogger.dbg("%s - has output [%s]: %s", DefaultResultChannel.this, timeout,
-                                hasNext);
+                    logger.dbg("%s - has output [%s]: %s", DefaultResultChannel.this, timeout,
+                               hasNext);
 
                     return hasNext;
                 }
@@ -688,8 +691,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 if (isTimeout) {
 
-                    mLogger.wrn("%s - has output timeout [%s]: %s", DefaultResultChannel.this,
-                                timeout, timeoutException);
+                    logger.wrn("%s - has output timeout [%s]: %s", DefaultResultChannel.this,
+                               timeout, timeoutException);
 
                     if (timeoutException != null) {
 
@@ -699,8 +702,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 final boolean hasNext = !outputQueue.isEmpty();
 
-                mLogger.dbg("%s - has output [%s]: %s", DefaultResultChannel.this, timeout,
-                            hasNext);
+                logger.dbg("%s - has output [%s]: %s", DefaultResultChannel.this, timeout, hasNext);
 
                 return hasNext;
             }
@@ -827,9 +829,11 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 verifyBound();
 
+                final Logger logger = mLogger;
+
                 if (results == null) {
 
-                    mLogger.err("%s - invalid null output list", DefaultResultChannel.this);
+                    logger.err("%s - invalid null output list", DefaultResultChannel.this);
 
                     throw new IllegalArgumentException("the result list must not be null");
                 }
@@ -844,8 +848,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                         final Object result = outputQueue.removeFirst();
 
-                        mLogger.dbg("%s - adding output [%s]: %s", DefaultResultChannel.this,
-                                    timeout, result);
+                        logger.dbg("%s - adding output to list [%s]: %s", DefaultResultChannel.this,
+                                   timeout, result);
 
                         RoutineExceptionWrapper.raise(result);
 
@@ -875,8 +879,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 if (isTimeout) {
 
-                    mLogger.wrn("%s - adding output timeout [%s]: %s", DefaultResultChannel.this,
-                                timeout, timeoutException);
+                    logger.wrn("%s - list output timeout [%s]: %s", DefaultResultChannel.this,
+                               timeout, timeoutException);
 
                     if (timeoutException != null) {
 
@@ -889,8 +893,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                         final Object result = outputQueue.removeFirst();
 
-                        mLogger.dbg("%s - adding output [%s]: %s", DefaultResultChannel.this,
-                                    timeout, result);
+                        logger.dbg("%s - adding output to list [%s]: %s", DefaultResultChannel.this,
+                                   timeout, result);
 
                         RoutineExceptionWrapper.raise(result);
 
@@ -1097,7 +1101,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 verifyOutput();
 
-                mLogger.dbg("%s - adding output [%d][%s]: %s", DefaultResultChannel.this,
+                mLogger.dbg("%s - adding output to queue [%d][%s]: %s", DefaultResultChannel.this,
                             mPendingOutputCount + 1, delay, output);
 
                 outputQueue = mQueue;

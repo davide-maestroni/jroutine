@@ -30,6 +30,7 @@ import java.lang.annotation.Target;
  * <p/>
  * <pre>
  *     <code>
+ *
  *         public int sum(int i1, int i2);
  *     </code>
  * </pre>
@@ -37,8 +38,9 @@ import java.lang.annotation.Target;
  * <p/>
  * <pre>
  *     <code>
+ *
  *         &#64;AsyncParameters({int.class, int.class})
- *                public int sum(OutputChannel&lt;Integer&gt; i1, int i2);
+ *         public int sum(OutputChannel&lt;Integer&gt; i1, int i2);
  *     </code>
  * </pre>
  * <p/>

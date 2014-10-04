@@ -141,13 +141,32 @@ public class RoutineBuilder<INPUT, OUTPUT> {
     }
 
     /**
+     * Sets the log level.
+     *
+     * @param level the log level.
+     * @return this builder.
+     * @throws NullPointerException if the log level is null.
+     */
+    public RoutineBuilder<INPUT, OUTPUT> logLevel(final LogLevel level) {
+
+        if (level == null) {
+
+            throw new NullPointerException("the log level must not be null");
+        }
+
+        mLogLevel = level;
+
+        return this;
+    }
+
+    /**
      * Sets the log instance.
      *
      * @param log the log instance.
      * @return this builder.
      * @throws NullPointerException if the log is null.
      */
-    public RoutineBuilder<INPUT, OUTPUT> loggedBy(final Log log) {
+    public RoutineBuilder<INPUT, OUTPUT> logWith(final Log log) {
 
         if (log == null) {
 
@@ -302,25 +321,6 @@ public class RoutineBuilder<INPUT, OUTPUT> {
         }
 
         mArgs = args;
-
-        return this;
-    }
-
-    /**
-     * Sets the log level.
-     *
-     * @param level the log level.
-     * @return this builder.
-     * @throws NullPointerException if the log level is null.
-     */
-    public RoutineBuilder<INPUT, OUTPUT> withLogLevel(final LogLevel level) {
-
-        if (level == null) {
-
-            throw new NullPointerException("the log level must not be null");
-        }
-
-        mLogLevel = level;
 
         return this;
     }

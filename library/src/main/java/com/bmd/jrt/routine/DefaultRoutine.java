@@ -75,18 +75,20 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
     @Override
     protected Execution<INPUT, OUTPUT> createExecution(final boolean async) {
 
+        final Logger logger = mLogger;
+
         try {
 
             final Constructor<? extends Execution<INPUT, OUTPUT>> constructor = mConstructor;
 
-            mLogger.dbg("%s - creating a new instance of class: %s", this,
-                        constructor.getDeclaringClass());
+            logger.dbg("%s - creating a new instance of class: %s", this,
+                       constructor.getDeclaringClass());
 
             return constructor.newInstance(mArgs);
 
         } catch (final Throwable t) {
 
-            mLogger.err(t, "%s - error creating the execution instance", this);
+            logger.err(t, "%s - error creating the execution instance", this);
 
             throw RoutineExceptionWrapper.wrap(t).raise();
         }

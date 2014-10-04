@@ -23,12 +23,19 @@ import com.bmd.jrt.channel.ResultChannel;
  *     <code>
  *
  *         - onInit();
+ *
  *           ...
+ *
  *         - onInput(input, results);
+ *
  *           ...
+ *
  *         - onInput(input, results);
+ *
  *           ...
+ *
  *         - onResult(results);
+ *
  *         - onReturn();
  *     </code>
  * </pre>

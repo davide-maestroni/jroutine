@@ -350,7 +350,7 @@ public class RoutineTest extends TestCase {
 
     public void testRoutine() {
 
-        final ExecutionAdapter<Integer, Integer> invokeSquare =
+        final ExecutionAdapter<Integer, Integer> execSquare =
                 new ExecutionAdapter<Integer, Integer>() {
 
                     @Override
@@ -364,7 +364,7 @@ public class RoutineTest extends TestCase {
                 };
 
         final Routine<Integer, Integer> squareRoutine =
-                on(ClassToken.classOf(invokeSquare)).withArgs(this).routine();
+                on(ClassToken.classOf(execSquare)).withArgs(this).routine();
 
         assertThat(squareRoutine.call(1, 2, 3, 4)).containsExactly(1, 4, 9, 16);
         assertThat(squareRoutine.callAsyn(1, 2, 3, 4)).containsExactly(1, 4, 9, 16);

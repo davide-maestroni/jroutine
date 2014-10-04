@@ -20,6 +20,8 @@ import java.io.StringWriter;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
+ * Utility class used for log messages.
+ * <p/>
  * Created by davide on 10/3/14.
  */
 public class Logger {
@@ -43,6 +45,12 @@ public class Logger {
 
     private final Log mLog;
 
+    /**
+     * Constructor.
+     *
+     * @param log   the log instance.
+     * @param level the log level.
+     */
     public Logger(final Log log, final LogLevel level) {
 
         if (log == null) {
@@ -54,16 +62,32 @@ public class Logger {
         mLevel = level.ordinal();
     }
 
+    /**
+     * Gets the default log instance.
+     *
+     * @return the log instance.
+     */
     public static Log getLog() {
 
         return sLog.get();
     }
 
+    /**
+     * Gets the default log level.
+     *
+     * @return the log level.
+     */
     public static LogLevel getLogLevel() {
 
         return sLogLevel.get();
     }
 
+    /**
+     * Sets the default log level.
+     *
+     * @param level the log level.
+     * @throws NullPointerException if the specified level is null.
+     */
     public static void setLogLevel(final LogLevel level) {
 
         if (level == null) {
@@ -74,6 +98,12 @@ public class Logger {
         sLogLevel.set(level);
     }
 
+    /**
+     * Sets the default log instance.
+     *
+     * @param log the log instance.
+     * @throws NullPointerException if the specified level is null.
+     */
     public static void seLog(final Log log) {
 
         if (log == null) {
@@ -92,6 +122,11 @@ public class Logger {
         return writer.toString();
     }
 
+    /**
+     * Logs a debug message.
+     *
+     * @param message the message.
+     */
     public void dbg(final String message) {
 
         if (mLevel <= DEBUG_LEVEL) {
@@ -100,6 +135,12 @@ public class Logger {
         }
     }
 
+    /**
+     * Logs a debug message.
+     *
+     * @param format the message format.
+     * @param arg1   the first format argument.
+     */
     public void dbg(final String format, final Object arg1) {
 
         if (mLevel <= DEBUG_LEVEL) {
@@ -108,6 +149,13 @@ public class Logger {
         }
     }
 
+    /**
+     * Logs a debug message.
+     *
+     * @param format the message format.
+     * @param arg1   the first format argument.
+     * @param arg2   the second format argument.
+     */
     public void dbg(final String format, final Object arg1, final Object arg2) {
 
         if (mLevel <= DEBUG_LEVEL) {
@@ -116,6 +164,14 @@ public class Logger {
         }
     }
 
+    /**
+     * Logs a debug message.
+     *
+     * @param format the message format.
+     * @param arg1   the first format argument.
+     * @param arg2   the second format argument.
+     * @param arg3   the third format argument.
+     */
     public void dbg(final String format, final Object arg1, final Object arg2, final Object arg3) {
 
         if (mLevel <= DEBUG_LEVEL) {
@@ -124,6 +180,15 @@ public class Logger {
         }
     }
 
+    /**
+     * Logs a debug message.
+     *
+     * @param format the message format.
+     * @param arg1   the first format argument.
+     * @param arg2   the second format argument.
+     * @param arg3   the third format argument.
+     * @param arg4   the fourth format argument.
+     */
     public void dbg(final String format, final Object arg1, final Object arg2, final Object arg3,
             final Object arg4) {
 
@@ -133,6 +198,12 @@ public class Logger {
         }
     }
 
+    /**
+     * Logs a debug message.
+     *
+     * @param format the message format.
+     * @param args   the format arguments.
+     */
     public void dbg(final String format, final Object... args) {
 
         if (mLevel <= DEBUG_LEVEL) {
@@ -141,6 +212,25 @@ public class Logger {
         }
     }
 
+    /**
+     * Logs a debug exception.
+     *
+     * @param t the related throwable.
+     */
+    public void dbg(final Throwable t) {
+
+        if (mLevel <= DEBUG_LEVEL) {
+
+            mLog.dbg(write(t));
+        }
+    }
+
+    /**
+     * Logs a debug message.
+     *
+     * @param t       the related throwable.
+     * @param message the message.
+     */
     public void dbg(final Throwable t, final String message) {
 
         if (mLevel <= DEBUG_LEVEL) {
@@ -149,6 +239,13 @@ public class Logger {
         }
     }
 
+    /**
+     * Logs a debug message.
+     *
+     * @param t      the related throwable.
+     * @param format the message format.
+     * @param arg1   the first format argument.
+     */
     public void dbg(final Throwable t, final String format, final Object arg1) {
 
         if (mLevel <= DEBUG_LEVEL) {
@@ -157,6 +254,14 @@ public class Logger {
         }
     }
 
+    /**
+     * Logs a debug message.
+     *
+     * @param t      the related throwable.
+     * @param format the message format.
+     * @param arg1   the first format argument.
+     * @param arg2   the second format argument.
+     */
     public void dbg(final Throwable t, final String format, final Object arg1, final Object arg2) {
 
         if (mLevel <= DEBUG_LEVEL) {
@@ -165,6 +270,15 @@ public class Logger {
         }
     }
 
+    /**
+     * Logs a debug message.
+     *
+     * @param t      the related throwable.
+     * @param format the message format.
+     * @param arg1   the first format argument.
+     * @param arg2   the second format argument.
+     * @param arg3   the third format argument.
+     */
     public void dbg(final Throwable t, final String format, final Object arg1, final Object arg2,
             final Object arg3) {
 
@@ -174,6 +288,16 @@ public class Logger {
         }
     }
 
+    /**
+     * Logs a debug message.
+     *
+     * @param t      the related throwable.
+     * @param format the message format.
+     * @param arg1   the first format argument.
+     * @param arg2   the second format argument.
+     * @param arg3   the third format argument.
+     * @param arg4   the fourth format argument.
+     */
     public void dbg(final Throwable t, final String format, final Object arg1, final Object arg2,
             final Object arg3, final Object arg4) {
 
@@ -183,6 +307,13 @@ public class Logger {
         }
     }
 
+    /**
+     * Logs a debug message.
+     *
+     * @param t      the related throwable.
+     * @param format the message format.
+     * @param args   the format arguments.
+     */
     public void dbg(final Throwable t, final String format, final Object... args) {
 
         if (mLevel <= DEBUG_LEVEL) {
@@ -191,6 +322,11 @@ public class Logger {
         }
     }
 
+    /**
+     * Logs an error message.
+     *
+     * @param message the message.
+     */
     public void err(final String message) {
 
         if (mLevel <= ERROR_LEVEL) {
@@ -199,6 +335,12 @@ public class Logger {
         }
     }
 
+    /**
+     * Logs an error message.
+     *
+     * @param format the message format.
+     * @param arg1   the first format argument.
+     */
     public void err(final String format, final Object arg1) {
 
         if (mLevel <= ERROR_LEVEL) {
@@ -207,6 +349,13 @@ public class Logger {
         }
     }
 
+    /**
+     * Logs an error message.
+     *
+     * @param format the message format.
+     * @param arg1   the first format argument.
+     * @param arg2   the second format argument.
+     */
     public void err(final String format, final Object arg1, final Object arg2) {
 
         if (mLevel <= ERROR_LEVEL) {
@@ -215,6 +364,14 @@ public class Logger {
         }
     }
 
+    /**
+     * Logs an error message.
+     *
+     * @param format the message format.
+     * @param arg1   the first format argument.
+     * @param arg2   the second format argument.
+     * @param arg3   the third format argument.
+     */
     public void err(final String format, final Object arg1, final Object arg2, final Object arg3) {
 
         if (mLevel <= ERROR_LEVEL) {
@@ -223,6 +380,15 @@ public class Logger {
         }
     }
 
+    /**
+     * Logs an error message.
+     *
+     * @param format the message format.
+     * @param arg1   the first format argument.
+     * @param arg2   the second format argument.
+     * @param arg3   the third format argument.
+     * @param arg4   the fourth format argument.
+     */
     public void err(final String format, final Object arg1, final Object arg2, final Object arg3,
             final Object arg4) {
 
@@ -232,6 +398,12 @@ public class Logger {
         }
     }
 
+    /**
+     * Logs an error message.
+     *
+     * @param format the message format.
+     * @param args   the format arguments.
+     */
     public void err(final String format, final Object... args) {
 
         if (mLevel <= ERROR_LEVEL) {
@@ -240,6 +412,25 @@ public class Logger {
         }
     }
 
+    /**
+     * Logs an error exception.
+     *
+     * @param t the related throwable.
+     */
+    public void err(final Throwable t) {
+
+        if (mLevel <= ERROR_LEVEL) {
+
+            mLog.err(write(t));
+        }
+    }
+
+    /**
+     * Logs an error message.
+     *
+     * @param t       the related throwable.
+     * @param message the message.
+     */
     public void err(final Throwable t, final String message) {
 
         if (mLevel <= ERROR_LEVEL) {
@@ -248,6 +439,13 @@ public class Logger {
         }
     }
 
+    /**
+     * Logs an error message.
+     *
+     * @param t      the related throwable.
+     * @param format the message format.
+     * @param arg1   the first format argument.
+     */
     public void err(final Throwable t, final String format, final Object arg1) {
 
         if (mLevel <= ERROR_LEVEL) {
@@ -256,6 +454,14 @@ public class Logger {
         }
     }
 
+    /**
+     * Logs an error message.
+     *
+     * @param t      the related throwable.
+     * @param format the message format.
+     * @param arg1   the first format argument.
+     * @param arg2   the second format argument.
+     */
     public void err(final Throwable t, final String format, final Object arg1, final Object arg2) {
 
         if (mLevel <= ERROR_LEVEL) {
@@ -264,6 +470,15 @@ public class Logger {
         }
     }
 
+    /**
+     * Logs an error message.
+     *
+     * @param t      the related throwable.
+     * @param format the message format.
+     * @param arg1   the first format argument.
+     * @param arg2   the second format argument.
+     * @param arg3   the third format argument.
+     */
     public void err(final Throwable t, final String format, final Object arg1, final Object arg2,
             final Object arg3) {
 
@@ -273,6 +488,16 @@ public class Logger {
         }
     }
 
+    /**
+     * Logs an error message.
+     *
+     * @param t      the related throwable.
+     * @param format the message format.
+     * @param arg1   the first format argument.
+     * @param arg2   the second format argument.
+     * @param arg3   the third format argument.
+     * @param arg4   the fourth format argument.
+     */
     public void err(final Throwable t, final String format, final Object arg1, final Object arg2,
             final Object arg3, final Object arg4) {
 
@@ -282,6 +507,13 @@ public class Logger {
         }
     }
 
+    /**
+     * Logs an error message.
+     *
+     * @param t      the related throwable.
+     * @param format the message format.
+     * @param args   the format arguments.
+     */
     public void err(final Throwable t, final String format, final Object... args) {
 
         if (mLevel <= ERROR_LEVEL) {
@@ -290,6 +522,11 @@ public class Logger {
         }
     }
 
+    /**
+     * Logs a warning message.
+     *
+     * @param message the message.
+     */
     public void wrn(final String message) {
 
         if (mLevel <= WARNING_LEVEL) {
@@ -298,6 +535,12 @@ public class Logger {
         }
     }
 
+    /**
+     * Logs a warning message.
+     *
+     * @param format the message format.
+     * @param arg1   the first format argument.
+     */
     public void wrn(final String format, final Object arg1) {
 
         if (mLevel <= WARNING_LEVEL) {
@@ -306,6 +549,13 @@ public class Logger {
         }
     }
 
+    /**
+     * Logs a warning message.
+     *
+     * @param format the message format.
+     * @param arg1   the first format argument.
+     * @param arg2   the second format argument.
+     */
     public void wrn(final String format, final Object arg1, final Object arg2) {
 
         if (mLevel <= WARNING_LEVEL) {
@@ -314,6 +564,14 @@ public class Logger {
         }
     }
 
+    /**
+     * Logs a warning message.
+     *
+     * @param format the message format.
+     * @param arg1   the first format argument.
+     * @param arg2   the second format argument.
+     * @param arg3   the third format argument.
+     */
     public void wrn(final String format, final Object arg1, final Object arg2, final Object arg3) {
 
         if (mLevel <= WARNING_LEVEL) {
@@ -322,6 +580,15 @@ public class Logger {
         }
     }
 
+    /**
+     * Logs a warning message.
+     *
+     * @param format the message format.
+     * @param arg1   the first format argument.
+     * @param arg2   the second format argument.
+     * @param arg3   the third format argument.
+     * @param arg4   the fourth format argument.
+     */
     public void wrn(final String format, final Object arg1, final Object arg2, final Object arg3,
             final Object arg4) {
 
@@ -331,6 +598,12 @@ public class Logger {
         }
     }
 
+    /**
+     * Logs a warning message.
+     *
+     * @param format the message format.
+     * @param args   the format arguments.
+     */
     public void wrn(final String format, final Object... args) {
 
         if (mLevel <= WARNING_LEVEL) {
@@ -339,6 +612,25 @@ public class Logger {
         }
     }
 
+    /**
+     * Logs a warning exception.
+     *
+     * @param t the related throwable.
+     */
+    public void wrn(final Throwable t) {
+
+        if (mLevel <= WARNING_LEVEL) {
+
+            mLog.wrn(write(t));
+        }
+    }
+
+    /**
+     * Logs a warning message.
+     *
+     * @param t       the related throwable.
+     * @param message the message.
+     */
     public void wrn(final Throwable t, final String message) {
 
         if (mLevel <= WARNING_LEVEL) {
@@ -347,6 +639,13 @@ public class Logger {
         }
     }
 
+    /**
+     * Logs a warning message.
+     *
+     * @param t      the related throwable.
+     * @param format the message format.
+     * @param arg1   the first format argument.
+     */
     public void wrn(final Throwable t, final String format, final Object arg1) {
 
         if (mLevel <= WARNING_LEVEL) {
@@ -355,6 +654,14 @@ public class Logger {
         }
     }
 
+    /**
+     * Logs a warning message.
+     *
+     * @param t      the related throwable.
+     * @param format the message format.
+     * @param arg1   the first format argument.
+     * @param arg2   the second format argument.
+     */
     public void wrn(final Throwable t, final String format, final Object arg1, final Object arg2) {
 
         if (mLevel <= WARNING_LEVEL) {
@@ -363,6 +670,15 @@ public class Logger {
         }
     }
 
+    /**
+     * Logs a warning message.
+     *
+     * @param t      the related throwable.
+     * @param format the message format.
+     * @param arg1   the first format argument.
+     * @param arg2   the second format argument.
+     * @param arg3   the third format argument.
+     */
     public void wrn(final Throwable t, final String format, final Object arg1, final Object arg2,
             final Object arg3) {
 
@@ -372,6 +688,16 @@ public class Logger {
         }
     }
 
+    /**
+     * Logs a warning message.
+     *
+     * @param t      the related throwable.
+     * @param format the message format.
+     * @param arg1   the first format argument.
+     * @param arg2   the second format argument.
+     * @param arg3   the third format argument.
+     * @param arg4   the fourth format argument.
+     */
     public void wrn(final Throwable t, final String format, final Object arg1, final Object arg2,
             final Object arg3, final Object arg4) {
 
@@ -381,6 +707,13 @@ public class Logger {
         }
     }
 
+    /**
+     * Logs a warning message.
+     *
+     * @param t      the related throwable.
+     * @param format the message format.
+     * @param args   the format arguments.
+     */
     public void wrn(final Throwable t, final String format, final Object... args) {
 
         if (mLevel <= WARNING_LEVEL) {

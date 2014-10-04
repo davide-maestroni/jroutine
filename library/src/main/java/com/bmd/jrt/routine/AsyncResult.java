@@ -16,6 +16,7 @@ import java.lang.annotation.Target;
  * <p/>
  * <pre>
  *     <code>
+ *
  *         public int sum(int i1, int i2);
  *     </code>
  * </pre>
@@ -23,8 +24,9 @@ import java.lang.annotation.Target;
  * <p/>
  * <pre>
  *     <code>
+ *
  *         &#64;AsyncResult
- *                public OutputChannel&lt;Integer&gt; sum(int i1, int i2);
+ *         public OutputChannel&lt;Integer&gt; sum(int i1, int i2);
  *     </code>
  * </pre>
  * <p/>

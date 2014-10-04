@@ -100,7 +100,7 @@ class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
 
             final Throwable exception = inputIterator.getAbortException();
 
-            mLogger.dbg("%s - aborting invocation: %s", this, exception);
+            mLogger.dbg(exception, "%s - aborting invocation", this);
 
             try {
 

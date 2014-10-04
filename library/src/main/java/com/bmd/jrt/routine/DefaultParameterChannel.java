@@ -124,12 +124,12 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
             if (!isOpen()) {
 
-                mLogger.dbg("%s - avoiding aborting since channel is closed: %s", this, throwable);
+                mLogger.dbg(throwable, "%s - avoiding aborting since channel is closed", this);
 
                 return false;
             }
 
-            mLogger.dbg("%s - aborting channel: %s", this, throwable);
+            mLogger.dbg(throwable, "%s - aborting channel", this);
 
             mInputQueue.clear();
 
@@ -338,7 +338,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
         if (throwable != null) {
 
-            mLogger.dbg("%s - abort exception: %s", this, throwable);
+            mLogger.dbg(throwable, "%s - abort exception", this);
 
             throw RoutineExceptionWrapper.wrap(throwable).raise();
         }
@@ -435,8 +435,8 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
                 exception = mAbortException;
 
-                mLogger.dbg("%s - aborting bound channels [%d]: %s", DefaultParameterChannel.this,
-                            mBoundChannels.size(), exception);
+                mLogger.dbg(exception, "%s - aborting bound channels [%d]",
+                            DefaultParameterChannel.this, mBoundChannels.size());
 
                 channels = new ArrayList<OutputChannel<?>>(mBoundChannels);
                 mBoundChannels.clear();
@@ -571,8 +571,8 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
                 if (throwable != null) {
 
-                    mLogger.dbg("%s - consumer abort exception: %s", DefaultParameterChannel.this,
-                                throwable);
+                    mLogger.dbg(throwable, "%s - consumer abort exception",
+                                DefaultParameterChannel.this);
 
                     throw RoutineExceptionWrapper.wrap(throwable).raise();
                 }

@@ -293,7 +293,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         synchronized (mMutex) {
 
-            mLogger.dbg("%s - aborting result channel: %s", this, throwable);
+            mLogger.dbg(throwable, "%s - aborting result channel", this);
 
             channels = new ArrayList<OutputChannel<?>>(mBoundChannels);
             mBoundChannels.clear();
@@ -401,7 +401,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                     } catch (final Throwable t) {
 
-                        logger.wrn("%s - ignoring consumer exception: %s - %s", this, consumer, t);
+                        logger.wrn(t, "%s - ignoring consumer exception: %s", this, consumer);
                     }
 
                     break;
@@ -428,7 +428,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 } catch (final Throwable t) {
 
-                    logger.wrn("%s - ignoring consumer exception: %s - %s", this, consumer, t);
+                    logger.wrn(t, "%s - ignoring consumer exception: %s", this, consumer);
                 }
             }
 
@@ -437,7 +437,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             boolean isFlush = false;
             boolean isAbort = false;
 
-            logger.wrn("%s - consumer exception: %s - %s", this, mOutputConsumer, t);
+            logger.wrn(t, "%s - consumer exception: %s", this, mOutputConsumer);
 
             synchronized (mMutex) {
 
@@ -447,8 +447,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 } else if (mState != ChannelState.EXCEPTION) {
 
-                    logger.wrn("%s - aborting on consumer exception: %s - %s", this,
-                               mOutputConsumer, t);
+                    logger.wrn(t, "%s - aborting on consumer exception: %s", this, mOutputConsumer);
 
                     isAbort = true;
 
@@ -582,7 +581,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         if (throwable != null) {
 
-            mLogger.dbg("%s - abort exception: %s", this, throwable);
+            mLogger.dbg(throwable, "%s - abort exception", this);
 
             throw RoutineExceptionWrapper.wrap(throwable).raise();
         }
@@ -989,7 +988,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 if (mState != ChannelState.EXCEPTION) {
 
-                    mLogger.dbg("%s - aborting output: %s", DefaultResultChannel.this, throwable);
+                    mLogger.dbg(throwable, "%s - aborting output", DefaultResultChannel.this);
 
                     mOutputQueue.clear();
 
@@ -1047,7 +1046,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 if (mState != ChannelState.EXCEPTION) {
 
-                    mLogger.dbg("%s - aborting output: %s", DefaultResultChannel.this, throwable);
+                    mLogger.dbg(throwable, "%s - aborting output", DefaultResultChannel.this);
 
                     mOutputQueue.clear();
 
@@ -1263,14 +1262,14 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             if (isDone()) {
 
-                mLogger.dbg("%s - avoiding aborting since channel is closed: %s", this, throwable);
+                mLogger.dbg(throwable, "%s - avoiding aborting since channel is closed", this);
 
                 return false;
             }
 
             if (mState != ChannelState.EXCEPTION) {
 
-                mLogger.dbg("%s - aborting channel: %s", this, throwable);
+                mLogger.dbg(throwable, "%s - aborting channel", this);
 
                 mOutputQueue.clear();
 

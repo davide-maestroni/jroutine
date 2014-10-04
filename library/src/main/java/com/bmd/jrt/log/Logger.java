@@ -50,12 +50,18 @@ public class Logger {
      *
      * @param log   the log instance.
      * @param level the log level.
+     * @throws NullPointerException if one of the parameters is null.
      */
     public Logger(final Log log, final LogLevel level) {
 
         if (log == null) {
 
             throw new NullPointerException("the log instance must not be null");
+        }
+
+        if (level == null) {
+
+            throw new NullPointerException("the log level must not be null");
         }
 
         mLog = log;

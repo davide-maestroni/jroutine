@@ -623,7 +623,7 @@ public class ClassRoutineBuilder {
         @Override
         public int hashCode() {
 
-            int result = mCatchClause != null ? mCatchClause.hashCode() : 0;
+            int result = mCatchClause.hashCode();
             result = 31 * result + (mIsSequential != null ? mIsSequential.hashCode() : 0);
             result = 31 * result + mLog.hashCode();
             result = 31 * result + mLogLevel.hashCode();
@@ -648,10 +648,9 @@ public class ClassRoutineBuilder {
 
             final RoutineInfo that = (RoutineInfo) o;
 
-            return mOrderedInput == that.mOrderedInput && !(mCatchClause != null
-                    ? !mCatchClause.equals(that.mCatchClause) : that.mCatchClause != null) && !(
-                    mIsSequential != null ? !mIsSequential.equals(that.mIsSequential)
-                            : that.mIsSequential != null) && mLog.equals(that.mLog)
+            return mOrderedInput == that.mOrderedInput && mCatchClause.equals(that.mCatchClause)
+                    && !(mIsSequential != null ? !mIsSequential.equals(that.mIsSequential)
+                    : that.mIsSequential != null) && mLog.equals(that.mLog)
                     && mLogLevel == that.mLogLevel && mMethod.equals(that.mMethod) && !(
                     mRunner != null ? !mRunner.equals(that.mRunner) : that.mRunner != null);
         }

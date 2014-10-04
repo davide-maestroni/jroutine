@@ -32,12 +32,13 @@ class ParallelExecution<INPUT, OUTPUT> extends ExecutionAdapter<INPUT, OUTPUT> {
      * Constructor.
      *
      * @param routine the routine to invoke in parallel mode.
+     * @throws NullPointerException if the routine instance is null;
      */
     ParallelExecution(final Routine<INPUT, OUTPUT> routine) {
 
         if (routine == null) {
 
-            throw new IllegalArgumentException("the routine instance must not be null");
+            throw new NullPointerException("the routine instance must not be null");
         }
 
         mRoutine = routine;

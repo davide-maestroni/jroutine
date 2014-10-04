@@ -453,7 +453,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
 
                 } else {
 
-                    mLogger.dbg("%s - discarding execution instance [%d/%d]: %s",
+                    mLogger.wrn("%s - discarding execution instance [%d/%d]: %s",
                                 AbstractRoutine.this, mMaxRetained, mMaxRetained, execution);
                 }
 

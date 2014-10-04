@@ -13,25 +13,13 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.runner.Invocation;
 import com.bmd.jrt.runner.Runner;
 
-import java.util.concurrent.TimeUnit;
-
 /**
- * Empty runner implementation used to identify the default runner in a {@link Async} annotation.
+ * Runner interface used to identify the default runner in a {@link Async} annotation.
  * <p/>
  * Created by davide on 9/22/14.
  */
-class DefaultRunner implements Runner {
+interface DefaultRunner extends Runner {
 
-    @Override
-    public void run(final Invocation invocation, final long delay, final TimeUnit timeUnit) {
-
-    }
-
-    @Override
-    public void runAbort(final Invocation invocation) {
-
-    }
 }

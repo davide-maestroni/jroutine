@@ -23,6 +23,9 @@ import com.bmd.jrt.common.RoutineException;
 import com.bmd.jrt.execution.Execution;
 import com.bmd.jrt.execution.ExecutionAdapter;
 import com.bmd.jrt.execution.ExecutionBody;
+import com.bmd.jrt.log.Log.LogLevel;
+import com.bmd.jrt.log.Logger;
+import com.bmd.jrt.runner.Runners;
 import com.bmd.jrt.time.TimeDuration;
 
 import junit.framework.TestCase;
@@ -174,6 +177,144 @@ public class RoutineTest extends TestCase {
         assertThat(squareSumRoutine.callAsyn(1, 2, 3, 4)).containsExactly(30);
         assertThat(squareSumRoutine.run(1, 2, 3, 4).readAll()).containsExactly(30);
         assertThat(squareSumRoutine.runAsyn(1, 2, 3, 4).readAll()).containsExactly(30);
+    }
+
+    public void testError() {
+
+        try {
+
+            new ParallelExecution<Object, Object>(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            on(ClassToken.tokenOf(ConstructorException.class)).logLevel(LogLevel.SILENT)
+                                                              .routine()
+                                                              .call();
+
+            fail();
+
+        } catch (final RoutineException ignored) {
+
+        }
+
+        try {
+
+            new AbstractRoutine<Object, Object>(null, Runners.shared(), 1, 1, TimeDuration.ZERO,
+                                                false, false,
+                                                new Logger(Logger.getLog(), Logger.getLogLevel())) {
+
+                @Override
+                protected Execution<Object, Object> createExecution(final boolean async) {
+
+                    return new ConstructorException();
+                }
+            };
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new AbstractRoutine<Object, Object>(Runners.queued(), null, 1, 1, TimeDuration.ZERO,
+                                                false, false,
+                                                new Logger(Logger.getLog(), Logger.getLogLevel())) {
+
+                @Override
+                protected Execution<Object, Object> createExecution(final boolean async) {
+
+                    return new ConstructorException();
+                }
+            };
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new AbstractRoutine<Object, Object>(Runners.queued(), Runners.shared(), 1, 1, null,
+                                                false, false,
+                                                new Logger(Logger.getLog(), Logger.getLogLevel())) {
+
+                @Override
+                protected Execution<Object, Object> createExecution(final boolean async) {
+
+                    return new ConstructorException();
+                }
+            };
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new AbstractRoutine<Object, Object>(Runners.queued(), Runners.shared(), 1, 0,
+                                                TimeDuration.ZERO, false, false, null) {
+
+                @Override
+                protected Execution<Object, Object> createExecution(final boolean async) {
+
+                    return new ConstructorException();
+                }
+            };
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new AbstractRoutine<Object, Object>(Runners.queued(), Runners.shared(), 0, 1,
+                                                TimeDuration.ZERO, false, false,
+                                                new Logger(Logger.getLog(), Logger.getLogLevel())) {
+
+                @Override
+                protected Execution<Object, Object> createExecution(final boolean async) {
+
+                    return new ConstructorException();
+                }
+            };
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            new AbstractRoutine<Object, Object>(Runners.queued(), Runners.shared(), 1, -1,
+                                                TimeDuration.ZERO, false, false,
+                                                new Logger(Logger.getLog(), Logger.getLogLevel())) {
+
+                @Override
+                protected Execution<Object, Object> createExecution(final boolean async) {
+
+                    return new ConstructorException();
+                }
+            };
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
     }
 
     public void testErrorConsumerOnResult() {
@@ -334,7 +475,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final Exception ignored) {
+        } catch (final IllegalArgumentException ignored) {
 
         }
 
@@ -1077,6 +1218,14 @@ public class RoutineTest extends TestCase {
 
         @Async(name = "getInt")
         public int take(int i);
+    }
+
+    private static class ConstructorException extends ExecutionAdapter<Object, Object> {
+
+        public ConstructorException() {
+
+            throw new IllegalStateException();
+        }
     }
 
     private static class DelayExecution extends ExecutionAdapter<String, String> {

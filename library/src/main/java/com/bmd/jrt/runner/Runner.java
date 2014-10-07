@@ -17,7 +17,8 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * The runner interface defines an object responsible for executing routine invocations inside
- * specifically managed threads.<br/>
+ * specifically managed threads.
+ * <p/>
  * The implementation can both be synchronous or asynchronous, it can allocate specific threads or
  * share a pool of them between different instances.<br/>
  * The only requirements is that the specified invocation is called each time a run method is

@@ -206,8 +206,8 @@ public class RoutineTest extends TestCase {
         try {
 
             new AbstractRoutine<Object, Object>(null, Runners.shared(), 1, 1, TimeDuration.ZERO,
-                                                false, false,
-                                                new Logger(Logger.getLog(), Logger.getLogLevel())) {
+                                                false, false, Logger.getDefaultLog(),
+                                                Logger.getDefaultLogLevel()) {
 
                 @Override
                 protected Execution<Object, Object> createExecution(final boolean async) {
@@ -225,8 +225,8 @@ public class RoutineTest extends TestCase {
         try {
 
             new AbstractRoutine<Object, Object>(Runners.queued(), null, 1, 1, TimeDuration.ZERO,
-                                                false, false,
-                                                new Logger(Logger.getLog(), Logger.getLogLevel())) {
+                                                false, false, Logger.getDefaultLog(),
+                                                Logger.getDefaultLogLevel()) {
 
                 @Override
                 protected Execution<Object, Object> createExecution(final boolean async) {
@@ -244,8 +244,8 @@ public class RoutineTest extends TestCase {
         try {
 
             new AbstractRoutine<Object, Object>(Runners.queued(), Runners.shared(), 1, 1, null,
-                                                false, false,
-                                                new Logger(Logger.getLog(), Logger.getLogLevel())) {
+                                                false, false, Logger.getDefaultLog(),
+                                                Logger.getDefaultLogLevel()) {
 
                 @Override
                 protected Execution<Object, Object> createExecution(final boolean async) {
@@ -263,7 +263,7 @@ public class RoutineTest extends TestCase {
         try {
 
             new AbstractRoutine<Object, Object>(Runners.queued(), Runners.shared(), 1, 0,
-                                                TimeDuration.ZERO, false, false, null) {
+                                                TimeDuration.ZERO, false, false, null, null) {
 
                 @Override
                 protected Execution<Object, Object> createExecution(final boolean async) {
@@ -282,7 +282,8 @@ public class RoutineTest extends TestCase {
 
             new AbstractRoutine<Object, Object>(Runners.queued(), Runners.shared(), 0, 1,
                                                 TimeDuration.ZERO, false, false,
-                                                new Logger(Logger.getLog(), Logger.getLogLevel())) {
+                                                Logger.getDefaultLog(),
+                                                Logger.getDefaultLogLevel()) {
 
                 @Override
                 protected Execution<Object, Object> createExecution(final boolean async) {
@@ -301,7 +302,8 @@ public class RoutineTest extends TestCase {
 
             new AbstractRoutine<Object, Object>(Runners.queued(), Runners.shared(), 1, -1,
                                                 TimeDuration.ZERO, false, false,
-                                                new Logger(Logger.getLog(), Logger.getLogLevel())) {
+                                                Logger.getDefaultLog(),
+                                                Logger.getDefaultLogLevel()) {
 
                 @Override
                 protected Execution<Object, Object> createExecution(final boolean async) {
@@ -505,7 +507,9 @@ public class RoutineTest extends TestCase {
                 };
 
         final Routine<Integer, Integer> squareRoutine =
-                on(ClassToken.classOf(execSquare)).withArgs(this).routine();
+                on(ClassToken.classOf(execSquare)).logLevel(LogLevel.DEBUG)
+                                                  .withArgs(this)
+                                                  .routine();
 
         assertThat(squareRoutine.call(1, 2, 3, 4)).containsExactly(1, 4, 9, 16);
         assertThat(squareRoutine.callAsyn(1, 2, 3, 4)).containsExactly(1, 4, 9, 16);

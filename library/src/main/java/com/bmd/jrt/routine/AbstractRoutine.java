@@ -17,7 +17,10 @@ import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ParameterChannel;
 import com.bmd.jrt.common.RoutineInterruptedException;
 import com.bmd.jrt.execution.Execution;
+import com.bmd.jrt.log.Log;
+import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.log.Logger;
+import com.bmd.jrt.routine.DefaultParameterChannel.ExecutionProvider;
 import com.bmd.jrt.runner.Runner;
 import com.bmd.jrt.time.TimeDuration;
 import com.bmd.jrt.time.TimeDuration.Check;
@@ -26,7 +29,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Basic abstract implementation of a routine.<b/>
+ * Basic abstract implementation of a routine.
+ * <p/>
  * This class provides implementations for all the routine functionalities. The inheriting class
  * just need to provide execution objects when required.
  * <p/>
@@ -72,13 +76,15 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
      *                      available.
      * @param orderedInput  whether the input data are forced to be delivered in insertion order.
      * @param orderedOutput whether the output data are forced to be delivered in insertion order.
-     * @param logger        the logger instance.
+     * @param log           the log instance.
+     * @param logLevel      the log level.
      * @throws NullPointerException     if one of the parameters is null.
      * @throws IllegalArgumentException if at least one of the parameter is invalid.
      */
     protected AbstractRoutine(final Runner syncRunner, final Runner asyncRunner,
             final int maxRunning, final int maxRetained, final TimeDuration availTimeout,
-            final boolean orderedInput, final boolean orderedOutput, final Logger logger) {
+            final boolean orderedInput, final boolean orderedOutput, final Log log,
+            final LogLevel logLevel) {
 
         if (syncRunner == null) {
 
@@ -108,10 +114,33 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
                     "the timeout for available execution instances must not be null");
         }
 
-        if (logger == null) {
+        mSyncRunner = syncRunner;
+        mAsyncRunner = asyncRunner;
+        mMaxRunning = maxRunning;
+        mMaxRetained = maxRetained;
+        mAvailTimeout = availTimeout;
+        mOrderedInput = orderedInput;
+        mOrderedOutput = orderedOutput;
+        mLogger = Logger.create(log, logLevel, this);
+    }
 
-            throw new NullPointerException("the logger instance must not be null");
-        }
+    /**
+     * Constructor.
+     *
+     * @param syncRunner    the runner used for synchronous invocation.
+     * @param asyncRunner   the runner used for asynchronous invocation.
+     * @param maxRunning    the maximum number of parallel running executions. Must be positive.
+     * @param maxRetained   the maximum number of retained execution instances. Must be 0 or a
+     *                      positive number.
+     * @param availTimeout  the maximum timeout while waiting for an execution instance to be
+     *                      available.
+     * @param orderedInput  whether the input data are forced to be delivered in insertion order.
+     * @param orderedOutput whether the output data are forced to be delivered in insertion order.
+     * @param logger        the logger instance.
+     */
+    private AbstractRoutine(final Runner syncRunner, final Runner asyncRunner, final int maxRunning,
+            final int maxRetained, final TimeDuration availTimeout, final boolean orderedInput,
+            final boolean orderedOutput, final Logger logger) {
 
         mSyncRunner = syncRunner;
         mAsyncRunner = asyncRunner;
@@ -228,7 +257,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
     @Override
     public ParameterChannel<INPUT, OUTPUT> invokeParall() {
 
-        mLogger.dbg("%s - invoking routine: parallel", this);
+        mLogger.dbg("invoking routine: parallel");
 
         final AbstractRoutine<INPUT, OUTPUT> parallelRoutine =
                 new AbstractRoutine<INPUT, OUTPUT>(mSyncRunner, mAsyncRunner, mMaxRunning,
@@ -345,19 +374,20 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
 
     private ParameterChannel<INPUT, OUTPUT> invoke(final boolean async) {
 
-        mLogger.dbg("%s - invoking routine: async = %s", this, async);
+        final Logger logger = mLogger;
+
+        logger.dbg("invoking routine: async = %s", async);
 
         return new DefaultParameterChannel<INPUT, OUTPUT>(new DefaultExecutionProvider(async),
                                                           (async) ? mAsyncRunner : mSyncRunner,
-                                                          mOrderedInput, mOrderedOutput, mLogger);
+                                                          mOrderedInput, mOrderedOutput, logger);
     }
 
     /**
      * Default implementation of an execution provider supporting recycling of execution
      * instances.
      */
-    private class DefaultExecutionProvider
-            implements DefaultParameterChannel.ExecutionProvider<INPUT, OUTPUT> {
+    private class DefaultExecutionProvider implements ExecutionProvider<INPUT, OUTPUT> {
 
         private final boolean mAsync;
 
@@ -388,16 +418,15 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
 
                 } catch (final InterruptedException e) {
 
-                    mLogger.err(e, "%s - waiting for available instance interrupted [%d]",
-                                AbstractRoutine.this, mMaxRunning);
+                    mLogger.err(e, "waiting for available instance interrupted [%d]", mMaxRunning);
 
                     RoutineInterruptedException.interrupt(e);
                 }
 
                 if (isTimeout) {
 
-                    mLogger.wrn("%s - routine instance not available after timeout [%d]: %s",
-                                AbstractRoutine.this, mMaxRunning, mAvailTimeout);
+                    mLogger.wrn("routine instance not available after timeout [%d]: %s",
+                                mMaxRunning, mAvailTimeout);
 
                     throw new RoutineNotAvailableException();
                 }
@@ -410,14 +439,13 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
 
                     final Execution<INPUT, OUTPUT> execution = executions.removeFirst();
 
-                    mLogger.dbg("%s - reusing execution instance [%d/%d]: %s", AbstractRoutine.this,
-                                executions.size() + 1, mMaxRetained, execution);
+                    mLogger.dbg("reusing execution instance [%d/%d]: %s", executions.size() + 1,
+                                mMaxRetained, execution);
 
                     return execution;
                 }
 
-                mLogger.dbg("%s - creating execution instance [1/%d]", AbstractRoutine.this,
-                            mMaxRetained);
+                mLogger.dbg("creating execution instance [1/%d]", mMaxRetained);
 
                 return createExecution(mAsync);
             }
@@ -428,8 +456,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
 
             synchronized (mMutex) {
 
-                mLogger.wrn("%s - discarding execution instance after error: %s",
-                            AbstractRoutine.this, execution);
+                mLogger.wrn("discarding execution instance after error: %s", execution);
 
                 --mRunningCount;
                 mMutex.notify();
@@ -445,16 +472,15 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
 
                 if (executions.size() < mMaxRetained) {
 
-                    mLogger.dbg("%s - recycling execution instance [%d/%d]: %s",
-                                AbstractRoutine.this, executions.size() + 1, mMaxRetained,
-                                execution);
+                    mLogger.dbg("recycling execution instance [%d/%d]: %s", executions.size() + 1,
+                                mMaxRetained, execution);
 
                     executions.add(execution);
 
                 } else {
 
-                    mLogger.wrn("%s - discarding execution instance [%d/%d]: %s",
-                                AbstractRoutine.this, mMaxRetained, mMaxRetained, execution);
+                    mLogger.wrn("discarding execution instance [%d/%d]: %s", mMaxRetained,
+                                mMaxRetained, execution);
                 }
 
                 --mRunningCount;

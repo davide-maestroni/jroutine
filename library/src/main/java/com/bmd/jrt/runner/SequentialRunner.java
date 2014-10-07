@@ -20,7 +20,8 @@ import java.util.concurrent.TimeUnit;
 import static com.bmd.jrt.time.TimeDuration.fromUnit;
 
 /**
- * Class implementing a sequential synchronous runner.<br/>
+ * Class implementing a sequential synchronous runner.
+ * <p/>
  * The runner simply executes the invocations as soon as they are run.<br/>
  * While it is less memory and CPU consuming than the queued implementation, it might greatly
  * increase the depth of the call stack, and blocks execution of the calling thread during delayed

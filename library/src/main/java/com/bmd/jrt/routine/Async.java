@@ -22,7 +22,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation is used to indicate methods which can be invoked in an asynchronous way.<br/>
+ * This annotation is used to indicate methods which can be invoked in an asynchronous way.
+ * <p/>
  * Note that the piece of code inside such methods will be automatically protected so to avoid
  * concurrency issue. Though, other parts of the code inside the same class will be not.
  * <p/>

@@ -13,6 +13,8 @@
  */
 package com.bmd.jrt.log;
 
+import java.util.List;
+
 /**
  * Interface defining a log object responsible for formatting and writing the framework log
  * messages.
@@ -36,6 +38,7 @@ package com.bmd.jrt.log;
  *         }
  *     </code>
  * </pre>
+ * TODO: strip create()
  * <p/>
  * Created by davide on 10/3/14.
  *
@@ -46,23 +49,53 @@ public interface Log {
     /**
      * Logs a debug message.
      *
-     * @param message the message.
+     * @param contexts the array of contexts.
+     * @param message  the message.
      */
-    public void dbg(String message);
+    public void dbg(List<Object> contexts, String message);
+
+    /**
+     * Logs a debug message.
+     *
+     * @param contexts  the array of contexts.
+     * @param message   the message.
+     * @param throwable the optional throwable.
+     */
+    public void dbg(List<Object> contexts, String message, Throwable throwable);
 
     /**
      * Logs an error message.
      *
-     * @param message the message.
+     * @param contexts the array of contexts.
+     * @param message  the message.
      */
-    public void err(String message);
+    public void err(List<Object> contexts, String message);
+
+    /**
+     * Logs an error message.
+     *
+     * @param contexts  the array of contexts.
+     * @param message   the message.
+     * @param throwable the optional throwable.
+     */
+    public void err(List<Object> contexts, String message, Throwable throwable);
 
     /**
      * Logs a warning message.
      *
-     * @param message the message.
+     * @param contexts the array of contexts.
+     * @param message  the message.
      */
-    public void wrn(String message);
+    public void wrn(List<Object> contexts, String message);
+
+    /**
+     * Logs a warning message.
+     *
+     * @param contexts  the array of contexts.
+     * @param message   the message.
+     * @param throwable the optional throwable.
+     */
+    public void wrn(List<Object> contexts, String message, Throwable throwable);
 
     /**
      * Log levels enumeration from more to less verbose.

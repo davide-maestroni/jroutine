@@ -14,7 +14,8 @@
 package com.bmd.jrt.channel;
 
 /**
- * Interface defining a basic communication channel with the routine.<br/>
+ * Interface defining a basic communication channel with the routine.
+ * <p/>
  * Channel instances are used to transfer data to and from the code executed inside the routine
  * invocation.
  * <p/>

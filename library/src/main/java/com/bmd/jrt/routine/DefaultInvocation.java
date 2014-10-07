@@ -70,15 +70,10 @@ class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
             throw new NullPointerException("the result channel must not be null");
         }
 
-        if (logger == null) {
-
-            throw new NullPointerException("the logger instance must not be null");
-        }
-
         mExecutionProvider = provider;
         mInputIterator = inputs;
         mResultChannel = results;
-        mLogger = logger;
+        mLogger = logger.subContextLogger(this);
     }
 
     @Override
@@ -93,14 +88,14 @@ class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
 
             if (!inputIterator.isAborting()) {
 
-                mLogger.wrn("%s - avoiding aborting since input is already aborted", this);
+                mLogger.wrn("avoiding aborting since input is already aborted");
 
                 return;
             }
 
             final Throwable exception = inputIterator.getAbortException();
 
-            mLogger.dbg(exception, "%s - aborting invocation", this);
+            mLogger.dbg(exception, "aborting invocation");
 
             try {
 
@@ -141,12 +136,12 @@ class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
 
                 if (!inputIterator.onConsumeInput()) {
 
-                    mLogger.wrn("%s - avoiding running invocation", this);
+                    mLogger.wrn("avoiding running invocation");
 
                     return;
                 }
 
-                mLogger.dbg("%s - running invocation", this);
+                mLogger.dbg("running invocation");
 
                 final Execution<INPUT, OUTPUT> execution = initExecution();
 
@@ -184,7 +179,7 @@ class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
 
             execution = (mExecution = mExecutionProvider.create());
 
-            mLogger.dbg("%s - initializing execution: %s", this, execution);
+            mLogger.dbg("initializing execution: %s", execution);
 
             execution.onInit();
         }

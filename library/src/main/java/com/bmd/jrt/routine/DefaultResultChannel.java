@@ -35,7 +35,8 @@ import static com.bmd.jrt.time.TimeDuration.fromUnit;
 import static com.bmd.jrt.time.TimeDuration.seconds;
 
 /**
- * Class handling the routine output.<br/>
+ * Class handling the routine output.
+ * <p/>
  * This class centralizes the managing of data passing through the routine output and result
  * channels, since, logically, the two objects are part of the same entity. In fact, on one end the
  * result channel puts data into the output queue and, on the other end, the output channel reads
@@ -101,14 +102,9 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             throw new NullPointerException("the runner instance must not be null");
         }
 
-        if (logger == null) {
-
-            throw new NullPointerException("the logger instance must not be null");
-        }
-
         mHandler = handler;
         mRunner = runner;
-        mLogger = logger;
+        mLogger = logger.subContextLogger(this);
         mOutputQueue = (orderedOutput) ? new OrderedNestedQueue<Object>()
                 : new SimpleNestedQueue<Object>();
     }
@@ -154,12 +150,12 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             if (channel == null) {
 
-                mLogger.wrn("%s - passing null channel", this);
+                mLogger.wrn("passing null channel");
 
                 return this;
             }
 
-            mLogger.dbg("%s - passing channel [%d]: %s", this, mPendingOutputCount + 1, channel);
+            mLogger.dbg("passing channel [%d]: %s", mPendingOutputCount + 1, channel);
 
             mBoundChannels.add(channel);
 
@@ -185,7 +181,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             if (outputs == null) {
 
-                mLogger.wrn("%s - passing null iterable", this);
+                mLogger.wrn("passing null iterable");
 
                 return this;
             }
@@ -193,8 +189,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             outputQueue = mOutputQueue;
             delay = mResultDelay;
 
-            mLogger.dbg("%s - passing iterable [%d][%s]: %s", this, mPendingOutputCount + 1, delay,
-                        outputs);
+            mLogger.dbg("passing iterable [%d][%s]: %s", mPendingOutputCount + 1, delay, outputs);
 
             if (delay.isZero()) {
 
@@ -237,8 +232,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             outputQueue = mOutputQueue;
             delay = mResultDelay;
 
-            mLogger.dbg("%s - passing output [%d][%s]: %s", this, mPendingOutputCount + 1, delay,
-                        output);
+            mLogger.dbg("passing output [%d][%s]: %s", mPendingOutputCount + 1, delay, output);
 
             if (delay.isZero()) {
 
@@ -273,7 +267,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             if (outputs == null) {
 
-                mLogger.wrn("%s - passing null output array", this);
+                mLogger.wrn("passing null output array");
 
                 return this;
             }
@@ -293,7 +287,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         synchronized (mMutex) {
 
-            mLogger.dbg(throwable, "%s - aborting result channel", this);
+            mLogger.dbg(throwable, "aborting result channel");
 
             channels = new ArrayList<OutputChannel<?>>(mBoundChannels);
             mBoundChannels.clear();
@@ -321,7 +315,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         synchronized (mMutex) {
 
-            mLogger.dbg("%s - closing result channel [%d]", this, mPendingOutputCount);
+            mLogger.dbg("closing result channel [%d]", mPendingOutputCount);
 
             if (mState == ChannelState.OUTPUT) {
 
@@ -371,7 +365,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 if (consumer == null) {
 
-                    logger.dbg("%s - avoiding flushing output since channel is not bound", this);
+                    logger.dbg("avoiding flushing output since channel is not bound");
 
                     mMutex.notifyAll();
 
@@ -391,7 +385,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                     try {
 
-                        logger.dbg("%s - aborting consumer: %s - %s", this, consumer, output);
+                        logger.dbg("aborting consumer: %s - %s", consumer, output);
 
                         consumer.onAbort(((RoutineExceptionWrapper) output).getCause());
 
@@ -401,14 +395,14 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                     } catch (final Throwable t) {
 
-                        logger.wrn(t, "%s - ignoring consumer exception: %s", this, consumer);
+                        logger.wrn(t, "ignoring consumer exception: %s", consumer);
                     }
 
                     break;
 
                 } else {
 
-                    logger.dbg("%s - output consumer: %s - %s", this, consumer, output);
+                    logger.dbg("output consumer: %s - %s", consumer, output);
 
                     consumer.onOutput((OUTPUT) output);
                 }
@@ -418,7 +412,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 try {
 
-                    logger.dbg("%s - closing consumer: %s", this, consumer);
+                    logger.dbg("closing consumer: %s", consumer);
 
                     consumer.onClose();
 
@@ -428,7 +422,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 } catch (final Throwable t) {
 
-                    logger.wrn(t, "%s - ignoring consumer exception: %s", this, consumer);
+                    logger.wrn(t, "ignoring consumer exception: %s", consumer);
                 }
             }
 
@@ -437,7 +431,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             boolean isFlush = false;
             boolean isAbort = false;
 
-            logger.wrn(t, "%s - consumer exception: %s", this, mOutputConsumer);
+            logger.wrn(t, "consumer exception: %s", mOutputConsumer);
 
             synchronized (mMutex) {
 
@@ -447,7 +441,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 } else if (mState != ChannelState.EXCEPTION) {
 
-                    logger.wrn(t, "%s - aborting on consumer exception: %s", this, mOutputConsumer);
+                    logger.wrn(t, "aborting on consumer exception: %s", mOutputConsumer);
 
                     isAbort = true;
 
@@ -515,7 +509,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 final Object result = outputQueue.removeFirst();
 
-                logger.dbg("%s - reading output [%s]: %s", this, timeout, result);
+                logger.dbg("reading output [%s]: %s", timeout, result);
 
                 RoutineExceptionWrapper.raise(result);
 
@@ -547,7 +541,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             if (isTimeout) {
 
-                logger.wrn("%s - reading output timeout [%s]: %s", this, timeout, timeoutException);
+                logger.wrn("reading output timeout [%s]: %s", timeout, timeoutException);
 
                 if (timeoutException != null) {
 
@@ -557,7 +551,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             final Object result = outputQueue.removeFirst();
 
-            logger.dbg("%s - reading output [%s]: %s", this, timeout, result);
+            logger.dbg("reading output [%s]: %s", timeout, result);
 
             RoutineExceptionWrapper.raise(result);
 
@@ -569,7 +563,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         if (mOutputConsumer != null) {
 
-            mLogger.err("%s - invalid call on bound channel", this);
+            mLogger.err("invalid call on bound channel");
 
             throw new IllegalStateException("the channel is already bound");
         }
@@ -581,14 +575,14 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         if (throwable != null) {
 
-            mLogger.dbg(throwable, "%s - abort exception", this);
+            mLogger.dbg(throwable, "abort exception");
 
             throw RoutineExceptionWrapper.wrap(throwable).raise();
         }
 
         if (!isResultOpen() || (mState == ChannelState.EXCEPTION)) {
 
-            mLogger.err("%s - invalid call on closed channel", this);
+            mLogger.err("invalid call on closed channel");
 
             throw new IllegalStateException("the channel is closed");
         }
@@ -624,6 +618,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
      */
     public class DefaultIterator implements Iterator<OUTPUT> {
 
+        private final Logger mSubLogger = mLogger.subContextLogger(this);
+
         private final TimeDuration mTimeout;
 
         private final RuntimeException mTimeoutException;
@@ -650,7 +646,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 verifyBound();
 
-                final Logger logger = mLogger;
+                final Logger logger = mSubLogger;
                 final TimeDuration timeout = mTimeout;
                 final RuntimeException timeoutException = mTimeoutException;
                 final NestedQueue<Object> outputQueue = mOutputQueue;
@@ -659,8 +655,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                     final boolean hasNext = !outputQueue.isEmpty();
 
-                    logger.dbg("%s - has output [%s]: %s", DefaultResultChannel.this, timeout,
-                               hasNext);
+                    logger.dbg("has output [%s]: %s", timeout, hasNext);
 
                     return hasNext;
                 }
@@ -690,8 +685,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 if (isTimeout) {
 
-                    logger.wrn("%s - has output timeout [%s]: %s", DefaultResultChannel.this,
-                               timeout, timeoutException);
+                    logger.wrn("has output timeout [%s]: %s", timeout, timeoutException);
 
                     if (timeoutException != null) {
 
@@ -701,7 +695,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 final boolean hasNext = !outputQueue.isEmpty();
 
-                logger.dbg("%s - has output [%s]: %s", DefaultResultChannel.this, timeout, hasNext);
+                logger.dbg("has output [%s]: %s", timeout, hasNext);
 
                 return hasNext;
             }
@@ -729,7 +723,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 if (mRemoved) {
 
-                    mLogger.err("%s - invalid output remove", DefaultResultChannel.this);
+                    mSubLogger.err("invalid output remove");
 
                     throw new IllegalStateException("the element has been already removed");
                 }
@@ -744,6 +738,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
      */
     private class DefaultOutputChannel implements OutputChannel<OUTPUT> {
 
+        private final Logger mSubLogger = mLogger.subContextLogger(this);
+
         @Override
         public OutputChannel<OUTPUT> afterMax(final TimeDuration timeout) {
 
@@ -753,7 +749,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 if (timeout == null) {
 
-                    mLogger.err("%s - invalid null timeout", DefaultResultChannel.this);
+                    mSubLogger.err("invalid null timeout");
 
                     throw new IllegalArgumentException("the output timeout must not be null");
                 }
@@ -779,7 +775,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 if (consumer == null) {
 
-                    mLogger.err("%s - invalid null consumer", DefaultResultChannel.this);
+                    mSubLogger.err("invalid null consumer");
 
                     throw new IllegalArgumentException("the output consumer must not be null");
                 }
@@ -828,11 +824,11 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 verifyBound();
 
-                final Logger logger = mLogger;
+                final Logger logger = mSubLogger;
 
                 if (results == null) {
 
-                    logger.err("%s - invalid null output list", DefaultResultChannel.this);
+                    logger.err("invalid null output list");
 
                     throw new IllegalArgumentException("the result list must not be null");
                 }
@@ -847,8 +843,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                         final Object result = outputQueue.removeFirst();
 
-                        logger.dbg("%s - adding output to list [%s]: %s", DefaultResultChannel.this,
-                                   timeout, result);
+                        logger.dbg("adding output to list [%s]: %s", timeout, result);
 
                         RoutineExceptionWrapper.raise(result);
 
@@ -878,8 +873,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 if (isTimeout) {
 
-                    logger.wrn("%s - list output timeout [%s]: %s", DefaultResultChannel.this,
-                               timeout, timeoutException);
+                    logger.wrn("list output timeout [%s]: %s", timeout, timeoutException);
 
                     if (timeoutException != null) {
 
@@ -892,8 +886,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                         final Object result = outputQueue.removeFirst();
 
-                        logger.dbg("%s - adding output to list [%s]: %s", DefaultResultChannel.this,
-                                   timeout, result);
+                        logger.dbg("adding output to list [%s]: %s", timeout, result);
 
                         RoutineExceptionWrapper.raise(result);
 
@@ -939,8 +932,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 if (!isDone && (timeoutException != null)) {
 
-                    mLogger.wrn("%s - waiting complete timeout [%s]: %s", DefaultResultChannel.this,
-                                timeout, timeoutException);
+                    mSubLogger.wrn("waiting complete timeout [%s]: %s", timeout, timeoutException);
 
                     throw timeoutException;
                 }
@@ -980,15 +972,14 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 if (!isResultOpen()) {
 
-                    mLogger.dbg("%s - avoid aborting output since result channel is closed",
-                                DefaultResultChannel.this);
+                    mSubLogger.dbg("avoid aborting output since result channel is closed");
 
                     return false;
                 }
 
                 if (mState != ChannelState.EXCEPTION) {
 
-                    mLogger.dbg(throwable, "%s - aborting output", DefaultResultChannel.this);
+                    mSubLogger.dbg(throwable, "aborting output");
 
                     mOutputQueue.clear();
 
@@ -1020,6 +1011,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         private final NestedQueue<Object> mQueue;
 
+        private final Logger mSubLogger = mLogger.subContextLogger(this);
+
         /**
          * Constructor.
          *
@@ -1038,15 +1031,14 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 if (!isResultOpen()) {
 
-                    mLogger.dbg("%s - avoid aborting output since result channel is closed",
-                                DefaultResultChannel.this);
+                    mSubLogger.dbg("avoid aborting output since result channel is closed");
 
                     return;
                 }
 
                 if (mState != ChannelState.EXCEPTION) {
 
-                    mLogger.dbg(throwable, "%s - aborting output", DefaultResultChannel.this);
+                    mSubLogger.dbg(throwable, "aborting output");
 
                     mOutputQueue.clear();
 
@@ -1067,8 +1059,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 verifyOutput();
 
-                mLogger.dbg("%s - closing output [%d]", DefaultResultChannel.this,
-                            mPendingOutputCount - 1);
+                mSubLogger.dbg("closing output [%d]", mPendingOutputCount - 1);
 
                 mQueue.close();
 
@@ -1100,8 +1091,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 verifyOutput();
 
-                mLogger.dbg("%s - adding output to queue [%d][%s]: %s", DefaultResultChannel.this,
-                            mPendingOutputCount + 1, delay, output);
+                mSubLogger.dbg("adding output to queue [%d][%s]: %s", mPendingOutputCount + 1,
+                               delay, output);
 
                 outputQueue = mQueue;
 
@@ -1161,8 +1152,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         @Override
         public void abort() {
 
-            mLogger.err("%s - invalid abort of delayed output invocation: %s",
-                        DefaultResultChannel.this, mOutputs);
+            mLogger.err("invalid abort of delayed output invocation: %s", mOutputs);
 
             throw new UnsupportedOperationException();
         }
@@ -1174,15 +1164,14 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 if (isError()) {
 
-                    mLogger.dbg(
-                            "%s - avoiding delayed output invocation since channel is closed: %s",
-                            DefaultResultChannel.this, mOutputs);
+                    mLogger.dbg("avoiding delayed output invocation since channel is closed: %s",
+                                mOutputs);
 
                     return;
                 }
 
-                mLogger.dbg("%s - delayed output invocation [%d]: %s", DefaultResultChannel.this,
-                            mPendingOutputCount - 1, mOutputs);
+                mLogger.dbg("delayed output invocation [%d]: %s", mPendingOutputCount - 1,
+                            mOutputs);
 
                 if ((--mPendingOutputCount == 0) && (mState == ChannelState.RESULT)) {
 
@@ -1220,8 +1209,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         @Override
         public void abort() {
 
-            mLogger.err("%s - invalid abort of delayed output invocation: %s",
-                        DefaultResultChannel.this, mOutput);
+            mLogger.err("invalid abort of delayed output invocation: %s", mOutput);
 
             throw new UnsupportedOperationException();
         }
@@ -1233,15 +1221,13 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 if (isError()) {
 
-                    mLogger.dbg(
-                            "%s - avoiding delayed output invocation since channel is closed: %s",
-                            DefaultResultChannel.this, mOutput);
+                    mLogger.dbg("avoiding delayed output invocation since channel is closed: %s",
+                                mOutput);
 
                     return;
                 }
 
-                mLogger.dbg("%s - delayed output invocation [%d]: %s", DefaultResultChannel.this,
-                            mPendingOutputCount - 1, mOutput);
+                mLogger.dbg("delayed output invocation [%d]: %s", mPendingOutputCount - 1, mOutput);
 
                 if ((--mPendingOutputCount == 0) && (mState == ChannelState.RESULT)) {
 
@@ -1262,14 +1248,14 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             if (isDone()) {
 
-                mLogger.dbg(throwable, "%s - avoiding aborting since channel is closed", this);
+                mLogger.dbg(throwable, "avoiding aborting since channel is closed");
 
                 return false;
             }
 
             if (mState != ChannelState.EXCEPTION) {
 
-                mLogger.dbg(throwable, "%s - aborting channel", this);
+                mLogger.dbg(throwable, "aborting channel");
 
                 mOutputQueue.clear();
 

@@ -77,9 +77,9 @@ public class RoutineBuilder<INPUT, OUTPUT> {
 
     private TimeDuration mAvailTimeout = seconds(5);
 
-    private Log mLog = Logger.getLog();
+    private Log mLog = Logger.getDefaultLog();
 
-    private LogLevel mLogLevel = Logger.getLogLevel();
+    private LogLevel mLogLevel = Logger.getDefaultLogLevel();
 
     private int mMaxRetained = 10;
 
@@ -269,7 +269,7 @@ public class RoutineBuilder<INPUT, OUTPUT> {
 
         return new DefaultRoutine<INPUT, OUTPUT>(mSyncRunner, mAsyncRunner, mMaxRunning,
                                                  mMaxRetained, mAvailTimeout, mOrderedInput,
-                                                 mOrderedOutput, new Logger(mLog, mLogLevel),
+                                                 mOrderedOutput, mLog, mLogLevel,
                                                  mClassToken.getRawClass(), mArgs);
     }
 

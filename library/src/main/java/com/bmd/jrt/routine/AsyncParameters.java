@@ -20,7 +20,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation is used to indicate methods whose parameters are passed asynchronously.<br/>
+ * This annotation is used to indicate methods whose parameters are passed asynchronously.
+ * <p/>
  * The only use case in which this annotation is useful, is when an interface is used as a mirror
  * of another class methods. The interface can take some input parameters as output channels whose
  * output will be passed to the mirrored method, only when available.<br/>

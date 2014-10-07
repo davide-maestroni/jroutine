@@ -17,6 +17,8 @@ import com.bmd.jrt.log.Log.LogLevel;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -30,10 +32,6 @@ public class Logger {
 
     private static final int ERROR_LEVEL = LogLevel.ERROR.ordinal();
 
-    private static final String NEW_LINE = System.getProperty("line.separator");
-
-    private static final String EXCEPTION_MESSAGE = NEW_LINE + "Caused by exception:" + NEW_LINE;
-
     private static final int WARNING_LEVEL = LogLevel.WARNING.ordinal();
 
     private static final AtomicReference<Log> sLog = new AtomicReference<Log>(new SystemLog());
@@ -41,18 +39,25 @@ public class Logger {
     private static final AtomicReference<LogLevel> sLogLevel =
             new AtomicReference<LogLevel>(LogLevel.ERROR);
 
+    private final List<Object> mContextList;
+
+    private final Object[] mContexts;
+
     private final int mLevel;
 
     private final Log mLog;
 
+    private final LogLevel mLogLevel;
+
     /**
      * Constructor.
      *
-     * @param log   the log instance.
-     * @param level the log level.
+     * @param contexts the array of contexts.
+     * @param log      the log instance.
+     * @param level    the log level.
      * @throws NullPointerException if one of the parameters is null.
      */
-    public Logger(final Log log, final LogLevel level) {
+    private Logger(final Object[] contexts, final Log log, final LogLevel level) {
 
         if (log == null) {
 
@@ -64,8 +69,25 @@ public class Logger {
             throw new NullPointerException("the log level must not be null");
         }
 
+        mContexts = contexts.clone();
         mLog = log;
+        mLogLevel = level;
         mLevel = level.ordinal();
+        mContextList = Arrays.asList(mContexts);
+    }
+
+    /**
+     * Creates a new logger.
+     *
+     * @param log      the log instance.
+     * @param level    the log level.
+     * @param contexts the array of contexts.
+     * @return the new logger.
+     * @throws NullPointerException if one of the parameters is null.
+     */
+    public static Logger create(final Log log, final LogLevel level, final Object... contexts) {
+
+        return new Logger(contexts, log, level);
     }
 
     /**
@@ -73,9 +95,25 @@ public class Logger {
      *
      * @return the log instance.
      */
-    public static Log getLog() {
+    public static Log getDefaultLog() {
 
         return sLog.get();
+    }
+
+    /**
+     * Sets the default log instance.
+     *
+     * @param log the log instance.
+     * @throws NullPointerException if the specified level is null.
+     */
+    public static void setDefaultLog(final Log log) {
+
+        if (log == null) {
+
+            throw new NullPointerException("the log instance must not be null");
+        }
+
+        sLog.set(log);
     }
 
     /**
@@ -83,7 +121,7 @@ public class Logger {
      *
      * @return the log level.
      */
-    public static LogLevel getLogLevel() {
+    public static LogLevel getDefaultLogLevel() {
 
         return sLogLevel.get();
     }
@@ -94,7 +132,7 @@ public class Logger {
      * @param level the log level.
      * @throws NullPointerException if the specified level is null.
      */
-    public static void setLogLevel(final LogLevel level) {
+    public static void setDefaultLogLevel(final LogLevel level) {
 
         if (level == null) {
 
@@ -105,25 +143,21 @@ public class Logger {
     }
 
     /**
-     * Sets the default log instance.
+     * Prints the stack trace of the specified throwable into a string.
      *
-     * @param log the log instance.
-     * @throws NullPointerException if the specified level is null.
+     * @param throwable the throwable instance.
+     * @return the printed stack trace.
+     * @throws NullPointerException if the specified throwable is null.
      */
-    public static void seLog(final Log log) {
+    public static String printStackTrace(final Throwable throwable) {
 
-        if (log == null) {
+        if (throwable == null) {
 
-            throw new NullPointerException("the log instance must not be null");
+            return null;
         }
 
-        sLog.set(log);
-    }
-
-    private static String write(final Throwable t) {
-
         final StringWriter writer = new StringWriter();
-        t.printStackTrace(new PrintWriter(writer));
+        throwable.printStackTrace(new PrintWriter(writer));
 
         return writer.toString();
     }
@@ -137,7 +171,7 @@ public class Logger {
 
         if (mLevel <= DEBUG_LEVEL) {
 
-            mLog.dbg(message);
+            mLog.dbg(mContextList, message);
         }
     }
 
@@ -151,7 +185,7 @@ public class Logger {
 
         if (mLevel <= DEBUG_LEVEL) {
 
-            mLog.dbg(String.format(format, arg1));
+            mLog.dbg(mContextList, String.format(format, arg1));
         }
     }
 
@@ -166,7 +200,7 @@ public class Logger {
 
         if (mLevel <= DEBUG_LEVEL) {
 
-            mLog.dbg(String.format(format, arg1, arg2));
+            mLog.dbg(mContextList, String.format(format, arg1, arg2));
         }
     }
 
@@ -182,7 +216,7 @@ public class Logger {
 
         if (mLevel <= DEBUG_LEVEL) {
 
-            mLog.dbg(String.format(format, arg1, arg2, arg3));
+            mLog.dbg(mContextList, String.format(format, arg1, arg2, arg3));
         }
     }
 
@@ -200,7 +234,7 @@ public class Logger {
 
         if (mLevel <= DEBUG_LEVEL) {
 
-            mLog.dbg(String.format(format, arg1, arg2, arg3, arg4));
+            mLog.dbg(mContextList, String.format(format, arg1, arg2, arg3, arg4));
         }
     }
 
@@ -214,7 +248,7 @@ public class Logger {
 
         if (mLevel <= DEBUG_LEVEL) {
 
-            mLog.dbg(String.format(format, args));
+            mLog.dbg(mContextList, String.format(format, args));
         }
     }
 
@@ -227,7 +261,7 @@ public class Logger {
 
         if (mLevel <= DEBUG_LEVEL) {
 
-            mLog.dbg(write(t));
+            mLog.dbg(mContextList, printStackTrace(t));
         }
     }
 
@@ -241,7 +275,7 @@ public class Logger {
 
         if (mLevel <= DEBUG_LEVEL) {
 
-            mLog.dbg(message + EXCEPTION_MESSAGE + write(t));
+            mLog.dbg(mContextList, message, t);
         }
     }
 
@@ -256,7 +290,7 @@ public class Logger {
 
         if (mLevel <= DEBUG_LEVEL) {
 
-            mLog.dbg(String.format(format, arg1) + EXCEPTION_MESSAGE + write(t));
+            mLog.dbg(mContextList, String.format(format, arg1), t);
         }
     }
 
@@ -272,7 +306,7 @@ public class Logger {
 
         if (mLevel <= DEBUG_LEVEL) {
 
-            mLog.dbg(String.format(format, arg1, arg2) + EXCEPTION_MESSAGE + write(t));
+            mLog.dbg(mContextList, String.format(format, arg1, arg2), t);
         }
     }
 
@@ -290,7 +324,7 @@ public class Logger {
 
         if (mLevel <= DEBUG_LEVEL) {
 
-            mLog.dbg(String.format(format, arg1, arg2, arg3) + EXCEPTION_MESSAGE + write(t));
+            mLog.dbg(mContextList, String.format(format, arg1, arg2, arg3), t);
         }
     }
 
@@ -309,7 +343,7 @@ public class Logger {
 
         if (mLevel <= DEBUG_LEVEL) {
 
-            mLog.dbg(String.format(format, arg1, arg2, arg3, arg4) + EXCEPTION_MESSAGE + write(t));
+            mLog.dbg(mContextList, String.format(format, arg1, arg2, arg3, arg4), t);
         }
     }
 
@@ -324,7 +358,7 @@ public class Logger {
 
         if (mLevel <= DEBUG_LEVEL) {
 
-            mLog.dbg(String.format(format, args) + EXCEPTION_MESSAGE + write(t));
+            mLog.dbg(mContextList, String.format(format, args), t);
         }
     }
 
@@ -337,7 +371,7 @@ public class Logger {
 
         if (mLevel <= ERROR_LEVEL) {
 
-            mLog.err(message);
+            mLog.err(mContextList, message);
         }
     }
 
@@ -351,7 +385,7 @@ public class Logger {
 
         if (mLevel <= ERROR_LEVEL) {
 
-            mLog.err(String.format(format, arg1));
+            mLog.err(mContextList, String.format(format, arg1));
         }
     }
 
@@ -366,7 +400,7 @@ public class Logger {
 
         if (mLevel <= ERROR_LEVEL) {
 
-            mLog.err(String.format(format, arg1, arg2));
+            mLog.err(mContextList, String.format(format, arg1, arg2));
         }
     }
 
@@ -382,7 +416,7 @@ public class Logger {
 
         if (mLevel <= ERROR_LEVEL) {
 
-            mLog.err(String.format(format, arg1, arg2, arg3));
+            mLog.err(mContextList, String.format(format, arg1, arg2, arg3));
         }
     }
 
@@ -400,7 +434,7 @@ public class Logger {
 
         if (mLevel <= ERROR_LEVEL) {
 
-            mLog.err(String.format(format, arg1, arg2, arg3, arg4));
+            mLog.err(mContextList, String.format(format, arg1, arg2, arg3, arg4));
         }
     }
 
@@ -414,7 +448,7 @@ public class Logger {
 
         if (mLevel <= ERROR_LEVEL) {
 
-            mLog.err(String.format(format, args));
+            mLog.err(mContextList, String.format(format, args));
         }
     }
 
@@ -427,7 +461,7 @@ public class Logger {
 
         if (mLevel <= ERROR_LEVEL) {
 
-            mLog.err(write(t));
+            mLog.err(mContextList, printStackTrace(t));
         }
     }
 
@@ -441,7 +475,7 @@ public class Logger {
 
         if (mLevel <= ERROR_LEVEL) {
 
-            mLog.err(message + EXCEPTION_MESSAGE + write(t));
+            mLog.err(mContextList, message, t);
         }
     }
 
@@ -456,7 +490,7 @@ public class Logger {
 
         if (mLevel <= ERROR_LEVEL) {
 
-            mLog.err(String.format(format, arg1) + EXCEPTION_MESSAGE + write(t));
+            mLog.err(mContextList, String.format(format, arg1), t);
         }
     }
 
@@ -472,7 +506,7 @@ public class Logger {
 
         if (mLevel <= ERROR_LEVEL) {
 
-            mLog.err(String.format(format, arg1, arg2) + EXCEPTION_MESSAGE + write(t));
+            mLog.err(mContextList, String.format(format, arg1, arg2), t);
         }
     }
 
@@ -490,7 +524,7 @@ public class Logger {
 
         if (mLevel <= ERROR_LEVEL) {
 
-            mLog.err(String.format(format, arg1, arg2, arg3) + EXCEPTION_MESSAGE + write(t));
+            mLog.err(mContextList, String.format(format, arg1, arg2, arg3), t);
         }
     }
 
@@ -509,7 +543,7 @@ public class Logger {
 
         if (mLevel <= ERROR_LEVEL) {
 
-            mLog.err(String.format(format, arg1, arg2, arg3, arg4) + EXCEPTION_MESSAGE + write(t));
+            mLog.err(mContextList, String.format(format, arg1, arg2, arg3, arg4), t);
         }
     }
 
@@ -524,8 +558,58 @@ public class Logger {
 
         if (mLevel <= ERROR_LEVEL) {
 
-            mLog.err(String.format(format, args) + EXCEPTION_MESSAGE + write(t));
+            mLog.err(mContextList, String.format(format, args), t);
         }
+    }
+
+    /**
+     * Returns the list of contexts.
+     *
+     * @return the list of contexts.
+     */
+    public List<Object> getContextList() {
+
+        return mContextList;
+    }
+
+    /**
+     * Returns the log instance of this logger.
+     *
+     * @return the log instance.
+     */
+    public Log getLog() {
+
+        return mLog;
+    }
+
+    /**
+     * Returns the log level of this logger.
+     *
+     * @return the log level.
+     */
+    public LogLevel getLogLevel() {
+
+        return mLogLevel;
+    }
+
+    /**
+     * Creates a new logger with the same log instance and log level, but adding the specified
+     * contexts to the contexts array.
+     *
+     * @param contexts the array of contexts.
+     * @return the new logger.
+     */
+    public Logger subContextLogger(final Object... contexts) {
+
+        final Object[] thisContexts = mContexts;
+        final int thisLength = thisContexts.length;
+        final int length = contexts.length;
+        final Object[] newContexts = new Object[thisLength + length];
+
+        System.arraycopy(thisContexts, 0, newContexts, 0, thisLength);
+        System.arraycopy(contexts, 0, newContexts, thisLength, length);
+
+        return new Logger(newContexts, mLog, mLogLevel);
     }
 
     /**
@@ -537,7 +621,7 @@ public class Logger {
 
         if (mLevel <= WARNING_LEVEL) {
 
-            mLog.wrn(message);
+            mLog.wrn(mContextList, message);
         }
     }
 
@@ -551,7 +635,7 @@ public class Logger {
 
         if (mLevel <= WARNING_LEVEL) {
 
-            mLog.wrn(String.format(format, arg1));
+            mLog.wrn(mContextList, String.format(format, arg1));
         }
     }
 
@@ -566,7 +650,7 @@ public class Logger {
 
         if (mLevel <= WARNING_LEVEL) {
 
-            mLog.wrn(String.format(format, arg1, arg2));
+            mLog.wrn(mContextList, String.format(format, arg1, arg2));
         }
     }
 
@@ -582,7 +666,7 @@ public class Logger {
 
         if (mLevel <= WARNING_LEVEL) {
 
-            mLog.wrn(String.format(format, arg1, arg2, arg3));
+            mLog.wrn(mContextList, String.format(format, arg1, arg2, arg3));
         }
     }
 
@@ -600,7 +684,7 @@ public class Logger {
 
         if (mLevel <= WARNING_LEVEL) {
 
-            mLog.wrn(String.format(format, arg1, arg2, arg3, arg4));
+            mLog.wrn(mContextList, String.format(format, arg1, arg2, arg3, arg4));
         }
     }
 
@@ -614,7 +698,7 @@ public class Logger {
 
         if (mLevel <= WARNING_LEVEL) {
 
-            mLog.wrn(String.format(format, args));
+            mLog.wrn(mContextList, String.format(format, args));
         }
     }
 
@@ -627,7 +711,7 @@ public class Logger {
 
         if (mLevel <= WARNING_LEVEL) {
 
-            mLog.wrn(write(t));
+            mLog.wrn(mContextList, printStackTrace(t));
         }
     }
 
@@ -641,7 +725,7 @@ public class Logger {
 
         if (mLevel <= WARNING_LEVEL) {
 
-            mLog.wrn(message + EXCEPTION_MESSAGE + write(t));
+            mLog.wrn(mContextList, message, t);
         }
     }
 
@@ -656,7 +740,7 @@ public class Logger {
 
         if (mLevel <= WARNING_LEVEL) {
 
-            mLog.wrn(String.format(format, arg1) + EXCEPTION_MESSAGE + write(t));
+            mLog.wrn(mContextList, String.format(format, arg1), t);
         }
     }
 
@@ -672,7 +756,7 @@ public class Logger {
 
         if (mLevel <= WARNING_LEVEL) {
 
-            mLog.wrn(String.format(format, arg1, arg2) + EXCEPTION_MESSAGE + write(t));
+            mLog.wrn(mContextList, String.format(format, arg1, arg2), t);
         }
     }
 
@@ -690,7 +774,7 @@ public class Logger {
 
         if (mLevel <= WARNING_LEVEL) {
 
-            mLog.wrn(String.format(format, arg1, arg2, arg3) + EXCEPTION_MESSAGE + write(t));
+            mLog.wrn(mContextList, String.format(format, arg1, arg2, arg3), t);
         }
     }
 
@@ -709,7 +793,7 @@ public class Logger {
 
         if (mLevel <= WARNING_LEVEL) {
 
-            mLog.wrn(String.format(format, arg1, arg2, arg3, arg4) + EXCEPTION_MESSAGE + write(t));
+            mLog.wrn(mContextList, String.format(format, arg1, arg2, arg3, arg4), t);
         }
     }
 
@@ -724,7 +808,7 @@ public class Logger {
 
         if (mLevel <= WARNING_LEVEL) {
 
-            mLog.wrn(String.format(format, args) + EXCEPTION_MESSAGE + write(t));
+            mLog.wrn(mContextList, String.format(format, args), t);
         }
     }
 }

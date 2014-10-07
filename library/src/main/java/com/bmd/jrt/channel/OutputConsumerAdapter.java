@@ -16,6 +16,8 @@ package com.bmd.jrt.channel;
 /**
  * Empty abstract implementation of an output consumer.
  * <p/>
+ * This class is useful to avoid the need of implementing all the methods defined in the interface.
+ * <p/>
  * Created by davide on 9/16/14.
  *
  * @param <OUTPUT> the output type.

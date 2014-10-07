@@ -338,7 +338,7 @@ public class TimeDuration extends Time {
      *
      * @param nanoTime the starting system time in nanoseconds.
      * @return whether the sleep happened at all.
-     * @throws InterruptedException if the current thread is interrupted.
+     * @throws InterruptedException  if the current thread is interrupted.
      * @throws IllegalStateException if this duration overflows the maximum sleep time.
      * @see System#nanoTime()
      */

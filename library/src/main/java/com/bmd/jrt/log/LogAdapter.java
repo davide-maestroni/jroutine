@@ -15,9 +15,12 @@ package com.bmd.jrt.log;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Abstract implementation of a log.
+ * <p/>
+ * This class is useful to avoid the need of implementing all the methods defined in the interface.
  * <p/>
  * A standard format is applied to the log messages.<br/>
  * The inheriting class may just implement the writing of the formatted message, or customize it
@@ -27,38 +30,87 @@ import java.util.Date;
  */
 public abstract class LogAdapter implements Log {
 
-    private static final String DATE_FORMAT = "yyyy/MM/dd HH:mm:ss.SSS z";
+    private static final String DATE_FORMAT = "MM/dd HH:mm:ss.SSS z";
 
-    private static final String LOG_FORMAT = "[%s] %s - %s: %s";
+    private static final String EXCEPTION_FORMAT = " - caused by exception:%n%s";
 
-    @Override
-    public void dbg(final String message) {
+    private static final String LOG_FORMAT = "%s\t%s\t%s%s: %s";
 
-        log(LogLevel.DEBUG, message);
+    private static String format(final LogLevel level, final List<Object> contexts,
+            final String message) {
+
+        final StringBuilder builder = new StringBuilder();
+
+        for (final Object context : contexts) {
+
+            builder.append(" >> ").append(context);
+        }
+
+        return String.format(LOG_FORMAT, new SimpleDateFormat(DATE_FORMAT).format(new Date()),
+                             Thread.currentThread().getName(), level, builder.toString(), message);
     }
 
     @Override
-    public void err(final String message) {
+    public void dbg(final List<Object> contexts, final String message) {
 
-        log(LogLevel.ERROR, message);
+        log(LogLevel.DEBUG, contexts, message);
     }
 
     @Override
-    public void wrn(final String message) {
+    public void dbg(final List<Object> contexts, final String message, final Throwable throwable) {
 
-        log(LogLevel.WARNING, message);
+        log(LogLevel.DEBUG, contexts, message, throwable);
+    }
+
+    @Override
+    public void err(final List<Object> contexts, final String message) {
+
+        log(LogLevel.ERROR, contexts, message);
+    }
+
+    @Override
+    public void err(final List<Object> contexts, final String message, final Throwable throwable) {
+
+        log(LogLevel.ERROR, contexts, message, throwable);
+    }
+
+    @Override
+    public void wrn(final List<Object> contexts, final String message) {
+
+        log(LogLevel.WARNING, contexts, message);
+    }
+
+    @Override
+    public void wrn(final List<Object> contexts, final String message, final Throwable throwable) {
+
+        log(LogLevel.WARNING, contexts, message, throwable);
     }
 
     /**
-     * Writes the specified message after formatting it.
+     * Formats and then write the specified log message.
      *
-     * @param level   the message level.
-     * @param message the message.
+     * @param level    the log level.
+     * @param contexts the log context array.
+     * @param message  the log message.
      */
-    protected void log(final LogLevel level, final String message) {
+    protected void log(final LogLevel level, final List<Object> contexts, final String message) {
 
-        log(String.format(LOG_FORMAT, new SimpleDateFormat(DATE_FORMAT).format(new Date()),
-                          Thread.currentThread(), level, message));
+        log(format(level, contexts, message));
+    }
+
+    /**
+     * Formats and then write the specified log message.
+     *
+     * @param level     the log level.
+     * @param contexts  the log context array.
+     * @param message   the log message.
+     * @param throwable the related exception.
+     */
+    protected void log(final LogLevel level, final List<Object> contexts, final String message,
+            final Throwable throwable) {
+
+        log(format(level, contexts, message) + String.format(EXCEPTION_FORMAT,
+                                                             Logger.printStackTrace(throwable)));
     }
 
     /**

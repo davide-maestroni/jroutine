@@ -23,7 +23,8 @@ import static com.bmd.jrt.time.TimeDuration.fromUnit;
 import static com.bmd.jrt.time.TimeDuration.nanos;
 
 /**
- * Class maintaining a queue of invocations which is local to the calling thread.<br/>
+ * Class maintaining a queue of invocations which is local to the calling thread.
+ * <p/>
  * The implementation ensures that recursive invocations are broken into a consuming loop running
  * in the same thread.
  * <p/>

@@ -13,6 +13,8 @@
  */
 package com.bmd.jrt.log;
 
+import java.util.List;
+
 /**
  * Log implementation simply discarding all messages.
  * <p/>
@@ -21,7 +23,13 @@ package com.bmd.jrt.log;
 public class NullLog extends LogAdapter {
 
     @Override
-    protected void log(final LogLevel level, final String message) {
+    protected void log(final LogLevel level, final List<Object> contexts, final String message) {
+
+    }
+
+    @Override
+    protected void log(final LogLevel level, final List<Object> contexts, final String message,
+            final Throwable throwable) {
 
     }
 }

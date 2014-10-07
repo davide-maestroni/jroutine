@@ -18,6 +18,8 @@ import com.bmd.jrt.channel.ResultChannel;
 /**
  * Empty abstract implementation of a routine execution.
  * <p/>
+ * This class is useful to avoid the need of implementing all the methods defined in the interface.
+ * <p/>
  * Created by davide on 9/11/14.
  *
  * @param <INPUT>  the input type.

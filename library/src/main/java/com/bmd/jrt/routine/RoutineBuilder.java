@@ -141,6 +141,19 @@ public class RoutineBuilder<INPUT, OUTPUT> {
     }
 
     /**
+     * Builds and returns the routine instance.
+     *
+     * @return the newly created routine.
+     */
+    public Routine<INPUT, OUTPUT> buildRoutine() {
+
+        return new DefaultRoutine<INPUT, OUTPUT>(mSyncRunner, mAsyncRunner, mMaxRunning,
+                                                 mMaxRetained, mAvailTimeout, mOrderedInput,
+                                                 mOrderedOutput, mLog, mLogLevel,
+                                                 mClassToken.getRawClass(), mArgs);
+    }
+
+    /**
      * Sets the log level.
      *
      * @param level the log level.
@@ -258,19 +271,6 @@ public class RoutineBuilder<INPUT, OUTPUT> {
         mSyncRunner = Runners.queued();
 
         return this;
-    }
-
-    /**
-     * Builds and returns the routine instance.
-     *
-     * @return the newly created routine.
-     */
-    public Routine<INPUT, OUTPUT> routine() {
-
-        return new DefaultRoutine<INPUT, OUTPUT>(mSyncRunner, mAsyncRunner, mMaxRunning,
-                                                 mMaxRetained, mAvailTimeout, mOrderedInput,
-                                                 mOrderedOutput, mLog, mLogLevel,
-                                                 mClassToken.getRawClass(), mArgs);
     }
 
     /**

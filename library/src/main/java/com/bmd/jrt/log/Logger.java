@@ -171,7 +171,7 @@ public class Logger {
 
         if (mLevel <= DEBUG_LEVEL) {
 
-            mLog.dbg(mContextList, message);
+            mLog.dbg(mContextList, message, null);
         }
     }
 
@@ -185,7 +185,7 @@ public class Logger {
 
         if (mLevel <= DEBUG_LEVEL) {
 
-            mLog.dbg(mContextList, String.format(format, arg1));
+            mLog.dbg(mContextList, String.format(format, arg1), null);
         }
     }
 
@@ -200,7 +200,7 @@ public class Logger {
 
         if (mLevel <= DEBUG_LEVEL) {
 
-            mLog.dbg(mContextList, String.format(format, arg1, arg2));
+            mLog.dbg(mContextList, String.format(format, arg1, arg2), null);
         }
     }
 
@@ -216,7 +216,7 @@ public class Logger {
 
         if (mLevel <= DEBUG_LEVEL) {
 
-            mLog.dbg(mContextList, String.format(format, arg1, arg2, arg3));
+            mLog.dbg(mContextList, String.format(format, arg1, arg2, arg3), null);
         }
     }
 
@@ -234,7 +234,7 @@ public class Logger {
 
         if (mLevel <= DEBUG_LEVEL) {
 
-            mLog.dbg(mContextList, String.format(format, arg1, arg2, arg3, arg4));
+            mLog.dbg(mContextList, String.format(format, arg1, arg2, arg3, arg4), null);
         }
     }
 
@@ -248,7 +248,7 @@ public class Logger {
 
         if (mLevel <= DEBUG_LEVEL) {
 
-            mLog.dbg(mContextList, String.format(format, args));
+            mLog.dbg(mContextList, String.format(format, args), null);
         }
     }
 
@@ -261,7 +261,7 @@ public class Logger {
 
         if (mLevel <= DEBUG_LEVEL) {
 
-            mLog.dbg(mContextList, printStackTrace(t));
+            mLog.dbg(mContextList, "", t);
         }
     }
 
@@ -371,7 +371,7 @@ public class Logger {
 
         if (mLevel <= ERROR_LEVEL) {
 
-            mLog.err(mContextList, message);
+            mLog.err(mContextList, message, null);
         }
     }
 
@@ -385,7 +385,7 @@ public class Logger {
 
         if (mLevel <= ERROR_LEVEL) {
 
-            mLog.err(mContextList, String.format(format, arg1));
+            mLog.err(mContextList, String.format(format, arg1), null);
         }
     }
 
@@ -400,7 +400,7 @@ public class Logger {
 
         if (mLevel <= ERROR_LEVEL) {
 
-            mLog.err(mContextList, String.format(format, arg1, arg2));
+            mLog.err(mContextList, String.format(format, arg1, arg2), null);
         }
     }
 
@@ -416,7 +416,7 @@ public class Logger {
 
         if (mLevel <= ERROR_LEVEL) {
 
-            mLog.err(mContextList, String.format(format, arg1, arg2, arg3));
+            mLog.err(mContextList, String.format(format, arg1, arg2, arg3), null);
         }
     }
 
@@ -434,7 +434,7 @@ public class Logger {
 
         if (mLevel <= ERROR_LEVEL) {
 
-            mLog.err(mContextList, String.format(format, arg1, arg2, arg3, arg4));
+            mLog.err(mContextList, String.format(format, arg1, arg2, arg3, arg4), null);
         }
     }
 
@@ -448,7 +448,7 @@ public class Logger {
 
         if (mLevel <= ERROR_LEVEL) {
 
-            mLog.err(mContextList, String.format(format, args));
+            mLog.err(mContextList, String.format(format, args), null);
         }
     }
 
@@ -461,7 +461,7 @@ public class Logger {
 
         if (mLevel <= ERROR_LEVEL) {
 
-            mLog.err(mContextList, printStackTrace(t));
+            mLog.err(mContextList, "", t);
         }
     }
 
@@ -621,7 +621,7 @@ public class Logger {
 
         if (mLevel <= WARNING_LEVEL) {
 
-            mLog.wrn(mContextList, message);
+            mLog.wrn(mContextList, message, null);
         }
     }
 
@@ -635,7 +635,7 @@ public class Logger {
 
         if (mLevel <= WARNING_LEVEL) {
 
-            mLog.wrn(mContextList, String.format(format, arg1));
+            mLog.wrn(mContextList, String.format(format, arg1), null);
         }
     }
 
@@ -650,7 +650,7 @@ public class Logger {
 
         if (mLevel <= WARNING_LEVEL) {
 
-            mLog.wrn(mContextList, String.format(format, arg1, arg2));
+            mLog.wrn(mContextList, String.format(format, arg1, arg2), null);
         }
     }
 
@@ -666,7 +666,7 @@ public class Logger {
 
         if (mLevel <= WARNING_LEVEL) {
 
-            mLog.wrn(mContextList, String.format(format, arg1, arg2, arg3));
+            mLog.wrn(mContextList, String.format(format, arg1, arg2, arg3), null);
         }
     }
 
@@ -684,7 +684,7 @@ public class Logger {
 
         if (mLevel <= WARNING_LEVEL) {
 
-            mLog.wrn(mContextList, String.format(format, arg1, arg2, arg3, arg4));
+            mLog.wrn(mContextList, String.format(format, arg1, arg2, arg3, arg4), null);
         }
     }
 
@@ -698,7 +698,7 @@ public class Logger {
 
         if (mLevel <= WARNING_LEVEL) {
 
-            mLog.wrn(mContextList, String.format(format, args));
+            mLog.wrn(mContextList, String.format(format, args), null);
         }
     }
 
@@ -711,7 +711,7 @@ public class Logger {
 
         if (mLevel <= WARNING_LEVEL) {
 
-            mLog.wrn(mContextList, printStackTrace(t));
+            mLog.wrn(mContextList, "", t);
         }
     }
 

@@ -27,7 +27,7 @@ import java.util.List;
  * fields when needed.
  * <p/>
  * To avoid an excessive number of log messages it is sufficient to set an higher log level.
- * Though, it is also possible to strip completely the log source code (and related strings) from
+ * Though, it is also possible to completely remove the log source code (and related strings) from
  * the released code, by using Proguard and adding, for example, the following rule to the
  * configuration file:
  * <pre>
@@ -38,7 +38,6 @@ import java.util.List;
  *         }
  *     </code>
  * </pre>
- * TODO: strip create()
  * <p/>
  * Created by davide on 10/3/14.
  *
@@ -49,51 +48,27 @@ public interface Log {
     /**
      * Logs a debug message.
      *
-     * @param contexts the array of contexts.
-     * @param message  the message.
-     */
-    public void dbg(List<Object> contexts, String message);
-
-    /**
-     * Logs a debug message.
-     *
      * @param contexts  the array of contexts.
      * @param message   the message.
-     * @param throwable the optional throwable.
+     * @param throwable the optional throwable or null.
      */
     public void dbg(List<Object> contexts, String message, Throwable throwable);
 
     /**
      * Logs an error message.
      *
-     * @param contexts the array of contexts.
-     * @param message  the message.
-     */
-    public void err(List<Object> contexts, String message);
-
-    /**
-     * Logs an error message.
-     *
      * @param contexts  the array of contexts.
      * @param message   the message.
-     * @param throwable the optional throwable.
+     * @param throwable the optional throwable or null.
      */
     public void err(List<Object> contexts, String message, Throwable throwable);
 
     /**
      * Logs a warning message.
      *
-     * @param contexts the array of contexts.
-     * @param message  the message.
-     */
-    public void wrn(List<Object> contexts, String message);
-
-    /**
-     * Logs a warning message.
-     *
      * @param contexts  the array of contexts.
      * @param message   the message.
-     * @param throwable the optional throwable.
+     * @param throwable the optional throwable or null.
      */
     public void wrn(List<Object> contexts, String message, Throwable throwable);
 

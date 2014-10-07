@@ -434,7 +434,7 @@ public class ClassRoutineBuilder {
             routine = builder.logWith(log)
                              .logLevel(logLevel)
                              .withArgs(target, method, catchClause, mutex)
-                             .routine();
+                             .buildRoutine();
             routineMap.put(routineInfo, routine);
         }
 

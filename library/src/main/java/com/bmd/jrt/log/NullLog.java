@@ -23,11 +23,6 @@ import java.util.List;
 public class NullLog extends LogAdapter {
 
     @Override
-    protected void log(final LogLevel level, final List<Object> contexts, final String message) {
-
-    }
-
-    @Override
     protected void log(final LogLevel level, final List<Object> contexts, final String message,
             final Throwable throwable) {
 

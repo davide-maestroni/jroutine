@@ -62,7 +62,7 @@ public class RoutineTest extends TestCase {
         };
 
         final Routine<Integer, Integer> sumRoutine =
-                on(ClassToken.classOf(execSum)).withArgs(this).routine();
+                on(ClassToken.classOf(execSum)).withArgs(this).buildRoutine();
 
         final ExecutionAdapter<Integer, Integer> invokeSquare =
                 new ExecutionAdapter<Integer, Integer>() {
@@ -78,7 +78,7 @@ public class RoutineTest extends TestCase {
                 };
 
         final Routine<Integer, Integer> squareRoutine =
-                on(ClassToken.classOf(invokeSquare)).withArgs(this).routine();
+                on(ClassToken.classOf(invokeSquare)).withArgs(this).buildRoutine();
 
         assertThat(sumRoutine.call(squareRoutine.run(1, 2, 3, 4))).containsExactly(30);
         assertThat(sumRoutine.callAsyn(squareRoutine.run(1, 2, 3, 4))).containsExactly(30);
@@ -120,7 +120,7 @@ public class RoutineTest extends TestCase {
         };
 
         final Routine<Integer, Integer> sumRoutine =
-                on(ClassToken.classOf(execSum)).withArgs(this).routine();
+                on(ClassToken.classOf(execSum)).withArgs(this).buildRoutine();
 
         final ExecutionAdapter<Integer, Integer> invokeSquare =
                 new ExecutionAdapter<Integer, Integer>() {
@@ -136,7 +136,7 @@ public class RoutineTest extends TestCase {
                 };
 
         final Routine<Integer, Integer> squareRoutine =
-                on(ClassToken.classOf(invokeSquare)).withArgs(this).routine();
+                on(ClassToken.classOf(invokeSquare)).withArgs(this).buildRoutine();
 
         final ExecutionAdapter<Integer, Integer> invokeSquareSum =
                 new ExecutionAdapter<Integer, Integer>() {
@@ -171,7 +171,7 @@ public class RoutineTest extends TestCase {
 
         final Routine<Integer, Integer> squareSumRoutine =
                 on(ClassToken.classOf(invokeSquareSum)).withArgs(this, sumRoutine, squareRoutine)
-                                                       .routine();
+                                                       .buildRoutine();
 
         assertThat(squareSumRoutine.call(1, 2, 3, 4)).containsExactly(30);
         assertThat(squareSumRoutine.callAsyn(1, 2, 3, 4)).containsExactly(30);
@@ -194,7 +194,7 @@ public class RoutineTest extends TestCase {
         try {
 
             on(ClassToken.tokenOf(ConstructorException.class)).logLevel(LogLevel.SILENT)
-                                                              .routine()
+                                                              .buildRoutine()
                                                               .call();
 
             fail();
@@ -361,12 +361,12 @@ public class RoutineTest extends TestCase {
         };
 
         final Routine<String, String> exceptionRoutine =
-                on(ClassToken.classOf(exceptionOnInit)).withArgs(this).routine();
+                on(ClassToken.classOf(exceptionOnInit)).withArgs(this).buildRoutine();
 
         testException(exceptionRoutine, "test", "test1");
 
         final Routine<String, String> passThroughRoutine =
-                on(ClassToken.tokenOf(PassThroughExecution.class)).routine();
+                on(ClassToken.tokenOf(PassThroughExecution.class)).buildRoutine();
 
         testChained(passThroughRoutine, exceptionRoutine, "test", "test1");
         testChained(exceptionRoutine, passThroughRoutine, "test", "test1");
@@ -384,12 +384,12 @@ public class RoutineTest extends TestCase {
         };
 
         final Routine<String, String> exceptionRoutine =
-                on(ClassToken.classOf(exceptionOnInput)).withArgs(this).routine();
+                on(ClassToken.classOf(exceptionOnInput)).withArgs(this).buildRoutine();
 
         testException(exceptionRoutine, "test2", "test2");
 
         final Routine<String, String> passThroughRoutine =
-                on(ClassToken.tokenOf(PassThroughExecution.class)).routine();
+                on(ClassToken.tokenOf(PassThroughExecution.class)).buildRoutine();
 
         testChained(passThroughRoutine, exceptionRoutine, "test2", "test2");
         testChained(exceptionRoutine, passThroughRoutine, "test2", "test2");
@@ -407,12 +407,12 @@ public class RoutineTest extends TestCase {
         };
 
         final Routine<String, String> exceptionRoutine =
-                on(ClassToken.classOf(exceptionOnResult)).withArgs(this).routine();
+                on(ClassToken.classOf(exceptionOnResult)).withArgs(this).buildRoutine();
 
         testException(exceptionRoutine, "test", "test3");
 
         final Routine<String, String> passThroughRoutine =
-                on(ClassToken.tokenOf(PassThroughExecution.class)).routine();
+                on(ClassToken.tokenOf(PassThroughExecution.class)).buildRoutine();
 
         testChained(passThroughRoutine, exceptionRoutine, "test", "test3");
         testChained(exceptionRoutine, passThroughRoutine, "test", "test3");
@@ -436,12 +436,12 @@ public class RoutineTest extends TestCase {
         };
 
         final Routine<String, String> exceptionRoutine =
-                on(ClassToken.classOf(exceptionOnReturn)).withArgs(this).routine();
+                on(ClassToken.classOf(exceptionOnReturn)).withArgs(this).buildRoutine();
 
         testException(exceptionRoutine, "test", "test4");
 
         final Routine<String, String> passThroughRoutine =
-                on(ClassToken.tokenOf(PassThroughExecution.class)).routine();
+                on(ClassToken.tokenOf(PassThroughExecution.class)).buildRoutine();
 
         testChained(passThroughRoutine, exceptionRoutine, "test", "test4");
         testChained(exceptionRoutine, passThroughRoutine, "test", "test4");
@@ -507,9 +507,7 @@ public class RoutineTest extends TestCase {
                 };
 
         final Routine<Integer, Integer> squareRoutine =
-                on(ClassToken.classOf(execSquare)).logLevel(LogLevel.DEBUG)
-                                                  .withArgs(this)
-                                                  .routine();
+                on(ClassToken.classOf(execSquare)).withArgs(this).buildRoutine();
 
         assertThat(squareRoutine.call(1, 2, 3, 4)).containsExactly(1, 4, 9, 16);
         assertThat(squareRoutine.callAsyn(1, 2, 3, 4)).containsExactly(1, 4, 9, 16);
@@ -539,7 +537,7 @@ public class RoutineTest extends TestCase {
         };
 
         final Routine<Integer, Integer> sumRoutine =
-                on(ClassToken.classOf(execSum)).withArgs(this).routine();
+                on(ClassToken.classOf(execSum)).withArgs(this).buildRoutine();
 
         assertThat(sumRoutine.call(1, 2, 3, 4)).containsExactly(10);
         assertThat(sumRoutine.callAsyn(1, 2, 3, 4)).containsExactly(10);
@@ -1005,7 +1003,7 @@ public class RoutineTest extends TestCase {
         final String input = "test";
         final Routine<String, String> routine =
                 on(ClassToken.tokenOf(DelayExecution.class)).withArgs(TimeDuration.millis(0))
-                                                            .routine();
+                                                            .buildRoutine();
 
         assertThat(routine.run(input).bind(consumer).waitComplete()).isTrue();
         assertThat(routine.runAsyn(input).bind(consumer).waitComplete()).isTrue();

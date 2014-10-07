@@ -34,26 +34,13 @@ public abstract class LogAdapter implements Log {
 
     private static final String EXCEPTION_FORMAT = " - caused by exception:%n%s";
 
-    private static final String LOG_FORMAT = "%s\t%s\t%s%s: %s";
+    private static final String LOG_FORMAT = "%s\t%s\t%s\t%s\t> %s";
 
     private static String format(final LogLevel level, final List<Object> contexts,
             final String message) {
 
-        final StringBuilder builder = new StringBuilder();
-
-        for (final Object context : contexts) {
-
-            builder.append(" >> ").append(context);
-        }
-
         return String.format(LOG_FORMAT, new SimpleDateFormat(DATE_FORMAT).format(new Date()),
-                             Thread.currentThread().getName(), level, builder.toString(), message);
-    }
-
-    @Override
-    public void dbg(final List<Object> contexts, final String message) {
-
-        log(LogLevel.DEBUG, contexts, message);
+                             Thread.currentThread().getName(), level, contexts.toString(), message);
     }
 
     @Override
@@ -63,39 +50,15 @@ public abstract class LogAdapter implements Log {
     }
 
     @Override
-    public void err(final List<Object> contexts, final String message) {
-
-        log(LogLevel.ERROR, contexts, message);
-    }
-
-    @Override
     public void err(final List<Object> contexts, final String message, final Throwable throwable) {
 
         log(LogLevel.ERROR, contexts, message, throwable);
     }
 
     @Override
-    public void wrn(final List<Object> contexts, final String message) {
-
-        log(LogLevel.WARNING, contexts, message);
-    }
-
-    @Override
     public void wrn(final List<Object> contexts, final String message, final Throwable throwable) {
 
         log(LogLevel.WARNING, contexts, message, throwable);
-    }
-
-    /**
-     * Formats and then write the specified log message.
-     *
-     * @param level    the log level.
-     * @param contexts the log context array.
-     * @param message  the log message.
-     */
-    protected void log(final LogLevel level, final List<Object> contexts, final String message) {
-
-        log(format(level, contexts, message));
     }
 
     /**
@@ -109,8 +72,14 @@ public abstract class LogAdapter implements Log {
     protected void log(final LogLevel level, final List<Object> contexts, final String message,
             final Throwable throwable) {
 
-        log(format(level, contexts, message) + String.format(EXCEPTION_FORMAT,
-                                                             Logger.printStackTrace(throwable)));
+        String formatted = format(level, contexts, message);
+
+        if (throwable != null) {
+
+            formatted += String.format(EXCEPTION_FORMAT, Logger.printStackTrace(throwable));
+        }
+
+        log(formatted);
     }
 
     /**

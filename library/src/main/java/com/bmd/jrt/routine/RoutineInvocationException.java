@@ -29,7 +29,7 @@ public class RoutineInvocationException extends RoutineException {
 
     private transient final Method mMethod;
 
-    private transient final Object mTarget;
+    private final Object mTarget;
 
     /**
      * Constructor.

@@ -51,9 +51,9 @@ task("jacocoTest", dependsOn: 'test') {
 }
 
 findbugs {
-    toolVersion = "2.0.1"
+    toolVersion = "3.0.0"
     effort = "max"
-    reportLevel = "medium"
+    reportLevel = "low"
 }
 
 tasks.withType(FindBugs) {

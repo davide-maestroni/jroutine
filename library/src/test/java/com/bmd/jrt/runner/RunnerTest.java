@@ -65,7 +65,7 @@ public class RunnerTest extends TestCase {
 
             fail();
 
-        } catch (final Exception ignored) {
+        } catch (final NullPointerException ignored) {
 
         }
     }
@@ -87,6 +87,7 @@ public class RunnerTest extends TestCase {
 
     public void testSequentialRunner() throws InterruptedException {
 
+        //TODO: fail on line 154
         testRunner(new SequentialRunner());
         testRunner(Runners.sequential());
         testRunner(new RunnerDecorator(new SequentialRunner()));

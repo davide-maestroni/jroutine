@@ -53,7 +53,7 @@ task("jacocoTest", dependsOn: 'test') {
 findbugs {
     toolVersion = "2.0.1"
     effort = "max"
-    reportLevel = "high"
+    reportLevel = "medium"
 }
 
 tasks.withType(FindBugs) {

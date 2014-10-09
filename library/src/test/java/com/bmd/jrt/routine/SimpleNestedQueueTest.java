@@ -17,6 +17,7 @@ import junit.framework.TestCase;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.NoSuchElementException;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
@@ -79,7 +80,7 @@ public class SimpleNestedQueueTest extends TestCase {
 
             fail();
 
-        } catch (final Exception ignored) {
+        } catch (final NoSuchElementException ignored) {
 
         }
 
@@ -100,7 +101,7 @@ public class SimpleNestedQueueTest extends TestCase {
 
             fail();
 
-        } catch (final Exception ignored) {
+        } catch (final NoSuchElementException ignored) {
 
         }
 
@@ -117,7 +118,7 @@ public class SimpleNestedQueueTest extends TestCase {
 
             fail();
 
-        } catch (final Exception ignored) {
+        } catch (final NoSuchElementException ignored) {
 
         }
 
@@ -129,7 +130,7 @@ public class SimpleNestedQueueTest extends TestCase {
 
             fail();
 
-        } catch (final Exception ignored) {
+        } catch (final NoSuchElementException ignored) {
 
         }
 
@@ -141,7 +142,7 @@ public class SimpleNestedQueueTest extends TestCase {
 
             fail();
 
-        } catch (final Exception ignored) {
+        } catch (final NoSuchElementException ignored) {
 
         }
 
@@ -151,7 +152,7 @@ public class SimpleNestedQueueTest extends TestCase {
 
             fail();
 
-        } catch (final Exception ignored) {
+        } catch (final IllegalStateException ignored) {
 
         }
 
@@ -161,7 +162,7 @@ public class SimpleNestedQueueTest extends TestCase {
 
             fail();
 
-        } catch (final Exception ignored) {
+        } catch (final IllegalStateException ignored) {
 
         }
 
@@ -171,7 +172,7 @@ public class SimpleNestedQueueTest extends TestCase {
 
             fail();
 
-        } catch (final Exception ignored) {
+        } catch (final IllegalStateException ignored) {
 
         }
 
@@ -181,7 +182,7 @@ public class SimpleNestedQueueTest extends TestCase {
 
             fail();
 
-        } catch (final Exception ignored) {
+        } catch (final IllegalStateException ignored) {
 
         }
 
@@ -191,7 +192,7 @@ public class SimpleNestedQueueTest extends TestCase {
 
             fail();
 
-        } catch (final Exception ignored) {
+        } catch (final IllegalStateException ignored) {
 
         }
 
@@ -201,7 +202,7 @@ public class SimpleNestedQueueTest extends TestCase {
 
             fail();
 
-        } catch (final Exception ignored) {
+        } catch (final IllegalStateException ignored) {
 
         }
 
@@ -213,7 +214,7 @@ public class SimpleNestedQueueTest extends TestCase {
 
             fail();
 
-        } catch (final Exception ignored) {
+        } catch (final IllegalStateException ignored) {
 
         }
 
@@ -223,7 +224,7 @@ public class SimpleNestedQueueTest extends TestCase {
 
             fail();
 
-        } catch (final Exception ignored) {
+        } catch (final IllegalStateException ignored) {
 
         }
 
@@ -233,7 +234,7 @@ public class SimpleNestedQueueTest extends TestCase {
 
             fail();
 
-        } catch (final Exception ignored) {
+        } catch (final IllegalStateException ignored) {
 
         }
     }

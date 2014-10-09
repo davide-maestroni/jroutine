@@ -431,6 +431,11 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
 
         private final boolean mAsync;
 
+        /**
+         * Constructor.
+         *
+         * @param async whether the execution is asynchronous.
+         */
         private DefaultExecutionProvider(final boolean async) {
 
             mAsync = async;

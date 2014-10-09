@@ -88,7 +88,7 @@ public class TimeTest extends TestCase {
 
             fail();
 
-        } catch (final Exception ignored) {
+        } catch (final NullPointerException ignored) {
 
         }
 
@@ -98,7 +98,7 @@ public class TimeTest extends TestCase {
 
             fail();
 
-        } catch (final Exception ignored) {
+        } catch (final NullPointerException ignored) {
 
         }
 
@@ -108,7 +108,7 @@ public class TimeTest extends TestCase {
 
             fail();
 
-        } catch (final Exception ignored) {
+        } catch (final IllegalArgumentException ignored) {
 
         }
 
@@ -118,7 +118,7 @@ public class TimeTest extends TestCase {
 
             fail();
 
-        } catch (final Exception ignored) {
+        } catch (final IllegalArgumentException ignored) {
 
         }
 
@@ -128,7 +128,7 @@ public class TimeTest extends TestCase {
 
             fail();
 
-        } catch (final Exception ignored) {
+        } catch (final IllegalArgumentException ignored) {
 
         }
 
@@ -138,7 +138,7 @@ public class TimeTest extends TestCase {
 
             fail();
 
-        } catch (final Exception ignored) {
+        } catch (final IllegalArgumentException ignored) {
 
         }
 
@@ -148,7 +148,7 @@ public class TimeTest extends TestCase {
 
             fail();
 
-        } catch (final Exception ignored) {
+        } catch (final IllegalArgumentException ignored) {
 
         }
 
@@ -158,7 +158,7 @@ public class TimeTest extends TestCase {
 
             fail();
 
-        } catch (final Exception ignored) {
+        } catch (final IllegalArgumentException ignored) {
 
         }
     }

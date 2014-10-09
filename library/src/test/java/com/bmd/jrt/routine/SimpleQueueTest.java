@@ -16,6 +16,7 @@ package com.bmd.jrt.routine;
 import junit.framework.TestCase;
 
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
@@ -102,7 +103,7 @@ public class SimpleQueueTest extends TestCase {
 
             fail();
 
-        } catch (final Exception ignored) {
+        } catch (final NoSuchElementException ignored) {
 
         }
 
@@ -112,7 +113,7 @@ public class SimpleQueueTest extends TestCase {
 
             fail();
 
-        } catch (final Exception ignored) {
+        } catch (final NoSuchElementException ignored) {
 
         }
 
@@ -134,7 +135,7 @@ public class SimpleQueueTest extends TestCase {
 
             fail();
 
-        } catch (final Exception ignored) {
+        } catch (final NoSuchElementException ignored) {
 
         }
 
@@ -144,7 +145,7 @@ public class SimpleQueueTest extends TestCase {
 
             fail();
 
-        } catch (final Exception ignored) {
+        } catch (final NoSuchElementException ignored) {
 
         }
 
@@ -161,7 +162,7 @@ public class SimpleQueueTest extends TestCase {
 
             fail();
 
-        } catch (final Exception ignored) {
+        } catch (final NoSuchElementException ignored) {
 
         }
 
@@ -171,7 +172,7 @@ public class SimpleQueueTest extends TestCase {
 
             fail();
 
-        } catch (final Exception ignored) {
+        } catch (final NoSuchElementException ignored) {
 
         }
     }

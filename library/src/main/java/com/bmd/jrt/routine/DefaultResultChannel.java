@@ -630,7 +630,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     /**
      * Default implementation of an output channel iterator.
      */
-    public class DefaultIterator implements Iterator<OUTPUT> {
+    private class DefaultIterator implements Iterator<OUTPUT> {
 
         private final Logger mSubLogger = mLogger.subContextLogger(this);
 
@@ -646,7 +646,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
          * @param timeout          the output timeout.
          * @param timeoutException the timeout exception.
          */
-        public DefaultIterator(@NonNull final TimeDuration timeout,
+        private DefaultIterator(@NonNull final TimeDuration timeout,
                 @Nullable final RuntimeException timeoutException) {
 
             mTimeout = timeout;
@@ -717,6 +717,9 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         @Override
         @Nullable
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "IT_NO_SUCH_ELEMENT",
+                                                          justification = "readQueue() actually"
+                                                                  + " throws it")
         public OUTPUT next() {
 
             synchronized (mMutex) {
@@ -1045,7 +1048,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
          *
          * @param delay the output delay.
          */
-        public DefaultOutputConsumer(@NonNull final TimeDuration delay) {
+        private DefaultOutputConsumer(@NonNull final TimeDuration delay) {
 
             mDelay = delay;
             mQueue = mOutputQueue.addNested();
@@ -1162,7 +1165,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
          * @param queue   the output queue.
          * @param outputs the iterable returning the output data.
          */
-        public DelayedListOutputInvocation(@NonNull final NestedQueue<Object> queue,
+        private DelayedListOutputInvocation(@NonNull final NestedQueue<Object> queue,
                 @NonNull final Iterable<? extends OUTPUT> outputs) {
 
             final ArrayList<OUTPUT> outputList = new ArrayList<OUTPUT>();
@@ -1227,7 +1230,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
          * @param queue  the output queue.
          * @param output the output.
          */
-        public DelayedOutputInvocation(@NonNull final NestedQueue<Object> queue,
+        private DelayedOutputInvocation(@NonNull final NestedQueue<Object> queue,
                 @Nullable final OUTPUT output) {
 
             mQueue = queue;

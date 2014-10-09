@@ -25,6 +25,8 @@ import com.bmd.jrt.runner.Runner;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -178,7 +180,7 @@ public class ClassRoutineBuilder {
 
         if (!method.isAccessible()) {
 
-            method.setAccessible(true);
+            AccessController.doPrivileged(new SetAccessibleAction(method));
         }
 
         Runner runner = mRunner;
@@ -654,6 +656,32 @@ public class ClassRoutineBuilder {
                     : that.mIsSequential != null) && mLog.equals(that.mLog)
                     && mLogLevel == that.mLogLevel && mMethod.equals(that.mMethod) && !(
                     mRunner != null ? !mRunner.equals(that.mRunner) : that.mRunner != null);
+        }
+    }
+
+    /**
+     * Privileged action used to grant accessibility to a method.
+     */
+    private static class SetAccessibleAction implements PrivilegedAction<Void> {
+
+        private final Method mMethod;
+
+        /**
+         * Constructor.
+         *
+         * @param method the method instance.
+         */
+        private SetAccessibleAction(@NonNull final Method method) {
+
+            mMethod = method;
+        }
+
+        @Override
+        public Void run() {
+
+            mMethod.setAccessible(true);
+
+            return null;
         }
     }
 }

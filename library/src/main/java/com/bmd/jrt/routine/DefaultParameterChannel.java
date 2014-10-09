@@ -491,6 +491,10 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
         }
 
         @Override
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "IT_NO_SUCH_ELEMENT",
+                                                          justification =
+                                                                  "NestedQueue.removeFirst()"
+                                                                          + " actually throws it")
         public INPUT next() {
 
             synchronized (mMutex) {
@@ -529,7 +533,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
          *
          * @param delay the output delay.
          */
-        public DefaultOutputConsumer(@NonNull final TimeDuration delay) {
+        private DefaultOutputConsumer(@NonNull final TimeDuration delay) {
 
             mDelay = delay;
             mQueue = mInputQueue.addNested();
@@ -637,7 +641,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
          * @param queue the input queue.
          * @param input the input.
          */
-        public DelayedInputInvocation(@NonNull final NestedQueue<INPUT> queue,
+        private DelayedInputInvocation(@NonNull final NestedQueue<INPUT> queue,
                 @Nullable final INPUT input) {
 
             mQueue = queue;
@@ -689,7 +693,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
          * @param queue  the input queue.
          * @param inputs the iterable returning the input data.
          */
-        public DelayedListInputInvocation(@NonNull final NestedQueue<INPUT> queue,
+        private DelayedListInputInvocation(@NonNull final NestedQueue<INPUT> queue,
                 @NonNull final Iterable<? extends INPUT> inputs) {
 
             final ArrayList<INPUT> inputList = new ArrayList<INPUT>();

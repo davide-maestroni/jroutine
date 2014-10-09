@@ -27,9 +27,9 @@ import edu.umd.cs.findbugs.annotations.Nullable;
  */
 public class RoutineInvocationException extends RoutineException {
 
-    private final Method mMethod;
+    private transient final Method mMethod;
 
-    private final Object mTarget;
+    private transient final Object mTarget;
 
     /**
      * Constructor.
@@ -59,6 +59,7 @@ public class RoutineInvocationException extends RoutineException {
      *
      * @return the method.
      */
+    @Nullable
     public Method getMethod() {
 
         return mMethod;
@@ -69,6 +70,7 @@ public class RoutineInvocationException extends RoutineException {
      *
      * @return the target object.
      */
+    @Nullable
     public Object getTarget() {
 
         return mTarget;

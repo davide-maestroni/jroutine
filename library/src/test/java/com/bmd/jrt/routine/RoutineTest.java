@@ -25,6 +25,9 @@ import com.bmd.jrt.execution.ExecutionAdapter;
 import com.bmd.jrt.execution.ExecutionBody;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.log.Logger;
+import com.bmd.jrt.routine.DefaultInvocation.InputIterator;
+import com.bmd.jrt.routine.DefaultParameterChannel.ExecutionProvider;
+import com.bmd.jrt.routine.DefaultResultChannel.AbortHandler;
 import com.bmd.jrt.runner.Runners;
 import com.bmd.jrt.time.TimeDuration;
 
@@ -33,6 +36,7 @@ import junit.framework.TestCase;
 import java.util.List;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 
 import static com.bmd.jrt.routine.JRoutine.on;
 import static org.fest.assertions.api.Assertions.assertThat;
@@ -324,6 +328,63 @@ public class RoutineTest extends TestCase {
             fail();
 
         } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        final Logger logger =
+                Logger.create(Logger.getDefaultLog(), Logger.getDefaultLogLevel(), this);
+
+        try {
+
+            new DefaultInvocation<Object, Object>(null, new TestInputIterator(),
+                                                  new DefaultResultChannel<Object>(
+                                                          new TestAbortHandler(),
+                                                          Runners.sequential(), false, logger),
+                                                  logger);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new DefaultInvocation<Object, Object>(new TestExecutionProvider(), null,
+                                                  new DefaultResultChannel<Object>(
+                                                          new TestAbortHandler(),
+                                                          Runners.sequential(), false, logger),
+                                                  logger);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new DefaultInvocation<Object, Object>(new TestExecutionProvider(),
+                                                  new TestInputIterator(), null, logger);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new DefaultInvocation<Object, Object>(new TestExecutionProvider(),
+                                                  new TestInputIterator(),
+                                                  new DefaultResultChannel<Object>(
+                                                          new TestAbortHandler(),
+                                                          Runners.sequential(), false, logger),
+                                                  null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
 
         }
     }
@@ -1264,6 +1325,14 @@ public class RoutineTest extends TestCase {
         }
     }
 
+    private static class TestAbortHandler implements AbortHandler {
+
+        @Override
+        public void onAbort(@Nullable final Throwable throwable) {
+
+        }
+    }
+
     private static class TestClass implements TestInterface {
 
         public static final String GET_METHOD = "get";
@@ -1284,6 +1353,77 @@ public class RoutineTest extends TestCase {
         public int getOne() {
 
             return 1;
+        }
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    private static class TestExecutionProvider implements ExecutionProvider<Object, Object> {
+
+        @NonNull
+        @Override
+        public Execution<Object, Object> create() {
+
+            return null;
+        }
+
+        @Override
+        public void discard(@NonNull final Execution<Object, Object> execution) {
+
+        }
+
+        @Override
+        public void recycle(@NonNull final Execution<Object, Object> execution) {
+
+        }
+    }
+
+    private static class TestInputIterator implements InputIterator<Object> {
+
+        @Nullable
+        @Override
+        public Throwable getAbortException() {
+
+            return null;
+        }
+
+        @Override
+        public boolean isAborting() {
+
+            return false;
+        }
+
+        @Override
+        public boolean isComplete() {
+
+            return false;
+        }
+
+        @Override
+        public void onAbortComplete() {
+
+        }
+
+        @Override
+        public boolean onConsumeInput() {
+
+            return false;
+        }
+
+        @Override
+        public boolean hasNext() {
+
+            return false;
+        }
+
+        @Override
+        public Object next() {
+
+            return null;
+        }
+
+        @Override
+        public void remove() {
+
         }
     }
 }

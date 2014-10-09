@@ -14,6 +14,8 @@
 package com.bmd.jrt.routine;
 
 import java.lang.reflect.Constructor;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -113,7 +115,7 @@ class ReflectionUtils {
 
         if (!constructor.isAccessible()) {
 
-            constructor.setAccessible(true);
+            AccessController.doPrivileged(new SetAccessibleAction(constructor));
         }
 
         return (Constructor<TYPE>) constructor;
@@ -190,5 +192,31 @@ class ReflectionUtils {
         }
 
         return bestMatch;
+    }
+
+    /**
+     * Privileged action used to grant accessibility to a constructor.
+     */
+    private static class SetAccessibleAction implements PrivilegedAction<Void> {
+
+        private final Constructor<?> mmConstructor;
+
+        /**
+         * Constructor.
+         *
+         * @param constructor the constructor instance.
+         */
+        private SetAccessibleAction(@NonNull final Constructor<?> constructor) {
+
+            mmConstructor = constructor;
+        }
+
+        @Override
+        public Void run() {
+
+            mmConstructor.setAccessible(true);
+
+            return null;
+        }
     }
 }

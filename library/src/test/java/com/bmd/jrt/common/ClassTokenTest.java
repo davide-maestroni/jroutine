@@ -79,7 +79,7 @@ public class ClassTokenTest extends TestCase {
 
             fail();
 
-        } catch (final Exception ignored) {
+        } catch (final NullPointerException ignored) {
 
         }
 
@@ -89,7 +89,7 @@ public class ClassTokenTest extends TestCase {
 
             fail();
 
-        } catch (final Exception ignored) {
+        } catch (final NullPointerException ignored) {
 
         }
 
@@ -99,7 +99,7 @@ public class ClassTokenTest extends TestCase {
 
             fail();
 
-        } catch (final Exception ignored) {
+        } catch (final IllegalStateException ignored) {
 
         }
 
@@ -109,7 +109,7 @@ public class ClassTokenTest extends TestCase {
 
             fail();
 
-        } catch (final Exception ignored) {
+        } catch (final IllegalStateException ignored) {
 
         }
     }

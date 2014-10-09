@@ -340,6 +340,9 @@ class LocalQueue {
         }
     }
 
+    /**
+     * Enumeration identifying the invocation type.
+     */
     private enum InvocationType {
 
         RUN,

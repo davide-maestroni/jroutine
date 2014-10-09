@@ -87,7 +87,7 @@ public class JRoutine {
      * @param <INPUT>    the input type.
      * @param <OUTPUT>   the output type.
      * @return the routine builder instance.
-     * @throws java.lang.NullPointerException if the class token is null.
+     * @throws NullPointerException if the class token is null.
      */
     @NonNull
     public static <INPUT, OUTPUT> RoutineBuilder<INPUT, OUTPUT> on(
@@ -101,9 +101,9 @@ public class JRoutine {
      *
      * @param target the target object.
      * @return the routine builder instance.
-     * @throws java.lang.NullPointerException     if the specified target is null.
-     * @throws java.lang.IllegalArgumentException if a duplicate name in the annotations is
-     *                                            detected.
+     * @throws NullPointerException     if the specified target is null.
+     * @throws IllegalArgumentException if a duplicate name in the annotations is
+     *                                  detected.
      */
     @NonNull
     public static ObjectRoutineBuilder on(@NonNull final Object target) {
@@ -116,9 +116,9 @@ public class JRoutine {
      *
      * @param target the target class.
      * @return the routine builder instance.
-     * @throws java.lang.NullPointerException     if the specified target is null.
-     * @throws java.lang.IllegalArgumentException if a duplicate name in the annotations is
-     *                                            detected.
+     * @throws NullPointerException     if the specified target is null.
+     * @throws IllegalArgumentException if a duplicate name in the annotations is
+     *                                  detected.
      */
     @NonNull
     public static ClassRoutineBuilder on(@NonNull final Class<?> target) {

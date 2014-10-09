@@ -44,7 +44,7 @@ public class AndroidRunners {
      *
      * @param looper the looper instance.
      * @return the runner instance.
-     * @throws java.lang.IllegalArgumentException if the specified looper is null.
+     * @throws IllegalArgumentException if the specified looper is null.
      */
     @NonNull
     public static Runner looper(@NonNull final Looper looper) {

@@ -27,7 +27,7 @@ public class TimeDuration extends Time {
     /**
      * Time duration instance representing the infinity.
      */
-    public static final TimeDuration INFINITY = days(Long.MAX_VALUE);
+    public static final TimeDuration INFINITY = seconds(Long.MAX_VALUE);
 
     /**
      * Time duration instance representing the zero.
@@ -67,6 +67,11 @@ public class TimeDuration extends Time {
     @NonNull
     public static TimeDuration days(final long days) {
 
+        if ((days > MAX_DAYS) || (days < -MAX_DAYS)) {
+
+            throw new IllegalArgumentException("time value overflow");
+        }
+
         return new TimeDuration(days * SECONDS_IN_DAY, TimeUnit.SECONDS);
     }
 
@@ -101,6 +106,11 @@ public class TimeDuration extends Time {
      */
     @NonNull
     public static TimeDuration hours(final long hours) {
+
+        if ((hours > MAX_HOURS) || (hours < -MAX_HOURS)) {
+
+            throw new IllegalArgumentException("time value overflow");
+        }
 
         return new TimeDuration(hours * SECONDS_IN_HOUR, TimeUnit.SECONDS);
     }
@@ -140,6 +150,11 @@ public class TimeDuration extends Time {
      */
     @NonNull
     public static TimeDuration minutes(final long minutes) {
+
+        if ((minutes > MAX_MINUTES) || (minutes < -MAX_MINUTES)) {
+
+            throw new IllegalArgumentException("time value overflow");
+        }
 
         return new TimeDuration(minutes * SECONDS_IN_MINUTE, TimeUnit.SECONDS);
     }

@@ -292,7 +292,7 @@ public class RunnerTest extends TestCase {
         @Override
         public void run() {
 
-            mIsPassed = (nano().toNanos() - mStartTime.toNanos() > mDelay.toNanos());
+            mIsPassed = (nano().toNanos() - mStartTime.toNanos() >= mDelay.toNanos());
 
             super.run();
         }

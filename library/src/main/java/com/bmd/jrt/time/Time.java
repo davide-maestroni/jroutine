@@ -54,6 +54,12 @@ public class Time {
      */
     public static final long SECONDS_IN_DAY = SECONDS_IN_HOUR * HOURS_IN_DAY;
 
+    protected static final long MAX_DAYS = Long.MAX_VALUE / SECONDS_IN_DAY;
+
+    protected static final long MAX_HOURS = Long.MAX_VALUE / SECONDS_IN_HOUR;
+
+    protected static final long MAX_MINUTES = Long.MAX_VALUE / SECONDS_IN_MINUTE;
+
     /**
      * The time value.
      */
@@ -97,6 +103,11 @@ public class Time {
     @NonNull
     public static Time days(final long days) {
 
+        if ((days > MAX_DAYS) || (days < -MAX_DAYS)) {
+
+            throw new IllegalArgumentException("time value overflow");
+        }
+
         return new Time(days * SECONDS_IN_DAY, TimeUnit.SECONDS);
     }
 
@@ -129,6 +140,11 @@ public class Time {
      */
     @NonNull
     public static Time hours(final long hours) {
+
+        if ((hours > MAX_HOURS) || (hours < -MAX_HOURS)) {
+
+            throw new IllegalArgumentException("time value overflow");
+        }
 
         return new Time(hours * SECONDS_IN_HOUR, TimeUnit.SECONDS);
     }
@@ -165,6 +181,11 @@ public class Time {
      */
     @NonNull
     public static Time minutes(final long minutes) {
+
+        if ((minutes > MAX_MINUTES) || (minutes < -MAX_MINUTES)) {
+
+            throw new IllegalArgumentException("time value overflow");
+        }
 
         return new Time(minutes * SECONDS_IN_MINUTE, TimeUnit.SECONDS);
     }

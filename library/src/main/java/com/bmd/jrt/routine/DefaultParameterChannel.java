@@ -44,6 +44,8 @@ import static com.bmd.jrt.time.TimeDuration.fromUnit;
  */
 class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, OUTPUT> {
 
+    private final ArrayList<OutputChannel<?>> mBoundChannels = new ArrayList<OutputChannel<?>>();
+
     private final NestedQueue<INPUT> mInputQueue;
 
     private final DefaultInvocation<INPUT, OUTPUT> mInvocation;
@@ -57,8 +59,6 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
     private final Runner mRunner;
 
     private Throwable mAbortException;
-
-    private ArrayList<OutputChannel<?>> mBoundChannels = new ArrayList<OutputChannel<?>>();
 
     private TimeDuration mInputDelay = ZERO;
 

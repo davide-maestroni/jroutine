@@ -20,6 +20,8 @@ import java.lang.reflect.Method;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
+ * Exception unit tests.
+ * <p/>
  * Created by davide on 10/3/14.
  */
 public class ExceptionTest extends TestCase {

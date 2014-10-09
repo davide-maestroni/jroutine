@@ -18,6 +18,7 @@ import com.bmd.jrt.time.TimeDuration;
 import java.util.concurrent.TimeUnit;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 
 /**
  * Interface defining a result channel, that is the channel used by the routine invocation to
@@ -39,17 +40,17 @@ public interface ResultChannel<OUTPUT> extends InputChannel<OUTPUT> {
 
     @Override
     @NonNull
-    public ResultChannel<OUTPUT> pass(@NonNull OutputChannel<OUTPUT> channel);
+    public ResultChannel<OUTPUT> pass(@Nullable OutputChannel<OUTPUT> channel);
 
     @Override
     @NonNull
-    public ResultChannel<OUTPUT> pass(@NonNull Iterable<? extends OUTPUT> outputs);
+    public ResultChannel<OUTPUT> pass(@Nullable Iterable<? extends OUTPUT> outputs);
 
     @Override
     @NonNull
-    public ResultChannel<OUTPUT> pass(@NonNull OUTPUT output);
+    public ResultChannel<OUTPUT> pass(@Nullable OUTPUT output);
 
     @Override
     @NonNull
-    public ResultChannel<OUTPUT> pass(@NonNull OUTPUT... outputs);
+    public ResultChannel<OUTPUT> pass(@Nullable OUTPUT... outputs);
 }

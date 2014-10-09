@@ -27,14 +27,35 @@ import static org.fest.assertions.api.Assertions.assertThat;
  */
 public class ClassTokenTest extends TestCase {
 
+    public void testCast() {
+
+        final ClassToken<List<Integer>> classToken = new ClassToken<List<Integer>>() {};
+
+        classToken.cast(new ArrayList<Integer>());
+
+        try {
+
+            final ArrayList<String> list = new ArrayList<String>();
+            list.add("test");
+            assertThat(classToken.cast(list).get(0) + 1).isNotZero();
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+    }
+
+    @SuppressWarnings("ObjectEqualsNull")
     public void testEquals() {
 
         final ClassToken<String> classToken1 = new ClassToken<String>() {};
 
         assertThat(classToken1).isEqualTo(classToken1);
         assertThat(classToken1).isEqualTo(new StringClassToken());
+        assertThat(classToken1.hashCode()).isEqualTo(new StringClassToken().hashCode());
         assertThat(classToken1).isEqualTo(new SubStringClassToken());
-        //noinspection ObjectEqualsNull
+        assertThat(classToken1.hashCode()).isEqualTo(new SubStringClassToken().hashCode());
         assertThat(classToken1.equals(null)).isFalse();
 
         final ClassToken<List<String>> classToken2 = new ClassToken<List<String>>() {};

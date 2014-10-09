@@ -85,7 +85,6 @@ public abstract class ClassToken<CLASS> {
      * @param object the object to cast.
      * @return the casted object.
      */
-    @Nullable
     @SuppressWarnings("unchecked")
     public final CLASS cast(@Nullable final Object object) {
 

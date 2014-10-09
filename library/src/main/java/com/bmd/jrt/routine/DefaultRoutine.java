@@ -74,9 +74,9 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
         super(syncRunner, asyncRunner, maxRunning, maxRetained, availTimeout, orderedInput,
               orderedOutput, log, logLevel);
 
-        mLogger = Logger.create(log, logLevel, this);
-        mConstructor = findConstructor(executionClass, executionArgs);
         mArgs = (executionArgs == null) ? NO_ARGS : executionArgs.clone();
+        mConstructor = findConstructor(executionClass, mArgs);
+        mLogger = Logger.create(log, logLevel, this);
     }
 
     @Override

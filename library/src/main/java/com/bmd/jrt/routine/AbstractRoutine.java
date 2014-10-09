@@ -48,6 +48,9 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
 
     private final TimeDuration mAvailTimeout;
 
+    private final LinkedList<Execution<INPUT, OUTPUT>> mExecutions =
+            new LinkedList<Execution<INPUT, OUTPUT>>();
+
     private final Logger mLogger;
 
     private final int mMaxRetained;
@@ -61,9 +64,6 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
     private final boolean mOrderedOutput;
 
     private final Runner mSyncRunner;
-
-    private LinkedList<Execution<INPUT, OUTPUT>> mExecutions =
-            new LinkedList<Execution<INPUT, OUTPUT>>();
 
     private int mRunningCount;
 
@@ -409,7 +409,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
      * @return the execution instance.
      */
     @NonNull
-    protected abstract Execution<INPUT, OUTPUT> createExecution(final boolean async);
+    protected abstract Execution<INPUT, OUTPUT> createExecution(boolean async);
 
     @NonNull
     private ParameterChannel<INPUT, OUTPUT> invoke(final boolean async) {

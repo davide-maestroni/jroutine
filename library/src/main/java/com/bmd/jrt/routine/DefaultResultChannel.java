@@ -51,6 +51,8 @@ import static com.bmd.jrt.time.TimeDuration.seconds;
  */
 class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
+    private final ArrayList<OutputChannel<?>> mBoundChannels = new ArrayList<OutputChannel<?>>();
+
     private final AbortHandler mHandler;
 
     private final Logger mLogger;
@@ -60,10 +62,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     private final Runner mRunner;
 
     private Throwable mAbortException;
-
-    private ArrayList<OutputChannel<?>> mBoundChannels = new ArrayList<OutputChannel<?>>();
-
-    private TimeDuration mInputDelay = ZERO;
 
     private OutputConsumer<OUTPUT> mOutputConsumer;
 
@@ -169,7 +167,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             mBoundChannels.add(channel);
 
-            delay = mInputDelay;
+            delay = mResultDelay;
 
             ++mPendingOutputCount;
         }

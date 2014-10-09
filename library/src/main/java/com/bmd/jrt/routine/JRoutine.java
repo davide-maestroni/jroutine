@@ -129,7 +129,7 @@ public class JRoutine {
     private static class SquareExecution extends ExecutionAdapter<Integer, Integer> {
 
         @Override
-        public void onInput(final Integer integer, final ResultChannel<Integer> results) {
+        public void onInput(final Integer integer, @NonNull final ResultChannel<Integer> results) {
 
             final int input = integer;
 
@@ -148,13 +148,13 @@ public class JRoutine {
         }
 
         @Override
-        public void onInput(final Integer integer, final ResultChannel<Integer> results) {
+        public void onInput(final Integer integer, @NonNull final ResultChannel<Integer> results) {
 
             mSum += integer;
         }
 
         @Override
-        public void onResult(final ResultChannel<Integer> results) {
+        public void onResult(@NonNull final ResultChannel<Integer> results) {
 
             results.pass(mSum);
         }

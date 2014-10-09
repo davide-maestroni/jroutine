@@ -20,6 +20,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
+
 /**
  * Helper class providing utility methods to convert native arrays into immutable object lists.
  * <p/>
@@ -39,7 +42,7 @@ public class Inputs<DATA> implements List<DATA> {
      * @param type    the list element type.
      * @param wrapped the wrapped list.
      */
-    private Inputs(final Class<DATA> type, final List<Object> wrapped) {
+    private Inputs(@NonNull final Class<DATA> type, @NonNull final List<Object> wrapped) {
 
         mType = type;
         mList = wrapped;
@@ -51,7 +54,8 @@ public class Inputs<DATA> implements List<DATA> {
      * @param inputs the data to fill the list with.
      * @return the newly created immutable input list.
      */
-    public static Inputs<Boolean> asList(final boolean... inputs) {
+    @NonNull
+    public static Inputs<Boolean> asList(@Nullable final boolean... inputs) {
 
         return new Inputs<Boolean>(boolean.class, asObjects(inputs));
     }
@@ -62,7 +66,8 @@ public class Inputs<DATA> implements List<DATA> {
      * @param inputs the data to fill the list with.
      * @return the newly created immutable input list.
      */
-    public static Inputs<Byte> asList(final byte... inputs) {
+    @NonNull
+    public static Inputs<Byte> asList(@Nullable final byte... inputs) {
 
         return new Inputs<Byte>(byte.class, asObjects(inputs));
     }
@@ -73,7 +78,8 @@ public class Inputs<DATA> implements List<DATA> {
      * @param inputs the data to fill the list with.
      * @return the newly created immutable input list.
      */
-    public static Inputs<Character> asList(final char... inputs) {
+    @NonNull
+    public static Inputs<Character> asList(@Nullable final char... inputs) {
 
         return new Inputs<Character>(char.class, asObjects(inputs));
     }
@@ -84,7 +90,8 @@ public class Inputs<DATA> implements List<DATA> {
      * @param inputs the data to fill the list with.
      * @return the newly created immutable input list.
      */
-    public static Inputs<Double> asList(final double... inputs) {
+    @NonNull
+    public static Inputs<Double> asList(@Nullable final double... inputs) {
 
         return new Inputs<Double>(double.class, asObjects(inputs));
     }
@@ -95,7 +102,8 @@ public class Inputs<DATA> implements List<DATA> {
      * @param inputs the data to fill the list with.
      * @return the newly created immutable input list.
      */
-    public static Inputs<Float> asList(final float... inputs) {
+    @NonNull
+    public static Inputs<Float> asList(@Nullable final float... inputs) {
 
         return new Inputs<Float>(float.class, asObjects(inputs));
     }
@@ -106,7 +114,8 @@ public class Inputs<DATA> implements List<DATA> {
      * @param inputs the data to fill the list with.
      * @return the newly created immutable input list.
      */
-    public static Inputs<Integer> asList(final int... inputs) {
+    @NonNull
+    public static Inputs<Integer> asList(@Nullable final int... inputs) {
 
         return new Inputs<Integer>(int.class, asObjects(inputs));
     }
@@ -117,7 +126,8 @@ public class Inputs<DATA> implements List<DATA> {
      * @param inputs the data to fill the list with.
      * @return the newly created immutable input list.
      */
-    public static Inputs<Long> asList(final long... inputs) {
+    @NonNull
+    public static Inputs<Long> asList(@Nullable final long... inputs) {
 
         return new Inputs<Long>(long.class, asObjects(inputs));
     }
@@ -128,7 +138,8 @@ public class Inputs<DATA> implements List<DATA> {
      * @param inputs the data to fill the list with.
      * @return the newly created immutable input list.
      */
-    public static Inputs<Short> asList(final short... inputs) {
+    @NonNull
+    public static Inputs<Short> asList(@Nullable final short... inputs) {
 
         return new Inputs<Short>(short.class, asObjects(inputs));
     }
@@ -139,7 +150,8 @@ public class Inputs<DATA> implements List<DATA> {
      * @param inputs the data to fill the list with.
      * @return the newly created immutable list.
      */
-    public static List<Object> asObjects(final boolean... inputs) {
+    @NonNull
+    public static List<Object> asObjects(@Nullable final boolean... inputs) {
 
         if ((inputs == null) || (inputs.length == 0)) {
 
@@ -163,7 +175,8 @@ public class Inputs<DATA> implements List<DATA> {
      * @param inputs the data to fill the list with.
      * @return the newly created immutable list.
      */
-    public static List<Object> asObjects(final byte... inputs) {
+    @NonNull
+    public static List<Object> asObjects(@Nullable final byte... inputs) {
 
         if ((inputs == null) || (inputs.length == 0)) {
 
@@ -187,7 +200,8 @@ public class Inputs<DATA> implements List<DATA> {
      * @param inputs the data to fill the list with.
      * @return the newly created immutable list.
      */
-    public static List<Object> asObjects(final char... inputs) {
+    @NonNull
+    public static List<Object> asObjects(@Nullable final char... inputs) {
 
         if ((inputs == null) || (inputs.length == 0)) {
 
@@ -211,7 +225,8 @@ public class Inputs<DATA> implements List<DATA> {
      * @param inputs the data to fill the list with.
      * @return the newly created immutable list.
      */
-    public static List<Object> asObjects(final double... inputs) {
+    @NonNull
+    public static List<Object> asObjects(@Nullable final double... inputs) {
 
         if ((inputs == null) || (inputs.length == 0)) {
 
@@ -235,7 +250,8 @@ public class Inputs<DATA> implements List<DATA> {
      * @param inputs the data to fill the list with.
      * @return the newly created immutable list.
      */
-    public static List<Object> asObjects(final float... inputs) {
+    @NonNull
+    public static List<Object> asObjects(@Nullable final float... inputs) {
 
         if ((inputs == null) || (inputs.length == 0)) {
 
@@ -259,7 +275,8 @@ public class Inputs<DATA> implements List<DATA> {
      * @param inputs the data to fill the list with.
      * @return the newly created immutable list.
      */
-    public static List<Object> asObjects(final int... inputs) {
+    @NonNull
+    public static List<Object> asObjects(@Nullable final int... inputs) {
 
         if ((inputs == null) || (inputs.length == 0)) {
 
@@ -283,7 +300,8 @@ public class Inputs<DATA> implements List<DATA> {
      * @param inputs the data to fill the list with.
      * @return the newly created immutable list.
      */
-    public static List<Object> asObjects(final long... inputs) {
+    @NonNull
+    public static List<Object> asObjects(@Nullable final long... inputs) {
 
         if ((inputs == null) || (inputs.length == 0)) {
 
@@ -307,7 +325,8 @@ public class Inputs<DATA> implements List<DATA> {
      * @param inputs the data to fill the list with.
      * @return the newly created immutable list.
      */
-    public static List<Object> asObjects(final short... inputs) {
+    @NonNull
+    public static List<Object> asObjects(@Nullable final short... inputs) {
 
         if ((inputs == null) || (inputs.length == 0)) {
 
@@ -344,22 +363,24 @@ public class Inputs<DATA> implements List<DATA> {
     }
 
     @Override
-    @SuppressWarnings({"NullableProblems", "unchecked"})
+    @NonNull
+    @SuppressWarnings("unchecked")
     public Iterator<DATA> iterator() {
 
         return (Iterator<DATA>) mList.iterator();
     }
 
     @Override
-    @SuppressWarnings("NullableProblems")
+    @NonNull
     public Object[] toArray() {
 
         return mList.toArray();
     }
 
     @Override
-    @SuppressWarnings({"NullableProblems", "SuspiciousToArrayCall"})
-    public <T> T[] toArray(final T[] a) {
+    @NonNull
+    @SuppressWarnings("SuspiciousToArrayCall")
+    public <T> T[] toArray(@NonNull final T[] a) {
 
         return mList.toArray(a);
     }
@@ -377,36 +398,31 @@ public class Inputs<DATA> implements List<DATA> {
     }
 
     @Override
-    @SuppressWarnings("NullableProblems")
-    public boolean containsAll(final Collection<?> c) {
+    public boolean containsAll(@NonNull final Collection<?> c) {
 
         return mList.containsAll(c);
     }
 
     @Override
-    @SuppressWarnings("NullableProblems")
-    public boolean addAll(final Collection<? extends DATA> c) {
+    public boolean addAll(@NonNull final Collection<? extends DATA> c) {
 
         return mList.addAll(c);
     }
 
     @Override
-    @SuppressWarnings("NullableProblems")
-    public boolean addAll(final int index, final Collection<? extends DATA> c) {
+    public boolean addAll(final int index, @NonNull final Collection<? extends DATA> c) {
 
         return mList.addAll(index, c);
     }
 
     @Override
-    @SuppressWarnings("NullableProblems")
-    public boolean removeAll(final Collection<?> c) {
+    public boolean removeAll(@NonNull final Collection<?> c) {
 
         return mList.removeAll(c);
     }
 
     @Override
-    @SuppressWarnings("NullableProblems")
-    public boolean retainAll(final Collection<?> c) {
+    public boolean retainAll(@NonNull final Collection<?> c) {
 
         return mList.retainAll(c);
     }
@@ -457,21 +473,23 @@ public class Inputs<DATA> implements List<DATA> {
     }
 
     @Override
-    @SuppressWarnings({"NullableProblems", "unchecked"})
+    @NonNull
+    @SuppressWarnings("unchecked")
     public ListIterator<DATA> listIterator() {
 
         return (ListIterator<DATA>) mList.listIterator();
     }
 
     @Override
-    @SuppressWarnings({"NullableProblems", "unchecked"})
+    @NonNull
+    @SuppressWarnings("unchecked")
     public ListIterator<DATA> listIterator(final int index) {
 
         return (ListIterator<DATA>) mList.listIterator(index);
     }
 
     @Override
-    @SuppressWarnings("NullableProblems")
+    @NonNull
     public Inputs<DATA> subList(final int fromIndex, final int toIndex) {
 
         return new Inputs<DATA>(mType, mList.subList(fromIndex, toIndex));
@@ -482,6 +500,7 @@ public class Inputs<DATA> implements List<DATA> {
      *
      * @return a newly created input list.
      */
+    @NonNull
     public Inputs<Boolean> toBooleans() {
 
         final List<Object> list = mList;
@@ -518,6 +537,7 @@ public class Inputs<DATA> implements List<DATA> {
      *
      * @return a newly created input list.
      */
+    @NonNull
     public Inputs<Byte> toBytes() {
 
         final List<Object> list = mList;
@@ -561,6 +581,7 @@ public class Inputs<DATA> implements List<DATA> {
      *
      * @return a newly created input list.
      */
+    @NonNull
     public Inputs<Character> toCharacters() {
 
         final List<Object> list = mList;
@@ -597,6 +618,7 @@ public class Inputs<DATA> implements List<DATA> {
      *
      * @return a newly created input list.
      */
+    @NonNull
     public Inputs<Double> toDoubles() {
 
         final List<Object> list = mList;
@@ -640,6 +662,7 @@ public class Inputs<DATA> implements List<DATA> {
      *
      * @return a newly created input list.
      */
+    @NonNull
     public Inputs<Float> toFloats() {
 
         final List<Object> list = mList;
@@ -683,6 +706,7 @@ public class Inputs<DATA> implements List<DATA> {
      *
      * @return a newly created input list.
      */
+    @NonNull
     public Inputs<Integer> toIntegers() {
 
         final List<Object> list = mList;
@@ -726,6 +750,7 @@ public class Inputs<DATA> implements List<DATA> {
      *
      * @return a newly created input list.
      */
+    @NonNull
     public Inputs<Long> toLongs() {
 
         final List<Object> list = mList;
@@ -769,6 +794,7 @@ public class Inputs<DATA> implements List<DATA> {
      *
      * @return an immutable list.
      */
+    @NonNull
     public List<Object> toObjects() {
 
         return mList;
@@ -779,6 +805,7 @@ public class Inputs<DATA> implements List<DATA> {
      *
      * @return a newly created input list.
      */
+    @NonNull
     public Inputs<Short> toShorts() {
 
         final List<Object> list = mList;

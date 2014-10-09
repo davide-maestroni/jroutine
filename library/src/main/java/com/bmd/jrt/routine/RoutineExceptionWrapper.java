@@ -15,6 +15,9 @@ package com.bmd.jrt.routine;
 
 import com.bmd.jrt.common.RoutineException;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
+
 /**
  * Helper class handling routine exceptions to be transferred through the routine channels.
  * <p/>
@@ -29,7 +32,7 @@ class RoutineExceptionWrapper {
      *
      * @param cause the cause exception.
      */
-    private RoutineExceptionWrapper(final Throwable cause) {
+    private RoutineExceptionWrapper(@Nullable final Throwable cause) {
 
         mCause = cause;
     }
@@ -40,7 +43,7 @@ class RoutineExceptionWrapper {
      * @param obj the object to check.
      * @throws RoutineException if the specified object is an exception wrapper instance.
      */
-    public static void raise(final Object obj) {
+    public static void raise(@Nullable final Object obj) {
 
         if (obj instanceof RoutineExceptionWrapper) {
 
@@ -54,7 +57,8 @@ class RoutineExceptionWrapper {
      * @param t the throwable to wrap.
      * @return the new wrapper instance.
      */
-    public static RoutineExceptionWrapper wrap(final Throwable t) {
+    @NonNull
+    public static RoutineExceptionWrapper wrap(@Nullable final Throwable t) {
 
         return new RoutineExceptionWrapper(t);
     }
@@ -64,6 +68,7 @@ class RoutineExceptionWrapper {
      *
      * @return the cause.
      */
+    @Nullable
     public Throwable getCause() {
 
         final Throwable cause = mCause;
@@ -81,6 +86,7 @@ class RoutineExceptionWrapper {
      *
      * @return the routine exception.
      */
+    @NonNull
     public RoutineException raise() {
 
         final Throwable cause = mCause;

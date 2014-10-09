@@ -15,6 +15,8 @@ package com.bmd.jrt.runner;
 
 import java.util.concurrent.TimeUnit;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+
 /**
  * The runner interface defines an object responsible for executing routine invocations inside
  * specifically managed threads.
@@ -38,7 +40,7 @@ public interface Runner {
      * @param delay      the execution delay.
      * @param timeUnit   the delay time unit.
      */
-    public void run(Invocation invocation, long delay, TimeUnit timeUnit);
+    public void run(@NonNull Invocation invocation, long delay, @NonNull TimeUnit timeUnit);
 
     /**
      * Runs the specified abort invocation. (that is, calls the invocation <code>abort()</code>
@@ -46,5 +48,5 @@ public interface Runner {
      *
      * @param invocation the invocation.
      */
-    public void runAbort(Invocation invocation);
+    public void runAbort(@NonNull Invocation invocation);
 }

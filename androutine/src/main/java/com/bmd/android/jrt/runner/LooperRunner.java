@@ -22,6 +22,8 @@ import com.bmd.jrt.runner.Runners;
 
 import java.util.concurrent.TimeUnit;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+
 /**
  * Implementation of a runner employing the Android {@link android.os.Looper} queue to execute
  * the routine invocations.
@@ -40,14 +42,9 @@ class LooperRunner implements Runner {
      * Constructor.
      *
      * @param looper the looper to employ.
-     * @throws java.lang.IllegalArgumentException if the specified looper is null.
+     * @throws NullPointerException if the specified looper is null.
      */
-    public LooperRunner(final Looper looper) {
-
-        if (looper == null) {
-
-            throw new IllegalArgumentException("the looper instance must not be null");
-        }
+    public LooperRunner(@NonNull final Looper looper) {
 
         mThread = looper.getThread();
         mHandler = new Handler(looper);
@@ -55,7 +52,8 @@ class LooperRunner implements Runner {
     }
 
     @Override
-    public void run(final Invocation invocation, final long delay, final TimeUnit timeUnit) {
+    public void run(@NonNull final Invocation invocation, final long delay,
+            @NonNull final TimeUnit timeUnit) {
 
         if (Thread.currentThread().equals(mThread)) {
 
@@ -84,7 +82,7 @@ class LooperRunner implements Runner {
     }
 
     @Override
-    public void runAbort(final Invocation invocation) {
+    public void runAbort(@NonNull final Invocation invocation) {
 
         if (Thread.currentThread().equals(mThread)) {
 

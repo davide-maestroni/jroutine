@@ -17,13 +17,17 @@ import com.bmd.jrt.log.Log;
 
 import java.util.List;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
+
 /**
  * Created by davide on 10/7/14.
  */
 public class AndroidLog implements Log {
 
     @Override
-    public void dbg(final List<Object> contexts, final String message, final Throwable throwable) {
+    public void dbg(@NonNull final List<Object> contexts, @Nullable final String message,
+            @Nullable final Throwable throwable) {
 
         if (throwable != null) {
 
@@ -36,7 +40,8 @@ public class AndroidLog implements Log {
     }
 
     @Override
-    public void err(final List<Object> contexts, final String message, final Throwable throwable) {
+    public void err(@NonNull final List<Object> contexts, @Nullable final String message,
+            @Nullable final Throwable throwable) {
 
         if (throwable != null) {
 
@@ -49,7 +54,8 @@ public class AndroidLog implements Log {
     }
 
     @Override
-    public void wrn(final List<Object> contexts, final String message, final Throwable throwable) {
+    public void wrn(@NonNull final List<Object> contexts, @Nullable final String message,
+            @Nullable final Throwable throwable) {
 
         if (throwable != null) {
 

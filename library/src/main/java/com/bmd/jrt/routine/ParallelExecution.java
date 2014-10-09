@@ -16,6 +16,9 @@ package com.bmd.jrt.routine;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.execution.ExecutionAdapter;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
+
 /**
  * Implementation of an execution handling parallel mode.
  * <p/>
@@ -34,7 +37,8 @@ class ParallelExecution<INPUT, OUTPUT> extends ExecutionAdapter<INPUT, OUTPUT> {
      * @param routine the routine to invoke in parallel mode.
      * @throws NullPointerException if the routine instance is null;
      */
-    ParallelExecution(final Routine<INPUT, OUTPUT> routine) {
+    @SuppressWarnings("ConstantConditions")
+    ParallelExecution(@NonNull final Routine<INPUT, OUTPUT> routine) {
 
         if (routine == null) {
 
@@ -45,7 +49,7 @@ class ParallelExecution<INPUT, OUTPUT> extends ExecutionAdapter<INPUT, OUTPUT> {
     }
 
     @Override
-    public void onInput(final INPUT input, final ResultChannel<OUTPUT> results) {
+    public void onInput(@Nullable final INPUT input, @NonNull final ResultChannel<OUTPUT> results) {
 
         results.pass(mRoutine.runAsyn(input));
     }

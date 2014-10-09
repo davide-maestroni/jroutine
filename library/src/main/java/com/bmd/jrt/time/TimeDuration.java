@@ -15,6 +15,8 @@ package com.bmd.jrt.time;
 
 import java.util.concurrent.TimeUnit;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+
 /**
  * Utility class for handling a time duration in different time units.
  * <p/>
@@ -45,7 +47,7 @@ public class TimeDuration extends Time {
      * @param unit     the time unit.
      * @throws IllegalArgumentException if the specified duration is negative.
      */
-    protected TimeDuration(final long duration, final TimeUnit unit) {
+    protected TimeDuration(final long duration, @NonNull final TimeUnit unit) {
 
         super(duration, unit);
 
@@ -62,9 +64,10 @@ public class TimeDuration extends Time {
      * @return the time instance.
      * @throws IllegalArgumentException if the specified duration is negative.
      */
+    @NonNull
     public static TimeDuration days(final long days) {
 
-        return new TimeDuration(days, TimeUnit.DAYS);
+        return new TimeDuration(days * SECONDS_IN_DAY, TimeUnit.SECONDS);
     }
 
     /**
@@ -77,7 +80,9 @@ public class TimeDuration extends Time {
      * @throws NullPointerException     if the time unit is null.
      * @throws IllegalArgumentException if the specified duration is negative.
      */
-    public static TimeDuration fromUnit(final long time, final TimeUnit unit) {
+    @NonNull
+    @SuppressWarnings("ConstantConditions")
+    public static TimeDuration fromUnit(final long time, @NonNull final TimeUnit unit) {
 
         if (unit == null) {
 
@@ -94,9 +99,10 @@ public class TimeDuration extends Time {
      * @return the time instance.
      * @throws IllegalArgumentException if the specified duration is negative.
      */
+    @NonNull
     public static TimeDuration hours(final long hours) {
 
-        return new TimeDuration(hours, TimeUnit.HOURS);
+        return new TimeDuration(hours * SECONDS_IN_HOUR, TimeUnit.SECONDS);
     }
 
     /**
@@ -106,6 +112,7 @@ public class TimeDuration extends Time {
      * @return the time duration instance.
      * @throws IllegalArgumentException if the specified duration is negative.
      */
+    @NonNull
     public static TimeDuration micros(final long micros) {
 
         return new TimeDuration(micros, TimeUnit.MICROSECONDS);
@@ -118,6 +125,7 @@ public class TimeDuration extends Time {
      * @return the time duration instance.
      * @throws IllegalArgumentException if the specified duration is negative.
      */
+    @NonNull
     public static TimeDuration millis(final long millis) {
 
         return new TimeDuration(millis, TimeUnit.MILLISECONDS);
@@ -130,9 +138,10 @@ public class TimeDuration extends Time {
      * @return the time duration instance.
      * @throws IllegalArgumentException if the specified duration is negative.
      */
+    @NonNull
     public static TimeDuration minutes(final long minutes) {
 
-        return new TimeDuration(minutes, TimeUnit.MINUTES);
+        return new TimeDuration(minutes * SECONDS_IN_MINUTE, TimeUnit.SECONDS);
     }
 
     /**
@@ -142,6 +151,7 @@ public class TimeDuration extends Time {
      * @return the time duration instance.
      * @throws IllegalArgumentException if the specified duration is negative.
      */
+    @NonNull
     public static TimeDuration nanos(final long nanos) {
 
         return new TimeDuration(nanos, TimeUnit.NANOSECONDS);
@@ -154,6 +164,7 @@ public class TimeDuration extends Time {
      * @return the time duration instance.
      * @throws IllegalArgumentException if the specified duration is negative.
      */
+    @NonNull
     public static TimeDuration seconds(final long seconds) {
 
         return new TimeDuration(seconds, TimeUnit.SECONDS);
@@ -164,6 +175,7 @@ public class TimeDuration extends Time {
      *
      * @return the time duration instance.
      */
+    @NonNull
     public TimeDuration daysTime() {
 
         return days(toDays());
@@ -174,6 +186,7 @@ public class TimeDuration extends Time {
      *
      * @return the time duration instance.
      */
+    @NonNull
     public TimeDuration hoursTime() {
 
         return hours(toHours());
@@ -184,6 +197,7 @@ public class TimeDuration extends Time {
      *
      * @return the time duration instance.
      */
+    @NonNull
     public TimeDuration microsTime() {
 
         return micros(toMicros());
@@ -194,6 +208,7 @@ public class TimeDuration extends Time {
      *
      * @return the time duration instance.
      */
+    @NonNull
     public TimeDuration millisTime() {
 
         return millis(toMillis());
@@ -204,6 +219,7 @@ public class TimeDuration extends Time {
      *
      * @return the time duration instance.
      */
+    @NonNull
     public TimeDuration minutesTime() {
 
         return minutes(toMinutes());
@@ -214,6 +230,7 @@ public class TimeDuration extends Time {
      *
      * @return the time duration instance.
      */
+    @NonNull
     public TimeDuration nanosTime() {
 
         return nanos(toNanos());
@@ -224,6 +241,7 @@ public class TimeDuration extends Time {
      *
      * @return the time duration instance.
      */
+    @NonNull
     public TimeDuration secondsTime() {
 
         return seconds(toSeconds());
@@ -246,7 +264,7 @@ public class TimeDuration extends Time {
      * @throws InterruptedException if the current thread is interrupted.
      * @throws NullPointerException if the time unit is null.
      */
-    public void join(final Thread target) throws InterruptedException {
+    public void join(@NonNull final Thread target) throws InterruptedException {
 
         unit.timedJoin(target, time);
     }
@@ -373,7 +391,7 @@ public class TimeDuration extends Time {
      * @throws InterruptedException if the current thread is interrupted.
      * @throws NullPointerException if the target object is null.
      */
-    public void wait(final Object target) throws InterruptedException {
+    public void wait(@NonNull final Object target) throws InterruptedException {
 
         if (isZero()) {
 
@@ -401,7 +419,7 @@ public class TimeDuration extends Time {
      * @throws NullPointerException if the target object is null.
      * @see System#currentTimeMillis()
      */
-    public boolean waitSinceMillis(final Object target, final long milliTime) throws
+    public boolean waitSinceMillis(@NonNull final Object target, final long milliTime) throws
             InterruptedException {
 
         if (isZero()) {
@@ -439,7 +457,7 @@ public class TimeDuration extends Time {
      * @throws NullPointerException if the target object is null.
      * @see System#nanoTime()
      */
-    public boolean waitSinceNanos(final Object target, final long nanoTime) throws
+    public boolean waitSinceNanos(@NonNull final Object target, final long nanoTime) throws
             InterruptedException {
 
         if (isZero()) {
@@ -476,7 +494,8 @@ public class TimeDuration extends Time {
      * @throws InterruptedException if the current thread is interrupted.
      * @throws NullPointerException if the target object or the specified check are null.
      */
-    public boolean waitTrue(final Object target, final Check check) throws InterruptedException {
+    public boolean waitTrue(@NonNull final Object target, final Check check) throws
+            InterruptedException {
 
         if (isZero()) {
 

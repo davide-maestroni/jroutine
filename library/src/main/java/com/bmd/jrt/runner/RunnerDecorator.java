@@ -15,6 +15,8 @@ package com.bmd.jrt.runner;
 
 import java.util.concurrent.TimeUnit;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+
 /**
  * Decorator implementation of a runner object.
  * <p/>
@@ -30,7 +32,8 @@ public class RunnerDecorator implements Runner {
      * @param wrapped the wrapped instance.
      * @throws NullPointerException if the specified instance is null.
      */
-    public RunnerDecorator(final Runner wrapped) {
+    @SuppressWarnings("ConstantConditions")
+    public RunnerDecorator(@NonNull final Runner wrapped) {
 
         if (wrapped == null) {
 
@@ -41,13 +44,14 @@ public class RunnerDecorator implements Runner {
     }
 
     @Override
-    public void run(final Invocation invocation, final long delay, final TimeUnit timeUnit) {
+    public void run(@NonNull final Invocation invocation, final long delay,
+            @NonNull final TimeUnit timeUnit) {
 
         mRunner.run(invocation, delay, timeUnit);
     }
 
     @Override
-    public void runAbort(final Invocation invocation) {
+    public void runAbort(@NonNull final Invocation invocation) {
 
         mRunner.runAbort(invocation);
     }

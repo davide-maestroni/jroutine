@@ -15,6 +15,9 @@ package com.bmd.jrt.execution;
 
 import com.bmd.jrt.channel.ResultChannel;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
+
 /**
  * Empty abstract implementation of a routine execution.
  * <p/>
@@ -28,7 +31,7 @@ import com.bmd.jrt.channel.ResultChannel;
 public abstract class ExecutionAdapter<INPUT, OUTPUT> implements Execution<INPUT, OUTPUT> {
 
     @Override
-    public void onAbort(final Throwable throwable) {
+    public void onAbort(@Nullable final Throwable throwable) {
 
     }
 
@@ -38,12 +41,12 @@ public abstract class ExecutionAdapter<INPUT, OUTPUT> implements Execution<INPUT
     }
 
     @Override
-    public void onInput(final INPUT input, final ResultChannel<OUTPUT> results) {
+    public void onInput(@Nullable final INPUT input, @NonNull final ResultChannel<OUTPUT> results) {
 
     }
 
     @Override
-    public void onResult(final ResultChannel<OUTPUT> results) {
+    public void onResult(@NonNull final ResultChannel<OUTPUT> results) {
 
     }
 

@@ -19,6 +19,8 @@ import junit.framework.TestCase;
 
 import java.util.List;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+
 import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
@@ -50,6 +52,7 @@ public class LoggerTest extends TestCase {
         assertThat(Logger.getDefaultLogLevel()).isEqualTo(LogLevel.SILENT);
     }
 
+    @SuppressWarnings("ConstantConditions")
     public void testError() {
 
         try {
@@ -844,17 +847,8 @@ public class LoggerTest extends TestCase {
         }
 
         @Override
-        protected void log(final LogLevel level, final List<Object> contexts,
-                final String message) {
-
-            mLevel = level;
-
-            super.log(level, contexts, message);
-        }
-
-        @Override
-        protected void log(final LogLevel level, final List<Object> contexts, final String message,
-                final Throwable throwable) {
+        protected void log(@NonNull final LogLevel level, @NonNull final List<Object> contexts,
+                final String message, final Throwable throwable) {
 
             mLevel = level;
 
@@ -862,7 +856,7 @@ public class LoggerTest extends TestCase {
         }
 
         @Override
-        protected void log(final String message) {
+        protected void log(@NonNull final String message) {
 
             mMessage = message;
         }

@@ -17,6 +17,9 @@ import com.bmd.jrt.time.TimeDuration;
 
 import java.util.concurrent.TimeUnit;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
+
 /**
  * Interface defining a parameter input channel, that is the channel used to pass input data to the
  * routine.
@@ -29,22 +32,28 @@ import java.util.concurrent.TimeUnit;
 public interface ParameterChannel<INPUT, OUTPUT> extends InputChannel<INPUT> {
 
     @Override
-    public ParameterChannel<INPUT, OUTPUT> after(TimeDuration delay);
+    @NonNull
+    public ParameterChannel<INPUT, OUTPUT> after(@NonNull TimeDuration delay);
 
     @Override
-    public ParameterChannel<INPUT, OUTPUT> after(long delay, TimeUnit timeUnit);
+    @NonNull
+    public ParameterChannel<INPUT, OUTPUT> after(long delay, @NonNull TimeUnit timeUnit);
 
     @Override
-    public ParameterChannel<INPUT, OUTPUT> pass(OutputChannel<INPUT> channel);
+    @NonNull
+    public ParameterChannel<INPUT, OUTPUT> pass(@Nullable OutputChannel<INPUT> channel);
 
     @Override
-    public ParameterChannel<INPUT, OUTPUT> pass(Iterable<? extends INPUT> inputs);
+    @NonNull
+    public ParameterChannel<INPUT, OUTPUT> pass(@Nullable Iterable<? extends INPUT> inputs);
 
     @Override
-    public ParameterChannel<INPUT, OUTPUT> pass(INPUT input);
+    @NonNull
+    public ParameterChannel<INPUT, OUTPUT> pass(@Nullable INPUT input);
 
     @Override
-    public ParameterChannel<INPUT, OUTPUT> pass(INPUT... inputs);
+    @NonNull
+    public ParameterChannel<INPUT, OUTPUT> pass(@Nullable INPUT... inputs);
 
     /**
      * Closes the input channel and returns the output one.
@@ -54,5 +63,6 @@ public interface ParameterChannel<INPUT, OUTPUT> extends InputChannel<INPUT> {
      * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
      *                                             exception.
      */
+    @NonNull
     public OutputChannel<OUTPUT> results();
 }

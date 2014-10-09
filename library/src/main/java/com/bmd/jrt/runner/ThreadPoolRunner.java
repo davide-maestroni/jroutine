@@ -17,6 +17,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+
 /**
  * Class implementing a runner employing a pool of background threads.
  * <p/>
@@ -37,7 +39,8 @@ class ThreadPoolRunner implements Runner {
     }
 
     @Override
-    public void run(final Invocation invocation, final long delay, final TimeUnit timeUnit) {
+    public void run(@NonNull final Invocation invocation, final long delay,
+            @NonNull final TimeUnit timeUnit) {
 
         final Runnable runnable = new Runnable() {
 
@@ -59,7 +62,7 @@ class ThreadPoolRunner implements Runner {
     }
 
     @Override
-    public void runAbort(final Invocation invocation) {
+    public void runAbort(@NonNull final Invocation invocation) {
 
         mService.execute(new Runnable() {
 

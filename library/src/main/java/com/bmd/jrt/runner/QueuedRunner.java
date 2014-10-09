@@ -15,6 +15,8 @@ package com.bmd.jrt.runner;
 
 import java.util.concurrent.TimeUnit;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+
 /**
  * Class implementing a queued synchronous runner.
  * <p/>
@@ -32,13 +34,14 @@ import java.util.concurrent.TimeUnit;
 class QueuedRunner implements Runner {
 
     @Override
-    public void run(final Invocation invocation, final long delay, final TimeUnit timeUnit) {
+    public void run(@NonNull final Invocation invocation, final long delay,
+            @NonNull final TimeUnit timeUnit) {
 
         LocalQueue.run(invocation, delay, timeUnit);
     }
 
     @Override
-    public void runAbort(final Invocation invocation) {
+    public void runAbort(@NonNull final Invocation invocation) {
 
         LocalQueue.runAbort(invocation);
     }

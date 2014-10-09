@@ -18,6 +18,8 @@ import com.bmd.jrt.time.TimeDuration;
 
 import java.util.concurrent.TimeUnit;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+
 import static com.bmd.jrt.time.TimeDuration.ZERO;
 import static com.bmd.jrt.time.TimeDuration.fromUnit;
 import static com.bmd.jrt.time.TimeDuration.nanos;
@@ -75,7 +77,8 @@ class LocalQueue {
      * @param delay      the execution delay.
      * @param timeUnit   the delay time unit.
      */
-    public static void run(final Invocation invocation, final long delay, final TimeUnit timeUnit) {
+    public static void run(@NonNull final Invocation invocation, final long delay,
+            @NonNull final TimeUnit timeUnit) {
 
         sQueue.get().addRun(invocation, delay, timeUnit);
     }
@@ -85,12 +88,13 @@ class LocalQueue {
      *
      * @param invocation the invocation.
      */
-    public static void runAbort(final Invocation invocation) {
+    public static void runAbort(@NonNull final Invocation invocation) {
 
         sQueue.get().addAbort(invocation);
     }
 
-    private static <T> void resizeArray(final T[] src, final T[] dst, final int first) {
+    private static <T> void resizeArray(@NonNull final T[] src, @NonNull final T[] dst,
+            final int first) {
 
         final int remainder = src.length - first;
 
@@ -98,7 +102,8 @@ class LocalQueue {
         System.arraycopy(src, first, dst, dst.length - remainder, remainder);
     }
 
-    private static void resizeArray(final long[] src, final long[] dst, final int first) {
+    private static void resizeArray(@NonNull final long[] src, @NonNull final long[] dst,
+            final int first) {
 
         final int remainder = src.length - first;
 
@@ -106,7 +111,8 @@ class LocalQueue {
         System.arraycopy(src, first, dst, dst.length - remainder, remainder);
     }
 
-    private void add(final Invocation invocation, TimeDuration delay, InvocationType type) {
+    private void add(@NonNull final Invocation invocation, @NonNull final TimeDuration delay,
+            @NonNull final InvocationType type) {
 
         final int i = mLast;
 
@@ -134,7 +140,7 @@ class LocalQueue {
         mLast = newLast;
     }
 
-    private void addAbort(final Invocation invocation) {
+    private void addAbort(@NonNull final Invocation invocation) {
 
         add(invocation, ZERO, InvocationType.ABORT);
 
@@ -144,7 +150,8 @@ class LocalQueue {
         }
     }
 
-    private void addRun(final Invocation invocation, final long delay, final TimeUnit timeUnit) {
+    private void addRun(@NonNull final Invocation invocation, final long delay,
+            @NonNull final TimeUnit timeUnit) {
 
         add(invocation, fromUnit(delay, timeUnit), InvocationType.RUN);
 

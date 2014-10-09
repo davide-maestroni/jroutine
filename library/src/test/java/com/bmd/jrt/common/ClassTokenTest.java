@@ -49,6 +49,7 @@ public class ClassTokenTest extends TestCase {
                 new ClassToken<ArrayList<String>>() {});
     }
 
+    @SuppressWarnings("ConstantConditions")
     public void testError() {
 
         try {

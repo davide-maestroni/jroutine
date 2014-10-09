@@ -26,6 +26,9 @@ import com.bmd.jrt.runner.Runner;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
+
 /**
  * Implementation of a runner employing {@link android.os.AsyncTask} instances to execute the
  * routine invocations.
@@ -45,7 +48,7 @@ class AsyncTaskRunner implements Runner {
      *
      * @param executor the executor.
      */
-    public AsyncTaskRunner(final Executor executor) {
+    public AsyncTaskRunner(@Nullable final Executor executor) {
 
         mExecutor = executor;
         // the handler is used to ensure that a task is always started in the main thread
@@ -53,7 +56,8 @@ class AsyncTaskRunner implements Runner {
     }
 
     @Override
-    public void run(final Invocation invocation, final long delay, final TimeUnit timeUnit) {
+    public void run(@NonNull final Invocation invocation, final long delay,
+            @NonNull final TimeUnit timeUnit) {
 
         final RunnableTask task = new RunnableTask(mExecutor) {
 
@@ -77,7 +81,7 @@ class AsyncTaskRunner implements Runner {
     }
 
     @Override
-    public void runAbort(final Invocation invocation) {
+    public void runAbort(@NonNull final Invocation invocation) {
 
         mHandler.post(new RunnableTask(mExecutor) {
 
@@ -99,7 +103,12 @@ class AsyncTaskRunner implements Runner {
 
         private final Executor mExecutor;
 
-        public RunnableTask(final Executor executor) {
+        /**
+         * Constructor.
+         *
+         * @param executor the executor.
+         */
+        public RunnableTask(@Nullable final Executor executor) {
 
             mExecutor = executor;
         }

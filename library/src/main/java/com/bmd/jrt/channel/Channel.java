@@ -13,6 +13,8 @@
  */
 package com.bmd.jrt.channel;
 
+import edu.umd.cs.findbugs.annotations.Nullable;
+
 /**
  * Interface defining a basic communication channel with the routine.
  * <p/>
@@ -41,7 +43,7 @@ public interface Channel {
      * @param throwable the throwable object identifying the reason of the routine abortion.
      * @return whether the channel status changed as a result of the call.
      */
-    public boolean abort(Throwable throwable);
+    public boolean abort(@Nullable Throwable throwable);
 
     /**
      * Checks if the channel is open, that is, data can be written or read.

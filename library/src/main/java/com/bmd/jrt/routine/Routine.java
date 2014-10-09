@@ -18,6 +18,9 @@ import com.bmd.jrt.channel.ParameterChannel;
 
 import java.util.List;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
+
 /**
  * This interface defines the main component of this framework.
  * <p/>
@@ -89,6 +92,7 @@ public interface Routine<INPUT, OUTPUT> {
      *
      * @return the list of output data.
      */
+    @NonNull
     public List<OUTPUT> call();
 
     /**
@@ -97,7 +101,8 @@ public interface Routine<INPUT, OUTPUT> {
      * @param input the input.
      * @return the list of output data.
      */
-    public List<OUTPUT> call(INPUT input);
+    @NonNull
+    public List<OUTPUT> call(@Nullable INPUT input);
 
     /**
      * Short for <code>run(inputs).readAll()</code>.
@@ -105,7 +110,8 @@ public interface Routine<INPUT, OUTPUT> {
      * @param inputs the input data.
      * @return the list of output data.
      */
-    public List<OUTPUT> call(INPUT... inputs);
+    @NonNull
+    public List<OUTPUT> call(@Nullable INPUT... inputs);
 
     /**
      * Short for <code>run(inputs).readAll()</code>.
@@ -113,7 +119,8 @@ public interface Routine<INPUT, OUTPUT> {
      * @param inputs the iterable returning the input data.
      * @return the list of output data.
      */
-    public List<OUTPUT> call(Iterable<? extends INPUT> inputs);
+    @NonNull
+    public List<OUTPUT> call(@Nullable Iterable<? extends INPUT> inputs);
 
     /**
      * Short for <code>run(inputs).readAll()</code>.
@@ -121,13 +128,15 @@ public interface Routine<INPUT, OUTPUT> {
      * @param inputs the output channel returning the input data.
      * @return the list of output data.
      */
-    public List<OUTPUT> call(OutputChannel<? extends INPUT> inputs);
+    @NonNull
+    public List<OUTPUT> call(@Nullable OutputChannel<? extends INPUT> inputs);
 
     /**
      * Short for <code>runAsyn().readAll()</code>.
      *
      * @return the list of output data.
      */
+    @NonNull
     public List<OUTPUT> callAsyn();
 
     /**
@@ -136,7 +145,8 @@ public interface Routine<INPUT, OUTPUT> {
      * @param input the input.
      * @return the list of output data.
      */
-    public List<OUTPUT> callAsyn(INPUT input);
+    @NonNull
+    public List<OUTPUT> callAsyn(@Nullable INPUT input);
 
     /**
      * Short for <code>runAsyn(inputs).readAll()</code>.
@@ -144,7 +154,8 @@ public interface Routine<INPUT, OUTPUT> {
      * @param inputs the input data.
      * @return the list of output data.
      */
-    public List<OUTPUT> callAsyn(INPUT... inputs);
+    @NonNull
+    public List<OUTPUT> callAsyn(@Nullable INPUT... inputs);
 
     /**
      * Short for <code>runAsyn(inputs).readAll()</code>.
@@ -152,7 +163,8 @@ public interface Routine<INPUT, OUTPUT> {
      * @param inputs the iterable returning the input data.
      * @return the list of output data.
      */
-    public List<OUTPUT> callAsyn(Iterable<? extends INPUT> inputs);
+    @NonNull
+    public List<OUTPUT> callAsyn(@Nullable Iterable<? extends INPUT> inputs);
 
     /**
      * Short for <code>runAsyn(inputs).readAll()</code>.
@@ -160,13 +172,15 @@ public interface Routine<INPUT, OUTPUT> {
      * @param inputs the output channel returning the input data.
      * @return the list of output data.
      */
-    public List<OUTPUT> callAsyn(OutputChannel<? extends INPUT> inputs);
+    @NonNull
+    public List<OUTPUT> callAsyn(@Nullable OutputChannel<? extends INPUT> inputs);
 
     /**
      * Short for <code>runParall().readAll()</code>.
      *
      * @return the list of output data.
      */
+    @NonNull
     public List<OUTPUT> callParall();
 
     /**
@@ -175,7 +189,8 @@ public interface Routine<INPUT, OUTPUT> {
      * @param input the input.
      * @return the list of output data.
      */
-    public List<OUTPUT> callParall(INPUT input);
+    @NonNull
+    public List<OUTPUT> callParall(@Nullable INPUT input);
 
     /**
      * Short for <code>runParall(inputs).readAll()</code>.
@@ -183,7 +198,8 @@ public interface Routine<INPUT, OUTPUT> {
      * @param inputs the input data.
      * @return the list of output data.
      */
-    public List<OUTPUT> callParall(INPUT... inputs);
+    @NonNull
+    public List<OUTPUT> callParall(@Nullable INPUT... inputs);
 
     /**
      * Short for <code>runParall(inputs).readAll()</code>.
@@ -191,7 +207,8 @@ public interface Routine<INPUT, OUTPUT> {
      * @param inputs the iterable returning the input data.
      * @return the list of output data.
      */
-    public List<OUTPUT> callParall(Iterable<? extends INPUT> inputs);
+    @NonNull
+    public List<OUTPUT> callParall(@Nullable Iterable<? extends INPUT> inputs);
 
     /**
      * Short for <code>runParall(inputs).readAll()</code>.
@@ -199,13 +216,15 @@ public interface Routine<INPUT, OUTPUT> {
      * @param inputs the output channel returning the input data.
      * @return the list of output data.
      */
-    public List<OUTPUT> callParall(OutputChannel<? extends INPUT> inputs);
+    @NonNull
+    public List<OUTPUT> callParall(@Nullable OutputChannel<? extends INPUT> inputs);
 
     /**
      * Invokes the execution of this routine in synchronous mode.
      *
      * @return the routine parameter channel.
      */
+    @NonNull
     public ParameterChannel<INPUT, OUTPUT> invoke();
 
     /**
@@ -213,6 +232,7 @@ public interface Routine<INPUT, OUTPUT> {
      *
      * @return the routine parameter channel.
      */
+    @NonNull
     public ParameterChannel<INPUT, OUTPUT> invokeAsyn();
 
     /**
@@ -220,6 +240,7 @@ public interface Routine<INPUT, OUTPUT> {
      *
      * @return the routine parameter channel.
      */
+    @NonNull
     public ParameterChannel<INPUT, OUTPUT> invokeParall();
 
     /**
@@ -227,6 +248,7 @@ public interface Routine<INPUT, OUTPUT> {
      *
      * @return the output channel.
      */
+    @NonNull
     public OutputChannel<OUTPUT> run();
 
     /**
@@ -235,7 +257,8 @@ public interface Routine<INPUT, OUTPUT> {
      * @param input the input.
      * @return the output channel.
      */
-    public OutputChannel<OUTPUT> run(INPUT input);
+    @NonNull
+    public OutputChannel<OUTPUT> run(@Nullable INPUT input);
 
     /**
      * Short for <code>invoke(inputs).results()</code>.
@@ -243,7 +266,8 @@ public interface Routine<INPUT, OUTPUT> {
      * @param inputs the input data.
      * @return the output channel.
      */
-    public OutputChannel<OUTPUT> run(INPUT... inputs);
+    @NonNull
+    public OutputChannel<OUTPUT> run(@Nullable INPUT... inputs);
 
     /**
      * Short for <code>invoke(inputs).results()</code>.
@@ -251,7 +275,8 @@ public interface Routine<INPUT, OUTPUT> {
      * @param inputs the iterable returning the input data.
      * @return the output channel.
      */
-    public OutputChannel<OUTPUT> run(Iterable<? extends INPUT> inputs);
+    @NonNull
+    public OutputChannel<OUTPUT> run(@Nullable Iterable<? extends INPUT> inputs);
 
     /**
      * Short for <code>invoke(inputs).results()</code>.
@@ -259,13 +284,15 @@ public interface Routine<INPUT, OUTPUT> {
      * @param inputs the output channel returning the input data.
      * @return the output channel.
      */
-    public OutputChannel<OUTPUT> run(OutputChannel<? extends INPUT> inputs);
+    @NonNull
+    public OutputChannel<OUTPUT> run(@Nullable OutputChannel<? extends INPUT> inputs);
 
     /**
      * Short for <code>invokeAsyn().results()</code>.
      *
      * @return the output channel.
      */
+    @NonNull
     public OutputChannel<OUTPUT> runAsyn();
 
     /**
@@ -274,7 +301,8 @@ public interface Routine<INPUT, OUTPUT> {
      * @param input the input.
      * @return the output channel.
      */
-    public OutputChannel<OUTPUT> runAsyn(INPUT input);
+    @NonNull
+    public OutputChannel<OUTPUT> runAsyn(@Nullable INPUT input);
 
     /**
      * Short for <code>invokeAsyn(inputs).results()</code>.
@@ -282,7 +310,8 @@ public interface Routine<INPUT, OUTPUT> {
      * @param inputs the input data.
      * @return the output channel.
      */
-    public OutputChannel<OUTPUT> runAsyn(INPUT... inputs);
+    @NonNull
+    public OutputChannel<OUTPUT> runAsyn(@Nullable INPUT... inputs);
 
     /**
      * Short for <code>invokeAsyn(inputs).results()</code>.
@@ -290,7 +319,8 @@ public interface Routine<INPUT, OUTPUT> {
      * @param inputs the iterable returning the input data.
      * @return the output channel.
      */
-    public OutputChannel<OUTPUT> runAsyn(Iterable<? extends INPUT> inputs);
+    @NonNull
+    public OutputChannel<OUTPUT> runAsyn(@Nullable Iterable<? extends INPUT> inputs);
 
     /**
      * Short for <code>invokeAsyn(inputs).results()</code>.
@@ -298,13 +328,15 @@ public interface Routine<INPUT, OUTPUT> {
      * @param inputs the output channel returning the input data.
      * @return the output channel.
      */
-    public OutputChannel<OUTPUT> runAsyn(OutputChannel<? extends INPUT> inputs);
+    @NonNull
+    public OutputChannel<OUTPUT> runAsyn(@Nullable OutputChannel<? extends INPUT> inputs);
 
     /**
      * Short for <code>invokeParall(input).results()</code>.
      *
      * @return the output channel.
      */
+    @NonNull
     public OutputChannel<OUTPUT> runParall();
 
     /**
@@ -313,7 +345,8 @@ public interface Routine<INPUT, OUTPUT> {
      * @param input the input.
      * @return the output channel.
      */
-    public OutputChannel<OUTPUT> runParall(INPUT input);
+    @NonNull
+    public OutputChannel<OUTPUT> runParall(@Nullable INPUT input);
 
     /**
      * Short for <code>invokeParall(inputs).results()</code>.
@@ -321,7 +354,8 @@ public interface Routine<INPUT, OUTPUT> {
      * @param inputs the iterable returning the input data.
      * @return the output channel.
      */
-    public OutputChannel<OUTPUT> runParall(INPUT... inputs);
+    @NonNull
+    public OutputChannel<OUTPUT> runParall(@Nullable INPUT... inputs);
 
     /**
      * Short for <code>invokeParall(inputs).results()</code>.
@@ -329,7 +363,8 @@ public interface Routine<INPUT, OUTPUT> {
      * @param inputs the output channel returning the input data.
      * @return the output channel.
      */
-    public OutputChannel<OUTPUT> runParall(Iterable<? extends INPUT> inputs);
+    @NonNull
+    public OutputChannel<OUTPUT> runParall(@Nullable Iterable<? extends INPUT> inputs);
 
     /**
      * Short for <code>invokeParall(inputs).results()</code>.
@@ -337,5 +372,6 @@ public interface Routine<INPUT, OUTPUT> {
      * @param inputs the output channel returning the input data.
      * @return the output channel.
      */
-    public OutputChannel<OUTPUT> runParall(OutputChannel<? extends INPUT> inputs);
+    @NonNull
+    public OutputChannel<OUTPUT> runParall(@Nullable OutputChannel<? extends INPUT> inputs);
 }

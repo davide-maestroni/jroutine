@@ -13,6 +13,8 @@
  */
 package com.bmd.jrt.channel;
 
+import edu.umd.cs.findbugs.annotations.Nullable;
+
 /**
  * Empty abstract implementation of an output consumer.
  * <p/>
@@ -25,7 +27,7 @@ package com.bmd.jrt.channel;
 public abstract class OutputConsumerAdapter<OUTPUT> implements OutputConsumer<OUTPUT> {
 
     @Override
-    public void onAbort(final Throwable throwable) {
+    public void onAbort(@Nullable final Throwable throwable) {
 
     }
 
@@ -35,7 +37,7 @@ public abstract class OutputConsumerAdapter<OUTPUT> implements OutputConsumer<OU
     }
 
     @Override
-    public void onOutput(final OUTPUT output) {
+    public void onOutput(@Nullable final OUTPUT output) {
 
     }
 }

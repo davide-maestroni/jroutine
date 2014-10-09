@@ -36,6 +36,7 @@ import static org.fest.assertions.api.Assertions.assertThat;
  */
 public class RunnerTest extends TestCase {
 
+    @SuppressWarnings("ConstantConditions")
     public void testError() {
 
         try {

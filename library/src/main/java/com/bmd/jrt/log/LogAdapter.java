@@ -17,6 +17,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
+
 /**
  * Abstract implementation of a log.
  * <p/>
@@ -44,19 +47,22 @@ public abstract class LogAdapter implements Log {
     }
 
     @Override
-    public void dbg(final List<Object> contexts, final String message, final Throwable throwable) {
+    public void dbg(@NonNull final List<Object> contexts, @Nullable final String message,
+            @Nullable final Throwable throwable) {
 
         log(LogLevel.DEBUG, contexts, message, throwable);
     }
 
     @Override
-    public void err(final List<Object> contexts, final String message, final Throwable throwable) {
+    public void err(@NonNull final List<Object> contexts, @Nullable final String message,
+            @Nullable final Throwable throwable) {
 
         log(LogLevel.ERROR, contexts, message, throwable);
     }
 
     @Override
-    public void wrn(final List<Object> contexts, final String message, final Throwable throwable) {
+    public void wrn(@NonNull final List<Object> contexts, @Nullable final String message,
+            @Nullable final Throwable throwable) {
 
         log(LogLevel.WARNING, contexts, message, throwable);
     }
@@ -69,8 +75,8 @@ public abstract class LogAdapter implements Log {
      * @param message   the log message.
      * @param throwable the related exception.
      */
-    protected void log(final LogLevel level, final List<Object> contexts, final String message,
-            final Throwable throwable) {
+    protected void log(@NonNull final LogLevel level, @NonNull final List<Object> contexts,
+            @Nullable final String message, @Nullable final Throwable throwable) {
 
         String formatted = format(level, contexts, message);
 
@@ -87,7 +93,7 @@ public abstract class LogAdapter implements Log {
      *
      * @param message the message.
      */
-    protected void log(final String message) {
+    protected void log(@NonNull final String message) {
 
     }
 }

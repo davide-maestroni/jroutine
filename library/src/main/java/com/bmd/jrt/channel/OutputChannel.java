@@ -18,6 +18,9 @@ import com.bmd.jrt.time.TimeDuration;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
+
 /**
  * Interface defining an output channel, that is the channel used to read the routine output data.
  * <p/>
@@ -40,7 +43,8 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
      *                                             exception.
      */
-    public OutputChannel<OUTPUT> afterMax(TimeDuration timeout);
+    @NonNull
+    public OutputChannel<OUTPUT> afterMax(@NonNull TimeDuration timeout);
 
     /**
      * Tells the channel to wait at max the specified time duration for the next result to be
@@ -56,7 +60,8 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
      *                                             exception.
      */
-    public OutputChannel<OUTPUT> afterMax(long timeout, TimeUnit timeUnit);
+    @NonNull
+    public OutputChannel<OUTPUT> afterMax(long timeout, @NonNull TimeUnit timeUnit);
 
     /**
      * Binds the specified consumer to this channel. After the call all the output will be passed
@@ -69,7 +74,8 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
      *                                             exception.
      */
-    public OutputChannel<OUTPUT> bind(OutputConsumer<OUTPUT> consumer);
+    @NonNull
+    public OutputChannel<OUTPUT> bind(@Nullable OutputConsumer<OUTPUT> consumer);
 
     /**
      * Tells the channel to throw the specified exception in case no result is available before the
@@ -81,7 +87,8 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
      *                                             exception.
      */
-    public OutputChannel<OUTPUT> eventuallyThrow(RuntimeException exception);
+    @NonNull
+    public OutputChannel<OUTPUT> eventuallyThrow(@Nullable RuntimeException exception);
 
     /**
      * Tells the channel to not wait for results to be available.
@@ -93,6 +100,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
      *                                             exception.
      */
+    @NonNull
     public OutputChannel<OUTPUT> immediately();
 
     /**
@@ -106,6 +114,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @see #afterMax(com.bmd.jrt.time.TimeDuration)
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
      */
+    @NonNull
     public List<OUTPUT> readAll();
 
     /**
@@ -121,7 +130,8 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @see #afterMax(com.bmd.jrt.time.TimeDuration)
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
      */
-    public OutputChannel<OUTPUT> readAllInto(List<OUTPUT> results);
+    @NonNull
+    public OutputChannel<OUTPUT> readAllInto(@NonNull List<OUTPUT> results);
 
     /**
      * Reads the first available result by waiting at the maximum for the set timeout.
@@ -133,6 +143,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @see #afterMax(com.bmd.jrt.time.TimeDuration)
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
      */
+    @Nullable
     public OUTPUT readFirst();
 
     /**

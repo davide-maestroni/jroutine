@@ -25,6 +25,8 @@ import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.WeakHashMap;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+
 import static com.bmd.jrt.routine.ReflectionUtils.boxingClass;
 
 /**
@@ -55,7 +57,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * @throws NullPointerException     if the specified target is null.
      * @throws IllegalArgumentException if a duplicate name in the annotations is detected.
      */
-    ObjectRoutineBuilder(final Object target) {
+    ObjectRoutineBuilder(@NonNull final Object target) {
 
         super(target);
 
@@ -80,12 +82,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * @throws NullPointerException     if the specified class is null.
      * @throws IllegalArgumentException if the specified class does not represent an interface.
      */
-    public <CLASS> CLASS asAsyn(final Class<CLASS> itf) {
-
-        if (itf == null) {
-
-            throw new NullPointerException("the interface type must be null");
-        }
+    @NonNull
+    public <CLASS> CLASS asAsyn(@NonNull final Class<CLASS> itf) {
 
         if (!itf.isInterface()) {
 
@@ -111,7 +109,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     }
 
     @Override
-    public ObjectRoutineBuilder logLevel(final LogLevel level) {
+    @NonNull
+    public ObjectRoutineBuilder logLevel(@NonNull final LogLevel level) {
 
         super.logLevel(level);
 
@@ -119,7 +118,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     }
 
     @Override
-    public ObjectRoutineBuilder logWith(final Log log) {
+    @NonNull
+    public ObjectRoutineBuilder logWith(@NonNull final Log log) {
 
         super.logWith(log);
 
@@ -127,6 +127,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     }
 
     @Override
+    @NonNull
     public ObjectRoutineBuilder queued() {
 
         super.queued();
@@ -135,7 +136,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     }
 
     @Override
-    public ObjectRoutineBuilder runBy(final Runner runner) {
+    @NonNull
+    public ObjectRoutineBuilder runBy(@NonNull final Runner runner) {
 
         super.runBy(runner);
 
@@ -143,6 +145,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     }
 
     @Override
+    @NonNull
     public ObjectRoutineBuilder sequential() {
 
         super.sequential();
@@ -151,7 +154,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     }
 
     @Override
-    public ObjectRoutineBuilder withinTry(final Catch catchClause) {
+    @NonNull
+    public ObjectRoutineBuilder withinTry(@NonNull final Catch catchClause) {
 
         super.withinTry(catchClause);
 
@@ -305,7 +309,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                 outputChannel = routine.runAsyn(args);
             }
 
-            if (!boxingClass(returnType).equals(Void.class)) {
+            if (!Void.class.equals(boxingClass(returnType))) {
 
                 if (isOverrideReturn) {
 
@@ -332,7 +336,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
             final Class<?> returnType = method.getReturnType();
 
-            if (!boxingClass(returnType).equals(Void.class)) {
+            if (!Void.class.equals(boxingClass(returnType))) {
 
                 return outputChannel.readFirst();
             }

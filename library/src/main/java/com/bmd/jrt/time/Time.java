@@ -15,12 +15,44 @@ package com.bmd.jrt.time;
 
 import java.util.concurrent.TimeUnit;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+
 /**
  * Utility class for handling time in different time units.
  * <p/>
  * Created by davide on 9/9/14.
  */
 public class Time {
+
+    /**
+     * The number of hours in a day.
+     */
+    public static final long HOURS_IN_DAY = 24;
+
+    /**
+     * The number of minutes in an hour.
+     */
+    public static final long MINUTES_IN_HOUR = 60;
+
+    /**
+     * The number of minutes in a day.
+     */
+    public static final long MINUTES_IN_DAY = MINUTES_IN_HOUR * HOURS_IN_DAY;
+
+    /**
+     * The number of seconds in a minute.
+     */
+    public static final long SECONDS_IN_MINUTE = 60;
+
+    /**
+     * The number of seconds in an hour.
+     */
+    public static final long SECONDS_IN_HOUR = SECONDS_IN_MINUTE * MINUTES_IN_HOUR;
+
+    /**
+     * The number of seconds in a day.
+     */
+    public static final long SECONDS_IN_DAY = SECONDS_IN_HOUR * HOURS_IN_DAY;
 
     /**
      * The time value.
@@ -38,7 +70,7 @@ public class Time {
      * @param time the time value.
      * @param unit the time unit.
      */
-    protected Time(final long time, final TimeUnit unit) {
+    protected Time(final long time, @NonNull final TimeUnit unit) {
 
         this.time = time;
         this.unit = unit;
@@ -50,6 +82,7 @@ public class Time {
      * @return the time instance.
      * @see System#currentTimeMillis()
      */
+    @NonNull
     public static Time current() {
 
         return millis(System.currentTimeMillis());
@@ -61,9 +94,10 @@ public class Time {
      * @param days the number of days.
      * @return the time instance.
      */
+    @NonNull
     public static Time days(final long days) {
 
-        return new Time(days, TimeUnit.DAYS);
+        return new Time(days * SECONDS_IN_DAY, TimeUnit.SECONDS);
     }
 
     /**
@@ -75,7 +109,9 @@ public class Time {
      * @return the time instance.
      * @throws NullPointerException if the specified time unit is null.
      */
-    public static Time fromUnit(final long time, TimeUnit unit) {
+    @NonNull
+    @SuppressWarnings("ConstantConditions")
+    public static Time fromUnit(final long time, @NonNull TimeUnit unit) {
 
         if (unit == null) {
 
@@ -91,9 +127,10 @@ public class Time {
      * @param hours the number of hours
      * @return the time instance.
      */
+    @NonNull
     public static Time hours(final long hours) {
 
-        return new Time(hours, TimeUnit.HOURS);
+        return new Time(hours * SECONDS_IN_HOUR, TimeUnit.SECONDS);
     }
 
     /**
@@ -102,6 +139,7 @@ public class Time {
      * @param micros the number of microseconds.
      * @return the time instance.
      */
+    @NonNull
     public static Time micros(final long micros) {
 
         return new Time(micros, TimeUnit.MICROSECONDS);
@@ -113,6 +151,7 @@ public class Time {
      * @param millis the number of milliseconds.
      * @return the time instance.
      */
+    @NonNull
     public static Time millis(final long millis) {
 
         return new Time(millis, TimeUnit.MILLISECONDS);
@@ -124,9 +163,10 @@ public class Time {
      * @param minutes the number of minutes.
      * @return the time instance.
      */
+    @NonNull
     public static Time minutes(final long minutes) {
 
-        return new Time(minutes, TimeUnit.MINUTES);
+        return new Time(minutes * SECONDS_IN_MINUTE, TimeUnit.SECONDS);
     }
 
     /**
@@ -136,6 +176,7 @@ public class Time {
      * @return the time instance.
      * @see System#nanoTime()
      */
+    @NonNull
     public static Time nano() {
 
         return nanos(System.nanoTime());
@@ -147,6 +188,7 @@ public class Time {
      * @param nanos the number of nanoseconds.
      * @return the time instance.
      */
+    @NonNull
     public static Time nanos(final long nanos) {
 
         return new Time(nanos, TimeUnit.NANOSECONDS);
@@ -158,6 +200,7 @@ public class Time {
      * @param seconds the number of seconds.
      * @return the time instance.
      */
+    @NonNull
     public static Time seconds(final long seconds) {
 
         return new Time(seconds, TimeUnit.SECONDS);
@@ -168,6 +211,7 @@ public class Time {
      *
      * @return the time instance.
      */
+    @NonNull
     public Time daysTime() {
 
         return days(toDays());
@@ -216,6 +260,7 @@ public class Time {
      *
      * @return the time instance.
      */
+    @NonNull
     public Time hoursTime() {
 
         return hours(toHours());
@@ -236,6 +281,7 @@ public class Time {
      *
      * @return the time instance.
      */
+    @NonNull
     public Time microsTime() {
 
         return micros(toMicros());
@@ -246,6 +292,7 @@ public class Time {
      *
      * @return the time instance.
      */
+    @NonNull
     public Time millisTime() {
 
         return millis(toMillis());
@@ -256,6 +303,7 @@ public class Time {
      *
      * @return the time instance.
      */
+    @NonNull
     public Time minutesTime() {
 
         return minutes(toMinutes());
@@ -266,6 +314,7 @@ public class Time {
      *
      * @return the time instance.
      */
+    @NonNull
     public Time nanosTime() {
 
         return nanos(toNanos());
@@ -276,6 +325,7 @@ public class Time {
      *
      * @return the time instance.
      */
+    @NonNull
     public Time secondsTime() {
 
         return seconds(toSeconds());
@@ -299,7 +349,7 @@ public class Time {
      */
     public long toDays() {
 
-        return unit.toDays(time);
+        return unit.toSeconds(time) / SECONDS_IN_DAY;
     }
 
     /**
@@ -309,7 +359,7 @@ public class Time {
      */
     public long toHours() {
 
-        return unit.toHours(time);
+        return unit.toSeconds(time) / SECONDS_IN_HOUR;
     }
 
     /**
@@ -339,7 +389,7 @@ public class Time {
      */
     public long toMinutes() {
 
-        return unit.toMinutes(time);
+        return unit.toSeconds(time) / SECONDS_IN_MINUTE;
     }
 
     /**

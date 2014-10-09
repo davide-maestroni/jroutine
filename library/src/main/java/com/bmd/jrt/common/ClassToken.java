@@ -16,6 +16,9 @@ package com.bmd.jrt.common;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
+
 /**
  * Utility abstract class used to work around Java type erasure.
  * <p/>
@@ -43,13 +46,9 @@ public abstract class ClassToken<CLASS> {
      * @return the newly created token.
      * @throws NullPointerException if the object is null.
      */
+    @NonNull
     @SuppressWarnings("unchecked")
-    public static <CLASS> ClassToken<CLASS> classOf(final CLASS object) {
-
-        if (object == null) {
-
-            throw new NullPointerException("the classification object must not be null");
-        }
+    public static <CLASS> ClassToken<CLASS> classOf(@NonNull final CLASS object) {
 
         return tokenOf((Class<CLASS>) object.getClass());
     }
@@ -62,7 +61,9 @@ public abstract class ClassToken<CLASS> {
      * @return the newly created token.
      * @throws NullPointerException if the raw class is null.
      */
-    public static <CLASS> ClassToken<CLASS> tokenOf(final Class<CLASS> rawClass) {
+    @NonNull
+    @SuppressWarnings("ConstantConditions")
+    public static <CLASS> ClassToken<CLASS> tokenOf(@NonNull final Class<CLASS> rawClass) {
 
         if (rawClass == null) {
 
@@ -84,8 +85,9 @@ public abstract class ClassToken<CLASS> {
      * @param object the object to cast.
      * @return the casted object.
      */
+    @Nullable
     @SuppressWarnings("unchecked")
-    public final CLASS cast(final Object object) {
+    public final CLASS cast(@Nullable final Object object) {
 
         return (CLASS) object;
     }
@@ -96,6 +98,7 @@ public abstract class ClassToken<CLASS> {
      * @return the generic type.
      * @throws IllegalStateException if this class does not correctly extends a class token.
      */
+    @NonNull
     public final Type getGenericType() {
 
         if (mGenericType == null) {
@@ -133,6 +136,7 @@ public abstract class ClassToken<CLASS> {
      * @return the raw class.
      * @throws IllegalStateException if this class does not correctly extends a class token.
      */
+    @NonNull
     @SuppressWarnings("unchecked")
     public final Class<CLASS> getRawClass() {
 
@@ -189,8 +193,9 @@ public abstract class ClassToken<CLASS> {
      * @param other the class token to compare.
      * @return whether this token raw class is equal to or is a super class.
      * @throws IllegalStateException if this class does not correctly extends a class token.
+     * @throws NullPointerException  if the other class token is null.
      */
-    public final boolean isAssignableFrom(final ClassToken<?> other) {
+    public final boolean isAssignableFrom(@NonNull final ClassToken<?> other) {
 
         return getRawClass().isAssignableFrom(other.getRawClass());
     }

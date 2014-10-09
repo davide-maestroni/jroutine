@@ -15,6 +15,9 @@ package com.bmd.jrt.routine;
 
 import java.util.Collection;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
+
 /**
  * Interface defining a queue with the possibility to add nested queues with additional elements.
  * <p/>
@@ -36,7 +39,8 @@ interface NestedQueue<E> {
      * @return this queue.
      * @throws java.lang.IllegalStateException if the queue has been already closed.
      */
-    public NestedQueue<E> add(E element);
+    @NonNull
+    public NestedQueue<E> add(@Nullable E element);
 
     /**
      * Adds all the elements returned by the specified iterable.
@@ -47,7 +51,8 @@ interface NestedQueue<E> {
      * @return this queue.
      * @throws java.lang.IllegalStateException if the queue has been already closed.
      */
-    public NestedQueue<E> addAll(Iterable<? extends E> elements);
+    @NonNull
+    public NestedQueue<E> addAll(@NonNull Iterable<? extends E> elements);
 
     /**
      * Adds a nested queue to this one.
@@ -55,6 +60,7 @@ interface NestedQueue<E> {
      * @return the newly added nested queue.
      * @throws java.lang.IllegalStateException if the queue has been already closed.
      */
+    @NonNull
     public NestedQueue<E> addNested();
 
     /**
@@ -62,6 +68,7 @@ interface NestedQueue<E> {
      *
      * @return this queue.
      */
+    @NonNull
     public NestedQueue<E> clear();
 
     /**
@@ -71,6 +78,7 @@ interface NestedQueue<E> {
      *
      * @return this queue.
      */
+    @NonNull
     public NestedQueue<E> close();
 
     /**
@@ -86,7 +94,8 @@ interface NestedQueue<E> {
      * @param collection the collection to fill.
      * @return this queue.
      */
-    public NestedQueue<E> moveTo(final Collection<? super E> collection);
+    @NonNull
+    public NestedQueue<E> moveTo(@NonNull final Collection<? super E> collection);
 
     /**
      * Removes the first element added into the queue.
@@ -94,5 +103,6 @@ interface NestedQueue<E> {
      * @return the element.
      * @throws java.util.NoSuchElementException if the queue is empty.
      */
+    @Nullable
     public E removeFirst();
 }

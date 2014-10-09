@@ -32,6 +32,8 @@ import junit.framework.TestCase;
 
 import java.util.List;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+
 import static com.bmd.jrt.routine.JRoutine.on;
 import static org.fest.assertions.api.Assertions.assertThat;
 
@@ -47,8 +49,8 @@ public class RoutineTest extends TestCase {
         final ExecutionBody<Integer, Integer> execSum = new ExecutionBody<Integer, Integer>() {
 
             @Override
-            public void onExec(final List<? extends Integer> integers,
-                    final ResultChannel<Integer> results) {
+            public void onExec(@NonNull final List<? extends Integer> integers,
+                    @NonNull final ResultChannel<Integer> results) {
 
                 int sum = 0;
 
@@ -69,7 +71,7 @@ public class RoutineTest extends TestCase {
 
                     @Override
                     public void onInput(final Integer integer,
-                            final ResultChannel<Integer> results) {
+                            @NonNull final ResultChannel<Integer> results) {
 
                         final int input = integer;
 
@@ -105,8 +107,8 @@ public class RoutineTest extends TestCase {
         final ExecutionBody<Integer, Integer> execSum = new ExecutionBody<Integer, Integer>() {
 
             @Override
-            public void onExec(final List<? extends Integer> integers,
-                    final ResultChannel<Integer> results) {
+            public void onExec(@NonNull final List<? extends Integer> integers,
+                    @NonNull final ResultChannel<Integer> results) {
 
                 int sum = 0;
 
@@ -127,7 +129,7 @@ public class RoutineTest extends TestCase {
 
                     @Override
                     public void onInput(final Integer integer,
-                            final ResultChannel<Integer> results) {
+                            @NonNull final ResultChannel<Integer> results) {
 
                         final int input = integer;
 
@@ -157,13 +159,13 @@ public class RoutineTest extends TestCase {
 
                     @Override
                     public void onInput(final Integer integer,
-                            final ResultChannel<Integer> results) {
+                            @NonNull final ResultChannel<Integer> results) {
 
                         mChannel.pass(squareRoutine.runAsyn(integer));
                     }
 
                     @Override
-                    public void onResult(final ResultChannel<Integer> results) {
+                    public void onResult(@NonNull final ResultChannel<Integer> results) {
 
                         results.pass(mChannel.results());
                     }
@@ -179,6 +181,7 @@ public class RoutineTest extends TestCase {
         assertThat(squareSumRoutine.runAsyn(1, 2, 3, 4).readAll()).containsExactly(30);
     }
 
+    @SuppressWarnings("ConstantConditions")
     public void testError() {
 
         try {
@@ -210,6 +213,7 @@ public class RoutineTest extends TestCase {
                                                 Logger.getDefaultLogLevel()) {
 
                 @Override
+                @NonNull
                 protected Execution<Object, Object> createExecution(final boolean async) {
 
                     return new ConstructorException();
@@ -229,6 +233,7 @@ public class RoutineTest extends TestCase {
                                                 Logger.getDefaultLogLevel()) {
 
                 @Override
+                @NonNull
                 protected Execution<Object, Object> createExecution(final boolean async) {
 
                     return new ConstructorException();
@@ -248,6 +253,7 @@ public class RoutineTest extends TestCase {
                                                 Logger.getDefaultLogLevel()) {
 
                 @Override
+                @NonNull
                 protected Execution<Object, Object> createExecution(final boolean async) {
 
                     return new ConstructorException();
@@ -266,6 +272,7 @@ public class RoutineTest extends TestCase {
                                                 TimeDuration.ZERO, false, false, null, null) {
 
                 @Override
+                @NonNull
                 protected Execution<Object, Object> createExecution(final boolean async) {
 
                     return new ConstructorException();
@@ -286,6 +293,7 @@ public class RoutineTest extends TestCase {
                                                 Logger.getDefaultLogLevel()) {
 
                 @Override
+                @NonNull
                 protected Execution<Object, Object> createExecution(final boolean async) {
 
                     return new ConstructorException();
@@ -306,6 +314,7 @@ public class RoutineTest extends TestCase {
                                                 Logger.getDefaultLogLevel()) {
 
                 @Override
+                @NonNull
                 protected Execution<Object, Object> createExecution(final boolean async) {
 
                     return new ConstructorException();
@@ -377,7 +386,7 @@ public class RoutineTest extends TestCase {
         final Execution<String, String> exceptionOnInput = new ExecutionAdapter<String, String>() {
 
             @Override
-            public void onInput(final String s, final ResultChannel<String> results) {
+            public void onInput(final String s, @NonNull final ResultChannel<String> results) {
 
                 throw new NullPointerException(s);
             }
@@ -400,7 +409,7 @@ public class RoutineTest extends TestCase {
         final Execution<String, String> exceptionOnResult = new ExecutionAdapter<String, String>() {
 
             @Override
-            public void onResult(final ResultChannel<String> results) {
+            public void onResult(@NonNull final ResultChannel<String> results) {
 
                 throw new NullPointerException("test3");
             }
@@ -423,7 +432,7 @@ public class RoutineTest extends TestCase {
         final Execution<String, String> exceptionOnReturn = new ExecutionAdapter<String, String>() {
 
             @Override
-            public void onInput(final String s, final ResultChannel<String> results) {
+            public void onInput(final String s, @NonNull final ResultChannel<String> results) {
 
                 results.pass(s);
             }
@@ -498,7 +507,7 @@ public class RoutineTest extends TestCase {
 
                     @Override
                     public void onInput(final Integer integer,
-                            final ResultChannel<Integer> results) {
+                            @NonNull final ResultChannel<Integer> results) {
 
                         final int input = integer;
 
@@ -522,8 +531,8 @@ public class RoutineTest extends TestCase {
         final ExecutionBody<Integer, Integer> execSum = new ExecutionBody<Integer, Integer>() {
 
             @Override
-            public void onExec(final List<? extends Integer> integers,
-                    final ResultChannel<Integer> results) {
+            public void onExec(@NonNull final List<? extends Integer> integers,
+                    @NonNull final ResultChannel<Integer> results) {
 
                 int sum = 0;
 
@@ -1240,7 +1249,7 @@ public class RoutineTest extends TestCase {
         }
 
         @Override
-        public void onInput(final String s, final ResultChannel<String> results) {
+        public void onInput(final String s, @NonNull final ResultChannel<String> results) {
 
             results.after(mDelay).pass(s);
         }
@@ -1249,7 +1258,7 @@ public class RoutineTest extends TestCase {
     private static class PassThroughExecution extends ExecutionAdapter<String, String> {
 
         @Override
-        public void onInput(final String s, final ResultChannel<String> results) {
+        public void onInput(final String s, @NonNull final ResultChannel<String> results) {
 
             results.pass(s);
         }

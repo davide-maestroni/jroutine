@@ -17,6 +17,9 @@ import com.bmd.jrt.time.TimeDuration;
 
 import java.util.concurrent.TimeUnit;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
+
 /**
  * Interface defining an input channel.
  * <p/>
@@ -36,7 +39,8 @@ public interface InputChannel<INPUT> extends Channel {
      * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
      *                                             exception.
      */
-    public InputChannel<INPUT> after(TimeDuration delay);
+    @NonNull
+    public InputChannel<INPUT> after(@NonNull TimeDuration delay);
 
     /**
      * Tells the channel to delay the transfer of data of the specified time duration.
@@ -49,7 +53,8 @@ public interface InputChannel<INPUT> extends Channel {
      * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
      *                                             exception.
      */
-    public InputChannel<INPUT> after(long delay, TimeUnit timeUnit);
+    @NonNull
+    public InputChannel<INPUT> after(long delay, @NonNull TimeUnit timeUnit);
 
     /**
      * Passes the specified channel to this one.
@@ -65,7 +70,8 @@ public interface InputChannel<INPUT> extends Channel {
      *                                             exception.
      * @see OutputChannel#bind(OutputConsumer)
      */
-    public InputChannel<INPUT> pass(OutputChannel<INPUT> channel);
+    @NonNull
+    public InputChannel<INPUT> pass(@Nullable OutputChannel<INPUT> channel);
 
     /**
      * Passes the data returned by the specified iterable to this channel.
@@ -76,7 +82,8 @@ public interface InputChannel<INPUT> extends Channel {
      * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
      *                                             exception.
      */
-    public InputChannel<INPUT> pass(Iterable<? extends INPUT> inputs);
+    @NonNull
+    public InputChannel<INPUT> pass(@Nullable Iterable<? extends INPUT> inputs);
 
     /**
      * Passes the specified input to this channel.
@@ -87,7 +94,8 @@ public interface InputChannel<INPUT> extends Channel {
      * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
      *                                             exception.
      */
-    public InputChannel<INPUT> pass(INPUT input);
+    @NonNull
+    public InputChannel<INPUT> pass(@Nullable INPUT input);
 
     /**
      * Passes the specified input data to this channel.
@@ -98,5 +106,6 @@ public interface InputChannel<INPUT> extends Channel {
      * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
      *                                             exception.
      */
-    public InputChannel<INPUT> pass(INPUT... inputs);
+    @NonNull
+    public InputChannel<INPUT> pass(@Nullable INPUT... inputs);
 }

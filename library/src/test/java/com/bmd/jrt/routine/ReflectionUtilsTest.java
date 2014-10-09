@@ -31,16 +31,16 @@ public class ReflectionUtilsTest extends TestCase {
     public void testBoxingClass() {
 
         assertThat(ReflectionUtils.boxingClass(null)).isNull();
-        assertThat(ReflectionUtils.boxingClass(void.class).equals(Void.class)).isTrue();
-        assertThat(ReflectionUtils.boxingClass(int.class).equals(Integer.class)).isTrue();
-        assertThat(ReflectionUtils.boxingClass(byte.class).equals(Byte.class)).isTrue();
-        assertThat(ReflectionUtils.boxingClass(boolean.class).equals(Boolean.class)).isTrue();
-        assertThat(ReflectionUtils.boxingClass(char.class).equals(Character.class)).isTrue();
-        assertThat(ReflectionUtils.boxingClass(short.class).equals(Short.class)).isTrue();
-        assertThat(ReflectionUtils.boxingClass(long.class).equals(Long.class)).isTrue();
-        assertThat(ReflectionUtils.boxingClass(float.class).equals(Float.class)).isTrue();
-        assertThat(ReflectionUtils.boxingClass(double.class).equals(Double.class)).isTrue();
-        assertThat(ReflectionUtils.boxingClass(TestCase.class).equals(TestCase.class)).isTrue();
+        assertThat(Void.class.equals(ReflectionUtils.boxingClass(void.class))).isTrue();
+        assertThat(Integer.class.equals(ReflectionUtils.boxingClass(int.class))).isTrue();
+        assertThat(Byte.class.equals(ReflectionUtils.boxingClass(byte.class))).isTrue();
+        assertThat(Boolean.class.equals(ReflectionUtils.boxingClass(boolean.class))).isTrue();
+        assertThat(Character.class.equals(ReflectionUtils.boxingClass(char.class))).isTrue();
+        assertThat(Short.class.equals(ReflectionUtils.boxingClass(short.class))).isTrue();
+        assertThat(Long.class.equals(ReflectionUtils.boxingClass(long.class))).isTrue();
+        assertThat(Float.class.equals(ReflectionUtils.boxingClass(float.class))).isTrue();
+        assertThat(Double.class.equals(ReflectionUtils.boxingClass(double.class))).isTrue();
+        assertThat(TestCase.class.equals(ReflectionUtils.boxingClass(TestCase.class))).isTrue();
     }
 
     public void testConstructor() {

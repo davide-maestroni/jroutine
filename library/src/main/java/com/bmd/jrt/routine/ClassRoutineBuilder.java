@@ -30,6 +30,9 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.WeakHashMap;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
+
 import static com.bmd.jrt.routine.ReflectionUtils.boxingClass;
 
 /**
@@ -75,12 +78,7 @@ public class ClassRoutineBuilder {
      * @throws NullPointerException     if the specified target is null.
      * @throws IllegalArgumentException if a duplicate name in the annotations is detected.
      */
-    ClassRoutineBuilder(final Object target) {
-
-        if (target == null) {
-
-            throw new NullPointerException("the target object must not be null");
-        }
+    ClassRoutineBuilder(@NonNull final Object target) {
 
         final Class<?> targetClass;
 
@@ -133,18 +131,9 @@ public class ClassRoutineBuilder {
      * @throws RoutineException         if an error occurred while instantiating the optional
      *                                  runner or the routine.
      */
-    public Routine<Object, Object> classMethod(final String name,
-            final Class<?>... parameterTypes) {
-
-        if (name == null) {
-
-            throw new NullPointerException("the method name must not be null");
-        }
-
-        if (parameterTypes == null) {
-
-            throw new NullPointerException("the list of parameter types must not be null");
-        }
+    @NonNull
+    public Routine<Object, Object> classMethod(@NonNull final String name,
+            @NonNull final Class<?>... parameterTypes) {
 
         final Class<?> targetClass = mTargetClass;
         Method targetMethod = null;
@@ -184,12 +173,8 @@ public class ClassRoutineBuilder {
      * @throws RoutineException     if an error occurred while instantiating the optional runner
      *                              or the routine.
      */
-    public Routine<Object, Object> classMethod(final Method method) {
-
-        if (method == null) {
-
-            throw new NullPointerException("the method must not be null");
-        }
+    @NonNull
+    public Routine<Object, Object> classMethod(@NonNull final Method method) {
 
         if (!method.isAccessible()) {
 
@@ -240,7 +225,9 @@ public class ClassRoutineBuilder {
      * @return this builder.
      * @throws NullPointerException if the log level is null.
      */
-    public ClassRoutineBuilder logLevel(final LogLevel level) {
+    @NonNull
+    @SuppressWarnings("ConstantConditions")
+    public ClassRoutineBuilder logLevel(@NonNull final LogLevel level) {
 
         if (level == null) {
 
@@ -259,7 +246,9 @@ public class ClassRoutineBuilder {
      * @return this builder.
      * @throws NullPointerException if the log is null.
      */
-    public ClassRoutineBuilder logWith(final Log log) {
+    @NonNull
+    @SuppressWarnings("ConstantConditions")
+    public ClassRoutineBuilder logWith(@NonNull final Log log) {
 
         if (log == null) {
 
@@ -281,7 +270,8 @@ public class ClassRoutineBuilder {
      * @throws RoutineException         if an error occurred while instantiating the optional
      *                                  runner or the routine.
      */
-    public Routine<Object, Object> method(final String name) {
+    @NonNull
+    public Routine<Object, Object> method(@NonNull final String name) {
 
         final Method method = mMethodMap.get(name);
 
@@ -299,6 +289,7 @@ public class ClassRoutineBuilder {
      *
      * @return this builder.
      */
+    @NonNull
     public ClassRoutineBuilder queued() {
 
         mIsSequential = false;
@@ -314,7 +305,9 @@ public class ClassRoutineBuilder {
      * @return this builder.
      * @throws NullPointerException if the specified runner is null.
      */
-    public ClassRoutineBuilder runBy(final Runner runner) {
+    @NonNull
+    @SuppressWarnings("ConstantConditions")
+    public ClassRoutineBuilder runBy(@NonNull final Runner runner) {
 
         if (runner == null) {
 
@@ -331,6 +324,7 @@ public class ClassRoutineBuilder {
      *
      * @return this builder.
      */
+    @NonNull
     public ClassRoutineBuilder sequential() {
 
         mIsSequential = true;
@@ -345,7 +339,9 @@ public class ClassRoutineBuilder {
      * @return this builder.
      * @throws NullPointerException if the specified clause is null.
      */
-    public ClassRoutineBuilder withinTry(final Catch catchClause) {
+    @NonNull
+    @SuppressWarnings("ConstantConditions")
+    public ClassRoutineBuilder withinTry(@NonNull final Catch catchClause) {
 
         if (catchClause == null) {
 
@@ -366,8 +362,10 @@ public class ClassRoutineBuilder {
      * @param orderedInput whether the input data are forced to be delivered in insertion order.
      * @return the routine instance.
      */
-    protected Routine<Object, Object> getRoutine(final Method method, final Runner runner,
-            final Boolean isSequential, final boolean orderedInput) {
+    @NonNull
+    protected Routine<Object, Object> getRoutine(@NonNull final Method method,
+            @Nullable final Runner runner, @Nullable final Boolean isSequential,
+            final boolean orderedInput) {
 
         final Object target = mTarget;
         Routine<Object, Object> routine;
@@ -441,7 +439,8 @@ public class ClassRoutineBuilder {
         return routine;
     }
 
-    private void fillMap(final HashMap<String, Method> map, final Method[] methods) {
+    private void fillMap(@NonNull final HashMap<String, Method> map,
+            @NonNull final Method[] methods) {
 
         final boolean isClass = mIsClass;
 
@@ -494,7 +493,7 @@ public class ClassRoutineBuilder {
          *
          * @param ex the exception.
          */
-        public void exception(RoutineInvocationException ex);
+        public void exception(@NonNull RoutineInvocationException ex);
     }
 
     /**
@@ -520,8 +519,8 @@ public class ClassRoutineBuilder {
          * @param catchClause the catch clause.
          * @param mutex       the mutex used for synchronization.
          */
-        public MethodExecutionBody(final Object target, final Method method,
-                final Catch catchClause, final Object mutex) {
+        public MethodExecutionBody(@NonNull final Object target, @NonNull final Method method,
+                @NonNull final Catch catchClause, @NonNull final Object mutex) {
 
             mTarget = target;
             mMethod = method;
@@ -529,11 +528,12 @@ public class ClassRoutineBuilder {
             mMutex = mutex;
 
             final Class<?> returnType = method.getReturnType();
-            mHasResult = !boxingClass(returnType).equals(Void.class);
+            mHasResult = !Void.class.equals(boxingClass(returnType));
         }
 
         @Override
-        public void onExec(final List<?> objects, final ResultChannel<Object> results) {
+        public void onExec(@NonNull final List<?> objects,
+                @NonNull final ResultChannel<Object> results) {
 
             synchronized (mMutex) {
 
@@ -571,7 +571,7 @@ public class ClassRoutineBuilder {
     private static class RethrowCatch implements Catch {
 
         @Override
-        public void exception(final RoutineInvocationException ex) {
+        public void exception(@NonNull final RoutineInvocationException ex) {
 
             throw ex;
         }
@@ -607,9 +607,10 @@ public class ClassRoutineBuilder {
          * @param log          the log instance.
          * @param level        the log level.
          */
-        private RoutineInfo(final Method method, final Runner runner, final Boolean isSequential,
-                final boolean orderedInput, final Catch catchClause, final Log log,
-                final LogLevel level) {
+        private RoutineInfo(@NonNull final Method method, @Nullable final Runner runner,
+                @Nullable final Boolean isSequential, final boolean orderedInput,
+                @NonNull final Catch catchClause, @NonNull final Log log,
+                @NonNull final LogLevel level) {
 
             mMethod = method;
             mRunner = runner;

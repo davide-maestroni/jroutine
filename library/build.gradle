@@ -15,7 +15,7 @@ apply plugin: 'java'
 apply plugin: 'jacoco'
 apply plugin: 'maven'
 apply plugin: 'signing'
-apply plugin: "findbugs"
+apply plugin: 'findbugs'
 
 group = 'com.github.davide-maestroni'
 version = '1.0.0'
@@ -27,6 +27,17 @@ dependencies {
 
     testCompile 'junit:junit:4.11'
     testCompile 'org.easytesting:fest-assert-core:2.0M10'
+}
+
+jar {
+    from configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+}
+
+task proguardTask(type: proguard.gradle.ProGuardTask) {
+    configuration file("${project.projectDir}/proguard-project.txt")
+    injars file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar")
+    libraryjars file("${System.env.JAVA_HOME}jre/lib/rt.jar")
+    outjars file("${project.buildDir}/libs/${archivesBaseName}-${version}-pro.jar")
 }
 
 javadoc {

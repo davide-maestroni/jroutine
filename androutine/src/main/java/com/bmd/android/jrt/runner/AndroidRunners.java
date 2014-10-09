@@ -20,6 +20,9 @@ import com.bmd.jrt.runner.Runner;
 
 import java.util.concurrent.Executor;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
+
 /**
  * Utility class for creating and sharing runner instances, employing specific Android classes.
  * <p/>
@@ -43,7 +46,8 @@ public class AndroidRunners {
      * @return the runner instance.
      * @throws java.lang.IllegalArgumentException if the specified looper is null.
      */
-    public static Runner looper(final Looper looper) {
+    @NonNull
+    public static Runner looper(@NonNull final Looper looper) {
 
         return new LooperRunner(looper);
     }
@@ -53,6 +57,7 @@ public class AndroidRunners {
      *
      * @return the runner instance.
      */
+    @NonNull
     public static Runner main() {
 
         if (sMainRunner == null) {
@@ -68,6 +73,7 @@ public class AndroidRunners {
      *
      * @return the runner instance.
      */
+    @NonNull
     public static Runner my() {
 
         return looper(Looper.myLooper());
@@ -82,6 +88,7 @@ public class AndroidRunners {
      *
      * @return the runner instance.
      */
+    @NonNull
     public static Runner task() {
 
         return task(null);
@@ -97,7 +104,8 @@ public class AndroidRunners {
      * @param executor the executor.
      * @return the runner instance.
      */
-    public static Runner task(final Executor executor) {
+    @NonNull
+    public static Runner task(@Nullable final Executor executor) {
 
         return new AsyncTaskRunner(executor);
     }
@@ -107,14 +115,10 @@ public class AndroidRunners {
      *
      * @param thread the thread.
      * @return the runner instance.
-     * @throws java.lang.IllegalArgumentException if the specified thread is null.
+     * @throws NullPointerException if the specified thread is null.
      */
-    public static Runner thread(final HandlerThread thread) {
-
-        if (thread == null) {
-
-            throw new IllegalArgumentException("the handler thread must not be null");
-        }
+    @NonNull
+    public static Runner thread(@NonNull final HandlerThread thread) {
 
         if (!thread.isAlive()) {
 

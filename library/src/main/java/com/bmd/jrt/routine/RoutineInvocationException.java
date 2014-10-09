@@ -17,6 +17,9 @@ import com.bmd.jrt.common.RoutineException;
 
 import java.lang.reflect.Method;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
+
 /**
  * Exception indicating that an execution of an object method thrown an exception.
  * <p/>
@@ -36,8 +39,9 @@ public class RoutineInvocationException extends RoutineException {
      * @param method the method throwing the exception.
      * @throws NullPointerException if the specified method is null.
      */
-    public RoutineInvocationException(final Throwable cause, final Object target,
-            final Method method) {
+    @SuppressWarnings("ConstantConditions")
+    public RoutineInvocationException(@Nullable final Throwable cause,
+            @Nullable final Object target, @NonNull final Method method) {
 
         super(cause);
 

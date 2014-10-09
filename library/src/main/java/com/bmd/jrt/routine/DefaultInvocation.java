@@ -20,6 +20,9 @@ import com.bmd.jrt.runner.Invocation;
 
 import java.util.Iterator;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
+
 /**
  * Default implementation of an invocation object.
  * <p/>
@@ -51,9 +54,10 @@ class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
      * @param logger   the logger instance.
      * @throws NullPointerException if one of the parameters is null.
      */
-    DefaultInvocation(final ExecutionProvider<INPUT, OUTPUT> provider,
-            final InputIterator<INPUT> inputs, final DefaultResultChannel<OUTPUT> results,
-            final Logger logger) {
+    @SuppressWarnings("ConstantConditions")
+    DefaultInvocation(@NonNull final ExecutionProvider<INPUT, OUTPUT> provider,
+            @NonNull final InputIterator<INPUT> inputs,
+            @NonNull final DefaultResultChannel<OUTPUT> results, @NonNull final Logger logger) {
 
         if (provider == null) {
 
@@ -167,6 +171,7 @@ class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
         }
     }
 
+    @NonNull
     private Execution<INPUT, OUTPUT> initExecution() {
 
         final Execution<INPUT, OUTPUT> execution;
@@ -199,6 +204,7 @@ class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
          *
          * @return the reason of the abortion.
          */
+        @Nullable
         public Throwable getAbortException();
 
         /**

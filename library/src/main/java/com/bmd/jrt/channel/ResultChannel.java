@@ -17,6 +17,8 @@ import com.bmd.jrt.time.TimeDuration;
 
 import java.util.concurrent.TimeUnit;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+
 /**
  * Interface defining a result channel, that is the channel used by the routine invocation to
  * publish the results into the output channel.
@@ -28,20 +30,26 @@ import java.util.concurrent.TimeUnit;
 public interface ResultChannel<OUTPUT> extends InputChannel<OUTPUT> {
 
     @Override
-    public ResultChannel<OUTPUT> after(TimeDuration delay);
+    @NonNull
+    public ResultChannel<OUTPUT> after(@NonNull TimeDuration delay);
 
     @Override
-    public ResultChannel<OUTPUT> after(long delay, TimeUnit timeUnit);
+    @NonNull
+    public ResultChannel<OUTPUT> after(long delay, @NonNull TimeUnit timeUnit);
 
     @Override
-    public ResultChannel<OUTPUT> pass(OutputChannel<OUTPUT> channel);
+    @NonNull
+    public ResultChannel<OUTPUT> pass(@NonNull OutputChannel<OUTPUT> channel);
 
     @Override
-    public ResultChannel<OUTPUT> pass(Iterable<? extends OUTPUT> outputs);
+    @NonNull
+    public ResultChannel<OUTPUT> pass(@NonNull Iterable<? extends OUTPUT> outputs);
 
     @Override
-    public ResultChannel<OUTPUT> pass(OUTPUT output);
+    @NonNull
+    public ResultChannel<OUTPUT> pass(@NonNull OUTPUT output);
 
     @Override
-    public ResultChannel<OUTPUT> pass(OUTPUT... outputs);
+    @NonNull
+    public ResultChannel<OUTPUT> pass(@NonNull OUTPUT... outputs);
 }

@@ -17,6 +17,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.NoSuchElementException;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
+
 /**
  * Minimal implementation of a light-weight queue storing elements into dynamically increasing
  * circular buffer.
@@ -33,7 +36,8 @@ class SimpleQueue<E> {
 
     private Object[] mQueue = new Object[8];
 
-    private static <T> void resizeArray(final T[] src, final T[] dst, final int first) {
+    private static <T> void resizeArray(@NonNull final T[] src, @NonNull final T[] dst,
+            final int first) {
 
         final int remainder = src.length - first;
 
@@ -48,7 +52,7 @@ class SimpleQueue<E> {
      *
      * @param element the element to add.
      */
-    public void add(final E element) {
+    public void add(@Nullable final E element) {
 
         final int i = mLast;
 
@@ -71,7 +75,7 @@ class SimpleQueue<E> {
      *
      * @param elements the element iterable.
      */
-    public void addAll(final Iterable<? extends E> elements) {
+    public void addAll(@NonNull final Iterable<? extends E> elements) {
 
         for (final E element : elements) {
 
@@ -105,7 +109,7 @@ class SimpleQueue<E> {
      *
      * @param collection the collection to fill.
      */
-    public void moveTo(final Collection<? super E> collection) {
+    public void moveTo(@NonNull final Collection<? super E> collection) {
 
         while (!isEmpty()) {
 
@@ -119,6 +123,7 @@ class SimpleQueue<E> {
      * @return the element.
      * @throws NoSuchElementException if the queue is empty.
      */
+    @Nullable
     @SuppressWarnings("unchecked")
     public E peekFirst() {
 
@@ -136,6 +141,7 @@ class SimpleQueue<E> {
      * @return the element.
      * @throws NoSuchElementException if the queue is empty.
      */
+    @Nullable
     @SuppressWarnings("unchecked")
     public E removeFirst() {
 

@@ -13,6 +13,8 @@
  */
 package com.bmd.jrt.log;
 
+import edu.umd.cs.findbugs.annotations.Nullable;
+
 /**
  * Simple log implementation writing messages to the system output.
  * <p/>
@@ -21,7 +23,7 @@ package com.bmd.jrt.log;
 public class SystemLog extends LogAdapter {
 
     @Override
-    public void log(final String message) {
+    public void log(@Nullable final String message) {
 
         System.out.println(message);
     }

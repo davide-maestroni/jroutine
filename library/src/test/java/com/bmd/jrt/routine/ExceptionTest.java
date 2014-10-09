@@ -24,6 +24,7 @@ import static org.fest.assertions.api.Assertions.assertThat;
  */
 public class ExceptionTest extends TestCase {
 
+    @SuppressWarnings("ConstantConditions")
     public void testRoutineInvocationException() throws NoSuchMethodException {
 
         final Method waitMethod = Object.class.getMethod("wait");

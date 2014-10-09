@@ -13,8 +13,15 @@
  */
 package com.bmd.jrt.routine;
 
+import com.bmd.jrt.channel.ParameterChannel;
+import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.execution.Execution;
+import com.bmd.jrt.execution.ExecutionAdapter;
+
+import edu.umd.cs.findbugs.annotations.NonNull;
+
+import static com.bmd.jrt.common.ClassToken.tokenOf;
 
 /**
  * This utility class represents the entry point to the framework functionalities by acting as a
@@ -54,18 +61,23 @@ public class JRoutine {
 
     }
 
-    /**
-     * Returns a routine builder wrapping the specified target class.
-     *
-     * @param target the target class.
-     * @return the routine builder instance.
-     * @throws java.lang.NullPointerException     if the specified target is null.
-     * @throws java.lang.IllegalArgumentException if a duplicate name in the annotations is
-     *                                            detected.
-     */
-    public static ClassRoutineBuilder on(final Class<?> target) {
+    public static void main(final String[] args) {
 
-        return new ClassRoutineBuilder(target);
+        final Routine<Integer, Integer> sumRoutine = on(tokenOf(SumExecution.class)).buildRoutine();
+
+        final Routine<Integer, Integer> squareRoutine =
+                on(tokenOf(SquareExecution.class)).buildRoutine();
+
+        final ParameterChannel<Integer, Integer> squareChannel = squareRoutine.invokeParall();
+
+        for (final String arg : args) {
+
+            squareChannel.pass(Integer.parseInt(arg));
+        }
+
+        System.out.println(sumRoutine.callAsyn(squareChannel.results()));
+
+        System.exit(0);
     }
 
     /**
@@ -77,8 +89,9 @@ public class JRoutine {
      * @return the routine builder instance.
      * @throws java.lang.NullPointerException if the class token is null.
      */
+    @NonNull
     public static <INPUT, OUTPUT> RoutineBuilder<INPUT, OUTPUT> on(
-            final ClassToken<? extends Execution<INPUT, OUTPUT>> classToken) {
+            @NonNull final ClassToken<? extends Execution<INPUT, OUTPUT>> classToken) {
 
         return new RoutineBuilder<INPUT, OUTPUT>(classToken);
     }
@@ -92,8 +105,58 @@ public class JRoutine {
      * @throws java.lang.IllegalArgumentException if a duplicate name in the annotations is
      *                                            detected.
      */
-    public static ObjectRoutineBuilder on(final Object target) {
+    @NonNull
+    public static ObjectRoutineBuilder on(@NonNull final Object target) {
 
         return new ObjectRoutineBuilder(target);
+    }
+
+    /**
+     * Returns a routine builder wrapping the specified target class.
+     *
+     * @param target the target class.
+     * @return the routine builder instance.
+     * @throws java.lang.NullPointerException     if the specified target is null.
+     * @throws java.lang.IllegalArgumentException if a duplicate name in the annotations is
+     *                                            detected.
+     */
+    @NonNull
+    public static ClassRoutineBuilder on(@NonNull final Class<?> target) {
+
+        return new ClassRoutineBuilder(target);
+    }
+
+    private static class SquareExecution extends ExecutionAdapter<Integer, Integer> {
+
+        @Override
+        public void onInput(final Integer integer, final ResultChannel<Integer> results) {
+
+            final int input = integer;
+
+            results.pass(input * input);
+        }
+    }
+
+    private static class SumExecution extends ExecutionAdapter<Integer, Integer> {
+
+        private int mSum;
+
+        @Override
+        public void onInit() {
+
+            mSum = 0;
+        }
+
+        @Override
+        public void onInput(final Integer integer, final ResultChannel<Integer> results) {
+
+            mSum += integer;
+        }
+
+        @Override
+        public void onResult(final ResultChannel<Integer> results) {
+
+            results.pass(mSum);
+        }
     }
 }

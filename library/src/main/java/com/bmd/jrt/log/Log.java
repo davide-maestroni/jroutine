@@ -15,6 +15,9 @@ package com.bmd.jrt.log;
 
 import java.util.List;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
+
 /**
  * Interface defining a log object responsible for formatting and writing the framework log
  * messages.
@@ -52,7 +55,8 @@ public interface Log {
      * @param message   the message.
      * @param throwable the optional throwable or null.
      */
-    public void dbg(List<Object> contexts, String message, Throwable throwable);
+    public void dbg(@NonNull List<Object> contexts, @Nullable String message,
+            @Nullable Throwable throwable);
 
     /**
      * Logs an error message.
@@ -61,7 +65,8 @@ public interface Log {
      * @param message   the message.
      * @param throwable the optional throwable or null.
      */
-    public void err(List<Object> contexts, String message, Throwable throwable);
+    public void err(@NonNull List<Object> contexts, @Nullable String message,
+            @Nullable Throwable throwable);
 
     /**
      * Logs a warning message.
@@ -70,7 +75,8 @@ public interface Log {
      * @param message   the message.
      * @param throwable the optional throwable or null.
      */
-    public void wrn(List<Object> contexts, String message, Throwable throwable);
+    public void wrn(@NonNull List<Object> contexts, @Nullable String message,
+            @Nullable Throwable throwable);
 
     /**
      * Log levels enumeration from more to less verbose.

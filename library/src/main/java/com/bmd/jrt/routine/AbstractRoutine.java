@@ -28,6 +28,9 @@ import com.bmd.jrt.time.TimeDuration.Check;
 import java.util.LinkedList;
 import java.util.List;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
+
 /**
  * Basic abstract implementation of a routine.
  * <p/>
@@ -81,10 +84,11 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
      * @throws NullPointerException     if one of the parameters is null.
      * @throws IllegalArgumentException if at least one of the parameter is invalid.
      */
-    protected AbstractRoutine(final Runner syncRunner, final Runner asyncRunner,
-            final int maxRunning, final int maxRetained, final TimeDuration availTimeout,
-            final boolean orderedInput, final boolean orderedOutput, final Log log,
-            final LogLevel logLevel) {
+    @SuppressWarnings("ConstantConditions")
+    protected AbstractRoutine(@NonNull final Runner syncRunner, @NonNull final Runner asyncRunner,
+            final int maxRunning, final int maxRetained, @NonNull final TimeDuration availTimeout,
+            final boolean orderedInput, final boolean orderedOutput, @NonNull final Log log,
+            @NonNull final LogLevel logLevel) {
 
         if (syncRunner == null) {
 
@@ -138,9 +142,9 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
      * @param orderedOutput whether the output data are forced to be delivered in insertion order.
      * @param logger        the logger instance.
      */
-    private AbstractRoutine(final Runner syncRunner, final Runner asyncRunner, final int maxRunning,
-            final int maxRetained, final TimeDuration availTimeout, final boolean orderedInput,
-            final boolean orderedOutput, final Logger logger) {
+    private AbstractRoutine(@NonNull final Runner syncRunner, @NonNull final Runner asyncRunner,
+            final int maxRunning, final int maxRetained, @NonNull final TimeDuration availTimeout,
+            final boolean orderedInput, final boolean orderedOutput, @NonNull final Logger logger) {
 
         mSyncRunner = syncRunner;
         mAsyncRunner = asyncRunner;
@@ -153,108 +157,126 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
     }
 
     @Override
+    @NonNull
     public List<OUTPUT> call() {
 
         return run().readAll();
     }
 
     @Override
-    public List<OUTPUT> call(final INPUT input) {
+    @NonNull
+    public List<OUTPUT> call(@Nullable final INPUT input) {
 
         return run(input).readAll();
     }
 
     @Override
-    public List<OUTPUT> call(final INPUT... inputs) {
+    @NonNull
+    public List<OUTPUT> call(@Nullable final INPUT... inputs) {
 
         return run(inputs).readAll();
     }
 
     @Override
-    public List<OUTPUT> call(final Iterable<? extends INPUT> inputs) {
+    @NonNull
+    public List<OUTPUT> call(@Nullable final Iterable<? extends INPUT> inputs) {
 
         return run(inputs).readAll();
     }
 
     @Override
-    public List<OUTPUT> call(final OutputChannel<? extends INPUT> inputs) {
+    @NonNull
+    public List<OUTPUT> call(@Nullable final OutputChannel<? extends INPUT> inputs) {
 
         return run(inputs).readAll();
     }
 
     @Override
+    @NonNull
     public List<OUTPUT> callAsyn() {
 
         return runAsyn().readAll();
     }
 
     @Override
-    public List<OUTPUT> callAsyn(final INPUT input) {
+    @NonNull
+    public List<OUTPUT> callAsyn(@Nullable final INPUT input) {
 
         return runAsyn(input).readAll();
     }
 
     @Override
-    public List<OUTPUT> callAsyn(final INPUT... inputs) {
+    @NonNull
+    public List<OUTPUT> callAsyn(@Nullable final INPUT... inputs) {
 
         return runAsyn(inputs).readAll();
     }
 
     @Override
-    public List<OUTPUT> callAsyn(final Iterable<? extends INPUT> inputs) {
+    @NonNull
+    public List<OUTPUT> callAsyn(@Nullable final Iterable<? extends INPUT> inputs) {
 
         return runAsyn(inputs).readAll();
     }
 
     @Override
-    public List<OUTPUT> callAsyn(final OutputChannel<? extends INPUT> inputs) {
+    @NonNull
+    public List<OUTPUT> callAsyn(@Nullable final OutputChannel<? extends INPUT> inputs) {
 
         return runAsyn(inputs).readAll();
     }
 
     @Override
+    @NonNull
     public List<OUTPUT> callParall() {
 
         return runParall().readAll();
     }
 
     @Override
-    public List<OUTPUT> callParall(final INPUT input) {
+    @NonNull
+    public List<OUTPUT> callParall(@Nullable final INPUT input) {
 
         return runParall(input).readAll();
     }
 
     @Override
-    public List<OUTPUT> callParall(final INPUT... inputs) {
+    @NonNull
+    public List<OUTPUT> callParall(@Nullable final INPUT... inputs) {
 
         return runParall(inputs).readAll();
     }
 
     @Override
-    public List<OUTPUT> callParall(final Iterable<? extends INPUT> inputs) {
+    @NonNull
+    public List<OUTPUT> callParall(@Nullable final Iterable<? extends INPUT> inputs) {
 
         return runParall(inputs).readAll();
     }
 
     @Override
-    public List<OUTPUT> callParall(final OutputChannel<? extends INPUT> inputs) {
+    @NonNull
+    public List<OUTPUT> callParall(@Nullable final OutputChannel<? extends INPUT> inputs) {
 
         return runParall(inputs).readAll();
     }
 
     @Override
+    @NonNull
     public ParameterChannel<INPUT, OUTPUT> invoke() {
 
         return invoke(false);
     }
 
     @Override
+    @NonNull
     public ParameterChannel<INPUT, OUTPUT> invokeAsyn() {
 
         return invoke(true);
     }
 
     @Override
+    @NonNull
     public ParameterChannel<INPUT, OUTPUT> invokeParall() {
 
         mLogger.dbg("invoking routine: parallel");
@@ -265,6 +287,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
                                                    mOrderedOutput, mLogger) {
 
                     @Override
+                    @NonNull
                     protected Execution<INPUT, OUTPUT> createExecution(final boolean async) {
 
                         return new ParallelExecution<INPUT, OUTPUT>(AbstractRoutine.this);
@@ -275,91 +298,106 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
     }
 
     @Override
+    @NonNull
     public OutputChannel<OUTPUT> run() {
 
         return invoke().results();
     }
 
     @Override
-    public OutputChannel<OUTPUT> run(final INPUT input) {
+    @NonNull
+    public OutputChannel<OUTPUT> run(@Nullable final INPUT input) {
 
         return invoke().pass(input).results();
     }
 
     @Override
-    public OutputChannel<OUTPUT> run(final INPUT... inputs) {
+    @NonNull
+    public OutputChannel<OUTPUT> run(@Nullable final INPUT... inputs) {
 
         return invoke().pass(inputs).results();
     }
 
     @Override
-    public OutputChannel<OUTPUT> run(final Iterable<? extends INPUT> inputs) {
+    @NonNull
+    public OutputChannel<OUTPUT> run(@Nullable final Iterable<? extends INPUT> inputs) {
 
         return invoke().pass(inputs).results();
     }
 
     @Override
-    public OutputChannel<OUTPUT> run(final OutputChannel<? extends INPUT> inputs) {
+    @NonNull
+    public OutputChannel<OUTPUT> run(@Nullable final OutputChannel<? extends INPUT> inputs) {
 
         return invoke().pass(inputs).results();
     }
 
     @Override
+    @NonNull
     public OutputChannel<OUTPUT> runAsyn() {
 
         return invokeAsyn().results();
     }
 
     @Override
-    public OutputChannel<OUTPUT> runAsyn(final INPUT input) {
+    @NonNull
+    public OutputChannel<OUTPUT> runAsyn(@Nullable final INPUT input) {
 
         return invokeAsyn().pass(input).results();
     }
 
     @Override
-    public OutputChannel<OUTPUT> runAsyn(final INPUT... inputs) {
+    @NonNull
+    public OutputChannel<OUTPUT> runAsyn(@Nullable final INPUT... inputs) {
 
         return invokeAsyn().pass(inputs).results();
     }
 
     @Override
-    public OutputChannel<OUTPUT> runAsyn(final Iterable<? extends INPUT> inputs) {
+    @NonNull
+    public OutputChannel<OUTPUT> runAsyn(@Nullable final Iterable<? extends INPUT> inputs) {
 
         return invokeAsyn().pass(inputs).results();
     }
 
     @Override
-    public OutputChannel<OUTPUT> runAsyn(final OutputChannel<? extends INPUT> inputs) {
+    @NonNull
+    public OutputChannel<OUTPUT> runAsyn(@Nullable final OutputChannel<? extends INPUT> inputs) {
 
         return invokeAsyn().pass(inputs).results();
     }
 
     @Override
+    @NonNull
     public OutputChannel<OUTPUT> runParall() {
 
         return invokeParall().results();
     }
 
     @Override
-    public OutputChannel<OUTPUT> runParall(final INPUT input) {
+    @NonNull
+    public OutputChannel<OUTPUT> runParall(@Nullable final INPUT input) {
 
         return invokeParall().pass(input).results();
     }
 
     @Override
-    public OutputChannel<OUTPUT> runParall(final INPUT... inputs) {
+    @NonNull
+    public OutputChannel<OUTPUT> runParall(@Nullable final INPUT... inputs) {
 
         return invokeParall().pass(inputs).results();
     }
 
     @Override
-    public OutputChannel<OUTPUT> runParall(final Iterable<? extends INPUT> inputs) {
+    @NonNull
+    public OutputChannel<OUTPUT> runParall(@Nullable final Iterable<? extends INPUT> inputs) {
 
         return invokeParall().pass(inputs).results();
     }
 
     @Override
-    public OutputChannel<OUTPUT> runParall(final OutputChannel<? extends INPUT> inputs) {
+    @NonNull
+    public OutputChannel<OUTPUT> runParall(@Nullable final OutputChannel<? extends INPUT> inputs) {
 
         return invokeParall().pass(inputs).results();
     }
@@ -370,8 +408,10 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
      * @param async whether the execution is asynchronous.
      * @return the execution instance.
      */
+    @NonNull
     protected abstract Execution<INPUT, OUTPUT> createExecution(final boolean async);
 
+    @NonNull
     private ParameterChannel<INPUT, OUTPUT> invoke(final boolean async) {
 
         final Logger logger = mLogger;
@@ -397,6 +437,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
         }
 
         @Override
+        @NonNull
         public Execution<INPUT, OUTPUT> create() {
 
             synchronized (mMutex) {
@@ -452,7 +493,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
         }
 
         @Override
-        public void discard(final Execution<INPUT, OUTPUT> execution) {
+        public void discard(@NonNull final Execution<INPUT, OUTPUT> execution) {
 
             synchronized (mMutex) {
 
@@ -464,7 +505,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
         }
 
         @Override
-        public void recycle(final Execution<INPUT, OUTPUT> execution) {
+        public void recycle(@NonNull final Execution<INPUT, OUTPUT> execution) {
 
             synchronized (mMutex) {
 

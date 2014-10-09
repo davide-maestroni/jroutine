@@ -55,10 +55,12 @@ public class TimeDurationTest extends TestCase {
                         true);
         testConversions(TimeDuration.fromUnit(random.nextInt(MAX_DURATION), TimeUnit.SECONDS),
                         true);
+        //TODO
         testConversions(TimeDuration.fromUnit(random.nextInt(MAX_DURATION), TimeUnit.MINUTES),
                         true);
         testConversions(TimeDuration.fromUnit(random.nextInt(MAX_DURATION), TimeUnit.HOURS), true);
         testConversions(TimeDuration.fromUnit(random.nextInt(MAX_DURATION), TimeUnit.DAYS), true);
+        //TODO
 
         final TimeDuration duration = TimeDuration.nanos(random.nextInt(MAX_DURATION));
         assertThat(duration).isEqualTo(duration);
@@ -68,6 +70,7 @@ public class TimeDurationTest extends TestCase {
         assertThat(duration.hashCode()).isEqualTo(duration.nanosTime().hashCode());
     }
 
+    @SuppressWarnings("ConstantConditions")
     public void testError() {
 
         try {
@@ -200,6 +203,7 @@ public class TimeDurationTest extends TestCase {
 
         }
 
+        //TODO
         try {
 
             TimeDuration.fromUnit(-1, TimeUnit.MINUTES);
@@ -229,6 +233,7 @@ public class TimeDurationTest extends TestCase {
         } catch (final Exception ignored) {
 
         }
+        //TODO
 
         try {
 
@@ -695,9 +700,11 @@ public class TimeDurationTest extends TestCase {
         assertThat(TimeDuration.fromUnit(0, TimeUnit.MICROSECONDS).isZero()).isTrue();
         assertThat(TimeDuration.fromUnit(0, TimeUnit.MILLISECONDS).isZero()).isTrue();
         assertThat(TimeDuration.fromUnit(0, TimeUnit.SECONDS).isZero()).isTrue();
+        //TODO
         assertThat(TimeDuration.fromUnit(0, TimeUnit.MINUTES).isZero()).isTrue();
         assertThat(TimeDuration.fromUnit(0, TimeUnit.HOURS).isZero()).isTrue();
         assertThat(TimeDuration.fromUnit(0, TimeUnit.DAYS).isZero()).isTrue();
+        //TODO
     }
 
     private void testConversions(final TimeDuration time, final boolean isFirst) {
@@ -709,9 +716,11 @@ public class TimeDurationTest extends TestCase {
         assertThat(time.toMicros()).isEqualTo(unit.toMicros(value));
         assertThat(time.toMillis()).isEqualTo(unit.toMillis(value));
         assertThat(time.toSeconds()).isEqualTo(unit.toSeconds(value));
+        //TODO
         assertThat(time.toMinutes()).isEqualTo(unit.toMinutes(value));
         assertThat(time.toHours()).isEqualTo(unit.toHours(value));
         assertThat(time.toDays()).isEqualTo(unit.toDays(value));
+        //TODO
 
         assertThat(time.to(TimeUnit.NANOSECONDS)).isEqualTo(
                 TimeUnit.NANOSECONDS.convert(value, unit));
@@ -720,9 +729,11 @@ public class TimeDurationTest extends TestCase {
         assertThat(time.to(TimeUnit.MILLISECONDS)).isEqualTo(
                 TimeUnit.MILLISECONDS.convert(value, unit));
         assertThat(time.to(TimeUnit.SECONDS)).isEqualTo(TimeUnit.SECONDS.convert(value, unit));
+        //TODO
         assertThat(time.to(TimeUnit.MINUTES)).isEqualTo(TimeUnit.MINUTES.convert(value, unit));
         assertThat(time.to(TimeUnit.HOURS)).isEqualTo(TimeUnit.HOURS.convert(value, unit));
         assertThat(time.to(TimeUnit.DAYS)).isEqualTo(TimeUnit.DAYS.convert(value, unit));
+        //TODO
 
         assertThat(time).isEqualTo(time);
         assertThat(time).isEqualTo(TimeDuration.fromUnit(time.time, time.unit));

@@ -13,6 +13,8 @@
  */
 package com.bmd.jrt.runner;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+
 /**
  * Utility class for creating and sharing runner instances.
  * <p/>
@@ -38,6 +40,7 @@ public class Runners {
      *
      * @return the runner instance.
      */
+    @NonNull
     public static Runner pool() {
 
         return pool(getBestPoolSize());
@@ -49,6 +52,7 @@ public class Runners {
      * @param poolSize the thread pool size.
      * @return the runner instance.
      */
+    @NonNull
     public static Runner pool(final int poolSize) {
 
         return new ThreadPoolRunner(poolSize);
@@ -59,6 +63,7 @@ public class Runners {
      *
      * @return the runner instance.
      */
+    @NonNull
     public static Runner queued() {
 
         return sQueuedRunner;
@@ -69,6 +74,7 @@ public class Runners {
      *
      * @return the runner instance.
      */
+    @NonNull
     public static Runner sequential() {
 
         return sSequentialRunner;
@@ -79,6 +85,7 @@ public class Runners {
      *
      * @return the runner instance.
      */
+    @NonNull
     public static Runner shared() {
 
         if (sSharedRunner == null) {

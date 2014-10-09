@@ -13,6 +13,8 @@
  */
 package com.bmd.jrt.channel;
 
+import edu.umd.cs.findbugs.annotations.Nullable;
+
 /**
  * Interface defining an output consumer which can be bound to an output channel.
  * <p/>
@@ -27,7 +29,7 @@ public interface OutputConsumer<OUTPUT> {
      *
      * @param throwable the reason of the abortion.
      */
-    public void onAbort(Throwable throwable);
+    public void onAbort(@Nullable Throwable throwable);
 
     /**
      * Called when the channel closes after the routine completes its execution.
@@ -39,5 +41,5 @@ public interface OutputConsumer<OUTPUT> {
      *
      * @param output the output.
      */
-    public void onOutput(OUTPUT output);
+    public void onOutput(@Nullable OUTPUT output);
 }

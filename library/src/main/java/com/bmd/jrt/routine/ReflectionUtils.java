@@ -17,6 +17,9 @@ import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
+
 /**
  * Reflection utility class.
  * <p/>
@@ -61,7 +64,8 @@ class ReflectionUtils {
      * @param type the primitive type.
      * @return the boxing class.
      */
-    public static Class<?> boxingClass(final Class<?> type) {
+    @Nullable
+    public static Class<?> boxingClass(@Nullable final Class<?> type) {
 
         if (type == null) {
 
@@ -89,9 +93,10 @@ class ReflectionUtils {
      * @throws IllegalArgumentException if no constructor taking the specified object as parameters
      *                                  was found.
      */
+    @NonNull
     @SuppressWarnings("unchecked")
-    public static <TYPE> Constructor<TYPE> findConstructor(final Class<TYPE> type,
-            final Object... ctorArgs) {
+    public static <TYPE> Constructor<TYPE> findConstructor(@NonNull final Class<TYPE> type,
+            @NonNull final Object... ctorArgs) {
 
         Constructor<?> constructor = findBestMatchingConstructor(type.getConstructors(), ctorArgs);
 
@@ -114,8 +119,9 @@ class ReflectionUtils {
         return (Constructor<TYPE>) constructor;
     }
 
-    private static Constructor<?> findBestMatchingConstructor(final Constructor<?>[] constructors,
-            final Object[] ctorArgs) {
+    @Nullable
+    private static Constructor<?> findBestMatchingConstructor(
+            @NonNull final Constructor<?>[] constructors, @NonNull final Object[] ctorArgs) {
 
         final int argsLength = ctorArgs.length;
 
@@ -151,7 +157,7 @@ class ReflectionUtils {
                         break;
                     }
 
-                    if (boxingClass.equals(contextArg.getClass())) {
+                    if (contextArg.getClass().equals(boxingClass)) {
 
                         ++confidence;
                     }

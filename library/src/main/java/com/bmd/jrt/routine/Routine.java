@@ -75,8 +75,6 @@ import edu.umd.cs.findbugs.annotations.Nullable;
  * TODO: interface integration
  * TODO: explain synchronization
  * TODO: examples
- * TODO: call via reflection in real life (verify security issues...)
- * TODO: @Nonnull
  * <p/>
  * Created by davide on 9/7/14.
  *

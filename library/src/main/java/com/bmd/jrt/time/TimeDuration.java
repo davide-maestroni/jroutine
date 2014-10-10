@@ -350,7 +350,7 @@ public class TimeDuration extends Time {
 
         if (toDays() > MILLI_DAYS_OVERFLOW) {
 
-            throw new IllegalStateException("the duration overflows maximum sleep time");
+            throw new IllegalStateException("the duration overflows the maximum sleep time");
         }
 
         final long millisToSleep = milliTime - System.currentTimeMillis() + toMillis();
@@ -384,7 +384,7 @@ public class TimeDuration extends Time {
 
         if (toDays() > NANO_DAYS_OVERFLOW) {
 
-            throw new IllegalStateException("the duration overflows maximum sleep time");
+            throw new IllegalStateException("the duration overflows the maximum sleep time");
         }
 
         final long nanosToSleep = nanoTime - System.nanoTime() + toNanos();

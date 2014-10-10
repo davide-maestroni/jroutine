@@ -48,6 +48,59 @@ import static org.fest.assertions.api.Assertions.assertThat;
  */
 public class RoutineTest extends TestCase {
 
+    public void testAbort() {
+
+        final Routine<String, String> routine =
+                on(ClassToken.tokenOf(DelayExecution.class)).withArgs(TimeDuration.millis(100))
+                                                            .buildRoutine();
+
+        final ParameterChannel<String, String> inputChannel = routine.invokeAsyn().pass("test1");
+        final OutputChannel<String> outputChannel = inputChannel.results();
+
+        assertThat(inputChannel.abort(new IllegalArgumentException("test1"))).isFalse();
+        assertThat(outputChannel.readFirst()).isEqualTo("test1");
+
+        final OutputChannel<String> channel = routine.runAsyn("test2");
+        assertThat(channel.abort(new IllegalArgumentException("test2"))).isTrue();
+
+        try {
+
+            channel.readFirst();
+
+            fail();
+
+        } catch (final RoutineException ex) {
+
+            assertThat(ex.getCause()).isExactlyInstanceOf(IllegalArgumentException.class);
+            assertThat(ex.getCause().getMessage()).isEqualTo("test2");
+        }
+
+        final Execution<String, String> abortExecution = new ExecutionAdapter<String, String>() {
+
+            @Override
+            public void onInput(@Nullable final String s,
+                    @NonNull final ResultChannel<String> results) {
+
+                assertThat(results.abort(new IllegalArgumentException(s))).isTrue();
+            }
+        };
+
+        final Routine<String, String> routine2 =
+                on(ClassToken.classOf(abortExecution)).withArgs(this).buildRoutine();
+
+        try {
+
+            routine2.callAsyn("test_abort");
+
+            fail();
+
+        } catch (final RoutineException ex) {
+
+            assertThat(ex.getCause()).isExactlyInstanceOf(IllegalArgumentException.class);
+            assertThat(ex.getCause().getMessage()).isEqualTo("test_abort");
+        }
+    }
+
     public void testChainedRoutine() {
 
         final ExecutionBody<Integer, Integer> execSum = new ExecutionBody<Integer, Integer>() {

@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.Semaphore;
 
-import static com.bmd.jrt.time.Time.nano;
+import static com.bmd.jrt.time.Time.current;
 import static com.bmd.jrt.time.TimeDuration.ZERO;
 import static com.bmd.jrt.time.TimeDuration.micros;
 import static com.bmd.jrt.time.TimeDuration.millis;
@@ -87,7 +87,6 @@ public class RunnerTest extends TestCase {
 
     public void testSequentialRunner() throws InterruptedException {
 
-        //TODO: fail on line 154
         testRunner(new SequentialRunner());
         testRunner(Runners.sequential());
         testRunner(new RunnerDecorator(new SequentialRunner()));
@@ -286,14 +285,15 @@ public class RunnerTest extends TestCase {
 
         public TestRunInvocation(final TimeDuration delay) {
 
-            mStartTime = nano();
+            mStartTime = current();
             mDelay = delay;
         }
 
         @Override
         public void run() {
 
-            mIsPassed = (nano().toNanos() - mStartTime.toNanos() >= mDelay.toNanos());
+            // the JVM might not have nanosecond precision...
+            mIsPassed = (current().toMillis() - mStartTime.toMillis() >= mDelay.toMillis());
 
             super.run();
         }

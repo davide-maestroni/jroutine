@@ -718,8 +718,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         @Override
         @Nullable
         @edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "IT_NO_SUCH_ELEMENT",
-                                                          justification = "readQueue() actually"
-                                                                  + " throws it")
+                                                          justification = "readQueue() actually "
+                                                                  + "throws it")
         public OUTPUT next() {
 
             synchronized (mMutex) {

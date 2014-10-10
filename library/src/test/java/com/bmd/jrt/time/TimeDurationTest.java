@@ -56,10 +56,13 @@ public class TimeDurationTest extends TestCase {
         testConversions(TimeDuration.fromUnit(random.nextInt(MAX_DURATION), TimeUnit.SECONDS),
                         true);
         // Java 6
-        //        testConversions(TimeDuration.fromUnit(random.nextInt(MAX_DURATION), TimeUnit.MINUTES),
+        //        testConversions(TimeDuration.fromUnit(random.nextInt(MAX_DURATION),
+        // TimeUnit.MINUTES),
         //                        true);
-        //        testConversions(TimeDuration.fromUnit(random.nextInt(MAX_DURATION), TimeUnit.HOURS), true);
-        //        testConversions(TimeDuration.fromUnit(random.nextInt(MAX_DURATION), TimeUnit.DAYS), true);
+        //        testConversions(TimeDuration.fromUnit(random.nextInt(MAX_DURATION),
+        // TimeUnit.HOURS), true);
+        //        testConversions(TimeDuration.fromUnit(random.nextInt(MAX_DURATION),
+        // TimeUnit.DAYS), true);
 
         final TimeDuration duration = TimeDuration.nanos(random.nextInt(MAX_DURATION));
         assertThat(duration).isEqualTo(duration);
@@ -804,8 +807,10 @@ public class TimeDurationTest extends TestCase {
                 TimeUnit.MILLISECONDS.convert(value, unit));
         assertThat(time.to(TimeUnit.SECONDS)).isEqualTo(TimeUnit.SECONDS.convert(value, unit));
         // Java 6
-        //        assertThat(time.to(TimeUnit.MINUTES)).isEqualTo(TimeUnit.MINUTES.convert(value, unit));
-        //        assertThat(time.to(TimeUnit.HOURS)).isEqualTo(TimeUnit.HOURS.convert(value, unit));
+        //        assertThat(time.to(TimeUnit.MINUTES)).isEqualTo(TimeUnit.MINUTES.convert(value,
+        // unit));
+        //        assertThat(time.to(TimeUnit.HOURS)).isEqualTo(TimeUnit.HOURS.convert(value,
+        // unit));
         //        assertThat(time.to(TimeUnit.DAYS)).isEqualTo(TimeUnit.DAYS.convert(value, unit));
 
         assertThat(time).isEqualTo(time);

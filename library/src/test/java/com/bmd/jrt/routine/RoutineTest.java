@@ -57,11 +57,26 @@ public class RoutineTest extends TestCase {
         final ParameterChannel<String, String> inputChannel = routine.invokeAsyn().pass("test1");
         final OutputChannel<String> outputChannel = inputChannel.results();
 
+        assertThat(inputChannel.isOpen()).isFalse();
         assertThat(inputChannel.abort(new IllegalArgumentException("test1"))).isFalse();
+        assertThat(inputChannel.isOpen()).isFalse();
         assertThat(outputChannel.readFirst()).isEqualTo("test1");
 
+        final ParameterChannel<String, String> inputChannel1 = routine.invokeAsyn().pass("test1");
+        final OutputChannel<String> outputChannel1 = inputChannel1.results();
+
+        assertThat(inputChannel1.isOpen()).isFalse();
+        assertThat(inputChannel1.abort()).isFalse();
+        assertThat(inputChannel1.isOpen()).isFalse();
+        assertThat(outputChannel1.isOpen()).isTrue();
+        assertThat(outputChannel1.readFirst()).isEqualTo("test1");
+        assertThat(outputChannel1.isOpen()).isFalse();
+
         final OutputChannel<String> channel = routine.runAsyn("test2");
+        assertThat(channel.isOpen()).isTrue();
         assertThat(channel.abort(new IllegalArgumentException("test2"))).isTrue();
+        assertThat(channel.abort()).isFalse();
+        assertThat(channel.isOpen()).isTrue();
 
         try {
 
@@ -75,18 +90,70 @@ public class RoutineTest extends TestCase {
             assertThat(ex.getCause().getMessage()).isEqualTo("test2");
         }
 
+        assertThat(channel.isOpen()).isFalse();
+
+
+        final OutputChannel<String> channel1 = routine.runAsyn("test2");
+        assertThat(channel1.isOpen()).isTrue();
+        assertThat(channel1.abort()).isTrue();
+        assertThat(channel1.abort(new IllegalArgumentException("test2"))).isFalse();
+        assertThat(channel1.isOpen()).isTrue();
+
+        try {
+
+            channel1.readFirst();
+
+            fail();
+
+        } catch (final RoutineException ex) {
+
+            assertThat(ex.getCause()).isNull();
+        }
+
+        assertThat(channel1.isOpen()).isFalse();
+
+
         final Execution<String, String> abortExecution = new ExecutionAdapter<String, String>() {
 
             @Override
             public void onInput(@Nullable final String s,
                     @NonNull final ResultChannel<String> results) {
 
+                assertThat(results.isOpen()).isTrue();
                 assertThat(results.abort(new IllegalArgumentException(s))).isTrue();
+                assertThat(results.abort()).isFalse();
+                assertThat(results.isOpen()).isFalse();
+            }
+        };
+
+        final Routine<String, String> routine1 =
+                on(ClassToken.classOf(abortExecution)).withArgs(this).buildRoutine();
+
+        try {
+
+            routine1.callAsyn("test_abort");
+
+            fail();
+
+        } catch (final RoutineException ex) {
+
+            assertThat(ex.getCause()).isExactlyInstanceOf(IllegalArgumentException.class);
+            assertThat(ex.getCause().getMessage()).isEqualTo("test_abort");
+        }
+
+        final Execution<String, String> abortExecution2 = new ExecutionAdapter<String, String>() {
+
+            @Override
+            public void onInput(@Nullable final String s,
+                    @NonNull final ResultChannel<String> results) {
+
+                assertThat(results.abort()).isTrue();
+                assertThat(results.abort(new IllegalArgumentException(s))).isFalse();
             }
         };
 
         final Routine<String, String> routine2 =
-                on(ClassToken.classOf(abortExecution)).withArgs(this).buildRoutine();
+                on(ClassToken.classOf(abortExecution2)).withArgs(this).buildRoutine();
 
         try {
 
@@ -96,8 +163,7 @@ public class RoutineTest extends TestCase {
 
         } catch (final RoutineException ex) {
 
-            assertThat(ex.getCause()).isExactlyInstanceOf(IllegalArgumentException.class);
-            assertThat(ex.getCause().getMessage()).isEqualTo("test_abort");
+            assertThat(ex.getCause()).isNull();
         }
     }
 

@@ -499,8 +499,8 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
 
         @Override
         @edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "NO_NOTIFY_NOT_NOTIFYALL",
-                                                          justification = "only one execution is"
-                                                                  + " released")
+                                                          justification = "only one execution is "
+                                                                  + "released")
         public void discard(@NonNull final Execution<INPUT, OUTPUT> execution) {
 
             synchronized (mMutex) {
@@ -514,8 +514,8 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
 
         @Override
         @edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "NO_NOTIFY_NOT_NOTIFYALL",
-                                                          justification = "only one execution is"
-                                                                  + " released")
+                                                          justification = "only one execution is "
+                                                                  + "released")
         public void recycle(@NonNull final Execution<INPUT, OUTPUT> execution) {
 
             synchronized (mMutex) {

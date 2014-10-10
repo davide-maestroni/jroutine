@@ -205,8 +205,10 @@ public class TimeTest extends TestCase {
                 TimeUnit.MILLISECONDS.convert(value, unit));
         assertThat(time.to(TimeUnit.SECONDS)).isEqualTo(TimeUnit.SECONDS.convert(value, unit));
         // Java 6
-        //        assertThat(time.to(TimeUnit.MINUTES)).isEqualTo(TimeUnit.MINUTES.convert(value, unit));
-        //        assertThat(time.to(TimeUnit.HOURS)).isEqualTo(TimeUnit.HOURS.convert(value, unit));
+        //        assertThat(time.to(TimeUnit.MINUTES)).isEqualTo(TimeUnit.MINUTES.convert(value,
+        // unit));
+        //        assertThat(time.to(TimeUnit.HOURS)).isEqualTo(TimeUnit.HOURS.convert(value,
+        // unit));
         //        assertThat(time.to(TimeUnit.DAYS)).isEqualTo(TimeUnit.DAYS.convert(value, unit));
 
         assertThat(time).isEqualTo(time);

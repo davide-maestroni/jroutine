@@ -60,9 +60,10 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
      * @param logLevel       the log level
      * @param executionClass the execution class.
      * @param executionArgs  the execution constructor arguments.
-     * @throws NullPointerException if at least one of the parameter is null   @throws IllegalArgumentException if at least one of the parameter is invalid, of no
-     *                              constructor matching the specified arguments is found for
-     *                              the target execution class.
+     * @throws NullPointerException     if at least one of the parameter is null.
+     * @throws IllegalArgumentException if at least one of the parameter is invalid, of no
+     *                                  constructor matching the specified arguments is found for
+     *                                  the target execution class.
      */
     DefaultRoutine(@NonNull final Runner syncRunner, @NonNull final Runner asyncRunner,
             final int maxRunning, final int maxRetained, @NonNull final TimeDuration availTimeout,

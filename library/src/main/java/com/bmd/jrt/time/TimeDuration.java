@@ -407,8 +407,8 @@ public class TimeDuration extends Time {
      * @throws NullPointerException if the target object is null.
      */
     @edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "WA_NOT_IN_LOOP",
-                                                      justification = "this is just a wrapper"
-                                                              + " on an Object.wait() call")
+                                                      justification = "this is just a wrapper on "
+                                                              + "an Object.wait() call")
     public void wait(@NonNull final Object target) throws InterruptedException {
 
         if (isZero()) {
@@ -438,8 +438,8 @@ public class TimeDuration extends Time {
      * @see System#currentTimeMillis()
      */
     @edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "WA_NOT_IN_LOOP",
-                                                      justification = "this is just a wrapper"
-                                                              + " on an Object.wait() call")
+                                                      justification = "this is just a wrapper on "
+                                                              + "an Object.wait() call")
     public boolean waitSinceMillis(@NonNull final Object target, final long milliTime) throws
             InterruptedException {
 
@@ -479,8 +479,8 @@ public class TimeDuration extends Time {
      * @see System#nanoTime()
      */
     @edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "WA_NOT_IN_LOOP",
-                                                      justification = "this is just a wrapper"
-                                                              + " on an Object.wait() call")
+                                                      justification = "this is just a wrapper on "
+                                                              + "an Object.wait() call")
     public boolean waitSinceNanos(@NonNull final Object target, final long nanoTime) throws
             InterruptedException {
 

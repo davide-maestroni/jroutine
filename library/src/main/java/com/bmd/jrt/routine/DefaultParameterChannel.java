@@ -492,9 +492,9 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
         @Override
         @edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "IT_NO_SUCH_ELEMENT",
-                                                          justification =
-                                                                  "NestedQueue.removeFirst()"
-                                                                          + " actually throws it")
+                                                          justification = "NestedQueue" +
+                                                                  ".removeFirst() actually throws" +
+                                                                  " it")
         public INPUT next() {
 
             synchronized (mMutex) {

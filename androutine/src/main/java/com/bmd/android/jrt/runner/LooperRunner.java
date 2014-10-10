@@ -44,7 +44,7 @@ class LooperRunner implements Runner {
      * @param looper the looper to employ.
      * @throws NullPointerException if the specified looper is null.
      */
-    public LooperRunner(@NonNull final Looper looper) {
+    LooperRunner(@NonNull final Looper looper) {
 
         mThread = looper.getThread();
         mHandler = new Handler(looper);
@@ -61,14 +61,7 @@ class LooperRunner implements Runner {
 
         } else {
 
-            final Runnable runnable = new Runnable() {
-
-                @Override
-                public void run() {
-
-                    invocation.run();
-                }
-            };
+            final InvocationRunnable runnable = new InvocationRunnable(invocation);
 
             if (delay > 0) {
 
@@ -90,14 +83,55 @@ class LooperRunner implements Runner {
 
         } else {
 
-            mHandler.post(new Runnable() {
+            mHandler.post(new AbortRunnable(invocation));
+        }
+    }
 
-                @Override
-                public void run() {
+    /**
+     * Runnable used to abort an invocation.
+     */
+    private static class AbortRunnable implements Runnable {
 
-                    invocation.abort();
-                }
-            });
+        private final Invocation mInvocation;
+
+        /**
+         * Constructor.
+         *
+         * @param invocation the invocation instance.
+         */
+        private AbortRunnable(@NonNull final Invocation invocation) {
+
+            mInvocation = invocation;
+        }
+
+        @Override
+        public void run() {
+
+            mInvocation.abort();
+        }
+    }
+
+    /**
+     * Runnable used to run an invocation.
+     */
+    private static class InvocationRunnable implements Runnable {
+
+        private final Invocation mInvocation;
+
+        /**
+         * Constructor.
+         *
+         * @param invocation the invocation instance.
+         */
+        private InvocationRunnable(@NonNull final Invocation invocation) {
+
+            mInvocation = invocation;
+        }
+
+        @Override
+        public void run() {
+
+            mInvocation.run();
         }
     }
 }

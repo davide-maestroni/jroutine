@@ -11,15 +11,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.runner;
+package com.bmd.android.jrt.runner;
 
+import android.os.HandlerThread;
+import android.os.Looper;
+import android.test.AndroidTestCase;
+
+import com.bmd.jrt.runner.Invocation;
+import com.bmd.jrt.runner.Runner;
+import com.bmd.jrt.runner.RunnerDecorator;
 import com.bmd.jrt.time.Time;
 import com.bmd.jrt.time.TimeDuration;
 
-import junit.framework.TestCase;
-
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 
 import static com.bmd.jrt.time.Time.current;
@@ -30,38 +36,18 @@ import static com.bmd.jrt.time.TimeDuration.nanos;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
- * Runners unit tests.
+ * Android runners unit tests.
  * <p/>
- * Created by davide on 10/2/14.
+ * Created by davide on 10/10/14.
  */
-public class RunnerTest extends TestCase {
+public class AndroidRunnerTest extends AndroidTestCase {
 
     @SuppressWarnings("ConstantConditions")
     public void testError() {
 
         try {
 
-            new ThreadPoolRunner(-1);
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            Runners.pool(-1);
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            new RunnerDecorator(null);
+            new LooperRunner(null);
 
             fail();
 
@@ -70,26 +56,26 @@ public class RunnerTest extends TestCase {
         }
     }
 
-    public void testPoolRunner() throws InterruptedException {
+    public void testLooperRunner() throws InterruptedException {
 
-        testRunner(new ThreadPoolRunner(4));
-        testRunner(Runners.pool(3));
-        testRunner(Runners.shared());
-        testRunner(new RunnerDecorator(new ThreadPoolRunner(4)));
+        testRunner(new LooperRunner(Looper.myLooper()));
+        testRunner(AndroidRunners.main());
+        testRunner(AndroidRunners.my());
+        testRunner(AndroidRunners.thread(new HandlerThread("test")));
+        testRunner(new RunnerDecorator(AndroidRunners.main()));
     }
 
-    public void testQueuedRunner() throws InterruptedException {
+    public void testMainRunner() throws InterruptedException {
 
-        testRunner(new QueuedRunner());
-        testRunner(Runners.queued());
-        testRunner(new RunnerDecorator(new QueuedRunner()));
+        testRunner(new MainRunner());
     }
 
-    public void testSequentialRunner() throws InterruptedException {
+    public void testTaskRunner() throws InterruptedException {
 
-        testRunner(new SequentialRunner());
-        testRunner(Runners.sequential());
-        testRunner(new RunnerDecorator(new SequentialRunner()));
+        testRunner(new AsyncTaskRunner(null));
+        testRunner(AndroidRunners.task());
+        testRunner(AndroidRunners.task(Executors.newCachedThreadPool()));
+        testRunner(new RunnerDecorator(AndroidRunners.task(Executors.newSingleThreadExecutor())));
     }
 
     private void testRunner(final Runner runner) throws InterruptedException {
@@ -209,7 +195,7 @@ public class RunnerTest extends TestCase {
 
     private static class TestAbortInvocation implements Invocation {
 
-        private final Semaphore mSemaphore = new Semaphore(0);
+        protected final Semaphore mSemaphore = new Semaphore(0);
 
         private boolean mIsAbort;
 
@@ -295,7 +281,7 @@ public class RunnerTest extends TestCase {
             // the JVM might not have nanosecond precision...
             mIsPassed = (current().toMillis() - mStartTime.toMillis() + 1 >= mDelay.toMillis());
 
-            super.run();
+            mSemaphore.release();
         }
 
         @Override

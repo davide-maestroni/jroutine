@@ -13,7 +13,7 @@
  */
 package com.bmd.android.jrt.log;
 
-import com.bmd.jrt.log.Log;
+import android.util.Log;
 
 import java.util.List;
 
@@ -21,9 +21,11 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 
 /**
+ * Android specific log implementation.
+ * <p/>
  * Created by davide on 10/7/14.
  */
-public class AndroidLog implements Log {
+public class AndroidLog implements com.bmd.jrt.log.Log {
 
     @Override
     public void dbg(@NonNull final List<Object> contexts, @Nullable final String message,
@@ -31,11 +33,11 @@ public class AndroidLog implements Log {
 
         if (throwable != null) {
 
-            android.util.Log.d(contexts.toString(), message, throwable);
+            Log.d(contexts.toString(), message, throwable);
 
         } else {
 
-            android.util.Log.d(contexts.toString(), message);
+            Log.d(contexts.toString(), message);
         }
     }
 
@@ -45,11 +47,11 @@ public class AndroidLog implements Log {
 
         if (throwable != null) {
 
-            android.util.Log.e(contexts.toString(), message, throwable);
+            Log.e(contexts.toString(), message, throwable);
 
         } else {
 
-            android.util.Log.e(contexts.toString(), message);
+            Log.e(contexts.toString(), message);
         }
     }
 
@@ -59,11 +61,11 @@ public class AndroidLog implements Log {
 
         if (throwable != null) {
 
-            android.util.Log.w(contexts.toString(), message, throwable);
+            Log.w(contexts.toString(), message, throwable);
 
         } else {
 
-            android.util.Log.w(contexts.toString(), message);
+            Log.w(contexts.toString(), message);
         }
     }
 }

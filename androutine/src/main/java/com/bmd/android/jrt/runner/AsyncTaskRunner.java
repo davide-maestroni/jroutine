@@ -48,7 +48,7 @@ class AsyncTaskRunner implements Runner {
      *
      * @param executor the executor.
      */
-    public AsyncTaskRunner(@Nullable final Executor executor) {
+    AsyncTaskRunner(@Nullable final Executor executor) {
 
         mExecutor = executor;
         // the handler is used to ensure that a task is always started in the main thread
@@ -59,16 +59,7 @@ class AsyncTaskRunner implements Runner {
     public void run(@NonNull final Invocation invocation, final long delay,
             @NonNull final TimeUnit timeUnit) {
 
-        final RunnableTask task = new RunnableTask(mExecutor) {
-
-            @Override
-            protected Void doInBackground(final Void... voids) {
-
-                invocation.run();
-
-                return null;
-            }
-        };
+        final InvocationTask task = new InvocationTask(mExecutor, invocation);
 
         if (delay > 0) {
 
@@ -83,16 +74,66 @@ class AsyncTaskRunner implements Runner {
     @Override
     public void runAbort(@NonNull final Invocation invocation) {
 
-        mHandler.post(new RunnableTask(mExecutor) {
+        mHandler.post(new AbortTask(mExecutor, invocation));
+    }
 
-            @Override
-            protected Void doInBackground(final Void... voids) {
+    /**
+     * Runnable used to abort an invocation.
+     */
+    private static class AbortTask extends RunnableTask {
 
-                invocation.abort();
+        private final Invocation mInvocation;
 
-                return null;
-            }
-        });
+        /**
+         * Constructor.
+         *
+         * @param executor   the executor.
+         * @param invocation the invocation instance.
+         */
+        private AbortTask(@Nullable final Executor executor, @NonNull final Invocation invocation) {
+
+            super(executor);
+
+            mInvocation = invocation;
+        }
+
+        @Override
+        protected Void doInBackground(final Void... voids) {
+
+            mInvocation.abort();
+
+            return null;
+        }
+    }
+
+    /**
+     * Runnable used to run an invocation.
+     */
+    private static class InvocationTask extends RunnableTask {
+
+        private final Invocation mInvocation;
+
+        /**
+         * Constructor.
+         *
+         * @param executor   the executor.
+         * @param invocation the invocation instance.
+         */
+        private InvocationTask(@Nullable final Executor executor,
+                @NonNull final Invocation invocation) {
+
+            super(executor);
+
+            mInvocation = invocation;
+        }
+
+        @Override
+        protected Void doInBackground(final Void... voids) {
+
+            mInvocation.run();
+
+            return null;
+        }
     }
 
     /**
@@ -117,18 +158,11 @@ class AsyncTaskRunner implements Runner {
         @TargetApi(11)
         public void run() {
 
-            boolean isExecuted = false;
+            if ((mExecutor != null) && (VERSION.SDK_INT >= VERSION_CODES.HONEYCOMB)) {
 
-            if (mExecutor != null) {
+                executeOnExecutor(mExecutor);
 
-                if (VERSION.SDK_INT >= VERSION_CODES.HONEYCOMB) {
-
-                    isExecuted = true;
-                    executeOnExecutor(mExecutor);
-                }
-            }
-
-            if (!isExecuted) {
+            } else {
 
                 execute();
             }

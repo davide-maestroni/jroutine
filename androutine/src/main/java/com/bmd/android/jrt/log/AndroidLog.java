@@ -33,11 +33,11 @@ public class AndroidLog implements com.bmd.jrt.log.Log {
 
         if (throwable != null) {
 
-            Log.d(contexts.toString(), message, throwable);
+            Log.d(contexts.get(contexts.size() - 1).toString(), message, throwable);
 
         } else {
 
-            Log.d(contexts.toString(), message);
+            Log.d(contexts.get(contexts.size() - 1).toString(), message);
         }
     }
 
@@ -47,11 +47,11 @@ public class AndroidLog implements com.bmd.jrt.log.Log {
 
         if (throwable != null) {
 
-            Log.e(contexts.toString(), message, throwable);
+            Log.e(contexts.get(contexts.size() - 1).toString(), message, throwable);
 
         } else {
 
-            Log.e(contexts.toString(), message);
+            Log.e(contexts.get(contexts.size() - 1).toString(), message);
         }
     }
 
@@ -61,11 +61,11 @@ public class AndroidLog implements com.bmd.jrt.log.Log {
 
         if (throwable != null) {
 
-            Log.w(contexts.toString(), message, throwable);
+            Log.w(contexts.get(contexts.size() - 1).toString(), message, throwable);
 
         } else {
 
-            Log.w(contexts.toString(), message);
+            Log.w(contexts.get(contexts.size() - 1).toString(), message);
         }
     }
 }

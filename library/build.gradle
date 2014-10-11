@@ -15,6 +15,7 @@ apply plugin: 'java'
 apply plugin: 'jacoco'
 apply plugin: 'maven'
 apply plugin: 'signing'
+apply plugin: 'findbugs'
 
 group = 'com.github.davide-maestroni'
 version = '1.0.0'
@@ -22,15 +23,24 @@ archivesBaseName = project.parent.name
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'findbugs:annotations:1.0.0'
 
     testCompile 'junit:junit:4.11'
     testCompile 'org.easytesting:fest-assert-core:2.0M10'
 }
 
+task proguardTask(type: proguard.gradle.ProGuardTask) {
+    configuration file("${project.projectDir}/proguard-project.txt")
+    injars file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar")
+    libraryjars file("${System.env.JAVA_HOME}jre/lib/rt.jar")
+    libraryjars configurations.compile.filter { !it.isDirectory() }
+    outjars file("${project.buildDir}/libs/${archivesBaseName}-${version}-pro.jar")
+}
+
 javadoc {
     title = "${archivesBaseName} ${version}"
     options.links("http://docs.oracle.com/javase/7/docs/api/")
-    options.overview("${project.name}/docs/overview.html")
+    options.overview("${project.projectDir}/docs/overview.html")
     options.windowTitle("Javadoc - ${archivesBaseName}")
 }
 
@@ -38,6 +48,19 @@ task("jacocoTest", dependsOn: 'test') {
     description = "Runs the tests and generates the JaCoCo report files."
 } << {
     tasks.jacocoTestReport.execute()
+}
+
+findbugs {
+    toolVersion = "3.0.0"
+    effort = "max"
+    reportLevel = "low"
+}
+
+tasks.withType(FindBugs) {
+    reports {
+        xml.enabled = false
+        html.enabled = true
+    }
 }
 
 artifacts {
@@ -83,12 +106,12 @@ uploadArchives {
                 name = archivesBaseName
                 packaging = 'jar'
                 description = 'Easily iterate through Android sparse collections'
-                url = 'http://davide-maestroni.github.io/javafall/'
+                url = 'http://davide-maestroni.github.io/jroutine/'
 
                 scm {
-                    url = 'git@github.com:davide-maestroni/javafall.git'
-                    connection = 'scm:git:git@github.com:davide-maestroni/javafall.git'
-                    developerConnection = 'scm:git:git@github.com:davide-maestroni/javafall.git'
+                    url = 'git@github.com:davide-maestroni/jroutine.git'
+                    connection = 'scm:git:git@github.com:davide-maestroni/jroutine.git'
+                    developerConnection = 'scm:git:git@github.com:davide-maestroni/jroutine.git'
                 }
 
                 licenses {

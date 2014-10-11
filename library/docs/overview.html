@@ -1,9 +1,9 @@
 <html>
 <head>
-    <title>javafall</title>
+    <title>jroutine</title>
 </head>
 <body>
-Cool and funny parallel programming.
+Parallel programming on the go.
 <h2>Usage examples</h2>
 <b>Example 1:</b> Root mean square:
 <p>
@@ -28,47 +28,6 @@ The code below shows how it is possible to implement the computation of the root
         final double sRms = Math.sqrt(sum / input.length);
 
         // Parallel
-
-        final Double pRms = (Double) fall().start()
-                                            // let the optimum number of threads be automatically computed
-                                            .inBackground()
-                                            // equally distribute the load among them
-                                            .distribute()
-                                            // compute the square of each sample
-                                            .chain(Rapid.gateGenerator(new RapidGate() {
-
-                                                public Double onSample(final Float sample) {
-
-                                                    final double d = sample;
-                                                    return (d * d);
-                                                }
-
-                                            }, this))
-                                            // merge the results in a single thread
-                                            .inBackground(1)
-                                            // accumulate the sum and then calculate the square root mean
-                                            .chain(new RapidGate() {
-
-                                                private int mCount;
-
-                                                private double mSum;
-
-                                                public void onSquare(final Double square) {
-
-                                                    mSum += square;
-                                                    ++mCount;
-                                                }
-
-                                                public Double onComplete(final Flush ignored) {
-
-                                                    return Math.sqrt(mSum / mCount);
-                                                }
-
-                                            })
-                                            // pull the input data along the flow...
-                                            .pull(Drops.asObjects(input))
-                                            // ...and finally collect the result
-                                            .next();
 
         assert pRms == sRms;
     </code>

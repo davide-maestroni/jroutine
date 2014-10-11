@@ -98,8 +98,10 @@ public class AndroidRunners {
      * Returns a runner employing async tasks running on the specified executor.
      * <p/>
      * Beware of the caveats of using
-     * <a href="http://developer.android.com/reference/android/os/AsyncTask.html">AyncTask<a/>s
+     * <a href="http://developer.android.com/reference/android/os/AsyncTask.html">AsyncTask<a/>s
      * especially on some platform versions.
+     * <p/>
+     * Note also that the executor instance will be ignored on platforms with API level < 11.
      *
      * @param executor the executor.
      * @return the runner instance.

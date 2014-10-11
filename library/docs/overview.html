@@ -7,7 +7,8 @@ Parallel programming on the go.
 <h2>Usage examples</h2>
 <b>Example 1:</b> Root mean square:
 <p>
-The code below shows how it is possible to implement the computation of the root mean square of some input data, by distributing it in a predefined number of background threads.
+    The code below shows how it is possible to implement the computation of the root mean square of
+    some input data, by distributing it in a predefined number of background threads.
 </p>
 <pre>
     <code>
@@ -21,8 +22,8 @@ The code below shows how it is possible to implement the computation of the root
 
         for (final float sample : input) {
 
-            final double d = sample;
-            sum += (d * d);
+        final double d = sample;
+        sum += (d * d);
         }
 
         final double sRms = Math.sqrt(sum / input.length);

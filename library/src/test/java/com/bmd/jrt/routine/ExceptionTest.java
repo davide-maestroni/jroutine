@@ -77,7 +77,8 @@ public class ExceptionTest extends TestCase {
 
         try {
 
-            throw new RoutineInvocationException(null, this, Object.class, "test", null);
+            throw new RoutineInvocationException(null, this, Object.class, "test",
+                                                 (Class<?>[]) null);
 
         } catch (final NullPointerException ignored) {
 

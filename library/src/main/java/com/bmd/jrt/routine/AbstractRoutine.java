@@ -417,7 +417,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
 
         final Logger logger = mLogger;
 
-        logger.dbg("invoking routine: async = %s", async);
+        logger.dbg("invoking routine: %sync", (async) ? "a" : "");
 
         return new DefaultParameterChannel<INPUT, OUTPUT>(new DefaultExecutionProvider(async),
                                                           (async) ? mAsyncRunner : mSyncRunner,
@@ -465,14 +465,14 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
 
                 } catch (final InterruptedException e) {
 
-                    mLogger.err(e, "waiting for available instance interrupted [%d]", mMaxRunning);
+                    mLogger.err(e, "waiting for available instance interrupted [#%d]", mMaxRunning);
 
                     RoutineInterruptedException.interrupt(e);
                 }
 
                 if (isTimeout) {
 
-                    mLogger.wrn("routine instance not available after timeout [%d]: %s",
+                    mLogger.wrn("routine instance not available after timeout [#%d]: %s",
                                 mMaxRunning, mAvailTimeout);
 
                     throw new RoutineNotAvailableException();

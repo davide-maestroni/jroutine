@@ -200,7 +200,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
                 return this;
             }
 
-            mLogger.dbg("passing channel [%d]: %s", mPendingInputCount + 1, channel);
+            mLogger.dbg("passing channel [#%d]: %s", mPendingInputCount + 1, channel);
 
             mBoundChannels.add(channel);
 
@@ -235,7 +235,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
             inputQueue = mInputQueue;
             delay = mInputDelay;
 
-            mLogger.dbg("passing iterable [%d][%s]: %s", mPendingInputCount + 1, delay, inputs);
+            mLogger.dbg("passing iterable [#%d]: %s [%s]", mPendingInputCount + 1, inputs, delay);
 
             if (delay.isZero()) {
 
@@ -278,7 +278,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
             inputQueue = mInputQueue;
             delay = mInputDelay;
 
-            mLogger.dbg("passing input [%d][%s]: %s", mPendingInputCount + 1, delay, input);
+            mLogger.dbg("passing input [#%d]: %s [%s]", mPendingInputCount + 1, input, delay);
 
             if (delay.isZero()) {
 
@@ -467,13 +467,13 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
                 if ((mState != ChannelState.INPUT) && (mState != ChannelState.OUTPUT)) {
 
-                    mLogger.wrn("avoiding consuming input since invocation is aborted [%d]",
+                    mLogger.wrn("avoiding consuming input since invocation is aborted [#%d]",
                                 mPendingInputCount);
 
                     return false;
                 }
 
-                mLogger.dbg("consuming input [%d]", mPendingInputCount);
+                mLogger.dbg("consuming input [#%d]", mPendingInputCount);
 
                 --mPendingInputCount;
             }
@@ -601,7 +601,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
                 inputQueue = mQueue;
 
-                mSubLogger.dbg("consumer input [%s]: %s", delay, output);
+                mSubLogger.dbg("consumer input: %s [%s]", output, delay);
 
                 if (delay.isZero()) {
 

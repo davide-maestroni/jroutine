@@ -49,6 +49,9 @@ import static com.bmd.jrt.routine.ReflectionUtils.boxingClass;
  */
 public class ClassRoutineBuilder {
 
+    private static final ClassToken<MethodExecutionBody> METHOD_EXECUTION_TOKEN =
+            ClassToken.tokenOf(MethodExecutionBody.class);
+
     private static final WeakHashMap<Object, Object> sMutexMap = new WeakHashMap<Object, Object>();
 
     private static final WeakHashMap<Object, HashMap<RoutineInfo, Routine<Object, Object>>>
@@ -67,9 +70,9 @@ public class ClassRoutineBuilder {
 
     private Boolean mIsSequential;
 
-    private Log mLog = Logger.getDefaultLog();
+    private Log mLog = null;
 
-    private LogLevel mLogLevel = Logger.getDefaultLogLevel();
+    private LogLevel mLogLevel = null;
 
     private Runner mRunner;
 
@@ -185,6 +188,8 @@ public class ClassRoutineBuilder {
 
         Runner runner = mRunner;
         Boolean isSequential = mIsSequential;
+        Log log = mLog;
+        LogLevel logLevel = mLogLevel;
 
         final Async annotation = method.getAnnotation(Async.class);
 
@@ -215,9 +220,35 @@ public class ClassRoutineBuilder {
 
                 isSequential = annotation.sequential();
             }
+
+            if (log == null) {
+
+                final Class<? extends Log> logClass = annotation.log();
+
+                if (logClass != DefaultLog.class) {
+
+                    try {
+
+                        log = logClass.newInstance();
+
+                    } catch (final InstantiationException e) {
+
+                        throw new RoutineException(e);
+
+                    } catch (IllegalAccessException e) {
+
+                        throw new RoutineException(e);
+                    }
+                }
+            }
+
+            if (logLevel == null) {
+
+                logLevel = annotation.logLevel();
+            }
         }
 
-        return getRoutine(method, runner, isSequential, false);
+        return getRoutine(method, runner, isSequential, false, log, logLevel);
     }
 
     /**
@@ -250,7 +281,7 @@ public class ClassRoutineBuilder {
      */
     @NonNull
     @SuppressWarnings("ConstantConditions")
-    public ClassRoutineBuilder logWith(@NonNull final Log log) {
+    public ClassRoutineBuilder loggedWith(@NonNull final Log log) {
 
         if (log == null) {
 
@@ -362,20 +393,23 @@ public class ClassRoutineBuilder {
      * @param runner       the asynchronous runner instance.
      * @param isSequential whether a sequential runner must be used for synchronous invocations.
      * @param orderedInput whether the input data are forced to be delivered in insertion order.
+     * @param log          the log instance.
+     * @param level        the log level.
      * @return the routine instance.
      */
     @NonNull
     protected Routine<Object, Object> getRoutine(@NonNull final Method method,
             @Nullable final Runner runner, @Nullable final Boolean isSequential,
-            final boolean orderedInput) {
+            final boolean orderedInput, @Nullable final Log log, @Nullable final LogLevel level) {
 
         final Object target = mTarget;
+        final Class<?> targetClass = mTargetClass;
         Routine<Object, Object> routine;
 
         synchronized (sMutexMap) {
 
-            final Log log = mLog;
-            final LogLevel logLevel = mLogLevel;
+            final Log routineLog = (log != null) ? log : Logger.getDefaultLog();
+            final LogLevel routineLogLevel = (level != null) ? level : Logger.getDefaultLogLevel();
             final WeakHashMap<Object, HashMap<RoutineInfo, Routine<Object, Object>>> routineCache =
                     sRoutineCache;
             HashMap<RoutineInfo, Routine<Object, Object>> routineMap = routineCache.get(target);
@@ -388,8 +422,8 @@ public class ClassRoutineBuilder {
 
             final Catch catchClause = mCatchClause;
             final RoutineInfo routineInfo =
-                    new RoutineInfo(method, runner, isSequential, orderedInput, catchClause, log,
-                                    logLevel);
+                    new RoutineInfo(method, runner, isSequential, orderedInput, catchClause,
+                                    routineLog, routineLogLevel);
             routine = routineMap.get(routineInfo);
 
             if (routine != null) {
@@ -406,8 +440,8 @@ public class ClassRoutineBuilder {
                 mutexMap.put(target, mutex);
             }
 
-            final RoutineBuilder<Object, Object> builder = new RoutineBuilder<Object, Object>(
-                    ClassToken.tokenOf(MethodExecutionBody.class));
+            final RoutineBuilder<Object, Object> builder =
+                    new RoutineBuilder<Object, Object>(METHOD_EXECUTION_TOKEN);
 
             if (runner != null) {
 
@@ -431,9 +465,9 @@ public class ClassRoutineBuilder {
                 builder.orderedInput();
             }
 
-            routine = builder.logWith(log)
-                             .logLevel(logLevel)
-                             .withArgs(target, method, catchClause, mutex)
+            routine = builder.loggedWith(routineLog)
+                             .logLevel(routineLogLevel)
+                             .withArgs(target, targetClass, method, catchClause, mutex)
                              .buildRoutine();
             routineMap.put(routineInfo, routine);
         }
@@ -513,18 +547,23 @@ public class ClassRoutineBuilder {
 
         private final Object mTarget;
 
+        private final Class<?> mTargetClass;
+
         /**
          * Constructor.
          *
-         * @param target      the target class or object.
+         * @param target      the target object.
+         * @param targetClass the taregt class.
          * @param method      the method to wrap.
          * @param catchClause the catch clause.
          * @param mutex       the mutex used for synchronization.
          */
-        public MethodExecutionBody(@NonNull final Object target, @NonNull final Method method,
+        public MethodExecutionBody(@Nullable final Object target,
+                @NonNull final Class<?> targetClass, @NonNull final Method method,
                 @NonNull final Catch catchClause, @NonNull final Object mutex) {
 
             mTarget = target;
+            mTargetClass = targetClass;
             mMethod = method;
             mCatch = catchClause;
             mMutex = mutex;
@@ -539,10 +578,13 @@ public class ClassRoutineBuilder {
 
             synchronized (mMutex) {
 
+                final Object target = mTarget;
+                final Method method = mMethod;
+
                 try {
 
                     final Object result =
-                            mMethod.invoke(mTarget, objects.toArray(new Object[objects.size()]));
+                            method.invoke(target, objects.toArray(new Object[objects.size()]));
 
                     if (mHasResult) {
 
@@ -552,16 +594,22 @@ public class ClassRoutineBuilder {
                 } catch (final InvocationTargetException e) {
 
                     mCatch.exception(
-                            new RoutineInvocationException(e.getCause(), mTarget, mMethod));
+                            new RoutineInvocationException(e.getCause(), target, mTargetClass,
+                                                           method.getName(),
+                                                           method.getParameterTypes()));
 
                 } catch (final RoutineException e) {
 
                     mCatch.exception(
-                            new RoutineInvocationException(e.getCause(), mTarget, mMethod));
+                            new RoutineInvocationException(e.getCause(), target, mTargetClass,
+                                                           method.getName(),
+                                                           method.getParameterTypes()));
 
                 } catch (final Throwable t) {
 
-                    mCatch.exception(new RoutineInvocationException(t, mTarget, mMethod));
+                    mCatch.exception(new RoutineInvocationException(t, target, mTargetClass,
+                                                                    method.getName(),
+                                                                    method.getParameterTypes()));
                 }
             }
         }

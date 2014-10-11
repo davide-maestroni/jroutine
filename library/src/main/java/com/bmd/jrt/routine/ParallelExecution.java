@@ -14,7 +14,7 @@
 package com.bmd.jrt.routine;
 
 import com.bmd.jrt.channel.ResultChannel;
-import com.bmd.jrt.execution.ExecutionAdapter;
+import com.bmd.jrt.execution.BasicExecution;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
@@ -27,7 +27,7 @@ import edu.umd.cs.findbugs.annotations.Nullable;
  * @param <INPUT>  the input type.
  * @param <OUTPUT> the output type.
  */
-class ParallelExecution<INPUT, OUTPUT> extends ExecutionAdapter<INPUT, OUTPUT> {
+class ParallelExecution<INPUT, OUTPUT> extends BasicExecution<INPUT, OUTPUT> {
 
     private final Routine<INPUT, OUTPUT> mRoutine;
 
@@ -51,6 +51,6 @@ class ParallelExecution<INPUT, OUTPUT> extends ExecutionAdapter<INPUT, OUTPUT> {
     @Override
     public void onInput(@Nullable final INPUT input, @NonNull final ResultChannel<OUTPUT> results) {
 
-        results.pass(mRoutine.runAsyn(input));
+        results.pass(mRoutine.runAsync(input));
     }
 }

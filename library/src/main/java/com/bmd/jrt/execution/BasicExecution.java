@@ -11,20 +11,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.channel;
+package com.bmd.jrt.execution;
 
+import com.bmd.jrt.channel.ResultChannel;
+
+import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 
 /**
- * Empty abstract implementation of an output consumer.
+ * Empty abstract implementation of a routine execution.
  * <p/>
  * This class is useful to avoid the need of implementing all the methods defined in the interface.
  * <p/>
- * Created by davide on 9/16/14.
+ * Created by davide on 9/11/14.
  *
+ * @param <INPUT>  the input type.
  * @param <OUTPUT> the output type.
  */
-public abstract class OutputConsumerAdapter<OUTPUT> implements OutputConsumer<OUTPUT> {
+public abstract class BasicExecution<INPUT, OUTPUT> implements Execution<INPUT, OUTPUT> {
 
     @Override
     public void onAbort(@Nullable final Throwable throwable) {
@@ -32,12 +36,22 @@ public abstract class OutputConsumerAdapter<OUTPUT> implements OutputConsumer<OU
     }
 
     @Override
-    public void onClose() {
+    public void onInit() {
 
     }
 
     @Override
-    public void onOutput(@Nullable final OUTPUT output) {
+    public void onInput(@Nullable final INPUT input, @NonNull final ResultChannel<OUTPUT> results) {
+
+    }
+
+    @Override
+    public void onResult(@NonNull final ResultChannel<OUTPUT> results) {
+
+    }
+
+    @Override
+    public void onReturn() {
 
     }
 }

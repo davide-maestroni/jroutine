@@ -16,6 +16,8 @@ package com.bmd.jrt.routine;
 import com.bmd.jrt.common.RoutineException;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
@@ -27,46 +29,88 @@ import edu.umd.cs.findbugs.annotations.Nullable;
  */
 public class RoutineInvocationException extends RoutineException {
 
-    private transient final Method mMethod;
+    private final String mMethodName;
+
+    private final Class<?>[] mMethodParameterTypes;
 
     private final Object mTarget;
+
+    private final Class<?> mTargetClass;
 
     /**
      * Constructor.
      *
-     * @param cause  the wrapped exception.
-     * @param target the target of the invocation.
-     * @param method the method throwing the exception.
+     * @param cause          the wrapped exception.
+     * @param target         the target of the invocation.
+     * @param targetClass    the target class.
+     * @param methodName     the method name.
+     * @param parameterTypes the method parameter types.
      * @throws NullPointerException if the specified method is null.
      */
     @SuppressWarnings("ConstantConditions")
     public RoutineInvocationException(@Nullable final Throwable cause,
-            @Nullable final Object target, @NonNull final Method method) {
+            @Nullable final Object target, @NonNull final Class<?> targetClass,
+            @NonNull final String methodName, @NonNull final Class<?>... parameterTypes) {
 
         super(cause);
 
-        if (method == null) {
+        if (targetClass == null) {
 
-            throw new NullPointerException("the method must not be null");
+            throw new NullPointerException("the target class must not be null");
+        }
+
+        if (methodName == null) {
+
+            throw new NullPointerException("the method name must not be null");
+        }
+
+        if (parameterTypes == null) {
+
+            throw new NullPointerException("the list of parameter types must not be null");
         }
 
         mTarget = target;
-        mMethod = method;
+        mTargetClass = targetClass;
+        mMethodName = methodName;
+        mMethodParameterTypes = parameterTypes;
     }
 
     /**
-     * The invoked method.
+     * Gets the invoked method.
      *
      * @return the method.
+     * @throws NoSuchMethodException if the method is not found.
      */
     @Nullable
-    public Method getMethod() {
+    public Method getMethod() throws NoSuchMethodException {
 
-        return mMethod;
+        return mTargetClass.getMethod(mMethodName, mMethodParameterTypes);
     }
 
     /**
-     * The target instance or null if the invoked method is static.
+     * Gets the invoked method name.
+     *
+     * @return the method name.
+     */
+    @NonNull
+    public String getMethodName() {
+
+        return mMethodName;
+    }
+
+    /**
+     * Gets the list of the invoked method parameter types.
+     *
+     * @return the list of parameter types.
+     */
+    @NonNull
+    public List<Class<?>> getMethodParameterTypes() {
+
+        return Arrays.asList(mMethodParameterTypes);
+    }
+
+    /**
+     * Gets the target instance or null if the invoked method is static.
      *
      * @return the target object.
      */
@@ -74,5 +118,16 @@ public class RoutineInvocationException extends RoutineException {
     public Object getTarget() {
 
         return mTarget;
+    }
+
+    /**
+     * Gets the target class.
+     *
+     * @return the target class.
+     */
+    @NonNull
+    public Class<?> getTargetClass() {
+
+        return mTargetClass;
     }
 }

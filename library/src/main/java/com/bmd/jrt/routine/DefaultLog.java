@@ -11,20 +11,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.log;
+package com.bmd.jrt.routine;
 
-import edu.umd.cs.findbugs.annotations.Nullable;
+import com.bmd.jrt.log.Log;
 
 /**
- * Simple log implementation writing messages to the system output.
+ * Log interface used to identify the default log instance in a {@link Async} annotation.
  * <p/>
- * Created by davide on 10/3/14.
+ * Created by davide on 10/11/14.
  */
-public class SystemLog extends BasicLog {
+interface DefaultLog extends Log {
 
-    @Override
-    public void log(@Nullable final String message) {
-
-        System.out.println(message);
-    }
 }

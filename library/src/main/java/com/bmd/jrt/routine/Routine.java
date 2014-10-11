@@ -130,92 +130,92 @@ public interface Routine<INPUT, OUTPUT> {
     public List<OUTPUT> call(@Nullable OutputChannel<? extends INPUT> inputs);
 
     /**
-     * Short for <code>runAsyn().readAll()</code>.
+     * Short for <code>runAsync().readAll()</code>.
      *
      * @return the list of output data.
      */
     @NonNull
-    public List<OUTPUT> callAsyn();
+    public List<OUTPUT> callAsync();
 
     /**
-     * Short for <code>runAsyn(input).readAll()</code>.
+     * Short for <code>runAsync(input).readAll()</code>.
      *
      * @param input the input.
      * @return the list of output data.
      */
     @NonNull
-    public List<OUTPUT> callAsyn(@Nullable INPUT input);
+    public List<OUTPUT> callAsync(@Nullable INPUT input);
 
     /**
-     * Short for <code>runAsyn(inputs).readAll()</code>.
+     * Short for <code>runAsync(inputs).readAll()</code>.
      *
      * @param inputs the input data.
      * @return the list of output data.
      */
     @NonNull
-    public List<OUTPUT> callAsyn(@Nullable INPUT... inputs);
+    public List<OUTPUT> callAsync(@Nullable INPUT... inputs);
 
     /**
-     * Short for <code>runAsyn(inputs).readAll()</code>.
+     * Short for <code>runAsync(inputs).readAll()</code>.
      *
      * @param inputs the iterable returning the input data.
      * @return the list of output data.
      */
     @NonNull
-    public List<OUTPUT> callAsyn(@Nullable Iterable<? extends INPUT> inputs);
+    public List<OUTPUT> callAsync(@Nullable Iterable<? extends INPUT> inputs);
 
     /**
-     * Short for <code>runAsyn(inputs).readAll()</code>.
+     * Short for <code>runAsync(inputs).readAll()</code>.
      *
      * @param inputs the output channel returning the input data.
      * @return the list of output data.
      */
     @NonNull
-    public List<OUTPUT> callAsyn(@Nullable OutputChannel<? extends INPUT> inputs);
+    public List<OUTPUT> callAsync(@Nullable OutputChannel<? extends INPUT> inputs);
 
     /**
-     * Short for <code>runParall().readAll()</code>.
+     * Short for <code>runParallel().readAll()</code>.
      *
      * @return the list of output data.
      */
     @NonNull
-    public List<OUTPUT> callParall();
+    public List<OUTPUT> callParallel();
 
     /**
-     * Short for <code>runParall(input).readAll()</code>.
+     * Short for <code>runParallel(input).readAll()</code>.
      *
      * @param input the input.
      * @return the list of output data.
      */
     @NonNull
-    public List<OUTPUT> callParall(@Nullable INPUT input);
+    public List<OUTPUT> callParallel(@Nullable INPUT input);
 
     /**
-     * Short for <code>runParall(inputs).readAll()</code>.
+     * Short for <code>runParallel(inputs).readAll()</code>.
      *
      * @param inputs the input data.
      * @return the list of output data.
      */
     @NonNull
-    public List<OUTPUT> callParall(@Nullable INPUT... inputs);
+    public List<OUTPUT> callParallel(@Nullable INPUT... inputs);
 
     /**
-     * Short for <code>runParall(inputs).readAll()</code>.
+     * Short for <code>runParallel(inputs).readAll()</code>.
      *
      * @param inputs the iterable returning the input data.
      * @return the list of output data.
      */
     @NonNull
-    public List<OUTPUT> callParall(@Nullable Iterable<? extends INPUT> inputs);
+    public List<OUTPUT> callParallel(@Nullable Iterable<? extends INPUT> inputs);
 
     /**
-     * Short for <code>runParall(inputs).readAll()</code>.
+     * Short for <code>runParallel(inputs).readAll()</code>.
      *
      * @param inputs the output channel returning the input data.
      * @return the list of output data.
      */
     @NonNull
-    public List<OUTPUT> callParall(@Nullable OutputChannel<? extends INPUT> inputs);
+    public List<OUTPUT> callParallel(@Nullable OutputChannel<? extends INPUT> inputs);
 
     /**
      * Invokes the execution of this routine in synchronous mode.
@@ -231,7 +231,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @return the routine parameter channel.
      */
     @NonNull
-    public ParameterChannel<INPUT, OUTPUT> invokeAsyn();
+    public ParameterChannel<INPUT, OUTPUT> invokeAsync();
 
     /**
      * Invokes the execution of this routine in parallel mode.
@@ -239,7 +239,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @return the routine parameter channel.
      */
     @NonNull
-    public ParameterChannel<INPUT, OUTPUT> invokeParall();
+    public ParameterChannel<INPUT, OUTPUT> invokeParallel();
 
     /**
      * Short for <code>invoke().results()</code>.
@@ -286,90 +286,90 @@ public interface Routine<INPUT, OUTPUT> {
     public OutputChannel<OUTPUT> run(@Nullable OutputChannel<? extends INPUT> inputs);
 
     /**
-     * Short for <code>invokeAsyn().results()</code>.
+     * Short for <code>invokeAsync().results()</code>.
      *
      * @return the output channel.
      */
     @NonNull
-    public OutputChannel<OUTPUT> runAsyn();
+    public OutputChannel<OUTPUT> runAsync();
 
     /**
-     * Short for <code>invokeAsyn(input).results()</code>.
+     * Short for <code>invokeAsync(input).results()</code>.
      *
      * @param input the input.
      * @return the output channel.
      */
     @NonNull
-    public OutputChannel<OUTPUT> runAsyn(@Nullable INPUT input);
+    public OutputChannel<OUTPUT> runAsync(@Nullable INPUT input);
 
     /**
-     * Short for <code>invokeAsyn(inputs).results()</code>.
+     * Short for <code>invokeAsync(inputs).results()</code>.
      *
      * @param inputs the input data.
      * @return the output channel.
      */
     @NonNull
-    public OutputChannel<OUTPUT> runAsyn(@Nullable INPUT... inputs);
+    public OutputChannel<OUTPUT> runAsync(@Nullable INPUT... inputs);
 
     /**
-     * Short for <code>invokeAsyn(inputs).results()</code>.
+     * Short for <code>invokeAsync(inputs).results()</code>.
      *
      * @param inputs the iterable returning the input data.
      * @return the output channel.
      */
     @NonNull
-    public OutputChannel<OUTPUT> runAsyn(@Nullable Iterable<? extends INPUT> inputs);
+    public OutputChannel<OUTPUT> runAsync(@Nullable Iterable<? extends INPUT> inputs);
 
     /**
-     * Short for <code>invokeAsyn(inputs).results()</code>.
+     * Short for <code>invokeAsync(inputs).results()</code>.
      *
      * @param inputs the output channel returning the input data.
      * @return the output channel.
      */
     @NonNull
-    public OutputChannel<OUTPUT> runAsyn(@Nullable OutputChannel<? extends INPUT> inputs);
+    public OutputChannel<OUTPUT> runAsync(@Nullable OutputChannel<? extends INPUT> inputs);
 
     /**
-     * Short for <code>invokeParall(input).results()</code>.
+     * Short for <code>invokeParallel(input).results()</code>.
      *
      * @return the output channel.
      */
     @NonNull
-    public OutputChannel<OUTPUT> runParall();
+    public OutputChannel<OUTPUT> runParallel();
 
     /**
-     * Short for <code>invokeParall(input).results()</code>.
+     * Short for <code>invokeParallel(input).results()</code>.
      *
      * @param input the input.
      * @return the output channel.
      */
     @NonNull
-    public OutputChannel<OUTPUT> runParall(@Nullable INPUT input);
+    public OutputChannel<OUTPUT> runParallel(@Nullable INPUT input);
 
     /**
-     * Short for <code>invokeParall(inputs).results()</code>.
+     * Short for <code>invokeParallel(inputs).results()</code>.
      *
      * @param inputs the iterable returning the input data.
      * @return the output channel.
      */
     @NonNull
-    public OutputChannel<OUTPUT> runParall(@Nullable INPUT... inputs);
+    public OutputChannel<OUTPUT> runParallel(@Nullable INPUT... inputs);
 
     /**
-     * Short for <code>invokeParall(inputs).results()</code>.
+     * Short for <code>invokeParallel(inputs).results()</code>.
      *
      * @param inputs the output channel returning the input data.
      * @return the output channel.
      */
     @NonNull
-    public OutputChannel<OUTPUT> runParall(@Nullable Iterable<? extends INPUT> inputs);
+    public OutputChannel<OUTPUT> runParallel(@Nullable Iterable<? extends INPUT> inputs);
 
     /**
-     * Short for <code>invokeParall(inputs).results()</code>.
+     * Short for <code>invokeParallel(inputs).results()</code>.
      *
      * @param inputs the output channel returning the input data.
      * @return the output channel.
      */
     @NonNull
-    public OutputChannel<OUTPUT> runParall(@Nullable OutputChannel<? extends INPUT> inputs);
+    public OutputChannel<OUTPUT> runParallel(@Nullable OutputChannel<? extends INPUT> inputs);
 }

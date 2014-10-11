@@ -31,27 +31,57 @@ public class ExceptionTest extends TestCase {
 
         final Method waitMethod = Object.class.getMethod("wait");
 
-        assertThat(new RoutineInvocationException(new NullPointerException(), null,
-                                                  waitMethod)).isExactlyInstanceOf(
+        assertThat(new RoutineInvocationException(new NullPointerException(), null, Object.class,
+                                                  waitMethod.getName())).isExactlyInstanceOf(
                 RoutineInvocationException.class);
-        assertThat(new RoutineInvocationException(new NullPointerException(), this,
-                                                  waitMethod).getCause()).isExactlyInstanceOf(
+        assertThat(new RoutineInvocationException(new NullPointerException(), this, Object.class,
+                                                  waitMethod.getName()).getCause())
+                .isExactlyInstanceOf(
                 NullPointerException.class);
-        assertThat(new RoutineInvocationException(null, null, waitMethod)).hasNoCause();
-        assertThat(new RoutineInvocationException(new NullPointerException(), this,
-                                                  waitMethod).getTarget()).isEqualTo(this);
-        assertThat(new RoutineInvocationException(null, null, waitMethod).getTarget()).isNull();
-        assertThat(new RoutineInvocationException(null, null, waitMethod).getMethod()).isEqualTo(
+        assertThat(new RoutineInvocationException(null, null, Object.class,
+                                                  waitMethod.getName())).hasNoCause();
+        assertThat(new RoutineInvocationException(new NullPointerException(), this, Object.class,
+                                                  waitMethod.getName()).getTarget()).isEqualTo(
+                this);
+        assertThat(new RoutineInvocationException(null, null, Object.class,
+                                                  waitMethod.getName()).getTarget()).isNull();
+        assertThat(new RoutineInvocationException(null, null, Object.class,
+                                                  waitMethod.getName()).getTargetClass()
+                                                                       .equals(Object.class))
+                .isTrue();
+        assertThat(new RoutineInvocationException(null, null, Object.class,
+                                                  waitMethod.getName()).getMethodName()).isEqualTo(
+                waitMethod.getName());
+        assertThat(new RoutineInvocationException(null, null, Object.class,
+                                                  waitMethod.getName()).getMethodParameterTypes()
+        ).isEmpty();
+        assertThat(new RoutineInvocationException(null, null, Object.class,
+                                                  waitMethod.getName()).getMethod()).isEqualTo(
                 waitMethod);
 
         try {
 
-            throw new RoutineInvocationException(null, this, null);
+            throw new RoutineInvocationException(null, this, null, "test");
 
         } catch (final NullPointerException ignored) {
 
         }
 
+        try {
+
+            throw new RoutineInvocationException(null, this, Object.class, null);
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            throw new RoutineInvocationException(null, this, Object.class, "test", null);
+
+        } catch (final NullPointerException ignored) {
+
+        }
     }
 
     public void testRoutineNotAvailableException() {

@@ -23,7 +23,7 @@ import edu.umd.cs.findbugs.annotations.Nullable;
  * <p/>
  * Created by davide on 10/4/14.
  */
-public class NullLog extends LogAdapter {
+public class NullLog extends BasicLog {
 
     @Override
     protected void log(@NonNull final LogLevel level, @NonNull final List<Object> contexts,

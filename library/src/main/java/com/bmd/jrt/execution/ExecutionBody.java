@@ -34,7 +34,7 @@ import edu.umd.cs.findbugs.annotations.Nullable;
  * @param <INPUT>  the input type.
  * @param <OUTPUT> the output type.
  */
-public abstract class ExecutionBody<INPUT, OUTPUT> extends ExecutionAdapter<INPUT, OUTPUT> {
+public abstract class ExecutionBody<INPUT, OUTPUT> extends BasicExecution<INPUT, OUTPUT> {
 
     private ArrayList<INPUT> mInputs;
 

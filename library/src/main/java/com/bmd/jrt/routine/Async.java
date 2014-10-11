@@ -13,6 +13,8 @@
  */
 package com.bmd.jrt.routine;
 
+import com.bmd.jrt.log.Log;
+import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.runner.Runner;
 
 import java.lang.annotation.ElementType;
@@ -52,15 +54,16 @@ import java.lang.annotation.Target;
  * <pre>
  *     <code>
  *
- *         JRoutine.on(new MyClass()).method(MyClass.GET_METHOD).callAsyn();
+ *         JRoutine.on(new MyClass()).method(MyClass.GET_METHOD).callAsync();
  *     </code>
  * </pre>
  * <p/>
  * If no name is specified the original one will be used instead.
  * <p/>
  * Additionally, through this annotation it is possible to indicate a specific runner
- * implementation to be used for asynchronous and synchronous invocations.<br/>
- * Note however that the specified runner classes must declare a default constructor to be
+ * implementation to be used for asynchronous and synchronous invocations, and a specific log and
+ * log level.<br/>
+ * Note however that the runner and log classes must declare a default constructor to be
  * instantiated via reflection.
  * <p/>
  * The same considerations apply to static class methods.
@@ -88,6 +91,20 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Async {
+
+    /**
+     * The class of the log to be used.
+     *
+     * @return the log class.
+     */
+    Class<? extends Log> log() default DefaultLog.class;
+
+    /**
+     * The log level.
+     *
+     * @return the log level.
+     */
+    LogLevel logLevel() default LogLevel.ERROR;
 
     /**
      * The name used to identify the method independently from its original signature.

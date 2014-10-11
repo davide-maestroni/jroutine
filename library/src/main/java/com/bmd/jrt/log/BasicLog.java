@@ -31,7 +31,7 @@ import edu.umd.cs.findbugs.annotations.Nullable;
  * <p/>
  * Created by davide on 10/3/14.
  */
-public abstract class LogAdapter implements Log {
+public abstract class BasicLog implements Log {
 
     private static final String DATE_FORMAT = "MM/dd HH:mm:ss.SSS z";
 

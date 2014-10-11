@@ -83,7 +83,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * @throws IllegalArgumentException if the specified class does not represent an interface.
      */
     @NonNull
-    public <CLASS> CLASS asAsyn(@NonNull final Class<CLASS> itf) {
+    public <CLASS> CLASS asAsync(@NonNull final Class<CLASS> itf) {
 
         if (!itf.isInterface()) {
 
@@ -119,9 +119,9 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
     @Override
     @NonNull
-    public ObjectRoutineBuilder logWith(@NonNull final Log log) {
+    public ObjectRoutineBuilder loggedWith(@NonNull final Log log) {
 
-        super.logWith(log);
+        super.loggedWith(log);
 
         return this;
     }
@@ -180,6 +180,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
             Method targetMethod;
             Runner runner = null;
             Boolean isSequential = null;
+            Log log = null;
+            LogLevel level = null;
 
             synchronized (sMethodCache) {
 
@@ -215,6 +217,15 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                         }
 
                         isSequential = annotation.sequential();
+
+                        final Class<? extends Log> logClass = annotation.log();
+
+                        if (logClass != DefaultLog.class) {
+
+                            log = logClass.newInstance();
+                        }
+
+                        level = annotation.logLevel();
                     }
 
                     if ((name == null) || (name.length() == 0)) {
@@ -283,12 +294,13 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
             }
 
             final Routine<Object, Object> routine =
-                    getRoutine(targetMethod, runner, isSequential, isOverrideParameters);
+                    getRoutine(targetMethod, runner, isSequential, isOverrideParameters, log,
+                               level);
             final OutputChannel<Object> outputChannel;
 
             if (isOverrideParameters) {
 
-                final ParameterChannel<Object, Object> parameterChannel = routine.invokeAsyn();
+                final ParameterChannel<Object, Object> parameterChannel = routine.invokeAsync();
 
                 for (final Object arg : args) {
 
@@ -306,7 +318,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
             } else {
 
-                outputChannel = routine.runAsyn(args);
+                outputChannel = routine.runAsync(args);
             }
 
             if (!Void.class.equals(boxingClass(returnType))) {
@@ -332,7 +344,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
         public Object invoke(final Object proxy, final Method method, final Object[] args) throws
                 Throwable {
 
-            final OutputChannel<Object> outputChannel = classMethod(method).runAsyn(args);
+            final OutputChannel<Object> outputChannel = classMethod(method).runAsync(args);
 
             final Class<?> returnType = method.getReturnType();
 

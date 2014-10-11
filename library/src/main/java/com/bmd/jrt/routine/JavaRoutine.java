@@ -16,8 +16,8 @@ package com.bmd.jrt.routine;
 import com.bmd.jrt.channel.ParameterChannel;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.ClassToken;
+import com.bmd.jrt.execution.BasicExecution;
 import com.bmd.jrt.execution.Execution;
-import com.bmd.jrt.execution.ExecutionAdapter;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 
@@ -52,12 +52,12 @@ import static com.bmd.jrt.common.ClassToken.tokenOf;
  * @see Async
  * @see AsyncParameters
  */
-public class JRoutine {
+public class JavaRoutine {
 
     /**
      * Avoid direct instantiation.
      */
-    protected JRoutine() {
+    protected JavaRoutine() {
 
     }
 
@@ -68,14 +68,14 @@ public class JRoutine {
         final Routine<Integer, Integer> squareRoutine =
                 on(tokenOf(SquareExecution.class)).buildRoutine();
 
-        final ParameterChannel<Integer, Integer> squareChannel = squareRoutine.invokeParall();
+        final ParameterChannel<Integer, Integer> squareChannel = squareRoutine.invokeParallel();
 
         for (final String arg : args) {
 
             squareChannel.pass(Integer.parseInt(arg));
         }
 
-        System.out.println(sumRoutine.callAsyn(squareChannel.results()));
+        System.out.println(sumRoutine.callAsync(squareChannel.results()));
 
         System.exit(0);
     }
@@ -126,7 +126,7 @@ public class JRoutine {
         return new ClassRoutineBuilder(target);
     }
 
-    private static class SquareExecution extends ExecutionAdapter<Integer, Integer> {
+    private static class SquareExecution extends BasicExecution<Integer, Integer> {
 
         @Override
         public void onInput(final Integer integer, @NonNull final ResultChannel<Integer> results) {
@@ -137,7 +137,7 @@ public class JRoutine {
         }
     }
 
-    private static class SumExecution extends ExecutionAdapter<Integer, Integer> {
+    private static class SumExecution extends BasicExecution<Integer, Integer> {
 
         private int mSum;
 

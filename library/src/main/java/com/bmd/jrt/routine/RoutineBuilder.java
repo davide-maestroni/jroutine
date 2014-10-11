@@ -190,7 +190,7 @@ public class RoutineBuilder<INPUT, OUTPUT> {
      */
     @NonNull
     @SuppressWarnings("ConstantConditions")
-    public RoutineBuilder<INPUT, OUTPUT> logWith(@NonNull final Log log) {
+    public RoutineBuilder<INPUT, OUTPUT> loggedWith(@NonNull final Log log) {
 
         if (log == null) {
 

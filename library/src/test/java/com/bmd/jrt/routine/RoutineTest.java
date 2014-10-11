@@ -13,15 +13,15 @@
  */
 package com.bmd.jrt.routine;
 
+import com.bmd.jrt.channel.BasicOutputConsumer;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.OutputConsumer;
-import com.bmd.jrt.channel.OutputConsumerAdapter;
 import com.bmd.jrt.channel.ParameterChannel;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.common.RoutineException;
+import com.bmd.jrt.execution.BasicExecution;
 import com.bmd.jrt.execution.Execution;
-import com.bmd.jrt.execution.ExecutionAdapter;
 import com.bmd.jrt.execution.ExecutionBody;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.log.Logger;
@@ -38,7 +38,7 @@ import java.util.List;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 
-import static com.bmd.jrt.routine.JRoutine.on;
+import static com.bmd.jrt.routine.JavaRoutine.on;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
@@ -54,7 +54,7 @@ public class RoutineTest extends TestCase {
                 on(ClassToken.tokenOf(DelayExecution.class)).withArgs(TimeDuration.millis(100))
                                                             .buildRoutine();
 
-        final ParameterChannel<String, String> inputChannel = routine.invokeAsyn().pass("test1");
+        final ParameterChannel<String, String> inputChannel = routine.invokeAsync().pass("test1");
         final OutputChannel<String> outputChannel = inputChannel.results();
 
         assertThat(inputChannel.isOpen()).isFalse();
@@ -62,7 +62,7 @@ public class RoutineTest extends TestCase {
         assertThat(inputChannel.isOpen()).isFalse();
         assertThat(outputChannel.readFirst()).isEqualTo("test1");
 
-        final ParameterChannel<String, String> inputChannel1 = routine.invokeAsyn().pass("test1");
+        final ParameterChannel<String, String> inputChannel1 = routine.invokeAsync().pass("test1");
         final OutputChannel<String> outputChannel1 = inputChannel1.results();
 
         assertThat(inputChannel1.isOpen()).isFalse();
@@ -72,7 +72,7 @@ public class RoutineTest extends TestCase {
         assertThat(outputChannel1.readFirst()).isEqualTo("test1");
         assertThat(outputChannel1.isOpen()).isFalse();
 
-        final OutputChannel<String> channel = routine.runAsyn("test2");
+        final OutputChannel<String> channel = routine.runAsync("test2");
         assertThat(channel.isOpen()).isTrue();
         assertThat(channel.abort(new IllegalArgumentException("test2"))).isTrue();
         assertThat(channel.abort()).isFalse();
@@ -93,7 +93,7 @@ public class RoutineTest extends TestCase {
         assertThat(channel.isOpen()).isFalse();
 
 
-        final OutputChannel<String> channel1 = routine.runAsyn("test2");
+        final OutputChannel<String> channel1 = routine.runAsync("test2");
         assertThat(channel1.isOpen()).isTrue();
         assertThat(channel1.abort()).isTrue();
         assertThat(channel1.abort(new IllegalArgumentException("test2"))).isFalse();
@@ -113,7 +113,7 @@ public class RoutineTest extends TestCase {
         assertThat(channel1.isOpen()).isFalse();
 
 
-        final Execution<String, String> abortExecution = new ExecutionAdapter<String, String>() {
+        final Execution<String, String> abortExecution = new BasicExecution<String, String>() {
 
             @Override
             public void onInput(@Nullable final String s,
@@ -131,7 +131,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            routine1.callAsyn("test_abort");
+            routine1.callAsync("test_abort");
 
             fail();
 
@@ -141,7 +141,7 @@ public class RoutineTest extends TestCase {
             assertThat(ex.getCause().getMessage()).isEqualTo("test_abort");
         }
 
-        final Execution<String, String> abortExecution2 = new ExecutionAdapter<String, String>() {
+        final Execution<String, String> abortExecution2 = new BasicExecution<String, String>() {
 
             @Override
             public void onInput(@Nullable final String s,
@@ -157,7 +157,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            routine2.callAsyn("test_abort");
+            routine2.callAsync("test_abort");
 
             fail();
 
@@ -189,8 +189,8 @@ public class RoutineTest extends TestCase {
         final Routine<Integer, Integer> sumRoutine =
                 on(ClassToken.classOf(execSum)).withArgs(this).buildRoutine();
 
-        final ExecutionAdapter<Integer, Integer> invokeSquare =
-                new ExecutionAdapter<Integer, Integer>() {
+        final BasicExecution<Integer, Integer> invokeSquare =
+                new BasicExecution<Integer, Integer>() {
 
                     @Override
                     public void onInput(final Integer integer,
@@ -206,23 +206,25 @@ public class RoutineTest extends TestCase {
                 on(ClassToken.classOf(invokeSquare)).withArgs(this).buildRoutine();
 
         assertThat(sumRoutine.call(squareRoutine.run(1, 2, 3, 4))).containsExactly(30);
-        assertThat(sumRoutine.callAsyn(squareRoutine.run(1, 2, 3, 4))).containsExactly(30);
+        assertThat(sumRoutine.callAsync(squareRoutine.run(1, 2, 3, 4))).containsExactly(30);
         assertThat(sumRoutine.run(squareRoutine.run(1, 2, 3, 4)).readAll()).containsExactly(30);
-        assertThat(sumRoutine.runAsyn(squareRoutine.run(1, 2, 3, 4)).readAll()).containsExactly(30);
-
-        assertThat(sumRoutine.call(squareRoutine.runAsyn(1, 2, 3, 4))).containsExactly(30);
-        assertThat(sumRoutine.callAsyn(squareRoutine.runAsyn(1, 2, 3, 4))).containsExactly(30);
-        assertThat(sumRoutine.run(squareRoutine.runAsyn(1, 2, 3, 4)).readAll()).containsExactly(30);
-        assertThat(sumRoutine.runAsyn(squareRoutine.runAsyn(1, 2, 3, 4)).readAll()).containsExactly(
+        assertThat(sumRoutine.runAsync(squareRoutine.run(1, 2, 3, 4)).readAll()).containsExactly(
                 30);
 
-        assertThat(sumRoutine.call(squareRoutine.runParall(1, 2, 3, 4))).containsExactly(30);
-        assertThat(sumRoutine.callAsyn(squareRoutine.runParall(1, 2, 3, 4))).containsExactly(30);
-        assertThat(sumRoutine.run(squareRoutine.runParall(1, 2, 3, 4)).readAll()).containsExactly(
+        assertThat(sumRoutine.call(squareRoutine.runAsync(1, 2, 3, 4))).containsExactly(30);
+        assertThat(sumRoutine.callAsync(squareRoutine.runAsync(1, 2, 3, 4))).containsExactly(30);
+        assertThat(sumRoutine.run(squareRoutine.runAsync(1, 2, 3, 4)).readAll()).containsExactly(
                 30);
         assertThat(
-                sumRoutine.runAsyn(squareRoutine.runParall(1, 2, 3, 4)).readAll()).containsExactly(
+                sumRoutine.runAsync(squareRoutine.runAsync(1, 2, 3, 4)).readAll()).containsExactly(
                 30);
+
+        assertThat(sumRoutine.call(squareRoutine.runParallel(1, 2, 3, 4))).containsExactly(30);
+        assertThat(sumRoutine.callAsync(squareRoutine.runParallel(1, 2, 3, 4))).containsExactly(30);
+        assertThat(sumRoutine.run(squareRoutine.runParallel(1, 2, 3, 4)).readAll()).containsExactly(
+                30);
+        assertThat(sumRoutine.runAsync(squareRoutine.runParallel(1, 2, 3, 4))
+                             .readAll()).containsExactly(30);
     }
 
     public void testComposedRoutine() {
@@ -247,8 +249,8 @@ public class RoutineTest extends TestCase {
         final Routine<Integer, Integer> sumRoutine =
                 on(ClassToken.classOf(execSum)).withArgs(this).buildRoutine();
 
-        final ExecutionAdapter<Integer, Integer> invokeSquare =
-                new ExecutionAdapter<Integer, Integer>() {
+        final BasicExecution<Integer, Integer> invokeSquare =
+                new BasicExecution<Integer, Integer>() {
 
                     @Override
                     public void onInput(final Integer integer,
@@ -263,8 +265,8 @@ public class RoutineTest extends TestCase {
         final Routine<Integer, Integer> squareRoutine =
                 on(ClassToken.classOf(invokeSquare)).withArgs(this).buildRoutine();
 
-        final ExecutionAdapter<Integer, Integer> invokeSquareSum =
-                new ExecutionAdapter<Integer, Integer>() {
+        final BasicExecution<Integer, Integer> invokeSquareSum =
+                new BasicExecution<Integer, Integer>() {
 
                     private ParameterChannel<Integer, Integer> mChannel;
 
@@ -277,14 +279,14 @@ public class RoutineTest extends TestCase {
                     @Override
                     public void onInit() {
 
-                        mChannel = sumRoutine.invokeAsyn();
+                        mChannel = sumRoutine.invokeAsync();
                     }
 
                     @Override
                     public void onInput(final Integer integer,
                             @NonNull final ResultChannel<Integer> results) {
 
-                        mChannel.pass(squareRoutine.runAsyn(integer));
+                        mChannel.pass(squareRoutine.runAsync(integer));
                     }
 
                     @Override
@@ -299,9 +301,9 @@ public class RoutineTest extends TestCase {
                                                        .buildRoutine();
 
         assertThat(squareSumRoutine.call(1, 2, 3, 4)).containsExactly(30);
-        assertThat(squareSumRoutine.callAsyn(1, 2, 3, 4)).containsExactly(30);
+        assertThat(squareSumRoutine.callAsync(1, 2, 3, 4)).containsExactly(30);
         assertThat(squareSumRoutine.run(1, 2, 3, 4).readAll()).containsExactly(30);
-        assertThat(squareSumRoutine.runAsyn(1, 2, 3, 4).readAll()).containsExactly(30);
+        assertThat(squareSumRoutine.runAsync(1, 2, 3, 4).readAll()).containsExactly(30);
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -510,44 +512,43 @@ public class RoutineTest extends TestCase {
 
     public void testErrorConsumerOnResult() {
 
-        final OutputConsumerAdapter<String> exceptionConsumer =
-                new OutputConsumerAdapter<String>() {
+        final BasicOutputConsumer<String> exceptionConsumer = new BasicOutputConsumer<String>() {
 
-                    @Override
-                    public void onOutput(final String output) {
+            @Override
+            public void onOutput(final String output) {
 
-                        throw new NullPointerException(output);
-                    }
-                };
+                throw new NullPointerException(output);
+            }
+        };
 
         testConsumer(exceptionConsumer);
     }
 
     public void testErrorConsumerOnReturn() {
 
-        final OutputConsumerAdapter<String> exceptionConsumer =
-                new OutputConsumerAdapter<String>() {
+        final BasicOutputConsumer<String> exceptionConsumer = new BasicOutputConsumer<String>() {
 
-                    @Override
-                    public void onClose() {
+            @Override
+            public void onClose() {
 
-                        throw new NullPointerException("test2");
-                    }
-                };
+                throw new NullPointerException("test2");
+            }
+        };
 
         testConsumer(exceptionConsumer);
     }
 
     public void testErrorOnInit() {
 
-        final Execution<String, String> exceptionOnInit = new ExecutionAdapter<String, String>() {
+        final BasicExecution<String, String> exceptionOnInit =
+                new BasicExecution<String, String>() {
 
-            @Override
-            public void onInit() {
+                    @Override
+                    public void onInit() {
 
-                throw new NullPointerException("test1");
-            }
-        };
+                        throw new NullPointerException("test1");
+                    }
+                };
 
         final Routine<String, String> exceptionRoutine =
                 on(ClassToken.classOf(exceptionOnInit)).withArgs(this).buildRoutine();
@@ -563,14 +564,16 @@ public class RoutineTest extends TestCase {
 
     public void testErrorOnInput() {
 
-        final Execution<String, String> exceptionOnInput = new ExecutionAdapter<String, String>() {
+        final BasicExecution<String, String> exceptionOnInput =
+                new BasicExecution<String, String>() {
 
-            @Override
-            public void onInput(final String s, @NonNull final ResultChannel<String> results) {
+                    @Override
+                    public void onInput(final String s,
+                            @NonNull final ResultChannel<String> results) {
 
-                throw new NullPointerException(s);
-            }
-        };
+                        throw new NullPointerException(s);
+                    }
+                };
 
         final Routine<String, String> exceptionRoutine =
                 on(ClassToken.classOf(exceptionOnInput)).withArgs(this).buildRoutine();
@@ -586,14 +589,15 @@ public class RoutineTest extends TestCase {
 
     public void testErrorOnResult() {
 
-        final Execution<String, String> exceptionOnResult = new ExecutionAdapter<String, String>() {
+        final BasicExecution<String, String> exceptionOnResult =
+                new BasicExecution<String, String>() {
 
-            @Override
-            public void onResult(@NonNull final ResultChannel<String> results) {
+                    @Override
+                    public void onResult(@NonNull final ResultChannel<String> results) {
 
-                throw new NullPointerException("test3");
-            }
-        };
+                        throw new NullPointerException("test3");
+                    }
+                };
 
         final Routine<String, String> exceptionRoutine =
                 on(ClassToken.classOf(exceptionOnResult)).withArgs(this).buildRoutine();
@@ -609,7 +613,7 @@ public class RoutineTest extends TestCase {
 
     public void testErrorOnReturn() {
 
-        final Execution<String, String> exceptionOnReturn = new ExecutionAdapter<String, String>() {
+        final Execution<String, String> exceptionOnReturn = new BasicExecution<String, String>() {
 
             @Override
             public void onInput(final String s, @NonNull final ResultChannel<String> results) {
@@ -643,16 +647,16 @@ public class RoutineTest extends TestCase {
         assertThat(on(new TestClass()).classMethod("getOne").call()).containsExactly(1);
         assertThat(on(new TestClass()).method(TestClass.GET_METHOD).call()).containsExactly(1);
         assertThat(on(TestClass.class).method(TestClass.GET_METHOD).call(3)).containsExactly(3);
-        assertThat(on(TestClass.class).method("get").callAsyn(-3)).containsExactly(-3);
+        assertThat(on(TestClass.class).method("get").callAsync(-3)).containsExactly(-3);
         assertThat(
-                on(TestClass.class).classMethod("get", int.class).callParall(17)).containsExactly(
+                on(TestClass.class).classMethod("get", int.class).callParallel(17)).containsExactly(
                 17);
 
-        assertThat(on(new TestClass()).asAsyn(TestInterface.class).getInt(2)).isEqualTo(2);
+        assertThat(on(new TestClass()).asAsync(TestInterface.class).getInt(2)).isEqualTo(2);
 
         try {
 
-            on(TestClass.class).method("get").callAsyn();
+            on(TestClass.class).method("get").callAsync();
 
             fail();
 
@@ -670,40 +674,39 @@ public class RoutineTest extends TestCase {
 
         }
 
-        assertThat(on(new TestClass()).asAsyn(TestInterfaceAsyn.class).take(77)).isEqualTo(77);
-        assertThat(
-                on(new TestClass()).asAsyn(TestInterfaceAsyn.class).getOne().readFirst()).isEqualTo(
-                1);
+        assertThat(on(new TestClass()).asAsync(TestInterfaceAsync.class).take(77)).isEqualTo(77);
+        assertThat(on(new TestClass()).asAsync(TestInterfaceAsync.class)
+                                      .getOne()
+                                      .readFirst()).isEqualTo(1);
 
-        final TestInterfaceAsyn testInterfaceAsyn =
-                on(new TestClass()).asAsyn(TestInterfaceAsyn.class);
-        assertThat(testInterfaceAsyn.getInt(testInterfaceAsyn.getOne())).isEqualTo(1);
+        final TestInterfaceAsync testInterfaceAsync =
+                on(new TestClass()).asAsync(TestInterfaceAsync.class);
+        assertThat(testInterfaceAsync.getInt(testInterfaceAsync.getOne())).isEqualTo(1);
     }
 
     public void testRoutine() {
 
-        final ExecutionAdapter<Integer, Integer> execSquare =
-                new ExecutionAdapter<Integer, Integer>() {
+        final BasicExecution<Integer, Integer> execSquare = new BasicExecution<Integer, Integer>() {
 
-                    @Override
-                    public void onInput(final Integer integer,
-                            @NonNull final ResultChannel<Integer> results) {
+            @Override
+            public void onInput(final Integer integer,
+                    @NonNull final ResultChannel<Integer> results) {
 
-                        final int input = integer;
+                final int input = integer;
 
-                        results.pass(input * input);
-                    }
-                };
+                results.pass(input * input);
+            }
+        };
 
         final Routine<Integer, Integer> squareRoutine =
                 on(ClassToken.classOf(execSquare)).withArgs(this).buildRoutine();
 
         assertThat(squareRoutine.call(1, 2, 3, 4)).containsExactly(1, 4, 9, 16);
-        assertThat(squareRoutine.callAsyn(1, 2, 3, 4)).containsExactly(1, 4, 9, 16);
-        assertThat(squareRoutine.callParall(1, 2, 3, 4)).containsOnly(1, 4, 9, 16);
+        assertThat(squareRoutine.callAsync(1, 2, 3, 4)).containsExactly(1, 4, 9, 16);
+        assertThat(squareRoutine.callParallel(1, 2, 3, 4)).containsOnly(1, 4, 9, 16);
         assertThat(squareRoutine.run(1, 2, 3, 4).readAll()).containsExactly(1, 4, 9, 16);
-        assertThat(squareRoutine.runAsyn(1, 2, 3, 4).readAll()).containsExactly(1, 4, 9, 16);
-        assertThat(squareRoutine.runParall(1, 2, 3, 4).readAll()).containsOnly(1, 4, 9, 16);
+        assertThat(squareRoutine.runAsync(1, 2, 3, 4).readAll()).containsExactly(1, 4, 9, 16);
+        assertThat(squareRoutine.runParallel(1, 2, 3, 4).readAll()).containsOnly(1, 4, 9, 16);
     }
 
     public void testRoutineFunction() {
@@ -729,9 +732,9 @@ public class RoutineTest extends TestCase {
                 on(ClassToken.classOf(execSum)).withArgs(this).buildRoutine();
 
         assertThat(sumRoutine.call(1, 2, 3, 4)).containsExactly(10);
-        assertThat(sumRoutine.callAsyn(1, 2, 3, 4)).containsExactly(10);
+        assertThat(sumRoutine.callAsync(1, 2, 3, 4)).containsExactly(10);
         assertThat(sumRoutine.run(1, 2, 3, 4).readAll()).containsExactly(10);
-        assertThat(sumRoutine.runAsyn(1, 2, 3, 4).readAll()).containsExactly(10);
+        assertThat(sumRoutine.runAsync(1, 2, 3, 4).readAll()).containsExactly(10);
     }
 
     private void testChained(final Routine<String, String> before,
@@ -750,7 +753,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.callAsyn(after.run(input));
+            before.callAsync(after.run(input));
 
             fail();
 
@@ -761,7 +764,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.callParall(after.run(input));
+            before.callParallel(after.run(input));
 
             fail();
 
@@ -797,7 +800,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.runAsyn(after.run(input)).readAll();
+            before.runAsync(after.run(input)).readAll();
 
             fail();
 
@@ -808,7 +811,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : before.runAsyn(after.run(input))) {
+            for (final String s : before.runAsync(after.run(input))) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -822,7 +825,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.runParall(after.run(input)).readAll();
+            before.runParallel(after.run(input)).readAll();
 
             fail();
 
@@ -833,7 +836,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : before.runParall(after.run(input))) {
+            for (final String s : before.runParallel(after.run(input))) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -872,7 +875,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.invokeAsyn().pass(after.run(input)).results().readAll();
+            before.invokeAsync().pass(after.run(input)).results().readAll();
 
             fail();
 
@@ -883,7 +886,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : before.invokeAsyn().pass(after.run(input)).results()) {
+            for (final String s : before.invokeAsync().pass(after.run(input)).results()) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -897,7 +900,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.invokeParall().pass(after.run(input)).results().readAll();
+            before.invokeParallel().pass(after.run(input)).results().readAll();
 
             fail();
 
@@ -908,7 +911,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : before.invokeParall().pass(after.run(input)).results()) {
+            for (final String s : before.invokeParallel().pass(after.run(input)).results()) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -922,7 +925,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.call(after.runAsyn(input));
+            before.call(after.runAsync(input));
 
             fail();
 
@@ -933,7 +936,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.callAsyn(after.runAsyn(input));
+            before.callAsync(after.runAsync(input));
 
             fail();
 
@@ -944,7 +947,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.callParall(after.runAsyn(input));
+            before.callParallel(after.runAsync(input));
 
             fail();
 
@@ -955,7 +958,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.run(after.runAsyn(input)).readAll();
+            before.run(after.runAsync(input)).readAll();
 
             fail();
 
@@ -966,7 +969,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : before.run(after.runAsyn(input))) {
+            for (final String s : before.run(after.runAsync(input))) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -980,7 +983,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.runAsyn(after.runAsyn(input)).readAll();
+            before.runAsync(after.runAsync(input)).readAll();
 
             fail();
 
@@ -991,7 +994,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : before.runAsyn(after.runAsyn(input))) {
+            for (final String s : before.runAsync(after.runAsync(input))) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -1005,7 +1008,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.invoke().pass(after.runAsyn(input)).results().readAll();
+            before.invoke().pass(after.runAsync(input)).results().readAll();
 
             fail();
 
@@ -1016,7 +1019,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : before.invoke().pass(after.runAsyn(input)).results()) {
+            for (final String s : before.invoke().pass(after.runAsync(input)).results()) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -1030,7 +1033,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.invokeAsyn().pass(after.runAsyn(input)).results().readAll();
+            before.invokeAsync().pass(after.runAsync(input)).results().readAll();
 
             fail();
 
@@ -1041,7 +1044,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : before.invokeAsyn().pass(after.runAsyn(input)).results()) {
+            for (final String s : before.invokeAsync().pass(after.runAsync(input)).results()) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -1055,7 +1058,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.call(after.runParall(input));
+            before.call(after.runParallel(input));
 
             fail();
 
@@ -1066,7 +1069,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.callAsyn(after.runParall(input));
+            before.callAsync(after.runParallel(input));
 
             fail();
 
@@ -1077,7 +1080,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.callParall(after.runParall(input));
+            before.callParallel(after.runParallel(input));
 
             fail();
 
@@ -1088,7 +1091,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.run(after.runParall(input)).readAll();
+            before.run(after.runParallel(input)).readAll();
 
             fail();
 
@@ -1099,7 +1102,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : before.run(after.runParall(input))) {
+            for (final String s : before.run(after.runParallel(input))) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -1113,7 +1116,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.runAsyn(after.runParall(input)).readAll();
+            before.runAsync(after.runParallel(input)).readAll();
 
             fail();
 
@@ -1124,7 +1127,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : before.runAsyn(after.runParall(input))) {
+            for (final String s : before.runAsync(after.runParallel(input))) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -1138,7 +1141,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.invoke().pass(after.runParall(input)).results().readAll();
+            before.invoke().pass(after.runParallel(input)).results().readAll();
 
             fail();
 
@@ -1149,7 +1152,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : before.invoke().pass(after.runParall(input)).results()) {
+            for (final String s : before.invoke().pass(after.runParallel(input)).results()) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -1163,7 +1166,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.invokeAsyn().pass(after.runParall(input)).results().readAll();
+            before.invokeAsync().pass(after.runParallel(input)).results().readAll();
 
             fail();
 
@@ -1174,7 +1177,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : before.invokeAsyn().pass(after.runParall(input)).results()) {
+            for (final String s : before.invokeAsync().pass(after.runParallel(input)).results()) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -1195,12 +1198,12 @@ public class RoutineTest extends TestCase {
                                                             .buildRoutine();
 
         assertThat(routine.run(input).bind(consumer).waitComplete()).isTrue();
-        assertThat(routine.runAsyn(input).bind(consumer).waitComplete()).isTrue();
-        assertThat(routine.runParall(input).bind(consumer).waitComplete()).isTrue();
+        assertThat(routine.runAsync(input).bind(consumer).waitComplete()).isTrue();
+        assertThat(routine.runParallel(input).bind(consumer).waitComplete()).isTrue();
         assertThat(routine.invoke().pass(input).results().bind(consumer).waitComplete()).isTrue();
         assertThat(
-                routine.invokeAsyn().pass(input).results().bind(consumer).waitComplete()).isTrue();
-        assertThat(routine.invokeParall()
+                routine.invokeAsync().pass(input).results().bind(consumer).waitComplete()).isTrue();
+        assertThat(routine.invokeParallel()
                           .pass(input)
                           .results()
                           .bind(consumer)
@@ -1223,7 +1226,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            routine.callAsyn(input);
+            routine.callAsync(input);
 
             fail();
 
@@ -1234,7 +1237,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            routine.callParall(input);
+            routine.callParallel(input);
 
             fail();
 
@@ -1270,7 +1273,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            routine.runAsyn(input).readAll();
+            routine.runAsync(input).readAll();
 
             fail();
 
@@ -1281,7 +1284,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : routine.runAsyn(input)) {
+            for (final String s : routine.runAsync(input)) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -1295,7 +1298,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            routine.runParall(input).readAll();
+            routine.runParallel(input).readAll();
 
             fail();
 
@@ -1306,7 +1309,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : routine.runParall(input)) {
+            for (final String s : routine.runParallel(input)) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -1345,7 +1348,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            routine.invokeAsyn().pass(input).results().readAll();
+            routine.invokeAsync().pass(input).results().readAll();
 
             fail();
 
@@ -1356,7 +1359,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : routine.invokeAsyn().pass(input).results()) {
+            for (final String s : routine.invokeAsync().pass(input).results()) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -1370,7 +1373,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            routine.invokeParall().pass(input).results().readAll();
+            routine.invokeParallel().pass(input).results().readAll();
 
             fail();
 
@@ -1381,7 +1384,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : routine.invokeParall().pass(input).results()) {
+            for (final String s : routine.invokeParallel().pass(input).results()) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -1399,7 +1402,7 @@ public class RoutineTest extends TestCase {
         public int getInt(int i);
     }
 
-    private interface TestInterfaceAsyn {
+    private interface TestInterfaceAsync {
 
         @AsyncParameters({int.class})
         public int getInt(OutputChannel<Integer> i);
@@ -1411,7 +1414,7 @@ public class RoutineTest extends TestCase {
         public int take(int i);
     }
 
-    private static class ConstructorException extends ExecutionAdapter<Object, Object> {
+    private static class ConstructorException extends BasicExecution<Object, Object> {
 
         public ConstructorException() {
 
@@ -1419,7 +1422,7 @@ public class RoutineTest extends TestCase {
         }
     }
 
-    private static class DelayExecution extends ExecutionAdapter<String, String> {
+    private static class DelayExecution extends BasicExecution<String, String> {
 
         private final TimeDuration mDelay;
 
@@ -1435,7 +1438,7 @@ public class RoutineTest extends TestCase {
         }
     }
 
-    private static class PassThroughExecution extends ExecutionAdapter<String, String> {
+    private static class PassThroughExecution extends BasicExecution<String, String> {
 
         @Override
         public void onInput(final String s, @NonNull final ResultChannel<String> results) {

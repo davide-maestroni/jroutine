@@ -293,7 +293,7 @@ public class RunnerTest extends TestCase {
         public void run() {
 
             // the JVM might not have nanosecond precision...
-            mIsPassed = (current().toMillis() - mStartTime.toMillis() + 1 >= mDelay.toMillis());
+            mIsPassed = (current().toMillis() - mStartTime.toMillis() >= mDelay.toMillis());
 
             super.run();
         }

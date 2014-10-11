@@ -278,7 +278,8 @@ public class AndroidRunnerTest extends AndroidTestCase {
         @Override
         public void run() {
 
-            // the JVM might not have nanosecond precision...
+            // it looks like that handlers and the kind are not so accurate after all...
+            // let's have a 1 millisecond error tolerance
             mIsPassed = (current().toMillis() - mStartTime.toMillis() + 1 >= mDelay.toMillis());
 
             mSemaphore.release();

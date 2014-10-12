@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.routine;
+package com.bmd.jrt.annotation;
 
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
@@ -27,12 +27,16 @@ import java.lang.annotation.Target;
  * This annotation is used to indicate methods which can be invoked in an asynchronous way.
  * <p/>
  * Note that the piece of code inside such methods will be automatically protected so to avoid
- * concurrency issue. Though, other parts of the code inside the same class will be not.
+ * concurrency issues. Though, other parts of the code inside the same class will be not.<br/>
+ * In order to avoid unexpected behavior it is advisable to avoid using the same class fields
+ * (unless immutable) in protected and non-protected code, or to use the framework to call
+ * synchronous methods too.<br/>
+ * In a dual way, it is possible to exclude single methods from this kind of protection by
+ * indicating them as belonging to parallel groups. Each group has a name associated,
+ * and every method inside a specific group is protected only from the other methods belonging to
+ * the same group.
  * <p/>
- * In order to avoid unexpected behavior it is advisable to avoid using the same class fields in
- * protected and non-protected code, or to use the framework to call synchronous methods too.
- * <p/>
- * This annotation allow to identify the method through a constant, thus avoiding problem when
+ * This annotation allows to identify the method through a constant, thus avoiding problem when
  * running obfuscation tools.<br/>
  * For example, the following code:
  * <pre>
@@ -54,7 +58,7 @@ import java.lang.annotation.Target;
  * <pre>
  *     <code>
  *
- *         JRoutine.on(new MyClass()).method(MyClass.GET_METHOD).callAsync();
+ *         JavaRoutine.on(new MyClass()).method(MyClass.GET_METHOD).callAsync();
  *     </code>
  * </pre>
  * <p/>
@@ -80,7 +84,7 @@ import java.lang.annotation.Target;
  *         -keepattributes RuntimeVisibleAnnotations
  *
  *         -keepclassmembers class ** {
- *              &#64;com.bmd.jrt.routine.AsynMethod *;
+ *              &#64;com.bmd.jrt.annotation.Async *;
  *         }
  *     </code>
  * </pre>
@@ -112,6 +116,13 @@ public @interface Async {
      * @return the name.
      */
     String name() default "";
+
+    /**
+     * The name of the parallel group associated to the method.
+     *
+     * @return the parallel group name.
+     */
+    String parallelGroup() default "";
 
     /**
      * The class of the runner to be used for asynchronous invocations.

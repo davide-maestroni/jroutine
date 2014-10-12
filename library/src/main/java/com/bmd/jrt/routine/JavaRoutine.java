@@ -49,8 +49,9 @@ import static com.bmd.jrt.common.ClassToken.tokenOf;
  * <p/>
  * Created by davide on 9/7/14.
  *
- * @see Async
- * @see AsyncParameters
+ * @see com.bmd.jrt.annotation.Async
+ * @see com.bmd.jrt.annotation.AsyncParameters
+ * @see com.bmd.jrt.annotation.AsyncResult
  */
 public class JavaRoutine {
 

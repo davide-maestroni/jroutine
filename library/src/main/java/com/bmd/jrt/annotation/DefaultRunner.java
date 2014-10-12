@@ -11,15 +11,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.routine;
+package com.bmd.jrt.annotation;
 
-import com.bmd.jrt.log.Log;
+import com.bmd.jrt.runner.Runner;
 
 /**
- * Log interface used to identify the default log instance in a {@link Async} annotation.
+ * Runner interface used to identify the default runner in a {@link Async} annotation.
  * <p/>
- * Created by davide on 10/11/14.
+ * Created by davide on 9/22/14.
  */
-interface DefaultLog extends Log {
+public interface DefaultRunner extends Runner {
 
 }

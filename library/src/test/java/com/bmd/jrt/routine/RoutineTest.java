@@ -13,6 +13,9 @@
  */
 package com.bmd.jrt.routine;
 
+import com.bmd.jrt.annotation.Async;
+import com.bmd.jrt.annotation.AsyncParameters;
+import com.bmd.jrt.annotation.AsyncResult;
 import com.bmd.jrt.channel.BasicOutputConsumer;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.OutputConsumer;
@@ -652,7 +655,7 @@ public class RoutineTest extends TestCase {
                 on(TestClass.class).classMethod("get", int.class).callParallel(17)).containsExactly(
                 17);
 
-        assertThat(on(new TestClass()).asAsync(TestInterface.class).getInt(2)).isEqualTo(2);
+        assertThat(on(new TestClass()).as(TestInterface.class).getInt(2)).isEqualTo(2);
 
         try {
 
@@ -674,13 +677,12 @@ public class RoutineTest extends TestCase {
 
         }
 
-        assertThat(on(new TestClass()).asAsync(TestInterfaceAsync.class).take(77)).isEqualTo(77);
-        assertThat(on(new TestClass()).asAsync(TestInterfaceAsync.class)
-                                      .getOne()
-                                      .readFirst()).isEqualTo(1);
+        assertThat(on(new TestClass()).as(TestInterfaceAsync.class).take(77)).isEqualTo(77);
+        assertThat(on(new TestClass()).as(TestInterfaceAsync.class).getOne().readFirst()).isEqualTo(
+                1);
 
         final TestInterfaceAsync testInterfaceAsync =
-                on(new TestClass()).asAsync(TestInterfaceAsync.class);
+                on(new TestClass()).as(TestInterfaceAsync.class);
         assertThat(testInterfaceAsync.getInt(testInterfaceAsync.getOne())).isEqualTo(1);
     }
 

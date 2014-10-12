@@ -13,6 +13,9 @@
  */
 package com.bmd.jrt.routine;
 
+import com.bmd.jrt.annotation.Async;
+import com.bmd.jrt.annotation.DefaultLog;
+import com.bmd.jrt.annotation.DefaultRunner;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.common.RoutineException;
@@ -70,9 +73,11 @@ public class ClassRoutineBuilder {
 
     private Boolean mIsSequential;
 
-    private Log mLog = null;
+    private Log mLog;
 
-    private LogLevel mLogLevel = null;
+    private LogLevel mLogLevel;
+
+    private String mParallelGroup;
 
     private Runner mRunner;
 
@@ -125,8 +130,8 @@ public class ClassRoutineBuilder {
     /**
      * Returns a routine used for calling the specified method.
      * <p/>
-     * The method is searched via reflection ignoring an optional name specified in a
-     * {@link Async} annotation. Though, the other annotation attributes will be honored.
+     * The method is searched via reflection ignoring an optional name specified in a {@link Async}
+     * annotation. Though, the other annotation attributes will be honored.
      *
      * @param name           the method name.
      * @param parameterTypes the method parameter types.
@@ -186,6 +191,7 @@ public class ClassRoutineBuilder {
             AccessController.doPrivileged(new SetAccessibleAction(method));
         }
 
+        String parallelGroup = mParallelGroup;
         Runner runner = mRunner;
         Boolean isSequential = mIsSequential;
         Log log = mLog;
@@ -221,6 +227,11 @@ public class ClassRoutineBuilder {
                 isSequential = annotation.sequential();
             }
 
+            if (parallelGroup == null) {
+
+                parallelGroup = annotation.parallelGroup();
+            }
+
             if (log == null) {
 
                 final Class<? extends Log> logClass = annotation.log();
@@ -248,7 +259,7 @@ public class ClassRoutineBuilder {
             }
         }
 
-        return getRoutine(method, runner, isSequential, false, log, logLevel);
+        return getRoutine(method, parallelGroup, runner, isSequential, false, log, logLevel);
     }
 
     /**
@@ -315,6 +326,20 @@ public class ClassRoutineBuilder {
         }
 
         return classMethod(method);
+    }
+
+    /**
+     * Tells the builder to create a routine which can run in parallel to other methods.
+     *
+     * @param name the parallel group name.
+     * @return this builder.
+     */
+    @NonNull
+    public ClassRoutineBuilder parallelGroup(@Nullable final String name) {
+
+        mParallelGroup = name;
+
+        return this;
     }
 
     /**
@@ -389,27 +414,27 @@ public class ClassRoutineBuilder {
     /**
      * Creates the routine.
      *
-     * @param method       the method to wrap.
-     * @param runner       the asynchronous runner instance.
-     * @param isSequential whether a sequential runner must be used for synchronous invocations.
-     * @param orderedInput whether the input data are forced to be delivered in insertion order.
-     * @param log          the log instance.
-     * @param level        the log level.
+     * @param method        the method to wrap.
+     * @param parallelGroup the parallel group name.
+     * @param runner        the asynchronous runner instance.
+     * @param isSequential  whether a sequential runner must be used for synchronous invocations.
+     * @param orderedInput  whether the input data are forced to be delivered in insertion order.
+     * @param log           the log instance.
+     * @param level         the log level.
      * @return the routine instance.
      */
     @NonNull
     protected Routine<Object, Object> getRoutine(@NonNull final Method method,
-            @Nullable final Runner runner, @Nullable final Boolean isSequential,
-            final boolean orderedInput, @Nullable final Log log, @Nullable final LogLevel level) {
+            @Nullable final String parallelGroup, @Nullable final Runner runner,
+            @Nullable final Boolean isSequential, final boolean orderedInput,
+            @Nullable final Log log, @Nullable final LogLevel level) {
 
-        final Object target = mTarget;
-        final Class<?> targetClass = mTargetClass;
         Routine<Object, Object> routine;
 
         synchronized (sMutexMap) {
 
-            final Log routineLog = (log != null) ? log : Logger.getDefaultLog();
-            final LogLevel routineLogLevel = (level != null) ? level : Logger.getDefaultLogLevel();
+            final Object target = mTarget;
+
             final WeakHashMap<Object, HashMap<RoutineInfo, Routine<Object, Object>>> routineCache =
                     sRoutineCache;
             HashMap<RoutineInfo, Routine<Object, Object>> routineMap = routineCache.get(target);
@@ -421,9 +446,13 @@ public class ClassRoutineBuilder {
             }
 
             final Catch catchClause = mCatchClause;
+            final Log routineLog = (log != null) ? log : Logger.getDefaultLog();
+            final LogLevel routineLogLevel = (level != null) ? level : Logger.getDefaultLogLevel();
+
             final RoutineInfo routineInfo =
-                    new RoutineInfo(method, runner, isSequential, orderedInput, catchClause,
-                                    routineLog, routineLogLevel);
+                    new RoutineInfo(method, (parallelGroup != null) ? parallelGroup : "", runner,
+                                    isSequential, orderedInput, catchClause, routineLog,
+                                    routineLogLevel);
             routine = routineMap.get(routineInfo);
 
             if (routine != null) {
@@ -440,6 +469,7 @@ public class ClassRoutineBuilder {
                 mutexMap.put(target, mutex);
             }
 
+            final Class<?> targetClass = mTargetClass;
             final RoutineBuilder<Object, Object> builder =
                     new RoutineBuilder<Object, Object>(METHOD_EXECUTION_TOKEN);
 
@@ -644,25 +674,30 @@ public class ClassRoutineBuilder {
 
         private final boolean mOrderedInput;
 
+        private final String mParallelGroup;
+
         private final Runner mRunner;
 
         /**
          * Constructor.
          *
-         * @param method       the method to wrap.
-         * @param runner       the runner instance.
-         * @param isSequential whether a sequential runner must be used for synchronous
-         * @param orderedInput whether the input data are forced to be delivered in insertion order.
-         * @param catchClause  the catch clause.
-         * @param log          the log instance.
-         * @param level        the log level.
+         * @param method        the method to wrap.
+         * @param parallelGroup the parallel group name.
+         * @param runner        the runner instance.
+         * @param isSequential  whether a sequential runner must be used for synchronous
+         * @param orderedInput  whether the input data are forced to be delivered in insertion
+         *                      order.
+         * @param catchClause   the catch clause.
+         * @param log           the log instance.
+         * @param level         the log level.
          */
-        private RoutineInfo(@NonNull final Method method, @Nullable final Runner runner,
-                @Nullable final Boolean isSequential, final boolean orderedInput,
-                @NonNull final Catch catchClause, @NonNull final Log log,
-                @NonNull final LogLevel level) {
+        private RoutineInfo(@NonNull final Method method, @NonNull final String parallelGroup,
+                @Nullable final Runner runner, @Nullable final Boolean isSequential,
+                final boolean orderedInput, @NonNull final Catch catchClause,
+                @NonNull final Log log, @NonNull final LogLevel level) {
 
             mMethod = method;
+            mParallelGroup = parallelGroup;
             mRunner = runner;
             mIsSequential = isSequential;
             mOrderedInput = orderedInput;
@@ -680,6 +715,7 @@ public class ClassRoutineBuilder {
             result = 31 * result + mLogLevel.hashCode();
             result = 31 * result + mMethod.hashCode();
             result = 31 * result + (mOrderedInput ? 1 : 0);
+            result = 31 * result + mParallelGroup.hashCode();
             result = 31 * result + (mRunner != null ? mRunner.hashCode() : 0);
             return result;
         }
@@ -702,8 +738,9 @@ public class ClassRoutineBuilder {
             return mOrderedInput == that.mOrderedInput && mCatchClause.equals(that.mCatchClause)
                     && !(mIsSequential != null ? !mIsSequential.equals(that.mIsSequential)
                     : that.mIsSequential != null) && mLog.equals(that.mLog)
-                    && mLogLevel == that.mLogLevel && mMethod.equals(that.mMethod) && !(
-                    mRunner != null ? !mRunner.equals(that.mRunner) : that.mRunner != null);
+                    && mLogLevel == that.mLogLevel && mMethod.equals(that.mMethod) && mParallelGroup
+                    .equals(that.mParallelGroup) && !(mRunner != null ? !mRunner.equals(
+                    that.mRunner) : that.mRunner != null);
         }
     }
 

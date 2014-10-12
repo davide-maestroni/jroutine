@@ -1,4 +1,4 @@
-package com.bmd.jrt.routine;
+package com.bmd.jrt.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
@@ -28,6 +28,19 @@ import java.lang.annotation.Target;
  *
  *         &#64;AsyncResult
  *         public OutputChannel&lt;Integer&gt; sum(int i1, int i2);
+ *     </code>
+ * </pre>
+ * <p/>
+ * Remember also that, in order for the annotation to properly work at run time, you will need to
+ * add the proper rules to your Proguard file if employing it for shrinking or obfuscation:
+ * <pre>
+ *     <code>
+ *
+ *         -keepattributes RuntimeVisibleAnnotations
+ *
+ *         -keepclassmembers class ** {
+ *              &#64;com.bmd.jrt.annotation.AsyncResult *;
+ *         }
  *     </code>
  * </pre>
  * <p/>

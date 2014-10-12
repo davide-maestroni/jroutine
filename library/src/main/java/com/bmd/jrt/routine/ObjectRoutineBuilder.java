@@ -13,6 +13,11 @@
  */
 package com.bmd.jrt.routine;
 
+import com.bmd.jrt.annotation.Async;
+import com.bmd.jrt.annotation.AsyncParameters;
+import com.bmd.jrt.annotation.AsyncResult;
+import com.bmd.jrt.annotation.DefaultLog;
+import com.bmd.jrt.annotation.DefaultRunner;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ParameterChannel;
 import com.bmd.jrt.log.Log;
@@ -26,6 +31,7 @@ import java.util.HashMap;
 import java.util.WeakHashMap;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 
 import static com.bmd.jrt.routine.ReflectionUtils.boxingClass;
 
@@ -83,7 +89,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * @throws IllegalArgumentException if the specified class does not represent an interface.
      */
     @NonNull
-    public <CLASS> CLASS asAsync(@NonNull final Class<CLASS> itf) {
+    public <CLASS> CLASS as(@NonNull final Class<CLASS> itf) {
 
         if (!itf.isInterface()) {
 
@@ -122,6 +128,15 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     public ObjectRoutineBuilder loggedWith(@NonNull final Log log) {
 
         super.loggedWith(log);
+
+        return this;
+    }
+
+    @NonNull
+    @Override
+    public ObjectRoutineBuilder parallelGroup(@Nullable final String name) {
+
+        super.parallelGroup(name);
 
         return this;
     }
@@ -178,6 +193,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
             final boolean isOverrideReturn;
 
             Method targetMethod;
+            String parallelGroup = null;
             Runner runner = null;
             Boolean isSequential = null;
             Log log = null;
@@ -208,6 +224,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                     if (annotation != null) {
 
                         name = annotation.name();
+                        parallelGroup = annotation.parallelGroup();
 
                         final Class<? extends Runner> runnerClass = annotation.runner();
 
@@ -294,8 +311,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
             }
 
             final Routine<Object, Object> routine =
-                    getRoutine(targetMethod, runner, isSequential, isOverrideParameters, log,
-                               level);
+                    getRoutine(targetMethod, parallelGroup, runner, isSequential,
+                               isOverrideParameters, log, level);
             final OutputChannel<Object> outputChannel;
 
             if (isOverrideParameters) {

@@ -55,7 +55,8 @@ public class ClassRoutineBuilder {
     private static final ClassToken<MethodExecutionBody> METHOD_EXECUTION_TOKEN =
             ClassToken.tokenOf(MethodExecutionBody.class);
 
-    private static final WeakHashMap<Object, Object> sMutexMap = new WeakHashMap<Object, Object>();
+    private static final WeakHashMap<Object, HashMap<String, Object>> sMutexCache =
+            new WeakHashMap<Object, HashMap<String, Object>>();
 
     private static final WeakHashMap<Object, HashMap<RoutineInfo, Routine<Object, Object>>>
             sRoutineCache =
@@ -201,6 +202,11 @@ public class ClassRoutineBuilder {
 
         if (annotation != null) {
 
+            if (parallelGroup == null) {
+
+                parallelGroup = annotation.parallelGroup();
+            }
+
             if (runner == null) {
 
                 final Class<? extends Runner> runnerClass = annotation.runner();
@@ -225,11 +231,6 @@ public class ClassRoutineBuilder {
             if (isSequential == null) {
 
                 isSequential = annotation.sequential();
-            }
-
-            if (parallelGroup == null) {
-
-                parallelGroup = annotation.parallelGroup();
             }
 
             if (log == null) {
@@ -412,6 +413,36 @@ public class ClassRoutineBuilder {
     }
 
     /**
+     * Returns the log instance set.
+     *
+     * @return the log instance.
+     */
+    protected Log getLog() {
+
+        return mLog;
+    }
+
+    /**
+     * Returns the log level set.
+     *
+     * @return the log level.
+     */
+    protected LogLevel getLogLevel() {
+
+        return mLogLevel;
+    }
+
+    /**
+     * Returns the parallel group name.
+     *
+     * @return the parallel group name.
+     */
+    protected String getParallelGroup() {
+
+        return mParallelGroup;
+    }
+
+    /**
      * Creates the routine.
      *
      * @param method        the method to wrap.
@@ -431,7 +462,7 @@ public class ClassRoutineBuilder {
 
         Routine<Object, Object> routine;
 
-        synchronized (sMutexMap) {
+        synchronized (sMutexCache) {
 
             final Object target = mTarget;
 
@@ -448,11 +479,11 @@ public class ClassRoutineBuilder {
             final Catch catchClause = mCatchClause;
             final Log routineLog = (log != null) ? log : Logger.getDefaultLog();
             final LogLevel routineLogLevel = (level != null) ? level : Logger.getDefaultLogLevel();
+            final String parallelGroupName = (parallelGroup != null) ? parallelGroup : "";
 
             final RoutineInfo routineInfo =
-                    new RoutineInfo(method, (parallelGroup != null) ? parallelGroup : "", runner,
-                                    isSequential, orderedInput, catchClause, routineLog,
-                                    routineLogLevel);
+                    new RoutineInfo(method, parallelGroupName, runner, isSequential, orderedInput,
+                                    catchClause, routineLog, routineLogLevel);
             routine = routineMap.get(routineInfo);
 
             if (routine != null) {
@@ -460,13 +491,21 @@ public class ClassRoutineBuilder {
                 return routine;
             }
 
-            final WeakHashMap<Object, Object> mutexMap = sMutexMap;
-            Object mutex = mutexMap.get(target);
+            final WeakHashMap<Object, HashMap<String, Object>> mutexCache = sMutexCache;
+            HashMap<String, Object> mutexMap = mutexCache.get(target);
+
+            if (mutexMap == null) {
+
+                mutexMap = new HashMap<String, Object>();
+                mutexCache.put(target, mutexMap);
+            }
+
+            Object mutex = mutexMap.get(parallelGroupName);
 
             if (mutex == null) {
 
                 mutex = new Object();
-                mutexMap.put(target, mutex);
+                mutexMap.put(parallelGroupName, mutex);
             }
 
             final Class<?> targetClass = mTargetClass;
@@ -503,6 +542,26 @@ public class ClassRoutineBuilder {
         }
 
         return routine;
+    }
+
+    /**
+     * Returns the asynchronous runner instance.
+     *
+     * @return the runner instance.
+     */
+    protected Runner getRunner() {
+
+        return mRunner;
+    }
+
+    /**
+     * Returns whether the sequential runner is set to be used as the synchronous one.
+     *
+     * @return whether the sequential runner is set.
+     */
+    protected Boolean getSequential() {
+
+        return mIsSequential;
     }
 
     private void fillMap(@NonNull final HashMap<String, Method> map,

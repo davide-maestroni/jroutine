@@ -193,11 +193,11 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
             final boolean isOverrideReturn;
 
             Method targetMethod;
-            String parallelGroup = null;
-            Runner runner = null;
-            Boolean isSequential = null;
-            Log log = null;
-            LogLevel level = null;
+            String parallelGroup = getParallelGroup();
+            Runner runner = getRunner();
+            Boolean isSequential = getSequential();
+            Log log = getLog();
+            LogLevel level = getLogLevel();
 
             synchronized (sMethodCache) {
 
@@ -210,6 +210,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                     methodCache.put(target, methodMap);
                 }
 
+                final Async annotation = method.getAnnotation(Async.class);
                 final AsyncParameters paramAnnotation = method.getAnnotation(AsyncParameters.class);
 
                 targetMethod = methodMap.get(method);
@@ -219,30 +220,9 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                     String name = null;
                     Class<?>[] parameterTypes = null;
 
-                    final Async annotation = method.getAnnotation(Async.class);
-
                     if (annotation != null) {
 
                         name = annotation.name();
-                        parallelGroup = annotation.parallelGroup();
-
-                        final Class<? extends Runner> runnerClass = annotation.runner();
-
-                        if (runnerClass != DefaultRunner.class) {
-
-                            runner = runnerClass.newInstance();
-                        }
-
-                        isSequential = annotation.sequential();
-
-                        final Class<? extends Log> logClass = annotation.log();
-
-                        if (logClass != DefaultLog.class) {
-
-                            log = logClass.newInstance();
-                        }
-
-                        level = annotation.logLevel();
                     }
 
                     if ((name == null) || (name.length() == 0)) {
@@ -292,6 +272,44 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                     if (targetMethod == null) {
 
                         targetMethod = targetClass.getDeclaredMethod(name, parameterTypes);
+                    }
+                }
+
+                if (annotation != null) {
+
+                    if (parallelGroup == null) {
+
+                        parallelGroup = annotation.parallelGroup();
+                    }
+
+                    if (runner == null) {
+
+                        final Class<? extends Runner> runnerClass = annotation.runner();
+
+                        if (runnerClass != DefaultRunner.class) {
+
+                            runner = runnerClass.newInstance();
+                        }
+                    }
+
+                    if (isSequential == null) {
+
+                        isSequential = annotation.sequential();
+                    }
+
+                    if (log == null) {
+
+                        final Class<? extends Log> logClass = annotation.log();
+
+                        if (logClass != DefaultLog.class) {
+
+                            log = logClass.newInstance();
+                        }
+                    }
+
+                    if (level == null) {
+
+                        level = annotation.logLevel();
                     }
                 }
 

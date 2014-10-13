@@ -59,7 +59,18 @@ class AsyncTaskRunner implements Runner {
     public void run(@NonNull final Invocation invocation, final long delay,
             @NonNull final TimeUnit timeUnit) {
 
-        final InvocationTask task = new InvocationTask(mExecutor, invocation);
+        run(new InvocationTask(mExecutor, invocation), delay, timeUnit);
+    }
+
+    @Override
+    public void runAbort(@NonNull final Invocation invocation, final long delay,
+            @NonNull final TimeUnit timeUnit) {
+
+        run(new AbortTask(mExecutor, invocation), delay, timeUnit);
+    }
+
+    private void run(@NonNull final RunnableTask task, final long delay,
+            @NonNull final TimeUnit timeUnit) {
 
         if (delay > 0) {
 
@@ -69,12 +80,6 @@ class AsyncTaskRunner implements Runner {
 
             mHandler.post(task);
         }
-    }
-
-    @Override
-    public void runAbort(@NonNull final Invocation invocation) {
-
-        mHandler.post(new AbortTask(mExecutor, invocation));
     }
 
     /**

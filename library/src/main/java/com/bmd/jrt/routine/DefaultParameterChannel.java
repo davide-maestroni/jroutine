@@ -87,7 +87,8 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
         mResultChanel = new DefaultResultChannel<OUTPUT>(new AbortHandler() {
 
             @Override
-            public void onAbort(final Throwable throwable) {
+            public void onAbort(final Throwable throwable, final long delay,
+                    @NonNull final TimeUnit timeUnit) {
 
                 synchronized (mMutex) {
 
@@ -106,7 +107,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
                     mState = ChannelState.EXCEPTION;
                 }
 
-                mRunner.runAbort(mInvocation);
+                mRunner.runAbort(mInvocation, delay, timeUnit);
             }
         }, runner, orderedOutput, logger);
         mInvocation = new DefaultInvocation<INPUT, OUTPUT>(provider, new DefaultInputIterator(),
@@ -122,6 +123,10 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
     @Override
     public boolean abort(@Nullable final Throwable throwable) {
 
+        // TODO: delay abort...
+
+        final TimeDuration delay;
+
         synchronized (mMutex) {
 
             if (!isOpen()) {
@@ -131,6 +136,8 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
                 return false;
             }
 
+            delay = mInputDelay;
+
             mLogger.dbg(throwable, "aborting channel");
 
             mInputQueue.clear();
@@ -139,7 +146,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
             mState = ChannelState.EXCEPTION;
         }
 
-        mRunner.runAbort(mInvocation);
+        mRunner.runAbort(mInvocation, delay.time, delay.unit);
 
         return false;
     }
@@ -559,7 +566,8 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
                 mState = ChannelState.EXCEPTION;
             }
 
-            mRunner.runAbort(mInvocation);
+            final TimeDuration delay = mDelay;
+            mRunner.runAbort(mInvocation, delay.time, delay.unit);
         }
 
         @Override

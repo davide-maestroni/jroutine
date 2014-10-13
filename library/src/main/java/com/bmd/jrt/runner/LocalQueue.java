@@ -20,7 +20,6 @@ import java.util.concurrent.TimeUnit;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 
-import static com.bmd.jrt.time.TimeDuration.ZERO;
 import static com.bmd.jrt.time.TimeDuration.fromUnit;
 import static com.bmd.jrt.time.TimeDuration.nanos;
 
@@ -87,10 +86,13 @@ class LocalQueue {
      * Runs the specified abort invocation.
      *
      * @param invocation the invocation.
+     * @param delay      the execution delay.
+     * @param timeUnit   the delay time unit.
      */
-    public static void runAbort(@NonNull final Invocation invocation) {
+    public static void runAbort(@NonNull final Invocation invocation, final long delay,
+            @NonNull final TimeUnit timeUnit) {
 
-        sQueue.get().addAbort(invocation);
+        sQueue.get().addAbort(invocation, delay, timeUnit);
     }
 
     private static <T> void resizeArray(@NonNull final T[] src, @NonNull final T[] dst,
@@ -140,9 +142,10 @@ class LocalQueue {
         mLast = newLast;
     }
 
-    private void addAbort(@NonNull final Invocation invocation) {
+    private void addAbort(@NonNull final Invocation invocation, final long delay,
+            @NonNull final TimeUnit timeUnit) {
 
-        add(invocation, ZERO, InvocationType.ABORT);
+        add(invocation, fromUnit(delay, timeUnit), InvocationType.ABORT);
 
         if (!mIsRunning) {
 

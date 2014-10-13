@@ -117,6 +117,17 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         return abort(null);
     }
 
+    /**
+     * Aborts immediately the execution.
+     *
+     * @param throwable the reason of the abortion.
+     * @see com.bmd.jrt.channel.Channel#abort(Throwable)
+     */
+    public void abortImmediately(@Nullable final Throwable throwable) {
+
+        abort(throwable, true);
+    }
+
     @Override
     @NonNull
     @SuppressWarnings("ConstantConditions")
@@ -360,6 +371,36 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         return new DefaultOutputChannel();
     }
 
+    private boolean abort(@Nullable final Throwable throwable, final boolean isImmediate) {
+
+        // TODO: delay abort...
+
+        final TimeDuration delay;
+
+        synchronized (mMutex) {
+
+            if (!isResultOpen()) {
+
+                mLogger.dbg(throwable, "avoiding aborting since channel is closed");
+
+                return false;
+            }
+
+            delay = (isImmediate) ? ZERO : mResultDelay;
+
+            mLogger.dbg(throwable, "aborting channel");
+
+            mOutputQueue.clear();
+
+            mAbortException = throwable;
+            mState = ChannelState.EXCEPTION;
+        }
+
+        mHandler.onAbort(throwable, delay.time, delay.unit);
+
+        return true;
+    }
+
     @SuppressWarnings("unchecked")
     private void flushOutput() {
 
@@ -470,7 +511,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             } else if (isAbort) {
 
-                mHandler.onAbort(t);
+                mHandler.onAbort(t, 0, TimeUnit.MILLISECONDS);
             }
         }
     }
@@ -623,8 +664,10 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
          * Called on an abort.
          *
          * @param throwable the reason of the abortion.
+         * @param delay     the abortion delay.
+         * @param timeUnit  the delay time unit.
          */
-        public void onAbort(@Nullable Throwable throwable);
+        public void onAbort(@Nullable Throwable throwable, long delay, @NonNull TimeUnit timeUnit);
     }
 
     /**
@@ -1015,7 +1058,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                 mState = ChannelState.EXCEPTION;
             }
 
-            mHandler.onAbort(throwable);
+            mHandler.onAbort(throwable, 0, TimeUnit.MILLISECONDS);
 
             return true;
         }
@@ -1063,18 +1106,16 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                     return;
                 }
 
-                if (mState != ChannelState.EXCEPTION) {
+                mSubLogger.dbg(throwable, "aborting output");
 
-                    mSubLogger.dbg(throwable, "aborting output");
+                mOutputQueue.clear();
 
-                    mOutputQueue.clear();
-
-                    mAbortException = throwable;
-                    mState = ChannelState.EXCEPTION;
-                }
+                mAbortException = throwable;
+                mState = ChannelState.EXCEPTION;
             }
 
-            mHandler.onAbort(throwable);
+            final TimeDuration delay = mDelay;
+            mHandler.onAbort(throwable, delay.time, delay.unit);
         }
 
         @Override
@@ -1273,26 +1314,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     @Override
     public boolean abort(@Nullable final Throwable throwable) {
 
-        synchronized (mMutex) {
-
-            if (!isResultOpen()) {
-
-                mLogger.dbg(throwable, "avoiding aborting since channel is closed");
-
-                return false;
-            }
-
-            mLogger.dbg(throwable, "aborting channel");
-
-            mOutputQueue.clear();
-
-            mAbortException = throwable;
-            mState = ChannelState.EXCEPTION;
-        }
-
-        mHandler.onAbort(throwable);
-
-        return false;
+        return abort(throwable, false);
     }
 
     @Override

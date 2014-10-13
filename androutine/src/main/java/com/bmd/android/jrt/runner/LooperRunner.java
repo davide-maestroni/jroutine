@@ -61,29 +61,34 @@ class LooperRunner implements Runner {
 
         } else {
 
-            final InvocationRunnable runnable = new InvocationRunnable(invocation);
-
-            if (delay > 0) {
-
-                mHandler.postDelayed(runnable, timeUnit.toMillis(delay));
-
-            } else {
-
-                mHandler.post(runnable);
-            }
+            run(new InvocationRunnable(invocation), delay, timeUnit);
         }
     }
 
     @Override
-    public void runAbort(@NonNull final Invocation invocation) {
+    public void runAbort(@NonNull final Invocation invocation, final long delay,
+            @NonNull final TimeUnit timeUnit) {
 
         if (Thread.currentThread().equals(mThread)) {
 
-            mQueuedRunner.runAbort(invocation);
+            mQueuedRunner.runAbort(invocation, delay, timeUnit);
 
         } else {
 
-            mHandler.post(new AbortRunnable(invocation));
+            run(new AbortRunnable(invocation), delay, timeUnit);
+        }
+    }
+
+    private void run(@NonNull final Runnable runnable, final long delay,
+            @NonNull final TimeUnit timeUnit) {
+
+        if (delay > 0) {
+
+            mHandler.postDelayed(runnable, timeUnit.toMillis(delay));
+
+        } else {
+
+            mHandler.post(runnable);
         }
     }
 

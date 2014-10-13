@@ -52,8 +52,18 @@ class SequentialRunner implements Runner {
     }
 
     @Override
-    public void runAbort(@NonNull final Invocation invocation) {
+    public void runAbort(@NonNull final Invocation invocation, final long delay,
+            @NonNull final TimeUnit timeUnit) {
 
-        invocation.abort();
+        try {
+
+            fromUnit(delay, timeUnit).sleepAtLeast();
+
+            invocation.abort();
+
+        } catch (final InterruptedException e) {
+
+            RoutineInterruptedException.interrupt(e);
+        }
     }
 }

@@ -166,7 +166,7 @@ class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
 
             } catch (final Throwable t) {
 
-                resultChannel.abort(t);
+                resultChannel.abortImmediately(t);
             }
         }
     }

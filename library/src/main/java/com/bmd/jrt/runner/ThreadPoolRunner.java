@@ -42,7 +42,18 @@ class ThreadPoolRunner implements Runner {
     public void run(@NonNull final Invocation invocation, final long delay,
             @NonNull final TimeUnit timeUnit) {
 
-        final InvocationRunnable runnable = new InvocationRunnable(invocation);
+        run(new InvocationRunnable(invocation), delay, timeUnit);
+    }
+
+    @Override
+    public void runAbort(@NonNull final Invocation invocation, final long delay,
+            @NonNull final TimeUnit timeUnit) {
+
+        run(new AbortRunnable(invocation), delay, timeUnit);
+    }
+
+    private void run(@NonNull final Runnable runnable, final long delay,
+            @NonNull final TimeUnit timeUnit) {
 
         if (delay > 0) {
 
@@ -52,12 +63,6 @@ class ThreadPoolRunner implements Runner {
 
             mService.execute(runnable);
         }
-    }
-
-    @Override
-    public void runAbort(@NonNull final Invocation invocation) {
-
-        mService.execute(new AbortRunnable(invocation));
     }
 
     /**

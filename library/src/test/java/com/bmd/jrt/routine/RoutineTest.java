@@ -23,6 +23,7 @@ import com.bmd.jrt.channel.ParameterChannel;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.common.RoutineException;
+import com.bmd.jrt.common.RoutineInterruptedException;
 import com.bmd.jrt.execution.BasicExecution;
 import com.bmd.jrt.execution.Execution;
 import com.bmd.jrt.execution.ExecutionBody;
@@ -125,6 +126,15 @@ public class RoutineTest extends TestCase {
             public void onInput(@Nullable final String s,
                     @NonNull final ResultChannel<String> results) {
 
+                try {
+
+                    TimeDuration.millis(10).sleepAtLeast();
+
+                } catch (final InterruptedException e) {
+
+                    RoutineInterruptedException.interrupt(e);
+                }
+
                 assertThat(results.isOpen()).isTrue();
                 assertThat(results.abort(new IllegalArgumentException(s))).isTrue();
                 assertThat(results.abort()).isFalse();
@@ -152,6 +162,15 @@ public class RoutineTest extends TestCase {
             @Override
             public void onInput(@Nullable final String s,
                     @NonNull final ResultChannel<String> results) {
+
+                try {
+
+                    TimeDuration.millis(10).sleepAtLeast();
+
+                } catch (final InterruptedException e) {
+
+                    RoutineInterruptedException.interrupt(e);
+                }
 
                 assertThat(results.abort()).isTrue();
                 assertThat(results.abort(new IllegalArgumentException(s))).isFalse();
@@ -1500,7 +1519,8 @@ public class RoutineTest extends TestCase {
     private static class TestAbortHandler implements AbortHandler {
 
         @Override
-        public void onAbort(@Nullable final Throwable throwable) {
+        public void onAbort(@Nullable final Throwable throwable, final long delay,
+                @NonNull final TimeUnit timeUnit) {
 
         }
     }

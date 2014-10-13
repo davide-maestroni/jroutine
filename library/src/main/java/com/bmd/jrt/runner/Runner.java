@@ -47,6 +47,8 @@ public interface Runner {
      * method inside the runner thread).
      *
      * @param invocation the invocation.
+     * @param delay      the execution delay.
+     * @param timeUnit   the delay time unit.
      */
-    public void runAbort(@NonNull Invocation invocation);
+    public void runAbort(@NonNull Invocation invocation, long delay, @NonNull TimeUnit timeUnit);
 }

@@ -326,6 +326,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             mOutputQueue.add(RoutineExceptionWrapper.wrap(throwable));
 
+            mAbortException = throwable;
             mState = ChannelState.ABORT;
             mMutex.notifyAll();
         }

@@ -80,14 +80,7 @@ class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
         mInputIterator = inputs;
         mResultChannel = results;
         mLogger = logger.subContextLogger(this);
-        mAbortInvocation = new Invocation() {
-
-            @Override
-            public void run() {
-
-                abortExecution();
-            }
-        };
+        mAbortInvocation = new AbortInvocation();
     }
 
     /**
@@ -100,49 +93,45 @@ class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
         return mAbortInvocation;
     }
 
-    private void abortExecution() {
+    @Override
+    public void run() {
 
         synchronized (mMutex) {
 
             final InputIterator<INPUT> inputIterator = mInputIterator;
-            final ExecutionProvider<INPUT, OUTPUT> provider = mExecutionProvider;
             final DefaultResultChannel<OUTPUT> resultChannel = mResultChannel;
-            Execution<INPUT, OUTPUT> execution = null;
-
-            if (!inputIterator.isAborting()) {
-
-                mLogger.wrn("avoiding aborting since input is already aborted");
-
-                return;
-            }
-
-            final Throwable exception = inputIterator.getAbortException();
-
-            mLogger.dbg(exception, "aborting invocation");
 
             try {
 
-                execution = initExecution();
+                if (!inputIterator.onConsumeInput()) {
 
-                execution.onAbort(exception);
-                execution.onReturn();
+                    mLogger.wrn("avoiding running invocation");
 
-                provider.recycle(execution);
+                    return;
+                }
 
-                resultChannel.close(exception);
+                mLogger.dbg("running invocation");
+
+                final Execution<INPUT, OUTPUT> execution = initExecution();
+
+                while (inputIterator.hasNext()) {
+
+                    execution.onInput(inputIterator.next(), resultChannel);
+                }
+
+                if (inputIterator.isComplete()) {
+
+                    execution.onResult(resultChannel);
+                    execution.onReturn();
+
+                    mExecutionProvider.recycle(execution);
+
+                    resultChannel.close();
+                }
 
             } catch (final Throwable t) {
 
-                if (execution != null) {
-
-                    provider.discard(execution);
-                }
-
-                resultChannel.close(t);
-
-            } finally {
-
-                inputIterator.onAbortComplete();
+                resultChannel.abortImmediately(t);
             }
         }
     }
@@ -210,45 +199,56 @@ class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
         public boolean onConsumeInput();
     }
 
-    @Override
-    public void run() {
+    /**
+     * Abort invocation implementation.
+     */
+    private class AbortInvocation implements Invocation {
 
-        synchronized (mMutex) {
+        @Override
+        public void run() {
 
-            final InputIterator<INPUT> inputIterator = mInputIterator;
-            final DefaultResultChannel<OUTPUT> resultChannel = mResultChannel;
+            synchronized (mMutex) {
 
-            try {
+                final InputIterator<INPUT> inputIterator = mInputIterator;
+                final ExecutionProvider<INPUT, OUTPUT> provider = mExecutionProvider;
+                final DefaultResultChannel<OUTPUT> resultChannel = mResultChannel;
+                Execution<INPUT, OUTPUT> execution = null;
 
-                if (!inputIterator.onConsumeInput()) {
+                if (!inputIterator.isAborting()) {
 
-                    mLogger.wrn("avoiding running invocation");
+                    mLogger.wrn("avoiding aborting since input is already aborted");
 
                     return;
                 }
 
-                mLogger.dbg("running invocation");
+                final Throwable exception = inputIterator.getAbortException();
 
-                final Execution<INPUT, OUTPUT> execution = initExecution();
+                mLogger.dbg(exception, "aborting invocation");
 
-                while (inputIterator.hasNext()) {
+                try {
 
-                    execution.onInput(inputIterator.next(), resultChannel);
-                }
+                    execution = initExecution();
 
-                if (inputIterator.isComplete()) {
-
-                    execution.onResult(resultChannel);
+                    execution.onAbort(exception);
                     execution.onReturn();
 
-                    mExecutionProvider.recycle(execution);
+                    provider.recycle(execution);
 
-                    resultChannel.close();
+                    resultChannel.close(exception);
+
+                } catch (final Throwable t) {
+
+                    if (execution != null) {
+
+                        provider.discard(execution);
+                    }
+
+                    resultChannel.close(t);
+
+                } finally {
+
+                    inputIterator.onAbortComplete();
                 }
-
-            } catch (final Throwable t) {
-
-                resultChannel.abortImmediately(t);
             }
         }
     }

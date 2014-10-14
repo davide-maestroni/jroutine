@@ -13,15 +13,10 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.channel.ParameterChannel;
-import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.ClassToken;
-import com.bmd.jrt.execution.BasicExecution;
 import com.bmd.jrt.execution.Execution;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
-
-import static com.bmd.jrt.common.ClassToken.tokenOf;
 
 /**
  * This utility class represents the entry point to the framework functionalities by acting as a
@@ -60,25 +55,6 @@ public class JavaRoutine {
      */
     protected JavaRoutine() {
 
-    }
-
-    public static void main(final String[] args) {
-
-        final Routine<Integer, Integer> sumRoutine = on(tokenOf(SumExecution.class)).buildRoutine();
-
-        final Routine<Integer, Integer> squareRoutine =
-                on(tokenOf(SquareExecution.class)).buildRoutine();
-
-        final ParameterChannel<Integer, Integer> squareChannel = squareRoutine.invokeParallel();
-
-        for (final String arg : args) {
-
-            squareChannel.pass(Integer.parseInt(arg));
-        }
-
-        System.out.println(sumRoutine.callAsync(squareChannel.results()));
-
-        System.exit(0);
     }
 
     /**
@@ -125,39 +101,5 @@ public class JavaRoutine {
     public static ClassRoutineBuilder on(@NonNull final Class<?> target) {
 
         return new ClassRoutineBuilder(target);
-    }
-
-    private static class SquareExecution extends BasicExecution<Integer, Integer> {
-
-        @Override
-        public void onInput(final Integer integer, @NonNull final ResultChannel<Integer> results) {
-
-            final int input = integer;
-
-            results.pass(input * input);
-        }
-    }
-
-    private static class SumExecution extends BasicExecution<Integer, Integer> {
-
-        private int mSum;
-
-        @Override
-        public void onInit() {
-
-            mSum = 0;
-        }
-
-        @Override
-        public void onInput(final Integer integer, @NonNull final ResultChannel<Integer> results) {
-
-            mSum += integer;
-        }
-
-        @Override
-        public void onResult(@NonNull final ResultChannel<Integer> results) {
-
-            results.pass(mSum);
-        }
     }
 }

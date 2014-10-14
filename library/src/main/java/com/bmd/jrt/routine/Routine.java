@@ -75,6 +75,8 @@ import edu.umd.cs.findbugs.annotations.Nullable;
  * It is worth noting how the framework has been designed only through interfaces, so that,
  * as far as the implementation respect the specific contracts, it is possible to seamlessly
  * combine different routine implementations. Even the ones coming from third party libraries.
+ * <p/>
+ * Some usage examples:
  * TODO: examples
  * <p/>
  * Created by davide on 9/7/14.

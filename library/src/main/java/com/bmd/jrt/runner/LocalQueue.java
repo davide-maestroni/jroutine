@@ -56,8 +56,6 @@ class LocalQueue {
 
     private int mLast;
 
-    private InvocationType[] mTypes;
-
     /**
      * Default constructor.
      */
@@ -66,7 +64,6 @@ class LocalQueue {
         mInvocationTimeNs = new long[INITIAL_CAPACITY];
         mInvocations = new Invocation[INITIAL_CAPACITY];
         mDelays = new TimeDuration[INITIAL_CAPACITY];
-        mTypes = new InvocationType[INITIAL_CAPACITY];
     }
 
     /**
@@ -79,20 +76,7 @@ class LocalQueue {
     public static void run(@NonNull final Invocation invocation, final long delay,
             @NonNull final TimeUnit timeUnit) {
 
-        sQueue.get().addRun(invocation, delay, timeUnit);
-    }
-
-    /**
-     * Runs the specified abort invocation.
-     *
-     * @param invocation the invocation.
-     * @param delay      the execution delay.
-     * @param timeUnit   the delay time unit.
-     */
-    public static void runAbort(@NonNull final Invocation invocation, final long delay,
-            @NonNull final TimeUnit timeUnit) {
-
-        sQueue.get().addAbort(invocation, delay, timeUnit);
+        sQueue.get().addInvocation(invocation, delay, timeUnit);
     }
 
     private static <T> void resizeArray(@NonNull final T[] src, @NonNull final T[] dst,
@@ -113,15 +97,13 @@ class LocalQueue {
         System.arraycopy(src, first, dst, dst.length - remainder, remainder);
     }
 
-    private void add(@NonNull final Invocation invocation, @NonNull final TimeDuration delay,
-            @NonNull final InvocationType type) {
+    private void add(@NonNull final Invocation invocation, @NonNull final TimeDuration delay) {
 
         final int i = mLast;
 
         mInvocationTimeNs[i] = System.nanoTime();
         mInvocations[i] = invocation;
         mDelays[i] = delay;
-        mTypes[i] = type;
 
         final int newLast;
 
@@ -142,21 +124,10 @@ class LocalQueue {
         mLast = newLast;
     }
 
-    private void addAbort(@NonNull final Invocation invocation, final long delay,
+    private void addInvocation(@NonNull final Invocation invocation, final long delay,
             @NonNull final TimeUnit timeUnit) {
 
-        add(invocation, fromUnit(delay, timeUnit), InvocationType.ABORT);
-
-        if (!mIsRunning) {
-
-            run();
-        }
-    }
-
-    private void addRun(@NonNull final Invocation invocation, final long delay,
-            @NonNull final TimeUnit timeUnit) {
-
-        add(invocation, fromUnit(delay, timeUnit), InvocationType.RUN);
+        add(invocation, fromUnit(delay, timeUnit));
 
         if (!mIsRunning) {
 
@@ -197,13 +168,9 @@ class LocalQueue {
         final TimeDuration[] newDelays = new TimeDuration[newSize];
         resizeArray(mDelays, newDelays, first);
 
-        final InvocationType[] newTypes = new InvocationType[newSize];
-        resizeArray(mTypes, newTypes, first);
-
         mInvocationTimeNs = newInvocationTimeNs;
         mInvocations = newInvocations;
         mDelays = newDelays;
-        mTypes = newTypes;
 
         final int shift = newSize - size;
 
@@ -224,12 +191,10 @@ class LocalQueue {
                 final long[] invocationTimeNs = mInvocationTimeNs;
                 final Invocation[] invocations = mInvocations;
                 final TimeDuration[] delays = mDelays;
-                final InvocationType[] types = mTypes;
 
                 long timeNs = invocationTimeNs[i];
                 Invocation invocation = invocations[i];
                 TimeDuration delay = delays[i];
-                InvocationType type = types[i];
 
                 final long currentTimeNs = System.nanoTime();
                 long delayNs = timeNs - currentTimeNs + delay.toNanos();
@@ -276,12 +241,10 @@ class LocalQueue {
                         timeNs = invocationTimeNs[s];
                         invocation = invocations[s];
                         delay = delays[s];
-                        type = types[s];
 
                         invocationTimeNs[s] = invocationTimeNs[i];
                         invocations[s] = invocations[i];
                         delays[s] = delays[i];
-                        types[s] = types[i];
                     }
 
                     delayNs = timeNs - System.nanoTime() + delay.toNanos();
@@ -302,14 +265,7 @@ class LocalQueue {
                 try {
 
                     // This call could be re-entrant
-                    if (type == InvocationType.RUN) {
-
-                        invocation.run();
-
-                    } else {
-
-                        invocation.abort();
-                    }
+                    invocation.run();
 
                 } catch (final RoutineInterruptedException e) {
 
@@ -341,14 +297,5 @@ class LocalQueue {
 
             mIsRunning = false;
         }
-    }
-
-    /**
-     * Enumeration identifying the invocation type.
-     */
-    private enum InvocationType {
-
-        RUN,
-        ABORT
     }
 }

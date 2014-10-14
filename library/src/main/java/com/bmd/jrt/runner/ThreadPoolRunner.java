@@ -42,74 +42,13 @@ class ThreadPoolRunner implements Runner {
     public void run(@NonNull final Invocation invocation, final long delay,
             @NonNull final TimeUnit timeUnit) {
 
-        run(new InvocationRunnable(invocation), delay, timeUnit);
-    }
-
-    @Override
-    public void runAbort(@NonNull final Invocation invocation, final long delay,
-            @NonNull final TimeUnit timeUnit) {
-
-        run(new AbortRunnable(invocation), delay, timeUnit);
-    }
-
-    private void run(@NonNull final Runnable runnable, final long delay,
-            @NonNull final TimeUnit timeUnit) {
-
         if (delay > 0) {
 
-            mService.schedule(runnable, delay, timeUnit);
+            mService.schedule(invocation, delay, timeUnit);
 
         } else {
 
-            mService.execute(runnable);
-        }
-    }
-
-    /**
-     * Runnable used to abort an invocation.
-     */
-    private static class AbortRunnable implements Runnable {
-
-        private final Invocation mInvocation;
-
-        /**
-         * Constructor.
-         *
-         * @param invocation the invocation instance.
-         */
-        private AbortRunnable(@NonNull final Invocation invocation) {
-
-            mInvocation = invocation;
-        }
-
-        @Override
-        public void run() {
-
-            mInvocation.abort();
-        }
-    }
-
-    /**
-     * Runnable used to run an invocation.
-     */
-    private static class InvocationRunnable implements Runnable {
-
-        private final Invocation mInvocation;
-
-        /**
-         * Constructor.
-         *
-         * @param invocation the invocation instance.
-         */
-        private InvocationRunnable(@NonNull final Invocation invocation) {
-
-            mInvocation = invocation;
-        }
-
-        @Override
-        public void run() {
-
-            mInvocation.run();
+            mService.execute(invocation);
         }
     }
 }

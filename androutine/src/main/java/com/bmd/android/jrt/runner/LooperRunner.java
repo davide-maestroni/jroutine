@@ -61,82 +61,14 @@ class LooperRunner implements Runner {
 
         } else {
 
-            run(new InvocationRunnable(invocation), delay, timeUnit);
-        }
-    }
+            if (delay > 0) {
 
-    @Override
-    public void runAbort(@NonNull final Invocation invocation, final long delay,
-            @NonNull final TimeUnit timeUnit) {
+                mHandler.postDelayed(invocation, timeUnit.toMillis(delay));
 
-        if (Thread.currentThread().equals(mThread)) {
+            } else {
 
-            mQueuedRunner.runAbort(invocation, delay, timeUnit);
-
-        } else {
-
-            run(new AbortRunnable(invocation), delay, timeUnit);
-        }
-    }
-
-    private void run(@NonNull final Runnable runnable, final long delay,
-            @NonNull final TimeUnit timeUnit) {
-
-        if (delay > 0) {
-
-            mHandler.postDelayed(runnable, timeUnit.toMillis(delay));
-
-        } else {
-
-            mHandler.post(runnable);
-        }
-    }
-
-    /**
-     * Runnable used to abort an invocation.
-     */
-    private static class AbortRunnable implements Runnable {
-
-        private final Invocation mInvocation;
-
-        /**
-         * Constructor.
-         *
-         * @param invocation the invocation instance.
-         */
-        private AbortRunnable(@NonNull final Invocation invocation) {
-
-            mInvocation = invocation;
-        }
-
-        @Override
-        public void run() {
-
-            mInvocation.abort();
-        }
-    }
-
-    /**
-     * Runnable used to run an invocation.
-     */
-    private static class InvocationRunnable implements Runnable {
-
-        private final Invocation mInvocation;
-
-        /**
-         * Constructor.
-         *
-         * @param invocation the invocation instance.
-         */
-        private InvocationRunnable(@NonNull final Invocation invocation) {
-
-            mInvocation = invocation;
-        }
-
-        @Override
-        public void run() {
-
-            mInvocation.run();
+                mHandler.post(invocation);
+            }
         }
     }
 }

@@ -59,18 +59,7 @@ class AsyncTaskRunner implements Runner {
     public void run(@NonNull final Invocation invocation, final long delay,
             @NonNull final TimeUnit timeUnit) {
 
-        run(new InvocationTask(mExecutor, invocation), delay, timeUnit);
-    }
-
-    @Override
-    public void runAbort(@NonNull final Invocation invocation, final long delay,
-            @NonNull final TimeUnit timeUnit) {
-
-        run(new AbortTask(mExecutor, invocation), delay, timeUnit);
-    }
-
-    private void run(@NonNull final RunnableTask task, final long delay,
-            @NonNull final TimeUnit timeUnit) {
+        final InvocationTask task = new InvocationTask(mExecutor, invocation);
 
         if (delay > 0) {
 
@@ -83,38 +72,11 @@ class AsyncTaskRunner implements Runner {
     }
 
     /**
-     * Runnable used to abort an invocation.
+     * Implementation of an async task whose execution starts in a runnable.
      */
-    private static class AbortTask extends RunnableTask {
+    private static class InvocationTask extends AsyncTask<Void, Void, Void> implements Runnable {
 
-        private final Invocation mInvocation;
-
-        /**
-         * Constructor.
-         *
-         * @param executor   the executor.
-         * @param invocation the invocation instance.
-         */
-        private AbortTask(@Nullable final Executor executor, @NonNull final Invocation invocation) {
-
-            super(executor);
-
-            mInvocation = invocation;
-        }
-
-        @Override
-        protected Void doInBackground(final Void... voids) {
-
-            mInvocation.abort();
-
-            return null;
-        }
-    }
-
-    /**
-     * Runnable used to run an invocation.
-     */
-    private static class InvocationTask extends RunnableTask {
+        private final Executor mExecutor;
 
         private final Invocation mInvocation;
 
@@ -127,36 +89,8 @@ class AsyncTaskRunner implements Runner {
         private InvocationTask(@Nullable final Executor executor,
                 @NonNull final Invocation invocation) {
 
-            super(executor);
-
-            mInvocation = invocation;
-        }
-
-        @Override
-        protected Void doInBackground(final Void... voids) {
-
-            mInvocation.run();
-
-            return null;
-        }
-    }
-
-    /**
-     * Abstract implementation of an async task whose execution starts in a runnable.
-     */
-    private static abstract class RunnableTask extends AsyncTask<Void, Void, Void>
-            implements Runnable {
-
-        private final Executor mExecutor;
-
-        /**
-         * Constructor.
-         *
-         * @param executor the executor.
-         */
-        public RunnableTask(@Nullable final Executor executor) {
-
             mExecutor = executor;
+            mInvocation = invocation;
         }
 
         @Override
@@ -171,6 +105,14 @@ class AsyncTaskRunner implements Runner {
 
                 execute();
             }
+        }
+
+        @Override
+        protected Void doInBackground(final Void... voids) {
+
+            mInvocation.run();
+
+            return null;
         }
     }
 }

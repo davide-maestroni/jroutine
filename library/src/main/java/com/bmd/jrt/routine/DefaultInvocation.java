@@ -33,6 +33,8 @@ import edu.umd.cs.findbugs.annotations.Nullable;
  */
 class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
 
+    private final Invocation mAbortInvocation;
+
     private final ExecutionProvider<INPUT, OUTPUT> mExecutionProvider;
 
     private final InputIterator<INPUT> mInputIterator;
@@ -78,10 +80,27 @@ class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
         mInputIterator = inputs;
         mResultChannel = results;
         mLogger = logger.subContextLogger(this);
+        mAbortInvocation = new Invocation() {
+
+            @Override
+            public void run() {
+
+                abortExecution();
+            }
+        };
     }
 
-    @Override
-    public void abort() {
+    /**
+     * Returns the abort invocation.
+     *
+     * @return the invocation.
+     */
+    public Invocation abort() {
+
+        return mAbortInvocation;
+    }
+
+    private void abortExecution() {
 
         synchronized (mMutex) {
 
@@ -124,49 +143,6 @@ class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
             } finally {
 
                 inputIterator.onAbortComplete();
-            }
-        }
-    }
-
-    @Override
-    public void run() {
-
-        synchronized (mMutex) {
-
-            final InputIterator<INPUT> inputIterator = mInputIterator;
-            final DefaultResultChannel<OUTPUT> resultChannel = mResultChannel;
-
-            try {
-
-                if (!inputIterator.onConsumeInput()) {
-
-                    mLogger.wrn("avoiding running invocation");
-
-                    return;
-                }
-
-                mLogger.dbg("running invocation");
-
-                final Execution<INPUT, OUTPUT> execution = initExecution();
-
-                while (inputIterator.hasNext()) {
-
-                    execution.onInput(inputIterator.next(), resultChannel);
-                }
-
-                if (inputIterator.isComplete()) {
-
-                    execution.onResult(resultChannel);
-                    execution.onReturn();
-
-                    mExecutionProvider.recycle(execution);
-
-                    resultChannel.close();
-                }
-
-            } catch (final Throwable t) {
-
-                resultChannel.abortImmediately(t);
             }
         }
     }
@@ -232,5 +208,48 @@ class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
          * @return whether at least one input is available.
          */
         public boolean onConsumeInput();
+    }
+
+    @Override
+    public void run() {
+
+        synchronized (mMutex) {
+
+            final InputIterator<INPUT> inputIterator = mInputIterator;
+            final DefaultResultChannel<OUTPUT> resultChannel = mResultChannel;
+
+            try {
+
+                if (!inputIterator.onConsumeInput()) {
+
+                    mLogger.wrn("avoiding running invocation");
+
+                    return;
+                }
+
+                mLogger.dbg("running invocation");
+
+                final Execution<INPUT, OUTPUT> execution = initExecution();
+
+                while (inputIterator.hasNext()) {
+
+                    execution.onInput(inputIterator.next(), resultChannel);
+                }
+
+                if (inputIterator.isComplete()) {
+
+                    execution.onResult(resultChannel);
+                    execution.onReturn();
+
+                    mExecutionProvider.recycle(execution);
+
+                    resultChannel.close();
+                }
+
+            } catch (final Throwable t) {
+
+                resultChannel.abortImmediately(t);
+            }
+        }
     }
 }

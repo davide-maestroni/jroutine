@@ -29,6 +29,8 @@ import edu.umd.cs.findbugs.annotations.Nullable;
  */
 public interface InputChannel<INPUT> extends Channel {
 
+    // TODO: now()
+
     /**
      * Tells the channel to delay the transfer of data of the specified time duration.
      *

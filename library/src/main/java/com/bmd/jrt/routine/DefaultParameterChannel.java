@@ -107,7 +107,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
                     mState = ChannelState.EXCEPTION;
                 }
 
-                mRunner.runAbort(mInvocation, delay, timeUnit);
+                mRunner.run(mInvocation.abort(), delay, timeUnit);
             }
         }, runner, orderedOutput, logger);
         mInvocation = new DefaultInvocation<INPUT, OUTPUT>(provider, new DefaultInputIterator(),
@@ -146,7 +146,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
             mState = ChannelState.EXCEPTION;
         }
 
-        mRunner.runAbort(mInvocation, delay.time, delay.unit);
+        mRunner.run(mInvocation.abort(), delay.time, delay.unit);
 
         return false;
     }
@@ -567,7 +567,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
             }
 
             final TimeDuration delay = mDelay;
-            mRunner.runAbort(mInvocation, delay.time, delay.unit);
+            mRunner.run(mInvocation.abort(), delay.time, delay.unit);
         }
 
         @Override
@@ -657,14 +657,6 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
         }
 
         @Override
-        public void abort() {
-
-            mLogger.err("invalid abort of delayed input invocation: %s", mInput);
-
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
         public void run() {
 
             synchronized (mMutex) {
@@ -713,14 +705,6 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
             mInputs = inputList;
             mQueue = queue;
-        }
-
-        @Override
-        public void abort() {
-
-            mLogger.err("invalid abort of delayed input invocation: %s", mInputs);
-
-            throw new UnsupportedOperationException();
         }
 
         @Override

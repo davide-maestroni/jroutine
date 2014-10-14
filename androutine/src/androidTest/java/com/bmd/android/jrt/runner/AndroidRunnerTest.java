@@ -81,59 +81,47 @@ public class AndroidRunnerTest extends AndroidTestCase {
     private void testRunner(final Runner runner) throws InterruptedException {
 
         final Random random = new Random(System.currentTimeMillis());
-        final ArrayList<TestAbortInvocation> invocations = new ArrayList<TestAbortInvocation>();
+        final ArrayList<TestRunInvocation> invocations = new ArrayList<TestRunInvocation>();
 
         for (int i = 0; i < 13; i++) {
 
-            if (random.nextBoolean()) {
+            final TimeDuration delay;
+            final int unit = random.nextInt(4);
 
-                final TimeDuration delay;
-                final int unit = random.nextInt(4);
+            switch (unit) {
 
-                switch (unit) {
+                case 0:
 
-                    case 0:
+                    delay = millis((long) Math.floor(random.nextFloat() * 500));
 
-                        delay = millis((long) Math.floor(random.nextFloat() * 500));
+                    break;
 
-                        break;
+                case 1:
 
-                    case 1:
+                    delay = micros((long) Math.floor(random.nextFloat() * millis(500).toMicros()));
 
-                        delay = micros((long) Math.floor(
-                                random.nextFloat() * millis(500).toMicros()));
+                    break;
 
-                        break;
+                case 2:
 
-                    case 2:
+                    delay = nanos((long) Math.floor(random.nextFloat() * millis(500).toNanos()));
 
-                        delay = nanos((long) Math.floor(
-                                random.nextFloat() * millis(500).toNanos()));
+                    break;
 
-                        break;
+                default:
 
-                    default:
+                    delay = ZERO;
 
-                        delay = ZERO;
-
-                        break;
-                }
-
-                final TestRunInvocation invocation = new TestRunInvocation(delay);
-                invocations.add(invocation);
-
-                runner.run(invocation, delay.time, delay.unit);
-
-            } else {
-
-                final TestAbortInvocation invocation = new TestAbortInvocation();
-                invocations.add(invocation);
-
-                runner.runAbort(invocation);
+                    break;
             }
+
+            final TestRunInvocation invocation = new TestRunInvocation(delay);
+            invocations.add(invocation);
+
+            runner.run(invocation, delay.time, delay.unit);
         }
 
-        for (final TestAbortInvocation invocation : invocations) {
+        for (final TestRunInvocation invocation : invocations) {
 
             invocation.await();
             assertThat(invocation.isPassed()).isTrue();
@@ -186,41 +174,10 @@ public class AndroidRunnerTest extends AndroidTestCase {
 
         runner.run(recursiveInvocation, ZERO.time, ZERO.unit);
 
-        for (final TestAbortInvocation invocation : invocations) {
+        for (final TestRunInvocation invocation : invocations) {
 
             invocation.await();
             assertThat(invocation.isPassed()).isTrue();
-        }
-    }
-
-    private static class TestAbortInvocation implements Invocation {
-
-        protected final Semaphore mSemaphore = new Semaphore(0);
-
-        private boolean mIsAbort;
-
-        @Override
-        public void abort() {
-
-            mIsAbort = true;
-
-            mSemaphore.release();
-        }
-
-        @Override
-        public void run() {
-
-            mSemaphore.release();
-        }
-
-        public void await() throws InterruptedException {
-
-            mSemaphore.acquire();
-        }
-
-        public boolean isPassed() {
-
-            return mIsAbort;
         }
     }
 
@@ -228,12 +185,12 @@ public class AndroidRunnerTest extends AndroidTestCase {
 
         private final ArrayList<TimeDuration> mDelays;
 
-        private final ArrayList<TestAbortInvocation> mInvocations;
+        private final ArrayList<TestRunInvocation> mInvocations;
 
         private final Runner mRunner;
 
         public TestRecursiveInvocation(final Runner runner,
-                final ArrayList<TestAbortInvocation> invocations,
+                final ArrayList<TestRunInvocation> invocations,
                 final ArrayList<TimeDuration> delays, final TimeDuration delay) {
 
             super(delay);
@@ -246,7 +203,7 @@ public class AndroidRunnerTest extends AndroidTestCase {
         @Override
         public void run() {
 
-            final ArrayList<TestAbortInvocation> invocations = mInvocations;
+            final ArrayList<TestRunInvocation> invocations = mInvocations;
             final ArrayList<TimeDuration> delays = mDelays;
             final Runner runner = mRunner;
             final int size = invocations.size();
@@ -261,9 +218,11 @@ public class AndroidRunnerTest extends AndroidTestCase {
         }
     }
 
-    private static class TestRunInvocation extends TestAbortInvocation {
+    private static class TestRunInvocation implements Invocation {
 
         private final TimeDuration mDelay;
+
+        private final Semaphore mSemaphore = new Semaphore(0);
 
         private final Time mStartTime;
 
@@ -275,6 +234,16 @@ public class AndroidRunnerTest extends AndroidTestCase {
             mDelay = delay;
         }
 
+        public void await() throws InterruptedException {
+
+            mSemaphore.acquire();
+        }
+
+        public boolean isPassed() {
+
+            return mIsPassed;
+        }
+
         @Override
         public void run() {
 
@@ -283,12 +252,6 @@ public class AndroidRunnerTest extends AndroidTestCase {
             mIsPassed = (current().toMillis() - mStartTime.toMillis() + 1 >= mDelay.toMillis());
 
             mSemaphore.release();
-        }
-
-        @Override
-        public boolean isPassed() {
-
-            return mIsPassed;
         }
     }
 }

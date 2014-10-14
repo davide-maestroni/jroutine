@@ -49,11 +49,4 @@ public class RunnerDecorator implements Runner {
 
         mRunner.run(invocation, delay, timeUnit);
     }
-
-    @Override
-    public void runAbort(@NonNull final Invocation invocation, final long delay,
-            @NonNull final TimeUnit timeUnit) {
-
-        mRunner.runAbort(invocation, delay, timeUnit);
-    }
 }

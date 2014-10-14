@@ -39,11 +39,4 @@ class QueuedRunner implements Runner {
 
         LocalQueue.run(invocation, delay, timeUnit);
     }
-
-    @Override
-    public void runAbort(@NonNull final Invocation invocation, final long delay,
-            @NonNull final TimeUnit timeUnit) {
-
-        LocalQueue.runAbort(invocation, delay, timeUnit);
-    }
 }

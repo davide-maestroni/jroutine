@@ -1218,14 +1218,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         }
 
         @Override
-        public void abort() {
-
-            mLogger.err("invalid abort of delayed output invocation: %s", mOutputs);
-
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
         public void run() {
 
             synchronized (mMutex) {
@@ -1273,14 +1265,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             mQueue = queue;
             mOutput = output;
-        }
-
-        @Override
-        public void abort() {
-
-            mLogger.err("invalid abort of delayed output invocation: %s", mOutput);
-
-            throw new UnsupportedOperationException();
         }
 
         @Override

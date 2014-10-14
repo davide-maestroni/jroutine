@@ -41,14 +41,4 @@ public interface Runner {
      * @param timeUnit   the delay time unit.
      */
     public void run(@NonNull Invocation invocation, long delay, @NonNull TimeUnit timeUnit);
-
-    /**
-     * Runs the specified abort invocation. (that is, calls the invocation <code>abort()</code>
-     * method inside the runner thread).
-     *
-     * @param invocation the invocation.
-     * @param delay      the execution delay.
-     * @param timeUnit   the delay time unit.
-     */
-    public void runAbort(@NonNull Invocation invocation, long delay, @NonNull TimeUnit timeUnit);
 }

@@ -129,20 +129,10 @@ public class RunnerTest extends TestCase {
                     break;
             }
 
-            if (random.nextBoolean()) {
+            final TestRunInvocation invocation = new TestRunInvocation(delay);
+            invocations.add(invocation);
 
-                final TestRunInvocation invocation = new TestRunInvocation(delay);
-                invocations.add(invocation);
-
-                runner.run(invocation, delay.time, delay.unit);
-
-            } else {
-
-                final TestAbortInvocation invocation = new TestAbortInvocation(delay);
-                invocations.add(invocation);
-
-                runner.runAbort(invocation, delay.time, delay.unit);
-            }
+            runner.run(invocation, delay.time, delay.unit);
         }
 
         for (final TestRunInvocation invocation : invocations) {
@@ -189,16 +179,8 @@ public class RunnerTest extends TestCase {
 
             delays.add(delay);
 
-            if (random.nextBoolean()) {
-
-                final TestRunInvocation invocation = new TestRunInvocation(delay);
-                invocations.add(invocation);
-
-            } else {
-
-                final TestAbortInvocation invocation = new TestAbortInvocation(delay);
-                invocations.add(invocation);
-            }
+            final TestRunInvocation invocation = new TestRunInvocation(delay);
+            invocations.add(invocation);
         }
 
         final TestRecursiveInvocation recursiveInvocation =
@@ -211,28 +193,6 @@ public class RunnerTest extends TestCase {
             invocation.await();
             assertThat(invocation.isPassed()).isTrue();
         }
-    }
-
-    private static class TestAbortInvocation extends TestRunInvocation {
-
-        public TestAbortInvocation(final TimeDuration delay) {
-
-            super(delay);
-        }
-
-        @Override
-        public void abort() {
-
-            super.run();
-        }
-
-        @Override
-        public void run() {
-
-            super.abort();
-        }
-
-
     }
 
     private static class TestRecursiveInvocation extends TestRunInvocation {
@@ -267,14 +227,7 @@ public class RunnerTest extends TestCase {
                 final TimeDuration delay = delays.get(i);
                 final TestRunInvocation invocation = invocations.get(i);
 
-                if (invocation instanceof TestAbortInvocation) {
-
-                    runner.runAbort(invocation, delay.time, delay.unit);
-
-                } else {
-
-                    runner.run(invocation, delay.time, delay.unit);
-                }
+                runner.run(invocation, delay.time, delay.unit);
             }
 
             super.run();
@@ -297,10 +250,14 @@ public class RunnerTest extends TestCase {
             mDelay = delay;
         }
 
-        @Override
-        public void abort() {
+        public void await() throws InterruptedException {
 
-            mSemaphore.release();
+            mSemaphore.acquire();
+        }
+
+        public boolean isPassed() {
+
+            return mIsPassed;
         }
 
         @Override
@@ -310,16 +267,6 @@ public class RunnerTest extends TestCase {
             mIsPassed = (current().toMillis() - mStartTime.toMillis() >= mDelay.toMillis());
 
             mSemaphore.release();
-        }
-
-        public void await() throws InterruptedException {
-
-            mSemaphore.acquire();
-        }
-
-        public boolean isPassed() {
-
-            return mIsPassed;
         }
     }
 }

@@ -21,15 +21,6 @@ package com.bmd.jrt.runner;
  * <p/>
  * Created by davide on 9/7/14.
  */
-public interface Invocation {
+public interface Invocation extends Runnable {
 
-    /**
-     * Called to abort the routine execution.
-     */
-    public void abort();
-
-    /**
-     * Called to run the routine execution.
-     */
-    public void run();
 }

@@ -86,8 +86,6 @@ import edu.umd.cs.findbugs.annotations.Nullable;
  */
 public interface Routine<INPUT, OUTPUT> {
 
-    // TODO: override abort exception?
-
     /**
      * Short for <code>run().readAll()</code>.
      *

@@ -54,10 +54,19 @@ public class Time {
      */
     public static final long SECONDS_IN_DAY = SECONDS_IN_HOUR * HOURS_IN_DAY;
 
+    /**
+     * The maximum number of days expressible in number of seconds.
+     */
     protected static final long MAX_DAYS = Long.MAX_VALUE / SECONDS_IN_DAY;
 
+    /**
+     * The maximum number of hours expressible in number of seconds.
+     */
     protected static final long MAX_HOURS = Long.MAX_VALUE / SECONDS_IN_HOUR;
 
+    /**
+     * The maximum number of minutes expressible in number of seconds.
+     */
     protected static final long MAX_MINUTES = Long.MAX_VALUE / SECONDS_IN_MINUTE;
 
     /**
@@ -92,6 +101,19 @@ public class Time {
     public static Time current() {
 
         return millis(System.currentTimeMillis());
+    }
+
+    /**
+     * Creates and returns an object representing the current high precision system time in
+     * nanoseconds.
+     *
+     * @return the time instance.
+     * @see System#nanoTime()
+     */
+    @NonNull
+    public static Time currentNano() {
+
+        return nanos(System.nanoTime());
     }
 
     /**
@@ -188,19 +210,6 @@ public class Time {
         }
 
         return new Time(minutes * SECONDS_IN_MINUTE, TimeUnit.SECONDS);
-    }
-
-    /**
-     * Creates and returns an object representing the current high precision system time in
-     * nanoseconds.
-     *
-     * @return the time instance.
-     * @see System#nanoTime()
-     */
-    @NonNull
-    public static Time nano() {
-
-        return nanos(System.nanoTime());
     }
 
     /**

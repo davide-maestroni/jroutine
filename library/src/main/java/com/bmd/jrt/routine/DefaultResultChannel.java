@@ -1058,7 +1058,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
 
         @Override
-        public boolean abort(@Nullable final Throwable throwable) {
+        public boolean abort(@Nullable final Throwable reason) {
 
             synchronized (mMutex) {
 
@@ -1069,15 +1069,15 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                     return false;
                 }
 
-                mSubLogger.dbg(throwable, "aborting output");
+                mSubLogger.dbg(reason, "aborting output");
 
                 mOutputQueue.clear();
 
-                mAbortException = throwable;
+                mAbortException = reason;
                 mState = ChannelState.EXCEPTION;
             }
 
-            mHandler.onAbort(throwable, 0, TimeUnit.MILLISECONDS);
+            mHandler.onAbort(reason, 0, TimeUnit.MILLISECONDS);
 
             return true;
         }
@@ -1114,7 +1114,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         }
 
         @Override
-        public void onAbort(@Nullable final Throwable throwable) {
+        public void onAbort(@Nullable final Throwable reason) {
 
             synchronized (mMutex) {
 
@@ -1125,16 +1125,16 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                     return;
                 }
 
-                mSubLogger.dbg(throwable, "aborting output");
+                mSubLogger.dbg(reason, "aborting output");
 
                 mOutputQueue.clear();
 
-                mAbortException = throwable;
+                mAbortException = reason;
                 mState = ChannelState.EXCEPTION;
             }
 
             final TimeDuration delay = mDelay;
-            mHandler.onAbort(throwable, delay.time, delay.unit);
+            mHandler.onAbort(reason, delay.time, delay.unit);
         }
 
         @Override
@@ -1358,9 +1358,9 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     }
 
     @Override
-    public boolean abort(@Nullable final Throwable throwable) {
+    public boolean abort(@Nullable final Throwable reason) {
 
-        return abort(throwable, false);
+        return abort(reason, false);
     }
 
     @Override

@@ -27,9 +27,9 @@ public interface OutputConsumer<OUTPUT> {
     /**
      * Called when the bounded channel transfer is aborted.
      *
-     * @param throwable the reason of the abortion.
+     * @param reason the reason of the abortion.
      */
-    public void onAbort(@Nullable Throwable throwable);
+    public void onAbort(@Nullable Throwable reason);
 
     /**
      * Called when the channel closes after the routine completes its execution.

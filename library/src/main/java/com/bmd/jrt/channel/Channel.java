@@ -40,10 +40,10 @@ public interface Channel {
      * <p/>
      * Note that, in case the channel was already closed, the call to this method has no effect.
      *
-     * @param throwable the throwable object identifying the reason of the routine abortion.
+     * @param reason the throwable object identifying the reason of the routine abortion.
      * @return whether the channel status changed as a result of the call.
      */
-    public boolean abort(@Nullable Throwable throwable);
+    public boolean abort(@Nullable Throwable reason);
 
     /**
      * Checks if the channel is open, that is, data can be written or read.

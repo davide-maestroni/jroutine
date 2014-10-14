@@ -38,7 +38,7 @@ public class TimeDuration extends Time {
 
     private static final long NANO_DAYS_OVERFLOW = 106750L;
 
-    private static final long ONE_MILLI_NANOS = millis(1).toNanos();
+    private static final long ONE_MILLI_NANOS = TimeUnit.MILLISECONDS.toNanos(1);
 
     /**
      * Constructor.

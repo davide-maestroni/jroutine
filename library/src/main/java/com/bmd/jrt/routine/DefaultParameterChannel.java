@@ -121,7 +121,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
     }
 
     @Override
-    public boolean abort(@Nullable final Throwable throwable) {
+    public boolean abort(@Nullable final Throwable reason) {
 
         final TimeDuration delay;
 
@@ -129,7 +129,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
             if (!isOpen()) {
 
-                mLogger.dbg(throwable, "avoiding aborting since channel is closed");
+                mLogger.dbg(reason, "avoiding aborting since channel is closed");
 
                 return false;
             }
@@ -138,11 +138,11 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
             if (delay.isZero()) {
 
-                mLogger.dbg(throwable, "aborting channel");
+                mLogger.dbg(reason, "aborting channel");
 
                 mInputQueue.clear();
 
-                mAbortException = throwable;
+                mAbortException = reason;
                 mState = ChannelState.EXCEPTION;
             }
         }
@@ -153,7 +153,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
         } else {
 
-            mRunner.run(new DelayedAbort(throwable), delay.time, delay.unit);
+            mRunner.run(new DelayedAbort(reason), delay.time, delay.unit);
         }
 
         return true;
@@ -565,7 +565,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
         }
 
         @Override
-        public void onAbort(@Nullable final Throwable throwable) {
+        public void onAbort(@Nullable final Throwable reason) {
 
             synchronized (mMutex) {
 
@@ -580,7 +580,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
                 mInputQueue.clear();
 
-                mAbortException = throwable;
+                mAbortException = reason;
                 mState = ChannelState.EXCEPTION;
             }
 

@@ -49,11 +49,11 @@ class SynchronizedConsumer<OUTPUT> implements OutputConsumer<OUTPUT> {
     }
 
     @Override
-    public void onAbort(@Nullable final Throwable throwable) {
+    public void onAbort(@Nullable final Throwable reason) {
 
         synchronized (mMutex) {
 
-            mConsumer.onAbort(throwable);
+            mConsumer.onAbort(reason);
         }
     }
 

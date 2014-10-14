@@ -27,7 +27,7 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 public abstract class BasicOutputConsumer<OUTPUT> implements OutputConsumer<OUTPUT> {
 
     @Override
-    public void onAbort(@Nullable final Throwable throwable) {
+    public void onAbort(@Nullable final Throwable reason) {
 
     }
 

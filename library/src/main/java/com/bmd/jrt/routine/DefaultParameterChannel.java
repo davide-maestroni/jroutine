@@ -198,11 +198,19 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
         return after(fromUnit(delay, timeUnit));
     }
 
+    @NonNull
+    @Override
+    public ParameterChannel<INPUT, OUTPUT> now() {
+
+        return after(ZERO);
+    }
+
     @Override
     @NonNull
     public ParameterChannel<INPUT, OUTPUT> pass(@Nullable final OutputChannel<INPUT> channel) {
 
         final TimeDuration delay;
+        final DefaultOutputConsumer consumer;
 
         synchronized (mMutex) {
 
@@ -222,9 +230,11 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
             delay = mInputDelay;
 
             ++mPendingInputCount;
+
+            consumer = new DefaultOutputConsumer(delay);
         }
 
-        channel.bind(new DefaultOutputConsumer(delay));
+        channel.bind(consumer);
 
         return this;
     }

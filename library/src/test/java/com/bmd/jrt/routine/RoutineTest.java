@@ -340,6 +340,7 @@ public class RoutineTest extends TestCase {
 
         final Routine<String, String> routine1 = JavaRoutine.on(tokenOf(DelayedExecution.class))
                                                             .orderedInput()
+                                                            .orderedOutput()
                                                             .withArgs(TimeDuration.millis(10))
                                                             .buildRoutine();
 

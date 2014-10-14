@@ -38,6 +38,10 @@ public interface ResultChannel<OUTPUT> extends InputChannel<OUTPUT> {
     @NonNull
     public ResultChannel<OUTPUT> after(long delay, @NonNull TimeUnit timeUnit);
 
+    @NonNull
+    @Override
+    public ResultChannel<OUTPUT> now();
+
     @Override
     @NonNull
     public ResultChannel<OUTPUT> pass(@Nullable OutputChannel<OUTPUT> channel);

@@ -39,6 +39,10 @@ public interface ParameterChannel<INPUT, OUTPUT> extends InputChannel<INPUT> {
     @NonNull
     public ParameterChannel<INPUT, OUTPUT> after(long delay, @NonNull TimeUnit timeUnit);
 
+    @NonNull
+    @Override
+    public ParameterChannel<INPUT, OUTPUT> now();
+
     @Override
     @NonNull
     public ParameterChannel<INPUT, OUTPUT> pass(@Nullable OutputChannel<INPUT> channel);

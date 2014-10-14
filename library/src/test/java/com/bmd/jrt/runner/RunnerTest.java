@@ -20,6 +20,7 @@ import junit.framework.TestCase;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 
 import static com.bmd.jrt.time.Time.current;
@@ -38,6 +39,26 @@ public class RunnerTest extends TestCase {
 
     @SuppressWarnings("ConstantConditions")
     public void testError() {
+
+        try {
+
+            new ScheduledRunner(null);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+
+        try {
+
+            Runners.scheduled(null);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
 
         try {
 
@@ -83,6 +104,14 @@ public class RunnerTest extends TestCase {
         testRunner(new QueuedRunner());
         testRunner(Runners.queued());
         testRunner(new RunnerDecorator(new QueuedRunner()));
+    }
+
+    public void testScheduledRunner() throws InterruptedException {
+
+        testRunner(new ScheduledRunner(Executors.newSingleThreadScheduledExecutor()));
+        testRunner(Runners.scheduled(Executors.newSingleThreadScheduledExecutor()));
+        testRunner(new RunnerDecorator(
+                new ScheduledRunner(Executors.newSingleThreadScheduledExecutor())));
     }
 
     public void testSequentialRunner() throws InterruptedException {

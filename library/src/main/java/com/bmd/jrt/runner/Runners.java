@@ -13,6 +13,8 @@
  */
 package com.bmd.jrt.runner;
 
+import java.util.concurrent.ScheduledExecutorService;
+
 import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
@@ -21,8 +23,6 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  * Created by davide on 9/9/14.
  */
 public class Runners {
-
-    // TODO: ScheduledRunner
 
     private static final QueuedRunner sQueuedRunner = new QueuedRunner();
 
@@ -69,6 +69,18 @@ public class Runners {
     public static Runner queued() {
 
         return sQueuedRunner;
+    }
+
+    /**
+     * Returns a runner employing the specified executor service.
+     *
+     * @param service the executor service.
+     * @return the runner instance.
+     */
+    @NonNull
+    public static Runner scheduled(@NonNull final ScheduledExecutorService service) {
+
+        return new ScheduledRunner(service);
     }
 
     /**

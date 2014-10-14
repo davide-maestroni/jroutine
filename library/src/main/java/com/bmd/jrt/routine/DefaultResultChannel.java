@@ -157,11 +157,19 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         return after(fromUnit(delay, timeUnit));
     }
 
+    @NonNull
+    @Override
+    public ResultChannel<OUTPUT> now() {
+
+        return after(ZERO);
+    }
+
     @Override
     @NonNull
     public ResultChannel<OUTPUT> pass(@Nullable final OutputChannel<OUTPUT> channel) {
 
         final TimeDuration delay;
+        final DefaultOutputConsumer consumer;
 
         synchronized (mMutex) {
 
@@ -181,9 +189,11 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             delay = mResultDelay;
 
             ++mPendingOutputCount;
+
+            consumer = new DefaultOutputConsumer(delay);
         }
 
-        channel.bind(new DefaultOutputConsumer(delay));
+        channel.bind(consumer);
 
         return this;
     }

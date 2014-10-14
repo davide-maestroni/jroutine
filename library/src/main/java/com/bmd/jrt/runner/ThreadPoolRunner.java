@@ -14,19 +14,13 @@
 package com.bmd.jrt.runner;
 
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
-import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
  * Class implementing a runner employing a pool of background threads.
  * <p/>
  * Created by davide on 9/9/14.
  */
-class ThreadPoolRunner implements Runner {
-
-    private final ScheduledExecutorService mService;
+class ThreadPoolRunner extends ScheduledRunner {
 
     /**
      * Constructor.
@@ -35,20 +29,6 @@ class ThreadPoolRunner implements Runner {
      */
     ThreadPoolRunner(final int threadPoolSize) {
 
-        mService = Executors.newScheduledThreadPool(threadPoolSize);
-    }
-
-    @Override
-    public void run(@NonNull final Invocation invocation, final long delay,
-            @NonNull final TimeUnit timeUnit) {
-
-        if (delay > 0) {
-
-            mService.schedule(invocation, delay, timeUnit);
-
-        } else {
-
-            mService.execute(invocation);
-        }
+        super(Executors.newScheduledThreadPool(threadPoolSize));
     }
 }

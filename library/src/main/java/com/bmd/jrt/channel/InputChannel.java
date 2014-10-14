@@ -29,8 +29,6 @@ import edu.umd.cs.findbugs.annotations.Nullable;
  */
 public interface InputChannel<INPUT> extends Channel {
 
-    // TODO: now()
-
     /**
      * Tells the channel to delay the transfer of data of the specified time duration.
      *
@@ -57,6 +55,17 @@ public interface InputChannel<INPUT> extends Channel {
      */
     @NonNull
     public InputChannel<INPUT> after(long delay, @NonNull TimeUnit timeUnit);
+
+    /**
+     * Tells the channel to not delay the transfer of data.
+     *
+     * @return this channel.
+     * @throws IllegalStateException               if this channel is already closed.
+     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
+     *                                             exception.
+     */
+    @NonNull
+    public InputChannel<INPUT> now();
 
     /**
      * Passes the specified channel to this one.

@@ -373,8 +373,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
     private boolean abort(@Nullable final Throwable throwable, final boolean isImmediate) {
 
-        // TODO: delay abort...
-
         final TimeDuration delay;
 
         synchronized (mMutex) {
@@ -386,17 +384,27 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                 return false;
             }
 
-            delay = (isImmediate) ? ZERO : mResultDelay;
+            delay = mResultDelay;
 
-            mLogger.dbg(throwable, "aborting channel");
+            if (isImmediate) {
 
-            mOutputQueue.clear();
+                mLogger.dbg(throwable, "aborting channel");
 
-            mAbortException = throwable;
-            mState = ChannelState.EXCEPTION;
+                mOutputQueue.clear();
+
+                mAbortException = throwable;
+                mState = ChannelState.EXCEPTION;
+            }
         }
 
-        mHandler.onAbort(throwable, delay.time, delay.unit);
+        if (isImmediate) {
+
+            mHandler.onAbort(throwable, 0, TimeUnit.MILLISECONDS);
+
+        } else {
+
+            mRunner.run(new DelayedAbort(throwable), delay.time, delay.unit);
+        }
 
         return true;
     }
@@ -1185,6 +1193,49 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                 mRunner.run(new DelayedOutputInvocation(outputQueue, output), delay.time,
                             delay.unit);
             }
+        }
+    }
+
+    /**
+     * Implementation of an invocation handling a delayed abort.
+     */
+    private class DelayedAbort implements Invocation {
+
+        private final Throwable mThrowable;
+
+        /**
+         * Constructor.
+         *
+         * @param throwable the reason of the abort.
+         */
+        private DelayedAbort(final Throwable throwable) {
+
+            mThrowable = throwable;
+        }
+
+        @Override
+        public void run() {
+
+            final Throwable throwable = mThrowable;
+
+            synchronized (mMutex) {
+
+                if (!isResultOpen()) {
+
+                    mLogger.dbg(throwable, "avoiding aborting since channel is closed");
+
+                    return;
+                }
+
+                mLogger.dbg(throwable, "aborting channel");
+
+                mOutputQueue.clear();
+
+                mAbortException = throwable;
+                mState = ChannelState.EXCEPTION;
+            }
+
+            mHandler.onAbort(throwable, 0, TimeUnit.MILLISECONDS);
         }
     }
 

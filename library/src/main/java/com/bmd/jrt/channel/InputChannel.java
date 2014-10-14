@@ -30,7 +30,8 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 public interface InputChannel<INPUT> extends Channel {
 
     /**
-     * Tells the channel to delay the transfer of data of the specified time duration.
+     * Tells the channel to delay the transfer of data of the specified time duration.<br/>
+     * Note that an abort invocation will be delayed as well.
      *
      * @param delay the delay.
      * @return this channel.
@@ -43,7 +44,8 @@ public interface InputChannel<INPUT> extends Channel {
     public InputChannel<INPUT> after(@NonNull TimeDuration delay);
 
     /**
-     * Tells the channel to delay the transfer of data of the specified time duration.
+     * Tells the channel to delay the transfer of data of the specified time duration.<br/>
+     * Note that an abort invocation will be delayed as well.
      *
      * @param delay    the delay value.
      * @param timeUnit the delay time unit.

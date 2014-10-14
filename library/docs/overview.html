@@ -8,29 +8,62 @@ Parallel programming on the go.
 <b>Example 1:</b> Root mean square:
 <p>
     The code below shows how it is possible to implement the computation of the root mean square of
-    some input data, by distributing it in a predefined number of background threads.
+    some input data, by distributing it in a number of background threads.
 </p>
 <pre>
     <code>
-        final float[] input;
+        public static void main(final String[] args) {
 
-        ...
+            final Routine&lt;Integer, Integer&gt; sumRoutine =
+                    on(tokenOf(SumExecution.class)).buildRoutine();
+            final Routine&lt;Integer, Integer&gt; squareRoutine =
+                    on(tokenOf(SquareExecution.class)).buildRoutine();
 
-        // Sequential
+            final ParameterChannel&lt;Integer, Integer&gt; squareChannel =
+                    squareRoutine.invokeParallel();
 
-        double sum = 0;
+            for (final String arg : args) {
 
-        for (final float sample : input) {
+                squareChannel.pass(Integer.parseInt(arg));
+            }
 
-        final double d = sample;
-        sum += (d * d);
+            System.out.println(sumRoutine.callAsync(squareChannel.results()));
+
+            System.exit(0);
         }
 
-        final double sRms = Math.sqrt(sum / input.length);
+        private static class SquareExecution extends BasicExecution&lt;Integer, Integer&gt; {
 
-        // Parallel
+            @Override
+            public void onInput(final Integer integer, @NonNull final ResultChannel&lt;Integer&gt; results) {
 
-        assert pRms == sRms;
+                final int input = integer;
+                results.pass(input * input);
+            }
+        }
+
+        private static class SumExecution extends BasicExecution&lt;Integer, Integer&gt; {
+
+            private int mSum;
+
+            @Override
+            public void onInit() {
+
+                mSum = 0;
+            }
+
+            @Override
+            public void onInput(final Integer integer, @NonNull final ResultChannel&lt;Integer&gt; results) {
+
+                mSum += integer;
+            }
+
+            @Override
+            public void onResult(@NonNull final ResultChannel&lt;Integer&gt; results) {
+
+                results.pass(mSum);
+            }
+        }
     </code>
 </pre>
 </body>

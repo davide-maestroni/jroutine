@@ -7,61 +7,68 @@ Parallel programming on the go.
 <h2>Usage examples</h2>
 <b>Example 1:</b> Root mean square:
 <p>
-    The code below shows how it is possible to implement the computation of the root mean square of
-    some input data, by distributing it in a number of background threads.
+    The code below shows how it is possible to implement the computation of the root mean square of some input data, by distributing it in a number of background threads.
 </p>
 <pre>
     <code>
-        public static void main(final String[] args) {
+        public class Main {
 
-            final Routine&lt;Integer, Integer&gt; sumRoutine =
-                    on(tokenOf(SumExecution.class)).buildRoutine();
-            final Routine&lt;Integer, Integer&gt; squareRoutine =
-                    on(tokenOf(SquareExecution.class)).buildRoutine();
+            public static void main(final String[] args) {
 
-            final ParameterChannel&lt;Integer, Integer&gt; squareChannel =
-                    squareRoutine.invokeParallel();
+                final Routine&lt;String, Integer&gt; parseRoutine = on(tokenOf(Parse.class)).buildRoutine();
+                final Routine&lt;Integer, Integer&gt; sumRoutine = on(tokenOf(Sum.class)).buildRoutine();
+                final Routine&lt;Integer, Integer&gt; squareRoutine = on(tokenOf(Square.class)).buildRoutine();
 
-            for (final String arg : args) {
+                final Integer rms =
+                        sumRoutine.runAsync(squareRoutine.runParallel(parseRoutine.runParallel(args)))
+                                  .readFirst();
 
-                squareChannel.pass(Integer.parseInt(arg));
+                System.out.println(rms);
+
+                System.exit(0);
             }
 
-            System.out.println(sumRoutine.callAsync(squareChannel.results()));
+            private static class Parse extends BasicExecution&lt;String, Integer&gt; {
 
-            System.exit(0);
-        }
+                &commat;Override
+                public void onInput(&commat;Nullable final String s,
+                        &commat;NonNull final ResultChannel&lt;Integer&gt; results) {
 
-        private static class SquareExecution extends BasicExecution&lt;Integer, Integer&gt; {
-
-            @Override
-            public void onInput(final Integer integer, @NonNull final ResultChannel&lt;Integer&gt; results) {
-
-                final int input = integer;
-                results.pass(input * input);
-            }
-        }
-
-        private static class SumExecution extends BasicExecution&lt;Integer, Integer&gt; {
-
-            private int mSum;
-
-            @Override
-            public void onInit() {
-
-                mSum = 0;
+                    results.pass(Integer.parseInt(s));
+                }
             }
 
-            @Override
-            public void onInput(final Integer integer, @NonNull final ResultChannel&lt;Integer&gt; results) {
+            private static class Square extends BasicExecution&lt;Integer, Integer&gt; {
 
-                mSum += integer;
+                &commat;Override
+                public void onInput(final Integer integer, &commat;NonNull final ResultChannel&lt;Integer&gt; results) {
+
+                    final int input = integer;
+                    results.pass(input * input);
+                }
             }
 
-            @Override
-            public void onResult(@NonNull final ResultChannel&lt;Integer&gt; results) {
+            private static class Sum extends BasicExecution&lt;Integer, Integer&gt; {
 
-                results.pass(mSum);
+                private int mSum;
+
+                &commat;Override
+                public void onInit() {
+
+                    mSum = 0;
+                }
+
+                &commat;Override
+                public void onInput(final Integer integer, &commat;NonNull final ResultChannel&lt;Integer&gt; results) {
+
+                    mSum += integer;
+                }
+
+                &commat;Override
+                public void onResult(&commat;NonNull final ResultChannel&lt;Integer&gt; results) {
+
+                    results.pass(mSum);
+                }
             }
         }
     </code>

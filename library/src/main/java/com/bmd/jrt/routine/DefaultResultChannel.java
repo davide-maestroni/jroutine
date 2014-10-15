@@ -30,8 +30,10 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import static com.bmd.jrt.time.TimeDuration.ZERO;
 import static com.bmd.jrt.time.TimeDuration.fromUnit;
@@ -91,8 +93,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
      * @throws NullPointerException if one of the parameters is null.
      */
     @SuppressWarnings("ConstantConditions")
-    DefaultResultChannel(@NonNull final AbortHandler handler, @NonNull final Runner runner,
-            final boolean orderedOutput, @NonNull final Logger logger) {
+    DefaultResultChannel(@Nonnull final AbortHandler handler, @Nonnull final Runner runner,
+            final boolean orderedOutput, @Nonnull final Logger logger) {
 
         if (handler == null) {
 
@@ -129,9 +131,9 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     }
 
     @Override
-    @NonNull
+    @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public ResultChannel<OUTPUT> after(@NonNull final TimeDuration delay) {
+    public ResultChannel<OUTPUT> after(@Nonnull final TimeDuration delay) {
 
         synchronized (mMutex) {
 
@@ -151,13 +153,13 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     }
 
     @Override
-    @NonNull
-    public ResultChannel<OUTPUT> after(final long delay, @NonNull final TimeUnit timeUnit) {
+    @Nonnull
+    public ResultChannel<OUTPUT> after(final long delay, @Nonnull final TimeUnit timeUnit) {
 
         return after(fromUnit(delay, timeUnit));
     }
 
-    @NonNull
+    @Nonnull
     @Override
     public ResultChannel<OUTPUT> now() {
 
@@ -165,7 +167,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public ResultChannel<OUTPUT> pass(@Nullable final OutputChannel<OUTPUT> channel) {
 
         final TimeDuration delay;
@@ -199,7 +201,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public ResultChannel<OUTPUT> pass(@Nullable final Iterable<? extends OUTPUT> outputs) {
 
         NestedQueue<Object> outputQueue;
@@ -250,7 +252,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public ResultChannel<OUTPUT> pass(@Nullable final OUTPUT output) {
 
         NestedQueue<Object> outputQueue;
@@ -290,7 +292,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public ResultChannel<OUTPUT> pass(@Nullable final OUTPUT... outputs) {
 
         synchronized (mMutex) {
@@ -376,7 +378,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
      *
      * @return the output channel.
      */
-    @NonNull
+    @Nonnull
     public OutputChannel<OUTPUT> getOutput() {
 
         return new DefaultOutputChannel();
@@ -564,7 +566,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
     @Nullable
     @SuppressWarnings("unchecked")
-    private OUTPUT readQueue(@NonNull final TimeDuration timeout,
+    private OUTPUT readQueue(@Nonnull final TimeDuration timeout,
             @Nullable final RuntimeException timeoutException) {
 
         synchronized (mMutex) {
@@ -686,7 +688,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
          * @param delay     the abortion delay.
          * @param timeUnit  the delay time unit.
          */
-        public void onAbort(@Nullable Throwable throwable, long delay, @NonNull TimeUnit timeUnit);
+        public void onAbort(@Nullable Throwable throwable, long delay, @Nonnull TimeUnit timeUnit);
     }
 
     /**
@@ -708,7 +710,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
          * @param timeout          the output timeout.
          * @param timeoutException the timeout exception.
          */
-        private DefaultIterator(@NonNull final TimeDuration timeout,
+        private DefaultIterator(@Nonnull final TimeDuration timeout,
                 @Nullable final RuntimeException timeoutException) {
 
             mTimeout = timeout;
@@ -779,9 +781,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         @Override
         @Nullable
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "IT_NO_SUCH_ELEMENT",
-                                                          justification = "readQueue() actually "
-                                                                  + "throws it")
+        @SuppressFBWarnings(value = "IT_NO_SUCH_ELEMENT",
+                            justification = "NestedQueue.removeFirst() actually throws it")
         public OUTPUT next() {
 
             synchronized (mMutex) {
@@ -821,9 +822,9 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         private final Logger mSubLogger = mLogger.subContextLogger(this);
 
         @Override
-        @NonNull
+        @Nonnull
         @SuppressWarnings("ConstantConditions")
-        public OutputChannel<OUTPUT> afterMax(@NonNull final TimeDuration timeout) {
+        public OutputChannel<OUTPUT> afterMax(@Nonnull final TimeDuration timeout) {
 
             synchronized (mMutex) {
 
@@ -843,15 +844,15 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         }
 
         @Override
-        @NonNull
+        @Nonnull
         public OutputChannel<OUTPUT> afterMax(final long timeout,
-                @NonNull final TimeUnit timeUnit) {
+                @Nonnull final TimeUnit timeUnit) {
 
             return afterMax(fromUnit(timeout, timeUnit));
         }
 
         @Override
-        @NonNull
+        @Nonnull
         @SuppressWarnings("ConstantConditions")
         public OutputChannel<OUTPUT> bind(@Nullable final OutputConsumer<OUTPUT> consumer) {
 
@@ -875,7 +876,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         }
 
         @Override
-        @NonNull
+        @Nonnull
         public OutputChannel<OUTPUT> eventuallyThrow(@Nullable final RuntimeException exception) {
 
             synchronized (mMutex) {
@@ -889,14 +890,14 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         }
 
         @Override
-        @NonNull
+        @Nonnull
         public OutputChannel<OUTPUT> immediately() {
 
             return afterMax(ZERO);
         }
 
         @Override
-        @NonNull
+        @Nonnull
         public List<OUTPUT> readAll() {
 
             final ArrayList<OUTPUT> results = new ArrayList<OUTPUT>();
@@ -906,9 +907,9 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         }
 
         @Override
-        @NonNull
+        @Nonnull
         @SuppressWarnings({"unchecked", "ConstantConditions"})
-        public OutputChannel<OUTPUT> readAllInto(@NonNull final List<OUTPUT> results) {
+        public OutputChannel<OUTPUT> readAllInto(@Nonnull final List<OUTPUT> results) {
 
             synchronized (mMutex) {
 
@@ -1033,7 +1034,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         }
 
         @Override
-        @NonNull
+        @Nonnull
         public Iterator<OUTPUT> iterator() {
 
             final TimeDuration timeout;
@@ -1107,7 +1108,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
          *
          * @param delay the output delay.
          */
-        private DefaultOutputConsumer(@NonNull final TimeDuration delay) {
+        private DefaultOutputConsumer(@Nonnull final TimeDuration delay) {
 
             mDelay = delay;
             mQueue = mOutputQueue.addNested();
@@ -1169,7 +1170,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         }
 
         @Override
-        public void onOutput(@Nullable final OUTPUT output) {
+        public void onOutput(final OUTPUT output) {
 
             NestedQueue<Object> outputQueue;
             final TimeDuration delay = mDelay;
@@ -1265,8 +1266,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
          * @param queue   the output queue.
          * @param outputs the iterable returning the output data.
          */
-        private DelayedListOutputInvocation(@NonNull final NestedQueue<Object> queue,
-                @NonNull final Iterable<? extends OUTPUT> outputs) {
+        private DelayedListOutputInvocation(@Nonnull final NestedQueue<Object> queue,
+                @Nonnull final Iterable<? extends OUTPUT> outputs) {
 
             final ArrayList<OUTPUT> outputList = new ArrayList<OUTPUT>();
 
@@ -1322,7 +1323,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
          * @param queue  the output queue.
          * @param output the output.
          */
-        private DelayedOutputInvocation(@NonNull final NestedQueue<Object> queue,
+        private DelayedOutputInvocation(@Nonnull final NestedQueue<Object> queue,
                 @Nullable final OUTPUT output) {
 
             mQueue = queue;

@@ -35,8 +35,8 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.WeakHashMap;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import static com.bmd.jrt.routine.ReflectionUtils.boxingClass;
 
@@ -89,7 +89,7 @@ public class ClassRoutineBuilder {
      * @throws NullPointerException     if the specified target is null.
      * @throws IllegalArgumentException if a duplicate name in the annotations is detected.
      */
-    ClassRoutineBuilder(@NonNull final Object target) {
+    ClassRoutineBuilder(@Nonnull final Object target) {
 
         final Class<?> targetClass;
 
@@ -142,9 +142,9 @@ public class ClassRoutineBuilder {
      * @throws RoutineException         if an error occurred while instantiating the optional
      *                                  runner or the routine.
      */
-    @NonNull
-    public Routine<Object, Object> classMethod(@NonNull final String name,
-            @NonNull final Class<?>... parameterTypes) {
+    @Nonnull
+    public Routine<Object, Object> classMethod(@Nonnull final String name,
+            @Nonnull final Class<?>... parameterTypes) {
 
         final Class<?> targetClass = mTargetClass;
         Method targetMethod = null;
@@ -184,8 +184,8 @@ public class ClassRoutineBuilder {
      * @throws RoutineException     if an error occurred while instantiating the optional runner
      *                              or the routine.
      */
-    @NonNull
-    public Routine<Object, Object> classMethod(@NonNull final Method method) {
+    @Nonnull
+    public Routine<Object, Object> classMethod(@Nonnull final Method method) {
 
         if (!method.isAccessible()) {
 
@@ -270,9 +270,9 @@ public class ClassRoutineBuilder {
      * @return this builder.
      * @throws NullPointerException if the log level is null.
      */
-    @NonNull
+    @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public ClassRoutineBuilder logLevel(@NonNull final LogLevel level) {
+    public ClassRoutineBuilder logLevel(@Nonnull final LogLevel level) {
 
         if (level == null) {
 
@@ -291,9 +291,9 @@ public class ClassRoutineBuilder {
      * @return this builder.
      * @throws NullPointerException if the log is null.
      */
-    @NonNull
+    @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public ClassRoutineBuilder loggedWith(@NonNull final Log log) {
+    public ClassRoutineBuilder loggedWith(@Nonnull final Log log) {
 
         if (log == null) {
 
@@ -315,8 +315,8 @@ public class ClassRoutineBuilder {
      * @throws RoutineException         if an error occurred while instantiating the optional
      *                                  runner or the routine.
      */
-    @NonNull
-    public Routine<Object, Object> method(@NonNull final String name) {
+    @Nonnull
+    public Routine<Object, Object> method(@Nonnull final String name) {
 
         final Method method = mMethodMap.get(name);
 
@@ -335,7 +335,7 @@ public class ClassRoutineBuilder {
      * @param name the parallel group name.
      * @return this builder.
      */
-    @NonNull
+    @Nonnull
     public ClassRoutineBuilder parallelGroup(@Nullable final String name) {
 
         mParallelGroup = name;
@@ -348,7 +348,7 @@ public class ClassRoutineBuilder {
      *
      * @return this builder.
      */
-    @NonNull
+    @Nonnull
     public ClassRoutineBuilder queued() {
 
         mIsSequential = false;
@@ -364,9 +364,9 @@ public class ClassRoutineBuilder {
      * @return this builder.
      * @throws NullPointerException if the specified runner is null.
      */
-    @NonNull
+    @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public ClassRoutineBuilder runBy(@NonNull final Runner runner) {
+    public ClassRoutineBuilder runBy(@Nonnull final Runner runner) {
 
         if (runner == null) {
 
@@ -383,7 +383,7 @@ public class ClassRoutineBuilder {
      *
      * @return this builder.
      */
-    @NonNull
+    @Nonnull
     public ClassRoutineBuilder sequential() {
 
         mIsSequential = true;
@@ -398,9 +398,9 @@ public class ClassRoutineBuilder {
      * @return this builder.
      * @throws NullPointerException if the specified clause is null.
      */
-    @NonNull
+    @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public ClassRoutineBuilder withinTry(@NonNull final Catch catchClause) {
+    public ClassRoutineBuilder withinTry(@Nonnull final Catch catchClause) {
 
         if (catchClause == null) {
 
@@ -454,8 +454,8 @@ public class ClassRoutineBuilder {
      * @param level         the log level.
      * @return the routine instance.
      */
-    @NonNull
-    protected Routine<Object, Object> getRoutine(@NonNull final Method method,
+    @Nonnull
+    protected Routine<Object, Object> getRoutine(@Nonnull final Method method,
             @Nullable final String parallelGroup, @Nullable final Runner runner,
             @Nullable final Boolean isSequential, final boolean orderedInput,
             @Nullable final Log log, @Nullable final LogLevel level) {
@@ -564,8 +564,8 @@ public class ClassRoutineBuilder {
         return mIsSequential;
     }
 
-    private void fillMap(@NonNull final HashMap<String, Method> map,
-            @NonNull final Method[] methods) {
+    private void fillMap(@Nonnull final HashMap<String, Method> map,
+            @Nonnull final Method[] methods) {
 
         final boolean isClass = mIsClass;
 
@@ -618,7 +618,7 @@ public class ClassRoutineBuilder {
          *
          * @param ex the exception.
          */
-        public void exception(@NonNull RoutineInvocationException ex);
+        public void exception(@Nonnull RoutineInvocationException ex);
     }
 
     /**
@@ -648,8 +648,8 @@ public class ClassRoutineBuilder {
          * @param mutex       the mutex used for synchronization.
          */
         public MethodExecutionBody(@Nullable final Object target,
-                @NonNull final Class<?> targetClass, @NonNull final Method method,
-                @NonNull final Catch catchClause, @NonNull final Object mutex) {
+                @Nonnull final Class<?> targetClass, @Nonnull final Method method,
+                @Nonnull final Catch catchClause, @Nonnull final Object mutex) {
 
             mTarget = target;
             mTargetClass = targetClass;
@@ -662,8 +662,8 @@ public class ClassRoutineBuilder {
         }
 
         @Override
-        public void onExec(@NonNull final List<?> objects,
-                @NonNull final ResultChannel<Object> results) {
+        public void onExec(@Nonnull final List<?> objects,
+                @Nonnull final ResultChannel<Object> results) {
 
             synchronized (mMutex) {
 
@@ -710,7 +710,7 @@ public class ClassRoutineBuilder {
     private static class RethrowCatch implements Catch {
 
         @Override
-        public void exception(@NonNull final RoutineInvocationException ex) {
+        public void exception(@Nonnull final RoutineInvocationException ex) {
 
             throw ex;
         }
@@ -750,10 +750,10 @@ public class ClassRoutineBuilder {
          * @param log           the log instance.
          * @param level         the log level.
          */
-        private RoutineInfo(@NonNull final Method method, @NonNull final String parallelGroup,
+        private RoutineInfo(@Nonnull final Method method, @Nonnull final String parallelGroup,
                 @Nullable final Runner runner, @Nullable final Boolean isSequential,
-                final boolean orderedInput, @NonNull final Catch catchClause,
-                @NonNull final Log log, @NonNull final LogLevel level) {
+                final boolean orderedInput, @Nonnull final Catch catchClause,
+                @Nonnull final Log log, @Nonnull final LogLevel level) {
 
             mMethod = method;
             mParallelGroup = parallelGroup;
@@ -815,7 +815,7 @@ public class ClassRoutineBuilder {
          *
          * @param method the method instance.
          */
-        private SetAccessibleAction(@NonNull final Method method) {
+        private SetAccessibleAction(@Nonnull final Method method) {
 
             mMethod = method;
         }

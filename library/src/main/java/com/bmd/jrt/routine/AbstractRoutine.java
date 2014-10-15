@@ -28,8 +28,10 @@ import com.bmd.jrt.time.TimeDuration.Check;
 import java.util.LinkedList;
 import java.util.List;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * Basic abstract implementation of a routine.
@@ -85,10 +87,10 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
      * @throws IllegalArgumentException if at least one of the parameter is invalid.
      */
     @SuppressWarnings("ConstantConditions")
-    protected AbstractRoutine(@NonNull final Runner syncRunner, @NonNull final Runner asyncRunner,
-            final int maxRunning, final int maxRetained, @NonNull final TimeDuration availTimeout,
-            final boolean orderedInput, final boolean orderedOutput, @NonNull final Log log,
-            @NonNull final LogLevel logLevel) {
+    protected AbstractRoutine(@Nonnull final Runner syncRunner, @Nonnull final Runner asyncRunner,
+            final int maxRunning, final int maxRetained, @Nonnull final TimeDuration availTimeout,
+            final boolean orderedInput, final boolean orderedOutput, @Nonnull final Log log,
+            @Nonnull final LogLevel logLevel) {
 
         if (syncRunner == null) {
 
@@ -142,9 +144,9 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
      * @param orderedOutput whether the output data are forced to be delivered in insertion order.
      * @param logger        the logger instance.
      */
-    private AbstractRoutine(@NonNull final Runner syncRunner, @NonNull final Runner asyncRunner,
-            final int maxRunning, final int maxRetained, @NonNull final TimeDuration availTimeout,
-            final boolean orderedInput, final boolean orderedOutput, @NonNull final Logger logger) {
+    private AbstractRoutine(@Nonnull final Runner syncRunner, @Nonnull final Runner asyncRunner,
+            final int maxRunning, final int maxRetained, @Nonnull final TimeDuration availTimeout,
+            final boolean orderedInput, final boolean orderedOutput, @Nonnull final Logger logger) {
 
         mSyncRunner = syncRunner;
         mAsyncRunner = asyncRunner;
@@ -157,126 +159,126 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public List<OUTPUT> call() {
 
         return run().readAll();
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public List<OUTPUT> call(@Nullable final INPUT input) {
 
         return run(input).readAll();
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public List<OUTPUT> call(@Nullable final INPUT... inputs) {
 
         return run(inputs).readAll();
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public List<OUTPUT> call(@Nullable final Iterable<? extends INPUT> inputs) {
 
         return run(inputs).readAll();
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public List<OUTPUT> call(@Nullable final OutputChannel<? extends INPUT> inputs) {
 
         return run(inputs).readAll();
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public List<OUTPUT> callAsync() {
 
         return runAsync().readAll();
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public List<OUTPUT> callAsync(@Nullable final INPUT input) {
 
         return runAsync(input).readAll();
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public List<OUTPUT> callAsync(@Nullable final INPUT... inputs) {
 
         return runAsync(inputs).readAll();
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public List<OUTPUT> callAsync(@Nullable final Iterable<? extends INPUT> inputs) {
 
         return runAsync(inputs).readAll();
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public List<OUTPUT> callAsync(@Nullable final OutputChannel<? extends INPUT> inputs) {
 
         return runAsync(inputs).readAll();
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public List<OUTPUT> callParallel() {
 
         return runParallel().readAll();
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public List<OUTPUT> callParallel(@Nullable final INPUT input) {
 
         return runParallel(input).readAll();
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public List<OUTPUT> callParallel(@Nullable final INPUT... inputs) {
 
         return runParallel(inputs).readAll();
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public List<OUTPUT> callParallel(@Nullable final Iterable<? extends INPUT> inputs) {
 
         return runParallel(inputs).readAll();
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public List<OUTPUT> callParallel(@Nullable final OutputChannel<? extends INPUT> inputs) {
 
         return runParallel(inputs).readAll();
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public ParameterChannel<INPUT, OUTPUT> invoke() {
 
         return invoke(false);
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public ParameterChannel<INPUT, OUTPUT> invokeAsync() {
 
         return invoke(true);
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public ParameterChannel<INPUT, OUTPUT> invokeParallel() {
 
         mLogger.dbg("invoking routine: parallel");
@@ -287,7 +289,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
                                                    mOrderedOutput, mLogger) {
 
                     @Override
-                    @NonNull
+                    @Nonnull
                     protected Execution<INPUT, OUTPUT> createExecution(final boolean async) {
 
                         return new ParallelExecution<INPUT, OUTPUT>(AbstractRoutine.this);
@@ -298,105 +300,105 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public OutputChannel<OUTPUT> run() {
 
         return invoke().results();
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public OutputChannel<OUTPUT> run(@Nullable final INPUT input) {
 
         return invoke().pass(input).results();
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public OutputChannel<OUTPUT> run(@Nullable final INPUT... inputs) {
 
         return invoke().pass(inputs).results();
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public OutputChannel<OUTPUT> run(@Nullable final Iterable<? extends INPUT> inputs) {
 
         return invoke().pass(inputs).results();
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public OutputChannel<OUTPUT> run(@Nullable final OutputChannel<? extends INPUT> inputs) {
 
         return invoke().pass(inputs).results();
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public OutputChannel<OUTPUT> runAsync() {
 
         return invokeAsync().results();
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public OutputChannel<OUTPUT> runAsync(@Nullable final INPUT input) {
 
         return invokeAsync().pass(input).results();
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public OutputChannel<OUTPUT> runAsync(@Nullable final INPUT... inputs) {
 
         return invokeAsync().pass(inputs).results();
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public OutputChannel<OUTPUT> runAsync(@Nullable final Iterable<? extends INPUT> inputs) {
 
         return invokeAsync().pass(inputs).results();
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public OutputChannel<OUTPUT> runAsync(@Nullable final OutputChannel<? extends INPUT> inputs) {
 
         return invokeAsync().pass(inputs).results();
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public OutputChannel<OUTPUT> runParallel() {
 
         return invokeParallel().results();
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public OutputChannel<OUTPUT> runParallel(@Nullable final INPUT input) {
 
         return invokeParallel().pass(input).results();
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public OutputChannel<OUTPUT> runParallel(@Nullable final INPUT... inputs) {
 
         return invokeParallel().pass(inputs).results();
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public OutputChannel<OUTPUT> runParallel(@Nullable final Iterable<? extends INPUT> inputs) {
 
         return invokeParallel().pass(inputs).results();
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public OutputChannel<OUTPUT> runParallel(
             @Nullable final OutputChannel<? extends INPUT> inputs) {
 
@@ -409,10 +411,10 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
      * @param async whether the execution is asynchronous.
      * @return the execution instance.
      */
-    @NonNull
+    @Nonnull
     protected abstract Execution<INPUT, OUTPUT> createExecution(boolean async);
 
-    @NonNull
+    @Nonnull
     private ParameterChannel<INPUT, OUTPUT> invoke(final boolean async) {
 
         final Logger logger = mLogger;
@@ -443,7 +445,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
         }
 
         @Override
-        @NonNull
+        @Nonnull
         public Execution<INPUT, OUTPUT> create() {
 
             synchronized (mMutex) {
@@ -499,10 +501,9 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
         }
 
         @Override
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "NO_NOTIFY_NOT_NOTIFYALL",
-                                                          justification = "only one execution is "
-                                                                  + "released")
-        public void discard(@NonNull final Execution<INPUT, OUTPUT> execution) {
+        @SuppressFBWarnings(value = "NO_NOTIFY_NOT_NOTIFYALL",
+                            justification = "only one execution is released")
+        public void discard(@Nonnull final Execution<INPUT, OUTPUT> execution) {
 
             synchronized (mMutex) {
 
@@ -514,10 +515,9 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
         }
 
         @Override
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "NO_NOTIFY_NOT_NOTIFYALL",
-                                                          justification = "only one execution is "
-                                                                  + "released")
-        public void recycle(@NonNull final Execution<INPUT, OUTPUT> execution) {
+        @SuppressFBWarnings(value = "NO_NOTIFY_NOT_NOTIFYALL",
+                            justification = "only one execution is released")
+        public void recycle(@Nonnull final Execution<INPUT, OUTPUT> execution) {
 
             synchronized (mMutex) {
 

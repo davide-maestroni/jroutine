@@ -17,8 +17,8 @@ import com.bmd.jrt.time.TimeDuration;
 
 import java.util.concurrent.TimeUnit;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Interface defining a result channel, that is the channel used by the routine invocation to
@@ -31,30 +31,30 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 public interface ResultChannel<OUTPUT> extends InputChannel<OUTPUT> {
 
     @Override
-    @NonNull
-    public ResultChannel<OUTPUT> after(@NonNull TimeDuration delay);
+    @Nonnull
+    public ResultChannel<OUTPUT> after(@Nonnull TimeDuration delay);
 
     @Override
-    @NonNull
-    public ResultChannel<OUTPUT> after(long delay, @NonNull TimeUnit timeUnit);
+    @Nonnull
+    public ResultChannel<OUTPUT> after(long delay, @Nonnull TimeUnit timeUnit);
 
-    @NonNull
+    @Nonnull
     @Override
     public ResultChannel<OUTPUT> now();
 
     @Override
-    @NonNull
+    @Nonnull
     public ResultChannel<OUTPUT> pass(@Nullable OutputChannel<OUTPUT> channel);
 
     @Override
-    @NonNull
+    @Nonnull
     public ResultChannel<OUTPUT> pass(@Nullable Iterable<? extends OUTPUT> outputs);
 
     @Override
-    @NonNull
+    @Nonnull
     public ResultChannel<OUTPUT> pass(@Nullable OUTPUT output);
 
     @Override
-    @NonNull
+    @Nonnull
     public ResultChannel<OUTPUT> pass(@Nullable OUTPUT... outputs);
 }

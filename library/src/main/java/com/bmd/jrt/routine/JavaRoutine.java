@@ -16,7 +16,7 @@ package com.bmd.jrt.routine;
 import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.execution.Execution;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
+import javax.annotation.Nonnull;
 
 /**
  * This utility class represents the entry point to the framework functionalities by acting as a
@@ -66,9 +66,9 @@ public class JavaRoutine {
      * @return the routine builder instance.
      * @throws NullPointerException if the class token is null.
      */
-    @NonNull
+    @Nonnull
     public static <INPUT, OUTPUT> RoutineBuilder<INPUT, OUTPUT> on(
-            @NonNull final ClassToken<? extends Execution<INPUT, OUTPUT>> classToken) {
+            @Nonnull final ClassToken<? extends Execution<INPUT, OUTPUT>> classToken) {
 
         return new RoutineBuilder<INPUT, OUTPUT>(classToken);
     }
@@ -82,8 +82,8 @@ public class JavaRoutine {
      * @throws IllegalArgumentException if a duplicate name in the annotations is
      *                                  detected.
      */
-    @NonNull
-    public static ObjectRoutineBuilder on(@NonNull final Object target) {
+    @Nonnull
+    public static ObjectRoutineBuilder on(@Nonnull final Object target) {
 
         return new ObjectRoutineBuilder(target);
     }
@@ -97,8 +97,8 @@ public class JavaRoutine {
      * @throws IllegalArgumentException if a duplicate name in the annotations is
      *                                  detected.
      */
-    @NonNull
-    public static ClassRoutineBuilder on(@NonNull final Class<?> target) {
+    @Nonnull
+    public static ClassRoutineBuilder on(@Nonnull final Class<?> target) {
 
         return new ClassRoutineBuilder(target);
     }

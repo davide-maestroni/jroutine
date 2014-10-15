@@ -17,8 +17,8 @@ import com.bmd.jrt.time.TimeDuration;
 
 import java.util.concurrent.TimeUnit;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Interface defining a parameter input channel, that is the channel used to pass input data to the
@@ -32,31 +32,31 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 public interface ParameterChannel<INPUT, OUTPUT> extends InputChannel<INPUT> {
 
     @Override
-    @NonNull
-    public ParameterChannel<INPUT, OUTPUT> after(@NonNull TimeDuration delay);
+    @Nonnull
+    public ParameterChannel<INPUT, OUTPUT> after(@Nonnull TimeDuration delay);
 
     @Override
-    @NonNull
-    public ParameterChannel<INPUT, OUTPUT> after(long delay, @NonNull TimeUnit timeUnit);
+    @Nonnull
+    public ParameterChannel<INPUT, OUTPUT> after(long delay, @Nonnull TimeUnit timeUnit);
 
-    @NonNull
+    @Nonnull
     @Override
     public ParameterChannel<INPUT, OUTPUT> now();
 
     @Override
-    @NonNull
+    @Nonnull
     public ParameterChannel<INPUT, OUTPUT> pass(@Nullable OutputChannel<INPUT> channel);
 
     @Override
-    @NonNull
+    @Nonnull
     public ParameterChannel<INPUT, OUTPUT> pass(@Nullable Iterable<? extends INPUT> inputs);
 
     @Override
-    @NonNull
+    @Nonnull
     public ParameterChannel<INPUT, OUTPUT> pass(@Nullable INPUT input);
 
     @Override
-    @NonNull
+    @Nonnull
     public ParameterChannel<INPUT, OUTPUT> pass(@Nullable INPUT... inputs);
 
     /**
@@ -67,6 +67,6 @@ public interface ParameterChannel<INPUT, OUTPUT> extends InputChannel<INPUT> {
      * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
      *                                             exception.
      */
-    @NonNull
+    @Nonnull
     public OutputChannel<OUTPUT> results();
 }

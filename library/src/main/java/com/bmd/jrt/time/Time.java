@@ -15,7 +15,7 @@ package com.bmd.jrt.time;
 
 import java.util.concurrent.TimeUnit;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
+import javax.annotation.Nonnull;
 
 /**
  * Utility class for handling time in different time units.
@@ -85,7 +85,7 @@ public class Time {
      * @param time the time value.
      * @param unit the time unit.
      */
-    protected Time(final long time, @NonNull final TimeUnit unit) {
+    protected Time(final long time, @Nonnull final TimeUnit unit) {
 
         this.time = time;
         this.unit = unit;
@@ -97,7 +97,7 @@ public class Time {
      * @return the time instance.
      * @see System#currentTimeMillis()
      */
-    @NonNull
+    @Nonnull
     public static Time current() {
 
         return millis(System.currentTimeMillis());
@@ -110,7 +110,7 @@ public class Time {
      * @return the time instance.
      * @see System#nanoTime()
      */
-    @NonNull
+    @Nonnull
     public static Time currentNano() {
 
         return nanos(System.nanoTime());
@@ -122,7 +122,7 @@ public class Time {
      * @param days the number of days.
      * @return the time instance.
      */
-    @NonNull
+    @Nonnull
     public static Time days(final long days) {
 
         if ((days > MAX_DAYS) || (days < -MAX_DAYS)) {
@@ -142,9 +142,9 @@ public class Time {
      * @return the time instance.
      * @throws NullPointerException if the specified time unit is null.
      */
-    @NonNull
+    @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public static Time fromUnit(final long time, @NonNull TimeUnit unit) {
+    public static Time fromUnit(final long time, @Nonnull TimeUnit unit) {
 
         if (unit == null) {
 
@@ -160,7 +160,7 @@ public class Time {
      * @param hours the number of hours
      * @return the time instance.
      */
-    @NonNull
+    @Nonnull
     public static Time hours(final long hours) {
 
         if ((hours > MAX_HOURS) || (hours < -MAX_HOURS)) {
@@ -177,7 +177,7 @@ public class Time {
      * @param micros the number of microseconds.
      * @return the time instance.
      */
-    @NonNull
+    @Nonnull
     public static Time micros(final long micros) {
 
         return new Time(micros, TimeUnit.MICROSECONDS);
@@ -189,7 +189,7 @@ public class Time {
      * @param millis the number of milliseconds.
      * @return the time instance.
      */
-    @NonNull
+    @Nonnull
     public static Time millis(final long millis) {
 
         return new Time(millis, TimeUnit.MILLISECONDS);
@@ -201,7 +201,7 @@ public class Time {
      * @param minutes the number of minutes.
      * @return the time instance.
      */
-    @NonNull
+    @Nonnull
     public static Time minutes(final long minutes) {
 
         if ((minutes > MAX_MINUTES) || (minutes < -MAX_MINUTES)) {
@@ -218,7 +218,7 @@ public class Time {
      * @param nanos the number of nanoseconds.
      * @return the time instance.
      */
-    @NonNull
+    @Nonnull
     public static Time nanos(final long nanos) {
 
         return new Time(nanos, TimeUnit.NANOSECONDS);
@@ -230,7 +230,7 @@ public class Time {
      * @param seconds the number of seconds.
      * @return the time instance.
      */
-    @NonNull
+    @Nonnull
     public static Time seconds(final long seconds) {
 
         return new Time(seconds, TimeUnit.SECONDS);
@@ -241,7 +241,7 @@ public class Time {
      *
      * @return the time instance.
      */
-    @NonNull
+    @Nonnull
     public Time daysTime() {
 
         return days(toDays());
@@ -290,7 +290,7 @@ public class Time {
      *
      * @return the time instance.
      */
-    @NonNull
+    @Nonnull
     public Time hoursTime() {
 
         return hours(toHours());
@@ -311,7 +311,7 @@ public class Time {
      *
      * @return the time instance.
      */
-    @NonNull
+    @Nonnull
     public Time microsTime() {
 
         return micros(toMicros());
@@ -322,7 +322,7 @@ public class Time {
      *
      * @return the time instance.
      */
-    @NonNull
+    @Nonnull
     public Time millisTime() {
 
         return millis(toMillis());
@@ -333,7 +333,7 @@ public class Time {
      *
      * @return the time instance.
      */
-    @NonNull
+    @Nonnull
     public Time minutesTime() {
 
         return minutes(toMinutes());
@@ -344,7 +344,7 @@ public class Time {
      *
      * @return the time instance.
      */
-    @NonNull
+    @Nonnull
     public Time nanosTime() {
 
         return nanos(toNanos());
@@ -355,7 +355,7 @@ public class Time {
      *
      * @return the time instance.
      */
-    @NonNull
+    @Nonnull
     public Time secondsTime() {
 
         return seconds(toSeconds());

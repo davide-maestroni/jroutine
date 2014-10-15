@@ -13,7 +13,7 @@
  */
 package com.bmd.jrt.channel;
 
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nullable;
 
 /**
  * Empty abstract implementation of an output consumer.
@@ -37,7 +37,7 @@ public abstract class BasicOutputConsumer<OUTPUT> implements OutputConsumer<OUTP
     }
 
     @Override
-    public void onOutput(@Nullable final OUTPUT output) {
+    public void onOutput(final OUTPUT output) {
 
     }
 }

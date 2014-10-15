@@ -22,8 +22,8 @@ import com.bmd.jrt.time.TimeDuration;
 
 import java.lang.reflect.Constructor;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import static com.bmd.jrt.routine.ReflectionUtils.NO_ARGS;
 import static com.bmd.jrt.routine.ReflectionUtils.findConstructor;
@@ -65,11 +65,11 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
      *                                  constructor matching the specified arguments is found for
      *                                  the target execution class.
      */
-    DefaultRoutine(@NonNull final Runner syncRunner, @NonNull final Runner asyncRunner,
-            final int maxRunning, final int maxRetained, @NonNull final TimeDuration availTimeout,
-            final boolean orderedInput, final boolean orderedOutput, @NonNull final Log log,
-            @NonNull final LogLevel logLevel,
-            @NonNull final Class<? extends Execution<INPUT, OUTPUT>> executionClass,
+    DefaultRoutine(@Nonnull final Runner syncRunner, @Nonnull final Runner asyncRunner,
+            final int maxRunning, final int maxRetained, @Nonnull final TimeDuration availTimeout,
+            final boolean orderedInput, final boolean orderedOutput, @Nonnull final Log log,
+            @Nonnull final LogLevel logLevel,
+            @Nonnull final Class<? extends Execution<INPUT, OUTPUT>> executionClass,
             @Nullable final Object... executionArgs) {
 
         super(syncRunner, asyncRunner, maxRunning, maxRetained, availTimeout, orderedInput,
@@ -81,7 +81,7 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
     }
 
     @Override
-    @NonNull
+    @Nonnull
     protected Execution<INPUT, OUTPUT> createExecution(final boolean async) {
 
         final Logger logger = mLogger;

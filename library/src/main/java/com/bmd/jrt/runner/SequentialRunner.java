@@ -17,7 +17,7 @@ import com.bmd.jrt.common.RoutineInterruptedException;
 
 import java.util.concurrent.TimeUnit;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
+import javax.annotation.Nonnull;
 
 import static com.bmd.jrt.time.TimeDuration.fromUnit;
 
@@ -36,8 +36,8 @@ import static com.bmd.jrt.time.TimeDuration.fromUnit;
 class SequentialRunner implements Runner {
 
     @Override
-    public void run(@NonNull final Invocation invocation, final long delay,
-            @NonNull final TimeUnit timeUnit) {
+    public void run(@Nonnull final Invocation invocation, final long delay,
+            @Nonnull final TimeUnit timeUnit) {
 
         try {
 

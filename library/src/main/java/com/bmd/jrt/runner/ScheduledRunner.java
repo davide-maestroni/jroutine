@@ -3,7 +3,7 @@ package com.bmd.jrt.runner;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
+import javax.annotation.Nonnull;
 
 /**
  * Class implementing a runner employing an executor service.
@@ -20,7 +20,7 @@ class ScheduledRunner implements Runner {
      * @param service the executor service.
      */
     @SuppressWarnings("ConstantConditions")
-    ScheduledRunner(@NonNull final ScheduledExecutorService service) {
+    ScheduledRunner(@Nonnull final ScheduledExecutorService service) {
 
         if (service == null) {
 
@@ -31,8 +31,8 @@ class ScheduledRunner implements Runner {
     }
 
     @Override
-    public void run(@NonNull final Invocation invocation, final long delay,
-            @NonNull final TimeUnit timeUnit) {
+    public void run(@Nonnull final Invocation invocation, final long delay,
+            @Nonnull final TimeUnit timeUnit) {
 
         if (delay > 0) {
 

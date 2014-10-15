@@ -15,7 +15,7 @@ package com.bmd.jrt.runner;
 
 import java.util.concurrent.ScheduledExecutorService;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
+import javax.annotation.Nonnull;
 
 /**
  * Utility class for creating and sharing runner instances.
@@ -42,7 +42,7 @@ public class Runners {
      *
      * @return the runner instance.
      */
-    @NonNull
+    @Nonnull
     public static Runner pool() {
 
         return pool(getBestPoolSize());
@@ -54,7 +54,7 @@ public class Runners {
      * @param poolSize the thread pool size.
      * @return the runner instance.
      */
-    @NonNull
+    @Nonnull
     public static Runner pool(final int poolSize) {
 
         return new ThreadPoolRunner(poolSize);
@@ -65,7 +65,7 @@ public class Runners {
      *
      * @return the runner instance.
      */
-    @NonNull
+    @Nonnull
     public static Runner queued() {
 
         return sQueuedRunner;
@@ -77,8 +77,8 @@ public class Runners {
      * @param service the executor service.
      * @return the runner instance.
      */
-    @NonNull
-    public static Runner scheduled(@NonNull final ScheduledExecutorService service) {
+    @Nonnull
+    public static Runner scheduled(@Nonnull final ScheduledExecutorService service) {
 
         return new ScheduledRunner(service);
     }
@@ -88,7 +88,7 @@ public class Runners {
      *
      * @return the runner instance.
      */
-    @NonNull
+    @Nonnull
     public static Runner sequential() {
 
         return sSequentialRunner;
@@ -99,7 +99,7 @@ public class Runners {
      *
      * @return the runner instance.
      */
-    @NonNull
+    @Nonnull
     public static Runner shared() {
 
         if (sSharedRunner == null) {

@@ -17,8 +17,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Abstract implementation of a log.
@@ -47,21 +47,21 @@ public abstract class BasicLog implements Log {
     }
 
     @Override
-    public void dbg(@NonNull final List<Object> contexts, @Nullable final String message,
+    public void dbg(@Nonnull final List<Object> contexts, @Nullable final String message,
             @Nullable final Throwable throwable) {
 
         log(LogLevel.DEBUG, contexts, message, throwable);
     }
 
     @Override
-    public void err(@NonNull final List<Object> contexts, @Nullable final String message,
+    public void err(@Nonnull final List<Object> contexts, @Nullable final String message,
             @Nullable final Throwable throwable) {
 
         log(LogLevel.ERROR, contexts, message, throwable);
     }
 
     @Override
-    public void wrn(@NonNull final List<Object> contexts, @Nullable final String message,
+    public void wrn(@Nonnull final List<Object> contexts, @Nullable final String message,
             @Nullable final Throwable throwable) {
 
         log(LogLevel.WARNING, contexts, message, throwable);
@@ -75,7 +75,7 @@ public abstract class BasicLog implements Log {
      * @param message   the log message.
      * @param throwable the related exception.
      */
-    protected void log(@NonNull final LogLevel level, @NonNull final List<Object> contexts,
+    protected void log(@Nonnull final LogLevel level, @Nonnull final List<Object> contexts,
             @Nullable final String message, @Nullable final Throwable throwable) {
 
         String formatted = format(level, contexts, message);
@@ -93,7 +93,7 @@ public abstract class BasicLog implements Log {
      *
      * @param message the message.
      */
-    protected void log(@NonNull final String message) {
+    protected void log(@Nonnull final String message) {
 
     }
 }

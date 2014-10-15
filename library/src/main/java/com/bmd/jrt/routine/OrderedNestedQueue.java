@@ -15,8 +15,8 @@ package com.bmd.jrt.routine;
 
 import java.util.Collection;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Implementation of a nested queue ensuring that data are returned in the same order as they are
@@ -45,12 +45,12 @@ class OrderedNestedQueue<E> implements NestedQueue<E> {
      *
      * @param queue the internal queue.
      */
-    private OrderedNestedQueue(@NonNull final SimpleQueue<Object> queue) {
+    private OrderedNestedQueue(@Nonnull final SimpleQueue<Object> queue) {
 
         mQueue = queue;
     }
 
-    private static void purge(@NonNull final OrderedNestedQueue<?> queue) {
+    private static void purge(@Nonnull final OrderedNestedQueue<?> queue) {
 
         final SimpleQueue<Object> simpleQueue = queue.mQueue;
 
@@ -94,7 +94,7 @@ class OrderedNestedQueue<E> implements NestedQueue<E> {
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public NestedQueue<E> add(@Nullable final E element) {
 
         checkOpen();
@@ -105,8 +105,8 @@ class OrderedNestedQueue<E> implements NestedQueue<E> {
     }
 
     @Override
-    @NonNull
-    public NestedQueue<E> addAll(@NonNull final Iterable<? extends E> elements) {
+    @Nonnull
+    public NestedQueue<E> addAll(@Nonnull final Iterable<? extends E> elements) {
 
         checkOpen();
 
@@ -116,7 +116,7 @@ class OrderedNestedQueue<E> implements NestedQueue<E> {
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public NestedQueue<E> addNested() {
 
         checkOpen();
@@ -128,7 +128,7 @@ class OrderedNestedQueue<E> implements NestedQueue<E> {
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public NestedQueue<E> clear() {
 
         mQueue.clear();
@@ -137,7 +137,7 @@ class OrderedNestedQueue<E> implements NestedQueue<E> {
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public NestedQueue<E> close() {
 
         mClosed = true;
@@ -164,9 +164,9 @@ class OrderedNestedQueue<E> implements NestedQueue<E> {
     }
 
     @Override
-    @NonNull
+    @Nonnull
     @SuppressWarnings("unchecked")
-    public NestedQueue<E> moveTo(@NonNull final Collection<? super E> collection) {
+    public NestedQueue<E> moveTo(@Nonnull final Collection<? super E> collection) {
 
         purge(this);
 

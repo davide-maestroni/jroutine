@@ -15,7 +15,7 @@ package com.bmd.jrt.runner;
 
 import java.util.concurrent.TimeUnit;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
+import javax.annotation.Nonnull;
 
 /**
  * The runner interface defines an object responsible for executing routine invocations inside
@@ -40,5 +40,5 @@ public interface Runner {
      * @param delay      the execution delay.
      * @param timeUnit   the delay time unit.
      */
-    public void run(@NonNull Invocation invocation, long delay, @NonNull TimeUnit timeUnit);
+    public void run(@Nonnull Invocation invocation, long delay, @Nonnull TimeUnit timeUnit);
 }

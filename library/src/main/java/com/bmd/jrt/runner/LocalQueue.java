@@ -18,7 +18,7 @@ import com.bmd.jrt.time.TimeDuration;
 
 import java.util.concurrent.TimeUnit;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
+import javax.annotation.Nonnull;
 
 import static com.bmd.jrt.time.TimeDuration.fromUnit;
 import static com.bmd.jrt.time.TimeDuration.nanos;
@@ -73,13 +73,13 @@ class LocalQueue {
      * @param delay      the execution delay.
      * @param timeUnit   the delay time unit.
      */
-    public static void run(@NonNull final Invocation invocation, final long delay,
-            @NonNull final TimeUnit timeUnit) {
+    public static void run(@Nonnull final Invocation invocation, final long delay,
+            @Nonnull final TimeUnit timeUnit) {
 
         sQueue.get().addInvocation(invocation, delay, timeUnit);
     }
 
-    private static <T> void resizeArray(@NonNull final T[] src, @NonNull final T[] dst,
+    private static <T> void resizeArray(@Nonnull final T[] src, @Nonnull final T[] dst,
             final int first) {
 
         final int remainder = src.length - first;
@@ -88,7 +88,7 @@ class LocalQueue {
         System.arraycopy(src, first, dst, dst.length - remainder, remainder);
     }
 
-    private static void resizeArray(@NonNull final long[] src, @NonNull final long[] dst,
+    private static void resizeArray(@Nonnull final long[] src, @Nonnull final long[] dst,
             final int first) {
 
         final int remainder = src.length - first;
@@ -97,7 +97,7 @@ class LocalQueue {
         System.arraycopy(src, first, dst, dst.length - remainder, remainder);
     }
 
-    private void add(@NonNull final Invocation invocation, @NonNull final TimeDuration delay) {
+    private void add(@Nonnull final Invocation invocation, @Nonnull final TimeDuration delay) {
 
         final int i = mLast;
 
@@ -124,8 +124,8 @@ class LocalQueue {
         mLast = newLast;
     }
 
-    private void addInvocation(@NonNull final Invocation invocation, final long delay,
-            @NonNull final TimeUnit timeUnit) {
+    private void addInvocation(@Nonnull final Invocation invocation, final long delay,
+            @Nonnull final TimeUnit timeUnit) {
 
         add(invocation, fromUnit(delay, timeUnit));
 

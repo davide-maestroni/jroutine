@@ -15,8 +15,8 @@ package com.bmd.jrt.log;
 
 import java.util.List;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Log implementation simply discarding all messages.
@@ -26,7 +26,7 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 public class NullLog extends BasicLog {
 
     @Override
-    protected void log(@NonNull final LogLevel level, @NonNull final List<Object> contexts,
+    protected void log(@Nonnull final LogLevel level, @Nonnull final List<Object> contexts,
             @Nullable final String message, @Nullable final Throwable throwable) {
 
     }

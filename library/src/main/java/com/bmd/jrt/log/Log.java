@@ -15,8 +15,8 @@ package com.bmd.jrt.log;
 
 import java.util.List;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Interface defining a log object responsible for formatting and writing the framework log
@@ -55,7 +55,7 @@ public interface Log {
      * @param message   the message.
      * @param throwable the optional throwable or null.
      */
-    public void dbg(@NonNull List<Object> contexts, @Nullable String message,
+    public void dbg(@Nonnull List<Object> contexts, @Nullable String message,
             @Nullable Throwable throwable);
 
     /**
@@ -65,7 +65,7 @@ public interface Log {
      * @param message   the message.
      * @param throwable the optional throwable or null.
      */
-    public void err(@NonNull List<Object> contexts, @Nullable String message,
+    public void err(@Nonnull List<Object> contexts, @Nullable String message,
             @Nullable Throwable throwable);
 
     /**
@@ -75,7 +75,7 @@ public interface Log {
      * @param message   the message.
      * @param throwable the optional throwable or null.
      */
-    public void wrn(@NonNull List<Object> contexts, @Nullable String message,
+    public void wrn(@Nonnull List<Object> contexts, @Nullable String message,
             @Nullable Throwable throwable);
 
     /**
@@ -83,9 +83,26 @@ public interface Log {
      */
     public enum LogLevel {
 
+        /**
+         * The most verbose log level.<br/>
+         * Debug logs are meant to describe in detail what's happening in the routine.
+         */
         DEBUG,
+        /**
+         * The medium log level.<br/>
+         * Warning logs are meant to notify events that are not completely unexpected,
+         * but might be a clue that something wrong is happening.
+         */
         WARNING,
+        /**
+         * The least verbose level.<br/>
+         * Error logs notify unexpected events that are clearly an exception in the normal routine
+         * execution.
+         */
         ERROR,
+        /**
+         * Silents all the logs.
+         */
         SILENT
     }
 }

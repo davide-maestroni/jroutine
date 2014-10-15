@@ -30,8 +30,8 @@ import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.WeakHashMap;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import static com.bmd.jrt.routine.ReflectionUtils.boxingClass;
 
@@ -63,7 +63,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * @throws NullPointerException     if the specified target is null.
      * @throws IllegalArgumentException if a duplicate name in the annotations is detected.
      */
-    ObjectRoutineBuilder(@NonNull final Object target) {
+    ObjectRoutineBuilder(@Nonnull final Object target) {
 
         super(target);
 
@@ -88,8 +88,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * @throws NullPointerException     if the specified class is null.
      * @throws IllegalArgumentException if the specified class does not represent an interface.
      */
-    @NonNull
-    public <CLASS> CLASS as(@NonNull final Class<CLASS> itf) {
+    @Nonnull
+    public <CLASS> CLASS as(@Nonnull final Class<CLASS> itf) {
 
         if (!itf.isInterface()) {
 
@@ -115,8 +115,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     }
 
     @Override
-    @NonNull
-    public ObjectRoutineBuilder logLevel(@NonNull final LogLevel level) {
+    @Nonnull
+    public ObjectRoutineBuilder logLevel(@Nonnull final LogLevel level) {
 
         super.logLevel(level);
 
@@ -124,15 +124,15 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     }
 
     @Override
-    @NonNull
-    public ObjectRoutineBuilder loggedWith(@NonNull final Log log) {
+    @Nonnull
+    public ObjectRoutineBuilder loggedWith(@Nonnull final Log log) {
 
         super.loggedWith(log);
 
         return this;
     }
 
-    @NonNull
+    @Nonnull
     @Override
     public ObjectRoutineBuilder parallelGroup(@Nullable final String name) {
 
@@ -142,7 +142,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public ObjectRoutineBuilder queued() {
 
         super.queued();
@@ -151,8 +151,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     }
 
     @Override
-    @NonNull
-    public ObjectRoutineBuilder runBy(@NonNull final Runner runner) {
+    @Nonnull
+    public ObjectRoutineBuilder runBy(@Nonnull final Runner runner) {
 
         super.runBy(runner);
 
@@ -160,7 +160,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public ObjectRoutineBuilder sequential() {
 
         super.sequential();
@@ -169,8 +169,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     }
 
     @Override
-    @NonNull
-    public ObjectRoutineBuilder withinTry(@NonNull final Catch catchClause) {
+    @Nonnull
+    public ObjectRoutineBuilder withinTry(@Nonnull final Catch catchClause) {
 
         super.withinTry(catchClause);
 

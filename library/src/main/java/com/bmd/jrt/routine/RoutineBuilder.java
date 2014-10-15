@@ -24,7 +24,7 @@ import com.bmd.jrt.time.TimeDuration;
 
 import java.util.concurrent.TimeUnit;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
+import javax.annotation.Nonnull;
 
 import static com.bmd.jrt.routine.ReflectionUtils.NO_ARGS;
 import static com.bmd.jrt.time.TimeDuration.fromUnit;
@@ -100,7 +100,7 @@ public class RoutineBuilder<INPUT, OUTPUT> {
      * @throws NullPointerException if the class token is null.
      */
     @SuppressWarnings("ConstantConditions")
-    RoutineBuilder(@NonNull final ClassToken<? extends Execution<INPUT, OUTPUT>> classToken) {
+    RoutineBuilder(@Nonnull final ClassToken<? extends Execution<INPUT, OUTPUT>> classToken) {
 
         if (classToken == null) {
 
@@ -118,9 +118,9 @@ public class RoutineBuilder<INPUT, OUTPUT> {
      * @return this builder.
      * @throws IllegalArgumentException if the specified timeout is negative.
      */
-    @NonNull
+    @Nonnull
     public RoutineBuilder<INPUT, OUTPUT> availableTimeout(final long timeout,
-            @NonNull final TimeUnit timeUnit) {
+            @Nonnull final TimeUnit timeUnit) {
 
         return availableTimeout(fromUnit(timeout, timeUnit));
     }
@@ -132,9 +132,9 @@ public class RoutineBuilder<INPUT, OUTPUT> {
      * @return this builder.
      * @throws NullPointerException if the specified timeout is null.
      */
-    @NonNull
+    @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public RoutineBuilder<INPUT, OUTPUT> availableTimeout(@NonNull final TimeDuration timeout) {
+    public RoutineBuilder<INPUT, OUTPUT> availableTimeout(@Nonnull final TimeDuration timeout) {
 
         if (timeout == null) {
 
@@ -151,7 +151,7 @@ public class RoutineBuilder<INPUT, OUTPUT> {
      *
      * @return the newly created routine.
      */
-    @NonNull
+    @Nonnull
     public Routine<INPUT, OUTPUT> buildRoutine() {
 
         return new DefaultRoutine<INPUT, OUTPUT>(mSyncRunner, mAsyncRunner, mMaxRunning,
@@ -167,9 +167,9 @@ public class RoutineBuilder<INPUT, OUTPUT> {
      * @return this builder.
      * @throws NullPointerException if the log level is null.
      */
-    @NonNull
+    @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public RoutineBuilder<INPUT, OUTPUT> logLevel(@NonNull final LogLevel level) {
+    public RoutineBuilder<INPUT, OUTPUT> logLevel(@Nonnull final LogLevel level) {
 
         if (level == null) {
 
@@ -188,9 +188,9 @@ public class RoutineBuilder<INPUT, OUTPUT> {
      * @return this builder.
      * @throws NullPointerException if the log is null.
      */
-    @NonNull
+    @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public RoutineBuilder<INPUT, OUTPUT> loggedWith(@NonNull final Log log) {
+    public RoutineBuilder<INPUT, OUTPUT> loggedWith(@Nonnull final Log log) {
 
         if (log == null) {
 
@@ -209,7 +209,7 @@ public class RoutineBuilder<INPUT, OUTPUT> {
      * @return this builder.
      * @throws IllegalArgumentException if the number is negative.
      */
-    @NonNull
+    @Nonnull
     public RoutineBuilder<INPUT, OUTPUT> maxRetained(final int maxRetainedInstances) {
 
         if (maxRetainedInstances < 0) {
@@ -230,7 +230,7 @@ public class RoutineBuilder<INPUT, OUTPUT> {
      * @return this builder.
      * @throws IllegalArgumentException if the number is less than 1.
      */
-    @NonNull
+    @Nonnull
     public RoutineBuilder<INPUT, OUTPUT> maxRunning(final int maxRunningInstances) {
 
         if (maxRunningInstances < 1) {
@@ -250,7 +250,7 @@ public class RoutineBuilder<INPUT, OUTPUT> {
      *
      * @return this builder.
      */
-    @NonNull
+    @Nonnull
     public RoutineBuilder<INPUT, OUTPUT> orderedInput() {
 
         mOrderedInput = true;
@@ -264,7 +264,7 @@ public class RoutineBuilder<INPUT, OUTPUT> {
      *
      * @return this builder.
      */
-    @NonNull
+    @Nonnull
     public RoutineBuilder<INPUT, OUTPUT> orderedOutput() {
 
         mOrderedOutput = true;
@@ -281,7 +281,7 @@ public class RoutineBuilder<INPUT, OUTPUT> {
      *
      * @return this builder.
      */
-    @NonNull
+    @Nonnull
     public RoutineBuilder<INPUT, OUTPUT> queued() {
 
         mSyncRunner = Runners.queued();
@@ -296,9 +296,9 @@ public class RoutineBuilder<INPUT, OUTPUT> {
      * @return this builder.
      * @throws NullPointerException if the specified runner is null.
      */
-    @NonNull
+    @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public RoutineBuilder<INPUT, OUTPUT> runBy(@NonNull final Runner runner) {
+    public RoutineBuilder<INPUT, OUTPUT> runBy(@Nonnull final Runner runner) {
 
         if (runner == null) {
 
@@ -317,7 +317,7 @@ public class RoutineBuilder<INPUT, OUTPUT> {
      *
      * @return this builder.
      */
-    @NonNull
+    @Nonnull
     public RoutineBuilder<INPUT, OUTPUT> sequential() {
 
         mSyncRunner = Runners.sequential();
@@ -332,9 +332,9 @@ public class RoutineBuilder<INPUT, OUTPUT> {
      * @return this builder.
      * @throws NullPointerException if the specified arguments array is null.
      */
-    @NonNull
+    @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public RoutineBuilder<INPUT, OUTPUT> withArgs(@NonNull final Object... args) {
+    public RoutineBuilder<INPUT, OUTPUT> withArgs(@Nonnull final Object... args) {
 
         if (args == null) {
 

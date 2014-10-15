@@ -15,8 +15,8 @@ package com.bmd.jrt.execution;
 
 import com.bmd.jrt.channel.ResultChannel;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Empty abstract implementation of a routine execution.
@@ -41,12 +41,12 @@ public abstract class BasicExecution<INPUT, OUTPUT> implements Execution<INPUT, 
     }
 
     @Override
-    public void onInput(@Nullable final INPUT input, @NonNull final ResultChannel<OUTPUT> results) {
+    public void onInput(final INPUT input, @Nonnull final ResultChannel<OUTPUT> results) {
 
     }
 
     @Override
-    public void onResult(@NonNull final ResultChannel<OUTPUT> results) {
+    public void onResult(@Nonnull final ResultChannel<OUTPUT> results) {
 
     }
 

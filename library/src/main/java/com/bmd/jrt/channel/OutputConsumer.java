@@ -13,7 +13,7 @@
  */
 package com.bmd.jrt.channel;
 
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nullable;
 
 /**
  * Interface defining an output consumer which can be bound to an output channel.
@@ -41,5 +41,5 @@ public interface OutputConsumer<OUTPUT> {
      *
      * @param output the output.
      */
-    public void onOutput(@Nullable OUTPUT output);
+    public void onOutput(OUTPUT output);
 }

@@ -15,8 +15,8 @@ package com.bmd.jrt.execution;
 
 import com.bmd.jrt.channel.ResultChannel;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Interface defining the behavior of a routine execution.
@@ -84,7 +84,7 @@ public interface Execution<INPUT, OUTPUT> {
      * @param input   the input.
      * @param results the result channel.
      */
-    public void onInput(@Nullable INPUT input, @NonNull ResultChannel<OUTPUT> results);
+    public void onInput(INPUT input, @Nonnull ResultChannel<OUTPUT> results);
 
     /**
      * Called when all the inputs has been passed to the routine.<br/>
@@ -93,7 +93,7 @@ public interface Execution<INPUT, OUTPUT> {
      *
      * @param results the result channel.
      */
-    public void onResult(@NonNull ResultChannel<OUTPUT> results);
+    public void onResult(@Nonnull ResultChannel<OUTPUT> results);
 
     /**
      * Called when the routine execution has completed.

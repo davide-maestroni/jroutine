@@ -13,7 +13,7 @@
  */
 package com.bmd.jrt.channel;
 
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nullable;
 
 /**
  * Interface defining a basic communication channel with the routine.

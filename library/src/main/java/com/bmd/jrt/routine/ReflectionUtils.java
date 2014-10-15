@@ -19,8 +19,8 @@ import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Reflection utility class.
@@ -95,10 +95,10 @@ class ReflectionUtils {
      * @throws IllegalArgumentException if no constructor taking the specified object as parameters
      *                                  was found.
      */
-    @NonNull
+    @Nonnull
     @SuppressWarnings("unchecked")
-    public static <TYPE> Constructor<TYPE> findConstructor(@NonNull final Class<TYPE> type,
-            @NonNull final Object... ctorArgs) {
+    public static <TYPE> Constructor<TYPE> findConstructor(@Nonnull final Class<TYPE> type,
+            @Nonnull final Object... ctorArgs) {
 
         Constructor<?> constructor = findBestMatchingConstructor(type.getConstructors(), ctorArgs);
 
@@ -123,7 +123,7 @@ class ReflectionUtils {
 
     @Nullable
     private static Constructor<?> findBestMatchingConstructor(
-            @NonNull final Constructor<?>[] constructors, @NonNull final Object[] ctorArgs) {
+            @Nonnull final Constructor<?>[] constructors, @Nonnull final Object[] ctorArgs) {
 
         final int argsLength = ctorArgs.length;
 
@@ -206,7 +206,7 @@ class ReflectionUtils {
          *
          * @param constructor the constructor instance.
          */
-        private SetAccessibleAction(@NonNull final Constructor<?> constructor) {
+        private SetAccessibleAction(@Nonnull final Constructor<?> constructor) {
 
             mmConstructor = constructor;
         }

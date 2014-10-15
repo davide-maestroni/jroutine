@@ -15,8 +15,8 @@ package com.bmd.jrt.routine;
 
 import com.bmd.jrt.channel.OutputConsumer;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Decorator of an output consumer instance which synchronizes the access to its methods.
@@ -38,7 +38,7 @@ class SynchronizedConsumer<OUTPUT> implements OutputConsumer<OUTPUT> {
      * @throws NullPointerException is the specified consumer is null.
      */
     @SuppressWarnings("ConstantConditions")
-    SynchronizedConsumer(@NonNull final OutputConsumer<OUTPUT> wrapped) {
+    SynchronizedConsumer(@Nonnull final OutputConsumer<OUTPUT> wrapped) {
 
         if (wrapped == null) {
 
@@ -67,7 +67,7 @@ class SynchronizedConsumer<OUTPUT> implements OutputConsumer<OUTPUT> {
     }
 
     @Override
-    public void onOutput(@Nullable final OUTPUT output) {
+    public void onOutput(final OUTPUT output) {
 
         synchronized (mMutex) {
 

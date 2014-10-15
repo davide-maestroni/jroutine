@@ -15,8 +15,8 @@ package com.bmd.jrt.routine;
 
 import com.bmd.jrt.common.RoutineException;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Helper class handling routine exceptions to be transferred through the routine channels.
@@ -57,7 +57,7 @@ class RoutineExceptionWrapper {
      * @param t the throwable to wrap.
      * @return the new wrapper instance.
      */
-    @NonNull
+    @Nonnull
     public static RoutineExceptionWrapper wrap(@Nullable final Throwable t) {
 
         return new RoutineExceptionWrapper(t);
@@ -86,7 +86,7 @@ class RoutineExceptionWrapper {
      *
      * @return the routine exception.
      */
-    @NonNull
+    @Nonnull
     public RoutineException raise() {
 
         final Throwable cause = mCause;

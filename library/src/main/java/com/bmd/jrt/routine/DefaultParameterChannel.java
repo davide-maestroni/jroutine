@@ -28,8 +28,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import static com.bmd.jrt.time.TimeDuration.ZERO;
 import static com.bmd.jrt.time.TimeDuration.fromUnit;
@@ -76,9 +78,9 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
      * @param logger        the logger instance.
      * @throws NullPointerException if one of the parameters is null.
      */
-    DefaultParameterChannel(@NonNull final ExecutionProvider<INPUT, OUTPUT> provider,
-            @NonNull final Runner runner, final boolean orderedInput, final boolean orderedOutput,
-            @NonNull final Logger logger) {
+    DefaultParameterChannel(@Nonnull final ExecutionProvider<INPUT, OUTPUT> provider,
+            @Nonnull final Runner runner, final boolean orderedInput, final boolean orderedOutput,
+            @Nonnull final Logger logger) {
 
         mLogger = logger.subContextLogger(this);
         mRunner = runner;
@@ -88,7 +90,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
             @Override
             public void onAbort(final Throwable throwable, final long delay,
-                    @NonNull final TimeUnit timeUnit) {
+                    @Nonnull final TimeUnit timeUnit) {
 
                 synchronized (mMutex) {
 
@@ -169,9 +171,9 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
     }
 
     @Override
-    @NonNull
+    @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public ParameterChannel<INPUT, OUTPUT> after(@NonNull final TimeDuration delay) {
+    public ParameterChannel<INPUT, OUTPUT> after(@Nonnull final TimeDuration delay) {
 
         synchronized (mMutex) {
 
@@ -191,14 +193,14 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public ParameterChannel<INPUT, OUTPUT> after(final long delay,
-            @NonNull final TimeUnit timeUnit) {
+            @Nonnull final TimeUnit timeUnit) {
 
         return after(fromUnit(delay, timeUnit));
     }
 
-    @NonNull
+    @Nonnull
     @Override
     public ParameterChannel<INPUT, OUTPUT> now() {
 
@@ -206,7 +208,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public ParameterChannel<INPUT, OUTPUT> pass(@Nullable final OutputChannel<INPUT> channel) {
 
         final TimeDuration delay;
@@ -240,7 +242,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public ParameterChannel<INPUT, OUTPUT> pass(@Nullable final Iterable<? extends INPUT> inputs) {
 
         NestedQueue<INPUT> inputQueue;
@@ -290,7 +292,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public ParameterChannel<INPUT, OUTPUT> pass(@Nullable final INPUT input) {
 
         NestedQueue<INPUT> inputQueue;
@@ -330,7 +332,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public ParameterChannel<INPUT, OUTPUT> pass(@Nullable final INPUT... inputs) {
 
         synchronized (mMutex) {
@@ -349,7 +351,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public OutputChannel<OUTPUT> results() {
 
         synchronized (mMutex) {
@@ -412,7 +414,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
          *
          * @return the execution instance.
          */
-        @NonNull
+        @Nonnull
         public Execution<INPUT, OUTPUT> create();
 
         /**
@@ -420,14 +422,14 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
          *
          * @param execution the execution instance.
          */
-        public void discard(@NonNull Execution<INPUT, OUTPUT> execution);
+        public void discard(@Nonnull Execution<INPUT, OUTPUT> execution);
 
         /**
          * Recycles the specified execution.
          *
          * @param execution the execution instance.
          */
-        public void recycle(@NonNull Execution<INPUT, OUTPUT> execution);
+        public void recycle(@Nonnull Execution<INPUT, OUTPUT> execution);
     }
 
     /**
@@ -516,10 +518,8 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
         }
 
         @Override
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "IT_NO_SUCH_ELEMENT",
-                                                          justification = "NestedQueue" +
-                                                                  ".removeFirst() actually throws" +
-                                                                  " it")
+        @SuppressFBWarnings(value = "IT_NO_SUCH_ELEMENT",
+                            justification = "NestedQueue.removeFirst() actually throws it")
         public INPUT next() {
 
             synchronized (mMutex) {
@@ -558,7 +558,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
          *
          * @param delay the output delay.
          */
-        private DefaultOutputConsumer(@NonNull final TimeDuration delay) {
+        private DefaultOutputConsumer(@Nonnull final TimeDuration delay) {
 
             mDelay = delay;
             mQueue = mInputQueue.addNested();
@@ -602,7 +602,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
         }
 
         @Override
-        public void onOutput(@Nullable final INPUT output) {
+        public void onOutput(final INPUT output) {
 
             NestedQueue<INPUT> inputQueue;
             final TimeDuration delay = mDelay;
@@ -710,7 +710,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
          * @param queue the input queue.
          * @param input the input.
          */
-        private DelayedInputInvocation(@NonNull final NestedQueue<INPUT> queue,
+        private DelayedInputInvocation(@Nonnull final NestedQueue<INPUT> queue,
                 @Nullable final INPUT input) {
 
             mQueue = queue;
@@ -754,8 +754,8 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
          * @param queue  the input queue.
          * @param inputs the iterable returning the input data.
          */
-        private DelayedListInputInvocation(@NonNull final NestedQueue<INPUT> queue,
-                @NonNull final Iterable<? extends INPUT> inputs) {
+        private DelayedListInputInvocation(@Nonnull final NestedQueue<INPUT> queue,
+                @Nonnull final Iterable<? extends INPUT> inputs) {
 
             final ArrayList<INPUT> inputList = new ArrayList<INPUT>();
 

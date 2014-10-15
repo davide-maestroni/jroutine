@@ -11,20 +11,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.log;
-
-import javax.annotation.Nonnull;
 
 /**
- * Simple log implementation writing messages to the system output.
+ * Package containing annotation definitions.
  * <p/>
- * Created by davide on 10/3/14.
+ * Created by davide on 10/14/14.
  */
-public class SystemLog extends BasicLog {
-
-    @Override
-    public void log(@Nonnull final String message) {
-
-        System.out.println(message);
-    }
-}
+package com.bmd.jrt.annotation;

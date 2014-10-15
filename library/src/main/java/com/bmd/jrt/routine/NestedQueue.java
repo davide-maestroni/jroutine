@@ -15,8 +15,8 @@ package com.bmd.jrt.routine;
 
 import java.util.Collection;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Interface defining a queue with the possibility to add nested queues with additional elements.
@@ -39,7 +39,7 @@ interface NestedQueue<E> {
      * @return this queue.
      * @throws IllegalStateException if the queue has been already closed.
      */
-    @NonNull
+    @Nonnull
     public NestedQueue<E> add(@Nullable E element);
 
     /**
@@ -51,8 +51,8 @@ interface NestedQueue<E> {
      * @return this queue.
      * @throws IllegalStateException if the queue has been already closed.
      */
-    @NonNull
-    public NestedQueue<E> addAll(@NonNull Iterable<? extends E> elements);
+    @Nonnull
+    public NestedQueue<E> addAll(@Nonnull Iterable<? extends E> elements);
 
     /**
      * Adds a nested queue to this one.
@@ -60,7 +60,7 @@ interface NestedQueue<E> {
      * @return the newly added nested queue.
      * @throws IllegalStateException if the queue has been already closed.
      */
-    @NonNull
+    @Nonnull
     public NestedQueue<E> addNested();
 
     /**
@@ -68,7 +68,7 @@ interface NestedQueue<E> {
      *
      * @return this queue.
      */
-    @NonNull
+    @Nonnull
     public NestedQueue<E> clear();
 
     /**
@@ -78,7 +78,7 @@ interface NestedQueue<E> {
      *
      * @return this queue.
      */
-    @NonNull
+    @Nonnull
     public NestedQueue<E> close();
 
     /**
@@ -94,8 +94,8 @@ interface NestedQueue<E> {
      * @param collection the collection to fill.
      * @return this queue.
      */
-    @NonNull
-    public NestedQueue<E> moveTo(@NonNull final Collection<? super E> collection);
+    @Nonnull
+    public NestedQueue<E> moveTo(@Nonnull final Collection<? super E> collection);
 
     /**
      * Removes the first element added into the queue.

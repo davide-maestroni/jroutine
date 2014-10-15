@@ -19,8 +19,8 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Exception indicating that an execution of an object method thrown an exception.
@@ -49,8 +49,8 @@ public class RoutineInvocationException extends RoutineException {
      */
     @SuppressWarnings("ConstantConditions")
     public RoutineInvocationException(@Nullable final Throwable cause,
-            @Nullable final Object target, @NonNull final Class<?> targetClass,
-            @NonNull final String methodName, @NonNull final Class<?>... parameterTypes) {
+            @Nullable final Object target, @Nonnull final Class<?> targetClass,
+            @Nonnull final String methodName, @Nonnull final Class<?>... parameterTypes) {
 
         super(cause);
 
@@ -92,7 +92,7 @@ public class RoutineInvocationException extends RoutineException {
      *
      * @return the method name.
      */
-    @NonNull
+    @Nonnull
     public String getMethodName() {
 
         return mMethodName;
@@ -103,7 +103,7 @@ public class RoutineInvocationException extends RoutineException {
      *
      * @return the list of parameter types.
      */
-    @NonNull
+    @Nonnull
     public List<Class<?>> getMethodParameterTypes() {
 
         return Arrays.asList(mMethodParameterTypes);
@@ -125,7 +125,7 @@ public class RoutineInvocationException extends RoutineException {
      *
      * @return the target class.
      */
-    @NonNull
+    @Nonnull
     public Class<?> getTargetClass() {
 
         return mTargetClass;

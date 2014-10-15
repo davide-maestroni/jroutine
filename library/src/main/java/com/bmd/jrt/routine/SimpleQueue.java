@@ -17,8 +17,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.NoSuchElementException;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Minimal implementation of a light-weight queue storing elements into dynamically increasing
@@ -36,7 +36,7 @@ class SimpleQueue<E> {
 
     private Object[] mQueue = new Object[8];
 
-    private static <T> void resizeArray(@NonNull final T[] src, @NonNull final T[] dst,
+    private static <T> void resizeArray(@Nonnull final T[] src, @Nonnull final T[] dst,
             final int first) {
 
         final int remainder = src.length - first;
@@ -75,7 +75,7 @@ class SimpleQueue<E> {
      *
      * @param elements the element iterable.
      */
-    public void addAll(@NonNull final Iterable<? extends E> elements) {
+    public void addAll(@Nonnull final Iterable<? extends E> elements) {
 
         for (final E element : elements) {
 
@@ -109,7 +109,7 @@ class SimpleQueue<E> {
      *
      * @param collection the collection to fill.
      */
-    public void moveTo(@NonNull final Collection<? super E> collection) {
+    public void moveTo(@Nonnull final Collection<? super E> collection) {
 
         while (!isEmpty()) {
 

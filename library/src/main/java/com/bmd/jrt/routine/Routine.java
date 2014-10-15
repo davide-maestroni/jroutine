@@ -18,8 +18,8 @@ import com.bmd.jrt.channel.ParameterChannel;
 
 import java.util.List;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * This interface defines the main component of this framework.
@@ -93,7 +93,7 @@ public interface Routine<INPUT, OUTPUT> {
      *
      * @return the list of output data.
      */
-    @NonNull
+    @Nonnull
     public List<OUTPUT> call();
 
     /**
@@ -102,7 +102,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @param input the input.
      * @return the list of output data.
      */
-    @NonNull
+    @Nonnull
     public List<OUTPUT> call(@Nullable INPUT input);
 
     /**
@@ -111,7 +111,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @param inputs the input data.
      * @return the list of output data.
      */
-    @NonNull
+    @Nonnull
     public List<OUTPUT> call(@Nullable INPUT... inputs);
 
     /**
@@ -120,7 +120,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @param inputs the iterable returning the input data.
      * @return the list of output data.
      */
-    @NonNull
+    @Nonnull
     public List<OUTPUT> call(@Nullable Iterable<? extends INPUT> inputs);
 
     /**
@@ -129,7 +129,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @param inputs the output channel returning the input data.
      * @return the list of output data.
      */
-    @NonNull
+    @Nonnull
     public List<OUTPUT> call(@Nullable OutputChannel<? extends INPUT> inputs);
 
     /**
@@ -137,7 +137,7 @@ public interface Routine<INPUT, OUTPUT> {
      *
      * @return the list of output data.
      */
-    @NonNull
+    @Nonnull
     public List<OUTPUT> callAsync();
 
     /**
@@ -146,7 +146,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @param input the input.
      * @return the list of output data.
      */
-    @NonNull
+    @Nonnull
     public List<OUTPUT> callAsync(@Nullable INPUT input);
 
     /**
@@ -155,7 +155,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @param inputs the input data.
      * @return the list of output data.
      */
-    @NonNull
+    @Nonnull
     public List<OUTPUT> callAsync(@Nullable INPUT... inputs);
 
     /**
@@ -164,7 +164,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @param inputs the iterable returning the input data.
      * @return the list of output data.
      */
-    @NonNull
+    @Nonnull
     public List<OUTPUT> callAsync(@Nullable Iterable<? extends INPUT> inputs);
 
     /**
@@ -173,7 +173,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @param inputs the output channel returning the input data.
      * @return the list of output data.
      */
-    @NonNull
+    @Nonnull
     public List<OUTPUT> callAsync(@Nullable OutputChannel<? extends INPUT> inputs);
 
     /**
@@ -181,7 +181,7 @@ public interface Routine<INPUT, OUTPUT> {
      *
      * @return the list of output data.
      */
-    @NonNull
+    @Nonnull
     public List<OUTPUT> callParallel();
 
     /**
@@ -190,7 +190,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @param input the input.
      * @return the list of output data.
      */
-    @NonNull
+    @Nonnull
     public List<OUTPUT> callParallel(@Nullable INPUT input);
 
     /**
@@ -199,7 +199,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @param inputs the input data.
      * @return the list of output data.
      */
-    @NonNull
+    @Nonnull
     public List<OUTPUT> callParallel(@Nullable INPUT... inputs);
 
     /**
@@ -208,7 +208,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @param inputs the iterable returning the input data.
      * @return the list of output data.
      */
-    @NonNull
+    @Nonnull
     public List<OUTPUT> callParallel(@Nullable Iterable<? extends INPUT> inputs);
 
     /**
@@ -217,7 +217,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @param inputs the output channel returning the input data.
      * @return the list of output data.
      */
-    @NonNull
+    @Nonnull
     public List<OUTPUT> callParallel(@Nullable OutputChannel<? extends INPUT> inputs);
 
     /**
@@ -225,7 +225,7 @@ public interface Routine<INPUT, OUTPUT> {
      *
      * @return the routine parameter channel.
      */
-    @NonNull
+    @Nonnull
     public ParameterChannel<INPUT, OUTPUT> invoke();
 
     /**
@@ -233,7 +233,7 @@ public interface Routine<INPUT, OUTPUT> {
      *
      * @return the routine parameter channel.
      */
-    @NonNull
+    @Nonnull
     public ParameterChannel<INPUT, OUTPUT> invokeAsync();
 
     /**
@@ -241,7 +241,7 @@ public interface Routine<INPUT, OUTPUT> {
      *
      * @return the routine parameter channel.
      */
-    @NonNull
+    @Nonnull
     public ParameterChannel<INPUT, OUTPUT> invokeParallel();
 
     /**
@@ -249,7 +249,7 @@ public interface Routine<INPUT, OUTPUT> {
      *
      * @return the output channel.
      */
-    @NonNull
+    @Nonnull
     public OutputChannel<OUTPUT> run();
 
     /**
@@ -258,7 +258,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @param input the input.
      * @return the output channel.
      */
-    @NonNull
+    @Nonnull
     public OutputChannel<OUTPUT> run(@Nullable INPUT input);
 
     /**
@@ -267,7 +267,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @param inputs the input data.
      * @return the output channel.
      */
-    @NonNull
+    @Nonnull
     public OutputChannel<OUTPUT> run(@Nullable INPUT... inputs);
 
     /**
@@ -276,7 +276,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @param inputs the iterable returning the input data.
      * @return the output channel.
      */
-    @NonNull
+    @Nonnull
     public OutputChannel<OUTPUT> run(@Nullable Iterable<? extends INPUT> inputs);
 
     /**
@@ -285,7 +285,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @param inputs the output channel returning the input data.
      * @return the output channel.
      */
-    @NonNull
+    @Nonnull
     public OutputChannel<OUTPUT> run(@Nullable OutputChannel<? extends INPUT> inputs);
 
     /**
@@ -293,7 +293,7 @@ public interface Routine<INPUT, OUTPUT> {
      *
      * @return the output channel.
      */
-    @NonNull
+    @Nonnull
     public OutputChannel<OUTPUT> runAsync();
 
     /**
@@ -302,7 +302,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @param input the input.
      * @return the output channel.
      */
-    @NonNull
+    @Nonnull
     public OutputChannel<OUTPUT> runAsync(@Nullable INPUT input);
 
     /**
@@ -311,7 +311,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @param inputs the input data.
      * @return the output channel.
      */
-    @NonNull
+    @Nonnull
     public OutputChannel<OUTPUT> runAsync(@Nullable INPUT... inputs);
 
     /**
@@ -320,7 +320,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @param inputs the iterable returning the input data.
      * @return the output channel.
      */
-    @NonNull
+    @Nonnull
     public OutputChannel<OUTPUT> runAsync(@Nullable Iterable<? extends INPUT> inputs);
 
     /**
@@ -329,7 +329,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @param inputs the output channel returning the input data.
      * @return the output channel.
      */
-    @NonNull
+    @Nonnull
     public OutputChannel<OUTPUT> runAsync(@Nullable OutputChannel<? extends INPUT> inputs);
 
     /**
@@ -337,7 +337,7 @@ public interface Routine<INPUT, OUTPUT> {
      *
      * @return the output channel.
      */
-    @NonNull
+    @Nonnull
     public OutputChannel<OUTPUT> runParallel();
 
     /**
@@ -346,7 +346,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @param input the input.
      * @return the output channel.
      */
-    @NonNull
+    @Nonnull
     public OutputChannel<OUTPUT> runParallel(@Nullable INPUT input);
 
     /**
@@ -355,7 +355,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @param inputs the iterable returning the input data.
      * @return the output channel.
      */
-    @NonNull
+    @Nonnull
     public OutputChannel<OUTPUT> runParallel(@Nullable INPUT... inputs);
 
     /**
@@ -364,7 +364,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @param inputs the output channel returning the input data.
      * @return the output channel.
      */
-    @NonNull
+    @Nonnull
     public OutputChannel<OUTPUT> runParallel(@Nullable Iterable<? extends INPUT> inputs);
 
     /**
@@ -373,6 +373,6 @@ public interface Routine<INPUT, OUTPUT> {
      * @param inputs the output channel returning the input data.
      * @return the output channel.
      */
-    @NonNull
+    @Nonnull
     public OutputChannel<OUTPUT> runParallel(@Nullable OutputChannel<? extends INPUT> inputs);
 }

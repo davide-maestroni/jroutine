@@ -15,8 +15,8 @@ package com.bmd.jrt.routine;
 
 import java.util.Collection;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Basic implementation of a nested queue.
@@ -46,13 +46,13 @@ class SimpleNestedQueue<E> implements NestedQueue<E> {
      *
      * @param queue the internal data queue.
      */
-    private SimpleNestedQueue(@NonNull final SimpleQueue<E> queue) {
+    private SimpleNestedQueue(@Nonnull final SimpleQueue<E> queue) {
 
         mQueue = queue;
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public NestedQueue<E> add(@Nullable final E element) {
 
         checkOpen();
@@ -63,8 +63,8 @@ class SimpleNestedQueue<E> implements NestedQueue<E> {
     }
 
     @Override
-    @NonNull
-    public NestedQueue<E> addAll(@NonNull final Iterable<? extends E> elements) {
+    @Nonnull
+    public NestedQueue<E> addAll(@Nonnull final Iterable<? extends E> elements) {
 
         checkOpen();
 
@@ -74,7 +74,7 @@ class SimpleNestedQueue<E> implements NestedQueue<E> {
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public NestedQueue<E> addNested() {
 
         checkOpen();
@@ -83,7 +83,7 @@ class SimpleNestedQueue<E> implements NestedQueue<E> {
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public NestedQueue<E> clear() {
 
         mQueue.clear();
@@ -92,7 +92,7 @@ class SimpleNestedQueue<E> implements NestedQueue<E> {
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public NestedQueue<E> close() {
 
         mClosed = true;
@@ -107,8 +107,8 @@ class SimpleNestedQueue<E> implements NestedQueue<E> {
     }
 
     @Override
-    @NonNull
-    public NestedQueue<E> moveTo(@NonNull final Collection<? super E> collection) {
+    @Nonnull
+    public NestedQueue<E> moveTo(@Nonnull final Collection<? super E> collection) {
 
         mQueue.moveTo(collection);
 

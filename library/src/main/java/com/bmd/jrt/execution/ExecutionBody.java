@@ -18,8 +18,7 @@ import com.bmd.jrt.channel.ResultChannel;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nonnull;
 
 /**
  * This is a special abstract implementation that centralizes the routine execution inside a
@@ -44,11 +43,11 @@ public abstract class ExecutionBody<INPUT, OUTPUT> extends BasicExecution<INPUT,
      * @param inputs  the input list.
      * @param results the result channel.
      */
-    public abstract void onExec(@NonNull List<? extends INPUT> inputs,
-            @NonNull ResultChannel<OUTPUT> results);
+    public abstract void onExec(@Nonnull List<? extends INPUT> inputs,
+            @Nonnull ResultChannel<OUTPUT> results);
 
     @Override
-    public void onInput(@Nullable final INPUT input, @NonNull final ResultChannel<OUTPUT> results) {
+    public void onInput(final INPUT input, @Nonnull final ResultChannel<OUTPUT> results) {
 
         if (mInputs == null) {
 
@@ -59,7 +58,7 @@ public abstract class ExecutionBody<INPUT, OUTPUT> extends BasicExecution<INPUT,
     }
 
     @Override
-    public void onResult(@NonNull final ResultChannel<OUTPUT> results) {
+    public void onResult(@Nonnull final ResultChannel<OUTPUT> results) {
 
         final ArrayList<INPUT> inputs = mInputs;
         final ArrayList<INPUT> clone;

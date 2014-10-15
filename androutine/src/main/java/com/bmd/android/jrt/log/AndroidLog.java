@@ -17,8 +17,8 @@ import android.util.Log;
 
 import java.util.List;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Android specific log implementation.
@@ -28,7 +28,7 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 public class AndroidLog implements com.bmd.jrt.log.Log {
 
     @Override
-    public void dbg(@NonNull final List<Object> contexts, @Nullable final String message,
+    public void dbg(@Nonnull final List<Object> contexts, @Nullable final String message,
             @Nullable final Throwable throwable) {
 
         if (throwable != null) {
@@ -42,7 +42,7 @@ public class AndroidLog implements com.bmd.jrt.log.Log {
     }
 
     @Override
-    public void err(@NonNull final List<Object> contexts, @Nullable final String message,
+    public void err(@Nonnull final List<Object> contexts, @Nullable final String message,
             @Nullable final Throwable throwable) {
 
         if (throwable != null) {
@@ -56,7 +56,7 @@ public class AndroidLog implements com.bmd.jrt.log.Log {
     }
 
     @Override
-    public void wrn(@NonNull final List<Object> contexts, @Nullable final String message,
+    public void wrn(@Nonnull final List<Object> contexts, @Nullable final String message,
             @Nullable final Throwable throwable) {
 
         if (throwable != null) {

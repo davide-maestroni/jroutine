@@ -20,8 +20,8 @@ import com.bmd.jrt.runner.Runner;
 
 import java.util.concurrent.Executor;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Utility class for creating and sharing runner instances, employing specific Android classes.
@@ -46,8 +46,8 @@ public class AndroidRunners {
      * @return the runner instance.
      * @throws IllegalArgumentException if the specified looper is null.
      */
-    @NonNull
-    public static Runner looper(@NonNull final Looper looper) {
+    @Nonnull
+    public static Runner looper(@Nonnull final Looper looper) {
 
         return new LooperRunner(looper);
     }
@@ -57,7 +57,7 @@ public class AndroidRunners {
      *
      * @return the runner instance.
      */
-    @NonNull
+    @Nonnull
     public static Runner main() {
 
         if (sMainRunner == null) {
@@ -73,7 +73,7 @@ public class AndroidRunners {
      *
      * @return the runner instance.
      */
-    @NonNull
+    @Nonnull
     public static Runner my() {
 
         return looper(Looper.myLooper());
@@ -88,7 +88,7 @@ public class AndroidRunners {
      *
      * @return the runner instance.
      */
-    @NonNull
+    @Nonnull
     public static Runner task() {
 
         return task(null);
@@ -106,7 +106,7 @@ public class AndroidRunners {
      * @param executor the executor.
      * @return the runner instance.
      */
-    @NonNull
+    @Nonnull
     public static Runner task(@Nullable final Executor executor) {
 
         return new AsyncTaskRunner(executor);
@@ -119,8 +119,8 @@ public class AndroidRunners {
      * @return the runner instance.
      * @throws NullPointerException if the specified thread is null.
      */
-    @NonNull
-    public static Runner thread(@NonNull final HandlerThread thread) {
+    @Nonnull
+    public static Runner thread(@Nonnull final HandlerThread thread) {
 
         if (!thread.isAlive()) {
 

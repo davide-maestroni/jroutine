@@ -26,8 +26,8 @@ import com.bmd.jrt.runner.Runner;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Implementation of a runner employing {@link android.os.AsyncTask} instances to execute the
@@ -56,8 +56,8 @@ class AsyncTaskRunner implements Runner {
     }
 
     @Override
-    public void run(@NonNull final Invocation invocation, final long delay,
-            @NonNull final TimeUnit timeUnit) {
+    public void run(@Nonnull final Invocation invocation, final long delay,
+            @Nonnull final TimeUnit timeUnit) {
 
         final InvocationTask task = new InvocationTask(mExecutor, invocation);
 
@@ -87,7 +87,7 @@ class AsyncTaskRunner implements Runner {
          * @param invocation the invocation instance.
          */
         private InvocationTask(@Nullable final Executor executor,
-                @NonNull final Invocation invocation) {
+                @Nonnull final Invocation invocation) {
 
             mExecutor = executor;
             mInvocation = invocation;

@@ -31,8 +31,8 @@ public interface InputChannel<INPUT> extends Channel {
 
     /**
      * Tells the channel to delay the transfer of data of the specified time duration.<br/>
-     * Note that an abort invocation will be delayed as well.
-     * TODO: order
+     * Note that an abort invocation will be delayed as well.<br/>
+     * Note also that the delivery order might not be guaranteed.
      *
      * @param delay the delay.
      * @return this channel.
@@ -46,7 +46,8 @@ public interface InputChannel<INPUT> extends Channel {
 
     /**
      * Tells the channel to delay the transfer of data of the specified time duration.<br/>
-     * Note that an abort invocation will be delayed as well.
+     * Note that an abort invocation will be delayed as well.<br/>
+     * Note also that the delivery order might not be guaranteed.
      *
      * @param delay    the delay value.
      * @param timeUnit the delay time unit.

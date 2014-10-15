@@ -31,8 +31,7 @@ Parallel programming on the go.
             private static class Parse extends BasicExecution&lt;String, Integer&gt; {
 
                 &commat;Override
-                public void onInput(&commat;Nullable final String s,
-                        &commat;NonNull final ResultChannel&lt;Integer&gt; results) {
+                public void onInput(final String s, &commat;NonNull final ResultChannel&lt;Integer&gt; results) {
 
                     results.pass(Integer.parseInt(s));
                 }

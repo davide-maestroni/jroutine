@@ -31,7 +31,7 @@ import javax.annotation.Nullable;
 public abstract class BasicExecution<INPUT, OUTPUT> implements Execution<INPUT, OUTPUT> {
 
     @Override
-    public void onAbort(@Nullable final Throwable throwable) {
+    public void onAbort(@Nullable final Throwable reason) {
 
     }
 

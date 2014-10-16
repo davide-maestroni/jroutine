@@ -67,9 +67,9 @@ public interface Execution<INPUT, OUTPUT> {
      * Called when the routine execution is aborted.<br/>
      * This method can be called at any time after the execution initialization.
      *
-     * @param throwable the reason of the abortion.
+     * @param reason the reason of the abortion.
      */
-    public void onAbort(@Nullable Throwable throwable);
+    public void onAbort(@Nullable Throwable reason);
 
     /**
      * Called when the routine execution is initialized.<br/>

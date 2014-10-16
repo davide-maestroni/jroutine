@@ -28,6 +28,7 @@ import com.bmd.jrt.execution.Execution;
 import com.bmd.jrt.execution.ExecutionBody;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.log.Logger;
+import com.bmd.jrt.log.NullLog;
 import com.bmd.jrt.routine.DefaultInvocation.InputIterator;
 import com.bmd.jrt.routine.DefaultParameterChannel.ExecutionProvider;
 import com.bmd.jrt.routine.DefaultResultChannel.AbortHandler;
@@ -38,8 +39,12 @@ import junit.framework.TestCase;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -180,6 +185,42 @@ public class RoutineTest extends TestCase {
         }
     }
 
+    public void testAbortInput() throws InterruptedException {
+
+        final Semaphore semaphore = new Semaphore(0);
+        final AtomicReference<Throwable> abortReason = new AtomicReference<Throwable>();
+
+        final BasicExecution<String, String> abortExecution = new BasicExecution<String, String>() {
+
+            @Override
+            public void onAbort(@Nullable final Throwable reason) {
+
+                abortReason.set(reason);
+                semaphore.release();
+            }
+        };
+
+        final Routine<String, String> routine = JavaRoutine.on(tokenOf(abortExecution))
+                                                           .withArgs(this, abortReason, semaphore)
+                                                           .buildRoutine();
+
+        final ParameterChannel<String, String> channel = routine.invokeAsync();
+        final IllegalArgumentException exception = new IllegalArgumentException();
+        channel.after(TimeDuration.millis(100)).abort(exception);
+
+        semaphore.tryAcquire(1, TimeUnit.SECONDS);
+
+        assertThat(abortReason.get()).isEqualTo(exception);
+
+        final ParameterChannel<String, String> channel1 = routine.invokeAsync();
+        final IllegalAccessError exception1 = new IllegalAccessError();
+        channel1.now().abort(exception1);
+
+        semaphore.tryAcquire(1, TimeUnit.SECONDS);
+
+        assertThat(abortReason.get()).isEqualTo(exception1);
+    }
+
     public void testChainedRoutine() {
 
         final ExecutionBody<Integer, Integer> execSum = new ExecutionBody<Integer, Integer>() {
@@ -284,9 +325,9 @@ public class RoutineTest extends TestCase {
                     private ParameterChannel<Integer, Integer> mChannel;
 
                     @Override
-                    public void onAbort(final Throwable throwable) {
+                    public void onAbort(final Throwable reason) {
 
-                        mChannel.abort(throwable);
+                        mChannel.abort(reason);
                     }
 
                     @Override
@@ -882,9 +923,223 @@ public class RoutineTest extends TestCase {
         assertThat(testInterfaceAsync.getInt(testInterfaceAsync.getOne())).isEqualTo(1);
     }
 
+    @SuppressWarnings("ConstantConditions")
+    public void testParameterChannelError() {
+
+        try {
+
+            new DefaultParameterChannel<Object, Object>(null, Runners.shared(), false, false,
+                                                        Logger.create(new NullLog(),
+                                                                      LogLevel.DEBUG));
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new DefaultParameterChannel<Object, Object>(new TestExecutionProvider(), null, false,
+                                                        false, Logger.create(new NullLog(),
+                                                                             LogLevel.DEBUG));
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new DefaultParameterChannel<Object, Object>(new TestExecutionProvider(),
+                                                        Runners.shared(), false, false, null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            final DefaultParameterChannel<Object, Object> channel =
+                    new DefaultParameterChannel<Object, Object>(new TestExecutionProvider(),
+                                                                Runners.shared(), false, false,
+                                                                Logger.create(new NullLog(),
+                                                                              LogLevel.DEBUG));
+
+            channel.results();
+            channel.pass("test");
+
+            fail();
+
+        } catch (final IllegalStateException ignored) {
+
+        }
+    }
+
+    @SuppressWarnings("ConstantConditions")
     public void testResultChannelError() {
 
-        //TODO
+        try {
+
+            new DefaultResultChannel<Object>(null, Runners.shared(), false,
+                                             Logger.create(new NullLog(), LogLevel.DEBUG));
+
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new DefaultResultChannel<Object>(new TestAbortHandler(), null, false,
+                                             Logger.create(new NullLog(), LogLevel.DEBUG));
+
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new DefaultResultChannel<Object>(new TestAbortHandler(), Runners.shared(), false, null);
+
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new DefaultResultChannel<Object>(new TestAbortHandler(), Runners.shared(), false,
+                                             Logger.create(new NullLog(), LogLevel.DEBUG)).after(
+                    null);
+
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new DefaultResultChannel<Object>(new TestAbortHandler(), Runners.shared(), false,
+                                             Logger.create(new NullLog(), LogLevel.DEBUG)).after(0,
+                                                                                                 null);
+
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        final Routine<String, String> routine = JavaRoutine.on(tokenOf(DelayedExecution.class))
+                                                           .logLevel(LogLevel.SILENT)
+                                                           .withArgs(TimeDuration.ZERO)
+                                                           .buildRoutine();
+        final OutputChannel<String> channel = routine.run();
+
+        try {
+
+            channel.afterMax(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            channel.afterMax(0, null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            channel.bind(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            channel.readAllInto(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        final BasicOutputConsumer<String> consumer = new BasicOutputConsumer<String>() {};
+
+        try {
+
+            channel.bind(consumer).bind(consumer);
+
+            fail();
+
+        } catch (final IllegalStateException ignored) {
+
+        }
+
+        try {
+
+            channel.iterator();
+
+            fail();
+
+        } catch (final IllegalStateException ignored) {
+
+        }
+
+        final Routine<String, String> routine1 = JavaRoutine.on(tokenOf(DelayedExecution.class))
+                                                            .logLevel(LogLevel.SILENT)
+                                                            .withArgs(TimeDuration.ZERO)
+                                                            .buildRoutine();
+        final Iterator<String> iterator =
+                routine1.run("test").afterMax(TimeDuration.millis(10)).iterator();
+
+        assertThat(iterator.next()).isEqualTo("test");
+        iterator.remove();
+
+        try {
+
+            iterator.remove();
+
+            fail();
+
+        } catch (final IllegalStateException ignored) {
+
+        }
+
+        try {
+
+            iterator.next();
+
+            fail();
+
+        } catch (final NoSuchElementException ignored) {
+
+        }
+
+        try {
+
+            routine1.run().immediately().iterator().next();
+
+            fail();
+
+        } catch (final NoSuchElementException ignored) {
+
+        }
     }
 
     public void testRoutine() {

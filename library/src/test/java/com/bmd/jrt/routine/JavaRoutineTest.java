@@ -13,9 +13,14 @@
  */
 package com.bmd.jrt.routine;
 
+import com.bmd.jrt.annotation.Async;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.execution.BasicExecution;
+import com.bmd.jrt.log.Log.LogLevel;
+import com.bmd.jrt.log.NullLog;
+import com.bmd.jrt.routine.ClassRoutineBuilder.Catch;
+import com.bmd.jrt.runner.RunnerDecorator;
 import com.bmd.jrt.runner.Runners;
 import com.bmd.jrt.time.TimeDuration;
 
@@ -33,6 +38,45 @@ import static org.fest.assertions.api.Assertions.assertThat;
  * Created by davide on 10/16/14.
  */
 public class JavaRoutineTest extends TestCase {
+
+    public void testClassRoutineBuilder() throws NoSuchMethodException {
+
+        final Routine<Object, Object> routine = JavaRoutine.on(Test.class)
+                                                           .sequential()
+                                                           .runBy(Runners.pool())
+                                                           .logLevel(LogLevel.DEBUG)
+                                                           .loggedWith(new NullLog())
+                                                           .method(Test.NAME);
+
+        assertThat(routine.call()).containsExactly(-77L);
+
+        final Routine<Object, Object> routine1 =
+                JavaRoutine.on(Test.class).queued().runBy(Runners.pool()).classMethod("getLong");
+
+        assertThat(routine1.call()).containsExactly(-77L);
+
+        final Routine<Object, Object> routine2 = JavaRoutine.on(Test.class)
+                                                            .queued()
+                                                            .runBy(Runners.pool())
+                                                            .classMethod(Test.class.getMethod(
+                                                                    "getLong"));
+
+        assertThat(routine2.call()).containsExactly(-77L);
+
+        final Catch testCatch = new Catch() {
+
+            @Override
+            public void exception(@Nonnull final RoutineInvocationException ex) {
+
+                assertThat(ex.getCause()).isExactlyInstanceOf(IllegalArgumentException.class);
+            }
+        };
+
+        final Routine<Object, Object> routine3 =
+                JavaRoutine.on(Test.class).withinTry(testCatch).method(Test.THROW);
+
+        assertThat(routine3.call(new IllegalArgumentException())).isEmpty();
+    }
 
     public void testRoutineBuilder() {
 
@@ -150,12 +194,40 @@ public class JavaRoutineTest extends TestCase {
         }
     }
 
+    private static class MyRunner extends RunnerDecorator {
+
+        public MyRunner() {
+
+            super(Runners.queued());
+        }
+    }
+
     private static class PassThroughExecution extends BasicExecution<String, String> {
 
         @Override
         public void onInput(final String s, @Nonnull final ResultChannel<String> results) {
 
             results.pass(s);
+        }
+    }
+
+    private static class Test {
+
+        public static final String NAME = "get";
+
+        public static final String THROW = "throw";
+
+        @Async(name = NAME)
+        public static long getLong() {
+
+            return -77;
+        }
+
+        @Async(name = THROW, log = NullLog.class, logLevel = LogLevel.DEBUG, sequential = false,
+               runner = MyRunner.class)
+        public static void throwException(final RuntimeException ex) {
+
+            throw ex;
         }
     }
 }

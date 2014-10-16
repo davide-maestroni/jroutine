@@ -19,7 +19,7 @@ import junit.framework.TestCase;
 
 import java.util.List;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
+import javax.annotation.Nonnull;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
@@ -847,7 +847,7 @@ public class LoggerTest extends TestCase {
         }
 
         @Override
-        protected void log(@NonNull final LogLevel level, @NonNull final List<Object> contexts,
+        protected void log(@Nonnull final LogLevel level, @Nonnull final List<Object> contexts,
                 final String message, final Throwable throwable) {
 
             mLevel = level;
@@ -856,7 +856,7 @@ public class LoggerTest extends TestCase {
         }
 
         @Override
-        protected void log(@NonNull final String message) {
+        protected void log(@Nonnull final String message) {
 
             mMessage = message;
         }

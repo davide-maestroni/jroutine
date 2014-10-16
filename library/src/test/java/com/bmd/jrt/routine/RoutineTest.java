@@ -36,6 +36,7 @@ import com.bmd.jrt.time.TimeDuration;
 
 import junit.framework.TestCase;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -132,7 +133,7 @@ public class RoutineTest extends TestCase {
         };
 
         final Routine<String, String> routine1 =
-                on(ClassToken.classOf(abortExecution)).withArgs(this).buildRoutine();
+                on(ClassToken.tokenOf(abortExecution)).withArgs(this).buildRoutine();
 
         try {
 
@@ -161,7 +162,7 @@ public class RoutineTest extends TestCase {
         };
 
         final Routine<String, String> routine2 =
-                on(ClassToken.classOf(abortExecution2)).withArgs(this).buildRoutine();
+                on(ClassToken.tokenOf(abortExecution2)).withArgs(this).buildRoutine();
 
         try {
 
@@ -199,7 +200,7 @@ public class RoutineTest extends TestCase {
         };
 
         final Routine<Integer, Integer> sumRoutine =
-                on(ClassToken.classOf(execSum)).withArgs(this).buildRoutine();
+                on(ClassToken.tokenOf(execSum)).withArgs(this).buildRoutine();
 
         final BasicExecution<Integer, Integer> invokeSquare =
                 new BasicExecution<Integer, Integer>() {
@@ -215,7 +216,7 @@ public class RoutineTest extends TestCase {
                 };
 
         final Routine<Integer, Integer> squareRoutine =
-                on(ClassToken.classOf(invokeSquare)).withArgs(this).buildRoutine();
+                on(ClassToken.tokenOf(invokeSquare)).withArgs(this).buildRoutine();
 
         assertThat(sumRoutine.call(squareRoutine.run(1, 2, 3, 4))).containsExactly(30);
         assertThat(sumRoutine.callAsync(squareRoutine.run(1, 2, 3, 4))).containsExactly(30);
@@ -259,7 +260,7 @@ public class RoutineTest extends TestCase {
         };
 
         final Routine<Integer, Integer> sumRoutine =
-                on(ClassToken.classOf(execSum)).withArgs(this).buildRoutine();
+                on(ClassToken.tokenOf(execSum)).withArgs(this).buildRoutine();
 
         final BasicExecution<Integer, Integer> invokeSquare =
                 new BasicExecution<Integer, Integer>() {
@@ -275,7 +276,7 @@ public class RoutineTest extends TestCase {
                 };
 
         final Routine<Integer, Integer> squareRoutine =
-                on(ClassToken.classOf(invokeSquare)).withArgs(this).buildRoutine();
+                on(ClassToken.tokenOf(invokeSquare)).withArgs(this).buildRoutine();
 
         final BasicExecution<Integer, Integer> invokeSquareSum =
                 new BasicExecution<Integer, Integer>() {
@@ -309,7 +310,7 @@ public class RoutineTest extends TestCase {
                 };
 
         final Routine<Integer, Integer> squareSumRoutine =
-                on(ClassToken.classOf(invokeSquareSum)).withArgs(this, sumRoutine, squareRoutine)
+                on(ClassToken.tokenOf(invokeSquareSum)).withArgs(this, sumRoutine, squareRoutine)
                                                        .buildRoutine();
 
         assertThat(squareSumRoutine.call(1, 2, 3, 4)).containsExactly(30);
@@ -330,6 +331,8 @@ public class RoutineTest extends TestCase {
         channel.after(100, TimeUnit.MILLISECONDS).pass("test1");
         channel.after(TimeDuration.millis(10).nanosTime()).pass("test2");
         channel.after(TimeDuration.millis(10).microsTime()).pass("test3", "test4");
+        channel.after(TimeDuration.millis(10)).pass((String[]) null);
+        channel.now().pass((List<String>) null).pass((OutputChannel<String>) null);
         assertThat(channel.results().afterMax(3, TimeUnit.SECONDS).readAll()).containsOnly("test1",
                                                                                            "test2",
                                                                                            "test3",
@@ -348,10 +351,160 @@ public class RoutineTest extends TestCase {
         channel1.after(100, TimeUnit.MILLISECONDS).pass("test1");
         channel1.after(TimeDuration.millis(10).nanosTime()).pass("test2");
         channel1.after(TimeDuration.millis(10).microsTime()).pass(Arrays.asList("test3", "test4"));
+        channel1.after(TimeDuration.millis(10)).pass((String[]) null);
+        channel1.now().pass((List<String>) null).pass((OutputChannel<String>) null);
         assertThat(
                 channel1.results().afterMax(TimeDuration.seconds(7000)).readAll()).containsExactly(
                 "test1", "test2", "test3", "test4");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(110);
+
+        final Routine<String, String> routine2 = JavaRoutine.on(tokenOf(DelayedListExecution.class))
+                                                            .withArgs(TimeDuration.millis(10), 2)
+                                                            .buildRoutine();
+
+        startTime = System.currentTimeMillis();
+
+        final ParameterChannel<String, String> channel2 = routine2.invokeAsync();
+        channel2.after(100, TimeUnit.MILLISECONDS).pass("test1");
+        channel2.after(TimeDuration.millis(10).nanosTime()).pass("test2");
+        channel2.after(TimeDuration.millis(10).microsTime()).pass("test3", "test4");
+        channel2.after(TimeDuration.millis(10)).pass((String[]) null);
+        channel2.now().pass((List<String>) null).pass((OutputChannel<String>) null);
+        assertThat(channel2.results().afterMax(3, TimeUnit.SECONDS).readAll()).containsOnly("test1",
+                                                                                            "test2",
+                                                                                            "test3",
+                                                                                            "test4");
+        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(110);
+
+        final Routine<String, String> routine3 = JavaRoutine.on(tokenOf(DelayedListExecution.class))
+                                                            .orderedInput()
+                                                            .orderedOutput()
+                                                            .withArgs(TimeDuration.millis(10), 2)
+                                                            .buildRoutine();
+
+        startTime = System.currentTimeMillis();
+
+        final ParameterChannel<String, String> channel3 = routine3.invokeAsync();
+        channel3.after(100, TimeUnit.MILLISECONDS).pass("test1");
+        channel3.after(TimeDuration.millis(10).nanosTime()).pass("test2");
+        channel3.after(TimeDuration.millis(10).microsTime()).pass("test3", "test4");
+        channel3.after(TimeDuration.millis(10)).pass((String[]) null);
+        channel3.now().pass((List<String>) null).pass((OutputChannel<String>) null);
+        assertThat(channel3.results().afterMax(3, TimeUnit.SECONDS).readAll()).containsExactly(
+                "test1", "test2", "test3", "test4");
+        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(110);
+
+        final Routine<String, String> routine4 = JavaRoutine.on(tokenOf(DelayedListExecution.class))
+                                                            .withArgs(TimeDuration.ZERO, 2)
+                                                            .buildRoutine();
+
+        startTime = System.currentTimeMillis();
+
+        final ParameterChannel<String, String> channel4 = routine4.invokeAsync();
+        channel4.after(100, TimeUnit.MILLISECONDS).pass("test1");
+        channel4.after(TimeDuration.millis(10).nanosTime()).pass("test2");
+        channel4.after(TimeDuration.millis(10).microsTime()).pass("test3", "test4");
+        channel4.after(TimeDuration.millis(10)).pass((String[]) null);
+        channel4.now().pass((List<String>) null).pass((OutputChannel<String>) null);
+        assertThat(channel4.results().afterMax(3, TimeUnit.SECONDS).readAll()).containsOnly("test1",
+                                                                                            "test2",
+                                                                                            "test3",
+                                                                                            "test4");
+        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(100);
+
+        final Routine<String, String> routine5 = JavaRoutine.on(tokenOf(DelayedListExecution.class))
+                                                            .orderedInput()
+                                                            .orderedOutput()
+                                                            .withArgs(TimeDuration.ZERO, 2)
+                                                            .buildRoutine();
+
+        startTime = System.currentTimeMillis();
+
+        final ParameterChannel<String, String> channel5 = routine5.invokeAsync();
+        channel5.after(100, TimeUnit.MILLISECONDS).pass("test1");
+        channel5.after(TimeDuration.millis(10).nanosTime()).pass("test2");
+        channel5.after(TimeDuration.millis(10).microsTime()).pass("test3", "test4");
+        channel5.after(TimeDuration.millis(10)).pass((String[]) null);
+        channel5.now().pass((List<String>) null).pass((OutputChannel<String>) null);
+        assertThat(channel5.results().afterMax(3, TimeUnit.SECONDS).readAll()).containsExactly(
+                "test1", "test2", "test3", "test4");
+        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(100);
+
+        final Routine<String, String> routine6 =
+                JavaRoutine.on(tokenOf(DelayedChannelExecution.class))
+                           .withArgs(TimeDuration.millis(10))
+                           .buildRoutine();
+
+        startTime = System.currentTimeMillis();
+
+        final ParameterChannel<String, String> channel6 = routine6.invokeAsync();
+        channel6.after(100, TimeUnit.MILLISECONDS).pass("test1");
+        channel6.after(TimeDuration.millis(10).nanosTime()).pass("test2");
+        channel6.after(TimeDuration.millis(10).microsTime()).pass("test3", "test4");
+        channel6.after(TimeDuration.millis(10)).pass((String[]) null);
+        channel6.now().pass((List<String>) null).pass((OutputChannel<String>) null);
+        assertThat(channel6.results().afterMax(3, TimeUnit.SECONDS).readAll()).containsOnly("test1",
+                                                                                            "test2",
+                                                                                            "test3",
+                                                                                            "test4");
+        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(110);
+
+        final Routine<String, String> routine7 =
+                JavaRoutine.on(tokenOf(DelayedChannelExecution.class))
+                           .orderedInput()
+                           .orderedOutput()
+                           .withArgs(TimeDuration.millis(10))
+                           .buildRoutine();
+
+        startTime = System.currentTimeMillis();
+
+        final ParameterChannel<String, String> channel7 = routine7.invokeAsync();
+        channel7.after(100, TimeUnit.MILLISECONDS).pass("test1");
+        channel7.after(TimeDuration.millis(10).nanosTime()).pass("test2");
+        channel7.after(TimeDuration.millis(10).microsTime()).pass("test3", "test4");
+        channel7.after(TimeDuration.millis(10)).pass((String[]) null);
+        channel7.now().pass((List<String>) null).pass((OutputChannel<String>) null);
+        assertThat(channel7.results().afterMax(3, TimeUnit.SECONDS).readAll()).containsExactly(
+                "test1", "test2", "test3", "test4");
+        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(110);
+
+        final Routine<String, String> routine8 =
+                JavaRoutine.on(tokenOf(DelayedChannelExecution.class))
+                           .withArgs(TimeDuration.ZERO)
+                           .buildRoutine();
+
+        startTime = System.currentTimeMillis();
+
+        final ParameterChannel<String, String> channel8 = routine8.invokeAsync();
+        channel8.after(100, TimeUnit.MILLISECONDS).pass("test1");
+        channel8.after(TimeDuration.millis(10).nanosTime()).pass("test2");
+        channel8.after(TimeDuration.millis(10).microsTime()).pass("test3", "test4");
+        channel8.after(TimeDuration.millis(10)).pass((String[]) null);
+        channel8.now().pass((List<String>) null).pass((OutputChannel<String>) null);
+        assertThat(channel8.results().afterMax(3, TimeUnit.SECONDS).readAll()).containsOnly("test1",
+                                                                                            "test2",
+                                                                                            "test3",
+                                                                                            "test4");
+        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(100);
+
+        final Routine<String, String> routine9 =
+                JavaRoutine.on(tokenOf(DelayedChannelExecution.class))
+                           .orderedInput()
+                           .orderedOutput()
+                           .withArgs(TimeDuration.ZERO)
+                           .buildRoutine();
+
+        startTime = System.currentTimeMillis();
+
+        final ParameterChannel<String, String> channel9 = routine9.invokeAsync();
+        channel9.after(100, TimeUnit.MILLISECONDS).pass("test1");
+        channel9.after(TimeDuration.millis(10).nanosTime()).pass("test2");
+        channel9.after(TimeDuration.millis(10).microsTime()).pass("test3", "test4");
+        channel9.after(TimeDuration.millis(10)).pass((String[]) null);
+        channel9.now().pass((List<String>) null).pass((OutputChannel<String>) null);
+        assertThat(channel9.results().afterMax(3, TimeUnit.SECONDS).readAll()).containsExactly(
+                "test1", "test2", "test3", "test4");
+        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(100);
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -597,7 +750,7 @@ public class RoutineTest extends TestCase {
                 };
 
         final Routine<String, String> exceptionRoutine =
-                on(ClassToken.classOf(exceptionOnInit)).withArgs(this).buildRoutine();
+                on(ClassToken.tokenOf(exceptionOnInit)).withArgs(this).buildRoutine();
 
         testException(exceptionRoutine, "test", "test1");
 
@@ -622,7 +775,7 @@ public class RoutineTest extends TestCase {
                 };
 
         final Routine<String, String> exceptionRoutine =
-                on(ClassToken.classOf(exceptionOnInput)).withArgs(this).buildRoutine();
+                on(ClassToken.tokenOf(exceptionOnInput)).withArgs(this).buildRoutine();
 
         testException(exceptionRoutine, "test2", "test2");
 
@@ -646,7 +799,7 @@ public class RoutineTest extends TestCase {
                 };
 
         final Routine<String, String> exceptionRoutine =
-                on(ClassToken.classOf(exceptionOnResult)).withArgs(this).buildRoutine();
+                on(ClassToken.tokenOf(exceptionOnResult)).withArgs(this).buildRoutine();
 
         testException(exceptionRoutine, "test", "test3");
 
@@ -675,7 +828,7 @@ public class RoutineTest extends TestCase {
         };
 
         final Routine<String, String> exceptionRoutine =
-                on(ClassToken.classOf(exceptionOnReturn)).withArgs(this).buildRoutine();
+                on(ClassToken.tokenOf(exceptionOnReturn)).withArgs(this).buildRoutine();
 
         testException(exceptionRoutine, "test", "test4");
 
@@ -729,6 +882,11 @@ public class RoutineTest extends TestCase {
         assertThat(testInterfaceAsync.getInt(testInterfaceAsync.getOne())).isEqualTo(1);
     }
 
+    public void testResultChannelError() {
+
+        //TODO
+    }
+
     public void testRoutine() {
 
         final BasicExecution<Integer, Integer> execSquare = new BasicExecution<Integer, Integer>() {
@@ -744,7 +902,7 @@ public class RoutineTest extends TestCase {
         };
 
         final Routine<Integer, Integer> squareRoutine =
-                on(ClassToken.classOf(execSquare)).withArgs(this).buildRoutine();
+                on(ClassToken.tokenOf(execSquare)).withArgs(this).buildRoutine();
 
         assertThat(squareRoutine.call(1, 2, 3, 4)).containsExactly(1, 4, 9, 16);
         assertThat(squareRoutine.callAsync(1, 2, 3, 4)).containsExactly(1, 4, 9, 16);
@@ -774,12 +932,74 @@ public class RoutineTest extends TestCase {
         };
 
         final Routine<Integer, Integer> sumRoutine =
-                on(ClassToken.classOf(execSum)).withArgs(this).buildRoutine();
+                on(ClassToken.tokenOf(execSum)).withArgs(this).buildRoutine();
 
         assertThat(sumRoutine.call(1, 2, 3, 4)).containsExactly(10);
         assertThat(sumRoutine.callAsync(1, 2, 3, 4)).containsExactly(10);
         assertThat(sumRoutine.run(1, 2, 3, 4).readAll()).containsExactly(10);
         assertThat(sumRoutine.runAsync(1, 2, 3, 4).readAll()).containsExactly(10);
+    }
+
+    public void testTimeout() {
+
+        final Routine<String, String> routine =
+                on(tokenOf(DelayedExecution.class)).withArgs(TimeDuration.seconds(3))
+                                                   .buildRoutine();
+
+        final OutputChannel<String> channel = routine.runAsync("test");
+        assertThat(channel.immediately().readAll()).isEmpty();
+
+        try {
+
+            channel.afterMax(TimeDuration.millis(10))
+                   .eventuallyThrow(new IllegalStateException())
+                   .readFirst();
+
+            fail();
+
+        } catch (final IllegalStateException ignored) {
+
+        }
+
+        try {
+
+            channel.readAll();
+
+            fail();
+
+        } catch (final IllegalStateException ignored) {
+
+        }
+
+        try {
+
+            channel.iterator().hasNext();
+
+            fail();
+
+        } catch (final IllegalStateException ignored) {
+
+        }
+
+        try {
+
+            channel.iterator().next();
+
+            fail();
+
+        } catch (final IllegalStateException ignored) {
+
+        }
+
+        try {
+
+            channel.waitComplete();
+
+            fail();
+
+        } catch (final IllegalStateException ignored) {
+
+        }
     }
 
     private void testChained(final Routine<String, String> before,
@@ -1239,7 +1459,7 @@ public class RoutineTest extends TestCase {
 
         final String input = "test";
         final Routine<String, String> routine =
-                on(tokenOf(DelayedExecution.class)).withArgs(TimeDuration.millis(0)).buildRoutine();
+                on(tokenOf(DelayedExecution.class)).withArgs(TimeDuration.ZERO).buildRoutine();
 
         assertThat(routine.run(input).bind(consumer).waitComplete()).isTrue();
         assertThat(routine.runAsync(input).bind(consumer).waitComplete()).isTrue();
@@ -1466,6 +1686,39 @@ public class RoutineTest extends TestCase {
         }
     }
 
+    private static class DelayedChannelExecution extends BasicExecution<String, String> {
+
+        private final TimeDuration mDelay;
+
+        private final Routine<String, String> mRoutine;
+
+        private boolean mFlag;
+
+        public DelayedChannelExecution(final TimeDuration delay) {
+
+            mDelay = delay;
+            mRoutine =
+                    on(tokenOf(DelayedExecution.class)).withArgs(TimeDuration.ZERO).buildRoutine();
+        }
+
+        @Override
+        public void onInput(final String s, @Nonnull final ResultChannel<String> results) {
+
+            if (mFlag) {
+
+                results.after(mDelay).pass((OutputChannel<String>) null);
+
+            } else {
+
+                results.after(mDelay.time, mDelay.unit).pass((OutputChannel<String>) null);
+            }
+
+            results.pass(mRoutine.runAsync(s));
+
+            mFlag = !mFlag;
+        }
+    }
+
     private static class DelayedExecution extends BasicExecution<String, String> {
 
         private final TimeDuration mDelay;
@@ -1492,6 +1745,58 @@ public class RoutineTest extends TestCase {
             results.pass(s);
 
             mFlag = !mFlag;
+        }
+    }
+
+    private static class DelayedListExecution extends BasicExecution<String, String> {
+
+        private final int mCount;
+
+        private final TimeDuration mDelay;
+
+        private final ArrayList<String> mList;
+
+        private boolean mFlag;
+
+        public DelayedListExecution(final TimeDuration delay, final int listCount) {
+
+            mDelay = delay;
+            mCount = listCount;
+            mList = new ArrayList<String>(listCount);
+        }
+
+        @Override
+        public void onInput(final String s, @Nonnull final ResultChannel<String> results) {
+
+            final ArrayList<String> list = mList;
+            list.add(s);
+
+            if (list.size() >= mCount) {
+
+                if (mFlag) {
+
+                    results.after(mDelay).pass((String[]) null).pass(list);
+
+                } else {
+
+                    results.after(mDelay.time, mDelay.unit)
+                           .pass((List<String>) null)
+                           .pass(list.toArray(new String[list.size()]));
+                }
+
+                results.now();
+                list.clear();
+
+                mFlag = !mFlag;
+            }
+        }
+
+        @Override
+        public void onResult(@Nonnull final ResultChannel<String> results) {
+
+            final ArrayList<String> list = mList;
+            results.after(mDelay).pass(list);
+            list.clear();
         }
     }
 

@@ -47,7 +47,7 @@ public abstract class ClassToken<CLASS> {
      */
     @Nonnull
     @SuppressWarnings("unchecked")
-    public static <CLASS> ClassToken<CLASS> classOf(@Nonnull final CLASS object) {
+    public static <CLASS> ClassToken<CLASS> tokenOf(@Nonnull final CLASS object) {
 
         return tokenOf((Class<CLASS>) object.getClass());
     }

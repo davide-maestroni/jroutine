@@ -65,8 +65,8 @@ public class ClassTokenTest extends TestCase {
         assertThat(classToken2.isAssignableFrom(new ClassToken<ArrayList<String>>() {})).isTrue();
 
         assertThat(ClassToken.tokenOf(List.class)).isEqualTo(new ClassToken<List>() {});
-        assertThat(ClassToken.classOf(new ArrayList())).isEqualTo(new ClassToken<ArrayList>() {});
-        assertThat(ClassToken.classOf(new ArrayList<String>())).isEqualTo(
+        assertThat(ClassToken.tokenOf(new ArrayList())).isEqualTo(new ClassToken<ArrayList>() {});
+        assertThat(ClassToken.tokenOf(new ArrayList<String>())).isEqualTo(
                 new ClassToken<ArrayList<String>>() {});
     }
 
@@ -85,7 +85,7 @@ public class ClassTokenTest extends TestCase {
 
         try {
 
-            ClassToken.classOf(null);
+            ClassToken.tokenOf(null);
 
             fail();
 

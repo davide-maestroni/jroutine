@@ -26,12 +26,11 @@ import com.bmd.jrt.time.TimeDuration;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import static com.bmd.jrt.time.TimeDuration.ZERO;
 import static com.bmd.jrt.time.TimeDuration.fromUnit;
@@ -448,6 +447,15 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
         }
 
         @Override
+        public boolean hasInput() {
+
+            synchronized (mMutex) {
+
+                return isInput() && !mInputQueue.isEmpty();
+            }
+        }
+
+        @Override
         public boolean isAborting() {
 
             synchronized (mMutex) {
@@ -462,6 +470,26 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
             synchronized (mMutex) {
 
                 return (mState == ChannelState.OUTPUT) && (mPendingInputCount <= 0);
+            }
+        }
+
+        @Override
+        public INPUT nextInput() throws NoSuchElementException {
+
+            synchronized (mMutex) {
+
+                if (!isInput()) {
+
+                    mLogger.err("invalid read from close input");
+
+                    throw new NoSuchElementException();
+                }
+
+                final INPUT input = mInputQueue.removeFirst();
+
+                mLogger.dbg("reading input: %s", input);
+
+                return input;
             }
         }
 
@@ -488,56 +516,27 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
         }
 
         @Override
-        public boolean onConsumeInput() {
+        public void onConsumeInput() {
 
             synchronized (mMutex) {
 
-                if ((mState != ChannelState.INPUT) && (mState != ChannelState.OUTPUT)) {
+                if (!isInput()) {
 
                     mLogger.wrn("avoiding consuming input since invocation is aborted [#%d]",
                                 mPendingInputCount);
 
-                    return false;
+                    return;
                 }
 
                 mLogger.dbg("consuming input [#%d]", mPendingInputCount);
 
                 --mPendingInputCount;
             }
-
-            return true;
         }
 
-        @Override
-        public boolean hasNext() {
+        private boolean isInput() {
 
-            synchronized (mMutex) {
-
-                return !mInputQueue.isEmpty();
-            }
-        }
-
-        @Override
-        @SuppressFBWarnings(value = "IT_NO_SUCH_ELEMENT",
-                            justification = "NestedQueue.removeFirst() actually throws it")
-        public INPUT next() {
-
-            synchronized (mMutex) {
-
-                final INPUT input = mInputQueue.removeFirst();
-
-                mLogger.dbg("reading input: %s", input);
-
-                return input;
-            }
-        }
-
-        @Override
-        public void remove() {
-
-            mLogger.err("invalid input remove");
-
-            throw new UnsupportedOperationException();
+            return ((mState == ChannelState.INPUT) || (mState == ChannelState.OUTPUT));
         }
     }
 

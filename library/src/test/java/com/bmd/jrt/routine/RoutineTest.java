@@ -2127,6 +2127,12 @@ public class RoutineTest extends TestCase {
         }
 
         @Override
+        public boolean hasInput() {
+
+            return false;
+        }
+
+        @Override
         public boolean isAborting() {
 
             return false;
@@ -2139,30 +2145,18 @@ public class RoutineTest extends TestCase {
         }
 
         @Override
-        public void onAbortComplete() {
-
-        }
-
-        @Override
-        public boolean onConsumeInput() {
-
-            return false;
-        }
-
-        @Override
-        public boolean hasNext() {
-
-            return false;
-        }
-
-        @Override
-        public Object next() {
+        public Object nextInput() {
 
             return null;
         }
 
         @Override
-        public void remove() {
+        public void onAbortComplete() {
+
+        }
+
+        @Override
+        public void onConsumeInput() {
 
         }
     }

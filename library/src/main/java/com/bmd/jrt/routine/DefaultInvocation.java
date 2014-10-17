@@ -18,8 +18,6 @@ import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.routine.DefaultParameterChannel.ExecutionProvider;
 import com.bmd.jrt.runner.Invocation;
 
-import java.util.Iterator;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -103,20 +101,15 @@ class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
 
             try {
 
-                if (!inputIterator.onConsumeInput()) {
-
-                    mLogger.wrn("avoiding running invocation");
-
-                    return;
-                }
+                inputIterator.onConsumeInput();
 
                 mLogger.dbg("running invocation");
 
                 final Execution<INPUT, OUTPUT> execution = initExecution();
 
-                while (inputIterator.hasNext()) {
+                while (inputIterator.hasInput()) {
 
-                    execution.onInput(inputIterator.next(), resultChannel);
+                    execution.onInput(inputIterator.nextInput(), resultChannel);
                 }
 
                 if (inputIterator.isComplete()) {
@@ -162,7 +155,7 @@ class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
      *
      * @param <INPUT>the input type.
      */
-    public interface InputIterator<INPUT> extends Iterator<INPUT> {
+    public interface InputIterator<INPUT> {
 
         /**
          * Returns the exception identifying the abortion reason.
@@ -171,6 +164,13 @@ class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
          */
         @Nullable
         public Throwable getAbortException();
+
+        /**
+         * Checks if an input is available.
+         *
+         * @return whether an input is available.
+         */
+        public boolean hasInput();
 
         /**
          * Checks if the input channel is aborting the execution.
@@ -187,16 +187,22 @@ class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
         public boolean isComplete();
 
         /**
+         * Gets the next input.
+         *
+         * @return the input.
+         * @throws NoSuchMethodException if no more input is available.
+         */
+        public INPUT nextInput() throws NoSuchMethodException;
+
+        /**
          * Notifies that the execution abortion is complete.
          */
         public void onAbortComplete();
 
         /**
          * Notifies that the available inputs are about to be consumed.
-         *
-         * @return whether at least one input is available.
          */
-        public boolean onConsumeInput();
+        public void onConsumeInput();
     }
 
     /**

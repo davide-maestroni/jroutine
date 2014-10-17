@@ -178,6 +178,8 @@ public interface Routine<INPUT, OUTPUT> {
 
     /**
      * Short for <code>runParallel().readAll()</code>.
+     * <p/>
+     * This method actually makes little sense, thought it is here for completeness.
      *
      * @return the list of output data.
      */
@@ -333,7 +335,9 @@ public interface Routine<INPUT, OUTPUT> {
     public OutputChannel<OUTPUT> runAsync(@Nullable OutputChannel<? extends INPUT> inputs);
 
     /**
-     * Short for <code>invokeParallel(input).results()</code>.
+     * Short for <code>invokeParallel().results()</code>.
+     * <p/>
+     * This method actually makes little sense, thought it is here for completeness.
      *
      * @return the output channel.
      */

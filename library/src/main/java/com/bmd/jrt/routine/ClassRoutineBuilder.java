@@ -413,6 +413,18 @@ public class ClassRoutineBuilder {
     }
 
     /**
+     * Gets the annotated method associated to the specified name.
+     *
+     * @param name the name specified in the annotation.
+     * @return the method or null.
+     */
+    @Nullable
+    protected Method getAnnotatedMethod(@Nonnull final String name) {
+
+        return mMethodMap.get(name);
+    }
+
+    /**
      * Returns the log instance set.
      *
      * @return the log instance.

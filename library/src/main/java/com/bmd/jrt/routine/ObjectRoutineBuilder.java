@@ -261,17 +261,22 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                         parameterTypes = method.getParameterTypes();
                     }
 
-                    try {
-
-                        targetMethod = targetClass.getMethod(name, parameterTypes);
-
-                    } catch (final NoSuchMethodException ignored) {
-
-                    }
+                    targetMethod = getAnnotatedMethod(name);
 
                     if (targetMethod == null) {
 
-                        targetMethod = targetClass.getDeclaredMethod(name, parameterTypes);
+                        try {
+
+                            targetMethod = targetClass.getMethod(name, parameterTypes);
+
+                        } catch (final NoSuchMethodException ignored) {
+
+                        }
+
+                        if (targetMethod == null) {
+
+                            targetMethod = targetClass.getDeclaredMethod(name, parameterTypes);
+                        }
                     }
                 }
 

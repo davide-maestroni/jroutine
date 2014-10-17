@@ -512,11 +512,11 @@ public class JavaRoutineTest extends TestCase {
         @AsyncParameters({RuntimeException.class, int.class})
         public void throwException(RuntimeException ex);
 
-        @Async(name = "throwException")
+        @Async(name = Test.THROW)
         @AsyncParameters({int.class})
         public void throwException1(RuntimeException ex);
 
-        @Async(name = "throwException")
+        @Async(name = Test.THROW)
         public int throwException2(RuntimeException ex);
     }
 

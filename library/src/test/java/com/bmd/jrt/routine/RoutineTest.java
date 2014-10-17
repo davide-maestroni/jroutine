@@ -221,6 +221,93 @@ public class RoutineTest extends TestCase {
         assertThat(abortReason.get()).isEqualTo(exception1);
     }
 
+    public void testCalls() {
+
+        final Routine<String, String> routine =
+                on(tokenOf(PassThroughExecution.class)).buildRoutine();
+
+        assertThat(routine.call()).isEmpty();
+        assertThat(routine.call(Arrays.asList("test1", "test2"))).containsExactly("test1", "test2");
+        assertThat(routine.call(routine.run("test1", "test2"))).containsExactly("test1", "test2");
+        assertThat(routine.call("test1")).containsExactly("test1");
+        assertThat(routine.call("test1", "test2")).containsExactly("test1", "test2");
+        assertThat(routine.callAsync()).isEmpty();
+        assertThat(routine.callAsync(Arrays.asList("test1", "test2"))).containsExactly("test1",
+                                                                                       "test2");
+        assertThat(routine.callAsync(routine.run("test1", "test2"))).containsExactly("test1",
+                                                                                     "test2");
+        assertThat(routine.callAsync("test1")).containsExactly("test1");
+        assertThat(routine.callAsync("test1", "test2")).containsExactly("test1", "test2");
+        assertThat(routine.callParallel()).isEmpty();
+        assertThat(routine.callParallel(Arrays.asList("test1", "test2"))).containsOnly("test1",
+                                                                                       "test2");
+        assertThat(routine.callParallel(routine.run("test1", "test2"))).containsOnly("test1",
+                                                                                     "test2");
+        assertThat(routine.callParallel("test1")).containsOnly("test1");
+        assertThat(routine.callParallel("test1", "test2")).containsOnly("test1", "test2");
+
+        assertThat(routine.run().readAll()).isEmpty();
+        assertThat(routine.run(Arrays.asList("test1", "test2")).readAll()).containsExactly("test1",
+                                                                                           "test2");
+        assertThat(routine.run(routine.run("test1", "test2")).readAll()).containsExactly("test1",
+                                                                                         "test2");
+        assertThat(routine.run("test1").readAll()).containsExactly("test1");
+        assertThat(routine.run("test1", "test2").readAll()).containsExactly("test1", "test2");
+        assertThat(routine.runAsync().readAll()).isEmpty();
+        assertThat(routine.runAsync(Arrays.asList("test1", "test2")).readAll()).containsExactly(
+                "test1", "test2");
+        assertThat(routine.runAsync(routine.run("test1", "test2")).readAll()).containsExactly(
+                "test1", "test2");
+        assertThat(routine.runAsync("test1").readAll()).containsExactly("test1");
+        assertThat(routine.runAsync("test1", "test2").readAll()).containsExactly("test1", "test2");
+        assertThat(routine.runParallel().readAll()).isEmpty();
+        assertThat(routine.runParallel(Arrays.asList("test1", "test2")).readAll()).containsOnly(
+                "test1", "test2");
+        assertThat(routine.runParallel(routine.run("test1", "test2")).readAll()).containsOnly(
+                "test1", "test2");
+        assertThat(routine.runParallel("test1").readAll()).containsOnly("test1");
+        assertThat(routine.runParallel("test1", "test2").readAll()).containsOnly("test1", "test2");
+
+        assertThat(routine.invoke().pass().results().readAll()).isEmpty();
+        assertThat(routine.invoke()
+                          .pass(Arrays.asList("test1", "test2"))
+                          .results()
+                          .readAll()).containsExactly("test1", "test2");
+        assertThat(routine.invoke()
+                          .pass(routine.run("test1", "test2"))
+                          .results()
+                          .readAll()).containsExactly("test1", "test2");
+        assertThat(routine.invoke().pass("test1").results().readAll()).containsExactly("test1");
+        assertThat(routine.invoke().pass("test1", "test2").results().readAll()).containsExactly(
+                "test1", "test2");
+        assertThat(routine.invokeAsync().pass().results().readAll()).isEmpty();
+        assertThat(routine.invokeAsync()
+                          .pass(Arrays.asList("test1", "test2"))
+                          .results()
+                          .readAll()).containsExactly("test1", "test2");
+        assertThat(routine.invokeAsync()
+                          .pass(routine.run("test1", "test2"))
+                          .results()
+                          .readAll()).containsExactly("test1", "test2");
+        assertThat(routine.invokeAsync().pass("test1").results().readAll()).containsExactly(
+                "test1");
+        assertThat(
+                routine.invokeAsync().pass("test1", "test2").results().readAll()).containsExactly(
+                "test1", "test2");
+        assertThat(routine.invokeParallel().pass().results().readAll()).isEmpty();
+        assertThat(routine.invokeParallel()
+                          .pass(Arrays.asList("test1", "test2"))
+                          .results()
+                          .readAll()).containsOnly("test1", "test2");
+        assertThat(routine.invokeParallel().pass(routine.run("test1", "test2")).results().readAll())
+                .containsOnly("test1", "test2");
+        assertThat(routine.invokeParallel().pass("test1").results().readAll()).containsOnly(
+                "test1");
+        assertThat(
+                routine.invokeParallel().pass("test1", "test2").results().readAll()).containsOnly(
+                "test1", "test2");
+    }
+
     public void testChainedRoutine() {
 
         final ExecutionBody<Integer, Integer> execSum = new ExecutionBody<Integer, Integer>() {

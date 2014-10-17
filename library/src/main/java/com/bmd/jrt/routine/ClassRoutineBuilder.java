@@ -78,7 +78,7 @@ public class ClassRoutineBuilder {
 
     private LogLevel mLogLevel;
 
-    private String mParallelGroup;
+    private String mParallelId;
 
     private Runner mRunner;
 
@@ -192,7 +192,7 @@ public class ClassRoutineBuilder {
             AccessController.doPrivileged(new SetAccessibleAction(method));
         }
 
-        String parallelGroup = mParallelGroup;
+        String parallelId = mParallelId;
         Runner runner = mRunner;
         Boolean isSequential = mIsSequential;
         Log log = mLog;
@@ -202,9 +202,9 @@ public class ClassRoutineBuilder {
 
         if (annotation != null) {
 
-            if (parallelGroup == null) {
+            if (parallelId == null) {
 
-                parallelGroup = annotation.parallelGroup();
+                parallelId = annotation.parallelId();
             }
 
             if (runner == null) {
@@ -260,7 +260,7 @@ public class ClassRoutineBuilder {
             }
         }
 
-        return getRoutine(method, parallelGroup, runner, isSequential, false, log, logLevel);
+        return getRoutine(method, parallelId, runner, isSequential, false, log, logLevel);
     }
 
     /**
@@ -332,13 +332,13 @@ public class ClassRoutineBuilder {
     /**
      * Tells the builder to create a routine which can run in parallel to other methods.
      *
-     * @param name the parallel group name.
+     * @param id the parallel group ID.
      * @return this builder.
      */
     @Nonnull
-    public ClassRoutineBuilder parallelGroup(@Nullable final String name) {
+    public ClassRoutineBuilder parallelId(@Nullable final String id) {
 
-        mParallelGroup = name;
+        mParallelId = id;
 
         return this;
     }
@@ -449,9 +449,9 @@ public class ClassRoutineBuilder {
      *
      * @return the parallel group name.
      */
-    protected String getParallelGroup() {
+    protected String getParallelId() {
 
-        return mParallelGroup;
+        return mParallelId;
     }
 
     /**

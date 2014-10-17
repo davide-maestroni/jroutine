@@ -909,7 +909,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         @Override
         @Nonnull
         @SuppressWarnings({"unchecked", "ConstantConditions"})
-        public OutputChannel<OUTPUT> readAllInto(@Nonnull final List<OUTPUT> results) {
+        public OutputChannel<OUTPUT> readAllInto(@Nonnull final List<? super OUTPUT> results) {
 
             synchronized (mMutex) {
 
@@ -990,7 +990,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         }
 
         @Override
-        @Nullable
         public OUTPUT readFirst() {
 
             return readQueue(mOutputTimeout, mOutputTimeoutException);

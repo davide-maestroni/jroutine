@@ -134,9 +134,9 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
     @Nonnull
     @Override
-    public ObjectRoutineBuilder parallelGroup(@Nullable final String name) {
+    public ObjectRoutineBuilder parallelId(@Nullable final String id) {
 
-        super.parallelGroup(name);
+        super.parallelId(id);
 
         return this;
     }
@@ -193,7 +193,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
             final boolean isOverrideReturn;
 
             Method targetMethod;
-            String parallelGroup = getParallelGroup();
+            String parallelId = getParallelId();
             Runner runner = getRunner();
             Boolean isSequential = getSequential();
             Log log = getLog();
@@ -282,9 +282,9 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
                 if (annotation != null) {
 
-                    if (parallelGroup == null) {
+                    if (parallelId == null) {
 
-                        parallelGroup = annotation.parallelGroup();
+                        parallelId = annotation.parallelId();
                     }
 
                     if (runner == null) {
@@ -334,8 +334,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
             }
 
             final Routine<Object, Object> routine =
-                    getRoutine(targetMethod, parallelGroup, runner, isSequential,
-                               isOverrideParameters, log, level);
+                    getRoutine(targetMethod, parallelId, runner, isSequential, isOverrideParameters,
+                               log, level);
             final OutputChannel<Object> outputChannel;
 
             if (isOverrideParameters) {

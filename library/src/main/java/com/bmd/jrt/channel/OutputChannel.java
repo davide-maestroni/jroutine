@@ -131,7 +131,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
      */
     @Nonnull
-    public OutputChannel<OUTPUT> readAllInto(@Nonnull List<OUTPUT> results);
+    public OutputChannel<OUTPUT> readAllInto(@Nonnull List<? super OUTPUT> results);
 
     /**
      * Reads the first available result by waiting at the maximum for the set timeout.
@@ -143,7 +143,6 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @see #afterMax(com.bmd.jrt.time.TimeDuration)
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
      */
-    @Nullable
     public OUTPUT readFirst();
 
     /**

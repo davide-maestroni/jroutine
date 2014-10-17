@@ -63,7 +63,7 @@ public abstract class BasicRoutine<INPUT, OUTPUT> implements Routine<INPUT, OUTP
 
     @Override
     @Nonnull
-    public List<OUTPUT> call(@Nullable final OutputChannel<? extends INPUT> inputs) {
+    public List<OUTPUT> call(@Nullable final OutputChannel<INPUT> inputs) {
 
         return run(inputs).readAll();
     }
@@ -98,7 +98,7 @@ public abstract class BasicRoutine<INPUT, OUTPUT> implements Routine<INPUT, OUTP
 
     @Override
     @Nonnull
-    public List<OUTPUT> callAsync(@Nullable final OutputChannel<? extends INPUT> inputs) {
+    public List<OUTPUT> callAsync(@Nullable final OutputChannel<INPUT> inputs) {
 
         return runAsync(inputs).readAll();
     }
@@ -133,7 +133,7 @@ public abstract class BasicRoutine<INPUT, OUTPUT> implements Routine<INPUT, OUTP
 
     @Override
     @Nonnull
-    public List<OUTPUT> callParallel(@Nullable final OutputChannel<? extends INPUT> inputs) {
+    public List<OUTPUT> callParallel(@Nullable final OutputChannel<INPUT> inputs) {
 
         return runParallel(inputs).readAll();
     }
@@ -168,7 +168,7 @@ public abstract class BasicRoutine<INPUT, OUTPUT> implements Routine<INPUT, OUTP
 
     @Override
     @Nonnull
-    public OutputChannel<OUTPUT> run(@Nullable final OutputChannel<? extends INPUT> inputs) {
+    public OutputChannel<OUTPUT> run(@Nullable final OutputChannel<INPUT> inputs) {
 
         return invoke().pass(inputs).results();
     }
@@ -203,7 +203,7 @@ public abstract class BasicRoutine<INPUT, OUTPUT> implements Routine<INPUT, OUTP
 
     @Override
     @Nonnull
-    public OutputChannel<OUTPUT> runAsync(@Nullable final OutputChannel<? extends INPUT> inputs) {
+    public OutputChannel<OUTPUT> runAsync(@Nullable final OutputChannel<INPUT> inputs) {
 
         return invokeAsync().pass(inputs).results();
     }

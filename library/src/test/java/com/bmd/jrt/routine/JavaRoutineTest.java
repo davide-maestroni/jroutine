@@ -62,7 +62,7 @@ public class JavaRoutineTest extends TestCase {
         final Routine<Object, Object> routine2 = JavaRoutine.on(TestStatic.class)
                                                             .queued()
                                                             .runBy(Runners.pool())
-                                                            .parallelGroup("test")
+                                                            .parallelId("test")
                                                             .classMethod(TestStatic.class.getMethod(
                                                                     "getLong"));
 
@@ -95,8 +95,8 @@ public class JavaRoutineTest extends TestCase {
 
         startTime = System.currentTimeMillis();
 
-        getOne = builder.parallelGroup("test").classMethod("getOne").runAsync();
-        getTwo = builder.parallelGroup("test").classMethod("getTwo").runAsync();
+        getOne = builder.parallelId("test").classMethod("getOne").runAsync();
+        getTwo = builder.parallelId("test").classMethod("getTwo").runAsync();
 
         assertThat(getOne.waitComplete()).isTrue();
         assertThat(getTwo.waitComplete()).isTrue();
@@ -206,7 +206,7 @@ public class JavaRoutineTest extends TestCase {
         final Routine<Object, Object> routine2 = JavaRoutine.on(new Test())
                                                             .queued()
                                                             .runBy(Runners.pool())
-                                                            .parallelGroup("test")
+                                                            .parallelId("test")
                                                             .classMethod(Test.class.getMethod(
                                                                     "getLong"));
 
@@ -239,8 +239,8 @@ public class JavaRoutineTest extends TestCase {
 
         startTime = System.currentTimeMillis();
 
-        getOne = builder.parallelGroup("test").classMethod("getOne").runAsync();
-        getTwo = builder.parallelGroup("test").classMethod("getTwo").runAsync();
+        getOne = builder.parallelId("test").classMethod("getOne").runAsync();
+        getTwo = builder.parallelId("test").classMethod("getTwo").runAsync();
 
         assertThat(getOne.waitComplete()).isTrue();
         assertThat(getTwo.waitComplete()).isTrue();
@@ -593,7 +593,7 @@ public class JavaRoutineTest extends TestCase {
 
     private static class Test2 {
 
-        @Async(parallelGroup = "1")
+        @Async(parallelId = "1")
         public int getOne() throws InterruptedException {
 
             TimeDuration.millis(500).sleepAtLeast();
@@ -601,7 +601,7 @@ public class JavaRoutineTest extends TestCase {
             return 1;
         }
 
-        @Async(parallelGroup = "2")
+        @Async(parallelId = "2")
         public int getTwo() throws InterruptedException {
 
             TimeDuration.millis(500).sleepAtLeast();
@@ -632,7 +632,7 @@ public class JavaRoutineTest extends TestCase {
 
     private static class TestStatic2 {
 
-        @Async(parallelGroup = "1")
+        @Async(parallelId = "1")
         public static int getOne() throws InterruptedException {
 
             TimeDuration.millis(500).sleepAtLeast();
@@ -640,7 +640,7 @@ public class JavaRoutineTest extends TestCase {
             return 1;
         }
 
-        @Async(parallelGroup = "2")
+        @Async(parallelId = "2")
         public static int getTwo() throws InterruptedException {
 
             TimeDuration.millis(500).sleepAtLeast();

@@ -130,7 +130,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @return the list of output data.
      */
     @Nonnull
-    public List<OUTPUT> call(@Nullable OutputChannel<? extends INPUT> inputs);
+    public List<OUTPUT> call(@Nullable OutputChannel<INPUT> inputs);
 
     /**
      * Short for <code>runAsync().readAll()</code>.
@@ -174,7 +174,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @return the list of output data.
      */
     @Nonnull
-    public List<OUTPUT> callAsync(@Nullable OutputChannel<? extends INPUT> inputs);
+    public List<OUTPUT> callAsync(@Nullable OutputChannel<INPUT> inputs);
 
     /**
      * Short for <code>runParallel().readAll()</code>.
@@ -220,7 +220,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @return the list of output data.
      */
     @Nonnull
-    public List<OUTPUT> callParallel(@Nullable OutputChannel<? extends INPUT> inputs);
+    public List<OUTPUT> callParallel(@Nullable OutputChannel<INPUT> inputs);
 
     /**
      * Invokes the execution of this routine in synchronous mode.
@@ -288,7 +288,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @return the output channel.
      */
     @Nonnull
-    public OutputChannel<OUTPUT> run(@Nullable OutputChannel<? extends INPUT> inputs);
+    public OutputChannel<OUTPUT> run(@Nullable OutputChannel<INPUT> inputs);
 
     /**
      * Short for <code>invokeAsync().results()</code>.
@@ -332,7 +332,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @return the output channel.
      */
     @Nonnull
-    public OutputChannel<OUTPUT> runAsync(@Nullable OutputChannel<? extends INPUT> inputs);
+    public OutputChannel<OUTPUT> runAsync(@Nullable OutputChannel<INPUT> inputs);
 
     /**
      * Short for <code>invokeParallel().results()</code>.
@@ -378,5 +378,5 @@ public interface Routine<INPUT, OUTPUT> {
      * @return the output channel.
      */
     @Nonnull
-    public OutputChannel<OUTPUT> runParallel(@Nullable OutputChannel<? extends INPUT> inputs);
+    public OutputChannel<OUTPUT> runParallel(@Nullable OutputChannel<INPUT> inputs);
 }

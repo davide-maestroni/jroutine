@@ -28,9 +28,9 @@ import java.lang.annotation.Target;
  * <p/>
  * Note that the piece of code inside such methods will be automatically protected so to avoid
  * concurrency issues. Though, other parts of the code inside the same class will be not.<br/>
- * In order to avoid unexpected behavior it is advisable to avoid using the same class fields
+ * In order to avoid unexpected behavior, it is advisable to avoid using the same class fields
  * (unless immutable) in protected and non-protected code, or to use the framework to call
- * synchronous methods too.<br/>
+ * synchronous methods as well.<br/>
  * In a dual way, it is possible to exclude single methods from this kind of protection by
  * indicating them as belonging to parallel groups. Each group has a name associated,
  * and every method inside a specific group is protected only from the other methods belonging to
@@ -118,11 +118,11 @@ public @interface Async {
     String name() default "";
 
     /**
-     * The name of the parallel group associated to the method.
+     * The ID of the parallel group associated with the annotated method.
      *
-     * @return the parallel group name.
+     * @return the parallel group ID.
      */
-    String parallelGroup() default "";
+    String parallelId() default "";
 
     /**
      * The class of the runner to be used for asynchronous invocations.

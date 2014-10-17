@@ -15,31 +15,31 @@ package com.bmd.jrt.sample;
 
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.RoutineException;
-import com.bmd.jrt.execution.ExecutionBody;
+import com.bmd.jrt.execution.BasicExecution;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URLConnection;
-import java.util.List;
 
 import javax.annotation.Nonnull;
 
 /**
+ * Execution reading from URL connection.
+ * <p/>
  * Created by davide on 10/17/14.
  */
-public class ConnectionReader extends ExecutionBody<URI, Chunk> {
+public class ReadConnection extends BasicExecution<URI, Chunk> {
 
     private static final int MAX_CHUNK_SIZE = 2048;
 
     @Override
-    public void onExec(@Nonnull final List<? extends URI> uris,
-            @Nonnull final ResultChannel<Chunk> results) {
+    public void onInput(final URI uri, @Nonnull final ResultChannel<Chunk> results) {
 
         try {
 
-            final URLConnection connection = uris.get(0).toURL().openConnection();
+            final URLConnection connection = uri.toURL().openConnection();
 
             if (connection instanceof HttpURLConnection) {
 

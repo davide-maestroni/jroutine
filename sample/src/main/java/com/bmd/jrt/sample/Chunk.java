@@ -18,6 +18,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
+ * Chunk of bytes.
+ * <p/>
  * Created by davide on 10/17/14.
  */
 public class Chunk {

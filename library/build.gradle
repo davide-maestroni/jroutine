@@ -64,7 +64,6 @@ tasks.withType(FindBugs) {
 }
 
 artifacts {
-
     archives task("sourcesJar", type: Jar) {
         description "Generates sources Jar"
         classifier = 'sources'

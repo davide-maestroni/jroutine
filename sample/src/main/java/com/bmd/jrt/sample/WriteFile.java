@@ -27,20 +27,23 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
+ * Execution writing into output file.
+ * <p/>
  * Created by davide on 10/17/14.
  */
-public class DataWriter extends BasicExecution<Chunk, Boolean> {
+public class WriteFile extends BasicExecution<Chunk, Boolean> {
 
     private final File mFile;
 
     private BufferedOutputStream mOutputStream;
 
-    public DataWriter(final File file) {
+    public WriteFile(final File file) {
 
         mFile = file;
     }
 
     @Override
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public void onAbort(@Nullable final Throwable reason) {
 
         closeStream();
@@ -84,25 +87,13 @@ public class DataWriter extends BasicExecution<Chunk, Boolean> {
 
     private void closeStream() {
 
-        final BufferedOutputStream outputStream = mOutputStream;
-
         try {
 
-            outputStream.flush();
+            mOutputStream.close();
 
         } catch (final IOException e) {
 
             throw new RoutineException(e);
-
-        } finally {
-
-            try {
-
-                outputStream.close();
-
-            } catch (final IOException ignored) {
-
-            }
         }
     }
 }

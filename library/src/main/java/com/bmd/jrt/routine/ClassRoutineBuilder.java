@@ -780,6 +780,7 @@ public class ClassRoutineBuilder {
         @Override
         public int hashCode() {
 
+            //auto-generated code
             int result = mCatchClause.hashCode();
             result = 31 * result + (mIsSequential != null ? mIsSequential.hashCode() : 0);
             result = 31 * result + mLog.hashCode();
@@ -794,6 +795,7 @@ public class ClassRoutineBuilder {
         @Override
         public boolean equals(final Object o) {
 
+            //auto-generated code
             if (this == o) {
 
                 return true;

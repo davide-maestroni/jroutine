@@ -19,7 +19,9 @@ import com.bmd.jrt.routine.Routine;
 import com.bmd.jrt.time.TimeDuration;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.NoSuchElementException;
@@ -28,6 +30,8 @@ import static com.bmd.jrt.common.ClassToken.tokenOf;
 import static com.bmd.jrt.routine.JavaRoutine.on;
 
 /**
+ * The downloader implementation.
+ * <p/>
  * Created by davide on 10/17/14.
  */
 public class Downloader {
@@ -37,7 +41,34 @@ public class Downloader {
 
     private final HashSet<URI> mDownloadedSet = new HashSet<URI>();
 
-    private final Routine<URI, Chunk> mReader = on(tokenOf(ConnectionReader.class)).buildRoutine();
+    private final Routine<URI, Chunk> mReadConnection =
+            on(tokenOf(ReadConnection.class)).buildRoutine();
+
+    public static String getFileName(final URI uri) {
+
+        final String path = uri.getPath();
+
+        final String fileName = path.substring(path.lastIndexOf('/') + 1);
+
+        if (fileName.equals("")) {
+
+            return Long.toString(path.hashCode()) + ".tmp";
+        }
+
+        return fileName;
+    }
+
+    public static void main(final String args[]) throws IOException, URISyntaxException {
+
+        final File downloadDir = new File(args[0]);
+        final Downloader manager = new Downloader();
+
+        for (int i = 1; i < args.length; i++) {
+
+            final URI uri = new URI(args[i]);
+            manager.download(uri, new File(downloadDir, getFileName(uri)));
+        }
+    }
 
     public boolean abort(final URI uri) {
 
@@ -90,10 +121,10 @@ public class Downloader {
 
             mDownloadedSet.remove(uri);
 
-            final Routine<Chunk, Boolean> writer =
-                    on(tokenOf(DataWriter.class)).withArgs(dst).buildRoutine();
+            final Routine<Chunk, Boolean> writeFile =
+                    on(tokenOf(WriteFile.class)).withArgs(dst).buildRoutine();
 
-            downloadMap.put(uri, writer.runAsync(mReader.runAsync(uri)));
+            downloadMap.put(uri, writeFile.runAsync(mReadConnection.runAsync(uri)));
         }
     }
 

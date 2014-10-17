@@ -455,8 +455,8 @@ public class TimeDurationTest extends TestCase {
 
         startTime = System.nanoTime();
 
-        TimeDuration.nanos(10573).sleep();
-        assertThat(System.nanoTime() - startTime).isGreaterThanOrEqualTo(10573);
+        TimeDuration.nanos(10573573).sleep();
+        assertThat(System.nanoTime() - startTime).isGreaterThanOrEqualTo(10573573);
 
         startTime = System.currentTimeMillis();
 
@@ -465,8 +465,8 @@ public class TimeDurationTest extends TestCase {
 
         startTime = System.nanoTime();
 
-        TimeDuration.nanos(10573).sleepAtLeast();
-        assertThat(System.nanoTime() - startTime).isGreaterThanOrEqualTo(10573);
+        TimeDuration.nanos(10573573).sleepAtLeast();
+        assertThat(System.nanoTime() - startTime).isGreaterThanOrEqualTo(10573573);
 
         startTime = System.currentTimeMillis() - 1000;
         assertThat(TimeDuration.millis(100).sleepSinceMillis(startTime)).isFalse();
@@ -475,12 +475,12 @@ public class TimeDurationTest extends TestCase {
         assertThat(TimeDuration.millis(100).sleepSinceMillis(startTime)).isTrue();
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(100);
 
-        startTime = System.nanoTime() - 100000;
-        assertThat(TimeDuration.nanos(10573).sleepSinceNanos(startTime)).isFalse();
+        startTime = System.nanoTime() - 100000000;
+        assertThat(TimeDuration.nanos(10573573).sleepSinceNanos(startTime)).isFalse();
 
         startTime = System.nanoTime();
-        assertThat(TimeDuration.nanos(10573).sleepSinceNanos(startTime)).isTrue();
-        assertThat(System.nanoTime() - startTime).isGreaterThanOrEqualTo(10573);
+        assertThat(TimeDuration.nanos(10573573).sleepSinceNanos(startTime)).isTrue();
+        assertThat(System.nanoTime() - startTime).isGreaterThanOrEqualTo(10573573);
 
         startTime = System.currentTimeMillis();
 
@@ -498,7 +498,7 @@ public class TimeDurationTest extends TestCase {
         startTime = System.currentTimeMillis();
         assertThat(TimeDuration.ZERO.sleepSinceMillis(startTime)).isFalse();
 
-        startTime = System.nanoTime() - 100000;
+        startTime = System.nanoTime() - 100000000;
         assertThat(TimeDuration.ZERO.sleepSinceNanos(startTime)).isFalse();
 
         startTime = System.nanoTime();

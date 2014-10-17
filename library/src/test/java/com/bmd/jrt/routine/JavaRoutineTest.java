@@ -58,6 +58,7 @@ public class JavaRoutineTest extends TestCase {
         final Routine<Object, Object> routine2 = JavaRoutine.on(Test.class)
                                                             .queued()
                                                             .runBy(Runners.pool())
+                                                            .parallelGroup("test")
                                                             .classMethod(Test.class.getMethod(
                                                                     "getLong"));
 
@@ -76,6 +77,90 @@ public class JavaRoutineTest extends TestCase {
                 JavaRoutine.on(Test.class).withinTry(testCatch).method(Test.THROW);
 
         assertThat(routine3.call(new IllegalArgumentException())).isEmpty();
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public void testClassRoutineBuilderError() {
+
+        try {
+
+            new ClassRoutineBuilder(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new ClassRoutineBuilder(DuplicateAnnotation.class);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            new ClassRoutineBuilder(Test.class).classMethod("test");
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            new ClassRoutineBuilder(Test.class).method("test");
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            new ClassRoutineBuilder(Test.class).logLevel(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new ClassRoutineBuilder(Test.class).loggedWith(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new ClassRoutineBuilder(Test.class).runBy(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new ClassRoutineBuilder(Test.class).withinTry(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
     }
 
     public void testRoutineBuilder() {
@@ -191,6 +276,23 @@ public class JavaRoutineTest extends TestCase {
 
         } catch (final IllegalArgumentException ignored) {
 
+        }
+    }
+
+    private static class DuplicateAnnotation {
+
+        public static final String NAME = "get";
+
+        @Async(name = NAME)
+        public static int getOne() {
+
+            return 1;
+        }
+
+        @Async(name = NAME)
+        public static int getTwo() {
+
+            return 2;
         }
     }
 

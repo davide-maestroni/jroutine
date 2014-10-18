@@ -13,7 +13,7 @@
  */
 
 /**
- * Package containing routine helper classes and exception definitions.
+ * Routine helper classes and exception definitions.
  * <p/>
  * Created by davide on 9/25/14.
  */

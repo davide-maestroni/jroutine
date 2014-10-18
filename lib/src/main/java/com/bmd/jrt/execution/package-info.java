@@ -13,7 +13,7 @@
  */
 
 /**
- * Package containing routine interfaces and implementations.
+ * Routine interfaces and implementations.
  * <p/>
  * Created by davide on 9/25/14.
  */

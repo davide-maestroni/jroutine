@@ -13,7 +13,7 @@
  */
 
 /**
- * Package containing classes and interfaces related to routine runners.
+ * Classes and interfaces related to routine runners.
  * <p/>
  * Created by davide on 9/25/14.
  */

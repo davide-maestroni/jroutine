@@ -13,7 +13,7 @@
  */
 
 /**
- * Package containing log classes specific to the Android platform.
+ * Log classes specific to the Android platform.
  * <p/>
  * Created by davide on 10/10/14.
  */

@@ -13,7 +13,7 @@
  */
 
 /**
- * Package containing log related classes and definitions.
+ * Log related classes and definitions.
  * <p/>
  * Created by davide on 10/4/14.
  */

@@ -355,7 +355,7 @@ public class RoutineTest extends TestCase {
         assertThat(sumRoutine.call(squareRoutine.runAsync(1, 2, 3, 4))).containsExactly(30);
         assertThat(sumRoutine.callAsync(squareRoutine.runAsync(1, 2, 3, 4))).containsExactly(30);
         assertThat(sumRoutine.run(squareRoutine.runAsync(1, 2, 3, 4)).readAll()).containsExactly(
-                30);
+                30);//TODO fail
         assertThat(
                 sumRoutine.runAsync(squareRoutine.runAsync(1, 2, 3, 4)).readAll()).containsExactly(
                 30);

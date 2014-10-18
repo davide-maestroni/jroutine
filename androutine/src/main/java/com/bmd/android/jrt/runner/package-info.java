@@ -13,7 +13,7 @@
  */
 
 /**
- * Package containing runner related classes and definitions specific to the Android platform.
+ * Runner related classes and definitions specific to the Android platform.
  * <p/>
  * Created by davide on 9/28/14.
  */

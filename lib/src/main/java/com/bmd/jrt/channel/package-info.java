@@ -13,7 +13,7 @@
  */
 
 /**
- * Package containing classes and interfaces related to routine channels.
+ * Classes and interfaces related to routine channels.
  * <p/>
  * Created by davide on 9/19/14.
  */

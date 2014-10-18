@@ -13,7 +13,7 @@
  */
 
 /**
- * Package containing annotation definitions.
+ * Annotation definitions.
  * <p/>
  * Created by davide on 10/14/14.
  */

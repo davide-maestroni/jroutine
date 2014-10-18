@@ -13,7 +13,7 @@
  */
 
 /**
- * Package containing classes and interfaces related to routine invocations.
+ * Classes and interfaces related to routine invocations.
  * <p/>
  * Created by davide on 9/25/14.
  */

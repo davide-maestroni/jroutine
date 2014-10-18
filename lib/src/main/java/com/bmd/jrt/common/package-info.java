@@ -13,7 +13,7 @@
  */
 
 /**
- * Package containing time related helper classes.
+ * Time related helper classes.
  * <p/>
  * Created by davide on 9/25/14.
  */

@@ -55,6 +55,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
     private final ArrayList<OutputChannel<?>> mBoundChannels = new ArrayList<OutputChannel<?>>();
 
+    private final Object mConsumerMutex = new Object();
+
     private final AbortHandler mHandler;
 
     private final Logger mLogger;
@@ -429,39 +431,68 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         try {
 
-            final ArrayList<Object> outputs;
-            final OutputConsumer<OUTPUT> consumer;
-            final ChannelState state;
+            synchronized (mConsumerMutex) {
 
-            synchronized (mMutex) {
+                final ArrayList<Object> outputs;
+                final OutputConsumer<OUTPUT> consumer;
+                final ChannelState state;
 
-                consumer = mOutputConsumer;
+                synchronized (mMutex) {
 
-                if (consumer == null) {
+                    consumer = mOutputConsumer;
 
-                    logger.dbg("avoiding flushing output since channel is not bound");
+                    if (consumer == null) {
+
+                        logger.dbg("avoiding flushing output since channel is not bound");
+
+                        mMutex.notifyAll();
+
+                        return;
+                    }
+
+                    outputs = new ArrayList<Object>();
+                    mOutputQueue.moveTo(outputs);
+                    state = mState;
 
                     mMutex.notifyAll();
-
-                    return;
                 }
 
-                outputs = new ArrayList<Object>();
-                mOutputQueue.moveTo(outputs);
-                state = mState;
+                for (final Object output : outputs) {
 
-                mMutex.notifyAll();
-            }
+                    if (output instanceof RoutineExceptionWrapper) {
 
-            for (final Object output : outputs) {
+                        try {
 
-                if (output instanceof RoutineExceptionWrapper) {
+                            logger.dbg("aborting consumer (%s): %s", consumer, output);
+
+                            consumer.onAbort(((RoutineExceptionWrapper) output).getCause());
+
+                        } catch (final RoutineInterruptedException e) {
+
+                            throw e;
+
+                        } catch (final Throwable t) {
+
+                            logger.wrn(t, "ignoring consumer exception (%s)", consumer);
+                        }
+
+                        break;
+
+                    } else {
+
+                        logger.dbg("output consumer (%s): %s", consumer, output);
+
+                        consumer.onOutput((OUTPUT) output);
+                    }
+                }
+
+                if (state == ChannelState.DONE) {
 
                     try {
 
-                        logger.dbg("aborting consumer (%s): %s", consumer, output);
+                        logger.dbg("closing consumer (%s)", consumer);
 
-                        consumer.onAbort(((RoutineExceptionWrapper) output).getCause());
+                        consumer.onClose();
 
                     } catch (final RoutineInterruptedException e) {
 
@@ -471,34 +502,12 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                         logger.wrn(t, "ignoring consumer exception (%s)", consumer);
                     }
-
-                    break;
-
-                } else {
-
-                    logger.dbg("output consumer (%s): %s", consumer, output);
-
-                    consumer.onOutput((OUTPUT) output);
                 }
             }
 
-            if (state == ChannelState.DONE) {
+        } catch (final RoutineInterruptedException e) {
 
-                try {
-
-                    logger.dbg("closing consumer (%s)", consumer);
-
-                    consumer.onClose();
-
-                } catch (final RoutineInterruptedException e) {
-
-                    throw e;
-
-                } catch (final Throwable t) {
-
-                    logger.wrn(t, "ignoring consumer exception (%s)", consumer);
-                }
-            }
+            throw e;
 
         } catch (final Throwable t) {
 
@@ -867,7 +876,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                     throw new NullPointerException("the output consumer must not be null");
                 }
 
-                mOutputConsumer = new SynchronizedConsumer<OUTPUT>(consumer);
+                mOutputConsumer = consumer;
             }
 
             flushOutput();

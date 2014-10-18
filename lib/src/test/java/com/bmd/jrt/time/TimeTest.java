@@ -75,8 +75,6 @@ public class TimeTest extends TestCase {
         assertThat(time).isNotEqualTo(time.millisTime());
         assertThat(time.equals(new Object())).isFalse();
         assertThat(time.hashCode()).isEqualTo(time.nanosTime().hashCode());
-
-        assertThat(Time.current().toMillis()).isEqualTo(System.currentTimeMillis());
     }
 
     @SuppressWarnings("ConstantConditions")

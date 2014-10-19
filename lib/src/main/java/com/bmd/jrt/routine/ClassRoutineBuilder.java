@@ -16,6 +16,8 @@ package com.bmd.jrt.routine;
 import com.bmd.jrt.annotation.Async;
 import com.bmd.jrt.annotation.DefaultLog;
 import com.bmd.jrt.annotation.DefaultRunner;
+import com.bmd.jrt.annotation.LongExecution;
+import com.bmd.jrt.annotation.VeryLongExecution;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.common.RoutineException;
@@ -24,6 +26,7 @@ import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.runner.Runner;
+import com.bmd.jrt.runner.Runners;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -473,6 +476,32 @@ public class ClassRoutineBuilder {
             @Nullable final Log log, @Nullable final LogLevel level) {
 
         Routine<Object, Object> routine;
+        Runner routineRunner = runner;
+
+        if (routineRunner == null) {
+
+            if (method.isAnnotationPresent(LongExecution.class)) {
+
+                routineRunner = Runners.sharedLong();
+
+            } else if (method.isAnnotationPresent(VeryLongExecution.class)) {
+
+                routineRunner = Runners.sharedVerylong();
+
+            } else {
+
+                final Class<?> targetClass = mTargetClass;
+
+                if (targetClass.isAnnotationPresent(LongExecution.class)) {
+
+                    routineRunner = Runners.sharedLong();
+
+                } else if (targetClass.isAnnotationPresent(VeryLongExecution.class)) {
+
+                    routineRunner = Runners.sharedVerylong();
+                }
+            }
+        }
 
         synchronized (sMutexCache) {
 
@@ -494,8 +523,8 @@ public class ClassRoutineBuilder {
             final String parallelGroupName = (parallelGroup != null) ? parallelGroup : "";
 
             final RoutineInfo routineInfo =
-                    new RoutineInfo(method, parallelGroupName, runner, isSequential, orderedInput,
-                                    catchClause, routineLog, routineLogLevel);
+                    new RoutineInfo(method, parallelGroupName, routineRunner, isSequential,
+                                    orderedInput, catchClause, routineLog, routineLogLevel);
             routine = routineMap.get(routineInfo);
 
             if (routine != null) {
@@ -524,9 +553,9 @@ public class ClassRoutineBuilder {
             final RoutineBuilder<Object, Object> builder =
                     new RoutineBuilder<Object, Object>(METHOD_EXECUTION_TOKEN);
 
-            if (runner != null) {
+            if (routineRunner != null) {
 
-                builder.runBy(runner);
+                builder.runBy(routineRunner);
             }
 
             if (isSequential != null) {

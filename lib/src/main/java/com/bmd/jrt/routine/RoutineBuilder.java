@@ -13,6 +13,8 @@
  */
 package com.bmd.jrt.routine;
 
+import com.bmd.jrt.annotation.LongExecution;
+import com.bmd.jrt.annotation.VeryLongExecution;
 import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.execution.Execution;
 import com.bmd.jrt.log.Log;
@@ -71,7 +73,7 @@ import static com.bmd.jrt.time.TimeDuration.seconds;
  */
 public class RoutineBuilder<INPUT, OUTPUT> {
 
-    private final ClassToken<? extends Execution<INPUT, OUTPUT>> mClassToken;
+    private final Class<? extends Execution<INPUT, OUTPUT>> mExecutionClass;
 
     private Object[] mArgs = NO_ARGS;
 
@@ -99,15 +101,18 @@ public class RoutineBuilder<INPUT, OUTPUT> {
      * @param classToken the execution class token.
      * @throws NullPointerException if the class token is null.
      */
-    @SuppressWarnings("ConstantConditions")
     RoutineBuilder(@Nonnull final ClassToken<? extends Execution<INPUT, OUTPUT>> classToken) {
 
-        if (classToken == null) {
+        mExecutionClass = classToken.getRawClass();
 
-            throw new NullPointerException("the execution class token must not be null");
+        if (mExecutionClass.isAnnotationPresent(LongExecution.class)) {
+
+            mAsyncRunner = Runners.sharedLong();
+
+        } else if (mExecutionClass.isAnnotationPresent(VeryLongExecution.class)) {
+
+            mAsyncRunner = Runners.sharedVerylong();
         }
-
-        mClassToken = classToken;
     }
 
     /**
@@ -156,8 +161,8 @@ public class RoutineBuilder<INPUT, OUTPUT> {
 
         return new DefaultRoutine<INPUT, OUTPUT>(mSyncRunner, mAsyncRunner, mMaxRunning,
                                                  mMaxRetained, mAvailTimeout, mOrderedInput,
-                                                 mOrderedOutput, mLog, mLogLevel,
-                                                 mClassToken.getRawClass(), mArgs);
+                                                 mOrderedOutput, mLog, mLogLevel, mExecutionClass,
+                                                 mArgs);
     }
 
     /**

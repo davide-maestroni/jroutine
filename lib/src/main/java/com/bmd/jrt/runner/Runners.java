@@ -28,7 +28,11 @@ public class Runners {
 
     private static final SequentialRunner sSequentialRunner = new SequentialRunner();
 
+    private static volatile Runner sSharedLongRunner;
+
     private static volatile Runner sSharedRunner;
+
+    private static volatile Runner sSharedVeryLongRunner;
 
     /**
      * Avoid direct instantiation.
@@ -108,6 +112,40 @@ public class Runners {
         }
 
         return sSharedRunner;
+    }
+
+    /**
+     * Returns the shared instance of a thread pool asynchronous runner dedicated to long tasks,
+     * that is tasks which might take more than a few seconds to complete.
+     *
+     * @return the runner instance.
+     */
+    @Nonnull
+    public static Runner sharedLong() {
+
+        if (sSharedLongRunner == null) {
+
+            sSharedLongRunner = pool();
+        }
+
+        return sSharedLongRunner;
+    }
+
+    /**
+     * Returns the shared instance of a thread pool asynchronous runner dedicated to very long
+     * tasks, that is tasks which might take more than a few dozens of seconds to complete.
+     *
+     * @return the runner instance.
+     */
+    @Nonnull
+    public static Runner sharedVerylong() {
+
+        if (sSharedVeryLongRunner == null) {
+
+            sSharedVeryLongRunner = pool();
+        }
+
+        return sSharedVeryLongRunner;
     }
 
     private static int getBestPoolSize() {

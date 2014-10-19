@@ -1,7 +1,5 @@
 package com.bmd.jrt.sample;
 
-import com.bmd.jrt.log.Log.LogLevel;
-import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.time.TimeDuration;
 
 import junit.framework.TestCase;
@@ -44,7 +42,7 @@ public class DownloaderTest extends TestCase {
     public DownloaderTest() throws IOException {
 
         mTmpDirPath = System.getProperty("java.io.tmpdir");
-        mDownloader = new Downloader();
+        mDownloader = new Downloader(2);
     }
 
     public void testAll() throws IOException, URISyntaxException {
@@ -267,8 +265,7 @@ public class DownloaderTest extends TestCase {
 
         super.setUp();
 
-        Logger.setDefaultLogLevel(LogLevel.SILENT);
-
+        delete(FAIL_URL);
         delete(HUGE_FILE_URL);
         delete(SMALL_FILE_URL1);
         delete(SMALL_FILE_URL2);

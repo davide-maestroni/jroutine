@@ -371,9 +371,9 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
     private void verifyInput() {
 
-        final Throwable throwable = mAbortException;
+        if (mState == ChannelState.EXCEPTION) {
 
-        if (throwable != null) {
+            final Throwable throwable = mAbortException;
 
             mLogger.dbg(throwable, "abort exception");
 

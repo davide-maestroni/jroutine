@@ -2183,14 +2183,13 @@ public class RoutineTest extends TestCase {
         }
     }
 
-    @SuppressWarnings("ConstantConditions")
     private static class TestExecutionProvider implements ExecutionProvider<Object, Object> {
 
         @Nonnull
         @Override
         public Execution<Object, Object> create() {
 
-            return null;
+            return new BasicExecution<Object, Object>() {};
         }
 
         @Override

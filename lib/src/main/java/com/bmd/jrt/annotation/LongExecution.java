@@ -20,6 +20,25 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * This annotation is used to indicate a class or method whose execution might take more than a
+ * few seconds to complete.
+ * <p/>
+ * The annotation will cause the routine execution to be run into a dedicated pool,
+ * unless a different runner is programmatically set through the proper methods.
+ * <p/>
+ * Remember also that, in order for the annotation to properly work at run time, you will need to
+ * add the proper rules to your Proguard file if employing it for shrinking or obfuscation:
+ * <pre>
+ *     <code>
+ *
+ *         -keepattributes RuntimeVisibleAnnotations
+ *
+ *         -keepclassmembers class ** {
+ *              &#64;com.bmd.jrt.annotation.LongExecution *;
+ *         }
+ *     </code>
+ * </pre>
+ * <p/>
  * Created by davide on 10/19/14.
  */
 @Inherited

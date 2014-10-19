@@ -120,7 +120,7 @@ public class Downloader {
         return false;
     }
 
-    public void download(final URI uri, final File dst) {
+    public void download(final URI uri, final File dstFile) {
 
         final HashMap<URI, OutputChannel<Boolean>> downloadMap = mDownloadMap;
 
@@ -129,7 +129,7 @@ public class Downloader {
             mDownloadedSet.remove(uri);
 
             final Routine<Chunk, Boolean> writeFile =
-                    JavaRoutine.on(tokenOf(WriteFile.class)).withArgs(dst).buildRoutine();
+                    JavaRoutine.on(tokenOf(WriteFile.class)).withArgs(dstFile).buildRoutine();
 
             downloadMap.put(uri, writeFile.runAsync(mReadConnection.runAsync(uri)));
         }

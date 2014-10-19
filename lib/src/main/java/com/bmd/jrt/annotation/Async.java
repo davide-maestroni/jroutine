@@ -97,6 +97,11 @@ import java.lang.annotation.Target;
 public @interface Async {
 
     /**
+     * Constant indicating a generic default value.
+     */
+    static final String DEFAULT = "";
+
+    /**
      * The class of the log to be used.
      *
      * @return the log class.
@@ -115,14 +120,14 @@ public @interface Async {
      *
      * @return the name.
      */
-    String name() default "";
+    String name() default DEFAULT;
 
     /**
      * The ID of the parallel group associated with the annotated method.
      *
      * @return the parallel group ID.
      */
-    String parallelId() default "";
+    String parallelId() default DEFAULT;
 
     /**
      * The class of the runner to be used for asynchronous invocations.

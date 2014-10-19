@@ -28,9 +28,9 @@ public class Chunk {
 
     private int mLength;
 
-    public Chunk(final int size) {
+    public Chunk(final int maxSize) {
 
-        mData = new byte[size];
+        mData = new byte[maxSize];
     }
 
     public boolean readFrom(final InputStream stream) throws IOException {

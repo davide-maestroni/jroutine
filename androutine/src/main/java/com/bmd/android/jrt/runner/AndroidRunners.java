@@ -30,7 +30,7 @@ import javax.annotation.Nullable;
  */
 public class AndroidRunners {
 
-    private static Runner sMainRunner;
+    private static volatile Runner sMainRunner;
 
     /**
      * Avoid direct instantiation.

@@ -6,7 +6,6 @@ import junit.framework.TestCase;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -279,11 +278,12 @@ public class DownloaderTest extends TestCase {
 
         try {
 
-            new FileInputStream(file);
+            // the only way to be sure that a file does not exists is to read it
+            assertThat(new FileInputStream(file).read());
 
             fail();
 
-        } catch (FileNotFoundException ignored) {
+        } catch (IOException ignored) {
 
         }
     }

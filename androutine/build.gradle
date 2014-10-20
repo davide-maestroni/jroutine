@@ -11,23 +11,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import com.android.builder.core.BuilderConstants
+
 apply plugin: 'com.android.library'
+apply plugin: 'jacoco'
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+group = 'com.github.davide-maestroni'
+version = '1.0.0'
+archivesBaseName = project.name
 
 android {
-    compileSdkVersion 19
-    buildToolsVersion "20.0.0"
+    compileSdkVersion 21
+    buildToolsVersion "21.0.1"
 
     defaultConfig {
         minSdkVersion 8
-        targetSdkVersion 19
+        targetSdkVersion 21
         versionCode 100
-        versionName "1.0"
+        versionName version
     }
 
     buildTypes {
         release {
             runProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+
+        debug {
+            testCoverageEnabled true
         }
     }
 
@@ -41,4 +54,116 @@ dependencies {
     compile project(':lib')
 
     androidTestCompile 'com.squareup:fest-android:1.0.7'
+}
+
+task("jacocoTest", dependsOn: 'connectedCheck') {
+    description = "Runs the tests and generates the JaCoCo report files."
+} << {
+    tasks.createDebugCoverageReport.execute()
+}
+
+android.libraryVariants.all { variant ->
+
+    def buildTypeName = variant.buildType.name
+
+    if (buildTypeName.equals(BuilderConstants.DEBUG)) {
+
+        // Skip debug builds.
+        return;
+    }
+
+    def variantName = variant.name.capitalize()
+
+    task("javadoc${variantName}", type: Javadoc) {
+        description "Generates Javadoc from the ${variantName} build"
+        source = variant.javaCompile.source
+        ext.androidJar =
+                "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
+        classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)
+        title = "${archivesBaseName} ${version}"
+        options.links("http://docs.oracle.com/javase/7/docs/api/")
+        options.linksOffline("http://developer.android.com/reference/", "${android.sdkDirectory}/docs/reference/")
+        options.overview("${project.projectDir}/docs/overview.html")
+        options.windowTitle("Javadoc - ${archivesBaseName}")
+        exclude '**/BuildConfig.java'
+        exclude '**/R.java'
+    }
+
+    artifacts {
+
+        archives task("sourcesJar${variantName}", type: Jar) {
+            description "Generates sources Jar from the ${variantName} build"
+            classifier = 'sources'
+            from variant.sourceSets.java.srcDirs
+        }
+
+        archives task("javadocJar${variantName}", type: Jar, dependsOn: tasks["javadoc${variantName}"]) {
+            description "Generates Javadoc Jar from the ${variantName} build"
+            classifier = 'javadoc'
+            from 'build/docs/javadoc'
+        }
+
+        archives task("jar${variantName}", type: Jar) {
+            dependsOn variant.javaCompile
+            description "Generates Jar from the ${variantName} build"
+            from variant.javaCompile.destinationDir
+            exclude '**/BuildConfig.class'
+            exclude '**/R*.class'
+        }
+    }
+}
+
+signing {
+    sign configurations.archives
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            def localRepoUrl = mavenLocal().url.toString()
+
+            if (file(localRepoUrl).exists()) {
+
+                // Upload the artifacts to the local repository
+                repository(url: localRepoUrl)
+            }
+
+            if (project.hasProperty('sonatypeUsername') && project.hasProperty('sonatypePassword')) {
+
+                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                    authentication(userName: sonatypeUsername, password: sonatypePassword)
+                }
+            }
+
+            pom.project {
+                name = archivesBaseName
+                packaging = 'jar'
+                description = 'Parallel programming on the go'
+                url = 'http://davide-maestroni.github.io/jroutine/'
+
+                scm {
+                    url = 'git@github.com:davide-maestroni/robo-fashion.git'
+                    connection = 'scm:git:git@github.com:davide-maestroni/jroutine.git'
+                    developerConnection = 'scm:git:git@github.com:davide-maestroni/jroutine.git'
+                }
+
+                licenses {
+                    license {
+                        name = 'The Apache Software License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        distribution = 'repo'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id = 'davide-maestroni'
+                        name = 'Davide Maestroni'
+                    }
+                }
+            }
+        }
+    }
 }

@@ -13,7 +13,6 @@
  */
 package com.bmd.jrt.sample;
 
-import com.bmd.jrt.annotation.VeryLongExecution;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.RoutineException;
 import com.bmd.jrt.execution.BasicExecution;
@@ -31,7 +30,6 @@ import javax.annotation.Nonnull;
  * <p/>
  * Created by davide on 10/17/14.
  */
-@VeryLongExecution
 public class ReadConnection extends BasicExecution<URI, Chunk> {
 
     private static final int MAX_CHUNK_SIZE = 2048;

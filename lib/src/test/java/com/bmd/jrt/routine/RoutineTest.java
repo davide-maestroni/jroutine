@@ -16,8 +16,6 @@ package com.bmd.jrt.routine;
 import com.bmd.jrt.annotation.Async;
 import com.bmd.jrt.annotation.AsyncParameters;
 import com.bmd.jrt.annotation.AsyncResult;
-import com.bmd.jrt.annotation.LongExecution;
-import com.bmd.jrt.annotation.VeryLongExecution;
 import com.bmd.jrt.channel.BasicOutputConsumer;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.OutputConsumer;
@@ -2007,18 +2005,15 @@ public class RoutineTest extends TestCase {
 
     private interface TestInterface {
 
-        @VeryLongExecution
         public int getInt(int i);
     }
 
-    @VeryLongExecution
     private interface TestInterfaceAsync {
 
         @AsyncParameters({int.class})
         public int getInt(OutputChannel<Integer> i);
 
         @AsyncResult
-        @LongExecution
         public OutputChannel<Integer> getOne();
 
         @Async(name = "getInt")
@@ -2165,7 +2160,6 @@ public class RoutineTest extends TestCase {
         }
     }
 
-    @LongExecution
     private static class TestClass implements TestInterface {
 
         public static final String GET_METHOD = "get";

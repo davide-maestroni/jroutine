@@ -18,14 +18,11 @@ import com.bmd.jrt.annotation.AsyncParameters;
 import com.bmd.jrt.annotation.AsyncResult;
 import com.bmd.jrt.annotation.DefaultLog;
 import com.bmd.jrt.annotation.DefaultRunner;
-import com.bmd.jrt.annotation.LongExecution;
-import com.bmd.jrt.annotation.VeryLongExecution;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ParameterChannel;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.runner.Runner;
-import com.bmd.jrt.runner.Runners;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -334,31 +331,6 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
                 isOverrideParameters =
                         (paramAnnotation != null) && (paramAnnotation.value().length > 0);
-            }
-
-            if (runner == null) {
-
-                if (method.isAnnotationPresent(LongExecution.class)) {
-
-                    runner = Runners.sharedLong();
-
-                } else if (method.isAnnotationPresent(VeryLongExecution.class)) {
-
-                    runner = Runners.sharedVerylong();
-
-                } else {
-
-                    final Class<?> declaringClass = method.getDeclaringClass();
-
-                    if (declaringClass.isAnnotationPresent(LongExecution.class)) {
-
-                        runner = Runners.sharedLong();
-
-                    } else if (declaringClass.isAnnotationPresent(VeryLongExecution.class)) {
-
-                        runner = Runners.sharedVerylong();
-                    }
-                }
             }
 
             final Routine<Object, Object> routine =

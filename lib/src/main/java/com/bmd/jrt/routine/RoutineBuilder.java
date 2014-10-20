@@ -13,8 +13,6 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.annotation.LongExecution;
-import com.bmd.jrt.annotation.VeryLongExecution;
 import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.execution.Execution;
 import com.bmd.jrt.log.Log;
@@ -77,7 +75,7 @@ public class RoutineBuilder<INPUT, OUTPUT> {
 
     private Object[] mArgs = NO_ARGS;
 
-    private Runner mAsyncRunner = Runners.shared();
+    private Runner mAsyncRunner = Runners.pool();
 
     private TimeDuration mAvailTimeout = seconds(5);
 
@@ -104,15 +102,6 @@ public class RoutineBuilder<INPUT, OUTPUT> {
     RoutineBuilder(@Nonnull final ClassToken<? extends Execution<INPUT, OUTPUT>> classToken) {
 
         mExecutionClass = classToken.getRawClass();
-
-        if (mExecutionClass.isAnnotationPresent(LongExecution.class)) {
-
-            mAsyncRunner = Runners.sharedLong();
-
-        } else if (mExecutionClass.isAnnotationPresent(VeryLongExecution.class)) {
-
-            mAsyncRunner = Runners.sharedVerylong();
-        }
     }
 
     /**

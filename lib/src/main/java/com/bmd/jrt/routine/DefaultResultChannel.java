@@ -424,6 +424,40 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         return true;
     }
 
+    private void closeConsumer() {
+
+        synchronized (mConsumerMutex) {
+
+            final Logger logger = mLogger;
+            final OutputConsumer<OUTPUT> consumer = mOutputConsumer;
+
+            try {
+
+                logger.dbg("closing consumer (%s)", consumer);
+
+                consumer.onClose();
+
+            } catch (final RoutineInterruptedException e) {
+
+                throw e;
+
+            } catch (final Throwable t) {
+
+                logger.wrn(t, "ignoring consumer exception (%s)", consumer);
+            }
+
+            synchronized (mMutex) {
+
+                if (mState == ChannelState.FLUSH) {
+
+                    mState = ChannelState.DONE;
+
+                    mMutex.notifyAll();
+                }
+            }
+        }
+    }
+
     @SuppressWarnings("unchecked")
     private void flushOutput() {
 
@@ -440,13 +474,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                 final ChannelState state;
 
                 synchronized (mMutex) {
-
-                    if (mState == ChannelState.DONE) {
-
-                        logger.dbg("avoiding flushing output since channel is closed");
-
-                        return;
-                    }
 
                     consumer = mOutputConsumer;
 
@@ -502,30 +529,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 if (state == ChannelState.FLUSH) {
 
-                    try {
-
-                        logger.dbg("closing consumer (%s)", consumer);
-
-                        consumer.onClose();
-
-                    } catch (final RoutineInterruptedException e) {
-
-                        throw e;
-
-                    } catch (final Throwable t) {
-
-                        logger.wrn(t, "ignoring consumer exception (%s)", consumer);
-                    }
-                }
-
-                synchronized (mMutex) {
-
-                    if (state == ChannelState.FLUSH) {
-
-                        mState = ChannelState.DONE;
-
-                        mMutex.notifyAll();
-                    }
+                    closeConsumer();
                 }
 
             } catch (final RoutineInterruptedException e) {
@@ -534,15 +538,15 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             } catch (final Throwable t) {
 
-                boolean isFlush = false;
+                boolean isClose = false;
 
                 synchronized (mMutex) {
 
                     logger.wrn(t, "consumer exception (%s)", mOutputConsumer);
 
-                    if (isDone()) {
+                    if ((mState == ChannelState.FLUSH) || (mState == ChannelState.ABORT)) {
 
-                        isFlush = true;
+                        isClose = true;
 
                     } else if (mState != ChannelState.EXCEPTION) {
 
@@ -557,9 +561,9 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                     }
                 }
 
-                if (isFlush) {
+                if (isClose) {
 
-                    flushOutput();
+                    closeConsumer();
                 }
             }
         }
@@ -890,6 +894,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         @SuppressWarnings("ConstantConditions")
         public OutputChannel<OUTPUT> bind(@Nullable final OutputConsumer<OUTPUT> consumer) {
 
+            final boolean isClose;
+
             synchronized (mMutex) {
 
                 verifyBound();
@@ -901,15 +907,17 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                     throw new NullPointerException("the output consumer must not be null");
                 }
 
-                if (mState == ChannelState.DONE) {
-
-                    mState = ChannelState.FLUSH;
-                }
+                isClose = (mState == ChannelState.DONE);
 
                 mOutputConsumer = consumer;
             }
 
             flushOutput();
+
+            if (isClose) {
+
+                closeConsumer();
+            }
 
             return this;
         }

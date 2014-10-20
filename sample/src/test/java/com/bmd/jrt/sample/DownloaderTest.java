@@ -5,6 +5,8 @@ import com.bmd.jrt.time.TimeDuration;
 import junit.framework.TestCase;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -100,6 +102,7 @@ public class DownloaderTest extends TestCase {
         assertThat(outFile2).exists();
         assertThat(outFile3).exists();
         assertThat(outFile).doesNotExist();
+        checkNotExists(outFileH);
 
         downloader.abort(uri1);
         downloader.abort(uri2);
@@ -185,7 +188,7 @@ public class DownloaderTest extends TestCase {
         waitFor(uri, startTime, 5000);
 
         assertThat(downloader.isDownloaded(uri)).isFalse();
-        assertThat(outFile).doesNotExist();
+        checkNotExists(outFile);
     }
 
     public void testRepeatedAbort() throws IOException, URISyntaxException {
@@ -217,7 +220,7 @@ public class DownloaderTest extends TestCase {
         waitFor(uri, startTime, 20000);
 
         assertThat(downloader.isDownloaded(uri)).isFalse();
-        assertThat(outFile).doesNotExist();
+        checkNotExists(outFile);
     }
 
     public void testSimpleAbort() throws IOException, URISyntaxException {
@@ -257,7 +260,7 @@ public class DownloaderTest extends TestCase {
         downloader.abort(uri, TimeDuration.seconds(20));
 
         assertThat(downloader.isDownloaded(uri)).isFalse();
-        assertThat(outFile).doesNotExist();
+        checkNotExists(outFile);
     }
 
     @Override
@@ -270,6 +273,19 @@ public class DownloaderTest extends TestCase {
         delete(SMALL_FILE_URL1);
         delete(SMALL_FILE_URL2);
         delete(SMALL_FILE_URL3);
+    }
+
+    private void checkNotExists(final File file) {
+
+        try {
+
+            new FileInputStream(file);
+
+            fail();
+
+        } catch (FileNotFoundException ignored) {
+
+        }
     }
 
     private boolean delete(final String url) throws MalformedURLException, URISyntaxException {

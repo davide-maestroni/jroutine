@@ -15,6 +15,8 @@ package com.bmd.jrt.time;
 
 import junit.framework.TestCase;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -38,6 +40,32 @@ public class TimeTest extends TestCase {
         return Math.min(Math.max(MIN_TIME, i), MAX_TIME);
     }
 
+    private static Method getMethod(final String name) {
+
+        try {
+
+            return TimeUnit.class.getMethod(name, long.class);
+
+        } catch (final NoSuchMethodException ignored) {
+
+        }
+
+        return null;
+    }
+
+    private static TimeUnit getUnit(final String name) {
+
+        try {
+
+            return TimeUnit.valueOf(name);
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        return null;
+    }
+
     public void testConstants() {
 
         assertThat(Time.SECONDS_IN_MINUTE).isEqualTo(60);
@@ -48,7 +76,7 @@ public class TimeTest extends TestCase {
         assertThat(Time.HOURS_IN_DAY).isEqualTo(24);
     }
 
-    public void testConversions() {
+    public void testConversions() throws InvocationTargetException, IllegalAccessException {
 
         final Random random = new Random();
 
@@ -64,10 +92,24 @@ public class TimeTest extends TestCase {
         testConversions(Time.fromUnit(clip(random.nextInt()), TimeUnit.MICROSECONDS), true);
         testConversions(Time.fromUnit(clip(random.nextInt()), TimeUnit.MILLISECONDS), true);
         testConversions(Time.fromUnit(clip(random.nextInt()), TimeUnit.SECONDS), true);
-        // Java 6
-        //        testConversions(Time.fromUnit(clip(random.nextInt()), TimeUnit.MINUTES), true);
-        //        testConversions(Time.fromUnit(clip(random.nextInt()), TimeUnit.HOURS), true);
-        //        testConversions(Time.fromUnit(clip(random.nextInt()), TimeUnit.DAYS), true);
+
+        final TimeUnit minutes = getUnit("MINUTES");
+        if (minutes != null) {
+
+            testConversions(Time.fromUnit(clip(random.nextInt()), minutes), true);
+        }
+
+        final TimeUnit hours = getUnit("HOURS");
+        if (hours != null) {
+
+            testConversions(Time.fromUnit(clip(random.nextInt()), hours), true);
+        }
+
+        final TimeUnit days = getUnit("DAYS");
+        if (days != null) {
+
+            testConversions(Time.fromUnit(clip(random.nextInt()), days), true);
+        }
 
         final Time time = Time.nanos(clip(random.nextInt()));
         assertThat(time).isEqualTo(time);
@@ -175,13 +217,28 @@ public class TimeTest extends TestCase {
         assertThat(Time.fromUnit(0, TimeUnit.MICROSECONDS).isZero()).isTrue();
         assertThat(Time.fromUnit(0, TimeUnit.MILLISECONDS).isZero()).isTrue();
         assertThat(Time.fromUnit(0, TimeUnit.SECONDS).isZero()).isTrue();
-        // Java 6
-        //        assertThat(Time.fromUnit(0, TimeUnit.MINUTES).isZero()).isTrue();
-        //        assertThat(Time.fromUnit(0, TimeUnit.HOURS).isZero()).isTrue();
-        //        assertThat(Time.fromUnit(0, TimeUnit.DAYS).isZero()).isTrue();
+
+        final TimeUnit minutes = getUnit("MINUTES");
+        if (minutes != null) {
+
+            assertThat(Time.fromUnit(0, minutes).isZero()).isTrue();
+        }
+
+        final TimeUnit hours = getUnit("HOURS");
+        if (hours != null) {
+
+            assertThat(Time.fromUnit(0, hours).isZero()).isTrue();
+        }
+
+        final TimeUnit days = getUnit("DAYS");
+        if (days != null) {
+
+            assertThat(Time.fromUnit(0, days).isZero()).isTrue();
+        }
     }
 
-    private void testConversions(final Time time, final boolean isFirst) {
+    private void testConversions(final Time time, final boolean isFirst) throws
+            InvocationTargetException, IllegalAccessException {
 
         final long value = time.time;
         final TimeUnit unit = time.unit;
@@ -190,10 +247,24 @@ public class TimeTest extends TestCase {
         assertThat(time.toMicros()).isEqualTo(unit.toMicros(value));
         assertThat(time.toMillis()).isEqualTo(unit.toMillis(value));
         assertThat(time.toSeconds()).isEqualTo(unit.toSeconds(value));
-        // Java 6
-        //        assertThat(time.toMinutes()).isEqualTo(unit.toMinutes(value));
-        //        assertThat(time.toHours()).isEqualTo(unit.toHours(value));
-        //        assertThat(time.toDays()).isEqualTo(unit.toDays(value));
+
+        final Method toMinutes = getMethod("toMinutes");
+        if (toMinutes != null) {
+
+            assertThat(time.toMinutes()).isEqualTo((Long) toMinutes.invoke(unit, value));
+        }
+
+        final Method toHours = getMethod("toHours");
+        if (toHours != null) {
+
+            assertThat(time.toHours()).isEqualTo((Long) toHours.invoke(unit, value));
+        }
+
+        final Method toDays = getMethod("toDays");
+        if (toDays != null) {
+
+            assertThat(time.toDays()).isEqualTo((Long) toDays.invoke(unit, value));
+        }
 
         assertThat(time.to(TimeUnit.NANOSECONDS)).isEqualTo(
                 TimeUnit.NANOSECONDS.convert(value, unit));
@@ -202,12 +273,24 @@ public class TimeTest extends TestCase {
         assertThat(time.to(TimeUnit.MILLISECONDS)).isEqualTo(
                 TimeUnit.MILLISECONDS.convert(value, unit));
         assertThat(time.to(TimeUnit.SECONDS)).isEqualTo(TimeUnit.SECONDS.convert(value, unit));
-        // Java 6
-        //        assertThat(time.to(TimeUnit.MINUTES)).isEqualTo(TimeUnit.MINUTES.convert(value,
-        // unit));
-        //        assertThat(time.to(TimeUnit.HOURS)).isEqualTo(TimeUnit.HOURS.convert(value,
-        // unit));
-        //        assertThat(time.to(TimeUnit.DAYS)).isEqualTo(TimeUnit.DAYS.convert(value, unit));
+
+        final TimeUnit minutes = getUnit("MINUTES");
+        if (minutes != null) {
+
+            assertThat(time.to(minutes)).isEqualTo(minutes.convert(value, unit));
+        }
+
+        final TimeUnit hours = getUnit("HOURS");
+        if (hours != null) {
+
+            assertThat(time.to(hours)).isEqualTo(hours.convert(value, unit));
+        }
+
+        final TimeUnit days = getUnit("DAYS");
+        if (days != null) {
+
+            assertThat(time.to(days)).isEqualTo(days.convert(value, unit));
+        }
 
         assertThat(time).isEqualTo(time);
         assertThat(time).isEqualTo(Time.fromUnit(time.time, time.unit));

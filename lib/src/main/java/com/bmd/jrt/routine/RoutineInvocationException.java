@@ -23,7 +23,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Exception indicating that an execution of an object method thrown an exception.
+ * Exception indicating that an invocation of an object method thrown an exception.
  * <p/>
  * Created by davide on 10/3/14.
  */

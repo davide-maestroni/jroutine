@@ -23,7 +23,7 @@ import javax.annotation.Nonnull;
  * <p/>
  * The implementation can both be synchronous or asynchronous, it can allocate specific threads or
  * share a pool of them between different instances.<br/>
- * The only requirements is that the specified invocation is called each time a run method is
+ * The only requirements is that the specified execution is called each time a run method is
  * invoked.<br/>
  * Note also that the runner methods can be called from different thread, so, it is up to the
  * implementing class to ensure synchronization when needed.
@@ -33,12 +33,12 @@ import javax.annotation.Nonnull;
 public interface Runner {
 
     /**
-     * Runs the specified invocation (that is, it calls the invocation <code>run()</code> method
+     * Runs the specified execution (that is, it calls the execution <code>run()</code> method
      * inside the runner thread).
      *
-     * @param invocation the invocation.
-     * @param delay      the execution delay.
-     * @param timeUnit   the delay time unit.
+     * @param execution the execution.
+     * @param delay     the execution delay.
+     * @param timeUnit  the delay time unit.
      */
-    public void run(@Nonnull Invocation invocation, long delay, @Nonnull TimeUnit timeUnit);
+    public void run(@Nonnull Execution execution, long delay, @Nonnull TimeUnit timeUnit);
 }

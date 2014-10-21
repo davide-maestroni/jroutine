@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.execution;
+package com.bmd.jrt.invocation;
 
 import com.bmd.jrt.channel.ResultChannel;
 
@@ -19,7 +19,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Empty abstract implementation of a routine execution.
+ * Empty abstract implementation of a routine invocation.
  * <p/>
  * This class is useful to avoid the need of implementing all the methods defined in the interface.
  * <p/>
@@ -28,7 +28,7 @@ import javax.annotation.Nullable;
  * @param <INPUT>  the input type.
  * @param <OUTPUT> the output type.
  */
-public abstract class BasicExecution<INPUT, OUTPUT> implements Execution<INPUT, OUTPUT> {
+public abstract class BasicInvocation<INPUT, OUTPUT> implements Invocation<INPUT, OUTPUT> {
 
     @Override
     public void onAbort(@Nullable final Throwable reason) {

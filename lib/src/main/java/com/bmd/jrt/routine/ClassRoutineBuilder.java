@@ -19,7 +19,7 @@ import com.bmd.jrt.annotation.DefaultRunner;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.common.RoutineException;
-import com.bmd.jrt.execution.ExecutionBody;
+import com.bmd.jrt.invocation.SimpleInvocation;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.log.Logger;
@@ -52,8 +52,8 @@ import static com.bmd.jrt.routine.ReflectionUtils.boxingClass;
  */
 public class ClassRoutineBuilder {
 
-    private static final ClassToken<MethodExecutionBody> METHOD_EXECUTION_TOKEN =
-            ClassToken.tokenOf(MethodExecutionBody.class);
+    private static final ClassToken<MethodSimpleInvocation> METHOD_EXECUTION_TOKEN =
+            ClassToken.tokenOf(MethodSimpleInvocation.class);
 
     private static final WeakHashMap<Object, HashMap<String, Object>> sMutexCache =
             new WeakHashMap<Object, HashMap<String, Object>>();
@@ -129,6 +129,72 @@ public class ClassRoutineBuilder {
     }
 
     /**
+     * Returns a routine used for calling the method whose identifying name is specified in a
+     * {@link Async} annotation.
+     *
+     * @param name the name specified in the annotation.
+     * @return the routine.
+     * @throws IllegalArgumentException if the specified method is not found.
+     * @throws RoutineException         if an error occurred while instantiating the optional
+     *                                  runner or the routine.
+     */
+    @Nonnull
+    public Routine<Object, Object> asyncMethod(@Nonnull final String name) {
+
+        final Method method = mMethodMap.get(name);
+
+        if (method == null) {
+
+            throw new IllegalArgumentException(
+                    "no annotated method with name '" + name + "' has been found");
+        }
+
+        return method(method);
+    }
+
+    /**
+     * Sets the log level.
+     *
+     * @param level the log level.
+     * @return this builder.
+     * @throws NullPointerException if the log level is null.
+     */
+    @Nonnull
+    @SuppressWarnings("ConstantConditions")
+    public ClassRoutineBuilder logLevel(@Nonnull final LogLevel level) {
+
+        if (level == null) {
+
+            throw new NullPointerException("the log level must not be null");
+        }
+
+        mLogLevel = level;
+
+        return this;
+    }
+
+    /**
+     * Sets the log instance.
+     *
+     * @param log the log instance.
+     * @return this builder.
+     * @throws NullPointerException if the log is null.
+     */
+    @Nonnull
+    @SuppressWarnings("ConstantConditions")
+    public ClassRoutineBuilder loggedWith(@Nonnull final Log log) {
+
+        if (log == null) {
+
+            throw new NullPointerException("the log instance must not be null");
+        }
+
+        mLog = log;
+
+        return this;
+    }
+
+    /**
      * Returns a routine used for calling the specified method.
      * <p/>
      * The method is searched via reflection ignoring an optional name specified in a {@link Async}
@@ -143,7 +209,7 @@ public class ClassRoutineBuilder {
      *                                  runner or the routine.
      */
     @Nonnull
-    public Routine<Object, Object> classMethod(@Nonnull final String name,
+    public Routine<Object, Object> method(@Nonnull final String name,
             @Nonnull final Class<?>... parameterTypes) {
 
         final Class<?> targetClass = mTargetClass;
@@ -169,7 +235,7 @@ public class ClassRoutineBuilder {
             }
         }
 
-        return classMethod(targetMethod);
+        return method(targetMethod);
     }
 
     /**
@@ -185,7 +251,7 @@ public class ClassRoutineBuilder {
      *                              or the routine.
      */
     @Nonnull
-    public Routine<Object, Object> classMethod(@Nonnull final Method method) {
+    public Routine<Object, Object> method(@Nonnull final Method method) {
 
         if (!method.isAccessible()) {
 
@@ -261,72 +327,6 @@ public class ClassRoutineBuilder {
         }
 
         return getRoutine(method, parallelId, runner, isSequential, false, log, logLevel);
-    }
-
-    /**
-     * Sets the log level.
-     *
-     * @param level the log level.
-     * @return this builder.
-     * @throws NullPointerException if the log level is null.
-     */
-    @Nonnull
-    @SuppressWarnings("ConstantConditions")
-    public ClassRoutineBuilder logLevel(@Nonnull final LogLevel level) {
-
-        if (level == null) {
-
-            throw new NullPointerException("the log level must not be null");
-        }
-
-        mLogLevel = level;
-
-        return this;
-    }
-
-    /**
-     * Sets the log instance.
-     *
-     * @param log the log instance.
-     * @return this builder.
-     * @throws NullPointerException if the log is null.
-     */
-    @Nonnull
-    @SuppressWarnings("ConstantConditions")
-    public ClassRoutineBuilder loggedWith(@Nonnull final Log log) {
-
-        if (log == null) {
-
-            throw new NullPointerException("the log instance must not be null");
-        }
-
-        mLog = log;
-
-        return this;
-    }
-
-    /**
-     * Returns a routine used for calling the method whose identifying name is specified in a
-     * {@link Async} annotation.
-     *
-     * @param name the name specified in the annotation.
-     * @return the routine.
-     * @throws IllegalArgumentException if the specified method is not found.
-     * @throws RoutineException         if an error occurred while instantiating the optional
-     *                                  runner or the routine.
-     */
-    @Nonnull
-    public Routine<Object, Object> method(@Nonnull final String name) {
-
-        final Method method = mMethodMap.get(name);
-
-        if (method == null) {
-
-            throw new IllegalArgumentException(
-                    "no annotated method with name '" + name + "' has been found");
-        }
-
-        return classMethod(method);
     }
 
     /**
@@ -634,9 +634,9 @@ public class ClassRoutineBuilder {
     }
 
     /**
-     * Implementation of an execution body wrapping the target method.
+     * Implementation of a simple invocation wrapping the target method.
      */
-    private static class MethodExecutionBody extends ExecutionBody<Object, Object> {
+    private static class MethodSimpleInvocation extends SimpleInvocation<Object, Object> {
 
         private final Catch mCatch;
 
@@ -659,7 +659,7 @@ public class ClassRoutineBuilder {
          * @param catchClause the catch clause.
          * @param mutex       the mutex used for synchronization.
          */
-        public MethodExecutionBody(@Nullable final Object target,
+        public MethodSimpleInvocation(@Nullable final Object target,
                 @Nonnull final Class<?> targetClass, @Nonnull final Method method,
                 @Nonnull final Catch catchClause, @Nonnull final Object mutex) {
 

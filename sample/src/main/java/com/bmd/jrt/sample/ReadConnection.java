@@ -15,7 +15,7 @@ package com.bmd.jrt.sample;
 
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.RoutineException;
-import com.bmd.jrt.execution.BasicExecution;
+import com.bmd.jrt.invocation.BasicInvocation;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,11 +26,11 @@ import java.net.URLConnection;
 import javax.annotation.Nonnull;
 
 /**
- * Execution reading from URL connection.
+ * Invocation reading from URL connection.
  * <p/>
  * Created by davide on 10/17/14.
  */
-public class ReadConnection extends BasicExecution<URI, Chunk> {
+public class ReadConnection extends BasicInvocation<URI, Chunk> {
 
     private static final int MAX_CHUNK_SIZE = 2048;
 

@@ -18,7 +18,7 @@ import com.bmd.jrt.channel.OutputConsumer;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.RoutineInterruptedException;
 import com.bmd.jrt.log.Logger;
-import com.bmd.jrt.runner.Invocation;
+import com.bmd.jrt.runner.Execution;
 import com.bmd.jrt.runner.Runner;
 import com.bmd.jrt.time.TimeDuration;
 import com.bmd.jrt.time.TimeDuration.Check;
@@ -246,7 +246,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         } else {
 
-            mRunner.run(new DelayedListOutputInvocation(outputQueue, outputs), delay.time,
+            mRunner.run(new DelayedListOutputExecution(outputQueue, outputs), delay.time,
                         delay.unit);
         }
 
@@ -287,7 +287,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         } else {
 
-            mRunner.run(new DelayedOutputInvocation(outputQueue, output), delay.time, delay.unit);
+            mRunner.run(new DelayedOutputExecution(outputQueue, output), delay.time, delay.unit);
         }
 
         return this;
@@ -418,7 +418,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         } else {
 
-            mRunner.run(new DelayedAbort(throwable), delay.time, delay.unit);
+            mRunner.run(new DelayedAbortExecution(throwable), delay.time, delay.unit);
         }
 
         return true;
@@ -1248,16 +1248,16 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             } else {
 
-                mRunner.run(new DelayedOutputInvocation(outputQueue, output), delay.time,
+                mRunner.run(new DelayedOutputExecution(outputQueue, output), delay.time,
                             delay.unit);
             }
         }
     }
 
     /**
-     * Implementation of an invocation handling a delayed abort.
+     * Implementation of an execution handling a delayed abort.
      */
-    private class DelayedAbort implements Invocation {
+    private class DelayedAbortExecution implements Execution {
 
         private final Throwable mThrowable;
 
@@ -1266,7 +1266,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
          *
          * @param throwable the reason of the abort.
          */
-        private DelayedAbort(final Throwable throwable) {
+        private DelayedAbortExecution(final Throwable throwable) {
 
             mThrowable = throwable;
         }
@@ -1298,9 +1298,9 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     }
 
     /**
-     * Implementation of an invocation handling a delayed output of a list of data.
+     * Implementation of an execution handling a delayed output of a list of data.
      */
-    private class DelayedListOutputInvocation implements Invocation {
+    private class DelayedListOutputExecution implements Execution {
 
         private final ArrayList<OUTPUT> mOutputs;
 
@@ -1312,7 +1312,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
          * @param queue   the output queue.
          * @param outputs the iterable returning the output data.
          */
-        private DelayedListOutputInvocation(@Nonnull final NestedQueue<Object> queue,
+        private DelayedListOutputExecution(@Nonnull final NestedQueue<Object> queue,
                 @Nonnull final Iterable<? extends OUTPUT> outputs) {
 
             final ArrayList<OUTPUT> outputList = new ArrayList<OUTPUT>();
@@ -1333,13 +1333,13 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 if (isError()) {
 
-                    mLogger.dbg("avoiding delayed output invocation since channel is closed: %s",
+                    mLogger.dbg("avoiding delayed output execution since channel is closed: %s",
                                 mOutputs);
 
                     return;
                 }
 
-                mLogger.dbg("delayed output invocation [#%d]: %s", mPendingOutputCount - 1,
+                mLogger.dbg("delayed output execution [#%d]: %s", mPendingOutputCount - 1,
                             mOutputs);
 
                 if ((--mPendingOutputCount == 0) && (mState == ChannelState.RESULT)) {
@@ -1355,9 +1355,9 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     }
 
     /**
-     * Implementation of an invocation handling a delayed output.
+     * Implementation of an execution handling a delayed output.
      */
-    private class DelayedOutputInvocation implements Invocation {
+    private class DelayedOutputExecution implements Execution {
 
         private final OUTPUT mOutput;
 
@@ -1369,7 +1369,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
          * @param queue  the output queue.
          * @param output the output.
          */
-        private DelayedOutputInvocation(@Nonnull final NestedQueue<Object> queue,
+        private DelayedOutputExecution(@Nonnull final NestedQueue<Object> queue,
                 @Nullable final OUTPUT output) {
 
             mQueue = queue;
@@ -1383,14 +1383,13 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 if (isError()) {
 
-                    mLogger.dbg("avoiding delayed output invocation since channel is closed: %s",
+                    mLogger.dbg("avoiding delayed output execution since channel is closed: %s",
                                 mOutput);
 
                     return;
                 }
 
-                mLogger.dbg("delayed output invocation [#%d]: %s", mPendingOutputCount - 1,
-                            mOutput);
+                mLogger.dbg("delayed output execution [#%d]: %s", mPendingOutputCount - 1, mOutput);
 
                 if ((--mPendingOutputCount == 0) && (mState == ChannelState.RESULT)) {
 

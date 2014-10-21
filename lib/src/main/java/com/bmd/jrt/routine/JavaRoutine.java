@@ -14,7 +14,7 @@
 package com.bmd.jrt.routine;
 
 import com.bmd.jrt.common.ClassToken;
-import com.bmd.jrt.execution.Execution;
+import com.bmd.jrt.invocation.Invocation;
 
 import javax.annotation.Nonnull;
 
@@ -24,8 +24,8 @@ import javax.annotation.Nonnull;
  * <p/>
  * There are mainly two ways to create a routine object:
  * <p/>
- * <b>Routine by execution customization</b><br/>
- * The first approach consists in implementing an execution object and build on its class token
+ * <b>Routine by invocation customization</b><br/>
+ * The first approach consists in implementing an invocation object and build on its class token
  * a routine instance.
  * <p/>
  * <b>Routine by method invocation</b><br/>
@@ -58,9 +58,9 @@ public class JavaRoutine {
     }
 
     /**
-     * Returns a routine builder wrapping the specified execution class token.
+     * Returns a routine builder wrapping the specified invocation class token.
      *
-     * @param classToken the execution class token.
+     * @param classToken the invocation class token.
      * @param <INPUT>    the input type.
      * @param <OUTPUT>   the output type.
      * @return the routine builder instance.
@@ -68,7 +68,7 @@ public class JavaRoutine {
      */
     @Nonnull
     public static <INPUT, OUTPUT> RoutineBuilder<INPUT, OUTPUT> on(
-            @Nonnull final ClassToken<? extends Execution<INPUT, OUTPUT>> classToken) {
+            @Nonnull final ClassToken<? extends Invocation<INPUT, OUTPUT>> classToken) {
 
         return new RoutineBuilder<INPUT, OUTPUT>(classToken);
     }

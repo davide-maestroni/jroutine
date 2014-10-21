@@ -16,7 +16,7 @@ package com.bmd.android.jrt.runner;
 import android.os.Handler;
 import android.os.Looper;
 
-import com.bmd.jrt.runner.Invocation;
+import com.bmd.jrt.runner.Execution;
 import com.bmd.jrt.runner.Runner;
 import com.bmd.jrt.runner.Runners;
 
@@ -52,22 +52,22 @@ class LooperRunner implements Runner {
     }
 
     @Override
-    public void run(@Nonnull final Invocation invocation, final long delay,
+    public void run(@Nonnull final Execution execution, final long delay,
             @Nonnull final TimeUnit timeUnit) {
 
         if (Thread.currentThread().equals(mThread)) {
 
-            mQueuedRunner.run(invocation, delay, timeUnit);
+            mQueuedRunner.run(execution, delay, timeUnit);
 
         } else {
 
             if (delay > 0) {
 
-                mHandler.postDelayed(invocation, timeUnit.toMillis(delay));
+                mHandler.postDelayed(execution, timeUnit.toMillis(delay));
 
             } else {
 
-                mHandler.post(invocation);
+                mHandler.post(execution);
             }
         }
     }

@@ -23,14 +23,14 @@ import com.bmd.jrt.channel.ParameterChannel;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.common.RoutineException;
-import com.bmd.jrt.execution.BasicExecution;
-import com.bmd.jrt.execution.Execution;
-import com.bmd.jrt.execution.ExecutionBody;
+import com.bmd.jrt.invocation.BasicInvocation;
+import com.bmd.jrt.invocation.Invocation;
+import com.bmd.jrt.invocation.SimpleInvocation;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.log.NullLog;
-import com.bmd.jrt.routine.DefaultInvocation.InputIterator;
-import com.bmd.jrt.routine.DefaultParameterChannel.ExecutionProvider;
+import com.bmd.jrt.routine.DefaultExecution.InputIterator;
+import com.bmd.jrt.routine.DefaultParameterChannel.InvocationManager;
 import com.bmd.jrt.routine.DefaultResultChannel.AbortHandler;
 import com.bmd.jrt.runner.Runners;
 import com.bmd.jrt.time.TimeDuration;
@@ -63,8 +63,8 @@ public class RoutineTest extends TestCase {
     public void testAbort() {
 
         final Routine<String, String> routine =
-                on(tokenOf(DelayedExecution.class)).withArgs(TimeDuration.millis(100))
-                                                   .buildRoutine();
+                on(tokenOf(DelayedInvocation.class)).withArgs(TimeDuration.millis(100))
+                                                    .buildRoutine();
 
         final ParameterChannel<String, String> inputChannel = routine.invokeAsync().pass("test1");
         final OutputChannel<String> outputChannel = inputChannel.results();
@@ -125,7 +125,7 @@ public class RoutineTest extends TestCase {
         assertThat(channel1.isOpen()).isFalse();
 
 
-        final Execution<String, String> abortExecution = new BasicExecution<String, String>() {
+        final Invocation<String, String> abortInvocation = new BasicInvocation<String, String>() {
 
             @Override
             public void onInput(final String s, @Nonnull final ResultChannel<String> results) {
@@ -138,7 +138,7 @@ public class RoutineTest extends TestCase {
         };
 
         final Routine<String, String> routine1 =
-                on(ClassToken.tokenOf(abortExecution)).withArgs(this).buildRoutine();
+                on(ClassToken.tokenOf(abortInvocation)).withArgs(this).buildRoutine();
 
         try {
 
@@ -156,7 +156,7 @@ public class RoutineTest extends TestCase {
             assertThat(ex.getCause().getMessage()).isEqualTo("test_abort");
         }
 
-        final Execution<String, String> abortExecution2 = new BasicExecution<String, String>() {
+        final Invocation<String, String> abortInvocation2 = new BasicInvocation<String, String>() {
 
             @Override
             public void onInput(final String s, @Nonnull final ResultChannel<String> results) {
@@ -167,7 +167,7 @@ public class RoutineTest extends TestCase {
         };
 
         final Routine<String, String> routine2 =
-                on(ClassToken.tokenOf(abortExecution2)).withArgs(this).buildRoutine();
+                on(ClassToken.tokenOf(abortInvocation2)).withArgs(this).buildRoutine();
 
         try {
 
@@ -190,17 +190,18 @@ public class RoutineTest extends TestCase {
         final Semaphore semaphore = new Semaphore(0);
         final AtomicReference<Throwable> abortReason = new AtomicReference<Throwable>();
 
-        final BasicExecution<String, String> abortExecution = new BasicExecution<String, String>() {
+        final BasicInvocation<String, String> abortInvocation =
+                new BasicInvocation<String, String>() {
 
-            @Override
-            public void onAbort(@Nullable final Throwable reason) {
+                    @Override
+                    public void onAbort(@Nullable final Throwable reason) {
 
-                abortReason.set(reason);
-                semaphore.release();
-            }
-        };
+                        abortReason.set(reason);
+                        semaphore.release();
+                    }
+                };
 
-        final Routine<String, String> routine = JavaRoutine.on(tokenOf(abortExecution))
+        final Routine<String, String> routine = JavaRoutine.on(tokenOf(abortInvocation))
                                                            .withArgs(this, abortReason, semaphore)
                                                            .buildRoutine();
 
@@ -224,7 +225,7 @@ public class RoutineTest extends TestCase {
     public void testCalls() {
 
         final Routine<String, String> routine =
-                on(tokenOf(PassThroughExecution.class)).buildRoutine();
+                on(tokenOf(PassThroughInvocation.class)).buildRoutine();
 
         assertThat(routine.call()).isEmpty();
         assertThat(routine.call(Arrays.asList("test1", "test2"))).containsExactly("test1", "test2");
@@ -310,28 +311,29 @@ public class RoutineTest extends TestCase {
 
     public void testChainedRoutine() {
 
-        final ExecutionBody<Integer, Integer> execSum = new ExecutionBody<Integer, Integer>() {
+        final SimpleInvocation<Integer, Integer> execSum =
+                new SimpleInvocation<Integer, Integer>() {
 
-            @Override
-            public void onExec(@Nonnull final List<? extends Integer> integers,
-                    @Nonnull final ResultChannel<Integer> results) {
+                    @Override
+                    public void onExec(@Nonnull final List<? extends Integer> integers,
+                            @Nonnull final ResultChannel<Integer> results) {
 
-                int sum = 0;
+                        int sum = 0;
 
-                for (final Integer integer : integers) {
+                        for (final Integer integer : integers) {
 
-                    sum += integer;
-                }
+                            sum += integer;
+                        }
 
-                results.pass(sum);
-            }
-        };
+                        results.pass(sum);
+                    }
+                };
 
         final Routine<Integer, Integer> sumRoutine =
                 on(ClassToken.tokenOf(execSum)).withArgs(this).buildRoutine();
 
-        final BasicExecution<Integer, Integer> invokeSquare =
-                new BasicExecution<Integer, Integer>() {
+        final BasicInvocation<Integer, Integer> invokeSquare =
+                new BasicInvocation<Integer, Integer>() {
 
                     @Override
                     public void onInput(final Integer integer,
@@ -370,28 +372,29 @@ public class RoutineTest extends TestCase {
 
     public void testComposedRoutine() {
 
-        final ExecutionBody<Integer, Integer> execSum = new ExecutionBody<Integer, Integer>() {
+        final SimpleInvocation<Integer, Integer> execSum =
+                new SimpleInvocation<Integer, Integer>() {
 
-            @Override
-            public void onExec(@Nonnull final List<? extends Integer> integers,
-                    @Nonnull final ResultChannel<Integer> results) {
+                    @Override
+                    public void onExec(@Nonnull final List<? extends Integer> integers,
+                            @Nonnull final ResultChannel<Integer> results) {
 
-                int sum = 0;
+                        int sum = 0;
 
-                for (final Integer integer : integers) {
+                        for (final Integer integer : integers) {
 
-                    sum += integer;
-                }
+                            sum += integer;
+                        }
 
-                results.pass(sum);
-            }
-        };
+                        results.pass(sum);
+                    }
+                };
 
         final Routine<Integer, Integer> sumRoutine =
                 on(ClassToken.tokenOf(execSum)).withArgs(this).buildRoutine();
 
-        final BasicExecution<Integer, Integer> invokeSquare =
-                new BasicExecution<Integer, Integer>() {
+        final BasicInvocation<Integer, Integer> invokeSquare =
+                new BasicInvocation<Integer, Integer>() {
 
                     @Override
                     public void onInput(final Integer integer,
@@ -406,8 +409,8 @@ public class RoutineTest extends TestCase {
         final Routine<Integer, Integer> squareRoutine =
                 on(ClassToken.tokenOf(invokeSquare)).withArgs(this).buildRoutine();
 
-        final BasicExecution<Integer, Integer> invokeSquareSum =
-                new BasicExecution<Integer, Integer>() {
+        final BasicInvocation<Integer, Integer> invokeSquareSum =
+                new BasicInvocation<Integer, Integer>() {
 
                     private ParameterChannel<Integer, Integer> mChannel;
 
@@ -449,7 +452,7 @@ public class RoutineTest extends TestCase {
 
     public void testDelay() {
 
-        final Routine<String, String> routine = JavaRoutine.on(tokenOf(DelayedExecution.class))
+        final Routine<String, String> routine = JavaRoutine.on(tokenOf(DelayedInvocation.class))
                                                            .withArgs(TimeDuration.millis(10))
                                                            .buildRoutine();
 
@@ -467,7 +470,7 @@ public class RoutineTest extends TestCase {
                                                                                            "test4");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(110);
 
-        final Routine<String, String> routine1 = JavaRoutine.on(tokenOf(DelayedExecution.class))
+        final Routine<String, String> routine1 = JavaRoutine.on(tokenOf(DelayedInvocation.class))
                                                             .orderedInput()
                                                             .orderedOutput()
                                                             .withArgs(TimeDuration.millis(10))
@@ -486,9 +489,10 @@ public class RoutineTest extends TestCase {
                 "test1", "test2", "test3", "test4");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(110);
 
-        final Routine<String, String> routine2 = JavaRoutine.on(tokenOf(DelayedListExecution.class))
-                                                            .withArgs(TimeDuration.millis(10), 2)
-                                                            .buildRoutine();
+        final Routine<String, String> routine2 =
+                JavaRoutine.on(tokenOf(DelayedListInvocation.class))
+                           .withArgs(TimeDuration.millis(10), 2)
+                           .buildRoutine();
 
         startTime = System.currentTimeMillis();
 
@@ -504,11 +508,12 @@ public class RoutineTest extends TestCase {
                                                                                             "test4");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(110);
 
-        final Routine<String, String> routine3 = JavaRoutine.on(tokenOf(DelayedListExecution.class))
-                                                            .orderedInput()
-                                                            .orderedOutput()
-                                                            .withArgs(TimeDuration.millis(10), 2)
-                                                            .buildRoutine();
+        final Routine<String, String> routine3 =
+                JavaRoutine.on(tokenOf(DelayedListInvocation.class))
+                           .orderedInput()
+                           .orderedOutput()
+                           .withArgs(TimeDuration.millis(10), 2)
+                           .buildRoutine();
 
         startTime = System.currentTimeMillis();
 
@@ -522,9 +527,10 @@ public class RoutineTest extends TestCase {
                 "test1", "test2", "test3", "test4");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(110);
 
-        final Routine<String, String> routine4 = JavaRoutine.on(tokenOf(DelayedListExecution.class))
-                                                            .withArgs(TimeDuration.ZERO, 2)
-                                                            .buildRoutine();
+        final Routine<String, String> routine4 =
+                JavaRoutine.on(tokenOf(DelayedListInvocation.class))
+                           .withArgs(TimeDuration.ZERO, 2)
+                           .buildRoutine();
 
         startTime = System.currentTimeMillis();
 
@@ -540,11 +546,12 @@ public class RoutineTest extends TestCase {
                                                                                             "test4");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(100);
 
-        final Routine<String, String> routine5 = JavaRoutine.on(tokenOf(DelayedListExecution.class))
-                                                            .orderedInput()
-                                                            .orderedOutput()
-                                                            .withArgs(TimeDuration.ZERO, 2)
-                                                            .buildRoutine();
+        final Routine<String, String> routine5 =
+                JavaRoutine.on(tokenOf(DelayedListInvocation.class))
+                           .orderedInput()
+                           .orderedOutput()
+                           .withArgs(TimeDuration.ZERO, 2)
+                           .buildRoutine();
 
         startTime = System.currentTimeMillis();
 
@@ -559,7 +566,7 @@ public class RoutineTest extends TestCase {
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(100);
 
         final Routine<String, String> routine6 =
-                JavaRoutine.on(tokenOf(DelayedChannelExecution.class))
+                JavaRoutine.on(tokenOf(DelayedChannelInvocation.class))
                            .withArgs(TimeDuration.millis(10))
                            .buildRoutine();
 
@@ -578,7 +585,7 @@ public class RoutineTest extends TestCase {
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(110);
 
         final Routine<String, String> routine7 =
-                JavaRoutine.on(tokenOf(DelayedChannelExecution.class))
+                JavaRoutine.on(tokenOf(DelayedChannelInvocation.class))
                            .orderedInput()
                            .orderedOutput()
                            .withArgs(TimeDuration.millis(10))
@@ -597,7 +604,7 @@ public class RoutineTest extends TestCase {
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(110);
 
         final Routine<String, String> routine8 =
-                JavaRoutine.on(tokenOf(DelayedChannelExecution.class))
+                JavaRoutine.on(tokenOf(DelayedChannelInvocation.class))
                            .withArgs(TimeDuration.ZERO)
                            .buildRoutine();
 
@@ -616,7 +623,7 @@ public class RoutineTest extends TestCase {
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(100);
 
         final Routine<String, String> routine9 =
-                JavaRoutine.on(tokenOf(DelayedChannelExecution.class))
+                JavaRoutine.on(tokenOf(DelayedChannelInvocation.class))
                            .orderedInput()
                            .orderedOutput()
                            .withArgs(TimeDuration.ZERO)
@@ -640,7 +647,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            new ParallelExecution<Object, Object>(null);
+            new ParallelInvocation<Object, Object>(null);
 
             fail();
 
@@ -666,7 +673,7 @@ public class RoutineTest extends TestCase {
 
                 @Override
                 @Nonnull
-                protected Execution<Object, Object> createExecution(final boolean async) {
+                protected Invocation<Object, Object> createInvocation(final boolean async) {
 
                     return new ConstructorException();
                 }
@@ -686,7 +693,7 @@ public class RoutineTest extends TestCase {
 
                 @Override
                 @Nonnull
-                protected Execution<Object, Object> createExecution(final boolean async) {
+                protected Invocation<Object, Object> createInvocation(final boolean async) {
 
                     return new ConstructorException();
                 }
@@ -706,7 +713,7 @@ public class RoutineTest extends TestCase {
 
                 @Override
                 @Nonnull
-                protected Execution<Object, Object> createExecution(final boolean async) {
+                protected Invocation<Object, Object> createInvocation(final boolean async) {
 
                     return new ConstructorException();
                 }
@@ -725,7 +732,7 @@ public class RoutineTest extends TestCase {
 
                 @Override
                 @Nonnull
-                protected Execution<Object, Object> createExecution(final boolean async) {
+                protected Invocation<Object, Object> createInvocation(final boolean async) {
 
                     return new ConstructorException();
                 }
@@ -746,7 +753,7 @@ public class RoutineTest extends TestCase {
 
                 @Override
                 @Nonnull
-                protected Execution<Object, Object> createExecution(final boolean async) {
+                protected Invocation<Object, Object> createInvocation(final boolean async) {
 
                     return new ConstructorException();
                 }
@@ -767,7 +774,7 @@ public class RoutineTest extends TestCase {
 
                 @Override
                 @Nonnull
-                protected Execution<Object, Object> createExecution(final boolean async) {
+                protected Invocation<Object, Object> createInvocation(final boolean async) {
 
                     return new ConstructorException();
                 }
@@ -784,11 +791,11 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            new DefaultInvocation<Object, Object>(null, new TestInputIterator(),
-                                                  new DefaultResultChannel<Object>(
-                                                          new TestAbortHandler(),
-                                                          Runners.sequential(), false, logger),
-                                                  logger);
+            new DefaultExecution<Object, Object>(null, new TestInputIterator(),
+                                                 new DefaultResultChannel<Object>(
+                                                         new TestAbortHandler(),
+                                                         Runners.sequential(), false, logger),
+                                                 logger);
 
             fail();
 
@@ -798,11 +805,11 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            new DefaultInvocation<Object, Object>(new TestExecutionProvider(), null,
-                                                  new DefaultResultChannel<Object>(
-                                                          new TestAbortHandler(),
-                                                          Runners.sequential(), false, logger),
-                                                  logger);
+            new DefaultExecution<Object, Object>(new TestInvocationManager(), null,
+                                                 new DefaultResultChannel<Object>(
+                                                         new TestAbortHandler(),
+                                                         Runners.sequential(), false, logger),
+                                                 logger);
 
             fail();
 
@@ -812,8 +819,8 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            new DefaultInvocation<Object, Object>(new TestExecutionProvider(),
-                                                  new TestInputIterator(), null, logger);
+            new DefaultExecution<Object, Object>(new TestInvocationManager(),
+                                                 new TestInputIterator(), null, logger);
 
             fail();
 
@@ -823,12 +830,12 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            new DefaultInvocation<Object, Object>(new TestExecutionProvider(),
-                                                  new TestInputIterator(),
-                                                  new DefaultResultChannel<Object>(
-                                                          new TestAbortHandler(),
-                                                          Runners.sequential(), false, logger),
-                                                  null);
+            new DefaultExecution<Object, Object>(new TestInvocationManager(),
+                                                 new TestInputIterator(),
+                                                 new DefaultResultChannel<Object>(
+                                                         new TestAbortHandler(),
+                                                         Runners.sequential(), false, logger),
+                                                 null);
 
             fail();
 
@@ -867,8 +874,8 @@ public class RoutineTest extends TestCase {
 
     public void testErrorOnInit() {
 
-        final BasicExecution<String, String> exceptionOnInit =
-                new BasicExecution<String, String>() {
+        final BasicInvocation<String, String> exceptionOnInit =
+                new BasicInvocation<String, String>() {
 
                     @Override
                     public void onInit() {
@@ -883,7 +890,7 @@ public class RoutineTest extends TestCase {
         testException(exceptionRoutine, "test", "test1");
 
         final Routine<String, String> passThroughRoutine =
-                on(tokenOf(PassThroughExecution.class)).buildRoutine();
+                on(tokenOf(PassThroughInvocation.class)).buildRoutine();
 
         testChained(passThroughRoutine, exceptionRoutine, "test", "test1");
         testChained(exceptionRoutine, passThroughRoutine, "test", "test1");
@@ -891,8 +898,8 @@ public class RoutineTest extends TestCase {
 
     public void testErrorOnInput() {
 
-        final BasicExecution<String, String> exceptionOnInput =
-                new BasicExecution<String, String>() {
+        final BasicInvocation<String, String> exceptionOnInput =
+                new BasicInvocation<String, String>() {
 
                     @Override
                     public void onInput(final String s,
@@ -908,7 +915,7 @@ public class RoutineTest extends TestCase {
         testException(exceptionRoutine, "test2", "test2");
 
         final Routine<String, String> passThroughRoutine =
-                on(tokenOf(PassThroughExecution.class)).buildRoutine();
+                on(tokenOf(PassThroughInvocation.class)).buildRoutine();
 
         testChained(passThroughRoutine, exceptionRoutine, "test2", "test2");
         testChained(exceptionRoutine, passThroughRoutine, "test2", "test2");
@@ -916,8 +923,8 @@ public class RoutineTest extends TestCase {
 
     public void testErrorOnResult() {
 
-        final BasicExecution<String, String> exceptionOnResult =
-                new BasicExecution<String, String>() {
+        final BasicInvocation<String, String> exceptionOnResult =
+                new BasicInvocation<String, String>() {
 
                     @Override
                     public void onResult(@Nonnull final ResultChannel<String> results) {
@@ -932,7 +939,7 @@ public class RoutineTest extends TestCase {
         testException(exceptionRoutine, "test", "test3");
 
         final Routine<String, String> passThroughRoutine =
-                on(tokenOf(PassThroughExecution.class)).buildRoutine();
+                on(tokenOf(PassThroughInvocation.class)).buildRoutine();
 
         testChained(passThroughRoutine, exceptionRoutine, "test", "test3");
         testChained(exceptionRoutine, passThroughRoutine, "test", "test3");
@@ -940,7 +947,7 @@ public class RoutineTest extends TestCase {
 
     public void testErrorOnReturn() {
 
-        final Execution<String, String> exceptionOnReturn = new BasicExecution<String, String>() {
+        final Invocation<String, String> exceptionOnReturn = new BasicInvocation<String, String>() {
 
             @Override
             public void onInput(final String s, @Nonnull final ResultChannel<String> results) {
@@ -961,7 +968,7 @@ public class RoutineTest extends TestCase {
         testException(exceptionRoutine, "test", "test4");
 
         final Routine<String, String> passThroughRoutine =
-                on(tokenOf(PassThroughExecution.class)).buildRoutine();
+                on(tokenOf(PassThroughInvocation.class)).buildRoutine();
 
         testChained(passThroughRoutine, exceptionRoutine, "test", "test4");
         testChained(exceptionRoutine, passThroughRoutine, "test", "test4");
@@ -969,21 +976,21 @@ public class RoutineTest extends TestCase {
 
     public void testMethod() throws NoSuchMethodException {
 
-        assertThat(on(new TestClass()).classMethod(TestClass.class.getMethod("getOne"))
+        assertThat(on(new TestClass()).method(TestClass.class.getMethod("getOne"))
                                       .call()).containsExactly(1);
-        assertThat(on(new TestClass()).classMethod("getOne").call()).containsExactly(1);
-        assertThat(on(new TestClass()).method(TestClass.GET_METHOD).call()).containsExactly(1);
-        assertThat(on(TestClass.class).method(TestClass.GET_METHOD).call(3)).containsExactly(3);
-        assertThat(on(TestClass.class).method("get").callAsync(-3)).containsExactly(-3);
-        assertThat(
-                on(TestClass.class).classMethod("get", int.class).callParallel(17)).containsExactly(
+        assertThat(on(new TestClass()).method("getOne").call()).containsExactly(1);
+        assertThat(on(new TestClass()).asyncMethod(TestClass.GET_METHOD).call()).containsExactly(1);
+        assertThat(on(TestClass.class).asyncMethod(TestClass.GET_METHOD).call(3)).containsExactly(
+                3);
+        assertThat(on(TestClass.class).asyncMethod("get").callAsync(-3)).containsExactly(-3);
+        assertThat(on(TestClass.class).method("get", int.class).callParallel(17)).containsExactly(
                 17);
 
         assertThat(on(new TestClass()).as(TestInterface.class).getInt(2)).isEqualTo(2);
 
         try {
 
-            on(TestClass.class).method("get").callAsync();
+            on(TestClass.class).asyncMethod("get").callAsync();
 
             fail();
 
@@ -993,7 +1000,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            on(TestClass.class).method("take");
+            on(TestClass.class).asyncMethod("take");
 
             fail();
 
@@ -1027,7 +1034,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            new DefaultParameterChannel<Object, Object>(new TestExecutionProvider(), null, false,
+            new DefaultParameterChannel<Object, Object>(new TestInvocationManager(), null, false,
                                                         false, Logger.create(new NullLog(),
                                                                              LogLevel.DEBUG));
 
@@ -1039,7 +1046,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            new DefaultParameterChannel<Object, Object>(new TestExecutionProvider(),
+            new DefaultParameterChannel<Object, Object>(new TestInvocationManager(),
                                                         Runners.shared(), false, false, null);
 
             fail();
@@ -1051,7 +1058,7 @@ public class RoutineTest extends TestCase {
         try {
 
             final DefaultParameterChannel<Object, Object> channel =
-                    new DefaultParameterChannel<Object, Object>(new TestExecutionProvider(),
+                    new DefaultParameterChannel<Object, Object>(new TestInvocationManager(),
                                                                 Runners.shared(), false, false,
                                                                 Logger.create(new NullLog(),
                                                                               LogLevel.DEBUG));
@@ -1120,7 +1127,7 @@ public class RoutineTest extends TestCase {
 
         }
 
-        final Routine<String, String> routine = JavaRoutine.on(tokenOf(DelayedExecution.class))
+        final Routine<String, String> routine = JavaRoutine.on(tokenOf(DelayedInvocation.class))
                                                            .logLevel(LogLevel.SILENT)
                                                            .withArgs(TimeDuration.ZERO)
                                                            .buildRoutine();
@@ -1188,7 +1195,7 @@ public class RoutineTest extends TestCase {
 
         }
 
-        final Routine<String, String> routine1 = JavaRoutine.on(tokenOf(DelayedExecution.class))
+        final Routine<String, String> routine1 = JavaRoutine.on(tokenOf(DelayedInvocation.class))
                                                             .logLevel(LogLevel.SILENT)
                                                             .withArgs(TimeDuration.ZERO)
                                                             .buildRoutine();
@@ -1231,17 +1238,18 @@ public class RoutineTest extends TestCase {
 
     public void testRoutine() {
 
-        final BasicExecution<Integer, Integer> execSquare = new BasicExecution<Integer, Integer>() {
+        final BasicInvocation<Integer, Integer> execSquare =
+                new BasicInvocation<Integer, Integer>() {
 
-            @Override
-            public void onInput(final Integer integer,
-                    @Nonnull final ResultChannel<Integer> results) {
+                    @Override
+                    public void onInput(final Integer integer,
+                            @Nonnull final ResultChannel<Integer> results) {
 
-                final int input = integer;
+                        final int input = integer;
 
-                results.pass(input * input);
-            }
-        };
+                        results.pass(input * input);
+                    }
+                };
 
         final Routine<Integer, Integer> squareRoutine =
                 on(ClassToken.tokenOf(execSquare)).withArgs(this).buildRoutine();
@@ -1256,22 +1264,23 @@ public class RoutineTest extends TestCase {
 
     public void testRoutineFunction() {
 
-        final ExecutionBody<Integer, Integer> execSum = new ExecutionBody<Integer, Integer>() {
+        final SimpleInvocation<Integer, Integer> execSum =
+                new SimpleInvocation<Integer, Integer>() {
 
-            @Override
-            public void onExec(@Nonnull final List<? extends Integer> integers,
-                    @Nonnull final ResultChannel<Integer> results) {
+                    @Override
+                    public void onExec(@Nonnull final List<? extends Integer> integers,
+                            @Nonnull final ResultChannel<Integer> results) {
 
-                int sum = 0;
+                        int sum = 0;
 
-                for (final Integer integer : integers) {
+                        for (final Integer integer : integers) {
 
-                    sum += integer;
-                }
+                            sum += integer;
+                        }
 
-                results.pass(sum);
-            }
-        };
+                        results.pass(sum);
+                    }
+                };
 
         final Routine<Integer, Integer> sumRoutine =
                 on(ClassToken.tokenOf(execSum)).withArgs(this).buildRoutine();
@@ -1285,8 +1294,8 @@ public class RoutineTest extends TestCase {
     public void testTimeout() {
 
         final Routine<String, String> routine =
-                on(tokenOf(DelayedExecution.class)).withArgs(TimeDuration.seconds(3))
-                                                   .buildRoutine();
+                on(tokenOf(DelayedInvocation.class)).withArgs(TimeDuration.seconds(3))
+                                                    .buildRoutine();
 
         final OutputChannel<String> channel = routine.runAsync("test");
         assertThat(channel.immediately().readAll()).isEmpty();
@@ -1801,7 +1810,7 @@ public class RoutineTest extends TestCase {
 
         final String input = "test";
         final Routine<String, String> routine =
-                on(tokenOf(DelayedExecution.class)).withArgs(TimeDuration.ZERO).buildRoutine();
+                on(tokenOf(DelayedInvocation.class)).withArgs(TimeDuration.ZERO).buildRoutine();
 
         assertThat(routine.run(input).bind(consumer).waitComplete()).isTrue();
         assertThat(routine.runAsync(input).bind(consumer).waitComplete()).isTrue();
@@ -2020,7 +2029,7 @@ public class RoutineTest extends TestCase {
         public int take(int i);
     }
 
-    private static class ConstructorException extends BasicExecution<Object, Object> {
+    private static class ConstructorException extends BasicInvocation<Object, Object> {
 
         public ConstructorException() {
 
@@ -2028,7 +2037,7 @@ public class RoutineTest extends TestCase {
         }
     }
 
-    private static class DelayedChannelExecution extends BasicExecution<String, String> {
+    private static class DelayedChannelInvocation extends BasicInvocation<String, String> {
 
         private final TimeDuration mDelay;
 
@@ -2036,11 +2045,11 @@ public class RoutineTest extends TestCase {
 
         private boolean mFlag;
 
-        public DelayedChannelExecution(final TimeDuration delay) {
+        public DelayedChannelInvocation(final TimeDuration delay) {
 
             mDelay = delay;
             mRoutine =
-                    on(tokenOf(DelayedExecution.class)).withArgs(TimeDuration.ZERO).buildRoutine();
+                    on(tokenOf(DelayedInvocation.class)).withArgs(TimeDuration.ZERO).buildRoutine();
         }
 
         @Override
@@ -2061,13 +2070,13 @@ public class RoutineTest extends TestCase {
         }
     }
 
-    private static class DelayedExecution extends BasicExecution<String, String> {
+    private static class DelayedInvocation extends BasicInvocation<String, String> {
 
         private final TimeDuration mDelay;
 
         private boolean mFlag;
 
-        public DelayedExecution(final TimeDuration delay) {
+        public DelayedInvocation(final TimeDuration delay) {
 
             mDelay = delay;
         }
@@ -2090,7 +2099,7 @@ public class RoutineTest extends TestCase {
         }
     }
 
-    private static class DelayedListExecution extends BasicExecution<String, String> {
+    private static class DelayedListInvocation extends BasicInvocation<String, String> {
 
         private final int mCount;
 
@@ -2100,7 +2109,7 @@ public class RoutineTest extends TestCase {
 
         private boolean mFlag;
 
-        public DelayedListExecution(final TimeDuration delay, final int listCount) {
+        public DelayedListInvocation(final TimeDuration delay, final int listCount) {
 
             mDelay = delay;
             mCount = listCount;
@@ -2142,7 +2151,7 @@ public class RoutineTest extends TestCase {
         }
     }
 
-    private static class PassThroughExecution extends BasicExecution<String, String> {
+    private static class PassThroughInvocation extends BasicInvocation<String, String> {
 
         @Override
         public void onInput(final String s, @Nonnull final ResultChannel<String> results) {
@@ -2180,26 +2189,6 @@ public class RoutineTest extends TestCase {
         public int getOne() {
 
             return 1;
-        }
-    }
-
-    private static class TestExecutionProvider implements ExecutionProvider<Object, Object> {
-
-        @Nonnull
-        @Override
-        public Execution<Object, Object> create() {
-
-            return new BasicExecution<Object, Object>() {};
-        }
-
-        @Override
-        public void discard(@Nonnull final Execution<Object, Object> execution) {
-
-        }
-
-        @Override
-        public void recycle(@Nonnull final Execution<Object, Object> execution) {
-
         }
     }
 
@@ -2243,6 +2232,26 @@ public class RoutineTest extends TestCase {
 
         @Override
         public void onConsumeInput() {
+
+        }
+    }
+
+    private static class TestInvocationManager implements InvocationManager<Object, Object> {
+
+        @Nonnull
+        @Override
+        public Invocation<Object, Object> create() {
+
+            return new BasicInvocation<Object, Object>() {};
+        }
+
+        @Override
+        public void discard(@Nonnull final Invocation<Object, Object> invocation) {
+
+        }
+
+        @Override
+        public void recycle(@Nonnull final Invocation<Object, Object> invocation) {
 
         }
     }

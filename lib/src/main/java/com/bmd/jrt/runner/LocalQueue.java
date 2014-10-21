@@ -24,9 +24,9 @@ import static com.bmd.jrt.time.TimeDuration.fromUnit;
 import static com.bmd.jrt.time.TimeDuration.nanos;
 
 /**
- * Class maintaining a queue of invocations which is local to the calling thread.
+ * Class maintaining a queue of executions which is local to the calling thread.
  * <p/>
- * The implementation ensures that recursive invocations are broken into a consuming loop running
+ * The implementation ensures that recursive executions are broken into a consuming loop running
  * in the same thread.
  * <p/>
  * Created by davide on 9/18/14.
@@ -46,11 +46,11 @@ class LocalQueue {
 
     private TimeDuration[] mDelays;
 
+    private long[] mExecutionTimeNs;
+
+    private Execution[] mExecutions;
+
     private int mFirst;
-
-    private long[] mInvocationTimeNs;
-
-    private Invocation[] mInvocations;
 
     private boolean mIsRunning;
 
@@ -61,22 +61,22 @@ class LocalQueue {
      */
     private LocalQueue() {
 
-        mInvocationTimeNs = new long[INITIAL_CAPACITY];
-        mInvocations = new Invocation[INITIAL_CAPACITY];
+        mExecutionTimeNs = new long[INITIAL_CAPACITY];
+        mExecutions = new Execution[INITIAL_CAPACITY];
         mDelays = new TimeDuration[INITIAL_CAPACITY];
     }
 
     /**
-     * Runs the specified invocation.
+     * Runs the specified execution.
      *
-     * @param invocation the invocation.
-     * @param delay      the execution delay.
-     * @param timeUnit   the delay time unit.
+     * @param execution the execution.
+     * @param delay     the execution delay.
+     * @param timeUnit  the delay time unit.
      */
-    public static void run(@Nonnull final Invocation invocation, final long delay,
+    public static void run(@Nonnull final Execution execution, final long delay,
             @Nonnull final TimeUnit timeUnit) {
 
-        sQueue.get().addInvocation(invocation, delay, timeUnit);
+        sQueue.get().addExecution(execution, delay, timeUnit);
     }
 
     private static <T> void resizeArray(@Nonnull final T[] src, @Nonnull final T[] dst,
@@ -97,17 +97,17 @@ class LocalQueue {
         System.arraycopy(src, first, dst, dst.length - remainder, remainder);
     }
 
-    private void add(@Nonnull final Invocation invocation, @Nonnull final TimeDuration delay) {
+    private void add(@Nonnull final Execution execution, @Nonnull final TimeDuration delay) {
 
         final int i = mLast;
 
-        mInvocationTimeNs[i] = System.nanoTime();
-        mInvocations[i] = invocation;
+        mExecutionTimeNs[i] = System.nanoTime();
+        mExecutions[i] = execution;
         mDelays[i] = delay;
 
         final int newLast;
 
-        if ((i >= (mInvocations.length - 1)) || (i == Integer.MAX_VALUE)) {
+        if ((i >= (mExecutions.length - 1)) || (i == Integer.MAX_VALUE)) {
 
             newLast = 0;
 
@@ -118,16 +118,16 @@ class LocalQueue {
 
         if (mFirst == newLast) {
 
-            ensureCapacity(mInvocations.length + 1);
+            ensureCapacity(mExecutions.length + 1);
         }
 
         mLast = newLast;
     }
 
-    private void addInvocation(@Nonnull final Invocation invocation, final long delay,
+    private void addExecution(@Nonnull final Execution execution, final long delay,
             @Nonnull final TimeUnit timeUnit) {
 
-        add(invocation, fromUnit(delay, timeUnit));
+        add(execution, fromUnit(delay, timeUnit));
 
         if (!mIsRunning) {
 
@@ -137,7 +137,7 @@ class LocalQueue {
 
     private void ensureCapacity(final int capacity) {
 
-        final int size = mInvocations.length;
+        final int size = mExecutions.length;
 
         if (capacity <= size) {
 
@@ -159,17 +159,17 @@ class LocalQueue {
         final int first = mFirst;
         final int last = mLast;
 
-        final long[] newInvocationTimeNs = new long[newSize];
-        resizeArray(mInvocationTimeNs, newInvocationTimeNs, first);
+        final long[] newExecutionTimeNs = new long[newSize];
+        resizeArray(mExecutionTimeNs, newExecutionTimeNs, first);
 
-        final Invocation[] newInvocations = new Invocation[newSize];
-        resizeArray(mInvocations, newInvocations, first);
+        final Execution[] newExecutions = new Execution[newSize];
+        resizeArray(mExecutions, newExecutions, first);
 
         final TimeDuration[] newDelays = new TimeDuration[newSize];
         resizeArray(mDelays, newDelays, first);
 
-        mInvocationTimeNs = newInvocationTimeNs;
-        mInvocations = newInvocations;
+        mExecutionTimeNs = newExecutionTimeNs;
+        mExecutions = newExecutions;
         mDelays = newDelays;
 
         final int shift = newSize - size;
@@ -188,12 +188,12 @@ class LocalQueue {
 
                 final int i = mFirst;
                 final int last = mLast;
-                final long[] invocationTimeNs = mInvocationTimeNs;
-                final Invocation[] invocations = mInvocations;
+                final long[] executionTimeNs = mExecutionTimeNs;
+                final Execution[] executions = mExecutions;
                 final TimeDuration[] delays = mDelays;
 
-                long timeNs = invocationTimeNs[i];
-                Invocation invocation = invocations[i];
+                long timeNs = executionTimeNs[i];
+                Execution execution = executions[i];
                 TimeDuration delay = delays[i];
 
                 final long currentTimeNs = System.nanoTime();
@@ -201,7 +201,7 @@ class LocalQueue {
 
                 if (delayNs > 0) {
 
-                    final int length = invocations.length;
+                    final int length = executions.length;
                     long minDelay = delayNs;
                     int s = i;
 
@@ -215,7 +215,7 @@ class LocalQueue {
                     while (j != last) {
 
                         final long nextDelayNs =
-                                invocationTimeNs[j] - currentTimeNs + delays[j].toNanos();
+                                executionTimeNs[j] - currentTimeNs + delays[j].toNanos();
 
                         if (nextDelayNs <= 0) {
 
@@ -238,12 +238,12 @@ class LocalQueue {
 
                     if (s != i) {
 
-                        timeNs = invocationTimeNs[s];
-                        invocation = invocations[s];
+                        timeNs = executionTimeNs[s];
+                        execution = executions[s];
                         delay = delays[s];
 
-                        invocationTimeNs[s] = invocationTimeNs[i];
-                        invocations[s] = invocations[i];
+                        executionTimeNs[s] = executionTimeNs[i];
+                        executions[s] = executions[i];
                         delays[s] = delays[i];
                     }
 
@@ -265,7 +265,7 @@ class LocalQueue {
                 try {
 
                     // This call could be re-entrant
-                    invocation.run();
+                    execution.run();
 
                 } catch (final RoutineInterruptedException e) {
 
@@ -278,12 +278,12 @@ class LocalQueue {
                 // Note that the field values may have changed here
                 final int n = mFirst;
 
-                mInvocations[n] = null;
+                mExecutions[n] = null;
                 mDelays[n] = null;
 
                 final int newFirst = mFirst + 1;
 
-                if (newFirst >= mInvocations.length) {
+                if (newFirst >= mExecutions.length) {
 
                     mFirst = 0;
 

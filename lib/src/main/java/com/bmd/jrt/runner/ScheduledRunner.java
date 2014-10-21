@@ -31,16 +31,16 @@ class ScheduledRunner implements Runner {
     }
 
     @Override
-    public void run(@Nonnull final Invocation invocation, final long delay,
+    public void run(@Nonnull final Execution execution, final long delay,
             @Nonnull final TimeUnit timeUnit) {
 
         if (delay > 0) {
 
-            mService.schedule(invocation, delay, timeUnit);
+            mService.schedule(execution, delay, timeUnit);
 
         } else {
 
-            mService.execute(invocation);
+            mService.execute(execution);
         }
     }
 }

@@ -14,7 +14,7 @@
 package com.bmd.jrt.common;
 
 /**
- * Exception wrapping a thread interrupted exception catch inside a routine execution.
+ * Exception wrapping a thread interrupted exception caught inside a routine execution.
  * <p/>
  * Created by davide on 9/8/14.
  */

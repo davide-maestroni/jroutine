@@ -11,16 +11,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.runner;
 
 /**
- * Interface defining a routine invocation.
+ * Classes and interfaces related to routine invocations.
  * <p/>
- * This interface is meant to be used by a runner to ensure that the routine execution will take
- * place in the specific handled thread or threads.
- * <p/>
- * Created by davide on 9/7/14.
+ * Created by davide on 9/25/14.
  */
-public interface Invocation extends Runnable {
-
-}
+package com.bmd.jrt.invocation;

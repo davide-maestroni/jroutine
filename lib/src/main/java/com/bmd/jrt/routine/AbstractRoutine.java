@@ -16,11 +16,11 @@ package com.bmd.jrt.routine;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ParameterChannel;
 import com.bmd.jrt.common.RoutineInterruptedException;
-import com.bmd.jrt.execution.Execution;
+import com.bmd.jrt.invocation.Invocation;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.log.Logger;
-import com.bmd.jrt.routine.DefaultParameterChannel.ExecutionProvider;
+import com.bmd.jrt.routine.DefaultParameterChannel.InvocationManager;
 import com.bmd.jrt.runner.Runner;
 import com.bmd.jrt.time.TimeDuration;
 import com.bmd.jrt.time.TimeDuration.Check;
@@ -36,7 +36,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * Basic abstract implementation of a routine.
  * <p/>
  * This class provides implementations for all the routine functionalities. The inheriting class
- * just need to provide execution objects when required.
+ * just need to provide invocation objects when required.
  * <p/>
  * Created by davide on 9/7/14.
  *
@@ -49,8 +49,8 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends BasicRoutine<INPUT,
 
     private final TimeDuration mAvailTimeout;
 
-    private final LinkedList<Execution<INPUT, OUTPUT>> mExecutions =
-            new LinkedList<Execution<INPUT, OUTPUT>>();
+    private final LinkedList<Invocation<INPUT, OUTPUT>> mInvocations =
+            new LinkedList<Invocation<INPUT, OUTPUT>>();
 
     private final Logger mLogger;
 
@@ -73,10 +73,10 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends BasicRoutine<INPUT,
      *
      * @param syncRunner    the runner used for synchronous invocation.
      * @param asyncRunner   the runner used for asynchronous invocation.
-     * @param maxRunning    the maximum number of parallel running executions. Must be positive.
-     * @param maxRetained   the maximum number of retained execution instances. Must be 0 or a
+     * @param maxRunning    the maximum number of parallel running invocations. Must be positive.
+     * @param maxRetained   the maximum number of retained invocation instances. Must be 0 or a
      *                      positive number.
-     * @param availTimeout  the maximum timeout while waiting for an execution instance to be
+     * @param availTimeout  the maximum timeout while waiting for an invocation instance to be
      *                      available.
      * @param orderedInput  whether the input data are forced to be delivered in insertion order.
      * @param orderedOutput whether the output data are forced to be delivered in insertion order.
@@ -104,19 +104,19 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends BasicRoutine<INPUT,
         if (maxRunning < 1) {
 
             throw new IllegalArgumentException(
-                    "the maximum number of parallel running execution must be a positive number");
+                    "the maximum number of parallel running invocations must be a positive number");
         }
 
         if (maxRetained < 0) {
 
             throw new IllegalArgumentException(
-                    "the maximum number of retained execution instances must be 0 or positive");
+                    "the maximum number of retained invocation instances must be 0 or positive");
         }
 
         if (availTimeout == null) {
 
             throw new NullPointerException(
-                    "the timeout for available execution instances must not be null");
+                    "the timeout for available invocation instances must not be null");
         }
 
         mSyncRunner = syncRunner;
@@ -134,10 +134,10 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends BasicRoutine<INPUT,
      *
      * @param syncRunner    the runner used for synchronous invocation.
      * @param asyncRunner   the runner used for asynchronous invocation.
-     * @param maxRunning    the maximum number of parallel running executions. Must be positive.
-     * @param maxRetained   the maximum number of retained execution instances. Must be 0 or a
+     * @param maxRunning    the maximum number of parallel running invocations. Must be positive.
+     * @param maxRetained   the maximum number of retained invocation instances. Must be 0 or a
      *                      positive number.
-     * @param availTimeout  the maximum timeout while waiting for an execution instance to be
+     * @param availTimeout  the maximum timeout while waiting for an invocation instance to be
      *                      available.
      * @param orderedInput  whether the input data are forced to be delivered in insertion order.
      * @param orderedOutput whether the output data are forced to be delivered in insertion order.
@@ -184,9 +184,9 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends BasicRoutine<INPUT,
 
                     @Override
                     @Nonnull
-                    protected Execution<INPUT, OUTPUT> createExecution(final boolean async) {
+                    protected Invocation<INPUT, OUTPUT> createInvocation(final boolean async) {
 
-                        return new ParallelExecution<INPUT, OUTPUT>(AbstractRoutine.this);
+                        return new ParallelInvocation<INPUT, OUTPUT>(AbstractRoutine.this);
                     }
                 };
 
@@ -208,13 +208,13 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends BasicRoutine<INPUT,
     }
 
     /**
-     * Creates a new execution instance.
+     * Creates a new invocation instance.
      *
-     * @param async whether the execution is asynchronous.
-     * @return the execution instance.
+     * @param async whether the invocation is asynchronous.
+     * @return the invocation instance.
      */
     @Nonnull
-    protected abstract Execution<INPUT, OUTPUT> createExecution(boolean async);
+    protected abstract Invocation<INPUT, OUTPUT> createInvocation(boolean async);
 
     @Nonnull
     private ParameterChannel<INPUT, OUTPUT> invoke(final boolean async) {
@@ -223,32 +223,31 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends BasicRoutine<INPUT,
 
         logger.dbg("invoking routine: %sync", (async) ? "a" : "");
 
-        return new DefaultParameterChannel<INPUT, OUTPUT>(new DefaultExecutionProvider(async),
+        return new DefaultParameterChannel<INPUT, OUTPUT>(new DefaultInvocationManager(async),
                                                           (async) ? mAsyncRunner : mSyncRunner,
                                                           mOrderedInput, mOrderedOutput, logger);
     }
 
     /**
-     * Default implementation of an execution provider supporting recycling of execution
-     * instances.
+     * Default implementation of an invocation manager supporting recycling of invocation instances.
      */
-    private class DefaultExecutionProvider implements ExecutionProvider<INPUT, OUTPUT> {
+    private class DefaultInvocationManager implements InvocationManager<INPUT, OUTPUT> {
 
         private final boolean mAsync;
 
         /**
          * Constructor.
          *
-         * @param async whether the execution is asynchronous.
+         * @param async whether the invocation is asynchronous.
          */
-        private DefaultExecutionProvider(final boolean async) {
+        private DefaultInvocationManager(final boolean async) {
 
             mAsync = async;
         }
 
         @Override
         @Nonnull
-        public Execution<INPUT, OUTPUT> create() {
+        public Invocation<INPUT, OUTPUT> create() {
 
             synchronized (mMutex) {
 
@@ -284,32 +283,32 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends BasicRoutine<INPUT,
 
                 ++mRunningCount;
 
-                final LinkedList<Execution<INPUT, OUTPUT>> executions = mExecutions;
+                final LinkedList<Invocation<INPUT, OUTPUT>> invocations = mInvocations;
 
-                if (!executions.isEmpty()) {
+                if (!invocations.isEmpty()) {
 
-                    final Execution<INPUT, OUTPUT> execution = executions.removeFirst();
+                    final Invocation<INPUT, OUTPUT> invocation = invocations.removeFirst();
 
-                    mLogger.dbg("reusing execution instance [%d/%d]: %s", executions.size() + 1,
-                                mMaxRetained, execution);
+                    mLogger.dbg("reusing invocation instance [%d/%d]: %s", invocations.size() + 1,
+                                mMaxRetained, invocation);
 
-                    return execution;
+                    return invocation;
                 }
 
-                mLogger.dbg("creating execution instance [1/%d]", mMaxRetained);
+                mLogger.dbg("creating invocation instance [1/%d]", mMaxRetained);
 
-                return createExecution(mAsync);
+                return createInvocation(mAsync);
             }
         }
 
         @Override
         @SuppressFBWarnings(value = "NO_NOTIFY_NOT_NOTIFYALL",
-                            justification = "only one execution is released")
-        public void discard(@Nonnull final Execution<INPUT, OUTPUT> execution) {
+                            justification = "only one invocation is released")
+        public void discard(@Nonnull final Invocation<INPUT, OUTPUT> invocation) {
 
             synchronized (mMutex) {
 
-                mLogger.wrn("discarding execution instance after error: %s", execution);
+                mLogger.wrn("discarding invocation instance after error: %s", invocation);
 
                 --mRunningCount;
                 mMutex.notify();
@@ -318,24 +317,24 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends BasicRoutine<INPUT,
 
         @Override
         @SuppressFBWarnings(value = "NO_NOTIFY_NOT_NOTIFYALL",
-                            justification = "only one execution is released")
-        public void recycle(@Nonnull final Execution<INPUT, OUTPUT> execution) {
+                            justification = "only one invocation is released")
+        public void recycle(@Nonnull final Invocation<INPUT, OUTPUT> invocation) {
 
             synchronized (mMutex) {
 
-                final LinkedList<Execution<INPUT, OUTPUT>> executions = mExecutions;
+                final LinkedList<Invocation<INPUT, OUTPUT>> invocations = mInvocations;
 
-                if (executions.size() < mMaxRetained) {
+                if (invocations.size() < mMaxRetained) {
 
-                    mLogger.dbg("recycling execution instance [%d/%d]: %s", executions.size() + 1,
-                                mMaxRetained, execution);
+                    mLogger.dbg("recycling invocation instance [%d/%d]: %s", invocations.size() + 1,
+                                mMaxRetained, invocation);
 
-                    executions.add(execution);
+                    invocations.add(invocation);
 
                 } else {
 
-                    mLogger.wrn("discarding execution instance [%d/%d]: %s", mMaxRetained,
-                                mMaxRetained, execution);
+                    mLogger.wrn("discarding invocation instance [%d/%d]: %s", mMaxRetained,
+                                mMaxRetained, invocation);
                 }
 
                 --mRunningCount;

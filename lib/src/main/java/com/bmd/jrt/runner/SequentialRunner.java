@@ -24,10 +24,10 @@ import static com.bmd.jrt.time.TimeDuration.fromUnit;
 /**
  * Class implementing a sequential synchronous runner.
  * <p/>
- * The runner simply executes the invocations as soon as they are run.<br/>
+ * The runner simply runs the executions as soon as they are invoked.<br/>
  * While it is less memory and CPU consuming than the queued implementation, it might greatly
  * increase the depth of the call stack, and blocks execution of the calling thread during delayed
- * invocations.
+ * executions.
  * <p/>
  * Created by davide on 9/9/14.
  *
@@ -36,14 +36,14 @@ import static com.bmd.jrt.time.TimeDuration.fromUnit;
 class SequentialRunner implements Runner {
 
     @Override
-    public void run(@Nonnull final Invocation invocation, final long delay,
+    public void run(@Nonnull final Execution execution, final long delay,
             @Nonnull final TimeUnit timeUnit) {
 
         try {
 
             fromUnit(delay, timeUnit).sleepAtLeast();
 
-            invocation.run();
+            execution.run();
 
         } catch (final InterruptedException e) {
 

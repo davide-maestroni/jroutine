@@ -13,7 +13,7 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.execution.Execution;
+import com.bmd.jrt.invocation.Invocation;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.log.Logger;
@@ -29,7 +29,7 @@ import static com.bmd.jrt.routine.ReflectionUtils.NO_ARGS;
 import static com.bmd.jrt.routine.ReflectionUtils.findConstructor;
 
 /**
- * Default implementation of a routine object instantiating execution objects via reflection.
+ * Default implementation of a routine object instantiating invocation objects via reflection.
  * <p/>
  * Created by davide on 9/9/14.
  *
@@ -40,55 +40,55 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
 
     private final Object[] mArgs;
 
-    private final Constructor<? extends Execution<INPUT, OUTPUT>> mConstructor;
+    private final Constructor<? extends Invocation<INPUT, OUTPUT>> mConstructor;
 
     private final Logger mLogger;
 
     /**
      * Constructor.
      *
-     * @param syncRunner     the runner used for synchronous invocation.
-     * @param asyncRunner    the runner used for asynchronous invocation.
-     * @param maxRunning     the maximum number of parallel running executions. Must be positive.
-     * @param maxRetained    the maximum number of retained execution instances. Must be 0 or a
-     *                       positive number.
-     * @param availTimeout   the maximum timeout while waiting for an execution instance to be
-     *                       available.
-     * @param orderedInput   whether the input data are forced to be delivered in insertion order.
-     * @param orderedOutput  whether the output data are forced to be delivered in insertion order.
-     * @param log            the log instance.
-     * @param logLevel       the log level
-     * @param executionClass the execution class.
-     * @param executionArgs  the execution constructor arguments.
+     * @param syncRunner      the runner used for synchronous invocation.
+     * @param asyncRunner     the runner used for asynchronous invocation.
+     * @param maxRunning      the maximum number of parallel running invocations. Must be positive.
+     * @param maxRetained     the maximum number of retained invocation instances. Must be 0 or a
+     *                        positive number.
+     * @param availTimeout    the maximum timeout while waiting for an invocation instance to be
+     *                        available.
+     * @param orderedInput    whether the input data are forced to be delivered in insertion order.
+     * @param orderedOutput   whether the output data are forced to be delivered in insertion order.
+     * @param log             the log instance.
+     * @param logLevel        the log level
+     * @param invocationClass the invocation class.
+     * @param invocationArgs  the invocation constructor arguments.
      * @throws NullPointerException     if at least one of the parameter is null.
      * @throws IllegalArgumentException if at least one of the parameter is invalid, of no
      *                                  constructor matching the specified arguments is found for
-     *                                  the target execution class.
+     *                                  the target invocation class.
      */
     DefaultRoutine(@Nonnull final Runner syncRunner, @Nonnull final Runner asyncRunner,
             final int maxRunning, final int maxRetained, @Nonnull final TimeDuration availTimeout,
             final boolean orderedInput, final boolean orderedOutput, @Nonnull final Log log,
             @Nonnull final LogLevel logLevel,
-            @Nonnull final Class<? extends Execution<INPUT, OUTPUT>> executionClass,
-            @Nullable final Object... executionArgs) {
+            @Nonnull final Class<? extends Invocation<INPUT, OUTPUT>> invocationClass,
+            @Nullable final Object... invocationArgs) {
 
         super(syncRunner, asyncRunner, maxRunning, maxRetained, availTimeout, orderedInput,
               orderedOutput, log, logLevel);
 
-        mArgs = (executionArgs == null) ? NO_ARGS : executionArgs.clone();
-        mConstructor = findConstructor(executionClass, mArgs);
+        mArgs = (invocationArgs == null) ? NO_ARGS : invocationArgs.clone();
+        mConstructor = findConstructor(invocationClass, mArgs);
         mLogger = Logger.create(log, logLevel, this);
     }
 
     @Override
     @Nonnull
-    protected Execution<INPUT, OUTPUT> createExecution(final boolean async) {
+    protected Invocation<INPUT, OUTPUT> createInvocation(final boolean async) {
 
         final Logger logger = mLogger;
 
         try {
 
-            final Constructor<? extends Execution<INPUT, OUTPUT>> constructor = mConstructor;
+            final Constructor<? extends Invocation<INPUT, OUTPUT>> constructor = mConstructor;
 
             logger.dbg("creating a new instance of class: %s", constructor.getDeclaringClass());
 
@@ -96,7 +96,7 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
 
         } catch (final Throwable t) {
 
-            logger.err(t, "error creating the execution instance");
+            logger.err(t, "error creating the invocation instance");
 
             throw RoutineExceptionWrapper.wrap(t).raise();
         }

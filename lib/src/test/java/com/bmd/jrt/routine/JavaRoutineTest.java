@@ -18,7 +18,7 @@ import com.bmd.jrt.annotation.AsyncParameters;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.ClassToken;
-import com.bmd.jrt.execution.BasicExecution;
+import com.bmd.jrt.invocation.BasicInvocation;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.log.NullLog;
 import com.bmd.jrt.routine.ClassRoutineBuilder.Catch;
@@ -48,14 +48,12 @@ public class JavaRoutineTest extends TestCase {
                                                            .runBy(Runners.pool())
                                                            .logLevel(LogLevel.DEBUG)
                                                            .loggedWith(new NullLog())
-                                                           .method(TestStatic.NAME);
+                                                           .asyncMethod(TestStatic.NAME);
 
         assertThat(routine.call()).containsExactly(-77L);
 
-        final Routine<Object, Object> routine1 = JavaRoutine.on(TestStatic.class)
-                                                            .queued()
-                                                            .runBy(Runners.pool())
-                                                            .classMethod("getLong");
+        final Routine<Object, Object> routine1 =
+                JavaRoutine.on(TestStatic.class).queued().runBy(Runners.pool()).method("getLong");
 
         assertThat(routine1.call()).containsExactly(-77L);
 
@@ -63,7 +61,7 @@ public class JavaRoutineTest extends TestCase {
                                                             .queued()
                                                             .runBy(Runners.pool())
                                                             .parallelId("test")
-                                                            .classMethod(TestStatic.class.getMethod(
+                                                            .method(TestStatic.class.getMethod(
                                                                     "getLong"));
 
         assertThat(routine2.call()).containsExactly(-77L);
@@ -78,7 +76,7 @@ public class JavaRoutineTest extends TestCase {
         };
 
         final Routine<Object, Object> routine3 =
-                JavaRoutine.on(TestStatic.class).withinTry(testCatch).method(TestStatic.THROW);
+                JavaRoutine.on(TestStatic.class).withinTry(testCatch).asyncMethod(TestStatic.THROW);
 
         assertThat(routine3.call(new IllegalArgumentException())).isEmpty();
 
@@ -86,8 +84,8 @@ public class JavaRoutineTest extends TestCase {
 
         long startTime = System.currentTimeMillis();
 
-        OutputChannel<Object> getOne = builder.classMethod("getOne").runAsync();
-        OutputChannel<Object> getTwo = builder.classMethod("getTwo").runAsync();
+        OutputChannel<Object> getOne = builder.method("getOne").runAsync();
+        OutputChannel<Object> getTwo = builder.method("getTwo").runAsync();
 
         assertThat(getOne.waitComplete()).isTrue();
         assertThat(getTwo.waitComplete()).isTrue();
@@ -95,8 +93,8 @@ public class JavaRoutineTest extends TestCase {
 
         startTime = System.currentTimeMillis();
 
-        getOne = builder.parallelId("test").classMethod("getOne").runAsync();
-        getTwo = builder.parallelId("test").classMethod("getTwo").runAsync();
+        getOne = builder.parallelId("test").method("getOne").runAsync();
+        getTwo = builder.parallelId("test").method("getTwo").runAsync();
 
         assertThat(getOne.waitComplete()).isTrue();
         assertThat(getTwo.waitComplete()).isTrue();
@@ -128,7 +126,7 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            new ClassRoutineBuilder(TestStatic.class).classMethod("test");
+            new ClassRoutineBuilder(TestStatic.class).method("test");
 
             fail();
 
@@ -138,7 +136,7 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            new ClassRoutineBuilder(TestStatic.class).method("test");
+            new ClassRoutineBuilder(TestStatic.class).asyncMethod("test");
 
             fail();
 
@@ -194,12 +192,12 @@ public class JavaRoutineTest extends TestCase {
                                                            .runBy(Runners.pool())
                                                            .logLevel(LogLevel.DEBUG)
                                                            .loggedWith(new NullLog())
-                                                           .method(Test.NAME);
+                                                           .asyncMethod(Test.NAME);
 
         assertThat(routine.call()).containsExactly(-77L);
 
         final Routine<Object, Object> routine1 =
-                JavaRoutine.on(new Test()).queued().runBy(Runners.pool()).classMethod("getLong");
+                JavaRoutine.on(new Test()).queued().runBy(Runners.pool()).method("getLong");
 
         assertThat(routine1.call()).containsExactly(-77L);
 
@@ -207,7 +205,7 @@ public class JavaRoutineTest extends TestCase {
                                                             .queued()
                                                             .runBy(Runners.pool())
                                                             .parallelId("test")
-                                                            .classMethod(Test.class.getMethod(
+                                                            .method(Test.class.getMethod(
                                                                     "getLong"));
 
         assertThat(routine2.call()).containsExactly(-77L);
@@ -222,7 +220,7 @@ public class JavaRoutineTest extends TestCase {
         };
 
         final Routine<Object, Object> routine3 =
-                JavaRoutine.on(new Test()).withinTry(testCatch).method(Test.THROW);
+                JavaRoutine.on(new Test()).withinTry(testCatch).asyncMethod(Test.THROW);
 
         assertThat(routine3.call(new IllegalArgumentException())).isEmpty();
 
@@ -230,8 +228,8 @@ public class JavaRoutineTest extends TestCase {
 
         long startTime = System.currentTimeMillis();
 
-        OutputChannel<Object> getOne = builder.classMethod("getOne").runAsync();
-        OutputChannel<Object> getTwo = builder.classMethod("getTwo").runAsync();
+        OutputChannel<Object> getOne = builder.method("getOne").runAsync();
+        OutputChannel<Object> getTwo = builder.method("getTwo").runAsync();
 
         assertThat(getOne.waitComplete()).isTrue();
         assertThat(getTwo.waitComplete()).isTrue();
@@ -239,8 +237,8 @@ public class JavaRoutineTest extends TestCase {
 
         startTime = System.currentTimeMillis();
 
-        getOne = builder.parallelId("test").classMethod("getOne").runAsync();
-        getTwo = builder.parallelId("test").classMethod("getTwo").runAsync();
+        getOne = builder.parallelId("test").method("getOne").runAsync();
+        getTwo = builder.parallelId("test").method("getTwo").runAsync();
 
         assertThat(getOne.waitComplete()).isTrue();
         assertThat(getTwo.waitComplete()).isTrue();
@@ -272,7 +270,7 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            new ObjectRoutineBuilder(new Test()).classMethod("test");
+            new ObjectRoutineBuilder(new Test()).method("test");
 
             fail();
 
@@ -282,7 +280,7 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            new ObjectRoutineBuilder(new Test()).method("test");
+            new ObjectRoutineBuilder(new Test()).asyncMethod("test");
 
             fail();
 
@@ -394,7 +392,7 @@ public class JavaRoutineTest extends TestCase {
     public void testRoutineBuilder() {
 
         final Routine<String, String> routine =
-                JavaRoutine.on(ClassToken.tokenOf(PassThroughExecution.class))
+                JavaRoutine.on(ClassToken.tokenOf(PassThroughInvocation.class))
                            .sequential()
                            .runBy(Runners.pool())
                            .maxRetained(0)
@@ -405,7 +403,7 @@ public class JavaRoutineTest extends TestCase {
         assertThat(routine.call("test1", "test2")).containsExactly("test1", "test2");
 
         final Routine<String, String> routine1 =
-                JavaRoutine.on(ClassToken.tokenOf(PassThroughExecution.class))
+                JavaRoutine.on(ClassToken.tokenOf(PassThroughInvocation.class))
                            .queued()
                            .runBy(Runners.pool())
                            .maxRetained(0)
@@ -432,7 +430,7 @@ public class JavaRoutineTest extends TestCase {
         try {
 
             new RoutineBuilder<String, String>(
-                    ClassToken.tokenOf(PassThroughExecution.class)).availableTimeout(null);
+                    ClassToken.tokenOf(PassThroughInvocation.class)).availableTimeout(null);
 
             fail();
 
@@ -443,7 +441,7 @@ public class JavaRoutineTest extends TestCase {
         try {
 
             new RoutineBuilder<String, String>(
-                    ClassToken.tokenOf(PassThroughExecution.class)).logLevel(null);
+                    ClassToken.tokenOf(PassThroughInvocation.class)).logLevel(null);
 
             fail();
 
@@ -454,7 +452,7 @@ public class JavaRoutineTest extends TestCase {
         try {
 
             new RoutineBuilder<String, String>(
-                    ClassToken.tokenOf(PassThroughExecution.class)).loggedWith(null);
+                    ClassToken.tokenOf(PassThroughInvocation.class)).loggedWith(null);
 
             fail();
 
@@ -465,7 +463,7 @@ public class JavaRoutineTest extends TestCase {
         try {
 
             new RoutineBuilder<String, String>(
-                    ClassToken.tokenOf(PassThroughExecution.class)).runBy(null);
+                    ClassToken.tokenOf(PassThroughInvocation.class)).runBy(null);
 
             fail();
 
@@ -476,7 +474,7 @@ public class JavaRoutineTest extends TestCase {
         try {
 
             new RoutineBuilder<String, String>(
-                    ClassToken.tokenOf(PassThroughExecution.class)).withArgs((Object[]) null);
+                    ClassToken.tokenOf(PassThroughInvocation.class)).withArgs((Object[]) null);
 
             fail();
 
@@ -487,7 +485,7 @@ public class JavaRoutineTest extends TestCase {
         try {
 
             new RoutineBuilder<String, String>(
-                    ClassToken.tokenOf(PassThroughExecution.class)).maxRunning(0);
+                    ClassToken.tokenOf(PassThroughInvocation.class)).maxRunning(0);
 
             fail();
 
@@ -498,7 +496,7 @@ public class JavaRoutineTest extends TestCase {
         try {
 
             new RoutineBuilder<String, String>(
-                    ClassToken.tokenOf(PassThroughExecution.class)).maxRetained(-1);
+                    ClassToken.tokenOf(PassThroughInvocation.class)).maxRetained(-1);
 
             fail();
 
@@ -562,7 +560,7 @@ public class JavaRoutineTest extends TestCase {
         }
     }
 
-    private static class PassThroughExecution extends BasicExecution<String, String> {
+    private static class PassThroughInvocation extends BasicInvocation<String, String> {
 
         @Override
         public void onInput(final String s, @Nonnull final ResultChannel<String> results) {

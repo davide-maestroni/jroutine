@@ -13,7 +13,7 @@
  */
 
 /**
- * Classes and interfaces related to routine invocations.
+ * Routine interfaces and implementations.
  * <p/>
  * Created by davide on 9/25/14.
  */

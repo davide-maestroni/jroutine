@@ -20,12 +20,12 @@ import javax.annotation.Nonnull;
 /**
  * Class implementing a queued synchronous runner.
  * <p/>
- * The runner maintains an internal buffer of invocations that are consumed only when the last one
+ * The runner maintains an internal buffer of executions that are consumed only when the last one
  * completes, thus avoiding overflowing the call stack because of nested calls to other routines.
  * <br/>
  * While it is more memory and CPU consuming than the sequential implementation, it avoids
  * overflows of the call stack, and tries to prevent blocking the execution of the calling thread
- * by reordering delayed invocations inside the queue.
+ * by reordering delayed executions inside the queue.
  * <p/>
  * Created by davide on 9/18/14.
  *
@@ -34,9 +34,9 @@ import javax.annotation.Nonnull;
 class QueuedRunner implements Runner {
 
     @Override
-    public void run(@Nonnull final Invocation invocation, final long delay,
+    public void run(@Nonnull final Execution execution, final long delay,
             @Nonnull final TimeUnit timeUnit) {
 
-        LocalQueue.run(invocation, delay, timeUnit);
+        LocalQueue.run(execution, delay, timeUnit);
     }
 }

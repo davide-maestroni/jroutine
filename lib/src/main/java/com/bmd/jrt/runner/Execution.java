@@ -11,10 +11,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.bmd.jrt.runner;
 
 /**
- * Routine interfaces and implementations.
+ * Interface defining a routine execution.
  * <p/>
- * Created by davide on 9/25/14.
+ * This interface is meant to be used by a runner to ensure that the routine execution will take
+ * place in the specific handled thread or threads.
+ * <p/>
+ * Created by davide on 9/7/14.
  */
-package com.bmd.jrt.execution;
+public interface Execution extends Runnable {
+
+}

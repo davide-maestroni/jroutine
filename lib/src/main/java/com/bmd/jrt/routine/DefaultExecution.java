@@ -13,29 +13,29 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.execution.Execution;
+import com.bmd.jrt.invocation.Invocation;
 import com.bmd.jrt.log.Logger;
-import com.bmd.jrt.routine.DefaultParameterChannel.ExecutionProvider;
-import com.bmd.jrt.runner.Invocation;
+import com.bmd.jrt.routine.DefaultParameterChannel.InvocationManager;
+import com.bmd.jrt.runner.Execution;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Default implementation of an invocation object.
+ * Default implementation of an execution object.
  * <p/>
  * Created by davide on 9/24/14.
  *
  * @param <INPUT>  the input type.
  * @param <OUTPUT> the output type.
  */
-class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
+class DefaultExecution<INPUT, OUTPUT> implements Execution {
 
-    private final Invocation mAbortInvocation;
-
-    private final ExecutionProvider<INPUT, OUTPUT> mExecutionProvider;
+    private final Execution mAbortExecution;
 
     private final InputIterator<INPUT> mInputIterator;
+
+    private final InvocationManager<INPUT, OUTPUT> mInvocationManager;
 
     private final Logger mLogger;
 
@@ -43,25 +43,25 @@ class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
 
     private final DefaultResultChannel<OUTPUT> mResultChannel;
 
-    private Execution<INPUT, OUTPUT> mExecution;
+    private Invocation<INPUT, OUTPUT> mInvocation;
 
     /**
      * Constructor.
      *
-     * @param provider the execution provider.
-     * @param inputs   the input iterator.
-     * @param results  the result channel.
-     * @param logger   the logger instance.
+     * @param manager the invocation manager.
+     * @param inputs  the input iterator.
+     * @param results the result channel.
+     * @param logger  the logger instance.
      * @throws NullPointerException if one of the parameters is null.
      */
     @SuppressWarnings("ConstantConditions")
-    DefaultInvocation(@Nonnull final ExecutionProvider<INPUT, OUTPUT> provider,
+    DefaultExecution(@Nonnull final InvocationManager<INPUT, OUTPUT> manager,
             @Nonnull final InputIterator<INPUT> inputs,
             @Nonnull final DefaultResultChannel<OUTPUT> results, @Nonnull final Logger logger) {
 
-        if (provider == null) {
+        if (manager == null) {
 
-            throw new NullPointerException("the execution provider must not be null");
+            throw new NullPointerException("the invocation manager must not be null");
         }
 
         if (inputs == null) {
@@ -74,21 +74,21 @@ class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
             throw new NullPointerException("the result channel must not be null");
         }
 
-        mExecutionProvider = provider;
+        mInvocationManager = manager;
         mInputIterator = inputs;
         mResultChannel = results;
         mLogger = logger.subContextLogger(this);
-        mAbortInvocation = new AbortInvocation();
+        mAbortExecution = new AbortExecution();
     }
 
     /**
-     * Returns the abort invocation.
+     * Returns the abort execution.
      *
-     * @return the invocation.
+     * @return the execution.
      */
-    public Invocation abort() {
+    public Execution abort() {
 
-        return mAbortInvocation;
+        return mAbortExecution;
     }
 
     @Override
@@ -103,21 +103,21 @@ class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
 
                 inputIterator.onConsumeInput();
 
-                mLogger.dbg("running invocation");
+                mLogger.dbg("running execution");
 
-                final Execution<INPUT, OUTPUT> execution = initExecution();
+                final Invocation<INPUT, OUTPUT> invocation = initInvocation();
 
                 while (inputIterator.hasInput()) {
 
-                    execution.onInput(inputIterator.nextInput(), resultChannel);
+                    invocation.onInput(inputIterator.nextInput(), resultChannel);
                 }
 
                 if (inputIterator.isComplete()) {
 
-                    execution.onResult(resultChannel);
-                    execution.onReturn();
+                    invocation.onResult(resultChannel);
+                    invocation.onReturn();
 
-                    mExecutionProvider.recycle(execution);
+                    mInvocationManager.recycle(invocation);
 
                     resultChannel.close();
                 }
@@ -130,24 +130,24 @@ class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
     }
 
     @Nonnull
-    private Execution<INPUT, OUTPUT> initExecution() {
+    private Invocation<INPUT, OUTPUT> initInvocation() {
 
-        final Execution<INPUT, OUTPUT> execution;
+        final Invocation<INPUT, OUTPUT> invocation;
 
-        if (mExecution != null) {
+        if (mInvocation != null) {
 
-            execution = mExecution;
+            invocation = mInvocation;
 
         } else {
 
-            execution = (mExecution = mExecutionProvider.create());
+            invocation = (mInvocation = mInvocationManager.create());
 
-            mLogger.dbg("initializing execution: %s", execution);
+            mLogger.dbg("initializing invocation: %s", invocation);
 
-            execution.onInit();
+            invocation.onInit();
         }
 
-        return execution;
+        return invocation;
     }
 
     /**
@@ -206,9 +206,9 @@ class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
     }
 
     /**
-     * Abort invocation implementation.
+     * Abort execution implementation.
      */
-    private class AbortInvocation implements Invocation {
+    private class AbortExecution implements Execution {
 
         @Override
         public void run() {
@@ -216,9 +216,9 @@ class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
             synchronized (mMutex) {
 
                 final InputIterator<INPUT> inputIterator = mInputIterator;
-                final ExecutionProvider<INPUT, OUTPUT> provider = mExecutionProvider;
+                final InvocationManager<INPUT, OUTPUT> manager = mInvocationManager;
                 final DefaultResultChannel<OUTPUT> resultChannel = mResultChannel;
-                Execution<INPUT, OUTPUT> execution = null;
+                Invocation<INPUT, OUTPUT> invocation = null;
 
                 if (!inputIterator.isAborting()) {
 
@@ -233,20 +233,20 @@ class DefaultInvocation<INPUT, OUTPUT> implements Invocation {
 
                 try {
 
-                    execution = initExecution();
+                    invocation = initInvocation();
 
-                    execution.onAbort(exception);
-                    execution.onReturn();
+                    invocation.onAbort(exception);
+                    invocation.onReturn();
 
-                    provider.recycle(execution);
+                    manager.recycle(invocation);
 
                     resultChannel.close(exception);
 
                 } catch (final Throwable t) {
 
-                    if (execution != null) {
+                    if (invocation != null) {
 
-                        provider.discard(execution);
+                        manager.discard(invocation);
                     }
 
                     resultChannel.close(t);

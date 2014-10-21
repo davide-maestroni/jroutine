@@ -20,7 +20,7 @@ import android.os.Build.VERSION_CODES;
 import android.os.Handler;
 import android.os.Looper;
 
-import com.bmd.jrt.runner.Invocation;
+import com.bmd.jrt.runner.Execution;
 import com.bmd.jrt.runner.Runner;
 
 import java.util.concurrent.Executor;
@@ -56,10 +56,10 @@ class AsyncTaskRunner implements Runner {
     }
 
     @Override
-    public void run(@Nonnull final Invocation invocation, final long delay,
+    public void run(@Nonnull final Execution execution, final long delay,
             @Nonnull final TimeUnit timeUnit) {
 
-        final InvocationTask task = new InvocationTask(mExecutor, invocation);
+        final ExecutionTask task = new ExecutionTask(mExecutor, execution);
 
         if (delay > 0) {
 
@@ -74,23 +74,23 @@ class AsyncTaskRunner implements Runner {
     /**
      * Implementation of an async task whose execution starts in a runnable.
      */
-    private static class InvocationTask extends AsyncTask<Void, Void, Void> implements Runnable {
+    private static class ExecutionTask extends AsyncTask<Void, Void, Void> implements Runnable {
+
+        private final Execution mExecution;
 
         private final Executor mExecutor;
-
-        private final Invocation mInvocation;
 
         /**
          * Constructor.
          *
-         * @param executor   the executor.
-         * @param invocation the invocation instance.
+         * @param executor  the executor.
+         * @param execution the execution instance.
          */
-        private InvocationTask(@Nullable final Executor executor,
-                @Nonnull final Invocation invocation) {
+        private ExecutionTask(@Nullable final Executor executor,
+                @Nonnull final Execution execution) {
 
             mExecutor = executor;
-            mInvocation = invocation;
+            mExecution = execution;
         }
 
         @Override
@@ -110,7 +110,7 @@ class AsyncTaskRunner implements Runner {
         @Override
         protected Void doInBackground(final Void... voids) {
 
-            mInvocation.run();
+            mExecution.run();
 
             return null;
         }

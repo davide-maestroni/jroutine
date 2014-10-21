@@ -124,7 +124,7 @@ public class RunnerTest extends TestCase {
     private void testRunner(final Runner runner) throws InterruptedException {
 
         final Random random = new Random(System.currentTimeMillis());
-        final ArrayList<TestRunInvocation> invocations = new ArrayList<TestRunInvocation>();
+        final ArrayList<TestRunExecution> executions = new ArrayList<TestRunExecution>();
 
         for (int i = 0; i < 13; i++) {
 
@@ -158,19 +158,19 @@ public class RunnerTest extends TestCase {
                     break;
             }
 
-            final TestRunInvocation invocation = new TestRunInvocation(delay);
-            invocations.add(invocation);
+            final TestRunExecution execution = new TestRunExecution(delay);
+            executions.add(execution);
 
-            runner.run(invocation, delay.time, delay.unit);
+            runner.run(execution, delay.time, delay.unit);
         }
 
-        for (final TestRunInvocation invocation : invocations) {
+        for (final TestRunExecution execution : executions) {
 
-            invocation.await();
-            assertThat(invocation.isPassed()).isTrue();
+            execution.await();
+            assertThat(execution.isPassed()).isTrue();
         }
 
-        invocations.clear();
+        executions.clear();
 
         final ArrayList<TimeDuration> delays = new ArrayList<TimeDuration>();
 
@@ -208,62 +208,62 @@ public class RunnerTest extends TestCase {
 
             delays.add(delay);
 
-            final TestRunInvocation invocation = new TestRunInvocation(delay);
-            invocations.add(invocation);
+            final TestRunExecution execution = new TestRunExecution(delay);
+            executions.add(execution);
         }
 
-        final TestRecursiveInvocation recursiveInvocation =
-                new TestRecursiveInvocation(runner, invocations, delays, ZERO);
+        final TestRecursiveExecution recursiveExecution =
+                new TestRecursiveExecution(runner, executions, delays, ZERO);
 
-        runner.run(recursiveInvocation, ZERO.time, ZERO.unit);
+        runner.run(recursiveExecution, ZERO.time, ZERO.unit);
 
-        for (final TestRunInvocation invocation : invocations) {
+        for (final TestRunExecution execution : executions) {
 
-            invocation.await();
-            assertThat(invocation.isPassed()).isTrue();
+            execution.await();
+            assertThat(execution.isPassed()).isTrue();
         }
     }
 
-    private static class TestRecursiveInvocation extends TestRunInvocation {
+    private static class TestRecursiveExecution extends TestRunExecution {
 
         private final ArrayList<TimeDuration> mDelays;
 
-        private final ArrayList<TestRunInvocation> mInvocations;
+        private final ArrayList<TestRunExecution> mExecutions;
 
         private final Runner mRunner;
 
-        public TestRecursiveInvocation(final Runner runner,
-                final ArrayList<TestRunInvocation> invocations,
-                final ArrayList<TimeDuration> delays, final TimeDuration delay) {
+        public TestRecursiveExecution(final Runner runner,
+                final ArrayList<TestRunExecution> executions, final ArrayList<TimeDuration> delays,
+                final TimeDuration delay) {
 
             super(delay);
 
             mRunner = runner;
-            mInvocations = invocations;
+            mExecutions = executions;
             mDelays = delays;
         }
 
         @Override
         public void run() {
 
-            final ArrayList<TestRunInvocation> invocations = mInvocations;
+            final ArrayList<TestRunExecution> executions = mExecutions;
             final ArrayList<TimeDuration> delays = mDelays;
             final Runner runner = mRunner;
-            final int size = invocations.size();
+            final int size = executions.size();
 
             for (int i = 0; i < size; i++) {
 
                 final TimeDuration delay = delays.get(i);
-                final TestRunInvocation invocation = invocations.get(i);
+                final TestRunExecution execution = executions.get(i);
 
-                runner.run(invocation, delay.time, delay.unit);
+                runner.run(execution, delay.time, delay.unit);
             }
 
             super.run();
         }
     }
 
-    private static class TestRunInvocation implements Invocation {
+    private static class TestRunExecution implements Execution {
 
         private final TimeDuration mDelay;
 
@@ -273,7 +273,7 @@ public class RunnerTest extends TestCase {
 
         private boolean mIsPassed;
 
-        public TestRunInvocation(final TimeDuration delay) {
+        public TestRunExecution(final TimeDuration delay) {
 
             mStartTime = current();
             mDelay = delay;

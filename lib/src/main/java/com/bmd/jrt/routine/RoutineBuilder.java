@@ -14,7 +14,7 @@
 package com.bmd.jrt.routine;
 
 import com.bmd.jrt.common.ClassToken;
-import com.bmd.jrt.execution.Execution;
+import com.bmd.jrt.invocation.Invocation;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.log.Logger;
@@ -35,27 +35,27 @@ import static com.bmd.jrt.time.TimeDuration.seconds;
  * <p/>
  * A routine has a synchronous and an asynchronous runner associated. The synchronous
  * implementation can only be chosen between queued (the default one) and sequential.<br/>
- * The queued one maintains an internal buffer of invocations that are consumed only when the
+ * The queued one maintains an internal buffer of executions that are consumed only when the
  * last one completes, thus avoiding overflowing the call stack because of nested calls to other
  * routines.<br/>
- * The sequential one simply executes the invocations as soon as they are run.<br/>
+ * The sequential one simply runs the executions as soon as they are invoked.<br/>
  * While the latter is less memory and CPU consuming, it might greatly increase the depth of the
- * call stack, and blocks execution of the calling thread during delayed invocations.<br/>
- * In both cases the invocations are run inside the calling thread.<br/>
+ * call stack, and blocks execution of the calling thread during delayed executions.<br/>
+ * In both cases the executions are run inside the calling thread.<br/>
  * The default asynchronous runner is shared among all the routines, but a custom one can be set
  * through the builder.
  * <p/>
- * The built routine is based on an execution implementation specified by a class token.<br/>
- * The execution instance is created only when needed, by passing the specified arguments to the
+ * The built routine is based on an invocation implementation specified by a class token.<br/>
+ * The invocation instance is created only when needed, by passing the specified arguments to the
  * constructor. Note that the arguments objects should be immutable or, at least, never shared
  * inside and outside the routine in order to avoid concurrency issues.<br/>
- * Additionally, a recycling mechanism is provided so that, when an execution successfully
- * completes, the instance is retained for future invocations. Moreover, the maximum running
- * execution instances at one time can be limited by calling the specific builder method. When the
+ * Additionally, a recycling mechanism is provided so that, when an invocation successfully
+ * completes, the instance is retained for future executions. Moreover, the maximum running
+ * invocation instances at one time can be limited by calling the specific builder method. When the
  * limit is reached and an additional instance is needed, the call is blocked until one become
  * available or the timeout set through the builder elapses.<br/>
  * By default the timeout is set to a few seconds to avoid unexpected deadlocks.<br/>
- * In case the timeout elapses before an execution instance becomes available, a
+ * In case the timeout elapses before an invocation instance becomes available, a
  * {@link RoutineNotAvailableException} will be thrown.
  * <p/>
  * Finally, by default the order of input and output data is not guaranteed unless delay is set to
@@ -71,7 +71,7 @@ import static com.bmd.jrt.time.TimeDuration.seconds;
  */
 public class RoutineBuilder<INPUT, OUTPUT> {
 
-    private final Class<? extends Execution<INPUT, OUTPUT>> mExecutionClass;
+    private final Class<? extends Invocation<INPUT, OUTPUT>> mInvocationClass;
 
     private Object[] mArgs = NO_ARGS;
 
@@ -96,16 +96,16 @@ public class RoutineBuilder<INPUT, OUTPUT> {
     /**
      * Constructor.
      *
-     * @param classToken the execution class token.
+     * @param classToken the invocation class token.
      * @throws NullPointerException if the class token is null.
      */
-    RoutineBuilder(@Nonnull final ClassToken<? extends Execution<INPUT, OUTPUT>> classToken) {
+    RoutineBuilder(@Nonnull final ClassToken<? extends Invocation<INPUT, OUTPUT>> classToken) {
 
-        mExecutionClass = classToken.getRawClass();
+        mInvocationClass = classToken.getRawClass();
     }
 
     /**
-     * Sets the timeout for an execution instance to become available.
+     * Sets the timeout for an invocation instance to become available.
      *
      * @param timeout  the timeout.
      * @param timeUnit the timeout time unit.
@@ -120,7 +120,7 @@ public class RoutineBuilder<INPUT, OUTPUT> {
     }
 
     /**
-     * Sets the timeout for an execution instance to become available.
+     * Sets the timeout for an invocation instance to become available.
      *
      * @param timeout the timeout.
      * @return this builder.
@@ -150,7 +150,7 @@ public class RoutineBuilder<INPUT, OUTPUT> {
 
         return new DefaultRoutine<INPUT, OUTPUT>(mSyncRunner, mAsyncRunner, mMaxRunning,
                                                  mMaxRetained, mAvailTimeout, mOrderedInput,
-                                                 mOrderedOutput, mLog, mLogLevel, mExecutionClass,
+                                                 mOrderedOutput, mLog, mLogLevel, mInvocationClass,
                                                  mArgs);
     }
 
@@ -268,10 +268,10 @@ public class RoutineBuilder<INPUT, OUTPUT> {
 
     /**
      * Sets the synchronous runner to the queued one.<br/>
-     * The queued runner maintains an internal buffer of invocations that are consumed only when
+     * The queued runner maintains an internal buffer of executions that are consumed only when
      * the last one complete, thus avoiding overflowing the call stack because of nested calls to
      * other routines.<br/>
-     * The invocations are run inside the calling thread.
+     * The executions are run inside the calling thread.
      *
      * @return this builder.
      */
@@ -306,8 +306,8 @@ public class RoutineBuilder<INPUT, OUTPUT> {
 
     /**
      * Sets the synchronous runner to the sequential one.<br/>
-     * The sequential one simply executes the invocations as soon as they are run.<br/>
-     * The invocations are run inside the calling thread.
+     * The sequential one simply runs the executions as soon as they are invoked.<br/>
+     * The executions are run inside the calling thread.
      *
      * @return this builder.
      */
@@ -320,7 +320,7 @@ public class RoutineBuilder<INPUT, OUTPUT> {
     }
 
     /**
-     * Sets the arguments to be passed to the execution constructor.
+     * Sets the arguments to be passed to the invocation constructor.
      *
      * @param args the arguments.
      * @return this builder.

@@ -14,19 +14,19 @@
 package com.bmd.jrt.routine;
 
 import com.bmd.jrt.channel.ResultChannel;
-import com.bmd.jrt.execution.BasicExecution;
+import com.bmd.jrt.invocation.BasicInvocation;
 
 import javax.annotation.Nonnull;
 
 /**
- * Implementation of an execution handling parallel mode.
+ * Implementation of an invocation handling parallel mode.
  * <p/>
  * Created by davide on 9/17/14.
  *
  * @param <INPUT>  the input type.
  * @param <OUTPUT> the output type.
  */
-class ParallelExecution<INPUT, OUTPUT> extends BasicExecution<INPUT, OUTPUT> {
+class ParallelInvocation<INPUT, OUTPUT> extends BasicInvocation<INPUT, OUTPUT> {
 
     private final Routine<INPUT, OUTPUT> mRoutine;
 
@@ -37,7 +37,7 @@ class ParallelExecution<INPUT, OUTPUT> extends BasicExecution<INPUT, OUTPUT> {
      * @throws NullPointerException if the routine instance is null;
      */
     @SuppressWarnings("ConstantConditions")
-    ParallelExecution(@Nonnull final Routine<INPUT, OUTPUT> routine) {
+    ParallelInvocation(@Nonnull final Routine<INPUT, OUTPUT> routine) {
 
         if (routine == null) {
 

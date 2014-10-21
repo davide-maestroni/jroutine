@@ -16,7 +16,7 @@ package com.bmd.jrt.routine;
 import com.bmd.jrt.common.RoutineException;
 
 /**
- * Exception indicating that no execution instance became available before the timeout elapsed.
+ * Exception indicating that no invocation instance became available before the timeout elapsed.
  * <p/>
  * Created by davide on 9/20/14.
  */

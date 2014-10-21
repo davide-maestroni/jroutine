@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.execution;
+package com.bmd.jrt.invocation;
 
 import com.bmd.jrt.channel.ResultChannel;
 
@@ -21,10 +21,10 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 /**
- * This is a special abstract implementation that centralizes the routine execution inside a
+ * This is a special abstract implementation that centralizes the routine invocation inside a
  * single method, which gets called only when all the inputs are available.
  * <p/>
- * The implementing class may additionally override the execution callbacks to specifically handle
+ * The implementing class may additionally override the invocation methods to specifically handle
  * the object lifecycle. Note anyway that the super class must be invoked in order to properly
  * work.
  * <p/>
@@ -33,7 +33,7 @@ import javax.annotation.Nonnull;
  * @param <INPUT>  the input type.
  * @param <OUTPUT> the output type.
  */
-public abstract class ExecutionBody<INPUT, OUTPUT> extends BasicExecution<INPUT, OUTPUT> {
+public abstract class SimpleInvocation<INPUT, OUTPUT> extends BasicInvocation<INPUT, OUTPUT> {
 
     private ArrayList<INPUT> mInputs;
 

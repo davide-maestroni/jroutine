@@ -15,7 +15,7 @@ package com.bmd.jrt.sample;
 
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.RoutineException;
-import com.bmd.jrt.execution.BasicExecution;
+import com.bmd.jrt.invocation.BasicInvocation;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -27,11 +27,11 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Execution writing into output file.
+ * Invocation writing into output file.
  * <p/>
  * Created by davide on 10/17/14.
  */
-public class WriteFile extends BasicExecution<Chunk, Boolean> {
+public class WriteFile extends BasicInvocation<Chunk, Boolean> {
 
     private final File mFile;
 

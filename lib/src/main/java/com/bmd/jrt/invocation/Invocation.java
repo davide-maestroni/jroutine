@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.execution;
+package com.bmd.jrt.invocation;
 
 import com.bmd.jrt.channel.ResultChannel;
 
@@ -19,9 +19,9 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Interface defining the behavior of a routine execution.
+ * Interface defining the behavior of a routine invocation.
  * <p/>
- * The typical lifecycle of an execution object is the following:
+ * The typical lifecycle of an invocation object is the following:
  * <pre>
  *     <code>
  *
@@ -53,27 +53,27 @@ import javax.annotation.Nullable;
  * exception escapes the <b><code>onAbort()</code></b> method invocation.
  * <p/>
  * The <b><code>onReturn()</code></b> method is meant to allow the clean up and reset operations
- * needed to prepare the execution object to be reused. In fact, when the method is not called or
- * does not complete successfully, the execution object is discarded.
+ * needed to prepare the invocation object to be reused. In fact, when the method is not called or
+ * does not complete successfully, the invocation object is discarded.
  * <p/>
  * Created by davide on 9/7/14.
  *
  * @param <INPUT>  the input type.
  * @param <OUTPUT> the output type.
  */
-public interface Execution<INPUT, OUTPUT> {
+public interface Invocation<INPUT, OUTPUT> {
 
     /**
      * Called when the routine execution is aborted.<br/>
-     * This method can be called at any time after the execution initialization.
+     * This method can be called at any time after the invocation initialization.
      *
      * @param reason the reason of the abortion.
      */
     public void onAbort(@Nullable Throwable reason);
 
     /**
-     * Called when the routine execution is initialized.<br/>
-     * This is always the first method in the execution lifecycle.
+     * Called when the routine invocation is initialized.<br/>
+     * This is always the first method in the invocation lifecycle.
      */
     public void onInit();
 
@@ -88,7 +88,7 @@ public interface Execution<INPUT, OUTPUT> {
 
     /**
      * Called when all the inputs has been passed to the routine.<br/>
-     * This method is called once in the execution lifecycle to indicate that the final execution
+     * This method is called once in the invocation lifecycle to indicate that the final invocation
      * results should be passed to the result channel.
      *
      * @param results the result channel.

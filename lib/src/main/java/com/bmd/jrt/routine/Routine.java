@@ -29,24 +29,24 @@ import javax.annotation.Nullable;
  * strictly non-functional programming language, the routine itself must be an object based on
  * logic implemented in other objects.
  * <p/>
- * The framework includes a routine class based on the implementation of an execution interface.
- * Execution objects are dynamically instantiated when needed, effectively mimicking the temporary
+ * The framework includes a routine class based on the implementation of an invocation interface.
+ * Invocation objects are dynamically instantiated when needed, effectively mimicking the temporary
  * scope of a function call.<br/>
  * The paradigm is based on input, result and output channels. The invocation of a routine returns
  * an input channel through which the caller can pass the input parameters. When the input is
  * closed, it returns the output channel from which to read the invocation results. At the same
- * time a result channel is passed to the execution implementation, so that the output computed
+ * time a result channel is passed to the invocation implementation, so that the output computed
  * from the input parameters can be transferred outside.<br/>
- * The advantage of this approach is that the execution flow can be run in steps, allowing for
+ * The advantage of this approach is that the invocation flow can be run in steps, allowing for
  * continuous streaming of the input data and for abortion in the middle of the execution, without
  * blocking the running thread for the whole duration of the asynchronous invocation.<br/>
- * In fact, each channel can be abort the execution at any time by calling the exposed method.
+ * In fact, each channel can abort the execution at any time.
  * <p/>
- * The class implementation provides an automatic synchronization of the execution member fields,
+ * The class implementation provides an automatic synchronization of the invocation member fields,
  * though, in order to avoid concurrency issues, data passed through the routine channels should
  * be immutable or, at least, never shared inside and outside the routine.<br/>
  * Moreover, it is possible to recursively call the same or another routine from inside a routine
- * execution in a safe way. Nevertheless, it is always advisable to never perform blocking calls
+ * invocation in a safe way. Nevertheless, it is always advisable to never perform blocking calls
  * (such as: reading data from an output channel) in the middle of an execution, since the use
  * of shared runner instances may lead to unexpected deadlocks. In facts, to prevent deadlock or
  * starvation issues, it is encouraged the use of finite timeouts when performing blocking calls.
@@ -54,11 +54,11 @@ import javax.annotation.Nullable;
  * The routine object provides three different ways to invoke an execution:
  * <p/>
  * <b>Synchronous invocation</b><br/>
- * The routine starts an execution employing a synchronous runner. The result is similar to a
+ * The routine starts an invocation employing a synchronous runner. The result is similar to a
  * classic method call where the processing completes as soon as the function exits.
  * <p/>
  * <b>Asynchronous invocation</b><br/>
- * The routine starts an execution employing an asynchronous runner. In this case the processing
+ * The routine starts an invocation employing an asynchronous runner. In this case the processing
  * happens in a different thread, while the calling process may go on with its own execution and
  * perform other tasks. The invocation results can be collected at any time through the output
  * channel methods.
@@ -67,7 +67,7 @@ import javax.annotation.Nullable;
  * Processing parallelization is the key to leverage the power of multi-core machines. In order to
  * achieve it, the input data must be divided into subsets which are then processed on different
  * threads.<br/>
- * A routine object provides a convenient way to start an execution which in turn spawns another
+ * A routine object provides a convenient way to start an invocation which in turn spawns another
  * invocation for each input passed. This particular type of invocation obviously produces
  * meaningful results only for routines which takes a single input parameter and computes the
  * relative output results.
@@ -83,7 +83,7 @@ import javax.annotation.Nullable;
  *
  * @param <INPUT>  the input type.
  * @param <OUTPUT> the output type.
- * @see com.bmd.jrt.execution.Execution
+ * @see com.bmd.jrt.invocation.Invocation
  * @see com.bmd.jrt.runner.Runner
  */
 public interface Routine<INPUT, OUTPUT> {

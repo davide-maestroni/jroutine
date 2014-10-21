@@ -16,11 +16,11 @@ package com.bmd.jrt.routine;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.OutputConsumer;
 import com.bmd.jrt.channel.ParameterChannel;
-import com.bmd.jrt.execution.Execution;
+import com.bmd.jrt.invocation.Invocation;
 import com.bmd.jrt.log.Logger;
-import com.bmd.jrt.routine.DefaultInvocation.InputIterator;
+import com.bmd.jrt.routine.DefaultExecution.InputIterator;
 import com.bmd.jrt.routine.DefaultResultChannel.AbortHandler;
-import com.bmd.jrt.runner.Invocation;
+import com.bmd.jrt.runner.Execution;
 import com.bmd.jrt.runner.Runner;
 import com.bmd.jrt.time.TimeDuration;
 
@@ -47,9 +47,9 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
     private final ArrayList<OutputChannel<?>> mBoundChannels = new ArrayList<OutputChannel<?>>();
 
-    private final NestedQueue<INPUT> mInputQueue;
+    private final DefaultExecution<INPUT, OUTPUT> mExecution;
 
-    private final DefaultInvocation<INPUT, OUTPUT> mInvocation;
+    private final NestedQueue<INPUT> mInputQueue;
 
     private final Logger mLogger;
 
@@ -70,14 +70,14 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
     /**
      * Constructor.
      *
-     * @param provider      the execution provider.
+     * @param manager       the invocation manager.
      * @param runner        the runner instance.
      * @param orderedInput  whether the input data are forced to be delivered in insertion order.
      * @param orderedOutput whether the output data are forced to be delivered in insertion order.
      * @param logger        the logger instance.
      * @throws NullPointerException if one of the parameters is null.
      */
-    DefaultParameterChannel(@Nonnull final ExecutionProvider<INPUT, OUTPUT> provider,
+    DefaultParameterChannel(@Nonnull final InvocationManager<INPUT, OUTPUT> manager,
             @Nonnull final Runner runner, final boolean orderedInput, final boolean orderedOutput,
             @Nonnull final Logger logger) {
 
@@ -108,11 +108,11 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
                     mState = ChannelState.EXCEPTION;
                 }
 
-                mRunner.run(mInvocation.abort(), delay, timeUnit);
+                mRunner.run(mExecution.abort(), delay, timeUnit);
             }
         }, runner, orderedOutput, logger);
-        mInvocation = new DefaultInvocation<INPUT, OUTPUT>(provider, new DefaultInputIterator(),
-                                                           mResultChanel, logger);
+        mExecution = new DefaultExecution<INPUT, OUTPUT>(manager, new DefaultInputIterator(),
+                                                         mResultChanel, logger);
     }
 
     @Override
@@ -150,11 +150,11 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
         if (delay.isZero()) {
 
-            mRunner.run(mInvocation.abort(), 0, TimeUnit.MILLISECONDS);
+            mRunner.run(mExecution.abort(), 0, TimeUnit.MILLISECONDS);
 
         } else {
 
-            mRunner.run(new DelayedAbort(reason), delay.time, delay.unit);
+            mRunner.run(new DelayedAbortExecution(reason), delay.time, delay.unit);
         }
 
         return true;
@@ -280,11 +280,11 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
         if (delay.isZero()) {
 
-            mRunner.run(mInvocation, 0, TimeUnit.MILLISECONDS);
+            mRunner.run(mExecution, 0, TimeUnit.MILLISECONDS);
 
         } else {
 
-            mRunner.run(new DelayedListInputInvocation(inputQueue, inputs), delay.time, delay.unit);
+            mRunner.run(new DelayedListInputExecution(inputQueue, inputs), delay.time, delay.unit);
         }
 
         return this;
@@ -320,11 +320,11 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
         if (delay.isZero()) {
 
-            mRunner.run(mInvocation, 0, TimeUnit.MILLISECONDS);
+            mRunner.run(mExecution, 0, TimeUnit.MILLISECONDS);
 
         } else {
 
-            mRunner.run(new DelayedInputInvocation(inputQueue, input), delay.time, delay.unit);
+            mRunner.run(new DelayedInputExecution(inputQueue, input), delay.time, delay.unit);
         }
 
         return this;
@@ -364,7 +364,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
             ++mPendingInputCount;
         }
 
-        mRunner.run(mInvocation, 0, TimeUnit.MILLISECONDS);
+        mRunner.run(mExecution, 0, TimeUnit.MILLISECONDS);
 
         return mResultChanel.getOutput();
     }
@@ -399,36 +399,36 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
     }
 
     /**
-     * Interface defining an object managing the creation and the recycling of execution instances.
+     * Interface defining an object managing the creation and the recycling of invocation instances.
      * <p/>
      * Created by davide on 9/24/14.
      *
      * @param <INPUT>  the input type.
      * @param <OUTPUT> the output type.
      */
-    public interface ExecutionProvider<INPUT, OUTPUT> {
+    public interface InvocationManager<INPUT, OUTPUT> {
 
         /**
-         * Creates and returns a new execution instance.
+         * Creates and returns a new invocation instance.
          *
-         * @return the execution instance.
+         * @return the invocation instance.
          */
         @Nonnull
-        public Execution<INPUT, OUTPUT> create();
+        public Invocation<INPUT, OUTPUT> create();
 
         /**
-         * Discards the specified execution.
+         * Discards the specified invocation.
          *
-         * @param execution the execution instance.
+         * @param invocation the invocation instance.
          */
-        public void discard(@Nonnull Execution<INPUT, OUTPUT> execution);
+        public void discard(@Nonnull Invocation<INPUT, OUTPUT> invocation);
 
         /**
-         * Recycles the specified execution.
+         * Recycles the specified invocation.
          *
-         * @param execution the execution instance.
+         * @param invocation the invocation instance.
          */
-        public void recycle(@Nonnull Execution<INPUT, OUTPUT> execution);
+        public void recycle(@Nonnull Invocation<INPUT, OUTPUT> invocation);
     }
 
     /**
@@ -584,7 +584,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
             }
 
             final TimeDuration delay = mDelay;
-            mRunner.run(mInvocation.abort(), delay.time, delay.unit);
+            mRunner.run(mExecution.abort(), delay.time, delay.unit);
         }
 
         @Override
@@ -597,7 +597,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
                 mQueue.close();
             }
 
-            mRunner.run(mInvocation, 0, TimeUnit.MILLISECONDS);
+            mRunner.run(mExecution, 0, TimeUnit.MILLISECONDS);
         }
 
         @Override
@@ -642,19 +642,19 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
             if (delay.isZero()) {
 
-                mRunner.run(mInvocation, 0, TimeUnit.MILLISECONDS);
+                mRunner.run(mExecution, 0, TimeUnit.MILLISECONDS);
 
             } else {
 
-                mRunner.run(new DelayedInputInvocation(inputQueue, output), delay.time, delay.unit);
+                mRunner.run(new DelayedInputExecution(inputQueue, output), delay.time, delay.unit);
             }
         }
     }
 
     /**
-     * Implementation of an invocation handling a delayed abort.
+     * Implementation of an execution handling a delayed abort.
      */
-    private class DelayedAbort implements Invocation {
+    private class DelayedAbortExecution implements Execution {
 
         private final Throwable mThrowable;
 
@@ -663,7 +663,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
          *
          * @param throwable the reason of the abort.
          */
-        private DelayedAbort(final Throwable throwable) {
+        private DelayedAbortExecution(final Throwable throwable) {
 
             mThrowable = throwable;
         }
@@ -690,14 +690,14 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
                 mState = ChannelState.EXCEPTION;
             }
 
-            mRunner.run(mInvocation.abort(), 0, TimeUnit.MILLISECONDS);
+            mRunner.run(mExecution.abort(), 0, TimeUnit.MILLISECONDS);
         }
     }
 
     /**
-     * Implementation of an invocation handling a delayed input.
+     * Implementation of an execution handling a delayed input.
      */
-    private class DelayedInputInvocation implements Invocation {
+    private class DelayedInputExecution implements Execution {
 
         private final INPUT mInput;
 
@@ -709,7 +709,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
          * @param queue the input queue.
          * @param input the input.
          */
-        private DelayedInputInvocation(@Nonnull final NestedQueue<INPUT> queue,
+        private DelayedInputExecution(@Nonnull final NestedQueue<INPUT> queue,
                 @Nullable final INPUT input) {
 
             mQueue = queue;
@@ -723,25 +723,25 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
                 if ((mState != ChannelState.INPUT) && (mState != ChannelState.OUTPUT)) {
 
-                    mLogger.dbg("avoiding delayed input invocation since channel is closed: %s",
+                    mLogger.dbg("avoiding delayed input execution since channel is closed: %s",
                                 mInput);
 
                     return;
                 }
 
-                mLogger.dbg("delayed input invocation: %s", mInput);
+                mLogger.dbg("delayed input execution: %s", mInput);
 
                 mQueue.add(mInput).close();
             }
 
-            mInvocation.run();
+            mExecution.run();
         }
     }
 
     /**
-     * Implementation of an invocation handling a delayed input of a list of data.
+     * Implementation of an execution handling a delayed input of a list of data.
      */
-    private class DelayedListInputInvocation implements Invocation {
+    private class DelayedListInputExecution implements Execution {
 
         private final ArrayList<INPUT> mInputs;
 
@@ -753,7 +753,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
          * @param queue  the input queue.
          * @param inputs the iterable returning the input data.
          */
-        private DelayedListInputInvocation(@Nonnull final NestedQueue<INPUT> queue,
+        private DelayedListInputExecution(@Nonnull final NestedQueue<INPUT> queue,
                 @Nonnull final Iterable<? extends INPUT> inputs) {
 
             final ArrayList<INPUT> inputList = new ArrayList<INPUT>();
@@ -774,18 +774,18 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
                 if ((mState != ChannelState.INPUT) && (mState != ChannelState.OUTPUT)) {
 
-                    mLogger.dbg("avoiding delayed input invocation since channel is closed: %s",
+                    mLogger.dbg("avoiding delayed input execution since channel is closed: %s",
                                 mInputs);
 
                     return;
                 }
 
-                mLogger.dbg("delayed input invocation: %s", mInputs);
+                mLogger.dbg("delayed input execution: %s", mInputs);
 
                 mQueue.addAll(mInputs).close();
             }
 
-            mInvocation.run();
+            mExecution.run();
         }
     }
 }

@@ -44,9 +44,9 @@ public class RunnerDecorator implements Runner {
     }
 
     @Override
-    public void run(@Nonnull final Invocation invocation, final long delay,
+    public void run(@Nonnull final Execution execution, final long delay,
             @Nonnull final TimeUnit timeUnit) {
 
-        mRunner.run(invocation, delay, timeUnit);
+        mRunner.run(execution, delay, timeUnit);
     }
 }

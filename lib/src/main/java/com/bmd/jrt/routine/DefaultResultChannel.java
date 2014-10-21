@@ -331,7 +331,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             mOutputQueue.add(RoutineExceptionWrapper.wrap(throwable));
 
             mAbortException = throwable;
-            mState = ChannelState.CLOSE;
+            mState = ChannelState.ABORT;
             mMutex.notifyAll();
         }
 
@@ -448,15 +448,9 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             synchronized (mMutex) {
 
-                if (mState == ChannelState.FLUSH) {
+                if ((mState == ChannelState.FLUSH) || (mState == ChannelState.ABORT)) {
 
                     mState = ChannelState.DONE;
-
-                    mMutex.notifyAll();
-
-                } else if (mState == ChannelState.CLOSE) {
-
-                    mState = ChannelState.ABORT;
 
                     mMutex.notifyAll();
                 }
@@ -487,13 +481,9 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                         logger.dbg("avoiding flushing output since channel is not bound");
 
-                        if (mState == ChannelState.FLUSH) {
+                        if ((mState == ChannelState.FLUSH) || (mState == ChannelState.ABORT)) {
 
                             mState = ChannelState.DONE;
-
-                        } else if (mState == ChannelState.CLOSE) {
-
-                            mState = ChannelState.ABORT;
                         }
 
                         mMutex.notifyAll();
@@ -537,7 +527,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                     }
                 }
 
-                if ((state == ChannelState.FLUSH) || (state == ChannelState.CLOSE)) {
+                if ((state == ChannelState.FLUSH) || (state == ChannelState.ABORT)) {
 
                     closeConsumer();
                 }
@@ -554,7 +544,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                     logger.wrn(t, "consumer exception (%s)", mOutputConsumer);
 
-                    if ((mState == ChannelState.FLUSH) || (mState == ChannelState.CLOSE)) {
+                    if ((mState == ChannelState.FLUSH) || (mState == ChannelState.ABORT)) {
 
                         isClose = true;
 
@@ -584,22 +574,11 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         }
     }
 
-    private boolean isDone() {
-
-        return (mState == ChannelState.DONE) || (mState == ChannelState.ABORT);
-    }
-
-    private boolean isError() {
-
-        return (mState == ChannelState.ABORT) || (mState == ChannelState.EXCEPTION);
-    }
-
     private boolean isOutputOpen() {
 
         synchronized (mMutex) {
 
-            return !mOutputQueue.isEmpty() || ((mState != ChannelState.DONE) && (mState
-                    != ChannelState.ABORT));
+            return !mOutputQueue.isEmpty() || (mState != ChannelState.DONE);
         }
     }
 
@@ -607,7 +586,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         synchronized (mMutex) {
 
-            return !isDone() && (mState != ChannelState.EXCEPTION);
+            return (mState != ChannelState.DONE) && (mState != ChannelState.EXCEPTION);
         }
     }
 
@@ -694,7 +673,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
     private void verifyOutput() {
 
-        if (isError()) {
+        if (mState == ChannelState.EXCEPTION) {
 
             final Throwable throwable = mAbortException;
 
@@ -716,13 +695,12 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
      */
     private static enum ChannelState {
 
-        OUTPUT,
-        RESULT,
-        FLUSH,
-        DONE,
-        EXCEPTION,
-        CLOSE,
-        ABORT
+        OUTPUT,     // result channel is open
+        RESULT,     // result channel is closed
+        FLUSH,      // no more pending outputs
+        EXCEPTION,  // abort issued
+        ABORT,      // invocation aborted
+        DONE        // output is closed
     }
 
     /**
@@ -778,7 +756,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                 final RuntimeException timeoutException = mTimeoutException;
                 final NestedQueue<Object> outputQueue = mOutputQueue;
 
-                if (timeout.isZero() || isDone()) {
+                if (timeout.isZero() || (mState == ChannelState.DONE)) {
 
                     final boolean hasNext = !outputQueue.isEmpty();
 
@@ -794,7 +772,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                         @Override
                         public boolean isTrue() {
 
-                            return !outputQueue.isEmpty() || isDone();
+                            return !outputQueue.isEmpty() || (mState == ChannelState.DONE);
                         }
                     };
                 }
@@ -986,7 +964,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                 final TimeDuration timeout = mOutputTimeout;
                 final RuntimeException timeoutException = mOutputTimeoutException;
 
-                if (timeout.isZero() || isDone()) {
+                if (timeout.isZero() || (mState == ChannelState.DONE)) {
 
                     while (!outputQueue.isEmpty()) {
 
@@ -1011,7 +989,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                         @Override
                         public boolean isTrue() {
 
-                            return isDone();
+                            return (mState == ChannelState.DONE);
                         }
                     });
 
@@ -1070,7 +1048,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                         @Override
                         public boolean isTrue() {
 
-                            return isDone();
+                            return (mState == ChannelState.DONE);
                         }
                     });
 
@@ -1342,7 +1320,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             synchronized (mMutex) {
 
-                if (isError()) {
+                if (mState == ChannelState.EXCEPTION) {
 
                     mLogger.dbg("avoiding delayed output execution since channel is closed: %s",
                                 mOutputs);
@@ -1392,7 +1370,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             synchronized (mMutex) {
 
-                if (isError()) {
+                if (mState == ChannelState.EXCEPTION) {
 
                     mLogger.dbg("avoiding delayed output execution since channel is closed: %s",
                                 mOutput);

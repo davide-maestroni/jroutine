@@ -393,9 +393,9 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
      */
     private static enum ChannelState {
 
-        INPUT,
-        OUTPUT,
-        EXCEPTION
+        INPUT,      // input channel is open
+        OUTPUT,     // no more input
+        EXCEPTION   // abort issued
     }
 
     /**

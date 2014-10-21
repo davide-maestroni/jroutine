@@ -219,7 +219,7 @@ public class DownloaderTest extends TestCase {
         waitFor(uri, startTime, 20000);
 
         assertThat(downloader.isDownloaded(uri)).isFalse();
-        checkNotExists(outFile);
+        checkNotExists(outFile);//XXX
     }
 
     public void testSimpleAbort() throws IOException, URISyntaxException {
@@ -279,9 +279,7 @@ public class DownloaderTest extends TestCase {
         try {
 
             // the only way to be sure that a file does not exists is to read it
-            assertThat(new FileInputStream(file).read());
-
-            fail();
+            assertThat(new FileInputStream(file).read()).isEqualTo(-1);
 
         } catch (IOException ignored) {
 

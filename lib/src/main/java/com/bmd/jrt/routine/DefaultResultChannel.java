@@ -399,9 +399,9 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                 return false;
             }
 
-            delay = mResultDelay;
+            delay = (isImmediate) ? ZERO : mResultDelay;
 
-            if (isImmediate) {
+            if (delay.isZero()) {
 
                 mLogger.dbg(throwable, "aborting channel");
 
@@ -412,7 +412,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             }
         }
 
-        if (isImmediate) {
+        if (delay.isZero()) {
 
             mHandler.onAbort(throwable, 0, TimeUnit.MILLISECONDS);
 

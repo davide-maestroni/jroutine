@@ -15,6 +15,7 @@ import com.android.builder.core.BuilderConstants
 
 apply plugin: 'com.android.library'
 apply plugin: 'jacoco'
+apply plugin: 'findbugs'
 apply plugin: 'maven'
 apply plugin: 'signing'
 
@@ -67,6 +68,22 @@ android.libraryVariants.all { variant ->
     def buildTypeName = variant.buildType.name
 
     if (buildTypeName.equals(BuilderConstants.DEBUG)) {
+
+        print variant
+
+        task("findbugsMain", type: FindBugs, dependsOn: "assemble${buildTypeName.capitalize()}") {
+            classes = fileTree(variant.javaCompile.destinationDir).filter {
+                !it.name.startsWith("R\$") && !it.name.equals("R.class")
+            }
+            source = variant.javaCompile.source
+            classpath = files(variant.javaCompile.classpath.files)
+            effort = 'max'
+            reportLevel = "low"
+            reports {
+                xml.enabled = false
+                html.enabled = true
+            }
+        }
 
         // Skip debug builds.
         return;

@@ -35,7 +35,7 @@ public abstract class BasicLog implements Log {
 
     private static final String DATE_FORMAT = "MM/dd HH:mm:ss.SSS z";
 
-    private static final String EXCEPTION_FORMAT = " > caused by exception:%n%s";
+    private static final String EXCEPTION_FORMAT = " > caused by:%n%s";
 
     private static final String LOG_FORMAT = "%s\t%s\t%s\t%s> %s";
 

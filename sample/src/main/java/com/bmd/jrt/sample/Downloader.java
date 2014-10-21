@@ -26,7 +26,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.NoSuchElementException;
 
 import static com.bmd.jrt.common.ClassToken.tokenOf;
 
@@ -79,45 +78,16 @@ public class Downloader {
 
     public boolean abort(final URI uri) {
 
-        final HashMap<URI, OutputChannel<Boolean>> downloadMap = mDownloadMap;
-        final OutputChannel<Boolean> channel = downloadMap.get(uri);
+        final OutputChannel<Boolean> channel = mDownloadMap.remove(uri);
 
-        if (channel != null) {
-
-            try {
-
-                return channel.abort();
-
-            } finally {
-
-                downloadMap.remove(uri);
-            }
-        }
-
-        return false;
+        return (channel != null) && channel.abort();
     }
 
-    public boolean abort(final URI uri, final TimeDuration timeout) {
+    public boolean abortAndWait(final URI uri, final TimeDuration timeout) {
 
-        final HashMap<URI, OutputChannel<Boolean>> downloadMap = mDownloadMap;
-        final OutputChannel<Boolean> channel = downloadMap.get(uri);
+        final OutputChannel<Boolean> channel = mDownloadMap.remove(uri);
 
-        if (channel != null) {
-
-            try {
-
-                if (channel.abort()) {
-
-                    return channel.afterMax(timeout).waitComplete();
-                }
-
-            } finally {
-
-                downloadMap.remove(uri);
-            }
-        }
-
-        return false;
+        return (channel != null) && channel.abort() && channel.afterMax(timeout).waitComplete();
     }
 
     public void download(final URI uri, final File dstFile) {
@@ -154,14 +124,14 @@ public class Downloader {
 
             try {
 
-                if (channel.afterMax(timeout).readFirst()) {
+                if (channel.afterMax(timeout).waitComplete() && channel.readFirst()) {
+
+                    downloadMap.remove(uri);
 
                     mDownloadedSet.add(uri);
 
                     return true;
                 }
-
-            } catch (final NoSuchElementException ignored) {
 
             } catch (final RoutineException ignored) {
 

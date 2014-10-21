@@ -256,7 +256,7 @@ public class DownloaderTest extends TestCase {
             }
         }
 
-        downloader.abort(uri, TimeDuration.seconds(20));
+        downloader.abortAndWait(uri, TimeDuration.seconds(20));
 
         assertThat(downloader.isDownloaded(uri)).isFalse();
         checkNotExists(outFile);

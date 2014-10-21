@@ -331,7 +331,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             mOutputQueue.add(RoutineExceptionWrapper.wrap(throwable));
 
             mAbortException = throwable;
-            mState = ChannelState.ABORT;
+            mState = ChannelState.CLOSE;
             mMutex.notifyAll();
         }
 
@@ -453,6 +453,12 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                     mState = ChannelState.DONE;
 
                     mMutex.notifyAll();
+
+                } else if (mState == ChannelState.CLOSE) {
+
+                    mState = ChannelState.ABORT;
+
+                    mMutex.notifyAll();
                 }
             }
         }
@@ -484,6 +490,10 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                         if (mState == ChannelState.FLUSH) {
 
                             mState = ChannelState.DONE;
+
+                        } else if (mState == ChannelState.CLOSE) {
+
+                            mState = ChannelState.ABORT;
                         }
 
                         mMutex.notifyAll();
@@ -527,7 +537,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                     }
                 }
 
-                if (state == ChannelState.FLUSH) {
+                if ((state == ChannelState.FLUSH) || (state == ChannelState.CLOSE)) {
 
                     closeConsumer();
                 }
@@ -544,7 +554,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                     logger.wrn(t, "consumer exception (%s)", mOutputConsumer);
 
-                    if ((mState == ChannelState.FLUSH) || (mState == ChannelState.ABORT)) {
+                    if ((mState == ChannelState.FLUSH) || (mState == ChannelState.CLOSE)) {
 
                         isClose = true;
 
@@ -711,6 +721,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         FLUSH,
         DONE,
         EXCEPTION,
+        CLOSE,
         ABORT
     }
 

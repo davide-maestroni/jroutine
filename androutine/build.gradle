@@ -69,8 +69,6 @@ android.libraryVariants.all { variant ->
 
     if (buildTypeName.equals(BuilderConstants.DEBUG)) {
 
-        print variant
-
         task("findbugsMain", type: FindBugs, dependsOn: "assemble${buildTypeName.capitalize()}") {
             classes = fileTree(variant.javaCompile.destinationDir).filter {
                 !it.name.startsWith("R\$") && !it.name.equals("R.class")

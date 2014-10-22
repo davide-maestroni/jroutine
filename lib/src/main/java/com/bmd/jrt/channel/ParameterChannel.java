@@ -22,7 +22,7 @@ import javax.annotation.Nullable;
 
 /**
  * Interface defining a parameter input channel, that is the channel used to pass input data to the
- * routine.
+ * routine invocation.
  * <p/>
  * Created by davide on 9/15/14.
  *

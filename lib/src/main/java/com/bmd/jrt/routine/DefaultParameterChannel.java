@@ -400,13 +400,11 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
     /**
      * Interface defining an object managing the creation and the recycling of invocation instances.
-     * <p/>
-     * Created by davide on 9/24/14.
      *
      * @param <INPUT>  the input type.
      * @param <OUTPUT> the output type.
      */
-    public interface InvocationManager<INPUT, OUTPUT> {
+    interface InvocationManager<INPUT, OUTPUT> {
 
         /**
          * Creates and returns a new invocation instance.

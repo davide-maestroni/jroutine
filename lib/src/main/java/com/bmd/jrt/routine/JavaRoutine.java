@@ -39,8 +39,8 @@ import javax.annotation.Nonnull;
  * apply the framework functionalities to objects defined by third party libraries which are not
  * under direct control.<br/>
  * A mirror interface adds the possibility to override input and output parameters with output
- * channels, so that data are transferred asynchronously avoiding the need to block waiting for
- * them to be available.<br/>
+ * channels, so that data are transferred asynchronously avoiding the need to block execution,
+ * waiting for them to be available.<br/>
  * <p/>
  * Created by davide on 9/7/14.
  *

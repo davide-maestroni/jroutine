@@ -60,8 +60,11 @@ dependencies {
 task("jacocoTest", dependsOn: 'connectedCheck') {
     description = "Runs the tests and generates the JaCoCo report files."
 } << {
+    //TODO: reports destination dir
     tasks.createDebugCoverageReport.execute()
 }
+
+task("javadoc", dependsOn: 'javadocRelease')
 
 android.libraryVariants.all { variant ->
 

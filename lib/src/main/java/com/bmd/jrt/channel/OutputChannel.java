@@ -15,6 +15,7 @@ package com.bmd.jrt.channel;
 
 import com.bmd.jrt.time.TimeDuration;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -22,7 +23,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Interface defining an output channel, that is the channel used to read the routine output data.
+ * Interface defining an output channel, that is the channel used to read the routine invocation
+ * output data.
  * <p/>
  * Created by davide on 9/4/14.
  *
@@ -104,6 +106,15 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
     public OutputChannel<OUTPUT> immediately();
 
     /**
+     * Checks if the routine is complete waiting at the maximum for the set timeout.
+     * <p/>
+     * By default the timeout is set to a few seconds to avoid unexpected deadlocks.
+     *
+     * @return whether the routine execution has complete.
+     */
+    public boolean isComplete();
+
+    /**
      * Reads all the results by waiting for the routine to complete at the maximum for the set
      * timeout.
      *
@@ -119,11 +130,11 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
 
     /**
      * Reads all the results by waiting for the routine to complete at the maximum for the set
-     * timeout, and put them into the specified list.
+     * timeout, and put them into the specified collection.
      *
-     * @param results the list to fill.
+     * @param results the collection to fill.
      * @return this channel.
-     * @throws NullPointerException                if the specified list is null.
+     * @throws NullPointerException                if the specified collection is null.
      * @throws IllegalStateException               if this channel is already bound to a consumer.
      * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
      *                                             exception.
@@ -131,7 +142,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
      */
     @Nonnull
-    public OutputChannel<OUTPUT> readAllInto(@Nonnull List<? super OUTPUT> results);
+    public OutputChannel<OUTPUT> readAllInto(@Nonnull Collection<? super OUTPUT> results);
 
     /**
      * Reads the first available result by waiting at the maximum for the set timeout.
@@ -144,13 +155,4 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
      */
     public OUTPUT readFirst();
-
-    /**
-     * Waits for the routine to complete at the maximum for the set timeout.
-     * <p/>
-     * By default the timeout is set to a few seconds to avoid unexpected deadlocks.
-     *
-     * @return whether the routine execution has complete.
-     */
-    public boolean waitComplete();
 }

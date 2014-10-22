@@ -16,7 +16,7 @@ package com.bmd.jrt.channel;
 import javax.annotation.Nullable;
 
 /**
- * Interface defining an output consumer which can be bound to an output channel.
+ * Interface defining an output consumer that can be bound to an output channel.
  * <p/>
  * Created by davide on 9/7/14.
  *

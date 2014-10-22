@@ -52,14 +52,13 @@ import static com.bmd.jrt.time.TimeDuration.seconds;
  * Additionally, a recycling mechanism is provided so that, when an invocation successfully
  * completes, the instance is retained for future executions. Moreover, the maximum running
  * invocation instances at one time can be limited by calling the specific builder method. When the
- * limit is reached and an additional instance is needed, the call is blocked until one become
+ * limit is reached and an additional instance is requires, the call is blocked until one becomes
  * available or the timeout set through the builder elapses.<br/>
  * By default the timeout is set to a few seconds to avoid unexpected deadlocks.<br/>
  * In case the timeout elapses before an invocation instance becomes available, a
  * {@link RoutineNotAvailableException} will be thrown.
  * <p/>
- * Finally, by default the order of input and output data is not guaranteed unless delay is set to
- * 0 and the sources are synchronous, that is, no output channel is passed. Nevertheless, it is
+ * Finally, by default the order of input and output data is not guaranteed. Nevertheless, it is
  * possible to force data to be delivered in insertion order, at the cost of a slightly increased
  * memory usage and computation, by calling the proper methods.
  * <p/>
@@ -67,7 +66,7 @@ import static com.bmd.jrt.time.TimeDuration.seconds;
  *
  * @param <INPUT>  the input type.
  * @param <OUTPUT> the output type.
- * @see com.bmd.jrt.runner.Runner
+ * @see Runner
  */
 public class RoutineBuilder<INPUT, OUTPUT> {
 

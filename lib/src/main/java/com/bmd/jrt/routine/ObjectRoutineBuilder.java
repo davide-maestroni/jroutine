@@ -72,7 +72,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     }
 
     /**
-     * Returns a proxy object enable the asynchronous call of the target instance methods.
+     * Returns a proxy object enabling the asynchronous call of the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
      * optional {@link Async} annotation. If no name is assigned the one of the interface method

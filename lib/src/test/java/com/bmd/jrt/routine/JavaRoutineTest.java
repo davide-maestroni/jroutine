@@ -89,8 +89,8 @@ public class JavaRoutineTest extends TestCase {
         OutputChannel<Object> getOne = builder.method("getOne").runAsync();
         OutputChannel<Object> getTwo = builder.method("getTwo").runAsync();
 
-        assertThat(getOne.waitComplete()).isTrue();
-        assertThat(getTwo.waitComplete()).isTrue();
+        assertThat(getOne.isComplete()).isTrue();
+        assertThat(getTwo.isComplete()).isTrue();
         assertThat(System.currentTimeMillis() - startTime).isLessThan(1000);
 
         startTime = System.currentTimeMillis();
@@ -98,8 +98,8 @@ public class JavaRoutineTest extends TestCase {
         getOne = builder.parallelId("test").method("getOne").runAsync();
         getTwo = builder.parallelId("test").method("getTwo").runAsync();
 
-        assertThat(getOne.waitComplete()).isTrue();
-        assertThat(getTwo.waitComplete()).isTrue();
+        assertThat(getOne.isComplete()).isTrue();
+        assertThat(getTwo.isComplete()).isTrue();
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
     }
 
@@ -233,8 +233,8 @@ public class JavaRoutineTest extends TestCase {
         OutputChannel<Object> getOne = builder.method("getOne").runAsync();
         OutputChannel<Object> getTwo = builder.method("getTwo").runAsync();
 
-        assertThat(getOne.waitComplete()).isTrue();
-        assertThat(getTwo.waitComplete()).isTrue();
+        assertThat(getOne.isComplete()).isTrue();
+        assertThat(getTwo.isComplete()).isTrue();
         assertThat(System.currentTimeMillis() - startTime).isLessThan(1000);
 
         startTime = System.currentTimeMillis();
@@ -242,8 +242,8 @@ public class JavaRoutineTest extends TestCase {
         getOne = builder.parallelId("test").method("getOne").runAsync();
         getTwo = builder.parallelId("test").method("getTwo").runAsync();
 
-        assertThat(getOne.waitComplete()).isTrue();
-        assertThat(getTwo.waitComplete()).isTrue();
+        assertThat(getOne.isComplete()).isTrue();
+        assertThat(getTwo.isComplete()).isTrue();
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
     }
 

@@ -13,7 +13,7 @@
  */
 
 /**
- * Time related helper classes.
+ * Routine helper classes and exception definitions.
  * <p/>
  * Created by davide on 9/25/14.
  */

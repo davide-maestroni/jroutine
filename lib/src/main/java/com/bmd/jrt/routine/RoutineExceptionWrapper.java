@@ -19,7 +19,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Helper class handling routine exceptions to be transferred through the routine channels.
+ * Helper class handling routine exceptions so that they can be transferred through the routine
+ * channels.
  * <p/>
  * Created by davide on 9/8/14.
  */

@@ -73,7 +73,7 @@ import javax.annotation.Nullable;
  * relative output results.
  * <p/>
  * It is worth noting how the framework has been designed only through interfaces, so that,
- * as far as the implementation respect the specific contracts, it is possible to seamlessly
+ * as far as the implementation respects the specific contracts, it is possible to seamlessly
  * combine different routine implementations. Even the ones coming from third party libraries.
  * <p/>
  * Some usage examples:

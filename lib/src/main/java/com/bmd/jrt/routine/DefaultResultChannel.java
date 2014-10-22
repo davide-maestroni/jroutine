@@ -25,6 +25,7 @@ import com.bmd.jrt.time.TimeDuration.Check;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -331,7 +332,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             mOutputQueue.add(RoutineExceptionWrapper.wrap(throwable));
 
             mAbortException = throwable;
-            mState = ChannelState.ABORT;
+            mState = ChannelState.ABORTED;
             mMutex.notifyAll();
         }
 
@@ -448,7 +449,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             synchronized (mMutex) {
 
-                if ((mState == ChannelState.FLUSH) || (mState == ChannelState.ABORT)) {
+                if ((mState == ChannelState.FLUSH) || (mState == ChannelState.ABORTED)) {
 
                     mState = ChannelState.DONE;
 
@@ -481,7 +482,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                         logger.dbg("avoiding flushing output since channel is not bound");
 
-                        if ((mState == ChannelState.FLUSH) || (mState == ChannelState.ABORT)) {
+                        if ((mState == ChannelState.FLUSH) || (mState == ChannelState.ABORTED)) {
 
                             mState = ChannelState.DONE;
                         }
@@ -527,7 +528,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                     }
                 }
 
-                if ((state == ChannelState.FLUSH) || (state == ChannelState.ABORT)) {
+                if ((state == ChannelState.FLUSH) || (state == ChannelState.ABORTED)) {
 
                     closeConsumer();
                 }
@@ -544,7 +545,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                     logger.wrn(t, "consumer exception (%s)", mOutputConsumer);
 
-                    if ((mState == ChannelState.FLUSH) || (mState == ChannelState.ABORT)) {
+                    if ((mState == ChannelState.FLUSH) || (mState == ChannelState.ABORTED)) {
 
                         isClose = true;
 
@@ -699,7 +700,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         RESULT,     // result channel is closed
         FLUSH,      // no more pending outputs
         EXCEPTION,  // abort issued
-        ABORT,      // invocation aborted
+        ABORTED,    // invocation aborted
         DONE        // output is closed
     }
 
@@ -933,6 +934,43 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         }
 
         @Override
+        public boolean isComplete() {
+
+            boolean isDone = false;
+
+            synchronized (mMutex) {
+
+                final TimeDuration timeout = mOutputTimeout;
+                final RuntimeException timeoutException = mOutputTimeoutException;
+
+                try {
+
+                    isDone = timeout.waitTrue(mMutex, new Check() {
+
+                        @Override
+                        public boolean isTrue() {
+
+                            return (mState == ChannelState.DONE);
+                        }
+                    });
+
+                } catch (final InterruptedException e) {
+
+                    RoutineInterruptedException.interrupt(e);
+                }
+
+                if (!isDone && (timeoutException != null)) {
+
+                    mSubLogger.wrn("waiting complete timeout: %s [%s]", timeoutException, timeout);
+
+                    throw timeoutException;
+                }
+            }
+
+            return isDone;
+        }
+
+        @Override
         @Nonnull
         public List<OUTPUT> readAll() {
 
@@ -945,7 +983,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         @Override
         @Nonnull
         @SuppressWarnings({"unchecked", "ConstantConditions"})
-        public OutputChannel<OUTPUT> readAllInto(@Nonnull final List<? super OUTPUT> results) {
+        public OutputChannel<OUTPUT> readAllInto(
+                @Nonnull final Collection<? super OUTPUT> results) {
 
             synchronized (mMutex) {
 
@@ -1029,43 +1068,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         public OUTPUT readFirst() {
 
             return readQueue(mOutputTimeout, mOutputTimeoutException);
-        }
-
-        @Override
-        public boolean waitComplete() {
-
-            boolean isDone = false;
-
-            synchronized (mMutex) {
-
-                final TimeDuration timeout = mOutputTimeout;
-                final RuntimeException timeoutException = mOutputTimeoutException;
-
-                try {
-
-                    isDone = timeout.waitTrue(mMutex, new Check() {
-
-                        @Override
-                        public boolean isTrue() {
-
-                            return (mState == ChannelState.DONE);
-                        }
-                    });
-
-                } catch (final InterruptedException e) {
-
-                    RoutineInterruptedException.interrupt(e);
-                }
-
-                if (!isDone && (timeoutException != null)) {
-
-                    mSubLogger.wrn("waiting complete timeout: %s [%s]", timeoutException, timeout);
-
-                    throw timeoutException;
-                }
-            }
-
-            return isDone;
         }
 
         @Override

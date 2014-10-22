@@ -155,7 +155,7 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
      *
      * @param <INPUT>the input type.
      */
-    public interface InputIterator<INPUT> {
+    interface InputIterator<INPUT> {
 
         /**
          * Returns the exception identifying the abortion reason.

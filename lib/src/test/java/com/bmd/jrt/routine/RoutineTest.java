@@ -1347,7 +1347,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            channel.waitComplete();
+            channel.isComplete();
 
             fail();
 
@@ -1815,17 +1815,17 @@ public class RoutineTest extends TestCase {
         final Routine<String, String> routine =
                 on(tokenOf(DelayedInvocation.class)).withArgs(TimeDuration.ZERO).buildRoutine();
 
-        assertThat(routine.run(input).bind(consumer).waitComplete()).isTrue();
-        assertThat(routine.runAsync(input).bind(consumer).waitComplete()).isTrue();
-        assertThat(routine.runParallel(input).bind(consumer).waitComplete()).isTrue();
-        assertThat(routine.invoke().pass(input).results().bind(consumer).waitComplete()).isTrue();
+        assertThat(routine.run(input).bind(consumer).isComplete()).isTrue();
+        assertThat(routine.runAsync(input).bind(consumer).isComplete()).isTrue();
+        assertThat(routine.runParallel(input).bind(consumer).isComplete()).isTrue();
+        assertThat(routine.invoke().pass(input).results().bind(consumer).isComplete()).isTrue();
         assertThat(
-                routine.invokeAsync().pass(input).results().bind(consumer).waitComplete()).isTrue();
+                routine.invokeAsync().pass(input).results().bind(consumer).isComplete()).isTrue();
         assertThat(routine.invokeParallel()
                           .pass(input)
                           .results()
                           .bind(consumer)
-                          .waitComplete()).isTrue();
+                          .isComplete()).isTrue();
     }
 
     private void testException(final Routine<String, String> routine, final String input,

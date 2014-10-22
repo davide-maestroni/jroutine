@@ -36,7 +36,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * Basic abstract implementation of a routine.
  * <p/>
  * This class provides implementations for all the routine functionalities. The inheriting class
- * just need to provide invocation objects when required.
+ * just need to creates invocation objects when required.
  * <p/>
  * Created by davide on 9/7/14.
  *

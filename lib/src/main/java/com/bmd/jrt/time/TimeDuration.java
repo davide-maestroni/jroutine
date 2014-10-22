@@ -34,7 +34,7 @@ public class TimeDuration extends Time {
     /**
      * Time duration instance representing the zero.
      */
-    public static final TimeDuration ZERO = fromUnit(0, TimeUnit.MILLISECONDS);
+    public static final TimeDuration ZERO = seconds(0);
 
     private static final long MILLI_DAYS_OVERFLOW = 106751991167L;
 

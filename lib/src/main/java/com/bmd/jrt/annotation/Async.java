@@ -24,7 +24,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation is used to indicate methods which can be invoked in an asynchronous way.
+ * This annotation is used to indicate methods that are to be invoked in an asynchronous way.
  * <p/>
  * Note that the piece of code inside such methods will be automatically protected so to avoid
  * concurrency issues. Though, other parts of the code inside the same class will be not.<br/>
@@ -32,7 +32,7 @@ import java.lang.annotation.Target;
  * (unless immutable) in protected and non-protected code, or to use the framework to call
  * synchronous methods as well.<br/>
  * In a dual way, it is possible to exclude single methods from this kind of protection by
- * indicating them as belonging to parallel groups. Each group has a name associated,
+ * indicating them as belonging to parallel groups. Each group has an ID associated,
  * and every method inside a specific group is protected only from the other methods belonging to
  * the same group.
  * <p/>
@@ -77,7 +77,7 @@ import java.lang.annotation.Target;
  * security exception might be raised based on the specific policy implemented.
  * <p/>
  * Remember also that, in order for the annotation to properly work at run time, you will need to
- * add the proper rules to your Proguard file if employing it for shrinking or obfuscation:
+ * add the following rules to your Proguard file (if employing it for shrinking or obfuscation):
  * <pre>
  *     <code>
  *

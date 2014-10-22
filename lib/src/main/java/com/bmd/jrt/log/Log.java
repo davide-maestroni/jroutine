@@ -31,7 +31,7 @@ import javax.annotation.Nullable;
  * <p/>
  * To avoid an excessive number of log messages it is sufficient to set an higher log level.
  * Though, it is also possible to completely remove the log source code (and related strings) from
- * the released code, by using Proguard and adding, for example, the following rule to the
+ * the released code by using Proguard and adding, for example, the following rule to the
  * configuration file:
  * <pre>
  *     <code>
@@ -85,7 +85,7 @@ public interface Log {
 
         /**
          * The most verbose log level.<br/>
-         * Debug logs are meant to describe in detail what's happening in the routine.
+         * Debug logs are meant to describe in detail what's happening inside the routine.
          */
         DEBUG,
         /**

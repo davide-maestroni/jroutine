@@ -88,9 +88,9 @@ class ReflectionUtils {
      * Note that clashing of signature is automatically avoided, since constructors are not
      * identified by their name. Hence the best match will be always unique in the class.
      *
-     * @param type     the target class.
-     * @param ctorArgs the constructor arguments.
-     * @param <TYPE>   the target type.
+     * @param type   the target class.
+     * @param args   the constructor arguments.
+     * @param <TYPE> the target type.
      * @return the best matching constructor.
      * @throws IllegalArgumentException if no constructor taking the specified object as parameters
      *                                  was found.
@@ -98,13 +98,13 @@ class ReflectionUtils {
     @Nonnull
     @SuppressWarnings("unchecked")
     public static <TYPE> Constructor<TYPE> findConstructor(@Nonnull final Class<TYPE> type,
-            @Nonnull final Object... ctorArgs) {
+            @Nonnull final Object... args) {
 
-        Constructor<?> constructor = findBestMatchingConstructor(type.getConstructors(), ctorArgs);
+        Constructor<?> constructor = findBestMatchingConstructor(type.getConstructors(), args);
 
         if (constructor == null) {
 
-            constructor = findBestMatchingConstructor(type.getDeclaredConstructors(), ctorArgs);
+            constructor = findBestMatchingConstructor(type.getDeclaredConstructors(), args);
 
             if (constructor == null) {
 

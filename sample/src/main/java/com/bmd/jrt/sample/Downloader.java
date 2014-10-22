@@ -87,7 +87,7 @@ public class Downloader {
 
         final OutputChannel<Boolean> channel = mDownloadMap.remove(uri);
 
-        return (channel != null) && channel.abort() && channel.afterMax(timeout).waitComplete();
+        return (channel != null) && channel.abort() && channel.afterMax(timeout).isComplete();
     }
 
     public void download(final URI uri, final File dstFile) {
@@ -124,7 +124,7 @@ public class Downloader {
 
             try {
 
-                if (channel.afterMax(timeout).waitComplete() && channel.readFirst()) {
+                if (channel.afterMax(timeout).isComplete() && channel.readFirst()) {
 
                     downloadMap.remove(uri);
 

@@ -334,6 +334,7 @@ public class ClassRoutineBuilder {
      *
      * @param id the parallel group ID.
      * @return this builder.
+     * @see Async
      */
     @Nonnull
     public ClassRoutineBuilder parallelId(@Nullable final String id) {

@@ -32,7 +32,7 @@ import java.lang.annotation.Target;
  * </pre>
  * <p/>
  * Remember also that, in order for the annotation to properly work at run time, you will need to
- * add the proper rules to your Proguard file if employing it for shrinking or obfuscation:
+ * add the following rules to your Proguard file (if employing it for shrinking or obfuscation):
  * <pre>
  *     <code>
  *

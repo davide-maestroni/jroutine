@@ -52,7 +52,7 @@ public class RunnerTest extends TestCase {
 
         try {
 
-            Runners.scheduled(null);
+            Runners.scheduledRunner(null);
 
             fail();
 
@@ -72,7 +72,7 @@ public class RunnerTest extends TestCase {
 
         try {
 
-            Runners.pool(-1);
+            Runners.poolRunner(-1);
 
             fail();
 
@@ -94,22 +94,22 @@ public class RunnerTest extends TestCase {
     public void testPoolRunner() throws InterruptedException {
 
         testRunner(new ThreadPoolRunner(4));
-        testRunner(Runners.pool(3));
-        testRunner(Runners.shared());
+        testRunner(Runners.poolRunner(3));
+        testRunner(Runners.sharedRunner());
         testRunner(new RunnerDecorator(new ThreadPoolRunner(4)));
     }
 
     public void testQueuedRunner() throws InterruptedException {
 
         testRunner(new QueuedRunner());
-        testRunner(Runners.queued());
+        testRunner(Runners.queuedRunner());
         testRunner(new RunnerDecorator(new QueuedRunner()));
     }
 
     public void testScheduledRunner() throws InterruptedException {
 
         testRunner(new ScheduledRunner(Executors.newSingleThreadScheduledExecutor()));
-        testRunner(Runners.scheduled(Executors.newSingleThreadScheduledExecutor()));
+        testRunner(Runners.scheduledRunner(Executors.newSingleThreadScheduledExecutor()));
         testRunner(new RunnerDecorator(
                 new ScheduledRunner(Executors.newSingleThreadScheduledExecutor())));
     }
@@ -117,7 +117,7 @@ public class RunnerTest extends TestCase {
     public void testSequentialRunner() throws InterruptedException {
 
         testRunner(new SequentialRunner());
-        testRunner(Runners.sequential());
+        testRunner(Runners.sequentialRunner());
         testRunner(new RunnerDecorator(new SequentialRunner()));
     }
 

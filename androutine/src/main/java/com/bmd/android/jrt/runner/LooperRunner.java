@@ -48,7 +48,7 @@ class LooperRunner implements Runner {
 
         mThread = looper.getThread();
         mHandler = new Handler(looper);
-        mQueuedRunner = Runners.queued();
+        mQueuedRunner = Runners.queuedRunner();
     }
 
     @Override

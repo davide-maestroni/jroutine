@@ -27,6 +27,6 @@ public class MainRunner extends RunnerDecorator {
      */
     public MainRunner() {
 
-        super(AndroidRunners.main());
+        super(AndroidRunners.mainRunner());
     }
 }

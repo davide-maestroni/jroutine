@@ -47,7 +47,7 @@ public class AndroidRunners {
      * @throws IllegalArgumentException if the specified looper is null.
      */
     @Nonnull
-    public static Runner looper(@Nonnull final Looper looper) {
+    public static Runner looperRunner(@Nonnull final Looper looper) {
 
         return new LooperRunner(looper);
     }
@@ -58,11 +58,11 @@ public class AndroidRunners {
      * @return the runner instance.
      */
     @Nonnull
-    public static Runner main() {
+    public static Runner mainRunner() {
 
         if (sMainRunner == null) {
 
-            sMainRunner = looper(Looper.getMainLooper());
+            sMainRunner = looperRunner(Looper.getMainLooper());
         }
 
         return sMainRunner;
@@ -74,9 +74,9 @@ public class AndroidRunners {
      * @return the runner instance.
      */
     @Nonnull
-    public static Runner my() {
+    public static Runner myRunner() {
 
-        return looper(Looper.myLooper());
+        return looperRunner(Looper.myLooper());
     }
 
     /**
@@ -89,9 +89,9 @@ public class AndroidRunners {
      * @return the runner instance.
      */
     @Nonnull
-    public static Runner task() {
+    public static Runner taskRunner() {
 
-        return task(null);
+        return taskRunner(null);
     }
 
     /**
@@ -107,7 +107,7 @@ public class AndroidRunners {
      * @return the runner instance.
      */
     @Nonnull
-    public static Runner task(@Nullable final Executor executor) {
+    public static Runner taskRunner(@Nullable final Executor executor) {
 
         return new AsyncTaskRunner(executor);
     }
@@ -120,13 +120,13 @@ public class AndroidRunners {
      * @throws NullPointerException if the specified thread is null.
      */
     @Nonnull
-    public static Runner thread(@Nonnull final HandlerThread thread) {
+    public static Runner threadRunner(@Nonnull final HandlerThread thread) {
 
         if (!thread.isAlive()) {
 
             thread.start();
         }
 
-        return looper(thread.getLooper());
+        return looperRunner(thread.getLooper());
     }
 }

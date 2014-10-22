@@ -75,7 +75,7 @@ public class RoutineBuilder<INPUT, OUTPUT> {
 
     private Object[] mArgs = NO_ARGS;
 
-    private Runner mAsyncRunner = Runners.pool();
+    private Runner mAsyncRunner = Runners.poolRunner();
 
     private TimeDuration mAvailTimeout = seconds(5);
 
@@ -91,7 +91,7 @@ public class RoutineBuilder<INPUT, OUTPUT> {
 
     private boolean mOrderedOutput;
 
-    private Runner mSyncRunner = Runners.queued();
+    private Runner mSyncRunner = Runners.queuedRunner();
 
     /**
      * Constructor.
@@ -278,7 +278,7 @@ public class RoutineBuilder<INPUT, OUTPUT> {
     @Nonnull
     public RoutineBuilder<INPUT, OUTPUT> queued() {
 
-        mSyncRunner = Runners.queued();
+        mSyncRunner = Runners.queuedRunner();
 
         return this;
     }
@@ -314,7 +314,7 @@ public class RoutineBuilder<INPUT, OUTPUT> {
     @Nonnull
     public RoutineBuilder<INPUT, OUTPUT> sequential() {
 
-        mSyncRunner = Runners.sequential();
+        mSyncRunner = Runners.sequentialRunner();
 
         return this;
     }

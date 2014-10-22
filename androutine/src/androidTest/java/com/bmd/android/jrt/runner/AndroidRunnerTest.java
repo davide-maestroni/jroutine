@@ -59,10 +59,10 @@ public class AndroidRunnerTest extends AndroidTestCase {
     public void testLooperRunner() throws InterruptedException {
 
         testRunner(new LooperRunner(Looper.myLooper()));
-        testRunner(AndroidRunners.main());
-        testRunner(AndroidRunners.my());
-        testRunner(AndroidRunners.thread(new HandlerThread("test")));
-        testRunner(new RunnerDecorator(AndroidRunners.main()));
+        testRunner(AndroidRunners.mainRunner());
+        testRunner(AndroidRunners.myRunner());
+        testRunner(AndroidRunners.threadRunner(new HandlerThread("test")));
+        testRunner(new RunnerDecorator(AndroidRunners.mainRunner()));
     }
 
     public void testMainRunner() throws InterruptedException {
@@ -73,9 +73,10 @@ public class AndroidRunnerTest extends AndroidTestCase {
     public void testTaskRunner() throws InterruptedException {
 
         testRunner(new AsyncTaskRunner(null));
-        testRunner(AndroidRunners.task());
-        testRunner(AndroidRunners.task(Executors.newCachedThreadPool()));
-        testRunner(new RunnerDecorator(AndroidRunners.task(Executors.newSingleThreadExecutor())));
+        testRunner(AndroidRunners.taskRunner());
+        testRunner(AndroidRunners.taskRunner(Executors.newCachedThreadPool()));
+        testRunner(new RunnerDecorator(
+                AndroidRunners.taskRunner(Executors.newSingleThreadExecutor())));
     }
 
     private void testRunner(final Runner runner) throws InterruptedException {

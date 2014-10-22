@@ -45,21 +45,23 @@ public class JavaRoutineTest extends TestCase {
 
         final Routine<Object, Object> routine = JavaRoutine.on(TestStatic.class)
                                                            .sequential()
-                                                           .runBy(Runners.pool())
+                                                           .runBy(Runners.poolRunner())
                                                            .logLevel(LogLevel.DEBUG)
                                                            .loggedWith(new NullLog())
                                                            .asyncMethod(TestStatic.NAME);
 
         assertThat(routine.call()).containsExactly(-77L);
 
-        final Routine<Object, Object> routine1 =
-                JavaRoutine.on(TestStatic.class).queued().runBy(Runners.pool()).method("getLong");
+        final Routine<Object, Object> routine1 = JavaRoutine.on(TestStatic.class)
+                                                            .queued()
+                                                            .runBy(Runners.poolRunner())
+                                                            .method("getLong");
 
         assertThat(routine1.call()).containsExactly(-77L);
 
         final Routine<Object, Object> routine2 = JavaRoutine.on(TestStatic.class)
                                                             .queued()
-                                                            .runBy(Runners.pool())
+                                                            .runBy(Runners.poolRunner())
                                                             .parallelId("test")
                                                             .method(TestStatic.class.getMethod(
                                                                     "getLong"));
@@ -189,7 +191,7 @@ public class JavaRoutineTest extends TestCase {
 
         final Routine<Object, Object> routine = JavaRoutine.on(new Test())
                                                            .sequential()
-                                                           .runBy(Runners.pool())
+                                                           .runBy(Runners.poolRunner())
                                                            .logLevel(LogLevel.DEBUG)
                                                            .loggedWith(new NullLog())
                                                            .asyncMethod(Test.NAME);
@@ -197,13 +199,13 @@ public class JavaRoutineTest extends TestCase {
         assertThat(routine.call()).containsExactly(-77L);
 
         final Routine<Object, Object> routine1 =
-                JavaRoutine.on(new Test()).queued().runBy(Runners.pool()).method("getLong");
+                JavaRoutine.on(new Test()).queued().runBy(Runners.poolRunner()).method("getLong");
 
         assertThat(routine1.call()).containsExactly(-77L);
 
         final Routine<Object, Object> routine2 = JavaRoutine.on(new Test())
                                                             .queued()
-                                                            .runBy(Runners.pool())
+                                                            .runBy(Runners.poolRunner())
                                                             .parallelId("test")
                                                             .method(Test.class.getMethod(
                                                                     "getLong"));
@@ -394,7 +396,7 @@ public class JavaRoutineTest extends TestCase {
         final Routine<String, String> routine =
                 JavaRoutine.on(ClassToken.tokenOf(PassThroughInvocation.class))
                            .sequential()
-                           .runBy(Runners.pool())
+                           .runBy(Runners.poolRunner())
                            .maxRetained(0)
                            .maxRunning(1)
                            .availableTimeout(1, TimeUnit.SECONDS)
@@ -405,7 +407,7 @@ public class JavaRoutineTest extends TestCase {
         final Routine<String, String> routine1 =
                 JavaRoutine.on(ClassToken.tokenOf(PassThroughInvocation.class))
                            .queued()
-                           .runBy(Runners.pool())
+                           .runBy(Runners.poolRunner())
                            .maxRetained(0)
                            .maxRunning(1)
                            .availableTimeout(TimeDuration.ZERO)
@@ -556,7 +558,7 @@ public class JavaRoutineTest extends TestCase {
 
         public MyRunner() {
 
-            super(Runners.queued());
+            super(Runners.queuedRunner());
         }
     }
 

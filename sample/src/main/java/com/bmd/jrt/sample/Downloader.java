@@ -46,7 +46,7 @@ public class Downloader {
     public Downloader(final int maxParallelDownloads) {
 
         mReadConnection = JavaRoutine.on(tokenOf(ReadConnection.class))
-                                     .runBy(Runners.pool(maxParallelDownloads))
+                                     .runBy(Runners.poolRunner(maxParallelDownloads))
                                      .buildRoutine();
     }
 

@@ -667,87 +667,89 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            new AbstractRoutine<Object, Object>(null, Runners.shared(), 1, 1, TimeDuration.ZERO,
-                                                false, false, Logger.getDefaultLog(),
-                                                Logger.getDefaultLogLevel()) {
-
-                @Override
-                @Nonnull
-                protected Invocation<Object, Object> createInvocation(final boolean async) {
-
-                    return new ConstructorException();
-                }
-            };
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            new AbstractRoutine<Object, Object>(Runners.queued(), null, 1, 1, TimeDuration.ZERO,
-                                                false, false, Logger.getDefaultLog(),
-                                                Logger.getDefaultLogLevel()) {
-
-                @Override
-                @Nonnull
-                protected Invocation<Object, Object> createInvocation(final boolean async) {
-
-                    return new ConstructorException();
-                }
-            };
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            new AbstractRoutine<Object, Object>(Runners.queued(), Runners.shared(), 1, 1, null,
-                                                false, false, Logger.getDefaultLog(),
-                                                Logger.getDefaultLogLevel()) {
-
-                @Override
-                @Nonnull
-                protected Invocation<Object, Object> createInvocation(final boolean async) {
-
-                    return new ConstructorException();
-                }
-            };
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            new AbstractRoutine<Object, Object>(Runners.queued(), Runners.shared(), 1, 0,
-                                                TimeDuration.ZERO, false, false, null, null) {
-
-                @Override
-                @Nonnull
-                protected Invocation<Object, Object> createInvocation(final boolean async) {
-
-                    return new ConstructorException();
-                }
-            };
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            new AbstractRoutine<Object, Object>(Runners.queued(), Runners.shared(), 0, 1,
+            new AbstractRoutine<Object, Object>(null, Runners.sharedRunner(), 1, 1,
                                                 TimeDuration.ZERO, false, false,
+                                                Logger.getDefaultLog(),
+                                                Logger.getDefaultLogLevel()) {
+
+                @Override
+                @Nonnull
+                protected Invocation<Object, Object> createInvocation(final boolean async) {
+
+                    return new ConstructorException();
+                }
+            };
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new AbstractRoutine<Object, Object>(Runners.queuedRunner(), null, 1, 1,
+                                                TimeDuration.ZERO, false, false,
+                                                Logger.getDefaultLog(),
+                                                Logger.getDefaultLogLevel()) {
+
+                @Override
+                @Nonnull
+                protected Invocation<Object, Object> createInvocation(final boolean async) {
+
+                    return new ConstructorException();
+                }
+            };
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new AbstractRoutine<Object, Object>(Runners.queuedRunner(), Runners.sharedRunner(), 1,
+                                                1, null, false, false, Logger.getDefaultLog(),
+                                                Logger.getDefaultLogLevel()) {
+
+                @Override
+                @Nonnull
+                protected Invocation<Object, Object> createInvocation(final boolean async) {
+
+                    return new ConstructorException();
+                }
+            };
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new AbstractRoutine<Object, Object>(Runners.queuedRunner(), Runners.sharedRunner(), 1,
+                                                0, TimeDuration.ZERO, false, false, null, null) {
+
+                @Override
+                @Nonnull
+                protected Invocation<Object, Object> createInvocation(final boolean async) {
+
+                    return new ConstructorException();
+                }
+            };
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new AbstractRoutine<Object, Object>(Runners.queuedRunner(), Runners.sharedRunner(), 0,
+                                                1, TimeDuration.ZERO, false, false,
                                                 Logger.getDefaultLog(),
                                                 Logger.getDefaultLogLevel()) {
 
@@ -767,8 +769,8 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            new AbstractRoutine<Object, Object>(Runners.queued(), Runners.shared(), 1, -1,
-                                                TimeDuration.ZERO, false, false,
+            new AbstractRoutine<Object, Object>(Runners.queuedRunner(), Runners.sharedRunner(), 1,
+                                                -1, TimeDuration.ZERO, false, false,
                                                 Logger.getDefaultLog(),
                                                 Logger.getDefaultLogLevel()) {
 
@@ -794,7 +796,7 @@ public class RoutineTest extends TestCase {
             new DefaultExecution<Object, Object>(null, new TestInputIterator(),
                                                  new DefaultResultChannel<Object>(
                                                          new TestAbortHandler(),
-                                                         Runners.sequential(), false, logger),
+                                                         Runners.sequentialRunner(), false, logger),
                                                  logger);
 
             fail();
@@ -808,7 +810,7 @@ public class RoutineTest extends TestCase {
             new DefaultExecution<Object, Object>(new TestInvocationManager(), null,
                                                  new DefaultResultChannel<Object>(
                                                          new TestAbortHandler(),
-                                                         Runners.sequential(), false, logger),
+                                                         Runners.sequentialRunner(), false, logger),
                                                  logger);
 
             fail();
@@ -834,7 +836,7 @@ public class RoutineTest extends TestCase {
                                                  new TestInputIterator(),
                                                  new DefaultResultChannel<Object>(
                                                          new TestAbortHandler(),
-                                                         Runners.sequential(), false, logger),
+                                                         Runners.sequentialRunner(), false, logger),
                                                  null);
 
             fail();
@@ -1022,7 +1024,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            new DefaultParameterChannel<Object, Object>(null, Runners.shared(), false, false,
+            new DefaultParameterChannel<Object, Object>(null, Runners.sharedRunner(), false, false,
                                                         Logger.create(new NullLog(),
                                                                       LogLevel.DEBUG));
 
@@ -1047,7 +1049,7 @@ public class RoutineTest extends TestCase {
         try {
 
             new DefaultParameterChannel<Object, Object>(new TestInvocationManager(),
-                                                        Runners.shared(), false, false, null);
+                                                        Runners.sharedRunner(), false, false, null);
 
             fail();
 
@@ -1059,9 +1061,9 @@ public class RoutineTest extends TestCase {
 
             final DefaultParameterChannel<Object, Object> channel =
                     new DefaultParameterChannel<Object, Object>(new TestInvocationManager(),
-                                                                Runners.shared(), false, false,
-                                                                Logger.create(new NullLog(),
-                                                                              LogLevel.DEBUG));
+                                                                Runners.sharedRunner(), false,
+                                                                false, Logger.create(new NullLog(),
+                                                                                     LogLevel.DEBUG));
 
             channel.results();
             channel.pass("test");
@@ -1078,7 +1080,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            new DefaultResultChannel<Object>(null, Runners.shared(), false,
+            new DefaultResultChannel<Object>(null, Runners.sharedRunner(), false,
                                              Logger.create(new NullLog(), LogLevel.DEBUG));
 
 
@@ -1098,7 +1100,8 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            new DefaultResultChannel<Object>(new TestAbortHandler(), Runners.shared(), false, null);
+            new DefaultResultChannel<Object>(new TestAbortHandler(), Runners.sharedRunner(), false,
+                                             null);
 
 
         } catch (final NullPointerException ignored) {
@@ -1107,7 +1110,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            new DefaultResultChannel<Object>(new TestAbortHandler(), Runners.shared(), false,
+            new DefaultResultChannel<Object>(new TestAbortHandler(), Runners.sharedRunner(), false,
                                              Logger.create(new NullLog(), LogLevel.DEBUG)).after(
                     null);
 
@@ -1118,7 +1121,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            new DefaultResultChannel<Object>(new TestAbortHandler(), Runners.shared(), false,
+            new DefaultResultChannel<Object>(new TestAbortHandler(), Runners.sharedRunner(), false,
                                              Logger.create(new NullLog(), LogLevel.DEBUG)).after(0,
                                                                                                  null);
 

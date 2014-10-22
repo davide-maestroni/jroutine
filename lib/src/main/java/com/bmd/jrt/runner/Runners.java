@@ -43,9 +43,9 @@ public class Runners {
      * @return the runner instance.
      */
     @Nonnull
-    public static Runner pool() {
+    public static Runner poolRunner() {
 
-        return pool(getBestPoolSize());
+        return poolRunner(getBestPoolSize());
     }
 
     /**
@@ -55,7 +55,7 @@ public class Runners {
      * @return the runner instance.
      */
     @Nonnull
-    public static Runner pool(final int poolSize) {
+    public static Runner poolRunner(final int poolSize) {
 
         return new ThreadPoolRunner(poolSize);
     }
@@ -66,7 +66,7 @@ public class Runners {
      * @return the runner instance.
      */
     @Nonnull
-    public static Runner queued() {
+    public static Runner queuedRunner() {
 
         return sQueuedRunner;
     }
@@ -78,7 +78,7 @@ public class Runners {
      * @return the runner instance.
      */
     @Nonnull
-    public static Runner scheduled(@Nonnull final ScheduledExecutorService service) {
+    public static Runner scheduledRunner(@Nonnull final ScheduledExecutorService service) {
 
         return new ScheduledRunner(service);
     }
@@ -89,7 +89,7 @@ public class Runners {
      * @return the runner instance.
      */
     @Nonnull
-    public static Runner sequential() {
+    public static Runner sequentialRunner() {
 
         return sSequentialRunner;
     }
@@ -100,11 +100,11 @@ public class Runners {
      * @return the runner instance.
      */
     @Nonnull
-    public static Runner shared() {
+    public static Runner sharedRunner() {
 
         if (sSharedRunner == null) {
 
-            sSharedRunner = pool();
+            sSharedRunner = poolRunner();
         }
 
         return sSharedRunner;

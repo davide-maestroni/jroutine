@@ -130,54 +130,57 @@ android.libraryVariants.all { variant ->
     }
 }
 
-signing {
-    sign configurations.archives
-}
+if (project.hasProperty('signing')) {
 
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+    signing {
+        sign configurations.archives
+    }
 
-            def localRepoUrl = mavenLocal().url.toString()
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
-            if (file(localRepoUrl).exists()) {
+                def localRepoUrl = mavenLocal().url.toString()
 
-                // Upload the artifacts to the local repository
-                repository(url: localRepoUrl)
-            }
+                if (file(localRepoUrl).exists()) {
 
-            if (project.hasProperty('sonatypeUsername') && project.hasProperty('sonatypePassword')) {
-
-                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                    authentication(userName: sonatypeUsername, password: sonatypePassword)
-                }
-            }
-
-            pom.project {
-                name = archivesBaseName
-                packaging = 'jar'
-                description = 'Parallel programming on the go'
-                url = 'http://davide-maestroni.github.io/jroutine/'
-
-                scm {
-                    url = 'git@github.com:davide-maestroni/robo-fashion.git'
-                    connection = 'scm:git:git@github.com:davide-maestroni/jroutine.git'
-                    developerConnection = 'scm:git:git@github.com:davide-maestroni/jroutine.git'
+                    // Upload the artifacts to the local repository
+                    repository(url: localRepoUrl)
                 }
 
-                licenses {
-                    license {
-                        name = 'The Apache Software License, Version 2.0'
-                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                        distribution = 'repo'
+                if (project.hasProperty('sonatypeUsername') && project.hasProperty('sonatypePassword')) {
+
+                    repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                        authentication(userName: sonatypeUsername, password: sonatypePassword)
                     }
                 }
 
-                developers {
-                    developer {
-                        id = 'davide-maestroni'
-                        name = 'Davide Maestroni'
+                pom.project {
+                    name = archivesBaseName
+                    packaging = 'jar'
+                    description = 'Parallel programming on the go'
+                    url = 'http://davide-maestroni.github.io/jroutine/'
+
+                    scm {
+                        url = 'git@github.com:davide-maestroni/robo-fashion.git'
+                        connection = 'scm:git:git@github.com:davide-maestroni/jroutine.git'
+                        developerConnection = 'scm:git:git@github.com:davide-maestroni/jroutine.git'
+                    }
+
+                    licenses {
+                        license {
+                            name = 'The Apache Software License, Version 2.0'
+                            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                            distribution = 'repo'
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id = 'davide-maestroni'
+                            name = 'Davide Maestroni'
+                        }
                     }
                 }
             }

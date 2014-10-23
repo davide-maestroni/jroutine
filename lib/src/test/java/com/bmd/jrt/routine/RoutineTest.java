@@ -641,6 +641,49 @@ public class RoutineTest extends TestCase {
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(100);
     }
 
+    public void testDelayedAbort() throws InterruptedException {
+
+        final Routine<String, String> passThroughRoutine = JavaRoutine.<String>on().buildRoutine();
+
+        final ParameterChannel<String, String> channel1 = passThroughRoutine.invokeAsync();
+        channel1.after(TimeDuration.seconds(2)).abort();
+        assertThat(channel1.now().pass("test").results().readFirst()).isEqualTo("test");
+
+        final ParameterChannel<String, String> channel2 = passThroughRoutine.invokeAsync();
+        channel2.after(TimeDuration.millis(100)).abort();
+
+        try {
+
+            channel2.after(TimeDuration.millis(200)).pass("test").results().readFirst();
+
+            fail();
+
+        } catch (final RoutineException ignored) {
+
+        }
+
+        final Routine<String, String> abortRoutine =
+                JavaRoutine.on(tokenOf(DelayedAbortInvocation.class))
+                           .withArgs(TimeDuration.millis(200))
+                           .buildRoutine();
+
+        assertThat(abortRoutine.runAsync("test").readFirst()).isEqualTo("test");
+
+        try {
+
+            final OutputChannel<String> channel = abortRoutine.runAsync("test");
+
+            TimeDuration.millis(500).sleepAtLeast();
+
+            channel.readFirst();
+
+            fail();
+
+        } catch (final RoutineException ignored) {
+
+        }
+    }
+
     @SuppressWarnings("ConstantConditions")
     public void testError() {
 
@@ -2029,6 +2072,22 @@ public class RoutineTest extends TestCase {
         public ConstructorException() {
 
             throw new IllegalStateException();
+        }
+    }
+
+    private static class DelayedAbortInvocation extends BasicInvocation<String, String> {
+
+        private final TimeDuration mDelay;
+
+        public DelayedAbortInvocation(final TimeDuration delay) {
+
+            mDelay = delay;
+        }
+
+        @Override
+        public void onInput(final String s, @Nonnull final ResultChannel<String> results) {
+
+            results.now().pass(s).after(mDelay).abort();
         }
     }
 

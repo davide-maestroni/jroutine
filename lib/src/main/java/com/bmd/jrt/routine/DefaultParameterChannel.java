@@ -369,6 +369,14 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
         return mResultChanel.getOutput();
     }
 
+    private boolean isInputComplete() {
+
+        synchronized (mMutex) {
+
+            return (mState == ChannelState.OUTPUT) && (mPendingInputCount <= 0);
+        }
+    }
+
     private void verifyInput() {
 
         if (mState == ChannelState.EXCEPTION) {
@@ -465,10 +473,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
         @Override
         public boolean isComplete() {
 
-            synchronized (mMutex) {
-
-                return (mState == ChannelState.OUTPUT) && (mPendingInputCount <= 0);
-            }
+            return isInputComplete();
         }
 
         @Override
@@ -673,7 +678,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
             synchronized (mMutex) {
 
-                if (!isOpen()) {
+                if (isInputComplete()) {
 
                     mLogger.dbg(throwable, "avoiding aborting since channel is closed");
 

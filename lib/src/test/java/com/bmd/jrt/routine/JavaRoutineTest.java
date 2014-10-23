@@ -187,6 +187,60 @@ public class JavaRoutineTest extends TestCase {
         }
     }
 
+    public void testClassRoutineCache() {
+
+        final NullLog nullLog = new NullLog();
+        final Routine<Object, Object> routine1 = JavaRoutine.on(TestStatic.class)
+                                                            .sequential()
+                                                            .runBy(Runners.sharedRunner())
+                                                            .logLevel(LogLevel.DEBUG)
+                                                            .loggedWith(nullLog)
+                                                            .asyncMethod(TestStatic.NAME);
+
+        assertThat(routine1.call()).containsExactly(-77L);
+
+        final Routine<Object, Object> routine2 = JavaRoutine.on(TestStatic.class)
+                                                            .sequential()
+                                                            .runBy(Runners.sharedRunner())
+                                                            .logLevel(LogLevel.DEBUG)
+                                                            .loggedWith(nullLog)
+                                                            .asyncMethod(TestStatic.NAME);
+
+        assertThat(routine2.call()).containsExactly(-77L);
+        assertThat(routine1).isEqualTo(routine2);
+
+        final Routine<Object, Object> routine3 = JavaRoutine.on(TestStatic.class)
+                                                            .queued()
+                                                            .runBy(Runners.sharedRunner())
+                                                            .logLevel(LogLevel.DEBUG)
+                                                            .loggedWith(nullLog)
+                                                            .asyncMethod(TestStatic.NAME);
+
+        assertThat(routine3.call()).containsExactly(-77L);
+        assertThat(routine1).isNotEqualTo(routine3);
+        assertThat(routine2).isNotEqualTo(routine3);
+
+        final Routine<Object, Object> routine4 = JavaRoutine.on(TestStatic.class)
+                                                            .queued()
+                                                            .runBy(Runners.sharedRunner())
+                                                            .logLevel(LogLevel.WARNING)
+                                                            .loggedWith(nullLog)
+                                                            .asyncMethod(TestStatic.NAME);
+
+        assertThat(routine4.call()).containsExactly(-77L);
+        assertThat(routine3).isNotEqualTo(routine4);
+
+        final Routine<Object, Object> routine5 = JavaRoutine.on(TestStatic.class)
+                                                            .queued()
+                                                            .runBy(Runners.sharedRunner())
+                                                            .logLevel(LogLevel.WARNING)
+                                                            .loggedWith(new NullLog())
+                                                            .asyncMethod(TestStatic.NAME);
+
+        assertThat(routine5.call()).containsExactly(-77L);
+        assertThat(routine4).isNotEqualTo(routine5);
+    }
+
     public void testObjectRoutineBuilder() throws NoSuchMethodException {
 
         final Routine<Object, Object> routine = JavaRoutine.on(new Test())
@@ -389,6 +443,61 @@ public class JavaRoutineTest extends TestCase {
         } catch (final IllegalArgumentException ignored) {
 
         }
+    }
+
+    public void testObjectRoutineCache() {
+
+        final Test test = new Test();
+        final NullLog nullLog = new NullLog();
+        final Routine<Object, Object> routine1 = JavaRoutine.on(test)
+                                                            .sequential()
+                                                            .runBy(Runners.sharedRunner())
+                                                            .logLevel(LogLevel.DEBUG)
+                                                            .loggedWith(nullLog)
+                                                            .asyncMethod(Test.NAME);
+
+        assertThat(routine1.call()).containsExactly(-77L);
+
+        final Routine<Object, Object> routine2 = JavaRoutine.on(test)
+                                                            .sequential()
+                                                            .runBy(Runners.sharedRunner())
+                                                            .logLevel(LogLevel.DEBUG)
+                                                            .loggedWith(nullLog)
+                                                            .asyncMethod(Test.NAME);
+
+        assertThat(routine2.call()).containsExactly(-77L);
+        assertThat(routine1).isEqualTo(routine2);
+
+        final Routine<Object, Object> routine3 = JavaRoutine.on(test)
+                                                            .queued()
+                                                            .runBy(Runners.sharedRunner())
+                                                            .logLevel(LogLevel.DEBUG)
+                                                            .loggedWith(nullLog)
+                                                            .asyncMethod(Test.NAME);
+
+        assertThat(routine3.call()).containsExactly(-77L);
+        assertThat(routine1).isNotEqualTo(routine3);
+        assertThat(routine2).isNotEqualTo(routine3);
+
+        final Routine<Object, Object> routine4 = JavaRoutine.on(test)
+                                                            .queued()
+                                                            .runBy(Runners.sharedRunner())
+                                                            .logLevel(LogLevel.WARNING)
+                                                            .loggedWith(nullLog)
+                                                            .asyncMethod(Test.NAME);
+
+        assertThat(routine4.call()).containsExactly(-77L);
+        assertThat(routine3).isNotEqualTo(routine4);
+
+        final Routine<Object, Object> routine5 = JavaRoutine.on(test)
+                                                            .queued()
+                                                            .runBy(Runners.sharedRunner())
+                                                            .logLevel(LogLevel.WARNING)
+                                                            .loggedWith(new NullLog())
+                                                            .asyncMethod(Test.NAME);
+
+        assertThat(routine5.call()).containsExactly(-77L);
+        assertThat(routine4).isNotEqualTo(routine5);
     }
 
     public void testRoutineBuilder() {

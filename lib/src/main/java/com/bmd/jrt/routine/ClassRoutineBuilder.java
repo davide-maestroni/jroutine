@@ -52,6 +52,10 @@ import static com.bmd.jrt.routine.ReflectionUtils.boxingClass;
  */
 public class ClassRoutineBuilder {
 
+    private static final Catch DEFAULT_CATCH_CLAUSE = new RethrowCatch();
+
+    private Catch mCatchClause = DEFAULT_CATCH_CLAUSE;
+
     private static final ClassToken<MethodSimpleInvocation> METHOD_EXECUTION_TOKEN =
             ClassToken.tokenOf(MethodSimpleInvocation.class);
 
@@ -69,8 +73,6 @@ public class ClassRoutineBuilder {
     private final Object mTarget;
 
     private final Class<?> mTargetClass;
-
-    private Catch mCatchClause = new RethrowCatch();
 
     private Boolean mIsSequential;
 

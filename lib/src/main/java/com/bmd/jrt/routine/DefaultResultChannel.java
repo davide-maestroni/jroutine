@@ -1269,7 +1269,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             synchronized (mMutex) {
 
-                if (!isResultOpen()) {
+                if (!isOutputOpen()) {
 
                     mLogger.dbg(throwable, "avoiding aborting since channel is closed");
 

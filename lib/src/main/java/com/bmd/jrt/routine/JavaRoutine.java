@@ -58,6 +58,33 @@ public class JavaRoutine {
     }
 
     /**
+     * Returns a builder for a routine simply passing on the input data.
+     *
+     * @param <DATA> the data type.
+     * @return the routine builder instance.
+     */
+    @Nonnull
+    public static <DATA> RoutineBuilder<DATA, DATA> on() {
+
+        return new RoutineBuilder<DATA, DATA>(new ClassToken<PassThroughInvocation<DATA>>() {});
+    }
+
+    /**
+     * Returns a routine builder wrapping the specified target class.
+     *
+     * @param target the target class.
+     * @return the routine builder instance.
+     * @throws NullPointerException     if the specified target is null.
+     * @throws IllegalArgumentException if a duplicate name in the annotations is
+     *                                  detected.
+     */
+    @Nonnull
+    public static ClassRoutineBuilder on(@Nonnull final Class<?> target) {
+
+        return new ClassRoutineBuilder(target);
+    }
+
+    /**
      * Returns a routine builder wrapping the specified invocation class token.
      *
      * @param classToken the invocation class token.
@@ -86,32 +113,5 @@ public class JavaRoutine {
     public static ObjectRoutineBuilder on(@Nonnull final Object target) {
 
         return new ObjectRoutineBuilder(target);
-    }
-
-    /**
-     * Returns a routine builder wrapping the specified target class.
-     *
-     * @param target the target class.
-     * @return the routine builder instance.
-     * @throws NullPointerException     if the specified target is null.
-     * @throws IllegalArgumentException if a duplicate name in the annotations is
-     *                                  detected.
-     */
-    @Nonnull
-    public static ClassRoutineBuilder on(@Nonnull final Class<?> target) {
-
-        return new ClassRoutineBuilder(target);
-    }
-
-    /**
-     * Returns a builder for a routine simply passing on the input data.
-     *
-     * @param <DATA> the data type.
-     * @return the routine builder instance.
-     */
-    @Nonnull
-    public static <DATA> RoutineBuilder<DATA, DATA> pass() {
-
-        return new RoutineBuilder<DATA, DATA>(new ClassToken<PassThroughInvocation<DATA>>() {});
     }
 }

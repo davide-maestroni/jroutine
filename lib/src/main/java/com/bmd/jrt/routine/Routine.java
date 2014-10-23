@@ -32,19 +32,20 @@ import javax.annotation.Nullable;
  * The framework includes a routine class based on the implementation of an invocation interface.
  * Invocation objects are dynamically instantiated when needed, effectively mimicking the temporary
  * scope of a function call.<br/>
- * The paradigm is based on input, result and output channels. The invocation of a routine returns
- * an input channel through which the caller can pass the input parameters. When the input is
- * closed, it returns the output channel from which to read the invocation results. At the same
- * time a result channel is passed to the invocation implementation, so that the output computed
- * from the input parameters can be transferred outside.<br/>
+ * The paradigm is based on input, result and output channels. A routine can be invoked in
+ * different ways (as explained below). Each routine invocation returns an input channel through
+ * which the caller can pass the input parameters. When all the parameters has been passed, the
+ * input channel is closed and returns the output channel from which to read the invocation
+ * results. At the same time a result channel is passed to the invocation implementation, so that
+ * the output computed from the input parameters can be published outside.<br/>
  * The advantage of this approach is that the invocation flow can be run in steps, allowing for
  * continuous streaming of the input data and for abortion in the middle of the execution, without
  * blocking the running thread for the whole duration of the asynchronous invocation.<br/>
  * In fact, each channel can abort the execution at any time.
  * <p/>
- * The class implementation provides an automatic synchronization of the invocation member fields,
- * though, in order to avoid concurrency issues, data passed through the routine channels should
- * be immutable or, at least, never shared inside and outside the routine.<br/>
+ * The implementing class must provides an automatic synchronization of the invocation member
+ * fields, though, in order to avoid concurrency issues, data passed through the routine channels
+ * should be immutable or, at least, never shared inside and outside the routine.<br/>
  * Moreover, it is possible to recursively call the same or another routine from inside a routine
  * invocation in a safe way. Nevertheless, it is always advisable to never perform blocking calls
  * (such as: reading data from an output channel) in the middle of an execution, since the use
@@ -76,8 +77,56 @@ import javax.annotation.Nullable;
  * as far as the implementation respects the specific contracts, it is possible to seamlessly
  * combine different routine implementations. Even the ones coming from third party libraries.
  * <p/>
- * Some usage examples:
- * TODO: examples
+ * <b>Some usage examples</b>
+ * <p/>
+ * <b>Example 1:</b> Asynchronously merge the output of two routines.
+ * <pre>
+ *     <code>
+ *
+ *         final Routine&lt;Object, Object&gt; routine = JavaRoutine.on().buildRoutine();
+ *
+ *         routine.invokeAsync()
+ *                .pass(doSomething1.runAsync())
+ *                .pass(doSomething2.runAsync())
+ *                .results()
+ *                .readAllInto(results);
+ *     </code>
+ * </pre>
+ * Or simply:
+ * <pre>
+ *     <code>
+ *
+ *         final OutputChannel&lt;Object&gt; output1 = doSomething1.runAsync();
+ *         final OutputChannel&lt;Object&gt; output2 = doSomething2.runAsync();
+ *
+ *         output1.readAllInto(results);
+ *         output2.readAllInto(results);
+ *     </code>
+ * </pre>
+ * (Note that, in case the order of the input or the output of the routines is relevant,
+ * you can built them so to preserve it by calling the proper builder methods)
+ * <p/>
+ * <b>Example 2:</b> Asynchronously concatenate the output of two routines.
+ * <pre>
+ *     <code>
+ *
+ *         final Routine&lt;Object, Object&gt; routine = JavaRoutine.on().buildRoutine();
+ *
+ *         routine.invokeAsync()
+ *                .pass(doSomething1.runAsync(doSomething2.runAsync()))
+ *                .results()
+ *                .readAllInto(results);
+ *     </code>
+ * </pre>
+ * Or, in a more compact way:
+ * <pre>
+ *     <code>
+ *
+ *         final Routine&lt;Object, Object&gt; routine = JavaRoutine.on().buildRoutine();
+ *
+ *         routine.runAsync(doSomething1.runAsync(doSomething2.runAsync())).readAllInto(results);
+ *     </code>
+ * </pre>
  * <p/>
  * Created by davide on 9/7/14.
  *

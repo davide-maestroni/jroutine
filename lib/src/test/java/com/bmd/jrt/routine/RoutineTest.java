@@ -224,7 +224,7 @@ public class RoutineTest extends TestCase {
 
     public void testCalls() {
 
-        final Routine<String, String> routine = JavaRoutine.<String>pass().buildRoutine();
+        final Routine<String, String> routine = JavaRoutine.<String>on().buildRoutine();
 
         assertThat(routine.call()).isEmpty();
         assertThat(routine.call(Arrays.asList("test1", "test2"))).containsExactly("test1", "test2");
@@ -890,8 +890,7 @@ public class RoutineTest extends TestCase {
 
         testException(exceptionRoutine, "test", "test1");
 
-        final Routine<String, String> passThroughRoutine =
-                JavaRoutine.<String>pass().buildRoutine();
+        final Routine<String, String> passThroughRoutine = JavaRoutine.<String>on().buildRoutine();
 
         testChained(passThroughRoutine, exceptionRoutine, "test", "test1");
         testChained(exceptionRoutine, passThroughRoutine, "test", "test1");
@@ -915,8 +914,7 @@ public class RoutineTest extends TestCase {
 
         testException(exceptionRoutine, "test2", "test2");
 
-        final Routine<String, String> passThroughRoutine =
-                JavaRoutine.<String>pass().buildRoutine();
+        final Routine<String, String> passThroughRoutine = JavaRoutine.<String>on().buildRoutine();
 
         testChained(passThroughRoutine, exceptionRoutine, "test2", "test2");
         testChained(exceptionRoutine, passThroughRoutine, "test2", "test2");
@@ -939,8 +937,7 @@ public class RoutineTest extends TestCase {
 
         testException(exceptionRoutine, "test", "test3");
 
-        final Routine<String, String> passThroughRoutine =
-                JavaRoutine.<String>pass().buildRoutine();
+        final Routine<String, String> passThroughRoutine = JavaRoutine.<String>on().buildRoutine();
 
         testChained(passThroughRoutine, exceptionRoutine, "test", "test3");
         testChained(exceptionRoutine, passThroughRoutine, "test", "test3");
@@ -968,8 +965,7 @@ public class RoutineTest extends TestCase {
 
         testException(exceptionRoutine, "test", "test4");
 
-        final Routine<String, String> passThroughRoutine =
-                JavaRoutine.<String>pass().buildRoutine();
+        final Routine<String, String> passThroughRoutine = JavaRoutine.<String>on().buildRoutine();
 
         testChained(passThroughRoutine, exceptionRoutine, "test", "test4");
         testChained(exceptionRoutine, passThroughRoutine, "test", "test4");

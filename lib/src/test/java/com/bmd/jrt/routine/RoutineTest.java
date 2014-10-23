@@ -224,8 +224,7 @@ public class RoutineTest extends TestCase {
 
     public void testCalls() {
 
-        final Routine<String, String> routine =
-                on(tokenOf(PassThroughInvocation.class)).buildRoutine();
+        final Routine<String, String> routine = JavaRoutine.<String>pass().buildRoutine();
 
         assertThat(routine.call()).isEmpty();
         assertThat(routine.call(Arrays.asList("test1", "test2"))).containsExactly("test1", "test2");
@@ -892,7 +891,7 @@ public class RoutineTest extends TestCase {
         testException(exceptionRoutine, "test", "test1");
 
         final Routine<String, String> passThroughRoutine =
-                on(tokenOf(PassThroughInvocation.class)).buildRoutine();
+                JavaRoutine.<String>pass().buildRoutine();
 
         testChained(passThroughRoutine, exceptionRoutine, "test", "test1");
         testChained(exceptionRoutine, passThroughRoutine, "test", "test1");
@@ -917,7 +916,7 @@ public class RoutineTest extends TestCase {
         testException(exceptionRoutine, "test2", "test2");
 
         final Routine<String, String> passThroughRoutine =
-                on(tokenOf(PassThroughInvocation.class)).buildRoutine();
+                JavaRoutine.<String>pass().buildRoutine();
 
         testChained(passThroughRoutine, exceptionRoutine, "test2", "test2");
         testChained(exceptionRoutine, passThroughRoutine, "test2", "test2");
@@ -941,7 +940,7 @@ public class RoutineTest extends TestCase {
         testException(exceptionRoutine, "test", "test3");
 
         final Routine<String, String> passThroughRoutine =
-                on(tokenOf(PassThroughInvocation.class)).buildRoutine();
+                JavaRoutine.<String>pass().buildRoutine();
 
         testChained(passThroughRoutine, exceptionRoutine, "test", "test3");
         testChained(exceptionRoutine, passThroughRoutine, "test", "test3");
@@ -970,7 +969,7 @@ public class RoutineTest extends TestCase {
         testException(exceptionRoutine, "test", "test4");
 
         final Routine<String, String> passThroughRoutine =
-                on(tokenOf(PassThroughInvocation.class)).buildRoutine();
+                JavaRoutine.<String>pass().buildRoutine();
 
         testChained(passThroughRoutine, exceptionRoutine, "test", "test4");
         testChained(exceptionRoutine, passThroughRoutine, "test", "test4");
@@ -1022,11 +1021,12 @@ public class RoutineTest extends TestCase {
     @SuppressWarnings("ConstantConditions")
     public void testParameterChannelError() {
 
+        final Logger logger = Logger.create(new NullLog(), LogLevel.DEBUG);
+
         try {
 
             new DefaultParameterChannel<Object, Object>(null, Runners.sharedRunner(), false, false,
-                                                        Logger.create(new NullLog(),
-                                                                      LogLevel.DEBUG));
+                                                        logger);
 
             fail();
 
@@ -1037,8 +1037,7 @@ public class RoutineTest extends TestCase {
         try {
 
             new DefaultParameterChannel<Object, Object>(new TestInvocationManager(), null, false,
-                                                        false, Logger.create(new NullLog(),
-                                                                             LogLevel.DEBUG));
+                                                        false, logger);
 
             fail();
 
@@ -1062,8 +1061,7 @@ public class RoutineTest extends TestCase {
             final DefaultParameterChannel<Object, Object> channel =
                     new DefaultParameterChannel<Object, Object>(new TestInvocationManager(),
                                                                 Runners.sharedRunner(), false,
-                                                                false, Logger.create(new NullLog(),
-                                                                                     LogLevel.DEBUG));
+                                                                false, logger);
 
             channel.results();
             channel.pass("test");
@@ -1078,10 +1076,11 @@ public class RoutineTest extends TestCase {
     @SuppressWarnings("ConstantConditions")
     public void testResultChannelError() {
 
+        final Logger logger = Logger.create(new NullLog(), LogLevel.DEBUG);
+
         try {
 
-            new DefaultResultChannel<Object>(null, Runners.sharedRunner(), false,
-                                             Logger.create(new NullLog(), LogLevel.DEBUG));
+            new DefaultResultChannel<Object>(null, Runners.sharedRunner(), false, logger);
 
 
         } catch (final NullPointerException ignored) {
@@ -1090,8 +1089,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            new DefaultResultChannel<Object>(new TestAbortHandler(), null, false,
-                                             Logger.create(new NullLog(), LogLevel.DEBUG));
+            new DefaultResultChannel<Object>(new TestAbortHandler(), null, false, logger);
 
 
         } catch (final NullPointerException ignored) {
@@ -1111,8 +1109,7 @@ public class RoutineTest extends TestCase {
         try {
 
             new DefaultResultChannel<Object>(new TestAbortHandler(), Runners.sharedRunner(), false,
-                                             Logger.create(new NullLog(), LogLevel.DEBUG)).after(
-                    null);
+                                             logger).after(null);
 
 
         } catch (final NullPointerException ignored) {
@@ -1122,8 +1119,7 @@ public class RoutineTest extends TestCase {
         try {
 
             new DefaultResultChannel<Object>(new TestAbortHandler(), Runners.sharedRunner(), false,
-                                             Logger.create(new NullLog(), LogLevel.DEBUG)).after(0,
-                                                                                                 null);
+                                             logger).after(0, null);
 
 
         } catch (final NullPointerException ignored) {
@@ -2151,15 +2147,6 @@ public class RoutineTest extends TestCase {
             final ArrayList<String> list = mList;
             results.after(mDelay).pass(list);
             list.clear();
-        }
-    }
-
-    private static class PassThroughInvocation extends BasicInvocation<String, String> {
-
-        @Override
-        public void onInput(final String s, @Nonnull final ResultChannel<String> results) {
-
-            results.pass(s);
         }
     }
 

@@ -40,7 +40,7 @@ import javax.annotation.Nonnull;
  * under direct control.<br/>
  * A mirror interface adds the possibility to override input and output parameters with output
  * channels, so that data are transferred asynchronously avoiding the need to block execution,
- * waiting for them to be available.<br/>
+ * waiting for them to be available.
  * <p/>
  * Created by davide on 9/7/14.
  *
@@ -101,5 +101,17 @@ public class JavaRoutine {
     public static ClassRoutineBuilder on(@Nonnull final Class<?> target) {
 
         return new ClassRoutineBuilder(target);
+    }
+
+    /**
+     * Returns a builder for a routine simply passing on the input data.
+     *
+     * @param <DATA> the data type.
+     * @return the routine builder instance.
+     */
+    @Nonnull
+    public static <DATA> RoutineBuilder<DATA, DATA> pass() {
+
+        return new RoutineBuilder<DATA, DATA>(new ClassToken<PassThroughInvocation<DATA>>() {});
     }
 }

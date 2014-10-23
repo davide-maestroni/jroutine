@@ -79,7 +79,7 @@ artifacts {
     }
 }
 
-if (project.hasProperty('signing')) {
+if (project.hasProperty('signing.password')) {
 
     signing {
         sign configurations.archives

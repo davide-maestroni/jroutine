@@ -712,11 +712,11 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         /**
          * Called on an abort.
          *
-         * @param throwable the reason of the abortion.
-         * @param delay     the abortion delay.
-         * @param timeUnit  the delay time unit.
+         * @param reason   the reason of the abortion.
+         * @param delay    the abortion delay.
+         * @param timeUnit the delay time unit.
          */
-        public void onAbort(@Nullable Throwable throwable, long delay, @Nonnull TimeUnit timeUnit);
+        public void onAbort(@Nullable Throwable reason, long delay, @Nonnull TimeUnit timeUnit);
     }
 
     /**
@@ -1094,7 +1094,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             return abort(null);
         }
 
-
         @Override
         public boolean abort(@Nullable final Throwable reason) {
 
@@ -1119,7 +1118,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             return true;
         }
-
 
         @Override
         public boolean isOpen() {

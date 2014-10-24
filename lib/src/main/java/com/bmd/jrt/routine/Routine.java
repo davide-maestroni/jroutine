@@ -103,8 +103,8 @@ import javax.annotation.Nullable;
  *         output2.readAllInto(results);
  *     </code>
  * </pre>
- * (Note that, in case the order of the input or the output of the routines is relevant,
- * you can built them so to preserve it by calling the proper builder methods)
+ * (Note that, the order of the input or the output of the routine channels may not be guaranteed
+ * by the specific routine implementation)
  * <p/>
  * <b>Example 2:</b> Asynchronously concatenate the output of two routines.
  * <pre>
@@ -132,8 +132,6 @@ import javax.annotation.Nullable;
  *
  * @param <INPUT>  the input type.
  * @param <OUTPUT> the output type.
- * @see com.bmd.jrt.invocation.Invocation
- * @see com.bmd.jrt.runner.Runner
  */
 public interface Routine<INPUT, OUTPUT> {
 

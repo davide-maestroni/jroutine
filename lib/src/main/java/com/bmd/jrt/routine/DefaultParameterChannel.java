@@ -88,7 +88,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
         mResultChanel = new DefaultResultChannel<OUTPUT>(new AbortHandler() {
 
             @Override
-            public void onAbort(final Throwable throwable, final long delay,
+            public void onAbort(final Throwable reason, final long delay,
                     @Nonnull final TimeUnit timeUnit) {
 
                 synchronized (mMutex) {
@@ -104,7 +104,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
                     mInputQueue.clear();
 
-                    mAbortException = throwable;
+                    mAbortException = reason;
                     mState = ChannelState.EXCEPTION;
                 }
 

@@ -1046,18 +1046,17 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                         throw timeoutException;
                     }
 
-                } else {
+                }
 
-                    while (!outputQueue.isEmpty()) {
+                while (!outputQueue.isEmpty()) {
 
-                        final Object result = outputQueue.removeFirst();
+                    final Object result = outputQueue.removeFirst();
 
-                        logger.dbg("adding output to list: %s [%s]", result, timeout);
+                    logger.dbg("adding output to list: %s [%s]", result, timeout);
 
-                        RoutineExceptionWrapper.raise(result);
+                    RoutineExceptionWrapper.raise(result);
 
-                        results.add((OUTPUT) result);
-                    }
+                    results.add((OUTPUT) result);
                 }
             }
 

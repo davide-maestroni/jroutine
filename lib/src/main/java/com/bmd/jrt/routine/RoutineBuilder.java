@@ -31,7 +31,7 @@ import static com.bmd.jrt.time.TimeDuration.fromUnit;
 import static com.bmd.jrt.time.TimeDuration.seconds;
 
 /**
- * Class implementing a builder of a routine object.
+ * Class implementing a builder of routine objects.
  * <p/>
  * A routine has a synchronous and an asynchronous runner associated. The synchronous
  * implementation can only be chosen between queued (the default one) and sequential.<br/>

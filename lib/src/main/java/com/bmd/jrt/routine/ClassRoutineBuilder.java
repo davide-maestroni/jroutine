@@ -41,7 +41,7 @@ import javax.annotation.Nullable;
 import static com.bmd.jrt.routine.ReflectionUtils.boxingClass;
 
 /**
- * Class implementing a builder of a routine wrapping a class method.
+ * Class implementing a builder of routines wrapping a class method.
  * <p/>
  * Note that only static methods can be asynchronously invoked through the routines created by
  * this builder.

@@ -1045,7 +1045,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                         throw timeoutException;
                     }
-
                 }
 
                 while (!outputQueue.isEmpty()) {

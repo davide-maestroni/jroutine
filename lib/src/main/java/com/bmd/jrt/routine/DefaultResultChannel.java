@@ -591,7 +591,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         synchronized (mMutex) {
 
-            return (mState != ChannelState.DONE) && (mState != ChannelState.EXCEPTION);
+            return (mState != ChannelState.DONE) && (mState != ChannelState.ABORTED) && (mState
+                    != ChannelState.EXCEPTION);
         }
     }
 

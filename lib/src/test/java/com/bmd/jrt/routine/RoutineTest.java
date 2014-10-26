@@ -684,6 +684,21 @@ public class RoutineTest extends TestCase {
         }
     }
 
+    public void testDelayedBind() {
+
+        final Routine<Object, Object> routine1 = JavaRoutine.on().buildRoutine();
+        final Routine<Object, Object> routine2 = JavaRoutine.on().buildRoutine();
+
+        final long startTime = System.currentTimeMillis();
+
+        assertThat(routine1.invokeAsync()
+                           .after(TimeDuration.millis(500))
+                           .pass(routine2.runAsync("test"))
+                           .results()
+                           .readFirst()).isEqualTo("test");
+        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(500);
+    }
+
     @SuppressWarnings("ConstantConditions")
     public void testError() {
 

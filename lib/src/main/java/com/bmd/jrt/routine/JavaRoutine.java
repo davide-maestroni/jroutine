@@ -58,6 +58,16 @@ public class JavaRoutine {
     }
 
     /**
+     * Returns a channel builder.
+     *
+     * @return the channel builder instance.
+     */
+    public static ChannelBuilder io() {
+
+        return new ChannelBuilder();
+    }
+
+    /**
      * Returns a builder for a routine simply passing on the input data.
      *
      * @param <DATA> the data type.

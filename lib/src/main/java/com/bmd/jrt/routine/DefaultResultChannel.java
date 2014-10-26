@@ -367,6 +367,10 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                     mState = ChannelState.FLUSH;
                 }
+
+            } else {
+
+                mLogger.dbg("avoiding closing result channel since already closed");
             }
         }
 
@@ -1099,7 +1103,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 if (!isResultOpen()) {
 
-                    mSubLogger.dbg("avoid aborting output since result channel is closed");
+                    mSubLogger.dbg("avoiding aborting output since result channel is closed");
 
                     return false;
                 }
@@ -1154,7 +1158,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 if (!isResultOpen()) {
 
-                    mSubLogger.dbg("avoid aborting output since result channel is closed");
+                    mSubLogger.dbg("avoiding aborting output since result channel is closed");
 
                     return;
                 }

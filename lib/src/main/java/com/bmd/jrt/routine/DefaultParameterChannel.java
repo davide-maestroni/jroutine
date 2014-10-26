@@ -611,9 +611,9 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
             synchronized (mMutex) {
 
-                final Throwable throwable = mAbortException;
+                if (mState == ChannelState.EXCEPTION) {
 
-                if (throwable != null) {
+                    final Throwable throwable = mAbortException;
 
                     mSubLogger.dbg(throwable, "consumer abort exception");
 

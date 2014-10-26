@@ -1112,6 +1112,24 @@ public class RoutineTest extends TestCase {
         }
     }
 
+    public void testPartialOut() {
+
+        final BasicInvocation<String, String> invocation = new BasicInvocation<String, String>() {
+
+            @Override
+            public void onInput(final String s, @Nonnull final ResultChannel<String> results) {
+
+                results.now().pass(s).after(TimeDuration.seconds(2)).abort();
+            }
+        };
+
+        final Routine<String, String> routine =
+                JavaRoutine.on(tokenOf(invocation)).withArgs(this).buildRoutine();
+        assertThat(routine.runAsync("test")
+                          .afterMax(TimeDuration.millis(500))
+                          .readAll()).containsExactly("test");
+    }
+
     @SuppressWarnings("ConstantConditions")
     public void testResultChannelError() {
 
@@ -2208,7 +2226,7 @@ public class RoutineTest extends TestCase {
     private static class TestAbortHandler implements AbortHandler {
 
         @Override
-        public void onAbort(@Nullable final Throwable throwable, final long delay,
+        public void onAbort(@Nullable final Throwable reason, final long delay,
                 @Nonnull final TimeUnit timeUnit) {
 
         }

@@ -15,6 +15,8 @@ package com.bmd.jrt.routine;
 
 import com.bmd.jrt.annotation.Async;
 import com.bmd.jrt.annotation.AsyncParameters;
+import com.bmd.jrt.channel.IOChannel;
+import com.bmd.jrt.channel.InputChannel;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.ClassToken;
@@ -40,6 +42,86 @@ import static org.fest.assertions.api.Assertions.assertThat;
  * Created by davide on 10/16/14.
  */
 public class JavaRoutineTest extends TestCase {
+
+    public void testChannelBuilder() {
+
+        final IOChannel<Object> channel = JavaRoutine.io()
+                                                     .withMaxAge(TimeDuration.hours(3))
+                                                     .orderedInput()
+                                                     .logLevel(LogLevel.DEBUG)
+                                                     .loggedWith(new NullLog())
+                                                     .buildChannel();
+        channel.input().pass(-77L);
+        assertThat(channel.output().readFirst()).isEqualTo(-77L);
+
+        final IOChannel<Object> channel1 = JavaRoutine.io().buildChannel();
+        final InputChannel<Object> input1 = channel1.input();
+
+        input1.after(TimeDuration.millis(200)).pass(23).now().pass(-77L);
+        channel1.close();
+        assertThat(channel1.output().readAll()).containsOnly(23, -77L);
+
+        final IOChannel<Object> channel2 = JavaRoutine.io().orderedInput().buildChannel();
+        final InputChannel<Object> input2 = channel2.input();
+
+        input2.after(TimeDuration.millis(200)).pass(23).now().pass(-77L);
+        channel2.close();
+        assertThat(channel2.output().readAll()).containsExactly(23, -77L);
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public void testChannelBuilderError() {
+
+        try {
+
+            new ChannelBuilder().withMaxAge(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new ChannelBuilder().withMaxAge(-1, TimeUnit.MILLISECONDS);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            new ChannelBuilder().withMaxAge(1, null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new ChannelBuilder().loggedWith(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new ChannelBuilder().logLevel(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
 
     public void testClassRoutineBuilder() throws NoSuchMethodException {
 

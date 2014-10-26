@@ -39,8 +39,81 @@ import javax.annotation.Nonnull;
  * apply the framework functionalities to objects defined by third party libraries which are not
  * under direct control.<br/>
  * A mirror interface adds the possibility to override input and output parameters with output
- * channels, so that data are transferred asynchronously avoiding the need to block execution,
+ * channels, so that data are transferred asynchronously avoiding the need to block execution while
  * waiting for them to be available.
+ * <p/>
+ * <b>Some usage examples</b>
+ * <p/>
+ * <b>Example 1:</b> Asynchronously merge the output of two routines.
+ * <pre>
+ *     <code>
+ *
+ *         final Routine&lt;Result, Result&gt; routine =
+ *                  JavaRoutine.&lt;Result&gt;on().buildRoutine();
+ *
+ *         routine.invokeAsync()
+ *                .pass(doSomething1.runAsync())
+ *                .pass(doSomething2.runAsync())
+ *                .results()
+ *                .readAllInto(results);
+ *     </code>
+ * </pre>
+ * Or simply:
+ * <pre>
+ *     <code>
+ *
+ *         final OutputChannel&lt;Result&gt; output1 = doSomething1.runAsync();
+ *         final OutputChannel&lt;Result&gt; output2 = doSomething2.runAsync();
+ *
+ *         output1.readAllInto(results);
+ *         output2.readAllInto(results);
+ *     </code>
+ * </pre>
+ * (Note that, the order of the input or the output of the routine channels may not be guaranteed
+ * by the specific routine implementation)
+ * <p/>
+ * <b>Example 2:</b> Asynchronously concatenate the output of two routines.
+ * <pre>
+ *     <code>
+ *
+ *         final Routine&lt;Result, Result&gt; routine =
+ *                  JavaRoutine.&lt;Result&gt;on().buildRoutine();
+ *
+ *         routine.invokeAsync()
+ *                .pass(doSomething1.runAsync(doSomething2.runAsync()))
+ *                .results()
+ *                .readAllInto(results);
+ *     </code>
+ * </pre>
+ * Or, in a more compact way:
+ * <pre>
+ *     <code>
+ *
+ *         final Routine&lt;Result, Result&gt; routine =
+ *                  JavaRoutine.&lt;Result&gt;on().buildRoutine();
+ *
+ *         routine.runAsync(doSomething1.runAsync(doSomething2.runAsync())).readAllInto(results);
+ *     </code>
+ * </pre>
+ * <p/>
+ * <b>Example 3:</b> Asynchronous callback of the output of two routines.
+ * <pre>
+ *     <code>
+ *
+ *         public interface AsyncCallback {
+ *
+ *             &#64;AyncParameters({Result.class, Result.class})
+ *             public void onResults(OutputChannel&lt;Result&gt; result1,
+ *                                      OutputChannel&lt;Result&gt; result2);
+ *         }
+ *
+ *         final Callback callback = JavaRoutine.on(myCallback).as(Callback.class);
+ *
+ *         callback.onResults(doSomething1.runAsync(), doSomething2.runAsync());
+ *     </code>
+ * </pre>
+ * Where the object <code>myCallback</code> implements a method <code>public void onResults(Result
+ * result1, Result result2)</code>.
  * <p/>
  * Created by davide on 9/7/14.
  *

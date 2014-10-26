@@ -77,57 +77,6 @@ import javax.annotation.Nullable;
  * as far as the implementation respects the specific contracts, it is possible to seamlessly
  * combine different routine implementations. Even the ones coming from third party libraries.
  * <p/>
- * <b>Some usage examples</b>
- * <p/>
- * <b>Example 1:</b> Asynchronously merge the output of two routines.
- * <pre>
- *     <code>
- *
- *         final Routine&lt;Object, Object&gt; routine = JavaRoutine.on().buildRoutine();
- *
- *         routine.invokeAsync()
- *                .pass(doSomething1.runAsync())
- *                .pass(doSomething2.runAsync())
- *                .results()
- *                .readAllInto(results);
- *     </code>
- * </pre>
- * Or simply:
- * <pre>
- *     <code>
- *
- *         final OutputChannel&lt;Object&gt; output1 = doSomething1.runAsync();
- *         final OutputChannel&lt;Object&gt; output2 = doSomething2.runAsync();
- *
- *         output1.readAllInto(results);
- *         output2.readAllInto(results);
- *     </code>
- * </pre>
- * (Note that, the order of the input or the output of the routine channels may not be guaranteed
- * by the specific routine implementation)
- * <p/>
- * <b>Example 2:</b> Asynchronously concatenate the output of two routines.
- * <pre>
- *     <code>
- *
- *         final Routine&lt;Object, Object&gt; routine = JavaRoutine.on().buildRoutine();
- *
- *         routine.invokeAsync()
- *                .pass(doSomething1.runAsync(doSomething2.runAsync()))
- *                .results()
- *                .readAllInto(results);
- *     </code>
- * </pre>
- * Or, in a more compact way:
- * <pre>
- *     <code>
- *
- *         final Routine&lt;Object, Object&gt; routine = JavaRoutine.on().buildRoutine();
- *
- *         routine.runAsync(doSomething1.runAsync(doSomething2.runAsync())).readAllInto(results);
- *     </code>
- * </pre>
- * <p/>
  * Created by davide on 9/7/14.
  *
  * @param <INPUT>  the input type.

@@ -92,7 +92,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            channel.readFirst();
+            channel.readAll();
 
             fail();
 
@@ -113,7 +113,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            channel1.readFirst();
+            channel1.readAll();
 
             fail();
 

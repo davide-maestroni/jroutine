@@ -1125,6 +1125,51 @@ public class RoutineTest extends TestCase {
         } catch (final IllegalStateException ignored) {
 
         }
+
+        try {
+
+            final DefaultParameterChannel<Object, Object> channel =
+                    new DefaultParameterChannel<Object, Object>(new TestInvocationManager(),
+                                                                Runners.sharedRunner(), false,
+                                                                false, logger);
+
+            channel.after(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            final DefaultParameterChannel<Object, Object> channel =
+                    new DefaultParameterChannel<Object, Object>(new TestInvocationManager(),
+                                                                Runners.sharedRunner(), false,
+                                                                false, logger);
+
+            channel.after(1, null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            final DefaultParameterChannel<Object, Object> channel =
+                    new DefaultParameterChannel<Object, Object>(new TestInvocationManager(),
+                                                                Runners.sharedRunner(), false,
+                                                                false, logger);
+
+            channel.after(-1, TimeUnit.MILLISECONDS);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
     }
 
     public void testPartialOut() {
@@ -1154,6 +1199,7 @@ public class RoutineTest extends TestCase {
 
             new DefaultResultChannel<Object>(null, Runners.sharedRunner(), false, logger);
 
+            fail();
 
         } catch (final NullPointerException ignored) {
 
@@ -1163,6 +1209,7 @@ public class RoutineTest extends TestCase {
 
             new DefaultResultChannel<Object>(new TestAbortHandler(), null, false, logger);
 
+            fail();
 
         } catch (final NullPointerException ignored) {
 
@@ -1173,6 +1220,7 @@ public class RoutineTest extends TestCase {
             new DefaultResultChannel<Object>(new TestAbortHandler(), Runners.sharedRunner(), false,
                                              null);
 
+            fail();
 
         } catch (final NullPointerException ignored) {
 
@@ -1183,6 +1231,7 @@ public class RoutineTest extends TestCase {
             new DefaultResultChannel<Object>(new TestAbortHandler(), Runners.sharedRunner(), false,
                                              logger).after(null);
 
+            fail();
 
         } catch (final NullPointerException ignored) {
 
@@ -1193,8 +1242,20 @@ public class RoutineTest extends TestCase {
             new DefaultResultChannel<Object>(new TestAbortHandler(), Runners.sharedRunner(), false,
                                              logger).after(0, null);
 
+            fail();
 
         } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new DefaultResultChannel<Object>(new TestAbortHandler(), Runners.sharedRunner(), false,
+                                             logger).after(-1, TimeUnit.MILLISECONDS);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
 
         }
 
@@ -1221,6 +1282,16 @@ public class RoutineTest extends TestCase {
             fail();
 
         } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            channel.afterMax(-1, TimeUnit.MILLISECONDS);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
 
         }
 

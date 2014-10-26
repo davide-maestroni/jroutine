@@ -199,8 +199,8 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
         return after(fromUnit(delay, timeUnit));
     }
 
-    @Nonnull
     @Override
+    @Nonnull
     public ParameterChannel<INPUT, OUTPUT> now() {
 
         return after(ZERO);

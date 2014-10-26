@@ -7,6 +7,10 @@ android:
     # The SDK version
     - android-21
 
+jdk:
+  - openjdk5
+  - openjdk7
+
 # Env matrix
 env:
   matrix:

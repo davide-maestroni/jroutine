@@ -8,7 +8,7 @@ android:
     - android-21
 
 jdk:
-  - openjdk5
+  - openjdk6
   - openjdk7
 
 # Env matrix

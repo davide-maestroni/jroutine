@@ -26,9 +26,9 @@ import javax.annotation.Nonnull;
  * <p/>
  * Created by davide on 10/25/14.
  *
- * @param <T> the data type.
+ * @param <TYPE> the data type.
  */
-public interface IOChannel<T> {
+public interface IOChannel<TYPE> {
 
     /**
      * Closes this channel.
@@ -43,7 +43,7 @@ public interface IOChannel<T> {
      * @return the input channel.
      */
     @Nonnull
-    public InputChannel<T> input();
+    public InputChannel<TYPE> input();
 
     /**
      * Returns the output end of this channel.
@@ -51,5 +51,5 @@ public interface IOChannel<T> {
      * @return the output channel.
      */
     @Nonnull
-    public OutputChannel<T> output();
+    public OutputChannel<TYPE> output();
 }

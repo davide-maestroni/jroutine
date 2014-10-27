@@ -2343,8 +2343,8 @@ public class RoutineTest extends TestCase {
 
     private static class TestInputIterator implements InputIterator<Object> {
 
-        @Nullable
         @Override
+        @Nullable
         public Throwable getAbortException() {
 
             return null;
@@ -2387,8 +2387,8 @@ public class RoutineTest extends TestCase {
 
     private static class TestInvocationManager implements InvocationManager<Object, Object> {
 
-        @Nonnull
         @Override
+        @Nonnull
         public Invocation<Object, Object> create() {
 
             return new BasicInvocation<Object, Object>() {};

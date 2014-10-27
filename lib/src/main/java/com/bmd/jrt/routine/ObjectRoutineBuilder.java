@@ -132,8 +132,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
         return this;
     }
 
-    @Nonnull
     @Override
+    @Nonnull
     public ObjectRoutineBuilder parallelId(@Nullable final String id) {
 
         super.parallelId(id);

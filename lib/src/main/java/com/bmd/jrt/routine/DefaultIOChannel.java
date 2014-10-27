@@ -39,9 +39,9 @@ import static com.bmd.jrt.runner.Runners.sharedRunner;
  * <p/>
  * Created by davide on 10/24/14.
  *
- * @param <T> the data type.
+ * @param <TYPE> the data type.
  */
-class DefaultIOChannel<T> implements IOChannel<T> {
+class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
 
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     private static final HashSet<ChannelWeakReference> sReferences =
@@ -51,9 +51,9 @@ class DefaultIOChannel<T> implements IOChannel<T> {
 
     private static Runner sWeakRunner;
 
-    private final DefaultResultChannel<T> mInputChannel;
+    private final DefaultResultChannel<TYPE> mInputChannel;
 
-    private final OutputChannel<T> mOutputChannel;
+    private final OutputChannel<TYPE> mOutputChannel;
 
     /**
      * Constructor.
@@ -66,17 +66,17 @@ class DefaultIOChannel<T> implements IOChannel<T> {
             @Nonnull final LogLevel level) {
 
         final ChannelAbortHandler abortHandler = new ChannelAbortHandler();
-        final DefaultResultChannel<T> inputChannel =
-                new DefaultResultChannel<T>(abortHandler, sharedRunner(), isOrdered,
-                                            Logger.create(log, level, IOChannel.class));
+        final DefaultResultChannel<TYPE> inputChannel =
+                new DefaultResultChannel<TYPE>(abortHandler, sharedRunner(), isOrdered,
+                                               Logger.create(log, level, IOChannel.class));
         abortHandler.setInputChannel(inputChannel);
         mInputChannel = inputChannel;
         mOutputChannel = inputChannel.getOutput();
 
-        addChannel(this);
+        addChannelReference(this);
     }
 
-    private static void addChannel(final DefaultIOChannel<?> channel) {
+    private static void addChannelReference(@Nonnull final DefaultIOChannel<?> channel) {
 
         synchronized (sReferences) {
 
@@ -103,14 +103,14 @@ class DefaultIOChannel<T> implements IOChannel<T> {
 
     @Override
     @Nonnull
-    public InputChannel<T> input() {
+    public InputChannel<TYPE> input() {
 
         return mInputChannel;
     }
 
     @Override
     @Nonnull
-    public OutputChannel<T> output() {
+    public OutputChannel<TYPE> output() {
 
         return mOutputChannel;
     }
@@ -176,8 +176,8 @@ class DefaultIOChannel<T> implements IOChannel<T> {
          * @param referent the referent channel instance.
          * @param queue    the reference queue.
          */
-        private ChannelWeakReference(final DefaultIOChannel<?> referent,
-                final ReferenceQueue<? super DefaultIOChannel<?>> queue) {
+        private ChannelWeakReference(@Nonnull final DefaultIOChannel<?> referent,
+                @Nonnull final ReferenceQueue<? super DefaultIOChannel<?>> queue) {
 
             super(referent, queue);
 

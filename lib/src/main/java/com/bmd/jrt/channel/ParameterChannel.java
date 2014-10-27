@@ -39,8 +39,8 @@ public interface ParameterChannel<INPUT, OUTPUT> extends InputChannel<INPUT> {
     @Nonnull
     public ParameterChannel<INPUT, OUTPUT> after(long delay, @Nonnull TimeUnit timeUnit);
 
-    @Nonnull
     @Override
+    @Nonnull
     public ParameterChannel<INPUT, OUTPUT> now();
 
     @Override

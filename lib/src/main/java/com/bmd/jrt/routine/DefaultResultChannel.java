@@ -162,8 +162,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         return after(fromUnit(delay, timeUnit));
     }
 
-    @Nonnull
     @Override
+    @Nonnull
     public ResultChannel<OUTPUT> now() {
 
         return after(ZERO);

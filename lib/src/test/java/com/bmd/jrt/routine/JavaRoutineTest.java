@@ -46,7 +46,6 @@ public class JavaRoutineTest extends TestCase {
     public void testChannelBuilder() {
 
         final IOChannel<Object> channel = JavaRoutine.io()
-                                                     .withMaxAge(TimeDuration.hours(3))
                                                      .orderedInput()
                                                      .logLevel(LogLevel.DEBUG)
                                                      .loggedWith(new NullLog())
@@ -71,36 +70,6 @@ public class JavaRoutineTest extends TestCase {
 
     @SuppressWarnings("ConstantConditions")
     public void testChannelBuilderError() {
-
-        try {
-
-            new ChannelBuilder().withMaxAge(null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            new ChannelBuilder().withMaxAge(-1, TimeUnit.MILLISECONDS);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            new ChannelBuilder().withMaxAge(1, null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
 
         try {
 

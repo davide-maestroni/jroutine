@@ -17,13 +17,8 @@ import com.bmd.jrt.channel.IOChannel;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.log.Logger;
-import com.bmd.jrt.time.TimeDuration;
-
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
-
-import static com.bmd.jrt.time.TimeDuration.fromUnit;
 
 /**
  * Class implementing a builder of I/O channel objects.
@@ -31,8 +26,6 @@ import static com.bmd.jrt.time.TimeDuration.fromUnit;
  * Created by davide on 10/25/14.
  */
 public class ChannelBuilder {
-
-    private TimeDuration mDuration = TimeDuration.INFINITY;
 
     private boolean mIsOrdered;
 
@@ -55,7 +48,7 @@ public class ChannelBuilder {
     @Nonnull
     public <T> IOChannel<T> buildChannel() {
 
-        return new DefaultIOChannel<T>(mIsOrdered, mDuration, mLog, mLogLevel);
+        return new DefaultIOChannel<T>(mIsOrdered, mLog, mLogLevel);
     }
 
     /**
@@ -110,41 +103,6 @@ public class ChannelBuilder {
     public ChannelBuilder orderedInput() {
 
         mIsOrdered = true;
-
-        return this;
-    }
-
-    /**
-     * Sets the max age of the channel.<br/>
-     * After the specified time elapsed, the channel will be automatically closed.
-     *
-     * @param duration the max age duration.
-     * @param timeUnit the duration time unit.
-     * @return this builder.
-     */
-    @Nonnull
-    public ChannelBuilder withMaxAge(final long duration, @Nonnull final TimeUnit timeUnit) {
-
-        return withMaxAge(fromUnit(duration, timeUnit));
-    }
-
-    /**
-     * Sets the max age of the channel.<br/>
-     * After the specified time elapsed, the channel will be automatically closed.
-     *
-     * @param duration the max age duration.
-     * @return this builder.
-     */
-    @Nonnull
-    @SuppressWarnings("ConstantConditions")
-    public ChannelBuilder withMaxAge(@Nonnull final TimeDuration duration) {
-
-        if (duration == null) {
-
-            throw new NullPointerException("the duration must not be null");
-        }
-
-        mDuration = duration;
 
         return this;
     }

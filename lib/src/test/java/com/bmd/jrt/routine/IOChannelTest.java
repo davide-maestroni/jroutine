@@ -15,11 +15,12 @@ package com.bmd.jrt.routine;
 
 import com.bmd.jrt.channel.IOChannel;
 import com.bmd.jrt.channel.OutputChannel;
+import com.bmd.jrt.common.RoutineException;
 import com.bmd.jrt.time.TimeDuration;
 
 import junit.framework.TestCase;
 
-import java.util.concurrent.TimeUnit;
+import java.lang.ref.WeakReference;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
@@ -29,6 +30,26 @@ import static org.fest.assertions.api.Assertions.assertThat;
  * Created by davide on 10/26/14.
  */
 public class IOChannelTest extends TestCase {
+
+    public void testAbort() {
+
+        final IOChannel<String> channel = JavaRoutine.io().buildChannel();
+        final Routine<String, String> routine = JavaRoutine.<String>on().buildRoutine();
+        final OutputChannel<String> outputChannel = routine.runAsync(channel.output());
+
+        channel.input().abort(new IllegalStateException());
+
+        try {
+
+            outputChannel.readFirst();
+
+            fail();
+
+        } catch (final RoutineException ex) {
+
+            assertThat(ex.getCause()).isExactlyInstanceOf(IllegalStateException.class);
+        }
+    }
 
     public void testAsynchronousInput() {
 
@@ -59,35 +80,6 @@ public class IOChannelTest extends TestCase {
         assertThat(outputChannel.isComplete()).isTrue();
     }
 
-    public void testMaxAge() {
-
-        final IOChannel<String> channel =
-                JavaRoutine.io().withMaxAge(1, TimeUnit.SECONDS).buildChannel();
-
-        new Thread() {
-
-            @Override
-            public void run() {
-
-                try {
-
-                    Thread.sleep(500);
-
-                } catch (final InterruptedException ignored) {
-
-                } finally {
-
-                    channel.input().pass("test");
-                }
-            }
-        }.start();
-
-        final Routine<String, String> routine = JavaRoutine.<String>on().buildRoutine();
-        final OutputChannel<String> outputChannel = routine.runAsync(channel.output());
-        assertThat(outputChannel.readFirst()).isEqualTo("test");
-        assertThat(outputChannel.afterMax(TimeDuration.seconds(1)).isComplete()).isTrue();
-    }
-
     public void testPartialOut() {
 
         final IOChannel<String> channel = JavaRoutine.io().buildChannel();
@@ -113,5 +105,62 @@ public class IOChannelTest extends TestCase {
         assertThat(outputChannel.immediately().isComplete()).isFalse();
         channel.close();
         assertThat(outputChannel.afterMax(TimeDuration.millis(500)).isComplete()).isTrue();
+    }
+
+    @SuppressWarnings("UnusedAssignment")
+    public void testWeak() throws InterruptedException {
+
+        IOChannel<String> channel = JavaRoutine.io().buildChannel();
+
+        new WeakThread(channel).start();
+
+        final Routine<String, String> routine = JavaRoutine.<String>on().buildRoutine();
+        final OutputChannel<String> outputChannel = routine.runAsync(channel.output());
+        assertThat(outputChannel.readFirst()).isEqualTo("test");
+
+        channel = null;
+
+        // this is not guaranteed to work, so let's try a few times...
+        for (int i = 0; i < 3; i++) {
+
+            System.gc();
+
+            if (outputChannel.afterMax(TimeDuration.seconds(500)).isComplete()) {
+
+                return;
+            }
+        }
+
+        fail();
+    }
+
+    private static class WeakThread extends Thread {
+
+        private final WeakReference<IOChannel<String>> mChannelRef;
+
+        public WeakThread(final IOChannel<String> channel) {
+
+            mChannelRef = new WeakReference<IOChannel<String>>(channel);
+        }
+
+        @Override
+        public void run() {
+
+            try {
+
+                Thread.sleep(500);
+
+            } catch (final InterruptedException ignored) {
+
+            } finally {
+
+                final IOChannel<String> channel = mChannelRef.get();
+
+                if (channel != null) {
+
+                    channel.input().pass("test");
+                }
+            }
+        }
     }
 }

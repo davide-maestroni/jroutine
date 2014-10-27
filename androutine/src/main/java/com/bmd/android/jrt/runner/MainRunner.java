@@ -13,14 +13,14 @@
  */
 package com.bmd.android.jrt.runner;
 
-import com.bmd.jrt.runner.RunnerDecorator;
+import com.bmd.jrt.runner.RunnerWrapper;
 
 /**
  * Main UI thread runner.
  * <p/>
  * Created by davide on 10/2/14.
  */
-public class MainRunner extends RunnerDecorator {
+public class MainRunner extends RunnerWrapper {
 
     /**
      * Constructor.

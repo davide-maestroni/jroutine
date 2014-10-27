@@ -24,7 +24,7 @@ import com.bmd.jrt.invocation.BasicInvocation;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.log.NullLog;
 import com.bmd.jrt.routine.ClassRoutineBuilder.Catch;
-import com.bmd.jrt.runner.RunnerDecorator;
+import com.bmd.jrt.runner.RunnerWrapper;
 import com.bmd.jrt.runner.Runners;
 import com.bmd.jrt.time.TimeDuration;
 
@@ -714,7 +714,7 @@ public class JavaRoutineTest extends TestCase {
         }
     }
 
-    private static class MyRunner extends RunnerDecorator {
+    private static class MyRunner extends RunnerWrapper {
 
         public MyRunner() {
 

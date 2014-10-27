@@ -18,11 +18,11 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 
 /**
- * Decorator implementation of a runner object.
+ * Wrapper implementation of a runner object.
  * <p/>
  * Created by davide on 9/22/14.
  */
-public class RunnerDecorator implements Runner {
+public class RunnerWrapper implements Runner {
 
     private final Runner mRunner;
 
@@ -33,7 +33,7 @@ public class RunnerDecorator implements Runner {
      * @throws NullPointerException if the specified instance is null.
      */
     @SuppressWarnings("ConstantConditions")
-    public RunnerDecorator(@Nonnull final Runner wrapped) {
+    public RunnerWrapper(@Nonnull final Runner wrapped) {
 
         if (wrapped == null) {
 

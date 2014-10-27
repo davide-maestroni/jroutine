@@ -19,7 +19,7 @@ import android.test.AndroidTestCase;
 
 import com.bmd.jrt.runner.Execution;
 import com.bmd.jrt.runner.Runner;
-import com.bmd.jrt.runner.RunnerDecorator;
+import com.bmd.jrt.runner.RunnerWrapper;
 import com.bmd.jrt.time.Time;
 import com.bmd.jrt.time.TimeDuration;
 
@@ -62,7 +62,7 @@ public class AndroidRunnerTest extends AndroidTestCase {
         testRunner(AndroidRunners.mainRunner());
         testRunner(AndroidRunners.myRunner());
         testRunner(AndroidRunners.threadRunner(new HandlerThread("test")));
-        testRunner(new RunnerDecorator(AndroidRunners.mainRunner()));
+        testRunner(new RunnerWrapper(AndroidRunners.mainRunner()));
     }
 
     public void testMainRunner() throws InterruptedException {
@@ -75,8 +75,8 @@ public class AndroidRunnerTest extends AndroidTestCase {
         testRunner(new AsyncTaskRunner(null));
         testRunner(AndroidRunners.taskRunner());
         testRunner(AndroidRunners.taskRunner(Executors.newCachedThreadPool()));
-        testRunner(new RunnerDecorator(
-                AndroidRunners.taskRunner(Executors.newSingleThreadExecutor())));
+        testRunner(
+                new RunnerWrapper(AndroidRunners.taskRunner(Executors.newSingleThreadExecutor())));
     }
 
     private void testRunner(final Runner runner) throws InterruptedException {

@@ -79,7 +79,6 @@ public interface InputChannel<INPUT> extends Channel {
      *
      * @param channel the output channel.
      * @return this channel.
-     * @throws NullPointerException                if the specified channel is null.
      * @throws IllegalStateException               if this channel is already closed.
      * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
      *                                             exception.

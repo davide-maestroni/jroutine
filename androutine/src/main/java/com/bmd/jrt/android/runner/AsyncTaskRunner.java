@@ -11,17 +11,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.android.jrt.runner;
+package com.bmd.jrt.android.runner;
 
 import android.annotation.TargetApi;
 import android.os.AsyncTask;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
-import android.os.Handler;
 import android.os.Looper;
 
 import com.bmd.jrt.runner.Execution;
-import com.bmd.jrt.runner.Runner;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
@@ -35,11 +33,9 @@ import javax.annotation.Nullable;
  * <p/>
  * Created by davide on 9/28/14.
  */
-class AsyncTaskRunner implements Runner {
+class AsyncTaskRunner extends LooperRunner {
 
     private final Executor mExecutor;
-
-    private final Handler mHandler;
 
     /**
      * Constructor.
@@ -50,9 +46,9 @@ class AsyncTaskRunner implements Runner {
      */
     AsyncTaskRunner(@Nullable final Executor executor) {
 
+        super(Looper.getMainLooper());
+
         mExecutor = executor;
-        // the handler is used to ensure that a task is always started in the main thread
-        mHandler = new Handler(Looper.getMainLooper());
     }
 
     @Override
@@ -60,21 +56,14 @@ class AsyncTaskRunner implements Runner {
             @Nonnull final TimeUnit timeUnit) {
 
         final ExecutionTask task = new ExecutionTask(mExecutor, execution);
-
-        if (delay > 0) {
-
-            mHandler.postDelayed(task, timeUnit.toMillis(delay));
-
-        } else {
-
-            mHandler.post(task);
-        }
+        // the super method is called to ensure that a task is always started in the main thread
+        super.run(task, delay, timeUnit);
     }
 
     /**
      * Implementation of an async task whose execution starts in a runnable.
      */
-    private static class ExecutionTask extends AsyncTask<Void, Void, Void> implements Runnable {
+    private static class ExecutionTask extends AsyncTask<Void, Void, Void> implements Execution {
 
         private final Execution mExecution;
 
@@ -94,7 +83,7 @@ class AsyncTaskRunner implements Runner {
         }
 
         @Override
-        @TargetApi(11)
+        @TargetApi(VERSION_CODES.HONEYCOMB)
         public void run() {
 
             if ((mExecutor != null) && (VERSION.SDK_INT >= VERSION_CODES.HONEYCOMB)) {

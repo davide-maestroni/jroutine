@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.android.jrt.runner;
+package com.bmd.jrt.android.runner;
 
 import android.os.HandlerThread;
 import android.os.Looper;
@@ -20,7 +20,6 @@ import android.test.AndroidTestCase;
 import com.bmd.jrt.runner.Execution;
 import com.bmd.jrt.runner.Runner;
 import com.bmd.jrt.runner.RunnerWrapper;
-import com.bmd.jrt.time.Time;
 import com.bmd.jrt.time.TimeDuration;
 
 import java.util.ArrayList;
@@ -28,7 +27,6 @@ import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 
-import static com.bmd.jrt.time.Time.current;
 import static com.bmd.jrt.time.TimeDuration.ZERO;
 import static com.bmd.jrt.time.TimeDuration.micros;
 import static com.bmd.jrt.time.TimeDuration.millis;
@@ -225,13 +223,13 @@ public class AndroidRunnerTest extends AndroidTestCase {
 
         private final Semaphore mSemaphore = new Semaphore(0);
 
-        private final Time mStartTime;
+        private final long mStartTime;
 
         private boolean mIsPassed;
 
         public TestRunExecution(final TimeDuration delay) {
 
-            mStartTime = current();
+            mStartTime = System.currentTimeMillis();
             mDelay = delay;
         }
 
@@ -250,7 +248,7 @@ public class AndroidRunnerTest extends AndroidTestCase {
 
             // it looks like that handlers and the kind are not so accurate after all...
             // let's have a 1 millisecond error tolerance
-            mIsPassed = (current().toMillis() - mStartTime.toMillis() + 1 >= mDelay.toMillis());
+            mIsPassed = (System.currentTimeMillis() - mStartTime + 1 >= mDelay.toMillis());
 
             mSemaphore.release();
         }

@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.android.jrt.log;
+package com.bmd.jrt.android.log;
 
 import android.util.Log;
 

@@ -13,8 +13,8 @@
  */
 
 /**
- * Runner related classes and definitions specific to the Android platform.
+ * Log classes specific to the Android platform.
  * <p/>
- * Created by davide on 9/28/14.
+ * Created by davide on 10/10/14.
  */
-package com.bmd.android.jrt.runner;
+package com.bmd.jrt.android.log;

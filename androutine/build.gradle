@@ -25,7 +25,7 @@ archivesBaseName = project.name
 
 android {
     compileSdkVersion 21
-    buildToolsVersion "21.0.1"
+    buildToolsVersion '21.0.1'
 
     defaultConfig {
         minSdkVersion 8
@@ -57,13 +57,13 @@ dependencies {
     androidTestCompile 'com.squareup:fest-android:1.0.7'
 }
 
-task("jacocoTest", dependsOn: 'connectedCheck') {
+task('jacocoTest', dependsOn: 'connectedCheck') {
     description = "Runs the tests and generates the JaCoCo report files."
 } << {
     tasks.createDebugCoverageReport.execute()
 }
 
-task("javadoc", dependsOn: 'javadocRelease')
+task('javadoc', dependsOn: 'javadocRelease')
 
 android.libraryVariants.all { variant ->
 
@@ -71,14 +71,14 @@ android.libraryVariants.all { variant ->
 
     if (buildTypeName.equals(BuilderConstants.DEBUG)) {
 
-        task("findbugsMain", type: FindBugs, dependsOn: "assemble${buildTypeName.capitalize()}") {
+        task('findbugsMain', type: FindBugs, dependsOn: "assemble${buildTypeName.capitalize()}") {
             classes = fileTree(variant.javaCompile.destinationDir).filter {
-                !it.name.startsWith("R\$") && !it.name.equals("R.class")
+                !it.name.startsWith('R\$') && !it.name.equals('R.class')
             }
             source = variant.javaCompile.source
             classpath = files(variant.javaCompile.classpath.files)
             effort = 'max'
-            reportLevel = "low"
+            reportLevel = 'low'
             reports {
                 xml.enabled = false
                 html.enabled = true
@@ -98,8 +98,8 @@ android.libraryVariants.all { variant ->
                 "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
         classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)
         title = "${archivesBaseName} ${version}"
-        options.links("http://docs.oracle.com/javase/7/docs/api/")
-        options.linksOffline("http://developer.android.com/reference/", "${android.sdkDirectory}/docs/reference/")
+        options.links('http://docs.oracle.com/javase/7/docs/api/')
+        options.linksOffline('http://developer.android.com/reference/', "${android.sdkDirectory}/docs/reference/")
         options.overview("${project.projectDir}/docs/overview.html")
         options.windowTitle("Javadoc - ${archivesBaseName}")
         exclude '**/BuildConfig.java'
@@ -114,14 +114,13 @@ android.libraryVariants.all { variant ->
             from variant.sourceSets.java.srcDirs
         }
 
-        archives task("javadocJar${variantName}", type: Jar, dependsOn: tasks["javadoc${variantName}"]) {
+        archives task("javadocJar${variantName}", type: Jar, dependsOn: "javadoc${variantName}") {
             description "Generates Javadoc Jar from the ${variantName} build"
             classifier = 'javadoc'
             from 'build/docs/javadoc'
         }
 
-        archives task("jar${variantName}", type: Jar) {
-            dependsOn variant.javaCompile
+        archives task("jar${variantName}", type: Jar, dependsOn: variant.javaCompile) {
             description "Generates Jar from the ${variantName} build"
             from variant.javaCompile.destinationDir
             exclude '**/BuildConfig.class'
@@ -151,7 +150,7 @@ if (project.hasProperty('uploadEnabled')) {
 
                 if (project.hasProperty('sonatypeUsername') && project.hasProperty('sonatypePassword')) {
 
-                    repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                    repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
                         authentication(userName: sonatypeUsername, password: sonatypePassword)
                     }
                 }
@@ -163,7 +162,7 @@ if (project.hasProperty('uploadEnabled')) {
                     url = 'http://davide-maestroni.github.io/jroutine/'
 
                     scm {
-                        url = 'git@github.com:davide-maestroni/robo-fashion.git'
+                        url = 'git@github.com:davide-maestroni/jroutine.git'
                         connection = 'scm:git:git@github.com:davide-maestroni/jroutine.git'
                         developerConnection = 'scm:git:git@github.com:davide-maestroni/jroutine.git'
                     }

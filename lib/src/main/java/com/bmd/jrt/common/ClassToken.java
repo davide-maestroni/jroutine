@@ -38,7 +38,7 @@ public abstract class ClassToken<CLASS> {
     private Class<CLASS> mRawClass;
 
     /**
-     * Creates a new token from the class specified object.
+     * Creates a new token from the class of the specified object.
      *
      * @param object  the object.
      * @param <CLASS> the class type.
@@ -77,7 +77,7 @@ public abstract class ClassToken<CLASS> {
     }
 
     /**
-     * Casts the specified object to this token raw class.
+     * Casts the specified object to this token type.
      * <p/>
      * Note that the cast is unsafe and may raise an exception.
      *

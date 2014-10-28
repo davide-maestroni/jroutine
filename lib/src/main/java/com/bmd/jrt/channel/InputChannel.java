@@ -23,6 +23,8 @@ import javax.annotation.Nullable;
 /**
  * Interface defining an input channel.
  * <p/>
+ * Note that the delivery order of the input data might not be guaranteed.
+ * <p/>
  * Created by davide on 9/4/14.
  *
  * @param <INPUT> the input type.
@@ -31,8 +33,7 @@ public interface InputChannel<INPUT> extends Channel {
 
     /**
      * Tells the channel to delay the transfer of data of the specified time duration.<br/>
-     * Note that an abort execution will be delayed as well.<br/>
-     * Note also that the delivery order might not be guaranteed.
+     * Note that an abort execution will be delayed as well.
      *
      * @param delay the delay.
      * @return this channel.
@@ -46,8 +47,7 @@ public interface InputChannel<INPUT> extends Channel {
 
     /**
      * Tells the channel to delay the transfer of data of the specified time duration.<br/>
-     * Note that an abort execution will be delayed as well.<br/>
-     * Note also that the delivery order might not be guaranteed.
+     * Note that an abort execution will be delayed as well.
      *
      * @param delay    the delay value.
      * @param timeUnit the delay time unit.

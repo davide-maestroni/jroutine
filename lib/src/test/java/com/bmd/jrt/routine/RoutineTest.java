@@ -922,7 +922,7 @@ public class RoutineTest extends TestCase {
         final BasicOutputConsumer<String> exceptionConsumer = new BasicOutputConsumer<String>() {
 
             @Override
-            public void onClose() {
+            public void onComplete() {
 
                 throw new NullPointerException("test2");
             }

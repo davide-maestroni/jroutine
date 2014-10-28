@@ -36,7 +36,8 @@ public class RoutineInterruptedException extends RoutineException {
      * @param exception the thread interrupted exception.
      * @throws RoutineInterruptedException always.
      */
-    public static void interrupt(final InterruptedException exception) {
+    public static void interrupt(final InterruptedException exception) throws
+            RoutineInterruptedException {
 
         Thread.currentThread().interrupt();
 

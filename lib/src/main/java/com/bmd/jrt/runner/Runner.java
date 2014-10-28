@@ -33,8 +33,8 @@ import javax.annotation.Nonnull;
 public interface Runner {
 
     /**
-     * Runs the specified execution (that is, it calls the execution <code>run()</code> method
-     * inside the runner thread).
+     * Runs the specified execution (that is, it calls the execution <b><code>run()</code></b>
+     * method inside the runner thread).
      *
      * @param execution the execution.
      * @param delay     the execution delay.

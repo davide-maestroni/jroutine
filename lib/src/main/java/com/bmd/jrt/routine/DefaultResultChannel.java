@@ -440,7 +440,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 logger.dbg("closing consumer (%s)", consumer);
 
-                consumer.onClose();
+                consumer.onComplete();
 
             } catch (final RoutineInterruptedException e) {
 
@@ -1177,7 +1177,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         }
 
         @Override
-        public void onClose() {
+        public void onComplete() {
 
             boolean isFlush = false;
 

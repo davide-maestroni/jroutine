@@ -36,7 +36,7 @@ import java.lang.annotation.Target;
  * and every method inside a specific group is protected only from the other methods belonging to
  * the same group.
  * <p/>
- * This annotation allows to identify the method through a constant, thus avoiding problem when
+ * This annotation allows to identify the method through a constant, thus avoiding issues when
  * running obfuscation tools.<br/>
  * For example, the following code:
  * <pre>
@@ -72,9 +72,9 @@ import java.lang.annotation.Target;
  * <p/>
  * The same considerations apply to static class methods.
  * <p/>
- * Finally, be aware that a method might need to be made accessible in order to be called via
- * reflection. That means that, in case a {@link java.lang.SecurityManager} is installed, a
- * security exception might be raised based on the specific policy implemented.
+ * Finally, be aware that a method might need to be made accessible in order to be called. That
+ * means that, in case a {@link java.lang.SecurityManager} is installed, a security exception might
+ * be raised based on the specific policy implemented.
  * <p/>
  * Remember also that, in order for the annotation to properly work at run time, you will need to
  * add the following rules to your Proguard file (if employing it for shrinking or obfuscation):

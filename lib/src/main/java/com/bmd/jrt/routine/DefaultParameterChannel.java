@@ -591,7 +591,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
         }
 
         @Override
-        public void onClose() {
+        public void onComplete() {
 
             synchronized (mMutex) {
 

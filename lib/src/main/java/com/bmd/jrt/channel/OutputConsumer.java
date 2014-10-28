@@ -34,7 +34,7 @@ public interface OutputConsumer<OUTPUT> {
     /**
      * Called when the channel closes after the routine completes its execution.
      */
-    public void onClose();
+    public void onComplete();
 
     /**
      * Called when an output is passed to the channel.

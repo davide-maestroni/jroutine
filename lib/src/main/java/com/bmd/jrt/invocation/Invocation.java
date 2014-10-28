@@ -25,21 +25,21 @@ import javax.annotation.Nullable;
  * <pre>
  *     <code>
  *
- *         - onInit();
+ *         > onInit();
  *
  *           ...
  *
- *         - onInput(input, results);
+ *         > onInput(input, results);
  *
  *           ...
  *
- *         - onInput(input, results);
+ *         > onInput(input, results);
  *
  *           ...
  *
- *         - onResult(results);
+ *         > onResult(results);
  *
- *         - onReturn();
+ *         > onReturn();
  *     </code>
  * </pre>
  * Note that the <b><code>onInput()</code></b> method will be called for each input passed to the
@@ -49,8 +49,8 @@ import javax.annotation.Nullable;
  * Note also that <b><code>onAbort()</code></b> might be called at any time between
  * <b><code>onInit()</code></b> and <b><code>onReturn()</code></b> in case the execution is
  * aborted.<br/>
- * The only case in which the <b><code>onReturn()</code></b> method does not get call, is when an
- * exception escapes the <b><code>onAbort()</code></b> method invocation.
+ * The only case in which the <b><code>onReturn()</code></b> method does not get call at all, is
+ * when an exception escapes the <b><code>onAbort()</code></b> method invocation.
  * <p/>
  * The <b><code>onReturn()</code></b> method is meant to allow the clean up and reset operations
  * needed to prepare the invocation object to be reused. In fact, when the method is not called or

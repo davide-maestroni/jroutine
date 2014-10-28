@@ -221,7 +221,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends BasicRoutine<INPUT,
 
         final Logger logger = mLogger;
 
-        logger.dbg("invoking routine: %sync", (async) ? "a" : "");
+        logger.dbg("invoking routine: %ssync", (async) ? "a" : "");
 
         return new DefaultParameterChannel<INPUT, OUTPUT>(new DefaultInvocationManager(async),
                                                           (async) ? mAsyncRunner : mSyncRunner,

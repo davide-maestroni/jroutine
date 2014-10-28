@@ -19,10 +19,10 @@ import javax.annotation.Nonnull;
  * Interface defining an input/output channel.
  * <p/>
  * An I/O channel is useful to make other asynchronous tasks communicate with a routine.<br/>
- * The channel output can be passed to a routine parameter or result channel in order to feed
- * them with data coming asynchronously from another source. Note however, that in both cases the
- * <code>close()</code> method must be called as soon as data are complete, so to correctly
- * terminate the invocation lifecycle.
+ * The channel output can be passed to a routine input channel in order to feed it with data coming
+ * asynchronously from another source. Note however, that in both cases the
+ * <b><code>close()</code></b> method must be called to correctly terminate the invocation
+ * lifecycle.
  * <p/>
  * Created by davide on 10/25/14.
  *

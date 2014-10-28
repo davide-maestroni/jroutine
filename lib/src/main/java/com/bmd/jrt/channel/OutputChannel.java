@@ -26,6 +26,8 @@ import javax.annotation.Nullable;
  * Interface defining an output channel, that is the channel used to read the routine invocation
  * output data.
  * <p/>
+ * Note that the delivery order of the output data might not be guaranteed.
+ * <p/>
  * Created by davide on 9/4/14.
  *
  * @param <OUTPUT> the output type.
@@ -88,6 +90,10 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @throws IllegalStateException               if this channel is already bound to a consumer.
      * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
      *                                             exception.
+     * @see #afterMax(com.bmd.jrt.time.TimeDuration)
+     * @see #afterMax(long, java.util.concurrent.TimeUnit)
+     * @see #immediately()
+     * @see #eventuallyThrow(RuntimeException)
      */
     @Nonnull
     public OutputChannel<OUTPUT> eventuallyThrow(@Nullable RuntimeException exception);
@@ -107,10 +113,11 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
 
     /**
      * Checks if the routine is complete waiting at the maximum for the set timeout.
-     * <p/>
-     * By default the timeout is set to a few seconds to avoid unexpected deadlocks.
      *
      * @return whether the routine execution has complete.
+     * @see #afterMax(com.bmd.jrt.time.TimeDuration)
+     * @see #afterMax(long, java.util.concurrent.TimeUnit)
+     * @see #immediately()
      */
     public boolean isComplete();
 
@@ -124,6 +131,8 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      *                                             exception.
      * @see #afterMax(com.bmd.jrt.time.TimeDuration)
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
+     * @see #immediately()
+     * @see #eventuallyThrow(RuntimeException)
      */
     @Nonnull
     public List<OUTPUT> readAll();
@@ -140,6 +149,8 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      *                                             exception.
      * @see #afterMax(com.bmd.jrt.time.TimeDuration)
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
+     * @see #immediately()
+     * @see #eventuallyThrow(RuntimeException)
      */
     @Nonnull
     public OutputChannel<OUTPUT> readAllInto(@Nonnull Collection<? super OUTPUT> results);
@@ -153,6 +164,8 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      *                                             exception.
      * @see #afterMax(com.bmd.jrt.time.TimeDuration)
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
+     * @see #immediately()
+     * @see #eventuallyThrow(RuntimeException)
      */
     public OUTPUT readFirst();
 }

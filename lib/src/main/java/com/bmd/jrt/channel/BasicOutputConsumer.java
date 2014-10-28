@@ -32,7 +32,7 @@ public abstract class BasicOutputConsumer<OUTPUT> implements OutputConsumer<OUTP
     }
 
     @Override
-    public void onClose() {
+    public void onComplete() {
 
     }
 

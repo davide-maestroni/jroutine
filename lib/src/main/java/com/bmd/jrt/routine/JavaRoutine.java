@@ -69,8 +69,8 @@ import javax.annotation.Nonnull;
  *         output2.readAllInto(results);
  *     </code>
  * </pre>
- * (Note that, the order of the input or the output of the routine channels may not be guaranteed
- * by the specific routine implementation)
+ * (Note that, the order of the input or the output of the routine is not guaranteed unless the
+ * proper methods are called)
  * <p/>
  * <b>Example 2:</b> Asynchronously concatenate the output of two routines.
  * <pre>
@@ -96,13 +96,13 @@ import javax.annotation.Nonnull;
  *     </code>
  * </pre>
  * <p/>
- * <b>Example 3:</b> Asynchronous callback of the output of two routines.
+ * <b>Example 3:</b> Asynchronously get the output of two routines.
  * <pre>
  *     <code>
  *
  *         public interface AsyncCallback {
  *
- *             &#64;AyncParameters({Result.class, Result.class})
+ *             &#64;AsyncParameters({Result.class, Result.class})
  *             public void onResults(OutputChannel&lt;Result&gt; result1,
  *                                      OutputChannel&lt;Result&gt; result2);
  *         }
@@ -114,6 +114,36 @@ import javax.annotation.Nonnull;
  * </pre>
  * Where the object <code>myCallback</code> implements a method <code>public void onResults(Result
  * result1, Result result2)</code>.
+ * <p/>
+ * <b>Example 4:</b> Asynchronously feed a routine from a different thread.
+ * <pre>
+ *     <code>
+ *
+ *         final IOChannel&lt;Result&gt; channel = JavaRoutine.io().&lt;Result&gt;buildChannel();
+ *
+ *         new Thread() {
+ *
+ *             &#64;Override
+ *             public void run() {
+ *
+ *                 try {
+ *
+ *                     channel.input().pass(new Result());
+ *
+ *                 } finally {
+ *
+ *                     channel.close();
+ *                 }
+ *             }
+ *
+ *         }.start();
+ *
+ *         final Routine&lt;Result, Result&gt; routine =
+ *                  JavaRoutine.&lt;Result&gt;on().buildRoutine();
+ *
+ *         routine.runAsync(channel).readAllInto(results);
+ *     </code>
+ * </pre>
  * <p/>
  * Created by davide on 9/7/14.
  *

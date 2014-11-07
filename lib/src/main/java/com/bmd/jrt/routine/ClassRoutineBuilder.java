@@ -89,7 +89,7 @@ public class ClassRoutineBuilder {
      *
      * @param target the target class or object.
      * @throws NullPointerException     if the specified target is null.
-     * @throws IllegalArgumentException if a duplicate name in the annotations is detected.
+     * @throws IllegalArgumentException if a duplicate tag in the annotations is detected.
      */
     ClassRoutineBuilder(@Nonnull final Object target) {
 
@@ -131,24 +131,24 @@ public class ClassRoutineBuilder {
     }
 
     /**
-     * Returns a routine used for calling the method whose identifying name is specified in a
+     * Returns a routine used for calling the method whose identifying tag is specified in a
      * {@link Async} annotation.
      *
-     * @param name the name specified in the annotation.
+     * @param tag the tag specified in the annotation.
      * @return the routine.
      * @throws IllegalArgumentException if the specified method is not found.
      * @throws RoutineException         if an error occurred while instantiating the optional
      *                                  runner or the routine.
      */
     @Nonnull
-    public Routine<Object, Object> asyncMethod(@Nonnull final String name) {
+    public Routine<Object, Object> asyncMethod(@Nonnull final String tag) {
 
-        final Method method = mMethodMap.get(name);
+        final Method method = mMethodMap.get(tag);
 
         if (method == null) {
 
             throw new IllegalArgumentException(
-                    "no annotated method with name '" + name + "' has been found");
+                    "no annotated method with tag '" + tag + "' has been found");
         }
 
         return method(method);
@@ -199,7 +199,7 @@ public class ClassRoutineBuilder {
     /**
      * Returns a routine used for calling the specified method.
      * <p/>
-     * The method is searched via reflection ignoring an optional name specified in a {@link Async}
+     * The method is searched via reflection ignoring an optional tag specified in a {@link Async}
      * annotation. Though, the other annotation attributes will be honored.
      *
      * @param name           the method name.
@@ -243,7 +243,7 @@ public class ClassRoutineBuilder {
     /**
      * Returns a routine used for calling the specified method.
      * <p/>
-     * The method is invoked ignoring an optional name specified in a {@link Async} annotation.
+     * The method is invoked ignoring an optional tag specified in a {@link Async} annotation.
      * Though, the other annotation attributes will be honored.
      *
      * @param method the method instance.
@@ -416,15 +416,15 @@ public class ClassRoutineBuilder {
     }
 
     /**
-     * Gets the annotated method associated to the specified name.
+     * Gets the annotated method associated to the specified tag.
      *
-     * @param name the name specified in the annotation.
+     * @param tag the tag specified in the annotation.
      * @return the method or null.
      */
     @Nullable
-    protected Method getAnnotatedMethod(@Nonnull final String name) {
+    protected Method getAnnotatedMethod(@Nonnull final String tag) {
 
-        return mMethodMap.get(name);
+        return mMethodMap.get(tag);
     }
 
     /**
@@ -604,21 +604,21 @@ public class ClassRoutineBuilder {
 
             if (annotation != null) {
 
-                String name = annotation.name();
+                String tag = annotation.tag();
 
-                if ((name == null) || (name.length() == 0)) {
+                if ((tag == null) || (tag.length() == 0)) {
 
-                    name = method.getName();
+                    tag = method.getName();
                 }
 
-                if (map.containsKey(name)) {
+                if (map.containsKey(tag)) {
 
                     throw new IllegalArgumentException(
-                            "the name '" + name + "' has already been used to identify a different"
+                            "the tag '" + tag + "' has already been used to identify a different"
                                     + " method");
                 }
 
-                map.put(name, method);
+                map.put(tag, method);
             }
         }
     }

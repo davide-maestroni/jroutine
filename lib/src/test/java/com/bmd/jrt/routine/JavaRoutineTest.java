@@ -99,7 +99,7 @@ public class JavaRoutineTest extends TestCase {
                                                            .runBy(Runners.poolRunner())
                                                            .logLevel(LogLevel.DEBUG)
                                                            .loggedWith(new NullLog())
-                                                           .asyncMethod(TestStatic.NAME);
+                                                           .asyncMethod(TestStatic.GET);
 
         assertThat(routine.call()).containsExactly(-77L);
 
@@ -246,7 +246,7 @@ public class JavaRoutineTest extends TestCase {
                                                             .runBy(Runners.sharedRunner())
                                                             .logLevel(LogLevel.DEBUG)
                                                             .loggedWith(nullLog)
-                                                            .asyncMethod(TestStatic.NAME);
+                                                            .asyncMethod(TestStatic.GET);
 
         assertThat(routine1.call()).containsExactly(-77L);
 
@@ -255,7 +255,7 @@ public class JavaRoutineTest extends TestCase {
                                                             .runBy(Runners.sharedRunner())
                                                             .logLevel(LogLevel.DEBUG)
                                                             .loggedWith(nullLog)
-                                                            .asyncMethod(TestStatic.NAME);
+                                                            .asyncMethod(TestStatic.GET);
 
         assertThat(routine2.call()).containsExactly(-77L);
         assertThat(routine1).isEqualTo(routine2);
@@ -265,7 +265,7 @@ public class JavaRoutineTest extends TestCase {
                                                             .runBy(Runners.sharedRunner())
                                                             .logLevel(LogLevel.DEBUG)
                                                             .loggedWith(nullLog)
-                                                            .asyncMethod(TestStatic.NAME);
+                                                            .asyncMethod(TestStatic.GET);
 
         assertThat(routine3.call()).containsExactly(-77L);
         assertThat(routine1).isNotEqualTo(routine3);
@@ -276,7 +276,7 @@ public class JavaRoutineTest extends TestCase {
                                                             .runBy(Runners.sharedRunner())
                                                             .logLevel(LogLevel.WARNING)
                                                             .loggedWith(nullLog)
-                                                            .asyncMethod(TestStatic.NAME);
+                                                            .asyncMethod(TestStatic.GET);
 
         assertThat(routine4.call()).containsExactly(-77L);
         assertThat(routine3).isNotEqualTo(routine4);
@@ -286,7 +286,7 @@ public class JavaRoutineTest extends TestCase {
                                                             .runBy(Runners.sharedRunner())
                                                             .logLevel(LogLevel.WARNING)
                                                             .loggedWith(new NullLog())
-                                                            .asyncMethod(TestStatic.NAME);
+                                                            .asyncMethod(TestStatic.GET);
 
         assertThat(routine5.call()).containsExactly(-77L);
         assertThat(routine4).isNotEqualTo(routine5);
@@ -299,7 +299,7 @@ public class JavaRoutineTest extends TestCase {
                                                            .runBy(Runners.poolRunner())
                                                            .logLevel(LogLevel.DEBUG)
                                                            .loggedWith(new NullLog())
-                                                           .asyncMethod(Test.NAME);
+                                                           .asyncMethod(Test.GET);
 
         assertThat(routine.call()).containsExactly(-77L);
 
@@ -505,7 +505,7 @@ public class JavaRoutineTest extends TestCase {
                                                             .runBy(Runners.sharedRunner())
                                                             .logLevel(LogLevel.DEBUG)
                                                             .loggedWith(nullLog)
-                                                            .asyncMethod(Test.NAME);
+                                                            .asyncMethod(Test.GET);
 
         assertThat(routine1.call()).containsExactly(-77L);
 
@@ -514,7 +514,7 @@ public class JavaRoutineTest extends TestCase {
                                                             .runBy(Runners.sharedRunner())
                                                             .logLevel(LogLevel.DEBUG)
                                                             .loggedWith(nullLog)
-                                                            .asyncMethod(Test.NAME);
+                                                            .asyncMethod(Test.GET);
 
         assertThat(routine2.call()).containsExactly(-77L);
         assertThat(routine1).isEqualTo(routine2);
@@ -524,7 +524,7 @@ public class JavaRoutineTest extends TestCase {
                                                             .runBy(Runners.sharedRunner())
                                                             .logLevel(LogLevel.DEBUG)
                                                             .loggedWith(nullLog)
-                                                            .asyncMethod(Test.NAME);
+                                                            .asyncMethod(Test.GET);
 
         assertThat(routine3.call()).containsExactly(-77L);
         assertThat(routine1).isNotEqualTo(routine3);
@@ -535,7 +535,7 @@ public class JavaRoutineTest extends TestCase {
                                                             .runBy(Runners.sharedRunner())
                                                             .logLevel(LogLevel.WARNING)
                                                             .loggedWith(nullLog)
-                                                            .asyncMethod(Test.NAME);
+                                                            .asyncMethod(Test.GET);
 
         assertThat(routine4.call()).containsExactly(-77L);
         assertThat(routine3).isNotEqualTo(routine4);
@@ -545,7 +545,7 @@ public class JavaRoutineTest extends TestCase {
                                                             .runBy(Runners.sharedRunner())
                                                             .logLevel(LogLevel.WARNING)
                                                             .loggedWith(new NullLog())
-                                                            .asyncMethod(Test.NAME);
+                                                            .asyncMethod(Test.GET);
 
         assertThat(routine5.call()).containsExactly(-77L);
         assertThat(routine4).isNotEqualTo(routine5);
@@ -672,25 +672,25 @@ public class JavaRoutineTest extends TestCase {
         @AsyncParameters({RuntimeException.class, int.class})
         public void throwException(RuntimeException ex);
 
-        @Async(name = Test.THROW)
+        @Async(tag = Test.THROW)
         @AsyncParameters({int.class})
         public void throwException1(RuntimeException ex);
 
-        @Async(name = Test.THROW)
+        @Async(tag = Test.THROW)
         public int throwException2(RuntimeException ex);
     }
 
     private static class DuplicateAnnotation {
 
-        public static final String NAME = "get";
+        public static final String GET = "get";
 
-        @Async(name = NAME)
+        @Async(tag = GET)
         public int getOne() {
 
             return 1;
         }
 
-        @Async(name = NAME)
+        @Async(tag = GET)
         public int getTwo() {
 
             return 2;
@@ -699,15 +699,15 @@ public class JavaRoutineTest extends TestCase {
 
     private static class DuplicateAnnotationStatic {
 
-        public static final String NAME = "get";
+        public static final String GET = "get";
 
-        @Async(name = NAME)
+        @Async(tag = GET)
         public static int getOne() {
 
             return 1;
         }
 
-        @Async(name = NAME)
+        @Async(tag = GET)
         public static int getTwo() {
 
             return 2;
@@ -733,17 +733,17 @@ public class JavaRoutineTest extends TestCase {
 
     private static class Test {
 
-        public static final String NAME = "get";
+        public static final String GET = "get";
 
         public static final String THROW = "throw";
 
-        @Async(name = NAME)
+        @Async(tag = GET)
         public long getLong() {
 
             return -77;
         }
 
-        @Async(name = THROW, log = NullLog.class, logLevel = LogLevel.DEBUG, sequential = false,
+        @Async(tag = THROW, log = NullLog.class, logLevel = LogLevel.DEBUG, sequential = false,
                runner = MyRunner.class)
         public void throwException(final RuntimeException ex) {
 
@@ -772,17 +772,17 @@ public class JavaRoutineTest extends TestCase {
 
     private static class TestStatic {
 
-        public static final String NAME = "get";
+        public static final String GET = "get";
 
         public static final String THROW = "throw";
 
-        @Async(name = NAME)
+        @Async(tag = GET)
         public static long getLong() {
 
             return -77;
         }
 
-        @Async(name = THROW, log = NullLog.class, logLevel = LogLevel.DEBUG, sequential = false,
+        @Async(tag = THROW, log = NullLog.class, logLevel = LogLevel.DEBUG, sequential = false,
                runner = MyRunner.class)
         public static void throwException(final RuntimeException ex) {
 

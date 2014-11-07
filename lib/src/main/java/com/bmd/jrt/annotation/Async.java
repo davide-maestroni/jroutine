@@ -44,9 +44,9 @@ import java.lang.annotation.Target;
  *
  *         public class MyClass {
  *
- *             public static final String GET_METHOD = "get";
+ *             public static final String METHOD_TAG = "get";
  *
- *             &#64;Async(name = GET_METHOD)
+ *             &#64;Async(tag = METHOD_TAG)
  *             public int getOne() {
  *
  *                 return 1;
@@ -58,11 +58,9 @@ import java.lang.annotation.Target;
  * <pre>
  *     <code>
  *
- *         JavaRoutine.on(new MyClass()).method(MyClass.GET_METHOD).callAsync();
+ *         JavaRoutine.on(new MyClass()).method(MyClass.METHOD_TAG).callAsync();
  *     </code>
  * </pre>
- * <p/>
- * If no name is specified the original one will be used instead.
  * <p/>
  * Additionally, through this annotation it is possible to indicate a specific runner
  * implementation to be used for asynchronous and synchronous invocations, and a specific log and
@@ -116,13 +114,6 @@ public @interface Async {
     LogLevel logLevel() default LogLevel.ERROR;
 
     /**
-     * The name used to identify the method independently from its original signature.
-     *
-     * @return the name.
-     */
-    String name() default DEFAULT;
-
-    /**
      * The ID of the parallel group associated with the annotated method.
      *
      * @return the parallel group ID.
@@ -142,4 +133,11 @@ public @interface Async {
      * @return whether the sequential runner will be used.
      */
     boolean sequential() default false;
+
+    /**
+     * The tag used to identify the method independently from its original signature.
+     *
+     * @return the tag.
+     */
+    String tag() default DEFAULT;
 }

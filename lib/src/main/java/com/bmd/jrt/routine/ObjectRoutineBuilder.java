@@ -61,7 +61,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      *
      * @param target the target object instance.
      * @throws NullPointerException     if the specified target is null.
-     * @throws IllegalArgumentException if a duplicate name in the annotations is detected.
+     * @throws IllegalArgumentException if a duplicate tag in the annotations is detected.
      */
     ObjectRoutineBuilder(@Nonnull final Object target) {
 
@@ -75,11 +75,11 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * Returns a proxy object enabling the asynchronous call of the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link Async} annotation. If no name is assigned the one of the interface method
-     * will be used instead.<br/>
-     * In case the wrapped object does not implement the specified interface, the name attribute
-     * will be used to bind the interface method with the instance ones. The interface will be
-     * interpreted as a mirror of the target object methods, and the optional
+     * optional {@link Async} annotation.<br/>
+     * In case the wrapped object does not implement the specified interface, the tag attribute
+     * will be used to bind the interface method with the instance ones.  If no tag is assigned the
+     * method name will be used instead to map it.<br/>
+     * The interface will be interpreted as a mirror of the target object methods, and the optional
      * {@link AsyncParameters} and {@link AsyncResult} annotations will be honored.
      *
      * @param itf     the interface implemented by the return object.
@@ -222,7 +222,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
                     if (annotation != null) {
 
-                        name = annotation.name();
+                        name = annotation.tag();
                     }
 
                     if ((name == null) || (name.length() == 0)) {

@@ -1034,8 +1034,8 @@ public class RoutineTest extends TestCase {
         assertThat(on(new TestClass()).method(TestClass.class.getMethod("getOne"))
                                       .call()).containsExactly(1);
         assertThat(on(new TestClass()).method("getOne").call()).containsExactly(1);
-        assertThat(on(new TestClass()).asyncMethod(TestClass.GET_METHOD).call()).containsExactly(1);
-        assertThat(on(TestClass.class).asyncMethod(TestClass.GET_METHOD).call(3)).containsExactly(
+        assertThat(on(new TestClass()).asyncMethod(TestClass.GET).call()).containsExactly(1);
+        assertThat(on(TestClass.class).asyncMethod(TestClass.GET).call(3)).containsExactly(
                 3);
         assertThat(on(TestClass.class).asyncMethod("get").callAsync(-3)).containsExactly(-3);
         assertThat(on(TestClass.class).method("get", int.class).callParallel(17)).containsExactly(
@@ -2167,7 +2167,7 @@ public class RoutineTest extends TestCase {
         @AsyncResult
         public OutputChannel<Integer> getOne();
 
-        @Async(name = "getInt")
+        @Async(tag = "getInt")
         public int take(int i);
     }
 
@@ -2320,9 +2320,9 @@ public class RoutineTest extends TestCase {
 
     private static class TestClass implements TestInterface {
 
-        public static final String GET_METHOD = "get";
+        public static final String GET = "get";
 
-        @Async(name = GET_METHOD)
+        @Async(tag = GET)
         public static int get(final int i) {
 
             return i;
@@ -2334,7 +2334,7 @@ public class RoutineTest extends TestCase {
             return i;
         }
 
-        @Async(name = GET_METHOD)
+        @Async(tag = GET)
         public int getOne() {
 
             return 1;

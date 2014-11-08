@@ -15,6 +15,8 @@ package com.bmd.jrt.annotation;
 
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
+import com.bmd.jrt.routine.Catch;
+import com.bmd.jrt.routine.RethrowCatch;
 import com.bmd.jrt.runner.Runner;
 
 import java.lang.annotation.ElementType;
@@ -95,9 +97,14 @@ import java.lang.annotation.Target;
 public @interface Async {
 
     /**
-     * Constant indicating a generic default value.
+     * Constant indicating a generic default string value.
      */
-    static final String DEFAULT = "";
+    static final String DEFAULT_ID = "";
+
+    /**
+     * Constant indicating a generic default int value.
+     */
+    static final int DEFAULT_NUMBER = Integer.MIN_VALUE;
 
     /**
      * The class of the log to be used.
@@ -114,11 +121,25 @@ public @interface Async {
     LogLevel logLevel() default LogLevel.ERROR;
 
     /**
+     * The max number of retained routine instances.
+     *
+     * @return the max retained instances.
+     */
+    int maxRetained() default DEFAULT_NUMBER;
+
+    /**
+     * The max number of concurrently running routine instances.
+     *
+     * @return the max concurrently running instances.
+     */
+    int maxRunning() default DEFAULT_NUMBER;
+
+    /**
      * The ID of the parallel group associated with the annotated method.
      *
      * @return the parallel group ID.
      */
-    String parallelId() default DEFAULT;
+    String parallelId() default DEFAULT_ID;
 
     /**
      * The class of the runner to be used for asynchronous invocations.
@@ -139,5 +160,12 @@ public @interface Async {
      *
      * @return the tag.
      */
-    String tag() default DEFAULT;
+    String tag() default DEFAULT_ID;
+
+    /**
+     * The routine try/catch clause class.
+     *
+     * @return the clause class.
+     */
+    Class<? extends Catch> tryCatch() default RethrowCatch.class;
 }

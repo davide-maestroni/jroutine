@@ -1035,8 +1035,7 @@ public class RoutineTest extends TestCase {
                                       .call()).containsExactly(1);
         assertThat(on(new TestClass()).method("getOne").call()).containsExactly(1);
         assertThat(on(new TestClass()).asyncMethod(TestClass.GET).call()).containsExactly(1);
-        assertThat(on(TestClass.class).asyncMethod(TestClass.GET).call(3)).containsExactly(
-                3);
+        assertThat(on(TestClass.class).asyncMethod(TestClass.GET).call(3)).containsExactly(3);
         assertThat(on(TestClass.class).asyncMethod("get").callAsync(-3)).containsExactly(-3);
         assertThat(on(TestClass.class).method("get", int.class).callParallel(17)).containsExactly(
                 17);

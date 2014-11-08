@@ -589,14 +589,14 @@ public class RoutineProcessor extends AbstractProcessor {
                 final Async annotation = methodElement.getAnnotation(Async.class);
                 final Async targetAnnotation = targetMethod.getAnnotation(Async.class);
 
-                String parallelId = Async.DEFAULT;
+                String parallelId = Async.DEFAULT_ID;
 
                 if (annotation != null) {
 
                     parallelId = annotation.parallelId();
                 }
 
-                if ((targetAnnotation != null) && (parallelId.equals(Async.DEFAULT))) {
+                if ((targetAnnotation != null) && (parallelId.equals(Async.DEFAULT_ID))) {
 
                     parallelId = targetAnnotation.parallelId();
                 }

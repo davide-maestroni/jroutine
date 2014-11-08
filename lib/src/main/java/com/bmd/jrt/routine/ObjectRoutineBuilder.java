@@ -134,6 +134,24 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
     @Override
     @Nonnull
+    public ObjectRoutineBuilder maxRetained(final int maxRetainedInstances) {
+
+        super.maxRetained(maxRetainedInstances);
+
+        return this;
+    }
+
+    @Override
+    @Nonnull
+    public ObjectRoutineBuilder maxRunning(final int maxRunningInstances) {
+
+        super.maxRunning(maxRunningInstances);
+
+        return this;
+    }
+
+    @Override
+    @Nonnull
     public ObjectRoutineBuilder parallelId(@Nullable final String id) {
 
         super.parallelId(id);
@@ -196,6 +214,9 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
             String parallelId = getParallelId();
             Runner runner = getRunner();
             Boolean isSequential = getSequential();
+            int maxRunning = getMaxRunning();
+            int maxRetained = getMaxRetained();
+            Catch catchClause = getCatchClause();
             Log log = getLog();
             LogLevel level = getLogLevel();
 
@@ -302,6 +323,23 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                         isSequential = annotation.sequential();
                     }
 
+                    if (maxRunning != Async.DEFAULT_NUMBER) {
+
+                        maxRunning = annotation.maxRunning();
+                    }
+
+                    if (maxRetained != Async.DEFAULT_NUMBER) {
+
+                        maxRetained = annotation.maxRetained();
+                    }
+
+                    if (catchClause == null) {
+
+                        final Class<? extends Catch> catchClass = annotation.tryCatch();
+
+                        catchClause = catchClass.newInstance();
+                    }
+
                     if (log == null) {
 
                         final Class<? extends Log> logClass = annotation.log();
@@ -334,8 +372,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
             }
 
             final Routine<Object, Object> routine =
-                    getRoutine(targetMethod, parallelId, runner, isSequential, isOverrideParameters,
-                               log, level);
+                    getRoutine(targetMethod, parallelId, runner, isSequential, maxRunning,
+                               maxRetained, isOverrideParameters, catchClause, log, level);
             final OutputChannel<Object> outputChannel;
 
             if (isOverrideParameters) {

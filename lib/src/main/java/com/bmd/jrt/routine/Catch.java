@@ -11,22 +11,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.android.runner;
+package com.bmd.jrt.routine;
 
-import com.bmd.jrt.runner.RunnerWrapper;
+import javax.annotation.Nonnull;
 
 /**
- * Main UI thread runner.
+ * Interface defining a catch clause.
  * <p/>
- * Created by davide on 10/2/14.
+ * Created by davide on 11/8/14.
  */
-public class MainRunner extends RunnerWrapper {
+public interface Catch {
 
     /**
-     * Constructor.
+     * Called when an exception is caught.
+     *
+     * @param ex the exception.
      */
-    public MainRunner() {
-
-        super(AndroidRunners.mainRunner());
-    }
+    public void exception(@Nonnull RoutineInvocationException ex);
 }

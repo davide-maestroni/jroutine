@@ -16,8 +16,7 @@ import com.android.builder.core.BuilderConstants
 apply plugin: 'com.android.library'
 apply plugin: 'jacoco'
 apply plugin: 'findbugs'
-apply plugin: 'maven'
-apply plugin: 'signing'
+apply from: '../upload.gradle'
 
 group = 'com.github.davide-maestroni'
 version = '1.0.0'
@@ -25,7 +24,7 @@ archivesBaseName = project.name
 
 android {
     compileSdkVersion 21
-    buildToolsVersion '21.0.1'
+    buildToolsVersion '21.1.0'
 
     defaultConfig {
         minSdkVersion 8
@@ -41,6 +40,7 @@ android {
         }
 
         debug {
+            minifyEnabled false
             testCoverageEnabled true
         }
     }
@@ -53,6 +53,7 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(':lib')
+    compile project(':jroutineprocessor')
 
     androidTestCompile 'com.squareup:fest-android:1.0.7'
 }
@@ -125,64 +126,6 @@ android.libraryVariants.all { variant ->
             from variant.javaCompile.destinationDir
             exclude '**/BuildConfig.class'
             exclude '**/R*.class'
-        }
-    }
-}
-
-if (project.hasProperty('uploadEnabled')) {
-
-    signing {
-        sign configurations.archives
-    }
-
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-                def localRepoUrl = mavenLocal().url.toString()
-
-                if (file(localRepoUrl).exists()) {
-
-                    // Upload the artifacts to the local repository
-                    repository(url: localRepoUrl)
-                }
-
-                if (project.hasProperty('sonatypeUsername') && project.hasProperty('sonatypePassword')) {
-
-                    repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
-                        authentication(userName: sonatypeUsername, password: sonatypePassword)
-                    }
-                }
-
-                pom.project {
-                    name = archivesBaseName
-                    packaging = 'jar'
-                    description = 'Parallel programming on the go'
-                    url = 'http://davide-maestroni.github.io/jroutine/'
-
-                    scm {
-                        url = 'git@github.com:davide-maestroni/jroutine.git'
-                        connection = 'scm:git:git@github.com:davide-maestroni/jroutine.git'
-                        developerConnection = 'scm:git:git@github.com:davide-maestroni/jroutine.git'
-                    }
-
-                    licenses {
-                        license {
-                            name = 'The Apache Software License, Version 2.0'
-                            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                            distribution = 'repo'
-                        }
-                    }
-
-                    developers {
-                        developer {
-                            id = 'davide-maestroni'
-                            name = 'Davide Maestroni'
-                        }
-                    }
-                }
-            }
         }
     }
 }

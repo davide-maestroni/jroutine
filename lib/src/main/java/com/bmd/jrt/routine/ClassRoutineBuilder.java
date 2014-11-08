@@ -405,6 +405,10 @@ public class ClassRoutineBuilder {
     @SuppressWarnings("ConstantConditions")
     public ClassRoutineBuilder withinTry(@Nonnull final Catch catchClause) {
 
+        //TODO: catch class in annotation?
+        //TODO: maxRetained, maxRunning?
+        //TODO: @ParallelParameters?
+
         if (catchClause == null) {
 
             throw new NullPointerException("the catch clause must not be null");

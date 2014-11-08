@@ -1,1 +1,1 @@
-include 'lib', 'androutine', 'sample'
+include ':lib', ':androutine', ':sample', ':jroutinewrapper', ':jroutineprocessor'

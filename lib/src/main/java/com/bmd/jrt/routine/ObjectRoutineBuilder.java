@@ -186,15 +186,6 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
         return this;
     }
 
-    @Override
-    @Nonnull
-    public ObjectRoutineBuilder withinTry(@Nonnull final Catch catchClause) {
-
-        super.withinTry(catchClause);
-
-        return this;
-    }
-
     /**
      * Invocation handler adapting a different interface to the target object instance.
      */
@@ -216,7 +207,6 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
             Boolean isSequential = getSequential();
             int maxRunning = getMaxRunning();
             int maxRetained = getMaxRetained();
-            Catch catchClause = getCatchClause();
             Log log = getLog();
             LogLevel level = getLogLevel();
 
@@ -333,13 +323,6 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                         maxRetained = annotation.maxRetained();
                     }
 
-                    if (catchClause == null) {
-
-                        final Class<? extends Catch> catchClass = annotation.tryCatch();
-
-                        catchClause = catchClass.newInstance();
-                    }
-
                     if (log == null) {
 
                         final Class<? extends Log> logClass = annotation.log();
@@ -373,7 +356,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
             final Routine<Object, Object> routine =
                     getRoutine(targetMethod, parallelId, runner, isSequential, maxRunning,
-                               maxRetained, isOverrideParameters, catchClause, log, level);
+                               maxRetained, isOverrideParameters, log, level);
             final OutputChannel<Object> outputChannel;
 
             if (isOverrideParameters) {

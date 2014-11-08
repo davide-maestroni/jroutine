@@ -118,19 +118,20 @@ public class JavaRoutineTest extends TestCase {
 
         assertThat(routine2.call()).containsExactly(-77L);
 
-        final Catch testCatch = new Catch() {
-
-            @Override
-            public void exception(@Nonnull final RoutineInvocationException ex) {
-
-                assertThat(ex.getCause()).isExactlyInstanceOf(IllegalArgumentException.class);
-            }
-        };
-
         final Routine<Object, Object> routine3 =
-                JavaRoutine.on(TestStatic.class).withinTry(testCatch).asyncMethod(TestStatic.THROW);
+                JavaRoutine.on(TestStatic.class).asyncMethod(TestStatic.THROW);
 
-        assertThat(routine3.call(new IllegalArgumentException())).isEmpty();
+        try {
+
+            routine3.call(new IllegalArgumentException("test"));
+
+            fail();
+
+        } catch (final RoutineInvocationException e) {
+
+            assertThat(e.getCause()).isExactlyInstanceOf(IllegalArgumentException.class);
+            assertThat(e.getCause().getMessage()).isEqualTo("test");
+        }
 
         final ClassRoutineBuilder builder = JavaRoutine.on(TestStatic2.class);
 
@@ -228,11 +229,21 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            new ClassRoutineBuilder(TestStatic.class).withinTry(null);
+            new ClassRoutineBuilder(TestStatic.class).maxRunning(0);
 
             fail();
 
-        } catch (final NullPointerException ignored) {
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            new ClassRoutineBuilder(TestStatic.class).maxRetained(-1);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
 
         }
     }
@@ -316,19 +327,19 @@ public class JavaRoutineTest extends TestCase {
 
         assertThat(routine2.call()).containsExactly(-77L);
 
-        final Catch testCatch = new Catch() {
+        final Routine<Object, Object> routine3 = JavaRoutine.on(new Test()).asyncMethod(Test.THROW);
 
-            @Override
-            public void exception(@Nonnull final RoutineInvocationException ex) {
+        try {
 
-                assertThat(ex.getCause()).isExactlyInstanceOf(IllegalArgumentException.class);
-            }
-        };
+            routine3.call(new IllegalArgumentException("test"));
 
-        final Routine<Object, Object> routine3 =
-                JavaRoutine.on(new Test()).withinTry(testCatch).asyncMethod(Test.THROW);
+            fail();
 
-        assertThat(routine3.call(new IllegalArgumentException())).isEmpty();
+        } catch (final RoutineInvocationException e) {
+
+            assertThat(e.getCause()).isExactlyInstanceOf(IllegalArgumentException.class);
+            assertThat(e.getCause().getMessage()).isEqualTo("test");
+        }
 
         final ObjectRoutineBuilder builder = JavaRoutine.on(new Test2());
 
@@ -426,11 +437,21 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            new ObjectRoutineBuilder(new Test()).withinTry(null);
+            new ObjectRoutineBuilder(new Test()).maxRunning(0);
 
             fail();
 
-        } catch (final NullPointerException ignored) {
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            new ObjectRoutineBuilder(new Test()).maxRetained(-1);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
 
         }
 

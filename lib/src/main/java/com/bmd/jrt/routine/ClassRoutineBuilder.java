@@ -52,7 +52,7 @@ import static com.bmd.jrt.routine.ReflectionUtils.boxingClass;
  */
 public class ClassRoutineBuilder {
 
-    private static final Catch DEFAULT_CATCH_CLAUSE = new RethrowCatch();
+    //TODO: @ParallelParameters?
 
     private static final ClassToken<MethodSimpleInvocation> METHOD_EXECUTION_TOKEN =
             ClassToken.tokenOf(MethodSimpleInvocation.class);
@@ -71,8 +71,6 @@ public class ClassRoutineBuilder {
     private final Object mTarget;
 
     private final Class<?> mTargetClass;
-
-    private Catch mCatchClause = null;
 
     private Boolean mIsSequential;
 
@@ -311,7 +309,6 @@ public class ClassRoutineBuilder {
         Boolean isSequential = mIsSequential;
         int maxRunning = mMaxRunning;
         int maxRetained = mMaxRetained;
-        Catch catchClause = mCatchClause;
         Log log = mLog;
         LogLevel logLevel = mLogLevel;
 
@@ -360,24 +357,6 @@ public class ClassRoutineBuilder {
                 maxRetained = annotation.maxRetained();
             }
 
-            if (catchClause == null) {
-
-                final Class<? extends Catch> catchClass = annotation.tryCatch();
-
-                try {
-
-                    catchClause = catchClass.newInstance();
-
-                } catch (final InstantiationException e) {
-
-                    throw new RoutineException(e);
-
-                } catch (IllegalAccessException e) {
-
-                    throw new RoutineException(e);
-                }
-            }
-
             if (log == null) {
 
                 final Class<? extends Log> logClass = annotation.log();
@@ -406,7 +385,7 @@ public class ClassRoutineBuilder {
         }
 
         return getRoutine(method, parallelId, runner, isSequential, maxRunning, maxRetained, false,
-                          catchClause, log, logLevel);
+                          log, logLevel);
     }
 
     /**
@@ -473,29 +452,6 @@ public class ClassRoutineBuilder {
     }
 
     /**
-     * Tells the builder to create a routine within the specified try/catch clause.
-     *
-     * @param catchClause the catch clause.
-     * @return this builder.
-     * @throws NullPointerException if the specified clause is null.
-     */
-    @Nonnull
-    @SuppressWarnings("ConstantConditions")
-    public ClassRoutineBuilder withinTry(@Nonnull final Catch catchClause) {
-
-        //TODO: @ParallelParameters?
-
-        if (catchClause == null) {
-
-            throw new NullPointerException("the catch clause must not be null");
-        }
-
-        mCatchClause = catchClause;
-
-        return this;
-    }
-
-    /**
      * Gets the annotated method associated to the specified tag.
      *
      * @param tag the tag specified in the annotation.
@@ -505,11 +461,6 @@ public class ClassRoutineBuilder {
     protected Method getAnnotatedMethod(@Nonnull final String tag) {
 
         return mMethodMap.get(tag);
-    }
-
-    protected Catch getCatchClause() {
-
-        return mCatchClause;
     }
 
     /**
@@ -562,7 +513,6 @@ public class ClassRoutineBuilder {
      * @param maxRunning   the max number of concurrently running instances.
      * @param maxRetained  the max number of retained instances.
      * @param orderedInput whether the input data are forced to be delivered in insertion order.
-     * @param catchClause  the catch clause.
      * @param log          the log instance.
      * @param level        the log level.
      * @return the routine instance.
@@ -571,8 +521,7 @@ public class ClassRoutineBuilder {
     protected Routine<Object, Object> getRoutine(@Nonnull final Method method,
             @Nullable final String parallelId, @Nullable final Runner runner,
             @Nullable final Boolean isSequential, final int maxRunning, final int maxRetained,
-            final boolean orderedInput, @Nullable final Catch catchClause, @Nullable final Log log,
-            @Nullable final LogLevel level) {
+            final boolean orderedInput, @Nullable final Log log, @Nullable final LogLevel level) {
 
         Routine<Object, Object> routine;
 
@@ -590,15 +539,13 @@ public class ClassRoutineBuilder {
                 routineCache.put(target, routineMap);
             }
 
-            final Catch routineCatch = (catchClause != null) ? catchClause : DEFAULT_CATCH_CLAUSE;
             final Log routineLog = (log != null) ? log : Logger.getDefaultLog();
             final LogLevel routineLogLevel = (level != null) ? level : Logger.getDefaultLogLevel();
             final String routineParallelId = (parallelId != null) ? parallelId : "";
 
             final RoutineInfo routineInfo =
                     new RoutineInfo(method, routineParallelId, runner, isSequential, maxRunning,
-                                    maxRetained, orderedInput, routineCatch, routineLog,
-                                    routineLogLevel);
+                                    maxRetained, orderedInput, routineLog, routineLogLevel);
             routine = routineMap.get(routineInfo);
 
             if (routine != null) {
@@ -661,7 +608,7 @@ public class ClassRoutineBuilder {
 
             routine = builder.loggedWith(routineLog)
                              .logLevel(routineLogLevel)
-                             .withArgs(target, targetClass, method, catchClause, mutex)
+                             .withArgs(target, targetClass, method, mutex)
                              .buildRoutine();
             routineMap.put(routineInfo, routine);
         }
@@ -738,8 +685,6 @@ public class ClassRoutineBuilder {
      */
     private static class MethodSimpleInvocation extends SimpleInvocation<Object, Object> {
 
-        private final Catch mCatch;
-
         private final boolean mHasResult;
 
         private final Method mMethod;
@@ -756,17 +701,15 @@ public class ClassRoutineBuilder {
          * @param target      the target object.
          * @param targetClass the taregt class.
          * @param method      the method to wrap.
-         * @param catchClause the catch clause.
          * @param mutex       the mutex used for synchronization.
          */
         public MethodSimpleInvocation(@Nullable final Object target,
                 @Nonnull final Class<?> targetClass, @Nonnull final Method method,
-                @Nonnull final Catch catchClause, @Nonnull final Object mutex) {
+                @Nonnull final Object mutex) {
 
             mTarget = target;
             mTargetClass = targetClass;
             mMethod = method;
-            mCatch = catchClause;
             mMutex = mutex;
 
             final Class<?> returnType = method.getReturnType();
@@ -794,23 +737,17 @@ public class ClassRoutineBuilder {
 
                 } catch (final InvocationTargetException e) {
 
-                    mCatch.exception(
-                            new RoutineInvocationException(e.getCause(), target, mTargetClass,
-                                                           method.getName(),
-                                                           method.getParameterTypes()));
+                    throw new RoutineInvocationException(e.getCause(), target, mTargetClass,
+                                                         method.getName(),
+                                                         method.getParameterTypes());
 
                 } catch (final RoutineException e) {
 
-                    mCatch.exception(
-                            new RoutineInvocationException(e.getCause(), target, mTargetClass,
-                                                           method.getName(),
-                                                           method.getParameterTypes()));
+                    throw e;
 
                 } catch (final Throwable t) {
 
-                    mCatch.exception(new RoutineInvocationException(t, target, mTargetClass,
-                                                                    method.getName(),
-                                                                    method.getParameterTypes()));
+                    throw new RoutineException(t);
                 }
             }
         }
@@ -820,8 +757,6 @@ public class ClassRoutineBuilder {
      * Class used as key to identify a specific routine instance.
      */
     private static class RoutineInfo {
-
-        private final Catch mCatchClause;
 
         private final Boolean mIsSequential;
 
@@ -852,15 +787,13 @@ public class ClassRoutineBuilder {
          * @param maxRetained  the max number of retained instances.
          * @param orderedInput whether the input data are forced to be delivered in insertion
          *                     order.
-         * @param catchClause  the catch clause.
          * @param log          the log instance.
          * @param level        the log level.
          */
         private RoutineInfo(@Nonnull final Method method, @Nonnull final String parallelId,
                 @Nullable final Runner runner, @Nullable final Boolean isSequential,
                 final int maxRunning, final int maxRetained, final boolean orderedInput,
-                @Nonnull final Catch catchClause, @Nonnull final Log log,
-                @Nonnull final LogLevel level) {
+                @Nonnull final Log log, @Nonnull final LogLevel level) {
 
             mMethod = method;
             mParallelId = parallelId;
@@ -869,7 +802,6 @@ public class ClassRoutineBuilder {
             mMaxRunning = maxRunning;
             mMaxRetained = maxRetained;
             mOrderedInput = orderedInput;
-            mCatchClause = catchClause;
             mLog = log;
             mLogLevel = level;
         }
@@ -878,8 +810,7 @@ public class ClassRoutineBuilder {
         public int hashCode() {
 
             // auto-generated code
-            int result = mCatchClause.hashCode();
-            result = 31 * result + (mIsSequential != null ? mIsSequential.hashCode() : 0);
+            int result = mIsSequential != null ? mIsSequential.hashCode() : 0;
             result = 31 * result + mLog.hashCode();
             result = 31 * result + mLogLevel.hashCode();
             result = 31 * result + mMaxRetained;
@@ -908,12 +839,11 @@ public class ClassRoutineBuilder {
             final RoutineInfo that = (RoutineInfo) o;
 
             return mMaxRetained == that.mMaxRetained && mMaxRunning == that.mMaxRunning
-                    && mOrderedInput == that.mOrderedInput && mCatchClause.equals(that.mCatchClause)
-                    && !(mIsSequential != null ? !mIsSequential.equals(that.mIsSequential)
-                    : that.mIsSequential != null) && mLog.equals(that.mLog)
-                    && mLogLevel == that.mLogLevel && mMethod.equals(that.mMethod)
-                    && mParallelId.equals(that.mParallelId) && !(mRunner != null ? !mRunner.equals(
-                    that.mRunner) : that.mRunner != null);
+                    && mOrderedInput == that.mOrderedInput && !(mIsSequential != null
+                    ? !mIsSequential.equals(that.mIsSequential) : that.mIsSequential != null)
+                    && mLog.equals(that.mLog) && mLogLevel == that.mLogLevel && mMethod.equals(
+                    that.mMethod) && mParallelId.equals(that.mParallelId) && !(mRunner != null
+                    ? !mRunner.equals(that.mRunner) : that.mRunner != null);
         }
     }
 

@@ -420,7 +420,6 @@ public class RoutineProcessor extends AbstractProcessor {
         LogLevel logLevel = null;
         TypeElement logType = null;
         TypeElement runnerType = null;
-        //        TypeElement catchType = null;
 
         if (annotation != null) {
 
@@ -442,14 +441,6 @@ public class RoutineProcessor extends AbstractProcessor {
 
                 runnerType = getTypeFromName(runner.toString());
             }
-
-            //            final Object catchClause = getElementValue(methodElement,
-            // annotationType, "tryCatch");
-            //
-            //            if (catchClause != null) {
-            //
-            //                catchType = getTypeFromName(catchClause.toString());
-            //            }
         }
 
         if (targetAnnotation != null) {

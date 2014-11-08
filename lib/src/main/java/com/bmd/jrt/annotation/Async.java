@@ -15,8 +15,6 @@ package com.bmd.jrt.annotation;
 
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
-import com.bmd.jrt.routine.Catch;
-import com.bmd.jrt.routine.RethrowCatch;
 import com.bmd.jrt.runner.Runner;
 
 import java.lang.annotation.ElementType;
@@ -65,8 +63,9 @@ import java.lang.annotation.Target;
  * </pre>
  * <p/>
  * Additionally, through this annotation it is possible to indicate a specific runner
- * implementation to be used for asynchronous and synchronous invocations, and a specific log and
- * log level.<br/>
+ * implementation to be used for asynchronous and synchronous invocations, the maximum invocation
+ * instances running at the same time, the maximum ones retained, and a specific log and log level.
+ * <br/>
  * Note however that the runner and log classes must declare a default constructor to be
  * instantiated via reflection.
  * <p/>
@@ -161,11 +160,4 @@ public @interface Async {
      * @return the tag.
      */
     String tag() default DEFAULT_ID;
-
-    /**
-     * The routine try/catch clause class.
-     *
-     * @return the clause class.
-     */
-    Class<? extends Catch> tryCatch() default RethrowCatch.class;
 }

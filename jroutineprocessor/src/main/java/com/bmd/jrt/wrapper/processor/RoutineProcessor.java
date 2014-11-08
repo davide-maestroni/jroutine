@@ -415,13 +415,18 @@ public class RoutineProcessor extends AbstractProcessor {
         final TypeMirror annotationType = annotationElement.asType();
 
         Boolean isSequential = null;
+        int maxRunning = Async.DEFAULT_NUMBER;
+        int maxRetained = Async.DEFAULT_NUMBER;
         LogLevel logLevel = null;
         TypeElement logType = null;
         TypeElement runnerType = null;
+        //        TypeElement catchType = null;
 
         if (annotation != null) {
 
             isSequential = annotation.sequential();
+            maxRunning = annotation.maxRunning();
+            maxRetained = annotation.maxRetained();
             logLevel = annotation.logLevel();
 
             final Object log = getElementValue(methodElement, annotationType, "log");
@@ -437,6 +442,14 @@ public class RoutineProcessor extends AbstractProcessor {
 
                 runnerType = getTypeFromName(runner.toString());
             }
+
+            //            final Object catchClause = getElementValue(methodElement,
+            // annotationType, "tryCatch");
+            //
+            //            if (catchClause != null) {
+            //
+            //                catchType = getTypeFromName(catchClause.toString());
+            //            }
         }
 
         if (targetAnnotation != null) {
@@ -444,6 +457,16 @@ public class RoutineProcessor extends AbstractProcessor {
             if (isSequential == null) {
 
                 isSequential = targetAnnotation.sequential();
+            }
+
+            if (maxRunning == Async.DEFAULT_NUMBER) {
+
+                maxRunning = targetAnnotation.maxRunning();
+            }
+
+            if (maxRetained == Async.DEFAULT_NUMBER) {
+
+                maxRetained = targetAnnotation.maxRetained();
             }
 
             if (logLevel == null) {
@@ -486,6 +509,16 @@ public class RoutineProcessor extends AbstractProcessor {
 
                 builder.append(".queued()");
             }
+        }
+
+        if (maxRunning != Async.DEFAULT_NUMBER) {
+
+            builder.append(".maxRunning(").append(maxRunning).append(")");
+        }
+
+        if (maxRetained != Async.DEFAULT_NUMBER) {
+
+            builder.append(".maxRetained(").append(maxRetained).append(")");
         }
 
         if (logLevel != null) {

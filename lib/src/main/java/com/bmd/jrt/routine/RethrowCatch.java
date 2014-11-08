@@ -37,6 +37,6 @@ public class RethrowCatch implements Catch {
     @Override
     public boolean equals(final Object obj) {
 
-        return (obj != null) && (obj.getClass().equals(RethrowCatch.class) || super.equals(obj));
+        return (obj != null) && (obj.getClass().equals(getClass()) || super.equals(obj));
     }
 }

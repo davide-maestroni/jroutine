@@ -18,15 +18,18 @@ import com.bmd.jrt.annotation.AsyncParameters;
 import com.bmd.jrt.annotation.AsyncResult;
 import com.bmd.jrt.annotation.DefaultLog;
 import com.bmd.jrt.annotation.DefaultRunner;
+import com.bmd.jrt.annotation.ParallelParameters;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ParameterChannel;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.runner.Runner;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.WeakHashMap;
 
@@ -116,6 +119,15 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
     @Override
     @Nonnull
+    public ObjectRoutineBuilder lockId(@Nullable final String id) {
+
+        super.lockId(id);
+
+        return this;
+    }
+
+    @Override
+    @Nonnull
     public ObjectRoutineBuilder logLevel(@Nonnull final LogLevel level) {
 
         super.logLevel(level);
@@ -146,15 +158,6 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     public ObjectRoutineBuilder maxRunning(final int maxRunningInstances) {
 
         super.maxRunning(maxRunningInstances);
-
-        return this;
-    }
-
-    @Override
-    @Nonnull
-    public ObjectRoutineBuilder parallelId(@Nullable final String id) {
-
-        super.parallelId(id);
 
         return this;
     }
@@ -200,9 +203,10 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
             final Class<?> returnType = method.getReturnType();
             final boolean isOverrideParameters;
             final boolean isOverrideReturn;
+            final boolean isParallel;
 
             Method targetMethod;
-            String parallelId = getParallelId();
+            String lockId = getLockId();
             Runner runner = getRunner();
             Boolean isSequential = getSequential();
             int maxRunning = getMaxRunning();
@@ -223,6 +227,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
                 final Async annotation = method.getAnnotation(Async.class);
                 final AsyncParameters paramAnnotation = method.getAnnotation(AsyncParameters.class);
+                final ParallelParameters parallelAnnotation =
+                        method.getAnnotation(ParallelParameters.class);
 
                 targetMethod = methodMap.get(method);
 
@@ -241,7 +247,32 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                         name = method.getName();
                     }
 
-                    if (paramAnnotation != null) {
+                    if (parallelAnnotation != null) {
+
+                        parameterTypes = new Class[]{parallelAnnotation.value()};
+                        final Class<?>[] methodParameterTypes = method.getParameterTypes();
+
+                        if ((methodParameterTypes.length != 1) || !(
+                                methodParameterTypes[0].isArray()
+                                        || Iterable.class.isAssignableFrom(
+                                        methodParameterTypes[0]))) {
+
+                            throw new IllegalArgumentException(
+                                    "the parallel parameter is not compatible");
+                        }
+
+                        if (paramAnnotation != null) {
+
+                            final Class<?>[] asyncTypes = paramAnnotation.value();
+
+                            if (!Arrays.equals(parameterTypes, asyncTypes)) {
+
+                                throw new IllegalArgumentException(
+                                        "the async parameters are not compatible");
+                            }
+                        }
+
+                    } else if (paramAnnotation != null) {
 
                         parameterTypes = paramAnnotation.value();
                         final Class<?>[] methodParameterTypes = method.getParameterTypes();
@@ -293,9 +324,9 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
                 if (annotation != null) {
 
-                    if (parallelId == null) {
+                    if (lockId == null) {
 
-                        parallelId = annotation.parallelId();
+                        lockId = annotation.lockId();
                     }
 
                     if (runner == null) {
@@ -313,12 +344,12 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                         isSequential = annotation.sequential();
                     }
 
-                    if (maxRunning != Async.DEFAULT_NUMBER) {
+                    if (maxRunning == Async.DEFAULT_NUMBER) {
 
                         maxRunning = annotation.maxRunning();
                     }
 
-                    if (maxRetained != Async.DEFAULT_NUMBER) {
+                    if (maxRetained == Async.DEFAULT_NUMBER) {
 
                         maxRetained = annotation.maxRetained();
                     }
@@ -352,14 +383,54 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
                 isOverrideParameters =
                         (paramAnnotation != null) && (paramAnnotation.value().length > 0);
+
+                isParallel = (parallelAnnotation != null);
             }
 
             final Routine<Object, Object> routine =
-                    getRoutine(targetMethod, parallelId, runner, isSequential, maxRunning,
-                               maxRetained, isOverrideParameters, log, level);
+                    getRoutine(targetMethod, lockId, runner, isSequential, maxRunning, maxRetained,
+                               isOverrideParameters, log, level);
             final OutputChannel<Object> outputChannel;
 
-            if (isOverrideParameters) {
+            if (isParallel) {
+
+                final ParameterChannel<Object, Object> parameterChannel = routine.invokeParallel();
+
+                //TODO: should be a single arg...
+                for (final Object arg : args) {
+
+                    if (arg instanceof OutputChannel) {
+
+                        parameterChannel.pass((OutputChannel<?>) arg);
+
+                    }
+                    if (arg == null) {
+
+                        parameterChannel.pass((Object) null);
+
+                    } else if (arg.getClass().isArray()) {
+
+                        final int length = Array.getLength(arg);
+
+                        for (int i = 0; i < length; i++) {
+
+                            parameterChannel.pass(Array.get(arg, i));
+                        }
+
+                    } else {
+
+                        final Iterable<?> iterable = (Iterable<?>) arg;
+
+                        for (final Object input : iterable) {
+
+                            parameterChannel.pass(input);
+                        }
+                    }
+                }
+
+                outputChannel = parameterChannel.results();
+
+            } else if (isOverrideParameters) {
 
                 final ParameterChannel<Object, Object> parameterChannel = routine.invokeAsync();
 

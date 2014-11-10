@@ -52,9 +52,7 @@ import static com.bmd.jrt.routine.ReflectionUtils.boxingClass;
  */
 public class ClassRoutineBuilder {
 
-    //TODO: @ParallelParameters?
-
-    private static final ClassToken<MethodSimpleInvocation> METHOD_EXECUTION_TOKEN =
+    private static final ClassToken<MethodSimpleInvocation> ASYNC_INVOCATION_TOKEN =
             ClassToken.tokenOf(MethodSimpleInvocation.class);
 
     private static final WeakHashMap<Object, HashMap<String, Object>> sMutexCache =
@@ -74,6 +72,8 @@ public class ClassRoutineBuilder {
 
     private Boolean mIsSequential;
 
+    private String mLockId;
+
     private Log mLog;
 
     private LogLevel mLogLevel;
@@ -81,8 +81,6 @@ public class ClassRoutineBuilder {
     private int mMaxRetained = Async.DEFAULT_NUMBER;
 
     private int mMaxRunning = Async.DEFAULT_NUMBER;
-
-    private String mParallelId;
 
     private Runner mRunner;
 
@@ -154,6 +152,21 @@ public class ClassRoutineBuilder {
         }
 
         return method(method);
+    }
+
+    /**
+     * Tells the builder to create a routine using the specified lock ID.
+     *
+     * @param id the lock ID.
+     * @return this builder.
+     * @see Async
+     */
+    @Nonnull
+    public ClassRoutineBuilder lockId(@Nullable final String id) {
+
+        mLockId = id;
+
+        return this;
     }
 
     /**
@@ -304,7 +317,7 @@ public class ClassRoutineBuilder {
             AccessController.doPrivileged(new SetAccessibleAction(method));
         }
 
-        String parallelId = mParallelId;
+        String lockId = mLockId;
         Runner runner = mRunner;
         Boolean isSequential = mIsSequential;
         int maxRunning = mMaxRunning;
@@ -316,9 +329,9 @@ public class ClassRoutineBuilder {
 
         if (annotation != null) {
 
-            if (parallelId == null) {
+            if (lockId == null) {
 
-                parallelId = annotation.parallelId();
+                lockId = annotation.lockId();
             }
 
             if (runner == null) {
@@ -384,23 +397,8 @@ public class ClassRoutineBuilder {
             }
         }
 
-        return getRoutine(method, parallelId, runner, isSequential, maxRunning, maxRetained, false,
-                          log, logLevel);
-    }
-
-    /**
-     * Tells the builder to create a routine which can run in parallel to other methods.
-     *
-     * @param id the parallel group ID.
-     * @return this builder.
-     * @see Async
-     */
-    @Nonnull
-    public ClassRoutineBuilder parallelId(@Nullable final String id) {
-
-        mParallelId = id;
-
-        return this;
+        return getRoutine(method, lockId, runner, isSequential, maxRunning, maxRetained, false, log,
+                          logLevel);
     }
 
     /**
@@ -464,6 +462,16 @@ public class ClassRoutineBuilder {
     }
 
     /**
+     * Returns the ID of the lock.
+     *
+     * @return the lock ID.
+     */
+    protected String getLockId() {
+
+        return mLockId;
+    }
+
+    /**
      * Returns the log instance set.
      *
      * @return the log instance.
@@ -494,20 +502,10 @@ public class ClassRoutineBuilder {
     }
 
     /**
-     * Returns the ID of the parallel group.
-     *
-     * @return the parallel group ID.
-     */
-    protected String getParallelId() {
-
-        return mParallelId;
-    }
-
-    /**
      * Creates the routine.
      *
      * @param method       the method to wrap.
-     * @param parallelId   the parallel group ID.
+     * @param lockId       the lock ID.
      * @param runner       the asynchronous runner instance.
      * @param isSequential whether a sequential runner must be used for synchronous invocations.
      * @param maxRunning   the max number of concurrently running instances.
@@ -519,7 +517,7 @@ public class ClassRoutineBuilder {
      */
     @Nonnull
     protected Routine<Object, Object> getRoutine(@Nonnull final Method method,
-            @Nullable final String parallelId, @Nullable final Runner runner,
+            @Nullable final String lockId, @Nullable final Runner runner,
             @Nullable final Boolean isSequential, final int maxRunning, final int maxRetained,
             final boolean orderedInput, @Nullable final Log log, @Nullable final LogLevel level) {
 
@@ -541,10 +539,10 @@ public class ClassRoutineBuilder {
 
             final Log routineLog = (log != null) ? log : Logger.getDefaultLog();
             final LogLevel routineLogLevel = (level != null) ? level : Logger.getDefaultLogLevel();
-            final String routineParallelId = (parallelId != null) ? parallelId : "";
+            final String routineLockId = (lockId != null) ? lockId : "";
 
             final RoutineInfo routineInfo =
-                    new RoutineInfo(method, routineParallelId, runner, isSequential, maxRunning,
+                    new RoutineInfo(method, routineLockId, runner, isSequential, maxRunning,
                                     maxRetained, orderedInput, routineLog, routineLogLevel);
             routine = routineMap.get(routineInfo);
 
@@ -553,26 +551,31 @@ public class ClassRoutineBuilder {
                 return routine;
             }
 
-            final WeakHashMap<Object, HashMap<String, Object>> mutexCache = sMutexCache;
-            HashMap<String, Object> mutexMap = mutexCache.get(target);
+            Object mutex = null;
 
-            if (mutexMap == null) {
+            if (!Async.UNLOCKED.equals(routineLockId)) {
 
-                mutexMap = new HashMap<String, Object>();
-                mutexCache.put(target, mutexMap);
-            }
+                final WeakHashMap<Object, HashMap<String, Object>> mutexCache = sMutexCache;
+                HashMap<String, Object> mutexMap = mutexCache.get(target);
 
-            Object mutex = mutexMap.get(routineParallelId);
+                if (mutexMap == null) {
 
-            if (mutex == null) {
+                    mutexMap = new HashMap<String, Object>();
+                    mutexCache.put(target, mutexMap);
+                }
 
-                mutex = new Object();
-                mutexMap.put(routineParallelId, mutex);
+                mutex = mutexMap.get(routineLockId);
+
+                if (mutex == null) {
+
+                    mutex = new Object();
+                    mutexMap.put(routineLockId, mutex);
+                }
             }
 
             final Class<?> targetClass = mTargetClass;
             final RoutineBuilder<Object, Object> builder =
-                    new RoutineBuilder<Object, Object>(METHOD_EXECUTION_TOKEN);
+                    new RoutineBuilder<Object, Object>(ASYNC_INVOCATION_TOKEN);
 
             if (runner != null) {
 
@@ -699,18 +702,18 @@ public class ClassRoutineBuilder {
          * Constructor.
          *
          * @param target      the target object.
-         * @param targetClass the taregt class.
+         * @param targetClass the target class.
          * @param method      the method to wrap.
          * @param mutex       the mutex used for synchronization.
          */
         public MethodSimpleInvocation(@Nullable final Object target,
                 @Nonnull final Class<?> targetClass, @Nonnull final Method method,
-                @Nonnull final Object mutex) {
+                @Nullable final Object mutex) {
 
             mTarget = target;
             mTargetClass = targetClass;
             mMethod = method;
-            mMutex = mutex;
+            mMutex = (mutex != null) ? mutex : this;
 
             final Class<?> returnType = method.getReturnType();
             mHasResult = !Void.class.equals(boxingClass(returnType));
@@ -760,6 +763,8 @@ public class ClassRoutineBuilder {
 
         private final Boolean mIsSequential;
 
+        private final String mLockId;
+
         private final Log mLog;
 
         private final LogLevel mLogLevel;
@@ -772,15 +777,13 @@ public class ClassRoutineBuilder {
 
         private final boolean mOrderedInput;
 
-        private final String mParallelId;
-
         private final Runner mRunner;
 
         /**
          * Constructor.
          *
          * @param method       the method to wrap.
-         * @param parallelId   the parallel group ID.
+         * @param lockId       the lock ID.
          * @param runner       the runner instance.
          * @param isSequential whether a sequential runner must be used for synchronous
          * @param maxRunning   the max number of concurrently running instances.
@@ -790,13 +793,13 @@ public class ClassRoutineBuilder {
          * @param log          the log instance.
          * @param level        the log level.
          */
-        private RoutineInfo(@Nonnull final Method method, @Nonnull final String parallelId,
+        private RoutineInfo(@Nonnull final Method method, @Nonnull final String lockId,
                 @Nullable final Runner runner, @Nullable final Boolean isSequential,
                 final int maxRunning, final int maxRetained, final boolean orderedInput,
                 @Nonnull final Log log, @Nonnull final LogLevel level) {
 
             mMethod = method;
-            mParallelId = parallelId;
+            mLockId = lockId;
             mRunner = runner;
             mIsSequential = isSequential;
             mMaxRunning = maxRunning;
@@ -817,7 +820,7 @@ public class ClassRoutineBuilder {
             result = 31 * result + mMaxRunning;
             result = 31 * result + mMethod.hashCode();
             result = 31 * result + (mOrderedInput ? 1 : 0);
-            result = 31 * result + mParallelId.hashCode();
+            result = 31 * result + mLockId.hashCode();
             result = 31 * result + (mRunner != null ? mRunner.hashCode() : 0);
             return result;
         }
@@ -842,7 +845,7 @@ public class ClassRoutineBuilder {
                     && mOrderedInput == that.mOrderedInput && !(mIsSequential != null
                     ? !mIsSequential.equals(that.mIsSequential) : that.mIsSequential != null)
                     && mLog.equals(that.mLog) && mLogLevel == that.mLogLevel && mMethod.equals(
-                    that.mMethod) && mParallelId.equals(that.mParallelId) && !(mRunner != null
+                    that.mMethod) && mLockId.equals(that.mLockId) && !(mRunner != null
                     ? !mRunner.equals(that.mRunner) : that.mRunner != null);
         }
     }

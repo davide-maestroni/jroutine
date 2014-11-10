@@ -39,7 +39,7 @@ public final class ${className}Async implements ${interfaceFullName} {
         ${routineFieldsInit}
     }
 
-    private Object getMutex(final String parallelId) {
+    private Object getMutex(final String lockId) {
 
         synchronized (mMutexMap) {
 
@@ -52,12 +52,12 @@ public final class ${className}Async implements ${interfaceFullName} {
                 mMutexMap.put(wrapped, mutexMap);
             }
 
-            Object mutex = mutexMap.get(parallelId);
+            Object mutex = mutexMap.get(lockId);
 
             if (mutex == null) {
 
                 mutex = new Object();
-                mutexMap.put(parallelId, mutex);
+                mutexMap.put(lockId, mutex);
             }
 
             return mutex;

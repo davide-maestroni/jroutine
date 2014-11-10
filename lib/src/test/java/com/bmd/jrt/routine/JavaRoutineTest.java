@@ -15,6 +15,8 @@ package com.bmd.jrt.routine;
 
 import com.bmd.jrt.annotation.Async;
 import com.bmd.jrt.annotation.AsyncParameters;
+import com.bmd.jrt.annotation.AsyncResult;
+import com.bmd.jrt.annotation.ParallelParameters;
 import com.bmd.jrt.channel.IOChannel;
 import com.bmd.jrt.channel.InputChannel;
 import com.bmd.jrt.channel.OutputChannel;
@@ -29,6 +31,8 @@ import com.bmd.jrt.time.TimeDuration;
 
 import junit.framework.TestCase;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
@@ -112,7 +116,7 @@ public class JavaRoutineTest extends TestCase {
         final Routine<Object, Object> routine2 = JavaRoutine.on(TestStatic.class)
                                                             .queued()
                                                             .runBy(Runners.poolRunner())
-                                                            .parallelId("test")
+                                                            .lockId("test")
                                                             .method(TestStatic.class.getMethod(
                                                                     "getLong"));
 
@@ -146,8 +150,8 @@ public class JavaRoutineTest extends TestCase {
 
         startTime = System.currentTimeMillis();
 
-        getOne = builder.parallelId("test").method("getOne").runAsync();
-        getTwo = builder.parallelId("test").method("getTwo").runAsync();
+        getOne = builder.lockId("test").method("getOne").runAsync();
+        getTwo = builder.lockId("test").method("getTwo").runAsync();
 
         assertThat(getOne.isComplete()).isTrue();
         assertThat(getTwo.isComplete()).isTrue();
@@ -321,7 +325,7 @@ public class JavaRoutineTest extends TestCase {
         final Routine<Object, Object> routine2 = JavaRoutine.on(new Test())
                                                             .queued()
                                                             .runBy(Runners.poolRunner())
-                                                            .parallelId("test")
+                                                            .lockId("test")
                                                             .method(Test.class.getMethod(
                                                                     "getLong"));
 
@@ -354,8 +358,8 @@ public class JavaRoutineTest extends TestCase {
 
         startTime = System.currentTimeMillis();
 
-        getOne = builder.parallelId("test").method("getOne").runAsync();
-        getTwo = builder.parallelId("test").method("getTwo").runAsync();
+        getOne = builder.lockId("test").method("getOne").runAsync();
+        getTwo = builder.lockId("test").method("getTwo").runAsync();
 
         assertThat(getOne.isComplete()).isTrue();
         assertThat(getTwo.isComplete()).isTrue();
@@ -571,6 +575,24 @@ public class JavaRoutineTest extends TestCase {
         assertThat(routine4).isNotEqualTo(routine5);
     }
 
+    public void testObjectRoutineParallel() {
+
+        final Square square = new Square();
+        final SquareItf squareAsync = JavaRoutine.on(square).as(SquareItf.class);
+
+        assertThat(squareAsync.compute(3)).isEqualTo(9);
+        assertThat(squareAsync.computeParallel1(1, 2, 3).readAll()).contains(1, 4, 9);
+        assertThat(squareAsync.computeParallel2(1, 2, 3).readAll()).contains(1, 4, 9);
+        assertThat(squareAsync.computeParallel3(Arrays.asList(1, 2, 3)).readAll()).contains(1, 4,
+                                                                                            9);
+
+        final IOChannel<Integer> channel = JavaRoutine.io().buildChannel();
+
+        channel.input().pass(1, 2, 3);
+        channel.close();
+        assertThat(squareAsync.computeParallel4(channel.output()).readAll()).contains(1, 4, 9);
+    }
+
     public void testRoutineBuilder() {
 
         final Routine<String, String> routine =
@@ -687,6 +709,31 @@ public class JavaRoutineTest extends TestCase {
         }
     }
 
+    private static interface SquareItf {
+
+        public int compute(int i);
+
+        @Async(tag = "compute", lockId = Async.UNLOCKED)
+        @AsyncResult
+        @ParallelParameters(int.class)
+        public OutputChannel<Integer> computeParallel1(int... i);
+
+        @Async(tag = "compute")
+        @AsyncResult
+        @ParallelParameters(int.class)
+        public OutputChannel<Integer> computeParallel2(Integer... i);
+
+        @Async(tag = "compute", lockId = Async.UNLOCKED)
+        @AsyncResult
+        @ParallelParameters(int.class)
+        public OutputChannel<Integer> computeParallel3(List<Integer> i);
+
+        @Async(tag = "compute", lockId = Async.UNLOCKED)
+        @AsyncResult
+        @ParallelParameters(int.class)
+        public OutputChannel<Integer> computeParallel4(OutputChannel<Integer> i);
+    }
+
     private static interface TestItf {
 
         @AsyncParameters({RuntimeException.class, int.class})
@@ -751,6 +798,14 @@ public class JavaRoutineTest extends TestCase {
         }
     }
 
+    private static class Square {
+
+        public int compute(final int i) {
+
+            return i * i;
+        }
+    }
+
     private static class Test {
 
         public static final String GET = "get";
@@ -773,7 +828,7 @@ public class JavaRoutineTest extends TestCase {
 
     private static class Test2 {
 
-        @Async(parallelId = "1")
+        @Async(lockId = "1")
         public int getOne() throws InterruptedException {
 
             TimeDuration.millis(500).sleepAtLeast();
@@ -781,7 +836,7 @@ public class JavaRoutineTest extends TestCase {
             return 1;
         }
 
-        @Async(parallelId = "2")
+        @Async(lockId = "2")
         public int getTwo() throws InterruptedException {
 
             TimeDuration.millis(500).sleepAtLeast();
@@ -812,7 +867,7 @@ public class JavaRoutineTest extends TestCase {
 
     private static class TestStatic2 {
 
-        @Async(parallelId = "1")
+        @Async(lockId = "1")
         public static int getOne() throws InterruptedException {
 
             TimeDuration.millis(500).sleepAtLeast();
@@ -820,7 +875,7 @@ public class JavaRoutineTest extends TestCase {
             return 1;
         }
 
-        @Async(parallelId = "2")
+        @Async(lockId = "2")
         public static int getTwo() throws InterruptedException {
 
             TimeDuration.millis(500).sleepAtLeast();

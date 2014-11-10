@@ -36,7 +36,7 @@
         private SimpleInvocation${methodCount}(final ${className}Async outer) {
 
             mWrapped = outer.mWrapped;
-            mMutex = outer.getMutex("${parallelId}");
+            mMutex = outer.getMutex("${lockId}");
         }
 
         @Override

@@ -613,19 +613,19 @@ public class RoutineProcessor extends AbstractProcessor {
                 final Async annotation = methodElement.getAnnotation(Async.class);
                 final Async targetAnnotation = targetMethod.getAnnotation(Async.class);
 
-                String parallelId = Async.DEFAULT_ID;
+                String lockId = Async.DEFAULT_ID;
 
                 if (annotation != null) {
 
-                    parallelId = annotation.parallelId();
+                    lockId = annotation.lockId();
                 }
 
-                if ((targetAnnotation != null) && (parallelId.equals(Async.DEFAULT_ID))) {
+                if ((targetAnnotation != null) && (lockId.equals(Async.DEFAULT_ID))) {
 
-                    parallelId = targetAnnotation.parallelId();
+                    lockId = targetAnnotation.lockId();
                 }
 
-                method = method.replace("${parallelId}", parallelId);
+                method = method.replace("${lockId}", lockId);
 
                 writer.append(method);
             }

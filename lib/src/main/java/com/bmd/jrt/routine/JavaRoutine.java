@@ -102,7 +102,7 @@ import javax.annotation.Nonnull;
  *
  *         public interface AsyncCallback {
  *
- *             &#64;AsyncParameters({Result.class, Result.class})
+ *             &#64;AsyncOverride({Result.class, Result.class})
  *             public void onResults(OutputChannel&lt;Result&gt; result1,
  *                                      OutputChannel&lt;Result&gt; result2);
  *         }
@@ -148,10 +148,12 @@ import javax.annotation.Nonnull;
  * Created by davide on 9/7/14.
  *
  * @see com.bmd.jrt.annotation.Async
- * @see com.bmd.jrt.annotation.AsyncParameters
- * @see com.bmd.jrt.annotation.AsyncResult
+ * @see com.bmd.jrt.annotation.AsyncOverride
  */
 public class JavaRoutine {
+
+    //TODO: routinebuilder interface
+    //TODO: maxinput, maxoutput, maxinputtimeout, etc.
 
     /**
      * Avoid direct instantiation.

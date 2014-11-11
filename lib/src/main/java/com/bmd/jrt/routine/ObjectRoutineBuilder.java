@@ -14,11 +14,9 @@
 package com.bmd.jrt.routine;
 
 import com.bmd.jrt.annotation.Async;
-import com.bmd.jrt.annotation.AsyncParameters;
-import com.bmd.jrt.annotation.AsyncResult;
+import com.bmd.jrt.annotation.AsyncOverride;
 import com.bmd.jrt.annotation.DefaultLog;
 import com.bmd.jrt.annotation.DefaultRunner;
-import com.bmd.jrt.annotation.ParallelParameters;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ParameterChannel;
 import com.bmd.jrt.log.Log;
@@ -29,7 +27,6 @@ import java.lang.reflect.Array;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.WeakHashMap;
 
@@ -47,8 +44,7 @@ import static com.bmd.jrt.routine.ReflectionUtils.boxingClass;
  * Created by davide on 9/21/14.
  *
  * @see Async
- * @see AsyncParameters
- * @see AsyncResult
+ * @see AsyncOverride
  */
 public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
@@ -83,7 +79,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * will be used to bind the interface method with the instance ones.  If no tag is assigned the
      * method name will be used instead to map it.<br/>
      * The interface will be interpreted as a mirror of the target object methods, and the optional
-     * {@link AsyncParameters} and {@link AsyncResult} annotations will be honored.
+     * {@link AsyncOverride} annotation will be honored.
      *
      * @param itf     the interface implemented by the return object.
      * @param <CLASS> the interface type.
@@ -201,9 +197,9 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
             final Object target = mTarget;
             final Class<?> targetClass = mTargetClass;
             final Class<?> returnType = method.getReturnType();
-            final boolean isOverrideParameters;
-            final boolean isOverrideReturn;
-            final boolean isParallel;
+            boolean isOverrideParameters = false;
+            boolean isOverrideResult = false;
+            boolean isParallel = false;
 
             Method targetMethod;
             String lockId = getLockId();
@@ -226,9 +222,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                 }
 
                 final Async annotation = method.getAnnotation(Async.class);
-                final AsyncParameters paramAnnotation = method.getAnnotation(AsyncParameters.class);
-                final ParallelParameters parallelAnnotation =
-                        method.getAnnotation(ParallelParameters.class);
+                final AsyncOverride overrideAnnotation = method.getAnnotation(AsyncOverride.class);
 
                 targetMethod = methodMap.get(method);
 
@@ -247,34 +241,9 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                         name = method.getName();
                     }
 
-                    if (parallelAnnotation != null) {
+                    if (overrideAnnotation != null) {
 
-                        parameterTypes = new Class[]{parallelAnnotation.value()};
-                        final Class<?>[] methodParameterTypes = method.getParameterTypes();
-
-                        if ((methodParameterTypes.length != 1) || !(
-                                methodParameterTypes[0].isArray()
-                                        || Iterable.class.isAssignableFrom(
-                                        methodParameterTypes[0]))) {
-
-                            throw new IllegalArgumentException(
-                                    "the parallel parameter is not compatible");
-                        }
-
-                        if (paramAnnotation != null) {
-
-                            final Class<?>[] asyncTypes = paramAnnotation.value();
-
-                            if (!Arrays.equals(parameterTypes, asyncTypes)) {
-
-                                throw new IllegalArgumentException(
-                                        "the async parameters are not compatible");
-                            }
-                        }
-
-                    } else if (paramAnnotation != null) {
-
-                        parameterTypes = paramAnnotation.value();
+                        parameterTypes = overrideAnnotation.value();
                         final Class<?>[] methodParameterTypes = method.getParameterTypes();
 
                         if (parameterTypes.length != methodParameterTypes.length) {
@@ -283,18 +252,55 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                                     "the async parameters are not compatible");
                         }
 
-                        final int length = parameterTypes.length;
+                        isParallel = overrideAnnotation.parallel();
 
-                        for (int i = 0; i < length; i++) {
+                        if (isParallel) {
 
-                            final Class<?> parameterType = methodParameterTypes[i];
-
-                            if (!OutputChannel.class.equals(parameterType)
-                                    && !parameterTypes[i].isAssignableFrom(parameterType)) {
+                            if (methodParameterTypes.length != 1) {
 
                                 throw new IllegalArgumentException(
-                                        "the async parameters are not compatible");
+                                        "the parallel parameter is not compatible");
                             }
+
+                            final Class<?> parameterType = methodParameterTypes[0];
+
+                            if (OutputChannel.class.equals(parameterType)) {
+
+                                isOverrideParameters = true;
+
+                            } else if (!parameterType.isArray() && !Iterable.class.isAssignableFrom(
+                                    parameterType)) {
+
+                                throw new IllegalArgumentException(
+                                        "the parallel parameter is not compatible");
+                            }
+
+                        } else if (parameterTypes.length > 0) {
+
+                            isOverrideParameters = true;
+
+                            final int length = parameterTypes.length;
+
+                            for (int i = 0; i < length; i++) {
+
+                                final Class<?> parameterType = methodParameterTypes[i];
+
+                                if (!OutputChannel.class.equals(parameterType) && !parameterTypes[i]
+                                        .isAssignableFrom(parameterType)) {
+
+                                    throw new IllegalArgumentException(
+                                            "the async parameters are not compatible");
+                                }
+                            }
+                        }
+
+                        isOverrideResult = overrideAnnotation.result();
+
+                        if (isOverrideResult && !OutputChannel
+                                .class.isAssignableFrom(returnType)) {
+
+                            throw new IllegalArgumentException(
+                                    "the async return type is not compatible");
                         }
                     }
 
@@ -370,21 +376,12 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                     }
                 }
 
-                isOverrideReturn = (method.getAnnotation(AsyncResult.class) != null)
-                        && OutputChannel.class.isAssignableFrom(returnType);
-
-                if (!isOverrideReturn && !returnType.isAssignableFrom(
-                        targetMethod.getReturnType())) {
+                if (!isOverrideResult && !returnType.isAssignableFrom(targetMethod.getReturnType())) {
 
                     throw new IllegalArgumentException("the async return type is not compatible");
                 }
 
                 methodMap.put(method, targetMethod);
-
-                isOverrideParameters =
-                        (paramAnnotation != null) && (paramAnnotation.value().length > 0);
-
-                isParallel = (parallelAnnotation != null);
             }
 
             final Routine<Object, Object> routine =
@@ -395,36 +392,32 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
             if (isParallel) {
 
                 final ParameterChannel<Object, Object> parameterChannel = routine.invokeParallel();
+                final Object arg = args[0];
 
-                //TODO: should be a single arg...
-                for (final Object arg : args) {
+                if (isOverrideParameters) {
 
-                    if (arg instanceof OutputChannel) {
+                    parameterChannel.pass((OutputChannel<?>) arg);
 
-                        parameterChannel.pass((OutputChannel<?>) arg);
+                } else if (arg == null) {
 
+                    parameterChannel.pass((Object) null);
+
+                } else if (arg.getClass().isArray()) {
+
+                    final int length = Array.getLength(arg);
+
+                    for (int i = 0; i < length; i++) {
+
+                        parameterChannel.pass(Array.get(arg, i));
                     }
-                    if (arg == null) {
 
-                        parameterChannel.pass((Object) null);
+                } else {
 
-                    } else if (arg.getClass().isArray()) {
+                    final Iterable<?> iterable = (Iterable<?>) arg;
 
-                        final int length = Array.getLength(arg);
+                    for (final Object input : iterable) {
 
-                        for (int i = 0; i < length; i++) {
-
-                            parameterChannel.pass(Array.get(arg, i));
-                        }
-
-                    } else {
-
-                        final Iterable<?> iterable = (Iterable<?>) arg;
-
-                        for (final Object input : iterable) {
-
-                            parameterChannel.pass(input);
-                        }
+                        parameterChannel.pass(input);
                     }
                 }
 
@@ -455,7 +448,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
             if (!Void.class.equals(boxingClass(returnType))) {
 
-                if (isOverrideReturn) {
+                if (isOverrideResult) {
 
                     return outputChannel;
                 }

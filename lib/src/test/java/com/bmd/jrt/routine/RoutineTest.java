@@ -14,8 +14,7 @@
 package com.bmd.jrt.routine;
 
 import com.bmd.jrt.annotation.Async;
-import com.bmd.jrt.annotation.AsyncParameters;
-import com.bmd.jrt.annotation.AsyncResult;
+import com.bmd.jrt.annotation.AsyncOverride;
 import com.bmd.jrt.channel.BasicOutputConsumer;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.OutputConsumer;
@@ -2160,10 +2159,10 @@ public class RoutineTest extends TestCase {
 
     private interface TestInterfaceAsync {
 
-        @AsyncParameters({int.class})
+        @AsyncOverride({int.class})
         public int getInt(OutputChannel<Integer> i);
 
-        @AsyncResult
+        @AsyncOverride(result = true)
         public OutputChannel<Integer> getOne();
 
         @Async(tag = "getInt")

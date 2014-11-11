@@ -14,9 +14,7 @@
 package com.bmd.jrt.routine;
 
 import com.bmd.jrt.annotation.Async;
-import com.bmd.jrt.annotation.AsyncParameters;
-import com.bmd.jrt.annotation.AsyncResult;
-import com.bmd.jrt.annotation.ParallelParameters;
+import com.bmd.jrt.annotation.AsyncOverride;
 import com.bmd.jrt.channel.IOChannel;
 import com.bmd.jrt.channel.InputChannel;
 import com.bmd.jrt.channel.OutputChannel;
@@ -714,33 +712,29 @@ public class JavaRoutineTest extends TestCase {
         public int compute(int i);
 
         @Async(tag = "compute", lockId = Async.UNLOCKED)
-        @AsyncResult
-        @ParallelParameters(int.class)
+        @AsyncOverride(value = int.class, parallel = true, result = true)
         public OutputChannel<Integer> computeParallel1(int... i);
 
         @Async(tag = "compute")
-        @AsyncResult
-        @ParallelParameters(int.class)
+        @AsyncOverride(value = int.class, parallel = true, result = true)
         public OutputChannel<Integer> computeParallel2(Integer... i);
 
         @Async(tag = "compute", lockId = Async.UNLOCKED)
-        @AsyncResult
-        @ParallelParameters(int.class)
+        @AsyncOverride(value = int.class, parallel = true, result = true)
         public OutputChannel<Integer> computeParallel3(List<Integer> i);
 
         @Async(tag = "compute", lockId = Async.UNLOCKED)
-        @AsyncResult
-        @ParallelParameters(int.class)
+        @AsyncOverride(value = int.class, parallel = true, result = true)
         public OutputChannel<Integer> computeParallel4(OutputChannel<Integer> i);
     }
 
     private static interface TestItf {
 
-        @AsyncParameters({RuntimeException.class, int.class})
+        @AsyncOverride({RuntimeException.class, int.class})
         public void throwException(RuntimeException ex);
 
         @Async(tag = Test.THROW)
-        @AsyncParameters({int.class})
+        @AsyncOverride({int.class})
         public void throwException1(RuntimeException ex);
 
         @Async(tag = Test.THROW)

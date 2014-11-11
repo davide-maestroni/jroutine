@@ -14,8 +14,7 @@
 package com.bmd.jrt.wrapper.processor;
 
 import com.bmd.jrt.annotation.Async;
-import com.bmd.jrt.annotation.AsyncParameters;
-import com.bmd.jrt.annotation.AsyncResult;
+import com.bmd.jrt.annotation.AsyncOverride;
 import com.bmd.jrt.annotation.DefaultLog;
 import com.bmd.jrt.annotation.DefaultRunner;
 import com.bmd.jrt.log.Log.LogLevel;
@@ -532,7 +531,9 @@ public class RoutineProcessor extends AbstractProcessor {
             builder.append(".runBy(new ").append(runnerType).append("())");
         }
 
-        if (methodElement.getAnnotation(AsyncParameters.class) != null) {
+        final AsyncOverride overrideAnnotation = methodElement.getAnnotation(AsyncOverride.class);
+
+        if ((overrideAnnotation != null) && (overrideAnnotation.value().length > 0)) {
 
             builder.append(".orderedInput()");
         }
@@ -583,7 +584,10 @@ public class RoutineProcessor extends AbstractProcessor {
 
                 String method;
 
-                if (methodElement.getAnnotation(AsyncResult.class) != null) {
+                final AsyncOverride overrideAnnotation =
+                        methodElement.getAnnotation(AsyncOverride.class);
+
+                if ((overrideAnnotation != null) && overrideAnnotation.result()) {
 
                     method = mMethodAsync.replace("${resultClassName}",
                                                   boxingClassName(returnTypeName));
@@ -659,8 +663,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
         ExecutableElement targetMethod = null;
         final Async asyncAnnotation = methodElement.getAnnotation(Async.class);
-        final AsyncParameters asyncParametersAnnotation =
-                methodElement.getAnnotation(AsyncParameters.class);
+        final AsyncOverride overrideAnnotation = methodElement.getAnnotation(AsyncOverride.class);
 
         if (asyncAnnotation != null) {
 
@@ -685,10 +688,10 @@ public class RoutineProcessor extends AbstractProcessor {
 
                 if (targetMethod == null) {
 
-                    if (asyncParametersAnnotation != null) {
+                    if (overrideAnnotation != null) {
 
                         final TypeElement annotationElement =
-                                getTypeFromName(AsyncParameters.class.getName());
+                                getTypeFromName(AsyncOverride.class.getName());
                         final TypeMirror annotationType = annotationElement.asType();
 
                         final List<?> values =
@@ -753,10 +756,10 @@ public class RoutineProcessor extends AbstractProcessor {
 
             final Name methodName = methodElement.getSimpleName();
 
-            if (asyncParametersAnnotation != null) {
+            if (overrideAnnotation != null) {
 
                 final TypeElement annotationElement =
-                        getTypeFromName(AsyncParameters.class.getName());
+                        getTypeFromName(AsyncOverride.class.getName());
                 final TypeMirror annotationType = annotationElement.asType();
 
                 final List<?> values =

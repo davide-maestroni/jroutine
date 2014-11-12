@@ -22,6 +22,7 @@ import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This annotation is used to indicate methods that are to be invoked in an asynchronous way.
@@ -64,6 +65,7 @@ import java.lang.annotation.Target;
  * Additionally, through this annotation it is possible to indicate a specific runner
  * implementation to be used for asynchronous and synchronous invocations, the maximum invocation
  * instances running at the same time, the maximum ones retained, and a specific log and log level.
+ * TODO
  * <br/>
  * Note however that the runner and log classes must declare a default constructor to be
  * instantiated via reflection.
@@ -110,6 +112,26 @@ public @interface Async {
     static final String UNLOCKED = "com.bmd.jrt.annotation.Async.UNLOCKED";
 
     /**
+     * @return
+     */
+    TimeUnit availTimeUnit() default TimeUnit.MILLISECONDS;
+
+    /**
+     * @return
+     */
+    long availTimeout() default DEFAULT_NUMBER;
+
+    /**
+     * @return
+     */
+    TimeUnit inputTimeUnit() default TimeUnit.MILLISECONDS;
+
+    /**
+     * @return
+     */
+    long inputTimeout() default DEFAULT_NUMBER;
+
+    /**
      * The ID of the lock associated with the annotated method.
      *
      * @return the lock ID.
@@ -131,6 +153,16 @@ public @interface Async {
     LogLevel logLevel() default LogLevel.ERROR;
 
     /**
+     * @return
+     */
+    int maxInput() default DEFAULT_NUMBER;
+
+    /**
+     * @return
+     */
+    int maxOutput() default DEFAULT_NUMBER;
+
+    /**
      * The max number of retained routine instances.
      *
      * @return the max retained instances.
@@ -143,6 +175,26 @@ public @interface Async {
      * @return the max concurrently running instances.
      */
     int maxRunning() default DEFAULT_NUMBER;
+
+    /**
+     * @return
+     */
+    boolean orderedInput() default false;
+
+    /**
+     * @return
+     */
+    boolean orderedOutput() default false;
+
+    /**
+     * @return
+     */
+    TimeUnit outputTimeUnit() default TimeUnit.MILLISECONDS;
+
+    /**
+     * @return
+     */
+    long outputTimeout() default DEFAULT_NUMBER;
 
     /**
      * The class of the runner to be used for asynchronous invocations.

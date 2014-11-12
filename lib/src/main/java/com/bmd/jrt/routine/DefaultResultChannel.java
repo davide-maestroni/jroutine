@@ -133,8 +133,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         abort(throwable, true);
     }
 
-    @Override
     @Nonnull
+    @Override
     @SuppressWarnings("ConstantConditions")
     public ResultChannel<OUTPUT> after(@Nonnull final TimeDuration delay) {
 
@@ -155,22 +155,22 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         return this;
     }
 
-    @Override
     @Nonnull
+    @Override
     public ResultChannel<OUTPUT> after(final long delay, @Nonnull final TimeUnit timeUnit) {
 
         return after(fromUnit(delay, timeUnit));
     }
 
-    @Override
     @Nonnull
+    @Override
     public ResultChannel<OUTPUT> now() {
 
         return after(ZERO);
     }
 
-    @Override
     @Nonnull
+    @Override
     public ResultChannel<OUTPUT> pass(@Nullable final OutputChannel<OUTPUT> channel) {
 
         final TimeDuration delay;
@@ -203,8 +203,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         return this;
     }
 
-    @Override
     @Nonnull
+    @Override
     public ResultChannel<OUTPUT> pass(@Nullable final Iterable<? extends OUTPUT> outputs) {
 
         NestedQueue<Object> outputQueue;
@@ -254,8 +254,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         return this;
     }
 
-    @Override
     @Nonnull
+    @Override
     public ResultChannel<OUTPUT> pass(@Nullable final OUTPUT output) {
 
         NestedQueue<Object> outputQueue;
@@ -294,8 +294,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         return this;
     }
 
-    @Override
     @Nonnull
+    @Override
     public ResultChannel<OUTPUT> pass(@Nullable final OUTPUT... outputs) {
 
         synchronized (mMutex) {
@@ -854,8 +854,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         private final Logger mSubLogger = mLogger.subContextLogger(this);
 
-        @Override
         @Nonnull
+        @Override
         @SuppressWarnings("ConstantConditions")
         public OutputChannel<OUTPUT> afterMax(@Nonnull final TimeDuration timeout) {
 
@@ -876,16 +876,16 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             return this;
         }
 
-        @Override
         @Nonnull
+        @Override
         public OutputChannel<OUTPUT> afterMax(final long timeout,
                 @Nonnull final TimeUnit timeUnit) {
 
             return afterMax(fromUnit(timeout, timeUnit));
         }
 
-        @Override
         @Nonnull
+        @Override
         @SuppressWarnings("ConstantConditions")
         public OutputChannel<OUTPUT> bind(@Nullable final OutputConsumer<OUTPUT> consumer) {
 
@@ -917,8 +917,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             return this;
         }
 
-        @Override
         @Nonnull
+        @Override
         public OutputChannel<OUTPUT> eventuallyThrow(@Nullable final RuntimeException exception) {
 
             synchronized (mMutex) {
@@ -931,8 +931,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             return this;
         }
 
-        @Override
         @Nonnull
+        @Override
         public OutputChannel<OUTPUT> immediately() {
 
             return afterMax(ZERO);
@@ -975,8 +975,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             return isDone;
         }
 
-        @Override
         @Nonnull
+        @Override
         public List<OUTPUT> readAll() {
 
             final ArrayList<OUTPUT> results = new ArrayList<OUTPUT>();
@@ -985,8 +985,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             return results;
         }
 
-        @Override
         @Nonnull
+        @Override
         @SuppressWarnings({"unchecked", "ConstantConditions"})
         public OutputChannel<OUTPUT> readAllInto(
                 @Nonnull final Collection<? super OUTPUT> results) {
@@ -1073,8 +1073,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             return readQueue(mOutputTimeout, mOutputTimeoutException);
         }
 
-        @Override
         @Nonnull
+        @Override
         public Iterator<OUTPUT> iterator() {
 
             final TimeDuration timeout;

@@ -80,8 +80,8 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
         mLogger = Logger.create(log, logLevel, this);
     }
 
-    @Override
     @Nonnull
+    @Override
     protected Invocation<INPUT, OUTPUT> createInvocation(final boolean async) {
 
         final Logger logger = mLogger;

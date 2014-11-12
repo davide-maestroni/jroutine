@@ -154,6 +154,7 @@ public class JavaRoutine {
 
     //TODO: routinebuilder interface
     //TODO: maxinput, maxoutput, maxinputtimeout, etc.
+    //TODO: processor builder
 
     /**
      * Avoid direct instantiation.
@@ -167,9 +168,9 @@ public class JavaRoutine {
      *
      * @return the channel builder instance.
      */
-    public static ChannelBuilder io() {
+    public static IOChannelBuilder io() {
 
-        return new ChannelBuilder();
+        return new IOChannelBuilder();
     }
 
     /**
@@ -179,9 +180,10 @@ public class JavaRoutine {
      * @return the routine builder instance.
      */
     @Nonnull
-    public static <DATA> RoutineBuilder<DATA, DATA> on() {
+    public static <DATA> InvocationRoutineBuilder<DATA, DATA> on() {
 
-        return new RoutineBuilder<DATA, DATA>(new ClassToken<PassThroughInvocation<DATA>>() {});
+        return new InvocationRoutineBuilder<DATA, DATA>(
+                new ClassToken<PassThroughInvocation<DATA>>() {});
     }
 
     /**
@@ -209,10 +211,10 @@ public class JavaRoutine {
      * @throws NullPointerException if the class token is null.
      */
     @Nonnull
-    public static <INPUT, OUTPUT> RoutineBuilder<INPUT, OUTPUT> on(
+    public static <INPUT, OUTPUT> InvocationRoutineBuilder<INPUT, OUTPUT> on(
             @Nonnull final ClassToken<? extends Invocation<INPUT, OUTPUT>> classToken) {
 
-        return new RoutineBuilder<INPUT, OUTPUT>(classToken);
+        return new InvocationRoutineBuilder<INPUT, OUTPUT>(classToken);
     }
 
     /**

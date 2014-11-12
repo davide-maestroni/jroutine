@@ -13,25 +13,17 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.common.ClassToken;
-import com.bmd.jrt.invocation.Invocation;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
-import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.runner.Runner;
-import com.bmd.jrt.runner.Runners;
 import com.bmd.jrt.time.TimeDuration;
 
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 
-import static com.bmd.jrt.routine.ReflectionUtils.NO_ARGS;
-import static com.bmd.jrt.time.TimeDuration.fromUnit;
-import static com.bmd.jrt.time.TimeDuration.seconds;
-
 /**
- * Class implementing a builder of routine objects.
+ * Interface defining a builder of routine objects.
  * <p/>
  * A routine has a synchronous and an asynchronous runner associated. The synchronous
  * implementation can only be chosen between queued (the default one) and sequential.<br/>
@@ -62,46 +54,9 @@ import static com.bmd.jrt.time.TimeDuration.seconds;
  * possible to force data to be delivered in insertion order, at the cost of a slightly increased
  * memory usage and computation, by calling the proper methods.
  * <p/>
- * Created by davide on 9/21/14.
- *
- * @param <INPUT>  the input type.
- * @param <OUTPUT> the output type.
- * @see Runner
+ * Created by davide on 11/11/14.
  */
-public class RoutineBuilder<INPUT, OUTPUT> {
-
-    private final Class<? extends Invocation<INPUT, OUTPUT>> mInvocationClass;
-
-    private Object[] mArgs = NO_ARGS;
-
-    private Runner mAsyncRunner = Runners.poolRunner();
-
-    private TimeDuration mAvailTimeout = seconds(5);
-
-    private Log mLog = Logger.getDefaultLog();
-
-    private LogLevel mLogLevel = Logger.getDefaultLogLevel();
-
-    private int mMaxRetained = 10;
-
-    private int mMaxRunning = Integer.MAX_VALUE;
-
-    private boolean mOrderedInput;
-
-    private boolean mOrderedOutput;
-
-    private Runner mSyncRunner = Runners.queuedRunner();
-
-    /**
-     * Constructor.
-     *
-     * @param classToken the invocation class token.
-     * @throws NullPointerException if the class token is null.
-     */
-    RoutineBuilder(@Nonnull final ClassToken<? extends Invocation<INPUT, OUTPUT>> classToken) {
-
-        mInvocationClass = classToken.getRawClass();
-    }
+public interface RoutineBuilder {
 
     /**
      * Sets the timeout for an invocation instance to become available.
@@ -112,11 +67,7 @@ public class RoutineBuilder<INPUT, OUTPUT> {
      * @throws IllegalArgumentException if the specified timeout is negative.
      */
     @Nonnull
-    public RoutineBuilder<INPUT, OUTPUT> availableTimeout(final long timeout,
-            @Nonnull final TimeUnit timeUnit) {
-
-        return availableTimeout(fromUnit(timeout, timeUnit));
-    }
+    public RoutineBuilder availableTimeout(long timeout, @Nonnull TimeUnit timeUnit);
 
     /**
      * Sets the timeout for an invocation instance to become available.
@@ -126,32 +77,22 @@ public class RoutineBuilder<INPUT, OUTPUT> {
      * @throws NullPointerException if the specified timeout is null.
      */
     @Nonnull
-    @SuppressWarnings("ConstantConditions")
-    public RoutineBuilder<INPUT, OUTPUT> availableTimeout(@Nonnull final TimeDuration timeout) {
-
-        if (timeout == null) {
-
-            throw new NullPointerException("the timeout must not be null");
-        }
-
-        mAvailTimeout = timeout;
-
-        return this;
-    }
+    public RoutineBuilder availableTimeout(@Nonnull TimeDuration timeout);
 
     /**
-     * Builds and returns the routine instance.
-     *
-     * @return the newly created routine.
+     * @param timeout
+     * @param timeUnit
+     * @return
      */
     @Nonnull
-    public Routine<INPUT, OUTPUT> buildRoutine() {
+    public RoutineBuilder inputBufferTimeout(long timeout, @Nonnull TimeUnit timeUnit);
 
-        return new DefaultRoutine<INPUT, OUTPUT>(mSyncRunner, mAsyncRunner, mMaxRunning,
-                                                 mMaxRetained, mAvailTimeout, mOrderedInput,
-                                                 mOrderedOutput, mLog, mLogLevel, mInvocationClass,
-                                                 mArgs);
-    }
+    /**
+     * @param timeout
+     * @return
+     */
+    @Nonnull
+    public RoutineBuilder inputBufferTimeout(@Nonnull TimeDuration timeout);
 
     /**
      * Sets the log level.
@@ -161,18 +102,7 @@ public class RoutineBuilder<INPUT, OUTPUT> {
      * @throws NullPointerException if the log level is null.
      */
     @Nonnull
-    @SuppressWarnings("ConstantConditions")
-    public RoutineBuilder<INPUT, OUTPUT> logLevel(@Nonnull final LogLevel level) {
-
-        if (level == null) {
-
-            throw new NullPointerException("the log level must not be null");
-        }
-
-        mLogLevel = level;
-
-        return this;
-    }
+    public RoutineBuilder logLevel(@Nonnull LogLevel level);
 
     /**
      * Sets the log instance.
@@ -182,18 +112,21 @@ public class RoutineBuilder<INPUT, OUTPUT> {
      * @throws NullPointerException if the log is null.
      */
     @Nonnull
-    @SuppressWarnings("ConstantConditions")
-    public RoutineBuilder<INPUT, OUTPUT> loggedWith(@Nonnull final Log log) {
+    public RoutineBuilder loggedWith(@Nonnull Log log);
 
-        if (log == null) {
+    /**
+     * @param maxInputBufferSize
+     * @return
+     */
+    @Nonnull
+    public RoutineBuilder maxBufferedInput(int maxInputBufferSize);
 
-            throw new NullPointerException("the log instance must not be null");
-        }
-
-        mLog = log;
-
-        return this;
-    }
+    /**
+     * @param maxOutputBufferSize
+     * @return
+     */
+    @Nonnull
+    public RoutineBuilder maxBufferedOutput(int maxOutputBufferSize);
 
     /**
      * Sets the max number of retained instances.
@@ -203,18 +136,7 @@ public class RoutineBuilder<INPUT, OUTPUT> {
      * @throws IllegalArgumentException if the number is negative.
      */
     @Nonnull
-    public RoutineBuilder<INPUT, OUTPUT> maxRetained(final int maxRetainedInstances) {
-
-        if (maxRetainedInstances < 0) {
-
-            throw new IllegalArgumentException(
-                    "the maximum number of retained instances cannot be negative");
-        }
-
-        mMaxRetained = maxRetainedInstances;
-
-        return this;
-    }
+    public RoutineBuilder maxRetained(int maxRetainedInstances);
 
     /**
      * Sets the max number of concurrently running instances.
@@ -224,18 +146,7 @@ public class RoutineBuilder<INPUT, OUTPUT> {
      * @throws IllegalArgumentException if the number is less than 1.
      */
     @Nonnull
-    public RoutineBuilder<INPUT, OUTPUT> maxRunning(final int maxRunningInstances) {
-
-        if (maxRunningInstances < 1) {
-
-            throw new IllegalArgumentException(
-                    "the maximum number of concurrently running instances cannot be less than 1");
-        }
-
-        mMaxRunning = maxRunningInstances;
-
-        return this;
-    }
+    public RoutineBuilder maxRunning(int maxRunningInstances);
 
     /**
      * Forces the inputs to be ordered as they are passed to the input channel, independently from
@@ -244,12 +155,7 @@ public class RoutineBuilder<INPUT, OUTPUT> {
      * @return this builder.
      */
     @Nonnull
-    public RoutineBuilder<INPUT, OUTPUT> orderedInput() {
-
-        mOrderedInput = true;
-
-        return this;
-    }
+    public RoutineBuilder orderedInput();
 
     /**
      * Forces the outputs to be ordered as they are passed to the result channel, independently
@@ -258,12 +164,22 @@ public class RoutineBuilder<INPUT, OUTPUT> {
      * @return this builder.
      */
     @Nonnull
-    public RoutineBuilder<INPUT, OUTPUT> orderedOutput() {
+    public RoutineBuilder orderedOutput();
 
-        mOrderedOutput = true;
+    /**
+     * @param timeout
+     * @param timeUnit
+     * @return
+     */
+    @Nonnull
+    public RoutineBuilder outputBufferTimeout(long timeout, @Nonnull TimeUnit timeUnit);
 
-        return this;
-    }
+    /**
+     * @param timeout
+     * @return
+     */
+    @Nonnull
+    public RoutineBuilder outputBufferTimeout(@Nonnull TimeDuration timeout);
 
     /**
      * Sets the synchronous runner to the queued one.<br/>
@@ -275,12 +191,7 @@ public class RoutineBuilder<INPUT, OUTPUT> {
      * @return this builder.
      */
     @Nonnull
-    public RoutineBuilder<INPUT, OUTPUT> queued() {
-
-        mSyncRunner = Runners.queuedRunner();
-
-        return this;
-    }
+    public RoutineBuilder queued();
 
     /**
      * Sets the asynchronous runner instance.
@@ -290,18 +201,7 @@ public class RoutineBuilder<INPUT, OUTPUT> {
      * @throws NullPointerException if the specified runner is null.
      */
     @Nonnull
-    @SuppressWarnings("ConstantConditions")
-    public RoutineBuilder<INPUT, OUTPUT> runBy(@Nonnull final Runner runner) {
-
-        if (runner == null) {
-
-            throw new NullPointerException("the runner instance must not be null");
-        }
-
-        mAsyncRunner = runner;
-
-        return this;
-    }
+    public RoutineBuilder runBy(@Nonnull Runner runner);
 
     /**
      * Sets the synchronous runner to the sequential one.<br/>
@@ -311,31 +211,5 @@ public class RoutineBuilder<INPUT, OUTPUT> {
      * @return this builder.
      */
     @Nonnull
-    public RoutineBuilder<INPUT, OUTPUT> sequential() {
-
-        mSyncRunner = Runners.sequentialRunner();
-
-        return this;
-    }
-
-    /**
-     * Sets the arguments to be passed to the invocation constructor.
-     *
-     * @param args the arguments.
-     * @return this builder.
-     * @throws NullPointerException if the specified arguments array is null.
-     */
-    @Nonnull
-    @SuppressWarnings("ConstantConditions")
-    public RoutineBuilder<INPUT, OUTPUT> withArgs(@Nonnull final Object... args) {
-
-        if (args == null) {
-
-            throw new NullPointerException("the arguments array must not be null");
-        }
-
-        mArgs = args;
-
-        return this;
-    }
+    public RoutineBuilder sequential();
 }

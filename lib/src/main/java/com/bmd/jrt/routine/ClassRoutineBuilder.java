@@ -24,6 +24,7 @@ import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.runner.Runner;
+import com.bmd.jrt.time.TimeDuration;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -34,11 +35,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.WeakHashMap;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import static com.bmd.jrt.routine.ReflectionUtils.boxingClass;
+import static com.bmd.jrt.time.TimeDuration.fromUnit;
 
 /**
  * Class implementing a builder of routines wrapping a class method.
@@ -50,7 +53,7 @@ import static com.bmd.jrt.routine.ReflectionUtils.boxingClass;
  *
  * @see Async
  */
-public class ClassRoutineBuilder {
+public class ClassRoutineBuilder implements RoutineBuilder {
 
     private static final ClassToken<MethodSimpleInvocation> ASYNC_INVOCATION_TOKEN =
             ClassToken.tokenOf(MethodSimpleInvocation.class);
@@ -70,6 +73,10 @@ public class ClassRoutineBuilder {
 
     private final Class<?> mTargetClass;
 
+    private TimeDuration mAvailTimeout;
+
+    private TimeDuration mInputTimeout;
+
     private Boolean mIsSequential;
 
     private String mLockId;
@@ -78,9 +85,19 @@ public class ClassRoutineBuilder {
 
     private LogLevel mLogLevel;
 
+    private int mMaxInputBufferSize = Async.DEFAULT_NUMBER;
+
+    private int mMaxOutputBufferSize = Async.DEFAULT_NUMBER;
+
     private int mMaxRetained = Async.DEFAULT_NUMBER;
 
     private int mMaxRunning = Async.DEFAULT_NUMBER;
+
+    private Boolean mOrderedInput;
+
+    private Boolean mOrderedOutput;
+
+    private TimeDuration mOutputTimeout;
 
     private Runner mRunner;
 
@@ -154,29 +171,53 @@ public class ClassRoutineBuilder {
         return method(method);
     }
 
-    /**
-     * Tells the builder to create a routine using the specified lock ID.
-     *
-     * @param id the lock ID.
-     * @return this builder.
-     * @see Async
-     */
     @Nonnull
-    public ClassRoutineBuilder lockId(@Nullable final String id) {
+    @Override
+    public ClassRoutineBuilder availableTimeout(final long timeout,
+            @Nonnull final TimeUnit timeUnit) {
 
-        mLockId = id;
+        return availableTimeout(fromUnit(timeout, timeUnit));
+    }
+
+    @Nonnull
+    @Override
+    @SuppressWarnings("ConstantConditions")
+    public ClassRoutineBuilder availableTimeout(@Nonnull final TimeDuration timeout) {
+
+        if (timeout == null) {
+
+            throw new NullPointerException("the timeout must not be null");
+        }
+
+        mAvailTimeout = timeout;
 
         return this;
     }
 
-    /**
-     * Sets the log level.
-     *
-     * @param level the log level.
-     * @return this builder.
-     * @throws NullPointerException if the log level is null.
-     */
     @Nonnull
+    @Override
+    public RoutineBuilder inputBufferTimeout(final long timeout, @Nonnull final TimeUnit timeUnit) {
+
+        return inputBufferTimeout(fromUnit(timeout, timeUnit));
+    }
+
+    @Nonnull
+    @Override
+    @SuppressWarnings("ConstantConditions")
+    public RoutineBuilder inputBufferTimeout(@Nonnull final TimeDuration timeout) {
+
+        if (timeout == null) {
+
+            throw new NullPointerException("the timeout must not be null");
+        }
+
+        mInputTimeout = timeout;
+
+        return this;
+    }
+
+    @Nonnull
+    @Override
     @SuppressWarnings("ConstantConditions")
     public ClassRoutineBuilder logLevel(@Nonnull final LogLevel level) {
 
@@ -190,14 +231,8 @@ public class ClassRoutineBuilder {
         return this;
     }
 
-    /**
-     * Sets the log instance.
-     *
-     * @param log the log instance.
-     * @return this builder.
-     * @throws NullPointerException if the log is null.
-     */
     @Nonnull
+    @Override
     @SuppressWarnings("ConstantConditions")
     public ClassRoutineBuilder loggedWith(@Nonnull final Log log) {
 
@@ -211,14 +246,36 @@ public class ClassRoutineBuilder {
         return this;
     }
 
-    /**
-     * Sets the max number of retained instances.
-     *
-     * @param maxRetainedInstances the max number of instances.
-     * @return this builder.
-     * @throws IllegalArgumentException if the number is negative.
-     */
     @Nonnull
+    @Override
+    public RoutineBuilder maxBufferedInput(final int maxInputBufferSize) {
+
+        if (maxInputBufferSize <= 0) {
+
+            throw new IllegalArgumentException("the buffer size cannot be 0 or negative");
+        }
+
+        mMaxInputBufferSize = maxInputBufferSize;
+
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public RoutineBuilder maxBufferedOutput(final int maxOutputBufferSize) {
+
+        if (maxOutputBufferSize <= 0) {
+
+            throw new IllegalArgumentException("the buffer size cannot be 0 or negative");
+        }
+
+        mMaxOutputBufferSize = maxOutputBufferSize;
+
+        return this;
+    }
+
+    @Nonnull
+    @Override
     public ClassRoutineBuilder maxRetained(final int maxRetainedInstances) {
 
         if (maxRetainedInstances < 0) {
@@ -232,14 +289,8 @@ public class ClassRoutineBuilder {
         return this;
     }
 
-    /**
-     * Sets the max number of concurrently running instances.
-     *
-     * @param maxRunningInstances the max number of instances.
-     * @return this builder.
-     * @throws IllegalArgumentException if the number is less than 1.
-     */
     @Nonnull
+    @Override
     public ClassRoutineBuilder maxRunning(final int maxRunningInstances) {
 
         if (maxRunningInstances < 1) {
@@ -249,6 +300,95 @@ public class ClassRoutineBuilder {
         }
 
         mMaxRunning = maxRunningInstances;
+
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public RoutineBuilder orderedInput() {
+
+        mOrderedInput = true;
+
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public RoutineBuilder orderedOutput() {
+
+        mOrderedOutput = true;
+
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public RoutineBuilder outputBufferTimeout(final long timeout,
+            @Nonnull final TimeUnit timeUnit) {
+
+        return outputBufferTimeout(fromUnit(timeout, timeUnit));
+    }
+
+    @Nonnull
+    @Override
+    @SuppressWarnings("ConstantConditions")
+    public RoutineBuilder outputBufferTimeout(@Nonnull final TimeDuration timeout) {
+
+        if (timeout == null) {
+
+            throw new NullPointerException("the timeout must not be null");
+        }
+
+        mOutputTimeout = timeout;
+
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public ClassRoutineBuilder queued() {
+
+        mIsSequential = false;
+
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    @SuppressWarnings("ConstantConditions")
+    public ClassRoutineBuilder runBy(@Nonnull final Runner runner) {
+
+        if (runner == null) {
+
+            throw new NullPointerException("the runner instance must not be null");
+        }
+
+        mRunner = runner;
+
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public ClassRoutineBuilder sequential() {
+
+        mIsSequential = true;
+
+        return this;
+    }
+
+    /**
+     * Tells the builder to create a routine using the specified lock ID.
+     *
+     * @param id the lock ID.
+     * @return this builder.
+     * @see Async
+     */
+    @Nonnull
+    public ClassRoutineBuilder lockId(@Nullable final String id) {
+
+        mLockId = id;
 
         return this;
     }
@@ -322,6 +462,13 @@ public class ClassRoutineBuilder {
         Boolean isSequential = mIsSequential;
         int maxRunning = mMaxRunning;
         int maxRetained = mMaxRetained;
+        TimeDuration availTimeout = mAvailTimeout;
+        int maxInputBufferSize = mMaxInputBufferSize;
+        TimeDuration inputTimeout = mInputTimeout;
+        Boolean orderedInput = mOrderedInput;
+        int maxOutputBufferSize = mMaxOutputBufferSize;
+        TimeDuration outputTimeout = mOutputTimeout;
+        Boolean orderedOutput = mOrderedOutput;
         Log log = mLog;
         LogLevel logLevel = mLogLevel;
 
@@ -360,14 +507,64 @@ public class ClassRoutineBuilder {
                 isSequential = annotation.sequential();
             }
 
-            if (maxRunning != Async.DEFAULT_NUMBER) {
+            if (maxRunning == Async.DEFAULT_NUMBER) {
 
                 maxRunning = annotation.maxRunning();
             }
 
-            if (maxRetained != Async.DEFAULT_NUMBER) {
+            if (maxRetained == Async.DEFAULT_NUMBER) {
 
                 maxRetained = annotation.maxRetained();
+            }
+
+            if (availTimeout == null) {
+
+                final long timeout = annotation.availTimeout();
+
+                if (timeout != Async.DEFAULT_NUMBER) {
+
+                    availTimeout = fromUnit(timeout, annotation.availTimeUnit());
+                }
+            }
+
+            if (maxInputBufferSize == Async.DEFAULT_NUMBER) {
+
+                maxInputBufferSize = annotation.maxInput();
+            }
+
+            if (inputTimeout == null) {
+
+                final long timeout = annotation.inputTimeout();
+
+                if (timeout != Async.DEFAULT_NUMBER) {
+
+                    inputTimeout = fromUnit(timeout, annotation.inputTimeUnit());
+                }
+            }
+
+            if (orderedInput == null) {
+
+                orderedInput = annotation.orderedInput();
+            }
+
+            if (maxOutputBufferSize == Async.DEFAULT_NUMBER) {
+
+                maxOutputBufferSize = annotation.maxOutput();
+            }
+
+            if (outputTimeout == null) {
+
+                final long timeout = annotation.outputTimeout();
+
+                if (timeout != Async.DEFAULT_NUMBER) {
+
+                    outputTimeout = fromUnit(timeout, annotation.outputTimeUnit());
+                }
+            }
+
+            if (orderedOutput == null) {
+
+                orderedOutput = annotation.orderedOutput();
             }
 
             if (log == null) {
@@ -397,56 +594,9 @@ public class ClassRoutineBuilder {
             }
         }
 
-        return getRoutine(method, lockId, runner, isSequential, maxRunning, maxRetained, false, log,
-                          logLevel);
-    }
-
-    /**
-     * Tells the builder to create a routine using a queued runner for synchronous invocations.
-     *
-     * @return this builder.
-     */
-    @Nonnull
-    public ClassRoutineBuilder queued() {
-
-        mIsSequential = false;
-
-        return this;
-    }
-
-    /**
-     * Tells the builder to create a routine using the specified runner instance for asynchronous
-     * invocations.
-     *
-     * @param runner the runner instance.
-     * @return this builder.
-     * @throws NullPointerException if the specified runner is null.
-     */
-    @Nonnull
-    @SuppressWarnings("ConstantConditions")
-    public ClassRoutineBuilder runBy(@Nonnull final Runner runner) {
-
-        if (runner == null) {
-
-            throw new NullPointerException("the runner instance must not be null");
-        }
-
-        mRunner = runner;
-
-        return this;
-    }
-
-    /**
-     * Tells the builder to create a routine using a sequential runner for synchronous invocations.
-     *
-     * @return this builder.
-     */
-    @Nonnull
-    public ClassRoutineBuilder sequential() {
-
-        mIsSequential = true;
-
-        return this;
+        return getRoutine(method, lockId, runner, isSequential, maxRunning, maxRetained,
+                          availTimeout, maxInputBufferSize, inputTimeout, orderedInput,
+                          maxOutputBufferSize, outputTimeout, orderedOutput, log, logLevel);
     }
 
     /**
@@ -459,6 +609,22 @@ public class ClassRoutineBuilder {
     protected Method getAnnotatedMethod(@Nonnull final String tag) {
 
         return mMethodMap.get(tag);
+    }
+
+    /**
+     * @return
+     */
+    protected TimeDuration getAvailTimeout() {
+
+        return mAvailTimeout;
+    }
+
+    /**
+     * @return
+     */
+    protected TimeDuration getInputTimeout() {
+
+        return mInputTimeout;
     }
 
     /**
@@ -491,35 +657,81 @@ public class ClassRoutineBuilder {
         return mLogLevel;
     }
 
+    /**
+     * @return
+     */
+    protected int getMaxInputBufferSize() {
+
+        return mMaxInputBufferSize;
+    }
+
+    /**
+     * @return
+     */
+    protected int getMaxOutputBufferSize() {
+
+        return mMaxOutputBufferSize;
+    }
+
+    /**
+     * Returns the max number of retained instances.
+     *
+     * @return the max retained instances.
+     */
     protected int getMaxRetained() {
 
         return mMaxRetained;
     }
 
+    /**
+     * Returns the max number of concurrently running instances.
+     *
+     * @return the max concurrently running instances.
+     */
     protected int getMaxRunning() {
 
         return mMaxRunning;
     }
 
     /**
+     * @return
+     */
+    protected TimeDuration getOutputTimeout() {
+
+        return mOutputTimeout;
+    }
+
+    /**
      * Creates the routine.
      *
-     * @param method       the method to wrap.
-     * @param lockId       the lock ID.
-     * @param runner       the asynchronous runner instance.
-     * @param isSequential whether a sequential runner must be used for synchronous invocations.
-     * @param maxRunning   the max number of concurrently running instances.
-     * @param maxRetained  the max number of retained instances.
-     * @param orderedInput whether the input data are forced to be delivered in insertion order.
-     * @param log          the log instance.
-     * @param level        the log level.
+     * @param method              the method to wrap.
+     * @param lockId              the lock ID.
+     * @param runner              the asynchronous runner instance.
+     * @param isSequential        whether a sequential runner must be used for synchronous
+     *                            invocations.
+     * @param maxRunning          the max number of concurrently running instances.
+     * @param maxRetained         the max number of retained instances.
+     * @param availTimeout
+     * @param maxInputBufferSize
+     * @param inputTimeout
+     * @param orderedInput        whether the input data are forced to be delivered in insertion
+     *                            order.
+     * @param maxOutputBufferSize
+     * @param outputTimeout
+     * @param orderedOutput
+     * @param log                 the log instance.
+     * @param level               the log level.
      * @return the routine instance.
      */
     @Nonnull
     protected Routine<Object, Object> getRoutine(@Nonnull final Method method,
             @Nullable final String lockId, @Nullable final Runner runner,
             @Nullable final Boolean isSequential, final int maxRunning, final int maxRetained,
-            final boolean orderedInput, @Nullable final Log log, @Nullable final LogLevel level) {
+            @Nullable final TimeDuration availTimeout, final int maxInputBufferSize,
+            @Nullable final TimeDuration inputTimeout, @Nullable final Boolean orderedInput,
+            final int maxOutputBufferSize, @Nullable final TimeDuration outputTimeout,
+            @Nullable final Boolean orderedOutput, @Nullable final Log log,
+            @Nullable final LogLevel level) {
 
         Routine<Object, Object> routine;
 
@@ -543,7 +755,9 @@ public class ClassRoutineBuilder {
 
             final RoutineInfo routineInfo =
                     new RoutineInfo(method, routineLockId, runner, isSequential, maxRunning,
-                                    maxRetained, orderedInput, routineLog, routineLogLevel);
+                                    maxRetained, availTimeout, maxInputBufferSize, inputTimeout,
+                                    orderedInput, maxOutputBufferSize, outputTimeout, orderedOutput,
+                                    routineLog, routineLogLevel);
             routine = routineMap.get(routineInfo);
 
             if (routine != null) {
@@ -574,8 +788,8 @@ public class ClassRoutineBuilder {
             }
 
             final Class<?> targetClass = mTargetClass;
-            final RoutineBuilder<Object, Object> builder =
-                    new RoutineBuilder<Object, Object>(ASYNC_INVOCATION_TOKEN);
+            final InvocationRoutineBuilder<Object, Object> builder =
+                    new InvocationRoutineBuilder<Object, Object>(ASYNC_INVOCATION_TOKEN);
 
             if (runner != null) {
 
@@ -604,9 +818,39 @@ public class ClassRoutineBuilder {
                 builder.maxRetained(maxRetained);
             }
 
-            if (orderedInput) {
+            if (availTimeout != null) {
+
+                builder.availableTimeout(availTimeout);
+            }
+
+            if (maxInputBufferSize != Async.DEFAULT_NUMBER) {
+
+                builder.maxBufferedInput(maxInputBufferSize);
+            }
+
+            if (inputTimeout != null) {
+
+                builder.inputBufferTimeout(inputTimeout);
+            }
+
+            if ((orderedInput != null) && orderedInput) {
 
                 builder.orderedInput();
+            }
+
+            if (maxOutputBufferSize != Async.DEFAULT_NUMBER) {
+
+                builder.maxBufferedOutput(maxOutputBufferSize);
+            }
+
+            if (outputTimeout != null) {
+
+                builder.outputBufferTimeout(outputTimeout);
+            }
+
+            if ((orderedOutput != null) && orderedOutput) {
+
+                builder.orderedOutput();
             }
 
             routine = builder.loggedWith(routineLog)
@@ -637,6 +881,22 @@ public class ClassRoutineBuilder {
     protected Boolean getSequential() {
 
         return mIsSequential;
+    }
+
+    /**
+     * @return
+     */
+    protected Boolean isOrderedInput() {
+
+        return mOrderedInput;
+    }
+
+    /**
+     * @return
+     */
+    protected Boolean isOrderedOutput() {
+
+        return mOrderedOutput;
     }
 
     private void fillMap(@Nonnull final HashMap<String, Method> map,
@@ -761,6 +1021,10 @@ public class ClassRoutineBuilder {
      */
     private static class RoutineInfo {
 
+        private final TimeDuration mAvailTimeout;
+
+        private final TimeDuration mInputTimeout;
+
         private final Boolean mIsSequential;
 
         private final String mLockId;
@@ -769,34 +1033,52 @@ public class ClassRoutineBuilder {
 
         private final LogLevel mLogLevel;
 
+        private final int mMaxInputSize;
+
+        private final int mMaxOutputSize;
+
         private final int mMaxRetained;
 
         private final int mMaxRunning;
 
         private final Method mMethod;
 
-        private final boolean mOrderedInput;
+        private final Boolean mOrderedInput;
+
+        private final Boolean mOrderedOutput;
+
+        private final TimeDuration mOutputTimeout;
 
         private final Runner mRunner;
 
         /**
          * Constructor.
          *
-         * @param method       the method to wrap.
-         * @param lockId       the lock ID.
-         * @param runner       the runner instance.
-         * @param isSequential whether a sequential runner must be used for synchronous
-         * @param maxRunning   the max number of concurrently running instances.
-         * @param maxRetained  the max number of retained instances.
-         * @param orderedInput whether the input data are forced to be delivered in insertion
-         *                     order.
-         * @param log          the log instance.
-         * @param level        the log level.
+         * @param method              the method to wrap.
+         * @param lockId              the lock ID.
+         * @param runner              the runner instance.
+         * @param isSequential        whether a sequential runner must be used for synchronous
+         * @param maxRunning          the max number of concurrently running instances.
+         * @param maxRetained         the max number of retained instances.
+         * @param availTimeout
+         * @param maxInputBufferSize
+         * @param inputTimeout
+         * @param orderedInput        whether the input data are forced to be delivered in insertion
+         *                            order.
+         * @param maxOutputBufferSize
+         * @param outputTimeout
+         * @param orderedOutput
+         * @param log                 the log instance.
+         * @param level               the log level.
          */
         private RoutineInfo(@Nonnull final Method method, @Nonnull final String lockId,
                 @Nullable final Runner runner, @Nullable final Boolean isSequential,
-                final int maxRunning, final int maxRetained, final boolean orderedInput,
-                @Nonnull final Log log, @Nonnull final LogLevel level) {
+                final int maxRunning, final int maxRetained,
+                @Nullable final TimeDuration availTimeout, final int maxInputBufferSize,
+                @Nullable final TimeDuration inputTimeout, @Nullable final Boolean orderedInput,
+                final int maxOutputBufferSize, @Nullable final TimeDuration outputTimeout,
+                @Nullable final Boolean orderedOutput, @Nonnull final Log log,
+                @Nonnull final LogLevel level) {
 
             mMethod = method;
             mLockId = lockId;
@@ -804,7 +1086,13 @@ public class ClassRoutineBuilder {
             mIsSequential = isSequential;
             mMaxRunning = maxRunning;
             mMaxRetained = maxRetained;
+            mAvailTimeout = availTimeout;
+            mMaxInputSize = maxInputBufferSize;
+            mInputTimeout = inputTimeout;
             mOrderedInput = orderedInput;
+            mMaxOutputSize = maxOutputBufferSize;
+            mOutputTimeout = outputTimeout;
+            mOrderedOutput = orderedOutput;
             mLog = log;
             mLogLevel = level;
         }
@@ -813,14 +1101,20 @@ public class ClassRoutineBuilder {
         public int hashCode() {
 
             // auto-generated code
-            int result = mIsSequential != null ? mIsSequential.hashCode() : 0;
+            int result = mAvailTimeout != null ? mAvailTimeout.hashCode() : 0;
+            result = 31 * result + (mInputTimeout != null ? mInputTimeout.hashCode() : 0);
+            result = 31 * result + (mIsSequential != null ? mIsSequential.hashCode() : 0);
+            result = 31 * result + mLockId.hashCode();
             result = 31 * result + mLog.hashCode();
             result = 31 * result + mLogLevel.hashCode();
+            result = 31 * result + mMaxInputSize;
+            result = 31 * result + mMaxOutputSize;
             result = 31 * result + mMaxRetained;
             result = 31 * result + mMaxRunning;
             result = 31 * result + mMethod.hashCode();
-            result = 31 * result + (mOrderedInput ? 1 : 0);
-            result = 31 * result + mLockId.hashCode();
+            result = 31 * result + (mOrderedInput != null ? mOrderedInput.hashCode() : 0);
+            result = 31 * result + (mOrderedOutput != null ? mOrderedOutput.hashCode() : 0);
+            result = 31 * result + (mOutputTimeout != null ? mOutputTimeout.hashCode() : 0);
             result = 31 * result + (mRunner != null ? mRunner.hashCode() : 0);
             return result;
         }
@@ -841,12 +1135,20 @@ public class ClassRoutineBuilder {
 
             final RoutineInfo that = (RoutineInfo) o;
 
-            return mMaxRetained == that.mMaxRetained && mMaxRunning == that.mMaxRunning
-                    && mOrderedInput == that.mOrderedInput && !(mIsSequential != null
-                    ? !mIsSequential.equals(that.mIsSequential) : that.mIsSequential != null)
+            return mMaxInputSize == that.mMaxInputSize && mMaxOutputSize == that.mMaxOutputSize
+                    && mMaxRetained == that.mMaxRetained && mMaxRunning == that.mMaxRunning && !(
+                    mAvailTimeout != null ? !mAvailTimeout.equals(that.mAvailTimeout)
+                            : that.mAvailTimeout != null) && !(mInputTimeout != null
+                    ? !mInputTimeout.equals(that.mInputTimeout) : that.mInputTimeout != null) && !(
+                    mIsSequential != null ? !mIsSequential.equals(that.mIsSequential)
+                            : that.mIsSequential != null) && mLockId.equals(that.mLockId)
                     && mLog.equals(that.mLog) && mLogLevel == that.mLogLevel && mMethod.equals(
-                    that.mMethod) && mLockId.equals(that.mLockId) && !(mRunner != null
-                    ? !mRunner.equals(that.mRunner) : that.mRunner != null);
+                    that.mMethod) && !(mOrderedInput != null ? !mOrderedInput.equals(
+                    that.mOrderedInput) : that.mOrderedInput != null) && !(mOrderedOutput != null
+                    ? !mOrderedOutput.equals(that.mOrderedOutput) : that.mOrderedOutput != null)
+                    && !(mOutputTimeout != null ? !mOutputTimeout.equals(that.mOutputTimeout)
+                    : that.mOutputTimeout != null) && !(mRunner != null ? !mRunner.equals(
+                    that.mRunner) : that.mRunner != null);
         }
     }
 

@@ -157,22 +157,22 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends BasicRoutine<INPUT,
         mLogger = logger;
     }
 
-    @Override
     @Nonnull
+    @Override
     public ParameterChannel<INPUT, OUTPUT> invoke() {
 
         return invoke(false);
     }
 
-    @Override
     @Nonnull
+    @Override
     public ParameterChannel<INPUT, OUTPUT> invokeAsync() {
 
         return invoke(true);
     }
 
-    @Override
     @Nonnull
+    @Override
     public ParameterChannel<INPUT, OUTPUT> invokeParallel() {
 
         mLogger.dbg("invoking routine: parallel");
@@ -182,8 +182,8 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends BasicRoutine<INPUT,
                                                    mMaxRetained, mAvailTimeout, mOrderedInput,
                                                    mOrderedOutput, mLogger) {
 
-                    @Override
                     @Nonnull
+                    @Override
                     protected Invocation<INPUT, OUTPUT> createInvocation(final boolean async) {
 
                         return new ParallelInvocation<INPUT, OUTPUT>(AbstractRoutine.this);
@@ -193,15 +193,15 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends BasicRoutine<INPUT,
         return parallelRoutine.invokeAsync();
     }
 
-    @Override
     @Nonnull
+    @Override
     public OutputChannel<OUTPUT> runParallel(@Nullable final Iterable<? extends INPUT> inputs) {
 
         return invokeParallel().pass(inputs).results();
     }
 
-    @Override
     @Nonnull
+    @Override
     public OutputChannel<OUTPUT> runParallel(@Nullable final OutputChannel<INPUT> inputs) {
 
         return invokeParallel().pass(inputs).results();
@@ -245,8 +245,8 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends BasicRoutine<INPUT,
             mAsync = async;
         }
 
-        @Override
         @Nonnull
+        @Override
         public Invocation<INPUT, OUTPUT> create() {
 
             synchronized (mMutex) {

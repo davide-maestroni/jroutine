@@ -30,31 +30,31 @@ import javax.annotation.Nullable;
  */
 public interface ResultChannel<OUTPUT> extends InputChannel<OUTPUT> {
 
-    @Override
     @Nonnull
+    @Override
     public ResultChannel<OUTPUT> after(@Nonnull TimeDuration delay);
 
-    @Override
     @Nonnull
+    @Override
     public ResultChannel<OUTPUT> after(long delay, @Nonnull TimeUnit timeUnit);
 
-    @Override
     @Nonnull
+    @Override
     public ResultChannel<OUTPUT> now();
 
-    @Override
     @Nonnull
+    @Override
     public ResultChannel<OUTPUT> pass(@Nullable OutputChannel<OUTPUT> channel);
 
-    @Override
     @Nonnull
+    @Override
     public ResultChannel<OUTPUT> pass(@Nullable Iterable<? extends OUTPUT> outputs);
 
-    @Override
     @Nonnull
+    @Override
     public ResultChannel<OUTPUT> pass(@Nullable OUTPUT output);
 
-    @Override
     @Nonnull
+    @Override
     public ResultChannel<OUTPUT> pass(@Nullable OUTPUT... outputs);
 }

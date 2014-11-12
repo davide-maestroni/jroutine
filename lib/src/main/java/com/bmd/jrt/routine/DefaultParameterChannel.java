@@ -169,8 +169,8 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
         }
     }
 
-    @Override
     @Nonnull
+    @Override
     @SuppressWarnings("ConstantConditions")
     public ParameterChannel<INPUT, OUTPUT> after(@Nonnull final TimeDuration delay) {
 
@@ -191,23 +191,23 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
         return this;
     }
 
-    @Override
     @Nonnull
+    @Override
     public ParameterChannel<INPUT, OUTPUT> after(final long delay,
             @Nonnull final TimeUnit timeUnit) {
 
         return after(fromUnit(delay, timeUnit));
     }
 
-    @Override
     @Nonnull
+    @Override
     public ParameterChannel<INPUT, OUTPUT> now() {
 
         return after(ZERO);
     }
 
-    @Override
     @Nonnull
+    @Override
     public ParameterChannel<INPUT, OUTPUT> pass(@Nullable final OutputChannel<INPUT> channel) {
 
         final TimeDuration delay;
@@ -240,8 +240,8 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
         return this;
     }
 
-    @Override
     @Nonnull
+    @Override
     public ParameterChannel<INPUT, OUTPUT> pass(@Nullable final Iterable<? extends INPUT> inputs) {
 
         NestedQueue<INPUT> inputQueue;
@@ -290,8 +290,8 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
         return this;
     }
 
-    @Override
     @Nonnull
+    @Override
     public ParameterChannel<INPUT, OUTPUT> pass(@Nullable final INPUT input) {
 
         NestedQueue<INPUT> inputQueue;
@@ -330,8 +330,8 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
         return this;
     }
 
-    @Override
     @Nonnull
+    @Override
     public ParameterChannel<INPUT, OUTPUT> pass(@Nullable final INPUT... inputs) {
 
         synchronized (mMutex) {
@@ -349,8 +349,8 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
         return pass(Arrays.asList(inputs));
     }
 
-    @Override
     @Nonnull
+    @Override
     public OutputChannel<OUTPUT> results() {
 
         synchronized (mMutex) {

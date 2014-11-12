@@ -22,6 +22,7 @@ import com.bmd.jrt.channel.ParameterChannel;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.runner.Runner;
+import com.bmd.jrt.time.TimeDuration;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationHandler;
@@ -34,6 +35,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import static com.bmd.jrt.routine.ReflectionUtils.boxingClass;
+import static com.bmd.jrt.time.TimeDuration.fromUnit;
 
 /**
  * Class implementing a builder of routines wrapping an object instance.
@@ -113,17 +115,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
         return itf.cast(proxy);
     }
 
-    @Override
     @Nonnull
-    public ObjectRoutineBuilder lockId(@Nullable final String id) {
-
-        super.lockId(id);
-
-        return this;
-    }
-
     @Override
-    @Nonnull
     public ObjectRoutineBuilder logLevel(@Nonnull final LogLevel level) {
 
         super.logLevel(level);
@@ -131,8 +124,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
         return this;
     }
 
-    @Override
     @Nonnull
+    @Override
     public ObjectRoutineBuilder loggedWith(@Nonnull final Log log) {
 
         super.loggedWith(log);
@@ -140,8 +133,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
         return this;
     }
 
-    @Override
     @Nonnull
+    @Override
     public ObjectRoutineBuilder maxRetained(final int maxRetainedInstances) {
 
         super.maxRetained(maxRetainedInstances);
@@ -149,8 +142,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
         return this;
     }
 
-    @Override
     @Nonnull
+    @Override
     public ObjectRoutineBuilder maxRunning(final int maxRunningInstances) {
 
         super.maxRunning(maxRunningInstances);
@@ -158,8 +151,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
         return this;
     }
 
-    @Override
     @Nonnull
+    @Override
     public ObjectRoutineBuilder queued() {
 
         super.queued();
@@ -167,8 +160,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
         return this;
     }
 
-    @Override
     @Nonnull
+    @Override
     public ObjectRoutineBuilder runBy(@Nonnull final Runner runner) {
 
         super.runBy(runner);
@@ -176,11 +169,20 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
         return this;
     }
 
-    @Override
     @Nonnull
+    @Override
     public ObjectRoutineBuilder sequential() {
 
         super.sequential();
+
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public ObjectRoutineBuilder lockId(@Nullable final String id) {
+
+        super.lockId(id);
 
         return this;
     }
@@ -189,6 +191,58 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * Invocation handler adapting a different interface to the target object instance.
      */
     private class InterfaceInvocationHandler implements InvocationHandler {
+
+        private final TimeDuration mAvailTimeout;
+
+        private final TimeDuration mInputTimeout;
+
+        private final Boolean mIsSequential;
+
+        private final String mLockId;
+
+        private final Log mLog;
+
+        private final LogLevel mLogLevel;
+
+        private final int mMaxInputSize;
+
+        private final int mMaxOutputSize;
+
+        private final int mMaxRetained;
+
+        private final int mMaxRunning;
+
+        private final Boolean mOrderedInput;
+
+        private final Boolean mOrderedOutput;
+
+        private final TimeDuration mOutputTimeout;
+
+        private final Runner mRunner;
+
+        private final Object mTarget;
+
+        private final Class<?> mTargetClass;
+
+        private InterfaceInvocationHandler() {
+
+            mTarget = ObjectRoutineBuilder.this.mTarget;
+            mTargetClass = ObjectRoutineBuilder.this.mTargetClass;
+            mLockId = getLockId();
+            mRunner = getRunner();
+            mIsSequential = getSequential();
+            mMaxRunning = getMaxRunning();
+            mMaxRetained = getMaxRetained();
+            mAvailTimeout = getAvailTimeout();
+            mMaxInputSize = getMaxInputBufferSize();
+            mInputTimeout = getInputTimeout();
+            mOrderedInput = isOrderedInput();
+            mMaxOutputSize = getMaxOutputBufferSize();
+            mOutputTimeout = getOutputTimeout();
+            mOrderedOutput = isOrderedOutput();
+            mLog = getLog();
+            mLogLevel = getLogLevel();
+        }
 
         @Override
         public Object invoke(final Object proxy, final Method method, final Object[] args) throws
@@ -202,13 +256,20 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
             boolean isParallel = false;
 
             Method targetMethod;
-            String lockId = getLockId();
-            Runner runner = getRunner();
-            Boolean isSequential = getSequential();
-            int maxRunning = getMaxRunning();
-            int maxRetained = getMaxRetained();
-            Log log = getLog();
-            LogLevel level = getLogLevel();
+            String lockId = mLockId;
+            Runner runner = mRunner;
+            Boolean isSequential = mIsSequential;
+            int maxRunning = mMaxRunning;
+            int maxRetained = mMaxRetained;
+            TimeDuration availTimeout = mAvailTimeout;
+            int maxInputBufferSize = mMaxInputSize;
+            TimeDuration inputTimeout = mInputTimeout;
+            Boolean orderedInput = mOrderedInput;
+            int maxOutputBufferSize = mMaxOutputSize;
+            TimeDuration outputTimeout = mOutputTimeout;
+            Boolean orderedOutput = mOrderedOutput;
+            Log log = mLog;
+            LogLevel level = mLogLevel;
 
             synchronized (sMethodCache) {
 
@@ -221,15 +282,80 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                     methodCache.put(target, methodMap);
                 }
 
-                final Async annotation = method.getAnnotation(Async.class);
+                Class<?>[] parameterTypes = null;
+
                 final AsyncOverride overrideAnnotation = method.getAnnotation(AsyncOverride.class);
+
+                if (overrideAnnotation != null) {
+
+                    parameterTypes = overrideAnnotation.value();
+                    final Class<?>[] methodParameterTypes = method.getParameterTypes();
+
+                    if (parameterTypes.length != methodParameterTypes.length) {
+
+                        throw new IllegalArgumentException(
+                                "the async parameters are not compatible");
+                    }
+
+                    isParallel = overrideAnnotation.parallel();
+
+                    if (isParallel) {
+
+                        if (methodParameterTypes.length != 1) {
+
+                            throw new IllegalArgumentException(
+                                    "the parallel parameter is not compatible");
+                        }
+
+                        final Class<?> parameterType = methodParameterTypes[0];
+
+                        if (OutputChannel.class.equals(parameterType)) {
+
+                            isOverrideParameters = true;
+
+                        } else if (!parameterType.isArray() && !Iterable.class.isAssignableFrom(
+                                parameterType)) {
+
+                            throw new IllegalArgumentException(
+                                    "the parallel parameter is not compatible");
+                        }
+
+                    } else if (parameterTypes.length > 0) {
+
+                        isOverrideParameters = true;
+
+                        final int length = parameterTypes.length;
+
+                        for (int i = 0; i < length; i++) {
+
+                            final Class<?> parameterType = methodParameterTypes[i];
+
+                            if (!OutputChannel.class.equals(parameterType)
+                                    && !parameterTypes[i].isAssignableFrom(parameterType)) {
+
+                                throw new IllegalArgumentException(
+                                        "the async parameters are not compatible");
+                            }
+                        }
+                    }
+
+                    isOverrideResult = overrideAnnotation.result();
+
+                    if (isOverrideResult && !OutputChannel
+                            .class.isAssignableFrom(returnType)) {
+
+                        throw new IllegalArgumentException(
+                                "the async return type is not compatible");
+                    }
+                }
+
+                final Async annotation = method.getAnnotation(Async.class);
 
                 targetMethod = methodMap.get(method);
 
                 if (targetMethod == null) {
 
                     String name = null;
-                    Class<?>[] parameterTypes = null;
 
                     if (annotation != null) {
 
@@ -239,69 +365,6 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                     if ((name == null) || (name.length() == 0)) {
 
                         name = method.getName();
-                    }
-
-                    if (overrideAnnotation != null) {
-
-                        parameterTypes = overrideAnnotation.value();
-                        final Class<?>[] methodParameterTypes = method.getParameterTypes();
-
-                        if (parameterTypes.length != methodParameterTypes.length) {
-
-                            throw new IllegalArgumentException(
-                                    "the async parameters are not compatible");
-                        }
-
-                        isParallel = overrideAnnotation.parallel();
-
-                        if (isParallel) {
-
-                            if (methodParameterTypes.length != 1) {
-
-                                throw new IllegalArgumentException(
-                                        "the parallel parameter is not compatible");
-                            }
-
-                            final Class<?> parameterType = methodParameterTypes[0];
-
-                            if (OutputChannel.class.equals(parameterType)) {
-
-                                isOverrideParameters = true;
-
-                            } else if (!parameterType.isArray() && !Iterable.class.isAssignableFrom(
-                                    parameterType)) {
-
-                                throw new IllegalArgumentException(
-                                        "the parallel parameter is not compatible");
-                            }
-
-                        } else if (parameterTypes.length > 0) {
-
-                            isOverrideParameters = true;
-
-                            final int length = parameterTypes.length;
-
-                            for (int i = 0; i < length; i++) {
-
-                                final Class<?> parameterType = methodParameterTypes[i];
-
-                                if (!OutputChannel.class.equals(parameterType) && !parameterTypes[i]
-                                        .isAssignableFrom(parameterType)) {
-
-                                    throw new IllegalArgumentException(
-                                            "the async parameters are not compatible");
-                                }
-                            }
-                        }
-
-                        isOverrideResult = overrideAnnotation.result();
-
-                        if (isOverrideResult && !OutputChannel
-                                .class.isAssignableFrom(returnType)) {
-
-                            throw new IllegalArgumentException(
-                                    "the async return type is not compatible");
-                        }
                     }
 
                     if ((parameterTypes == null) || (parameterTypes.length == 0)) {
@@ -325,6 +388,13 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
                             targetMethod = targetClass.getDeclaredMethod(name, parameterTypes);
                         }
+                    }
+
+                    if (!isOverrideResult && !returnType.isAssignableFrom(
+                            targetMethod.getReturnType())) {
+
+                        throw new IllegalArgumentException(
+                                "the async return type is not compatible");
                     }
                 }
 
@@ -360,6 +430,56 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                         maxRetained = annotation.maxRetained();
                     }
 
+                    if (availTimeout == null) {
+
+                        final long timeout = annotation.availTimeout();
+
+                        if (timeout != Async.DEFAULT_NUMBER) {
+
+                            availTimeout = fromUnit(timeout, annotation.availTimeUnit());
+                        }
+                    }
+
+                    if (maxInputBufferSize == Async.DEFAULT_NUMBER) {
+
+                        maxInputBufferSize = annotation.maxInput();
+                    }
+
+                    if (inputTimeout == null) {
+
+                        final long timeout = annotation.inputTimeout();
+
+                        if (timeout != Async.DEFAULT_NUMBER) {
+
+                            inputTimeout = fromUnit(timeout, annotation.inputTimeUnit());
+                        }
+                    }
+
+                    if (orderedInput == null) {
+
+                        orderedInput = annotation.orderedInput();
+                    }
+
+                    if (maxOutputBufferSize == Async.DEFAULT_NUMBER) {
+
+                        maxOutputBufferSize = annotation.maxOutput();
+                    }
+
+                    if (outputTimeout == null) {
+
+                        final long timeout = annotation.outputTimeout();
+
+                        if (timeout != Async.DEFAULT_NUMBER) {
+
+                            outputTimeout = fromUnit(timeout, annotation.outputTimeUnit());
+                        }
+                    }
+
+                    if (orderedOutput == null) {
+
+                        orderedOutput = annotation.orderedOutput();
+                    }
+
                     if (log == null) {
 
                         final Class<? extends Log> logClass = annotation.log();
@@ -376,17 +496,18 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                     }
                 }
 
-                if (!isOverrideResult && !returnType.isAssignableFrom(targetMethod.getReturnType())) {
-
-                    throw new IllegalArgumentException("the async return type is not compatible");
-                }
-
                 methodMap.put(method, targetMethod);
+            }
+
+            if (isOverrideParameters) {
+
+                orderedInput = true;
             }
 
             final Routine<Object, Object> routine =
                     getRoutine(targetMethod, lockId, runner, isSequential, maxRunning, maxRetained,
-                               isOverrideParameters, log, level);
+                               availTimeout, maxInputBufferSize, inputTimeout, orderedInput,
+                               maxOutputBufferSize, outputTimeout, orderedOutput, log, level);
             final OutputChannel<Object> outputChannel;
 
             if (isParallel) {

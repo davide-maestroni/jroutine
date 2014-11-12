@@ -33,197 +33,197 @@ import javax.annotation.Nullable;
  */
 public abstract class BasicRoutine<INPUT, OUTPUT> implements Routine<INPUT, OUTPUT> {
 
-    @Override
     @Nonnull
+    @Override
     public List<OUTPUT> call() {
 
         return run().readAll();
     }
 
-    @Override
     @Nonnull
+    @Override
     public List<OUTPUT> call(@Nullable final INPUT input) {
 
         return run(input).readAll();
     }
 
-    @Override
     @Nonnull
+    @Override
     public List<OUTPUT> call(@Nullable final INPUT... inputs) {
 
         return run(inputs).readAll();
     }
 
-    @Override
     @Nonnull
+    @Override
     public List<OUTPUT> call(@Nullable final Iterable<? extends INPUT> inputs) {
 
         return run(inputs).readAll();
     }
 
-    @Override
     @Nonnull
+    @Override
     public List<OUTPUT> call(@Nullable final OutputChannel<INPUT> inputs) {
 
         return run(inputs).readAll();
     }
 
-    @Override
     @Nonnull
+    @Override
     public List<OUTPUT> callAsync() {
 
         return runAsync().readAll();
     }
 
-    @Override
     @Nonnull
+    @Override
     public List<OUTPUT> callAsync(@Nullable final INPUT input) {
 
         return runAsync(input).readAll();
     }
 
-    @Override
     @Nonnull
+    @Override
     public List<OUTPUT> callAsync(@Nullable final INPUT... inputs) {
 
         return runAsync(inputs).readAll();
     }
 
-    @Override
     @Nonnull
+    @Override
     public List<OUTPUT> callAsync(@Nullable final Iterable<? extends INPUT> inputs) {
 
         return runAsync(inputs).readAll();
     }
 
-    @Override
     @Nonnull
+    @Override
     public List<OUTPUT> callAsync(@Nullable final OutputChannel<INPUT> inputs) {
 
         return runAsync(inputs).readAll();
     }
 
-    @Override
     @Nonnull
+    @Override
     public List<OUTPUT> callParallel() {
 
         return runParallel().readAll();
     }
 
-    @Override
     @Nonnull
+    @Override
     public List<OUTPUT> callParallel(@Nullable final INPUT input) {
 
         return runParallel(input).readAll();
     }
 
-    @Override
     @Nonnull
+    @Override
     public List<OUTPUT> callParallel(@Nullable final INPUT... inputs) {
 
         return runParallel(inputs).readAll();
     }
 
-    @Override
     @Nonnull
+    @Override
     public List<OUTPUT> callParallel(@Nullable final Iterable<? extends INPUT> inputs) {
 
         return runParallel(inputs).readAll();
     }
 
-    @Override
     @Nonnull
+    @Override
     public List<OUTPUT> callParallel(@Nullable final OutputChannel<INPUT> inputs) {
 
         return runParallel(inputs).readAll();
     }
 
-    @Override
     @Nonnull
+    @Override
     public OutputChannel<OUTPUT> run() {
 
         return invoke().results();
     }
 
-    @Override
     @Nonnull
+    @Override
     public OutputChannel<OUTPUT> run(@Nullable final INPUT input) {
 
         return invoke().pass(input).results();
     }
 
-    @Override
     @Nonnull
+    @Override
     public OutputChannel<OUTPUT> run(@Nullable final INPUT... inputs) {
 
         return invoke().pass(inputs).results();
     }
 
-    @Override
     @Nonnull
+    @Override
     public OutputChannel<OUTPUT> run(@Nullable final Iterable<? extends INPUT> inputs) {
 
         return invoke().pass(inputs).results();
     }
 
-    @Override
     @Nonnull
+    @Override
     public OutputChannel<OUTPUT> run(@Nullable final OutputChannel<INPUT> inputs) {
 
         return invoke().pass(inputs).results();
     }
 
-    @Override
     @Nonnull
+    @Override
     public OutputChannel<OUTPUT> runAsync() {
 
         return invokeAsync().results();
     }
 
-    @Override
     @Nonnull
+    @Override
     public OutputChannel<OUTPUT> runAsync(@Nullable final INPUT input) {
 
         return invokeAsync().pass(input).results();
     }
 
-    @Override
     @Nonnull
+    @Override
     public OutputChannel<OUTPUT> runAsync(@Nullable final INPUT... inputs) {
 
         return invokeAsync().pass(inputs).results();
     }
 
-    @Override
     @Nonnull
+    @Override
     public OutputChannel<OUTPUT> runAsync(@Nullable final Iterable<? extends INPUT> inputs) {
 
         return invokeAsync().pass(inputs).results();
     }
 
-    @Override
     @Nonnull
+    @Override
     public OutputChannel<OUTPUT> runAsync(@Nullable final OutputChannel<INPUT> inputs) {
 
         return invokeAsync().pass(inputs).results();
     }
 
-    @Override
     @Nonnull
+    @Override
     public OutputChannel<OUTPUT> runParallel() {
 
         return invokeParallel().results();
     }
 
-    @Override
     @Nonnull
+    @Override
     public OutputChannel<OUTPUT> runParallel(@Nullable final INPUT input) {
 
         return invokeParallel().pass(input).results();
     }
 
-    @Override
     @Nonnull
+    @Override
     public OutputChannel<OUTPUT> runParallel(@Nullable final INPUT... inputs) {
 
         return invokeParallel().pass(inputs).results();

@@ -101,15 +101,15 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
         mInputChannel.close();
     }
 
-    @Override
     @Nonnull
+    @Override
     public InputChannel<TYPE> input() {
 
         return mInputChannel;
     }
 
-    @Override
     @Nonnull
+    @Override
     public OutputChannel<TYPE> output() {
 
         return mOutputChannel;

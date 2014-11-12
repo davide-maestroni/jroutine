@@ -74,7 +74,7 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            new ChannelBuilder().loggedWith(null);
+            new IOChannelBuilder().loggedWith(null);
 
             fail();
 
@@ -84,7 +84,7 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            new ChannelBuilder().logLevel(null);
+            new IOChannelBuilder().logLevel(null);
 
             fail();
 
@@ -621,7 +621,7 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            new RoutineBuilder<String, String>(null);
+            new InvocationRoutineBuilder<String, String>(null);
 
             fail();
 
@@ -631,7 +631,7 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            new RoutineBuilder<String, String>(
+            new InvocationRoutineBuilder<String, String>(
                     ClassToken.tokenOf(PassThroughInvocation.class)).availableTimeout(null);
 
             fail();
@@ -642,7 +642,7 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            new RoutineBuilder<String, String>(
+            new InvocationRoutineBuilder<String, String>(
                     ClassToken.tokenOf(PassThroughInvocation.class)).logLevel(null);
 
             fail();
@@ -653,7 +653,7 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            new RoutineBuilder<String, String>(
+            new InvocationRoutineBuilder<String, String>(
                     ClassToken.tokenOf(PassThroughInvocation.class)).loggedWith(null);
 
             fail();
@@ -664,7 +664,7 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            new RoutineBuilder<String, String>(
+            new InvocationRoutineBuilder<String, String>(
                     ClassToken.tokenOf(PassThroughInvocation.class)).runBy(null);
 
             fail();
@@ -675,7 +675,7 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            new RoutineBuilder<String, String>(
+            new InvocationRoutineBuilder<String, String>(
                     ClassToken.tokenOf(PassThroughInvocation.class)).withArgs((Object[]) null);
 
             fail();
@@ -686,7 +686,7 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            new RoutineBuilder<String, String>(
+            new InvocationRoutineBuilder<String, String>(
                     ClassToken.tokenOf(PassThroughInvocation.class)).maxRunning(0);
 
             fail();
@@ -697,7 +697,7 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            new RoutineBuilder<String, String>(
+            new InvocationRoutineBuilder<String, String>(
                     ClassToken.tokenOf(PassThroughInvocation.class)).maxRetained(-1);
 
             fail();

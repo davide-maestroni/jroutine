@@ -303,9 +303,10 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineBuilder {
     public Routine<INPUT, OUTPUT> buildRoutine() {
 
         return new DefaultRoutine<INPUT, OUTPUT>(mSyncRunner, mAsyncRunner, mMaxRunning,
-                                                 mMaxRetained, mAvailTimeout, mOrderedInput,
-                                                 mOrderedOutput, mLog, mLogLevel, mInvocationClass,
-                                                 mArgs);
+                                                 mMaxRetained, mAvailTimeout, mMaxInputBufferSize,
+                                                 mInputTimeout, mOrderedInput, mMaxOutputBufferSize,
+                                                 mOutputTimeout, mOrderedOutput, mLog, mLogLevel,
+                                                 mInvocationClass, mArgs);
     }
 
     /**

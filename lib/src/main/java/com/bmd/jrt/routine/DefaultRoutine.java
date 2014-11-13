@@ -54,7 +54,11 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
      *                        positive number.
      * @param availTimeout    the maximum timeout while waiting for an invocation instance to be
      *                        available.
+     * @param maxInputSize
+     * @param inputTimeout
      * @param orderedInput    whether the input data are forced to be delivered in insertion order.
+     * @param maxOutputSize
+     * @param outputTimeout
      * @param orderedOutput   whether the output data are forced to be delivered in insertion order.
      * @param log             the log instance.
      * @param logLevel        the log level
@@ -67,13 +71,16 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
      */
     DefaultRoutine(@Nonnull final Runner syncRunner, @Nonnull final Runner asyncRunner,
             final int maxRunning, final int maxRetained, @Nonnull final TimeDuration availTimeout,
-            final boolean orderedInput, final boolean orderedOutput, @Nonnull final Log log,
-            @Nonnull final LogLevel logLevel,
+            final int maxInputSize, @Nonnull final TimeDuration inputTimeout,
+            final boolean orderedInput, final int maxOutputSize,
+            @Nonnull final TimeDuration outputTimeout, final boolean orderedOutput,
+            @Nonnull final Log log, @Nonnull final LogLevel logLevel,
             @Nonnull final Class<? extends Invocation<INPUT, OUTPUT>> invocationClass,
             @Nullable final Object... invocationArgs) {
 
-        super(syncRunner, asyncRunner, maxRunning, maxRetained, availTimeout, orderedInput,
-              orderedOutput, log, logLevel);
+        super(syncRunner, asyncRunner, maxRunning, maxRetained, availTimeout, maxInputSize,
+              inputTimeout, orderedInput, maxOutputSize, outputTimeout, orderedOutput, log,
+              logLevel);
 
         mArgs = (invocationArgs == null) ? NO_ARGS : invocationArgs.clone();
         mConstructor = findConstructor(invocationClass, mArgs);

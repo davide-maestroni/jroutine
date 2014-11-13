@@ -724,8 +724,8 @@ public class RoutineTest extends TestCase {
         try {
 
             new AbstractRoutine<Object, Object>(null, Runners.sharedRunner(), 1, 1,
-                                                TimeDuration.ZERO, false, false,
-                                                Logger.getDefaultLog(),
+                                                TimeDuration.ZERO, 1, TimeDuration.ZERO, false, 1,
+                                                TimeDuration.ZERO, false, Logger.getDefaultLog(),
                                                 Logger.getDefaultLogLevel()) {
 
                 @Override
@@ -745,8 +745,8 @@ public class RoutineTest extends TestCase {
         try {
 
             new AbstractRoutine<Object, Object>(Runners.queuedRunner(), null, 1, 1,
-                                                TimeDuration.ZERO, false, false,
-                                                Logger.getDefaultLog(),
+                                                TimeDuration.ZERO, 1, TimeDuration.ZERO, false, 1,
+                                                TimeDuration.ZERO, false, Logger.getDefaultLog(),
                                                 Logger.getDefaultLogLevel()) {
 
                 @Override
@@ -766,7 +766,8 @@ public class RoutineTest extends TestCase {
         try {
 
             new AbstractRoutine<Object, Object>(Runners.queuedRunner(), Runners.sharedRunner(), 1,
-                                                1, null, false, false, Logger.getDefaultLog(),
+                                                1, null, 1, TimeDuration.ZERO, false, 1,
+                                                TimeDuration.ZERO, false, Logger.getDefaultLog(),
                                                 Logger.getDefaultLogLevel()) {
 
                 @Override
@@ -786,7 +787,8 @@ public class RoutineTest extends TestCase {
         try {
 
             new AbstractRoutine<Object, Object>(Runners.queuedRunner(), Runners.sharedRunner(), 1,
-                                                0, TimeDuration.ZERO, false, false, null, null) {
+                                                0, TimeDuration.ZERO, 1, TimeDuration.ZERO, false,
+                                                1, TimeDuration.ZERO, false, null, null) {
 
                 @Override
                 @Nonnull
@@ -805,8 +807,8 @@ public class RoutineTest extends TestCase {
         try {
 
             new AbstractRoutine<Object, Object>(Runners.queuedRunner(), Runners.sharedRunner(), 0,
-                                                1, TimeDuration.ZERO, false, false,
-                                                Logger.getDefaultLog(),
+                                                1, TimeDuration.ZERO, 1, TimeDuration.ZERO, false,
+                                                1, TimeDuration.ZERO, false, Logger.getDefaultLog(),
                                                 Logger.getDefaultLogLevel()) {
 
                 @Override
@@ -826,8 +828,8 @@ public class RoutineTest extends TestCase {
         try {
 
             new AbstractRoutine<Object, Object>(Runners.queuedRunner(), Runners.sharedRunner(), 1,
-                                                -1, TimeDuration.ZERO, false, false,
-                                                Logger.getDefaultLog(),
+                                                -1, TimeDuration.ZERO, 1, TimeDuration.ZERO, false,
+                                                1, TimeDuration.ZERO, false, Logger.getDefaultLog(),
                                                 Logger.getDefaultLogLevel()) {
 
                 @Override

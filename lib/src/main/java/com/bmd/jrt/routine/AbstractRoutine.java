@@ -49,10 +49,16 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends BasicRoutine<INPUT,
 
     private final TimeDuration mAvailTimeout;
 
+    private final TimeDuration mInputTimeout;
+
     private final LinkedList<Invocation<INPUT, OUTPUT>> mInvocations =
             new LinkedList<Invocation<INPUT, OUTPUT>>();
 
     private final Logger mLogger;
+
+    private final int mMaxInputSize;
+
+    private final int mMaxOutputSize;
 
     private final int mMaxRetained;
 
@@ -63,6 +69,8 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends BasicRoutine<INPUT,
     private final boolean mOrderedInput;
 
     private final boolean mOrderedOutput;
+
+    private final TimeDuration mOutputTimeout;
 
     private final Runner mSyncRunner;
 
@@ -78,7 +86,11 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends BasicRoutine<INPUT,
      *                      positive number.
      * @param availTimeout  the maximum timeout while waiting for an invocation instance to be
      *                      available.
+     * @param maxInputSize
+     * @param inputTimeout
      * @param orderedInput  whether the input data are forced to be delivered in insertion order.
+     * @param maxOutputSize
+     * @param outputTimeout
      * @param orderedOutput whether the output data are forced to be delivered in insertion order.
      * @param log           the log instance.
      * @param logLevel      the log level.
@@ -88,8 +100,10 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends BasicRoutine<INPUT,
     @SuppressWarnings("ConstantConditions")
     protected AbstractRoutine(@Nonnull final Runner syncRunner, @Nonnull final Runner asyncRunner,
             final int maxRunning, final int maxRetained, @Nonnull final TimeDuration availTimeout,
-            final boolean orderedInput, final boolean orderedOutput, @Nonnull final Log log,
-            @Nonnull final LogLevel logLevel) {
+            final int maxInputSize, @Nonnull final TimeDuration inputTimeout,
+            final boolean orderedInput, final int maxOutputSize,
+            @Nonnull final TimeDuration outputTimeout, final boolean orderedOutput,
+            @Nonnull final Log log, @Nonnull final LogLevel logLevel) {
 
         if (syncRunner == null) {
 
@@ -119,12 +133,28 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends BasicRoutine<INPUT,
                     "the timeout for available invocation instances must not be null");
         }
 
+        if (inputTimeout == null) {
+
+            throw new NullPointerException(
+                    "the timeout for available input buffer must not be null");
+        }
+
+        if (outputTimeout == null) {
+
+            throw new NullPointerException(
+                    "the timeout for available output buffer must not be null");
+        }
+
         mSyncRunner = syncRunner;
         mAsyncRunner = asyncRunner;
         mMaxRunning = maxRunning;
         mMaxRetained = maxRetained;
         mAvailTimeout = availTimeout;
+        mMaxInputSize = maxInputSize;
+        mInputTimeout = inputTimeout;
         mOrderedInput = orderedInput;
+        mMaxOutputSize = maxOutputSize;
+        mOutputTimeout = outputTimeout;
         mOrderedOutput = orderedOutput;
         mLogger = Logger.create(log, logLevel, this);
     }
@@ -139,20 +169,31 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends BasicRoutine<INPUT,
      *                      positive number.
      * @param availTimeout  the maximum timeout while waiting for an invocation instance to be
      *                      available.
+     * @param maxInputSize
+     * @param inputTimeout
      * @param orderedInput  whether the input data are forced to be delivered in insertion order.
+     * @param maxOutputSize
+     * @param outputTimeout
      * @param orderedOutput whether the output data are forced to be delivered in insertion order.
      * @param logger        the logger instance.
      */
     private AbstractRoutine(@Nonnull final Runner syncRunner, @Nonnull final Runner asyncRunner,
             final int maxRunning, final int maxRetained, @Nonnull final TimeDuration availTimeout,
-            final boolean orderedInput, final boolean orderedOutput, @Nonnull final Logger logger) {
+            final int maxInputSize, @Nonnull final TimeDuration inputTimeout,
+            final boolean orderedInput, final int maxOutputSize,
+            @Nonnull final TimeDuration outputTimeout, final boolean orderedOutput,
+            @Nonnull final Logger logger) {
 
         mSyncRunner = syncRunner;
         mAsyncRunner = asyncRunner;
         mMaxRunning = maxRunning;
         mMaxRetained = maxRetained;
         mAvailTimeout = availTimeout;
+        mMaxInputSize = maxInputSize;
+        mInputTimeout = inputTimeout;
         mOrderedInput = orderedInput;
+        mMaxOutputSize = maxOutputSize;
+        mOutputTimeout = outputTimeout;
         mOrderedOutput = orderedOutput;
         mLogger = logger;
     }
@@ -179,8 +220,9 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends BasicRoutine<INPUT,
 
         final AbstractRoutine<INPUT, OUTPUT> parallelRoutine =
                 new AbstractRoutine<INPUT, OUTPUT>(mSyncRunner, mAsyncRunner, mMaxRunning,
-                                                   mMaxRetained, mAvailTimeout, mOrderedInput,
-                                                   mOrderedOutput, mLogger) {
+                                                   mMaxRetained, mAvailTimeout, mMaxInputSize,
+                                                   mInputTimeout, mOrderedInput, mMaxOutputSize,
+                                                   mOutputTimeout, mOrderedOutput, mLogger) {
 
                     @Nonnull
                     @Override

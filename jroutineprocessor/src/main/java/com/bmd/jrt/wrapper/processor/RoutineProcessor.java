@@ -531,9 +531,14 @@ public class RoutineProcessor extends AbstractProcessor {
             builder.append(".runBy(new ").append(runnerType).append("())");
         }
 
-        final AsyncOverride overrideAnnotation = methodElement.getAnnotation(AsyncOverride.class);
+        final TypeElement overrideAnnotationElement =
+                getTypeFromName(AsyncOverride.class.getName());
+        final TypeMirror overrideAnnotationType = overrideAnnotationElement.asType();
 
-        if ((overrideAnnotation != null) && (overrideAnnotation.value().length > 0)) {
+        final List<?> values =
+                (List<?>) getElementValue(methodElement, overrideAnnotationType, "value");
+
+        if ((values != null) && !values.isEmpty()) {
 
             builder.append(".orderedInput()");
         }
@@ -688,14 +693,14 @@ public class RoutineProcessor extends AbstractProcessor {
 
                 if (targetMethod == null) {
 
-                    if (overrideAnnotation != null) {
+                    final TypeElement annotationElement =
+                            getTypeFromName(AsyncOverride.class.getName());
+                    final TypeMirror annotationType = annotationElement.asType();
 
-                        final TypeElement annotationElement =
-                                getTypeFromName(AsyncOverride.class.getName());
-                        final TypeMirror annotationType = annotationElement.asType();
+                    final List<?> values =
+                            (List<?>) getElementValue(methodElement, annotationType, "value");
 
-                        final List<?> values =
-                                (List<?>) getElementValue(methodElement, annotationType, "value");
+                    if ((overrideAnnotation != null) && (values != null)) {
 
                         for (final ExecutableElement targetMethodElement : ElementFilter.methodsIn(
                                 targetElement.getEnclosedElements())) {
@@ -756,14 +761,13 @@ public class RoutineProcessor extends AbstractProcessor {
 
             final Name methodName = methodElement.getSimpleName();
 
-            if (overrideAnnotation != null) {
+            final TypeElement annotationElement = getTypeFromName(AsyncOverride.class.getName());
+            final TypeMirror annotationType = annotationElement.asType();
 
-                final TypeElement annotationElement =
-                        getTypeFromName(AsyncOverride.class.getName());
-                final TypeMirror annotationType = annotationElement.asType();
+            final List<?> values =
+                    (List<?>) getElementValue(methodElement, annotationType, "value");
 
-                final List<?> values =
-                        (List<?>) getElementValue(methodElement, annotationType, "value");
+            if ((overrideAnnotation != null) && (values != null)) {
 
                 for (final ExecutableElement targetMethodElement : ElementFilter.methodsIn(
                         targetElement.getEnclosedElements())) {

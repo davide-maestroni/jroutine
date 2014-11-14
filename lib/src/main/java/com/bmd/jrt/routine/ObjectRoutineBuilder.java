@@ -30,6 +30,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.WeakHashMap;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -117,6 +118,43 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
     @Nonnull
     @Override
+    public ObjectRoutineBuilder availableTimeout(final long timeout,
+            @Nonnull final TimeUnit timeUnit) {
+
+        super.availableTimeout(timeout, timeUnit);
+
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public ObjectRoutineBuilder availableTimeout(@Nonnull final TimeDuration timeout) {
+
+        super.availableTimeout(timeout);
+
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public ObjectRoutineBuilder inputTimeout(final long timeout, @Nonnull final TimeUnit timeUnit) {
+
+        super.inputTimeout(timeout, timeUnit);
+
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public ObjectRoutineBuilder inputTimeout(@Nonnull final TimeDuration timeout) {
+
+        super.inputTimeout(timeout);
+
+        return this;
+    }
+
+    @Nonnull
+    @Override
     public ObjectRoutineBuilder logLevel(@Nonnull final LogLevel level) {
 
         super.logLevel(level);
@@ -135,6 +173,24 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
     @Nonnull
     @Override
+    public ObjectRoutineBuilder maxInputSize(final int maxInputSize) {
+
+        super.maxInputSize(maxInputSize);
+
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public ObjectRoutineBuilder maxOutputSize(final int maxOutputSize) {
+
+        super.maxOutputSize(maxOutputSize);
+
+        return this;
+    }
+
+    @Nonnull
+    @Override
     public ObjectRoutineBuilder maxRetained(final int maxRetainedInstances) {
 
         super.maxRetained(maxRetainedInstances);
@@ -147,6 +203,43 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     public ObjectRoutineBuilder maxRunning(final int maxRunningInstances) {
 
         super.maxRunning(maxRunningInstances);
+
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public ObjectRoutineBuilder orderedInput() {
+
+        super.orderedInput();
+
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public ObjectRoutineBuilder orderedOutput() {
+
+        super.orderedOutput();
+
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public ObjectRoutineBuilder outputTimeout(final long timeout,
+            @Nonnull final TimeUnit timeUnit) {
+
+        super.outputTimeout(timeout, timeUnit);
+
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public ObjectRoutineBuilder outputTimeout(@Nonnull final TimeDuration timeout) {
+
+        super.outputTimeout(timeout);
 
         return this;
     }
@@ -234,10 +327,10 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
             mMaxRunning = getMaxRunning();
             mMaxRetained = getMaxRetained();
             mAvailTimeout = getAvailTimeout();
-            mMaxInputSize = getMaxInputBufferSize();
+            mMaxInputSize = getMaxInputSize();
             mInputTimeout = getInputTimeout();
             mOrderedInput = isOrderedInput();
-            mMaxOutputSize = getMaxOutputBufferSize();
+            mMaxOutputSize = getMaxOutputSize();
             mOutputTimeout = getOutputTimeout();
             mOrderedOutput = isOrderedOutput();
             mLog = getLog();
@@ -262,10 +355,10 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
             int maxRunning = mMaxRunning;
             int maxRetained = mMaxRetained;
             TimeDuration availTimeout = mAvailTimeout;
-            int maxInputBufferSize = mMaxInputSize;
+            int maxInputSize = mMaxInputSize;
             TimeDuration inputTimeout = mInputTimeout;
             Boolean orderedInput = mOrderedInput;
-            int maxOutputBufferSize = mMaxOutputSize;
+            int maxOutputSize = mMaxOutputSize;
             TimeDuration outputTimeout = mOutputTimeout;
             Boolean orderedOutput = mOrderedOutput;
             Log log = mLog;
@@ -440,9 +533,9 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                         }
                     }
 
-                    if (maxInputBufferSize == Async.DEFAULT_NUMBER) {
+                    if (maxInputSize == Async.DEFAULT_NUMBER) {
 
-                        maxInputBufferSize = annotation.maxInput();
+                        maxInputSize = annotation.maxInput();
                     }
 
                     if (inputTimeout == null) {
@@ -460,9 +553,9 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                         orderedInput = annotation.orderedInput();
                     }
 
-                    if (maxOutputBufferSize == Async.DEFAULT_NUMBER) {
+                    if (maxOutputSize == Async.DEFAULT_NUMBER) {
 
-                        maxOutputBufferSize = annotation.maxOutput();
+                        maxOutputSize = annotation.maxOutput();
                     }
 
                     if (outputTimeout == null) {
@@ -506,8 +599,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
             final Routine<Object, Object> routine =
                     getRoutine(targetMethod, lockId, runner, isSequential, maxRunning, maxRetained,
-                               availTimeout, maxInputBufferSize, inputTimeout, orderedInput,
-                               maxOutputBufferSize, outputTimeout, orderedOutput, log, level);
+                               availTimeout, maxInputSize, inputTimeout, orderedInput,
+                               maxOutputSize, outputTimeout, orderedOutput, log, level);
             final OutputChannel<Object> outputChannel;
 
             if (isParallel) {

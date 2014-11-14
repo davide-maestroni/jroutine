@@ -50,6 +50,11 @@ import javax.annotation.Nonnull;
  * In case the timeout elapses before an invocation instance becomes available, a
  * {@link RoutineNotAvailableException} will be thrown.
  * <p/>
+ * Moreover, the number of input and output data buffered in the corresponding channel can be
+ * limited in order to avoid excessive memory consumption. In case the maximum number is reached
+ * when passing an input or output, the call blocks until enough data are consumed or the specified
+ * timeout elapses. In the latter case a {@link RoutineChannelOverflowException} will be thrown.
+ * <p/>
  * Finally, by default the order of input and output data is not guaranteed. Nevertheless, it is
  * possible to force data to be delivered in insertion order, at the cost of a slightly increased
  * memory usage and computation, by calling the proper methods.
@@ -64,6 +69,7 @@ public interface RoutineBuilder {
      * @param timeout  the timeout.
      * @param timeUnit the timeout time unit.
      * @return this builder.
+     * @throws NullPointerException     if the specified time unit is null.
      * @throws IllegalArgumentException if the specified timeout is negative.
      */
     @Nonnull
@@ -80,19 +86,26 @@ public interface RoutineBuilder {
     public RoutineBuilder availableTimeout(@Nonnull TimeDuration timeout);
 
     /**
-     * @param timeout
-     * @param timeUnit
-     * @return
+     * Sets the timeout for an input channel to have room for additional data.
+     *
+     * @param timeout  the timeout.
+     * @param timeUnit the timeout time unit.
+     * @return this builder.
+     * @throws NullPointerException     if the specified time unit is null.
+     * @throws IllegalArgumentException if the specified timeout is negative.
      */
     @Nonnull
-    public RoutineBuilder inputBufferTimeout(long timeout, @Nonnull TimeUnit timeUnit);
+    public RoutineBuilder inputTimeout(long timeout, @Nonnull TimeUnit timeUnit);
 
     /**
-     * @param timeout
-     * @return
+     * Sets the timeout for an input channel to have room for additional data.
+     *
+     * @param timeout the timeout.
+     * @return this builder.
+     * @throws NullPointerException if the specified timeout is null.
      */
     @Nonnull
-    public RoutineBuilder inputBufferTimeout(@Nonnull TimeDuration timeout);
+    public RoutineBuilder inputTimeout(@Nonnull TimeDuration timeout);
 
     /**
      * Sets the log level.
@@ -115,18 +128,24 @@ public interface RoutineBuilder {
     public RoutineBuilder loggedWith(@Nonnull Log log);
 
     /**
-     * @param maxInputBufferSize
-     * @return
+     * Sets the maximum number of data that the input channel can retain before they are consumed.
+     *
+     * @param maxInputSize the maximum size.
+     * @return this builder.
+     * @throws IllegalArgumentException if the number is less than 1.
      */
     @Nonnull
-    public RoutineBuilder maxBufferedInput(int maxInputBufferSize);
+    public RoutineBuilder maxInputSize(int maxInputSize);
 
     /**
-     * @param maxOutputBufferSize
-     * @return
+     * Sets the maximum number of data that the result channel can retain before they are consumed.
+     *
+     * @param maxOutputSize the maximum size.
+     * @return this builder.
+     * @throws IllegalArgumentException if the number is less than 1.
      */
     @Nonnull
-    public RoutineBuilder maxBufferedOutput(int maxOutputBufferSize);
+    public RoutineBuilder maxOutputSize(int maxOutputSize);
 
     /**
      * Sets the max number of retained instances.
@@ -167,19 +186,26 @@ public interface RoutineBuilder {
     public RoutineBuilder orderedOutput();
 
     /**
-     * @param timeout
-     * @param timeUnit
-     * @return
+     * Sets the timeout for a result channel to have room for additional data.
+     *
+     * @param timeout  the timeout.
+     * @param timeUnit the timeout time unit.
+     * @return this builder.
+     * @throws NullPointerException     if the specified time unit is null.
+     * @throws IllegalArgumentException if the specified timeout is negative.
      */
     @Nonnull
-    public RoutineBuilder outputBufferTimeout(long timeout, @Nonnull TimeUnit timeUnit);
+    public RoutineBuilder outputTimeout(long timeout, @Nonnull TimeUnit timeUnit);
 
     /**
-     * @param timeout
-     * @return
+     * Sets the timeout for a result channel to have room for additional data.
+     *
+     * @param timeout the timeout.
+     * @return this builder.
+     * @throws NullPointerException if the specified timeout is null.
      */
     @Nonnull
-    public RoutineBuilder outputBufferTimeout(@Nonnull TimeDuration timeout);
+    public RoutineBuilder outputTimeout(@Nonnull TimeDuration timeout);
 
     /**
      * Sets the synchronous runner to the queued one.<br/>

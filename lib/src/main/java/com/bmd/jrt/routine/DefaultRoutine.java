@@ -54,11 +54,13 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
      *                        positive number.
      * @param availTimeout    the maximum timeout while waiting for an invocation instance to be
      *                        available.
-     * @param maxInputSize
-     * @param inputTimeout
+     * @param maxInputSize    the maximum number of buffered input data. Must be positive.
+     * @param inputTimeout    the maximum timeout while waiting for an input to be passed to the
+     *                        input channel.
      * @param orderedInput    whether the input data are forced to be delivered in insertion order.
-     * @param maxOutputSize
-     * @param outputTimeout
+     * @param maxOutputSize   the maximum number of buffered output data. Must be positive.
+     * @param outputTimeout   the maximum timeout while waiting for an output to be passed to the
+     *                        result channel.
      * @param orderedOutput   whether the output data are forced to be delivered in insertion order.
      * @param log             the log instance.
      * @param logLevel        the log level

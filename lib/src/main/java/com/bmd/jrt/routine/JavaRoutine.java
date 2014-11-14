@@ -152,8 +152,6 @@ import javax.annotation.Nonnull;
  */
 public class JavaRoutine {
 
-    //TODO: routinebuilder interface
-    //TODO: maxinput, maxoutput, maxinputtimeout, etc.
     //TODO: processor builder
 
     /**

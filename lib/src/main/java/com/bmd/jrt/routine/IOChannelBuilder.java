@@ -23,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 
+import static com.bmd.jrt.time.TimeDuration.ZERO;
 import static com.bmd.jrt.time.TimeDuration.fromUnit;
 
 /**
@@ -32,21 +33,57 @@ import static com.bmd.jrt.time.TimeDuration.fromUnit;
  */
 public class IOChannelBuilder {
 
-    private TimeDuration mInputTimeout;
-
     private boolean mIsOrdered;
 
     private Log mLog = Logger.getDefaultLog();
 
     private LogLevel mLogLevel = Logger.getDefaultLogLevel();
 
-    private TimeDuration mOutputTimeout;
+    private int mMaxSize = Integer.MAX_VALUE;
+
+    private TimeDuration mTimeout = ZERO;
 
     /**
      * Avoid direct instantiation.
      */
     IOChannelBuilder() {
 
+    }
+
+    /**
+     * Sets the timeout for the channel to have room for additional data.
+     *
+     * @param timeout  the timeout.
+     * @param timeUnit the timeout time unit.
+     * @return this builder.
+     * @throws NullPointerException     if the specified time unit is null.
+     * @throws IllegalArgumentException if the specified timeout is negative.
+     */
+    @Nonnull
+    public IOChannelBuilder bufferTimeout(final long timeout, @Nonnull final TimeUnit timeUnit) {
+
+        return bufferTimeout(fromUnit(timeout, timeUnit));
+    }
+
+    /**
+     * Sets the timeout for the channel to have room for additional data.
+     *
+     * @param timeout the timeout.
+     * @return this builder.
+     * @throws NullPointerException if the specified timeout is null.
+     */
+    @Nonnull
+    @SuppressWarnings("ConstantConditions")
+    public IOChannelBuilder bufferTimeout(final TimeDuration timeout) {
+
+        if (timeout == null) {
+
+            throw new NullPointerException("the timeout must not be null");
+        }
+
+        mTimeout = timeout;
+
+        return this;
     }
 
     /**
@@ -57,37 +94,7 @@ public class IOChannelBuilder {
     @Nonnull
     public <T> IOChannel<T> buildChannel() {
 
-        return new DefaultIOChannel<T>(mIsOrdered, mLog, mLogLevel);
-    }
-
-    /**
-     * @param timeout
-     * @param timeUnit
-     * @return
-     */
-    @Nonnull
-    public IOChannelBuilder inputBufferTimeout(final long timeout,
-            @Nonnull final TimeUnit timeUnit) {
-
-        return inputBufferTimeout(fromUnit(timeout, timeUnit));
-    }
-
-    /**
-     * @param timeout
-     * @return
-     */
-    @Nonnull
-    @SuppressWarnings("ConstantConditions")
-    public IOChannelBuilder inputBufferTimeout(final TimeDuration timeout) {
-
-        if (timeout == null) {
-
-            throw new NullPointerException("the timeout must not be null");
-        }
-
-        mInputTimeout = timeout;
-
-        return this;
+        return new DefaultIOChannel<T>(mMaxSize, mTimeout, mIsOrdered, mLog, mLogLevel);
     }
 
     /**
@@ -133,25 +140,21 @@ public class IOChannelBuilder {
     }
 
     /**
-     * @param maxInputBufferSize
-     * @return
+     * Sets the maximum number of data that the channel can retain before they are consumed.
+     *
+     * @param maxBufferSize the maximum size.
+     * @return this builder.
+     * @throws IllegalArgumentException if the number is less than 1.
      */
     @Nonnull
-    public IOChannelBuilder maxBufferedInput(final int maxInputBufferSize) {
+    public IOChannelBuilder maxSize(final int maxBufferSize) {
 
-        //TODO
+        if (maxBufferSize <= 0) {
 
-        return this;
-    }
+            throw new IllegalArgumentException("the buffer size cannot be 0 or negative");
+        }
 
-    /**
-     * @param maxOutputBufferSize
-     * @return
-     */
-    @Nonnull
-    public IOChannelBuilder maxBufferedOutput(final int maxOutputBufferSize) {
-
-        //TODO
+        mMaxSize = maxBufferSize;
 
         return this;
     }
@@ -166,36 +169,6 @@ public class IOChannelBuilder {
     public IOChannelBuilder orderedInput() {
 
         mIsOrdered = true;
-
-        return this;
-    }
-
-    /**
-     * @param timeout
-     * @param timeUnit
-     * @return
-     */
-    @Nonnull
-    public IOChannelBuilder outputBufferTimeout(final long timeout,
-            @Nonnull final TimeUnit timeUnit) {
-
-        return outputBufferTimeout(fromUnit(timeout, timeUnit));
-    }
-
-    /**
-     * @param timeout
-     * @return
-     */
-    @Nonnull
-    @SuppressWarnings("ConstantConditions")
-    public IOChannelBuilder outputBufferTimeout(final TimeDuration timeout) {
-
-        if (timeout == null) {
-
-            throw new NullPointerException("the timeout must not be null");
-        }
-
-        mOutputTimeout = timeout;
 
         return this;
     }

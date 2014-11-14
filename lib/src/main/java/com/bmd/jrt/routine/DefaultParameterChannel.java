@@ -16,6 +16,7 @@ package com.bmd.jrt.routine;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.OutputConsumer;
 import com.bmd.jrt.channel.ParameterChannel;
+import com.bmd.jrt.common.RoutineInterruptedException;
 import com.bmd.jrt.invocation.Invocation;
 import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.routine.DefaultExecution.InputIterator;
@@ -23,6 +24,7 @@ import com.bmd.jrt.routine.DefaultResultChannel.AbortHandler;
 import com.bmd.jrt.runner.Execution;
 import com.bmd.jrt.runner.Runner;
 import com.bmd.jrt.time.TimeDuration;
+import com.bmd.jrt.time.TimeDuration.Check;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,6 +33,8 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import static com.bmd.jrt.time.TimeDuration.ZERO;
 import static com.bmd.jrt.time.TimeDuration.fromUnit;
@@ -49,9 +53,15 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
     private final DefaultExecution<INPUT, OUTPUT> mExecution;
 
+    private final Check mHasInputs;
+
     private final NestedQueue<INPUT> mInputQueue;
 
+    private final TimeDuration mInputTimeout;
+
     private final Logger mLogger;
+
+    private final int mMaxInput;
 
     private final Object mMutex = new Object();
 
@@ -61,7 +71,11 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
     private Throwable mAbortException;
 
+    private int mInputCount;
+
     private TimeDuration mInputDelay = ZERO;
+
+    private boolean mIsPendingExecution;
 
     private int mPendingInputCount;
 
@@ -72,19 +86,48 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
      *
      * @param manager       the invocation manager.
      * @param runner        the runner instance.
+     * @param maxInputSize  the maximum number of buffered input data.
+     * @param inputTimeout  the maximum timeout while waiting for an input to be passed to the
+     *                      input channel.
      * @param orderedInput  whether the input data are forced to be delivered in insertion order.
+     * @param maxOutputSize the maximum number of buffered output data.
+     * @param outputTimeout the maximum timeout while waiting for an output to be passed to the
+     *                      result channel.
      * @param orderedOutput whether the output data are forced to be delivered in insertion order.
      * @param logger        the logger instance.
      * @throws NullPointerException if one of the parameters is null.
      */
+    @SuppressWarnings("ConstantConditions")
     DefaultParameterChannel(@Nonnull final InvocationManager<INPUT, OUTPUT> manager,
-            @Nonnull final Runner runner, final boolean orderedInput, final boolean orderedOutput,
-            @Nonnull final Logger logger) {
+            @Nonnull final Runner runner, final int maxInputSize,
+            @Nonnull final TimeDuration inputTimeout, final boolean orderedInput,
+            final int maxOutputSize, @Nonnull final TimeDuration outputTimeout,
+            final boolean orderedOutput, @Nonnull final Logger logger) {
+
+        if (inputTimeout == null) {
+
+            throw new NullPointerException("the input timeout must not be null");
+        }
+
+        if (maxInputSize < 1) {
+
+            throw new IllegalArgumentException("the input buffer size cannot be 0 or negative");
+        }
 
         mLogger = logger.subContextLogger(this);
         mRunner = runner;
+        mMaxInput = maxInputSize;
+        mInputTimeout = inputTimeout;
         mInputQueue =
                 (orderedInput) ? new OrderedNestedQueue<INPUT>() : new SimpleNestedQueue<INPUT>();
+        mHasInputs = new Check() {
+
+            @Override
+            public boolean isTrue() {
+
+                return (mInputCount <= maxInputSize);
+            }
+        };
         mResultChanel = new DefaultResultChannel<OUTPUT>(new AbortHandler() {
 
             @Override
@@ -110,7 +153,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
                 mRunner.run(mExecution.abort(), delay, timeUnit);
             }
-        }, runner, orderedOutput, logger);
+        }, runner, maxOutputSize, outputTimeout, orderedOutput, logger);
         mExecution = new DefaultExecution<INPUT, OUTPUT>(manager, new DefaultInputIterator(),
                                                          mResultChanel, logger);
     }
@@ -224,13 +267,13 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
                 return this;
             }
 
-            mLogger.dbg("passing channel [#%d]: %s", mPendingInputCount + 1, channel);
-
             mBoundChannels.add(channel);
 
             delay = mInputDelay;
 
             ++mPendingInputCount;
+
+            mLogger.dbg("passing channel: %s", channel);
 
             consumer = new DefaultOutputConsumer(delay);
         }
@@ -245,6 +288,8 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
     public ParameterChannel<INPUT, OUTPUT> pass(@Nullable final Iterable<? extends INPUT> inputs) {
 
         NestedQueue<INPUT> inputQueue;
+        ArrayList<INPUT> list = null;
+        boolean isPendingExecution = false;
         final TimeDuration delay;
 
         synchronized (mMutex) {
@@ -261,30 +306,61 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
             inputQueue = mInputQueue;
             delay = mInputDelay;
 
-            mLogger.dbg("passing iterable [#%d]: %s [%s]", mPendingInputCount + 1, inputs, delay);
+            int count = 0;
 
             if (delay.isZero()) {
 
                 for (final INPUT input : inputs) {
 
                     inputQueue.add(input);
+                    ++count;
                 }
 
             } else {
 
                 inputQueue = inputQueue.addNested();
+
+                list = new ArrayList<INPUT>();
+
+                for (final INPUT input : inputs) {
+
+                    list.add(input);
+                }
+
+                count = list.size();
             }
 
-            ++mPendingInputCount;
+            mLogger.dbg("passing iterable [#%d+%d]: %s [%s]", mInputCount, count, inputs, delay);
+
+            addInputs(count);
+
+            if (delay.isZero()) {
+
+                isPendingExecution = mIsPendingExecution;
+
+                if (!isPendingExecution) {
+
+                    ++mPendingInputCount;
+
+                    mIsPendingExecution = true;
+                }
+
+            } else {
+
+                ++mPendingInputCount;
+            }
         }
 
         if (delay.isZero()) {
 
-            mRunner.run(mExecution, 0, TimeUnit.MILLISECONDS);
+            if (!isPendingExecution) {
+
+                mRunner.run(mExecution, 0, TimeUnit.MILLISECONDS);
+            }
 
         } else {
 
-            mRunner.run(new DelayedListInputExecution(inputQueue, inputs), delay.time, delay.unit);
+            mRunner.run(new DelayedListInputExecution(inputQueue, list), delay.time, delay.unit);
         }
 
         return this;
@@ -295,6 +371,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
     public ParameterChannel<INPUT, OUTPUT> pass(@Nullable final INPUT input) {
 
         NestedQueue<INPUT> inputQueue;
+        boolean isPendingExecution = false;
         final TimeDuration delay;
 
         synchronized (mMutex) {
@@ -303,8 +380,6 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
             inputQueue = mInputQueue;
             delay = mInputDelay;
-
-            mLogger.dbg("passing input [#%d]: %s [%s]", mPendingInputCount + 1, input, delay);
 
             if (delay.isZero()) {
 
@@ -315,12 +390,33 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
                 inputQueue = inputQueue.addNested();
             }
 
-            ++mPendingInputCount;
+            mLogger.dbg("passing input [#%d+1]: %s [%s]", mInputCount, input, delay);
+
+            addInputs(1);
+
+            if (delay.isZero()) {
+
+                isPendingExecution = mIsPendingExecution;
+
+                if (!isPendingExecution) {
+
+                    ++mPendingInputCount;
+
+                    mIsPendingExecution = true;
+                }
+
+            } else {
+
+                ++mPendingInputCount;
+            }
         }
 
         if (delay.isZero()) {
 
-            mRunner.run(mExecution, 0, TimeUnit.MILLISECONDS);
+            if (!isPendingExecution) {
+
+                mRunner.run(mExecution, 0, TimeUnit.MILLISECONDS);
+            }
 
         } else {
 
@@ -353,6 +449,8 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
     @Override
     public OutputChannel<OUTPUT> results() {
 
+        final boolean isPendingExecution;
+
         synchronized (mMutex) {
 
             verifyInput();
@@ -361,12 +459,39 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
             mState = ChannelState.OUTPUT;
 
-            ++mPendingInputCount;
+            isPendingExecution = mIsPendingExecution;
+
+            if (!isPendingExecution) {
+
+                ++mPendingInputCount;
+
+                mIsPendingExecution = true;
+            }
         }
 
-        mRunner.run(mExecution, 0, TimeUnit.MILLISECONDS);
+        if (!isPendingExecution) {
+
+            mRunner.run(mExecution, 0, TimeUnit.MILLISECONDS);
+        }
 
         return mResultChanel.getOutput();
+    }
+
+    private void addInputs(final int count) {
+
+        mInputCount += count;
+
+        try {
+
+            if (!mInputTimeout.waitTrue(mMutex, mHasInputs)) {
+
+                throw new RoutineChannelOverflowException();
+            }
+
+        } catch (final InterruptedException e) {
+
+            RoutineInterruptedException.interrupt(e);
+        }
     }
 
     private boolean isInputComplete() {
@@ -476,7 +601,10 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
             return isInputComplete();
         }
 
+        @Nullable
         @Override
+        @SuppressFBWarnings(value = "NO_NOTIFY_NOT_NOTIFYALL",
+                            justification = "only one input is released")
         public INPUT nextInput() throws NoSuchElementException {
 
             synchronized (mMutex) {
@@ -488,9 +616,17 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
                     throw new NoSuchElementException();
                 }
 
+                final boolean wasInputFull = (mInputCount >= mMaxInput);
                 final INPUT input = mInputQueue.removeFirst();
 
-                mLogger.dbg("reading input: %s", input);
+                mLogger.dbg("reading input [#%d]: %s", mInputCount, input);
+
+                --mInputCount;
+
+                if (wasInputFull) {
+
+                    mMutex.notify();
+                }
 
                 return input;
             }
@@ -534,6 +670,8 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
                 mLogger.dbg("consuming input [#%d]", mPendingInputCount);
 
                 --mPendingInputCount;
+
+                mIsPendingExecution = false;
             }
         }
 
@@ -593,20 +731,37 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
         @Override
         public void onComplete() {
 
+            final boolean isPendingExecution;
+
             synchronized (mMutex) {
 
                 mSubLogger.dbg("closing consumer");
 
                 mQueue.close();
+
+                isPendingExecution = mIsPendingExecution;
+
+                if (!isPendingExecution) {
+
+                    mIsPendingExecution = true;
+
+                } else {
+
+                    --mPendingInputCount;
+                }
             }
 
-            mRunner.run(mExecution, 0, TimeUnit.MILLISECONDS);
+            if (!isPendingExecution) {
+
+                mRunner.run(mExecution, 0, TimeUnit.MILLISECONDS);
+            }
         }
 
         @Override
         public void onOutput(final INPUT output) {
 
             NestedQueue<INPUT> inputQueue;
+            boolean isPendingExecution = false;
             final TimeDuration delay = mDelay;
 
             synchronized (mMutex) {
@@ -629,8 +784,6 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
                 inputQueue = mQueue;
 
-                mSubLogger.dbg("consumer input: %s [%s]", output, delay);
-
                 if (delay.isZero()) {
 
                     inputQueue.add(output);
@@ -640,12 +793,33 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
                     inputQueue = inputQueue.addNested();
                 }
 
-                ++mPendingInputCount;
+                mSubLogger.dbg("consumer input [#%d+1]: %s [%s]", mInputCount, output, delay);
+
+                addInputs(1);
+
+                if (delay.isZero()) {
+
+                    isPendingExecution = mIsPendingExecution;
+
+                    if (!isPendingExecution) {
+
+                        ++mPendingInputCount;
+
+                        mIsPendingExecution = true;
+                    }
+
+                } else {
+
+                    ++mPendingInputCount;
+                }
             }
 
             if (delay.isZero()) {
 
-                mRunner.run(mExecution, 0, TimeUnit.MILLISECONDS);
+                if (!isPendingExecution) {
+
+                    mRunner.run(mExecution, 0, TimeUnit.MILLISECONDS);
+                }
 
             } else {
 
@@ -754,19 +928,12 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
          * Constructor.
          *
          * @param queue  the input queue.
-         * @param inputs the iterable returning the input data.
+         * @param inputs the list of input data.
          */
         private DelayedListInputExecution(@Nonnull final NestedQueue<INPUT> queue,
-                @Nonnull final Iterable<? extends INPUT> inputs) {
+                final ArrayList<INPUT> inputs) {
 
-            final ArrayList<INPUT> inputList = new ArrayList<INPUT>();
-
-            for (final INPUT input : inputs) {
-
-                inputList.add(input);
-            }
-
-            mInputs = inputList;
+            mInputs = inputs;
             mQueue = queue;
         }
 

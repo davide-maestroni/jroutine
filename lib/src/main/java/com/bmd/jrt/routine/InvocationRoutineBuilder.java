@@ -27,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 
 import static com.bmd.jrt.routine.ReflectionUtils.NO_ARGS;
+import static com.bmd.jrt.time.TimeDuration.ZERO;
 import static com.bmd.jrt.time.TimeDuration.fromUnit;
 import static com.bmd.jrt.time.TimeDuration.seconds;
 
@@ -48,15 +49,15 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineBuilder {
 
     private TimeDuration mAvailTimeout = seconds(5);
 
-    private TimeDuration mInputTimeout = seconds(3);
+    private TimeDuration mInputTimeout = ZERO;
 
     private Log mLog = Logger.getDefaultLog();
 
     private LogLevel mLogLevel = Logger.getDefaultLogLevel();
 
-    private int mMaxInputBufferSize = Integer.MAX_VALUE;
+    private int mMaxInputSize = Integer.MAX_VALUE;
 
-    private int mMaxOutputBufferSize = Integer.MAX_VALUE;
+    private int mMaxOutputSize = Integer.MAX_VALUE;
 
     private int mMaxRetained = 10;
 
@@ -66,7 +67,7 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineBuilder {
 
     private boolean mOrderedOutput;
 
-    private TimeDuration mOutputTimeout = seconds(3);
+    private TimeDuration mOutputTimeout = ZERO;
 
     private Runner mSyncRunner = Runners.queuedRunner();
 
@@ -108,21 +109,21 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineBuilder {
 
     @Nonnull
     @Override
-    public InvocationRoutineBuilder<INPUT, OUTPUT> inputBufferTimeout(final long timeout,
+    public InvocationRoutineBuilder<INPUT, OUTPUT> inputTimeout(final long timeout,
             @Nonnull final TimeUnit timeUnit) {
 
-        return inputBufferTimeout(fromUnit(timeout, timeUnit));
+        return inputTimeout(fromUnit(timeout, timeUnit));
     }
 
     @Nonnull
     @Override
     @SuppressWarnings("ConstantConditions")
-    public InvocationRoutineBuilder<INPUT, OUTPUT> inputBufferTimeout(
+    public InvocationRoutineBuilder<INPUT, OUTPUT> inputTimeout(
             @Nonnull final TimeDuration timeout) {
 
         if (timeout == null) {
 
-            throw new NullPointerException("the timeout must not be null");
+            throw new NullPointerException("the input timeout must not be null");
         }
 
         mInputTimeout = timeout;
@@ -162,29 +163,28 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineBuilder {
 
     @Nonnull
     @Override
-    public InvocationRoutineBuilder<INPUT, OUTPUT> maxBufferedInput(final int maxInputBufferSize) {
+    public InvocationRoutineBuilder<INPUT, OUTPUT> maxInputSize(final int maxInputSize) {
 
-        if (maxInputBufferSize <= 0) {
+        if (maxInputSize <= 0) {
 
-            throw new IllegalArgumentException("the buffer size cannot be 0 or negative");
+            throw new IllegalArgumentException("the input buffer size cannot be 0 or negative");
         }
 
-        mMaxInputBufferSize = maxInputBufferSize;
+        mMaxInputSize = maxInputSize;
 
         return this;
     }
 
     @Nonnull
     @Override
-    public InvocationRoutineBuilder<INPUT, OUTPUT> maxBufferedOutput(
-            final int maxOutputBufferSize) {
+    public InvocationRoutineBuilder<INPUT, OUTPUT> maxOutputSize(final int maxOutputSize) {
 
-        if (maxOutputBufferSize <= 0) {
+        if (maxOutputSize <= 0) {
 
-            throw new IllegalArgumentException("the buffer size cannot be 0 or negative");
+            throw new IllegalArgumentException("the output buffer size cannot be 0 or negative");
         }
 
-        mMaxOutputBufferSize = maxOutputBufferSize;
+        mMaxOutputSize = maxOutputSize;
 
         return this;
     }
@@ -239,21 +239,21 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineBuilder {
 
     @Nonnull
     @Override
-    public InvocationRoutineBuilder<INPUT, OUTPUT> outputBufferTimeout(final long timeout,
+    public InvocationRoutineBuilder<INPUT, OUTPUT> outputTimeout(final long timeout,
             @Nonnull final TimeUnit timeUnit) {
 
-        return outputBufferTimeout(fromUnit(timeout, timeUnit));
+        return outputTimeout(fromUnit(timeout, timeUnit));
     }
 
     @Nonnull
     @Override
     @SuppressWarnings("ConstantConditions")
-    public InvocationRoutineBuilder<INPUT, OUTPUT> outputBufferTimeout(
+    public InvocationRoutineBuilder<INPUT, OUTPUT> outputTimeout(
             @Nonnull final TimeDuration timeout) {
 
         if (timeout == null) {
 
-            throw new NullPointerException("the timeout must not be null");
+            throw new NullPointerException("the output timeout must not be null");
         }
 
         mOutputTimeout = timeout;
@@ -303,8 +303,8 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineBuilder {
     public Routine<INPUT, OUTPUT> buildRoutine() {
 
         return new DefaultRoutine<INPUT, OUTPUT>(mSyncRunner, mAsyncRunner, mMaxRunning,
-                                                 mMaxRetained, mAvailTimeout, mMaxInputBufferSize,
-                                                 mInputTimeout, mOrderedInput, mMaxOutputBufferSize,
+                                                 mMaxRetained, mAvailTimeout, mMaxInputSize,
+                                                 mInputTimeout, mOrderedInput, mMaxOutputSize,
                                                  mOutputTimeout, mOrderedOutput, mLog, mLogLevel,
                                                  mInvocationClass, mArgs);
     }

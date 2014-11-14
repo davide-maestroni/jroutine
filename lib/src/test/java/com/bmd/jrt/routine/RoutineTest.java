@@ -854,8 +854,8 @@ public class RoutineTest extends TestCase {
             new DefaultExecution<Object, Object>(null, new TestInputIterator(),
                                                  new DefaultResultChannel<Object>(
                                                          new TestAbortHandler(),
-                                                         Runners.sequentialRunner(), false, logger),
-                                                 logger);
+                                                         Runners.sequentialRunner(), 1,
+                                                         TimeDuration.ZERO, false, logger), logger);
 
             fail();
 
@@ -868,8 +868,8 @@ public class RoutineTest extends TestCase {
             new DefaultExecution<Object, Object>(new TestInvocationManager(), null,
                                                  new DefaultResultChannel<Object>(
                                                          new TestAbortHandler(),
-                                                         Runners.sequentialRunner(), false, logger),
-                                                 logger);
+                                                         Runners.sequentialRunner(), 1,
+                                                         TimeDuration.ZERO, false, logger), logger);
 
             fail();
 
@@ -894,8 +894,8 @@ public class RoutineTest extends TestCase {
                                                  new TestInputIterator(),
                                                  new DefaultResultChannel<Object>(
                                                          new TestAbortHandler(),
-                                                         Runners.sequentialRunner(), false, logger),
-                                                 null);
+                                                         Runners.sequentialRunner(), 1,
+                                                         TimeDuration.ZERO, false, logger), null);
 
             fail();
 
@@ -1079,8 +1079,9 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            new DefaultParameterChannel<Object, Object>(null, Runners.sharedRunner(), false, false,
-                                                        logger);
+            new DefaultParameterChannel<Object, Object>(null, Runners.sharedRunner(), 1,
+                                                        TimeDuration.ZERO, false, 1,
+                                                        TimeDuration.ZERO, false, logger);
 
             fail();
 
@@ -1090,8 +1091,9 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            new DefaultParameterChannel<Object, Object>(new TestInvocationManager(), null, false,
-                                                        false, logger);
+            new DefaultParameterChannel<Object, Object>(new TestInvocationManager(), null, 1,
+                                                        TimeDuration.ZERO, false, 1,
+                                                        TimeDuration.ZERO, false, logger);
 
             fail();
 
@@ -1102,7 +1104,9 @@ public class RoutineTest extends TestCase {
         try {
 
             new DefaultParameterChannel<Object, Object>(new TestInvocationManager(),
-                                                        Runners.sharedRunner(), false, false, null);
+                                                        Runners.sharedRunner(), 1,
+                                                        TimeDuration.ZERO, false, 1,
+                                                        TimeDuration.ZERO, false, null);
 
             fail();
 
@@ -1114,8 +1118,9 @@ public class RoutineTest extends TestCase {
 
             final DefaultParameterChannel<Object, Object> channel =
                     new DefaultParameterChannel<Object, Object>(new TestInvocationManager(),
-                                                                Runners.sharedRunner(), false,
-                                                                false, logger);
+                                                                Runners.sharedRunner(), 1,
+                                                                TimeDuration.ZERO, false, 1,
+                                                                TimeDuration.ZERO, false, logger);
 
             channel.results();
             channel.pass("test");
@@ -1130,8 +1135,9 @@ public class RoutineTest extends TestCase {
 
             final DefaultParameterChannel<Object, Object> channel =
                     new DefaultParameterChannel<Object, Object>(new TestInvocationManager(),
-                                                                Runners.sharedRunner(), false,
-                                                                false, logger);
+                                                                Runners.sharedRunner(), 1,
+                                                                TimeDuration.ZERO, false, 1,
+                                                                TimeDuration.ZERO, false, logger);
 
             channel.after(null);
 
@@ -1145,8 +1151,9 @@ public class RoutineTest extends TestCase {
 
             final DefaultParameterChannel<Object, Object> channel =
                     new DefaultParameterChannel<Object, Object>(new TestInvocationManager(),
-                                                                Runners.sharedRunner(), false,
-                                                                false, logger);
+                                                                Runners.sharedRunner(), 1,
+                                                                TimeDuration.ZERO, false, 1,
+                                                                TimeDuration.ZERO, false, logger);
 
             channel.after(1, null);
 
@@ -1160,8 +1167,9 @@ public class RoutineTest extends TestCase {
 
             final DefaultParameterChannel<Object, Object> channel =
                     new DefaultParameterChannel<Object, Object>(new TestInvocationManager(),
-                                                                Runners.sharedRunner(), false,
-                                                                false, logger);
+                                                                Runners.sharedRunner(), 1,
+                                                                TimeDuration.ZERO, false, 1,
+                                                                TimeDuration.ZERO, false, logger);
 
             channel.after(-1, TimeUnit.MILLISECONDS);
 
@@ -1197,7 +1205,8 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            new DefaultResultChannel<Object>(null, Runners.sharedRunner(), false, logger);
+            new DefaultResultChannel<Object>(null, Runners.sharedRunner(), 1, TimeDuration.ZERO,
+                                             false, logger);
 
             fail();
 
@@ -1207,7 +1216,8 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            new DefaultResultChannel<Object>(new TestAbortHandler(), null, false, logger);
+            new DefaultResultChannel<Object>(new TestAbortHandler(), null, 1, TimeDuration.ZERO,
+                                             false, logger);
 
             fail();
 
@@ -1217,8 +1227,8 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            new DefaultResultChannel<Object>(new TestAbortHandler(), Runners.sharedRunner(), false,
-                                             null);
+            new DefaultResultChannel<Object>(new TestAbortHandler(), Runners.sharedRunner(), 1,
+                                             TimeDuration.ZERO, false, null);
 
             fail();
 
@@ -1228,8 +1238,8 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            new DefaultResultChannel<Object>(new TestAbortHandler(), Runners.sharedRunner(), false,
-                                             logger).after(null);
+            new DefaultResultChannel<Object>(new TestAbortHandler(), Runners.sharedRunner(), 1,
+                                             TimeDuration.ZERO, false, logger).after(null);
 
             fail();
 
@@ -1239,8 +1249,8 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            new DefaultResultChannel<Object>(new TestAbortHandler(), Runners.sharedRunner(), false,
-                                             logger).after(0, null);
+            new DefaultResultChannel<Object>(new TestAbortHandler(), Runners.sharedRunner(), 1,
+                                             TimeDuration.ZERO, false, logger).after(0, null);
 
             fail();
 
@@ -1250,8 +1260,9 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            new DefaultResultChannel<Object>(new TestAbortHandler(), Runners.sharedRunner(), false,
-                                             logger).after(-1, TimeUnit.MILLISECONDS);
+            new DefaultResultChannel<Object>(new TestAbortHandler(), Runners.sharedRunner(), 1,
+                                             TimeDuration.ZERO, false, logger).after(-1,
+                                                                                     TimeUnit.MILLISECONDS);
 
             fail();
 

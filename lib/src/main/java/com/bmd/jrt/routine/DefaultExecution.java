@@ -192,6 +192,7 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
          * @return the input.
          * @throws NoSuchMethodException if no more input is available.
          */
+        @Nullable
         public INPUT nextInput() throws NoSuchMethodException;
 
         /**

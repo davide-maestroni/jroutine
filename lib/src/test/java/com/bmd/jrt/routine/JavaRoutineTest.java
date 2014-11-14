@@ -98,6 +98,11 @@ public class JavaRoutineTest extends TestCase {
         final Routine<Object, Object> routine = JavaRoutine.on(TestStatic.class)
                                                            .sequential()
                                                            .runBy(Runners.poolRunner())
+                                                           .maxInputSize(2)
+                                                           .inputTimeout(1, TimeUnit.SECONDS)
+                                                           .maxOutputSize(2)
+                                                           .outputTimeout(1, TimeUnit.SECONDS)
+                                                           .orderedOutput()
                                                            .logLevel(LogLevel.DEBUG)
                                                            .loggedWith(new NullLog())
                                                            .asyncMethod(TestStatic.GET);
@@ -107,6 +112,13 @@ public class JavaRoutineTest extends TestCase {
         final Routine<Object, Object> routine1 = JavaRoutine.on(TestStatic.class)
                                                             .queued()
                                                             .runBy(Runners.poolRunner())
+                                                            .maxRunning(1)
+                                                            .availableTimeout(TimeDuration.ZERO)
+                                                            .maxInputSize(2)
+                                                            .inputTimeout(TimeDuration.ZERO)
+                                                            .maxOutputSize(2)
+                                                            .outputTimeout(TimeDuration.ZERO)
+                                                            .orderedOutput()
                                                             .method("getLong");
 
         assertThat(routine1.call()).containsExactly(-77L);
@@ -114,6 +126,9 @@ public class JavaRoutineTest extends TestCase {
         final Routine<Object, Object> routine2 = JavaRoutine.on(TestStatic.class)
                                                             .queued()
                                                             .runBy(Runners.poolRunner())
+                                                            .maxRunning(1)
+                                                            .maxRetained(0)
+                                                            .availableTimeout(1, TimeUnit.SECONDS)
                                                             .lockId("test")
                                                             .method(TestStatic.class.getMethod(
                                                                     "getLong"));
@@ -192,6 +207,116 @@ public class JavaRoutineTest extends TestCase {
         try {
 
             new ClassRoutineBuilder(TestStatic.class).asyncMethod("test");
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            new ClassRoutineBuilder(TestStatic.class).availableTimeout(1, null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new ClassRoutineBuilder(TestStatic.class).availableTimeout(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new ClassRoutineBuilder(TestStatic.class).availableTimeout(-1, TimeUnit.MILLISECONDS);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            new ClassRoutineBuilder(TestStatic.class).inputTimeout(1, null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new ClassRoutineBuilder(TestStatic.class).inputTimeout(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new ClassRoutineBuilder(TestStatic.class).inputTimeout(-1, TimeUnit.MILLISECONDS);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            new ClassRoutineBuilder(TestStatic.class).maxInputSize(0);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            new ClassRoutineBuilder(TestStatic.class).outputTimeout(1, null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new ClassRoutineBuilder(TestStatic.class).outputTimeout(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new ClassRoutineBuilder(TestStatic.class).outputTimeout(-1, TimeUnit.MILLISECONDS);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            new ClassRoutineBuilder(TestStatic.class).maxOutputSize(0);
 
             fail();
 
@@ -309,6 +434,15 @@ public class JavaRoutineTest extends TestCase {
         final Routine<Object, Object> routine = JavaRoutine.on(new Test())
                                                            .sequential()
                                                            .runBy(Runners.poolRunner())
+                                                           .maxRunning(1)
+                                                           .maxRetained(1)
+                                                           .availableTimeout(1, TimeUnit.SECONDS)
+                                                           .maxInputSize(2)
+                                                           .inputTimeout(1, TimeUnit.SECONDS)
+                                                           .orderedInput()
+                                                           .maxOutputSize(2)
+                                                           .outputTimeout(1, TimeUnit.SECONDS)
+                                                           .orderedOutput()
                                                            .logLevel(LogLevel.DEBUG)
                                                            .loggedWith(new NullLog())
                                                            .asyncMethod(Test.GET);
@@ -323,6 +457,14 @@ public class JavaRoutineTest extends TestCase {
         final Routine<Object, Object> routine2 = JavaRoutine.on(new Test())
                                                             .queued()
                                                             .runBy(Runners.poolRunner())
+                                                            .maxRunning(1)
+                                                            .availableTimeout(TimeDuration.ZERO)
+                                                            .maxInputSize(2)
+                                                            .inputTimeout(TimeDuration.ZERO)
+                                                            .orderedInput()
+                                                            .maxOutputSize(2)
+                                                            .outputTimeout(TimeDuration.ZERO)
+                                                            .orderedOutput()
                                                             .lockId("test")
                                                             .method(Test.class.getMethod(
                                                                     "getLong"));
@@ -387,9 +529,11 @@ public class JavaRoutineTest extends TestCase {
 
         }
 
+        final Test test = new Test();
+
         try {
 
-            new ObjectRoutineBuilder(new Test()).method("test");
+            new ObjectRoutineBuilder(test).method("test");
 
             fail();
 
@@ -399,7 +543,7 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            new ObjectRoutineBuilder(new Test()).asyncMethod("test");
+            new ObjectRoutineBuilder(test).asyncMethod("test");
 
             fail();
 
@@ -409,7 +553,7 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            new ObjectRoutineBuilder(new Test()).logLevel(null);
+            new ObjectRoutineBuilder(test).availableTimeout(1, null);
 
             fail();
 
@@ -419,7 +563,7 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            new ObjectRoutineBuilder(new Test()).loggedWith(null);
+            new ObjectRoutineBuilder(test).availableTimeout(null);
 
             fail();
 
@@ -429,7 +573,17 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            new ObjectRoutineBuilder(new Test()).runBy(null);
+            new ObjectRoutineBuilder(test).availableTimeout(-1, TimeUnit.MILLISECONDS);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            new ObjectRoutineBuilder(test).inputTimeout(1, null);
 
             fail();
 
@@ -439,27 +593,7 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            new ObjectRoutineBuilder(new Test()).maxRunning(0);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            new ObjectRoutineBuilder(new Test()).maxRetained(-1);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            new ObjectRoutineBuilder(new Test()).as(null);
+            new ObjectRoutineBuilder(test).inputTimeout(null);
 
             fail();
 
@@ -469,7 +603,7 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            new ObjectRoutineBuilder(new Test()).as(Test.class);
+            new ObjectRoutineBuilder(test).inputTimeout(-1, TimeUnit.MILLISECONDS);
 
             fail();
 
@@ -479,7 +613,7 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            new ObjectRoutineBuilder(new Test()).as(Test.class);
+            new ObjectRoutineBuilder(test).maxInputSize(0);
 
             fail();
 
@@ -489,7 +623,27 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            JavaRoutine.on(new Test()).as(TestItf.class).throwException(null);
+            new ObjectRoutineBuilder(test).outputTimeout(1, null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new ObjectRoutineBuilder(test).outputTimeout(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new ObjectRoutineBuilder(test).outputTimeout(-1, TimeUnit.MILLISECONDS);
 
             fail();
 
@@ -499,7 +653,7 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            JavaRoutine.on(new Test()).as(TestItf.class).throwException1(null);
+            new ObjectRoutineBuilder(test).maxOutputSize(0);
 
             fail();
 
@@ -509,7 +663,107 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            JavaRoutine.on(new Test()).as(TestItf.class).throwException2(null);
+            new ObjectRoutineBuilder(test).logLevel(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new ObjectRoutineBuilder(test).loggedWith(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new ObjectRoutineBuilder(test).runBy(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new ObjectRoutineBuilder(test).maxRunning(0);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            new ObjectRoutineBuilder(test).maxRetained(-1);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            new ObjectRoutineBuilder(test).as(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new ObjectRoutineBuilder(test).as(Test.class);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            new ObjectRoutineBuilder(test).as(Test.class);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            JavaRoutine.on(test).as(TestItf.class).throwException(null);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            JavaRoutine.on(test).as(TestItf.class).throwException1(null);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            JavaRoutine.on(test).as(TestItf.class).throwException2(null);
 
             fail();
 
@@ -600,6 +854,11 @@ public class JavaRoutineTest extends TestCase {
                            .maxRetained(0)
                            .maxRunning(1)
                            .availableTimeout(1, TimeUnit.SECONDS)
+                           .maxInputSize(2)
+                           .inputTimeout(1, TimeUnit.SECONDS)
+                           .maxOutputSize(2)
+                           .outputTimeout(1, TimeUnit.SECONDS)
+                           .orderedOutput()
                            .buildRoutine();
 
         assertThat(routine.call("test1", "test2")).containsExactly("test1", "test2");
@@ -611,6 +870,11 @@ public class JavaRoutineTest extends TestCase {
                            .maxRetained(0)
                            .maxRunning(1)
                            .availableTimeout(TimeDuration.ZERO)
+                           .maxInputSize(2)
+                           .inputTimeout(TimeDuration.ZERO)
+                           .maxOutputSize(2)
+                           .outputTimeout(TimeDuration.ZERO)
+                           .orderedOutput()
                            .buildRoutine();
 
         assertThat(routine1.call("test1", "test2")).containsExactly("test1", "test2");

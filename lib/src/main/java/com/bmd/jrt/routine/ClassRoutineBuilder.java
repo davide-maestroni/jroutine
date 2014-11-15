@@ -938,7 +938,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
             if (annotation != null) {
 
-                String tag = annotation.tag();
+                String tag = annotation.value();
 
                 if ((tag == null) || (tag.length() == 0)) {
 

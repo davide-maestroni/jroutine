@@ -44,6 +44,7 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Name;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
@@ -97,190 +98,17 @@ public class RoutineProcessor extends AbstractProcessor {
 
         final byte[] buffer = new byte[2048];
 
-        final InputStream headerStream =
-                RoutineProcessor.class.getResourceAsStream("/templates/header.txt");
-
         try {
 
-            final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            int length;
-
-            while ((length = headerStream.read(buffer)) > 0) {
-
-                outputStream.write(buffer, 0, length);
-            }
-
-            outputStream.flush();
-
-            mHeader = outputStream.toString("UTF-8");
+            mHeader = parseTemplate("/templates/header.txt", buffer);
+            mMethodAsync = parseTemplate("/templates/method_async.txt", buffer);
+            mMethodResult = parseTemplate("/templates/method_result.txt", buffer);
+            mMethodVoid = parseTemplate("/templates/method_void.txt", buffer);
+            mFooter = parseTemplate("/templates/footer.txt", buffer);
 
         } catch (final IOException ex) {
 
-            processingEnv.getMessager()
-                         .printMessage(Kind.ERROR, "IOException while reading header template");
-
             mDisabled = true;
-
-            return;
-
-        } finally {
-
-            try {
-
-                headerStream.close();
-
-            } catch (final IOException ignored) {
-
-            }
-        }
-
-        final InputStream methodAsyncStream =
-                RoutineProcessor.class.getResourceAsStream("/templates/method_async.txt");
-
-        try {
-
-            final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            int length;
-
-            while ((length = methodAsyncStream.read(buffer)) > 0) {
-
-                outputStream.write(buffer, 0, length);
-            }
-
-            outputStream.flush();
-
-            mMethodAsync = outputStream.toString("UTF-8");
-
-        } catch (final IOException ex) {
-
-            processingEnv.getMessager()
-                         .printMessage(Kind.ERROR,
-                                       "IOException while reading async method template");
-
-            mDisabled = true;
-
-            return;
-
-        } finally {
-
-            try {
-
-                methodAsyncStream.close();
-
-            } catch (final IOException ignored) {
-
-            }
-        }
-
-        final InputStream methodResultStream =
-                RoutineProcessor.class.getResourceAsStream("/templates/method_result.txt");
-
-        try {
-
-            final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            int length;
-
-            while ((length = methodResultStream.read(buffer)) > 0) {
-
-                outputStream.write(buffer, 0, length);
-            }
-
-            outputStream.flush();
-
-            mMethodResult = outputStream.toString("UTF-8");
-
-        } catch (final IOException ex) {
-
-            processingEnv.getMessager()
-                         .printMessage(Kind.ERROR,
-                                       "IOException while reading result method template");
-
-            mDisabled = true;
-
-            return;
-
-        } finally {
-
-            try {
-
-                methodResultStream.close();
-
-            } catch (final IOException ignored) {
-
-            }
-        }
-
-        final InputStream methodVoidStream =
-                RoutineProcessor.class.getResourceAsStream("/templates/method_void.txt");
-
-        try {
-
-            final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            int length;
-
-            while ((length = methodVoidStream.read(buffer)) > 0) {
-
-                outputStream.write(buffer, 0, length);
-            }
-
-            outputStream.flush();
-
-            mMethodVoid = outputStream.toString("UTF-8");
-
-        } catch (final IOException ex) {
-
-            processingEnv.getMessager()
-                         .printMessage(Kind.ERROR,
-                                       "IOException while reading void method template");
-
-            mDisabled = true;
-
-            return;
-
-        } finally {
-
-            try {
-
-                methodVoidStream.close();
-
-            } catch (final IOException ignored) {
-
-            }
-        }
-
-        final InputStream footerStream =
-                RoutineProcessor.class.getResourceAsStream("/templates/footer.txt");
-
-        try {
-
-            final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            int length;
-
-            while ((length = footerStream.read(buffer)) > 0) {
-
-                outputStream.write(buffer, 0, length);
-            }
-
-            outputStream.flush();
-
-            mFooter = outputStream.toString("UTF-8");
-
-        } catch (final IOException ex) {
-
-            processingEnv.getMessager()
-                         .printMessage(Kind.ERROR, "IOException while reading footer template");
-
-            mDisabled = true;
-
-        } finally {
-
-            try {
-
-                footerStream.close();
-
-            } catch (final IOException ignored) {
-
-            }
         }
     }
 
@@ -331,6 +159,23 @@ public class RoutineProcessor extends AbstractProcessor {
         final String name = mBoxingMap.get(s);
 
         return (name != null) ? name : s;
+    }
+
+    private String buildGenericTypes(final TypeElement element) {
+
+        final StringBuilder builder = new StringBuilder("<");
+
+        for (final TypeParameterElement typeParameterElement : element.getTypeParameters()) {
+
+            if (builder.length() > 1) {
+
+                builder.append(", ");
+            }
+
+            builder.append(typeParameterElement.asType());
+        }
+
+        return builder.append(">").toString();
     }
 
     private String buildInputParams(final ExecutableElement methodElement) {
@@ -572,8 +417,9 @@ public class RoutineProcessor extends AbstractProcessor {
 
             String header = mHeader.replace("${packageName}", packageName);
             header = header.replace("${className}", simpleName);
-            header = header.replace("${classFullName}", qualifiedName);
-            header = header.replace("${interfaceFullName}", element.getQualifiedName());
+            header = header.replace("${genericTypes}", buildGenericTypes(element));
+            header = header.replace("${classFullName}", targetElement.asType().toString());
+            header = header.replace("${interfaceFullName}", element.asType().toString());
             header = header.replace("${routineFieldsInit}",
                                     buildRoutineFieldsInit(methodElements.size()));
 
@@ -609,8 +455,6 @@ public class RoutineProcessor extends AbstractProcessor {
                 }
 
                 method = method.replace("${methodCount}", Integer.toString(++count));
-                method = method.replace("${className}", targetElement.getSimpleName());
-                method = method.replace("${classFullName}", qualifiedName);
                 method = method.replace("${methodName}", methodElement.getSimpleName());
                 method = method.replace("${targetMethodName}", targetMethod.getSimpleName());
                 method = method.replace("${paramTypes}", buildParamTypes(methodElement));
@@ -672,7 +516,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
         if (asyncAnnotation != null) {
 
-            final String tag = asyncAnnotation.tag();
+            final String tag = asyncAnnotation.value();
 
             if ((tag != null) && (tag.length() > 0)) {
 
@@ -683,7 +527,7 @@ public class RoutineProcessor extends AbstractProcessor {
                             targetMethodElement.getAnnotation(Async.class);
 
                     if ((targetAsyncAnnotation != null) && tag.equals(
-                            targetAsyncAnnotation.tag())) {
+                            targetAsyncAnnotation.value())) {
 
                         targetMethod = targetMethodElement;
 
@@ -808,8 +652,12 @@ public class RoutineProcessor extends AbstractProcessor {
 
             } else {
 
+                System.out.println(">>>> method: " + methodElement);
+
                 for (final ExecutableElement targetMethodElement : ElementFilter.methodsIn(
                         targetElement.getEnclosedElements())) {
+
+                    System.out.println(">>>> target: " + targetMethodElement);
 
                     if (methodName.equals(targetMethodElement.getSimpleName())
                             && haveSameParameters(methodElement, targetMethodElement)) {
@@ -842,7 +690,7 @@ public class RoutineProcessor extends AbstractProcessor {
                 final Set<? extends Entry<? extends ExecutableElement, ? extends AnnotationValue>>
                         entrySet = mirror.getElementValues().entrySet();
 
-                for (Entry<? extends ExecutableElement, ? extends AnnotationValue> entry :
+                for (final Entry<? extends ExecutableElement, ? extends AnnotationValue> entry :
                         entrySet) {
 
                     if (valueName.equals(entry.getKey().getSimpleName().toString())) {
@@ -863,25 +711,27 @@ public class RoutineProcessor extends AbstractProcessor {
         return processingEnv.getElementUtils().getTypeElement(normalizeTypeName(typeName));
     }
 
-    private boolean haveSameParameters(final ExecutableElement interfaceMethod,
-            final ExecutableElement classMethod) {
+    private boolean haveSameParameters(final ExecutableElement firstMethodElement,
+            final ExecutableElement secondMethodElement) {
 
-        final List<? extends VariableElement> interfaceTypeParameters =
-                interfaceMethod.getParameters();
-        final List<? extends VariableElement> classTypeParameters = classMethod.getParameters();
+        final List<? extends VariableElement> firstTypeParameters =
+                firstMethodElement.getParameters();
+        final List<? extends VariableElement> secondTypeParameters =
+                secondMethodElement.getParameters();
 
-        final int length = interfaceTypeParameters.size();
+        final int length = firstTypeParameters.size();
 
-        if (length != classTypeParameters.size()) {
+        if (length != secondTypeParameters.size()) {
 
             return false;
         }
 
         for (int i = 0; i < length; i++) {
 
-            if (!interfaceTypeParameters.get(i)
-                                        .asType()
-                                        .equals(classTypeParameters.get(i).asType())) {
+            final TypeMirror firstType = firstTypeParameters.get(i).asType();
+            final TypeMirror secondType = secondTypeParameters.get(i).asType();
+
+            if (!firstType.toString().equals(secondType.toString())) {
 
                 return false;
             }
@@ -902,31 +752,9 @@ public class RoutineProcessor extends AbstractProcessor {
                 if (parentMethod.getSimpleName().equals(method.getSimpleName())
                         && parentMethod.getReturnType().equals(method.getReturnType())) {
 
-                    final List<? extends VariableElement> parentParameters =
-                            parentMethod.getParameters();
-                    final List<? extends VariableElement> parameters = method.getParameters();
+                    if (haveSameParameters(parentMethod, method)) {
 
-                    final int size = parentParameters.size();
-
-                    if (size != parameters.size()) {
-
-                        continue;
-                    }
-
-                    isOverride = true;
-
-                    for (int i = 0; i < size; i++) {
-
-                        //TODO: what about generics
-                        if (!parentParameters.get(i).asType().equals(parameters.get(i).asType())) {
-
-                            isOverride = false;
-
-                            break;
-                        }
-                    }
-
-                    if (isOverride) {
+                        isOverride = true;
 
                         break;
                     }
@@ -948,5 +776,43 @@ public class RoutineProcessor extends AbstractProcessor {
         }
 
         return typeName;
+    }
+
+    private String parseTemplate(final String path, final byte[] buffer) throws IOException {
+
+        final InputStream resourceStream = RoutineProcessor.class.getResourceAsStream(path);
+
+        try {
+
+            final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            int length;
+
+            while ((length = resourceStream.read(buffer)) > 0) {
+
+                outputStream.write(buffer, 0, length);
+            }
+
+            outputStream.flush();
+
+            return outputStream.toString("UTF-8");
+
+        } catch (final IOException ex) {
+
+            processingEnv.getMessager()
+                         .printMessage(Kind.ERROR,
+                                       "IOException while reading " + path + " template");
+
+            throw ex;
+
+        } finally {
+
+            try {
+
+                resourceStream.close();
+
+            } catch (final IOException ignored) {
+
+            }
+        }
     }
 }

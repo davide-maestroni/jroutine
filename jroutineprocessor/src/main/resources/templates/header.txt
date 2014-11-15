@@ -15,7 +15,7 @@
 // GENERATED CODE - PLEASE DO NOT EDIT
 package ${packageName};
 
-public final class ${className}Async implements ${interfaceFullName} {
+public final class ${className}Async${genericTypes} implements ${interfaceFullName} {
 
     private final java.util.WeakHashMap<Object, java.util.HashMap<String, Object>> mMutexMap;
 

@@ -19,6 +19,7 @@ import com.bmd.jrt.annotation.DefaultLog;
 import com.bmd.jrt.annotation.DefaultRunner;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ParameterChannel;
+import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.runner.Runner;
@@ -78,8 +79,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
      * optional {@link Async} annotation.<br/>
-     * In case the wrapped object does not implement the specified interface, the tag attribute
-     * will be used to bind the interface method with the instance ones.  If no tag is assigned the
+     * In case the wrapped object does not implement the specified interface, the value attribute
+     * will be used to bind the interface method with the instance ones. If no tag is assigned the
      * method name will be used instead to map it.<br/>
      * The interface will be interpreted as a mirror of the target object methods, and the optional
      * {@link AsyncOverride} annotation will be honored.
@@ -114,6 +115,29 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                 Proxy.newProxyInstance(itf.getClassLoader(), new Class[]{itf}, handler);
 
         return itf.cast(proxy);
+    }
+
+    /**
+     * Returns a proxy object enabling the asynchronous call of the target instance methods.
+     * <p/>
+     * The routines used for calling the methods will honor the attributes specified in any
+     * optional {@link Async} annotation.<br/>
+     * In case the wrapped object does not implement the specified interface, the value attribute
+     * will be used to bind the interface method with the instance ones. If no tag is assigned the
+     * method name will be used instead to map it.<br/>
+     * The interface will be interpreted as a mirror of the target object methods, and the optional
+     * {@link AsyncOverride} annotation will be honored.
+     *
+     * @param itf     the token of the interface implemented by the return object.
+     * @param <CLASS> the interface type.
+     * @return the proxy object.
+     * @throws NullPointerException     if the specified class is null.
+     * @throws IllegalArgumentException if the specified class does not represent an interface.
+     */
+    @Nonnull
+    public <CLASS> CLASS as(@Nonnull final ClassToken<CLASS> itf) {
+
+        return itf.cast(as(itf.getRawClass()));
     }
 
     @Nonnull
@@ -337,6 +361,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
             mLogLevel = getLogLevel();
         }
 
+        @SuppressWarnings("unchecked")
         @Override
         public Object invoke(final Object proxy, final Method method, final Object[] args) throws
                 Throwable {
@@ -384,7 +409,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                     parameterTypes = overrideAnnotation.value();
                     final Class<?>[] methodParameterTypes = method.getParameterTypes();
 
-                    if (parameterTypes.length != methodParameterTypes.length) {
+                    if ((parameterTypes.length > 0) && (parameterTypes.length
+                            != methodParameterTypes.length)) {
 
                         throw new IllegalArgumentException(
                                 "the async parameters are not compatible");
@@ -452,7 +478,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
                     if (annotation != null) {
 
-                        name = annotation.tag();
+                        name = annotation.value();
                     }
 
                     if ((name == null) || (name.length() == 0)) {
@@ -610,7 +636,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
                 if (isOverrideParameters) {
 
-                    parameterChannel.pass((OutputChannel<?>) arg);
+                    parameterChannel.pass((OutputChannel<Object>) arg);
 
                 } else if (arg == null) {
 
@@ -645,7 +671,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
                     if (arg instanceof OutputChannel) {
 
-                        parameterChannel.pass((OutputChannel<?>) arg);
+                        parameterChannel.pass((OutputChannel<Object>) arg);
 
                     } else {
 

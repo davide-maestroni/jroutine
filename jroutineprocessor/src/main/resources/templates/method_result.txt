@@ -23,23 +23,21 @@
 
     private com.bmd.jrt.routine.Routine<Object, ${resultClassName}> initRoutine${methodCount}() {
 
-        return com.bmd.jrt.routine.JavaRoutine.on(com.bmd.jrt.common.ClassToken.tokenOf(SimpleInvocation${methodCount}.class))
+        return com.bmd.jrt.routine.JavaRoutine.on(new com.bmd.jrt.common.ClassToken<SimpleInvocation${methodCount}>(){})
                                        ${routineBuilderOptions}.withArgs(this).buildRoutine();
     }
 
-    private static class SimpleInvocation${methodCount} extends com.bmd.jrt.invocation.SimpleInvocation<Object, ${resultClassName}> {
+    private class SimpleInvocation${methodCount} extends com.bmd.jrt.invocation.SimpleInvocation<Object, ${resultClassName}> {
 
         private final Object mMutex;
 
-        private final ${classFullName} mWrapped;
+        private SimpleInvocation${methodCount}() {
 
-        private SimpleInvocation${methodCount}(final ${className}Async outer) {
-
-            mWrapped = outer.mWrapped;
-            mMutex = outer.getMutex("${lockId}");
+            mMutex = getMutex("${lockId}");
         }
 
         @Override
+        @SuppressWarnings("unchecked")
         public void onExec(@javax.annotation.Nonnull final java.util.List<?> objects,
                 @javax.annotation.Nonnull final com.bmd.jrt.channel.ResultChannel<${resultClassName}> results) {
 

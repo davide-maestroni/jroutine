@@ -152,8 +152,6 @@ import javax.annotation.Nonnull;
  */
 public class JavaRoutine {
 
-    //TODO: processor builder
-
     /**
      * Avoid direct instantiation.
      */
@@ -190,8 +188,7 @@ public class JavaRoutine {
      * @param target the target class.
      * @return the routine builder instance.
      * @throws NullPointerException     if the specified target is null.
-     * @throws IllegalArgumentException if a duplicate tag in the annotations is
-     *                                  detected.
+     * @throws IllegalArgumentException if a duplicate tag in the annotations is detected.
      */
     @Nonnull
     public static ClassRoutineBuilder on(@Nonnull final Class<?> target) {
@@ -221,8 +218,7 @@ public class JavaRoutine {
      * @param target the target object.
      * @return the routine builder instance.
      * @throws NullPointerException     if the specified target is null.
-     * @throws IllegalArgumentException if a duplicate tag in the annotations is
-     *                                  detected.
+     * @throws IllegalArgumentException if a duplicate tag in the annotations is detected.
      */
     @Nonnull
     public static ObjectRoutineBuilder on(@Nonnull final Object target) {

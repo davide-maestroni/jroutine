@@ -713,7 +713,17 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            new ObjectRoutineBuilder(test).as(null);
+            new ObjectRoutineBuilder(test).as((Class<?>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new ObjectRoutineBuilder(test).as((ClassToken<?>) null);
 
             fail();
 
@@ -733,7 +743,7 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            new ObjectRoutineBuilder(test).as(Test.class);
+            new ObjectRoutineBuilder(test).as(ClassToken.tokenOf(Test.class));
 
             fail();
 
@@ -975,19 +985,19 @@ public class JavaRoutineTest extends TestCase {
 
         public int compute(int i);
 
-        @Async(tag = "compute", lockId = Async.UNLOCKED)
+        @Async(value = "compute", lockId = Async.UNLOCKED)
         @AsyncOverride(value = int.class, parallel = true, result = true)
         public OutputChannel<Integer> computeParallel1(int... i);
 
-        @Async(tag = "compute")
+        @Async(value = "compute")
         @AsyncOverride(value = int.class, parallel = true, result = true)
         public OutputChannel<Integer> computeParallel2(Integer... i);
 
-        @Async(tag = "compute", lockId = Async.UNLOCKED)
+        @Async(value = "compute", lockId = Async.UNLOCKED)
         @AsyncOverride(value = int.class, parallel = true, result = true)
         public OutputChannel<Integer> computeParallel3(List<Integer> i);
 
-        @Async(tag = "compute", lockId = Async.UNLOCKED)
+        @Async(value = "compute", lockId = Async.UNLOCKED)
         @AsyncOverride(value = int.class, parallel = true, result = true)
         public OutputChannel<Integer> computeParallel4(OutputChannel<Integer> i);
     }
@@ -997,11 +1007,11 @@ public class JavaRoutineTest extends TestCase {
         @AsyncOverride({RuntimeException.class, int.class})
         public void throwException(RuntimeException ex);
 
-        @Async(tag = Test.THROW)
+        @Async(Test.THROW)
         @AsyncOverride({int.class})
         public void throwException1(RuntimeException ex);
 
-        @Async(tag = Test.THROW)
+        @Async(Test.THROW)
         public int throwException2(RuntimeException ex);
     }
 
@@ -1009,13 +1019,13 @@ public class JavaRoutineTest extends TestCase {
 
         public static final String GET = "get";
 
-        @Async(tag = GET)
+        @Async(value = GET)
         public int getOne() {
 
             return 1;
         }
 
-        @Async(tag = GET)
+        @Async(value = GET)
         public int getTwo() {
 
             return 2;
@@ -1026,13 +1036,13 @@ public class JavaRoutineTest extends TestCase {
 
         public static final String GET = "get";
 
-        @Async(tag = GET)
+        @Async(GET)
         public static int getOne() {
 
             return 1;
         }
 
-        @Async(tag = GET)
+        @Async(GET)
         public static int getTwo() {
 
             return 2;
@@ -1056,6 +1066,7 @@ public class JavaRoutineTest extends TestCase {
         }
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     private static class Square {
 
         public int compute(final int i) {
@@ -1070,13 +1081,13 @@ public class JavaRoutineTest extends TestCase {
 
         public static final String THROW = "throw";
 
-        @Async(tag = GET)
+        @Async(value = GET)
         public long getLong() {
 
             return -77;
         }
 
-        @Async(tag = THROW, log = NullLog.class, logLevel = LogLevel.DEBUG, sequential = false,
+        @Async(value = THROW, log = NullLog.class, logLevel = LogLevel.DEBUG, sequential = false,
                runner = MyRunner.class)
         public void throwException(final RuntimeException ex) {
 
@@ -1109,13 +1120,13 @@ public class JavaRoutineTest extends TestCase {
 
         public static final String THROW = "throw";
 
-        @Async(tag = GET)
+        @Async(GET)
         public static long getLong() {
 
             return -77;
         }
 
-        @Async(tag = THROW, log = NullLog.class, logLevel = LogLevel.DEBUG, sequential = false,
+        @Async(value = THROW, log = NullLog.class, logLevel = LogLevel.DEBUG, sequential = false,
                runner = MyRunner.class)
         public static void throwException(final RuntimeException ex) {
 

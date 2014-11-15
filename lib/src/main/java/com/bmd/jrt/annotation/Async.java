@@ -46,7 +46,7 @@ import java.util.concurrent.TimeUnit;
  *
  *             public static final String METHOD_TAG = "get";
  *
- *             &#64;Async(tag = METHOD_TAG)
+ *             &#64;Async(METHOD_TAG)
  *             public int getOne() {
  *
  *                 return 1;
@@ -237,5 +237,5 @@ public @interface Async {
      *
      * @return the tag.
      */
-    String tag() default DEFAULT_ID;
+    String value() default DEFAULT_ID;
 }

@@ -2178,7 +2178,7 @@ public class RoutineTest extends TestCase {
         @AsyncOverride(result = true)
         public OutputChannel<Integer> getOne();
 
-        @Async(tag = "getInt")
+        @Async(value = "getInt")
         public int take(int i);
     }
 
@@ -2333,7 +2333,7 @@ public class RoutineTest extends TestCase {
 
         public static final String GET = "get";
 
-        @Async(tag = GET)
+        @Async(value = GET)
         public static int get(final int i) {
 
             return i;
@@ -2345,7 +2345,7 @@ public class RoutineTest extends TestCase {
             return i;
         }
 
-        @Async(tag = GET)
+        @Async(value = GET)
         public int getOne() {
 
             return 1;

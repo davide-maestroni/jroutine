@@ -15,13 +15,8 @@ package com.bmd.jrt.android.log;
 
 import android.test.AndroidTestCase;
 
-import com.bmd.jrt.android.test.TestTest;
-import com.bmd.jrt.android.test.TestTestAsync2;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.log.Logger;
-
-import java.util.HashMap;
-import java.util.WeakHashMap;
 
 /**
  * Android log unit tests.
@@ -88,14 +83,5 @@ public class AndroidLogTest extends AndroidTestCase {
         logger.err(ex, FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
         logger.err(ex, FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
         logger.err(ex, FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
-    }
-
-    public void testTest() {
-
-        final TestTestAsync2<String, String> async =
-                new TestTestAsync2<String, String>(new TestTest(),
-                                                   new WeakHashMap<Object, HashMap<String,
-                                                           Object>>());
-        async.cassa("ciao");
     }
 }

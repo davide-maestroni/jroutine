@@ -13,6 +13,7 @@
  */
 package com.bmd.jrt.routine;
 
+import com.bmd.jrt.builder.RoutineConfigurationBuilder;
 import com.bmd.jrt.channel.IOChannel;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
@@ -24,7 +25,6 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 
 import static com.bmd.jrt.time.TimeDuration.ZERO;
-import static com.bmd.jrt.time.TimeDuration.fromUnit;
 
 /**
  * Class implementing a builder of I/O channel objects.
@@ -33,21 +33,18 @@ import static com.bmd.jrt.time.TimeDuration.fromUnit;
  */
 public class IOChannelBuilder {
 
-    private boolean mIsOrdered;
-
-    private Log mLog = Logger.getDefaultLog();
-
-    private LogLevel mLogLevel = Logger.getDefaultLogLevel();
-
-    private int mMaxSize = Integer.MAX_VALUE;
-
-    private TimeDuration mTimeout = ZERO;
+    private final RoutineConfigurationBuilder mBuilder;
 
     /**
      * Avoid direct instantiation.
      */
     IOChannelBuilder() {
 
+        mBuilder = new RoutineConfigurationBuilder().maxOutputSize(Integer.MAX_VALUE)
+                                                    .outputTimeout(ZERO)
+                                                    .delayedOutput()
+                                                    .loggedWith(Logger.getDefaultLog())
+                                                    .logLevel(Logger.getDefaultLogLevel());
     }
 
     /**
@@ -62,7 +59,9 @@ public class IOChannelBuilder {
     @Nonnull
     public IOChannelBuilder bufferTimeout(final long timeout, @Nonnull final TimeUnit timeUnit) {
 
-        return bufferTimeout(fromUnit(timeout, timeUnit));
+        mBuilder.outputTimeout(timeout, timeUnit);
+
+        return this;
     }
 
     /**
@@ -73,15 +72,9 @@ public class IOChannelBuilder {
      * @throws NullPointerException if the specified timeout is null.
      */
     @Nonnull
-    @SuppressWarnings("ConstantConditions")
     public IOChannelBuilder bufferTimeout(final TimeDuration timeout) {
 
-        if (timeout == null) {
-
-            throw new NullPointerException("the timeout must not be null");
-        }
-
-        mTimeout = timeout;
+        mBuilder.outputTimeout(timeout);
 
         return this;
     }
@@ -94,7 +87,7 @@ public class IOChannelBuilder {
     @Nonnull
     public <T> IOChannel<T> buildChannel() {
 
-        return new DefaultIOChannel<T>(mMaxSize, mTimeout, mIsOrdered, mLog, mLogLevel);
+        return new DefaultIOChannel<T>(mBuilder.buildConfiguration());
     }
 
     /**
@@ -105,15 +98,9 @@ public class IOChannelBuilder {
      * @throws NullPointerException if the log level is null.
      */
     @Nonnull
-    @SuppressWarnings("ConstantConditions")
     public IOChannelBuilder logLevel(@Nonnull final LogLevel level) {
 
-        if (level == null) {
-
-            throw new NullPointerException("the log level must not be null");
-        }
-
-        mLogLevel = level;
+        mBuilder.logLevel(level);
 
         return this;
     }
@@ -126,15 +113,9 @@ public class IOChannelBuilder {
      * @throws NullPointerException if the log is null.
      */
     @Nonnull
-    @SuppressWarnings("ConstantConditions")
     public IOChannelBuilder loggedWith(@Nonnull final Log log) {
 
-        if (log == null) {
-
-            throw new NullPointerException("the log instance must not be null");
-        }
-
-        mLog = log;
+        mBuilder.loggedWith(log);
 
         return this;
     }
@@ -149,12 +130,7 @@ public class IOChannelBuilder {
     @Nonnull
     public IOChannelBuilder maxSize(final int maxBufferSize) {
 
-        if (maxBufferSize <= 0) {
-
-            throw new IllegalArgumentException("the buffer size cannot be 0 or negative");
-        }
-
-        mMaxSize = maxBufferSize;
+        mBuilder.maxOutputSize(maxBufferSize);
 
         return this;
     }
@@ -168,7 +144,7 @@ public class IOChannelBuilder {
     @Nonnull
     public IOChannelBuilder orderedInput() {
 
-        mIsOrdered = true;
+        mBuilder.orderedOutput();
 
         return this;
     }

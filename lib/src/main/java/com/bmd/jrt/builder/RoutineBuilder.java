@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.routine;
+package com.bmd.jrt.builder;
 
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
@@ -48,12 +48,13 @@ import javax.annotation.Nonnull;
  * available or the timeout set through the builder elapses.<br/>
  * By default the timeout is set to a few seconds to avoid unexpected deadlocks.<br/>
  * In case the timeout elapses before an invocation instance becomes available, a
- * {@link RoutineNotAvailableException} will be thrown.
+ * {@link com.bmd.jrt.routine.RoutineNotAvailableException} will be thrown.
  * <p/>
  * Moreover, the number of input and output data buffered in the corresponding channel can be
  * limited in order to avoid excessive memory consumption. In case the maximum number is reached
  * when passing an input or output, the call blocks until enough data are consumed or the specified
- * timeout elapses. In the latter case a {@link RoutineChannelOverflowException} will be thrown.
+ * timeout elapses. In the latter case a {@link com.bmd.jrt.routine
+ * .RoutineChannelOverflowException} will be thrown.
  * <p/>
  * Finally, by default the order of input and output data is not guaranteed. Nevertheless, it is
  * possible to force data to be delivered in insertion order, at the cost of a slightly increased
@@ -84,6 +85,24 @@ public interface RoutineBuilder {
      */
     @Nonnull
     public RoutineBuilder availableTimeout(@Nonnull TimeDuration timeout);
+
+    /**
+     * Lets the input data be delivered based on the input source delay.
+     *
+     * @return this builder.
+     * @see #orderedInput()
+     */
+    @Nonnull
+    public RoutineBuilder delayedInput();
+
+    /**
+     * Lets the output data be delivered based on the result source delay.
+     *
+     * @return this builder.
+     * @see #orderedOutput()
+     */
+    @Nonnull
+    public RoutineBuilder delayedOutput();
 
     /**
      * Sets the timeout for an input channel to have room for additional data.
@@ -172,6 +191,7 @@ public interface RoutineBuilder {
      * the source or the input delay.
      *
      * @return this builder.
+     * @see #delayedInput()
      */
     @Nonnull
     public RoutineBuilder orderedInput();
@@ -181,6 +201,7 @@ public interface RoutineBuilder {
      * from the source or the result delay.
      *
      * @return this builder.
+     * @see #delayedOutput()
      */
     @Nonnull
     public RoutineBuilder orderedOutput();
@@ -215,6 +236,7 @@ public interface RoutineBuilder {
      * The executions are run inside the calling thread.
      *
      * @return this builder.
+     * @see #sequential()
      */
     @Nonnull
     public RoutineBuilder queued();
@@ -235,6 +257,7 @@ public interface RoutineBuilder {
      * The executions are run inside the calling thread.
      *
      * @return this builder.
+     * @see #queued()
      */
     @Nonnull
     public RoutineBuilder sequential();

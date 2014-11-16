@@ -13,6 +13,7 @@
  */
 package com.bmd.jrt.routine;
 
+import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.OutputConsumer;
 import com.bmd.jrt.channel.ParameterChannel;
@@ -84,42 +85,36 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
     /**
      * Constructor.
      *
+     * @param configuration the routine configuration.
      * @param manager       the invocation manager.
      * @param runner        the runner instance.
-     * @param maxInputSize  the maximum number of buffered input data.
-     * @param inputTimeout  the maximum timeout while waiting for an input to be passed to the
-     *                      input channel.
-     * @param orderedInput  whether the input data are forced to be delivered in insertion order.
-     * @param maxOutputSize the maximum number of buffered output data.
-     * @param outputTimeout the maximum timeout while waiting for an output to be passed to the
-     *                      result channel.
-     * @param orderedOutput whether the output data are forced to be delivered in insertion order.
      * @param logger        the logger instance.
-     * @throws NullPointerException if one of the parameters is null.
+     * @throws NullPointerException     if one of the parameters is null.
+     * @throws IllegalArgumentException if at least one of the parameter is invalid.
      */
-    @SuppressWarnings("ConstantConditions")
-    DefaultParameterChannel(@Nonnull final InvocationManager<INPUT, OUTPUT> manager,
-            @Nonnull final Runner runner, final int maxInputSize,
-            @Nonnull final TimeDuration inputTimeout, final boolean orderedInput,
-            final int maxOutputSize, @Nonnull final TimeDuration outputTimeout,
-            final boolean orderedOutput, @Nonnull final Logger logger) {
+    DefaultParameterChannel(@Nonnull final RoutineConfiguration configuration,
+            @Nonnull final InvocationManager<INPUT, OUTPUT> manager, @Nonnull final Runner runner,
+            @Nonnull final Logger logger) {
 
-        if (inputTimeout == null) {
+        mLogger = logger.subContextLogger(this);
+        mRunner = runner;
+        mMaxInput = configuration.getMaxInputSize(-1);
+        mInputTimeout = configuration.getInputTimeout(null);
+
+        if (mInputTimeout == null) {
 
             throw new NullPointerException("the input timeout must not be null");
         }
+
+        final int maxInputSize = mMaxInput;
 
         if (maxInputSize < 1) {
 
             throw new IllegalArgumentException("the input buffer size cannot be 0 or negative");
         }
 
-        mLogger = logger.subContextLogger(this);
-        mRunner = runner;
-        mMaxInput = maxInputSize;
-        mInputTimeout = inputTimeout;
-        mInputQueue =
-                (orderedInput) ? new OrderedNestedQueue<INPUT>() : new SimpleNestedQueue<INPUT>();
+        mInputQueue = configuration.getOrderedInput(null) ? new OrderedNestedQueue<INPUT>()
+                : new SimpleNestedQueue<INPUT>();
         mHasInputs = new Check() {
 
             @Override
@@ -128,7 +123,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
                 return (mInputCount <= maxInputSize);
             }
         };
-        mResultChanel = new DefaultResultChannel<OUTPUT>(new AbortHandler() {
+        mResultChanel = new DefaultResultChannel<OUTPUT>(configuration, new AbortHandler() {
 
             @Override
             public void onAbort(final Throwable reason, final long delay,
@@ -153,7 +148,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
                 mRunner.run(mExecution.abort(), delay, timeUnit);
             }
-        }, runner, maxOutputSize, outputTimeout, orderedOutput, logger);
+        }, runner, logger);
         mExecution = new DefaultExecution<INPUT, OUTPUT>(manager, new DefaultInputIterator(),
                                                          mResultChanel, logger);
     }

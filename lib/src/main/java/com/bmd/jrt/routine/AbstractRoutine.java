@@ -13,12 +13,11 @@
  */
 package com.bmd.jrt.routine;
 
+import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ParameterChannel;
 import com.bmd.jrt.common.RoutineInterruptedException;
 import com.bmd.jrt.invocation.Invocation;
-import com.bmd.jrt.log.Log;
-import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.routine.DefaultParameterChannel.InvocationManager;
 import com.bmd.jrt.runner.Runner;
@@ -49,28 +48,19 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends BasicRoutine<INPUT,
 
     private final TimeDuration mAvailTimeout;
 
-    private final TimeDuration mInputTimeout;
+    private final RoutineConfiguration mConfiguration;
 
     private final LinkedList<Invocation<INPUT, OUTPUT>> mInvocations =
             new LinkedList<Invocation<INPUT, OUTPUT>>();
 
     private final Logger mLogger;
 
-    private final int mMaxInputSize;
-
-    private final int mMaxOutputSize;
 
     private final int mMaxRetained;
 
     private final int mMaxRunning;
 
     private final Object mMutex = new Object();
-
-    private final boolean mOrderedInput;
-
-    private final boolean mOrderedOutput;
-
-    private final TimeDuration mOutputTimeout;
 
     private final Runner mSyncRunner;
 
@@ -79,136 +69,90 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends BasicRoutine<INPUT,
     /**
      * Constructor.
      *
+     * @param configuration the routine configuration.
      * @param syncRunner    the runner used for synchronous invocation.
-     * @param asyncRunner   the runner used for asynchronous invocation.
-     * @param maxRunning    the maximum number of parallel running invocations. Must be positive.
-     * @param maxRetained   the maximum number of retained invocation instances. Must be 0 or a
-     *                      positive number.
-     * @param availTimeout  the maximum timeout while waiting for an invocation instance to be
-     *                      available.
-     * @param maxInputSize  the maximum number of buffered input data. Must be positive.
-     * @param inputTimeout  the maximum timeout while waiting for an input to be passed to the
-     *                      input channel.
-     * @param orderedInput  whether the input data are forced to be delivered in insertion order.
-     * @param maxOutputSize the maximum number of buffered output data. Must be positive.
-     * @param outputTimeout the maximum timeout while waiting for an output to be passed to the
-     *                      result channel.
-     * @param orderedOutput whether the output data are forced to be delivered in insertion order.
-     * @param log           the log instance.
-     * @param logLevel      the log level.
      * @throws NullPointerException     if one of the parameters is null.
      * @throws IllegalArgumentException if at least one of the parameter is invalid.
      */
     @SuppressWarnings("ConstantConditions")
-    protected AbstractRoutine(@Nonnull final Runner syncRunner, @Nonnull final Runner asyncRunner,
-            final int maxRunning, final int maxRetained, @Nonnull final TimeDuration availTimeout,
-            final int maxInputSize, @Nonnull final TimeDuration inputTimeout,
-            final boolean orderedInput, final int maxOutputSize,
-            @Nonnull final TimeDuration outputTimeout, final boolean orderedOutput,
-            @Nonnull final Log log, @Nonnull final LogLevel logLevel) {
+    protected AbstractRoutine(@Nonnull RoutineConfiguration configuration,
+            @Nonnull final Runner syncRunner) {
 
         if (syncRunner == null) {
 
             throw new NullPointerException("the synchronous runner instance must not be null");
         }
 
-        if (asyncRunner == null) {
-
-            throw new NullPointerException("the asynchronous runner instance must not be null");
-        }
-
-        if (maxRunning < 1) {
-
-            throw new IllegalArgumentException(
-                    "the maximum number of parallel running invocations must be a positive number");
-        }
-
-        if (maxRetained < 0) {
-
-            throw new IllegalArgumentException(
-                    "the maximum number of retained invocation instances must be 0 or positive");
-        }
-
-        if (availTimeout == null) {
-
-            throw new NullPointerException(
-                    "the timeout for available invocation instances must not be null");
-        }
-
-        if (maxInputSize < 1) {
+        if (configuration.getMaxInputSize(-1) < 1) {
 
             throw new IllegalArgumentException("the maximum input size must be a positive number");
         }
 
-        if (inputTimeout == null) {
+        if (configuration.getInputTimeout(null) == null) {
 
             throw new NullPointerException(
                     "the timeout for available input buffer must not be null");
         }
 
-        if (maxOutputSize < 1) {
+        if (configuration.getMaxOutputSize(-1) < 1) {
 
             throw new IllegalArgumentException("the maximum output size must be a positive number");
         }
 
-        if (outputTimeout == null) {
+        if (configuration.getOutputTimeout(null) == null) {
 
             throw new NullPointerException(
                     "the timeout for available output buffer must not be null");
         }
 
+        mConfiguration = configuration;
         mSyncRunner = syncRunner;
-        mAsyncRunner = asyncRunner;
-        mMaxRunning = maxRunning;
-        mMaxRetained = maxRetained;
-        mAvailTimeout = availTimeout;
-        mMaxInputSize = maxInputSize;
-        mInputTimeout = inputTimeout;
-        mOrderedInput = orderedInput;
-        mMaxOutputSize = maxOutputSize;
-        mOutputTimeout = outputTimeout;
-        mOrderedOutput = orderedOutput;
-        mLogger = Logger.create(log, logLevel, this);
+        mAsyncRunner = configuration.getRunner(null);
+        mMaxRunning = configuration.getMaxRunning(-1);
+        mMaxRetained = configuration.getMaxRetained(-1);
+        mAvailTimeout = configuration.getAvailTimeout(null);
+        mLogger = Logger.create(configuration.getLog(null), configuration.getLogLevel(null), this);
+
+        if (mAsyncRunner == null) {
+
+            throw new NullPointerException("the asynchronous runner instance must not be null");
+        }
+
+        if (mMaxRunning < 1) {
+
+            throw new IllegalArgumentException(
+                    "the maximum number of parallel running invocations must be a positive number");
+        }
+
+        if (mMaxRetained < 0) {
+
+            throw new IllegalArgumentException(
+                    "the maximum number of retained invocation instances must be 0 or positive");
+        }
+
+        if (mAvailTimeout == null) {
+
+            throw new NullPointerException(
+                    "the timeout for available invocation instances must not be null");
+        }
     }
 
     /**
      * Constructor.
      *
+     * @param configuration the routine configuration.
      * @param syncRunner    the runner used for synchronous invocation.
-     * @param asyncRunner   the runner used for asynchronous invocation.
-     * @param maxRunning    the maximum number of parallel running invocations. Must be positive.
-     * @param maxRetained   the maximum number of retained invocation instances. Must be 0 or a
-     *                      positive number.
-     * @param availTimeout  the maximum timeout while waiting for an invocation instance to be
-     *                      available.
-     * @param maxInputSize  the maximum number of buffered input data. Must be positive.
-     * @param inputTimeout  the maximum timeout while waiting for an input to be passed to the
-     *                      input channel.
-     * @param orderedInput  whether the input data are forced to be delivered in insertion order.
-     * @param maxOutputSize the maximum number of buffered output data. Must be positive.
-     * @param outputTimeout the maximum timeout while waiting for an output to be passed to the
-     *                      result channel.
-     * @param orderedOutput whether the output data are forced to be delivered in insertion order.
      * @param logger        the logger instance.
      */
-    private AbstractRoutine(@Nonnull final Runner syncRunner, @Nonnull final Runner asyncRunner,
-            final int maxRunning, final int maxRetained, @Nonnull final TimeDuration availTimeout,
-            final int maxInputSize, @Nonnull final TimeDuration inputTimeout,
-            final boolean orderedInput, final int maxOutputSize,
-            @Nonnull final TimeDuration outputTimeout, final boolean orderedOutput,
-            @Nonnull final Logger logger) {
+    private AbstractRoutine(@Nonnull RoutineConfiguration configuration,
+            @Nonnull final Runner syncRunner, @Nonnull final Logger logger) {
 
+        mConfiguration = configuration;
         mSyncRunner = syncRunner;
-        mAsyncRunner = asyncRunner;
-        mMaxRunning = maxRunning;
-        mMaxRetained = maxRetained;
-        mAvailTimeout = availTimeout;
-        mMaxInputSize = maxInputSize;
-        mInputTimeout = inputTimeout;
-        mOrderedInput = orderedInput;
-        mMaxOutputSize = maxOutputSize;
-        mOutputTimeout = outputTimeout;
-        mOrderedOutput = orderedOutput;
+        mAsyncRunner = configuration.getRunner(null);
+        mMaxRunning = configuration.getMaxRunning(-1);
+        mMaxRetained = configuration.getMaxRetained(-1);
+        mAvailTimeout = configuration.getAvailTimeout(null);
         mLogger = logger;
     }
 
@@ -233,10 +177,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends BasicRoutine<INPUT,
         mLogger.dbg("invoking routine: parallel");
 
         final AbstractRoutine<INPUT, OUTPUT> parallelRoutine =
-                new AbstractRoutine<INPUT, OUTPUT>(mSyncRunner, mAsyncRunner, mMaxRunning,
-                                                   mMaxRetained, mAvailTimeout, mMaxInputSize,
-                                                   mInputTimeout, mOrderedInput, mMaxOutputSize,
-                                                   mOutputTimeout, mOrderedOutput, mLogger) {
+                new AbstractRoutine<INPUT, OUTPUT>(mConfiguration, mSyncRunner, mLogger) {
 
                     @Nonnull
                     @Override
@@ -279,11 +220,10 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends BasicRoutine<INPUT,
 
         logger.dbg("invoking routine: %ssync", (async) ? "a" : "");
 
-        return new DefaultParameterChannel<INPUT, OUTPUT>(new DefaultInvocationManager(async),
+        return new DefaultParameterChannel<INPUT, OUTPUT>(mConfiguration,
+                                                          new DefaultInvocationManager(async),
                                                           (async) ? mAsyncRunner : mSyncRunner,
-                                                          mMaxInputSize, mInputTimeout,
-                                                          mOrderedInput, mMaxOutputSize,
-                                                          mOutputTimeout, mOrderedOutput, logger);
+                                                          logger);
     }
 
     /**

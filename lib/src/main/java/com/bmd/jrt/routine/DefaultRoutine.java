@@ -13,12 +13,10 @@
  */
 package com.bmd.jrt.routine;
 
+import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.invocation.Invocation;
-import com.bmd.jrt.log.Log;
-import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.runner.Runner;
-import com.bmd.jrt.time.TimeDuration;
 
 import java.lang.reflect.Constructor;
 
@@ -47,23 +45,8 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
     /**
      * Constructor.
      *
+     * @param configuration   the routine configuration.
      * @param syncRunner      the runner used for synchronous invocation.
-     * @param asyncRunner     the runner used for asynchronous invocation.
-     * @param maxRunning      the maximum number of parallel running invocations. Must be positive.
-     * @param maxRetained     the maximum number of retained invocation instances. Must be 0 or a
-     *                        positive number.
-     * @param availTimeout    the maximum timeout while waiting for an invocation instance to be
-     *                        available.
-     * @param maxInputSize    the maximum number of buffered input data. Must be positive.
-     * @param inputTimeout    the maximum timeout while waiting for an input to be passed to the
-     *                        input channel.
-     * @param orderedInput    whether the input data are forced to be delivered in insertion order.
-     * @param maxOutputSize   the maximum number of buffered output data. Must be positive.
-     * @param outputTimeout   the maximum timeout while waiting for an output to be passed to the
-     *                        result channel.
-     * @param orderedOutput   whether the output data are forced to be delivered in insertion order.
-     * @param log             the log instance.
-     * @param logLevel        the log level
      * @param invocationClass the invocation class.
      * @param invocationArgs  the invocation constructor arguments.
      * @throws NullPointerException     if at least one of the parameter is null.
@@ -71,22 +54,15 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
      *                                  constructor matching the specified arguments is found for
      *                                  the target invocation class.
      */
-    DefaultRoutine(@Nonnull final Runner syncRunner, @Nonnull final Runner asyncRunner,
-            final int maxRunning, final int maxRetained, @Nonnull final TimeDuration availTimeout,
-            final int maxInputSize, @Nonnull final TimeDuration inputTimeout,
-            final boolean orderedInput, final int maxOutputSize,
-            @Nonnull final TimeDuration outputTimeout, final boolean orderedOutput,
-            @Nonnull final Log log, @Nonnull final LogLevel logLevel,
+    DefaultRoutine(@Nonnull RoutineConfiguration configuration, @Nonnull final Runner syncRunner,
             @Nonnull final Class<? extends Invocation<INPUT, OUTPUT>> invocationClass,
             @Nullable final Object... invocationArgs) {
 
-        super(syncRunner, asyncRunner, maxRunning, maxRetained, availTimeout, maxInputSize,
-              inputTimeout, orderedInput, maxOutputSize, outputTimeout, orderedOutput, log,
-              logLevel);
+        super(configuration, syncRunner);
 
         mArgs = (invocationArgs == null) ? NO_ARGS : invocationArgs.clone();
         mConstructor = findConstructor(invocationClass, mArgs);
-        mLogger = Logger.create(log, logLevel, this);
+        mLogger = Logger.create(configuration.getLog(null), configuration.getLogLevel(null), this);
     }
 
     @Nonnull

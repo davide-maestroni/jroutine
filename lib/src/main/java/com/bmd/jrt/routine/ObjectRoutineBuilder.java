@@ -15,8 +15,8 @@ package com.bmd.jrt.routine;
 
 import com.bmd.jrt.annotation.Async;
 import com.bmd.jrt.annotation.AsyncOverride;
-import com.bmd.jrt.annotation.DefaultLog;
-import com.bmd.jrt.annotation.DefaultRunner;
+import com.bmd.jrt.builder.RoutineConfiguration;
+import com.bmd.jrt.builder.RoutineConfigurationBuilder;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ParameterChannel;
 import com.bmd.jrt.common.ClassToken;
@@ -37,7 +37,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import static com.bmd.jrt.routine.ReflectionUtils.boxingClass;
-import static com.bmd.jrt.time.TimeDuration.fromUnit;
 
 /**
  * Class implementing a builder of routines wrapping an object instance.
@@ -155,6 +154,24 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     public ObjectRoutineBuilder availableTimeout(@Nonnull final TimeDuration timeout) {
 
         super.availableTimeout(timeout);
+
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public ObjectRoutineBuilder delayedInput() {
+
+        super.delayedInput();
+
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public ObjectRoutineBuilder delayedOutput() {
+
+        super.delayedOutput();
 
         return this;
     }
@@ -309,33 +326,9 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      */
     private class InterfaceInvocationHandler implements InvocationHandler {
 
-        private final TimeDuration mAvailTimeout;
-
-        private final TimeDuration mInputTimeout;
-
-        private final Boolean mIsSequential;
+        private final RoutineConfiguration mConfiguration;
 
         private final String mLockId;
-
-        private final Log mLog;
-
-        private final LogLevel mLogLevel;
-
-        private final int mMaxInputSize;
-
-        private final int mMaxOutputSize;
-
-        private final int mMaxRetained;
-
-        private final int mMaxRunning;
-
-        private final Boolean mOrderedInput;
-
-        private final Boolean mOrderedOutput;
-
-        private final TimeDuration mOutputTimeout;
-
-        private final Runner mRunner;
 
         private final Object mTarget;
 
@@ -346,23 +339,11 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
             mTarget = ObjectRoutineBuilder.this.mTarget;
             mTargetClass = ObjectRoutineBuilder.this.mTargetClass;
             mLockId = getLockId();
-            mRunner = getRunner();
-            mIsSequential = getSequential();
-            mMaxRunning = getMaxRunning();
-            mMaxRetained = getMaxRetained();
-            mAvailTimeout = getAvailTimeout();
-            mMaxInputSize = getMaxInputSize();
-            mInputTimeout = getInputTimeout();
-            mOrderedInput = isOrderedInput();
-            mMaxOutputSize = getMaxOutputSize();
-            mOutputTimeout = getOutputTimeout();
-            mOrderedOutput = isOrderedOutput();
-            mLog = getLog();
-            mLogLevel = getLogLevel();
+            mConfiguration = getBuilder().buildConfiguration();
         }
 
-        @SuppressWarnings("unchecked")
         @Override
+        @SuppressWarnings("unchecked")
         public Object invoke(final Object proxy, final Method method, final Object[] args) throws
                 Throwable {
 
@@ -375,19 +356,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
             Method targetMethod;
             String lockId = mLockId;
-            Runner runner = mRunner;
-            Boolean isSequential = mIsSequential;
-            int maxRunning = mMaxRunning;
-            int maxRetained = mMaxRetained;
-            TimeDuration availTimeout = mAvailTimeout;
-            int maxInputSize = mMaxInputSize;
-            TimeDuration inputTimeout = mInputTimeout;
-            Boolean orderedInput = mOrderedInput;
-            int maxOutputSize = mMaxOutputSize;
-            TimeDuration outputTimeout = mOutputTimeout;
-            Boolean orderedOutput = mOrderedOutput;
-            Log log = mLog;
-            LogLevel level = mLogLevel;
+            RoutineConfiguration configuration = mConfiguration;
 
             synchronized (sMethodCache) {
 
@@ -515,6 +484,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                         throw new IllegalArgumentException(
                                 "the async return type is not compatible");
                     }
+
+                    methodMap.put(method, targetMethod);
                 }
 
                 if (annotation != null) {
@@ -524,109 +495,17 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                         lockId = annotation.lockId();
                     }
 
-                    if (runner == null) {
-
-                        final Class<? extends Runner> runnerClass = annotation.runner();
-
-                        if (runnerClass != DefaultRunner.class) {
-
-                            runner = runnerClass.newInstance();
-                        }
-                    }
-
-                    if (isSequential == null) {
-
-                        isSequential = annotation.sequential();
-                    }
-
-                    if (maxRunning == Async.DEFAULT_NUMBER) {
-
-                        maxRunning = annotation.maxRunning();
-                    }
-
-                    if (maxRetained == Async.DEFAULT_NUMBER) {
-
-                        maxRetained = annotation.maxRetained();
-                    }
-
-                    if (availTimeout == null) {
-
-                        final long timeout = annotation.availTimeout();
-
-                        if (timeout != Async.DEFAULT_NUMBER) {
-
-                            availTimeout = fromUnit(timeout, annotation.availTimeUnit());
-                        }
-                    }
-
-                    if (maxInputSize == Async.DEFAULT_NUMBER) {
-
-                        maxInputSize = annotation.maxInput();
-                    }
-
-                    if (inputTimeout == null) {
-
-                        final long timeout = annotation.inputTimeout();
-
-                        if (timeout != Async.DEFAULT_NUMBER) {
-
-                            inputTimeout = fromUnit(timeout, annotation.inputTimeUnit());
-                        }
-                    }
-
-                    if (orderedInput == null) {
-
-                        orderedInput = annotation.orderedInput();
-                    }
-
-                    if (maxOutputSize == Async.DEFAULT_NUMBER) {
-
-                        maxOutputSize = annotation.maxOutput();
-                    }
-
-                    if (outputTimeout == null) {
-
-                        final long timeout = annotation.outputTimeout();
-
-                        if (timeout != Async.DEFAULT_NUMBER) {
-
-                            outputTimeout = fromUnit(timeout, annotation.outputTimeUnit());
-                        }
-                    }
-
-                    if (orderedOutput == null) {
-
-                        orderedOutput = annotation.orderedOutput();
-                    }
-
-                    if (log == null) {
-
-                        final Class<? extends Log> logClass = annotation.log();
-
-                        if (logClass != DefaultLog.class) {
-
-                            log = logClass.newInstance();
-                        }
-                    }
-
-                    if (level == null) {
-
-                        level = annotation.logLevel();
-                    }
+                    configuration = overrideConfiguration(configuration, annotation);
                 }
-
-                methodMap.put(method, targetMethod);
             }
 
             if (isOverrideParameters) {
 
-                orderedInput = true;
+                configuration = new RoutineConfigurationBuilder(configuration).orderedInput()
+                                                                              .buildConfiguration();
             }
 
-            final Routine<Object, Object> routine =
-                    getRoutine(targetMethod, lockId, runner, isSequential, maxRunning, maxRetained,
-                               availTimeout, maxInputSize, inputTimeout, orderedInput,
-                               maxOutputSize, outputTimeout, orderedOutput, log, level);
+            final Routine<Object, Object> routine = getRoutine(configuration, targetMethod, lockId);
             final OutputChannel<Object> outputChannel;
 
             if (isParallel) {

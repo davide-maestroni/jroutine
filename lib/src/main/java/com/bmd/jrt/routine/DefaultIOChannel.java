@@ -13,17 +13,15 @@
  */
 package com.bmd.jrt.routine;
 
+import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.channel.IOChannel;
 import com.bmd.jrt.channel.InputChannel;
 import com.bmd.jrt.channel.OutputChannel;
-import com.bmd.jrt.log.Log;
-import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.routine.DefaultResultChannel.AbortHandler;
 import com.bmd.jrt.runner.Execution;
 import com.bmd.jrt.runner.Runner;
 import com.bmd.jrt.runner.Runners;
-import com.bmd.jrt.time.TimeDuration;
 
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
@@ -59,20 +57,16 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
     /**
      * Constructor.
      *
-     * @param maxSize   the maximum number of buffered data.
-     * @param timeout   the maximum timeout while waiting for an input to be passed to the channel.
-     * @param isOrdered whether the data are forced to be delivered in insertion order.
-     * @param log       the log instance.
-     * @param level     the log level.
+     * @param configuration the routine configuration.
      */
-    DefaultIOChannel(final int maxSize, @Nonnull final TimeDuration timeout,
-            final boolean isOrdered, @Nonnull final Log log, @Nonnull final LogLevel level) {
+    DefaultIOChannel(@Nonnull final RoutineConfiguration configuration) {
 
         final ChannelAbortHandler abortHandler = new ChannelAbortHandler();
         final DefaultResultChannel<TYPE> inputChannel =
-                new DefaultResultChannel<TYPE>(abortHandler, sharedRunner(), maxSize, timeout,
-                                               isOrdered,
-                                               Logger.create(log, level, IOChannel.class));
+                new DefaultResultChannel<TYPE>(configuration, abortHandler, sharedRunner(),
+                                               Logger.create(configuration.getLog(null),
+                                                             configuration.getLogLevel(null),
+                                                             IOChannel.class));
         abortHandler.setInputChannel(inputChannel);
         mInputChannel = inputChannel;
         mOutputChannel = inputChannel.getOutput();

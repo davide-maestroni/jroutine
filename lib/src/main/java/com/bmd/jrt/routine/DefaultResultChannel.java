@@ -13,6 +13,7 @@
  */
 package com.bmd.jrt.routine;
 
+import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.OutputConsumer;
 import com.bmd.jrt.channel.ResultChannel;
@@ -97,19 +98,17 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     /**
      * Constructor.
      *
+     * @param configuration the routine configuration.
      * @param handler       the abort handler.
      * @param runner        the runner instance.
-     * @param maxOutputSize the maximum number of buffered output data.
-     * @param outputTimeout the maximum timeout while waiting for an output to be passed to the
-     *                      result channel.
-     * @param orderedOutput whether the output data are forced to be delivered in insertion order.
      * @param logger        the logger instance.
-     * @throws NullPointerException if one of the parameters is null.
+     * @throws NullPointerException     if one of the parameters is null.
+     * @throws IllegalArgumentException if at least one of the parameter is invalid.
      */
     @SuppressWarnings("ConstantConditions")
-    DefaultResultChannel(@Nonnull final AbortHandler handler, @Nonnull final Runner runner,
-            final int maxOutputSize, @Nonnull final TimeDuration outputTimeout,
-            final boolean orderedOutput, @Nonnull final Logger logger) {
+    DefaultResultChannel(@Nonnull RoutineConfiguration configuration,
+            @Nonnull final AbortHandler handler, @Nonnull final Runner runner,
+            @Nonnull final Logger logger) {
 
         if (handler == null) {
 
@@ -121,22 +120,25 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             throw new NullPointerException("the runner instance must not be null");
         }
 
-        if (outputTimeout == null) {
+        mLogger = logger.subContextLogger(this);
+        mHandler = handler;
+        mRunner = runner;
+        mMaxOutput = configuration.getMaxOutputSize(-1);
+        mOutputTimeout = configuration.getOutputTimeout(null);
+
+        if (mOutputTimeout == null) {
 
             throw new NullPointerException("the output timeout must not be null");
         }
+
+        final int maxOutputSize = mMaxOutput;
 
         if (maxOutputSize < 1) {
 
             throw new IllegalArgumentException("the output buffer size cannot be 0 or negative");
         }
 
-        mLogger = logger.subContextLogger(this);
-        mHandler = handler;
-        mRunner = runner;
-        mMaxOutput = maxOutputSize;
-        mOutputTimeout = outputTimeout;
-        mOutputQueue = (orderedOutput) ? new OrderedNestedQueue<Object>()
+        mOutputQueue = configuration.getOrderedOutput(null) ? new OrderedNestedQueue<Object>()
                 : new SimpleNestedQueue<Object>();
         mHasOutputs = new Check() {
 

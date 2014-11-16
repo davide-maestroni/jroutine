@@ -13,6 +13,8 @@
  */
 package com.bmd.jrt.annotation;
 
+import com.bmd.jrt.builder.RoutineBuilder.ChannelDataOrder;
+import com.bmd.jrt.builder.RoutineBuilder.SyncRunnerType;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.runner.Runner;
@@ -128,6 +130,13 @@ public @interface Async {
     long availTimeout() default DEFAULT_NUMBER;
 
     /**
+     * The input data order.
+     *
+     * @return the order type.
+     */
+    ChannelDataOrder inputOrder() default ChannelDataOrder.DEFAULT;
+
+    /**
      * The time unit of the timeout for an input channel to have room for additional data.
      *
      * @return the time unit.
@@ -160,7 +169,7 @@ public @interface Async {
      *
      * @return the log level.
      */
-    LogLevel logLevel() default LogLevel.ERROR;
+    LogLevel logLevel() default LogLevel.DEFAULT;
 
     /**
      * The maximum number of data that the input channel can retain before they are consumed.
@@ -191,18 +200,11 @@ public @interface Async {
     int maxRunning() default DEFAULT_NUMBER;
 
     /**
-     * If the input data are forced to be delivered in insertion order.
+     * The output data order.
      *
-     * @return whether the input data are delivered in insertion order.
+     * @return the order type.
      */
-    boolean orderedInput() default false;
-
-    /**
-     * If the output data are forced to be delivered in insertion order.
-     *
-     * @return whether the output data are delivered in insertion order.
-     */
-    boolean orderedOutput() default false;
+    ChannelDataOrder outputOrder() default ChannelDataOrder.DEFAULT;
 
     /**
      * The time unit of the timeout for a result channel to have room for additional data.
@@ -223,14 +225,14 @@ public @interface Async {
      *
      * @return the runner class.
      */
-    Class<? extends Runner> runner() default DefaultRunner.class;
+    Class<? extends Runner> runnerClass() default DefaultRunner.class;
 
     /**
-     * If the sequential runner should be used for synchronous invocations.
+     * The type of the runner to be used for synchronous invocations.
      *
-     * @return whether the sequential runner will be used.
+     * @return the runner type.
      */
-    boolean sequential() default false;
+    SyncRunnerType runnerType() default SyncRunnerType.DEFAULT;
 
     /**
      * The tag used to identify the method independently from its original signature.

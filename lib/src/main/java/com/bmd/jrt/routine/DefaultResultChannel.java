@@ -13,6 +13,7 @@
  */
 package com.bmd.jrt.routine;
 
+import com.bmd.jrt.builder.RoutineBuilder.ChannelDataOrder;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.OutputConsumer;
@@ -106,7 +107,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
      * @throws IllegalArgumentException if at least one of the parameter is invalid.
      */
     @SuppressWarnings("ConstantConditions")
-    DefaultResultChannel(@Nonnull RoutineConfiguration configuration,
+    DefaultResultChannel(@Nonnull final RoutineConfiguration configuration,
             @Nonnull final AbortHandler handler, @Nonnull final Runner runner,
             @Nonnull final Logger logger) {
 
@@ -123,7 +124,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         mLogger = logger.subContextLogger(this);
         mHandler = handler;
         mRunner = runner;
-        mMaxOutput = configuration.getMaxOutputSize(-1);
+        mMaxOutput = configuration.getOutputMaxSize(-1);
         mOutputTimeout = configuration.getOutputTimeout(null);
 
         if (mOutputTimeout == null) {
@@ -138,8 +139,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             throw new IllegalArgumentException("the output buffer size cannot be 0 or negative");
         }
 
-        mOutputQueue = configuration.getOrderedOutput(null) ? new OrderedNestedQueue<Object>()
-                : new SimpleNestedQueue<Object>();
+        mOutputQueue = (configuration.getOutputOrder(null) == ChannelDataOrder.INSERTION)
+                ? new OrderedNestedQueue<Object>() : new SimpleNestedQueue<Object>();
         mHasOutputs = new Check() {
 
             @Override

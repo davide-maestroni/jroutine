@@ -80,18 +80,19 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineBuilder {
 
     @Nonnull
     @Override
-    public InvocationRoutineBuilder delayedInput() {
+    public InvocationRoutineBuilder<INPUT, OUTPUT> inputMaxSize(final int inputMaxSize) {
 
-        mBuilder.delayedInput();
+        mBuilder.inputMaxSize(inputMaxSize);
 
         return this;
     }
 
     @Nonnull
     @Override
-    public InvocationRoutineBuilder delayedOutput() {
+    public InvocationRoutineBuilder<INPUT, OUTPUT> inputOrder(
+            @Nonnull final ChannelDataOrder order) {
 
-        mBuilder.delayedOutput();
+        mBuilder.inputOrder(order);
 
         return this;
     }
@@ -136,24 +137,6 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineBuilder {
 
     @Nonnull
     @Override
-    public InvocationRoutineBuilder<INPUT, OUTPUT> maxInputSize(final int maxInputSize) {
-
-        mBuilder.maxInputSize(maxInputSize);
-
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public InvocationRoutineBuilder<INPUT, OUTPUT> maxOutputSize(final int maxOutputSize) {
-
-        mBuilder.maxOutputSize(maxOutputSize);
-
-        return this;
-    }
-
-    @Nonnull
-    @Override
     public InvocationRoutineBuilder<INPUT, OUTPUT> maxRetained(final int maxRetainedInstances) {
 
         mBuilder.maxRetained(maxRetainedInstances);
@@ -172,18 +155,18 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineBuilder {
 
     @Nonnull
     @Override
-    public InvocationRoutineBuilder<INPUT, OUTPUT> orderedInput() {
+    public InvocationRoutineBuilder<INPUT, OUTPUT> outputMaxSize(final int outputMaxSize) {
 
-        mBuilder.orderedInput();
+        mBuilder.outputMaxSize(outputMaxSize);
 
         return this;
     }
 
     @Nonnull
     @Override
-    public InvocationRoutineBuilder<INPUT, OUTPUT> orderedOutput() {
+    public InvocationRoutineBuilder<INPUT, OUTPUT> outputOrder(final ChannelDataOrder order) {
 
-        mBuilder.orderedOutput();
+        mBuilder.outputOrder(order);
 
         return this;
     }
@@ -210,15 +193,6 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineBuilder {
 
     @Nonnull
     @Override
-    public InvocationRoutineBuilder<INPUT, OUTPUT> queued() {
-
-        mBuilder.queued();
-
-        return this;
-    }
-
-    @Nonnull
-    @Override
     public InvocationRoutineBuilder<INPUT, OUTPUT> runBy(@Nonnull final Runner runner) {
 
         mBuilder.runBy(runner);
@@ -228,9 +202,9 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineBuilder {
 
     @Nonnull
     @Override
-    public InvocationRoutineBuilder<INPUT, OUTPUT> sequential() {
+    public InvocationRoutineBuilder<INPUT, OUTPUT> syncRunner(@Nonnull final SyncRunnerType type) {
 
-        mBuilder.sequential();
+        mBuilder.syncRunner(type);
 
         return this;
     }
@@ -244,8 +218,8 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineBuilder {
     public Routine<INPUT, OUTPUT> buildRoutine() {
 
         final RoutineConfiguration configuration = mBuilder.buildConfiguration();
-        final Runner syncRunner = configuration.getIsSequential(null) ? Runners.sequentialRunner()
-                : Runners.queuedRunner();
+        final Runner syncRunner = (configuration.getSyncRunner(null) == SyncRunnerType.SEQUENTIAL)
+                ? Runners.sequentialRunner() : Runners.queuedRunner();
 
         return new DefaultRoutine<INPUT, OUTPUT>(configuration, syncRunner, mInvocationClass,
                                                  mArgs);

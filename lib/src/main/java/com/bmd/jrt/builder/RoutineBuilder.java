@@ -87,22 +87,24 @@ public interface RoutineBuilder {
     public RoutineBuilder availableTimeout(@Nonnull TimeDuration timeout);
 
     /**
-     * Lets the input data be delivered based on the input source delay.
+     * Sets the maximum number of data that the input channel can retain before they are consumed.
      *
+     * @param inputMaxSize the maximum size.
      * @return this builder.
-     * @see #orderedInput()
+     * @throws IllegalArgumentException if the number is less than 1.
      */
     @Nonnull
-    public RoutineBuilder delayedInput();
+    public RoutineBuilder inputMaxSize(int inputMaxSize);
 
     /**
-     * Lets the output data be delivered based on the result source delay.
+     * Sets the order in which input data are collected from the input channel.
      *
+     * @param order the order type.
      * @return this builder.
-     * @see #orderedOutput()
+     * @throws NullPointerException if the specified order type is null.
      */
     @Nonnull
-    public RoutineBuilder delayedOutput();
+    public RoutineBuilder inputOrder(@Nonnull ChannelDataOrder order);
 
     /**
      * Sets the timeout for an input channel to have room for additional data.
@@ -147,26 +149,6 @@ public interface RoutineBuilder {
     public RoutineBuilder loggedWith(@Nonnull Log log);
 
     /**
-     * Sets the maximum number of data that the input channel can retain before they are consumed.
-     *
-     * @param maxInputSize the maximum size.
-     * @return this builder.
-     * @throws IllegalArgumentException if the number is less than 1.
-     */
-    @Nonnull
-    public RoutineBuilder maxInputSize(int maxInputSize);
-
-    /**
-     * Sets the maximum number of data that the result channel can retain before they are consumed.
-     *
-     * @param maxOutputSize the maximum size.
-     * @return this builder.
-     * @throws IllegalArgumentException if the number is less than 1.
-     */
-    @Nonnull
-    public RoutineBuilder maxOutputSize(int maxOutputSize);
-
-    /**
      * Sets the max number of retained instances.
      *
      * @param maxRetainedInstances the max number of instances.
@@ -187,24 +169,24 @@ public interface RoutineBuilder {
     public RoutineBuilder maxRunning(int maxRunningInstances);
 
     /**
-     * Forces the inputs to be ordered as they are passed to the input channel, independently from
-     * the source or the input delay.
+     * Sets the maximum number of data that the result channel can retain before they are consumed.
      *
+     * @param outputMaxSize the maximum size.
      * @return this builder.
-     * @see #delayedInput()
+     * @throws IllegalArgumentException if the number is less than 1.
      */
     @Nonnull
-    public RoutineBuilder orderedInput();
+    public RoutineBuilder outputMaxSize(int outputMaxSize);
 
     /**
-     * Forces the outputs to be ordered as they are passed to the result channel, independently
-     * from the source or the result delay.
+     * Sets the order in which output data are collected from the result channel.
      *
+     * @param order the order type.
      * @return this builder.
-     * @see #delayedOutput()
+     * @throws NullPointerException if the specified order type is null.
      */
     @Nonnull
-    public RoutineBuilder orderedOutput();
+    public RoutineBuilder outputOrder(ChannelDataOrder order);
 
     /**
      * Sets the timeout for a result channel to have room for additional data.
@@ -229,19 +211,6 @@ public interface RoutineBuilder {
     public RoutineBuilder outputTimeout(@Nonnull TimeDuration timeout);
 
     /**
-     * Sets the synchronous runner to the queued one.<br/>
-     * The queued runner maintains an internal buffer of executions that are consumed only when
-     * the last one complete, thus avoiding overflowing the call stack because of nested calls to
-     * other routines.<br/>
-     * The executions are run inside the calling thread.
-     *
-     * @return this builder.
-     * @see #sequential()
-     */
-    @Nonnull
-    public RoutineBuilder queued();
-
-    /**
      * Sets the asynchronous runner instance.
      *
      * @param runner the runner instance.
@@ -252,13 +221,64 @@ public interface RoutineBuilder {
     public RoutineBuilder runBy(@Nonnull Runner runner);
 
     /**
-     * Sets the synchronous runner to the sequential one.<br/>
-     * The sequential one simply runs the executions as soon as they are invoked.<br/>
-     * The executions are run inside the calling thread.
+     * Sets the type of the synchronous runner to be used by the routine.
      *
+     * @param type the runner type.
      * @return this builder.
-     * @see #queued()
+     * @throws NullPointerException if the specified type is null.
      */
     @Nonnull
-    public RoutineBuilder sequential();
+    public RoutineBuilder syncRunner(@Nonnull SyncRunnerType type);
+
+    /**
+     * Enumeration defining how data are ordered inside a channel.
+     */
+    public enum ChannelDataOrder {
+
+        /**
+         * Insertion order.<br/>
+         * Data are returned in the same order as they are passed to the channel, independently from
+         * the specific delay.
+         */
+        INSERTION,
+        /**
+         * Delivery order.<br/>
+         * Data are returned in the same order as they are delivered, taking also into consideration
+         * the specific delay. Note that the delivery time might be different based on the specific
+         * runner implementation, so there is no guarantee about the data order when, for example,
+         * two objects are passed one immediately after the other with the same delay.
+         */
+        DELIVERY,
+        /**
+         * Default order.<br/>
+         * This value is used to indicated that the choice of the order is left to the framework.
+         */
+        DEFAULT
+    }
+
+    /**
+     * Synchronous runner type enumeration.
+     */
+    public enum SyncRunnerType {
+
+        /**
+         * Sequential runner.<br/>
+         * The sequential one simply runs the executions as soon as they are invoked.<br/>
+         * The executions are run inside the calling thread.
+         */
+        SEQUENTIAL,
+        /**
+         * Queued runner.<br/>
+         * The queued runner maintains an internal buffer of executions that are consumed only when
+         * the last one complete, thus avoiding overflowing the call stack because of nested calls
+         * to other routines.<br/>
+         * The executions are run inside the calling thread.
+         */
+        QUEUED,
+        /**
+         * Default runner.<br/>
+         * This value is used to indicated that the choice of the runner is left to the framework.
+         */
+        DEFAULT
+    }
 }

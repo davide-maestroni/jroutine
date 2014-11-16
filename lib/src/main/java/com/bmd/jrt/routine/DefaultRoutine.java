@@ -54,7 +54,8 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
      *                                  constructor matching the specified arguments is found for
      *                                  the target invocation class.
      */
-    DefaultRoutine(@Nonnull RoutineConfiguration configuration, @Nonnull final Runner syncRunner,
+    DefaultRoutine(@Nonnull final RoutineConfiguration configuration,
+            @Nonnull final Runner syncRunner,
             @Nonnull final Class<? extends Invocation<INPUT, OUTPUT>> invocationClass,
             @Nullable final Object... invocationArgs) {
 

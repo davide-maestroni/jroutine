@@ -15,6 +15,8 @@ package com.bmd.jrt.routine;
 
 import com.bmd.jrt.annotation.Async;
 import com.bmd.jrt.annotation.AsyncOverride;
+import com.bmd.jrt.builder.RoutineBuilder.ChannelDataOrder;
+import com.bmd.jrt.builder.RoutineBuilder.SyncRunnerType;
 import com.bmd.jrt.channel.IOChannel;
 import com.bmd.jrt.channel.InputChannel;
 import com.bmd.jrt.channel.OutputChannel;
@@ -46,8 +48,7 @@ public class JavaRoutineTest extends TestCase {
 
     public void testChannelBuilder() {
 
-        final IOChannel<Object> channel = JavaRoutine.io()
-                                                     .orderedInput()
+        final IOChannel<Object> channel = JavaRoutine.io().dataOrder(ChannelDataOrder.INSERTION)
                                                      .logLevel(LogLevel.DEBUG)
                                                      .loggedWith(new NullLog())
                                                      .buildChannel();
@@ -61,7 +62,8 @@ public class JavaRoutineTest extends TestCase {
         channel1.close();
         assertThat(channel1.output().readAll()).containsOnly(23, -77L);
 
-        final IOChannel<Object> channel2 = JavaRoutine.io().orderedInput().buildChannel();
+        final IOChannel<Object> channel2 =
+                JavaRoutine.io().dataOrder(ChannelDataOrder.INSERTION).buildChannel();
         final InputChannel<Object> input2 = channel2.input();
 
         input2.after(TimeDuration.millis(200)).pass(23).now().pass(-77L);
@@ -96,13 +98,13 @@ public class JavaRoutineTest extends TestCase {
     public void testClassRoutineBuilder() throws NoSuchMethodException {
 
         final Routine<Object, Object> routine = JavaRoutine.on(TestStatic.class)
-                                                           .sequential()
+                                                           .syncRunner(SyncRunnerType.SEQUENTIAL)
                                                            .runBy(Runners.poolRunner())
-                                                           .maxInputSize(2)
+                                                           .inputMaxSize(2)
                                                            .inputTimeout(1, TimeUnit.SECONDS)
-                                                           .maxOutputSize(2)
+                                                           .outputMaxSize(2)
                                                            .outputTimeout(1, TimeUnit.SECONDS)
-                                                           .orderedOutput()
+                                                           .outputOrder(ChannelDataOrder.INSERTION)
                                                            .logLevel(LogLevel.DEBUG)
                                                            .loggedWith(new NullLog())
                                                            .asyncMethod(TestStatic.GET);
@@ -110,21 +112,21 @@ public class JavaRoutineTest extends TestCase {
         assertThat(routine.call()).containsExactly(-77L);
 
         final Routine<Object, Object> routine1 = JavaRoutine.on(TestStatic.class)
-                                                            .queued()
+                                                            .syncRunner(SyncRunnerType.QUEUED)
                                                             .runBy(Runners.poolRunner())
                                                             .maxRunning(1)
                                                             .availableTimeout(TimeDuration.ZERO)
-                                                            .maxInputSize(2)
+                                                            .inputMaxSize(2)
                                                             .inputTimeout(TimeDuration.ZERO)
-                                                            .maxOutputSize(2)
+                                                            .outputMaxSize(2)
                                                             .outputTimeout(TimeDuration.ZERO)
-                                                            .orderedOutput()
+                                                            .outputOrder(ChannelDataOrder.INSERTION)
                                                             .method("getLong");
 
         assertThat(routine1.call()).containsExactly(-77L);
 
         final Routine<Object, Object> routine2 = JavaRoutine.on(TestStatic.class)
-                                                            .queued()
+                                                            .syncRunner(SyncRunnerType.QUEUED)
                                                             .runBy(Runners.poolRunner())
                                                             .maxRunning(1)
                                                             .maxRetained(0)
@@ -276,7 +278,7 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            new ClassRoutineBuilder(TestStatic.class).maxInputSize(0);
+            new ClassRoutineBuilder(TestStatic.class).inputMaxSize(0);
 
             fail();
 
@@ -316,7 +318,7 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            new ClassRoutineBuilder(TestStatic.class).maxOutputSize(0);
+            new ClassRoutineBuilder(TestStatic.class).outputMaxSize(0);
 
             fail();
 
@@ -379,7 +381,7 @@ public class JavaRoutineTest extends TestCase {
 
         final NullLog nullLog = new NullLog();
         final Routine<Object, Object> routine1 = JavaRoutine.on(TestStatic.class)
-                                                            .sequential()
+                                                            .syncRunner(SyncRunnerType.SEQUENTIAL)
                                                             .runBy(Runners.sharedRunner())
                                                             .logLevel(LogLevel.DEBUG)
                                                             .loggedWith(nullLog)
@@ -388,7 +390,7 @@ public class JavaRoutineTest extends TestCase {
         assertThat(routine1.call()).containsExactly(-77L);
 
         final Routine<Object, Object> routine2 = JavaRoutine.on(TestStatic.class)
-                                                            .sequential()
+                                                            .syncRunner(SyncRunnerType.SEQUENTIAL)
                                                             .runBy(Runners.sharedRunner())
                                                             .logLevel(LogLevel.DEBUG)
                                                             .loggedWith(nullLog)
@@ -398,7 +400,7 @@ public class JavaRoutineTest extends TestCase {
         assertThat(routine1).isEqualTo(routine2);
 
         final Routine<Object, Object> routine3 = JavaRoutine.on(TestStatic.class)
-                                                            .queued()
+                                                            .syncRunner(SyncRunnerType.QUEUED)
                                                             .runBy(Runners.sharedRunner())
                                                             .logLevel(LogLevel.DEBUG)
                                                             .loggedWith(nullLog)
@@ -409,7 +411,7 @@ public class JavaRoutineTest extends TestCase {
         assertThat(routine2).isNotEqualTo(routine3);
 
         final Routine<Object, Object> routine4 = JavaRoutine.on(TestStatic.class)
-                                                            .queued()
+                                                            .syncRunner(SyncRunnerType.QUEUED)
                                                             .runBy(Runners.sharedRunner())
                                                             .logLevel(LogLevel.WARNING)
                                                             .loggedWith(nullLog)
@@ -419,7 +421,7 @@ public class JavaRoutineTest extends TestCase {
         assertThat(routine3).isNotEqualTo(routine4);
 
         final Routine<Object, Object> routine5 = JavaRoutine.on(TestStatic.class)
-                                                            .queued()
+                                                            .syncRunner(SyncRunnerType.QUEUED)
                                                             .runBy(Runners.sharedRunner())
                                                             .logLevel(LogLevel.WARNING)
                                                             .loggedWith(new NullLog())
@@ -432,39 +434,41 @@ public class JavaRoutineTest extends TestCase {
     public void testObjectRoutineBuilder() throws NoSuchMethodException {
 
         final Routine<Object, Object> routine = JavaRoutine.on(new Test())
-                                                           .sequential()
+                                                           .syncRunner(SyncRunnerType.SEQUENTIAL)
                                                            .runBy(Runners.poolRunner())
                                                            .maxRunning(1)
                                                            .maxRetained(1)
                                                            .availableTimeout(1, TimeUnit.SECONDS)
-                                                           .maxInputSize(2)
+                                                           .inputMaxSize(2)
                                                            .inputTimeout(1, TimeUnit.SECONDS)
-                                                           .orderedInput()
-                                                           .maxOutputSize(2)
+                                                           .inputOrder(ChannelDataOrder.INSERTION)
+                                                           .outputMaxSize(2)
                                                            .outputTimeout(1, TimeUnit.SECONDS)
-                                                           .orderedOutput()
+                                                           .outputOrder(ChannelDataOrder.INSERTION)
                                                            .logLevel(LogLevel.DEBUG)
                                                            .loggedWith(new NullLog())
                                                            .asyncMethod(Test.GET);
 
         assertThat(routine.call()).containsExactly(-77L);
 
-        final Routine<Object, Object> routine1 =
-                JavaRoutine.on(new Test()).queued().runBy(Runners.poolRunner()).method("getLong");
+        final Routine<Object, Object> routine1 = JavaRoutine.on(new Test())
+                                                            .syncRunner(SyncRunnerType.QUEUED)
+                                                            .runBy(Runners.poolRunner())
+                                                            .method("getLong");
 
         assertThat(routine1.call()).containsExactly(-77L);
 
         final Routine<Object, Object> routine2 = JavaRoutine.on(new Test())
-                                                            .queued()
+                                                            .syncRunner(SyncRunnerType.QUEUED)
                                                             .runBy(Runners.poolRunner())
                                                             .maxRunning(1)
                                                             .availableTimeout(TimeDuration.ZERO)
-                                                            .maxInputSize(2)
+                                                            .inputMaxSize(2)
                                                             .inputTimeout(TimeDuration.ZERO)
-                                                            .orderedInput()
-                                                            .maxOutputSize(2)
+                                                            .inputOrder(ChannelDataOrder.INSERTION)
+                                                            .outputMaxSize(2)
                                                             .outputTimeout(TimeDuration.ZERO)
-                                                            .orderedOutput()
+                                                            .outputOrder(ChannelDataOrder.INSERTION)
                                                             .lockId("test")
                                                             .method(Test.class.getMethod(
                                                                     "getLong"));
@@ -613,7 +617,7 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            new ObjectRoutineBuilder(test).maxInputSize(0);
+            new ObjectRoutineBuilder(test).inputMaxSize(0);
 
             fail();
 
@@ -653,7 +657,7 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            new ObjectRoutineBuilder(test).maxOutputSize(0);
+            new ObjectRoutineBuilder(test).outputMaxSize(0);
 
             fail();
 
@@ -787,7 +791,7 @@ public class JavaRoutineTest extends TestCase {
         final Test test = new Test();
         final NullLog nullLog = new NullLog();
         final Routine<Object, Object> routine1 = JavaRoutine.on(test)
-                                                            .sequential()
+                                                            .syncRunner(SyncRunnerType.SEQUENTIAL)
                                                             .runBy(Runners.sharedRunner())
                                                             .logLevel(LogLevel.DEBUG)
                                                             .loggedWith(nullLog)
@@ -796,7 +800,7 @@ public class JavaRoutineTest extends TestCase {
         assertThat(routine1.call()).containsExactly(-77L);
 
         final Routine<Object, Object> routine2 = JavaRoutine.on(test)
-                                                            .sequential()
+                                                            .syncRunner(SyncRunnerType.SEQUENTIAL)
                                                             .runBy(Runners.sharedRunner())
                                                             .logLevel(LogLevel.DEBUG)
                                                             .loggedWith(nullLog)
@@ -806,7 +810,7 @@ public class JavaRoutineTest extends TestCase {
         assertThat(routine1).isEqualTo(routine2);
 
         final Routine<Object, Object> routine3 = JavaRoutine.on(test)
-                                                            .queued()
+                                                            .syncRunner(SyncRunnerType.QUEUED)
                                                             .runBy(Runners.sharedRunner())
                                                             .logLevel(LogLevel.DEBUG)
                                                             .loggedWith(nullLog)
@@ -817,7 +821,7 @@ public class JavaRoutineTest extends TestCase {
         assertThat(routine2).isNotEqualTo(routine3);
 
         final Routine<Object, Object> routine4 = JavaRoutine.on(test)
-                                                            .queued()
+                                                            .syncRunner(SyncRunnerType.QUEUED)
                                                             .runBy(Runners.sharedRunner())
                                                             .logLevel(LogLevel.WARNING)
                                                             .loggedWith(nullLog)
@@ -827,7 +831,7 @@ public class JavaRoutineTest extends TestCase {
         assertThat(routine3).isNotEqualTo(routine4);
 
         final Routine<Object, Object> routine5 = JavaRoutine.on(test)
-                                                            .queued()
+                                                            .syncRunner(SyncRunnerType.QUEUED)
                                                             .runBy(Runners.sharedRunner())
                                                             .logLevel(LogLevel.WARNING)
                                                             .loggedWith(new NullLog())
@@ -859,32 +863,32 @@ public class JavaRoutineTest extends TestCase {
 
         final Routine<String, String> routine =
                 JavaRoutine.on(ClassToken.tokenOf(PassThroughInvocation.class))
-                           .sequential()
+                           .syncRunner(SyncRunnerType.SEQUENTIAL)
                            .runBy(Runners.poolRunner())
                            .maxRetained(0)
                            .maxRunning(1)
                            .availableTimeout(1, TimeUnit.SECONDS)
-                           .maxInputSize(2)
+                           .inputMaxSize(2)
                            .inputTimeout(1, TimeUnit.SECONDS)
-                           .maxOutputSize(2)
+                           .outputMaxSize(2)
                            .outputTimeout(1, TimeUnit.SECONDS)
-                           .orderedOutput()
+                           .outputOrder(ChannelDataOrder.INSERTION)
                            .buildRoutine();
 
         assertThat(routine.call("test1", "test2")).containsExactly("test1", "test2");
 
         final Routine<String, String> routine1 =
                 JavaRoutine.on(ClassToken.tokenOf(PassThroughInvocation.class))
-                           .queued()
+                           .syncRunner(SyncRunnerType.QUEUED)
                            .runBy(Runners.poolRunner())
                            .maxRetained(0)
                            .maxRunning(1)
                            .availableTimeout(TimeDuration.ZERO)
-                           .maxInputSize(2)
+                           .inputMaxSize(2)
                            .inputTimeout(TimeDuration.ZERO)
-                           .maxOutputSize(2)
+                           .outputMaxSize(2)
                            .outputTimeout(TimeDuration.ZERO)
-                           .orderedOutput()
+                           .outputOrder(ChannelDataOrder.INSERTION)
                            .buildRoutine();
 
         assertThat(routine1.call("test1", "test2")).containsExactly("test1", "test2");
@@ -1087,8 +1091,9 @@ public class JavaRoutineTest extends TestCase {
             return -77;
         }
 
-        @Async(value = THROW, log = NullLog.class, logLevel = LogLevel.DEBUG, sequential = false,
-               runner = MyRunner.class)
+        @Async(value = THROW, log = NullLog.class, logLevel = LogLevel.DEBUG,
+               runnerType = SyncRunnerType.QUEUED,
+               runnerClass = MyRunner.class)
         public void throwException(final RuntimeException ex) {
 
             throw ex;
@@ -1126,8 +1131,9 @@ public class JavaRoutineTest extends TestCase {
             return -77;
         }
 
-        @Async(value = THROW, log = NullLog.class, logLevel = LogLevel.DEBUG, sequential = false,
-               runner = MyRunner.class)
+        @Async(value = THROW, log = NullLog.class, logLevel = LogLevel.DEBUG,
+               runnerType = SyncRunnerType.QUEUED,
+               runnerClass = MyRunner.class)
         public static void throwException(final RuntimeException ex) {
 
             throw ex;

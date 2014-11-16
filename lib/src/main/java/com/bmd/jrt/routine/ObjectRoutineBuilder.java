@@ -160,18 +160,18 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
     @Nonnull
     @Override
-    public ObjectRoutineBuilder delayedInput() {
+    public ObjectRoutineBuilder inputMaxSize(final int inputMaxSize) {
 
-        super.delayedInput();
+        super.inputMaxSize(inputMaxSize);
 
         return this;
     }
 
     @Nonnull
     @Override
-    public ObjectRoutineBuilder delayedOutput() {
+    public ObjectRoutineBuilder inputOrder(@Nonnull final ChannelDataOrder order) {
 
-        super.delayedOutput();
+        super.inputOrder(order);
 
         return this;
     }
@@ -214,24 +214,6 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
     @Nonnull
     @Override
-    public ObjectRoutineBuilder maxInputSize(final int maxInputSize) {
-
-        super.maxInputSize(maxInputSize);
-
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ObjectRoutineBuilder maxOutputSize(final int maxOutputSize) {
-
-        super.maxOutputSize(maxOutputSize);
-
-        return this;
-    }
-
-    @Nonnull
-    @Override
     public ObjectRoutineBuilder maxRetained(final int maxRetainedInstances) {
 
         super.maxRetained(maxRetainedInstances);
@@ -250,18 +232,18 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
     @Nonnull
     @Override
-    public ObjectRoutineBuilder orderedInput() {
+    public ObjectRoutineBuilder outputMaxSize(final int outputMaxSize) {
 
-        super.orderedInput();
+        super.outputMaxSize(outputMaxSize);
 
         return this;
     }
 
     @Nonnull
     @Override
-    public ObjectRoutineBuilder orderedOutput() {
+    public ObjectRoutineBuilder outputOrder(final ChannelDataOrder order) {
 
-        super.orderedOutput();
+        super.outputOrder(order);
 
         return this;
     }
@@ -287,15 +269,6 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
     @Nonnull
     @Override
-    public ObjectRoutineBuilder queued() {
-
-        super.queued();
-
-        return this;
-    }
-
-    @Nonnull
-    @Override
     public ObjectRoutineBuilder runBy(@Nonnull final Runner runner) {
 
         super.runBy(runner);
@@ -305,9 +278,9 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
     @Nonnull
     @Override
-    public ObjectRoutineBuilder sequential() {
+    public ObjectRoutineBuilder syncRunner(@Nonnull final SyncRunnerType type) {
 
-        super.sequential();
+        super.syncRunner(type);
 
         return this;
     }
@@ -501,8 +474,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
             if (isOverrideParameters) {
 
-                configuration = new RoutineConfigurationBuilder(configuration).orderedInput()
-                                                                              .buildConfiguration();
+                configuration = new RoutineConfigurationBuilder(configuration).inputOrder(
+                        ChannelDataOrder.INSERTION).buildConfiguration();
             }
 
             final Routine<Object, Object> routine = getRoutine(configuration, targetMethod, lockId);

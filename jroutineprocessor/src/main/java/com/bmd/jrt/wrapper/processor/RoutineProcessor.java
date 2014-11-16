@@ -17,6 +17,7 @@ import com.bmd.jrt.annotation.Async;
 import com.bmd.jrt.annotation.AsyncOverride;
 import com.bmd.jrt.annotation.DefaultLog;
 import com.bmd.jrt.annotation.DefaultRunner;
+import com.bmd.jrt.builder.RoutineBuilder.SyncRunnerType;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.wrapper.annotation.WrapAsync;
 
@@ -258,16 +259,16 @@ public class RoutineProcessor extends AbstractProcessor {
         final TypeElement annotationElement = getTypeFromName(Async.class.getName());
         final TypeMirror annotationType = annotationElement.asType();
 
-        Boolean isSequential = null;
+        SyncRunnerType runnerType = null;
         int maxRunning = Async.DEFAULT_NUMBER;
         int maxRetained = Async.DEFAULT_NUMBER;
         LogLevel logLevel = null;
         TypeElement logType = null;
-        TypeElement runnerType = null;
+        TypeElement runnerElement = null;
 
         if (annotation != null) {
 
-            isSequential = annotation.sequential();
+            runnerType = annotation.runnerType();
             maxRunning = annotation.maxRunning();
             maxRetained = annotation.maxRetained();
             logLevel = annotation.logLevel();
@@ -279,20 +280,21 @@ public class RoutineProcessor extends AbstractProcessor {
                 logType = getTypeFromName(log.toString());
             }
 
-            final Object runner = getElementValue(methodElement, annotationType, "runner");
+            final Object runner = getElementValue(methodElement, annotationType, "runnerClass");
 
             if (runner != null) {
 
-                runnerType = getTypeFromName(runner.toString());
+                runnerElement = getTypeFromName(runner.toString());
             }
         }
 
         if (targetAnnotation != null) {
 
-            if (isSequential == null) {
-
-                isSequential = targetAnnotation.sequential();
-            }
+            //TODO
+            //            if (runnerType == null) {
+            //
+            //                runnerType = targetAnnotation.sequential();
+            //            }
 
             if (maxRunning == Async.DEFAULT_NUMBER) {
 
@@ -319,31 +321,26 @@ public class RoutineProcessor extends AbstractProcessor {
                 }
             }
 
-            if ((runnerType == null) || runnerType.equals(
+            if ((runnerElement == null) || runnerElement.equals(
                     getTypeFromName(DefaultRunner.class.getName()))) {
 
                 final Object runner =
-                        getElementValue(targetMethodElement, annotationType, "runner");
+                        getElementValue(targetMethodElement, annotationType, "runnerClass");
 
                 if (runner != null) {
 
-                    runnerType = getTypeFromName(runner.toString());
+                    runnerElement = getTypeFromName(runner.toString());
                 }
             }
         }
 
         final StringBuilder builder = new StringBuilder();
 
-        if (isSequential != null) {
+        if (runnerType != null) {
 
-            if (isSequential) {
-
-                builder.append(".sequential()");
-
-            } else {
-
-                builder.append(".queued()");
-            }
+            builder.append(".syncRunner(com.bmd.jrt.builder.RoutineBuilder.SyncRunnerType.")
+                   .append(runnerType)
+                   .append(")");
         }
 
         if (maxRunning != Async.DEFAULT_NUMBER) {
@@ -370,10 +367,10 @@ public class RoutineProcessor extends AbstractProcessor {
             builder.append(".loggedWith(new ").append(logType).append("())");
         }
 
-        if ((runnerType != null) && !runnerType.equals(
+        if ((runnerElement != null) && !runnerElement.equals(
                 getTypeFromName(DefaultRunner.class.getName()))) {
 
-            builder.append(".runBy(new ").append(runnerType).append("())");
+            builder.append(".runBy(new ").append(runnerElement).append("())");
         }
 
         final TypeElement overrideAnnotationElement =
@@ -385,7 +382,8 @@ public class RoutineProcessor extends AbstractProcessor {
 
         if ((values != null) && !values.isEmpty()) {
 
-            builder.append(".orderedInput()");
+            builder.append(
+                    ".inputOrder(com.bmd.jrt.builder.RoutineBuilder.ChannelDataOrder.INSERTION)");
         }
 
         return builder.toString();

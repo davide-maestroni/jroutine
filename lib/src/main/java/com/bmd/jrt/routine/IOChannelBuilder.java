@@ -13,18 +13,19 @@
  */
 package com.bmd.jrt.routine;
 
+import com.bmd.jrt.builder.RoutineBuilder.ChannelDataOrder;
 import com.bmd.jrt.builder.RoutineConfigurationBuilder;
 import com.bmd.jrt.channel.IOChannel;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.log.Logger;
+import com.bmd.jrt.runner.Runner;
+import com.bmd.jrt.runner.Runners;
 import com.bmd.jrt.time.TimeDuration;
 
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
-
-import static com.bmd.jrt.time.TimeDuration.ZERO;
 
 /**
  * Class implementing a builder of I/O channel objects.
@@ -40,9 +41,10 @@ public class IOChannelBuilder {
      */
     IOChannelBuilder() {
 
-        mBuilder = new RoutineConfigurationBuilder().maxOutputSize(Integer.MAX_VALUE)
-                                                    .outputTimeout(ZERO)
-                                                    .delayedOutput()
+        mBuilder = new RoutineConfigurationBuilder().runBy(Runners.sharedRunner())
+                                                    .outputMaxSize(Integer.MAX_VALUE)
+                                                    .outputTimeout(TimeDuration.ZERO)
+                                                    .outputOrder(ChannelDataOrder.DELIVERY)
                                                     .loggedWith(Logger.getDefaultLog())
                                                     .logLevel(Logger.getDefaultLogLevel());
     }
@@ -91,6 +93,36 @@ public class IOChannelBuilder {
     }
 
     /**
+     * Sets the order in which data are collected from the channel.
+     *
+     * @param order the order type.
+     * @return this builder.
+     * @throws NullPointerException if the specified order type is null.
+     */
+    @Nonnull
+    public IOChannelBuilder dataOrder(@Nonnull ChannelDataOrder order) {
+
+        mBuilder.outputOrder(order);
+
+        return this;
+    }
+
+    /**
+     * Sets the runner instance used to schedule delayed inputs.
+     *
+     * @param runner the runner instance.
+     * @return this builder.
+     * @throws NullPointerException if the specified runner is null.
+     */
+    @Nonnull
+    public IOChannelBuilder delayRunner(@Nonnull final Runner runner) {
+
+        mBuilder.runBy(runner);
+
+        return this;
+    }
+
+    /**
      * Sets the log level.
      *
      * @param level the log level.
@@ -130,21 +162,7 @@ public class IOChannelBuilder {
     @Nonnull
     public IOChannelBuilder maxSize(final int maxBufferSize) {
 
-        mBuilder.maxOutputSize(maxBufferSize);
-
-        return this;
-    }
-
-    /**
-     * Forces the inputs to be ordered as they are passed to the input channel,
-     * independently from the source or the input delay.
-     *
-     * @return this builder.
-     */
-    @Nonnull
-    public IOChannelBuilder orderedInput() {
-
-        mBuilder.orderedOutput();
+        mBuilder.outputMaxSize(maxBufferSize);
 
         return this;
     }

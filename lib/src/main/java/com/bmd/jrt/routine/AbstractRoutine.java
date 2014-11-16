@@ -75,7 +75,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends BasicRoutine<INPUT,
      * @throws IllegalArgumentException if at least one of the parameter is invalid.
      */
     @SuppressWarnings("ConstantConditions")
-    protected AbstractRoutine(@Nonnull RoutineConfiguration configuration,
+    protected AbstractRoutine(@Nonnull final RoutineConfiguration configuration,
             @Nonnull final Runner syncRunner) {
 
         if (syncRunner == null) {
@@ -83,7 +83,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends BasicRoutine<INPUT,
             throw new NullPointerException("the synchronous runner instance must not be null");
         }
 
-        if (configuration.getMaxInputSize(-1) < 1) {
+        if (configuration.getInputMaxSize(-1) < 1) {
 
             throw new IllegalArgumentException("the maximum input size must be a positive number");
         }
@@ -94,7 +94,12 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends BasicRoutine<INPUT,
                     "the timeout for available input buffer must not be null");
         }
 
-        if (configuration.getMaxOutputSize(-1) < 1) {
+        if (configuration.getInputOrder(null) == null) {
+
+            throw new NullPointerException("the input order type must not be null");
+        }
+
+        if (configuration.getOutputMaxSize(-1) < 1) {
 
             throw new IllegalArgumentException("the maximum output size must be a positive number");
         }
@@ -103,6 +108,11 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends BasicRoutine<INPUT,
 
             throw new NullPointerException(
                     "the timeout for available output buffer must not be null");
+        }
+
+        if (configuration.getOutputOrder(null) == null) {
+
+            throw new NullPointerException("the output order type must not be null");
         }
 
         mConfiguration = configuration;
@@ -144,7 +154,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends BasicRoutine<INPUT,
      * @param syncRunner    the runner used for synchronous invocation.
      * @param logger        the logger instance.
      */
-    private AbstractRoutine(@Nonnull RoutineConfiguration configuration,
+    private AbstractRoutine(@Nonnull final RoutineConfiguration configuration,
             @Nonnull final Runner syncRunner, @Nonnull final Logger logger) {
 
         mConfiguration = configuration;

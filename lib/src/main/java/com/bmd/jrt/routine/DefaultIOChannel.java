@@ -31,8 +31,6 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static com.bmd.jrt.runner.Runners.sharedRunner;
-
 /**
  * Default implementation of an input/output channel.
  * <p/>
@@ -63,7 +61,8 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
 
         final ChannelAbortHandler abortHandler = new ChannelAbortHandler();
         final DefaultResultChannel<TYPE> inputChannel =
-                new DefaultResultChannel<TYPE>(configuration, abortHandler, sharedRunner(),
+                new DefaultResultChannel<TYPE>(configuration, abortHandler,
+                                               configuration.getRunner(null),
                                                Logger.create(configuration.getLog(null),
                                                              configuration.getLogLevel(null),
                                                              IOChannel.class));

@@ -169,18 +169,18 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
     @Nonnull
     @Override
-    public RoutineBuilder delayedInput() {
+    public ClassRoutineBuilder inputMaxSize(final int inputMaxSize) {
 
-        mBuilder.delayedInput();
+        mBuilder.inputMaxSize(inputMaxSize);
 
         return this;
     }
 
     @Nonnull
     @Override
-    public RoutineBuilder delayedOutput() {
+    public ClassRoutineBuilder inputOrder(@Nonnull final ChannelDataOrder order) {
 
-        mBuilder.delayedOutput();
+        mBuilder.inputOrder(order);
 
         return this;
     }
@@ -223,24 +223,6 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
     @Nonnull
     @Override
-    public ClassRoutineBuilder maxInputSize(final int maxInputSize) {
-
-        mBuilder.maxInputSize(maxInputSize);
-
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ClassRoutineBuilder maxOutputSize(final int maxOutputSize) {
-
-        mBuilder.maxOutputSize(maxOutputSize);
-
-        return this;
-    }
-
-    @Nonnull
-    @Override
     public ClassRoutineBuilder maxRetained(final int maxRetainedInstances) {
 
         mBuilder.maxRetained(maxRetainedInstances);
@@ -259,18 +241,18 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
     @Nonnull
     @Override
-    public ClassRoutineBuilder orderedInput() {
+    public ClassRoutineBuilder outputMaxSize(final int outputMaxSize) {
 
-        mBuilder.orderedInput();
+        mBuilder.outputMaxSize(outputMaxSize);
 
         return this;
     }
 
     @Nonnull
     @Override
-    public ClassRoutineBuilder orderedOutput() {
+    public ClassRoutineBuilder outputOrder(final ChannelDataOrder order) {
 
-        mBuilder.orderedOutput();
+        mBuilder.outputOrder(order);
 
         return this;
     }
@@ -295,15 +277,6 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
     @Nonnull
     @Override
-    public ClassRoutineBuilder queued() {
-
-        mBuilder.queued();
-
-        return this;
-    }
-
-    @Nonnull
-    @Override
     public ClassRoutineBuilder runBy(@Nonnull final Runner runner) {
 
         mBuilder.runBy(runner);
@@ -313,9 +286,9 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
     @Nonnull
     @Override
-    public ClassRoutineBuilder sequential() {
+    public ClassRoutineBuilder syncRunner(@Nonnull final SyncRunnerType type) {
 
-        mBuilder.sequential();
+        mBuilder.syncRunner(type);
 
         return this;
     }
@@ -514,8 +487,8 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
             final Class<?> targetClass = mTargetClass;
             final Runner syncRunner =
-                    finalConfiguration.getIsSequential(null) ? Runners.sequentialRunner()
-                            : Runners.queuedRunner();
+                    (finalConfiguration.getSyncRunner(null) == SyncRunnerType.SEQUENTIAL)
+                            ? Runners.sequentialRunner() : Runners.queuedRunner();
 
             routine = new DefaultRoutine<Object, Object>(finalConfiguration, syncRunner,
                                                          MethodSimpleInvocation.class, target,
@@ -541,7 +514,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
         if (configuration.getRunner(null) == null) {
 
-            final Class<? extends Runner> runnerClass = annotation.runner();
+            final Class<? extends Runner> runnerClass = annotation.runnerClass();
 
             if (runnerClass != DefaultRunner.class) {
 
@@ -560,16 +533,11 @@ public class ClassRoutineBuilder implements RoutineBuilder {
             }
         }
 
-        if (configuration.getIsSequential(null) == null) {
+        final SyncRunnerType runnerType = annotation.runnerType();
 
-            if (annotation.sequential()) {
+        if (runnerType != SyncRunnerType.DEFAULT) {
 
-                builder.sequential();
-
-            } else {
-
-                builder.queued();
-            }
+            builder.syncRunner(configuration.getSyncRunner(runnerType));
         }
 
         final int maxRunning = annotation.maxRunning();
@@ -598,7 +566,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
         if (maxInput != Async.DEFAULT_NUMBER) {
 
-            builder.maxInputSize(configuration.getMaxInputSize(maxInput));
+            builder.inputMaxSize(configuration.getInputMaxSize(maxInput));
         }
 
         final long inputTimeout = annotation.inputTimeout();
@@ -609,23 +577,18 @@ public class ClassRoutineBuilder implements RoutineBuilder {
                     fromUnit(inputTimeout, annotation.inputTimeUnit())));
         }
 
-        if (configuration.getOrderedInput(null) == null) {
+        final ChannelDataOrder inputOrder = annotation.inputOrder();
 
-            if (annotation.orderedInput()) {
+        if (inputOrder != ChannelDataOrder.DEFAULT) {
 
-                builder.orderedInput();
-
-            } else {
-
-                builder.delayedInput();
-            }
+            builder.inputOrder(configuration.getInputOrder(inputOrder));
         }
 
         final int maxOutput = annotation.maxOutput();
 
         if (maxOutput != Async.DEFAULT_NUMBER) {
 
-            builder.maxOutputSize(configuration.getMaxOutputSize(maxOutput));
+            builder.outputMaxSize(configuration.getOutputMaxSize(maxOutput));
         }
 
         final long outputTimeout = annotation.outputTimeout();
@@ -636,16 +599,11 @@ public class ClassRoutineBuilder implements RoutineBuilder {
                     fromUnit(outputTimeout, annotation.outputTimeUnit())));
         }
 
-        if (configuration.getOrderedOutput(null) == null) {
+        final ChannelDataOrder outputOrder = annotation.outputOrder();
 
-            if (annotation.orderedOutput()) {
+        if (outputOrder != ChannelDataOrder.DEFAULT) {
 
-                builder.orderedOutput();
-
-            } else {
-
-                builder.delayedOutput();
-            }
+            builder.outputOrder(configuration.getOutputOrder(outputOrder));
         }
 
         if (configuration.getLog(null) == null) {
@@ -669,9 +627,11 @@ public class ClassRoutineBuilder implements RoutineBuilder {
             }
         }
 
-        if (configuration.getLogLevel(null) == null) {
+        final LogLevel logLevel = annotation.logLevel();
 
-            builder.logLevel(annotation.logLevel());
+        if (logLevel != LogLevel.DEFAULT) {
+
+            builder.logLevel(configuration.getLogLevel(logLevel));
         }
 
         return builder.buildConfiguration();

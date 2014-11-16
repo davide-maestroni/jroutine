@@ -13,6 +13,7 @@
  */
 package com.bmd.jrt.routine;
 
+import com.bmd.jrt.builder.RoutineBuilder.ChannelDataOrder;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.OutputConsumer;
@@ -98,7 +99,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
         mLogger = logger.subContextLogger(this);
         mRunner = runner;
-        mMaxInput = configuration.getMaxInputSize(-1);
+        mMaxInput = configuration.getInputMaxSize(-1);
         mInputTimeout = configuration.getInputTimeout(null);
 
         if (mInputTimeout == null) {
@@ -113,8 +114,8 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
             throw new IllegalArgumentException("the input buffer size cannot be 0 or negative");
         }
 
-        mInputQueue = configuration.getOrderedInput(null) ? new OrderedNestedQueue<INPUT>()
-                : new SimpleNestedQueue<INPUT>();
+        mInputQueue = (configuration.getInputOrder(null) == ChannelDataOrder.INSERTION)
+                ? new OrderedNestedQueue<INPUT>() : new SimpleNestedQueue<INPUT>();
         mHasInputs = new Check() {
 
             @Override

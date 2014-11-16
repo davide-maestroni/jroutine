@@ -31,31 +31,31 @@ import static com.bmd.jrt.time.TimeDuration.fromUnit;
  */
 public class RoutineConfigurationBuilder implements RoutineBuilder {
 
-    private TimeDuration mAvailTimeout;
+    private TimeDuration mAvailTimeout = null;
 
-    private TimeDuration mInputTimeout;
+    private int mInputMaxSize = RoutineConfiguration.NOT_SET;
 
-    private Boolean mIsSequential;
+    private ChannelDataOrder mInputOrder = null;
 
-    private Log mLog;
+    private TimeDuration mInputTimeout = null;
 
-    private LogLevel mLogLevel;
+    private Log mLog = null;
 
-    private int mMaxInputSize = RoutineConfiguration.NOT_SET;
-
-    private int mMaxOutputSize = RoutineConfiguration.NOT_SET;
+    private LogLevel mLogLevel = null;
 
     private int mMaxRetained = RoutineConfiguration.NOT_SET;
 
     private int mMaxRunning = RoutineConfiguration.NOT_SET;
 
-    private Boolean mOrderedInput;
+    private int mOutputMaxSize = RoutineConfiguration.NOT_SET;
 
-    private Boolean mOrderedOutput;
+    private ChannelDataOrder mOutputOrder = null;
 
-    private TimeDuration mOutputTimeout;
+    private TimeDuration mOutputTimeout = null;
 
-    private Runner mRunner;
+    private Runner mRunner = null;
+
+    private SyncRunnerType mRunnerType = null;
 
     /**
      * Constructor.
@@ -73,16 +73,16 @@ public class RoutineConfigurationBuilder implements RoutineBuilder {
     public RoutineConfigurationBuilder(final RoutineConfiguration initialConfiguration) {
 
         mRunner = initialConfiguration.getRunner(mRunner);
-        mIsSequential = initialConfiguration.getIsSequential(mIsSequential);
+        mRunnerType = initialConfiguration.getSyncRunner(mRunnerType);
         mMaxRunning = initialConfiguration.getMaxRunning(mMaxRunning);
         mMaxRetained = initialConfiguration.getMaxRetained(mMaxRetained);
         mAvailTimeout = initialConfiguration.getAvailTimeout(mAvailTimeout);
-        mMaxInputSize = initialConfiguration.getMaxInputSize(mMaxInputSize);
+        mInputMaxSize = initialConfiguration.getInputMaxSize(mInputMaxSize);
         mInputTimeout = initialConfiguration.getInputTimeout(mInputTimeout);
-        mOrderedInput = initialConfiguration.getOrderedInput(mOrderedInput);
-        mMaxOutputSize = initialConfiguration.getMaxOutputSize(mMaxOutputSize);
+        mInputOrder = initialConfiguration.getInputOrder(mInputOrder);
+        mOutputMaxSize = initialConfiguration.getOutputMaxSize(mOutputMaxSize);
         mOutputTimeout = initialConfiguration.getOutputTimeout(mOutputTimeout);
-        mOrderedOutput = initialConfiguration.getOrderedOutput(mOrderedOutput);
+        mOutputOrder = initialConfiguration.getOutputOrder(mOutputOrder);
         mLog = initialConfiguration.getLog(mLog);
         mLogLevel = initialConfiguration.getLogLevel(mLogLevel);
     }
@@ -112,18 +112,29 @@ public class RoutineConfigurationBuilder implements RoutineBuilder {
 
     @Nonnull
     @Override
-    public RoutineConfigurationBuilder delayedInput() {
+    public RoutineConfigurationBuilder inputMaxSize(final int inputMaxSize) {
 
-        mOrderedInput = false;
+        if (inputMaxSize <= 0) {
+
+            throw new IllegalArgumentException("the buffer size cannot be 0 or negative");
+        }
+
+        mInputMaxSize = inputMaxSize;
 
         return this;
     }
 
     @Nonnull
     @Override
-    public RoutineConfigurationBuilder delayedOutput() {
+    @SuppressWarnings("ConstantConditions")
+    public RoutineConfigurationBuilder inputOrder(@Nonnull final ChannelDataOrder order) {
 
-        mOrderedOutput = false;
+        if (order == null) {
+
+            throw new NullPointerException("the input order type must not be null");
+        }
+
+        mInputOrder = order;
 
         return this;
     }
@@ -183,34 +194,6 @@ public class RoutineConfigurationBuilder implements RoutineBuilder {
 
     @Nonnull
     @Override
-    public RoutineConfigurationBuilder maxInputSize(final int maxInputSize) {
-
-        if (maxInputSize <= 0) {
-
-            throw new IllegalArgumentException("the buffer size cannot be 0 or negative");
-        }
-
-        mMaxInputSize = maxInputSize;
-
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public RoutineConfigurationBuilder maxOutputSize(final int maxOutputSize) {
-
-        if (maxOutputSize <= 0) {
-
-            throw new IllegalArgumentException("the buffer size cannot be 0 or negative");
-        }
-
-        mMaxOutputSize = maxOutputSize;
-
-        return this;
-    }
-
-    @Nonnull
-    @Override
     public RoutineConfigurationBuilder maxRetained(final int maxRetainedInstances) {
 
         if (maxRetainedInstances < 0) {
@@ -241,18 +224,29 @@ public class RoutineConfigurationBuilder implements RoutineBuilder {
 
     @Nonnull
     @Override
-    public RoutineConfigurationBuilder orderedInput() {
+    public RoutineConfigurationBuilder outputMaxSize(final int outputMaxSize) {
 
-        mOrderedInput = true;
+        if (outputMaxSize <= 0) {
+
+            throw new IllegalArgumentException("the buffer size cannot be 0 or negative");
+        }
+
+        mOutputMaxSize = outputMaxSize;
 
         return this;
     }
 
     @Nonnull
     @Override
-    public RoutineConfigurationBuilder orderedOutput() {
+    @SuppressWarnings("ConstantConditions")
+    public RoutineConfigurationBuilder outputOrder(@Nonnull final ChannelDataOrder order) {
 
-        mOrderedOutput = true;
+        if (order == null) {
+
+            throw new NullPointerException("the output order type must not be null");
+        }
+
+        mOutputOrder = order;
 
         return this;
     }
@@ -282,15 +276,6 @@ public class RoutineConfigurationBuilder implements RoutineBuilder {
 
     @Nonnull
     @Override
-    public RoutineConfigurationBuilder queued() {
-
-        mIsSequential = false;
-
-        return this;
-    }
-
-    @Nonnull
-    @Override
     @SuppressWarnings("ConstantConditions")
     public RoutineConfigurationBuilder runBy(@Nonnull final Runner runner) {
 
@@ -306,9 +291,15 @@ public class RoutineConfigurationBuilder implements RoutineBuilder {
 
     @Nonnull
     @Override
-    public RoutineConfigurationBuilder sequential() {
+    @SuppressWarnings("ConstantConditions")
+    public RoutineConfigurationBuilder syncRunner(@Nonnull final SyncRunnerType type) {
 
-        mIsSequential = true;
+        if (type == null) {
+
+            throw new NullPointerException("the synchronous runner type must not be null");
+        }
+
+        mRunnerType = type;
 
         return this;
     }
@@ -321,9 +312,9 @@ public class RoutineConfigurationBuilder implements RoutineBuilder {
     @Nonnull
     public RoutineConfiguration buildConfiguration() {
 
-        return new RoutineConfiguration(mRunner, mIsSequential, mMaxRunning, mMaxRetained,
-                                        mAvailTimeout, mMaxInputSize, mInputTimeout, mOrderedInput,
-                                        mMaxOutputSize, mOutputTimeout, mOrderedOutput, mLog,
+        return new RoutineConfiguration(mRunner, mRunnerType, mMaxRunning, mMaxRetained,
+                                        mAvailTimeout, mInputMaxSize, mInputTimeout, mInputOrder,
+                                        mOutputMaxSize, mOutputTimeout, mOutputOrder, mLog,
                                         mLogLevel);
     }
 }

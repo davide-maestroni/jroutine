@@ -38,17 +38,17 @@ class DefaultConfigurationBuilder extends RoutineConfigurationBuilder {
      */
     DefaultConfigurationBuilder() {
 
-        queued();
+        syncRunner(SyncRunnerType.QUEUED);
         runBy(Runners.poolRunner());
         availableTimeout(seconds(5));
         maxRunning(Integer.MAX_VALUE);
         maxRetained(10);
-        maxInputSize(Integer.MAX_VALUE);
+        inputMaxSize(Integer.MAX_VALUE);
         inputTimeout(ZERO);
-        delayedInput();
-        maxOutputSize(Integer.MAX_VALUE);
+        inputOrder(ChannelDataOrder.DELIVERY);
+        outputMaxSize(Integer.MAX_VALUE);
         outputTimeout(ZERO);
-        delayedOutput();
+        outputOrder(ChannelDataOrder.DELIVERY);
         loggedWith(Logger.getDefaultLog());
         logLevel(Logger.getDefaultLogLevel());
     }
@@ -70,18 +70,12 @@ class DefaultConfigurationBuilder extends RoutineConfigurationBuilder {
             runBy(runner);
         }
 
-        final Boolean isSequential = initialConfiguration.getIsSequential(null);
+        final SyncRunnerType syncRunner =
+                initialConfiguration.getSyncRunner(SyncRunnerType.DEFAULT);
 
-        if (isSequential != null) {
+        if (syncRunner != SyncRunnerType.DEFAULT) {
 
-            if (isSequential) {
-
-                sequential();
-
-            } else {
-
-                queued();
-            }
+            syncRunner(syncRunner);
         }
 
         final int maxRunning = initialConfiguration.getMaxRunning(NOT_SET);
@@ -105,11 +99,11 @@ class DefaultConfigurationBuilder extends RoutineConfigurationBuilder {
             availableTimeout(availTimeout);
         }
 
-        final int maxInputSize = initialConfiguration.getMaxInputSize(NOT_SET);
+        final int inputMaxSize = initialConfiguration.getInputMaxSize(NOT_SET);
 
-        if (maxInputSize != NOT_SET) {
+        if (inputMaxSize != NOT_SET) {
 
-            maxInputSize(maxInputSize);
+            inputMaxSize(inputMaxSize);
         }
 
         final TimeDuration inputTimeout = initialConfiguration.getInputTimeout(null);
@@ -119,25 +113,19 @@ class DefaultConfigurationBuilder extends RoutineConfigurationBuilder {
             inputTimeout(inputTimeout);
         }
 
-        final Boolean orderedInput = initialConfiguration.getOrderedInput(null);
+        final ChannelDataOrder inputOrder =
+                initialConfiguration.getInputOrder(ChannelDataOrder.DEFAULT);
 
-        if (orderedInput != null) {
+        if (inputOrder != ChannelDataOrder.DEFAULT) {
 
-            if (orderedInput) {
-
-                orderedInput();
-
-            } else {
-
-                delayedInput();
-            }
+            inputOrder(inputOrder);
         }
 
-        final int maxOutputSize = initialConfiguration.getMaxOutputSize(NOT_SET);
+        final int outputMaxSize = initialConfiguration.getOutputMaxSize(NOT_SET);
 
-        if (maxOutputSize != NOT_SET) {
+        if (outputMaxSize != NOT_SET) {
 
-            maxOutputSize(maxOutputSize);
+            outputMaxSize(outputMaxSize);
         }
 
         final TimeDuration outputTimeout = initialConfiguration.getOutputTimeout(null);
@@ -147,18 +135,12 @@ class DefaultConfigurationBuilder extends RoutineConfigurationBuilder {
             outputTimeout(outputTimeout);
         }
 
-        final Boolean orderedOutput = initialConfiguration.getOrderedOutput(null);
+        final ChannelDataOrder outputOrder =
+                initialConfiguration.getOutputOrder(ChannelDataOrder.DEFAULT);
 
-        if (orderedOutput != null) {
+        if (outputOrder != ChannelDataOrder.DEFAULT) {
 
-            if (orderedOutput) {
-
-                orderedOutput();
-
-            } else {
-
-                delayedOutput();
-            }
+            outputOrder(outputOrder);
         }
 
         final Log log = initialConfiguration.getLog(null);
@@ -168,9 +150,9 @@ class DefaultConfigurationBuilder extends RoutineConfigurationBuilder {
             loggedWith(log);
         }
 
-        final LogLevel logLevel = initialConfiguration.getLogLevel(null);
+        final LogLevel logLevel = initialConfiguration.getLogLevel(LogLevel.DEFAULT);
 
-        if (logLevel != null) {
+        if (logLevel != LogLevel.DEFAULT) {
 
             logLevel(logLevel);
         }

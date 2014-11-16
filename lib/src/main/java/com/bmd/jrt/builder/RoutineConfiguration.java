@@ -13,6 +13,8 @@
  */
 package com.bmd.jrt.builder;
 
+import com.bmd.jrt.builder.RoutineBuilder.ChannelDataOrder;
+import com.bmd.jrt.builder.RoutineBuilder.SyncRunnerType;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.runner.Runner;
@@ -34,69 +36,70 @@ public class RoutineConfiguration {
 
     private final TimeDuration mAvailTimeout;
 
-    private final TimeDuration mInputTimeout;
+    private final int mInputMaxSize;
 
-    private final Boolean mIsSequential;
+    private final ChannelDataOrder mInputOrder;
+
+    private final TimeDuration mInputTimeout;
 
     private final Log mLog;
 
     private final LogLevel mLogLevel;
 
-    private final int mMaxInputSize;
-
-    private final int mMaxOutputSize;
-
     private final int mMaxRetained;
 
     private final int mMaxRunning;
 
-    private final Boolean mOrderedInput;
+    private final int mOutputMaxSize;
 
-    private final Boolean mOrderedOutput;
+    private final ChannelDataOrder mOutputOrder;
 
     private final TimeDuration mOutputTimeout;
 
     private final Runner mRunner;
 
+    private final SyncRunnerType mRunnerType;
+
     /**
      * Constructor.
      *
      * @param runner        the runner used for asynchronous invocations.
-     * @param isSequential  whether the sequential runner is used for synchronous invocations.
+     * @param runnerType    the type of the runner used for synchronous invocations.
      * @param maxRunning    the maximum number of parallel running invocations. Must be positive.
      * @param maxRetained   the maximum number of retained invocation instances. Must be 0 or a
      *                      positive number.
      * @param availTimeout  the maximum timeout while waiting for an invocation instance to be
      *                      available.
-     * @param maxInputSize  the maximum number of buffered input data. Must be positive.
+     * @param inputMaxSize  the maximum number of buffered input data. Must be positive.
      * @param inputTimeout  the maximum timeout while waiting for an input to be passed to the
      *                      input channel.
-     * @param orderedInput  whether the input data are forced to be delivered in insertion order.
-     * @param maxOutputSize the maximum number of buffered output data. Must be positive.
+     * @param inputOrder    whether the input data are forced to be delivered in insertion order.
+     * @param outputMaxSize the maximum number of buffered output data. Must be positive.
      * @param outputTimeout the maximum timeout while waiting for an output to be passed to the
      *                      result channel.
-     * @param orderedOutput whether the output data are forced to be delivered in insertion order.
+     * @param outputOrder   whether the output data are forced to be delivered in insertion order.
      * @param log           the log instance.
      * @param logLevel      the log level.
      */
-    RoutineConfiguration(@Nullable final Runner runner, @Nullable final Boolean isSequential,
+    RoutineConfiguration(@Nullable final Runner runner, @Nullable final SyncRunnerType runnerType,
             final int maxRunning, final int maxRetained, @Nullable final TimeDuration availTimeout,
-            final int maxInputSize, @Nullable final TimeDuration inputTimeout,
-            final @Nullable Boolean orderedInput, final int maxOutputSize,
-            @Nullable final TimeDuration outputTimeout, @Nullable final Boolean orderedOutput,
-            @Nullable final Log log, @Nullable final LogLevel logLevel) {
+            final int inputMaxSize, @Nullable final TimeDuration inputTimeout,
+            final @Nullable ChannelDataOrder inputOrder, final int outputMaxSize,
+            @Nullable final TimeDuration outputTimeout,
+            @Nullable final ChannelDataOrder outputOrder, @Nullable final Log log,
+            @Nullable final LogLevel logLevel) {
 
         mRunner = runner;
-        mIsSequential = isSequential;
+        mRunnerType = runnerType;
         mMaxRunning = maxRunning;
         mMaxRetained = maxRetained;
         mAvailTimeout = availTimeout;
-        mMaxInputSize = maxInputSize;
+        mInputMaxSize = inputMaxSize;
         mInputTimeout = inputTimeout;
-        mOrderedInput = orderedInput;
-        mMaxOutputSize = maxOutputSize;
+        mInputOrder = inputOrder;
+        mOutputMaxSize = outputMaxSize;
         mOutputTimeout = outputTimeout;
-        mOrderedOutput = orderedOutput;
+        mOutputOrder = outputOrder;
         mLog = log;
         mLogLevel = logLevel;
     }
@@ -115,6 +118,39 @@ public class RoutineConfiguration {
         return (availTimeout != null) ? availTimeout : valueIfNotSet;
     }
 
+    /**
+     * Returns the maximum number of buffered input data (NOT_SET by default).
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the maximum size.
+     */
+    public int getInputMaxSize(final int valueIfNotSet) {
+
+        final int inputMaxSize = mInputMaxSize;
+
+        return (inputMaxSize != NOT_SET) ? inputMaxSize : valueIfNotSet;
+    }
+
+    /**
+     * Returns the input data order (null by default).
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the order type.
+     */
+    public ChannelDataOrder getInputOrder(final ChannelDataOrder valueIfNotSet) {
+
+        final ChannelDataOrder orderedInput = mInputOrder;
+
+        return (orderedInput != null) ? orderedInput : valueIfNotSet;
+    }
+
+    /**
+     * Returns the maximum timeout while waiting for an input to be passed to the input channel
+     * (null by default).
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the timeout.
+     */
     public TimeDuration getInputTimeout(final TimeDuration valueIfNotSet) {
 
         final TimeDuration inputTimeout = mInputTimeout;
@@ -122,13 +158,12 @@ public class RoutineConfiguration {
         return (inputTimeout != null) ? inputTimeout : valueIfNotSet;
     }
 
-    public Boolean getIsSequential(final Boolean valueIfNotSet) {
-
-        final Boolean isSequential = mIsSequential;
-
-        return (isSequential != null) ? isSequential : valueIfNotSet;
-    }
-
+    /**
+     * Returns the log instance (null by default).
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the log instance.
+     */
     public Log getLog(final Log valueIfNotSet) {
 
         final Log log = mLog;
@@ -136,6 +171,12 @@ public class RoutineConfiguration {
         return (log != null) ? log : valueIfNotSet;
     }
 
+    /**
+     * Returns the log level (null by default).
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the log level.
+     */
     public LogLevel getLogLevel(final LogLevel valueIfNotSet) {
 
         final LogLevel logLevel = mLogLevel;
@@ -143,20 +184,12 @@ public class RoutineConfiguration {
         return (logLevel != null) ? logLevel : valueIfNotSet;
     }
 
-    public int getMaxInputSize(final int valueIfNotSet) {
-
-        final int maxInputSize = mMaxInputSize;
-
-        return (maxInputSize != NOT_SET) ? maxInputSize : valueIfNotSet;
-    }
-
-    public int getMaxOutputSize(final int valueIfNotSet) {
-
-        final int maxOutputSize = mMaxOutputSize;
-
-        return (maxOutputSize != NOT_SET) ? maxOutputSize : valueIfNotSet;
-    }
-
+    /**
+     * Returns the maximum number of retained invocation instances (NOT_SET by default).
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the maximum number.
+     */
     public int getMaxRetained(final int valueIfNotSet) {
 
         final int maxRetained = mMaxRetained;
@@ -164,6 +197,12 @@ public class RoutineConfiguration {
         return (maxRetained != NOT_SET) ? maxRetained : valueIfNotSet;
     }
 
+    /**
+     * Returns the maximum number of parallel running invocations (NOT_SET by default).
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the maximum number.
+     */
     public int getMaxRunning(final int valueIfNotSet) {
 
         final int maxRunning = mMaxRunning;
@@ -171,20 +210,39 @@ public class RoutineConfiguration {
         return (maxRunning != NOT_SET) ? maxRunning : valueIfNotSet;
     }
 
-    public Boolean getOrderedInput(final Boolean valueIfNotSet) {
+    /**
+     * Returns the maximum number of buffered output data (NOT_SET by default).
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the maximum size.
+     */
+    public int getOutputMaxSize(final int valueIfNotSet) {
 
-        final Boolean orderedInput = mOrderedInput;
+        final int outputMaxSize = mOutputMaxSize;
 
-        return (orderedInput != null) ? orderedInput : valueIfNotSet;
+        return (outputMaxSize != NOT_SET) ? outputMaxSize : valueIfNotSet;
     }
 
-    public Boolean getOrderedOutput(final Boolean valueIfNotSet) {
+    /**
+     * Returns the output data order (null by default).
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the order type.
+     */
+    public ChannelDataOrder getOutputOrder(final ChannelDataOrder valueIfNotSet) {
 
-        final Boolean orderedOutput = mOrderedOutput;
+        final ChannelDataOrder orderedOutput = mOutputOrder;
 
         return (orderedOutput != null) ? orderedOutput : valueIfNotSet;
     }
 
+    /**
+     * Returns the maximum timeout while waiting for an output to be passed to the result channel
+     * (null by default).
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the timeout.
+     */
     public TimeDuration getOutputTimeout(final TimeDuration valueIfNotSet) {
 
         final TimeDuration outputTimeout = mOutputTimeout;
@@ -192,6 +250,12 @@ public class RoutineConfiguration {
         return (outputTimeout != null) ? outputTimeout : valueIfNotSet;
     }
 
+    /**
+     * Returns the runner used for asynchronous invocations (null by default).
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the runner instance.
+     */
     public Runner getRunner(final Runner valueIfNotSet) {
 
         final Runner runner = mRunner;
@@ -199,23 +263,36 @@ public class RoutineConfiguration {
         return (runner != null) ? runner : valueIfNotSet;
     }
 
+    /**
+     * Returns the type of the runner used for synchronous invocations (null by default).
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the runner type.
+     */
+    public SyncRunnerType getSyncRunner(final SyncRunnerType valueIfNotSet) {
+
+        final SyncRunnerType runnerType = mRunnerType;
+
+        return (runnerType != null) ? runnerType : valueIfNotSet;
+    }
+
     @Override
     public int hashCode() {
 
         // auto-generated code
         int result = mAvailTimeout != null ? mAvailTimeout.hashCode() : 0;
+        result = 31 * result + mInputMaxSize;
+        result = 31 * result + (mInputOrder != null ? mInputOrder.hashCode() : 0);
         result = 31 * result + (mInputTimeout != null ? mInputTimeout.hashCode() : 0);
-        result = 31 * result + (mIsSequential != null ? mIsSequential.hashCode() : 0);
         result = 31 * result + (mLog != null ? mLog.hashCode() : 0);
         result = 31 * result + (mLogLevel != null ? mLogLevel.hashCode() : 0);
-        result = 31 * result + mMaxInputSize;
-        result = 31 * result + mMaxOutputSize;
         result = 31 * result + mMaxRetained;
         result = 31 * result + mMaxRunning;
-        result = 31 * result + (mOrderedInput != null ? mOrderedInput.hashCode() : 0);
-        result = 31 * result + (mOrderedOutput != null ? mOrderedOutput.hashCode() : 0);
+        result = 31 * result + mOutputMaxSize;
+        result = 31 * result + (mOutputOrder != null ? mOutputOrder.hashCode() : 0);
         result = 31 * result + (mOutputTimeout != null ? mOutputTimeout.hashCode() : 0);
         result = 31 * result + (mRunner != null ? mRunner.hashCode() : 0);
+        result = 31 * result + (mRunnerType != null ? mRunnerType.hashCode() : 0);
         return result;
     }
 
@@ -235,18 +312,16 @@ public class RoutineConfiguration {
 
         final RoutineConfiguration that = (RoutineConfiguration) o;
 
-        return mMaxInputSize == that.mMaxInputSize && mMaxOutputSize == that.mMaxOutputSize
-                && mMaxRetained == that.mMaxRetained && mMaxRunning == that.mMaxRunning && !(
+        return mInputMaxSize == that.mInputMaxSize && mMaxRetained == that.mMaxRetained
+                && mMaxRunning == that.mMaxRunning && mOutputMaxSize == that.mOutputMaxSize && !(
                 mAvailTimeout != null ? !mAvailTimeout.equals(that.mAvailTimeout)
-                        : that.mAvailTimeout != null) && !(mInputTimeout != null
-                ? !mInputTimeout.equals(that.mInputTimeout) : that.mInputTimeout != null) && !(
-                mIsSequential != null ? !mIsSequential.equals(that.mIsSequential)
-                        : that.mIsSequential != null) && !(mLog != null ? !mLog.equals(that.mLog)
-                : that.mLog != null) && mLogLevel == that.mLogLevel && !(mOrderedInput != null
-                ? !mOrderedInput.equals(that.mOrderedInput) : that.mOrderedInput != null) && !(
-                mOrderedOutput != null ? !mOrderedOutput.equals(that.mOrderedOutput)
-                        : that.mOrderedOutput != null) && !(mOutputTimeout != null ? !mOutputTimeout
-                .equals(that.mOutputTimeout) : that.mOutputTimeout != null) && !(mRunner != null
-                ? !mRunner.equals(that.mRunner) : that.mRunner != null);
+                        : that.mAvailTimeout != null) && mInputOrder == that.mInputOrder && !(
+                mInputTimeout != null ? !mInputTimeout.equals(that.mInputTimeout)
+                        : that.mInputTimeout != null) && !(mLog != null ? !mLog.equals(that.mLog)
+                : that.mLog != null) && mLogLevel == that.mLogLevel
+                && mOutputOrder == that.mOutputOrder && !(mOutputTimeout != null
+                ? !mOutputTimeout.equals(that.mOutputTimeout) : that.mOutputTimeout != null) && !(
+                mRunner != null ? !mRunner.equals(that.mRunner) : that.mRunner != null)
+                && mRunnerType == that.mRunnerType;
     }
 }

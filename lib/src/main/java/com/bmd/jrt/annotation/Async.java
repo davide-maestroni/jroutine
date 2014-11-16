@@ -15,6 +15,7 @@ package com.bmd.jrt.annotation;
 
 import com.bmd.jrt.builder.RoutineBuilder.ChannelDataOrder;
 import com.bmd.jrt.builder.RoutineBuilder.SyncRunnerType;
+import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.runner.Runner;
@@ -101,14 +102,9 @@ import java.util.concurrent.TimeUnit;
 public @interface Async {
 
     /**
-     * Constant indicating a generic default string value.
+     * Constant indicating a default ID value.
      */
     static final String DEFAULT_ID = "";
-
-    /**
-     * Constant indicating a generic default int value.
-     */
-    static final int DEFAULT_NUMBER = Integer.MIN_VALUE;
 
     /**
      * Constant indicating a null lock ID.
@@ -127,7 +123,7 @@ public @interface Async {
      *
      * @return the timeout.
      */
-    long availTimeout() default DEFAULT_NUMBER;
+    long availTimeout() default RoutineConfiguration.NOT_SET;
 
     /**
      * The input data order.
@@ -148,7 +144,7 @@ public @interface Async {
      *
      * @return the timeout.
      */
-    long inputTimeout() default DEFAULT_NUMBER;
+    long inputTimeout() default RoutineConfiguration.NOT_SET;
 
     /**
      * The ID of the lock associated with the annotated method.
@@ -176,28 +172,28 @@ public @interface Async {
      *
      * @return the maximum number of input data.
      */
-    int maxInput() default DEFAULT_NUMBER;
+    int maxInput() default RoutineConfiguration.NOT_SET;
 
     /**
      * The maximum number of data that the result channel can retain before they are consumed.
      *
      * @return the maximum number of result data.
      */
-    int maxOutput() default DEFAULT_NUMBER;
+    int maxOutput() default RoutineConfiguration.NOT_SET;
 
     /**
      * The max number of retained routine instances.
      *
      * @return the max retained instances.
      */
-    int maxRetained() default DEFAULT_NUMBER;
+    int maxRetained() default RoutineConfiguration.NOT_SET;
 
     /**
      * The max number of concurrently running routine instances.
      *
      * @return the max concurrently running instances.
      */
-    int maxRunning() default DEFAULT_NUMBER;
+    int maxRunning() default RoutineConfiguration.NOT_SET;
 
     /**
      * The output data order.
@@ -218,7 +214,7 @@ public @interface Async {
      *
      * @return the timeout.
      */
-    long outputTimeout() default DEFAULT_NUMBER;
+    long outputTimeout() default RoutineConfiguration.NOT_SET;
 
     /**
      * The class of the runner to be used for asynchronous invocations.

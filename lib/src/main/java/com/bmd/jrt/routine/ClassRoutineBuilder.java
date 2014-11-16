@@ -542,21 +542,21 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
         final int maxRunning = annotation.maxRunning();
 
-        if (maxRunning != Async.DEFAULT_NUMBER) {
+        if (maxRunning != RoutineConfiguration.NOT_SET) {
 
             builder.maxRunning(configuration.getMaxRunning(maxRunning));
         }
 
         final int maxRetained = annotation.maxRetained();
 
-        if (maxRetained != Async.DEFAULT_NUMBER) {
+        if (maxRetained != RoutineConfiguration.NOT_SET) {
 
             builder.maxRetained(configuration.getMaxRetained(maxRetained));
         }
 
         final long availTimeout = annotation.availTimeout();
 
-        if (availTimeout != Async.DEFAULT_NUMBER) {
+        if (availTimeout != RoutineConfiguration.NOT_SET) {
 
             builder.availableTimeout(configuration.getAvailTimeout(
                     fromUnit(availTimeout, annotation.availTimeUnit())));
@@ -564,14 +564,14 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
         final int maxInput = annotation.maxInput();
 
-        if (maxInput != Async.DEFAULT_NUMBER) {
+        if (maxInput != RoutineConfiguration.NOT_SET) {
 
             builder.inputMaxSize(configuration.getInputMaxSize(maxInput));
         }
 
         final long inputTimeout = annotation.inputTimeout();
 
-        if (inputTimeout != Async.DEFAULT_NUMBER) {
+        if (inputTimeout != RoutineConfiguration.NOT_SET) {
 
             builder.inputTimeout(configuration.getInputTimeout(
                     fromUnit(inputTimeout, annotation.inputTimeUnit())));
@@ -586,14 +586,14 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
         final int maxOutput = annotation.maxOutput();
 
-        if (maxOutput != Async.DEFAULT_NUMBER) {
+        if (maxOutput != RoutineConfiguration.NOT_SET) {
 
             builder.outputMaxSize(configuration.getOutputMaxSize(maxOutput));
         }
 
         final long outputTimeout = annotation.outputTimeout();
 
-        if (outputTimeout != Async.DEFAULT_NUMBER) {
+        if (outputTimeout != RoutineConfiguration.NOT_SET) {
 
             builder.outputTimeout(configuration.getOutputTimeout(
                     fromUnit(outputTimeout, annotation.outputTimeUnit())));

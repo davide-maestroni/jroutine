@@ -17,7 +17,9 @@ import com.bmd.jrt.annotation.Async;
 import com.bmd.jrt.annotation.AsyncOverride;
 import com.bmd.jrt.annotation.DefaultLog;
 import com.bmd.jrt.annotation.DefaultRunner;
+import com.bmd.jrt.builder.RoutineBuilder.ChannelDataOrder;
 import com.bmd.jrt.builder.RoutineBuilder.SyncRunnerType;
+import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.wrapper.annotation.WrapAsync;
 
@@ -122,7 +124,7 @@ public class RoutineProcessor extends AbstractProcessor {
             return false;
         }
 
-        final TypeElement annotationElement = getTypeFromName(WrapAsync.class.getName());
+        final TypeElement annotationElement = getTypeFromName(WrapAsync.class.getCanonicalName());
         final TypeMirror annotationType = annotationElement.asType();
 
         for (final Element element : ElementFilter.typesIn(
@@ -256,14 +258,14 @@ public class RoutineProcessor extends AbstractProcessor {
         final Async annotation = methodElement.getAnnotation(Async.class);
         final Async targetAnnotation = targetMethodElement.getAnnotation(Async.class);
 
-        final TypeElement annotationElement = getTypeFromName(Async.class.getName());
+        final TypeElement annotationElement = getTypeFromName(Async.class.getCanonicalName());
         final TypeMirror annotationType = annotationElement.asType();
 
-        SyncRunnerType runnerType = null;
-        int maxRunning = Async.DEFAULT_NUMBER;
-        int maxRetained = Async.DEFAULT_NUMBER;
-        LogLevel logLevel = null;
-        TypeElement logType = null;
+        SyncRunnerType runnerType = SyncRunnerType.DEFAULT;
+        int maxRunning = RoutineConfiguration.NOT_SET;
+        int maxRetained = RoutineConfiguration.NOT_SET;
+        LogLevel logLevel = LogLevel.DEFAULT;
+        TypeElement logElement = null;
         TypeElement runnerElement = null;
 
         if (annotation != null) {
@@ -277,7 +279,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
             if (log != null) {
 
-                logType = getTypeFromName(log.toString());
+                logElement = getTypeFromName(log.toString());
             }
 
             final Object runner = getElementValue(methodElement, annotationType, "runnerClass");
@@ -296,33 +298,34 @@ public class RoutineProcessor extends AbstractProcessor {
             //                runnerType = targetAnnotation.sequential();
             //            }
 
-            if (maxRunning == Async.DEFAULT_NUMBER) {
+            if (maxRunning == RoutineConfiguration.NOT_SET) {
 
                 maxRunning = targetAnnotation.maxRunning();
             }
 
-            if (maxRetained == Async.DEFAULT_NUMBER) {
+            if (maxRetained == RoutineConfiguration.NOT_SET) {
 
                 maxRetained = targetAnnotation.maxRetained();
             }
 
-            if (logLevel == null) {
+            if (logLevel == LogLevel.DEFAULT) {
 
                 logLevel = targetAnnotation.logLevel();
             }
 
-            if ((logType == null) || logType.equals(getTypeFromName(DefaultLog.class.getName()))) {
+            if ((logElement == null) || logElement.equals(
+                    getTypeFromName(DefaultLog.class.getCanonicalName()))) {
 
                 final Object log = getElementValue(targetMethodElement, annotationType, "log");
 
                 if (log != null) {
 
-                    logType = getTypeFromName(log.toString());
+                    logElement = getTypeFromName(log.toString());
                 }
             }
 
             if ((runnerElement == null) || runnerElement.equals(
-                    getTypeFromName(DefaultRunner.class.getName()))) {
+                    getTypeFromName(DefaultRunner.class.getCanonicalName()))) {
 
                 final Object runner =
                         getElementValue(targetMethodElement, annotationType, "runnerClass");
@@ -338,17 +341,19 @@ public class RoutineProcessor extends AbstractProcessor {
 
         if (runnerType != null) {
 
-            builder.append(".syncRunner(com.bmd.jrt.builder.RoutineBuilder.SyncRunnerType.")
+            builder.append(".syncRunner(")
+                   .append(SyncRunnerType.class.getCanonicalName())
+                   .append(".")
                    .append(runnerType)
                    .append(")");
         }
 
-        if (maxRunning != Async.DEFAULT_NUMBER) {
+        if (maxRunning != RoutineConfiguration.NOT_SET) {
 
             builder.append(".maxRunning(").append(maxRunning).append(")");
         }
 
-        if (maxRetained != Async.DEFAULT_NUMBER) {
+        if (maxRetained != RoutineConfiguration.NOT_SET) {
 
             builder.append(".maxRetained(").append(maxRetained).append(")");
         }
@@ -362,19 +367,20 @@ public class RoutineProcessor extends AbstractProcessor {
                    .append(")");
         }
 
-        if ((logType != null) && !logType.equals(getTypeFromName(DefaultLog.class.getName()))) {
+        if ((logElement != null) && !logElement.equals(
+                getTypeFromName(DefaultLog.class.getCanonicalName()))) {
 
-            builder.append(".loggedWith(new ").append(logType).append("())");
+            builder.append(".loggedWith(new ").append(logElement).append("())");
         }
 
         if ((runnerElement != null) && !runnerElement.equals(
-                getTypeFromName(DefaultRunner.class.getName()))) {
+                getTypeFromName(DefaultRunner.class.getCanonicalName()))) {
 
             builder.append(".runBy(new ").append(runnerElement).append("())");
         }
 
         final TypeElement overrideAnnotationElement =
-                getTypeFromName(AsyncOverride.class.getName());
+                getTypeFromName(AsyncOverride.class.getCanonicalName());
         final TypeMirror overrideAnnotationType = overrideAnnotationElement.asType();
 
         final List<?> values =
@@ -382,8 +388,11 @@ public class RoutineProcessor extends AbstractProcessor {
 
         if ((values != null) && !values.isEmpty()) {
 
-            builder.append(
-                    ".inputOrder(com.bmd.jrt.builder.RoutineBuilder.ChannelDataOrder.INSERTION)");
+            builder.append(".inputOrder(")
+                   .append(ChannelDataOrder.class.getCanonicalName())
+                   .append(".")
+                   .append(ChannelDataOrder.INSERTION)
+                   .append(")");
         }
 
         return builder.toString();
@@ -536,7 +545,7 @@ public class RoutineProcessor extends AbstractProcessor {
                 if (targetMethod == null) {
 
                     final TypeElement annotationElement =
-                            getTypeFromName(AsyncOverride.class.getName());
+                            getTypeFromName(AsyncOverride.class.getCanonicalName());
                     final TypeMirror annotationType = annotationElement.asType();
 
                     final List<?> values =
@@ -603,7 +612,8 @@ public class RoutineProcessor extends AbstractProcessor {
 
             final Name methodName = methodElement.getSimpleName();
 
-            final TypeElement annotationElement = getTypeFromName(AsyncOverride.class.getName());
+            final TypeElement annotationElement =
+                    getTypeFromName(AsyncOverride.class.getCanonicalName());
             final TypeMirror annotationType = annotationElement.asType();
 
             final List<?> values =

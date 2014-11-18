@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.wrapper.processor;
+package com.bmd.jrt.processor;
 
 import com.bmd.jrt.annotation.Async;
 import com.bmd.jrt.annotation.AsyncOverride;
@@ -55,7 +55,7 @@ import javax.tools.Diagnostic.Kind;
 import javax.tools.JavaFileObject;
 
 /**
- * Processor implementation.
+ * Annotation processor used to generate wrapper classes enable method asynchronous invocations.
  * <p/>
  * Created by davide on 11/3/14.
  */
@@ -254,8 +254,7 @@ public class RoutineProcessor extends AbstractProcessor {
             builder.append("mRoutine")
                    .append(i)
                    .append(" = ")
-                   .append("initRoutine")
-                   .append(i).append("(configuration);");
+                   .append("initRoutine").append(i).append("(configuration);");
         }
 
         return builder.toString();

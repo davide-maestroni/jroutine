@@ -19,11 +19,28 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * This annotation is used to indicate interfaces used as templates to generate wrapper classes
+ * enabling asynchronous calls to the target instance methods.
+ * <p/>
+ * The target classes are specified in the annotation attribute. For each one a new wrapper class
+ * implementing the annotated interface will be generated in the interface package.<br/>
+ * The routines used for calling the methods will honor the attributes specified in any optional
+ * {@link Async} and {@link AsyncOverride} annotation defined for each interface method, and for
+ * each target method as well.
+ * <p/>
+ * Note that, you'll need to enable annotation pre-processing by adding the processor package to
+ * the specific project dependencies.
+ * <p/>
  * Created by davide on 11/3/14.
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
 public @interface AsyncWrapper {
 
+    /**
+     * The list of wrapped classes.
+     *
+     * @return the wrapped classes.
+     */
     Class<?>[] value();
 }

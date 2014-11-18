@@ -29,7 +29,7 @@ import static com.bmd.jrt.time.TimeDuration.fromUnit;
  * <p/>
  * Created by davide on 11/15/14.
  */
-public class RoutineConfigurationBuilder implements RoutineBuilder {
+public class RoutineConfigurationBuilder extends AbstractRoutineBuilder {
 
     private TimeDuration mAvailTimeout = null;
 

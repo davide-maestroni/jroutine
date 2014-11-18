@@ -19,6 +19,7 @@ import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.builder.RoutineConfigurationBuilder;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ParameterChannel;
+import com.bmd.jrt.common.CacheHashMap;
 import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
@@ -26,11 +27,12 @@ import com.bmd.jrt.runner.Runner;
 import com.bmd.jrt.time.TimeDuration;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
-import java.util.WeakHashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
@@ -51,8 +53,11 @@ import static com.bmd.jrt.routine.ReflectionUtils.boxingClass;
  */
 public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
-    private static final WeakHashMap<Object, HashMap<Method, Method>> sMethodCache =
-            new WeakHashMap<Object, HashMap<Method, Method>>();
+    public static final CacheHashMap<Object, HashMap<WrapperInfo, Object>> sWrapperMap =
+            new CacheHashMap<Object, HashMap<WrapperInfo, Object>>();
+
+    private static final CacheHashMap<Object, HashMap<Method, Method>> sMethodCache =
+            new CacheHashMap<Object, HashMap<Method, Method>>();
 
     private final Object mTarget;
 
@@ -73,70 +78,13 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
         mTargetClass = target.getClass();
     }
 
-    /**
-     * Returns a proxy object enabling the asynchronous call of the target instance methods.
-     * <p/>
-     * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link Async} annotation.<br/>
-     * In case the wrapped object does not implement the specified interface, the value attribute
-     * will be used to bind the interface method with the instance ones. If no tag is assigned the
-     * method name will be used instead to map it.<br/>
-     * The interface will be interpreted as a mirror of the target object methods, and the optional
-     * {@link AsyncOverride} annotation will be honored.
-     *
-     * @param itf     the interface implemented by the return object.
-     * @param <CLASS> the interface type.
-     * @return the proxy object.
-     * @throws NullPointerException     if the specified class is null.
-     * @throws IllegalArgumentException if the specified class does not represent an interface.
-     */
     @Nonnull
-    public <CLASS> CLASS as(@Nonnull final Class<CLASS> itf) {
+    @Override
+    public ClassRoutineBuilder apply(@Nonnull final RoutineConfiguration configuration) {
 
-        if (!itf.isInterface()) {
+        super.apply(configuration);
 
-            throw new IllegalArgumentException(
-                    "the specified class is not an interface: " + itf.getCanonicalName());
-        }
-
-        final InvocationHandler handler;
-
-        if (itf.isAssignableFrom(mTargetClass)) {
-
-            handler = new ObjectInvocationHandler();
-
-        } else {
-
-            handler = new InterfaceInvocationHandler();
-        }
-
-        final Object proxy =
-                Proxy.newProxyInstance(itf.getClassLoader(), new Class[]{itf}, handler);
-
-        return itf.cast(proxy);
-    }
-
-    /**
-     * Returns a proxy object enabling the asynchronous call of the target instance methods.
-     * <p/>
-     * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link Async} annotation.<br/>
-     * In case the wrapped object does not implement the specified interface, the value attribute
-     * will be used to bind the interface method with the instance ones. If no tag is assigned the
-     * method name will be used instead to map it.<br/>
-     * The interface will be interpreted as a mirror of the target object methods, and the optional
-     * {@link AsyncOverride} annotation will be honored.
-     *
-     * @param itf     the token of the interface implemented by the return object.
-     * @param <CLASS> the interface type.
-     * @return the proxy object.
-     * @throws NullPointerException     if the specified class is null.
-     * @throws IllegalArgumentException if the specified class does not represent an interface.
-     */
-    @Nonnull
-    public <CLASS> CLASS as(@Nonnull final ClassToken<CLASS> itf) {
-
-        return itf.cast(as(itf.getRawClass()));
+        return this;
     }
 
     @Nonnull
@@ -295,6 +243,232 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     }
 
     /**
+     * Returns a proxy object enabling asynchronous calls to the target instance methods.
+     * <p/>
+     * The routines used for calling the methods will honor the attributes specified in any
+     * optional {@link Async} annotation.<br/>
+     * In case the wrapped object does not implement the specified interface, the value attribute
+     * will be used to bind the interface method with the instance ones. If no tag is assigned the
+     * method name will be used instead to map it.<br/>
+     * The interface will be interpreted as a mirror of the target object methods, and the optional
+     * {@link AsyncOverride} annotation will be honored.
+     *
+     * @param itf     the interface implemented by the return object.
+     * @param <CLASS> the interface type.
+     * @return the proxy object.
+     * @throws NullPointerException     if the specified class is null.
+     * @throws IllegalArgumentException if the specified class does not represent an interface.
+     */
+    @Nonnull
+    public <CLASS> CLASS as(@Nonnull final Class<CLASS> itf) {
+
+        if (!itf.isInterface()) {
+
+            throw new IllegalArgumentException(
+                    "the specified class is not an interface: " + itf.getCanonicalName());
+        }
+
+        final InvocationHandler handler;
+
+        if (itf.isAssignableFrom(mTargetClass)) {
+
+            handler = new ObjectInvocationHandler();
+
+        } else {
+
+            handler = new InterfaceInvocationHandler();
+        }
+
+        final Object proxy =
+                Proxy.newProxyInstance(itf.getClassLoader(), new Class[]{itf}, handler);
+
+        return itf.cast(proxy);
+    }
+
+    /**
+     * Returns a proxy object enabling asynchronous calls to the target instance methods.
+     * <p/>
+     * The routines used for calling the methods will honor the attributes specified in any
+     * optional {@link Async} annotation.<br/>
+     * In case the wrapped object does not implement the specified interface, the value attribute
+     * will be used to bind the interface method with the instance ones. If no tag is assigned the
+     * method name will be used instead to map it.<br/>
+     * The interface will be interpreted as a mirror of the target object methods, and the optional
+     * {@link AsyncOverride} annotation will be honored.
+     *
+     * @param itf     the token of the interface implemented by the return object.
+     * @param <CLASS> the interface type.
+     * @return the proxy object.
+     * @throws NullPointerException     if the specified class is null.
+     * @throws IllegalArgumentException if the specified class does not represent an interface.
+     */
+    @Nonnull
+    public <CLASS> CLASS as(@Nonnull final ClassToken<CLASS> itf) {
+
+        return itf.cast(as(itf.getRawClass()));
+    }
+
+    /**
+     * Returns an object enabling asynchronous calls to the target instance methods.
+     * <p/>
+     * The routines used for calling the methods will honor the attributes specified in any
+     * optional {@link Async} and {@link AsyncOverride} annotation.<br/>
+     * The wrapping object is created through code generation based on the interfaces annotated
+     * with {@link com.bmd.jrt.annotation.AsyncWrapper}.<br/>
+     * Note that, you'll need to enable annotation pre-processing by adding the processor package
+     * to the specific project dependencies.
+     *
+     * @param itf     the interface implemented by the return object.
+     * @param <CLASS> the interface type.
+     * @return the wrapping object.
+     * @throws NullPointerException     if the specified class is null.
+     * @throws IllegalArgumentException if the specified class does not represent an interface.
+     */
+    @Nonnull
+    public <CLASS> CLASS wrappedIn(@Nonnull final Class<CLASS> itf) {
+
+        if (!itf.isInterface()) {
+
+            throw new IllegalArgumentException(
+                    "the specified class is not an interface: " + itf.getCanonicalName());
+        }
+
+        synchronized (sWrapperMap) {
+
+            final Object target = mTarget;
+            final CacheHashMap<Object, HashMap<WrapperInfo, Object>> wrapperMap = sWrapperMap;
+
+            HashMap<WrapperInfo, Object> wrappers = wrapperMap.get(target);
+
+            if (wrappers == null) {
+
+                wrappers = new HashMap<WrapperInfo, Object>();
+                wrapperMap.put(target, wrappers);
+            }
+
+            final String lockId = getLockId();
+            final String wrapperLockId = (lockId != null) ? lockId : "";
+            final RoutineConfiguration configuration = getBuilder().buildConfiguration();
+            final WrapperInfo wrapperInfo = new WrapperInfo(configuration, itf, wrapperLockId);
+
+            Object wrapper = wrappers.get(wrapperInfo);
+
+            if (wrapper != null) {
+
+                return itf.cast(wrapper);
+            }
+
+            try {
+
+                final String wrapperClassName =
+                        itf.getCanonicalName() + target.getClass().getSimpleName();
+
+                final Class<?> wrapperClass = Class.forName(wrapperClassName);
+                final Constructor<?> constructor =
+                        wrapperClass.getConstructor(target.getClass(), Map.class, String.class,
+                                                    RoutineConfiguration.class);
+
+                synchronized (sMutexCache) {
+
+                    wrapper = constructor.newInstance(target, sMutexCache, wrapperLockId,
+                                                      configuration);
+                }
+
+                wrappers.put(wrapperInfo, wrapper);
+
+                return itf.cast(wrapper);
+
+            } catch (final InstantiationException e) {
+
+                throw new IllegalArgumentException(e.getCause());
+
+            } catch (final Throwable t) {
+
+                throw new IllegalArgumentException(t);
+            }
+        }
+    }
+
+    /**
+     * Returns an object enabling asynchronous calls to the target instance methods.
+     * <p/>
+     * The routines used for calling the methods will honor the attributes specified in any
+     * optional {@link Async} and {@link AsyncOverride} annotation.<br/>
+     * The wrapping object is created through code generation based on the interfaces annotated
+     * with {@link com.bmd.jrt.annotation.AsyncWrapper}.<br/>
+     * Note that, you'll need to enable annotation pre-processing by adding the processor package
+     * to the specific project dependencies.
+     *
+     * @param itf     the token of the interface implemented by the return object.
+     * @param <CLASS> the interface type.
+     * @return the wrapping object.
+     * @throws NullPointerException     if the specified class is null.
+     * @throws IllegalArgumentException if the specified class does not represent an interface.
+     */
+    @Nonnull
+    public <CLASS> CLASS wrappedIn(@Nonnull final ClassToken<CLASS> itf) {
+
+        return itf.cast(wrappedIn(itf.getRawClass()));
+    }
+
+    /**
+     * Class used as key to identify a specific wrapper instance.
+     */
+    private static class WrapperInfo {
+
+        private final RoutineConfiguration mConfiguration;
+
+        private final Class<?> mItf;
+
+        private final String mLockId;
+
+        /**
+         * Constructor.
+         *
+         * @param configuration the routine configuration.
+         * @param itf           the wrapper interface.
+         * @param lockId        the lock ID.
+         */
+        private WrapperInfo(@Nonnull final RoutineConfiguration configuration,
+                @Nonnull final Class<?> itf, @Nonnull final String lockId) {
+
+            mConfiguration = configuration;
+            mItf = itf;
+            mLockId = lockId;
+        }
+
+        @Override
+        public int hashCode() {
+
+            // auto-generated code
+            int result = mConfiguration.hashCode();
+            result = 31 * result + mItf.hashCode();
+            result = 31 * result + mLockId.hashCode();
+            return result;
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+
+            // auto-generated code
+            if (this == o) {
+
+                return true;
+            }
+
+            if (!(o instanceof WrapperInfo)) {
+
+                return false;
+            }
+
+            final WrapperInfo that = (WrapperInfo) o;
+
+            return mConfiguration.equals(that.mConfiguration) && mItf.equals(that.mItf)
+                    && mLockId.equals(that.mLockId);
+        }
+    }
+
+    /**
      * Invocation handler adapting a different interface to the target object instance.
      */
     private class InterfaceInvocationHandler implements InvocationHandler {
@@ -307,6 +481,9 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
         private final Class<?> mTargetClass;
 
+        /**
+         * Constructor.
+         */
         private InterfaceInvocationHandler() {
 
             mTarget = ObjectRoutineBuilder.this.mTarget;
@@ -333,7 +510,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
             synchronized (sMethodCache) {
 
-                final WeakHashMap<Object, HashMap<Method, Method>> methodCache = sMethodCache;
+                final CacheHashMap<Object, HashMap<Method, Method>> methodCache = sMethodCache;
                 HashMap<Method, Method> methodMap = methodCache.get(target);
 
                 if (methodMap == null) {

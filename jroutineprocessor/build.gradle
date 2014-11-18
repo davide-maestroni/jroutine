@@ -23,7 +23,6 @@ archivesBaseName = project.name
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(':lib')
-    compile project(':jroutinewrapper')
 }
 
 task('jacocoTest', dependsOn: 'test') {

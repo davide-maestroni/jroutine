@@ -65,6 +65,16 @@ import javax.annotation.Nonnull;
 public interface RoutineBuilder {
 
     /**
+     * Applies the specified configuration to this builder.
+     *
+     * @param configuration the configuration.
+     * @return this builder.
+     * @throws NullPointerException if the specified configuration is null.
+     */
+    @Nonnull
+    public RoutineBuilder apply(@Nonnull RoutineConfiguration configuration);
+
+    /**
      * Sets the timeout for an invocation instance to become available.
      *
      * @param timeout  the timeout.

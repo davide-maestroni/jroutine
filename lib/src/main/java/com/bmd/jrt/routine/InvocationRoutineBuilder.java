@@ -60,6 +60,16 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineBuilder {
 
     @Nonnull
     @Override
+    public InvocationRoutineBuilder<INPUT, OUTPUT> apply(
+            @Nonnull final RoutineConfiguration configuration) {
+
+        mBuilder.apply(configuration);
+
+        return this;
+    }
+
+    @Nonnull
+    @Override
     public InvocationRoutineBuilder<INPUT, OUTPUT> availableTimeout(final long timeout,
             @Nonnull final TimeUnit timeUnit) {
 

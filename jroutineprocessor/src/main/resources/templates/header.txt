@@ -15,27 +15,31 @@
 // GENERATED CODE - PLEASE DO NOT EDIT
 package ${packageName};
 
-public final class ${className}Async${genericTypes} implements ${interfaceFullName} {
+public final class ${interfaceName}${className}${genericTypes} implements ${interfaceFullName} {
 
-    private final java.util.WeakHashMap<Object, java.util.HashMap<String, Object>> mMutexMap;
+    private final String mLockId;
+
+    private final java.util.Map<Object, java.util.Map<String, Object>> mMutexMap;
 
     private final ${classFullName} mWrapped;
 
-    public ${className}Async(final ${classFullName} wrapped,
-            java.util.WeakHashMap<Object, java.util.HashMap<String, Object>> mutexMap) {
+    public ${interfaceName}${className}(final ${classFullName} wrapped,
+            final java.util.Map<Object, java.util.Map<String, Object>> mutexMap,
+            final String lockId, final com.bmd.jrt.builder.RoutineConfiguration configuration) {
 
         if (wrapped == null) {
 
-            throw new NullPointerException();
+            throw new NullPointerException("the wrapped instance must not be null");
         }
 
         if (mutexMap == null) {
 
-            throw new NullPointerException();
+            throw new NullPointerException("the mutex map must not be null");
         }
 
         mWrapped = wrapped;
         mMutexMap = mutexMap;
+        mLockId = ((lockId != null) && (lockId.length() > 0)) ? lockId : null;
         ${routineFieldsInit}
     }
 
@@ -44,7 +48,7 @@ public final class ${className}Async${genericTypes} implements ${interfaceFullNa
         synchronized (mMutexMap) {
 
             final Object wrapped = mWrapped;
-            java.util.HashMap<String, Object> mutexMap = mMutexMap.get(wrapped);
+            java.util.Map<String, Object> mutexMap = mMutexMap.get(wrapped);
 
             if (mutexMap == null) {
 
@@ -52,12 +56,13 @@ public final class ${className}Async${genericTypes} implements ${interfaceFullNa
                 mMutexMap.put(wrapped, mutexMap);
             }
 
-            Object mutex = mutexMap.get(lockId);
+            final String id = (mLockId != null) ? mLockId : lockId;
+            Object mutex = mutexMap.get(id);
 
             if (mutex == null) {
 
                 mutex = new Object();
-                mutexMap.put(lockId, mutex);
+                mutexMap.put(id, mutex);
             }
 
             return mutex;

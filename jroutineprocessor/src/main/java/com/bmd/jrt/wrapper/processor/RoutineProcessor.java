@@ -15,13 +15,13 @@ package com.bmd.jrt.wrapper.processor;
 
 import com.bmd.jrt.annotation.Async;
 import com.bmd.jrt.annotation.AsyncOverride;
+import com.bmd.jrt.annotation.AsyncWrapper;
 import com.bmd.jrt.annotation.DefaultLog;
 import com.bmd.jrt.annotation.DefaultRunner;
 import com.bmd.jrt.builder.RoutineBuilder.ChannelDataOrder;
 import com.bmd.jrt.builder.RoutineBuilder.SyncRunnerType;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.log.Log.LogLevel;
-import com.bmd.jrt.wrapper.annotation.WrapAsync;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -32,13 +32,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
-import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
@@ -59,8 +59,7 @@ import javax.tools.JavaFileObject;
  * <p/>
  * Created by davide on 11/3/14.
  */
-@SupportedAnnotationTypes("com.bmd.jrt.wrapper.annotation.WrapAsync")
-@SupportedSourceVersion(SourceVersion.RELEASE_5)
+@SupportedAnnotationTypes("com.bmd.jrt.annotation.AsyncWrapper")
 public class RoutineProcessor extends AbstractProcessor {
 
     private static final boolean DEBUG = false;
@@ -90,9 +89,18 @@ public class RoutineProcessor extends AbstractProcessor {
 
     private String mMethodAsync;
 
+    private String mMethodHeader;
+
     private String mMethodResult;
 
     private String mMethodVoid;
+
+    @Override
+    public SourceVersion getSupportedSourceVersion() {
+
+        // Let's return the latest version
+        return SourceVersion.values()[SourceVersion.values().length - 1];
+    }
 
     @Override
     public synchronized void init(final ProcessingEnvironment processingEnv) {
@@ -104,6 +112,7 @@ public class RoutineProcessor extends AbstractProcessor {
         try {
 
             mHeader = parseTemplate("/templates/header.txt", buffer);
+            mMethodHeader = parseTemplate("/templates/method_header.txt", buffer);
             mMethodAsync = parseTemplate("/templates/method_async.txt", buffer);
             mMethodResult = parseTemplate("/templates/method_result.txt", buffer);
             mMethodVoid = parseTemplate("/templates/method_void.txt", buffer);
@@ -124,11 +133,12 @@ public class RoutineProcessor extends AbstractProcessor {
             return false;
         }
 
-        final TypeElement annotationElement = getTypeFromName(WrapAsync.class.getCanonicalName());
+        final TypeElement annotationElement =
+                getTypeFromName(AsyncWrapper.class.getCanonicalName());
         final TypeMirror annotationType = annotationElement.asType();
 
         for (final Element element : ElementFilter.typesIn(
-                roundEnvironment.getElementsAnnotatedWith(WrapAsync.class))) {
+                roundEnvironment.getElementsAnnotatedWith(AsyncWrapper.class))) {
 
             final TypeElement classElement = (TypeElement) element;
             final List<ExecutableElement> methodElements =
@@ -245,8 +255,7 @@ public class RoutineProcessor extends AbstractProcessor {
                    .append(i)
                    .append(" = ")
                    .append("initRoutine")
-                   .append(i)
-                   .append("();");
+                   .append(i).append("(configuration);");
         }
 
         return builder.toString();
@@ -264,16 +273,42 @@ public class RoutineProcessor extends AbstractProcessor {
         SyncRunnerType runnerType = SyncRunnerType.DEFAULT;
         int maxRunning = RoutineConfiguration.NOT_SET;
         int maxRetained = RoutineConfiguration.NOT_SET;
+        long availTimeout = RoutineConfiguration.NOT_SET;
+        TimeUnit availTimeUnit = null;
+        int maxInput = RoutineConfiguration.NOT_SET;
+        long inputTimeout = RoutineConfiguration.NOT_SET;
+        TimeUnit inputTimeUnit = null;
+        ChannelDataOrder inputOrder = ChannelDataOrder.DEFAULT;
+        int maxOutput = RoutineConfiguration.NOT_SET;
+        long outputTimeout = RoutineConfiguration.NOT_SET;
+        TimeUnit outputTimeUnit = null;
+        ChannelDataOrder outputOrder = ChannelDataOrder.DEFAULT;
         LogLevel logLevel = LogLevel.DEFAULT;
         TypeElement logElement = null;
         TypeElement runnerElement = null;
 
         if (annotation != null) {
 
+            final Object runner = getElementValue(methodElement, annotationType, "runnerClass");
+
+            if (runner != null) {
+
+                runnerElement = getTypeFromName(runner.toString());
+            }
+
             runnerType = annotation.runnerType();
             maxRunning = annotation.maxRunning();
             maxRetained = annotation.maxRetained();
-            logLevel = annotation.logLevel();
+            availTimeout = annotation.availTimeout();
+            availTimeUnit = annotation.availTimeUnit();
+            maxInput = annotation.maxInput();
+            inputTimeout = annotation.inputTimeout();
+            inputTimeUnit = annotation.inputTimeUnit();
+            inputOrder = annotation.inputOrder();
+            maxOutput = annotation.maxOutput();
+            outputTimeout = annotation.outputTimeout();
+            outputTimeUnit = annotation.outputTimeUnit();
+            outputOrder = annotation.outputOrder();
 
             final Object log = getElementValue(methodElement, annotationType, "log");
 
@@ -282,21 +317,27 @@ public class RoutineProcessor extends AbstractProcessor {
                 logElement = getTypeFromName(log.toString());
             }
 
-            final Object runner = getElementValue(methodElement, annotationType, "runnerClass");
-
-            if (runner != null) {
-
-                runnerElement = getTypeFromName(runner.toString());
-            }
+            logLevel = annotation.logLevel();
         }
 
         if (targetAnnotation != null) {
 
-            //TODO
-            //            if (runnerType == null) {
-            //
-            //                runnerType = targetAnnotation.sequential();
-            //            }
+            if ((runnerElement == null) || runnerElement.equals(
+                    getTypeFromName(DefaultRunner.class.getCanonicalName()))) {
+
+                final Object runner =
+                        getElementValue(targetMethodElement, annotationType, "runnerClass");
+
+                if (runner != null) {
+
+                    runnerElement = getTypeFromName(runner.toString());
+                }
+            }
+
+            if (runnerType == SyncRunnerType.DEFAULT) {
+
+                runnerType = targetAnnotation.runnerType();
+            }
 
             if (maxRunning == RoutineConfiguration.NOT_SET) {
 
@@ -308,9 +349,42 @@ public class RoutineProcessor extends AbstractProcessor {
                 maxRetained = targetAnnotation.maxRetained();
             }
 
-            if (logLevel == LogLevel.DEFAULT) {
+            if (availTimeout == RoutineConfiguration.NOT_SET) {
 
-                logLevel = targetAnnotation.logLevel();
+                availTimeout = targetAnnotation.availTimeout();
+                availTimeUnit = targetAnnotation.availTimeUnit();
+            }
+
+            if (maxInput == RoutineConfiguration.NOT_SET) {
+
+                maxInput = targetAnnotation.maxInput();
+            }
+
+            if (inputTimeout == RoutineConfiguration.NOT_SET) {
+
+                inputTimeout = targetAnnotation.inputTimeout();
+                inputTimeUnit = targetAnnotation.inputTimeUnit();
+            }
+
+            if (inputOrder == ChannelDataOrder.DEFAULT) {
+
+                inputOrder = targetAnnotation.inputOrder();
+            }
+
+            if (maxOutput == RoutineConfiguration.NOT_SET) {
+
+                maxOutput = targetAnnotation.maxOutput();
+            }
+
+            if (outputTimeout == RoutineConfiguration.NOT_SET) {
+
+                outputTimeout = targetAnnotation.outputTimeout();
+                outputTimeUnit = targetAnnotation.outputTimeUnit();
+            }
+
+            if (outputOrder == ChannelDataOrder.DEFAULT) {
+
+                outputOrder = targetAnnotation.outputOrder();
             }
 
             if ((logElement == null) || logElement.equals(
@@ -324,22 +398,21 @@ public class RoutineProcessor extends AbstractProcessor {
                 }
             }
 
-            if ((runnerElement == null) || runnerElement.equals(
-                    getTypeFromName(DefaultRunner.class.getCanonicalName()))) {
+            if (logLevel == LogLevel.DEFAULT) {
 
-                final Object runner =
-                        getElementValue(targetMethodElement, annotationType, "runnerClass");
-
-                if (runner != null) {
-
-                    runnerElement = getTypeFromName(runner.toString());
-                }
+                logLevel = targetAnnotation.logLevel();
             }
         }
 
         final StringBuilder builder = new StringBuilder();
 
-        if (runnerType != null) {
+        if ((runnerElement != null) && !runnerElement.equals(
+                getTypeFromName(DefaultRunner.class.getCanonicalName()))) {
+
+            builder.append(".runBy(new ").append(runnerElement).append("())");
+        }
+
+        if (runnerType != SyncRunnerType.DEFAULT) {
 
             builder.append(".syncRunner(")
                    .append(SyncRunnerType.class.getCanonicalName())
@@ -358,12 +431,64 @@ public class RoutineProcessor extends AbstractProcessor {
             builder.append(".maxRetained(").append(maxRetained).append(")");
         }
 
-        if (logLevel != null) {
+        if (availTimeout != RoutineConfiguration.NOT_SET) {
 
-            builder.append(".logLevel(")
-                   .append(LogLevel.class.getCanonicalName())
+            builder.append(".availTimeout(")
+                   .append(availTimeout)
+                   .append(", ")
+                   .append(TimeUnit.class.getCanonicalName())
                    .append(".")
-                   .append(logLevel)
+                   .append(availTimeUnit)
+                   .append(")");
+        }
+
+        if (maxInput != RoutineConfiguration.NOT_SET) {
+
+            builder.append(".inputMaxSize(").append(maxInput).append(")");
+        }
+
+        if (inputTimeout != RoutineConfiguration.NOT_SET) {
+
+            builder.append(".inputTimeout(")
+                   .append(inputTimeout)
+                   .append(", ")
+                   .append(TimeUnit.class.getCanonicalName())
+                   .append(".")
+                   .append(inputTimeUnit)
+                   .append(")");
+        }
+
+        if (inputOrder != ChannelDataOrder.DEFAULT) {
+
+            builder.append(".inputOrder(")
+                   .append(ChannelDataOrder.class.getCanonicalName())
+                   .append(".")
+                   .append(inputOrder)
+                   .append(")");
+        }
+
+        if (maxOutput != RoutineConfiguration.NOT_SET) {
+
+            builder.append(".outputMaxSize(").append(maxOutput).append(")");
+        }
+
+        if (outputTimeout != RoutineConfiguration.NOT_SET) {
+
+            builder.append(".outputTimeout(")
+                   .append(outputTimeout)
+                   .append(", ")
+                   .append(TimeUnit.class.getCanonicalName())
+                   .append(".")
+                   .append(outputTimeUnit)
+                   .append(")");
+        }
+
+        if (outputOrder != ChannelDataOrder.DEFAULT) {
+
+            builder.append(".outputOrder(")
+                   .append(ChannelDataOrder.class.getCanonicalName())
+                   .append(".")
+                   .append(outputOrder)
                    .append(")");
         }
 
@@ -373,10 +498,13 @@ public class RoutineProcessor extends AbstractProcessor {
             builder.append(".loggedWith(new ").append(logElement).append("())");
         }
 
-        if ((runnerElement != null) && !runnerElement.equals(
-                getTypeFromName(DefaultRunner.class.getCanonicalName()))) {
+        if (logLevel != LogLevel.DEFAULT) {
 
-            builder.append(".runBy(new ").append(runnerElement).append("())");
+            builder.append(".logLevel(")
+                   .append(LogLevel.class.getCanonicalName())
+                   .append(".")
+                   .append(logLevel)
+                   .append(")");
         }
 
         final TypeElement overrideAnnotationElement =
@@ -405,16 +533,17 @@ public class RoutineProcessor extends AbstractProcessor {
 
         try {
 
-            final CharSequence packageName =
-                    ((PackageElement) targetElement.getEnclosingElement()).getQualifiedName();
-            final CharSequence simpleName = targetElement.getSimpleName();
-            final Name qualifiedName = targetElement.getQualifiedName();
+            final String packageName =
+                    ((PackageElement) element.getEnclosingElement()).getQualifiedName().toString();
+            final String className = targetElement.getSimpleName().toString();
+            final String interfaceName = element.getSimpleName().toString();
             final Filer filer = processingEnv.getFiler();
 
             //noinspection PointlessBooleanExpression,ConstantConditions
             if (!DEBUG) {
 
-                final JavaFileObject sourceFile = filer.createSourceFile(qualifiedName + "Async");
+                final JavaFileObject sourceFile =
+                        filer.createSourceFile(element.toString() + className);
                 writer = sourceFile.openWriter();
 
             } else {
@@ -423,9 +552,10 @@ public class RoutineProcessor extends AbstractProcessor {
             }
 
             String header = mHeader.replace("${packageName}", packageName);
-            header = header.replace("${className}", simpleName);
+            header = header.replace("${className}", className);
             header = header.replace("${genericTypes}", buildGenericTypes(element));
             header = header.replace("${classFullName}", targetElement.asType().toString());
+            header = header.replace("${interfaceName}", interfaceName);
             header = header.replace("${interfaceFullName}", element.asType().toString());
             header = header.replace("${routineFieldsInit}",
                                     buildRoutineFieldsInit(methodElements.size()));
@@ -436,9 +566,22 @@ public class RoutineProcessor extends AbstractProcessor {
 
             for (final ExecutableElement methodElement : methodElements) {
 
+                ++count;
+
                 final ExecutableElement targetMethod =
                         findMatchingMethod(methodElement, targetElement);
                 final String returnTypeName = targetMethod.getReturnType().toString();
+
+                String methodHeader;
+
+                methodHeader = mMethodHeader.replace("${resultClassName}",
+                                                     boxingClassName(returnTypeName));
+                methodHeader = methodHeader.replace("${methodCount}", Integer.toString(count));
+                methodHeader = methodHeader.replace("${routineBuilderOptions}",
+                                                    buildRoutineOptions(methodElement,
+                                                                        targetMethod));
+
+                writer.append(methodHeader);
 
                 String method;
 
@@ -461,14 +604,12 @@ public class RoutineProcessor extends AbstractProcessor {
                     method = method.replace("${resultType}", returnTypeName);
                 }
 
-                method = method.replace("${methodCount}", Integer.toString(++count));
+                method = method.replace("${methodCount}", Integer.toString(count));
                 method = method.replace("${methodName}", methodElement.getSimpleName());
                 method = method.replace("${targetMethodName}", targetMethod.getSimpleName());
                 method = method.replace("${paramTypes}", buildParamTypes(methodElement));
                 method = method.replace("${paramValues}", buildParamValues(targetMethod));
                 method = method.replace("${inputParams}", buildInputParams(methodElement));
-                method = method.replace("${routineBuilderOptions}",
-                                        buildRoutineOptions(methodElement, targetMethod));
 
                 final Async annotation = methodElement.getAnnotation(Async.class);
                 final Async targetAnnotation = targetMethod.getAnnotation(Async.class);
@@ -660,12 +801,8 @@ public class RoutineProcessor extends AbstractProcessor {
 
             } else {
 
-                System.out.println(">>>> method: " + methodElement);
-
                 for (final ExecutableElement targetMethodElement : ElementFilter.methodsIn(
                         targetElement.getEnclosedElements())) {
-
-                    System.out.println(">>>> target: " + targetMethodElement);
 
                     if (methodName.equals(targetMethodElement.getSimpleName())
                             && haveSameParameters(methodElement, targetMethodElement)) {
@@ -693,20 +830,21 @@ public class RoutineProcessor extends AbstractProcessor {
 
         for (final AnnotationMirror mirror : element.getAnnotationMirrors()) {
 
-            if (mirror.getAnnotationType().equals(annotationType)) {
+            if (!mirror.getAnnotationType().equals(annotationType)) {
 
-                final Set<? extends Entry<? extends ExecutableElement, ? extends AnnotationValue>>
-                        entrySet = mirror.getElementValues().entrySet();
+                continue;
+            }
 
-                for (final Entry<? extends ExecutableElement, ? extends AnnotationValue> entry :
-                        entrySet) {
+            final Set<? extends Entry<? extends ExecutableElement, ? extends AnnotationValue>> set =
+                    mirror.getElementValues().entrySet();
 
-                    if (valueName.equals(entry.getKey().getSimpleName().toString())) {
+            for (final Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : set) {
 
-                        value = entry.getValue();
+                if (valueName.equals(entry.getKey().getSimpleName().toString())) {
 
-                        break;
-                    }
+                    value = entry.getValue();
+
+                    break;
                 }
             }
         }

@@ -11,21 +11,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.wrapper;
 
-/**
- * Created by davide on 11/7/14.
- */
-public class WrapperRoutineBuilder {
+// GENERATED CODE - PLEASE DO NOT EDIT
 
-    protected WrapperRoutineBuilder(final Object target) {
+    private com.bmd.jrt.routine.Routine<Object, ${resultClassName}> initRoutine${methodCount}(
+            final com.bmd.jrt.builder.RoutineConfiguration configuration) {
 
+        return com.bmd.jrt.routine.JavaRoutine.on(new com.bmd.jrt.common.ClassToken<SimpleInvocation${methodCount}>(){})
+                                       .apply(configuration).withArgs(this)
+                                       ${routineBuilderOptions}.buildRoutine();
     }
-
-    public static WrapperRoutineBuilder wrap(final Object target) {
-
-        return new WrapperRoutineBuilder(target);
-    }
-
-    //TODO: log, logLevel, runner, sequential, queued, lockId, tryCatch
-}

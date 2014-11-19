@@ -15,7 +15,14 @@
 // GENERATED CODE - PLEASE DO NOT EDIT
 
     @Override
-    public void ${methodName}(${paramTypes}) {
+    public ${resultType} ${methodName}(${paramTypes}) {
 
-        mRoutine${methodCount}.invokeAsync()${inputParams}.results();
+        final com.bmd.jrt.channel.ParameterChannel<Object, ${resultClassName}> channel = mRoutine${methodCount}.invokeParallel();
+
+        for (final Object object: ${params}) {
+
+            channel.pass(object);
+        }
+
+        return channel.results().readFirst();
     }

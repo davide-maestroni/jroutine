@@ -1099,18 +1099,41 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                     return this;
                 }
 
-                boolean isTimeout = false;
+                if (mOutputHasNext == null) {
 
-                try {
-
-                    isTimeout = !timeout.waitTrue(mMutex, new Check() {
+                    mOutputHasNext = new Check() {
 
                         @Override
                         public boolean isTrue() {
 
-                            return (mState == ChannelState.DONE);
+                            return !outputQueue.isEmpty() || (mState == ChannelState.DONE);
                         }
-                    });
+                    };
+                }
+
+                final long startTime = System.currentTimeMillis();
+                boolean isTimeout = false;
+
+                try {
+
+                    while (timeout.waitSinceMillis(mMutex, startTime)) {
+
+                        while (!outputQueue.isEmpty()) {
+
+                            final OUTPUT result = nextOutput(outputQueue, timeout);
+
+                            logger.dbg("adding output to list: %s [%s]", result, timeout);
+
+                            results.add(result);
+                        }
+
+                        if (mState == ChannelState.DONE) {
+
+                            break;
+                        }
+                    }
+
+                    isTimeout = (mState != ChannelState.DONE);
 
                 } catch (final InterruptedException e) {
 
@@ -1125,15 +1148,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                         throw timeoutException;
                     }
-                }
-
-                while (!outputQueue.isEmpty()) {
-
-                    final OUTPUT result = nextOutput(outputQueue, timeout);
-
-                    logger.dbg("adding output to list: %s [%s]", result, timeout);
-
-                    results.add(result);
                 }
             }
 

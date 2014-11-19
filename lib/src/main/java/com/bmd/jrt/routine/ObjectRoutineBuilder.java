@@ -336,6 +336,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
         synchronized (sWrapperMap) {
 
             final Object target = mTarget;
+            final Class<?> targetClass = mTargetClass;
             final CacheHashMap<Object, HashMap<WrapperInfo, Object>> wrapperMap = sWrapperMap;
 
             HashMap<WrapperInfo, Object> wrappers = wrapperMap.get(target);
@@ -361,7 +362,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
             try {
 
                 final String wrapperClassName =
-                        itf.getCanonicalName() + target.getClass().getSimpleName();
+                        itf.getPackage().getName() + "." + itf.getSimpleName()
+                                + targetClass.getSimpleName();
 
                 final Class<?> wrapperClass = Class.forName(wrapperClassName);
                 final Constructor<?> constructor =

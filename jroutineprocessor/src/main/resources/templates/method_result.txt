@@ -14,31 +14,8 @@
 
 // GENERATED CODE - PLEASE DO NOT EDIT
 
-    private final com.bmd.jrt.routine.Routine<Object, ${resultClassName}> mRoutine${methodCount};
-
     @Override
     public ${resultType} ${methodName}(${paramTypes}) {
 
         return mRoutine${methodCount}.invokeAsync()${inputParams}.results().readFirst();
-    }
-
-    private class SimpleInvocation${methodCount} extends com.bmd.jrt.invocation.SimpleInvocation<Object, ${resultClassName}> {
-
-        private final Object mMutex;
-
-        private SimpleInvocation${methodCount}() {
-
-            mMutex = getMutex("${lockId}");
-        }
-
-        @Override
-        @SuppressWarnings("unchecked")
-        public void onExec(@javax.annotation.Nonnull final java.util.List<?> objects,
-                @javax.annotation.Nonnull final com.bmd.jrt.channel.ResultChannel<${resultClassName}> results) {
-
-            synchronized(mMutex) {
-
-                results.pass(mWrapped.${targetMethodName}(${paramValues}));
-            }
-        }
     }

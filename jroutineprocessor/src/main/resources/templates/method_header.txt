@@ -14,6 +14,8 @@
 
 // GENERATED CODE - PLEASE DO NOT EDIT
 
+    private final com.bmd.jrt.routine.Routine<Object, ${resultClassName}> mRoutine${methodCount};
+
     private com.bmd.jrt.routine.Routine<Object, ${resultClassName}> initRoutine${methodCount}(
             final com.bmd.jrt.builder.RoutineConfiguration configuration) {
 

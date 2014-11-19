@@ -89,7 +89,17 @@ public class RoutineProcessor extends AbstractProcessor {
 
     private String mMethodAsync;
 
+    private String mMethodFooter;
+
+    private String mMethodFooterVoid;
+
     private String mMethodHeader;
+
+    private String mMethodParallelAsync;
+
+    private String mMethodParallelResult;
+
+    private String mMethodParallelVoid;
 
     private String mMethodResult;
 
@@ -116,6 +126,11 @@ public class RoutineProcessor extends AbstractProcessor {
             mMethodAsync = parseTemplate("/templates/method_async.txt", buffer);
             mMethodResult = parseTemplate("/templates/method_result.txt", buffer);
             mMethodVoid = parseTemplate("/templates/method_void.txt", buffer);
+            mMethodParallelAsync = parseTemplate("/templates/method_parallel_async.txt", buffer);
+            mMethodParallelResult = parseTemplate("/templates/method_parallel_result.txt", buffer);
+            mMethodParallelVoid = parseTemplate("/templates/method_parallel_void.txt", buffer);
+            mMethodFooter = parseTemplate("/templates/method_footer.txt", buffer);
+            mMethodFooterVoid = parseTemplate("/templates/method_footer_void.txt", buffer);
             mFooter = parseTemplate("/templates/footer.txt", buffer);
 
         } catch (final IOException ex) {
@@ -176,9 +191,16 @@ public class RoutineProcessor extends AbstractProcessor {
 
     private String buildGenericTypes(final TypeElement element) {
 
+        final List<? extends TypeParameterElement> typeParameters = element.getTypeParameters();
+
+        if (typeParameters.isEmpty()) {
+
+            return "";
+        }
+
         final StringBuilder builder = new StringBuilder("<");
 
-        for (final TypeParameterElement typeParameterElement : element.getTypeParameters()) {
+        for (final TypeParameterElement typeParameterElement : typeParameters) {
 
             if (builder.length() > 1) {
 
@@ -193,11 +215,28 @@ public class RoutineProcessor extends AbstractProcessor {
 
     private String buildInputParams(final ExecutableElement methodElement) {
 
+        final AsyncOverride annotation = methodElement.getAnnotation(AsyncOverride.class);
+        final boolean isParallel = ((annotation != null) && annotation.parallel());
+
         final StringBuilder builder = new StringBuilder();
 
-        for (final VariableElement variableElement : methodElement.getParameters()) {
+        if (isParallel) {
 
-            builder.append(".pass(").append(variableElement).append(")");
+            for (final VariableElement variableElement : methodElement.getParameters()) {
+
+                builder.append(".pass((")
+                       .append(variableElement.asType())
+                       .append(") ")
+                       .append(variableElement)
+                       .append(")");
+            }
+
+        } else {
+
+            for (final VariableElement variableElement : methodElement.getParameters()) {
+
+                builder.append(".pass(").append(variableElement).append(")");
+            }
         }
 
         return builder.toString();
@@ -245,6 +284,23 @@ public class RoutineProcessor extends AbstractProcessor {
         return builder.toString();
     }
 
+    private CharSequence buildParams(final ExecutableElement methodElement) {
+
+        final StringBuilder builder = new StringBuilder();
+
+        for (final VariableElement variableElement : methodElement.getParameters()) {
+
+            if (builder.length() > 0) {
+
+                builder.append(", ");
+            }
+
+            builder.append(variableElement);
+        }
+
+        return builder.toString();
+    }
+
     private String buildRoutineFieldsInit(final int size) {
 
         final StringBuilder builder = new StringBuilder();
@@ -253,8 +309,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
             builder.append("mRoutine")
                    .append(i)
-                   .append(" = ")
-                   .append("initRoutine").append(i).append("(configuration);");
+                   .append(" = ").append("initRoutine").append(i).append("(configuration);");
         }
 
         return builder.toString();
@@ -532,8 +587,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
         try {
 
-            final String packageName =
-                    ((PackageElement) element.getEnclosingElement()).getQualifiedName().toString();
+            final String packageName = getPackage(element).getQualifiedName().toString();
             final String className = targetElement.getSimpleName().toString();
             final String interfaceName = element.getSimpleName().toString();
             final Filer filer = processingEnv.getFiler();
@@ -542,7 +596,7 @@ public class RoutineProcessor extends AbstractProcessor {
             if (!DEBUG) {
 
                 final JavaFileObject sourceFile =
-                        filer.createSourceFile(element.toString() + className);
+                        filer.createSourceFile(packageName + "." + interfaceName + className);
                 writer = sourceFile.openWriter();
 
             } else {
@@ -550,7 +604,9 @@ public class RoutineProcessor extends AbstractProcessor {
                 writer = new StringWriter();
             }
 
-            String header = mHeader.replace("${packageName}", packageName);
+            String header;
+
+            header = mHeader.replace("${packageName}", packageName);
             header = header.replace("${className}", className);
             header = header.replace("${genericTypes}", buildGenericTypes(element));
             header = header.replace("${classFullName}", targetElement.asType().toString());
@@ -582,33 +638,70 @@ public class RoutineProcessor extends AbstractProcessor {
 
                 writer.append(methodHeader);
 
-                String method;
+                String method = null;
 
+                final boolean isVoid = "void".equalsIgnoreCase(returnTypeName);
                 final AsyncOverride overrideAnnotation =
                         methodElement.getAnnotation(AsyncOverride.class);
 
-                if ((overrideAnnotation != null) && overrideAnnotation.result()) {
+                if (overrideAnnotation != null) {
 
-                    method = mMethodAsync.replace("${resultClassName}",
-                                                  boxingClassName(returnTypeName));
+                    if (overrideAnnotation.parallel()) {
 
-                } else if ("void".equalsIgnoreCase(returnTypeName)) {
+                        if (overrideAnnotation.result()) {
 
-                    method = mMethodVoid;
+                            method = mMethodParallelAsync;
 
-                } else {
+                        } else if (isVoid) {
 
-                    method = mMethodResult.replace("${resultClassName}",
-                                                   boxingClassName(returnTypeName));
-                    method = method.replace("${resultType}", returnTypeName);
+                            method = mMethodParallelVoid;
+
+                        } else {
+
+                            method = mMethodParallelResult;
+                        }
+
+                    } else if (overrideAnnotation.result()) {
+
+                        method = mMethodAsync;
+                    }
                 }
 
+                if (method == null) {
+
+                    if (isVoid) {
+
+                        method = mMethodVoid;
+
+                    } else {
+
+                        method = mMethodResult;
+                    }
+                }
+
+                method = method.replace("${resultClassName}", boxingClassName(returnTypeName));
+                method = method.replace("${resultType}", returnTypeName);
                 method = method.replace("${methodCount}", Integer.toString(count));
                 method = method.replace("${methodName}", methodElement.getSimpleName());
-                method = method.replace("${targetMethodName}", targetMethod.getSimpleName());
+                method = method.replace("${params}", buildParams(methodElement));
                 method = method.replace("${paramTypes}", buildParamTypes(methodElement));
                 method = method.replace("${paramValues}", buildParamValues(targetMethod));
                 method = method.replace("${inputParams}", buildInputParams(methodElement));
+
+                writer.append(method);
+
+                String methodFooter;
+
+                methodFooter = (isVoid) ? mMethodFooterVoid : mMethodFooter;
+
+                methodFooter =
+                        methodFooter.replace("${resultClassName}", boxingClassName(returnTypeName));
+                methodFooter = methodFooter.replace("${methodCount}", Integer.toString(count));
+                methodFooter = methodFooter.replace("${methodName}", methodElement.getSimpleName());
+                methodFooter =
+                        methodFooter.replace("${targetMethodName}", targetMethod.getSimpleName());
+                methodFooter =
+                        methodFooter.replace("${paramValues}", buildParamValues(targetMethod));
 
                 final Async annotation = methodElement.getAnnotation(Async.class);
                 final Async targetAnnotation = targetMethod.getAnnotation(Async.class);
@@ -625,9 +718,9 @@ public class RoutineProcessor extends AbstractProcessor {
                     lockId = targetAnnotation.lockId();
                 }
 
-                method = method.replace("${lockId}", lockId);
+                methodFooter = methodFooter.replace("${lockId}", lockId);
 
-                writer.append(method);
+                writer.append(methodFooter);
             }
 
             writer.append(mFooter);
@@ -849,6 +942,18 @@ public class RoutineProcessor extends AbstractProcessor {
         }
 
         return (value != null) ? value.getValue() : null;
+    }
+
+    private PackageElement getPackage(final TypeElement element) {
+
+        Element enclosingElement = element.getEnclosingElement();
+
+        while (!(enclosingElement instanceof PackageElement)) {
+
+            enclosingElement = enclosingElement.getEnclosingElement();
+        }
+
+        return (PackageElement) enclosingElement;
     }
 
     private TypeElement getTypeFromName(final String typeName) {

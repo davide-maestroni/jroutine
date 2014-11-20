@@ -40,8 +40,7 @@ import java.lang.annotation.Target;
  * <pre>
  *     <code>
  *
- *         &#64;AsyncOverride({int.class, int.class})
- *         public int sum(OutputChannel&lt;Integer&gt; i1, int i2);
+ *         public int sum(&#64;AsyncType(int.class) OutputChannel&lt;Integer&gt; i1, int i2);
  *     </code>
  * </pre>
  * <p/>
@@ -61,51 +60,18 @@ import java.lang.annotation.Target;
  * <pre>
  *     <code>
  *
- *         &#64;AsyncOverride(result = true)
+ *         &#64;AsyncType(int.class)
  *         public OutputChannel&lt;Integer&gt; sum(int i1, int i2);
  *     </code>
  * </pre>
  * <p/>
- * The interface can also take an array or collection of input parameters which will be passed in a
- * parallel way to the mirrored method, so that the method will be called several times, one for
- * each input value.<br/>
- * In this case, the specified type indicates the parameter type expected by the target method.
- * <p/>
- * For example, a method taking an integer:
+ * The interface can also return an array or list of outputs:
  * <p/>
  * <pre>
  *     <code>
  *
- *         public int square(int i);
- *     </code>
- * </pre>
- * can be mirrored by a method defined as:
- * <p/>
- * <pre>
- *     <code>
- *
- *         &#64;AsyncOverride(value = int.class, parallel = true, result = true)
- *         public OutputChannel&lt;Integer&gt; square(int... i);
- *     </code>
- * </pre>
- * <p/>
- * or:
- * <p/>
- * <pre>
- *     <code>
- *
- *         &#64;AsyncOverride(value = int.class, parallel = true, result = true)
- *         public OutputChannel&lt;Integer&gt; square(List&lt;Integer&gt; i);
- *     </code>
- * </pre>
- * <p/>
- * Note that the described overrides can be composed in any way, like, for example:
- * <p/>
- * <pre>
- *     <code>
- *
- *         &#64;AsyncOverride(value = int.class, parallel = true, result = true)
- *         public OutputChannel&lt;Integer&gt; square(OutputChannel&lt;Integer&gt; i);
+ *         &#64;AsyncType(int.class)
+ *         public List&lt;Integer&gt; sum(int i1, int i2);
  *     </code>
  * </pre>
  * <p/>
@@ -117,7 +83,7 @@ import java.lang.annotation.Target;
  *         -keepattributes RuntimeVisibleAnnotations
  *
  *         -keepclassmembers class ** {
- *              &#64;com.bmd.jrt.annotation.AsyncOverride *;
+ *              &#64;com.bmd.jrt.annotation.AsyncType *;
  *         }
  *     </code>
  * </pre>
@@ -125,28 +91,14 @@ import java.lang.annotation.Target;
  * Created by davide on 11/11/14.
  */
 @Inherited
-@Target(ElementType.METHOD)
+@Target({ElementType.PARAMETER, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface AsyncOverride {
+public @interface AsyncType {
 
     /**
-     * If the inputs must be passed in a parallel way.
+     * The type of the overridden parameter.
      *
-     * @return whether the inputs are passed in a parallel way.
+     * @return the parameter type.
      */
-    boolean parallel() default false;
-
-    /**
-     * If the results are returned through an output channel.
-     *
-     * @return whether results are passed through an output channel.
-     */
-    boolean result() default false;
-
-    /**
-     * The list of the overridden method parameter types.
-     *
-     * @return the list of types.
-     */
-    Class<?>[] value() default {};
+    Class<?> value();
 }

@@ -14,7 +14,8 @@
 package com.bmd.jrt.routine;
 
 import com.bmd.jrt.annotation.Async;
-import com.bmd.jrt.annotation.AsyncOverride;
+import com.bmd.jrt.annotation.AsyncType;
+import com.bmd.jrt.annotation.ParallelType;
 import com.bmd.jrt.builder.RoutineBuilder.ChannelDataOrder;
 import com.bmd.jrt.builder.RoutineBuilder.SyncRunnerType;
 import com.bmd.jrt.channel.IOChannel;
@@ -1052,29 +1053,29 @@ public class JavaRoutineTest extends TestCase {
         public int compute(int i);
 
         @Async(value = "compute", lockId = Async.UNLOCKED)
-        @AsyncOverride(value = int.class, parallel = true, result = true)
-        public OutputChannel<Integer> computeParallel1(int... i);
+        @AsyncType(int.class)
+        public OutputChannel<Integer> computeParallel1(@ParallelType(int.class) int... i);
 
         @Async(value = "compute")
-        @AsyncOverride(value = int.class, parallel = true, result = true)
-        public OutputChannel<Integer> computeParallel2(Integer... i);
+        @AsyncType(int.class)
+        public OutputChannel<Integer> computeParallel2(@ParallelType(int.class) Integer... i);
 
         @Async(value = "compute", lockId = Async.UNLOCKED)
-        @AsyncOverride(value = int.class, parallel = true, result = true)
-        public OutputChannel<Integer> computeParallel3(List<Integer> i);
+        @AsyncType(int.class)
+        public OutputChannel<Integer> computeParallel3(@ParallelType(int.class) List<Integer> i);
 
         @Async(value = "compute", lockId = Async.UNLOCKED)
-        @AsyncOverride(value = int.class, parallel = true, result = true)
-        public OutputChannel<Integer> computeParallel4(OutputChannel<Integer> i);
+        @AsyncType(int.class)
+        public OutputChannel<Integer> computeParallel4(
+                @ParallelType(int.class) OutputChannel<Integer> i);
     }
 
     private static interface TestItf {
 
-        @AsyncOverride({RuntimeException.class, int.class})
-        public void throwException(RuntimeException ex);
+        public void throwException(@AsyncType(int.class) RuntimeException ex);
 
         @Async(Test.THROW)
-        @AsyncOverride({int.class})
+        @AsyncType(int.class)
         public void throwException1(RuntimeException ex);
 
         @Async(Test.THROW)

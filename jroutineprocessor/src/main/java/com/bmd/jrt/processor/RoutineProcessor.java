@@ -14,10 +14,11 @@
 package com.bmd.jrt.processor;
 
 import com.bmd.jrt.annotation.Async;
-import com.bmd.jrt.annotation.AsyncOverride;
-import com.bmd.jrt.annotation.AsyncWrapper;
+import com.bmd.jrt.annotation.AsyncClass;
+import com.bmd.jrt.annotation.AsyncType;
 import com.bmd.jrt.annotation.DefaultLog;
 import com.bmd.jrt.annotation.DefaultRunner;
+import com.bmd.jrt.annotation.ParallelType;
 import com.bmd.jrt.builder.RoutineBuilder.ChannelDataOrder;
 import com.bmd.jrt.builder.RoutineBuilder.SyncRunnerType;
 import com.bmd.jrt.builder.RoutineConfiguration;
@@ -44,7 +45,6 @@ import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.Name;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.TypeParameterElement;
@@ -59,7 +59,7 @@ import javax.tools.JavaFileObject;
  * <p/>
  * Created by davide on 11/3/14.
  */
-@SupportedAnnotationTypes("com.bmd.jrt.annotation.AsyncWrapper")
+@SupportedAnnotationTypes("com.bmd.jrt.annotation.AsyncClass")
 public class RoutineProcessor extends AbstractProcessor {
 
     private static final boolean DEBUG = false;
@@ -148,12 +148,11 @@ public class RoutineProcessor extends AbstractProcessor {
             return false;
         }
 
-        final TypeElement annotationElement =
-                getTypeFromName(AsyncWrapper.class.getCanonicalName());
+        final TypeElement annotationElement = getTypeFromName(AsyncClass.class.getCanonicalName());
         final TypeMirror annotationType = annotationElement.asType();
 
         for (final Element element : ElementFilter.typesIn(
-                roundEnvironment.getElementsAnnotatedWith(AsyncWrapper.class))) {
+                roundEnvironment.getElementsAnnotatedWith(AsyncClass.class))) {
 
             final TypeElement classElement = (TypeElement) element;
             final List<ExecutableElement> methodElements =
@@ -215,28 +214,11 @@ public class RoutineProcessor extends AbstractProcessor {
 
     private String buildInputParams(final ExecutableElement methodElement) {
 
-        final AsyncOverride annotation = methodElement.getAnnotation(AsyncOverride.class);
-        final boolean isParallel = ((annotation != null) && annotation.parallel());
-
         final StringBuilder builder = new StringBuilder();
 
-        if (isParallel) {
+        for (final VariableElement variableElement : methodElement.getParameters()) {
 
-            for (final VariableElement variableElement : methodElement.getParameters()) {
-
-                builder.append(".pass((")
-                       .append(variableElement.asType())
-                       .append(") ")
-                       .append(variableElement)
-                       .append(")");
-            }
-
-        } else {
-
-            for (final VariableElement variableElement : methodElement.getParameters()) {
-
-                builder.append(".pass(").append(variableElement).append(")");
-            }
+            builder.append(".pass(").append(variableElement).append(")");
         }
 
         return builder.toString();
@@ -309,7 +291,10 @@ public class RoutineProcessor extends AbstractProcessor {
 
             builder.append("mRoutine")
                    .append(i)
-                   .append(" = ").append("initRoutine").append(i).append("(configuration);");
+                   .append(" = ")
+                   .append("initRoutine")
+                   .append(i)
+                   .append("(configuration);");
         }
 
         return builder.toString();
@@ -561,14 +546,19 @@ public class RoutineProcessor extends AbstractProcessor {
                    .append(")");
         }
 
-        final TypeElement overrideAnnotationElement =
-                getTypeFromName(AsyncOverride.class.getCanonicalName());
-        final TypeMirror overrideAnnotationType = overrideAnnotationElement.asType();
+        boolean isOverrideParameters = false;
 
-        final List<?> values =
-                (List<?>) getElementValue(methodElement, overrideAnnotationType, "value");
+        for (final VariableElement parameterElement : methodElement.getParameters()) {
 
-        if ((values != null) && !values.isEmpty()) {
+            if (parameterElement.getAnnotation(AsyncType.class) != null) {
+
+                isOverrideParameters = true;
+
+                break;
+            }
+        }
+
+        if (isOverrideParameters) {
 
             builder.append(".inputOrder(")
                    .append(ChannelDataOrder.class.getCanonicalName())
@@ -641,30 +631,28 @@ public class RoutineProcessor extends AbstractProcessor {
                 String method = null;
 
                 final boolean isVoid = "void".equalsIgnoreCase(returnTypeName);
-                final AsyncOverride overrideAnnotation =
-                        methodElement.getAnnotation(AsyncOverride.class);
+                final AsyncType overrideAnnotation = methodElement.getAnnotation(AsyncType.class);
+                final List<? extends VariableElement> parameters = methodElement.getParameters();
 
-                if (overrideAnnotation != null) {
+                if ((parameters.size() == 1) && (parameters.get(0).getAnnotation(ParallelType.class)
+                        != null)) {
 
-                    if (overrideAnnotation.parallel()) {
+                    if (overrideAnnotation != null) {
 
-                        if (overrideAnnotation.result()) {
+                        method = mMethodParallelAsync;
 
-                            method = mMethodParallelAsync;
+                    } else if (isVoid) {
 
-                        } else if (isVoid) {
+                        method = mMethodParallelVoid;
 
-                            method = mMethodParallelVoid;
+                    } else {
 
-                        } else {
-
-                            method = mMethodParallelResult;
-                        }
-
-                    } else if (overrideAnnotation.result()) {
-
-                        method = mMethodAsync;
+                        method = mMethodParallelResult;
                     }
+
+                } else if (overrideAnnotation != null) {
+
+                    method = mMethodAsync;
                 }
 
                 if (method == null) {
@@ -750,15 +738,17 @@ public class RoutineProcessor extends AbstractProcessor {
     private ExecutableElement findMatchingMethod(final ExecutableElement methodElement,
             final TypeElement targetElement) {
 
+        String methodName = methodElement.getSimpleName().toString();
         ExecutableElement targetMethod = null;
         final Async asyncAnnotation = methodElement.getAnnotation(Async.class);
-        final AsyncOverride overrideAnnotation = methodElement.getAnnotation(AsyncOverride.class);
 
         if (asyncAnnotation != null) {
 
             final String tag = asyncAnnotation.value();
 
             if ((tag != null) && (tag.length() > 0)) {
+
+                methodName = tag;
 
                 for (final ExecutableElement targetMethodElement : ElementFilter.methodsIn(
                         targetElement.getEnclosedElements())) {
@@ -774,130 +764,79 @@ public class RoutineProcessor extends AbstractProcessor {
                         break;
                     }
                 }
-
-                if (targetMethod == null) {
-
-                    final TypeElement annotationElement =
-                            getTypeFromName(AsyncOverride.class.getCanonicalName());
-                    final TypeMirror annotationType = annotationElement.asType();
-
-                    final List<?> values =
-                            (List<?>) getElementValue(methodElement, annotationType, "value");
-
-                    if ((overrideAnnotation != null) && (values != null)) {
-
-                        for (final ExecutableElement targetMethodElement : ElementFilter.methodsIn(
-                                targetElement.getEnclosedElements())) {
-
-                            if (!tag.equals(targetMethodElement.getSimpleName().toString())) {
-
-                                continue;
-                            }
-
-                            final List<? extends VariableElement> classTypeParameters =
-                                    targetMethodElement.getParameters();
-
-                            final int length = values.size();
-
-                            if (length == classTypeParameters.size()) {
-
-                                boolean matches = true;
-
-                                for (int i = 0; i < length; i++) {
-
-                                    if (!normalizeTypeName(values.get(i).toString()).equals(
-                                            classTypeParameters.get(i).asType().toString())) {
-
-                                        matches = false;
-
-                                        break;
-                                    }
-                                }
-
-                                if (matches) {
-
-                                    targetMethod = targetMethodElement;
-
-                                    break;
-                                }
-                            }
-                        }
-
-                    } else {
-
-                        for (final ExecutableElement targetMethodElement : ElementFilter.methodsIn(
-                                targetElement.getEnclosedElements())) {
-
-                            if (tag.equals(targetMethodElement.getSimpleName().toString())
-                                    && haveSameParameters(methodElement, targetMethodElement)) {
-
-                                targetMethod = targetMethodElement;
-
-                                break;
-                            }
-                        }
-                    }
-                }
             }
         }
 
         if (targetMethod == null) {
 
-            final Name methodName = methodElement.getSimpleName();
+            final TypeElement asyncAnnotationElement =
+                    getTypeFromName(AsyncType.class.getCanonicalName());
+            final TypeMirror asyncAnnotationType = asyncAnnotationElement.asType();
+            final TypeElement parallelAnnotationElement =
+                    getTypeFromName(ParallelType.class.getCanonicalName());
+            final TypeMirror parallelAnnotationType = parallelAnnotationElement.asType();
 
-            final TypeElement annotationElement =
-                    getTypeFromName(AsyncOverride.class.getCanonicalName());
-            final TypeMirror annotationType = annotationElement.asType();
+            final List<? extends VariableElement> interfaceTypeParameters =
+                    methodElement.getParameters();
+            final int length = interfaceTypeParameters.size();
 
-            final List<?> values =
-                    (List<?>) getElementValue(methodElement, annotationType, "value");
+            for (final ExecutableElement targetMethodElement : ElementFilter.methodsIn(
+                    targetElement.getEnclosedElements())) {
 
-            if ((overrideAnnotation != null) && (values != null)) {
+                if (!methodName.equals(targetMethodElement.getSimpleName().toString())) {
 
-                for (final ExecutableElement targetMethodElement : ElementFilter.methodsIn(
-                        targetElement.getEnclosedElements())) {
+                    continue;
+                }
 
-                    if (!methodName.equals(targetMethodElement.getSimpleName())) {
+                final List<? extends VariableElement> classTypeParameters =
+                        targetMethodElement.getParameters();
 
-                        continue;
-                    }
+                if (length == classTypeParameters.size()) {
 
-                    final List<? extends VariableElement> classTypeParameters =
-                            targetMethodElement.getParameters();
+                    boolean matches = true;
 
-                    final int length = values.size();
+                    for (int i = 0; i < length; i++) {
 
-                    if (length == classTypeParameters.size()) {
+                        Object value = null;
+                        final VariableElement variableElement = interfaceTypeParameters.get(i);
 
-                        boolean matches = true;
+                        if (variableElement.getAnnotation(AsyncType.class) != null) {
 
-                        for (int i = 0; i < length; i++) {
+                            value = getElementValue(variableElement, asyncAnnotationType, "value");
+                        }
 
-                            if (!normalizeTypeName(values.get(i).toString()).equals(
+                        if (variableElement.getAnnotation(ParallelType.class) != null) {
+
+                            value = getElementValue(variableElement, parallelAnnotationType,
+                                                    "value");
+                        }
+
+                        if (value != null) {
+
+                            if (!normalizeTypeName(value.toString()).equals(
                                     classTypeParameters.get(i).asType().toString())) {
 
                                 matches = false;
 
                                 break;
                             }
-                        }
 
-                        if (matches) {
+                        } else {
 
-                            targetMethod = targetMethodElement;
+                            if (!variableElement.asType()
+                                                .toString()
+                                                .equals(classTypeParameters.get(i)
+                                                                           .asType()
+                                                                           .toString())) {
 
-                            break;
+                                matches = false;
+
+                                break;
+                            }
                         }
                     }
-                }
 
-            } else {
-
-                for (final ExecutableElement targetMethodElement : ElementFilter.methodsIn(
-                        targetElement.getEnclosedElements())) {
-
-                    if (methodName.equals(targetMethodElement.getSimpleName())
-                            && haveSameParameters(methodElement, targetMethodElement)) {
+                    if (matches) {
 
                         targetMethod = targetMethodElement;
 

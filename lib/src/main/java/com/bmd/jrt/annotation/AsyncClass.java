@@ -25,8 +25,8 @@ import java.lang.annotation.Target;
  * The target classes are specified in the annotation attribute. For each one a new wrapper class
  * implementing the annotated interface will be generated in the interface package.<br/>
  * The routines used for calling the methods will honor the attributes specified in any optional
- * {@link Async} and {@link AsyncOverride} annotation defined for each interface method, and for
- * each target method as well.
+ * {@link Async}, {@link AsyncType} and {@link ParallelType} annotation defined for each interface
+ * method, and for each target method as well.
  * <p/>
  * Note that, you'll need to enable annotation pre-processing by adding the processor package to
  * the specific project dependencies.
@@ -35,7 +35,7 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
-public @interface AsyncWrapper {
+public @interface AsyncClass {
 
     /**
      * The list of wrapped classes.

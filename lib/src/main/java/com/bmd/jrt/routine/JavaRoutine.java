@@ -102,9 +102,9 @@ import javax.annotation.Nonnull;
  *
  *         public interface AsyncCallback {
  *
- *             &#64;AsyncOverride({Result.class, Result.class})
- *             public void onResults(OutputChannel&lt;Result&gt; result1,
- *                                      OutputChannel&lt;Result&gt; result2);
+ *             public void onResults(
+ *                  &#64;AsyncType(Result.class) OutputChannel&lt;Result&gt; result1,
+ *                  &#64;AsyncType(Result.class) OutputChannel&lt;Result&gt; result2);
  *         }
  *
  *         final Callback callback = JavaRoutine.on(myCallback).as(Callback.class);
@@ -126,14 +126,7 @@ import javax.annotation.Nonnull;
  *             &#64;Override
  *             public void run() {
  *
- *                 try {
- *
- *                     channel.input().pass(new Result());
- *
- *                 } finally {
- *
- *                     channel.close();
- *                 }
+ *                 channel.input().pass(new Result()).close();
  *             }
  *
  *         }.start();
@@ -148,7 +141,8 @@ import javax.annotation.Nonnull;
  * Created by davide on 9/7/14.
  *
  * @see com.bmd.jrt.annotation.Async
- * @see com.bmd.jrt.annotation.AsyncOverride
+ * @see com.bmd.jrt.annotation.AsyncType
+ * @see com.bmd.jrt.annotation.ParallelType
  */
 public class JavaRoutine {
 

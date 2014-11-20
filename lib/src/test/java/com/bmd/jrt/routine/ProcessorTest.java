@@ -13,8 +13,9 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.annotation.AsyncOverride;
-import com.bmd.jrt.annotation.AsyncWrapper;
+import com.bmd.jrt.annotation.AsyncClass;
+import com.bmd.jrt.annotation.AsyncType;
+import com.bmd.jrt.annotation.ParallelType;
 import com.bmd.jrt.builder.RoutineBuilder.ChannelDataOrder;
 import com.bmd.jrt.builder.RoutineBuilder.SyncRunnerType;
 import com.bmd.jrt.channel.IOChannel;
@@ -62,20 +63,18 @@ public class ProcessorTest extends TestCase {
         assertThat(testInterface.getString(channel.output())).isEqualTo("3");
     }
 
-    @AsyncWrapper(TestClass.class)
+    @AsyncClass(TestClass.class)
     public interface TestInterface {
 
-        @AsyncOverride(result = true)
+        @AsyncType(int.class)
         public OutputChannel<Integer> getOne();
 
-        @AsyncOverride(int.class)
-        public String getString(OutputChannel<Integer> i);
+        public String getString(@AsyncType(int.class) OutputChannel<Integer> i);
 
-        @AsyncOverride(parallel = true, value = int.class)
-        public String getString(int... i);
+        public String getString(@ParallelType(int.class) int... i);
 
-        @AsyncOverride(parallel = true, value = int.class, result = true)
-        public OutputChannel<String> getString(HashSet<Integer> i);
+        @AsyncType(int.class)
+        public OutputChannel<String> getString(@ParallelType(int.class) HashSet<Integer> i);
     }
 
     public static class TestClass {

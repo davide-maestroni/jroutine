@@ -14,7 +14,7 @@
 package com.bmd.jrt.routine;
 
 import com.bmd.jrt.annotation.Async;
-import com.bmd.jrt.annotation.AsyncOverride;
+import com.bmd.jrt.annotation.AsyncType;
 import com.bmd.jrt.builder.RoutineBuilder.ChannelDataOrder;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.builder.RoutineConfigurationBuilder;
@@ -2576,10 +2576,9 @@ public class RoutineTest extends TestCase {
 
     private interface TestInterfaceAsync {
 
-        @AsyncOverride({int.class})
-        public int getInt(OutputChannel<Integer> i);
+        public int getInt(@AsyncType(int.class) OutputChannel<Integer> i);
 
-        @AsyncOverride(result = true)
+        @AsyncType(int.class)
         public OutputChannel<Integer> getOne();
 
         @Async(value = "getInt")

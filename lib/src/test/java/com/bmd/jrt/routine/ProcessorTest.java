@@ -1,3 +1,16 @@
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.bmd.jrt.routine;
 
 import com.bmd.jrt.annotation.AsyncOverride;
@@ -19,6 +32,8 @@ import java.util.concurrent.TimeUnit;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
+ * Java routine processor unit tests.
+ * <p/>
  * Created by davide on 11/18/14.
  */
 public class ProcessorTest extends TestCase {
@@ -43,8 +58,7 @@ public class ProcessorTest extends TestCase {
                                 .readAll()).containsOnly("1", "2", "3");
 
         final IOChannel<Integer> channel = JavaRoutine.io().buildChannel();
-        channel.input().pass(3);
-        channel.close();
+        channel.input().pass(3).close();
         assertThat(testInterface.getString(channel.output())).isEqualTo("3");
     }
 

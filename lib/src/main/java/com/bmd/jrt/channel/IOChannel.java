@@ -13,7 +13,13 @@
  */
 package com.bmd.jrt.channel;
 
+import com.bmd.jrt.time.TimeDuration;
+
+import java.util.Collection;
+import java.util.concurrent.TimeUnit;
+
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Interface defining an input/output channel.
@@ -31,19 +37,12 @@ import javax.annotation.Nonnull;
 public interface IOChannel<TYPE> {
 
     /**
-     * Closes this channel.
-     * <p/>
-     * Note that this method must be always called when done with the channel.
-     */
-    public void close();
-
-    /**
      * Returns the input end of this channel.
      *
      * @return the input channel.
      */
     @Nonnull
-    public InputChannel<TYPE> input();
+    public ChannelInput<TYPE> input();
 
     /**
      * Returns the output end of this channel.
@@ -51,5 +50,81 @@ public interface IOChannel<TYPE> {
      * @return the output channel.
      */
     @Nonnull
-    public OutputChannel<TYPE> output();
+    public ChannelOutput<TYPE> output();
+
+    /**
+     * Interface defining an I/O channel input.
+     *
+     * @param <INPUT> the input type.
+     */
+    public interface ChannelInput<INPUT> extends InputChannel<INPUT> {
+
+        @Nonnull
+        @Override
+        public ChannelInput<INPUT> after(@Nonnull TimeDuration delay);
+
+        @Nonnull
+        @Override
+        public ChannelInput<INPUT> after(long delay, @Nonnull TimeUnit timeUnit);
+
+        @Nonnull
+        @Override
+        public ChannelInput<INPUT> now();
+
+        @Nonnull
+        @Override
+        public ChannelInput<INPUT> pass(@Nullable OutputChannel<INPUT> channel);
+
+        @Nonnull
+        @Override
+        public ChannelInput<INPUT> pass(@Nullable Iterable<? extends INPUT> inputs);
+
+        @Nonnull
+        @Override
+        public ChannelInput<INPUT> pass(@Nullable INPUT input);
+
+        @Nonnull
+        @Override
+        public ChannelInput<INPUT> pass(@Nullable INPUT... inputs);
+
+        /**
+         * Closes the channel input.<br/>
+         * If the channel is already close, this method has no effect.
+         * <p/>
+         * Note that this method must be always called when done with the channel.
+         */
+        public void close();
+    }
+
+    /**
+     * Interface defining an I/O channel output.
+     *
+     * @param <OUTPUT> the output type.
+     */
+    public interface ChannelOutput<OUTPUT> extends OutputChannel<OUTPUT> {
+
+        @Nonnull
+        @Override
+        public ChannelOutput<OUTPUT> afterMax(@Nonnull TimeDuration timeout);
+
+        @Nonnull
+        @Override
+        public ChannelOutput<OUTPUT> afterMax(long timeout, @Nonnull TimeUnit timeUnit);
+
+        @Nonnull
+        @Override
+        public ChannelOutput<OUTPUT> bind(@Nullable OutputConsumer<OUTPUT> consumer);
+
+        @Nonnull
+        @Override
+        public ChannelOutput<OUTPUT> eventuallyThrow(@Nullable RuntimeException exception);
+
+        @Nonnull
+        @Override
+        public ChannelOutput<OUTPUT> immediately();
+
+        @Nonnull
+        @Override
+        public ChannelOutput<OUTPUT> readAllInto(@Nonnull Collection<? super OUTPUT> results);
+    }
 }

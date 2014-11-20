@@ -157,17 +157,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         return abort(null);
     }
 
-    /**
-     * Aborts immediately the execution.
-     *
-     * @param throwable the reason of the abortion.
-     * @see com.bmd.jrt.channel.Channel#abort(Throwable)
-     */
-    public void abortImmediately(@Nullable final Throwable throwable) {
-
-        abort(throwable, true);
-    }
-
     @Nonnull
     @Override
     @SuppressWarnings("ConstantConditions")
@@ -365,11 +354,22 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     }
 
     /**
+     * Aborts immediately the execution.
+     *
+     * @param throwable the reason of the abortion.
+     * @see com.bmd.jrt.channel.Channel#abort(Throwable)
+     */
+    void abortImmediately(@Nullable final Throwable throwable) {
+
+        abort(throwable, true);
+    }
+
+    /**
      * Closes this channel with the specified exception.
      *
      * @param throwable the exception.
      */
-    public void close(@Nullable final Throwable throwable) {
+    void close(@Nullable final Throwable throwable) {
 
         final ArrayList<OutputChannel<?>> channels;
 
@@ -398,7 +398,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     /**
      * Closes this channel successfully.
      */
-    public void close() {
+    void close() {
 
         boolean isFlush = false;
 
@@ -437,7 +437,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
      * @return the output channel.
      */
     @Nonnull
-    public OutputChannel<OUTPUT> getOutput() {
+    OutputChannel<OUTPUT> getOutput() {
 
         return new DefaultOutputChannel();
     }

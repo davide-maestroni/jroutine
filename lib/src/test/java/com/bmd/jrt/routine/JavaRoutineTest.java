@@ -18,7 +18,7 @@ import com.bmd.jrt.annotation.AsyncOverride;
 import com.bmd.jrt.builder.RoutineBuilder.ChannelDataOrder;
 import com.bmd.jrt.builder.RoutineBuilder.SyncRunnerType;
 import com.bmd.jrt.channel.IOChannel;
-import com.bmd.jrt.channel.InputChannel;
+import com.bmd.jrt.channel.IOChannel.ChannelInput;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.ClassToken;
@@ -48,7 +48,12 @@ public class JavaRoutineTest extends TestCase {
 
     public void testChannelBuilder() {
 
-        final IOChannel<Object> channel = JavaRoutine.io().dataOrder(ChannelDataOrder.INSERTION)
+        final IOChannel<Object> channel = JavaRoutine.io()
+                                                     .dataOrder(ChannelDataOrder.INSERTION)
+                                                     .delayRunner(Runners.sharedRunner())
+                                                     .maxSize(1)
+                                                     .bufferTimeout(1, TimeUnit.MILLISECONDS)
+                                                     .bufferTimeout(TimeDuration.seconds(1))
                                                      .logLevel(LogLevel.DEBUG)
                                                      .loggedWith(new NullLog())
                                                      .buildChannel();
@@ -56,23 +61,61 @@ public class JavaRoutineTest extends TestCase {
         assertThat(channel.output().readFirst()).isEqualTo(-77L);
 
         final IOChannel<Object> channel1 = JavaRoutine.io().buildChannel();
-        final InputChannel<Object> input1 = channel1.input();
+        final ChannelInput<Object> input1 = channel1.input();
 
-        input1.after(TimeDuration.millis(200)).pass(23).now().pass(-77L);
-        channel1.close();
+        input1.after(TimeDuration.millis(200)).pass(23).now().pass(-77L).close();
         assertThat(channel1.output().readAll()).containsOnly(23, -77L);
 
         final IOChannel<Object> channel2 =
                 JavaRoutine.io().dataOrder(ChannelDataOrder.INSERTION).buildChannel();
-        final InputChannel<Object> input2 = channel2.input();
+        final ChannelInput<Object> input2 = channel2.input();
 
-        input2.after(TimeDuration.millis(200)).pass(23).now().pass(-77L);
-        channel2.close();
+        input2.after(TimeDuration.millis(200)).pass(23).now().pass(-77L).close();
         assertThat(channel2.output().readAll()).containsExactly(23, -77L);
     }
 
     @SuppressWarnings("ConstantConditions")
     public void testChannelBuilderError() {
+
+        try {
+
+            new IOChannelBuilder().delayRunner(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new IOChannelBuilder().dataOrder(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new IOChannelBuilder().bufferTimeout(0, null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new IOChannelBuilder().bufferTimeout(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
 
         try {
 
@@ -91,6 +134,26 @@ public class JavaRoutineTest extends TestCase {
             fail();
 
         } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new IOChannelBuilder().bufferTimeout(-1, TimeUnit.MILLISECONDS);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            new IOChannelBuilder().maxSize(0);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
 
         }
     }
@@ -854,8 +917,7 @@ public class JavaRoutineTest extends TestCase {
 
         final IOChannel<Integer> channel = JavaRoutine.io().buildChannel();
 
-        channel.input().pass(1, 2, 3);
-        channel.close();
+        channel.input().pass(1, 2, 3).close();
         assertThat(squareAsync.computeParallel4(channel.output()).readAll()).contains(1, 4, 9);
     }
 

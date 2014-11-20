@@ -13,6 +13,7 @@
  */
 package com.bmd.jrt.routine;
 
+import com.bmd.jrt.builder.RoutineBuilder.ChannelDataOrder;
 import com.bmd.jrt.channel.IOChannel;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.common.RoutineException;
@@ -21,6 +22,8 @@ import com.bmd.jrt.time.TimeDuration;
 import junit.framework.TestCase;
 
 import java.lang.ref.WeakReference;
+import java.util.Collections;
+import java.util.concurrent.TimeUnit;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
@@ -68,8 +71,7 @@ public class IOChannelTest extends TestCase {
 
                 } finally {
 
-                    channel.input().pass("test");
-                    channel.close();
+                    channel.input().pass("test").close();
                 }
             }
         }.start();
@@ -78,6 +80,27 @@ public class IOChannelTest extends TestCase {
         final OutputChannel<String> outputChannel = routine.runAsync(channel.output());
         assertThat(outputChannel.readFirst()).isEqualTo("test");
         assertThat(outputChannel.isComplete()).isTrue();
+
+        final IOChannel<String> channel1 =
+                JavaRoutine.io().dataOrder(ChannelDataOrder.INSERTION).buildChannel();
+
+        new Thread() {
+
+            @Override
+            public void run() {
+
+                channel1.input()
+                        .after(1, TimeUnit.MILLISECONDS)
+                        .after(TimeDuration.millis(200))
+                        .pass("test1", "test2")
+                        .pass(Collections.singleton("test3"))
+                        .close();
+            }
+        }.start();
+
+        final Routine<String, String> routine1 = JavaRoutine.<String>on().buildRoutine();
+        final OutputChannel<String> outputChannel1 = routine1.runAsync(channel1.output());
+        assertThat(outputChannel1.readAll()).containsExactly("test1", "test2", "test3");
     }
 
     public void testPartialOut() {
@@ -103,7 +126,7 @@ public class IOChannelTest extends TestCase {
         assertThat(System.currentTimeMillis() - startTime).isLessThan(2000);
 
         assertThat(outputChannel.immediately().isComplete()).isFalse();
-        channel.close();
+        channel.input().close();
         assertThat(outputChannel.afterMax(TimeDuration.millis(500)).isComplete()).isTrue();
     }
 

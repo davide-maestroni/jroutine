@@ -15,17 +15,21 @@ package com.bmd.jrt.routine;
 
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.channel.IOChannel;
-import com.bmd.jrt.channel.InputChannel;
 import com.bmd.jrt.channel.OutputChannel;
+import com.bmd.jrt.channel.OutputConsumer;
 import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.routine.DefaultResultChannel.AbortHandler;
 import com.bmd.jrt.runner.Execution;
 import com.bmd.jrt.runner.Runner;
 import com.bmd.jrt.runner.Runners;
+import com.bmd.jrt.time.TimeDuration;
 
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
@@ -48,9 +52,9 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
 
     private static Runner sWeakRunner;
 
-    private final DefaultResultChannel<TYPE> mInputChannel;
+    private final DefaultChannelInput<TYPE> mInputChannel;
 
-    private final OutputChannel<TYPE> mOutputChannel;
+    private final DefaultChannelOutput<TYPE> mOutputChannel;
 
     /**
      * Constructor.
@@ -67,8 +71,8 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
                                                              configuration.getLogLevel(null),
                                                              IOChannel.class));
         abortHandler.setInputChannel(inputChannel);
-        mInputChannel = inputChannel;
-        mOutputChannel = inputChannel.getOutput();
+        mInputChannel = new DefaultChannelInput<TYPE>(inputChannel);
+        mOutputChannel = new DefaultChannelOutput<TYPE>(inputChannel.getOutput());
 
         addChannelReference(this);
     }
@@ -92,22 +96,16 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
         }
     }
 
-    @Override
-    public void close() {
-
-        mInputChannel.close();
-    }
-
     @Nonnull
     @Override
-    public InputChannel<TYPE> input() {
+    public ChannelInput<TYPE> input() {
 
         return mInputChannel;
     }
 
     @Nonnull
     @Override
-    public OutputChannel<TYPE> output() {
+    public ChannelOutput<TYPE> output() {
 
         return mOutputChannel;
     }
@@ -165,7 +163,7 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
      */
     private static class ChannelWeakReference extends WeakReference<DefaultIOChannel<?>> {
 
-        private final DefaultResultChannel<?> mInputChannel;
+        private final DefaultChannelInput<?> mInputChannel;
 
         /**
          * Constructor.
@@ -184,6 +182,232 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
         public void closeInput() {
 
             mInputChannel.close();
+        }
+    }
+
+    /**
+     * Default implementation of an I/O channel input.
+     *
+     * @param <INPUT> the input type.
+     */
+    private static class DefaultChannelInput<INPUT> implements ChannelInput<INPUT> {
+
+        private final DefaultResultChannel<INPUT> mChannel;
+
+        /**
+         * Constructor.
+         *
+         * @param wrapped the wrapped result channel.
+         */
+        private DefaultChannelInput(@Nonnull final DefaultResultChannel<INPUT> wrapped) {
+
+            mChannel = wrapped;
+        }
+
+        @Override
+        public boolean abort() {
+
+            return mChannel.abort();
+        }
+
+        @Nonnull
+        @Override
+        public ChannelInput<INPUT> after(@Nonnull final TimeDuration delay) {
+
+            mChannel.after(delay);
+
+            return this;
+        }
+
+        @Nonnull
+        @Override
+        public ChannelInput<INPUT> after(final long delay, @Nonnull final TimeUnit timeUnit) {
+
+            mChannel.after(delay, timeUnit);
+
+            return this;
+        }
+
+        @Nonnull
+        @Override
+        public ChannelInput<INPUT> now() {
+
+            mChannel.now();
+
+            return this;
+        }
+
+        @Nonnull
+        @Override
+        public ChannelInput<INPUT> pass(@Nullable final OutputChannel<INPUT> channel) {
+
+            mChannel.pass(channel);
+
+            return this;
+        }
+
+        @Nonnull
+        @Override
+        public ChannelInput<INPUT> pass(@Nullable final Iterable<? extends INPUT> inputs) {
+
+            mChannel.pass(inputs);
+
+            return this;
+        }
+
+        @Nonnull
+        @Override
+        public ChannelInput<INPUT> pass(@Nullable final INPUT input) {
+
+            mChannel.pass(input);
+
+            return this;
+        }
+
+        @Nonnull
+        @Override
+        public ChannelInput<INPUT> pass(@Nullable final INPUT... inputs) {
+
+            mChannel.pass(inputs);
+
+            return this;
+        }
+
+        @Override
+        public void close() {
+
+            mChannel.close();
+        }
+
+        @Override
+        public boolean abort(@Nullable final Throwable reason) {
+
+            return mChannel.abort(reason);
+        }
+
+        @Override
+        public boolean isOpen() {
+
+            return mChannel.isOpen();
+        }
+    }
+
+    /**
+     * Default implementation of an I/O channel output.
+     *
+     * @param <OUTPUT> the output type.
+     */
+    private static class DefaultChannelOutput<OUTPUT> implements ChannelOutput<OUTPUT> {
+
+        private final OutputChannel<OUTPUT> mChannel;
+
+        /**
+         * Constructor.
+         *
+         * @param wrapped the wrapped output channel.
+         */
+        private DefaultChannelOutput(@Nonnull final OutputChannel<OUTPUT> wrapped) {
+
+            mChannel = wrapped;
+        }
+
+        @Nonnull
+        @Override
+        public ChannelOutput<OUTPUT> afterMax(@Nonnull final TimeDuration timeout) {
+
+            mChannel.afterMax(timeout);
+
+            return this;
+        }
+
+        @Nonnull
+        @Override
+        public ChannelOutput<OUTPUT> afterMax(final long timeout,
+                @Nonnull final TimeUnit timeUnit) {
+
+            mChannel.afterMax(timeout, timeUnit);
+
+            return this;
+        }
+
+        @Nonnull
+        @Override
+        public ChannelOutput<OUTPUT> bind(@Nullable final OutputConsumer<OUTPUT> consumer) {
+
+            mChannel.bind(consumer);
+
+            return this;
+        }
+
+        @Nonnull
+        @Override
+        public ChannelOutput<OUTPUT> eventuallyThrow(@Nullable final RuntimeException exception) {
+
+            mChannel.eventuallyThrow(exception);
+
+            return this;
+        }
+
+        @Nonnull
+        @Override
+        public ChannelOutput<OUTPUT> immediately() {
+
+            mChannel.immediately();
+
+            return this;
+        }
+
+        @Nonnull
+        @Override
+        public ChannelOutput<OUTPUT> readAllInto(
+                @Nonnull final Collection<? super OUTPUT> results) {
+
+            mChannel.readAllInto(results);
+
+            return this;
+        }
+
+        @Override
+        public boolean isComplete() {
+
+            return mChannel.isComplete();
+        }
+
+        @Nonnull
+        @Override
+        public List<OUTPUT> readAll() {
+
+            return mChannel.readAll();
+        }
+
+        @Override
+        public OUTPUT readFirst() {
+
+            return mChannel.readFirst();
+        }
+
+        @Override
+        public Iterator<OUTPUT> iterator() {
+
+            return mChannel.iterator();
+        }
+
+        @Override
+        public boolean abort() {
+
+            return mChannel.abort();
+        }
+
+        @Override
+        public boolean abort(@Nullable final Throwable reason) {
+
+            return mChannel.abort(reason);
+        }
+
+        @Override
+        public boolean isOpen() {
+
+            return mChannel.isOpen();
         }
     }
 }

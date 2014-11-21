@@ -104,7 +104,7 @@ public class Runners {
 
         if (sSharedRunner == null) {
 
-            sSharedRunner = poolRunner();
+            sSharedRunner = poolRunner(getBestPoolSize() * 4);
         }
 
         return sSharedRunner;

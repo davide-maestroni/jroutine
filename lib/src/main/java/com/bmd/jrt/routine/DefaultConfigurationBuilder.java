@@ -34,7 +34,7 @@ class DefaultConfigurationBuilder extends RoutineConfigurationBuilder {
     DefaultConfigurationBuilder() {
 
         syncRunner(SyncRunnerType.QUEUED);
-        runBy(Runners.poolRunner()); //TODO: too many thread!!!!
+        runBy(Runners.sharedRunner());
         availableTimeout(seconds(5));
         maxRunning(Integer.MAX_VALUE);
         maxRetained(10);

@@ -31,7 +31,7 @@ import javax.annotation.Nullable;
  */
 class DefaultExecution<INPUT, OUTPUT> implements Execution {
 
-    private final Execution mAbortExecution;
+    private final AbortExecution mAbortExecution;
 
     private final InputIterator<INPUT> mInputIterator;
 

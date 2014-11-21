@@ -821,6 +821,26 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
+            new ObjectRoutineBuilder(test).wrappedAs(Test.class);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            new ObjectRoutineBuilder(test).wrappedAs(ClassToken.tokenOf(Test.class));
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
             JavaRoutine.on(test).as(TestItf.class).throwException(null);
 
             fail();
@@ -1152,11 +1172,15 @@ public class JavaRoutineTest extends TestCase {
         public long getLong() {
 
             return -77;
+
         }
 
-        @Async(value = THROW, log = NullLog.class, logLevel = LogLevel.DEBUG,
-               runnerType = SyncRunnerType.QUEUED,
-               runnerClass = MyRunner.class)
+        @Async(value = THROW, runnerType = SyncRunnerType.QUEUED, runnerClass = MyRunner.class,
+               maxRetained = 1, maxRunning = 1, availTimeout = 1, availTimeUnit = TimeUnit.SECONDS,
+               maxInput = 1, inputOrder = ChannelDataOrder.DELIVERY, inputTimeout = 1,
+               inputTimeUnit = TimeUnit.SECONDS, maxOutput = 1,
+               outputOrder = ChannelDataOrder.DELIVERY, outputTimeout = 1,
+               outputTimeUnit = TimeUnit.SECONDS, log = NullLog.class, logLevel = LogLevel.DEBUG)
         public void throwException(final RuntimeException ex) {
 
             throw ex;

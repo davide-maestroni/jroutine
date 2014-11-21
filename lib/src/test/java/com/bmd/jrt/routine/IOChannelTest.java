@@ -15,6 +15,7 @@ package com.bmd.jrt.routine;
 
 import com.bmd.jrt.builder.RoutineBuilder.ChannelDataOrder;
 import com.bmd.jrt.channel.IOChannel;
+import com.bmd.jrt.channel.IOChannel.ChannelOutput;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.common.RoutineException;
 import com.bmd.jrt.time.TimeDuration;
@@ -22,6 +23,7 @@ import com.bmd.jrt.time.TimeDuration;
 import junit.framework.TestCase;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
@@ -52,6 +54,33 @@ public class IOChannelTest extends TestCase {
 
             assertThat(ex.getCause()).isExactlyInstanceOf(IllegalStateException.class);
         }
+    }
+
+    public void testAbortDelay() {
+
+        final IOChannel<String> channel = JavaRoutine.io().buildChannel();
+        channel.input().after(TimeDuration.days(1)).pass("test").close();
+
+        final ChannelOutput<String> output = channel.output();
+        assertThat(output.immediately().readAll()).isEmpty();
+
+        final ArrayList<String> results = new ArrayList<String>();
+        output.afterMax(10, TimeUnit.MILLISECONDS).readAllInto(results);
+        assertThat(results).isEmpty();
+        assertThat(output.immediately().isComplete()).isFalse();
+        assertThat(output.abort()).isTrue();
+
+        try {
+
+            output.readFirst();
+
+            fail();
+
+        } catch (final RoutineException ignored) {
+
+        }
+
+        assertThat(output.isOpen()).isFalse();
     }
 
     public void testAsynchronousInput() {
@@ -128,6 +157,77 @@ public class IOChannelTest extends TestCase {
         assertThat(outputChannel.immediately().isComplete()).isFalse();
         channel.input().close();
         assertThat(outputChannel.afterMax(TimeDuration.millis(500)).isComplete()).isTrue();
+    }
+
+    public void testTimeout() {
+
+        final IOChannel<String> channel = JavaRoutine.io().buildChannel();
+        channel.input().after(TimeDuration.seconds(3)).pass("test").close();
+
+        final ChannelOutput<String> output = channel.output();
+        assertThat(output.immediately().readAll()).isEmpty();
+
+        try {
+
+            output.afterMax(TimeDuration.millis(10))
+                  .eventuallyThrow(new IllegalStateException())
+                  .readFirst();
+
+            fail();
+
+        } catch (final IllegalStateException ignored) {
+
+        }
+
+        try {
+
+            output.readAllInto(new ArrayList<String>());
+
+            fail();
+
+        } catch (final IllegalStateException ignored) {
+
+        }
+
+        try {
+
+            output.readAll();
+
+            fail();
+
+        } catch (final IllegalStateException ignored) {
+
+        }
+
+        try {
+
+            output.iterator().hasNext();
+
+            fail();
+
+        } catch (final IllegalStateException ignored) {
+
+        }
+
+        try {
+
+            output.iterator().next();
+
+            fail();
+
+        } catch (final IllegalStateException ignored) {
+
+        }
+
+        try {
+
+            output.isComplete();
+
+            fail();
+
+        } catch (final IllegalStateException ignored) {
+
+        }
     }
 
     @SuppressWarnings("UnusedAssignment")

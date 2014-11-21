@@ -28,7 +28,7 @@ Parallel programming on the go.
                 System.exit(0);
             }
 
-            private static class Parse extends BasicExecution&lt;String, Integer&gt; {
+            private static class Parse extends BasicInvocation&lt;String, Integer&gt; {
 
                 &commat;Override
                 public void onInput(final String s, &commat;NonNull final ResultChannel&lt;Integer&gt; results) {
@@ -37,7 +37,7 @@ Parallel programming on the go.
                 }
             }
 
-            private static class Square extends BasicExecution&lt;Integer, Integer&gt; {
+            private static class Square extends BasicInvocation&lt;Integer, Integer&gt; {
 
                 &commat;Override
                 public void onInput(final Integer integer, &commat;NonNull final ResultChannel&lt;Integer&gt; results) {
@@ -47,7 +47,7 @@ Parallel programming on the go.
                 }
             }
 
-            private static class Sum extends BasicExecution&lt;Integer, Integer&gt; {
+            private static class Sum extends BasicInvocation&lt;Integer, Integer&gt; {
 
                 private int mSum;
 

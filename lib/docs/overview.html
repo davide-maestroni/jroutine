@@ -31,7 +31,7 @@ Parallel programming on the go.
             private static class Parse extends BasicInvocation&lt;String, Integer&gt; {
 
                 &commat;Override
-                public void onInput(final String s, &commat;NonNull final ResultChannel&lt;Integer&gt; results) {
+                public void onInput(final String s, &commat;Nonnull final ResultChannel&lt;Integer&gt; results) {
 
                     results.pass(Integer.parseInt(s));
                 }
@@ -40,7 +40,7 @@ Parallel programming on the go.
             private static class Square extends BasicInvocation&lt;Integer, Integer&gt; {
 
                 &commat;Override
-                public void onInput(final Integer integer, &commat;NonNull final ResultChannel&lt;Integer&gt; results) {
+                public void onInput(final Integer integer, &commat;Nonnull final ResultChannel&lt;Integer&gt; results) {
 
                     final int input = integer;
                     results.pass(input * input);
@@ -58,13 +58,13 @@ Parallel programming on the go.
                 }
 
                 &commat;Override
-                public void onInput(final Integer integer, &commat;NonNull final ResultChannel&lt;Integer&gt; results) {
+                public void onInput(final Integer integer, &commat;Nonnull final ResultChannel&lt;Integer&gt; results) {
 
                     mSum += integer;
                 }
 
                 &commat;Override
-                public void onResult(&commat;NonNull final ResultChannel&lt;Integer&gt; results) {
+                public void onResult(&commat;Nonnull final ResultChannel&lt;Integer&gt; results) {
 
                     results.pass(mSum);
                 }

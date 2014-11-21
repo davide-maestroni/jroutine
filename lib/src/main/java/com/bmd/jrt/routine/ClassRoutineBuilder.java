@@ -234,7 +234,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
     @Nonnull
     @Override
-    public ClassRoutineBuilder outputOrder(final ChannelDataOrder order) {
+    public ClassRoutineBuilder outputOrder(@Nonnull final ChannelDataOrder order) {
 
         mBuilder.outputOrder(order);
 

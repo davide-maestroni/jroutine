@@ -193,7 +193,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
     @Nonnull
     @Override
-    public ObjectRoutineBuilder outputOrder(final ChannelDataOrder order) {
+    public ObjectRoutineBuilder outputOrder(@Nonnull final ChannelDataOrder order) {
 
         super.outputOrder(order);
 

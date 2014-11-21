@@ -17,7 +17,6 @@ import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.common.RoutineException;
 import com.bmd.jrt.routine.JavaRoutine;
 import com.bmd.jrt.routine.Routine;
-import com.bmd.jrt.runner.Runners;
 import com.bmd.jrt.time.TimeDuration;
 
 import java.io.File;
@@ -46,7 +45,7 @@ public class Downloader {
     public Downloader(final int maxParallelDownloads) {
 
         mReadConnection = JavaRoutine.on(tokenOf(ReadConnection.class))
-                                     .runBy(Runners.poolRunner(maxParallelDownloads))
+                                     .maxRunning(maxParallelDownloads)
                                      .buildRoutine();
     }
 

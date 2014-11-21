@@ -174,7 +174,8 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineBuilder {
 
     @Nonnull
     @Override
-    public InvocationRoutineBuilder<INPUT, OUTPUT> outputOrder(final ChannelDataOrder order) {
+    public InvocationRoutineBuilder<INPUT, OUTPUT> outputOrder(
+            @Nonnull final ChannelDataOrder order) {
 
         mBuilder.outputOrder(order);
 

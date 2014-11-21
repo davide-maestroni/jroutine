@@ -53,8 +53,8 @@ import javax.annotation.Nonnull;
  * Moreover, the number of input and output data buffered in the corresponding channel can be
  * limited in order to avoid excessive memory consumption. In case the maximum number is reached
  * when passing an input or output, the call blocks until enough data are consumed or the specified
- * timeout elapses. In the latter case a {@link com.bmd.jrt.routine
- * .RoutineChannelOverflowException} will be thrown.
+ * timeout elapses. In the latter case a
+ * {@link com.bmd.jrt.routine .RoutineChannelOverflowException} will be thrown.
  * <p/>
  * Finally, by default the order of input and output data is not guaranteed. Nevertheless, it is
  * possible to force data to be delivered in insertion order, at the cost of a slightly increased
@@ -196,7 +196,7 @@ public interface RoutineBuilder {
      * @throws NullPointerException if the specified order type is null.
      */
     @Nonnull
-    public RoutineBuilder outputOrder(ChannelDataOrder order);
+    public RoutineBuilder outputOrder(@Nonnull ChannelDataOrder order);
 
     /**
      * Sets the timeout for a result channel to have room for additional data.

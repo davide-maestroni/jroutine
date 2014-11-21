@@ -51,7 +51,7 @@ public class ProcessorTest extends TestCase {
                                                        .outputOrder(ChannelDataOrder.INSERTION)
                                                        .logLevel(LogLevel.DEBUG)
                                                        .loggedWith(new NullLog())
-                                                       .wrappedAs(TestInterface.class);
+                                                       .as(TestInterface.class);
 
         assertThat(testInterface.getOne().readFirst()).isEqualTo(1);
         assertThat(testInterface.getString(1, 2, 3)).isIn("1", "2", "3");

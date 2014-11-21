@@ -1289,7 +1289,7 @@ public class RoutineTest extends TestCase {
         assertThat(on(TestClass.class).method("get", int.class).callParallel(17)).containsExactly(
                 17);
 
-        assertThat(on(new TestClass()).as(TestInterface.class).getInt(2)).isEqualTo(2);
+        assertThat(on(new TestClass()).proxy(TestInterface.class).getInt(2)).isEqualTo(2);
 
         try {
 
@@ -1311,12 +1311,13 @@ public class RoutineTest extends TestCase {
 
         }
 
-        assertThat(on(new TestClass()).as(TestInterfaceAsync.class).take(77)).isEqualTo(77);
-        assertThat(on(new TestClass()).as(TestInterfaceAsync.class).getOne().readFirst()).isEqualTo(
+        assertThat(on(new TestClass()).proxy(TestInterfaceAsync.class).take(77)).isEqualTo(77);
+        assertThat(
+                on(new TestClass()).proxy(TestInterfaceAsync.class).getOne().readFirst()).isEqualTo(
                 1);
 
         final TestInterfaceAsync testInterfaceAsync =
-                on(new TestClass()).as(TestInterfaceAsync.class);
+                on(new TestClass()).proxy(TestInterfaceAsync.class);
         assertThat(testInterfaceAsync.getInt(testInterfaceAsync.getOne())).isEqualTo(1);
     }
 

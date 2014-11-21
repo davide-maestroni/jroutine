@@ -781,7 +781,7 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            new ObjectRoutineBuilder(test).as((Class<?>) null);
+            new ObjectRoutineBuilder(test).proxy((Class<?>) null);
 
             fail();
 
@@ -791,11 +791,31 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            new ObjectRoutineBuilder(test).as((ClassToken<?>) null);
+            new ObjectRoutineBuilder(test).proxy((ClassToken<?>) null);
 
             fail();
 
         } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new ObjectRoutineBuilder(test).proxy(Test.class);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            new ObjectRoutineBuilder(test).proxy(ClassToken.tokenOf(Test.class));
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
 
         }
 
@@ -821,7 +841,7 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            new ObjectRoutineBuilder(test).wrappedAs(Test.class);
+            JavaRoutine.on(test).proxy(TestItf.class).throwException(null);
 
             fail();
 
@@ -831,7 +851,7 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            new ObjectRoutineBuilder(test).wrappedAs(ClassToken.tokenOf(Test.class));
+            JavaRoutine.on(test).proxy(TestItf.class).throwException1(null);
 
             fail();
 
@@ -841,27 +861,7 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            JavaRoutine.on(test).as(TestItf.class).throwException(null);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            JavaRoutine.on(test).as(TestItf.class).throwException1(null);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            JavaRoutine.on(test).as(TestItf.class).throwException2(null);
+            JavaRoutine.on(test).proxy(TestItf.class).throwException2(null);
 
             fail();
 
@@ -928,7 +928,7 @@ public class JavaRoutineTest extends TestCase {
     public void testObjectRoutineParallel() {
 
         final Square square = new Square();
-        final SquareItf squareAsync = JavaRoutine.on(square).as(SquareItf.class);
+        final SquareItf squareAsync = JavaRoutine.on(square).proxy(SquareItf.class);
 
         assertThat(squareAsync.compute(3)).isEqualTo(9);
         assertThat(squareAsync.computeParallel1(1, 2, 3).readAll()).contains(1, 4, 9);

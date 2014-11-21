@@ -247,8 +247,8 @@ public class AndroidRunnerTest extends AndroidTestCase {
         public void run() {
 
             // it looks like that handlers and the kind are not so accurate after all...
-            // let's have a 1 millisecond error tolerance
-            mIsPassed = (System.currentTimeMillis() - mStartTime + 1 >= mDelay.toMillis());
+            // let's have a 10 millisecond error tolerance
+            mIsPassed = (System.currentTimeMillis() - mStartTime + 10 >= mDelay.toMillis());
 
             mSemaphore.release();
         }

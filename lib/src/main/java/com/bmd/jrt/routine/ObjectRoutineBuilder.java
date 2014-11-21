@@ -247,72 +247,6 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     }
 
     /**
-     * Returns a proxy object enabling asynchronous calls to the target instance methods.
-     * <p/>
-     * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link Async} annotation.<br/>
-     * In case the wrapped object does not implement the specified interface, the value attribute
-     * will be used to bind the interface method with the instance ones. If no tag is assigned the
-     * method name will be used instead to map it.<br/>
-     * The interface will be interpreted as a mirror of the target object methods, and the optional
-     * {@link AsyncType} and {@link ParallelType} annotations will be honored.
-     *
-     * @param itf     the interface implemented by the return object.
-     * @param <CLASS> the interface type.
-     * @return the proxy object.
-     * @throws NullPointerException     if the specified class is null.
-     * @throws IllegalArgumentException if the specified class does not represent an interface.
-     */
-    @Nonnull
-    public <CLASS> CLASS as(@Nonnull final Class<CLASS> itf) {
-
-        if (!itf.isInterface()) {
-
-            throw new IllegalArgumentException(
-                    "the specified class is not an interface: " + itf.getCanonicalName());
-        }
-
-        final InvocationHandler handler;
-
-        if (itf.isAssignableFrom(mTargetClass)) {
-
-            handler = new ObjectInvocationHandler();
-
-        } else {
-
-            handler = new InterfaceInvocationHandler();
-        }
-
-        final Object proxy =
-                Proxy.newProxyInstance(itf.getClassLoader(), new Class[]{itf}, handler);
-
-        return itf.cast(proxy);
-    }
-
-    /**
-     * Returns a proxy object enabling asynchronous calls to the target instance methods.
-     * <p/>
-     * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link Async} annotation.<br/>
-     * In case the wrapped object does not implement the specified interface, the value attribute
-     * will be used to bind the interface method with the instance ones. If no tag is assigned the
-     * method name will be used instead to map it.<br/>
-     * The interface will be interpreted as a mirror of the target object methods, and the optional
-     * {@link AsyncType} and {@link ParallelType} annotations will be honored.
-     *
-     * @param itf     the token of the interface implemented by the return object.
-     * @param <CLASS> the interface type.
-     * @return the proxy object.
-     * @throws NullPointerException     if the specified class is null.
-     * @throws IllegalArgumentException if the specified class does not represent an interface.
-     */
-    @Nonnull
-    public <CLASS> CLASS as(@Nonnull final ClassToken<CLASS> itf) {
-
-        return itf.cast(as(itf.getRawClass()));
-    }
-
-    /**
      * Returns an object enabling asynchronous calls to the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
@@ -329,7 +263,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * @throws IllegalArgumentException if the specified class does not represent an interface.
      */
     @Nonnull
-    public <CLASS> CLASS wrappedAs(@Nonnull final Class<CLASS> itf) {
+    public <CLASS> CLASS as(@Nonnull final Class<CLASS> itf) {
 
         if (!itf.isInterface()) {
 
@@ -412,9 +346,75 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * @throws IllegalArgumentException if the specified class does not represent an interface.
      */
     @Nonnull
-    public <CLASS> CLASS wrappedAs(@Nonnull final ClassToken<CLASS> itf) {
+    public <CLASS> CLASS as(@Nonnull final ClassToken<CLASS> itf) {
 
-        return itf.cast(wrappedAs(itf.getRawClass()));
+        return itf.cast(as(itf.getRawClass()));
+    }
+
+    /**
+     * Returns a proxy object enabling asynchronous calls to the target instance methods.
+     * <p/>
+     * The routines used for calling the methods will honor the attributes specified in any
+     * optional {@link Async} annotation.<br/>
+     * In case the wrapped object does not implement the specified interface, the value attribute
+     * will be used to bind the interface method with the instance ones. If no tag is assigned the
+     * method name will be used instead to map it.<br/>
+     * The interface will be interpreted as a mirror of the target object methods, and the optional
+     * {@link AsyncType} and {@link ParallelType} annotations will be honored.
+     *
+     * @param itf     the interface implemented by the return object.
+     * @param <CLASS> the interface type.
+     * @return the proxy object.
+     * @throws NullPointerException     if the specified class is null.
+     * @throws IllegalArgumentException if the specified class does not represent an interface.
+     */
+    @Nonnull
+    public <CLASS> CLASS proxy(@Nonnull final Class<CLASS> itf) {
+
+        if (!itf.isInterface()) {
+
+            throw new IllegalArgumentException(
+                    "the specified class is not an interface: " + itf.getCanonicalName());
+        }
+
+        final InvocationHandler handler;
+
+        if (itf.isAssignableFrom(mTargetClass)) {
+
+            handler = new ObjectInvocationHandler();
+
+        } else {
+
+            handler = new InterfaceInvocationHandler();
+        }
+
+        final Object proxy =
+                Proxy.newProxyInstance(itf.getClassLoader(), new Class[]{itf}, handler);
+
+        return itf.cast(proxy);
+    }
+
+    /**
+     * Returns a proxy object enabling asynchronous calls to the target instance methods.
+     * <p/>
+     * The routines used for calling the methods will honor the attributes specified in any
+     * optional {@link Async} annotation.<br/>
+     * In case the wrapped object does not implement the specified interface, the value attribute
+     * will be used to bind the interface method with the instance ones. If no tag is assigned the
+     * method name will be used instead to map it.<br/>
+     * The interface will be interpreted as a mirror of the target object methods, and the optional
+     * {@link AsyncType} and {@link ParallelType} annotations will be honored.
+     *
+     * @param itf     the token of the interface implemented by the return object.
+     * @param <CLASS> the interface type.
+     * @return the proxy object.
+     * @throws NullPointerException     if the specified class is null.
+     * @throws IllegalArgumentException if the specified class does not represent an interface.
+     */
+    @Nonnull
+    public <CLASS> CLASS proxy(@Nonnull final ClassToken<CLASS> itf) {
+
+        return itf.cast(proxy(itf.getRawClass()));
     }
 
     /**

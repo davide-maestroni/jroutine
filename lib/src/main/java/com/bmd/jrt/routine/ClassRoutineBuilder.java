@@ -123,6 +123,92 @@ public class ClassRoutineBuilder implements RoutineBuilder {
         }
     }
 
+    /**
+     * Applies the configuration inferred from the specified annotation attributes to the passed
+     * builder.
+     *
+     * @param builder    the builder.
+     * @param annotation the annotation.
+     * @return the passed builder.
+     * @throws NullPointerException if any of the passed parameter is null.
+     */
+    protected static RoutineConfigurationBuilder applyConfiguration(
+            final RoutineConfigurationBuilder builder, final Async annotation) {
+
+        final Class<? extends Runner> runnerClass = annotation.runnerClass();
+
+        if (runnerClass != DefaultRunner.class) {
+
+            try {
+
+                builder.runBy(runnerClass.newInstance());
+
+            } catch (final InstantiationException e) {
+
+                throw new RoutineException(e.getCause());
+
+            } catch (final IllegalAccessException e) {
+
+                throw new RoutineException(e);
+            }
+        }
+
+        builder.syncRunner(annotation.runnerType());
+        builder.maxRunning(annotation.maxRunning());
+        builder.maxRetained(annotation.maxRetained());
+
+        final long availTimeout = annotation.availTimeout();
+
+        if (availTimeout != DEFAULT) {
+
+            builder.availableTimeout(fromUnit(availTimeout, annotation.availTimeUnit()));
+        }
+
+        builder.inputMaxSize(annotation.maxInput());
+
+        final long inputTimeout = annotation.inputTimeout();
+
+        if (inputTimeout != DEFAULT) {
+
+            builder.inputTimeout(fromUnit(inputTimeout, annotation.inputTimeUnit()));
+        }
+
+        builder.inputOrder(annotation.inputOrder());
+
+        builder.outputMaxSize(annotation.maxOutput());
+
+        final long outputTimeout = annotation.outputTimeout();
+
+        if (outputTimeout != DEFAULT) {
+
+            builder.outputTimeout(fromUnit(outputTimeout, annotation.outputTimeUnit()));
+        }
+
+        builder.outputOrder(annotation.outputOrder());
+
+        final Class<? extends Log> logClass = annotation.log();
+
+        if (logClass != DefaultLog.class) {
+
+            try {
+
+                builder.loggedWith(logClass.newInstance());
+
+            } catch (final InstantiationException e) {
+
+                throw new RoutineException(e.getCause());
+
+            } catch (final IllegalAccessException e) {
+
+                throw new RoutineException(e);
+            }
+        }
+
+        builder.logLevel(annotation.logLevel());
+
+        return builder;
+    }
+
     @Nonnull
     @Override
     public ClassRoutineBuilder apply(@Nonnull final RoutineConfiguration configuration) {
@@ -144,7 +230,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
     @Nonnull
     @Override
-    public ClassRoutineBuilder availableTimeout(@Nonnull final TimeDuration timeout) {
+    public ClassRoutineBuilder availableTimeout(@Nullable final TimeDuration timeout) {
 
         mBuilder.availableTimeout(timeout);
 
@@ -162,7 +248,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
     @Nonnull
     @Override
-    public ClassRoutineBuilder inputOrder(@Nonnull final ChannelDataOrder order) {
+    public ClassRoutineBuilder inputOrder(@Nonnull final DataOrder order) {
 
         mBuilder.inputOrder(order);
 
@@ -180,7 +266,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
     @Nonnull
     @Override
-    public ClassRoutineBuilder inputTimeout(@Nonnull final TimeDuration timeout) {
+    public ClassRoutineBuilder inputTimeout(@Nullable final TimeDuration timeout) {
 
         mBuilder.inputTimeout(timeout);
 
@@ -198,7 +284,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
     @Nonnull
     @Override
-    public ClassRoutineBuilder loggedWith(@Nonnull final Log log) {
+    public ClassRoutineBuilder loggedWith(@Nullable final Log log) {
 
         mBuilder.loggedWith(log);
 
@@ -234,7 +320,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
     @Nonnull
     @Override
-    public ClassRoutineBuilder outputOrder(@Nonnull final ChannelDataOrder order) {
+    public ClassRoutineBuilder outputOrder(@Nonnull final DataOrder order) {
 
         mBuilder.outputOrder(order);
 
@@ -252,7 +338,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
     @Nonnull
     @Override
-    public ClassRoutineBuilder outputTimeout(@Nonnull final TimeDuration timeout) {
+    public ClassRoutineBuilder outputTimeout(@Nullable final TimeDuration timeout) {
 
         mBuilder.outputTimeout(timeout);
 
@@ -261,7 +347,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
     @Nonnull
     @Override
-    public ClassRoutineBuilder runBy(@Nonnull final Runner runner) {
+    public ClassRoutineBuilder runBy(@Nullable final Runner runner) {
 
         mBuilder.runBy(runner);
 
@@ -270,7 +356,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
     @Nonnull
     @Override
-    public ClassRoutineBuilder syncRunner(@Nonnull final SyncRunnerType type) {
+    public ClassRoutineBuilder syncRunner(@Nonnull final RunnerType type) {
 
         mBuilder.syncRunner(type);
 
@@ -381,8 +467,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
         }
 
         String lockId = mLockId;
-        final RoutineConfigurationBuilder builder = mBuilder;
-        RoutineConfiguration configuration = builder.buildConfiguration();
+        final DefaultConfigurationBuilder builder = new DefaultConfigurationBuilder();
         final Async annotation = method.getAnnotation(Async.class);
 
         if (annotation != null) {
@@ -392,10 +477,11 @@ public class ClassRoutineBuilder implements RoutineBuilder {
                 lockId = annotation.lockId();
             }
 
-            configuration = overrideConfiguration(configuration, annotation);
+            applyConfiguration(builder, annotation);
         }
 
-        return getRoutine(configuration, method, lockId);
+        return getRoutine(builder.apply(mBuilder.buildConfiguration()).buildConfiguration(), method,
+                          lockId);
     }
 
     /**
@@ -459,11 +545,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
             }
 
             final String routineLockId = (lockId != null) ? lockId : "";
-
-            final RoutineConfiguration finalConfiguration =
-                    new DefaultConfigurationBuilder(configuration).buildConfiguration();
-            final RoutineInfo routineInfo =
-                    new RoutineInfo(finalConfiguration, method, routineLockId);
+            final RoutineInfo routineInfo = new RoutineInfo(configuration, method, routineLockId);
             routine = routineMap.get(routineInfo);
 
             if (routine != null) {
@@ -497,155 +579,16 @@ public class ClassRoutineBuilder implements RoutineBuilder {
             }
 
             final Class<?> targetClass = mTargetClass;
-            final Runner syncRunner =
-                    (finalConfiguration.getSyncRunner(null) == SyncRunnerType.SEQUENTIAL)
-                            ? Runners.sequentialRunner() : Runners.queuedRunner();
+            final Runner syncRunner = (configuration.getSyncRunner(null) == RunnerType.SEQUENTIAL)
+                    ? Runners.sequentialRunner() : Runners.queuedRunner();
 
-            routine = new DefaultRoutine<Object, Object>(finalConfiguration, syncRunner,
+            routine = new DefaultRoutine<Object, Object>(configuration, syncRunner,
                                                          MethodSimpleInvocation.class, target,
                                                          targetClass, method, mutex);
             routineMap.put(routineInfo, routine);
         }
 
         return routine;
-    }
-
-    /**
-     * Overrides the specified routine configuration by reading the specified annotation attributes
-     * when the configuration ones are not set.
-     *
-     * @param configuration the routine configuration.
-     * @param annotation    the async annotation.
-     * @return the new configuration.
-     */
-    protected RoutineConfiguration overrideConfiguration(final RoutineConfiguration configuration,
-            final Async annotation) {
-
-        final RoutineConfigurationBuilder builder = new RoutineConfigurationBuilder(configuration);
-
-        if (configuration.getRunner(null) == null) {
-
-            final Class<? extends Runner> runnerClass = annotation.runnerClass();
-
-            if (runnerClass != DefaultRunner.class) {
-
-                try {
-
-                    builder.runBy(runnerClass.newInstance());
-
-                } catch (final InstantiationException e) {
-
-                    throw new RoutineException(e.getCause());
-
-                } catch (IllegalAccessException e) {
-
-                    throw new RoutineException(e);
-                }
-            }
-        }
-
-        final SyncRunnerType runnerType = annotation.runnerType();
-
-        if (runnerType != SyncRunnerType.DEFAULT) {
-
-            builder.syncRunner(configuration.getSyncRunner(runnerType));
-        }
-
-        final int maxRunning = annotation.maxRunning();
-
-        if (maxRunning != RoutineConfiguration.NOT_SET) {
-
-            builder.maxRunning(configuration.getMaxRunning(maxRunning));
-        }
-
-        final int maxRetained = annotation.maxRetained();
-
-        if (maxRetained != RoutineConfiguration.NOT_SET) {
-
-            builder.maxRetained(configuration.getMaxRetained(maxRetained));
-        }
-
-        final long availTimeout = annotation.availTimeout();
-
-        if (availTimeout != RoutineConfiguration.NOT_SET) {
-
-            builder.availableTimeout(configuration.getAvailTimeout(
-                    fromUnit(availTimeout, annotation.availTimeUnit())));
-        }
-
-        final int maxInput = annotation.maxInput();
-
-        if (maxInput != RoutineConfiguration.NOT_SET) {
-
-            builder.inputMaxSize(configuration.getInputMaxSize(maxInput));
-        }
-
-        final long inputTimeout = annotation.inputTimeout();
-
-        if (inputTimeout != RoutineConfiguration.NOT_SET) {
-
-            builder.inputTimeout(configuration.getInputTimeout(
-                    fromUnit(inputTimeout, annotation.inputTimeUnit())));
-        }
-
-        final ChannelDataOrder inputOrder = annotation.inputOrder();
-
-        if (inputOrder != ChannelDataOrder.DEFAULT) {
-
-            builder.inputOrder(configuration.getInputOrder(inputOrder));
-        }
-
-        final int maxOutput = annotation.maxOutput();
-
-        if (maxOutput != RoutineConfiguration.NOT_SET) {
-
-            builder.outputMaxSize(configuration.getOutputMaxSize(maxOutput));
-        }
-
-        final long outputTimeout = annotation.outputTimeout();
-
-        if (outputTimeout != RoutineConfiguration.NOT_SET) {
-
-            builder.outputTimeout(configuration.getOutputTimeout(
-                    fromUnit(outputTimeout, annotation.outputTimeUnit())));
-        }
-
-        final ChannelDataOrder outputOrder = annotation.outputOrder();
-
-        if (outputOrder != ChannelDataOrder.DEFAULT) {
-
-            builder.outputOrder(configuration.getOutputOrder(outputOrder));
-        }
-
-        if (configuration.getLog(null) == null) {
-
-            final Class<? extends Log> logClass = annotation.log();
-
-            if (logClass != DefaultLog.class) {
-
-                try {
-
-                    builder.loggedWith(logClass.newInstance());
-
-                } catch (final InstantiationException e) {
-
-                    throw new RoutineException(e.getCause());
-
-                } catch (IllegalAccessException e) {
-
-                    throw new RoutineException(e);
-                }
-            }
-        }
-
-        final LogLevel logLevel = annotation.logLevel();
-
-        if (logLevel != LogLevel.DEFAULT) {
-
-            builder.logLevel(configuration.getLogLevel(logLevel));
-        }
-
-        return builder.buildConfiguration();
     }
 
     private void fillMap(@Nonnull final HashMap<String, Method> map,

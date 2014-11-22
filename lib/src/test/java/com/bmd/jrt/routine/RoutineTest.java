@@ -15,7 +15,7 @@ package com.bmd.jrt.routine;
 
 import com.bmd.jrt.annotation.Async;
 import com.bmd.jrt.annotation.AsyncType;
-import com.bmd.jrt.builder.RoutineBuilder.ChannelDataOrder;
+import com.bmd.jrt.builder.RoutineBuilder.DataOrder;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.builder.RoutineConfigurationBuilder;
 import com.bmd.jrt.channel.BasicOutputConsumer;
@@ -474,8 +474,8 @@ public class RoutineTest extends TestCase {
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(110);
 
         final Routine<String, String> routine1 = JavaRoutine.on(tokenOf(DelayedInvocation.class))
-                                                            .inputOrder(ChannelDataOrder.INSERTION)
-                                                            .outputOrder(ChannelDataOrder.INSERTION)
+                                                            .inputOrder(DataOrder.INSERTION)
+                                                            .outputOrder(DataOrder.INSERTION)
                                                             .withArgs(TimeDuration.millis(10))
                                                             .buildRoutine();
 
@@ -513,8 +513,8 @@ public class RoutineTest extends TestCase {
 
         final Routine<String, String> routine3 =
                 JavaRoutine.on(tokenOf(DelayedListInvocation.class))
-                           .inputOrder(ChannelDataOrder.INSERTION)
-                           .outputOrder(ChannelDataOrder.INSERTION)
+                           .inputOrder(DataOrder.INSERTION)
+                           .outputOrder(DataOrder.INSERTION)
                            .withArgs(TimeDuration.millis(10), 2)
                            .buildRoutine();
 
@@ -551,8 +551,8 @@ public class RoutineTest extends TestCase {
 
         final Routine<String, String> routine5 =
                 JavaRoutine.on(tokenOf(DelayedListInvocation.class))
-                           .inputOrder(ChannelDataOrder.INSERTION)
-                           .outputOrder(ChannelDataOrder.INSERTION)
+                           .inputOrder(DataOrder.INSERTION)
+                           .outputOrder(DataOrder.INSERTION)
                            .withArgs(TimeDuration.ZERO, 2)
                            .buildRoutine();
 
@@ -589,8 +589,8 @@ public class RoutineTest extends TestCase {
 
         final Routine<String, String> routine7 =
                 JavaRoutine.on(tokenOf(DelayedChannelInvocation.class))
-                           .inputOrder(ChannelDataOrder.INSERTION)
-                           .outputOrder(ChannelDataOrder.INSERTION)
+                           .inputOrder(DataOrder.INSERTION)
+                           .outputOrder(DataOrder.INSERTION)
                            .withArgs(TimeDuration.millis(10))
                            .buildRoutine();
 
@@ -627,8 +627,8 @@ public class RoutineTest extends TestCase {
 
         final Routine<String, String> routine9 =
                 JavaRoutine.on(tokenOf(DelayedChannelInvocation.class))
-                           .inputOrder(ChannelDataOrder.INSERTION)
-                           .outputOrder(ChannelDataOrder.INSERTION)
+                           .inputOrder(DataOrder.INSERTION)
+                           .outputOrder(DataOrder.INSERTION)
                            .withArgs(TimeDuration.ZERO)
                            .buildRoutine();
 
@@ -771,11 +771,10 @@ public class RoutineTest extends TestCase {
                                                               .maxRetained(10)
                                                               .inputMaxSize(Integer.MAX_VALUE)
                                                               .inputTimeout(ZERO)
-                                                              .inputOrder(ChannelDataOrder.DELIVERY)
+                                                              .inputOrder(DataOrder.DELIVERY)
                                                               .outputMaxSize(Integer.MAX_VALUE)
                                                               .outputTimeout(ZERO)
-                                                              .outputOrder(
-                                                                      ChannelDataOrder.DELIVERY)
+                                                              .outputOrder(DataOrder.DELIVERY)
                                                               .loggedWith(Logger.getDefaultLog())
                                                               .logLevel(Logger.getDefaultLogLevel())
                                                               .buildConfiguration();
@@ -804,11 +803,10 @@ public class RoutineTest extends TestCase {
                                                               .maxRetained(10)
                                                               .inputMaxSize(Integer.MAX_VALUE)
                                                               .inputTimeout(ZERO)
-                                                              .inputOrder(ChannelDataOrder.DELIVERY)
+                                                              .inputOrder(DataOrder.DELIVERY)
                                                               .outputMaxSize(Integer.MAX_VALUE)
                                                               .outputTimeout(ZERO)
-                                                              .outputOrder(
-                                                                      ChannelDataOrder.DELIVERY)
+                                                              .outputOrder(DataOrder.DELIVERY)
                                                               .loggedWith(Logger.getDefaultLog())
                                                               .logLevel(Logger.getDefaultLogLevel())
                                                               .buildConfiguration();
@@ -837,44 +835,10 @@ public class RoutineTest extends TestCase {
                                                               .maxRunning(Integer.MAX_VALUE)
                                                               .maxRetained(10)
                                                               .inputMaxSize(Integer.MAX_VALUE)
-                                                              .inputOrder(ChannelDataOrder.DELIVERY)
+                                                              .inputOrder(DataOrder.DELIVERY)
                                                               .outputMaxSize(Integer.MAX_VALUE)
                                                               .outputTimeout(ZERO)
-                                                              .outputOrder(
-                                                                      ChannelDataOrder.DELIVERY)
-                                                              .loggedWith(Logger.getDefaultLog())
-                                                              .logLevel(Logger.getDefaultLogLevel())
-                                                              .buildConfiguration();
-
-            new AbstractRoutine<Object, Object>(configuration, Runners.queuedRunner()) {
-
-                @Override
-                @Nonnull
-                protected Invocation<Object, Object> createInvocation(final boolean async) {
-
-                    return new ConstructorException();
-                }
-            };
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            final RoutineConfigurationBuilder builder = new RoutineConfigurationBuilder();
-            final RoutineConfiguration configuration = builder.runBy(Runners.sharedRunner())
-                                                              .availableTimeout(ZERO)
-                                                              .maxRunning(Integer.MAX_VALUE)
-                                                              .maxRetained(10)
-                                                              .inputMaxSize(Integer.MAX_VALUE)
-                                                              .inputTimeout(ZERO)
-                                                              .inputOrder(ChannelDataOrder.DELIVERY)
-                                                              .outputMaxSize(Integer.MAX_VALUE)
-                                                              .outputOrder(
-                                                                      ChannelDataOrder.DELIVERY)
+                                                              .outputOrder(DataOrder.DELIVERY)
                                                               .loggedWith(Logger.getDefaultLog())
                                                               .logLevel(Logger.getDefaultLogLevel())
                                                               .buildConfiguration();
@@ -904,11 +868,10 @@ public class RoutineTest extends TestCase {
                                                               .maxRetained(10)
                                                               .inputMaxSize(Integer.MAX_VALUE)
                                                               .inputTimeout(ZERO)
-                                                              .inputOrder(ChannelDataOrder.DELIVERY)
+                                                              .inputOrder(DataOrder.DELIVERY)
                                                               .outputMaxSize(Integer.MAX_VALUE)
-                                                              .outputTimeout(ZERO)
-                                                              .outputOrder(
-                                                                      ChannelDataOrder.DELIVERY)
+                                                              .outputOrder(DataOrder.DELIVERY)
+                                                              .loggedWith(Logger.getDefaultLog())
                                                               .logLevel(Logger.getDefaultLogLevel())
                                                               .buildConfiguration();
 
@@ -937,11 +900,42 @@ public class RoutineTest extends TestCase {
                                                               .maxRetained(10)
                                                               .inputMaxSize(Integer.MAX_VALUE)
                                                               .inputTimeout(ZERO)
-                                                              .inputOrder(ChannelDataOrder.DELIVERY)
+                                                              .inputOrder(DataOrder.DELIVERY)
                                                               .outputMaxSize(Integer.MAX_VALUE)
                                                               .outputTimeout(ZERO)
-                                                              .outputOrder(
-                                                                      ChannelDataOrder.DELIVERY)
+                                                              .outputOrder(DataOrder.DELIVERY)
+                                                              .logLevel(Logger.getDefaultLogLevel())
+                                                              .buildConfiguration();
+
+            new AbstractRoutine<Object, Object>(configuration, Runners.queuedRunner()) {
+
+                @Override
+                @Nonnull
+                protected Invocation<Object, Object> createInvocation(final boolean async) {
+
+                    return new ConstructorException();
+                }
+            };
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            final RoutineConfigurationBuilder builder = new RoutineConfigurationBuilder();
+            final RoutineConfiguration configuration = builder.runBy(Runners.sharedRunner())
+                                                              .availableTimeout(ZERO)
+                                                              .maxRunning(Integer.MAX_VALUE)
+                                                              .maxRetained(10)
+                                                              .inputMaxSize(Integer.MAX_VALUE)
+                                                              .inputTimeout(ZERO)
+                                                              .inputOrder(DataOrder.DELIVERY)
+                                                              .outputMaxSize(Integer.MAX_VALUE)
+                                                              .outputTimeout(ZERO)
+                                                              .outputOrder(DataOrder.DELIVERY)
                                                               .loggedWith(Logger.getDefaultLog())
                                                               .buildConfiguration();
 
@@ -969,11 +963,10 @@ public class RoutineTest extends TestCase {
                                                               .maxRetained(10)
                                                               .inputMaxSize(Integer.MAX_VALUE)
                                                               .inputTimeout(ZERO)
-                                                              .inputOrder(ChannelDataOrder.DELIVERY)
+                                                              .inputOrder(DataOrder.DELIVERY)
                                                               .outputMaxSize(Integer.MAX_VALUE)
                                                               .outputTimeout(ZERO)
-                                                              .outputOrder(
-                                                                      ChannelDataOrder.DELIVERY)
+                                                              .outputOrder(DataOrder.DELIVERY)
                                                               .loggedWith(Logger.getDefaultLog())
                                                               .logLevel(Logger.getDefaultLogLevel())
                                                               .buildConfiguration();
@@ -1002,11 +995,10 @@ public class RoutineTest extends TestCase {
                                                               .maxRunning(Integer.MAX_VALUE)
                                                               .inputMaxSize(Integer.MAX_VALUE)
                                                               .inputTimeout(ZERO)
-                                                              .inputOrder(ChannelDataOrder.DELIVERY)
+                                                              .inputOrder(DataOrder.DELIVERY)
                                                               .outputMaxSize(Integer.MAX_VALUE)
                                                               .outputTimeout(ZERO)
-                                                              .outputOrder(
-                                                                      ChannelDataOrder.DELIVERY)
+                                                              .outputOrder(DataOrder.DELIVERY)
                                                               .loggedWith(Logger.getDefaultLog())
                                                               .logLevel(Logger.getDefaultLogLevel())
                                                               .buildConfiguration();
@@ -1035,11 +1027,10 @@ public class RoutineTest extends TestCase {
                                                               .maxRunning(Integer.MAX_VALUE)
                                                               .maxRetained(10)
                                                               .inputTimeout(ZERO)
-                                                              .inputOrder(ChannelDataOrder.DELIVERY)
+                                                              .inputOrder(DataOrder.DELIVERY)
                                                               .outputMaxSize(Integer.MAX_VALUE)
                                                               .outputTimeout(ZERO)
-                                                              .outputOrder(
-                                                                      ChannelDataOrder.DELIVERY)
+                                                              .outputOrder(DataOrder.DELIVERY)
                                                               .loggedWith(Logger.getDefaultLog())
                                                               .logLevel(Logger.getDefaultLogLevel())
                                                               .buildConfiguration();
@@ -1069,10 +1060,9 @@ public class RoutineTest extends TestCase {
                                                               .maxRetained(10)
                                                               .inputMaxSize(Integer.MAX_VALUE)
                                                               .inputTimeout(ZERO)
-                                                              .inputOrder(ChannelDataOrder.DELIVERY)
+                                                              .inputOrder(DataOrder.DELIVERY)
                                                               .outputTimeout(ZERO)
-                                                              .outputOrder(
-                                                                      ChannelDataOrder.DELIVERY)
+                                                              .outputOrder(DataOrder.DELIVERY)
                                                               .loggedWith(Logger.getDefaultLog())
                                                               .logLevel(Logger.getDefaultLogLevel())
                                                               .buildConfiguration();
@@ -1383,11 +1373,10 @@ public class RoutineTest extends TestCase {
 
             final RoutineConfigurationBuilder builder = new RoutineConfigurationBuilder();
             final RoutineConfiguration configuration = builder.inputMaxSize(Integer.MAX_VALUE)
-                                                              .inputOrder(ChannelDataOrder.DELIVERY)
+                                                              .inputOrder(DataOrder.DELIVERY)
                                                               .outputMaxSize(Integer.MAX_VALUE)
                                                               .outputTimeout(ZERO)
-                                                              .outputOrder(
-                                                                      ChannelDataOrder.DELIVERY)
+                                                              .outputOrder(DataOrder.DELIVERY)
                                                               .buildConfiguration();
 
             new DefaultParameterChannel<Object, Object>(configuration, new TestInvocationManager(),
@@ -1404,10 +1393,9 @@ public class RoutineTest extends TestCase {
             final RoutineConfigurationBuilder builder = new RoutineConfigurationBuilder();
             final RoutineConfiguration configuration = builder.inputMaxSize(Integer.MAX_VALUE)
                                                               .inputTimeout(ZERO)
-                                                              .inputOrder(ChannelDataOrder.DELIVERY)
+                                                              .inputOrder(DataOrder.DELIVERY)
                                                               .outputMaxSize(Integer.MAX_VALUE)
-                                                              .outputOrder(
-                                                                      ChannelDataOrder.DELIVERY)
+                                                              .outputOrder(DataOrder.DELIVERY)
                                                               .buildConfiguration();
 
             new DefaultParameterChannel<Object, Object>(configuration, new TestInvocationManager(),
@@ -1423,11 +1411,10 @@ public class RoutineTest extends TestCase {
 
             final RoutineConfigurationBuilder builder = new RoutineConfigurationBuilder();
             final RoutineConfiguration configuration = builder.inputTimeout(ZERO)
-                                                              .inputOrder(ChannelDataOrder.DELIVERY)
+                                                              .inputOrder(DataOrder.DELIVERY)
                                                               .outputMaxSize(Integer.MAX_VALUE)
                                                               .outputTimeout(ZERO)
-                                                              .outputOrder(
-                                                                      ChannelDataOrder.DELIVERY)
+                                                              .outputOrder(DataOrder.DELIVERY)
                                                               .buildConfiguration();
 
             new DefaultParameterChannel<Object, Object>(configuration, new TestInvocationManager(),
@@ -1444,10 +1431,9 @@ public class RoutineTest extends TestCase {
             final RoutineConfigurationBuilder builder = new RoutineConfigurationBuilder();
             final RoutineConfiguration configuration = builder.inputMaxSize(Integer.MAX_VALUE)
                                                               .inputTimeout(ZERO)
-                                                              .inputOrder(ChannelDataOrder.DELIVERY)
+                                                              .inputOrder(DataOrder.DELIVERY)
                                                               .outputTimeout(ZERO)
-                                                              .outputOrder(
-                                                                      ChannelDataOrder.DELIVERY)
+                                                              .outputOrder(DataOrder.DELIVERY)
                                                               .buildConfiguration();
 
             new DefaultParameterChannel<Object, Object>(configuration, new TestInvocationManager(),
@@ -1645,8 +1631,7 @@ public class RoutineTest extends TestCase {
 
             final RoutineConfigurationBuilder builder = new RoutineConfigurationBuilder();
             final RoutineConfiguration configuration = builder.outputMaxSize(Integer.MAX_VALUE)
-                                                              .outputOrder(
-                                                                      ChannelDataOrder.DELIVERY)
+                                                              .outputOrder(DataOrder.DELIVERY)
                                                               .buildConfiguration();
 
             new DefaultResultChannel<Object>(configuration, new TestAbortHandler(),
@@ -1662,8 +1647,7 @@ public class RoutineTest extends TestCase {
 
             final RoutineConfigurationBuilder builder = new RoutineConfigurationBuilder();
             final RoutineConfiguration configuration = builder.outputTimeout(ZERO)
-                                                              .outputOrder(
-                                                                      ChannelDataOrder.DELIVERY)
+                                                              .outputOrder(DataOrder.DELIVERY)
                                                               .buildConfiguration();
 
             new DefaultResultChannel<Object>(configuration, new TestAbortHandler(),

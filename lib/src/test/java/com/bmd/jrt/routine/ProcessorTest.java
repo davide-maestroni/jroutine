@@ -16,8 +16,8 @@ package com.bmd.jrt.routine;
 import com.bmd.jrt.annotation.AsyncClass;
 import com.bmd.jrt.annotation.AsyncType;
 import com.bmd.jrt.annotation.ParallelType;
-import com.bmd.jrt.builder.RoutineBuilder.ChannelDataOrder;
-import com.bmd.jrt.builder.RoutineBuilder.SyncRunnerType;
+import com.bmd.jrt.builder.RoutineBuilder.DataOrder;
+import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
 import com.bmd.jrt.channel.IOChannel;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.log.Log.LogLevel;
@@ -42,13 +42,13 @@ public class ProcessorTest extends TestCase {
     public void testWrapper() {
 
         final TestInterface testInterface = JavaRoutine.on(new TestClass())
-                                                       .syncRunner(SyncRunnerType.SEQUENTIAL)
+                                                       .syncRunner(RunnerType.SEQUENTIAL)
                                                        .runBy(Runners.poolRunner())
                                                        .inputMaxSize(3)
                                                        .inputTimeout(1, TimeUnit.SECONDS)
                                                        .outputMaxSize(2)
                                                        .outputTimeout(1, TimeUnit.SECONDS)
-                                                       .outputOrder(ChannelDataOrder.INSERTION)
+                                                       .outputOrder(DataOrder.INSERTION)
                                                        .logLevel(LogLevel.DEBUG)
                                                        .loggedWith(new NullLog())
                                                        .as(TestInterface.class);

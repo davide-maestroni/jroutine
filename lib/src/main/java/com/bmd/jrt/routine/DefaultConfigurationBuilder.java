@@ -15,8 +15,13 @@ package com.bmd.jrt.routine;
 
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.builder.RoutineConfigurationBuilder;
+import com.bmd.jrt.log.Log;
+import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.runner.Runners;
+import com.bmd.jrt.time.TimeDuration;
+
+import javax.annotation.Nonnull;
 
 import static com.bmd.jrt.time.TimeDuration.ZERO;
 import static com.bmd.jrt.time.TimeDuration.seconds;
@@ -28,24 +33,17 @@ import static com.bmd.jrt.time.TimeDuration.seconds;
  */
 class DefaultConfigurationBuilder extends RoutineConfigurationBuilder {
 
+    private static final TimeDuration DEFAULT_AVAIL_TIMEOUT = seconds(5);
+
+    private final Log mDefaultLog = Logger.getDefaultLog();
+
+    private final LogLevel mDefaultLogLevel = Logger.getDefaultLogLevel();
+
     /**
      * Constructor.
      */
     DefaultConfigurationBuilder() {
 
-        syncRunner(SyncRunnerType.QUEUED);
-        runBy(Runners.sharedRunner());
-        availableTimeout(seconds(5));
-        maxRunning(Integer.MAX_VALUE);
-        maxRetained(10);
-        inputMaxSize(Integer.MAX_VALUE);
-        inputTimeout(ZERO);
-        inputOrder(ChannelDataOrder.DELIVERY);
-        outputMaxSize(Integer.MAX_VALUE);
-        outputTimeout(ZERO);
-        outputOrder(ChannelDataOrder.DELIVERY);
-        loggedWith(Logger.getDefaultLog());
-        logLevel(Logger.getDefaultLogLevel());
     }
 
     /**
@@ -54,10 +52,32 @@ class DefaultConfigurationBuilder extends RoutineConfigurationBuilder {
      * @param initialConfiguration the initial configuration.
      * @throws NullPointerException if the specified configuration instance is null.
      */
-    DefaultConfigurationBuilder(final RoutineConfiguration initialConfiguration) {
+    DefaultConfigurationBuilder(@Nonnull final RoutineConfiguration initialConfiguration) {
 
-        this();
+        super(initialConfiguration);
+    }
 
-        apply(initialConfiguration);
+    @Nonnull
+    @Override
+    public RoutineConfiguration buildConfiguration() {
+
+        final RoutineConfiguration configuration = super.buildConfiguration();
+        final RoutineConfigurationBuilder builder = new RoutineConfigurationBuilder();
+
+        builder.availableTimeout(configuration.getAvailTimeout(DEFAULT_AVAIL_TIMEOUT));
+        builder.inputMaxSize(configuration.getInputMaxSize(Integer.MAX_VALUE));
+        builder.inputOrder(configuration.getInputOrder(DataOrder.DELIVERY));
+        builder.inputTimeout(configuration.getInputTimeout(ZERO));
+        builder.logLevel(configuration.getLogLevel(mDefaultLogLevel));
+        builder.loggedWith(configuration.getLog(mDefaultLog));
+        builder.maxRetained(configuration.getMaxRetained(10));
+        builder.maxRunning(configuration.getMaxRunning(Integer.MAX_VALUE));
+        builder.outputMaxSize(configuration.getOutputMaxSize(Integer.MAX_VALUE));
+        builder.outputOrder(configuration.getOutputOrder(DataOrder.DELIVERY));
+        builder.outputTimeout(configuration.getOutputTimeout(ZERO));
+        builder.runBy(configuration.getRunner(Runners.sharedRunner()));
+        builder.syncRunner(configuration.getSyncRunner(RunnerType.QUEUED));
+
+        return builder.buildConfiguration();
     }
 }

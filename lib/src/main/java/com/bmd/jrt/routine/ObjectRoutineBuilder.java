@@ -17,7 +17,6 @@ import com.bmd.jrt.annotation.Async;
 import com.bmd.jrt.annotation.AsyncType;
 import com.bmd.jrt.annotation.ParallelType;
 import com.bmd.jrt.builder.RoutineConfiguration;
-import com.bmd.jrt.builder.RoutineConfigurationBuilder;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ParameterChannel;
 import com.bmd.jrt.common.CacheHashMap;
@@ -103,7 +102,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
     @Nonnull
     @Override
-    public ObjectRoutineBuilder availableTimeout(@Nonnull final TimeDuration timeout) {
+    public ObjectRoutineBuilder availableTimeout(@Nullable final TimeDuration timeout) {
 
         super.availableTimeout(timeout);
 
@@ -121,7 +120,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
     @Nonnull
     @Override
-    public ObjectRoutineBuilder inputOrder(@Nonnull final ChannelDataOrder order) {
+    public ObjectRoutineBuilder inputOrder(@Nonnull final DataOrder order) {
 
         super.inputOrder(order);
 
@@ -139,7 +138,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
     @Nonnull
     @Override
-    public ObjectRoutineBuilder inputTimeout(@Nonnull final TimeDuration timeout) {
+    public ObjectRoutineBuilder inputTimeout(@Nullable final TimeDuration timeout) {
 
         super.inputTimeout(timeout);
 
@@ -157,7 +156,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
     @Nonnull
     @Override
-    public ObjectRoutineBuilder loggedWith(@Nonnull final Log log) {
+    public ObjectRoutineBuilder loggedWith(@Nullable final Log log) {
 
         super.loggedWith(log);
 
@@ -193,7 +192,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
     @Nonnull
     @Override
-    public ObjectRoutineBuilder outputOrder(@Nonnull final ChannelDataOrder order) {
+    public ObjectRoutineBuilder outputOrder(@Nonnull final DataOrder order) {
 
         super.outputOrder(order);
 
@@ -212,7 +211,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
     @Nonnull
     @Override
-    public ObjectRoutineBuilder outputTimeout(@Nonnull final TimeDuration timeout) {
+    public ObjectRoutineBuilder outputTimeout(@Nullable final TimeDuration timeout) {
 
         super.outputTimeout(timeout);
 
@@ -221,7 +220,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
     @Nonnull
     @Override
-    public ObjectRoutineBuilder runBy(@Nonnull final Runner runner) {
+    public ObjectRoutineBuilder runBy(@Nullable final Runner runner) {
 
         super.runBy(runner);
 
@@ -230,7 +229,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
     @Nonnull
     @Override
-    public ObjectRoutineBuilder syncRunner(@Nonnull final SyncRunnerType type) {
+    public ObjectRoutineBuilder syncRunner(@Nonnull final RunnerType type) {
 
         super.syncRunner(type);
 
@@ -492,9 +491,11 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
          */
         private InterfaceInvocationHandler() {
 
+            final String lockId = getLockId();
+
             mTarget = ObjectRoutineBuilder.this.mTarget;
             mTargetClass = ObjectRoutineBuilder.this.mTargetClass;
-            mLockId = getLockId();
+            mLockId = (lockId != null) ? lockId : "";
             mConfiguration = getBuilder().buildConfiguration();
         }
 
@@ -515,7 +516,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
             Method targetMethod;
             String lockId = mLockId;
-            RoutineConfiguration configuration = mConfiguration;
+            final DefaultConfigurationBuilder builder = new DefaultConfigurationBuilder();
 
             synchronized (sMethodCache) {
 
@@ -656,24 +657,47 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                     }
                 }
 
-                if (annotation != null) {
+                final Async targetAnnotation = targetMethod.getAnnotation(Async.class);
 
-                    if (lockId == null) {
+                if (targetAnnotation != null) {
+
+                    if (lockId.length() == 0) {
+
+                        lockId = targetAnnotation.lockId();
+                    }
+
+                    applyConfiguration(builder, targetAnnotation);
+
+                    if (annotation != null) {
+
+                        if (lockId.length() == 0) {
+
+                            lockId = annotation.lockId();
+                        }
+
+                        applyConfiguration(builder, annotation);
+                    }
+
+                } else if (annotation != null) {
+
+                    if (lockId.length() == 0) {
 
                         lockId = annotation.lockId();
                     }
 
-                    configuration = overrideConfiguration(configuration, annotation);
+                    applyConfiguration(builder, annotation);
                 }
             }
 
+            builder.apply(mConfiguration);
+
             if (isOverrideParameters) {
 
-                configuration = new RoutineConfigurationBuilder(configuration).inputOrder(
-                        ChannelDataOrder.INSERTION).buildConfiguration();
+                builder.inputOrder(DataOrder.INSERTION);
             }
 
-            final Routine<Object, Object> routine = getRoutine(configuration, targetMethod, lockId);
+            final Routine<Object, Object> routine =
+                    getRoutine(builder.buildConfiguration(), targetMethod, lockId);
             final OutputChannel<Object> outputChannel;
 
             if (isParallel) {

@@ -21,6 +21,7 @@ import com.bmd.jrt.time.TimeDuration;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Interface defining a builder of routine objects.
@@ -65,6 +66,11 @@ import javax.annotation.Nonnull;
 public interface RoutineBuilder {
 
     /**
+     * Constant indicating the default value of an integer attribute.
+     */
+    public static final int DEFAULT = Integer.MIN_VALUE;
+
+    /**
      * Applies the specified configuration to this builder.
      *
      * @param configuration the configuration.
@@ -87,17 +93,18 @@ public interface RoutineBuilder {
     public RoutineBuilder availableTimeout(long timeout, @Nonnull TimeUnit timeUnit);
 
     /**
-     * Sets the timeout for an invocation instance to become available.
+     * Sets the timeout for an invocation instance to become available. A null value means that
+     * it is up to the framework to chose a default.
      *
      * @param timeout the timeout.
      * @return this builder.
-     * @throws NullPointerException if the specified timeout is null.
      */
     @Nonnull
-    public RoutineBuilder availableTimeout(@Nonnull TimeDuration timeout);
+    public RoutineBuilder availableTimeout(@Nullable TimeDuration timeout);
 
     /**
      * Sets the maximum number of data that the input channel can retain before they are consumed.
+     * A DEFAULT value means that it is up to the framework to chose a default.
      *
      * @param inputMaxSize the maximum size.
      * @return this builder.
@@ -114,7 +121,7 @@ public interface RoutineBuilder {
      * @throws NullPointerException if the specified order type is null.
      */
     @Nonnull
-    public RoutineBuilder inputOrder(@Nonnull ChannelDataOrder order);
+    public RoutineBuilder inputOrder(@Nonnull DataOrder order);
 
     /**
      * Sets the timeout for an input channel to have room for additional data.
@@ -129,14 +136,14 @@ public interface RoutineBuilder {
     public RoutineBuilder inputTimeout(long timeout, @Nonnull TimeUnit timeUnit);
 
     /**
-     * Sets the timeout for an input channel to have room for additional data.
+     * Sets the timeout for an input channel to have room for additional data. A null value means
+     * that it is up to the framework to chose a default.
      *
      * @param timeout the timeout.
      * @return this builder.
-     * @throws NullPointerException if the specified timeout is null.
      */
     @Nonnull
-    public RoutineBuilder inputTimeout(@Nonnull TimeDuration timeout);
+    public RoutineBuilder inputTimeout(@Nullable TimeDuration timeout);
 
     /**
      * Sets the log level.
@@ -149,17 +156,17 @@ public interface RoutineBuilder {
     public RoutineBuilder logLevel(@Nonnull LogLevel level);
 
     /**
-     * Sets the log instance.
+     * Sets the log instance. A null value means that it is up to the framework to chose a default.
      *
      * @param log the log instance.
      * @return this builder.
-     * @throws NullPointerException if the log is null.
      */
     @Nonnull
-    public RoutineBuilder loggedWith(@Nonnull Log log);
+    public RoutineBuilder loggedWith(@Nullable Log log);
 
     /**
-     * Sets the max number of retained instances.
+     * Sets the max number of retained instances. A DEFAULT value means that it is up to the
+     * framework to chose a default.
      *
      * @param maxRetainedInstances the max number of instances.
      * @return this builder.
@@ -169,7 +176,8 @@ public interface RoutineBuilder {
     public RoutineBuilder maxRetained(int maxRetainedInstances);
 
     /**
-     * Sets the max number of concurrently running instances.
+     * Sets the max number of concurrently running instances.A DEFAULT value means that it is up
+     * to the framework to chose a default.
      *
      * @param maxRunningInstances the max number of instances.
      * @return this builder.
@@ -180,6 +188,7 @@ public interface RoutineBuilder {
 
     /**
      * Sets the maximum number of data that the result channel can retain before they are consumed.
+     * A DEFAULT value means that it is up to the framework to chose a default.
      *
      * @param outputMaxSize the maximum size.
      * @return this builder.
@@ -196,7 +205,7 @@ public interface RoutineBuilder {
      * @throws NullPointerException if the specified order type is null.
      */
     @Nonnull
-    public RoutineBuilder outputOrder(@Nonnull ChannelDataOrder order);
+    public RoutineBuilder outputOrder(@Nonnull DataOrder order);
 
     /**
      * Sets the timeout for a result channel to have room for additional data.
@@ -211,24 +220,24 @@ public interface RoutineBuilder {
     public RoutineBuilder outputTimeout(long timeout, @Nonnull TimeUnit timeUnit);
 
     /**
-     * Sets the timeout for a result channel to have room for additional data.
+     * Sets the timeout for a result channel to have room for additional data. A null value means
+     * that it is up to the framework to chose a default.
      *
      * @param timeout the timeout.
      * @return this builder.
-     * @throws NullPointerException if the specified timeout is null.
      */
     @Nonnull
-    public RoutineBuilder outputTimeout(@Nonnull TimeDuration timeout);
+    public RoutineBuilder outputTimeout(@Nullable TimeDuration timeout);
 
     /**
-     * Sets the asynchronous runner instance.
+     * Sets the asynchronous runner instance. A null value means that it is up to the framework
+     * to chose a default.
      *
      * @param runner the runner instance.
      * @return this builder.
-     * @throws NullPointerException if the specified runner is null.
      */
     @Nonnull
-    public RoutineBuilder runBy(@Nonnull Runner runner);
+    public RoutineBuilder runBy(@Nullable Runner runner);
 
     /**
      * Sets the type of the synchronous runner to be used by the routine.
@@ -238,12 +247,12 @@ public interface RoutineBuilder {
      * @throws NullPointerException if the specified type is null.
      */
     @Nonnull
-    public RoutineBuilder syncRunner(@Nonnull SyncRunnerType type);
+    public RoutineBuilder syncRunner(@Nonnull RunnerType type);
 
     /**
      * Enumeration defining how data are ordered inside a channel.
      */
-    public enum ChannelDataOrder {
+    public enum DataOrder {
 
         /**
          * Insertion order.<br/>
@@ -269,7 +278,7 @@ public interface RoutineBuilder {
     /**
      * Synchronous runner type enumeration.
      */
-    public enum SyncRunnerType {
+    public enum RunnerType {
 
         /**
          * Sequential runner.<br/>

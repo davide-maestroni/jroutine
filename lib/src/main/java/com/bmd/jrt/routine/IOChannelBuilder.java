@@ -13,14 +13,11 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.builder.RoutineBuilder.ChannelDataOrder;
-import com.bmd.jrt.builder.RoutineConfigurationBuilder;
+import com.bmd.jrt.builder.RoutineBuilder.DataOrder;
 import com.bmd.jrt.channel.IOChannel;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
-import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.runner.Runner;
-import com.bmd.jrt.runner.Runners;
 import com.bmd.jrt.time.TimeDuration;
 
 import java.util.concurrent.TimeUnit;
@@ -34,19 +31,14 @@ import javax.annotation.Nonnull;
  */
 public class IOChannelBuilder {
 
-    private final RoutineConfigurationBuilder mBuilder;
+    private final DefaultConfigurationBuilder mBuilder;
 
     /**
      * Avoid direct instantiation.
      */
     IOChannelBuilder() {
 
-        mBuilder = new RoutineConfigurationBuilder().runBy(Runners.sharedRunner())
-                                                    .outputMaxSize(Integer.MAX_VALUE)
-                                                    .outputTimeout(TimeDuration.ZERO)
-                                                    .outputOrder(ChannelDataOrder.DELIVERY)
-                                                    .loggedWith(Logger.getDefaultLog())
-                                                    .logLevel(Logger.getDefaultLogLevel());
+        mBuilder = new DefaultConfigurationBuilder();
     }
 
     /**
@@ -100,7 +92,7 @@ public class IOChannelBuilder {
      * @throws NullPointerException if the specified order type is null.
      */
     @Nonnull
-    public IOChannelBuilder dataOrder(@Nonnull ChannelDataOrder order) {
+    public IOChannelBuilder dataOrder(@Nonnull DataOrder order) {
 
         mBuilder.outputOrder(order);
 

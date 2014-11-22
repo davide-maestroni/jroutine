@@ -21,6 +21,7 @@ import com.bmd.jrt.time.TimeDuration;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import static com.bmd.jrt.time.TimeDuration.fromUnit;
 
@@ -33,29 +34,29 @@ public class RoutineConfigurationBuilder extends AbstractRoutineBuilder {
 
     private TimeDuration mAvailTimeout = null;
 
-    private int mInputMaxSize = RoutineConfiguration.NOT_SET;
+    private int mInputMaxSize = DEFAULT;
 
-    private ChannelDataOrder mInputOrder = null;
+    private DataOrder mInputOrder = DataOrder.DEFAULT;
 
     private TimeDuration mInputTimeout = null;
 
     private Log mLog = null;
 
-    private LogLevel mLogLevel = null;
+    private LogLevel mLogLevel = LogLevel.DEFAULT;
 
-    private int mMaxRetained = RoutineConfiguration.NOT_SET;
+    private int mMaxRetained = DEFAULT;
 
-    private int mMaxRunning = RoutineConfiguration.NOT_SET;
+    private int mMaxRunning = DEFAULT;
 
-    private int mOutputMaxSize = RoutineConfiguration.NOT_SET;
+    private int mOutputMaxSize = DEFAULT;
 
-    private ChannelDataOrder mOutputOrder = null;
+    private DataOrder mOutputOrder = DataOrder.DEFAULT;
 
     private TimeDuration mOutputTimeout = null;
 
     private Runner mRunner = null;
 
-    private SyncRunnerType mRunnerType = null;
+    private RunnerType mRunnerType = RunnerType.DEFAULT;
 
     /**
      * Constructor.
@@ -70,7 +71,7 @@ public class RoutineConfigurationBuilder extends AbstractRoutineBuilder {
      * @param initialConfiguration the initial configuration.
      * @throws NullPointerException if the specified configuration instance is null.
      */
-    public RoutineConfigurationBuilder(final RoutineConfiguration initialConfiguration) {
+    public RoutineConfigurationBuilder(@Nonnull final RoutineConfiguration initialConfiguration) {
 
         mRunner = initialConfiguration.getRunner(mRunner);
         mRunnerType = initialConfiguration.getSyncRunner(mRunnerType);
@@ -89,6 +90,15 @@ public class RoutineConfigurationBuilder extends AbstractRoutineBuilder {
 
     @Nonnull
     @Override
+    public RoutineConfigurationBuilder apply(@Nonnull final RoutineConfiguration configuration) {
+
+        super.apply(configuration);
+
+        return this;
+    }
+
+    @Nonnull
+    @Override
     public RoutineConfigurationBuilder availableTimeout(final long timeout,
             @Nonnull final TimeUnit timeUnit) {
 
@@ -97,13 +107,7 @@ public class RoutineConfigurationBuilder extends AbstractRoutineBuilder {
 
     @Nonnull
     @Override
-    @SuppressWarnings("ConstantConditions")
-    public RoutineConfigurationBuilder availableTimeout(@Nonnull final TimeDuration timeout) {
-
-        if (timeout == null) {
-
-            throw new NullPointerException("the timeout must not be null");
-        }
+    public RoutineConfigurationBuilder availableTimeout(@Nullable final TimeDuration timeout) {
 
         mAvailTimeout = timeout;
 
@@ -114,7 +118,7 @@ public class RoutineConfigurationBuilder extends AbstractRoutineBuilder {
     @Override
     public RoutineConfigurationBuilder inputMaxSize(final int inputMaxSize) {
 
-        if (inputMaxSize <= 0) {
+        if ((inputMaxSize != DEFAULT) && (inputMaxSize <= 0)) {
 
             throw new IllegalArgumentException("the buffer size cannot be 0 or negative");
         }
@@ -127,7 +131,7 @@ public class RoutineConfigurationBuilder extends AbstractRoutineBuilder {
     @Nonnull
     @Override
     @SuppressWarnings("ConstantConditions")
-    public RoutineConfigurationBuilder inputOrder(@Nonnull final ChannelDataOrder order) {
+    public RoutineConfigurationBuilder inputOrder(@Nonnull final DataOrder order) {
 
         if (order == null) {
 
@@ -149,13 +153,7 @@ public class RoutineConfigurationBuilder extends AbstractRoutineBuilder {
 
     @Nonnull
     @Override
-    @SuppressWarnings("ConstantConditions")
-    public RoutineConfigurationBuilder inputTimeout(@Nonnull final TimeDuration timeout) {
-
-        if (timeout == null) {
-
-            throw new NullPointerException("the timeout must not be null");
-        }
+    public RoutineConfigurationBuilder inputTimeout(@Nullable final TimeDuration timeout) {
 
         mInputTimeout = timeout;
 
@@ -179,13 +177,7 @@ public class RoutineConfigurationBuilder extends AbstractRoutineBuilder {
 
     @Nonnull
     @Override
-    @SuppressWarnings("ConstantConditions")
-    public RoutineConfigurationBuilder loggedWith(@Nonnull final Log log) {
-
-        if (log == null) {
-
-            throw new NullPointerException("the log instance must not be null");
-        }
+    public RoutineConfigurationBuilder loggedWith(@Nullable final Log log) {
 
         mLog = log;
 
@@ -196,7 +188,7 @@ public class RoutineConfigurationBuilder extends AbstractRoutineBuilder {
     @Override
     public RoutineConfigurationBuilder maxRetained(final int maxRetainedInstances) {
 
-        if (maxRetainedInstances < 0) {
+        if ((maxRetainedInstances != DEFAULT) && (maxRetainedInstances < 0)) {
 
             throw new IllegalArgumentException(
                     "the maximum number of retained instances cannot be negative");
@@ -211,7 +203,7 @@ public class RoutineConfigurationBuilder extends AbstractRoutineBuilder {
     @Override
     public RoutineConfigurationBuilder maxRunning(final int maxRunningInstances) {
 
-        if (maxRunningInstances < 1) {
+        if ((maxRunningInstances != DEFAULT) && (maxRunningInstances < 1)) {
 
             throw new IllegalArgumentException(
                     "the maximum number of concurrently running instances cannot be less than 1");
@@ -226,7 +218,7 @@ public class RoutineConfigurationBuilder extends AbstractRoutineBuilder {
     @Override
     public RoutineConfigurationBuilder outputMaxSize(final int outputMaxSize) {
 
-        if (outputMaxSize <= 0) {
+        if ((outputMaxSize != DEFAULT) && (outputMaxSize <= 0)) {
 
             throw new IllegalArgumentException("the buffer size cannot be 0 or negative");
         }
@@ -239,7 +231,7 @@ public class RoutineConfigurationBuilder extends AbstractRoutineBuilder {
     @Nonnull
     @Override
     @SuppressWarnings("ConstantConditions")
-    public RoutineConfigurationBuilder outputOrder(@Nonnull final ChannelDataOrder order) {
+    public RoutineConfigurationBuilder outputOrder(@Nonnull final DataOrder order) {
 
         if (order == null) {
 
@@ -261,13 +253,7 @@ public class RoutineConfigurationBuilder extends AbstractRoutineBuilder {
 
     @Nonnull
     @Override
-    @SuppressWarnings("ConstantConditions")
-    public RoutineConfigurationBuilder outputTimeout(@Nonnull final TimeDuration timeout) {
-
-        if (timeout == null) {
-
-            throw new NullPointerException("the timeout must not be null");
-        }
+    public RoutineConfigurationBuilder outputTimeout(@Nullable final TimeDuration timeout) {
 
         mOutputTimeout = timeout;
 
@@ -276,13 +262,7 @@ public class RoutineConfigurationBuilder extends AbstractRoutineBuilder {
 
     @Nonnull
     @Override
-    @SuppressWarnings("ConstantConditions")
-    public RoutineConfigurationBuilder runBy(@Nonnull final Runner runner) {
-
-        if (runner == null) {
-
-            throw new NullPointerException("the runner instance must not be null");
-        }
+    public RoutineConfigurationBuilder runBy(@Nullable final Runner runner) {
 
         mRunner = runner;
 
@@ -292,7 +272,7 @@ public class RoutineConfigurationBuilder extends AbstractRoutineBuilder {
     @Nonnull
     @Override
     @SuppressWarnings("ConstantConditions")
-    public RoutineConfigurationBuilder syncRunner(@Nonnull final SyncRunnerType type) {
+    public RoutineConfigurationBuilder syncRunner(@Nonnull final RunnerType type) {
 
         if (type == null) {
 

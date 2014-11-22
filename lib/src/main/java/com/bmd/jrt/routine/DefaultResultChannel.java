@@ -13,7 +13,7 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.builder.RoutineBuilder.ChannelDataOrder;
+import com.bmd.jrt.builder.RoutineBuilder.DataOrder;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.OutputConsumer;
@@ -139,7 +139,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             throw new IllegalArgumentException("the output buffer size cannot be 0 or negative");
         }
 
-        mOutputQueue = (configuration.getOutputOrder(null) == ChannelDataOrder.INSERTION)
+        mOutputQueue = (configuration.getOutputOrder(null) == DataOrder.INSERTION)
                 ? new OrderedNestedQueue<Object>() : new SimpleNestedQueue<Object>();
         mHasOutputs = new Check() {
 

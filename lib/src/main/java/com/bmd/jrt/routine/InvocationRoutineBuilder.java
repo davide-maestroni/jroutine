@@ -26,6 +26,7 @@ import com.bmd.jrt.time.TimeDuration;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import static com.bmd.jrt.routine.ReflectionUtils.NO_ARGS;
 
@@ -81,7 +82,7 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineBuilder {
     @Nonnull
     @Override
     public InvocationRoutineBuilder<INPUT, OUTPUT> availableTimeout(
-            @Nonnull final TimeDuration timeout) {
+            @Nullable final TimeDuration timeout) {
 
         mBuilder.availableTimeout(timeout);
 
@@ -99,8 +100,7 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineBuilder {
 
     @Nonnull
     @Override
-    public InvocationRoutineBuilder<INPUT, OUTPUT> inputOrder(
-            @Nonnull final ChannelDataOrder order) {
+    public InvocationRoutineBuilder<INPUT, OUTPUT> inputOrder(@Nonnull final DataOrder order) {
 
         mBuilder.inputOrder(order);
 
@@ -120,7 +120,7 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineBuilder {
     @Nonnull
     @Override
     public InvocationRoutineBuilder<INPUT, OUTPUT> inputTimeout(
-            @Nonnull final TimeDuration timeout) {
+            @Nullable final TimeDuration timeout) {
 
         mBuilder.inputTimeout(timeout);
 
@@ -138,7 +138,7 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineBuilder {
 
     @Nonnull
     @Override
-    public InvocationRoutineBuilder<INPUT, OUTPUT> loggedWith(@Nonnull final Log log) {
+    public InvocationRoutineBuilder<INPUT, OUTPUT> loggedWith(@Nullable final Log log) {
 
         mBuilder.loggedWith(log);
 
@@ -174,8 +174,7 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineBuilder {
 
     @Nonnull
     @Override
-    public InvocationRoutineBuilder<INPUT, OUTPUT> outputOrder(
-            @Nonnull final ChannelDataOrder order) {
+    public InvocationRoutineBuilder<INPUT, OUTPUT> outputOrder(@Nonnull final DataOrder order) {
 
         mBuilder.outputOrder(order);
 
@@ -195,7 +194,7 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineBuilder {
     @Nonnull
     @Override
     public InvocationRoutineBuilder<INPUT, OUTPUT> outputTimeout(
-            @Nonnull final TimeDuration timeout) {
+            @Nullable final TimeDuration timeout) {
 
         mBuilder.outputTimeout(timeout);
 
@@ -204,7 +203,7 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineBuilder {
 
     @Nonnull
     @Override
-    public InvocationRoutineBuilder<INPUT, OUTPUT> runBy(@Nonnull final Runner runner) {
+    public InvocationRoutineBuilder<INPUT, OUTPUT> runBy(@Nullable final Runner runner) {
 
         mBuilder.runBy(runner);
 
@@ -213,7 +212,7 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineBuilder {
 
     @Nonnull
     @Override
-    public InvocationRoutineBuilder<INPUT, OUTPUT> syncRunner(@Nonnull final SyncRunnerType type) {
+    public InvocationRoutineBuilder<INPUT, OUTPUT> syncRunner(@Nonnull final RunnerType type) {
 
         mBuilder.syncRunner(type);
 
@@ -229,7 +228,7 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineBuilder {
     public Routine<INPUT, OUTPUT> buildRoutine() {
 
         final RoutineConfiguration configuration = mBuilder.buildConfiguration();
-        final Runner syncRunner = (configuration.getSyncRunner(null) == SyncRunnerType.SEQUENTIAL)
+        final Runner syncRunner = (configuration.getSyncRunner(null) == RunnerType.SEQUENTIAL)
                 ? Runners.sequentialRunner() : Runners.queuedRunner();
 
         return new DefaultRoutine<INPUT, OUTPUT>(configuration, syncRunner, mInvocationClass,

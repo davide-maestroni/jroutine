@@ -19,9 +19,9 @@ import com.bmd.jrt.annotation.AsyncType;
 import com.bmd.jrt.annotation.DefaultLog;
 import com.bmd.jrt.annotation.DefaultRunner;
 import com.bmd.jrt.annotation.ParallelType;
-import com.bmd.jrt.builder.RoutineBuilder.ChannelDataOrder;
-import com.bmd.jrt.builder.RoutineBuilder.SyncRunnerType;
-import com.bmd.jrt.builder.RoutineConfiguration;
+import com.bmd.jrt.builder.RoutineBuilder;
+import com.bmd.jrt.builder.RoutineBuilder.DataOrder;
+import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
 import com.bmd.jrt.log.Log.LogLevel;
 
 import java.io.ByteArrayOutputStream;
@@ -309,19 +309,19 @@ public class RoutineProcessor extends AbstractProcessor {
         final TypeElement annotationElement = getTypeFromName(Async.class.getCanonicalName());
         final TypeMirror annotationType = annotationElement.asType();
 
-        SyncRunnerType runnerType = SyncRunnerType.DEFAULT;
-        int maxRunning = RoutineConfiguration.NOT_SET;
-        int maxRetained = RoutineConfiguration.NOT_SET;
-        long availTimeout = RoutineConfiguration.NOT_SET;
+        RunnerType runnerType = RunnerType.DEFAULT;
+        int maxRunning = RoutineBuilder.DEFAULT;
+        int maxRetained = RoutineBuilder.DEFAULT;
+        long availTimeout = RoutineBuilder.DEFAULT;
         TimeUnit availTimeUnit = null;
-        int maxInput = RoutineConfiguration.NOT_SET;
-        long inputTimeout = RoutineConfiguration.NOT_SET;
+        int maxInput = RoutineBuilder.DEFAULT;
+        long inputTimeout = RoutineBuilder.DEFAULT;
         TimeUnit inputTimeUnit = null;
-        ChannelDataOrder inputOrder = ChannelDataOrder.DEFAULT;
-        int maxOutput = RoutineConfiguration.NOT_SET;
-        long outputTimeout = RoutineConfiguration.NOT_SET;
+        DataOrder inputOrder = DataOrder.DEFAULT;
+        int maxOutput = RoutineBuilder.DEFAULT;
+        long outputTimeout = RoutineBuilder.DEFAULT;
         TimeUnit outputTimeUnit = null;
-        ChannelDataOrder outputOrder = ChannelDataOrder.DEFAULT;
+        DataOrder outputOrder = DataOrder.DEFAULT;
         LogLevel logLevel = LogLevel.DEFAULT;
         TypeElement logElement = null;
         TypeElement runnerElement = null;
@@ -373,55 +373,55 @@ public class RoutineProcessor extends AbstractProcessor {
                 }
             }
 
-            if (runnerType == SyncRunnerType.DEFAULT) {
+            if (runnerType == RunnerType.DEFAULT) {
 
                 runnerType = targetAnnotation.runnerType();
             }
 
-            if (maxRunning == RoutineConfiguration.NOT_SET) {
+            if (maxRunning == RoutineBuilder.DEFAULT) {
 
                 maxRunning = targetAnnotation.maxRunning();
             }
 
-            if (maxRetained == RoutineConfiguration.NOT_SET) {
+            if (maxRetained == RoutineBuilder.DEFAULT) {
 
                 maxRetained = targetAnnotation.maxRetained();
             }
 
-            if (availTimeout == RoutineConfiguration.NOT_SET) {
+            if (availTimeout == RoutineBuilder.DEFAULT) {
 
                 availTimeout = targetAnnotation.availTimeout();
                 availTimeUnit = targetAnnotation.availTimeUnit();
             }
 
-            if (maxInput == RoutineConfiguration.NOT_SET) {
+            if (maxInput == RoutineBuilder.DEFAULT) {
 
                 maxInput = targetAnnotation.maxInput();
             }
 
-            if (inputTimeout == RoutineConfiguration.NOT_SET) {
+            if (inputTimeout == RoutineBuilder.DEFAULT) {
 
                 inputTimeout = targetAnnotation.inputTimeout();
                 inputTimeUnit = targetAnnotation.inputTimeUnit();
             }
 
-            if (inputOrder == ChannelDataOrder.DEFAULT) {
+            if (inputOrder == DataOrder.DEFAULT) {
 
                 inputOrder = targetAnnotation.inputOrder();
             }
 
-            if (maxOutput == RoutineConfiguration.NOT_SET) {
+            if (maxOutput == RoutineBuilder.DEFAULT) {
 
                 maxOutput = targetAnnotation.maxOutput();
             }
 
-            if (outputTimeout == RoutineConfiguration.NOT_SET) {
+            if (outputTimeout == RoutineBuilder.DEFAULT) {
 
                 outputTimeout = targetAnnotation.outputTimeout();
                 outputTimeUnit = targetAnnotation.outputTimeUnit();
             }
 
-            if (outputOrder == ChannelDataOrder.DEFAULT) {
+            if (outputOrder == DataOrder.DEFAULT) {
 
                 outputOrder = targetAnnotation.outputOrder();
             }
@@ -451,26 +451,26 @@ public class RoutineProcessor extends AbstractProcessor {
             builder.append(".runBy(new ").append(runnerElement).append("())");
         }
 
-        if (runnerType != SyncRunnerType.DEFAULT) {
+        if (runnerType != RunnerType.DEFAULT) {
 
             builder.append(".syncRunner(")
-                   .append(SyncRunnerType.class.getCanonicalName())
+                   .append(RunnerType.class.getCanonicalName())
                    .append(".")
                    .append(runnerType)
                    .append(")");
         }
 
-        if (maxRunning != RoutineConfiguration.NOT_SET) {
+        if (maxRunning != RoutineBuilder.DEFAULT) {
 
             builder.append(".maxRunning(").append(maxRunning).append(")");
         }
 
-        if (maxRetained != RoutineConfiguration.NOT_SET) {
+        if (maxRetained != RoutineBuilder.DEFAULT) {
 
             builder.append(".maxRetained(").append(maxRetained).append(")");
         }
 
-        if (availTimeout != RoutineConfiguration.NOT_SET) {
+        if (availTimeout != RoutineBuilder.DEFAULT) {
 
             builder.append(".availTimeout(")
                    .append(availTimeout)
@@ -481,12 +481,12 @@ public class RoutineProcessor extends AbstractProcessor {
                    .append(")");
         }
 
-        if (maxInput != RoutineConfiguration.NOT_SET) {
+        if (maxInput != RoutineBuilder.DEFAULT) {
 
             builder.append(".inputMaxSize(").append(maxInput).append(")");
         }
 
-        if (inputTimeout != RoutineConfiguration.NOT_SET) {
+        if (inputTimeout != RoutineBuilder.DEFAULT) {
 
             builder.append(".inputTimeout(")
                    .append(inputTimeout)
@@ -497,21 +497,21 @@ public class RoutineProcessor extends AbstractProcessor {
                    .append(")");
         }
 
-        if (inputOrder != ChannelDataOrder.DEFAULT) {
+        if (inputOrder != DataOrder.DEFAULT) {
 
             builder.append(".inputOrder(")
-                   .append(ChannelDataOrder.class.getCanonicalName())
+                   .append(DataOrder.class.getCanonicalName())
                    .append(".")
                    .append(inputOrder)
                    .append(")");
         }
 
-        if (maxOutput != RoutineConfiguration.NOT_SET) {
+        if (maxOutput != RoutineBuilder.DEFAULT) {
 
             builder.append(".outputMaxSize(").append(maxOutput).append(")");
         }
 
-        if (outputTimeout != RoutineConfiguration.NOT_SET) {
+        if (outputTimeout != RoutineBuilder.DEFAULT) {
 
             builder.append(".outputTimeout(")
                    .append(outputTimeout)
@@ -522,10 +522,10 @@ public class RoutineProcessor extends AbstractProcessor {
                    .append(")");
         }
 
-        if (outputOrder != ChannelDataOrder.DEFAULT) {
+        if (outputOrder != DataOrder.DEFAULT) {
 
             builder.append(".outputOrder(")
-                   .append(ChannelDataOrder.class.getCanonicalName())
+                   .append(DataOrder.class.getCanonicalName())
                    .append(".")
                    .append(outputOrder)
                    .append(")");
@@ -561,9 +561,9 @@ public class RoutineProcessor extends AbstractProcessor {
         if (isOverrideParameters) {
 
             builder.append(".inputOrder(")
-                   .append(ChannelDataOrder.class.getCanonicalName())
+                   .append(DataOrder.class.getCanonicalName())
                    .append(".")
-                   .append(ChannelDataOrder.INSERTION)
+                   .append(DataOrder.INSERTION)
                    .append(")");
         }
 

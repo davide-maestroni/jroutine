@@ -13,9 +13,9 @@
  */
 package com.bmd.jrt.annotation;
 
-import com.bmd.jrt.builder.RoutineBuilder.ChannelDataOrder;
-import com.bmd.jrt.builder.RoutineBuilder.SyncRunnerType;
-import com.bmd.jrt.builder.RoutineConfiguration;
+import com.bmd.jrt.builder.RoutineBuilder;
+import com.bmd.jrt.builder.RoutineBuilder.DataOrder;
+import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.runner.Runner;
@@ -123,14 +123,14 @@ public @interface Async {
      *
      * @return the timeout.
      */
-    long availTimeout() default RoutineConfiguration.NOT_SET;
+    long availTimeout() default RoutineBuilder.DEFAULT;
 
     /**
      * The input data order.
      *
      * @return the order type.
      */
-    ChannelDataOrder inputOrder() default ChannelDataOrder.DEFAULT;
+    DataOrder inputOrder() default DataOrder.DEFAULT;
 
     /**
      * The time unit of the timeout for an input channel to have room for additional data.
@@ -144,7 +144,7 @@ public @interface Async {
      *
      * @return the timeout.
      */
-    long inputTimeout() default RoutineConfiguration.NOT_SET;
+    long inputTimeout() default RoutineBuilder.DEFAULT;
 
     /**
      * The ID of the lock associated with the annotated method.
@@ -172,35 +172,35 @@ public @interface Async {
      *
      * @return the maximum number of input data.
      */
-    int maxInput() default RoutineConfiguration.NOT_SET;
+    int maxInput() default RoutineBuilder.DEFAULT;
 
     /**
      * The maximum number of data that the result channel can retain before they are consumed.
      *
      * @return the maximum number of result data.
      */
-    int maxOutput() default RoutineConfiguration.NOT_SET;
+    int maxOutput() default RoutineBuilder.DEFAULT;
 
     /**
      * The max number of retained routine instances.
      *
      * @return the max retained instances.
      */
-    int maxRetained() default RoutineConfiguration.NOT_SET;
+    int maxRetained() default RoutineBuilder.DEFAULT;
 
     /**
      * The max number of concurrently running routine instances.
      *
      * @return the max concurrently running instances.
      */
-    int maxRunning() default RoutineConfiguration.NOT_SET;
+    int maxRunning() default RoutineBuilder.DEFAULT;
 
     /**
      * The output data order.
      *
      * @return the order type.
      */
-    ChannelDataOrder outputOrder() default ChannelDataOrder.DEFAULT;
+    DataOrder outputOrder() default DataOrder.DEFAULT;
 
     /**
      * The time unit of the timeout for a result channel to have room for additional data.
@@ -214,7 +214,7 @@ public @interface Async {
      *
      * @return the timeout.
      */
-    long outputTimeout() default RoutineConfiguration.NOT_SET;
+    long outputTimeout() default RoutineBuilder.DEFAULT;
 
     /**
      * The class of the runner to be used for asynchronous invocations.
@@ -228,7 +228,7 @@ public @interface Async {
      *
      * @return the runner type.
      */
-    SyncRunnerType runnerType() default SyncRunnerType.DEFAULT;
+    RunnerType runnerType() default RunnerType.DEFAULT;
 
     /**
      * The tag used to identify the method independently from its original signature.

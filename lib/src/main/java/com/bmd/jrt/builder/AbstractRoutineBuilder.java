@@ -20,9 +20,9 @@ import com.bmd.jrt.time.TimeDuration;
 
 import javax.annotation.Nonnull;
 
-import static com.bmd.jrt.builder.RoutineConfiguration.NOT_SET;
-
 /**
+ * Abstract implementation of a routine builder.
+ * <p/>
  * Created by davide on 11/17/14.
  */
 public abstract class AbstractRoutineBuilder implements RoutineBuilder {
@@ -38,23 +38,23 @@ public abstract class AbstractRoutineBuilder implements RoutineBuilder {
             runBy(runner);
         }
 
-        final SyncRunnerType syncRunner = configuration.getSyncRunner(SyncRunnerType.DEFAULT);
+        final RunnerType syncRunner = configuration.getSyncRunner(RunnerType.DEFAULT);
 
-        if (syncRunner != SyncRunnerType.DEFAULT) {
+        if (syncRunner != RunnerType.DEFAULT) {
 
             syncRunner(syncRunner);
         }
 
-        final int maxRunning = configuration.getMaxRunning(NOT_SET);
+        final int maxRunning = configuration.getMaxRunning(DEFAULT);
 
-        if (maxRunning != NOT_SET) {
+        if (maxRunning != DEFAULT) {
 
             maxRunning(maxRunning);
         }
 
-        final int maxRetained = configuration.getMaxRetained(NOT_SET);
+        final int maxRetained = configuration.getMaxRetained(DEFAULT);
 
-        if (maxRetained != NOT_SET) {
+        if (maxRetained != DEFAULT) {
 
             maxRetained(maxRetained);
         }
@@ -66,9 +66,9 @@ public abstract class AbstractRoutineBuilder implements RoutineBuilder {
             availableTimeout(availTimeout);
         }
 
-        final int inputMaxSize = configuration.getInputMaxSize(NOT_SET);
+        final int inputMaxSize = configuration.getInputMaxSize(DEFAULT);
 
-        if (inputMaxSize != NOT_SET) {
+        if (inputMaxSize != DEFAULT) {
 
             inputMaxSize(inputMaxSize);
         }
@@ -80,16 +80,16 @@ public abstract class AbstractRoutineBuilder implements RoutineBuilder {
             inputTimeout(inputTimeout);
         }
 
-        final ChannelDataOrder inputOrder = configuration.getInputOrder(ChannelDataOrder.DEFAULT);
+        final DataOrder inputOrder = configuration.getInputOrder(DataOrder.DEFAULT);
 
-        if (inputOrder != ChannelDataOrder.DEFAULT) {
+        if (inputOrder != DataOrder.DEFAULT) {
 
             inputOrder(inputOrder);
         }
 
-        final int outputMaxSize = configuration.getOutputMaxSize(NOT_SET);
+        final int outputMaxSize = configuration.getOutputMaxSize(DEFAULT);
 
-        if (outputMaxSize != NOT_SET) {
+        if (outputMaxSize != DEFAULT) {
 
             outputMaxSize(outputMaxSize);
         }
@@ -101,9 +101,9 @@ public abstract class AbstractRoutineBuilder implements RoutineBuilder {
             outputTimeout(outputTimeout);
         }
 
-        final ChannelDataOrder outputOrder = configuration.getOutputOrder(ChannelDataOrder.DEFAULT);
+        final DataOrder outputOrder = configuration.getOutputOrder(DataOrder.DEFAULT);
 
-        if (outputOrder != ChannelDataOrder.DEFAULT) {
+        if (outputOrder != DataOrder.DEFAULT) {
 
             outputOrder(outputOrder);
         }

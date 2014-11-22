@@ -904,38 +904,6 @@ public class RoutineTest extends TestCase {
                                                               .outputMaxSize(Integer.MAX_VALUE)
                                                               .outputTimeout(ZERO)
                                                               .outputOrder(DataOrder.DELIVERY)
-                                                              .logLevel(Logger.getDefaultLogLevel())
-                                                              .buildConfiguration();
-
-            new AbstractRoutine<Object, Object>(configuration, Runners.queuedRunner()) {
-
-                @Override
-                @Nonnull
-                protected Invocation<Object, Object> createInvocation(final boolean async) {
-
-                    return new ConstructorException();
-                }
-            };
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            final RoutineConfigurationBuilder builder = new RoutineConfigurationBuilder();
-            final RoutineConfiguration configuration = builder.runBy(Runners.sharedRunner())
-                                                              .availableTimeout(ZERO)
-                                                              .maxRunning(Integer.MAX_VALUE)
-                                                              .maxRetained(10)
-                                                              .inputMaxSize(Integer.MAX_VALUE)
-                                                              .inputTimeout(ZERO)
-                                                              .inputOrder(DataOrder.DELIVERY)
-                                                              .outputMaxSize(Integer.MAX_VALUE)
-                                                              .outputTimeout(ZERO)
-                                                              .outputOrder(DataOrder.DELIVERY)
                                                               .loggedWith(Logger.getDefaultLog())
                                                               .buildConfiguration();
 

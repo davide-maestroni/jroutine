@@ -33,14 +33,18 @@ public class Logger {
 
     private static final int DEBUG_LEVEL = LogLevel.DEBUG.ordinal();
 
+    private static final LogLevel DEFAULT_LEVEL = LogLevel.ERROR;
+
+    private static final AtomicReference<LogLevel> sLogLevel =
+            new AtomicReference<LogLevel>(DEFAULT_LEVEL);
+
+    private static final SystemLog DEFAULT_LOG = new SystemLog();
+
+    private static final AtomicReference<Log> sLog = new AtomicReference<Log>(DEFAULT_LOG);
+
     private static final int ERROR_LEVEL = LogLevel.ERROR.ordinal();
 
     private static final int WARNING_LEVEL = LogLevel.WARNING.ordinal();
-
-    private static final AtomicReference<Log> sLog = new AtomicReference<Log>(new SystemLog());
-
-    private static final AtomicReference<LogLevel> sLogLevel =
-            new AtomicReference<LogLevel>(LogLevel.ERROR);
 
     private final List<Object> mContextList;
 
@@ -58,20 +62,14 @@ public class Logger {
      * @param contexts the array of contexts.
      * @param log      the log instance.
      * @param level    the log level.
-     * @throws NullPointerException if one of the parameters is null.
+     * @throws NullPointerException if any of the parameters is null.
      */
-    @SuppressWarnings("ConstantConditions")
-    private Logger(@Nonnull final Object[] contexts, @Nonnull final Log log,
+    private Logger(@Nonnull final Object[] contexts, @Nullable final Log log,
             @Nonnull final LogLevel level) {
 
-        if (log == null) {
-
-            throw new NullPointerException("the log instance must not be null");
-        }
-
         mContexts = contexts.clone();
-        mLog = log;
-        mLogLevel = level;
+        mLog = (log == null) ? DEFAULT_LOG : log;
+        mLogLevel = (level == LogLevel.DEFAULT) ? DEFAULT_LEVEL : level;
         mLevel = level.ordinal();
         mContextList = Arrays.asList(mContexts);
     }
@@ -83,10 +81,10 @@ public class Logger {
      * @param level    the log level.
      * @param contexts the array of contexts.
      * @return the new logger.
-     * @throws NullPointerException if one of the parameters is null.
+     * @throws NullPointerException if any of the parameters is null.
      */
     @Nonnull
-    public static Logger create(@Nonnull final Log log, @Nonnull final LogLevel level,
+    public static Logger create(@Nullable final Log log, @Nonnull final LogLevel level,
             @Nonnull final Object... contexts) {
 
         return new Logger(contexts, log, level);
@@ -107,17 +105,10 @@ public class Logger {
      * Sets the default log instance.
      *
      * @param log the log instance.
-     * @throws NullPointerException if the specified level is null.
      */
-    @SuppressWarnings("ConstantConditions")
-    public static void setDefaultLog(@Nonnull final Log log) {
+    public static void setDefaultLog(@Nullable final Log log) {
 
-        if (log == null) {
-
-            throw new NullPointerException("the log instance must not be null");
-        }
-
-        sLog.set(log);
+        sLog.set((log == null) ? DEFAULT_LOG : log);
     }
 
     /**
@@ -145,7 +136,7 @@ public class Logger {
             throw new NullPointerException("the log level must not be null");
         }
 
-        sLogLevel.set(level);
+        sLogLevel.set((level == LogLevel.DEFAULT) ? DEFAULT_LEVEL : level);
     }
 
     /**

@@ -44,26 +44,32 @@ public class LoggerTest extends TestCase {
 
     public void testDefault() {
 
+        final Log defaultLog = Logger.getDefaultLog();
+        Logger.setDefaultLog(null);
+        assertThat(Logger.getDefaultLog()).isEqualTo(defaultLog);
+
         final NullLog log = new NullLog();
         Logger.setDefaultLog(log);
         assertThat(Logger.getDefaultLog()).isEqualTo(log);
 
+        final LogLevel defaultLogLevel = Logger.getDefaultLogLevel();
+        Logger.setDefaultLogLevel(LogLevel.DEFAULT);
+        assertThat(Logger.getDefaultLogLevel()).isEqualTo(defaultLogLevel);
+
         Logger.setDefaultLogLevel(LogLevel.SILENT);
         assertThat(Logger.getDefaultLogLevel()).isEqualTo(LogLevel.SILENT);
+
+        Logger logger = Logger.create(null, LogLevel.DEBUG);
+        assertThat(logger.getLog()).isEqualTo(defaultLog);
+        assertThat(logger.getLogLevel()).isEqualTo(LogLevel.DEBUG);
+
+        logger = Logger.create(log, LogLevel.DEFAULT);
+        assertThat(logger.getLog()).isEqualTo(log);
+        assertThat(logger.getLogLevel()).isEqualTo(defaultLogLevel);
     }
 
     @SuppressWarnings("ConstantConditions")
     public void testError() {
-
-        try {
-
-            Logger.create(null, LogLevel.DEBUG);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
 
         try {
 
@@ -78,16 +84,6 @@ public class LoggerTest extends TestCase {
         try {
 
             Logger.create(new NullLog(), LogLevel.DEBUG, (Object[]) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            Logger.setDefaultLog(null);
 
             fail();
 

@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -52,6 +51,7 @@ import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.ArrayType;
 import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.PrimitiveType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
@@ -68,23 +68,6 @@ import javax.tools.JavaFileObject;
 public class RoutineProcessor extends AbstractProcessor {
 
     private static final boolean DEBUG = false;
-
-    private static final HashMap<String, String> mBoxingMap = new HashMap<String, String>();
-
-    static {
-
-        final HashMap<String, String> boxingMap = mBoxingMap;
-
-        boxingMap.put("boolean", "Boolean");
-        boxingMap.put("byte", "Byte");
-        boxingMap.put("char", "Character");
-        boxingMap.put("double", "Double");
-        boxingMap.put("float", "Float");
-        boxingMap.put("int", "Integer");
-        boxingMap.put("long", "Long");
-        boxingMap.put("short", "Short");
-        boxingMap.put("void", "Void");
-    }
 
     private boolean mDisabled;
 
@@ -199,13 +182,6 @@ public class RoutineProcessor extends AbstractProcessor {
         return false;
     }
 
-    private CharSequence boxingClassName(final String s) {
-
-        final String name = mBoxingMap.get(s);
-
-        return (name != null) ? name : s;
-    }
-
     private String buildGenericTypes(final TypeElement element) {
 
         final List<? extends TypeParameterElement> typeParameters = element.getTypeParameters();
@@ -274,8 +250,7 @@ public class RoutineProcessor extends AbstractProcessor {
                 builder.append(", ");
             }
 
-            builder.append("(")
-                   .append(boxingClassName(variableElement.asType().toString()))
+            builder.append("(").append(getBoxedType(variableElement.asType()))
                    .append(") objects.get(")
                    .append(count++)
                    .append(")");
@@ -603,6 +578,7 @@ public class RoutineProcessor extends AbstractProcessor {
             final TypeElement outputChannelElement =
                     getTypeFromName(OutputChannel.class.getCanonicalName());
             final TypeElement listElement = getTypeFromName(List.class.getCanonicalName());
+            final TypeMirror objectType = getTypeFromName(Object.class.getCanonicalName()).asType();
 
             //noinspection PointlessBooleanExpression,ConstantConditions
             if (!DEBUG) {
@@ -637,10 +613,10 @@ public class RoutineProcessor extends AbstractProcessor {
 
                 final ExecutableElement targetMethod =
                         findMatchingMethod(methodElement, targetElement);
-                String returnTypeName = targetMethod.getReturnType().toString();
+                TypeMirror targetReturnType = targetMethod.getReturnType();
 
                 boolean isParallel = false;
-                final boolean isVoid = "void".equalsIgnoreCase(returnTypeName);
+                final boolean isVoid = (targetReturnType.getKind() == TypeKind.VOID);
                 final AsyncType overrideAnnotation = methodElement.getAnnotation(AsyncType.class);
                 final List<? extends VariableElement> parameters = methodElement.getParameters();
 
@@ -670,10 +646,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
                     if (returnType.getKind() == TypeKind.ARRAY) {
 
-                        final TypeMirror componentType =
-                                ((ArrayType) returnType).getComponentType();
-
-                        returnTypeName = componentType.toString();
+                        targetReturnType = ((ArrayType) returnType).getComponentType();
 
                         method = (isParallel) ? mMethodParallelArray : mMethodArray;
 
@@ -684,11 +657,11 @@ public class RoutineProcessor extends AbstractProcessor {
 
                         if (typeArguments.isEmpty()) {
 
-                            returnTypeName = Object.class.getCanonicalName();
+                            targetReturnType = objectType;
 
                         } else {
 
-                            returnTypeName = typeArguments.get(0).toString();
+                            targetReturnType = typeArguments.get(0);
                         }
 
                         method = (isParallel) ? mMethodParallelList : mMethodList;
@@ -701,11 +674,11 @@ public class RoutineProcessor extends AbstractProcessor {
 
                         if (typeArguments.isEmpty()) {
 
-                            returnTypeName = Object.class.getCanonicalName();
+                            targetReturnType = objectType;
 
                         } else {
 
-                            returnTypeName = typeArguments.get(0).toString();
+                            targetReturnType = typeArguments.get(0);
                         }
 
                         method = (isParallel) ? mMethodParallelAsync : mMethodAsync;
@@ -722,12 +695,12 @@ public class RoutineProcessor extends AbstractProcessor {
 
                 } else {
 
-                    returnTypeName = methodElement.getReturnType().toString();
+                    targetReturnType = methodElement.getReturnType();
 
                     method = (isParallel) ? mMethodParallelResult : mMethodResult;
                 }
 
-                final CharSequence resultClassName = boxingClassName(returnTypeName);
+                final String resultClassName = getBoxedType(targetReturnType).toString();
 
                 String methodHeader;
 
@@ -921,6 +894,16 @@ public class RoutineProcessor extends AbstractProcessor {
         }
 
         return targetMethod;
+    }
+
+    private TypeMirror getBoxedType(final TypeMirror type) {
+
+        if ((type != null) && type.getKind().isPrimitive()) {
+
+            return processingEnv.getTypeUtils().boxedClass((PrimitiveType) type).asType();
+        }
+
+        return type;
     }
 
     private Object getElementValue(final Element element, final TypeMirror annotationType,

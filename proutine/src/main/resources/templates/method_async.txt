@@ -15,7 +15,7 @@
 // GENERATED CODE - PLEASE DO NOT EDIT
 
     @Override
-    public com.bmd.jrt.channel.OutputChannel<${resultClassName}> ${methodName}(${paramTypes}) {
+    public ${resultType} ${methodName}(${paramTypes}) {
 
-        return mRoutine${methodCount}.invokeAsync()${inputParams}.results();
+        return this.mRoutine${methodCount}.invokeAsync()${inputParams}.results();
     }

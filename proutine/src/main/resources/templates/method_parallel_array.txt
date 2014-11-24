@@ -24,5 +24,14 @@
             dontcallmechannel.pass(dontcallmeobject);
         }
 
-        return dontcallmechannel.results();
+        final java.util.List<${resultClassName}> dontcallmelist = dontcallmechannel.results().readAll();
+        final int dontcallmesize = dontcallmelist.size();
+        final ${resultClassName}[] dontcallmearray = new ${resultClassName}[dontcallmesize];
+
+        for (int dontcallmei = 0; dontcallmei < dontcallmesize; ++dontcallmei) {
+
+            dontcallmearray[dontcallmei] = dontcallmelist.get(dontcallmei);
+        }
+
+        return dontcallmearray;
     }

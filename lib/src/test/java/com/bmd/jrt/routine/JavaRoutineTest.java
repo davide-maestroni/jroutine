@@ -47,9 +47,16 @@ import static org.fest.assertions.api.Assertions.assertThat;
  */
 public class JavaRoutineTest extends TestCase {
 
+    public void testA() {
+
+        final int[] inc = JavaRoutine.on(new TestA()).proxy(ITestA.class).inc(1, 2, 3, 4);
+        assertThat(inc).containsSequence(2, 3, 4, 5);
+    }
+
     public void testChannelBuilder() {
 
-        final IOChannel<Object> channel = JavaRoutine.io().dataOrder(DataOrder.INSERTION)
+        final IOChannel<Object> channel = JavaRoutine.io()
+                                                     .dataOrder(DataOrder.INSERTION)
                                                      .delayRunner(Runners.sharedRunner())
                                                      .maxSize(1)
                                                      .bufferTimeout(1, TimeUnit.MILLISECONDS)
@@ -822,7 +829,8 @@ public class JavaRoutineTest extends TestCase {
         assertThat(routine2.call()).containsExactly(-77L);
         assertThat(routine1).isEqualTo(routine2);
 
-        final Routine<Object, Object> routine3 = JavaRoutine.on(test).syncRunner(RunnerType.QUEUED)
+        final Routine<Object, Object> routine3 = JavaRoutine.on(test)
+                                                            .syncRunner(RunnerType.QUEUED)
                                                             .runBy(Runners.sharedRunner())
                                                             .logLevel(LogLevel.DEBUG)
                                                             .loggedWith(nullLog)
@@ -832,7 +840,8 @@ public class JavaRoutineTest extends TestCase {
         assertThat(routine1).isNotEqualTo(routine3);
         assertThat(routine2).isNotEqualTo(routine3);
 
-        final Routine<Object, Object> routine4 = JavaRoutine.on(test).syncRunner(RunnerType.QUEUED)
+        final Routine<Object, Object> routine4 = JavaRoutine.on(test)
+                                                            .syncRunner(RunnerType.QUEUED)
                                                             .runBy(Runners.sharedRunner())
                                                             .logLevel(LogLevel.WARNING)
                                                             .loggedWith(nullLog)
@@ -841,7 +850,8 @@ public class JavaRoutineTest extends TestCase {
         assertThat(routine4.call()).containsExactly(-77L);
         assertThat(routine3).isNotEqualTo(routine4);
 
-        final Routine<Object, Object> routine5 = JavaRoutine.on(test).syncRunner(RunnerType.QUEUED)
+        final Routine<Object, Object> routine5 = JavaRoutine.on(test)
+                                                            .syncRunner(RunnerType.QUEUED)
                                                             .runBy(Runners.sharedRunner())
                                                             .logLevel(LogLevel.WARNING)
                                                             .loggedWith(new NullLog())
@@ -959,6 +969,12 @@ public class JavaRoutineTest extends TestCase {
         } catch (final IllegalArgumentException ignored) {
 
         }
+    }
+
+    private interface ITestA {
+
+        @AsyncType(int.class)
+        public int[] inc(@ParallelType(int.class) int... i);
     }
 
     private static interface SquareItf {
@@ -1096,6 +1112,14 @@ public class JavaRoutineTest extends TestCase {
             TimeDuration.millis(500).sleepAtLeast();
 
             return 2;
+        }
+    }
+
+    private static class TestA {
+
+        public int inc(final int i) {
+
+            return i + 1;
         }
     }
 

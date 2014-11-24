@@ -533,17 +533,17 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
                 if (overrideAnnotation != null) {
 
-                    if (OutputChannel.class.isAssignableFrom(returnType)) {
+                    if (returnType.isArray()) {
 
-                        isResultChannel = true;
+                        isResultArray = true;
 
-                    } else if (List.class.isAssignableFrom(returnType)) {
+                    } else if (returnType.isAssignableFrom(List.class)) {
 
                         isResultList = true;
 
-                    } else if (returnType.isArray()) {
+                    } else if (returnType.isAssignableFrom(OutputChannel.class)) {
 
-                        isResultArray = true;
+                        isResultChannel = true;
 
                     } else {
 
@@ -584,8 +584,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
                             if ((length > 1) || (
                                     !OutputChannel.class.isAssignableFrom(parameterType)
-                                            && !parameterType.isArray()
-                                            && !Iterable.class.isAssignableFrom(parameterType))) {
+                                            && !Iterable.class.isAssignableFrom(parameterType)
+                                            && !parameterType.isArray())) {
 
                                 throw new IllegalArgumentException(
                                         "the async input parameter is not compatible");
@@ -639,6 +639,14 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
                     if ((overrideAnnotation == null) && !returnType.isAssignableFrom(
                             targetMethod.getReturnType())) {
+
+                        throw new IllegalArgumentException(
+                                "the async return type is not compatible");
+                    }
+
+                    if (isResultArray && !returnType.getComponentType()
+                                                    .isAssignableFrom(
+                                                            targetMethod.getReturnType())) {
 
                         throw new IllegalArgumentException(
                                 "the async return type is not compatible");
@@ -706,13 +714,13 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                 final Class<?> parameterType = method.getParameterTypes()[0];
                 final Object arg = args[0];
 
-                if (OutputChannel.class.isAssignableFrom(parameterType)) {
-
-                    parameterChannel.pass((OutputChannel<Object>) arg);
-
-                } else if (arg == null) {
+                if (arg == null) {
 
                     parameterChannel.pass((Iterable<Object>) null);
+
+                } else if (OutputChannel.class.isAssignableFrom(parameterType)) {
+
+                    parameterChannel.pass((OutputChannel<Object>) arg);
 
                 } else if (parameterType.isArray()) {
 
@@ -778,7 +786,15 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
                     final List<Object> results = outputChannel.readAll();
 
-                    return results.toArray(new Object[results.size()]);
+                    final int size = results.size();
+                    final Object array = Array.newInstance(returnType.getComponentType(), size);
+
+                    for (int i = 0; i < size; ++i) {
+
+                        Array.set(array, i, results.get(i));
+                    }
+
+                    return array;
                 }
 
                 return outputChannel.readFirst();

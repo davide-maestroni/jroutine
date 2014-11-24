@@ -26,8 +26,11 @@ import com.bmd.jrt.runner.Runners;
 
 import junit.framework.TestCase;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static org.fest.assertions.api.Assertions.assertThat;
@@ -37,8 +40,9 @@ import static org.fest.assertions.api.Assertions.assertThat;
  * <p/>
  * Created by davide on 11/18/14.
  */
-public class ProcessorTest extends TestCase {
+public class RoutineProcessorTest extends TestCase {
 
+    @SuppressWarnings("unchecked")
     public void testWrapper() {
 
         final TestInterface testInterface = JavaRoutine.on(new TestClass())
@@ -57,6 +61,16 @@ public class ProcessorTest extends TestCase {
         assertThat(testInterface.getString(1, 2, 3)).isIn("1", "2", "3");
         assertThat(testInterface.getString(new HashSet<Integer>(Arrays.asList(1, 2, 3)))
                                 .readAll()).containsOnly("1", "2", "3");
+        assertThat(testInterface.getString(Arrays.asList(1, 2, 3))).containsOnly("1", "2", "3");
+        assertThat(
+                testInterface.getString((Iterable<Integer>) Arrays.asList(1, 2, 3))).containsOnly(
+                "1", "2", "3");
+        assertThat(
+                testInterface.getString((Collection<Integer>) Arrays.asList(1, 2, 3))).containsOnly(
+                "1", "2", "3");
+
+        final ArrayList<String> list = new ArrayList<String>();
+        assertThat(testInterface.getList(Arrays.asList(list))).containsExactly(list);
 
         final IOChannel<Integer> channel = JavaRoutine.io().buildChannel();
         channel.input().pass(3).close();
@@ -66,18 +80,35 @@ public class ProcessorTest extends TestCase {
     @AsyncClass(TestClass.class)
     public interface TestInterface {
 
+        @AsyncType(List.class)
+        public Iterable<Iterable> getList(@ParallelType(List.class) List<? extends List<String>> i);
+
         @AsyncType(int.class)
         public OutputChannel<Integer> getOne();
-
-        public String getString(@AsyncType(int.class) OutputChannel<Integer> i);
 
         public String getString(@ParallelType(int.class) int... i);
 
         @AsyncType(int.class)
         public OutputChannel<String> getString(@ParallelType(int.class) HashSet<Integer> i);
+
+        @AsyncType(int.class)
+        public List<String> getString(@ParallelType(int.class) List<Integer> i);
+
+        @AsyncType(int.class)
+        public Iterable<String> getString(@ParallelType(int.class) Iterable<Integer> i);
+
+        @AsyncType(int.class)
+        public String[] getString(@ParallelType(int.class) Collection<Integer> i);
+
+        public String getString(@AsyncType(int.class) OutputChannel<Integer> i);
     }
 
     public static class TestClass {
+
+        public List<String> getList(final List<String> list) {
+
+            return list;
+        }
 
         public int getOne() {
 

@@ -17,12 +17,12 @@
     @Override
     public void ${methodName}(${paramTypes}) {
 
-        final com.bmd.jrt.channel.ParameterChannel<Object, ${resultClassName}> channel = mRoutine${methodCount}.invokeParallel();
+        final com.bmd.jrt.channel.ParameterChannel<Object, ${resultClassName}> dontcallmechannel = this.mRoutine${methodCount}.invokeParallel();
 
-        for (final Object object: ${params}) {
+        for (final Object dontcallmeobject: ${params}) {
 
-            channel.pass(object);
+            dontcallmechannel.pass(dontcallmeobject);
         }
 
-        channel.results();
+        dontcallmechannel.results();
     }

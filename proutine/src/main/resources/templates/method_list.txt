@@ -17,12 +17,5 @@
     @Override
     public ${resultType} ${methodName}(${paramTypes}) {
 
-        final com.bmd.jrt.channel.ParameterChannel<Object, ${resultClassName}> dontcallmechannel = this.mRoutine${methodCount}.invokeParallel();
-
-        for (final Object dontcallmeobject: ${params}) {
-
-            dontcallmechannel.pass(dontcallmeobject);
-        }
-
-        return dontcallmechannel.results();
+        return this.mRoutine${methodCount}.invokeAsync()${inputParams}.results().readAll();
     }

@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import static com.bmd.jrt.common.ClassToken.tokenOf;
+import static com.bmd.jrt.time.TimeDuration.seconds;
 
 /**
  * The downloader implementation.
@@ -97,10 +98,19 @@ public class Downloader {
 
             mDownloadedSet.remove(uri);
 
-            final Routine<Chunk, Boolean> writeFile =
-                    JavaRoutine.on(tokenOf(WriteFile.class)).withArgs(dstFile).buildRoutine();
+            final Routine<Chunk, Boolean> writeFile = JavaRoutine.on(tokenOf(WriteFile.class))
+                                                                 .inputMaxSize(8)
+                                                                 .inputTimeout(seconds(30))
+                                                                 .withArgs(dstFile)
+                                                                 .buildRoutine();
 
-            downloadMap.put(uri, writeFile.runAsync(mReadConnection.runAsync(uri)));
+            try {
+
+                downloadMap.put(uri, writeFile.runAsync(mReadConnection.runAsync(uri)));
+
+            } catch (final RoutineException ignored) {
+
+            }
         }
     }
 

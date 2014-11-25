@@ -568,6 +568,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                     mOutputQueue.moveTo(outputs);
                     state = mState;
 
+                    mOutputCount = 0;
+
                     mMutex.notifyAll();
                 }
 

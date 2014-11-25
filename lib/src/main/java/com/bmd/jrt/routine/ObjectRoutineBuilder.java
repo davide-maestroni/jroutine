@@ -766,7 +766,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
             } else {
 
-                outputChannel = routine.runAsync(args);
+                outputChannel = routine.callAsync(args);
             }
 
             if (!Void.class.equals(boxingClass(returnType))) {
@@ -812,7 +812,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
         public Object invoke(final Object proxy, final Method method, final Object[] args) throws
                 Throwable {
 
-            final OutputChannel<Object> outputChannel = method(method).runAsync(args);
+            final OutputChannel<Object> outputChannel = method(method).callAsync(args);
 
             final Class<?> returnType = method.getReturnType();
 

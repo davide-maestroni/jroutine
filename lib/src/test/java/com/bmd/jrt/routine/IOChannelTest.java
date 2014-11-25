@@ -41,7 +41,7 @@ public class IOChannelTest extends TestCase {
 
         final IOChannel<String> channel = JavaRoutine.io().buildChannel();
         final Routine<String, String> routine = JavaRoutine.<String>on().buildRoutine();
-        final OutputChannel<String> outputChannel = routine.runAsync(channel.output());
+        final OutputChannel<String> outputChannel = routine.callAsync(channel.output());
 
         channel.input().abort(new IllegalStateException());
 
@@ -107,7 +107,7 @@ public class IOChannelTest extends TestCase {
         }.start();
 
         final Routine<String, String> routine = JavaRoutine.<String>on().buildRoutine();
-        final OutputChannel<String> outputChannel = routine.runAsync(channel.output());
+        final OutputChannel<String> outputChannel = routine.callAsync(channel.output());
         assertThat(outputChannel.readFirst()).isEqualTo("test");
         assertThat(outputChannel.isComplete()).isTrue();
 
@@ -129,7 +129,7 @@ public class IOChannelTest extends TestCase {
         }.start();
 
         final Routine<String, String> routine1 = JavaRoutine.<String>on().buildRoutine();
-        final OutputChannel<String> outputChannel1 = routine1.runAsync(channel1.output());
+        final OutputChannel<String> outputChannel1 = routine1.callAsync(channel1.output());
         assertThat(outputChannel1.readAll()).containsExactly("test1", "test2", "test3");
     }
 
@@ -149,7 +149,7 @@ public class IOChannelTest extends TestCase {
         final long startTime = System.currentTimeMillis();
 
         final Routine<String, String> routine = JavaRoutine.<String>on().buildRoutine();
-        final OutputChannel<String> outputChannel = routine.runAsync(channel.output());
+        final OutputChannel<String> outputChannel = routine.callAsync(channel.output());
         assertThat(outputChannel.afterMax(TimeDuration.millis(500)).readAll()).containsExactly(
                 "test");
 
@@ -237,7 +237,7 @@ public class IOChannelTest extends TestCase {
         new WeakThread(channel).start();
 
         final Routine<String, String> routine = JavaRoutine.<String>on().buildRoutine();
-        final OutputChannel<String> outputChannel = routine.runAsync(channel.output());
+        final OutputChannel<String> outputChannel = routine.callAsync(channel.output());
         assertThat(outputChannel.readFirst()).isEqualTo("test");
 
         channel = null;

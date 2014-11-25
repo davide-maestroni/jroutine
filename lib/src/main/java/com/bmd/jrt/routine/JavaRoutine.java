@@ -52,8 +52,8 @@ import javax.annotation.Nonnull;
  *                  JavaRoutine.&lt;Result&gt;on().buildRoutine();
  *
  *         routine.invokeAsync()
- *                .pass(doSomething1.runAsync())
- *                .pass(doSomething2.runAsync())
+ *                .pass(doSomething1.callAsync())
+ *                .pass(doSomething2.callAsync())
  *                .result()
  *                .readAllInto(results);
  *     </code>
@@ -62,8 +62,8 @@ import javax.annotation.Nonnull;
  * <pre>
  *     <code>
  *
- *         final OutputChannel&lt;Result&gt; output1 = doSomething1.runAsync();
- *         final OutputChannel&lt;Result&gt; output2 = doSomething2.runAsync();
+ *         final OutputChannel&lt;Result&gt; output1 = doSomething1.callAsync();
+ *         final OutputChannel&lt;Result&gt; output2 = doSomething2.callAsync();
  *
  *         output1.readAllInto(results);
  *         output2.readAllInto(results);
@@ -80,7 +80,7 @@ import javax.annotation.Nonnull;
  *                  JavaRoutine.&lt;Result&gt;on().buildRoutine();
  *
  *         routine.invokeAsync()
- *                .pass(doSomething1.runAsync(doSomething2.runAsync()))
+ *                .pass(doSomething1.callAsync(doSomething2.callAsync()))
  *                .result()
  *                .readAllInto(results);
  *     </code>
@@ -92,7 +92,7 @@ import javax.annotation.Nonnull;
  *         final Routine&lt;Result, Result&gt; routine =
  *                  JavaRoutine.&lt;Result&gt;on().buildRoutine();
  *
- *         routine.runAsync(doSomething1.runAsync(doSomething2.runAsync())).readAllInto(results);
+ *         routine.callAsync(doSomething1.callAsync(doSomething2.callAsync())).readAllInto(results);
  *     </code>
  * </pre>
  * <p/>
@@ -109,7 +109,7 @@ import javax.annotation.Nonnull;
  *
  *         final Callback callback = JavaRoutine.on(myCallback).as(Callback.class);
  *
- *         callback.onResults(doSomething1.runAsync(), doSomething2.runAsync());
+ *         callback.onResults(doSomething1.callAsync(), doSomething2.callAsync());
  *     </code>
  * </pre>
  * Where the object <code>myCallback</code> implements a method <code>public void onResults(Result
@@ -134,7 +134,7 @@ import javax.annotation.Nonnull;
  *         final Routine&lt;Result, Result&gt; routine =
  *                  JavaRoutine.&lt;Result&gt;on().buildRoutine();
  *
- *         routine.runAsync(channel).readAllInto(results);
+ *         routine.callAsync(channel).readAllInto(results);
  *     </code>
  * </pre>
  * <p/>

@@ -14,7 +14,6 @@
 package com.bmd.jrt.routine;
 
 import com.bmd.jrt.builder.RoutineConfiguration;
-import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ParameterChannel;
 import com.bmd.jrt.common.RoutineInterruptedException;
 import com.bmd.jrt.invocation.Invocation;
@@ -27,7 +26,6 @@ import com.bmd.jrt.time.TimeDuration.Check;
 import java.util.LinkedList;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -198,20 +196,6 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends BasicRoutine<INPUT,
                 };
 
         return parallelRoutine.invokeAsync();
-    }
-
-    @Nonnull
-    @Override
-    public OutputChannel<OUTPUT> runParallel(@Nullable final Iterable<? extends INPUT> inputs) {
-
-        return invokeParallel().pass(inputs).result();
-    }
-
-    @Nonnull
-    @Override
-    public OutputChannel<OUTPUT> runParallel(@Nullable final OutputChannel<INPUT> inputs) {
-
-        return invokeParallel().pass(inputs).result();
     }
 
     /**

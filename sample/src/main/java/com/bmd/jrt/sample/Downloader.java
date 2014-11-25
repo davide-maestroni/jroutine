@@ -106,7 +106,7 @@ public class Downloader {
 
             try {
 
-                downloadMap.put(uri, writeFile.runAsync(mReadConnection.runAsync(uri)));
+                downloadMap.put(uri, writeFile.callAsync(mReadConnection.callAsync(uri)));
 
             } catch (final RoutineException ignored) {
 

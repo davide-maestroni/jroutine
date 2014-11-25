@@ -20,7 +20,7 @@ Parallel programming on the go.
                 final Routine&lt;Integer, Integer&gt; squareRoutine = on(tokenOf(Square.class)).buildRoutine();
 
                 final Integer rms =
-                        sumRoutine.runAsync(squareRoutine.runParallel(parseRoutine.runParallel(args)))
+                        sumRoutine.callAsync(squareRoutine.callParallel(parseRoutine.callParallel(args)))
                                   .readFirst();
 
                 System.out.println(rms);

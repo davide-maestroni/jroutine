@@ -34,7 +34,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
@@ -304,8 +303,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
                 final Class<?> wrapperClass = Class.forName(wrapperClassName);
                 final Constructor<?> constructor =
-                        wrapperClass.getConstructor(target.getClass(), Map.class, String.class,
-                                                    RoutineConfiguration.class);
+                        wrapperClass.getConstructor(target.getClass(), CacheHashMap.class,
+                                                    String.class, RoutineConfiguration.class);
 
                 synchronized (sMutexCache) {
 

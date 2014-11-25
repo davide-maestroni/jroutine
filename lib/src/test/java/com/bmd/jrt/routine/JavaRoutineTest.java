@@ -1112,6 +1112,7 @@ public class JavaRoutineTest extends TestCase {
         }
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     private static class TestInc {
 
         public int inc(final int i) {

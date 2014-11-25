@@ -19,12 +19,12 @@ public final class ${interfaceName}${className}${genericTypes} implements ${inte
 
     private final String mLockId;
 
-    private final java.util.Map<Object, java.util.Map<String, Object>> mMutexMap;
+    private final com.bmd.jrt.common.CacheHashMap<Object, java.util.Map<String, Object>> mMutexMap;
 
     private final ${classFullName} mWrapped;
 
     public ${interfaceName}${className}(final ${classFullName} wrapped,
-            final java.util.Map<Object, java.util.Map<String, Object>> mutexMap,
+            final com.bmd.jrt.common.CacheHashMap<Object, java.util.Map<String, Object>> mutexMap,
             final String lockId, final com.bmd.jrt.builder.RoutineConfiguration configuration) {
 
         if (wrapped == null) {

@@ -24,12 +24,13 @@
         }
 
         @Override
+        @SuppressWarnings("unchecked")
         public void onExec(@javax.annotation.Nonnull final java.util.List<?> objects,
-                @javax.annotation.Nonnull final com.bmd.jrt.channel.ResultChannel<${resultClassName}> results) {
+                @javax.annotation.Nonnull final com.bmd.jrt.channel.ResultChannel<${resultClassName}> result) {
 
             synchronized(mMutex) {
 
-                results.pass(mWrapped.${targetMethodName}(${paramValues}));
+                result.pass(mWrapped.${targetMethodName}(${paramValues}));
             }
         }
     }

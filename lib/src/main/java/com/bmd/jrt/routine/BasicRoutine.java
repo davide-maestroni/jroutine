@@ -142,90 +142,90 @@ public abstract class BasicRoutine<INPUT, OUTPUT> implements Routine<INPUT, OUTP
     @Override
     public OutputChannel<OUTPUT> run() {
 
-        return invoke().results();
+        return invoke().result();
     }
 
     @Nonnull
     @Override
     public OutputChannel<OUTPUT> run(@Nullable final INPUT input) {
 
-        return invoke().pass(input).results();
+        return invoke().pass(input).result();
     }
 
     @Nonnull
     @Override
     public OutputChannel<OUTPUT> run(@Nullable final INPUT... inputs) {
 
-        return invoke().pass(inputs).results();
+        return invoke().pass(inputs).result();
     }
 
     @Nonnull
     @Override
     public OutputChannel<OUTPUT> run(@Nullable final Iterable<? extends INPUT> inputs) {
 
-        return invoke().pass(inputs).results();
+        return invoke().pass(inputs).result();
     }
 
     @Nonnull
     @Override
     public OutputChannel<OUTPUT> run(@Nullable final OutputChannel<INPUT> inputs) {
 
-        return invoke().pass(inputs).results();
+        return invoke().pass(inputs).result();
     }
 
     @Nonnull
     @Override
     public OutputChannel<OUTPUT> runAsync() {
 
-        return invokeAsync().results();
+        return invokeAsync().result();
     }
 
     @Nonnull
     @Override
     public OutputChannel<OUTPUT> runAsync(@Nullable final INPUT input) {
 
-        return invokeAsync().pass(input).results();
+        return invokeAsync().pass(input).result();
     }
 
     @Nonnull
     @Override
     public OutputChannel<OUTPUT> runAsync(@Nullable final INPUT... inputs) {
 
-        return invokeAsync().pass(inputs).results();
+        return invokeAsync().pass(inputs).result();
     }
 
     @Nonnull
     @Override
     public OutputChannel<OUTPUT> runAsync(@Nullable final Iterable<? extends INPUT> inputs) {
 
-        return invokeAsync().pass(inputs).results();
+        return invokeAsync().pass(inputs).result();
     }
 
     @Nonnull
     @Override
     public OutputChannel<OUTPUT> runAsync(@Nullable final OutputChannel<INPUT> inputs) {
 
-        return invokeAsync().pass(inputs).results();
+        return invokeAsync().pass(inputs).result();
     }
 
     @Nonnull
     @Override
     public OutputChannel<OUTPUT> runParallel() {
 
-        return invokeParallel().results();
+        return invokeParallel().result();
     }
 
     @Nonnull
     @Override
     public OutputChannel<OUTPUT> runParallel(@Nullable final INPUT input) {
 
-        return invokeParallel().pass(input).results();
+        return invokeParallel().pass(input).result();
     }
 
     @Nonnull
     @Override
     public OutputChannel<OUTPUT> runParallel(@Nullable final INPUT... inputs) {
 
-        return invokeParallel().pass(inputs).results();
+        return invokeParallel().pass(inputs).result();
     }
 }

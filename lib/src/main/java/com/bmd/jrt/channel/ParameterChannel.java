@@ -68,5 +68,5 @@ public interface ParameterChannel<INPUT, OUTPUT> extends InputChannel<INPUT> {
      *                                             exception.
      */
     @Nonnull
-    public OutputChannel<OUTPUT> results();
+    public OutputChannel<OUTPUT> result();
 }

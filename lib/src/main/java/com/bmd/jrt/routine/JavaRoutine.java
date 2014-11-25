@@ -54,7 +54,7 @@ import javax.annotation.Nonnull;
  *         routine.invokeAsync()
  *                .pass(doSomething1.runAsync())
  *                .pass(doSomething2.runAsync())
- *                .results()
+ *                .result()
  *                .readAllInto(results);
  *     </code>
  * </pre>
@@ -81,7 +81,7 @@ import javax.annotation.Nonnull;
  *
  *         routine.invokeAsync()
  *                .pass(doSomething1.runAsync(doSomething2.runAsync()))
- *                .results()
+ *                .result()
  *                .readAllInto(results);
  *     </code>
  * </pre>

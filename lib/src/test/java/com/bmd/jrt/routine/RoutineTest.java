@@ -71,7 +71,7 @@ public class RoutineTest extends TestCase {
                                                     .buildRoutine();
 
         final ParameterChannel<String, String> inputChannel = routine.invokeAsync().pass("test1");
-        final OutputChannel<String> outputChannel = inputChannel.results();
+        final OutputChannel<String> outputChannel = inputChannel.result();
 
         assertThat(inputChannel.isOpen()).isFalse();
         assertThat(inputChannel.abort(new IllegalArgumentException("test1"))).isFalse();
@@ -79,7 +79,7 @@ public class RoutineTest extends TestCase {
         assertThat(outputChannel.readFirst()).isEqualTo("test1");
 
         final ParameterChannel<String, String> inputChannel1 = routine.invokeAsync().pass("test1");
-        final OutputChannel<String> outputChannel1 = inputChannel1.results();
+        final OutputChannel<String> outputChannel1 = inputChannel1.result();
 
         assertThat(inputChannel1.isOpen()).isFalse();
         assertThat(inputChannel1.abort()).isFalse();
@@ -148,8 +148,7 @@ public class RoutineTest extends TestCase {
 
             routine1.invokeAsync()
                     .after(TimeDuration.millis(10))
-                    .pass("test_abort")
-                    .results()
+                    .pass("test_abort").result()
                     .readFirst();
 
             fail();
@@ -177,8 +176,7 @@ public class RoutineTest extends TestCase {
 
             routine2.invokeAsync()
                     .after(TimeDuration.millis(10))
-                    .pass("test_abort")
-                    .results()
+                    .pass("test_abort").result()
                     .readFirst();
 
             fail();
@@ -272,43 +270,36 @@ public class RoutineTest extends TestCase {
         assertThat(routine.runParallel("test1").readAll()).containsOnly("test1");
         assertThat(routine.runParallel("test1", "test2").readAll()).containsOnly("test1", "test2");
 
-        assertThat(routine.invoke().pass().results().readAll()).isEmpty();
+        assertThat(routine.invoke().pass().result().readAll()).isEmpty();
         assertThat(routine.invoke()
-                          .pass(Arrays.asList("test1", "test2"))
-                          .results()
+                          .pass(Arrays.asList("test1", "test2")).result()
                           .readAll()).containsExactly("test1", "test2");
         assertThat(routine.invoke()
-                          .pass(routine.run("test1", "test2"))
-                          .results()
+                          .pass(routine.run("test1", "test2")).result()
                           .readAll()).containsExactly("test1", "test2");
-        assertThat(routine.invoke().pass("test1").results().readAll()).containsExactly("test1");
-        assertThat(routine.invoke().pass("test1", "test2").results().readAll()).containsExactly(
+        assertThat(routine.invoke().pass("test1").result().readAll()).containsExactly("test1");
+        assertThat(routine.invoke().pass("test1", "test2").result().readAll()).containsExactly(
                 "test1", "test2");
-        assertThat(routine.invokeAsync().pass().results().readAll()).isEmpty();
+        assertThat(routine.invokeAsync().pass().result().readAll()).isEmpty();
         assertThat(routine.invokeAsync()
-                          .pass(Arrays.asList("test1", "test2"))
-                          .results()
+                          .pass(Arrays.asList("test1", "test2")).result()
                           .readAll()).containsExactly("test1", "test2");
         assertThat(routine.invokeAsync()
-                          .pass(routine.run("test1", "test2"))
-                          .results()
+                          .pass(routine.run("test1", "test2")).result()
                           .readAll()).containsExactly("test1", "test2");
-        assertThat(routine.invokeAsync().pass("test1").results().readAll()).containsExactly(
-                "test1");
-        assertThat(
-                routine.invokeAsync().pass("test1", "test2").results().readAll()).containsExactly(
+        assertThat(routine.invokeAsync().pass("test1").result().readAll()).containsExactly("test1");
+        assertThat(routine.invokeAsync().pass("test1", "test2").result().readAll()).containsExactly(
                 "test1", "test2");
-        assertThat(routine.invokeParallel().pass().results().readAll()).isEmpty();
+        assertThat(routine.invokeParallel().pass().result().readAll()).isEmpty();
         assertThat(routine.invokeParallel()
-                          .pass(Arrays.asList("test1", "test2"))
-                          .results()
+                          .pass(Arrays.asList("test1", "test2")).result()
                           .readAll()).containsOnly("test1", "test2");
-        assertThat(routine.invokeParallel().pass(routine.run("test1", "test2")).results().readAll())
-                .containsOnly("test1", "test2");
-        assertThat(routine.invokeParallel().pass("test1").results().readAll()).containsOnly(
-                "test1");
-        assertThat(
-                routine.invokeParallel().pass("test1", "test2").results().readAll()).containsOnly(
+        assertThat(routine.invokeParallel()
+                          .pass(routine.run("test1", "test2"))
+                          .result()
+                          .readAll()).containsOnly("test1", "test2");
+        assertThat(routine.invokeParallel().pass("test1").result().readAll()).containsOnly("test1");
+        assertThat(routine.invokeParallel().pass("test1", "test2").result().readAll()).containsOnly(
                 "test1", "test2");
     }
 
@@ -439,7 +430,7 @@ public class RoutineTest extends TestCase {
                     @Override
                     public void onResult(@Nonnull final ResultChannel<Integer> results) {
 
-                        results.pass(mChannel.results());
+                        results.pass(mChannel.result());
                     }
                 };
 
@@ -467,10 +458,10 @@ public class RoutineTest extends TestCase {
         channel.after(TimeDuration.millis(10).microsTime()).pass("test3", "test4");
         channel.after(TimeDuration.millis(10)).pass((String[]) null);
         channel.now().pass((List<String>) null).pass((OutputChannel<String>) null);
-        assertThat(channel.results().afterMax(3, TimeUnit.SECONDS).readAll()).containsOnly("test1",
-                                                                                           "test2",
-                                                                                           "test3",
-                                                                                           "test4");
+        assertThat(channel.result().afterMax(3, TimeUnit.SECONDS).readAll()).containsOnly("test1",
+                                                                                          "test2",
+                                                                                          "test3",
+                                                                                          "test4");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(110);
 
         final Routine<String, String> routine1 = JavaRoutine.on(tokenOf(DelayedInvocation.class))
@@ -488,7 +479,7 @@ public class RoutineTest extends TestCase {
         channel1.after(TimeDuration.millis(10)).pass((String[]) null);
         channel1.now().pass((List<String>) null).pass((OutputChannel<String>) null);
         assertThat(
-                channel1.results().afterMax(TimeDuration.seconds(7000)).readAll()).containsExactly(
+                channel1.result().afterMax(TimeDuration.seconds(7000)).readAll()).containsExactly(
                 "test1", "test2", "test3", "test4");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(110);
 
@@ -505,10 +496,10 @@ public class RoutineTest extends TestCase {
         channel2.after(TimeDuration.millis(10).microsTime()).pass("test3", "test4");
         channel2.after(TimeDuration.millis(10)).pass((String[]) null);
         channel2.now().pass((List<String>) null).pass((OutputChannel<String>) null);
-        assertThat(channel2.results().afterMax(3, TimeUnit.SECONDS).readAll()).containsOnly("test1",
-                                                                                            "test2",
-                                                                                            "test3",
-                                                                                            "test4");
+        assertThat(channel2.result().afterMax(3, TimeUnit.SECONDS).readAll()).containsOnly("test1",
+                                                                                           "test2",
+                                                                                           "test3",
+                                                                                           "test4");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(110);
 
         final Routine<String, String> routine3 =
@@ -526,7 +517,7 @@ public class RoutineTest extends TestCase {
         channel3.after(TimeDuration.millis(10).microsTime()).pass("test3", "test4");
         channel3.after(TimeDuration.millis(10)).pass((String[]) null);
         channel3.now().pass((List<String>) null).pass((OutputChannel<String>) null);
-        assertThat(channel3.results().afterMax(3, TimeUnit.SECONDS).readAll()).containsExactly(
+        assertThat(channel3.result().afterMax(3, TimeUnit.SECONDS).readAll()).containsExactly(
                 "test1", "test2", "test3", "test4");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(110);
 
@@ -543,10 +534,10 @@ public class RoutineTest extends TestCase {
         channel4.after(TimeDuration.millis(10).microsTime()).pass("test3", "test4");
         channel4.after(TimeDuration.millis(10)).pass((String[]) null);
         channel4.now().pass((List<String>) null).pass((OutputChannel<String>) null);
-        assertThat(channel4.results().afterMax(3, TimeUnit.SECONDS).readAll()).containsOnly("test1",
-                                                                                            "test2",
-                                                                                            "test3",
-                                                                                            "test4");
+        assertThat(channel4.result().afterMax(3, TimeUnit.SECONDS).readAll()).containsOnly("test1",
+                                                                                           "test2",
+                                                                                           "test3",
+                                                                                           "test4");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(100);
 
         final Routine<String, String> routine5 =
@@ -564,7 +555,7 @@ public class RoutineTest extends TestCase {
         channel5.after(TimeDuration.millis(10).microsTime()).pass("test3", "test4");
         channel5.after(TimeDuration.millis(10)).pass((String[]) null);
         channel5.now().pass((List<String>) null).pass((OutputChannel<String>) null);
-        assertThat(channel5.results().afterMax(3, TimeUnit.SECONDS).readAll()).containsExactly(
+        assertThat(channel5.result().afterMax(3, TimeUnit.SECONDS).readAll()).containsExactly(
                 "test1", "test2", "test3", "test4");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(100);
 
@@ -581,10 +572,10 @@ public class RoutineTest extends TestCase {
         channel6.after(TimeDuration.millis(10).microsTime()).pass("test3", "test4");
         channel6.after(TimeDuration.millis(10)).pass((String[]) null);
         channel6.now().pass((List<String>) null).pass((OutputChannel<String>) null);
-        assertThat(channel6.results().afterMax(3, TimeUnit.SECONDS).readAll()).containsOnly("test1",
-                                                                                            "test2",
-                                                                                            "test3",
-                                                                                            "test4");
+        assertThat(channel6.result().afterMax(3, TimeUnit.SECONDS).readAll()).containsOnly("test1",
+                                                                                           "test2",
+                                                                                           "test3",
+                                                                                           "test4");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(110);
 
         final Routine<String, String> routine7 =
@@ -602,7 +593,7 @@ public class RoutineTest extends TestCase {
         channel7.after(TimeDuration.millis(10).microsTime()).pass("test3", "test4");
         channel7.after(TimeDuration.millis(10)).pass((String[]) null);
         channel7.now().pass((List<String>) null).pass((OutputChannel<String>) null);
-        assertThat(channel7.results().afterMax(3, TimeUnit.SECONDS).readAll()).containsExactly(
+        assertThat(channel7.result().afterMax(3, TimeUnit.SECONDS).readAll()).containsExactly(
                 "test1", "test2", "test3", "test4");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(110);
 
@@ -619,10 +610,10 @@ public class RoutineTest extends TestCase {
         channel8.after(TimeDuration.millis(10).microsTime()).pass("test3", "test4");
         channel8.after(TimeDuration.millis(10)).pass((String[]) null);
         channel8.now().pass((List<String>) null).pass((OutputChannel<String>) null);
-        assertThat(channel8.results().afterMax(3, TimeUnit.SECONDS).readAll()).containsOnly("test1",
-                                                                                            "test2",
-                                                                                            "test3",
-                                                                                            "test4");
+        assertThat(channel8.result().afterMax(3, TimeUnit.SECONDS).readAll()).containsOnly("test1",
+                                                                                           "test2",
+                                                                                           "test3",
+                                                                                           "test4");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(100);
 
         final Routine<String, String> routine9 =
@@ -640,7 +631,7 @@ public class RoutineTest extends TestCase {
         channel9.after(TimeDuration.millis(10).microsTime()).pass("test3", "test4");
         channel9.after(TimeDuration.millis(10)).pass((String[]) null);
         channel9.now().pass((List<String>) null).pass((OutputChannel<String>) null);
-        assertThat(channel9.results().afterMax(3, TimeUnit.SECONDS).readAll()).containsExactly(
+        assertThat(channel9.result().afterMax(3, TimeUnit.SECONDS).readAll()).containsExactly(
                 "test1", "test2", "test3", "test4");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(100);
     }
@@ -651,14 +642,14 @@ public class RoutineTest extends TestCase {
 
         final ParameterChannel<String, String> channel1 = passThroughRoutine.invokeAsync();
         channel1.after(TimeDuration.seconds(2)).abort();
-        assertThat(channel1.now().pass("test").results().readFirst()).isEqualTo("test");
+        assertThat(channel1.now().pass("test").result().readFirst()).isEqualTo("test");
 
         final ParameterChannel<String, String> channel2 = passThroughRoutine.invokeAsync();
         channel2.after(TimeDuration.millis(100)).abort();
 
         try {
 
-            channel2.after(TimeDuration.millis(200)).pass("test").results().readFirst();
+            channel2.after(TimeDuration.millis(200)).pass("test").result().readFirst();
 
             fail();
 
@@ -697,8 +688,7 @@ public class RoutineTest extends TestCase {
 
         assertThat(routine1.invokeAsync()
                            .after(TimeDuration.millis(500))
-                           .pass(routine2.runAsync("test"))
-                           .results()
+                           .pass(routine2.runAsync("test")).result()
                            .readFirst()).isEqualTo("test");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(500);
     }
@@ -1423,7 +1413,7 @@ public class RoutineTest extends TestCase {
                                                                 new TestInvocationManager(),
                                                                 Runners.sharedRunner(), logger);
 
-            channel.results();
+            channel.result();
             channel.pass("test");
 
             fail();
@@ -1976,7 +1966,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.invoke().pass(after.run(input)).results().readAll();
+            before.invoke().pass(after.run(input)).result().readAll();
 
             fail();
 
@@ -1987,7 +1977,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : before.invoke().pass(after.run(input)).results()) {
+            for (final String s : before.invoke().pass(after.run(input)).result()) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -2001,7 +1991,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.invokeAsync().pass(after.run(input)).results().readAll();
+            before.invokeAsync().pass(after.run(input)).result().readAll();
 
             fail();
 
@@ -2012,7 +2002,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : before.invokeAsync().pass(after.run(input)).results()) {
+            for (final String s : before.invokeAsync().pass(after.run(input)).result()) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -2026,7 +2016,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.invokeParallel().pass(after.run(input)).results().readAll();
+            before.invokeParallel().pass(after.run(input)).result().readAll();
 
             fail();
 
@@ -2037,7 +2027,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : before.invokeParallel().pass(after.run(input)).results()) {
+            for (final String s : before.invokeParallel().pass(after.run(input)).result()) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -2134,7 +2124,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.invoke().pass(after.runAsync(input)).results().readAll();
+            before.invoke().pass(after.runAsync(input)).result().readAll();
 
             fail();
 
@@ -2145,7 +2135,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : before.invoke().pass(after.runAsync(input)).results()) {
+            for (final String s : before.invoke().pass(after.runAsync(input)).result()) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -2159,7 +2149,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.invokeAsync().pass(after.runAsync(input)).results().readAll();
+            before.invokeAsync().pass(after.runAsync(input)).result().readAll();
 
             fail();
 
@@ -2170,7 +2160,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : before.invokeAsync().pass(after.runAsync(input)).results()) {
+            for (final String s : before.invokeAsync().pass(after.runAsync(input)).result()) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -2267,7 +2257,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.invoke().pass(after.runParallel(input)).results().readAll();
+            before.invoke().pass(after.runParallel(input)).result().readAll();
 
             fail();
 
@@ -2278,7 +2268,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : before.invoke().pass(after.runParallel(input)).results()) {
+            for (final String s : before.invoke().pass(after.runParallel(input)).result()) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -2292,7 +2282,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.invokeAsync().pass(after.runParallel(input)).results().readAll();
+            before.invokeAsync().pass(after.runParallel(input)).result().readAll();
 
             fail();
 
@@ -2303,7 +2293,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : before.invokeAsync().pass(after.runParallel(input)).results()) {
+            for (final String s : before.invokeAsync().pass(after.runParallel(input)).result()) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -2325,14 +2315,10 @@ public class RoutineTest extends TestCase {
         assertThat(routine.run(input).bind(consumer).isComplete()).isTrue();
         assertThat(routine.runAsync(input).bind(consumer).isComplete()).isTrue();
         assertThat(routine.runParallel(input).bind(consumer).isComplete()).isTrue();
-        assertThat(routine.invoke().pass(input).results().bind(consumer).isComplete()).isTrue();
+        assertThat(routine.invoke().pass(input).result().bind(consumer).isComplete()).isTrue();
+        assertThat(routine.invokeAsync().pass(input).result().bind(consumer).isComplete()).isTrue();
         assertThat(
-                routine.invokeAsync().pass(input).results().bind(consumer).isComplete()).isTrue();
-        assertThat(routine.invokeParallel()
-                          .pass(input)
-                          .results()
-                          .bind(consumer)
-                          .isComplete()).isTrue();
+                routine.invokeParallel().pass(input).result().bind(consumer).isComplete()).isTrue();
     }
 
     private void testException(final Routine<String, String> routine, final String input,
@@ -2448,7 +2434,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            routine.invoke().pass(input).results().readAll();
+            routine.invoke().pass(input).result().readAll();
 
             fail();
 
@@ -2459,7 +2445,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : routine.invoke().pass(input).results()) {
+            for (final String s : routine.invoke().pass(input).result()) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -2473,7 +2459,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            routine.invokeAsync().pass(input).results().readAll();
+            routine.invokeAsync().pass(input).result().readAll();
 
             fail();
 
@@ -2484,7 +2470,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : routine.invokeAsync().pass(input).results()) {
+            for (final String s : routine.invokeAsync().pass(input).result()) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -2498,7 +2484,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            routine.invokeParallel().pass(input).results().readAll();
+            routine.invokeParallel().pass(input).result().readAll();
 
             fail();
 
@@ -2509,7 +2495,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : routine.invokeParallel().pass(input).results()) {
+            for (final String s : routine.invokeParallel().pass(input).result()) {
 
                 assertThat(s).isNotEmpty();
             }

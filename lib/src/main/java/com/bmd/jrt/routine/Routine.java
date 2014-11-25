@@ -88,6 +88,8 @@ public interface Routine<INPUT, OUTPUT> {
      * Short for <b><code>run().readAll()</code></b>.
      *
      * @return the list of output data.
+     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
+     *                                             exception.
      */
     @Nonnull
     public List<OUTPUT> call();
@@ -97,6 +99,8 @@ public interface Routine<INPUT, OUTPUT> {
      *
      * @param input the input.
      * @return the list of output data.
+     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
+     *                                             exception.
      */
     @Nonnull
     public List<OUTPUT> call(@Nullable INPUT input);
@@ -106,6 +110,8 @@ public interface Routine<INPUT, OUTPUT> {
      *
      * @param inputs the input data.
      * @return the list of output data.
+     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
+     *                                             exception.
      */
     @Nonnull
     public List<OUTPUT> call(@Nullable INPUT... inputs);
@@ -115,6 +121,8 @@ public interface Routine<INPUT, OUTPUT> {
      *
      * @param inputs the iterable returning the input data.
      * @return the list of output data.
+     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
+     *                                             exception.
      */
     @Nonnull
     public List<OUTPUT> call(@Nullable Iterable<? extends INPUT> inputs);
@@ -124,6 +132,8 @@ public interface Routine<INPUT, OUTPUT> {
      *
      * @param inputs the output channel returning the input data.
      * @return the list of output data.
+     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
+     *                                             exception.
      */
     @Nonnull
     public List<OUTPUT> call(@Nullable OutputChannel<INPUT> inputs);
@@ -132,6 +142,8 @@ public interface Routine<INPUT, OUTPUT> {
      * Short for <b><code>runAsync().readAll()</code></b>.
      *
      * @return the list of output data.
+     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
+     *                                             exception.
      */
     @Nonnull
     public List<OUTPUT> callAsync();
@@ -141,6 +153,8 @@ public interface Routine<INPUT, OUTPUT> {
      *
      * @param input the input.
      * @return the list of output data.
+     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
+     *                                             exception.
      */
     @Nonnull
     public List<OUTPUT> callAsync(@Nullable INPUT input);
@@ -150,6 +164,8 @@ public interface Routine<INPUT, OUTPUT> {
      *
      * @param inputs the input data.
      * @return the list of output data.
+     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
+     *                                             exception.
      */
     @Nonnull
     public List<OUTPUT> callAsync(@Nullable INPUT... inputs);
@@ -159,6 +175,8 @@ public interface Routine<INPUT, OUTPUT> {
      *
      * @param inputs the iterable returning the input data.
      * @return the list of output data.
+     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
+     *                                             exception.
      */
     @Nonnull
     public List<OUTPUT> callAsync(@Nullable Iterable<? extends INPUT> inputs);
@@ -168,6 +186,8 @@ public interface Routine<INPUT, OUTPUT> {
      *
      * @param inputs the output channel returning the input data.
      * @return the list of output data.
+     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
+     *                                             exception.
      */
     @Nonnull
     public List<OUTPUT> callAsync(@Nullable OutputChannel<INPUT> inputs);
@@ -178,6 +198,8 @@ public interface Routine<INPUT, OUTPUT> {
      * This method actually makes little sense, thought it is here for completeness.
      *
      * @return the list of output data.
+     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
+     *                                             exception.
      */
     @Nonnull
     public List<OUTPUT> callParallel();
@@ -187,6 +209,8 @@ public interface Routine<INPUT, OUTPUT> {
      *
      * @param input the input.
      * @return the list of output data.
+     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
+     *                                             exception.
      */
     @Nonnull
     public List<OUTPUT> callParallel(@Nullable INPUT input);
@@ -196,6 +220,8 @@ public interface Routine<INPUT, OUTPUT> {
      *
      * @param inputs the input data.
      * @return the list of output data.
+     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
+     *                                             exception.
      */
     @Nonnull
     public List<OUTPUT> callParallel(@Nullable INPUT... inputs);
@@ -205,6 +231,8 @@ public interface Routine<INPUT, OUTPUT> {
      *
      * @param inputs the iterable returning the input data.
      * @return the list of output data.
+     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
+     *                                             exception.
      */
     @Nonnull
     public List<OUTPUT> callParallel(@Nullable Iterable<? extends INPUT> inputs);
@@ -214,6 +242,8 @@ public interface Routine<INPUT, OUTPUT> {
      *
      * @param inputs the output channel returning the input data.
      * @return the list of output data.
+     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
+     *                                             exception.
      */
     @Nonnull
     public List<OUTPUT> callParallel(@Nullable OutputChannel<INPUT> inputs);
@@ -243,135 +273,165 @@ public interface Routine<INPUT, OUTPUT> {
     public ParameterChannel<INPUT, OUTPUT> invokeParallel();
 
     /**
-     * Short for <b><code>invoke().results()</code></b>.
+     * Short for <b><code>invoke().result()</code></b>.
      *
      * @return the output channel.
+     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
+     *                                             exception.
      */
     @Nonnull
     public OutputChannel<OUTPUT> run();
 
     /**
-     * Short for <b><code>invoke().pass(input).results()</code></b>.
+     * Short for <b><code>invoke().pass(input).result()</code></b>.
      *
      * @param input the input.
      * @return the output channel.
+     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
+     *                                             exception.
      */
     @Nonnull
     public OutputChannel<OUTPUT> run(@Nullable INPUT input);
 
     /**
-     * Short for <b><code>invoke().pass(inputs).results()</code></b>.
+     * Short for <b><code>invoke().pass(inputs).result()</code></b>.
      *
      * @param inputs the input data.
      * @return the output channel.
+     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
+     *                                             exception.
      */
     @Nonnull
     public OutputChannel<OUTPUT> run(@Nullable INPUT... inputs);
 
     /**
-     * Short for <b><code>invoke().pass(inputs).results()</code></b>.
+     * Short for <b><code>invoke().pass(inputs).result()</code></b>.
      *
      * @param inputs the iterable returning the input data.
      * @return the output channel.
+     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
+     *                                             exception.
      */
     @Nonnull
     public OutputChannel<OUTPUT> run(@Nullable Iterable<? extends INPUT> inputs);
 
     /**
-     * Short for <b><code>invoke().pass(inputs).results()</code></b>.
+     * Short for <b><code>invoke().pass(inputs).result()</code></b>.
      *
      * @param inputs the output channel returning the input data.
      * @return the output channel.
+     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
+     *                                             exception.
      */
     @Nonnull
     public OutputChannel<OUTPUT> run(@Nullable OutputChannel<INPUT> inputs);
 
     /**
-     * Short for <b><code>invokeAsync().results()</code></b>.
+     * Short for <b><code>invokeAsync().result()</code></b>.
      *
      * @return the output channel.
+     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
+     *                                             exception.
      */
     @Nonnull
     public OutputChannel<OUTPUT> runAsync();
 
     /**
-     * Short for <b><code>invokeAsync().pass(input).results()</code></b>.
+     * Short for <b><code>invokeAsync().pass(input).result()</code></b>.
      *
      * @param input the input.
      * @return the output channel.
+     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
+     *                                             exception.
      */
     @Nonnull
     public OutputChannel<OUTPUT> runAsync(@Nullable INPUT input);
 
     /**
-     * Short for <b><code>invokeAsync().pass(inputs).results()</code></b>.
+     * Short for <b><code>invokeAsync().pass(inputs).result()</code></b>.
      *
      * @param inputs the input data.
      * @return the output channel.
+     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
+     *                                             exception.
      */
     @Nonnull
     public OutputChannel<OUTPUT> runAsync(@Nullable INPUT... inputs);
 
     /**
-     * Short for <b><code>invokeAsync().pass(inputs).results()</code></b>.
+     * Short for <b><code>invokeAsync().pass(inputs).result()</code></b>.
      *
      * @param inputs the iterable returning the input data.
      * @return the output channel.
+     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
+     *                                             exception.
      */
     @Nonnull
     public OutputChannel<OUTPUT> runAsync(@Nullable Iterable<? extends INPUT> inputs);
 
     /**
-     * Short for <b><code>invokeAsync().pass(inputs).results()</code></b>.
+     * Short for <b><code>invokeAsync().pass(inputs).result()</code></b>.
      *
      * @param inputs the output channel returning the input data.
      * @return the output channel.
+     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
+     *                                             exception.
      */
     @Nonnull
     public OutputChannel<OUTPUT> runAsync(@Nullable OutputChannel<INPUT> inputs);
 
     /**
-     * Short for <b><code>invokeParallel().results()</code></b>.
+     * Short for <b><code>invokeParallel().result()</code></b>.
      * <p/>
      * This method actually makes little sense, thought it is here for completeness.
      *
      * @return the output channel.
+     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
+     *                                             exception.
      */
     @Nonnull
     public OutputChannel<OUTPUT> runParallel();
 
     /**
-     * Short for <b><code>invokeParallel().pass(input).results()</code></b>.
+     * Short for <b><code>invokeParallel().pass(input).result()</code></b>.
      *
      * @param input the input.
      * @return the output channel.
+     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
+     *                                             exception.
      */
     @Nonnull
     public OutputChannel<OUTPUT> runParallel(@Nullable INPUT input);
 
     /**
-     * Short for <b><code>invokeParallel().pass(inputs).results()</code></b>.
+     * Short for <b><code>invokeParallel().pass(inputs).result()</code></b>.
      *
      * @param inputs the iterable returning the input data.
      * @return the output channel.
+     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
+     *                                             exception.
      */
     @Nonnull
     public OutputChannel<OUTPUT> runParallel(@Nullable INPUT... inputs);
 
     /**
-     * Short for <b><code>invokeParallel().pass(inputs).results()</code></b>.
+     * Short for <b><code>invokeParallel().pass(inputs).result()</code></b>.
      *
      * @param inputs the output channel returning the input data.
      * @return the output channel.
+     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
+     *                                             exception.
      */
     @Nonnull
     public OutputChannel<OUTPUT> runParallel(@Nullable Iterable<? extends INPUT> inputs);
 
     /**
-     * Short for <b><code>invokeParallel().pass(inputs).results()</code></b>.
+     * Short for <b><code>invokeParallel().pass(inputs).result()</code></b>.
      *
      * @param inputs the output channel returning the input data.
      * @return the output channel.
+     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
+     *                                             exception.
      */
     @Nonnull
     public OutputChannel<OUTPUT> runParallel(@Nullable OutputChannel<INPUT> inputs);

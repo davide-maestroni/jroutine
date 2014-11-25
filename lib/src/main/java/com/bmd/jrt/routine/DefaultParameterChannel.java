@@ -443,7 +443,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
     @Nonnull
     @Override
-    public OutputChannel<OUTPUT> results() {
+    public OutputChannel<OUTPUT> result() {
 
         final boolean isPendingExecution;
 

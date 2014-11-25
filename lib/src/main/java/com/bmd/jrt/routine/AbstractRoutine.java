@@ -204,14 +204,14 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends BasicRoutine<INPUT,
     @Override
     public OutputChannel<OUTPUT> runParallel(@Nullable final Iterable<? extends INPUT> inputs) {
 
-        return invokeParallel().pass(inputs).results();
+        return invokeParallel().pass(inputs).result();
     }
 
     @Nonnull
     @Override
     public OutputChannel<OUTPUT> runParallel(@Nullable final OutputChannel<INPUT> inputs) {
 
-        return invokeParallel().pass(inputs).results();
+        return invokeParallel().pass(inputs).result();
     }
 
     /**

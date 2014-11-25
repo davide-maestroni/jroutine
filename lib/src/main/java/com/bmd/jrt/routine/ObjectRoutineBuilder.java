@@ -741,7 +741,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                     }
                 }
 
-                outputChannel = parameterChannel.results();
+                outputChannel = parameterChannel.result();
 
             } else if (isOverrideParameters) {
 
@@ -763,7 +763,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                     }
                 }
 
-                outputChannel = parameterChannel.results();
+                outputChannel = parameterChannel.result();
 
             } else {
 

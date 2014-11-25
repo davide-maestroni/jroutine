@@ -20,6 +20,5 @@
             final com.bmd.jrt.builder.RoutineConfiguration configuration) {
 
         return com.bmd.jrt.routine.JavaRoutine.on(new com.bmd.jrt.common.ClassToken<SimpleInvocation${methodCount}>(){})
-                                       .apply(configuration).withArgs(this)
-                                       ${routineBuilderOptions}.buildRoutine();
+                                       ${routineBuilderOptions}.apply(configuration).withArgs(this).buildRoutine();
     }

@@ -11,18 +11,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.bmd.jrt.routine;
 
-// GENERATED CODE - PLEASE DO NOT EDIT
+import com.bmd.jrt.common.DeadLockException;
 
-    @Override
-    public ${resultType} ${methodName}(${paramTypes}) {
+/**
+ * Exception indicating that no invocation instance became available before the timeout elapsed.
+ * <p/>
+ * Created by davide on 9/20/14.
+ */
+public class RoutineDeadLockException extends DeadLockException {
 
-        final com.bmd.jrt.channel.ParameterChannel<Object, ${resultClassName}> dontcallmechannel = this.mRoutine${methodCount}.invokeParallel();
-
-        for (final Object dontcallmeobject: ${params}) {
-
-            dontcallmechannel.pass(dontcallmeobject);
-        }
-
-        return dontcallmechannel.result().readAll();
-    }
+}

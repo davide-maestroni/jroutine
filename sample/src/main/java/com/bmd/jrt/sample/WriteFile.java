@@ -65,7 +65,7 @@ public class WriteFile extends BasicInvocation<Chunk, Boolean> {
     }
 
     @Override
-    public void onInput(final Chunk chunk, @Nonnull final ResultChannel<Boolean> results) {
+    public void onInput(final Chunk chunk, @Nonnull final ResultChannel<Boolean> result) {
 
         try {
 
@@ -78,11 +78,11 @@ public class WriteFile extends BasicInvocation<Chunk, Boolean> {
     }
 
     @Override
-    public void onResult(@Nonnull final ResultChannel<Boolean> results) {
+    public void onResult(@Nonnull final ResultChannel<Boolean> result) {
 
         closeStream();
 
-        results.pass(true);
+        result.pass(true);
     }
 
     private void closeStream() {

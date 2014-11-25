@@ -47,12 +47,6 @@ import static org.fest.assertions.api.Assertions.assertThat;
  */
 public class JavaRoutineTest extends TestCase {
 
-    public void testA() {
-
-        final int[] inc = JavaRoutine.on(new TestA()).proxy(ITestA.class).inc(1, 2, 3, 4);
-        assertThat(inc).containsSequence(2, 3, 4, 5);
-    }
-
     public void testChannelBuilder() {
 
         final IOChannel<Object> channel = JavaRoutine.io()
@@ -876,6 +870,9 @@ public class JavaRoutineTest extends TestCase {
 
         channel.input().pass(1, 2, 3).close();
         assertThat(squareAsync.computeParallel4(channel.output()).readAll()).contains(1, 4, 9);
+
+        final int[] inc = JavaRoutine.on(new TestInc()).proxy(ITestInc.class).inc(1, 2, 3, 4);
+        assertThat(inc).containsOnly(2, 3, 4, 5);
     }
 
     public void testRoutineBuilder() {
@@ -971,7 +968,7 @@ public class JavaRoutineTest extends TestCase {
         }
     }
 
-    private interface ITestA {
+    private interface ITestInc {
 
         @AsyncType(int.class)
         public int[] inc(@ParallelType(int.class) int... i);
@@ -1056,9 +1053,9 @@ public class JavaRoutineTest extends TestCase {
     private static class PassThroughInvocation extends BasicInvocation<String, String> {
 
         @Override
-        public void onInput(final String s, @Nonnull final ResultChannel<String> results) {
+        public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
 
-            results.pass(s);
+            result.pass(s);
         }
     }
 
@@ -1115,7 +1112,7 @@ public class JavaRoutineTest extends TestCase {
         }
     }
 
-    private static class TestA {
+    private static class TestInc {
 
         public int inc(final int i) {
 

@@ -13,6 +13,11 @@
  */
 package com.bmd.jrt.routine;
 
+import com.bmd.jrt.builder.InputDeadLockException;
+import com.bmd.jrt.builder.OutputDeadLockException;
+import com.bmd.jrt.channel.ReadDeadLockException;
+import com.bmd.jrt.common.DeadLockException;
+
 import junit.framework.TestCase;
 
 import java.lang.reflect.Method;
@@ -26,6 +31,15 @@ import static org.fest.assertions.api.Assertions.assertThat;
  */
 public class ExceptionTest extends TestCase {
 
+    public void testExceptions() {
+
+        assertThat(new DeadLockException()).hasNoCause();
+        assertThat(new InputDeadLockException()).hasNoCause();
+        assertThat(new OutputDeadLockException()).hasNoCause();
+        assertThat(new ReadDeadLockException()).hasNoCause();
+        assertThat(new RoutineDeadLockException()).hasNoCause();
+    }
+
     @SuppressWarnings("ConstantConditions")
     public void testRoutineInvocationException() throws NoSuchMethodException {
 
@@ -36,8 +50,7 @@ public class ExceptionTest extends TestCase {
                 RoutineInvocationException.class);
         assertThat(new RoutineInvocationException(new NullPointerException(), this, Object.class,
                                                   waitMethod.getName()).getCause())
-                .isExactlyInstanceOf(
-                NullPointerException.class);
+                .isExactlyInstanceOf(NullPointerException.class);
         assertThat(new RoutineInvocationException(null, null, Object.class,
                                                   waitMethod.getName())).hasNoCause();
         assertThat(new RoutineInvocationException(new NullPointerException(), this, Object.class,
@@ -83,10 +96,5 @@ public class ExceptionTest extends TestCase {
         } catch (final NullPointerException ignored) {
 
         }
-    }
-
-    public void testRoutineNotAvailableException() {
-
-        assertThat(new RoutineNotAvailableException()).hasNoCause();
     }
 }

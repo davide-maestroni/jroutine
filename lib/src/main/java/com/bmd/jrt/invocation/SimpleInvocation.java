@@ -40,14 +40,14 @@ public abstract class SimpleInvocation<INPUT, OUTPUT> extends BasicInvocation<IN
     /**
      * This method is called when all the inputs are available and ready to be processed.
      *
-     * @param inputs  the input list.
-     * @param results the result channel.
+     * @param inputs the input list.
+     * @param result the result channel.
      */
     public abstract void onExec(@Nonnull List<? extends INPUT> inputs,
-            @Nonnull ResultChannel<OUTPUT> results);
+            @Nonnull ResultChannel<OUTPUT> result);
 
     @Override
-    public void onInput(final INPUT input, @Nonnull final ResultChannel<OUTPUT> results) {
+    public void onInput(final INPUT input, @Nonnull final ResultChannel<OUTPUT> result) {
 
         if (mInputs == null) {
 
@@ -58,7 +58,7 @@ public abstract class SimpleInvocation<INPUT, OUTPUT> extends BasicInvocation<IN
     }
 
     @Override
-    public void onResult(@Nonnull final ResultChannel<OUTPUT> results) {
+    public void onResult(@Nonnull final ResultChannel<OUTPUT> result) {
 
         final ArrayList<INPUT> inputs = mInputs;
         final ArrayList<INPUT> clone;
@@ -72,7 +72,7 @@ public abstract class SimpleInvocation<INPUT, OUTPUT> extends BasicInvocation<IN
             clone = new ArrayList<INPUT>(inputs);
         }
 
-        onExec(clone, results);
+        onExec(clone, result);
     }
 
     @Override

@@ -41,12 +41,12 @@ public abstract class BasicInvocation<INPUT, OUTPUT> implements Invocation<INPUT
     }
 
     @Override
-    public void onInput(final INPUT input, @Nonnull final ResultChannel<OUTPUT> results) {
+    public void onInput(final INPUT input, @Nonnull final ResultChannel<OUTPUT> result) {
 
     }
 
     @Override
-    public void onResult(@Nonnull final ResultChannel<OUTPUT> results) {
+    public void onResult(@Nonnull final ResultChannel<OUTPUT> result) {
 
     }
 

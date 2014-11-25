@@ -50,14 +50,14 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
      *
      * @param manager the invocation manager.
      * @param inputs  the input iterator.
-     * @param results the result channel.
+     * @param result  the result channel.
      * @param logger  the logger instance.
      * @throws NullPointerException if one of the parameters is null.
      */
     @SuppressWarnings("ConstantConditions")
     DefaultExecution(@Nonnull final InvocationManager<INPUT, OUTPUT> manager,
             @Nonnull final InputIterator<INPUT> inputs,
-            @Nonnull final DefaultResultChannel<OUTPUT> results, @Nonnull final Logger logger) {
+            @Nonnull final DefaultResultChannel<OUTPUT> result, @Nonnull final Logger logger) {
 
         if (manager == null) {
 
@@ -69,14 +69,14 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
             throw new NullPointerException("the input iterator must not be null");
         }
 
-        if (results == null) {
+        if (result == null) {
 
             throw new NullPointerException("the result channel must not be null");
         }
 
         mInvocationManager = manager;
         mInputIterator = inputs;
-        mResultChannel = results;
+        mResultChannel = result;
         mLogger = logger.subContextLogger(this);
         mAbortExecution = new AbortExecution();
     }

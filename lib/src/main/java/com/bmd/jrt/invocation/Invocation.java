@@ -29,15 +29,15 @@ import javax.annotation.Nullable;
  *
  *           ...
  *
- *         > onInput(input, results);
+ *         > onInput(input, result);
  *
  *           ...
  *
- *         > onInput(input, results);
+ *         > onInput(input, result);
  *
  *           ...
  *
- *         > onResult(results);
+ *         > onResult(result);
  *
  *         > onReturn();
  *     </code>
@@ -81,19 +81,19 @@ public interface Invocation<INPUT, OUTPUT> {
      * Called when an input is passed to the routine.<br/>
      * This method is called once for each input object.
      *
-     * @param input   the input.
-     * @param results the result channel.
+     * @param input  the input.
+     * @param result the result channel.
      */
-    public void onInput(INPUT input, @Nonnull ResultChannel<OUTPUT> results);
+    public void onInput(INPUT input, @Nonnull ResultChannel<OUTPUT> result);
 
     /**
      * Called when all the inputs has been passed to the routine.<br/>
      * This method is called once in the invocation lifecycle to indicate that the final invocation
      * results should be passed to the result channel.
      *
-     * @param results the result channel.
+     * @param result the result channel.
      */
-    public void onResult(@Nonnull ResultChannel<OUTPUT> results);
+    public void onResult(@Nonnull ResultChannel<OUTPUT> result);
 
     /**
      * Called when the routine execution has completed.

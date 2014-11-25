@@ -17,6 +17,7 @@ import com.bmd.jrt.builder.RoutineBuilder.DataOrder;
 import com.bmd.jrt.channel.IOChannel;
 import com.bmd.jrt.channel.IOChannel.ChannelOutput;
 import com.bmd.jrt.channel.OutputChannel;
+import com.bmd.jrt.channel.ReadDeadLockException;
 import com.bmd.jrt.common.RoutineException;
 import com.bmd.jrt.time.TimeDuration;
 
@@ -169,13 +170,11 @@ public class IOChannelTest extends TestCase {
 
         try {
 
-            output.afterMax(TimeDuration.millis(10))
-                  .eventuallyThrow(new IllegalStateException())
-                  .readFirst();
+            output.afterMax(TimeDuration.millis(10)).eventuallyDeadLock().readFirst();
 
             fail();
 
-        } catch (final IllegalStateException ignored) {
+        } catch (final ReadDeadLockException ignored) {
 
         }
 
@@ -185,7 +184,7 @@ public class IOChannelTest extends TestCase {
 
             fail();
 
-        } catch (final IllegalStateException ignored) {
+        } catch (final ReadDeadLockException ignored) {
 
         }
 
@@ -195,7 +194,7 @@ public class IOChannelTest extends TestCase {
 
             fail();
 
-        } catch (final IllegalStateException ignored) {
+        } catch (final ReadDeadLockException ignored) {
 
         }
 
@@ -205,7 +204,7 @@ public class IOChannelTest extends TestCase {
 
             fail();
 
-        } catch (final IllegalStateException ignored) {
+        } catch (final ReadDeadLockException ignored) {
 
         }
 
@@ -215,7 +214,7 @@ public class IOChannelTest extends TestCase {
 
             fail();
 
-        } catch (final IllegalStateException ignored) {
+        } catch (final ReadDeadLockException ignored) {
 
         }
 
@@ -225,7 +224,7 @@ public class IOChannelTest extends TestCase {
 
             fail();
 
-        } catch (final IllegalStateException ignored) {
+        } catch (final ReadDeadLockException ignored) {
 
         }
     }

@@ -49,13 +49,13 @@ import javax.annotation.Nullable;
  * available or the timeout set through the builder elapses.<br/>
  * By default the timeout is set to a few seconds to avoid unexpected deadlocks.<br/>
  * In case the timeout elapses before an invocation instance becomes available, a
- * {@link com.bmd.jrt.routine.RoutineNotAvailableException} will be thrown.
+ * {@link com.bmd.jrt.routine.RoutineDeadLockException} will be thrown.
  * <p/>
  * Moreover, the number of input and output data buffered in the corresponding channel can be
  * limited in order to avoid excessive memory consumption. In case the maximum number is reached
  * when passing an input or output, the call blocks until enough data are consumed or the specified
- * timeout elapses. In the latter case a
- * {@link com.bmd.jrt.routine.RoutineChannelOverflowException} will be thrown.
+ * timeout elapses. In the latter case a {@link com.bmd.jrt.common.DeadLockException} will be
+ * thrown.
  * <p/>
  * Finally, by default the order of input and output data is not guaranteed. Nevertheless, it is
  * possible to force data to be delivered in insertion order, at the cost of a slightly increased

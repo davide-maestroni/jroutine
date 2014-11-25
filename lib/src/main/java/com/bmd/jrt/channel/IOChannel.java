@@ -117,11 +117,15 @@ public interface IOChannel<TYPE> {
 
         @Nonnull
         @Override
-        public ChannelOutput<OUTPUT> eventuallyThrow(@Nullable RuntimeException exception);
+        public ChannelOutput<OUTPUT> eventuallyDeadLock();
 
         @Nonnull
         @Override
         public ChannelOutput<OUTPUT> immediately();
+
+        @Nonnull
+        @Override
+        public ChannelOutput<OUTPUT> neverDeadLock();
 
         @Nonnull
         @Override

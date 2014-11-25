@@ -35,7 +35,7 @@ public class ReadConnection extends BasicInvocation<URI, Chunk> {
     private static final int MAX_CHUNK_SIZE = 2048;
 
     @Override
-    public void onInput(final URI uri, @Nonnull final ResultChannel<Chunk> results) {
+    public void onInput(final URI uri, @Nonnull final ResultChannel<Chunk> result) {
 
         try {
 
@@ -56,7 +56,7 @@ public class ReadConnection extends BasicInvocation<URI, Chunk> {
 
             while (chunk.readFrom(inputStream)) {
 
-                results.pass(chunk);
+                result.pass(chunk);
                 chunk = new Chunk(MAX_CHUNK_SIZE);
             }
 

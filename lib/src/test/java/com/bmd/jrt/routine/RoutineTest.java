@@ -15,6 +15,8 @@ package com.bmd.jrt.routine;
 
 import com.bmd.jrt.annotation.Async;
 import com.bmd.jrt.annotation.AsyncType;
+import com.bmd.jrt.builder.InputDeadLockException;
+import com.bmd.jrt.builder.OutputDeadLockException;
 import com.bmd.jrt.builder.RoutineBuilder.DataOrder;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.builder.RoutineConfigurationBuilder;
@@ -22,6 +24,7 @@ import com.bmd.jrt.channel.BasicOutputConsumer;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.OutputConsumer;
 import com.bmd.jrt.channel.ParameterChannel;
+import com.bmd.jrt.channel.ReadDeadLockException;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.common.RoutineException;
@@ -132,12 +135,12 @@ public class RoutineTest extends TestCase {
         final Invocation<String, String> abortInvocation = new BasicInvocation<String, String>() {
 
             @Override
-            public void onInput(final String s, @Nonnull final ResultChannel<String> results) {
+            public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
 
-                assertThat(results.isOpen()).isTrue();
-                assertThat(results.abort(new IllegalArgumentException(s))).isTrue();
-                assertThat(results.abort()).isFalse();
-                assertThat(results.isOpen()).isFalse();
+                assertThat(result.isOpen()).isTrue();
+                assertThat(result.abort(new IllegalArgumentException(s))).isTrue();
+                assertThat(result.abort()).isFalse();
+                assertThat(result.isOpen()).isFalse();
             }
         };
 
@@ -148,7 +151,8 @@ public class RoutineTest extends TestCase {
 
             routine1.invokeAsync()
                     .after(TimeDuration.millis(10))
-                    .pass("test_abort").result()
+                    .pass("test_abort")
+                    .result()
                     .readFirst();
 
             fail();
@@ -162,10 +166,10 @@ public class RoutineTest extends TestCase {
         final Invocation<String, String> abortInvocation2 = new BasicInvocation<String, String>() {
 
             @Override
-            public void onInput(final String s, @Nonnull final ResultChannel<String> results) {
+            public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
 
-                assertThat(results.abort()).isTrue();
-                assertThat(results.abort(new IllegalArgumentException(s))).isFalse();
+                assertThat(result.abort()).isTrue();
+                assertThat(result.abort(new IllegalArgumentException(s))).isFalse();
             }
         };
 
@@ -176,7 +180,8 @@ public class RoutineTest extends TestCase {
 
             routine2.invokeAsync()
                     .after(TimeDuration.millis(10))
-                    .pass("test_abort").result()
+                    .pass("test_abort")
+                    .result()
                     .readFirst();
 
             fail();
@@ -272,27 +277,32 @@ public class RoutineTest extends TestCase {
 
         assertThat(routine.invoke().pass().result().readAll()).isEmpty();
         assertThat(routine.invoke()
-                          .pass(Arrays.asList("test1", "test2")).result()
+                          .pass(Arrays.asList("test1", "test2"))
+                          .result()
                           .readAll()).containsExactly("test1", "test2");
         assertThat(routine.invoke()
-                          .pass(routine.run("test1", "test2")).result()
+                          .pass(routine.run("test1", "test2"))
+                          .result()
                           .readAll()).containsExactly("test1", "test2");
         assertThat(routine.invoke().pass("test1").result().readAll()).containsExactly("test1");
         assertThat(routine.invoke().pass("test1", "test2").result().readAll()).containsExactly(
                 "test1", "test2");
         assertThat(routine.invokeAsync().pass().result().readAll()).isEmpty();
         assertThat(routine.invokeAsync()
-                          .pass(Arrays.asList("test1", "test2")).result()
+                          .pass(Arrays.asList("test1", "test2"))
+                          .result()
                           .readAll()).containsExactly("test1", "test2");
         assertThat(routine.invokeAsync()
-                          .pass(routine.run("test1", "test2")).result()
+                          .pass(routine.run("test1", "test2"))
+                          .result()
                           .readAll()).containsExactly("test1", "test2");
         assertThat(routine.invokeAsync().pass("test1").result().readAll()).containsExactly("test1");
         assertThat(routine.invokeAsync().pass("test1", "test2").result().readAll()).containsExactly(
                 "test1", "test2");
         assertThat(routine.invokeParallel().pass().result().readAll()).isEmpty();
         assertThat(routine.invokeParallel()
-                          .pass(Arrays.asList("test1", "test2")).result()
+                          .pass(Arrays.asList("test1", "test2"))
+                          .result()
                           .readAll()).containsOnly("test1", "test2");
         assertThat(routine.invokeParallel()
                           .pass(routine.run("test1", "test2"))
@@ -310,7 +320,7 @@ public class RoutineTest extends TestCase {
 
                     @Override
                     public void onExec(@Nonnull final List<? extends Integer> integers,
-                            @Nonnull final ResultChannel<Integer> results) {
+                            @Nonnull final ResultChannel<Integer> result) {
 
                         int sum = 0;
 
@@ -319,7 +329,7 @@ public class RoutineTest extends TestCase {
                             sum += integer;
                         }
 
-                        results.pass(sum);
+                        result.pass(sum);
                     }
                 };
 
@@ -331,11 +341,11 @@ public class RoutineTest extends TestCase {
 
                     @Override
                     public void onInput(final Integer integer,
-                            @Nonnull final ResultChannel<Integer> results) {
+                            @Nonnull final ResultChannel<Integer> result) {
 
                         final int input = integer;
 
-                        results.pass(input * input);
+                        result.pass(input * input);
                     }
                 };
 
@@ -371,7 +381,7 @@ public class RoutineTest extends TestCase {
 
                     @Override
                     public void onExec(@Nonnull final List<? extends Integer> integers,
-                            @Nonnull final ResultChannel<Integer> results) {
+                            @Nonnull final ResultChannel<Integer> result) {
 
                         int sum = 0;
 
@@ -380,7 +390,7 @@ public class RoutineTest extends TestCase {
                             sum += integer;
                         }
 
-                        results.pass(sum);
+                        result.pass(sum);
                     }
                 };
 
@@ -392,11 +402,11 @@ public class RoutineTest extends TestCase {
 
                     @Override
                     public void onInput(final Integer integer,
-                            @Nonnull final ResultChannel<Integer> results) {
+                            @Nonnull final ResultChannel<Integer> result) {
 
                         final int input = integer;
 
-                        results.pass(input * input);
+                        result.pass(input * input);
                     }
                 };
 
@@ -422,15 +432,15 @@ public class RoutineTest extends TestCase {
 
                     @Override
                     public void onInput(final Integer integer,
-                            @Nonnull final ResultChannel<Integer> results) {
+                            @Nonnull final ResultChannel<Integer> result) {
 
                         mChannel.pass(squareRoutine.runAsync(integer));
                     }
 
                     @Override
-                    public void onResult(@Nonnull final ResultChannel<Integer> results) {
+                    public void onResult(@Nonnull final ResultChannel<Integer> result) {
 
-                        results.pass(mChannel.result());
+                        result.pass(mChannel.result());
                     }
                 };
 
@@ -688,7 +698,8 @@ public class RoutineTest extends TestCase {
 
         assertThat(routine1.invokeAsync()
                            .after(TimeDuration.millis(500))
-                           .pass(routine2.runAsync("test")).result()
+                           .pass(routine2.runAsync("test"))
+                           .result()
                            .readFirst()).isEqualTo("test");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(500);
     }
@@ -1158,7 +1169,7 @@ public class RoutineTest extends TestCase {
 
                     @Override
                     public void onInput(final String s,
-                            @Nonnull final ResultChannel<String> results) {
+                            @Nonnull final ResultChannel<String> result) {
 
                         throw new NullPointerException(s);
                     }
@@ -1181,7 +1192,7 @@ public class RoutineTest extends TestCase {
                 new BasicInvocation<String, String>() {
 
                     @Override
-                    public void onResult(@Nonnull final ResultChannel<String> results) {
+                    public void onResult(@Nonnull final ResultChannel<String> result) {
 
                         throw new NullPointerException("test3");
                     }
@@ -1203,9 +1214,9 @@ public class RoutineTest extends TestCase {
         final Invocation<String, String> exceptionOnReturn = new BasicInvocation<String, String>() {
 
             @Override
-            public void onInput(final String s, @Nonnull final ResultChannel<String> results) {
+            public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
 
-                results.pass(s);
+                result.pass(s);
             }
 
             @Override
@@ -1224,6 +1235,25 @@ public class RoutineTest extends TestCase {
 
         testChained(passThroughRoutine, exceptionRoutine, "test", "test4");
         testChained(exceptionRoutine, passThroughRoutine, "test", "test4");
+    }
+
+    public void testInputTimeout() {
+
+        final Routine<String, String> routine = JavaRoutine.<String>on()
+                                                           .inputMaxSize(1)
+                                                           .inputTimeout(TimeDuration.ZERO)
+                                                           .buildRoutine();
+
+
+        try {
+
+            routine.callAsync("test1", "test2");
+
+            fail();
+
+        } catch (final InputDeadLockException ignored) {
+
+        }
     }
 
     public void testMethod() throws NoSuchMethodException {
@@ -1267,6 +1297,31 @@ public class RoutineTest extends TestCase {
         final TestInterfaceAsync testInterfaceAsync =
                 on(new TestClass()).proxy(TestInterfaceAsync.class);
         assertThat(testInterfaceAsync.getInt(testInterfaceAsync.getOne())).isEqualTo(1);
+    }
+
+    public void testOutputTimeout() {
+
+        final Routine<String, String> routine =
+                JavaRoutine.on(tokenOf(new SimpleInvocation<String, String>() {
+
+                    @Override
+                    public void onExec(@Nonnull final List<? extends String> strings,
+                            @Nonnull final ResultChannel<String> result) {
+
+                        result.pass(strings);
+                    }
+                })).outputMaxSize(1).outputTimeout(TimeDuration.ZERO).withArgs(this).buildRoutine();
+
+
+        try {
+
+            routine.callAsync("test1", "test2");
+
+            fail();
+
+        } catch (final OutputDeadLockException ignored) {
+
+        }
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -1482,9 +1537,9 @@ public class RoutineTest extends TestCase {
         final BasicInvocation<String, String> invocation = new BasicInvocation<String, String>() {
 
             @Override
-            public void onInput(final String s, @Nonnull final ResultChannel<String> results) {
+            public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
 
-                results.now().pass(s).after(TimeDuration.seconds(2)).abort();
+                result.now().pass(s).after(TimeDuration.seconds(2)).abort();
             }
         };
 
@@ -1743,11 +1798,11 @@ public class RoutineTest extends TestCase {
 
                     @Override
                     public void onInput(final Integer integer,
-                            @Nonnull final ResultChannel<Integer> results) {
+                            @Nonnull final ResultChannel<Integer> result) {
 
                         final int input = integer;
 
-                        results.pass(input * input);
+                        result.pass(input * input);
                     }
                 };
 
@@ -1769,7 +1824,7 @@ public class RoutineTest extends TestCase {
 
                     @Override
                     public void onExec(@Nonnull final List<? extends Integer> integers,
-                            @Nonnull final ResultChannel<Integer> results) {
+                            @Nonnull final ResultChannel<Integer> result) {
 
                         int sum = 0;
 
@@ -1778,7 +1833,7 @@ public class RoutineTest extends TestCase {
                             sum += integer;
                         }
 
-                        results.pass(sum);
+                        result.pass(sum);
                     }
                 };
 
@@ -1802,13 +1857,11 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            channel.afterMax(TimeDuration.millis(10))
-                   .eventuallyThrow(new IllegalStateException())
-                   .readFirst();
+            channel.afterMax(TimeDuration.millis(10)).eventuallyDeadLock().readFirst();
 
             fail();
 
-        } catch (final IllegalStateException ignored) {
+        } catch (final ReadDeadLockException ignored) {
 
         }
 
@@ -1818,7 +1871,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final IllegalStateException ignored) {
+        } catch (final ReadDeadLockException ignored) {
 
         }
 
@@ -1828,7 +1881,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final IllegalStateException ignored) {
+        } catch (final ReadDeadLockException ignored) {
 
         }
 
@@ -1838,7 +1891,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final IllegalStateException ignored) {
+        } catch (final ReadDeadLockException ignored) {
 
         }
 
@@ -1848,7 +1901,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final IllegalStateException ignored) {
+        } catch (final ReadDeadLockException ignored) {
 
         }
     }
@@ -2542,9 +2595,9 @@ public class RoutineTest extends TestCase {
         }
 
         @Override
-        public void onInput(final String s, @Nonnull final ResultChannel<String> results) {
+        public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
 
-            results.now().pass(s).after(mDelay).abort();
+            result.now().pass(s).after(mDelay).abort();
         }
     }
 
@@ -2564,18 +2617,18 @@ public class RoutineTest extends TestCase {
         }
 
         @Override
-        public void onInput(final String s, @Nonnull final ResultChannel<String> results) {
+        public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
 
             if (mFlag) {
 
-                results.after(mDelay).pass((OutputChannel<String>) null);
+                result.after(mDelay).pass((OutputChannel<String>) null);
 
             } else {
 
-                results.after(mDelay.time, mDelay.unit).pass((OutputChannel<String>) null);
+                result.after(mDelay.time, mDelay.unit).pass((OutputChannel<String>) null);
             }
 
-            results.pass(mRoutine.runAsync(s));
+            result.pass(mRoutine.runAsync(s));
 
             mFlag = !mFlag;
         }
@@ -2593,18 +2646,18 @@ public class RoutineTest extends TestCase {
         }
 
         @Override
-        public void onInput(final String s, @Nonnull final ResultChannel<String> results) {
+        public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
 
             if (mFlag) {
 
-                results.after(mDelay);
+                result.after(mDelay);
 
             } else {
 
-                results.after(mDelay.time, mDelay.unit);
+                result.after(mDelay.time, mDelay.unit);
             }
 
-            results.pass(s);
+            result.pass(s);
 
             mFlag = !mFlag;
         }
@@ -2628,7 +2681,7 @@ public class RoutineTest extends TestCase {
         }
 
         @Override
-        public void onInput(final String s, @Nonnull final ResultChannel<String> results) {
+        public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
 
             final ArrayList<String> list = mList;
             list.add(s);
@@ -2637,16 +2690,16 @@ public class RoutineTest extends TestCase {
 
                 if (mFlag) {
 
-                    results.after(mDelay).pass((String[]) null).pass(list);
+                    result.after(mDelay).pass((String[]) null).pass(list);
 
                 } else {
 
-                    results.after(mDelay.time, mDelay.unit)
-                           .pass((List<String>) null)
-                           .pass(list.toArray(new String[list.size()]));
+                    result.after(mDelay.time, mDelay.unit)
+                          .pass((List<String>) null)
+                          .pass(list.toArray(new String[list.size()]));
                 }
 
-                results.now();
+                result.now();
                 list.clear();
 
                 mFlag = !mFlag;
@@ -2654,10 +2707,10 @@ public class RoutineTest extends TestCase {
         }
 
         @Override
-        public void onResult(@Nonnull final ResultChannel<String> results) {
+        public void onResult(@Nonnull final ResultChannel<String> result) {
 
             final ArrayList<String> list = mList;
-            results.after(mDelay).pass(list);
+            result.after(mDelay).pass(list);
             list.clear();
         }
     }

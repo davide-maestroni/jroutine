@@ -673,7 +673,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
         @Override
         public void onExec(@Nonnull final List<?> objects,
-                @Nonnull final ResultChannel<Object> results) {
+                @Nonnull final ResultChannel<Object> result) {
 
             synchronized (mMutex) {
 
@@ -682,12 +682,12 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
                 try {
 
-                    final Object result =
+                    final Object methodResult =
                             method.invoke(target, objects.toArray(new Object[objects.size()]));
 
                     if (mHasResult) {
 
-                        results.pass(result);
+                        result.pass(methodResult);
                     }
 
                 } catch (final InvocationTargetException e) {

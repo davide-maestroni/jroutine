@@ -341,9 +341,9 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
 
         @Nonnull
         @Override
-        public ChannelOutput<OUTPUT> eventuallyThrow(@Nullable final RuntimeException exception) {
+        public ChannelOutput<OUTPUT> eventuallyDeadLock() {
 
-            mChannel.eventuallyThrow(exception);
+            mChannel.eventuallyDeadLock();
 
             return this;
         }
@@ -359,10 +359,18 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
 
         @Nonnull
         @Override
-        public ChannelOutput<OUTPUT> readAllInto(
-                @Nonnull final Collection<? super OUTPUT> results) {
+        public ChannelOutput<OUTPUT> neverDeadLock() {
 
-            mChannel.readAllInto(results);
+            mChannel.neverDeadLock();
+
+            return this;
+        }
+
+        @Nonnull
+        @Override
+        public ChannelOutput<OUTPUT> readAllInto(@Nonnull final Collection<? super OUTPUT> result) {
+
+            mChannel.readAllInto(result);
 
             return this;
         }

@@ -28,8 +28,8 @@ import javax.annotation.Nonnull;
 class PassThroughInvocation<DATA> extends BasicInvocation<DATA, DATA> {
 
     @Override
-    public void onInput(final DATA input, @Nonnull final ResultChannel<DATA> results) {
+    public void onInput(final DATA input, @Nonnull final ResultChannel<DATA> result) {
 
-        results.pass(input);
+        result.pass(input);
     }
 }

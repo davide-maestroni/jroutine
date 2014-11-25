@@ -24,7 +24,7 @@
             dontcallmechannel.pass(dontcallmeobject);
         }
 
-        final java.util.List<${resultClassName}> dontcallmelist = dontcallmechannel.results().readAll();
+        final java.util.List<${resultClassName}> dontcallmelist = dontcallmechannel.result().readAll();
         final int dontcallmesize = dontcallmelist.size();
         final ${resultClassName}[] dontcallmearray = new ${resultClassName}[dontcallmesize];
 

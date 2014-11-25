@@ -11,23 +11,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.routine;
+package com.bmd.jrt.channel;
 
-import com.bmd.jrt.common.RoutineException;
+import com.bmd.jrt.common.DeadLockException;
 
 /**
- * Exception indicating that no room in the channel buffer became available before the timeout
- * elapsed.
+ * Exception indicating that no result became available before the timeout elapsed.
  * <p/>
- * Created by davide on 11/14/14.
+ * Created by davide on 11/25/14.
  */
-public class RoutineChannelOverflowException extends RoutineException {
+public class ReadDeadLockException extends DeadLockException {
 
-    /**
-     * Constructor.
-     */
-    public RoutineChannelOverflowException() {
-
-        super(null);
-    }
 }

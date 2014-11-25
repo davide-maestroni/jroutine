@@ -17,7 +17,7 @@
     @Override
     public ${resultType} ${methodName}(${paramTypes}) {
 
-        final java.util.List<${resultClassName}> dontcallmelist = this.mRoutine${methodCount}.invokeAsync()${inputParams}.results().readAll();
+        final java.util.List<${resultClassName}> dontcallmelist = this.mRoutine${methodCount}.invokeAsync()${inputParams}.result().readAll();
         final int dontcallmesize = dontcallmelist.size();
         final ${resultClassName}[] dontcallmearray = new ${resultClassName}[dontcallmesize];
 

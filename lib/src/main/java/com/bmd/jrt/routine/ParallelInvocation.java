@@ -48,8 +48,8 @@ class ParallelInvocation<INPUT, OUTPUT> extends BasicInvocation<INPUT, OUTPUT> {
     }
 
     @Override
-    public void onInput(final INPUT input, @Nonnull final ResultChannel<OUTPUT> results) {
+    public void onInput(final INPUT input, @Nonnull final ResultChannel<OUTPUT> result) {
 
-        results.pass(mRoutine.runAsync(input));
+        result.pass(mRoutine.runAsync(input));
     }
 }

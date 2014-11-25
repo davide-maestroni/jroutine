@@ -17,5 +17,5 @@
     @Override
     public void ${methodName}(${paramTypes}) {
 
-        this.mRoutine${methodCount}.invokeAsync()${inputParams}.results();
+        this.mRoutine${methodCount}.invokeAsync()${inputParams}.result();
     }

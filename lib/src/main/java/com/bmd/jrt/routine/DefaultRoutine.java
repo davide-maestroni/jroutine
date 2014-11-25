@@ -61,7 +61,7 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
 
         super(configuration, syncRunner);
 
-        mArgs = (invocationArgs == null) ? NO_ARGS : (Object[]) invocationArgs.clone();
+        mArgs = (invocationArgs == null) ? NO_ARGS : invocationArgs.clone();
         mConstructor = findConstructor(invocationClass, mArgs);
         mLogger = Logger.create(configuration.getLog(null), configuration.getLogLevel(null), this);
     }

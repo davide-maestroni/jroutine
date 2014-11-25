@@ -45,6 +45,11 @@ public final class ${interfaceName}${className}${genericTypes} implements ${inte
 
     private Object getMutex(final String lockId) {
 
+        if (com.bmd.jrt.annotation.Async.UNLOCKED.equals(lockId)) {
+
+            return null;
+        }
+
         synchronized (mMutexMap) {
 
             final Object wrapped = mWrapped;

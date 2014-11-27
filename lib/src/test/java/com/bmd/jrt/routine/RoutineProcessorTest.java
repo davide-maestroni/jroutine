@@ -50,8 +50,8 @@ public class RoutineProcessorTest extends TestCase {
                                                        .runBy(Runners.poolRunner())
                                                        .inputMaxSize(3)
                                                        .inputTimeout(1, TimeUnit.SECONDS)
-                                                       .outputMaxSize(2)
-                                                       .outputTimeout(1, TimeUnit.SECONDS)
+                                                       .outputMaxSize(3)
+                                                       .outputTimeout(2, TimeUnit.SECONDS)
                                                        .outputOrder(DataOrder.INSERTION)
                                                        .logLevel(LogLevel.DEBUG)
                                                        .loggedWith(new NullLog())
@@ -103,6 +103,7 @@ public class RoutineProcessorTest extends TestCase {
         public String getString(@AsyncType(int.class) OutputChannel<Integer> i);
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     public static class TestClass {
 
         public List<String> getList(final List<String> list) {

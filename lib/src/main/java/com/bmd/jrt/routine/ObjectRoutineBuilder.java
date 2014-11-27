@@ -796,7 +796,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                     return array;
                 }
 
-                return outputChannel.readFirst();
+                return outputChannel.readAll().iterator().next();
             }
 
             return null;

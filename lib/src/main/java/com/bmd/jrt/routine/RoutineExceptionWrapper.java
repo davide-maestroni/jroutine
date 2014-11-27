@@ -74,7 +74,7 @@ class RoutineExceptionWrapper {
 
         final Throwable cause = mCause;
 
-        if (cause instanceof RoutineException) {
+        if ((cause != null) && RoutineException.class.equals(cause.getClass())) {
 
             return cause.getCause();
         }

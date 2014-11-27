@@ -23,7 +23,7 @@ import javax.annotation.Nullable;
  * <p/>
  * Created by davide on 10/4/14.
  */
-public class NullLog extends BasicLog {
+public class NullLog extends TemplateLog {
 
     @Override
     protected void log(@Nonnull final LogLevel level, @Nonnull final List<Object> contexts,

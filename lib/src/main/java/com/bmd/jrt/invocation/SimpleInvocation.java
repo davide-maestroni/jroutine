@@ -33,7 +33,7 @@ import javax.annotation.Nonnull;
  * @param <INPUT>  the input type.
  * @param <OUTPUT> the output type.
  */
-public abstract class SimpleInvocation<INPUT, OUTPUT> extends BasicInvocation<INPUT, OUTPUT> {
+public abstract class SimpleInvocation<INPUT, OUTPUT> extends TemplateInvocation<INPUT, OUTPUT> {
 
     private ArrayList<INPUT> mInputs;
 
@@ -43,7 +43,7 @@ public abstract class SimpleInvocation<INPUT, OUTPUT> extends BasicInvocation<IN
      * @param inputs the input list.
      * @param result the result channel.
      */
-    public abstract void onExec(@Nonnull List<? extends INPUT> inputs,
+    public abstract void onCall(@Nonnull List<? extends INPUT> inputs,
             @Nonnull ResultChannel<OUTPUT> result);
 
     @Override
@@ -72,7 +72,7 @@ public abstract class SimpleInvocation<INPUT, OUTPUT> extends BasicInvocation<IN
             clone = new ArrayList<INPUT>(inputs);
         }
 
-        onExec(clone, result);
+        onCall(clone, result);
     }
 
     @Override

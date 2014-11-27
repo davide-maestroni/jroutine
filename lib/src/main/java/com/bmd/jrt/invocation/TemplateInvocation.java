@@ -28,7 +28,7 @@ import javax.annotation.Nullable;
  * @param <INPUT>  the input type.
  * @param <OUTPUT> the output type.
  */
-public abstract class BasicInvocation<INPUT, OUTPUT> implements Invocation<INPUT, OUTPUT> {
+public abstract class TemplateInvocation<INPUT, OUTPUT> implements Invocation<INPUT, OUTPUT> {
 
     @Override
     public void onAbort(@Nullable final Throwable reason) {

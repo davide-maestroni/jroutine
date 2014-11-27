@@ -672,7 +672,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
         }
 
         @Override
-        public void onExec(@Nonnull final List<?> objects,
+        public void onCall(@Nonnull final List<?> objects,
                 @Nonnull final ResultChannel<Object> result) {
 
             synchronized (mMutex) {

@@ -40,7 +40,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * @param <INPUT>  the input type.
  * @param <OUTPUT> the output type.
  */
-public abstract class AbstractRoutine<INPUT, OUTPUT> extends BasicRoutine<INPUT, OUTPUT> {
+public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
     private final Runner mAsyncRunner;
 

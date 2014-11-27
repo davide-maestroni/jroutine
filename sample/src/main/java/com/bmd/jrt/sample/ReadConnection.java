@@ -15,7 +15,7 @@ package com.bmd.jrt.sample;
 
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.RoutineException;
-import com.bmd.jrt.invocation.BasicInvocation;
+import com.bmd.jrt.invocation.TemplateInvocation;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,7 +30,7 @@ import javax.annotation.Nonnull;
  * <p/>
  * Created by davide on 10/17/14.
  */
-public class ReadConnection extends BasicInvocation<URI, Chunk> {
+public class ReadConnection extends TemplateInvocation<URI, Chunk> {
 
     private static final int MAX_CHUNK_SIZE = 2048;
 

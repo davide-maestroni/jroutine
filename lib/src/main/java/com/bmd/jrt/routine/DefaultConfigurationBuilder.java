@@ -46,17 +46,6 @@ class DefaultConfigurationBuilder extends RoutineConfigurationBuilder {
 
     }
 
-    /**
-     * Constructor.
-     *
-     * @param initialConfiguration the initial configuration.
-     * @throws NullPointerException if the specified configuration instance is null.
-     */
-    DefaultConfigurationBuilder(@Nonnull final RoutineConfiguration initialConfiguration) {
-
-        super(initialConfiguration);
-    }
-
     @Nonnull
     @Override
     public RoutineConfiguration buildConfiguration() {

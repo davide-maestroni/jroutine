@@ -24,7 +24,7 @@ import javax.annotation.Nullable;
  *
  * @param <OUTPUT> the output type.
  */
-public abstract class BasicOutputConsumer<OUTPUT> implements OutputConsumer<OUTPUT> {
+public abstract class TemplateOutputConsumer<OUTPUT> implements OutputConsumer<OUTPUT> {
 
     @Override
     public void onAbort(@Nullable final Throwable reason) {

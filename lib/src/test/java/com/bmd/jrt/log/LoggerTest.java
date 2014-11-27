@@ -826,7 +826,7 @@ public class LoggerTest extends TestCase {
         assertThat(log.getMessage()).contains("ctx2");
     }
 
-    private static class TestLog extends BasicLog {
+    private static class TestLog extends TemplateLog {
 
         private LogLevel mLevel;
 

@@ -14,7 +14,7 @@
 package com.bmd.jrt.routine;
 
 import com.bmd.jrt.channel.ResultChannel;
-import com.bmd.jrt.invocation.BasicInvocation;
+import com.bmd.jrt.invocation.TemplateInvocation;
 
 import javax.annotation.Nonnull;
 
@@ -26,7 +26,7 @@ import javax.annotation.Nonnull;
  * @param <INPUT>  the input type.
  * @param <OUTPUT> the output type.
  */
-class ParallelInvocation<INPUT, OUTPUT> extends BasicInvocation<INPUT, OUTPUT> {
+class ParallelInvocation<INPUT, OUTPUT> extends TemplateInvocation<INPUT, OUTPUT> {
 
     private final Routine<INPUT, OUTPUT> mRoutine;
 

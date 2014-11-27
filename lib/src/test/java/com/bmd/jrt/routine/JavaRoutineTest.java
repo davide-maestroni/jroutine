@@ -23,7 +23,7 @@ import com.bmd.jrt.channel.IOChannel.ChannelInput;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.ClassToken;
-import com.bmd.jrt.invocation.BasicInvocation;
+import com.bmd.jrt.invocation.TemplateInvocation;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.log.NullLog;
 import com.bmd.jrt.runner.RunnerWrapper;
@@ -1050,7 +1050,7 @@ public class JavaRoutineTest extends TestCase {
         }
     }
 
-    private static class PassThroughInvocation extends BasicInvocation<String, String> {
+    private static class PassThroughInvocation extends TemplateInvocation<String, String> {
 
         @Override
         public void onInput(final String s, @Nonnull final ResultChannel<String> result) {

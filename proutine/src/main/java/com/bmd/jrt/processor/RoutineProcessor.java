@@ -75,6 +75,8 @@ public class RoutineProcessor extends AbstractProcessor {
 
     private String mHeader;
 
+    private TypeElement mListElement;
+
     private String mMethodArray;
 
     private String mMethodAsync;
@@ -100,6 +102,10 @@ public class RoutineProcessor extends AbstractProcessor {
     private String mMethodResult;
 
     private String mMethodVoid;
+
+    private TypeMirror mObjectType;
+
+    private TypeElement mOutputChannelElement;
 
     @Override
     public SourceVersion getSupportedSourceVersion() {
@@ -133,6 +139,11 @@ public class RoutineProcessor extends AbstractProcessor {
             mMethodFooter = parseTemplate("/templates/method_footer.txt", buffer);
             mMethodFooterVoid = parseTemplate("/templates/method_footer_void.txt", buffer);
             mFooter = parseTemplate("/templates/footer.txt", buffer);
+
+            mOutputChannelElement = getTypeFromName(OutputChannel.class.getCanonicalName());
+            mListElement = getTypeFromName(List.class.getCanonicalName());
+            mObjectType = getTypeFromName(Object.class.getCanonicalName()).asType();
+
 
         } catch (final IOException ex) {
 
@@ -250,7 +261,8 @@ public class RoutineProcessor extends AbstractProcessor {
                 builder.append(", ");
             }
 
-            builder.append("(").append(getBoxedType(variableElement.asType()))
+            builder.append("(")
+                   .append(getBoxedType(variableElement.asType()))
                    .append(") objects.get(")
                    .append(count++)
                    .append(")");
@@ -296,269 +308,12 @@ public class RoutineProcessor extends AbstractProcessor {
     private String buildRoutineOptions(final ExecutableElement methodElement,
             final ExecutableElement targetMethodElement) {
 
-        final Async annotation = methodElement.getAnnotation(Async.class);
-        final Async targetAnnotation = targetMethodElement.getAnnotation(Async.class);
-
-        final TypeElement annotationElement = getTypeFromName(Async.class.getCanonicalName());
-        final TypeMirror annotationType = annotationElement.asType();
-
-        RunnerType runnerType = RunnerType.DEFAULT;
-        int maxRunning = RoutineBuilder.DEFAULT;
-        int maxRetained = RoutineBuilder.DEFAULT;
-        long availTimeout = RoutineBuilder.DEFAULT;
-        TimeUnit availTimeUnit = null;
-        int maxInput = RoutineBuilder.DEFAULT;
-        long inputTimeout = RoutineBuilder.DEFAULT;
-        TimeUnit inputTimeUnit = null;
-        DataOrder inputOrder = DataOrder.DEFAULT;
-        int maxOutput = RoutineBuilder.DEFAULT;
-        long outputTimeout = RoutineBuilder.DEFAULT;
-        TimeUnit outputTimeUnit = null;
-        DataOrder outputOrder = DataOrder.DEFAULT;
-        LogLevel logLevel = LogLevel.DEFAULT;
-        TypeElement logElement = null;
-        TypeElement runnerElement = null;
-
-        if (annotation != null) {
-
-            final Object runner = getElementValue(methodElement, annotationType, "runnerClass");
-
-            if (runner != null) {
-
-                runnerElement = getTypeFromName(runner.toString());
-            }
-
-            runnerType = annotation.runnerType();
-            maxRunning = annotation.maxRunning();
-            maxRetained = annotation.maxRetained();
-            availTimeout = annotation.availTimeout();
-            availTimeUnit = annotation.availTimeUnit();
-            maxInput = annotation.maxInput();
-            inputTimeout = annotation.inputTimeout();
-            inputTimeUnit = annotation.inputTimeUnit();
-            inputOrder = annotation.inputOrder();
-            maxOutput = annotation.maxOutput();
-            outputTimeout = annotation.outputTimeout();
-            outputTimeUnit = annotation.outputTimeUnit();
-            outputOrder = annotation.outputOrder();
-
-            final Object log = getElementValue(methodElement, annotationType, "log");
-
-            if (log != null) {
-
-                logElement = getTypeFromName(log.toString());
-            }
-
-            logLevel = annotation.logLevel();
-        }
-
-        if (targetAnnotation != null) {
-
-            if ((runnerElement == null) || runnerElement.equals(
-                    getTypeFromName(DefaultRunner.class.getCanonicalName()))) {
-
-                final Object runner =
-                        getElementValue(targetMethodElement, annotationType, "runnerClass");
-
-                if (runner != null) {
-
-                    runnerElement = getTypeFromName(runner.toString());
-                }
-            }
-
-            if (runnerType == RunnerType.DEFAULT) {
-
-                runnerType = targetAnnotation.runnerType();
-            }
-
-            if (maxRunning == RoutineBuilder.DEFAULT) {
-
-                maxRunning = targetAnnotation.maxRunning();
-            }
-
-            if (maxRetained == RoutineBuilder.DEFAULT) {
-
-                maxRetained = targetAnnotation.maxRetained();
-            }
-
-            if (availTimeout == RoutineBuilder.DEFAULT) {
-
-                availTimeout = targetAnnotation.availTimeout();
-                availTimeUnit = targetAnnotation.availTimeUnit();
-            }
-
-            if (maxInput == RoutineBuilder.DEFAULT) {
-
-                maxInput = targetAnnotation.maxInput();
-            }
-
-            if (inputTimeout == RoutineBuilder.DEFAULT) {
-
-                inputTimeout = targetAnnotation.inputTimeout();
-                inputTimeUnit = targetAnnotation.inputTimeUnit();
-            }
-
-            if (inputOrder == DataOrder.DEFAULT) {
-
-                inputOrder = targetAnnotation.inputOrder();
-            }
-
-            if (maxOutput == RoutineBuilder.DEFAULT) {
-
-                maxOutput = targetAnnotation.maxOutput();
-            }
-
-            if (outputTimeout == RoutineBuilder.DEFAULT) {
-
-                outputTimeout = targetAnnotation.outputTimeout();
-                outputTimeUnit = targetAnnotation.outputTimeUnit();
-            }
-
-            if (outputOrder == DataOrder.DEFAULT) {
-
-                outputOrder = targetAnnotation.outputOrder();
-            }
-
-            if ((logElement == null) || logElement.equals(
-                    getTypeFromName(DefaultLog.class.getCanonicalName()))) {
-
-                final Object log = getElementValue(targetMethodElement, annotationType, "log");
-
-                if (log != null) {
-
-                    logElement = getTypeFromName(log.toString());
-                }
-            }
-
-            if (logLevel == LogLevel.DEFAULT) {
-
-                logLevel = targetAnnotation.logLevel();
-            }
-        }
-
         final StringBuilder builder = new StringBuilder();
 
-        if ((runnerElement != null) && !runnerElement.equals(
-                getTypeFromName(DefaultRunner.class.getCanonicalName()))) {
-
-            builder.append(".runBy(new ").append(runnerElement).append("())");
-        }
-
-        if (runnerType != RunnerType.DEFAULT) {
-
-            builder.append(".syncRunner(")
-                   .append(RunnerType.class.getCanonicalName())
-                   .append(".")
-                   .append(runnerType)
-                   .append(")");
-        }
-
-        if (maxRunning != RoutineBuilder.DEFAULT) {
-
-            builder.append(".maxRunning(").append(maxRunning).append(")");
-        }
-
-        if (maxRetained != RoutineBuilder.DEFAULT) {
-
-            builder.append(".maxRetained(").append(maxRetained).append(")");
-        }
-
-        if (availTimeout != RoutineBuilder.DEFAULT) {
-
-            builder.append(".availTimeout(")
-                   .append(availTimeout)
-                   .append(", ")
-                   .append(TimeUnit.class.getCanonicalName())
-                   .append(".")
-                   .append(availTimeUnit)
-                   .append(")");
-        }
-
-        if (maxInput != RoutineBuilder.DEFAULT) {
-
-            builder.append(".inputMaxSize(").append(maxInput).append(")");
-        }
-
-        if (inputTimeout != RoutineBuilder.DEFAULT) {
-
-            builder.append(".inputTimeout(")
-                   .append(inputTimeout)
-                   .append(", ")
-                   .append(TimeUnit.class.getCanonicalName())
-                   .append(".")
-                   .append(inputTimeUnit)
-                   .append(")");
-        }
-
-        if (inputOrder != DataOrder.DEFAULT) {
-
-            builder.append(".inputOrder(")
-                   .append(DataOrder.class.getCanonicalName())
-                   .append(".")
-                   .append(inputOrder)
-                   .append(")");
-        }
-
-        if (maxOutput != RoutineBuilder.DEFAULT) {
-
-            builder.append(".outputMaxSize(").append(maxOutput).append(")");
-        }
-
-        if (outputTimeout != RoutineBuilder.DEFAULT) {
-
-            builder.append(".outputTimeout(")
-                   .append(outputTimeout)
-                   .append(", ")
-                   .append(TimeUnit.class.getCanonicalName())
-                   .append(".")
-                   .append(outputTimeUnit)
-                   .append(")");
-        }
-
-        if (outputOrder != DataOrder.DEFAULT) {
-
-            builder.append(".outputOrder(")
-                   .append(DataOrder.class.getCanonicalName())
-                   .append(".")
-                   .append(outputOrder)
-                   .append(")");
-        }
-
-        if ((logElement != null) && !logElement.equals(
-                getTypeFromName(DefaultLog.class.getCanonicalName()))) {
-
-            builder.append(".loggedWith(new ").append(logElement).append("())");
-        }
-
-        if (logLevel != LogLevel.DEFAULT) {
-
-            builder.append(".logLevel(")
-                   .append(LogLevel.class.getCanonicalName())
-                   .append(".")
-                   .append(logLevel)
-                   .append(")");
-        }
-
-        boolean isOverrideParameters = false;
-
-        for (final VariableElement parameterElement : methodElement.getParameters()) {
-
-            if (parameterElement.getAnnotation(AsyncType.class) != null) {
-
-                isOverrideParameters = true;
-
-                break;
-            }
-        }
-
-        if (isOverrideParameters) {
-
-            builder.append(".inputOrder(")
-                   .append(DataOrder.class.getCanonicalName())
-                   .append(".")
-                   .append(DataOrder.INSERTION)
-                   .append(")");
-        }
+        writeInstanceOptions(builder, methodElement, targetMethodElement);
+        writeInputOptions(builder, methodElement, targetMethodElement);
+        writeOutputOptions(builder, methodElement, targetMethodElement);
+        writeLogOptions(builder, methodElement, targetMethodElement);
 
         return builder.toString();
     }
@@ -574,11 +329,6 @@ public class RoutineProcessor extends AbstractProcessor {
             final String className = targetElement.getSimpleName().toString();
             final String interfaceName = element.getSimpleName().toString();
             final Filer filer = processingEnv.getFiler();
-            final Types typeUtils = processingEnv.getTypeUtils();
-            final TypeElement outputChannelElement =
-                    getTypeFromName(OutputChannel.class.getCanonicalName());
-            final TypeElement listElement = getTypeFromName(List.class.getCanonicalName());
-            final TypeMirror objectType = getTypeFromName(Object.class.getCanonicalName()).asType();
 
             //noinspection PointlessBooleanExpression,ConstantConditions
             if (!DEBUG) {
@@ -611,148 +361,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
                 ++count;
 
-                final ExecutableElement targetMethod =
-                        findMatchingMethod(methodElement, targetElement);
-                TypeMirror targetReturnType = targetMethod.getReturnType();
-
-                boolean isParallel = false;
-                final boolean isVoid = (targetReturnType.getKind() == TypeKind.VOID);
-                final AsyncType overrideAnnotation = methodElement.getAnnotation(AsyncType.class);
-                final List<? extends VariableElement> parameters = methodElement.getParameters();
-
-                if ((parameters.size() == 1) && (parameters.get(0).getAnnotation(ParallelType.class)
-                        != null)) {
-
-                    isParallel = true;
-
-                } else {
-
-                    for (final VariableElement parameter : parameters) {
-
-                        if (parameter.getAnnotation(ParallelType.class) != null) {
-
-                            throw new IllegalArgumentException(
-                                    "Invalid annotations for method: " + methodElement);
-                        }
-                    }
-                }
-
-                String method;
-
-                if (overrideAnnotation != null) {
-
-                    final TypeMirror returnType = methodElement.getReturnType();
-                    final TypeMirror returnTypeErasure = typeUtils.erasure(returnType);
-
-                    if (returnType.getKind() == TypeKind.ARRAY) {
-
-                        targetReturnType = ((ArrayType) returnType).getComponentType();
-
-                        method = (isParallel) ? mMethodParallelArray : mMethodArray;
-
-                    } else if (typeUtils.isAssignable(listElement.asType(), returnTypeErasure)) {
-
-                        final List<? extends TypeMirror> typeArguments =
-                                ((DeclaredType) returnType).getTypeArguments();
-
-                        if (typeArguments.isEmpty()) {
-
-                            targetReturnType = objectType;
-
-                        } else {
-
-                            targetReturnType = typeArguments.get(0);
-                        }
-
-                        method = (isParallel) ? mMethodParallelList : mMethodList;
-
-                    } else if (typeUtils.isAssignable(outputChannelElement.asType(),
-                                                      returnTypeErasure)) {
-
-                        final List<? extends TypeMirror> typeArguments =
-                                ((DeclaredType) returnType).getTypeArguments();
-
-                        if (typeArguments.isEmpty()) {
-
-                            targetReturnType = objectType;
-
-                        } else {
-
-                            targetReturnType = typeArguments.get(0);
-                        }
-
-                        method = (isParallel) ? mMethodParallelAsync : mMethodAsync;
-
-                    } else {
-
-                        throw new IllegalArgumentException(
-                                "Invalid return type for method: " + methodElement);
-                    }
-
-                } else if (isVoid) {
-
-                    method = (isParallel) ? mMethodParallelVoid : mMethodVoid;
-
-                } else {
-
-                    targetReturnType = methodElement.getReturnType();
-
-                    method = (isParallel) ? mMethodParallelResult : mMethodResult;
-                }
-
-                final String resultClassName = getBoxedType(targetReturnType).toString();
-
-                String methodHeader;
-
-                methodHeader = mMethodHeader.replace("${resultClassName}", resultClassName);
-                methodHeader = methodHeader.replace("${methodCount}", Integer.toString(count));
-                methodHeader = methodHeader.replace("${routineBuilderOptions}",
-                                                    buildRoutineOptions(methodElement,
-                                                                        targetMethod));
-
-                writer.append(methodHeader);
-
-                method = method.replace("${resultClassName}", resultClassName);
-                method = method.replace("${resultType}", methodElement.getReturnType().toString());
-                method = method.replace("${methodCount}", Integer.toString(count));
-                method = method.replace("${methodName}", methodElement.getSimpleName());
-                method = method.replace("${params}", buildParams(methodElement));
-                method = method.replace("${paramTypes}", buildParamTypes(methodElement));
-                method = method.replace("${paramValues}", buildParamValues(targetMethod));
-                method = method.replace("${inputParams}", buildInputParams(methodElement));
-
-                writer.append(method);
-
-                String methodFooter;
-
-                methodFooter = (isVoid) ? mMethodFooterVoid : mMethodFooter;
-
-                methodFooter = methodFooter.replace("${resultClassName}", resultClassName);
-                methodFooter = methodFooter.replace("${methodCount}", Integer.toString(count));
-                methodFooter = methodFooter.replace("${methodName}", methodElement.getSimpleName());
-                methodFooter =
-                        methodFooter.replace("${targetMethodName}", targetMethod.getSimpleName());
-                methodFooter =
-                        methodFooter.replace("${paramValues}", buildParamValues(targetMethod));
-
-                final Async annotation = methodElement.getAnnotation(Async.class);
-                final Async targetAnnotation = targetMethod.getAnnotation(Async.class);
-
-                String lockId = Async.DEFAULT_ID;
-
-                if (annotation != null) {
-
-                    lockId = annotation.lockId();
-                }
-
-                if ((targetAnnotation != null) && (lockId.equals(Async.DEFAULT_ID))) {
-
-                    lockId = targetAnnotation.lockId();
-                }
-
-                methodFooter = methodFooter.replace("${lockId}", lockId);
-
-                writer.append(methodFooter);
+                writeMethod(writer, methodElement, targetElement, count);
             }
 
             writer.append(mFooter);
@@ -1049,6 +658,467 @@ public class RoutineProcessor extends AbstractProcessor {
             } catch (final IOException ignored) {
 
             }
+        }
+    }
+
+    private void writeInputOptions(final StringBuilder builder,
+            final ExecutableElement methodElement, final ExecutableElement targetMethodElement) {
+
+        final Async annotation = methodElement.getAnnotation(Async.class);
+        final Async targetAnnotation = targetMethodElement.getAnnotation(Async.class);
+
+        int maxInput = RoutineBuilder.DEFAULT;
+        long inputTimeout = RoutineBuilder.DEFAULT;
+        TimeUnit inputTimeUnit = null;
+        DataOrder inputOrder = DataOrder.DEFAULT;
+
+        if (annotation != null) {
+
+            maxInput = annotation.maxInput();
+            inputTimeout = annotation.inputTimeout();
+            inputTimeUnit = annotation.inputTimeUnit();
+            inputOrder = annotation.inputOrder();
+        }
+
+        if (targetAnnotation != null) {
+
+            if (maxInput == RoutineBuilder.DEFAULT) {
+
+                maxInput = targetAnnotation.maxInput();
+            }
+
+            if (inputTimeout == RoutineBuilder.DEFAULT) {
+
+                inputTimeout = targetAnnotation.inputTimeout();
+                inputTimeUnit = targetAnnotation.inputTimeUnit();
+            }
+
+            if (inputOrder == DataOrder.DEFAULT) {
+
+                inputOrder = targetAnnotation.inputOrder();
+            }
+        }
+
+
+        if (maxInput != RoutineBuilder.DEFAULT) {
+
+            builder.append(".inputMaxSize(").append(maxInput).append(")");
+        }
+
+        if (inputTimeout != RoutineBuilder.DEFAULT) {
+
+            builder.append(".inputTimeout(")
+                   .append(inputTimeout)
+                   .append(", ")
+                   .append(TimeUnit.class.getCanonicalName())
+                   .append(".")
+                   .append(inputTimeUnit)
+                   .append(")");
+        }
+
+        if (inputOrder != DataOrder.DEFAULT) {
+
+            builder.append(".inputOrder(")
+                   .append(DataOrder.class.getCanonicalName())
+                   .append(".")
+                   .append(inputOrder)
+                   .append(")");
+        }
+
+        boolean isOverrideParameters = false;
+
+        for (final VariableElement parameterElement : methodElement.getParameters()) {
+
+            if (parameterElement.getAnnotation(AsyncType.class) != null) {
+
+                isOverrideParameters = true;
+
+                break;
+            }
+        }
+
+        if (isOverrideParameters) {
+
+            builder.append(".inputOrder(")
+                   .append(DataOrder.class.getCanonicalName())
+                   .append(".")
+                   .append(DataOrder.INSERTION)
+                   .append(")");
+        }
+    }
+
+    private void writeInstanceOptions(final StringBuilder builder,
+            final ExecutableElement methodElement, final ExecutableElement targetMethodElement) {
+
+        final Async annotation = methodElement.getAnnotation(Async.class);
+        final Async targetAnnotation = targetMethodElement.getAnnotation(Async.class);
+
+        final TypeElement annotationElement = getTypeFromName(Async.class.getCanonicalName());
+        final TypeMirror annotationType = annotationElement.asType();
+
+        RunnerType runnerType = RunnerType.DEFAULT;
+        int maxRunning = RoutineBuilder.DEFAULT;
+        int maxRetained = RoutineBuilder.DEFAULT;
+        long availTimeout = RoutineBuilder.DEFAULT;
+        TimeUnit availTimeUnit = null;
+        TypeElement runnerElement = null;
+
+        if (annotation != null) {
+
+            final Object runner = getElementValue(methodElement, annotationType, "runnerClass");
+
+            if (runner != null) {
+
+                runnerElement = getTypeFromName(runner.toString());
+            }
+
+            runnerType = annotation.runnerType();
+            maxRunning = annotation.maxRunning();
+            maxRetained = annotation.maxRetained();
+            availTimeout = annotation.availTimeout();
+            availTimeUnit = annotation.availTimeUnit();
+        }
+
+        if (targetAnnotation != null) {
+
+            if ((runnerElement == null) || runnerElement.equals(
+                    getTypeFromName(DefaultRunner.class.getCanonicalName()))) {
+
+                final Object runner =
+                        getElementValue(targetMethodElement, annotationType, "runnerClass");
+
+                if (runner != null) {
+
+                    runnerElement = getTypeFromName(runner.toString());
+                }
+            }
+
+            if (runnerType == RunnerType.DEFAULT) {
+
+                runnerType = targetAnnotation.runnerType();
+            }
+
+            if (maxRunning == RoutineBuilder.DEFAULT) {
+
+                maxRunning = targetAnnotation.maxRunning();
+            }
+
+            if (maxRetained == RoutineBuilder.DEFAULT) {
+
+                maxRetained = targetAnnotation.maxRetained();
+            }
+
+            if (availTimeout == RoutineBuilder.DEFAULT) {
+
+                availTimeout = targetAnnotation.availTimeout();
+                availTimeUnit = targetAnnotation.availTimeUnit();
+            }
+        }
+
+        if ((runnerElement != null) && !runnerElement.equals(
+                getTypeFromName(DefaultRunner.class.getCanonicalName()))) {
+
+            builder.append(".runBy(new ").append(runnerElement).append("())");
+        }
+
+        if (runnerType != RunnerType.DEFAULT) {
+
+            builder.append(".syncRunner(")
+                   .append(RunnerType.class.getCanonicalName())
+                   .append(".")
+                   .append(runnerType)
+                   .append(")");
+        }
+
+        if (maxRunning != RoutineBuilder.DEFAULT) {
+
+            builder.append(".maxRunning(").append(maxRunning).append(")");
+        }
+
+        if (maxRetained != RoutineBuilder.DEFAULT) {
+
+            builder.append(".maxRetained(").append(maxRetained).append(")");
+        }
+
+        if (availTimeout != RoutineBuilder.DEFAULT) {
+
+            builder.append(".availTimeout(")
+                   .append(availTimeout)
+                   .append(", ")
+                   .append(TimeUnit.class.getCanonicalName())
+                   .append(".")
+                   .append(availTimeUnit)
+                   .append(")");
+        }
+    }
+
+    private void writeLogOptions(final StringBuilder builder, final ExecutableElement methodElement,
+            final ExecutableElement targetMethodElement) {
+
+        final Async annotation = methodElement.getAnnotation(Async.class);
+        final Async targetAnnotation = targetMethodElement.getAnnotation(Async.class);
+
+        final TypeElement annotationElement = getTypeFromName(Async.class.getCanonicalName());
+        final TypeMirror annotationType = annotationElement.asType();
+
+        LogLevel logLevel = LogLevel.DEFAULT;
+        TypeElement logElement = null;
+
+        if (annotation != null) {
+
+            final Object log = getElementValue(methodElement, annotationType, "log");
+
+            if (log != null) {
+
+                logElement = getTypeFromName(log.toString());
+            }
+
+            logLevel = annotation.logLevel();
+        }
+
+        if (targetAnnotation != null) {
+
+            if ((logElement == null) || logElement.equals(
+                    getTypeFromName(DefaultLog.class.getCanonicalName()))) {
+
+                final Object log = getElementValue(targetMethodElement, annotationType, "log");
+
+                if (log != null) {
+
+                    logElement = getTypeFromName(log.toString());
+                }
+            }
+
+            if (logLevel == LogLevel.DEFAULT) {
+
+                logLevel = targetAnnotation.logLevel();
+            }
+        }
+
+        if ((logElement != null) && !logElement.equals(
+                getTypeFromName(DefaultLog.class.getCanonicalName()))) {
+
+            builder.append(".loggedWith(new ").append(logElement).append("())");
+        }
+
+        if (logLevel != LogLevel.DEFAULT) {
+
+            builder.append(".logLevel(")
+                   .append(LogLevel.class.getCanonicalName())
+                   .append(".")
+                   .append(logLevel)
+                   .append(")");
+        }
+    }
+
+    private void writeMethod(final Writer writer, final ExecutableElement methodElement,
+            final TypeElement targetElement, final int count) throws IOException {
+
+        final Types typeUtils = processingEnv.getTypeUtils();
+        final TypeElement outputChannelElement = mOutputChannelElement;
+        final TypeElement listElement = mListElement;
+        final TypeMirror objectType = mObjectType;
+        final ExecutableElement targetMethod = findMatchingMethod(methodElement, targetElement);
+        TypeMirror targetReturnType = targetMethod.getReturnType();
+
+        boolean isParallel = false;
+        final boolean isVoid = (targetReturnType.getKind() == TypeKind.VOID);
+        final AsyncType overrideAnnotation = methodElement.getAnnotation(AsyncType.class);
+        final List<? extends VariableElement> parameters = methodElement.getParameters();
+
+        if ((parameters.size() == 1) && (parameters.get(0).getAnnotation(ParallelType.class)
+                != null)) {
+
+            isParallel = true;
+
+        } else {
+
+            for (final VariableElement parameter : parameters) {
+
+                if (parameter.getAnnotation(ParallelType.class) != null) {
+
+                    throw new IllegalArgumentException(
+                            "Invalid annotations for method: " + methodElement);
+                }
+            }
+        }
+
+        String method;
+
+        if (overrideAnnotation != null) {
+
+            final TypeMirror returnType = methodElement.getReturnType();
+            final TypeMirror returnTypeErasure = typeUtils.erasure(returnType);
+
+            if (returnType.getKind() == TypeKind.ARRAY) {
+
+                targetReturnType = ((ArrayType) returnType).getComponentType();
+
+                method = (isParallel) ? mMethodParallelArray : mMethodArray;
+
+            } else if (typeUtils.isAssignable(listElement.asType(), returnTypeErasure)) {
+
+                final List<? extends TypeMirror> typeArguments =
+                        ((DeclaredType) returnType).getTypeArguments();
+
+                if (typeArguments.isEmpty()) {
+
+                    targetReturnType = objectType;
+
+                } else {
+
+                    targetReturnType = typeArguments.get(0);
+                }
+
+                method = (isParallel) ? mMethodParallelList : mMethodList;
+
+            } else if (typeUtils.isAssignable(outputChannelElement.asType(), returnTypeErasure)) {
+
+                final List<? extends TypeMirror> typeArguments =
+                        ((DeclaredType) returnType).getTypeArguments();
+
+                if (typeArguments.isEmpty()) {
+
+                    targetReturnType = objectType;
+
+                } else {
+
+                    targetReturnType = typeArguments.get(0);
+                }
+
+                method = (isParallel) ? mMethodParallelAsync : mMethodAsync;
+
+            } else {
+
+                throw new IllegalArgumentException(
+                        "Invalid return type for method: " + methodElement);
+            }
+
+        } else if (isVoid) {
+
+            method = (isParallel) ? mMethodParallelVoid : mMethodVoid;
+
+        } else {
+
+            targetReturnType = methodElement.getReturnType();
+
+            method = (isParallel) ? mMethodParallelResult : mMethodResult;
+        }
+
+        final String resultClassName = getBoxedType(targetReturnType).toString();
+
+        String methodHeader;
+
+        methodHeader = mMethodHeader.replace("${resultClassName}", resultClassName);
+        methodHeader = methodHeader.replace("${methodCount}", Integer.toString(count));
+        methodHeader = methodHeader.replace("${routineBuilderOptions}",
+                                            buildRoutineOptions(methodElement, targetMethod));
+
+        writer.append(methodHeader);
+
+        method = method.replace("${resultClassName}", resultClassName);
+        method = method.replace("${resultType}", methodElement.getReturnType().toString());
+        method = method.replace("${methodCount}", Integer.toString(count));
+        method = method.replace("${methodName}", methodElement.getSimpleName());
+        method = method.replace("${params}", buildParams(methodElement));
+        method = method.replace("${paramTypes}", buildParamTypes(methodElement));
+        method = method.replace("${paramValues}", buildParamValues(targetMethod));
+        method = method.replace("${inputParams}", buildInputParams(methodElement));
+
+        writer.append(method);
+
+        String methodFooter;
+
+        methodFooter = (isVoid) ? mMethodFooterVoid : mMethodFooter;
+
+        methodFooter = methodFooter.replace("${resultClassName}", resultClassName);
+        methodFooter = methodFooter.replace("${methodCount}", Integer.toString(count));
+        methodFooter = methodFooter.replace("${methodName}", methodElement.getSimpleName());
+        methodFooter = methodFooter.replace("${targetMethodName}", targetMethod.getSimpleName());
+        methodFooter = methodFooter.replace("${paramValues}", buildParamValues(targetMethod));
+
+        final Async annotation = methodElement.getAnnotation(Async.class);
+        final Async targetAnnotation = targetMethod.getAnnotation(Async.class);
+
+        String lockId = Async.DEFAULT_ID;
+
+        if (annotation != null) {
+
+            lockId = annotation.lockId();
+        }
+
+        if ((targetAnnotation != null) && (lockId.equals(Async.DEFAULT_ID))) {
+
+            lockId = targetAnnotation.lockId();
+        }
+
+        methodFooter = methodFooter.replace("${lockId}", lockId);
+
+        writer.append(methodFooter);
+    }
+
+    private void writeOutputOptions(final StringBuilder builder,
+            final ExecutableElement methodElement, final ExecutableElement targetMethodElement) {
+
+        final Async annotation = methodElement.getAnnotation(Async.class);
+        final Async targetAnnotation = targetMethodElement.getAnnotation(Async.class);
+
+        int maxOutput = RoutineBuilder.DEFAULT;
+        long outputTimeout = RoutineBuilder.DEFAULT;
+        TimeUnit outputTimeUnit = null;
+        DataOrder outputOrder = DataOrder.DEFAULT;
+
+        if (annotation != null) {
+
+            maxOutput = annotation.maxOutput();
+            outputTimeout = annotation.outputTimeout();
+            outputTimeUnit = annotation.outputTimeUnit();
+            outputOrder = annotation.outputOrder();
+        }
+
+        if (targetAnnotation != null) {
+
+            if (maxOutput == RoutineBuilder.DEFAULT) {
+
+                maxOutput = targetAnnotation.maxOutput();
+            }
+
+            if (outputTimeout == RoutineBuilder.DEFAULT) {
+
+                outputTimeout = targetAnnotation.outputTimeout();
+                outputTimeUnit = targetAnnotation.outputTimeUnit();
+            }
+
+            if (outputOrder == DataOrder.DEFAULT) {
+
+                outputOrder = targetAnnotation.outputOrder();
+            }
+
+        }
+
+        if (maxOutput != RoutineBuilder.DEFAULT) {
+
+            builder.append(".outputMaxSize(").append(maxOutput).append(")");
+        }
+
+        if (outputTimeout != RoutineBuilder.DEFAULT) {
+
+            builder.append(".outputTimeout(")
+                   .append(outputTimeout)
+                   .append(", ")
+                   .append(TimeUnit.class.getCanonicalName())
+                   .append(".")
+                   .append(outputTimeUnit)
+                   .append(")");
+        }
+
+        if (outputOrder != DataOrder.DEFAULT) {
+
+            builder.append(".outputOrder(")
+                   .append(DataOrder.class.getCanonicalName())
+                   .append(".")
+                   .append(outputOrder)
+                   .append(")");
         }
     }
 }

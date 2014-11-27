@@ -499,12 +499,10 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
         }
 
         @Override
-        @SuppressWarnings("unchecked")
         public Object invoke(final Object proxy, final Method method, final Object[] args) throws
                 Throwable {
 
             final Object target = mTarget;
-            final Class<?> targetClass = mTargetClass;
             final Class<?> returnType = method.getReturnType();
             final Class<?>[] targetParameterTypes = method.getParameterTypes();
             boolean isOverrideParameters = false;
@@ -599,42 +597,11 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                     }
                 }
 
-                final Async annotation = method.getAnnotation(Async.class);
-
                 targetMethod = methodMap.get(method);
 
                 if (targetMethod == null) {
 
-                    String name = null;
-
-                    if (annotation != null) {
-
-                        name = annotation.value();
-                    }
-
-                    if ((name == null) || (name.length() == 0)) {
-
-                        name = method.getName();
-                    }
-
-                    targetMethod = getAnnotatedMethod(name);
-
-                    if (targetMethod == null) {
-
-                        try {
-
-                            targetMethod = targetClass.getMethod(name, targetParameterTypes);
-
-                        } catch (final NoSuchMethodException ignored) {
-
-                        }
-
-                        if (targetMethod == null) {
-
-                            targetMethod =
-                                    targetClass.getDeclaredMethod(name, targetParameterTypes);
-                        }
-                    }
+                    targetMethod = getTargetMethod(method, targetParameterTypes);
 
                     if ((overrideAnnotation == null) && !returnType.isAssignableFrom(
                             targetMethod.getReturnType())) {
@@ -664,36 +631,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                     }
                 }
 
-                final Async targetAnnotation = targetMethod.getAnnotation(Async.class);
-
-                if (targetAnnotation != null) {
-
-                    if (lockId.length() == 0) {
-
-                        lockId = targetAnnotation.lockId();
-                    }
-
-                    applyConfiguration(builder, targetAnnotation);
-
-                    if (annotation != null) {
-
-                        if (lockId.length() == 0) {
-
-                            lockId = annotation.lockId();
-                        }
-
-                        applyConfiguration(builder, annotation);
-                    }
-
-                } else if (annotation != null) {
-
-                    if (lockId.length() == 0) {
-
-                        lockId = annotation.lockId();
-                    }
-
-                    applyConfiguration(builder, annotation);
-                }
+                lockId = fillConfiguration(builder, lockId, method, targetMethod);
             }
 
             builder.apply(mConfiguration);
@@ -705,6 +643,18 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
             final Routine<Object, Object> routine =
                     getRoutine(builder.buildConfiguration(), targetMethod, lockId);
+
+            return callRoutine(routine, method, args, isOverrideParameters, isParallel,
+                               isResultChannel, isResultList, isResultArray);
+        }
+
+        @SuppressWarnings("unchecked")
+        private Object callRoutine(final Routine<Object, Object> routine, final Method method,
+                final Object[] args, final boolean isOverrideParameters, final boolean isParallel,
+                final boolean isResultChannel, final boolean isResultList,
+                final boolean isResultArray) {
+
+            final Class<?> returnType = method.getReturnType();
             final OutputChannel<Object> outputChannel;
 
             if (isParallel) {
@@ -800,6 +750,83 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
             }
 
             return null;
+        }
+
+        private String fillConfiguration(final DefaultConfigurationBuilder builder,
+                final String lockId, final Method method, final Method targetMethod) {
+
+            String methodLockId = lockId;
+            final Async annotation = method.getAnnotation(Async.class);
+            final Async targetAnnotation = targetMethod.getAnnotation(Async.class);
+
+            if (targetAnnotation != null) {
+
+                if (lockId.length() == 0) {
+
+                    methodLockId = targetAnnotation.lockId();
+                }
+
+                applyConfiguration(builder, targetAnnotation);
+
+                if (annotation != null) {
+
+                    if (lockId.length() == 0) {
+
+                        methodLockId = annotation.lockId();
+                    }
+
+                    applyConfiguration(builder, annotation);
+                }
+
+            } else if (annotation != null) {
+
+                if (lockId.length() == 0) {
+
+                    methodLockId = annotation.lockId();
+                }
+
+                applyConfiguration(builder, annotation);
+            }
+
+            return methodLockId;
+        }
+
+        private Method getTargetMethod(final Method method,
+                final Class<?>[] targetParameterTypes) throws NoSuchMethodException {
+
+            final Class<?> targetClass = mTargetClass;
+            final Async annotation = method.getAnnotation(Async.class);
+
+            String name = null;
+
+            if (annotation != null) {
+
+                name = annotation.value();
+            }
+
+            if ((name == null) || (name.length() == 0)) {
+
+                name = method.getName();
+            }
+
+            Method targetMethod = getAnnotatedMethod(name);
+
+            if (targetMethod == null) {
+
+                try {
+
+                    targetMethod = targetClass.getMethod(name, targetParameterTypes);
+
+                } catch (final NoSuchMethodException ignored) {
+
+                }
+
+                if (targetMethod == null) {
+
+                    targetMethod = targetClass.getDeclaredMethod(name, targetParameterTypes);
+                }
+            }
+            return targetMethod;
         }
     }
 

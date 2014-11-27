@@ -20,7 +20,7 @@ import javax.annotation.Nonnull;
  * <p/>
  * Created by davide on 10/3/14.
  */
-public class SystemLog extends BasicLog {
+public class SystemLog extends TemplateLog {
 
     @Override
     public void log(@Nonnull final String message) {

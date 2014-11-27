@@ -31,7 +31,7 @@ import javax.annotation.Nullable;
  * <p/>
  * Created by davide on 10/3/14.
  */
-public abstract class BasicLog implements Log {
+public abstract class TemplateLog implements Log {
 
     private static final String DATE_FORMAT = "MM/dd HH:mm:ss.SSS z";
 

@@ -29,7 +29,7 @@ import javax.annotation.Nullable;
  * @param <INPUT>  the input type.
  * @param <OUTPUT> the output type.
  */
-public abstract class BasicRoutine<INPUT, OUTPUT> implements Routine<INPUT, OUTPUT> {
+public abstract class TemplateRoutine<INPUT, OUTPUT> implements Routine<INPUT, OUTPUT> {
 
     @Nonnull
     @Override

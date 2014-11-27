@@ -20,17 +20,17 @@ import com.bmd.jrt.builder.OutputDeadLockException;
 import com.bmd.jrt.builder.RoutineBuilder.DataOrder;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.builder.RoutineConfigurationBuilder;
-import com.bmd.jrt.channel.BasicOutputConsumer;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.OutputConsumer;
 import com.bmd.jrt.channel.ParameterChannel;
 import com.bmd.jrt.channel.ReadDeadLockException;
 import com.bmd.jrt.channel.ResultChannel;
+import com.bmd.jrt.channel.TemplateOutputConsumer;
 import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.common.RoutineException;
-import com.bmd.jrt.invocation.BasicInvocation;
 import com.bmd.jrt.invocation.Invocation;
 import com.bmd.jrt.invocation.SimpleInvocation;
+import com.bmd.jrt.invocation.TemplateInvocation;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.log.NullLog;
@@ -132,17 +132,19 @@ public class RoutineTest extends TestCase {
         assertThat(channel1.isOpen()).isFalse();
 
 
-        final Invocation<String, String> abortInvocation = new BasicInvocation<String, String>() {
+        final Invocation<String, String> abortInvocation =
+                new TemplateInvocation<String, String>() {
 
-            @Override
-            public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
+                    @Override
+                    public void onInput(final String s,
+                            @Nonnull final ResultChannel<String> result) {
 
-                assertThat(result.isOpen()).isTrue();
-                assertThat(result.abort(new IllegalArgumentException(s))).isTrue();
-                assertThat(result.abort()).isFalse();
-                assertThat(result.isOpen()).isFalse();
-            }
-        };
+                        assertThat(result.isOpen()).isTrue();
+                        assertThat(result.abort(new IllegalArgumentException(s))).isTrue();
+                        assertThat(result.abort()).isFalse();
+                        assertThat(result.isOpen()).isFalse();
+                    }
+                };
 
         final Routine<String, String> routine1 =
                 on(ClassToken.tokenOf(abortInvocation)).withArgs(this).buildRoutine();
@@ -163,15 +165,17 @@ public class RoutineTest extends TestCase {
             assertThat(ex.getCause().getMessage()).isEqualTo("test_abort");
         }
 
-        final Invocation<String, String> abortInvocation2 = new BasicInvocation<String, String>() {
+        final Invocation<String, String> abortInvocation2 =
+                new TemplateInvocation<String, String>() {
 
-            @Override
-            public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
+                    @Override
+                    public void onInput(final String s,
+                            @Nonnull final ResultChannel<String> result) {
 
-                assertThat(result.abort()).isTrue();
-                assertThat(result.abort(new IllegalArgumentException(s))).isFalse();
-            }
-        };
+                        assertThat(result.abort()).isTrue();
+                        assertThat(result.abort(new IllegalArgumentException(s))).isFalse();
+                    }
+                };
 
         final Routine<String, String> routine2 =
                 on(ClassToken.tokenOf(abortInvocation2)).withArgs(this).buildRoutine();
@@ -197,8 +201,8 @@ public class RoutineTest extends TestCase {
         final Semaphore semaphore = new Semaphore(0);
         final AtomicReference<Throwable> abortReason = new AtomicReference<Throwable>();
 
-        final BasicInvocation<String, String> abortInvocation =
-                new BasicInvocation<String, String>() {
+        final TemplateInvocation<String, String> abortInvocation =
+                new TemplateInvocation<String, String>() {
 
                     @Override
                     public void onAbort(@Nullable final Throwable reason) {
@@ -297,7 +301,7 @@ public class RoutineTest extends TestCase {
                 new SimpleInvocation<Integer, Integer>() {
 
                     @Override
-                    public void onExec(@Nonnull final List<? extends Integer> integers,
+                    public void onCall(@Nonnull final List<? extends Integer> integers,
                             @Nonnull final ResultChannel<Integer> result) {
 
                         int sum = 0;
@@ -314,8 +318,8 @@ public class RoutineTest extends TestCase {
         final Routine<Integer, Integer> sumRoutine =
                 on(ClassToken.tokenOf(execSum)).withArgs(this).buildRoutine();
 
-        final BasicInvocation<Integer, Integer> invokeSquare =
-                new BasicInvocation<Integer, Integer>() {
+        final TemplateInvocation<Integer, Integer> invokeSquare =
+                new TemplateInvocation<Integer, Integer>() {
 
                     @Override
                     public void onInput(final Integer integer,
@@ -352,7 +356,7 @@ public class RoutineTest extends TestCase {
                 new SimpleInvocation<Integer, Integer>() {
 
                     @Override
-                    public void onExec(@Nonnull final List<? extends Integer> integers,
+                    public void onCall(@Nonnull final List<? extends Integer> integers,
                             @Nonnull final ResultChannel<Integer> result) {
 
                         int sum = 0;
@@ -369,8 +373,8 @@ public class RoutineTest extends TestCase {
         final Routine<Integer, Integer> sumRoutine =
                 on(ClassToken.tokenOf(execSum)).withArgs(this).buildRoutine();
 
-        final BasicInvocation<Integer, Integer> invokeSquare =
-                new BasicInvocation<Integer, Integer>() {
+        final TemplateInvocation<Integer, Integer> invokeSquare =
+                new TemplateInvocation<Integer, Integer>() {
 
                     @Override
                     public void onInput(final Integer integer,
@@ -385,8 +389,8 @@ public class RoutineTest extends TestCase {
         final Routine<Integer, Integer> squareRoutine =
                 on(ClassToken.tokenOf(invokeSquare)).withArgs(this).buildRoutine();
 
-        final BasicInvocation<Integer, Integer> invokeSquareSum =
-                new BasicInvocation<Integer, Integer>() {
+        final TemplateInvocation<Integer, Integer> invokeSquareSum =
+                new TemplateInvocation<Integer, Integer>() {
 
                     private ParameterChannel<Integer, Integer> mChannel;
 
@@ -1086,36 +1090,38 @@ public class RoutineTest extends TestCase {
 
     public void testErrorConsumerOnResult() {
 
-        final BasicOutputConsumer<String> exceptionConsumer = new BasicOutputConsumer<String>() {
+        final TemplateOutputConsumer<String> exceptionConsumer =
+                new TemplateOutputConsumer<String>() {
 
-            @Override
-            public void onOutput(final String output) {
+                    @Override
+                    public void onOutput(final String output) {
 
-                throw new NullPointerException(output);
-            }
-        };
+                        throw new NullPointerException(output);
+                    }
+                };
 
         testConsumer(exceptionConsumer);
     }
 
     public void testErrorConsumerOnReturn() {
 
-        final BasicOutputConsumer<String> exceptionConsumer = new BasicOutputConsumer<String>() {
+        final TemplateOutputConsumer<String> exceptionConsumer =
+                new TemplateOutputConsumer<String>() {
 
-            @Override
-            public void onComplete() {
+                    @Override
+                    public void onComplete() {
 
-                throw new NullPointerException("test2");
-            }
-        };
+                        throw new NullPointerException("test2");
+                    }
+                };
 
         testConsumer(exceptionConsumer);
     }
 
     public void testErrorOnInit() {
 
-        final BasicInvocation<String, String> exceptionOnInit =
-                new BasicInvocation<String, String>() {
+        final TemplateInvocation<String, String> exceptionOnInit =
+                new TemplateInvocation<String, String>() {
 
                     @Override
                     public void onInit() {
@@ -1137,8 +1143,8 @@ public class RoutineTest extends TestCase {
 
     public void testErrorOnInput() {
 
-        final BasicInvocation<String, String> exceptionOnInput =
-                new BasicInvocation<String, String>() {
+        final TemplateInvocation<String, String> exceptionOnInput =
+                new TemplateInvocation<String, String>() {
 
                     @Override
                     public void onInput(final String s,
@@ -1161,8 +1167,8 @@ public class RoutineTest extends TestCase {
 
     public void testErrorOnResult() {
 
-        final BasicInvocation<String, String> exceptionOnResult =
-                new BasicInvocation<String, String>() {
+        final TemplateInvocation<String, String> exceptionOnResult =
+                new TemplateInvocation<String, String>() {
 
                     @Override
                     public void onResult(@Nonnull final ResultChannel<String> result) {
@@ -1184,20 +1190,22 @@ public class RoutineTest extends TestCase {
 
     public void testErrorOnReturn() {
 
-        final Invocation<String, String> exceptionOnReturn = new BasicInvocation<String, String>() {
+        final Invocation<String, String> exceptionOnReturn =
+                new TemplateInvocation<String, String>() {
 
-            @Override
-            public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
+                    @Override
+                    public void onInput(final String s,
+                            @Nonnull final ResultChannel<String> result) {
 
-                result.pass(s);
-            }
+                        result.pass(s);
+                    }
 
-            @Override
-            public void onReturn() {
+                    @Override
+                    public void onReturn() {
 
-                throw new NullPointerException("test4");
-            }
-        };
+                        throw new NullPointerException("test4");
+                    }
+                };
 
         final Routine<String, String> exceptionRoutine =
                 on(ClassToken.tokenOf(exceptionOnReturn)).withArgs(this).buildRoutine();
@@ -1283,7 +1291,7 @@ public class RoutineTest extends TestCase {
                 JavaRoutine.on(tokenOf(new SimpleInvocation<String, String>() {
 
                     @Override
-                    public void onExec(@Nonnull final List<? extends String> strings,
+                    public void onCall(@Nonnull final List<? extends String> strings,
                             @Nonnull final ResultChannel<String> result) {
 
                         result.pass(strings);
@@ -1512,14 +1520,16 @@ public class RoutineTest extends TestCase {
 
     public void testPartialOut() {
 
-        final BasicInvocation<String, String> invocation = new BasicInvocation<String, String>() {
+        final TemplateInvocation<String, String> invocation =
+                new TemplateInvocation<String, String>() {
 
-            @Override
-            public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
+                    @Override
+                    public void onInput(final String s,
+                            @Nonnull final ResultChannel<String> result) {
 
-                result.now().pass(s).after(TimeDuration.seconds(2)).abort();
-            }
-        };
+                        result.now().pass(s).after(TimeDuration.seconds(2)).abort();
+                    }
+                };
 
         final Routine<String, String> routine =
                 JavaRoutine.on(tokenOf(invocation)).withArgs(this).buildRoutine();
@@ -1706,7 +1716,7 @@ public class RoutineTest extends TestCase {
 
         }
 
-        final BasicOutputConsumer<String> consumer = new BasicOutputConsumer<String>() {};
+        final TemplateOutputConsumer<String> consumer = new TemplateOutputConsumer<String>() {};
 
         try {
 
@@ -1771,8 +1781,8 @@ public class RoutineTest extends TestCase {
 
     public void testRoutine() {
 
-        final BasicInvocation<Integer, Integer> execSquare =
-                new BasicInvocation<Integer, Integer>() {
+        final TemplateInvocation<Integer, Integer> execSquare =
+                new TemplateInvocation<Integer, Integer>() {
 
                     @Override
                     public void onInput(final Integer integer,
@@ -1798,7 +1808,7 @@ public class RoutineTest extends TestCase {
                 new SimpleInvocation<Integer, Integer>() {
 
                     @Override
-                    public void onExec(@Nonnull final List<? extends Integer> integers,
+                    public void onCall(@Nonnull final List<? extends Integer> integers,
                             @Nonnull final ResultChannel<Integer> result) {
 
                         int sum = 0;
@@ -2418,7 +2428,7 @@ public class RoutineTest extends TestCase {
         public int take(int i);
     }
 
-    private static class ConstructorException extends BasicInvocation<Object, Object> {
+    private static class ConstructorException extends TemplateInvocation<Object, Object> {
 
         public ConstructorException() {
 
@@ -2426,7 +2436,7 @@ public class RoutineTest extends TestCase {
         }
     }
 
-    private static class DelayedAbortInvocation extends BasicInvocation<String, String> {
+    private static class DelayedAbortInvocation extends TemplateInvocation<String, String> {
 
         private final TimeDuration mDelay;
 
@@ -2442,7 +2452,7 @@ public class RoutineTest extends TestCase {
         }
     }
 
-    private static class DelayedChannelInvocation extends BasicInvocation<String, String> {
+    private static class DelayedChannelInvocation extends TemplateInvocation<String, String> {
 
         private final TimeDuration mDelay;
 
@@ -2475,7 +2485,7 @@ public class RoutineTest extends TestCase {
         }
     }
 
-    private static class DelayedInvocation extends BasicInvocation<String, String> {
+    private static class DelayedInvocation extends TemplateInvocation<String, String> {
 
         private final TimeDuration mDelay;
 
@@ -2504,7 +2514,7 @@ public class RoutineTest extends TestCase {
         }
     }
 
-    private static class DelayedListInvocation extends BasicInvocation<String, String> {
+    private static class DelayedListInvocation extends TemplateInvocation<String, String> {
 
         private final int mCount;
 
@@ -2638,7 +2648,7 @@ public class RoutineTest extends TestCase {
         @Nonnull
         public Invocation<Object, Object> create() {
 
-            return new BasicInvocation<Object, Object>() {};
+            return new TemplateInvocation<Object, Object>() {};
         }
 
         @Override

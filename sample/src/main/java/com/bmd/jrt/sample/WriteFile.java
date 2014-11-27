@@ -15,7 +15,7 @@ package com.bmd.jrt.sample;
 
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.RoutineException;
-import com.bmd.jrt.invocation.BasicInvocation;
+import com.bmd.jrt.invocation.TemplateInvocation;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -31,7 +31,7 @@ import javax.annotation.Nullable;
  * <p/>
  * Created by davide on 10/17/14.
  */
-public class WriteFile extends BasicInvocation<Chunk, Boolean> {
+public class WriteFile extends TemplateInvocation<Chunk, Boolean> {
 
     private final File mFile;
 

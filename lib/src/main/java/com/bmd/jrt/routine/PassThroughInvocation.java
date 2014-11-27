@@ -14,7 +14,7 @@
 package com.bmd.jrt.routine;
 
 import com.bmd.jrt.channel.ResultChannel;
-import com.bmd.jrt.invocation.BasicInvocation;
+import com.bmd.jrt.invocation.TemplateInvocation;
 
 import javax.annotation.Nonnull;
 
@@ -25,7 +25,7 @@ import javax.annotation.Nonnull;
  *
  * @param <DATA> the data type.
  */
-class PassThroughInvocation<DATA> extends BasicInvocation<DATA, DATA> {
+class PassThroughInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
 
     @Override
     public void onInput(final DATA input, @Nonnull final ResultChannel<DATA> result) {

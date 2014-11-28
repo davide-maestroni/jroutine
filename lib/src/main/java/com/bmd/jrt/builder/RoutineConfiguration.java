@@ -120,19 +120,6 @@ public class RoutineConfiguration {
     }
 
     /**
-     * Returns the maximum number of buffered input data (DEFAULT by default).
-     *
-     * @param valueIfNotSet the default value if none was set.
-     * @return the maximum size.
-     */
-    public int getInputMaxSize(final int valueIfNotSet) {
-
-        final int inputMaxSize = mInputMaxSize;
-
-        return (inputMaxSize != DEFAULT) ? inputMaxSize : valueIfNotSet;
-    }
-
-    /**
      * Returns the input data order (DEFAULT by default).
      *
      * @param valueIfNotSet the default value if none was set.
@@ -143,6 +130,19 @@ public class RoutineConfiguration {
         final DataOrder orderedInput = mInputOrder;
 
         return (orderedInput != DataOrder.DEFAULT) ? orderedInput : valueIfNotSet;
+    }
+
+    /**
+     * Returns the maximum number of buffered input data (DEFAULT by default).
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the maximum size.
+     */
+    public int getInputSize(final int valueIfNotSet) {
+
+        final int inputMaxSize = mInputMaxSize;
+
+        return (inputMaxSize != DEFAULT) ? inputMaxSize : valueIfNotSet;
     }
 
     /**
@@ -212,19 +212,6 @@ public class RoutineConfiguration {
     }
 
     /**
-     * Returns the maximum number of buffered output data (DEFAULT by default).
-     *
-     * @param valueIfNotSet the default value if none was set.
-     * @return the maximum size.
-     */
-    public int getOutputMaxSize(final int valueIfNotSet) {
-
-        final int outputMaxSize = mOutputMaxSize;
-
-        return (outputMaxSize != DEFAULT) ? outputMaxSize : valueIfNotSet;
-    }
-
-    /**
      * Returns the output data order (DEFAULT by default).
      *
      * @param valueIfNotSet the default value if none was set.
@@ -235,6 +222,19 @@ public class RoutineConfiguration {
         final DataOrder orderedOutput = mOutputOrder;
 
         return (orderedOutput != DataOrder.DEFAULT) ? orderedOutput : valueIfNotSet;
+    }
+
+    /**
+     * Returns the maximum number of buffered output data (DEFAULT by default).
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the maximum size.
+     */
+    public int getOutputSize(final int valueIfNotSet) {
+
+        final int outputMaxSize = mOutputMaxSize;
+
+        return (outputMaxSize != DEFAULT) ? outputMaxSize : valueIfNotSet;
     }
 
     /**

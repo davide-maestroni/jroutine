@@ -154,7 +154,7 @@ public class IOChannelBuilder {
     @Nonnull
     public IOChannelBuilder maxSize(final int maxBufferSize) {
 
-        mBuilder.outputMaxSize(maxBufferSize);
+        mBuilder.outputSize(maxBufferSize);
 
         return this;
     }

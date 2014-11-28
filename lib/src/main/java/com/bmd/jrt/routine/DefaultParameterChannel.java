@@ -100,7 +100,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
         mLogger = logger.subContextLogger(this);
         mRunner = runner;
-        mMaxInput = configuration.getInputMaxSize(-1);
+        mMaxInput = configuration.getInputSize(-1);
         mInputTimeout = configuration.getInputTimeout(null);
 
         if (mInputTimeout == null) {

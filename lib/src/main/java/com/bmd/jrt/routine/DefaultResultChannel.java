@@ -126,7 +126,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         mLogger = logger.subContextLogger(this);
         mHandler = handler;
         mRunner = runner;
-        mMaxOutput = configuration.getOutputMaxSize(-1);
+        mMaxOutput = configuration.getOutputSize(-1);
         mOutputTimeout = configuration.getOutputTimeout(null);
 
         if (mOutputTimeout == null) {

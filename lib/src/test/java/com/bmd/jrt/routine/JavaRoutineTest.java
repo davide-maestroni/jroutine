@@ -134,9 +134,9 @@ public class JavaRoutineTest extends TestCase {
         final Routine<Object, Object> routine = JavaRoutine.on(TestStatic.class)
                                                            .syncRunner(RunnerType.SEQUENTIAL)
                                                            .runBy(Runners.poolRunner())
-                                                           .inputMaxSize(2)
+                                                           .inputSize(2)
                                                            .inputTimeout(1, TimeUnit.SECONDS)
-                                                           .outputMaxSize(2)
+                                                           .outputSize(2)
                                                            .outputTimeout(1, TimeUnit.SECONDS)
                                                            .outputOrder(DataOrder.INSERTION)
                                                            .logLevel(LogLevel.DEBUG)
@@ -150,9 +150,9 @@ public class JavaRoutineTest extends TestCase {
                                                             .runBy(Runners.poolRunner())
                                                             .maxRunning(1)
                                                             .availableTimeout(TimeDuration.ZERO)
-                                                            .inputMaxSize(2)
+                                                            .inputSize(2)
                                                             .inputTimeout(TimeDuration.ZERO)
-                                                            .outputMaxSize(2)
+                                                            .outputSize(2)
                                                             .outputTimeout(TimeDuration.ZERO)
                                                             .outputOrder(DataOrder.INSERTION)
                                                             .method("getLong");
@@ -292,7 +292,7 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            new ClassRoutineBuilder(TestStatic.class).inputMaxSize(0);
+            new ClassRoutineBuilder(TestStatic.class).inputSize(0);
 
             fail();
 
@@ -332,7 +332,7 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            new ClassRoutineBuilder(TestStatic.class).outputMaxSize(0);
+            new ClassRoutineBuilder(TestStatic.class).outputSize(0);
 
             fail();
 
@@ -453,10 +453,10 @@ public class JavaRoutineTest extends TestCase {
                                                            .maxRunning(1)
                                                            .maxRetained(1)
                                                            .availableTimeout(1, TimeUnit.SECONDS)
-                                                           .inputMaxSize(2)
+                                                           .inputSize(2)
                                                            .inputTimeout(1, TimeUnit.SECONDS)
                                                            .inputOrder(DataOrder.INSERTION)
-                                                           .outputMaxSize(2)
+                                                           .outputSize(2)
                                                            .outputTimeout(1, TimeUnit.SECONDS)
                                                            .outputOrder(DataOrder.INSERTION)
                                                            .logLevel(LogLevel.DEBUG)
@@ -477,10 +477,10 @@ public class JavaRoutineTest extends TestCase {
                                                             .runBy(Runners.poolRunner())
                                                             .maxRunning(1)
                                                             .availableTimeout(TimeDuration.ZERO)
-                                                            .inputMaxSize(2)
+                                                            .inputSize(2)
                                                             .inputTimeout(TimeDuration.ZERO)
                                                             .inputOrder(DataOrder.INSERTION)
-                                                            .outputMaxSize(2)
+                                                            .outputSize(2)
                                                             .outputTimeout(TimeDuration.ZERO)
                                                             .outputOrder(DataOrder.INSERTION)
                                                             .lockId("test")
@@ -611,7 +611,7 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            new ObjectRoutineBuilder(test).inputMaxSize(0);
+            new ObjectRoutineBuilder(test).inputSize(0);
 
             fail();
 
@@ -651,7 +651,7 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            new ObjectRoutineBuilder(test).outputMaxSize(0);
+            new ObjectRoutineBuilder(test).outputSize(0);
 
             fail();
 
@@ -751,7 +751,7 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            new ObjectRoutineBuilder(test).as(Test.class);
+            new ObjectRoutineBuilder(test).asClass(Test.class);
 
             fail();
 
@@ -761,7 +761,7 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            new ObjectRoutineBuilder(test).as(ClassToken.tokenOf(Test.class));
+            new ObjectRoutineBuilder(test).asClass(ClassToken.tokenOf(Test.class));
 
             fail();
 
@@ -884,9 +884,9 @@ public class JavaRoutineTest extends TestCase {
                            .maxRetained(0)
                            .maxRunning(1)
                            .availableTimeout(1, TimeUnit.SECONDS)
-                           .inputMaxSize(2)
+                           .inputSize(2)
                            .inputTimeout(1, TimeUnit.SECONDS)
-                           .outputMaxSize(2)
+                           .outputSize(2)
                            .outputTimeout(1, TimeUnit.SECONDS)
                            .outputOrder(DataOrder.INSERTION)
                            .buildRoutine();
@@ -900,9 +900,9 @@ public class JavaRoutineTest extends TestCase {
                            .maxRetained(0)
                            .maxRunning(1)
                            .availableTimeout(TimeDuration.ZERO)
-                           .inputMaxSize(2)
+                           .inputSize(2)
                            .inputTimeout(TimeDuration.ZERO)
-                           .outputMaxSize(2)
+                           .outputSize(2)
                            .outputTimeout(TimeDuration.ZERO)
                            .outputOrder(DataOrder.INSERTION)
                            .buildRoutine();

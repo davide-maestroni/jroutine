@@ -48,14 +48,14 @@ public class RoutineProcessorTest extends TestCase {
         final TestInterface testInterface = JavaRoutine.on(new TestClass())
                                                        .syncRunner(RunnerType.SEQUENTIAL)
                                                        .runBy(Runners.poolRunner())
-                                                       .inputMaxSize(3)
+                                                       .inputSize(3)
                                                        .inputTimeout(1, TimeUnit.SECONDS)
-                                                       .outputMaxSize(3)
+                                                       .outputSize(3)
                                                        .outputTimeout(2, TimeUnit.SECONDS)
                                                        .outputOrder(DataOrder.INSERTION)
                                                        .logLevel(LogLevel.DEBUG)
                                                        .loggedWith(new NullLog())
-                                                       .as(TestInterface.class);
+                                                       .asClass(TestInterface.class);
 
         assertThat(testInterface.getOne().readFirst()).isEqualTo(1);
         assertThat(testInterface.getString(1, 2, 3)).isIn("1", "2", "3");

@@ -164,7 +164,8 @@ public class ClassRoutineBuilder implements RoutineBuilder {
             builder.availableTimeout(fromUnit(availTimeout, annotation.availTimeUnit()));
         }
 
-        builder.inputMaxSize(annotation.maxInput());
+        builder.inputOrder(annotation.inputOrder());
+        builder.inputSize(annotation.maxInput());
 
         final long inputTimeout = annotation.inputTimeout();
 
@@ -173,9 +174,8 @@ public class ClassRoutineBuilder implements RoutineBuilder {
             builder.inputTimeout(fromUnit(inputTimeout, annotation.inputTimeUnit()));
         }
 
-        builder.inputOrder(annotation.inputOrder());
-
-        builder.outputMaxSize(annotation.maxOutput());
+        builder.outputOrder(annotation.outputOrder());
+        builder.outputSize(annotation.maxOutput());
 
         final long outputTimeout = annotation.outputTimeout();
 
@@ -183,8 +183,6 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
             builder.outputTimeout(fromUnit(outputTimeout, annotation.outputTimeUnit()));
         }
-
-        builder.outputOrder(annotation.outputOrder());
 
         final Class<? extends Log> logClass = annotation.log();
 
@@ -239,18 +237,18 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
     @Nonnull
     @Override
-    public ClassRoutineBuilder inputMaxSize(final int inputMaxSize) {
+    public ClassRoutineBuilder inputOrder(@Nonnull final DataOrder order) {
 
-        mBuilder.inputMaxSize(inputMaxSize);
+        mBuilder.inputOrder(order);
 
         return this;
     }
 
     @Nonnull
     @Override
-    public ClassRoutineBuilder inputOrder(@Nonnull final DataOrder order) {
+    public ClassRoutineBuilder inputSize(final int inputMaxSize) {
 
-        mBuilder.inputOrder(order);
+        mBuilder.inputSize(inputMaxSize);
 
         return this;
     }
@@ -311,18 +309,18 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
     @Nonnull
     @Override
-    public ClassRoutineBuilder outputMaxSize(final int outputMaxSize) {
+    public ClassRoutineBuilder outputOrder(@Nonnull final DataOrder order) {
 
-        mBuilder.outputMaxSize(outputMaxSize);
+        mBuilder.outputOrder(order);
 
         return this;
     }
 
     @Nonnull
     @Override
-    public ClassRoutineBuilder outputOrder(@Nonnull final DataOrder order) {
+    public ClassRoutineBuilder outputSize(final int outputMaxSize) {
 
-        mBuilder.outputOrder(order);
+        mBuilder.outputSize(outputMaxSize);
 
         return this;
     }
@@ -461,27 +459,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
     @Nonnull
     public Routine<Object, Object> method(@Nonnull final Method method) {
 
-        if (!method.isAccessible()) {
-
-            AccessController.doPrivileged(new SetAccessibleAction(method));
-        }
-
-        String lockId = mLockId;
-        final DefaultConfigurationBuilder builder = new DefaultConfigurationBuilder();
-        final Async annotation = method.getAnnotation(Async.class);
-
-        if (annotation != null) {
-
-            if (lockId == null) {
-
-                lockId = annotation.lockId();
-            }
-
-            applyConfiguration(builder, annotation);
-        }
-
-        return getRoutine(builder.apply(mBuilder.buildConfiguration()).buildConfiguration(), method,
-                          lockId);
+        return method(mBuilder.buildConfiguration(), mLockId, method);
     }
 
     /**
@@ -520,13 +498,13 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      * Creates the routine.
      *
      * @param configuration the routine configuration.
-     * @param method        the method to wrap.
      * @param lockId        the lock ID.
+     * @param method        the method to wrap.
      * @return the routine instance.
      */
     @Nonnull
     protected Routine<Object, Object> getRoutine(@Nonnull final RoutineConfiguration configuration,
-            @Nonnull final Method method, @Nullable final String lockId) {
+            @Nullable final String lockId, @Nonnull final Method method) {
 
         Routine<Object, Object> routine;
 
@@ -544,8 +522,8 @@ public class ClassRoutineBuilder implements RoutineBuilder {
                 routineCache.put(target, routineMap);
             }
 
-            final String routineLockId = (lockId != null) ? lockId : "";
-            final RoutineInfo routineInfo = new RoutineInfo(configuration, method, routineLockId);
+            final String methodLockId = (lockId != null) ? lockId : "";
+            final RoutineInfo routineInfo = new RoutineInfo(configuration, method, methodLockId);
             routine = routineMap.get(routineInfo);
 
             if (routine != null) {
@@ -555,7 +533,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
             Object mutex = null;
 
-            if (!Async.UNLOCKED.equals(routineLockId)) {
+            if (!Async.UNLOCKED.equals(methodLockId)) {
 
                 synchronized (sMutexCache) {
 
@@ -568,12 +546,12 @@ public class ClassRoutineBuilder implements RoutineBuilder {
                         mutexCache.put(target, mutexMap);
                     }
 
-                    mutex = mutexMap.get(routineLockId);
+                    mutex = mutexMap.get(methodLockId);
 
                     if (mutex == null) {
 
                         mutex = new Object();
-                        mutexMap.put(routineLockId, mutex);
+                        mutexMap.put(methodLockId, mutex);
                     }
                 }
             }
@@ -589,6 +567,42 @@ public class ClassRoutineBuilder implements RoutineBuilder {
         }
 
         return routine;
+    }
+
+    /**
+     * Returns a routine used for calling the specified method.
+     *
+     * @param configuration the routine configuration.
+     * @param lockId        the lock ID.
+     * @param method        the method instance.
+     * @return the routine.
+     * @throws NullPointerException if the specified method is null.
+     * @throws RoutineException     if an error occurred while instantiating the optional runner
+     *                              or the routine.
+     */
+    protected Routine<Object, Object> method(@Nonnull final RoutineConfiguration configuration,
+            @Nullable final String lockId, @Nonnull final Method method) {
+
+        if (!method.isAccessible()) {
+
+            AccessController.doPrivileged(new SetAccessibleAction(method));
+        }
+
+        final DefaultConfigurationBuilder builder = new DefaultConfigurationBuilder();
+        String methodLockId = lockId;
+        final Async annotation = method.getAnnotation(Async.class);
+
+        if (annotation != null) {
+
+            if (methodLockId == null) {
+
+                methodLockId = annotation.lockId();
+            }
+
+            applyConfiguration(builder, annotation);
+        }
+
+        return getRoutine(builder.apply(configuration).buildConfiguration(), methodLockId, method);
     }
 
     private void fillMap(@Nonnull final HashMap<String, Method> map,

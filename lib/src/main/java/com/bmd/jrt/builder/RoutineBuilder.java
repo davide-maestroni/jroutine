@@ -103,17 +103,6 @@ public interface RoutineBuilder {
     public RoutineBuilder availableTimeout(@Nullable TimeDuration timeout);
 
     /**
-     * Sets the maximum number of data that the input channel can retain before they are consumed.
-     * A DEFAULT value means that it is up to the framework to chose a default.
-     *
-     * @param inputMaxSize the maximum size.
-     * @return this builder.
-     * @throws IllegalArgumentException if the number is less than 1.
-     */
-    @Nonnull
-    public RoutineBuilder inputMaxSize(int inputMaxSize);
-
-    /**
      * Sets the order in which input data are collected from the input channel.
      *
      * @param order the order type.
@@ -122,6 +111,17 @@ public interface RoutineBuilder {
      */
     @Nonnull
     public RoutineBuilder inputOrder(@Nonnull DataOrder order);
+
+    /**
+     * Sets the maximum number of data that the input channel can retain before they are consumed.
+     * A DEFAULT value means that it is up to the framework to chose a default.
+     *
+     * @param inputMaxSize the maximum size.
+     * @return this builder.
+     * @throws IllegalArgumentException if the number is less than 1.
+     */
+    @Nonnull
+    public RoutineBuilder inputSize(int inputMaxSize);
 
     /**
      * Sets the timeout for an input channel to have room for additional data.
@@ -187,17 +187,6 @@ public interface RoutineBuilder {
     public RoutineBuilder maxRunning(int maxRunningInstances);
 
     /**
-     * Sets the maximum number of data that the result channel can retain before they are consumed.
-     * A DEFAULT value means that it is up to the framework to chose a default.
-     *
-     * @param outputMaxSize the maximum size.
-     * @return this builder.
-     * @throws IllegalArgumentException if the number is less than 1.
-     */
-    @Nonnull
-    public RoutineBuilder outputMaxSize(int outputMaxSize);
-
-    /**
      * Sets the order in which output data are collected from the result channel.
      *
      * @param order the order type.
@@ -206,6 +195,17 @@ public interface RoutineBuilder {
      */
     @Nonnull
     public RoutineBuilder outputOrder(@Nonnull DataOrder order);
+
+    /**
+     * Sets the maximum number of data that the result channel can retain before they are consumed.
+     * A DEFAULT value means that it is up to the framework to chose a default.
+     *
+     * @param outputMaxSize the maximum size.
+     * @return this builder.
+     * @throws IllegalArgumentException if the number is less than 1.
+     */
+    @Nonnull
+    public RoutineBuilder outputSize(int outputMaxSize);
 
     /**
      * Sets the timeout for a result channel to have room for additional data.

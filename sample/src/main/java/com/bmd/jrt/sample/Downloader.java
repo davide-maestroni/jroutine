@@ -99,7 +99,7 @@ public class Downloader {
             mDownloadedSet.remove(uri);
 
             final Routine<Chunk, Boolean> writeFile = JavaRoutine.on(tokenOf(WriteFile.class))
-                                                                 .inputMaxSize(8)
+                                                                 .inputSize(8)
                                                                  .inputTimeout(seconds(30))
                                                                  .withArgs(dstFile)
                                                                  .buildRoutine();

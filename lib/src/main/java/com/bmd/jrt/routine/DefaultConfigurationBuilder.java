@@ -54,15 +54,15 @@ class DefaultConfigurationBuilder extends RoutineConfigurationBuilder {
         final RoutineConfigurationBuilder builder = new RoutineConfigurationBuilder();
 
         builder.availableTimeout(configuration.getAvailTimeout(DEFAULT_AVAIL_TIMEOUT));
-        builder.inputMaxSize(configuration.getInputMaxSize(Integer.MAX_VALUE));
         builder.inputOrder(configuration.getInputOrder(DataOrder.DELIVERY));
+        builder.inputSize(configuration.getInputSize(Integer.MAX_VALUE));
         builder.inputTimeout(configuration.getInputTimeout(ZERO));
         builder.logLevel(configuration.getLogLevel(mDefaultLogLevel));
         builder.loggedWith(configuration.getLog(mDefaultLog));
         builder.maxRetained(configuration.getMaxRetained(10));
         builder.maxRunning(configuration.getMaxRunning(Integer.MAX_VALUE));
-        builder.outputMaxSize(configuration.getOutputMaxSize(Integer.MAX_VALUE));
         builder.outputOrder(configuration.getOutputOrder(DataOrder.DELIVERY));
+        builder.outputSize(configuration.getOutputSize(Integer.MAX_VALUE));
         builder.outputTimeout(configuration.getOutputTimeout(ZERO));
         builder.runBy(configuration.getRunner(Runners.sharedRunner()));
         builder.syncRunner(configuration.getSyncRunner(RunnerType.QUEUED));

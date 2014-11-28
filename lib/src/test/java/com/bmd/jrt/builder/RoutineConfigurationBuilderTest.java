@@ -86,7 +86,7 @@ public class RoutineConfigurationBuilderTest extends TestCase {
 
         try {
 
-            new RoutineConfigurationBuilder().inputMaxSize(0);
+            new RoutineConfigurationBuilder().inputSize(0);
 
             fail();
 
@@ -126,7 +126,7 @@ public class RoutineConfigurationBuilderTest extends TestCase {
 
         try {
 
-            new RoutineConfigurationBuilder().outputMaxSize(0);
+            new RoutineConfigurationBuilder().outputSize(0);
 
             fail();
 
@@ -192,7 +192,7 @@ public class RoutineConfigurationBuilderTest extends TestCase {
                .inputOrder(DataOrder.INSERTION)
                .runBy(Runners.queuedRunner())
                .loggedWith(new NullLog())
-               .outputMaxSize(100);
+               .outputSize(100);
 
         final RoutineConfiguration configuration = builder.buildConfiguration();
         assertThat(new RoutineConfigurationBuilder(configuration).buildConfiguration()).isEqualTo(

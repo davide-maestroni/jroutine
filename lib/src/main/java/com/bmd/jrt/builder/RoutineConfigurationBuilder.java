@@ -78,12 +78,12 @@ public class RoutineConfigurationBuilder extends AbstractRoutineBuilder {
         mMaxRunning = initialConfiguration.getMaxRunning(mMaxRunning);
         mMaxRetained = initialConfiguration.getMaxRetained(mMaxRetained);
         mAvailTimeout = initialConfiguration.getAvailTimeout(mAvailTimeout);
-        mInputMaxSize = initialConfiguration.getInputMaxSize(mInputMaxSize);
-        mInputTimeout = initialConfiguration.getInputTimeout(mInputTimeout);
         mInputOrder = initialConfiguration.getInputOrder(mInputOrder);
-        mOutputMaxSize = initialConfiguration.getOutputMaxSize(mOutputMaxSize);
-        mOutputTimeout = initialConfiguration.getOutputTimeout(mOutputTimeout);
+        mInputMaxSize = initialConfiguration.getInputSize(mInputMaxSize);
+        mInputTimeout = initialConfiguration.getInputTimeout(mInputTimeout);
         mOutputOrder = initialConfiguration.getOutputOrder(mOutputOrder);
+        mOutputMaxSize = initialConfiguration.getOutputSize(mOutputMaxSize);
+        mOutputTimeout = initialConfiguration.getOutputTimeout(mOutputTimeout);
         mLog = initialConfiguration.getLog(mLog);
         mLogLevel = initialConfiguration.getLogLevel(mLogLevel);
     }
@@ -116,20 +116,6 @@ public class RoutineConfigurationBuilder extends AbstractRoutineBuilder {
 
     @Nonnull
     @Override
-    public RoutineConfigurationBuilder inputMaxSize(final int inputMaxSize) {
-
-        if ((inputMaxSize != DEFAULT) && (inputMaxSize <= 0)) {
-
-            throw new IllegalArgumentException("the buffer size cannot be 0 or negative");
-        }
-
-        mInputMaxSize = inputMaxSize;
-
-        return this;
-    }
-
-    @Nonnull
-    @Override
     @SuppressWarnings("ConstantConditions")
     public RoutineConfigurationBuilder inputOrder(@Nonnull final DataOrder order) {
 
@@ -139,6 +125,20 @@ public class RoutineConfigurationBuilder extends AbstractRoutineBuilder {
         }
 
         mInputOrder = order;
+
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public RoutineConfigurationBuilder inputSize(final int inputMaxSize) {
+
+        if ((inputMaxSize != DEFAULT) && (inputMaxSize <= 0)) {
+
+            throw new IllegalArgumentException("the buffer size cannot be 0 or negative");
+        }
+
+        mInputMaxSize = inputMaxSize;
 
         return this;
     }
@@ -216,20 +216,6 @@ public class RoutineConfigurationBuilder extends AbstractRoutineBuilder {
 
     @Nonnull
     @Override
-    public RoutineConfigurationBuilder outputMaxSize(final int outputMaxSize) {
-
-        if ((outputMaxSize != DEFAULT) && (outputMaxSize <= 0)) {
-
-            throw new IllegalArgumentException("the buffer size cannot be 0 or negative");
-        }
-
-        mOutputMaxSize = outputMaxSize;
-
-        return this;
-    }
-
-    @Nonnull
-    @Override
     @SuppressWarnings("ConstantConditions")
     public RoutineConfigurationBuilder outputOrder(@Nonnull final DataOrder order) {
 
@@ -239,6 +225,20 @@ public class RoutineConfigurationBuilder extends AbstractRoutineBuilder {
         }
 
         mOutputOrder = order;
+
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public RoutineConfigurationBuilder outputSize(final int outputMaxSize) {
+
+        if ((outputMaxSize != DEFAULT) && (outputMaxSize <= 0)) {
+
+            throw new IllegalArgumentException("the buffer size cannot be 0 or negative");
+        }
+
+        mOutputMaxSize = outputMaxSize;
 
         return this;
     }

@@ -66,11 +66,18 @@ public abstract class AbstractRoutineBuilder implements RoutineBuilder {
             availableTimeout(availTimeout);
         }
 
-        final int inputMaxSize = configuration.getInputMaxSize(DEFAULT);
+        final DataOrder inputOrder = configuration.getInputOrder(DataOrder.DEFAULT);
 
-        if (inputMaxSize != DEFAULT) {
+        if (inputOrder != DataOrder.DEFAULT) {
 
-            inputMaxSize(inputMaxSize);
+            inputOrder(inputOrder);
+        }
+
+        final int inputSize = configuration.getInputSize(DEFAULT);
+
+        if (inputSize != DEFAULT) {
+
+            inputSize(inputSize);
         }
 
         final TimeDuration inputTimeout = configuration.getInputTimeout(null);
@@ -80,18 +87,18 @@ public abstract class AbstractRoutineBuilder implements RoutineBuilder {
             inputTimeout(inputTimeout);
         }
 
-        final DataOrder inputOrder = configuration.getInputOrder(DataOrder.DEFAULT);
+        final DataOrder outputOrder = configuration.getOutputOrder(DataOrder.DEFAULT);
 
-        if (inputOrder != DataOrder.DEFAULT) {
+        if (outputOrder != DataOrder.DEFAULT) {
 
-            inputOrder(inputOrder);
+            outputOrder(outputOrder);
         }
 
-        final int outputMaxSize = configuration.getOutputMaxSize(DEFAULT);
+        final int outputSize = configuration.getOutputSize(DEFAULT);
 
-        if (outputMaxSize != DEFAULT) {
+        if (outputSize != DEFAULT) {
 
-            outputMaxSize(outputMaxSize);
+            outputSize(outputSize);
         }
 
         final TimeDuration outputTimeout = configuration.getOutputTimeout(null);
@@ -99,13 +106,6 @@ public abstract class AbstractRoutineBuilder implements RoutineBuilder {
         if (outputTimeout != null) {
 
             outputTimeout(outputTimeout);
-        }
-
-        final DataOrder outputOrder = configuration.getOutputOrder(DataOrder.DEFAULT);
-
-        if (outputOrder != DataOrder.DEFAULT) {
-
-            outputOrder(outputOrder);
         }
 
         final Log log = configuration.getLog(null);

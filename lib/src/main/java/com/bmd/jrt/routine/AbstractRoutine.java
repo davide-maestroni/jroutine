@@ -81,7 +81,12 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
             throw new NullPointerException("the synchronous runner instance must not be null");
         }
 
-        if (configuration.getInputMaxSize(-1) < 1) {
+        if (configuration.getInputOrder(null) == null) {
+
+            throw new NullPointerException("the input order type must not be null");
+        }
+
+        if (configuration.getInputSize(-1) < 1) {
 
             throw new IllegalArgumentException("the maximum input size must be a positive number");
         }
@@ -92,12 +97,12 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
                     "the timeout for available input buffer must not be null");
         }
 
-        if (configuration.getInputOrder(null) == null) {
+        if (configuration.getOutputOrder(null) == null) {
 
-            throw new NullPointerException("the input order type must not be null");
+            throw new NullPointerException("the output order type must not be null");
         }
 
-        if (configuration.getOutputMaxSize(-1) < 1) {
+        if (configuration.getOutputSize(-1) < 1) {
 
             throw new IllegalArgumentException("the maximum output size must be a positive number");
         }
@@ -106,11 +111,6 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
             throw new NullPointerException(
                     "the timeout for available output buffer must not be null");
-        }
-
-        if (configuration.getOutputOrder(null) == null) {
-
-            throw new NullPointerException("the output order type must not be null");
         }
 
         mConfiguration = configuration;

@@ -702,7 +702,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
         if (maxInput != RoutineBuilder.DEFAULT) {
 
-            builder.append(".inputMaxSize(").append(maxInput).append(")");
+            builder.append(".inputSize(").append(maxInput).append(")");
         }
 
         if (inputTimeout != RoutineBuilder.DEFAULT) {
@@ -1098,7 +1098,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
         if (maxOutput != RoutineBuilder.DEFAULT) {
 
-            builder.append(".outputMaxSize(").append(maxOutput).append(")");
+            builder.append(".outputSize(").append(maxOutput).append(")");
         }
 
         if (outputTimeout != RoutineBuilder.DEFAULT) {

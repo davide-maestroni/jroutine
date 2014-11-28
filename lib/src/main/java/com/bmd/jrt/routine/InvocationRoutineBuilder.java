@@ -91,18 +91,18 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineBuilder {
 
     @Nonnull
     @Override
-    public InvocationRoutineBuilder<INPUT, OUTPUT> inputMaxSize(final int inputMaxSize) {
+    public InvocationRoutineBuilder<INPUT, OUTPUT> inputOrder(@Nonnull final DataOrder order) {
 
-        mBuilder.inputMaxSize(inputMaxSize);
+        mBuilder.inputOrder(order);
 
         return this;
     }
 
     @Nonnull
     @Override
-    public InvocationRoutineBuilder<INPUT, OUTPUT> inputOrder(@Nonnull final DataOrder order) {
+    public InvocationRoutineBuilder<INPUT, OUTPUT> inputSize(final int inputMaxSize) {
 
-        mBuilder.inputOrder(order);
+        mBuilder.inputSize(inputMaxSize);
 
         return this;
     }
@@ -165,18 +165,18 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineBuilder {
 
     @Nonnull
     @Override
-    public InvocationRoutineBuilder<INPUT, OUTPUT> outputMaxSize(final int outputMaxSize) {
+    public InvocationRoutineBuilder<INPUT, OUTPUT> outputOrder(@Nonnull final DataOrder order) {
 
-        mBuilder.outputMaxSize(outputMaxSize);
+        mBuilder.outputOrder(order);
 
         return this;
     }
 
     @Nonnull
     @Override
-    public InvocationRoutineBuilder<INPUT, OUTPUT> outputOrder(@Nonnull final DataOrder order) {
+    public InvocationRoutineBuilder<INPUT, OUTPUT> outputSize(final int outputMaxSize) {
 
-        mBuilder.outputOrder(order);
+        mBuilder.outputSize(outputMaxSize);
 
         return this;
     }

@@ -13,6 +13,8 @@
  */
 package com.bmd.jrt.android.runner;
 
+import android.os.Build.VERSION;
+import android.os.Build.VERSION_CODES;
 import android.os.Handler;
 import android.os.Looper;
 
@@ -46,7 +48,15 @@ class LooperRunner implements Runner {
      */
     LooperRunner(@Nonnull final Looper looper) {
 
-        mThread = looper.getThread();
+        if (VERSION.SDK_INT < VERSION_CODES.CUPCAKE) {
+
+            mThread = null;
+
+        } else {
+
+            mThread = looper.getThread();
+        }
+
         mHandler = new Handler(looper);
         mQueuedRunner = Runners.queuedRunner();
     }

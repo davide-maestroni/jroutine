@@ -13,6 +13,8 @@
  */
 package com.bmd.jrt.android.runner;
 
+import android.annotation.TargetApi;
+import android.os.Build.VERSION_CODES;
 import android.os.HandlerThread;
 import android.os.Looper;
 
@@ -80,7 +82,8 @@ public class AndroidRunners {
     }
 
     /**
-     * Returns a runner employing default async tasks.
+     * Returns a runner employing default async tasks.<br/>
+     * Note that the use of this method requires at least an API level of 3.
      * <p/>
      * Beware of the caveats of using
      * <a href="http://developer.android.com/reference/android/os/AsyncTask.html">AyncTask<a/>s
@@ -89,13 +92,15 @@ public class AndroidRunners {
      * @return the runner instance.
      */
     @Nonnull
+    @TargetApi(VERSION_CODES.CUPCAKE)
     public static Runner taskRunner() {
 
         return taskRunner(null);
     }
 
     /**
-     * Returns a runner employing async tasks running on the specified executor.
+     * Returns a runner employing async tasks running on the specified executor.<br/>
+     * Note that the use of this method requires at least an API level of 3.
      * <p/>
      * Beware of the caveats of using
      * <a href="http://developer.android.com/reference/android/os/AsyncTask.html">AsyncTask<a/>s
@@ -107,6 +112,7 @@ public class AndroidRunners {
      * @return the runner instance.
      */
     @Nonnull
+    @TargetApi(VERSION_CODES.CUPCAKE)
     public static Runner taskRunner(@Nullable final Executor executor) {
 
         return new AsyncTaskRunner(executor);

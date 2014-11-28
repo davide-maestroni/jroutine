@@ -27,7 +27,7 @@ android {
     buildToolsVersion '21.0.2' // Travis does not support an higher version
 
     defaultConfig {
-        minSdkVersion 8
+        minSdkVersion 1
         targetSdkVersion 21
         versionCode 100
         versionName version

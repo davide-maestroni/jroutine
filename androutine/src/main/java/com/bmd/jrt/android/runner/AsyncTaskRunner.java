@@ -33,6 +33,7 @@ import javax.annotation.Nullable;
  * <p/>
  * Created by davide on 9/28/14.
  */
+@TargetApi(VERSION_CODES.CUPCAKE)
 class AsyncTaskRunner extends LooperRunner {
 
     private final Executor mExecutor;

@@ -16,6 +16,7 @@ package com.bmd.jrt.routine;
 import com.bmd.jrt.annotation.Async;
 import com.bmd.jrt.annotation.AsyncType;
 import com.bmd.jrt.annotation.ParallelType;
+import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ParameterChannel;
@@ -253,42 +254,6 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
     @Nonnull
     @Override
-    public ObjectRoutineBuilder inputOrder(@Nonnull final DataOrder order) {
-
-        super.inputOrder(order);
-
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ObjectRoutineBuilder inputSize(final int inputMaxSize) {
-
-        super.inputSize(inputMaxSize);
-
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ObjectRoutineBuilder inputTimeout(final long timeout, @Nonnull final TimeUnit timeUnit) {
-
-        super.inputTimeout(timeout, timeUnit);
-
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ObjectRoutineBuilder inputTimeout(@Nullable final TimeDuration timeout) {
-
-        super.inputTimeout(timeout);
-
-        return this;
-    }
-
-    @Nonnull
-    @Override
     public ObjectRoutineBuilder logLevel(@Nonnull final LogLevel level) {
 
         super.logLevel(level);
@@ -319,43 +284,6 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     public ObjectRoutineBuilder maxRunning(final int maxRunningInstances) {
 
         super.maxRunning(maxRunningInstances);
-
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ObjectRoutineBuilder outputOrder(@Nonnull final DataOrder order) {
-
-        super.outputOrder(order);
-
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ObjectRoutineBuilder outputSize(final int outputMaxSize) {
-
-        super.outputSize(outputMaxSize);
-
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ObjectRoutineBuilder outputTimeout(final long timeout,
-            @Nonnull final TimeUnit timeUnit) {
-
-        super.outputTimeout(timeout, timeUnit);
-
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ObjectRoutineBuilder outputTimeout(@Nullable final TimeDuration timeout) {
-
-        super.outputTimeout(timeout);
 
         return this;
     }
@@ -815,6 +743,11 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
                 builder.inputOrder(DataOrder.INSERTION);
             }
+
+            builder.inputSize(Integer.MAX_VALUE)
+                   .inputTimeout(TimeDuration.ZERO)
+                   .outputSize(Integer.MAX_VALUE)
+                   .outputTimeout(TimeDuration.ZERO);
 
             final Routine<Object, Object> routine =
                     getRoutine(builder.buildConfiguration(), lockId, targetMethod);

@@ -13,7 +13,7 @@
  */
 package com.bmd.jrt.builder;
 
-import com.bmd.jrt.builder.RoutineBuilder.DataOrder;
+import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
 import com.bmd.jrt.log.NullLog;
 import com.bmd.jrt.runner.Runners;
 import com.bmd.jrt.time.TimeDuration;

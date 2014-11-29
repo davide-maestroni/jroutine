@@ -13,7 +13,7 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.builder.RoutineBuilder;
+import com.bmd.jrt.builder.RoutineChannelBuilder;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.invocation.Invocation;
@@ -38,7 +38,7 @@ import static com.bmd.jrt.routine.ReflectionUtils.NO_ARGS;
  * @param <INPUT>  the input type.
  * @param <OUTPUT> the output type.
  */
-public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineBuilder {
+public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineChannelBuilder {
 
     private final DefaultConfigurationBuilder mBuilder;
 
@@ -91,44 +91,6 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineBuilder {
 
     @Nonnull
     @Override
-    public InvocationRoutineBuilder<INPUT, OUTPUT> inputOrder(@Nonnull final DataOrder order) {
-
-        mBuilder.inputOrder(order);
-
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public InvocationRoutineBuilder<INPUT, OUTPUT> inputSize(final int inputMaxSize) {
-
-        mBuilder.inputSize(inputMaxSize);
-
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public InvocationRoutineBuilder<INPUT, OUTPUT> inputTimeout(final long timeout,
-            @Nonnull final TimeUnit timeUnit) {
-
-        mBuilder.inputTimeout(timeout, timeUnit);
-
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public InvocationRoutineBuilder<INPUT, OUTPUT> inputTimeout(
-            @Nullable final TimeDuration timeout) {
-
-        mBuilder.inputTimeout(timeout);
-
-        return this;
-    }
-
-    @Nonnull
-    @Override
     public InvocationRoutineBuilder<INPUT, OUTPUT> logLevel(@Nonnull final LogLevel level) {
 
         mBuilder.logLevel(level);
@@ -159,6 +121,62 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineBuilder {
     public InvocationRoutineBuilder<INPUT, OUTPUT> maxRunning(final int maxRunningInstances) {
 
         mBuilder.maxRunning(maxRunningInstances);
+
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public InvocationRoutineBuilder<INPUT, OUTPUT> runBy(@Nullable final Runner runner) {
+
+        mBuilder.runBy(runner);
+
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public InvocationRoutineBuilder<INPUT, OUTPUT> syncRunner(@Nonnull final RunnerType type) {
+
+        mBuilder.syncRunner(type);
+
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public InvocationRoutineBuilder<INPUT, OUTPUT> inputOrder(@Nonnull final DataOrder order) {
+
+        mBuilder.inputOrder(order);
+
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public InvocationRoutineBuilder<INPUT, OUTPUT> inputSize(final int inputMaxSize) {
+
+        mBuilder.inputSize(inputMaxSize);
+
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public InvocationRoutineBuilder<INPUT, OUTPUT> inputTimeout(
+            @Nullable final TimeDuration timeout) {
+
+        mBuilder.inputTimeout(timeout);
+
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public InvocationRoutineBuilder<INPUT, OUTPUT> inputTimeout(final long timeout,
+            @Nonnull final TimeUnit timeUnit) {
+
+        mBuilder.inputTimeout(timeout, timeUnit);
 
         return this;
     }
@@ -197,24 +215,6 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineBuilder {
             @Nullable final TimeDuration timeout) {
 
         mBuilder.outputTimeout(timeout);
-
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public InvocationRoutineBuilder<INPUT, OUTPUT> runBy(@Nullable final Runner runner) {
-
-        mBuilder.runBy(runner);
-
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public InvocationRoutineBuilder<INPUT, OUTPUT> syncRunner(@Nonnull final RunnerType type) {
-
-        mBuilder.syncRunner(type);
 
         return this;
     }

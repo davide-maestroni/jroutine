@@ -14,7 +14,6 @@
 package com.bmd.jrt.annotation;
 
 import com.bmd.jrt.builder.RoutineBuilder;
-import com.bmd.jrt.builder.RoutineBuilder.DataOrder;
 import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
@@ -68,9 +67,7 @@ import java.util.concurrent.TimeUnit;
  * Additionally, through this annotation it is possible to indicate: a specific runner
  * implementation to be used for asynchronous and synchronous invocations; the maximum invocation
  * instances running at the same time; the maximum ones retained; the timeout for an invocation
- * instance to become available; the maximum size of the input and output channels and the timeout
- * for each channel for having room for additional data; whether data are forced to be delivered in
- * insertion order; a specific log and log level.
+ * instance to become available; a specific log and log level.
  * <br/>
  * Note however that the runner and log classes must declare a default constructor to be
  * instantiated via reflection.
@@ -126,27 +123,6 @@ public @interface Async {
     long availTimeout() default RoutineBuilder.DEFAULT;
 
     /**
-     * The input data order.
-     *
-     * @return the order type.
-     */
-    DataOrder inputOrder() default DataOrder.DEFAULT;
-
-    /**
-     * The time unit of the timeout for an input channel to have room for additional data.
-     *
-     * @return the time unit.
-     */
-    TimeUnit inputTimeUnit() default TimeUnit.MILLISECONDS;
-
-    /**
-     * The timeout for an input channel to have room for additional data.
-     *
-     * @return the timeout.
-     */
-    long inputTimeout() default RoutineBuilder.DEFAULT;
-
-    /**
      * The ID of the lock associated with the annotated method.
      *
      * @return the lock ID.
@@ -168,20 +144,6 @@ public @interface Async {
     LogLevel logLevel() default LogLevel.DEFAULT;
 
     /**
-     * The maximum number of data that the input channel can retain before they are consumed.
-     *
-     * @return the maximum number of input data.
-     */
-    int maxInput() default RoutineBuilder.DEFAULT;
-
-    /**
-     * The maximum number of data that the result channel can retain before they are consumed.
-     *
-     * @return the maximum number of result data.
-     */
-    int maxOutput() default RoutineBuilder.DEFAULT;
-
-    /**
      * The max number of retained routine instances.
      *
      * @return the max retained instances.
@@ -194,27 +156,6 @@ public @interface Async {
      * @return the max concurrently running instances.
      */
     int maxRunning() default RoutineBuilder.DEFAULT;
-
-    /**
-     * The output data order.
-     *
-     * @return the order type.
-     */
-    DataOrder outputOrder() default DataOrder.DEFAULT;
-
-    /**
-     * The time unit of the timeout for a result channel to have room for additional data.
-     *
-     * @return the time unit.
-     */
-    TimeUnit outputTimeUnit() default TimeUnit.MILLISECONDS;
-
-    /**
-     * The timeout for a result channel to have room for additional data.
-     *
-     * @return the timeout.
-     */
-    long outputTimeout() default RoutineBuilder.DEFAULT;
 
     /**
      * The class of the runner to be used for asynchronous invocations.

@@ -51,16 +51,6 @@ import javax.annotation.Nullable;
  * In case the timeout elapses before an invocation instance becomes available, a
  * {@link com.bmd.jrt.routine.RoutineDeadLockException} will be thrown.
  * <p/>
- * Moreover, the number of input and output data buffered in the corresponding channel can be
- * limited in order to avoid excessive memory consumption. In case the maximum number is reached
- * when passing an input or output, the call blocks until enough data are consumed or the specified
- * timeout elapses. In the latter case a {@link com.bmd.jrt.common.DeadLockException} will be
- * thrown.
- * <p/>
- * Finally, by default the order of input and output data is not guaranteed. Nevertheless, it is
- * possible to force data to be delivered in insertion order, at the cost of a slightly increased
- * memory usage and computation, by calling the proper methods.
- * <p/>
  * Created by davide on 11/11/14.
  */
 public interface RoutineBuilder {
@@ -101,49 +91,6 @@ public interface RoutineBuilder {
      */
     @Nonnull
     public RoutineBuilder availableTimeout(@Nullable TimeDuration timeout);
-
-    /**
-     * Sets the order in which input data are collected from the input channel.
-     *
-     * @param order the order type.
-     * @return this builder.
-     * @throws NullPointerException if the specified order type is null.
-     */
-    @Nonnull
-    public RoutineBuilder inputOrder(@Nonnull DataOrder order);
-
-    /**
-     * Sets the maximum number of data that the input channel can retain before they are consumed.
-     * A DEFAULT value means that it is up to the framework to chose a default.
-     *
-     * @param inputMaxSize the maximum size.
-     * @return this builder.
-     * @throws IllegalArgumentException if the number is less than 1.
-     */
-    @Nonnull
-    public RoutineBuilder inputSize(int inputMaxSize);
-
-    /**
-     * Sets the timeout for an input channel to have room for additional data.
-     *
-     * @param timeout  the timeout.
-     * @param timeUnit the timeout time unit.
-     * @return this builder.
-     * @throws NullPointerException     if the specified time unit is null.
-     * @throws IllegalArgumentException if the specified timeout is negative.
-     */
-    @Nonnull
-    public RoutineBuilder inputTimeout(long timeout, @Nonnull TimeUnit timeUnit);
-
-    /**
-     * Sets the timeout for an input channel to have room for additional data. A null value means
-     * that it is up to the framework to chose a default.
-     *
-     * @param timeout the timeout.
-     * @return this builder.
-     */
-    @Nonnull
-    public RoutineBuilder inputTimeout(@Nullable TimeDuration timeout);
 
     /**
      * Sets the log level.
@@ -187,49 +134,6 @@ public interface RoutineBuilder {
     public RoutineBuilder maxRunning(int maxRunningInstances);
 
     /**
-     * Sets the order in which output data are collected from the result channel.
-     *
-     * @param order the order type.
-     * @return this builder.
-     * @throws NullPointerException if the specified order type is null.
-     */
-    @Nonnull
-    public RoutineBuilder outputOrder(@Nonnull DataOrder order);
-
-    /**
-     * Sets the maximum number of data that the result channel can retain before they are consumed.
-     * A DEFAULT value means that it is up to the framework to chose a default.
-     *
-     * @param outputMaxSize the maximum size.
-     * @return this builder.
-     * @throws IllegalArgumentException if the number is less than 1.
-     */
-    @Nonnull
-    public RoutineBuilder outputSize(int outputMaxSize);
-
-    /**
-     * Sets the timeout for a result channel to have room for additional data.
-     *
-     * @param timeout  the timeout.
-     * @param timeUnit the timeout time unit.
-     * @return this builder.
-     * @throws NullPointerException     if the specified time unit is null.
-     * @throws IllegalArgumentException if the specified timeout is negative.
-     */
-    @Nonnull
-    public RoutineBuilder outputTimeout(long timeout, @Nonnull TimeUnit timeUnit);
-
-    /**
-     * Sets the timeout for a result channel to have room for additional data. A null value means
-     * that it is up to the framework to chose a default.
-     *
-     * @param timeout the timeout.
-     * @return this builder.
-     */
-    @Nonnull
-    public RoutineBuilder outputTimeout(@Nullable TimeDuration timeout);
-
-    /**
      * Sets the asynchronous runner instance. A null value means that it is up to the framework
      * to chose a default.
      *
@@ -248,32 +152,6 @@ public interface RoutineBuilder {
      */
     @Nonnull
     public RoutineBuilder syncRunner(@Nonnull RunnerType type);
-
-    /**
-     * Enumeration defining how data are ordered inside a channel.
-     */
-    public enum DataOrder {
-
-        /**
-         * Insertion order.<br/>
-         * Data are returned in the same order as they are passed to the channel, independently from
-         * the specific delay.
-         */
-        INSERTION,
-        /**
-         * Delivery order.<br/>
-         * Data are returned in the same order as they are delivered, taking also into consideration
-         * the specific delay. Note that the delivery time might be different based on the specific
-         * runner implementation, so there is no guarantee about the data order when, for example,
-         * two objects are passed one immediately after the other with the same delay.
-         */
-        DELIVERY,
-        /**
-         * Default order.<br/>
-         * This value is used to indicated that the choice of the order is left to the framework.
-         */
-        DEFAULT
-    }
 
     /**
      * Synchronous runner type enumeration.

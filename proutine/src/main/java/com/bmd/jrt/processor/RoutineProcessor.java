@@ -20,8 +20,8 @@ import com.bmd.jrt.annotation.DefaultLog;
 import com.bmd.jrt.annotation.DefaultRunner;
 import com.bmd.jrt.annotation.ParallelType;
 import com.bmd.jrt.builder.RoutineBuilder;
-import com.bmd.jrt.builder.RoutineBuilder.DataOrder;
 import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
+import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.log.Log.LogLevel;
 
@@ -311,9 +311,28 @@ public class RoutineProcessor extends AbstractProcessor {
         final StringBuilder builder = new StringBuilder();
 
         writeInstanceOptions(builder, methodElement, targetMethodElement);
-        writeInputOptions(builder, methodElement, targetMethodElement);
-        writeOutputOptions(builder, methodElement, targetMethodElement);
         writeLogOptions(builder, methodElement, targetMethodElement);
+
+        boolean isOverrideParameters = false;
+
+        for (final VariableElement parameterElement : methodElement.getParameters()) {
+
+            if (parameterElement.getAnnotation(AsyncType.class) != null) {
+
+                isOverrideParameters = true;
+
+                break;
+            }
+        }
+
+        if (isOverrideParameters) {
+
+            builder.append(".inputOrder(")
+                   .append(DataOrder.class.getCanonicalName())
+                   .append(".")
+                   .append(DataOrder.INSERTION)
+                   .append(")");
+        }
 
         return builder.toString();
     }
@@ -661,92 +680,6 @@ public class RoutineProcessor extends AbstractProcessor {
         }
     }
 
-    private void writeInputOptions(final StringBuilder builder,
-            final ExecutableElement methodElement, final ExecutableElement targetMethodElement) {
-
-        final Async annotation = methodElement.getAnnotation(Async.class);
-        final Async targetAnnotation = targetMethodElement.getAnnotation(Async.class);
-
-        int maxInput = RoutineBuilder.DEFAULT;
-        long inputTimeout = RoutineBuilder.DEFAULT;
-        TimeUnit inputTimeUnit = null;
-        DataOrder inputOrder = DataOrder.DEFAULT;
-
-        if (annotation != null) {
-
-            maxInput = annotation.maxInput();
-            inputTimeout = annotation.inputTimeout();
-            inputTimeUnit = annotation.inputTimeUnit();
-            inputOrder = annotation.inputOrder();
-        }
-
-        if (targetAnnotation != null) {
-
-            if (maxInput == RoutineBuilder.DEFAULT) {
-
-                maxInput = targetAnnotation.maxInput();
-            }
-
-            if (inputTimeout == RoutineBuilder.DEFAULT) {
-
-                inputTimeout = targetAnnotation.inputTimeout();
-                inputTimeUnit = targetAnnotation.inputTimeUnit();
-            }
-
-            if (inputOrder == DataOrder.DEFAULT) {
-
-                inputOrder = targetAnnotation.inputOrder();
-            }
-        }
-
-
-        if (maxInput != RoutineBuilder.DEFAULT) {
-
-            builder.append(".inputSize(").append(maxInput).append(")");
-        }
-
-        if (inputTimeout != RoutineBuilder.DEFAULT) {
-
-            builder.append(".inputTimeout(")
-                   .append(inputTimeout)
-                   .append(", ")
-                   .append(TimeUnit.class.getCanonicalName())
-                   .append(".")
-                   .append(inputTimeUnit)
-                   .append(")");
-        }
-
-        if (inputOrder != DataOrder.DEFAULT) {
-
-            builder.append(".inputOrder(")
-                   .append(DataOrder.class.getCanonicalName())
-                   .append(".")
-                   .append(inputOrder)
-                   .append(")");
-        }
-
-        boolean isOverrideParameters = false;
-
-        for (final VariableElement parameterElement : methodElement.getParameters()) {
-
-            if (parameterElement.getAnnotation(AsyncType.class) != null) {
-
-                isOverrideParameters = true;
-
-                break;
-            }
-        }
-
-        if (isOverrideParameters) {
-
-            builder.append(".inputOrder(")
-                   .append(DataOrder.class.getCanonicalName())
-                   .append(".")
-                   .append(DataOrder.INSERTION)
-                   .append(")");
-        }
-    }
-
     private void writeInstanceOptions(final StringBuilder builder,
             final ExecutableElement methodElement, final ExecutableElement targetMethodElement) {
 
@@ -1055,70 +988,5 @@ public class RoutineProcessor extends AbstractProcessor {
         methodFooter = methodFooter.replace("${lockId}", lockId);
 
         writer.append(methodFooter);
-    }
-
-    private void writeOutputOptions(final StringBuilder builder,
-            final ExecutableElement methodElement, final ExecutableElement targetMethodElement) {
-
-        final Async annotation = methodElement.getAnnotation(Async.class);
-        final Async targetAnnotation = targetMethodElement.getAnnotation(Async.class);
-
-        int maxOutput = RoutineBuilder.DEFAULT;
-        long outputTimeout = RoutineBuilder.DEFAULT;
-        TimeUnit outputTimeUnit = null;
-        DataOrder outputOrder = DataOrder.DEFAULT;
-
-        if (annotation != null) {
-
-            maxOutput = annotation.maxOutput();
-            outputTimeout = annotation.outputTimeout();
-            outputTimeUnit = annotation.outputTimeUnit();
-            outputOrder = annotation.outputOrder();
-        }
-
-        if (targetAnnotation != null) {
-
-            if (maxOutput == RoutineBuilder.DEFAULT) {
-
-                maxOutput = targetAnnotation.maxOutput();
-            }
-
-            if (outputTimeout == RoutineBuilder.DEFAULT) {
-
-                outputTimeout = targetAnnotation.outputTimeout();
-                outputTimeUnit = targetAnnotation.outputTimeUnit();
-            }
-
-            if (outputOrder == DataOrder.DEFAULT) {
-
-                outputOrder = targetAnnotation.outputOrder();
-            }
-
-        }
-
-        if (maxOutput != RoutineBuilder.DEFAULT) {
-
-            builder.append(".outputSize(").append(maxOutput).append(")");
-        }
-
-        if (outputTimeout != RoutineBuilder.DEFAULT) {
-
-            builder.append(".outputTimeout(")
-                   .append(outputTimeout)
-                   .append(", ")
-                   .append(TimeUnit.class.getCanonicalName())
-                   .append(".")
-                   .append(outputTimeUnit)
-                   .append(")");
-        }
-
-        if (outputOrder != DataOrder.DEFAULT) {
-
-            builder.append(".outputOrder(")
-                   .append(DataOrder.class.getCanonicalName())
-                   .append(".")
-                   .append(outputOrder)
-                   .append(")");
-        }
     }
 }

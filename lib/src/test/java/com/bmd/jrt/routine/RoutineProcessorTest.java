@@ -16,7 +16,6 @@ package com.bmd.jrt.routine;
 import com.bmd.jrt.annotation.AsyncClass;
 import com.bmd.jrt.annotation.AsyncType;
 import com.bmd.jrt.annotation.ParallelType;
-import com.bmd.jrt.builder.RoutineBuilder.DataOrder;
 import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
 import com.bmd.jrt.channel.IOChannel;
 import com.bmd.jrt.channel.OutputChannel;
@@ -31,7 +30,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
@@ -48,11 +46,6 @@ public class RoutineProcessorTest extends TestCase {
         final TestInterface testInterface = JavaRoutine.on(new TestClass())
                                                        .syncRunner(RunnerType.SEQUENTIAL)
                                                        .runBy(Runners.poolRunner())
-                                                       .inputSize(3)
-                                                       .inputTimeout(1, TimeUnit.SECONDS)
-                                                       .outputSize(3)
-                                                       .outputTimeout(2, TimeUnit.SECONDS)
-                                                       .outputOrder(DataOrder.INSERTION)
                                                        .logLevel(LogLevel.DEBUG)
                                                        .loggedWith(new NullLog())
                                                        .asClass(TestInterface.class);

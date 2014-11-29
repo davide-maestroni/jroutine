@@ -13,7 +13,7 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.builder.RoutineBuilder.DataOrder;
+import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
 import com.bmd.jrt.channel.IOChannel;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
@@ -92,7 +92,7 @@ public class IOChannelBuilder {
      * @throws NullPointerException if the specified order type is null.
      */
     @Nonnull
-    public IOChannelBuilder dataOrder(@Nonnull DataOrder order) {
+    public IOChannelBuilder dataOrder(@Nonnull final DataOrder order) {
 
         mBuilder.outputOrder(order);
 

@@ -164,26 +164,6 @@ public class ClassRoutineBuilder implements RoutineBuilder {
             builder.availableTimeout(fromUnit(availTimeout, annotation.availTimeUnit()));
         }
 
-        builder.inputOrder(annotation.inputOrder());
-        builder.inputSize(annotation.maxInput());
-
-        final long inputTimeout = annotation.inputTimeout();
-
-        if (inputTimeout != DEFAULT) {
-
-            builder.inputTimeout(fromUnit(inputTimeout, annotation.inputTimeUnit()));
-        }
-
-        builder.outputOrder(annotation.outputOrder());
-        builder.outputSize(annotation.maxOutput());
-
-        final long outputTimeout = annotation.outputTimeout();
-
-        if (outputTimeout != DEFAULT) {
-
-            builder.outputTimeout(fromUnit(outputTimeout, annotation.outputTimeUnit()));
-        }
-
         final Class<? extends Log> logClass = annotation.log();
 
         if (logClass != DefaultLog.class) {
@@ -237,42 +217,6 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
     @Nonnull
     @Override
-    public ClassRoutineBuilder inputOrder(@Nonnull final DataOrder order) {
-
-        mBuilder.inputOrder(order);
-
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ClassRoutineBuilder inputSize(final int inputMaxSize) {
-
-        mBuilder.inputSize(inputMaxSize);
-
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ClassRoutineBuilder inputTimeout(final long timeout, @Nonnull final TimeUnit timeUnit) {
-
-        mBuilder.inputTimeout(timeout, timeUnit);
-
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ClassRoutineBuilder inputTimeout(@Nullable final TimeDuration timeout) {
-
-        mBuilder.inputTimeout(timeout);
-
-        return this;
-    }
-
-    @Nonnull
-    @Override
     public ClassRoutineBuilder logLevel(@Nonnull final LogLevel level) {
 
         mBuilder.logLevel(level);
@@ -303,42 +247,6 @@ public class ClassRoutineBuilder implements RoutineBuilder {
     public ClassRoutineBuilder maxRunning(final int maxRunningInstances) {
 
         mBuilder.maxRunning(maxRunningInstances);
-
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ClassRoutineBuilder outputOrder(@Nonnull final DataOrder order) {
-
-        mBuilder.outputOrder(order);
-
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ClassRoutineBuilder outputSize(final int outputMaxSize) {
-
-        mBuilder.outputSize(outputMaxSize);
-
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ClassRoutineBuilder outputTimeout(final long timeout, @Nonnull final TimeUnit timeUnit) {
-
-        mBuilder.outputTimeout(timeout, timeUnit);
-
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ClassRoutineBuilder outputTimeout(@Nullable final TimeDuration timeout) {
-
-        mBuilder.outputTimeout(timeout);
 
         return this;
     }
@@ -602,7 +510,12 @@ public class ClassRoutineBuilder implements RoutineBuilder {
             applyConfiguration(builder, annotation);
         }
 
-        return getRoutine(builder.apply(configuration).buildConfiguration(), methodLockId, method);
+        return getRoutine(builder.apply(configuration)
+                                 .inputSize(Integer.MAX_VALUE)
+                                 .inputTimeout(TimeDuration.ZERO)
+                                 .outputSize(Integer.MAX_VALUE)
+                                 .outputTimeout(TimeDuration.ZERO)
+                                 .buildConfiguration(), methodLockId, method);
     }
 
     private void fillMap(@Nonnull final HashMap<String, Method> map,

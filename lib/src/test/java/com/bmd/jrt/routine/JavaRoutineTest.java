@@ -16,8 +16,8 @@ package com.bmd.jrt.routine;
 import com.bmd.jrt.annotation.Async;
 import com.bmd.jrt.annotation.AsyncType;
 import com.bmd.jrt.annotation.ParallelType;
-import com.bmd.jrt.builder.RoutineBuilder.DataOrder;
 import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
+import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
 import com.bmd.jrt.channel.IOChannel;
 import com.bmd.jrt.channel.IOChannel.ChannelInput;
 import com.bmd.jrt.channel.OutputChannel;
@@ -134,11 +134,6 @@ public class JavaRoutineTest extends TestCase {
         final Routine<Object, Object> routine = JavaRoutine.on(TestStatic.class)
                                                            .syncRunner(RunnerType.SEQUENTIAL)
                                                            .runBy(Runners.poolRunner())
-                                                           .inputSize(2)
-                                                           .inputTimeout(1, TimeUnit.SECONDS)
-                                                           .outputSize(2)
-                                                           .outputTimeout(1, TimeUnit.SECONDS)
-                                                           .outputOrder(DataOrder.INSERTION)
                                                            .logLevel(LogLevel.DEBUG)
                                                            .loggedWith(new NullLog())
                                                            .asyncMethod(TestStatic.GET);
@@ -150,11 +145,6 @@ public class JavaRoutineTest extends TestCase {
                                                             .runBy(Runners.poolRunner())
                                                             .maxRunning(1)
                                                             .availableTimeout(TimeDuration.ZERO)
-                                                            .inputSize(2)
-                                                            .inputTimeout(TimeDuration.ZERO)
-                                                            .outputSize(2)
-                                                            .outputTimeout(TimeDuration.ZERO)
-                                                            .outputOrder(DataOrder.INSERTION)
                                                             .method("getLong");
 
         assertThat(routine1.call().readAll()).containsExactly(-77L);
@@ -272,86 +262,6 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            new ClassRoutineBuilder(TestStatic.class).inputTimeout(1, null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            new ClassRoutineBuilder(TestStatic.class).inputTimeout(-1, TimeUnit.MILLISECONDS);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            new ClassRoutineBuilder(TestStatic.class).inputSize(0);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            new ClassRoutineBuilder(TestStatic.class).inputOrder(null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            new ClassRoutineBuilder(TestStatic.class).outputTimeout(1, null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            new ClassRoutineBuilder(TestStatic.class).outputTimeout(-1, TimeUnit.MILLISECONDS);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            new ClassRoutineBuilder(TestStatic.class).outputSize(0);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            new ClassRoutineBuilder(TestStatic.class).outputOrder(null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
             new ClassRoutineBuilder(TestStatic.class).logLevel(null);
 
             fail();
@@ -453,12 +363,6 @@ public class JavaRoutineTest extends TestCase {
                                                            .maxRunning(1)
                                                            .maxRetained(1)
                                                            .availableTimeout(1, TimeUnit.SECONDS)
-                                                           .inputSize(2)
-                                                           .inputTimeout(1, TimeUnit.SECONDS)
-                                                           .inputOrder(DataOrder.INSERTION)
-                                                           .outputSize(2)
-                                                           .outputTimeout(1, TimeUnit.SECONDS)
-                                                           .outputOrder(DataOrder.INSERTION)
                                                            .logLevel(LogLevel.DEBUG)
                                                            .loggedWith(new NullLog())
                                                            .asyncMethod(Test.GET);
@@ -477,12 +381,6 @@ public class JavaRoutineTest extends TestCase {
                                                             .runBy(Runners.poolRunner())
                                                             .maxRunning(1)
                                                             .availableTimeout(TimeDuration.ZERO)
-                                                            .inputSize(2)
-                                                            .inputTimeout(TimeDuration.ZERO)
-                                                            .inputOrder(DataOrder.INSERTION)
-                                                            .outputSize(2)
-                                                            .outputTimeout(TimeDuration.ZERO)
-                                                            .outputOrder(DataOrder.INSERTION)
                                                             .lockId("test")
                                                             .method(Test.class.getMethod(
                                                                     "getLong"));
@@ -586,86 +484,6 @@ public class JavaRoutineTest extends TestCase {
             fail();
 
         } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            new ObjectRoutineBuilder(test).inputTimeout(1, null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            new ObjectRoutineBuilder(test).inputTimeout(-1, TimeUnit.MILLISECONDS);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            new ObjectRoutineBuilder(test).inputSize(0);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            new ObjectRoutineBuilder(test).inputOrder(null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            new ObjectRoutineBuilder(test).outputTimeout(1, null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            new ObjectRoutineBuilder(test).outputTimeout(-1, TimeUnit.MILLISECONDS);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            new ObjectRoutineBuilder(test).outputSize(0);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            new ObjectRoutineBuilder(test).outputOrder(null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
 
         }
 
@@ -1083,10 +901,7 @@ public class JavaRoutineTest extends TestCase {
 
         @Async(value = THROW, runnerType = RunnerType.QUEUED, runnerClass = MyRunner.class,
                maxRetained = 1, maxRunning = 1, availTimeout = 1, availTimeUnit = TimeUnit.SECONDS,
-               maxInput = 1, inputOrder = DataOrder.DELIVERY, inputTimeout = 1,
-               inputTimeUnit = TimeUnit.SECONDS, maxOutput = 1,
-               outputOrder = DataOrder.DELIVERY, outputTimeout = 1,
-               outputTimeUnit = TimeUnit.SECONDS, log = NullLog.class, logLevel = LogLevel.DEBUG)
+               log = NullLog.class, logLevel = LogLevel.DEBUG)
         public void throwException(final RuntimeException ex) {
 
             throw ex;

@@ -158,6 +158,7 @@ public class JavaRoutine {
      *
      * @return the channel builder instance.
      */
+    @Nonnull
     public static IOChannelBuilder io() {
 
         return new IOChannelBuilder();

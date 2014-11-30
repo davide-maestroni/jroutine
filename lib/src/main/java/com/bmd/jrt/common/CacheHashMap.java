@@ -60,7 +60,7 @@ public class CacheHashMap<K, V> implements Map<K, V> {
      * @throws NullPointerException if the specified map is null.
      * @see HashMap#HashMap(java.util.Map)
      */
-    public CacheHashMap(final Map<? extends K, ? extends V> map) {
+    public CacheHashMap(@Nonnull final Map<? extends K, ? extends V> map) {
 
         mMap = new HashMap<IdentityWeakReference, V>(map.size());
 
@@ -85,7 +85,7 @@ public class CacheHashMap<K, V> implements Map<K, V> {
      * @param loadFactor      the load factor.
      * @see HashMap#HashMap(int, float)
      */
-    public CacheHashMap(final int initialCapacity, float loadFactor) {
+    public CacheHashMap(final int initialCapacity, final float loadFactor) {
 
         mMap = new HashMap<IdentityWeakReference, V>(initialCapacity, loadFactor);
     }

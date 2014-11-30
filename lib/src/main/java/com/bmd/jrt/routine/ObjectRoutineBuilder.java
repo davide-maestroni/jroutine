@@ -81,9 +81,11 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
         mTargetClass = target.getClass();
     }
 
+    @Nullable
     @SuppressWarnings("unchecked")
-    private static Object callRoutine(final Routine<Object, Object> routine, final Method method,
-            final Object[] args, final ParamType paramType, final ResultType resultType) {
+    private static Object callRoutine(@Nonnull final Routine<Object, Object> routine,
+            @Nonnull final Method method, @Nonnull final Object[] args,
+            @Nonnull final ParamType paramType, @Nonnull final ResultType resultType) {
 
         final Class<?> returnType = method.getReturnType();
         final OutputChannel<Object> outputChannel;
@@ -446,8 +448,9 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
         return itf.cast(proxy(itf.getRawClass()));
     }
 
-    private Method getTargetMethod(final Method method,
-            final Class<?>[] targetParameterTypes) throws NoSuchMethodException {
+    @Nonnull
+    private Method getTargetMethod(@Nonnull final Method method,
+            @Nonnull final Class<?>[] targetParameterTypes) throws NoSuchMethodException {
 
         final Class<?> targetClass = mTargetClass;
         final Async annotation = method.getAnnotation(Async.class);
@@ -481,6 +484,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                 targetMethod = targetClass.getDeclaredMethod(name, targetParameterTypes);
             }
         }
+
         return targetMethod;
     }
 

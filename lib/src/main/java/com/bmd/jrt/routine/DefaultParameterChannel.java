@@ -564,8 +564,8 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
      */
     private class DefaultInputIterator implements InputIterator<INPUT> {
 
-        @Override
         @Nullable
+        @Override
         public Throwable getAbortException() {
 
             synchronized (mMutex) {
@@ -837,7 +837,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
          *
          * @param throwable the reason of the abort.
          */
-        private DelayedAbortExecution(final Throwable throwable) {
+        private DelayedAbortExecution(@Nullable final Throwable throwable) {
 
             mThrowable = throwable;
         }

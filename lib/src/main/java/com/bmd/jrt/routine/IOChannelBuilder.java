@@ -66,7 +66,7 @@ public class IOChannelBuilder {
      * @throws NullPointerException if the specified timeout is null.
      */
     @Nonnull
-    public IOChannelBuilder bufferTimeout(final TimeDuration timeout) {
+    public IOChannelBuilder bufferTimeout(@Nonnull final TimeDuration timeout) {
 
         mBuilder.outputTimeout(timeout);
 

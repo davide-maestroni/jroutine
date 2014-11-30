@@ -133,7 +133,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      * @throws NullPointerException if any of the passed parameter is null.
      */
     protected static RoutineConfigurationBuilder applyConfiguration(
-            final RoutineConfigurationBuilder builder, final Async annotation) {
+            @Nonnull final RoutineConfigurationBuilder builder, @Nonnull final Async annotation) {
 
         final Class<? extends Runner> runnerClass = annotation.runnerClass();
 
@@ -387,6 +387,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      *
      * @return the configurator builder.
      */
+    @Nonnull
     protected RoutineConfigurationBuilder getBuilder() {
 
         return mBuilder;
@@ -397,6 +398,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      *
      * @return the lock ID.
      */
+    @Nullable
     protected String getLockId() {
 
         return mLockId;
@@ -488,6 +490,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      * @throws RoutineException     if an error occurred while instantiating the optional runner
      *                              or the routine.
      */
+    @Nonnull
     protected Routine<Object, Object> method(@Nonnull final RoutineConfiguration configuration,
             @Nullable final String lockId, @Nonnull final Class<?> targetClass,
             @Nonnull final Method targetMethod) {

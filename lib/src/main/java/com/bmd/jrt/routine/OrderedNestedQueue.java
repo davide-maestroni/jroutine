@@ -198,8 +198,8 @@ class OrderedNestedQueue<E> implements NestedQueue<E> {
         return this;
     }
 
-    @Override
     @Nullable
+    @Override
     @SuppressWarnings("unchecked")
     public E removeFirst() {
 

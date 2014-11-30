@@ -517,7 +517,7 @@ public class TimeDuration extends Time {
      * @throws InterruptedException if the current thread is interrupted.
      * @throws NullPointerException if the target object or the specified check are null.
      */
-    public boolean waitTrue(@Nonnull final Object target, final Check check) throws
+    public boolean waitTrue(@Nonnull final Object target, @Nonnull final Check check) throws
             InterruptedException {
 
         if (isZero()) {

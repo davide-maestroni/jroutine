@@ -35,6 +35,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.ProcessingEnvironment;
@@ -183,17 +185,21 @@ public class RoutineProcessor extends AbstractProcessor {
 
             final List<?> elementList = (List<?>) getElementValue(element, annotationType, "value");
 
-            for (final Object targetElement : elementList) {
+            if (elementList != null) {
 
-                createWrapper(classElement, getTypeFromName(targetElement.toString()),
-                              methodElements);
+                for (final Object targetElement : elementList) {
+
+                    createWrapper(classElement, getTypeFromName(targetElement.toString()),
+                                  methodElements);
+                }
             }
         }
 
         return false;
     }
 
-    private String buildGenericTypes(final TypeElement element) {
+    @Nonnull
+    private String buildGenericTypes(@Nonnull final TypeElement element) {
 
         final List<? extends TypeParameterElement> typeParameters = element.getTypeParameters();
 
@@ -217,7 +223,8 @@ public class RoutineProcessor extends AbstractProcessor {
         return builder.append(">").toString();
     }
 
-    private String buildInputParams(final ExecutableElement methodElement) {
+    @Nonnull
+    private String buildInputParams(@Nonnull final ExecutableElement methodElement) {
 
         final StringBuilder builder = new StringBuilder();
 
@@ -229,7 +236,8 @@ public class RoutineProcessor extends AbstractProcessor {
         return builder.toString();
     }
 
-    private String buildParamTypes(final ExecutableElement methodElement) {
+    @Nonnull
+    private String buildParamTypes(@Nonnull final ExecutableElement methodElement) {
 
         final StringBuilder builder = new StringBuilder();
 
@@ -249,7 +257,8 @@ public class RoutineProcessor extends AbstractProcessor {
         return builder.toString();
     }
 
-    private String buildParamValues(final ExecutableElement targetMethodElement) {
+    @Nonnull
+    private String buildParamValues(@Nonnull final ExecutableElement targetMethodElement) {
 
         int count = 0;
         final StringBuilder builder = new StringBuilder();
@@ -271,7 +280,8 @@ public class RoutineProcessor extends AbstractProcessor {
         return builder.toString();
     }
 
-    private CharSequence buildParams(final ExecutableElement methodElement) {
+    @Nonnull
+    private CharSequence buildParams(@Nonnull final ExecutableElement methodElement) {
 
         final StringBuilder builder = new StringBuilder();
 
@@ -288,6 +298,7 @@ public class RoutineProcessor extends AbstractProcessor {
         return builder.toString();
     }
 
+    @Nonnull
     private String buildRoutineFieldsInit(final int size) {
 
         final StringBuilder builder = new StringBuilder();
@@ -305,8 +316,9 @@ public class RoutineProcessor extends AbstractProcessor {
         return builder.toString();
     }
 
-    private String buildRoutineOptions(final TypeElement element,
-            final ExecutableElement methodElement) {
+    @Nonnull
+    private String buildRoutineOptions(@Nonnull final TypeElement element,
+            @Nonnull final ExecutableElement methodElement) {
 
         final StringBuilder builder = new StringBuilder();
 
@@ -337,8 +349,9 @@ public class RoutineProcessor extends AbstractProcessor {
         return builder.toString();
     }
 
-    private void createWrapper(final TypeElement element, final TypeElement targetElement,
-            final List<ExecutableElement> methodElements) {
+    private void createWrapper(@Nonnull final TypeElement element,
+            @Nonnull final TypeElement targetElement,
+            @Nonnull final List<ExecutableElement> methodElements) {
 
         Writer writer = null;
 
@@ -407,8 +420,9 @@ public class RoutineProcessor extends AbstractProcessor {
         }
     }
 
-    private ExecutableElement findMatchingMethod(final ExecutableElement methodElement,
-            final TypeElement targetElement) {
+    @Nonnull
+    private ExecutableElement findMatchingMethod(@Nonnull final ExecutableElement methodElement,
+            @Nonnull final TypeElement targetElement) {
 
         String methodName = methodElement.getSimpleName().toString();
         ExecutableElement targetMethod = null;
@@ -534,8 +548,9 @@ public class RoutineProcessor extends AbstractProcessor {
         return type;
     }
 
-    private Object getElementValue(final Element element, final TypeMirror annotationType,
-            final String valueName) {
+    @Nullable
+    private Object getElementValue(@Nonnull final Element element,
+            @Nonnull final TypeMirror annotationType, @Nonnull final String valueName) {
 
         AnnotationValue value = null;
 
@@ -563,18 +578,20 @@ public class RoutineProcessor extends AbstractProcessor {
         return (value != null) ? value.getValue() : null;
     }
 
-    private PackageElement getPackage(final TypeElement element) {
+    @Nonnull
+    private PackageElement getPackage(@Nonnull final TypeElement element) {
 
         return processingEnv.getElementUtils().getPackageOf(element);
     }
 
-    private TypeElement getTypeFromName(final String typeName) {
+    @Nonnull
+    private TypeElement getTypeFromName(@Nonnull final String typeName) {
 
         return processingEnv.getElementUtils().getTypeElement(normalizeTypeName(typeName));
     }
 
-    private boolean haveSameParameters(final ExecutableElement firstMethodElement,
-            final ExecutableElement secondMethodElement) {
+    private boolean haveSameParameters(@Nonnull final ExecutableElement firstMethodElement,
+            @Nonnull final ExecutableElement secondMethodElement) {
 
         final List<? extends VariableElement> firstTypeParameters =
                 firstMethodElement.getParameters();
@@ -604,8 +621,8 @@ public class RoutineProcessor extends AbstractProcessor {
         return true;
     }
 
-    private void mergeParentMethods(final List<ExecutableElement> methods,
-            final List<ExecutableElement> parentMethods) {
+    private void mergeParentMethods(@Nonnull final List<ExecutableElement> methods,
+            @Nonnull final List<ExecutableElement> parentMethods) {
 
         for (final ExecutableElement parentMethod : parentMethods) {
 
@@ -632,7 +649,8 @@ public class RoutineProcessor extends AbstractProcessor {
         }
     }
 
-    private String normalizeTypeName(final String typeName) {
+    @Nonnull
+    private String normalizeTypeName(@Nonnull final String typeName) {
 
         if (typeName.endsWith(".class")) {
 
@@ -642,7 +660,9 @@ public class RoutineProcessor extends AbstractProcessor {
         return typeName;
     }
 
-    private String parseTemplate(final String path, final byte[] buffer) throws IOException {
+    @Nonnull
+    private String parseTemplate(@Nonnull final String path, @Nonnull final byte[] buffer) throws
+            IOException {
 
         final InputStream resourceStream = RoutineProcessor.class.getResourceAsStream(path);
 
@@ -680,8 +700,8 @@ public class RoutineProcessor extends AbstractProcessor {
         }
     }
 
-    private void writeInstanceOptions(final StringBuilder builder, final TypeElement element,
-            final ExecutableElement methodElement) {
+    private void writeInstanceOptions(@Nonnull final StringBuilder builder,
+            @Nonnull final TypeElement element, @Nonnull final ExecutableElement methodElement) {
 
         final Async classAnnotation = element.getAnnotation(Async.class);
         final Async methodAnnotation = methodElement.getAnnotation(Async.class);
@@ -784,8 +804,8 @@ public class RoutineProcessor extends AbstractProcessor {
         }
     }
 
-    private void writeLogOptions(final StringBuilder builder, final TypeElement element,
-            final ExecutableElement methodElement) {
+    private void writeLogOptions(@Nonnull final StringBuilder builder,
+            @Nonnull final TypeElement element, @Nonnull final ExecutableElement methodElement) {
 
         final Async classAnnotation = element.getAnnotation(Async.class);
         final Async methodAnnotation = methodElement.getAnnotation(Async.class);
@@ -843,9 +863,9 @@ public class RoutineProcessor extends AbstractProcessor {
         }
     }
 
-    private void writeMethod(final Writer writer, final TypeElement element,
-            final TypeElement targetElement, final ExecutableElement methodElement,
-            final int count) throws IOException {
+    private void writeMethod(@Nonnull final Writer writer, @Nonnull final TypeElement element,
+            @Nonnull final TypeElement targetElement,
+            @Nonnull final ExecutableElement methodElement, final int count) throws IOException {
 
         final Types typeUtils = processingEnv.getTypeUtils();
         final TypeElement outputChannelElement = mOutputChannelElement;

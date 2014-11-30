@@ -13,6 +13,8 @@
  */
 package com.bmd.jrt.common;
 
+import javax.annotation.Nullable;
+
 /**
  * Exception wrapping any throwable escaping a routine execution.
  * <p/>
@@ -25,7 +27,7 @@ public class RoutineException extends RuntimeException {
      *
      * @param cause the wrapped exception.
      */
-    public RoutineException(final Throwable cause) {
+    public RoutineException(@Nullable final Throwable cause) {
 
         super(cause);
     }

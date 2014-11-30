@@ -2600,8 +2600,8 @@ public class RoutineTest extends TestCase {
 
     private static class TestInputIterator implements InputIterator<Object> {
 
-        @Override
         @Nullable
+        @Override
         public Throwable getAbortException() {
 
             return null;

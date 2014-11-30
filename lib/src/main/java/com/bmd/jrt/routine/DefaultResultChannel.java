@@ -670,7 +670,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
     @Nullable
     @SuppressWarnings("unchecked")
-    private OUTPUT nextOutput(@Nonnull NestedQueue<Object> outputQueue,
+    private OUTPUT nextOutput(@Nonnull final NestedQueue<Object> outputQueue,
             @Nonnull final TimeDuration timeout) {
 
         final boolean wasInputFull = (mOutputCount >= mMaxOutput);
@@ -1364,7 +1364,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
          *
          * @param throwable the reason of the abort.
          */
-        private DelayedAbortExecution(final Throwable throwable) {
+        private DelayedAbortExecution(@Nullable final Throwable throwable) {
 
             mThrowable = throwable;
         }

@@ -78,6 +78,9 @@ import java.util.concurrent.TimeUnit;
  * means that, in case a {@link java.lang.SecurityManager} is installed, a security exception might
  * be raised based on the specific policy implemented.
  * <p/>
+ * When used to annotate a class instead of a method, its attributes are applied to all the class
+ * methods unless specific values are set in the method annotation.
+ * <p/>
  * Remember also that, in order for the annotation to properly work at run time, you will need to
  * add the following rules to your Proguard file (if employing it for shrinking or obfuscation):
  * <pre>

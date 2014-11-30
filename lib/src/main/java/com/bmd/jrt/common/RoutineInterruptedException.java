@@ -13,6 +13,8 @@
  */
 package com.bmd.jrt.common;
 
+import javax.annotation.Nullable;
+
 /**
  * Exception wrapping a thread interrupted exception caught inside a routine execution.
  * <p/>
@@ -25,7 +27,7 @@ public class RoutineInterruptedException extends RoutineException {
      *
      * @param cause the wrapped exception.
      */
-    public RoutineInterruptedException(final InterruptedException cause) {
+    public RoutineInterruptedException(@Nullable final InterruptedException cause) {
 
         super(cause);
     }
@@ -36,7 +38,7 @@ public class RoutineInterruptedException extends RoutineException {
      * @param exception the thread interrupted exception.
      * @throws RoutineInterruptedException always.
      */
-    public static void interrupt(final InterruptedException exception) throws
+    public static void interrupt(@Nullable final InterruptedException exception) throws
             RoutineInterruptedException {
 
         Thread.currentThread().interrupt();

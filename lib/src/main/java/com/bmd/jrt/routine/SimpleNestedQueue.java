@@ -115,8 +115,8 @@ class SimpleNestedQueue<E> implements NestedQueue<E> {
         return this;
     }
 
-    @Override
     @Nullable
+    @Override
     public E removeFirst() {
 
         return mQueue.removeFirst();

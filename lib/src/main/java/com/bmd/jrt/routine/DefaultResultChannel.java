@@ -583,7 +583,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                             logger.dbg("aborting consumer (%s): %s", consumer, output);
 
-                            consumer.onAbort(((RoutineExceptionWrapper) output).getCause());
+                            consumer.onError(((RoutineExceptionWrapper) output).getCause());
 
                         } catch (final RoutineInterruptedException e) {
 
@@ -1258,30 +1258,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         }
 
         @Override
-        public void onAbort(@Nullable final Throwable reason) {
-
-            synchronized (mMutex) {
-
-                if (!isResultOpen()) {
-
-                    mSubLogger.dbg("avoiding aborting output since result channel is closed");
-
-                    return;
-                }
-
-                mSubLogger.dbg(reason, "aborting output");
-
-                mOutputQueue.clear();
-
-                mAbortException = reason;
-                mState = ChannelState.EXCEPTION;
-            }
-
-            final TimeDuration delay = mDelay;
-            mHandler.onAbort(reason, delay.time, delay.unit);
-        }
-
-        @Override
         public void onComplete() {
 
             boolean isFlush = false;
@@ -1310,6 +1286,30 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 flushOutput();
             }
+        }
+
+        @Override
+        public void onError(@Nullable final Throwable error) {
+
+            synchronized (mMutex) {
+
+                if (!isResultOpen()) {
+
+                    mSubLogger.dbg("avoiding aborting output since result channel is closed");
+
+                    return;
+                }
+
+                mSubLogger.dbg(error, "aborting output");
+
+                mOutputQueue.clear();
+
+                mAbortException = error;
+                mState = ChannelState.EXCEPTION;
+            }
+
+            final TimeDuration delay = mDelay;
+            mHandler.onAbort(error, delay.time, delay.unit);
         }
 
         @Override

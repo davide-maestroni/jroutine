@@ -367,7 +367,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
     @Nonnull
     public Routine<Object, Object> method(@Nonnull final Method method) {
 
-        return method(mBuilder.buildConfiguration(), mLockId, method);
+        return method(mBuilder.buildConfiguration(), mLockId, mTargetClass, method);
     }
 
     /**
@@ -464,13 +464,12 @@ public class ClassRoutineBuilder implements RoutineBuilder {
                 }
             }
 
-            final Class<?> targetClass = mTargetClass;
             final Runner syncRunner = (configuration.getSyncRunner(null) == RunnerType.SEQUENTIAL)
                     ? Runners.sequentialRunner() : Runners.queuedRunner();
 
             routine = new DefaultRoutine<Object, Object>(configuration, syncRunner,
-                                                         MethodSimpleInvocation.class, target,
-                                                         targetClass, method, mutex);
+                                                         MethodSimpleInvocation.class, mTarget,
+                                                         mTargetClass, method, mutex);
             routineMap.put(routineInfo, routine);
         }
 
@@ -482,32 +481,47 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      *
      * @param configuration the routine configuration.
      * @param lockId        the lock ID.
-     * @param method        the method instance.
+     * @param targetClass   the target class.
+     * @param targetMethod  the target method.
      * @return the routine.
-     * @throws NullPointerException if the specified method is null.
+     * @throws NullPointerException if the specified configuration, class or method are null.
      * @throws RoutineException     if an error occurred while instantiating the optional runner
      *                              or the routine.
      */
     protected Routine<Object, Object> method(@Nonnull final RoutineConfiguration configuration,
-            @Nullable final String lockId, @Nonnull final Method method) {
+            @Nullable final String lockId, @Nonnull final Class<?> targetClass,
+            @Nonnull final Method targetMethod) {
 
-        if (!method.isAccessible()) {
+        if (!targetMethod.isAccessible()) {
 
-            AccessController.doPrivileged(new SetAccessibleAction(method));
+            AccessController.doPrivileged(new SetAccessibleAction(targetMethod));
         }
 
-        final DefaultConfigurationBuilder builder = new DefaultConfigurationBuilder();
         String methodLockId = lockId;
-        final Async annotation = method.getAnnotation(Async.class);
+        final DefaultConfigurationBuilder builder = new DefaultConfigurationBuilder();
 
-        if (annotation != null) {
+        final Async classAnnotation = targetClass.getAnnotation(Async.class);
 
-            if (methodLockId == null) {
+        if (classAnnotation != null) {
 
-                methodLockId = annotation.lockId();
+            if (lockId == null) {
+
+                methodLockId = classAnnotation.lockId();
             }
 
-            applyConfiguration(builder, annotation);
+            applyConfiguration(builder, classAnnotation);
+        }
+
+        final Async methodAnnotation = targetMethod.getAnnotation(Async.class);
+
+        if (methodAnnotation != null) {
+
+            if (lockId == null) {
+
+                methodLockId = methodAnnotation.lockId();
+            }
+
+            applyConfiguration(builder, methodAnnotation);
         }
 
         return getRoutine(builder.apply(configuration)
@@ -515,7 +529,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
                                  .inputTimeout(TimeDuration.ZERO)
                                  .outputSize(Integer.MAX_VALUE)
                                  .outputTimeout(TimeDuration.ZERO)
-                                 .buildConfiguration(), methodLockId, method);
+                                 .buildConfiguration(), methodLockId, targetMethod);
     }
 
     private void fillMap(@Nonnull final HashMap<String, Method> map,

@@ -27,12 +27,12 @@ import javax.annotation.Nullable;
 public abstract class TemplateOutputConsumer<OUTPUT> implements OutputConsumer<OUTPUT> {
 
     @Override
-    public void onAbort(@Nullable final Throwable reason) {
+    public void onComplete() {
 
     }
 
     @Override
-    public void onComplete() {
+    public void onError(@Nullable final Throwable error) {
 
     }
 

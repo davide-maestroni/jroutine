@@ -5,10 +5,10 @@
 <body>
 Parallel programming on the go.
 <h2>Usage examples</h2>
-<b>Example 1:</b> Root mean square:
 <p>
     The code below shows how it is possible to implement the computation of the root mean square of some input data, by distributing it in a number of background threads.
 </p>
+<b>Example 1:</b> via invocation implementations:
 <pre>
     <code>
         public class Main {
@@ -28,7 +28,7 @@ Parallel programming on the go.
                 System.exit(0);
             }
 
-            private static class Parse extends BasicInvocation&lt;String, Integer&gt; {
+            private static class Parse extends TemplateInvocation&lt;String, Integer&gt; {
 
                 &commat;Override
                 public void onInput(final String s, &commat;Nonnull final ResultChannel&lt;Integer&gt; result) {
@@ -37,7 +37,7 @@ Parallel programming on the go.
                 }
             }
 
-            private static class Square extends BasicInvocation&lt;Integer, Integer&gt; {
+            private static class Square extends TemplateInvocation&lt;Integer, Integer&gt; {
 
                 &commat;Override
                 public void onInput(final Integer integer, &commat;Nonnull final ResultChannel&lt;Integer&gt; result) {
@@ -47,7 +47,7 @@ Parallel programming on the go.
                 }
             }
 
-            private static class Sum extends BasicInvocation&lt;Integer, Integer&gt; {
+            private static class Sum extends TemplateInvocation&lt;Integer, Integer&gt; {
 
                 private int mSum;
 
@@ -68,6 +68,109 @@ Parallel programming on the go.
 
                     result.pass(mSum);
                 }
+            }
+        }
+    </code>
+</pre>
+<b>Example 2:</b> via reflection:
+<pre>
+    <code>
+        public class Main {
+
+            public static void main(final String[] args) {
+
+                final AsyncMain proxy = on(new Main()).proxy(AsyncMain.class);
+                final int rms = proxy.sum(proxy.square(proxy.parseArg(args)));
+
+                System.out.println(rms);
+
+                System.exit(0);
+            }
+
+            public int parseArg(final String arg) {
+
+                return Integer.parseInt(arg);
+            }
+
+            public int square(final int value) {
+
+                return value * value;
+            }
+
+            public int sum(final int... values) {
+
+                int sum = 0;
+
+                for (final int value : values) {
+
+                    sum += value;
+                }
+
+                return sum;
+            }
+
+            &commat;Async(lockId = Async.UNLOCKED)
+            private interface AsyncMain {
+
+                &commat;AsyncType(int.class)
+                public OutputChannel&lt;Integer&gt; parseArg(&commat;ParallelType(String.class) String[] args);
+
+                &commat;AsyncType(int.class)
+                public int[] square(&commat;ParallelType(int.class) OutputChannel&lt;Integer&gt; value);
+
+                public int sum(int... values);
+            }
+        }
+    </code>
+</pre>
+<b>Example 3:</b> via code generation:
+<pre>
+    <code>
+        public class Main {
+
+            public static void main(final String[] args) {
+
+                final Async proxy = on(new Main()).asClass(Async.class);
+                final int rms = proxy.sum(proxy.square(proxy.parseArg(args)));
+
+                System.out.println(rms);
+
+                System.exit(0);
+            }
+
+            public int parseArg(final String arg) {
+
+                return Integer.parseInt(arg);
+            }
+
+            public int square(final int value) {
+
+                return value * value;
+            }
+
+            public int sum(final int... values) {
+
+                int sum = 0;
+
+                for (final int value : values) {
+
+                    sum += value;
+                }
+
+                return sum;
+            }
+
+            &commat;AsyncClass(Main.class)
+            &commat;Async(lockId = Async.UNLOCKED)
+            private interface Async {
+
+                &commat;AsyncType(int.class)
+                public OutputChannel&lt;Integer&gt; parseArg(&commat;ParallelType(String.class) String[] args);
+
+                &commat;AsyncType(int.class)
+                public int[] square(&commat;ParallelType(int.class) OutputChannel&lt;Integer&gt; value);
+
+                public int sum(int... values);
             }
         }
     </code>

@@ -94,7 +94,7 @@ import java.util.concurrent.TimeUnit;
  * Created by davide on 9/21/14.
  */
 @Inherited
-@Target(ElementType.METHOD)
+@Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Async {
 

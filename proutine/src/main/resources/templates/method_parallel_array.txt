@@ -26,7 +26,7 @@
 
         final java.util.List<${resultClassName}> dontcallmelist = dontcallmechannel.result().readAll();
         final int dontcallmesize = dontcallmelist.size();
-        final ${resultClassName}[] dontcallmearray = new ${resultClassName}[dontcallmesize];
+        final ${resultRawClass}[] dontcallmearray = new ${resultRawClass}[dontcallmesize];
 
         for (int dontcallmei = 0; dontcallmei < dontcallmesize; ++dontcallmei) {
 

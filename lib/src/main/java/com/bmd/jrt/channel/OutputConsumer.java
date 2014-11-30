@@ -25,16 +25,16 @@ import javax.annotation.Nullable;
 public interface OutputConsumer<OUTPUT> {
 
     /**
-     * Called when the bounded channel transfer is aborted.
-     *
-     * @param reason the reason of the abortion.
-     */
-    public void onAbort(@Nullable Throwable reason);
-
-    /**
      * Called when the channel closes after the routine completes its execution.
      */
     public void onComplete();
+
+    /**
+     * Called when the bounded channel transfer is aborted.
+     *
+     * @param error the reason of the abortion.
+     */
+    public void onError(@Nullable Throwable error);
 
     /**
      * Called when an output is passed to the channel.

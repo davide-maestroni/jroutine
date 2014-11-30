@@ -56,8 +56,8 @@ import static com.bmd.jrt.routine.ReflectionUtils.boxingClass;
  */
 public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
-    public static final CacheHashMap<Object, HashMap<WrapperInfo, Object>> sWrapperMap =
-            new CacheHashMap<Object, HashMap<WrapperInfo, Object>>();
+    public static final CacheHashMap<Object, HashMap<ClassInfo, Object>> sClassMap =
+            new CacheHashMap<Object, HashMap<ClassInfo, Object>>();
 
     private static final CacheHashMap<Object, HashMap<Method, Method>> sMethodCache =
             new CacheHashMap<Object, HashMap<Method, Method>>();
@@ -83,14 +83,12 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
     @SuppressWarnings("unchecked")
     private static Object callRoutine(final Routine<Object, Object> routine, final Method method,
-            final Object[] args, final boolean isOverrideParameters, final boolean isParallel,
-            final boolean isResultChannel, final boolean isResultList,
-            final boolean isResultArray) {
+            final Object[] args, final ParamType paramType, final ResultType resultType) {
 
         final Class<?> returnType = method.getReturnType();
         final OutputChannel<Object> outputChannel;
 
-        if (isParallel) {
+        if (paramType == ParamType.PARALLEL) {
 
             final ParameterChannel<Object, Object> parameterChannel = routine.invokeParallel();
             final Class<?> parameterType = method.getParameterTypes()[0];
@@ -125,7 +123,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
             outputChannel = parameterChannel.result();
 
-        } else if (isOverrideParameters) {
+        } else if (paramType == ParamType.ASYNC) {
 
             final ParameterChannel<Object, Object> parameterChannel = routine.invokeAsync();
             final Class<?>[] parameterTypes = method.getParameterTypes();
@@ -154,17 +152,17 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
         if (!Void.class.equals(boxingClass(returnType))) {
 
-            if (isResultChannel) {
+            if (resultType == ResultType.CHANNEL) {
 
                 return outputChannel;
             }
 
-            if (isResultList) {
+            if (resultType == ResultType.LIST) {
 
                 return outputChannel.readAll();
             }
 
-            if (isResultArray) {
+            if (resultType == ResultType.ARRAY) {
 
                 final List<Object> results = outputChannel.readAll();
 
@@ -183,45 +181,6 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
         }
 
         return null;
-    }
-
-    private static String fillConfiguration(final DefaultConfigurationBuilder builder,
-            final String lockId, final Method method, final Method targetMethod) {
-
-        String methodLockId = lockId;
-        final Async annotation = method.getAnnotation(Async.class);
-        final Async targetAnnotation = targetMethod.getAnnotation(Async.class);
-
-        if (targetAnnotation != null) {
-
-            if (lockId.length() == 0) {
-
-                methodLockId = targetAnnotation.lockId();
-            }
-
-            applyConfiguration(builder, targetAnnotation);
-
-            if (annotation != null) {
-
-                if (lockId.length() == 0) {
-
-                    methodLockId = annotation.lockId();
-                }
-
-                applyConfiguration(builder, annotation);
-            }
-
-        } else if (annotation != null) {
-
-            if (lockId.length() == 0) {
-
-                methodLockId = annotation.lockId();
-            }
-
-            applyConfiguration(builder, annotation);
-        }
-
-        return methodLockId;
     }
 
     @Nonnull
@@ -340,52 +299,53 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                     "the specified class is not an interface: " + itf.getCanonicalName());
         }
 
-        synchronized (sWrapperMap) {
+        synchronized (sClassMap) {
 
             final Object target = mTarget;
             final Class<?> targetClass = mTargetClass;
-            final CacheHashMap<Object, HashMap<WrapperInfo, Object>> wrapperMap = sWrapperMap;
+            final CacheHashMap<Object, HashMap<ClassInfo, Object>> classMap = sClassMap;
 
-            HashMap<WrapperInfo, Object> wrappers = wrapperMap.get(target);
+            HashMap<ClassInfo, Object> classes = classMap.get(target);
 
-            if (wrappers == null) {
+            if (classes == null) {
 
-                wrappers = new HashMap<WrapperInfo, Object>();
-                wrapperMap.put(target, wrappers);
+                classes = new HashMap<ClassInfo, Object>();
+                classMap.put(target, classes);
             }
 
             final String lockId = getLockId();
-            final String wrapperLockId = (lockId != null) ? lockId : "";
+            final String classLockId = (lockId != null) ? lockId : "";
             final RoutineConfiguration configuration = getBuilder().buildConfiguration();
-            final WrapperInfo wrapperInfo = new WrapperInfo(configuration, itf, wrapperLockId);
+            final ClassInfo classInfo = new ClassInfo(configuration, itf, classLockId);
 
-            Object wrapper = wrappers.get(wrapperInfo);
+            Object instance = classes.get(classInfo);
 
-            if (wrapper != null) {
+            if (instance != null) {
 
-                return itf.cast(wrapper);
+                return itf.cast(instance);
             }
 
             try {
 
-                final String wrapperClassName =
-                        itf.getPackage().getName() + "." + itf.getSimpleName()
-                                + targetClass.getSimpleName();
+                final Package classPackage = itf.getPackage();
+                final String className =
+                        ((classPackage != null) ? classPackage.getName() + "." : "")
+                                + itf.getSimpleName() + targetClass.getSimpleName();
 
-                final Class<?> wrapperClass = Class.forName(wrapperClassName);
+                final Class<?> wrapperClass = Class.forName(className);
                 final Constructor<?> constructor =
                         wrapperClass.getConstructor(target.getClass(), CacheHashMap.class,
                                                     String.class, RoutineConfiguration.class);
 
                 synchronized (sMutexCache) {
 
-                    wrapper = constructor.newInstance(target, sMutexCache, wrapperLockId,
-                                                      configuration);
+                    instance = constructor.newInstance(target, sMutexCache, classLockId,
+                                                       configuration);
                 }
 
-                wrappers.put(wrapperInfo, wrapper);
+                classes.put(classInfo, instance);
 
-                return itf.cast(wrapper);
+                return itf.cast(instance);
 
             } catch (final InstantiationException e) {
 
@@ -450,11 +410,11 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
         if (itf.isAssignableFrom(mTargetClass)) {
 
-            handler = new ObjectInvocationHandler();
+            handler = new ObjectInvocationHandler(itf);
 
         } else {
 
-            handler = new InterfaceInvocationHandler();
+            handler = new InterfaceInvocationHandler(itf);
         }
 
         final Object proxy =
@@ -525,9 +485,30 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     }
 
     /**
+     * Enumeration defining how parameters are passed to the proxy method.
+     */
+    private enum ParamType {
+
+        ASYNC,      // through an output channel
+        PARALLEL,   // through a list or array
+        DEFAULT     // the normal way
+    }
+
+    /**
+     * Enumeration defining how results are returned by the proxy method.
+     */
+    private enum ResultType {
+
+        CHANNEL,    // through an output channel
+        LIST,       // through a list
+        ARRAY,      // through an array
+        DEFAULT     // the normal way
+    }
+
+    /**
      * Class used as key to identify a specific wrapper instance.
      */
-    private static class WrapperInfo {
+    private static class ClassInfo {
 
         private final RoutineConfiguration mConfiguration;
 
@@ -542,7 +523,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
          * @param itf           the wrapper interface.
          * @param lockId        the lock ID.
          */
-        private WrapperInfo(@Nonnull final RoutineConfiguration configuration,
+        private ClassInfo(@Nonnull final RoutineConfiguration configuration,
                 @Nonnull final Class<?> itf, @Nonnull final String lockId) {
 
             mConfiguration = configuration;
@@ -569,12 +550,12 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                 return true;
             }
 
-            if (!(o instanceof WrapperInfo)) {
+            if (!(o instanceof ClassInfo)) {
 
                 return false;
             }
 
-            final WrapperInfo that = (WrapperInfo) o;
+            final ClassInfo that = (ClassInfo) o;
 
             return mConfiguration.equals(that.mConfiguration) && mItf.equals(that.mItf)
                     && mLockId.equals(that.mLockId);
@@ -588,15 +569,20 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
         private final RoutineConfiguration mConfiguration;
 
+        private final Class<?> mItf;
+
         private final String mLockId;
 
         /**
          * Constructor.
+         *
+         * @param itf the proxy interface.
          */
-        private InterfaceInvocationHandler() {
+        private InterfaceInvocationHandler(@Nonnull final Class<?> itf) {
 
             final String lockId = getLockId();
 
+            mItf = itf;
             mLockId = (lockId != null) ? lockId : "";
             mConfiguration = getBuilder().buildConfiguration();
         }
@@ -608,15 +594,10 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
             final Object target = mTarget;
             final Class<?> returnType = method.getReturnType();
             final Class<?>[] targetParameterTypes = method.getParameterTypes();
-            boolean isOverrideParameters = false;
-            boolean isResultChannel = false;
-            boolean isResultList = false;
-            boolean isResultArray = false;
-            boolean isParallel = false;
+            ParamType paramType = ParamType.DEFAULT;
+            ResultType resultType = ResultType.DEFAULT;
 
             Method targetMethod;
-            String lockId = mLockId;
-            final DefaultConfigurationBuilder builder = new DefaultConfigurationBuilder();
 
             synchronized (sMethodCache) {
 
@@ -635,15 +616,15 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
                     if (returnType.isArray()) {
 
-                        isResultArray = true;
+                        resultType = ResultType.ARRAY;
 
                     } else if (returnType.isAssignableFrom(List.class)) {
 
-                        isResultList = true;
+                        resultType = ResultType.LIST;
 
                     } else if (returnType.isAssignableFrom(OutputChannel.class)) {
 
-                        isResultChannel = true;
+                        resultType = ResultType.CHANNEL;
 
                     } else {
 
@@ -671,7 +652,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                                         "the async input parameter is not compatible");
                             }
 
-                            isOverrideParameters = true;
+                            paramType = ParamType.ASYNC;
 
                             targetParameterTypes[i] = ((AsyncType) paramAnnotation).value();
 
@@ -691,7 +672,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                                         "the async input parameter is not compatible");
                             }
 
-                            isParallel = true;
+                            paramType = ParamType.PARALLEL;
 
                             targetParameterTypes[i] = ((ParallelType) paramAnnotation).value();
 
@@ -706,16 +687,18 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
                     targetMethod = getTargetMethod(method, targetParameterTypes);
 
+                    final Class<?> targetReturnType = targetMethod.getReturnType();
+
                     if ((overrideAnnotation == null) && !returnType.isAssignableFrom(
-                            targetMethod.getReturnType())) {
+                            targetReturnType)) {
 
                         throw new IllegalArgumentException(
                                 "the async return type is not compatible");
                     }
 
-                    if (isResultArray && !returnType.getComponentType()
-                                                    .isAssignableFrom(
-                                                            targetMethod.getReturnType())) {
+                    if ((resultType == ResultType.ARRAY) && !returnType.getComponentType()
+                                                                       .isAssignableFrom(
+                                                                               targetReturnType)) {
 
                         throw new IllegalArgumentException(
                                 "the async return type is not compatible");
@@ -733,13 +716,38 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                                 "the async return type is not compatible");
                     }
                 }
+            }
 
-                lockId = fillConfiguration(builder, lockId, method, targetMethod);
+            String lockId = mLockId;
+            final DefaultConfigurationBuilder builder = new DefaultConfigurationBuilder();
+
+            final Async classAnnotation = mItf.getAnnotation(Async.class);
+
+            if (classAnnotation != null) {
+
+                if (mLockId.length() == 0) {
+
+                    lockId = classAnnotation.lockId();
+                }
+
+                applyConfiguration(builder, classAnnotation);
+            }
+
+            final Async methodAnnotation = method.getAnnotation(Async.class);
+
+            if (methodAnnotation != null) {
+
+                if (mLockId.length() == 0) {
+
+                    lockId = methodAnnotation.lockId();
+                }
+
+                applyConfiguration(builder, methodAnnotation);
             }
 
             builder.apply(mConfiguration);
 
-            if (isOverrideParameters) {
+            if (paramType == ParamType.ASYNC) {
 
                 builder.inputOrder(DataOrder.INSERTION);
             }
@@ -752,8 +760,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
             final Routine<Object, Object> routine =
                     getRoutine(builder.buildConfiguration(), lockId, targetMethod);
 
-            return callRoutine(routine, method, args, isOverrideParameters, isParallel,
-                               isResultChannel, isResultList, isResultArray);
+            return callRoutine(routine, method, args, paramType, resultType);
         }
     }
 
@@ -764,13 +771,18 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
         private final RoutineConfiguration mConfiguration;
 
+        private final Class<?> mItf;
+
         private final String mLockId;
 
         /**
          * Constructor.
+         *
+         * @param itf the proxy interface.
          */
-        private ObjectInvocationHandler() {
+        private ObjectInvocationHandler(@Nonnull final Class<?> itf) {
 
+            mItf = itf;
             mLockId = getLockId();
             mConfiguration = getBuilder().buildConfiguration();
         }
@@ -780,7 +792,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                 Throwable {
 
             final OutputChannel<Object> outputChannel =
-                    method(mConfiguration, mLockId, method).callAsync(args);
+                    method(mConfiguration, mLockId, mItf, method).callAsync(args);
 
             final Class<?> returnType = method.getReturnType();
 

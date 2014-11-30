@@ -55,13 +55,13 @@ class LooperRunner implements Runner {
     public void run(@Nonnull final Execution execution, final long delay,
             @Nonnull final TimeUnit timeUnit) {
 
-        if (delay > 0) {
-
-            mHandler.postDelayed(execution, timeUnit.toMillis(delay));
-
-        } else if (Thread.currentThread().equals(mThread)) {
+        if (Thread.currentThread().equals(mThread)) {
 
             mQueuedRunner.run(execution, delay, timeUnit);
+
+        } else if (delay > 0) {
+
+            mHandler.postDelayed(execution, timeUnit.toMillis(delay));
 
         } else {
 

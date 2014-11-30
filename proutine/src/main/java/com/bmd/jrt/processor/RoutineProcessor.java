@@ -305,13 +305,13 @@ public class RoutineProcessor extends AbstractProcessor {
         return builder.toString();
     }
 
-    private String buildRoutineOptions(final ExecutableElement methodElement,
-            final ExecutableElement targetMethodElement) {
+    private String buildRoutineOptions(final TypeElement element,
+            final ExecutableElement methodElement) {
 
         final StringBuilder builder = new StringBuilder();
 
-        writeInstanceOptions(builder, methodElement, targetMethodElement);
-        writeLogOptions(builder, methodElement, targetMethodElement);
+        writeInstanceOptions(builder, element, methodElement);
+        writeLogOptions(builder, element, methodElement);
 
         boolean isOverrideParameters = false;
 
@@ -380,7 +380,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
                 ++count;
 
-                writeMethod(writer, methodElement, targetElement, count);
+                writeMethod(writer, element, targetElement, methodElement, count);
             }
 
             writer.append(mFooter);
@@ -680,11 +680,11 @@ public class RoutineProcessor extends AbstractProcessor {
         }
     }
 
-    private void writeInstanceOptions(final StringBuilder builder,
-            final ExecutableElement methodElement, final ExecutableElement targetMethodElement) {
+    private void writeInstanceOptions(final StringBuilder builder, final TypeElement element,
+            final ExecutableElement methodElement) {
 
-        final Async annotation = methodElement.getAnnotation(Async.class);
-        final Async targetAnnotation = targetMethodElement.getAnnotation(Async.class);
+        final Async classAnnotation = element.getAnnotation(Async.class);
+        final Async methodAnnotation = methodElement.getAnnotation(Async.class);
 
         final TypeElement annotationElement = getTypeFromName(Async.class.getCanonicalName());
         final TypeMirror annotationType = annotationElement.asType();
@@ -696,7 +696,7 @@ public class RoutineProcessor extends AbstractProcessor {
         TimeUnit availTimeUnit = null;
         TypeElement runnerElement = null;
 
-        if (annotation != null) {
+        if (methodAnnotation != null) {
 
             final Object runner = getElementValue(methodElement, annotationType, "runnerClass");
 
@@ -705,20 +705,19 @@ public class RoutineProcessor extends AbstractProcessor {
                 runnerElement = getTypeFromName(runner.toString());
             }
 
-            runnerType = annotation.runnerType();
-            maxRunning = annotation.maxRunning();
-            maxRetained = annotation.maxRetained();
-            availTimeout = annotation.availTimeout();
-            availTimeUnit = annotation.availTimeUnit();
+            runnerType = methodAnnotation.runnerType();
+            maxRunning = methodAnnotation.maxRunning();
+            maxRetained = methodAnnotation.maxRetained();
+            availTimeout = methodAnnotation.availTimeout();
+            availTimeUnit = methodAnnotation.availTimeUnit();
         }
 
-        if (targetAnnotation != null) {
+        if (classAnnotation != null) {
 
             if ((runnerElement == null) || runnerElement.equals(
                     getTypeFromName(DefaultRunner.class.getCanonicalName()))) {
 
-                final Object runner =
-                        getElementValue(targetMethodElement, annotationType, "runnerClass");
+                final Object runner = getElementValue(element, annotationType, "runnerClass");
 
                 if (runner != null) {
 
@@ -728,23 +727,23 @@ public class RoutineProcessor extends AbstractProcessor {
 
             if (runnerType == RunnerType.DEFAULT) {
 
-                runnerType = targetAnnotation.runnerType();
+                runnerType = classAnnotation.runnerType();
             }
 
             if (maxRunning == RoutineBuilder.DEFAULT) {
 
-                maxRunning = targetAnnotation.maxRunning();
+                maxRunning = classAnnotation.maxRunning();
             }
 
             if (maxRetained == RoutineBuilder.DEFAULT) {
 
-                maxRetained = targetAnnotation.maxRetained();
+                maxRetained = classAnnotation.maxRetained();
             }
 
             if (availTimeout == RoutineBuilder.DEFAULT) {
 
-                availTimeout = targetAnnotation.availTimeout();
-                availTimeUnit = targetAnnotation.availTimeUnit();
+                availTimeout = classAnnotation.availTimeout();
+                availTimeUnit = classAnnotation.availTimeUnit();
             }
         }
 
@@ -785,11 +784,11 @@ public class RoutineProcessor extends AbstractProcessor {
         }
     }
 
-    private void writeLogOptions(final StringBuilder builder, final ExecutableElement methodElement,
-            final ExecutableElement targetMethodElement) {
+    private void writeLogOptions(final StringBuilder builder, final TypeElement element,
+            final ExecutableElement methodElement) {
 
-        final Async annotation = methodElement.getAnnotation(Async.class);
-        final Async targetAnnotation = targetMethodElement.getAnnotation(Async.class);
+        final Async classAnnotation = element.getAnnotation(Async.class);
+        final Async methodAnnotation = methodElement.getAnnotation(Async.class);
 
         final TypeElement annotationElement = getTypeFromName(Async.class.getCanonicalName());
         final TypeMirror annotationType = annotationElement.asType();
@@ -797,7 +796,7 @@ public class RoutineProcessor extends AbstractProcessor {
         LogLevel logLevel = LogLevel.DEFAULT;
         TypeElement logElement = null;
 
-        if (annotation != null) {
+        if (methodAnnotation != null) {
 
             final Object log = getElementValue(methodElement, annotationType, "log");
 
@@ -806,15 +805,15 @@ public class RoutineProcessor extends AbstractProcessor {
                 logElement = getTypeFromName(log.toString());
             }
 
-            logLevel = annotation.logLevel();
+            logLevel = methodAnnotation.logLevel();
         }
 
-        if (targetAnnotation != null) {
+        if (classAnnotation != null) {
 
             if ((logElement == null) || logElement.equals(
                     getTypeFromName(DefaultLog.class.getCanonicalName()))) {
 
-                final Object log = getElementValue(targetMethodElement, annotationType, "log");
+                final Object log = getElementValue(element, annotationType, "log");
 
                 if (log != null) {
 
@@ -824,7 +823,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
             if (logLevel == LogLevel.DEFAULT) {
 
-                logLevel = targetAnnotation.logLevel();
+                logLevel = classAnnotation.logLevel();
             }
         }
 
@@ -844,8 +843,9 @@ public class RoutineProcessor extends AbstractProcessor {
         }
     }
 
-    private void writeMethod(final Writer writer, final ExecutableElement methodElement,
-            final TypeElement targetElement, final int count) throws IOException {
+    private void writeMethod(final Writer writer, final TypeElement element,
+            final TypeElement targetElement, final ExecutableElement methodElement,
+            final int count) throws IOException {
 
         final Types typeUtils = processingEnv.getTypeUtils();
         final TypeElement outputChannelElement = mOutputChannelElement;
@@ -945,11 +945,12 @@ public class RoutineProcessor extends AbstractProcessor {
         methodHeader = mMethodHeader.replace("${resultClassName}", resultClassName);
         methodHeader = methodHeader.replace("${methodCount}", Integer.toString(count));
         methodHeader = methodHeader.replace("${routineBuilderOptions}",
-                                            buildRoutineOptions(methodElement, targetMethod));
+                                            buildRoutineOptions(element, methodElement));
 
         writer.append(methodHeader);
 
         method = method.replace("${resultClassName}", resultClassName);
+        method = method.replace("${resultRawClass}", targetReturnType.toString());
         method = method.replace("${resultType}", methodElement.getReturnType().toString());
         method = method.replace("${methodCount}", Integer.toString(count));
         method = method.replace("${methodName}", methodElement.getSimpleName());
@@ -970,19 +971,19 @@ public class RoutineProcessor extends AbstractProcessor {
         methodFooter = methodFooter.replace("${targetMethodName}", targetMethod.getSimpleName());
         methodFooter = methodFooter.replace("${paramValues}", buildParamValues(targetMethod));
 
-        final Async annotation = methodElement.getAnnotation(Async.class);
-        final Async targetAnnotation = targetMethod.getAnnotation(Async.class);
+        final Async classAnnotation = element.getAnnotation(Async.class);
+        final Async methodAnnotation = methodElement.getAnnotation(Async.class);
 
         String lockId = Async.DEFAULT_ID;
 
-        if (annotation != null) {
+        if (methodAnnotation != null) {
 
-            lockId = annotation.lockId();
+            lockId = methodAnnotation.lockId();
         }
 
-        if ((targetAnnotation != null) && (lockId.equals(Async.DEFAULT_ID))) {
+        if ((classAnnotation != null) && (lockId.equals(Async.DEFAULT_ID))) {
 
-            lockId = targetAnnotation.lockId();
+            lockId = classAnnotation.lockId();
         }
 
         methodFooter = methodFooter.replace("${lockId}", lockId);

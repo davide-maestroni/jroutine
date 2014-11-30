@@ -702,30 +702,6 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
         }
 
         @Override
-        public void onAbort(@Nullable final Throwable reason) {
-
-            synchronized (mMutex) {
-
-                if (!isOpen() && (mState != ChannelState.OUTPUT)) {
-
-                    mSubLogger.wrn("avoiding aborting consumer since channel is closed");
-
-                    return;
-                }
-
-                mSubLogger.dbg("aborting consumer");
-
-                mInputQueue.clear();
-
-                mAbortException = reason;
-                mState = ChannelState.EXCEPTION;
-            }
-
-            final TimeDuration delay = mDelay;
-            mRunner.run(mExecution.abort(), delay.time, delay.unit);
-        }
-
-        @Override
         public void onComplete() {
 
             final boolean isPendingExecution;
@@ -752,6 +728,30 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
                 mRunner.run(mExecution, 0, TimeUnit.MILLISECONDS);
             }
+        }
+
+        @Override
+        public void onError(@Nullable final Throwable error) {
+
+            synchronized (mMutex) {
+
+                if (!isOpen() && (mState != ChannelState.OUTPUT)) {
+
+                    mSubLogger.wrn("avoiding aborting consumer since channel is closed");
+
+                    return;
+                }
+
+                mSubLogger.dbg("aborting consumer");
+
+                mInputQueue.clear();
+
+                mAbortException = error;
+                mState = ChannelState.EXCEPTION;
+            }
+
+            final TimeDuration delay = mDelay;
+            mRunner.run(mExecution.abort(), delay.time, delay.unit);
         }
 
         @Override

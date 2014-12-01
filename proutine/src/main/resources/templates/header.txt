@@ -39,7 +39,7 @@ public final class ${interfaceName}${className}${genericTypes} implements ${inte
 
         mWrapped = wrapped;
         mMutexMap = mutexMap;
-        mLockName = ((lockName != null) && !com.bmd.jrt.annotation.Async.DEFAULT_NAME.equals(lockName) ? lockName : null;
+        mLockName = ((lockName != null) && !com.bmd.jrt.annotation.Async.DEFAULT_NAME.equals(lockName)) ? lockName : null;
         ${routineFieldsInit}
     }
 

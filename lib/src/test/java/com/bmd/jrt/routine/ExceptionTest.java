@@ -50,8 +50,7 @@ public class ExceptionTest extends TestCase {
                 RoutineInvocationException.class);
         assertThat(new RoutineInvocationException(new NullPointerException(), this, Object.class,
                                                   waitMethod.getName()).getCause())
-                .isExactlyInstanceOf(
-                NullPointerException.class);
+                .isExactlyInstanceOf(NullPointerException.class);
         assertThat(new RoutineInvocationException(null, null, Object.class,
                                                   waitMethod.getName())).hasNoCause();
         assertThat(new RoutineInvocationException(new NullPointerException(), this, Object.class,

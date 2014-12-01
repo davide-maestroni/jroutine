@@ -71,7 +71,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      *
      * @param target the target object instance.
      * @throws NullPointerException     if the specified target is null.
-     * @throws IllegalArgumentException if a duplicate tag in the annotations is detected.
+     * @throws IllegalArgumentException if a duplicate name in the annotations is detected.
      */
     ObjectRoutineBuilder(@Nonnull final Object target) {
 
@@ -269,9 +269,9 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
     @Nonnull
     @Override
-    public ObjectRoutineBuilder lockId(@Nullable final String id) {
+    public ObjectRoutineBuilder lockName(@Nullable final String lockName) {
 
-        super.lockId(id);
+        super.lockName(lockName);
 
         return this;
     }
@@ -315,10 +315,10 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                 classMap.put(target, classes);
             }
 
-            final String lockId = getLockId();
-            final String classLockId = (lockId != null) ? lockId : "";
+            final String lockName = getLockName();
+            final String classLockName = (lockName != null) ? lockName : Async.DEFAULT_NAME;
             final RoutineConfiguration configuration = getBuilder().buildConfiguration();
-            final ClassInfo classInfo = new ClassInfo(configuration, itf, classLockId);
+            final ClassInfo classInfo = new ClassInfo(configuration, itf, classLockName);
 
             Object instance = classes.get(classInfo);
 
@@ -341,7 +341,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
                 synchronized (sMutexCache) {
 
-                    instance = constructor.newInstance(target, sMutexCache, classLockId,
+                    instance = constructor.newInstance(target, sMutexCache, classLockName,
                                                        configuration);
                 }
 
@@ -388,7 +388,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * The routines used for calling the methods will honor the attributes specified in any
      * optional {@link Async} annotation.<br/>
      * In case the wrapped object does not implement the specified interface, the value attribute
-     * will be used to bind the interface method with the instance ones. If no tag is assigned the
+     * will be used to bind the interface method with the instance ones. If no name is assigned the
      * method name will be used instead to map it.<br/>
      * The interface will be interpreted as a mirror of the target object methods, and the optional
      * {@link AsyncType} and {@link ParallelType} annotations will be honored.
@@ -431,7 +431,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * The routines used for calling the methods will honor the attributes specified in any
      * optional {@link Async} annotation.<br/>
      * In case the wrapped object does not implement the specified interface, the value attribute
-     * will be used to bind the interface method with the instance ones. If no tag is assigned the
+     * will be used to bind the interface method with the instance ones. If no name is assigned the
      * method name will be used instead to map it.<br/>
      * The interface will be interpreted as a mirror of the target object methods, and the optional
      * {@link AsyncType} and {@link ParallelType} annotations will be honored.
@@ -518,21 +518,21 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
         private final Class<?> mItf;
 
-        private final String mLockId;
+        private final String mLockName;
 
         /**
          * Constructor.
          *
          * @param configuration the routine configuration.
          * @param itf           the wrapper interface.
-         * @param lockId        the lock ID.
+         * @param lockName      the lock name.
          */
         private ClassInfo(@Nonnull final RoutineConfiguration configuration,
-                @Nonnull final Class<?> itf, @Nonnull final String lockId) {
+                @Nonnull final Class<?> itf, @Nonnull final String lockName) {
 
             mConfiguration = configuration;
             mItf = itf;
-            mLockId = lockId;
+            mLockName = lockName;
         }
 
         @Override
@@ -541,7 +541,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
             // auto-generated code
             int result = mConfiguration.hashCode();
             result = 31 * result + mItf.hashCode();
-            result = 31 * result + mLockId.hashCode();
+            result = 31 * result + mLockName.hashCode();
             return result;
         }
 
@@ -561,8 +561,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
             final ClassInfo that = (ClassInfo) o;
 
-            return mConfiguration.equals(that.mConfiguration) && mItf.equals(that.mItf)
-                    && mLockId.equals(that.mLockId);
+            return mConfiguration.equals(that.mConfiguration) && mItf.equals(that.mItf) && mLockName
+                    .equals(that.mLockName);
         }
     }
 
@@ -575,7 +575,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
         private final Class<?> mItf;
 
-        private final String mLockId;
+        private final String mLockName;
 
         /**
          * Constructor.
@@ -584,10 +584,10 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
          */
         private InterfaceInvocationHandler(@Nonnull final Class<?> itf) {
 
-            final String lockId = getLockId();
+            final String lockName = getLockName();
 
             mItf = itf;
-            mLockId = (lockId != null) ? lockId : "";
+            mLockName = (lockName != null) ? lockName : Async.DEFAULT_NAME;
             mConfiguration = getBuilder().buildConfiguration();
         }
 
@@ -722,16 +722,16 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                 }
             }
 
-            String lockId = mLockId;
+            String lockName = mLockName;
             final DefaultConfigurationBuilder builder = new DefaultConfigurationBuilder();
 
             final Async classAnnotation = mItf.getAnnotation(Async.class);
 
             if (classAnnotation != null) {
 
-                if (mLockId.length() == 0) {
+                if (Async.DEFAULT_NAME.equals(mLockName)) {
 
-                    lockId = classAnnotation.lockId();
+                    lockName = classAnnotation.lockName();
                 }
 
                 applyConfiguration(builder, classAnnotation);
@@ -741,9 +741,14 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
             if (methodAnnotation != null) {
 
-                if (mLockId.length() == 0) {
+                if (Async.DEFAULT_NAME.equals(mLockName)) {
 
-                    lockId = methodAnnotation.lockId();
+                    final String annotationLockName = methodAnnotation.lockName();
+
+                    if (!Async.DEFAULT_NAME.equals(annotationLockName)) {
+
+                        lockName = annotationLockName;
+                    }
                 }
 
                 applyConfiguration(builder, methodAnnotation);
@@ -762,7 +767,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                    .outputTimeout(TimeDuration.ZERO);
 
             final Routine<Object, Object> routine =
-                    getRoutine(builder.buildConfiguration(), lockId, targetMethod);
+                    getRoutine(builder.buildConfiguration(), lockName, targetMethod);
 
             return callRoutine(routine, method, args, paramType, resultType);
         }
@@ -777,7 +782,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
         private final Class<?> mItf;
 
-        private final String mLockId;
+        private final String mLockName;
 
         /**
          * Constructor.
@@ -787,7 +792,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
         private ObjectInvocationHandler(@Nonnull final Class<?> itf) {
 
             mItf = itf;
-            mLockId = getLockId();
+            mLockName = getLockName();
             mConfiguration = getBuilder().buildConfiguration();
         }
 
@@ -796,7 +801,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                 Throwable {
 
             final OutputChannel<Object> outputChannel =
-                    method(mConfiguration, mLockId, mItf, method).callAsync(args);
+                    method(mConfiguration, mLockName, mItf, method).callAsync(args);
 
             final Class<?> returnType = method.getReturnType();
 

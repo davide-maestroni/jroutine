@@ -27,4 +27,10 @@ public class DeadLockException extends RoutineException {
 
         super(null);
     }
+
+    @Override
+    public boolean needsUnwrap() {
+
+        return false;
+    }
 }

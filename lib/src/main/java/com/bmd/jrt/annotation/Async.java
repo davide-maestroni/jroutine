@@ -35,8 +35,8 @@ import java.util.concurrent.TimeUnit;
  * (unless immutable) in protected and non-protected code, or to use the framework to call
  * synchronous methods as well.<br/>
  * In a dual way, it is possible to exclude single methods from this kind of protection by
- * indicating them as having a different lock. Each lock has an ID associated, and every method
- * with a specific lock is protected only from the other methods with the same lock ID.
+ * indicating them as having a different lock. Each lock has a name associated, and every method
+ * with a specific lock is protected only from the other methods with the same lock name.
  * <p/>
  * This annotation allows to identify the method through a constant, thus avoiding issues when
  * running obfuscation tools.<br/>
@@ -46,9 +46,9 @@ import java.util.concurrent.TimeUnit;
  *
  *         public class MyClass {
  *
- *             public static final String METHOD_TAG = "get";
+ *             public static final String METHOD_NAME = "get";
  *
- *             &#64;Async(METHOD_TAG)
+ *             &#64;Async(METHOD_NAME)
  *             public int getOne() {
  *
  *                 return 1;
@@ -60,7 +60,7 @@ import java.util.concurrent.TimeUnit;
  * <pre>
  *     <code>
  *
- *         JavaRoutine.on(new MyClass()).method(MyClass.METHOD_TAG).callAsync();
+ *         JavaRoutine.on(new MyClass()).method(MyClass.METHOD_NAME).callAsync();
  *     </code>
  * </pre>
  * <p/>
@@ -102,14 +102,14 @@ import java.util.concurrent.TimeUnit;
 public @interface Async {
 
     /**
-     * Constant indicating a default ID value.
+     * Constant indicating a default name value.
      */
-    static final String DEFAULT_ID = "";
+    static final String DEFAULT_NAME = "";
 
     /**
-     * Constant indicating a null lock ID.
+     * Constant indicating a null lock name.
      */
-    static final String UNLOCKED = "com.bmd.jrt.annotation.Async.UNLOCKED";
+    static final String NULL_LOCK = "com.bmd.jrt.annotation.Async.NULL_LOCK";
 
     /**
      * The time unit of the timeout for an invocation instance to become available.
@@ -126,11 +126,11 @@ public @interface Async {
     long availTimeout() default RoutineBuilder.DEFAULT;
 
     /**
-     * The ID of the lock associated with the annotated method.
+     * The name of the lock associated with the annotated method.
      *
-     * @return the lock ID.
+     * @return the lock name.
      */
-    String lockId() default DEFAULT_ID;
+    String lockName() default DEFAULT_NAME;
 
     /**
      * The class of the log to be used.
@@ -175,9 +175,9 @@ public @interface Async {
     RunnerType runnerType() default RunnerType.DEFAULT;
 
     /**
-     * The tag used to identify the method independently from its original signature.
+     * The name used to identify the method independently from its original signature.
      *
-     * @return the tag.
+     * @return the name.
      */
-    String value() default DEFAULT_ID;
+    String value() default DEFAULT_NAME;
 }

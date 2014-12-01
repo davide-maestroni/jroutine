@@ -78,9 +78,11 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
     private TimeDuration mInputDelay = ZERO;
 
+    private boolean mIsConsuming;
+
     private boolean mIsPendingExecution;
 
-    private int mPendingInputCount;
+    private int mPendingExecutionCount;
 
     private ChannelState mState = ChannelState.INPUT;
 
@@ -268,7 +270,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
             delay = mInputDelay;
 
-            ++mPendingInputCount;
+            ++mPendingExecutionCount;
 
             mLogger.dbg("passing channel: %s", channel);
 
@@ -286,7 +288,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
         NestedQueue<INPUT> inputQueue;
         ArrayList<INPUT> list = null;
-        boolean isPendingExecution = false;
+        boolean needsExecution = false;
         final TimeDuration delay;
 
         synchronized (mMutex) {
@@ -333,24 +335,24 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
             if (delay.isZero()) {
 
-                isPendingExecution = mIsPendingExecution;
+                needsExecution = !mIsPendingExecution;
 
-                if (!isPendingExecution) {
+                if (needsExecution) {
 
-                    ++mPendingInputCount;
+                    ++mPendingExecutionCount;
 
                     mIsPendingExecution = true;
                 }
 
             } else {
 
-                ++mPendingInputCount;
+                ++mPendingExecutionCount;
             }
         }
 
         if (delay.isZero()) {
 
-            if (!isPendingExecution) {
+            if (needsExecution) {
 
                 mRunner.run(mExecution, 0, TimeUnit.MILLISECONDS);
             }
@@ -368,7 +370,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
     public ParameterChannel<INPUT, OUTPUT> pass(@Nullable final INPUT input) {
 
         NestedQueue<INPUT> inputQueue;
-        boolean isPendingExecution = false;
+        boolean needsExecution = false;
         final TimeDuration delay;
 
         synchronized (mMutex) {
@@ -393,24 +395,24 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
             if (delay.isZero()) {
 
-                isPendingExecution = mIsPendingExecution;
+                needsExecution = !mIsPendingExecution;
 
-                if (!isPendingExecution) {
+                if (needsExecution) {
 
-                    ++mPendingInputCount;
+                    ++mPendingExecutionCount;
 
                     mIsPendingExecution = true;
                 }
 
             } else {
 
-                ++mPendingInputCount;
+                ++mPendingExecutionCount;
             }
         }
 
         if (delay.isZero()) {
 
-            if (!isPendingExecution) {
+            if (needsExecution) {
 
                 mRunner.run(mExecution, 0, TimeUnit.MILLISECONDS);
             }
@@ -446,7 +448,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
     @Override
     public OutputChannel<OUTPUT> result() {
 
-        final boolean isPendingExecution;
+        final boolean needsExecution;
 
         synchronized (mMutex) {
 
@@ -456,17 +458,17 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
             mState = ChannelState.OUTPUT;
 
-            isPendingExecution = mIsPendingExecution;
+            needsExecution = !mIsPendingExecution && !mIsConsuming;
 
-            if (!isPendingExecution) {
+            if (needsExecution) {
 
-                ++mPendingInputCount;
+                ++mPendingExecutionCount;
 
                 mIsPendingExecution = true;
             }
         }
 
-        if (!isPendingExecution) {
+        if (needsExecution) {
 
             mRunner.run(mExecution, 0, TimeUnit.MILLISECONDS);
         }
@@ -491,12 +493,14 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
         }
     }
 
+    private boolean isInput() {
+
+        return ((mState == ChannelState.INPUT) || (mState == ChannelState.OUTPUT));
+    }
+
     private boolean isInputComplete() {
 
-        synchronized (mMutex) {
-
-            return (mState == ChannelState.OUTPUT) && (mPendingInputCount <= 0);
-        }
+        return (mState == ChannelState.OUTPUT) && (mPendingExecutionCount <= 0);
     }
 
     private void verifyInput() {
@@ -592,12 +596,6 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
             }
         }
 
-        @Override
-        public boolean isComplete() {
-
-            return isInputComplete();
-        }
-
         @Nullable
         @Override
         @SuppressFBWarnings(value = "NO_NOTIFY_NOT_NOTIFYALL",
@@ -652,29 +650,36 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
         }
 
         @Override
-        public void onConsumeInput() {
+        public boolean onConsumeComplete() {
+
+            synchronized (mMutex) {
+
+                mIsConsuming = false;
+
+                return isInputComplete();
+            }
+        }
+
+        @Override
+        public void onConsumeStart() {
 
             synchronized (mMutex) {
 
                 if (!isInput()) {
 
                     mLogger.wrn("avoiding consuming input since invocation is aborted [#%d]",
-                                mPendingInputCount);
+                                mPendingExecutionCount);
 
                     return;
                 }
 
-                mLogger.dbg("consuming input [#%d]", mPendingInputCount);
+                mLogger.dbg("consuming input [#%d]", mPendingExecutionCount);
 
-                --mPendingInputCount;
+                --mPendingExecutionCount;
 
                 mIsPendingExecution = false;
+                mIsConsuming = true;
             }
-        }
-
-        private boolean isInput() {
-
-            return ((mState == ChannelState.INPUT) || (mState == ChannelState.OUTPUT));
         }
     }
 
@@ -704,7 +709,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
         @Override
         public void onComplete() {
 
-            final boolean isPendingExecution;
+            final boolean needsExecution;
 
             synchronized (mMutex) {
 
@@ -712,19 +717,19 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
                 mQueue.close();
 
-                isPendingExecution = mIsPendingExecution;
+                needsExecution = !mIsPendingExecution && !mIsConsuming;
 
-                if (!isPendingExecution) {
+                if (needsExecution) {
 
                     mIsPendingExecution = true;
 
                 } else {
 
-                    --mPendingInputCount;
+                    --mPendingExecutionCount;
                 }
             }
 
-            if (!isPendingExecution) {
+            if (needsExecution) {
 
                 mRunner.run(mExecution, 0, TimeUnit.MILLISECONDS);
             }
@@ -758,7 +763,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
         public void onOutput(final INPUT output) {
 
             NestedQueue<INPUT> inputQueue;
-            boolean isPendingExecution = false;
+            boolean needsExecution = false;
             final TimeDuration delay = mDelay;
 
             synchronized (mMutex) {
@@ -796,24 +801,24 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
                 if (delay.isZero()) {
 
-                    isPendingExecution = mIsPendingExecution;
+                    needsExecution = !mIsPendingExecution;
 
-                    if (!isPendingExecution) {
+                    if (needsExecution) {
 
-                        ++mPendingInputCount;
+                        ++mPendingExecutionCount;
 
                         mIsPendingExecution = true;
                     }
 
                 } else {
 
-                    ++mPendingInputCount;
+                    ++mPendingExecutionCount;
                 }
             }
 
             if (delay.isZero()) {
 
-                if (!isPendingExecution) {
+                if (needsExecution) {
 
                     mRunner.run(mExecution, 0, TimeUnit.MILLISECONDS);
                 }
@@ -895,7 +900,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
             synchronized (mMutex) {
 
-                if ((mState != ChannelState.INPUT) && (mState != ChannelState.OUTPUT)) {
+                if (!isInput()) {
 
                     mLogger.dbg("avoiding delayed input execution since channel is closed: %s",
                                 mInput);
@@ -939,7 +944,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
             synchronized (mMutex) {
 
-                if ((mState != ChannelState.INPUT) && (mState != ChannelState.OUTPUT)) {
+                if (!isInput()) {
 
                     mLogger.dbg("avoiding delayed input execution since channel is closed: %s",
                                 mInputs);

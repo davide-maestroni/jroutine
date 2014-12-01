@@ -75,6 +75,60 @@ Parallel programming on the go.
 <b>Example 2:</b> via reflection:
 <pre>
     <code>
+        &commat;Async(lockName = Async.NULL_LOCK)
+        public class Main {
+
+            private static final String PARSE = "parse";
+
+            private static final String SQUARE = "square";
+
+            private static final String SUM = "sum";
+
+            public static void main(final String[] args) {
+
+                final Routine&lt;Object, Object&gt; parseRoutine = on(Main.class).asyncMethod(PARSE);
+                final Routine&lt;Object, Object&gt; squareRoutine = on(Main.class).asyncMethod(SQUARE);
+                final Routine&lt;Object, Object&gt; sumRoutine = on(Main.class).asyncMethod(SUM);
+
+                final Integer rms = (Integer) sumRoutine.callAsync(
+                        (Object) squareRoutine.callParallel(parseRoutine.callParallel(args)).readAll())
+                                                        .readFirst();
+
+                System.out.println(rms);
+
+                System.exit(0);
+            }
+
+            &commat;Async(PARSE)
+            private static int parseArg(final String arg) {
+
+                return Integer.parseInt(arg);
+            }
+
+            &commat;Async(SQUARE)
+            private static int square(final int value) {
+
+                return value * value;
+            }
+
+            &commat;Async(SUM)
+            private static int sum(final List&lt;Integer&gt; values) {
+
+                int sum = 0;
+
+                for (final int value : values) {
+
+                    sum += value;
+                }
+
+                return sum;
+            }
+        }
+    </code>
+</pre>
+<b>Example 3:</b> via proxy:
+<pre>
+    <code>
         public class Main {
 
             public static void main(final String[] args) {
@@ -87,17 +141,17 @@ Parallel programming on the go.
                 System.exit(0);
             }
 
-            public int parseArg(final String arg) {
+            private int parseArg(final String arg) {
 
                 return Integer.parseInt(arg);
             }
 
-            public int square(final int value) {
+            private int square(final int value) {
 
                 return value * value;
             }
 
-            public int sum(final int... values) {
+            private int sum(final int... values) {
 
                 int sum = 0;
 
@@ -109,7 +163,7 @@ Parallel programming on the go.
                 return sum;
             }
 
-            &commat;Async(lockId = Async.UNLOCKED)
+            &commat;Async(lockName = Async.NULL_LOCK)
             private interface AsyncMain {
 
                 &commat;AsyncType(int.class)
@@ -123,7 +177,7 @@ Parallel programming on the go.
         }
     </code>
 </pre>
-<b>Example 3:</b> via code generation:
+<b>Example 4:</b> via code generation:
 <pre>
     <code>
         public class Main {
@@ -161,7 +215,7 @@ Parallel programming on the go.
             }
 
             &commat;AsyncClass(Main.class)
-            &commat;Async(lockId = Async.UNLOCKED)
+            &commat;Async(lockName = Async.NULL_LOCK)
             private interface Async {
 
                 &commat;AsyncType(int.class)

@@ -17,7 +17,7 @@ package ${packageName};
 
 public final class ${interfaceName}${className}${genericTypes} implements ${interfaceFullName} {
 
-    private final String mLockId;
+    private final String mLockName;
 
     private final com.bmd.jrt.common.CacheHashMap<Object, java.util.Map<String, Object>> mMutexMap;
 
@@ -25,7 +25,7 @@ public final class ${interfaceName}${className}${genericTypes} implements ${inte
 
     public ${interfaceName}${className}(final ${classFullName} wrapped,
             final com.bmd.jrt.common.CacheHashMap<Object, java.util.Map<String, Object>> mutexMap,
-            final String lockId, final com.bmd.jrt.builder.RoutineConfiguration configuration) {
+            final String lockName, final com.bmd.jrt.builder.RoutineConfiguration configuration) {
 
         if (wrapped == null) {
 
@@ -39,13 +39,13 @@ public final class ${interfaceName}${className}${genericTypes} implements ${inte
 
         mWrapped = wrapped;
         mMutexMap = mutexMap;
-        mLockId = ((lockId != null) && (lockId.length() > 0)) ? lockId : null;
+        mLockName = ((lockName != null) && !com.bmd.jrt.annotation.Async.DEFAULT_NAME.equals(lockName) ? lockName : null;
         ${routineFieldsInit}
     }
 
-    private Object getMutex(final String lockId) {
+    private Object getMutex(final String lockName) {
 
-        if (com.bmd.jrt.annotation.Async.UNLOCKED.equals(lockId)) {
+        if (com.bmd.jrt.annotation.Async.NULL_LOCK.equals(lockName)) {
 
             return null;
         }
@@ -61,13 +61,13 @@ public final class ${interfaceName}${className}${genericTypes} implements ${inte
                 mMutexMap.put(wrapped, mutexMap);
             }
 
-            final String id = (mLockId != null) ? mLockId : lockId;
-            Object mutex = mutexMap.get(id);
+            final String name = (mLockName != null) ? mLockName : lockName;
+            Object mutex = mutexMap.get(name);
 
             if (mutex == null) {
 
                 mutex = new Object();
-                mutexMap.put(id, mutex);
+                mutexMap.put(name, mutex);
             }
 
             return mutex;

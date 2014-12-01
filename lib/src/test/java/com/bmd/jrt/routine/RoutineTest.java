@@ -2620,12 +2620,6 @@ public class RoutineTest extends TestCase {
         }
 
         @Override
-        public boolean isComplete() {
-
-            return false;
-        }
-
-        @Override
         public Object nextInput() {
 
             return null;
@@ -2637,7 +2631,13 @@ public class RoutineTest extends TestCase {
         }
 
         @Override
-        public void onConsumeInput() {
+        public boolean onConsumeComplete() {
+
+            return false;
+        }
+
+        @Override
+        public void onConsumeStart() {
 
         }
     }

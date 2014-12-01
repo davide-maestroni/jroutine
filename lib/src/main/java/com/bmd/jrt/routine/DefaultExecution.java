@@ -101,18 +101,28 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
 
             try {
 
-                inputIterator.onConsumeInput();
+                inputIterator.onConsumeStart();
 
                 mLogger.dbg("running execution");
 
-                final Invocation<INPUT, OUTPUT> invocation = initInvocation();
+                final boolean isComplete;
+                final Invocation<INPUT, OUTPUT> invocation;
 
-                while (inputIterator.hasInput()) {
+                try {
 
-                    invocation.onInput(inputIterator.nextInput(), resultChannel);
+                    invocation = initInvocation();
+
+                    while (inputIterator.hasInput()) {
+
+                        invocation.onInput(inputIterator.nextInput(), resultChannel);
+                    }
+
+                } finally {
+
+                    isComplete = inputIterator.onConsumeComplete();
                 }
 
-                if (inputIterator.isComplete()) {
+                if (isComplete) {
 
                     invocation.onResult(resultChannel);
                     invocation.onReturn();
@@ -180,13 +190,6 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
         public boolean isAborting();
 
         /**
-         * Checks if the input has completed, that is, all the inputs have been consumed.
-         *
-         * @return whether the input has completed.
-         */
-        public boolean isComplete();
-
-        /**
          * Gets the next input.
          *
          * @return the input.
@@ -201,9 +204,16 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
         public void onAbortComplete();
 
         /**
+         * Checks if the input has completed, that is, all the inputs have been consumed.
+         *
+         * @return whether the input has completed.
+         */
+        public boolean onConsumeComplete();
+
+        /**
          * Notifies that the available inputs are about to be consumed.
          */
-        public void onConsumeInput();
+        public void onConsumeStart();
     }
 
     /**

@@ -75,14 +75,14 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
     private final Class<?> mTargetClass;
 
-    private String mLockId;
+    private String mLockName;
 
     /**
      * Constructor.
      *
      * @param target the target class or object.
      * @throws NullPointerException     if the specified target is null.
-     * @throws IllegalArgumentException if a duplicate tag in the annotations is detected.
+     * @throws IllegalArgumentException if a duplicate name in the annotations is detected.
      */
     ClassRoutineBuilder(@Nonnull final Object target) {
 
@@ -109,7 +109,6 @@ public class ClassRoutineBuilder implements RoutineBuilder {
         fillMap(methodMap, targetClass.getMethods());
 
         final HashMap<String, Method> declaredMethodMap = new HashMap<String, Method>();
-
         fillMap(declaredMethodMap, targetClass.getDeclaredMethods());
 
         for (final Entry<String, Method> methodEntry : declaredMethodMap.entrySet()) {
@@ -270,40 +269,40 @@ public class ClassRoutineBuilder implements RoutineBuilder {
     }
 
     /**
-     * Returns a routine used for calling the method whose identifying tag is specified in a
+     * Returns a routine used for calling the method whose identifying name is specified in a
      * {@link Async} annotation.
      *
-     * @param tag the tag specified in the annotation.
+     * @param name the name specified in the annotation.
      * @return the routine.
      * @throws IllegalArgumentException if the specified method is not found.
      * @throws RoutineException         if an error occurred while instantiating the optional
      *                                  runner or the routine.
      */
     @Nonnull
-    public Routine<Object, Object> asyncMethod(@Nonnull final String tag) {
+    public Routine<Object, Object> asyncMethod(@Nonnull final String name) {
 
-        final Method method = mMethodMap.get(tag);
+        final Method method = mMethodMap.get(name);
 
         if (method == null) {
 
             throw new IllegalArgumentException(
-                    "no annotated method with tag '" + tag + "' has been found");
+                    "no annotated method with name '" + name + "' has been found");
         }
 
         return method(method);
     }
 
     /**
-     * Tells the builder to create a routine using the specified lock ID.
+     * Tells the builder to create a routine using the specified lock name.
      *
-     * @param id the lock ID.
+     * @param lockName the lock name.
      * @return this builder.
      * @see Async
      */
     @Nonnull
-    public ClassRoutineBuilder lockId(@Nullable final String id) {
+    public ClassRoutineBuilder lockName(@Nullable final String lockName) {
 
-        mLockId = id;
+        mLockName = lockName;
 
         return this;
     }
@@ -311,7 +310,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
     /**
      * Returns a routine used for calling the specified method.
      * <p/>
-     * The method is searched via reflection ignoring an optional tag specified in a {@link Async}
+     * The method is searched via reflection ignoring an optional name specified in a {@link Async}
      * annotation. Though, the other annotation attributes will be honored.
      *
      * @param name           the method name.
@@ -355,7 +354,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
     /**
      * Returns a routine used for calling the specified method.
      * <p/>
-     * The method is invoked ignoring an optional tag specified in a {@link Async} annotation.
+     * The method is invoked ignoring an optional name specified in a {@link Async} annotation.
      * Though, the other annotation attributes will be honored.
      *
      * @param method the method instance.
@@ -367,19 +366,19 @@ public class ClassRoutineBuilder implements RoutineBuilder {
     @Nonnull
     public Routine<Object, Object> method(@Nonnull final Method method) {
 
-        return method(mBuilder.buildConfiguration(), mLockId, mTargetClass, method);
+        return method(mBuilder.buildConfiguration(), mLockName, mTargetClass, method);
     }
 
     /**
-     * Gets the annotated method associated to the specified tag.
+     * Gets the annotated method associated to the specified name.
      *
-     * @param tag the tag specified in the annotation.
+     * @param name the name specified in the annotation.
      * @return the method or null.
      */
     @Nullable
-    protected Method getAnnotatedMethod(@Nonnull final String tag) {
+    protected Method getAnnotatedMethod(@Nonnull final String name) {
 
-        return mMethodMap.get(tag);
+        return mMethodMap.get(name);
     }
 
     /**
@@ -394,27 +393,32 @@ public class ClassRoutineBuilder implements RoutineBuilder {
     }
 
     /**
-     * Returns the ID of the lock.
+     * Returns the name of the lock.
      *
-     * @return the lock ID.
+     * @return the lock name.
      */
     @Nullable
-    protected String getLockId() {
+    protected String getLockName() {
 
-        return mLockId;
+        return mLockName;
     }
 
     /**
      * Creates the routine.
      *
      * @param configuration the routine configuration.
-     * @param lockId        the lock ID.
+     * @param lockName      the lock name.
      * @param method        the method to wrap.
      * @return the routine instance.
      */
     @Nonnull
     protected Routine<Object, Object> getRoutine(@Nonnull final RoutineConfiguration configuration,
-            @Nullable final String lockId, @Nonnull final Method method) {
+            @Nullable final String lockName, @Nonnull final Method method) {
+
+        if (!method.isAccessible()) {
+
+            AccessController.doPrivileged(new SetAccessibleAction(method));
+        }
 
         Routine<Object, Object> routine;
 
@@ -432,8 +436,8 @@ public class ClassRoutineBuilder implements RoutineBuilder {
                 routineCache.put(target, routineMap);
             }
 
-            final String methodLockId = (lockId != null) ? lockId : "";
-            final RoutineInfo routineInfo = new RoutineInfo(configuration, method, methodLockId);
+            final String methodLockName = (lockName != null) ? lockName : Async.DEFAULT_NAME;
+            final RoutineInfo routineInfo = new RoutineInfo(configuration, method, methodLockName);
             routine = routineMap.get(routineInfo);
 
             if (routine != null) {
@@ -443,7 +447,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
             Object mutex = null;
 
-            if (!Async.UNLOCKED.equals(methodLockId)) {
+            if (!Async.NULL_LOCK.equals(methodLockName)) {
 
                 synchronized (sMutexCache) {
 
@@ -456,12 +460,12 @@ public class ClassRoutineBuilder implements RoutineBuilder {
                         mutexCache.put(target, mutexMap);
                     }
 
-                    mutex = mutexMap.get(methodLockId);
+                    mutex = mutexMap.get(methodLockName);
 
                     if (mutex == null) {
 
                         mutex = new Object();
-                        mutexMap.put(methodLockId, mutex);
+                        mutexMap.put(methodLockName, mutex);
                     }
                 }
             }
@@ -482,7 +486,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      * Returns a routine used for calling the specified method.
      *
      * @param configuration the routine configuration.
-     * @param lockId        the lock ID.
+     * @param lockName      the lock name.
      * @param targetClass   the target class.
      * @param targetMethod  the target method.
      * @return the routine.
@@ -492,24 +496,19 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      */
     @Nonnull
     protected Routine<Object, Object> method(@Nonnull final RoutineConfiguration configuration,
-            @Nullable final String lockId, @Nonnull final Class<?> targetClass,
+            @Nullable final String lockName, @Nonnull final Class<?> targetClass,
             @Nonnull final Method targetMethod) {
 
-        if (!targetMethod.isAccessible()) {
-
-            AccessController.doPrivileged(new SetAccessibleAction(targetMethod));
-        }
-
-        String methodLockId = lockId;
+        String methodLockName = lockName;
         final DefaultConfigurationBuilder builder = new DefaultConfigurationBuilder();
 
         final Async classAnnotation = targetClass.getAnnotation(Async.class);
 
         if (classAnnotation != null) {
 
-            if (lockId == null) {
+            if (lockName == null) {
 
-                methodLockId = classAnnotation.lockId();
+                methodLockName = classAnnotation.lockName();
             }
 
             applyConfiguration(builder, classAnnotation);
@@ -519,9 +518,14 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
         if (methodAnnotation != null) {
 
-            if (lockId == null) {
+            if (lockName == null) {
 
-                methodLockId = methodAnnotation.lockId();
+                final String annotationLockName = methodAnnotation.lockName();
+
+                if (!Async.DEFAULT_NAME.equals(annotationLockName)) {
+
+                    methodLockName = annotationLockName;
+                }
             }
 
             applyConfiguration(builder, methodAnnotation);
@@ -532,7 +536,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
                                  .inputTimeout(TimeDuration.ZERO)
                                  .outputSize(Integer.MAX_VALUE)
                                  .outputTimeout(TimeDuration.ZERO)
-                                 .buildConfiguration(), methodLockId, targetMethod);
+                                 .buildConfiguration(), methodLockName, targetMethod);
     }
 
     private void fillMap(@Nonnull final HashMap<String, Method> map,
@@ -560,21 +564,21 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
             if (annotation != null) {
 
-                String tag = annotation.value();
+                String name = annotation.value();
 
-                if ((tag == null) || (tag.length() == 0)) {
+                if ((name == null) || (name.length() == 0)) {
 
-                    tag = method.getName();
+                    name = method.getName();
                 }
 
-                if (map.containsKey(tag)) {
+                if (map.containsKey(name)) {
 
                     throw new IllegalArgumentException(
-                            "the tag '" + tag + "' has already been used to identify a different"
+                            "the name '" + name + "' has already been used to identify a different"
                                     + " method");
                 }
 
-                map.put(tag, method);
+                map.put(name, method);
             }
         }
     }
@@ -659,7 +663,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
         private final RoutineConfiguration mConfiguration;
 
-        private final String mLockId;
+        private final String mLockName;
 
         private final Method mMethod;
 
@@ -668,13 +672,13 @@ public class ClassRoutineBuilder implements RoutineBuilder {
          *
          * @param configuration the routine configuration.
          * @param method        the method to wrap.
-         * @param lockId        the lock ID.
+         * @param lockName      the lock name.
          */
         private RoutineInfo(@Nonnull final RoutineConfiguration configuration,
-                @Nonnull final Method method, @Nonnull final String lockId) {
+                @Nonnull final Method method, @Nonnull final String lockName) {
 
             mMethod = method;
-            mLockId = lockId;
+            mLockName = lockName;
             mConfiguration = configuration;
         }
 
@@ -683,7 +687,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
             // auto-generated code
             int result = mConfiguration.hashCode();
-            result = 31 * result + mLockId.hashCode();
+            result = 31 * result + mLockName.hashCode();
             result = 31 * result + mMethod.hashCode();
             return result;
         }
@@ -704,7 +708,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
             final RoutineInfo that = (RoutineInfo) o;
 
-            return mConfiguration.equals(that.mConfiguration) && mLockId.equals(that.mLockId)
+            return mConfiguration.equals(that.mConfiguration) && mLockName.equals(that.mLockName)
                     && mMethod.equals(that.mMethod);
         }
     }

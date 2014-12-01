@@ -130,4 +130,10 @@ public class RoutineInvocationException extends RoutineException {
 
         return mTargetClass;
     }
+
+    @Override
+    public boolean needsUnwrap() {
+
+        return false;
+    }
 }

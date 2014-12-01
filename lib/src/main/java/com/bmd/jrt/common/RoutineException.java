@@ -31,4 +31,15 @@ public class RoutineException extends RuntimeException {
 
         super(cause);
     }
+
+    /**
+     * Checks if this exception it's just a wrapper of another exception with no additional
+     * information.
+     *
+     * @return whether this exceptions needs to be unwrapped.
+     */
+    public boolean needsUnwrap() {
+
+        return getCause() != null;
+    }
 }

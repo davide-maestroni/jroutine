@@ -71,6 +71,8 @@ public class RoutineProcessor extends AbstractProcessor {
 
     private static final boolean DEBUG = false;
 
+    private static final String NEW_LINE = System.getProperty("line.separator");
+
     private boolean mDisabled;
 
     private String mFooter;
@@ -310,7 +312,8 @@ public class RoutineProcessor extends AbstractProcessor {
                    .append(" = ")
                    .append("initRoutine")
                    .append(i)
-                   .append("(configuration);");
+                   .append("(configuration);")
+                   .append(NEW_LINE);
         }
 
         return builder.toString();
@@ -430,11 +433,11 @@ public class RoutineProcessor extends AbstractProcessor {
 
         if (asyncAnnotation != null) {
 
-            final String tag = asyncAnnotation.value();
+            final String name = asyncAnnotation.value();
 
-            if ((tag != null) && (tag.length() > 0)) {
+            if ((name != null) && (name.length() > 0)) {
 
-                methodName = tag;
+                methodName = name;
 
                 for (final ExecutableElement targetMethodElement : ElementFilter.methodsIn(
                         targetElement.getEnclosedElements())) {
@@ -442,7 +445,7 @@ public class RoutineProcessor extends AbstractProcessor {
                     final Async targetAsyncAnnotation =
                             targetMethodElement.getAnnotation(Async.class);
 
-                    if ((targetAsyncAnnotation != null) && tag.equals(
+                    if ((targetAsyncAnnotation != null) && name.equals(
                             targetAsyncAnnotation.value())) {
 
                         targetMethod = targetMethodElement;
@@ -994,19 +997,19 @@ public class RoutineProcessor extends AbstractProcessor {
         final Async classAnnotation = element.getAnnotation(Async.class);
         final Async methodAnnotation = methodElement.getAnnotation(Async.class);
 
-        String lockId = Async.DEFAULT_ID;
+        String lockName = Async.DEFAULT_NAME;
 
         if (methodAnnotation != null) {
 
-            lockId = methodAnnotation.lockId();
+            lockName = methodAnnotation.lockName();
         }
 
-        if ((classAnnotation != null) && (lockId.equals(Async.DEFAULT_ID))) {
+        if ((classAnnotation != null) && (lockName.equals(Async.DEFAULT_NAME))) {
 
-            lockId = classAnnotation.lockId();
+            lockName = classAnnotation.lockName();
         }
 
-        methodFooter = methodFooter.replace("${lockId}", lockId);
+        methodFooter = methodFooter.replace("${lockName}", lockName);
 
         writer.append(methodFooter);
     }

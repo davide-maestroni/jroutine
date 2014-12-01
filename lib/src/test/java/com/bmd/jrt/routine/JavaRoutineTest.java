@@ -155,7 +155,7 @@ public class JavaRoutineTest extends TestCase {
                                                             .maxRunning(1)
                                                             .maxRetained(0)
                                                             .availableTimeout(1, TimeUnit.SECONDS)
-                                                            .lockId("test")
+                                                            .lockName("test")
                                                             .method(TestStatic.class.getMethod(
                                                                     "getLong"));
 
@@ -189,8 +189,8 @@ public class JavaRoutineTest extends TestCase {
 
         startTime = System.currentTimeMillis();
 
-        getOne = builder.lockId("test").method("getOne").callAsync();
-        getTwo = builder.lockId("test").method("getTwo").callAsync();
+        getOne = builder.lockName("test").method("getOne").callAsync();
+        getTwo = builder.lockName("test").method("getTwo").callAsync();
 
         assertThat(getOne.isComplete()).isTrue();
         assertThat(getTwo.isComplete()).isTrue();
@@ -381,7 +381,7 @@ public class JavaRoutineTest extends TestCase {
                                                             .runBy(Runners.poolRunner())
                                                             .maxRunning(1)
                                                             .availableTimeout(TimeDuration.ZERO)
-                                                            .lockId("test")
+                                                            .lockName("test")
                                                             .method(Test.class.getMethod(
                                                                     "getLong"));
 
@@ -414,8 +414,8 @@ public class JavaRoutineTest extends TestCase {
 
         startTime = System.currentTimeMillis();
 
-        getOne = builder.lockId("test").method("getOne").callAsync();
-        getTwo = builder.lockId("test").method("getTwo").callAsync();
+        getOne = builder.lockName("test").method("getOne").callAsync();
+        getTwo = builder.lockName("test").method("getTwo").callAsync();
 
         assertThat(getOne.isComplete()).isTrue();
         assertThat(getTwo.isComplete()).isTrue();
@@ -796,7 +796,7 @@ public class JavaRoutineTest extends TestCase {
 
         public int compute(int i);
 
-        @Async(value = "compute", lockId = Async.UNLOCKED)
+        @Async(value = "compute", lockName = Async.NULL_LOCK)
         @AsyncType(int.class)
         public OutputChannel<Integer> computeParallel1(@ParallelType(int.class) int... i);
 
@@ -804,11 +804,11 @@ public class JavaRoutineTest extends TestCase {
         @AsyncType(int.class)
         public OutputChannel<Integer> computeParallel2(@ParallelType(int.class) Integer... i);
 
-        @Async(value = "compute", lockId = Async.UNLOCKED)
+        @Async(value = "compute", lockName = Async.NULL_LOCK)
         @AsyncType(int.class)
         public OutputChannel<Integer> computeParallel3(@ParallelType(int.class) List<Integer> i);
 
-        @Async(value = "compute", lockId = Async.UNLOCKED)
+        @Async(value = "compute", lockName = Async.NULL_LOCK)
         @AsyncType(int.class)
         public OutputChannel<Integer> computeParallel4(
                 @ParallelType(int.class) OutputChannel<Integer> i);
@@ -910,7 +910,7 @@ public class JavaRoutineTest extends TestCase {
 
     private static class Test2 {
 
-        @Async(lockId = "1")
+        @Async(lockName = "1")
         public int getOne() throws InterruptedException {
 
             TimeDuration.millis(500).sleepAtLeast();
@@ -918,7 +918,7 @@ public class JavaRoutineTest extends TestCase {
             return 1;
         }
 
-        @Async(lockId = "2")
+        @Async(lockName = "2")
         public int getTwo() throws InterruptedException {
 
             TimeDuration.millis(500).sleepAtLeast();
@@ -959,7 +959,7 @@ public class JavaRoutineTest extends TestCase {
 
     private static class TestStatic2 {
 
-        @Async(lockId = "1")
+        @Async(lockName = "1")
         public static int getOne() throws InterruptedException {
 
             TimeDuration.millis(500).sleepAtLeast();
@@ -967,7 +967,7 @@ public class JavaRoutineTest extends TestCase {
             return 1;
         }
 
-        @Async(lockId = "2")
+        @Async(lockName = "2")
         public static int getTwo() throws InterruptedException {
 
             TimeDuration.millis(500).sleepAtLeast();

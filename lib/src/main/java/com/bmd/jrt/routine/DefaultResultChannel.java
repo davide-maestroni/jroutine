@@ -968,7 +968,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         @Nonnull
         @Override
         @SuppressWarnings("ConstantConditions")
-        public OutputChannel<OUTPUT> bind(@Nullable final OutputConsumer<OUTPUT> consumer) {
+        public OutputChannel<OUTPUT> bind(@Nonnull final OutputConsumer<OUTPUT> consumer) {
 
             final boolean isClose;
 
@@ -1017,6 +1017,15 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         public OutputChannel<OUTPUT> immediately() {
 
             return afterMax(ZERO);
+        }
+
+        @Override
+        public boolean isBound() {
+
+            synchronized (mMutex) {
+
+                return (mOutputConsumer != null);
+            }
         }
 
         @Override
@@ -1176,6 +1185,21 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         public OUTPUT readFirst() {
 
             return readQueue(mReadTimeout, mReadTimeoutException);
+        }
+
+        @Nonnull
+        @Override
+        public OutputChannel<OUTPUT> unbind(@Nullable final OutputConsumer<OUTPUT> consumer) {
+
+            synchronized (mMutex) {
+
+                if (mOutputConsumer == consumer) {
+
+                    mOutputConsumer = null;
+                }
+            }
+
+            return this;
         }
 
         @Nonnull

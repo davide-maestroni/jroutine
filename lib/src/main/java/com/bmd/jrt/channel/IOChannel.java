@@ -42,7 +42,7 @@ public interface IOChannel<TYPE> {
      * @return the input channel.
      */
     @Nonnull
-    public ChannelInput<TYPE> input();
+    public IOChannelInput<TYPE> input();
 
     /**
      * Returns the output end of this channel.
@@ -50,42 +50,42 @@ public interface IOChannel<TYPE> {
      * @return the output channel.
      */
     @Nonnull
-    public ChannelOutput<TYPE> output();
+    public IOChannelOutput<TYPE> output();
 
     /**
      * Interface defining an I/O channel input.
      *
      * @param <INPUT> the input data type.
      */
-    public interface ChannelInput<INPUT> extends InputChannel<INPUT> {
+    public interface IOChannelInput<INPUT> extends InputChannel<INPUT> {
 
         @Nonnull
         @Override
-        public ChannelInput<INPUT> after(@Nonnull TimeDuration delay);
+        public IOChannelInput<INPUT> after(@Nonnull TimeDuration delay);
 
         @Nonnull
         @Override
-        public ChannelInput<INPUT> after(long delay, @Nonnull TimeUnit timeUnit);
+        public IOChannelInput<INPUT> after(long delay, @Nonnull TimeUnit timeUnit);
 
         @Nonnull
         @Override
-        public ChannelInput<INPUT> now();
+        public IOChannelInput<INPUT> now();
 
         @Nonnull
         @Override
-        public ChannelInput<INPUT> pass(@Nullable OutputChannel<INPUT> channel);
+        public IOChannelInput<INPUT> pass(@Nullable OutputChannel<INPUT> channel);
 
         @Nonnull
         @Override
-        public ChannelInput<INPUT> pass(@Nullable Iterable<? extends INPUT> inputs);
+        public IOChannelInput<INPUT> pass(@Nullable Iterable<? extends INPUT> inputs);
 
         @Nonnull
         @Override
-        public ChannelInput<INPUT> pass(@Nullable INPUT input);
+        public IOChannelInput<INPUT> pass(@Nullable INPUT input);
 
         @Nonnull
         @Override
-        public ChannelInput<INPUT> pass(@Nullable INPUT... inputs);
+        public IOChannelInput<INPUT> pass(@Nullable INPUT... inputs);
 
         /**
          * Closes the channel input.<br/>
@@ -101,34 +101,34 @@ public interface IOChannel<TYPE> {
      *
      * @param <OUTPUT> the output data type.
      */
-    public interface ChannelOutput<OUTPUT> extends OutputChannel<OUTPUT> {
+    public interface IOChannelOutput<OUTPUT> extends OutputChannel<OUTPUT> {
 
         @Nonnull
         @Override
-        public ChannelOutput<OUTPUT> afterMax(@Nonnull TimeDuration timeout);
+        public IOChannelOutput<OUTPUT> afterMax(@Nonnull TimeDuration timeout);
 
         @Nonnull
         @Override
-        public ChannelOutput<OUTPUT> afterMax(long timeout, @Nonnull TimeUnit timeUnit);
+        public IOChannelOutput<OUTPUT> afterMax(long timeout, @Nonnull TimeUnit timeUnit);
 
         @Nonnull
         @Override
-        public ChannelOutput<OUTPUT> bind(@Nullable OutputConsumer<OUTPUT> consumer);
+        public IOChannelOutput<OUTPUT> bind(@Nonnull OutputConsumer<OUTPUT> consumer);
 
         @Nonnull
         @Override
-        public ChannelOutput<OUTPUT> eventuallyDeadLock();
+        public IOChannelOutput<OUTPUT> eventuallyDeadLock();
 
         @Nonnull
         @Override
-        public ChannelOutput<OUTPUT> immediately();
+        public IOChannelOutput<OUTPUT> immediately();
 
         @Nonnull
         @Override
-        public ChannelOutput<OUTPUT> neverDeadLock();
+        public IOChannelOutput<OUTPUT> neverDeadLock();
 
         @Nonnull
         @Override
-        public ChannelOutput<OUTPUT> readAllInto(@Nonnull Collection<? super OUTPUT> results);
+        public IOChannelOutput<OUTPUT> readAllInto(@Nonnull Collection<? super OUTPUT> results);
     }
 }

@@ -45,16 +45,16 @@ import javax.annotation.Nullable;
 class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
 
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
-    private static final HashSet<ChannelWeakReference> sReferences =
-            new HashSet<ChannelWeakReference>();
+    private static final HashSet<IOChannelWeakReference> sReferences =
+            new HashSet<IOChannelWeakReference>();
 
     private static ReferenceQueue<DefaultIOChannel<?>> sReferenceQueue;
 
     private static Runner sWeakRunner;
 
-    private final DefaultChannelInput<TYPE> mInputChannel;
+    private final DefaultIOChannelInput<TYPE> mInputChannel;
 
-    private final DefaultChannelOutput<TYPE> mOutputChannel;
+    private final DefaultIOChannelOutput<TYPE> mOutputChannel;
 
     /**
      * Constructor.
@@ -63,7 +63,7 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
      */
     DefaultIOChannel(@Nonnull final RoutineConfiguration configuration) {
 
-        final ChannelAbortHandler abortHandler = new ChannelAbortHandler();
+        final IOChannelAbortHandler abortHandler = new IOChannelAbortHandler();
         final DefaultResultChannel<TYPE> inputChannel =
                 new DefaultResultChannel<TYPE>(configuration, abortHandler,
                                                configuration.getRunner(null),
@@ -71,8 +71,8 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
                                                              configuration.getLogLevel(null),
                                                              IOChannel.class));
         abortHandler.setInputChannel(inputChannel);
-        mInputChannel = new DefaultChannelInput<TYPE>(inputChannel);
-        mOutputChannel = new DefaultChannelOutput<TYPE>(inputChannel.getOutput());
+        mInputChannel = new DefaultIOChannelInput<TYPE>(inputChannel);
+        mOutputChannel = new DefaultIOChannelOutput<TYPE>(inputChannel.getOutput());
 
         addChannelReference(this);
     }
@@ -89,100 +89,25 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
             if (sReferenceQueue == null) {
 
                 sReferenceQueue = new ReferenceQueue<DefaultIOChannel<?>>();
-                sWeakRunner.run(new ChannelExecution(), 0, TimeUnit.MILLISECONDS);
+                sWeakRunner.run(new IOChannelExecution(), 0, TimeUnit.MILLISECONDS);
             }
 
-            sReferences.add(new ChannelWeakReference(channel, sReferenceQueue));
+            sReferences.add(new IOChannelWeakReference(channel, sReferenceQueue));
         }
     }
 
     @Nonnull
     @Override
-    public ChannelInput<TYPE> input() {
+    public IOChannelInput<TYPE> input() {
 
         return mInputChannel;
     }
 
     @Nonnull
     @Override
-    public ChannelOutput<TYPE> output() {
+    public IOChannelOutput<TYPE> output() {
 
         return mOutputChannel;
-    }
-
-    /**
-     * Abort handler used to close the input channel on abort.
-     */
-    private static class ChannelAbortHandler implements AbortHandler {
-
-        private DefaultResultChannel<?> mInputChannel;
-
-        @Override
-        public void onAbort(@Nullable final Throwable reason, final long delay,
-                @Nonnull final TimeUnit timeUnit) {
-
-            mInputChannel.close(reason);
-        }
-
-        public void setInputChannel(@Nonnull final DefaultResultChannel<?> inputChannel) {
-
-            mInputChannel = inputChannel;
-        }
-    }
-
-    /**
-     * Execution used to wait on the weak reference queue.
-     */
-    private static class ChannelExecution implements Execution {
-
-        @Override
-        public void run() {
-
-            try {
-
-                ChannelWeakReference reference;
-
-                while ((reference = (ChannelWeakReference) sReferenceQueue.remove()) != null) {
-
-                    reference.closeInput();
-
-                    synchronized (sReferences) {
-
-                        sReferences.remove(reference);
-                    }
-                }
-
-            } catch (final InterruptedException ignored) {
-
-            }
-        }
-    }
-
-    /**
-     * Weak reference used to close the input channel.
-     */
-    private static class ChannelWeakReference extends WeakReference<DefaultIOChannel<?>> {
-
-        private final DefaultChannelInput<?> mInputChannel;
-
-        /**
-         * Constructor.
-         *
-         * @param referent the referent channel instance.
-         * @param queue    the reference queue.
-         */
-        private ChannelWeakReference(@Nonnull final DefaultIOChannel<?> referent,
-                @Nonnull final ReferenceQueue<? super DefaultIOChannel<?>> queue) {
-
-            super(referent, queue);
-
-            mInputChannel = referent.mInputChannel;
-        }
-
-        public void closeInput() {
-
-            mInputChannel.close();
-        }
     }
 
     /**
@@ -190,7 +115,7 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
      *
      * @param <INPUT> the input data type.
      */
-    private static class DefaultChannelInput<INPUT> implements ChannelInput<INPUT> {
+    private static class DefaultIOChannelInput<INPUT> implements IOChannelInput<INPUT> {
 
         private final DefaultResultChannel<INPUT> mChannel;
 
@@ -199,7 +124,7 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
          *
          * @param wrapped the wrapped result channel.
          */
-        private DefaultChannelInput(@Nonnull final DefaultResultChannel<INPUT> wrapped) {
+        private DefaultIOChannelInput(@Nonnull final DefaultResultChannel<INPUT> wrapped) {
 
             mChannel = wrapped;
         }
@@ -212,7 +137,7 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
 
         @Nonnull
         @Override
-        public ChannelInput<INPUT> after(@Nonnull final TimeDuration delay) {
+        public IOChannelInput<INPUT> after(@Nonnull final TimeDuration delay) {
 
             mChannel.after(delay);
 
@@ -221,7 +146,7 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
 
         @Nonnull
         @Override
-        public ChannelInput<INPUT> after(final long delay, @Nonnull final TimeUnit timeUnit) {
+        public IOChannelInput<INPUT> after(final long delay, @Nonnull final TimeUnit timeUnit) {
 
             mChannel.after(delay, timeUnit);
 
@@ -230,7 +155,7 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
 
         @Nonnull
         @Override
-        public ChannelInput<INPUT> now() {
+        public IOChannelInput<INPUT> now() {
 
             mChannel.now();
 
@@ -239,7 +164,7 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
 
         @Nonnull
         @Override
-        public ChannelInput<INPUT> pass(@Nullable final OutputChannel<INPUT> channel) {
+        public IOChannelInput<INPUT> pass(@Nullable final OutputChannel<INPUT> channel) {
 
             mChannel.pass(channel);
 
@@ -248,7 +173,7 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
 
         @Nonnull
         @Override
-        public ChannelInput<INPUT> pass(@Nullable final Iterable<? extends INPUT> inputs) {
+        public IOChannelInput<INPUT> pass(@Nullable final Iterable<? extends INPUT> inputs) {
 
             mChannel.pass(inputs);
 
@@ -257,7 +182,7 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
 
         @Nonnull
         @Override
-        public ChannelInput<INPUT> pass(@Nullable final INPUT input) {
+        public IOChannelInput<INPUT> pass(@Nullable final INPUT input) {
 
             mChannel.pass(input);
 
@@ -266,7 +191,7 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
 
         @Nonnull
         @Override
-        public ChannelInput<INPUT> pass(@Nullable final INPUT... inputs) {
+        public IOChannelInput<INPUT> pass(@Nullable final INPUT... inputs) {
 
             mChannel.pass(inputs);
 
@@ -297,7 +222,7 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
      *
      * @param <OUTPUT> the output data type.
      */
-    private static class DefaultChannelOutput<OUTPUT> implements ChannelOutput<OUTPUT> {
+    private static class DefaultIOChannelOutput<OUTPUT> implements IOChannelOutput<OUTPUT> {
 
         private final OutputChannel<OUTPUT> mChannel;
 
@@ -306,14 +231,14 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
          *
          * @param wrapped the wrapped output channel.
          */
-        private DefaultChannelOutput(@Nonnull final OutputChannel<OUTPUT> wrapped) {
+        private DefaultIOChannelOutput(@Nonnull final OutputChannel<OUTPUT> wrapped) {
 
             mChannel = wrapped;
         }
 
         @Nonnull
         @Override
-        public ChannelOutput<OUTPUT> afterMax(@Nonnull final TimeDuration timeout) {
+        public IOChannelOutput<OUTPUT> afterMax(@Nonnull final TimeDuration timeout) {
 
             mChannel.afterMax(timeout);
 
@@ -322,7 +247,7 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
 
         @Nonnull
         @Override
-        public ChannelOutput<OUTPUT> afterMax(final long timeout,
+        public IOChannelOutput<OUTPUT> afterMax(final long timeout,
                 @Nonnull final TimeUnit timeUnit) {
 
             mChannel.afterMax(timeout, timeUnit);
@@ -332,7 +257,7 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
 
         @Nonnull
         @Override
-        public ChannelOutput<OUTPUT> bind(@Nullable final OutputConsumer<OUTPUT> consumer) {
+        public IOChannelOutput<OUTPUT> bind(@Nonnull final OutputConsumer<OUTPUT> consumer) {
 
             mChannel.bind(consumer);
 
@@ -341,7 +266,7 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
 
         @Nonnull
         @Override
-        public ChannelOutput<OUTPUT> eventuallyDeadLock() {
+        public IOChannelOutput<OUTPUT> eventuallyDeadLock() {
 
             mChannel.eventuallyDeadLock();
 
@@ -350,7 +275,7 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
 
         @Nonnull
         @Override
-        public ChannelOutput<OUTPUT> immediately() {
+        public IOChannelOutput<OUTPUT> immediately() {
 
             mChannel.immediately();
 
@@ -359,7 +284,7 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
 
         @Nonnull
         @Override
-        public ChannelOutput<OUTPUT> neverDeadLock() {
+        public IOChannelOutput<OUTPUT> neverDeadLock() {
 
             mChannel.neverDeadLock();
 
@@ -368,11 +293,18 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
 
         @Nonnull
         @Override
-        public ChannelOutput<OUTPUT> readAllInto(@Nonnull final Collection<? super OUTPUT> result) {
+        public IOChannelOutput<OUTPUT> readAllInto(
+                @Nonnull final Collection<? super OUTPUT> result) {
 
             mChannel.readAllInto(result);
 
             return this;
+        }
+
+        @Override
+        public boolean isBound() {
+
+            return mChannel.isBound();
         }
 
         @Override
@@ -392,6 +324,15 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
         public OUTPUT readFirst() {
 
             return mChannel.readFirst();
+        }
+
+        @Nonnull
+        @Override
+        public IOChannelOutput<OUTPUT> unbind(@Nullable final OutputConsumer<OUTPUT> consumer) {
+
+            mChannel.unbind(consumer);
+
+            return this;
         }
 
         @Override
@@ -416,6 +357,81 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
         public boolean isOpen() {
 
             return mChannel.isOpen();
+        }
+    }
+
+    /**
+     * Abort handler used to close the input channel on abort.
+     */
+    private static class IOChannelAbortHandler implements AbortHandler {
+
+        private DefaultResultChannel<?> mInputChannel;
+
+        @Override
+        public void onAbort(@Nullable final Throwable reason, final long delay,
+                @Nonnull final TimeUnit timeUnit) {
+
+            mInputChannel.close(reason);
+        }
+
+        public void setInputChannel(@Nonnull final DefaultResultChannel<?> inputChannel) {
+
+            mInputChannel = inputChannel;
+        }
+    }
+
+    /**
+     * Execution used to wait on the weak reference queue.
+     */
+    private static class IOChannelExecution implements Execution {
+
+        @Override
+        public void run() {
+
+            try {
+
+                IOChannelWeakReference reference;
+
+                while ((reference = (IOChannelWeakReference) sReferenceQueue.remove()) != null) {
+
+                    reference.closeInput();
+
+                    synchronized (sReferences) {
+
+                        sReferences.remove(reference);
+                    }
+                }
+
+            } catch (final InterruptedException ignored) {
+
+            }
+        }
+    }
+
+    /**
+     * Weak reference used to close the input channel.
+     */
+    private static class IOChannelWeakReference extends WeakReference<DefaultIOChannel<?>> {
+
+        private final DefaultIOChannelInput<?> mInputChannel;
+
+        /**
+         * Constructor.
+         *
+         * @param referent the referent channel instance.
+         * @param queue    the reference queue.
+         */
+        private IOChannelWeakReference(@Nonnull final DefaultIOChannel<?> referent,
+                @Nonnull final ReferenceQueue<? super DefaultIOChannel<?>> queue) {
+
+            super(referent, queue);
+
+            mInputChannel = referent.mInputChannel;
+        }
+
+        public void closeInput() {
+
+            mInputChannel.close();
         }
     }
 }

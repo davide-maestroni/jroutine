@@ -233,6 +233,42 @@ public class RoutineTest extends TestCase {
         assertThat(abortReason.get()).isEqualTo(exception1);
     }
 
+    public void testBind() {
+
+        final TestOutputConsumer consumer = new TestOutputConsumer();
+        final OutputChannel<Object> channel1 = JavaRoutine.on()
+                                                          .buildRoutine()
+                                                          .invokeAsync()
+                                                          .after(seconds(1))
+                                                          .pass("test1")
+                                                          .result();
+
+        channel1.bind(consumer);
+        assertThat(channel1.isBound()).isTrue();
+        assertThat(consumer.isOutput()).isFalse();
+
+        channel1.unbind(null);
+        assertThat(channel1.isBound()).isTrue();
+        assertThat(consumer.isOutput()).isFalse();
+
+        channel1.unbind(new TestOutputConsumer());
+        assertThat(channel1.isBound()).isTrue();
+        assertThat(consumer.isOutput()).isFalse();
+
+        channel1.unbind(consumer);
+        assertThat(channel1.isBound()).isFalse();
+        assertThat(consumer.isOutput()).isFalse();
+
+        final OutputChannel<Object> channel2 =
+                JavaRoutine.on().buildRoutine().invoke().pass("test2").result();
+
+        channel2.bind(consumer);
+        assertThat(channel1.isBound()).isFalse();
+        assertThat(channel2.isBound()).isTrue();
+        assertThat(consumer.isOutput()).isTrue();
+        assertThat(consumer.getOutput()).isEqualTo("test2");
+    }
+
     public void testCalls() {
 
         final Routine<String, String> routine = JavaRoutine.<String>on().buildRoutine();
@@ -1836,7 +1872,7 @@ public class RoutineTest extends TestCase {
                                                     .buildRoutine();
 
         final OutputChannel<String> channel = routine.callAsync("test");
-        assertThat(channel.immediately().readAll()).isEmpty();
+        assertThat(channel.neverDeadLock().immediately().readAll()).isEmpty();
 
         try {
 
@@ -2659,6 +2695,30 @@ public class RoutineTest extends TestCase {
         @Override
         public void recycle(@Nonnull final Invocation<Object, Object> invocation) {
 
+        }
+    }
+
+    private static class TestOutputConsumer extends TemplateOutputConsumer<Object> {
+
+        private boolean mIsOutput;
+
+        private Object mOutput;
+
+        public Object getOutput() {
+
+            return mOutput;
+        }
+
+        public boolean isOutput() {
+
+            return mIsOutput;
+        }
+
+        @Override
+        public void onOutput(final Object o) {
+
+            mIsOutput = true;
+            mOutput = o;
         }
     }
 }

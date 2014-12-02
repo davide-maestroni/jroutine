@@ -79,7 +79,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      *                                             exception.
      */
     @Nonnull
-    public OutputChannel<OUTPUT> bind(@Nullable OutputConsumer<OUTPUT> consumer);
+    public OutputChannel<OUTPUT> bind(@Nonnull OutputConsumer<OUTPUT> consumer);
 
     /**
      * Tells the channel to throw a {@link ReadDeadLockException} in case no result is available
@@ -108,6 +108,11 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      */
     @Nonnull
     public OutputChannel<OUTPUT> immediately();
+
+    /**
+     * @return
+     */
+    public boolean isBound();
 
     /**
      * Checks if the routine is complete waiting at the maximum for the set timeout.
@@ -187,4 +192,11 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @see #neverDeadLock()
      */
     public OUTPUT readFirst();
+
+    /**
+     * @param consumer
+     * @return
+     */
+    @Nonnull
+    public OutputChannel<OUTPUT> unbind(@Nullable OutputConsumer<OUTPUT> consumer);
 }

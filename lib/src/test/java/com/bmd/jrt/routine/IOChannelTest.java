@@ -15,7 +15,7 @@ package com.bmd.jrt.routine;
 
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
 import com.bmd.jrt.channel.IOChannel;
-import com.bmd.jrt.channel.IOChannel.ChannelOutput;
+import com.bmd.jrt.channel.IOChannel.IOChannelOutput;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ReadDeadLockException;
 import com.bmd.jrt.common.RoutineException;
@@ -62,7 +62,7 @@ public class IOChannelTest extends TestCase {
         final IOChannel<String> channel = JavaRoutine.io().buildChannel();
         channel.input().after(TimeDuration.days(1)).pass("test").close();
 
-        final ChannelOutput<String> output = channel.output();
+        final IOChannelOutput<String> output = channel.output();
         assertThat(output.immediately().readAll()).isEmpty();
 
         final ArrayList<String> results = new ArrayList<String>();
@@ -165,7 +165,7 @@ public class IOChannelTest extends TestCase {
         final IOChannel<String> channel = JavaRoutine.io().buildChannel();
         channel.input().after(TimeDuration.seconds(3)).pass("test").close();
 
-        final ChannelOutput<String> output = channel.output();
+        final IOChannelOutput<String> output = channel.output();
         assertThat(output.immediately().readAll()).isEmpty();
 
         try {

@@ -19,7 +19,7 @@ import com.bmd.jrt.annotation.ParallelType;
 import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
 import com.bmd.jrt.channel.IOChannel;
-import com.bmd.jrt.channel.IOChannel.ChannelInput;
+import com.bmd.jrt.channel.IOChannel.IOChannelInput;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.ClassToken;
@@ -62,14 +62,14 @@ public class JavaRoutineTest extends TestCase {
         assertThat(channel.output().readFirst()).isEqualTo(-77L);
 
         final IOChannel<Object> channel1 = JavaRoutine.io().buildChannel();
-        final ChannelInput<Object> input1 = channel1.input();
+        final IOChannelInput<Object> input1 = channel1.input();
 
         input1.after(TimeDuration.millis(200)).pass(23).now().pass(-77L).close();
         assertThat(channel1.output().readAll()).containsOnly(23, -77L);
 
         final IOChannel<Object> channel2 =
                 JavaRoutine.io().dataOrder(DataOrder.INSERTION).buildChannel();
-        final ChannelInput<Object> input2 = channel2.input();
+        final IOChannelInput<Object> input2 = channel2.input();
 
         input2.after(TimeDuration.millis(200)).pass(23).now().pass(-77L).close();
         assertThat(channel2.output().readAll()).containsExactly(23, -77L);

@@ -195,8 +195,8 @@ public class JavaRoutine {
      * Returns a routine builder wrapping the specified invocation class token.
      *
      * @param classToken the invocation class token.
-     * @param <INPUT>    the input type.
-     * @param <OUTPUT>   the output type.
+     * @param <INPUT>    the input data type.
+     * @param <OUTPUT>   the output data type.
      * @return the routine builder instance.
      * @throws NullPointerException if the class token is null.
      */

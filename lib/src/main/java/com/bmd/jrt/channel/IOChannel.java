@@ -55,7 +55,7 @@ public interface IOChannel<TYPE> {
     /**
      * Interface defining an I/O channel input.
      *
-     * @param <INPUT> the input type.
+     * @param <INPUT> the input data type.
      */
     public interface ChannelInput<INPUT> extends InputChannel<INPUT> {
 
@@ -99,7 +99,7 @@ public interface IOChannel<TYPE> {
     /**
      * Interface defining an I/O channel output.
      *
-     * @param <OUTPUT> the output type.
+     * @param <OUTPUT> the output data type.
      */
     public interface ChannelOutput<OUTPUT> extends OutputChannel<OUTPUT> {
 

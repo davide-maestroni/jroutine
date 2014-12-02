@@ -22,7 +22,7 @@ import javax.annotation.Nullable;
  * <p/>
  * Created by davide on 9/16/14.
  *
- * @param <OUTPUT> the output type.
+ * @param <OUTPUT> the output data type.
  */
 public abstract class TemplateOutputConsumer<OUTPUT> implements OutputConsumer<OUTPUT> {
 

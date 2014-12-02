@@ -54,7 +54,7 @@ import static com.bmd.jrt.time.TimeDuration.seconds;
  * <p/>
  * Created by davide on 9/24/14.
  *
- * @param <OUTPUT> the output type.
+ * @param <OUTPUT> the output data type.
  */
 class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 

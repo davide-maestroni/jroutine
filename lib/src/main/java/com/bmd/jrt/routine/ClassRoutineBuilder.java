@@ -272,14 +272,16 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      * Returns a routine used for calling the method whose identifying name is specified in a
      * {@link Async} annotation.
      *
-     * @param name the name specified in the annotation.
+     * @param name     the name specified in the annotation.
+     * @param <INPUT>  the input data type.
+     * @param <OUTPUT> the output data type.
      * @return the routine.
      * @throws IllegalArgumentException if the specified method is not found.
      * @throws RoutineException         if an error occurred while instantiating the optional
      *                                  runner or the routine.
      */
     @Nonnull
-    public Routine<Object, Object> asyncMethod(@Nonnull final String name) {
+    public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> asyncMethod(@Nonnull final String name) {
 
         final Method method = mMethodMap.get(name);
 
@@ -357,14 +359,16 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      * The method is invoked ignoring an optional name specified in a {@link Async} annotation.
      * Though, the other annotation attributes will be honored.
      *
-     * @param method the method instance.
+     * @param method   the method instance.
+     * @param <INPUT>  the input data type.
+     * @param <OUTPUT> the output data type.
      * @return the routine.
      * @throws NullPointerException if the specified method is null.
      * @throws RoutineException     if an error occurred while instantiating the optional runner
      *                              or the routine.
      */
     @Nonnull
-    public Routine<Object, Object> method(@Nonnull final Method method) {
+    public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final Method method) {
 
         return method(mBuilder.buildConfiguration(), mLockName, mTargetClass, method);
     }
@@ -409,11 +413,15 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      * @param configuration the routine configuration.
      * @param lockName      the lock name.
      * @param method        the method to wrap.
+     * @param <INPUT>       the input data type.
+     * @param <OUTPUT>      the output data type.
      * @return the routine instance.
      */
     @Nonnull
-    protected Routine<Object, Object> getRoutine(@Nonnull final RoutineConfiguration configuration,
-            @Nullable final String lockName, @Nonnull final Method method) {
+    @SuppressWarnings("unchecked")
+    protected <INPUT, OUTPUT> Routine<INPUT, OUTPUT> getRoutine(
+            @Nonnull final RoutineConfiguration configuration, @Nullable final String lockName,
+            @Nonnull final Method method) {
 
         if (!method.isAccessible()) {
 
@@ -442,7 +450,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
             if (routine != null) {
 
-                return routine;
+                return (Routine<INPUT, OUTPUT>) routine;
             }
 
             Object mutex = null;
@@ -479,7 +487,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
             routineMap.put(routineInfo, routine);
         }
 
-        return routine;
+        return (Routine<INPUT, OUTPUT>) routine;
     }
 
     /**
@@ -489,15 +497,17 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      * @param lockName      the lock name.
      * @param targetClass   the target class.
      * @param targetMethod  the target method.
+     * @param <INPUT>       the input data type.
+     * @param <OUTPUT>      the output data type.
      * @return the routine.
      * @throws NullPointerException if the specified configuration, class or method are null.
      * @throws RoutineException     if an error occurred while instantiating the optional runner
      *                              or the routine.
      */
     @Nonnull
-    protected Routine<Object, Object> method(@Nonnull final RoutineConfiguration configuration,
-            @Nullable final String lockName, @Nonnull final Class<?> targetClass,
-            @Nonnull final Method targetMethod) {
+    protected <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(
+            @Nonnull final RoutineConfiguration configuration, @Nullable final String lockName,
+            @Nonnull final Class<?> targetClass, @Nonnull final Method targetMethod) {
 
         String methodLockName = lockName;
         final DefaultConfigurationBuilder builder = new DefaultConfigurationBuilder();

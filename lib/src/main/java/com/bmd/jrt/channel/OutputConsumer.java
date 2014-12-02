@@ -20,7 +20,7 @@ import javax.annotation.Nullable;
  * <p/>
  * Created by davide on 9/7/14.
  *
- * @param <OUTPUT> the output type.
+ * @param <OUTPUT> the output data type.
  */
 public interface OutputConsumer<OUTPUT> {
 

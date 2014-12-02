@@ -27,7 +27,7 @@ import javax.annotation.Nullable;
  * <p/>
  * Created by davide on 9/4/14.
  *
- * @param <INPUT> the input type.
+ * @param <INPUT> the input data type.
  */
 public interface InputChannel<INPUT> extends Channel {
 

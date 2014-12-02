@@ -26,8 +26,8 @@ import javax.annotation.Nullable;
  * <p/>
  * Created by davide on 10/17/14.
  *
- * @param <INPUT>  the input type.
- * @param <OUTPUT> the output type.
+ * @param <INPUT>  the input data type.
+ * @param <OUTPUT> the output data type.
  */
 public abstract class TemplateRoutine<INPUT, OUTPUT> implements Routine<INPUT, OUTPUT> {
 

@@ -35,8 +35,8 @@ import static com.bmd.jrt.routine.ReflectionUtils.NO_ARGS;
  * <p/>
  * Created by davide on 9/21/14.
  *
- * @param <INPUT>  the input type.
- * @param <OUTPUT> the output type.
+ * @param <INPUT>  the input data type.
+ * @param <OUTPUT> the output data type.
  */
 public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineChannelBuilder {
 

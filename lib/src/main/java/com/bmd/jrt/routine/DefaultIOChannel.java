@@ -188,7 +188,7 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
     /**
      * Default implementation of an I/O channel input.
      *
-     * @param <INPUT> the input type.
+     * @param <INPUT> the input data type.
      */
     private static class DefaultChannelInput<INPUT> implements ChannelInput<INPUT> {
 
@@ -295,7 +295,7 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
     /**
      * Default implementation of an I/O channel output.
      *
-     * @param <OUTPUT> the output type.
+     * @param <OUTPUT> the output data type.
      */
     private static class DefaultChannelOutput<OUTPUT> implements ChannelOutput<OUTPUT> {
 

@@ -23,8 +23,8 @@ import javax.annotation.Nonnull;
  * <p/>
  * Created by davide on 9/17/14.
  *
- * @param <INPUT>  the input type.
- * @param <OUTPUT> the output type.
+ * @param <INPUT>  the input data type.
+ * @param <OUTPUT> the output data type.
  */
 class ParallelInvocation<INPUT, OUTPUT> extends TemplateInvocation<INPUT, OUTPUT> {
 

@@ -47,8 +47,8 @@ import static com.bmd.jrt.time.TimeDuration.fromUnit;
  * <p/>
  * Created by davide on 9/24/14.
  *
- * @param <INPUT>  the input type.
- * @param <OUTPUT> the output type.
+ * @param <INPUT>  the input data type.
+ * @param <OUTPUT> the output data type.
  */
 class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, OUTPUT> {
 
@@ -535,8 +535,8 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
     /**
      * Interface defining an object managing the creation and the recycling of invocation instances.
      *
-     * @param <INPUT>  the input type.
-     * @param <OUTPUT> the output type.
+     * @param <INPUT>  the input data type.
+     * @param <OUTPUT> the output data type.
      */
     interface InvocationManager<INPUT, OUTPUT> {
 

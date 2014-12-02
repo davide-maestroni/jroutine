@@ -31,8 +31,8 @@ import static com.bmd.jrt.routine.ReflectionUtils.findConstructor;
  * <p/>
  * Created by davide on 9/9/14.
  *
- * @param <INPUT>  the input type.
- * @param <OUTPUT> the output type.
+ * @param <INPUT>  the input data type.
+ * @param <OUTPUT> the output data type.
  */
 class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
 

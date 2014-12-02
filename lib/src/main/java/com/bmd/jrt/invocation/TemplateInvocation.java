@@ -25,8 +25,8 @@ import javax.annotation.Nullable;
  * <p/>
  * Created by davide on 9/11/14.
  *
- * @param <INPUT>  the input type.
- * @param <OUTPUT> the output type.
+ * @param <INPUT>  the input data type.
+ * @param <OUTPUT> the output data type.
  */
 public abstract class TemplateInvocation<INPUT, OUTPUT> implements Invocation<INPUT, OUTPUT> {
 

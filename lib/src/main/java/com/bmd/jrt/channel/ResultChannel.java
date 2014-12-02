@@ -26,7 +26,7 @@ import javax.annotation.Nullable;
  * <p/>
  * Created by davide on 9/15/14.
  *
- * @param <OUTPUT> the output type.
+ * @param <OUTPUT> the output data type.
  */
 public interface ResultChannel<OUTPUT> extends InputChannel<OUTPUT> {
 

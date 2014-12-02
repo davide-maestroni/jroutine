@@ -30,7 +30,7 @@ import javax.annotation.Nullable;
  * <p/>
  * Created by davide on 9/4/14.
  *
- * @param <OUTPUT> the output type.
+ * @param <OUTPUT> the output data type.
  */
 public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
 

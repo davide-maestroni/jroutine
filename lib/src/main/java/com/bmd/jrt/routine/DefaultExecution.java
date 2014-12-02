@@ -26,8 +26,8 @@ import javax.annotation.Nullable;
  * <p/>
  * Created by davide on 9/24/14.
  *
- * @param <INPUT>  the input type.
- * @param <OUTPUT> the output type.
+ * @param <INPUT>  the input data type.
+ * @param <OUTPUT> the output data type.
  */
 class DefaultExecution<INPUT, OUTPUT> implements Execution {
 
@@ -163,7 +163,7 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
     /**
      * Interface defining an iterator of input data.
      *
-     * @param <INPUT>the input type.
+     * @param <INPUT> the input data type.
      */
     interface InputIterator<INPUT> {
 

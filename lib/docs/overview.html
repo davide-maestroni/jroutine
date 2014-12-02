@@ -16,11 +16,11 @@ Parallel programming on the go.
             public static void main(final String[] args) {
 
                 final Routine&lt;String, Integer&gt; parseRoutine = on(tokenOf(Parse.class)).buildRoutine();
-                final Routine&lt;Integer, Integer&gt; sumRoutine = on(tokenOf(Sum.class)).buildRoutine();
                 final Routine&lt;Integer, Integer&gt; squareRoutine = on(tokenOf(Square.class)).buildRoutine();
+                final Routine&lt;Integer, Double&gt; meanRoutine = on(tokenOf(SquareRootMean.class)).buildRoutine();
 
-                final Integer rms =
-                        sumRoutine.callAsync(squareRoutine.callParallel(parseRoutine.callParallel(args)))
+                final Double rms =
+                        meanRoutine.callAsync(squareRoutine.callParallel(parseRoutine.callParallel(args)))
                                   .readFirst();
 
                 System.out.println(rms);
@@ -47,26 +47,37 @@ Parallel programming on the go.
                 }
             }
 
-            private static class Sum extends TemplateInvocation&lt;Integer, Integer&gt; {
+            private static class SquareRootMean extends TemplateInvocation&lt;Integer, Double&gt; {
+
+                private int mCount;
 
                 private int mSum;
 
                 &commat;Override
                 public void onInit() {
 
+                    mCount = 0;
                     mSum = 0;
                 }
 
                 &commat;Override
-                public void onInput(final Integer integer, &commat;Nonnull final ResultChannel&lt;Integer&gt; result) {
+                public void onInput(final Integer integer, &commat;Nonnull final ResultChannel&lt;Double&gt; result) {
 
+                    ++mCount;
                     mSum += integer;
                 }
 
                 &commat;Override
-                public void onResult(&commat;Nonnull final ResultChannel&lt;Integer&gt; result) {
+                public void onResult(&commat;Nonnull final ResultChannel&lt;Double&gt; result) {
 
-                    result.pass(mSum);
+                    if (mCount > 0) {
+
+                        result.pass(Math.sqrt(mSum) / mCount);
+
+                    } else {
+
+                        result.pass(0d);
+                    }
                 }
             }
         }
@@ -78,21 +89,20 @@ Parallel programming on the go.
         &commat;Async(lockName = Async.NULL_LOCK)
         public class Main {
 
+            private static final String MEAN = "mean";
+
             private static final String PARSE = "parse";
 
             private static final String SQUARE = "square";
 
-            private static final String SUM = "sum";
-
             public static void main(final String[] args) {
 
-                final Routine&lt;Object, Object&gt; parseRoutine = on(Main.class).asyncMethod(PARSE);
-                final Routine&lt;Object, Object&gt; squareRoutine = on(Main.class).asyncMethod(SQUARE);
-                final Routine&lt;Object, Object&gt; sumRoutine = on(Main.class).asyncMethod(SUM);
+                final Routine&lt;String, Integer&gt; parseRoutine = on(Main.class).asyncMethod(PARSE);
+                final Routine&lt;Integer, Integer&gt; squareRoutine = on(Main.class).asyncMethod(SQUARE);
+                final Routine&lt;List&lt;Integer&gt;, Double&gt; meanRoutine = on(Main.class).asyncMethod(MEAN);
 
-                final Integer rms = (Integer) sumRoutine.callAsync(
-                        (Object) squareRoutine.callParallel(parseRoutine.callParallel(args)).readAll())
-                                                        .readFirst();
+                final Double rms = meanRoutine.callAsync(
+                        squareRoutine.callParallel(parseRoutine.callParallel(args)).readAll()).readFirst();
 
                 System.out.println(rms);
 
@@ -111,8 +121,13 @@ Parallel programming on the go.
                 return value * value;
             }
 
-            &commat;Async(SUM)
-            private static int sum(final List&lt;Integer&gt; values) {
+            &commat;Async(MEAN)
+            private static double squareRootMean(final List&lt;Integer&gt; values) {
+
+                if (values.isEmpty()) {
+
+                    return 0;
+                }
 
                 int sum = 0;
 
@@ -121,7 +136,7 @@ Parallel programming on the go.
                     sum += value;
                 }
 
-                return sum;
+                return Math.sqrt(sum) / values.size();
             }
         }
     </code>
@@ -134,7 +149,7 @@ Parallel programming on the go.
             public static void main(final String[] args) {
 
                 final AsyncMain proxy = on(new Main()).proxy(AsyncMain.class);
-                final int rms = proxy.sum(proxy.square(proxy.parseArg(args)));
+                final double rms = proxy.squareRootMean(proxy.square(proxy.parseArg(args)));
 
                 System.out.println(rms);
 
@@ -151,7 +166,12 @@ Parallel programming on the go.
                 return value * value;
             }
 
-            private int sum(final int... values) {
+            private double squareRootMean(final int... values) {
+
+                if (values.length == 0) {
+
+                    return 0;
+                }
 
                 int sum = 0;
 
@@ -160,7 +180,7 @@ Parallel programming on the go.
                     sum += value;
                 }
 
-                return sum;
+                return Math.sqrt(sum) / values.length;
             }
 
             &commat;Async(lockName = Async.NULL_LOCK)
@@ -172,7 +192,7 @@ Parallel programming on the go.
                 &commat;AsyncType(int.class)
                 public int[] square(&commat;ParallelType(int.class) OutputChannel&lt;Integer&gt; value);
 
-                public int sum(int... values);
+                public double squareRootMean(int... values);
             }
         }
     </code>
@@ -184,8 +204,8 @@ Parallel programming on the go.
 
             public static void main(final String[] args) {
 
-                final Async proxy = on(new Main()).asClass(Async.class);
-                final int rms = proxy.sum(proxy.square(proxy.parseArg(args)));
+                final AsyncMain proxy = on(new Main()).asClass(AsyncMain.class);
+                final double rms = proxy.squareRootMean(proxy.square(proxy.parseArg(args)));
 
                 System.out.println(rms);
 
@@ -202,7 +222,12 @@ Parallel programming on the go.
                 return value * value;
             }
 
-            public int sum(final int... values) {
+            public double squareRootMean(final int... values) {
+
+                if (values.length == 0) {
+
+                    return 0;
+                }
 
                 int sum = 0;
 
@@ -211,12 +236,12 @@ Parallel programming on the go.
                     sum += value;
                 }
 
-                return sum;
+                return Math.sqrt(sum) / values.length;
             }
 
             &commat;AsyncClass(Main.class)
             &commat;Async(lockName = Async.NULL_LOCK)
-            private interface Async {
+            private interface AsyncMain {
 
                 &commat;AsyncType(int.class)
                 public OutputChannel&lt;Integer&gt; parseArg(&commat;ParallelType(String.class) String[] args);
@@ -224,7 +249,7 @@ Parallel programming on the go.
                 &commat;AsyncType(int.class)
                 public int[] square(&commat;ParallelType(int.class) OutputChannel&lt;Integer&gt; value);
 
-                public int sum(int... values);
+                public double squareRootMean(int... values);
             }
         }
     </code>

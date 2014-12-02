@@ -19,6 +19,7 @@ import com.bmd.jrt.annotation.ParallelType;
 import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
 import com.bmd.jrt.channel.IOChannel;
 import com.bmd.jrt.channel.OutputChannel;
+import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.log.NullLog;
 import com.bmd.jrt.runner.Runners;
@@ -48,7 +49,8 @@ public class RoutineProcessorTest extends TestCase {
                                                        .runBy(Runners.poolRunner())
                                                        .logLevel(LogLevel.DEBUG)
                                                        .loggedWith(new NullLog())
-                                                       .asClass(TestInterface.class);
+                                                       .asClass(ClassToken.tokenOf(
+                                                               TestInterface.class));
 
         assertThat(testInterface.getOne().readFirst()).isEqualTo(1);
         assertThat(testInterface.getString(1, 2, 3)).isIn("1", "2", "3");

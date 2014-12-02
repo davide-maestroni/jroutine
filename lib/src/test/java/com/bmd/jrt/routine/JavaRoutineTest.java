@@ -569,6 +569,26 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
+            new ObjectRoutineBuilder(test).asClass((Class<?>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new ObjectRoutineBuilder(test).asClass((ClassToken<?>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
             new ObjectRoutineBuilder(test).asClass(Test.class);
 
             fail();
@@ -689,7 +709,9 @@ public class JavaRoutineTest extends TestCase {
         channel.input().pass(1, 2, 3).close();
         assertThat(squareAsync.computeParallel4(channel.output()).readAll()).contains(1, 4, 9);
 
-        final int[] inc = JavaRoutine.on(new TestInc()).proxy(ITestInc.class).inc(1, 2, 3, 4);
+        final int[] inc = JavaRoutine.on(new TestInc())
+                                     .proxy(ClassToken.tokenOf(ITestInc.class))
+                                     .inc(1, 2, 3, 4);
         assertThat(inc).containsOnly(2, 3, 4, 5);
     }
 

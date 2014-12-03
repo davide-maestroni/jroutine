@@ -99,6 +99,7 @@ android.libraryVariants.all { variant ->
         classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)
         title = "${archivesBaseName} ${version}"
         options.links('http://docs.oracle.com/javase/7/docs/api/')
+        options.links('http://davide-maestroni.github.io/jroutine/javadocs/')
         options.linksOffline('http://developer.android.com/reference/', "${android.sdkDirectory}/docs/reference/")
         options.overview("${project.projectDir}/docs/overview.html")
         options.windowTitle("Javadoc - ${archivesBaseName}")

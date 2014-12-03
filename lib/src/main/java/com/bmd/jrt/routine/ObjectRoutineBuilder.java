@@ -293,7 +293,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * @throws IllegalArgumentException if the specified class does not represent an interface.
      */
     @Nonnull
-    public <CLASS> CLASS asClass(@Nonnull final Class<CLASS> itf) {
+    public <CLASS> CLASS implementationOf(@Nonnull final Class<CLASS> itf) {
 
         if (!itf.isInterface()) {
 
@@ -377,9 +377,9 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * @throws IllegalArgumentException if the specified class does not represent an interface.
      */
     @Nonnull
-    public <CLASS> CLASS asClass(@Nonnull final ClassToken<CLASS> itf) {
+    public <CLASS> CLASS implementationOf(@Nonnull final ClassToken<CLASS> itf) {
 
-        return itf.cast(asClass(itf.getRawClass()));
+        return itf.cast(implementationOf(itf.getRawClass()));
     }
 
     /**

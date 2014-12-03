@@ -569,7 +569,7 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            new ObjectRoutineBuilder(test).asClass((Class<?>) null);
+            new ObjectRoutineBuilder(test).implementationOf((Class<?>) null);
 
             fail();
 
@@ -579,7 +579,7 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            new ObjectRoutineBuilder(test).asClass((ClassToken<?>) null);
+            new ObjectRoutineBuilder(test).implementationOf((ClassToken<?>) null);
 
             fail();
 
@@ -589,7 +589,7 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            new ObjectRoutineBuilder(test).asClass(Test.class);
+            new ObjectRoutineBuilder(test).implementationOf(Test.class);
 
             fail();
 
@@ -599,7 +599,7 @@ public class JavaRoutineTest extends TestCase {
 
         try {
 
-            new ObjectRoutineBuilder(test).asClass(ClassToken.tokenOf(Test.class));
+            new ObjectRoutineBuilder(test).implementationOf(ClassToken.tokenOf(Test.class));
 
             fail();
 

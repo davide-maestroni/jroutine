@@ -44,10 +44,6 @@ android {
             testCoverageEnabled true
         }
     }
-
-    lintOptions {
-        disable 'InvalidPackage', 'OldTargetApi'
-    }
 }
 
 dependencies {

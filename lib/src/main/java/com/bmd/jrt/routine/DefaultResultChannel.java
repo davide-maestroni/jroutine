@@ -673,16 +673,16 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     private OUTPUT nextOutput(@Nonnull final NestedQueue<Object> outputQueue,
             @Nonnull final TimeDuration timeout) {
 
-        final boolean wasInputFull = (mOutputCount >= mMaxOutput);
         final Object result = outputQueue.removeFirst();
 
         mLogger.dbg("reading output [#%d]: %s [%s]", mOutputCount, result, timeout);
 
         RoutineExceptionWrapper.raise(result);
 
-        --mOutputCount;
+        final int maxOutput = mMaxOutput;
+        final int prevOutputCount = mOutputCount;
 
-        if (wasInputFull) {
+        if ((--mOutputCount < maxOutput) && (prevOutputCount >= maxOutput)) {
 
             mMutex.notifyAll();
         }

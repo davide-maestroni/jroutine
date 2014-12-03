@@ -611,14 +611,14 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
                     throw new NoSuchElementException();
                 }
 
-                final boolean wasInputFull = (mInputCount >= mMaxInput);
                 final INPUT input = mInputQueue.removeFirst();
 
                 mLogger.dbg("reading input [#%d]: %s", mInputCount, input);
 
-                --mInputCount;
+                final int maxInput = mMaxInput;
+                final int prevInputCount = mInputCount;
 
-                if (wasInputFull) {
+                if ((--mInputCount < maxInput) && (prevInputCount >= maxInput)) {
 
                     mMutex.notify();
                 }

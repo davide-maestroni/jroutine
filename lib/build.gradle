@@ -11,8 +11,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import proguard.gradle.ProGuardTask
-
 apply plugin: 'java'
 apply plugin: 'jacoco'
 apply plugin: 'findbugs'
@@ -29,14 +27,6 @@ dependencies {
     testCompile 'junit:junit:4.11'
     testCompile 'org.easytesting:fest-assert-core:2.0M10'
     testCompile project(":proutine")
-}
-
-task proguardTask(type: ProGuardTask) {
-    configuration file("${project.projectDir}/proguard-project.txt")
-    injars file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar")
-    libraryjars file("${System.env.JAVA_HOME}/jre/lib/rt.jar")
-    libraryjars configurations.compile.filter { !it.isDirectory() }
-    outjars file("${project.buildDir}/libs/${archivesBaseName}-${version}-pro.jar")
 }
 
 task('jacocoTest', dependsOn: 'test') {

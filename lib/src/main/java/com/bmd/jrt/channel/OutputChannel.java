@@ -73,10 +73,8 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      *
      * @param consumer the consumer instance.
      * @return this channel.
-     * @throws NullPointerException                if the specified consumer is null.
-     * @throws IllegalStateException               if this channel is already bound to a consumer.
-     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
-     *                                             exception.
+     * @throws NullPointerException  if the specified consumer is null.
+     * @throws IllegalStateException if this channel is already bound to a consumer.
      */
     @Nonnull
     public OutputChannel<OUTPUT> bind(@Nonnull OutputConsumer<OUTPUT> consumer);
@@ -196,8 +194,11 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
     public OUTPUT readFirst();
 
     /**
-     * @param consumer
-     * @return
+     * Unbinds the specified consumer from this channel. After the call the output will returned to
+     * readers.
+     *
+     * @param consumer the consumer instance.
+     * @return this channel.
      */
     @Nonnull
     public OutputChannel<OUTPUT> unbind(@Nullable OutputConsumer<OUTPUT> consumer);

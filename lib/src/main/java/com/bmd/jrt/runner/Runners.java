@@ -104,7 +104,7 @@ public class Runners {
 
         if (sSharedRunner == null) {
 
-            sSharedRunner = poolRunner(getBestPoolSize() * 4);
+            sSharedRunner = poolRunner();
         }
 
         return sSharedRunner;
@@ -112,13 +112,6 @@ public class Runners {
 
     private static int getBestPoolSize() {
 
-        final int processors = Runtime.getRuntime().availableProcessors();
-
-        if (processors < 4) {
-
-            return Math.max(1, processors - 1);
-        }
-
-        return (processors / 2);
+        return Runtime.getRuntime().availableProcessors() << 1;
     }
 }

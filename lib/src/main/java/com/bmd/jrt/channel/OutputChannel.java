@@ -110,7 +110,9 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
     public OutputChannel<OUTPUT> immediately();
 
     /**
-     * @return
+     * Checks if this channel is bound to a consumer.
+     *
+     * @return whether the channel is bound.
      */
     public boolean isBound();
 

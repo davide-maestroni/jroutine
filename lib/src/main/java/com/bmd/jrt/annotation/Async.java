@@ -60,7 +60,7 @@ import java.util.concurrent.TimeUnit;
  * <pre>
  *     <code>
  *
- *         JavaRoutine.on(new MyClass()).method(MyClass.METHOD_NAME).callAsync();
+ *         JavaRoutine.on(new MyClass()).asyncMethod(MyClass.METHOD_NAME).callAsync();
  *     </code>
  * </pre>
  * <p/>

@@ -8,7 +8,11 @@ Parallel programming on the go.
 <p>
     The code below shows how it is possible to implement the computation of the root mean square of some input data, by distributing it in a number of background threads.
 </p>
-<b>Example 1:</b> via invocation implementations:
+<b>Example 1:</b> via invocation implementations.
+<pre>
+    This is actually the most efficient way, since there is full control on how data are passed to the specific invocations.<br/>
+    In fact, the parsing, the square and the mean computation all happen in parallel background threads.
+</pre>
 <pre>
     <code>
         public class Main {
@@ -83,7 +87,11 @@ Parallel programming on the go.
         }
     </code>
 </pre>
-<b>Example 2:</b> via reflection:
+<b>Example 2:</b> via reflection.
+<pre>
+    This approach allows the asynchronous invocation of an object methods, by creating routines which wrap the methods to call.<br/>
+    In this case, the mean computation must actually wait for all the input data to be available before being invoked. Thus, it cannot really happen in a parallel way like in the previous example.
+</pre>
 <pre>
     <code>
         &commat;Async(lockName = Async.NULL_LOCK)
@@ -141,7 +149,11 @@ Parallel programming on the go.
         }
     </code>
 </pre>
-<b>Example 3:</b> via proxy:
+<b>Example 3:</b> via proxy.
+<pre>
+    Using a proxy object is just a convenient way to wrap several methods at once.<br/>
+    Note that the some annotations of the previous example could have been used to bind the methods with the proxy interface.
+</pre>
 <pre>
     <code>
         public class Main {
@@ -197,14 +209,18 @@ Parallel programming on the go.
         }
     </code>
 </pre>
-<b>Example 4:</b> via code generation:
+<b>Example 4:</b> via code generation.
+<pre>
+    This example is the same as the previous one with the only difference that the class methods are not called through reflection, but a concrete object is dynamically generated through an annotation processor.<br/>
+    Note that, unlike the previous example, the proxy interface and the class methods bust be declared as public in order to be called by the proxy instance.
+</pre>
 <pre>
     <code>
         public class Main {
 
             public static void main(final String[] args) {
 
-                final AsyncMain proxy = on(new Main()).asClass(AsyncMain.class);
+                final AsyncMain proxy = on(new Main()).implementationOf(AsyncMain.class);
                 final double rms = proxy.squareRootMean(proxy.square(proxy.parseArg(args)));
 
                 System.out.println(rms);
@@ -241,7 +257,7 @@ Parallel programming on the go.
 
             &commat;AsyncClass(Main.class)
             &commat;Async(lockName = Async.NULL_LOCK)
-            private interface AsyncMain {
+            public interface AsyncMain {
 
                 &commat;AsyncType(int.class)
                 public OutputChannel&lt;Integer&gt; parseArg(&commat;ParallelType(String.class) String[] args);

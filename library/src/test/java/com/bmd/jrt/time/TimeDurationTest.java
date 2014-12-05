@@ -23,7 +23,7 @@ import java.lang.reflect.Method;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Time duration unit tests.

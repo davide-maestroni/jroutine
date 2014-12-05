@@ -22,7 +22,7 @@ import junit.framework.TestCase;
 
 import java.lang.reflect.Method;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Exception unit tests.
@@ -50,7 +50,8 @@ public class ExceptionTest extends TestCase {
                 RoutineInvocationException.class);
         assertThat(new RoutineInvocationException(new NullPointerException(), this, Object.class,
                                                   waitMethod.getName()).getCause())
-                .isExactlyInstanceOf(NullPointerException.class);
+                .isExactlyInstanceOf(
+                NullPointerException.class);
         assertThat(new RoutineInvocationException(null, null, Object.class,
                                                   waitMethod.getName())).hasNoCause();
         assertThat(new RoutineInvocationException(new NullPointerException(), this, Object.class,

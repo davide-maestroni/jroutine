@@ -31,7 +31,7 @@ import static com.bmd.jrt.time.TimeDuration.ZERO;
 import static com.bmd.jrt.time.TimeDuration.micros;
 import static com.bmd.jrt.time.TimeDuration.millis;
 import static com.bmd.jrt.time.TimeDuration.nanos;
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Android runners unit tests.

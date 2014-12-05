@@ -49,7 +49,7 @@ import javax.annotation.Nonnull;
  *     <code>
  *
  *         final Routine&lt;Result, Result&gt; routine =
- *                  JavaRoutine.&lt;Result&gt;on().buildRoutine();
+ *                  JRoutine.&lt;Result&gt;on().buildRoutine();
  *
  *         routine.invokeAsync()
  *                .pass(doSomething1.callAsync())
@@ -77,7 +77,7 @@ import javax.annotation.Nonnull;
  *     <code>
  *
  *         final Routine&lt;Result, Result&gt; routine =
- *                  JavaRoutine.&lt;Result&gt;on().buildRoutine();
+ *                  JRoutine.&lt;Result&gt;on().buildRoutine();
  *
  *         routine.invokeAsync()
  *                .pass(doSomething1.callAsync(doSomething2.callAsync()))
@@ -90,7 +90,7 @@ import javax.annotation.Nonnull;
  *     <code>
  *
  *         final Routine&lt;Result, Result&gt; routine =
- *                  JavaRoutine.&lt;Result&gt;on().buildRoutine();
+ *                  JRoutine.&lt;Result&gt;on().buildRoutine();
  *
  *         routine.callAsync(doSomething1.callAsync(doSomething2.callAsync())).readAllInto(results);
  *     </code>
@@ -107,7 +107,7 @@ import javax.annotation.Nonnull;
  *                  &#64;AsyncType(Result.class) OutputChannel&lt;Result&gt; result2);
  *         }
  *
- *         final AsyncCallback callback = JavaRoutine.on(myCallback).proxy(AsyncCallback.class);
+ *         final AsyncCallback callback = JRoutine.on(myCallback).proxy(AsyncCallback.class);
  *
  *         callback.onResults(doSomething1.callAsync(), doSomething2.callAsync());
  *     </code>
@@ -119,7 +119,7 @@ import javax.annotation.Nonnull;
  * <pre>
  *     <code>
  *
- *         final IOChannel&lt;Result&gt; channel = JavaRoutine.io().&lt;Result&gt;buildChannel();
+ *         final IOChannel&lt;Result&gt; channel = JRoutine.io().&lt;Result&gt;buildChannel();
  *
  *         new Thread() {
  *
@@ -132,7 +132,7 @@ import javax.annotation.Nonnull;
  *         }.start();
  *
  *         final Routine&lt;Result, Result&gt; routine =
- *                  JavaRoutine.&lt;Result&gt;on().buildRoutine();
+ *                  JRoutine.&lt;Result&gt;on().buildRoutine();
  *
  *         routine.callAsync(channel).readAllInto(results);
  *     </code>
@@ -144,12 +144,12 @@ import javax.annotation.Nonnull;
  * @see com.bmd.jrt.annotation.AsyncType
  * @see com.bmd.jrt.annotation.ParallelType
  */
-public class JavaRoutine {
+public class JRoutine {
 
     /**
      * Avoid direct instantiation.
      */
-    protected JavaRoutine() {
+    protected JRoutine() {
 
     }
 

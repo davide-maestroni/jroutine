@@ -266,9 +266,10 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
 
         @Nonnull
         @Override
-        public IOChannelOutput<OUTPUT> eventuallyDeadLock() {
+        @SuppressWarnings("BooleanParameter")
+        public IOChannelOutput<OUTPUT> eventuallyDeadLock(final boolean throwException) {
 
-            mChannel.eventuallyDeadLock();
+            mChannel.eventuallyDeadLock(throwException);
 
             return this;
         }
@@ -278,15 +279,6 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
         public IOChannelOutput<OUTPUT> immediately() {
 
             mChannel.immediately();
-
-            return this;
-        }
-
-        @Nonnull
-        @Override
-        public IOChannelOutput<OUTPUT> neverDeadLock() {
-
-            mChannel.neverDeadLock();
 
             return this;
         }

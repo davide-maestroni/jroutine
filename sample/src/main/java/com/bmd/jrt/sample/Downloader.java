@@ -15,7 +15,7 @@ package com.bmd.jrt.sample;
 
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.common.RoutineException;
-import com.bmd.jrt.routine.JavaRoutine;
+import com.bmd.jrt.routine.JRoutine;
 import com.bmd.jrt.routine.Routine;
 import com.bmd.jrt.time.TimeDuration;
 
@@ -45,9 +45,9 @@ public class Downloader {
 
     public Downloader(final int maxParallelDownloads) {
 
-        mReadConnection = JavaRoutine.on(tokenOf(ReadConnection.class))
-                                     .maxRunning(maxParallelDownloads)
-                                     .buildRoutine();
+        mReadConnection = JRoutine.on(tokenOf(ReadConnection.class))
+                                  .maxRunning(maxParallelDownloads)
+                                  .buildRoutine();
     }
 
     public static String getFileName(final URI uri) {
@@ -98,11 +98,11 @@ public class Downloader {
 
             mDownloadedSet.remove(uri);
 
-            final Routine<Chunk, Boolean> writeFile = JavaRoutine.on(tokenOf(WriteFile.class))
-                                                                 .inputSize(8)
-                                                                 .inputTimeout(seconds(30))
-                                                                 .withArgs(dstFile)
-                                                                 .buildRoutine();
+            final Routine<Chunk, Boolean> writeFile = JRoutine.on(tokenOf(WriteFile.class))
+                                                              .inputSize(8)
+                                                              .inputTimeout(seconds(30))
+                                                              .withArgs(dstFile)
+                                                              .buildRoutine();
 
             try {
 

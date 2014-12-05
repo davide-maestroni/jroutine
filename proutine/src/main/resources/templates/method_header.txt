@@ -19,7 +19,7 @@
     private com.bmd.jrt.routine.Routine<Object, ${resultClassName}> initRoutine${methodCount}(
             final com.bmd.jrt.builder.RoutineConfiguration configuration) {
 
-        return com.bmd.jrt.routine.JavaRoutine.on(new com.bmd.jrt.common.ClassToken<SimpleInvocation${methodCount}>(){})
+        return com.bmd.jrt.routine.JRoutine.on(new com.bmd.jrt.common.ClassToken<SimpleInvocation${methodCount}>(){})
                                        ${routineBuilderOptions}
                                        .inputSize(Integer.MAX_VALUE)
                                        .inputTimeout(com.bmd.jrt.time.TimeDuration.ZERO)

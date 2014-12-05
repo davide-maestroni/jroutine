@@ -55,10 +55,10 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import static com.bmd.jrt.common.ClassToken.tokenOf;
-import static com.bmd.jrt.routine.JavaRoutine.on;
+import static com.bmd.jrt.routine.JRoutine.on;
 import static com.bmd.jrt.time.TimeDuration.ZERO;
 import static com.bmd.jrt.time.TimeDuration.seconds;
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Routine unit tests.
@@ -212,7 +212,7 @@ public class RoutineTest extends TestCase {
                     }
                 };
 
-        final Routine<String, String> routine = JavaRoutine.on(tokenOf(abortInvocation))
+        final Routine<String, String> routine = JRoutine.on(tokenOf(abortInvocation))
                                                            .withArgs(this, abortReason, semaphore)
                                                            .buildRoutine();
 
@@ -236,7 +236,7 @@ public class RoutineTest extends TestCase {
     public void testBind() {
 
         final TestOutputConsumer consumer = new TestOutputConsumer();
-        final OutputChannel<Object> channel1 = JavaRoutine.on()
+        final OutputChannel<Object> channel1 = JRoutine.on()
                                                           .buildRoutine()
                                                           .invokeAsync()
                                                           .after(seconds(1))
@@ -260,7 +260,7 @@ public class RoutineTest extends TestCase {
         assertThat(consumer.isOutput()).isFalse();
 
         final OutputChannel<Object> channel2 =
-                JavaRoutine.on().buildRoutine().invoke().pass("test2").result();
+                JRoutine.on().buildRoutine().invoke().pass("test2").result();
 
         channel2.bind(consumer);
         assertThat(channel1.isBound()).isFalse();
@@ -271,7 +271,7 @@ public class RoutineTest extends TestCase {
 
     public void testCalls() {
 
-        final Routine<String, String> routine = JavaRoutine.<String>on().buildRoutine();
+        final Routine<String, String> routine = JRoutine.<String>on().buildRoutine();
 
         assertThat(routine.call().readAll()).isEmpty();
         assertThat(routine.call(Arrays.asList("test1", "test2")).readAll()).containsExactly("test1",
@@ -466,7 +466,7 @@ public class RoutineTest extends TestCase {
 
     public void testDelay() {
 
-        final Routine<String, String> routine = JavaRoutine.on(tokenOf(DelayedInvocation.class))
+        final Routine<String, String> routine = JRoutine.on(tokenOf(DelayedInvocation.class))
                                                            .withArgs(TimeDuration.millis(10))
                                                            .buildRoutine();
 
@@ -484,7 +484,7 @@ public class RoutineTest extends TestCase {
                                                                                           "test4");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(110);
 
-        final Routine<String, String> routine1 = JavaRoutine.on(tokenOf(DelayedInvocation.class))
+        final Routine<String, String> routine1 = JRoutine.on(tokenOf(DelayedInvocation.class))
                                                             .inputOrder(DataOrder.INSERTION)
                                                             .outputOrder(DataOrder.INSERTION)
                                                             .withArgs(TimeDuration.millis(10))
@@ -503,8 +503,7 @@ public class RoutineTest extends TestCase {
                 "test1", "test2", "test3", "test4");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(110);
 
-        final Routine<String, String> routine2 =
-                JavaRoutine.on(tokenOf(DelayedListInvocation.class))
+        final Routine<String, String> routine2 = JRoutine.on(tokenOf(DelayedListInvocation.class))
                            .withArgs(TimeDuration.millis(10), 2)
                            .buildRoutine();
 
@@ -522,8 +521,7 @@ public class RoutineTest extends TestCase {
                                                                                            "test4");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(110);
 
-        final Routine<String, String> routine3 =
-                JavaRoutine.on(tokenOf(DelayedListInvocation.class))
+        final Routine<String, String> routine3 = JRoutine.on(tokenOf(DelayedListInvocation.class))
                            .inputOrder(DataOrder.INSERTION)
                            .outputOrder(DataOrder.INSERTION)
                            .withArgs(TimeDuration.millis(10), 2)
@@ -541,8 +539,7 @@ public class RoutineTest extends TestCase {
                 "test1", "test2", "test3", "test4");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(110);
 
-        final Routine<String, String> routine4 =
-                JavaRoutine.on(tokenOf(DelayedListInvocation.class))
+        final Routine<String, String> routine4 = JRoutine.on(tokenOf(DelayedListInvocation.class))
                            .withArgs(TimeDuration.ZERO, 2)
                            .buildRoutine();
 
@@ -560,8 +557,7 @@ public class RoutineTest extends TestCase {
                                                                                            "test4");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(100);
 
-        final Routine<String, String> routine5 =
-                JavaRoutine.on(tokenOf(DelayedListInvocation.class))
+        final Routine<String, String> routine5 = JRoutine.on(tokenOf(DelayedListInvocation.class))
                            .inputOrder(DataOrder.INSERTION)
                            .outputOrder(DataOrder.INSERTION)
                            .withArgs(TimeDuration.ZERO, 2)
@@ -580,7 +576,7 @@ public class RoutineTest extends TestCase {
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(100);
 
         final Routine<String, String> routine6 =
-                JavaRoutine.on(tokenOf(DelayedChannelInvocation.class))
+                JRoutine.on(tokenOf(DelayedChannelInvocation.class))
                            .withArgs(TimeDuration.millis(10))
                            .buildRoutine();
 
@@ -599,7 +595,7 @@ public class RoutineTest extends TestCase {
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(110);
 
         final Routine<String, String> routine7 =
-                JavaRoutine.on(tokenOf(DelayedChannelInvocation.class))
+                JRoutine.on(tokenOf(DelayedChannelInvocation.class))
                            .inputOrder(DataOrder.INSERTION)
                            .outputOrder(DataOrder.INSERTION)
                            .withArgs(TimeDuration.millis(10))
@@ -618,7 +614,7 @@ public class RoutineTest extends TestCase {
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(110);
 
         final Routine<String, String> routine8 =
-                JavaRoutine.on(tokenOf(DelayedChannelInvocation.class))
+                JRoutine.on(tokenOf(DelayedChannelInvocation.class))
                            .withArgs(TimeDuration.ZERO)
                            .buildRoutine();
 
@@ -637,7 +633,7 @@ public class RoutineTest extends TestCase {
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(100);
 
         final Routine<String, String> routine9 =
-                JavaRoutine.on(tokenOf(DelayedChannelInvocation.class))
+                JRoutine.on(tokenOf(DelayedChannelInvocation.class))
                            .inputOrder(DataOrder.INSERTION)
                            .outputOrder(DataOrder.INSERTION)
                            .withArgs(TimeDuration.ZERO)
@@ -658,7 +654,7 @@ public class RoutineTest extends TestCase {
 
     public void testDelayedAbort() throws InterruptedException {
 
-        final Routine<String, String> passThroughRoutine = JavaRoutine.<String>on().buildRoutine();
+        final Routine<String, String> passThroughRoutine = JRoutine.<String>on().buildRoutine();
 
         final ParameterChannel<String, String> channel1 = passThroughRoutine.invokeAsync();
         channel1.after(TimeDuration.seconds(2)).abort();
@@ -678,7 +674,7 @@ public class RoutineTest extends TestCase {
         }
 
         final Routine<String, String> abortRoutine =
-                JavaRoutine.on(tokenOf(DelayedAbortInvocation.class))
+                JRoutine.on(tokenOf(DelayedAbortInvocation.class))
                            .withArgs(TimeDuration.millis(200))
                            .buildRoutine();
 
@@ -701,8 +697,8 @@ public class RoutineTest extends TestCase {
 
     public void testDelayedBind() {
 
-        final Routine<Object, Object> routine1 = JavaRoutine.on().buildRoutine();
-        final Routine<Object, Object> routine2 = JavaRoutine.on().buildRoutine();
+        final Routine<Object, Object> routine1 = JRoutine.on().buildRoutine();
+        final Routine<Object, Object> routine2 = JRoutine.on().buildRoutine();
 
         final long startTime = System.currentTimeMillis();
 
@@ -1171,7 +1167,7 @@ public class RoutineTest extends TestCase {
 
         testException(exceptionRoutine, "test", "test1");
 
-        final Routine<String, String> passThroughRoutine = JavaRoutine.<String>on().buildRoutine();
+        final Routine<String, String> passThroughRoutine = JRoutine.<String>on().buildRoutine();
 
         testChained(passThroughRoutine, exceptionRoutine, "test", "test1");
         testChained(exceptionRoutine, passThroughRoutine, "test", "test1");
@@ -1195,7 +1191,7 @@ public class RoutineTest extends TestCase {
 
         testException(exceptionRoutine, "test2", "test2");
 
-        final Routine<String, String> passThroughRoutine = JavaRoutine.<String>on().buildRoutine();
+        final Routine<String, String> passThroughRoutine = JRoutine.<String>on().buildRoutine();
 
         testChained(passThroughRoutine, exceptionRoutine, "test2", "test2");
         testChained(exceptionRoutine, passThroughRoutine, "test2", "test2");
@@ -1218,7 +1214,7 @@ public class RoutineTest extends TestCase {
 
         testException(exceptionRoutine, "test", "test3");
 
-        final Routine<String, String> passThroughRoutine = JavaRoutine.<String>on().buildRoutine();
+        final Routine<String, String> passThroughRoutine = JRoutine.<String>on().buildRoutine();
 
         testChained(passThroughRoutine, exceptionRoutine, "test", "test3");
         testChained(exceptionRoutine, passThroughRoutine, "test", "test3");
@@ -1248,7 +1244,7 @@ public class RoutineTest extends TestCase {
 
         testException(exceptionRoutine, "test", "test4");
 
-        final Routine<String, String> passThroughRoutine = JavaRoutine.<String>on().buildRoutine();
+        final Routine<String, String> passThroughRoutine = JRoutine.<String>on().buildRoutine();
 
         testChained(passThroughRoutine, exceptionRoutine, "test", "test4");
         testChained(exceptionRoutine, passThroughRoutine, "test", "test4");
@@ -1256,7 +1252,7 @@ public class RoutineTest extends TestCase {
 
     public void testInputTimeout() {
 
-        final Routine<String, String> routine = JavaRoutine.<String>on()
+        final Routine<String, String> routine = JRoutine.<String>on()
                                                            .inputSize(1)
                                                            .inputTimeout(TimeDuration.ZERO)
                                                            .buildRoutine();
@@ -1324,7 +1320,7 @@ public class RoutineTest extends TestCase {
     public void testOutputTimeout() {
 
         final Routine<String, String> routine =
-                JavaRoutine.on(tokenOf(new SimpleInvocation<String, String>() {
+                JRoutine.on(tokenOf(new SimpleInvocation<String, String>() {
 
                     @Override
                     public void onCall(@Nonnull final List<? extends String> strings,
@@ -1568,7 +1564,7 @@ public class RoutineTest extends TestCase {
                 };
 
         final Routine<String, String> routine =
-                JavaRoutine.on(tokenOf(invocation)).withArgs(this).buildRoutine();
+                JRoutine.on(tokenOf(invocation)).withArgs(this).buildRoutine();
         assertThat(routine.callAsync("test")
                           .afterMax(TimeDuration.millis(500))
                           .readAll()).containsExactly("test");
@@ -1696,7 +1692,7 @@ public class RoutineTest extends TestCase {
 
         }
 
-        final Routine<String, String> routine = JavaRoutine.on(tokenOf(DelayedInvocation.class))
+        final Routine<String, String> routine = JRoutine.on(tokenOf(DelayedInvocation.class))
                                                            .logLevel(LogLevel.SILENT)
                                                            .withArgs(TimeDuration.ZERO)
                                                            .buildRoutine();
@@ -1774,7 +1770,7 @@ public class RoutineTest extends TestCase {
 
         }
 
-        final Routine<String, String> routine1 = JavaRoutine.on(tokenOf(DelayedInvocation.class))
+        final Routine<String, String> routine1 = JRoutine.on(tokenOf(DelayedInvocation.class))
                                                             .logLevel(LogLevel.SILENT)
                                                             .withArgs(TimeDuration.ZERO)
                                                             .buildRoutine();
@@ -1872,11 +1868,11 @@ public class RoutineTest extends TestCase {
                                                     .buildRoutine();
 
         final OutputChannel<String> channel = routine.callAsync("test");
-        assertThat(channel.neverDeadLock().immediately().readAll()).isEmpty();
+        assertThat(channel.eventuallyDeadLock(false).immediately().readAll()).isEmpty();
 
         try {
 
-            channel.afterMax(TimeDuration.millis(10)).eventuallyDeadLock().readFirst();
+            channel.afterMax(TimeDuration.millis(10)).eventuallyDeadLock(true).readFirst();
 
             fail();
 

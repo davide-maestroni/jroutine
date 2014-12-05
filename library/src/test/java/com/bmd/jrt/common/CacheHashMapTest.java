@@ -15,14 +15,14 @@ package com.bmd.jrt.common;
 
 import junit.framework.TestCase;
 
-import org.fest.assertions.data.MapEntry;
+import org.assertj.core.data.MapEntry;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Cache hash map unit tests.

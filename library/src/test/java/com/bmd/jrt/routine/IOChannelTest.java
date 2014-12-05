@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * I/O channel unit tests.
@@ -39,8 +39,8 @@ public class IOChannelTest extends TestCase {
 
     public void testAbort() {
 
-        final IOChannel<String> channel = JavaRoutine.io().buildChannel();
-        final Routine<String, String> routine = JavaRoutine.<String>on().buildRoutine();
+        final IOChannel<String> channel = JRoutine.io().buildChannel();
+        final Routine<String, String> routine = JRoutine.<String>on().buildRoutine();
         final OutputChannel<String> outputChannel = routine.callAsync(channel.output());
 
         channel.input().abort(new IllegalStateException());
@@ -59,7 +59,7 @@ public class IOChannelTest extends TestCase {
 
     public void testAbortDelay() {
 
-        final IOChannel<String> channel = JavaRoutine.io().buildChannel();
+        final IOChannel<String> channel = JRoutine.io().buildChannel();
         channel.input().after(TimeDuration.days(1)).pass("test").close();
 
         final IOChannelOutput<String> output = channel.output();
@@ -86,7 +86,7 @@ public class IOChannelTest extends TestCase {
 
     public void testAsynchronousInput() {
 
-        final IOChannel<String> channel = JavaRoutine.io().buildChannel();
+        final IOChannel<String> channel = JRoutine.io().buildChannel();
 
         new Thread() {
 
@@ -106,13 +106,13 @@ public class IOChannelTest extends TestCase {
             }
         }.start();
 
-        final Routine<String, String> routine = JavaRoutine.<String>on().buildRoutine();
+        final Routine<String, String> routine = JRoutine.<String>on().buildRoutine();
         final OutputChannel<String> outputChannel = routine.callAsync(channel.output());
         assertThat(outputChannel.readFirst()).isEqualTo("test");
         assertThat(outputChannel.isComplete()).isTrue();
 
         final IOChannel<String> channel1 =
-                JavaRoutine.io().dataOrder(DataOrder.INSERTION).buildChannel();
+                JRoutine.io().dataOrder(DataOrder.INSERTION).buildChannel();
 
         new Thread() {
 
@@ -128,14 +128,14 @@ public class IOChannelTest extends TestCase {
             }
         }.start();
 
-        final Routine<String, String> routine1 = JavaRoutine.<String>on().buildRoutine();
+        final Routine<String, String> routine1 = JRoutine.<String>on().buildRoutine();
         final OutputChannel<String> outputChannel1 = routine1.callAsync(channel1.output());
         assertThat(outputChannel1.readAll()).containsExactly("test1", "test2", "test3");
     }
 
     public void testPartialOut() {
 
-        final IOChannel<String> channel = JavaRoutine.io().buildChannel();
+        final IOChannel<String> channel = JRoutine.io().buildChannel();
 
         new Thread() {
 
@@ -148,7 +148,7 @@ public class IOChannelTest extends TestCase {
 
         final long startTime = System.currentTimeMillis();
 
-        final Routine<String, String> routine = JavaRoutine.<String>on().buildRoutine();
+        final Routine<String, String> routine = JRoutine.<String>on().buildRoutine();
         final OutputChannel<String> outputChannel = routine.callAsync(channel.output());
         assertThat(outputChannel.afterMax(TimeDuration.millis(500)).readAll()).containsExactly(
                 "test");
@@ -162,7 +162,7 @@ public class IOChannelTest extends TestCase {
 
     public void testTimeout() {
 
-        final IOChannel<String> channel = JavaRoutine.io().buildChannel();
+        final IOChannel<String> channel = JRoutine.io().buildChannel();
         channel.input().after(TimeDuration.seconds(3)).pass("test").close();
 
         final IOChannelOutput<String> output = channel.output();
@@ -170,7 +170,7 @@ public class IOChannelTest extends TestCase {
 
         try {
 
-            output.afterMax(TimeDuration.millis(10)).eventuallyDeadLock().readFirst();
+            output.afterMax(TimeDuration.millis(10)).eventuallyDeadLock(true).readFirst();
 
             fail();
 
@@ -232,11 +232,11 @@ public class IOChannelTest extends TestCase {
     @SuppressWarnings("UnusedAssignment")
     public void testWeak() throws InterruptedException {
 
-        IOChannel<String> channel = JavaRoutine.io().buildChannel();
+        IOChannel<String> channel = JRoutine.io().buildChannel();
 
         new WeakThread(channel).start();
 
-        final Routine<String, String> routine = JavaRoutine.<String>on().buildRoutine();
+        final Routine<String, String> routine = JRoutine.<String>on().buildRoutine();
         final OutputChannel<String> outputChannel = routine.callAsync(channel.output());
         assertThat(outputChannel.readFirst()).isEqualTo("test");
 

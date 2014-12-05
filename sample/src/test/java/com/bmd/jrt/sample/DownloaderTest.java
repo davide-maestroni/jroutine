@@ -12,7 +12,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import static com.bmd.jrt.sample.Downloader.getFileName;
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Downloader unit tests.

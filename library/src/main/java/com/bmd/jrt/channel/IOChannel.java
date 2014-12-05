@@ -117,15 +117,12 @@ public interface IOChannel<TYPE> {
 
         @Nonnull
         @Override
-        public IOChannelOutput<OUTPUT> eventuallyDeadLock();
+        @SuppressWarnings("BooleanParameter")
+        public IOChannelOutput<OUTPUT> eventuallyDeadLock(final boolean throwException);
 
         @Nonnull
         @Override
         public IOChannelOutput<OUTPUT> immediately();
-
-        @Nonnull
-        @Override
-        public IOChannelOutput<OUTPUT> neverDeadLock();
 
         @Nonnull
         @Override

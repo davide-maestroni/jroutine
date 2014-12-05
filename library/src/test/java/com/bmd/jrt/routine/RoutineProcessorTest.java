@@ -32,7 +32,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Java routine processor unit tests.
@@ -44,13 +44,13 @@ public class RoutineProcessorTest extends TestCase {
     @SuppressWarnings("unchecked")
     public void testWrapper() {
 
-        final TestInterface testInterface = JavaRoutine.on(new TestClass())
-                                                       .syncRunner(RunnerType.SEQUENTIAL)
-                                                       .runBy(Runners.poolRunner())
-                                                       .logLevel(LogLevel.DEBUG)
-                                                       .loggedWith(new NullLog())
-                                                       .implementationOf(ClassToken.tokenOf(
-                                                               TestInterface.class));
+        final TestInterface testInterface = JRoutine.on(new TestClass())
+                                                    .syncRunner(RunnerType.SEQUENTIAL)
+                                                    .runBy(Runners.poolRunner())
+                                                    .logLevel(LogLevel.DEBUG)
+                                                    .loggedWith(new NullLog())
+                                                    .implementationOf(ClassToken.tokenOf(
+                                                            TestInterface.class));
 
         assertThat(testInterface.getOne().readFirst()).isEqualTo(1);
         assertThat(testInterface.getString(1, 2, 3)).isIn("1", "2", "3");
@@ -67,7 +67,7 @@ public class RoutineProcessorTest extends TestCase {
         final ArrayList<String> list = new ArrayList<String>();
         assertThat(testInterface.getList(Arrays.asList(list))).containsExactly(list);
 
-        final IOChannel<Integer> channel = JavaRoutine.io().buildChannel();
+        final IOChannel<Integer> channel = JRoutine.io().buildChannel();
         channel.input().pass(3).close();
         assertThat(testInterface.getString(channel.output())).isEqualTo("3");
     }

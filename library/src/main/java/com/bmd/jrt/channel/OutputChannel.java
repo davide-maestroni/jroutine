@@ -83,6 +83,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * Tells the channel to throw a {@link ReadDeadLockException} in case no result is available
      * before the timeout has elapsed.
      *
+     * @param throwException whether to throw a deadlock exception.
      * @return this channel.
      * @throws IllegalStateException               if this channel is already bound to a consumer.
      * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
@@ -92,7 +93,8 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @see #immediately()
      */
     @Nonnull
-    public OutputChannel<OUTPUT> eventuallyDeadLock();
+    @SuppressWarnings("BooleanParameter")
+    public OutputChannel<OUTPUT> eventuallyDeadLock(boolean throwException);
 
     /**
      * Tells the channel to not wait for results to be available.
@@ -125,18 +127,6 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
     public boolean isComplete();
 
     /**
-     * Tells the channel to not throw any exception in case no result is available before the
-     * timeout has elapsed.
-     *
-     * @return this channel.
-     * @see #afterMax(com.bmd.jrt.time.TimeDuration)
-     * @see #afterMax(long, java.util.concurrent.TimeUnit)
-     * @see #immediately()
-     */
-    @Nonnull
-    public OutputChannel<OUTPUT> neverDeadLock();
-
-    /**
      * Reads all the results by waiting for the routine to complete at the maximum for the set
      * timeout.
      *
@@ -149,8 +139,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @see #afterMax(com.bmd.jrt.time.TimeDuration)
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
      * @see #immediately()
-     * @see #eventuallyDeadLock()
-     * @see #neverDeadLock()
+     * @see #eventuallyDeadLock(boolean)
      */
     @Nonnull
     public List<OUTPUT> readAll();
@@ -170,8 +159,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @see #afterMax(com.bmd.jrt.time.TimeDuration)
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
      * @see #immediately()
-     * @see #eventuallyDeadLock()
-     * @see #neverDeadLock()
+     * @see #eventuallyDeadLock(boolean)
      */
     @Nonnull
     public OutputChannel<OUTPUT> readAllInto(@Nonnull Collection<? super OUTPUT> results);
@@ -188,8 +176,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @see #afterMax(com.bmd.jrt.time.TimeDuration)
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
      * @see #immediately()
-     * @see #eventuallyDeadLock()
-     * @see #neverDeadLock()
+     * @see #eventuallyDeadLock(boolean)
      */
     public OUTPUT readFirst();
 

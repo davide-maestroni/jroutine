@@ -15,7 +15,7 @@ package com.bmd.jrt.common;
 
 import junit.framework.TestCase;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Exceptions unit tests.

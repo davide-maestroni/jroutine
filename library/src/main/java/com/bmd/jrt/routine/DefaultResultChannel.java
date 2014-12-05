@@ -1000,13 +1000,14 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         @Nonnull
         @Override
-        public OutputChannel<OUTPUT> eventuallyDeadLock() {
+        @SuppressWarnings("BooleanParameter")
+        public OutputChannel<OUTPUT> eventuallyDeadLock(final boolean throwException) {
 
             synchronized (mMutex) {
 
                 verifyBound();
 
-                mReadTimeoutException = true;
+                mReadTimeoutException = throwException;
             }
 
             return this;
@@ -1063,20 +1064,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             }
 
             return isDone;
-        }
-
-        @Nonnull
-        @Override
-        public OutputChannel<OUTPUT> neverDeadLock() {
-
-            synchronized (mMutex) {
-
-                verifyBound();
-
-                mReadTimeoutException = false;
-            }
-
-            return this;
         }
 
         @Nonnull

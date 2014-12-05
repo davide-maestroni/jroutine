@@ -91,6 +91,12 @@ public class CacheHashMap<K, V> implements Map<K, V> {
     }
 
     @Override
+    public int hashCode() {
+
+        return mMap.hashCode();
+    }
+
+    @Override
     public int size() {
 
         cleanUp();
@@ -396,5 +402,23 @@ public class CacheHashMap<K, V> implements Map<K, V> {
 
             return mMap.put(mReference, v);
         }
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+
+        if (this == o) {
+
+            return true;
+        }
+
+        if (!(o instanceof CacheHashMap)) {
+
+            return (o instanceof Map) && o.equals(this);
+        }
+
+        final CacheHashMap that = (CacheHashMap) o;
+
+        return mMap.equals(that.mMap);
     }
 }

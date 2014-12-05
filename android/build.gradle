@@ -20,7 +20,7 @@ apply from: '../upload.gradle'
 
 group = 'com.github.davide-maestroni'
 version = '1.0.0'
-archivesBaseName = project.name
+archivesBaseName = "${project.parent.name}-${project.name}"
 
 android {
     compileSdkVersion 21

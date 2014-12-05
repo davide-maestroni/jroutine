@@ -62,13 +62,13 @@ TBD
 Complete Javadoc with insights and examples is available:
 
 * [JRoutine][12]
-* [AndRoutine][13]
+* [JRoutine Android][13]
 
 The project contains an additional sample module showing how to implement a file downloader with just 4 classes.
 
 ##Further development
 
-TBD
+Feel free to contribute with your own [Runner][14] so to support other platform than Android.
 
 ##Build instructions
 
@@ -112,10 +112,6 @@ gradlew lint
 
 For additional commands please refer to the [Gradle Android Plugin User Guide][4].
 
-##Version
-
-1.0.0
-
 ##Dependencies
 
 ####Runtime dependencies
@@ -152,3 +148,4 @@ For additional commands please refer to the [Gradle Android Plugin User Guide][4
 [11]:http://joel-costigliola.github.io/assertj/
 [12]:http://davide-maestroni.github.io/jroutine/javadocs/
 [13]:http://davide-maestroni.github.io/jroutine/android/javadocs/
+[14]:http://davide-maestroni.github.io/jroutine/javadocs/com/bmd/jrt/runner/Runner.html

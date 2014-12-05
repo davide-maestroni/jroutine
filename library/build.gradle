@@ -24,9 +24,9 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.google.code.findbugs:annotations:3.0.0'
 
+    testCompile project(":proutine")
     testCompile 'junit:junit:4.12'
     testCompile 'org.assertj:assertj-core:1.7.0'
-    testCompile project(":proutine")
 }
 
 task('jacocoTest', dependsOn: 'test') {

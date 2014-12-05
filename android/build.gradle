@@ -59,6 +59,7 @@ task('jacocoTest', dependsOn: 'connectedCheck') {
     tasks.createDebugCoverageReport.execute()
 }
 
+task('jar', dependsOn: 'jarRelease')
 task('javadoc', dependsOn: 'javadocRelease')
 
 android.libraryVariants.all { variant ->

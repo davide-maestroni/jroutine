@@ -43,7 +43,7 @@ What the library has to offer is:
 
 And more:
 
-* **< 180KB  Jar**
+* **< 175KB  Jar**
 * **Java 5+ and Android 1.5+**
 * **@Nullable and @Nonnull annotations**
 
@@ -120,7 +120,7 @@ For additional commands please refer to the [Gradle Android Plugin User Guide][4
 
 ####Runtime dependencies
 
-- TBD
+- None
 
 ####Compile time dependencies
 

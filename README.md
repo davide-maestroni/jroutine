@@ -122,7 +122,7 @@ For additional commands please refer to the [Gradle Android Plugin User Guide][4
 
 - None
 
-####Compile time dependencies
+####Compile dependencies
 
 - [FindBugs][10] annotations ([Lesser GNU Public License][3])
 - Android SDK ([Terms and Condition][1])

@@ -87,15 +87,14 @@ android.libraryVariants.all { variant ->
 
     def variantName = variant.name.capitalize()
 
-    task("javadoc${variantName}", type: Javadoc) {
+    task("javadoc${variantName}", type: Javadoc, dependsOn: "assemble${variantName}") {
         description "Generates Javadoc from the ${variantName} build"
         source = variant.javaCompile.source
         ext.androidJar =
                 "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
         classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)
         title = "${archivesBaseName} ${version}"
-        options.links('http://docs.oracle.com/javase/7/docs/api/')
-        options.links('http://davide-maestroni.github.io/jroutine/javadocs/')
+        options.links('http://docs.oracle.com/javase/7/docs/api/', 'http://davide-maestroni.github.io/jroutine/javadocs/')
         options.linksOffline('http://developer.android.com/reference/', "${android.sdkDirectory}/docs/reference/")
         options.overview("${project.projectDir}/docs/overview.html")
         options.windowTitle("Javadoc - ${archivesBaseName}")

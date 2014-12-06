@@ -308,7 +308,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
             if (target == null) {
 
-                throw new NullPointerException("target object has been destroyed");
+                throw new IllegalStateException("target object has been destroyed");
             }
 
             final Class<?> targetClass = mTargetClass;
@@ -606,7 +606,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
             if (target == null) {
 
-                throw new NullPointerException("target object has been destroyed");
+                throw new IllegalStateException("target object has been destroyed");
             }
 
             final Class<?> returnType = method.getReturnType();

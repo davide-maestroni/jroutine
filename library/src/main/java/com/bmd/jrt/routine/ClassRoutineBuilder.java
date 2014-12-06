@@ -437,7 +437,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
             if (target == null) {
 
-                throw new NullPointerException("target object has been destroyed");
+                throw new IllegalStateException("target object has been destroyed");
             }
 
             final CacheHashMap<Object, HashMap<RoutineInfo, Routine<Object, Object>>> routineCache =

@@ -28,6 +28,7 @@ import com.bmd.jrt.runner.Runner;
 import com.bmd.jrt.time.TimeDuration;
 
 import java.lang.annotation.Annotation;
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
@@ -62,7 +63,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     private static final CacheHashMap<Object, HashMap<Method, Method>> sMethodCache =
             new CacheHashMap<Object, HashMap<Method, Method>>();
 
-    private final Object mTarget;
+    private final WeakReference<Object> mTarget;
 
     private final Class<?> mTargetClass;
 
@@ -77,7 +78,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
         super(target);
 
-        mTarget = target;
+        mTarget = new WeakReference<Object>(target);
         mTargetClass = target.getClass();
     }
 
@@ -303,7 +304,13 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
         synchronized (sClassMap) {
 
-            final Object target = mTarget;
+            final Object target = mTarget.get();
+
+            if (target == null) {
+
+                throw new NullPointerException("target object has been destroyed");
+            }
+
             final Class<?> targetClass = mTargetClass;
             final CacheHashMap<Object, HashMap<ClassInfo, Object>> classMap = sClassMap;
 
@@ -336,8 +343,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
                 final Class<?> wrapperClass = Class.forName(className);
                 final Constructor<?> constructor =
-                        wrapperClass.getConstructor(target.getClass(), CacheHashMap.class,
-                                                    String.class, RoutineConfiguration.class);
+                        wrapperClass.getConstructor(targetClass, CacheHashMap.class, String.class,
+                                                    RoutineConfiguration.class);
 
                 synchronized (sMutexCache) {
 
@@ -595,7 +602,13 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
         public Object invoke(final Object proxy, final Method method, final Object[] args) throws
                 Throwable {
 
-            final Object target = mTarget;
+            final Object target = mTarget.get();
+
+            if (target == null) {
+
+                throw new NullPointerException("target object has been destroyed");
+            }
+
             final Class<?> returnType = method.getReturnType();
             final Class<?>[] targetParameterTypes = method.getParameterTypes();
             ParamType paramType = ParamType.DEFAULT;

@@ -209,6 +209,8 @@ public class JRoutine {
 
     /**
      * Returns a routine builder wrapping the specified target object.
+     * <p/>
+     * Note that no strong reference to the object instance will be retained.
      *
      * @param target the target object.
      * @return the routine builder instance.

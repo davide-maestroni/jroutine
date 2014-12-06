@@ -29,6 +29,7 @@ import com.bmd.jrt.runner.Runner;
 import com.bmd.jrt.runner.Runners;
 import com.bmd.jrt.time.TimeDuration;
 
+import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -71,7 +72,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
     private final HashMap<String, Method> mMethodMap = new HashMap<String, Method>();
 
-    private final Object mTarget;
+    private final WeakReference<Object> mTarget;
 
     private final Class<?> mTargetClass;
 
@@ -97,7 +98,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
         } else {
 
-            mTarget = target;
+            mTarget = new WeakReference<Object>(target);
             mIsClass = false;
 
             targetClass = target.getClass();
@@ -432,7 +433,12 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
         synchronized (sRoutineCache) {
 
-            final Object target = (mTarget != null) ? mTarget : mTargetClass;
+            final Object target = (mIsClass) ? mTargetClass : mTarget.get();
+
+            if (target == null) {
+
+                throw new NullPointerException("target object has been destroyed");
+            }
 
             final CacheHashMap<Object, HashMap<RoutineInfo, Routine<Object, Object>>> routineCache =
                     sRoutineCache;
@@ -604,7 +610,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
         private final Object mMutex;
 
-        private final Object mTarget;
+        private final WeakReference<Object> mTarget;
 
         private final Class<?> mTargetClass;
 
@@ -616,7 +622,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
          * @param method      the method to wrap.
          * @param mutex       the mutex used for synchronization.
          */
-        public MethodSimpleInvocation(@Nullable final Object target,
+        public MethodSimpleInvocation(@Nullable final WeakReference<Object> target,
                 @Nonnull final Class<?> targetClass, @Nonnull final Method method,
                 @Nullable final Object mutex) {
 
@@ -635,7 +641,22 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
             synchronized (mMutex) {
 
-                final Object target = mTarget;
+                final Object target;
+
+                if (mTarget == null) {
+
+                    target = null;
+
+                } else {
+
+                    target = mTarget.get();
+
+                    if (target == null) {
+
+                        return;
+                    }
+                }
+
                 final Method method = mMethod;
 
                 try {

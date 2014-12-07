@@ -18,6 +18,8 @@ import com.bmd.jrt.annotation.AsyncType;
 import com.bmd.jrt.annotation.ParallelType;
 import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
+import com.bmd.jrt.builder.RoutineConfiguration;
+import com.bmd.jrt.builder.RoutineConfigurationBuilder;
 import com.bmd.jrt.channel.IOChannel;
 import com.bmd.jrt.channel.IOChannel.IOChannelInput;
 import com.bmd.jrt.channel.OutputChannel;
@@ -73,6 +75,20 @@ public class JRoutineTest extends TestCase {
 
         input2.after(TimeDuration.millis(200)).pass(23).now().pass(-77L).close();
         assertThat(channel2.output().readAll()).containsExactly(23, -77L);
+    }
+
+    public void testChannelBuilderApply() {
+
+        final RoutineConfiguration configuration =
+                new RoutineConfigurationBuilder().runBy(Runners.queuedRunner())
+                                                 .buildConfiguration();
+        final IOChannel<Object> channel = JRoutine.io()
+                                                  .delayRunner(Runners.sharedRunner())
+                                                  .apply(configuration)
+                                                  .buildChannel();
+
+        channel.input().after(TimeDuration.millis(200)).pass("test").close();
+        assertThat(channel.output().immediately().readAll()).containsExactly("test");
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -195,6 +211,21 @@ public class JRoutineTest extends TestCase {
         assertThat(getOne.isComplete()).isTrue();
         assertThat(getTwo.isComplete()).isTrue();
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
+    }
+
+    public void testClassRoutineBuilderApply() {
+
+        final RoutineConfiguration configuration =
+                new RoutineConfigurationBuilder().runBy(Runners.queuedRunner())
+                                                 .buildConfiguration();
+        final Routine<Object, Object> routine = JRoutine.on(TestApply.class)
+                                                        .runBy(Runners.sharedRunner())
+                                                        .apply(configuration)
+                                                        .asyncMethod(TestApply.GET_STRING);
+
+        final OutputChannel<Object> channel =
+                routine.invokeAsync().after(TimeDuration.millis(200)).pass("test").result();
+        assertThat(channel.immediately().readAll()).containsExactly("test");
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -357,7 +388,8 @@ public class JRoutineTest extends TestCase {
 
     public void testObjectRoutineBuilder() throws NoSuchMethodException {
 
-        final Routine<Object, Object> routine = JRoutine.on(new Test())
+        final Test test = new Test();
+        final Routine<Object, Object> routine = JRoutine.on(test)
                                                         .syncRunner(RunnerType.SEQUENTIAL)
                                                         .runBy(Runners.poolRunner())
                                                         .maxRunning(1)
@@ -369,14 +401,14 @@ public class JRoutineTest extends TestCase {
 
         assertThat(routine.call().readAll()).containsExactly(-77L);
 
-        final Routine<Object, Object> routine1 = JRoutine.on(new Test())
+        final Routine<Object, Object> routine1 = JRoutine.on(test)
                                                          .syncRunner(RunnerType.QUEUED)
                                                          .runBy(Runners.poolRunner())
                                                          .method("getLong");
 
         assertThat(routine1.call().readAll()).containsExactly(-77L);
 
-        final Routine<Object, Object> routine2 = JRoutine.on(new Test())
+        final Routine<Object, Object> routine2 = JRoutine.on(test)
                                                          .syncRunner(RunnerType.QUEUED)
                                                          .runBy(Runners.poolRunner())
                                                          .maxRunning(1)
@@ -386,7 +418,7 @@ public class JRoutineTest extends TestCase {
 
         assertThat(routine2.call().readAll()).containsExactly(-77L);
 
-        final Routine<Object, Object> routine3 = JRoutine.on(new Test()).asyncMethod(Test.THROW);
+        final Routine<Object, Object> routine3 = JRoutine.on(test).asyncMethod(Test.THROW);
 
         try {
 
@@ -419,6 +451,22 @@ public class JRoutineTest extends TestCase {
         assertThat(getOne.isComplete()).isTrue();
         assertThat(getTwo.isComplete()).isTrue();
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
+    }
+
+    public void testObjectRoutineBuilderApply() {
+
+        final RoutineConfiguration configuration =
+                new RoutineConfigurationBuilder().runBy(Runners.queuedRunner())
+                                                 .buildConfiguration();
+        final TestApply testApply = new TestApply();
+        final Routine<Object, Object> routine = JRoutine.on(testApply)
+                                                        .runBy(Runners.sharedRunner())
+                                                        .apply(configuration)
+                                                        .asyncMethod(TestApply.GET_STRING);
+
+        final OutputChannel<Object> channel =
+                routine.invokeAsync().after(TimeDuration.millis(200)).pass("test").result();
+        assertThat(channel.immediately().readAll()).containsExactly("test");
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -708,7 +756,8 @@ public class JRoutineTest extends TestCase {
         channel.input().pass(1, 2, 3).close();
         assertThat(squareAsync.computeParallel4(channel.output()).readAll()).contains(1, 4, 9);
 
-        final int[] inc = JRoutine.on(new TestInc())
+        final TestInc testInc = new TestInc();
+        final int[] inc = JRoutine.on(testInc)
                                   .proxy(ClassToken.tokenOf(ITestInc.class))
                                   .inc(1, 2, 3, 4);
         assertThat(inc).containsOnly(2, 3, 4, 5);
@@ -747,6 +796,19 @@ public class JRoutineTest extends TestCase {
                         .buildRoutine();
 
         assertThat(routine1.call("test1", "test2").readAll()).containsExactly("test1", "test2");
+    }
+
+    public void testRoutineBuilderApply() {
+
+        final RoutineConfiguration configuration =
+                new RoutineConfigurationBuilder().runBy(Runners.queuedRunner())
+                                                 .buildConfiguration();
+        final Routine<Object, Object> routine =
+                JRoutine.on().runBy(Runners.sharedRunner()).apply(configuration).buildRoutine();
+
+        final OutputChannel<Object> channel =
+                routine.invokeAsync().after(TimeDuration.millis(200)).pass("test").result();
+        assertThat(channel.immediately().readAll()).containsExactly("test");
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -945,6 +1007,24 @@ public class JRoutineTest extends TestCase {
             TimeDuration.millis(500).sleepAtLeast();
 
             return 2;
+        }
+    }
+
+    @Async(lockName = Async.NULL_LOCK)
+    private static class TestApply {
+
+        public static final String GET_STRING = "get_string";
+
+        @Async(GET_STRING)
+        public static String getStringStatic(final String string) {
+
+            return string;
+        }
+
+        @Async(GET_STRING)
+        public String getString(final String string) {
+
+            return string;
         }
     }
 

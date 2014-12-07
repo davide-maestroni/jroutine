@@ -14,6 +14,7 @@
 package com.bmd.jrt.routine;
 
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
+import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.channel.IOChannel;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
@@ -39,6 +40,21 @@ public class IOChannelBuilder {
     IOChannelBuilder() {
 
         mBuilder = new DefaultConfigurationBuilder();
+    }
+
+    /**
+     * Applies the specified configuration to this builder.
+     *
+     * @param configuration the configuration.
+     * @return this builder.
+     * @throws NullPointerException if the specified configuration is null.
+     */
+    @Nonnull
+    public IOChannelBuilder apply(@Nonnull final RoutineConfiguration configuration) {
+
+        mBuilder.apply(configuration);
+
+        return this;
     }
 
     /**

@@ -44,7 +44,8 @@ public class RoutineProcessorTest extends TestCase {
     @SuppressWarnings("unchecked")
     public void testWrapper() {
 
-        final TestInterface testInterface = JRoutine.on(new TestClass())
+        final TestClass testClass = new TestClass();
+        final TestInterface testInterface = JRoutine.on(testClass)
                                                     .syncRunner(RunnerType.SEQUENTIAL)
                                                     .runBy(Runners.poolRunner())
                                                     .logLevel(LogLevel.DEBUG)

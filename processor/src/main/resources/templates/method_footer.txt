@@ -32,7 +32,14 @@
 
             synchronized(mMutex) {
 
-                result.pass(mWrapped.${targetMethodName}(${paramValues}));
+                final ${classFullName} wrapped = mWrapped.get();
+
+                if (wrapped == null) {
+
+                    throw new IllegalStateException("target object has been destroyed");
+                }
+
+                result.pass(wrapped.${targetMethodName}(${paramValues}));
             }
         }
     }

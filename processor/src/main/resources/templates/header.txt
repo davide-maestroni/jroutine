@@ -21,7 +21,7 @@ public final class ${interfaceName}${className}${genericTypes} implements ${inte
 
     private final com.bmd.jrt.common.CacheHashMap<Object, java.util.Map<String, Object>> mMutexMap;
 
-    private final ${classFullName} mWrapped;
+    private final java.lang.ref.WeakReference<${classFullName}> mWrapped;
 
     public ${interfaceName}${className}(final ${classFullName} wrapped,
             final com.bmd.jrt.common.CacheHashMap<Object, java.util.Map<String, Object>> mutexMap,
@@ -37,7 +37,7 @@ public final class ${interfaceName}${className}${genericTypes} implements ${inte
             throw new NullPointerException("the mutex map must not be null");
         }
 
-        mWrapped = wrapped;
+        mWrapped = new java.lang.ref.WeakReference<${classFullName}>(wrapped);
         mMutexMap = mutexMap;
         mLockName = ((lockName != null) && !com.bmd.jrt.annotation.Async.DEFAULT_NAME.equals(lockName)) ? lockName : null;
         ${routineFieldsInit}
@@ -52,7 +52,13 @@ public final class ${interfaceName}${className}${genericTypes} implements ${inte
 
         synchronized (mMutexMap) {
 
-            final Object wrapped = mWrapped;
+            final ${classFullName} wrapped = mWrapped.get();
+
+            if (wrapped == null) {
+
+                throw new IllegalStateException("target object has been destroyed");
+            }
+
             java.util.Map<String, Object> mutexMap = mMutexMap.get(wrapped);
 
             if (mutexMap == null) {

@@ -988,6 +988,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
         methodFooter = (isVoid) ? mMethodFooterVoid : mMethodFooter;
 
+        methodFooter = methodFooter.replace("${classFullName}", targetElement.asType().toString());
         methodFooter = methodFooter.replace("${resultClassName}", resultClassName);
         methodFooter = methodFooter.replace("${methodCount}", Integer.toString(count));
         methodFooter = methodFooter.replace("${methodName}", methodElement.getSimpleName());

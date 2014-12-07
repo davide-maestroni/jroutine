@@ -17,8 +17,8 @@ The main way to define a routine is to implement an invocation object. Though, t
 
 ##Why not RxJava?
 
-Among the many open source libraries, [RxJava][6] is one of the preferred choices when it comes to handle background tasks.
-Although [Reactive Extensions][7] is a great tool for managing events and composing event listeners, it has not been designed with parallel programming in mind.
+Among the many open source libraries, [RxJava][7] is one of the preferred choices when it comes to handle background tasks.
+Although [Reactive Extensions][8] is a great tool for managing events and composing event listeners, it has not been designed with parallel programming in mind.
 In fact, RxJava shows a few limits in this respect.
 The framework has once been compared, with a fitting example, to a line of domino pieces: once the first tile falls down, all the others are to follow, and there is no way to stop them other than to cut the line.
 Each time a background operation is required, the whole chain of observables/subscribers must be rebuilt from scratch, the chained functions are called recursively and many objects are created in the while.
@@ -49,68 +49,34 @@ And more:
 * *Java 5+** *and Android 1.5+*
 * *@Nullable and @Nonnull annotations*
 
-(*) for older Java versions please have a look at [Retrotranslator][15].
+(*) for older Java versions please have a look at [Retrotranslator][16].
 
 ##Why not JRoutine?
 
 The JRoutine library is designed for parallel programming and nothing else. It's no golden hammer and does not pretend to.
-If you need event handling, please use [RxJava][6], it's one of the best library out there. If you need distributed scalable computing, consider using [Akka][8].
-For anything else [GitHub][9] is a great source of inspiration.
+If you need event handling, please use [RxJava][7], it's one of the best library out there. If you need distributed scalable computing, consider using [Akka][9].
+For anything else [GitHub][10] is a great source of inspiration.
 
 ##Usage examples
 
-TBD
+Please have a look to the dedicated [wiki page][5].
 
 ##Documentation
 
 Complete Javadoc with insights and examples is available:
 
-* [JRoutine][12]
-* [JRoutine Android][13]
+* [JRoutine][13]
+* [JRoutine Android][14]
 
 The project contains an additional sample module showing how to implement a file downloader with just 4 classes.
 
 ##Further development
 
-Feel free to contribute with your own [Runner][14] so to support more platforms other than Android.
+Feel free to contribute with your own [Runner][15] so to support more platforms other than Android.
 
 ##Build instructions
 
-To generate the library JAR just run on a command line:
-```sh
-gradlew jar
-```
-
-For the Javadocs run:
-```sh
-gradlew javadoc
-```
-
-To run the tests:
-```sh
-gradlew test
-```
-on a connected device:
-```sh
-gradlew cAT
-```
-
-To run the tests with code coverage:
-```sh
-gradlew jT
-```
-
-To run the FindBugs analyzer:
-```sh
-gradlew fM
-```
-
-To run the Android lint:
-```sh
-gradlew lint
-```
-
-For additional commands please refer to the [Gradle Android Plugin User Guide][4].
+Please refer to the dedicated [wiki page][4].
 
 ##Dependencies
 
@@ -120,14 +86,14 @@ For additional commands please refer to the [Gradle Android Plugin User Guide][4
 
 ####Compile dependencies
 
-- [FindBugs][10] annotations ([Lesser GNU Public License][3])
+- [FindBugs][11] annotations ([Lesser GNU Public License][3])
 - Android SDK ([Terms and Condition][1])
 - Android Support Library ([Apache License v2.0][2])
 
 ####Test dependencies
 
-- JUnit ([Eclipse Public License v1.0][5])
-- [AssertJ][11] ([Apache License v2.0][2])
+- JUnit ([Eclipse Public License v1.0][6])
+- [AssertJ][12] ([Apache License v2.0][2])
 
 ##License
 
@@ -135,18 +101,20 @@ For additional commands please refer to the [Gradle Android Plugin User Guide][4
 
 **IT'S OPEN DUDE!**
 
+
 [1]:http://developer.android.com/sdk/terms.html
 [2]:http://www.apache.org/licenses/LICENSE-2.0
 [3]:http://www.gnu.org/licenses/lgpl.html
-[4]:http://tools.android.com/tech-docs/new-build-system/user-guide
-[5]:https://www.eclipse.org/legal/epl-v10.html
-[6]:https://github.com/ReactiveX/RxJava
-[7]:http://reactivex.io/
-[8]:http://akka.io/
-[9]:https://github.com/
-[10]:http://findbugs.sourceforge.net/
-[11]:http://joel-costigliola.github.io/assertj/
-[12]:http://davide-maestroni.github.io/jroutine/javadocs/
-[13]:http://davide-maestroni.github.io/jroutine/android/javadocs/
-[14]:http://davide-maestroni.github.io/jroutine/javadocs/com/bmd/jrt/runner/Runner.html
-[15]:http://retrotranslator.sourceforge.net/
+[4]:https://github.com/davide-maestroni/jroutine/wiki/Build-Instructions
+[5]:https://github.com/davide-maestroni/jroutine/wiki/Usage-Examples
+[6]:https://www.eclipse.org/legal/epl-v10.html
+[7]:https://github.com/ReactiveX/RxJava
+[8]:http://reactivex.io/
+[9]:http://akka.io/
+[10]:https://github.com/
+[11]:http://findbugs.sourceforge.net/
+[12]:http://joel-costigliola.github.io/assertj/
+[13]:http://davide-maestroni.github.io/jroutine/javadocs/
+[14]:http://davide-maestroni.github.io/jroutine/android/javadocs/
+[15]:http://davide-maestroni.github.io/jroutine/javadocs/com/bmd/jrt/runner/Runner.html
+[16]:http://retrotranslator.sourceforge.net/

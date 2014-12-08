@@ -68,59 +68,75 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
     private final RoutineConfigurationBuilder mBuilder = new RoutineConfigurationBuilder();
 
-    private final boolean mIsClass;
-
     private final HashMap<String, Method> mMethodMap = new HashMap<String, Method>();
 
-    private final WeakReference<Object> mTarget;
+    private final Object mTarget;
 
     private final Class<?> mTargetClass;
+
+    private final WeakReference<?> mTargetReference;
 
     private String mLockName;
 
     /**
      * Constructor.
      *
-     * @param target the target class or object.
+     * @param targetClass the target class.
+     * @throws NullPointerException     if the specified target is null.
+     * @throws IllegalArgumentException if a duplicate name in the annotations is detected, or the
+     *                                  specified class represents an interface.
+     */
+    ClassRoutineBuilder(@Nonnull final Class<?> targetClass) {
+
+        if (targetClass.isInterface()) {
+
+            throw new IllegalArgumentException("the target class must not be an interface");
+        }
+
+        mTargetClass = targetClass;
+        mTarget = null;
+        mTargetReference = null;
+
+        fillMethodMap(true);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param target the target object.
      * @throws NullPointerException     if the specified target is null.
      * @throws IllegalArgumentException if a duplicate name in the annotations is detected.
      */
     ClassRoutineBuilder(@Nonnull final Object target) {
 
-        final Class<?> targetClass;
+        mTargetClass = target.getClass();
+        mTarget = target;
+        mTargetReference = null;
 
-        if (target instanceof Class) {
+        fillMethodMap(false);
+    }
 
-            mTarget = null;
-            mIsClass = true;
+    /**
+     * Constructor.
+     *
+     * @param targetReference the reference to the target object.
+     * @throws NullPointerException     if the specified target is null.
+     * @throws IllegalArgumentException if a duplicate name in the annotations is detected.
+     */
+    ClassRoutineBuilder(@Nonnull final WeakReference<?> targetReference) {
 
-            targetClass = ((Class<?>) target);
+        final Object target = targetReference.get();
 
-        } else {
+        if (target == null) {
 
-            mTarget = new WeakReference<Object>(target);
-            mIsClass = false;
-
-            targetClass = target.getClass();
+            throw new IllegalStateException("target object has been destroyed");
         }
 
-        mTargetClass = targetClass;
+        mTargetClass = target.getClass();
+        mTarget = null;
+        mTargetReference = targetReference;
 
-        final HashMap<String, Method> methodMap = mMethodMap;
-        fillMap(methodMap, targetClass.getMethods());
-
-        final HashMap<String, Method> declaredMethodMap = new HashMap<String, Method>();
-        fillMap(declaredMethodMap, targetClass.getDeclaredMethods());
-
-        for (final Entry<String, Method> methodEntry : declaredMethodMap.entrySet()) {
-
-            final String name = methodEntry.getKey();
-
-            if (!methodMap.containsKey(name)) {
-
-                methodMap.put(name, methodEntry.getValue());
-            }
-        }
+        fillMethodMap(false);
     }
 
     /**
@@ -433,7 +449,8 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
         synchronized (sRoutineCache) {
 
-            final Object target = (mIsClass) ? mTargetClass : mTarget.get();
+            final Object target = (mTargetReference != null) ? mTargetReference.get()
+                    : (mTarget != null) ? mTarget : mTargetClass;
 
             if (target == null) {
 
@@ -488,12 +505,46 @@ public class ClassRoutineBuilder implements RoutineBuilder {
                     ? Runners.sequentialRunner() : Runners.queuedRunner();
 
             routine = new DefaultRoutine<Object, Object>(configuration, syncRunner,
-                                                         MethodSimpleInvocation.class, mTarget,
-                                                         mTargetClass, method, mutex);
+                                                         MethodSimpleInvocation.class,
+                                                         mTargetReference, mTarget, mTargetClass,
+                                                         method, mutex);
             routineMap.put(routineInfo, routine);
         }
 
         return (Routine<INPUT, OUTPUT>) routine;
+    }
+
+    /**
+     * Returns the builder target object.
+     *
+     * @return the target object.
+     */
+    @Nullable
+    protected Object getTarget() {
+
+        return mTarget;
+    }
+
+    /**
+     * Returns the builder target class.
+     *
+     * @return the target class.
+     */
+    @Nonnull
+    protected Class<?> getTargetClass() {
+
+        return mTargetClass;
+    }
+
+    /**
+     * Returns the builder reference to the target object.
+     *
+     * @return the target reference.
+     */
+    @Nullable
+    protected WeakReference<?> getTargetReference() {
+
+        return mTargetReference;
     }
 
     /**
@@ -556,22 +607,20 @@ public class ClassRoutineBuilder implements RoutineBuilder {
     }
 
     private void fillMap(@Nonnull final HashMap<String, Method> map,
-            @Nonnull final Method[] methods) {
-
-        final boolean isClass = mIsClass;
+            @Nonnull final Method[] methods, final boolean isClass) {
 
         for (final Method method : methods) {
 
-            final int staticFlag = method.getModifiers() & Modifier.STATIC;
+            final boolean isStatic = Modifier.isStatic(method.getModifiers());
 
             if (isClass) {
 
-                if (staticFlag == 0) {
+                if (!isStatic) {
 
                     continue;
                 }
 
-            } else if (staticFlag != 0) {
+            } else if (isStatic) {
 
                 continue;
             }
@@ -599,6 +648,26 @@ public class ClassRoutineBuilder implements RoutineBuilder {
         }
     }
 
+    private void fillMethodMap(final boolean isClass) {
+
+        final Class<?> targetClass = mTargetClass;
+        final HashMap<String, Method> methodMap = mMethodMap;
+        fillMap(methodMap, targetClass.getMethods(), isClass);
+
+        final HashMap<String, Method> declaredMethodMap = new HashMap<String, Method>();
+        fillMap(declaredMethodMap, targetClass.getDeclaredMethods(), isClass);
+
+        for (final Entry<String, Method> methodEntry : declaredMethodMap.entrySet()) {
+
+            final String name = methodEntry.getKey();
+
+            if (!methodMap.containsKey(name)) {
+
+                methodMap.put(name, methodEntry.getValue());
+            }
+        }
+    }
+
     /**
      * Implementation of a simple invocation wrapping the target method.
      */
@@ -610,22 +679,26 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
         private final Object mMutex;
 
-        private final WeakReference<Object> mTarget;
+        private final Object mTarget;
 
         private final Class<?> mTargetClass;
+
+        private final WeakReference<?> mTargetReference;
 
         /**
          * Constructor.
          *
-         * @param target      the target object.
-         * @param targetClass the target class.
-         * @param method      the method to wrap.
-         * @param mutex       the mutex used for synchronization.
+         * @param targetReference the reference to the target object.
+         * @param target          the target object.
+         * @param targetClass     the target class.
+         * @param method          the method to wrap.
+         * @param mutex           the mutex used for synchronization.
          */
-        public MethodSimpleInvocation(@Nullable final WeakReference<Object> target,
-                @Nonnull final Class<?> targetClass, @Nonnull final Method method,
-                @Nullable final Object mutex) {
+        public MethodSimpleInvocation(final WeakReference<?> targetReference,
+                @Nullable final Object target, @Nonnull final Class<?> targetClass,
+                @Nonnull final Method method, @Nullable final Object mutex) {
 
+            mTargetReference = targetReference;
             mTarget = target;
             mTargetClass = targetClass;
             mMethod = method;
@@ -642,19 +715,20 @@ public class ClassRoutineBuilder implements RoutineBuilder {
             synchronized (mMutex) {
 
                 final Object target;
+                final WeakReference<?> targetReference = mTargetReference;
 
-                if (mTarget == null) {
+                if (targetReference != null) {
 
-                    target = null;
-
-                } else {
-
-                    target = mTarget.get();
+                    target = targetReference.get();
 
                     if (target == null) {
 
-                        return;
+                        throw new IllegalStateException("target object has been destroyed");
                     }
+
+                } else {
+
+                    target = mTarget;
                 }
 
                 final Method method = mMethod;

@@ -16,6 +16,8 @@ package com.bmd.jrt.routine;
 import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.invocation.Invocation;
 
+import java.lang.ref.WeakReference;
+
 import javax.annotation.Nonnull;
 
 /**
@@ -209,8 +211,6 @@ public class JRoutine {
 
     /**
      * Returns a routine builder wrapping the specified target object.
-     * <p/>
-     * Note that no strong reference to the object instance will be retained.
      *
      * @param target the target object.
      * @return the routine builder instance.
@@ -219,6 +219,20 @@ public class JRoutine {
      */
     @Nonnull
     public static ObjectRoutineBuilder on(@Nonnull final Object target) {
+
+        return new ObjectRoutineBuilder(target);
+    }
+
+    /**
+     * Returns a routine builder wrapping the specified target object.
+     *
+     * @param target the reference to the target object.
+     * @return the routine builder instance.
+     * @throws NullPointerException     if the specified target is null.
+     * @throws IllegalArgumentException if a duplicate name in the annotations is detected.
+     */
+    @Nonnull
+    public static ObjectRoutineBuilder on(@Nonnull final WeakReference<?> target) {
 
         return new ObjectRoutineBuilder(target);
     }

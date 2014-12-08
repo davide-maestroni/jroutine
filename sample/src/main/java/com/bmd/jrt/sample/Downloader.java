@@ -133,13 +133,16 @@ public class Downloader {
 
             try {
 
-                if (channel.afterMax(timeout).isComplete() && channel.readFirst()) {
+                if (channel.afterMax(timeout).isComplete()) {
 
                     downloadMap.remove(uri);
 
-                    mDownloadedSet.add(uri);
+                    if (channel.readFirst()) {
 
-                    return true;
+                        mDownloadedSet.add(uri);
+
+                        return true;
+                    }
                 }
 
             } catch (final RoutineException ignored) {

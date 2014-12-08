@@ -63,10 +63,6 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     private static final CacheHashMap<Object, HashMap<Method, Method>> sMethodCache =
             new CacheHashMap<Object, HashMap<Method, Method>>();
 
-    private final WeakReference<Object> mTarget;
-
-    private final Class<?> mTargetClass;
-
     /**
      * Constructor.
      *
@@ -77,16 +73,25 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     ObjectRoutineBuilder(@Nonnull final Object target) {
 
         super(target);
+    }
 
-        mTarget = new WeakReference<Object>(target);
-        mTargetClass = target.getClass();
+    /**
+     * Constructor.
+     *
+     * @param targetReference the reference to the target object.
+     * @throws NullPointerException     if the specified target is null.
+     * @throws IllegalArgumentException if a duplicate name in the annotations is detected.
+     */
+    ObjectRoutineBuilder(@Nonnull final WeakReference<?> targetReference) {
+
+        super(targetReference);
     }
 
     @Nullable
     @SuppressWarnings("unchecked")
     private static Object callRoutine(@Nonnull final Routine<Object, Object> routine,
-            @Nonnull final Method method, @Nonnull final Object[] args,
-            @Nonnull final ParamType paramType, @Nonnull final ResultType resultType) {
+            @Nonnull final Method method, @Nonnull final ParamType paramType,
+            @Nonnull final ResultType resultType, @Nonnull final Object[] args) {
 
         final Class<?> returnType = method.getReturnType();
         final OutputChannel<Object> outputChannel;
@@ -304,14 +309,15 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
         synchronized (sClassMap) {
 
-            final Object target = mTarget.get();
+            final WeakReference<?> targetReference = getTargetReference();
+            final Object target = (targetReference != null) ? targetReference.get() : getTarget();
 
             if (target == null) {
 
                 throw new IllegalStateException("target object has been destroyed");
             }
 
-            final Class<?> targetClass = mTargetClass;
+            final Class<?> targetClass = getTargetClass();
             final CacheHashMap<Object, HashMap<ClassInfo, Object>> classMap = sClassMap;
 
             HashMap<ClassInfo, Object> classes = classMap.get(target);
@@ -417,7 +423,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
         final InvocationHandler handler;
 
-        if (itf.isAssignableFrom(mTargetClass)) {
+        if (itf.isAssignableFrom(getTargetClass())) {
 
             handler = new ObjectInvocationHandler(itf);
 
@@ -459,7 +465,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     private Method getTargetMethod(@Nonnull final Method method,
             @Nonnull final Class<?>[] targetParameterTypes) throws NoSuchMethodException {
 
-        final Class<?> targetClass = mTargetClass;
+        final Class<?> targetClass = getTargetClass();
         final Async annotation = method.getAnnotation(Async.class);
 
         String name = null;
@@ -602,7 +608,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
         public Object invoke(final Object proxy, final Method method, final Object[] args) throws
                 Throwable {
 
-            final Object target = mTarget.get();
+            final WeakReference<?> targetReference = getTargetReference();
+            final Object target = (targetReference != null) ? targetReference.get() : getTarget();
 
             if (target == null) {
 
@@ -735,6 +742,13 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                 }
             }
 
+            final Routine<Object, Object> routine = buildRoutine(method, targetMethod, paramType);
+            return callRoutine(routine, method, paramType, resultType, args);
+        }
+
+        private Routine<Object, Object> buildRoutine(final Method method, final Method targetMethod,
+                final ParamType paramType) {
+
             String lockName = mLockName;
             final DefaultConfigurationBuilder builder = new DefaultConfigurationBuilder();
 
@@ -779,10 +793,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                    .outputSize(Integer.MAX_VALUE)
                    .outputTimeout(TimeDuration.ZERO);
 
-            final Routine<Object, Object> routine =
-                    getRoutine(builder.buildConfiguration(), lockName, targetMethod);
-
-            return callRoutine(routine, method, args, paramType, resultType);
+            return getRoutine(builder.buildConfiguration(), lockName, targetMethod);
         }
     }
 

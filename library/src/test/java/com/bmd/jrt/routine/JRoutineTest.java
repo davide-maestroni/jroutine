@@ -34,6 +34,7 @@ import com.bmd.jrt.time.TimeDuration;
 
 import junit.framework.TestCase;
 
+import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -233,11 +234,31 @@ public class JRoutineTest extends TestCase {
 
         try {
 
-            new ClassRoutineBuilder(null);
+            new ClassRoutineBuilder((Object) null);
 
             fail();
 
         } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new ClassRoutineBuilder((WeakReference<?>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new ClassRoutineBuilder(TestItf.class);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
 
         }
 
@@ -401,7 +422,7 @@ public class JRoutineTest extends TestCase {
 
         assertThat(routine.call().readAll()).containsExactly(-77L);
 
-        final Routine<Object, Object> routine1 = JRoutine.on(test)
+        final Routine<Object, Object> routine1 = JRoutine.on(new WeakReference<Test>(test))
                                                          .syncRunner(RunnerType.QUEUED)
                                                          .runBy(Runners.poolRunner())
                                                          .method("getLong");
@@ -418,7 +439,8 @@ public class JRoutineTest extends TestCase {
 
         assertThat(routine2.call().readAll()).containsExactly(-77L);
 
-        final Routine<Object, Object> routine3 = JRoutine.on(test).asyncMethod(Test.THROW);
+        final Routine<Object, Object> routine3 =
+                JRoutine.on(new WeakReference<Test>(test)).asyncMethod(Test.THROW);
 
         try {
 
@@ -757,9 +779,8 @@ public class JRoutineTest extends TestCase {
         assertThat(squareAsync.computeParallel4(channel.output()).readAll()).contains(1, 4, 9);
 
         final TestInc testInc = new TestInc();
-        final int[] inc = JRoutine.on(testInc)
-                                  .proxy(ClassToken.tokenOf(ITestInc.class))
-                                  .inc(1, 2, 3, 4);
+        final int[] inc =
+                JRoutine.on(testInc).proxy(ClassToken.tokenOf(ITestInc.class)).inc(1, 2, 3, 4);
         assertThat(inc).containsOnly(2, 3, 4, 5);
     }
 

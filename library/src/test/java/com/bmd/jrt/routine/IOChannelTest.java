@@ -160,6 +160,17 @@ public class IOChannelTest extends TestCase {
         assertThat(outputChannel.afterMax(TimeDuration.millis(500)).isComplete()).isTrue();
     }
 
+    public void testReadFirst() throws InterruptedException {
+
+        IOChannel<String> channel = JRoutine.io().buildChannel();
+
+        new WeakThread(channel).start();
+
+        final Routine<String, String> routine = JRoutine.<String>on().buildRoutine();
+        final OutputChannel<String> outputChannel = routine.callAsync(channel.output());
+        assertThat(outputChannel.readFirst()).isEqualTo("test");
+    }
+
     public void testTimeout() {
 
         final IOChannel<String> channel = JRoutine.io().buildChannel();
@@ -227,33 +238,6 @@ public class IOChannelTest extends TestCase {
         } catch (final ReadDeadLockException ignored) {
 
         }
-    }
-
-    @SuppressWarnings("UnusedAssignment")
-    public void testWeak() throws InterruptedException {
-
-        IOChannel<String> channel = JRoutine.io().buildChannel();
-
-        new WeakThread(channel).start();
-
-        final Routine<String, String> routine = JRoutine.<String>on().buildRoutine();
-        final OutputChannel<String> outputChannel = routine.callAsync(channel.output());
-        assertThat(outputChannel.readFirst()).isEqualTo("test");
-
-        channel = null;
-
-        // this is not guaranteed to work, so let's try a few times...
-        for (int i = 0; i < 3; i++) {
-
-            System.gc();
-
-            if (outputChannel.afterMax(TimeDuration.seconds(500)).isComplete()) {
-
-                return;
-            }
-        }
-
-        fail();
     }
 
     private static class WeakThread extends Thread {

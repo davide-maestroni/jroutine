@@ -24,7 +24,7 @@ archivesBaseName = "${project.parent.name}-${project.name}"
 
 android {
     compileSdkVersion 21
-    buildToolsVersion '21.0.2' // Travis does not support an higher version
+    buildToolsVersion '21.1.1'
 
     defaultConfig {
         minSdkVersion 3

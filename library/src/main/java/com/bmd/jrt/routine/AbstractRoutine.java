@@ -53,7 +53,6 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
     private final Logger mLogger;
 
-
     private final int mMaxRetained;
 
     private final int mMaxRunning;

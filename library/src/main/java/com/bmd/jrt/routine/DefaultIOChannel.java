@@ -19,15 +19,9 @@ import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.OutputConsumer;
 import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.routine.DefaultResultChannel.AbortHandler;
-import com.bmd.jrt.runner.Execution;
-import com.bmd.jrt.runner.Runner;
-import com.bmd.jrt.runner.Runners;
 import com.bmd.jrt.time.TimeDuration;
 
-import java.lang.ref.ReferenceQueue;
-import java.lang.ref.WeakReference;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -43,14 +37,6 @@ import javax.annotation.Nullable;
  * @param <TYPE> the data type.
  */
 class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
-
-    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
-    private static final HashSet<IOChannelWeakReference> sReferences =
-            new HashSet<IOChannelWeakReference>();
-
-    private static ReferenceQueue<DefaultIOChannel<?>> sReferenceQueue;
-
-    private static Runner sWeakRunner;
 
     private final DefaultIOChannelInput<TYPE> mInputChannel;
 
@@ -73,27 +59,6 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
         abortHandler.setInputChannel(inputChannel);
         mInputChannel = new DefaultIOChannelInput<TYPE>(inputChannel);
         mOutputChannel = new DefaultIOChannelOutput<TYPE>(inputChannel.getOutput());
-
-        addChannelReference(this);
-    }
-
-    private static void addChannelReference(@Nonnull final DefaultIOChannel<?> channel) {
-
-        synchronized (sReferences) {
-
-            if (sWeakRunner == null) {
-
-                sWeakRunner = Runners.poolRunner(1);
-            }
-
-            if (sReferenceQueue == null) {
-
-                sReferenceQueue = new ReferenceQueue<DefaultIOChannel<?>>();
-                sWeakRunner.run(new IOChannelExecution(), 0, TimeUnit.MILLISECONDS);
-            }
-
-            sReferences.add(new IOChannelWeakReference(channel, sReferenceQueue));
-        }
     }
 
     @Nonnull
@@ -369,61 +334,6 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
         public void setInputChannel(@Nonnull final DefaultResultChannel<?> inputChannel) {
 
             mInputChannel = inputChannel;
-        }
-    }
-
-    /**
-     * Execution used to wait on the weak reference queue.
-     */
-    private static class IOChannelExecution implements Execution {
-
-        @Override
-        public void run() {
-
-            try {
-
-                IOChannelWeakReference reference;
-
-                while ((reference = (IOChannelWeakReference) sReferenceQueue.remove()) != null) {
-
-                    reference.closeInput();
-
-                    synchronized (sReferences) {
-
-                        sReferences.remove(reference);
-                    }
-                }
-
-            } catch (final InterruptedException ignored) {
-
-            }
-        }
-    }
-
-    /**
-     * Weak reference used to close the input channel.
-     */
-    private static class IOChannelWeakReference extends WeakReference<DefaultIOChannel<?>> {
-
-        private final DefaultIOChannelInput<?> mInputChannel;
-
-        /**
-         * Constructor.
-         *
-         * @param referent the referent channel instance.
-         * @param queue    the reference queue.
-         */
-        private IOChannelWeakReference(@Nonnull final DefaultIOChannel<?> referent,
-                @Nonnull final ReferenceQueue<? super DefaultIOChannel<?>> queue) {
-
-            super(referent, queue);
-
-            mInputChannel = referent.mInputChannel;
-        }
-
-        public void closeInput() {
-
-            mInputChannel.close();
         }
     }
 }

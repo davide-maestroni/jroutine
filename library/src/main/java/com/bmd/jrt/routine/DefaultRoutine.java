@@ -14,17 +14,19 @@
 package com.bmd.jrt.routine;
 
 import com.bmd.jrt.builder.RoutineConfiguration;
+import com.bmd.jrt.common.RoutineException;
 import com.bmd.jrt.invocation.Invocation;
 import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.runner.Runner;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static com.bmd.jrt.routine.ReflectionUtils.NO_ARGS;
-import static com.bmd.jrt.routine.ReflectionUtils.findConstructor;
+import static com.bmd.jrt.common.Reflection.NO_ARGS;
+import static com.bmd.jrt.common.Reflection.findConstructor;
 
 /**
  * Default implementation of a routine object instantiating invocation objects via reflection.
@@ -80,11 +82,23 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
 
             return constructor.newInstance(mArgs);
 
+        } catch (final InvocationTargetException e) {
+
+            logger.err(e, "error creating the invocation instance");
+
+            throw new RoutineException(e.getCause());
+
+        } catch (final RoutineException e) {
+
+            logger.err(e, "error creating the invocation instance");
+
+            throw e;
+
         } catch (final Throwable t) {
 
             logger.err(t, "error creating the invocation instance");
 
-            throw RoutineExceptionWrapper.wrap(t).raise();
+            throw new RoutineException(t);
         }
     }
 }

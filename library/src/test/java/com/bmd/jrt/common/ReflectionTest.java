@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.routine;
+package com.bmd.jrt.common;
 
 import junit.framework.TestCase;
 
@@ -26,31 +26,31 @@ import static org.assertj.core.api.Assertions.assertThat;
  * <p/>
  * Created by davide on 10/4/14.
  */
-public class ReflectionUtilsTest extends TestCase {
+public class ReflectionTest extends TestCase {
 
     public void testBoxingClass() {
 
-        assertThat(ReflectionUtils.boxingClass(null)).isNull();
-        assertThat(Void.class.equals(ReflectionUtils.boxingClass(void.class))).isTrue();
-        assertThat(Integer.class.equals(ReflectionUtils.boxingClass(int.class))).isTrue();
-        assertThat(Byte.class.equals(ReflectionUtils.boxingClass(byte.class))).isTrue();
-        assertThat(Boolean.class.equals(ReflectionUtils.boxingClass(boolean.class))).isTrue();
-        assertThat(Character.class.equals(ReflectionUtils.boxingClass(char.class))).isTrue();
-        assertThat(Short.class.equals(ReflectionUtils.boxingClass(short.class))).isTrue();
-        assertThat(Long.class.equals(ReflectionUtils.boxingClass(long.class))).isTrue();
-        assertThat(Float.class.equals(ReflectionUtils.boxingClass(float.class))).isTrue();
-        assertThat(Double.class.equals(ReflectionUtils.boxingClass(double.class))).isTrue();
-        assertThat(TestCase.class.equals(ReflectionUtils.boxingClass(TestCase.class))).isTrue();
+        assertThat(Reflection.boxingClass(null)).isNull();
+        assertThat(Void.class.equals(Reflection.boxingClass(void.class))).isTrue();
+        assertThat(Integer.class.equals(Reflection.boxingClass(int.class))).isTrue();
+        assertThat(Byte.class.equals(Reflection.boxingClass(byte.class))).isTrue();
+        assertThat(Boolean.class.equals(Reflection.boxingClass(boolean.class))).isTrue();
+        assertThat(Character.class.equals(Reflection.boxingClass(char.class))).isTrue();
+        assertThat(Short.class.equals(Reflection.boxingClass(short.class))).isTrue();
+        assertThat(Long.class.equals(Reflection.boxingClass(long.class))).isTrue();
+        assertThat(Float.class.equals(Reflection.boxingClass(float.class))).isTrue();
+        assertThat(Double.class.equals(Reflection.boxingClass(double.class))).isTrue();
+        assertThat(TestCase.class.equals(Reflection.boxingClass(TestCase.class))).isTrue();
     }
 
     public void testConstructor() {
 
-        assertThat(ReflectionUtils.findConstructor(TestClass.class)).isNotNull();
-        assertThat(ReflectionUtils.findConstructor(TestClass.class, "test")).isNotNull();
+        assertThat(Reflection.findConstructor(TestClass.class)).isNotNull();
+        assertThat(Reflection.findConstructor(TestClass.class, "test")).isNotNull();
 
         try {
 
-            ReflectionUtils.findConstructor(TestClass.class, 4);
+            Reflection.findConstructor(TestClass.class, 4);
 
             fail();
 
@@ -60,7 +60,7 @@ public class ReflectionUtilsTest extends TestCase {
 
         try {
 
-            ReflectionUtils.findConstructor(TestClass.class, "test", 4);
+            Reflection.findConstructor(TestClass.class, "test", 4);
 
             fail();
 
@@ -68,12 +68,12 @@ public class ReflectionUtilsTest extends TestCase {
 
         }
 
-        assertThat(ReflectionUtils.findConstructor(TestClass.class,
-                                                   new ArrayList<String>())).isNotNull();
+        assertThat(
+                Reflection.findConstructor(TestClass.class, new ArrayList<String>())).isNotNull();
 
         try {
 
-            ReflectionUtils.findConstructor(TestClass.class, (Object) null);
+            Reflection.findConstructor(TestClass.class, (Object) null);
 
             fail();
 

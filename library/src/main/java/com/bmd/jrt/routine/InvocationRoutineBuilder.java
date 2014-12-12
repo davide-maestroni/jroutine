@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static com.bmd.jrt.routine.ReflectionUtils.NO_ARGS;
+import static com.bmd.jrt.common.Reflection.NO_ARGS;
 
 /**
  * Class implementing a builder of routine objects based on an invocation class token.

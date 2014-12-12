@@ -17,20 +17,30 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.test.AndroidTestCase;
 
+import com.bmd.jrt.android.v11.routine.JRoutine;
+import com.bmd.jrt.channel.OutputChannel;
+import com.bmd.jrt.channel.ResultChannel;
+import com.bmd.jrt.common.ClassToken;
+import com.bmd.jrt.common.RoutineInterruptedException;
+import com.bmd.jrt.invocation.SimpleInvocation;
 import com.bmd.jrt.runner.Execution;
 import com.bmd.jrt.runner.Runner;
 import com.bmd.jrt.runner.RunnerWrapper;
 import com.bmd.jrt.time.TimeDuration;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
+
+import javax.annotation.Nonnull;
 
 import static com.bmd.jrt.time.TimeDuration.ZERO;
 import static com.bmd.jrt.time.TimeDuration.micros;
 import static com.bmd.jrt.time.TimeDuration.millis;
 import static com.bmd.jrt.time.TimeDuration.nanos;
+import static com.bmd.jrt.time.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -45,7 +55,7 @@ public class AndroidRunnerTest extends AndroidTestCase {
 
         try {
 
-            new LooperRunner(null);
+            new LooperRunner(null, null);
 
             fail();
 
@@ -56,25 +66,69 @@ public class AndroidRunnerTest extends AndroidTestCase {
 
     public void testLooperRunner() throws InterruptedException {
 
-        testRunner(new LooperRunner(Looper.myLooper()));
-        testRunner(AndroidRunners.mainRunner());
-        testRunner(AndroidRunners.myRunner());
-        testRunner(AndroidRunners.threadRunner(new HandlerThread("test")));
-        testRunner(new RunnerWrapper(AndroidRunners.mainRunner()));
+        testRunner(new LooperRunner(Looper.myLooper(), Runners.queuedRunner()));
+        testRunner(Runners.myRunner());
+
+        final OutputChannel<Object> channel =
+                JRoutine.on(ClassToken.tokenOf(new SimpleInvocation<Object, Object>() {
+
+                    @Override
+                    public void onCall(@Nonnull final List<?> objects,
+                            @Nonnull final ResultChannel<Object> result) {
+
+                        result.pass(Looper.myLooper()).pass(Runners.myRunner());
+                    }
+                }))
+                        .runBy(Runners.threadRunner(new HandlerThread("test")))
+                        .withArgs(this)
+                        .buildRoutine()
+                        .callAsync();
+
+        assertThat(JRoutine.on(ClassToken.tokenOf(new SimpleInvocation<Object, Object>() {
+
+            @Override
+            public void onCall(@Nonnull final List<?> objects,
+                    @Nonnull final ResultChannel<Object> result) {
+
+                try {
+
+                    testRunner(new LooperRunner((Looper) objects.get(0), null));
+                    testRunner((Runner) objects.get(1));
+
+                    result.pass(true);
+
+                } catch (final InterruptedException e) {
+
+                    RoutineInterruptedException.interrupt(e);
+                }
+            }
+        }))
+                           .withArgs(this)
+                           .buildRoutine()
+                           .callAsync(channel)
+                           .afterMax(seconds(30))
+                           .readFirst()).isEqualTo(true);
     }
 
     public void testMainRunner() throws InterruptedException {
 
-        testRunner(new MainRunner());
+        testRunner(Runners.mainRunner(null));
+        testRunner(new RunnerWrapper(Runners.mainRunner(null)));
+        testRunner(Runners.mainRunner(Runners.queuedRunner()));
+        testRunner(new RunnerWrapper(Runners.mainRunner(Runners.queuedRunner())));
     }
 
     public void testTaskRunner() throws InterruptedException {
 
         testRunner(new AsyncTaskRunner(null));
-        testRunner(AndroidRunners.taskRunner());
-        testRunner(AndroidRunners.taskRunner(Executors.newCachedThreadPool()));
-        testRunner(
-                new RunnerWrapper(AndroidRunners.taskRunner(Executors.newSingleThreadExecutor())));
+        testRunner(Runners.taskRunner());
+        testRunner(Runners.taskRunner(Executors.newCachedThreadPool()));
+        testRunner(new RunnerWrapper(Runners.taskRunner(Executors.newSingleThreadExecutor())));
+    }
+
+    public void testThreadRunner() throws InterruptedException {
+
+        testRunner(Runners.threadRunner(new HandlerThread("test")));
     }
 
     private void testRunner(final Runner runner) throws InterruptedException {

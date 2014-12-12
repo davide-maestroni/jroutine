@@ -82,6 +82,8 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
     /**
      * Tells the channel to throw a {@link ReadDeadLockException} in case no result is available
      * before the timeout has elapsed.
+     * <p/>
+     * By default no exception will be thrown.
      *
      * @param throwException whether to throw a deadlock exception.
      * @return this channel.
@@ -169,6 +171,9 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      *
      * @return the first available result.
      * @throws IllegalStateException               if this channel is already bound to a consumer.
+     * @throws java.util.NoSuchElementException    if no output is available (it might be thrown
+     *                                             also in the case the read timeout elapses and no
+     *                                             deadlock exception is set to be thrown).
      * @throws ReadDeadLockException               if the channel is set to throw an exception when
      *                                             the timeout elapses.
      * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an

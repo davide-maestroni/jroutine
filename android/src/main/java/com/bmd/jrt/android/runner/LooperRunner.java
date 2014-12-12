@@ -18,11 +18,11 @@ import android.os.Looper;
 
 import com.bmd.jrt.runner.Execution;
 import com.bmd.jrt.runner.Runner;
-import com.bmd.jrt.runner.Runners;
 
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Implementation of a runner employing the Android {@link android.os.Looper} queue to execute
@@ -34,21 +34,31 @@ class LooperRunner implements Runner {
 
     private final Handler mHandler;
 
-    private final Runner mQueuedRunner;
+    private final Runner mSameThreadRunner;
 
     private final Thread mThread;
 
     /**
      * Constructor.
      *
-     * @param looper the looper to employ.
+     * @param looper           the looper to employ.
+     * @param sameThreadRunner the runner to be used when this one is called on its own thread.
+     *                         If null, the invocation will be posted on the specified looper.
      * @throws NullPointerException if the specified looper is null.
      */
-    LooperRunner(@Nonnull final Looper looper) {
+    LooperRunner(@Nonnull final Looper looper, @Nullable final Runner sameThreadRunner) {
 
         mThread = looper.getThread();
         mHandler = new Handler(looper);
-        mQueuedRunner = Runners.queuedRunner();
+        mSameThreadRunner = (sameThreadRunner != null) ? sameThreadRunner : new Runner() {
+
+            @Override
+            public void run(@Nonnull final Execution execution, final long delay,
+                    @Nonnull final TimeUnit timeUnit) {
+
+                runInternal(execution, delay, timeUnit);
+            }
+        };
     }
 
     @Override
@@ -57,9 +67,18 @@ class LooperRunner implements Runner {
 
         if (Thread.currentThread() == mThread) {
 
-            mQueuedRunner.run(execution, delay, timeUnit);
+            mSameThreadRunner.run(execution, delay, timeUnit);
 
-        } else if (delay > 0) {
+        } else {
+
+            runInternal(execution, delay, timeUnit);
+        }
+    }
+
+    private void runInternal(@Nonnull final Execution execution, final long delay,
+            @Nonnull final TimeUnit timeUnit) {
+
+        if (delay > 0) {
 
             mHandler.postDelayed(execution, timeUnit.toMillis(delay));
 

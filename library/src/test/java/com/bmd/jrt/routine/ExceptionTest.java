@@ -16,11 +16,8 @@ package com.bmd.jrt.routine;
 import com.bmd.jrt.builder.InputDeadLockException;
 import com.bmd.jrt.builder.OutputDeadLockException;
 import com.bmd.jrt.channel.ReadDeadLockException;
-import com.bmd.jrt.common.DeadLockException;
 
 import junit.framework.TestCase;
-
-import java.lang.reflect.Method;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -33,69 +30,9 @@ public class ExceptionTest extends TestCase {
 
     public void testExceptions() {
 
-        assertThat(new DeadLockException()).hasNoCause();
         assertThat(new InputDeadLockException()).hasNoCause();
         assertThat(new OutputDeadLockException()).hasNoCause();
         assertThat(new ReadDeadLockException()).hasNoCause();
         assertThat(new RoutineDeadLockException()).hasNoCause();
-    }
-
-    @SuppressWarnings("ConstantConditions")
-    public void testRoutineInvocationException() throws NoSuchMethodException {
-
-        final Method waitMethod = Object.class.getMethod("wait");
-
-        assertThat(new RoutineInvocationException(new NullPointerException(), null, Object.class,
-                                                  waitMethod.getName())).isExactlyInstanceOf(
-                RoutineInvocationException.class);
-        assertThat(new RoutineInvocationException(new NullPointerException(), this, Object.class,
-                                                  waitMethod.getName()).getCause())
-                .isExactlyInstanceOf(
-                NullPointerException.class);
-        assertThat(new RoutineInvocationException(null, null, Object.class,
-                                                  waitMethod.getName())).hasNoCause();
-        assertThat(new RoutineInvocationException(new NullPointerException(), this, Object.class,
-                                                  waitMethod.getName()).getTarget()).isEqualTo(
-                this);
-        assertThat(new RoutineInvocationException(null, null, Object.class,
-                                                  waitMethod.getName()).getTarget()).isNull();
-        assertThat(new RoutineInvocationException(null, null, Object.class,
-                                                  waitMethod.getName()).getTargetClass()
-                                                                       .equals(Object.class))
-                .isTrue();
-        assertThat(new RoutineInvocationException(null, null, Object.class,
-                                                  waitMethod.getName()).getMethodName()).isEqualTo(
-                waitMethod.getName());
-        assertThat(new RoutineInvocationException(null, null, Object.class,
-                                                  waitMethod.getName()).getMethodParameterTypes()
-        ).isEmpty();
-        assertThat(new RoutineInvocationException(null, null, Object.class,
-                                                  waitMethod.getName()).getMethod()).isEqualTo(
-                waitMethod);
-
-        try {
-
-            throw new RoutineInvocationException(null, this, null, "test");
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            throw new RoutineInvocationException(null, this, Object.class, null);
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            throw new RoutineInvocationException(null, this, Object.class, "test",
-                                                 (Class<?>[]) null);
-
-        } catch (final NullPointerException ignored) {
-
-        }
     }
 }

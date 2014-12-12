@@ -44,7 +44,7 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static com.bmd.jrt.routine.ReflectionUtils.boxingClass;
+import static com.bmd.jrt.common.Reflection.boxingClass;
 import static com.bmd.jrt.time.TimeDuration.fromUnit;
 
 /**
@@ -506,8 +506,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
             routine = new DefaultRoutine<Object, Object>(configuration, syncRunner,
                                                          MethodSimpleInvocation.class,
-                                                         mTargetReference, mTarget, mTargetClass,
-                                                         method, mutex);
+                                                         mTargetReference, mTarget, method, mutex);
             routineMap.put(routineInfo, routine);
         }
 
@@ -681,8 +680,6 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
         private final Object mTarget;
 
-        private final Class<?> mTargetClass;
-
         private final WeakReference<?> mTargetReference;
 
         /**
@@ -690,17 +687,15 @@ public class ClassRoutineBuilder implements RoutineBuilder {
          *
          * @param targetReference the reference to the target object.
          * @param target          the target object.
-         * @param targetClass     the target class.
          * @param method          the method to wrap.
          * @param mutex           the mutex used for synchronization.
          */
         public MethodSimpleInvocation(final WeakReference<?> targetReference,
-                @Nullable final Object target, @Nonnull final Class<?> targetClass,
-                @Nonnull final Method method, @Nullable final Object mutex) {
+                @Nullable final Object target, @Nonnull final Method method,
+                @Nullable final Object mutex) {
 
             mTargetReference = targetReference;
             mTarget = target;
-            mTargetClass = targetClass;
             mMethod = method;
             mMutex = (mutex != null) ? mutex : this;
 
@@ -745,9 +740,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
                 } catch (final InvocationTargetException e) {
 
-                    throw new RoutineInvocationException(e.getCause(), target, mTargetClass,
-                                                         method.getName(),
-                                                         method.getParameterTypes());
+                    throw new RoutineException(e.getCause());
 
                 } catch (final RoutineException e) {
 

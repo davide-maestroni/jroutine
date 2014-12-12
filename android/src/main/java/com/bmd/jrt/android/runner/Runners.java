@@ -28,44 +28,36 @@ import javax.annotation.Nullable;
  * <p/>
  * Created by davide on 9/28/14.
  */
-public class AndroidRunners {
-
-    private static volatile Runner sMainRunner;
-
-    /**
-     * Avoid direct instantiation.
-     */
-    protected AndroidRunners() {
-
-    }
+public class Runners extends com.bmd.jrt.runner.Runners {
 
     /**
      * Returns a runner employing in the specified looper.
      *
-     * @param looper the looper instance.
+     * @param looper           the looper instance.
+     * @param sameThreadRunner the runner to be used when the specified looper is called on its own
+     *                         thread. If null, the invocation will be posted on the specified
+     *                         looper.
      * @return the runner instance.
-     * @throws IllegalArgumentException if the specified looper is null.
+     * @throws NullPointerException if the specified looper is null.
      */
     @Nonnull
-    public static Runner looperRunner(@Nonnull final Looper looper) {
+    public static Runner looperRunner(@Nonnull final Looper looper,
+            @Nullable final Runner sameThreadRunner) {
 
-        return new LooperRunner(looper);
+        return new LooperRunner(looper, sameThreadRunner);
     }
 
     /**
      * Returns a runner employing the main thread looper.
      *
+     * @param sameThreadRunner the runner to be used when the main looper is called on its own
+     *                         thread. If null, the invocation will be posted on the main looper.
      * @return the runner instance.
      */
     @Nonnull
-    public static Runner mainRunner() {
+    public static Runner mainRunner(@Nullable final Runner sameThreadRunner) {
 
-        if (sMainRunner == null) {
-
-            sMainRunner = looperRunner(Looper.getMainLooper());
-        }
-
-        return sMainRunner;
+        return looperRunner(Looper.getMainLooper(), sameThreadRunner);
     }
 
     /**
@@ -76,7 +68,7 @@ public class AndroidRunners {
     @Nonnull
     public static Runner myRunner() {
 
-        return looperRunner(Looper.myLooper());
+        return looperRunner(Looper.myLooper(), queuedRunner());
     }
 
     /**
@@ -127,6 +119,6 @@ public class AndroidRunners {
             thread.start();
         }
 
-        return looperRunner(thread.getLooper());
+        return looperRunner(thread.getLooper(), null);
     }
 }

@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.routine;
+package com.bmd.jrt.common;
 
 import java.lang.reflect.Constructor;
 import java.security.AccessController;
@@ -27,7 +27,7 @@ import javax.annotation.Nullable;
  * <p/>
  * Created by davide on 9/9/14.
  */
-class ReflectionUtils {
+public class Reflection {
 
     /**
      * Constant defining an empty argument array for methods or constructors.
@@ -54,7 +54,7 @@ class ReflectionUtils {
     /**
      * Avoid direct instantiation.
      */
-    private ReflectionUtils() {
+    private Reflection() {
 
     }
 

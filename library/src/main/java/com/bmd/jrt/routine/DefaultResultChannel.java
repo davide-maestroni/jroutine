@@ -450,7 +450,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         synchronized (mMutex) {
 
-            if (!isResultOpen()) {
+            if (isResultComplete()) {
 
                 mLogger.dbg(throwable, "avoiding aborting since channel is closed");
 
@@ -523,7 +523,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             synchronized (mMutex) {
 
-                if ((mState == ChannelState.FLUSH) || (mState == ChannelState.ABORTED)) {
+                if (!isOutputPending(mState)) {
 
                     mState = ChannelState.DONE;
 
@@ -556,7 +556,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                         logger.dbg("avoiding flushing output since channel is not bound");
 
-                        if ((mState == ChannelState.FLUSH) || (mState == ChannelState.ABORTED)) {
+                        if (!isOutputPending(mState)) {
 
                             mState = ChannelState.DONE;
                         }
@@ -604,7 +604,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                     }
                 }
 
-                if ((state == ChannelState.FLUSH) || (state == ChannelState.ABORTED)) {
+                if (!isOutputPending(state)) {
 
                     closeConsumer();
                 }
@@ -621,7 +621,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                     logger.wrn(t, "consumer exception (%s)", mOutputConsumer);
 
-                    if ((mState == ChannelState.FLUSH) || (mState == ChannelState.ABORTED)) {
+                    if (!isOutputPending(mState)) {
 
                         isClose = true;
 
@@ -659,12 +659,22 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         }
     }
 
+    private boolean isOutputPending(@Nonnull final ChannelState state) {
+
+        return (state != ChannelState.FLUSH) && (state != ChannelState.ABORTED) && (state
+                != ChannelState.DONE);
+    }
+
+    private boolean isResultComplete() {
+
+        return (mState.ordinal() > ChannelState.FLUSH.ordinal());
+    }
+
     private boolean isResultOpen() {
 
         synchronized (mMutex) {
 
-            return (mState != ChannelState.DONE) && (mState != ChannelState.ABORTED) && (mState
-                    != ChannelState.EXCEPTION);
+            return (mState == ChannelState.OUTPUT);
         }
     }
 
@@ -755,6 +765,25 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             mLogger.err("invalid call on bound channel");
 
             throw new IllegalStateException("the channel is already bound");
+        }
+    }
+
+    private void verifyComplete() {
+
+        if (mState == ChannelState.EXCEPTION) {
+
+            final Throwable throwable = mAbortException;
+
+            mLogger.dbg(throwable, "abort exception");
+
+            throw RoutineExceptionWrapper.wrap(throwable).raise();
+        }
+
+        if (isResultComplete()) {
+
+            mLogger.err("invalid call on closed channel");
+
+            throw new IllegalStateException("the channel is closed");
         }
     }
 
@@ -1218,7 +1247,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             synchronized (mMutex) {
 
-                if (!isResultOpen()) {
+                if (isResultComplete()) {
 
                     mSubLogger.dbg("avoiding aborting output since result channel is closed");
 
@@ -1275,7 +1304,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             synchronized (mMutex) {
 
-                verifyOutput();
+                verifyComplete();
 
                 mQueue.close();
 
@@ -1304,7 +1333,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             synchronized (mMutex) {
 
-                if (!isResultOpen()) {
+                if (isResultComplete()) {
 
                     mSubLogger.dbg("avoiding aborting output since result channel is closed");
 
@@ -1331,7 +1360,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             synchronized (mMutex) {
 
-                verifyOutput();
+                verifyComplete();
 
                 outputQueue = mQueue;
 

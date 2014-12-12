@@ -1,0 +1,16 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.bmd.jrt.android">
+
+    <application
+        android:label="@string/lib_name">
+        <activity
+            android:name=".v11.routine.TestActivity"
+            android:label="test">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>

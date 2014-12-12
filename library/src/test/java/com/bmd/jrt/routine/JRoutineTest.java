@@ -25,6 +25,7 @@ import com.bmd.jrt.channel.IOChannel.IOChannelInput;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.ClassToken;
+import com.bmd.jrt.common.RoutineException;
 import com.bmd.jrt.invocation.TemplateInvocation;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.log.NullLog;
@@ -187,7 +188,7 @@ public class JRoutineTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineInvocationException e) {
+        } catch (final RoutineException e) {
 
             assertThat(e.getCause()).isExactlyInstanceOf(IllegalArgumentException.class);
             assertThat(e.getCause().getMessage()).isEqualTo("test");
@@ -448,7 +449,7 @@ public class JRoutineTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineInvocationException e) {
+        } catch (final RoutineException e) {
 
             assertThat(e.getCause()).isExactlyInstanceOf(IllegalArgumentException.class);
             assertThat(e.getCause().getMessage()).isEqualTo("test");

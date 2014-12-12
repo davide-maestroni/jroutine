@@ -84,7 +84,7 @@ public interface RoutineBuilder {
 
     /**
      * Sets the timeout for an invocation instance to become available. A null value means that
-     * it is up to the framework to chose a default.
+     * it is up to the framework to chose a default duration.
      *
      * @param timeout the timeout.
      * @return this builder.
@@ -103,7 +103,8 @@ public interface RoutineBuilder {
     public RoutineBuilder logLevel(@Nonnull LogLevel level);
 
     /**
-     * Sets the log instance. A null value means that it is up to the framework to chose a default.
+     * Sets the log instance. A null value means that it is up to the framework to chose a default
+     * implementation.
      *
      * @param log the log instance.
      * @return this builder.
@@ -113,7 +114,7 @@ public interface RoutineBuilder {
 
     /**
      * Sets the max number of retained instances. A DEFAULT value means that it is up to the
-     * framework to chose a default.
+     * framework to chose a default number.
      *
      * @param maxRetainedInstances the max number of instances.
      * @return this builder.
@@ -124,7 +125,7 @@ public interface RoutineBuilder {
 
     /**
      * Sets the max number of concurrently running instances.A DEFAULT value means that it is up
-     * to the framework to chose a default.
+     * to the framework to chose a default number.
      *
      * @param maxRunningInstances the max number of instances.
      * @return this builder.
@@ -135,7 +136,7 @@ public interface RoutineBuilder {
 
     /**
      * Sets the asynchronous runner instance. A null value means that it is up to the framework
-     * to chose a default.
+     * to chose a default instance.
      *
      * @param runner the runner instance.
      * @return this builder.

@@ -24,6 +24,11 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class ExceptionTest extends TestCase {
 
+    public void testExceptions() {
+
+        assertThat(new DeadLockException()).hasNoCause();
+    }
+
     public void testRoutineException() {
 
         assertThat(new RoutineException(new NullPointerException())).isExactlyInstanceOf(

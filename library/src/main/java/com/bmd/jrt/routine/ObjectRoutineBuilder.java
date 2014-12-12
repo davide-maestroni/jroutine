@@ -41,7 +41,7 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static com.bmd.jrt.routine.ReflectionUtils.boxingClass;
+import static com.bmd.jrt.common.Reflection.boxingClass;
 
 /**
  * Class implementing a builder of routines wrapping an object instance.

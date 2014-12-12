@@ -46,7 +46,7 @@ class AsyncTaskRunner extends LooperRunner {
      */
     AsyncTaskRunner(@Nullable final Executor executor) {
 
-        super(Looper.getMainLooper());
+        super(Looper.getMainLooper(), null);
 
         mExecutor = executor;
     }

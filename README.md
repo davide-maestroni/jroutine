@@ -1,5 +1,6 @@
 #jroutine
 [![Build Status](https://travis-ci.org/davide-maestroni/jroutine.svg?branch=master)](https://travis-ci.org/davide-maestroni/jroutine)
+[![Coverage Status](https://img.shields.io/coveralls/davide-maestroni/jroutine.svg)](https://coveralls.io/r/davide-maestroni/jroutine?branch=master)
 
 Parallel programming on the go.
 

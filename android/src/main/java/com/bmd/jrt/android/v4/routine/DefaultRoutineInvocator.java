@@ -38,6 +38,8 @@ class DefaultRoutineInvocator implements RoutineInvocator {
 
     private final WeakReference<Object> mContext;
 
+    private InvocationCachePolicy mCachePolicy = InvocationCachePolicy.DEFAULT;
+
     private int mLoaderId = RoutineInvocator.GENERATED_ID;
 
     private ClashResolution mResolution = ClashResolution.DEFAULT;
@@ -71,11 +73,14 @@ class DefaultRoutineInvocator implements RoutineInvocator {
 
         final ClashResolution resolution =
                 (mResolution == ClashResolution.DEFAULT) ? ClashResolution.RESTART : mResolution;
+        final InvocationCachePolicy cachePolicy =
+                (mCachePolicy == InvocationCachePolicy.DEFAULT) ? InvocationCachePolicy.CLEAR
+                        : mCachePolicy;
         final Routine<INPUT, OUTPUT> routine =
                 JRoutine.on(new ClassToken<LoaderInvocation<INPUT, OUTPUT>>() {})
                         .runBy(Runners.mainRunner(null))
                         .inputOrder(DataOrder.INSERTION)
-                        .withArgs(mContext, mLoaderId, resolution,
+                        .withArgs(mContext, mLoaderId, resolution, cachePolicy,
                                   Reflection.findConstructor(classToken.getRawClass()))
                         .buildRoutine();
 
@@ -93,6 +98,21 @@ class DefaultRoutineInvocator implements RoutineInvocator {
         }
 
         mResolution = resolution;
+
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    @SuppressWarnings("ConstantConditions")
+    public RoutineInvocator onComplete(@Nonnull final InvocationCachePolicy cachePolicy) {
+
+        if (cachePolicy == null) {
+
+            throw new NullPointerException("the cache policy type must not be null");
+        }
+
+        mCachePolicy = cachePolicy;
 
         return this;
     }

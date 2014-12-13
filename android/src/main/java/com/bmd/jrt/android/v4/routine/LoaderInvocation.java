@@ -24,6 +24,7 @@ import android.util.SparseArray;
 
 import com.bmd.jrt.android.invocator.RoutineInvocator;
 import com.bmd.jrt.android.invocator.RoutineInvocator.ClashResolution;
+import com.bmd.jrt.android.invocator.RoutineInvocator.InvocationCachePolicy;
 import com.bmd.jrt.channel.IOChannel;
 import com.bmd.jrt.channel.IOChannel.IOChannelInput;
 import com.bmd.jrt.channel.OutputChannel;
@@ -54,6 +55,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
     private static final CacheHashMap<Object, SparseArray<RoutineLoaderCallbacks<?>>> sCallbackMap =
             new CacheHashMap<Object, SparseArray<RoutineLoaderCallbacks<?>>>();
 
+    private final InvocationCachePolicy mCachePolicy;
+
     private final Constructor<? extends Invocation<INPUT, OUTPUT>> mConstructor;
 
     private final WeakReference<Object> mContext;
@@ -68,12 +71,14 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
      * @param context     the context reference.
      * @param loaderId    the loader ID.
      * @param resolution  the clash resolution type.
+     * @param cachePolicy the cache policy type.
      * @param constructor the invocation constructor.
      * @throws NullPointerException if one of the specified parameters is null.
      */
     @SuppressWarnings("ConstantConditions")
     LoaderInvocation(@Nonnull final WeakReference<Object> context, final int loaderId,
             @Nonnull final ClashResolution resolution,
+            @Nonnull final InvocationCachePolicy cachePolicy,
             @Nonnull final Constructor<? extends Invocation<INPUT, OUTPUT>> constructor) {
 
         if (context == null) {
@@ -86,6 +91,11 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
             throw new NullPointerException("the clash resolution type must not be null");
         }
 
+        if (cachePolicy == null) {
+
+            throw new NullPointerException("the cache policy type must not be null");
+        }
+
         if (constructor == null) {
 
             throw new NullPointerException("the invocation constructor must not be null");
@@ -94,6 +104,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
         mContext = context;
         mLoaderId = loaderId;
         mResolution = resolution;
+        mCachePolicy = cachePolicy;
         mConstructor = constructor;
     }
 
@@ -208,7 +219,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
                 routineLoader = new RoutineLoader<INPUT, OUTPUT>(loaderContext, invocation, inputs);
             }
 
-            callbacks = new RoutineLoaderCallbacks<OUTPUT>(loaderManager, routineLoader);
+            callbacks =
+                    new RoutineLoaderCallbacks<OUTPUT>(loaderManager, routineLoader, mCachePolicy);
             callbackArray.put(loaderId, callbacks);
         }
 
@@ -234,6 +246,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
     private static class RoutineLoaderCallbacks<OUTPUT>
             implements LoaderCallbacks<InvocationResult<OUTPUT>> {
 
+        private final InvocationCachePolicy mCachePolicy;
+
         private final ArrayList<IOChannel<OUTPUT>> mChannels = new ArrayList<IOChannel<OUTPUT>>();
 
         private final RoutineLoader<?, OUTPUT> mLoader;
@@ -249,12 +263,15 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
          *
          * @param loaderManager the loader manager.
          * @param loader        the loader instance.
+         * @param cachePolicy   the cache policy type.
          */
         private RoutineLoaderCallbacks(@Nonnull final LoaderManager loaderManager,
-                @Nonnull final RoutineLoader<?, OUTPUT> loader) {
+                @Nonnull final RoutineLoader<?, OUTPUT> loader,
+                @Nonnull final InvocationCachePolicy cachePolicy) {
 
             mLoaderManager = loaderManager;
             mLoader = loader;
+            mCachePolicy = cachePolicy;
         }
 
         /**
@@ -286,10 +303,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
 
             ++mResultCount;
 
-            if (result.isError() && (mResultCount >= internalLoader.getInvocationCount())) {
-
-                mLoaderManager.destroyLoader(internalLoader.getId());
-            }
+            checkComplete();
 
             return channel.output();
         }
@@ -306,11 +320,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
 
             mResult = result;
 
-            final ArrayList<IOChannel<OUTPUT>> channels =
-                    new ArrayList<IOChannel<OUTPUT>>(mChannels);
-            mChannels.clear();
-
-            final RoutineLoader<?, OUTPUT> internalLoader = mLoader;
+            final ArrayList<IOChannel<OUTPUT>> channels = mChannels;
 
             for (final IOChannel<OUTPUT> channel : channels) {
 
@@ -320,17 +330,32 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
             }
 
             mResultCount += channels.size();
+            channels.clear();
 
-            if (result.isError() && (mResultCount >= internalLoader.getInvocationCount())) {
-
-                mLoaderManager.destroyLoader(internalLoader.getId());
-            }
+            checkComplete();
         }
 
         @Override
         public void onLoaderReset(final Loader<InvocationResult<OUTPUT>> loader) {
 
             mResult = null;
+        }
+
+        private void checkComplete() {
+
+            final RoutineLoader<?, OUTPUT> internalLoader = mLoader;
+
+            if (mResultCount >= internalLoader.getInvocationCount()) {
+
+                final InvocationCachePolicy cachePolicy = mCachePolicy;
+
+                if ((cachePolicy == InvocationCachePolicy.CLEAR) || (mResult.isError() ? (
+                        cachePolicy == InvocationCachePolicy.CLEAR_IF_ERROR)
+                        : (cachePolicy == InvocationCachePolicy.CLEAR_IF_RESULT))) {
+
+                    mLoaderManager.destroyLoader(internalLoader.getId());
+                }
+            }
         }
     }
 }

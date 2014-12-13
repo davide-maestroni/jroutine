@@ -65,6 +65,16 @@ public interface RoutineInvocator {
     public RoutineInvocator onClash(@Nonnull ClashResolution resolution);
 
     /**
+     * Tells the invocator... TODO
+     *
+     * @param cachePolicy the cache policy.
+     * @return this invocator.
+     * @throws NullPointerException if the specified resolution type is null.
+     */
+    @Nonnull
+    public RoutineInvocator onComplete(@Nonnull InvocationCachePolicy cachePolicy);
+
+    /**
      * Tells the invocator to identify the invocation with the specified ID.
      *
      * @param id the invocation ID.
@@ -103,6 +113,37 @@ public interface RoutineInvocator {
         /**
          * The default resolution, that is, it is let to the framework decide the best strategy to
          * resolve the clash.
+         */
+        DEFAULT
+    }
+
+    /**
+     * Invocation cache policy enumeration.<br/>
+     * The cache policy indicates what will happen to an invocation after its completion.
+     */
+    public enum InvocationCachePolicy {
+
+        /**
+         * On completion the invocation is destroyed and its data cleared.
+         */
+        CLEAR,
+        /**
+         * Only in case of error the invocation is cleared, otherwise it is retained along with its
+         * result.
+         */
+        CLEAR_IF_ERROR,
+        /**
+         * Only in case of successful completion the invocation is cleared, otherwise it is retained
+         * along with its result.
+         */
+        CLEAR_IF_RESULT,
+        /**
+         * On completion the invocation and its data are retained.
+         */
+        RETAIN,
+        /**
+         * The default policy, that is, it is let to the framework decide what to do with the
+         * invocation instance.
          */
         DEFAULT
     }

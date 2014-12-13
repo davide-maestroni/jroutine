@@ -24,7 +24,7 @@ import android.util.SparseArray;
 
 import com.bmd.jrt.android.invocator.RoutineInvocator;
 import com.bmd.jrt.android.invocator.RoutineInvocator.ClashResolution;
-import com.bmd.jrt.android.invocator.RoutineInvocator.InvocationCachePolicy;
+import com.bmd.jrt.android.invocator.RoutineInvocator.ResultCache;
 import com.bmd.jrt.channel.IOChannel;
 import com.bmd.jrt.channel.IOChannel.IOChannelInput;
 import com.bmd.jrt.channel.OutputChannel;
@@ -55,7 +55,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
     private static final CacheHashMap<Object, SparseArray<RoutineLoaderCallbacks<?>>> sCallbackMap =
             new CacheHashMap<Object, SparseArray<RoutineLoaderCallbacks<?>>>();
 
-    private final InvocationCachePolicy mCachePolicy;
+    private final ResultCache mCacheType;
 
     private final Constructor<? extends Invocation<INPUT, OUTPUT>> mConstructor;
 
@@ -71,14 +71,13 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
      * @param context     the context reference.
      * @param loaderId    the loader ID.
      * @param resolution  the clash resolution type.
-     * @param cachePolicy the cache policy type.
+     * @param cacheType   the result cache type.
      * @param constructor the invocation constructor.
      * @throws NullPointerException if one of the specified parameters is null.
      */
     @SuppressWarnings("ConstantConditions")
     LoaderInvocation(@Nonnull final WeakReference<Object> context, final int loaderId,
-            @Nonnull final ClashResolution resolution,
-            @Nonnull final InvocationCachePolicy cachePolicy,
+            @Nonnull final ClashResolution resolution, @Nonnull final ResultCache cacheType,
             @Nonnull final Constructor<? extends Invocation<INPUT, OUTPUT>> constructor) {
 
         if (context == null) {
@@ -91,9 +90,9 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
             throw new NullPointerException("the clash resolution type must not be null");
         }
 
-        if (cachePolicy == null) {
+        if (cacheType == null) {
 
-            throw new NullPointerException("the cache policy type must not be null");
+            throw new NullPointerException("the result cache type must not be null");
         }
 
         if (constructor == null) {
@@ -104,7 +103,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
         mContext = context;
         mLoaderId = loaderId;
         mResolution = resolution;
-        mCachePolicy = cachePolicy;
+        mCacheType = cacheType;
         mConstructor = constructor;
     }
 
@@ -220,7 +219,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
             }
 
             callbacks =
-                    new RoutineLoaderCallbacks<OUTPUT>(loaderManager, routineLoader, mCachePolicy);
+                    new RoutineLoaderCallbacks<OUTPUT>(loaderManager, routineLoader, mCacheType);
             callbackArray.put(loaderId, callbacks);
         }
 
@@ -246,7 +245,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
     private static class RoutineLoaderCallbacks<OUTPUT>
             implements LoaderCallbacks<InvocationResult<OUTPUT>> {
 
-        private final InvocationCachePolicy mCachePolicy;
+        private final ResultCache mCacheType;
 
         private final ArrayList<IOChannel<OUTPUT>> mChannels = new ArrayList<IOChannel<OUTPUT>>();
 
@@ -263,15 +262,15 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
          *
          * @param loaderManager the loader manager.
          * @param loader        the loader instance.
-         * @param cachePolicy   the cache policy type.
+         * @param cacheType     the cache type.
          */
         private RoutineLoaderCallbacks(@Nonnull final LoaderManager loaderManager,
                 @Nonnull final RoutineLoader<?, OUTPUT> loader,
-                @Nonnull final InvocationCachePolicy cachePolicy) {
+                @Nonnull final ResultCache cacheType) {
 
             mLoaderManager = loaderManager;
             mLoader = loader;
-            mCachePolicy = cachePolicy;
+            mCacheType = cacheType;
         }
 
         /**
@@ -347,11 +346,11 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
 
             if (mResultCount >= internalLoader.getInvocationCount()) {
 
-                final InvocationCachePolicy cachePolicy = mCachePolicy;
+                final ResultCache cacheType = mCacheType;
 
-                if ((cachePolicy == InvocationCachePolicy.CLEAR) || (mResult.isError() ? (
-                        cachePolicy == InvocationCachePolicy.CLEAR_IF_ERROR)
-                        : (cachePolicy == InvocationCachePolicy.CLEAR_IF_RESULT))) {
+                if ((cacheType == ResultCache.CLEAR) || (mResult.isError() ? (cacheType
+                        == ResultCache.CLEAR_IF_ERROR)
+                        : (cacheType == ResultCache.CLEAR_IF_RESULT))) {
 
                     mLoaderManager.destroyLoader(internalLoader.getId());
                 }

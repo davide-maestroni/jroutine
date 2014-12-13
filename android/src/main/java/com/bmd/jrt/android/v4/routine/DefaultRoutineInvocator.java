@@ -38,7 +38,7 @@ class DefaultRoutineInvocator implements RoutineInvocator {
 
     private final WeakReference<Object> mContext;
 
-    private InvocationCachePolicy mCachePolicy = InvocationCachePolicy.DEFAULT;
+    private ResultCache mCacheType = ResultCache.DEFAULT;
 
     private int mLoaderId = RoutineInvocator.GENERATED_ID;
 
@@ -73,14 +73,13 @@ class DefaultRoutineInvocator implements RoutineInvocator {
 
         final ClashResolution resolution =
                 (mResolution == ClashResolution.DEFAULT) ? ClashResolution.RESTART : mResolution;
-        final InvocationCachePolicy cachePolicy =
-                (mCachePolicy == InvocationCachePolicy.DEFAULT) ? InvocationCachePolicy.CLEAR
-                        : mCachePolicy;
+        final ResultCache cacheType =
+                (mCacheType == ResultCache.DEFAULT) ? ResultCache.CLEAR : mCacheType;
         final Routine<INPUT, OUTPUT> routine =
                 JRoutine.on(new ClassToken<LoaderInvocation<INPUT, OUTPUT>>() {})
                         .runBy(Runners.mainRunner(null))
                         .inputOrder(DataOrder.INSERTION)
-                        .withArgs(mContext, mLoaderId, resolution, cachePolicy,
+                        .withArgs(mContext, mLoaderId, resolution, cacheType,
                                   Reflection.findConstructor(classToken.getRawClass()))
                         .buildRoutine();
 
@@ -105,14 +104,14 @@ class DefaultRoutineInvocator implements RoutineInvocator {
     @Nonnull
     @Override
     @SuppressWarnings("ConstantConditions")
-    public RoutineInvocator onComplete(@Nonnull final InvocationCachePolicy cachePolicy) {
+    public RoutineInvocator onComplete(@Nonnull final ResultCache cacheType) {
 
-        if (cachePolicy == null) {
+        if (cacheType == null) {
 
-            throw new NullPointerException("the cache policy type must not be null");
+            throw new NullPointerException("the result cache type must not be null");
         }
 
-        mCachePolicy = cachePolicy;
+        mCacheType = cacheType;
 
         return this;
     }

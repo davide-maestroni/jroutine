@@ -65,14 +65,14 @@ public interface RoutineInvocator {
     public RoutineInvocator onClash(@Nonnull ClashResolution resolution);
 
     /**
-     * Tells the invocator... TODO
+     * Tells the invocator how to cache the invocation result after its completion.
      *
-     * @param cachePolicy the cache policy.
+     * @param cacheType the cache type.
      * @return this invocator.
-     * @throws NullPointerException if the specified resolution type is null.
+     * @throws NullPointerException if the specified cache type is null.
      */
     @Nonnull
-    public RoutineInvocator onComplete(@Nonnull InvocationCachePolicy cachePolicy);
+    public RoutineInvocator onComplete(@Nonnull ResultCache cacheType);
 
     /**
      * Tells the invocator to identify the invocation with the specified ID.
@@ -118,32 +118,32 @@ public interface RoutineInvocator {
     }
 
     /**
-     * Invocation cache policy enumeration.<br/>
-     * The cache policy indicates what will happen to an invocation after its completion.
+     * Result cache type enumeration.<br/>
+     * The cache type indicates what will happen to the result of an invocation after its
+     * completion.
      */
-    public enum InvocationCachePolicy {
+    public enum ResultCache {
 
         /**
-         * On completion the invocation is destroyed and its data cleared.
+         * On completion the invocation results are cleared.
          */
         CLEAR,
         /**
-         * Only in case of error the invocation is cleared, otherwise it is retained along with its
-         * result.
+         * Only in case of error the results are cleared, otherwise they are retained.
          */
         CLEAR_IF_ERROR,
         /**
-         * Only in case of successful completion the invocation is cleared, otherwise it is retained
-         * along with its result.
+         * Only in case of successful completion the results are cleared, otherwise they are
+         * retained.
          */
         CLEAR_IF_RESULT,
         /**
-         * On completion the invocation and its data are retained.
+         * On completion the invocation results are retained.
          */
         RETAIN,
         /**
-         * The default policy, that is, it is let to the framework decide what to do with the
-         * invocation instance.
+         * The default type, that is, it is let to the framework decide what to do with the
+         * invocation results.
          */
         DEFAULT
     }

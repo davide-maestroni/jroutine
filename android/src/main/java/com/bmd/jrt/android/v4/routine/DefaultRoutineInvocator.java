@@ -34,7 +34,7 @@ import javax.annotation.Nonnull;
  * <p/>
  * Created by davide on 12/9/14.
  */
-public class DefaultRoutineInvocator implements RoutineInvocator {
+class DefaultRoutineInvocator implements RoutineInvocator {
 
     private final WeakReference<Object> mContext;
 
@@ -72,8 +72,8 @@ public class DefaultRoutineInvocator implements RoutineInvocator {
         final ClashResolution resolution =
                 (mResolution == ClashResolution.DEFAULT) ? ClashResolution.RESTART : mResolution;
         final Routine<INPUT, OUTPUT> routine =
-                JRoutine.on(new ClassToken<LoaderInvocation<INPUT, OUTPUT>>() {}).runBy(
-                        Runners.mainRunner(null)) //TODO: ???
+                JRoutine.on(new ClassToken<LoaderInvocation<INPUT, OUTPUT>>() {})
+                        .runBy(Runners.mainRunner(null))
                         .inputOrder(DataOrder.INSERTION)
                         .withArgs(mContext, mLoaderId, resolution,
                                   Reflection.findConstructor(classToken.getRawClass()))

@@ -73,7 +73,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         getInstrumentation().waitForIdleSync();
 
-        Thread.sleep(2000);
+        Thread.sleep(1000);
 
         final OutputChannel<String> result1 = JRoutine.in(activity)
                                                       .invoke(ClassToken.tokenOf(ToUpperCase.class))

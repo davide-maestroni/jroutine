@@ -78,7 +78,13 @@ class InvocationResult<OUTPUT> {
 
         } else {
 
-            channel.pass(mOutputs);
+            try {
+
+                channel.pass(mOutputs);
+
+            } catch (final RoutineException ignored) {
+
+            }
         }
     }
 }

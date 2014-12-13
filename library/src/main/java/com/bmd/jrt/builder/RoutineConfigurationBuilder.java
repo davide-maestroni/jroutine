@@ -199,7 +199,6 @@ public class RoutineConfigurationBuilder implements RoutineChannelBuilder {
     public RoutineConfigurationBuilder availableTimeout(@Nullable final TimeDuration timeout) {
 
         mAvailTimeout = timeout;
-
         return this;
     }
 
@@ -214,7 +213,6 @@ public class RoutineConfigurationBuilder implements RoutineChannelBuilder {
         }
 
         mLogLevel = level;
-
         return this;
     }
 
@@ -223,7 +221,6 @@ public class RoutineConfigurationBuilder implements RoutineChannelBuilder {
     public RoutineConfigurationBuilder loggedWith(@Nullable final Log log) {
 
         mLog = log;
-
         return this;
     }
 
@@ -238,7 +235,6 @@ public class RoutineConfigurationBuilder implements RoutineChannelBuilder {
         }
 
         mMaxRetained = maxRetainedInstances;
-
         return this;
     }
 
@@ -253,7 +249,6 @@ public class RoutineConfigurationBuilder implements RoutineChannelBuilder {
         }
 
         mMaxRunning = maxRunningInstances;
-
         return this;
     }
 
@@ -262,7 +257,6 @@ public class RoutineConfigurationBuilder implements RoutineChannelBuilder {
     public RoutineConfigurationBuilder runBy(@Nullable final Runner runner) {
 
         mRunner = runner;
-
         return this;
     }
 
@@ -277,7 +271,6 @@ public class RoutineConfigurationBuilder implements RoutineChannelBuilder {
         }
 
         mRunnerType = type;
-
         return this;
     }
 
@@ -292,7 +285,6 @@ public class RoutineConfigurationBuilder implements RoutineChannelBuilder {
         }
 
         mInputOrder = order;
-
         return this;
     }
 
@@ -306,7 +298,6 @@ public class RoutineConfigurationBuilder implements RoutineChannelBuilder {
         }
 
         mInputMaxSize = inputMaxSize;
-
         return this;
     }
 
@@ -315,7 +306,6 @@ public class RoutineConfigurationBuilder implements RoutineChannelBuilder {
     public RoutineConfigurationBuilder inputTimeout(@Nullable final TimeDuration timeout) {
 
         mInputTimeout = timeout;
-
         return this;
     }
 
@@ -338,7 +328,6 @@ public class RoutineConfigurationBuilder implements RoutineChannelBuilder {
         }
 
         mOutputOrder = order;
-
         return this;
     }
 
@@ -352,7 +341,6 @@ public class RoutineConfigurationBuilder implements RoutineChannelBuilder {
         }
 
         mOutputMaxSize = outputMaxSize;
-
         return this;
     }
 
@@ -369,7 +357,6 @@ public class RoutineConfigurationBuilder implements RoutineChannelBuilder {
     public RoutineConfigurationBuilder outputTimeout(@Nullable final TimeDuration timeout) {
 
         mOutputTimeout = timeout;
-
         return this;
     }
 

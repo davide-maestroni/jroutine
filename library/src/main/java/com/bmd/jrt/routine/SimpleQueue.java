@@ -40,7 +40,6 @@ class SimpleQueue<E> {
             final int first) {
 
         final int remainder = src.length - first;
-
         System.arraycopy(src, 0, dst, 0, first);
         System.arraycopy(src, first, dst, dst.length - remainder, remainder);
     }
@@ -55,9 +54,7 @@ class SimpleQueue<E> {
     public void add(@Nullable final E element) {
 
         final int i = mLast;
-
         final int newLast = (i + 1) & (mQueue.length - 1);
-
         mQueue[i] = element;
 
         if (mFirst == newLast) {
@@ -90,7 +87,6 @@ class SimpleQueue<E> {
 
         mFirst = 0;
         mLast = 0;
-
         Arrays.fill(mQueue, null);
     }
 
@@ -152,12 +148,10 @@ class SimpleQueue<E> {
 
         final Object[] queue = mQueue;
         final int i = mFirst;
-
         mFirst = (i + 1) & (queue.length - 1);
 
         final Object output = queue[i];
         queue[i] = null;
-
         return (E) output;
     }
 
@@ -176,11 +170,9 @@ class SimpleQueue<E> {
 
         final Object[] newQueue = new Object[newSize];
         resizeArray(mQueue, newQueue, first);
-
         mQueue = newQueue;
 
         final int shift = newSize - size;
-
         mFirst = first + shift;
         mLast = (last < first) ? last : last + shift;
     }

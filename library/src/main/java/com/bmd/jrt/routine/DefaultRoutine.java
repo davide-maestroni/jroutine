@@ -77,27 +77,22 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
         try {
 
             final Constructor<? extends Invocation<INPUT, OUTPUT>> constructor = mConstructor;
-
             logger.dbg("creating a new instance of class: %s", constructor.getDeclaringClass());
-
             return constructor.newInstance(mArgs);
 
         } catch (final InvocationTargetException e) {
 
             logger.err(e, "error creating the invocation instance");
-
             throw new RoutineException(e.getCause());
 
         } catch (final RoutineException e) {
 
             logger.err(e, "error creating the invocation instance");
-
             throw e;
 
         } catch (final Throwable t) {
 
             logger.err(t, "error creating the invocation instance");
-
             throw new RoutineException(t);
         }
     }

@@ -96,7 +96,6 @@ public class ClassRoutineBuilder implements RoutineBuilder {
         mTargetClass = targetClass;
         mTarget = null;
         mTargetReference = null;
-
         fillMethodMap(true);
     }
 
@@ -112,7 +111,6 @@ public class ClassRoutineBuilder implements RoutineBuilder {
         mTargetClass = target.getClass();
         mTarget = target;
         mTargetReference = null;
-
         fillMethodMap(false);
     }
 
@@ -135,7 +133,6 @@ public class ClassRoutineBuilder implements RoutineBuilder {
         mTargetClass = target.getClass();
         mTarget = null;
         mTargetReference = targetReference;
-
         fillMethodMap(false);
     }
 
@@ -199,7 +196,6 @@ public class ClassRoutineBuilder implements RoutineBuilder {
         }
 
         builder.logLevel(annotation.logLevel());
-
         return builder;
     }
 
@@ -208,7 +204,6 @@ public class ClassRoutineBuilder implements RoutineBuilder {
     public ClassRoutineBuilder apply(@Nonnull final RoutineConfiguration configuration) {
 
         mBuilder.apply(configuration);
-
         return this;
     }
 
@@ -218,7 +213,6 @@ public class ClassRoutineBuilder implements RoutineBuilder {
             @Nonnull final TimeUnit timeUnit) {
 
         mBuilder.availableTimeout(timeout, timeUnit);
-
         return this;
     }
 
@@ -227,7 +221,6 @@ public class ClassRoutineBuilder implements RoutineBuilder {
     public ClassRoutineBuilder availableTimeout(@Nullable final TimeDuration timeout) {
 
         mBuilder.availableTimeout(timeout);
-
         return this;
     }
 
@@ -236,7 +229,6 @@ public class ClassRoutineBuilder implements RoutineBuilder {
     public ClassRoutineBuilder logLevel(@Nonnull final LogLevel level) {
 
         mBuilder.logLevel(level);
-
         return this;
     }
 
@@ -245,7 +237,6 @@ public class ClassRoutineBuilder implements RoutineBuilder {
     public ClassRoutineBuilder loggedWith(@Nullable final Log log) {
 
         mBuilder.loggedWith(log);
-
         return this;
     }
 
@@ -254,7 +245,6 @@ public class ClassRoutineBuilder implements RoutineBuilder {
     public ClassRoutineBuilder maxRetained(final int maxRetainedInstances) {
 
         mBuilder.maxRetained(maxRetainedInstances);
-
         return this;
     }
 
@@ -263,7 +253,6 @@ public class ClassRoutineBuilder implements RoutineBuilder {
     public ClassRoutineBuilder maxRunning(final int maxRunningInstances) {
 
         mBuilder.maxRunning(maxRunningInstances);
-
         return this;
     }
 
@@ -272,7 +261,6 @@ public class ClassRoutineBuilder implements RoutineBuilder {
     public ClassRoutineBuilder runBy(@Nullable final Runner runner) {
 
         mBuilder.runBy(runner);
-
         return this;
     }
 
@@ -281,7 +269,6 @@ public class ClassRoutineBuilder implements RoutineBuilder {
     public ClassRoutineBuilder syncRunner(@Nonnull final RunnerType type) {
 
         mBuilder.syncRunner(type);
-
         return this;
     }
 
@@ -322,7 +309,6 @@ public class ClassRoutineBuilder implements RoutineBuilder {
     public ClassRoutineBuilder lockName(@Nullable final String lockName) {
 
         mLockName = lockName;
-
         return this;
     }
 
@@ -503,7 +489,6 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
             final Runner syncRunner = (configuration.getSyncRunner(null) == RunnerType.SEQUENTIAL)
                     ? Runners.sequentialRunner() : Runners.queuedRunner();
-
             routine = new DefaultRoutine<Object, Object>(configuration, syncRunner,
                                                          MethodSimpleInvocation.class,
                                                          mTargetReference, mTarget, method, mutex);
@@ -805,7 +790,6 @@ public class ClassRoutineBuilder implements RoutineBuilder {
             }
 
             final RoutineInfo that = (RoutineInfo) o;
-
             return mConfiguration.equals(that.mConfiguration) && mLockName.equals(that.mLockName)
                     && mMethod.equals(that.mMethod);
         }
@@ -832,7 +816,6 @@ public class ClassRoutineBuilder implements RoutineBuilder {
         public Void run() {
 
             mMethod.setAccessible(true);
-
             return null;
         }
     }

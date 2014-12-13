@@ -53,7 +53,6 @@ public class Downloader {
     public static String getFileName(final URI uri) {
 
         final String path = uri.getPath();
-
         final String fileName = path.substring(path.lastIndexOf('/') + 1);
 
         if (fileName.equals("")) {
@@ -79,14 +78,12 @@ public class Downloader {
     public boolean abort(final URI uri) {
 
         final OutputChannel<Boolean> channel = mDownloadMap.remove(uri);
-
         return (channel != null) && channel.abort();
     }
 
     public boolean abortAndWait(final URI uri, final TimeDuration timeout) {
 
         final OutputChannel<Boolean> channel = mDownloadMap.remove(uri);
-
         return (channel != null) && channel.abort() && channel.afterMax(timeout).isComplete();
     }
 
@@ -140,7 +137,6 @@ public class Downloader {
                     if (channel.readFirst()) {
 
                         mDownloadedSet.add(uri);
-
                         return true;
                     }
                 }

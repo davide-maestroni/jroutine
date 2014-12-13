@@ -420,7 +420,6 @@ public class TimeDuration extends Time {
         if (isInfinite()) {
 
             target.wait();
-
             return;
         }
 
@@ -451,7 +450,6 @@ public class TimeDuration extends Time {
         if (isInfinite() || (toDays() > MILLI_DAYS_OVERFLOW)) {
 
             target.wait();
-
             return true;
         }
 
@@ -491,7 +489,6 @@ public class TimeDuration extends Time {
         if (isInfinite() || (toDays() > NANO_DAYS_OVERFLOW)) {
 
             target.wait();
-
             return true;
         }
 

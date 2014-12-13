@@ -42,7 +42,6 @@ class SequentialRunner implements Runner {
         try {
 
             fromUnit(delay, timeUnit).sleepAtLeast();
-
             execution.run();
 
         } catch (final InterruptedException e) {

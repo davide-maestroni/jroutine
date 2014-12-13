@@ -72,7 +72,6 @@ public abstract class ClassToken<CLASS> {
         final ClassToken<CLASS> classToken = new ClassToken<CLASS>() {};
         classToken.mGenericType = rawClass;
         classToken.mRawClass = rawClass;
-
         return classToken;
     }
 
@@ -115,7 +114,6 @@ public abstract class ClassToken<CLASS> {
             if (type instanceof ParameterizedType) {
 
                 final ParameterizedType paramType = (ParameterizedType) type;
-
                 mGenericType = paramType.getActualTypeArguments()[0];
 
             } else {
@@ -181,7 +179,6 @@ public abstract class ClassToken<CLASS> {
         }
 
         final ClassToken that = (ClassToken) o;
-
         return getRawClass().equals(that.getRawClass());
     }
 

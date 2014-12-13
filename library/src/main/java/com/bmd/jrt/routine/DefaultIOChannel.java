@@ -105,7 +105,6 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
         public IOChannelInput<INPUT> after(@Nonnull final TimeDuration delay) {
 
             mChannel.after(delay);
-
             return this;
         }
 
@@ -114,7 +113,6 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
         public IOChannelInput<INPUT> after(final long delay, @Nonnull final TimeUnit timeUnit) {
 
             mChannel.after(delay, timeUnit);
-
             return this;
         }
 
@@ -123,7 +121,6 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
         public IOChannelInput<INPUT> now() {
 
             mChannel.now();
-
             return this;
         }
 
@@ -132,7 +129,6 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
         public IOChannelInput<INPUT> pass(@Nullable final OutputChannel<INPUT> channel) {
 
             mChannel.pass(channel);
-
             return this;
         }
 
@@ -141,7 +137,6 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
         public IOChannelInput<INPUT> pass(@Nullable final Iterable<? extends INPUT> inputs) {
 
             mChannel.pass(inputs);
-
             return this;
         }
 
@@ -150,7 +145,6 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
         public IOChannelInput<INPUT> pass(@Nullable final INPUT input) {
 
             mChannel.pass(input);
-
             return this;
         }
 
@@ -159,7 +153,6 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
         public IOChannelInput<INPUT> pass(@Nullable final INPUT... inputs) {
 
             mChannel.pass(inputs);
-
             return this;
         }
 
@@ -206,7 +199,6 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
         public IOChannelOutput<OUTPUT> afterMax(@Nonnull final TimeDuration timeout) {
 
             mChannel.afterMax(timeout);
-
             return this;
         }
 
@@ -216,7 +208,6 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
                 @Nonnull final TimeUnit timeUnit) {
 
             mChannel.afterMax(timeout, timeUnit);
-
             return this;
         }
 
@@ -225,7 +216,6 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
         public IOChannelOutput<OUTPUT> bind(@Nonnull final OutputConsumer<OUTPUT> consumer) {
 
             mChannel.bind(consumer);
-
             return this;
         }
 
@@ -235,7 +225,6 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
         public IOChannelOutput<OUTPUT> eventuallyDeadLock(final boolean throwException) {
 
             mChannel.eventuallyDeadLock(throwException);
-
             return this;
         }
 
@@ -244,7 +233,6 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
         public IOChannelOutput<OUTPUT> immediately() {
 
             mChannel.immediately();
-
             return this;
         }
 
@@ -254,7 +242,6 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
                 @Nonnull final Collection<? super OUTPUT> result) {
 
             mChannel.readAllInto(result);
-
             return this;
         }
 
@@ -288,7 +275,6 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
         public IOChannelOutput<OUTPUT> unbind(@Nullable final OutputConsumer<OUTPUT> consumer) {
 
             mChannel.unbind(consumer);
-
             return this;
         }
 

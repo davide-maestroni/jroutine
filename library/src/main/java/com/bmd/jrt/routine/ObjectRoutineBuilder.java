@@ -173,7 +173,6 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
             if (resultType == ResultType.ARRAY) {
 
                 final List<Object> results = outputChannel.readAll();
-
                 final int size = results.size();
                 final Object array = Array.newInstance(returnType.getComponentType(), size);
 
@@ -196,7 +195,6 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     public ClassRoutineBuilder apply(@Nonnull final RoutineConfiguration configuration) {
 
         super.apply(configuration);
-
         return this;
     }
 
@@ -206,7 +204,6 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
             @Nonnull final TimeUnit timeUnit) {
 
         super.availableTimeout(timeout, timeUnit);
-
         return this;
     }
 
@@ -215,7 +212,6 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     public ObjectRoutineBuilder availableTimeout(@Nullable final TimeDuration timeout) {
 
         super.availableTimeout(timeout);
-
         return this;
     }
 
@@ -224,7 +220,6 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     public ObjectRoutineBuilder logLevel(@Nonnull final LogLevel level) {
 
         super.logLevel(level);
-
         return this;
     }
 
@@ -233,7 +228,6 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     public ObjectRoutineBuilder loggedWith(@Nullable final Log log) {
 
         super.loggedWith(log);
-
         return this;
     }
 
@@ -242,7 +236,6 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     public ObjectRoutineBuilder maxRetained(final int maxRetainedInstances) {
 
         super.maxRetained(maxRetainedInstances);
-
         return this;
     }
 
@@ -251,7 +244,6 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     public ObjectRoutineBuilder maxRunning(final int maxRunningInstances) {
 
         super.maxRunning(maxRunningInstances);
-
         return this;
     }
 
@@ -260,7 +252,6 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     public ObjectRoutineBuilder runBy(@Nullable final Runner runner) {
 
         super.runBy(runner);
-
         return this;
     }
 
@@ -269,7 +260,6 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     public ObjectRoutineBuilder syncRunner(@Nonnull final RunnerType type) {
 
         super.syncRunner(type);
-
         return this;
     }
 
@@ -278,7 +268,6 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     public ObjectRoutineBuilder lockName(@Nullable final String lockName) {
 
         super.lockName(lockName);
-
         return this;
     }
 
@@ -346,7 +335,6 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                 final String className =
                         ((classPackage != null) ? classPackage.getName() + "." : "")
                                 + itf.getSimpleName() + targetClass.getSimpleName();
-
                 final Class<?> wrapperClass = Class.forName(className);
                 final Constructor<?> constructor =
                         wrapperClass.getConstructor(targetClass, CacheHashMap.class, String.class,
@@ -359,7 +347,6 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                 }
 
                 classes.put(classInfo, instance);
-
                 return itf.cast(instance);
 
             } catch (final InstantiationException e) {
@@ -434,7 +421,6 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
         final Object proxy =
                 Proxy.newProxyInstance(itf.getClassLoader(), new Class[]{itf}, handler);
-
         return itf.cast(proxy);
     }
 
@@ -573,7 +559,6 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
             }
 
             final ClassInfo that = (ClassInfo) o;
-
             return mConfiguration.equals(that.mConfiguration) && mItf.equals(that.mItf) && mLockName
                     .equals(that.mLockName);
         }
@@ -677,9 +662,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                             }
 
                             paramType = ParamType.ASYNC;
-
                             targetParameterTypes[i] = ((AsyncType) paramAnnotation).value();
-
                             break;
                         }
 
@@ -697,9 +680,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                             }
 
                             paramType = ParamType.PARALLEL;
-
                             targetParameterTypes[i] = ((ParallelType) paramAnnotation).value();
-
                             break;
                         }
                     }
@@ -792,7 +773,6 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                    .inputTimeout(TimeDuration.ZERO)
                    .outputSize(Integer.MAX_VALUE)
                    .outputTimeout(TimeDuration.ZERO);
-
             return getRoutine(builder.buildConfiguration(), lockName, targetMethod);
         }
     }

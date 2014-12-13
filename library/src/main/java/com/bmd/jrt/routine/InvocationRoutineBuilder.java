@@ -65,7 +65,6 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineChannelBu
             @Nonnull final RoutineConfiguration configuration) {
 
         mBuilder.apply(configuration);
-
         return this;
     }
 
@@ -75,7 +74,6 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineChannelBu
             @Nonnull final TimeUnit timeUnit) {
 
         mBuilder.availableTimeout(timeout, timeUnit);
-
         return this;
     }
 
@@ -85,7 +83,6 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineChannelBu
             @Nullable final TimeDuration timeout) {
 
         mBuilder.availableTimeout(timeout);
-
         return this;
     }
 
@@ -94,7 +91,6 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineChannelBu
     public InvocationRoutineBuilder<INPUT, OUTPUT> logLevel(@Nonnull final LogLevel level) {
 
         mBuilder.logLevel(level);
-
         return this;
     }
 
@@ -103,7 +99,6 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineChannelBu
     public InvocationRoutineBuilder<INPUT, OUTPUT> loggedWith(@Nullable final Log log) {
 
         mBuilder.loggedWith(log);
-
         return this;
     }
 
@@ -112,7 +107,6 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineChannelBu
     public InvocationRoutineBuilder<INPUT, OUTPUT> maxRetained(final int maxRetainedInstances) {
 
         mBuilder.maxRetained(maxRetainedInstances);
-
         return this;
     }
 
@@ -121,7 +115,6 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineChannelBu
     public InvocationRoutineBuilder<INPUT, OUTPUT> maxRunning(final int maxRunningInstances) {
 
         mBuilder.maxRunning(maxRunningInstances);
-
         return this;
     }
 
@@ -130,7 +123,6 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineChannelBu
     public InvocationRoutineBuilder<INPUT, OUTPUT> runBy(@Nullable final Runner runner) {
 
         mBuilder.runBy(runner);
-
         return this;
     }
 
@@ -139,7 +131,6 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineChannelBu
     public InvocationRoutineBuilder<INPUT, OUTPUT> syncRunner(@Nonnull final RunnerType type) {
 
         mBuilder.syncRunner(type);
-
         return this;
     }
 
@@ -148,7 +139,6 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineChannelBu
     public InvocationRoutineBuilder<INPUT, OUTPUT> inputOrder(@Nonnull final DataOrder order) {
 
         mBuilder.inputOrder(order);
-
         return this;
     }
 
@@ -157,7 +147,6 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineChannelBu
     public InvocationRoutineBuilder<INPUT, OUTPUT> inputSize(final int inputMaxSize) {
 
         mBuilder.inputSize(inputMaxSize);
-
         return this;
     }
 
@@ -167,7 +156,6 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineChannelBu
             @Nullable final TimeDuration timeout) {
 
         mBuilder.inputTimeout(timeout);
-
         return this;
     }
 
@@ -177,7 +165,6 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineChannelBu
             @Nonnull final TimeUnit timeUnit) {
 
         mBuilder.inputTimeout(timeout, timeUnit);
-
         return this;
     }
 
@@ -186,7 +173,6 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineChannelBu
     public InvocationRoutineBuilder<INPUT, OUTPUT> outputOrder(@Nonnull final DataOrder order) {
 
         mBuilder.outputOrder(order);
-
         return this;
     }
 
@@ -195,7 +181,6 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineChannelBu
     public InvocationRoutineBuilder<INPUT, OUTPUT> outputSize(final int outputMaxSize) {
 
         mBuilder.outputSize(outputMaxSize);
-
         return this;
     }
 
@@ -205,7 +190,6 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineChannelBu
             @Nonnull final TimeUnit timeUnit) {
 
         mBuilder.outputTimeout(timeout, timeUnit);
-
         return this;
     }
 
@@ -215,7 +199,6 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineChannelBu
             @Nullable final TimeDuration timeout) {
 
         mBuilder.outputTimeout(timeout);
-
         return this;
     }
 
@@ -230,7 +213,6 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineChannelBu
         final RoutineConfiguration configuration = mBuilder.buildConfiguration();
         final Runner syncRunner = (configuration.getSyncRunner(null) == RunnerType.SEQUENTIAL)
                 ? Runners.sequentialRunner() : Runners.queuedRunner();
-
         return new DefaultRoutine<INPUT, OUTPUT>(configuration, syncRunner, mInvocationClass,
                                                  mArgs);
     }
@@ -252,7 +234,6 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineChannelBu
         }
 
         mArgs = args;
-
         return this;
     }
 }

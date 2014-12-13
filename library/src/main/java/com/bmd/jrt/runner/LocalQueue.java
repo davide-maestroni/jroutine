@@ -83,7 +83,6 @@ class LocalQueue {
             final int first) {
 
         final int remainder = src.length - first;
-
         System.arraycopy(src, 0, dst, 0, first);
         System.arraycopy(src, first, dst, dst.length - remainder, remainder);
     }
@@ -92,7 +91,6 @@ class LocalQueue {
             final int first) {
 
         final int remainder = src.length - first;
-
         System.arraycopy(src, 0, dst, 0, first);
         System.arraycopy(src, first, dst, dst.length - remainder, remainder);
     }
@@ -100,7 +98,6 @@ class LocalQueue {
     private void add(@Nonnull final Execution execution, @Nonnull final TimeDuration delay) {
 
         final int i = mLast;
-
         mExecutionTimeNs[i] = System.nanoTime();
         mExecutions[i] = execution;
         mDelays[i] = delay;
@@ -173,7 +170,6 @@ class LocalQueue {
         mDelays = newDelays;
 
         final int shift = newSize - size;
-
         mFirst = first + shift;
         mLast = (last < first) ? last : last + shift;
     }
@@ -204,7 +200,6 @@ class LocalQueue {
                     final int length = executions.length;
                     long minDelay = delayNs;
                     int s = i;
-
                     int j = i + 1;
 
                     if (j >= length) {
@@ -220,7 +215,6 @@ class LocalQueue {
                         if (nextDelayNs <= 0) {
 
                             s = j;
-
                             break;
                         }
 
@@ -277,7 +271,6 @@ class LocalQueue {
 
                 // Note that the field values may have changed here
                 final int n = mFirst;
-
                 mExecutions[n] = null;
                 mDelays[n] = null;
 

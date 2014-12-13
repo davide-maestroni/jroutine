@@ -151,7 +151,6 @@ public class Logger {
 
         final StringWriter writer = new StringWriter();
         throwable.printStackTrace(new PrintWriter(writer));
-
         return writer.toString();
     }
 
@@ -617,7 +616,6 @@ public class Logger {
 
         System.arraycopy(thisContexts, 0, newContexts, 0, thisLength);
         System.arraycopy(contexts, 0, newContexts, thisLength, length);
-
         return new Logger(newContexts, mLog, mLogLevel);
     }
 

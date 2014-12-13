@@ -63,7 +63,6 @@ public class CacheHashMap<K, V> implements Map<K, V> {
     public CacheHashMap(@Nonnull final Map<? extends K, ? extends V> map) {
 
         mMap = new HashMap<IdentityWeakReference, V>(map.size());
-
         putAll(map);
     }
 
@@ -100,7 +99,6 @@ public class CacheHashMap<K, V> implements Map<K, V> {
     public int size() {
 
         cleanUp();
-
         return mMap.size();
     }
 
@@ -108,7 +106,6 @@ public class CacheHashMap<K, V> implements Map<K, V> {
     public boolean isEmpty() {
 
         cleanUp();
-
         return mMap.isEmpty();
     }
 
@@ -116,7 +113,6 @@ public class CacheHashMap<K, V> implements Map<K, V> {
     public boolean containsKey(final Object o) {
 
         cleanUp();
-
         return mMap.containsKey(new IdentityWeakReference(o));
     }
 
@@ -124,7 +120,6 @@ public class CacheHashMap<K, V> implements Map<K, V> {
     public boolean containsValue(final Object o) {
 
         cleanUp();
-
         return mMap.containsValue(o);
     }
 
@@ -132,7 +127,6 @@ public class CacheHashMap<K, V> implements Map<K, V> {
     public V get(final Object o) {
 
         cleanUp();
-
         return mMap.get(new IdentityWeakReference(o));
     }
 
@@ -140,7 +134,6 @@ public class CacheHashMap<K, V> implements Map<K, V> {
     public V put(final K k, final V v) {
 
         cleanUp();
-
         return mMap.put(new IdentityWeakReference(k, mQueue), v);
     }
 
@@ -148,7 +141,6 @@ public class CacheHashMap<K, V> implements Map<K, V> {
     public V remove(final Object o) {
 
         cleanUp();
-
         return mMap.remove(new IdentityWeakReference(o));
     }
 
@@ -242,7 +234,6 @@ public class CacheHashMap<K, V> implements Map<K, V> {
         while (reference != null) {
 
             map.remove(reference);
-
             reference = (IdentityWeakReference) queue.poll();
         }
     }
@@ -309,7 +300,6 @@ public class CacheHashMap<K, V> implements Map<K, V> {
             }
 
             final Object referent = get();
-
             return (referent == that.get()) && ((referent != null) || (this == that));
         }
     }
@@ -418,7 +408,6 @@ public class CacheHashMap<K, V> implements Map<K, V> {
         }
 
         final CacheHashMap that = (CacheHashMap) o;
-
         return mMap.equals(that.mMap);
     }
 }

@@ -42,7 +42,6 @@ public class RoutineInterruptedException extends RoutineException {
             RoutineInterruptedException {
 
         Thread.currentThread().interrupt();
-
         throw new RoutineInterruptedException(exception);
     }
 }

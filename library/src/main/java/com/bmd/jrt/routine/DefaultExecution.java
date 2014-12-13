@@ -102,7 +102,6 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
             try {
 
                 inputIterator.onConsumeStart();
-
                 mLogger.dbg("running execution");
 
                 final boolean isComplete;
@@ -128,7 +127,6 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
                     invocation.onReturn();
 
                     mInvocationManager.recycle(invocation);
-
                     resultChannel.close();
                 }
 
@@ -151,9 +149,7 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
         } else {
 
             invocation = (mInvocation = mInvocationManager.create());
-
             mLogger.dbg("initializing invocation: %s", invocation);
-
             invocation.onInit();
         }
 
@@ -234,23 +230,19 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
                 if (!inputIterator.isAborting()) {
 
                     mLogger.wrn("avoiding aborting since input is already aborted");
-
                     return;
                 }
 
                 final Throwable exception = inputIterator.getAbortException();
-
                 mLogger.dbg(exception, "aborting invocation");
 
                 try {
 
                     invocation = initInvocation();
-
                     invocation.onAbort(exception);
                     invocation.onReturn();
 
                     manager.recycle(invocation);
-
                     resultChannel.close(exception);
 
                 } catch (final Throwable t) {

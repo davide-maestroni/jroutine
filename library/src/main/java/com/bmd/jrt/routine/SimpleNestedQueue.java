@@ -56,9 +56,7 @@ class SimpleNestedQueue<E> implements NestedQueue<E> {
     public NestedQueue<E> add(@Nullable final E element) {
 
         checkOpen();
-
         mQueue.add(element);
-
         return this;
     }
 
@@ -67,9 +65,7 @@ class SimpleNestedQueue<E> implements NestedQueue<E> {
     public NestedQueue<E> addAll(@Nonnull final Iterable<? extends E> elements) {
 
         checkOpen();
-
         mQueue.addAll(elements);
-
         return this;
     }
 
@@ -78,7 +74,6 @@ class SimpleNestedQueue<E> implements NestedQueue<E> {
     public NestedQueue<E> addNested() {
 
         checkOpen();
-
         return new SimpleNestedQueue<E>(mQueue);
     }
 
@@ -87,7 +82,6 @@ class SimpleNestedQueue<E> implements NestedQueue<E> {
     public NestedQueue<E> clear() {
 
         mQueue.clear();
-
         return this;
     }
 
@@ -96,7 +90,6 @@ class SimpleNestedQueue<E> implements NestedQueue<E> {
     public NestedQueue<E> close() {
 
         mClosed = true;
-
         return this;
     }
 
@@ -111,7 +104,6 @@ class SimpleNestedQueue<E> implements NestedQueue<E> {
     public NestedQueue<E> moveTo(@Nonnull final Collection<? super E> collection) {
 
         mQueue.moveTo(collection);
-
         return this;
     }
 

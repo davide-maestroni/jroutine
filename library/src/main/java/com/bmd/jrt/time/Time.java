@@ -252,7 +252,6 @@ public class Time {
 
         int result = (int) (time ^ (time >>> 32));
         result = 31 * result + unit.hashCode();
-
         return result;
     }
 

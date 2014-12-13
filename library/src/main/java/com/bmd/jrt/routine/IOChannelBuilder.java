@@ -53,7 +53,6 @@ public class IOChannelBuilder {
     public IOChannelBuilder apply(@Nonnull final RoutineConfiguration configuration) {
 
         mBuilder.apply(configuration);
-
         return this;
     }
 
@@ -70,7 +69,6 @@ public class IOChannelBuilder {
     public IOChannelBuilder bufferTimeout(final long timeout, @Nonnull final TimeUnit timeUnit) {
 
         mBuilder.outputTimeout(timeout, timeUnit);
-
         return this;
     }
 
@@ -85,7 +83,6 @@ public class IOChannelBuilder {
     public IOChannelBuilder bufferTimeout(@Nonnull final TimeDuration timeout) {
 
         mBuilder.outputTimeout(timeout);
-
         return this;
     }
 
@@ -111,7 +108,6 @@ public class IOChannelBuilder {
     public IOChannelBuilder dataOrder(@Nonnull final DataOrder order) {
 
         mBuilder.outputOrder(order);
-
         return this;
     }
 
@@ -126,7 +122,6 @@ public class IOChannelBuilder {
     public IOChannelBuilder delayRunner(@Nonnull final Runner runner) {
 
         mBuilder.runBy(runner);
-
         return this;
     }
 
@@ -141,7 +136,6 @@ public class IOChannelBuilder {
     public IOChannelBuilder logLevel(@Nonnull final LogLevel level) {
 
         mBuilder.logLevel(level);
-
         return this;
     }
 
@@ -156,7 +150,6 @@ public class IOChannelBuilder {
     public IOChannelBuilder loggedWith(@Nonnull final Log log) {
 
         mBuilder.loggedWith(log);
-
         return this;
     }
 
@@ -171,7 +164,6 @@ public class IOChannelBuilder {
     public IOChannelBuilder maxSize(final int maxBufferSize) {
 
         mBuilder.outputSize(maxBufferSize);
-
         return this;
     }
 }

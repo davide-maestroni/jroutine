@@ -66,7 +66,6 @@ class DefaultConfigurationBuilder extends RoutineConfigurationBuilder {
         builder.outputTimeout(configuration.getOutputTimeout(ZERO));
         builder.runBy(configuration.getRunner(Runners.sharedRunner()));
         builder.syncRunner(configuration.getSyncRunner(RunnerType.QUEUED));
-
         return builder.buildConfiguration();
     }
 }

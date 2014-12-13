@@ -82,7 +82,6 @@ class DefaultRoutineInvocator implements RoutineInvocator {
                         .withArgs(mContext, mLoaderId, resolution, cacheType,
                                   Reflection.findConstructor(classToken.getRawClass()))
                         .buildRoutine();
-
         return routine.invokeAsync();
     }
 
@@ -97,7 +96,6 @@ class DefaultRoutineInvocator implements RoutineInvocator {
         }
 
         mResolution = resolution;
-
         return this;
     }
 
@@ -112,7 +110,6 @@ class DefaultRoutineInvocator implements RoutineInvocator {
         }
 
         mCacheType = cacheType;
-
         return this;
     }
 
@@ -121,7 +118,6 @@ class DefaultRoutineInvocator implements RoutineInvocator {
     public RoutineInvocator withId(final int id) {
 
         mLoaderId = id;
-
         return this;
     }
 }

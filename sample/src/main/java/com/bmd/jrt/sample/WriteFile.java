@@ -47,7 +47,6 @@ public class WriteFile extends TemplateInvocation<Chunk, Boolean> {
     public void onAbort(@Nullable final Throwable reason) {
 
         closeStream();
-
         mFile.delete();
     }
 
@@ -81,7 +80,6 @@ public class WriteFile extends TemplateInvocation<Chunk, Boolean> {
     public void onResult(@Nonnull final ResultChannel<Boolean> result) {
 
         closeStream();
-
         result.pass(true);
     }
 

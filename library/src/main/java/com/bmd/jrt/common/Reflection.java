@@ -39,7 +39,6 @@ public class Reflection {
     static {
 
         final HashMap<Class<?>, Class<?>> boxMap = sBoxMap;
-
         boxMap.put(boolean.class, Boolean.class);
         boxMap.put(byte.class, Byte.class);
         boxMap.put(char.class, Character.class);
@@ -155,7 +154,6 @@ public class Reflection {
                     if (!boxingClass.isInstance(contextArg)) {
 
                         isValid = false;
-
                         break;
                     }
 
@@ -167,7 +165,6 @@ public class Reflection {
                 } else if (param.isPrimitive()) {
 
                     isValid = false;
-
                     break;
                 }
             }
@@ -215,7 +212,6 @@ public class Reflection {
         public Void run() {
 
             mmConstructor.setAccessible(true);
-
             return null;
         }
     }

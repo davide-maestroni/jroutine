@@ -115,7 +115,6 @@ public class RoutineConfiguration {
     public TimeDuration getAvailTimeout(final TimeDuration valueIfNotSet) {
 
         final TimeDuration availTimeout = mAvailTimeout;
-
         return (availTimeout != null) ? availTimeout : valueIfNotSet;
     }
 
@@ -128,7 +127,6 @@ public class RoutineConfiguration {
     public DataOrder getInputOrder(final DataOrder valueIfNotSet) {
 
         final DataOrder orderedInput = mInputOrder;
-
         return (orderedInput != DataOrder.DEFAULT) ? orderedInput : valueIfNotSet;
     }
 
@@ -141,7 +139,6 @@ public class RoutineConfiguration {
     public int getInputSize(final int valueIfNotSet) {
 
         final int inputMaxSize = mInputMaxSize;
-
         return (inputMaxSize != DEFAULT) ? inputMaxSize : valueIfNotSet;
     }
 
@@ -155,7 +152,6 @@ public class RoutineConfiguration {
     public TimeDuration getInputTimeout(final TimeDuration valueIfNotSet) {
 
         final TimeDuration inputTimeout = mInputTimeout;
-
         return (inputTimeout != null) ? inputTimeout : valueIfNotSet;
     }
 
@@ -168,7 +164,6 @@ public class RoutineConfiguration {
     public Log getLog(final Log valueIfNotSet) {
 
         final Log log = mLog;
-
         return (log != null) ? log : valueIfNotSet;
     }
 
@@ -181,7 +176,6 @@ public class RoutineConfiguration {
     public LogLevel getLogLevel(final LogLevel valueIfNotSet) {
 
         final LogLevel logLevel = mLogLevel;
-
         return (logLevel != LogLevel.DEFAULT) ? logLevel : valueIfNotSet;
     }
 
@@ -194,7 +188,6 @@ public class RoutineConfiguration {
     public int getMaxRetained(final int valueIfNotSet) {
 
         final int maxRetained = mMaxRetained;
-
         return (maxRetained != DEFAULT) ? maxRetained : valueIfNotSet;
     }
 
@@ -207,7 +200,6 @@ public class RoutineConfiguration {
     public int getMaxRunning(final int valueIfNotSet) {
 
         final int maxRunning = mMaxRunning;
-
         return (maxRunning != DEFAULT) ? maxRunning : valueIfNotSet;
     }
 
@@ -220,7 +212,6 @@ public class RoutineConfiguration {
     public DataOrder getOutputOrder(final DataOrder valueIfNotSet) {
 
         final DataOrder orderedOutput = mOutputOrder;
-
         return (orderedOutput != DataOrder.DEFAULT) ? orderedOutput : valueIfNotSet;
     }
 
@@ -233,7 +224,6 @@ public class RoutineConfiguration {
     public int getOutputSize(final int valueIfNotSet) {
 
         final int outputMaxSize = mOutputMaxSize;
-
         return (outputMaxSize != DEFAULT) ? outputMaxSize : valueIfNotSet;
     }
 
@@ -247,7 +237,6 @@ public class RoutineConfiguration {
     public TimeDuration getOutputTimeout(final TimeDuration valueIfNotSet) {
 
         final TimeDuration outputTimeout = mOutputTimeout;
-
         return (outputTimeout != null) ? outputTimeout : valueIfNotSet;
     }
 
@@ -260,7 +249,6 @@ public class RoutineConfiguration {
     public Runner getRunner(final Runner valueIfNotSet) {
 
         final Runner runner = mRunner;
-
         return (runner != null) ? runner : valueIfNotSet;
     }
 
@@ -273,7 +261,6 @@ public class RoutineConfiguration {
     public RunnerType getSyncRunner(final RunnerType valueIfNotSet) {
 
         final RunnerType runnerType = mRunnerType;
-
         return (runnerType != RunnerType.DEFAULT) ? runnerType : valueIfNotSet;
     }
 
@@ -312,7 +299,6 @@ public class RoutineConfiguration {
         }
 
         final RoutineConfiguration that = (RoutineConfiguration) o;
-
         return mInputMaxSize == that.mInputMaxSize && mMaxRetained == that.mMaxRetained
                 && mMaxRunning == that.mMaxRunning && mOutputMaxSize == that.mOutputMaxSize && !(
                 mAvailTimeout != null ? !mAvailTimeout.equals(that.mAvailTimeout)

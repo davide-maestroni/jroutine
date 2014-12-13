@@ -210,9 +210,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
     private ParameterChannel<INPUT, OUTPUT> invoke(final boolean async) {
 
         final Logger logger = mLogger;
-
         logger.dbg("invoking routine: %ssync", (async) ? "a" : "");
-
         return new DefaultParameterChannel<INPUT, OUTPUT>(mConfiguration,
                                                           new DefaultInvocationManager(async),
                                                           (async) ? mAsyncRunner : mSyncRunner,
@@ -247,7 +245,6 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
                 try {
 
                     final int maxRunning = mMaxRunning;
-
                     isTimeout = !mAvailTimeout.waitTrue(mMutex, new Check() {
 
                         @Override
@@ -260,7 +257,6 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
                 } catch (final InterruptedException e) {
 
                     mLogger.err(e, "waiting for available instance interrupted [#%d]", mMaxRunning);
-
                     RoutineInterruptedException.interrupt(e);
                 }
 
@@ -268,7 +264,6 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
                     mLogger.wrn("routine instance not available after timeout [#%d]: %s",
                                 mMaxRunning, mAvailTimeout);
-
                     throw new RoutineDeadLockException();
                 }
 
@@ -279,15 +274,12 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
                 if (!invocations.isEmpty()) {
 
                     final Invocation<INPUT, OUTPUT> invocation = invocations.removeFirst();
-
                     mLogger.dbg("reusing invocation instance [%d/%d]: %s", invocations.size() + 1,
                                 mMaxRetained, invocation);
-
                     return invocation;
                 }
 
                 mLogger.dbg("creating invocation instance [1/%d]", mMaxRetained);
-
                 return createInvocation(mAsync);
             }
         }
@@ -300,7 +292,6 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
             synchronized (mMutex) {
 
                 mLogger.wrn("discarding invocation instance after error: %s", invocation);
-
                 --mRunningCount;
                 mMutex.notify();
             }
@@ -319,7 +310,6 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
                     mLogger.dbg("recycling invocation instance [%d/%d]: %s", invocations.size() + 1,
                                 mMaxRetained, invocation);
-
                     invocations.add(invocation);
 
                 } else {

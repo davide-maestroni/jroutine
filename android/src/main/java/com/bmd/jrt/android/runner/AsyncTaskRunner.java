@@ -100,7 +100,6 @@ class AsyncTaskRunner extends LooperRunner {
         protected Void doInBackground(final Void... voids) {
 
             mExecution.run();
-
             return null;
         }
     }

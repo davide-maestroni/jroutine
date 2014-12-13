@@ -36,7 +36,6 @@ public class Chunk {
     public boolean readFrom(final InputStream stream) throws IOException {
 
         mLength = stream.read(mData);
-
         return (mLength >= 0);
     }
 

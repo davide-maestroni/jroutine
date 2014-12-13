@@ -98,9 +98,7 @@ class OrderedNestedQueue<E> implements NestedQueue<E> {
     public NestedQueue<E> add(@Nullable final E element) {
 
         checkOpen();
-
         mQueue.add(element);
-
         return this;
     }
 
@@ -109,9 +107,7 @@ class OrderedNestedQueue<E> implements NestedQueue<E> {
     public NestedQueue<E> addAll(@Nonnull final Iterable<? extends E> elements) {
 
         checkOpen();
-
         mQueue.addAll(elements);
-
         return this;
     }
 
@@ -120,10 +116,8 @@ class OrderedNestedQueue<E> implements NestedQueue<E> {
     public NestedQueue<E> addNested() {
 
         checkOpen();
-
         final OrderedNestedQueue<E> queue = new OrderedNestedQueue<E>();
         mQueue.add(queue);
-
         return queue;
     }
 
@@ -132,7 +126,6 @@ class OrderedNestedQueue<E> implements NestedQueue<E> {
     public NestedQueue<E> clear() {
 
         mQueue.clear();
-
         return this;
     }
 
@@ -141,7 +134,6 @@ class OrderedNestedQueue<E> implements NestedQueue<E> {
     public NestedQueue<E> close() {
 
         mClosed = true;
-
         return this;
     }
 
@@ -158,7 +150,6 @@ class OrderedNestedQueue<E> implements NestedQueue<E> {
         }
 
         final Object element = queue.peekFirst();
-
         return (element instanceof OrderedNestedQueue)
                 && ((OrderedNestedQueue<?>) element).isEmpty();
     }
@@ -179,7 +170,6 @@ class OrderedNestedQueue<E> implements NestedQueue<E> {
             if (element instanceof OrderedNestedQueue) {
 
                 final OrderedNestedQueue<E> nested = (OrderedNestedQueue<E>) element;
-
                 nested.moveTo(collection);
 
                 if (!nested.mClosed || !nested.mQueue.isEmpty()) {

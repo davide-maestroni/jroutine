@@ -153,7 +153,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
 
         if (loaderId == RoutineInvocator.GENERATED_ID) {
 
-            loaderId = constructor.getDeclaringClass().hashCode() + inputs.hashCode();
+            loaderId = 31 * constructor.getDeclaringClass().hashCode() + inputs.hashCode();
         }
 
         final Loader<InvocationResult<OUTPUT>> loader = loaderManager.getLoader(loaderId);
@@ -295,7 +295,6 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
                 channels.add(channel);
                 internalLoader.setInvocationCount(
                         Math.max(channels.size(), internalLoader.getInvocationCount()));
-
                 return channel.output();
             }
 
@@ -304,9 +303,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
             input.close();
 
             ++mResultCount;
-
             checkComplete();
-
             return channel.output();
         }
 
@@ -333,7 +330,6 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
 
             mResultCount += channels.size();
             channels.clear();
-
             checkComplete();
         }
 

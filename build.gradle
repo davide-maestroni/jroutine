@@ -13,12 +13,6 @@ allprojects {
     repositories {
         mavenCentral()
     }
-
-    tasks.withType(JavaCompile) {
-        //TODO: classpath
-        sourceCompatibility = 1.5
-        targetCompatibility = 1.5
-    }
 }
 
 task wrapper(type: Wrapper) {

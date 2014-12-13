@@ -258,7 +258,6 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
         public ResultChannel<OUTPUT> after(@Nonnull final TimeDuration delay) {
 
             mChannelInput.after(delay);
-
             return this;
         }
 
@@ -267,7 +266,6 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
         public ResultChannel<OUTPUT> after(final long delay, @Nonnull final TimeUnit timeUnit) {
 
             mChannelInput.after(delay, timeUnit);
-
             return this;
         }
 
@@ -276,7 +274,6 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
         public ResultChannel<OUTPUT> now() {
 
             mChannelInput.now();
-
             return this;
         }
 
@@ -285,7 +282,6 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
         public ResultChannel<OUTPUT> pass(@Nullable final OutputChannel<OUTPUT> channel) {
 
             mChannelInput.pass(channel);
-
             return this;
         }
 
@@ -294,7 +290,6 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
         public ResultChannel<OUTPUT> pass(@Nullable final Iterable<? extends OUTPUT> outputs) {
 
             mChannelInput.pass(outputs);
-
             return this;
         }
 
@@ -303,7 +298,6 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
         public ResultChannel<OUTPUT> pass(@Nullable final OUTPUT output) {
 
             mChannelInput.pass(output);
-
             return this;
         }
 
@@ -312,7 +306,6 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
         public ResultChannel<OUTPUT> pass(@Nullable final OUTPUT... outputs) {
 
             mChannelInput.pass(outputs);
-
             return this;
         }
 

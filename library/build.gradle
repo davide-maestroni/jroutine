@@ -30,6 +30,21 @@ dependencies {
     testCompile 'org.assertj:assertj-core:1.7.0'
 }
 
+tasks.withType(JavaCompile) {
+    sourceCompatibility = 1.5
+    targetCompatibility = 1.5
+}
+
+def java5 = System.getenv("JAVA5_HOME")
+if ((java5 != null) && (java5.length() > 0)) {
+    def bootClasspathStr = "${java5}/jre/lib/rt.jar"
+    tasks.withType(AbstractCompile, { AbstractCompile ac ->
+        if (ac.hasProperty("options")) {
+            ac.options.bootClasspath = bootClasspathStr
+        }
+    })
+}
+
 task('jacocoTest', dependsOn: 'test') {
     description = "Runs the tests and generates the JaCoCo report files."
 } << {

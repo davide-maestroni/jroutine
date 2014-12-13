@@ -13,12 +13,11 @@
  */
 package com.bmd.jrt.android.v4.routine;
 
+import android.annotation.TargetApi;
 import android.content.pm.ActivityInfo;
-import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
-import com.bmd.jrt.android.BuildConfig;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.ClassToken;
@@ -33,14 +32,15 @@ import static org.assertj.core.api.Assertions.assertThat;
  * <p/>
  * Created by davide on 12/10/14.
  */
+@TargetApi(VERSION_CODES.FROYO)
 public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestActivity> {
 
     public JRoutineActivityTest() {
 
-        super(BuildConfig.APPLICATION_ID, TestActivity.class);
+        super(TestActivity.class);
     }
 
-    public void testLoader() {
+    public void testInputs() {
 
         final TestActivity activity = getActivity();
 
@@ -57,12 +57,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         assertThat(result2.readFirst()).isEqualTo("TEST2");
     }
 
-    public void testRotation() throws InterruptedException {
-
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            return;
-        }
+    public void testRotationInputs() throws InterruptedException {
 
         final TestActivity activity = getActivity();
 
@@ -91,6 +86,61 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         assertThat(result1.readFirst()).isEqualTo("TEST1");
         assertThat(result2.readFirst()).isEqualTo("TEST2");
+    }
+
+    public void testRotationSame() throws InterruptedException {
+
+        final TestActivity activity = getActivity();
+
+        final Data data1 = new Data();
+        JRoutine.in(activity).invoke(ClassToken.tokenOf(Mirror.class)).pass(data1).result();
+        JRoutine.in(activity).invoke(ClassToken.tokenOf(Mirror.class)).pass(data1).result();
+
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        getInstrumentation().waitForIdleSync();
+
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        getInstrumentation().waitForIdleSync();
+
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        getInstrumentation().waitForIdleSync();
+
+        Thread.sleep(1000);
+
+        final OutputChannel<Data> result1 =
+                JRoutine.in(activity).invoke(ClassToken.tokenOf(Mirror.class)).pass(data1).result();
+        final OutputChannel<Data> result2 =
+                JRoutine.in(activity).invoke(ClassToken.tokenOf(Mirror.class)).pass(data1).result();
+
+        assertThat(result1.readFirst()).isSameAs(data1);
+        assertThat(result2.readFirst()).isSameAs(data1);
+    }
+
+    public void testSame() {
+
+        final TestActivity activity = getActivity();
+
+        final Data data1 = new Data();
+        final OutputChannel<Data> result1 =
+                JRoutine.in(activity).invoke(ClassToken.tokenOf(Mirror.class)).pass(data1).result();
+        final OutputChannel<Data> result2 =
+                JRoutine.in(activity).invoke(ClassToken.tokenOf(Mirror.class)).pass(data1).result();
+
+        assertThat(result1.readFirst()).isSameAs(data1);
+        assertThat(result2.readFirst()).isSameAs(data1);
+    }
+
+    private static class Data {
+
+    }
+
+    private static class Mirror extends TemplateInvocation<Data, Data> {
+
+        @Override
+        public void onInput(final Data d, @Nonnull final ResultChannel<Data> result) {
+
+            result.pass(d);
+        }
     }
 
     private static class ToUpperCase extends TemplateInvocation<String, String> {

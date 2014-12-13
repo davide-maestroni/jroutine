@@ -41,7 +41,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         super(TestActivity.class);
     }
 
-    public void testLoader() {
+    public void testInputs() {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
 
@@ -63,7 +63,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         assertThat(result2.readFirst()).isEqualTo("TEST2");
     }
 
-    public void testRotation() throws InterruptedException {
+    public void testRotationInputs() throws InterruptedException {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
 
@@ -97,6 +97,71 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         assertThat(result1.readFirst()).isEqualTo("TEST1");
         assertThat(result2.readFirst()).isEqualTo("TEST2");
+    }
+
+    public void testRotationSame() throws InterruptedException {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final TestActivity activity = getActivity();
+
+        final Data data1 = new Data();
+        JRoutine.in(activity).invoke(ClassToken.tokenOf(Mirror.class)).pass(data1).result();
+        JRoutine.in(activity).invoke(ClassToken.tokenOf(Mirror.class)).pass(data1).result();
+
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        getInstrumentation().waitForIdleSync();
+
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        getInstrumentation().waitForIdleSync();
+
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        getInstrumentation().waitForIdleSync();
+
+        Thread.sleep(1000);
+
+        final OutputChannel<Data> result1 =
+                JRoutine.in(activity).invoke(ClassToken.tokenOf(Mirror.class)).pass(data1).result();
+        final OutputChannel<Data> result2 =
+                JRoutine.in(activity).invoke(ClassToken.tokenOf(Mirror.class)).pass(data1).result();
+
+        assertThat(result1.readFirst()).isSameAs(data1);
+        assertThat(result2.readFirst()).isSameAs(data1);
+    }
+
+    public void testSame() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final TestActivity activity = getActivity();
+
+        final Data data1 = new Data();
+        final OutputChannel<Data> result1 =
+                JRoutine.in(activity).invoke(ClassToken.tokenOf(Mirror.class)).pass(data1).result();
+        final OutputChannel<Data> result2 =
+                JRoutine.in(activity).invoke(ClassToken.tokenOf(Mirror.class)).pass(data1).result();
+
+        assertThat(result1.readFirst()).isSameAs(data1);
+        assertThat(result2.readFirst()).isSameAs(data1);
+    }
+
+    private static class Data {
+
+    }
+
+    private static class Mirror extends TemplateInvocation<Data, Data> {
+
+        @Override
+        public void onInput(final Data d, @Nonnull final ResultChannel<Data> result) {
+
+            result.pass(d);
+        }
     }
 
     private static class ToUpperCase extends TemplateInvocation<String, String> {

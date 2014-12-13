@@ -11,13 +11,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.android.v11.routine;
+package com.bmd.jrt.android.v4.routine;
 
-import android.app.Activity;
+import android.support.v4.app.FragmentActivity;
 
 /**
  * Test activity.
  */
-public class TestActivity extends Activity {
+public class TestActivity extends FragmentActivity {
 
 }

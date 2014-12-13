@@ -635,8 +635,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
     private boolean isOutputPending(@Nonnull final ChannelState state) {
 
-        return (state != ChannelState.FLUSH) && (state != ChannelState.ABORTED) && (state
-                != ChannelState.DONE);
+        return (state != ChannelState.FLUSH) && (state != ChannelState.ABORTED);
     }
 
     private boolean isResultComplete() {
@@ -957,6 +956,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         @SuppressWarnings("ConstantConditions")
         public OutputChannel<OUTPUT> bind(@Nonnull final OutputConsumer<OUTPUT> consumer) {
 
+            final boolean isClose;
+
             synchronized (mMutex) {
 
                 verifyBound();
@@ -967,10 +968,17 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                     throw new NullPointerException("the output consumer must not be null");
                 }
 
+                isClose = (mState == ChannelState.DONE);
                 mOutputConsumer = consumer;
             }
 
             flushOutput();
+
+            if (isClose) {
+
+                closeConsumer();
+            }
+
             return this;
         }
 

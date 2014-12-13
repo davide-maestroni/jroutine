@@ -6,10 +6,10 @@
         <activity
             android:name=".v11.routine.TestActivity"
             android:label="test">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
+        </activity>
+        <activity
+            android:name=".v4.routine.TestActivity"
+            android:label="test">
         </activity>
     </application>
 

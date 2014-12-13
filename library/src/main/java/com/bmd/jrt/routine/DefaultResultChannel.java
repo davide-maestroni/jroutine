@@ -661,8 +661,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
     private boolean isOutputPending(@Nonnull final ChannelState state) {
 
-        return (state != ChannelState.FLUSH) && (state != ChannelState.ABORTED) && (state
-                != ChannelState.DONE);
+        return (state != ChannelState.FLUSH) && (state != ChannelState.ABORTED);
     }
 
     private boolean isResultComplete() {

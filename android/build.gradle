@@ -16,6 +16,7 @@ import com.android.builder.core.BuilderConstants
 apply plugin: 'com.android.library'
 apply plugin: 'jacoco'
 apply plugin: 'findbugs'
+apply plugin: 'com.github.kt3k.coveralls'
 apply from: '../upload.gradle'
 
 group = 'com.github.davide-maestroni'
@@ -49,7 +50,7 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(':library')
-    compile 'com.android.support:support-v4:21.0.2'
+    compile 'com.android.support:support-v4:21.0.3'
 
     androidTestCompile 'org.assertj:assertj-core:1.7.0'
 }
@@ -58,6 +59,10 @@ task('jacocoTest', dependsOn: 'connectedCheck') {
     description = "Runs the tests and generates the JaCoCo report files."
 } << {
     tasks.createDebugCoverageReport.execute()
+}
+
+task('jacocoTestReport', dependsOn: 'createDebugCoverageReport') {
+    description = "Generates the JaCoCo report files."
 }
 
 task('jar', dependsOn: 'jarRelease')

@@ -15,6 +15,7 @@ package com.bmd.jrt.android.v11.routine;
 
 import android.annotation.TargetApi;
 import android.content.pm.ActivityInfo;
+import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
@@ -42,6 +43,11 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
     public void testLoader() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final TestActivity activity = getActivity();
 
         final OutputChannel<String> result1 = JRoutine.in(activity)
@@ -58,6 +64,11 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
     }
 
     public void testRotation() throws InterruptedException {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         final TestActivity activity = getActivity();
 

@@ -14,6 +14,7 @@
 apply plugin: 'java'
 apply plugin: 'jacoco'
 apply plugin: 'findbugs'
+apply plugin: 'com.github.kt3k.coveralls'
 apply from: '../upload.gradle'
 
 group = 'com.github.davide-maestroni'
@@ -33,6 +34,13 @@ task('jacocoTest', dependsOn: 'test') {
     description = "Runs the tests and generates the JaCoCo report files."
 } << {
     tasks.jacocoTestReport.execute()
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled = true // coveralls plugin depends on xml format report
+        html.enabled = true
+    }
 }
 
 javadoc {

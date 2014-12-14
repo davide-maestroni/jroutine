@@ -54,8 +54,8 @@ public interface RoutineInvocator {
             @Nonnull ClassToken<? extends Invocation<INPUT, OUTPUT>> classToken);
 
     /**
-     * Tells the invocator how to resolve invocation clashes. A clash happens when an invocation
-     * with the same ID is still running.
+     * Tells the invocator how to resolve clashes of invocation inputs. A clash happens when an
+     * invocation of the same type and with the same ID is still running.
      *
      * @param resolution the type of resolution.
      * @return this invocator.
@@ -91,7 +91,9 @@ public interface RoutineInvocator {
      * <li>the running invocation is reset</li>
      * <li>the running invocation is restarted only if the input data are different from the current
      * ones, and retained otherwise</li>
-     * <li>the running invocation is always retained (ignoring the input data)</li>
+     * <li>the running invocation is retained (ignoring the input data)</li>
+     * <li>the current invocation is aborted if the input data are different from the current ones,
+     * and retained otherwise</li>
      * </ul>
      */
     public enum ClashResolution {
@@ -110,6 +112,10 @@ public interface RoutineInvocator {
          * data.
          */
         KEEP,
+        /**
+         * The clash is resolved by aborting the invocation with an {@link InputClashException}.
+         */
+        ABORT,
         /**
          * The default resolution, that is, it is let to the framework decide the best strategy to
          * resolve the clash.

@@ -43,9 +43,9 @@ class DefaultRoutineInvocator implements RoutineInvocator {
 
     private ResultCache mCacheType = ResultCache.DEFAULT;
 
-    private int mLoaderId = RoutineInvocator.GENERATED_ID;
+    private ClashResolution mClashResolution = ClashResolution.DEFAULT;
 
-    private ClashResolution mResolution = ClashResolution.DEFAULT;
+    private int mLoaderId = RoutineInvocator.GENERATED_ID;
 
     /**
      * Constructor.
@@ -75,7 +75,8 @@ class DefaultRoutineInvocator implements RoutineInvocator {
             @Nonnull final ClassToken<? extends Invocation<INPUT, OUTPUT>> classToken) {
 
         final ClashResolution resolution =
-                (mResolution == ClashResolution.DEFAULT) ? ClashResolution.RESTART : mResolution;
+                (mClashResolution == ClashResolution.DEFAULT) ? ClashResolution.RESTART
+                        : mClashResolution;
         final ResultCache cacheType =
                 (mCacheType == ResultCache.DEFAULT) ? ResultCache.CLEAR : mCacheType;
         final Routine<INPUT, OUTPUT> routine =
@@ -98,7 +99,7 @@ class DefaultRoutineInvocator implements RoutineInvocator {
             throw new NullPointerException("the clash resolution type must not be null");
         }
 
-        mResolution = resolution;
+        mClashResolution = resolution;
         return this;
     }
 

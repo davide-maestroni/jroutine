@@ -24,6 +24,8 @@ import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.util.SparseArray;
 
+import com.bmd.jrt.android.invocator.InputClashException;
+import com.bmd.jrt.android.invocator.RoutineClashException;
 import com.bmd.jrt.android.invocator.RoutineInvocator;
 import com.bmd.jrt.android.invocator.RoutineInvocator.ClashResolution;
 import com.bmd.jrt.android.invocator.RoutineInvocator.ResultCache;
@@ -60,13 +62,13 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
 
     private final ResultCache mCacheType;
 
+    private final ClashResolution mClashResolution;
+
     private final Constructor<? extends Invocation<INPUT, OUTPUT>> mConstructor;
 
     private final WeakReference<Object> mContext;
 
     private final int mLoaderId;
-
-    private final ClashResolution mResolution;
 
     /**
      * Constructor.
@@ -105,7 +107,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
 
         mContext = context;
         mLoaderId = loaderId;
-        mResolution = resolution;
+        mClashResolution = resolution;
         mCacheType = cacheType;
         mConstructor = constructor;
     }
@@ -169,7 +171,13 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
                         .getCanonicalName());
             }
 
-            final ClashResolution resolution = mResolution;
+            if (!((RoutineLoader<INPUT, OUTPUT>) loader).isSameInvocationType(
+                    mConstructor.getDeclaringClass())) {
+
+                throw new RoutineClashException(loaderId);
+            }
+
+            final ClashResolution resolution = mClashResolution;
 
             if (resolution == ClashResolution.RESET) {
 
@@ -178,8 +186,19 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
             } else {
 
                 routineLoader = (RoutineLoader<INPUT, OUTPUT>) loader;
-                isRestart = (resolution != ClashResolution.KEEP) && !routineLoader.areSameInputs(
-                        inputs);
+
+                if (resolution != ClashResolution.KEEP) {
+
+                    if (!routineLoader.areSameInputs(inputs)) {
+
+                        if (resolution == ClashResolution.ABORT) {
+
+                            throw new InputClashException(loaderId);
+                        }
+
+                        isRestart = true;
+                    }
+                }
             }
         }
 

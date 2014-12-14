@@ -650,13 +650,13 @@ public class RoutineTest extends TestCase {
 
     public void testDelayedAbort() throws InterruptedException {
 
-        final Routine<String, String> passThroughRoutine = JRoutine.<String>on().buildRoutine();
+        final Routine<String, String> tunnelRoutine = JRoutine.<String>on().buildRoutine();
 
-        final ParameterChannel<String, String> channel1 = passThroughRoutine.invokeAsync();
+        final ParameterChannel<String, String> channel1 = tunnelRoutine.invokeAsync();
         channel1.after(TimeDuration.seconds(2)).abort();
         assertThat(channel1.now().pass("test").result().readFirst()).isEqualTo("test");
 
-        final ParameterChannel<String, String> channel2 = passThroughRoutine.invokeAsync();
+        final ParameterChannel<String, String> channel2 = tunnelRoutine.invokeAsync();
         channel2.after(TimeDuration.millis(100)).abort();
 
         try {
@@ -1163,10 +1163,10 @@ public class RoutineTest extends TestCase {
 
         testException(exceptionRoutine, "test", "test1");
 
-        final Routine<String, String> passThroughRoutine = JRoutine.<String>on().buildRoutine();
+        final Routine<String, String> tunnelRoutine = JRoutine.<String>on().buildRoutine();
 
-        testChained(passThroughRoutine, exceptionRoutine, "test", "test1");
-        testChained(exceptionRoutine, passThroughRoutine, "test", "test1");
+        testChained(tunnelRoutine, exceptionRoutine, "test", "test1");
+        testChained(exceptionRoutine, tunnelRoutine, "test", "test1");
     }
 
     public void testErrorOnInput() {
@@ -1187,10 +1187,10 @@ public class RoutineTest extends TestCase {
 
         testException(exceptionRoutine, "test2", "test2");
 
-        final Routine<String, String> passThroughRoutine = JRoutine.<String>on().buildRoutine();
+        final Routine<String, String> tunnelRoutine = JRoutine.<String>on().buildRoutine();
 
-        testChained(passThroughRoutine, exceptionRoutine, "test2", "test2");
-        testChained(exceptionRoutine, passThroughRoutine, "test2", "test2");
+        testChained(tunnelRoutine, exceptionRoutine, "test2", "test2");
+        testChained(exceptionRoutine, tunnelRoutine, "test2", "test2");
     }
 
     public void testErrorOnResult() {
@@ -1210,10 +1210,10 @@ public class RoutineTest extends TestCase {
 
         testException(exceptionRoutine, "test", "test3");
 
-        final Routine<String, String> passThroughRoutine = JRoutine.<String>on().buildRoutine();
+        final Routine<String, String> tunnelRoutine = JRoutine.<String>on().buildRoutine();
 
-        testChained(passThroughRoutine, exceptionRoutine, "test", "test3");
-        testChained(exceptionRoutine, passThroughRoutine, "test", "test3");
+        testChained(tunnelRoutine, exceptionRoutine, "test", "test3");
+        testChained(exceptionRoutine, tunnelRoutine, "test", "test3");
     }
 
     public void testErrorOnReturn() {
@@ -1240,10 +1240,10 @@ public class RoutineTest extends TestCase {
 
         testException(exceptionRoutine, "test", "test4");
 
-        final Routine<String, String> passThroughRoutine = JRoutine.<String>on().buildRoutine();
+        final Routine<String, String> tunnelRoutine = JRoutine.<String>on().buildRoutine();
 
-        testChained(passThroughRoutine, exceptionRoutine, "test", "test4");
-        testChained(exceptionRoutine, passThroughRoutine, "test", "test4");
+        testChained(tunnelRoutine, exceptionRoutine, "test", "test4");
+        testChained(exceptionRoutine, tunnelRoutine, "test", "test4");
     }
 
     public void testInputTimeout() {

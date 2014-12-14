@@ -32,7 +32,7 @@ import javax.annotation.Nonnull;
  * Created by davide on 12/8/14.
  */
 @TargetApi(VERSION_CODES.HONEYCOMB)
-public class JRoutine extends com.bmd.jrt.routine.JRoutine {
+public class JRoutine extends com.bmd.jrt.android.v4.routine.JRoutine {
 
     /**
      * Returns an invocator operating in the specified context.

@@ -15,6 +15,7 @@ package com.bmd.jrt.routine;
 
 import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.invocation.Invocation;
+import com.bmd.jrt.invocation.TunnelInvocation;
 
 import java.lang.ref.WeakReference;
 
@@ -176,7 +177,7 @@ public class JRoutine {
     public static <DATA> InvocationRoutineBuilder<DATA, DATA> on() {
 
         return new InvocationRoutineBuilder<DATA, DATA>(
-                new ClassToken<PassThroughInvocation<DATA>>() {});
+                new ClassToken<TunnelInvocation<DATA>>() {});
     }
 
     /**

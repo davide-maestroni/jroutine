@@ -11,10 +11,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.routine;
+package com.bmd.jrt.invocation;
 
 import com.bmd.jrt.channel.ResultChannel;
-import com.bmd.jrt.invocation.TemplateInvocation;
 
 import javax.annotation.Nonnull;
 
@@ -25,7 +24,7 @@ import javax.annotation.Nonnull;
  *
  * @param <DATA> the data type.
  */
-class PassThroughInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
+public class TunnelInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
 
     @Override
     public void onInput(final DATA input, @Nonnull final ResultChannel<DATA> result) {

@@ -23,10 +23,9 @@ import com.bmd.jrt.builder.RoutineConfigurationBuilder;
 import com.bmd.jrt.channel.IOChannel;
 import com.bmd.jrt.channel.IOChannel.IOChannelInput;
 import com.bmd.jrt.channel.OutputChannel;
-import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.common.RoutineException;
-import com.bmd.jrt.invocation.TemplateInvocation;
+import com.bmd.jrt.invocation.TunnelInvocation;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.log.NullLog;
 import com.bmd.jrt.runner.RunnerWrapper;
@@ -39,8 +38,6 @@ import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Nonnull;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -787,35 +784,33 @@ public class JRoutineTest extends TestCase {
 
     public void testRoutineBuilder() {
 
-        final Routine<String, String> routine =
-                JRoutine.on(ClassToken.tokenOf(PassThroughInvocation.class))
-                        .syncRunner(RunnerType.SEQUENTIAL)
-                        .runBy(Runners.poolRunner())
-                        .maxRetained(0)
-                        .maxRunning(1)
-                        .availableTimeout(1, TimeUnit.SECONDS)
-                        .inputSize(2)
-                        .inputTimeout(1, TimeUnit.SECONDS)
-                        .outputSize(2)
-                        .outputTimeout(1, TimeUnit.SECONDS)
-                        .outputOrder(DataOrder.INSERTION)
-                        .buildRoutine();
+        final Routine<String, String> routine = JRoutine.<String>on()
+                                                        .syncRunner(RunnerType.SEQUENTIAL)
+                                                        .runBy(Runners.poolRunner())
+                                                        .maxRetained(0)
+                                                        .maxRunning(1)
+                                                        .availableTimeout(1, TimeUnit.SECONDS)
+                                                        .inputSize(2)
+                                                        .inputTimeout(1, TimeUnit.SECONDS)
+                                                        .outputSize(2)
+                                                        .outputTimeout(1, TimeUnit.SECONDS)
+                                                        .outputOrder(DataOrder.INSERTION)
+                                                        .buildRoutine();
 
         assertThat(routine.call("test1", "test2").readAll()).containsExactly("test1", "test2");
 
-        final Routine<String, String> routine1 =
-                JRoutine.on(ClassToken.tokenOf(PassThroughInvocation.class))
-                        .syncRunner(RunnerType.QUEUED)
-                        .runBy(Runners.poolRunner())
-                        .maxRetained(0)
-                        .maxRunning(1)
-                        .availableTimeout(TimeDuration.ZERO)
-                        .inputSize(2)
-                        .inputTimeout(TimeDuration.ZERO)
-                        .outputSize(2)
-                        .outputTimeout(TimeDuration.ZERO)
-                        .outputOrder(DataOrder.INSERTION)
-                        .buildRoutine();
+        final Routine<String, String> routine1 = JRoutine.<String>on()
+                                                         .syncRunner(RunnerType.QUEUED)
+                                                         .runBy(Runners.poolRunner())
+                                                         .maxRetained(0)
+                                                         .maxRunning(1)
+                                                         .availableTimeout(TimeDuration.ZERO)
+                                                         .inputSize(2)
+                                                         .inputTimeout(TimeDuration.ZERO)
+                                                         .outputSize(2)
+                                                         .outputTimeout(TimeDuration.ZERO)
+                                                         .outputOrder(DataOrder.INSERTION)
+                                                         .buildRoutine();
 
         assertThat(routine1.call("test1", "test2").readAll()).containsExactly("test1", "test2");
     }
@@ -848,8 +843,8 @@ public class JRoutineTest extends TestCase {
 
         try {
 
-            new InvocationRoutineBuilder<String, String>(
-                    ClassToken.tokenOf(PassThroughInvocation.class)).logLevel(null);
+            new InvocationRoutineBuilder<String, String>(ClassToken.tokenOf(TunnelInvocation.class))
+                    .logLevel(null);
 
             fail();
 
@@ -859,8 +854,8 @@ public class JRoutineTest extends TestCase {
 
         try {
 
-            new InvocationRoutineBuilder<String, String>(
-                    ClassToken.tokenOf(PassThroughInvocation.class)).withArgs((Object[]) null);
+            new InvocationRoutineBuilder<String, String>(ClassToken.tokenOf(TunnelInvocation.class))
+                    .withArgs((Object[]) null);
 
             fail();
 
@@ -870,8 +865,8 @@ public class JRoutineTest extends TestCase {
 
         try {
 
-            new InvocationRoutineBuilder<String, String>(
-                    ClassToken.tokenOf(PassThroughInvocation.class)).maxRunning(0);
+            new InvocationRoutineBuilder<String, String>(ClassToken.tokenOf(TunnelInvocation.class))
+                    .maxRunning(0);
 
             fail();
 
@@ -881,8 +876,8 @@ public class JRoutineTest extends TestCase {
 
         try {
 
-            new InvocationRoutineBuilder<String, String>(
-                    ClassToken.tokenOf(PassThroughInvocation.class)).maxRetained(-1);
+            new InvocationRoutineBuilder<String, String>(ClassToken.tokenOf(TunnelInvocation.class))
+                    .maxRetained(-1);
 
             fail();
 
@@ -970,15 +965,6 @@ public class JRoutineTest extends TestCase {
         public MyRunner() {
 
             super(Runners.queuedRunner());
-        }
-    }
-
-    private static class PassThroughInvocation extends TemplateInvocation<String, String> {
-
-        @Override
-        public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
-
-            result.pass(s);
         }
     }
 

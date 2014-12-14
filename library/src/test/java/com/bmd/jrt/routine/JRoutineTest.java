@@ -843,7 +843,7 @@ public class JRoutineTest extends TestCase {
 
         try {
 
-            new InvocationRoutineBuilder<String, String>(ClassToken.tokenOf(TunnelInvocation.class))
+            new InvocationRoutineBuilder<Object, Object>(ClassToken.tokenOf(TunnelInvocation.class))
                     .logLevel(null);
 
             fail();
@@ -854,7 +854,7 @@ public class JRoutineTest extends TestCase {
 
         try {
 
-            new InvocationRoutineBuilder<String, String>(ClassToken.tokenOf(TunnelInvocation.class))
+            new InvocationRoutineBuilder<Object, Object>(ClassToken.tokenOf(TunnelInvocation.class))
                     .withArgs((Object[]) null);
 
             fail();
@@ -865,7 +865,7 @@ public class JRoutineTest extends TestCase {
 
         try {
 
-            new InvocationRoutineBuilder<String, String>(ClassToken.tokenOf(TunnelInvocation.class))
+            new InvocationRoutineBuilder<Object, Object>(ClassToken.tokenOf(TunnelInvocation.class))
                     .maxRunning(0);
 
             fail();
@@ -876,7 +876,7 @@ public class JRoutineTest extends TestCase {
 
         try {
 
-            new InvocationRoutineBuilder<String, String>(ClassToken.tokenOf(TunnelInvocation.class))
+            new InvocationRoutineBuilder<Object, Object>(ClassToken.tokenOf(TunnelInvocation.class))
                     .maxRetained(-1);
 
             fail();

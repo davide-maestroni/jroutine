@@ -497,7 +497,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
     private boolean isInputComplete() {
 
-        return (mState == ChannelState.OUTPUT) && (mPendingExecutionCount <= 0);
+        return (mState == ChannelState.OUTPUT) && (mPendingExecutionCount <= 0) && !mIsConsuming;
     }
 
     private void verifyInput() {

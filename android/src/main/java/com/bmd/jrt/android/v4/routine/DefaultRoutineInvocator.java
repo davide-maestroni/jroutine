@@ -26,6 +26,7 @@ import com.bmd.jrt.invocation.Invocation;
 import com.bmd.jrt.routine.Routine;
 
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Constructor;
 
 import javax.annotation.Nonnull;
 
@@ -76,13 +77,14 @@ class DefaultRoutineInvocator implements RoutineInvocator {
                         : mClashResolution;
         final ResultCache cacheType =
                 (mCacheType == ResultCache.DEFAULT) ? ResultCache.CLEAR : mCacheType;
-        final Routine<INPUT, OUTPUT> routine =
-                JRoutine.on(new ClassToken<LoaderInvocation<INPUT, OUTPUT>>() {})
-                        .runBy(Runners.mainRunner(null))
-                        .inputOrder(DataOrder.INSERTION)
-                        .withArgs(mContext, mLoaderId, resolution, cacheType,
-                                  Reflection.findConstructor(classToken.getRawClass()))
-                        .buildRoutine();
+        final Constructor<? extends Invocation<INPUT, OUTPUT>> constructor =
+                Reflection.findConstructor(classToken.getRawClass());
+        final Routine<INPUT, OUTPUT> routine = JRoutine.on(new LoaderToken<INPUT, OUTPUT>())
+                                                       .runBy(Runners.mainRunner())
+                                                       .inputOrder(DataOrder.INSERTION)
+                                                       .withArgs(mContext, mLoaderId, resolution,
+                                                                 cacheType, constructor)
+                                                       .buildRoutine();
         return routine.invokeAsync();
     }
 
@@ -120,5 +122,16 @@ class DefaultRoutineInvocator implements RoutineInvocator {
 
         mLoaderId = id;
         return this;
+    }
+
+    /**
+     * Loader invocation class token.
+     *
+     * @param <INPUT>  the input data type.
+     * @param <OUTPUT> the output data type.
+     */
+    public static final class LoaderToken<INPUT, OUTPUT>
+            extends ClassToken<LoaderInvocation<INPUT, OUTPUT>> {
+
     }
 }

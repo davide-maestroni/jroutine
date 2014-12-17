@@ -80,6 +80,16 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
     public OutputChannel<OUTPUT> bind(@Nonnull OutputConsumer<OUTPUT> consumer);
 
     /**
+     * Checks if the routine is complete waiting at the maximum for the set timeout.
+     *
+     * @return whether the routine execution has complete.
+     * @see #afterMax(com.bmd.jrt.time.TimeDuration)
+     * @see #afterMax(long, java.util.concurrent.TimeUnit)
+     * @see #immediately()
+     */
+    public boolean checkComplete();
+
+    /**
      * Tells the channel to throw a {@link ReadDeadLockException} in case no result is available
      * before the timeout has elapsed.
      * <p/>
@@ -117,16 +127,6 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @return whether the channel is bound.
      */
     public boolean isBound();
-
-    /**
-     * Checks if the routine is complete waiting at the maximum for the set timeout.
-     *
-     * @return whether the routine execution has complete.
-     * @see #afterMax(com.bmd.jrt.time.TimeDuration)
-     * @see #afterMax(long, java.util.concurrent.TimeUnit)
-     * @see #immediately()
-     */
-    public boolean isComplete();
 
     /**
      * Reads all the results by waiting for the routine to complete at the maximum for the set

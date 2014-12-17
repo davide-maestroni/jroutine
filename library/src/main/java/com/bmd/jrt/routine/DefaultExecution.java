@@ -18,6 +18,8 @@ import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.routine.DefaultParameterChannel.InvocationManager;
 import com.bmd.jrt.runner.Execution;
 
+import java.util.NoSuchElementException;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -31,7 +33,7 @@ import javax.annotation.Nullable;
  */
 class DefaultExecution<INPUT, OUTPUT> implements Execution {
 
-    private final AbortExecution mAbortExecution;
+    private final Object mAbortMutex = new Object();
 
     private final InputIterator<INPUT> mInputIterator;
 
@@ -42,6 +44,8 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
     private final Object mMutex = new Object();
 
     private final DefaultResultChannel<OUTPUT> mResultChannel;
+
+    private AbortExecution mAbortExecution;
 
     private Invocation<INPUT, OUTPUT> mInvocation;
 
@@ -78,7 +82,6 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
         mInputIterator = inputs;
         mResultChannel = result;
         mLogger = logger.subContextLogger(this);
-        mAbortExecution = new AbortExecution();
     }
 
     /**
@@ -88,7 +91,15 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
      */
     public Execution abort() {
 
-        return mAbortExecution;
+        synchronized (mAbortMutex) {
+
+            if (mAbortExecution == null) {
+
+                mAbortExecution = new AbortExecution();
+            }
+
+            return mAbortExecution;
+        }
     }
 
     @Override
@@ -189,10 +200,10 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
          * Gets the next input.
          *
          * @return the input.
-         * @throws NoSuchMethodException if no more input is available.
+         * @throws NoSuchElementException if no more input is available.
          */
         @Nullable
-        public INPUT nextInput() throws NoSuchMethodException;
+        public INPUT nextInput();
 
         /**
          * Notifies that the execution abortion is complete.

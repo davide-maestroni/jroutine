@@ -31,6 +31,7 @@ import com.bmd.jrt.common.RoutineException;
 import com.bmd.jrt.invocation.Invocation;
 import com.bmd.jrt.invocation.SimpleInvocation;
 import com.bmd.jrt.invocation.TemplateInvocation;
+import com.bmd.jrt.invocation.TunnelInvocation;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.log.NullLog;
@@ -56,7 +57,9 @@ import javax.annotation.Nullable;
 
 import static com.bmd.jrt.common.ClassToken.tokenOf;
 import static com.bmd.jrt.routine.JRoutine.on;
+import static com.bmd.jrt.time.TimeDuration.INFINITY;
 import static com.bmd.jrt.time.TimeDuration.ZERO;
+import static com.bmd.jrt.time.TimeDuration.millis;
 import static com.bmd.jrt.time.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -1262,6 +1265,19 @@ public class RoutineTest extends TestCase {
         }
     }
 
+    public void testInvocationLifecycle() throws InterruptedException {
+
+        final Routine<String, String> routine =
+                JRoutine.on(tokenOf(TestLifecycle.class)).buildRoutine();
+        final OutputChannel<String> outputChannel = routine.callAsync("test");
+
+        Thread.sleep(500);
+
+        outputChannel.abort();
+        outputChannel.afterMax(INFINITY).checkComplete();
+        assertThat(TestLifecycle.sIsError).isFalse();
+    }
+
     public void testMethod() throws NoSuchMethodException {
 
         final TestClass testClass = new TestClass();
@@ -1902,7 +1918,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            channel.isComplete();
+            channel.checkComplete();
 
             fail();
 
@@ -2271,13 +2287,17 @@ public class RoutineTest extends TestCase {
         final Routine<String, String> routine =
                 on(tokenOf(DelayedInvocation.class)).withArgs(TimeDuration.ZERO).buildRoutine();
 
-        assertThat(routine.call(input).bind(consumer).isComplete()).isTrue();
-        assertThat(routine.callAsync(input).bind(consumer).isComplete()).isTrue();
-        assertThat(routine.callParallel(input).bind(consumer).isComplete()).isTrue();
-        assertThat(routine.invoke().pass(input).result().bind(consumer).isComplete()).isTrue();
-        assertThat(routine.invokeAsync().pass(input).result().bind(consumer).isComplete()).isTrue();
+        assertThat(routine.call(input).bind(consumer).checkComplete()).isTrue();
+        assertThat(routine.callAsync(input).bind(consumer).checkComplete()).isTrue();
+        assertThat(routine.callParallel(input).bind(consumer).checkComplete()).isTrue();
+        assertThat(routine.invoke().pass(input).result().bind(consumer).checkComplete()).isTrue();
         assertThat(
-                routine.invokeParallel().pass(input).result().bind(consumer).isComplete()).isTrue();
+                routine.invokeAsync().pass(input).result().bind(consumer).checkComplete()).isTrue();
+        assertThat(routine.invokeParallel()
+                          .pass(input)
+                          .result()
+                          .bind(consumer)
+                          .checkComplete()).isTrue();
     }
 
     private void testException(final Routine<String, String> routine, final String input,
@@ -2448,6 +2468,43 @@ public class RoutineTest extends TestCase {
 
         @Async(value = "getInt")
         public int take(int i);
+    }
+
+    public static class TestLifecycle extends TunnelInvocation<String> {
+
+        private static boolean sActive;
+
+        private static boolean sIsError;
+
+        @Override
+        public void onInput(final String input, @Nonnull final ResultChannel<String> result) {
+
+            result.after(millis(1000)).pass(input);
+        }
+
+        @Override
+        public void onAbort(@Nullable final Throwable reason) {
+
+            if (!sActive) {
+
+                sIsError = true;
+            }
+        }
+
+        @Override
+        public void onInit() {
+
+            sActive = true;
+        }
+
+
+        @Override
+        public void onReturn() {
+
+            sActive = false;
+        }
+
+
     }
 
     private static class ConstructorException extends TemplateInvocation<Object, Object> {

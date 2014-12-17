@@ -25,7 +25,7 @@ import com.bmd.jrt.common.RoutineInterruptedException;
 import com.bmd.jrt.invocation.SimpleInvocation;
 import com.bmd.jrt.runner.Execution;
 import com.bmd.jrt.runner.Runner;
-import com.bmd.jrt.runner.RunnerWrapper;
+import com.bmd.jrt.runner.RunnerDecorator;
 import com.bmd.jrt.time.TimeDuration;
 
 import java.util.ArrayList;
@@ -112,10 +112,12 @@ public class AndroidRunnerTest extends AndroidTestCase {
 
     public void testMainRunner() throws InterruptedException {
 
+        testRunner(Runners.mainRunner());
+        testRunner(new MainRunner());
         testRunner(Runners.mainRunner(null));
-        testRunner(new RunnerWrapper(Runners.mainRunner(null)));
+        testRunner(new RunnerDecorator(Runners.mainRunner(null)));
         testRunner(Runners.mainRunner(Runners.queuedRunner()));
-        testRunner(new RunnerWrapper(Runners.mainRunner(Runners.queuedRunner())));
+        testRunner(new RunnerDecorator(Runners.mainRunner(Runners.queuedRunner())));
     }
 
     public void testTaskRunner() throws InterruptedException {
@@ -123,7 +125,7 @@ public class AndroidRunnerTest extends AndroidTestCase {
         testRunner(new AsyncTaskRunner(null));
         testRunner(Runners.taskRunner());
         testRunner(Runners.taskRunner(Executors.newCachedThreadPool()));
-        testRunner(new RunnerWrapper(Runners.taskRunner(Executors.newSingleThreadExecutor())));
+        testRunner(new RunnerDecorator(Runners.taskRunner(Executors.newSingleThreadExecutor())));
     }
 
     public void testThreadRunner() throws InterruptedException {

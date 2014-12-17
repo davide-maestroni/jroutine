@@ -19,10 +19,12 @@ import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
+import com.bmd.jrt.android.R;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.invocation.TemplateInvocation;
+import com.bmd.jrt.time.TimeDuration;
 
 import javax.annotation.Nonnull;
 
@@ -33,12 +35,101 @@ import static org.assertj.core.api.Assertions.assertThat;
  * <p/>
  * Created by davide on 12/10/14.
  */
-@TargetApi(VERSION_CODES.FROYO)
+@TargetApi(VERSION_CODES.HONEYCOMB)
 public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestActivity> {
 
     public JRoutineActivityTest() {
 
         super(TestActivity.class);
+    }
+
+    public void testFragmentInputs() throws InterruptedException {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+                                                            .findFragmentById(R.id.test_fragment);
+
+        while (fragment == null) {
+
+            Thread.sleep(100);
+
+            fragment = (TestFragment) getActivity().getFragmentManager()
+                                                   .findFragmentById(R.id.test_fragment);
+        }
+
+        final OutputChannel<String> result1 = JRoutine.in(fragment)
+                                                      .invoke(ClassToken.tokenOf(ToUpperCase.class))
+                                                      .pass("test1")
+                                                      .result();
+        final OutputChannel<String> result2 = JRoutine.in(fragment)
+                                                      .invoke(ClassToken.tokenOf(ToUpperCase.class))
+                                                      .pass("test2")
+                                                      .result();
+
+        assertThat(result1.readFirst()).isEqualTo("TEST1");
+        assertThat(result2.readFirst()).isEqualTo("TEST2");
+    }
+
+    public void testFragmentRotationInputs() throws InterruptedException {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+                                                            .findFragmentById(R.id.test_fragment);
+
+        while (fragment == null) {
+
+            Thread.sleep(100);
+
+            fragment = (TestFragment) getActivity().getFragmentManager()
+                                                   .findFragmentById(R.id.test_fragment);
+        }
+
+        JRoutine.in(fragment).invoke(ClassToken.tokenOf(ToUpperCase.class)).pass("test1").result();
+        JRoutine.in(fragment).invoke(ClassToken.tokenOf(ToUpperCase.class)).pass("test2").result();
+
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        getInstrumentation().waitForIdleSync();
+
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        getInstrumentation().waitForIdleSync();
+
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        getInstrumentation().waitForIdleSync();
+
+        Thread.sleep(1000);
+
+        //        fragment = (TestFragment) getActivity().getFragmentManager()
+        //                                               .findFragmentById(R.id.test_fragment);
+        //
+        //        while (fragment == null) {
+        //
+        //            Thread.sleep(100);
+        //
+        //            fragment = (TestFragment) getActivity().getFragmentManager()
+        //                                                   .findFragmentById(R.id.test_fragment);
+        //        }
+        //
+        //        final OutputChannel<String> result1 = JRoutine.in(fragment)
+        //                                                      .invoke(ClassToken.tokenOf
+        // (ToUpperCase.class))
+        //                                                      .pass("test1")
+        //                                                      .result();
+        //        final OutputChannel<String> result2 = JRoutine.in(fragment)
+        //                                                      .invoke(ClassToken.tokenOf
+        // (ToUpperCase.class))
+        //                                                      .pass("test2")
+        //                                                      .result();
+        //
+        //        assertThat(result1.readFirst()).isEqualTo("TEST1");
+        //        assertThat(result2.readFirst()).isEqualTo("TEST2");
     }
 
     public void testInputs() {
@@ -48,13 +139,11 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
-        final TestActivity activity = getActivity();
-
-        final OutputChannel<String> result1 = JRoutine.in(activity)
+        final OutputChannel<String> result1 = JRoutine.in(getActivity())
                                                       .invoke(ClassToken.tokenOf(ToUpperCase.class))
                                                       .pass("test1")
                                                       .result();
-        final OutputChannel<String> result2 = JRoutine.in(activity)
+        final OutputChannel<String> result2 = JRoutine.in(getActivity())
                                                       .invoke(ClassToken.tokenOf(ToUpperCase.class))
                                                       .pass("test2")
                                                       .result();
@@ -70,10 +159,14 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
-        final TestActivity activity = getActivity();
-
-        JRoutine.in(activity).invoke(ClassToken.tokenOf(ToUpperCase.class)).pass("test1").result();
-        JRoutine.in(activity).invoke(ClassToken.tokenOf(ToUpperCase.class)).pass("test2").result();
+        JRoutine.in(getActivity())
+                .invoke(ClassToken.tokenOf(ToUpperCase.class))
+                .pass("test1")
+                .result();
+        JRoutine.in(getActivity())
+                .invoke(ClassToken.tokenOf(ToUpperCase.class))
+                .pass("test2")
+                .result();
 
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         getInstrumentation().waitForIdleSync();
@@ -86,11 +179,11 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         Thread.sleep(1000);
 
-        final OutputChannel<String> result1 = JRoutine.in(activity)
+        final OutputChannel<String> result1 = JRoutine.in(getActivity())
                                                       .invoke(ClassToken.tokenOf(ToUpperCase.class))
                                                       .pass("test1")
                                                       .result();
-        final OutputChannel<String> result2 = JRoutine.in(activity)
+        final OutputChannel<String> result2 = JRoutine.in(getActivity())
                                                       .invoke(ClassToken.tokenOf(ToUpperCase.class))
                                                       .pass("test2")
                                                       .result();
@@ -106,11 +199,9 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
-        final TestActivity activity = getActivity();
-
         final Data data1 = new Data();
-        JRoutine.in(activity).invoke(ClassToken.tokenOf(Mirror.class)).pass(data1).result();
-        JRoutine.in(activity).invoke(ClassToken.tokenOf(Mirror.class)).pass(data1).result();
+        JRoutine.in(getActivity()).invoke(ClassToken.tokenOf(Delay.class)).pass(data1).result();
+        JRoutine.in(getActivity()).invoke(ClassToken.tokenOf(Delay.class)).pass(data1).result();
 
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         getInstrumentation().waitForIdleSync();
@@ -123,10 +214,14 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         Thread.sleep(1000);
 
-        final OutputChannel<Data> result1 =
-                JRoutine.in(activity).invoke(ClassToken.tokenOf(Mirror.class)).pass(data1).result();
-        final OutputChannel<Data> result2 =
-                JRoutine.in(activity).invoke(ClassToken.tokenOf(Mirror.class)).pass(data1).result();
+        final OutputChannel<Data> result1 = JRoutine.in(getActivity())
+                                                    .invoke(ClassToken.tokenOf(Delay.class))
+                                                    .pass(data1)
+                                                    .result();
+        final OutputChannel<Data> result2 = JRoutine.in(getActivity())
+                                                    .invoke(ClassToken.tokenOf(Delay.class))
+                                                    .pass(data1)
+                                                    .result();
 
         assertThat(result1.readFirst()).isSameAs(data1);
         assertThat(result2.readFirst()).isSameAs(data1);
@@ -139,13 +234,15 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
-        final TestActivity activity = getActivity();
-
         final Data data1 = new Data();
-        final OutputChannel<Data> result1 =
-                JRoutine.in(activity).invoke(ClassToken.tokenOf(Mirror.class)).pass(data1).result();
-        final OutputChannel<Data> result2 =
-                JRoutine.in(activity).invoke(ClassToken.tokenOf(Mirror.class)).pass(data1).result();
+        final OutputChannel<Data> result1 = JRoutine.in(getActivity())
+                                                    .invoke(ClassToken.tokenOf(Delay.class))
+                                                    .pass(data1)
+                                                    .result();
+        final OutputChannel<Data> result2 = JRoutine.in(getActivity())
+                                                    .invoke(ClassToken.tokenOf(Delay.class))
+                                                    .pass(data1)
+                                                    .result();
 
         assertThat(result1.readFirst()).isSameAs(data1);
         assertThat(result2.readFirst()).isSameAs(data1);
@@ -155,12 +252,12 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
     }
 
-    private static class Mirror extends TemplateInvocation<Data, Data> {
+    private static class Delay extends TemplateInvocation<Data, Data> {
 
         @Override
         public void onInput(final Data d, @Nonnull final ResultChannel<Data> result) {
 
-            result.pass(d);
+            result.after(TimeDuration.millis(500)).pass(d);
         }
     }
 
@@ -169,7 +266,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         @Override
         public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
 
-            result.pass(s.toUpperCase());
+            result.after(TimeDuration.millis(500)).pass(s.toUpperCase());
         }
     }
 }

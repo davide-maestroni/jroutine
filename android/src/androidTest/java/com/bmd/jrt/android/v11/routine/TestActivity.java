@@ -13,11 +13,26 @@
  */
 package com.bmd.jrt.android.v11.routine;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.os.Build.VERSION_CODES;
+import android.os.Bundle;
+
+import com.bmd.jrt.android.R;
 
 /**
  * Test activity.
  */
+@TargetApi(VERSION_CODES.HONEYCOMB)
 public class TestActivity extends Activity {
 
+    @Override
+    protected void onCreate(final Bundle savedInstanceState) {
+
+        super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.test_layout);
+
+        JRoutine.enable(this);
+    }
 }

@@ -28,7 +28,7 @@ import com.bmd.jrt.common.RoutineException;
 import com.bmd.jrt.invocation.TunnelInvocation;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.log.NullLog;
-import com.bmd.jrt.runner.RunnerWrapper;
+import com.bmd.jrt.runner.RunnerDecorator;
 import com.bmd.jrt.runner.Runners;
 import com.bmd.jrt.time.TimeDuration;
 
@@ -198,8 +198,8 @@ public class JRoutineTest extends TestCase {
         OutputChannel<Object> getOne = builder.method("getOne").callAsync();
         OutputChannel<Object> getTwo = builder.method("getTwo").callAsync();
 
-        assertThat(getOne.isComplete()).isTrue();
-        assertThat(getTwo.isComplete()).isTrue();
+        assertThat(getOne.checkComplete()).isTrue();
+        assertThat(getTwo.checkComplete()).isTrue();
         assertThat(System.currentTimeMillis() - startTime).isLessThan(1000);
 
         startTime = System.currentTimeMillis();
@@ -207,8 +207,8 @@ public class JRoutineTest extends TestCase {
         getOne = builder.lockName("test").method("getOne").callAsync();
         getTwo = builder.lockName("test").method("getTwo").callAsync();
 
-        assertThat(getOne.isComplete()).isTrue();
-        assertThat(getTwo.isComplete()).isTrue();
+        assertThat(getOne.checkComplete()).isTrue();
+        assertThat(getTwo.checkComplete()).isTrue();
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
     }
 
@@ -459,8 +459,8 @@ public class JRoutineTest extends TestCase {
         OutputChannel<Object> getOne = builder.method("getOne").callAsync();
         OutputChannel<Object> getTwo = builder.method("getTwo").callAsync();
 
-        assertThat(getOne.isComplete()).isTrue();
-        assertThat(getTwo.isComplete()).isTrue();
+        assertThat(getOne.checkComplete()).isTrue();
+        assertThat(getTwo.checkComplete()).isTrue();
         assertThat(System.currentTimeMillis() - startTime).isLessThan(1000);
 
         startTime = System.currentTimeMillis();
@@ -468,8 +468,8 @@ public class JRoutineTest extends TestCase {
         getOne = builder.lockName("test").method("getOne").callAsync();
         getTwo = builder.lockName("test").method("getTwo").callAsync();
 
-        assertThat(getOne.isComplete()).isTrue();
-        assertThat(getTwo.isComplete()).isTrue();
+        assertThat(getOne.checkComplete()).isTrue();
+        assertThat(getTwo.checkComplete()).isTrue();
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
     }
 
@@ -959,7 +959,7 @@ public class JRoutineTest extends TestCase {
         }
     }
 
-    private static class MyRunner extends RunnerWrapper {
+    private static class MyRunner extends RunnerDecorator {
 
         public MyRunner() {
 

@@ -84,7 +84,7 @@ public class Downloader {
     public boolean abortAndWait(final URI uri, final TimeDuration timeout) {
 
         final OutputChannel<Boolean> channel = mDownloadMap.remove(uri);
-        return (channel != null) && channel.abort() && channel.afterMax(timeout).isComplete();
+        return (channel != null) && channel.abort() && channel.afterMax(timeout).checkComplete();
     }
 
     public void download(final URI uri, final File dstFile) {
@@ -130,7 +130,7 @@ public class Downloader {
 
             try {
 
-                if (channel.afterMax(timeout).isComplete()) {
+                if (channel.afterMax(timeout).checkComplete()) {
 
                     downloadMap.remove(uri);
 

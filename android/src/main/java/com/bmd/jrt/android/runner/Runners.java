@@ -23,12 +23,19 @@ import java.util.concurrent.Executor;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /**
  * Utility class for creating and sharing runner instances, employing specific Android classes.
  * <p/>
  * Created by davide on 9/28/14.
  */
+@SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS",
+                    justification = "utility class extending functionalities of another utility "
+                            + "class")
 public class Runners extends com.bmd.jrt.runner.Runners {
+
+    private static volatile Runner sMainRunner;
 
     /**
      * Returns a runner employing in the specified looper.
@@ -58,6 +65,24 @@ public class Runners extends com.bmd.jrt.runner.Runners {
     public static Runner mainRunner(@Nullable final Runner sameThreadRunner) {
 
         return looperRunner(Looper.getMainLooper(), sameThreadRunner);
+    }
+
+    /**
+     * Returns the shared runner employing the main thread looper.<br/>
+     * Note that the execution with a delay of 0 will be performed synchronously, while the ones
+     * with a positive delay will be posted on the UI thread.
+     *
+     * @return the runner instance.
+     */
+    @Nonnull
+    public static Runner mainRunner() {
+
+        if (sMainRunner == null) {
+
+            sMainRunner = new MainRunner();
+        }
+
+        return sMainRunner;
     }
 
     /**

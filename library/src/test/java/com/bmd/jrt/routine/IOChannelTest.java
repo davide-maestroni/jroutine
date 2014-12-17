@@ -68,7 +68,7 @@ public class IOChannelTest extends TestCase {
         final ArrayList<String> results = new ArrayList<String>();
         output.afterMax(10, TimeUnit.MILLISECONDS).readAllInto(results);
         assertThat(results).isEmpty();
-        assertThat(output.immediately().isComplete()).isFalse();
+        assertThat(output.immediately().checkComplete()).isFalse();
         assertThat(output.abort()).isTrue();
 
         try {
@@ -109,7 +109,7 @@ public class IOChannelTest extends TestCase {
         final Routine<String, String> routine = JRoutine.<String>on().buildRoutine();
         final OutputChannel<String> outputChannel = routine.callAsync(channel.output());
         assertThat(outputChannel.readFirst()).isEqualTo("test");
-        assertThat(outputChannel.isComplete()).isTrue();
+        assertThat(outputChannel.checkComplete()).isTrue();
 
         final IOChannel<String> channel1 =
                 JRoutine.io().dataOrder(DataOrder.INSERTION).buildChannel();
@@ -155,9 +155,9 @@ public class IOChannelTest extends TestCase {
 
         assertThat(System.currentTimeMillis() - startTime).isLessThan(2000);
 
-        assertThat(outputChannel.immediately().isComplete()).isFalse();
+        assertThat(outputChannel.immediately().checkComplete()).isFalse();
         channel.input().close();
-        assertThat(outputChannel.afterMax(TimeDuration.millis(500)).isComplete()).isTrue();
+        assertThat(outputChannel.afterMax(TimeDuration.millis(500)).checkComplete()).isTrue();
     }
 
     public void testReadFirst() throws InterruptedException {
@@ -231,7 +231,7 @@ public class IOChannelTest extends TestCase {
 
         try {
 
-            output.isComplete();
+            output.checkComplete();
 
             fail();
 

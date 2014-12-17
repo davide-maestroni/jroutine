@@ -113,7 +113,8 @@ public interface RoutineInvocator {
          */
         KEEP,
         /**
-         * The clash is resolved by aborting the invocation with an {@link InputClashException}.
+         * The clash is resolved by aborting the invocation with an {@link InputClashException}, in
+         * case its input data are different from the current ones.
          */
         ABORT,
         /**

@@ -13,6 +13,7 @@
  */
 package com.bmd.jrt.android.v4.routine;
 
+import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
 /**
@@ -20,4 +21,11 @@ import android.support.v4.app.FragmentActivity;
  */
 public class TestActivity extends FragmentActivity {
 
+    @Override
+    protected void onCreate(final Bundle savedInstanceState) {
+
+        super.onCreate(savedInstanceState);
+
+        JRoutine.enable(this);
+    }
 }

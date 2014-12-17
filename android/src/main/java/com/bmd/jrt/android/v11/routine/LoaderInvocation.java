@@ -46,6 +46,8 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /**
  * Invocation implementation employing loaders to perform background operations.
  * <p/>
@@ -112,7 +114,63 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
         mConstructor = constructor;
     }
 
+    /**
+     * Enables routine invocation for the specified activity.<br/>
+     * This method must be called in the activity <code>onCreate()</code> method.
+     *
+     * @param activity the activity instance.
+     */
+    static void enable(@Nonnull final Activity activity) {
+
+        if (!sCallbackMap.containsKey(activity)) {
+
+            sCallbackMap.put(activity, new SparseArray<RoutineLoaderCallbacks<?>>());
+        }
+
+        activity.getLoaderManager();
+    }
+
+    /**
+     * Enables routine invocation for the specified fragment.<br/>
+     * This method must be called in the fragment <code>onCreate()</code> method.
+     *
+     * @param fragment the fragment instance.
+     */
+    static void enable(@Nonnull final Fragment fragment) {
+
+        if (!sCallbackMap.containsKey(fragment)) {
+
+            sCallbackMap.put(fragment, new SparseArray<RoutineLoaderCallbacks<?>>());
+        }
+
+        fragment.getLoaderManager();
+    }
+
+    /**
+     * Checks if the specified activity is enabled for routine invocation.
+     *
+     * @param activity the activity instance.
+     * @return whether the activity is enabled.
+     */
+    static boolean isEnabled(@Nonnull final Activity activity) {
+
+        return sCallbackMap.containsKey(activity);
+    }
+
+    /**
+     * Checks if the specified fragment is enabled for routine invocation.
+     *
+     * @param fragment the fragment instance.
+     * @return whether the fragment is enabled.
+     */
+    static boolean isEnabled(@Nonnull final Fragment fragment) {
+
+        return sCallbackMap.containsKey(fragment);
+    }
+
     @Override
+    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST_OF_RETURN_VALUE",
+                        justification = "class comparison with == is done")
     @SuppressWarnings("unchecked")
     public void onCall(@Nonnull final List<? extends INPUT> inputs,
             @Nonnull final ResultChannel<OUTPUT> result) {
@@ -130,13 +188,13 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
         if (context instanceof Activity) {
 
             final Activity activity = (Activity) context;
-            loaderContext = activity;
+            loaderContext = activity.getApplicationContext();
             loaderManager = activity.getLoaderManager();
 
         } else if (context instanceof Fragment) {
 
             final Fragment fragment = (Fragment) context;
-            loaderContext = fragment.getActivity();
+            loaderContext = fragment.getActivity().getApplicationContext();
             loaderManager = fragment.getLoaderManager();
 
         } else {
@@ -158,9 +216,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
             loaderId = 31 * constructor.getDeclaringClass().hashCode() + inputs.hashCode();
         }
 
+        boolean needRestart = true;
         final Loader<InvocationResult<OUTPUT>> loader = loaderManager.getLoader(loaderId);
-        RoutineLoader<INPUT, OUTPUT> routineLoader = null;
-        boolean isRestart = false;
 
         if (loader != null) {
 
@@ -171,81 +228,73 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
                         .getCanonicalName());
             }
 
-            if (!((RoutineLoader<INPUT, OUTPUT>) loader).isSameInvocationType(
-                    mConstructor.getDeclaringClass())) {
+            final RoutineLoader<INPUT, OUTPUT> routineLoader =
+                    (RoutineLoader<INPUT, OUTPUT>) loader;
+
+            if (!routineLoader.isSameInvocationType(mConstructor.getDeclaringClass())) {
 
                 throw new RoutineClashException(loaderId);
             }
 
             final ClashResolution resolution = mClashResolution;
 
-            if (resolution == ClashResolution.RESET) {
+            if (resolution != ClashResolution.RESET) {
 
-                loaderManager.destroyLoader(loaderId);
+                if ((resolution == ClashResolution.KEEP) || routineLoader.areSameInputs(inputs)) {
 
-            } else {
+                    needRestart = false;
 
-                routineLoader = (RoutineLoader<INPUT, OUTPUT>) loader;
+                } else if (resolution == ClashResolution.ABORT) {
 
-                if (resolution != ClashResolution.KEEP) {
-
-                    if (!routineLoader.areSameInputs(inputs)) {
-
-                        if (resolution == ClashResolution.ABORT) {
-
-                            throw new InputClashException(loaderId);
-                        }
-
-                        isRestart = true;
-                    }
+                    throw new InputClashException(loaderId);
                 }
             }
         }
 
         final CacheHashMap<Object, SparseArray<RoutineLoaderCallbacks<?>>> callbackMap =
                 sCallbackMap;
-        SparseArray<RoutineLoaderCallbacks<?>> callbackArray = callbackMap.get(context);
+        final SparseArray<RoutineLoaderCallbacks<?>> callbackArray = callbackMap.get(context);
 
-        if (callbackArray == null) {
+        RoutineLoaderCallbacks<OUTPUT> callbacks =
+                (RoutineLoaderCallbacks<OUTPUT>) callbackArray.get(loaderId);
 
-            callbackArray = new SparseArray<RoutineLoaderCallbacks<?>>();
-            callbackMap.put(context, callbackArray);
-        }
+        if ((callbacks == null) || needRestart) {
 
-        RoutineLoaderCallbacks<?> callbacks = callbackArray.get(loaderId);
+            final Invocation<INPUT, OUTPUT> invocation;
 
-        if (callbacks == null) {
+            try {
 
-            if (routineLoader == null) {
+                invocation = mConstructor.newInstance();
 
-                final Invocation<INPUT, OUTPUT> invocation;
+            } catch (final InvocationTargetException e) {
 
-                try {
+                throw new RoutineException(e.getCause());
 
-                    invocation = constructor.newInstance();
+            } catch (final RoutineException e) {
 
-                } catch (final InvocationTargetException e) {
+                throw e;
 
-                    throw new RoutineException(e.getCause());
+            } catch (final Throwable t) {
 
-                } catch (final RoutineException e) {
-
-                    throw e;
-
-                } catch (final Throwable t) {
-
-                    throw new RoutineException(t);
-                }
-
-                routineLoader = new RoutineLoader<INPUT, OUTPUT>(loaderContext, invocation, inputs);
+                throw new RoutineException(t);
             }
 
+            if (callbacks != null) {
+
+                callbacks.reset();
+            }
+
+            final RoutineLoader<INPUT, OUTPUT> routineLoader =
+                    new RoutineLoader<INPUT, OUTPUT>(loaderContext, invocation, inputs);
             callbacks =
                     new RoutineLoaderCallbacks<OUTPUT>(loaderManager, routineLoader, mCacheType);
             callbackArray.put(loaderId, callbacks);
+            needRestart = true;
         }
 
-        if (isRestart) {
+        final OutputChannel<OUTPUT> outputChannel = callbacks.newChannel();
+
+        if (needRestart) {
 
             loaderManager.restartLoader(loaderId, Bundle.EMPTY, callbacks);
 
@@ -254,7 +303,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
             loaderManager.initLoader(loaderId, Bundle.EMPTY, callbacks);
         }
 
-        result.pass((OutputChannel<OUTPUT>) callbacks.newChannel());
+        result.pass(outputChannel);
     }
 
     /**
@@ -274,8 +323,6 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
         private final RoutineLoader<?, OUTPUT> mLoader;
 
         private final LoaderManager mLoaderManager;
-
-        private InvocationResult<OUTPUT> mResult;
 
         private int mResultCount;
 
@@ -304,25 +351,12 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
         @Nonnull
         public OutputChannel<OUTPUT> newChannel() {
 
-            final InvocationResult<OUTPUT> result = mResult;
             final RoutineLoader<?, OUTPUT> internalLoader = mLoader;
             final IOChannel<OUTPUT> channel = JRoutine.io().buildChannel();
-
-            if (result == null) {
-
-                final ArrayList<IOChannel<OUTPUT>> channels = mChannels;
-                channels.add(channel);
-                internalLoader.setInvocationCount(
-                        Math.max(channels.size(), internalLoader.getInvocationCount()));
-                return channel.output();
-            }
-
-            final IOChannelInput<OUTPUT> input = channel.input();
-            result.passTo(input);
-            input.close();
-
-            ++mResultCount;
-            checkComplete();
+            final ArrayList<IOChannel<OUTPUT>> channels = mChannels;
+            channels.add(channel);
+            internalLoader.setInvocationCount(
+                    Math.max(channels.size(), internalLoader.getInvocationCount()));
             return channel.output();
         }
 
@@ -336,8 +370,6 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
         public void onLoadFinished(final Loader<InvocationResult<OUTPUT>> loader,
                 final InvocationResult<OUTPUT> result) {
 
-            mResult = result;
-
             final ArrayList<IOChannel<OUTPUT>> channels = mChannels;
 
             for (final IOChannel<OUTPUT> channel : channels) {
@@ -349,30 +381,40 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
 
             mResultCount += channels.size();
             channels.clear();
-            checkComplete();
-        }
-
-        @Override
-        public void onLoaderReset(final Loader<InvocationResult<OUTPUT>> loader) {
-
-            mResult = null;
-        }
-
-        private void checkComplete() {
 
             final RoutineLoader<?, OUTPUT> internalLoader = mLoader;
 
             if (mResultCount >= internalLoader.getInvocationCount()) {
 
+                mResultCount = 0;
+
                 final ResultCache cacheType = mCacheType;
 
-                if ((cacheType == ResultCache.CLEAR) || (mResult.isError() ? (cacheType
+                if ((cacheType == ResultCache.CLEAR) || (result.isError() ? (cacheType
                         == ResultCache.CLEAR_IF_ERROR)
                         : (cacheType == ResultCache.CLEAR_IF_RESULT))) {
 
                     mLoaderManager.destroyLoader(internalLoader.getId());
                 }
             }
+        }
+
+        @Override
+        public void onLoaderReset(final Loader<InvocationResult<OUTPUT>> loader) {
+
+            reset();
+        }
+
+        private void reset() {
+
+            final ArrayList<IOChannel<OUTPUT>> channels = mChannels;
+
+            for (final IOChannel<OUTPUT> channel : channels) {
+
+                channel.input().abort(); // TODO: abort?
+            }
+
+            channels.clear();
         }
     }
 }

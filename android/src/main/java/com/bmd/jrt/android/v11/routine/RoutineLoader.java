@@ -99,17 +99,9 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
     @Override
     public void deliverResult(final InvocationResult<OUTPUT> data) {
 
-        if (isReset()) {
-
-            return;
-        }
-
         mResult = data;
 
-        if (isStarted()) {
-
-            super.deliverResult(data);
-        }
+        super.deliverResult(data);
     }
 
     @Override
@@ -131,9 +123,9 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
     @Override
     protected void onReset() {
 
-        super.onReset();
-
         mResult = null;
+
+        super.onReset();
     }
 
     /**

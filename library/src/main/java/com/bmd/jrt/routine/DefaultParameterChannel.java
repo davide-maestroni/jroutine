@@ -130,8 +130,10 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
         mResultChanel = new DefaultResultChannel<OUTPUT>(configuration, new AbortHandler() {
 
             @Override
-            public void onAbort(final Throwable reason, final long delay,
+            public void onAbort(@Nullable final Throwable reason, final long delay,
                     @Nonnull final TimeUnit timeUnit) {
+
+                final boolean isComplete;
 
                 synchronized (mMutex) {
 
@@ -141,13 +143,29 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
                         return;
                     }
 
-                    mLogger.dbg("aborting result channel");
-                    mInputQueue.clear();
-                    mAbortException = reason;
-                    mState = ChannelState.EXCEPTION;
+                    isComplete = isInputComplete();
+
+                    if (isComplete) {
+
+                        mLogger.dbg("avoiding aborting result channel since input is complete");
+
+                    } else {
+
+                        mLogger.dbg("aborting result channel");
+                        mInputQueue.clear();
+                        mAbortException = reason;
+                        mState = ChannelState.EXCEPTION;
+                    }
                 }
 
-                mRunner.run(mExecution.abort(), delay, timeUnit);
+                if (isComplete) {
+
+                    mRunner.run(new AbortResultExecution(reason), delay, timeUnit);
+
+                } else {
+
+                    mRunner.run(mExecution.abort(), delay, timeUnit);
+                }
             }
         }, runner, logger);
         mExecution = new DefaultExecution<INPUT, OUTPUT>(manager, new DefaultInputIterator(),
@@ -540,6 +558,30 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
     }
 
     /**
+     * Implementation of an execution handling the abortion of the result channel.
+     */
+    private class AbortResultExecution implements Execution {
+
+        private Throwable mReason;
+
+        /**
+         * Constructor.
+         *
+         * @param reason the reason of the abortion.
+         */
+        private AbortResultExecution(@Nullable final Throwable reason) {
+
+            mReason = reason;
+        }
+
+        @Override
+        public void run() {
+
+            mResultChanel.close(mReason);
+        }
+    }
+
+    /**
      * Default implementation of an input iterator.
      */
     private class DefaultInputIterator implements InputIterator<INPUT> {
@@ -576,7 +618,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
         @Override
         @SuppressFBWarnings(value = "NO_NOTIFY_NOT_NOTIFYALL",
                             justification = "only one input is released")
-        public INPUT nextInput() throws NoSuchElementException {
+        public INPUT nextInput() {
 
             synchronized (mMutex) {
 

@@ -982,39 +982,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             return this;
         }
 
-        @Nonnull
         @Override
-        @SuppressWarnings("BooleanParameter")
-        public OutputChannel<OUTPUT> eventuallyDeadLock(final boolean throwException) {
-
-            synchronized (mMutex) {
-
-                verifyBound();
-
-                mReadTimeoutException = throwException;
-            }
-
-            return this;
-        }
-
-        @Nonnull
-        @Override
-        public OutputChannel<OUTPUT> immediately() {
-
-            return afterMax(ZERO);
-        }
-
-        @Override
-        public boolean isBound() {
-
-            synchronized (mMutex) {
-
-                return (mOutputConsumer != null);
-            }
-        }
-
-        @Override
-        public boolean isComplete() {
+        public boolean checkComplete() {
 
             boolean isDone = false;
 
@@ -1047,6 +1016,37 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             }
 
             return isDone;
+        }
+
+        @Nonnull
+        @Override
+        @SuppressWarnings("BooleanParameter")
+        public OutputChannel<OUTPUT> eventuallyDeadLock(final boolean throwException) {
+
+            synchronized (mMutex) {
+
+                verifyBound();
+
+                mReadTimeoutException = throwException;
+            }
+
+            return this;
+        }
+
+        @Nonnull
+        @Override
+        public OutputChannel<OUTPUT> immediately() {
+
+            return afterMax(ZERO);
+        }
+
+        @Override
+        public boolean isBound() {
+
+            synchronized (mMutex) {
+
+                return (mOutputConsumer != null);
+            }
         }
 
         @Nonnull

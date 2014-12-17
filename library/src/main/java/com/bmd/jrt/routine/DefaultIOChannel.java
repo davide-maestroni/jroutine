@@ -246,15 +246,15 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
         }
 
         @Override
-        public boolean isBound() {
+        public boolean checkComplete() {
 
-            return mChannel.isBound();
+            return mChannel.checkComplete();
         }
 
         @Override
-        public boolean isComplete() {
+        public boolean isBound() {
 
-            return mChannel.isComplete();
+            return mChannel.isBound();
         }
 
         @Nonnull

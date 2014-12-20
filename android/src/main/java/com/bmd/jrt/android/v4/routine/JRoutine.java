@@ -63,7 +63,7 @@ public class JRoutine extends com.bmd.jrt.routine.JRoutine {
      * @param fragment the fragment instance.
      * @return the invocator instance.
      * @throws IllegalStateException if the specified fragment is not enabled.
-     * @throws NullPointerException if the specified fragment is null.
+     * @throws NullPointerException  if the specified fragment is null.
      */
     @Nonnull
     public static RoutineInvocator in(@Nonnull final Fragment fragment) {
@@ -71,8 +71,8 @@ public class JRoutine extends com.bmd.jrt.routine.JRoutine {
         if (!LoaderInvocation.isEnabled(fragment)) {
 
             throw new IllegalStateException(
-                    "routine invocation is not enabled: be sure to call RoutineInvocator.enable"
-                            + "(this) in activity onCreate() method");
+                    "routine invocation is not enabled: be sure to call JRoutine.enable(this) in "
+                            + "activity onCreate() method");
         }
 
         return new DefaultRoutineInvocator(fragment);
@@ -84,7 +84,7 @@ public class JRoutine extends com.bmd.jrt.routine.JRoutine {
      * @param activity the activity instance.
      * @return the invocator instance.
      * @throws IllegalStateException if the specified activity is not enabled.
-     * @throws NullPointerException if the specified activity is null.
+     * @throws NullPointerException  if the specified activity is null.
      */
     @Nonnull
     public static RoutineInvocator in(@Nonnull final FragmentActivity activity) {
@@ -92,8 +92,8 @@ public class JRoutine extends com.bmd.jrt.routine.JRoutine {
         if (!LoaderInvocation.isEnabled(activity)) {
 
             throw new IllegalStateException(
-                    "routine invocation is not enabled: be sure to call RoutineInvocator.enable"
-                            + "(this) in activity onCreate() method");
+                    "routine invocation is not enabled: be sure to call JRoutine.enable(this) in "
+                            + "activity onCreate() method");
         }
 
         return new DefaultRoutineInvocator(activity);

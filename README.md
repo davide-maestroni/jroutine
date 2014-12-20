@@ -35,20 +35,20 @@ This paradigm is nothing but what any developer is already familiar to, that is,
 
 What the library has to offer is:
 
-* *Flat learning curve*: a single paradigm to make everything: invoke the routine, pass the inputs, read the results
-* *Extreme configurability*: each routine instance may have its own set of configurations, and its own source of concurrency
-* *Ease of integration*: no need to modify existing code to make a method asynchronous
-* *Memory optimization*: maximum number of invocations running and retained in the instance pool, and maximum number of data passed through the channels, are just some of the parameters that can be tuned to lower memory consumption
-* *Data streaming*: not all the inputs might be known at the time of invocation, and outputs might need to be fetched at specific points of the code execution
-* *Real processing abort*: invocations can be interrupted at any moment between two data are passed to the input or output channels, thus achieving real abortion of the processing and not a mere removal of a listener
-* *Non-recursive calls*: even during synchronous invocations, recursion is broken up in a sequential sequence of operations
-* *Automatic code generation*: as an alternative to reflection, existing methods can be made asynchronous through annotation pre-processing and compile-time code generation
+* ***Flat learning curve***: a single paradigm to make everything: invoke the routine, pass the inputs, read the results
+* ***Extreme configurability***: each routine instance may have its own set of configurations, and its own source of concurrency
+* ***Ease of integration***: no need to modify existing code to make a method asynchronous
+* ***Memory optimization***: maximum number of invocations running and retained in the instance pool, and maximum number of data passed through the channels, are just some of the parameters that can be tuned to lower memory consumption
+* ***Data streaming***: not all the inputs might be known at the time of invocation, and outputs might need to be fetched at specific points of the code execution
+* ***Real processing abort***: invocations can be interrupted at any moment between two data are passed to the input or output channels, thus achieving real abortion of the processing and not a mere removal of a listener
+* ***Non-recursive calls***: even during synchronous invocations, recursion is broken up in a sequential sequence of operations
+* ***Automatic code generation***: as an alternative to reflection, existing methods can be made asynchronous through annotation pre-processing and compile-time code generation
 
 And more:
 
-* *< 175KB Jar*
-* *Java 5+** *and Android 1.6+*
-* *@Nullable and @Nonnull annotations*
+* ***< 175KB Jar***
+* ***Java 5+**** ***and Android 1.6+***
+* ***@Nullable and @Nonnull annotations***
 
 (*) for older Java versions please have a look at [Retrotranslator][16].
 

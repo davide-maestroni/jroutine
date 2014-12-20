@@ -18,9 +18,15 @@ import android.content.pm.ActivityInfo;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
+import com.bmd.jrt.android.R;
+import com.bmd.jrt.android.invocator.InputClashException;
+import com.bmd.jrt.android.invocator.RoutineInvocator.ClashResolution;
+import com.bmd.jrt.android.invocator.RoutineInvocator.ResultCache;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.ClassToken;
+import com.bmd.jrt.common.RoutineException;
+import com.bmd.jrt.common.RoutineInterruptedException;
 import com.bmd.jrt.invocation.TemplateInvocation;
 import com.bmd.jrt.time.TimeDuration;
 
@@ -41,15 +47,128 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         super(TestActivity.class);
     }
 
-    public void testInputs() {
+    public void testActivityAbort() {
 
-        final TestActivity activity = getActivity();
-
-        final OutputChannel<String> result1 = JRoutine.in(activity)
+        final OutputChannel<String> result1 = JRoutine.in(getActivity())
+                                                      .withId(0)
+                                                      .onClash(ClashResolution.ABORT)
                                                       .invoke(ClassToken.tokenOf(ToUpperCase.class))
                                                       .pass("test1")
                                                       .result();
-        final OutputChannel<String> result2 = JRoutine.in(activity)
+        final OutputChannel<String> result2 = JRoutine.in(getActivity())
+                                                      .withId(0)
+                                                      .onClash(ClashResolution.ABORT)
+                                                      .invoke(ClassToken.tokenOf(ToUpperCase.class))
+                                                      .pass("test2")
+                                                      .result();
+
+        assertThat(result1.readFirst()).isEqualTo("TEST1");
+
+        try {
+
+            result2.readFirst();
+
+            fail();
+
+        } catch (final InputClashException ignored) {
+
+        }
+    }
+
+    public void testActivityClearError() {
+
+        final Data data1 = new Data();
+        final OutputChannel<Data> result1 = JRoutine.in(getActivity())
+                                                    .withId(0)
+                                                    .onComplete(ResultCache.CLEAR_IF_ERROR)
+                                                    .invoke(ClassToken.tokenOf(Abort.class))
+                                                    .pass(data1)
+                                                    .result();
+
+        try {
+
+            result1.readFirst();
+
+            fail();
+
+        } catch (final RoutineException ignored) {
+
+        }
+
+        final OutputChannel<Data> result2 = JRoutine.in(getActivity())
+                                                    .withId(0)
+                                                    .onComplete(ResultCache.CLEAR_IF_ERROR)
+                                                    .invoke(ClassToken.tokenOf(Delay.class))
+                                                    .pass(data1)
+                                                    .result();
+
+        assertThat(result2.readFirst()).isSameAs(data1);
+
+        final OutputChannel<Data> result3 = JRoutine.in(getActivity())
+                                                    .withId(0)
+                                                    .invoke(ClassToken.tokenOf(Delay.class))
+                                                    .pass(data1)
+                                                    .result();
+
+        assertThat(result3.readFirst()).isSameAs(data1);
+    }
+
+    public void testActivityClearResult() {
+
+        final Data data1 = new Data();
+        final OutputChannel<Data> result1 = JRoutine.in(getActivity())
+                                                    .withId(0)
+                                                    .onComplete(ResultCache.CLEAR_IF_RESULT)
+                                                    .invoke(ClassToken.tokenOf(Delay.class))
+                                                    .pass(data1)
+                                                    .result();
+
+        assertThat(result1.readFirst()).isSameAs(data1);
+
+        RoutineException error = null;
+        final OutputChannel<Data> result2 = JRoutine.in(getActivity())
+                                                    .withId(0)
+                                                    .onComplete(ResultCache.CLEAR_IF_RESULT)
+                                                    .invoke(ClassToken.tokenOf(Abort.class))
+                                                    .pass(data1)
+                                                    .result();
+
+        try {
+
+            result2.readFirst();
+
+            fail();
+
+        } catch (final RoutineException e) {
+
+            error = e;
+        }
+
+        final OutputChannel<Data> result3 = JRoutine.in(getActivity())
+                                                    .withId(0)
+                                                    .invoke(ClassToken.tokenOf(Abort.class))
+                                                    .pass(data1)
+                                                    .result();
+
+        try {
+
+            result3.readFirst();
+
+            fail();
+
+        } catch (final RoutineException e) {
+
+            assertThat(e).isSameAs(error);
+        }
+    }
+
+    public void testActivityInputs() {
+
+        final OutputChannel<String> result1 = JRoutine.in(getActivity())
+                                                      .invoke(ClassToken.tokenOf(ToUpperCase.class))
+                                                      .pass("test1")
+                                                      .result();
+        final OutputChannel<String> result2 = JRoutine.in(getActivity())
                                                       .invoke(ClassToken.tokenOf(ToUpperCase.class))
                                                       .pass("test2")
                                                       .result();
@@ -58,7 +177,137 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         assertThat(result2.readFirst()).isEqualTo("TEST2");
     }
 
-    public void testRotationInputs() throws InterruptedException {
+    public void testActivityKeep() {
+
+        final OutputChannel<String> result1 = JRoutine.in(getActivity())
+                                                      .withId(0)
+                                                      .onClash(ClashResolution.KEEP)
+                                                      .invoke(ClassToken.tokenOf(ToUpperCase.class))
+                                                      .pass("test1")
+                                                      .result();
+        final OutputChannel<String> result2 = JRoutine.in(getActivity())
+                                                      .withId(0)
+                                                      .onClash(ClashResolution.KEEP)
+                                                      .invoke(ClassToken.tokenOf(ToUpperCase.class))
+                                                      .pass("test2")
+                                                      .result();
+
+        assertThat(result1.readFirst()).isEqualTo("TEST1");
+        assertThat(result2.readFirst()).isEqualTo("TEST1");
+    }
+
+    public void testActivityReset() {
+
+        final OutputChannel<String> result1 = JRoutine.in(getActivity())
+                                                      .withId(0)
+                                                      .onClash(ClashResolution.RESET)
+                                                      .invoke(ClassToken.tokenOf(ToUpperCase.class))
+                                                      .pass("test1")
+                                                      .result();
+        final OutputChannel<String> result2 = JRoutine.in(getActivity())
+                                                      .withId(0)
+                                                      .onClash(ClashResolution.RESET)
+                                                      .invoke(ClassToken.tokenOf(ToUpperCase.class))
+                                                      .pass("test1")
+                                                      .result();
+
+        try {
+
+            result1.readFirst();
+
+            fail();
+
+        } catch (final RoutineException ignored) {
+
+        }
+
+        assertThat(result2.readFirst()).isEqualTo("TEST1");
+    }
+
+    public void testActivityRestart() {
+
+        final OutputChannel<String> result1 = JRoutine.in(getActivity())
+                                                      .withId(0)
+                                                      .invoke(ClassToken.tokenOf(ToUpperCase.class))
+                                                      .pass("test1")
+                                                      .result();
+        final OutputChannel<String> result2 = JRoutine.in(getActivity())
+                                                      .withId(0)
+                                                      .invoke(ClassToken.tokenOf(ToUpperCase.class))
+                                                      .pass("test2")
+                                                      .result();
+
+        try {
+
+            result1.readFirst();
+
+            fail();
+
+        } catch (final RoutineException ignored) {
+
+        }
+
+        assertThat(result2.readFirst()).isEqualTo("TEST2");
+    }
+
+    public void testActivityRetain() {
+
+        final Data data1 = new Data();
+        final OutputChannel<Data> result1 = JRoutine.in(getActivity())
+                                                    .withId(0)
+                                                    .onComplete(ResultCache.RETAIN)
+                                                    .invoke(ClassToken.tokenOf(Delay.class))
+                                                    .pass(data1)
+                                                    .result();
+
+        assertThat(result1.readFirst()).isSameAs(data1);
+
+        final OutputChannel<Data> result2 = JRoutine.in(getActivity())
+                                                    .withId(0)
+                                                    .invoke(ClassToken.tokenOf(Delay.class))
+                                                    .pass(data1)
+                                                    .result();
+
+        assertThat(result2.readFirst()).isSameAs(data1);
+
+        RoutineException error = null;
+        final OutputChannel<Data> result3 = JRoutine.in(getActivity())
+                                                    .withId(0)
+                                                    .onComplete(ResultCache.RETAIN)
+                                                    .invoke(ClassToken.tokenOf(Abort.class))
+                                                    .pass(data1)
+                                                    .result();
+
+        try {
+
+            result3.readFirst();
+
+            fail();
+
+        } catch (final RoutineException e) {
+
+            error = e;
+        }
+
+        final OutputChannel<Data> result4 = JRoutine.in(getActivity())
+                                                    .withId(0)
+                                                    .invoke(ClassToken.tokenOf(Abort.class))
+                                                    .pass(data1)
+                                                    .result();
+
+        try {
+
+            result4.readFirst();
+
+            fail();
+
+        } catch (final RoutineException e) {
+
+            assertThat(e).isSameAs(error);
+        }
+    }
+
+    public void testActivityRotationInputs() throws InterruptedException {
 
         JRoutine.in(getActivity())
                 .invoke(ClassToken.tokenOf(ToUpperCase.class))
@@ -78,8 +327,6 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         getInstrumentation().waitForIdleSync();
 
-        Thread.sleep(1000);
-
         final OutputChannel<String> result1 =
                 JRoutine.in(getActivity()).invoke(ClassToken.tokenOf(ToUpperCase.class))
                                                       .pass("test1")
@@ -93,7 +340,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         assertThat(result2.readFirst()).isEqualTo("TEST2");
     }
 
-    public void testRotationSame() throws InterruptedException {
+    public void testActivityRotationSame() throws InterruptedException {
 
         final Data data1 = new Data();
         JRoutine.in(getActivity()).invoke(ClassToken.tokenOf(Delay.class)).pass(data1).result();
@@ -108,8 +355,6 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         getInstrumentation().waitForIdleSync();
 
-        Thread.sleep(1000);
-
         final OutputChannel<Data> result1 = JRoutine.in(getActivity())
                                                     .invoke(ClassToken.tokenOf(Delay.class))
                                                     .pass(data1)
@@ -123,7 +368,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         assertThat(result2.readFirst()).isSameAs(data1);
     }
 
-    public void testSame() {
+    public void testActivitySame() {
 
         final Data data1 = new Data();
         final OutputChannel<Data> result1 = JRoutine.in(getActivity())
@@ -137,6 +382,170 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         assertThat(result1.readFirst()).isSameAs(data1);
         assertThat(result2.readFirst()).isSameAs(data1);
+    }
+
+    public void testFragmentAbort() {
+
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        final OutputChannel<String> result1 = JRoutine.in(fragment)
+                                                      .withId(0)
+                                                      .onClash(ClashResolution.ABORT)
+                                                      .invoke(ClassToken.tokenOf(ToUpperCase.class))
+                                                      .pass("test1")
+                                                      .result();
+        final OutputChannel<String> result2 = JRoutine.in(fragment)
+                                                      .withId(0)
+                                                      .onClash(ClashResolution.ABORT)
+                                                      .invoke(ClassToken.tokenOf(ToUpperCase.class))
+                                                      .pass("test2")
+                                                      .result();
+
+        assertThat(result1.readFirst()).isEqualTo("TEST1");
+
+        try {
+
+            result2.readFirst();
+
+            fail();
+
+        } catch (final InputClashException ignored) {
+
+        }
+    }
+
+    public void testFragmentInputs() throws InterruptedException {
+
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        final OutputChannel<String> result1 = JRoutine.in(fragment)
+                                                      .invoke(ClassToken.tokenOf(ToUpperCase.class))
+                                                      .pass("test1")
+                                                      .result();
+        final OutputChannel<String> result2 = JRoutine.in(fragment)
+                                                      .invoke(ClassToken.tokenOf(ToUpperCase.class))
+                                                      .pass("test2")
+                                                      .result();
+
+        assertThat(result1.readFirst()).isEqualTo("TEST1");
+        assertThat(result2.readFirst()).isEqualTo("TEST2");
+    }
+
+    public void testFragmentKeep() {
+
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        final OutputChannel<String> result1 = JRoutine.in(fragment)
+                                                      .withId(0)
+                                                      .onClash(ClashResolution.KEEP)
+                                                      .invoke(ClassToken.tokenOf(ToUpperCase.class))
+                                                      .pass("test1")
+                                                      .result();
+        final OutputChannel<String> result2 = JRoutine.in(fragment)
+                                                      .withId(0)
+                                                      .onClash(ClashResolution.KEEP)
+                                                      .invoke(ClassToken.tokenOf(ToUpperCase.class))
+                                                      .pass("test2")
+                                                      .result();
+
+        assertThat(result1.readFirst()).isEqualTo("TEST1");
+        assertThat(result2.readFirst()).isEqualTo("TEST1");
+    }
+
+    public void testFragmentReset() {
+
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        final OutputChannel<String> result1 = JRoutine.in(fragment)
+                                                      .withId(0)
+                                                      .onClash(ClashResolution.RESET)
+                                                      .invoke(ClassToken.tokenOf(ToUpperCase.class))
+                                                      .pass("test1")
+                                                      .result();
+        final OutputChannel<String> result2 = JRoutine.in(fragment)
+                                                      .withId(0)
+                                                      .onClash(ClashResolution.RESET)
+                                                      .invoke(ClassToken.tokenOf(ToUpperCase.class))
+                                                      .pass("test1")
+                                                      .result();
+
+        try {
+
+            result1.readFirst();
+
+            fail();
+
+        } catch (final RoutineException ignored) {
+
+        }
+
+        assertThat(result2.readFirst()).isEqualTo("TEST1");
+    }
+
+    public void testFragmentRestart() {
+
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        final OutputChannel<String> result1 = JRoutine.in(fragment)
+                                                      .withId(0)
+                                                      .invoke(ClassToken.tokenOf(ToUpperCase.class))
+                                                      .pass("test1")
+                                                      .result();
+        final OutputChannel<String> result2 = JRoutine.in(fragment)
+                                                      .withId(0)
+                                                      .invoke(ClassToken.tokenOf(ToUpperCase.class))
+                                                      .pass("test2")
+                                                      .result();
+
+        try {
+
+            result1.readFirst();
+
+            fail();
+
+        } catch (final RoutineException ignored) {
+
+        }
+
+        assertThat(result2.readFirst()).isEqualTo("TEST2");
+    }
+
+    public void testFragmentSame() throws InterruptedException {
+
+        final Data data1 = new Data();
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        final OutputChannel<Data> result1 =
+                JRoutine.in(fragment).invoke(ClassToken.tokenOf(Delay.class)).pass(data1).result();
+        final OutputChannel<Data> result2 =
+                JRoutine.in(fragment).invoke(ClassToken.tokenOf(Delay.class)).pass(data1).result();
+
+        assertThat(result1.readFirst()).isSameAs(data1);
+        assertThat(result2.readFirst()).isSameAs(data1);
+    }
+
+    private static class Abort extends TemplateInvocation<Data, Data> {
+
+        @Override
+        public void onInput(final Data d, @Nonnull final ResultChannel<Data> result) {
+
+            try {
+
+                Thread.sleep(500);
+
+            } catch (final InterruptedException e) {
+
+                RoutineInterruptedException.interrupt(e);
+            }
+
+            result.abort();
+        }
     }
 
     private static class Data {
@@ -157,7 +566,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         @Override
         public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
 
-            result.pass(s.toUpperCase());
+            result.after(TimeDuration.millis(500)).pass(s.toUpperCase());
         }
     }
 }

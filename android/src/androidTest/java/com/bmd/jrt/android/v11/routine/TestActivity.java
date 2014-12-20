@@ -22,6 +22,8 @@ import com.bmd.jrt.android.R;
 
 /**
  * Test activity.
+ * <p/>
+ * Created by davide on 12/16/14.
  */
 @TargetApi(VERSION_CODES.HONEYCOMB)
 public class TestActivity extends Activity {
@@ -31,7 +33,7 @@ public class TestActivity extends Activity {
 
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.test_layout);
+        setContentView(R.layout.test_v11_layout);
 
         JRoutine.enable(this);
     }

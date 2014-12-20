@@ -11,13 +11,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.android.v11.routine;
+package com.bmd.jrt.android.v4.routine;
 
-import android.annotation.TargetApi;
-import android.app.Fragment;
-import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,7 +25,6 @@ import android.view.ViewGroup;
  * <p/>
  * Created by davide on 12/16/14.
  */
-@TargetApi(VERSION_CODES.HONEYCOMB)
 public class TestFragment extends Fragment {
 
     @Override

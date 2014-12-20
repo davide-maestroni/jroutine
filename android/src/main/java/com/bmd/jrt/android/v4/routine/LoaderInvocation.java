@@ -116,8 +116,15 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
      * This method must be called in the activity <code>onCreate()</code> method.
      *
      * @param activity the activity instance.
+     * @throws NullPointerException if the specified activity is null.
      */
+    @SuppressWarnings("ConstantConditions")
     static void enable(@Nonnull final FragmentActivity activity) {
+
+        if (activity == null) {
+
+            throw new NullPointerException("the activity instance must not be null");
+        }
 
         if (!sCallbackMap.containsKey(activity)) {
 
@@ -132,8 +139,15 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
      * This method must be called in the fragment <code>onCreate()</code> method.
      *
      * @param fragment the fragment instance.
+     * @throws NullPointerException if the specified fragment is null.
      */
+    @SuppressWarnings("ConstantConditions")
     static void enable(@Nonnull final Fragment fragment) {
+
+        if (fragment == null) {
+
+            throw new NullPointerException("the fragment instance must not be null");
+        }
 
         if (!sCallbackMap.containsKey(fragment)) {
 
@@ -283,11 +297,12 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
 
             final RoutineLoader<INPUT, OUTPUT> routineLoader =
                     new RoutineLoader<INPUT, OUTPUT>(loaderContext, invocation, inputs);
-            callbacks =
-                    new RoutineLoaderCallbacks<OUTPUT>(loaderManager, routineLoader, mCacheType);
+            callbacks = new RoutineLoaderCallbacks<OUTPUT>(loaderManager, routineLoader);
             callbackArray.put(loaderId, callbacks);
             needRestart = true;
         }
+
+        callbacks.setCacheType(mCacheType);
 
         final OutputChannel<OUTPUT> outputChannel = callbacks.newChannel();
 
@@ -313,13 +328,13 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
     private static class RoutineLoaderCallbacks<OUTPUT>
             implements LoaderCallbacks<InvocationResult<OUTPUT>> {
 
-        private final ResultCache mCacheType;
-
         private final ArrayList<IOChannel<OUTPUT>> mChannels = new ArrayList<IOChannel<OUTPUT>>();
 
         private final RoutineLoader<?, OUTPUT> mLoader;
 
         private final LoaderManager mLoaderManager;
+
+        private ResultCache mCacheType;
 
         private int mResultCount;
 
@@ -328,15 +343,12 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
          *
          * @param loaderManager the loader manager.
          * @param loader        the loader instance.
-         * @param cacheType     the cache type.
          */
         private RoutineLoaderCallbacks(@Nonnull final LoaderManager loaderManager,
-                @Nonnull final RoutineLoader<?, OUTPUT> loader,
-                @Nonnull final ResultCache cacheType) {
+                @Nonnull final RoutineLoader<?, OUTPUT> loader) {
 
             mLoaderManager = loaderManager;
             mLoader = loader;
-            mCacheType = cacheType;
         }
 
         /**
@@ -408,10 +420,15 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
 
             for (final IOChannel<OUTPUT> channel : channels) {
 
-                channel.input().abort(); // TODO: abort?
+                channel.input().abort();
             }
 
             channels.clear();
+        }
+
+        private void setCacheType(@Nonnull final ResultCache cacheType) {
+
+            mCacheType = cacheType;
         }
     }
 }

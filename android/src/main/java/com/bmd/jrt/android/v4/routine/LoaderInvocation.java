@@ -112,29 +112,6 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
     }
 
     /**
-     * Enables routine invocation for the specified activity.<br/>
-     * This method must be called in the activity <code>onCreate()</code> method.
-     *
-     * @param activity the activity instance.
-     * @throws NullPointerException if the specified activity is null.
-     */
-    @SuppressWarnings("ConstantConditions")
-    static void enable(@Nonnull final FragmentActivity activity) {
-
-        if (activity == null) {
-
-            throw new NullPointerException("the activity instance must not be null");
-        }
-
-        if (!sCallbackMap.containsKey(activity)) {
-
-            sCallbackMap.put(activity, new SparseArray<RoutineLoaderCallbacks<?>>());
-        }
-
-        activity.getSupportLoaderManager();
-    }
-
-    /**
      * Enables routine invocation for the specified fragment.<br/>
      * This method must be called in the fragment <code>onCreate()</code> method.
      *
@@ -158,14 +135,26 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
     }
 
     /**
-     * Checks if the specified activity is enabled for routine invocation.
+     * Enables routine invocation for the specified activity.<br/>
+     * This method must be called in the activity <code>onCreate()</code> method.
      *
      * @param activity the activity instance.
-     * @return whether the activity is enabled.
+     * @throws NullPointerException if the specified activity is null.
      */
-    static boolean isEnabled(@Nonnull final FragmentActivity activity) {
+    @SuppressWarnings("ConstantConditions")
+    static void enable(@Nonnull final FragmentActivity activity) {
 
-        return sCallbackMap.containsKey(activity);
+        if (activity == null) {
+
+            throw new NullPointerException("the activity instance must not be null");
+        }
+
+        if (!sCallbackMap.containsKey(activity)) {
+
+            sCallbackMap.put(activity, new SparseArray<RoutineLoaderCallbacks<?>>());
+        }
+
+        activity.getSupportLoaderManager();
     }
 
     /**
@@ -173,10 +162,35 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
      *
      * @param fragment the fragment instance.
      * @return whether the fragment is enabled.
+     * @throws NullPointerException if the specified fragment is null.
      */
+    @SuppressWarnings("ConstantConditions")
     static boolean isEnabled(@Nonnull final Fragment fragment) {
 
+        if (fragment == null) {
+
+            throw new NullPointerException("the fragment instance must not be null");
+        }
+
         return sCallbackMap.containsKey(fragment);
+    }
+
+    /**
+     * Checks if the specified activity is enabled for routine invocation.
+     *
+     * @param activity the activity instance.
+     * @return whether the activity is enabled.
+     * @throws NullPointerException if the specified activity is null.
+     */
+    @SuppressWarnings("ConstantConditions")
+    static boolean isEnabled(@Nonnull final FragmentActivity activity) {
+
+        if (activity == null) {
+
+            throw new NullPointerException("the activity instance must not be null");
+        }
+
+        return sCallbackMap.containsKey(activity);
     }
 
     @Override

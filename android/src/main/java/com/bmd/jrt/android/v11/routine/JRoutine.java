@@ -75,6 +75,7 @@ public class JRoutine extends com.bmd.jrt.android.v4.routine.JRoutine {
      *
      * @param activity the activity instance.
      * @return the invocator instance.
+     * @throws IllegalStateException if the specified activity is not enabled.
      * @throws NullPointerException if the specified activity is null.
      */
     @Nonnull
@@ -103,6 +104,7 @@ public class JRoutine extends com.bmd.jrt.android.v4.routine.JRoutine {
      *
      * @param fragment the fragment instance.
      * @return the invocator instance.
+     * @throws IllegalStateException if the specified fragment is not enabled.
      * @throws NullPointerException if the specified fragment is null.
      */
     @Nonnull

@@ -36,17 +36,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 public class JRoutine extends com.bmd.jrt.routine.JRoutine {
 
     /**
-     * Enables routine invocation for the specified activity.<br/>
-     * This method must be called in the activity <code>onCreate()</code> method.
-     *
-     * @param activity the activity instance.
-     */
-    public static void enable(@Nonnull final FragmentActivity activity) {
-
-        LoaderInvocation.enable(activity);
-    }
-
-    /**
      * Enables routine invocation for the specified fragment.<br/>
      * This method must be called in the fragment <code>onCreate()</code> method.
      *
@@ -58,23 +47,14 @@ public class JRoutine extends com.bmd.jrt.routine.JRoutine {
     }
 
     /**
-     * Returns an invocator operating in the specified context.
+     * Enables routine invocation for the specified activity.<br/>
+     * This method must be called in the activity <code>onCreate()</code> method.
      *
      * @param activity the activity instance.
-     * @return the invocator instance.
-     * @throws NullPointerException if the specified activity is null.
      */
-    @Nonnull
-    public static RoutineInvocator in(@Nonnull final FragmentActivity activity) {
+    public static void enable(@Nonnull final FragmentActivity activity) {
 
-        if (!LoaderInvocation.isEnabled(activity)) {
-
-            throw new IllegalStateException(
-                    "routine invocation is not enabled: be sure to call RoutineInvocator.enable"
-                            + "(this) in activity onCreate() method");
-        }
-
-        return new DefaultRoutineInvocator(activity);
+        LoaderInvocation.enable(activity);
     }
 
     /**
@@ -82,6 +62,7 @@ public class JRoutine extends com.bmd.jrt.routine.JRoutine {
      *
      * @param fragment the fragment instance.
      * @return the invocator instance.
+     * @throws IllegalStateException if the specified fragment is not enabled.
      * @throws NullPointerException if the specified fragment is null.
      */
     @Nonnull
@@ -95,5 +76,26 @@ public class JRoutine extends com.bmd.jrt.routine.JRoutine {
         }
 
         return new DefaultRoutineInvocator(fragment);
+    }
+
+    /**
+     * Returns an invocator operating in the specified context.
+     *
+     * @param activity the activity instance.
+     * @return the invocator instance.
+     * @throws IllegalStateException if the specified activity is not enabled.
+     * @throws NullPointerException if the specified activity is null.
+     */
+    @Nonnull
+    public static RoutineInvocator in(@Nonnull final FragmentActivity activity) {
+
+        if (!LoaderInvocation.isEnabled(activity)) {
+
+            throw new IllegalStateException(
+                    "routine invocation is not enabled: be sure to call RoutineInvocator.enable"
+                            + "(this) in activity onCreate() method");
+        }
+
+        return new DefaultRoutineInvocator(activity);
     }
 }

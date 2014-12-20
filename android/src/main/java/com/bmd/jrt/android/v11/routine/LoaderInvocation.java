@@ -165,8 +165,15 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
      *
      * @param activity the activity instance.
      * @return whether the activity is enabled.
+     * @throws NullPointerException if the specified activity is null.
      */
+    @SuppressWarnings("ConstantConditions")
     static boolean isEnabled(@Nonnull final Activity activity) {
+
+        if (activity == null) {
+
+            throw new NullPointerException("the activity instance must not be null");
+        }
 
         return sCallbackMap.containsKey(activity);
     }
@@ -176,8 +183,15 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
      *
      * @param fragment the fragment instance.
      * @return whether the fragment is enabled.
+     * @throws NullPointerException if the specified fragment is null.
      */
+    @SuppressWarnings("ConstantConditions")
     static boolean isEnabled(@Nonnull final Fragment fragment) {
+
+        if (fragment == null) {
+
+            throw new NullPointerException("the fragment instance must not be null");
+        }
 
         return sCallbackMap.containsKey(fragment);
     }

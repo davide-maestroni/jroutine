@@ -14,13 +14,15 @@
 package com.bmd.jrt.android.v11.routine;
 
 import android.annotation.TargetApi;
-import android.content.pm.ActivityInfo;
+import android.app.Activity;
+import android.app.Fragment;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.bmd.jrt.android.R;
 import com.bmd.jrt.android.invocator.InputClashException;
+import com.bmd.jrt.android.invocator.RoutineClashException;
 import com.bmd.jrt.android.invocator.RoutineInvocator.ClashResolution;
 import com.bmd.jrt.android.invocator.RoutineInvocator.ResultCache;
 import com.bmd.jrt.channel.OutputChannel;
@@ -30,6 +32,8 @@ import com.bmd.jrt.common.RoutineException;
 import com.bmd.jrt.common.RoutineInterruptedException;
 import com.bmd.jrt.invocation.TemplateInvocation;
 import com.bmd.jrt.time.TimeDuration;
+
+import java.util.concurrent.Semaphore;
 
 import javax.annotation.Nonnull;
 
@@ -362,13 +366,19 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                 .pass("test2")
                 .result();
 
-        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        getInstrumentation().waitForIdleSync();
+        final Semaphore semaphore = new Semaphore(0);
 
-        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        getInstrumentation().waitForIdleSync();
+        getActivity().runOnUiThread(new Runnable() {
 
-        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            @Override
+            public void run() {
+
+                getActivity().recreate();
+                semaphore.release();
+            }
+        });
+
+        semaphore.acquire();
         getInstrumentation().waitForIdleSync();
 
         final OutputChannel<String> result1 = JRoutine.in(getActivity())
@@ -395,13 +405,19 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         JRoutine.in(getActivity()).invoke(ClassToken.tokenOf(Delay.class)).pass(data1).result();
         JRoutine.in(getActivity()).invoke(ClassToken.tokenOf(Delay.class)).pass(data1).result();
 
-        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        getInstrumentation().waitForIdleSync();
+        final Semaphore semaphore = new Semaphore(0);
 
-        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        getInstrumentation().waitForIdleSync();
+        getActivity().runOnUiThread(new Runnable() {
 
-        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            @Override
+            public void run() {
+
+                getActivity().recreate();
+                semaphore.release();
+            }
+        });
+
+        semaphore.acquire();
         getInstrumentation().waitForIdleSync();
 
         final OutputChannel<Data> result1 = JRoutine.in(getActivity())
@@ -436,6 +452,109 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         assertThat(result1.readFirst()).isSameAs(data1);
         assertThat(result2.readFirst()).isSameAs(data1);
+    }
+
+    public void testClash() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final Data data1 = new Data();
+        final OutputChannel<Data> result1 = JRoutine.in(getActivity())
+                                                    .withId(0)
+                                                    .onComplete(ResultCache.RETAIN)
+                                                    .invoke(ClassToken.tokenOf(Delay.class))
+                                                    .pass(data1)
+                                                    .result();
+
+        assertThat(result1.readFirst()).isSameAs(data1);
+
+        final OutputChannel<Data> result2 = JRoutine.in(getActivity())
+                                                    .withId(0)
+                                                    .invoke(ClassToken.tokenOf(Abort.class))
+                                                    .pass(data1)
+                                                    .result();
+
+        try {
+
+            result2.readFirst();
+
+            fail();
+
+        } catch (final RoutineClashException ignored) {
+
+        }
+    }
+
+    @SuppressWarnings({"ConstantConditions", "RedundantCast"})
+    public void testErrors() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        try {
+
+            JRoutine.enable((Activity) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.enable((Fragment) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.in((Activity) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.in((Fragment) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.in(new TestActivity());
+
+            fail();
+
+        } catch (final IllegalStateException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.in(new TestFragment());
+
+            fail();
+
+        } catch (final IllegalStateException ignored) {
+
+        }
     }
 
     public void testFragmentAbort() {

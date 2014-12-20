@@ -40,6 +40,7 @@ public class JRoutine extends com.bmd.jrt.routine.JRoutine {
      * This method must be called in the fragment <code>onCreate()</code> method.
      *
      * @param fragment the fragment instance.
+     * @throws NullPointerException if the specified fragment is null.
      */
     public static void enable(@Nonnull final Fragment fragment) {
 
@@ -51,6 +52,7 @@ public class JRoutine extends com.bmd.jrt.routine.JRoutine {
      * This method must be called in the activity <code>onCreate()</code> method.
      *
      * @param activity the activity instance.
+     * @throws NullPointerException if the specified activity is null.
      */
     public static void enable(@Nonnull final FragmentActivity activity) {
 

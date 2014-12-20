@@ -52,7 +52,6 @@ class DefaultRoutineInvocator implements RoutineInvocator {
      * Constructor.
      *
      * @param activity the context activity.
-     * @throws NullPointerException if the specified activity is null.
      */
     DefaultRoutineInvocator(@Nonnull final Activity activity) {
 
@@ -63,7 +62,6 @@ class DefaultRoutineInvocator implements RoutineInvocator {
      * Constructor.
      *
      * @param fragment the context fragment.
-     * @throws NullPointerException if the specified fragment is null.
      */
     DefaultRoutineInvocator(@Nonnull final Fragment fragment) {
 

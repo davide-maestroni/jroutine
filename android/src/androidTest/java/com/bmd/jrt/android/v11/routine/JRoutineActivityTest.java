@@ -33,6 +33,7 @@ import com.bmd.jrt.common.RoutineInterruptedException;
 import com.bmd.jrt.invocation.TemplateInvocation;
 import com.bmd.jrt.time.TimeDuration;
 
+import java.lang.ref.WeakReference;
 import java.util.concurrent.Semaphore;
 
 import javax.annotation.Nonnull;
@@ -731,6 +732,56 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         assertThat(result1.readFirst()).isSameAs(data1);
         assertThat(result2.readFirst()).isSameAs(data1);
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public void testLoaderError() throws NoSuchMethodException {
+
+        try {
+
+            new LoaderInvocation<String, String>(null, 0, ClashResolution.KEEP, ResultCache.RETAIN,
+                                                 ToUpperCase.class.getDeclaredConstructor());
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new LoaderInvocation<String, String>(new WeakReference<Object>(getActivity()), 0, null,
+                                                 ResultCache.RETAIN,
+                                                 ToUpperCase.class.getDeclaredConstructor());
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new LoaderInvocation<String, String>(new WeakReference<Object>(getActivity()), 0,
+                                                 ClashResolution.KEEP, null,
+                                                 ToUpperCase.class.getDeclaredConstructor());
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new LoaderInvocation<String, String>(new WeakReference<Object>(getActivity()), 0,
+                                                 ClashResolution.KEEP, ResultCache.RETAIN, null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
     }
 
     private static class Abort extends TemplateInvocation<Data, Data> {

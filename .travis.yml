@@ -1,4 +1,9 @@
 language: android
+
+# Enable Docker
+sudo: false
+
+# Android environment setup
 android:
   components:
     # The BuildTools version

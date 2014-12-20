@@ -737,6 +737,11 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
     @SuppressWarnings("ConstantConditions")
     public void testLoaderError() throws NoSuchMethodException {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         try {
 
             new LoaderInvocation<String, String>(null, 0, ClashResolution.KEEP, ResultCache.RETAIN,

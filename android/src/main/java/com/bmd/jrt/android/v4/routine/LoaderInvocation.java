@@ -126,12 +126,15 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
             throw new NullPointerException("the fragment instance must not be null");
         }
 
-        if (!sCallbackMap.containsKey(fragment)) {
+        synchronized (sCallbackMap) {
 
-            sCallbackMap.put(fragment, new SparseArray<RoutineLoaderCallbacks<?>>());
+            if (!sCallbackMap.containsKey(fragment)) {
+
+                sCallbackMap.put(fragment, new SparseArray<RoutineLoaderCallbacks<?>>());
+            }
+
+            fragment.getLoaderManager();
         }
-
-        fragment.getLoaderManager();
     }
 
     /**
@@ -149,12 +152,15 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
             throw new NullPointerException("the activity instance must not be null");
         }
 
-        if (!sCallbackMap.containsKey(activity)) {
+        synchronized (sCallbackMap) {
 
-            sCallbackMap.put(activity, new SparseArray<RoutineLoaderCallbacks<?>>());
+            if (!sCallbackMap.containsKey(activity)) {
+
+                sCallbackMap.put(activity, new SparseArray<RoutineLoaderCallbacks<?>>());
+            }
+
+            activity.getSupportLoaderManager();
         }
-
-        activity.getSupportLoaderManager();
     }
 
     /**
@@ -172,7 +178,10 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
             throw new NullPointerException("the fragment instance must not be null");
         }
 
-        return sCallbackMap.containsKey(fragment);
+        synchronized (sCallbackMap) {
+
+            return sCallbackMap.containsKey(fragment);
+        }
     }
 
     /**
@@ -190,7 +199,10 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
             throw new NullPointerException("the activity instance must not be null");
         }
 
-        return sCallbackMap.containsKey(activity);
+        synchronized (sCallbackMap) {
+
+            return sCallbackMap.containsKey(activity);
+        }
     }
 
     @Override

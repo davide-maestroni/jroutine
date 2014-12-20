@@ -60,7 +60,7 @@ For anything else [GitHub][10] is a great source of inspiration.
 
 ##Usage examples
 
-Please have a look to the dedicated [wiki page][5].
+Please have a look at the dedicated [wiki page][5].
 
 ##Documentation
 

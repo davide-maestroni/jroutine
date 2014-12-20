@@ -38,7 +38,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
                     justification = "utility class extending functionalities of another utility "
                             + "class")
 @TargetApi(VERSION_CODES.HONEYCOMB)
-public class JRoutine extends com.bmd.jrt.android.v4.routine.JRoutine {
+public class JRoutine extends com.bmd.jrt.routine.JRoutine {
 
     /**
      * Enables routine invocation for the specified activity.<br/>

@@ -22,11 +22,11 @@ import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.util.SparseArray;
 
-import com.bmd.jrt.android.invocator.InputClashException;
-import com.bmd.jrt.android.invocator.RoutineClashException;
-import com.bmd.jrt.android.invocator.RoutineInvocator;
-import com.bmd.jrt.android.invocator.RoutineInvocator.ClashResolution;
-import com.bmd.jrt.android.invocator.RoutineInvocator.ResultCache;
+import com.bmd.jrt.android.builder.AndroidRoutineBuilder;
+import com.bmd.jrt.android.builder.AndroidRoutineBuilder.ClashResolution;
+import com.bmd.jrt.android.builder.AndroidRoutineBuilder.ResultCache;
+import com.bmd.jrt.android.builder.InputClashException;
+import com.bmd.jrt.android.builder.RoutineClashException;
 import com.bmd.jrt.channel.IOChannel;
 import com.bmd.jrt.channel.IOChannel.IOChannelInput;
 import com.bmd.jrt.channel.OutputChannel;
@@ -119,7 +119,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
      * @throws NullPointerException if the specified fragment is null.
      */
     @SuppressWarnings("ConstantConditions")
-    static void enable(@Nonnull final Fragment fragment) {
+    static void initContext(@Nonnull final Fragment fragment) {
 
         if (fragment == null) {
 
@@ -145,7 +145,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
      * @throws NullPointerException if the specified activity is null.
      */
     @SuppressWarnings("ConstantConditions")
-    static void enable(@Nonnull final FragmentActivity activity) {
+    static void initContext(@Nonnull final FragmentActivity activity) {
 
         if (activity == null) {
 
@@ -248,7 +248,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
         final Constructor<? extends Invocation<INPUT, OUTPUT>> constructor = mConstructor;
         int loaderId = mLoaderId;
 
-        if (loaderId == RoutineInvocator.GENERATED_ID) {
+        if (loaderId == AndroidRoutineBuilder.GENERATED) {
 
             loaderId = 31 * constructor.getDeclaringClass().hashCode() + inputs.hashCode();
         }
@@ -426,8 +426,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
                 final ResultCache cacheType = mCacheType;
 
                 if ((cacheType == ResultCache.CLEAR) || (result.isError() ? (cacheType
-                        == ResultCache.CLEAR_IF_ERROR)
-                        : (cacheType == ResultCache.CLEAR_IF_RESULT))) {
+                        == ResultCache.RETAIN_RESULT) : (cacheType == ResultCache.RETAIN_ERROR))) {
 
                     mLoaderManager.destroyLoader(internalLoader.getId());
                 }

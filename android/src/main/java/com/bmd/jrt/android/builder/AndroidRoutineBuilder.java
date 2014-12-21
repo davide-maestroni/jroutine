@@ -11,19 +11,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.android.invocator;
+package com.bmd.jrt.android.builder;
 
-import com.bmd.jrt.channel.ParameterChannel;
-import com.bmd.jrt.common.ClassToken;
-import com.bmd.jrt.invocation.Invocation;
+import com.bmd.jrt.routine.Routine;
 
 import javax.annotation.Nonnull;
 
 /**
- * Interface defining an helper class used to invoke routines linked to a context lifecycle.
+ * Interface defining an builder of routines linked to a context lifecycle.
  * <p/>
- * Routine invocations started through the implementing classes can be safely restored after a
- * change in the configuration, so to avoid duplicated calls and memory leaks.
+ * Routine invocations started through the returned objects can be safely restored after a change in
+ * the configuration, so to avoid duplicated calls and memory leaks.
  * <p/>
  * Note that the <code>equals()</code> and <code>hashCode()</code> methods of the input parameter
  * objects might be employed to check for clashing of invocations or compute the invocation ID.<br/>
@@ -32,26 +30,22 @@ import javax.annotation.Nonnull;
  * avoid unexpected results.
  * <p/>
  * Created by davide on 12/9/14.
+ *
+ * @param <INPUT>  the input data type.
+ * @param <OUTPUT> the output data type.
  */
-public interface RoutineInvocator {
+public interface AndroidRoutineBuilder<INPUT, OUTPUT> {
 
     /**
      * Constant identifying a routine ID computed from the executor class and the input parameters.
      */
-    public static final int GENERATED_ID = Integer.MIN_VALUE;
+    public static final int GENERATED = Integer.MIN_VALUE;
 
     /**
-     * Invokes the routine employing the specified executor.
-     *
-     * @param classToken the invocation class token.
-     * @param <INPUT>    the input data type.
-     * @param <OUTPUT>   the output data type.
-     * @return the routine parameter channel.
-     * @throws NullPointerException if the specified token is null.
+     * @return
      */
     @Nonnull
-    public <INPUT, OUTPUT> ParameterChannel<INPUT, OUTPUT> invoke(
-            @Nonnull ClassToken<? extends Invocation<INPUT, OUTPUT>> classToken);
+    public Routine<INPUT, OUTPUT> buildRoutine();
 
     /**
      * Tells the invocator how to resolve clashes of invocation inputs. A clash happens when an
@@ -62,7 +56,7 @@ public interface RoutineInvocator {
      * @throws NullPointerException if the specified resolution type is null.
      */
     @Nonnull
-    public RoutineInvocator onClash(@Nonnull ClashResolution resolution);
+    public AndroidRoutineBuilder<INPUT, OUTPUT> onClash(@Nonnull ClashResolution resolution);
 
     /**
      * Tells the invocator how to cache the invocation result after its completion.
@@ -72,7 +66,7 @@ public interface RoutineInvocator {
      * @throws NullPointerException if the specified cache type is null.
      */
     @Nonnull
-    public RoutineInvocator onComplete(@Nonnull ResultCache cacheType);
+    public AndroidRoutineBuilder<INPUT, OUTPUT> onComplete(@Nonnull ResultCache cacheType);
 
     /**
      * Tells the invocator to identify the invocation with the specified ID.
@@ -81,7 +75,7 @@ public interface RoutineInvocator {
      * @return this invocator.
      */
     @Nonnull
-    public RoutineInvocator withId(int id);
+    public AndroidRoutineBuilder<INPUT, OUTPUT> withId(int id);
 
     /**
      * Invocation clash resolution enumeration.<br/>
@@ -138,12 +132,12 @@ public interface RoutineInvocator {
         /**
          * Only in case of error the results are cleared, otherwise they are retained.
          */
-        CLEAR_IF_ERROR,
+        RETAIN_RESULT,
         /**
          * Only in case of successful completion the results are cleared, otherwise they are
          * retained.
          */
-        CLEAR_IF_RESULT,
+        RETAIN_ERROR,
         /**
          * On completion the invocation results are retained.
          */

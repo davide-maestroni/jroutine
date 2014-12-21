@@ -32,6 +32,6 @@ public class TestActivity extends FragmentActivity {
 
         setContentView(R.layout.test_v4_layout);
 
-        JRoutine.enable(this);
+        JRoutine.initContext(this);
     }
 }

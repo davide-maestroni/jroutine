@@ -11,10 +11,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.bmd.jrt.android.builder;
 
 /**
- * Android routine invocation definitions.
+ * Exception indicating a clash of routine invocations with the same ID but different input data.
  * <p/>
- * Created by davide on 10/10/14.
+ * Created by davide on 12/14/14.
  */
-package com.bmd.jrt.android.invocator;
+public class InputClashException extends RoutineClashException {
+
+    /**
+     * Constructor.
+     *
+     * @param id the invocation ID.
+     */
+    public InputClashException(final int id) {
+
+        super(id);
+    }
+}

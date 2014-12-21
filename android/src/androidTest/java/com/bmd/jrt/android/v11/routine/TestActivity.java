@@ -35,6 +35,6 @@ public class TestActivity extends Activity {
 
         setContentView(R.layout.test_v11_layout);
 
-        JRoutine.enable(this);
+        JRoutine.initContext(this);
     }
 }

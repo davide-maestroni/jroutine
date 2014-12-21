@@ -19,7 +19,9 @@ import android.app.Fragment;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 
-import com.bmd.jrt.android.invocator.RoutineInvocator;
+import com.bmd.jrt.android.builder.AndroidRoutineBuilder;
+import com.bmd.jrt.common.ClassToken;
+import com.bmd.jrt.invocation.Invocation;
 
 import javax.annotation.Nonnull;
 
@@ -41,47 +43,20 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 public class JRoutine extends com.bmd.jrt.routine.JRoutine {
 
     /**
-     * Enables routine invocation for the specified activity.<br/>
-     * This method must be called in the activity <code>onCreate()</code> method.
+     * Returns a builder of routines linked to the specified context.
      *
-     * @param activity the activity instance.
-     * @throws NullPointerException if the specified activity is null.
-     */
-    public static void enable(@Nonnull final Activity activity) {
-
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            throw new UnsupportedOperationException(
-                    "this method is supported only with API level >= " +
-                            VERSION_CODES.HONEYCOMB
-                            + ": use com.bmd.jrt.android.v4.routine.JRoutine class instead");
-        }
-
-        LoaderInvocation.enable(activity);
-    }
-
-    /**
-     * Enables routine invocation for the specified fragment.<br/>
-     * This method must be called in the fragment <code>onCreate()</code> method.
-     *
-     * @param fragment the fragment instance.
-     * @throws NullPointerException if the specified fragment is null.
-     */
-    public static void enable(@Nonnull final Fragment fragment) {
-
-        LoaderInvocation.enable(fragment);
-    }
-
-    /**
-     * Returns an invocator operating in the specified context.
-     *
-     * @param activity the activity instance.
-     * @return the invocator instance.
-     * @throws IllegalStateException if the specified activity is not enabled.
-     * @throws NullPointerException  if the specified activity is null.
+     * @param activity   the activity instance.
+     * @param classToken the invocation class token.
+     * @param <INPUT>    the input data type.
+     * @param <OUTPUT>   the output data type.
+     * @return the routine builder instance.
+     * @throws IllegalStateException if the specified activity is not initialized.
+     * @throws NullPointerException  if any of the specified parameters is null.
      */
     @Nonnull
-    public static RoutineInvocator in(@Nonnull final Activity activity) {
+    public static <INPUT, OUTPUT> AndroidRoutineBuilder<INPUT, OUTPUT> from(
+            @Nonnull final Activity activity,
+            @Nonnull ClassToken<? extends Invocation<INPUT, OUTPUT>> classToken) {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
 
@@ -94,31 +69,70 @@ public class JRoutine extends com.bmd.jrt.routine.JRoutine {
         if (!LoaderInvocation.isEnabled(activity)) {
 
             throw new IllegalStateException(
-                    "routine invocation is not enabled: be sure to call JRoutine.enable(this) in "
-                            + "activity onCreate() method");
+                    "routine creation is not enabled: be sure to call JRoutine.initContext(this) "
+                            + "in activity onCreate() method");
         }
 
-        return new DefaultRoutineInvocator(activity);
+        return new DefaultAndroidRoutineBuilder<INPUT, OUTPUT>(activity, classToken);
     }
 
     /**
-     * Returns an invocator operating in the specified context.
+     * Returns a builder of routines linked to the specified context.
      *
-     * @param fragment the fragment instance.
-     * @return the invocator instance.
-     * @throws IllegalStateException if the specified fragment is not enabled.
-     * @throws NullPointerException  if the specified fragment is null.
+     * @param fragment   the fragment instance.
+     * @param classToken the invocation class token.
+     * @param <INPUT>    the input data type.
+     * @param <OUTPUT>   the output data type.
+     * @return the routine builder instance.
+     * @throws IllegalStateException if the specified activity is not initialized.
+     * @throws NullPointerException  if any of the specified parameters is null.
      */
     @Nonnull
-    public static RoutineInvocator in(@Nonnull final Fragment fragment) {
+    public static <INPUT, OUTPUT> AndroidRoutineBuilder<INPUT, OUTPUT> from(
+            @Nonnull final Fragment fragment,
+            @Nonnull ClassToken<? extends Invocation<INPUT, OUTPUT>> classToken) {
 
         if (!LoaderInvocation.isEnabled(fragment)) {
 
             throw new IllegalStateException(
-                    "routine invocation is not enabled: be sure to call JRoutine.enable(this) in "
-                            + "fragment onCreate() method");
+                    "routine creation is not enabled: be sure to call JRoutine.initContext(this) "
+                            + "in fragment onCreate() method");
         }
 
-        return new DefaultRoutineInvocator(fragment);
+        return new DefaultAndroidRoutineBuilder<INPUT, OUTPUT>(fragment, classToken);
+    }
+
+    /**
+     * Initializes the specified context so to enable the creation of routines linked to the context
+     * lifecycle.<br/>
+     * This method must be called in the activity <code>onCreate()</code> method.
+     *
+     * @param activity the activity instance.
+     * @throws NullPointerException if the specified activity is null.
+     */
+    public static void initContext(@Nonnull final Activity activity) {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            throw new UnsupportedOperationException(
+                    "this method is supported only with API level >= " +
+                            VERSION_CODES.HONEYCOMB
+                            + ": use com.bmd.jrt.android.v4.routine.JRoutine class instead");
+        }
+
+        LoaderInvocation.initContext(activity);
+    }
+
+    /**
+     * Initializes the specified context so to enable the creation of routines linked to the context
+     * lifecycle.<br/>
+     * This method must be called in the fragment <code>onCreate()</code> method.
+     *
+     * @param fragment the fragment instance.
+     * @throws NullPointerException if the specified fragment is null.
+     */
+    public static void initContext(@Nonnull final Fragment fragment) {
+
+        LoaderInvocation.initContext(fragment);
     }
 }

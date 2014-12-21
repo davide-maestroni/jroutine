@@ -21,16 +21,17 @@ import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.bmd.jrt.android.R;
-import com.bmd.jrt.android.invocator.InputClashException;
-import com.bmd.jrt.android.invocator.RoutineClashException;
-import com.bmd.jrt.android.invocator.RoutineInvocator.ClashResolution;
-import com.bmd.jrt.android.invocator.RoutineInvocator.ResultCache;
+import com.bmd.jrt.android.builder.AndroidRoutineBuilder.ClashResolution;
+import com.bmd.jrt.android.builder.AndroidRoutineBuilder.ResultCache;
+import com.bmd.jrt.android.builder.InputClashException;
+import com.bmd.jrt.android.builder.RoutineClashException;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.common.RoutineException;
 import com.bmd.jrt.common.RoutineInterruptedException;
 import com.bmd.jrt.invocation.TemplateInvocation;
+import com.bmd.jrt.routine.Routine;
 import com.bmd.jrt.time.TimeDuration;
 
 import java.lang.ref.WeakReference;
@@ -60,18 +61,13 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
-        final OutputChannel<String> result1 = JRoutine.in(getActivity())
-                                                      .withId(0)
-                                                      .onClash(ClashResolution.ABORT)
-                                                      .invoke(ClassToken.tokenOf(ToUpperCase.class))
-                                                      .pass("test1")
-                                                      .result();
-        final OutputChannel<String> result2 = JRoutine.in(getActivity())
-                                                      .withId(0)
-                                                      .onClash(ClashResolution.ABORT)
-                                                      .invoke(ClassToken.tokenOf(ToUpperCase.class))
-                                                      .pass("test2")
-                                                      .result();
+        final Routine<String, String> routine =
+                JRoutine.from(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
+                        .withId(0)
+                        .onClash(ClashResolution.ABORT)
+                        .buildRoutine();
+        final OutputChannel<String> result1 = routine.callAsync("test1");
+        final OutputChannel<String> result2 = routine.callAsync("test2");
 
         assertThat(result1.readFirst()).isEqualTo("TEST1");
 
@@ -94,12 +90,12 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         }
 
         final Data data1 = new Data();
-        final OutputChannel<Data> result1 = JRoutine.in(getActivity())
-                                                    .withId(0)
-                                                    .onComplete(ResultCache.CLEAR_IF_ERROR)
-                                                    .invoke(ClassToken.tokenOf(Abort.class))
-                                                    .pass(data1)
-                                                    .result();
+        final OutputChannel<Data> result1 =
+                JRoutine.from(getActivity(), ClassToken.tokenOf(Abort.class))
+                        .withId(0)
+                        .onComplete(ResultCache.RETAIN_RESULT)
+                        .buildRoutine()
+                        .callAsync(data1);
 
         try {
 
@@ -111,20 +107,20 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         }
 
-        final OutputChannel<Data> result2 = JRoutine.in(getActivity())
-                                                    .withId(0)
-                                                    .onComplete(ResultCache.CLEAR_IF_ERROR)
-                                                    .invoke(ClassToken.tokenOf(Delay.class))
-                                                    .pass(data1)
-                                                    .result();
+        final OutputChannel<Data> result2 =
+                JRoutine.from(getActivity(), ClassToken.tokenOf(Delay.class))
+                        .withId(0)
+                        .onComplete(ResultCache.RETAIN_RESULT)
+                        .buildRoutine()
+                        .callAsync(data1);
 
         assertThat(result2.readFirst()).isSameAs(data1);
 
-        final OutputChannel<Data> result3 = JRoutine.in(getActivity())
-                                                    .withId(0)
-                                                    .invoke(ClassToken.tokenOf(Delay.class))
-                                                    .pass(data1)
-                                                    .result();
+        final OutputChannel<Data> result3 =
+                JRoutine.from(getActivity(), ClassToken.tokenOf(Delay.class))
+                        .withId(0)
+                        .buildRoutine()
+                        .callAsync(data1);
 
         assertThat(result3.readFirst()).isSameAs(data1);
     }
@@ -137,22 +133,22 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         }
 
         final Data data1 = new Data();
-        final OutputChannel<Data> result1 = JRoutine.in(getActivity())
-                                                    .withId(0)
-                                                    .onComplete(ResultCache.CLEAR_IF_RESULT)
-                                                    .invoke(ClassToken.tokenOf(Delay.class))
-                                                    .pass(data1)
-                                                    .result();
+        final OutputChannel<Data> result1 =
+                JRoutine.from(getActivity(), ClassToken.tokenOf(Delay.class))
+                        .withId(0)
+                        .onComplete(ResultCache.RETAIN_ERROR)
+                        .buildRoutine()
+                        .callAsync(data1);
 
         assertThat(result1.readFirst()).isSameAs(data1);
 
         RoutineException error = null;
-        final OutputChannel<Data> result2 = JRoutine.in(getActivity())
-                                                    .withId(0)
-                                                    .onComplete(ResultCache.CLEAR_IF_RESULT)
-                                                    .invoke(ClassToken.tokenOf(Abort.class))
-                                                    .pass(data1)
-                                                    .result();
+        final OutputChannel<Data> result2 =
+                JRoutine.from(getActivity(), ClassToken.tokenOf(Abort.class))
+                        .withId(0)
+                        .onComplete(ResultCache.RETAIN_ERROR)
+                        .buildRoutine()
+                        .callAsync(data1);
 
         try {
 
@@ -165,11 +161,11 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             error = e;
         }
 
-        final OutputChannel<Data> result3 = JRoutine.in(getActivity())
-                                                    .withId(0)
-                                                    .invoke(ClassToken.tokenOf(Abort.class))
-                                                    .pass(data1)
-                                                    .result();
+        final OutputChannel<Data> result3 =
+                JRoutine.from(getActivity(), ClassToken.tokenOf(Abort.class))
+                        .withId(0)
+                        .buildRoutine()
+                        .callAsync(data1);
 
         try {
 
@@ -190,14 +186,10 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
-        final OutputChannel<String> result1 = JRoutine.in(getActivity())
-                                                      .invoke(ClassToken.tokenOf(ToUpperCase.class))
-                                                      .pass("test1")
-                                                      .result();
-        final OutputChannel<String> result2 = JRoutine.in(getActivity())
-                                                      .invoke(ClassToken.tokenOf(ToUpperCase.class))
-                                                      .pass("test2")
-                                                      .result();
+        final Routine<String, String> routine =
+                JRoutine.from(getActivity(), ClassToken.tokenOf(ToUpperCase.class)).buildRoutine();
+        final OutputChannel<String> result1 = routine.callAsync("test1");
+        final OutputChannel<String> result2 = routine.callAsync("test2");
 
         assertThat(result1.readFirst()).isEqualTo("TEST1");
         assertThat(result2.readFirst()).isEqualTo("TEST2");
@@ -210,18 +202,13 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
-        final OutputChannel<String> result1 = JRoutine.in(getActivity())
-                                                      .withId(0)
-                                                      .onClash(ClashResolution.KEEP)
-                                                      .invoke(ClassToken.tokenOf(ToUpperCase.class))
-                                                      .pass("test1")
-                                                      .result();
-        final OutputChannel<String> result2 = JRoutine.in(getActivity())
-                                                      .withId(0)
-                                                      .onClash(ClashResolution.KEEP)
-                                                      .invoke(ClassToken.tokenOf(ToUpperCase.class))
-                                                      .pass("test2")
-                                                      .result();
+        final Routine<String, String> routine =
+                JRoutine.from(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
+                        .withId(0)
+                        .onClash(ClashResolution.KEEP)
+                        .buildRoutine();
+        final OutputChannel<String> result1 = routine.callAsync("test1");
+        final OutputChannel<String> result2 = routine.callAsync("test2");
 
         assertThat(result1.readFirst()).isEqualTo("TEST1");
         assertThat(result2.readFirst()).isEqualTo("TEST1");
@@ -234,18 +221,13 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
-        final OutputChannel<String> result1 = JRoutine.in(getActivity())
-                                                      .withId(0)
-                                                      .onClash(ClashResolution.RESET)
-                                                      .invoke(ClassToken.tokenOf(ToUpperCase.class))
-                                                      .pass("test1")
-                                                      .result();
-        final OutputChannel<String> result2 = JRoutine.in(getActivity())
-                                                      .withId(0)
-                                                      .onClash(ClashResolution.RESET)
-                                                      .invoke(ClassToken.tokenOf(ToUpperCase.class))
-                                                      .pass("test1")
-                                                      .result();
+        final Routine<String, String> routine =
+                JRoutine.from(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
+                        .withId(0)
+                        .onClash(ClashResolution.RESET)
+                        .buildRoutine();
+        final OutputChannel<String> result1 = routine.callAsync("test1");
+        final OutputChannel<String> result2 = routine.callAsync("test1");
 
         try {
 
@@ -267,14 +249,13 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
-        final OutputChannel<String> result1 = JRoutine.in(getActivity()).withId(0)
-                                                      .invoke(ClassToken.tokenOf(ToUpperCase.class))
-                                                      .pass("test1")
-                                                      .result();
-        final OutputChannel<String> result2 = JRoutine.in(getActivity()).withId(0)
-                                                      .invoke(ClassToken.tokenOf(ToUpperCase.class))
-                                                      .pass("test2")
-                                                      .result();
+        final Routine<String, String> routine =
+                JRoutine.from(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
+                        .withId(0)
+                        .onClash(ClashResolution.RESTART)
+                        .buildRoutine();
+        final OutputChannel<String> result1 = routine.callAsync("test1");
+        final OutputChannel<String> result2 = routine.callAsync("test2");
 
         try {
 
@@ -297,30 +278,30 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         }
 
         final Data data1 = new Data();
-        final OutputChannel<Data> result1 = JRoutine.in(getActivity())
-                                                    .withId(0)
-                                                    .onComplete(ResultCache.RETAIN)
-                                                    .invoke(ClassToken.tokenOf(Delay.class))
-                                                    .pass(data1)
-                                                    .result();
+        final OutputChannel<Data> result1 =
+                JRoutine.from(getActivity(), ClassToken.tokenOf(Delay.class))
+                        .withId(0)
+                        .onComplete(ResultCache.RETAIN)
+                        .buildRoutine()
+                        .callAsync(data1);
 
         assertThat(result1.readFirst()).isSameAs(data1);
 
-        final OutputChannel<Data> result2 = JRoutine.in(getActivity())
-                                                    .withId(0)
-                                                    .invoke(ClassToken.tokenOf(Delay.class))
-                                                    .pass(data1)
-                                                    .result();
+        final OutputChannel<Data> result2 =
+                JRoutine.from(getActivity(), ClassToken.tokenOf(Delay.class))
+                        .withId(0)
+                        .buildRoutine()
+                        .callAsync(data1);
 
         assertThat(result2.readFirst()).isSameAs(data1);
 
         RoutineException error = null;
-        final OutputChannel<Data> result3 = JRoutine.in(getActivity())
-                                                    .withId(0)
-                                                    .onComplete(ResultCache.RETAIN)
-                                                    .invoke(ClassToken.tokenOf(Abort.class))
-                                                    .pass(data1)
-                                                    .result();
+        final OutputChannel<Data> result3 =
+                JRoutine.from(getActivity(), ClassToken.tokenOf(Abort.class))
+                        .withId(0)
+                        .onComplete(ResultCache.RETAIN)
+                        .buildRoutine()
+                        .callAsync(data1);
 
         try {
 
@@ -333,11 +314,11 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             error = e;
         }
 
-        final OutputChannel<Data> result4 = JRoutine.in(getActivity())
-                                                    .withId(0)
-                                                    .invoke(ClassToken.tokenOf(Abort.class))
-                                                    .pass(data1)
-                                                    .result();
+        final OutputChannel<Data> result4 =
+                JRoutine.from(getActivity(), ClassToken.tokenOf(Abort.class))
+                        .withId(0)
+                        .buildRoutine()
+                        .callAsync(data1);
 
         try {
 
@@ -358,14 +339,10 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
-        JRoutine.in(getActivity())
-                .invoke(ClassToken.tokenOf(ToUpperCase.class))
-                .pass("test1")
-                .result();
-        JRoutine.in(getActivity())
-                .invoke(ClassToken.tokenOf(ToUpperCase.class))
-                .pass("test2")
-                .result();
+        final Routine<String, String> routine1 =
+                JRoutine.from(getActivity(), ClassToken.tokenOf(ToUpperCase.class)).buildRoutine();
+        routine1.callAsync("test1");
+        routine1.callAsync("test2");
 
         final Semaphore semaphore = new Semaphore(0);
 
@@ -382,14 +359,10 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         semaphore.acquire();
         getInstrumentation().waitForIdleSync();
 
-        final OutputChannel<String> result1 = JRoutine.in(getActivity())
-                                                      .invoke(ClassToken.tokenOf(ToUpperCase.class))
-                                                      .pass("test1")
-                                                      .result();
-        final OutputChannel<String> result2 = JRoutine.in(getActivity())
-                                                      .invoke(ClassToken.tokenOf(ToUpperCase.class))
-                                                      .pass("test2")
-                                                      .result();
+        final Routine<String, String> routine2 =
+                JRoutine.from(getActivity(), ClassToken.tokenOf(ToUpperCase.class)).buildRoutine();
+        final OutputChannel<String> result1 = routine2.callAsync("test1");
+        final OutputChannel<String> result2 = routine2.callAsync("test2");
 
         assertThat(result1.readFirst()).isEqualTo("TEST1");
         assertThat(result2.readFirst()).isEqualTo("TEST2");
@@ -403,8 +376,10 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         }
 
         final Data data1 = new Data();
-        JRoutine.in(getActivity()).invoke(ClassToken.tokenOf(Delay.class)).pass(data1).result();
-        JRoutine.in(getActivity()).invoke(ClassToken.tokenOf(Delay.class)).pass(data1).result();
+        final Routine<Data, Data> routine1 =
+                JRoutine.from(getActivity(), ClassToken.tokenOf(Delay.class)).buildRoutine();
+        routine1.callAsync(data1);
+        routine1.callAsync(data1);
 
         final Semaphore semaphore = new Semaphore(0);
 
@@ -421,14 +396,10 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         semaphore.acquire();
         getInstrumentation().waitForIdleSync();
 
-        final OutputChannel<Data> result1 = JRoutine.in(getActivity())
-                                                    .invoke(ClassToken.tokenOf(Delay.class))
-                                                    .pass(data1)
-                                                    .result();
-        final OutputChannel<Data> result2 = JRoutine.in(getActivity())
-                                                    .invoke(ClassToken.tokenOf(Delay.class))
-                                                    .pass(data1)
-                                                    .result();
+        final Routine<Data, Data> routine2 =
+                JRoutine.from(getActivity(), ClassToken.tokenOf(Delay.class)).buildRoutine();
+        final OutputChannel<Data> result1 = routine2.callAsync(data1);
+        final OutputChannel<Data> result2 = routine2.callAsync(data1);
 
         assertThat(result1.readFirst()).isSameAs(data1);
         assertThat(result2.readFirst()).isSameAs(data1);
@@ -442,14 +413,10 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         }
 
         final Data data1 = new Data();
-        final OutputChannel<Data> result1 = JRoutine.in(getActivity())
-                                                    .invoke(ClassToken.tokenOf(Delay.class))
-                                                    .pass(data1)
-                                                    .result();
-        final OutputChannel<Data> result2 = JRoutine.in(getActivity())
-                                                    .invoke(ClassToken.tokenOf(Delay.class))
-                                                    .pass(data1)
-                                                    .result();
+        final Routine<Data, Data> routine =
+                JRoutine.from(getActivity(), ClassToken.tokenOf(Delay.class)).buildRoutine();
+        final OutputChannel<Data> result1 = routine.callAsync(data1);
+        final OutputChannel<Data> result2 = routine.callAsync(data1);
 
         assertThat(result1.readFirst()).isSameAs(data1);
         assertThat(result2.readFirst()).isSameAs(data1);
@@ -463,20 +430,20 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         }
 
         final Data data1 = new Data();
-        final OutputChannel<Data> result1 = JRoutine.in(getActivity())
-                                                    .withId(0)
-                                                    .onComplete(ResultCache.RETAIN)
-                                                    .invoke(ClassToken.tokenOf(Delay.class))
-                                                    .pass(data1)
-                                                    .result();
+        final OutputChannel<Data> result1 =
+                JRoutine.from(getActivity(), ClassToken.tokenOf(Delay.class))
+                        .withId(0)
+                        .onComplete(ResultCache.RETAIN)
+                        .buildRoutine()
+                        .callAsync(data1);
 
         assertThat(result1.readFirst()).isSameAs(data1);
 
-        final OutputChannel<Data> result2 = JRoutine.in(getActivity())
-                                                    .withId(0)
-                                                    .invoke(ClassToken.tokenOf(Abort.class))
-                                                    .pass(data1)
-                                                    .result();
+        final OutputChannel<Data> result2 =
+                JRoutine.from(getActivity(), ClassToken.tokenOf(Abort.class))
+                        .withId(0)
+                        .buildRoutine()
+                        .callAsync(data1);
 
         try {
 
@@ -499,7 +466,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            JRoutine.enable((Activity) null);
+            JRoutine.initContext((Activity) null);
 
             fail();
 
@@ -509,7 +476,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            JRoutine.enable((Fragment) null);
+            JRoutine.initContext((Fragment) null);
 
             fail();
 
@@ -519,7 +486,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            JRoutine.in((Activity) null);
+            JRoutine.from((Activity) null, ClassToken.tokenOf(ToUpperCase.class));
 
             fail();
 
@@ -529,7 +496,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            JRoutine.in((Fragment) null);
+            JRoutine.from((Fragment) null, ClassToken.tokenOf(ToUpperCase.class));
 
             fail();
 
@@ -539,7 +506,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            JRoutine.in(new TestActivity());
+            JRoutine.from(new TestActivity(), ClassToken.tokenOf(ToUpperCase.class));
 
             fail();
 
@@ -549,7 +516,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            JRoutine.in(new TestFragment());
+            JRoutine.from(new TestFragment(), ClassToken.tokenOf(ToUpperCase.class));
 
             fail();
 
@@ -568,18 +535,13 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final OutputChannel<String> result1 = JRoutine.in(fragment)
-                                                      .withId(0)
-                                                      .onClash(ClashResolution.ABORT)
-                                                      .invoke(ClassToken.tokenOf(ToUpperCase.class))
-                                                      .pass("test1")
-                                                      .result();
-        final OutputChannel<String> result2 = JRoutine.in(fragment)
-                                                      .withId(0)
-                                                      .onClash(ClashResolution.ABORT)
-                                                      .invoke(ClassToken.tokenOf(ToUpperCase.class))
-                                                      .pass("test2")
-                                                      .result();
+        final Routine<String, String> routine =
+                JRoutine.from(fragment, ClassToken.tokenOf(ToUpperCase.class))
+                        .withId(0)
+                        .onClash(ClashResolution.ABORT)
+                        .buildRoutine();
+        final OutputChannel<String> result1 = routine.callAsync("test1");
+        final OutputChannel<String> result2 = routine.callAsync("test2");
 
         assertThat(result1.readFirst()).isEqualTo("TEST1");
 
@@ -604,14 +566,10 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final OutputChannel<String> result1 = JRoutine.in(fragment)
-                                                      .invoke(ClassToken.tokenOf(ToUpperCase.class))
-                                                      .pass("test1")
-                                                      .result();
-        final OutputChannel<String> result2 = JRoutine.in(fragment)
-                                                      .invoke(ClassToken.tokenOf(ToUpperCase.class))
-                                                      .pass("test2")
-                                                      .result();
+        final Routine<String, String> routine =
+                JRoutine.from(fragment, ClassToken.tokenOf(ToUpperCase.class)).buildRoutine();
+        final OutputChannel<String> result1 = routine.callAsync("test1");
+        final OutputChannel<String> result2 = routine.callAsync("test2");
 
         assertThat(result1.readFirst()).isEqualTo("TEST1");
         assertThat(result2.readFirst()).isEqualTo("TEST2");
@@ -627,18 +585,13 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final OutputChannel<String> result1 = JRoutine.in(fragment)
-                                                      .withId(0)
-                                                      .onClash(ClashResolution.KEEP)
-                                                      .invoke(ClassToken.tokenOf(ToUpperCase.class))
-                                                      .pass("test1")
-                                                      .result();
-        final OutputChannel<String> result2 = JRoutine.in(fragment)
-                                                      .withId(0)
-                                                      .onClash(ClashResolution.KEEP)
-                                                      .invoke(ClassToken.tokenOf(ToUpperCase.class))
-                                                      .pass("test2")
-                                                      .result();
+        final Routine<String, String> routine =
+                JRoutine.from(fragment, ClassToken.tokenOf(ToUpperCase.class))
+                        .withId(0)
+                        .onClash(ClashResolution.KEEP)
+                        .buildRoutine();
+        final OutputChannel<String> result1 = routine.callAsync("test1");
+        final OutputChannel<String> result2 = routine.callAsync("test2");
 
         assertThat(result1.readFirst()).isEqualTo("TEST1");
         assertThat(result2.readFirst()).isEqualTo("TEST1");
@@ -654,18 +607,13 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final OutputChannel<String> result1 = JRoutine.in(fragment)
-                                                      .withId(0)
-                                                      .onClash(ClashResolution.RESET)
-                                                      .invoke(ClassToken.tokenOf(ToUpperCase.class))
-                                                      .pass("test1")
-                                                      .result();
-        final OutputChannel<String> result2 = JRoutine.in(fragment)
-                                                      .withId(0)
-                                                      .onClash(ClashResolution.RESET)
-                                                      .invoke(ClassToken.tokenOf(ToUpperCase.class))
-                                                      .pass("test1")
-                                                      .result();
+        final Routine<String, String> routine =
+                JRoutine.from(fragment, ClassToken.tokenOf(ToUpperCase.class))
+                        .withId(0)
+                        .onClash(ClashResolution.RESET)
+                        .buildRoutine();
+        final OutputChannel<String> result1 = routine.callAsync("test1");
+        final OutputChannel<String> result2 = routine.callAsync("test1");
 
         try {
 
@@ -690,16 +638,13 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final OutputChannel<String> result1 = JRoutine.in(fragment)
-                                                      .withId(0)
-                                                      .invoke(ClassToken.tokenOf(ToUpperCase.class))
-                                                      .pass("test1")
-                                                      .result();
-        final OutputChannel<String> result2 = JRoutine.in(fragment)
-                                                      .withId(0)
-                                                      .invoke(ClassToken.tokenOf(ToUpperCase.class))
-                                                      .pass("test2")
-                                                      .result();
+        final Routine<String, String> routine =
+                JRoutine.from(fragment, ClassToken.tokenOf(ToUpperCase.class))
+                        .withId(0)
+                        .onClash(ClashResolution.RESTART)
+                        .buildRoutine();
+        final OutputChannel<String> result1 = routine.callAsync("test1");
+        final OutputChannel<String> result2 = routine.callAsync("test2");
 
         try {
 
@@ -725,10 +670,10 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final OutputChannel<Data> result1 =
-                JRoutine.in(fragment).invoke(ClassToken.tokenOf(Delay.class)).pass(data1).result();
-        final OutputChannel<Data> result2 =
-                JRoutine.in(fragment).invoke(ClassToken.tokenOf(Delay.class)).pass(data1).result();
+        final Routine<Data, Data> routine =
+                JRoutine.from(fragment, ClassToken.tokenOf(Delay.class)).buildRoutine();
+        final OutputChannel<Data> result1 = routine.callAsync(data1);
+        final OutputChannel<Data> result2 = routine.callAsync(data1);
 
         assertThat(result1.readFirst()).isSameAs(data1);
         assertThat(result2.readFirst()).isSameAs(data1);

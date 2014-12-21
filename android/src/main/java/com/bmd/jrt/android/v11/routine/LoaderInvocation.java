@@ -24,11 +24,11 @@ import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.util.SparseArray;
 
-import com.bmd.jrt.android.invocator.InputClashException;
-import com.bmd.jrt.android.invocator.RoutineClashException;
-import com.bmd.jrt.android.invocator.RoutineInvocator;
-import com.bmd.jrt.android.invocator.RoutineInvocator.ClashResolution;
-import com.bmd.jrt.android.invocator.RoutineInvocator.ResultCache;
+import com.bmd.jrt.android.builder.AndroidRoutineBuilder;
+import com.bmd.jrt.android.builder.AndroidRoutineBuilder.ClashResolution;
+import com.bmd.jrt.android.builder.AndroidRoutineBuilder.ResultCache;
+import com.bmd.jrt.android.builder.InputClashException;
+import com.bmd.jrt.android.builder.RoutineClashException;
 import com.bmd.jrt.channel.IOChannel;
 import com.bmd.jrt.channel.IOChannel.IOChannelInput;
 import com.bmd.jrt.channel.OutputChannel;
@@ -115,14 +115,15 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
     }
 
     /**
-     * Enables routine invocation for the specified activity.<br/>
+     * Initializes the specified context so to enable the creation of routines linked to the context
+     * lifecycle.<br/>
      * This method must be called in the activity <code>onCreate()</code> method.
      *
      * @param activity the activity instance.
      * @throws NullPointerException if the specified activity is null.
      */
     @SuppressWarnings("ConstantConditions")
-    static void enable(@Nonnull final Activity activity) {
+    static void initContext(@Nonnull final Activity activity) {
 
         if (activity == null) {
 
@@ -141,14 +142,15 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
     }
 
     /**
-     * Enables routine invocation for the specified fragment.<br/>
+     * Initializes the specified context so to enable the creation of routines linked to the context
+     * lifecycle.<br/>
      * This method must be called in the fragment <code>onCreate()</code> method.
      *
      * @param fragment the fragment instance.
      * @throws NullPointerException if the specified fragment is null.
      */
     @SuppressWarnings("ConstantConditions")
-    static void enable(@Nonnull final Fragment fragment) {
+    static void initContext(@Nonnull final Fragment fragment) {
 
         if (fragment == null) {
 
@@ -251,7 +253,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
         final Constructor<? extends Invocation<INPUT, OUTPUT>> constructor = mConstructor;
         int loaderId = mLoaderId;
 
-        if (loaderId == RoutineInvocator.GENERATED_ID) {
+        if (loaderId == AndroidRoutineBuilder.GENERATED) {
 
             loaderId = 31 * constructor.getDeclaringClass().hashCode() + inputs.hashCode();
         }
@@ -429,8 +431,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
                 final ResultCache cacheType = mCacheType;
 
                 if ((cacheType == ResultCache.CLEAR) || (result.isError() ? (cacheType
-                        == ResultCache.CLEAR_IF_ERROR)
-                        : (cacheType == ResultCache.CLEAR_IF_RESULT))) {
+                        == ResultCache.RETAIN_RESULT) : (cacheType == ResultCache.RETAIN_ERROR))) {
 
                     mLoaderManager.destroyLoader(internalLoader.getId());
                 }

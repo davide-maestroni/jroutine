@@ -32,7 +32,7 @@ public class TestFragment extends Fragment {
 
         super.onCreate(savedInstanceState);
 
-        JRoutine.enable(this);
+        JRoutine.initContext(this);
     }
 
     @Nullable

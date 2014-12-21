@@ -50,7 +50,7 @@ import javax.annotation.Nullable;
  * of shared runner instances may lead to unexpected deadlocks. In facts, to prevent deadlock or
  * starvation issues, it is encouraged the use of finite timeouts when performing blocking calls.
  * <p/>
- * The routine object provides three different ways to invoke an execution:
+ * The routine object provides three different ways to invokeSync an execution:
  * <p/>
  * <b>Synchronous invocation</b><br/>
  * The routine starts an invocation employing a synchronous runner. The result is similar to a
@@ -81,60 +81,6 @@ import javax.annotation.Nullable;
  * @param <OUTPUT> the output data type.
  */
 public interface Routine<INPUT, OUTPUT> {
-
-    /**
-     * Short for <b><code>invoke().result()</code></b>.
-     *
-     * @return the output channel.
-     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
-     *                                             exception.
-     */
-    @Nonnull
-    public OutputChannel<OUTPUT> call();
-
-    /**
-     * Short for <b><code>invoke().pass(input).result()</code></b>.
-     *
-     * @param input the input.
-     * @return the output channel.
-     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
-     *                                             exception.
-     */
-    @Nonnull
-    public OutputChannel<OUTPUT> call(@Nullable INPUT input);
-
-    /**
-     * Short for <b><code>invoke().pass(inputs).result()</code></b>.
-     *
-     * @param inputs the input data.
-     * @return the output channel.
-     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
-     *                                             exception.
-     */
-    @Nonnull
-    public OutputChannel<OUTPUT> call(@Nullable INPUT... inputs);
-
-    /**
-     * Short for <b><code>invoke().pass(inputs).result()</code></b>.
-     *
-     * @param inputs the iterable returning the input data.
-     * @return the output channel.
-     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
-     *                                             exception.
-     */
-    @Nonnull
-    public OutputChannel<OUTPUT> call(@Nullable Iterable<? extends INPUT> inputs);
-
-    /**
-     * Short for <b><code>invoke().pass(inputs).result()</code></b>.
-     *
-     * @param inputs the output channel returning the input data.
-     * @return the output channel.
-     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
-     *                                             exception.
-     */
-    @Nonnull
-    public OutputChannel<OUTPUT> call(@Nullable OutputChannel<INPUT> inputs);
 
     /**
      * Short for <b><code>invokeAsync().result()</code></b>.
@@ -247,12 +193,58 @@ public interface Routine<INPUT, OUTPUT> {
     public OutputChannel<OUTPUT> callParallel(@Nullable OutputChannel<INPUT> inputs);
 
     /**
-     * Invokes the execution of this routine in synchronous mode.
+     * Short for <b><code>invokeSync().result()</code></b>.
      *
-     * @return the routine parameter channel.
+     * @return the output channel.
+     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
+     *                                             exception.
      */
     @Nonnull
-    public ParameterChannel<INPUT, OUTPUT> invoke();
+    public OutputChannel<OUTPUT> callSync();
+
+    /**
+     * Short for <b><code>invokeSync().pass(input).result()</code></b>.
+     *
+     * @param input the input.
+     * @return the output channel.
+     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
+     *                                             exception.
+     */
+    @Nonnull
+    public OutputChannel<OUTPUT> callSync(@Nullable INPUT input);
+
+    /**
+     * Short for <b><code>invokeSync().pass(inputs).result()</code></b>.
+     *
+     * @param inputs the input data.
+     * @return the output channel.
+     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
+     *                                             exception.
+     */
+    @Nonnull
+    public OutputChannel<OUTPUT> callSync(@Nullable INPUT... inputs);
+
+    /**
+     * Short for <b><code>invokeSync().pass(inputs).result()</code></b>.
+     *
+     * @param inputs the iterable returning the input data.
+     * @return the output channel.
+     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
+     *                                             exception.
+     */
+    @Nonnull
+    public OutputChannel<OUTPUT> callSync(@Nullable Iterable<? extends INPUT> inputs);
+
+    /**
+     * Short for <b><code>invokeSync().pass(inputs).result()</code></b>.
+     *
+     * @param inputs the output channel returning the input data.
+     * @return the output channel.
+     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
+     *                                             exception.
+     */
+    @Nonnull
+    public OutputChannel<OUTPUT> callSync(@Nullable OutputChannel<INPUT> inputs);
 
     /**
      * Invokes the execution of this routine in asynchronous mode.
@@ -269,4 +261,12 @@ public interface Routine<INPUT, OUTPUT> {
      */
     @Nonnull
     public ParameterChannel<INPUT, OUTPUT> invokeParallel();
+
+    /**
+     * Invokes the execution of this routine in synchronous mode.
+     *
+     * @return the routine parameter channel.
+     */
+    @Nonnull
+    public ParameterChannel<INPUT, OUTPUT> invokeSync();
 }

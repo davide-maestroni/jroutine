@@ -33,41 +33,6 @@ public abstract class TemplateRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
 
     @Nonnull
     @Override
-    public OutputChannel<OUTPUT> call() {
-
-        return invoke().result();
-    }
-
-    @Nonnull
-    @Override
-    public OutputChannel<OUTPUT> call(@Nullable final INPUT input) {
-
-        return invoke().pass(input).result();
-    }
-
-    @Nonnull
-    @Override
-    public OutputChannel<OUTPUT> call(@Nullable final INPUT... inputs) {
-
-        return invoke().pass(inputs).result();
-    }
-
-    @Nonnull
-    @Override
-    public OutputChannel<OUTPUT> call(@Nullable final Iterable<? extends INPUT> inputs) {
-
-        return invoke().pass(inputs).result();
-    }
-
-    @Nonnull
-    @Override
-    public OutputChannel<OUTPUT> call(@Nullable final OutputChannel<INPUT> inputs) {
-
-        return invoke().pass(inputs).result();
-    }
-
-    @Nonnull
-    @Override
     public OutputChannel<OUTPUT> callAsync() {
 
         return invokeAsync().result();
@@ -134,5 +99,40 @@ public abstract class TemplateRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
     public OutputChannel<OUTPUT> callParallel(@Nullable final OutputChannel<INPUT> inputs) {
 
         return invokeParallel().pass(inputs).result();
+    }
+
+    @Nonnull
+    @Override
+    public OutputChannel<OUTPUT> callSync() {
+
+        return invokeSync().result();
+    }
+
+    @Nonnull
+    @Override
+    public OutputChannel<OUTPUT> callSync(@Nullable final INPUT input) {
+
+        return invokeSync().pass(input).result();
+    }
+
+    @Nonnull
+    @Override
+    public OutputChannel<OUTPUT> callSync(@Nullable final INPUT... inputs) {
+
+        return invokeSync().pass(inputs).result();
+    }
+
+    @Nonnull
+    @Override
+    public OutputChannel<OUTPUT> callSync(@Nullable final Iterable<? extends INPUT> inputs) {
+
+        return invokeSync().pass(inputs).result();
+    }
+
+    @Nonnull
+    @Override
+    public OutputChannel<OUTPUT> callSync(@Nullable final OutputChannel<INPUT> inputs) {
+
+        return invokeSync().pass(inputs).result();
     }
 }

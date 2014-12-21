@@ -153,7 +153,7 @@ public class JRoutineTest extends TestCase {
                                                         .loggedWith(new NullLog())
                                                         .asyncMethod(TestStatic.GET);
 
-        assertThat(routine.call().readAll()).containsExactly(-77L);
+        assertThat(routine.callSync().readAll()).containsExactly(-77L);
 
         final Routine<Object, Object> routine1 = JRoutine.on(TestStatic.class)
                                                          .syncRunner(RunnerType.QUEUED)
@@ -162,7 +162,7 @@ public class JRoutineTest extends TestCase {
                                                          .availableTimeout(TimeDuration.ZERO)
                                                          .method("getLong");
 
-        assertThat(routine1.call().readAll()).containsExactly(-77L);
+        assertThat(routine1.callSync().readAll()).containsExactly(-77L);
 
         final Routine<Object, Object> routine2 = JRoutine.on(TestStatic.class)
                                                          .syncRunner(RunnerType.QUEUED)
@@ -174,14 +174,14 @@ public class JRoutineTest extends TestCase {
                                                          .method(TestStatic.class.getMethod(
                                                                  "getLong"));
 
-        assertThat(routine2.call().readAll()).containsExactly(-77L);
+        assertThat(routine2.callSync().readAll()).containsExactly(-77L);
 
         final Routine<Object, Object> routine3 =
                 JRoutine.on(TestStatic.class).asyncMethod(TestStatic.THROW);
 
         try {
 
-            routine3.call(new IllegalArgumentException("test")).readAll();
+            routine3.callSync(new IllegalArgumentException("test")).readAll();
 
             fail();
 
@@ -361,7 +361,7 @@ public class JRoutineTest extends TestCase {
                                                          .loggedWith(nullLog)
                                                          .asyncMethod(TestStatic.GET);
 
-        assertThat(routine1.call().readAll()).containsExactly(-77L);
+        assertThat(routine1.callSync().readAll()).containsExactly(-77L);
 
         final Routine<Object, Object> routine2 = JRoutine.on(TestStatic.class)
                                                          .syncRunner(RunnerType.SEQUENTIAL)
@@ -370,7 +370,7 @@ public class JRoutineTest extends TestCase {
                                                          .loggedWith(nullLog)
                                                          .asyncMethod(TestStatic.GET);
 
-        assertThat(routine2.call().readAll()).containsExactly(-77L);
+        assertThat(routine2.callSync().readAll()).containsExactly(-77L);
         assertThat(routine1).isEqualTo(routine2);
 
         final Routine<Object, Object> routine3 = JRoutine.on(TestStatic.class)
@@ -380,7 +380,7 @@ public class JRoutineTest extends TestCase {
                                                          .loggedWith(nullLog)
                                                          .asyncMethod(TestStatic.GET);
 
-        assertThat(routine3.call().readAll()).containsExactly(-77L);
+        assertThat(routine3.callSync().readAll()).containsExactly(-77L);
         assertThat(routine1).isNotEqualTo(routine3);
         assertThat(routine2).isNotEqualTo(routine3);
 
@@ -391,7 +391,7 @@ public class JRoutineTest extends TestCase {
                                                          .loggedWith(nullLog)
                                                          .asyncMethod(TestStatic.GET);
 
-        assertThat(routine4.call().readAll()).containsExactly(-77L);
+        assertThat(routine4.callSync().readAll()).containsExactly(-77L);
         assertThat(routine3).isNotEqualTo(routine4);
 
         final Routine<Object, Object> routine5 = JRoutine.on(TestStatic.class)
@@ -401,7 +401,7 @@ public class JRoutineTest extends TestCase {
                                                          .loggedWith(new NullLog())
                                                          .asyncMethod(TestStatic.GET);
 
-        assertThat(routine5.call().readAll()).containsExactly(-77L);
+        assertThat(routine5.callSync().readAll()).containsExactly(-77L);
         assertThat(routine4).isNotEqualTo(routine5);
     }
 
@@ -418,14 +418,14 @@ public class JRoutineTest extends TestCase {
                                                         .loggedWith(new NullLog())
                                                         .asyncMethod(Test.GET);
 
-        assertThat(routine.call().readAll()).containsExactly(-77L);
+        assertThat(routine.callSync().readAll()).containsExactly(-77L);
 
         final Routine<Object, Object> routine1 = JRoutine.on(new WeakReference<Test>(test))
                                                          .syncRunner(RunnerType.QUEUED)
                                                          .runBy(Runners.poolRunner())
                                                          .method("getLong");
 
-        assertThat(routine1.call().readAll()).containsExactly(-77L);
+        assertThat(routine1.callSync().readAll()).containsExactly(-77L);
 
         final Routine<Object, Object> routine2 = JRoutine.on(test)
                                                          .syncRunner(RunnerType.QUEUED)
@@ -435,14 +435,14 @@ public class JRoutineTest extends TestCase {
                                                          .lockName("test")
                                                          .method(Test.class.getMethod("getLong"));
 
-        assertThat(routine2.call().readAll()).containsExactly(-77L);
+        assertThat(routine2.callSync().readAll()).containsExactly(-77L);
 
         final Routine<Object, Object> routine3 =
                 JRoutine.on(new WeakReference<Test>(test)).asyncMethod(Test.THROW);
 
         try {
 
-            routine3.call(new IllegalArgumentException("test")).readAll();
+            routine3.callSync(new IllegalArgumentException("test")).readAll();
 
             fail();
 
@@ -716,7 +716,7 @@ public class JRoutineTest extends TestCase {
                                                          .loggedWith(nullLog)
                                                          .asyncMethod(Test.GET);
 
-        assertThat(routine1.call().readAll()).containsExactly(-77L);
+        assertThat(routine1.callSync().readAll()).containsExactly(-77L);
 
         final Routine<Object, Object> routine2 = JRoutine.on(test)
                                                          .syncRunner(RunnerType.SEQUENTIAL)
@@ -725,7 +725,7 @@ public class JRoutineTest extends TestCase {
                                                          .loggedWith(nullLog)
                                                          .asyncMethod(Test.GET);
 
-        assertThat(routine2.call().readAll()).containsExactly(-77L);
+        assertThat(routine2.callSync().readAll()).containsExactly(-77L);
         assertThat(routine1).isEqualTo(routine2);
 
         final Routine<Object, Object> routine3 = JRoutine.on(test)
@@ -735,7 +735,7 @@ public class JRoutineTest extends TestCase {
                                                          .loggedWith(nullLog)
                                                          .asyncMethod(Test.GET);
 
-        assertThat(routine3.call().readAll()).containsExactly(-77L);
+        assertThat(routine3.callSync().readAll()).containsExactly(-77L);
         assertThat(routine1).isNotEqualTo(routine3);
         assertThat(routine2).isNotEqualTo(routine3);
 
@@ -746,7 +746,7 @@ public class JRoutineTest extends TestCase {
                                                          .loggedWith(nullLog)
                                                          .asyncMethod(Test.GET);
 
-        assertThat(routine4.call().readAll()).containsExactly(-77L);
+        assertThat(routine4.callSync().readAll()).containsExactly(-77L);
         assertThat(routine3).isNotEqualTo(routine4);
 
         final Routine<Object, Object> routine5 = JRoutine.on(test)
@@ -756,7 +756,7 @@ public class JRoutineTest extends TestCase {
                                                          .loggedWith(new NullLog())
                                                          .asyncMethod(Test.GET);
 
-        assertThat(routine5.call().readAll()).containsExactly(-77L);
+        assertThat(routine5.callSync().readAll()).containsExactly(-77L);
         assertThat(routine4).isNotEqualTo(routine5);
     }
 
@@ -797,7 +797,7 @@ public class JRoutineTest extends TestCase {
                                                         .outputOrder(DataOrder.INSERTION)
                                                         .buildRoutine();
 
-        assertThat(routine.call("test1", "test2").readAll()).containsExactly("test1", "test2");
+        assertThat(routine.callSync("test1", "test2").readAll()).containsExactly("test1", "test2");
 
         final Routine<String, String> routine1 = JRoutine.<String>on()
                                                          .syncRunner(RunnerType.QUEUED)
@@ -812,7 +812,7 @@ public class JRoutineTest extends TestCase {
                                                          .outputOrder(DataOrder.INSERTION)
                                                          .buildRoutine();
 
-        assertThat(routine1.call("test1", "test2").readAll()).containsExactly("test1", "test2");
+        assertThat(routine1.callSync("test1", "test2").readAll()).containsExactly("test1", "test2");
     }
 
     public void testRoutineBuilderApply() {

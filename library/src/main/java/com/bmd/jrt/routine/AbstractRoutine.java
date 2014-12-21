@@ -165,13 +165,6 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
     @Nonnull
     @Override
-    public ParameterChannel<INPUT, OUTPUT> invoke() {
-
-        return invoke(false);
-    }
-
-    @Nonnull
-    @Override
     public ParameterChannel<INPUT, OUTPUT> invokeAsync() {
 
         return invoke(true);
@@ -195,6 +188,13 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
                 };
 
         return parallelRoutine.invokeAsync();
+    }
+
+    @Nonnull
+    @Override
+    public ParameterChannel<INPUT, OUTPUT> invokeSync() {
+
+        return invoke(false);
     }
 
     /**

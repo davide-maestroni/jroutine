@@ -39,6 +39,10 @@ public class JRoutine extends com.bmd.jrt.routine.JRoutine {
 
     /**
      * Returns a builder of routines linked to the specified context.
+     * <p/>
+     * Note that, waiting for the outputs of the built routine immediately after its invocation on
+     * the main thread, will result in a deadlock. In fact the routine results will be always
+     * dispatched in the main UI thread.
      *
      * @param fragment   the fragment instance.
      * @param classToken the invocation class token.
@@ -65,6 +69,10 @@ public class JRoutine extends com.bmd.jrt.routine.JRoutine {
 
     /**
      * Returns a builder of routines linked to the specified context.
+     * <p/>
+     * Note that, waiting for the outputs of the built routine immediately after its invocation on
+     * the main thread, will result in a deadlock. In fact the routine results will be always
+     * dispatched in the main UI thread.
      *
      * @param activity   the activity instance.
      * @param classToken the invocation class token.

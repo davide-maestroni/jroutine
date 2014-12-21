@@ -203,9 +203,9 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineChannelBu
     }
 
     /**
-     * Builds and returns the routine instance.
+     * Builds and returns the routine.
      *
-     * @return the newly created routine.
+     * @return the newly created routine instance.
      */
     @Nonnull
     public Routine<INPUT, OUTPUT> buildRoutine() {

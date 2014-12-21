@@ -21,7 +21,9 @@ import javax.annotation.Nonnull;
  * Interface defining an builder of routines linked to a context lifecycle.
  * <p/>
  * Routine invocations started through the returned objects can be safely restored after a change in
- * the configuration, so to avoid duplicated calls and memory leaks.
+ * the configuration, so to avoid duplicated calls and memory leaks. Be aware, though, that the
+ * invocation results will always be dispatched in the main thread, no matter the calling one was,
+ * so that waiting for the outputs right after the routine invocation will result in a deadlock.
  * <p/>
  * Note that the <code>equals()</code> and <code>hashCode()</code> methods of the input parameter
  * objects might be employed to check for clashing of invocations or compute the invocation ID.<br/>
@@ -42,37 +44,39 @@ public interface AndroidRoutineBuilder<INPUT, OUTPUT> {
     public static final int GENERATED = Integer.MIN_VALUE;
 
     /**
-     * @return
+     * Builds and returns the routine.
+     *
+     * @return the newly created routine instance.
      */
     @Nonnull
     public Routine<INPUT, OUTPUT> buildRoutine();
 
     /**
-     * Tells the invocator how to resolve clashes of invocation inputs. A clash happens when an
+     * Tells the builder how to resolve clashes of invocation inputs. A clash happens when an
      * invocation of the same type and with the same ID is still running.
      *
      * @param resolution the type of resolution.
-     * @return this invocator.
+     * @return this builder.
      * @throws NullPointerException if the specified resolution type is null.
      */
     @Nonnull
     public AndroidRoutineBuilder<INPUT, OUTPUT> onClash(@Nonnull ClashResolution resolution);
 
     /**
-     * Tells the invocator how to cache the invocation result after its completion.
+     * Tells the builder how to cache the invocation result after its completion.
      *
      * @param cacheType the cache type.
-     * @return this invocator.
+     * @return this builder.
      * @throws NullPointerException if the specified cache type is null.
      */
     @Nonnull
     public AndroidRoutineBuilder<INPUT, OUTPUT> onComplete(@Nonnull ResultCache cacheType);
 
     /**
-     * Tells the invocator to identify the invocation with the specified ID.
+     * Tells the builder to identify the invocation with the specified ID.
      *
      * @param id the invocation ID.
-     * @return this invocator.
+     * @return this builder.
      */
     @Nonnull
     public AndroidRoutineBuilder<INPUT, OUTPUT> withId(int id);

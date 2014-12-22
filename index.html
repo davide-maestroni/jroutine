@@ -34,7 +34,8 @@
         <h1>
 <a id="jroutine" class="anchor" href="#jroutine" aria-hidden="true"><span class="octicon octicon-link"></span></a>jroutine</h1>
 
-<p><a href="https://travis-ci.org/davide-maestroni/jroutine"><img src="https://travis-ci.org/davide-maestroni/jroutine.svg?branch=master" alt="Build Status"></a></p>
+<p><a href="https://travis-ci.org/davide-maestroni/jroutine"><img src="https://travis-ci.org/davide-maestroni/jroutine.svg?branch=master" alt="Build Status"></a>
+<a href="https://coveralls.io/r/davide-maestroni/jroutine?branch=master"><img src="https://img.shields.io/coveralls/davide-maestroni/jroutine.svg" alt="Coverage Status"></a></p>
 
 <p>Parallel programming on the go.</p>
 
@@ -45,13 +46,137 @@
 
 <p>The main paradigm is based on routines and channels. A routine is the container in which a piece of code is executed asynchronously. It takes care of the synchronization and manages the invocation lifecycle. The channels are means of communication between the routine and the outside world.</p>
 
-<p>A routine can be invoked in a synchronous, asynchronous and parallel way. The main difference between the asynchronous and the parallel invocation is that, in the former, all the input data are processed by the same invocation instance, while, in the latter, each input item is (potentially) processed by different instances. For example, if the sum of the inputs has to be computed by the routine, an asynchronous invocation is the way to go, while, when the routine is used to compute, for instance, the square of a number, all the inputs can be safely processed in parallel.
-After the invocation, the routine returns an input channel which is used to pass the input parameters. Input data can be passed in bulk or streamed, delayed or fetched asynchonously from another channel. When done with the input, the channel is closed and returns an output channel used to read the invocation results.</p>
+<p>A routine can be invoked in a synchronous, asynchronous and parallel way. The main difference between the asynchronous and the parallel invocation is that, in the former, all the input data are processed by the same invocation instance, while, in the latter, each input item is (potentially) processed by a different one. For example, if the sum of the inputs has to be computed by the routine, an asynchronous invocation is the way to go, while, when the routine is used to compute, for instance, the square of a number, all the inputs can be safely processed in parallel.</p>
 
-<p>The main way to define a routine is to implement an invocation object. Though, the library provides several other ways (always backed by invocations) to call any method of any object, even defined in third party source code, asynchronously in separate threads.</p>
+<p>After the invocation, the routine returns an input channel which is used to pass the input parameters. Input data can be passed in bulk or streamed, delayed or fetched asynchronously from another channel. When done with the input, the channel is closed and returns an output channel used to read the invocation results.</p>
+
+<p>The main way to define a routine is to implement an invocation object. Though, the library provides several other ways (always backed by invocations) to call any method of any object (even defined in third party source code) asynchronously in separate threads.</p>
 
 <h2>
-<a id="why-not-rxjava" class="anchor" href="#why-not-rxjava" aria-hidden="true"><span class="octicon octicon-link"></span></a>Why not <a href="https://github.com/ReactiveX/RxJava">RxJava</a>?</h2>
+<a id="why-not-rxjava" class="anchor" href="#why-not-rxjava" aria-hidden="true"><span class="octicon octicon-link"></span></a>Why not RxJava?</h2>
+
+<p>Among the many open source libraries, <a href="https://github.com/ReactiveX/RxJava">RxJava</a> is one of the preferred choices when it comes to handle background tasks.
+Although <a href="http://reactivex.io/">Reactive Extensions</a> is a great tool for managing events and composing event listeners, it has not been designed with parallel programming in mind.
+In fact, RxJava shows a few limits in this respect.
+The framework has once been compared, with a fitting example, to a line of domino pieces: once the first tile falls down, all the others are to follow, and there is no way to stop them other than to cut the line.
+Each time a background operation is required, the whole chain of observables/subscribers must be rebuilt from scratch, the chained functions are called recursively and many objects are created in the while.
+While such design works great for common events, it does not adapt so well to background tasks, where, each time, everything is recreated and discarded at the end.
+After all, a network request does not really fit in the definition of "event".</p>
+
+<p>RxJava is still one of the best library for handling events, though, something specifically designed is needed to make parallel programming easily accessible and manageable.</p>
+
+<h2>
+<a id="why-jroutine" class="anchor" href="#why-jroutine" aria-hidden="true"><span class="octicon octicon-link"></span></a>Why JRoutine?</h2>
+
+<p>The JRoutine library is based on a single paradigm, at the same time simple, but flexible and powerful enough to provide all the features needed to perform, manage and combine asynchronous tasks in any environment and on any platform.
+This paradigm is nothing but what any developer is already familiar to, that is, a function call.</p>
+
+<p>What the library has to offer is:</p>
+
+<ul>
+<li>
+<strong><em>Flat learning curve</em></strong>: a single paradigm to make everything: invoke the routine, pass the inputs, read the results</li>
+<li>
+<strong><em>Extreme configurability</em></strong>: each routine instance may have its own set of configurations, and its own source of concurrency</li>
+<li>
+<strong><em>Ease of integration</em></strong>: no need to modify existing code to make a method asynchronous</li>
+<li>
+<strong><em>Memory optimization</em></strong>: maximum number of invocations running and retained in the instance pool, and maximum number of data passed through the channels, are just some of the parameters that can be tuned to lower memory consumption</li>
+<li>
+<strong><em>Data streaming</em></strong>: not all the inputs might be known at the time of invocation, and outputs might need to be fetched at specific points of the code execution</li>
+<li>
+<strong><em>Real processing abort</em></strong>: invocations can be interrupted at any moment between two data are passed to the input or output channels, thus achieving real abortion of the processing and not a mere removal of a listener</li>
+<li>
+<strong><em>Non-recursive calls</em></strong>: even during synchronous invocations, recursion is broken up in a sequential sequence of operations</li>
+<li>
+<strong><em>Automatic code generation</em></strong>: as an alternative to reflection, existing methods can be made asynchronous through annotation pre-processing and compile-time code generation</li>
+</ul>
+
+<p>And more:</p>
+
+<ul>
+<li><strong><em>&lt; 175KB Jar</em></strong></li>
+<li>
+<strong><em>Java 5+</em></strong>* <strong><em>and Android 1.6+</em></strong>
+</li>
+<li><strong><em><a href="https://github.com/Nullable" class="user-mention">@Nullable</a> and <a href="https://github.com/Nonnull" class="user-mention">@Nonnull</a> annotations</em></strong></li>
+</ul>
+
+<p>(*) for older Java versions please have a look at <a href="http://retrotranslator.sourceforge.net/">Retrotranslator</a>.</p>
+
+<h2>
+<a id="why-not-jroutine" class="anchor" href="#why-not-jroutine" aria-hidden="true"><span class="octicon octicon-link"></span></a>Why not JRoutine?</h2>
+
+<p>The JRoutine library is designed for parallel programming and nothing else. It's no golden hammer and does not pretend to.
+If you need event handling, please use <a href="https://github.com/ReactiveX/RxJava">RxJava</a>, it's one of the best library out there. If you need distributed scalable computing, consider using <a href="http://akka.io/">Akka</a>.
+For anything else <a href="https://github.com/">GitHub</a> is a great source of inspiration.</p>
+
+<h2>
+<a id="usage-examples" class="anchor" href="#usage-examples" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage examples</h2>
+
+<p>Please have a look at the dedicated <a href="https://github.com/davide-maestroni/jroutine/wiki/Usage-Examples">wiki page</a>.</p>
+
+<h2>
+<a id="documentation" class="anchor" href="#documentation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Documentation</h2>
+
+<p>Complete Javadoc with insights and examples is available:</p>
+
+<ul>
+<li><a href="http://davide-maestroni.github.io/jroutine/javadocs/">JRoutine</a></li>
+<li><a href="http://davide-maestroni.github.io/jroutine/android/javadocs/">JRoutine Android</a></li>
+</ul>
+
+<p>The project contains an additional sample module showing how to implement a file downloader with just 4 classes.</p>
+
+<h2>
+<a id="further-development" class="anchor" href="#further-development" aria-hidden="true"><span class="octicon octicon-link"></span></a>Further development</h2>
+
+<p>Feel free to contribute with your own <a href="http://davide-maestroni.github.io/jroutine/javadocs/com/bmd/jrt/runner/Runner.html">Runner</a> so to support more platforms other than Android.</p>
+
+<h2>
+<a id="build-instructions" class="anchor" href="#build-instructions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Build instructions</h2>
+
+<p>Please refer to the dedicated <a href="https://github.com/davide-maestroni/jroutine/wiki/Build-Instructions">wiki page</a>.</p>
+
+<h2>
+<a id="dependencies" class="anchor" href="#dependencies" aria-hidden="true"><span class="octicon octicon-link"></span></a>Dependencies</h2>
+
+<h4>
+<a id="runtime-dependencies" class="anchor" href="#runtime-dependencies" aria-hidden="true"><span class="octicon octicon-link"></span></a>Runtime dependencies</h4>
+
+<ul>
+<li>None</li>
+</ul>
+
+<h4>
+<a id="compile-dependencies" class="anchor" href="#compile-dependencies" aria-hidden="true"><span class="octicon octicon-link"></span></a>Compile dependencies</h4>
+
+<ul>
+<li>
+<a href="http://findbugs.sourceforge.net/">FindBugs</a> annotations (<a href="http://www.gnu.org/licenses/lgpl.html">Lesser GNU Public License</a>)</li>
+<li>Android SDK (<a href="http://developer.android.com/sdk/terms.html">Terms and Condition</a>)</li>
+<li>Android Support Library (<a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License v2.0</a>)</li>
+</ul>
+
+<h4>
+<a id="test-dependencies" class="anchor" href="#test-dependencies" aria-hidden="true"><span class="octicon octicon-link"></span></a>Test dependencies</h4>
+
+<ul>
+<li>JUnit (<a href="https://www.eclipse.org/legal/epl-v10.html">Eclipse Public License v1.0</a>)</li>
+<li>
+<a href="http://joel-costigliola.github.io/assertj/">AssertJ</a> (<a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License v2.0</a>)</li>
+</ul>
+
+<h2>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h2>
+
+<p>Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at</p>
+
+<p>    <a href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a></p>
+
+<p>Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.</p>
+
+<p><strong>IT'S OPEN DUDE!</strong></p>
       </section>
     </div>
 

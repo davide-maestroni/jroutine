@@ -1,4 +1,4 @@
-#jroutine
+#JRoutine
 [![Build Status](https://travis-ci.org/davide-maestroni/jroutine.svg?branch=master)](https://travis-ci.org/davide-maestroni/jroutine)
 [![Coverage Status](https://img.shields.io/coveralls/davide-maestroni/jroutine.svg)](https://coveralls.io/r/davide-maestroni/jroutine?branch=master)
 
@@ -43,6 +43,7 @@ What the library has to offer is:
 * ***Real processing abort***: invocations can be interrupted at any moment between two data are passed to the input or output channels, thus achieving real abortion of the processing and not a mere removal of a listener
 * ***Non-recursive calls***: even during synchronous invocations, recursion is broken up in a sequential sequence of operations
 * ***Automatic code generation***: as an alternative to reflection, existing methods can be made asynchronous through annotation pre-processing and compile-time code generation
+* ***Nice handling of Android configuration changes***: the same paradigm is applied on the Android platform so to support background tasks surviving changes in the configuration of Activities or Fragments
 
 And more:
 

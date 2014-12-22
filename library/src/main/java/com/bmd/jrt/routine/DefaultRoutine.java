@@ -15,6 +15,7 @@ package com.bmd.jrt.routine;
 
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.common.RoutineException;
+import com.bmd.jrt.common.RoutineInterruptedException;
 import com.bmd.jrt.invocation.Invocation;
 import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.runner.Runner;
@@ -84,6 +85,11 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
 
             logger.err(e, "error creating the invocation instance");
             throw new RoutineException(e.getCause());
+
+        } catch (final RoutineInterruptedException e) {
+
+            logger.err(e, "error creating the invocation instance");
+            throw e.interrupt();
 
         } catch (final RoutineException e) {
 

@@ -25,12 +25,15 @@ import com.bmd.jrt.android.builder.AndroidRoutineBuilder.ClashResolution;
 import com.bmd.jrt.android.builder.AndroidRoutineBuilder.ResultCache;
 import com.bmd.jrt.android.builder.InputClashException;
 import com.bmd.jrt.android.builder.RoutineClashException;
+import com.bmd.jrt.android.log.Logs;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.common.RoutineException;
 import com.bmd.jrt.common.RoutineInterruptedException;
 import com.bmd.jrt.invocation.TemplateInvocation;
+import com.bmd.jrt.invocation.TunnelInvocation;
+import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.routine.Routine;
 import com.bmd.jrt.time.TimeDuration;
@@ -471,6 +474,36 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         } catch (final IllegalStateException ignored) {
 
         }
+
+        try {
+
+            JRoutine.from(getActivity(), ClassToken.tokenOf(ToUpperCase.class)).logLevel(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.from(getActivity(), ClassToken.tokenOf(ToUpperCase.class)).onClash(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.from(getActivity(), ClassToken.tokenOf(ToUpperCase.class)).onComplete(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
     }
 
     public void testFragmentAbort() {
@@ -595,6 +628,22 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         assertThat(result1.readFirst()).isSameAs(data1);
         assertThat(result2.readFirst()).isSameAs(data1);
+    }
+
+    public void testInvocations() {
+
+        final Routine<String, String> routine =
+                JRoutine.from(getActivity(), new ClassToken<TunnelInvocation<String>>() {})
+                        .loggedWith(Logs.androidLog())
+                        .logLevel(LogLevel.DEBUG)
+                        .buildRoutine();
+        assertThat(routine.callSync("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2", "3",
+                                                                                     "4", "5");
+        assertThat(routine.callAsync("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2", "3",
+                                                                                      "4", "5");
+        assertThat(routine.callParallel("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2",
+                                                                                         "3", "4",
+                                                                                         "5");
     }
 
     @SuppressWarnings("ConstantConditions")

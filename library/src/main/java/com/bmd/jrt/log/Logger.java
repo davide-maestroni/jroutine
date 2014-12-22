@@ -38,7 +38,7 @@ public class Logger {
     private static final AtomicReference<LogLevel> sLogLevel =
             new AtomicReference<LogLevel>(DEFAULT_LEVEL);
 
-    private static final SystemLog DEFAULT_LOG = new SystemLog();
+    private static final SystemLog DEFAULT_LOG = Logs.systemLog();
 
     private static final AtomicReference<Log> sLog = new AtomicReference<Log>(DEFAULT_LOG);
 

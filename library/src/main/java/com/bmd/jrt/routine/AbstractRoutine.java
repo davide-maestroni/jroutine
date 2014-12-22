@@ -64,7 +64,22 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
     private final Runner mSyncRunner;
 
+    private volatile DefaultInvocationManager mAsyncManager;
+
+    private volatile AbstractRoutine<INPUT, OUTPUT> mParallelRoutine;
+
     private int mRunningCount;
+
+    private final Check mIsInvocationAvailable = new Check() {
+
+        @Override
+        public boolean isTrue() {
+
+            return mRunningCount < mMaxRunning;
+        }
+    };
+
+    private volatile DefaultInvocationManager mSyncManager;
 
     /**
      * Constructor.
@@ -118,15 +133,13 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
         mConfiguration = configuration;
         mSyncRunner = syncRunner;
         mAsyncRunner = configuration.getRunner(null);
-        mMaxRunning = configuration.getMaxRunning(-1);
-        mMaxRetained = configuration.getMaxRetained(-1);
-        mAvailTimeout = configuration.getAvailTimeout(null);
-        mLogger = Logger.create(configuration.getLog(null), configuration.getLogLevel(null), this);
 
         if (mAsyncRunner == null) {
 
             throw new NullPointerException("the asynchronous runner instance must not be null");
         }
+
+        mMaxRunning = configuration.getMaxRunning(-1);
 
         if (mMaxRunning < 1) {
 
@@ -134,17 +147,23 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
                     "the maximum number of parallel running invocations must be a positive number");
         }
 
+        mMaxRetained = configuration.getMaxRetained(-1);
+
         if (mMaxRetained < 0) {
 
             throw new IllegalArgumentException(
                     "the maximum number of retained invocation instances must be 0 or positive");
         }
 
+        mAvailTimeout = configuration.getAvailTimeout(null);
+
         if (mAvailTimeout == null) {
 
             throw new NullPointerException(
                     "the timeout for available invocation instances must not be null");
         }
+
+        mLogger = Logger.create(configuration.getLog(null), configuration.getLogLevel(null), this);
     }
 
     /**
@@ -179,18 +198,21 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
         mLogger.dbg("invoking routine: parallel");
 
-        final AbstractRoutine<INPUT, OUTPUT> parallelRoutine =
-                new AbstractRoutine<INPUT, OUTPUT>(mConfiguration, mSyncRunner, mLogger) {
+        if (mParallelRoutine == null) {
 
-                    @Nonnull
-                    @Override
-                    protected Invocation<INPUT, OUTPUT> createInvocation(final boolean async) {
+            mParallelRoutine =
+                    new AbstractRoutine<INPUT, OUTPUT>(mConfiguration, mSyncRunner, mLogger) {
 
-                        return new ParallelInvocation<INPUT, OUTPUT>(AbstractRoutine.this);
-                    }
-                };
+                        @Nonnull
+                        @Override
+                        protected Invocation<INPUT, OUTPUT> createInvocation(final boolean async) {
 
-        return parallelRoutine.invokeAsync();
+                            return new ParallelInvocation<INPUT, OUTPUT>(AbstractRoutine.this);
+                        }
+                    };
+        }
+
+        return mParallelRoutine.invokeAsync();
     }
 
     @Nonnull
@@ -214,6 +236,10 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
                     syncInvocation.onDestroy();
 
+                } catch (final RoutineInterruptedException e) {
+
+                    throw e.interrupt();
+
                 } catch (final Throwable t) {
 
                     logger.wrn(t, "ignoring exception while destroying invocation instance");
@@ -229,6 +255,10 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
                 try {
 
                     invocation.onDestroy();
+
+                } catch (final RoutineInterruptedException e) {
+
+                    throw e.interrupt();
 
                 } catch (final Throwable t) {
 
@@ -265,12 +295,33 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
     protected abstract Invocation<INPUT, OUTPUT> createInvocation(boolean async);
 
     @Nonnull
+    private DefaultInvocationManager getInvocationManager(final boolean async) {
+
+        if (async) {
+
+            if (mAsyncManager == null) {
+
+                mAsyncManager = new DefaultInvocationManager(true);
+            }
+
+            return mAsyncManager;
+        }
+
+        if (mSyncManager == null) {
+
+            mSyncManager = new DefaultInvocationManager(false);
+        }
+
+        return mSyncManager;
+    }
+
+    @Nonnull
     private ParameterChannel<INPUT, OUTPUT> invoke(final boolean async) {
 
         final Logger logger = mLogger;
         logger.dbg("invoking routine: %ssync", (async) ? "a" : "");
         return new DefaultParameterChannel<INPUT, OUTPUT>(mConfiguration,
-                                                          new DefaultInvocationManager(async),
+                                                          getInvocationManager(async),
                                                           (async) ? mAsyncRunner : mSyncRunner,
                                                           logger);
     }
@@ -302,15 +353,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
                 try {
 
-                    final int maxRunning = mMaxRunning;
-                    isTimeout = !mAvailTimeout.waitTrue(mMutex, new Check() {
-
-                        @Override
-                        public boolean isTrue() {
-
-                            return mRunningCount < maxRunning;
-                        }
-                    });
+                    isTimeout = !mAvailTimeout.waitTrue(mMutex, mIsInvocationAvailable);
 
                 } catch (final InterruptedException e) {
 
@@ -403,6 +446,10 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
                     try {
 
                         invocation.onDestroy();
+
+                    } catch (final RoutineInterruptedException e) {
+
+                        throw e.interrupt();
 
                     } catch (final Throwable t) {
 

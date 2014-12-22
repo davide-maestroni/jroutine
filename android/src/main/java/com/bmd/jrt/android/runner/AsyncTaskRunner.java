@@ -17,7 +17,6 @@ import android.annotation.TargetApi;
 import android.os.AsyncTask;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
-import android.os.Looper;
 
 import com.bmd.jrt.runner.Execution;
 
@@ -33,7 +32,7 @@ import javax.annotation.Nullable;
  * <p/>
  * Created by davide on 9/28/14.
  */
-class AsyncTaskRunner extends LooperRunner {
+class AsyncTaskRunner extends MainRunner {
 
     private final Executor mExecutor;
 
@@ -45,8 +44,6 @@ class AsyncTaskRunner extends LooperRunner {
      * @param executor the executor.
      */
     AsyncTaskRunner(@Nullable final Executor executor) {
-
-        super(Looper.getMainLooper(), null);
 
         mExecutor = executor;
     }

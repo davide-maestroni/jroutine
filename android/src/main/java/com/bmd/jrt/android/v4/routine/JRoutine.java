@@ -25,10 +25,64 @@ import javax.annotation.Nonnull;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
- * This utility class extends the base Java routine in order to support additional paradigms
+ * This utility class extends the base Java routine in order to support additional routine builders
  * specific to the Android platform.
  * <p/>
- * TODO: example
+ * For example, in order to get a resource from the network, needed to fill an activity UI:
+ * <pre>
+ *     <code>
+ *
+ *         &#64;Override
+ *         protected void onCreate(final Bundle savedInstanceState) {
+ *
+ *             super.onCreate(savedInstanceState);
+ *             setContentView(R.layout.my_activity_layout);
+ *
+ *             JRoutine.initContext(this);
+ *
+ *             if (savedInstanceState != null) {
+ *
+ *                 mResource = savedInstanceState.getParcelable(RESOURCE_KEY);
+ *             }
+ *
+ *             if (mResource != null) {
+ *
+ *                 displayResource(mResource);
+ *
+ *             } else {
+ *
+ *                 final Routine&lt;URI, MyResource&gt; routine =
+ *                         JRoutine.from(this, ClassToken.tokenOf(LoadResource.class))
+ *                                 .buildRoutine();
+ *                 routine.callAsync(RESOURCE_URI)
+ *                        .bind(new TemplateOutputConsumer&lt;MyResource&gt;() {
+ *
+ *                            &#64;Override
+ *                            public void onError(&#64;Nullable final Throwable error) {
+ *
+ *                                displayError(error);
+ *                            }
+ *
+ *                            &#64;Override
+ *                            public void onOutput(final MyResource resource) {
+ *
+ *                                mResource = resource;
+ *                                displayResource(resource);
+ *                            }
+ *                        });
+ *             }
+ *         }
+ *
+ *         &#64;Override
+ *         protected void onSaveInstanceState(final Bundle outState) {
+ *
+ *             super.onSaveInstanceState(outState);
+ *             outState.putParcelable(RESOURCE_KEY, mResource);
+ *         }
+ *     </code>
+ * </pre>
+ * The above code will ensure that the loading process survives any configuration change and the
+ * resulting resource is dispatched only once.
  * <p/>
  * Created by davide on 12/8/14.
  */

@@ -48,7 +48,7 @@ public class LoggerTest extends TestCase {
         Logger.setDefaultLog(null);
         assertThat(Logger.getDefaultLog()).isEqualTo(defaultLog);
 
-        final NullLog log = new NullLog();
+        final NullLog log = Logs.nullLog();
         Logger.setDefaultLog(log);
         assertThat(Logger.getDefaultLog()).isEqualTo(log);
 

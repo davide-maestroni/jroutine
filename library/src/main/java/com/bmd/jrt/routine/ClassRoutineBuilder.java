@@ -23,6 +23,7 @@ import com.bmd.jrt.builder.RoutineConfigurationBuilder;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.CacheHashMap;
 import com.bmd.jrt.common.RoutineException;
+import com.bmd.jrt.common.RoutineInterruptedException;
 import com.bmd.jrt.invocation.SimpleInvocation;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
@@ -727,6 +728,10 @@ public class ClassRoutineBuilder implements RoutineBuilder {
                 } catch (final InvocationTargetException e) {
 
                     throw new RoutineException(e.getCause());
+
+                } catch (final RoutineInterruptedException e) {
+
+                    throw e.interrupt();
 
                 } catch (final RoutineException e) {
 

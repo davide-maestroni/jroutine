@@ -28,6 +28,7 @@ import com.bmd.jrt.builder.RoutineConfigurationBuilder;
 import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.common.Reflection;
 import com.bmd.jrt.common.RoutineException;
+import com.bmd.jrt.common.RoutineInterruptedException;
 import com.bmd.jrt.invocation.Invocation;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
@@ -224,6 +225,10 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> implements AndroidRoutineBuild
 
                 invocation.onDestroy();
 
+            } catch (final RoutineInterruptedException e) {
+
+                throw e.interrupt();
+
             } catch (final Throwable t) {
 
                 mLogger.wrn(t, "ignoring exception while destroying invocation instance");
@@ -254,6 +259,11 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> implements AndroidRoutineBuild
 
                 logger.err(e, "error creating the invocation instance");
                 throw new RoutineException(e.getCause());
+
+            } catch (final RoutineInterruptedException e) {
+
+                logger.err(e, "error creating the invocation instance");
+                throw e.interrupt();
 
             } catch (final RoutineException e) {
 

@@ -44,4 +44,15 @@ public class RoutineInterruptedException extends RoutineException {
         Thread.currentThread().interrupt();
         throw new RoutineInterruptedException(exception);
     }
+
+    /**
+     * Sets the interrupt flag of the current thread and returns this exception.
+     *
+     * @return this exception.
+     */
+    public RoutineInterruptedException interrupt() {
+
+        Thread.currentThread().interrupt();
+        return this;
+    }
 }

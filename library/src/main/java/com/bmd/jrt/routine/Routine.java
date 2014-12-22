@@ -272,8 +272,8 @@ public interface Routine<INPUT, OUTPUT> {
 
     /**
      * Makes the routine recycle all the cached invocation instance.<br/>
-     * This method is useful to force the release of external resources when needed.<br/>
-     * Note that the routine will still be usable after the method returns.
+     * This method is useful to force the release of external resources when done with the routine.
+     * Note however that the routine will still be usable after the method returns.
      */
     public void recycle();
 }

@@ -35,6 +35,7 @@ import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.CacheHashMap;
 import com.bmd.jrt.common.RoutineException;
+import com.bmd.jrt.common.RoutineInterruptedException;
 import com.bmd.jrt.invocation.Invocation;
 import com.bmd.jrt.invocation.SimpleInvocation;
 import com.bmd.jrt.log.Logger;
@@ -324,6 +325,11 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
 
                 logger.err(e, "error creating the invocation instance [%d]", loaderId);
                 throw new RoutineException(e.getCause());
+
+            } catch (final RoutineInterruptedException e) {
+
+                logger.err(e, "error creating the invocation instance");
+                throw e.interrupt();
 
             } catch (final RoutineException e) {
 

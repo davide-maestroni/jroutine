@@ -263,7 +263,7 @@ class LocalQueue {
 
                 } catch (final RoutineInterruptedException e) {
 
-                    throw e;
+                    throw e.interrupt();
 
                 } catch (final Throwable ignored) {
 

@@ -46,7 +46,7 @@ What the library has to offer is:
 
 And more:
 
-* ***< 175KB Jar***
+* ***< 170KB Jar***
 * ***Java 5+**** ***and Android 1.6+***
 * ***@Nullable and @Nonnull annotations***
 

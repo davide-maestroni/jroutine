@@ -37,6 +37,7 @@ import com.bmd.jrt.common.CacheHashMap;
 import com.bmd.jrt.common.RoutineException;
 import com.bmd.jrt.invocation.Invocation;
 import com.bmd.jrt.invocation.SimpleInvocation;
+import com.bmd.jrt.log.Logger;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
@@ -72,6 +73,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
 
     private final int mLoaderId;
 
+    private final Logger mLogger;
+
     /**
      * Constructor.
      *
@@ -80,12 +83,14 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
      * @param resolution  the clash resolution type.
      * @param cacheType   the result cache type.
      * @param constructor the invocation constructor.
-     * @throws NullPointerException if one of the specified parameters is null.
+     * @param logger      the logger instance.
+     * @throws NullPointerException if any of the specified parameters is null.
      */
     @SuppressWarnings("ConstantConditions")
     LoaderInvocation(@Nonnull final WeakReference<Object> context, final int loaderId,
             @Nonnull final ClashResolution resolution, @Nonnull final ResultCache cacheType,
-            @Nonnull final Constructor<? extends Invocation<INPUT, OUTPUT>> constructor) {
+            @Nonnull final Constructor<? extends Invocation<INPUT, OUTPUT>> constructor,
+            @Nonnull final Logger logger) {
 
         if (context == null) {
 
@@ -112,6 +117,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
         mClashResolution = resolution;
         mCacheType = cacheType;
         mConstructor = constructor;
+        mLogger = logger.subContextLogger(this);
     }
 
     /**
@@ -217,10 +223,12 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
     public void onCall(@Nonnull final List<? extends INPUT> inputs,
             @Nonnull final ResultChannel<OUTPUT> result) {
 
+        final Logger logger = mLogger;
         final Object context = mContext.get();
 
         if (context == null) {
 
+            logger.dbg("avoiding running invocation since context is null");
             return;
         }
 
@@ -232,22 +240,19 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
             final Activity activity = (Activity) context;
             loaderContext = activity.getApplicationContext();
             loaderManager = activity.getLoaderManager();
+            logger.dbg("running invocation linked to activity: %s", activity);
 
         } else if (context instanceof Fragment) {
 
             final Fragment fragment = (Fragment) context;
             loaderContext = fragment.getActivity().getApplicationContext();
             loaderManager = fragment.getLoaderManager();
+            logger.dbg("running invocation linked to fragment: %s", fragment);
 
         } else {
 
             throw new IllegalArgumentException(
                     "invalid context type: " + context.getClass().getCanonicalName());
-        }
-
-        if ((loaderContext == null) || (loaderManager == null)) {
-
-            return;
         }
 
         final Constructor<? extends Invocation<INPUT, OUTPUT>> constructor = mConstructor;
@@ -256,6 +261,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
         if (loaderId == AndroidRoutineBuilder.GENERATED) {
 
             loaderId = 31 * constructor.getDeclaringClass().hashCode() + inputs.hashCode();
+            logger.dbg("generating invocation ID: %d", loaderId);
         }
 
         boolean needRestart = true;
@@ -265,6 +271,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
 
             if (loader.getClass() != RoutineLoader.class) {
 
+                logger.err("invocation ID clashing with loader [%d]: %s", loaderId, loader);
                 throw new IllegalStateException("invalid loader with ID=" + loaderId + ": " + loader
                         .getClass()
                         .getCanonicalName());
@@ -275,6 +282,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
 
             if (!routineLoader.isSameInvocationType(mConstructor.getDeclaringClass())) {
 
+                logger.wrn("clashing invocation ID [%d]", loaderId);
                 throw new RoutineClashException(loaderId);
             }
 
@@ -284,10 +292,12 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
 
                 if ((resolution == ClashResolution.KEEP) || routineLoader.areSameInputs(inputs)) {
 
+                    logger.dbg("keeping existing invocation [%d]", loaderId);
                     needRestart = false;
 
                 } else if (resolution == ClashResolution.ABORT) {
 
+                    logger.dbg("aborting invocation invocation [%d]", loaderId);
                     throw new InputClashException(loaderId);
                 }
             }
@@ -306,43 +316,52 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
 
             try {
 
-                invocation = mConstructor.newInstance();
+                logger.dbg("creating a new instance of class [%d]: %s", loaderId,
+                           constructor.getDeclaringClass());
+                invocation = constructor.newInstance();
 
             } catch (final InvocationTargetException e) {
 
+                logger.err(e, "error creating the invocation instance [%d]", loaderId);
                 throw new RoutineException(e.getCause());
 
             } catch (final RoutineException e) {
 
+                logger.err(e, "error creating the invocation instance [%d]", loaderId);
                 throw e;
 
             } catch (final Throwable t) {
 
+                logger.err(t, "error creating the invocation instance [%d]", loaderId);
                 throw new RoutineException(t);
             }
 
             if (callbacks != null) {
 
+                logger.dbg("resetting existing callbacks [%d]", loaderId);
                 callbacks.reset();
             }
 
             final RoutineLoader<INPUT, OUTPUT> routineLoader =
-                    new RoutineLoader<INPUT, OUTPUT>(loaderContext, invocation, inputs);
-            callbacks = new RoutineLoaderCallbacks<OUTPUT>(loaderManager, routineLoader);
+                    new RoutineLoader<INPUT, OUTPUT>(loaderContext, invocation, inputs, logger);
+            callbacks = new RoutineLoaderCallbacks<OUTPUT>(loaderManager, routineLoader, logger);
             callbackArray.put(loaderId, callbacks);
             needRestart = true;
         }
 
+        logger.dbg("setting result cache type [%d]: %s", loaderId, mCacheType);
         callbacks.setCacheType(mCacheType);
 
         final OutputChannel<OUTPUT> outputChannel = callbacks.newChannel();
 
         if (needRestart) {
 
+            logger.dbg("restarting loader [%d]", loaderId);
             loaderManager.restartLoader(loaderId, Bundle.EMPTY, callbacks);
 
         } else {
 
+            logger.dbg("initializing loader [%d]", loaderId);
             loaderManager.initLoader(loaderId, Bundle.EMPTY, callbacks);
         }
 
@@ -365,6 +384,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
 
         private final LoaderManager mLoaderManager;
 
+        private final Logger mLogger;
+
         private ResultCache mCacheType;
 
         private int mResultCount;
@@ -374,12 +395,14 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
          *
          * @param loaderManager the loader manager.
          * @param loader        the loader instance.
+         * @param logger        the logger instance.
          */
         private RoutineLoaderCallbacks(@Nonnull final LoaderManager loaderManager,
-                @Nonnull final RoutineLoader<?, OUTPUT> loader) {
+                @Nonnull final RoutineLoader<?, OUTPUT> loader, @Nonnull final Logger logger) {
 
             mLoaderManager = loaderManager;
             mLoader = loader;
+            mLogger = logger.subContextLogger(this);
         }
 
         /**
@@ -391,9 +414,15 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
         @Nonnull
         public OutputChannel<OUTPUT> newChannel() {
 
+            final Logger logger = mLogger;
+            logger.dbg("creating new result channel");
+
             final RoutineLoader<?, OUTPUT> internalLoader = mLoader;
-            final IOChannel<OUTPUT> channel = JRoutine.io().buildChannel();
             final ArrayList<IOChannel<OUTPUT>> channels = mChannels;
+            final IOChannel<OUTPUT> channel = JRoutine.io()
+                                                      .loggedWith(logger.getLog())
+                                                      .logLevel(logger.getLogLevel())
+                                                      .buildChannel();
             channels.add(channel);
             internalLoader.setInvocationCount(
                     Math.max(channels.size(), internalLoader.getInvocationCount()));
@@ -403,6 +432,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
         @Override
         public Loader<InvocationResult<OUTPUT>> onCreateLoader(final int id, final Bundle args) {
 
+            mLogger.dbg("creating Android loader: %d", id);
             return mLoader;
         }
 
@@ -410,7 +440,10 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
         public void onLoadFinished(final Loader<InvocationResult<OUTPUT>> loader,
                 final InvocationResult<OUTPUT> result) {
 
+            final Logger logger = mLogger;
             final ArrayList<IOChannel<OUTPUT>> channels = mChannels;
+
+            logger.dbg("dispatching invocation result: " + result);
 
             for (final IOChannel<OUTPUT> channel : channels) {
 
@@ -433,7 +466,9 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
                 if ((cacheType == ResultCache.CLEAR) || (result.isError() ? (cacheType
                         == ResultCache.RETAIN_RESULT) : (cacheType == ResultCache.RETAIN_ERROR))) {
 
-                    mLoaderManager.destroyLoader(internalLoader.getId());
+                    final int id = internalLoader.getId();
+                    logger.dbg("destroying Android loader: %d", id);
+                    mLoaderManager.destroyLoader(id);
                 }
             }
         }
@@ -441,11 +476,13 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
         @Override
         public void onLoaderReset(final Loader<InvocationResult<OUTPUT>> loader) {
 
+            mLogger.dbg("resetting Android loader: %d", mLoader.getId());
             reset();
         }
 
         private void reset() {
 
+            mLogger.dbg("aborting result channels");
             final ArrayList<IOChannel<OUTPUT>> channels = mChannels;
 
             for (final IOChannel<OUTPUT> channel : channels) {
@@ -458,6 +495,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
 
         private void setCacheType(@Nonnull final ResultCache cacheType) {
 
+            mLogger.dbg("setting cache type: %s", cacheType);
             mCacheType = cacheType;
         }
     }

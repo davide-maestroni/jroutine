@@ -15,6 +15,7 @@ package com.bmd.jrt.routine;
 
 import com.bmd.jrt.annotation.Async;
 import com.bmd.jrt.annotation.AsyncType;
+import com.bmd.jrt.builder.DefaultConfigurationBuilder;
 import com.bmd.jrt.builder.InputDeadLockException;
 import com.bmd.jrt.builder.OutputDeadLockException;
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
@@ -31,7 +32,6 @@ import com.bmd.jrt.common.RoutineException;
 import com.bmd.jrt.invocation.Invocation;
 import com.bmd.jrt.invocation.SimpleInvocation;
 import com.bmd.jrt.invocation.TemplateInvocation;
-import com.bmd.jrt.invocation.TunnelInvocation;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.log.NullLog;
@@ -50,6 +50,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.annotation.Nonnull;
@@ -1580,6 +1581,17 @@ public class RoutineTest extends TestCase {
                           .readAll()).containsExactly("test");
     }
 
+    public void testRecycle() {
+
+        final Routine<String, String> routine =
+                JRoutine.on(tokenOf(TestRecycle.class)).buildRoutine();
+        assertThat(routine.callParallel("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2",
+                                                                                         "3", "4",
+                                                                                         "5");
+        routine.recycle();
+        assertThat(TestRecycle.getInstanceCount()).isZero();
+    }
+
     @SuppressWarnings("ConstantConditions")
     public void testResultChannelError() {
 
@@ -2475,43 +2487,6 @@ public class RoutineTest extends TestCase {
         public int take(int i);
     }
 
-    public static class TestLifecycle extends TunnelInvocation<String> {
-
-        private static boolean sActive;
-
-        private static boolean sIsError;
-
-        @Override
-        public void onInput(final String input, @Nonnull final ResultChannel<String> result) {
-
-            result.after(millis(1000)).pass(input);
-        }
-
-        @Override
-        public void onAbort(@Nullable final Throwable reason) {
-
-            if (!sActive) {
-
-                sIsError = true;
-            }
-        }
-
-        @Override
-        public void onInit() {
-
-            sActive = true;
-        }
-
-
-        @Override
-        public void onReturn() {
-
-            sActive = false;
-        }
-
-
-    }
-
     private static class ConstructorException extends TemplateInvocation<Object, Object> {
 
         public ConstructorException() {
@@ -2746,6 +2721,41 @@ public class RoutineTest extends TestCase {
         }
     }
 
+    private static class TestLifecycle extends TemplateInvocation<String, String> {
+
+        private static boolean sActive;
+
+        private static boolean sIsError;
+
+        @Override
+        public void onInput(final String input, @Nonnull final ResultChannel<String> result) {
+
+            result.after(millis(1000)).pass(input);
+        }
+
+        @Override
+        public void onAbort(@Nullable final Throwable reason) {
+
+            if (!sActive) {
+
+                sIsError = true;
+            }
+        }
+
+        @Override
+        public void onInit() {
+
+            sActive = true;
+        }
+
+
+        @Override
+        public void onReturn() {
+
+            sActive = false;
+        }
+    }
+
     private static class TestOutputConsumer extends TemplateOutputConsumer<Object> {
 
         private boolean mIsOutput;
@@ -2768,5 +2778,34 @@ public class RoutineTest extends TestCase {
             mIsOutput = true;
             mOutput = o;
         }
+    }
+
+    private static class TestRecycle extends TemplateInvocation<String, String> {
+
+        private static final AtomicInteger sInstanceCount = new AtomicInteger();
+
+        public TestRecycle() {
+
+            sInstanceCount.incrementAndGet();
+        }
+
+        public static int getInstanceCount() {
+
+            return sInstanceCount.get();
+        }
+
+        @Override
+        public void onInput(final String input, @Nonnull final ResultChannel<String> result) {
+
+            result.after(millis(100)).pass(input);
+        }
+
+        @Override
+        public void onDestroy() {
+
+            sInstanceCount.decrementAndGet();
+        }
+
+
     }
 }

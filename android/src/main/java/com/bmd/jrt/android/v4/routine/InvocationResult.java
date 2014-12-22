@@ -55,6 +55,12 @@ class InvocationResult<OUTPUT> {
         mOutputs = null;
     }
 
+    @Override
+    public String toString() {
+
+        return isError() ? mException.toString() : mOutputs.toString();
+    }
+
     /**
      * Checks if this result represents an error.
      *

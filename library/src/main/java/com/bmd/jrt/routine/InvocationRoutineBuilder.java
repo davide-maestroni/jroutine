@@ -13,6 +13,7 @@
  */
 package com.bmd.jrt.routine;
 
+import com.bmd.jrt.builder.DefaultConfigurationBuilder;
 import com.bmd.jrt.builder.RoutineChannelBuilder;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.common.ClassToken;

@@ -40,6 +40,10 @@ import javax.annotation.Nullable;
  *         > onResult(result);
  *
  *         > onReturn();
+ *
+ *           ...
+ *
+ *         > onDestroy();
  *     </code>
  * </pre>
  * Note that the <b><code>onInput()</code></b> method will be called for each input passed to the
@@ -53,8 +57,10 @@ import javax.annotation.Nullable;
  * when an exception escapes the <b><code>onAbort()</code></b> method invocation.
  * <p/>
  * The <b><code>onReturn()</code></b> method is meant to allow the clean up and reset operations
- * needed to prepare the invocation object to be reused. In fact, when the method is not called or
- * does not complete successfully, the invocation object is discarded.
+ * needed to prepare the invocation object to be reused. When the method is not called or does not
+ * complete successfully, the invocation object is discarded.<br/>
+ * The <b><code>onDestroy()</code></b> method is meant to indicate that the invocation object is no
+ * longer needed, so any associated resource can be safely released.
  * <p/>
  * Created by davide on 9/7/14.
  *
@@ -70,6 +76,11 @@ public interface Invocation<INPUT, OUTPUT> {
      * @param reason the reason of the abortion.
      */
     public void onAbort(@Nullable Throwable reason);
+
+    /**
+     * Called when the routine invocation is no longer needed.
+     */
+    public void onDestroy();
 
     /**
      * Called when the routine invocation is initialized.<br/>

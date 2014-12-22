@@ -11,10 +11,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.routine;
+package com.bmd.jrt.builder;
 
-import com.bmd.jrt.builder.RoutineConfiguration;
-import com.bmd.jrt.builder.RoutineConfigurationBuilder;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.log.Logger;
@@ -31,7 +29,7 @@ import static com.bmd.jrt.time.TimeDuration.seconds;
  * <p/>
  * Created by davide on 11/15/14.
  */
-class DefaultConfigurationBuilder extends RoutineConfigurationBuilder {
+public class DefaultConfigurationBuilder extends RoutineConfigurationBuilder {
 
     private static final TimeDuration DEFAULT_AVAIL_TIMEOUT = seconds(5);
 
@@ -42,7 +40,7 @@ class DefaultConfigurationBuilder extends RoutineConfigurationBuilder {
     /**
      * Constructor.
      */
-    DefaultConfigurationBuilder() {
+    public DefaultConfigurationBuilder() {
 
     }
 

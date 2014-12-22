@@ -31,6 +31,7 @@ import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.common.RoutineException;
 import com.bmd.jrt.common.RoutineInterruptedException;
 import com.bmd.jrt.invocation.TemplateInvocation;
+import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.routine.Routine;
 import com.bmd.jrt.time.TimeDuration;
 
@@ -599,10 +600,14 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
     @SuppressWarnings("ConstantConditions")
     public void testLoaderError() throws NoSuchMethodException {
 
+        final Logger logger = Logger.create(Logger.getDefaultLog(), Logger.getDefaultLogLevel());
+        final WeakReference<Object> reference = new WeakReference<Object>(getActivity());
+
         try {
 
             new LoaderInvocation<String, String>(null, 0, ClashResolution.KEEP, ResultCache.RETAIN,
-                                                 ToUpperCase.class.getDeclaredConstructor());
+                                                 ToUpperCase.class.getDeclaredConstructor(),
+                                                 logger);
 
             fail();
 
@@ -612,32 +617,44 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            new LoaderInvocation<String, String>(new WeakReference<Object>(getActivity()), 0, null,
+            new LoaderInvocation<String, String>(reference, 0, null, ResultCache.RETAIN,
+                                                 ToUpperCase.class.getDeclaredConstructor(),
+                                                 logger);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new LoaderInvocation<String, String>(reference, 0, ClashResolution.KEEP, null,
+                                                 ToUpperCase.class.getDeclaredConstructor(),
+                                                 logger);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new LoaderInvocation<String, String>(reference, 0, ClashResolution.KEEP,
+                                                 ResultCache.RETAIN, null, logger);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new LoaderInvocation<String, String>(reference, 0, ClashResolution.KEEP,
                                                  ResultCache.RETAIN,
-                                                 ToUpperCase.class.getDeclaredConstructor());
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            new LoaderInvocation<String, String>(new WeakReference<Object>(getActivity()), 0,
-                                                 ClashResolution.KEEP, null,
-                                                 ToUpperCase.class.getDeclaredConstructor());
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            new LoaderInvocation<String, String>(new WeakReference<Object>(getActivity()), 0,
-                                                 ClashResolution.KEEP, ResultCache.RETAIN, null);
+                                                 ToUpperCase.class.getDeclaredConstructor(), null);
 
             fail();
 

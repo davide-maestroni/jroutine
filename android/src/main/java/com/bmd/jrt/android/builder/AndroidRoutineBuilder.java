@@ -13,9 +13,12 @@
  */
 package com.bmd.jrt.android.builder;
 
+import com.bmd.jrt.log.Log;
+import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.routine.Routine;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Interface defining an builder of routines linked to a context lifecycle.
@@ -50,6 +53,26 @@ public interface AndroidRoutineBuilder<INPUT, OUTPUT> {
      */
     @Nonnull
     public Routine<INPUT, OUTPUT> buildRoutine();
+
+    /**
+     * Sets the log level.
+     *
+     * @param level the log level.
+     * @return this builder.
+     * @throws NullPointerException if the log level is null.
+     */
+    @Nonnull
+    public AndroidRoutineBuilder<INPUT, OUTPUT> logLevel(@Nonnull LogLevel level);
+
+    /**
+     * Sets the log instance. A null value means that it is up to the framework to chose a default
+     * implementation.
+     *
+     * @param log the log instance.
+     * @return this builder.
+     */
+    @Nonnull
+    public AndroidRoutineBuilder<INPUT, OUTPUT> loggedWith(@Nullable Log log);
 
     /**
      * Tells the builder how to resolve clashes of invocation inputs. A clash happens when an

@@ -42,14 +42,14 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  */
 public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
+    private final LinkedList<Invocation<INPUT, OUTPUT>> mAsyncInvocations =
+            new LinkedList<Invocation<INPUT, OUTPUT>>();
+
     private final Runner mAsyncRunner;
 
     private final TimeDuration mAvailTimeout;
 
     private final RoutineConfiguration mConfiguration;
-
-    private final LinkedList<Invocation<INPUT, OUTPUT>> mInvocations =
-            new LinkedList<Invocation<INPUT, OUTPUT>>();
 
     private final Logger mLogger;
 
@@ -58,6 +58,9 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
     private final int mMaxRunning;
 
     private final Object mMutex = new Object();
+
+    private final LinkedList<Invocation<INPUT, OUTPUT>> mSyncInvocations =
+            new LinkedList<Invocation<INPUT, OUTPUT>>();
 
     private final Runner mSyncRunner;
 
@@ -197,6 +200,61 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
         return invoke(false);
     }
 
+    @Override
+    public void recycle() {
+
+        synchronized (mMutex) {
+
+            final Logger logger = mLogger;
+            final LinkedList<Invocation<INPUT, OUTPUT>> syncInvocations = mSyncInvocations;
+
+            for (final Invocation<INPUT, OUTPUT> syncInvocation : syncInvocations) {
+
+                try {
+
+                    syncInvocation.onDestroy();
+
+                } catch (final Throwable t) {
+
+                    logger.wrn(t, "ignoring exception while destroying invocation instance");
+                }
+            }
+
+            syncInvocations.clear();
+
+            final LinkedList<Invocation<INPUT, OUTPUT>> asyncInvocations = mAsyncInvocations;
+
+            for (final Invocation<INPUT, OUTPUT> invocation : asyncInvocations) {
+
+                try {
+
+                    invocation.onDestroy();
+
+                } catch (final Throwable t) {
+
+                    logger.wrn(t, "ignoring exception while destroying invocation instance");
+                }
+            }
+
+            asyncInvocations.clear();
+        }
+    }
+
+    /**
+     * Converts an invocation instance
+     *
+     * @param async      whether the converted invocation is asynchronous.
+     * @param invocation the invocation to convert.
+     * @return the converted invocation.
+     */
+    @Nonnull
+    @SuppressWarnings("UnusedParameters")
+    protected Invocation<INPUT, OUTPUT> convertInvocation(final boolean async,
+            @Nonnull final Invocation<INPUT, OUTPUT> invocation) {
+
+        return invocation;
+    }
+
     /**
      * Creates a new invocation instance.
      *
@@ -269,18 +327,37 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
                 ++mRunningCount;
 
-                final LinkedList<Invocation<INPUT, OUTPUT>> invocations = mInvocations;
+                final boolean async = mAsync;
+                final LinkedList<Invocation<INPUT, OUTPUT>> invocations =
+                        (async) ? mAsyncInvocations : mSyncInvocations;
 
                 if (!invocations.isEmpty()) {
 
                     final Invocation<INPUT, OUTPUT> invocation = invocations.removeFirst();
-                    mLogger.dbg("reusing invocation instance [%d/%d]: %s", invocations.size() + 1,
-                                mMaxRetained, invocation);
+                    mLogger.dbg("reusing %ssync invocation instance [%d/%d]: %s",
+                                (async) ? "a" : "", invocations.size() + 1, mMaxRetained,
+                                invocation);
                     return invocation;
+
+                } else {
+
+                    final LinkedList<Invocation<INPUT, OUTPUT>> fallbackInvocations =
+                            (async) ? mSyncInvocations : mAsyncInvocations;
+
+                    if (!fallbackInvocations.isEmpty()) {
+
+                        final Invocation<INPUT, OUTPUT> invocation =
+                                fallbackInvocations.removeFirst();
+                        mLogger.dbg("converting %ssync invocation instance [%d/%d]: %s",
+                                    (async) ? "a" : "", invocations.size() + 1, mMaxRetained,
+                                    invocation);
+                        return convertInvocation(async, invocation);
+                    }
                 }
 
-                mLogger.dbg("creating invocation instance [1/%d]", mMaxRetained);
-                return createInvocation(mAsync);
+                mLogger.dbg("creating %ssync invocation instance [1/%d]", (async) ? "a" : "",
+                            mMaxRetained);
+                return createInvocation(async);
             }
         }
 
@@ -304,18 +381,33 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
             synchronized (mMutex) {
 
-                final LinkedList<Invocation<INPUT, OUTPUT>> invocations = mInvocations;
+                final Logger logger = mLogger;
+                final boolean async = mAsync;
+                final LinkedList<Invocation<INPUT, OUTPUT>> syncInvocations = mSyncInvocations;
+                final LinkedList<Invocation<INPUT, OUTPUT>> asyncInvocations = mAsyncInvocations;
 
-                if (invocations.size() < mMaxRetained) {
+                if ((syncInvocations.size() + asyncInvocations.size()) < mMaxRetained) {
 
-                    mLogger.dbg("recycling invocation instance [%d/%d]: %s", invocations.size() + 1,
-                                mMaxRetained, invocation);
+                    final LinkedList<Invocation<INPUT, OUTPUT>> invocations =
+                            (async) ? asyncInvocations : syncInvocations;
+                    logger.dbg("recycling %ssync invocation instance [%d/%d]: %s",
+                               (async) ? "a" : "", invocations.size() + 1, mMaxRetained,
+                               invocation);
                     invocations.add(invocation);
 
                 } else {
 
-                    mLogger.wrn("discarding invocation instance [%d/%d]: %s", mMaxRetained,
-                                mMaxRetained, invocation);
+                    logger.wrn("discarding %ssync invocation instance [%d/%d]: %s",
+                               (async) ? "a" : "", mMaxRetained, mMaxRetained, invocation);
+
+                    try {
+
+                        invocation.onDestroy();
+
+                    } catch (final Throwable t) {
+
+                        logger.wrn(t, "ignoring exception while destroying invocation instance");
+                    }
                 }
 
                 --mRunningCount;

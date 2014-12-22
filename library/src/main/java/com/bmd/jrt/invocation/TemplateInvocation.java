@@ -36,6 +36,11 @@ public abstract class TemplateInvocation<INPUT, OUTPUT> implements Invocation<IN
     }
 
     @Override
+    public void onDestroy() {
+
+    }
+
+    @Override
     public void onInit() {
 
     }

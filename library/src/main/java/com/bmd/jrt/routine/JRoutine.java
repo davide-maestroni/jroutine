@@ -225,7 +225,21 @@ public class JRoutine {
     }
 
     /**
-     * Returns a routine builder wrapping the specified target object.
+     * Returns a routine builder wrapping a weak reference to the specified target object.
+     *
+     * @param target the target object.
+     * @return the routine builder instance.
+     * @throws NullPointerException     if the specified target is null.
+     * @throws IllegalArgumentException if a duplicate name in the annotations is detected.
+     */
+    @Nonnull
+    public static ObjectRoutineBuilder onWeak(@Nonnull final Object target) {
+
+        return onWeak(new WeakReference<Object>(target));
+    }
+
+    /**
+     * Returns a routine builder wrapping a weak reference to the specified target object.
      *
      * @param target the reference to the target object.
      * @return the routine builder instance.
@@ -233,7 +247,7 @@ public class JRoutine {
      * @throws IllegalArgumentException if a duplicate name in the annotations is detected.
      */
     @Nonnull
-    public static ObjectRoutineBuilder on(@Nonnull final WeakReference<?> target) {
+    public static ObjectRoutineBuilder onWeak(@Nonnull final WeakReference<?> target) {
 
         return new ObjectRoutineBuilder(target);
     }

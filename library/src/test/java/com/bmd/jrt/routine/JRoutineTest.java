@@ -420,7 +420,7 @@ public class JRoutineTest extends TestCase {
 
         assertThat(routine.callSync().readAll()).containsExactly(-77L);
 
-        final Routine<Object, Object> routine1 = JRoutine.on(new WeakReference<Test>(test))
+        final Routine<Object, Object> routine1 = JRoutine.onWeak(test)
                                                          .syncRunner(RunnerType.QUEUED)
                                                          .runBy(Runners.poolRunner())
                                                          .method("getLong");
@@ -437,8 +437,7 @@ public class JRoutineTest extends TestCase {
 
         assertThat(routine2.callSync().readAll()).containsExactly(-77L);
 
-        final Routine<Object, Object> routine3 =
-                JRoutine.on(new WeakReference<Test>(test)).asyncMethod(Test.THROW);
+        final Routine<Object, Object> routine3 = JRoutine.onWeak(test).asyncMethod(Test.THROW);
 
         try {
 

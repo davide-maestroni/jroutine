@@ -113,6 +113,7 @@ public class RoutineTest extends TestCase {
             assertThat(ex.getCause().getMessage()).isEqualTo("test2");
         }
 
+        assertThat(channel.checkComplete()).isTrue();
         assertThat(channel.isOpen()).isFalse();
 
 
@@ -133,6 +134,7 @@ public class RoutineTest extends TestCase {
             assertThat(ex.getCause()).isNull();
         }
 
+        assertThat(channel1.checkComplete()).isTrue();
         assertThat(channel1.isOpen()).isFalse();
 
 

@@ -271,9 +271,12 @@ public interface Routine<INPUT, OUTPUT> {
     public ParameterChannel<INPUT, OUTPUT> invokeSync();
 
     /**
-     * Makes the routine recycle all the cached invocation instance.<br/>
+     * Makes the routine recycle all the cached invocation instances.
+     * <p/>
      * This method is useful to force the release of external resources when done with the routine.
      * Note however that the routine will still be usable after the method returns.
+     * <p/>
+     * Normally it is not needed to call this method.
      */
     public void recycle();
 }

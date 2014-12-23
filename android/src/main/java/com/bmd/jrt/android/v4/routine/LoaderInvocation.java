@@ -58,8 +58,9 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  */
 class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
 
-    private static final CacheHashMap<Object, SparseArray<RoutineLoaderCallbacks<?>>> sCallbackMap =
-            new CacheHashMap<Object, SparseArray<RoutineLoaderCallbacks<?>>>();
+    private static final CacheHashMap<Object, SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>
+            sCallbackMap =
+            new CacheHashMap<Object, SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>();
 
     private final ResultCache mCacheType;
 
@@ -137,7 +138,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
 
             if (!sCallbackMap.containsKey(fragment)) {
 
-                sCallbackMap.put(fragment, new SparseArray<RoutineLoaderCallbacks<?>>());
+                sCallbackMap.put(fragment,
+                                 new SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>());
             }
 
             fragment.getLoaderManager();
@@ -163,7 +165,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
 
             if (!sCallbackMap.containsKey(activity)) {
 
-                sCallbackMap.put(activity, new SparseArray<RoutineLoaderCallbacks<?>>());
+                sCallbackMap.put(activity,
+                                 new SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>());
             }
 
             activity.getSupportLoaderManager();
@@ -213,8 +216,6 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
     }
 
     @Override
-    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST_OF_RETURN_VALUE",
-                        justification = "class comparison with == is done")
     @SuppressWarnings("unchecked")
     public void onCall(@Nonnull final List<? extends INPUT> inputs,
             @Nonnull final ResultChannel<OUTPUT> result) {
@@ -260,53 +261,18 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
             logger.dbg("generating invocation ID: %d", loaderId);
         }
 
-        boolean needRestart = true;
-        final Loader<InvocationResult<OUTPUT>> loader = loaderManager.getLoader(loaderId);
+        boolean needsRestart = loaderNeedsRestart(loaderManager, loaderId, inputs);
+        final CacheHashMap<Object, SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>
+                callbackMap = sCallbackMap;
+        final SparseArray<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
+                callbackMap.get(context);
 
-        if (loader != null) {
+        final WeakReference<RoutineLoaderCallbacks<?>> callbackReference =
+                callbackArray.get(loaderId);
+        RoutineLoaderCallbacks<OUTPUT> callbacks = (callbackReference != null)
+                ? (RoutineLoaderCallbacks<OUTPUT>) callbackReference.get() : null;
 
-            if (loader.getClass() != RoutineLoader.class) {
-
-                logger.err("invocation ID clashing with loader [%d]: %s", loaderId, loader);
-                throw new IllegalStateException("invalid loader with ID=" + loaderId + ": " + loader
-                        .getClass()
-                        .getCanonicalName());
-            }
-
-            final RoutineLoader<INPUT, OUTPUT> routineLoader =
-                    (RoutineLoader<INPUT, OUTPUT>) loader;
-
-            if (!routineLoader.isSameInvocationType(mConstructor.getDeclaringClass())) {
-
-                logger.wrn("clashing invocation ID [%d]", loaderId);
-                throw new RoutineClashException(loaderId);
-            }
-
-            final ClashResolution resolution = mClashResolution;
-
-            if (resolution != ClashResolution.RESET) {
-
-                if ((resolution == ClashResolution.KEEP) || routineLoader.areSameInputs(inputs)) {
-
-                    logger.dbg("keeping existing invocation [%d]", loaderId);
-                    needRestart = false;
-
-                } else if (resolution == ClashResolution.ABORT) {
-
-                    logger.dbg("aborting invocation invocation [%d]", loaderId);
-                    throw new InputClashException(loaderId);
-                }
-            }
-        }
-
-        final CacheHashMap<Object, SparseArray<RoutineLoaderCallbacks<?>>> callbackMap =
-                sCallbackMap;
-        final SparseArray<RoutineLoaderCallbacks<?>> callbackArray = callbackMap.get(context);
-
-        RoutineLoaderCallbacks<OUTPUT> callbacks =
-                (RoutineLoaderCallbacks<OUTPUT>) callbackArray.get(loaderId);
-
-        if ((callbacks == null) || needRestart) {
+        if ((callbacks == null) || needsRestart) {
 
             final Invocation<INPUT, OUTPUT> invocation;
 
@@ -346,8 +312,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
             final RoutineLoader<INPUT, OUTPUT> routineLoader =
                     new RoutineLoader<INPUT, OUTPUT>(loaderContext, invocation, inputs, logger);
             callbacks = new RoutineLoaderCallbacks<OUTPUT>(loaderManager, routineLoader, logger);
-            callbackArray.put(loaderId, callbacks);
-            needRestart = true;
+            callbackArray.put(loaderId, new WeakReference<RoutineLoaderCallbacks<?>>(callbacks));
+            needsRestart = true;
         }
 
         logger.dbg("setting result cache type [%d]: %s", loaderId, mCacheType);
@@ -355,7 +321,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
 
         final OutputChannel<OUTPUT> outputChannel = callbacks.newChannel();
 
-        if (needRestart) {
+        if (needsRestart) {
 
             logger.dbg("restarting loader [%d]", loaderId);
             loaderManager.restartLoader(loaderId, Bundle.EMPTY, callbacks);
@@ -367,6 +333,53 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
         }
 
         result.pass(outputChannel);
+    }
+
+    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST_OF_RETURN_VALUE",
+                        justification = "class comparison with == is done")
+    private boolean loaderNeedsRestart(@Nonnull final LoaderManager loaderManager,
+            final int loaderId, @Nonnull final List<? extends INPUT> inputs) {
+
+        final Logger logger = mLogger;
+        final Loader<InvocationResult<OUTPUT>> loader = loaderManager.getLoader(loaderId);
+
+        if (loader != null) {
+
+            if (loader.getClass() != RoutineLoader.class) {
+
+                logger.err("invocation ID clashing with loader [%d]: %s", loaderId, loader);
+                throw new IllegalStateException("invalid loader with ID=" + loaderId + ": " + loader
+                        .getClass()
+                        .getCanonicalName());
+            }
+
+            final RoutineLoader<INPUT, OUTPUT> routineLoader =
+                    (RoutineLoader<INPUT, OUTPUT>) loader;
+
+            if (!routineLoader.isSameInvocationType(mConstructor.getDeclaringClass())) {
+
+                logger.wrn("clashing invocation ID [%d]", loaderId);
+                throw new RoutineClashException(loaderId);
+            }
+
+            final ClashResolution resolution = mClashResolution;
+
+            if (resolution != ClashResolution.RESET) {
+
+                if ((resolution == ClashResolution.KEEP) || routineLoader.areSameInputs(inputs)) {
+
+                    logger.dbg("keeping existing invocation [%d]", loaderId);
+                    return false;
+
+                } else if (resolution == ClashResolution.ABORT) {
+
+                    logger.dbg("aborting invocation invocation [%d]", loaderId);
+                    throw new InputClashException(loaderId);
+                }
+            }
+        }
+
+        return true;
     }
 
     /**

@@ -1092,18 +1092,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                     return this;
                 }
 
-                if (mOutputHasNext == null) {
-
-                    mOutputHasNext = new Check() {
-
-                        @Override
-                        public boolean isTrue() {
-
-                            return !outputQueue.isEmpty() || (mState == ChannelState.DONE);
-                        }
-                    };
-                }
-
                 final long startTime = System.currentTimeMillis();
                 boolean isTimeout = false;
 

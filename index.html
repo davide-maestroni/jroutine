@@ -1,38 +1,46 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-
   <head>
-    <meta charset='utf-8'>
+    <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <meta name="description" content="Jroutine : Parallel programming on the go">
+    <title>JRoutine by davide-maestroni</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/main.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
-
-    <title>Jroutine</title>
   </head>
-
   <body>
 
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/davide-maestroni/jroutine">View on GitHub</a>
+      <header>
+        <h1>JRoutine</h1>
+        <p>Parallel programming on the go</p>
+      </header>
 
-          <h1 id="project_title">Jroutine</h1>
-          <h2 id="project_tagline">Parallel programming on the go</h2>
+      <div id="banner">
+        <span id="logo"></span>
 
-            <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/davide-maestroni/jroutine/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/davide-maestroni/jroutine/tarball/master">Download this project as a tar.gz file</a>
-            </section>
-        </header>
-    </div>
+        <a href="https://github.com/davide-maestroni/jroutine" class="button fork"><strong>View On GitHub</strong></a>
+        <div class="downloads">
+          <span>Downloads:</span>
+          <ul>
+            <li><a href="https://github.com/davide-maestroni/jroutine/zipball/master" class="button">ZIP</a></li>
+            <li><a href="https://github.com/davide-maestroni/jroutine/tarball/master" class="button">TAR</a></li>
+          </ul>
+        </div>
+      </div><!-- end banner -->
 
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
+    <div class="wrapper">
+      <nav>
+        <ul></ul>
+      </nav>
+      <section>
         <h1>
-<a id="jroutine" class="anchor" href="#jroutine" aria-hidden="true"><span class="octicon octicon-link"></span></a>jroutine</h1>
+<a id="jroutine" class="anchor" href="#jroutine" aria-hidden="true"><span class="octicon octicon-link"></span></a>JRoutine</h1>
 
 <p><a href="https://travis-ci.org/davide-maestroni/jroutine"><img src="https://travis-ci.org/davide-maestroni/jroutine.svg?branch=master" alt="Build Status"></a>
 <a href="https://coveralls.io/r/davide-maestroni/jroutine?branch=master"><img src="https://img.shields.io/coveralls/davide-maestroni/jroutine.svg" alt="Coverage Status"></a></p>
@@ -90,12 +98,14 @@ This paradigm is nothing but what any developer is already familiar to, that is,
 <strong><em>Non-recursive calls</em></strong>: even during synchronous invocations, recursion is broken up in a sequential sequence of operations</li>
 <li>
 <strong><em>Automatic code generation</em></strong>: as an alternative to reflection, existing methods can be made asynchronous through annotation pre-processing and compile-time code generation</li>
+<li>
+<strong><em>Nice handling of Android configuration changes</em></strong>: the same paradigm is applied on the Android platform so to support background tasks surviving changes in the configuration of Activities or Fragments</li>
 </ul>
 
 <p>And more:</p>
 
 <ul>
-<li><strong><em>&lt; 175KB Jar</em></strong></li>
+<li><strong><em>&lt; 170KB Jar</em></strong></li>
 <li>
 <strong><em>Java 5+</em></strong>* <strong><em>and Android 1.6+</em></strong>
 </li>
@@ -122,8 +132,8 @@ For anything else <a href="https://github.com/">GitHub</a> is a great source of 
 <p>Complete Javadoc with insights and examples is available:</p>
 
 <ul>
-<li><a href="http://davide-maestroni.github.io/jroutine/javadocs/">JRoutine</a></li>
-<li><a href="http://davide-maestroni.github.io/jroutine/android/javadocs/">JRoutine Android</a></li>
+<li><a href="http://davide-maestroni.github.io/jroutine/docs/jroutine">JRoutine</a></li>
+<li><a href="http://davide-maestroni.github.io/jroutine/docs/android">JRoutine Android</a></li>
 </ul>
 
 <p>The project contains an additional sample module showing how to implement a file downloader with just 4 classes.</p>
@@ -131,7 +141,7 @@ For anything else <a href="https://github.com/">GitHub</a> is a great source of 
 <h2>
 <a id="further-development" class="anchor" href="#further-development" aria-hidden="true"><span class="octicon octicon-link"></span></a>Further development</h2>
 
-<p>Feel free to contribute with your own <a href="http://davide-maestroni.github.io/jroutine/javadocs/com/bmd/jrt/runner/Runner.html">Runner</a> so to support more platforms other than Android.</p>
+<p>Feel free to contribute with your own <a href="http://davide-maestroni.github.io/jroutine/docs/jroutine/com/bmd/jrt/runner/Runner.html">Runner</a> so to support more platforms other than Android.</p>
 
 <h2>
 <a id="build-instructions" class="anchor" href="#build-instructions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Build instructions</h2>
@@ -178,17 +188,12 @@ For anything else <a href="https://github.com/">GitHub</a> is a great source of 
 
 <p><strong>IT'S OPEN DUDE!</strong></p>
       </section>
-    </div>
-
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p class="copyright">Jroutine maintained by <a href="https://github.com/davide-maestroni">davide-maestroni</a></p>
-        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      <footer>
+        <p>Project maintained by <a href="https://github.com/davide-maestroni">davide-maestroni</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></small></p>
       </footer>
     </div>
-
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
     
-
   </body>
 </html>

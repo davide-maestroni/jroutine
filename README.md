@@ -120,7 +120,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 [10]:https://github.com/
 [11]:http://findbugs.sourceforge.net/
 [12]:http://joel-costigliola.github.io/assertj/
-[13]:http://davide-maestroni.github.io/jroutine/javadocs/
-[14]:http://davide-maestroni.github.io/jroutine/android/javadocs/
-[15]:http://davide-maestroni.github.io/jroutine/javadocs/com/bmd/jrt/runner/Runner.html
+[13]:http://davide-maestroni.github.io/jroutine/docs/jroutine
+[14]:http://davide-maestroni.github.io/jroutine/docs/android
+[15]:http://davide-maestroni.github.io/jroutine/docs/jroutine/com/bmd/jrt/runner/Runner.html
 [16]:http://retrotranslator.sourceforge.net/

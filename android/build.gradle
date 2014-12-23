@@ -105,6 +105,7 @@ android.libraryVariants.all { variant ->
         options.linksOffline('http://developer.android.com/reference/', "${android.sdkDirectory}/docs/reference/")
         options.overview("${project.projectDir}/docs/overview.html")
         options.windowTitle("Javadoc - ${archivesBaseName}")
+        options.setMemberLevel(JavadocMemberLevel.PUBLIC)
         exclude '**/BuildConfig.java'
         exclude '**/R.java'
     }

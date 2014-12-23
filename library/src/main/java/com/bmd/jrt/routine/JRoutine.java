@@ -73,7 +73,7 @@ import javax.annotation.Nonnull;
  *     </code>
  * </pre>
  * (Note that, the order of the input or the output of the routine is not guaranteed unless the
- * proper methods are called)
+ * proper builder methods are called)
  * <p/>
  * <b>Example 2:</b> Asynchronously concatenate the output of two routines.
  * <pre>

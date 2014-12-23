@@ -228,11 +228,28 @@ public class RoutineProcessor extends AbstractProcessor {
     @Nonnull
     private String buildInputParams(@Nonnull final ExecutableElement methodElement) {
 
+        final Types typeUtils = processingEnv.getTypeUtils();
+        final TypeElement outputChannelElement = mOutputChannelElement;
         final StringBuilder builder = new StringBuilder();
 
         for (final VariableElement variableElement : methodElement.getParameters()) {
 
-            builder.append(".pass(").append(variableElement).append(")");
+            builder.append(".pass(");
+
+            if (typeUtils.isAssignable(outputChannelElement.asType(),
+                                       typeUtils.erasure(variableElement.asType()))) {
+
+                if (variableElement.getAnnotation(AsyncType.class) != null) {
+
+                    builder.append("(com.bmd.jrt.channel.OutputChannel)");
+
+                } else {
+
+                    builder.append("(Object)");
+                }
+            }
+
+            builder.append(variableElement).append(")");
         }
 
         return builder.toString();

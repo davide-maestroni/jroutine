@@ -32,7 +32,7 @@
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
         <h1>
-<a id="jroutine" class="anchor" href="#jroutine" aria-hidden="true"><span class="octicon octicon-link"></span></a>jroutine</h1>
+<a id="jroutine" class="anchor" href="#jroutine" aria-hidden="true"><span class="octicon octicon-link"></span></a>JRoutine</h1>
 
 <p><a href="https://travis-ci.org/davide-maestroni/jroutine"><img src="https://travis-ci.org/davide-maestroni/jroutine.svg?branch=master" alt="Build Status"></a>
 <a href="https://coveralls.io/r/davide-maestroni/jroutine?branch=master"><img src="https://img.shields.io/coveralls/davide-maestroni/jroutine.svg" alt="Coverage Status"></a></p>
@@ -90,12 +90,14 @@ This paradigm is nothing but what any developer is already familiar to, that is,
 <strong><em>Non-recursive calls</em></strong>: even during synchronous invocations, recursion is broken up in a sequential sequence of operations</li>
 <li>
 <strong><em>Automatic code generation</em></strong>: as an alternative to reflection, existing methods can be made asynchronous through annotation pre-processing and compile-time code generation</li>
+<li>
+<strong><em>Nice handling of Android configuration changes</em></strong>: the same paradigm is applied on the Android platform so to support background tasks surviving changes in the configuration of Activities or Fragments</li>
 </ul>
 
 <p>And more:</p>
 
 <ul>
-<li><strong><em>&lt; 175KB Jar</em></strong></li>
+<li><strong><em>&lt; 170KB Jar</em></strong></li>
 <li>
 <strong><em>Java 5+</em></strong>* <strong><em>and Android 1.6+</em></strong>
 </li>
@@ -122,8 +124,8 @@ For anything else <a href="https://github.com/">GitHub</a> is a great source of 
 <p>Complete Javadoc with insights and examples is available:</p>
 
 <ul>
-<li><a href="http://davide-maestroni.github.io/jroutine/javadocs/">JRoutine</a></li>
-<li><a href="http://davide-maestroni.github.io/jroutine/android/javadocs/">JRoutine Android</a></li>
+<li><a href="http://davide-maestroni.github.io/jroutine/docs/jroutine">JRoutine</a></li>
+<li><a href="http://davide-maestroni.github.io/jroutine/docs/android">JRoutine Android</a></li>
 </ul>
 
 <p>The project contains an additional sample module showing how to implement a file downloader with just 4 classes.</p>
@@ -131,7 +133,7 @@ For anything else <a href="https://github.com/">GitHub</a> is a great source of 
 <h2>
 <a id="further-development" class="anchor" href="#further-development" aria-hidden="true"><span class="octicon octicon-link"></span></a>Further development</h2>
 
-<p>Feel free to contribute with your own <a href="http://davide-maestroni.github.io/jroutine/javadocs/com/bmd/jrt/runner/Runner.html">Runner</a> so to support more platforms other than Android.</p>
+<p>Feel free to contribute with your own <a href="http://davide-maestroni.github.io/jroutine/docs/jroutine/com/bmd/jrt/runner/Runner.html">Runner</a> so to support more platforms other than Android.</p>
 
 <h2>
 <a id="build-instructions" class="anchor" href="#build-instructions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Build instructions</h2>

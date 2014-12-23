@@ -14,16 +14,16 @@
 package com.bmd.jrt.common;
 
 /**
- * Exception indicating a possible dead lock.
+ * Exception indicating a possible deadlock.
  * <p/>
  * Created by davide on 11/25/14.
  */
-public class DeadLockException extends RoutineException {
+public class DeadlockException extends RoutineException {
 
     /**
      * Constructor.
      */
-    public DeadLockException() {
+    public DeadlockException() {
 
         super(null);
     }

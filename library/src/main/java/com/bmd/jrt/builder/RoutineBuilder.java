@@ -49,7 +49,7 @@ import javax.annotation.Nullable;
  * available or the timeout set through the builder elapses.<br/>
  * By default the timeout is set to a few seconds to avoid unexpected deadlocks.<br/>
  * In case the timeout elapses before an invocation instance becomes available, a
- * {@link com.bmd.jrt.routine.RoutineDeadLockException} will be thrown.
+ * {@link com.bmd.jrt.routine.RoutineDeadlockException} will be thrown.
  * <p/>
  * Created by davide on 11/11/14.
  */

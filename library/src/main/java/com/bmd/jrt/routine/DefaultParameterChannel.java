@@ -13,7 +13,7 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.builder.InputDeadLockException;
+import com.bmd.jrt.builder.InputDeadlockException;
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.channel.OutputChannel;
@@ -481,7 +481,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
             if (!mInputTimeout.waitTrue(mMutex, mHasInputs)) {
 
-                throw new InputDeadLockException();
+                throw new InputDeadlockException();
             }
 
         } catch (final InterruptedException e) {

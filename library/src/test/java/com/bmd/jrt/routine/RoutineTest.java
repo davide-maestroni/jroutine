@@ -16,15 +16,15 @@ package com.bmd.jrt.routine;
 import com.bmd.jrt.annotation.Async;
 import com.bmd.jrt.annotation.AsyncType;
 import com.bmd.jrt.builder.DefaultConfigurationBuilder;
-import com.bmd.jrt.builder.InputDeadLockException;
-import com.bmd.jrt.builder.OutputDeadLockException;
+import com.bmd.jrt.builder.InputDeadlockException;
+import com.bmd.jrt.builder.OutputDeadlockException;
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.builder.RoutineConfigurationBuilder;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.OutputConsumer;
 import com.bmd.jrt.channel.ParameterChannel;
-import com.bmd.jrt.channel.ReadDeadLockException;
+import com.bmd.jrt.channel.ReadDeadlockException;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.channel.TemplateOutputConsumer;
 import com.bmd.jrt.common.ClassToken;
@@ -1266,7 +1266,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final InputDeadLockException ignored) {
+        } catch (final InputDeadlockException ignored) {
 
         }
     }
@@ -1350,7 +1350,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final OutputDeadLockException ignored) {
+        } catch (final OutputDeadlockException ignored) {
 
         }
     }
@@ -1900,7 +1900,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final ReadDeadLockException ignored) {
+        } catch (final ReadDeadlockException ignored) {
 
         }
 
@@ -1910,7 +1910,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final ReadDeadLockException ignored) {
+        } catch (final ReadDeadlockException ignored) {
 
         }
 
@@ -1920,7 +1920,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final ReadDeadLockException ignored) {
+        } catch (final ReadDeadlockException ignored) {
 
         }
 
@@ -1930,7 +1930,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final ReadDeadLockException ignored) {
+        } catch (final ReadDeadlockException ignored) {
 
         }
 
@@ -1940,7 +1940,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final ReadDeadLockException ignored) {
+        } catch (final ReadDeadlockException ignored) {
 
         }
     }

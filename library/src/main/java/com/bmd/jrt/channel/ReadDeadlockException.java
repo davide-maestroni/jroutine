@@ -13,13 +13,13 @@
  */
 package com.bmd.jrt.channel;
 
-import com.bmd.jrt.common.DeadLockException;
+import com.bmd.jrt.common.DeadlockException;
 
 /**
  * Exception indicating that no result became available before the timeout elapsed.
  * <p/>
  * Created by davide on 11/25/14.
  */
-public class ReadDeadLockException extends DeadLockException {
+public class ReadDeadlockException extends DeadlockException {
 
 }

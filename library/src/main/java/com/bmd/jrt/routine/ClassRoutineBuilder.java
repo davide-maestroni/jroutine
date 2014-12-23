@@ -150,7 +150,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
     protected static RoutineConfigurationBuilder applyConfiguration(
             @Nonnull final RoutineConfigurationBuilder builder, @Nonnull final Async annotation) {
 
-        final Class<? extends Runner> runnerClass = annotation.runnerClass();
+        final Class<? extends Runner> runnerClass = annotation.asyncRunner();
 
         if (runnerClass != DefaultRunner.class) {
 
@@ -168,7 +168,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
             }
         }
 
-        builder.syncRunner(annotation.runnerType());
+        builder.syncRunner(annotation.syncRunnerType());
         builder.maxRunning(annotation.maxRunning());
         builder.maxRetained(annotation.maxRetained());
 

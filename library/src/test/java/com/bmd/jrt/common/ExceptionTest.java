@@ -26,7 +26,7 @@ public class ExceptionTest extends TestCase {
 
     public void testExceptions() {
 
-        assertThat(new DeadLockException()).hasNoCause();
+        assertThat(new DeadlockException()).hasNoCause();
     }
 
     public void testRoutineException() {

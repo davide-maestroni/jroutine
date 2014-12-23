@@ -13,9 +13,9 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.builder.InputDeadLockException;
-import com.bmd.jrt.builder.OutputDeadLockException;
-import com.bmd.jrt.channel.ReadDeadLockException;
+import com.bmd.jrt.builder.InputDeadlockException;
+import com.bmd.jrt.builder.OutputDeadlockException;
+import com.bmd.jrt.channel.ReadDeadlockException;
 
 import junit.framework.TestCase;
 
@@ -30,9 +30,9 @@ public class ExceptionTest extends TestCase {
 
     public void testExceptions() {
 
-        assertThat(new InputDeadLockException()).hasNoCause();
-        assertThat(new OutputDeadLockException()).hasNoCause();
-        assertThat(new ReadDeadLockException()).hasNoCause();
-        assertThat(new RoutineDeadLockException()).hasNoCause();
+        assertThat(new InputDeadlockException()).hasNoCause();
+        assertThat(new OutputDeadlockException()).hasNoCause();
+        assertThat(new ReadDeadlockException()).hasNoCause();
+        assertThat(new RoutineDeadlockException()).hasNoCause();
     }
 }

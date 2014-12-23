@@ -13,12 +13,12 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.builder.OutputDeadLockException;
+import com.bmd.jrt.builder.OutputDeadlockException;
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.OutputConsumer;
-import com.bmd.jrt.channel.ReadDeadLockException;
+import com.bmd.jrt.channel.ReadDeadlockException;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.RoutineInterruptedException;
 import com.bmd.jrt.log.Logger;
@@ -473,7 +473,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             if (!mOutputTimeout.waitTrue(mMutex, mHasOutputs)) {
 
-                throw new OutputDeadLockException();
+                throw new OutputDeadlockException();
             }
 
         } catch (final InterruptedException e) {
@@ -722,7 +722,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 if (throwTimeoutException) {
 
-                    throw new ReadDeadLockException();
+                    throw new ReadDeadlockException();
                 }
             }
 
@@ -873,7 +873,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                     if (throwTimeoutException) {
 
-                        throw new ReadDeadLockException();
+                        throw new ReadDeadlockException();
                     }
                 }
 
@@ -1011,7 +1011,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                 if (!isDone && throwTimeoutException) {
 
                     mSubLogger.wrn("waiting complete timeout: [%s]", timeout);
-                    throw new ReadDeadLockException();
+                    throw new ReadDeadlockException();
                 }
             }
 
@@ -1125,7 +1125,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                     if (throwTimeoutException) {
 
-                        throw new ReadDeadLockException();
+                        throw new ReadDeadlockException();
                     }
                 }
             }

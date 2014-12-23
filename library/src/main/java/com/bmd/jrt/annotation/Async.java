@@ -112,6 +112,13 @@ public @interface Async {
     static final String NULL_LOCK = "com.bmd.jrt.annotation.Async.NULL_LOCK";
 
     /**
+     * The class of the runner to be used for asynchronous invocations.
+     *
+     * @return the runner class.
+     */
+    Class<? extends Runner> asyncRunner() default DefaultRunner.class;
+
+    /**
      * The time unit of the timeout for an invocation instance to become available.
      *
      * @return the time unit.
@@ -161,18 +168,11 @@ public @interface Async {
     int maxRunning() default RoutineBuilder.DEFAULT;
 
     /**
-     * The class of the runner to be used for asynchronous invocations.
-     *
-     * @return the runner class.
-     */
-    Class<? extends Runner> runnerClass() default DefaultRunner.class;
-
-    /**
      * The type of the runner to be used for synchronous invocations.
      *
      * @return the runner type.
      */
-    RunnerType runnerType() default RunnerType.DEFAULT;
+    RunnerType syncRunnerType() default RunnerType.DEFAULT;
 
     /**
      * The name used to identify the method independently from its original signature.

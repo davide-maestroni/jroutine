@@ -38,7 +38,10 @@ public class Runners extends com.bmd.jrt.runner.Runners {
     private static volatile Runner sMainRunner;
 
     /**
-     * Returns a runner employing in the specified looper.
+     * Returns a runner employing in the specified looper.<br/>
+     * Note that, based on the choice of the runner to be used when the invocation runs in the
+     * looper thread, waiting for results in the very same thread may result in a deadlock
+     * exception.
      *
      * @param looper           the looper instance.
      * @param sameThreadRunner the runner to be used when the specified looper is called on its own
@@ -55,7 +58,10 @@ public class Runners extends com.bmd.jrt.runner.Runners {
     }
 
     /**
-     * Returns a runner employing the main thread looper.
+     * Returns a runner employing the main thread looper.<br/>
+     * Note that, based on the choice of the runner to be used when the invocation runs in the
+     * looper thread, waiting for results in the very same thread may result in a deadlock
+     * exception.
      *
      * @param sameThreadRunner the runner to be used when the main looper is called on its own
      *                         thread. If null, the invocation will be posted on the main looper.
@@ -69,8 +75,9 @@ public class Runners extends com.bmd.jrt.runner.Runners {
 
     /**
      * Returns the shared runner employing the main thread looper.<br/>
-     * Note that the execution with a delay of 0 will be performed synchronously, while the ones
-     * with a positive delay will be posted on the UI thread.
+     * Note that, when the invocation runs in the main thread, the executions with a delay of 0 will
+     * be performed synchronously, while the ones with a positive delay will be posted on the UI
+     * thread.
      *
      * @return the runner instance.
      */

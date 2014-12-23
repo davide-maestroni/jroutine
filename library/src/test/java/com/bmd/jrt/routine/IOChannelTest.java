@@ -17,7 +17,7 @@ import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
 import com.bmd.jrt.channel.IOChannel;
 import com.bmd.jrt.channel.IOChannel.IOChannelOutput;
 import com.bmd.jrt.channel.OutputChannel;
-import com.bmd.jrt.channel.ReadDeadLockException;
+import com.bmd.jrt.channel.ReadDeadlockException;
 import com.bmd.jrt.common.RoutineException;
 import com.bmd.jrt.time.TimeDuration;
 
@@ -185,7 +185,7 @@ public class IOChannelTest extends TestCase {
 
             fail();
 
-        } catch (final ReadDeadLockException ignored) {
+        } catch (final ReadDeadlockException ignored) {
 
         }
 
@@ -195,7 +195,7 @@ public class IOChannelTest extends TestCase {
 
             fail();
 
-        } catch (final ReadDeadLockException ignored) {
+        } catch (final ReadDeadlockException ignored) {
 
         }
 
@@ -205,7 +205,7 @@ public class IOChannelTest extends TestCase {
 
             fail();
 
-        } catch (final ReadDeadLockException ignored) {
+        } catch (final ReadDeadlockException ignored) {
 
         }
 
@@ -215,7 +215,7 @@ public class IOChannelTest extends TestCase {
 
             fail();
 
-        } catch (final ReadDeadLockException ignored) {
+        } catch (final ReadDeadlockException ignored) {
 
         }
 
@@ -225,7 +225,7 @@ public class IOChannelTest extends TestCase {
 
             fail();
 
-        } catch (final ReadDeadLockException ignored) {
+        } catch (final ReadDeadlockException ignored) {
 
         }
 
@@ -235,7 +235,7 @@ public class IOChannelTest extends TestCase {
 
             fail();
 
-        } catch (final ReadDeadLockException ignored) {
+        } catch (final ReadDeadlockException ignored) {
 
         }
     }

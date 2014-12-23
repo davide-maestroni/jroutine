@@ -988,7 +988,7 @@ public class JRoutineTest extends TestCase {
 
         }
 
-        @Async(value = THROW, runnerType = RunnerType.QUEUED, runnerClass = MyRunner.class,
+        @Async(value = THROW, syncRunnerType = RunnerType.QUEUED, asyncRunner = MyRunner.class,
                maxRetained = 1, maxRunning = 1, availTimeout = 1, availTimeUnit = TimeUnit.SECONDS,
                log = NullLog.class, logLevel = LogLevel.DEBUG)
         public void throwException(final RuntimeException ex) {
@@ -1056,8 +1056,8 @@ public class JRoutineTest extends TestCase {
         }
 
         @Async(value = THROW, log = NullLog.class, logLevel = LogLevel.DEBUG,
-               runnerType = RunnerType.QUEUED,
-               runnerClass = MyRunner.class)
+               syncRunnerType = RunnerType.QUEUED,
+               asyncRunner = MyRunner.class)
         public static void throwException(final RuntimeException ex) {
 
             throw ex;

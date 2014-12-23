@@ -726,14 +726,14 @@ public class RoutineProcessor extends AbstractProcessor {
 
         if (methodAnnotation != null) {
 
-            final Object runner = getElementValue(methodElement, annotationType, "runnerClass");
+            final Object runner = getElementValue(methodElement, annotationType, "asyncRunner");
 
             if (runner != null) {
 
                 runnerElement = getTypeFromName(runner.toString());
             }
 
-            runnerType = methodAnnotation.runnerType();
+            runnerType = methodAnnotation.syncRunnerType();
             maxRunning = methodAnnotation.maxRunning();
             maxRetained = methodAnnotation.maxRetained();
             availTimeout = methodAnnotation.availTimeout();
@@ -745,7 +745,7 @@ public class RoutineProcessor extends AbstractProcessor {
             if ((runnerElement == null) || runnerElement.equals(
                     getTypeFromName(DefaultRunner.class.getCanonicalName()))) {
 
-                final Object runner = getElementValue(element, annotationType, "runnerClass");
+                final Object runner = getElementValue(element, annotationType, "asyncRunner");
 
                 if (runner != null) {
 
@@ -755,7 +755,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
             if (runnerType == RunnerType.DEFAULT) {
 
-                runnerType = classAnnotation.runnerType();
+                runnerType = classAnnotation.syncRunnerType();
             }
 
             if (maxRunning == RoutineBuilder.DEFAULT) {

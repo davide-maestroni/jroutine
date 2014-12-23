@@ -11,16 +11,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.builder;
+package com.bmd.jrt.routine;
 
-import com.bmd.jrt.common.DeadLockException;
+import com.bmd.jrt.common.DeadlockException;
 
 /**
- * Exception indicating that no room in the output channel buffer became available before the
- * timeout elapsed.
+ * Exception indicating that no invocation instance became available before the timeout elapsed.
  * <p/>
- * Created by davide on 11/25/14.
+ * Created by davide on 9/20/14.
  */
-public class OutputDeadLockException extends DeadLockException {
+public class RoutineDeadlockException extends DeadlockException {
 
 }

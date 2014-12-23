@@ -13,7 +13,7 @@
  */
 package com.bmd.jrt.builder;
 
-import com.bmd.jrt.common.DeadLockException;
+import com.bmd.jrt.common.DeadlockException;
 
 /**
  * Exception indicating that no room in the input channel buffer became available before the timeout
@@ -21,6 +21,6 @@ import com.bmd.jrt.common.DeadLockException;
  * <p/>
  * Created by davide on 11/25/14.
  */
-public class InputDeadLockException extends DeadLockException {
+public class InputDeadlockException extends DeadlockException {
 
 }

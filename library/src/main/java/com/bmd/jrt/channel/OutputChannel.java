@@ -90,7 +90,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
     public boolean checkComplete();
 
     /**
-     * Tells the channel to throw a {@link ReadDeadLockException} in case no result is available
+     * Tells the channel to throw a {@link ReadDeadlockException} in case no result is available
      * before the timeout has elapsed.
      * <p/>
      * By default no exception will be thrown.
@@ -134,7 +134,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      *
      * @return this channel.
      * @throws IllegalStateException               if this channel is already bound to a consumer.
-     * @throws ReadDeadLockException               if the channel is set to throw an exception when
+     * @throws ReadDeadlockException               if the channel is set to throw an exception when
      *                                             the timeout elapses.
      * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
      *                                             exception.
@@ -154,7 +154,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @return this channel.
      * @throws NullPointerException                if the specified collection is null.
      * @throws IllegalStateException               if this channel is already bound to a consumer.
-     * @throws ReadDeadLockException               if the channel is set to throw an exception when
+     * @throws ReadDeadlockException               if the channel is set to throw an exception when
      *                                             the timeout elapses.
      * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
      *                                             exception.
@@ -174,7 +174,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @throws java.util.NoSuchElementException    if no output is available (it might be thrown
      *                                             also in the case the read timeout elapses and no
      *                                             deadlock exception is set to be thrown).
-     * @throws ReadDeadLockException               if the channel is set to throw an exception when
+     * @throws ReadDeadlockException               if the channel is set to throw an exception when
      *                                             the timeout elapses.
      * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
      *                                             exception.

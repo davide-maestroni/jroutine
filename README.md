@@ -19,11 +19,11 @@ The main way to define a routine is to implement an invocation object. Though, t
 ##Why not RxJava?
 
 Among the many open source libraries, [RxJava][7] is one of the preferred choices when it comes to handle background tasks.
-Although [Reactive Extensions][8] is a great tool for managing events and composing event listeners, it has not been designed with parallel programming in mind.
+Although [Reactive Extensions][8] is a great tool for managing events and composing event listeners, it has not been clearly designed with parallel programming in mind.
 In fact, RxJava shows a few limits in this respect.
 The framework has once been compared, with a fitting example, to a line of domino pieces: once the first tile falls down, all the others are to follow, and there is no way to stop them other than to cut the line.
 Each time a background operation is required, the whole chain of observables/subscribers must be rebuilt from scratch, the chained functions are called recursively and many objects are created in the while.
-While such design works great for common events, it does not adapt so well to background tasks, where, each time, everything is recreated and discarded at the end.
+While such design works great for common events, it does not adapt so well to background tasks.
 After all, a network request does not really fit in the definition of "event".
 
 RxJava is still one of the best library for handling events, though, something specifically designed is needed to make parallel programming easily accessible and manageable.

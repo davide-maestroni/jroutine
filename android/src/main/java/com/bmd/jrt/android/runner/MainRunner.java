@@ -23,8 +23,8 @@ import javax.annotation.Nonnull;
 
 /**
  * Implementation of a runner employing the main UI thread looper.<br/>
- * Note that the execution with a delay of 0 will be performed synchronously, while the ones with
- * a positive delay will be posted on the UI thread.
+ * Note that, when the invocation runs in the main thread, the executions with a delay of 0 will be
+ * performed synchronously, while the ones with a positive delay will be posted on the UI thread.
  * <p/>
  * Created by davide on 12/17/14.
  */

@@ -164,6 +164,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
         }
 
         mLogger = Logger.create(configuration.getLog(null), configuration.getLogLevel(null), this);
+        mLogger.dbg("building routine with configuration: %s", configuration);
     }
 
     /**

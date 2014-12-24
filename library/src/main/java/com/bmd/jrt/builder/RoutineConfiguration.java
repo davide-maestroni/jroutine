@@ -311,4 +311,25 @@ public class RoutineConfiguration {
                 mRunner != null ? !mRunner.equals(that.mRunner) : that.mRunner != null)
                 && mRunnerType == that.mRunnerType;
     }
+
+    @Override
+    public String toString() {
+
+        // auto-generated code
+        return "RoutineConfiguration{" +
+                "availTimeout=" + mAvailTimeout +
+                ", inputMaxSize=" + mInputMaxSize +
+                ", inputOrder=" + mInputOrder +
+                ", inputTimeout=" + mInputTimeout +
+                ", log=" + ((mLog != null) ? mLog.getClass().getCanonicalName() : null) +
+                ", logLevel=" + mLogLevel +
+                ", maxRetained=" + mMaxRetained +
+                ", maxRunning=" + mMaxRunning +
+                ", outputMaxSize=" + mOutputMaxSize +
+                ", outputOrder=" + mOutputOrder +
+                ", outputTimeout=" + mOutputTimeout +
+                ", runner=" + ((mRunner != null) ? mRunner.getClass().getCanonicalName() : null) +
+                ", runnerType=" + mRunnerType +
+                '}';
+    }
 }

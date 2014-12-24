@@ -49,16 +49,16 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
      */
     DefaultIOChannel(@Nonnull final RoutineConfiguration configuration) {
 
+        final Logger logger =
+                Logger.create(configuration.getLog(null), configuration.getLogLevel(null), this);
         final IOChannelAbortHandler abortHandler = new IOChannelAbortHandler();
         final DefaultResultChannel<TYPE> inputChannel =
                 new DefaultResultChannel<TYPE>(configuration, abortHandler,
-                                               configuration.getRunner(null),
-                                               Logger.create(configuration.getLog(null),
-                                                             configuration.getLogLevel(null),
-                                                             IOChannel.class));
+                                               configuration.getRunner(null), logger);
         abortHandler.setInputChannel(inputChannel);
         mInputChannel = new DefaultIOChannelInput<TYPE>(inputChannel);
         mOutputChannel = new DefaultIOChannelOutput<TYPE>(inputChannel.getOutput());
+        logger.dbg("building I/O channel with configuration: %s", configuration);
     }
 
     @Nonnull

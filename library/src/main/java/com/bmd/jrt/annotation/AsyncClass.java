@@ -29,7 +29,17 @@ import java.lang.annotation.Target;
  * method, and for each target method as well.
  * <p/>
  * Note that, you'll need to enable annotation pre-processing by adding the "jroutine-processor"
- * artifact or module to the specific project dependencies.
+ * artifact or module to the specific project dependencies. Be sure also to include a proper rule in
+ * your Proguard file, so to keep the signatures of all the classes implementing the specific mirror
+ * interface, like, for example:
+ * <pre>
+ *     <code>
+ *
+ *         -keep public class * extends my.mirror.Interface {
+ *              public &lt;methods&gt;;
+ *         }
+ *     </code>
+ * </pre>
  * <p/>
  * Created by davide on 11/3/14.
  */

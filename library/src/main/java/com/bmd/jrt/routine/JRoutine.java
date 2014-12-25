@@ -47,17 +47,7 @@ import javax.annotation.Nonnull;
  * Finally, it also possible to create a wrapper class to enable asynchronous invocation of methods,
  * through annotation pre-processing and compile time code generation. In order to activate the
  * processing of annotations, it is simply necessary to include the "jroutine-processor" artifact
- * or module in the project dependencies. Be sure also to include a proper rule in your Proguard
- * file, so to keep the signatures of all the classes implementing the specific mirror interface,
- * like, for example:
- * <pre>
- *     <code>
- *
- *         -keep public class * extends my.mirror.Interface {
- *              public *;
- *         }
- *     </code>
- * </pre>
+ * or module in the project dependencies.
  * <p/>
  * <b>Some usage examples</b>
  * <p/>

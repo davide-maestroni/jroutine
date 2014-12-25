@@ -28,8 +28,8 @@ import java.lang.annotation.Target;
  * {@link Async}, {@link AsyncType} and {@link ParallelType} annotation defined for each interface
  * method, and for each target method as well.
  * <p/>
- * Note that, you'll need to enable annotation pre-processing by adding the processor package to
- * the specific project dependencies.
+ * Note that, you'll need to enable annotation pre-processing by adding the "jroutine-processor"
+ * artifact or module to the specific project dependencies.
  * <p/>
  * Created by davide on 11/3/14.
  */

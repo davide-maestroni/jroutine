@@ -43,7 +43,21 @@ import javax.annotation.Nonnull;
  * under direct control.<br/>
  * A mirror interface adds the possibility to override input and output parameters with output
  * channels, so that data are transferred asynchronously avoiding the need to block execution while
- * waiting for them to be available.
+ * waiting for them to be available.<br/>
+ * Finally, it also possible to create a wrapper class to enable asynchronous invocation of methods,
+ * through annotation pre-processing and compile time code generation. In order to activate the
+ * processing of annotations, it is simply necessary to include the "jroutine-processor" artifact
+ * or module in the project dependencies. Be sure also to include a proper rule in your Proguard
+ * file, so to keep the signatures of all the classes implementing the specific mirror interface,
+ * like, for example:
+ * <pre>
+ *     <code>
+ *
+ *         -keep public class * extends my.mirror.Interface {
+ *              public *;
+ *         }
+ *     </code>
+ * </pre>
  * <p/>
  * <b>Some usage examples</b>
  * <p/>
@@ -144,6 +158,7 @@ import javax.annotation.Nonnull;
  * Created by davide on 9/7/14.
  *
  * @see com.bmd.jrt.annotation.Async
+ * @see com.bmd.jrt.annotation.AsyncClass
  * @see com.bmd.jrt.annotation.AsyncType
  * @see com.bmd.jrt.annotation.ParallelType
  */

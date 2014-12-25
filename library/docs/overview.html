@@ -105,9 +105,9 @@ Parallel programming on the go.
 
             public static void main(final String[] args) {
 
-                final Routine&lt;String, Integer&gt; parseRoutine = on(Main.class).asyncMethod(PARSE);
-                final Routine&lt;Integer, Integer&gt; squareRoutine = on(Main.class).asyncMethod(SQUARE);
-                final Routine&lt;List&lt;Integer&gt;, Double&gt; meanRoutine = on(Main.class).asyncMethod(MEAN);
+                final Routine&lt;String, Integer&gt; parseRoutine = on(Main.class).annotatedMethod(PARSE);
+                final Routine&lt;Integer, Integer&gt; squareRoutine = on(Main.class).annotatedMethod(SQUARE);
+                final Routine&lt;List&lt;Integer&gt;, Double&gt; meanRoutine = on(Main.class).annotatedMethod(MEAN);
 
                 final Double rms = meanRoutine.callAsync(
                         squareRoutine.callParallel(parseRoutine.callParallel(args)).readAll()).readFirst();
@@ -160,7 +160,7 @@ Parallel programming on the go.
 
             public static void main(final String[] args) {
 
-                final AsyncMain proxy = on(new Main()).proxy(AsyncMain.class);
+                final AsyncMain proxy = on(new Main()).buildProxy(AsyncMain.class);
                 final double rms = proxy.squareRootMean(proxy.square(proxy.parseArg(args)));
 
                 System.out.println(rms);
@@ -212,7 +212,7 @@ Parallel programming on the go.
 <b>Example 4:</b> via code generation.
 <p>
     This example is the same as the previous one, with the only difference that the class methods are not called through reflection, but a concrete object is dynamically generated through an annotation processor.<br/>
-    Note that, unlike the previous example, the proxy interface and the class methods bust be declared as public in order to be called by the proxy instance.
+    Note that, unlike the previous example, the proxy interface and the class methods bust be declared as public in order to be called by the wrapper object.
 </p>
 <pre>
     <code>
@@ -220,8 +220,8 @@ Parallel programming on the go.
 
             public static void main(final String[] args) {
 
-                final AsyncMain proxy = on(new Main()).implementationOf(AsyncMain.class);
-                final double rms = proxy.squareRootMean(proxy.square(proxy.parseArg(args)));
+                final AsyncMain wrapper = on(new Main()).buildClass(AsyncMain.class);
+                final double rms = wrapper.squareRootMean(wrapper.square(wrapper.parseArg(args)));
 
                 System.out.println(rms);
 

@@ -50,7 +50,7 @@ public class RoutineProcessorTest extends TestCase {
                                                     .runBy(Runners.poolRunner())
                                                     .logLevel(LogLevel.DEBUG)
                                                     .loggedWith(new NullLog())
-                                                    .implementationOf(ClassToken.tokenOf(
+                                                    .buildClass(ClassToken.tokenOf(
                                                             TestInterface.class));
 
         assertThat(testInterface.getOne().readFirst()).isEqualTo(1);

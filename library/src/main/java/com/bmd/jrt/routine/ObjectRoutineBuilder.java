@@ -289,7 +289,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * @throws IllegalArgumentException if the specified class does not represent an interface.
      */
     @Nonnull
-    public <CLASS> CLASS implementationOf(@Nonnull final Class<CLASS> itf) {
+    public <CLASS> CLASS buildClass(@Nonnull final Class<CLASS> itf) {
 
         if (!itf.isInterface()) {
 
@@ -378,9 +378,9 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * @throws IllegalArgumentException if the specified class does not represent an interface.
      */
     @Nonnull
-    public <CLASS> CLASS implementationOf(@Nonnull final ClassToken<CLASS> itf) {
+    public <CLASS> CLASS buildClass(@Nonnull final ClassToken<CLASS> itf) {
 
-        return itf.cast(implementationOf(itf.getRawClass()));
+        return itf.cast(buildClass(itf.getRawClass()));
     }
 
     /**
@@ -401,7 +401,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * @throws IllegalArgumentException if the specified class does not represent an interface.
      */
     @Nonnull
-    public <CLASS> CLASS proxy(@Nonnull final Class<CLASS> itf) {
+    public <CLASS> CLASS buildProxy(@Nonnull final Class<CLASS> itf) {
 
         if (!itf.isInterface()) {
 
@@ -443,9 +443,9 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * @throws IllegalArgumentException if the specified class does not represent an interface.
      */
     @Nonnull
-    public <CLASS> CLASS proxy(@Nonnull final ClassToken<CLASS> itf) {
+    public <CLASS> CLASS buildProxy(@Nonnull final ClassToken<CLASS> itf) {
 
-        return itf.cast(proxy(itf.getRawClass()));
+        return itf.cast(buildProxy(itf.getRawClass()));
     }
 
     @Nonnull

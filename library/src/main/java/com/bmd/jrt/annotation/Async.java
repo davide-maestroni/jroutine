@@ -60,7 +60,7 @@ import java.util.concurrent.TimeUnit;
  * <pre>
  *     <code>
  *
- *         JRoutine.on(new MyClass()).asyncMethod(MyClass.METHOD_NAME).callAsync();
+ *         JRoutine.on(new MyClass()).annotatedMethod(MyClass.METHOD_NAME).callAsync();
  *     </code>
  * </pre>
  * <p/>

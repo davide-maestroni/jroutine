@@ -1291,22 +1291,24 @@ public class RoutineTest extends TestCase {
                                 .callSync()
                                 .readAll()).containsExactly(1);
         assertThat(on(testClass).method("getOne").callSync().readAll()).containsExactly(1);
-        assertThat(on(testClass).asyncMethod(TestClass.GET).callSync().readAll()).containsExactly(
+        assertThat(
+                on(testClass).annotatedMethod(TestClass.GET).callSync().readAll()).containsExactly(
                 1);
-        assertThat(on(TestClass.class).asyncMethod(TestClass.GET)
+        assertThat(on(TestClass.class).annotatedMethod(TestClass.GET)
                                       .callSync(3)
                                       .readAll()).containsExactly(3);
-        assertThat(on(TestClass.class).asyncMethod("get").callAsync(-3).readAll()).containsExactly(
+        assertThat(
+                on(TestClass.class).annotatedMethod("get").callAsync(-3).readAll()).containsExactly(
                 -3);
         assertThat(on(TestClass.class).method("get", int.class)
                                       .callParallel(17)
                                       .readAll()).containsExactly(17);
 
-        assertThat(on(testClass).proxy(TestInterface.class).getInt(2)).isEqualTo(2);
+        assertThat(on(testClass).buildProxy(TestInterface.class).getInt(2)).isEqualTo(2);
 
         try {
 
-            on(TestClass.class).asyncMethod("get").callAsync().readAll();
+            on(TestClass.class).annotatedMethod("get").callAsync().readAll();
 
             fail();
 
@@ -1316,7 +1318,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            on(TestClass.class).asyncMethod("take");
+            on(TestClass.class).annotatedMethod("take");
 
             fail();
 
@@ -1324,10 +1326,13 @@ public class RoutineTest extends TestCase {
 
         }
 
-        assertThat(on(testClass).proxy(TestInterfaceAsync.class).take(77)).isEqualTo(77);
-        assertThat(on(testClass).proxy(TestInterfaceAsync.class).getOne().readFirst()).isEqualTo(1);
+        assertThat(on(testClass).buildProxy(TestInterfaceAsync.class).take(77)).isEqualTo(77);
+        assertThat(
+                on(testClass).buildProxy(TestInterfaceAsync.class).getOne().readFirst()).isEqualTo(
+                1);
 
-        final TestInterfaceAsync testInterfaceAsync = on(testClass).proxy(TestInterfaceAsync.class);
+        final TestInterfaceAsync testInterfaceAsync =
+                on(testClass).buildProxy(TestInterfaceAsync.class);
         assertThat(testInterfaceAsync.getInt(testInterfaceAsync.getOne())).isEqualTo(1);
     }
 

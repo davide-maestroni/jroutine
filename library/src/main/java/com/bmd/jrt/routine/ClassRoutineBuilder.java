@@ -201,6 +201,32 @@ public class ClassRoutineBuilder implements RoutineBuilder {
         return builder;
     }
 
+    /**
+     * Returns a routine used for calling the method whose identifying name is specified in a
+     * {@link Async} annotation.
+     *
+     * @param name     the name specified in the annotation.
+     * @param <INPUT>  the input data type.
+     * @param <OUTPUT> the output data type.
+     * @return the routine.
+     * @throws IllegalArgumentException if the specified method is not found.
+     * @throws RoutineException         if an error occurred while instantiating the optional
+     *                                  runner or the routine.
+     */
+    @Nonnull
+    public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> annotatedMethod(@Nonnull final String name) {
+
+        final Method method = mMethodMap.get(name);
+
+        if (method == null) {
+
+            throw new IllegalArgumentException(
+                    "no annotated method with name '" + name + "' has been found");
+        }
+
+        return method(method);
+    }
+
     @Nonnull
     @Override
     public ClassRoutineBuilder apply(@Nonnull final RoutineConfiguration configuration) {
@@ -272,32 +298,6 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
         mBuilder.syncRunner(type);
         return this;
-    }
-
-    /**
-     * Returns a routine used for calling the method whose identifying name is specified in a
-     * {@link Async} annotation.
-     *
-     * @param name     the name specified in the annotation.
-     * @param <INPUT>  the input data type.
-     * @param <OUTPUT> the output data type.
-     * @return the routine.
-     * @throws IllegalArgumentException if the specified method is not found.
-     * @throws RoutineException         if an error occurred while instantiating the optional
-     *                                  runner or the routine.
-     */
-    @Nonnull
-    public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> asyncMethod(@Nonnull final String name) {
-
-        final Method method = mMethodMap.get(name);
-
-        if (method == null) {
-
-            throw new IllegalArgumentException(
-                    "no annotated method with name '" + name + "' has been found");
-        }
-
-        return method(method);
     }
 
     /**

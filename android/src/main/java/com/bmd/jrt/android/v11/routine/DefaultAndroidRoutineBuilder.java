@@ -108,7 +108,7 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> implements AndroidRoutineBuild
         final Runner syncRunner = (configuration.getSyncRunner(null) == RunnerType.SEQUENTIAL)
                 ? Runners.sequentialRunner() : Runners.queuedRunner();
         final ClashResolution resolution =
-                (mClashResolution == ClashResolution.DEFAULT) ? ClashResolution.RESTART
+                (mClashResolution == ClashResolution.DEFAULT) ? ClashResolution.RESTART_ON_INPUT
                         : mClashResolution;
         final ResultCache cacheType =
                 (mCacheType == ResultCache.DEFAULT) ? ResultCache.CLEAR : mCacheType;

@@ -31,7 +31,7 @@ import javax.annotation.Nullable;
  * Note that the <code>equals()</code> and <code>hashCode()</code> methods of the input parameter
  * objects might be employed to check for clashing of invocations or compute the invocation ID.<br/>
  * In case the caller cannot guarantee the correct behavior of the aforementioned method
- * implementations, a user defined ID or the <code>RESET</code> clash resolution should be used to
+ * implementations, a user defined ID or the <code>RESTART</code> clash resolution should be used to
  * avoid unexpected results.
  * <p/>
  * Created by davide on 12/9/14.
@@ -109,35 +109,39 @@ public interface AndroidRoutineBuilder<INPUT, OUTPUT> {
      * The clash of two invocation happens when the same ID is already in use at the time of the
      * routine execution. The possible outcomes are:
      * <ul>
-     * <li>the running invocation is reset</li>
+     * <li>the running invocation is restarted</li>
+     * <li>the running invocation is retained, ignoring the input data</li>
+     * <li>the current invocation is aborted</li>
      * <li>the running invocation is restarted only if the input data are different from the current
      * ones, and retained otherwise</li>
-     * <li>the running invocation is retained (ignoring the input data)</li>
-     * <li>the current invocation is aborted if the input data are different from the current ones,
-     * and retained otherwise</li>
+     * <li>the current invocation is aborted only if the input data are different from the current
+     * ones, and retained otherwise</li>
      * </ul>
      */
     public enum ClashResolution {
 
         /**
-         * The clash is resolved by aborting and resetting the running invocation.
-         */
-        RESET,
-        /**
-         * The clash is resolved by restarting the running invocation, in case its input data are
-         * different from the current ones.
+         * The clash is resolved by restarting the running invocation.
          */
         RESTART,
         /**
-         * The clash is resolved by keeping the running invocation, independently from its input
-         * data.
+         * The clash is resolved by keeping the running invocation.
          */
         KEEP,
         /**
-         * The clash is resolved by aborting the invocation with an {@link InputClashException}, in
-         * case its input data are different from the current ones.
+         * The clash is resolved by aborting the invocation with an {@link InputClashException}.
          */
         ABORT,
+        /**
+         * The clash is resolved by restarting the running invocation, only in case its input data
+         * are different from the current ones.
+         */
+        RESTART_ON_INPUT,
+        /**
+         * The clash is resolved by aborting the invocation with an {@link InputClashException},
+         * only in case its input data are different from the current ones.
+         */
+        ABORT_ON_INPUT,
         /**
          * The default resolution, that is, it is let to the framework decide the best strategy to
          * resolve the clash.

@@ -15,6 +15,7 @@
 // GENERATED CODE - PLEASE DO NOT EDIT
 
     @Override
+    @SuppressWarnings("unchecked")
     public void ${methodName}(${paramTypes}) {
 
         this.mRoutine${methodCount}.invokeAsync()${inputParams}.result();

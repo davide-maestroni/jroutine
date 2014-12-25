@@ -71,6 +71,34 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                         .onClash(ClashResolution.ABORT)
                         .buildRoutine();
         final OutputChannel<String> result1 = routine.callAsync("test1");
+        final OutputChannel<String> result2 = routine.callAsync("test1");
+
+        assertThat(result1.readFirst()).isEqualTo("TEST1");
+
+        try {
+
+            result2.readFirst();
+
+            fail();
+
+        } catch (final InputClashException ignored) {
+
+        }
+    }
+
+    public void testActivityAbortInput() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final Routine<String, String> routine =
+                JRoutine.from(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
+                        .withId(0)
+                        .onClash(ClashResolution.ABORT_ON_INPUT)
+                        .buildRoutine();
+        final OutputChannel<String> result1 = routine.callAsync("test1");
         final OutputChannel<String> result2 = routine.callAsync("test2");
 
         assertThat(result1.readFirst()).isEqualTo("TEST1");
@@ -218,7 +246,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         assertThat(result2.readFirst()).isEqualTo("TEST1");
     }
 
-    public void testActivityReset() {
+    public void testActivityRestart() {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
 
@@ -227,8 +255,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         final Routine<String, String> routine =
                 JRoutine.from(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
-                        .withId(0)
-                        .onClash(ClashResolution.RESET)
+                        .withId(0).onClash(ClashResolution.RESTART)
                         .buildRoutine();
         final OutputChannel<String> result1 = routine.callAsync("test1");
         final OutputChannel<String> result2 = routine.callAsync("test1");
@@ -246,7 +273,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         assertThat(result2.readFirst()).isEqualTo("TEST1");
     }
 
-    public void testActivityRestart() {
+    public void testActivityRestartOnInput() {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
 
@@ -255,8 +282,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         final Routine<String, String> routine =
                 JRoutine.from(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
-                        .withId(0)
-                        .onClash(ClashResolution.RESTART)
+                        .withId(0).onClash(ClashResolution.RESTART_ON_INPUT)
                         .buildRoutine();
         final OutputChannel<String> result1 = routine.callAsync("test1");
         final OutputChannel<String> result2 = routine.callAsync("test2");
@@ -571,8 +597,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                                                                           R.id.test_fragment);
         final Routine<String, String> routine =
                 JRoutine.from(fragment, ClassToken.tokenOf(ToUpperCase.class))
-                        .withId(0)
-                        .onClash(ClashResolution.ABORT)
+                        .withId(0).onClash(ClashResolution.ABORT_ON_INPUT)
                         .buildRoutine();
         final OutputChannel<String> result1 = routine.callAsync("test1");
         final OutputChannel<String> result2 = routine.callAsync("test2");
@@ -643,8 +668,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                                                                           R.id.test_fragment);
         final Routine<String, String> routine =
                 JRoutine.from(fragment, ClassToken.tokenOf(ToUpperCase.class))
-                        .withId(0)
-                        .onClash(ClashResolution.RESET)
+                        .withId(0).onClash(ClashResolution.RESTART)
                         .buildRoutine();
         final OutputChannel<String> result1 = routine.callAsync("test1");
         final OutputChannel<String> result2 = routine.callAsync("test1");
@@ -674,8 +698,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                                                                           R.id.test_fragment);
         final Routine<String, String> routine =
                 JRoutine.from(fragment, ClassToken.tokenOf(ToUpperCase.class))
-                        .withId(0)
-                        .onClash(ClashResolution.RESTART)
+                        .withId(0).onClash(ClashResolution.RESTART_ON_INPUT)
                         .buildRoutine();
         final OutputChannel<String> result1 = routine.callAsync("test1");
         final OutputChannel<String> result2 = routine.callAsync("test2");

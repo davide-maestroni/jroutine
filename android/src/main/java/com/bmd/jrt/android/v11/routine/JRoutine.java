@@ -30,7 +30,18 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 /**
  * This utility class extends the base Java routine in order to support additional routine builders
  * specific to the Android platform.<br/>
- * See {@link com.bmd.jrt.android.v4.routine.JRoutine} for pre-HONEYCOMB support.
+ * Routine invocations created through the returned builders can be safely restored after a change
+ * in the configuration, so to avoid duplicated calls and memory leaks. Be aware, though, that the
+ * invocation results will always be dispatched in the main thread, no matter the calling one was,
+ * so that waiting for the outputs right after the routine invocation will result in a deadlock.
+ * <p/>
+ * Note that the <code>equals()</code> and <code>hashCode()</code> methods of the input parameter
+ * objects might be employed to check for clashing of invocations or compute the invocation ID.<br/>
+ * In case the caller cannot guarantee the correct behavior of the aforementioned method
+ * implementations, a user defined ID or the <code>RESTART</code> clash resolution should be used to
+ * avoid unexpected results.
+ * <p/>
+ * TODO: ID clash
  * <p/>
  * For example, in order to get a resource from the network, needed to fill an activity UI:
  * <pre>
@@ -87,6 +98,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * </pre>
  * The above code will ensure that the loading process survives any configuration change and the
  * resulting resource is dispatched only once.
+ * <p/>
+ * See {@link com.bmd.jrt.android.v4.routine.JRoutine} for pre-HONEYCOMB support.
  * <p/>
  * Created by davide on 12/8/14.
  */

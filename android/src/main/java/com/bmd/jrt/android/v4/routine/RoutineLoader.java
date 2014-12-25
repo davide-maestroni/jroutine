@@ -133,14 +133,14 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
     }
 
     /**
-     * Checks if the loader type is the same as the specified one.
+     * Returns the type of the loader invocation.
      *
-     * @param type the invocation type.
-     * @return whether the types are the same.
+     * @return the invocation class.
      */
-    public boolean isSameInvocationType(@Nullable final Class<? extends Invocation<?, ?>> type) {
+    @Nonnull
+    public Class<?> getInvocationType() {
 
-        return (mInvocation.getClass() == type);
+        return mInvocation.getClass();
     }
 
     @Override

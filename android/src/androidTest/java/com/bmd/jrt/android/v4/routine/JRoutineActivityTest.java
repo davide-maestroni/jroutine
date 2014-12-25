@@ -66,6 +66,29 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                         .onClash(ClashResolution.ABORT)
                         .buildRoutine();
         final OutputChannel<String> result1 = routine.callAsync("test1");
+        final OutputChannel<String> result2 = routine.callAsync("test1");
+
+        assertThat(result1.readFirst()).isEqualTo("TEST1");
+
+        try {
+
+            result2.readFirst();
+
+            fail();
+
+        } catch (final InputClashException ignored) {
+
+        }
+    }
+
+    public void testActivityAbortInput() {
+
+        final Routine<String, String> routine =
+                JRoutine.from(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
+                        .withId(0)
+                        .onClash(ClashResolution.ABORT_ON_INPUT)
+                        .buildRoutine();
+        final OutputChannel<String> result1 = routine.callAsync("test1");
         final OutputChannel<String> result2 = routine.callAsync("test2");
 
         assertThat(result1.readFirst()).isEqualTo("TEST1");
@@ -193,12 +216,12 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         assertThat(result2.readFirst()).isEqualTo("TEST1");
     }
 
-    public void testActivityReset() {
+    public void testActivityRestart() {
 
         final Routine<String, String> routine =
                 JRoutine.from(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
                         .withId(0)
-                        .onClash(ClashResolution.RESET)
+                        .onClash(ClashResolution.RESTART)
                         .buildRoutine();
         final OutputChannel<String> result1 = routine.callAsync("test1");
         final OutputChannel<String> result2 = routine.callAsync("test1");
@@ -216,12 +239,12 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         assertThat(result2.readFirst()).isEqualTo("TEST1");
     }
 
-    public void testActivityRestart() {
+    public void testActivityRestartOnInput() {
 
         final Routine<String, String> routine =
                 JRoutine.from(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
                         .withId(0)
-                        .onClash(ClashResolution.RESTART)
+                        .onClash(ClashResolution.RESTART_ON_INPUT)
                         .buildRoutine();
         final OutputChannel<String> result1 = routine.callAsync("test1");
         final OutputChannel<String> result2 = routine.callAsync("test2");
@@ -514,7 +537,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final Routine<String, String> routine =
                 JRoutine.from(fragment, ClassToken.tokenOf(ToUpperCase.class))
                         .withId(0)
-                        .onClash(ClashResolution.ABORT)
+                        .onClash(ClashResolution.ABORT_ON_INPUT)
                         .buildRoutine();
         final OutputChannel<String> result1 = routine.callAsync("test1");
         final OutputChannel<String> result2 = routine.callAsync("test2");
@@ -571,7 +594,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final Routine<String, String> routine =
                 JRoutine.from(fragment, ClassToken.tokenOf(ToUpperCase.class))
                         .withId(0)
-                        .onClash(ClashResolution.RESET)
+                        .onClash(ClashResolution.RESTART)
                         .buildRoutine();
         final OutputChannel<String> result1 = routine.callAsync("test1");
         final OutputChannel<String> result2 = routine.callAsync("test1");
@@ -597,7 +620,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final Routine<String, String> routine =
                 JRoutine.from(fragment, ClassToken.tokenOf(ToUpperCase.class))
                         .withId(0)
-                        .onClash(ClashResolution.RESTART)
+                        .onClash(ClashResolution.RESTART_ON_INPUT)
                         .buildRoutine();
         final OutputChannel<String> result1 = routine.callAsync("test1");
         final OutputChannel<String> result2 = routine.callAsync("test2");

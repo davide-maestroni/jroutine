@@ -13,6 +13,7 @@
  */
 
 // GENERATED CODE - PLEASE DO NOT EDIT
+
 package ${packageName};
 
 public final class ${interfaceName}${className}${genericTypes} implements ${interfaceFullName} {

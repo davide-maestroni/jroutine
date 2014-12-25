@@ -65,10 +65,10 @@ Please have a look at the dedicated [wiki page][5].
 
 ##Documentation
 
-Complete Javadoc with insights and examples is available:
+Complete Javadoc with insights and examples is available for:
 
 * [JRoutine][13]
-* [JRoutine Android][14]
+* [JRoutine-Android][14]
 
 The project contains an additional sample module showing how to implement a file downloader with just 4 classes.
 

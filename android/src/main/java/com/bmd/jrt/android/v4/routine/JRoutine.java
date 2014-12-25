@@ -35,10 +35,14 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * Note that the <code>equals()</code> and <code>hashCode()</code> methods of the input parameter
  * objects might be employed to check for clashing of invocations or compute the invocation ID.<br/>
  * In case the caller cannot guarantee the correct behavior of the aforementioned method
- * implementations, a user defined ID or the <code>RESTART</code> clash resolution should be used to
+ * implementations, a user defined ID or an input independent clash resolution should be used to
  * avoid unexpected results.
  * <p/>
- * TODO: ID clash
+ * The routine invocations will be identified by an ID number. In case a clash is detected, that is,
+ * an already running invocation with the same ID exists at the time the new invocation is executed,
+ * the clash is resolved based on the strategy specified through the builder. When a clash cannot be
+ * resolved, for example when invocations with different implementations share the same ID, the new
+ * invocation is aborted with a {@link com.bmd.jrt.android.builder.RoutineClashException}.
  * <p/>
  * For example, in order to get a resource from the network, needed to fill an activity UI:
  * <pre>

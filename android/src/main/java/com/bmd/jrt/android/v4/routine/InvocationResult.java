@@ -13,12 +13,19 @@
  */
 package com.bmd.jrt.android.v4.routine;
 
-import com.bmd.jrt.channel.InputChannel;
-import com.bmd.jrt.common.RoutineException;
+import android.support.v4.util.Pair;
 
-import java.util.List;
+import com.bmd.jrt.channel.IOChannel.IOChannelInput;
+import com.bmd.jrt.channel.TemplateOutputConsumer;
+import com.bmd.jrt.common.RoutineException;
+import com.bmd.jrt.common.RoutineInterruptedException;
+import com.bmd.jrt.log.Logger;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Class storing the invocation loader result.
@@ -27,38 +34,124 @@ import javax.annotation.Nonnull;
  *
  * @param <OUTPUT> the output data type.
  */
-class InvocationResult<OUTPUT> {
+class InvocationResult<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
 
-    private final RoutineException mException;
+    private final ArrayList<OUTPUT> mCachedResults = new ArrayList<OUTPUT>();
 
-    private final List<OUTPUT> mOutputs;
+    private final ArrayList<OUTPUT> mLastResults = new ArrayList<OUTPUT>();
+
+    private final RoutineLoader<?, OUTPUT> mLoader;
+
+    private final Logger mLogger;
+
+    private final Object mMutex = new Object();
+
+    private RoutineException mAbortException;
+
+    private boolean mIsComplete;
 
     /**
      * Constructor.
      *
-     * @param outputs the output data.
+     * @param loader the loader instance.
+     * @param logger the logger instance.
+     * @throws NullPointerException if any of the parameter is null.
      */
-    InvocationResult(@Nonnull final List<OUTPUT> outputs) {
+    @SuppressWarnings("ConstantConditions")
+    InvocationResult(@Nonnull final RoutineLoader<?, OUTPUT> loader, @Nonnull final Logger logger) {
 
-        mException = null;
-        mOutputs = outputs;
-    }
+        if (loader == null) {
 
-    /**
-     * Constructor.
-     *
-     * @param exception the abort exception.
-     */
-    InvocationResult(@Nonnull final RoutineException exception) {
+            throw new NullPointerException("the loader cannot be null");
+        }
 
-        mException = exception;
-        mOutputs = null;
+        mLoader = loader;
+        mLogger = logger.subContextLogger(this);
     }
 
     @Override
-    public String toString() {
+    public void onComplete() {
 
-        return isError() ? mException.toString() : mOutputs.toString();
+        final boolean deliverResult;
+
+        synchronized (mMutex) {
+
+            mIsComplete = true;
+
+            if (mAbortException != null) {
+
+                mLogger.dbg("aborting channel");
+                throw mAbortException;
+            }
+
+            deliverResult = mLastResults.isEmpty();
+        }
+
+        if (deliverResult) {
+
+            mLogger.dbg("delivering final result");
+            mLoader.deliverResult(new Pair<InvocationResult<OUTPUT>, String>(this, "complete"));
+        }
+    }
+
+    @Override
+    public void onError(@Nullable final Throwable error) {
+
+        final boolean deliverResult;
+        final RoutineException abortException;
+
+        synchronized (mMutex) {
+
+            mIsComplete = true;
+            abortException = new RoutineException(error);
+            mAbortException = abortException;
+            deliverResult = mLastResults.isEmpty();
+        }
+
+        if (deliverResult) {
+
+            mLogger.dbg(abortException, "delivering error");
+            mLoader.deliverResult(new Pair<InvocationResult<OUTPUT>, String>(this, "error"));
+        }
+    }
+
+    @Override
+    public void onOutput(final OUTPUT output) {
+
+        final boolean deliverResult;
+
+        synchronized (mMutex) {
+
+            if (mAbortException != null) {
+
+                mLogger.dbg("aborting channel");
+                throw mAbortException;
+            }
+
+            deliverResult = mLastResults.isEmpty();
+            mLastResults.add(output);
+        }
+
+        if (deliverResult) {
+
+            mLogger.dbg("delivering result: %s", output);
+            mLoader.deliverResult(new Pair<InvocationResult<OUTPUT>, String>(this, "output"));
+        }
+    }
+
+    /**
+     * Returns the abort exception.
+     *
+     * @return the exception.
+     */
+    @Nullable
+    Throwable getAbortException() {
+
+        synchronized (mMutex) {
+
+            final RoutineException exception = mAbortException;
+            return (exception != null) ? exception.getCause() : null;
+        }
     }
 
     /**
@@ -68,29 +161,69 @@ class InvocationResult<OUTPUT> {
      */
     boolean isError() {
 
-        return (mException != null);
+        synchronized (mMutex) {
+
+            return (mAbortException != null);
+        }
     }
 
     /**
-     * Passes the result to the specified channel.
+     * Passes the cached results to the specified channels.
      *
-     * @param channel the input channel.
+     * @param oldChannels old channels already fed with previous results.
+     * @param newChannels new channels freshly created.
+     * @return whether the invocation is complete.
+     * @throws NullPointerException if any of the parameters is null.
      */
-    void passTo(@Nonnull final InputChannel<OUTPUT> channel) {
+    boolean passTo(@Nonnull final Collection<IOChannelInput<OUTPUT>> oldChannels,
+            @Nonnull final Collection<IOChannelInput<OUTPUT>> newChannels) {
 
-        if (isError()) {
+        synchronized (mMutex) {
 
-            channel.abort(mException);
+            final Logger logger = mLogger;
+            final ArrayList<OUTPUT> lastResults = mLastResults;
+            final ArrayList<OUTPUT> cachedResults = mCachedResults;
 
-        } else {
+            if (mAbortException != null) {
 
-            try {
+                logger.dbg("avoiding passing results since invocation is aborted");
 
-                channel.pass(mOutputs);
+                lastResults.clear();
+                cachedResults.clear();
+                return true;
 
-            } catch (final RoutineException ignored) {
+            } else {
 
+                try {
+
+                    logger.dbg("passing result: %s + %s", cachedResults, lastResults);
+
+                    for (final IOChannelInput<OUTPUT> newChannel : newChannels) {
+
+                        newChannel.pass(cachedResults).pass(lastResults);
+                    }
+
+                    for (final IOChannelInput<OUTPUT> channel : oldChannels) {
+
+                        channel.pass(lastResults);
+                    }
+
+                    cachedResults.addAll(lastResults);
+                    lastResults.clear();
+
+                } catch (final RoutineInterruptedException e) {
+
+                    throw e.interrupt();
+
+                } catch (final RoutineException e) {
+
+                    mIsComplete = true;
+                    mAbortException = e;
+                }
             }
+
+            logger.dbg("invocation is complete: %s", mIsComplete);
+            return mIsComplete;
         }
     }
 }

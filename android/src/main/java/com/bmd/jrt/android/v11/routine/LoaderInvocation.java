@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.Loader;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
+import android.util.Pair;
 import android.util.SparseArray;
 
 import com.bmd.jrt.android.builder.AndroidRoutineBuilder;
@@ -31,6 +32,7 @@ import com.bmd.jrt.android.builder.InputClashException;
 import com.bmd.jrt.android.builder.RoutineClashException;
 import com.bmd.jrt.channel.IOChannel;
 import com.bmd.jrt.channel.IOChannel.IOChannelInput;
+import com.bmd.jrt.channel.InputChannel;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.CacheHashMap;
@@ -346,7 +348,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
             @Nonnull final List<? extends INPUT> inputs) {
 
         final Logger logger = mLogger;
-        final Loader<InvocationResult<OUTPUT>> loader = loaderManager.getLoader(loaderId);
+        final Loader<Pair<InvocationResult<OUTPUT>, String>> loader =
+                loaderManager.getLoader(loaderId);
 
         if (loader != null) {
 
@@ -408,15 +411,19 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
      * @param <OUTPUT> the output data type.
      */
     private static class RoutineLoaderCallbacks<OUTPUT>
-            implements LoaderCallbacks<InvocationResult<OUTPUT>> {
+            implements LoaderCallbacks<Pair<InvocationResult<OUTPUT>, String>> {
 
-        private final ArrayList<IOChannel<OUTPUT>> mChannels = new ArrayList<IOChannel<OUTPUT>>();
+        private final ArrayList<IOChannelInput<OUTPUT>> mChannels =
+                new ArrayList<IOChannelInput<OUTPUT>>();
 
         private final RoutineLoader<?, OUTPUT> mLoader;
 
         private final LoaderManager mLoaderManager;
 
         private final Logger mLogger;
+
+        private final ArrayList<IOChannelInput<OUTPUT>> mNewChannels =
+                new ArrayList<IOChannelInput<OUTPUT>>();
 
         private ResultCache mCacheType;
 
@@ -450,63 +457,91 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
             logger.dbg("creating new result channel");
 
             final RoutineLoader<?, OUTPUT> internalLoader = mLoader;
-            final ArrayList<IOChannel<OUTPUT>> channels = mChannels;
+            final ArrayList<IOChannelInput<OUTPUT>> channels = mNewChannels;
             final IOChannel<OUTPUT> channel = JRoutine.io()
                                                       .loggedWith(logger.getLog())
                                                       .logLevel(logger.getLogLevel())
                                                       .buildChannel();
-            channels.add(channel);
+            channels.add(channel.input());
             internalLoader.setInvocationCount(
                     Math.max(channels.size(), internalLoader.getInvocationCount()));
             return channel.output();
         }
 
         @Override
-        public Loader<InvocationResult<OUTPUT>> onCreateLoader(final int id, final Bundle args) {
+        public Loader<Pair<InvocationResult<OUTPUT>, String>> onCreateLoader(final int id,
+                final Bundle args) {
 
             mLogger.dbg("creating Android loader: %d", id);
             return mLoader;
         }
 
         @Override
-        public void onLoadFinished(final Loader<InvocationResult<OUTPUT>> loader,
-                final InvocationResult<OUTPUT> result) {
+        public void onLoadFinished(final Loader<Pair<InvocationResult<OUTPUT>, String>> loader,
+                final Pair<InvocationResult<OUTPUT>, String> data) {
 
             final Logger logger = mLogger;
-            final ArrayList<IOChannel<OUTPUT>> channels = mChannels;
+            final ArrayList<IOChannelInput<OUTPUT>> channels = mChannels;
+            final ArrayList<IOChannelInput<OUTPUT>> newChannels = mNewChannels;
+            final InvocationResult<OUTPUT> result = data.first;
 
-            logger.dbg("dispatching invocation result: " + result);
+            logger.dbg("dispatching invocation result: %s", result);
 
-            for (final IOChannel<OUTPUT> channel : channels) {
+            if (result.passTo(channels, newChannels)) {
 
-                final IOChannelInput<OUTPUT> input = channel.input();
-                result.passTo(input);
-                input.close();
-            }
+                final ArrayList<IOChannelInput<OUTPUT>> channelsToClose =
+                        new ArrayList<IOChannelInput<OUTPUT>>(channels);
+                channelsToClose.addAll(newChannels);
 
-            mResultCount += channels.size();
-            channels.clear();
+                mResultCount += channels.size() + newChannels.size();
+                channels.clear();
+                newChannels.clear();
 
-            final RoutineLoader<?, OUTPUT> internalLoader = mLoader;
+                final RoutineLoader<?, OUTPUT> internalLoader = mLoader;
 
-            if (mResultCount >= internalLoader.getInvocationCount()) {
+                if (mResultCount >= internalLoader.getInvocationCount()) {
 
-                mResultCount = 0;
+                    mResultCount = 0;
+                    internalLoader.setInvocationCount(0);
 
-                final ResultCache cacheType = mCacheType;
+                    final ResultCache cacheType = mCacheType;
 
-                if ((cacheType == ResultCache.CLEAR) || (result.isError() ? (cacheType
-                        == ResultCache.RETAIN_RESULT) : (cacheType == ResultCache.RETAIN_ERROR))) {
+                    if ((cacheType == ResultCache.CLEAR) || (result.isError() ? (cacheType
+                            == ResultCache.RETAIN_RESULT)
+                            : (cacheType == ResultCache.RETAIN_ERROR))) {
 
-                    final int id = internalLoader.getId();
-                    logger.dbg("destroying Android loader: %d", id);
-                    mLoaderManager.destroyLoader(id);
+                        final int id = internalLoader.getId();
+                        logger.dbg("destroying Android loader: %d", id);
+                        mLoaderManager.destroyLoader(id);
+                    }
                 }
+
+                if (result.isError()) {
+
+                    final Throwable exception = result.getAbortException();
+
+                    for (final IOChannelInput<OUTPUT> channel : channelsToClose) {
+
+                        channel.abort(exception);
+                    }
+
+                } else {
+
+                    for (final IOChannelInput<OUTPUT> channel : channelsToClose) {
+
+                        channel.close();
+                    }
+                }
+
+            } else {
+
+                channels.addAll(newChannels);
+                newChannels.clear();
             }
         }
 
         @Override
-        public void onLoaderReset(final Loader<InvocationResult<OUTPUT>> loader) {
+        public void onLoaderReset(final Loader<Pair<InvocationResult<OUTPUT>, String>> loader) {
 
             mLogger.dbg("resetting Android loader: %d", mLoader.getId());
             reset();
@@ -515,14 +550,22 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
         private void reset() {
 
             mLogger.dbg("aborting result channels");
-            final ArrayList<IOChannel<OUTPUT>> channels = mChannels;
+            final ArrayList<IOChannelInput<OUTPUT>> channels = mChannels;
+            final ArrayList<IOChannelInput<OUTPUT>> newChannels = mNewChannels;
 
-            for (final IOChannel<OUTPUT> channel : channels) {
+            for (final InputChannel<OUTPUT> channel : channels) {
 
-                channel.input().abort();
+                channel.abort();
             }
 
             channels.clear();
+
+            for (final InputChannel<OUTPUT> newChannel : newChannels) {
+
+                newChannel.abort();
+            }
+
+            newChannels.clear();
         }
 
         private void setCacheType(@Nonnull final ResultCache cacheType) {

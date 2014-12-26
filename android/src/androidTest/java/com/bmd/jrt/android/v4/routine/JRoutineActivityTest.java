@@ -124,6 +124,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         }
 
+        result1.checkComplete();
+
         final OutputChannel<Data> result2 =
                 JRoutine.from(getActivity(), ClassToken.tokenOf(Delay.class))
                         .withId(0)
@@ -132,6 +134,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                         .callAsync(data1);
 
         assertThat(result2.readFirst()).isSameAs(data1);
+        result2.checkComplete();
 
         final OutputChannel<Data> result3 =
                 JRoutine.from(getActivity(), ClassToken.tokenOf(Delay.class))
@@ -140,6 +143,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                         .callAsync(data1);
 
         assertThat(result3.readFirst()).isSameAs(data1);
+        result3.checkComplete();
     }
 
     public void testActivityClearResult() {
@@ -153,6 +157,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                         .callAsync(data1);
 
         assertThat(result1.readFirst()).isSameAs(data1);
+        result1.checkComplete();
 
         RoutineException error = null;
         final OutputChannel<Data> result2 =
@@ -173,6 +178,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             error = e;
         }
 
+        result2.checkComplete();
+
         final OutputChannel<Data> result3 =
                 JRoutine.from(getActivity(), ClassToken.tokenOf(Abort.class))
                         .withId(0)
@@ -187,8 +194,10 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         } catch (final RoutineException e) {
 
-            assertThat(e).isSameAs(error);
+            assertThat(e.getCause()).isSameAs(error.getCause());
         }
+
+        result3.checkComplete();
     }
 
     public void testActivityInputs() {
@@ -273,6 +282,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                         .callAsync(data1);
 
         assertThat(result1.readFirst()).isSameAs(data1);
+        result1.checkComplete();
 
         final OutputChannel<Data> result2 =
                 JRoutine.from(getActivity(), ClassToken.tokenOf(Delay.class))
@@ -281,6 +291,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                         .callAsync(data1);
 
         assertThat(result2.readFirst()).isSameAs(data1);
+        result2.checkComplete();
 
         RoutineException error = null;
         final OutputChannel<Data> result3 =
@@ -301,6 +312,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             error = e;
         }
 
+        result3.checkComplete();
+
         final OutputChannel<Data> result4 =
                 JRoutine.from(getActivity(), ClassToken.tokenOf(Abort.class))
                         .withId(0)
@@ -315,8 +328,10 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         } catch (final RoutineException e) {
 
-            assertThat(e).isSameAs(error);
+            assertThat(e.getCause()).isSameAs(error.getCause());
         }
+
+        result4.checkComplete();
     }
 
     @TargetApi(VERSION_CODES.HONEYCOMB)
@@ -417,6 +432,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                         .callAsync(data1);
 
         assertThat(result1.readFirst()).isSameAs(data1);
+        result1.checkComplete();
 
         final OutputChannel<Data> result2 =
                 JRoutine.from(getActivity(), ClassToken.tokenOf(Abort.class))
@@ -433,6 +449,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         } catch (final RoutineClashException ignored) {
 
         }
+
+        result2.checkComplete();
     }
 
     @SuppressWarnings({"ConstantConditions", "RedundantCast"})
@@ -749,7 +767,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                 RoutineInterruptedException.interrupt(e);
             }
 
-            result.abort();
+            result.abort(new IllegalStateException());
         }
     }
 

@@ -15,7 +15,6 @@ package com.bmd.jrt.android.v4.routine;
 
 import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
-import android.support.v4.util.Pair;
 
 import com.bmd.jrt.channel.IOChannel;
 import com.bmd.jrt.channel.IOChannel.IOChannelInput;
@@ -40,7 +39,7 @@ import javax.annotation.Nullable;
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<Pair<InvocationResult<OUTPUT>, String>> {
+class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTPUT>> {
 
     private final List<? extends INPUT> mInputs;
 
@@ -50,7 +49,7 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<Pair<InvocationResult
 
     private int mInvocationCount;
 
-    private Pair<InvocationResult<OUTPUT>, String> mResult;
+    private InvocationResult<OUTPUT> mResult;
 
     /**
      * Stores away the application context associated with context.
@@ -100,7 +99,7 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<Pair<InvocationResult
     }
 
     @Override
-    public void deliverResult(final Pair<InvocationResult<OUTPUT>, String> data) {
+    public void deliverResult(final InvocationResult<OUTPUT> data) {
 
         mLogger.dbg("delivering result: %s", data);
         mResult = data;
@@ -145,13 +144,14 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<Pair<InvocationResult
     }
 
     @Override
-    public Pair<InvocationResult<OUTPUT>, String> loadInBackground() {
+    public InvocationResult<OUTPUT> loadInBackground() {
 
         final Logger logger = mLogger;
         final Invocation<INPUT, OUTPUT> invocation = mInvocation;
         final LoaderResultChannel<OUTPUT> channel = new LoaderResultChannel<OUTPUT>(logger);
-        final InvocationResult<OUTPUT> result = new InvocationResult<OUTPUT>(this, logger);
-        channel.output().bind(result);
+        final InvocationOutputConsumer<OUTPUT> consumer =
+                new InvocationOutputConsumer<OUTPUT>(this, logger);
+        channel.output().bind(consumer);
 
         Throwable abortException = null;
         logger.dbg("running invocation");
@@ -196,12 +196,12 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<Pair<InvocationResult
 
             logger.dbg(abortException, "aborted invocation");
             channel.abort(abortException);
-            return new Pair<InvocationResult<OUTPUT>, String>(result, "abort");
+            return consumer.createResult();
         }
 
         logger.dbg("reading invocation results");
         channel.close();
-        return new Pair<InvocationResult<OUTPUT>, String>(result, "result");
+        return consumer.createResult();
     }
 
     /**

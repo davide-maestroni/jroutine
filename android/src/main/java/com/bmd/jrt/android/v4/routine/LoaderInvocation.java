@@ -20,7 +20,6 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
-import android.support.v4.util.Pair;
 import android.util.SparseArray;
 
 import com.bmd.jrt.android.builder.AndroidRoutineBuilder;
@@ -254,12 +253,11 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
                     "invalid context type: " + context.getClass().getCanonicalName());
         }
 
-        final Constructor<? extends Invocation<INPUT, OUTPUT>> constructor = mConstructor;
         int loaderId = mLoaderId;
 
         if (loaderId == AndroidRoutineBuilder.GENERATED) {
 
-            loaderId = 31 * constructor.getDeclaringClass().hashCode() + inputs.hashCode();
+            loaderId = 31 * mConstructor.getDeclaringClass().hashCode() + inputs.hashCode();
             logger.dbg("generating invocation ID: %d", loaderId);
         }
 
@@ -276,34 +274,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
 
         if ((callbacks == null) || needsRestart) {
 
-            final Invocation<INPUT, OUTPUT> invocation;
-
-            try {
-
-                logger.dbg("creating a new instance of class [%d]: %s", loaderId,
-                           constructor.getDeclaringClass());
-                invocation = constructor.newInstance();
-
-            } catch (final InvocationTargetException e) {
-
-                logger.err(e, "error creating the invocation instance [%d]", loaderId);
-                throw new RoutineException(e.getCause());
-
-            } catch (final RoutineInterruptedException e) {
-
-                logger.err(e, "error creating the invocation instance");
-                throw e.interrupt();
-
-            } catch (final RoutineException e) {
-
-                logger.err(e, "error creating the invocation instance [%d]", loaderId);
-                throw e;
-
-            } catch (final Throwable t) {
-
-                logger.err(t, "error creating the invocation instance [%d]", loaderId);
-                throw new RoutineException(t);
-            }
+            final RoutineLoaderCallbacks<OUTPUT> newCallbacks =
+                    createCallbacks(loaderContext, loaderManager, inputs, loaderId);
 
             if (callbacks != null) {
 
@@ -311,10 +283,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
                 callbacks.reset();
             }
 
-            final RoutineLoader<INPUT, OUTPUT> routineLoader =
-                    new RoutineLoader<INPUT, OUTPUT>(loaderContext, invocation, inputs, logger);
-            callbacks = new RoutineLoaderCallbacks<OUTPUT>(loaderManager, routineLoader, logger);
-            callbackArray.put(loaderId, new WeakReference<RoutineLoaderCallbacks<?>>(callbacks));
+            callbackArray.put(loaderId, new WeakReference<RoutineLoaderCallbacks<?>>(newCallbacks));
+            callbacks = newCallbacks;
             needsRestart = true;
         }
 
@@ -337,14 +307,53 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
         result.pass(outputChannel);
     }
 
+    private RoutineLoaderCallbacks<OUTPUT> createCallbacks(@Nonnull final Context loaderContext,
+            @Nonnull final LoaderManager loaderManager, @Nonnull final List<? extends INPUT> inputs,
+            final int loaderId) {
+
+        final Logger logger = mLogger;
+        final Constructor<? extends Invocation<INPUT, OUTPUT>> constructor = mConstructor;
+        final Invocation<INPUT, OUTPUT> invocation;
+
+        try {
+
+            logger.dbg("creating a new instance of class [%d]: %s", loaderId,
+                       constructor.getDeclaringClass());
+            invocation = constructor.newInstance();
+
+        } catch (final InvocationTargetException e) {
+
+            logger.err(e, "error creating the invocation instance [%d]", loaderId);
+            throw new RoutineException(e.getCause());
+
+        } catch (final RoutineInterruptedException e) {
+
+            logger.err(e, "error creating the invocation instance");
+            throw e.interrupt();
+
+        } catch (final RoutineException e) {
+
+            logger.err(e, "error creating the invocation instance [%d]", loaderId);
+            throw e;
+
+        } catch (final Throwable t) {
+
+            logger.err(t, "error creating the invocation instance [%d]", loaderId);
+            throw new RoutineException(t);
+        }
+
+        final RoutineLoader<INPUT, OUTPUT> routineLoader =
+                new RoutineLoader<INPUT, OUTPUT>(loaderContext, invocation, inputs, logger);
+        return new RoutineLoaderCallbacks<OUTPUT>(loaderManager, routineLoader, logger);
+    }
+
     @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST_OF_RETURN_VALUE",
                         justification = "class comparison with == is done")
     private boolean isClash(@Nonnull final LoaderManager loaderManager, final int loaderId,
             @Nonnull final List<? extends INPUT> inputs) {
 
         final Logger logger = mLogger;
-        final Loader<Pair<InvocationResult<OUTPUT>, String>> loader =
-                loaderManager.getLoader(loaderId);
+        final Loader<InvocationResult<OUTPUT>> loader = loaderManager.getLoader(loaderId);
 
         if (loader != null) {
 
@@ -406,7 +415,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
      * @param <OUTPUT> the output data type.
      */
     private static class RoutineLoaderCallbacks<OUTPUT>
-            implements LoaderCallbacks<Pair<InvocationResult<OUTPUT>, String>> {
+            implements LoaderCallbacks<InvocationResult<OUTPUT>> {
 
         private final ArrayList<IOChannelInput<OUTPUT>> mChannels =
                 new ArrayList<IOChannelInput<OUTPUT>>();
@@ -464,25 +473,23 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
         }
 
         @Override
-        public Loader<Pair<InvocationResult<OUTPUT>, String>> onCreateLoader(final int id,
-                final Bundle args) {
+        public Loader<InvocationResult<OUTPUT>> onCreateLoader(final int id, final Bundle args) {
 
             mLogger.dbg("creating Android loader: %d", id);
             return mLoader;
         }
 
         @Override
-        public void onLoadFinished(final Loader<Pair<InvocationResult<OUTPUT>, String>> loader,
-                final Pair<InvocationResult<OUTPUT>, String> data) {
+        public void onLoadFinished(final Loader<InvocationResult<OUTPUT>> loader,
+                final InvocationResult<OUTPUT> data) {
 
             final Logger logger = mLogger;
             final ArrayList<IOChannelInput<OUTPUT>> channels = mChannels;
             final ArrayList<IOChannelInput<OUTPUT>> newChannels = mNewChannels;
-            final InvocationResult<OUTPUT> result = data.first;
 
-            logger.dbg("dispatching invocation result: %s", result);
+            logger.dbg("dispatching invocation result: %s", data);
 
-            if (result.passTo(channels, newChannels)) {
+            if (data.passTo(newChannels, channels)) {
 
                 final ArrayList<IOChannelInput<OUTPUT>> channelsToClose =
                         new ArrayList<IOChannelInput<OUTPUT>>(channels);
@@ -501,7 +508,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
 
                     final ResultCache cacheType = mCacheType;
 
-                    if ((cacheType == ResultCache.CLEAR) || (result.isError() ? (cacheType
+                    if ((cacheType == ResultCache.CLEAR) || (data.isError() ? (cacheType
                             == ResultCache.RETAIN_RESULT)
                             : (cacheType == ResultCache.RETAIN_ERROR))) {
 
@@ -511,9 +518,9 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
                     }
                 }
 
-                if (result.isError()) {
+                if (data.isError()) {
 
-                    final Throwable exception = result.getAbortException();
+                    final Throwable exception = data.getAbortException();
 
                     for (final IOChannelInput<OUTPUT> channel : channelsToClose) {
 
@@ -536,7 +543,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
         }
 
         @Override
-        public void onLoaderReset(final Loader<Pair<InvocationResult<OUTPUT>, String>> loader) {
+        public void onLoaderReset(final Loader<InvocationResult<OUTPUT>> loader) {
 
             mLogger.dbg("resetting Android loader: %d", mLoader.getId());
             reset();

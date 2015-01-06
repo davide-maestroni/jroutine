@@ -16,7 +16,7 @@
 
 package ${packageName};
 
-public final class ${interfaceName}${className}${genericTypes} implements ${interfaceFullName} {
+public final class ${interfaceName}$${className}${genericTypes} implements ${interfaceFullName} {
 
     private final String mLockName;
 
@@ -24,7 +24,7 @@ public final class ${interfaceName}${className}${genericTypes} implements ${inte
 
     private final java.lang.ref.WeakReference<${classFullName}> mWrapped;
 
-    public ${interfaceName}${className}(final ${classFullName} wrapped,
+    public ${interfaceName}$${className}(final ${classFullName} wrapped,
             final com.bmd.jrt.common.CacheHashMap<Object, java.util.Map<String, Object>> mutexMap,
             final String lockName, final com.bmd.jrt.builder.RoutineConfiguration configuration) {
 

@@ -335,7 +335,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                 final Package classPackage = itf.getPackage();
                 final String className =
                         ((classPackage != null) ? classPackage.getName() + "." : "")
-                                + itf.getSimpleName() + targetClass.getSimpleName();
+                                + itf.getSimpleName() + "$" + targetClass.getSimpleName();
                 final Class<?> wrapperClass = Class.forName(className);
                 final Constructor<?> constructor =
                         wrapperClass.getConstructor(targetClass, CacheHashMap.class, String.class,

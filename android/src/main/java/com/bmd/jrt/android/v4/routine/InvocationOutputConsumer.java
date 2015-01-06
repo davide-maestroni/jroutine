@@ -13,14 +13,18 @@
  */
 package com.bmd.jrt.android.v4.routine;
 
+import com.bmd.jrt.android.runner.Runners;
 import com.bmd.jrt.channel.IOChannel.IOChannelInput;
 import com.bmd.jrt.channel.TemplateOutputConsumer;
 import com.bmd.jrt.common.RoutineException;
 import com.bmd.jrt.common.RoutineInterruptedException;
 import com.bmd.jrt.log.Logger;
+import com.bmd.jrt.runner.Execution;
+import com.bmd.jrt.runner.Runner;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -34,11 +38,13 @@ import javax.annotation.Nullable;
  */
 class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
 
+    private static final Runner sMainRunner = Runners.mainRunner();
+
     private final ArrayList<OUTPUT> mCachedResults = new ArrayList<OUTPUT>();
 
-    private final ArrayList<OUTPUT> mLastResults = new ArrayList<OUTPUT>();
+    private final Execution mDeliverResult;
 
-    private final RoutineLoader<?, OUTPUT> mLoader;
+    private final ArrayList<OUTPUT> mLastResults = new ArrayList<OUTPUT>();
 
     private final Logger mLogger;
 
@@ -64,7 +70,14 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
             throw new NullPointerException("the loader cannot be null");
         }
 
-        mLoader = loader;
+        mDeliverResult = new Execution() {
+
+            @Override
+            public void run() {
+
+                loader.deliverResult(createResult());
+            }
+        };
         mLogger = logger.subContextLogger(this);
     }
 
@@ -89,7 +102,7 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
         if (deliverResult) {
 
             mLogger.dbg("delivering final result");
-            mLoader.deliverResult(createResult());
+            deliverResult();
         }
     }
 
@@ -110,7 +123,7 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
         if (deliverResult) {
 
             mLogger.dbg(abortException, "delivering error");
-            mLoader.deliverResult(createResult());
+            deliverResult();
         }
     }
 
@@ -134,7 +147,7 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
         if (deliverResult) {
 
             mLogger.dbg("delivering result: %s", output);
-            mLoader.deliverResult(createResult());
+            deliverResult();
         }
     }
 
@@ -146,6 +159,11 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
     InvocationResult<OUTPUT> createResult() {
 
         return new Result();
+    }
+
+    private void deliverResult() {
+
+        sMainRunner.run(mDeliverResult, 0, TimeUnit.MILLISECONDS);
     }
 
     /**

@@ -17,6 +17,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 
 import com.bmd.jrt.android.builder.AndroidRoutineBuilder;
+import com.bmd.jrt.android.invocation.AndroidInvocation;
 import com.bmd.jrt.android.runner.Runners;
 import com.bmd.jrt.builder.DefaultConfigurationBuilder;
 import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
@@ -54,7 +55,7 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> implements AndroidRoutineBuild
 
     private final RoutineConfigurationBuilder mBuilder;
 
-    private final Constructor<? extends Invocation<INPUT, OUTPUT>> mConstructor;
+    private final Constructor<? extends AndroidInvocation<INPUT, OUTPUT>> mConstructor;
 
     private final WeakReference<Object> mContext;
 
@@ -69,9 +70,10 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> implements AndroidRoutineBuild
      *
      * @param activity   the context activity.
      * @param classToken the invocation class token.
+     * @throws NullPointerException if the class token is null.
      */
     DefaultAndroidRoutineBuilder(@Nonnull final FragmentActivity activity,
-            @Nonnull ClassToken<? extends Invocation<INPUT, OUTPUT>> classToken) {
+            @Nonnull final ClassToken<? extends AndroidInvocation<INPUT, OUTPUT>> classToken) {
 
         this((Object) activity, classToken);
     }
@@ -81,15 +83,16 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> implements AndroidRoutineBuild
      *
      * @param fragment   the context fragment.
      * @param classToken the invocation class token.
+     * @throws NullPointerException if the class token is null.
      */
     DefaultAndroidRoutineBuilder(@Nonnull final Fragment fragment,
-            @Nonnull ClassToken<? extends Invocation<INPUT, OUTPUT>> classToken) {
+            @Nonnull final ClassToken<? extends AndroidInvocation<INPUT, OUTPUT>> classToken) {
 
         this((Object) fragment, classToken);
     }
 
     private DefaultAndroidRoutineBuilder(@Nonnull final Object context,
-            @Nonnull ClassToken<? extends Invocation<INPUT, OUTPUT>> classToken) {
+            @Nonnull final ClassToken<? extends AndroidInvocation<INPUT, OUTPUT>> classToken) {
 
         mContext = new WeakReference<Object>(context);
         mConstructor = Reflection.findConstructor(classToken.getRawClass());
@@ -159,6 +162,14 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> implements AndroidRoutineBuild
 
     @Nonnull
     @Override
+    public AndroidRoutineBuilder<INPUT, OUTPUT> syncRunner(@Nonnull final RunnerType type) {
+
+        mBuilder.syncRunner(type);
+        return this;
+    }
+
+    @Nonnull
+    @Override
     public AndroidRoutineBuilder<INPUT, OUTPUT> withId(final int id) {
 
         mLoaderId = id;
@@ -177,7 +188,7 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> implements AndroidRoutineBuild
 
         private final ClashResolution mClashResolution;
 
-        private final Constructor<? extends Invocation<INPUT, OUTPUT>> mConstructor;
+        private final Constructor<? extends AndroidInvocation<INPUT, OUTPUT>> mConstructor;
 
         private final WeakReference<Object> mContext;
 
@@ -200,7 +211,8 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> implements AndroidRoutineBuild
                 @Nonnull final Runner syncRunner, @Nonnull final WeakReference<Object> context,
                 final int loaderId, @Nonnull final ClashResolution resolution,
                 @Nonnull final ResultCache cacheType,
-                @Nonnull final Constructor<? extends Invocation<INPUT, OUTPUT>> constructor) {
+                @Nonnull final Constructor<? extends AndroidInvocation<INPUT,
+                        OUTPUT>> constructor) {
 
             super(configuration, syncRunner);
 
@@ -248,7 +260,8 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> implements AndroidRoutineBuild
 
             try {
 
-                final Constructor<? extends Invocation<INPUT, OUTPUT>> constructor = mConstructor;
+                final Constructor<? extends AndroidInvocation<INPUT, OUTPUT>> constructor =
+                        mConstructor;
                 logger.dbg("creating a new instance of class: %s", constructor.getDeclaringClass());
                 return constructor.newInstance();
 

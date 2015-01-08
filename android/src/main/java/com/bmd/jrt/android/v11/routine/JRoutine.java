@@ -20,8 +20,8 @@ import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 
 import com.bmd.jrt.android.builder.AndroidRoutineBuilder;
+import com.bmd.jrt.android.invocation.AndroidInvocation;
 import com.bmd.jrt.common.ClassToken;
-import com.bmd.jrt.invocation.Invocation;
 
 import javax.annotation.Nonnull;
 
@@ -131,7 +131,7 @@ public class JRoutine extends com.bmd.jrt.routine.JRoutine {
     @Nonnull
     public static <INPUT, OUTPUT> AndroidRoutineBuilder<INPUT, OUTPUT> from(
             @Nonnull final Activity activity,
-            @Nonnull ClassToken<? extends Invocation<INPUT, OUTPUT>> classToken) {
+            @Nonnull ClassToken<? extends AndroidInvocation<INPUT, OUTPUT>> classToken) {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
 
@@ -169,7 +169,7 @@ public class JRoutine extends com.bmd.jrt.routine.JRoutine {
     @Nonnull
     public static <INPUT, OUTPUT> AndroidRoutineBuilder<INPUT, OUTPUT> from(
             @Nonnull final Fragment fragment,
-            @Nonnull ClassToken<? extends Invocation<INPUT, OUTPUT>> classToken) {
+            @Nonnull ClassToken<? extends AndroidInvocation<INPUT, OUTPUT>> classToken) {
 
         if (!LoaderInvocation.isEnabled(fragment)) {
 

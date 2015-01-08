@@ -29,6 +29,7 @@ import com.bmd.jrt.android.builder.AndroidRoutineBuilder.ClashResolution;
 import com.bmd.jrt.android.builder.AndroidRoutineBuilder.ResultCache;
 import com.bmd.jrt.android.builder.InputClashException;
 import com.bmd.jrt.android.builder.RoutineClashException;
+import com.bmd.jrt.android.invocation.AndroidInvocation;
 import com.bmd.jrt.channel.IOChannel;
 import com.bmd.jrt.channel.IOChannel.IOChannelInput;
 import com.bmd.jrt.channel.InputChannel;
@@ -37,7 +38,6 @@ import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.CacheHashMap;
 import com.bmd.jrt.common.RoutineException;
 import com.bmd.jrt.common.RoutineInterruptedException;
-import com.bmd.jrt.invocation.Invocation;
 import com.bmd.jrt.invocation.SimpleInvocation;
 import com.bmd.jrt.log.Logger;
 
@@ -70,7 +70,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
 
     private final ClashResolution mClashResolution;
 
-    private final Constructor<? extends Invocation<INPUT, OUTPUT>> mConstructor;
+    private final Constructor<? extends AndroidInvocation<INPUT, OUTPUT>> mConstructor;
 
     private final WeakReference<Object> mContext;
 
@@ -92,7 +92,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
     @SuppressWarnings("ConstantConditions")
     LoaderInvocation(@Nonnull final WeakReference<Object> context, final int loaderId,
             @Nonnull final ClashResolution resolution, @Nonnull final ResultCache cacheType,
-            @Nonnull final Constructor<? extends Invocation<INPUT, OUTPUT>> constructor,
+            @Nonnull final Constructor<? extends AndroidInvocation<INPUT, OUTPUT>> constructor,
             @Nonnull final Logger logger) {
 
         if (context == null) {
@@ -317,14 +317,15 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
             final int loaderId) {
 
         final Logger logger = mLogger;
-        final Constructor<? extends Invocation<INPUT, OUTPUT>> constructor = mConstructor;
-        final Invocation<INPUT, OUTPUT> invocation;
+        final Constructor<? extends AndroidInvocation<INPUT, OUTPUT>> constructor = mConstructor;
+        final AndroidInvocation<INPUT, OUTPUT> invocation;
 
         try {
 
             logger.dbg("creating a new instance of class [%d]: %s", loaderId,
                        constructor.getDeclaringClass());
             invocation = constructor.newInstance();
+            invocation.onSetContext(loaderContext.getApplicationContext());
 
         } catch (final InvocationTargetException e) {
 

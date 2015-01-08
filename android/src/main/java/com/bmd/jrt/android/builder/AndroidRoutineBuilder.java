@@ -13,6 +13,7 @@
  */
 package com.bmd.jrt.android.builder;
 
+import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.routine.Routine;
@@ -94,6 +95,16 @@ public interface AndroidRoutineBuilder<INPUT, OUTPUT> {
      */
     @Nonnull
     public AndroidRoutineBuilder<INPUT, OUTPUT> onComplete(@Nonnull ResultCache cacheType);
+
+    /**
+     * Sets the type of the synchronous runner to be used by the routine.
+     *
+     * @param type the runner type.
+     * @return this builder.
+     * @throws NullPointerException if the specified type is null.
+     */
+    @Nonnull
+    public AndroidRoutineBuilder<INPUT, OUTPUT> syncRunner(@Nonnull RunnerType type);
 
     /**
      * Tells the builder to identify the invocation with the specified ID.

@@ -25,20 +25,22 @@ import com.bmd.jrt.android.builder.AndroidRoutineBuilder.ClashResolution;
 import com.bmd.jrt.android.builder.AndroidRoutineBuilder.ResultCache;
 import com.bmd.jrt.android.builder.InputClashException;
 import com.bmd.jrt.android.builder.RoutineClashException;
+import com.bmd.jrt.android.invocation.AndroidSimpleInvocation;
+import com.bmd.jrt.android.invocation.AndroidTemplateInvocation;
 import com.bmd.jrt.android.log.Logs;
+import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.common.RoutineException;
 import com.bmd.jrt.common.RoutineInterruptedException;
-import com.bmd.jrt.invocation.TemplateInvocation;
-import com.bmd.jrt.invocation.TunnelInvocation;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.routine.Routine;
 import com.bmd.jrt.time.TimeDuration;
 
 import java.lang.ref.WeakReference;
+import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import javax.annotation.Nonnull;
@@ -766,18 +768,35 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
-        final Routine<String, String> routine =
-                JRoutine.from(getActivity(), new ClassToken<TunnelInvocation<String>>() {})
+        final Routine<String, String> routine1 =
+                JRoutine.from(getActivity(), ClassToken.tokenOf(StringTunnelInvocation.class))
+                        .syncRunner(RunnerType.QUEUED)
                         .loggedWith(Logs.androidLog())
                         .logLevel(LogLevel.DEBUG)
                         .buildRoutine();
-        assertThat(routine.callSync("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2", "3",
-                                                                                     "4", "5");
-        assertThat(routine.callAsync("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2", "3",
+        assertThat(routine1.callSync("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2", "3",
                                                                                       "4", "5");
-        assertThat(routine.callParallel("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2",
-                                                                                         "3", "4",
-                                                                                         "5");
+        assertThat(routine1.callAsync("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2",
+                                                                                       "3", "4",
+                                                                                       "5");
+        assertThat(routine1.callParallel("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2",
+                                                                                          "3", "4",
+                                                                                          "5");
+
+        final Routine<String, String> routine2 =
+                JRoutine.from(getActivity(), ClassToken.tokenOf(StringSimpleInvocation.class))
+                        .syncRunner(RunnerType.SEQUENTIAL)
+                        .loggedWith(Logs.androidLog())
+                        .logLevel(LogLevel.DEBUG)
+                        .buildRoutine();
+        assertThat(routine2.callSync("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2", "3",
+                                                                                      "4", "5");
+        assertThat(routine2.callAsync("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2",
+                                                                                       "3", "4",
+                                                                                       "5");
+        assertThat(routine2.callParallel("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2",
+                                                                                          "3", "4",
+                                                                                          "5");
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -851,7 +870,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         }
     }
 
-    private static class Abort extends TemplateInvocation<Data, Data> {
+    private static class Abort extends AndroidTemplateInvocation<Data, Data> {
 
         @Override
         public void onInput(final Data d, @Nonnull final ResultChannel<Data> result) {
@@ -873,7 +892,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
     }
 
-    private static class Delay extends TemplateInvocation<Data, Data> {
+    private static class Delay extends AndroidTemplateInvocation<Data, Data> {
 
         @Override
         public void onInput(final Data d, @Nonnull final ResultChannel<Data> result) {
@@ -882,7 +901,26 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         }
     }
 
-    private static class ToUpperCase extends TemplateInvocation<String, String> {
+    private static class StringSimpleInvocation extends AndroidSimpleInvocation<String, String> {
+
+        @Override
+        public void onCall(@Nonnull final List<? extends String> strings,
+                @Nonnull final ResultChannel<String> result) {
+
+            result.pass(strings);
+        }
+    }
+
+    private static class StringTunnelInvocation extends AndroidTemplateInvocation<String, String> {
+
+        @Override
+        public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
+
+            result.pass(s);
+        }
+    }
+
+    private static class ToUpperCase extends AndroidTemplateInvocation<String, String> {
 
         @Override
         public void onInput(final String s, @Nonnull final ResultChannel<String> result) {

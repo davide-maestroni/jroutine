@@ -18,12 +18,13 @@ import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.os.Build.VERSION_CODES;
 
+import com.bmd.jrt.android.invocation.AndroidInvocation;
 import com.bmd.jrt.channel.IOChannel;
 import com.bmd.jrt.channel.IOChannel.IOChannelInput;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.RoutineException;
-import com.bmd.jrt.invocation.Invocation;
+import com.bmd.jrt.common.RoutineInterruptedException;
 import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.time.TimeDuration;
 
@@ -46,7 +47,7 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
 
     private final List<? extends INPUT> mInputs;
 
-    private final Invocation<INPUT, OUTPUT> mInvocation;
+    private final AndroidInvocation<INPUT, OUTPUT> mInvocation;
 
     private final Logger mLogger;
 
@@ -70,7 +71,7 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
      */
     @SuppressWarnings("ConstantConditions")
     RoutineLoader(@Nonnull final Context context,
-            @Nonnull final Invocation<INPUT, OUTPUT> invocation,
+            @Nonnull final AndroidInvocation<INPUT, OUTPUT> invocation,
             @Nonnull final List<? extends INPUT> inputs, @Nonnull final Logger logger) {
 
         super(context);
@@ -130,6 +131,19 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
     @Override
     protected void onReset() {
 
+        try {
+
+            mInvocation.onDestroy();
+
+        } catch (final RoutineInterruptedException e) {
+
+            throw e.interrupt();
+
+        } catch (final Throwable t) {
+
+            mLogger.wrn(t, "ignoring exception while destroying invocation instance");
+        }
+
         mLogger.dbg("resetting result");
         mResult = null;
         super.onReset();
@@ -150,7 +164,7 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
     public InvocationResult<OUTPUT> loadInBackground() {
 
         final Logger logger = mLogger;
-        final Invocation<INPUT, OUTPUT> invocation = mInvocation;
+        final AndroidInvocation<INPUT, OUTPUT> invocation = mInvocation;
         final LoaderResultChannel<OUTPUT> channel = new LoaderResultChannel<OUTPUT>(logger);
         final InvocationOutputConsumer<OUTPUT> consumer =
                 new InvocationOutputConsumer<OUTPUT>(this, logger);

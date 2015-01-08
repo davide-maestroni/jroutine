@@ -325,7 +325,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
             logger.dbg("creating a new instance of class [%d]: %s", loaderId,
                        constructor.getDeclaringClass());
             invocation = constructor.newInstance();
-            invocation.onSetContext(loaderContext.getApplicationContext());
+            invocation.onContext(loaderContext.getApplicationContext());
 
         } catch (final InvocationTargetException e) {
 

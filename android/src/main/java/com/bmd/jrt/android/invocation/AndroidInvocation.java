@@ -32,5 +32,5 @@ public interface AndroidInvocation<INPUT, OUTPUT> extends Invocation<INPUT, OUTP
      *
      * @param context the context of the invocation.
      */
-    public void onSetContext(@Nonnull Context context);
+    public void onContext(@Nonnull Context context);
 }

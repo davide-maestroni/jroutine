@@ -33,7 +33,7 @@ public abstract class AndroidSimpleInvocation<INPUT, OUTPUT> extends SimpleInvoc
     private Context mContext;
 
     @Override
-    public void onSetContext(@Nonnull final Context context) {
+    public void onContext(@Nonnull final Context context) {
 
         mContext = context;
     }

@@ -13,6 +13,7 @@
  */
 package com.bmd.jrt.android.v4.routine;
 
+import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 
@@ -258,12 +259,33 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> implements AndroidRoutineBuild
                                                            mCacheType, mConstructor, logger);
             }
 
+            final Object context = mContext.get();
+            final Context appContext;
+
+            if (context instanceof FragmentActivity) {
+
+                final FragmentActivity activity = (FragmentActivity) context;
+                appContext = activity.getApplicationContext();
+
+            } else if (context instanceof Fragment) {
+
+                final Fragment fragment = (Fragment) context;
+                appContext = fragment.getActivity().getApplicationContext();
+
+            } else {
+
+                throw new IllegalArgumentException(
+                        "invalid context type: " + context.getClass().getCanonicalName());
+            }
+
             try {
 
                 final Constructor<? extends AndroidInvocation<INPUT, OUTPUT>> constructor =
                         mConstructor;
                 logger.dbg("creating a new instance of class: %s", constructor.getDeclaringClass());
-                return constructor.newInstance();
+                final AndroidInvocation<INPUT, OUTPUT> invocation = constructor.newInstance();
+                invocation.onContext(appContext);
+                return invocation;
 
             } catch (final InvocationTargetException e) {
 

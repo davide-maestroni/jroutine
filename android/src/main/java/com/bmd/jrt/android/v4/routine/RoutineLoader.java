@@ -17,6 +17,7 @@ import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
 
 import com.bmd.jrt.android.invocation.AndroidInvocation;
+import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
 import com.bmd.jrt.channel.IOChannel;
 import com.bmd.jrt.channel.IOChannel.IOChannelInput;
 import com.bmd.jrt.channel.OutputChannel;
@@ -42,6 +43,8 @@ import javax.annotation.Nullable;
  */
 class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTPUT>> {
 
+    private final DataOrder mDataOrder;
+
     private final List<? extends INPUT> mInputs;
 
     private final AndroidInvocation<INPUT, OUTPUT> mInvocation;
@@ -63,13 +66,15 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
      * @param context    used to retrieve the application context.
      * @param invocation the invocation instance.
      * @param inputs     the input data.
+     * @param order      the data order.
      * @param logger     the logger instance.
      * @throws NullPointerException if any of the specified parameters is null.
      */
     @SuppressWarnings("ConstantConditions")
     RoutineLoader(@Nonnull final Context context,
             @Nonnull final AndroidInvocation<INPUT, OUTPUT> invocation,
-            @Nonnull final List<? extends INPUT> inputs, @Nonnull final Logger logger) {
+            @Nonnull final List<? extends INPUT> inputs, @Nonnull final DataOrder order,
+            @Nonnull final Logger logger) {
 
         super(context);
 
@@ -83,8 +88,14 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
             throw new NullPointerException("the list of input data must not be null");
         }
 
+        if (order == null) {
+
+            throw new NullPointerException("the data order must not be null");
+        }
+
         mInvocation = invocation;
         mInputs = inputs;
+        mDataOrder = order;
         mLogger = logger.subContextLogger(this);
     }
 
@@ -162,7 +173,8 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
 
         final Logger logger = mLogger;
         final AndroidInvocation<INPUT, OUTPUT> invocation = mInvocation;
-        final LoaderResultChannel<OUTPUT> channel = new LoaderResultChannel<OUTPUT>(logger);
+        final LoaderResultChannel<OUTPUT> channel =
+                new LoaderResultChannel<OUTPUT>(mDataOrder, logger);
         final InvocationOutputConsumer<OUTPUT> consumer =
                 new InvocationOutputConsumer<OUTPUT>(this, logger);
         channel.output().bind(consumer);
@@ -252,11 +264,15 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
         /**
          * Constructor.
          *
+         * @param order  the data order.
          * @param logger the logger instance.
          */
-        private LoaderResultChannel(@Nonnull final Logger logger) {
+        private LoaderResultChannel(final DataOrder order, @Nonnull final Logger logger) {
 
             mChannel = JRoutine.io()
+                               .dataOrder(order)
+                               .maxSize(Integer.MAX_VALUE)
+                               .bufferTimeout(TimeDuration.ZERO)
                                .loggedWith(logger.getLog())
                                .logLevel(logger.getLogLevel())
                                .buildChannel();

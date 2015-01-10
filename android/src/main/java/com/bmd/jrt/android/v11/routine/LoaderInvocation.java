@@ -30,6 +30,7 @@ import com.bmd.jrt.android.builder.AndroidRoutineBuilder.ResultCache;
 import com.bmd.jrt.android.builder.InputClashException;
 import com.bmd.jrt.android.builder.RoutineClashException;
 import com.bmd.jrt.android.invocation.AndroidInvocation;
+import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
 import com.bmd.jrt.channel.IOChannel;
 import com.bmd.jrt.channel.IOChannel.IOChannelInput;
 import com.bmd.jrt.channel.InputChannel;
@@ -40,6 +41,7 @@ import com.bmd.jrt.common.RoutineException;
 import com.bmd.jrt.common.RoutineInterruptedException;
 import com.bmd.jrt.invocation.SimpleInvocation;
 import com.bmd.jrt.log.Logger;
+import com.bmd.jrt.time.TimeDuration;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
@@ -74,6 +76,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
 
     private final WeakReference<Object> mContext;
 
+    private final DataOrder mDataOrder;
+
     private final int mLoaderId;
 
     private final Logger mLogger;
@@ -86,6 +90,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
      * @param resolution  the clash resolution type.
      * @param cacheType   the result cache type.
      * @param constructor the invocation constructor.
+     * @param order       the input data order.
      * @param logger      the logger instance.
      * @throws NullPointerException if any of the specified parameters is null.
      */
@@ -93,7 +98,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
     LoaderInvocation(@Nonnull final WeakReference<Object> context, final int loaderId,
             @Nonnull final ClashResolution resolution, @Nonnull final ResultCache cacheType,
             @Nonnull final Constructor<? extends AndroidInvocation<INPUT, OUTPUT>> constructor,
-            @Nonnull final Logger logger) {
+            @Nonnull final DataOrder order, @Nonnull final Logger logger) {
 
         if (context == null) {
 
@@ -115,11 +120,17 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
             throw new NullPointerException("the invocation constructor must not be null");
         }
 
+        if (order == null) {
+
+            throw new NullPointerException("the data order must not be null");
+        }
+
         mContext = context;
         mLoaderId = loaderId;
         mClashResolution = resolution;
         mCacheType = cacheType;
         mConstructor = constructor;
+        mDataOrder = order;
         mLogger = logger.subContextLogger(this);
     }
 
@@ -349,7 +360,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
         }
 
         final RoutineLoader<INPUT, OUTPUT> routineLoader =
-                new RoutineLoader<INPUT, OUTPUT>(loaderContext, invocation, inputs, logger);
+                new RoutineLoader<INPUT, OUTPUT>(loaderContext, invocation, inputs, mDataOrder,
+                                                 logger);
         return new RoutineLoaderCallbacks<OUTPUT>(loaderManager, routineLoader, logger);
     }
 
@@ -469,6 +481,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
             final RoutineLoader<?, OUTPUT> internalLoader = mLoader;
             final ArrayList<IOChannelInput<OUTPUT>> channels = mNewChannels;
             final IOChannel<OUTPUT> channel = JRoutine.io()
+                                                      .maxSize(Integer.MAX_VALUE)
+                                                      .bufferTimeout(TimeDuration.ZERO)
                                                       .loggedWith(logger.getLog())
                                                       .logLevel(logger.getLogLevel())
                                                       .buildChannel();

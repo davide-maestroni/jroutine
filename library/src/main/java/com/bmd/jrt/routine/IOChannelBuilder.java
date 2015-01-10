@@ -74,11 +74,11 @@ public class IOChannelBuilder {
     }
 
     /**
-     * Sets the timeout for the channel to have room for additional data.
+     * Sets the timeout for the channel to have room for additional data. A null value means
+     * that it is up to the framework to chose a default.
      *
      * @param timeout the timeout.
      * @return this builder.
-     * @throws NullPointerException if the specified timeout is null.
      */
     @Nonnull
     public IOChannelBuilder bufferTimeout(@Nonnull final TimeDuration timeout) {
@@ -113,11 +113,11 @@ public class IOChannelBuilder {
     }
 
     /**
-     * Sets the runner instance used to schedule delayed inputs.
+     * Sets the runner instance used to schedule delayed inputs. A null value means that it is up to
+     * the framework to chose a default instance.
      *
      * @param runner the runner instance.
      * @return this builder.
-     * @throws NullPointerException if the specified runner is null.
      */
     @Nonnull
     public IOChannelBuilder delayRunner(@Nonnull final Runner runner) {
@@ -141,11 +141,11 @@ public class IOChannelBuilder {
     }
 
     /**
-     * Sets the log instance.
+     * Sets the log instance. A null value means that it is up to the framework to chose a default
+     * implementation.
      *
      * @param log the log instance.
      * @return this builder.
-     * @throws NullPointerException if the log is null.
      */
     @Nonnull
     public IOChannelBuilder loggedWith(@Nonnull final Log log) {
@@ -155,7 +155,8 @@ public class IOChannelBuilder {
     }
 
     /**
-     * Sets the maximum number of data that the channel can retain before they are consumed.
+     * Sets the maximum number of data that the channel can retain before they are consumed. A
+     * DEFAULT value means that it is up to the framework to chose a default.
      *
      * @param maxBufferSize the maximum size.
      * @return this builder.

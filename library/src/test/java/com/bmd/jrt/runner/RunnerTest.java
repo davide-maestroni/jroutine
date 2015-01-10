@@ -134,27 +134,19 @@ public class RunnerTest extends TestCase {
             switch (unit) {
 
                 case 0:
-
                     delay = millis((long) Math.floor(random.nextFloat() * 500));
-
                     break;
 
                 case 1:
-
                     delay = micros((long) Math.floor(random.nextFloat() * millis(500).toMicros()));
-
                     break;
 
                 case 2:
-
                     delay = nanos((long) Math.floor(random.nextFloat() * millis(500).toNanos()));
-
                     break;
 
                 default:
-
                     delay = ZERO;
-
                     break;
             }
 
@@ -182,27 +174,19 @@ public class RunnerTest extends TestCase {
             switch (unit) {
 
                 case 0:
-
                     delay = millis((long) Math.floor(random.nextFloat() * 500));
-
                     break;
 
                 case 1:
-
                     delay = micros((long) Math.floor(random.nextFloat() * millis(500).toMicros()));
-
                     break;
 
                 case 2:
-
                     delay = nanos((long) Math.floor(random.nextFloat() * millis(500).toNanos()));
-
                     break;
 
                 default:
-
                     delay = ZERO;
-
                     break;
             }
 

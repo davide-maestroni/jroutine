@@ -122,6 +122,14 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> implements AndroidRoutineBuild
 
     @Nonnull
     @Override
+    public AndroidRoutineBuilder<INPUT, OUTPUT> inputOrder(@Nonnull final DataOrder order) {
+
+        mBuilder.inputOrder(order);
+        return this;
+    }
+
+    @Nonnull
+    @Override
     public AndroidRoutineBuilder<INPUT, OUTPUT> logLevel(@Nonnull final LogLevel level) {
 
         mBuilder.logLevel(level);
@@ -166,6 +174,14 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> implements AndroidRoutineBuild
 
     @Nonnull
     @Override
+    public AndroidRoutineBuilder<INPUT, OUTPUT> outputOrder(@Nonnull final DataOrder order) {
+
+        mBuilder.outputOrder(order);
+        return this;
+    }
+
+    @Nonnull
+    @Override
     public AndroidRoutineBuilder<INPUT, OUTPUT> syncRunner(@Nonnull final RunnerType type) {
 
         mBuilder.syncRunner(type);
@@ -196,6 +212,8 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> implements AndroidRoutineBuild
 
         private final WeakReference<Object> mContext;
 
+        private final DataOrder mDataOrder;
+
         private final int mLoaderId;
 
         private final Logger mLogger;
@@ -225,6 +243,7 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> implements AndroidRoutineBuild
             mClashResolution = resolution;
             mCacheType = cacheType;
             mConstructor = constructor;
+            mDataOrder = configuration.getOutputOrder(DataOrder.DEFAULT);
             mLogger = Logger.create(configuration.getLog(null), configuration.getLogLevel(null),
                                     this);
         }
@@ -259,7 +278,8 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> implements AndroidRoutineBuild
             if (async) {
 
                 return new LoaderInvocation<INPUT, OUTPUT>(mContext, mLoaderId, mClashResolution,
-                                                           mCacheType, mConstructor, logger);
+                                                           mCacheType, mConstructor, mDataOrder,
+                                                           logger);
             }
 
             final Object context = mContext.get();

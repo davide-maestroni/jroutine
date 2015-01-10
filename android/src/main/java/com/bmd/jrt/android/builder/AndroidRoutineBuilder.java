@@ -14,6 +14,7 @@
 package com.bmd.jrt.android.builder;
 
 import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
+import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.routine.Routine;
@@ -56,6 +57,16 @@ public interface AndroidRoutineBuilder<INPUT, OUTPUT> {
     public Routine<INPUT, OUTPUT> buildRoutine();
 
     /**
+     * Sets the order in which input data are collected from the input channel.
+     *
+     * @param order the order type.
+     * @return this builder.
+     * @throws NullPointerException if the specified order type is null.
+     */
+    @Nonnull
+    public AndroidRoutineBuilder<INPUT, OUTPUT> inputOrder(@Nonnull DataOrder order);
+
+    /**
      * Sets the log level.
      *
      * @param level the log level.
@@ -95,6 +106,16 @@ public interface AndroidRoutineBuilder<INPUT, OUTPUT> {
      */
     @Nonnull
     public AndroidRoutineBuilder<INPUT, OUTPUT> onComplete(@Nonnull ResultCache cacheType);
+
+    /**
+     * Sets the order in which output data are collected from the result channel.
+     *
+     * @param order the order type.
+     * @return this builder.
+     * @throws NullPointerException if the specified order type is null.
+     */
+    @Nonnull
+    public AndroidRoutineBuilder<INPUT, OUTPUT> outputOrder(@Nonnull DataOrder order);
 
     /**
      * Sets the type of the synchronous runner to be used by the routine.

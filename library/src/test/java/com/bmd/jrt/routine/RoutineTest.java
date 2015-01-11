@@ -1255,6 +1255,17 @@ public class RoutineTest extends TestCase {
         testChained(exceptionRoutine, tunnelRoutine, "test", "test4");
     }
 
+    public void testFlush() {
+
+        final Routine<String, String> routine =
+                JRoutine.on(tokenOf(TestFlush.class)).buildRoutine();
+        assertThat(routine.callParallel("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2",
+                                                                                         "3", "4",
+                                                                                         "5");
+        routine.flush();
+        assertThat(TestFlush.getInstanceCount()).isZero();
+    }
+
     public void testInputTimeout() {
 
         final Routine<String, String> routine =
@@ -1586,17 +1597,6 @@ public class RoutineTest extends TestCase {
         assertThat(routine.callAsync("test")
                           .afterMax(TimeDuration.millis(500))
                           .readAll()).containsExactly("test");
-    }
-
-    public void testRecycle() {
-
-        final Routine<String, String> routine =
-                JRoutine.on(tokenOf(TestRecycle.class)).buildRoutine();
-        assertThat(routine.callParallel("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2",
-                                                                                         "3", "4",
-                                                                                         "5");
-        routine.recycle();
-        assertThat(TestRecycle.getInstanceCount()).isZero();
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -2664,6 +2664,33 @@ public class RoutineTest extends TestCase {
         }
     }
 
+    private static class TestFlush extends TemplateInvocation<String, String> {
+
+        private static final AtomicInteger sInstanceCount = new AtomicInteger();
+
+        public TestFlush() {
+
+            sInstanceCount.incrementAndGet();
+        }
+
+        public static int getInstanceCount() {
+
+            return sInstanceCount.get();
+        }
+
+        @Override
+        public void onInput(final String input, @Nonnull final ResultChannel<String> result) {
+
+            result.after(millis(100)).pass(input);
+        }
+
+        @Override
+        public void onDestroy() {
+
+            sInstanceCount.decrementAndGet();
+        }
+    }
+
     private static class TestInputIterator implements InputIterator<Object> {
 
         @Nullable
@@ -2785,34 +2812,5 @@ public class RoutineTest extends TestCase {
             mIsOutput = true;
             mOutput = o;
         }
-    }
-
-    private static class TestRecycle extends TemplateInvocation<String, String> {
-
-        private static final AtomicInteger sInstanceCount = new AtomicInteger();
-
-        public TestRecycle() {
-
-            sInstanceCount.incrementAndGet();
-        }
-
-        public static int getInstanceCount() {
-
-            return sInstanceCount.get();
-        }
-
-        @Override
-        public void onInput(final String input, @Nonnull final ResultChannel<String> result) {
-
-            result.after(millis(100)).pass(input);
-        }
-
-        @Override
-        public void onDestroy() {
-
-            sInstanceCount.decrementAndGet();
-        }
-
-
     }
 }

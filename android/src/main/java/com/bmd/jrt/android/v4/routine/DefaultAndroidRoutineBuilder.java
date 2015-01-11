@@ -13,7 +13,6 @@
  */
 package com.bmd.jrt.android.v4.routine;
 
-import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 
@@ -27,19 +26,13 @@ import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.builder.RoutineConfigurationBuilder;
 import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.common.Reflection;
-import com.bmd.jrt.common.RoutineException;
-import com.bmd.jrt.common.RoutineInterruptedException;
-import com.bmd.jrt.invocation.Invocation;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
-import com.bmd.jrt.log.Logger;
-import com.bmd.jrt.routine.AbstractRoutine;
 import com.bmd.jrt.routine.Routine;
 import com.bmd.jrt.runner.Runner;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -193,140 +186,4 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> implements AndroidRoutineBuild
         return this;
     }
 
-    /**
-     * Routine implementation delegating to Android loaders the asynchronous processing.
-     *
-     * @param <INPUT>  the input data type.
-     * @param <OUTPUT> the output data type.
-     */
-    private static class AndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
-
-        private final ResultCache mCacheType;
-
-        private final ClashResolution mClashResolution;
-
-        private final Constructor<? extends AndroidInvocation<INPUT, OUTPUT>> mConstructor;
-
-        private final WeakReference<Object> mContext;
-
-        private final DataOrder mDataOrder;
-
-        private final int mLoaderId;
-
-        private final Logger mLogger;
-
-        /**
-         * Constructor.
-         *
-         * @param configuration the routine configuration.
-         * @param syncRunner    the runner used for synchronous invocation.
-         * @param context       the context reference.
-         * @param loaderId      the loader ID.
-         * @param resolution    the clash resolution type.
-         * @param cacheType     the result cache type.
-         * @param constructor   the invocation constructor.
-         */
-        private AndroidRoutine(@Nonnull final RoutineConfiguration configuration,
-                @Nonnull final Runner syncRunner, @Nonnull final WeakReference<Object> context,
-                final int loaderId, @Nonnull final ClashResolution resolution,
-                @Nonnull final ResultCache cacheType,
-                @Nonnull final Constructor<? extends AndroidInvocation<INPUT,
-                        OUTPUT>> constructor) {
-
-            super(configuration, syncRunner);
-
-            mContext = context;
-            mLoaderId = loaderId;
-            mClashResolution = resolution;
-            mCacheType = cacheType;
-            mConstructor = constructor;
-            mDataOrder = configuration.getOutputOrder(DataOrder.DEFAULT);
-            mLogger = Logger.create(configuration.getLog(null), configuration.getLogLevel(null),
-                                    this);
-        }
-
-        @Nonnull
-        @Override
-        protected Invocation<INPUT, OUTPUT> convertInvocation(final boolean async,
-                @Nonnull final Invocation<INPUT, OUTPUT> invocation) {
-
-            try {
-
-                invocation.onDestroy();
-
-            } catch (final RoutineInterruptedException e) {
-
-                throw e.interrupt();
-
-            } catch (final Throwable t) {
-
-                mLogger.wrn(t, "ignoring exception while destroying invocation instance");
-            }
-
-            return createInvocation(async);
-        }
-
-        @Nonnull
-        @Override
-        protected Invocation<INPUT, OUTPUT> createInvocation(final boolean async) {
-
-            final Logger logger = mLogger;
-
-            if (async) {
-
-                return new LoaderInvocation<INPUT, OUTPUT>(mContext, mLoaderId, mClashResolution,
-                                                           mCacheType, mConstructor, mDataOrder,
-                                                           logger);
-            }
-
-            final Object context = mContext.get();
-            final Context appContext;
-
-            if (context instanceof FragmentActivity) {
-
-                final FragmentActivity activity = (FragmentActivity) context;
-                appContext = activity.getApplicationContext();
-
-            } else if (context instanceof Fragment) {
-
-                final Fragment fragment = (Fragment) context;
-                appContext = fragment.getActivity().getApplicationContext();
-
-            } else {
-
-                throw new IllegalArgumentException(
-                        "invalid context type: " + context.getClass().getCanonicalName());
-            }
-
-            try {
-
-                final Constructor<? extends AndroidInvocation<INPUT, OUTPUT>> constructor =
-                        mConstructor;
-                logger.dbg("creating a new instance of class: %s", constructor.getDeclaringClass());
-                final AndroidInvocation<INPUT, OUTPUT> invocation = constructor.newInstance();
-                invocation.onContext(appContext);
-                return invocation;
-
-            } catch (final InvocationTargetException e) {
-
-                logger.err(e, "error creating the invocation instance");
-                throw new RoutineException(e.getCause());
-
-            } catch (final RoutineInterruptedException e) {
-
-                logger.err(e, "error creating the invocation instance");
-                throw e.interrupt();
-
-            } catch (final RoutineException e) {
-
-                logger.err(e, "error creating the invocation instance");
-                throw e;
-
-            } catch (final Throwable t) {
-
-                logger.err(t, "error creating the invocation instance");
-                throw new RoutineException(t);
-            }
-        }
-    }
 }

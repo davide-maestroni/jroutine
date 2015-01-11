@@ -28,8 +28,11 @@ import com.bmd.jrt.android.builder.RoutineClashException;
 import com.bmd.jrt.android.invocation.AndroidSimpleInvocation;
 import com.bmd.jrt.android.invocation.AndroidTemplateInvocation;
 import com.bmd.jrt.android.log.Logs;
+import com.bmd.jrt.android.runner.Runners;
+import com.bmd.jrt.builder.DefaultConfigurationBuilder;
 import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
+import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.ClassToken;
@@ -780,6 +783,85 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                                                  ResultCache.RETAIN,
                                                  ToUpperCase.class.getDeclaredConstructor(),
                                                  DataOrder.DEFAULT, null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public void testRoutineError() throws NoSuchMethodException {
+
+        final RoutineConfiguration configuration =
+                new DefaultConfigurationBuilder().buildConfiguration();
+        final WeakReference<Object> reference = new WeakReference<Object>(getActivity());
+
+        try {
+
+            new AndroidRoutine<String, String>(null, Runners.queuedRunner(), reference, 0,
+                                               ClashResolution.KEEP, ResultCache.RETAIN,
+                                               ToUpperCase.class.getDeclaredConstructor());
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new AndroidRoutine<String, String>(configuration, null, reference, 0,
+                                               ClashResolution.KEEP, ResultCache.RETAIN,
+                                               ToUpperCase.class.getDeclaredConstructor());
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new AndroidRoutine<String, String>(configuration, Runners.queuedRunner(), null, 0,
+                                               ClashResolution.KEEP, ResultCache.RETAIN,
+                                               ToUpperCase.class.getDeclaredConstructor());
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new AndroidRoutine<String, String>(configuration, Runners.queuedRunner(), reference, 0,
+                                               null, ResultCache.RETAIN,
+                                               ToUpperCase.class.getDeclaredConstructor());
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new AndroidRoutine<String, String>(configuration, Runners.queuedRunner(), reference, 0,
+                                               ClashResolution.KEEP, null,
+                                               ToUpperCase.class.getDeclaredConstructor());
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new AndroidRoutine<String, String>(configuration, Runners.queuedRunner(), reference, 0,
+                                               ClashResolution.KEEP, ResultCache.RETAIN, null);
 
             fail();
 

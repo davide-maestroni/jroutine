@@ -132,33 +132,6 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
     }
 
     /**
-     * Enables routine invocation for the specified fragment.<br/>
-     * This method must be called in the fragment <code>onCreate()</code> method.
-     *
-     * @param fragment the fragment instance.
-     * @throws NullPointerException if the specified fragment is null.
-     */
-    @SuppressWarnings("ConstantConditions")
-    static void initContext(@Nonnull final Fragment fragment) {
-
-        if (fragment == null) {
-
-            throw new NullPointerException("the fragment instance must not be null");
-        }
-
-        synchronized (sCallbackMap) {
-
-            if (!sCallbackMap.containsKey(fragment)) {
-
-                sCallbackMap.put(fragment,
-                                 new SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>());
-            }
-
-            fragment.getLoaderManager();
-        }
-    }
-
-    /**
      * Enables routine invocation for the specified activity.<br/>
      * This method must be called in the activity <code>onCreate()</code> method.
      *
@@ -166,7 +139,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
      * @throws NullPointerException if the specified activity is null.
      */
     @SuppressWarnings("ConstantConditions")
-    static void initContext(@Nonnull final FragmentActivity activity) {
+    static void initActivity(@Nonnull final FragmentActivity activity) {
 
         if (activity == null) {
 
@@ -182,6 +155,33 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
             }
 
             activity.getSupportLoaderManager();
+        }
+    }
+
+    /**
+     * Enables routine invocation for the specified fragment.<br/>
+     * This method must be called in the fragment <code>onCreate()</code> method.
+     *
+     * @param fragment the fragment instance.
+     * @throws NullPointerException if the specified fragment is null.
+     */
+    @SuppressWarnings("ConstantConditions")
+    static void initFragment(@Nonnull final Fragment fragment) {
+
+        if (fragment == null) {
+
+            throw new NullPointerException("the fragment instance must not be null");
+        }
+
+        synchronized (sCallbackMap) {
+
+            if (!sCallbackMap.containsKey(fragment)) {
+
+                sCallbackMap.put(fragment,
+                                 new SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>());
+            }
+
+            fragment.getLoaderManager();
         }
     }
 

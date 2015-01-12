@@ -27,7 +27,6 @@ import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.builder.RoutineConfigurationBuilder;
 import com.bmd.jrt.common.ClassToken;
-import com.bmd.jrt.common.Reflection;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.routine.Routine;
@@ -38,6 +37,8 @@ import java.lang.reflect.Constructor;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
+import static com.bmd.jrt.common.Reflection.findConstructor;
 
 /**
  * Default implementation of an Android routine builder.
@@ -92,7 +93,7 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> implements AndroidRoutineBuild
             @Nonnull final ClassToken<? extends AndroidInvocation<INPUT, OUTPUT>> classToken) {
 
         mContext = new WeakReference<Object>(context);
-        mConstructor = Reflection.findConstructor(classToken.getRawClass());
+        mConstructor = findConstructor(classToken.getRawClass());
         mBuilder = new DefaultConfigurationBuilder().runBy(Runners.mainRunner())
                                                     .inputOrder(DataOrder.INSERTION);
     }

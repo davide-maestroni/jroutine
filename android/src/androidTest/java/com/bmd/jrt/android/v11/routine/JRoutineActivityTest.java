@@ -27,6 +27,7 @@ import com.bmd.jrt.android.builder.InputClashException;
 import com.bmd.jrt.android.builder.RoutineClashException;
 import com.bmd.jrt.android.invocation.AndroidSimpleInvocation;
 import com.bmd.jrt.android.invocation.AndroidTemplateInvocation;
+import com.bmd.jrt.android.invocation.AndroidTunnelInvocation;
 import com.bmd.jrt.android.log.Logs;
 import com.bmd.jrt.android.runner.Runners;
 import com.bmd.jrt.builder.DefaultConfigurationBuilder;
@@ -72,7 +73,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         }
 
         final Routine<String, String> routine =
-                JRoutine.from(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
+                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
                         .withId(0)
                         .onClash(ClashResolution.ABORT)
                         .buildRoutine();
@@ -100,7 +101,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         }
 
         final Routine<String, String> routine =
-                JRoutine.from(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
+                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
                         .withId(0)
                         .onClash(ClashResolution.ABORT_ON_INPUT)
                         .buildRoutine();
@@ -129,7 +130,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         final Data data1 = new Data();
         final OutputChannel<Data> result1 =
-                JRoutine.from(getActivity(), ClassToken.tokenOf(Abort.class))
+                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Abort.class))
                         .withId(0)
                         .onComplete(ResultCache.RETAIN_RESULT)
                         .buildRoutine()
@@ -148,7 +149,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         result1.checkComplete();
 
         final OutputChannel<Data> result2 =
-                JRoutine.from(getActivity(), ClassToken.tokenOf(Delay.class))
+                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class))
                         .withId(0)
                         .onComplete(ResultCache.RETAIN_RESULT)
                         .buildRoutine()
@@ -158,7 +159,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         result2.checkComplete();
 
         final OutputChannel<Data> result3 =
-                JRoutine.from(getActivity(), ClassToken.tokenOf(Delay.class))
+                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class))
                         .withId(0)
                         .buildRoutine()
                         .callAsync(data1);
@@ -176,7 +177,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         final Data data1 = new Data();
         final OutputChannel<Data> result1 =
-                JRoutine.from(getActivity(), ClassToken.tokenOf(Delay.class))
+                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class))
                         .withId(0)
                         .onComplete(ResultCache.RETAIN_ERROR)
                         .buildRoutine()
@@ -187,7 +188,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         RoutineException error = null;
         final OutputChannel<Data> result2 =
-                JRoutine.from(getActivity(), ClassToken.tokenOf(Abort.class))
+                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Abort.class))
                         .withId(0)
                         .onComplete(ResultCache.RETAIN_ERROR)
                         .buildRoutine()
@@ -207,7 +208,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         result2.checkComplete();
 
         final OutputChannel<Data> result3 =
-                JRoutine.from(getActivity(), ClassToken.tokenOf(Abort.class))
+                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Abort.class))
                         .withId(0)
                         .buildRoutine()
                         .callAsync(data1);
@@ -234,7 +235,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         }
 
         final Routine<String, String> routine =
-                JRoutine.from(getActivity(), ClassToken.tokenOf(ToUpperCase.class)).buildRoutine();
+                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
+                        .buildRoutine();
         final OutputChannel<String> result1 = routine.callAsync("test1");
         final OutputChannel<String> result2 = routine.callAsync("test2");
 
@@ -250,7 +252,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         }
 
         final Routine<String, String> routine =
-                JRoutine.from(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
+                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
                         .withId(0)
                         .onClash(ClashResolution.KEEP)
                         .buildRoutine();
@@ -269,7 +271,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         }
 
         final Routine<String, String> routine =
-                JRoutine.from(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
+                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
                         .withId(0)
                         .onClash(ClashResolution.RESTART)
                         .buildRoutine();
@@ -297,7 +299,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         }
 
         final Routine<String, String> routine =
-                JRoutine.from(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
+                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
                         .withId(0)
                         .onClash(ClashResolution.RESTART_ON_INPUT)
                         .buildRoutine();
@@ -326,7 +328,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         final Data data1 = new Data();
         final OutputChannel<Data> result1 =
-                JRoutine.from(getActivity(), ClassToken.tokenOf(Delay.class))
+                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class))
                         .withId(0)
                         .onComplete(ResultCache.RETAIN)
                         .buildRoutine()
@@ -336,7 +338,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         result1.checkComplete();
 
         final OutputChannel<Data> result2 =
-                JRoutine.from(getActivity(), ClassToken.tokenOf(Delay.class))
+                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class))
                         .withId(0)
                         .buildRoutine()
                         .callAsync(data1);
@@ -346,7 +348,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         RoutineException error = null;
         final OutputChannel<Data> result3 =
-                JRoutine.from(getActivity(), ClassToken.tokenOf(Abort.class))
+                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Abort.class))
                         .withId(0)
                         .onComplete(ResultCache.RETAIN)
                         .buildRoutine()
@@ -366,7 +368,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         result3.checkComplete();
 
         final OutputChannel<Data> result4 =
-                JRoutine.from(getActivity(), ClassToken.tokenOf(Abort.class))
+                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Abort.class))
                         .withId(0)
                         .buildRoutine()
                         .callAsync(data1);
@@ -393,7 +395,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         }
 
         final Routine<String, String> routine1 =
-                JRoutine.from(getActivity(), ClassToken.tokenOf(ToUpperCase.class)).buildRoutine();
+                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
+                        .buildRoutine();
         routine1.callAsync("test1");
         routine1.callAsync("test2");
 
@@ -413,7 +416,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         getInstrumentation().waitForIdleSync();
 
         final Routine<String, String> routine2 =
-                JRoutine.from(getActivity(), ClassToken.tokenOf(ToUpperCase.class)).buildRoutine();
+                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
+                        .buildRoutine();
         final OutputChannel<String> result1 = routine2.callAsync("test1");
         final OutputChannel<String> result2 = routine2.callAsync("test2");
 
@@ -430,7 +434,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         final Data data1 = new Data();
         final Routine<Data, Data> routine1 =
-                JRoutine.from(getActivity(), ClassToken.tokenOf(Delay.class)).buildRoutine();
+                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class)).buildRoutine();
         routine1.callAsync(data1);
         routine1.callAsync(data1);
 
@@ -450,7 +454,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         getInstrumentation().waitForIdleSync();
 
         final Routine<Data, Data> routine2 =
-                JRoutine.from(getActivity(), ClassToken.tokenOf(Delay.class)).buildRoutine();
+                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class)).buildRoutine();
         final OutputChannel<Data> result1 = routine2.callAsync(data1);
         final OutputChannel<Data> result2 = routine2.callAsync(data1);
 
@@ -467,7 +471,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         final Data data1 = new Data();
         final Routine<Data, Data> routine =
-                JRoutine.from(getActivity(), ClassToken.tokenOf(Delay.class)).buildRoutine();
+                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class)).buildRoutine();
         final OutputChannel<Data> result1 = routine.callAsync(data1);
         final OutputChannel<Data> result2 = routine.callAsync(data1);
 
@@ -484,7 +488,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         final Data data1 = new Data();
         final OutputChannel<Data> result1 =
-                JRoutine.from(getActivity(), ClassToken.tokenOf(Delay.class))
+                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class))
                         .withId(0)
                         .onComplete(ResultCache.RETAIN)
                         .buildRoutine()
@@ -494,7 +498,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         result1.checkComplete();
 
         final OutputChannel<Data> result2 =
-                JRoutine.from(getActivity(), ClassToken.tokenOf(Abort.class))
+                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Abort.class))
                         .withId(0)
                         .buildRoutine()
                         .callAsync(data1);
@@ -522,7 +526,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            JRoutine.initContext((Activity) null);
+            JRoutine.initActivity((Activity) null);
 
             fail();
 
@@ -532,7 +536,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            JRoutine.initContext((Fragment) null);
+            JRoutine.initFragment((Fragment) null);
 
             fail();
 
@@ -542,7 +546,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            JRoutine.from((Activity) null, ClassToken.tokenOf(ToUpperCase.class));
+            JRoutine.onActivity((Activity) null, ClassToken.tokenOf(ToUpperCase.class));
 
             fail();
 
@@ -552,7 +556,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            JRoutine.from((Fragment) null, ClassToken.tokenOf(ToUpperCase.class));
+            JRoutine.onFragment((Fragment) null, ClassToken.tokenOf(ToUpperCase.class));
 
             fail();
 
@@ -562,7 +566,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            JRoutine.from(new TestActivity(), ClassToken.tokenOf(ToUpperCase.class));
+            JRoutine.onActivity(new TestActivity(), ClassToken.tokenOf(ToUpperCase.class));
 
             fail();
 
@@ -572,7 +576,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            JRoutine.from(new TestFragment(), ClassToken.tokenOf(ToUpperCase.class));
+            JRoutine.onFragment(new TestFragment(), ClassToken.tokenOf(ToUpperCase.class));
 
             fail();
 
@@ -582,7 +586,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            JRoutine.from(getActivity(), ClassToken.tokenOf(ToUpperCase.class)).logLevel(null);
+            JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
+                    .logLevel(null);
 
             fail();
 
@@ -592,7 +597,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            JRoutine.from(getActivity(), ClassToken.tokenOf(ToUpperCase.class)).onClash(null);
+            JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class)).onClash(null);
 
             fail();
 
@@ -602,7 +607,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            JRoutine.from(getActivity(), ClassToken.tokenOf(ToUpperCase.class)).onComplete(null);
+            JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
+                    .onComplete(null);
 
             fail();
 
@@ -622,7 +628,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Routine<String, String> routine =
-                JRoutine.from(fragment, ClassToken.tokenOf(ToUpperCase.class))
+                JRoutine.onFragment(fragment, ClassToken.tokenOf(ToUpperCase.class))
                         .withId(0)
                         .onClash(ClashResolution.ABORT_ON_INPUT)
                         .buildRoutine();
@@ -653,7 +659,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Routine<String, String> routine =
-                JRoutine.from(fragment, ClassToken.tokenOf(ToUpperCase.class)).buildRoutine();
+                JRoutine.onFragment(fragment, ClassToken.tokenOf(ToUpperCase.class)).buildRoutine();
         final OutputChannel<String> result1 = routine.callAsync("test1");
         final OutputChannel<String> result2 = routine.callAsync("test2");
 
@@ -672,7 +678,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Routine<String, String> routine =
-                JRoutine.from(fragment, ClassToken.tokenOf(ToUpperCase.class))
+                JRoutine.onFragment(fragment, ClassToken.tokenOf(ToUpperCase.class))
                         .withId(0)
                         .onClash(ClashResolution.KEEP)
                         .buildRoutine();
@@ -694,7 +700,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Routine<String, String> routine =
-                JRoutine.from(fragment, ClassToken.tokenOf(ToUpperCase.class))
+                JRoutine.onFragment(fragment, ClassToken.tokenOf(ToUpperCase.class))
                         .withId(0)
                         .onClash(ClashResolution.RESTART)
                         .buildRoutine();
@@ -725,7 +731,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Routine<String, String> routine =
-                JRoutine.from(fragment, ClassToken.tokenOf(ToUpperCase.class))
+                JRoutine.onFragment(fragment, ClassToken.tokenOf(ToUpperCase.class))
                         .withId(0)
                         .onClash(ClashResolution.RESTART_ON_INPUT)
                         .buildRoutine();
@@ -757,7 +763,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Routine<Data, Data> routine =
-                JRoutine.from(fragment, ClassToken.tokenOf(Delay.class)).buildRoutine();
+                JRoutine.onFragment(fragment, ClassToken.tokenOf(Delay.class)).buildRoutine();
         final OutputChannel<Data> result1 = routine.callAsync(data1);
         final OutputChannel<Data> result2 = routine.callAsync(data1);
 
@@ -773,10 +779,10 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         }
 
         final Routine<String, String> routine1 =
-                JRoutine.from(getActivity(), ClassToken.tokenOf(StringTunnelInvocation.class))
+                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(StringTunnelInvocation.class))
                         .syncRunner(RunnerType.QUEUED)
                         .loggedWith(Logs.androidLog())
-                        .logLevel(LogLevel.DEBUG)
+                        .logLevel(LogLevel.WARNING)
                         .buildRoutine();
         assertThat(routine1.callSync("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2", "3",
                                                                                       "4", "5");
@@ -788,10 +794,10 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                                                                                           "5");
 
         final Routine<String, String> routine2 =
-                JRoutine.from(getActivity(), ClassToken.tokenOf(StringSimpleInvocation.class))
+                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(StringSimpleInvocation.class))
                         .syncRunner(RunnerType.SEQUENTIAL)
                         .loggedWith(Logs.androidLog())
-                        .logLevel(LogLevel.DEBUG)
+                        .logLevel(LogLevel.WARNING)
                         .buildRoutine();
         assertThat(routine2.callSync("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2", "3",
                                                                                       "4", "5");
@@ -1014,13 +1020,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         }
     }
 
-    private static class StringTunnelInvocation extends AndroidTemplateInvocation<String, String> {
+    private static class StringTunnelInvocation extends AndroidTunnelInvocation<String> {
 
-        @Override
-        public void onInput(final String s, @Nonnull final ResultChannel<String> result) {
-
-            result.pass(s);
-        }
     }
 
     private static class ToUpperCase extends AndroidTemplateInvocation<String, String> {

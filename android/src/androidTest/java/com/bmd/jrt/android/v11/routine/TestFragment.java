@@ -35,7 +35,7 @@ public class TestFragment extends Fragment {
 
         super.onCreate(savedInstanceState);
 
-        JRoutine.initContext(this);
+        JRoutine.initFragment(this);
     }
 
     @Nullable

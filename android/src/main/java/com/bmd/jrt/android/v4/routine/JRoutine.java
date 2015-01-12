@@ -54,7 +54,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  *             super.onCreate(savedInstanceState);
  *             setContentView(R.layout.my_activity_layout);
  *
- *             JRoutine.initContext(this);
+ *             JRoutine.initActivity(this);
  *
  *             if (savedInstanceState != null) {
  *
@@ -105,40 +105,36 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 @SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS",
                     justification = "utility class extending functionalities of another utility "
                             + "class")
-public class JRoutine extends com.bmd.jrt.routine.JRoutine {
+public class JRoutine extends com.bmd.jrt.android.routine.JRoutine {
 
     /**
-     * Returns a builder of routines linked to the specified context.
-     * <p/>
-     * Note that, waiting for the outputs of the built routine immediately after its invocation on
-     * the main thread, will result in a deadlock. In fact the routine results will be always
-     * dispatched in the main UI thread.
+     * Initializes the specified activity so to enable the creation of routines linked to its
+     * lifecycle.<br/>
+     * This method must be called in the activity <code>onCreate()</code> method.
      *
-     * @param fragment   the fragment instance.
-     * @param classToken the invocation class token.
-     * @param <INPUT>    the input data type.
-     * @param <OUTPUT>   the output data type.
-     * @return the routine builder instance.
-     * @throws IllegalStateException if the specified activity is not initialized.
-     * @throws NullPointerException  if any of the specified parameters is null.
+     * @param activity the activity instance.
+     * @throws NullPointerException if the specified activity is null.
      */
-    @Nonnull
-    public static <INPUT, OUTPUT> AndroidRoutineBuilder<INPUT, OUTPUT> from(
-            @Nonnull final Fragment fragment,
-            @Nonnull ClassToken<? extends AndroidInvocation<INPUT, OUTPUT>> classToken) {
+    public static void initActivity(@Nonnull final FragmentActivity activity) {
 
-        if (!LoaderInvocation.isEnabled(fragment)) {
-
-            throw new IllegalStateException(
-                    "routine creation is not enabled: be sure to call JRoutine.initContext(this) "
-                            + "in fragment onCreate() method");
-        }
-
-        return new DefaultAndroidRoutineBuilder<INPUT, OUTPUT>(fragment, classToken);
+        LoaderInvocation.initActivity(activity);
     }
 
     /**
-     * Returns a builder of routines linked to the specified context.
+     * Initializes the specified fragment so to enable the creation of routines linked to its
+     * lifecycle.<br/>
+     * This method must be called in the fragment <code>onCreate()</code> method.
+     *
+     * @param fragment the fragment instance.
+     * @throws NullPointerException if the specified fragment is null.
+     */
+    public static void initFragment(@Nonnull final Fragment fragment) {
+
+        LoaderInvocation.initFragment(fragment);
+    }
+
+    /**
+     * Returns a builder of routines linked to the specified activity.
      * <p/>
      * Note that, waiting for the outputs of the built routine immediately after its invocation on
      * the main thread, will result in a deadlock. In fact the routine results will be always
@@ -153,14 +149,14 @@ public class JRoutine extends com.bmd.jrt.routine.JRoutine {
      * @throws NullPointerException  if any of the specified parameters is null.
      */
     @Nonnull
-    public static <INPUT, OUTPUT> AndroidRoutineBuilder<INPUT, OUTPUT> from(
+    public static <INPUT, OUTPUT> AndroidRoutineBuilder<INPUT, OUTPUT> onActivity(
             @Nonnull final FragmentActivity activity,
             @Nonnull ClassToken<? extends AndroidInvocation<INPUT, OUTPUT>> classToken) {
 
         if (!LoaderInvocation.isEnabled(activity)) {
 
             throw new IllegalStateException(
-                    "routine creation is not enabled: be sure to call JRoutine.initContext(this) "
+                    "routine creation is not enabled: be sure to call JRoutine.initActivity(this) "
                             + "in activity onCreate() method");
         }
 
@@ -168,28 +164,32 @@ public class JRoutine extends com.bmd.jrt.routine.JRoutine {
     }
 
     /**
-     * Initializes the specified context so to enable the creation of routines linked to the context
-     * lifecycle.<br/>
-     * This method must be called in the fragment <code>onCreate()</code> method.
+     * Returns a builder of routines linked to the specified fragment.
+     * <p/>
+     * Note that, waiting for the outputs of the built routine immediately after its invocation on
+     * the main thread, will result in a deadlock. In fact the routine results will be always
+     * dispatched in the main UI thread.
      *
-     * @param fragment the fragment instance.
-     * @throws NullPointerException if the specified fragment is null.
+     * @param fragment   the fragment instance.
+     * @param classToken the invocation class token.
+     * @param <INPUT>    the input data type.
+     * @param <OUTPUT>   the output data type.
+     * @return the routine builder instance.
+     * @throws IllegalStateException if the specified activity is not initialized.
+     * @throws NullPointerException  if any of the specified parameters is null.
      */
-    public static void initContext(@Nonnull final Fragment fragment) {
+    @Nonnull
+    public static <INPUT, OUTPUT> AndroidRoutineBuilder<INPUT, OUTPUT> onFragment(
+            @Nonnull final Fragment fragment,
+            @Nonnull ClassToken<? extends AndroidInvocation<INPUT, OUTPUT>> classToken) {
 
-        LoaderInvocation.initContext(fragment);
-    }
+        if (!LoaderInvocation.isEnabled(fragment)) {
 
-    /**
-     * Initializes the specified context so to enable the creation of routines linked to the context
-     * lifecycle.<br/>
-     * This method must be called in the activity <code>onCreate()</code> method.
-     *
-     * @param activity the activity instance.
-     * @throws NullPointerException if the specified activity is null.
-     */
-    public static void initContext(@Nonnull final FragmentActivity activity) {
+            throw new IllegalStateException(
+                    "routine creation is not enabled: be sure to call JRoutine.initFragment(this) "
+                            + "in fragment onCreate() method");
+        }
 
-        LoaderInvocation.initContext(activity);
+        return new DefaultAndroidRoutineBuilder<INPUT, OUTPUT>(fragment, classToken);
     }
 }

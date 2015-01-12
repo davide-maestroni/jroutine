@@ -11,27 +11,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.android.v4.routine;
+package com.bmd.jrt.android.invocation;
 
-import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
+import com.bmd.jrt.channel.ResultChannel;
 
-import com.bmd.jrt.android.R;
+import javax.annotation.Nonnull;
 
 /**
- * Test activity.
+ * Implementation of an invocation simply passing on the input data.
  * <p/>
- * Created by davide on 12/16/14.
+ * Created by davide on 1/12/14.
+ *
+ * @param <DATA> the data type.
  */
-public class TestActivity extends FragmentActivity {
+public class AndroidTunnelInvocation<DATA> extends AndroidTemplateInvocation<DATA, DATA> {
 
     @Override
-    protected void onCreate(final Bundle savedInstanceState) {
+    public void onInput(final DATA input, @Nonnull final ResultChannel<DATA> result) {
 
-        super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.test_v4_layout);
-
-        JRoutine.initActivity(this);
+        result.pass(input);
     }
 }

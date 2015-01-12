@@ -11,27 +11,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.android.v4.routine;
-
-import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
-
-import com.bmd.jrt.android.R;
 
 /**
- * Test activity.
+ * Android service class implementation.
  * <p/>
- * Created by davide on 12/16/14.
+ * Created by davide on 1/10/15.
  */
-public class TestActivity extends FragmentActivity {
-
-    @Override
-    protected void onCreate(final Bundle savedInstanceState) {
-
-        super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.test_v4_layout);
-
-        JRoutine.initActivity(this);
-    }
-}
+package com.bmd.jrt.android.service;

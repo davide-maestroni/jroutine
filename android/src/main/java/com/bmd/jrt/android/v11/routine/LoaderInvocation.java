@@ -135,15 +135,14 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
     }
 
     /**
-     * Initializes the specified context so to enable the creation of routines linked to the context
-     * lifecycle.<br/>
+     * Enables routine invocation for the specified activity.<br/>
      * This method must be called in the activity <code>onCreate()</code> method.
      *
      * @param activity the activity instance.
      * @throws NullPointerException if the specified activity is null.
      */
     @SuppressWarnings("ConstantConditions")
-    static void initContext(@Nonnull final Activity activity) {
+    static void initActivity(@Nonnull final Activity activity) {
 
         if (activity == null) {
 
@@ -163,15 +162,14 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
     }
 
     /**
-     * Initializes the specified context so to enable the creation of routines linked to the context
-     * lifecycle.<br/>
+     * Enables routine invocation for the specified fragment.<br/>
      * This method must be called in the fragment <code>onCreate()</code> method.
      *
      * @param fragment the fragment instance.
      * @throws NullPointerException if the specified fragment is null.
      */
     @SuppressWarnings("ConstantConditions")
-    static void initContext(@Nonnull final Fragment fragment) {
+    static void initFragment(@Nonnull final Fragment fragment) {
 
         if (fragment == null) {
 

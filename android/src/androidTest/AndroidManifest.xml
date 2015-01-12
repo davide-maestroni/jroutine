@@ -4,6 +4,10 @@
     <application
         android:label="@string/lib_name">
         <activity
+            android:name=".routine.TestActivity"
+            android:label="test">
+        </activity>
+        <activity
             android:name=".v11.routine.TestActivity"
             android:label="test">
         </activity>
@@ -11,6 +15,10 @@
             android:name=".v4.routine.TestActivity"
             android:label="test">
         </activity>
+
+        <service
+            android:name=".service.RoutineService"
+            android:process=":ciao"/>
     </application>
 
 </manifest>

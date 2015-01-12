@@ -25,7 +25,50 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 /**
  * This utility class extends the base Java routine in order to support additional routine builders
  * specific to the Android platform.<br/>
- * Routine invocations created through the returned builder TODO: Parcel.writeValue() + service
+ * Routine invocations created through the returned builder will be execute inside a service
+ * specified through the routine builder. Be aware, though, that the invocation results will be
+ * dispatched in the looper specified through the builder, so that waiting for the outputs right
+ * after the routine invocation in the looper thread will result in a deadlock.
+ * <p/>
+ * Note that it is up to the calling library or application to properly declare the service in the
+ * manifest file. Note also that it is possible to manage the service lifecycle starting it through
+ * the {@link Context#startService(android.content.Intent)} method. Normally the service will stay
+ * active only during a routine invocation.<br/>
+ * The service can be also made run in a different process, however, in such case, the data passed
+ * through the routine input and output channels must comply to the
+ * {@link android.os.Parcel#writeValue(Object)} method.
+ * <p/>
+ * For example, in order to get a resource from the network, needed to fill an activity UI:
+ * <pre>
+ *     <code>
+ *
+ *         &#64;Override
+ *         protected void onCreate(final Bundle savedInstanceState) {
+ *
+ *             super.onCreate(savedInstanceState);
+ *             setContentView(R.layout.my_activity_layout);
+ *
+ *             final Routine&lt;URI, MyResource&gt; routine =
+ *                     JRoutine.onService(this, ClassToken.tokenOf(LoadResourceUri.class))
+ *                             .buildRoutine();
+ *             routine.callAsync(RESOURCE_URI)
+ *                    .bind(new TemplateOutputConsumer&lt;MyResource&gt;() {
+ *
+ *                        &#64;Override
+ *                        public void onError(&#64;Nullable final Throwable error) {
+ *
+ *                            displayError(error);
+ *                        }
+ *
+ *                        &#64;Override
+ *                        public void onOutput(final MyResource resource) {
+ *
+ *                            displayResource(resource);
+ *                        }
+ *                    });
+ *         }
+ *     </code>
+ * </pre>
  * <p/>
  * Created by davide on 1/8/15.
  */
@@ -37,9 +80,9 @@ public class JRoutine extends com.bmd.jrt.routine.JRoutine {
     /**
      * Returns a builder of routines running in a service based on the specified context.
      * <p/>
-     * Note that, waiting for the outputs of the built routine immediately after its invocation on
-     * the main thread, will result in a deadlock. In fact the routine results will be always
-     * dispatched in the main UI thread.
+     * Note that the built routine results will be dispatched in the looper specified through the
+     * builder, thus waiting for the outputs immediately after its invocation in the looper thread
+     * will result in a deadlock.
      *
      * @param context    the routine context.
      * @param classToken the invocation class token.

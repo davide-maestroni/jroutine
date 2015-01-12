@@ -195,12 +195,15 @@ public class RoutineService extends Service {
     /**
      * Puts the specified abort exception into the passed bundle.
      *
-     * @param bundle the bundle to fill.
-     * @param error  the exception instance.
+     * @param bundle       the bundle to fill.
+     * @param invocationId the invocation ID.
+     * @param error        the exception instance.
      */
-    public static void putError(@Nonnull final Bundle bundle, final Throwable error) {
+    public static void putError(@Nonnull final Bundle bundle, @Nonnull final String invocationId,
+            @Nullable final Throwable error) {
 
-        bundle.putSerializable(RoutineService.KEY_ABORT_EXCEPTION, error);
+        putInvocationId(bundle, invocationId);
+        putError(bundle, error);
     }
 
     /**
@@ -240,12 +243,15 @@ public class RoutineService extends Service {
     /**
      * Puts the specified value object into the passed bundle.
      *
-     * @param bundle the bundle to fill.
-     * @param value  the value instance.
+     * @param bundle       the bundle to fill.
+     * @param invocationId the invocation ID.
+     * @param value        the value instance.
      */
-    public static void putValue(@Nonnull final Bundle bundle, final Object value) {
+    public static void putValue(@Nonnull final Bundle bundle, @Nonnull final String invocationId,
+            @Nullable final Object value) {
 
-        bundle.putParcelable(KEY_DATA_VALUE, new ParcelableValue(value));
+        putInvocationId(bundle, invocationId);
+        putValue(bundle, value);
     }
 
     @Nonnull
@@ -258,6 +264,11 @@ public class RoutineService extends Service {
     private static LogLevel normalize(@Nullable final LogLevel level) {
 
         return (level != null) ? level : LogLevel.DEFAULT;
+    }
+
+    private static void putError(@Nonnull final Bundle bundle, @Nullable final Throwable error) {
+
+        bundle.putSerializable(RoutineService.KEY_ABORT_EXCEPTION, error);
     }
 
     /**
@@ -302,6 +313,11 @@ public class RoutineService extends Service {
         bundle.putSerializable(KEY_LOG_LEVEL, configuration.getLogLevel(LogLevel.DEFAULT));
     }
 
+    private static void putValue(@Nonnull final Bundle bundle, @Nullable final Object value) {
+
+        bundle.putParcelable(KEY_DATA_VALUE, new ParcelableValue(value));
+    }
+
     @Override
     public void onDestroy() {
 
@@ -329,7 +345,7 @@ public class RoutineService extends Service {
 
         if (data == null) {
 
-            throw new IllegalArgumentException("service message cannot have null data");
+            throw new IllegalArgumentException("service message must not have null data");
         }
 
         data.setClassLoader(getClassLoader());
@@ -361,7 +377,7 @@ public class RoutineService extends Service {
 
         if (data == null) {
 
-            throw new IllegalArgumentException("service message cannot have null data");
+            throw new IllegalArgumentException("service message must not have null data");
         }
 
         data.setClassLoader(getClassLoader());
@@ -469,10 +485,9 @@ public class RoutineService extends Service {
             final boolean isParallel = data.getBoolean(KEY_PARALLEL_INVOCATION);
             final ParameterChannel<Object, Object> channel =
                     (isParallel) ? routineState.invokeParallel() : routineState.invokeAsync();
-
-            invocationMap.put(invocationId,
-                              new RoutineInvocation(invocationId, channel, routineInfo,
-                                                    routineState));
+            final RoutineInvocation routineInvocation =
+                    new RoutineInvocation(invocationId, channel, routineInfo, routineState);
+            invocationMap.put(invocationId, routineInvocation);
         }
     }
 
@@ -484,8 +499,6 @@ public class RoutineService extends Service {
         private final Constructor<? extends AndroidInvocation<Object, Object>> mConstructor;
 
         private final Context mContext;
-
-        private final Logger mLogger;
 
         /**
          * Constructor.
@@ -502,15 +515,13 @@ public class RoutineService extends Service {
 
             mContext = context;
             mConstructor = findConstructor(invocationClass);
-            mLogger = Logger.create(configuration.getLog(null),
-                                    configuration.getLogLevel(LogLevel.DEFAULT), this);
         }
 
         @Nonnull
         @Override
         protected Invocation<Object, Object> createInvocation(final boolean async) {
 
-            final Logger logger = mLogger;
+            final Logger logger = getLogger();
 
             try {
 
@@ -736,7 +747,7 @@ public class RoutineService extends Service {
 
                             if (invocation != null) {
 
-                                invocation.release();
+                                invocation.recycle();
                             }
                         }
                     }
@@ -750,10 +761,8 @@ public class RoutineService extends Service {
                     return;
                 }
 
-                final Bundle bundle = new Bundle();
-                putError(bundle, t);
                 final Message message = Message.obtain(null, RoutineService.MSG_ABORT);
-                message.setData(bundle);
+                putError(message.getData(), t);
 
                 try {
 
@@ -821,9 +830,9 @@ public class RoutineService extends Service {
         }
 
         /**
-         * Releases this invocation, that is, removes it from the service cache.
+         * Recycles this invocation, that is, removes it from the service cache.
          */
-        public void release() {
+        public void recycle() {
 
             synchronized (mMutex) {
 
@@ -882,15 +891,11 @@ public class RoutineService extends Service {
         @Override
         public void onComplete() {
 
-            mInvocation.release();
-
-            final Bundle data = new Bundle();
-            final Message message = Message.obtain(null, RoutineService.MSG_COMPLETE);
-            message.setData(data);
+            mInvocation.recycle();
 
             try {
 
-                mOutMessenger.send(message);
+                mOutMessenger.send(Message.obtain(null, RoutineService.MSG_COMPLETE));
 
             } catch (final RemoteException e) {
 
@@ -901,12 +906,10 @@ public class RoutineService extends Service {
         @Override
         public void onError(@Nullable final Throwable error) {
 
-            mInvocation.release();
+            mInvocation.recycle();
 
-            final Bundle data = new Bundle();
-            putError(data, error);
             final Message message = Message.obtain(null, RoutineService.MSG_ABORT);
-            message.setData(data);
+            putError(message.getData(), error);
 
             try {
 
@@ -921,10 +924,8 @@ public class RoutineService extends Service {
         @Override
         public void onOutput(final Object o) {
 
-            final Bundle data = new Bundle();
-            putValue(data, o);
             final Message message = Message.obtain(null, RoutineService.MSG_DATA);
-            message.setData(data);
+            putValue(message.getData(), o);
 
             try {
 

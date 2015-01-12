@@ -71,7 +71,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  *             } else {
  *
  *                 final Routine&lt;URI, MyResource&gt; routine =
- *                         JRoutine.from(this, ClassToken.tokenOf(LoadResource.class))
+ *                         JRoutine.onActivity(this, ClassToken.tokenOf(LoadResource.class))
  *                                 .buildRoutine();
  *                 routine.callAsync(RESOURCE_URI)
  *                        .bind(new TemplateOutputConsumer&lt;MyResource&gt;() {
@@ -102,6 +102,33 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * </pre>
  * The above code will ensure that the loading process survives any configuration change and the
  * resulting resource is dispatched only once.
+ * <p/>
+ * Note that the invocation may be implemented so to run in a separate service:
+ * <pre>
+ *     <code>
+ *
+ *         public class LoadResource extends AndroidTemplateInvocation&lt;URI, MyResource&gt; {
+ *
+ *             private Routine&lt;URI, MyResource&gt; mRoutine;
+ *
+ *             &#64;Override
+ *             public void onContext(&#64;Nonnull final Context context) {
+ *
+ *                 super.onContext(context);
+ *
+ *                 mRoutine = JRoutine.onService(context, ClassToken.tokenOf(LoadResourceUri.class))
+ *                                    .buildRoutine();
+ *             }
+ *
+ *             &#64;Override
+ *             public void onInput(final URI uri,
+ *                     &#64;Nonnull final ResultChannel&lt;MyResource&gt; result) {
+ *
+ *                 result.pass(mRoutine.callAsync(uri));
+ *             }
+ *         }
+ *     </code>
+ * </pre>
  * <p/>
  * See {@link com.bmd.jrt.android.v4.routine.JRoutine} for pre-HONEYCOMB support.
  * <p/>
@@ -135,7 +162,7 @@ public class JRoutine extends com.bmd.jrt.android.routine.JRoutine {
     }
 
     /**
-     * Initializes the specified context so to enable the creation of routines linked to the context
+     * Initializes the specified fragment so to enable the creation of routines linked to its
      * lifecycle.<br/>
      * This method must be called in the fragment <code>onCreate()</code> method.
      *
@@ -150,9 +177,9 @@ public class JRoutine extends com.bmd.jrt.android.routine.JRoutine {
     /**
      * Returns a builder of routines linked to the specified activity.
      * <p/>
-     * Note that, waiting for the outputs of the built routine immediately after its invocation on
-     * the main thread, will result in a deadlock. In fact the routine results will be always
-     * dispatched in the main UI thread.
+     * Note that the built routine results will be always dispatched in the main UI thread, thus
+     * waiting for the outputs immediately after its invocation in the main thread will result in a
+     * deadlock.
      *
      * @param activity   the activity instance.
      * @param classToken the invocation class token.
@@ -188,9 +215,9 @@ public class JRoutine extends com.bmd.jrt.android.routine.JRoutine {
     /**
      * Returns a builder of routines linked to the specified fragment.
      * <p/>
-     * Note that, waiting for the outputs of the built routine immediately after its invocation on
-     * the main thread, will result in a deadlock. In fact the routine results will be always
-     * dispatched in the main UI thread.
+     * Note that the built routine results will be always dispatched in the main UI thread, thus
+     * waiting for the outputs immediately after its invocation in the main thread will result in a
+     * deadlock.
      *
      * @param fragment   the fragment instance.
      * @param classToken the invocation class token.

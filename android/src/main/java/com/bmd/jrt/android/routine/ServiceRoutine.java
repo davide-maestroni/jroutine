@@ -17,7 +17,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -94,8 +93,8 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
      * Constructor.
      *
      * @param context         the routine context.
-     * @param looper          the message looper.
      * @param serviceClass    the service class.
+     * @param looper          the message looper.
      * @param invocationToken the invocation class token.
      * @param configuration   the routine configuration.
      * @param runnerClass     the asynchronous runner class.
@@ -103,8 +102,9 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
      * @throws NullPointerException     if one of the parameters is null.
      * @throws IllegalArgumentException if at least one of the parameter is invalid.
      */
-    ServiceRoutine(@Nonnull final Context context, @Nullable final Looper looper,
+    ServiceRoutine(@Nonnull final Context context,
             @Nullable final Class<? extends RoutineService> serviceClass,
+            @Nullable final Looper looper,
             @Nonnull final ClassToken<? extends AndroidInvocation<INPUT, OUTPUT>> invocationToken,
             @Nonnull final RoutineConfiguration configuration,
             @Nullable final Class<? extends Runner> runnerClass,
@@ -140,7 +140,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         final LogLevel logLevel = configuration.getLogLevel(LogLevel.DEFAULT);
         mLogger = Logger.create(log, logLevel, this);
         mRoutine = JRoutine.on((ClassToken<? extends Invocation<INPUT, OUTPUT>>) invocationToken)
-                           .apply(configuration)
+                           .apply(configuration).loggedWith(log)
                            .logLevel(logLevel)
                            .buildRoutine();
     }
@@ -155,7 +155,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
     @Override
     public ParameterChannel<INPUT, OUTPUT> invokeAsync() {
 
-        return new ServiceChannel<INPUT, OUTPUT>(false, mContext, mLooper, mServiceClass,
+        return new ServiceChannel<INPUT, OUTPUT>(false, mContext, mServiceClass, mLooper,
                                                  mInvocationClass, mConfiguration, mRunnerClass,
                                                  mLogClass, mLogger);
     }
@@ -164,7 +164,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
     @Override
     public ParameterChannel<INPUT, OUTPUT> invokeParallel() {
 
-        return new ServiceChannel<INPUT, OUTPUT>(true, mContext, mLooper, mServiceClass,
+        return new ServiceChannel<INPUT, OUTPUT>(true, mContext, mServiceClass, mLooper,
                                                  mInvocationClass, mConfiguration, mRunnerClass,
                                                  mLogClass, mLogger);
     }
@@ -218,6 +218,8 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
         private boolean mIsBound;
 
+        private boolean mIsUnbound;
+
         private Messenger mOutMessenger;
 
         /**
@@ -225,8 +227,8 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
          *
          * @param isParallel      whether the invocation is parallel.
          * @param context         the routine context.
-         * @param looper          the message looper.
          * @param serviceClass    the service class.
+         * @param looper          the message looper.
          * @param invocationClass the invocation class.
          * @param configuration   the routine configuration.
          * @param runnerClass     the asynchronous runner class.
@@ -234,8 +236,8 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
          * @param logger          the routine logger.
          */
         private ServiceChannel(boolean isParallel, @Nonnull final Context context,
-                @Nullable final Looper looper,
                 @Nonnull final Class<? extends RoutineService> serviceClass,
+                @Nullable final Looper looper,
                 @Nonnull Class<? extends AndroidInvocation<INPUT, OUTPUT>> invocationClass,
                 @Nonnull final RoutineConfiguration configuration,
                 @Nullable final Class<? extends Runner> runnerClass,
@@ -377,7 +379,6 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                 }
 
                 mIsBound = true;
-
                 final Context context = mContext;
                 mConnection = new RoutineServiceConnection();
                 context.bindService(new Intent(context, mServiceClass), mConnection,
@@ -389,13 +390,12 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
             synchronized (mMutex) {
 
-                if (!mIsBound) {
+                if (mIsUnbound) {
 
                     return;
                 }
 
-                mIsBound = false;
-
+                mIsUnbound = true;
                 mContext.unbindService(mConnection);
             }
         }
@@ -408,11 +408,9 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
             @Override
             public void onComplete() {
 
-                final Bundle data = new Bundle();
-                putInvocationId(data, mUUID);
                 final Message message = Message.obtain(null, RoutineService.MSG_COMPLETE);
+                putInvocationId(message.getData(), mUUID);
                 message.replyTo = mInMessenger;
-                message.setData(data);
 
                 try {
 
@@ -420,6 +418,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
                 } catch (final RemoteException e) {
 
+                    unbindService();
                     throw new RoutineException(e);
                 }
             }
@@ -427,12 +426,9 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
             @Override
             public void onError(@Nullable final Throwable error) {
 
-                final Bundle data = new Bundle();
-                putInvocationId(data, mUUID);
-                putError(data, error);
                 final Message message = Message.obtain(null, RoutineService.MSG_ABORT);
+                putError(message.getData(), mUUID, error);
                 message.replyTo = mInMessenger;
-                message.setData(data);
 
                 try {
 
@@ -440,6 +436,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
                 } catch (final RemoteException e) {
 
+                    unbindService();
                     throw new RoutineException(e);
                 }
             }
@@ -447,12 +444,9 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
             @Override
             public void onOutput(final INPUT input) {
 
-                final Bundle data = new Bundle();
-                putInvocationId(data, mUUID);
-                putValue(data, input);
                 final Message message = Message.obtain(null, RoutineService.MSG_DATA);
+                putValue(message.getData(), mUUID, input);
                 message.replyTo = mInMessenger;
-                message.setData(data);
 
                 try {
 
@@ -501,6 +495,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                             break;
 
                         case RoutineService.MSG_ABORT:
+                            unbindService();
                             mResultChannelInput.abort(getAbortError(msg));
                             break;
 
@@ -512,11 +507,8 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
                     logger.err(t, "error while parsing service message");
 
-                    final Bundle data = new Bundle();
-                    putInvocationId(data, mUUID);
-                    putError(data, t);
                     final Message message = Message.obtain(null, RoutineService.MSG_ABORT);
-                    message.setData(data);
+                    putError(message.getData(), mUUID, t);
 
                     try {
 
@@ -526,6 +518,9 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
                         logger.err(e, "error while sending service abort message");
                     }
+
+                    unbindService();
+                    mResultChannelInput.abort(t);
                 }
             }
         }
@@ -540,24 +535,27 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
             @Override
             public void onServiceConnected(final ComponentName name, final IBinder service) {
 
+                final Logger logger = mLogger;
+                logger.dbg("service connected: %s", name);
+
                 mOutMessenger = new Messenger(service);
 
-                final Bundle data = new Bundle();
+                final Message message = Message.obtain(null, RoutineService.MSG_INIT);
 
                 if (mIsParallel) {
 
-                    putParallelInvocation(data, mUUID, mInvocationClass, mConfiguration,
-                                          mRunnerClass, mLogClass);
+                    logger.dbg("sending parallel invocation message");
+                    putParallelInvocation(message.getData(), mUUID, mInvocationClass,
+                                          mConfiguration, mRunnerClass, mLogClass);
 
                 } else {
 
-                    putAsyncInvocation(data, mUUID, mInvocationClass, mConfiguration, mRunnerClass,
-                                       mLogClass);
+                    logger.dbg("sending async invocation message");
+                    putAsyncInvocation(message.getData(), mUUID, mInvocationClass, mConfiguration,
+                                       mRunnerClass, mLogClass);
                 }
 
-                final Message message = Message.obtain(null, RoutineService.MSG_INIT);
                 message.replyTo = mInMessenger;
-                message.setData(data);
 
                 try {
 
@@ -567,6 +565,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
                 } catch (final RemoteException e) {
 
+                    logger.err(e, "error while sending service invocation message");
                     unbindService();
                     mResultChannelInput.abort(e);
                 }
@@ -575,6 +574,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
             @Override
             public void onServiceDisconnected(final ComponentName name) {
 
+                mLogger.dbg("service disconnected: %s", name);
                 mParamChannelOutput.unbind(mConsumer);
             }
         }

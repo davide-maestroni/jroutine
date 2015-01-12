@@ -43,8 +43,6 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
 
     private final Constructor<? extends Invocation<INPUT, OUTPUT>> mConstructor;
 
-    private final Logger mLogger;
-
     /**
      * Constructor.
      *
@@ -66,14 +64,13 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
 
         mArgs = (invocationArgs == null) ? NO_ARGS : invocationArgs.clone();
         mConstructor = findConstructor(invocationClass, mArgs);
-        mLogger = Logger.create(configuration.getLog(null), configuration.getLogLevel(null), this);
     }
 
     @Nonnull
     @Override
     protected Invocation<INPUT, OUTPUT> createInvocation(final boolean async) {
 
-        final Logger logger = mLogger;
+        final Logger logger = getLogger();
 
         try {
 

@@ -57,8 +57,6 @@ class AndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
 
     private final int mLoaderId;
 
-    private final Logger mLogger;
-
     /**
      * Constructor.
      *
@@ -107,7 +105,6 @@ class AndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
         mCacheType = cacheType;
         mConstructor = constructor;
         mDataOrder = configuration.getOutputOrder(DataOrder.DEFAULT);
-        mLogger = Logger.create(configuration.getLog(null), configuration.getLogLevel(null), this);
     }
 
     @Nonnull
@@ -125,7 +122,7 @@ class AndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
 
         } catch (final Throwable t) {
 
-            mLogger.wrn(t, "ignoring exception while destroying invocation instance");
+            getLogger().wrn(t, "ignoring exception while destroying invocation instance");
         }
 
         return createInvocation(async);
@@ -135,7 +132,7 @@ class AndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
     @Override
     protected Invocation<INPUT, OUTPUT> createInvocation(final boolean async) {
 
-        final Logger logger = mLogger;
+        final Logger logger = getLogger();
 
         if (async) {
 

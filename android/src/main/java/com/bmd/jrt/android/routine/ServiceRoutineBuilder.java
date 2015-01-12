@@ -114,7 +114,7 @@ public class ServiceRoutineBuilder<INPUT, OUTPUT> {
     public Routine<INPUT, OUTPUT> buildRoutine() {
 
         final RoutineConfiguration configuration = mBuilder.buildConfiguration();
-        return new ServiceRoutine<INPUT, OUTPUT>(mContext, mLooper, mServiceClass, mClassToken,
+        return new ServiceRoutine<INPUT, OUTPUT>(mContext, mServiceClass, mLooper, mClassToken,
                                                  configuration, mRunnerClass, mLogClass);
     }
 

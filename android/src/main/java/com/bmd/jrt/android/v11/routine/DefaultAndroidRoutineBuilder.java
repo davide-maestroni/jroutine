@@ -21,7 +21,6 @@ import android.os.Build.VERSION_CODES;
 import com.bmd.jrt.android.builder.AndroidRoutineBuilder;
 import com.bmd.jrt.android.invocation.AndroidInvocation;
 import com.bmd.jrt.android.runner.Runners;
-import com.bmd.jrt.builder.DefaultConfigurationBuilder;
 import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
 import com.bmd.jrt.builder.RoutineConfiguration;
@@ -30,7 +29,6 @@ import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.routine.Routine;
-import com.bmd.jrt.runner.Runner;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
@@ -61,7 +59,7 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> implements AndroidRoutineBuild
 
     private ClashResolution mClashResolution = ClashResolution.DEFAULT;
 
-    private int mLoaderId = AndroidRoutineBuilder.GENERATED;
+    private int mLoaderId = AndroidRoutineBuilder.GENERATED_ID;
 
     /**
      * Constructor.
@@ -94,8 +92,17 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> implements AndroidRoutineBuild
 
         mContext = new WeakReference<Object>(context);
         mConstructor = findConstructor(classToken.getRawClass());
-        mBuilder = new DefaultConfigurationBuilder().runBy(Runners.mainRunner())
+        mBuilder = new RoutineConfigurationBuilder().runBy(Runners.mainRunner())
                                                     .inputOrder(DataOrder.INSERTION);
+    }
+
+    @Nonnull
+    @Override
+    public AndroidRoutineBuilder<INPUT, OUTPUT> apply(
+            @Nonnull final RoutineConfiguration configuration) {
+
+        mBuilder.apply(configuration);
+        return this;
     }
 
     @Nonnull
@@ -103,15 +110,13 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> implements AndroidRoutineBuild
     public Routine<INPUT, OUTPUT> buildRoutine() {
 
         final RoutineConfiguration configuration = mBuilder.buildConfiguration();
-        final Runner syncRunner = (configuration.getSyncRunner(null) == RunnerType.SEQUENTIAL)
-                ? Runners.sequentialRunner() : Runners.queuedRunner();
         final ClashResolution resolution =
                 (mClashResolution == ClashResolution.DEFAULT) ? ClashResolution.RESTART_ON_INPUT
                         : mClashResolution;
         final ResultCache cacheType =
                 (mCacheType == ResultCache.DEFAULT) ? ResultCache.CLEAR : mCacheType;
-        return new AndroidRoutine<INPUT, OUTPUT>(configuration, syncRunner, mContext, mLoaderId,
-                                                 resolution, cacheType, mConstructor);
+        return new AndroidRoutine<INPUT, OUTPUT>(configuration, mContext, mLoaderId, resolution,
+                                                 cacheType, mConstructor);
     }
 
     @Nonnull

@@ -56,11 +56,6 @@ import javax.annotation.Nullable;
 public interface RoutineBuilder {
 
     /**
-     * Constant indicating the default value of an integer attribute.
-     */
-    public static final int DEFAULT = Integer.MIN_VALUE;
-
-    /**
      * Applies the specified configuration to this builder.
      *
      * @param configuration the configuration.
@@ -113,8 +108,8 @@ public interface RoutineBuilder {
     public RoutineBuilder loggedWith(@Nullable Log log);
 
     /**
-     * Sets the max number of retained instances. A DEFAULT value means that it is up to the
-     * framework to chose a default number.
+     * Sets the max number of retained invocation instances. A {@link RoutineConfiguration#DEFAULT}
+     * value means that it is up to the framework to chose a default number.
      *
      * @param maxRetainedInstances the max number of instances.
      * @return this builder.
@@ -124,8 +119,9 @@ public interface RoutineBuilder {
     public RoutineBuilder maxRetained(int maxRetainedInstances);
 
     /**
-     * Sets the max number of concurrently running instances.A DEFAULT value means that it is up
-     * to the framework to chose a default number.
+     * Sets the max number of concurrently running invocation instances. A
+     * {@link RoutineConfiguration#DEFAULT} value means that it is up to the framework to chose a
+     * default number.
      *
      * @param maxRunningInstances the max number of instances.
      * @return this builder.

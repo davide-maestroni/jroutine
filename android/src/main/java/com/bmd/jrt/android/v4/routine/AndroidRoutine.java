@@ -27,7 +27,6 @@ import com.bmd.jrt.common.RoutineInterruptedException;
 import com.bmd.jrt.invocation.Invocation;
 import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.routine.AbstractRoutine;
-import com.bmd.jrt.runner.Runner;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
@@ -61,7 +60,6 @@ class AndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
      * Constructor.
      *
      * @param configuration the routine configuration.
-     * @param syncRunner    the runner used for synchronous invocation.
      * @param context       the context reference.
      * @param loaderId      the loader ID.
      * @param resolution    the clash resolution type.
@@ -72,12 +70,11 @@ class AndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
      */
     @SuppressWarnings("ConstantConditions")
     AndroidRoutine(@Nonnull final RoutineConfiguration configuration,
-            @Nonnull final Runner syncRunner, @Nonnull final WeakReference<Object> context,
-            final int loaderId, @Nonnull final ClashResolution resolution,
-            @Nonnull final ResultCache cacheType,
+            @Nonnull final WeakReference<Object> context, final int loaderId,
+            @Nonnull final ClashResolution resolution, @Nonnull final ResultCache cacheType,
             @Nonnull final Constructor<? extends AndroidInvocation<INPUT, OUTPUT>> constructor) {
 
-        super(configuration, syncRunner);
+        super(configuration);
 
         if (context == null) {
 
@@ -104,7 +101,7 @@ class AndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
         mClashResolution = resolution;
         mCacheType = cacheType;
         mConstructor = constructor;
-        mDataOrder = configuration.getOutputOrder(DataOrder.DEFAULT);
+        mDataOrder = configuration.getOutputOrderOr(DataOrder.DEFAULT);
     }
 
     @Nonnull

@@ -13,8 +13,8 @@
  */
 package com.bmd.jrt.annotation;
 
-import com.bmd.jrt.builder.RoutineBuilder;
 import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
+import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.runner.Runner;
@@ -130,7 +130,7 @@ public @interface Async {
      *
      * @return the timeout.
      */
-    long availTimeout() default RoutineBuilder.DEFAULT;
+    long availTimeout() default RoutineConfiguration.DEFAULT;
 
     /**
      * The name of the lock associated with the annotated method.
@@ -158,14 +158,14 @@ public @interface Async {
      *
      * @return the max retained instances.
      */
-    int maxRetained() default RoutineBuilder.DEFAULT;
+    int maxRetained() default RoutineConfiguration.DEFAULT;
 
     /**
      * The max number of concurrently running routine instances.
      *
      * @return the max concurrently running instances.
      */
-    int maxRunning() default RoutineBuilder.DEFAULT;
+    int maxRunning() default RoutineConfiguration.DEFAULT;
 
     /**
      * The type of the runner to be used for synchronous invocations.

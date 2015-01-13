@@ -126,8 +126,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         mLogger = logger.subContextLogger(this);
         mHandler = handler;
         mRunner = runner;
-        mMaxOutput = configuration.getOutputSize(-1);
-        mOutputTimeout = configuration.getOutputTimeout(null);
+        mMaxOutput = configuration.getOutputSizeOr(Integer.MAX_VALUE);
+        mOutputTimeout = configuration.getOutputTimeoutOr(TimeDuration.ZERO);
 
         if (mOutputTimeout == null) {
 
@@ -141,8 +141,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             throw new IllegalArgumentException("the output buffer size cannot be 0 or negative");
         }
 
-        mOutputQueue = (configuration.getOutputOrder(null) == DataOrder.INSERTION)
-                ? new OrderedNestedQueue<Object>() : new SimpleNestedQueue<Object>();
+        mOutputQueue = (configuration.getOutputOrderOr(DataOrder.DELIVERY) == DataOrder.DELIVERY)
+                ? new SimpleNestedQueue<Object>() : new OrderedNestedQueue<Object>();
         mHasOutputs = new Check() {
 
             @Override

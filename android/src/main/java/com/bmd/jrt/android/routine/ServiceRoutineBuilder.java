@@ -18,10 +18,10 @@ import android.os.Looper;
 
 import com.bmd.jrt.android.invocation.AndroidInvocation;
 import com.bmd.jrt.android.service.RoutineService;
-import com.bmd.jrt.builder.DefaultConfigurationBuilder;
 import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
 import com.bmd.jrt.builder.RoutineConfiguration;
+import com.bmd.jrt.builder.RoutineConfigurationBuilder;
 import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
@@ -44,7 +44,7 @@ import javax.annotation.Nullable;
  */
 public class ServiceRoutineBuilder<INPUT, OUTPUT> {
 
-    private final DefaultConfigurationBuilder mBuilder;
+    private final RoutineConfigurationBuilder mBuilder;
 
     private final ClassToken<? extends AndroidInvocation<INPUT, OUTPUT>> mClassToken;
 
@@ -70,7 +70,22 @@ public class ServiceRoutineBuilder<INPUT, OUTPUT> {
 
         mContext = context;
         mClassToken = classToken;
-        mBuilder = new DefaultConfigurationBuilder();
+        mBuilder = new RoutineConfigurationBuilder();
+    }
+
+    /**
+     * Applies the specified configuration to this builder.
+     *
+     * @param configuration the configuration.
+     * @return this builder.
+     * @throws NullPointerException if the specified configuration is null.
+     */
+    @Nonnull
+    public ServiceRoutineBuilder<INPUT, OUTPUT> apply(
+            @Nonnull final RoutineConfiguration configuration) {
+
+        mBuilder.apply(configuration);
+        return this;
     }
 
     /**
@@ -113,9 +128,23 @@ public class ServiceRoutineBuilder<INPUT, OUTPUT> {
     @Nonnull
     public Routine<INPUT, OUTPUT> buildRoutine() {
 
-        final RoutineConfiguration configuration = mBuilder.buildConfiguration();
         return new ServiceRoutine<INPUT, OUTPUT>(mContext, mServiceClass, mLooper, mClassToken,
-                                                 configuration, mRunnerClass, mLogClass);
+                                                 mBuilder.buildConfiguration(), mRunnerClass,
+                                                 mLogClass);
+    }
+
+    /**
+     * Sets the looper on which the results from the service are dispatched. A null value means that
+     * results will be dispatched on the invocation thread.
+     *
+     * @param looper the looper instance.
+     * @return this builder.
+     */
+    @Nonnull
+    public ServiceRoutineBuilder<INPUT, OUTPUT> dispatchIn(@Nullable final Looper looper) {
+
+        mLooper = looper;
+        return this;
     }
 
     /**
@@ -162,8 +191,8 @@ public class ServiceRoutineBuilder<INPUT, OUTPUT> {
     }
 
     /**
-     * Sets the max number of retained instances. A DEFAULT value means that it is up to the
-     * framework to chose a default number.
+     * Sets the max number of retained invocation instances. A {@link RoutineConfiguration#DEFAULT}
+     * value means that it is up to the framework to chose a default number.
      *
      * @param maxRetainedInstances the max number of instances.
      * @return this builder.
@@ -177,8 +206,9 @@ public class ServiceRoutineBuilder<INPUT, OUTPUT> {
     }
 
     /**
-     * Sets the max number of concurrently running instances.A DEFAULT value means that it is up
-     * to the framework to chose a default number.
+     * Sets the max number of concurrently running invocation instances. A
+     * {@link RoutineConfiguration#DEFAULT} value means that it is up to the framework to chose a
+     * default number.
      *
      * @param maxRunningInstances the max number of instances.
      * @return this builder.
@@ -202,20 +232,6 @@ public class ServiceRoutineBuilder<INPUT, OUTPUT> {
     public ServiceRoutineBuilder<INPUT, OUTPUT> outputOrder(@Nonnull final DataOrder order) {
 
         mBuilder.outputOrder(order);
-        return this;
-    }
-
-    /**
-     * Sets the looper on which the results from the service are dispatched. A null value means that
-     * results will be dispatched on the invocation thread.
-     *
-     * @param looper the looper instance.
-     * @return this builder.
-     */
-    @Nonnull
-    public ServiceRoutineBuilder<INPUT, OUTPUT> resultOn(@Nullable final Looper looper) {
-
-        mLooper = looper;
         return this;
     }
 

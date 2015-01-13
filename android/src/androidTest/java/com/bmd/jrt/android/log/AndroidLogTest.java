@@ -40,7 +40,7 @@ public class AndroidLogTest extends AndroidTestCase {
     public void testLog() {
 
         final NullPointerException ex = new NullPointerException();
-        final Logger logger = Logger.create(new AndroidLog(), LogLevel.DEBUG, this);
+        final Logger logger = Logger.createLogger(new AndroidLog(), LogLevel.DEBUG, this);
 
         logger.dbg(ARGS[0]);
         logger.dbg(FORMAT0, ARGS[0]);

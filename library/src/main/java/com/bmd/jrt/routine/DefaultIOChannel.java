@@ -17,9 +17,9 @@ import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.channel.IOChannel;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.OutputConsumer;
-import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.routine.DefaultResultChannel.AbortHandler;
+import com.bmd.jrt.runner.Runners;
 import com.bmd.jrt.time.TimeDuration;
 
 import java.util.Collection;
@@ -50,12 +50,14 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
      */
     DefaultIOChannel(@Nonnull final RoutineConfiguration configuration) {
 
-        final Logger logger = Logger.create(configuration.getLog(null),
-                                            configuration.getLogLevel(LogLevel.DEFAULT), this);
+        final Logger logger = Logger.createLogger(configuration.getLogOr(Logger.getGlobalLog()),
+                                                  configuration.getLogLevelOr(
+                                                          Logger.getGlobalLogLevel()), this);
         final IOChannelAbortHandler abortHandler = new IOChannelAbortHandler();
         final DefaultResultChannel<TYPE> inputChannel =
                 new DefaultResultChannel<TYPE>(configuration, abortHandler,
-                                               configuration.getRunner(null), logger);
+                                               configuration.getRunnerOr(Runners.sharedRunner()),
+                                               logger);
         abortHandler.setInputChannel(inputChannel);
         mInputChannel = new DefaultIOChannelInput<TYPE>(inputChannel);
         mOutputChannel = new DefaultIOChannelOutput<TYPE>(inputChannel.getOutput());

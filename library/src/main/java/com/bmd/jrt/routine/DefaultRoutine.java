@@ -18,7 +18,6 @@ import com.bmd.jrt.common.RoutineException;
 import com.bmd.jrt.common.RoutineInterruptedException;
 import com.bmd.jrt.invocation.Invocation;
 import com.bmd.jrt.log.Logger;
-import com.bmd.jrt.runner.Runner;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -47,7 +46,6 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
      * Constructor.
      *
      * @param configuration   the routine configuration.
-     * @param syncRunner      the runner used for synchronous invocation.
      * @param invocationClass the invocation class.
      * @param invocationArgs  the invocation constructor arguments.
      * @throws NullPointerException     if at least one of the parameter is null.
@@ -56,11 +54,10 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
      *                                  the target invocation class.
      */
     DefaultRoutine(@Nonnull final RoutineConfiguration configuration,
-            @Nonnull final Runner syncRunner,
             @Nonnull final Class<? extends Invocation<INPUT, OUTPUT>> invocationClass,
             @Nullable final Object... invocationArgs) {
 
-        super(configuration, syncRunner);
+        super(configuration);
 
         mArgs = (invocationArgs == null) ? NO_ARGS : invocationArgs.clone();
         mConstructor = findConstructor(invocationClass, mArgs);

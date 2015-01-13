@@ -15,7 +15,6 @@ package com.bmd.jrt.routine;
 
 import com.bmd.jrt.annotation.Async;
 import com.bmd.jrt.annotation.AsyncType;
-import com.bmd.jrt.builder.DefaultConfigurationBuilder;
 import com.bmd.jrt.builder.InputDeadlockException;
 import com.bmd.jrt.builder.OutputDeadlockException;
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
@@ -50,6 +49,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -59,7 +59,6 @@ import javax.annotation.Nullable;
 import static com.bmd.jrt.common.ClassToken.tokenOf;
 import static com.bmd.jrt.routine.JRoutine.on;
 import static com.bmd.jrt.time.TimeDuration.INFINITY;
-import static com.bmd.jrt.time.TimeDuration.ZERO;
 import static com.bmd.jrt.time.TimeDuration.millis;
 import static com.bmd.jrt.time.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -71,7 +70,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class RoutineTest extends TestCase {
 
-    public void testAbort() {
+    public void testAbort() throws InterruptedException {
 
         final Routine<String, String> routine =
                 on(tokenOf(DelayedInvocation.class)).withArgs(TimeDuration.millis(100))
@@ -149,6 +148,16 @@ public class RoutineTest extends TestCase {
                         assertThat(result.abort(new IllegalArgumentException(s))).isTrue();
                         assertThat(result.abort()).isFalse();
                         assertThat(result.isOpen()).isFalse();
+
+                        try {
+
+                            result.pass(s);
+
+                            fail();
+
+                        } catch (final RoutineException ignored) {
+
+                        }
                     }
                 };
 
@@ -200,6 +209,55 @@ public class RoutineTest extends TestCase {
 
             assertThat(ex.getCause()).isNull();
         }
+
+        final AtomicBoolean isFailed = new AtomicBoolean(false);
+        final Semaphore semaphore = new Semaphore(0);
+        final Invocation<String, String> closeInvocation =
+                new TemplateInvocation<String, String>() {
+
+                    @Override
+                    public void onInput(final String s,
+                            @Nonnull final ResultChannel<String> result) {
+
+                        new Thread() {
+
+                            @Override
+                            public void run() {
+
+                                super.run();
+
+                                try {
+
+                                    Thread.sleep(100);
+
+                                    try {
+
+                                        result.pass(s);
+
+                                        isFailed.set(true);
+
+                                    } catch (final IllegalStateException ignored) {
+
+                                    }
+
+                                    semaphore.release();
+
+                                } catch (final InterruptedException ignored) {
+
+                                }
+                            }
+
+                        }.start();
+                    }
+                };
+
+        final Routine<String, String> routine3 =
+                on(ClassToken.tokenOf(closeInvocation)).withArgs(this, isFailed, semaphore)
+                                                       .buildRoutine();
+
+        assertThat(routine3.callAsync("test").readAll()).isEmpty();
+        semaphore.tryAcquire(1, 1, TimeUnit.SECONDS);
+        assertThat(isFailed.get()).isFalse();
     }
 
     public void testAbortInput() throws InterruptedException {
@@ -743,7 +801,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            new AbstractRoutine<Object, Object>(null, Runners.queuedRunner()) {
+            new AbstractRoutine<Object, Object>(null) {
 
                 @Override
                 @Nonnull
@@ -759,320 +817,12 @@ public class RoutineTest extends TestCase {
 
         }
 
-        try {
-
-            new AbstractRoutine<Object, Object>(
-                    new DefaultConfigurationBuilder().buildConfiguration(), null) {
-
-                @Override
-                @Nonnull
-                protected Invocation<Object, Object> createInvocation(final boolean async) {
-
-                    return new ConstructorException();
-                }
-            };
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            final RoutineConfigurationBuilder builder = new RoutineConfigurationBuilder();
-            final RoutineConfiguration configuration = builder.availableTimeout(seconds(5))
-                                                              .maxRunning(Integer.MAX_VALUE)
-                                                              .maxRetained(10)
-                                                              .inputSize(Integer.MAX_VALUE)
-                                                              .inputTimeout(ZERO)
-                                                              .inputOrder(DataOrder.DELIVERY)
-                                                              .outputSize(Integer.MAX_VALUE)
-                                                              .outputTimeout(ZERO)
-                                                              .outputOrder(DataOrder.DELIVERY)
-                                                              .loggedWith(Logger.getDefaultLog())
-                                                              .logLevel(Logger.getDefaultLogLevel())
-                                                              .buildConfiguration();
-
-            new AbstractRoutine<Object, Object>(configuration, Runners.queuedRunner()) {
-
-                @Override
-                @Nonnull
-                protected Invocation<Object, Object> createInvocation(final boolean async) {
-
-                    return new ConstructorException();
-                }
-            };
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            final RoutineConfigurationBuilder builder = new RoutineConfigurationBuilder();
-            final RoutineConfiguration configuration = builder.runBy(Runners.sharedRunner())
-                                                              .maxRunning(Integer.MAX_VALUE)
-                                                              .maxRetained(10)
-                                                              .inputSize(Integer.MAX_VALUE)
-                                                              .inputTimeout(ZERO)
-                                                              .inputOrder(DataOrder.DELIVERY)
-                                                              .outputSize(Integer.MAX_VALUE)
-                                                              .outputTimeout(ZERO)
-                                                              .outputOrder(DataOrder.DELIVERY)
-                                                              .loggedWith(Logger.getDefaultLog())
-                                                              .logLevel(Logger.getDefaultLogLevel())
-                                                              .buildConfiguration();
-
-            new AbstractRoutine<Object, Object>(configuration, Runners.queuedRunner()) {
-
-                @Override
-                @Nonnull
-                protected Invocation<Object, Object> createInvocation(final boolean async) {
-
-                    return new ConstructorException();
-                }
-            };
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            final RoutineConfigurationBuilder builder = new RoutineConfigurationBuilder();
-            final RoutineConfiguration configuration = builder.runBy(Runners.sharedRunner())
-                                                              .availableTimeout(ZERO)
-                                                              .maxRunning(Integer.MAX_VALUE)
-                                                              .maxRetained(10)
-                                                              .inputSize(Integer.MAX_VALUE)
-                                                              .inputOrder(DataOrder.DELIVERY)
-                                                              .outputSize(Integer.MAX_VALUE)
-                                                              .outputTimeout(ZERO)
-                                                              .outputOrder(DataOrder.DELIVERY)
-                                                              .loggedWith(Logger.getDefaultLog())
-                                                              .logLevel(Logger.getDefaultLogLevel())
-                                                              .buildConfiguration();
-
-            new AbstractRoutine<Object, Object>(configuration, Runners.queuedRunner()) {
-
-                @Override
-                @Nonnull
-                protected Invocation<Object, Object> createInvocation(final boolean async) {
-
-                    return new ConstructorException();
-                }
-            };
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            final RoutineConfigurationBuilder builder = new RoutineConfigurationBuilder();
-            final RoutineConfiguration configuration = builder.runBy(Runners.sharedRunner())
-                                                              .availableTimeout(ZERO)
-                                                              .maxRunning(Integer.MAX_VALUE)
-                                                              .maxRetained(10)
-                                                              .inputSize(Integer.MAX_VALUE)
-                                                              .inputTimeout(ZERO)
-                                                              .inputOrder(DataOrder.DELIVERY)
-                                                              .outputSize(Integer.MAX_VALUE)
-                                                              .outputOrder(DataOrder.DELIVERY)
-                                                              .loggedWith(Logger.getDefaultLog())
-                                                              .logLevel(Logger.getDefaultLogLevel())
-                                                              .buildConfiguration();
-
-            new AbstractRoutine<Object, Object>(configuration, Runners.queuedRunner()) {
-
-                @Override
-                @Nonnull
-                protected Invocation<Object, Object> createInvocation(final boolean async) {
-
-                    return new ConstructorException();
-                }
-            };
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            final RoutineConfigurationBuilder builder = new RoutineConfigurationBuilder();
-            final RoutineConfiguration configuration = builder.runBy(Runners.sharedRunner())
-                                                              .availableTimeout(ZERO)
-                                                              .maxRunning(Integer.MAX_VALUE)
-                                                              .maxRetained(10)
-                                                              .inputSize(Integer.MAX_VALUE)
-                                                              .inputTimeout(ZERO)
-                                                              .inputOrder(DataOrder.DELIVERY)
-                                                              .outputSize(Integer.MAX_VALUE)
-                                                              .outputTimeout(ZERO)
-                                                              .outputOrder(DataOrder.DELIVERY)
-                                                              .loggedWith(Logger.getDefaultLog())
-                                                              .buildConfiguration();
-
-            new AbstractRoutine<Object, Object>(configuration, Runners.queuedRunner()) {
-
-                @Override
-                @Nonnull
-                protected Invocation<Object, Object> createInvocation(final boolean async) {
-
-                    return new ConstructorException();
-                }
-            };
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            final RoutineConfigurationBuilder builder = new RoutineConfigurationBuilder();
-            final RoutineConfiguration configuration = builder.runBy(Runners.sharedRunner())
-                                                              .availableTimeout(ZERO)
-                                                              .maxRetained(10)
-                                                              .inputSize(Integer.MAX_VALUE)
-                                                              .inputTimeout(ZERO)
-                                                              .inputOrder(DataOrder.DELIVERY)
-                                                              .outputSize(Integer.MAX_VALUE)
-                                                              .outputTimeout(ZERO)
-                                                              .outputOrder(DataOrder.DELIVERY)
-                                                              .loggedWith(Logger.getDefaultLog())
-                                                              .logLevel(Logger.getDefaultLogLevel())
-                                                              .buildConfiguration();
-
-            new AbstractRoutine<Object, Object>(configuration, Runners.queuedRunner()) {
-
-                @Override
-                @Nonnull
-                protected Invocation<Object, Object> createInvocation(final boolean async) {
-
-                    return new ConstructorException();
-                }
-            };
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            final RoutineConfigurationBuilder builder = new RoutineConfigurationBuilder();
-            final RoutineConfiguration configuration = builder.runBy(Runners.sharedRunner())
-                                                              .availableTimeout(ZERO)
-                                                              .maxRunning(Integer.MAX_VALUE)
-                                                              .inputSize(Integer.MAX_VALUE)
-                                                              .inputTimeout(ZERO)
-                                                              .inputOrder(DataOrder.DELIVERY)
-                                                              .outputSize(Integer.MAX_VALUE)
-                                                              .outputTimeout(ZERO)
-                                                              .outputOrder(DataOrder.DELIVERY)
-                                                              .loggedWith(Logger.getDefaultLog())
-                                                              .logLevel(Logger.getDefaultLogLevel())
-                                                              .buildConfiguration();
-
-            new AbstractRoutine<Object, Object>(configuration, Runners.queuedRunner()) {
-
-                @Override
-                @Nonnull
-                protected Invocation<Object, Object> createInvocation(final boolean async) {
-
-                    return new ConstructorException();
-                }
-            };
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            final RoutineConfigurationBuilder builder = new RoutineConfigurationBuilder();
-            final RoutineConfiguration configuration = builder.runBy(Runners.sharedRunner())
-                                                              .availableTimeout(ZERO)
-                                                              .maxRunning(Integer.MAX_VALUE)
-                                                              .maxRetained(10)
-                                                              .inputTimeout(ZERO)
-                                                              .inputOrder(DataOrder.DELIVERY)
-                                                              .outputSize(Integer.MAX_VALUE)
-                                                              .outputTimeout(ZERO)
-                                                              .outputOrder(DataOrder.DELIVERY)
-                                                              .loggedWith(Logger.getDefaultLog())
-                                                              .logLevel(Logger.getDefaultLogLevel())
-                                                              .buildConfiguration();
-
-            new AbstractRoutine<Object, Object>(configuration, Runners.queuedRunner()) {
-
-                @Override
-                @Nonnull
-                protected Invocation<Object, Object> createInvocation(final boolean async) {
-
-                    return new ConstructorException();
-                }
-            };
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            final RoutineConfigurationBuilder builder = new RoutineConfigurationBuilder();
-            final RoutineConfiguration configuration = builder.runBy(Runners.sharedRunner())
-                                                              .availableTimeout(ZERO)
-                                                              .maxRunning(Integer.MAX_VALUE)
-                                                              .maxRetained(10)
-                                                              .inputSize(Integer.MAX_VALUE)
-                                                              .inputTimeout(ZERO)
-                                                              .inputOrder(DataOrder.DELIVERY)
-                                                              .outputTimeout(ZERO)
-                                                              .outputOrder(DataOrder.DELIVERY)
-                                                              .loggedWith(Logger.getDefaultLog())
-                                                              .logLevel(Logger.getDefaultLogLevel())
-                                                              .buildConfiguration();
-
-            new AbstractRoutine<Object, Object>(configuration, Runners.queuedRunner()) {
-
-                @Override
-                @Nonnull
-                protected Invocation<Object, Object> createInvocation(final boolean async) {
-
-                    return new ConstructorException();
-                }
-            };
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        final Logger logger =
-                Logger.create(Logger.getDefaultLog(), Logger.getDefaultLogLevel(), this);
+        final Logger logger = Logger.createLogger(null, LogLevel.DEFAULT);
 
         try {
 
             final DefaultResultChannel<Object> channel = new DefaultResultChannel<Object>(
-                    new DefaultConfigurationBuilder().buildConfiguration(), new TestAbortHandler(),
+                    new RoutineConfigurationBuilder().buildConfiguration(), new TestAbortHandler(),
                     Runners.sequentialRunner(), logger);
 
             new DefaultExecution<Object, Object>(null, new TestInputIterator(), channel, logger);
@@ -1086,7 +836,7 @@ public class RoutineTest extends TestCase {
         try {
 
             final DefaultResultChannel<Object> channel = new DefaultResultChannel<Object>(
-                    new DefaultConfigurationBuilder().buildConfiguration(), new TestAbortHandler(),
+                    new RoutineConfigurationBuilder().buildConfiguration(), new TestAbortHandler(),
                     Runners.sequentialRunner(), logger);
 
             new DefaultExecution<Object, Object>(new TestInvocationManager(), null, channel,
@@ -1112,7 +862,7 @@ public class RoutineTest extends TestCase {
         try {
 
             final DefaultResultChannel<Object> channel = new DefaultResultChannel<Object>(
-                    new DefaultConfigurationBuilder().buildConfiguration(), new TestAbortHandler(),
+                    new RoutineConfigurationBuilder().buildConfiguration(), new TestAbortHandler(),
                     Runners.sequentialRunner(), logger);
 
             new DefaultExecution<Object, Object>(new TestInvocationManager(),
@@ -1374,12 +1124,12 @@ public class RoutineTest extends TestCase {
     @SuppressWarnings("ConstantConditions")
     public void testParameterChannelError() {
 
-        final Logger logger = Logger.create(new NullLog(), LogLevel.DEBUG);
+        final Logger logger = Logger.createLogger(new NullLog(), LogLevel.DEBUG);
 
         try {
 
             final RoutineConfiguration configuration =
-                    new DefaultConfigurationBuilder().buildConfiguration();
+                    new RoutineConfigurationBuilder().buildConfiguration();
 
             new DefaultParameterChannel<Object, Object>(configuration, null, Runners.sharedRunner(),
                                                         logger);
@@ -1393,7 +1143,7 @@ public class RoutineTest extends TestCase {
         try {
 
             final RoutineConfiguration configuration =
-                    new DefaultConfigurationBuilder().buildConfiguration();
+                    new RoutineConfigurationBuilder().buildConfiguration();
 
             new DefaultParameterChannel<Object, Object>(configuration, new TestInvocationManager(),
                                                         null, logger);
@@ -1407,7 +1157,7 @@ public class RoutineTest extends TestCase {
         try {
 
             final RoutineConfiguration configuration =
-                    new DefaultConfigurationBuilder().buildConfiguration();
+                    new RoutineConfigurationBuilder().buildConfiguration();
 
             new DefaultParameterChannel<Object, Object>(configuration, new TestInvocationManager(),
                                                         Runners.sharedRunner(), null);
@@ -1431,84 +1181,8 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            final RoutineConfigurationBuilder builder = new RoutineConfigurationBuilder();
-            final RoutineConfiguration configuration = builder.inputSize(Integer.MAX_VALUE)
-                                                              .inputOrder(DataOrder.DELIVERY)
-                                                              .outputSize(Integer.MAX_VALUE)
-                                                              .outputTimeout(ZERO)
-                                                              .outputOrder(DataOrder.DELIVERY)
-                                                              .buildConfiguration();
-
-            new DefaultParameterChannel<Object, Object>(configuration, new TestInvocationManager(),
-                                                        Runners.sharedRunner(), logger);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            final RoutineConfigurationBuilder builder = new RoutineConfigurationBuilder();
-            final RoutineConfiguration configuration = builder.inputSize(Integer.MAX_VALUE)
-                                                              .inputTimeout(ZERO)
-                                                              .inputOrder(DataOrder.DELIVERY)
-                                                              .outputSize(Integer.MAX_VALUE)
-                                                              .outputOrder(DataOrder.DELIVERY)
-                                                              .buildConfiguration();
-
-            new DefaultParameterChannel<Object, Object>(configuration, new TestInvocationManager(),
-                                                        Runners.sharedRunner(), logger);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            final RoutineConfigurationBuilder builder = new RoutineConfigurationBuilder();
-            final RoutineConfiguration configuration = builder.inputTimeout(ZERO)
-                                                              .inputOrder(DataOrder.DELIVERY)
-                                                              .outputSize(Integer.MAX_VALUE)
-                                                              .outputTimeout(ZERO)
-                                                              .outputOrder(DataOrder.DELIVERY)
-                                                              .buildConfiguration();
-
-            new DefaultParameterChannel<Object, Object>(configuration, new TestInvocationManager(),
-                                                        Runners.sharedRunner(), logger);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            final RoutineConfigurationBuilder builder = new RoutineConfigurationBuilder();
-            final RoutineConfiguration configuration = builder.inputSize(Integer.MAX_VALUE)
-                                                              .inputTimeout(ZERO)
-                                                              .inputOrder(DataOrder.DELIVERY)
-                                                              .outputTimeout(ZERO)
-                                                              .outputOrder(DataOrder.DELIVERY)
-                                                              .buildConfiguration();
-
-            new DefaultParameterChannel<Object, Object>(configuration, new TestInvocationManager(),
-                                                        Runners.sharedRunner(), logger);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
             final RoutineConfiguration configuration =
-                    new DefaultConfigurationBuilder().buildConfiguration();
+                    new RoutineConfigurationBuilder().buildConfiguration();
 
             final DefaultParameterChannel<Object, Object> channel =
                     new DefaultParameterChannel<Object, Object>(configuration,
@@ -1527,7 +1201,7 @@ public class RoutineTest extends TestCase {
         try {
 
             final RoutineConfiguration configuration =
-                    new DefaultConfigurationBuilder().buildConfiguration();
+                    new RoutineConfigurationBuilder().buildConfiguration();
 
             final DefaultParameterChannel<Object, Object> channel =
                     new DefaultParameterChannel<Object, Object>(configuration,
@@ -1545,7 +1219,7 @@ public class RoutineTest extends TestCase {
         try {
 
             final RoutineConfiguration configuration =
-                    new DefaultConfigurationBuilder().buildConfiguration();
+                    new RoutineConfigurationBuilder().buildConfiguration();
 
             final DefaultParameterChannel<Object, Object> channel =
                     new DefaultParameterChannel<Object, Object>(configuration,
@@ -1563,7 +1237,7 @@ public class RoutineTest extends TestCase {
         try {
 
             final RoutineConfiguration configuration =
-                    new DefaultConfigurationBuilder().buildConfiguration();
+                    new RoutineConfigurationBuilder().buildConfiguration();
 
             final DefaultParameterChannel<Object, Object> channel =
                     new DefaultParameterChannel<Object, Object>(configuration,
@@ -1602,12 +1276,12 @@ public class RoutineTest extends TestCase {
     @SuppressWarnings("ConstantConditions")
     public void testResultChannelError() {
 
-        final Logger logger = Logger.create(new NullLog(), LogLevel.DEBUG);
+        final Logger logger = Logger.createLogger(new NullLog(), LogLevel.DEBUG);
 
         try {
 
             final RoutineConfiguration configuration =
-                    new DefaultConfigurationBuilder().buildConfiguration();
+                    new RoutineConfigurationBuilder().buildConfiguration();
 
             new DefaultResultChannel<Object>(configuration, null, Runners.sharedRunner(), logger);
 
@@ -1620,7 +1294,7 @@ public class RoutineTest extends TestCase {
         try {
 
             final RoutineConfiguration configuration =
-                    new DefaultConfigurationBuilder().buildConfiguration();
+                    new RoutineConfigurationBuilder().buildConfiguration();
 
             new DefaultResultChannel<Object>(configuration, new TestAbortHandler(), null, logger);
 
@@ -1633,7 +1307,7 @@ public class RoutineTest extends TestCase {
         try {
 
             final RoutineConfiguration configuration =
-                    new DefaultConfigurationBuilder().buildConfiguration();
+                    new RoutineConfigurationBuilder().buildConfiguration();
 
             new DefaultResultChannel<Object>(configuration, new TestAbortHandler(),
                                              Runners.sharedRunner(), null);
@@ -1647,7 +1321,7 @@ public class RoutineTest extends TestCase {
         try {
 
             final RoutineConfiguration configuration =
-                    new DefaultConfigurationBuilder().buildConfiguration();
+                    new RoutineConfigurationBuilder().buildConfiguration();
 
             new DefaultResultChannel<Object>(configuration, new TestAbortHandler(),
                                              Runners.sharedRunner(), logger).after(null);
@@ -1661,7 +1335,7 @@ public class RoutineTest extends TestCase {
         try {
 
             final RoutineConfiguration configuration =
-                    new DefaultConfigurationBuilder().buildConfiguration();
+                    new RoutineConfigurationBuilder().buildConfiguration();
 
             new DefaultResultChannel<Object>(configuration, new TestAbortHandler(),
                                              Runners.sharedRunner(), logger).after(0, null);
@@ -1675,45 +1349,13 @@ public class RoutineTest extends TestCase {
         try {
 
             final RoutineConfiguration configuration =
-                    new DefaultConfigurationBuilder().buildConfiguration();
+                    new RoutineConfigurationBuilder().buildConfiguration();
 
             final DefaultResultChannel<Object> channel =
                     new DefaultResultChannel<Object>(configuration, new TestAbortHandler(),
                                                      Runners.sharedRunner(), logger);
 
             channel.after(-1, TimeUnit.MILLISECONDS);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            final RoutineConfigurationBuilder builder = new RoutineConfigurationBuilder();
-            final RoutineConfiguration configuration = builder.outputSize(Integer.MAX_VALUE)
-                                                              .outputOrder(DataOrder.DELIVERY)
-                                                              .buildConfiguration();
-
-            new DefaultResultChannel<Object>(configuration, new TestAbortHandler(),
-                                             Runners.sharedRunner(), logger);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            final RoutineConfigurationBuilder builder = new RoutineConfigurationBuilder();
-            final RoutineConfiguration configuration = builder.outputTimeout(ZERO)
-                                                              .outputOrder(DataOrder.DELIVERY)
-                                                              .buildConfiguration();
-
-            new DefaultResultChannel<Object>(configuration, new TestAbortHandler(),
-                                             Runners.sharedRunner(), logger);
 
             fail();
 

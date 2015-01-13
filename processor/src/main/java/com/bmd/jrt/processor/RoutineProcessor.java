@@ -19,9 +19,9 @@ import com.bmd.jrt.annotation.AsyncType;
 import com.bmd.jrt.annotation.DefaultLog;
 import com.bmd.jrt.annotation.DefaultRunner;
 import com.bmd.jrt.annotation.ParallelType;
-import com.bmd.jrt.builder.RoutineBuilder;
 import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
+import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.log.Log.LogLevel;
 
@@ -718,9 +718,9 @@ public class RoutineProcessor extends AbstractProcessor {
         final TypeMirror annotationType = annotationElement.asType();
 
         RunnerType runnerType = RunnerType.DEFAULT;
-        int maxRunning = RoutineBuilder.DEFAULT;
-        int maxRetained = RoutineBuilder.DEFAULT;
-        long availTimeout = RoutineBuilder.DEFAULT;
+        int maxRunning = RoutineConfiguration.DEFAULT;
+        int maxRetained = RoutineConfiguration.DEFAULT;
+        long availTimeout = RoutineConfiguration.DEFAULT;
         TimeUnit availTimeUnit = null;
         TypeElement runnerElement = null;
 
@@ -758,17 +758,17 @@ public class RoutineProcessor extends AbstractProcessor {
                 runnerType = classAnnotation.syncRunnerType();
             }
 
-            if (maxRunning == RoutineBuilder.DEFAULT) {
+            if (maxRunning == RoutineConfiguration.DEFAULT) {
 
                 maxRunning = classAnnotation.maxRunning();
             }
 
-            if (maxRetained == RoutineBuilder.DEFAULT) {
+            if (maxRetained == RoutineConfiguration.DEFAULT) {
 
                 maxRetained = classAnnotation.maxRetained();
             }
 
-            if (availTimeout == RoutineBuilder.DEFAULT) {
+            if (availTimeout == RoutineConfiguration.DEFAULT) {
 
                 availTimeout = classAnnotation.availTimeout();
                 availTimeUnit = classAnnotation.availTimeUnit();
@@ -790,17 +790,17 @@ public class RoutineProcessor extends AbstractProcessor {
                    .append(")");
         }
 
-        if (maxRunning != RoutineBuilder.DEFAULT) {
+        if (maxRunning != RoutineConfiguration.DEFAULT) {
 
             builder.append(".maxRunning(").append(maxRunning).append(")");
         }
 
-        if (maxRetained != RoutineBuilder.DEFAULT) {
+        if (maxRetained != RoutineConfiguration.DEFAULT) {
 
             builder.append(".maxRetained(").append(maxRetained).append(")");
         }
 
-        if (availTimeout != RoutineBuilder.DEFAULT) {
+        if (availTimeout != RoutineConfiguration.DEFAULT) {
 
             builder.append(".availTimeout(")
                    .append(availTimeout)

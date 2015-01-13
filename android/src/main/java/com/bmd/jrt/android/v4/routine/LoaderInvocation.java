@@ -266,7 +266,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
 
         int loaderId = mLoaderId;
 
-        if (loaderId == AndroidRoutineBuilder.GENERATED) {
+        if (loaderId == AndroidRoutineBuilder.GENERATED_ID) {
 
             loaderId = 31 * mConstructor.getDeclaringClass().hashCode() + inputs.hashCode();
             logger.dbg("generating invocation ID: %d", loaderId);

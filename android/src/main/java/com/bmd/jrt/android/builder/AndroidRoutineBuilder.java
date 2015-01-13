@@ -15,6 +15,7 @@ package com.bmd.jrt.android.builder;
 
 import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
+import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.routine.Routine;
@@ -46,7 +47,18 @@ public interface AndroidRoutineBuilder<INPUT, OUTPUT> {
     /**
      * Constant identifying a routine ID computed from the executor class and the input parameters.
      */
-    public static final int GENERATED = Integer.MIN_VALUE;
+    public static final int GENERATED_ID = Integer.MIN_VALUE;
+
+
+    /**
+     * Applies the specified configuration to this builder.
+     *
+     * @param configuration the configuration.
+     * @return this builder.
+     * @throws NullPointerException if the specified configuration is null.
+     */
+    @Nonnull
+    public AndroidRoutineBuilder<INPUT, OUTPUT> apply(@Nonnull RoutineConfiguration configuration);
 
     /**
      * Builds and returns the routine.

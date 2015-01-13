@@ -24,7 +24,7 @@ import android.os.Messenger;
 import android.os.RemoteException;
 
 import com.bmd.jrt.android.invocation.AndroidInvocation;
-import com.bmd.jrt.builder.DefaultConfigurationBuilder;
+import com.bmd.jrt.android.log.Logs;
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.builder.RoutineConfigurationBuilder;
@@ -38,7 +38,6 @@ import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.routine.AbstractRoutine;
 import com.bmd.jrt.runner.Runner;
-import com.bmd.jrt.runner.Runners;
 import com.bmd.jrt.time.TimeDuration;
 
 import java.lang.reflect.Constructor;
@@ -112,7 +111,7 @@ public class RoutineService extends Service {
     @SuppressWarnings("UnusedDeclaration")
     public RoutineService() {
 
-        this(Logger.getDefaultLog(), Logger.getDefaultLogLevel());
+        this(Logger.getGlobalLog(), Logger.getGlobalLogLevel());
     }
 
     /**
@@ -124,7 +123,7 @@ public class RoutineService extends Service {
      */
     public RoutineService(@Nullable final Log log, @Nonnull final LogLevel logLevel) {
 
-        mLogger = Logger.create(log, logLevel, this);
+        mLogger = Logger.createLogger(Logs.androidLog(), LogLevel.DEBUG, this);
     }
 
     /**
@@ -294,11 +293,10 @@ public class RoutineService extends Service {
         bundle.putString(KEY_INVOCATION_ID, invocationId);
         bundle.putSerializable(KEY_INVOCATION_CLASS, invocationClass);
         bundle.putInt(KEY_MAX_RETAINED,
-                      configuration.getMaxRetained(RoutineConfigurationBuilder.DEFAULT));
-        bundle.putInt(KEY_MAX_RUNNING,
-                      configuration.getMaxRunning(RoutineConfigurationBuilder.DEFAULT));
+                      configuration.getMaxRetainedOr(RoutineConfiguration.DEFAULT));
+        bundle.putInt(KEY_MAX_RUNNING, configuration.getMaxRunningOr(RoutineConfiguration.DEFAULT));
 
-        final TimeDuration availTimeout = configuration.getAvailTimeout(null);
+        final TimeDuration availTimeout = configuration.getAvailTimeoutOr(null);
 
         if (availTimeout != null) {
 
@@ -306,11 +304,11 @@ public class RoutineService extends Service {
             bundle.putSerializable(KEY_AVAILABLE_TIMEUNIT, availTimeout.unit);
         }
 
-        bundle.putSerializable(KEY_INPUT_ORDER, configuration.getInputOrder(DataOrder.DEFAULT));
-        bundle.putSerializable(KEY_OUTPUT_ORDER, configuration.getOutputOrder(DataOrder.DEFAULT));
+        bundle.putSerializable(KEY_INPUT_ORDER, configuration.getInputOrderOr(DataOrder.DEFAULT));
+        bundle.putSerializable(KEY_OUTPUT_ORDER, configuration.getOutputOrderOr(DataOrder.DEFAULT));
         bundle.putSerializable(KEY_RUNNER_CLASS, runnerClass);
         bundle.putSerializable(KEY_LOG_CLASS, logClass);
-        bundle.putSerializable(KEY_LOG_LEVEL, configuration.getLogLevel(LogLevel.DEFAULT));
+        bundle.putSerializable(KEY_LOG_LEVEL, configuration.getLogLevelOr(LogLevel.DEFAULT));
     }
 
     private static void putValue(@Nonnull final Bundle bundle, @Nullable final Object value) {
@@ -431,7 +429,7 @@ public class RoutineService extends Service {
 
             if (routineState == null) {
 
-                final DefaultConfigurationBuilder builder = new DefaultConfigurationBuilder();
+                final RoutineConfigurationBuilder builder = new RoutineConfigurationBuilder();
 
                 if (runnerClass != null) {
 
@@ -511,7 +509,7 @@ public class RoutineService extends Service {
                 @Nonnull final RoutineConfiguration configuration,
                 @Nonnull final Class<? extends AndroidInvocation<Object, Object>> invocationClass) {
 
-            super(configuration, Runners.sequentialRunner());
+            super(configuration);
 
             mContext = context;
             mConstructor = findConstructor(invocationClass);

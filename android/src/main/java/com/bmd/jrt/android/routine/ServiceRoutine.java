@@ -127,7 +127,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
         } else {
 
-            log = Logger.getDefaultLog();
+            log = null;
         }
 
         mContext = context.getApplicationContext();
@@ -137,11 +137,12 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         mConfiguration = configuration;
         mRunnerClass = runnerClass;
         mLogClass = logClass;
-        final LogLevel logLevel = configuration.getLogLevel(LogLevel.DEFAULT);
-        mLogger = Logger.create(log, logLevel, this);
+        mLogger = Logger.createLogger((log != null) ? log : Logger.getGlobalLog(),
+                                      configuration.getLogLevelOr(Logger.getGlobalLogLevel()),
+                                      this);
         mRoutine = JRoutine.on((ClassToken<? extends Invocation<INPUT, OUTPUT>>) invocationToken)
-                           .apply(configuration).loggedWith(log)
-                           .logLevel(logLevel)
+                           .apply(configuration)
+                           .loggedWith(log)
                            .buildRoutine();
     }
 
@@ -257,7 +258,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
             final Log log = logger.getLog();
             final LogLevel logLevel = logger.getLogLevel();
             final IOChannel<INPUT> paramChannel = JRoutine.io()
-                                                          .dataOrder(configuration.getInputOrder(
+                                                          .dataOrder(configuration.getInputOrderOr(
                                                                   DataOrder.DEFAULT))
                                                           .maxSize(Integer.MAX_VALUE)
                                                           .bufferTimeout(TimeDuration.ZERO)
@@ -267,8 +268,9 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
             mParamChannelInput = paramChannel.input();
             mParamChannelOutput = paramChannel.output();
             final IOChannel<OUTPUT> resultChannel = JRoutine.io()
-                                                            .dataOrder(configuration.getOutputOrder(
-                                                                    DataOrder.DEFAULT))
+                                                            .dataOrder(
+                                                                    configuration.getOutputOrderOr(
+                                                                            DataOrder.DEFAULT))
                                                             .maxSize(Integer.MAX_VALUE)
                                                             .bufferTimeout(TimeDuration.ZERO)
                                                             .loggedWith(log)
@@ -490,13 +492,13 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                             break;
 
                         case RoutineService.MSG_COMPLETE:
-                            unbindService();
                             mResultChannelInput.close();
+                            unbindService();
                             break;
 
                         case RoutineService.MSG_ABORT:
-                            unbindService();
                             mResultChannelInput.abort(getAbortError(msg));
+                            unbindService();
                             break;
 
                         default:
@@ -519,8 +521,8 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                         logger.err(e, "error while sending service abort message");
                     }
 
-                    unbindService();
                     mResultChannelInput.abort(t);
+                    unbindService();
                 }
             }
         }
@@ -566,8 +568,8 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                 } catch (final RemoteException e) {
 
                     logger.err(e, "error while sending service invocation message");
-                    unbindService();
                     mResultChannelInput.abort(e);
+                    unbindService();
                 }
             }
 

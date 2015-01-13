@@ -51,12 +51,11 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
         super(TestActivity.class);
     }
 
-    public void testInvocations() {
+    public void testInvocations() throws InterruptedException {
 
         final Routine<String, String> routine1 =
                 JRoutine.onService(getActivity(), ClassToken.tokenOf(StringTunnelInvocation.class))
-                        .syncRunner(RunnerType.QUEUED)
-                        .resultOn(Looper.getMainLooper())
+                        .syncRunner(RunnerType.QUEUED).dispatchIn(Looper.getMainLooper())
                         .logClass(AndroidLog.class)
                         .logLevel(LogLevel.DEBUG)
                         .buildRoutine();
@@ -71,8 +70,7 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
 
         final Routine<String, String> routine2 =
                 JRoutine.onService(getActivity(), ClassToken.tokenOf(StringSimpleInvocation.class))
-                        .syncRunner(RunnerType.SEQUENTIAL)
-                        .resultOn(Looper.getMainLooper())
+                        .syncRunner(RunnerType.SEQUENTIAL).dispatchIn(Looper.getMainLooper())
                         .logClass(AndroidLog.class)
                         .logLevel(LogLevel.DEBUG)
                         .buildRoutine();
@@ -91,7 +89,7 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
         final MyParcelable p = new MyParcelable(33, -17);
         final Routine<MyParcelable, MyParcelable> routine =
                 JRoutine.onService(getActivity(), ClassToken.tokenOf(MyParcelableInvocation.class))
-                        .resultOn(Looper.getMainLooper())
+                        .dispatchIn(Looper.getMainLooper())
                         .buildRoutine();
         assertThat(routine.callAsync(p).readFirst()).isEqualTo(p);
     }

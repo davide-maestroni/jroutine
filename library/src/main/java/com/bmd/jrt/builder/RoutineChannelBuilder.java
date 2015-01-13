@@ -88,7 +88,8 @@ public interface RoutineChannelBuilder extends RoutineBuilder {
 
     /**
      * Sets the maximum number of data that the input channel can retain before they are consumed.
-     * A DEFAULT value means that it is up to the framework to chose a default.
+     * A {@link RoutineConfiguration#DEFAULT} value means that it is up to the framework to chose a
+     * default size.
      *
      * @param inputMaxSize the maximum size.
      * @return this builder.
@@ -131,7 +132,8 @@ public interface RoutineChannelBuilder extends RoutineBuilder {
 
     /**
      * Sets the maximum number of data that the result channel can retain before they are consumed.
-     * A DEFAULT value means that it is up to the framework to chose a default.
+     * A {@link RoutineConfiguration#DEFAULT} value means that it is up to the framework to chose a
+     * default size.
      *
      * @param outputMaxSize the maximum size.
      * @return this builder.

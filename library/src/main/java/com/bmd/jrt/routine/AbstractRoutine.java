@@ -13,14 +13,15 @@
  */
 package com.bmd.jrt.routine;
 
+import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.channel.ParameterChannel;
 import com.bmd.jrt.common.RoutineInterruptedException;
 import com.bmd.jrt.invocation.Invocation;
-import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.routine.DefaultParameterChannel.InvocationManager;
 import com.bmd.jrt.runner.Runner;
+import com.bmd.jrt.runner.Runners;
 import com.bmd.jrt.time.TimeDuration;
 import com.bmd.jrt.time.TimeDuration.Check;
 
@@ -29,6 +30,8 @@ import java.util.LinkedList;
 import javax.annotation.Nonnull;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
+import static com.bmd.jrt.time.TimeDuration.seconds;
 
 /**
  * Basic abstract implementation of a routine.
@@ -42,6 +45,12 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * @param <OUTPUT> the output data type.
  */
 public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
+
+    private static final TimeDuration DEFAULT_AVAIL_TIMEOUT = seconds(5);
+
+    private static final int DEFAULT_MAX_RETAINED = 10;
+
+    private static final int DEFAULT_MAX_RUNNING = Integer.MAX_VALUE;
 
     private final LinkedList<Invocation<INPUT, OUTPUT>> mAsyncInvocations =
             new LinkedList<Invocation<INPUT, OUTPUT>>();
@@ -86,86 +95,22 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
      * Constructor.
      *
      * @param configuration the routine configuration.
-     * @param syncRunner    the runner used for synchronous invocation.
      * @throws NullPointerException     if one of the parameters is null.
      * @throws IllegalArgumentException if at least one of the parameter is invalid.
      */
     @SuppressWarnings("ConstantConditions")
-    protected AbstractRoutine(@Nonnull final RoutineConfiguration configuration,
-            @Nonnull final Runner syncRunner) {
-
-        if (syncRunner == null) {
-
-            throw new NullPointerException("the synchronous runner instance must not be null");
-        }
-
-        if (configuration.getInputOrder(null) == null) {
-
-            throw new NullPointerException("the input order type must not be null");
-        }
-
-        if (configuration.getInputSize(-1) < 1) {
-
-            throw new IllegalArgumentException("the maximum input size must be a positive number");
-        }
-
-        if (configuration.getInputTimeout(null) == null) {
-
-            throw new NullPointerException(
-                    "the timeout for available input buffer must not be null");
-        }
-
-        if (configuration.getOutputOrder(null) == null) {
-
-            throw new NullPointerException("the output order type must not be null");
-        }
-
-        if (configuration.getOutputSize(-1) < 1) {
-
-            throw new IllegalArgumentException("the maximum output size must be a positive number");
-        }
-
-        if (configuration.getOutputTimeout(null) == null) {
-
-            throw new NullPointerException(
-                    "the timeout for available output buffer must not be null");
-        }
+    protected AbstractRoutine(@Nonnull final RoutineConfiguration configuration) {
 
         mConfiguration = configuration;
-        mSyncRunner = syncRunner;
-        mAsyncRunner = configuration.getRunner(null);
-
-        if (mAsyncRunner == null) {
-
-            throw new NullPointerException("the asynchronous runner instance must not be null");
-        }
-
-        mMaxRunning = configuration.getMaxRunning(-1);
-
-        if (mMaxRunning < 1) {
-
-            throw new IllegalArgumentException(
-                    "the maximum number of parallel running invocations must be a positive number");
-        }
-
-        mMaxRetained = configuration.getMaxRetained(-1);
-
-        if (mMaxRetained < 0) {
-
-            throw new IllegalArgumentException(
-                    "the maximum number of retained invocation instances must be 0 or positive");
-        }
-
-        mAvailTimeout = configuration.getAvailTimeout(null);
-
-        if (mAvailTimeout == null) {
-
-            throw new NullPointerException(
-                    "the timeout for available invocation instances must not be null");
-        }
-
-        mLogger = Logger.create(configuration.getLog(null),
-                                configuration.getLogLevel(LogLevel.DEFAULT), this);
+        mSyncRunner = (configuration.getSyncRunnerOr(RunnerType.QUEUED) == RunnerType.QUEUED)
+                ? Runners.queuedRunner() : Runners.sequentialRunner();
+        mAsyncRunner = configuration.getRunnerOr(Runners.sharedRunner());
+        mMaxRunning = configuration.getMaxRunningOr(DEFAULT_MAX_RUNNING);
+        mMaxRetained = configuration.getMaxRetainedOr(DEFAULT_MAX_RETAINED);
+        mAvailTimeout = configuration.getAvailTimeoutOr(DEFAULT_AVAIL_TIMEOUT);
+        mLogger = Logger.createLogger(configuration.getLogOr(Logger.getGlobalLog()),
+                                      configuration.getLogLevelOr(Logger.getGlobalLogLevel()),
+                                      this);
         mLogger.dbg("building routine with configuration: %s", configuration);
     }
 
@@ -174,17 +119,23 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
      *
      * @param configuration the routine configuration.
      * @param syncRunner    the runner used for synchronous invocation.
+     * @param asyncRunner   the runner used for asynchronous invocation.
+     * @param maxRunning    the maximum number of running invocation instances.
+     * @param maxRetained   the maximum number of retained invocation instances.
+     * @param availTimeout  the maximum timeout to wait for available invocation instances.
      * @param logger        the logger instance.
      */
     private AbstractRoutine(@Nonnull final RoutineConfiguration configuration,
-            @Nonnull final Runner syncRunner, @Nonnull final Logger logger) {
+            @Nonnull final Runner syncRunner, @Nonnull final Runner asyncRunner,
+            final int maxRunning, final int maxRetained, @Nonnull final TimeDuration availTimeout,
+            @Nonnull final Logger logger) {
 
         mConfiguration = configuration;
         mSyncRunner = syncRunner;
-        mAsyncRunner = configuration.getRunner(null);
-        mMaxRunning = configuration.getMaxRunning(-1);
-        mMaxRetained = configuration.getMaxRetained(-1);
-        mAvailTimeout = configuration.getAvailTimeout(null);
+        mAsyncRunner = asyncRunner;
+        mMaxRunning = maxRunning;
+        mMaxRetained = maxRetained;
+        mAvailTimeout = availTimeout;
         mLogger = logger;
     }
 
@@ -252,7 +203,9 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
         if (mParallelRoutine == null) {
 
             mParallelRoutine =
-                    new AbstractRoutine<INPUT, OUTPUT>(mConfiguration, mSyncRunner, mLogger) {
+                    new AbstractRoutine<INPUT, OUTPUT>(mConfiguration, mSyncRunner, mAsyncRunner,
+                                                       mMaxRunning, mMaxRetained, mAvailTimeout,
+                                                       mLogger) {
 
                         @Nonnull
                         @Override

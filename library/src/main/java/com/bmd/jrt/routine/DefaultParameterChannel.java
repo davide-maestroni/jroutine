@@ -102,8 +102,8 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
         mLogger = logger.subContextLogger(this);
         mRunner = runner;
-        mMaxInput = configuration.getInputSize(-1);
-        mInputTimeout = configuration.getInputTimeout(null);
+        mMaxInput = configuration.getInputSizeOr(Integer.MAX_VALUE);
+        mInputTimeout = configuration.getInputTimeoutOr(TimeDuration.ZERO);
 
         if (mInputTimeout == null) {
 
@@ -117,8 +117,8 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
             throw new IllegalArgumentException("the input buffer size cannot be 0 or negative");
         }
 
-        mInputQueue = (configuration.getInputOrder(null) == DataOrder.INSERTION)
-                ? new OrderedNestedQueue<INPUT>() : new SimpleNestedQueue<INPUT>();
+        mInputQueue = (configuration.getInputOrderOr(DataOrder.DELIVERY) == DataOrder.DELIVERY)
+                ? new SimpleNestedQueue<INPUT>() : new OrderedNestedQueue<INPUT>();
         mHasInputs = new Check() {
 
             @Override

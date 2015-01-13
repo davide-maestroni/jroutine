@@ -34,7 +34,7 @@ public class RoutineConfigurationBuilder implements RoutineChannelBuilder {
 
     private TimeDuration mAvailTimeout = null;
 
-    private int mInputMaxSize = DEFAULT;
+    private int mInputMaxSize = RoutineConfiguration.DEFAULT;
 
     private DataOrder mInputOrder = DataOrder.DEFAULT;
 
@@ -44,11 +44,11 @@ public class RoutineConfigurationBuilder implements RoutineChannelBuilder {
 
     private LogLevel mLogLevel = LogLevel.DEFAULT;
 
-    private int mMaxRetained = DEFAULT;
+    private int mMaxRetained = RoutineConfiguration.DEFAULT;
 
-    private int mMaxRunning = DEFAULT;
+    private int mMaxRunning = RoutineConfiguration.DEFAULT;
 
-    private int mOutputMaxSize = DEFAULT;
+    private int mOutputMaxSize = RoutineConfiguration.DEFAULT;
 
     private DataOrder mOutputOrder = DataOrder.DEFAULT;
 
@@ -73,110 +73,110 @@ public class RoutineConfigurationBuilder implements RoutineChannelBuilder {
      */
     public RoutineConfigurationBuilder(@Nonnull final RoutineConfiguration initialConfiguration) {
 
-        mRunner = initialConfiguration.getRunner(mRunner);
-        mRunnerType = initialConfiguration.getSyncRunner(mRunnerType);
-        mMaxRunning = initialConfiguration.getMaxRunning(mMaxRunning);
-        mMaxRetained = initialConfiguration.getMaxRetained(mMaxRetained);
-        mAvailTimeout = initialConfiguration.getAvailTimeout(mAvailTimeout);
-        mInputOrder = initialConfiguration.getInputOrder(mInputOrder);
-        mInputMaxSize = initialConfiguration.getInputSize(mInputMaxSize);
-        mInputTimeout = initialConfiguration.getInputTimeout(mInputTimeout);
-        mOutputOrder = initialConfiguration.getOutputOrder(mOutputOrder);
-        mOutputMaxSize = initialConfiguration.getOutputSize(mOutputMaxSize);
-        mOutputTimeout = initialConfiguration.getOutputTimeout(mOutputTimeout);
-        mLog = initialConfiguration.getLog(mLog);
-        mLogLevel = initialConfiguration.getLogLevel(mLogLevel);
+        mRunner = initialConfiguration.getRunnerOr(mRunner);
+        mRunnerType = initialConfiguration.getSyncRunnerOr(mRunnerType);
+        mMaxRunning = initialConfiguration.getMaxRunningOr(mMaxRunning);
+        mMaxRetained = initialConfiguration.getMaxRetainedOr(mMaxRetained);
+        mAvailTimeout = initialConfiguration.getAvailTimeoutOr(mAvailTimeout);
+        mInputOrder = initialConfiguration.getInputOrderOr(mInputOrder);
+        mInputMaxSize = initialConfiguration.getInputSizeOr(mInputMaxSize);
+        mInputTimeout = initialConfiguration.getInputTimeoutOr(mInputTimeout);
+        mOutputOrder = initialConfiguration.getOutputOrderOr(mOutputOrder);
+        mOutputMaxSize = initialConfiguration.getOutputSizeOr(mOutputMaxSize);
+        mOutputTimeout = initialConfiguration.getOutputTimeoutOr(mOutputTimeout);
+        mLog = initialConfiguration.getLogOr(mLog);
+        mLogLevel = initialConfiguration.getLogLevelOr(mLogLevel);
     }
 
     @Nonnull
     @Override
     public RoutineConfigurationBuilder apply(@Nonnull final RoutineConfiguration configuration) {
 
-        final Runner runner = configuration.getRunner(null);
+        final Runner runner = configuration.getRunnerOr(null);
 
         if (runner != null) {
 
             runBy(runner);
         }
 
-        final RunnerType syncRunner = configuration.getSyncRunner(RunnerType.DEFAULT);
+        final RunnerType syncRunner = configuration.getSyncRunnerOr(RunnerType.DEFAULT);
 
         if (syncRunner != RunnerType.DEFAULT) {
 
             syncRunner(syncRunner);
         }
 
-        final int maxRunning = configuration.getMaxRunning(DEFAULT);
+        final int maxRunning = configuration.getMaxRunningOr(RoutineConfiguration.DEFAULT);
 
-        if (maxRunning != DEFAULT) {
+        if (maxRunning != RoutineConfiguration.DEFAULT) {
 
             maxRunning(maxRunning);
         }
 
-        final int maxRetained = configuration.getMaxRetained(DEFAULT);
+        final int maxRetained = configuration.getMaxRetainedOr(RoutineConfiguration.DEFAULT);
 
-        if (maxRetained != DEFAULT) {
+        if (maxRetained != RoutineConfiguration.DEFAULT) {
 
             maxRetained(maxRetained);
         }
 
-        final TimeDuration availTimeout = configuration.getAvailTimeout(null);
+        final TimeDuration availTimeout = configuration.getAvailTimeoutOr(null);
 
         if (availTimeout != null) {
 
             availableTimeout(availTimeout);
         }
 
-        final DataOrder inputOrder = configuration.getInputOrder(DataOrder.DEFAULT);
+        final DataOrder inputOrder = configuration.getInputOrderOr(DataOrder.DEFAULT);
 
         if (inputOrder != DataOrder.DEFAULT) {
 
             inputOrder(inputOrder);
         }
 
-        final int inputSize = configuration.getInputSize(DEFAULT);
+        final int inputSize = configuration.getInputSizeOr(RoutineConfiguration.DEFAULT);
 
-        if (inputSize != DEFAULT) {
+        if (inputSize != RoutineConfiguration.DEFAULT) {
 
             inputSize(inputSize);
         }
 
-        final TimeDuration inputTimeout = configuration.getInputTimeout(null);
+        final TimeDuration inputTimeout = configuration.getInputTimeoutOr(null);
 
         if (inputTimeout != null) {
 
             inputTimeout(inputTimeout);
         }
 
-        final DataOrder outputOrder = configuration.getOutputOrder(DataOrder.DEFAULT);
+        final DataOrder outputOrder = configuration.getOutputOrderOr(DataOrder.DEFAULT);
 
         if (outputOrder != DataOrder.DEFAULT) {
 
             outputOrder(outputOrder);
         }
 
-        final int outputSize = configuration.getOutputSize(DEFAULT);
+        final int outputSize = configuration.getOutputSizeOr(RoutineConfiguration.DEFAULT);
 
-        if (outputSize != DEFAULT) {
+        if (outputSize != RoutineConfiguration.DEFAULT) {
 
             outputSize(outputSize);
         }
 
-        final TimeDuration outputTimeout = configuration.getOutputTimeout(null);
+        final TimeDuration outputTimeout = configuration.getOutputTimeoutOr(null);
 
         if (outputTimeout != null) {
 
             outputTimeout(outputTimeout);
         }
 
-        final Log log = configuration.getLog(null);
+        final Log log = configuration.getLogOr(null);
 
         if (log != null) {
 
             loggedWith(log);
         }
 
-        final LogLevel logLevel = configuration.getLogLevel(LogLevel.DEFAULT);
+        final LogLevel logLevel = configuration.getLogLevelOr(LogLevel.DEFAULT);
 
         if (logLevel != LogLevel.DEFAULT) {
 
@@ -228,7 +228,7 @@ public class RoutineConfigurationBuilder implements RoutineChannelBuilder {
     @Override
     public RoutineConfigurationBuilder maxRetained(final int maxRetainedInstances) {
 
-        if ((maxRetainedInstances != DEFAULT) && (maxRetainedInstances < 0)) {
+        if ((maxRetainedInstances != RoutineConfiguration.DEFAULT) && (maxRetainedInstances < 0)) {
 
             throw new IllegalArgumentException(
                     "the maximum number of retained instances cannot be negative");
@@ -242,7 +242,7 @@ public class RoutineConfigurationBuilder implements RoutineChannelBuilder {
     @Override
     public RoutineConfigurationBuilder maxRunning(final int maxRunningInstances) {
 
-        if ((maxRunningInstances != DEFAULT) && (maxRunningInstances < 1)) {
+        if ((maxRunningInstances != RoutineConfiguration.DEFAULT) && (maxRunningInstances < 1)) {
 
             throw new IllegalArgumentException(
                     "the maximum number of concurrently running instances cannot be less than 1");
@@ -292,9 +292,9 @@ public class RoutineConfigurationBuilder implements RoutineChannelBuilder {
     @Override
     public RoutineConfigurationBuilder inputSize(final int inputMaxSize) {
 
-        if ((inputMaxSize != DEFAULT) && (inputMaxSize <= 0)) {
+        if ((inputMaxSize != RoutineConfiguration.DEFAULT) && (inputMaxSize <= 0)) {
 
-            throw new IllegalArgumentException("the buffer size cannot be 0 or negative");
+            throw new IllegalArgumentException("the input buffer size cannot be 0 or negative");
         }
 
         mInputMaxSize = inputMaxSize;
@@ -335,9 +335,9 @@ public class RoutineConfigurationBuilder implements RoutineChannelBuilder {
     @Override
     public RoutineConfigurationBuilder outputSize(final int outputMaxSize) {
 
-        if ((outputMaxSize != DEFAULT) && (outputMaxSize <= 0)) {
+        if ((outputMaxSize != RoutineConfiguration.DEFAULT) && (outputMaxSize <= 0)) {
 
-            throw new IllegalArgumentException("the buffer size cannot be 0 or negative");
+            throw new IllegalArgumentException("the output buffer size cannot be 0 or negative");
         }
 
         mOutputMaxSize = outputMaxSize;

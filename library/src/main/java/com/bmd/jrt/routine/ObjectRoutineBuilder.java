@@ -16,9 +16,9 @@ package com.bmd.jrt.routine;
 import com.bmd.jrt.annotation.Async;
 import com.bmd.jrt.annotation.AsyncType;
 import com.bmd.jrt.annotation.ParallelType;
-import com.bmd.jrt.builder.DefaultConfigurationBuilder;
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
 import com.bmd.jrt.builder.RoutineConfiguration;
+import com.bmd.jrt.builder.RoutineConfigurationBuilder;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ParameterChannel;
 import com.bmd.jrt.common.CacheHashMap;
@@ -732,7 +732,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                 final ParamType paramType) {
 
             String lockName = mLockName;
-            final DefaultConfigurationBuilder builder = new DefaultConfigurationBuilder();
+            final RoutineConfigurationBuilder builder = new RoutineConfigurationBuilder();
 
             final Async classAnnotation = mItf.getAnnotation(Async.class);
 

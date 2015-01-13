@@ -13,9 +13,9 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.builder.DefaultConfigurationBuilder;
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
 import com.bmd.jrt.builder.RoutineConfiguration;
+import com.bmd.jrt.builder.RoutineConfigurationBuilder;
 import com.bmd.jrt.channel.IOChannel;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
@@ -33,14 +33,14 @@ import javax.annotation.Nonnull;
  */
 public class IOChannelBuilder {
 
-    private final DefaultConfigurationBuilder mBuilder;
+    private final RoutineConfigurationBuilder mBuilder;
 
     /**
      * Avoid direct instantiation.
      */
     IOChannelBuilder() {
 
-        mBuilder = new DefaultConfigurationBuilder();
+        mBuilder = new RoutineConfigurationBuilder();
     }
 
     /**
@@ -156,7 +156,8 @@ public class IOChannelBuilder {
 
     /**
      * Sets the maximum number of data that the channel can retain before they are consumed. A
-     * DEFAULT value means that it is up to the framework to chose a default.
+     * {@link RoutineConfiguration#DEFAULT} value means that it is up to the framework to chose a
+     * default size.
      *
      * @param maxBufferSize the maximum size.
      * @return this builder.

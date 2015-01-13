@@ -16,7 +16,6 @@ package com.bmd.jrt.routine;
 import com.bmd.jrt.annotation.Async;
 import com.bmd.jrt.annotation.DefaultLog;
 import com.bmd.jrt.annotation.DefaultRunner;
-import com.bmd.jrt.builder.DefaultConfigurationBuilder;
 import com.bmd.jrt.builder.RoutineBuilder;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.builder.RoutineConfigurationBuilder;
@@ -28,7 +27,6 @@ import com.bmd.jrt.invocation.SimpleInvocation;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.runner.Runner;
-import com.bmd.jrt.runner.Runners;
 import com.bmd.jrt.time.TimeDuration;
 
 import java.lang.ref.WeakReference;
@@ -174,7 +172,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
         final long availTimeout = annotation.availTimeout();
 
-        if (availTimeout != DEFAULT) {
+        if (availTimeout != RoutineConfiguration.DEFAULT) {
 
             builder.availableTimeout(fromUnit(availTimeout, annotation.availTimeUnit()));
         }
@@ -489,11 +487,9 @@ public class ClassRoutineBuilder implements RoutineBuilder {
                 }
             }
 
-            final Runner syncRunner = (configuration.getSyncRunner(null) == RunnerType.SEQUENTIAL)
-                    ? Runners.sequentialRunner() : Runners.queuedRunner();
-            routine = new DefaultRoutine<Object, Object>(configuration, syncRunner,
-                                                         MethodSimpleInvocation.class,
-                                                         mTargetReference, mTarget, method, mutex);
+            routine =
+                    new DefaultRoutine<Object, Object>(configuration, MethodSimpleInvocation.class,
+                                                       mTargetReference, mTarget, method, mutex);
             routineMap.put(routineInfo, routine);
         }
 
@@ -553,7 +549,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
             @Nonnull final Class<?> targetClass, @Nonnull final Method targetMethod) {
 
         String methodLockName = lockName;
-        final DefaultConfigurationBuilder builder = new DefaultConfigurationBuilder();
+        final RoutineConfigurationBuilder builder = new RoutineConfigurationBuilder();
 
         final Async classAnnotation = targetClass.getAnnotation(Async.class);
 

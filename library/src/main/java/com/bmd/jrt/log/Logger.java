@@ -84,52 +84,52 @@ public class Logger {
      * @throws NullPointerException if any of the parameters is null.
      */
     @Nonnull
-    public static Logger create(@Nullable final Log log, @Nonnull final LogLevel level,
+    public static Logger createLogger(@Nullable final Log log, @Nonnull final LogLevel level,
             @Nonnull final Object... contexts) {
 
         return new Logger(contexts, log, level);
     }
 
     /**
-     * Gets the default log instance.
+     * Gets the global log instance.
      *
      * @return the log instance.
      */
     @Nonnull
-    public static Log getDefaultLog() {
+    public static Log getGlobalLog() {
 
         return sLog.get();
     }
 
     /**
-     * Sets the default log instance.
+     * Sets the global log instance.
      *
      * @param log the log instance.
      */
-    public static void setDefaultLog(@Nullable final Log log) {
+    public static void setGlobalLog(@Nullable final Log log) {
 
         sLog.set((log == null) ? DEFAULT_LOG : log);
     }
 
     /**
-     * Gets the default log level.
+     * Gets the global log level.
      *
      * @return the log level.
      */
     @Nonnull
-    public static LogLevel getDefaultLogLevel() {
+    public static LogLevel getGlobalLogLevel() {
 
         return sLogLevel.get();
     }
 
     /**
-     * Sets the default log level.
+     * Sets the global log level.
      *
      * @param level the log level.
      * @throws NullPointerException if the specified level is null.
      */
     @SuppressWarnings("ConstantConditions")
-    public static void setDefaultLogLevel(@Nonnull final LogLevel level) {
+    public static void setGlobalLogLevel(@Nonnull final LogLevel level) {
 
         if (level == null) {
 

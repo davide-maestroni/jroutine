@@ -13,15 +13,14 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.builder.DefaultConfigurationBuilder;
 import com.bmd.jrt.builder.RoutineChannelBuilder;
 import com.bmd.jrt.builder.RoutineConfiguration;
+import com.bmd.jrt.builder.RoutineConfigurationBuilder;
 import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.invocation.Invocation;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.runner.Runner;
-import com.bmd.jrt.runner.Runners;
 import com.bmd.jrt.time.TimeDuration;
 
 import java.util.concurrent.TimeUnit;
@@ -41,7 +40,7 @@ import static com.bmd.jrt.common.Reflection.NO_ARGS;
  */
 public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineChannelBuilder {
 
-    private final DefaultConfigurationBuilder mBuilder;
+    private final RoutineConfigurationBuilder mBuilder;
 
     private final Class<? extends Invocation<INPUT, OUTPUT>> mInvocationClass;
 
@@ -57,7 +56,7 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineChannelBu
             @Nonnull final ClassToken<? extends Invocation<INPUT, OUTPUT>> classToken) {
 
         mInvocationClass = classToken.getRawClass();
-        mBuilder = new DefaultConfigurationBuilder();
+        mBuilder = new RoutineConfigurationBuilder();
     }
 
     @Nonnull
@@ -211,10 +210,7 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineChannelBu
     @Nonnull
     public Routine<INPUT, OUTPUT> buildRoutine() {
 
-        final RoutineConfiguration configuration = mBuilder.buildConfiguration();
-        final Runner syncRunner = (configuration.getSyncRunner(null) == RunnerType.SEQUENTIAL)
-                ? Runners.sequentialRunner() : Runners.queuedRunner();
-        return new DefaultRoutine<INPUT, OUTPUT>(configuration, syncRunner, mInvocationClass,
+        return new DefaultRoutine<INPUT, OUTPUT>(mBuilder.buildConfiguration(), mInvocationClass,
                                                  mArgs);
     }
 

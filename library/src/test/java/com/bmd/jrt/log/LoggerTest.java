@@ -44,26 +44,26 @@ public class LoggerTest extends TestCase {
 
     public void testDefault() {
 
-        final Log defaultLog = Logger.getDefaultLog();
-        Logger.setDefaultLog(null);
-        assertThat(Logger.getDefaultLog()).isEqualTo(defaultLog);
+        final Log defaultLog = Logger.getGlobalLog();
+        Logger.setGlobalLog(null);
+        assertThat(Logger.getGlobalLog()).isEqualTo(defaultLog);
 
         final NullLog log = Logs.nullLog();
-        Logger.setDefaultLog(log);
-        assertThat(Logger.getDefaultLog()).isEqualTo(log);
+        Logger.setGlobalLog(log);
+        assertThat(Logger.getGlobalLog()).isEqualTo(log);
 
-        final LogLevel defaultLogLevel = Logger.getDefaultLogLevel();
-        Logger.setDefaultLogLevel(LogLevel.DEFAULT);
-        assertThat(Logger.getDefaultLogLevel()).isEqualTo(defaultLogLevel);
+        final LogLevel defaultLogLevel = Logger.getGlobalLogLevel();
+        Logger.setGlobalLogLevel(LogLevel.DEFAULT);
+        assertThat(Logger.getGlobalLogLevel()).isEqualTo(defaultLogLevel);
 
-        Logger.setDefaultLogLevel(LogLevel.SILENT);
-        assertThat(Logger.getDefaultLogLevel()).isEqualTo(LogLevel.SILENT);
+        Logger.setGlobalLogLevel(LogLevel.SILENT);
+        assertThat(Logger.getGlobalLogLevel()).isEqualTo(LogLevel.SILENT);
 
-        Logger logger = Logger.create(null, LogLevel.DEBUG);
+        Logger logger = Logger.createLogger(null, LogLevel.DEBUG);
         assertThat(logger.getLog()).isEqualTo(defaultLog);
         assertThat(logger.getLogLevel()).isEqualTo(LogLevel.DEBUG);
 
-        logger = Logger.create(log, LogLevel.DEFAULT);
+        logger = Logger.createLogger(log, LogLevel.DEFAULT);
         assertThat(logger.getLog()).isEqualTo(log);
         assertThat(logger.getLogLevel()).isEqualTo(defaultLogLevel);
     }
@@ -73,7 +73,7 @@ public class LoggerTest extends TestCase {
 
         try {
 
-            Logger.create(new NullLog(), null);
+            Logger.createLogger(new NullLog(), null);
 
             fail();
 
@@ -83,7 +83,7 @@ public class LoggerTest extends TestCase {
 
         try {
 
-            Logger.create(new NullLog(), LogLevel.DEBUG, (Object[]) null);
+            Logger.createLogger(new NullLog(), LogLevel.DEBUG, (Object[]) null);
 
             fail();
 
@@ -91,11 +91,11 @@ public class LoggerTest extends TestCase {
 
         }
 
-        assertThat(Logger.getDefaultLog()).isNotNull();
+        assertThat(Logger.getGlobalLog()).isNotNull();
 
         try {
 
-            Logger.setDefaultLogLevel(null);
+            Logger.setGlobalLogLevel(null);
 
             fail();
 
@@ -103,16 +103,16 @@ public class LoggerTest extends TestCase {
 
         }
 
-        assertThat(Logger.getDefaultLogLevel()).isNotNull();
+        assertThat(Logger.getGlobalLogLevel()).isNotNull();
 
-        Logger.create(new NullLog(), LogLevel.DEBUG).err((Throwable) null);
+        Logger.createLogger(new NullLog(), LogLevel.DEBUG).err((Throwable) null);
     }
 
     public void testLoggerDebug() {
 
         final NullPointerException ex = new NullPointerException();
         final TestLog log = new TestLog();
-        final Logger logger = Logger.create(log, LogLevel.DEBUG);
+        final Logger logger = Logger.createLogger(log, LogLevel.DEBUG);
 
         assertThat(logger.getLog()).isEqualTo(log);
         assertThat(logger.getLogLevel()).isEqualTo(LogLevel.DEBUG);
@@ -292,7 +292,7 @@ public class LoggerTest extends TestCase {
 
         final NullPointerException ex = new NullPointerException();
         final TestLog log = new TestLog();
-        final Logger logger = Logger.create(log, LogLevel.ERROR);
+        final Logger logger = Logger.createLogger(log, LogLevel.ERROR);
 
         assertThat(logger.getLog()).isEqualTo(log);
         assertThat(logger.getLogLevel()).isEqualTo(LogLevel.ERROR);
@@ -464,7 +464,7 @@ public class LoggerTest extends TestCase {
 
         final NullPointerException ex = new NullPointerException();
         final TestLog log = new TestLog();
-        final Logger logger = Logger.create(log, LogLevel.SILENT);
+        final Logger logger = Logger.createLogger(log, LogLevel.SILENT);
 
         assertThat(logger.getLog()).isEqualTo(log);
         assertThat(logger.getLogLevel()).isEqualTo(LogLevel.SILENT);
@@ -632,7 +632,7 @@ public class LoggerTest extends TestCase {
 
         final NullPointerException ex = new NullPointerException();
         final TestLog log = new TestLog();
-        final Logger logger = Logger.create(log, LogLevel.WARNING);
+        final Logger logger = Logger.createLogger(log, LogLevel.WARNING);
 
         assertThat(logger.getLog()).isEqualTo(log);
         assertThat(logger.getLogLevel()).isEqualTo(LogLevel.WARNING);
@@ -807,7 +807,7 @@ public class LoggerTest extends TestCase {
     public void testSubContext() {
 
         final TestLog log = new TestLog();
-        final Logger logger = Logger.create(log, LogLevel.WARNING, "ctx1");
+        final Logger logger = Logger.createLogger(log, LogLevel.WARNING, "ctx1");
         final Logger subLogger = logger.subContextLogger("ctx2");
 
         assertThat(logger.getContextList()).containsExactly("ctx1");

@@ -23,8 +23,6 @@ import com.bmd.jrt.time.TimeDuration;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static com.bmd.jrt.builder.RoutineBuilder.DEFAULT;
-
 /**
  * Class storing the routine configuration.
  * <p/>
@@ -34,6 +32,11 @@ import static com.bmd.jrt.builder.RoutineBuilder.DEFAULT;
  * Created by davide on 11/15/14.
  */
 public class RoutineConfiguration {
+
+    /**
+     * Constant indicating the default value of an integer attribute.
+     */
+    public static final int DEFAULT = Integer.MIN_VALUE;
 
     private final TimeDuration mAvailTimeout;
 
@@ -90,6 +93,48 @@ public class RoutineConfiguration {
             @Nullable final TimeDuration outputTimeout, @Nonnull final DataOrder outputOrder,
             @Nullable final Log log, @Nonnull final LogLevel logLevel) {
 
+        if (runnerType == null) {
+
+            throw new NullPointerException("the synchronous runner type must not be null");
+        }
+
+        if ((maxRunning != DEFAULT) && (maxRunning < 1)) {
+
+            throw new IllegalArgumentException(
+                    "the maximum number of concurrently running instances cannot be less than 1");
+        }
+
+        if ((maxRetained != DEFAULT) && (maxRetained < 0)) {
+
+            throw new IllegalArgumentException(
+                    "the maximum number of retained instances cannot be negative");
+        }
+
+        if ((inputMaxSize != DEFAULT) && (inputMaxSize <= 0)) {
+
+            throw new IllegalArgumentException("the input buffer size cannot be 0 or negative");
+        }
+
+        if (inputOrder == null) {
+
+            throw new NullPointerException("the input order type must not be null");
+        }
+
+        if ((outputMaxSize != DEFAULT) && (outputMaxSize <= 0)) {
+
+            throw new IllegalArgumentException("the output buffer size cannot be 0 or negative");
+        }
+
+        if (outputOrder == null) {
+
+            throw new NullPointerException("the output order type must not be null");
+        }
+
+        if (logLevel == null) {
+
+            throw new NullPointerException("the log level must not be null");
+        }
+
         mRunner = runner;
         mRunnerType = runnerType;
         mMaxRunning = maxRunning;
@@ -112,7 +157,7 @@ public class RoutineConfiguration {
      * @param valueIfNotSet the default value if none was set.
      * @return the timeout.
      */
-    public TimeDuration getAvailTimeout(final TimeDuration valueIfNotSet) {
+    public TimeDuration getAvailTimeoutOr(final TimeDuration valueIfNotSet) {
 
         final TimeDuration availTimeout = mAvailTimeout;
         return (availTimeout != null) ? availTimeout : valueIfNotSet;
@@ -124,7 +169,7 @@ public class RoutineConfiguration {
      * @param valueIfNotSet the default value if none was set.
      * @return the order type.
      */
-    public DataOrder getInputOrder(final DataOrder valueIfNotSet) {
+    public DataOrder getInputOrderOr(final DataOrder valueIfNotSet) {
 
         final DataOrder orderedInput = mInputOrder;
         return (orderedInput != DataOrder.DEFAULT) ? orderedInput : valueIfNotSet;
@@ -136,7 +181,7 @@ public class RoutineConfiguration {
      * @param valueIfNotSet the default value if none was set.
      * @return the maximum size.
      */
-    public int getInputSize(final int valueIfNotSet) {
+    public int getInputSizeOr(final int valueIfNotSet) {
 
         final int inputMaxSize = mInputMaxSize;
         return (inputMaxSize != DEFAULT) ? inputMaxSize : valueIfNotSet;
@@ -149,22 +194,10 @@ public class RoutineConfiguration {
      * @param valueIfNotSet the default value if none was set.
      * @return the timeout.
      */
-    public TimeDuration getInputTimeout(final TimeDuration valueIfNotSet) {
+    public TimeDuration getInputTimeoutOr(final TimeDuration valueIfNotSet) {
 
         final TimeDuration inputTimeout = mInputTimeout;
         return (inputTimeout != null) ? inputTimeout : valueIfNotSet;
-    }
-
-    /**
-     * Returns the log instance (null by default).
-     *
-     * @param valueIfNotSet the default value if none was set.
-     * @return the log instance.
-     */
-    public Log getLog(final Log valueIfNotSet) {
-
-        final Log log = mLog;
-        return (log != null) ? log : valueIfNotSet;
     }
 
     /**
@@ -173,10 +206,22 @@ public class RoutineConfiguration {
      * @param valueIfNotSet the default value if none was set.
      * @return the log level.
      */
-    public LogLevel getLogLevel(final LogLevel valueIfNotSet) {
+    public LogLevel getLogLevelOr(final LogLevel valueIfNotSet) {
 
         final LogLevel logLevel = mLogLevel;
         return (logLevel != LogLevel.DEFAULT) ? logLevel : valueIfNotSet;
+    }
+
+    /**
+     * Returns the log instance (null by default).
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the log instance.
+     */
+    public Log getLogOr(final Log valueIfNotSet) {
+
+        final Log log = mLog;
+        return (log != null) ? log : valueIfNotSet;
     }
 
     /**
@@ -185,7 +230,7 @@ public class RoutineConfiguration {
      * @param valueIfNotSet the default value if none was set.
      * @return the maximum number.
      */
-    public int getMaxRetained(final int valueIfNotSet) {
+    public int getMaxRetainedOr(final int valueIfNotSet) {
 
         final int maxRetained = mMaxRetained;
         return (maxRetained != DEFAULT) ? maxRetained : valueIfNotSet;
@@ -197,7 +242,7 @@ public class RoutineConfiguration {
      * @param valueIfNotSet the default value if none was set.
      * @return the maximum number.
      */
-    public int getMaxRunning(final int valueIfNotSet) {
+    public int getMaxRunningOr(final int valueIfNotSet) {
 
         final int maxRunning = mMaxRunning;
         return (maxRunning != DEFAULT) ? maxRunning : valueIfNotSet;
@@ -209,7 +254,7 @@ public class RoutineConfiguration {
      * @param valueIfNotSet the default value if none was set.
      * @return the order type.
      */
-    public DataOrder getOutputOrder(final DataOrder valueIfNotSet) {
+    public DataOrder getOutputOrderOr(final DataOrder valueIfNotSet) {
 
         final DataOrder orderedOutput = mOutputOrder;
         return (orderedOutput != DataOrder.DEFAULT) ? orderedOutput : valueIfNotSet;
@@ -221,7 +266,7 @@ public class RoutineConfiguration {
      * @param valueIfNotSet the default value if none was set.
      * @return the maximum size.
      */
-    public int getOutputSize(final int valueIfNotSet) {
+    public int getOutputSizeOr(final int valueIfNotSet) {
 
         final int outputMaxSize = mOutputMaxSize;
         return (outputMaxSize != DEFAULT) ? outputMaxSize : valueIfNotSet;
@@ -234,7 +279,7 @@ public class RoutineConfiguration {
      * @param valueIfNotSet the default value if none was set.
      * @return the timeout.
      */
-    public TimeDuration getOutputTimeout(final TimeDuration valueIfNotSet) {
+    public TimeDuration getOutputTimeoutOr(final TimeDuration valueIfNotSet) {
 
         final TimeDuration outputTimeout = mOutputTimeout;
         return (outputTimeout != null) ? outputTimeout : valueIfNotSet;
@@ -246,7 +291,7 @@ public class RoutineConfiguration {
      * @param valueIfNotSet the default value if none was set.
      * @return the runner instance.
      */
-    public Runner getRunner(final Runner valueIfNotSet) {
+    public Runner getRunnerOr(final Runner valueIfNotSet) {
 
         final Runner runner = mRunner;
         return (runner != null) ? runner : valueIfNotSet;
@@ -258,7 +303,7 @@ public class RoutineConfiguration {
      * @param valueIfNotSet the default value if none was set.
      * @return the runner type.
      */
-    public RunnerType getSyncRunner(final RunnerType valueIfNotSet) {
+    public RunnerType getSyncRunnerOr(final RunnerType valueIfNotSet) {
 
         final RunnerType runnerType = mRunnerType;
         return (runnerType != RunnerType.DEFAULT) ? runnerType : valueIfNotSet;

@@ -49,7 +49,7 @@ import static com.bmd.jrt.common.Reflection.findConstructor;
 @TargetApi(VERSION_CODES.HONEYCOMB)
 class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> implements AndroidRoutineBuilder<INPUT, OUTPUT> {
 
-    private final RoutineConfigurationBuilder mBuilder;
+    private final RoutineConfigurationBuilder mBuilder = new RoutineConfigurationBuilder();
 
     private final Constructor<? extends AndroidInvocation<INPUT, OUTPUT>> mConstructor;
 
@@ -87,13 +87,18 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> implements AndroidRoutineBuild
         this((Object) fragment, classToken);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param context    the context instance.
+     * @param classToken the invocation class token.
+     * @throws NullPointerException if the class token is null.
+     */
     private DefaultAndroidRoutineBuilder(@Nonnull final Object context,
             @Nonnull final ClassToken<? extends AndroidInvocation<INPUT, OUTPUT>> classToken) {
 
         mContext = new WeakReference<Object>(context);
         mConstructor = findConstructor(classToken.getRawClass());
-        mBuilder = new RoutineConfigurationBuilder().runBy(Runners.mainRunner())
-                                                    .inputOrder(DataOrder.INSERTION);
     }
 
     @Nonnull
@@ -109,7 +114,8 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> implements AndroidRoutineBuild
     @Override
     public Routine<INPUT, OUTPUT> buildRoutine() {
 
-        final RoutineConfiguration configuration = mBuilder.buildConfiguration();
+        final RoutineConfiguration configuration =
+                mBuilder.runBy(Runners.mainRunner()).buildConfiguration();
         final ClashResolution resolution =
                 (mClashResolution == ClashResolution.DEFAULT) ? ClashResolution.RESTART_ON_INPUT
                         : mClashResolution;

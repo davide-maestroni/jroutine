@@ -43,6 +43,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import static com.bmd.jrt.common.Reflection.boxingClass;
+import static com.bmd.jrt.common.Reflection.findConstructor;
 
 /**
  * Class implementing a builder of routines wrapping an object instance.
@@ -273,117 +274,6 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     }
 
     /**
-     * Returns an object enabling asynchronous calls to the target instance methods.
-     * <p/>
-     * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link Async}, {@link AsyncType} and {@link ParallelType} annotations.<br/>
-     * The wrapping object is created through code generation based on the interfaces annotated
-     * with {@link com.bmd.jrt.annotation.AsyncClass}.<br/>
-     * Note that, you'll need to enable annotation pre-processing by adding the processor package
-     * to the specific project dependencies.
-     *
-     * @param itf     the interface implemented by the return object.
-     * @param <CLASS> the interface type.
-     * @return the wrapping object.
-     * @throws NullPointerException     if the specified class is null.
-     * @throws IllegalArgumentException if the specified class does not represent an interface.
-     */
-    @Nonnull
-    public <CLASS> CLASS buildClass(@Nonnull final Class<CLASS> itf) {
-
-        if (!itf.isInterface()) {
-
-            throw new IllegalArgumentException(
-                    "the specified class is not an interface: " + itf.getCanonicalName());
-        }
-
-        synchronized (sClassMap) {
-
-            final WeakReference<?> targetReference = getTargetReference();
-            final Object target = (targetReference != null) ? targetReference.get() : getTarget();
-
-            if (target == null) {
-
-                throw new IllegalStateException("target object has been destroyed");
-            }
-
-            final Class<?> targetClass = getTargetClass();
-            final CacheHashMap<Object, HashMap<ClassInfo, Object>> classMap = sClassMap;
-
-            HashMap<ClassInfo, Object> classes = classMap.get(target);
-
-            if (classes == null) {
-
-                classes = new HashMap<ClassInfo, Object>();
-                classMap.put(target, classes);
-            }
-
-            final String lockName = getLockName();
-            final String classLockName = (lockName != null) ? lockName : Async.DEFAULT_NAME;
-            final RoutineConfiguration configuration = getBuilder().buildConfiguration();
-            final ClassInfo classInfo = new ClassInfo(configuration, itf, classLockName);
-
-            Object instance = classes.get(classInfo);
-
-            if (instance != null) {
-
-                return itf.cast(instance);
-            }
-
-            try {
-
-                final Package classPackage = itf.getPackage();
-                final String className =
-                        ((classPackage != null) ? classPackage.getName() + "." : "")
-                                + itf.getSimpleName() + "$" + targetClass.getSimpleName();
-                final Class<?> wrapperClass = Class.forName(className);
-                final Constructor<?> constructor =
-                        wrapperClass.getConstructor(targetClass, CacheHashMap.class, String.class,
-                                                    RoutineConfiguration.class);
-
-                synchronized (sMutexCache) {
-
-                    instance = constructor.newInstance(target, sMutexCache, classLockName,
-                                                       configuration);
-                }
-
-                classes.put(classInfo, instance);
-                return itf.cast(instance);
-
-            } catch (final InstantiationException e) {
-
-                throw new IllegalArgumentException(e.getCause());
-
-            } catch (final Throwable t) {
-
-                throw new IllegalArgumentException(t);
-            }
-        }
-    }
-
-    /**
-     * Returns an object enabling asynchronous calls to the target instance methods.
-     * <p/>
-     * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link Async}, {@link AsyncType} and {@link ParallelType} annotations.<br/>
-     * The wrapping object is created through code generation based on the interfaces annotated
-     * with {@link com.bmd.jrt.annotation.AsyncClass}.<br/>
-     * Note that, you'll need to enable annotation pre-processing by adding the processor package
-     * to the specific project dependencies.
-     *
-     * @param itf     the token of the interface implemented by the return object.
-     * @param <CLASS> the interface type.
-     * @return the wrapping object.
-     * @throws NullPointerException     if the specified class is null.
-     * @throws IllegalArgumentException if the specified class does not represent an interface.
-     */
-    @Nonnull
-    public <CLASS> CLASS buildClass(@Nonnull final ClassToken<CLASS> itf) {
-
-        return itf.cast(buildClass(itf.getRawClass()));
-    }
-
-    /**
      * Returns a proxy object enabling asynchronous calls to the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
@@ -446,6 +336,114 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     public <CLASS> CLASS buildProxy(@Nonnull final ClassToken<CLASS> itf) {
 
         return itf.cast(buildProxy(itf.getRawClass()));
+    }
+
+    /**
+     * Returns a wrapper object enabling asynchronous calls to the target instance methods.
+     * <p/>
+     * The routines used for calling the methods will honor the attributes specified in any
+     * optional {@link Async}, {@link AsyncType} and {@link ParallelType} annotations.<br/>
+     * The wrapping object is created through code generation based on the interfaces annotated
+     * with {@link com.bmd.jrt.annotation.AsyncWrap}.<br/>
+     * Note that, you'll need to enable annotation pre-processing by adding the processor package
+     * to the specific project dependencies.
+     *
+     * @param itf     the interface implemented by the return object.
+     * @param <CLASS> the interface type.
+     * @return the wrapping object.
+     * @throws NullPointerException     if the specified class is null.
+     * @throws IllegalArgumentException if the specified class does not represent an interface.
+     */
+    @Nonnull
+    public <CLASS> CLASS buildWrapper(@Nonnull final Class<CLASS> itf) {
+
+        if (!itf.isInterface()) {
+
+            throw new IllegalArgumentException(
+                    "the specified class is not an interface: " + itf.getCanonicalName());
+        }
+
+        synchronized (sClassMap) {
+
+            final WeakReference<?> targetReference = getTargetReference();
+            final Object target = (targetReference != null) ? targetReference.get() : getTarget();
+
+            if (target == null) {
+
+                throw new IllegalStateException("target object has been destroyed");
+            }
+
+            final CacheHashMap<Object, HashMap<ClassInfo, Object>> classMap = sClassMap;
+            HashMap<ClassInfo, Object> classes = classMap.get(target);
+
+            if (classes == null) {
+
+                classes = new HashMap<ClassInfo, Object>();
+                classMap.put(target, classes);
+            }
+
+            final String lockName = getLockName();
+            final String classLockName = (lockName != null) ? lockName : Async.DEFAULT_NAME;
+            final RoutineConfiguration configuration = getBuilder().buildConfiguration();
+            final ClassInfo classInfo = new ClassInfo(configuration, itf, classLockName);
+            Object instance = classes.get(classInfo);
+
+            if (instance != null) {
+
+                return itf.cast(instance);
+            }
+
+            try {
+
+                final Package classPackage = itf.getPackage();
+                final String className =
+                        ((classPackage != null) ? classPackage.getName() + "." : "")
+                                + itf.getSimpleName() + "$$Wrapper";
+                final Class<?> wrapperClass = Class.forName(className);
+                final Constructor<?> constructor =
+                        findConstructor(wrapperClass, target, sMutexCache, classLockName,
+                                        configuration);
+
+                synchronized (sMutexCache) {
+
+                    instance = constructor.newInstance(target, sMutexCache, classLockName,
+                                                       configuration);
+                }
+
+                classes.put(classInfo, instance);
+                return itf.cast(instance);
+
+            } catch (final InstantiationException e) {
+
+                throw new IllegalArgumentException(e.getCause());
+
+            } catch (final Throwable t) {
+
+                throw new IllegalArgumentException(t);
+            }
+        }
+    }
+
+    /**
+     * Returns a wrapper object enabling asynchronous calls to the target instance methods.
+     * <p/>
+     * The routines used for calling the methods will honor the attributes specified in any
+     * optional {@link Async}, {@link AsyncType} and {@link ParallelType} annotations.<br/>
+     * The wrapping object is created through code generation based on the interfaces annotated
+     * with {@link com.bmd.jrt.annotation.AsyncWrap}.<br/>
+     * Note that, you'll need to enable annotation pre-processing by adding the processor package
+     * to the specific project dependencies.
+     *
+     * @param itf     the token of the interface implemented by the return object.
+     * @param <CLASS> the interface type.
+     * @return the wrapping object.
+     * @throws NullPointerException     if the specified class is null.
+     * @throws IllegalArgumentException if the specified class does not represent an interface.
+     */
+    @Nonnull
+    public <CLASS> CLASS buildWrapper(@Nonnull final ClassToken<CLASS> itf) {
+
+        return itf.cast(buildWrapper(itf.getRawClass()));
     }
 
     @Nonnull

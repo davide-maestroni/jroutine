@@ -18,14 +18,14 @@
     @SuppressWarnings("unchecked")
     public ${resultType} ${methodName}(${paramTypes}) {
 
-        final java.util.List<${resultClassName}> dontcallmelist = this.mRoutine${methodCount}.invokeAsync()${inputParams}.result().readAll();
-        final int dontcallmesize = dontcallmelist.size();
-        final ${resultRawClass}[] dontcallmearray = new ${resultRawClass}[dontcallmesize];
+        final java.util.List<${resultClassName}> $$list = this.mRoutine${methodCount}.invokeAsync()${inputParams}.result().readAll();
+        final int $$size = $$list.size();
+        final ${resultRawClass}[] $$array = new ${resultRawClass}[$$size];
 
-        for (int dontcallmei = 0; dontcallmei < dontcallmesize; ++dontcallmei) {
+        for (int $$i = 0; $$i < $$size; ++$$i) {
 
-            dontcallmearray[dontcallmei] = dontcallmelist.get(dontcallmei);
+            $$array[$$i] = $$list.get($$i);
         }
 
-        return dontcallmearray;
+        return $$array;
     }

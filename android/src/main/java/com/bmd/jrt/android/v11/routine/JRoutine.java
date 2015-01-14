@@ -19,6 +19,7 @@ import android.app.Fragment;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 
+import com.bmd.jrt.android.builder.AndroidChannelBuilder;
 import com.bmd.jrt.android.builder.AndroidRoutineBuilder;
 import com.bmd.jrt.android.invocation.AndroidInvocation;
 import com.bmd.jrt.common.ClassToken;
@@ -175,19 +176,20 @@ public class JRoutine extends com.bmd.jrt.android.routine.JRoutine {
     }
 
     /**
-     * Returns a builder of routines linked to the specified activity.
-     * <p/>
-     * Note that the built routine results will be always dispatched in the main UI thread, thus
-     * waiting for the outputs immediately after its invocation in the main thread will result in a
-     * deadlock.
+     * Returns a builder of routines linked to the specified activity.<br/>
+     * Note that the specified invocation class must be static and have a default constructor.<br/>
+     * Note that also the built routine results will be always dispatched in the main UI thread,
+     * thus waiting for the outputs immediately after its invocation in the main thread will result
+     * in a deadlock.
      *
      * @param activity   the activity instance.
      * @param classToken the invocation class token.
      * @param <INPUT>    the input data type.
      * @param <OUTPUT>   the output data type.
      * @return the routine builder instance.
-     * @throws IllegalStateException if the specified activity is not initialized.
-     * @throws NullPointerException  if any of the specified parameters is null.
+     * @throws IllegalArgumentException if the specified invocation has no default constructor.
+     * @throws IllegalStateException    if the specified activity is not initialized.
+     * @throws NullPointerException     if any of the specified parameters is null.
      */
     @Nonnull
     public static <INPUT, OUTPUT> AndroidRoutineBuilder<INPUT, OUTPUT> onActivity(
@@ -213,11 +215,51 @@ public class JRoutine extends com.bmd.jrt.android.routine.JRoutine {
     }
 
     /**
-     * Returns a builder of routines linked to the specified fragment.
-     * <p/>
-     * Note that the built routine results will be always dispatched in the main UI thread, thus
-     * waiting for the outputs immediately after its invocation in the main thread will result in a
-     * deadlock.
+     * Returns a builder of an output channel linked to the invocation identified by the specified
+     * ID.<br/>
+     * Note that, if no invocation with the specified ID is running at the time of the channel
+     * creation, the output will be aborted with a
+     * {@link com.bmd.jrt.android.builder.RoutineMissingException}.
+     *
+     * @param activity the invocation activity context.
+     * @param id       the invocation ID.
+     * @return the channel builder instance.
+     * @throws IllegalArgumentException if the specified invocation ID is equal to GENERATED_ID.
+     * @throws IllegalStateException    if the specified activity is not initialized.
+     * @throws NullPointerException     if any of the specified parameters is null.
+     */
+    @Nonnull
+    public static AndroidChannelBuilder onActivity(@Nonnull final Activity activity, final int id) {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            throw new UnsupportedOperationException(
+                    "this method is supported only with API level >= " +
+                            VERSION_CODES.HONEYCOMB
+                            + ": use com.bmd.jrt.android.v4.routine.JRoutine class instead");
+        }
+
+        if (!LoaderInvocation.isEnabled(activity)) {
+
+            throw new IllegalStateException(
+                    "routine creation is not enabled: be sure to call JRoutine.initActivity(this) "
+                            + "in activity onCreate() method");
+        }
+
+        if (id == AndroidRoutineBuilder.GENERATED_ID) {
+
+            throw new IllegalArgumentException("the invocation ID must not be generated");
+        }
+
+        return new DefaultAndroidChannelBuilder(activity, id);
+    }
+
+    /**
+     * Returns a builder of routines linked to the specified fragment.<br/>
+     * Note that the specified invocation class must be static and have a default constructor.<br/>
+     * Note that also the built routine results will be always dispatched in the main UI thread,
+     * thus waiting for the outputs immediately after its invocation in the main thread will result
+     * in a deadlock.
      *
      * @param fragment   the fragment instance.
      * @param classToken the invocation class token.
@@ -240,5 +282,37 @@ public class JRoutine extends com.bmd.jrt.android.routine.JRoutine {
         }
 
         return new DefaultAndroidRoutineBuilder<INPUT, OUTPUT>(fragment, classToken);
+    }
+
+    /**
+     * Returns a builder of an output channel linked to the invocation identified by the specified
+     * ID.<br/>
+     * Note that, if no invocation with the specified ID is running at the time of the channel
+     * creation, the output will be aborted with a
+     * {@link com.bmd.jrt.android.builder.RoutineMissingException}.
+     *
+     * @param fragment the invocation fragment context.
+     * @param id       the invocation ID.
+     * @return the channel builder instance.
+     * @throws IllegalArgumentException if the specified invocation ID is equal to GENERATED_ID.
+     * @throws IllegalStateException    if the specified activity is not initialized.
+     * @throws NullPointerException     if any of the specified parameters is null.
+     */
+    @Nonnull
+    public static AndroidChannelBuilder onFragment(@Nonnull final Fragment fragment, final int id) {
+
+        if (!LoaderInvocation.isEnabled(fragment)) {
+
+            throw new IllegalStateException(
+                    "routine creation is not enabled: be sure to call JRoutine.initFragment(this) "
+                            + "in fragment onCreate() method");
+        }
+
+        if (id == AndroidRoutineBuilder.GENERATED_ID) {
+
+            throw new IllegalArgumentException("the invocation ID must not be generated");
+        }
+
+        return new DefaultAndroidChannelBuilder(fragment, id);
     }
 }

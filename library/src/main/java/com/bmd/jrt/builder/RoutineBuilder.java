@@ -56,7 +56,8 @@ import javax.annotation.Nullable;
 public interface RoutineBuilder {
 
     /**
-     * Applies the specified configuration to this builder.
+     * Applies the specified configuration to this builder.<br/>
+     * Note that the configuration options not supported by the builder methods will be ignored.
      *
      * @param configuration the configuration.
      * @return this builder.

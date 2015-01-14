@@ -45,12 +45,12 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
-public @interface AsyncClass {
+public @interface AsyncWrap {
 
     /**
      * The list of wrapped classes.
      *
      * @return the wrapped classes.
      */
-    Class<?>[] value();
+    Class<?> value();
 }

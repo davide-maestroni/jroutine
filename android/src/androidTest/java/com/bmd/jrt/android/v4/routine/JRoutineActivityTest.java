@@ -21,10 +21,12 @@ import android.support.v4.app.FragmentActivity;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.bmd.jrt.android.R;
+import com.bmd.jrt.android.builder.AndroidRoutineBuilder;
 import com.bmd.jrt.android.builder.AndroidRoutineBuilder.ClashResolution;
 import com.bmd.jrt.android.builder.AndroidRoutineBuilder.ResultCache;
 import com.bmd.jrt.android.builder.InputClashException;
 import com.bmd.jrt.android.builder.RoutineClashException;
+import com.bmd.jrt.android.builder.RoutineMissingException;
 import com.bmd.jrt.android.invocation.AndroidSimpleInvocation;
 import com.bmd.jrt.android.invocation.AndroidTemplateInvocation;
 import com.bmd.jrt.android.invocation.AndroidTunnelInvocation;
@@ -232,6 +234,21 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         assertThat(result2.readFirst()).isEqualTo("TEST1");
     }
 
+    public void testActivityMissingRoutine() throws InterruptedException {
+
+        final OutputChannel<String> channel = JRoutine.onActivity(getActivity(), 0).buildChannel();
+
+        try {
+
+            channel.readAll();
+
+            fail();
+
+        } catch (final RoutineMissingException ignored) {
+
+        }
+    }
+
     public void testActivityRestart() {
 
         final Routine<String, String> routine =
@@ -339,6 +356,41 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         }
 
         result4.checkComplete();
+    }
+
+    @TargetApi(VERSION_CODES.HONEYCOMB)
+    public void testActivityRotationChannel() throws InterruptedException {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final Routine<String, String> routine =
+                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
+                        .withId(0)
+                        .outputOrder(DataOrder.INSERTION)
+                        .buildRoutine();
+        routine.callAsync("test1", "test2");
+
+        final Semaphore semaphore = new Semaphore(0);
+
+        getActivity().runOnUiThread(new Runnable() {
+
+            @Override
+            public void run() {
+
+                getActivity().recreate();
+                semaphore.release();
+            }
+        });
+
+        semaphore.acquire();
+        getInstrumentation().waitForIdleSync();
+
+        final OutputChannel<String> channel = JRoutine.onActivity(getActivity(), 0).buildChannel();
+
+        assertThat(channel.readAll()).containsExactly("TEST1", "TEST2");
     }
 
     @TargetApi(VERSION_CODES.HONEYCOMB)
@@ -497,11 +549,54 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
+            JRoutine.onActivity((FragmentActivity) null, 0);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.onActivity(getActivity(), AndroidRoutineBuilder.GENERATED_ID);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
             JRoutine.onFragment((Fragment) null, ClassToken.tokenOf(ToUpperCase.class));
 
             fail();
 
         } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.onFragment((Fragment) null, 0);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+                                                                      .findFragmentById(
+                                                                              R.id.test_fragment);
+            JRoutine.onFragment(fragment, AndroidRoutineBuilder.GENERATED_ID);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
 
         }
 
@@ -584,6 +679,23 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         }
     }
 
+    public void testFragmentChannel() {
+
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        final Routine<String, String> routine =
+                JRoutine.onFragment(fragment, ClassToken.tokenOf(ToUpperCase.class))
+                        .withId(0)
+                        .outputOrder(DataOrder.INSERTION)
+                        .buildRoutine();
+        final OutputChannel<String> channel1 = routine.callAsync("test1", "test2");
+        final OutputChannel<String> channel2 = JRoutine.onFragment(fragment, 0).buildChannel();
+
+        assertThat(channel1.readAll()).containsExactly("TEST1", "TEST2");
+        assertThat(channel2.readAll()).containsExactly("TEST1", "TEST2");
+    }
+
     public void testFragmentInputs() throws InterruptedException {
 
         final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
@@ -613,6 +725,24 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         assertThat(result1.readFirst()).isEqualTo("TEST1");
         assertThat(result2.readFirst()).isEqualTo("TEST1");
+    }
+
+    public void testFragmentMissingRoutine() throws InterruptedException {
+
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        final OutputChannel<String> channel = JRoutine.onFragment(fragment, 0).buildChannel();
+
+        try {
+
+            channel.readAll();
+
+            fail();
+
+        } catch (final RoutineMissingException ignored) {
+
+        }
     }
 
     public void testFragmentReset() {

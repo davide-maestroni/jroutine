@@ -635,7 +635,7 @@ public class JRoutineTest extends TestCase {
 
         try {
 
-            new ObjectRoutineBuilder(test).buildClass((Class<?>) null);
+            new ObjectRoutineBuilder(test).buildWrapper((Class<?>) null);
 
             fail();
 
@@ -645,7 +645,7 @@ public class JRoutineTest extends TestCase {
 
         try {
 
-            new ObjectRoutineBuilder(test).buildClass((ClassToken<?>) null);
+            new ObjectRoutineBuilder(test).buildWrapper((ClassToken<?>) null);
 
             fail();
 
@@ -655,7 +655,7 @@ public class JRoutineTest extends TestCase {
 
         try {
 
-            new ObjectRoutineBuilder(test).buildClass(Test.class);
+            new ObjectRoutineBuilder(test).buildWrapper(Test.class);
 
             fail();
 
@@ -665,7 +665,7 @@ public class JRoutineTest extends TestCase {
 
         try {
 
-            new ObjectRoutineBuilder(test).buildClass(ClassToken.tokenOf(Test.class));
+            new ObjectRoutineBuilder(test).buildWrapper(ClassToken.tokenOf(Test.class));
 
             fail();
 

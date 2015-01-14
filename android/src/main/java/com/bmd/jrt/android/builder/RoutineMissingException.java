@@ -11,18 +11,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.bmd.jrt.android.builder;
 
-// GENERATED CODE - PLEASE DO NOT EDIT
+import com.bmd.jrt.common.RoutineException;
+
+/**
+ * Exception indicating that a routine invocation with a specified ID is not running.
+ * <p/>
+ * Created by davide on 1/14/15.
+ */
+public class RoutineMissingException extends RoutineException {
+
+    /**
+     * Constructor.
+     */
+    public RoutineMissingException() {
+
+        super(null);
+    }
 
     @Override
-    public ${resultType} ${methodName}(${paramTypes}) {
+    public boolean needsUnwrap() {
 
-        final com.bmd.jrt.channel.ParameterChannel<Object, ${resultClassName}> $$channel = this.mRoutine${methodCount}.invokeParallel();
-
-        for (final Object $$object: ${params}) {
-
-            $$channel.pass($$object);
-        }
-
-        return $$channel.result().readFirst();
+        return false;
     }
+}

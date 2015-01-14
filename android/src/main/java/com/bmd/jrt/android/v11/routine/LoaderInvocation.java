@@ -37,6 +37,7 @@ import com.bmd.jrt.channel.InputChannel;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.CacheHashMap;
+import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.common.RoutineException;
 import com.bmd.jrt.common.RoutineInterruptedException;
 import com.bmd.jrt.invocation.SimpleInvocation;
@@ -382,8 +383,11 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
 
             final RoutineLoader<INPUT, OUTPUT> routineLoader =
                     (RoutineLoader<INPUT, OUTPUT>) loader;
+            final Class<? extends AndroidInvocation<INPUT, OUTPUT>> invocationClass =
+                    mConstructor.getDeclaringClass();
 
-            if (routineLoader.getInvocationType() != mConstructor.getDeclaringClass()) {
+            if ((new ClassToken<MissingLoaderInvocation<INPUT, OUTPUT>>() {}.getRawClass()
+                    != invocationClass) && (routineLoader.getInvocationType() != invocationClass)) {
 
                 logger.wrn("clashing invocation ID [%d]: %s", loaderId,
                            routineLoader.getInvocationType().getCanonicalName());
@@ -572,17 +576,18 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
             mLogger.dbg("aborting result channels");
             final ArrayList<IOChannelInput<OUTPUT>> channels = mChannels;
             final ArrayList<IOChannelInput<OUTPUT>> newChannels = mNewChannels;
+            final RoutineClashException reason = new RoutineClashException(mLoader.getId());
 
             for (final InputChannel<OUTPUT> channel : channels) {
 
-                channel.abort();
+                channel.abort(reason);
             }
 
             channels.clear();
 
             for (final InputChannel<OUTPUT> newChannel : newChannels) {
 
-                newChannel.abort();
+                newChannel.abort(reason);
             }
 
             newChannels.clear();

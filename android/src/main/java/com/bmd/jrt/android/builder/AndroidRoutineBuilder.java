@@ -24,7 +24,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Interface defining an builder of routines linked to a context lifecycle.
+ * Interface defining a builder of routines linked to a context lifecycle.
  * <p/>
  * Routine invocations started through the returned objects can be safely restored after a change in
  * the configuration, so to avoid duplicated calls and memory leaks. Be aware, though, that the
@@ -49,9 +49,9 @@ public interface AndroidRoutineBuilder<INPUT, OUTPUT> {
      */
     public static final int GENERATED_ID = Integer.MIN_VALUE;
 
-
     /**
-     * Applies the specified configuration to this builder.
+     * Applies the specified configuration to this builder.<br/>
+     * Note that the configuration options not supported by this builder methods will be ignored.
      *
      * @param configuration the configuration.
      * @return this builder.

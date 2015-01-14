@@ -25,6 +25,7 @@ import com.bmd.jrt.time.TimeDuration;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Class implementing a builder of I/O channel objects.
@@ -44,7 +45,8 @@ public class IOChannelBuilder {
     }
 
     /**
-     * Applies the specified configuration to this builder.
+     * Applies the specified configuration to this builder.<br/>
+     * Note that the configuration options not supported by this builder methods will be ignored.
      *
      * @param configuration the configuration.
      * @return this builder.
@@ -58,7 +60,9 @@ public class IOChannelBuilder {
     }
 
     /**
-     * Sets the timeout for the channel to have room for additional data.
+     * Sets the timeout for the channel to have room for additional data.<br/>
+     * Note that the output buffer timeout set through the <code>apply()</code> method will be used
+     * to fill this value.
      *
      * @param timeout  the timeout.
      * @param timeUnit the timeout time unit.
@@ -75,7 +79,9 @@ public class IOChannelBuilder {
 
     /**
      * Sets the timeout for the channel to have room for additional data. A null value means
-     * that it is up to the framework to chose a default.
+     * that it is up to the framework to chose a default.<br/>
+     * Note that the output buffer timeout set through the <code>apply()</code> method will be used
+     * to fill this value.
      *
      * @param timeout the timeout.
      * @return this builder.
@@ -99,7 +105,9 @@ public class IOChannelBuilder {
     }
 
     /**
-     * Sets the order in which data are collected from the channel.
+     * Sets the order in which data are collected from the channel.<br/>
+     * Note that the output order set through the <code>apply()</code> method will be used to fill
+     * this value.
      *
      * @param order the order type.
      * @return this builder.
@@ -114,7 +122,9 @@ public class IOChannelBuilder {
 
     /**
      * Sets the runner instance used to schedule delayed inputs. A null value means that it is up to
-     * the framework to chose a default instance.
+     * the framework to chose a default instance.<br/>
+     * Note that the async runner set through the <code>apply()</code> method will be used to fill
+     * this value.
      *
      * @param runner the runner instance.
      * @return this builder.
@@ -148,7 +158,7 @@ public class IOChannelBuilder {
      * @return this builder.
      */
     @Nonnull
-    public IOChannelBuilder loggedWith(@Nonnull final Log log) {
+    public IOChannelBuilder loggedWith(@Nullable final Log log) {
 
         mBuilder.loggedWith(log);
         return this;
@@ -157,7 +167,9 @@ public class IOChannelBuilder {
     /**
      * Sets the maximum number of data that the channel can retain before they are consumed. A
      * {@link RoutineConfiguration#DEFAULT} value means that it is up to the framework to chose a
-     * default size.
+     * default size.<br/>
+     * Note that the max output buffer size set through the <code>apply()</code> method will be used
+     * to fill this value.
      *
      * @param maxBufferSize the maximum size.
      * @return this builder.

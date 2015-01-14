@@ -13,8 +13,8 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.annotation.AsyncClass;
 import com.bmd.jrt.annotation.AsyncType;
+import com.bmd.jrt.annotation.AsyncWrap;
 import com.bmd.jrt.annotation.ParallelType;
 import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
 import com.bmd.jrt.channel.IOChannel;
@@ -41,40 +41,62 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class RoutineProcessorTest extends TestCase {
 
+    public void testInterface() {
+
+        final TestClass testClass = new TestClass();
+        final TestInterfaceWrapper testWrapper = JRoutine.on(testClass)
+                                                         .syncRunner(RunnerType.SEQUENTIAL)
+                                                         .buildWrapper(ClassToken.tokenOf(
+                                                                 TestInterfaceWrapper.class));
+
+        assertThat(testWrapper.getOne().readFirst()).isEqualTo(1);
+    }
+
     @SuppressWarnings("unchecked")
     public void testWrapper() {
 
         final TestClass testClass = new TestClass();
-        final TestInterface testInterface = JRoutine.on(testClass)
-                                                    .syncRunner(RunnerType.SEQUENTIAL)
-                                                    .runBy(Runners.poolRunner())
-                                                    .logLevel(LogLevel.DEBUG)
-                                                    .loggedWith(new NullLog())
-                                                    .buildClass(ClassToken.tokenOf(
-                                                            TestInterface.class));
+        final TestWrapper testWrapper = JRoutine.on(testClass)
+                                                .syncRunner(RunnerType.SEQUENTIAL)
+                                                .runBy(Runners.poolRunner())
+                                                .logLevel(LogLevel.DEBUG)
+                                                .loggedWith(new NullLog())
+                                                .buildWrapper(
+                                                        ClassToken.tokenOf(TestWrapper.class));
 
-        assertThat(testInterface.getOne().readFirst()).isEqualTo(1);
-        assertThat(testInterface.getString(1, 2, 3)).isIn("1", "2", "3");
-        assertThat(testInterface.getString(new HashSet<Integer>(Arrays.asList(1, 2, 3)))
-                                .readAll()).containsOnly("1", "2", "3");
-        assertThat(testInterface.getString(Arrays.asList(1, 2, 3))).containsOnly("1", "2", "3");
-        assertThat(
-                testInterface.getString((Iterable<Integer>) Arrays.asList(1, 2, 3))).containsOnly(
+        assertThat(testWrapper.getOne().readFirst()).isEqualTo(1);
+        assertThat(testWrapper.getString(1, 2, 3)).isIn("1", "2", "3");
+        assertThat(testWrapper.getString(new HashSet<Integer>(Arrays.asList(1, 2, 3)))
+                              .readAll()).containsOnly("1", "2", "3");
+        assertThat(testWrapper.getString(Arrays.asList(1, 2, 3))).containsOnly("1", "2", "3");
+        assertThat(testWrapper.getString((Iterable<Integer>) Arrays.asList(1, 2, 3))).containsOnly(
                 "1", "2", "3");
         assertThat(
-                testInterface.getString((Collection<Integer>) Arrays.asList(1, 2, 3))).containsOnly(
+                testWrapper.getString((Collection<Integer>) Arrays.asList(1, 2, 3))).containsOnly(
                 "1", "2", "3");
 
         final ArrayList<String> list = new ArrayList<String>();
-        assertThat(testInterface.getList(Arrays.asList(list))).containsExactly(list);
+        assertThat(testWrapper.getList(Arrays.asList(list))).containsExactly(list);
 
         final IOChannel<Integer> channel = JRoutine.io().buildChannel();
         channel.input().pass(3).close();
-        assertThat(testInterface.getString(channel.output())).isEqualTo("3");
+        assertThat(testWrapper.getString(channel.output())).isEqualTo("3");
     }
 
-    @AsyncClass(TestClass.class)
-    public interface TestInterface {
+    public interface TestClassInterface {
+
+        public int getOne();
+    }
+
+    @AsyncWrap(TestClassInterface.class)
+    public interface TestInterfaceWrapper {
+
+        @AsyncType(int.class)
+        public OutputChannel<Integer> getOne();
+    }
+
+    @AsyncWrap(TestClass.class)
+    public interface TestWrapper {
 
         @AsyncType(List.class)
         public Iterable<Iterable> getList(@ParallelType(List.class) List<? extends List<String>> i);
@@ -100,7 +122,7 @@ public class RoutineProcessorTest extends TestCase {
     }
 
     @SuppressWarnings("UnusedDeclaration")
-    public static class TestClass {
+    public static class TestClass implements TestClassInterface {
 
         public List<String> getList(final List<String> list) {
 

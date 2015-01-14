@@ -17,21 +17,21 @@
     @Override
     public ${resultType} ${methodName}(${paramTypes}) {
 
-        final com.bmd.jrt.channel.ParameterChannel<Object, ${resultClassName}> dontcallmechannel = this.mRoutine${methodCount}.invokeParallel();
+        final com.bmd.jrt.channel.ParameterChannel<Object, ${resultClassName}> $$channel = this.mRoutine${methodCount}.invokeParallel();
 
-        for (final Object dontcallmeobject: ${params}) {
+        for (final Object $$object: ${params}) {
 
-            dontcallmechannel.pass(dontcallmeobject);
+            $$channel.pass($$object);
         }
 
-        final java.util.List<${resultClassName}> dontcallmelist = dontcallmechannel.result().readAll();
-        final int dontcallmesize = dontcallmelist.size();
-        final ${resultRawClass}[] dontcallmearray = new ${resultRawClass}[dontcallmesize];
+        final java.util.List<${resultClassName}> $$list = $$channel.result().readAll();
+        final int $$size = $$list.size();
+        final ${resultRawClass}[] $$array = new ${resultRawClass}[$$size];
 
-        for (int dontcallmei = 0; dontcallmei < dontcallmesize; ++dontcallmei) {
+        for (int $$i = 0; $$i < $$size; ++$$i) {
 
-            dontcallmearray[dontcallmei] = dontcallmelist.get(dontcallmei);
+            $$array[$$i] = $$list.get($$i);
         }
 
-        return dontcallmearray;
+        return $$array;
     }

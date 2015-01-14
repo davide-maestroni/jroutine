@@ -14,8 +14,8 @@
 package com.bmd.jrt.processor;
 
 import com.bmd.jrt.annotation.Async;
-import com.bmd.jrt.annotation.AsyncClass;
 import com.bmd.jrt.annotation.AsyncType;
+import com.bmd.jrt.annotation.AsyncWrap;
 import com.bmd.jrt.annotation.DefaultLog;
 import com.bmd.jrt.annotation.DefaultRunner;
 import com.bmd.jrt.annotation.ParallelType;
@@ -66,7 +66,7 @@ import javax.tools.JavaFileObject;
  * <p/>
  * Created by davide on 11/3/14.
  */
-@SupportedAnnotationTypes("com.bmd.jrt.annotation.AsyncClass")
+@SupportedAnnotationTypes("com.bmd.jrt.annotation.AsyncWrap")
 public class RoutineProcessor extends AbstractProcessor {
 
     private static final boolean DEBUG = false;
@@ -164,11 +164,11 @@ public class RoutineProcessor extends AbstractProcessor {
             return false;
         }
 
-        final TypeElement annotationElement = getTypeFromName(AsyncClass.class.getCanonicalName());
+        final TypeElement annotationElement = getTypeFromName(AsyncWrap.class.getCanonicalName());
         final TypeMirror annotationType = annotationElement.asType();
 
         for (final Element element : ElementFilter.typesIn(
-                roundEnvironment.getElementsAnnotatedWith(AsyncClass.class))) {
+                roundEnvironment.getElementsAnnotatedWith(AsyncWrap.class))) {
 
             final TypeElement classElement = (TypeElement) element;
             final List<ExecutableElement> methodElements =
@@ -185,15 +185,12 @@ public class RoutineProcessor extends AbstractProcessor {
                 }
             }
 
-            final List<?> elementList = (List<?>) getElementValue(element, annotationType, "value");
+            final Object targetElement = getElementValue(element, annotationType, "value");
 
-            if (elementList != null) {
+            if (targetElement != null) {
 
-                for (final Object targetElement : elementList) {
-
-                    createWrapper(classElement, getTypeFromName(targetElement.toString()),
-                                  methodElements);
-                }
+                createWrapper(classElement, getTypeFromName(targetElement.toString()),
+                              methodElements);
             }
         }
 
@@ -376,7 +373,6 @@ public class RoutineProcessor extends AbstractProcessor {
         try {
 
             final String packageName = getPackage(element).getQualifiedName().toString();
-            final String className = targetElement.getSimpleName().toString();
             final String interfaceName = element.getSimpleName().toString();
             final Filer filer = processingEnv.getFiler();
 
@@ -384,7 +380,7 @@ public class RoutineProcessor extends AbstractProcessor {
             if (!DEBUG) {
 
                 final JavaFileObject sourceFile =
-                        filer.createSourceFile(packageName + "." + interfaceName + "$" + className);
+                        filer.createSourceFile(packageName + "." + interfaceName + "$$Wrapper");
                 writer = sourceFile.openWriter();
 
             } else {
@@ -394,7 +390,6 @@ public class RoutineProcessor extends AbstractProcessor {
 
             String header;
             header = mHeader.replace("${packageName}", packageName);
-            header = header.replace("${className}", className);
             header = header.replace("${genericTypes}", buildGenericTypes(element));
             header = header.replace("${classFullName}", targetElement.asType().toString());
             header = header.replace("${interfaceName}", interfaceName);

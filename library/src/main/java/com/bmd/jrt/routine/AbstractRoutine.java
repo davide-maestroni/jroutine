@@ -376,6 +376,8 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
                             justification = "only one invocation is released")
         public void discard(@Nonnull final Invocation<INPUT, OUTPUT> invocation) {
 
+            //TODO: why it's never called??
+
             synchronized (mMutex) {
 
                 mLogger.wrn("discarding invocation instance after error: %s", invocation);

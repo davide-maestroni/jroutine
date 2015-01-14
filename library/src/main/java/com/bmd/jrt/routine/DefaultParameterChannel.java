@@ -133,7 +133,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
             public void onAbort(@Nullable final Throwable reason, final long delay,
                     @Nonnull final TimeUnit timeUnit) {
 
-                final boolean isComplete;
+                final boolean isDone;
 
                 synchronized (mMutex) {
 
@@ -143,11 +143,12 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
                         return;
                     }
 
-                    isComplete = isInputComplete();
+                    isDone = (mState == ChannelState.RESULT);
 
-                    if (isComplete) {
+                    if (isDone) {
 
-                        mLogger.dbg("avoiding aborting result channel since input is complete");
+                        mLogger.dbg(
+                                "avoiding aborting result channel since invocation is complete");
 
                     } else {
 
@@ -158,7 +159,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
                     }
                 }
 
-                if (isComplete) {
+                if (isDone) {
 
                     mRunner.run(new AbortResultExecution(reason), delay, timeUnit);
 
@@ -523,6 +524,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
         INPUT,      // input channel is open
         OUTPUT,     // no more input
+        RESULT,     // result called
         EXCEPTION   // abort issued
     }
 
@@ -690,6 +692,15 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
                 --mPendingExecutionCount;
                 mIsPendingExecution = false;
                 mIsConsuming = true;
+            }
+        }
+
+        @Override
+        public void onInvocationComplete() {
+
+            synchronized (mMutex) {
+
+                mState = ChannelState.RESULT;
             }
         }
     }

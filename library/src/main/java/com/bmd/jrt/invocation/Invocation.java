@@ -25,25 +25,35 @@ import javax.annotation.Nullable;
  * <pre>
  *     <code>
  *
- *              |
- *              V
- *        -> onInit()
- *       |      |         -----------
- *       |      |        |           |
- *       |      V        V           |
- *       |   onInput(input, result) -
- *       |      |
- *       |      |
- *       |      V
- *       |   onResult(result)
- *       |      |
- *       |      |
- *       |      V
- *        -- onReturn()
- *              |
- *              |
- *              V
- *           onDestroy()
+ *                  |
+ *                  V
+ *             ------------
+ *        --->|  onInit()  |
+ *       |     ------------
+ *       |          |     ------
+ *       |          |    |      |
+ *       |          V    V      |
+ *       |     ------------     |
+ *       |    | onInput()  |----
+ *       |     ------------
+ *       |          |                ------------
+ *       |          |        ...--->| onAbort()  |
+ *       |          V                ------------
+ *       |     ------------               |
+ *       |    | onResult() |              |
+ *       |     ------------               |
+ *       |          |     ----------------
+ *       |          |    |
+ *       |          V    V
+ *       |     ------------
+ *        ----| onReturn() |
+ *             ------------
+ *                  |
+ *                  |
+ *                  V
+ *             ------------
+ *            |onDestroy() |
+ *             ------------
  *     </code>
  * </pre>
  * Note that the <b><code>onInput()</code></b> method will be called for each input passed to the

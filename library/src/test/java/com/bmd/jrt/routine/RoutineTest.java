@@ -2375,6 +2375,11 @@ public class RoutineTest extends TestCase {
         public void onConsumeStart() {
 
         }
+
+        @Override
+        public void onInvocationComplete() {
+
+        }
     }
 
     private static class TestInvocationManager implements InvocationManager<Object, Object> {

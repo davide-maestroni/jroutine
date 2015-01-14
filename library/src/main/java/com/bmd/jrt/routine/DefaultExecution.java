@@ -134,11 +134,23 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
 
                 if (isComplete) {
 
+                    final InvocationManager<INPUT, OUTPUT> manager = mInvocationManager;
                     invocation.onResult(resultChannel);
-                    invocation.onReturn();
 
-                    mInvocationManager.recycle(invocation);
-                    resultChannel.close();
+                    try {
+
+                        invocation.onReturn();
+
+                        manager.recycle(invocation);
+                        resultChannel.close();
+
+                        inputIterator.onInvocationComplete();
+
+                    } catch (final Throwable t) {
+
+                        manager.discard(invocation);
+                        resultChannel.close(t);
+                    }
                 }
 
             } catch (final Throwable t) {
@@ -221,6 +233,11 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
          * Notifies that the available inputs are about to be consumed.
          */
         public void onConsumeStart();
+
+        /**
+         * Notifies that the invocation execution is complete.
+         */
+        public void onInvocationComplete();
     }
 
     /**

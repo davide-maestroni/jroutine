@@ -231,7 +231,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
         synchronized (mMutex) {
 
-            verifyInput();
+            verifyOpen();
 
             if (delay == null) {
 
@@ -269,7 +269,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
         synchronized (mMutex) {
 
-            verifyInput();
+            verifyOpen();
 
             if (channel == null) {
 
@@ -301,7 +301,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
         synchronized (mMutex) {
 
-            verifyInput();
+            verifyOpen();
 
             if (inputs == null) {
 
@@ -379,7 +379,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
         synchronized (mMutex) {
 
-            verifyInput();
+            verifyOpen();
 
             inputQueue = mInputQueue;
             delay = mInputDelay;
@@ -433,7 +433,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
         synchronized (mMutex) {
 
-            verifyInput();
+            verifyOpen();
 
             if (inputs == null) {
 
@@ -453,7 +453,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
         synchronized (mMutex) {
 
-            verifyInput();
+            verifyOpen();
 
             mLogger.dbg("closing input channel");
             mState = ChannelState.OUTPUT;
@@ -501,7 +501,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
         return (mState == ChannelState.OUTPUT) && (mPendingExecutionCount <= 0) && !mIsConsuming;
     }
 
-    private void verifyInput() {
+    private void verifyOpen() {
 
         if (mState == ChannelState.EXCEPTION) {
 
@@ -683,7 +683,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
                 if (!isInput()) {
 
-                    mLogger.wrn("avoiding consuming input since invocation is aborted [#%d]",
+                    mLogger.wrn("avoiding consuming input since invocation is complete [#%d]",
                                 mPendingExecutionCount);
                     return;
                 }
@@ -700,7 +700,10 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
             synchronized (mMutex) {
 
-                mState = ChannelState.RESULT;
+                if (mState != ChannelState.EXCEPTION) {
+
+                    mState = ChannelState.RESULT;
+                }
             }
         }
     }
@@ -735,6 +738,8 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
             synchronized (mMutex) {
 
+                verifyInput();
+
                 mSubLogger.dbg("closing consumer");
                 mQueue.close();
                 needsExecution = !mIsPendingExecution && !mIsConsuming;
@@ -760,7 +765,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
             synchronized (mMutex) {
 
-                if (!isOpen() && (mState != ChannelState.OUTPUT)) {
+                if (!isInput()) {
 
                     mSubLogger.wrn("avoiding aborting consumer since channel is closed");
                     return;
@@ -785,18 +790,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
             synchronized (mMutex) {
 
-                if (mState == ChannelState.EXCEPTION) {
-
-                    final Throwable throwable = mAbortException;
-                    mSubLogger.dbg(throwable, "consumer abort exception");
-                    throw RoutineExceptionWrapper.wrap(throwable).raise();
-                }
-
-                if (!isOpen() && (mState != ChannelState.OUTPUT)) {
-
-                    mSubLogger.dbg("consumer invalid call on closed channel");
-                    throw new IllegalStateException("the input channel is closed");
-                }
+                verifyInput();
 
                 inputQueue = mQueue;
 
@@ -840,6 +834,22 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
                 mRunner.run(new DelayedInputExecution(inputQueue, output), delay.time, delay.unit);
             }
         }
+
+        private void verifyInput() {
+
+            if (mState == ChannelState.EXCEPTION) {
+
+                final Throwable throwable = mAbortException;
+                mSubLogger.dbg(throwable, "consumer abort exception");
+                throw RoutineExceptionWrapper.wrap(throwable).raise();
+            }
+
+            if (!isInput()) {
+
+                mSubLogger.dbg("consumer invalid call on closed channel");
+                throw new IllegalStateException("the input channel is closed");
+            }
+        }
     }
 
     /**
@@ -866,7 +876,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
             synchronized (mMutex) {
 
-                if (isInputComplete()) {
+                if (isInputComplete() || (mState == ChannelState.RESULT)) {
 
                     mLogger.dbg(throwable, "avoiding aborting since channel is closed");
                     return;
@@ -909,7 +919,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
             synchronized (mMutex) {
 
-                if (!isInput()) {
+                if (mState == ChannelState.EXCEPTION) {
 
                     mLogger.dbg("avoiding delayed input execution since channel is closed: %s",
                                 mInput);
@@ -951,7 +961,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
             synchronized (mMutex) {
 
-                if (!isInput()) {
+                if (mState == ChannelState.EXCEPTION) {
 
                     mLogger.dbg("avoiding delayed input execution since channel is closed: %s",
                                 mInputs);

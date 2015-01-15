@@ -739,22 +739,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         }
     }
 
-    private void verifyComplete() {
-
-        if (mState == ChannelState.EXCEPTION) {
-
-            final Throwable throwable = mAbortException;
-            mLogger.dbg(throwable, "abort exception");
-            throw RoutineExceptionWrapper.wrap(throwable).raise();
-        }
-
-        if (isResultComplete()) {
-
-            mLogger.err("invalid call on closed channel");
-            throw new IllegalStateException("the channel is closed");
-        }
-    }
-
     private void verifyOutput() {
 
         if (mState == ChannelState.EXCEPTION) {
@@ -1315,6 +1299,22 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 mRunner.run(new DelayedOutputExecution(outputQueue, output), delay.time,
                             delay.unit);
+            }
+        }
+
+        private void verifyComplete() {
+
+            if (mState == ChannelState.EXCEPTION) {
+
+                final Throwable throwable = mAbortException;
+                mSubLogger.dbg(throwable, "consumer abort exception");
+                throw RoutineExceptionWrapper.wrap(throwable).raise();
+            }
+
+            if (isResultComplete()) {
+
+                mSubLogger.err("consumer invalid call on closed channel");
+                throw new IllegalStateException("the channel is closed");
             }
         }
     }

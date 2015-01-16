@@ -24,7 +24,6 @@ import android.os.Messenger;
 import android.os.RemoteException;
 
 import com.bmd.jrt.android.invocation.AndroidInvocation;
-import com.bmd.jrt.android.log.Logs;
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.builder.RoutineConfigurationBuilder;
@@ -40,6 +39,7 @@ import com.bmd.jrt.routine.AbstractRoutine;
 import com.bmd.jrt.runner.Runner;
 import com.bmd.jrt.time.TimeDuration;
 
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -93,7 +93,7 @@ public class RoutineService extends Service {
 
     private static final String KEY_RUNNER_CLASS = "runner_class";
 
-    private final Messenger mInMessenger = new Messenger(new IncomingHandler());
+    private final Messenger mInMessenger = new Messenger(new IncomingHandler(this));
 
     private final HashMap<String, RoutineInvocation> mInvocationMap =
             new HashMap<String, RoutineInvocation>();
@@ -123,7 +123,7 @@ public class RoutineService extends Service {
      */
     public RoutineService(@Nullable final Log log, @Nonnull final LogLevel logLevel) {
 
-        mLogger = Logger.createLogger(Logs.androidLog(), LogLevel.DEBUG, this);
+        mLogger = Logger.createLogger(log, logLevel, this);
     }
 
     /**
@@ -554,6 +554,111 @@ public class RoutineService extends Service {
     }
 
     /**
+     * Handler implementation managing incoming messages from the routine invocation.
+     */
+    private static class IncomingHandler extends Handler {
+
+        private final WeakReference<RoutineService> mService;
+
+        /**
+         * Constructor.
+         *
+         * @param service the service.
+         */
+        private IncomingHandler(final RoutineService service) {
+
+            mService = new WeakReference<RoutineService>(service);
+        }
+
+        @Override
+        public void handleMessage(final Message msg) {
+
+            final RoutineService service = mService.get();
+
+            if (service == null) {
+
+                super.handleMessage(msg);
+                return;
+            }
+
+            final Logger logger = service.mLogger;
+            logger.dbg("incoming routine message: %s", msg);
+
+            try {
+
+                switch (msg.what) {
+
+                    case MSG_DATA:
+                        service.getInvocation(msg).pass(getValue(msg));
+                        break;
+
+                    case MSG_COMPLETE:
+                        final RoutineInvocation invocation = service.getInvocation(msg);
+                        invocation.result(new ServiceOutputConsumer(invocation, msg.replyTo));
+                        break;
+
+                    case MSG_ABORT:
+                        service.getInvocation(msg).abort(getAbortError(msg));
+                        break;
+
+                    case MSG_INIT:
+                        service.initRoutine(msg);
+                        break;
+
+                    default:
+                        super.handleMessage(msg);
+                }
+
+            } catch (final Throwable t) {
+
+                logger.err(t, "error while parsing routine message");
+
+                final Bundle data = msg.peekData();
+
+                if (data != null) {
+
+                    data.setClassLoader(service.getClassLoader());
+                    final String invocationId = data.getString(KEY_INVOCATION_ID);
+
+                    if (invocationId != null) {
+
+                        synchronized (service.mMutex) {
+
+                            final RoutineInvocation invocation =
+                                    service.mInvocationMap.get(invocationId);
+
+                            if (invocation != null) {
+
+                                invocation.recycle();
+                            }
+                        }
+                    }
+                }
+
+                final Messenger outMessenger = msg.replyTo;
+
+                if (outMessenger == null) {
+
+                    logger.wrn("avoid aborting since reply messenger is null");
+                    return;
+                }
+
+                final Message message = Message.obtain(null, RoutineService.MSG_ABORT);
+                putError(message.getData(), t);
+
+                try {
+
+                    outMessenger.send(message);
+
+                } catch (final RemoteException e) {
+
+                    logger.err(e, "error while sending routine abort message");
+                }
+            }
+        }
+    }
+
+    /**
      * Class storing the routine information.
      */
     private static class RoutineInfo {
@@ -691,85 +796,80 @@ public class RoutineService extends Service {
     }
 
     /**
-     * Handler implementation managing incoming messages from the routine invocation.
+     * Output consumer sending messages to the routine.
      */
-    private class IncomingHandler extends Handler {
+    private static class ServiceOutputConsumer implements OutputConsumer<Object> {
+
+        private final RoutineInvocation mInvocation;
+
+        private final Messenger mOutMessenger;
+
+        /**
+         * Constructor.
+         *
+         * @param invocation the routine invocation.
+         * @param messenger  the output messenger.
+         * @throws NullPointerException if the specified messenger is null.
+         */
+        @SuppressWarnings("ConstantConditions")
+        private ServiceOutputConsumer(@Nonnull final RoutineInvocation invocation,
+                @Nonnull final Messenger messenger) {
+
+            if (messenger == null) {
+
+                throw new NullPointerException("the output messenger must not be null");
+            }
+
+            mInvocation = invocation;
+            mOutMessenger = messenger;
+        }
 
         @Override
-        public void handleMessage(final Message msg) {
+        public void onComplete() {
 
-            final Logger logger = mLogger;
-            logger.dbg("incoming routine message: %s", msg);
+            mInvocation.recycle();
 
             try {
 
-                switch (msg.what) {
+                mOutMessenger.send(Message.obtain(null, RoutineService.MSG_COMPLETE));
 
-                    case MSG_DATA:
-                        getInvocation(msg).pass(getValue(msg));
-                        break;
+            } catch (final RemoteException e) {
 
-                    case MSG_COMPLETE:
-                        final RoutineInvocation invocation = getInvocation(msg);
-                        invocation.result(new ServiceOutputConsumer(invocation, msg.replyTo));
-                        break;
+                throw new RoutineException(e);
+            }
+        }
 
-                    case MSG_ABORT:
-                        getInvocation(msg).abort(getAbortError(msg));
-                        break;
+        @Override
+        public void onError(@Nullable final Throwable error) {
 
-                    case MSG_INIT:
-                        initRoutine(msg);
-                        break;
+            mInvocation.recycle();
 
-                    default:
-                        super.handleMessage(msg);
-                }
+            final Message message = Message.obtain(null, RoutineService.MSG_ABORT);
+            putError(message.getData(), error);
 
-            } catch (final Throwable t) {
+            try {
 
-                logger.err(t, "error while parsing routine message");
+                mOutMessenger.send(message);
 
-                final Bundle data = msg.peekData();
+            } catch (final RemoteException e) {
 
-                if (data != null) {
+                throw new RoutineException(e);
+            }
+        }
 
-                    data.setClassLoader(getClassLoader());
-                    final String invocationId = data.getString(KEY_INVOCATION_ID);
+        @Override
+        public void onOutput(final Object o) {
 
-                    if (invocationId != null) {
+            final Message message = Message.obtain(null, RoutineService.MSG_DATA);
+            putValue(message.getData(), o);
 
-                        synchronized (mMutex) {
+            try {
 
-                            final RoutineInvocation invocation = mInvocationMap.get(invocationId);
+                mOutMessenger.send(message);
 
-                            if (invocation != null) {
+            } catch (final RemoteException e) {
 
-                                invocation.recycle();
-                            }
-                        }
-                    }
-                }
-
-                final Messenger outMessenger = msg.replyTo;
-
-                if (outMessenger == null) {
-
-                    logger.wrn("avoid aborting since reply messenger is null");
-                    return;
-                }
-
-                final Message message = Message.obtain(null, RoutineService.MSG_ABORT);
-                putError(message.getData(), t);
-
-                try {
-
-                    outMessenger.send(message);
-
-                } catch (final RemoteException e) {
-
-                    logger.err(e, "error while sending routine abort message");
-                }
+                throw new RoutineException(e);
             }
         }
     }
@@ -854,85 +954,6 @@ public class RoutineService extends Service {
         public void result(@Nonnull final OutputConsumer<Object> consumer) {
 
             mChannel.result().bind(consumer);
-        }
-    }
-
-    /**
-     * Output consumer sending messages to the routine.
-     */
-    private class ServiceOutputConsumer implements OutputConsumer<Object> {
-
-        private final RoutineInvocation mInvocation;
-
-        private final Messenger mOutMessenger;
-
-        /**
-         * Constructor.
-         *
-         * @param invocation the routine invocation.
-         * @param messenger  the output messenger.
-         * @throws NullPointerException if the specified messenger is null.
-         */
-        @SuppressWarnings("ConstantConditions")
-        private ServiceOutputConsumer(@Nonnull final RoutineInvocation invocation,
-                @Nonnull final Messenger messenger) {
-
-            if (messenger == null) {
-
-                throw new NullPointerException("the output messenger must not be null");
-            }
-
-            mInvocation = invocation;
-            mOutMessenger = messenger;
-        }
-
-        @Override
-        public void onComplete() {
-
-            mInvocation.recycle();
-
-            try {
-
-                mOutMessenger.send(Message.obtain(null, RoutineService.MSG_COMPLETE));
-
-            } catch (final RemoteException e) {
-
-                throw new RoutineException(e);
-            }
-        }
-
-        @Override
-        public void onError(@Nullable final Throwable error) {
-
-            mInvocation.recycle();
-
-            final Message message = Message.obtain(null, RoutineService.MSG_ABORT);
-            putError(message.getData(), error);
-
-            try {
-
-                mOutMessenger.send(message);
-
-            } catch (final RemoteException e) {
-
-                throw new RoutineException(e);
-            }
-        }
-
-        @Override
-        public void onOutput(final Object o) {
-
-            final Message message = Message.obtain(null, RoutineService.MSG_DATA);
-            putValue(message.getData(), o);
-
-            try {
-
-                mOutMessenger.send(message);
-
-            } catch (final RemoteException e) {
-
-                throw new RoutineException(e);
-            }
         }
     }
 }

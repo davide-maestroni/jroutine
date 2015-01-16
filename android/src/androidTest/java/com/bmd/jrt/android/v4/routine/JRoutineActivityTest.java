@@ -848,7 +848,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
     @SuppressWarnings("ConstantConditions")
     public void testLoaderError() throws NoSuchMethodException {
 
-        final Logger logger = Logger.createLogger(null, LogLevel.DEFAULT);
+        final Logger logger = Logger.createLogger(null, LogLevel.DEFAULT, this);
         final WeakReference<Object> reference = new WeakReference<Object>(getActivity());
 
         try {

@@ -19,6 +19,9 @@
         <service
             android:name=".service.RoutineService"
             android:process=":remote"/>
+        <service
+            android:name=".routine.TestService"
+            android:process=":remote"/>
     </application>
 
 </manifest>

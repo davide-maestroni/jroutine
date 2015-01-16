@@ -960,7 +960,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
-        final Logger logger = Logger.createLogger(null, LogLevel.DEFAULT);
+        final Logger logger = Logger.createLogger(null, LogLevel.DEFAULT, this);
         final WeakReference<Object> reference = new WeakReference<Object>(getActivity());
 
         try {

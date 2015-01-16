@@ -24,15 +24,21 @@ import com.bmd.jrt.android.invocation.AndroidSimpleInvocation;
 import com.bmd.jrt.android.invocation.AndroidTemplateInvocation;
 import com.bmd.jrt.android.invocation.AndroidTunnelInvocation;
 import com.bmd.jrt.android.log.AndroidLog;
+import com.bmd.jrt.android.runner.MainRunner;
 import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
+import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
+import com.bmd.jrt.builder.RoutineConfigurationBuilder;
+import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.ClassToken;
+import com.bmd.jrt.common.RoutineException;
 import com.bmd.jrt.common.RoutineInterruptedException;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.routine.Routine;
 import com.bmd.jrt.time.TimeDuration;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 
@@ -51,11 +57,53 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
         super(TestActivity.class);
     }
 
+    public void testAbort() {
+
+        final Data data = new Data();
+        final Routine<Data, Data> routine1 =
+                JRoutine.onService(getActivity(), ClassToken.tokenOf(Delay.class))
+                        .dispatchIn(Looper.getMainLooper())
+                        .runnerClass(MainRunner.class)
+                        .buildRoutine();
+
+        final OutputChannel<Data> channel = routine1.callAsync(data);
+        assertThat(channel.abort(new IllegalArgumentException("test"))).isTrue();
+
+        try {
+
+            channel.readFirst();
+
+            fail();
+
+        } catch (final RoutineException e) {
+
+            assertThat(e.getCause().getMessage()).isEqualTo("test");
+        }
+
+        final Routine<Data, Data> routine2 =
+                JRoutine.onService(getActivity(), ClassToken.tokenOf(Abort.class))
+                        .dispatchIn(Looper.getMainLooper())
+                        .buildRoutine();
+
+        try {
+
+            routine2.callAsync(data).readFirst();
+
+            fail();
+
+        } catch (final RoutineException e) {
+
+            assertThat(e.getCause().getMessage()).isEqualTo("test");
+        }
+    }
+
     public void testInvocations() throws InterruptedException {
 
         final Routine<String, String> routine1 =
                 JRoutine.onService(getActivity(), ClassToken.tokenOf(StringTunnelInvocation.class))
-                        .syncRunner(RunnerType.QUEUED).dispatchIn(Looper.getMainLooper())
+                        .dispatchIn(Looper.getMainLooper())
+                        .syncRunner(RunnerType.QUEUED)
+                        .inputOrder(DataOrder.DELIVERY)
                         .logClass(AndroidLog.class)
                         .logLevel(LogLevel.DEBUG)
                         .buildRoutine();
@@ -70,16 +118,56 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
 
         final Routine<String, String> routine2 =
                 JRoutine.onService(getActivity(), ClassToken.tokenOf(StringSimpleInvocation.class))
-                        .syncRunner(RunnerType.SEQUENTIAL).dispatchIn(Looper.getMainLooper())
+                        .dispatchIn(Looper.getMainLooper())
+                        .syncRunner(RunnerType.SEQUENTIAL)
+                        .outputOrder(DataOrder.DELIVERY)
                         .logClass(AndroidLog.class)
                         .logLevel(LogLevel.DEBUG)
                         .buildRoutine();
-        assertThat(routine2.callSync("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2", "3",
+        assertThat(routine2.callSync("1", "2", "3", "4", "5").readAll()).containsExactly("1", "2",
+                                                                                         "3", "4",
+                                                                                         "5");
+        assertThat(routine2.callAsync("1", "2", "3", "4", "5").readAll()).containsExactly("1", "2",
+                                                                                          "3", "4",
+                                                                                          "5");
+        assertThat(routine2.callParallel("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2",
+                                                                                          "3", "4",
+                                                                                          "5");
+
+        final RoutineConfigurationBuilder builder =
+                new RoutineConfigurationBuilder().inputOrder(DataOrder.DELIVERY)
+                                                 .outputOrder(DataOrder.DELIVERY);
+        final Routine<String, String> routine3 =
+                JRoutine.onService(getActivity(), ClassToken.tokenOf(StringSimpleInvocation.class))
+                        .dispatchIn(Looper.getMainLooper())
+                        .apply(builder.buildConfiguration())
+                        .buildRoutine();
+        assertThat(routine3.callSync("1", "2", "3", "4", "5").readAll()).containsExactly("1", "2",
+                                                                                         "3", "4",
+                                                                                         "5");
+        assertThat(routine3.callAsync("1", "2", "3", "4", "5").readAll()).containsExactly("1", "2",
+                                                                                          "3", "4",
+                                                                                          "5");
+        assertThat(routine3.callParallel("1", "2", "3", "4", "5").readAll()).containsExactly("1",
+                                                                                             "2",
+                                                                                             "3",
+                                                                                             "4",
+                                                                                             "5");
+
+        final Routine<String, String> routine4 =
+                JRoutine.onService(getActivity(), ClassToken.tokenOf(StringSimpleInvocation.class))
+                        .dispatchIn(Looper.getMainLooper())
+                        .maxRetained(0)
+                        .maxRunning(2)
+                        .availableTimeout(1, TimeUnit.SECONDS)
+                        .availableTimeout(TimeDuration.millis(200))
+                        .buildRoutine();
+        assertThat(routine4.callSync("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2", "3",
                                                                                       "4", "5");
-        assertThat(routine2.callAsync("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2",
+        assertThat(routine4.callAsync("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2",
                                                                                        "3", "4",
                                                                                        "5");
-        assertThat(routine2.callParallel("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2",
+        assertThat(routine4.callParallel("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2",
                                                                                           "3", "4",
                                                                                           "5");
     }
@@ -92,6 +180,22 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
                         .dispatchIn(Looper.getMainLooper())
                         .buildRoutine();
         assertThat(routine.callAsync(p).readFirst()).isEqualTo(p);
+    }
+
+    public void testService() {
+
+        final Routine<String, String> routine =
+                JRoutine.onService(getActivity(), ClassToken.tokenOf(StringTunnelInvocation.class))
+                        .dispatchIn(Looper.getMainLooper())
+                        .serviceClass(TestService.class)
+                        .buildRoutine();
+        assertThat(routine.callSync("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2", "3",
+                                                                                     "4", "5");
+        assertThat(routine.callAsync("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2", "3",
+                                                                                      "4", "5");
+        assertThat(routine.callParallel("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2",
+                                                                                         "3", "4",
+                                                                                         "5");
     }
 
     private static class Abort extends AndroidTemplateInvocation<Data, Data> {
@@ -108,12 +212,38 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
                 RoutineInterruptedException.interrupt(e);
             }
 
-            result.abort(new IllegalStateException());
+            result.abort(new IllegalStateException("test"));
         }
     }
 
-    private static class Data {
+    private static class Data implements Parcelable {
 
+        public static final Creator<Data> CREATOR = new Creator<Data>() {
+
+
+            @Override
+            public Data createFromParcel(final Parcel source) {
+
+                return new Data();
+            }
+
+            @Override
+            public Data[] newArray(final int size) {
+
+                return new Data[size];
+            }
+        };
+
+        @Override
+        public int describeContents() {
+
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(final Parcel dest, final int flags) {
+
+        }
     }
 
     private static class Delay extends AndroidTemplateInvocation<Data, Data> {
@@ -155,19 +285,6 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
         }
 
         @Override
-        public int describeContents() {
-
-            return 0;
-        }
-
-        @Override
-        public void writeToParcel(final Parcel dest, final int flags) {
-
-            dest.writeInt(mX);
-            dest.writeInt(mY);
-        }
-
-        @Override
         public boolean equals(final Object o) {
 
             if (this == o) {
@@ -192,6 +309,22 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
             result = 31 * result + mY;
             return result;
         }
+
+        @Override
+        public int describeContents() {
+
+            return 0;
+        }
+
+
+        @Override
+        public void writeToParcel(final Parcel dest, final int flags) {
+
+            dest.writeInt(mX);
+            dest.writeInt(mY);
+        }
+
+
     }
 
     private static class MyParcelableInvocation extends AndroidTunnelInvocation<MyParcelable> {

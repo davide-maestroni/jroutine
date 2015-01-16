@@ -773,7 +773,7 @@ public class RoutineTest extends TestCase {
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(500);
     }
 
-    public void testDestroy() throws InterruptedException {
+    public void testDestroy() {
 
         final Routine<String, String> routine1 =
                 JRoutine.on(tokenOf(TestDestroy.class)).maxRetained(0).buildRoutine();
@@ -790,12 +790,14 @@ public class RoutineTest extends TestCase {
         final Routine<String, String> routine2 =
                 JRoutine.on(tokenOf(TestDestroyDiscard.class)).buildRoutine();
         assertThat(routine2.callSync("1", "2", "3", "4", "5").checkComplete()).isTrue();
+        assertThat(routine2.callParallel("1", "2", "3", "4", "5").checkComplete()).isTrue();
         assertThat(routine2.callAsync("1", "2", "3", "4", "5").checkComplete()).isTrue();
         assertThat(TestDestroy.getInstanceCount()).isZero();
 
         final Routine<String, String> routine3 =
                 JRoutine.on(tokenOf(TestDestroyDiscardException.class)).buildRoutine();
         assertThat(routine3.callSync("1", "2", "3", "4", "5").checkComplete()).isTrue();
+        assertThat(routine3.callParallel("1", "2", "3", "4", "5").checkComplete()).isTrue();
         assertThat(routine3.callAsync("1", "2", "3", "4", "5").checkComplete()).isTrue();
         assertThat(TestDestroy.getInstanceCount()).isZero();
 
@@ -871,7 +873,7 @@ public class RoutineTest extends TestCase {
 
         }
 
-        final Logger logger = Logger.createLogger(null, LogLevel.DEFAULT);
+        final Logger logger = Logger.createLogger(null, LogLevel.DEFAULT, this);
 
         try {
 
@@ -1167,7 +1169,7 @@ public class RoutineTest extends TestCase {
     @SuppressWarnings("ConstantConditions")
     public void testParameterChannelError() {
 
-        final Logger logger = Logger.createLogger(new NullLog(), LogLevel.DEBUG);
+        final Logger logger = Logger.createLogger(new NullLog(), LogLevel.DEBUG, this);
 
         try {
 
@@ -1319,7 +1321,7 @@ public class RoutineTest extends TestCase {
     @SuppressWarnings("ConstantConditions")
     public void testResultChannelError() {
 
-        final Logger logger = Logger.createLogger(new NullLog(), LogLevel.DEBUG);
+        final Logger logger = Logger.createLogger(new NullLog(), LogLevel.DEBUG, this);
 
         try {
 

@@ -13,34 +13,13 @@
  */
 package com.bmd.jrt.android.routine;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.os.Bundle;
-
-import com.bmd.jrt.android.R;
+import com.bmd.jrt.android.service.RoutineService;
 
 /**
- * Test activity.
+ * Test service.
  * <p/>
- * Created by davide on 11/1/15.
+ * Created by davide on 1/16/15.
  */
-public class TestActivity extends Activity {
+public class TestService extends RoutineService {
 
-    @Override
-    protected void onCreate(final Bundle savedInstanceState) {
-
-        super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.test_layout);
-
-        startService(new Intent(this, TestService.class));
-    }
-
-    @Override
-    protected void onDestroy() {
-
-        stopService(new Intent(this, TestService.class));
-
-        super.onDestroy();
-    }
 }

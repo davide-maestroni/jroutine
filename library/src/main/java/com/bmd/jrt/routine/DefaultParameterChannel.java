@@ -919,7 +919,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
             synchronized (mMutex) {
 
-                if (mState == ChannelState.EXCEPTION) {
+                if (!isInput()) {
 
                     mLogger.dbg("avoiding delayed input execution since channel is closed: %s",
                                 mInput);
@@ -961,7 +961,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
             synchronized (mMutex) {
 
-                if (mState == ChannelState.EXCEPTION) {
+                if (!isInput()) {
 
                     mLogger.dbg("avoiding delayed input execution since channel is closed: %s",
                                 mInputs);

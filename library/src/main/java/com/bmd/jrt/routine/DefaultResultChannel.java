@@ -1386,7 +1386,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             synchronized (mMutex) {
 
-                if (mState == ChannelState.EXCEPTION) {
+                if (isResultComplete()) {
 
                     mLogger.dbg("avoiding delayed output execution since channel is closed: %s",
                                 mOutputs);
@@ -1434,7 +1434,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             synchronized (mMutex) {
 
-                if (mState == ChannelState.EXCEPTION) {
+                if (isResultComplete()) {
 
                     mLogger.dbg("avoiding delayed output execution since channel is closed: %s",
                                 mOutput);

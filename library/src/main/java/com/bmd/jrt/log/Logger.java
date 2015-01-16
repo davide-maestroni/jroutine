@@ -77,17 +77,23 @@ public class Logger {
     /**
      * Creates a new logger.
      *
-     * @param log      the log instance.
-     * @param level    the log level.
-     * @param contexts the array of contexts.
+     * @param log     the log instance.
+     * @param level   the log level.
+     * @param context the context.
      * @return the new logger.
      * @throws NullPointerException if any of the parameters is null.
      */
     @Nonnull
+    @SuppressWarnings("ConstantConditions")
     public static Logger createLogger(@Nullable final Log log, @Nonnull final LogLevel level,
-            @Nonnull final Object... contexts) {
+            @Nonnull final Object context) {
 
-        return new Logger(contexts, log, level);
+        if (context == null) {
+
+            throw new NullPointerException("the context must not be null");
+        }
+
+        return new Logger(new Object[]{context}, log, level);
     }
 
     /**
@@ -603,19 +609,24 @@ public class Logger {
      * Creates a new logger with the same log instance and log level, but adding the specified
      * contexts to the contexts array.
      *
-     * @param contexts the array of contexts.
+     * @param context the context.
      * @return the new logger.
      */
     @Nonnull
-    public Logger subContextLogger(@Nonnull final Object... contexts) {
+    @SuppressWarnings("ConstantConditions")
+    public Logger subContextLogger(@Nonnull final Object context) {
+
+        if (context == null) {
+
+            throw new NullPointerException("the context must not be null");
+        }
 
         final Object[] thisContexts = mContexts;
         final int thisLength = thisContexts.length;
-        final int length = contexts.length;
-        final Object[] newContexts = new Object[thisLength + length];
+        final Object[] newContexts = new Object[thisLength + 1];
 
         System.arraycopy(thisContexts, 0, newContexts, 0, thisLength);
-        System.arraycopy(contexts, 0, newContexts, thisLength, length);
+        newContexts[thisLength] = context;
         return new Logger(newContexts, mLog, mLogLevel);
     }
 

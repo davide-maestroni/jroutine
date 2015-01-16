@@ -120,23 +120,19 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
      * @param configuration the routine configuration.
      * @param syncRunner    the runner used for synchronous invocation.
      * @param asyncRunner   the runner used for asynchronous invocation.
-     * @param maxRunning    the maximum number of running invocation instances.
-     * @param maxRetained   the maximum number of retained invocation instances.
-     * @param availTimeout  the maximum timeout to wait for available invocation instances.
      * @param logger        the logger instance.
      */
     private AbstractRoutine(@Nonnull final RoutineConfiguration configuration,
             @Nonnull final Runner syncRunner, @Nonnull final Runner asyncRunner,
-            final int maxRunning, final int maxRetained, @Nonnull final TimeDuration availTimeout,
             @Nonnull final Logger logger) {
 
         mConfiguration = configuration;
         mSyncRunner = syncRunner;
         mAsyncRunner = asyncRunner;
-        mMaxRunning = maxRunning;
-        mMaxRetained = maxRetained;
-        mAvailTimeout = availTimeout;
-        mLogger = logger;
+        mMaxRunning = DEFAULT_MAX_RUNNING;
+        mMaxRetained = DEFAULT_MAX_RETAINED;
+        mAvailTimeout = DEFAULT_AVAIL_TIMEOUT;
+        mLogger = logger.subContextLogger(this);
     }
 
     @Override
@@ -204,7 +200,6 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
             mParallelRoutine =
                     new AbstractRoutine<INPUT, OUTPUT>(mConfiguration, mSyncRunner, mAsyncRunner,
-                                                       mMaxRunning, mMaxRetained, mAvailTimeout,
                                                        mLogger) {
 
                         @Nonnull

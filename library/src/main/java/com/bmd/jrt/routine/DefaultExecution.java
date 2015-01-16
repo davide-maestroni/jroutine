@@ -142,13 +142,15 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
                         invocation.onReturn();
 
                         manager.recycle(invocation);
-                        resultChannel.close();
 
                         inputIterator.onInvocationComplete();
+                        resultChannel.close();
 
                     } catch (final Throwable t) {
 
                         manager.discard(invocation);
+
+                        inputIterator.onInvocationComplete();
                         resultChannel.close(t);
                     }
                 }

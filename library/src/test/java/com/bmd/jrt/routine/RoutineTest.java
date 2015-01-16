@@ -773,6 +773,60 @@ public class RoutineTest extends TestCase {
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(500);
     }
 
+    public void testDestroy() throws InterruptedException {
+
+        final Routine<String, String> routine1 =
+                JRoutine.on(tokenOf(TestDestroy.class)).maxRetained(0).buildRoutine();
+        assertThat(routine1.callSync("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2", "3",
+                                                                                      "4", "5");
+        assertThat(routine1.callAsync("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2",
+                                                                                       "3", "4",
+                                                                                       "5");
+        assertThat(routine1.callParallel("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2",
+                                                                                          "3", "4",
+                                                                                          "5");
+        assertThat(TestDestroy.getInstanceCount()).isZero();
+
+        final Routine<String, String> routine2 =
+                JRoutine.on(tokenOf(TestDestroyDiscard.class)).buildRoutine();
+        assertThat(routine2.callSync("1", "2", "3", "4", "5").checkComplete()).isTrue();
+        assertThat(routine2.callAsync("1", "2", "3", "4", "5").checkComplete()).isTrue();
+        assertThat(TestDestroy.getInstanceCount()).isZero();
+
+        final Routine<String, String> routine3 =
+                JRoutine.on(tokenOf(TestDestroyDiscardException.class)).buildRoutine();
+        assertThat(routine3.callSync("1", "2", "3", "4", "5").checkComplete()).isTrue();
+        assertThat(routine3.callAsync("1", "2", "3", "4", "5").checkComplete()).isTrue();
+        assertThat(TestDestroy.getInstanceCount()).isZero();
+
+        final Routine<String, String> routine4 =
+                JRoutine.on(tokenOf(TestDestroy.class)).buildRoutine();
+        assertThat(routine4.callSync("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2", "3",
+                                                                                      "4", "5");
+        assertThat(routine4.callAsync("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2",
+                                                                                       "3", "4",
+                                                                                       "5");
+        assertThat(routine4.callParallel("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2",
+                                                                                          "3", "4",
+                                                                                          "5");
+        routine4.flush();
+        assertThat(TestDestroy.getInstanceCount()).isZero();
+
+        final Routine<String, String> routine5 =
+                JRoutine.on(tokenOf(TestDestroyException.class)).buildRoutine();
+
+        assertThat(routine5.callSync("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2", "3",
+                                                                                      "4", "5");
+        assertThat(routine5.callAsync("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2",
+                                                                                       "3", "4",
+                                                                                       "5");
+        assertThat(routine5.callParallel("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2",
+                                                                                          "3", "4",
+                                                                                          "5");
+        routine5.flush();
+        assertThat(TestDestroy.getInstanceCount()).isZero();
+    }
+
     @SuppressWarnings("ConstantConditions")
     public void testError() {
 
@@ -1003,17 +1057,6 @@ public class RoutineTest extends TestCase {
 
         testChained(tunnelRoutine, exceptionRoutine, "test", "test4");
         testChained(exceptionRoutine, tunnelRoutine, "test", "test4");
-    }
-
-    public void testFlush() {
-
-        final Routine<String, String> routine =
-                JRoutine.on(tokenOf(TestFlush.class)).buildRoutine();
-        assertThat(routine.callParallel("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2",
-                                                                                         "3", "4",
-                                                                                         "5");
-        routine.flush();
-        assertThat(TestFlush.getInstanceCount()).isZero();
     }
 
     public void testInputTimeout() {
@@ -2306,11 +2349,11 @@ public class RoutineTest extends TestCase {
         }
     }
 
-    private static class TestFlush extends TemplateInvocation<String, String> {
+    private static class TestDestroy extends TemplateInvocation<String, String> {
 
         private static final AtomicInteger sInstanceCount = new AtomicInteger();
 
-        public TestFlush() {
+        public TestDestroy() {
 
             sInstanceCount.incrementAndGet();
         }
@@ -2329,7 +2372,50 @@ public class RoutineTest extends TestCase {
         @Override
         public void onDestroy() {
 
-            sInstanceCount.decrementAndGet();
+            synchronized (sInstanceCount) {
+
+                sInstanceCount.decrementAndGet();
+                sInstanceCount.notifyAll();
+            }
+        }
+    }
+
+    private static class TestDestroyDiscard extends TestDestroy {
+
+        @Override
+        public void onDestroy() {
+
+            super.onDestroy();
+            throw new IllegalArgumentException("test");
+        }
+
+        @Override
+        public void onReturn() {
+
+            super.onReturn();
+            throw new IllegalArgumentException("test");
+        }
+
+
+    }
+
+    private static class TestDestroyDiscardException extends TestDestroyException {
+
+        @Override
+        public void onReturn() {
+
+            super.onReturn();
+            throw new IllegalArgumentException("test");
+        }
+    }
+
+    private static class TestDestroyException extends TestDestroy {
+
+        @Override
+        public void onDestroy() {
+
+            super.onDestroy();
+            throw new IllegalArgumentException("test");
         }
     }
 

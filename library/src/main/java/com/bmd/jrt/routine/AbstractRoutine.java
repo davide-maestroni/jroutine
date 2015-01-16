@@ -378,7 +378,22 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
             synchronized (mMutex) {
 
-                mLogger.wrn("discarding invocation instance after error: %s", invocation);
+                final Logger logger = mLogger;
+                logger.wrn("discarding invocation instance after error: %s", invocation);
+
+                try {
+
+                    invocation.onDestroy();
+
+                } catch (final RoutineInterruptedException e) {
+
+                    throw e.interrupt();
+
+                } catch (final Throwable t) {
+
+                    logger.wrn(t, "ignoring exception while destroying invocation instance");
+                }
+
                 --mRunningCount;
                 mMutex.notify();
             }

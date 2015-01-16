@@ -834,16 +834,6 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            new ParallelInvocation<Object, Object>(null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
             on(tokenOf(ConstructorException.class)).logLevel(LogLevel.SILENT)
                                                    .buildRoutine()
                                                    .callSync()

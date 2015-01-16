@@ -16,8 +16,10 @@ package com.bmd.jrt.routine;
 import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.channel.ParameterChannel;
+import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.RoutineInterruptedException;
 import com.bmd.jrt.invocation.Invocation;
+import com.bmd.jrt.invocation.TemplateInvocation;
 import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.routine.DefaultParameterChannel.InvocationManager;
 import com.bmd.jrt.runner.Runner;
@@ -286,6 +288,35 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
                                                           getInvocationManager(async),
                                                           (async) ? mAsyncRunner : mSyncRunner,
                                                           logger);
+    }
+
+    /**
+     * Implementation of an invocation handling parallel mode.
+     *
+     * @param <INPUT>  the input data type.
+     * @param <OUTPUT> the output data type.
+     */
+    private static class ParallelInvocation<INPUT, OUTPUT>
+            extends TemplateInvocation<INPUT, OUTPUT> {
+
+        private final Routine<INPUT, OUTPUT> mRoutine;
+
+        /**
+         * Constructor.
+         *
+         * @param routine the routine to invoke in parallel mode.
+         * @throws NullPointerException if the routine instance is null;
+         */
+        private ParallelInvocation(@Nonnull final Routine<INPUT, OUTPUT> routine) {
+
+            mRoutine = routine;
+        }
+
+        @Override
+        public void onInput(final INPUT input, @Nonnull final ResultChannel<OUTPUT> result) {
+
+            result.pass(mRoutine.callAsync(input));
+        }
     }
 
     /**

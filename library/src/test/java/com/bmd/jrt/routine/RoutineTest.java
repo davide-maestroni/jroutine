@@ -789,35 +789,33 @@ public class RoutineTest extends TestCase {
         assertThat(TestDestroy.getInstanceCount()).isZero();
 
         final Routine<String, String> routine2 =
-                JRoutine.on(tokenOf(TestDestroyDiscard.class)).buildRoutine();
-        assertThat(routine2.callSync("1", "2", "3", "4", "5").checkComplete()).isTrue();
-        assertThat(routine2.callParallel("1", "2", "3", "4", "5").checkComplete()).isTrue();
-        assertThat(routine2.callAsync("1", "2", "3", "4", "5").checkComplete()).isTrue();
+                JRoutine.on(tokenOf(TestDiscardException.class)).maxRetained(0).buildRoutine();
+        assertThat(routine2.callSync("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2", "3",
+                                                                                      "4", "5");
+        assertThat(routine2.callAsync("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2",
+                                                                                       "3", "4",
+                                                                                       "5");
+        assertThat(routine2.callParallel("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2",
+                                                                                          "3", "4",
+                                                                                          "5");
         assertThat(TestDestroy.getInstanceCount()).isZero();
 
         final Routine<String, String> routine3 =
-                JRoutine.on(tokenOf(TestDestroyDiscardException.class)).buildRoutine();
+                JRoutine.on(tokenOf(TestDestroyDiscard.class)).buildRoutine();
         assertThat(routine3.callSync("1", "2", "3", "4", "5").checkComplete()).isTrue();
         assertThat(routine3.callParallel("1", "2", "3", "4", "5").checkComplete()).isTrue();
         assertThat(routine3.callAsync("1", "2", "3", "4", "5").checkComplete()).isTrue();
         assertThat(TestDestroy.getInstanceCount()).isZero();
 
         final Routine<String, String> routine4 =
-                JRoutine.on(tokenOf(TestDestroy.class)).buildRoutine();
-        assertThat(routine4.callSync("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2", "3",
-                                                                                      "4", "5");
-        assertThat(routine4.callAsync("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2",
-                                                                                       "3", "4",
-                                                                                       "5");
-        assertThat(routine4.callParallel("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2",
-                                                                                          "3", "4",
-                                                                                          "5");
-        routine4.flush();
+                JRoutine.on(tokenOf(TestDestroyDiscardException.class)).buildRoutine();
+        assertThat(routine4.callSync("1", "2", "3", "4", "5").checkComplete()).isTrue();
+        assertThat(routine4.callParallel("1", "2", "3", "4", "5").checkComplete()).isTrue();
+        assertThat(routine4.callAsync("1", "2", "3", "4", "5").checkComplete()).isTrue();
         assertThat(TestDestroy.getInstanceCount()).isZero();
 
         final Routine<String, String> routine5 =
-                JRoutine.on(tokenOf(TestDestroyException.class)).buildRoutine();
-
+                JRoutine.on(tokenOf(TestDestroy.class)).buildRoutine();
         assertThat(routine5.callSync("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2", "3",
                                                                                       "4", "5");
         assertThat(routine5.callAsync("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2",
@@ -827,6 +825,20 @@ public class RoutineTest extends TestCase {
                                                                                           "3", "4",
                                                                                           "5");
         routine5.flush();
+        assertThat(TestDestroy.getInstanceCount()).isZero();
+
+        final Routine<String, String> routine6 =
+                JRoutine.on(tokenOf(TestDestroyException.class)).buildRoutine();
+
+        assertThat(routine6.callSync("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2", "3",
+                                                                                      "4", "5");
+        assertThat(routine6.callAsync("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2",
+                                                                                       "3", "4",
+                                                                                       "5");
+        assertThat(routine6.callParallel("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2",
+                                                                                          "3", "4",
+                                                                                          "5");
+        routine6.flush();
         assertThat(TestDestroy.getInstanceCount()).isZero();
     }
 
@@ -2376,6 +2388,16 @@ public class RoutineTest extends TestCase {
         public void onDestroy() {
 
             super.onDestroy();
+            throw new IllegalArgumentException("test");
+        }
+    }
+
+    private static class TestDiscardException extends TestDestroy {
+
+        @Override
+        public void onReturn() {
+
+            super.onReturn();
             throw new IllegalArgumentException("test");
         }
     }

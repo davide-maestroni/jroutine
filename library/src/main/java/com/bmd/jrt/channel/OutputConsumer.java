@@ -18,6 +18,27 @@ import javax.annotation.Nullable;
 /**
  * Interface defining an output consumer that can be bound to an output channel.
  * <p/>
+ * The typical lifecycle of a consumer object is the following:
+ * <pre>
+ *     <code>
+ *
+ *                           ------
+ *                     |    |      |
+ *                     V    V      |
+ *                ------------     |
+ *               | onOutput() |----
+ *                ------------
+ *                   |    |
+ *                   |    |
+ *             ------      ------
+ *       |    |                  |    |
+ *       V    V                  V    V
+ *    ------------            ------------
+ *   |onComplete()|          | onError()  |
+ *    ------------            ------------
+ *     </code>
+ * </pre>
+ * <p/>
  * Created by davide on 9/7/14.
  *
  * @param <OUTPUT> the output data type.

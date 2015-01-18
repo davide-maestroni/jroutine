@@ -141,7 +141,7 @@ public class ServiceRoutineBuilder<INPUT, OUTPUT> {
      * @return this builder.
      */
     @Nonnull
-    public ServiceRoutineBuilder<INPUT, OUTPUT> dispatchIn(@Nullable final Looper looper) {
+    public ServiceRoutineBuilder<INPUT, OUTPUT> dispatchTo(@Nullable final Looper looper) {
 
         mLooper = looper;
         return this;

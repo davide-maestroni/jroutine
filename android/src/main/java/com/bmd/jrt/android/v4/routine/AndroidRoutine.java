@@ -139,6 +139,12 @@ class AndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
         }
 
         final Object context = mContext.get();
+
+        if (context == null) {
+
+            throw new IllegalStateException("routine context has been destroyed");
+        }
+
         final Context appContext;
 
         if (context instanceof FragmentActivity) {

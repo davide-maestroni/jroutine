@@ -78,6 +78,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
     private Throwable mAbortException;
 
+    private boolean mIsException;
+
     private OutputConsumer<OUTPUT> mOutputConsumer;
 
     private int mOutputCount;
@@ -275,7 +277,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         if (delay.isZero()) {
 
-            flushOutput();
+            flushOutput(false);
 
         } else {
 
@@ -315,7 +317,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         if (delay.isZero()) {
 
-            flushOutput();
+            flushOutput(false);
 
         } else {
 
@@ -370,6 +372,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             channels = new ArrayList<OutputChannel<?>>(mBoundChannels);
             mBoundChannels.clear();
             mOutputQueue.add(RoutineExceptionWrapper.wrap(throwable));
+            mIsException = true;
             mAbortException = throwable;
             mState = ChannelState.ABORTED;
             mMutex.notifyAll();
@@ -380,7 +383,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             channel.abort(throwable);
         }
 
-        flushOutput();
+        flushOutput(false);
     }
 
     /**
@@ -415,7 +418,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         if (isFlush) {
 
-            flushOutput();
+            flushOutput(false);
         }
     }
 
@@ -448,6 +451,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 mLogger.dbg(throwable, "aborting channel");
                 mOutputQueue.clear();
+                mIsException = true;
                 mAbortException = throwable;
                 mState = ChannelState.EXCEPTION;
             }
@@ -482,9 +486,9 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         }
     }
 
-    private void closeConsumer() {
+    private void closeConsumer(final ChannelState state) {
 
-        synchronized (mConsumerMutex) {
+        if (state != ChannelState.ABORTED) {
 
             final Logger logger = mLogger;
             final OutputConsumer<OUTPUT> consumer = mOutputConsumer;
@@ -502,20 +506,20 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 logger.wrn(t, "ignoring consumer exception (%s)", consumer);
             }
+        }
 
-            synchronized (mMutex) {
+        synchronized (mMutex) {
 
-                if (!isOutputPending(mState)) {
+            if (!isOutputPending(mState)) {
 
-                    mState = ChannelState.DONE;
-                    mMutex.notifyAll();
-                }
+                mState = ChannelState.DONE;
+                mMutex.notifyAll();
             }
         }
     }
 
     @SuppressWarnings("unchecked")
-    private void flushOutput() {
+    private void flushOutput(final boolean forceClose) {
 
         Throwable abortException = null;
 
@@ -580,9 +584,9 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                     }
                 }
 
-                if (!isOutputPending(state)) {
+                if (forceClose || !isOutputPending(state)) {
 
-                    closeConsumer();
+                    closeConsumer(state);
                 }
 
             } catch (final RoutineInterruptedException e) {
@@ -592,21 +596,24 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             } catch (final Throwable t) {
 
                 boolean isClose = false;
+                final ChannelState state;
 
                 synchronized (mMutex) {
 
                     logger.wrn(t, "consumer exception (%s)", mOutputConsumer);
+                    state = mState;
 
-                    if (!isOutputPending(mState)) {
+                    if (forceClose || !isOutputPending(state)) {
 
                         isClose = true;
 
-                    } else if (mState != ChannelState.EXCEPTION) {
+                    } else if (state != ChannelState.EXCEPTION) {
 
                         logger.wrn(t, "aborting on consumer exception (%s)", mOutputConsumer);
                         abortException = t;
 
                         mOutputQueue.clear();
+                        mIsException = true;
                         mAbortException = t;
                         mState = ChannelState.EXCEPTION;
                     }
@@ -614,7 +621,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 if (isClose) {
 
-                    closeConsumer();
+                    closeConsumer(state);
                 }
             }
         }
@@ -640,7 +647,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
     private boolean isResultComplete() {
 
-        return (mState.ordinal() > ChannelState.FLUSH.ordinal());
+        return (mState.ordinal() >= ChannelState.FLUSH.ordinal());
     }
 
     private boolean isResultOpen() {
@@ -741,7 +748,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
     private void verifyOutput() {
 
-        if (mState == ChannelState.EXCEPTION) {
+        if (mIsException) {
 
             final Throwable throwable = mAbortException;
             mLogger.dbg(throwable, "abort exception");
@@ -940,7 +947,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         @SuppressWarnings("ConstantConditions")
         public OutputChannel<OUTPUT> bind(@Nonnull final OutputConsumer<OUTPUT> consumer) {
 
-            final boolean isClose;
+            final boolean forceClose;
+            final ChannelState state;
 
             synchronized (mMutex) {
 
@@ -952,16 +960,12 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                     throw new NullPointerException("the output consumer must not be null");
                 }
 
-                isClose = (mState == ChannelState.DONE);
+                state = mState;
+                forceClose = (state == ChannelState.DONE);
                 mOutputConsumer = consumer;
             }
 
-            flushOutput();
-
-            if (isClose) {
-
-                closeConsumer();
-            }
+            flushOutput(forceClose);
 
             return this;
         }
@@ -1175,6 +1179,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 mSubLogger.dbg(reason, "aborting output");
                 mOutputQueue.clear();
+                mIsException = true;
                 mAbortException = reason;
                 mState = ChannelState.EXCEPTION;
             }
@@ -1240,7 +1245,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             if (isFlush) {
 
-                flushOutput();
+                flushOutput(false);
             }
         }
 
@@ -1257,6 +1262,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 mSubLogger.dbg(error, "aborting output");
                 mOutputQueue.clear();
+                mIsException = true;
                 mAbortException = error;
                 mState = ChannelState.EXCEPTION;
             }
@@ -1293,7 +1299,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             if (delay.isZero()) {
 
-                flushOutput();
+                flushOutput(false);
 
             } else {
 
@@ -1304,7 +1310,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         private void verifyComplete() {
 
-            if (mState == ChannelState.EXCEPTION) {
+            if (mIsException) {
 
                 final Throwable throwable = mAbortException;
                 mSubLogger.dbg(throwable, "consumer abort exception");
@@ -1351,6 +1357,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 mLogger.dbg(throwable, "aborting channel");
                 mOutputQueue.clear();
+                mIsException = true;
                 mAbortException = throwable;
                 mState = ChannelState.EXCEPTION;
             }
@@ -1403,7 +1410,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                 mQueue.addAll(mOutputs).close();
             }
 
-            flushOutput();
+            flushOutput(false);
         }
     }
 
@@ -1451,7 +1458,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                 mQueue.add(mOutput).close();
             }
 
-            flushOutput();
+            flushOutput(false);
         }
     }
 

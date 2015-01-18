@@ -31,7 +31,6 @@ import com.bmd.jrt.time.TimeDuration.Check;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
@@ -153,7 +152,6 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
                     } else {
 
                         mLogger.dbg("aborting result channel");
-                        mInputQueue.clear();
                         mAbortException = reason;
                         mState = ChannelState.EXCEPTION;
                     }
@@ -197,7 +195,6 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
             if (delay.isZero()) {
 
                 mLogger.dbg(reason, "aborting channel");
-                mInputQueue.clear();
                 mAbortException = reason;
                 mState = ChannelState.EXCEPTION;
             }
@@ -624,12 +621,6 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
             synchronized (mMutex) {
 
-                if (!isInput()) {
-
-                    mLogger.err("invalid read from close input");
-                    throw new NoSuchElementException();
-                }
-
                 final INPUT input = mInputQueue.removeFirst();
                 mLogger.dbg("reading input [#%d]: %s", mInputCount, input);
 
@@ -772,7 +763,6 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
                 }
 
                 mSubLogger.dbg("aborting consumer");
-                mInputQueue.clear();
                 mAbortException = error;
                 mState = ChannelState.EXCEPTION;
             }
@@ -883,7 +873,6 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
                 }
 
                 mLogger.dbg(throwable, "aborting channel");
-                mInputQueue.clear();
                 mAbortException = throwable;
                 mState = ChannelState.EXCEPTION;
             }

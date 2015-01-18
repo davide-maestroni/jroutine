@@ -252,7 +252,8 @@ public class RoutineTest extends TestCase {
                 };
 
         final Routine<String, String> routine3 =
-                on(ClassToken.tokenOf(closeInvocation)).withArgs(this, isFailed, semaphore)
+                on(ClassToken.tokenOf(closeInvocation)).logLevel(LogLevel.SILENT)
+                                                       .withArgs(this, isFailed, semaphore)
                                                        .buildRoutine();
 
         assertThat(routine3.callAsync("test").readAll()).isEmpty();
@@ -921,22 +922,7 @@ public class RoutineTest extends TestCase {
         }
     }
 
-    public void testErrorConsumerOnResult() {
-
-        final TemplateOutputConsumer<String> exceptionConsumer =
-                new TemplateOutputConsumer<String>() {
-
-                    @Override
-                    public void onOutput(final String output) {
-
-                        throw new NullPointerException(output);
-                    }
-                };
-
-        testConsumer(exceptionConsumer);
-    }
-
-    public void testErrorConsumerOnReturn() {
+    public void testErrorConsumerOnComplete() {
 
         final TemplateOutputConsumer<String> exceptionConsumer =
                 new TemplateOutputConsumer<String>() {
@@ -945,6 +931,21 @@ public class RoutineTest extends TestCase {
                     public void onComplete() {
 
                         throw new NullPointerException("test2");
+                    }
+                };
+
+        testConsumer(exceptionConsumer);
+    }
+
+    public void testErrorConsumerOnOutput() {
+
+        final TemplateOutputConsumer<String> exceptionConsumer =
+                new TemplateOutputConsumer<String>() {
+
+                    @Override
+                    public void onOutput(final String output) {
+
+                        throw new NullPointerException(output);
                     }
                 };
 
@@ -1019,36 +1020,6 @@ public class RoutineTest extends TestCase {
 
         testChained(tunnelRoutine, exceptionRoutine, "test", "test3");
         testChained(exceptionRoutine, tunnelRoutine, "test", "test3");
-    }
-
-    public void testErrorOnReturn() {
-
-        final Invocation<String, String> exceptionOnReturn =
-                new TemplateInvocation<String, String>() {
-
-                    @Override
-                    public void onInput(final String s,
-                            @Nonnull final ResultChannel<String> result) {
-
-                        result.pass(s);
-                    }
-
-                    @Override
-                    public void onReturn() {
-
-                        throw new NullPointerException("test4");
-                    }
-                };
-
-        final Routine<String, String> exceptionRoutine =
-                on(ClassToken.tokenOf(exceptionOnReturn)).withArgs(this).buildRoutine();
-
-        testException(exceptionRoutine, "test", "test4");
-
-        final Routine<String, String> tunnelRoutine = JRoutine.<String>on().buildRoutine();
-
-        testChained(tunnelRoutine, exceptionRoutine, "test", "test4");
-        testChained(exceptionRoutine, tunnelRoutine, "test", "test4");
     }
 
     public void testInputTimeout() {
@@ -2387,8 +2358,6 @@ public class RoutineTest extends TestCase {
             super.onReturn();
             throw new IllegalArgumentException("test");
         }
-
-
     }
 
     private static class TestDestroyDiscardException extends TestDestroyException {

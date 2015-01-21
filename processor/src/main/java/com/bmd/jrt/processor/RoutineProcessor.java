@@ -314,6 +314,49 @@ public class RoutineProcessor extends AbstractProcessor {
         return builder.toString();
     }
 
+    private String buildResultTimeout(@Nonnull final TypeElement element,
+            final ExecutableElement methodElement) {
+
+        final Async classAnnotation = element.getAnnotation(Async.class);
+        final Async methodAnnotation = methodElement.getAnnotation(Async.class);
+
+        long resultTimeout = RoutineConfiguration.DEFAULT;
+        TimeUnit resultTimeUnit = null;
+
+        if (methodAnnotation != null) {
+
+            resultTimeout = methodAnnotation.resultTimeout();
+            resultTimeUnit = methodAnnotation.resultTimeUnit();
+        }
+
+        if (classAnnotation != null) {
+
+            if (resultTimeout == RoutineConfiguration.DEFAULT) {
+
+                resultTimeout = classAnnotation.resultTimeout();
+                resultTimeUnit = classAnnotation.resultTimeUnit();
+            }
+        }
+
+        final StringBuilder builder = new StringBuilder();
+
+        if (resultTimeout != RoutineConfiguration.DEFAULT) {
+
+            builder.append(resultTimeout);
+
+        } else {
+
+            builder.append(0);
+        }
+
+        builder.append(", ")
+               .append(TimeUnit.class.getCanonicalName())
+               .append(".")
+               .append(resultTimeUnit);
+
+        return builder.toString();
+    }
+
     @Nonnull
     private String buildRoutineFieldsInit(final int size) {
 
@@ -978,6 +1021,7 @@ public class RoutineProcessor extends AbstractProcessor {
         method = method.replace("${paramTypes}", buildParamTypes(methodElement));
         method = method.replace("${paramValues}", buildParamValues(targetMethod));
         method = method.replace("${inputParams}", buildInputParams(methodElement));
+        method = method.replace("${resultTimeout}", buildResultTimeout(element, methodElement));
 
         writer.append(method);
 

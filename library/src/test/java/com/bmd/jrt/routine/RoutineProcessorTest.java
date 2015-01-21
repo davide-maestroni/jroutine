@@ -13,6 +13,7 @@
  */
 package com.bmd.jrt.routine;
 
+import com.bmd.jrt.annotation.Async;
 import com.bmd.jrt.annotation.AsyncType;
 import com.bmd.jrt.annotation.AsyncWrap;
 import com.bmd.jrt.annotation.ParallelType;
@@ -83,11 +84,13 @@ public class RoutineProcessorTest extends TestCase {
         assertThat(testWrapper.getString(channel.output())).isEqualTo("3");
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     public interface TestClassInterface {
 
         public int getOne();
     }
 
+    @Async(resultTimeout = 300)
     @AsyncWrap(TestClassInterface.class)
     public interface TestInterfaceWrapper {
 
@@ -95,6 +98,7 @@ public class RoutineProcessorTest extends TestCase {
         public OutputChannel<Integer> getOne();
     }
 
+    @Async(resultTimeout = 300)
     @AsyncWrap(TestClass.class)
     public interface TestWrapper {
 

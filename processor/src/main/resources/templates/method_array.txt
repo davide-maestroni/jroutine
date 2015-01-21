@@ -18,7 +18,7 @@
     @SuppressWarnings("unchecked")
     public ${resultType} ${methodName}(${paramTypes}) {
 
-        final java.util.List<${resultClassName}> $$list = this.mRoutine${methodCount}.invokeAsync()${inputParams}.result().readAll();
+        final java.util.List<${resultClassName}> $$list = this.mRoutine${methodCount}.invokeAsync()${inputParams}.result().afterMax(${resultTimeout}).readAll();
         final int $$size = $$list.size();
         final ${resultRawClass}[] $$array = new ${resultRawClass}[$$size];
 

@@ -39,6 +39,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static com.bmd.jrt.time.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -50,30 +51,31 @@ public class JRoutineTest extends TestCase {
 
     public void testChannelBuilder() {
 
+        final TimeDuration timeout = seconds(1);
         final IOChannel<Object> channel = JRoutine.io()
                                                   .dataOrder(DataOrder.INSERTION)
                                                   .delayRunner(Runners.sharedRunner())
                                                   .maxSize(1)
                                                   .bufferTimeout(1, TimeUnit.MILLISECONDS)
-                                                  .bufferTimeout(TimeDuration.seconds(1))
+                                                  .bufferTimeout(seconds(1))
                                                   .logLevel(LogLevel.DEBUG)
                                                   .loggedWith(new NullLog())
                                                   .buildChannel();
         channel.input().pass(-77L);
-        assertThat(channel.output().readFirst()).isEqualTo(-77L);
+        assertThat(channel.output().afterMax(timeout).readFirst()).isEqualTo(-77L);
 
         final IOChannel<Object> channel1 = JRoutine.io().buildChannel();
         final IOChannelInput<Object> input1 = channel1.input();
 
         input1.after(TimeDuration.millis(200)).pass(23).now().pass(-77L).close();
-        assertThat(channel1.output().readAll()).containsOnly(23, -77L);
+        assertThat(channel1.output().afterMax(timeout).readAll()).containsOnly(23, -77L);
 
         final IOChannel<Object> channel2 =
                 JRoutine.io().dataOrder(DataOrder.INSERTION).buildChannel();
         final IOChannelInput<Object> input2 = channel2.input();
 
         input2.after(TimeDuration.millis(200)).pass(23).now().pass(-77L).close();
-        assertThat(channel2.output().readAll()).containsExactly(23, -77L);
+        assertThat(channel2.output().afterMax(timeout).readAll()).containsExactly(23, -77L);
     }
 
     public void testChannelBuilderApply() {
@@ -146,6 +148,7 @@ public class JRoutineTest extends TestCase {
 
     public void testClassRoutineBuilder() throws NoSuchMethodException {
 
+        final TimeDuration timeout = seconds(1);
         final Routine<Object, Object> routine = JRoutine.on(TestStatic.class)
                                                         .syncRunner(RunnerType.SEQUENTIAL)
                                                         .runBy(Runners.poolRunner())
@@ -153,7 +156,7 @@ public class JRoutineTest extends TestCase {
                                                         .loggedWith(new NullLog())
                                                         .annotatedMethod(TestStatic.GET);
 
-        assertThat(routine.callSync().readAll()).containsExactly(-77L);
+        assertThat(routine.callSync().afterMax(timeout).readAll()).containsExactly(-77L);
 
         final Routine<Object, Object> routine1 = JRoutine.on(TestStatic.class)
                                                          .syncRunner(RunnerType.QUEUED)
@@ -162,7 +165,7 @@ public class JRoutineTest extends TestCase {
                                                          .availableTimeout(TimeDuration.ZERO)
                                                          .method("getLong");
 
-        assertThat(routine1.callSync().readAll()).containsExactly(-77L);
+        assertThat(routine1.callSync().afterMax(timeout).readAll()).containsExactly(-77L);
 
         final Routine<Object, Object> routine2 = JRoutine.on(TestStatic.class)
                                                          .syncRunner(RunnerType.QUEUED)
@@ -174,14 +177,14 @@ public class JRoutineTest extends TestCase {
                                                          .method(TestStatic.class.getMethod(
                                                                  "getLong"));
 
-        assertThat(routine2.callSync().readAll()).containsExactly(-77L);
+        assertThat(routine2.callSync().afterMax(timeout).readAll()).containsExactly(-77L);
 
         final Routine<Object, Object> routine3 =
                 JRoutine.on(TestStatic.class).annotatedMethod(TestStatic.THROW);
 
         try {
 
-            routine3.callSync(new IllegalArgumentException("test")).readAll();
+            routine3.callSync(new IllegalArgumentException("test")).afterMax(timeout).readAll();
 
             fail();
 
@@ -198,8 +201,8 @@ public class JRoutineTest extends TestCase {
         OutputChannel<Object> getOne = builder.method("getOne").callAsync();
         OutputChannel<Object> getTwo = builder.method("getTwo").callAsync();
 
-        assertThat(getOne.checkComplete()).isTrue();
-        assertThat(getTwo.checkComplete()).isTrue();
+        assertThat(getOne.afterMax(timeout).checkComplete()).isTrue();
+        assertThat(getTwo.afterMax(timeout).checkComplete()).isTrue();
         assertThat(System.currentTimeMillis() - startTime).isLessThan(1000);
 
         startTime = System.currentTimeMillis();
@@ -207,8 +210,8 @@ public class JRoutineTest extends TestCase {
         getOne = builder.lockName("test").method("getOne").callAsync();
         getTwo = builder.lockName("test").method("getTwo").callAsync();
 
-        assertThat(getOne.checkComplete()).isTrue();
-        assertThat(getTwo.checkComplete()).isTrue();
+        assertThat(getOne.afterMax(timeout).checkComplete()).isTrue();
+        assertThat(getTwo.afterMax(timeout).checkComplete()).isTrue();
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
     }
 
@@ -407,6 +410,7 @@ public class JRoutineTest extends TestCase {
 
     public void testObjectRoutineBuilder() throws NoSuchMethodException {
 
+        final TimeDuration timeout = seconds(1);
         final Test test = new Test();
         final Routine<Object, Object> routine = JRoutine.on(test)
                                                         .syncRunner(RunnerType.SEQUENTIAL)
@@ -418,14 +422,14 @@ public class JRoutineTest extends TestCase {
                                                         .loggedWith(new NullLog())
                                                         .annotatedMethod(Test.GET);
 
-        assertThat(routine.callSync().readAll()).containsExactly(-77L);
+        assertThat(routine.callSync().afterMax(timeout).readAll()).containsExactly(-77L);
 
         final Routine<Object, Object> routine1 = JRoutine.onWeak(test)
                                                          .syncRunner(RunnerType.QUEUED)
                                                          .runBy(Runners.poolRunner())
                                                          .method("getLong");
 
-        assertThat(routine1.callSync().readAll()).containsExactly(-77L);
+        assertThat(routine1.callSync().afterMax(timeout).readAll()).containsExactly(-77L);
 
         final Routine<Object, Object> routine2 = JRoutine.on(test)
                                                          .syncRunner(RunnerType.QUEUED)
@@ -435,13 +439,13 @@ public class JRoutineTest extends TestCase {
                                                          .lockName("test")
                                                          .method(Test.class.getMethod("getLong"));
 
-        assertThat(routine2.callSync().readAll()).containsExactly(-77L);
+        assertThat(routine2.callSync().afterMax(timeout).readAll()).containsExactly(-77L);
 
         final Routine<Object, Object> routine3 = JRoutine.onWeak(test).annotatedMethod(Test.THROW);
 
         try {
 
-            routine3.callSync(new IllegalArgumentException("test")).readAll();
+            routine3.callSync(new IllegalArgumentException("test")).afterMax(timeout).readAll();
 
             fail();
 
@@ -458,8 +462,8 @@ public class JRoutineTest extends TestCase {
         OutputChannel<Object> getOne = builder.method("getOne").callAsync();
         OutputChannel<Object> getTwo = builder.method("getTwo").callAsync();
 
-        assertThat(getOne.checkComplete()).isTrue();
-        assertThat(getTwo.checkComplete()).isTrue();
+        assertThat(getOne.afterMax(timeout).checkComplete()).isTrue();
+        assertThat(getTwo.afterMax(timeout).checkComplete()).isTrue();
         assertThat(System.currentTimeMillis() - startTime).isLessThan(1000);
 
         startTime = System.currentTimeMillis();
@@ -467,8 +471,8 @@ public class JRoutineTest extends TestCase {
         getOne = builder.lockName("test").method("getOne").callAsync();
         getTwo = builder.lockName("test").method("getTwo").callAsync();
 
-        assertThat(getOne.checkComplete()).isTrue();
-        assertThat(getTwo.checkComplete()).isTrue();
+        assertThat(getOne.afterMax(timeout).checkComplete()).isTrue();
+        assertThat(getTwo.afterMax(timeout).checkComplete()).isTrue();
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
     }
 
@@ -761,19 +765,24 @@ public class JRoutineTest extends TestCase {
 
     public void testObjectRoutineParallel() {
 
+        final TimeDuration timeout = seconds(1);
         final Square square = new Square();
         final SquareItf squareAsync = JRoutine.on(square).buildProxy(SquareItf.class);
 
         assertThat(squareAsync.compute(3)).isEqualTo(9);
-        assertThat(squareAsync.computeParallel1(1, 2, 3).readAll()).contains(1, 4, 9);
-        assertThat(squareAsync.computeParallel2(1, 2, 3).readAll()).contains(1, 4, 9);
-        assertThat(squareAsync.computeParallel3(Arrays.asList(1, 2, 3)).readAll()).contains(1, 4,
-                                                                                            9);
+        assertThat(squareAsync.computeParallel1(1, 2, 3).afterMax(timeout).readAll()).contains(1, 4,
+                                                                                               9);
+        assertThat(squareAsync.computeParallel2(1, 2, 3).afterMax(timeout).readAll()).contains(1, 4,
+                                                                                               9);
+        assertThat(squareAsync.computeParallel3(Arrays.asList(1, 2, 3)).afterMax(timeout).readAll())
+                .contains(1, 4, 9);
 
         final IOChannel<Integer> channel = JRoutine.io().buildChannel();
 
         channel.input().pass(1, 2, 3).close();
-        assertThat(squareAsync.computeParallel4(channel.output()).readAll()).contains(1, 4, 9);
+        assertThat(squareAsync.computeParallel4(channel.output())
+                              .afterMax(timeout)
+                              .readAll()).contains(1, 4, 9);
 
         final TestInc testInc = new TestInc();
         final int[] inc =
@@ -884,6 +893,7 @@ public class JRoutineTest extends TestCase {
         }
     }
 
+    @Async(resultTimeout = 1000)
     private interface ITestInc {
 
         @AsyncType(int.class)
@@ -892,6 +902,7 @@ public class JRoutineTest extends TestCase {
 
     private static interface SquareItf {
 
+        @Async(resultTimeout = 1, resultTimeUnit = TimeUnit.SECONDS)
         public int compute(int i);
 
         @Async(value = "compute", lockName = Async.NULL_LOCK)

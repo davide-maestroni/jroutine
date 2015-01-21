@@ -168,6 +168,20 @@ public @interface Async {
     int maxRunning() default RoutineConfiguration.DEFAULT;
 
     /**
+     * The time unit of the timeout for an invocation instance to produce a result.
+     *
+     * @return the time unit.
+     */
+    TimeUnit resultTimeUnit() default TimeUnit.MILLISECONDS;
+
+    /**
+     * The timeout for an invocation instance to produce a result.
+     *
+     * @return the timeout.
+     */
+    long resultTimeout() default RoutineConfiguration.DEFAULT;
+
+    /**
      * The type of the runner to be used for synchronous invocations.
      *
      * @return the runner type.

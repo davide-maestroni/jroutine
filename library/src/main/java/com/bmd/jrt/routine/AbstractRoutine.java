@@ -33,7 +33,7 @@ import javax.annotation.Nonnull;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-import static com.bmd.jrt.time.TimeDuration.seconds;
+import static com.bmd.jrt.time.TimeDuration.ZERO;
 
 /**
  * Basic abstract implementation of a routine.
@@ -48,7 +48,7 @@ import static com.bmd.jrt.time.TimeDuration.seconds;
  */
 public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
-    private static final TimeDuration DEFAULT_AVAIL_TIMEOUT = seconds(5);
+    private static final TimeDuration DEFAULT_AVAIL_TIMEOUT = ZERO;
 
     private static final int DEFAULT_MAX_RETAINED = 10;
 

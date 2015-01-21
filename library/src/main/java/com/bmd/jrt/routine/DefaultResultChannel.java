@@ -17,6 +17,7 @@ import com.bmd.jrt.builder.OutputDeadlockException;
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.channel.OutputChannel;
+import com.bmd.jrt.channel.OutputChannel.TimeoutAction;
 import com.bmd.jrt.channel.OutputConsumer;
 import com.bmd.jrt.channel.ReadDeadlockException;
 import com.bmd.jrt.channel.ResultChannel;
@@ -42,7 +43,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import static com.bmd.jrt.time.TimeDuration.ZERO;
 import static com.bmd.jrt.time.TimeDuration.fromUnit;
-import static com.bmd.jrt.time.TimeDuration.seconds;
 
 /**
  * Class handling the routine output.
@@ -92,9 +92,9 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
     private int mPendingOutputCount;
 
-    private TimeDuration mReadTimeout = seconds(5);
+    private TimeDuration mReadTimeout = ZERO;
 
-    private boolean mReadTimeoutException;
+    private TimeoutAction mReadTimeoutAction;
 
     private TimeDuration mResultDelay = ZERO;
 
@@ -129,7 +129,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         mHandler = handler;
         mRunner = runner;
         mMaxOutput = configuration.getOutputSizeOr(Integer.MAX_VALUE);
-        mOutputTimeout = configuration.getOutputTimeoutOr(TimeDuration.ZERO);
+        mOutputTimeout = configuration.getOutputTimeoutOr(ZERO);
 
         if (mOutputTimeout == null) {
 
@@ -681,60 +681,65 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
     @Nullable
     private OUTPUT readQueue(@Nonnull final TimeDuration timeout,
-            final boolean throwTimeoutException) {
+            @Nonnull final TimeoutAction timeoutAction) {
 
-        synchronized (mMutex) {
+        verifyBound();
 
-            verifyBound();
+        final Logger logger = mLogger;
+        final NestedQueue<Object> outputQueue = mOutputQueue;
 
-            final Logger logger = mLogger;
-            final NestedQueue<Object> outputQueue = mOutputQueue;
+        if (timeout.isZero() || !outputQueue.isEmpty()) {
 
-            if (timeout.isZero() || !outputQueue.isEmpty()) {
+            if (outputQueue.isEmpty()) {
 
-                if (outputQueue.isEmpty()) {
-
-                    throw new NoSuchElementException();
-                }
-
-                return nextOutput(outputQueue, timeout);
-            }
-
-            if (mOutputNotEmpty == null) {
-
-                mOutputNotEmpty = new Check() {
-
-                    @Override
-                    public boolean isTrue() {
-
-                        return !outputQueue.isEmpty();
-                    }
-                };
-            }
-
-            boolean isTimeout = false;
-
-            try {
-
-                isTimeout = !timeout.waitTrue(mMutex, mOutputNotEmpty);
-
-            } catch (final InterruptedException e) {
-
-                RoutineInterruptedException.interrupt(e);
-            }
-
-            if (isTimeout) {
-
-                logger.wrn("reading output timeout: [%s]", timeout);
-
-                if (throwTimeoutException) {
-
-                    throw new ReadDeadlockException();
-                }
+                throw new NoSuchElementException();
             }
 
             return nextOutput(outputQueue, timeout);
         }
+
+        if (mOutputNotEmpty == null) {
+
+            mOutputNotEmpty = new Check() {
+
+                @Override
+                public boolean isTrue() {
+
+                    return !outputQueue.isEmpty();
+                }
+            };
+        }
+
+        boolean isTimeout = false;
+
+        try {
+
+            isTimeout = !timeout.waitTrue(mMutex, mOutputNotEmpty);
+
+        } catch (final InterruptedException e) {
+
+            RoutineInterruptedException.interrupt(e);
+        }
+
+        if (isTimeout) {
+
+            logger.wrn("reading output timeout: [%s]", timeout);
+
+            if (timeoutAction == TimeoutAction.DEADLOCK) {
+
+                throw new ReadDeadlockException();
+
+            } else if (timeoutAction == TimeoutAction.ABORT) {
+
+                //TODO??
+
+            } else if (timeoutAction == TimeoutAction.RETURN) {
+
+                return null;
+            }
+        }
+
+        return nextOutput(outputQueue, timeout);
     }
 
     private void verifyBound() {
@@ -797,23 +802,23 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         private final Logger mSubLogger = mLogger.subContextLogger(this);
 
-        private final boolean mThrowTimeoutException;
-
         private final TimeDuration mTimeout;
+
+        private final TimeoutAction mTimeoutAction;
 
         private boolean mRemoved = true;
 
         /**
          * Constructor.
          *
-         * @param timeout               the output timeout.
-         * @param throwTimeoutException whether to throw the timeout exception.
+         * @param timeout       the output timeout.
+         * @param timeoutAction the timeout action.
          */
         private DefaultIterator(@Nonnull final TimeDuration timeout,
-                final boolean throwTimeoutException) {
+                @Nonnull final TimeoutAction timeoutAction) {
 
             mTimeout = timeout;
-            mThrowTimeoutException = throwTimeoutException;
+            mTimeoutAction = timeoutAction;
         }
 
         @Override
@@ -825,7 +830,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 final Logger logger = mSubLogger;
                 final TimeDuration timeout = mTimeout;
-                final boolean throwTimeoutException = mThrowTimeoutException;
+                final TimeoutAction timeoutAction = mTimeoutAction;
                 final NestedQueue<Object> outputQueue = mOutputQueue;
 
                 if (timeout.isZero() || (mState == ChannelState.DONE)) {
@@ -862,7 +867,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                     logger.wrn("has output timeout: [%s]", timeout);
 
-                    if (throwTimeoutException) {
+                    if (timeoutAction) {
 
                         throw new ReadDeadlockException();
                     }
@@ -882,7 +887,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             synchronized (mMutex) {
 
-                final OUTPUT next = readQueue(mTimeout, mThrowTimeoutException);
+                final OUTPUT next = readQueue(mTimeout, mTimeoutAction);
                 mRemoved = false;
                 return next;
             }
@@ -919,8 +924,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         public OutputChannel<OUTPUT> afterMax(@Nonnull final TimeDuration timeout) {
 
             synchronized (mMutex) {
-
-                verifyBound();
 
                 if (timeout == null) {
 
@@ -978,7 +981,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             synchronized (mMutex) {
 
                 final TimeDuration timeout = mReadTimeout;
-                final boolean throwTimeoutException = mReadTimeoutException;
+                final TimeoutAction timeoutAction = mReadTimeoutAction;
 
                 try {
 
@@ -996,7 +999,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                     RoutineInterruptedException.interrupt(e);
                 }
 
-                if (!isDone && throwTimeoutException) {
+                if (!isDone && timeoutAction) {
 
                     mSubLogger.wrn("waiting complete timeout: [%s]", timeout);
                     throw new ReadDeadlockException();
@@ -1008,14 +1011,17 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         @Nonnull
         @Override
-        @SuppressWarnings("BooleanParameter")
-        public OutputChannel<OUTPUT> eventuallyDeadLock(final boolean throwException) {
+        @SuppressWarnings("ConstantConditions")
+        public OutputChannel<OUTPUT> eventually(@Nonnull final TimeoutAction action) {
 
             synchronized (mMutex) {
 
-                verifyBound();
+                if (action == null) {
 
-                mReadTimeoutException = throwException;
+                    throw new NullPointerException("the timeout action must not be null");
+                }
+
+                mReadTimeoutAction = action;
             }
 
             return this;
@@ -1066,7 +1072,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 final NestedQueue<Object> outputQueue = mOutputQueue;
                 final TimeDuration timeout = mReadTimeout;
-                final boolean throwTimeoutException = mReadTimeoutException;
+                final TimeoutAction timeoutAction = mReadTimeoutAction;
 
                 if (timeout.isZero() || (mState == ChannelState.DONE)) {
 
@@ -1111,7 +1117,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                     logger.wrn("list output timeout: [%s]", timeout);
 
-                    if (throwTimeoutException) {
+                    if (timeoutAction) {
 
                         throw new ReadDeadlockException();
                     }
@@ -1124,7 +1130,10 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         @Override
         public OUTPUT readFirst() {
 
-            return readQueue(mReadTimeout, mReadTimeoutException);
+            synchronized (mMutex) {
+
+                return readQueue(mReadTimeout, mReadTimeoutAction);
+            }
         }
 
         @Nonnull
@@ -1147,17 +1156,17 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         public Iterator<OUTPUT> iterator() {
 
             final TimeDuration timeout;
-            final boolean throwTimeoutException;
+            final TimeoutAction timeoutAction;
 
             synchronized (mMutex) {
 
                 verifyBound();
 
                 timeout = mReadTimeout;
-                throwTimeoutException = mReadTimeoutException;
+                timeoutAction = mReadTimeoutAction;
             }
 
-            return new DefaultIterator(timeout, throwTimeoutException);
+            return new DefaultIterator(timeout, timeoutAction);
         }
 
         @Override

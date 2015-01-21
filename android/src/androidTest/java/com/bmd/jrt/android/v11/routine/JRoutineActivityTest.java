@@ -73,13 +73,14 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
+        final TimeDuration timeout = TimeDuration.seconds(1);
         final Routine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
                         .withId(0)
                         .onClash(ClashResolution.ABORT)
                         .buildRoutine();
-        final OutputChannel<String> result1 = routine.callAsync("test1");
-        final OutputChannel<String> result2 = routine.callAsync("test1");
+        final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
+        final OutputChannel<String> result2 = routine.callAsync("test1").afterMax(timeout);
 
         assertThat(result1.readFirst()).isEqualTo("TEST1");
 
@@ -101,13 +102,14 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
+        final TimeDuration timeout = TimeDuration.seconds(1);
         final Routine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
                         .withId(0)
                         .onClash(ClashResolution.ABORT_ON_INPUT)
                         .buildRoutine();
-        final OutputChannel<String> result1 = routine.callAsync("test1");
-        final OutputChannel<String> result2 = routine.callAsync("test2");
+        final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
+        final OutputChannel<String> result2 = routine.callAsync("test2").afterMax(timeout);
 
         assertThat(result1.readFirst()).isEqualTo("TEST1");
 
@@ -129,13 +131,15 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
+        final TimeDuration timeout = TimeDuration.seconds(1);
         final Data data1 = new Data();
         final OutputChannel<Data> result1 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Abort.class))
                         .withId(0)
                         .onComplete(ResultCache.RETAIN_RESULT)
                         .buildRoutine()
-                        .callAsync(data1);
+                        .callAsync(data1)
+                        .afterMax(timeout);
 
         try {
 
@@ -154,7 +158,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                         .withId(0)
                         .onComplete(ResultCache.RETAIN_RESULT)
                         .buildRoutine()
-                        .callAsync(data1);
+                        .callAsync(data1)
+                        .afterMax(timeout);
 
         assertThat(result2.readFirst()).isSameAs(data1);
         result2.checkComplete();
@@ -163,7 +168,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class))
                         .withId(0)
                         .buildRoutine()
-                        .callAsync(data1);
+                        .callAsync(data1)
+                        .afterMax(timeout);
 
         assertThat(result3.readFirst()).isSameAs(data1);
         result3.checkComplete();
@@ -176,13 +182,15 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
+        final TimeDuration timeout = TimeDuration.seconds(1);
         final Data data1 = new Data();
         final OutputChannel<Data> result1 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class))
                         .withId(0)
                         .onComplete(ResultCache.RETAIN_ERROR)
                         .buildRoutine()
-                        .callAsync(data1);
+                        .callAsync(data1)
+                        .afterMax(timeout);
 
         assertThat(result1.readFirst()).isSameAs(data1);
         result1.checkComplete();
@@ -193,7 +201,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                         .withId(0)
                         .onComplete(ResultCache.RETAIN_ERROR)
                         .buildRoutine()
-                        .callAsync(data1);
+                        .callAsync(data1)
+                        .afterMax(timeout);
 
         try {
 
@@ -212,7 +221,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Abort.class))
                         .withId(0)
                         .buildRoutine()
-                        .callAsync(data1);
+                        .callAsync(data1)
+                        .afterMax(timeout);
 
         try {
 
@@ -235,11 +245,12 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
+        final TimeDuration timeout = TimeDuration.seconds(1);
         final Routine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
                         .buildRoutine();
-        final OutputChannel<String> result1 = routine.callAsync("test1");
-        final OutputChannel<String> result2 = routine.callAsync("test2");
+        final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
+        final OutputChannel<String> result2 = routine.callAsync("test2").afterMax(timeout);
 
         assertThat(result1.readFirst()).isEqualTo("TEST1");
         assertThat(result2.readFirst()).isEqualTo("TEST2");
@@ -252,13 +263,14 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
+        final TimeDuration timeout = TimeDuration.seconds(1);
         final Routine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
                         .withId(0)
                         .onClash(ClashResolution.KEEP)
                         .buildRoutine();
-        final OutputChannel<String> result1 = routine.callAsync("test1");
-        final OutputChannel<String> result2 = routine.callAsync("test2");
+        final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
+        final OutputChannel<String> result2 = routine.callAsync("test2").afterMax(timeout);
 
         assertThat(result1.readFirst()).isEqualTo("TEST1");
         assertThat(result2.readFirst()).isEqualTo("TEST1");
@@ -271,11 +283,12 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
+        final TimeDuration timeout = TimeDuration.seconds(1);
         final OutputChannel<String> channel = JRoutine.onActivity(getActivity(), 0).buildChannel();
 
         try {
 
-            channel.readAll();
+            channel.afterMax(timeout).readAll();
 
             fail();
 
@@ -291,13 +304,14 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
+        final TimeDuration timeout = TimeDuration.seconds(1);
         final Routine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
                         .withId(0)
                         .onClash(ClashResolution.RESTART)
                         .buildRoutine();
-        final OutputChannel<String> result1 = routine.callAsync("test1");
-        final OutputChannel<String> result2 = routine.callAsync("test1");
+        final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
+        final OutputChannel<String> result2 = routine.callAsync("test1").afterMax(timeout);
 
         try {
 
@@ -319,13 +333,14 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
+        final TimeDuration timeout = TimeDuration.seconds(1);
         final Routine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
                         .withId(0)
                         .onClash(ClashResolution.RESTART_ON_INPUT)
                         .buildRoutine();
-        final OutputChannel<String> result1 = routine.callAsync("test1");
-        final OutputChannel<String> result2 = routine.callAsync("test2");
+        final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
+        final OutputChannel<String> result2 = routine.callAsync("test2").afterMax(timeout);
 
         try {
 
@@ -347,13 +362,15 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
+        final TimeDuration timeout = TimeDuration.seconds(1);
         final Data data1 = new Data();
         final OutputChannel<Data> result1 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class))
                         .withId(0)
                         .onComplete(ResultCache.RETAIN)
                         .buildRoutine()
-                        .callAsync(data1);
+                        .callAsync(data1)
+                        .afterMax(timeout);
 
         assertThat(result1.readFirst()).isSameAs(data1);
         result1.checkComplete();
@@ -362,7 +379,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class))
                         .withId(0)
                         .buildRoutine()
-                        .callAsync(data1);
+                        .callAsync(data1)
+                        .afterMax(timeout);
 
         assertThat(result2.readFirst()).isSameAs(data1);
         result2.checkComplete();
@@ -373,7 +391,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                         .withId(0)
                         .onComplete(ResultCache.RETAIN)
                         .buildRoutine()
-                        .callAsync(data1);
+                        .callAsync(data1)
+                        .afterMax(timeout);
 
         try {
 
@@ -392,7 +411,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Abort.class))
                         .withId(0)
                         .buildRoutine()
-                        .callAsync(data1);
+                        .callAsync(data1)
+                        .afterMax(timeout);
 
         try {
 
@@ -415,6 +435,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
+        final TimeDuration timeout = TimeDuration.seconds(1);
         final Routine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
                         .withId(0)
@@ -439,7 +460,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         final OutputChannel<String> channel = JRoutine.onActivity(getActivity(), 0).buildChannel();
 
-        assertThat(channel.readAll()).containsExactly("TEST1", "TEST2");
+        assertThat(channel.afterMax(timeout).readAll()).containsExactly("TEST1", "TEST2");
     }
 
     public void testActivityRotationInputs() throws InterruptedException {
@@ -449,6 +470,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
+        final TimeDuration timeout = TimeDuration.seconds(1);
         final Routine<String, String> routine1 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
                         .buildRoutine();
@@ -473,8 +495,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final Routine<String, String> routine2 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
                         .buildRoutine();
-        final OutputChannel<String> result1 = routine2.callAsync("test1");
-        final OutputChannel<String> result2 = routine2.callAsync("test2");
+        final OutputChannel<String> result1 = routine2.callAsync("test1").afterMax(timeout);
+        final OutputChannel<String> result2 = routine2.callAsync("test2").afterMax(timeout);
 
         assertThat(result1.readFirst()).isEqualTo("TEST1");
         assertThat(result2.readFirst()).isEqualTo("TEST2");
@@ -487,6 +509,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
+        final TimeDuration timeout = TimeDuration.seconds(1);
         final Data data1 = new Data();
         final Routine<Data, Data> routine1 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class)).buildRoutine();
@@ -510,8 +533,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         final Routine<Data, Data> routine2 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class)).buildRoutine();
-        final OutputChannel<Data> result1 = routine2.callAsync(data1);
-        final OutputChannel<Data> result2 = routine2.callAsync(data1);
+        final OutputChannel<Data> result1 = routine2.callAsync(data1).afterMax(timeout);
+        final OutputChannel<Data> result2 = routine2.callAsync(data1).afterMax(timeout);
 
         assertThat(result1.readFirst()).isSameAs(data1);
         assertThat(result2.readFirst()).isSameAs(data1);
@@ -524,11 +547,12 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
+        final TimeDuration timeout = TimeDuration.seconds(1);
         final Data data1 = new Data();
         final Routine<Data, Data> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class)).buildRoutine();
-        final OutputChannel<Data> result1 = routine.callAsync(data1);
-        final OutputChannel<Data> result2 = routine.callAsync(data1);
+        final OutputChannel<Data> result1 = routine.callAsync(data1).afterMax(timeout);
+        final OutputChannel<Data> result2 = routine.callAsync(data1).afterMax(timeout);
 
         assertThat(result1.readFirst()).isSameAs(data1);
         assertThat(result2.readFirst()).isSameAs(data1);
@@ -541,13 +565,15 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
+        final TimeDuration timeout = TimeDuration.seconds(1);
         final Data data1 = new Data();
         final OutputChannel<Data> result1 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class))
                         .withId(0)
                         .onComplete(ResultCache.RETAIN)
                         .buildRoutine()
-                        .callAsync(data1);
+                        .callAsync(data1)
+                        .afterMax(timeout);
 
         assertThat(result1.readFirst()).isSameAs(data1);
         result1.checkComplete();
@@ -556,7 +582,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Abort.class))
                         .withId(0)
                         .buildRoutine()
-                        .callAsync(data1);
+                        .callAsync(data1)
+                        .afterMax(timeout);
 
         try {
 
@@ -722,6 +749,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
+        final TimeDuration timeout = TimeDuration.seconds(1);
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
@@ -730,8 +758,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                         .withId(0)
                         .onClash(ClashResolution.ABORT_ON_INPUT)
                         .buildRoutine();
-        final OutputChannel<String> result1 = routine.callAsync("test1");
-        final OutputChannel<String> result2 = routine.callAsync("test2");
+        final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
+        final OutputChannel<String> result2 = routine.callAsync("test2").afterMax(timeout);
 
         assertThat(result1.readFirst()).isEqualTo("TEST1");
 
@@ -753,6 +781,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
+        final TimeDuration timeout = TimeDuration.seconds(1);
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
@@ -764,8 +793,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final OutputChannel<String> channel1 = routine.callAsync("test1", "test2");
         final OutputChannel<String> channel2 = JRoutine.onFragment(fragment, 0).buildChannel();
 
-        assertThat(channel1.readAll()).containsExactly("TEST1", "TEST2");
-        assertThat(channel2.readAll()).containsExactly("TEST1", "TEST2");
+        assertThat(channel1.afterMax(timeout).readAll()).containsExactly("TEST1", "TEST2");
+        assertThat(channel2.afterMax(timeout).readAll()).containsExactly("TEST1", "TEST2");
     }
 
     public void testFragmentInputs() throws InterruptedException {
@@ -775,13 +804,14 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
+        final TimeDuration timeout = TimeDuration.seconds(1);
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Routine<String, String> routine =
                 JRoutine.onFragment(fragment, ClassToken.tokenOf(ToUpperCase.class)).buildRoutine();
-        final OutputChannel<String> result1 = routine.callAsync("test1");
-        final OutputChannel<String> result2 = routine.callAsync("test2");
+        final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
+        final OutputChannel<String> result2 = routine.callAsync("test2").afterMax(timeout);
 
         assertThat(result1.readFirst()).isEqualTo("TEST1");
         assertThat(result2.readFirst()).isEqualTo("TEST2");
@@ -794,6 +824,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
+        final TimeDuration timeout = TimeDuration.seconds(1);
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
@@ -802,8 +833,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                         .withId(0)
                         .onClash(ClashResolution.KEEP)
                         .buildRoutine();
-        final OutputChannel<String> result1 = routine.callAsync("test1");
-        final OutputChannel<String> result2 = routine.callAsync("test2");
+        final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
+        final OutputChannel<String> result2 = routine.callAsync("test2").afterMax(timeout);
 
         assertThat(result1.readFirst()).isEqualTo("TEST1");
         assertThat(result2.readFirst()).isEqualTo("TEST1");
@@ -816,6 +847,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
+        final TimeDuration timeout = TimeDuration.seconds(1);
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
@@ -823,7 +855,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            channel.readAll();
+            channel.afterMax(timeout).readAll();
 
             fail();
 
@@ -839,6 +871,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
+        final TimeDuration timeout = TimeDuration.seconds(1);
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
@@ -847,8 +880,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                         .withId(0)
                         .onClash(ClashResolution.RESTART)
                         .buildRoutine();
-        final OutputChannel<String> result1 = routine.callAsync("test1");
-        final OutputChannel<String> result2 = routine.callAsync("test1");
+        final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
+        final OutputChannel<String> result2 = routine.callAsync("test1").afterMax(timeout);
 
         try {
 
@@ -870,6 +903,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
+        final TimeDuration timeout = TimeDuration.seconds(1);
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
@@ -878,8 +912,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                         .withId(0)
                         .onClash(ClashResolution.RESTART_ON_INPUT)
                         .buildRoutine();
-        final OutputChannel<String> result1 = routine.callAsync("test1");
-        final OutputChannel<String> result2 = routine.callAsync("test2");
+        final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
+        final OutputChannel<String> result2 = routine.callAsync("test2").afterMax(timeout);
 
         try {
 
@@ -901,14 +935,15 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
+        final TimeDuration timeout = TimeDuration.seconds(1);
         final Data data1 = new Data();
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Routine<Data, Data> routine =
                 JRoutine.onFragment(fragment, ClassToken.tokenOf(Delay.class)).buildRoutine();
-        final OutputChannel<Data> result1 = routine.callAsync(data1);
-        final OutputChannel<Data> result2 = routine.callAsync(data1);
+        final OutputChannel<Data> result1 = routine.callAsync(data1).afterMax(timeout);
+        final OutputChannel<Data> result2 = routine.callAsync(data1).afterMax(timeout);
 
         assertThat(result1.readFirst()).isSameAs(data1);
         assertThat(result2.readFirst()).isSameAs(data1);
@@ -921,20 +956,22 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
+        final TimeDuration timeout = TimeDuration.seconds(1);
         final Routine<String, String> routine1 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(StringTunnelInvocation.class))
                         .syncRunner(RunnerType.QUEUED)
                         .loggedWith(Logs.androidLog())
                         .logLevel(LogLevel.WARNING)
                         .buildRoutine();
-        assertThat(routine1.callSync("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2", "3",
-                                                                                      "4", "5");
-        assertThat(routine1.callAsync("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2",
-                                                                                       "3", "4",
-                                                                                       "5");
-        assertThat(routine1.callParallel("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2",
-                                                                                          "3", "4",
-                                                                                          "5");
+        assertThat(routine1.callSync("1", "2", "3", "4", "5")
+                           .afterMax(timeout)
+                           .readAll()).containsOnly("1", "2", "3", "4", "5");
+        assertThat(routine1.callAsync("1", "2", "3", "4", "5")
+                           .afterMax(timeout)
+                           .readAll()).containsOnly("1", "2", "3", "4", "5");
+        assertThat(routine1.callParallel("1", "2", "3", "4", "5")
+                           .afterMax(timeout)
+                           .readAll()).containsOnly("1", "2", "3", "4", "5");
 
         final Routine<String, String> routine2 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(StringSimpleInvocation.class))
@@ -942,14 +979,15 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                         .loggedWith(Logs.androidLog())
                         .logLevel(LogLevel.WARNING)
                         .buildRoutine();
-        assertThat(routine2.callSync("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2", "3",
-                                                                                      "4", "5");
-        assertThat(routine2.callAsync("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2",
-                                                                                       "3", "4",
-                                                                                       "5");
-        assertThat(routine2.callParallel("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2",
-                                                                                          "3", "4",
-                                                                                          "5");
+        assertThat(routine2.callSync("1", "2", "3", "4", "5")
+                           .afterMax(timeout)
+                           .readAll()).containsOnly("1", "2", "3", "4", "5");
+        assertThat(routine2.callAsync("1", "2", "3", "4", "5")
+                           .afterMax(timeout)
+                           .readAll()).containsOnly("1", "2", "3", "4", "5");
+        assertThat(routine2.callParallel("1", "2", "3", "4", "5")
+                           .afterMax(timeout)
+                           .readAll()).containsOnly("1", "2", "3", "4", "5");
     }
 
     @SuppressWarnings("ConstantConditions")

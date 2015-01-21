@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
+import static com.bmd.jrt.time.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -39,6 +40,8 @@ public class IOChannelTest extends TestCase {
 
     public void testAbort() {
 
+        final TimeDuration timeout = seconds(1);
+
         final IOChannel<String> channel = JRoutine.io().buildChannel();
         final Routine<String, String> routine = JRoutine.<String>on().buildRoutine();
         final OutputChannel<String> outputChannel = routine.callAsync(channel.output());
@@ -47,7 +50,7 @@ public class IOChannelTest extends TestCase {
 
         try {
 
-            outputChannel.readFirst();
+            outputChannel.afterMax(timeout).readFirst();
 
             fail();
 
@@ -86,6 +89,8 @@ public class IOChannelTest extends TestCase {
 
     public void testAsynchronousInput() {
 
+        final TimeDuration timeout = seconds(1);
+
         final IOChannel<String> channel = JRoutine.io().buildChannel();
 
         new Thread() {
@@ -108,7 +113,7 @@ public class IOChannelTest extends TestCase {
 
         final Routine<String, String> routine = JRoutine.<String>on().buildRoutine();
         final OutputChannel<String> outputChannel = routine.callAsync(channel.output());
-        assertThat(outputChannel.readFirst()).isEqualTo("test");
+        assertThat(outputChannel.afterMax(timeout).readFirst()).isEqualTo("test");
         assertThat(outputChannel.checkComplete()).isTrue();
 
         final IOChannel<String> channel1 =
@@ -130,7 +135,8 @@ public class IOChannelTest extends TestCase {
 
         final Routine<String, String> routine1 = JRoutine.<String>on().buildRoutine();
         final OutputChannel<String> outputChannel1 = routine1.callAsync(channel1.output());
-        assertThat(outputChannel1.readAll()).containsExactly("test1", "test2", "test3");
+        assertThat(outputChannel1.afterMax(timeout).readAll()).containsExactly("test1", "test2",
+                                                                               "test3");
     }
 
     public void testPartialOut() {
@@ -162,13 +168,15 @@ public class IOChannelTest extends TestCase {
 
     public void testReadFirst() throws InterruptedException {
 
+        final TimeDuration timeout = seconds(1);
+
         IOChannel<String> channel = JRoutine.io().buildChannel();
 
         new WeakThread(channel).start();
 
         final Routine<String, String> routine = JRoutine.<String>on().buildRoutine();
         final OutputChannel<String> outputChannel = routine.callAsync(channel.output());
-        assertThat(outputChannel.readFirst()).isEqualTo("test");
+        assertThat(outputChannel.afterMax(timeout).readFirst()).isEqualTo("test");
     }
 
     public void testTimeout() {
@@ -181,7 +189,7 @@ public class IOChannelTest extends TestCase {
 
         try {
 
-            output.afterMax(TimeDuration.millis(10)).eventuallyDeadLock(true).readFirst();
+            output.afterMax(TimeDuration.millis(10)).eventually(true).readFirst();
 
             fail();
 

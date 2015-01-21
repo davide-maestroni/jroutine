@@ -47,7 +47,7 @@ import javax.annotation.Nullable;
  * invocation instances at one time can be limited by calling the specific builder method. When the
  * limit is reached and an additional instance is requires, the call is blocked until one becomes
  * available or the timeout set through the builder elapses.<br/>
- * By default the timeout is set to a few seconds to avoid unexpected deadlocks.<br/>
+ * By default the timeout is set to 0 to avoid unexpected deadlocks.<br/>
  * In case the timeout elapses before an invocation instance becomes available, a
  * {@link com.bmd.jrt.routine.RoutineDeadlockException} will be thrown.
  * <p/>
@@ -68,6 +68,8 @@ public interface RoutineBuilder {
 
     /**
      * Sets the timeout for an invocation instance to become available.
+     * <p/>
+     * By default the timeout is set to 0 to avoid unexpected deadlocks.
      *
      * @param timeout  the timeout.
      * @param timeUnit the timeout time unit.
@@ -81,6 +83,8 @@ public interface RoutineBuilder {
     /**
      * Sets the timeout for an invocation instance to become available. A null value means that
      * it is up to the framework to chose a default duration.
+     * <p/>
+     * By default the timeout is set to 0 to avoid unexpected deadlocks.
      *
      * @param timeout the timeout.
      * @return this builder.

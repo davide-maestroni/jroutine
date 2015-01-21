@@ -30,7 +30,8 @@ import javax.annotation.Nullable;
  * corresponding channel can be limited in order to avoid excessive memory consumption. In case the
  * maximum number is reached when passing an input or output, the call blocks until enough data are
  * consumed or the specified timeout elapses. In the latter case a
- * {@link com.bmd.jrt.common.DeadlockException} will be thrown.
+ * {@link com.bmd.jrt.common.DeadlockException} will be thrown.<br/>
+ * By default the timeout is set to 0 to avoid unexpected deadlocks.
  * <p/>
  * Finally, by default the order of input and output data is not guaranteed. Nevertheless, it is
  * possible to force data to be delivered in insertion order, at the cost of a slightly increased
@@ -110,6 +111,8 @@ public interface RoutineChannelBuilder extends RoutineBuilder {
 
     /**
      * Sets the timeout for an input channel to have room for additional data.
+     * <p/>
+     * By default the timeout is set to 0 to avoid unexpected deadlocks.
      *
      * @param timeout  the timeout.
      * @param timeUnit the timeout time unit.
@@ -144,6 +147,8 @@ public interface RoutineChannelBuilder extends RoutineBuilder {
 
     /**
      * Sets the timeout for a result channel to have room for additional data.
+     * <p/>
+     * By default the timeout is set to 0 to avoid unexpected deadlocks.
      *
      * @param timeout  the timeout.
      * @param timeUnit the timeout time unit.

@@ -38,7 +38,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * Tells the channel to wait at max the specified time duration for the next result to be
      * available.
      * <p/>
-     * By default the timeout is set to a few seconds to avoid unexpected deadlocks.
+     * By default the timeout is set to 0 to avoid unexpected deadlocks.
      *
      * @param timeout the maximum timeout.
      * @return this channel.
@@ -54,7 +54,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * Tells the channel to wait at max the specified time duration for the next result to be
      * available.
      * <p/>
-     * By default the timeout is set to a few seconds to avoid unexpected deadlocks.
+     * By default the timeout is set to 0 to avoid unexpected deadlocks.
      *
      * @param timeout  the maximum timeout value.
      * @param timeUnit the timeout time unit.
@@ -90,12 +90,13 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
     public boolean checkComplete();
 
     /**
+     * TODO
      * Tells the channel to throw a {@link ReadDeadlockException} in case no result is available
      * before the timeout has elapsed.
      * <p/>
      * By default no exception will be thrown.
      *
-     * @param throwException whether to throw a deadlock exception.
+     * @param action whether to throw a deadlock exception.
      * @return this channel.
      * @throws IllegalStateException               if this channel is already bound to a consumer.
      * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
@@ -105,13 +106,12 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @see #immediately()
      */
     @Nonnull
-    @SuppressWarnings("BooleanParameter")
-    public OutputChannel<OUTPUT> eventuallyDeadLock(boolean throwException);
+    public OutputChannel<OUTPUT> eventually(@Nonnull TimeoutAction action);
 
     /**
      * Tells the channel to not wait for results to be available.
      * <p/>
-     * By default the timeout is set to a few seconds to avoid unexpected deadlocks.
+     * By default the timeout is set to 0 to avoid unexpected deadlocks.
      *
      * @return this channel.
      * @throws IllegalStateException               if this channel is already bound to a consumer.
@@ -141,7 +141,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @see #afterMax(com.bmd.jrt.time.TimeDuration)
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
      * @see #immediately()
-     * @see #eventuallyDeadLock(boolean)
+     * @see #eventually(com.bmd.jrt.channel.OutputChannel.TimeoutAction)
      */
     @Nonnull
     public List<OUTPUT> readAll();
@@ -161,7 +161,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @see #afterMax(com.bmd.jrt.time.TimeDuration)
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
      * @see #immediately()
-     * @see #eventuallyDeadLock(boolean)
+     * @see #eventually(com.bmd.jrt.channel.OutputChannel.TimeoutAction)
      */
     @Nonnull
     public OutputChannel<OUTPUT> readAllInto(@Nonnull Collection<? super OUTPUT> results);
@@ -181,7 +181,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @see #afterMax(com.bmd.jrt.time.TimeDuration)
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
      * @see #immediately()
-     * @see #eventuallyDeadLock(boolean)
+     * @see #eventually(com.bmd.jrt.channel.OutputChannel.TimeoutAction)
      */
     public OUTPUT readFirst();
 
@@ -194,4 +194,13 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      */
     @Nonnull
     public OutputChannel<OUTPUT> unbind(@Nullable OutputConsumer<OUTPUT> consumer);
+
+    public enum TimeoutAction {
+
+        DEADLOCK,
+        CONTINUE,
+        RETURN,
+        ABORT,
+        DEFAULT
+    }
 }

@@ -24,5 +24,5 @@
             $$channel.pass($$object);
         }
 
-        return $$channel.result();
+        return $$channel.result().afterMax(${resultTimeout});
     }

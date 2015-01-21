@@ -72,6 +72,8 @@ public class RoutineTest extends TestCase {
 
     public void testAbort() throws InterruptedException {
 
+        final TimeDuration timeout = seconds(1);
+
         final Routine<String, String> routine =
                 on(tokenOf(DelayedInvocation.class)).withArgs(TimeDuration.millis(100))
                                                     .buildRoutine();
@@ -82,7 +84,7 @@ public class RoutineTest extends TestCase {
         assertThat(inputChannel.isOpen()).isFalse();
         assertThat(inputChannel.abort(new IllegalArgumentException("test1"))).isFalse();
         assertThat(inputChannel.isOpen()).isFalse();
-        assertThat(outputChannel.readFirst()).isEqualTo("test1");
+        assertThat(outputChannel.afterMax(timeout).readFirst()).isEqualTo("test1");
 
         final ParameterChannel<String, String> inputChannel1 = routine.invokeAsync().pass("test1");
         final OutputChannel<String> outputChannel1 = inputChannel1.result();
@@ -91,7 +93,7 @@ public class RoutineTest extends TestCase {
         assertThat(inputChannel1.abort()).isFalse();
         assertThat(inputChannel1.isOpen()).isFalse();
         assertThat(outputChannel1.isOpen()).isTrue();
-        assertThat(outputChannel1.readFirst()).isEqualTo("test1");
+        assertThat(outputChannel1.afterMax(timeout).readFirst()).isEqualTo("test1");
         assertThat(outputChannel1.isOpen()).isFalse();
 
         final OutputChannel<String> channel = routine.callAsync("test2");
@@ -102,7 +104,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            channel.readAll();
+            channel.afterMax(timeout).readAll();
 
             fail();
 
@@ -124,7 +126,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            channel1.readAll();
+            channel1.afterMax(timeout).readAll();
 
             fail();
 
@@ -170,6 +172,7 @@ public class RoutineTest extends TestCase {
                     .after(TimeDuration.millis(10))
                     .pass("test_abort")
                     .result()
+                    .afterMax(timeout)
                     .readFirst();
 
             fail();
@@ -201,6 +204,7 @@ public class RoutineTest extends TestCase {
                     .after(TimeDuration.millis(10))
                     .pass("test_abort")
                     .result()
+                    .afterMax(timeout)
                     .readFirst();
 
             fail();
@@ -256,7 +260,7 @@ public class RoutineTest extends TestCase {
                                                        .withArgs(this, isFailed, semaphore)
                                                        .buildRoutine();
 
-        assertThat(routine3.callAsync("test").readAll()).isEmpty();
+        assertThat(routine3.callAsync("test").afterMax(timeout).readAll()).isEmpty();
         semaphore.tryAcquire(1, 1, TimeUnit.SECONDS);
         assertThat(isFailed.get()).isFalse();
     }
@@ -332,67 +336,105 @@ public class RoutineTest extends TestCase {
 
     public void testCalls() {
 
+        final TimeDuration timeout = seconds(1);
+
         final Routine<String, String> routine = JRoutine.<String>on().buildRoutine();
 
-        assertThat(routine.callSync().readAll()).isEmpty();
-        assertThat(routine.callSync(Arrays.asList("test1", "test2")).readAll()).containsExactly(
+        assertThat(routine.callSync().afterMax(timeout).readAll()).isEmpty();
+        assertThat(routine.callSync(Arrays.asList("test1", "test2"))
+                          .afterMax(timeout)
+                          .readAll()).containsExactly("test1", "test2");
+        assertThat(routine.callSync(routine.callSync("test1", "test2")).afterMax(timeout).readAll())
+                .containsExactly("test1", "test2");
+        assertThat(routine.callSync("test1").afterMax(timeout).readAll()).containsExactly("test1");
+        assertThat(routine.callSync("test1", "test2").afterMax(timeout).readAll()).containsExactly(
                 "test1", "test2");
-        assertThat(routine.callSync(routine.callSync("test1", "test2")).readAll()).containsExactly(
+        assertThat(routine.callAsync().afterMax(timeout).readAll()).isEmpty();
+        assertThat(routine.callAsync(Arrays.asList("test1", "test2"))
+                          .afterMax(timeout)
+                          .readAll()).containsExactly("test1", "test2");
+        assertThat(routine.callAsync(routine.callSync("test1", "test2"))
+                          .afterMax(timeout)
+                          .readAll()).containsExactly("test1", "test2");
+        assertThat(routine.callAsync("test1").afterMax(timeout).readAll()).containsExactly("test1");
+        assertThat(routine.callAsync("test1", "test2").afterMax(timeout).readAll()).containsExactly(
                 "test1", "test2");
-        assertThat(routine.callSync("test1").readAll()).containsExactly("test1");
-        assertThat(routine.callSync("test1", "test2").readAll()).containsExactly("test1", "test2");
-        assertThat(routine.callAsync().readAll()).isEmpty();
-        assertThat(routine.callAsync(Arrays.asList("test1", "test2")).readAll()).containsExactly(
+        assertThat(routine.callParallel().afterMax(timeout).readAll()).isEmpty();
+        assertThat(routine.callParallel(Arrays.asList("test1", "test2"))
+                          .afterMax(timeout)
+                          .readAll()).containsOnly("test1", "test2");
+        assertThat(routine.callParallel(routine.callSync("test1", "test2"))
+                          .afterMax(timeout)
+                          .readAll()).containsOnly("test1", "test2");
+        assertThat(routine.callParallel("test1").afterMax(timeout).readAll()).containsOnly("test1");
+        assertThat(routine.callParallel("test1", "test2").afterMax(timeout).readAll()).containsOnly(
                 "test1", "test2");
-        assertThat(routine.callAsync(routine.callSync("test1", "test2")).readAll()).containsExactly(
-                "test1", "test2");
-        assertThat(routine.callAsync("test1").readAll()).containsExactly("test1");
-        assertThat(routine.callAsync("test1", "test2").readAll()).containsExactly("test1", "test2");
-        assertThat(routine.callParallel().readAll()).isEmpty();
-        assertThat(routine.callParallel(Arrays.asList("test1", "test2")).readAll()).containsOnly(
-                "test1", "test2");
-        assertThat(routine.callParallel(routine.callSync("test1", "test2")).readAll()).containsOnly(
-                "test1", "test2");
-        assertThat(routine.callParallel("test1").readAll()).containsOnly("test1");
-        assertThat(routine.callParallel("test1", "test2").readAll()).containsOnly("test1", "test2");
 
         assertThat(routine.invokeSync().pass().result().readAll()).isEmpty();
         assertThat(routine.invokeSync()
                           .pass(Arrays.asList("test1", "test2"))
                           .result()
+                          .afterMax(timeout)
                           .readAll()).containsExactly("test1", "test2");
-        assertThat(routine.invokeSync().pass(routine.callSync("test1", "test2")).result().readAll())
+        assertThat(routine.invokeSync()
+                          .pass(routine.callSync("test1", "test2"))
+                          .result()
+                          .afterMax(timeout)
+                          .readAll()).containsExactly("test1", "test2");
+        assertThat(routine.invokeSync()
+                          .pass("test1")
+                          .result()
+                          .afterMax(timeout)
+                          .readAll()).containsExactly("test1");
+        assertThat(routine.invokeSync().pass("test1", "test2").result().afterMax(timeout).readAll())
                 .containsExactly("test1", "test2");
-        assertThat(routine.invokeSync().pass("test1").result().readAll()).containsExactly("test1");
-        assertThat(routine.invokeSync().pass("test1", "test2").result().readAll()).containsExactly(
-                "test1", "test2");
-        assertThat(routine.invokeAsync().pass().result().readAll()).isEmpty();
+        assertThat(routine.invokeAsync().pass().result().afterMax(timeout).readAll()).isEmpty();
         assertThat(routine.invokeAsync()
                           .pass(Arrays.asList("test1", "test2"))
                           .result()
+                          .afterMax(timeout)
                           .readAll()).containsExactly("test1", "test2");
         assertThat(routine.invokeAsync()
                           .pass(routine.callSync("test1", "test2"))
                           .result()
+                          .afterMax(timeout)
                           .readAll()).containsExactly("test1", "test2");
-        assertThat(routine.invokeAsync().pass("test1").result().readAll()).containsExactly("test1");
-        assertThat(routine.invokeAsync().pass("test1", "test2").result().readAll()).containsExactly(
-                "test1", "test2");
-        assertThat(routine.invokeParallel().pass().result().readAll()).isEmpty();
+        assertThat(routine.invokeAsync()
+                          .pass("test1")
+                          .result()
+                          .afterMax(timeout)
+                          .readAll()).containsExactly("test1");
+        assertThat(routine.invokeAsync()
+                          .pass("test1", "test2")
+                          .result()
+                          .afterMax(timeout)
+                          .readAll()).containsExactly("test1", "test2");
+        assertThat(routine.invokeParallel().pass().result().afterMax(timeout).readAll()).isEmpty();
         assertThat(routine.invokeParallel()
                           .pass(Arrays.asList("test1", "test2"))
                           .result()
+                          .afterMax(timeout)
                           .readAll()).containsOnly("test1", "test2");
         assertThat(routine.invokeParallel()
                           .pass(routine.callSync("test1", "test2"))
                           .result()
+                          .afterMax(timeout)
                           .readAll()).containsOnly("test1", "test2");
-        assertThat(routine.invokeParallel().pass("test1").result().readAll()).containsOnly("test1");
-        assertThat(routine.invokeParallel().pass("test1", "test2").result().readAll()).containsOnly(
-                "test1", "test2");
+        assertThat(routine.invokeParallel()
+                          .pass("test1")
+                          .result()
+                          .afterMax(timeout)
+                          .readAll()).containsOnly("test1");
+        assertThat(routine.invokeParallel()
+                          .pass("test1", "test2")
+                          .result()
+                          .afterMax(timeout)
+                          .readAll()).containsOnly("test1", "test2");
     }
 
     public void testChainedRoutine() {
+
+        final TimeDuration timeout = seconds(1);
 
         final SimpleInvocation<Integer, Integer> execSum =
                 new SimpleInvocation<Integer, Integer>() {
@@ -432,25 +474,30 @@ public class RoutineTest extends TestCase {
                 on(ClassToken.tokenOf(invokeSquare)).withArgs(this).buildRoutine();
 
         assertThat(
-                sumRoutine.callSync(squareRoutine.callSync(1, 2, 3, 4)).readAll()).containsExactly(
-                30);
-        assertThat(
-                sumRoutine.callAsync(squareRoutine.callSync(1, 2, 3, 4)).readAll()).containsExactly(
-                30);
+                sumRoutine.callSync(squareRoutine.callSync(1, 2, 3, 4)).afterMax(timeout).readAll())
+                .containsExactly(30);
+        assertThat(sumRoutine.callAsync(squareRoutine.callSync(1, 2, 3, 4))
+                             .afterMax(timeout)
+                             .readAll()).containsExactly(30);
 
-        assertThat(
-                sumRoutine.callSync(squareRoutine.callAsync(1, 2, 3, 4)).readAll()).containsExactly(
-                30);
+        assertThat(sumRoutine.callSync(squareRoutine.callAsync(1, 2, 3, 4))
+                             .afterMax(timeout)
+                             .readAll()).containsExactly(30);
         assertThat(sumRoutine.callAsync(squareRoutine.callAsync(1, 2, 3, 4))
+                             .afterMax(timeout)
                              .readAll()).containsExactly(30);
 
         assertThat(sumRoutine.callSync(squareRoutine.callParallel(1, 2, 3, 4))
+                             .afterMax(timeout)
                              .readAll()).containsExactly(30);
         assertThat(sumRoutine.callAsync(squareRoutine.callParallel(1, 2, 3, 4))
+                             .afterMax(timeout)
                              .readAll()).containsExactly(30);
     }
 
     public void testComposedRoutine() {
+
+        final TimeDuration timeout = seconds(1);
 
         final SimpleInvocation<Integer, Integer> execSum =
                 new SimpleInvocation<Integer, Integer>() {
@@ -524,8 +571,12 @@ public class RoutineTest extends TestCase {
                 on(ClassToken.tokenOf(invokeSquareSum)).withArgs(this, sumRoutine, squareRoutine)
                                                        .buildRoutine();
 
-        assertThat(squareSumRoutine.callSync(1, 2, 3, 4).readAll()).containsExactly(30);
-        assertThat(squareSumRoutine.callAsync(1, 2, 3, 4).readAll()).containsExactly(30);
+        assertThat(
+                squareSumRoutine.callSync(1, 2, 3, 4).afterMax(timeout).readAll()).containsExactly(
+                30);
+        assertThat(
+                squareSumRoutine.callAsync(1, 2, 3, 4).afterMax(timeout).readAll()).containsExactly(
+                30);
     }
 
     public void testDelay() {
@@ -718,18 +769,25 @@ public class RoutineTest extends TestCase {
 
     public void testDelayedAbort() throws InterruptedException {
 
+        final TimeDuration timeout = seconds(1);
+
         final Routine<String, String> tunnelRoutine = JRoutine.<String>on().buildRoutine();
 
         final ParameterChannel<String, String> channel1 = tunnelRoutine.invokeAsync();
         channel1.after(TimeDuration.seconds(2)).abort();
-        assertThat(channel1.now().pass("test").result().readFirst()).isEqualTo("test");
+        assertThat(channel1.now().pass("test").result().afterMax(timeout).readFirst()).isEqualTo(
+                "test");
 
         final ParameterChannel<String, String> channel2 = tunnelRoutine.invokeAsync();
         channel2.after(TimeDuration.millis(100)).abort();
 
         try {
 
-            channel2.after(TimeDuration.millis(200)).pass("test").result().readFirst();
+            channel2.after(TimeDuration.millis(200))
+                    .pass("test")
+                    .result()
+                    .afterMax(timeout)
+                    .readFirst();
 
             fail();
 
@@ -742,7 +800,7 @@ public class RoutineTest extends TestCase {
                         .withArgs(TimeDuration.millis(200))
                         .buildRoutine();
 
-        assertThat(abortRoutine.callAsync("test").readFirst()).isEqualTo("test");
+        assertThat(abortRoutine.callAsync("test").afterMax(timeout).readFirst()).isEqualTo("test");
 
         try {
 
@@ -750,7 +808,7 @@ public class RoutineTest extends TestCase {
 
             TimeDuration.millis(500).sleepAtLeast();
 
-            channel.readFirst();
+            channel.afterMax(timeout).readFirst();
 
             fail();
 
@@ -761,6 +819,8 @@ public class RoutineTest extends TestCase {
 
     public void testDelayedBind() {
 
+        final TimeDuration timeout = seconds(1);
+
         final Routine<Object, Object> routine1 = JRoutine.on().buildRoutine();
         final Routine<Object, Object> routine2 = JRoutine.on().buildRoutine();
 
@@ -770,74 +830,91 @@ public class RoutineTest extends TestCase {
                            .after(TimeDuration.millis(500))
                            .pass(routine2.callAsync("test"))
                            .result()
+                           .afterMax(timeout)
                            .readFirst()).isEqualTo("test");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(500);
     }
 
     public void testDestroy() {
 
+        final TimeDuration timeout = seconds(1);
+
         final Routine<String, String> routine1 =
                 JRoutine.on(tokenOf(TestDestroy.class)).maxRetained(0).buildRoutine();
-        assertThat(routine1.callSync("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2", "3",
-                                                                                      "4", "5");
-        assertThat(routine1.callAsync("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2",
-                                                                                       "3", "4",
-                                                                                       "5");
-        assertThat(routine1.callParallel("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2",
-                                                                                          "3", "4",
-                                                                                          "5");
+        assertThat(routine1.callSync("1", "2", "3", "4", "5")
+                           .afterMax(timeout)
+                           .readAll()).containsOnly("1", "2", "3", "4", "5");
+        assertThat(routine1.callAsync("1", "2", "3", "4", "5")
+                           .afterMax(timeout)
+                           .readAll()).containsOnly("1", "2", "3", "4", "5");
+        assertThat(routine1.callParallel("1", "2", "3", "4", "5")
+                           .afterMax(timeout)
+                           .readAll()).containsOnly("1", "2", "3", "4", "5");
         assertThat(TestDestroy.getInstanceCount()).isZero();
 
         final Routine<String, String> routine2 =
                 JRoutine.on(tokenOf(TestDiscardException.class)).maxRetained(0).buildRoutine();
-        assertThat(routine2.callSync("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2", "3",
-                                                                                      "4", "5");
-        assertThat(routine2.callAsync("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2",
-                                                                                       "3", "4",
-                                                                                       "5");
-        assertThat(routine2.callParallel("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2",
-                                                                                          "3", "4",
-                                                                                          "5");
+        assertThat(routine2.callSync("1", "2", "3", "4", "5")
+                           .afterMax(timeout)
+                           .readAll()).containsOnly("1", "2", "3", "4", "5");
+        assertThat(routine2.callAsync("1", "2", "3", "4", "5")
+                           .afterMax(timeout)
+                           .readAll()).containsOnly("1", "2", "3", "4", "5");
+        assertThat(routine2.callParallel("1", "2", "3", "4", "5")
+                           .afterMax(timeout)
+                           .readAll()).containsOnly("1", "2", "3", "4", "5");
         assertThat(TestDestroy.getInstanceCount()).isZero();
 
         final Routine<String, String> routine3 =
                 JRoutine.on(tokenOf(TestDestroyDiscard.class)).buildRoutine();
-        assertThat(routine3.callSync("1", "2", "3", "4", "5").checkComplete()).isTrue();
-        assertThat(routine3.callParallel("1", "2", "3", "4", "5").checkComplete()).isTrue();
-        assertThat(routine3.callAsync("1", "2", "3", "4", "5").checkComplete()).isTrue();
+        assertThat(routine3.callSync("1", "2", "3", "4", "5")
+                           .afterMax(timeout)
+                           .checkComplete()).isTrue();
+        assertThat(routine3.callParallel("1", "2", "3", "4", "5").afterMax(timeout).checkComplete())
+                .isTrue();
+        assertThat(routine3.callAsync("1", "2", "3", "4", "5")
+                           .afterMax(timeout)
+                           .checkComplete()).isTrue();
         assertThat(TestDestroy.getInstanceCount()).isZero();
 
         final Routine<String, String> routine4 =
                 JRoutine.on(tokenOf(TestDestroyDiscardException.class)).buildRoutine();
-        assertThat(routine4.callSync("1", "2", "3", "4", "5").checkComplete()).isTrue();
-        assertThat(routine4.callParallel("1", "2", "3", "4", "5").checkComplete()).isTrue();
-        assertThat(routine4.callAsync("1", "2", "3", "4", "5").checkComplete()).isTrue();
+        assertThat(routine4.callSync("1", "2", "3", "4", "5")
+                           .afterMax(timeout)
+                           .checkComplete()).isTrue();
+        assertThat(routine4.callParallel("1", "2", "3", "4", "5").afterMax(timeout).checkComplete())
+                .isTrue();
+        assertThat(routine4.callAsync("1", "2", "3", "4", "5")
+                           .afterMax(timeout)
+                           .checkComplete()).isTrue();
         assertThat(TestDestroy.getInstanceCount()).isZero();
 
         final Routine<String, String> routine5 =
                 JRoutine.on(tokenOf(TestDestroy.class)).buildRoutine();
-        assertThat(routine5.callSync("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2", "3",
-                                                                                      "4", "5");
-        assertThat(routine5.callAsync("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2",
-                                                                                       "3", "4",
-                                                                                       "5");
-        assertThat(routine5.callParallel("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2",
-                                                                                          "3", "4",
-                                                                                          "5");
+        assertThat(routine5.callSync("1", "2", "3", "4", "5")
+                           .afterMax(timeout)
+                           .readAll()).containsOnly("1", "2", "3", "4", "5");
+        assertThat(routine5.callAsync("1", "2", "3", "4", "5")
+                           .afterMax(timeout)
+                           .readAll()).containsOnly("1", "2", "3", "4", "5");
+        assertThat(routine5.callParallel("1", "2", "3", "4", "5")
+                           .afterMax(timeout)
+                           .readAll()).containsOnly("1", "2", "3", "4", "5");
         routine5.flush();
         assertThat(TestDestroy.getInstanceCount()).isZero();
 
         final Routine<String, String> routine6 =
                 JRoutine.on(tokenOf(TestDestroyException.class)).buildRoutine();
 
-        assertThat(routine6.callSync("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2", "3",
-                                                                                      "4", "5");
-        assertThat(routine6.callAsync("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2",
-                                                                                       "3", "4",
-                                                                                       "5");
-        assertThat(routine6.callParallel("1", "2", "3", "4", "5").readAll()).containsOnly("1", "2",
-                                                                                          "3", "4",
-                                                                                          "5");
+        assertThat(routine6.callSync("1", "2", "3", "4", "5")
+                           .afterMax(timeout)
+                           .readAll()).containsOnly("1", "2", "3", "4", "5");
+        assertThat(routine6.callAsync("1", "2", "3", "4", "5")
+                           .afterMax(timeout)
+                           .readAll()).containsOnly("1", "2", "3", "4", "5");
+        assertThat(routine6.callParallel("1", "2", "3", "4", "5")
+                           .afterMax(timeout)
+                           .readAll()).containsOnly("1", "2", "3", "4", "5");
         routine6.flush();
         assertThat(TestDestroy.getInstanceCount()).isZero();
     }
@@ -1065,29 +1142,38 @@ public class RoutineTest extends TestCase {
 
     public void testMethod() throws NoSuchMethodException {
 
+        final TimeDuration timeout = seconds(1);
+
         final TestClass testClass = new TestClass();
         assertThat(on(testClass).method(TestClass.class.getMethod("getOne"))
                                 .callSync()
+                                .afterMax(timeout)
                                 .readAll()).containsExactly(1);
-        assertThat(on(testClass).method("getOne").callSync().readAll()).containsExactly(1);
+        assertThat(on(testClass).method("getOne")
+                                .callSync()
+                                .afterMax(timeout)
+                                .readAll()).containsExactly(1);
         assertThat(
-                on(testClass).annotatedMethod(TestClass.GET).callSync().readAll()).containsExactly(
-                1);
+                on(testClass).annotatedMethod(TestClass.GET).callSync().afterMax(timeout).readAll())
+                .containsExactly(1);
         assertThat(on(TestClass.class).annotatedMethod(TestClass.GET)
                                       .callSync(3)
+                                      .afterMax(timeout)
                                       .readAll()).containsExactly(3);
-        assertThat(
-                on(TestClass.class).annotatedMethod("get").callAsync(-3).readAll()).containsExactly(
-                -3);
+        assertThat(on(TestClass.class).annotatedMethod("get")
+                                      .callAsync(-3)
+                                      .afterMax(timeout)
+                                      .readAll()).containsExactly(-3);
         assertThat(on(TestClass.class).method("get", int.class)
                                       .callParallel(17)
+                                      .afterMax(timeout)
                                       .readAll()).containsExactly(17);
 
         assertThat(on(testClass).buildProxy(TestInterface.class).getInt(2)).isEqualTo(2);
 
         try {
 
-            on(TestClass.class).annotatedMethod("get").callAsync().readAll();
+            on(TestClass.class).annotatedMethod("get").callAsync().afterMax(timeout).readAll();
 
             fail();
 
@@ -1105,17 +1191,23 @@ public class RoutineTest extends TestCase {
 
         }
 
-        assertThat(on(testClass).buildProxy(TestInterfaceAsync.class).take(77)).isEqualTo(77);
-        assertThat(
-                on(testClass).buildProxy(TestInterfaceAsync.class).getOne().readFirst()).isEqualTo(
-                1);
+        assertThat(on(testClass).resultTimeout(timeout)
+                                .buildProxy(TestInterfaceAsync.class)
+                                .take(77)).isEqualTo(77);
+        assertThat(on(testClass).buildProxy(TestInterfaceAsync.class)
+                                .getOne()
+                                .afterMax(timeout)
+                                .readFirst()).isEqualTo(1);
 
         final TestInterfaceAsync testInterfaceAsync =
-                on(testClass).buildProxy(TestInterfaceAsync.class);
+                on(testClass).resultTimeout(1, TimeUnit.SECONDS)
+                             .buildProxy(TestInterfaceAsync.class);
         assertThat(testInterfaceAsync.getInt(testInterfaceAsync.getOne())).isEqualTo(1);
     }
 
     public void testOutputTimeout() {
+
+        final TimeDuration timeout = seconds(1);
 
         final Routine<String, String> routine =
                 JRoutine.on(tokenOf(new SimpleInvocation<String, String>() {
@@ -1130,7 +1222,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            routine.callAsync("test1", "test2").readAll();
+            routine.callAsync("test1", "test2").afterMax(timeout).readAll();
 
             fail();
 
@@ -1502,6 +1594,8 @@ public class RoutineTest extends TestCase {
 
     public void testRoutine() {
 
+        final TimeDuration timeout = seconds(1);
+
         final TemplateInvocation<Integer, Integer> execSquare =
                 new TemplateInvocation<Integer, Integer>() {
 
@@ -1518,12 +1612,17 @@ public class RoutineTest extends TestCase {
         final Routine<Integer, Integer> squareRoutine =
                 on(ClassToken.tokenOf(execSquare)).withArgs(this).buildRoutine();
 
-        assertThat(squareRoutine.callSync(1, 2, 3, 4).readAll()).containsExactly(1, 4, 9, 16);
-        assertThat(squareRoutine.callAsync(1, 2, 3, 4).readAll()).containsExactly(1, 4, 9, 16);
-        assertThat(squareRoutine.callParallel(1, 2, 3, 4).readAll()).containsOnly(1, 4, 9, 16);
+        assertThat(squareRoutine.callSync(1, 2, 3, 4).afterMax(timeout).readAll()).containsExactly(
+                1, 4, 9, 16);
+        assertThat(squareRoutine.callAsync(1, 2, 3, 4).afterMax(timeout).readAll()).containsExactly(
+                1, 4, 9, 16);
+        assertThat(squareRoutine.callParallel(1, 2, 3, 4).afterMax(timeout).readAll()).containsOnly(
+                1, 4, 9, 16);
     }
 
     public void testRoutineFunction() {
+
+        final TimeDuration timeout = seconds(1);
 
         final SimpleInvocation<Integer, Integer> execSum =
                 new SimpleInvocation<Integer, Integer>() {
@@ -1546,8 +1645,9 @@ public class RoutineTest extends TestCase {
         final Routine<Integer, Integer> sumRoutine =
                 on(ClassToken.tokenOf(execSum)).withArgs(this).buildRoutine();
 
-        assertThat(sumRoutine.callSync(1, 2, 3, 4).readAll()).containsExactly(10);
-        assertThat(sumRoutine.callAsync(1, 2, 3, 4).readAll()).containsExactly(10);
+        assertThat(sumRoutine.callSync(1, 2, 3, 4).afterMax(timeout).readAll()).containsExactly(10);
+        assertThat(sumRoutine.callAsync(1, 2, 3, 4).afterMax(timeout).readAll()).containsExactly(
+                10);
     }
 
     public void testTimeout() {
@@ -1557,11 +1657,11 @@ public class RoutineTest extends TestCase {
                                                     .buildRoutine();
 
         final OutputChannel<String> channel = routine.callAsync("test");
-        assertThat(channel.eventuallyDeadLock(false).immediately().readAll()).isEmpty();
+        assertThat(channel.eventually(false).immediately().readAll()).isEmpty();
 
         try {
 
-            channel.afterMax(TimeDuration.millis(10)).eventuallyDeadLock(true).readFirst();
+            channel.afterMax(TimeDuration.millis(10)).eventually(true).readFirst();
 
             fail();
 
@@ -1613,9 +1713,11 @@ public class RoutineTest extends TestCase {
     private void testChained(final Routine<String, String> before,
             final Routine<String, String> after, final String input, final String expected) {
 
+        final TimeDuration timeout = seconds(1);
+
         try {
 
-            before.callSync(after.callSync(input)).readAll();
+            before.callSync(after.callSync(input)).afterMax(timeout).readAll();
 
             fail();
 
@@ -1626,7 +1728,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : before.callSync(after.callSync(input))) {
+            for (final String s : before.callSync(after.callSync(input)).afterMax(timeout)) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -1640,7 +1742,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.callAsync(after.callSync(input)).readAll();
+            before.callAsync(after.callSync(input)).afterMax(timeout).readAll();
 
             fail();
 
@@ -1651,7 +1753,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : before.callAsync(after.callSync(input))) {
+            for (final String s : before.callAsync(after.callSync(input)).afterMax(timeout)) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -1665,7 +1767,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.callParallel(after.callSync(input)).readAll();
+            before.callParallel(after.callSync(input)).afterMax(timeout).readAll();
 
             fail();
 
@@ -1676,7 +1778,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : before.callParallel(after.callSync(input))) {
+            for (final String s : before.callParallel(after.callSync(input)).afterMax(timeout)) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -1690,7 +1792,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.invokeSync().pass(after.callSync(input)).result().readAll();
+            before.invokeSync().pass(after.callSync(input)).result().afterMax(timeout).readAll();
 
             fail();
 
@@ -1701,7 +1803,10 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : before.invokeSync().pass(after.callSync(input)).result()) {
+            for (final String s : before.invokeSync()
+                                        .pass(after.callSync(input))
+                                        .result()
+                                        .afterMax(timeout)) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -1715,7 +1820,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.invokeAsync().pass(after.callSync(input)).result().readAll();
+            before.invokeAsync().pass(after.callSync(input)).result().afterMax(timeout).readAll();
 
             fail();
 
@@ -1726,7 +1831,10 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : before.invokeAsync().pass(after.callSync(input)).result()) {
+            for (final String s : before.invokeAsync()
+                                        .pass(after.callSync(input))
+                                        .result()
+                                        .afterMax(timeout)) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -1740,7 +1848,11 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.invokeParallel().pass(after.callSync(input)).result().readAll();
+            before.invokeParallel()
+                  .pass(after.callSync(input))
+                  .result()
+                  .afterMax(timeout)
+                  .readAll();
 
             fail();
 
@@ -1751,7 +1863,10 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : before.invokeParallel().pass(after.callSync(input)).result()) {
+            for (final String s : before.invokeParallel()
+                                        .pass(after.callSync(input))
+                                        .result()
+                                        .afterMax(timeout)) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -1765,7 +1880,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.callSync(after.callAsync(input)).readAll();
+            before.callSync(after.callAsync(input)).afterMax(timeout).readAll();
 
             fail();
 
@@ -1776,7 +1891,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : before.callSync(after.callAsync(input))) {
+            for (final String s : before.callSync(after.callAsync(input)).afterMax(timeout)) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -1790,7 +1905,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.callAsync(after.callAsync(input)).readAll();
+            before.callAsync(after.callAsync(input)).afterMax(timeout).readAll();
 
             fail();
 
@@ -1801,7 +1916,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : before.callAsync(after.callAsync(input))) {
+            for (final String s : before.callAsync(after.callAsync(input)).afterMax(timeout)) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -1815,7 +1930,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.invokeSync().pass(after.callAsync(input)).result().readAll();
+            before.invokeSync().pass(after.callAsync(input)).result().afterMax(timeout).readAll();
 
             fail();
 
@@ -1826,7 +1941,10 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : before.invokeSync().pass(after.callAsync(input)).result()) {
+            for (final String s : before.invokeSync()
+                                        .pass(after.callAsync(input))
+                                        .result()
+                                        .afterMax(timeout)) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -1840,7 +1958,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.invokeAsync().pass(after.callAsync(input)).result().readAll();
+            before.invokeAsync().pass(after.callAsync(input)).result().afterMax(timeout).readAll();
 
             fail();
 
@@ -1851,7 +1969,10 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : before.invokeAsync().pass(after.callAsync(input)).result()) {
+            for (final String s : before.invokeAsync()
+                                        .pass(after.callAsync(input))
+                                        .result()
+                                        .afterMax(timeout)) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -1865,7 +1986,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.callSync(after.callParallel(input)).readAll();
+            before.callSync(after.callParallel(input)).afterMax(timeout).readAll();
 
             fail();
 
@@ -1876,7 +1997,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : before.callSync(after.callParallel(input))) {
+            for (final String s : before.callSync(after.callParallel(input)).afterMax(timeout)) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -1890,7 +2011,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.callAsync(after.callParallel(input)).readAll();
+            before.callAsync(after.callParallel(input)).afterMax(timeout).readAll();
 
             fail();
 
@@ -1901,7 +2022,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : before.callAsync(after.callParallel(input))) {
+            for (final String s : before.callAsync(after.callParallel(input)).afterMax(timeout)) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -1915,7 +2036,11 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.invokeSync().pass(after.callParallel(input)).result().readAll();
+            before.invokeSync()
+                  .pass(after.callParallel(input))
+                  .result()
+                  .afterMax(timeout)
+                  .readAll();
 
             fail();
 
@@ -1926,7 +2051,10 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : before.invokeSync().pass(after.callParallel(input)).result()) {
+            for (final String s : before.invokeSync()
+                                        .pass(after.callParallel(input))
+                                        .result()
+                                        .afterMax(timeout)) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -1940,7 +2068,11 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            before.invokeAsync().pass(after.callParallel(input)).result().readAll();
+            before.invokeAsync()
+                  .pass(after.callParallel(input))
+                  .result()
+                  .afterMax(timeout)
+                  .readAll();
 
             fail();
 
@@ -1951,7 +2083,10 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : before.invokeAsync().pass(after.callParallel(input)).result()) {
+            for (final String s : before.invokeAsync()
+                                        .pass(after.callParallel(input))
+                                        .result()
+                                        .afterMax(timeout)) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -1970,26 +2105,44 @@ public class RoutineTest extends TestCase {
         final Routine<String, String> routine =
                 on(tokenOf(DelayedInvocation.class)).withArgs(TimeDuration.ZERO).buildRoutine();
 
-        assertThat(routine.callSync(input).bind(consumer).checkComplete()).isTrue();
-        assertThat(routine.callAsync(input).bind(consumer).checkComplete()).isTrue();
-        assertThat(routine.callParallel(input).bind(consumer).checkComplete()).isTrue();
+        final TimeDuration timeout = seconds(1);
+
         assertThat(
-                routine.invokeSync().pass(input).result().bind(consumer).checkComplete()).isTrue();
+                routine.callSync(input).bind(consumer).afterMax(timeout).checkComplete()).isTrue();
         assertThat(
-                routine.invokeAsync().pass(input).result().bind(consumer).checkComplete()).isTrue();
+                routine.callAsync(input).bind(consumer).afterMax(timeout).checkComplete()).isTrue();
+        assertThat(routine.callParallel(input)
+                          .bind(consumer)
+                          .afterMax(timeout)
+                          .checkComplete()).isTrue();
+        assertThat(routine.invokeSync()
+                          .pass(input)
+                          .result()
+                          .bind(consumer)
+                          .afterMax(timeout)
+                          .checkComplete()).isTrue();
+        assertThat(routine.invokeAsync()
+                          .pass(input)
+                          .result()
+                          .bind(consumer)
+                          .afterMax(timeout)
+                          .checkComplete()).isTrue();
         assertThat(routine.invokeParallel()
                           .pass(input)
                           .result()
                           .bind(consumer)
+                          .afterMax(timeout)
                           .checkComplete()).isTrue();
     }
 
     private void testException(final Routine<String, String> routine, final String input,
             final String expected) {
 
+        final TimeDuration timeout = seconds(1);
+
         try {
 
-            routine.callSync(input).readAll();
+            routine.callSync(input).afterMax(timeout).readAll();
 
             fail();
 
@@ -2000,7 +2153,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : routine.callSync(input)) {
+            for (final String s : routine.callSync(input).afterMax(timeout)) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -2014,7 +2167,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            routine.callAsync(input).readAll();
+            routine.callAsync(input).afterMax(timeout).readAll();
 
             fail();
 
@@ -2025,7 +2178,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : routine.callAsync(input)) {
+            for (final String s : routine.callAsync(input).afterMax(timeout)) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -2039,7 +2192,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            routine.callParallel(input).readAll();
+            routine.callParallel(input).afterMax(timeout).readAll();
 
             fail();
 
@@ -2050,7 +2203,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : routine.callParallel(input)) {
+            for (final String s : routine.callParallel(input).afterMax(timeout)) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -2064,7 +2217,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            routine.invokeSync().pass(input).result().readAll();
+            routine.invokeSync().pass(input).result().afterMax(timeout).readAll();
 
             fail();
 
@@ -2075,7 +2228,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : routine.invokeSync().pass(input).result()) {
+            for (final String s : routine.invokeSync().pass(input).result().afterMax(timeout)) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -2089,7 +2242,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            routine.invokeAsync().pass(input).result().readAll();
+            routine.invokeAsync().pass(input).result().afterMax(timeout).readAll();
 
             fail();
 
@@ -2100,7 +2253,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : routine.invokeAsync().pass(input).result()) {
+            for (final String s : routine.invokeAsync().pass(input).result().afterMax(timeout)) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -2114,7 +2267,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            routine.invokeParallel().pass(input).result().readAll();
+            routine.invokeParallel().pass(input).result().afterMax(timeout).readAll();
 
             fail();
 
@@ -2125,7 +2278,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            for (final String s : routine.invokeParallel().pass(input).result()) {
+            for (final String s : routine.invokeParallel().pass(input).result().afterMax(timeout)) {
 
                 assertThat(s).isNotEmpty();
             }
@@ -2140,11 +2293,14 @@ public class RoutineTest extends TestCase {
 
     private interface TestInterface {
 
+        @Async(resultTimeout = 1, resultTimeUnit = TimeUnit.SECONDS)
         public int getInt(int i);
     }
 
+    @Async(resultTimeout = 0)
     private interface TestInterfaceAsync {
 
+        @Async(resultTimeout = 1, resultTimeUnit = TimeUnit.MILLISECONDS)
         public int getInt(@AsyncType(int.class) OutputChannel<Integer> i);
 
         @AsyncType(int.class)

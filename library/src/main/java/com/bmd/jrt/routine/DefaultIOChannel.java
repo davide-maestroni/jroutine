@@ -224,10 +224,9 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
 
         @Nonnull
         @Override
-        @SuppressWarnings("BooleanParameter")
-        public IOChannelOutput<OUTPUT> eventuallyDeadLock(final boolean throwException) {
+        public IOChannelOutput<OUTPUT> eventually(@Nonnull final TimeoutAction action) {
 
-            mChannel.eventuallyDeadLock(throwException);
+            mChannel.eventually(action);
             return this;
         }
 

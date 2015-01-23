@@ -28,12 +28,12 @@ import com.bmd.jrt.android.invocation.AndroidInvocation;
 import com.bmd.jrt.android.service.RoutineService;
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
 import com.bmd.jrt.builder.RoutineConfiguration;
-import com.bmd.jrt.channel.IOChannel;
-import com.bmd.jrt.channel.IOChannel.IOChannelInput;
-import com.bmd.jrt.channel.IOChannel.IOChannelOutput;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.OutputConsumer;
 import com.bmd.jrt.channel.ParameterChannel;
+import com.bmd.jrt.channel.Tunnel;
+import com.bmd.jrt.channel.Tunnel.TunnelInput;
+import com.bmd.jrt.channel.Tunnel.TunnelOutput;
 import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.common.RoutineException;
 import com.bmd.jrt.invocation.Invocation;
@@ -201,13 +201,13 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
         private final Object mMutex = new Object();
 
-        private final IOChannelInput<INPUT> mParamChannelInput;
+        private final TunnelInput<INPUT> mParamTunnelInput;
 
-        private final IOChannelOutput<INPUT> mParamChannelOutput;
+        private final TunnelOutput<INPUT> mParamTunnelOutput;
 
-        private final IOChannelInput<OUTPUT> mResultChannelInput;
+        private final TunnelInput<OUTPUT> mResultTunnelInput;
 
-        private final IOChannelOutput<OUTPUT> mResultChannelOutput;
+        private final TunnelOutput<OUTPUT> mResultTunnelOutput;
 
         private final Class<? extends Runner> mRunnerClass;
 
@@ -263,54 +263,53 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
             mLogger = logger;
             final Log log = logger.getLog();
             final LogLevel logLevel = logger.getLogLevel();
-            final IOChannel<INPUT> paramChannel = JRoutine.io()
-                                                          .dataOrder(configuration.getInputOrderOr(
-                                                                  DataOrder.DEFAULT))
-                                                          .maxSize(Integer.MAX_VALUE)
-                                                          .bufferTimeout(TimeDuration.ZERO)
-                                                          .loggedWith(log)
-                                                          .logLevel(logLevel)
-                                                          .buildChannel();
-            mParamChannelInput = paramChannel.input();
-            mParamChannelOutput = paramChannel.output();
-            final IOChannel<OUTPUT> resultChannel = JRoutine.io()
-                                                            .dataOrder(
-                                                                    configuration.getOutputOrderOr(
-                                                                            DataOrder.DEFAULT))
-                                                            .maxSize(Integer.MAX_VALUE)
-                                                            .bufferTimeout(TimeDuration.ZERO)
-                                                            .loggedWith(log)
-                                                            .logLevel(logLevel)
-                                                            .buildChannel();
-            mResultChannelInput = resultChannel.input();
-            mResultChannelOutput = resultChannel.output();
+            final Tunnel<INPUT> paramTunnel = JRoutine.io()
+                                                      .dataOrder(configuration.getInputOrderOr(
+                                                              DataOrder.DEFAULT))
+                                                      .maxSize(Integer.MAX_VALUE)
+                                                      .bufferTimeout(TimeDuration.ZERO)
+                                                      .loggedWith(log)
+                                                      .logLevel(logLevel)
+                                                      .buildTunnel();
+            mParamTunnelInput = paramTunnel.input();
+            mParamTunnelOutput = paramTunnel.output();
+            final Tunnel<OUTPUT> resultTunnel = JRoutine.io()
+                                                        .dataOrder(configuration.getOutputOrderOr(
+                                                                DataOrder.DEFAULT))
+                                                        .maxSize(Integer.MAX_VALUE)
+                                                        .bufferTimeout(TimeDuration.ZERO)
+                                                        .loggedWith(log)
+                                                        .logLevel(logLevel)
+                                                        .buildTunnel();
+            mResultTunnelInput = resultTunnel.input();
+            mResultTunnelOutput = resultTunnel.output();
         }
 
         @Override
         public boolean abort() {
 
             bindService();
-            return mParamChannelInput.abort();
+            return mParamTunnelInput.abort();
         }
 
         @Override
         public boolean abort(@Nullable final Throwable reason) {
 
             bindService();
-            return mParamChannelInput.abort(reason);
+            return mParamTunnelInput.abort(reason);
         }
 
         @Override
         public boolean isOpen() {
 
-            return mParamChannelInput.isOpen();
+            return mParamTunnelInput.isOpen();
         }
 
         @Nonnull
         @Override
         public ParameterChannel<INPUT, OUTPUT> after(@Nonnull final TimeDuration delay) {
 
-            mParamChannelInput.after(delay);
+            mParamTunnelInput.after(delay);
             return this;
         }
 
@@ -319,7 +318,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         public ParameterChannel<INPUT, OUTPUT> after(final long delay,
                 @Nonnull final TimeUnit timeUnit) {
 
-            mParamChannelInput.after(delay, timeUnit);
+            mParamTunnelInput.after(delay, timeUnit);
             return this;
         }
 
@@ -327,7 +326,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         @Override
         public ParameterChannel<INPUT, OUTPUT> now() {
 
-            mParamChannelInput.now();
+            mParamTunnelInput.now();
             return this;
         }
 
@@ -336,7 +335,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         public ParameterChannel<INPUT, OUTPUT> pass(@Nullable final OutputChannel<INPUT> channel) {
 
             bindService();
-            mParamChannelInput.pass(channel);
+            mParamTunnelInput.pass(channel);
             return this;
         }
 
@@ -346,7 +345,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                 @Nullable final Iterable<? extends INPUT> inputs) {
 
             bindService();
-            mParamChannelInput.pass(inputs);
+            mParamTunnelInput.pass(inputs);
             return this;
         }
 
@@ -355,7 +354,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         public ParameterChannel<INPUT, OUTPUT> pass(@Nullable final INPUT input) {
 
             bindService();
-            mParamChannelInput.pass(input);
+            mParamTunnelInput.pass(input);
             return this;
         }
 
@@ -364,7 +363,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         public ParameterChannel<INPUT, OUTPUT> pass(@Nullable final INPUT... inputs) {
 
             bindService();
-            mParamChannelInput.pass(inputs);
+            mParamTunnelInput.pass(inputs);
             return this;
         }
 
@@ -373,8 +372,8 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         public OutputChannel<OUTPUT> result() {
 
             bindService();
-            mParamChannelInput.close();
-            return mResultChannelOutput;
+            mParamTunnelInput.close();
+            return mResultTunnelOutput;
         }
 
         private void bindService() {
@@ -494,16 +493,16 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                     switch (msg.what) {
 
                         case RoutineService.MSG_DATA:
-                            mResultChannelInput.pass((OUTPUT) getValue(msg));
+                            mResultTunnelInput.pass((OUTPUT) getValue(msg));
                             break;
 
                         case RoutineService.MSG_COMPLETE:
-                            mResultChannelInput.close();
+                            mResultTunnelInput.close();
                             unbindService();
                             break;
 
                         case RoutineService.MSG_ABORT:
-                            mResultChannelInput.abort(getAbortError(msg));
+                            mResultTunnelInput.abort(getAbortError(msg));
                             unbindService();
                             break;
 
@@ -527,7 +526,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                         logger.err(e, "error while sending service abort message");
                     }
 
-                    mResultChannelInput.abort(t);
+                    mResultTunnelInput.abort(t);
                     unbindService();
                 }
             }
@@ -569,12 +568,12 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
                     mOutMessenger.send(message);
                     mConsumer = new ConnectionOutputConsumer();
-                    mParamChannelOutput.bind(mConsumer);
+                    mParamTunnelOutput.bind(mConsumer);
 
                 } catch (final RemoteException e) {
 
                     logger.err(e, "error while sending service invocation message");
-                    mResultChannelInput.abort(e);
+                    mResultTunnelInput.abort(e);
                     unbindService();
                 }
             }
@@ -583,7 +582,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
             public void onServiceDisconnected(final ComponentName name) {
 
                 mLogger.dbg("service disconnected: %s", name);
-                mParamChannelOutput.unbind(mConsumer);
+                mParamTunnelOutput.unbind(mConsumer);
             }
         }
     }

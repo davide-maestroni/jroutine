@@ -484,6 +484,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         }
     }
 
+    @SuppressFBWarnings(value = "UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR",
+                        justification = "cannot be called if output consumer is null")
     private void closeConsumer(final ChannelState state) {
 
         if (state != ChannelState.ABORTED) {
@@ -524,36 +526,35 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         synchronized (mConsumerMutex) {
 
             final Logger logger = mLogger;
+            final ArrayList<Object> outputs;
+            final OutputConsumer<OUTPUT> consumer;
+            final ChannelState state;
 
-            try {
+            synchronized (mMutex) {
 
-                final ArrayList<Object> outputs;
-                final OutputConsumer<OUTPUT> consumer;
-                final ChannelState state;
+                consumer = mOutputConsumer;
 
-                synchronized (mMutex) {
+                if (consumer == null) {
 
-                    consumer = mOutputConsumer;
+                    logger.dbg("avoiding flushing output since channel is not bound");
 
-                    if (consumer == null) {
+                    if (!isOutputPending(mState)) {
 
-                        logger.dbg("avoiding flushing output since channel is not bound");
-
-                        if (!isOutputPending(mState)) {
-
-                            mState = ChannelState.DONE;
-                        }
-
-                        mMutex.notifyAll();
-                        return;
+                        mState = ChannelState.DONE;
                     }
 
-                    outputs = new ArrayList<Object>();
-                    mOutputQueue.moveTo(outputs);
-                    state = mState;
-                    mOutputCount = 0;
                     mMutex.notifyAll();
+                    return;
                 }
+
+                outputs = new ArrayList<Object>();
+                mOutputQueue.moveTo(outputs);
+                state = mState;
+                mOutputCount = 0;
+                mMutex.notifyAll();
+            }
+
+            try {
 
                 for (final Object output : outputs) {
 
@@ -594,18 +595,18 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             } catch (final Throwable t) {
 
                 boolean isClose = false;
-                final ChannelState state;
+                final ChannelState finalState;
 
                 synchronized (mMutex) {
 
                     logger.wrn(t, "consumer exception (%s)", mOutputConsumer);
-                    state = mState;
+                    finalState = mState;
 
-                    if (forceClose || !isOutputPending(state)) {
+                    if (forceClose || !isOutputPending(finalState)) {
 
                         isClose = true;
 
-                    } else if (state != ChannelState.EXCEPTION) {
+                    } else if (finalState != ChannelState.EXCEPTION) {
 
                         logger.wrn(t, "aborting on consumer exception (%s)", mOutputConsumer);
                         abortException = t;
@@ -619,7 +620,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 if (isClose) {
 
-                    closeConsumer(state);
+                    closeConsumer(finalState);
                 }
             }
         }

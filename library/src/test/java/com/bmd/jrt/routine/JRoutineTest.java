@@ -21,9 +21,9 @@ import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.builder.RoutineConfigurationBuilder;
-import com.bmd.jrt.channel.IOChannel;
-import com.bmd.jrt.channel.IOChannel.IOChannelInput;
 import com.bmd.jrt.channel.OutputChannel;
+import com.bmd.jrt.channel.Tunnel;
+import com.bmd.jrt.channel.Tunnel.TunnelInput;
 import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.common.RoutineException;
 import com.bmd.jrt.invocation.TunnelInvocation;
@@ -50,55 +50,12 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class JRoutineTest extends TestCase {
 
-    public void testChannelBuilder() {
-
-        final TimeDuration timeout = seconds(1);
-        final IOChannel<Object> channel = JRoutine.io()
-                                                  .dataOrder(DataOrder.INSERTION)
-                                                  .delayRunner(Runners.sharedRunner())
-                                                  .maxSize(1)
-                                                  .bufferTimeout(1, TimeUnit.MILLISECONDS)
-                                                  .bufferTimeout(seconds(1))
-                                                  .logLevel(LogLevel.DEBUG)
-                                                  .loggedWith(new NullLog())
-                                                  .buildChannel();
-        channel.input().pass(-77L);
-        assertThat(channel.output().afterMax(timeout).readNext()).isEqualTo(-77L);
-
-        final IOChannel<Object> channel1 = JRoutine.io().buildChannel();
-        final IOChannelInput<Object> input1 = channel1.input();
-
-        input1.after(TimeDuration.millis(200)).pass(23).now().pass(-77L).close();
-        assertThat(channel1.output().afterMax(timeout).readAll()).containsOnly(23, -77L);
-
-        final IOChannel<Object> channel2 =
-                JRoutine.io().dataOrder(DataOrder.INSERTION).buildChannel();
-        final IOChannelInput<Object> input2 = channel2.input();
-
-        input2.after(TimeDuration.millis(200)).pass(23).now().pass(-77L).close();
-        assertThat(channel2.output().afterMax(timeout).readAll()).containsExactly(23, -77L);
-    }
-
-    public void testChannelBuilderApply() {
-
-        final RoutineConfiguration configuration =
-                new RoutineConfigurationBuilder().runBy(Runners.queuedRunner())
-                                                 .buildConfiguration();
-        final IOChannel<Object> channel = JRoutine.io()
-                                                  .delayRunner(Runners.sharedRunner())
-                                                  .apply(configuration)
-                                                  .buildChannel();
-
-        channel.input().after(TimeDuration.millis(200)).pass("test").close();
-        assertThat(channel.output().immediately().readAll()).containsExactly("test");
-    }
-
     @SuppressWarnings("ConstantConditions")
     public void testChannelBuilderError() {
 
         try {
 
-            new IOChannelBuilder().dataOrder(null);
+            new TunnelBuilder().dataOrder(null);
 
             fail();
 
@@ -108,7 +65,7 @@ public class JRoutineTest extends TestCase {
 
         try {
 
-            new IOChannelBuilder().bufferTimeout(0, null);
+            new TunnelBuilder().bufferTimeout(0, null);
 
             fail();
 
@@ -118,7 +75,7 @@ public class JRoutineTest extends TestCase {
 
         try {
 
-            new IOChannelBuilder().logLevel(null);
+            new TunnelBuilder().logLevel(null);
 
             fail();
 
@@ -128,7 +85,7 @@ public class JRoutineTest extends TestCase {
 
         try {
 
-            new IOChannelBuilder().bufferTimeout(-1, TimeUnit.MILLISECONDS);
+            new TunnelBuilder().bufferTimeout(-1, TimeUnit.MILLISECONDS);
 
             fail();
 
@@ -138,7 +95,7 @@ public class JRoutineTest extends TestCase {
 
         try {
 
-            new IOChannelBuilder().maxSize(0);
+            new TunnelBuilder().maxSize(0);
 
             fail();
 
@@ -778,12 +735,12 @@ public class JRoutineTest extends TestCase {
         assertThat(squareAsync.computeParallel3(Arrays.asList(1, 2, 3)).afterMax(timeout).readAll())
                 .contains(1, 4, 9);
 
-        final IOChannel<Integer> channel = JRoutine.io().buildChannel();
+        final Tunnel<Integer> tunnel = JRoutine.io().buildTunnel();
 
-        channel.input().pass(1, 2, 3).close();
-        assertThat(squareAsync.computeParallel4(channel.output())
-                              .afterMax(timeout)
-                              .readAll()).contains(1, 4, 9);
+        tunnel.input().pass(1, 2, 3).close();
+        assertThat(
+                squareAsync.computeParallel4(tunnel.output()).afterMax(timeout).readAll()).contains(
+                1, 4, 9);
 
         final TestInc testInc = new TestInc();
         final int[] inc =
@@ -892,6 +849,48 @@ public class JRoutineTest extends TestCase {
         } catch (final IllegalArgumentException ignored) {
 
         }
+    }
+
+    public void testTunnelBuilder() {
+
+        final TimeDuration timeout = seconds(1);
+        final Tunnel<Object> tunnel = JRoutine.io()
+                                              .dataOrder(DataOrder.INSERTION)
+                                              .delayRunner(Runners.sharedRunner())
+                                              .maxSize(1)
+                                              .bufferTimeout(1, TimeUnit.MILLISECONDS)
+                                              .bufferTimeout(seconds(1))
+                                              .logLevel(LogLevel.DEBUG)
+                                              .loggedWith(new NullLog())
+                                              .buildTunnel();
+        tunnel.input().pass(-77L);
+        assertThat(tunnel.output().afterMax(timeout).readNext()).isEqualTo(-77L);
+
+        final Tunnel<Object> tunnel1 = JRoutine.io().buildTunnel();
+        final TunnelInput<Object> input1 = tunnel1.input();
+
+        input1.after(TimeDuration.millis(200)).pass(23).now().pass(-77L).close();
+        assertThat(tunnel1.output().afterMax(timeout).readAll()).containsOnly(23, -77L);
+
+        final Tunnel<Object> tunnel2 = JRoutine.io().dataOrder(DataOrder.INSERTION).buildTunnel();
+        final TunnelInput<Object> input2 = tunnel2.input();
+
+        input2.after(TimeDuration.millis(200)).pass(23).now().pass(-77L).close();
+        assertThat(tunnel2.output().afterMax(timeout).readAll()).containsExactly(23, -77L);
+    }
+
+    public void testTunnnelBuilderApply() {
+
+        final RoutineConfiguration configuration =
+                new RoutineConfigurationBuilder().runBy(Runners.queuedRunner())
+                                                 .buildConfiguration();
+        final Tunnel<Object> tunnel = JRoutine.io()
+                                              .delayRunner(Runners.sharedRunner())
+                                              .apply(configuration)
+                                              .buildTunnel();
+
+        tunnel.input().after(TimeDuration.millis(200)).pass("test").close();
+        assertThat(tunnel.output().immediately().readAll()).containsExactly("test");
     }
 
     @Async(resultTimeout = 1000)

@@ -126,7 +126,7 @@ import javax.annotation.Nonnull;
  * <pre>
  *     <code>
  *
- *         final IOChannel&lt;Result&gt; channel = JRoutine.io().&lt;Result&gt;buildChannel();
+ *         final IOChannel&lt;Result&gt; channel = JRoutine.io().&lt;Result&gt;buildTunnel();
  *
  *         new Thread() {
  *
@@ -167,9 +167,9 @@ public class JRoutine {
      * @return the channel builder instance.
      */
     @Nonnull
-    public static IOChannelBuilder io() {
+    public static TunnelBuilder io() {
 
-        return new IOChannelBuilder();
+        return new TunnelBuilder();
     }
 
     /**

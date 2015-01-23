@@ -18,8 +18,8 @@ import com.bmd.jrt.annotation.AsyncType;
 import com.bmd.jrt.annotation.AsyncWrap;
 import com.bmd.jrt.annotation.ParallelType;
 import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
-import com.bmd.jrt.channel.IOChannel;
 import com.bmd.jrt.channel.OutputChannel;
+import com.bmd.jrt.channel.Tunnel;
 import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.log.NullLog;
@@ -79,9 +79,9 @@ public class RoutineProcessorTest extends TestCase {
         final ArrayList<String> list = new ArrayList<String>();
         assertThat(testWrapper.getList(Arrays.asList(list))).containsExactly(list);
 
-        final IOChannel<Integer> channel = JRoutine.io().buildChannel();
-        channel.input().pass(3).close();
-        assertThat(testWrapper.getString(channel.output())).isEqualTo("3");
+        final Tunnel<Integer> tunnel = JRoutine.io().buildTunnel();
+        tunnel.input().pass(3).close();
+        assertThat(testWrapper.getString(tunnel.output())).isEqualTo("3");
     }
 
     @SuppressWarnings("UnusedDeclaration")

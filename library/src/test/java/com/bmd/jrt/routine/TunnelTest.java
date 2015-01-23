@@ -14,10 +14,10 @@
 package com.bmd.jrt.routine;
 
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
-import com.bmd.jrt.channel.IOChannel;
-import com.bmd.jrt.channel.IOChannel.IOChannelOutput;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ReadDeadlockException;
+import com.bmd.jrt.channel.Tunnel;
+import com.bmd.jrt.channel.Tunnel.TunnelOutput;
 import com.bmd.jrt.common.RoutineException;
 import com.bmd.jrt.time.TimeDuration;
 
@@ -32,21 +32,21 @@ import static com.bmd.jrt.time.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * I/O channel unit tests.
+ * Tunnel unit tests.
  * <p/>
  * Created by davide on 10/26/14.
  */
-public class IOChannelTest extends TestCase {
+public class TunnelTest extends TestCase {
 
     public void testAbort() {
 
         final TimeDuration timeout = seconds(1);
 
-        final IOChannel<String> channel = JRoutine.io().buildChannel();
+        final Tunnel<String> tunnel = JRoutine.io().buildTunnel();
         final Routine<String, String> routine = JRoutine.<String>on().buildRoutine();
-        final OutputChannel<String> outputChannel = routine.callAsync(channel.output());
+        final OutputChannel<String> outputChannel = routine.callAsync(tunnel.output());
 
-        channel.input().abort(new IllegalStateException());
+        tunnel.input().abort(new IllegalStateException());
 
         try {
 
@@ -62,10 +62,10 @@ public class IOChannelTest extends TestCase {
 
     public void testAbortDelay() {
 
-        final IOChannel<String> channel = JRoutine.io().buildChannel();
-        channel.input().after(TimeDuration.days(1)).pass("test").close();
+        final Tunnel<String> tunnel = JRoutine.io().buildTunnel();
+        tunnel.input().after(TimeDuration.days(1)).pass("test").close();
 
-        final IOChannelOutput<String> output = channel.output();
+        final TunnelOutput<String> output = tunnel.output();
         assertThat(output.immediately().eventuallyExit().readAll()).isEmpty();
 
         final ArrayList<String> results = new ArrayList<String>();
@@ -91,7 +91,7 @@ public class IOChannelTest extends TestCase {
 
         final TimeDuration timeout = seconds(1);
 
-        final IOChannel<String> channel = JRoutine.io().buildChannel();
+        final Tunnel<String> tunnel = JRoutine.io().buildTunnel();
 
         new Thread() {
 
@@ -106,49 +106,48 @@ public class IOChannelTest extends TestCase {
 
                 } finally {
 
-                    channel.input().pass("test").close();
+                    tunnel.input().pass("test").close();
                 }
             }
         }.start();
 
         final Routine<String, String> routine = JRoutine.<String>on().buildRoutine();
-        final OutputChannel<String> outputChannel = routine.callAsync(channel.output());
+        final OutputChannel<String> outputChannel = routine.callAsync(tunnel.output());
         assertThat(outputChannel.afterMax(timeout).readNext()).isEqualTo("test");
         assertThat(outputChannel.checkComplete()).isTrue();
 
-        final IOChannel<String> channel1 =
-                JRoutine.io().dataOrder(DataOrder.INSERTION).buildChannel();
+        final Tunnel<String> tunnel1 = JRoutine.io().dataOrder(DataOrder.INSERTION).buildTunnel();
 
         new Thread() {
 
             @Override
             public void run() {
 
-                channel1.input()
-                        .after(1, TimeUnit.MILLISECONDS)
-                        .after(TimeDuration.millis(200))
-                        .pass("test1", "test2")
-                        .pass(Collections.singleton("test3"))
-                        .close();
+                tunnel1.input()
+                       .after(1, TimeUnit.MILLISECONDS)
+                       .after(TimeDuration.millis(200))
+                       .pass("test1", "test2")
+                       .pass(Collections.singleton("test3"))
+                       .close();
             }
         }.start();
 
         final Routine<String, String> routine1 = JRoutine.<String>on().buildRoutine();
-        final OutputChannel<String> outputChannel1 = routine1.callAsync(channel1.output());
+        final OutputChannel<String> outputChannel1 = routine1.callAsync(tunnel1.output());
         assertThat(outputChannel1.afterMax(timeout).readAll()).containsExactly("test1", "test2",
                                                                                "test3");
     }
 
     public void testPartialOut() {
 
-        final IOChannel<String> channel = JRoutine.io().buildChannel();
+        final Tunnel<String> tunnel = JRoutine.io().buildTunnel();
 
         new Thread() {
 
             @Override
             public void run() {
 
-                channel.input().pass("test");
+                tunnel.input().pass("test");
             }
         }.start();
 
@@ -156,14 +155,14 @@ public class IOChannelTest extends TestCase {
 
         final Routine<String, String> routine = JRoutine.<String>on().buildRoutine();
         final OutputChannel<String> outputChannel =
-                routine.callAsync(channel.output()).eventuallyExit();
+                routine.callAsync(tunnel.output()).eventuallyExit();
         assertThat(outputChannel.afterMax(TimeDuration.millis(500)).readAll()).containsExactly(
                 "test");
 
         assertThat(System.currentTimeMillis() - startTime).isLessThan(2000);
 
         assertThat(outputChannel.immediately().checkComplete()).isFalse();
-        channel.input().close();
+        tunnel.input().close();
         assertThat(outputChannel.afterMax(TimeDuration.millis(500)).checkComplete()).isTrue();
     }
 
@@ -171,21 +170,21 @@ public class IOChannelTest extends TestCase {
 
         final TimeDuration timeout = seconds(1);
 
-        IOChannel<String> channel = JRoutine.io().buildChannel();
+        final Tunnel<String> tunnel = JRoutine.io().buildTunnel();
 
-        new WeakThread(channel).start();
+        new WeakThread(tunnel).start();
 
         final Routine<String, String> routine = JRoutine.<String>on().buildRoutine();
-        final OutputChannel<String> outputChannel = routine.callAsync(channel.output());
+        final OutputChannel<String> outputChannel = routine.callAsync(tunnel.output());
         assertThat(outputChannel.afterMax(timeout).readNext()).isEqualTo("test");
     }
 
     public void testTimeout() {
 
-        final IOChannel<String> channel = JRoutine.io().buildChannel();
-        channel.input().after(TimeDuration.seconds(3)).pass("test").close();
+        final Tunnel<String> tunnel = JRoutine.io().buildTunnel();
+        tunnel.input().after(TimeDuration.seconds(3)).pass("test").close();
 
-        final IOChannelOutput<String> output = channel.output();
+        final TunnelOutput<String> output = tunnel.output();
         assertThat(output.immediately().readAll()).isEmpty();
 
         output.afterMax(TimeDuration.millis(10)).eventuallyDeadlock();
@@ -245,11 +244,11 @@ public class IOChannelTest extends TestCase {
 
     private static class WeakThread extends Thread {
 
-        private final WeakReference<IOChannel<String>> mChannelRef;
+        private final WeakReference<Tunnel<String>> mTunnelRef;
 
-        public WeakThread(final IOChannel<String> channel) {
+        public WeakThread(final Tunnel<String> tunnel) {
 
-            mChannelRef = new WeakReference<IOChannel<String>>(channel);
+            mTunnelRef = new WeakReference<Tunnel<String>>(tunnel);
         }
 
         @Override
@@ -263,11 +262,11 @@ public class IOChannelTest extends TestCase {
 
             } finally {
 
-                final IOChannel<String> channel = mChannelRef.get();
+                final Tunnel<String> tunnel = mTunnelRef.get();
 
-                if (channel != null) {
+                if (tunnel != null) {
 
-                    channel.input().pass("test");
+                    tunnel.input().pass("test");
                 }
             }
         }

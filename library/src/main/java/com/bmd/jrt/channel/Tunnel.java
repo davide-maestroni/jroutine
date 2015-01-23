@@ -22,10 +22,10 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Interface defining an input/output channel.
+ * Interface defining a tunnel.
  * <p/>
- * An I/O channel is useful to make other asynchronous tasks communicate with a routine.<br/>
- * The channel output can be passed to a routine input channel in order to feed it with data coming
+ * An tunnel is useful to make other asynchronous tasks communicate with a routine.<br/>
+ * The tunnel output can be passed to a routine input channel in order to feed it with data coming
  * asynchronously from another source. Note however, that in both cases the
  * <b><code>close()</code></b> method must be called to correctly terminate the invocation
  * lifecycle.
@@ -34,106 +34,105 @@ import javax.annotation.Nullable;
  *
  * @param <TYPE> the data type.
  */
-//TODO: tunnel??
-public interface IOChannel<TYPE> {
+public interface Tunnel<TYPE> {
 
     /**
-     * Returns the input end of this channel.
+     * Returns the input end of this tunnel.
      *
      * @return the input channel.
      */
     @Nonnull
-    public IOChannelInput<TYPE> input();
+    public TunnelInput<TYPE> input();
 
     /**
-     * Returns the output end of this channel.
+     * Returns the output end of this tunnel.
      *
      * @return the output channel.
      */
     @Nonnull
-    public IOChannelOutput<TYPE> output();
+    public TunnelOutput<TYPE> output();
 
     /**
-     * Interface defining an I/O channel input.
+     * Interface defining a tunnel input.
      *
      * @param <INPUT> the input data type.
      */
-    public interface IOChannelInput<INPUT> extends InputChannel<INPUT> {
+    public interface TunnelInput<INPUT> extends InputChannel<INPUT> {
 
         @Nonnull
         @Override
-        public IOChannelInput<INPUT> after(@Nonnull TimeDuration delay);
+        public TunnelInput<INPUT> after(@Nonnull TimeDuration delay);
 
         @Nonnull
         @Override
-        public IOChannelInput<INPUT> after(long delay, @Nonnull TimeUnit timeUnit);
+        public TunnelInput<INPUT> after(long delay, @Nonnull TimeUnit timeUnit);
 
         @Nonnull
         @Override
-        public IOChannelInput<INPUT> now();
+        public TunnelInput<INPUT> now();
 
         @Nonnull
         @Override
-        public IOChannelInput<INPUT> pass(@Nullable OutputChannel<INPUT> channel);
+        public TunnelInput<INPUT> pass(@Nullable OutputChannel<INPUT> channel);
 
         @Nonnull
         @Override
-        public IOChannelInput<INPUT> pass(@Nullable Iterable<? extends INPUT> inputs);
+        public TunnelInput<INPUT> pass(@Nullable Iterable<? extends INPUT> inputs);
 
         @Nonnull
         @Override
-        public IOChannelInput<INPUT> pass(@Nullable INPUT input);
+        public TunnelInput<INPUT> pass(@Nullable INPUT input);
 
         @Nonnull
         @Override
-        public IOChannelInput<INPUT> pass(@Nullable INPUT... inputs);
+        public TunnelInput<INPUT> pass(@Nullable INPUT... inputs);
 
         /**
-         * Closes the channel input.<br/>
+         * Closes the tunnel input.<br/>
          * If the channel is already close, this method has no effect.
          * <p/>
-         * Note that this method must be always called when done with the channel.
+         * Note that this method must be always called when done with the tunnel.
          */
         public void close();
     }
 
     /**
-     * Interface defining an I/O channel output.
+     * Interface defining a tunnel output.
      *
      * @param <OUTPUT> the output data type.
      */
-    public interface IOChannelOutput<OUTPUT> extends OutputChannel<OUTPUT> {
+    public interface TunnelOutput<OUTPUT> extends OutputChannel<OUTPUT> {
 
         @Nonnull
         @Override
-        public IOChannelOutput<OUTPUT> afterMax(@Nonnull TimeDuration timeout);
+        public TunnelOutput<OUTPUT> afterMax(@Nonnull TimeDuration timeout);
 
         @Nonnull
         @Override
-        public IOChannelOutput<OUTPUT> afterMax(long timeout, @Nonnull TimeUnit timeUnit);
+        public TunnelOutput<OUTPUT> afterMax(long timeout, @Nonnull TimeUnit timeUnit);
 
         @Nonnull
         @Override
-        public IOChannelOutput<OUTPUT> bind(@Nonnull OutputConsumer<OUTPUT> consumer);
+        public TunnelOutput<OUTPUT> bind(@Nonnull OutputConsumer<OUTPUT> consumer);
 
         @Nonnull
         @Override
-        public IOChannelOutput<OUTPUT> eventually();
+        public TunnelOutput<OUTPUT> eventually();
 
         @Nonnull
         @Override
-        public IOChannelOutput<OUTPUT> eventuallyDeadlock();
+        public TunnelOutput<OUTPUT> eventuallyDeadlock();
 
         @Nonnull
         @Override
-        public IOChannelOutput<OUTPUT> eventuallyExit();
+        public TunnelOutput<OUTPUT> eventuallyExit();
 
         @Nonnull
         @Override
-        public IOChannelOutput<OUTPUT> immediately();
+        public TunnelOutput<OUTPUT> immediately();
 
         @Nonnull
         @Override
-        public IOChannelOutput<OUTPUT> readAllInto(@Nonnull Collection<? super OUTPUT> results);
+        public TunnelOutput<OUTPUT> readAllInto(@Nonnull Collection<? super OUTPUT> results);
     }
 }

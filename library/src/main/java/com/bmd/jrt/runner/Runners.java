@@ -107,6 +107,7 @@ public class Runners {
     @Nonnull
     public static Runner sharedRunner() {
 
+        //TODO: protect?
         if (sSharedRunner == null) {
 
             sSharedRunner = scheduledRunner(new ScheduledThreadPoolExecutor(1) {

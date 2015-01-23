@@ -29,11 +29,11 @@ import com.bmd.jrt.android.builder.InputClashException;
 import com.bmd.jrt.android.builder.RoutineClashException;
 import com.bmd.jrt.android.invocation.AndroidInvocation;
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
-import com.bmd.jrt.channel.IOChannel;
-import com.bmd.jrt.channel.IOChannel.IOChannelInput;
 import com.bmd.jrt.channel.InputChannel;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ResultChannel;
+import com.bmd.jrt.channel.Tunnel;
+import com.bmd.jrt.channel.Tunnel.TunnelInput;
 import com.bmd.jrt.common.CacheHashMap;
 import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.common.RoutineException;
@@ -434,8 +434,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
     private static class RoutineLoaderCallbacks<OUTPUT>
             implements LoaderCallbacks<InvocationResult<OUTPUT>> {
 
-        private final ArrayList<IOChannelInput<OUTPUT>> mChannels =
-                new ArrayList<IOChannelInput<OUTPUT>>();
+        private final ArrayList<TunnelInput<OUTPUT>> mChannels =
+                new ArrayList<TunnelInput<OUTPUT>>();
 
         private final RoutineLoader<?, OUTPUT> mLoader;
 
@@ -443,8 +443,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
 
         private final Logger mLogger;
 
-        private final ArrayList<IOChannelInput<OUTPUT>> mNewChannels =
-                new ArrayList<IOChannelInput<OUTPUT>>();
+        private final ArrayList<TunnelInput<OUTPUT>> mNewChannels =
+                new ArrayList<TunnelInput<OUTPUT>>();
 
         private ResultCache mCacheType;
 
@@ -478,17 +478,17 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
             logger.dbg("creating new result channel");
 
             final RoutineLoader<?, OUTPUT> internalLoader = mLoader;
-            final ArrayList<IOChannelInput<OUTPUT>> channels = mNewChannels;
-            final IOChannel<OUTPUT> channel = JRoutine.io()
-                                                      .maxSize(Integer.MAX_VALUE)
-                                                      .bufferTimeout(TimeDuration.ZERO)
-                                                      .loggedWith(logger.getLog())
-                                                      .logLevel(logger.getLogLevel())
-                                                      .buildChannel();
-            channels.add(channel.input());
+            final ArrayList<TunnelInput<OUTPUT>> channels = mNewChannels;
+            final Tunnel<OUTPUT> tunnel = JRoutine.io()
+                                                  .maxSize(Integer.MAX_VALUE)
+                                                  .bufferTimeout(TimeDuration.ZERO)
+                                                  .loggedWith(logger.getLog())
+                                                  .logLevel(logger.getLogLevel())
+                                                  .buildTunnel();
+            channels.add(tunnel.input());
             internalLoader.setInvocationCount(
                     Math.max(channels.size(), internalLoader.getInvocationCount()));
-            return channel.output();
+            return tunnel.output();
         }
 
         @Override
@@ -503,15 +503,15 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
                 final InvocationResult<OUTPUT> data) {
 
             final Logger logger = mLogger;
-            final ArrayList<IOChannelInput<OUTPUT>> channels = mChannels;
-            final ArrayList<IOChannelInput<OUTPUT>> newChannels = mNewChannels;
+            final ArrayList<TunnelInput<OUTPUT>> channels = mChannels;
+            final ArrayList<TunnelInput<OUTPUT>> newChannels = mNewChannels;
 
             logger.dbg("dispatching invocation result: %s", data);
 
             if (data.passTo(newChannels, channels)) {
 
-                final ArrayList<IOChannelInput<OUTPUT>> channelsToClose =
-                        new ArrayList<IOChannelInput<OUTPUT>>(channels);
+                final ArrayList<TunnelInput<OUTPUT>> channelsToClose =
+                        new ArrayList<TunnelInput<OUTPUT>>(channels);
                 channelsToClose.addAll(newChannels);
 
                 mResultCount += channels.size() + newChannels.size();
@@ -541,14 +541,14 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
 
                     final Throwable exception = data.getAbortException();
 
-                    for (final IOChannelInput<OUTPUT> channel : channelsToClose) {
+                    for (final TunnelInput<OUTPUT> channel : channelsToClose) {
 
                         channel.abort(exception);
                     }
 
                 } else {
 
-                    for (final IOChannelInput<OUTPUT> channel : channelsToClose) {
+                    for (final TunnelInput<OUTPUT> channel : channelsToClose) {
 
                         channel.close();
                     }
@@ -571,8 +571,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
         private void reset() {
 
             mLogger.dbg("aborting result channels");
-            final ArrayList<IOChannelInput<OUTPUT>> channels = mChannels;
-            final ArrayList<IOChannelInput<OUTPUT>> newChannels = mNewChannels;
+            final ArrayList<TunnelInput<OUTPUT>> channels = mChannels;
+            final ArrayList<TunnelInput<OUTPUT>> newChannels = mNewChannels;
             final RoutineClashException reason = new RoutineClashException(mLoader.getId());
 
             for (final InputChannel<OUTPUT> channel : channels) {

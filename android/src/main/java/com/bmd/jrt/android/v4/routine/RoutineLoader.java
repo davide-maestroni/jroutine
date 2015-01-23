@@ -18,10 +18,10 @@ import android.support.v4.content.AsyncTaskLoader;
 
 import com.bmd.jrt.android.invocation.AndroidInvocation;
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
-import com.bmd.jrt.channel.IOChannel;
-import com.bmd.jrt.channel.IOChannel.IOChannelInput;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ResultChannel;
+import com.bmd.jrt.channel.Tunnel;
+import com.bmd.jrt.channel.Tunnel.TunnelInput;
 import com.bmd.jrt.common.RoutineException;
 import com.bmd.jrt.common.RoutineInterruptedException;
 import com.bmd.jrt.log.Logger;
@@ -257,9 +257,9 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
      */
     private static class LoaderResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
-        private final IOChannel<OUTPUT> mChannel;
+        private final TunnelInput<OUTPUT> mTunnelInput;
 
-        private final IOChannelInput<OUTPUT> mChannelInput;
+        private final Tunnel<OUTPUT> mmTunnel;
 
         /**
          * Constructor.
@@ -269,39 +269,39 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
          */
         private LoaderResultChannel(final DataOrder order, @Nonnull final Logger logger) {
 
-            mChannel = JRoutine.io()
+            mmTunnel = JRoutine.io()
                                .dataOrder(order)
                                .maxSize(Integer.MAX_VALUE)
                                .bufferTimeout(TimeDuration.ZERO)
                                .loggedWith(logger.getLog())
                                .logLevel(logger.getLogLevel())
-                               .buildChannel();
-            mChannelInput = mChannel.input();
+                               .buildTunnel();
+            mTunnelInput = mmTunnel.input();
         }
 
         @Override
         public boolean abort() {
 
-            return mChannelInput.abort();
+            return mTunnelInput.abort();
         }
 
         @Override
         public boolean abort(@Nullable final Throwable reason) {
 
-            return mChannelInput.abort(reason);
+            return mTunnelInput.abort(reason);
         }
 
         @Override
         public boolean isOpen() {
 
-            return mChannelInput.isOpen();
+            return mTunnelInput.isOpen();
         }
 
         @Nonnull
         @Override
         public ResultChannel<OUTPUT> after(@Nonnull final TimeDuration delay) {
 
-            mChannelInput.after(delay);
+            mTunnelInput.after(delay);
             return this;
         }
 
@@ -309,7 +309,7 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
         @Override
         public ResultChannel<OUTPUT> after(final long delay, @Nonnull final TimeUnit timeUnit) {
 
-            mChannelInput.after(delay, timeUnit);
+            mTunnelInput.after(delay, timeUnit);
             return this;
         }
 
@@ -317,7 +317,7 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
         @Override
         public ResultChannel<OUTPUT> now() {
 
-            mChannelInput.now();
+            mTunnelInput.now();
             return this;
         }
 
@@ -325,7 +325,7 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
         @Override
         public ResultChannel<OUTPUT> pass(@Nullable final OutputChannel<OUTPUT> channel) {
 
-            mChannelInput.pass(channel);
+            mTunnelInput.pass(channel);
             return this;
         }
 
@@ -333,7 +333,7 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
         @Override
         public ResultChannel<OUTPUT> pass(@Nullable final Iterable<? extends OUTPUT> outputs) {
 
-            mChannelInput.pass(outputs);
+            mTunnelInput.pass(outputs);
             return this;
         }
 
@@ -341,7 +341,7 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
         @Override
         public ResultChannel<OUTPUT> pass(@Nullable final OUTPUT output) {
 
-            mChannelInput.pass(output);
+            mTunnelInput.pass(output);
             return this;
         }
 
@@ -349,19 +349,19 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
         @Override
         public ResultChannel<OUTPUT> pass(@Nullable final OUTPUT... outputs) {
 
-            mChannelInput.pass(outputs);
+            mTunnelInput.pass(outputs);
             return this;
         }
 
         private void close() {
 
-            mChannelInput.close();
+            mTunnelInput.close();
         }
 
         @Nonnull
         private OutputChannel<OUTPUT> output() {
 
-            return mChannel.output();
+            return mmTunnel.output();
         }
     }
 }

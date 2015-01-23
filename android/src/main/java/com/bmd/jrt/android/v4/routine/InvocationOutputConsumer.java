@@ -14,8 +14,8 @@
 package com.bmd.jrt.android.v4.routine;
 
 import com.bmd.jrt.android.runner.Runners;
-import com.bmd.jrt.channel.IOChannel.IOChannelInput;
 import com.bmd.jrt.channel.TemplateOutputConsumer;
+import com.bmd.jrt.channel.Tunnel.TunnelInput;
 import com.bmd.jrt.common.RoutineException;
 import com.bmd.jrt.common.RoutineInterruptedException;
 import com.bmd.jrt.log.Logger;
@@ -192,8 +192,8 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
         }
 
         @Override
-        public boolean passTo(@Nonnull final Collection<IOChannelInput<OUTPUT>> newChannels,
-                @Nonnull final Collection<IOChannelInput<OUTPUT>> oldChannels) {
+        public boolean passTo(@Nonnull final Collection<TunnelInput<OUTPUT>> newChannels,
+                @Nonnull final Collection<TunnelInput<OUTPUT>> oldChannels) {
 
             synchronized (mMutex) {
 
@@ -215,12 +215,12 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
 
                         logger.dbg("passing result: %s + %s", cachedResults, lastResults);
 
-                        for (final IOChannelInput<OUTPUT> newChannel : newChannels) {
+                        for (final TunnelInput<OUTPUT> newChannel : newChannels) {
 
                             newChannel.pass(cachedResults).pass(lastResults);
                         }
 
-                        for (final IOChannelInput<OUTPUT> channel : oldChannels) {
+                        for (final TunnelInput<OUTPUT> channel : oldChannels) {
 
                             channel.pass(lastResults);
                         }

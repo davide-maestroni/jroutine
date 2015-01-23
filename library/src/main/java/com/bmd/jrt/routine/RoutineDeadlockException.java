@@ -15,6 +15,8 @@ package com.bmd.jrt.routine;
 
 import com.bmd.jrt.common.DeadlockException;
 
+import javax.annotation.Nullable;
+
 /**
  * Exception indicating that no invocation instance became available before the timeout elapsed.
  * <p/>
@@ -22,4 +24,13 @@ import com.bmd.jrt.common.DeadlockException;
  */
 public class RoutineDeadlockException extends DeadlockException {
 
+    /**
+     * Constructor.
+     *
+     * @param message the error message.
+     */
+    public RoutineDeadlockException(@Nullable final String message) {
+
+        super(message);
+    }
 }

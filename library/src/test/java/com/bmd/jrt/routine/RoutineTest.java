@@ -14,6 +14,7 @@
 package com.bmd.jrt.routine;
 
 import com.bmd.jrt.annotation.Async;
+import com.bmd.jrt.annotation.AsyncName;
 import com.bmd.jrt.annotation.AsyncType;
 import com.bmd.jrt.builder.InputDeadlockException;
 import com.bmd.jrt.builder.OutputDeadlockException;
@@ -84,7 +85,7 @@ public class RoutineTest extends TestCase {
         assertThat(inputChannel.isOpen()).isFalse();
         assertThat(inputChannel.abort(new IllegalArgumentException("test1"))).isFalse();
         assertThat(inputChannel.isOpen()).isFalse();
-        assertThat(outputChannel.afterMax(timeout).readFirst()).isEqualTo("test1");
+        assertThat(outputChannel.afterMax(timeout).readNext()).isEqualTo("test1");
 
         final ParameterChannel<String, String> inputChannel1 = routine.invokeAsync().pass("test1");
         final OutputChannel<String> outputChannel1 = inputChannel1.result();
@@ -93,7 +94,7 @@ public class RoutineTest extends TestCase {
         assertThat(inputChannel1.abort()).isFalse();
         assertThat(inputChannel1.isOpen()).isFalse();
         assertThat(outputChannel1.isOpen()).isTrue();
-        assertThat(outputChannel1.afterMax(timeout).readFirst()).isEqualTo("test1");
+        assertThat(outputChannel1.afterMax(timeout).readNext()).isEqualTo("test1");
         assertThat(outputChannel1.isOpen()).isFalse();
 
         final OutputChannel<String> channel = routine.callAsync("test2");
@@ -172,8 +173,7 @@ public class RoutineTest extends TestCase {
                     .after(TimeDuration.millis(10))
                     .pass("test_abort")
                     .result()
-                    .afterMax(timeout)
-                    .readFirst();
+                    .afterMax(timeout).readNext();
 
             fail();
 
@@ -204,8 +204,7 @@ public class RoutineTest extends TestCase {
                     .after(TimeDuration.millis(10))
                     .pass("test_abort")
                     .result()
-                    .afterMax(timeout)
-                    .readFirst();
+                    .afterMax(timeout).readNext();
 
             fail();
 
@@ -775,7 +774,7 @@ public class RoutineTest extends TestCase {
 
         final ParameterChannel<String, String> channel1 = tunnelRoutine.invokeAsync();
         channel1.after(TimeDuration.seconds(2)).abort();
-        assertThat(channel1.now().pass("test").result().afterMax(timeout).readFirst()).isEqualTo(
+        assertThat(channel1.now().pass("test").result().afterMax(timeout).readNext()).isEqualTo(
                 "test");
 
         final ParameterChannel<String, String> channel2 = tunnelRoutine.invokeAsync();
@@ -786,8 +785,7 @@ public class RoutineTest extends TestCase {
             channel2.after(TimeDuration.millis(200))
                     .pass("test")
                     .result()
-                    .afterMax(timeout)
-                    .readFirst();
+                    .afterMax(timeout).readNext();
 
             fail();
 
@@ -800,7 +798,7 @@ public class RoutineTest extends TestCase {
                         .withArgs(TimeDuration.millis(200))
                         .buildRoutine();
 
-        assertThat(abortRoutine.callAsync("test").afterMax(timeout).readFirst()).isEqualTo("test");
+        assertThat(abortRoutine.callAsync("test").afterMax(timeout).readNext()).isEqualTo("test");
 
         try {
 
@@ -808,7 +806,7 @@ public class RoutineTest extends TestCase {
 
             TimeDuration.millis(500).sleepAtLeast();
 
-            channel.afterMax(timeout).readFirst();
+            channel.afterMax(timeout).readNext();
 
             fail();
 
@@ -830,8 +828,7 @@ public class RoutineTest extends TestCase {
                            .after(TimeDuration.millis(500))
                            .pass(routine2.callAsync("test"))
                            .result()
-                           .afterMax(timeout)
-                           .readFirst()).isEqualTo("test");
+                           .afterMax(timeout).readNext()).isEqualTo("test");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(500);
     }
 
@@ -1196,8 +1193,7 @@ public class RoutineTest extends TestCase {
                                 .take(77)).isEqualTo(77);
         assertThat(on(testClass).buildProxy(TestInterfaceAsync.class)
                                 .getOne()
-                                .afterMax(timeout)
-                                .readFirst()).isEqualTo(1);
+                                .afterMax(timeout).readNext()).isEqualTo(1);
 
         final TestInterfaceAsync testInterfaceAsync =
                 on(testClass).resultTimeout(1, TimeUnit.SECONDS)
@@ -1553,10 +1549,10 @@ public class RoutineTest extends TestCase {
 
         final Routine<String, String> routine1 = JRoutine.on(tokenOf(DelayedInvocation.class))
                                                          .logLevel(LogLevel.SILENT)
-                                                         .withArgs(TimeDuration.ZERO)
+                                                         .withArgs(millis(100))
                                                          .buildRoutine();
         final Iterator<String> iterator =
-                routine1.callSync("test").afterMax(TimeDuration.millis(10)).iterator();
+                routine1.callSync("test").afterMax(millis(500)).eventuallyExit().iterator();
 
         assertThat(iterator.next()).isEqualTo("test");
         iterator.remove();
@@ -1583,11 +1579,21 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            routine1.callSync().immediately().iterator().next();
+            routine1.callSync().immediately().eventuallyExit().iterator().next();
 
             fail();
 
         } catch (final NoSuchElementException ignored) {
+
+        }
+
+        try {
+
+            routine1.callAsync("test").immediately().iterator().next();
+
+            fail();
+
+        } catch (final ReadDeadlockException ignored) {
 
         }
     }
@@ -1657,11 +1663,13 @@ public class RoutineTest extends TestCase {
                                                     .buildRoutine();
 
         final OutputChannel<String> channel = routine.callAsync("test");
-        assertThat(channel.eventually(false).immediately().readAll()).isEmpty();
+        assertThat(channel.immediately().readAll()).isEmpty();
+
+        channel.afterMax(TimeDuration.millis(10)).eventuallyDeadlock();
 
         try {
 
-            channel.afterMax(TimeDuration.millis(10)).eventually(true).readFirst();
+            channel.readNext();
 
             fail();
 
@@ -1699,15 +1707,7 @@ public class RoutineTest extends TestCase {
 
         }
 
-        try {
-
-            channel.checkComplete();
-
-            fail();
-
-        } catch (final ReadDeadlockException ignored) {
-
-        }
+        assertThat(channel.checkComplete()).isFalse();
     }
 
     private void testChained(final Routine<String, String> before,
@@ -2306,7 +2306,7 @@ public class RoutineTest extends TestCase {
         @AsyncType(int.class)
         public OutputChannel<Integer> getOne();
 
-        @Async(value = "getInt")
+        @AsyncName(value = "getInt")
         public int take(int i);
     }
 
@@ -2461,7 +2461,7 @@ public class RoutineTest extends TestCase {
 
         public static final String GET = "get";
 
-        @Async(value = GET)
+        @AsyncName(GET)
         public static int get(final int i) {
 
             return i;
@@ -2473,7 +2473,7 @@ public class RoutineTest extends TestCase {
             return i;
         }
 
-        @Async(value = GET)
+        @AsyncName(GET)
         public int getOne() {
 
             return 1;

@@ -90,23 +90,45 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
     public boolean checkComplete();
 
     /**
-     * TODO
-     * Tells the channel to throw a {@link ReadDeadlockException} in case no result is available
-     * before the timeout has elapsed.
+     * Tells the channel to wait indefinitely for results to be available.
      * <p/>
-     * By default no exception will be thrown.
+     * By default the timeout is set to 0 to avoid unexpected deadlocks.
      *
-     * @param action whether to throw a deadlock exception.
      * @return this channel.
      * @throws IllegalStateException               if this channel is already bound to a consumer.
      * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
      *                                             exception.
+     */
+    @Nonnull
+    public OutputChannel<OUTPUT> eventually();
+
+    /**
+     * Tells the channel to throw a {@link ReadDeadlockException} in case no result is available
+     * before the timeout has elapsed.
+     * <p/>
+     * This is the default behavior.
+     *
+     * @return this channel.
      * @see #afterMax(com.bmd.jrt.time.TimeDuration)
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
      * @see #immediately()
      */
     @Nonnull
-    public OutputChannel<OUTPUT> eventually(@Nonnull TimeoutAction action);
+    public OutputChannel<OUTPUT> eventuallyDeadlock();
+
+    /**
+     * Tells the channel to break execution in case no result is available before the timeout has
+     * elapsed.
+     * <p/>
+     * By default an exception will be thrown.
+     *
+     * @return this channel.
+     * @see #afterMax(com.bmd.jrt.time.TimeDuration)
+     * @see #afterMax(long, java.util.concurrent.TimeUnit)
+     * @see #immediately()
+     */
+    @Nonnull
+    public OutputChannel<OUTPUT> eventuallyExit();
 
     /**
      * Tells the channel to not wait for results to be available.
@@ -141,7 +163,8 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @see #afterMax(com.bmd.jrt.time.TimeDuration)
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
      * @see #immediately()
-     * @see #eventually(com.bmd.jrt.channel.OutputChannel.TimeoutAction)
+     * @see #eventuallyDeadlock()
+     * @see #eventuallyExit()
      */
     @Nonnull
     public List<OUTPUT> readAll();
@@ -161,7 +184,8 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @see #afterMax(com.bmd.jrt.time.TimeDuration)
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
      * @see #immediately()
-     * @see #eventually(com.bmd.jrt.channel.OutputChannel.TimeoutAction)
+     * @see #eventuallyDeadlock()
+     * @see #eventuallyExit()
      */
     @Nonnull
     public OutputChannel<OUTPUT> readAllInto(@Nonnull Collection<? super OUTPUT> results);
@@ -181,9 +205,10 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @see #afterMax(com.bmd.jrt.time.TimeDuration)
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
      * @see #immediately()
-     * @see #eventually(com.bmd.jrt.channel.OutputChannel.TimeoutAction)
+     * @see #eventuallyDeadlock()
+     * @see #eventuallyExit()
      */
-    public OUTPUT readFirst();
+    public OUTPUT readNext();
 
     /**
      * Unbinds the specified consumer from this channel. After the call the output will returned to
@@ -194,13 +219,4 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      */
     @Nonnull
     public OutputChannel<OUTPUT> unbind(@Nullable OutputConsumer<OUTPUT> consumer);
-
-    public enum TimeoutAction {
-
-        DEADLOCK,
-        CONTINUE,
-        RETURN,
-        ABORT,
-        DEFAULT
-    }
 }

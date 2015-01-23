@@ -13,11 +13,7 @@
  */
 package com.bmd.jrt.annotation;
 
-import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
 import com.bmd.jrt.builder.RoutineConfiguration;
-import com.bmd.jrt.log.Log;
-import com.bmd.jrt.log.Log.LogLevel;
-import com.bmd.jrt.runner.Runner;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
@@ -27,7 +23,7 @@ import java.lang.annotation.Target;
 import java.util.concurrent.TimeUnit;
 
 /**
- * This annotation is used to indicate methods that are to be invoked in an asynchronous way.
+ * This annotation is used to customize methods that are to be invoked in an asynchronous way.
  * <p/>
  * Note that the piece of code inside such methods will be automatically protected so to avoid
  * concurrency issues. Though, other parts of the code inside the same class will be not.<br/>
@@ -36,43 +32,9 @@ import java.util.concurrent.TimeUnit;
  * synchronous methods as well.<br/>
  * In a dual way, it is possible to exclude single methods from this kind of protection by
  * indicating them as having a different lock. Each lock has a name associated, and every method
- * with a specific lock is protected only from the other methods with the same lock name.
- * <p/>
- * This annotation allows to identify the method through a constant, thus avoiding issues when
- * running obfuscation tools.<br/>
- * For example, the following code:
- * <pre>
- *     <code>
- *
- *         public class MyClass {
- *
- *             public static final String METHOD_NAME = "get";
- *
- *             &#64;Async(METHOD_NAME)
- *             public int getOne() {
- *
- *                 return 1;
- *             }
- *         }
- *     </code>
- * </pre>
- * allows to asynchronously call the method independently from its original name like:
- * <pre>
- *     <code>
- *
- *         JRoutine.on(new MyClass()).annotatedMethod(MyClass.METHOD_NAME).callAsync();
- *     </code>
- * </pre>
- * <p/>
- * Additionally, through this annotation it is possible to indicate: a specific runner
- * implementation to be used for asynchronous and synchronous invocations; the maximum invocation
- * instances running at the same time; the maximum ones retained; the timeout for an invocation
- * instance to become available; a specific log and log level.
- * <br/>
- * Note however that the runner and log classes must declare a default constructor to be
- * instantiated via reflection.
- * <p/>
- * The same considerations apply to static class methods.
+ * with a specific lock is protected only from the other methods with the same lock name.<br/>
+ * Additionally, through this annotation it is possible to indicate the timeout for a result
+ * to become available.
  * <p/>
  * Finally, be aware that a method might need to be made accessible in order to be called. That
  * means that, in case a {@link java.lang.SecurityManager} is installed, a security exception might
@@ -104,68 +66,26 @@ public @interface Async {
     /**
      * Constant indicating a default name value.
      */
-    static final String DEFAULT_NAME = "";
+    static final String DEFAULT_LOCK = "com.bmd.jrt.annotation.Async.DEFAULT_LOCK";
 
     /**
      * Constant indicating a null lock name.
      */
-    static final String NULL_LOCK = "com.bmd.jrt.annotation.Async.NULL_LOCK";
+    static final String NULL_LOCK = "";
 
     /**
-     * The class of the runner to be used for asynchronous invocations.
+     * The type of action to take on output channel timeout.
      *
-     * @return the runner class.
+     * @return the action type.
      */
-    Class<? extends Runner> asyncRunner() default DefaultRunner.class;
-
-    /**
-     * The time unit of the timeout for an invocation instance to become available.
-     *
-     * @return the time unit.
-     */
-    TimeUnit availTimeUnit() default TimeUnit.MILLISECONDS;
-
-    /**
-     * The timeout for an invocation instance to become available.
-     *
-     * @return the timeout.
-     */
-    long availTimeout() default RoutineConfiguration.DEFAULT;
+    TimeoutAction eventually() default TimeoutAction.DEFAULT;
 
     /**
      * The name of the lock associated with the annotated method.
      *
      * @return the lock name.
      */
-    String lockName() default DEFAULT_NAME;
-
-    /**
-     * The class of the log to be used.
-     *
-     * @return the log class.
-     */
-    Class<? extends Log> log() default DefaultLog.class;
-
-    /**
-     * The log level.
-     *
-     * @return the log level.
-     */
-    LogLevel logLevel() default LogLevel.DEFAULT;
-
-    /**
-     * The max number of retained routine instances.
-     *
-     * @return the max retained instances.
-     */
-    int maxRetained() default RoutineConfiguration.DEFAULT;
-
-    /**
-     * The max number of concurrently running routine instances.
-     *
-     * @return the max concurrently running instances.
-     */
-    int maxRunning() default RoutineConfiguration.DEFAULT;
+    String lockName() default DEFAULT_LOCK;
 
     /**
      * The time unit of the timeout for an invocation instance to produce a result.
@@ -182,16 +102,26 @@ public @interface Async {
     long resultTimeout() default RoutineConfiguration.DEFAULT;
 
     /**
-     * The type of the runner to be used for synchronous invocations.
-     *
-     * @return the runner type.
+     * Enumeration indicating the action to take on output channel timeout.
      */
-    RunnerType syncRunnerType() default RunnerType.DEFAULT;
+    public enum TimeoutAction {
 
-    /**
-     * The name used to identify the method independently from its original signature.
-     *
-     * @return the name.
-     */
-    String value() default DEFAULT_NAME;
+        /**
+         * Deadlock.<br/>
+         * If no result is available after the specified timeout, the called method will throw a
+         * {@link com.bmd.jrt.channel.ReadDeadlockException}.
+         */
+        DEADLOCK,
+        /**
+         * Break execution.<br/>
+         * If no result is available after the specified timeout, the called method will its
+         * execution and exit immediately.
+         */
+        EXIT,
+        /**
+         * Default action.<br/>
+         * This value is used to indicated that the choice of the action is left to the framework.
+         */
+        DEFAULT
+    }
 }

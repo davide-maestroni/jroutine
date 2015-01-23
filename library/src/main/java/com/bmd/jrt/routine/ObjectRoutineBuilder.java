@@ -14,6 +14,8 @@
 package com.bmd.jrt.routine;
 
 import com.bmd.jrt.annotation.Async;
+import com.bmd.jrt.annotation.Async.TimeoutAction;
+import com.bmd.jrt.annotation.AsyncName;
 import com.bmd.jrt.annotation.AsyncType;
 import com.bmd.jrt.annotation.ParallelType;
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
@@ -69,6 +71,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
     private TimeDuration mResultTimeout = null;
 
+    private TimeoutAction mTimeoutAction = TimeoutAction.DEFAULT;
+
     /**
      * Constructor.
      *
@@ -98,7 +102,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     private static Object callRoutine(@Nonnull final Routine<Object, Object> routine,
             @Nonnull final Method method, @Nonnull final ParamType paramType,
             @Nonnull final ResultType resultType, @Nonnull final Object[] args,
-            @Nonnull final TimeDuration outputTimeout) {
+            @Nonnull final TimeDuration outputTimeout, @Nullable final TimeoutAction outputAction) {
 
         final Class<?> returnType = method.getReturnType();
         final OutputChannel<Object> outputChannel;
@@ -166,6 +170,15 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
         }
 
         outputChannel.afterMax(outputTimeout);
+
+        if (outputAction == TimeoutAction.EXIT) {
+
+            outputChannel.eventuallyExit();
+
+        } else if (outputAction == TimeoutAction.DEADLOCK) {
+
+            outputChannel.eventuallyDeadlock();
+        }
 
         if (!Void.class.equals(boxingClass(returnType))) {
 
@@ -390,7 +403,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
             }
 
             final String lockName = getLockName();
-            final String classLockName = (lockName != null) ? lockName : Async.DEFAULT_NAME;
+            final String classLockName = (lockName != null) ? lockName : Async.DEFAULT_LOCK;
             final RoutineConfiguration configuration = getBuilder().buildConfiguration();
             final ClassInfo classInfo = new ClassInfo(configuration, itf, classLockName);
             Object instance = classes.get(classInfo);
@@ -454,6 +467,26 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     }
 
     /**
+     * @return
+     */
+    @Nonnull
+    public ObjectRoutineBuilder eventuallyDeadlock() {
+
+        mTimeoutAction = TimeoutAction.DEADLOCK;
+        return this;
+    }
+
+    /**
+     * @return
+     */
+    @Nonnull
+    public ObjectRoutineBuilder eventuallyExit() {
+
+        mTimeoutAction = TimeoutAction.EXIT;
+        return this;
+    }
+
+    /**
      * Sets the timeout for an invocation instance to produce a result.
      * <p/>
      * By default the timeout is set to 0 to avoid unexpected deadlocks.
@@ -492,23 +525,23 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
             @Nonnull final Class<?>[] targetParameterTypes) throws NoSuchMethodException {
 
         final Class<?> targetClass = getTargetClass();
-        final Async annotation = method.getAnnotation(Async.class);
+        final AsyncName annotation = method.getAnnotation(AsyncName.class);
 
         String name = null;
+        Method targetMethod = null;
 
         if (annotation != null) {
 
             name = annotation.value();
+            targetMethod = getAnnotatedMethod(name);
         }
-
-        if ((name == null) || (name.length() == 0)) {
-
-            name = method.getName();
-        }
-
-        Method targetMethod = getAnnotatedMethod(name);
 
         if (targetMethod == null) {
+
+            if (name == null) {
+
+                name = method.getName();
+            }
 
             try {
 
@@ -611,11 +644,11 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
         private final RoutineConfiguration mConfiguration;
 
-        private final Class<?> mItf;
-
         private final String mLockName;
 
         private final TimeDuration mOutputTimeout;
+
+        private TimeoutAction mOutputAction;
 
         /**
          * Constructor.
@@ -624,29 +657,38 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
          */
         private InterfaceInvocationHandler(@Nonnull final Class<?> itf) {
 
-            final String lockName = getLockName();
+            final Async classAnnotation = itf.getAnnotation(Async.class);
+            String lockName = getLockName();
+
+            if (((lockName == null) || Async.DEFAULT_LOCK.equals(lockName)) && (classAnnotation
+                    != null)) {
+
+                lockName = classAnnotation.lockName();
+            }
 
             TimeDuration outputTimeout = mResultTimeout;
 
-            if (outputTimeout == null) {
+            if ((outputTimeout == null) && (classAnnotation != null)) {
 
-                final Async classAnnotation = itf.getAnnotation(Async.class);
+                final long resultTimeout = classAnnotation.resultTimeout();
 
-                if (classAnnotation != null) {
+                if (resultTimeout != RoutineConfiguration.DEFAULT) {
 
-                    final long resultTimeout = classAnnotation.resultTimeout();
-
-                    if (resultTimeout != RoutineConfiguration.DEFAULT) {
-
-                        outputTimeout = fromUnit(resultTimeout, classAnnotation.resultTimeUnit());
-                    }
+                    outputTimeout = fromUnit(resultTimeout, classAnnotation.resultTimeUnit());
                 }
             }
 
-            mItf = itf;
-            mLockName = (lockName != null) ? lockName : Async.DEFAULT_NAME;
+            TimeoutAction outputAction = mTimeoutAction;
+
+            if ((outputAction == TimeoutAction.DEFAULT) && (classAnnotation != null)) {
+
+                outputAction = classAnnotation.eventually();
+            }
+
+            mLockName = lockName;
             mConfiguration = getBuilder().buildConfiguration();
             mOutputTimeout = outputTimeout;
+            mOutputAction = outputAction;
         }
 
         @Override
@@ -784,26 +826,34 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
             }
 
             final Routine<Object, Object> routine = buildRoutine(method, targetMethod, paramType);
+            final Async methodAnnotation = method.getAnnotation(Async.class);
 
             TimeDuration outputTimeout = mOutputTimeout;
 
-            if (outputTimeout == null) {
+            if ((outputTimeout == null) && (methodAnnotation != null)) {
 
-                final Async methodAnnotation = method.getAnnotation(Async.class);
+                final long resultTimeout = methodAnnotation.resultTimeout();
 
-                if (methodAnnotation != null) {
+                if (resultTimeout != RoutineConfiguration.DEFAULT) {
 
-                    final long resultTimeout = methodAnnotation.resultTimeout();
-
-                    if (resultTimeout != RoutineConfiguration.DEFAULT) {
-
-                        outputTimeout = fromUnit(resultTimeout, methodAnnotation.resultTimeUnit());
-                    }
+                    outputTimeout = fromUnit(resultTimeout, methodAnnotation.resultTimeUnit());
                 }
             }
 
-            return callRoutine(routine, method, paramType, resultType, args,
-                               (outputTimeout != null) ? outputTimeout : ZERO);
+            if (outputTimeout == null) {
+
+                outputTimeout = ZERO;
+            }
+
+            TimeoutAction outputAction = mOutputAction;
+
+            if ((outputAction == TimeoutAction.DEFAULT) && (methodAnnotation != null)) {
+
+                outputAction = methodAnnotation.eventually();
+            }
+
+            return callRoutine(routine, method, paramType, resultType, args, outputTimeout,
+                               outputAction);
         }
 
         private Routine<Object, Object> buildRoutine(final Method method, final Method targetMethod,
@@ -811,34 +861,19 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
             String lockName = mLockName;
             final RoutineConfigurationBuilder builder = new RoutineConfigurationBuilder();
-
-            final Async classAnnotation = mItf.getAnnotation(Async.class);
-
-            if (classAnnotation != null) {
-
-                if (Async.DEFAULT_NAME.equals(mLockName)) {
-
-                    lockName = classAnnotation.lockName();
-                }
-
-                applyConfiguration(builder, classAnnotation);
-            }
-
             final Async methodAnnotation = method.getAnnotation(Async.class);
 
             if (methodAnnotation != null) {
 
-                if (Async.DEFAULT_NAME.equals(mLockName)) {
+                if (Async.DEFAULT_LOCK.equals(mLockName)) {
 
                     final String annotationLockName = methodAnnotation.lockName();
 
-                    if (!Async.DEFAULT_NAME.equals(annotationLockName)) {
+                    if (!Async.DEFAULT_LOCK.equals(annotationLockName)) {
 
                         lockName = annotationLockName;
                     }
                 }
-
-                applyConfiguration(builder, methodAnnotation);
             }
 
             builder.apply(mConfiguration);
@@ -869,6 +904,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
         private final TimeDuration mOutputTimeout;
 
+        private TimeoutAction mOutputAction;
+
         /**
          * Constructor.
          *
@@ -876,27 +913,39 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
          */
         private ObjectInvocationHandler(@Nonnull final Class<?> itf) {
 
+            final Async classAnnotation = itf.getAnnotation(Async.class);
+            String lockName = getLockName();
+
+            if (((lockName == null) || Async.DEFAULT_LOCK.equals(lockName)) && (classAnnotation
+                    != null)) {
+
+                lockName = classAnnotation.lockName();
+            }
+
             TimeDuration outputTimeout = mResultTimeout;
 
-            if (outputTimeout == null) {
+            if ((outputTimeout == null) && (classAnnotation != null)) {
 
-                final Async classAnnotation = itf.getAnnotation(Async.class);
+                final long resultTimeout = classAnnotation.resultTimeout();
 
-                if (classAnnotation != null) {
+                if (resultTimeout != RoutineConfiguration.DEFAULT) {
 
-                    final long resultTimeout = classAnnotation.resultTimeout();
-
-                    if (resultTimeout != RoutineConfiguration.DEFAULT) {
-
-                        outputTimeout = fromUnit(resultTimeout, classAnnotation.resultTimeUnit());
-                    }
+                    outputTimeout = fromUnit(resultTimeout, classAnnotation.resultTimeUnit());
                 }
             }
 
+            TimeoutAction outputAction = mTimeoutAction;
+
+            if ((outputAction == TimeoutAction.DEFAULT) && (classAnnotation != null)) {
+
+                outputAction = classAnnotation.eventually();
+            }
+
             mItf = itf;
-            mLockName = getLockName();
+            mLockName = lockName;
             mConfiguration = getBuilder().buildConfiguration();
             mOutputTimeout = outputTimeout;
+            mOutputAction = outputAction;
         }
 
         @Override
@@ -910,26 +959,42 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
             if (!Void.class.equals(boxingClass(returnType))) {
 
+                final Async methodAnnotation = method.getAnnotation(Async.class);
+
                 TimeDuration outputTimeout = mOutputTimeout;
 
-                if (outputTimeout == null) {
+                if ((outputTimeout == null) && (methodAnnotation != null)) {
 
-                    final Async methodAnnotation = method.getAnnotation(Async.class);
+                    final long resultTimeout = methodAnnotation.resultTimeout();
 
-                    if (methodAnnotation != null) {
+                    if (resultTimeout != RoutineConfiguration.DEFAULT) {
 
-                        final long resultTimeout = methodAnnotation.resultTimeout();
-
-                        if (resultTimeout != RoutineConfiguration.DEFAULT) {
-
-                            outputTimeout =
-                                    fromUnit(resultTimeout, methodAnnotation.resultTimeUnit());
-                        }
+                        outputTimeout = fromUnit(resultTimeout, methodAnnotation.resultTimeUnit());
                     }
                 }
 
-                return outputChannel.afterMax((outputTimeout != null) ? outputTimeout : ZERO)
-                                    .readFirst();
+                if (outputTimeout == null) {
+
+                    outputTimeout = ZERO;
+                }
+
+                TimeoutAction outputAction = mOutputAction;
+
+                if ((outputAction == TimeoutAction.DEFAULT) && (methodAnnotation != null)) {
+
+                    outputAction = methodAnnotation.eventually();
+                }
+
+                if (outputAction == TimeoutAction.EXIT) {
+
+                    outputChannel.eventuallyExit();
+
+                } else if (outputAction == TimeoutAction.DEADLOCK) {
+
+                    outputChannel.eventuallyDeadlock();
+                }
+
+                return outputChannel.afterMax(outputTimeout).readNext();
             }
 
             return null;

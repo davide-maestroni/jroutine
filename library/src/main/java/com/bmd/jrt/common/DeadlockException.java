@@ -13,6 +13,8 @@
  */
 package com.bmd.jrt.common;
 
+import javax.annotation.Nullable;
+
 /**
  * Exception indicating a possible deadlock.
  * <p/>
@@ -20,12 +22,24 @@ package com.bmd.jrt.common;
  */
 public class DeadlockException extends RoutineException {
 
+    private final String mMessage;
+
     /**
      * Constructor.
+     *
+     * @param message the error message.
      */
-    public DeadlockException() {
+    public DeadlockException(@Nullable final String message) {
 
         super(null);
+
+        mMessage = message;
+    }
+
+    @Override
+    public String getMessage() {
+
+        return mMessage;
     }
 
     @Override

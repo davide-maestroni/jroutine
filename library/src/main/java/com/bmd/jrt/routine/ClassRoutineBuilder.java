@@ -14,8 +14,7 @@
 package com.bmd.jrt.routine;
 
 import com.bmd.jrt.annotation.Async;
-import com.bmd.jrt.annotation.DefaultLog;
-import com.bmd.jrt.annotation.DefaultRunner;
+import com.bmd.jrt.annotation.AsyncName;
 import com.bmd.jrt.builder.RoutineBuilder;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.builder.RoutineConfigurationBuilder;
@@ -45,7 +44,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import static com.bmd.jrt.common.Reflection.boxingClass;
-import static com.bmd.jrt.time.TimeDuration.fromUnit;
 
 /**
  * Class implementing a builder of routines wrapping a class method.
@@ -134,69 +132,6 @@ public class ClassRoutineBuilder implements RoutineBuilder {
         mTarget = null;
         mTargetReference = targetReference;
         fillMethodMap(false);
-    }
-
-    /**
-     * Applies the configuration inferred from the specified annotation attributes to the passed
-     * builder.
-     *
-     * @param builder    the builder.
-     * @param annotation the annotation.
-     * @return the passed builder.
-     * @throws NullPointerException if any of the passed parameter is null.
-     */
-    protected static RoutineConfigurationBuilder applyConfiguration(
-            @Nonnull final RoutineConfigurationBuilder builder, @Nonnull final Async annotation) {
-
-        final Class<? extends Runner> runnerClass = annotation.asyncRunner();
-
-        if (runnerClass != DefaultRunner.class) {
-
-            try {
-
-                builder.runBy(runnerClass.newInstance());
-
-            } catch (final InstantiationException e) {
-
-                throw new RoutineException(e.getCause());
-
-            } catch (final IllegalAccessException e) {
-
-                throw new RoutineException(e);
-            }
-        }
-
-        builder.syncRunner(annotation.syncRunnerType());
-        builder.maxRunning(annotation.maxRunning());
-        builder.maxRetained(annotation.maxRetained());
-
-        final long availTimeout = annotation.availTimeout();
-
-        if (availTimeout != RoutineConfiguration.DEFAULT) {
-
-            builder.availableTimeout(fromUnit(availTimeout, annotation.availTimeUnit()));
-        }
-
-        final Class<? extends Log> logClass = annotation.log();
-
-        if (logClass != DefaultLog.class) {
-
-            try {
-
-                builder.loggedWith(logClass.newInstance());
-
-            } catch (final InstantiationException e) {
-
-                throw new RoutineException(e.getCause());
-
-            } catch (final IllegalAccessException e) {
-
-                throw new RoutineException(e);
-            }
-        }
-
-        builder.logLevel(annotation.logLevel());
-        return builder;
     }
 
     /**
@@ -383,7 +318,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      * @return the method or null.
      */
     @Nullable
-    protected Method getAnnotatedMethod(@Nonnull final String name) {
+    protected Method getAnnotatedMethod(final String name) {
 
         return mMethodMap.get(name);
     }
@@ -453,7 +388,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
                 routineCache.put(target, routineMap);
             }
 
-            final String methodLockName = (lockName != null) ? lockName : Async.DEFAULT_NAME;
+            final String methodLockName = (lockName != null) ? lockName : Async.DEFAULT_LOCK;
             final RoutineInfo routineInfo = new RoutineInfo(configuration, method, methodLockName);
             routine = routineMap.get(routineInfo);
 
@@ -551,33 +486,29 @@ public class ClassRoutineBuilder implements RoutineBuilder {
         String methodLockName = lockName;
         final RoutineConfigurationBuilder builder = new RoutineConfigurationBuilder();
 
-        final Async classAnnotation = targetClass.getAnnotation(Async.class);
+        if (lockName == null) {
 
-        if (classAnnotation != null) {
+            final Async classAnnotation = targetClass.getAnnotation(Async.class);
 
-            if (lockName == null) {
+            if (classAnnotation != null) {
 
                 methodLockName = classAnnotation.lockName();
             }
-
-            applyConfiguration(builder, classAnnotation);
         }
 
-        final Async methodAnnotation = targetMethod.getAnnotation(Async.class);
+        if (lockName == null) {
 
-        if (methodAnnotation != null) {
+            final Async methodAnnotation = targetMethod.getAnnotation(Async.class);
 
-            if (lockName == null) {
+            if (methodAnnotation != null) {
 
                 final String annotationLockName = methodAnnotation.lockName();
 
-                if (!Async.DEFAULT_NAME.equals(annotationLockName)) {
+                if (!Async.DEFAULT_LOCK.equals(annotationLockName)) {
 
                     methodLockName = annotationLockName;
                 }
             }
-
-            applyConfiguration(builder, methodAnnotation);
         }
 
         return getRoutine(builder.apply(configuration)
@@ -607,16 +538,11 @@ public class ClassRoutineBuilder implements RoutineBuilder {
                 continue;
             }
 
-            final Async annotation = method.getAnnotation(Async.class);
+            final AsyncName annotation = method.getAnnotation(AsyncName.class);
 
             if (annotation != null) {
 
-                String name = annotation.value();
-
-                if ((name == null) || (name.length() == 0)) {
-
-                    name = method.getName();
-                }
+                final String name = annotation.value();
 
                 if (map.containsKey(name)) {
 

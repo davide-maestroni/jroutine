@@ -14,6 +14,7 @@
 package com.bmd.jrt.routine;
 
 import com.bmd.jrt.annotation.Async;
+import com.bmd.jrt.annotation.AsyncName;
 import com.bmd.jrt.annotation.AsyncType;
 import com.bmd.jrt.annotation.ParallelType;
 import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
@@ -62,7 +63,7 @@ public class JRoutineTest extends TestCase {
                                                   .loggedWith(new NullLog())
                                                   .buildChannel();
         channel.input().pass(-77L);
-        assertThat(channel.output().afterMax(timeout).readFirst()).isEqualTo(-77L);
+        assertThat(channel.output().afterMax(timeout).readNext()).isEqualTo(-77L);
 
         final IOChannel<Object> channel1 = JRoutine.io().buildChannel();
         final IOChannelInput<Object> input1 = channel1.input();
@@ -905,19 +906,22 @@ public class JRoutineTest extends TestCase {
         @Async(resultTimeout = 1, resultTimeUnit = TimeUnit.SECONDS)
         public int compute(int i);
 
-        @Async(value = "compute", lockName = Async.NULL_LOCK)
+        @Async(lockName = Async.NULL_LOCK)
+        @AsyncName("compute")
         @AsyncType(int.class)
         public OutputChannel<Integer> computeParallel1(@ParallelType(int.class) int... i);
 
-        @Async(value = "compute")
+        @AsyncName("compute")
         @AsyncType(int.class)
         public OutputChannel<Integer> computeParallel2(@ParallelType(int.class) Integer... i);
 
-        @Async(value = "compute", lockName = Async.NULL_LOCK)
+        @Async(lockName = Async.NULL_LOCK)
+        @AsyncName("compute")
         @AsyncType(int.class)
         public OutputChannel<Integer> computeParallel3(@ParallelType(int.class) List<Integer> i);
 
-        @Async(value = "compute", lockName = Async.NULL_LOCK)
+        @Async(lockName = Async.NULL_LOCK)
+        @AsyncName("compute")
         @AsyncType(int.class)
         public OutputChannel<Integer> computeParallel4(
                 @ParallelType(int.class) OutputChannel<Integer> i);
@@ -927,11 +931,11 @@ public class JRoutineTest extends TestCase {
 
         public void throwException(@AsyncType(int.class) RuntimeException ex);
 
-        @Async(Test.THROW)
+        @AsyncName(Test.THROW)
         @AsyncType(int.class)
         public void throwException1(RuntimeException ex);
 
-        @Async(Test.THROW)
+        @AsyncName(Test.THROW)
         public int throwException2(RuntimeException ex);
     }
 
@@ -939,13 +943,13 @@ public class JRoutineTest extends TestCase {
 
         public static final String GET = "get";
 
-        @Async(value = GET)
+        @AsyncName(GET)
         public int getOne() {
 
             return 1;
         }
 
-        @Async(value = GET)
+        @AsyncName(GET)
         public int getTwo() {
 
             return 2;
@@ -956,13 +960,13 @@ public class JRoutineTest extends TestCase {
 
         public static final String GET = "get";
 
-        @Async(GET)
+        @AsyncName(GET)
         public static int getOne() {
 
             return 1;
         }
 
-        @Async(GET)
+        @AsyncName(GET)
         public static int getTwo() {
 
             return 2;
@@ -992,16 +996,14 @@ public class JRoutineTest extends TestCase {
 
         public static final String THROW = "throw";
 
-        @Async(value = GET)
+        @AsyncName(GET)
         public long getLong() {
 
             return -77;
 
         }
 
-        @Async(value = THROW, syncRunnerType = RunnerType.QUEUED, asyncRunner = MyRunner.class,
-               maxRetained = 1, maxRunning = 1, availTimeout = 1, availTimeUnit = TimeUnit.SECONDS,
-               log = NullLog.class, logLevel = LogLevel.DEBUG)
+        @AsyncName(THROW)
         public void throwException(final RuntimeException ex) {
 
             throw ex;
@@ -1032,13 +1034,13 @@ public class JRoutineTest extends TestCase {
 
         public static final String GET_STRING = "get_string";
 
-        @Async(GET_STRING)
+        @AsyncName(GET_STRING)
         public static String getStringStatic(final String string) {
 
             return string;
         }
 
-        @Async(GET_STRING)
+        @AsyncName(GET_STRING)
         public String getString(final String string) {
 
             return string;
@@ -1060,15 +1062,13 @@ public class JRoutineTest extends TestCase {
 
         public static final String THROW = "throw";
 
-        @Async(GET)
+        @AsyncName(GET)
         public static long getLong() {
 
             return -77;
         }
 
-        @Async(value = THROW, log = NullLog.class, logLevel = LogLevel.DEBUG,
-               syncRunnerType = RunnerType.QUEUED,
-               asyncRunner = MyRunner.class)
+        @AsyncName(THROW)
         public static void throwException(final RuntimeException ex) {
 
             throw ex;

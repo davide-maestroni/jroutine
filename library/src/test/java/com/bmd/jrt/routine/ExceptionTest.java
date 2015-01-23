@@ -30,9 +30,9 @@ public class ExceptionTest extends TestCase {
 
     public void testExceptions() {
 
-        assertThat(new InputDeadlockException()).hasNoCause();
-        assertThat(new OutputDeadlockException()).hasNoCause();
-        assertThat(new ReadDeadlockException()).hasNoCause();
-        assertThat(new RoutineDeadlockException()).hasNoCause();
+        assertThat(new InputDeadlockException("")).hasNoCause();
+        assertThat(new OutputDeadlockException("")).hasNoCause();
+        assertThat(new ReadDeadlockException("")).hasNoCause();
+        assertThat(new RoutineDeadlockException("")).hasNoCause();
     }
 }

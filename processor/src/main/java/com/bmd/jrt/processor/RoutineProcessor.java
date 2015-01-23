@@ -14,16 +14,14 @@
 package com.bmd.jrt.processor;
 
 import com.bmd.jrt.annotation.Async;
+import com.bmd.jrt.annotation.Async.TimeoutAction;
+import com.bmd.jrt.annotation.AsyncName;
 import com.bmd.jrt.annotation.AsyncType;
 import com.bmd.jrt.annotation.AsyncWrap;
-import com.bmd.jrt.annotation.DefaultLog;
-import com.bmd.jrt.annotation.DefaultRunner;
 import com.bmd.jrt.annotation.ParallelType;
-import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.channel.OutputChannel;
-import com.bmd.jrt.log.Log.LogLevel;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -252,6 +250,55 @@ public class RoutineProcessor extends AbstractProcessor {
         return builder.toString();
     }
 
+    private String buildOutputOptions(@Nonnull final TypeElement element,
+            final ExecutableElement methodElement) {
+
+        final Async classAnnotation = element.getAnnotation(Async.class);
+        final Async methodAnnotation = methodElement.getAnnotation(Async.class);
+
+        long resultTimeout = RoutineConfiguration.DEFAULT;
+        TimeUnit resultTimeUnit = null;
+        TimeoutAction timeoutAction = TimeoutAction.DEFAULT;
+
+        if (methodAnnotation != null) {
+
+            resultTimeout = methodAnnotation.resultTimeout();
+            resultTimeUnit = methodAnnotation.resultTimeUnit();
+            timeoutAction = methodAnnotation.eventually();
+        }
+
+        if ((classAnnotation != null) && (resultTimeout == RoutineConfiguration.DEFAULT)) {
+
+            resultTimeout = classAnnotation.resultTimeout();
+            resultTimeUnit = classAnnotation.resultTimeUnit();
+            timeoutAction = classAnnotation.eventually();
+        }
+
+        final StringBuilder builder = new StringBuilder();
+
+        if (resultTimeout != RoutineConfiguration.DEFAULT) {
+
+            builder.append(".afterMax(")
+                   .append(resultTimeout)
+                   .append(", ")
+                   .append(TimeUnit.class.getCanonicalName())
+                   .append(".")
+                   .append(resultTimeUnit)
+                   .append(")");
+        }
+
+        if (timeoutAction == TimeoutAction.EXIT) {
+
+            builder.append(".eventuallyExit()");
+
+        } else if (timeoutAction == TimeoutAction.DEADLOCK) {
+
+            builder.append(".eventuallyDeadlock()");
+        }
+
+        return builder.toString();
+    }
+
     @Nonnull
     private String buildParamTypes(@Nonnull final ExecutableElement methodElement) {
 
@@ -314,49 +361,6 @@ public class RoutineProcessor extends AbstractProcessor {
         return builder.toString();
     }
 
-    private String buildResultTimeout(@Nonnull final TypeElement element,
-            final ExecutableElement methodElement) {
-
-        final Async classAnnotation = element.getAnnotation(Async.class);
-        final Async methodAnnotation = methodElement.getAnnotation(Async.class);
-
-        long resultTimeout = RoutineConfiguration.DEFAULT;
-        TimeUnit resultTimeUnit = null;
-
-        if (methodAnnotation != null) {
-
-            resultTimeout = methodAnnotation.resultTimeout();
-            resultTimeUnit = methodAnnotation.resultTimeUnit();
-        }
-
-        if (classAnnotation != null) {
-
-            if (resultTimeout == RoutineConfiguration.DEFAULT) {
-
-                resultTimeout = classAnnotation.resultTimeout();
-                resultTimeUnit = classAnnotation.resultTimeUnit();
-            }
-        }
-
-        final StringBuilder builder = new StringBuilder();
-
-        if (resultTimeout != RoutineConfiguration.DEFAULT) {
-
-            builder.append(resultTimeout);
-
-        } else {
-
-            builder.append(0);
-        }
-
-        builder.append(", ")
-               .append(TimeUnit.class.getCanonicalName())
-               .append(".")
-               .append(resultTimeUnit);
-
-        return builder.toString();
-    }
-
     @Nonnull
     private String buildRoutineFieldsInit(final int size) {
 
@@ -377,12 +381,9 @@ public class RoutineProcessor extends AbstractProcessor {
     }
 
     @Nonnull
-    private String buildRoutineOptions(@Nonnull final TypeElement element,
-            @Nonnull final ExecutableElement methodElement) {
+    private String buildRoutineOptions(@Nonnull final ExecutableElement methodElement) {
 
         final StringBuilder builder = new StringBuilder();
-        writeInstanceOptions(builder, element, methodElement);
-        writeLogOptions(builder, element, methodElement);
 
         boolean isOverrideParameters = false;
 
@@ -480,29 +481,24 @@ public class RoutineProcessor extends AbstractProcessor {
 
         String methodName = methodElement.getSimpleName().toString();
         ExecutableElement targetMethod = null;
-        final Async asyncAnnotation = methodElement.getAnnotation(Async.class);
+        final AsyncName asyncAnnotation = methodElement.getAnnotation(AsyncName.class);
 
         if (asyncAnnotation != null) {
 
-            final String name = asyncAnnotation.value();
+            methodName = asyncAnnotation.value();
 
-            if ((name != null) && (name.length() > 0)) {
+            for (final ExecutableElement targetMethodElement : ElementFilter.methodsIn(
+                    targetElement.getEnclosedElements())) {
 
-                methodName = name;
+                final AsyncName targetAsyncAnnotation =
+                        targetMethodElement.getAnnotation(AsyncName.class);
 
-                for (final ExecutableElement targetMethodElement : ElementFilter.methodsIn(
-                        targetElement.getEnclosedElements())) {
+                if ((targetAsyncAnnotation != null) && methodName.equals(
+                        targetAsyncAnnotation.value())) {
 
-                    final Async targetAsyncAnnotation =
-                            targetMethodElement.getAnnotation(Async.class);
+                    targetMethod = targetMethodElement;
 
-                    if ((targetAsyncAnnotation != null) && name.equals(
-                            targetAsyncAnnotation.value())) {
-
-                        targetMethod = targetMethodElement;
-
-                        break;
-                    }
+                    break;
                 }
             }
         }
@@ -747,167 +743,6 @@ public class RoutineProcessor extends AbstractProcessor {
         }
     }
 
-    private void writeInstanceOptions(@Nonnull final StringBuilder builder,
-            @Nonnull final TypeElement element, @Nonnull final ExecutableElement methodElement) {
-
-        final Async classAnnotation = element.getAnnotation(Async.class);
-        final Async methodAnnotation = methodElement.getAnnotation(Async.class);
-        final TypeElement annotationElement = getTypeFromName(Async.class.getCanonicalName());
-        final TypeMirror annotationType = annotationElement.asType();
-
-        RunnerType runnerType = RunnerType.DEFAULT;
-        int maxRunning = RoutineConfiguration.DEFAULT;
-        int maxRetained = RoutineConfiguration.DEFAULT;
-        long availTimeout = RoutineConfiguration.DEFAULT;
-        TimeUnit availTimeUnit = null;
-        TypeElement runnerElement = null;
-
-        if (methodAnnotation != null) {
-
-            final Object runner = getElementValue(methodElement, annotationType, "asyncRunner");
-
-            if (runner != null) {
-
-                runnerElement = getTypeFromName(runner.toString());
-            }
-
-            runnerType = methodAnnotation.syncRunnerType();
-            maxRunning = methodAnnotation.maxRunning();
-            maxRetained = methodAnnotation.maxRetained();
-            availTimeout = methodAnnotation.availTimeout();
-            availTimeUnit = methodAnnotation.availTimeUnit();
-        }
-
-        if (classAnnotation != null) {
-
-            if ((runnerElement == null) || runnerElement.equals(
-                    getTypeFromName(DefaultRunner.class.getCanonicalName()))) {
-
-                final Object runner = getElementValue(element, annotationType, "asyncRunner");
-
-                if (runner != null) {
-
-                    runnerElement = getTypeFromName(runner.toString());
-                }
-            }
-
-            if (runnerType == RunnerType.DEFAULT) {
-
-                runnerType = classAnnotation.syncRunnerType();
-            }
-
-            if (maxRunning == RoutineConfiguration.DEFAULT) {
-
-                maxRunning = classAnnotation.maxRunning();
-            }
-
-            if (maxRetained == RoutineConfiguration.DEFAULT) {
-
-                maxRetained = classAnnotation.maxRetained();
-            }
-
-            if (availTimeout == RoutineConfiguration.DEFAULT) {
-
-                availTimeout = classAnnotation.availTimeout();
-                availTimeUnit = classAnnotation.availTimeUnit();
-            }
-        }
-
-        if ((runnerElement != null) && !runnerElement.equals(
-                getTypeFromName(DefaultRunner.class.getCanonicalName()))) {
-
-            builder.append(".runBy(new ").append(runnerElement).append("())");
-        }
-
-        if (runnerType != RunnerType.DEFAULT) {
-
-            builder.append(".syncRunner(")
-                   .append(RunnerType.class.getCanonicalName())
-                   .append(".")
-                   .append(runnerType)
-                   .append(")");
-        }
-
-        if (maxRunning != RoutineConfiguration.DEFAULT) {
-
-            builder.append(".maxRunning(").append(maxRunning).append(")");
-        }
-
-        if (maxRetained != RoutineConfiguration.DEFAULT) {
-
-            builder.append(".maxRetained(").append(maxRetained).append(")");
-        }
-
-        if (availTimeout != RoutineConfiguration.DEFAULT) {
-
-            builder.append(".availTimeout(")
-                   .append(availTimeout)
-                   .append(", ")
-                   .append(TimeUnit.class.getCanonicalName())
-                   .append(".")
-                   .append(availTimeUnit)
-                   .append(")");
-        }
-    }
-
-    private void writeLogOptions(@Nonnull final StringBuilder builder,
-            @Nonnull final TypeElement element, @Nonnull final ExecutableElement methodElement) {
-
-        final Async classAnnotation = element.getAnnotation(Async.class);
-        final Async methodAnnotation = methodElement.getAnnotation(Async.class);
-        final TypeElement annotationElement = getTypeFromName(Async.class.getCanonicalName());
-        final TypeMirror annotationType = annotationElement.asType();
-
-        LogLevel logLevel = LogLevel.DEFAULT;
-        TypeElement logElement = null;
-
-        if (methodAnnotation != null) {
-
-            final Object log = getElementValue(methodElement, annotationType, "log");
-
-            if (log != null) {
-
-                logElement = getTypeFromName(log.toString());
-            }
-
-            logLevel = methodAnnotation.logLevel();
-        }
-
-        if (classAnnotation != null) {
-
-            if ((logElement == null) || logElement.equals(
-                    getTypeFromName(DefaultLog.class.getCanonicalName()))) {
-
-                final Object log = getElementValue(element, annotationType, "log");
-
-                if (log != null) {
-
-                    logElement = getTypeFromName(log.toString());
-                }
-            }
-
-            if (logLevel == LogLevel.DEFAULT) {
-
-                logLevel = classAnnotation.logLevel();
-            }
-        }
-
-        if ((logElement != null) && !logElement.equals(
-                getTypeFromName(DefaultLog.class.getCanonicalName()))) {
-
-            builder.append(".loggedWith(new ").append(logElement).append("())");
-        }
-
-        if (logLevel != LogLevel.DEFAULT) {
-
-            builder.append(".logLevel(")
-                   .append(LogLevel.class.getCanonicalName())
-                   .append(".")
-                   .append(logLevel)
-                   .append(")");
-        }
-    }
-
     private void writeMethod(@Nonnull final Writer writer, @Nonnull final TypeElement element,
             @Nonnull final TypeElement targetElement,
             @Nonnull final ExecutableElement methodElement, final int count) throws IOException {
@@ -1008,7 +843,7 @@ public class RoutineProcessor extends AbstractProcessor {
         methodHeader = mMethodHeader.replace("${resultClassName}", resultClassName);
         methodHeader = methodHeader.replace("${methodCount}", Integer.toString(count));
         methodHeader = methodHeader.replace("${routineBuilderOptions}",
-                                            buildRoutineOptions(element, methodElement));
+                                            buildRoutineOptions(methodElement));
 
         writer.append(methodHeader);
 
@@ -1021,7 +856,7 @@ public class RoutineProcessor extends AbstractProcessor {
         method = method.replace("${paramTypes}", buildParamTypes(methodElement));
         method = method.replace("${paramValues}", buildParamValues(targetMethod));
         method = method.replace("${inputParams}", buildInputParams(methodElement));
-        method = method.replace("${resultTimeout}", buildResultTimeout(element, methodElement));
+        method = method.replace("${outputOptions}", buildOutputOptions(element, methodElement));
 
         writer.append(method);
 
@@ -1036,14 +871,14 @@ public class RoutineProcessor extends AbstractProcessor {
 
         final Async classAnnotation = element.getAnnotation(Async.class);
         final Async methodAnnotation = methodElement.getAnnotation(Async.class);
-        String lockName = Async.DEFAULT_NAME;
+        String lockName = Async.DEFAULT_LOCK;
 
         if (methodAnnotation != null) {
 
             lockName = methodAnnotation.lockName();
         }
 
-        if ((classAnnotation != null) && (lockName.equals(Async.DEFAULT_NAME))) {
+        if ((classAnnotation != null) && (lockName.equals(Async.DEFAULT_LOCK))) {
 
             lockName = classAnnotation.lockName();
         }

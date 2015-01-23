@@ -224,9 +224,25 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
 
         @Nonnull
         @Override
-        public IOChannelOutput<OUTPUT> eventually(@Nonnull final TimeoutAction action) {
+        public IOChannelOutput<OUTPUT> eventually() {
 
-            mChannel.eventually(action);
+            mChannel.eventually();
+            return this;
+        }
+
+        @Nonnull
+        @Override
+        public IOChannelOutput<OUTPUT> eventuallyDeadlock() {
+
+            mChannel.eventuallyDeadlock();
+            return this;
+        }
+
+        @Nonnull
+        @Override
+        public IOChannelOutput<OUTPUT> eventuallyExit() {
+
+            mChannel.eventuallyExit();
             return this;
         }
 
@@ -267,9 +283,9 @@ class DefaultIOChannel<TYPE> implements IOChannel<TYPE> {
         }
 
         @Override
-        public OUTPUT readFirst() {
+        public OUTPUT readNext() {
 
-            return mChannel.readFirst();
+            return mChannel.readNext();
         }
 
         @Nonnull

@@ -34,6 +34,7 @@ import javax.annotation.Nullable;
  *
  * @param <TYPE> the data type.
  */
+//TODO: tunnel??
 public interface IOChannel<TYPE> {
 
     /**
@@ -117,7 +118,15 @@ public interface IOChannel<TYPE> {
 
         @Nonnull
         @Override
-        public IOChannelOutput<OUTPUT> eventually(@Nonnull TimeoutAction action);
+        public IOChannelOutput<OUTPUT> eventually();
+
+        @Nonnull
+        @Override
+        public IOChannelOutput<OUTPUT> eventuallyDeadlock();
+
+        @Nonnull
+        @Override
+        public IOChannelOutput<OUTPUT> eventuallyExit();
 
         @Nonnull
         @Override

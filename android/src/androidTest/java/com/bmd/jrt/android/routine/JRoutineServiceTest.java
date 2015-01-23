@@ -72,7 +72,7 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
 
         try {
 
-            channel.afterMax(timeout).readFirst();
+            channel.afterMax(timeout).readNext();
 
             fail();
 
@@ -88,7 +88,7 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
 
         try {
 
-            routine2.callAsync(data).afterMax(timeout).readFirst();
+            routine2.callAsync(data).afterMax(timeout).readNext();
 
             fail();
 
@@ -182,7 +182,7 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
                 JRoutine.onService(getActivity(), ClassToken.tokenOf(MyParcelableInvocation.class))
                         .dispatchTo(Looper.getMainLooper())
                         .buildRoutine();
-        assertThat(routine.callAsync(p).afterMax(timeout).readFirst()).isEqualTo(p);
+        assertThat(routine.callAsync(p).afterMax(timeout).readNext()).isEqualTo(p);
     }
 
     public void testService() {

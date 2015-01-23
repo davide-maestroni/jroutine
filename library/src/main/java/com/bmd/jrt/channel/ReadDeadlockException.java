@@ -15,6 +15,8 @@ package com.bmd.jrt.channel;
 
 import com.bmd.jrt.common.DeadlockException;
 
+import javax.annotation.Nullable;
+
 /**
  * Exception indicating that no result became available before the timeout elapsed.
  * <p/>
@@ -22,4 +24,13 @@ import com.bmd.jrt.common.DeadlockException;
  */
 public class ReadDeadlockException extends DeadlockException {
 
+    /**
+     * Constructor.
+     *
+     * @param message the error message.
+     */
+    public ReadDeadlockException(@Nullable final String message) {
+
+        super(message);
+    }
 }

@@ -15,6 +15,8 @@ package com.bmd.jrt.builder;
 
 import com.bmd.jrt.common.DeadlockException;
 
+import javax.annotation.Nullable;
+
 /**
  * Exception indicating that no room in the output channel buffer became available before the
  * timeout elapsed.
@@ -23,4 +25,13 @@ import com.bmd.jrt.common.DeadlockException;
  */
 public class OutputDeadlockException extends DeadlockException {
 
+    /**
+     * Constructor.
+     *
+     * @param message the error message.
+     */
+    public OutputDeadlockException(@Nullable final String message) {
+
+        super(message);
+    }
 }

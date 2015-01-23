@@ -50,7 +50,7 @@ public class IOChannelTest extends TestCase {
 
         try {
 
-            outputChannel.afterMax(timeout).readFirst();
+            outputChannel.afterMax(timeout).readNext();
 
             fail();
 
@@ -66,17 +66,17 @@ public class IOChannelTest extends TestCase {
         channel.input().after(TimeDuration.days(1)).pass("test").close();
 
         final IOChannelOutput<String> output = channel.output();
-        assertThat(output.immediately().readAll()).isEmpty();
+        assertThat(output.immediately().eventuallyExit().readAll()).isEmpty();
 
         final ArrayList<String> results = new ArrayList<String>();
         output.afterMax(10, TimeUnit.MILLISECONDS).readAllInto(results);
         assertThat(results).isEmpty();
-        assertThat(output.immediately().checkComplete()).isFalse();
+        assertThat(output.immediately().eventuallyExit().checkComplete()).isFalse();
         assertThat(output.abort()).isTrue();
 
         try {
 
-            output.readFirst();
+            output.readNext();
 
             fail();
 
@@ -113,7 +113,7 @@ public class IOChannelTest extends TestCase {
 
         final Routine<String, String> routine = JRoutine.<String>on().buildRoutine();
         final OutputChannel<String> outputChannel = routine.callAsync(channel.output());
-        assertThat(outputChannel.afterMax(timeout).readFirst()).isEqualTo("test");
+        assertThat(outputChannel.afterMax(timeout).readNext()).isEqualTo("test");
         assertThat(outputChannel.checkComplete()).isTrue();
 
         final IOChannel<String> channel1 =
@@ -155,7 +155,8 @@ public class IOChannelTest extends TestCase {
         final long startTime = System.currentTimeMillis();
 
         final Routine<String, String> routine = JRoutine.<String>on().buildRoutine();
-        final OutputChannel<String> outputChannel = routine.callAsync(channel.output());
+        final OutputChannel<String> outputChannel =
+                routine.callAsync(channel.output()).eventuallyExit();
         assertThat(outputChannel.afterMax(TimeDuration.millis(500)).readAll()).containsExactly(
                 "test");
 
@@ -176,7 +177,7 @@ public class IOChannelTest extends TestCase {
 
         final Routine<String, String> routine = JRoutine.<String>on().buildRoutine();
         final OutputChannel<String> outputChannel = routine.callAsync(channel.output());
-        assertThat(outputChannel.afterMax(timeout).readFirst()).isEqualTo("test");
+        assertThat(outputChannel.afterMax(timeout).readNext()).isEqualTo("test");
     }
 
     public void testTimeout() {
@@ -187,9 +188,11 @@ public class IOChannelTest extends TestCase {
         final IOChannelOutput<String> output = channel.output();
         assertThat(output.immediately().readAll()).isEmpty();
 
+        output.afterMax(TimeDuration.millis(10)).eventuallyDeadlock();
+
         try {
 
-            output.afterMax(TimeDuration.millis(10)).eventually(true).readFirst();
+            output.readNext();
 
             fail();
 
@@ -237,15 +240,7 @@ public class IOChannelTest extends TestCase {
 
         }
 
-        try {
-
-            output.checkComplete();
-
-            fail();
-
-        } catch (final ReadDeadlockException ignored) {
-
-        }
+        assertThat(output.checkComplete()).isFalse();
     }
 
     private static class WeakThread extends Thread {

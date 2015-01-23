@@ -358,7 +358,8 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
                     mLogger.wrn("routine instance not available after timeout [#%d]: %s",
                                 mMaxRunning, mAvailTimeout);
-                    throw new RoutineDeadlockException();
+                    throw new RoutineDeadlockException(
+                            "deadlock while waiting for an available invocation instance");
                 }
 
                 ++mRunningCount;

@@ -107,7 +107,7 @@ public class AndroidRunnerTest extends AndroidTestCase {
                            .buildRoutine()
                            .callAsync(channel)
                            .afterMax(seconds(30))
-                           .readFirst()).isEqualTo(true);
+                           .readNext()).isEqualTo(true);
     }
 
     public void testMainRunner() throws InterruptedException {

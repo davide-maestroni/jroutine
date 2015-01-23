@@ -134,7 +134,7 @@ public class Downloader {
 
                     downloadMap.remove(uri);
 
-                    if (channel.readFirst()) {
+                    if (channel.readNext()) {
 
                         mDownloadedSet.add(uri);
                         return true;

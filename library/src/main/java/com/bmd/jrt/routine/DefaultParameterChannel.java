@@ -479,7 +479,8 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
             if (!mInputTimeout.waitTrue(mMutex, mHasInputs)) {
 
-                throw new InputDeadlockException();
+                throw new InputDeadlockException(
+                        "deadlock while waiting for room in the input channel");
             }
 
         } catch (final InterruptedException e) {

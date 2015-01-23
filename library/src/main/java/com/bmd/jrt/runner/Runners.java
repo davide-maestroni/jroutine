@@ -13,7 +13,12 @@
  */
 package com.bmd.jrt.runner;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 
@@ -104,7 +109,31 @@ public class Runners {
 
         if (sSharedRunner == null) {
 
-            sSharedRunner = poolRunner();
+            sSharedRunner = scheduledRunner(new ScheduledThreadPoolExecutor(1) {
+
+                private final ExecutorService mExecutor = Executors.newCachedThreadPool();
+
+                @Override
+                public void execute(final Runnable command) {
+
+                    mExecutor.execute(command);
+                }
+
+                @Nonnull
+                @Override
+                public ScheduledFuture<?> schedule(final Runnable command, final long delay,
+                        final TimeUnit unit) {
+
+                    return super.schedule(new Runnable() {
+
+                        @Override
+                        public void run() {
+
+                            mExecutor.execute(command);
+                        }
+                    }, delay, unit);
+                }
+            });
         }
 
         return sSharedRunner;

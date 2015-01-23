@@ -50,7 +50,7 @@ public class RoutineProcessorTest extends TestCase {
                                                          .buildWrapper(ClassToken.tokenOf(
                                                                  TestInterfaceWrapper.class));
 
-        assertThat(testWrapper.getOne().readFirst()).isEqualTo(1);
+        assertThat(testWrapper.getOne().readNext()).isEqualTo(1);
     }
 
     @SuppressWarnings("unchecked")
@@ -65,7 +65,7 @@ public class RoutineProcessorTest extends TestCase {
                                                 .buildWrapper(
                                                         ClassToken.tokenOf(TestWrapper.class));
 
-        assertThat(testWrapper.getOne().readFirst()).isEqualTo(1);
+        assertThat(testWrapper.getOne().readNext()).isEqualTo(1);
         assertThat(testWrapper.getString(1, 2, 3)).isIn("1", "2", "3");
         assertThat(testWrapper.getString(new HashSet<Integer>(Arrays.asList(1, 2, 3)))
                               .readAll()).containsOnly("1", "2", "3");

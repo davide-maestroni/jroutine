@@ -77,11 +77,11 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
         final OutputChannel<String> result2 = routine.callAsync("test1").afterMax(timeout);
 
-        assertThat(result1.readFirst()).isEqualTo("TEST1");
+        assertThat(result1.readNext()).isEqualTo("TEST1");
 
         try {
 
-            result2.readFirst();
+            result2.readNext();
 
             fail();
 
@@ -101,11 +101,11 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
         final OutputChannel<String> result2 = routine.callAsync("test2").afterMax(timeout);
 
-        assertThat(result1.readFirst()).isEqualTo("TEST1");
+        assertThat(result1.readNext()).isEqualTo("TEST1");
 
         try {
 
-            result2.readFirst();
+            result2.readNext();
 
             fail();
 
@@ -128,7 +128,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            result1.readFirst();
+            result1.readNext();
 
             fail();
 
@@ -146,7 +146,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                         .callAsync(data1)
                         .afterMax(timeout);
 
-        assertThat(result2.readFirst()).isSameAs(data1);
+        assertThat(result2.readNext()).isSameAs(data1);
         result2.checkComplete();
 
         final OutputChannel<Data> result3 =
@@ -156,7 +156,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                         .callAsync(data1)
                         .afterMax(timeout);
 
-        assertThat(result3.readFirst()).isSameAs(data1);
+        assertThat(result3.readNext()).isSameAs(data1);
         result3.checkComplete();
     }
 
@@ -172,7 +172,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                         .callAsync(data1)
                         .afterMax(timeout);
 
-        assertThat(result1.readFirst()).isSameAs(data1);
+        assertThat(result1.readNext()).isSameAs(data1);
         result1.checkComplete();
 
         RoutineException error = null;
@@ -186,7 +186,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            result2.readFirst();
+            result2.readNext();
 
             fail();
 
@@ -206,7 +206,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            result3.readFirst();
+            result3.readNext();
 
             fail();
 
@@ -227,8 +227,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
         final OutputChannel<String> result2 = routine.callAsync("test2").afterMax(timeout);
 
-        assertThat(result1.readFirst()).isEqualTo("TEST1");
-        assertThat(result2.readFirst()).isEqualTo("TEST2");
+        assertThat(result1.readNext()).isEqualTo("TEST1");
+        assertThat(result2.readNext()).isEqualTo("TEST2");
     }
 
     public void testActivityKeep() {
@@ -242,8 +242,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
         final OutputChannel<String> result2 = routine.callAsync("test2").afterMax(timeout);
 
-        assertThat(result1.readFirst()).isEqualTo("TEST1");
-        assertThat(result2.readFirst()).isEqualTo("TEST1");
+        assertThat(result1.readNext()).isEqualTo("TEST1");
+        assertThat(result2.readNext()).isEqualTo("TEST1");
     }
 
     public void testActivityMissingRoutine() throws InterruptedException {
@@ -275,7 +275,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            result1.readFirst();
+            result1.readNext();
 
             fail();
 
@@ -283,7 +283,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         }
 
-        assertThat(result2.readFirst()).isEqualTo("TEST1");
+        assertThat(result2.readNext()).isEqualTo("TEST1");
     }
 
     public void testActivityRestartOnInput() {
@@ -299,7 +299,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            result1.readFirst();
+            result1.readNext();
 
             fail();
 
@@ -307,7 +307,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         }
 
-        assertThat(result2.readFirst()).isEqualTo("TEST2");
+        assertThat(result2.readNext()).isEqualTo("TEST2");
     }
 
     public void testActivityRetain() {
@@ -322,7 +322,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                         .callAsync(data1)
                         .afterMax(timeout);
 
-        assertThat(result1.readFirst()).isSameAs(data1);
+        assertThat(result1.readNext()).isSameAs(data1);
         result1.checkComplete();
 
         final OutputChannel<Data> result2 =
@@ -332,7 +332,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                         .callAsync(data1)
                         .afterMax(timeout);
 
-        assertThat(result2.readFirst()).isSameAs(data1);
+        assertThat(result2.readNext()).isSameAs(data1);
         result2.checkComplete();
 
         RoutineException error = null;
@@ -346,7 +346,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            result3.readFirst();
+            result3.readNext();
 
             fail();
 
@@ -366,7 +366,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            result4.readFirst();
+            result4.readNext();
 
             fail();
 
@@ -450,8 +450,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final OutputChannel<String> result1 = routine2.callAsync("test1").afterMax(timeout);
         final OutputChannel<String> result2 = routine2.callAsync("test2").afterMax(timeout);
 
-        assertThat(result1.readFirst()).isEqualTo("TEST1");
-        assertThat(result2.readFirst()).isEqualTo("TEST2");
+        assertThat(result1.readNext()).isEqualTo("TEST1");
+        assertThat(result2.readNext()).isEqualTo("TEST2");
     }
 
     @TargetApi(VERSION_CODES.HONEYCOMB)
@@ -489,8 +489,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final OutputChannel<Data> result1 = routine2.callAsync(data1).afterMax(timeout);
         final OutputChannel<Data> result2 = routine2.callAsync(data1).afterMax(timeout);
 
-        assertThat(result1.readFirst()).isSameAs(data1);
-        assertThat(result2.readFirst()).isSameAs(data1);
+        assertThat(result1.readNext()).isSameAs(data1);
+        assertThat(result2.readNext()).isSameAs(data1);
     }
 
     public void testActivitySame() {
@@ -502,8 +502,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final OutputChannel<Data> result1 = routine.callAsync(data1).afterMax(timeout);
         final OutputChannel<Data> result2 = routine.callAsync(data1).afterMax(timeout);
 
-        assertThat(result1.readFirst()).isSameAs(data1);
-        assertThat(result2.readFirst()).isSameAs(data1);
+        assertThat(result1.readNext()).isSameAs(data1);
+        assertThat(result2.readNext()).isSameAs(data1);
     }
 
     public void testClash() {
@@ -518,7 +518,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                         .callAsync(data1)
                         .afterMax(timeout);
 
-        assertThat(result1.readFirst()).isSameAs(data1);
+        assertThat(result1.readNext()).isSameAs(data1);
         result1.checkComplete();
 
         final OutputChannel<Data> result2 =
@@ -530,7 +530,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            result2.readFirst();
+            result2.readNext();
 
             fail();
 
@@ -694,11 +694,11 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
         final OutputChannel<String> result2 = routine.callAsync("test2").afterMax(timeout);
 
-        assertThat(result1.readFirst()).isEqualTo("TEST1");
+        assertThat(result1.readNext()).isEqualTo("TEST1");
 
         try {
 
-            result2.readFirst();
+            result2.readNext();
 
             fail();
 
@@ -736,8 +736,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
         final OutputChannel<String> result2 = routine.callAsync("test2").afterMax(timeout);
 
-        assertThat(result1.readFirst()).isEqualTo("TEST1");
-        assertThat(result2.readFirst()).isEqualTo("TEST2");
+        assertThat(result1.readNext()).isEqualTo("TEST1");
+        assertThat(result2.readNext()).isEqualTo("TEST2");
     }
 
     public void testFragmentKeep() {
@@ -754,8 +754,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
         final OutputChannel<String> result2 = routine.callAsync("test2").afterMax(timeout);
 
-        assertThat(result1.readFirst()).isEqualTo("TEST1");
-        assertThat(result2.readFirst()).isEqualTo("TEST1");
+        assertThat(result1.readNext()).isEqualTo("TEST1");
+        assertThat(result2.readNext()).isEqualTo("TEST1");
     }
 
     public void testFragmentMissingRoutine() throws InterruptedException {
@@ -793,7 +793,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            result1.readFirst();
+            result1.readNext();
 
             fail();
 
@@ -801,7 +801,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         }
 
-        assertThat(result2.readFirst()).isEqualTo("TEST1");
+        assertThat(result2.readNext()).isEqualTo("TEST1");
     }
 
     public void testFragmentRestart() {
@@ -820,7 +820,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            result1.readFirst();
+            result1.readNext();
 
             fail();
 
@@ -828,7 +828,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         }
 
-        assertThat(result2.readFirst()).isEqualTo("TEST2");
+        assertThat(result2.readNext()).isEqualTo("TEST2");
     }
 
     public void testFragmentSame() throws InterruptedException {
@@ -843,8 +843,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final OutputChannel<Data> result1 = routine.callAsync(data1).afterMax(timeout);
         final OutputChannel<Data> result2 = routine.callAsync(data1).afterMax(timeout);
 
-        assertThat(result1.readFirst()).isSameAs(data1);
-        assertThat(result2.readFirst()).isSameAs(data1);
+        assertThat(result1.readNext()).isSameAs(data1);
+        assertThat(result2.readNext()).isSameAs(data1);
     }
 
     public void testInvocations() {

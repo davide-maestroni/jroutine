@@ -17,7 +17,6 @@ import com.bmd.jrt.builder.OutputDeadlockException;
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.channel.OutputChannel;
-import com.bmd.jrt.channel.OutputChannel.TimeoutAction;
 import com.bmd.jrt.channel.OutputConsumer;
 import com.bmd.jrt.channel.ReadDeadlockException;
 import com.bmd.jrt.channel.ResultChannel;
@@ -33,7 +32,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
@@ -41,6 +39,7 @@ import javax.annotation.Nullable;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+import static com.bmd.jrt.time.TimeDuration.INFINITY;
 import static com.bmd.jrt.time.TimeDuration.ZERO;
 import static com.bmd.jrt.time.TimeDuration.fromUnit;
 
@@ -93,8 +92,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     private int mPendingOutputCount;
 
     private TimeDuration mReadTimeout = ZERO;
-
-    private TimeoutAction mReadTimeoutAction;
 
     private TimeDuration mResultDelay = ZERO;
 
@@ -477,7 +474,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             if (!mOutputTimeout.waitTrue(mMutex, mHasOutputs)) {
 
-                throw new OutputDeadlockException();
+                throw new OutputDeadlockException(
+                        "deadlock while waiting for room in the output channel");
             }
 
         } catch (final InterruptedException e) {
@@ -680,8 +678,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     }
 
     @Nullable
-    private OUTPUT readQueue(@Nonnull final TimeDuration timeout,
-            @Nonnull final TimeoutAction timeoutAction) {
+    private OUTPUT readQueue(@Nonnull final TimeDuration timeout, final boolean isDeadlock) {
 
         verifyBound();
 
@@ -690,9 +687,9 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         if (timeout.isZero() || !outputQueue.isEmpty()) {
 
-            if (outputQueue.isEmpty()) {
+            if (outputQueue.isEmpty() && isDeadlock) {
 
-                throw new NoSuchElementException();
+                throw new ReadDeadlockException("deadlock while waiting for outputs");
             }
 
             return nextOutput(outputQueue, timeout);
@@ -725,17 +722,9 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             logger.wrn("reading output timeout: [%s]", timeout);
 
-            if (timeoutAction == TimeoutAction.DEADLOCK) {
+            if (isDeadlock) {
 
-                throw new ReadDeadlockException();
-
-            } else if (timeoutAction == TimeoutAction.ABORT) {
-
-                //TODO??
-
-            } else if (timeoutAction == TimeoutAction.RETURN) {
-
-                return null;
+                throw new ReadDeadlockException("deadlock while waiting for outputs");
             }
         }
 
@@ -800,25 +789,24 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
      */
     private class DefaultIterator implements Iterator<OUTPUT> {
 
+        private final boolean mIsDeadlock;
+
         private final Logger mSubLogger = mLogger.subContextLogger(this);
 
         private final TimeDuration mTimeout;
-
-        private final TimeoutAction mTimeoutAction;
 
         private boolean mRemoved = true;
 
         /**
          * Constructor.
          *
-         * @param timeout       the output timeout.
-         * @param timeoutAction the timeout action.
+         * @param timeout    the output timeout.
+         * @param isDeadlock whether to throw a deadlock exception when timeout elapses.
          */
-        private DefaultIterator(@Nonnull final TimeDuration timeout,
-                @Nonnull final TimeoutAction timeoutAction) {
+        private DefaultIterator(@Nonnull final TimeDuration timeout, final boolean isDeadlock) {
 
             mTimeout = timeout;
-            mTimeoutAction = timeoutAction;
+            mIsDeadlock = isDeadlock;
         }
 
         @Override
@@ -830,7 +818,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 final Logger logger = mSubLogger;
                 final TimeDuration timeout = mTimeout;
-                final TimeoutAction timeoutAction = mTimeoutAction;
                 final NestedQueue<Object> outputQueue = mOutputQueue;
 
                 if (timeout.isZero() || (mState == ChannelState.DONE)) {
@@ -867,9 +854,10 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                     logger.wrn("has output timeout: [%s]", timeout);
 
-                    if (timeoutAction) {
+                    if (mIsDeadlock) {
 
-                        throw new ReadDeadlockException();
+                        throw new ReadDeadlockException(
+                                "deadlock while waiting to know if more outputs are coming");
                     }
                 }
 
@@ -887,7 +875,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             synchronized (mMutex) {
 
-                final OUTPUT next = readQueue(mTimeout, mTimeoutAction);
+                final OUTPUT next = readQueue(mTimeout, mIsDeadlock);
                 mRemoved = false;
                 return next;
             }
@@ -917,6 +905,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     private class DefaultOutputChannel implements OutputChannel<OUTPUT> {
 
         private final Logger mSubLogger = mLogger.subContextLogger(this);
+
+        private boolean mIsDeadlock = true;
 
         @Nonnull
         @Override
@@ -981,7 +971,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             synchronized (mMutex) {
 
                 final TimeDuration timeout = mReadTimeout;
-                final TimeoutAction timeoutAction = mReadTimeoutAction;
 
                 try {
 
@@ -999,10 +988,9 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                     RoutineInterruptedException.interrupt(e);
                 }
 
-                if (!isDone && timeoutAction) {
+                if (!isDone) {
 
                     mSubLogger.wrn("waiting complete timeout: [%s]", timeout);
-                    throw new ReadDeadlockException();
                 }
             }
 
@@ -1011,17 +999,30 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         @Nonnull
         @Override
-        @SuppressWarnings("ConstantConditions")
-        public OutputChannel<OUTPUT> eventually(@Nonnull final TimeoutAction action) {
+        public OutputChannel<OUTPUT> eventually() {
+
+            return afterMax(INFINITY);
+        }
+
+        @Nonnull
+        @Override
+        public OutputChannel<OUTPUT> eventuallyDeadlock() {
 
             synchronized (mMutex) {
 
-                if (action == null) {
+                mIsDeadlock = true;
+            }
 
-                    throw new NullPointerException("the timeout action must not be null");
-                }
+            return this;
+        }
 
-                mReadTimeoutAction = action;
+        @Nonnull
+        @Override
+        public OutputChannel<OUTPUT> eventuallyExit() {
+
+            synchronized (mMutex) {
+
+                mIsDeadlock = false;
             }
 
             return this;
@@ -1072,7 +1073,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 final NestedQueue<Object> outputQueue = mOutputQueue;
                 final TimeDuration timeout = mReadTimeout;
-                final TimeoutAction timeoutAction = mReadTimeoutAction;
 
                 if (timeout.isZero() || (mState == ChannelState.DONE)) {
 
@@ -1117,9 +1117,10 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                     logger.wrn("list output timeout: [%s]", timeout);
 
-                    if (timeoutAction) {
+                    if (mIsDeadlock) {
 
-                        throw new ReadDeadlockException();
+                        throw new ReadDeadlockException(
+                                "deadlock while waiting to collect all outputs");
                     }
                 }
             }
@@ -1128,11 +1129,11 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         }
 
         @Override
-        public OUTPUT readFirst() {
+        public OUTPUT readNext() {
 
             synchronized (mMutex) {
 
-                return readQueue(mReadTimeout, mReadTimeoutAction);
+                return readQueue(mReadTimeout, mIsDeadlock);
             }
         }
 
@@ -1156,17 +1157,17 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         public Iterator<OUTPUT> iterator() {
 
             final TimeDuration timeout;
-            final TimeoutAction timeoutAction;
+            final boolean isDeadlock;
 
             synchronized (mMutex) {
 
                 verifyBound();
 
                 timeout = mReadTimeout;
-                timeoutAction = mReadTimeoutAction;
+                isDeadlock = mIsDeadlock;
             }
 
-            return new DefaultIterator(timeout, timeoutAction);
+            return new DefaultIterator(timeout, isDeadlock);
         }
 
         @Override

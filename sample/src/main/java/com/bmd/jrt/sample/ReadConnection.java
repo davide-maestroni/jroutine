@@ -14,7 +14,7 @@
 package com.bmd.jrt.sample;
 
 import com.bmd.jrt.channel.ResultChannel;
-import com.bmd.jrt.common.RoutineException;
+import com.bmd.jrt.common.InvocationException;
 import com.bmd.jrt.invocation.TemplateInvocation;
 
 import java.io.IOException;
@@ -62,7 +62,7 @@ public class ReadConnection extends TemplateInvocation<URI, Chunk> {
 
         } catch (final IOException e) {
 
-            throw new RoutineException(e);
+            throw new InvocationException(e);
         }
     }
 }

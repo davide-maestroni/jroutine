@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 import static com.bmd.jrt.time.Time.current;
 import static com.bmd.jrt.time.TimeDuration.ZERO;
@@ -36,6 +37,14 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Created by davide on 10/2/14.
  */
 public class RunnerTest extends TestCase {
+
+    public void testDynamicPoolRunner() throws InterruptedException {
+
+        testRunner(Runners.sharedRunner());
+        testRunner(Runners.dynamicPoolRunner(3, 4, 5L, TimeUnit.SECONDS));
+        testRunner(new RunnerDecorator(Runners.sharedRunner()));
+        testRunner(new RunnerDecorator(Runners.dynamicPoolRunner(1, 4, 0L, TimeUnit.SECONDS)));
+    }
 
     @SuppressWarnings("ConstantConditions")
     public void testError() {
@@ -53,16 +62,6 @@ public class RunnerTest extends TestCase {
         try {
 
             Runners.scheduledRunner(null);
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            new ThreadPoolRunner(-1);
 
             fail();
 
@@ -93,10 +92,8 @@ public class RunnerTest extends TestCase {
 
     public void testPoolRunner() throws InterruptedException {
 
-        testRunner(new ThreadPoolRunner(4));
         testRunner(Runners.poolRunner(3));
-        testRunner(Runners.sharedRunner());
-        testRunner(new RunnerDecorator(new ThreadPoolRunner(4)));
+        testRunner(new RunnerDecorator(Runners.poolRunner(4)));
     }
 
     public void testQueuedRunner() throws InterruptedException {

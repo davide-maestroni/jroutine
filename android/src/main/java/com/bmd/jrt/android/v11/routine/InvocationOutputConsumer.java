@@ -19,8 +19,8 @@ import android.os.Build.VERSION_CODES;
 import com.bmd.jrt.android.runner.Runners;
 import com.bmd.jrt.channel.TemplateOutputConsumer;
 import com.bmd.jrt.channel.Tunnel.TunnelInput;
-import com.bmd.jrt.common.RoutineException;
-import com.bmd.jrt.common.RoutineInterruptedException;
+import com.bmd.jrt.common.InvocationException;
+import com.bmd.jrt.common.InvocationInterruptedException;
 import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.runner.Execution;
 import com.bmd.jrt.runner.Runner;
@@ -54,7 +54,7 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
 
     private final Object mMutex = new Object();
 
-    private RoutineException mAbortException;
+    private InvocationException mAbortException;
 
     private boolean mIsComplete;
 
@@ -114,12 +114,12 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
     public void onError(@Nullable final Throwable error) {
 
         final boolean deliverResult;
-        final RoutineException abortException;
+        final InvocationException abortException;
 
         synchronized (mMutex) {
 
             mIsComplete = true;
-            abortException = new RoutineException(error);
+            abortException = new InvocationException(error);
             mAbortException = abortException;
             deliverResult = mLastResults.isEmpty();
         }
@@ -181,7 +181,7 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
 
             synchronized (mMutex) {
 
-                final RoutineException exception = mAbortException;
+                final InvocationException exception = mAbortException;
                 return (exception != null) ? exception.getCause() : null;
             }
         }
@@ -232,11 +232,11 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
                         cachedResults.addAll(lastResults);
                         lastResults.clear();
 
-                    } catch (final RoutineInterruptedException e) {
+                    } catch (final InvocationInterruptedException e) {
 
                         throw e.interrupt();
 
-                    } catch (final RoutineException e) {
+                    } catch (final InvocationException e) {
 
                         mIsComplete = true;
                         mAbortException = e;

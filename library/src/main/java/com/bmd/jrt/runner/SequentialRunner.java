@@ -13,7 +13,7 @@
  */
 package com.bmd.jrt.runner;
 
-import com.bmd.jrt.common.RoutineInterruptedException;
+import com.bmd.jrt.common.InvocationInterruptedException;
 
 import java.util.concurrent.TimeUnit;
 
@@ -46,7 +46,7 @@ class SequentialRunner implements Runner {
 
         } catch (final InterruptedException e) {
 
-            RoutineInterruptedException.interrupt(e);
+            throw InvocationInterruptedException.interrupt(e);
         }
     }
 }

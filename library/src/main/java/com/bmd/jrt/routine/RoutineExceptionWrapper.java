@@ -13,6 +13,7 @@
  */
 package com.bmd.jrt.routine;
 
+import com.bmd.jrt.common.InvocationException;
 import com.bmd.jrt.common.RoutineException;
 
 import javax.annotation.Nonnull;
@@ -42,7 +43,8 @@ class RoutineExceptionWrapper {
      * If the specified object is a wrapper instance, the wrapped routine exception is thrown.
      *
      * @param obj the object to check.
-     * @throws RoutineException if the specified object is an exception wrapper instance.
+     * @throws com.bmd.jrt.common.InvocationException if the specified object is an exception
+     *                                                wrapper instance.
      */
     public static void raise(@Nullable final Object obj) {
 
@@ -74,7 +76,7 @@ class RoutineExceptionWrapper {
 
         final Throwable cause = mCause;
 
-        if ((cause instanceof RoutineException) && ((RoutineException) cause).needsUnwrap()) {
+        if (cause instanceof InvocationException) {
 
             return cause.getCause();
         }
@@ -97,6 +99,6 @@ class RoutineExceptionWrapper {
             return ((RoutineException) cause);
         }
 
-        return new RoutineException(cause);
+        return new InvocationException(cause);
     }
 }

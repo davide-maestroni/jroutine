@@ -29,8 +29,8 @@ import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.builder.RoutineConfigurationBuilder;
 import com.bmd.jrt.channel.OutputConsumer;
 import com.bmd.jrt.channel.ParameterChannel;
-import com.bmd.jrt.common.RoutineException;
-import com.bmd.jrt.common.RoutineInterruptedException;
+import com.bmd.jrt.common.InvocationException;
+import com.bmd.jrt.common.InvocationInterruptedException;
 import com.bmd.jrt.invocation.Invocation;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
@@ -437,7 +437,7 @@ public class RoutineService extends Service {
 
                         builder.runBy(findConstructor(runnerClass).newInstance());
 
-                    } catch (final RoutineInterruptedException e) {
+                    } catch (final InvocationInterruptedException e) {
 
                         mLogger.err(e, "error creating the runner instance");
                         throw e.interrupt();
@@ -455,7 +455,7 @@ public class RoutineService extends Service {
 
                         builder.loggedWith(findConstructor(logClass).newInstance());
 
-                    } catch (final RoutineInterruptedException e) {
+                    } catch (final InvocationInterruptedException e) {
 
                         mLogger.err(e, "error creating the log instance");
                         throw e.interrupt();
@@ -533,14 +533,14 @@ public class RoutineService extends Service {
             } catch (final InvocationTargetException e) {
 
                 logger.err(e, "error creating the invocation instance");
-                throw new RoutineException(e.getCause());
+                throw new InvocationException(e.getCause());
 
-            } catch (final RoutineInterruptedException e) {
+            } catch (final InvocationInterruptedException e) {
 
                 logger.err(e, "error creating the invocation instance");
                 throw e.interrupt();
 
-            } catch (final RoutineException e) {
+            } catch (final InvocationException e) {
 
                 logger.err(e, "error creating the invocation instance");
                 throw e;
@@ -548,7 +548,7 @@ public class RoutineService extends Service {
             } catch (final Throwable t) {
 
                 logger.err(t, "error creating the invocation instance");
-                throw new RoutineException(t);
+                throw new InvocationException(t);
             }
         }
     }
@@ -835,7 +835,7 @@ public class RoutineService extends Service {
 
             } catch (final RemoteException e) {
 
-                throw new RoutineException(e);
+                throw new InvocationException(e);
             }
         }
 
@@ -853,7 +853,7 @@ public class RoutineService extends Service {
 
             } catch (final RemoteException e) {
 
-                throw new RoutineException(e);
+                throw new InvocationException(e);
             }
         }
 
@@ -869,7 +869,7 @@ public class RoutineService extends Service {
 
             } catch (final RemoteException e) {
 
-                throw new RoutineException(e);
+                throw new InvocationException(e);
             }
         }
     }
@@ -919,8 +919,9 @@ public class RoutineService extends Service {
          * Passes the specified input to the invocation parameter channel.
          *
          * @param input the input.
-         * @throws IllegalStateException if the channel is already closed.
-         * @throws RoutineException      if the execution has been aborted with an exception.
+         * @throws IllegalStateException                  if the channel is already closed.
+         * @throws com.bmd.jrt.common.InvocationException if the execution has been aborted with
+         * an exception.
          */
         public void pass(@Nullable final Object input) {
 
@@ -946,10 +947,12 @@ public class RoutineService extends Service {
         /**
          * Closes the input channel and binds the specified consumer to the output one.
          *
-         * @throws NullPointerException  if the specified consumer is null.
-         * @throws IllegalStateException if the channel is already closed or already bound to a
-         *                               consumer.
-         * @throws RoutineException      if the execution has been aborted with an exception.
+         * @throws NullPointerException                   if the specified consumer is null.
+         * @throws IllegalStateException                  if the channel is already closed or
+         * already bound to a
+         *                                                consumer.
+         * @throws com.bmd.jrt.common.InvocationException if the execution has been aborted with
+         * an exception.
          */
         public void result(@Nonnull final OutputConsumer<Object> consumer) {
 

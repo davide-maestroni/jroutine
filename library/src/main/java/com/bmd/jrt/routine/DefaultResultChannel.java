@@ -20,7 +20,7 @@ import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.OutputConsumer;
 import com.bmd.jrt.channel.ReadDeadlockException;
 import com.bmd.jrt.channel.ResultChannel;
-import com.bmd.jrt.common.RoutineInterruptedException;
+import com.bmd.jrt.common.InvocationInterruptedException;
 import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.runner.Execution;
 import com.bmd.jrt.runner.Runner;
@@ -480,7 +480,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         } catch (final InterruptedException e) {
 
-            RoutineInterruptedException.interrupt(e);
+            throw InvocationInterruptedException.interrupt(e);
         }
     }
 
@@ -498,7 +498,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                 logger.dbg("closing consumer (%s)", consumer);
                 consumer.onComplete();
 
-            } catch (final RoutineInterruptedException e) {
+            } catch (final InvocationInterruptedException e) {
 
                 throw e;
 
@@ -565,7 +565,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                             logger.dbg("aborting consumer (%s): %s", consumer, output);
                             consumer.onError(((RoutineExceptionWrapper) output).getCause());
 
-                        } catch (final RoutineInterruptedException e) {
+                        } catch (final InvocationInterruptedException e) {
 
                             throw e;
 
@@ -588,7 +588,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                     closeConsumer(state);
                 }
 
-            } catch (final RoutineInterruptedException e) {
+            } catch (final InvocationInterruptedException e) {
 
                 throw e;
 
@@ -708,7 +708,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             };
         }
 
-        boolean isTimeout = false;
+        final boolean isTimeout;
 
         try {
 
@@ -716,7 +716,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         } catch (final InterruptedException e) {
 
-            RoutineInterruptedException.interrupt(e);
+            throw InvocationInterruptedException.interrupt(e);
         }
 
         if (isTimeout) {
@@ -840,7 +840,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                     };
                 }
 
-                boolean isTimeout = false;
+                final boolean isTimeout;
 
                 try {
 
@@ -848,7 +848,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 } catch (final InterruptedException e) {
 
-                    RoutineInterruptedException.interrupt(e);
+                    throw InvocationInterruptedException.interrupt(e);
                 }
 
                 if (isTimeout) {
@@ -967,7 +967,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         @Override
         public boolean checkComplete() {
 
-            boolean isDone = false;
+            final boolean isDone;
 
             synchronized (mMutex) {
 
@@ -986,7 +986,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 } catch (final InterruptedException e) {
 
-                    RoutineInterruptedException.interrupt(e);
+                    throw InvocationInterruptedException.interrupt(e);
                 }
 
                 if (!isDone) {
@@ -1088,7 +1088,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                 }
 
                 final long startTime = System.currentTimeMillis();
-                boolean isTimeout = false;
+                final boolean isTimeout;
 
                 try {
 
@@ -1111,7 +1111,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 } catch (final InterruptedException e) {
 
-                    RoutineInterruptedException.interrupt(e);
+                    throw InvocationInterruptedException.interrupt(e);
                 }
 
                 if (isTimeout) {

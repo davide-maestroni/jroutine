@@ -43,7 +43,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * an already running invocation with the same ID exists at the time the new invocation is executed,
  * the clash is resolved based on the strategy specified through the builder. When a clash cannot be
  * resolved, for example when invocations with different implementations share the same ID, the new
- * invocation is aborted with a {@link com.bmd.jrt.android.builder.RoutineClashException}.
+ * invocation is aborted with a {@link com.bmd.jrt.android.builder.InvocationClashException}.
  * <p/>
  * For example, in order to get a resource from the network, needed to fill an activity UI:
  * <pre>
@@ -197,7 +197,7 @@ public class JRoutine extends com.bmd.jrt.android.routine.JRoutine {
      * ID.<br/>
      * Note that, if no invocation with the specified ID is running at the time of the channel
      * creation, the output will be aborted with a
-     * {@link com.bmd.jrt.android.builder.RoutineMissingException}.
+     * {@link com.bmd.jrt.android.builder.InvocationMissingException}.
      *
      * @param activity the invocation activity context.
      * @param id       the invocation ID.
@@ -260,7 +260,7 @@ public class JRoutine extends com.bmd.jrt.android.routine.JRoutine {
      * ID.<br/>
      * Note that, if no invocation with the specified ID is running at the time of the channel
      * creation, the output will be aborted with a
-     * {@link com.bmd.jrt.android.builder.RoutineMissingException}.
+     * {@link com.bmd.jrt.android.builder.InvocationMissingException}.
      *
      * @param fragment the invocation fragment context.
      * @param id       the invocation ID.

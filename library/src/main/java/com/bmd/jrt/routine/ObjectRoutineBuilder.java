@@ -58,6 +58,7 @@ import static com.bmd.jrt.time.TimeDuration.fromUnit;
  * Created by davide on 9/21/14.
  *
  * @see Async
+ * @see AsyncName
  * @see AsyncType
  * @see ParallelType
  */
@@ -297,7 +298,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * Returns a proxy object enabling asynchronous calls to the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link Async} annotation.<br/>
+     * optional {@link AsyncName} and {@link Async} annotation.<br/>
      * In case the wrapped object does not implement the specified interface, the value attribute
      * will be used to bind the interface method with the instance ones. If no name is assigned the
      * method name will be used instead to map it.<br/>
@@ -339,7 +340,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * Returns a proxy object enabling asynchronous calls to the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link Async} annotation.<br/>
+     * optional {@link AsyncName} and {@link Async} annotation.<br/>
      * In case the wrapped object does not implement the specified interface, the value attribute
      * will be used to bind the interface method with the instance ones. If no name is assigned the
      * method name will be used instead to map it.<br/>
@@ -362,7 +363,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * Returns a wrapper object enabling asynchronous calls to the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link Async}, {@link AsyncType} and {@link ParallelType} annotations.<br/>
+     * optional {@link AsyncName}, {@link Async}, {@link AsyncType} and {@link ParallelType}
+     * annotations.<br/>
      * The wrapping object is created through code generation based on the interfaces annotated
      * with {@link com.bmd.jrt.annotation.AsyncWrap}.<br/>
      * Note that, you'll need to enable annotation pre-processing by adding the processor package
@@ -448,7 +450,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * Returns a wrapper object enabling asynchronous calls to the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link Async}, {@link AsyncType} and {@link ParallelType} annotations.<br/>
+     * optional {@link AsyncName}, {@link Async}, {@link AsyncType} and {@link ParallelType}
+     * annotations.<br/>
      * The wrapping object is created through code generation based on the interfaces annotated
      * with {@link com.bmd.jrt.annotation.AsyncWrap}.<br/>
      * Note that, you'll need to enable annotation pre-processing by adding the processor package
@@ -467,7 +470,11 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     }
 
     /**
-     * @return
+     * Tells the builder to create a routine throwing a
+     * {@link com.bmd.jrt.channel.ReadDeadlockException} in case no result is available before the
+     * result timeout has elapsed.
+     *
+     * @return this builder.
      */
     @Nonnull
     public ObjectRoutineBuilder eventuallyDeadlock() {
@@ -477,7 +484,10 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     }
 
     /**
-     * @return
+     * Tells the builder to create a routine breaking the execution in case no result is available
+     * before the result timeout has elapsed.
+     *
+     * @return this builder.
      */
     @Nonnull
     public ObjectRoutineBuilder eventuallyExit() {

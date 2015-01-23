@@ -73,6 +73,8 @@ import java.lang.annotation.Target;
  * </pre>
  * <p/>
  * Created by davide on 11/11/14.
+ *
+ * @see AsyncType
  */
 @Inherited
 @Target(ElementType.PARAMETER)

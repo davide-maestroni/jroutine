@@ -18,7 +18,7 @@ package com.bmd.jrt.android.builder;
  * <p/>
  * Created by davide on 12/14/14.
  */
-public class InputClashException extends RoutineClashException {
+public class InputClashException extends InvocationClashException {
 
     /**
      * Constructor.

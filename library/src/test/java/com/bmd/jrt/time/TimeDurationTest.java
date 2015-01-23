@@ -13,7 +13,7 @@
  */
 package com.bmd.jrt.time;
 
-import com.bmd.jrt.common.RoutineInterruptedException;
+import com.bmd.jrt.common.InvocationInterruptedException;
 import com.bmd.jrt.time.TimeDuration.Check;
 
 import junit.framework.TestCase;
@@ -488,7 +488,7 @@ public class TimeDurationTest extends TestCase {
 
                 } catch (final InterruptedException e) {
 
-                    RoutineInterruptedException.interrupt(e);
+                    throw InvocationInterruptedException.interrupt(e);
                 }
             }
         };
@@ -593,7 +593,7 @@ public class TimeDurationTest extends TestCase {
 
                 } catch (final InterruptedException e) {
 
-                    RoutineInterruptedException.interrupt(e);
+                    throw InvocationInterruptedException.interrupt(e);
                 }
             }
         };
@@ -671,7 +671,7 @@ public class TimeDurationTest extends TestCase {
 
                 } catch (final InterruptedException e) {
 
-                    RoutineInterruptedException.interrupt(e);
+                    throw InvocationInterruptedException.interrupt(e);
                 }
             }
         };
@@ -699,7 +699,7 @@ public class TimeDurationTest extends TestCase {
 
                 } catch (final InterruptedException e) {
 
-                    RoutineInterruptedException.interrupt(e);
+                    throw InvocationInterruptedException.interrupt(e);
                 }
             }
         };
@@ -796,7 +796,7 @@ public class TimeDurationTest extends TestCase {
 
                 } catch (final InterruptedException e) {
 
-                    RoutineInterruptedException.interrupt(e);
+                    throw InvocationInterruptedException.interrupt(e);
                 }
             }
         };

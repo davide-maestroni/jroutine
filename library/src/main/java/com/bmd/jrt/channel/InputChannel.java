@@ -38,10 +38,10 @@ public interface InputChannel<INPUT> extends Channel {
      *
      * @param delay the delay.
      * @return this channel.
-     * @throws NullPointerException                if the specified delay is null.
-     * @throws IllegalStateException               if this channel is already closed.
-     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
-     *                                             exception.
+     * @throws NullPointerException                   if the specified delay is null.
+     * @throws IllegalStateException                  if this channel is already closed.
+     * @throws com.bmd.jrt.common.InvocationException if the execution has been aborted with an
+     *                                                exception.
      */
     @Nonnull
     public InputChannel<INPUT> after(@Nonnull TimeDuration delay);
@@ -54,10 +54,10 @@ public interface InputChannel<INPUT> extends Channel {
      * @param delay    the delay value.
      * @param timeUnit the delay time unit.
      * @return this channel.
-     * @throws IllegalArgumentException            if the specified delay is negative.
-     * @throws IllegalStateException               if this channel is already closed.
-     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
-     *                                             exception.
+     * @throws IllegalArgumentException               if the specified delay is negative.
+     * @throws IllegalStateException                  if this channel is already closed.
+     * @throws com.bmd.jrt.common.InvocationException if the execution has been aborted with an
+     *                                                exception.
      */
     @Nonnull
     public InputChannel<INPUT> after(long delay, @Nonnull TimeUnit timeUnit);
@@ -66,9 +66,9 @@ public interface InputChannel<INPUT> extends Channel {
      * Tells the channel to not delay the transfer of data.
      *
      * @return this channel.
-     * @throws IllegalStateException               if this channel is already closed.
-     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
-     *                                             exception.
+     * @throws IllegalStateException                  if this channel is already closed.
+     * @throws com.bmd.jrt.common.InvocationException if the execution has been aborted with an
+     *                                                exception.
      */
     @Nonnull
     public InputChannel<INPUT> now();
@@ -81,9 +81,9 @@ public interface InputChannel<INPUT> extends Channel {
      *
      * @param channel the output channel.
      * @return this channel.
-     * @throws IllegalStateException               if this channel is already closed.
-     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
-     *                                             exception.
+     * @throws IllegalStateException                  if this channel is already closed.
+     * @throws com.bmd.jrt.common.InvocationException if the execution has been aborted with an
+     *                                                exception.
      * @see OutputChannel#bind(OutputConsumer)
      */
     @Nonnull
@@ -94,9 +94,9 @@ public interface InputChannel<INPUT> extends Channel {
      *
      * @param inputs the iterable returning the input data.
      * @return this channel.
-     * @throws IllegalStateException               if this channel is already closed.
-     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
-     *                                             exception.
+     * @throws IllegalStateException                  if this channel is already closed.
+     * @throws com.bmd.jrt.common.InvocationException if the execution has been aborted with an
+     *                                                exception.
      */
     @Nonnull
     public InputChannel<INPUT> pass(@Nullable Iterable<? extends INPUT> inputs);
@@ -106,9 +106,9 @@ public interface InputChannel<INPUT> extends Channel {
      *
      * @param input the input.
      * @return this channel.
-     * @throws IllegalStateException               if this channel is already closed.
-     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
-     *                                             exception.
+     * @throws IllegalStateException                  if this channel is already closed.
+     * @throws com.bmd.jrt.common.InvocationException if the execution has been aborted with an
+     *                                                exception.
      */
     @Nonnull
     public InputChannel<INPUT> pass(@Nullable INPUT input);
@@ -118,9 +118,9 @@ public interface InputChannel<INPUT> extends Channel {
      *
      * @param inputs the input data.
      * @return this channel.
-     * @throws IllegalStateException               if this channel is already closed.
-     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
-     *                                             exception.
+     * @throws IllegalStateException                  if this channel is already closed.
+     * @throws com.bmd.jrt.common.InvocationException if the execution has been aborted with an
+     *                                                exception.
      */
     @Nonnull
     public InputChannel<INPUT> pass(@Nullable INPUT... inputs);

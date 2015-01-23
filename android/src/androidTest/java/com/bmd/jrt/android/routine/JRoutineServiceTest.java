@@ -31,8 +31,8 @@ import com.bmd.jrt.builder.RoutineConfigurationBuilder;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.ClassToken;
-import com.bmd.jrt.common.RoutineException;
-import com.bmd.jrt.common.RoutineInterruptedException;
+import com.bmd.jrt.common.InvocationException;
+import com.bmd.jrt.common.InvocationInterruptedException;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.routine.Routine;
 import com.bmd.jrt.time.TimeDuration;
@@ -76,7 +76,7 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
 
             fail();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             assertThat(e.getCause().getMessage()).isEqualTo("test");
         }
@@ -92,7 +92,7 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
 
             fail();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             assertThat(e.getCause().getMessage()).isEqualTo("test");
         }
@@ -138,8 +138,8 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
                            .readAll()).containsOnly("1", "2", "3", "4", "5");
 
         final RoutineConfigurationBuilder builder =
-                new RoutineConfigurationBuilder().inputOrder(DataOrder.DELIVERY)
-                                                 .outputOrder(DataOrder.DELIVERY);
+                new RoutineConfigurationBuilder().inputOrder(DataOrder.INSERTION)
+                                                 .outputOrder(DataOrder.INSERTION);
         final Routine<String, String> routine3 =
                 JRoutine.onService(getActivity(), ClassToken.tokenOf(StringSimpleInvocation.class))
                         .dispatchTo(Looper.getMainLooper())
@@ -215,7 +215,7 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
 
             } catch (final InterruptedException e) {
 
-                RoutineInterruptedException.interrupt(e);
+                throw InvocationInterruptedException.interrupt(e);
             }
 
             result.abort(new IllegalStateException("test"));

@@ -20,8 +20,8 @@ import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.builder.RoutineConfigurationBuilder;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.CacheHashMap;
-import com.bmd.jrt.common.RoutineException;
-import com.bmd.jrt.common.RoutineInterruptedException;
+import com.bmd.jrt.common.InvocationException;
+import com.bmd.jrt.common.InvocationInterruptedException;
 import com.bmd.jrt.invocation.SimpleInvocation;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
@@ -54,6 +54,7 @@ import static com.bmd.jrt.common.Reflection.boxingClass;
  * Created by davide on 9/21/14.
  *
  * @see Async
+ * @see AsyncName
  */
 public class ClassRoutineBuilder implements RoutineBuilder {
 
@@ -136,15 +137,15 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
     /**
      * Returns a routine used for calling the method whose identifying name is specified in a
-     * {@link Async} annotation.
+     * {@link AsyncName} annotation.
      *
      * @param name     the name specified in the annotation.
      * @param <INPUT>  the input data type.
      * @param <OUTPUT> the output data type.
      * @return the routine.
-     * @throws IllegalArgumentException if the specified method is not found.
-     * @throws RoutineException         if an error occurred while instantiating the optional
-     *                                  runner or the routine.
+     * @throws IllegalArgumentException               if the specified method is not found.
+     * @throws com.bmd.jrt.common.InvocationException if an error occurred while instantiating
+     *                                                the optional runner or the routine.
      */
     @Nonnull
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> annotatedMethod(@Nonnull final String name) {
@@ -256,10 +257,10 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      * @param name           the method name.
      * @param parameterTypes the method parameter types.
      * @return the routine.
-     * @throws NullPointerException     if one of the parameter is null.
-     * @throws IllegalArgumentException if no matching method is found.
-     * @throws RoutineException         if an error occurred while instantiating the optional
-     *                                  runner or the routine.
+     * @throws NullPointerException                   if one of the parameter is null.
+     * @throws IllegalArgumentException               if no matching method is found.
+     * @throws com.bmd.jrt.common.InvocationException if an error occurred while instantiating
+     *                                                the optional runner or the routine.
      */
     @Nonnull
     public Routine<Object, Object> method(@Nonnull final String name,
@@ -294,16 +295,16 @@ public class ClassRoutineBuilder implements RoutineBuilder {
     /**
      * Returns a routine used for calling the specified method.
      * <p/>
-     * The method is invoked ignoring an optional name specified in a {@link Async} annotation.
+     * The method is invoked ignoring an optional name specified in a {@link AsyncName} annotation.
      * Though, the other annotation attributes will be honored.
      *
      * @param method   the method instance.
      * @param <INPUT>  the input data type.
      * @param <OUTPUT> the output data type.
      * @return the routine.
-     * @throws NullPointerException if the specified method is null.
-     * @throws RoutineException     if an error occurred while instantiating the optional runner
-     *                              or the routine.
+     * @throws NullPointerException                   if the specified method is null.
+     * @throws com.bmd.jrt.common.InvocationException if an error occurred while instantiating
+     *                                                the optional runner or the routine.
      */
     @Nonnull
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final Method method) {
@@ -474,9 +475,10 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      * @param <INPUT>       the input data type.
      * @param <OUTPUT>      the output data type.
      * @return the routine.
-     * @throws NullPointerException if the specified configuration, class or method are null.
-     * @throws RoutineException     if an error occurred while instantiating the optional runner
-     *                              or the routine.
+     * @throws NullPointerException                   if the specified configuration, class or
+     *                                                method are null.
+     * @throws com.bmd.jrt.common.InvocationException if an error occurred while instantiating
+     *                                                the optional runner or the routine.
      */
     @Nonnull
     protected <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(
@@ -649,19 +651,19 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
                 } catch (final InvocationTargetException e) {
 
-                    throw new RoutineException(e.getCause());
+                    throw new InvocationException(e.getCause());
 
-                } catch (final RoutineInterruptedException e) {
+                } catch (final InvocationInterruptedException e) {
 
                     throw e.interrupt();
 
-                } catch (final RoutineException e) {
+                } catch (final InvocationException e) {
 
                     throw e;
 
                 } catch (final Throwable t) {
 
-                    throw new RoutineException(t);
+                    throw new InvocationException(t);
                 }
             }
         }

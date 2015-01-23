@@ -20,19 +20,12 @@ import com.bmd.jrt.common.RoutineException;
  * <p/>
  * Created by davide on 1/14/15.
  */
-public class RoutineMissingException extends RoutineException {
+public class InvocationMissingException extends RoutineException {
 
     /**
      * Constructor.
      */
-    public RoutineMissingException() {
+    public InvocationMissingException() {
 
-        super(null);
-    }
-
-    @Override
-    public boolean needsUnwrap() {
-
-        return false;
     }
 }

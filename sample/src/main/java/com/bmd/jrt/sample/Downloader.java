@@ -14,7 +14,7 @@
 package com.bmd.jrt.sample;
 
 import com.bmd.jrt.channel.OutputChannel;
-import com.bmd.jrt.common.RoutineException;
+import com.bmd.jrt.common.InvocationException;
 import com.bmd.jrt.routine.JRoutine;
 import com.bmd.jrt.routine.Routine;
 import com.bmd.jrt.time.TimeDuration;
@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import static com.bmd.jrt.common.ClassToken.tokenOf;
+import static com.bmd.jrt.time.TimeDuration.INFINITY;
 import static com.bmd.jrt.time.TimeDuration.seconds;
 
 /**
@@ -47,6 +48,7 @@ public class Downloader {
 
         mReadConnection = JRoutine.on(tokenOf(ReadConnection.class))
                                   .maxRunning(maxParallelDownloads)
+                                  .availableTimeout(INFINITY)
                                   .buildRoutine();
     }
 
@@ -105,7 +107,7 @@ public class Downloader {
 
                 downloadMap.put(uri, writeFile.callAsync(mReadConnection.callAsync(uri)));
 
-            } catch (final RoutineException ignored) {
+            } catch (final InvocationException ignored) {
 
             }
         }
@@ -141,7 +143,7 @@ public class Downloader {
                     }
                 }
 
-            } catch (final RoutineException ignored) {
+            } catch (final InvocationException ignored) {
 
                 downloadMap.remove(uri);
             }

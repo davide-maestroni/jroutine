@@ -21,7 +21,7 @@ import com.bmd.jrt.android.v11.routine.JRoutine;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.ClassToken;
-import com.bmd.jrt.common.RoutineInterruptedException;
+import com.bmd.jrt.common.InvocationInterruptedException;
 import com.bmd.jrt.invocation.SimpleInvocation;
 import com.bmd.jrt.runner.Execution;
 import com.bmd.jrt.runner.Runner;
@@ -99,7 +99,7 @@ public class AndroidRunnerTest extends AndroidTestCase {
 
                 } catch (final InterruptedException e) {
 
-                    RoutineInterruptedException.interrupt(e);
+                    throw InvocationInterruptedException.interrupt(e);
                 }
             }
         }))

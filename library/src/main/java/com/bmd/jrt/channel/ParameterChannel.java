@@ -63,9 +63,9 @@ public interface ParameterChannel<INPUT, OUTPUT> extends InputChannel<INPUT> {
      * Closes the input channel and returns the output one.
      *
      * @return the routine output channel.
-     * @throws IllegalStateException               if this channel is already closed.
-     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
-     *                                             exception.
+     * @throws IllegalStateException                  if this channel is already closed.
+     * @throws com.bmd.jrt.common.InvocationException if the execution has been aborted with an
+     *                                                exception.
      */
     @Nonnull
     public OutputChannel<OUTPUT> result();

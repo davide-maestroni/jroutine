@@ -24,8 +24,8 @@ import com.bmd.jrt.android.builder.AndroidRoutineBuilder.ResultCache;
 import com.bmd.jrt.android.invocation.AndroidInvocation;
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
 import com.bmd.jrt.builder.RoutineConfiguration;
-import com.bmd.jrt.common.RoutineException;
-import com.bmd.jrt.common.RoutineInterruptedException;
+import com.bmd.jrt.common.InvocationException;
+import com.bmd.jrt.common.InvocationInterruptedException;
 import com.bmd.jrt.invocation.Invocation;
 import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.routine.AbstractRoutine;
@@ -116,7 +116,7 @@ class AndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
 
             invocation.onDestroy();
 
-        } catch (final RoutineInterruptedException e) {
+        } catch (final InvocationInterruptedException e) {
 
             throw e.interrupt();
 
@@ -178,14 +178,14 @@ class AndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
         } catch (final InvocationTargetException e) {
 
             logger.err(e, "error creating the invocation instance");
-            throw new RoutineException(e.getCause());
+            throw new InvocationException(e.getCause());
 
-        } catch (final RoutineInterruptedException e) {
+        } catch (final InvocationInterruptedException e) {
 
             logger.err(e, "error creating the invocation instance");
             throw e.interrupt();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             logger.err(e, "error creating the invocation instance");
             throw e;
@@ -193,7 +193,7 @@ class AndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
         } catch (final Throwable t) {
 
             logger.err(t, "error creating the invocation instance");
-            throw new RoutineException(t);
+            throw new InvocationException(t);
         }
     }
 }

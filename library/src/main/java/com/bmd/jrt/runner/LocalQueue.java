@@ -13,7 +13,7 @@
  */
 package com.bmd.jrt.runner;
 
-import com.bmd.jrt.common.RoutineInterruptedException;
+import com.bmd.jrt.common.InvocationInterruptedException;
 import com.bmd.jrt.time.TimeDuration;
 
 import java.util.concurrent.TimeUnit;
@@ -252,7 +252,7 @@ class LocalQueue {
 
                     } catch (final InterruptedException e) {
 
-                        RoutineInterruptedException.interrupt(e);
+                        throw InvocationInterruptedException.interrupt(e);
                     }
                 }
 
@@ -261,7 +261,7 @@ class LocalQueue {
                     // This call could be re-entrant
                     execution.run();
 
-                } catch (final RoutineInterruptedException e) {
+                } catch (final InvocationInterruptedException e) {
 
                     throw e.interrupt();
 

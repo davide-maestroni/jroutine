@@ -62,6 +62,7 @@ import javax.annotation.Nonnull;
  *                .pass(doSomething1.callAsync())
  *                .pass(doSomething2.callAsync())
  *                .result()
+ *                .eventually()
  *                .readAllInto(results);
  *     </code>
  * </pre>
@@ -72,8 +73,8 @@ import javax.annotation.Nonnull;
  *         final OutputChannel&lt;Result&gt; output1 = doSomething1.callAsync();
  *         final OutputChannel&lt;Result&gt; output2 = doSomething2.callAsync();
  *
- *         output1.readAllInto(results);
- *         output2.readAllInto(results);
+ *         output1.eventually().readAllInto(results);
+ *         output2.eventually().readAllInto(results);
  *     </code>
  * </pre>
  * (Note that, the order of the input or the output of the routine is not guaranteed unless the
@@ -83,23 +84,7 @@ import javax.annotation.Nonnull;
  * <pre>
  *     <code>
  *
- *         final Routine&lt;Result, Result&gt; routine =
- *                  JRoutine.&lt;Result&gt;on().buildRoutine();
- *
- *         routine.invokeAsync()
- *                .pass(doSomething1.callAsync(doSomething2.callAsync()))
- *                .result()
- *                .readAllInto(results);
- *     </code>
- * </pre>
- * Or, in a more compact way:
- * <pre>
- *     <code>
- *
- *         final Routine&lt;Result, Result&gt; routine =
- *                  JRoutine.&lt;Result&gt;on().buildRoutine();
- *
- *         routine.callAsync(doSomething1.callAsync(doSomething2.callAsync())).readAllInto(results);
+ *         doSomething1.callAsync(doSomething2.callAsync())).eventually().readAllInto(results);
  *     </code>
  * </pre>
  * <p/>
@@ -109,12 +94,15 @@ import javax.annotation.Nonnull;
  *
  *         public interface AsyncCallback {
  *
+ *             &#64;Async(resultTimeout = Long.MAX_VALUE)
  *             public void onResults(
  *                  &#64;AsyncType(Result.class) OutputChannel&lt;Result&gt; result1,
  *                  &#64;AsyncType(Result.class) OutputChannel&lt;Result&gt; result2);
  *         }
  *
- *         final AsyncCallback callback = JRoutine.on(myCallback).buildProxy(AsyncCallback.class);
+ *         final AsyncCallback callback = JRoutine.on(myCallback)
+ *                                                .resultTimeout(seconds(30))
+ *                                                .buildProxy(AsyncCallback.class);
  *
  *         callback.onResults(doSomething1.callAsync(), doSomething2.callAsync());
  *     </code>
@@ -126,14 +114,14 @@ import javax.annotation.Nonnull;
  * <pre>
  *     <code>
  *
- *         final IOChannel&lt;Result&gt; channel = JRoutine.io().&lt;Result&gt;buildTunnel();
+ *         final Tunnel&lt;Result&gt; tunnel = JRoutine.io().&lt;Result&gt;buildTunnel();
  *
  *         new Thread() {
  *
  *             &#64;Override
  *             public void run() {
  *
- *                 channel.input().pass(new Result()).close();
+ *                 tunnel.input().pass(new Result()).close();
  *             }
  *
  *         }.start();
@@ -141,13 +129,14 @@ import javax.annotation.Nonnull;
  *         final Routine&lt;Result, Result&gt; routine =
  *                  JRoutine.&lt;Result&gt;on().buildRoutine();
  *
- *         routine.callAsync(channel).readAllInto(results);
+ *         routine.callAsync(tunnel.output()).eventually().readAllInto(results);
  *     </code>
  * </pre>
  * <p/>
  * Created by davide on 9/7/14.
  *
  * @see com.bmd.jrt.annotation.Async
+ * @see com.bmd.jrt.annotation.AsyncName
  * @see com.bmd.jrt.annotation.AsyncWrap
  * @see com.bmd.jrt.annotation.AsyncType
  * @see com.bmd.jrt.annotation.ParallelType
@@ -162,12 +151,14 @@ public class JRoutine {
     }
 
     /**
-     * Returns a channel builder.
+     * Returns a tunnel builder.
      *
-     * @return the channel builder instance.
+     * @return the tunnel builder instance.
      */
     @Nonnull
     public static TunnelBuilder io() {
+
+        //TODO: on()???
 
         return new TunnelBuilder();
     }
@@ -201,6 +192,12 @@ public class JRoutine {
 
     /**
      * Returns a routine builder wrapping the specified invocation class token.
+     * <p/>
+     * Note that class tokens of inner and anonymous class can be passed as well. Remember however
+     * that Java creates synthetic constructor for such classes, so be sure to specify the correct
+     * arguments to guarantee proper instantiation. In fact, inner classes always have the outer
+     * instance as first constructor parameter, and anonymous classes has both the outer instance
+     * and all the variables captured in the closure.
      *
      * @param classToken the invocation class token.
      * @param <INPUT>    the input data type.

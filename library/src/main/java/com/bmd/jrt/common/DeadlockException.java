@@ -22,8 +22,6 @@ import javax.annotation.Nullable;
  */
 public class DeadlockException extends RoutineException {
 
-    private final String mMessage;
-
     /**
      * Constructor.
      *
@@ -31,20 +29,6 @@ public class DeadlockException extends RoutineException {
      */
     public DeadlockException(@Nullable final String message) {
 
-        super(null);
-
-        mMessage = message;
-    }
-
-    @Override
-    public String getMessage() {
-
-        return mMessage;
-    }
-
-    @Override
-    public boolean needsUnwrap() {
-
-        return false;
+        super(message);
     }
 }

@@ -25,8 +25,8 @@ import com.bmd.jrt.android.builder.AndroidRoutineBuilder;
 import com.bmd.jrt.android.builder.AndroidRoutineBuilder.ClashResolution;
 import com.bmd.jrt.android.builder.AndroidRoutineBuilder.ResultCache;
 import com.bmd.jrt.android.builder.InputClashException;
-import com.bmd.jrt.android.builder.RoutineClashException;
-import com.bmd.jrt.android.builder.RoutineMissingException;
+import com.bmd.jrt.android.builder.InvocationClashException;
+import com.bmd.jrt.android.builder.InvocationMissingException;
 import com.bmd.jrt.android.invocation.AndroidSimpleInvocation;
 import com.bmd.jrt.android.invocation.AndroidTemplateInvocation;
 import com.bmd.jrt.android.invocation.AndroidTunnelInvocation;
@@ -38,8 +38,8 @@ import com.bmd.jrt.builder.RoutineConfigurationBuilder;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.ClassToken;
-import com.bmd.jrt.common.RoutineException;
-import com.bmd.jrt.common.RoutineInterruptedException;
+import com.bmd.jrt.common.InvocationException;
+import com.bmd.jrt.common.InvocationInterruptedException;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.routine.Routine;
@@ -132,7 +132,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
             fail();
 
-        } catch (final RoutineException ignored) {
+        } catch (final InvocationException ignored) {
 
         }
 
@@ -175,7 +175,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         assertThat(result1.readNext()).isSameAs(data1);
         result1.checkComplete();
 
-        RoutineException error = null;
+        InvocationException error = null;
         final OutputChannel<Data> result2 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Abort.class))
                         .withId(0)
@@ -190,7 +190,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
             fail();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             error = e;
         }
@@ -210,7 +210,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
             fail();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             assertThat(e.getCause()).isSameAs(error.getCause());
         }
@@ -257,7 +257,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
             fail();
 
-        } catch (final RoutineMissingException ignored) {
+        } catch (final InvocationMissingException ignored) {
 
         }
     }
@@ -279,7 +279,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
             fail();
 
-        } catch (final RoutineException ignored) {
+        } catch (final InvocationClashException ignored) {
 
         }
 
@@ -303,7 +303,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
             fail();
 
-        } catch (final RoutineException ignored) {
+        } catch (final InvocationClashException ignored) {
 
         }
 
@@ -335,7 +335,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         assertThat(result2.readNext()).isSameAs(data1);
         result2.checkComplete();
 
-        RoutineException error = null;
+        InvocationException error = null;
         final OutputChannel<Data> result3 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Abort.class))
                         .withId(0)
@@ -350,7 +350,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
             fail();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             error = e;
         }
@@ -370,7 +370,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
             fail();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             assertThat(e.getCause()).isSameAs(error.getCause());
         }
@@ -534,7 +534,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
             fail();
 
-        } catch (final RoutineClashException ignored) {
+        } catch (final InvocationClashException ignored) {
 
         }
 
@@ -772,7 +772,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
             fail();
 
-        } catch (final RoutineMissingException ignored) {
+        } catch (final InvocationMissingException ignored) {
 
         }
     }
@@ -797,7 +797,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
             fail();
 
-        } catch (final RoutineException ignored) {
+        } catch (final InvocationClashException ignored) {
 
         }
 
@@ -824,7 +824,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
             fail();
 
-        } catch (final RoutineException ignored) {
+        } catch (final InvocationClashException ignored) {
 
         }
 
@@ -1041,7 +1041,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
             } catch (final InterruptedException e) {
 
-                RoutineInterruptedException.interrupt(e);
+                throw InvocationInterruptedException.interrupt(e);
             }
 
             result.abort(new IllegalStateException());

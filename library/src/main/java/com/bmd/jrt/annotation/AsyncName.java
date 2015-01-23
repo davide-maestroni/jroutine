@@ -25,11 +25,8 @@ import java.lang.annotation.Target;
  * Note that the piece of code inside such methods will be automatically protected so to avoid
  * concurrency issues. Though, other parts of the code inside the same class will be not.<br/>
  * In order to avoid unexpected behavior, it is advisable to avoid using the same class fields
- * (unless immutable) in protected and non-protected code, or to use the framework to call
- * synchronous methods as well.<br/>
- * In a dual way, it is possible to exclude single methods from this kind of protection by
- * indicating them as having a different lock. Each lock has a name associated, and every method
- * with a specific lock is protected only from the other methods with the same lock name.
+ * (unless immutable) in protected and non-protected code, or to call synchronous methods through
+ * the framework as well.
  * <p/>
  * This annotation allows to identify the method through a constant, thus avoiding issues when
  * running obfuscation tools.<br/>
@@ -41,7 +38,7 @@ import java.lang.annotation.Target;
  *
  *             public static final String METHOD_NAME = "get";
  *
- *             &#64;Async(METHOD_NAME)
+ *             &#64;AsyncName(METHOD_NAME)
  *             public int getOne() {
  *
  *                 return 1;

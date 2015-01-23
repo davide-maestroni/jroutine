@@ -18,7 +18,7 @@ import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ReadDeadlockException;
 import com.bmd.jrt.channel.Tunnel;
 import com.bmd.jrt.channel.Tunnel.TunnelOutput;
-import com.bmd.jrt.common.RoutineException;
+import com.bmd.jrt.common.InvocationException;
 import com.bmd.jrt.time.TimeDuration;
 
 import junit.framework.TestCase;
@@ -54,7 +54,7 @@ public class TunnelTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineException ex) {
+        } catch (final InvocationException ex) {
 
             assertThat(ex.getCause()).isExactlyInstanceOf(IllegalStateException.class);
         }
@@ -80,7 +80,7 @@ public class TunnelTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineException ignored) {
+        } catch (final InvocationException ignored) {
 
         }
 

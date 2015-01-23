@@ -28,7 +28,7 @@ import com.bmd.jrt.channel.ReadDeadlockException;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.channel.TemplateOutputConsumer;
 import com.bmd.jrt.common.ClassToken;
-import com.bmd.jrt.common.RoutineException;
+import com.bmd.jrt.common.InvocationException;
 import com.bmd.jrt.invocation.Invocation;
 import com.bmd.jrt.invocation.SimpleInvocation;
 import com.bmd.jrt.invocation.TemplateInvocation;
@@ -74,7 +74,6 @@ public class RoutineTest extends TestCase {
     public void testAbort() throws InterruptedException {
 
         final TimeDuration timeout = seconds(1);
-
         final Routine<String, String> routine =
                 on(tokenOf(DelayedInvocation.class)).withArgs(TimeDuration.millis(100))
                                                     .buildRoutine();
@@ -109,7 +108,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineException ex) {
+        } catch (final InvocationException ex) {
 
             assertThat(ex.getCause()).isExactlyInstanceOf(IllegalArgumentException.class);
             assertThat(ex.getCause().getMessage()).isEqualTo("test2");
@@ -131,7 +130,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineException ex) {
+        } catch (final InvocationException ex) {
 
             assertThat(ex.getCause()).isNull();
         }
@@ -158,7 +157,7 @@ public class RoutineTest extends TestCase {
 
                             fail();
 
-                        } catch (final RoutineException ignored) {
+                        } catch (final InvocationException ignored) {
 
                         }
                     }
@@ -173,11 +172,12 @@ public class RoutineTest extends TestCase {
                     .after(TimeDuration.millis(10))
                     .pass("test_abort")
                     .result()
-                    .afterMax(timeout).readNext();
+                    .afterMax(timeout)
+                    .readNext();
 
             fail();
 
-        } catch (final RoutineException ex) {
+        } catch (final InvocationException ex) {
 
             assertThat(ex.getCause()).isExactlyInstanceOf(IllegalArgumentException.class);
             assertThat(ex.getCause().getMessage()).isEqualTo("test_abort");
@@ -204,11 +204,12 @@ public class RoutineTest extends TestCase {
                     .after(TimeDuration.millis(10))
                     .pass("test_abort")
                     .result()
-                    .afterMax(timeout).readNext();
+                    .afterMax(timeout)
+                    .readNext();
 
             fail();
 
-        } catch (final RoutineException ex) {
+        } catch (final InvocationException ex) {
 
             assertThat(ex.getCause()).isNull();
         }
@@ -336,7 +337,6 @@ public class RoutineTest extends TestCase {
     public void testCalls() {
 
         final TimeDuration timeout = seconds(1);
-
         final Routine<String, String> routine = JRoutine.<String>on().buildRoutine();
 
         assertThat(routine.callSync().afterMax(timeout).readAll()).isEmpty();
@@ -434,7 +434,6 @@ public class RoutineTest extends TestCase {
     public void testChainedRoutine() {
 
         final TimeDuration timeout = seconds(1);
-
         final SimpleInvocation<Integer, Integer> execSum =
                 new SimpleInvocation<Integer, Integer>() {
 
@@ -497,7 +496,6 @@ public class RoutineTest extends TestCase {
     public void testComposedRoutine() {
 
         final TimeDuration timeout = seconds(1);
-
         final SimpleInvocation<Integer, Integer> execSum =
                 new SimpleInvocation<Integer, Integer>() {
 
@@ -769,7 +767,6 @@ public class RoutineTest extends TestCase {
     public void testDelayedAbort() throws InterruptedException {
 
         final TimeDuration timeout = seconds(1);
-
         final Routine<String, String> tunnelRoutine = JRoutine.<String>on().buildRoutine();
 
         final ParameterChannel<String, String> channel1 = tunnelRoutine.invokeAsync();
@@ -785,11 +782,12 @@ public class RoutineTest extends TestCase {
             channel2.after(TimeDuration.millis(200))
                     .pass("test")
                     .result()
-                    .afterMax(timeout).readNext();
+                    .afterMax(timeout)
+                    .readNext();
 
             fail();
 
-        } catch (final RoutineException ignored) {
+        } catch (final InvocationException ignored) {
 
         }
 
@@ -810,7 +808,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineException ignored) {
+        } catch (final InvocationException ignored) {
 
         }
     }
@@ -818,7 +816,6 @@ public class RoutineTest extends TestCase {
     public void testDelayedBind() {
 
         final TimeDuration timeout = seconds(1);
-
         final Routine<Object, Object> routine1 = JRoutine.on().buildRoutine();
         final Routine<Object, Object> routine2 = JRoutine.on().buildRoutine();
 
@@ -828,14 +825,14 @@ public class RoutineTest extends TestCase {
                            .after(TimeDuration.millis(500))
                            .pass(routine2.callAsync("test"))
                            .result()
-                           .afterMax(timeout).readNext()).isEqualTo("test");
+                           .afterMax(timeout)
+                           .readNext()).isEqualTo("test");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(500);
     }
 
     public void testDestroy() {
 
         final TimeDuration timeout = seconds(1);
-
         final Routine<String, String> routine1 =
                 JRoutine.on(tokenOf(TestDestroy.class)).maxRetained(0).buildRoutine();
         assertThat(routine1.callSync("1", "2", "3", "4", "5")
@@ -928,7 +925,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineException ignored) {
+        } catch (final InvocationException ignored) {
 
         }
 
@@ -1140,7 +1137,6 @@ public class RoutineTest extends TestCase {
     public void testMethod() throws NoSuchMethodException {
 
         final TimeDuration timeout = seconds(1);
-
         final TestClass testClass = new TestClass();
         assertThat(on(testClass).method(TestClass.class.getMethod("getOne"))
                                 .callSync()
@@ -1174,7 +1170,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineException ignored) {
+        } catch (final InvocationException ignored) {
 
         }
 
@@ -1193,7 +1189,8 @@ public class RoutineTest extends TestCase {
                                 .take(77)).isEqualTo(77);
         assertThat(on(testClass).buildProxy(TestInterfaceAsync.class)
                                 .getOne()
-                                .afterMax(timeout).readNext()).isEqualTo(1);
+                                .afterMax(timeout)
+                                .readNext()).isEqualTo(1);
 
         final TestInterfaceAsync testInterfaceAsync =
                 on(testClass).resultTimeout(1, TimeUnit.SECONDS)
@@ -1202,8 +1199,6 @@ public class RoutineTest extends TestCase {
     }
 
     public void testOutputTimeout() {
-
-        final TimeDuration timeout = seconds(1);
 
         final Routine<String, String> routine =
                 JRoutine.on(tokenOf(new SimpleInvocation<String, String>() {
@@ -1218,7 +1213,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            routine.callAsync("test1", "test2").afterMax(timeout).readAll();
+            routine.callAsync("test1", "test2").eventually().readAll();
 
             fail();
 
@@ -1601,7 +1596,6 @@ public class RoutineTest extends TestCase {
     public void testRoutine() {
 
         final TimeDuration timeout = seconds(1);
-
         final TemplateInvocation<Integer, Integer> execSquare =
                 new TemplateInvocation<Integer, Integer>() {
 
@@ -1629,7 +1623,6 @@ public class RoutineTest extends TestCase {
     public void testRoutineFunction() {
 
         final TimeDuration timeout = seconds(1);
-
         final SimpleInvocation<Integer, Integer> execSum =
                 new SimpleInvocation<Integer, Integer>() {
 
@@ -1721,7 +1714,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             assertThat(e.getCause().getMessage()).isEqualTo(expected);
         }
@@ -1735,7 +1728,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             assertThat(e.getCause().getMessage()).isEqualTo(expected);
         }
@@ -1746,7 +1739,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             assertThat(e.getCause().getMessage()).isEqualTo(expected);
         }
@@ -1760,7 +1753,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             assertThat(e.getCause().getMessage()).isEqualTo(expected);
         }
@@ -1771,7 +1764,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             assertThat(e.getCause().getMessage()).isEqualTo(expected);
         }
@@ -1785,7 +1778,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             assertThat(e.getCause().getMessage()).isEqualTo(expected);
         }
@@ -1796,7 +1789,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             assertThat(e.getCause().getMessage()).isEqualTo(expected);
         }
@@ -1813,7 +1806,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             assertThat(e.getCause().getMessage()).isEqualTo(expected);
         }
@@ -1824,7 +1817,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             assertThat(e.getCause().getMessage()).isEqualTo(expected);
         }
@@ -1841,7 +1834,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             assertThat(e.getCause().getMessage()).isEqualTo(expected);
         }
@@ -1856,7 +1849,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             assertThat(e.getCause().getMessage()).isEqualTo(expected);
         }
@@ -1873,7 +1866,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             assertThat(e.getCause().getMessage()).isEqualTo(expected);
         }
@@ -1884,7 +1877,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             assertThat(e.getCause().getMessage()).isEqualTo(expected);
         }
@@ -1898,7 +1891,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             assertThat(e.getCause().getMessage()).isEqualTo(expected);
         }
@@ -1909,7 +1902,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             assertThat(e.getCause().getMessage()).isEqualTo(expected);
         }
@@ -1923,7 +1916,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             assertThat(e.getCause().getMessage()).isEqualTo(expected);
         }
@@ -1934,7 +1927,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             assertThat(e.getCause().getMessage()).isEqualTo(expected);
         }
@@ -1951,7 +1944,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             assertThat(e.getCause().getMessage()).isEqualTo(expected);
         }
@@ -1962,7 +1955,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             assertThat(e.getCause().getMessage()).isEqualTo(expected);
         }
@@ -1979,7 +1972,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             assertThat(e.getCause().getMessage()).isEqualTo(expected);
         }
@@ -1990,7 +1983,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             assertThat(e.getCause().getMessage()).isEqualTo(expected);
         }
@@ -2004,7 +1997,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             assertThat(e.getCause().getMessage()).isEqualTo(expected);
         }
@@ -2015,7 +2008,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             assertThat(e.getCause().getMessage()).isEqualTo(expected);
         }
@@ -2029,7 +2022,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             assertThat(e.getCause().getMessage()).isEqualTo(expected);
         }
@@ -2044,7 +2037,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             assertThat(e.getCause().getMessage()).isEqualTo(expected);
         }
@@ -2061,7 +2054,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             assertThat(e.getCause().getMessage()).isEqualTo(expected);
         }
@@ -2076,7 +2069,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             assertThat(e.getCause().getMessage()).isEqualTo(expected);
         }
@@ -2093,7 +2086,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             assertThat(e.getCause().getMessage()).isEqualTo(expected);
         }
@@ -2101,11 +2094,10 @@ public class RoutineTest extends TestCase {
 
     private void testConsumer(final OutputConsumer<String> consumer) {
 
+        final TimeDuration timeout = seconds(1);
         final String input = "test";
         final Routine<String, String> routine =
                 on(tokenOf(DelayedInvocation.class)).withArgs(TimeDuration.ZERO).buildRoutine();
-
-        final TimeDuration timeout = seconds(1);
 
         assertThat(
                 routine.callSync(input).bind(consumer).afterMax(timeout).checkComplete()).isTrue();
@@ -2146,7 +2138,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             assertThat(e.getCause().getMessage()).isEqualTo(expected);
         }
@@ -2160,7 +2152,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             assertThat(e.getCause().getMessage()).isEqualTo(expected);
         }
@@ -2171,7 +2163,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             assertThat(e.getCause().getMessage()).isEqualTo(expected);
         }
@@ -2185,7 +2177,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             assertThat(e.getCause().getMessage()).isEqualTo(expected);
         }
@@ -2196,7 +2188,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             assertThat(e.getCause().getMessage()).isEqualTo(expected);
         }
@@ -2210,7 +2202,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             assertThat(e.getCause().getMessage()).isEqualTo(expected);
         }
@@ -2221,7 +2213,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             assertThat(e.getCause().getMessage()).isEqualTo(expected);
         }
@@ -2235,7 +2227,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             assertThat(e.getCause().getMessage()).isEqualTo(expected);
         }
@@ -2246,7 +2238,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             assertThat(e.getCause().getMessage()).isEqualTo(expected);
         }
@@ -2260,7 +2252,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             assertThat(e.getCause().getMessage()).isEqualTo(expected);
         }
@@ -2271,7 +2263,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             assertThat(e.getCause().getMessage()).isEqualTo(expected);
         }
@@ -2285,7 +2277,7 @@ public class RoutineTest extends TestCase {
 
             fail();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             assertThat(e.getCause().getMessage()).isEqualTo(expected);
         }

@@ -13,11 +13,8 @@
  */
 package com.bmd.jrt.runner;
 
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
@@ -29,11 +26,13 @@ import javax.annotation.Nonnull;
  */
 public class Runners {
 
+    private static final Object sMutex = new Object();
+
     private static final QueuedRunner sQueuedRunner = new QueuedRunner();
 
     private static final SequentialRunner sSequentialRunner = new SequentialRunner();
 
-    private static volatile Runner sSharedRunner;
+    private static Runner sSharedRunner;
 
     /**
      * Avoid direct instantiation.
@@ -43,14 +42,26 @@ public class Runners {
     }
 
     /**
-     * Returns a runner employing an optimum number of threads.
+     * Returns a runner employing a dynamic pool of threads.<br/>
+     * The number of threads may increase when needed from the core to the maximum pool size. The
+     * number of threads exceeding the core size are kept alive when idle for the specified time.
+     * If they stay idle for more time they will be destroyed.
      *
+     * @param corePoolSize    the number of threads to keep in the pool, even if they are idle.
+     * @param maximumPoolSize the maximum number of threads to allow in the pool.
+     * @param keepAliveTime   when the number of threads is greater than the core, this is the
+     *                        maximum time that excess idle threads will wait for new tasks before
+     *                        terminating.
+     * @param keepAliveUnit   the time unit for the keep alive time.
      * @return the runner instance.
      */
     @Nonnull
-    public static Runner poolRunner() {
+    public static Runner dynamicPoolRunner(final int corePoolSize, final int maximumPoolSize,
+            final long keepAliveTime, @Nonnull final TimeUnit keepAliveUnit) {
 
-        return poolRunner(getBestPoolSize());
+        return scheduledRunner(
+                new DynamicScheduledThreadExecutor(corePoolSize, maximumPoolSize, keepAliveTime,
+                                                   keepAliveUnit));
     }
 
     /**
@@ -62,7 +73,18 @@ public class Runners {
     @Nonnull
     public static Runner poolRunner(final int poolSize) {
 
-        return new ThreadPoolRunner(poolSize);
+        return scheduledRunner(Executors.newScheduledThreadPool(poolSize));
+    }
+
+    /**
+     * Returns a runner employing an optimum number of threads.
+     *
+     * @return the runner instance.
+     */
+    @Nonnull
+    public static Runner poolRunner() {
+
+        return poolRunner(Runtime.getRuntime().availableProcessors() << 1);
     }
 
     /**
@@ -107,41 +129,16 @@ public class Runners {
     @Nonnull
     public static Runner sharedRunner() {
 
-        //TODO: protect?
-        if (sSharedRunner == null) {
+        synchronized (sMutex) {
 
-            sSharedRunner = scheduledRunner(new ScheduledThreadPoolExecutor(1) {
+            if (sSharedRunner == null) {
 
-                private final ExecutorService mExecutor = Executors.newCachedThreadPool();
+                final int processors = Runtime.getRuntime().availableProcessors();
+                sSharedRunner = dynamicPoolRunner((processors <= 2) ? processors : processors - 1,
+                                                  (processors << 3) - 1, 3L, TimeUnit.SECONDS);
+            }
 
-                @Override
-                public void execute(final Runnable command) {
-
-                    mExecutor.execute(command);
-                }
-
-                @Nonnull
-                @Override
-                public ScheduledFuture<?> schedule(final Runnable command, final long delay,
-                        final TimeUnit unit) {
-
-                    return super.schedule(new Runnable() {
-
-                        @Override
-                        public void run() {
-
-                            mExecutor.execute(command);
-                        }
-                    }, delay, unit);
-                }
-            });
+            return sSharedRunner;
         }
-
-        return sSharedRunner;
-    }
-
-    private static int getBestPoolSize() {
-
-        return Runtime.getRuntime().availableProcessors() << 1;
     }
 }

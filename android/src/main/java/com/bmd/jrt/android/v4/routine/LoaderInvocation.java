@@ -26,7 +26,7 @@ import com.bmd.jrt.android.builder.AndroidRoutineBuilder;
 import com.bmd.jrt.android.builder.AndroidRoutineBuilder.ClashResolution;
 import com.bmd.jrt.android.builder.AndroidRoutineBuilder.ResultCache;
 import com.bmd.jrt.android.builder.InputClashException;
-import com.bmd.jrt.android.builder.RoutineClashException;
+import com.bmd.jrt.android.builder.InvocationClashException;
 import com.bmd.jrt.android.invocation.AndroidInvocation;
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
 import com.bmd.jrt.channel.InputChannel;
@@ -36,8 +36,8 @@ import com.bmd.jrt.channel.Tunnel;
 import com.bmd.jrt.channel.Tunnel.TunnelInput;
 import com.bmd.jrt.common.CacheHashMap;
 import com.bmd.jrt.common.ClassToken;
-import com.bmd.jrt.common.RoutineException;
-import com.bmd.jrt.common.RoutineInterruptedException;
+import com.bmd.jrt.common.InvocationException;
+import com.bmd.jrt.common.InvocationInterruptedException;
 import com.bmd.jrt.invocation.SimpleInvocation;
 import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.time.TimeDuration;
@@ -337,14 +337,14 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
         } catch (final InvocationTargetException e) {
 
             logger.err(e, "error creating the invocation instance [%d]", loaderId);
-            throw new RoutineException(e.getCause());
+            throw new InvocationException(e.getCause());
 
-        } catch (final RoutineInterruptedException e) {
+        } catch (final InvocationInterruptedException e) {
 
             logger.err(e, "error creating the invocation instance");
             throw e.interrupt();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             logger.err(e, "error creating the invocation instance [%d]", loaderId);
             throw e;
@@ -352,7 +352,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
         } catch (final Throwable t) {
 
             logger.err(t, "error creating the invocation instance [%d]", loaderId);
-            throw new RoutineException(t);
+            throw new InvocationException(t);
         }
 
         final RoutineLoader<INPUT, OUTPUT> routineLoader =
@@ -375,7 +375,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
 
                 logger.err("clashing invocation ID [%d]: %s", loaderId,
                            loader.getClass().getCanonicalName());
-                throw new RoutineClashException(loaderId);
+                throw new InvocationClashException(loaderId);
             }
 
             final RoutineLoader<INPUT, OUTPUT> routineLoader =
@@ -388,7 +388,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
 
                 logger.wrn("clashing invocation ID [%d]: %s", loaderId,
                            routineLoader.getInvocationType().getCanonicalName());
-                throw new RoutineClashException(loaderId);
+                throw new InvocationClashException(loaderId);
             }
 
             final ClashResolution resolution = mClashResolution;
@@ -573,7 +573,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
             mLogger.dbg("aborting result channels");
             final ArrayList<TunnelInput<OUTPUT>> channels = mChannels;
             final ArrayList<TunnelInput<OUTPUT>> newChannels = mNewChannels;
-            final RoutineClashException reason = new RoutineClashException(mLoader.getId());
+            final InvocationClashException reason = new InvocationClashException(mLoader.getId());
 
             for (final InputChannel<OUTPUT> channel : channels) {
 

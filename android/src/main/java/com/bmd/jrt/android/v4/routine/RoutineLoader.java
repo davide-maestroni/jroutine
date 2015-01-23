@@ -22,8 +22,8 @@ import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.channel.Tunnel;
 import com.bmd.jrt.channel.Tunnel.TunnelInput;
-import com.bmd.jrt.common.RoutineException;
-import com.bmd.jrt.common.RoutineInterruptedException;
+import com.bmd.jrt.common.InvocationException;
+import com.bmd.jrt.common.InvocationInterruptedException;
 import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.time.TimeDuration;
 
@@ -143,7 +143,7 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
 
             mInvocation.onDestroy();
 
-        } catch (final RoutineInterruptedException e) {
+        } catch (final InvocationInterruptedException e) {
 
             throw e.interrupt();
 
@@ -194,7 +194,7 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
             invocation.onResult(channel);
             invocation.onReturn();
 
-        } catch (final RoutineException e) {
+        } catch (final InvocationException e) {
 
             abortException = e.getCause();
 
@@ -211,7 +211,7 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
 
                 invocation.onAbort(abortException);
 
-            } catch (final RoutineException e) {
+            } catch (final InvocationException e) {
 
                 abortException = e.getCause();
 

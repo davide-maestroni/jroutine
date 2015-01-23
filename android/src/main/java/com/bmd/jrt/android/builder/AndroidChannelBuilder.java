@@ -23,8 +23,8 @@ import javax.annotation.Nullable;
 
 /**
  * Interface defining a builder of output channel linked to routine invocations.<br/>
- * In order to be successfully linked, the specific routine invocation must have a user defined
- * ID and still running (or cached) at the time of the channel creation.
+ * In order to be successfully linked, the specific routine invocation must have a user defined ID
+ * and still running (or cached) at the time of the channel creation.
  * <p/>
  * Created by davide on 1/14/15.
  *

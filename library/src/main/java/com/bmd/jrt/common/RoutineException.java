@@ -13,33 +13,37 @@
  */
 package com.bmd.jrt.common;
 
-import javax.annotation.Nullable;
-
 /**
- * Exception wrapping any throwable escaping a routine execution.
+ * Common base class for all the exceptions defined in the framework.
  * <p/>
- * Created by davide on 9/8/14.
+ * Created by davide on 1/23/15.
  */
 public class RoutineException extends RuntimeException {
 
     /**
      * Constructor.
-     *
-     * @param cause the wrapped exception.
      */
-    public RoutineException(@Nullable final Throwable cause) {
+    public RoutineException() {
 
-        super(cause);
     }
 
     /**
-     * Checks if this exception it's just a wrapper of another exception with no additional
-     * information.
+     * Constructor.
      *
-     * @return whether this exceptions needs to be unwrapped.
+     * @param message the error message.
      */
-    public boolean needsUnwrap() {
+    public RoutineException(final String message) {
 
-        return getCause() != null;
+        super(message);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param cause the error cause.
+     */
+    public RoutineException(final Throwable cause) {
+
+        super(cause);
     }
 }

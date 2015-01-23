@@ -14,7 +14,7 @@
 package com.bmd.jrt.sample;
 
 import com.bmd.jrt.channel.ResultChannel;
-import com.bmd.jrt.common.RoutineException;
+import com.bmd.jrt.common.InvocationException;
 import com.bmd.jrt.invocation.TemplateInvocation;
 
 import java.io.BufferedOutputStream;
@@ -59,7 +59,7 @@ public class WriteFile extends TemplateInvocation<Chunk, Boolean> {
 
         } catch (final FileNotFoundException e) {
 
-            throw new RoutineException(e);
+            throw new InvocationException(e);
         }
     }
 
@@ -72,7 +72,7 @@ public class WriteFile extends TemplateInvocation<Chunk, Boolean> {
 
         } catch (final IOException e) {
 
-            throw new RoutineException(e);
+            throw new InvocationException(e);
         }
     }
 
@@ -91,7 +91,7 @@ public class WriteFile extends TemplateInvocation<Chunk, Boolean> {
 
         } catch (final IOException e) {
 
-            throw new RoutineException(e);
+            throw new InvocationException(e);
         }
     }
 }

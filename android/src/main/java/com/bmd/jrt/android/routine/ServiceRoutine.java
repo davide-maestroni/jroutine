@@ -35,7 +35,7 @@ import com.bmd.jrt.channel.Tunnel;
 import com.bmd.jrt.channel.Tunnel.TunnelInput;
 import com.bmd.jrt.channel.Tunnel.TunnelOutput;
 import com.bmd.jrt.common.ClassToken;
-import com.bmd.jrt.common.RoutineException;
+import com.bmd.jrt.common.InvocationException;
 import com.bmd.jrt.invocation.Invocation;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
@@ -426,7 +426,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                 } catch (final RemoteException e) {
 
                     unbindService();
-                    throw new RoutineException(e);
+                    throw new InvocationException(e);
                 }
             }
 
@@ -444,7 +444,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                 } catch (final RemoteException e) {
 
                     unbindService();
-                    throw new RoutineException(e);
+                    throw new InvocationException(e);
                 }
             }
 
@@ -461,7 +461,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
                 } catch (final RemoteException e) {
 
-                    throw new RoutineException(e);
+                    throw new InvocationException(e);
                 }
             }
         }

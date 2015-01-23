@@ -20,29 +20,28 @@ import javax.annotation.Nullable;
  * <p/>
  * Created by davide on 9/8/14.
  */
-public class RoutineInterruptedException extends RoutineException {
+public class InvocationInterruptedException extends RoutineException {
 
     /**
      * Constructor.
      *
      * @param cause the wrapped exception.
      */
-    public RoutineInterruptedException(@Nullable final InterruptedException cause) {
+    public InvocationInterruptedException(@Nullable final InterruptedException cause) {
 
         super(cause);
     }
 
     /**
-     * Sets the interrupt flag of the current thread and throws a wrapped exception.
+     * Sets the interrupt flag of the current thread and returns a wrapped exception.
      *
      * @param exception the thread interrupted exception.
-     * @throws RoutineInterruptedException always.
+     * @return the wrapped exception.
      */
-    public static void interrupt(@Nullable final InterruptedException exception) throws
-            RoutineInterruptedException {
+    public static InvocationInterruptedException interrupt(
+            @Nullable final InterruptedException exception) throws InvocationInterruptedException {
 
-        Thread.currentThread().interrupt();
-        throw new RoutineInterruptedException(exception);
+        return new InvocationInterruptedException(exception).interrupt();
     }
 
     /**
@@ -50,7 +49,7 @@ public class RoutineInterruptedException extends RoutineException {
      *
      * @return this exception.
      */
-    public RoutineInterruptedException interrupt() {
+    public InvocationInterruptedException interrupt() {
 
         Thread.currentThread().interrupt();
         return this;

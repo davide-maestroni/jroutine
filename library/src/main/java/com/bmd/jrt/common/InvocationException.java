@@ -11,24 +11,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bmd.jrt.runner;
+package com.bmd.jrt.common;
 
-import java.util.concurrent.Executors;
+import javax.annotation.Nullable;
 
 /**
- * Class implementing a runner employing a pool of background threads.
+ * Exception wrapping any throwable escaping a routine execution.
  * <p/>
- * Created by davide on 9/9/14.
+ * Created by davide on 9/8/14.
  */
-class ThreadPoolRunner extends ScheduledRunner {
+public class InvocationException extends RoutineException {
 
     /**
      * Constructor.
      *
-     * @param threadPoolSize the thread pool size.
+     * @param cause the wrapped exception.
      */
-    ThreadPoolRunner(final int threadPoolSize) {
+    public InvocationException(@Nullable final Throwable cause) {
 
-        super(Executors.newScheduledThreadPool(threadPoolSize));
+        super(cause);
     }
 }

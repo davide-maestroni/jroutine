@@ -19,7 +19,7 @@ import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.OutputConsumer;
 import com.bmd.jrt.channel.ParameterChannel;
-import com.bmd.jrt.common.RoutineInterruptedException;
+import com.bmd.jrt.common.InvocationInterruptedException;
 import com.bmd.jrt.invocation.Invocation;
 import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.routine.DefaultExecution.InputIterator;
@@ -485,7 +485,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
         } catch (final InterruptedException e) {
 
-            RoutineInterruptedException.interrupt(e);
+            throw InvocationInterruptedException.interrupt(e);
         }
     }
 

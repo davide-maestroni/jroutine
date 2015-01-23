@@ -31,29 +31,29 @@ public class ExceptionTest extends TestCase {
 
     public void testRoutineException() {
 
-        assertThat(new RoutineException(new NullPointerException())).isExactlyInstanceOf(
-                RoutineException.class);
-        assertThat(new RoutineException(new NullPointerException()).getCause()).isExactlyInstanceOf(
+        assertThat(new InvocationException(new NullPointerException())).isExactlyInstanceOf(
+                InvocationException.class);
+        assertThat(
+                new InvocationException(new NullPointerException()).getCause()).isExactlyInstanceOf(
                 NullPointerException.class);
-        assertThat(new RoutineException(null)).hasNoCause();
+        assertThat(new InvocationException(null)).hasNoCause();
     }
 
     public void testRoutineInterruptedException() {
 
-        assertThat(new RoutineInterruptedException(new InterruptedException())).isExactlyInstanceOf(
-                RoutineInterruptedException.class);
-        assertThat(new RoutineInterruptedException(
+        assertThat(
+                new InvocationInterruptedException(new InterruptedException())).isExactlyInstanceOf(
+                InvocationInterruptedException.class);
+        assertThat(new InvocationInterruptedException(
                 new InterruptedException()).getCause()).isExactlyInstanceOf(
                 InterruptedException.class);
-        assertThat(new RoutineInterruptedException(null)).hasNoCause();
+        assertThat(new InvocationInterruptedException(null)).hasNoCause();
 
         try {
 
-            RoutineInterruptedException.interrupt(new InterruptedException());
+            throw InvocationInterruptedException.interrupt(new InterruptedException());
 
-            fail();
-
-        } catch (final RoutineInterruptedException ignored) {
+        } catch (final InvocationInterruptedException ignored) {
 
         }
     }

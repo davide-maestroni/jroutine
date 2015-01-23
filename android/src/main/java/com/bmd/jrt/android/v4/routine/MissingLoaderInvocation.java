@@ -13,7 +13,7 @@
  */
 package com.bmd.jrt.android.v4.routine;
 
-import com.bmd.jrt.android.builder.RoutineMissingException;
+import com.bmd.jrt.android.builder.InvocationMissingException;
 import com.bmd.jrt.android.invocation.AndroidTemplateInvocation;
 import com.bmd.jrt.channel.ResultChannel;
 
@@ -32,6 +32,6 @@ class MissingLoaderInvocation<INPUT, OUTPUT> extends AndroidTemplateInvocation<I
     @Override
     public void onResult(@Nonnull final ResultChannel<OUTPUT> result) {
 
-        result.abort(new RoutineMissingException());
+        result.abort(new InvocationMissingException());
     }
 }

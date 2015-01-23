@@ -86,8 +86,8 @@ public interface Routine<INPUT, OUTPUT> {
      * Short for <b><code>invokeAsync().result()</code></b>.
      *
      * @return the output channel.
-     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
-     *                                             exception.
+     * @throws com.bmd.jrt.common.InvocationException if the execution has been aborted with an
+     *                                                exception.
      */
     @Nonnull
     public OutputChannel<OUTPUT> callAsync();
@@ -97,8 +97,8 @@ public interface Routine<INPUT, OUTPUT> {
      *
      * @param input the input.
      * @return the output channel.
-     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
-     *                                             exception.
+     * @throws com.bmd.jrt.common.InvocationException if the execution has been aborted with an
+     *                                                exception.
      */
     @Nonnull
     public OutputChannel<OUTPUT> callAsync(@Nullable INPUT input);
@@ -108,8 +108,8 @@ public interface Routine<INPUT, OUTPUT> {
      *
      * @param inputs the input data.
      * @return the output channel.
-     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
-     *                                             exception.
+     * @throws com.bmd.jrt.common.InvocationException if the execution has been aborted with an
+     *                                                exception.
      */
     @Nonnull
     public OutputChannel<OUTPUT> callAsync(@Nullable INPUT... inputs);
@@ -119,8 +119,8 @@ public interface Routine<INPUT, OUTPUT> {
      *
      * @param inputs the iterable returning the input data.
      * @return the output channel.
-     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
-     *                                             exception.
+     * @throws com.bmd.jrt.common.InvocationException if the execution has been aborted with an
+     *                                                exception.
      */
     @Nonnull
     public OutputChannel<OUTPUT> callAsync(@Nullable Iterable<? extends INPUT> inputs);
@@ -130,8 +130,8 @@ public interface Routine<INPUT, OUTPUT> {
      *
      * @param inputs the output channel returning the input data.
      * @return the output channel.
-     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
-     *                                             exception.
+     * @throws com.bmd.jrt.common.InvocationException if the execution has been aborted with an
+     *                                                exception.
      */
     @Nonnull
     public OutputChannel<OUTPUT> callAsync(@Nullable OutputChannel<INPUT> inputs);
@@ -142,8 +142,8 @@ public interface Routine<INPUT, OUTPUT> {
      * This method actually makes little sense, thought it is here for completeness.
      *
      * @return the output channel.
-     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
-     *                                             exception.
+     * @throws com.bmd.jrt.common.InvocationException if the execution has been aborted with an
+     *                                                exception.
      */
     @Nonnull
     public OutputChannel<OUTPUT> callParallel();
@@ -153,8 +153,8 @@ public interface Routine<INPUT, OUTPUT> {
      *
      * @param input the input.
      * @return the output channel.
-     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
-     *                                             exception.
+     * @throws com.bmd.jrt.common.InvocationException if the execution has been aborted with an
+     *                                                exception.
      */
     @Nonnull
     public OutputChannel<OUTPUT> callParallel(@Nullable INPUT input);
@@ -164,8 +164,8 @@ public interface Routine<INPUT, OUTPUT> {
      *
      * @param inputs the iterable returning the input data.
      * @return the output channel.
-     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
-     *                                             exception.
+     * @throws com.bmd.jrt.common.InvocationException if the execution has been aborted with an
+     *                                                exception.
      */
     @Nonnull
     public OutputChannel<OUTPUT> callParallel(@Nullable INPUT... inputs);
@@ -175,8 +175,8 @@ public interface Routine<INPUT, OUTPUT> {
      *
      * @param inputs the output channel returning the input data.
      * @return the output channel.
-     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
-     *                                             exception.
+     * @throws com.bmd.jrt.common.InvocationException if the execution has been aborted with an
+     *                                                exception.
      */
     @Nonnull
     public OutputChannel<OUTPUT> callParallel(@Nullable Iterable<? extends INPUT> inputs);
@@ -186,8 +186,8 @@ public interface Routine<INPUT, OUTPUT> {
      *
      * @param inputs the output channel returning the input data.
      * @return the output channel.
-     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
-     *                                             exception.
+     * @throws com.bmd.jrt.common.InvocationException if the execution has been aborted with an
+     *                                                exception.
      */
     @Nonnull
     public OutputChannel<OUTPUT> callParallel(@Nullable OutputChannel<INPUT> inputs);
@@ -196,8 +196,8 @@ public interface Routine<INPUT, OUTPUT> {
      * Short for <b><code>invokeSync().result()</code></b>.
      *
      * @return the output channel.
-     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
-     *                                             exception.
+     * @throws com.bmd.jrt.common.InvocationException if the execution has been aborted with an
+     *                                                exception.
      */
     @Nonnull
     public OutputChannel<OUTPUT> callSync();
@@ -207,8 +207,8 @@ public interface Routine<INPUT, OUTPUT> {
      *
      * @param input the input.
      * @return the output channel.
-     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
-     *                                             exception.
+     * @throws com.bmd.jrt.common.InvocationException if the execution has been aborted with an
+     *                                                exception.
      */
     @Nonnull
     public OutputChannel<OUTPUT> callSync(@Nullable INPUT input);
@@ -218,8 +218,8 @@ public interface Routine<INPUT, OUTPUT> {
      *
      * @param inputs the input data.
      * @return the output channel.
-     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
-     *                                             exception.
+     * @throws com.bmd.jrt.common.InvocationException if the execution has been aborted with an
+     *                                                exception.
      */
     @Nonnull
     public OutputChannel<OUTPUT> callSync(@Nullable INPUT... inputs);
@@ -229,8 +229,8 @@ public interface Routine<INPUT, OUTPUT> {
      *
      * @param inputs the iterable returning the input data.
      * @return the output channel.
-     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
-     *                                             exception.
+     * @throws com.bmd.jrt.common.InvocationException if the execution has been aborted with an
+     *                                                exception.
      */
     @Nonnull
     public OutputChannel<OUTPUT> callSync(@Nullable Iterable<? extends INPUT> inputs);
@@ -240,8 +240,8 @@ public interface Routine<INPUT, OUTPUT> {
      *
      * @param inputs the output channel returning the input data.
      * @return the output channel.
-     * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted with an
-     *                                             exception.
+     * @throws com.bmd.jrt.common.InvocationException if the execution has been aborted with an
+     *                                                exception.
      */
     @Nonnull
     public OutputChannel<OUTPUT> callSync(@Nullable OutputChannel<INPUT> inputs);

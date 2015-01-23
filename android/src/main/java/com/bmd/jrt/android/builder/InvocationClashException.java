@@ -20,7 +20,7 @@ import com.bmd.jrt.common.RoutineException;
  * <p/>
  * Created by davide on 12/14/14.
  */
-public class RoutineClashException extends RoutineException {
+public class InvocationClashException extends RoutineException {
 
     private final int mId;
 
@@ -29,9 +29,7 @@ public class RoutineClashException extends RoutineException {
      *
      * @param id the invocation ID.
      */
-    public RoutineClashException(final int id) {
-
-        super(null);
+    public InvocationClashException(final int id) {
 
         mId = id;
     }
@@ -44,11 +42,5 @@ public class RoutineClashException extends RoutineException {
     public int getId() {
 
         return mId;
-    }
-
-    @Override
-    public boolean needsUnwrap() {
-
-        return false;
     }
 }

@@ -73,7 +73,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(1);
+        final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
                         .withId(0)
@@ -102,7 +102,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(1);
+        final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
                         .withId(0)
@@ -131,7 +131,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(1);
+        final TimeDuration timeout = TimeDuration.seconds(10);
         final Data data1 = new Data();
         final OutputChannel<Data> result1 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Abort.class))
@@ -182,7 +182,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(1);
+        final TimeDuration timeout = TimeDuration.seconds(10);
         final Data data1 = new Data();
         final OutputChannel<Data> result1 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class))
@@ -245,7 +245,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(1);
+        final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
                         .buildRoutine();
@@ -263,7 +263,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(1);
+        final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
                         .withId(0)
@@ -283,7 +283,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(1);
+        final TimeDuration timeout = TimeDuration.seconds(10);
         final OutputChannel<String> channel = JRoutine.onActivity(getActivity(), 0).buildChannel();
 
         try {
@@ -304,7 +304,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(1);
+        final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
                         .withId(0)
@@ -333,7 +333,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(1);
+        final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
                         .withId(0)
@@ -362,7 +362,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(1);
+        final TimeDuration timeout = TimeDuration.seconds(10);
         final Data data1 = new Data();
         final OutputChannel<Data> result1 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class))
@@ -435,7 +435,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(1);
+        final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
                         .withId(0)
@@ -470,7 +470,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(1);
+        final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine1 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
                         .buildRoutine();
@@ -509,7 +509,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(1);
+        final TimeDuration timeout = TimeDuration.seconds(10);
         final Data data1 = new Data();
         final Routine<Data, Data> routine1 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class)).buildRoutine();
@@ -547,7 +547,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(1);
+        final TimeDuration timeout = TimeDuration.seconds(10);
         final Data data1 = new Data();
         final Routine<Data, Data> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class)).buildRoutine();
@@ -565,7 +565,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(1);
+        final TimeDuration timeout = TimeDuration.seconds(10);
         final Data data1 = new Data();
         final OutputChannel<Data> result1 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class))
@@ -749,7 +749,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(1);
+        final TimeDuration timeout = TimeDuration.seconds(10);
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
@@ -781,7 +781,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(1);
+        final TimeDuration timeout = TimeDuration.seconds(10);
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
@@ -804,7 +804,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(1);
+        final TimeDuration timeout = TimeDuration.seconds(10);
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
@@ -824,7 +824,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(1);
+        final TimeDuration timeout = TimeDuration.seconds(10);
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
@@ -847,7 +847,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(1);
+        final TimeDuration timeout = TimeDuration.seconds(10);
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
@@ -871,7 +871,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(1);
+        final TimeDuration timeout = TimeDuration.seconds(10);
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
@@ -903,7 +903,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(1);
+        final TimeDuration timeout = TimeDuration.seconds(10);
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
@@ -935,7 +935,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(1);
+        final TimeDuration timeout = TimeDuration.seconds(10);
         final Data data1 = new Data();
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
@@ -956,7 +956,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(1);
+        final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine1 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(StringTunnelInvocation.class))
                         .syncRunner(RunnerType.QUEUED)

@@ -59,7 +59,7 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
 
     public void testAbort() {
 
-        final TimeDuration timeout = TimeDuration.seconds(1);
+        final TimeDuration timeout = TimeDuration.seconds(10);
         final Data data = new Data();
         final Routine<Data, Data> routine1 =
                 JRoutine.onService(getActivity(), ClassToken.tokenOf(Delay.class))
@@ -100,7 +100,7 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
 
     public void testInvocations() throws InterruptedException {
 
-        final TimeDuration timeout = TimeDuration.seconds(1);
+        final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine1 =
                 JRoutine.onService(getActivity(), ClassToken.tokenOf(StringTunnelInvocation.class))
                         .dispatchTo(Looper.getMainLooper())
@@ -176,7 +176,7 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
 
     public void testParcelable() {
 
-        final TimeDuration timeout = TimeDuration.seconds(1);
+        final TimeDuration timeout = TimeDuration.seconds(10);
         final MyParcelable p = new MyParcelable(33, -17);
         final Routine<MyParcelable, MyParcelable> routine =
                 JRoutine.onService(getActivity(), ClassToken.tokenOf(MyParcelableInvocation.class))
@@ -187,7 +187,7 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
 
     public void testService() {
 
-        final TimeDuration timeout = TimeDuration.seconds(1);
+        final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine =
                 JRoutine.onService(getActivity(), ClassToken.tokenOf(StringTunnelInvocation.class))
                         .dispatchTo(Looper.getMainLooper())
@@ -329,8 +329,6 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
             dest.writeInt(mX);
             dest.writeInt(mY);
         }
-
-
     }
 
     private static class MyParcelableInvocation extends AndroidTunnelInvocation<MyParcelable> {

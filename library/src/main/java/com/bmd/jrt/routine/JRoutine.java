@@ -15,7 +15,6 @@ package com.bmd.jrt.routine;
 
 import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.invocation.Invocation;
-import com.bmd.jrt.invocation.TunnelInvocation;
 
 import java.lang.ref.WeakReference;
 
@@ -114,7 +113,7 @@ import javax.annotation.Nonnull;
  * <pre>
  *     <code>
  *
- *         final Tunnel&lt;Result&gt; tunnel = JRoutine.io().&lt;Result&gt;buildTunnel();
+ *         final Tunnel&lt;Result&gt; tunnel = JRoutine.on().&lt;Result&gt;buildTunnel();
  *
  *         new Thread() {
  *
@@ -156,24 +155,9 @@ public class JRoutine {
      * @return the tunnel builder instance.
      */
     @Nonnull
-    public static TunnelBuilder io() {
-
-        //TODO: on()???
+    public static TunnelBuilder on() {
 
         return new TunnelBuilder();
-    }
-
-    /**
-     * Returns a builder for a routine simply passing on the input data.
-     *
-     * @param <DATA> the data type.
-     * @return the routine builder instance.
-     */
-    @Nonnull
-    public static <DATA> InvocationRoutineBuilder<DATA, DATA> on() {
-
-        return new InvocationRoutineBuilder<DATA, DATA>(
-                new ClassToken<TunnelInvocation<DATA>>() {});
     }
 
     /**

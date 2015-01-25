@@ -220,6 +220,30 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
     @Nonnull
     @Override
+    public ClassRoutineBuilder onResultTimeout(@Nonnull final TimeoutAction action) {
+
+        mBuilder.onResultTimeout(action);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public ClassRoutineBuilder resultTimeout(final long timeout, @Nonnull final TimeUnit timeUnit) {
+
+        mBuilder.resultTimeout(timeout, timeUnit);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public ClassRoutineBuilder resultTimeout(@Nullable final TimeDuration timeout) {
+
+        mBuilder.resultTimeout(timeout);
+        return this;
+    }
+
+    @Nonnull
+    @Override
     public ClassRoutineBuilder runBy(@Nullable final Runner runner) {
 
         mBuilder.runBy(runner);

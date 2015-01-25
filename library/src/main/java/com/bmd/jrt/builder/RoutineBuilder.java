@@ -136,6 +136,42 @@ public interface RoutineBuilder {
     public RoutineBuilder maxRunning(int maxRunningInstances);
 
     /**
+     * TODO
+     *
+     * @param action
+     * @return
+     * @throws NullPointerException if the specified action type is null.
+     */
+    @Nonnull
+    public RoutineBuilder onResultTimeout(@Nonnull TimeoutAction action);
+
+    /**
+     * Sets the timeout for an invocation instance to produce a result.
+     * <p/>
+     * By default the timeout is set to 0 to avoid unexpected deadlocks.
+     *
+     * @param timeout  the timeout.
+     * @param timeUnit the timeout time unit.
+     * @return this builder.
+     * @throws NullPointerException     if the specified time unit is null.
+     * @throws IllegalArgumentException if the specified timeout is negative.
+     */
+    @Nonnull
+    public RoutineBuilder resultTimeout(long timeout, @Nonnull TimeUnit timeUnit);
+
+    /**
+     * Sets the timeout for an invocation instance to produce a result. A null value means that
+     * it is up to the framework to chose a default duration.
+     * <p/>
+     * By default the timeout is set to 0 to avoid unexpected deadlocks.
+     *
+     * @param timeout the timeout.
+     * @return this builder.
+     */
+    @Nonnull
+    public RoutineBuilder resultTimeout(@Nullable TimeDuration timeout);
+
+    /**
      * Sets the asynchronous runner instance. A null value means that it is up to the framework
      * to chose a default instance.
      *
@@ -177,6 +213,30 @@ public interface RoutineBuilder {
         /**
          * Default runner.<br/>
          * This value is used to indicated that the choice of the runner is left to the framework.
+         */
+        DEFAULT
+    }
+
+    /**
+     * Enumeration indicating the action to take on output channel timeout.
+     */
+    public enum TimeoutAction {
+
+        /**
+         * Deadlock.<br/>
+         * If no result is available after the specified timeout, the called method will throw a
+         * {@link com.bmd.jrt.channel.ReadDeadlockException}.
+         */
+        DEADLOCK,
+        /**
+         * Break execution.<br/>
+         * If no result is available after the specified timeout, the called method will its
+         * execution and exit immediately.
+         */
+        EXIT,
+        /**
+         * Default action.<br/>
+         * This value is used to indicated that the choice of the action is left to the framework.
          */
         DEFAULT
     }

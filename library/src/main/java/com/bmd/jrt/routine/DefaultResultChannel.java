@@ -14,6 +14,7 @@
 package com.bmd.jrt.routine;
 
 import com.bmd.jrt.builder.OutputDeadlockException;
+import com.bmd.jrt.builder.RoutineBuilder.TimeoutAction;
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.channel.OutputChannel;
@@ -73,7 +74,11 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
     private final TimeDuration mOutputTimeout;
 
+    private final TimeDuration mResultTimeout;
+
     private final Runner mRunner;
+
+    private final TimeoutAction mTimeoutAction;
 
     private Throwable mAbortException;
 
@@ -125,6 +130,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         mLogger = logger.subContextLogger(this);
         mHandler = handler;
         mRunner = runner;
+        mResultTimeout = configuration.getResultTimeoutOr(ZERO);
+        mTimeoutAction = configuration.getResultTimeoutActionOr(TimeoutAction.DEADLOCK);
         mMaxOutput = configuration.getOutputSizeOr(Integer.MAX_VALUE);
         mOutputTimeout = configuration.getOutputTimeoutOr(ZERO);
 
@@ -427,7 +434,16 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     @Nonnull
     OutputChannel<OUTPUT> getOutput() {
 
-        return new DefaultOutputChannel();
+        final DefaultOutputChannel outputChannel = new DefaultOutputChannel();
+
+        outputChannel.afterMax(mResultTimeout);
+
+        if (mTimeoutAction == TimeoutAction.EXIT) {
+
+            outputChannel.eventuallyExit();
+        }
+
+        return outputChannel;
     }
 
     private boolean abort(@Nullable final Throwable throwable, final boolean isImmediate) {

@@ -79,7 +79,7 @@ public class RoutineProcessorTest extends TestCase {
         final ArrayList<String> list = new ArrayList<String>();
         assertThat(testWrapper.getList(Arrays.asList(list))).containsExactly(list);
 
-        final Tunnel<Integer> tunnel = JRoutine.io().buildTunnel();
+        final Tunnel<Integer> tunnel = JRoutine.on().buildTunnel();
         tunnel.input().pass(3).close();
         assertThat(testWrapper.getString(tunnel.output())).isEqualTo("3");
     }

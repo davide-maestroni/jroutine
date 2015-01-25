@@ -29,7 +29,6 @@ import com.bmd.jrt.common.InvocationException;
 import com.bmd.jrt.invocation.TunnelInvocation;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.log.NullLog;
-import com.bmd.jrt.runner.RunnerDecorator;
 import com.bmd.jrt.runner.Runners;
 import com.bmd.jrt.time.TimeDuration;
 
@@ -735,7 +734,7 @@ public class JRoutineTest extends TestCase {
         assertThat(squareAsync.computeParallel3(Arrays.asList(1, 2, 3)).afterMax(timeout).readAll())
                 .contains(1, 4, 9);
 
-        final Tunnel<Integer> tunnel = JRoutine.io().buildTunnel();
+        final Tunnel<Integer> tunnel = JRoutine.on().buildTunnel();
 
         tunnel.input().pass(1, 2, 3).close();
         assertThat(
@@ -750,33 +749,35 @@ public class JRoutineTest extends TestCase {
 
     public void testRoutineBuilder() {
 
-        final Routine<String, String> routine = JRoutine.<String>on()
-                                                        .syncRunner(RunnerType.SEQUENTIAL)
-                                                        .runBy(Runners.poolRunner())
-                                                        .maxRetained(0)
-                                                        .maxRunning(1)
-                                                        .availableTimeout(1, TimeUnit.SECONDS)
-                                                        .inputSize(2)
-                                                        .inputTimeout(1, TimeUnit.SECONDS)
-                                                        .outputSize(2)
-                                                        .outputTimeout(1, TimeUnit.SECONDS)
-                                                        .outputOrder(DataOrder.INSERTION)
-                                                        .buildRoutine();
+        final Routine<String, String> routine =
+                JRoutine.on(new ClassToken<TunnelInvocation<String>>() {})
+                        .syncRunner(RunnerType.SEQUENTIAL)
+                        .runBy(Runners.poolRunner())
+                        .maxRetained(0)
+                        .maxRunning(1)
+                        .availableTimeout(1, TimeUnit.SECONDS)
+                        .inputSize(2)
+                        .inputTimeout(1, TimeUnit.SECONDS)
+                        .outputSize(2)
+                        .outputTimeout(1, TimeUnit.SECONDS)
+                        .outputOrder(DataOrder.INSERTION)
+                        .buildRoutine();
 
         assertThat(routine.callSync("test1", "test2").readAll()).containsExactly("test1", "test2");
 
-        final Routine<String, String> routine1 = JRoutine.<String>on()
-                                                         .syncRunner(RunnerType.QUEUED)
-                                                         .runBy(Runners.poolRunner())
-                                                         .maxRetained(0)
-                                                         .maxRunning(1)
-                                                         .availableTimeout(TimeDuration.ZERO)
-                                                         .inputSize(2)
-                                                         .inputTimeout(TimeDuration.ZERO)
-                                                         .outputSize(2)
-                                                         .outputTimeout(TimeDuration.ZERO)
-                                                         .outputOrder(DataOrder.INSERTION)
-                                                         .buildRoutine();
+        final Routine<String, String> routine1 =
+                JRoutine.on(new ClassToken<TunnelInvocation<String>>() {})
+                        .syncRunner(RunnerType.QUEUED)
+                        .runBy(Runners.poolRunner())
+                        .maxRetained(0)
+                        .maxRunning(1)
+                        .availableTimeout(TimeDuration.ZERO)
+                        .inputSize(2)
+                        .inputTimeout(TimeDuration.ZERO)
+                        .outputSize(2)
+                        .outputTimeout(TimeDuration.ZERO)
+                        .outputOrder(DataOrder.INSERTION)
+                        .buildRoutine();
 
         assertThat(routine1.callSync("test1", "test2").readAll()).containsExactly("test1", "test2");
     }
@@ -786,8 +787,10 @@ public class JRoutineTest extends TestCase {
         final RoutineConfiguration configuration =
                 new RoutineConfigurationBuilder().runBy(Runners.queuedRunner())
                                                  .buildConfiguration();
-        final Routine<Object, Object> routine =
-                JRoutine.on().runBy(Runners.sharedRunner()).apply(configuration).buildRoutine();
+        final Routine<Object, Object> routine = JRoutine.on(TunnelInvocation.tokenOf())
+                                                        .runBy(Runners.sharedRunner())
+                                                        .apply(configuration)
+                                                        .buildRoutine();
 
         final OutputChannel<Object> channel =
                 routine.invokeAsync().after(TimeDuration.millis(200)).pass("test").result();
@@ -854,7 +857,7 @@ public class JRoutineTest extends TestCase {
     public void testTunnelBuilder() {
 
         final TimeDuration timeout = seconds(1);
-        final Tunnel<Object> tunnel = JRoutine.io()
+        final Tunnel<Object> tunnel = JRoutine.on()
                                               .dataOrder(DataOrder.INSERTION)
                                               .delayRunner(Runners.sharedRunner())
                                               .maxSize(1)
@@ -866,13 +869,13 @@ public class JRoutineTest extends TestCase {
         tunnel.input().pass(-77L);
         assertThat(tunnel.output().afterMax(timeout).readNext()).isEqualTo(-77L);
 
-        final Tunnel<Object> tunnel1 = JRoutine.io().buildTunnel();
+        final Tunnel<Object> tunnel1 = JRoutine.on().buildTunnel();
         final TunnelInput<Object> input1 = tunnel1.input();
 
         input1.after(TimeDuration.millis(200)).pass(23).now().pass(-77L).close();
         assertThat(tunnel1.output().afterMax(timeout).readAll()).containsOnly(23, -77L);
 
-        final Tunnel<Object> tunnel2 = JRoutine.io().dataOrder(DataOrder.INSERTION).buildTunnel();
+        final Tunnel<Object> tunnel2 = JRoutine.on().dataOrder(DataOrder.INSERTION).buildTunnel();
         final TunnelInput<Object> input2 = tunnel2.input();
 
         input2.after(TimeDuration.millis(200)).pass(23).now().pass(-77L).close();
@@ -884,7 +887,7 @@ public class JRoutineTest extends TestCase {
         final RoutineConfiguration configuration =
                 new RoutineConfigurationBuilder().runBy(Runners.queuedRunner())
                                                  .buildConfiguration();
-        final Tunnel<Object> tunnel = JRoutine.io()
+        final Tunnel<Object> tunnel = JRoutine.on()
                                               .delayRunner(Runners.sharedRunner())
                                               .apply(configuration)
                                               .buildTunnel();
@@ -969,14 +972,6 @@ public class JRoutineTest extends TestCase {
         public static int getTwo() {
 
             return 2;
-        }
-    }
-
-    private static class MyRunner extends RunnerDecorator {
-
-        public MyRunner() {
-
-            super(Runners.queuedRunner());
         }
     }
 

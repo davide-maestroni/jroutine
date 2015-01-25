@@ -14,6 +14,7 @@
 package com.bmd.jrt.invocation;
 
 import com.bmd.jrt.channel.ResultChannel;
+import com.bmd.jrt.common.ClassToken;
 
 import javax.annotation.Nonnull;
 
@@ -25,6 +26,15 @@ import javax.annotation.Nonnull;
  * @param <DATA> the data type.
  */
 public class TunnelInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
+
+    /**
+     * @param <DATA>
+     * @return
+     */
+    public static <DATA> ClassToken<TunnelInvocation<DATA>> tokenOf() {
+
+        return new ClassToken<TunnelInvocation<DATA>>() {};
+    }
 
     @Override
     public void onInput(final DATA input, @Nonnull final ResultChannel<DATA> result) {

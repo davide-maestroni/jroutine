@@ -25,7 +25,8 @@ Parallel programming on the go.
 
                 final Double rms =
                         meanRoutine.callAsync(squareRoutine.callParallel(parseRoutine.callParallel(args)))
-                                  .readFirst();
+                                   .eventually()
+                                   .readNext();
 
                 System.out.println(rms);
 
@@ -110,26 +111,26 @@ Parallel programming on the go.
                 final Routine&lt;List&lt;Integer&gt;, Double&gt; meanRoutine = on(Main.class).annotatedMethod(MEAN);
 
                 final Double rms = meanRoutine.callAsync(
-                        squareRoutine.callParallel(parseRoutine.callParallel(args)).readAll()).readFirst();
+                        squareRoutine.callParallel(parseRoutine.callParallel(args)).eventually().readAll()).eventually().readNext();
 
                 System.out.println(rms);
 
                 System.exit(0);
             }
 
-            &commat;Async(PARSE)
+            &commat;AsyncName(PARSE)
             private static int parseArg(final String arg) {
 
                 return Integer.parseInt(arg);
             }
 
-            &commat;Async(SQUARE)
+            &commat;AsyncName(SQUARE)
             private static int square(final int value) {
 
                 return value * value;
             }
 
-            &commat;Async(MEAN)
+            &commat;AsyncName(MEAN)
             private static double squareRootMean(final List&lt;Integer&gt; values) {
 
                 if (values.isEmpty()) {
@@ -195,7 +196,7 @@ Parallel programming on the go.
                 return Math.sqrt(sum) / values.length;
             }
 
-            &commat;Async(lockName = Async.NULL_LOCK)
+            &commat;Async(lockName = Async.NULL_LOCK, resultTimeout = Long.MAX_VALUE)
             private interface AsyncMain {
 
                 &commat;AsyncType(int.class)
@@ -256,7 +257,7 @@ Parallel programming on the go.
             }
 
             &commat;AsyncWrap(Main.class)
-            &commat;Async(lockName = Async.NULL_LOCK)
+            &commat;Async(lockName = Async.NULL_LOCK, resultTimeout = Long.MAX_VALUE)
             public interface AsyncMain {
 
                 &commat;AsyncType(int.class)

@@ -482,7 +482,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
 
             final RoutineLoader<?, OUTPUT> internalLoader = mLoader;
             final ArrayList<TunnelInput<OUTPUT>> channels = mNewChannels;
-            final Tunnel<OUTPUT> tunnel = JRoutine.io()
+            final Tunnel<OUTPUT> tunnel = JRoutine.on()
                                                   .maxSize(Integer.MAX_VALUE)
                                                   .bufferTimeout(TimeDuration.ZERO)
                                                   .loggedWith(logger.getLog())

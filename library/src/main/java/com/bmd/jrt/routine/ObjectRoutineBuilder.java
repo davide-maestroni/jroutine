@@ -14,7 +14,6 @@
 package com.bmd.jrt.routine;
 
 import com.bmd.jrt.annotation.Async;
-import com.bmd.jrt.annotation.Async.TimeoutAction;
 import com.bmd.jrt.annotation.AsyncName;
 import com.bmd.jrt.annotation.AsyncType;
 import com.bmd.jrt.annotation.ParallelType;
@@ -70,10 +69,6 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     private static final CacheHashMap<Object, HashMap<Method, Method>> sMethodCache =
             new CacheHashMap<Object, HashMap<Method, Method>>();
 
-    private TimeDuration mResultTimeout = null;
-
-    private TimeoutAction mTimeoutAction = TimeoutAction.DEFAULT;
-
     /**
      * Constructor.
      *
@@ -103,7 +98,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     private static Object callRoutine(@Nonnull final Routine<Object, Object> routine,
             @Nonnull final Method method, @Nonnull final ParamType paramType,
             @Nonnull final ResultType resultType, @Nonnull final Object[] args,
-            @Nonnull final TimeDuration outputTimeout, @Nullable final TimeoutAction outputAction) {
+            @Nullable final TimeDuration outputTimeout,
+            @Nullable final TimeoutAction outputAction) {
 
         final Class<?> returnType = method.getReturnType();
         final OutputChannel<Object> outputChannel;
@@ -170,7 +166,10 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
             outputChannel = routine.callAsync(args);
         }
 
-        outputChannel.afterMax(outputTimeout);
+        if (outputTimeout != null) {
+
+            outputChannel.afterMax(outputTimeout);
+        }
 
         if (outputAction == TimeoutAction.EXIT) {
 
@@ -267,6 +266,31 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     public ObjectRoutineBuilder maxRunning(final int maxRunningInstances) {
 
         super.maxRunning(maxRunningInstances);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public ObjectRoutineBuilder onResultTimeout(@Nonnull final TimeoutAction action) {
+
+        super.onResultTimeout(action);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public ObjectRoutineBuilder resultTimeout(final long timeout,
+            @Nonnull final TimeUnit timeUnit) {
+
+        super.resultTimeout(timeout, timeUnit);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public ObjectRoutineBuilder resultTimeout(@Nullable final TimeDuration timeout) {
+
+        super.resultTimeout(timeout);
         return this;
     }
 
@@ -469,67 +493,6 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
         return itf.cast(buildWrapper(itf.getRawClass()));
     }
 
-    /**
-     * Tells the builder to create a routine throwing a
-     * {@link com.bmd.jrt.channel.ReadDeadlockException} in case no result is available before the
-     * result timeout has elapsed.
-     *
-     * @return this builder.
-     */
-    @Nonnull
-    public ObjectRoutineBuilder eventuallyDeadlock() {
-
-        mTimeoutAction = TimeoutAction.DEADLOCK;
-        return this;
-    }
-
-    /**
-     * Tells the builder to create a routine breaking the execution in case no result is available
-     * before the result timeout has elapsed.
-     *
-     * @return this builder.
-     */
-    @Nonnull
-    public ObjectRoutineBuilder eventuallyExit() {
-
-        mTimeoutAction = TimeoutAction.EXIT;
-        return this;
-    }
-
-    /**
-     * Sets the timeout for an invocation instance to produce a result.
-     * <p/>
-     * By default the timeout is set to 0 to avoid unexpected deadlocks.
-     *
-     * @param timeout  the timeout.
-     * @param timeUnit the timeout time unit.
-     * @return this builder.
-     * @throws NullPointerException     if the specified time unit is null.
-     * @throws IllegalArgumentException if the specified timeout is negative.
-     */
-    @Nonnull
-    public ObjectRoutineBuilder resultTimeout(final long timeout,
-            @Nonnull final TimeUnit timeUnit) {
-
-        return resultTimeout(fromUnit(timeout, timeUnit));
-    }
-
-    /**
-     * Sets the timeout for an invocation instance to produce a result. A null value means that
-     * it is up to the framework to chose a default duration.
-     * <p/>
-     * By default the timeout is set to 0 to avoid unexpected deadlocks.
-     *
-     * @param timeout the timeout.
-     * @return this builder.
-     */
-    @Nonnull
-    public ObjectRoutineBuilder resultTimeout(@Nonnull final TimeDuration timeout) {
-
-        mResultTimeout = timeout;
-        return this;
-    }
-
     @Nonnull
     private Method getTargetMethod(@Nonnull final Method method,
             @Nonnull final Class<?>[] targetParameterTypes) throws NoSuchMethodException {
@@ -676,9 +639,9 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                 lockName = classAnnotation.lockName();
             }
 
-            TimeDuration outputTimeout = mResultTimeout;
+            TimeDuration outputTimeout = null;
 
-            if ((outputTimeout == null) && (classAnnotation != null)) {
+            if (classAnnotation != null) {
 
                 final long resultTimeout = classAnnotation.resultTimeout();
 
@@ -688,9 +651,9 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                 }
             }
 
-            TimeoutAction outputAction = mTimeoutAction;
+            TimeoutAction outputAction = TimeoutAction.DEFAULT;
 
-            if ((outputAction == TimeoutAction.DEFAULT) && (classAnnotation != null)) {
+            if (classAnnotation != null) {
 
                 outputAction = classAnnotation.eventually();
             }
@@ -850,11 +813,6 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                 }
             }
 
-            if (outputTimeout == null) {
-
-                outputTimeout = ZERO;
-            }
-
             TimeoutAction outputAction = mOutputAction;
 
             if ((outputAction == TimeoutAction.DEFAULT) && (methodAnnotation != null)) {
@@ -932,9 +890,9 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                 lockName = classAnnotation.lockName();
             }
 
-            TimeDuration outputTimeout = mResultTimeout;
+            TimeDuration outputTimeout = null;
 
-            if ((outputTimeout == null) && (classAnnotation != null)) {
+            if (classAnnotation != null) {
 
                 final long resultTimeout = classAnnotation.resultTimeout();
 
@@ -944,9 +902,9 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                 }
             }
 
-            TimeoutAction outputAction = mTimeoutAction;
+            TimeoutAction outputAction = TimeoutAction.DEFAULT;
 
-            if ((outputAction == TimeoutAction.DEFAULT) && (classAnnotation != null)) {
+            if (classAnnotation != null) {
 
                 outputAction = classAnnotation.eventually();
             }

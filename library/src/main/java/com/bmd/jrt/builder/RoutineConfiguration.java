@@ -14,6 +14,7 @@
 package com.bmd.jrt.builder;
 
 import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
+import com.bmd.jrt.builder.RoutineBuilder.TimeoutAction;
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
@@ -60,9 +61,13 @@ public class RoutineConfiguration {
 
     private final TimeDuration mOutputTimeout;
 
+    private final TimeDuration mResultTimeout;
+
     private final Runner mRunner;
 
     private final RunnerType mRunnerType;
+
+    private final TimeoutAction mTimeoutAction;
 
     /**
      * Constructor.
@@ -74,6 +79,8 @@ public class RoutineConfiguration {
      *                      positive number.
      * @param availTimeout  the maximum timeout while waiting for an invocation instance to be
      *                      available.
+     * @param resultTimeout
+     * @param actionType
      * @param inputMaxSize  the maximum number of buffered input data. Must be positive.
      * @param inputTimeout  the maximum timeout while waiting for an input to be passed to the
      *                      input channel.
@@ -88,6 +95,7 @@ public class RoutineConfiguration {
     @SuppressWarnings("ConstantConditions")
     RoutineConfiguration(@Nullable final Runner runner, @Nonnull final RunnerType runnerType,
             final int maxRunning, final int maxRetained, @Nullable final TimeDuration availTimeout,
+            @Nullable final TimeDuration resultTimeout, @Nonnull final TimeoutAction actionType,
             final int inputMaxSize, @Nullable final TimeDuration inputTimeout,
             final @Nonnull DataOrder inputOrder, final int outputMaxSize,
             @Nullable final TimeDuration outputTimeout, @Nonnull final DataOrder outputOrder,
@@ -108,6 +116,11 @@ public class RoutineConfiguration {
 
             throw new IllegalArgumentException(
                     "the maximum number of retained instances cannot be negative");
+        }
+
+        if (actionType == null) {
+
+            throw new NullPointerException("the result timeout action must not be null");
         }
 
         if ((inputMaxSize != DEFAULT) && (inputMaxSize <= 0)) {
@@ -140,6 +153,8 @@ public class RoutineConfiguration {
         mMaxRunning = maxRunning;
         mMaxRetained = maxRetained;
         mAvailTimeout = availTimeout;
+        mResultTimeout = resultTimeout;
+        mTimeoutAction = actionType;
         mInputMaxSize = inputMaxSize;
         mInputTimeout = inputTimeout;
         mInputOrder = inputOrder;
@@ -286,6 +301,30 @@ public class RoutineConfiguration {
     }
 
     /**
+     * TODO
+     *
+     * @param valueIfNotSet
+     * @return
+     */
+    public TimeoutAction getResultTimeoutActionOr(final TimeoutAction valueIfNotSet) {
+
+        final TimeoutAction timeoutAction = mTimeoutAction;
+        return (timeoutAction != TimeoutAction.DEFAULT) ? timeoutAction : valueIfNotSet;
+    }
+
+    /**
+     * TODO
+     *
+     * @param valueIfNotSet
+     * @return
+     */
+    public TimeDuration getResultTimeoutOr(final TimeDuration valueIfNotSet) {
+
+        final TimeDuration resultTimeout = mResultTimeout;
+        return (resultTimeout != null) ? resultTimeout : valueIfNotSet;
+    }
+
+    /**
      * Returns the runner used for asynchronous invocations (null by default).
      *
      * @param valueIfNotSet the default value if none was set.
@@ -324,8 +363,10 @@ public class RoutineConfiguration {
         result = 31 * result + mOutputMaxSize;
         result = 31 * result + mOutputOrder.hashCode();
         result = 31 * result + (mOutputTimeout != null ? mOutputTimeout.hashCode() : 0);
+        result = 31 * result + (mResultTimeout != null ? mResultTimeout.hashCode() : 0);
         result = 31 * result + (mRunner != null ? mRunner.hashCode() : 0);
         result = 31 * result + mRunnerType.hashCode();
+        result = 31 * result + mTimeoutAction.hashCode();
         return result;
     }
 
@@ -344,6 +385,7 @@ public class RoutineConfiguration {
         }
 
         final RoutineConfiguration that = (RoutineConfiguration) o;
+
         return mInputMaxSize == that.mInputMaxSize && mMaxRetained == that.mMaxRetained
                 && mMaxRunning == that.mMaxRunning && mOutputMaxSize == that.mOutputMaxSize && !(
                 mAvailTimeout != null ? !mAvailTimeout.equals(that.mAvailTimeout)
@@ -353,28 +395,31 @@ public class RoutineConfiguration {
                 : that.mLog != null) && mLogLevel == that.mLogLevel
                 && mOutputOrder == that.mOutputOrder && !(mOutputTimeout != null
                 ? !mOutputTimeout.equals(that.mOutputTimeout) : that.mOutputTimeout != null) && !(
-                mRunner != null ? !mRunner.equals(that.mRunner) : that.mRunner != null)
-                && mRunnerType == that.mRunnerType;
+                mResultTimeout != null ? !mResultTimeout.equals(that.mResultTimeout)
+                        : that.mResultTimeout != null) && !(mRunner != null ? !mRunner.equals(
+                that.mRunner) : that.mRunner != null) && mRunnerType == that.mRunnerType
+                && mTimeoutAction == that.mTimeoutAction;
     }
 
     @Override
     public String toString() {
 
-        // auto-generated code
         return "RoutineConfiguration{" +
-                "availTimeout=" + mAvailTimeout +
-                ", inputMaxSize=" + mInputMaxSize +
-                ", inputOrder=" + mInputOrder +
-                ", inputTimeout=" + mInputTimeout +
-                ", log=" + ((mLog != null) ? mLog.getClass().getCanonicalName() : null) +
-                ", logLevel=" + mLogLevel +
-                ", maxRetained=" + mMaxRetained +
-                ", maxRunning=" + mMaxRunning +
-                ", outputMaxSize=" + mOutputMaxSize +
-                ", outputOrder=" + mOutputOrder +
-                ", outputTimeout=" + mOutputTimeout +
-                ", runner=" + ((mRunner != null) ? mRunner.getClass().getCanonicalName() : null) +
-                ", runnerType=" + mRunnerType +
+                "mAvailTimeout=" + mAvailTimeout +
+                ", mInputMaxSize=" + mInputMaxSize +
+                ", mInputOrder=" + mInputOrder +
+                ", mInputTimeout=" + mInputTimeout +
+                ", mLog=" + mLog +
+                ", mLogLevel=" + mLogLevel +
+                ", mMaxRetained=" + mMaxRetained +
+                ", mMaxRunning=" + mMaxRunning +
+                ", mOutputMaxSize=" + mOutputMaxSize +
+                ", mOutputOrder=" + mOutputOrder +
+                ", mOutputTimeout=" + mOutputTimeout +
+                ", mResultTimeout=" + mResultTimeout +
+                ", mRunner=" + mRunner +
+                ", mRunnerType=" + mRunnerType +
+                ", mTimeoutAction=" + mTimeoutAction +
                 '}';
     }
 }

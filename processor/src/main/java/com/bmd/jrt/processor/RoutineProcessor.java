@@ -14,11 +14,12 @@
 package com.bmd.jrt.processor;
 
 import com.bmd.jrt.annotation.Async;
-import com.bmd.jrt.annotation.Async.TimeoutAction;
+import com.bmd.jrt.builder.RoutineBuilder.TimeoutAction;
 import com.bmd.jrt.annotation.AsyncName;
 import com.bmd.jrt.annotation.AsyncType;
 import com.bmd.jrt.annotation.AsyncWrap;
 import com.bmd.jrt.annotation.ParallelType;
+import com.bmd.jrt.builder.RoutineBuilder;
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.channel.OutputChannel;
@@ -258,7 +259,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
         long resultTimeout = RoutineConfiguration.DEFAULT;
         TimeUnit resultTimeUnit = null;
-        TimeoutAction timeoutAction = TimeoutAction.DEFAULT;
+        TimeoutAction timeoutAction = RoutineBuilder.TimeoutAction.DEFAULT;
 
         if (methodAnnotation != null) {
 
@@ -287,11 +288,11 @@ public class RoutineProcessor extends AbstractProcessor {
                    .append(")");
         }
 
-        if (timeoutAction == TimeoutAction.EXIT) {
+        if (timeoutAction == RoutineBuilder.TimeoutAction.EXIT) {
 
             builder.append(".eventuallyExit()");
 
-        } else if (timeoutAction == TimeoutAction.DEADLOCK) {
+        } else if (timeoutAction == RoutineBuilder.TimeoutAction.DEADLOCK) {
 
             builder.append(".eventuallyDeadlock()");
         }

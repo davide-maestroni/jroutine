@@ -32,6 +32,7 @@ import com.bmd.jrt.common.InvocationException;
 import com.bmd.jrt.invocation.Invocation;
 import com.bmd.jrt.invocation.SimpleInvocation;
 import com.bmd.jrt.invocation.TemplateInvocation;
+import com.bmd.jrt.invocation.TunnelInvocation;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.log.NullLog;
@@ -306,7 +307,12 @@ public class RoutineTest extends TestCase {
 
         final TestOutputConsumer consumer = new TestOutputConsumer();
         final OutputChannel<Object> channel1 =
-                JRoutine.on().buildRoutine().invokeAsync().after(seconds(1)).pass("test1").result();
+                JRoutine.on(new ClassToken<TunnelInvocation<Object>>() {})
+                        .buildRoutine()
+                        .invokeAsync()
+                        .after(seconds(1))
+                        .pass("test1")
+                        .result();
 
         channel1.bind(consumer);
         assertThat(channel1.isBound()).isTrue();
@@ -325,7 +331,11 @@ public class RoutineTest extends TestCase {
         assertThat(consumer.isOutput()).isFalse();
 
         final OutputChannel<Object> channel2 =
-                JRoutine.on().buildRoutine().invokeSync().pass("test2").result();
+                JRoutine.on(new ClassToken<TunnelInvocation<Object>>() {})
+                        .buildRoutine()
+                        .invokeSync()
+                        .pass("test2")
+                        .result();
 
         channel2.bind(consumer);
         assertThat(channel1.isBound()).isFalse();
@@ -337,7 +347,8 @@ public class RoutineTest extends TestCase {
     public void testCalls() {
 
         final TimeDuration timeout = seconds(1);
-        final Routine<String, String> routine = JRoutine.<String>on().buildRoutine();
+        final Routine<String, String> routine =
+                JRoutine.on(new ClassToken<TunnelInvocation<String>>() {}).buildRoutine();
 
         assertThat(routine.callSync().afterMax(timeout).readAll()).isEmpty();
         assertThat(routine.callSync(Arrays.asList("test1", "test2"))
@@ -767,7 +778,8 @@ public class RoutineTest extends TestCase {
     public void testDelayedAbort() throws InterruptedException {
 
         final TimeDuration timeout = seconds(1);
-        final Routine<String, String> tunnelRoutine = JRoutine.<String>on().buildRoutine();
+        final Routine<String, String> tunnelRoutine =
+                JRoutine.on(new ClassToken<TunnelInvocation<String>>() {}).buildRoutine();
 
         final ParameterChannel<String, String> channel1 = tunnelRoutine.invokeAsync();
         channel1.after(TimeDuration.seconds(2)).abort();
@@ -816,8 +828,10 @@ public class RoutineTest extends TestCase {
     public void testDelayedBind() {
 
         final TimeDuration timeout = seconds(1);
-        final Routine<Object, Object> routine1 = JRoutine.on().buildRoutine();
-        final Routine<Object, Object> routine2 = JRoutine.on().buildRoutine();
+        final Routine<Object, Object> routine1 =
+                JRoutine.on(new ClassToken<TunnelInvocation<Object>>() {}).buildRoutine();
+        final Routine<Object, Object> routine2 =
+                JRoutine.on(new ClassToken<TunnelInvocation<Object>>() {}).buildRoutine();
 
         final long startTime = System.currentTimeMillis();
 
@@ -1052,7 +1066,8 @@ public class RoutineTest extends TestCase {
 
         testException(exceptionRoutine, "test", "test1");
 
-        final Routine<String, String> tunnelRoutine = JRoutine.<String>on().buildRoutine();
+        final Routine<String, String> tunnelRoutine =
+                JRoutine.on(new ClassToken<TunnelInvocation<String>>() {}).buildRoutine();
 
         testChained(tunnelRoutine, exceptionRoutine, "test", "test1");
         testChained(exceptionRoutine, tunnelRoutine, "test", "test1");
@@ -1076,7 +1091,8 @@ public class RoutineTest extends TestCase {
 
         testException(exceptionRoutine, "test2", "test2");
 
-        final Routine<String, String> tunnelRoutine = JRoutine.<String>on().buildRoutine();
+        final Routine<String, String> tunnelRoutine =
+                JRoutine.on(new ClassToken<TunnelInvocation<String>>() {}).buildRoutine();
 
         testChained(tunnelRoutine, exceptionRoutine, "test2", "test2");
         testChained(exceptionRoutine, tunnelRoutine, "test2", "test2");
@@ -1099,7 +1115,8 @@ public class RoutineTest extends TestCase {
 
         testException(exceptionRoutine, "test", "test3");
 
-        final Routine<String, String> tunnelRoutine = JRoutine.<String>on().buildRoutine();
+        final Routine<String, String> tunnelRoutine =
+                JRoutine.on(new ClassToken<TunnelInvocation<String>>() {}).buildRoutine();
 
         testChained(tunnelRoutine, exceptionRoutine, "test", "test3");
         testChained(exceptionRoutine, tunnelRoutine, "test", "test3");
@@ -1108,7 +1125,10 @@ public class RoutineTest extends TestCase {
     public void testInputTimeout() {
 
         final Routine<String, String> routine =
-                JRoutine.<String>on().inputSize(1).inputTimeout(TimeDuration.ZERO).buildRoutine();
+                JRoutine.on(new ClassToken<TunnelInvocation<String>>() {})
+                        .inputSize(1)
+                        .inputTimeout(TimeDuration.ZERO)
+                        .buildRoutine();
 
         try {
 

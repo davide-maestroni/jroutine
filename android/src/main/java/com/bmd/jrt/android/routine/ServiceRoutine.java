@@ -263,7 +263,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
             mLogger = logger;
             final Log log = logger.getLog();
             final LogLevel logLevel = logger.getLogLevel();
-            final Tunnel<INPUT> paramTunnel = JRoutine.io()
+            final Tunnel<INPUT> paramTunnel = JRoutine.on()
                                                       .dataOrder(configuration.getInputOrderOr(
                                                               DataOrder.DEFAULT))
                                                       .maxSize(Integer.MAX_VALUE)
@@ -273,7 +273,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                                                       .buildTunnel();
             mParamTunnelInput = paramTunnel.input();
             mParamTunnelOutput = paramTunnel.output();
-            final Tunnel<OUTPUT> resultTunnel = JRoutine.io()
+            final Tunnel<OUTPUT> resultTunnel = JRoutine.on()
                                                         .dataOrder(configuration.getOutputOrderOr(
                                                                 DataOrder.DEFAULT))
                                                         .maxSize(Integer.MAX_VALUE)

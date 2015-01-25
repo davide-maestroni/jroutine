@@ -54,9 +54,13 @@ public class RoutineConfigurationBuilder implements RoutineChannelBuilder {
 
     private TimeDuration mOutputTimeout = null;
 
+    private TimeDuration mResultTimeout = null;
+
     private Runner mRunner = null;
 
     private RunnerType mRunnerType = RunnerType.DEFAULT;
+
+    private TimeoutAction mTimeoutAction = TimeoutAction.DEFAULT;
 
     /**
      * Constructor.
@@ -78,6 +82,8 @@ public class RoutineConfigurationBuilder implements RoutineChannelBuilder {
         mMaxRunning = initialConfiguration.getMaxRunningOr(mMaxRunning);
         mMaxRetained = initialConfiguration.getMaxRetainedOr(mMaxRetained);
         mAvailTimeout = initialConfiguration.getAvailTimeoutOr(mAvailTimeout);
+        mResultTimeout = initialConfiguration.getResultTimeoutOr(mResultTimeout);
+        mTimeoutAction = initialConfiguration.getResultTimeoutActionOr(mTimeoutAction);
         mInputOrder = initialConfiguration.getInputOrderOr(mInputOrder);
         mInputMaxSize = initialConfiguration.getInputSizeOr(mInputMaxSize);
         mInputTimeout = initialConfiguration.getInputTimeoutOr(mInputTimeout);
@@ -125,6 +131,21 @@ public class RoutineConfigurationBuilder implements RoutineChannelBuilder {
         if (availTimeout != null) {
 
             availableTimeout(availTimeout);
+        }
+
+        final TimeDuration resultTimeout = configuration.getResultTimeoutOr(null);
+
+        if (resultTimeout != null) {
+
+            resultTimeout(resultTimeout);
+        }
+
+        final TimeoutAction timeoutAction =
+                configuration.getResultTimeoutActionOr(TimeoutAction.DEFAULT);
+
+        if (timeoutAction != TimeoutAction.DEFAULT) {
+
+            onResultTimeout(timeoutAction);
         }
 
         final DataOrder inputOrder = configuration.getInputOrderOr(DataOrder.DEFAULT);
@@ -254,6 +275,36 @@ public class RoutineConfigurationBuilder implements RoutineChannelBuilder {
 
     @Nonnull
     @Override
+    @SuppressWarnings("ConstantConditions")
+    public RoutineConfigurationBuilder onResultTimeout(@Nonnull final TimeoutAction action) {
+
+        if (action == null) {
+
+            throw new NullPointerException("the result timeout action must not be null");
+        }
+
+        mTimeoutAction = action;
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public RoutineConfigurationBuilder resultTimeout(final long timeout,
+            @Nonnull final TimeUnit timeUnit) {
+
+        return resultTimeout(fromUnit(timeout, timeUnit));
+    }
+
+    @Nonnull
+    @Override
+    public RoutineConfigurationBuilder resultTimeout(@Nullable final TimeDuration timeout) {
+
+        mResultTimeout = timeout;
+        return this;
+    }
+
+    @Nonnull
+    @Override
     public RoutineConfigurationBuilder runBy(@Nullable final Runner runner) {
 
         mRunner = runner;
@@ -369,8 +420,8 @@ public class RoutineConfigurationBuilder implements RoutineChannelBuilder {
     public RoutineConfiguration buildConfiguration() {
 
         return new RoutineConfiguration(mRunner, mRunnerType, mMaxRunning, mMaxRetained,
-                                        mAvailTimeout, mInputMaxSize, mInputTimeout, mInputOrder,
-                                        mOutputMaxSize, mOutputTimeout, mOutputOrder, mLog,
-                                        mLogLevel);
+                                        mAvailTimeout, mResultTimeout, mTimeoutAction,
+                                        mInputMaxSize, mInputTimeout, mInputOrder, mOutputMaxSize,
+                                        mOutputTimeout, mOutputOrder, mLog, mLogLevel);
     }
 }

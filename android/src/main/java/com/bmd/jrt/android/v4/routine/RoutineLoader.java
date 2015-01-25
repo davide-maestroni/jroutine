@@ -269,7 +269,7 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
          */
         private LoaderResultChannel(final DataOrder order, @Nonnull final Logger logger) {
 
-            mmTunnel = JRoutine.io()
+            mmTunnel = JRoutine.on()
                                .dataOrder(order)
                                .maxSize(Integer.MAX_VALUE)
                                .bufferTimeout(TimeDuration.ZERO)

@@ -13,6 +13,7 @@
  */
 package com.bmd.jrt.annotation;
 
+import com.bmd.jrt.builder.RoutineBuilder.TimeoutAction;
 import com.bmd.jrt.builder.RoutineConfiguration;
 
 import java.lang.annotation.ElementType;
@@ -63,6 +64,8 @@ import java.util.concurrent.TimeUnit;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Async {
 
+    //TODO: AsyncLock???
+
     /**
      * Constant indicating a default name value.
      */
@@ -100,28 +103,4 @@ public @interface Async {
      * @return the timeout.
      */
     long resultTimeout() default RoutineConfiguration.DEFAULT;
-
-    /**
-     * Enumeration indicating the action to take on output channel timeout.
-     */
-    public enum TimeoutAction {
-
-        /**
-         * Deadlock.<br/>
-         * If no result is available after the specified timeout, the called method will throw a
-         * {@link com.bmd.jrt.channel.ReadDeadlockException}.
-         */
-        DEADLOCK,
-        /**
-         * Break execution.<br/>
-         * If no result is available after the specified timeout, the called method will its
-         * execution and exit immediately.
-         */
-        EXIT,
-        /**
-         * Default action.<br/>
-         * This value is used to indicated that the choice of the action is left to the framework.
-         */
-        DEFAULT
-    }
 }

@@ -120,6 +120,33 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineChannelBu
 
     @Nonnull
     @Override
+    public InvocationRoutineBuilder<INPUT, OUTPUT> onResultTimeout(
+            @Nonnull final TimeoutAction action) {
+
+        mBuilder.onResultTimeout(action);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public InvocationRoutineBuilder<INPUT, OUTPUT> resultTimeout(final long timeout,
+            @Nonnull final TimeUnit timeUnit) {
+
+        mBuilder.resultTimeout(timeout, timeUnit);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public InvocationRoutineBuilder<INPUT, OUTPUT> resultTimeout(
+            @Nullable final TimeDuration timeout) {
+
+        mBuilder.resultTimeout(timeout);
+        return this;
+    }
+
+    @Nonnull
+    @Override
     public InvocationRoutineBuilder<INPUT, OUTPUT> runBy(@Nullable final Runner runner) {
 
         mBuilder.runBy(runner);

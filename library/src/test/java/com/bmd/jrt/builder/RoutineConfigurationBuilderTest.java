@@ -14,6 +14,7 @@
 package com.bmd.jrt.builder;
 
 import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
+import com.bmd.jrt.builder.RoutineBuilder.TimeoutAction;
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.log.NullLog;
@@ -192,7 +193,68 @@ public class RoutineConfigurationBuilderTest extends TestCase {
 
         try {
 
-            new RoutineConfiguration(null, null, 1, 0, null, 1, null, DataOrder.DEFAULT, 1, null,
+            new RoutineConfiguration(null, null, 1, 0, null, null, TimeoutAction.DEFAULT, 1, null,
+                                     DataOrder.DEFAULT, 1, null, DataOrder.DEFAULT, null,
+                                     LogLevel.DEFAULT);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new RoutineConfiguration(null, RunnerType.DEFAULT, 0, 0, null, null,
+                                     TimeoutAction.DEFAULT, 1, null, DataOrder.DEFAULT, 1, null,
+                                     DataOrder.DEFAULT, null, LogLevel.DEFAULT);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            new RoutineConfiguration(null, RunnerType.DEFAULT, 1, -1, null, null,
+                                     TimeoutAction.DEFAULT, 1, null, DataOrder.DEFAULT, 1, null,
+                                     DataOrder.DEFAULT, null, LogLevel.DEFAULT);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            new RoutineConfiguration(null, RunnerType.DEFAULT, 1, 0, null, null, null, 0, null,
+                                     DataOrder.DEFAULT, 1, null, DataOrder.DEFAULT, null,
+                                     LogLevel.DEFAULT);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new RoutineConfiguration(null, RunnerType.DEFAULT, 1, 0, null, null,
+                                     TimeoutAction.DEFAULT, 0, null, DataOrder.DEFAULT, 1, null,
+                                     DataOrder.DEFAULT, null, LogLevel.DEFAULT);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            new RoutineConfiguration(null, RunnerType.DEFAULT, 1, 0, null, null,
+                                     TimeoutAction.DEFAULT, 1, null, null, 1, null,
                                      DataOrder.DEFAULT, null, LogLevel.DEFAULT);
 
             fail();
@@ -203,67 +265,21 @@ public class RoutineConfigurationBuilderTest extends TestCase {
 
         try {
 
-            new RoutineConfiguration(null, RunnerType.DEFAULT, 0, 0, null, 1, null,
-                                     DataOrder.DEFAULT, 1, null, DataOrder.DEFAULT, null,
-                                     LogLevel.DEFAULT);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            new RoutineConfiguration(null, RunnerType.DEFAULT, 1, -1, null, 1, null,
-                                     DataOrder.DEFAULT, 1, null, DataOrder.DEFAULT, null,
-                                     LogLevel.DEFAULT);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            new RoutineConfiguration(null, RunnerType.DEFAULT, 1, 0, null, 0, null,
-                                     DataOrder.DEFAULT, 1, null, DataOrder.DEFAULT, null,
-                                     LogLevel.DEFAULT);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            new RoutineConfiguration(null, RunnerType.DEFAULT, 1, 0, null, 1, null, null, 1, null,
+            new RoutineConfiguration(null, RunnerType.DEFAULT, 1, 0, null, null,
+                                     TimeoutAction.DEFAULT, 1, null, DataOrder.DEFAULT, 0, null,
                                      DataOrder.DEFAULT, null, LogLevel.DEFAULT);
 
             fail();
 
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            new RoutineConfiguration(null, RunnerType.DEFAULT, 1, 0, null, 1, null,
-                                     DataOrder.DEFAULT, 0, null, DataOrder.DEFAULT, null,
-                                     LogLevel.DEFAULT);
-
-            fail();
-
         } catch (final IllegalArgumentException ignored) {
 
         }
 
         try {
 
-            new RoutineConfiguration(null, RunnerType.DEFAULT, 1, 0, null, 1, null,
-                                     DataOrder.DEFAULT, 1, null, null, null, LogLevel.DEFAULT);
+            new RoutineConfiguration(null, RunnerType.DEFAULT, 1, 0, null, null,
+                                     TimeoutAction.DEFAULT, 1, null, DataOrder.DEFAULT, 1, null,
+                                     null, null, LogLevel.DEFAULT);
 
             fail();
 
@@ -273,8 +289,9 @@ public class RoutineConfigurationBuilderTest extends TestCase {
 
         try {
 
-            new RoutineConfiguration(null, RunnerType.DEFAULT, 1, 0, null, 1, null,
-                                     DataOrder.DEFAULT, 1, null, DataOrder.DEFAULT, null, null);
+            new RoutineConfiguration(null, RunnerType.DEFAULT, 1, 0, null, null,
+                                     TimeoutAction.DEFAULT, 1, null, DataOrder.DEFAULT, 1, null,
+                                     DataOrder.DEFAULT, null, null);
 
             fail();
 

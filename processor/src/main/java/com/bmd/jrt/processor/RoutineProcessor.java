@@ -13,13 +13,13 @@
  */
 package com.bmd.jrt.processor;
 
-import com.bmd.jrt.annotation.Async;
-import com.bmd.jrt.builder.RoutineBuilder.TimeoutAction;
+import com.bmd.jrt.annotation.AsyncLock;
 import com.bmd.jrt.annotation.AsyncName;
+import com.bmd.jrt.annotation.AsyncTimeout;
 import com.bmd.jrt.annotation.AsyncType;
 import com.bmd.jrt.annotation.AsyncWrap;
 import com.bmd.jrt.annotation.ParallelType;
-import com.bmd.jrt.builder.RoutineBuilder;
+import com.bmd.jrt.builder.RoutineBuilder.TimeoutAction;
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.channel.OutputChannel;
@@ -254,25 +254,25 @@ public class RoutineProcessor extends AbstractProcessor {
     private String buildOutputOptions(@Nonnull final TypeElement element,
             final ExecutableElement methodElement) {
 
-        final Async classAnnotation = element.getAnnotation(Async.class);
-        final Async methodAnnotation = methodElement.getAnnotation(Async.class);
+        final AsyncTimeout classAnnotation = element.getAnnotation(AsyncTimeout.class);
+        final AsyncTimeout methodAnnotation = methodElement.getAnnotation(AsyncTimeout.class);
 
         long resultTimeout = RoutineConfiguration.DEFAULT;
         TimeUnit resultTimeUnit = null;
-        TimeoutAction timeoutAction = RoutineBuilder.TimeoutAction.DEFAULT;
+        TimeoutAction timeoutAction = TimeoutAction.DEFAULT;
 
         if (methodAnnotation != null) {
 
-            resultTimeout = methodAnnotation.resultTimeout();
-            resultTimeUnit = methodAnnotation.resultTimeUnit();
-            timeoutAction = methodAnnotation.eventually();
+            resultTimeout = methodAnnotation.value();
+            resultTimeUnit = methodAnnotation.unit();
+            timeoutAction = methodAnnotation.action();
         }
 
         if ((classAnnotation != null) && (resultTimeout == RoutineConfiguration.DEFAULT)) {
 
-            resultTimeout = classAnnotation.resultTimeout();
-            resultTimeUnit = classAnnotation.resultTimeUnit();
-            timeoutAction = classAnnotation.eventually();
+            resultTimeout = classAnnotation.value();
+            resultTimeUnit = classAnnotation.unit();
+            timeoutAction = classAnnotation.action();
         }
 
         final StringBuilder builder = new StringBuilder();
@@ -288,11 +288,11 @@ public class RoutineProcessor extends AbstractProcessor {
                    .append(")");
         }
 
-        if (timeoutAction == RoutineBuilder.TimeoutAction.EXIT) {
+        if (timeoutAction == TimeoutAction.EXIT) {
 
             builder.append(".eventuallyExit()");
 
-        } else if (timeoutAction == RoutineBuilder.TimeoutAction.DEADLOCK) {
+        } else if (timeoutAction == TimeoutAction.DEADLOCK) {
 
             builder.append(".eventuallyDeadlock()");
         }
@@ -870,18 +870,18 @@ public class RoutineProcessor extends AbstractProcessor {
         methodFooter = methodFooter.replace("${targetMethodName}", targetMethod.getSimpleName());
         methodFooter = methodFooter.replace("${paramValues}", buildParamValues(targetMethod));
 
-        final Async classAnnotation = element.getAnnotation(Async.class);
-        final Async methodAnnotation = methodElement.getAnnotation(Async.class);
-        String lockName = Async.DEFAULT_LOCK;
+        final AsyncLock classAnnotation = element.getAnnotation(AsyncLock.class);
+        final AsyncLock methodAnnotation = methodElement.getAnnotation(AsyncLock.class);
+        String lockName = AsyncLock.DEFAULT_LOCK;
 
         if (methodAnnotation != null) {
 
-            lockName = methodAnnotation.lockName();
+            lockName = methodAnnotation.value();
         }
 
-        if ((classAnnotation != null) && (lockName.equals(Async.DEFAULT_LOCK))) {
+        if ((classAnnotation != null) && (lockName.equals(AsyncLock.DEFAULT_LOCK))) {
 
-            lockName = classAnnotation.lockName();
+            lockName = classAnnotation.value();
         }
 
         methodFooter = methodFooter.replace("${lockName}", lockName);

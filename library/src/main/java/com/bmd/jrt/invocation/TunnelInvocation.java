@@ -28,8 +28,10 @@ import javax.annotation.Nonnull;
 public class TunnelInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
 
     /**
-     * @param <DATA>
-     * @return
+     * Creates and returns the token of a typed tunnel invocation.
+     *
+     * @param <DATA> the data type.
+     * @return the token instance.
      */
     public static <DATA> ClassToken<TunnelInvocation<DATA>> tokenOf() {
 

@@ -13,8 +13,9 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.annotation.Async;
+import com.bmd.jrt.annotation.AsyncLock;
 import com.bmd.jrt.annotation.AsyncName;
+import com.bmd.jrt.annotation.AsyncTimeout;
 import com.bmd.jrt.annotation.AsyncType;
 import com.bmd.jrt.annotation.ParallelType;
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
@@ -45,7 +46,6 @@ import javax.annotation.Nullable;
 
 import static com.bmd.jrt.common.Reflection.boxingClass;
 import static com.bmd.jrt.common.Reflection.findConstructor;
-import static com.bmd.jrt.time.TimeDuration.ZERO;
 import static com.bmd.jrt.time.TimeDuration.fromUnit;
 
 /**
@@ -56,8 +56,8 @@ import static com.bmd.jrt.time.TimeDuration.fromUnit;
  * <p/>
  * Created by davide on 9/21/14.
  *
- * @see Async
  * @see AsyncName
+ * @see AsyncTimeout
  * @see AsyncType
  * @see ParallelType
  */
@@ -322,7 +322,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * Returns a proxy object enabling asynchronous calls to the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link AsyncName} and {@link Async} annotation.<br/>
+     * optional {@link AsyncName} and {@link AsyncTimeout} annotation.<br/>
      * In case the wrapped object does not implement the specified interface, the value attribute
      * will be used to bind the interface method with the instance ones. If no name is assigned the
      * method name will be used instead to map it.<br/>
@@ -364,7 +364,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * Returns a proxy object enabling asynchronous calls to the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link AsyncName} and {@link Async} annotation.<br/>
+     * optional {@link AsyncName} and {@link AsyncTimeout} annotation.<br/>
      * In case the wrapped object does not implement the specified interface, the value attribute
      * will be used to bind the interface method with the instance ones. If no name is assigned the
      * method name will be used instead to map it.<br/>
@@ -387,7 +387,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * Returns a wrapper object enabling asynchronous calls to the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link AsyncName}, {@link Async}, {@link AsyncType} and {@link ParallelType}
+     * optional {@link AsyncName}, {@link AsyncTimeout}, {@link AsyncType} and {@link ParallelType}
      * annotations.<br/>
      * The wrapping object is created through code generation based on the interfaces annotated
      * with {@link com.bmd.jrt.annotation.AsyncWrap}.<br/>
@@ -429,7 +429,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
             }
 
             final String lockName = getLockName();
-            final String classLockName = (lockName != null) ? lockName : Async.DEFAULT_LOCK;
+            final String classLockName = (lockName != null) ? lockName : AsyncLock.DEFAULT_LOCK;
             final RoutineConfiguration configuration = getBuilder().buildConfiguration();
             final ClassInfo classInfo = new ClassInfo(configuration, itf, classLockName);
             Object instance = classes.get(classInfo);
@@ -442,9 +442,9 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
             try {
 
                 final Package classPackage = itf.getPackage();
-                final String className =
-                        ((classPackage != null) ? classPackage.getName() + "." : "")
-                                + itf.getSimpleName() + "$$Wrapper";
+                final String packageName =
+                        (classPackage != null) ? classPackage.getName() + "." : "";
+                final String className = packageName + itf.getSimpleName() + "$$Wrapper";
                 final Class<?> wrapperClass = Class.forName(className);
                 final Constructor<?> constructor =
                         findConstructor(wrapperClass, target, sMutexCache, classLockName,
@@ -474,7 +474,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * Returns a wrapper object enabling asynchronous calls to the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link AsyncName}, {@link Async}, {@link AsyncType} and {@link ParallelType}
+     * optional {@link AsyncName}, {@link AsyncTimeout}, {@link AsyncType} and {@link ParallelType}
      * annotations.<br/>
      * The wrapping object is created through code generation based on the interfaces annotated
      * with {@link com.bmd.jrt.annotation.AsyncWrap}.<br/>
@@ -630,32 +630,33 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
          */
         private InterfaceInvocationHandler(@Nonnull final Class<?> itf) {
 
-            final Async classAnnotation = itf.getAnnotation(Async.class);
+            final AsyncLock lockAnnotation = itf.getAnnotation(AsyncLock.class);
             String lockName = getLockName();
 
-            if (((lockName == null) || Async.DEFAULT_LOCK.equals(lockName)) && (classAnnotation
+            if (((lockName == null) || AsyncLock.DEFAULT_LOCK.equals(lockName)) && (lockAnnotation
                     != null)) {
 
-                lockName = classAnnotation.lockName();
+                lockName = lockAnnotation.value();
             }
 
+            final AsyncTimeout timeoutAnnotation = itf.getAnnotation(AsyncTimeout.class);
             TimeDuration outputTimeout = null;
 
-            if (classAnnotation != null) {
+            if (timeoutAnnotation != null) {
 
-                final long resultTimeout = classAnnotation.resultTimeout();
+                final long resultTimeout = timeoutAnnotation.value();
 
                 if (resultTimeout != RoutineConfiguration.DEFAULT) {
 
-                    outputTimeout = fromUnit(resultTimeout, classAnnotation.resultTimeUnit());
+                    outputTimeout = fromUnit(resultTimeout, timeoutAnnotation.unit());
                 }
             }
 
             TimeoutAction outputAction = TimeoutAction.DEFAULT;
 
-            if (classAnnotation != null) {
+            if (timeoutAnnotation != null) {
 
-                outputAction = classAnnotation.eventually();
+                outputAction = timeoutAnnotation.action();
             }
 
             mLockName = lockName;
@@ -799,17 +800,17 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
             }
 
             final Routine<Object, Object> routine = buildRoutine(method, targetMethod, paramType);
-            final Async methodAnnotation = method.getAnnotation(Async.class);
+            final AsyncTimeout methodAnnotation = method.getAnnotation(AsyncTimeout.class);
 
             TimeDuration outputTimeout = mOutputTimeout;
 
             if ((outputTimeout == null) && (methodAnnotation != null)) {
 
-                final long resultTimeout = methodAnnotation.resultTimeout();
+                final long resultTimeout = methodAnnotation.value();
 
                 if (resultTimeout != RoutineConfiguration.DEFAULT) {
 
-                    outputTimeout = fromUnit(resultTimeout, methodAnnotation.resultTimeUnit());
+                    outputTimeout = fromUnit(resultTimeout, methodAnnotation.unit());
                 }
             }
 
@@ -817,7 +818,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
             if ((outputAction == TimeoutAction.DEFAULT) && (methodAnnotation != null)) {
 
-                outputAction = methodAnnotation.eventually();
+                outputAction = methodAnnotation.action();
             }
 
             return callRoutine(routine, method, paramType, resultType, args, outputTimeout,
@@ -829,18 +830,15 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
             String lockName = mLockName;
             final RoutineConfigurationBuilder builder = new RoutineConfigurationBuilder();
-            final Async methodAnnotation = method.getAnnotation(Async.class);
+            final AsyncLock methodAnnotation = method.getAnnotation(AsyncLock.class);
 
-            if (methodAnnotation != null) {
+            if ((methodAnnotation != null) && AsyncLock.DEFAULT_LOCK.equals(mLockName)) {
 
-                if (Async.DEFAULT_LOCK.equals(mLockName)) {
+                final String annotationLockName = methodAnnotation.value();
 
-                    final String annotationLockName = methodAnnotation.lockName();
+                if (!AsyncLock.DEFAULT_LOCK.equals(annotationLockName)) {
 
-                    if (!Async.DEFAULT_LOCK.equals(annotationLockName)) {
-
-                        lockName = annotationLockName;
-                    }
+                    lockName = annotationLockName;
                 }
             }
 
@@ -881,32 +879,33 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
          */
         private ObjectInvocationHandler(@Nonnull final Class<?> itf) {
 
-            final Async classAnnotation = itf.getAnnotation(Async.class);
+            final AsyncLock lockAnnotation = itf.getAnnotation(AsyncLock.class);
             String lockName = getLockName();
 
-            if (((lockName == null) || Async.DEFAULT_LOCK.equals(lockName)) && (classAnnotation
+            if (((lockName == null) || AsyncLock.DEFAULT_LOCK.equals(lockName)) && (lockAnnotation
                     != null)) {
 
-                lockName = classAnnotation.lockName();
+                lockName = lockAnnotation.value();
             }
 
+            final AsyncTimeout timeoutAnnotation = itf.getAnnotation(AsyncTimeout.class);
             TimeDuration outputTimeout = null;
 
-            if (classAnnotation != null) {
+            if (timeoutAnnotation != null) {
 
-                final long resultTimeout = classAnnotation.resultTimeout();
+                final long resultTimeout = timeoutAnnotation.value();
 
                 if (resultTimeout != RoutineConfiguration.DEFAULT) {
 
-                    outputTimeout = fromUnit(resultTimeout, classAnnotation.resultTimeUnit());
+                    outputTimeout = fromUnit(resultTimeout, timeoutAnnotation.unit());
                 }
             }
 
             TimeoutAction outputAction = TimeoutAction.DEFAULT;
 
-            if (classAnnotation != null) {
+            if (timeoutAnnotation != null) {
 
-                outputAction = classAnnotation.eventually();
+                outputAction = timeoutAnnotation.action();
             }
 
             mItf = itf;
@@ -922,35 +921,33 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
             final OutputChannel<Object> outputChannel =
                     method(mConfiguration, mLockName, mItf, method).callAsync(args);
-
             final Class<?> returnType = method.getReturnType();
 
             if (!Void.class.equals(boxingClass(returnType))) {
 
-                final Async methodAnnotation = method.getAnnotation(Async.class);
-
+                final AsyncTimeout methodAnnotation = method.getAnnotation(AsyncTimeout.class);
                 TimeDuration outputTimeout = mOutputTimeout;
 
                 if ((outputTimeout == null) && (methodAnnotation != null)) {
 
-                    final long resultTimeout = methodAnnotation.resultTimeout();
+                    final long resultTimeout = methodAnnotation.value();
 
                     if (resultTimeout != RoutineConfiguration.DEFAULT) {
 
-                        outputTimeout = fromUnit(resultTimeout, methodAnnotation.resultTimeUnit());
+                        outputTimeout = fromUnit(resultTimeout, methodAnnotation.unit());
                     }
                 }
 
-                if (outputTimeout == null) {
+                if (outputTimeout != null) {
 
-                    outputTimeout = ZERO;
+                    outputChannel.afterMax(outputTimeout);
                 }
 
                 TimeoutAction outputAction = mOutputAction;
 
                 if ((outputAction == TimeoutAction.DEFAULT) && (methodAnnotation != null)) {
 
-                    outputAction = methodAnnotation.eventually();
+                    outputAction = methodAnnotation.action();
                 }
 
                 if (outputAction == TimeoutAction.EXIT) {
@@ -962,7 +959,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                     outputChannel.eventuallyDeadlock();
                 }
 
-                return outputChannel.afterMax(outputTimeout).readNext();
+                return outputChannel.readNext();
             }
 
             return null;

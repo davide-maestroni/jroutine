@@ -13,8 +13,9 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.annotation.Async;
+import com.bmd.jrt.annotation.AsyncLock;
 import com.bmd.jrt.annotation.AsyncName;
+import com.bmd.jrt.annotation.AsyncTimeout;
 import com.bmd.jrt.annotation.AsyncType;
 import com.bmd.jrt.annotation.ParallelType;
 import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
@@ -896,19 +897,19 @@ public class JRoutineTest extends TestCase {
         assertThat(tunnel.output().immediately().readAll()).containsExactly("test");
     }
 
-    @Async(resultTimeout = 1000)
     private interface ITestInc {
 
+        @AsyncTimeout(1000)
         @AsyncType(int.class)
         public int[] inc(@ParallelType(int.class) int... i);
     }
 
     private static interface SquareItf {
 
-        @Async(resultTimeout = 1, resultTimeUnit = TimeUnit.SECONDS)
+        @AsyncTimeout(value = 1, unit = TimeUnit.SECONDS)
         public int compute(int i);
 
-        @Async(lockName = Async.NULL_LOCK)
+        @AsyncLock(AsyncLock.NULL_LOCK)
         @AsyncName("compute")
         @AsyncType(int.class)
         public OutputChannel<Integer> computeParallel1(@ParallelType(int.class) int... i);
@@ -917,12 +918,12 @@ public class JRoutineTest extends TestCase {
         @AsyncType(int.class)
         public OutputChannel<Integer> computeParallel2(@ParallelType(int.class) Integer... i);
 
-        @Async(lockName = Async.NULL_LOCK)
+        @AsyncLock(AsyncLock.NULL_LOCK)
         @AsyncName("compute")
         @AsyncType(int.class)
         public OutputChannel<Integer> computeParallel3(@ParallelType(int.class) List<Integer> i);
 
-        @Async(lockName = Async.NULL_LOCK)
+        @AsyncLock(AsyncLock.NULL_LOCK)
         @AsyncName("compute")
         @AsyncType(int.class)
         public OutputChannel<Integer> computeParallel4(
@@ -1006,7 +1007,7 @@ public class JRoutineTest extends TestCase {
 
     private static class Test2 {
 
-        @Async(lockName = "1")
+        @AsyncLock("1")
         public int getOne() throws InterruptedException {
 
             TimeDuration.millis(500).sleepAtLeast();
@@ -1014,7 +1015,7 @@ public class JRoutineTest extends TestCase {
             return 1;
         }
 
-        @Async(lockName = "2")
+        @AsyncLock("2")
         public int getTwo() throws InterruptedException {
 
             TimeDuration.millis(500).sleepAtLeast();
@@ -1023,7 +1024,7 @@ public class JRoutineTest extends TestCase {
         }
     }
 
-    @Async(lockName = Async.NULL_LOCK)
+    @AsyncLock(AsyncLock.NULL_LOCK)
     private static class TestApply {
 
         public static final String GET_STRING = "get_string";
@@ -1071,7 +1072,7 @@ public class JRoutineTest extends TestCase {
 
     private static class TestStatic2 {
 
-        @Async(lockName = "1")
+        @AsyncLock("1")
         public static int getOne() throws InterruptedException {
 
             TimeDuration.millis(500).sleepAtLeast();
@@ -1079,7 +1080,7 @@ public class JRoutineTest extends TestCase {
             return 1;
         }
 
-        @Async(lockName = "2")
+        @AsyncLock("2")
         public static int getTwo() throws InterruptedException {
 
             TimeDuration.millis(500).sleepAtLeast();

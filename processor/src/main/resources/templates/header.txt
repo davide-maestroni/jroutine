@@ -40,13 +40,13 @@ public final class ${interfaceName}$$Wrapper${genericTypes} implements ${interfa
 
         mWrapped = new java.lang.ref.WeakReference<${classFullName}>(wrapped);
         mMutexMap = mutexMap;
-        mLockName = ((lockName != null) && !com.bmd.jrt.annotation.Async.DEFAULT_LOCK.equals(lockName)) ? lockName : null;
+        mLockName = ((lockName != null) && !com.bmd.jrt.annotation.AsyncLock.DEFAULT_LOCK.equals(lockName)) ? lockName : null;
         ${routineFieldsInit}
     }
 
     private Object getMutex(final String lockName) {
 
-        if (com.bmd.jrt.annotation.Async.NULL_LOCK.equals(lockName)) {
+        if (com.bmd.jrt.annotation.AsyncLock.NULL_LOCK.equals(lockName)) {
 
             return null;
         }

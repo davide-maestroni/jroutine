@@ -13,8 +13,8 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.annotation.Async;
 import com.bmd.jrt.annotation.AsyncName;
+import com.bmd.jrt.annotation.AsyncTimeout;
 import com.bmd.jrt.annotation.AsyncType;
 import com.bmd.jrt.builder.InputDeadlockException;
 import com.bmd.jrt.builder.OutputDeadlockException;
@@ -2305,14 +2305,12 @@ public class RoutineTest extends TestCase {
 
     private interface TestInterface {
 
-        @Async(resultTimeout = 1, resultTimeUnit = TimeUnit.SECONDS)
+        @AsyncTimeout(value = 1, unit = TimeUnit.SECONDS)
         public int getInt(int i);
     }
 
-    @Async(resultTimeout = 0)
     private interface TestInterfaceAsync {
 
-        @Async(resultTimeout = 1, resultTimeUnit = TimeUnit.MILLISECONDS)
         public int getInt(@AsyncType(int.class) OutputChannel<Integer> i);
 
         @AsyncType(int.class)

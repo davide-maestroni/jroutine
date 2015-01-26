@@ -13,7 +13,7 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.annotation.Async;
+import com.bmd.jrt.annotation.AsyncLock;
 import com.bmd.jrt.annotation.AsyncName;
 import com.bmd.jrt.builder.RoutineBuilder;
 import com.bmd.jrt.builder.RoutineConfiguration;
@@ -53,7 +53,7 @@ import static com.bmd.jrt.common.Reflection.boxingClass;
  * <p/>
  * Created by davide on 9/21/14.
  *
- * @see Async
+ * @see com.bmd.jrt.annotation.AsyncTimeout
  * @see AsyncName
  */
 public class ClassRoutineBuilder implements RoutineBuilder {
@@ -263,7 +263,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      *
      * @param lockName the lock name.
      * @return this builder.
-     * @see Async
+     * @see com.bmd.jrt.annotation.AsyncTimeout
      */
     @Nonnull
     public ClassRoutineBuilder lockName(@Nullable final String lockName) {
@@ -275,8 +275,9 @@ public class ClassRoutineBuilder implements RoutineBuilder {
     /**
      * Returns a routine used for calling the specified method.
      * <p/>
-     * The method is searched via reflection ignoring an optional name specified in a {@link Async}
-     * annotation. Though, the other annotation attributes will be honored.
+     * The method is searched via reflection ignoring an optional name specified in a
+     * {@link com.bmd.jrt.annotation.AsyncTimeout} annotation. Though, the other annotation
+     * attributes will be honored.
      *
      * @param name           the method name.
      * @param parameterTypes the method parameter types.
@@ -413,7 +414,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
                 routineCache.put(target, routineMap);
             }
 
-            final String methodLockName = (lockName != null) ? lockName : Async.DEFAULT_LOCK;
+            final String methodLockName = (lockName != null) ? lockName : AsyncLock.DEFAULT_LOCK;
             final RoutineInfo routineInfo = new RoutineInfo(configuration, method, methodLockName);
             routine = routineMap.get(routineInfo);
 
@@ -424,7 +425,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
             Object mutex = null;
 
-            if (!Async.NULL_LOCK.equals(methodLockName)) {
+            if (!AsyncLock.NULL_LOCK.equals(methodLockName)) {
 
                 synchronized (sMutexCache) {
 
@@ -514,23 +515,23 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
         if (lockName == null) {
 
-            final Async classAnnotation = targetClass.getAnnotation(Async.class);
+            final AsyncLock classAnnotation = targetClass.getAnnotation(AsyncLock.class);
 
             if (classAnnotation != null) {
 
-                methodLockName = classAnnotation.lockName();
+                methodLockName = classAnnotation.value();
             }
         }
 
         if (lockName == null) {
 
-            final Async methodAnnotation = targetMethod.getAnnotation(Async.class);
+            final AsyncLock methodAnnotation = targetMethod.getAnnotation(AsyncLock.class);
 
             if (methodAnnotation != null) {
 
-                final String annotationLockName = methodAnnotation.lockName();
+                final String annotationLockName = methodAnnotation.value();
 
-                if (!Async.DEFAULT_LOCK.equals(annotationLockName)) {
+                if (!AsyncLock.DEFAULT_LOCK.equals(annotationLockName)) {
 
                     methodLockName = annotationLockName;
                 }

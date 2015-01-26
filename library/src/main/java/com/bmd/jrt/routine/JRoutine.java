@@ -93,14 +93,12 @@ import javax.annotation.Nonnull;
  *
  *         public interface AsyncCallback {
  *
- *             &#64;Async(resultTimeout = Long.MAX_VALUE)
  *             public void onResults(
  *                  &#64;AsyncType(Result.class) OutputChannel&lt;Result&gt; result1,
  *                  &#64;AsyncType(Result.class) OutputChannel&lt;Result&gt; result2);
  *         }
  *
  *         final AsyncCallback callback = JRoutine.on(myCallback)
- *                                                .resultTimeout(seconds(30))
  *                                                .buildProxy(AsyncCallback.class);
  *
  *         callback.onResults(doSomething1.callAsync(), doSomething2.callAsync());
@@ -134,9 +132,9 @@ import javax.annotation.Nonnull;
  * <p/>
  * Created by davide on 9/7/14.
  *
- * @see com.bmd.jrt.annotation.Async
  * @see com.bmd.jrt.annotation.AsyncName
  * @see com.bmd.jrt.annotation.AsyncWrap
+ * @see com.bmd.jrt.annotation.AsyncTimeout
  * @see com.bmd.jrt.annotation.AsyncType
  * @see com.bmd.jrt.annotation.ParallelType
  */

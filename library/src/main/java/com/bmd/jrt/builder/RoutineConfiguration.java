@@ -79,8 +79,9 @@ public class RoutineConfiguration {
      *                      positive number.
      * @param availTimeout  the maximum timeout while waiting for an invocation instance to be
      *                      available.
-     * @param resultTimeout
-     * @param actionType
+     * @param resultTimeout the action to be taken if the timeout elapses before a result is
+     *                      available.
+     * @param actionType    the timeout for an invocation instance to produce a result.
      * @param inputMaxSize  the maximum number of buffered input data. Must be positive.
      * @param inputTimeout  the maximum timeout while waiting for an input to be passed to the
      *                      input channel.
@@ -301,10 +302,11 @@ public class RoutineConfiguration {
     }
 
     /**
-     * TODO
+     * Returns the action to be taken if the timeout elapses before a result is available (DEFAULT
+     * by default).
      *
-     * @param valueIfNotSet
-     * @return
+     * @param valueIfNotSet the default value if none was set.
+     * @return the action type.
      */
     public TimeoutAction getResultTimeoutActionOr(final TimeoutAction valueIfNotSet) {
 
@@ -313,10 +315,10 @@ public class RoutineConfiguration {
     }
 
     /**
-     * TODO
+     * Returns the timeout for an invocation instance to produce a result (null by default).
      *
-     * @param valueIfNotSet
-     * @return
+     * @param valueIfNotSet the default value if none was set.
+     * @return the timeout.
      */
     public TimeDuration getResultTimeoutOr(final TimeDuration valueIfNotSet) {
 

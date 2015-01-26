@@ -13,7 +13,7 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.annotation.Async;
+import com.bmd.jrt.annotation.AsyncTimeout;
 import com.bmd.jrt.annotation.AsyncType;
 import com.bmd.jrt.annotation.AsyncWrap;
 import com.bmd.jrt.annotation.ParallelType;
@@ -90,38 +90,45 @@ public class RoutineProcessorTest extends TestCase {
         public int getOne();
     }
 
-    @Async(resultTimeout = 300)
     @AsyncWrap(TestClassInterface.class)
     public interface TestInterfaceWrapper {
 
+        @AsyncTimeout(300)
         @AsyncType(int.class)
         public OutputChannel<Integer> getOne();
     }
 
-    @Async(resultTimeout = 300)
     @AsyncWrap(TestClass.class)
     public interface TestWrapper {
 
+        @AsyncTimeout(300)
         @AsyncType(List.class)
         public Iterable<Iterable> getList(@ParallelType(List.class) List<? extends List<String>> i);
 
+        @AsyncTimeout(300)
         @AsyncType(int.class)
         public OutputChannel<Integer> getOne();
 
+        @AsyncTimeout(300)
         public String getString(@ParallelType(int.class) int... i);
 
+        @AsyncTimeout(300)
         @AsyncType(int.class)
         public OutputChannel<String> getString(@ParallelType(int.class) HashSet<Integer> i);
 
+        @AsyncTimeout(300)
         @AsyncType(int.class)
         public List<String> getString(@ParallelType(int.class) List<Integer> i);
 
+        @AsyncTimeout(300)
         @AsyncType(int.class)
         public Iterable<String> getString(@ParallelType(int.class) Iterable<Integer> i);
 
+        @AsyncTimeout(300)
         @AsyncType(int.class)
         public String[] getString(@ParallelType(int.class) Collection<Integer> i);
 
+        @AsyncTimeout(300)
         public String getString(@AsyncType(int.class) OutputChannel<Integer> i);
     }
 

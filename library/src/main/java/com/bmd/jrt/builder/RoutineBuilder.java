@@ -136,14 +136,15 @@ public interface RoutineBuilder {
     public RoutineBuilder maxRunning(int maxRunningInstances);
 
     /**
-     * TODO
+     * Sets the action to be taken if the timeout elapses before a result is available.
      *
-     * @param action
-     * @return
+     * @param action the action type.
+     * @return this builder.
      * @throws NullPointerException if the specified action type is null.
      */
     @Nonnull
     public RoutineBuilder onResultTimeout(@Nonnull TimeoutAction action);
+    //TODO: test
 
     /**
      * Sets the timeout for an invocation instance to produce a result.

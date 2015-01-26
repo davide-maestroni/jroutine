@@ -52,7 +52,7 @@ import java.util.concurrent.TimeUnit;
  *         -keepattributes RuntimeVisibleAnnotations
  *
  *         -keepclassmembers class ** {
- *              &#64;com.bmd.jrt.annotation.Async *;
+ *              &#64;com.bmd.jrt.annotation.AsyncTimeout *;
  *         }
  *     </code>
  * </pre>
@@ -60,47 +60,30 @@ import java.util.concurrent.TimeUnit;
  * Created by davide on 9/21/14.
  */
 @Inherited
-@Target({ElementType.TYPE, ElementType.METHOD})
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Async {
+public @interface AsyncTimeout {
 
-    //TODO: AsyncLock???
-
-    /**
-     * Constant indicating a default name value.
-     */
-    static final String DEFAULT_LOCK = "com.bmd.jrt.annotation.Async.DEFAULT_LOCK";
-
-    /**
-     * Constant indicating a null lock name.
-     */
-    static final String NULL_LOCK = "";
+    //TODO: ResultTimeout
 
     /**
      * The type of action to take on output channel timeout.
      *
      * @return the action type.
      */
-    TimeoutAction eventually() default TimeoutAction.DEFAULT;
-
-    /**
-     * The name of the lock associated with the annotated method.
-     *
-     * @return the lock name.
-     */
-    String lockName() default DEFAULT_LOCK;
+    TimeoutAction action() default TimeoutAction.DEFAULT;
 
     /**
      * The time unit of the timeout for an invocation instance to produce a result.
      *
      * @return the time unit.
      */
-    TimeUnit resultTimeUnit() default TimeUnit.MILLISECONDS;
+    TimeUnit unit() default TimeUnit.MILLISECONDS;
 
     /**
      * The timeout for an invocation instance to produce a result.
      *
      * @return the timeout.
      */
-    long resultTimeout() default RoutineConfiguration.DEFAULT;
+    long value() default RoutineConfiguration.DEFAULT;
 }

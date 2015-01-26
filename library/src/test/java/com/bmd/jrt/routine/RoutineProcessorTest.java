@@ -13,10 +13,10 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.annotation.AsyncTimeout;
 import com.bmd.jrt.annotation.AsyncType;
 import com.bmd.jrt.annotation.AsyncWrap;
 import com.bmd.jrt.annotation.ParallelType;
+import com.bmd.jrt.annotation.ResultTimeout;
 import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.Tunnel;
@@ -93,7 +93,7 @@ public class RoutineProcessorTest extends TestCase {
     @AsyncWrap(TestClassInterface.class)
     public interface TestInterfaceWrapper {
 
-        @AsyncTimeout(300)
+        @ResultTimeout(300)
         @AsyncType(int.class)
         public OutputChannel<Integer> getOne();
     }
@@ -101,34 +101,34 @@ public class RoutineProcessorTest extends TestCase {
     @AsyncWrap(TestClass.class)
     public interface TestWrapper {
 
-        @AsyncTimeout(300)
+        @ResultTimeout(300)
         @AsyncType(List.class)
         public Iterable<Iterable> getList(@ParallelType(List.class) List<? extends List<String>> i);
 
-        @AsyncTimeout(300)
+        @ResultTimeout(300)
         @AsyncType(int.class)
         public OutputChannel<Integer> getOne();
 
-        @AsyncTimeout(300)
+        @ResultTimeout(300)
         public String getString(@ParallelType(int.class) int... i);
 
-        @AsyncTimeout(300)
+        @ResultTimeout(300)
         @AsyncType(int.class)
         public OutputChannel<String> getString(@ParallelType(int.class) HashSet<Integer> i);
 
-        @AsyncTimeout(300)
+        @ResultTimeout(300)
         @AsyncType(int.class)
         public List<String> getString(@ParallelType(int.class) List<Integer> i);
 
-        @AsyncTimeout(300)
+        @ResultTimeout(300)
         @AsyncType(int.class)
         public Iterable<String> getString(@ParallelType(int.class) Iterable<Integer> i);
 
-        @AsyncTimeout(300)
+        @ResultTimeout(300)
         @AsyncType(int.class)
         public String[] getString(@ParallelType(int.class) Collection<Integer> i);
 
-        @AsyncTimeout(300)
+        @ResultTimeout(300)
         public String getString(@AsyncType(int.class) OutputChannel<Integer> i);
     }
 

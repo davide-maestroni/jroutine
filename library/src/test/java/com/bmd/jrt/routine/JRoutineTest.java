@@ -15,9 +15,9 @@ package com.bmd.jrt.routine;
 
 import com.bmd.jrt.annotation.AsyncLock;
 import com.bmd.jrt.annotation.AsyncName;
-import com.bmd.jrt.annotation.AsyncTimeout;
 import com.bmd.jrt.annotation.AsyncType;
 import com.bmd.jrt.annotation.ParallelType;
+import com.bmd.jrt.annotation.ResultTimeout;
 import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
 import com.bmd.jrt.builder.RoutineConfiguration;
@@ -899,14 +899,14 @@ public class JRoutineTest extends TestCase {
 
     private interface ITestInc {
 
-        @AsyncTimeout(1000)
+        @ResultTimeout(1000)
         @AsyncType(int.class)
         public int[] inc(@ParallelType(int.class) int... i);
     }
 
     private static interface SquareItf {
 
-        @AsyncTimeout(value = 1, unit = TimeUnit.SECONDS)
+        @ResultTimeout(value = 1, unit = TimeUnit.SECONDS)
         public int compute(int i);
 
         @AsyncLock(AsyncLock.NULL_LOCK)

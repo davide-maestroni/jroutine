@@ -189,9 +189,61 @@ public class TunnelTest extends TestCase {
         tunnel.input().after(TimeDuration.seconds(3)).pass("test").close();
 
         final TunnelOutput<String> output = tunnel.output();
-        assertThat(output.immediately().readAll()).isEmpty();
+        assertThat(output.immediately().eventuallyExit().readAll()).isEmpty();
 
-        output.afterMax(TimeDuration.millis(10)).eventuallyDeadlock();
+        output.eventuallyDeadlock();
+
+        try {
+
+            output.readNext();
+
+            fail();
+
+        } catch (final ReadDeadlockException ignored) {
+
+        }
+
+        try {
+
+            output.readAllInto(new ArrayList<String>());
+
+            fail();
+
+        } catch (final ReadDeadlockException ignored) {
+
+        }
+
+        try {
+
+            output.readAll();
+
+            fail();
+
+        } catch (final ReadDeadlockException ignored) {
+
+        }
+
+        try {
+
+            output.iterator().hasNext();
+
+            fail();
+
+        } catch (final ReadDeadlockException ignored) {
+
+        }
+
+        try {
+
+            output.iterator().next();
+
+            fail();
+
+        } catch (final ReadDeadlockException ignored) {
+
+        }
+
+        output.afterMax(TimeDuration.millis(10));
 
         try {
 

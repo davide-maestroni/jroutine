@@ -33,6 +33,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
@@ -434,13 +435,17 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     @Nonnull
     OutputChannel<OUTPUT> getOutput() {
 
-        final DefaultOutputChannel outputChannel = new DefaultOutputChannel();
+        final TimeoutAction action = mTimeoutAction;
+        final OutputChannel<OUTPUT> outputChannel =
+                new DefaultOutputChannel().afterMax(mResultTimeout);
 
-        outputChannel.afterMax(mResultTimeout);
-
-        if (mTimeoutAction == TimeoutAction.EXIT) {
+        if (action == TimeoutAction.EXIT) {
 
             outputChannel.eventuallyExit();
+
+        } else if (action == TimeoutAction.ABORT) {
+
+            outputChannel.eventuallyAbort();
         }
 
         return outputChannel;
@@ -695,7 +700,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     }
 
     @Nullable
-    private OUTPUT readQueue(@Nonnull final TimeDuration timeout, final boolean isDeadlock) {
+    private OUTPUT readQueue(@Nonnull final TimeDuration timeout,
+            @Nonnull final TimeoutAction action) {
 
         verifyBound();
 
@@ -704,9 +710,14 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         if (timeout.isZero() || !outputQueue.isEmpty()) {
 
-            if (outputQueue.isEmpty() && isDeadlock) {
+            if (outputQueue.isEmpty()) {
 
-                throw new ReadDeadlockException("deadlock while waiting for outputs");
+                logger.wrn("reading output timeout: [%s] => [%s]", timeout, action);
+
+                if (action == TimeoutAction.DEADLOCK) {
+
+                    throw new ReadDeadlockException("deadlock while waiting for outputs");
+                }
             }
 
             return nextOutput(outputQueue, timeout);
@@ -737,9 +748,9 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         if (isTimeout) {
 
-            logger.wrn("reading output timeout: [%s]", timeout);
+            logger.wrn("reading output timeout: [%s] => [%s]", timeout, action);
 
-            if (isDeadlock) {
+            if (action == TimeoutAction.DEADLOCK) {
 
                 throw new ReadDeadlockException("deadlock while waiting for outputs");
             }
@@ -806,7 +817,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
      */
     private class DefaultIterator implements Iterator<OUTPUT> {
 
-        private final boolean mIsDeadlock;
+        private final TimeoutAction mAction;
 
         private final Logger mSubLogger = mLogger.subContextLogger(this);
 
@@ -817,17 +828,20 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         /**
          * Constructor.
          *
-         * @param timeout    the output timeout.
-         * @param isDeadlock whether to throw a deadlock exception when timeout elapses.
+         * @param timeout the output timeout.
+         * @param action  the timeout action.
          */
-        private DefaultIterator(@Nonnull final TimeDuration timeout, final boolean isDeadlock) {
+        private DefaultIterator(@Nonnull final TimeDuration timeout,
+                @Nonnull final TimeoutAction action) {
 
             mTimeout = timeout;
-            mIsDeadlock = isDeadlock;
+            mAction = action;
         }
 
         @Override
         public boolean hasNext() {
+
+            boolean isAbort = false;
 
             synchronized (mMutex) {
 
@@ -840,48 +854,76 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                 if (timeout.isZero() || (mState == ChannelState.DONE)) {
 
                     final boolean hasNext = !outputQueue.isEmpty();
-                    logger.dbg("has output: %s [%s]", hasNext, timeout);
-                    return hasNext;
-                }
 
-                if (mOutputHasNext == null) {
+                    if (!hasNext && (mState != ChannelState.DONE)) {
 
-                    mOutputHasNext = new Check() {
+                        final TimeoutAction action = mAction;
+                        logger.wrn("has output timeout: [%s] => [%s]", timeout, action);
 
-                        @Override
-                        public boolean isTrue() {
+                        if (action == TimeoutAction.DEADLOCK) {
 
-                            return !outputQueue.isEmpty() || (mState == ChannelState.DONE);
+                            throw new ReadDeadlockException(
+                                    "deadlock while waiting to know if more outputs are coming");
+
+                        } else {
+
+                            isAbort = (action == TimeoutAction.ABORT);
                         }
-                    };
-                }
+                    }
 
-                final boolean isTimeout;
+                } else {
 
-                try {
+                    if (mOutputHasNext == null) {
 
-                    isTimeout = !timeout.waitTrue(mMutex, mOutputHasNext);
+                        mOutputHasNext = new Check() {
 
-                } catch (final InterruptedException e) {
+                            @Override
+                            public boolean isTrue() {
 
-                    throw InvocationInterruptedException.interrupt(e);
-                }
+                                return !outputQueue.isEmpty() || (mState == ChannelState.DONE);
+                            }
+                        };
+                    }
 
-                if (isTimeout) {
+                    final boolean isTimeout;
 
-                    logger.wrn("has output timeout: [%s]", timeout);
+                    try {
 
-                    if (mIsDeadlock) {
+                        isTimeout = !timeout.waitTrue(mMutex, mOutputHasNext);
 
-                        throw new ReadDeadlockException(
-                                "deadlock while waiting to know if more outputs are coming");
+                    } catch (final InterruptedException e) {
+
+                        throw InvocationInterruptedException.interrupt(e);
+                    }
+
+                    if (isTimeout) {
+
+                        final TimeoutAction action = mAction;
+                        logger.wrn("has output timeout: [%s] => [%s]", timeout, action);
+
+                        if (action == TimeoutAction.DEADLOCK) {
+
+                            throw new ReadDeadlockException(
+                                    "deadlock while waiting to know if more outputs are coming");
+
+                        } else {
+
+                            isAbort = (action == TimeoutAction.ABORT);
+                        }
                     }
                 }
 
-                final boolean hasNext = !outputQueue.isEmpty();
-                logger.dbg("has output: %s [%s]", hasNext, timeout);
-                return hasNext;
+                if (!isAbort) {
+
+                    final boolean hasNext = !outputQueue.isEmpty();
+                    logger.dbg("has output: %s [%s]", hasNext, timeout);
+                    return hasNext;
+                }
             }
+
+            abort();
+
+            return false;
         }
 
         @Nullable
@@ -890,11 +932,28 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                             justification = "NestedQueue.removeFirst() actually throws it")
         public OUTPUT next() {
 
-            synchronized (mMutex) {
+            boolean isAbort = false;
 
-                final OUTPUT next = readQueue(mTimeout, mIsDeadlock);
-                mRemoved = false;
-                return next;
+            try {
+
+                synchronized (mMutex) {
+
+                    final TimeoutAction action = mAction;
+                    isAbort = (action == TimeoutAction.ABORT);
+
+                    final OUTPUT next = readQueue(mTimeout, action);
+                    mRemoved = false;
+                    return next;
+                }
+
+            } catch (final NoSuchElementException e) {
+
+                if (isAbort) {
+
+                    abort();
+                }
+
+                throw e;
             }
         }
 
@@ -923,7 +982,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         private final Logger mSubLogger = mLogger.subContextLogger(this);
 
-        private boolean mIsDeadlock = true;
+        private TimeoutAction mTimeoutAction = TimeoutAction.DEADLOCK;
 
         @Nonnull
         @Override
@@ -1023,11 +1082,23 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         @Nonnull
         @Override
+        public OutputChannel<OUTPUT> eventuallyAbort() {
+
+            synchronized (mMutex) {
+
+                mTimeoutAction = TimeoutAction.ABORT;
+            }
+
+            return this;
+        }
+
+        @Nonnull
+        @Override
         public OutputChannel<OUTPUT> eventuallyDeadlock() {
 
             synchronized (mMutex) {
 
-                mIsDeadlock = true;
+                mTimeoutAction = TimeoutAction.DEADLOCK;
             }
 
             return this;
@@ -1039,7 +1110,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             synchronized (mMutex) {
 
-                mIsDeadlock = false;
+                mTimeoutAction = TimeoutAction.EXIT;
             }
 
             return this;
@@ -1076,6 +1147,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         public OutputChannel<OUTPUT> readAllInto(
                 @Nonnull final Collection<? super OUTPUT> results) {
 
+            boolean isAbort = false;
+
             synchronized (mMutex) {
 
                 verifyBound();
@@ -1100,46 +1173,72 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                         results.add(result);
                     }
 
-                    return this;
-                }
+                    if (mState != ChannelState.DONE) {
 
-                final long startTime = System.currentTimeMillis();
-                final boolean isTimeout;
+                        final TimeoutAction action = mTimeoutAction;
+                        logger.wrn("list output timeout: [%s] => [%s]", timeout, action);
 
-                try {
+                        if (action == TimeoutAction.DEADLOCK) {
 
-                    while (timeout.waitSinceMillis(mMutex, startTime)) {
+                            throw new ReadDeadlockException(
+                                    "deadlock while waiting to collect all outputs");
 
-                        while (!outputQueue.isEmpty()) {
+                        } else {
 
-                            final OUTPUT result = nextOutput(outputQueue, timeout);
-                            logger.dbg("adding output to list: %s [%s]", result, timeout);
-                            results.add(result);
-                        }
-
-                        if (mState == ChannelState.DONE) {
-
-                            break;
+                            isAbort = (action == TimeoutAction.ABORT);
                         }
                     }
 
-                    isTimeout = (mState != ChannelState.DONE);
+                } else {
 
-                } catch (final InterruptedException e) {
+                    final long startTime = System.currentTimeMillis();
+                    final boolean isTimeout;
 
-                    throw InvocationInterruptedException.interrupt(e);
-                }
+                    try {
 
-                if (isTimeout) {
+                        while (timeout.waitSinceMillis(mMutex, startTime)) {
 
-                    logger.wrn("list output timeout: [%s]", timeout);
+                            while (!outputQueue.isEmpty()) {
 
-                    if (mIsDeadlock) {
+                                final OUTPUT result = nextOutput(outputQueue, timeout);
+                                logger.dbg("adding output to list: %s [%s]", result, timeout);
+                                results.add(result);
+                            }
 
-                        throw new ReadDeadlockException(
-                                "deadlock while waiting to collect all outputs");
+                            if (mState == ChannelState.DONE) {
+
+                                break;
+                            }
+                        }
+
+                        isTimeout = (mState != ChannelState.DONE);
+
+                    } catch (final InterruptedException e) {
+
+                        throw InvocationInterruptedException.interrupt(e);
+                    }
+
+                    if (isTimeout) {
+
+                        final TimeoutAction action = mTimeoutAction;
+                        logger.wrn("list output timeout: [%s] => [%s]", timeout, action);
+
+                        if (action == TimeoutAction.DEADLOCK) {
+
+                            throw new ReadDeadlockException(
+                                    "deadlock while waiting to collect all outputs");
+
+                        } else {
+
+                            isAbort = (action == TimeoutAction.ABORT);
+                        }
                     }
                 }
+            }
+
+            if (isAbort) {
+
+                abort();
             }
 
             return this;
@@ -1148,9 +1247,26 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         @Override
         public OUTPUT readNext() {
 
-            synchronized (mMutex) {
+            boolean isAbort = false;
 
-                return readQueue(mReadTimeout, mIsDeadlock);
+            try {
+
+                synchronized (mMutex) {
+
+                    final TimeoutAction action = mTimeoutAction;
+                    isAbort = (action == TimeoutAction.ABORT);
+
+                    return readQueue(mReadTimeout, action);
+                }
+
+            } catch (final NoSuchElementException e) {
+
+                if (isAbort) {
+
+                    abort();
+                }
+
+                throw e;
             }
         }
 
@@ -1174,17 +1290,17 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         public Iterator<OUTPUT> iterator() {
 
             final TimeDuration timeout;
-            final boolean isDeadlock;
+            final TimeoutAction action;
 
             synchronized (mMutex) {
 
                 verifyBound();
 
                 timeout = mReadTimeout;
-                isDeadlock = mIsDeadlock;
+                action = mTimeoutAction;
             }
 
-            return new DefaultIterator(timeout, isDeadlock);
+            return new DefaultIterator(timeout, action);
         }
 
         @Override

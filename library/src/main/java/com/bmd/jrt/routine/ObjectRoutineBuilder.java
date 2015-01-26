@@ -15,9 +15,9 @@ package com.bmd.jrt.routine;
 
 import com.bmd.jrt.annotation.AsyncLock;
 import com.bmd.jrt.annotation.AsyncName;
-import com.bmd.jrt.annotation.AsyncTimeout;
 import com.bmd.jrt.annotation.AsyncType;
 import com.bmd.jrt.annotation.ParallelType;
+import com.bmd.jrt.annotation.ResultTimeout;
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.builder.RoutineConfigurationBuilder;
@@ -56,10 +56,12 @@ import static com.bmd.jrt.time.TimeDuration.fromUnit;
  * <p/>
  * Created by davide on 9/21/14.
  *
- * @see AsyncName
- * @see AsyncTimeout
- * @see AsyncType
- * @see ParallelType
+ * @see com.bmd.jrt.annotation.AsyncName
+ * @see com.bmd.jrt.annotation.AsyncLock
+ * @see com.bmd.jrt.annotation.AsyncType
+ * @see com.bmd.jrt.annotation.AsyncWrap
+ * @see com.bmd.jrt.annotation.ParallelType
+ * @see com.bmd.jrt.annotation.ResultTimeout
  */
 public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
@@ -171,13 +173,17 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
             outputChannel.afterMax(outputTimeout);
         }
 
-        if (outputAction == TimeoutAction.EXIT) {
+        if (outputAction == TimeoutAction.DEADLOCK) {
+
+            outputChannel.eventuallyDeadlock();
+
+        } else if (outputAction == TimeoutAction.EXIT) {
 
             outputChannel.eventuallyExit();
 
-        } else if (outputAction == TimeoutAction.DEADLOCK) {
+        } else if (outputAction == TimeoutAction.ABORT) {
 
-            outputChannel.eventuallyDeadlock();
+            outputChannel.eventuallyAbort();
         }
 
         if (!Void.class.equals(boxingClass(returnType))) {
@@ -322,7 +328,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * Returns a proxy object enabling asynchronous calls to the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link AsyncName} and {@link AsyncTimeout} annotation.<br/>
+     * optional {@link AsyncName} and {@link ResultTimeout} annotation.<br/>
      * In case the wrapped object does not implement the specified interface, the value attribute
      * will be used to bind the interface method with the instance ones. If no name is assigned the
      * method name will be used instead to map it.<br/>
@@ -364,7 +370,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * Returns a proxy object enabling asynchronous calls to the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link AsyncName} and {@link AsyncTimeout} annotation.<br/>
+     * optional {@link AsyncName} and {@link ResultTimeout} annotation.<br/>
      * In case the wrapped object does not implement the specified interface, the value attribute
      * will be used to bind the interface method with the instance ones. If no name is assigned the
      * method name will be used instead to map it.<br/>
@@ -387,7 +393,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * Returns a wrapper object enabling asynchronous calls to the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link AsyncName}, {@link AsyncTimeout}, {@link AsyncType} and {@link ParallelType}
+     * optional {@link AsyncName}, {@link ResultTimeout}, {@link AsyncType} and {@link ParallelType}
      * annotations.<br/>
      * The wrapping object is created through code generation based on the interfaces annotated
      * with {@link com.bmd.jrt.annotation.AsyncWrap}.<br/>
@@ -474,7 +480,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * Returns a wrapper object enabling asynchronous calls to the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link AsyncName}, {@link AsyncTimeout}, {@link AsyncType} and {@link ParallelType}
+     * optional {@link AsyncName}, {@link ResultTimeout}, {@link AsyncType} and {@link ParallelType}
      * annotations.<br/>
      * The wrapping object is created through code generation based on the interfaces annotated
      * with {@link com.bmd.jrt.annotation.AsyncWrap}.<br/>
@@ -639,7 +645,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                 lockName = lockAnnotation.value();
             }
 
-            final AsyncTimeout timeoutAnnotation = itf.getAnnotation(AsyncTimeout.class);
+            final ResultTimeout timeoutAnnotation = itf.getAnnotation(ResultTimeout.class);
             TimeDuration outputTimeout = null;
 
             if (timeoutAnnotation != null) {
@@ -800,7 +806,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
             }
 
             final Routine<Object, Object> routine = buildRoutine(method, targetMethod, paramType);
-            final AsyncTimeout methodAnnotation = method.getAnnotation(AsyncTimeout.class);
+            final ResultTimeout methodAnnotation = method.getAnnotation(ResultTimeout.class);
 
             TimeDuration outputTimeout = mOutputTimeout;
 
@@ -888,7 +894,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                 lockName = lockAnnotation.value();
             }
 
-            final AsyncTimeout timeoutAnnotation = itf.getAnnotation(AsyncTimeout.class);
+            final ResultTimeout timeoutAnnotation = itf.getAnnotation(ResultTimeout.class);
             TimeDuration outputTimeout = null;
 
             if (timeoutAnnotation != null) {
@@ -925,7 +931,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
             if (!Void.class.equals(boxingClass(returnType))) {
 
-                final AsyncTimeout methodAnnotation = method.getAnnotation(AsyncTimeout.class);
+                final ResultTimeout methodAnnotation = method.getAnnotation(ResultTimeout.class);
                 TimeDuration outputTimeout = mOutputTimeout;
 
                 if ((outputTimeout == null) && (methodAnnotation != null)) {
@@ -950,13 +956,17 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                     outputAction = methodAnnotation.action();
                 }
 
-                if (outputAction == TimeoutAction.EXIT) {
+                if (outputAction == TimeoutAction.DEADLOCK) {
+
+                    outputChannel.eventuallyDeadlock();
+
+                } else if (outputAction == TimeoutAction.EXIT) {
 
                     outputChannel.eventuallyExit();
 
-                } else if (outputAction == TimeoutAction.DEADLOCK) {
+                } else if (outputAction == TimeoutAction.ABORT) {
 
-                    outputChannel.eventuallyDeadlock();
+                    outputChannel.eventuallyAbort();
                 }
 
                 return outputChannel.readNext();

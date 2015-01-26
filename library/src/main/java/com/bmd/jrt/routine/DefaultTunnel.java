@@ -231,6 +231,14 @@ class DefaultTunnel<TYPE> implements Tunnel<TYPE> {
 
         @Nonnull
         @Override
+        public TunnelOutput<OUTPUT> eventuallyAbort() {
+
+            mChannel.eventuallyAbort();
+            return this;
+        }
+
+        @Nonnull
+        @Override
         public TunnelOutput<OUTPUT> eventuallyDeadlock() {
 
             mChannel.eventuallyDeadlock();

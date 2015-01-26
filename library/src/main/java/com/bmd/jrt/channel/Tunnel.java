@@ -121,6 +121,10 @@ public interface Tunnel<TYPE> {
 
         @Nonnull
         @Override
+        public TunnelOutput<OUTPUT> eventuallyAbort();
+
+        @Nonnull
+        @Override
         public TunnelOutput<OUTPUT> eventuallyDeadlock();
 
         @Nonnull

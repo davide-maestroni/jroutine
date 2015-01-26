@@ -53,10 +53,12 @@ import static com.bmd.jrt.common.Reflection.boxingClass;
  * <p/>
  * Created by davide on 9/21/14.
  *
- * @see com.bmd.jrt.annotation.AsyncTimeout
- * @see AsyncName
+ * @see com.bmd.jrt.annotation.AsyncName
+ * @see com.bmd.jrt.annotation.AsyncLock
  */
 public class ClassRoutineBuilder implements RoutineBuilder {
+
+    //TODO: ResultTimeout? AsyncType? ParallelType?
 
     protected static final CacheHashMap<Object, Map<String, Object>> sMutexCache =
             new CacheHashMap<Object, Map<String, Object>>();
@@ -263,7 +265,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      *
      * @param lockName the lock name.
      * @return this builder.
-     * @see com.bmd.jrt.annotation.AsyncTimeout
+     * @see AsyncLock
      */
     @Nonnull
     public ClassRoutineBuilder lockName(@Nullable final String lockName) {
@@ -276,8 +278,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      * Returns a routine used for calling the specified method.
      * <p/>
      * The method is searched via reflection ignoring an optional name specified in a
-     * {@link com.bmd.jrt.annotation.AsyncTimeout} annotation. Though, the other annotation
-     * attributes will be honored.
+     * {@link AsyncName} annotation. Though, the other annotation attributes will be honored.
      *
      * @param name           the method name.
      * @param parameterTypes the method parameter types.

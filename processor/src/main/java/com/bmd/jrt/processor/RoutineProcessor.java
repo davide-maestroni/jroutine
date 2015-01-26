@@ -15,10 +15,10 @@ package com.bmd.jrt.processor;
 
 import com.bmd.jrt.annotation.AsyncLock;
 import com.bmd.jrt.annotation.AsyncName;
-import com.bmd.jrt.annotation.AsyncTimeout;
 import com.bmd.jrt.annotation.AsyncType;
 import com.bmd.jrt.annotation.AsyncWrap;
 import com.bmd.jrt.annotation.ParallelType;
+import com.bmd.jrt.annotation.ResultTimeout;
 import com.bmd.jrt.builder.RoutineBuilder.TimeoutAction;
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
 import com.bmd.jrt.builder.RoutineConfiguration;
@@ -254,8 +254,8 @@ public class RoutineProcessor extends AbstractProcessor {
     private String buildOutputOptions(@Nonnull final TypeElement element,
             final ExecutableElement methodElement) {
 
-        final AsyncTimeout classAnnotation = element.getAnnotation(AsyncTimeout.class);
-        final AsyncTimeout methodAnnotation = methodElement.getAnnotation(AsyncTimeout.class);
+        final ResultTimeout classAnnotation = element.getAnnotation(ResultTimeout.class);
+        final ResultTimeout methodAnnotation = methodElement.getAnnotation(ResultTimeout.class);
 
         long resultTimeout = RoutineConfiguration.DEFAULT;
         TimeUnit resultTimeUnit = null;
@@ -288,13 +288,17 @@ public class RoutineProcessor extends AbstractProcessor {
                    .append(")");
         }
 
-        if (timeoutAction == TimeoutAction.EXIT) {
+        if (timeoutAction == TimeoutAction.DEADLOCK) {
+
+            builder.append(".eventuallyDeadlock()");
+
+        } else if (timeoutAction == TimeoutAction.EXIT) {
 
             builder.append(".eventuallyExit()");
 
-        } else if (timeoutAction == TimeoutAction.DEADLOCK) {
+        } else if (timeoutAction == TimeoutAction.ABORT) {
 
-            builder.append(".eventuallyDeadlock()");
+            builder.append(".eventuallyAbort()");
         }
 
         return builder.toString();

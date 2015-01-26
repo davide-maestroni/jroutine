@@ -231,10 +231,16 @@ public interface RoutineBuilder {
         DEADLOCK,
         /**
          * Break execution.<br/>
-         * If no result is available after the specified timeout, the called method will its
+         * If no result is available after the specified timeout, the called method will stop its
          * execution and exit immediately.
          */
         EXIT,
+        /**
+         * Abort invocation.<br/>
+         * If no result is available after the specified timeout, the invocation will be aborted and
+         * the method will immediately exit.
+         */
+        ABORT,
         /**
          * Default action.<br/>
          * This value is used to indicated that the choice of the action is left to the framework.

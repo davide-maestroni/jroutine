@@ -14,8 +14,8 @@
 package com.bmd.jrt.routine;
 
 import com.bmd.jrt.annotation.AsyncName;
-import com.bmd.jrt.annotation.AsyncTimeout;
 import com.bmd.jrt.annotation.AsyncType;
+import com.bmd.jrt.annotation.ResultTimeout;
 import com.bmd.jrt.builder.InputDeadlockException;
 import com.bmd.jrt.builder.OutputDeadlockException;
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
@@ -1676,9 +1676,51 @@ public class RoutineTest extends TestCase {
                                                     .buildRoutine();
 
         final OutputChannel<String> channel = routine.callAsync("test");
-        assertThat(channel.immediately().readAll()).isEmpty();
+        assertThat(channel.immediately().eventuallyExit().readAll()).isEmpty();
 
-        channel.afterMax(TimeDuration.millis(10)).eventuallyDeadlock();
+        channel.eventuallyDeadlock();
+
+        try {
+
+            channel.readNext();
+
+            fail();
+
+        } catch (final ReadDeadlockException ignored) {
+
+        }
+
+        try {
+
+            channel.readAll();
+
+            fail();
+
+        } catch (final ReadDeadlockException ignored) {
+
+        }
+
+        try {
+
+            channel.iterator().hasNext();
+
+            fail();
+
+        } catch (final ReadDeadlockException ignored) {
+
+        }
+
+        try {
+
+            channel.iterator().next();
+
+            fail();
+
+        } catch (final ReadDeadlockException ignored) {
+
+        }
+
+        channel.afterMax(TimeDuration.millis(10));
 
         try {
 
@@ -2305,7 +2347,7 @@ public class RoutineTest extends TestCase {
 
     private interface TestInterface {
 
-        @AsyncTimeout(value = 1, unit = TimeUnit.SECONDS)
+        @ResultTimeout(value = 1, unit = TimeUnit.SECONDS)
         public int getInt(int i);
     }
 

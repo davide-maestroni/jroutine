@@ -106,6 +106,18 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
     public OutputChannel<OUTPUT> eventually();
 
     /**
+     * Tells the channel to abort the invocation execution in case no result is available before
+     * the timeout has elapsed.
+     *
+     * @return this channel.
+     * @see #afterMax(com.bmd.jrt.time.TimeDuration)
+     * @see #afterMax(long, java.util.concurrent.TimeUnit)
+     * @see #immediately()
+     */
+    @Nonnull
+    public OutputChannel<OUTPUT> eventuallyAbort();
+
+    /**
      * Tells the channel to throw a {@link ReadDeadlockException} in case no result is available
      * before the timeout has elapsed.
      * <p/>

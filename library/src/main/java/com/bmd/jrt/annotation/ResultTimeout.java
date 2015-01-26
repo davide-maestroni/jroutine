@@ -52,7 +52,7 @@ import java.util.concurrent.TimeUnit;
  *         -keepattributes RuntimeVisibleAnnotations
  *
  *         -keepclassmembers class ** {
- *              &#64;com.bmd.jrt.annotation.AsyncTimeout *;
+ *              &#64;com.bmd.jrt.annotation.ResultTimeout *;
  *         }
  *     </code>
  * </pre>
@@ -62,9 +62,7 @@ import java.util.concurrent.TimeUnit;
 @Inherited
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface AsyncTimeout {
-
-    //TODO: ResultTimeout
+public @interface ResultTimeout {
 
     /**
      * The type of action to take on output channel timeout.

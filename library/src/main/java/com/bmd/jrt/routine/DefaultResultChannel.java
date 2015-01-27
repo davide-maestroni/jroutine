@@ -927,10 +927,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                 }
             }
 
-            //TODO: AbortException
             abort();
-
-            return false;
+            throw new AbortException(null);
         }
 
         @Nullable
@@ -958,6 +956,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                 if (isAbort) {
 
                     abort();
+                    throw new AbortException(null);
                 }
 
                 throw e;
@@ -1246,6 +1245,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             if (isAbort) {
 
                 abort();
+                throw new AbortException(null);
             }
 
             return this;
@@ -1271,6 +1271,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                 if (isAbort) {
 
                     abort();
+                    throw new AbortException(null);
                 }
 
                 throw e;

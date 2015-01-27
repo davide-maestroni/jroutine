@@ -273,7 +273,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
             logger.dbg("generating invocation ID: %d", loaderId);
         }
 
-        boolean needsRestart = isClash(loaderManager, loaderId, inputs);
+        final Loader<InvocationResult<OUTPUT>> loader = loaderManager.getLoader(loaderId);
+        boolean needsRestart = (loader == null) || isClash(loader, loaderId, inputs);
         final CacheHashMap<Object, SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>
                 callbackMap = sCallbackMap;
         final SparseArray<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
@@ -305,7 +306,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
 
         final OutputChannel<OUTPUT> outputChannel = callbacks.newChannel();
 
-        if (needsRestart && (loaderManager.getLoader(loaderId) != null)) {
+        if (needsRestart && (loader != null)) {
 
             logger.dbg("restarting loader [%d]", loaderId);
             loaderManager.restartLoader(loaderId, Bundle.EMPTY, callbacks);
@@ -363,62 +364,56 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
 
     @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST_OF_RETURN_VALUE",
                         justification = "class comparison with == is done")
-    private boolean isClash(@Nonnull final LoaderManager loaderManager, final int loaderId,
-            @Nonnull final List<? extends INPUT> inputs) {
+    private boolean isClash(@Nonnull final Loader<InvocationResult<OUTPUT>> loader,
+            final int loaderId, @Nonnull final List<? extends INPUT> inputs) {
 
         final Logger logger = mLogger;
-        final Loader<InvocationResult<OUTPUT>> loader = loaderManager.getLoader(loaderId);
 
-        if (loader != null) {
+        if (loader.getClass() != RoutineLoader.class) {
 
-            if (loader.getClass() != RoutineLoader.class) {
+            logger.err("clashing invocation ID [%d]: %s", loaderId,
+                       loader.getClass().getCanonicalName());
+            throw new InvocationClashException(loaderId);
+        }
 
-                logger.err("clashing invocation ID [%d]: %s", loaderId,
-                           loader.getClass().getCanonicalName());
-                throw new InvocationClashException(loaderId);
-            }
+        final RoutineLoader<INPUT, OUTPUT> routineLoader = (RoutineLoader<INPUT, OUTPUT>) loader;
+        final Class<? extends AndroidInvocation<INPUT, OUTPUT>> invocationClass =
+                mConstructor.getDeclaringClass();
 
-            final RoutineLoader<INPUT, OUTPUT> routineLoader =
-                    (RoutineLoader<INPUT, OUTPUT>) loader;
-            final Class<? extends AndroidInvocation<INPUT, OUTPUT>> invocationClass =
-                    mConstructor.getDeclaringClass();
+        if ((new ClassToken<MissingLoaderInvocation<INPUT, OUTPUT>>() {}.getRawClass()
+                != invocationClass) && (routineLoader.getInvocationType() != invocationClass)) {
 
-            if ((new ClassToken<MissingLoaderInvocation<INPUT, OUTPUT>>() {}.getRawClass()
-                    != invocationClass) && (routineLoader.getInvocationType() != invocationClass)) {
+            logger.wrn("clashing invocation ID [%d]: %s", loaderId,
+                       routineLoader.getInvocationType().getCanonicalName());
+            throw new InvocationClashException(loaderId);
+        }
 
-                logger.wrn("clashing invocation ID [%d]: %s", loaderId,
-                           routineLoader.getInvocationType().getCanonicalName());
-                throw new InvocationClashException(loaderId);
-            }
+        final ClashResolution resolution = mClashResolution;
 
-            final ClashResolution resolution = mClashResolution;
+        if (resolution == ClashResolution.RESTART) {
 
-            if (resolution == ClashResolution.RESTART) {
+            logger.dbg("restarting existing invocation [%d]", loaderId);
+            return true;
 
-                logger.dbg("restarting existing invocation [%d]", loaderId);
-                return true;
+        } else if (resolution == ClashResolution.ABORT) {
 
-            } else if (resolution == ClashResolution.ABORT) {
+            logger.dbg("aborting invocation invocation [%d]", loaderId);
+            throw new InputClashException(loaderId);
 
-                logger.dbg("aborting invocation invocation [%d]", loaderId);
-                throw new InputClashException(loaderId);
+        } else if ((resolution == ClashResolution.KEEP) || routineLoader.areSameInputs(inputs)) {
 
-            } else if ((resolution == ClashResolution.KEEP) || routineLoader.areSameInputs(
-                    inputs)) {
+            logger.dbg("keeping existing invocation [%d]", loaderId);
+            return false;
 
-                logger.dbg("keeping existing invocation [%d]", loaderId);
-                return false;
+        } else if (resolution == ClashResolution.RESTART_ON_INPUT) {
 
-            } else if (resolution == ClashResolution.RESTART_ON_INPUT) {
+            logger.dbg("restarting existing invocation [%d]", loaderId);
+            return true;
 
-                logger.dbg("restarting existing invocation [%d]", loaderId);
-                return true;
+        } else if (resolution == ClashResolution.ABORT_ON_INPUT) {
 
-            } else if (resolution == ClashResolution.ABORT_ON_INPUT) {
-
-                logger.dbg("aborting invocation invocation [%d]", loaderId);
-                throw new InputClashException(loaderId);
-            }
+            logger.dbg("aborting invocation invocation [%d]", loaderId);
+            throw new InputClashException(loaderId);
         }
 
         return true;

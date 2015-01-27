@@ -300,7 +300,7 @@ public class RoutineTest extends TestCase {
 
         semaphore.tryAcquire(1, TimeUnit.SECONDS);
 
-        assertThat(abortReason.get()).isEqualTo(exception1);
+        assertThat(abortReason.get().getCause()).isEqualTo(exception1);
     }
 
     public void testBind() {

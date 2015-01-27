@@ -21,6 +21,7 @@ import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.OutputConsumer;
 import com.bmd.jrt.channel.ReadDeadlockException;
 import com.bmd.jrt.channel.ResultChannel;
+import com.bmd.jrt.common.AbortException;
 import com.bmd.jrt.common.InvocationInterruptedException;
 import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.runner.Execution;
@@ -378,7 +379,12 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             mBoundChannels.clear();
             mOutputQueue.add(RoutineExceptionWrapper.wrap(throwable));
             mIsException = true;
-            mAbortException = throwable;
+
+            if (mAbortException == null) {
+
+                mAbortException = throwable;
+            }
+
             mState = ChannelState.ABORTED;
             mMutex.notifyAll();
         }
@@ -470,7 +476,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                 mLogger.dbg(throwable, "aborting channel");
                 mOutputQueue.clear();
                 mIsException = true;
-                mAbortException = throwable;
+                mAbortException = (isImmediate) ? throwable : new AbortException(throwable);
                 mState = ChannelState.EXCEPTION;
             }
         }
@@ -1324,7 +1330,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                 mSubLogger.dbg(reason, "aborting output");
                 mOutputQueue.clear();
                 mIsException = true;
-                mAbortException = reason;
+                mAbortException = new AbortException(reason);
                 mState = ChannelState.EXCEPTION;
             }
 

@@ -152,15 +152,16 @@ public class JRoutineTest extends TestCase {
             assertThat(e.getCause().getMessage()).isEqualTo("test");
         }
 
-        final ClassRoutineBuilder builder = JRoutine.on(TestStatic2.class);
+        final ClassRoutineBuilder builder =
+                JRoutine.on(TestStatic2.class).resultTimeout(seconds(2));
 
         long startTime = System.currentTimeMillis();
 
         OutputChannel<Object> getOne = builder.lockName("1").method("getOne").callAsync();
         OutputChannel<Object> getTwo = builder.lockName("2").method("getTwo").callAsync();
 
-        assertThat(getOne.afterMax(timeout).checkComplete()).isTrue();
-        assertThat(getTwo.afterMax(timeout).checkComplete()).isTrue();
+        assertThat(getOne.checkComplete()).isTrue();
+        assertThat(getTwo.checkComplete()).isTrue();
         assertThat(System.currentTimeMillis() - startTime).isLessThan(1000);
 
         startTime = System.currentTimeMillis();
@@ -168,8 +169,8 @@ public class JRoutineTest extends TestCase {
         getOne = builder.method("getOne").callAsync();
         getTwo = builder.method("getTwo").callAsync();
 
-        assertThat(getOne.afterMax(timeout).checkComplete()).isTrue();
-        assertThat(getTwo.afterMax(timeout).checkComplete()).isTrue();
+        assertThat(getOne.checkComplete()).isTrue();
+        assertThat(getTwo.checkComplete()).isTrue();
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
     }
 
@@ -413,15 +414,15 @@ public class JRoutineTest extends TestCase {
             assertThat(e.getCause().getMessage()).isEqualTo("test");
         }
 
-        final ObjectRoutineBuilder builder = JRoutine.on(new Test2());
+        final ObjectRoutineBuilder builder = JRoutine.on(new Test2()).resultTimeout(seconds(2));
 
         long startTime = System.currentTimeMillis();
 
         OutputChannel<Object> getOne = builder.lockName("1").method("getOne").callAsync();
         OutputChannel<Object> getTwo = builder.lockName("2").method("getTwo").callAsync();
 
-        assertThat(getOne.afterMax(timeout).checkComplete()).isTrue();
-        assertThat(getTwo.afterMax(timeout).checkComplete()).isTrue();
+        assertThat(getOne.checkComplete()).isTrue();
+        assertThat(getTwo.checkComplete()).isTrue();
         assertThat(System.currentTimeMillis() - startTime).isLessThan(1000);
 
         startTime = System.currentTimeMillis();
@@ -429,8 +430,8 @@ public class JRoutineTest extends TestCase {
         getOne = builder.method("getOne").callAsync();
         getTwo = builder.method("getTwo").callAsync();
 
-        assertThat(getOne.afterMax(timeout).checkComplete()).isTrue();
-        assertThat(getTwo.afterMax(timeout).checkComplete()).isTrue();
+        assertThat(getOne.checkComplete()).isTrue();
+        assertThat(getTwo.checkComplete()).isTrue();
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
     }
 
@@ -1005,6 +1006,7 @@ public class JRoutineTest extends TestCase {
         }
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     private static class Test2 {
 
         public int getOne() throws InterruptedException {
@@ -1069,6 +1071,7 @@ public class JRoutineTest extends TestCase {
         }
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     private static class TestStatic2 {
 
         public static int getOne() throws InterruptedException {

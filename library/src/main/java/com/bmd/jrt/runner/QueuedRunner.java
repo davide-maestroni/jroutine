@@ -29,7 +29,7 @@ import javax.annotation.Nonnull;
  * <p/>
  * Created by davide on 9/18/14.
  *
- * @see SequentialRunner
+ * @see com.bmd.jrt.runner.SequentialRunner
  */
 class QueuedRunner implements Runner {
 

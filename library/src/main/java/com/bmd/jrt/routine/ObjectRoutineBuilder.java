@@ -309,8 +309,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
      * optional {@link AsyncName} and {@link ResultTimeout} annotation.<br/>
-     * In case the wrapped object does not implement the specified interface, the value attribute
-     * will be used to bind the interface method with the instance ones. If no name is assigned the
+     * In case the wrapped object does not implement the specified interface, the annotation name
+     * will be used to bind the interface method with the instance ones. If no name is assigned, the
      * method name will be used instead to map it.<br/>
      * The interface will be interpreted as a mirror of the target object methods, and the optional
      * {@link AsyncType} and {@link ParallelType} annotations will be honored.
@@ -351,8 +351,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
      * optional {@link AsyncName} and {@link ResultTimeout} annotation.<br/>
-     * In case the wrapped object does not implement the specified interface, the value attribute
-     * will be used to bind the interface method with the instance ones. If no name is assigned the
+     * In case the wrapped object does not implement the specified interface, the annotation name
+     * will be used to bind the interface method with the instance ones. If no name is assigned, the
      * method name will be used instead to map it.<br/>
      * The interface will be interpreted as a mirror of the target object methods, and the optional
      * {@link AsyncType} and {@link ParallelType} annotations will be honored.

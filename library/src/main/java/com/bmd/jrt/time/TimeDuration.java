@@ -341,7 +341,7 @@ public class TimeDuration extends Time {
      * @return whether the sleep happened at all.
      * @throws InterruptedException  if the current thread is interrupted.
      * @throws IllegalStateException if this duration overflows the maximum sleep time.
-     * @see System#currentTimeMillis()
+     * @see java.lang.System#currentTimeMillis()
      */
     public boolean sleepSinceMillis(final long milliTime) throws InterruptedException {
 
@@ -375,7 +375,7 @@ public class TimeDuration extends Time {
      * @return whether the sleep happened at all.
      * @throws InterruptedException  if the current thread is interrupted.
      * @throws IllegalStateException if this duration overflows the maximum sleep time.
-     * @see System#nanoTime()
+     * @see java.lang.System#nanoTime()
      */
     public boolean sleepSinceNanos(final long nanoTime) throws InterruptedException {
 
@@ -435,7 +435,7 @@ public class TimeDuration extends Time {
      * @return whether the wait happened at all.
      * @throws InterruptedException if the current thread is interrupted.
      * @throws NullPointerException if the target object is null.
-     * @see System#currentTimeMillis()
+     * @see java.lang.System#currentTimeMillis()
      */
     @SuppressFBWarnings(value = "WA_NOT_IN_LOOP",
                         justification = "this is just a wrapper on an Object.wait() call")
@@ -474,7 +474,7 @@ public class TimeDuration extends Time {
      * @return whether the wait happened at all.
      * @throws InterruptedException if the current thread is interrupted.
      * @throws NullPointerException if the target object is null.
-     * @see System#nanoTime()
+     * @see java.lang.System#nanoTime()
      */
     @SuppressFBWarnings(value = "WA_NOT_IN_LOOP",
                         justification = "this is just a wrapper on an Object.wait() call")

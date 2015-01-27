@@ -139,7 +139,8 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
     /**
      * Returns a routine used for calling the method whose identifying name is specified in a
-     * {@link AsyncName} annotation.
+     * {@link AsyncName} annotation.<br/>
+     * Optional {@link LockName} and {@link ResultTimeout} method annotations will be honored.
      *
      * @param name     the name specified in the annotation.
      * @param <INPUT>  the input data type.
@@ -263,7 +264,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      *
      * @param lockName the lock name.
      * @return this builder.
-     * @see LockName
+     * @see com.bmd.jrt.annotation.LockName
      */
     @Nonnull
     public ClassRoutineBuilder lockName(@Nullable final String lockName) {
@@ -272,13 +273,12 @@ public class ClassRoutineBuilder implements RoutineBuilder {
         return this;
     }
 
-    //TODO: annotation documentation
-
     /**
      * Returns a routine used for calling the specified method.
      * <p/>
      * The method is searched via reflection ignoring an optional name specified in a
-     * {@link AsyncName} annotation. Though, the other annotation attributes will be honored.
+     * {@link AsyncName} annotation. Though, optional {@link LockName} and {@link ResultTimeout}
+     * method annotations will be honored.
      *
      * @param name           the method name.
      * @param parameterTypes the method parameter types.
@@ -320,7 +320,8 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      * Returns a routine used for calling the specified method.
      * <p/>
      * The method is invoked ignoring an optional name specified in a {@link AsyncName} annotation.
-     * Though, the other annotation attributes will be honored.
+     * Though, optional {@link LockName} and {@link ResultTimeout} method annotations will be
+     * honored.
      *
      * @param method   the method instance.
      * @param <INPUT>  the input data type.
@@ -339,6 +340,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      *
      * @param name the name specified in the annotation.
      * @return the method or null.
+     * @see com.bmd.jrt.annotation.AsyncName
      */
     @Nullable
     protected Method getAnnotatedMethod(final String name) {

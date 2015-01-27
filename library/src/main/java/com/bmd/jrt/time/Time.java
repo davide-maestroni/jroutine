@@ -95,7 +95,7 @@ public class Time {
      * Creates and returns an object representing the current system time in milliseconds.
      *
      * @return the time instance.
-     * @see System#currentTimeMillis()
+     * @see java.lang.System#currentTimeMillis()
      */
     @Nonnull
     public static Time current() {
@@ -108,7 +108,7 @@ public class Time {
      * nanoseconds.
      *
      * @return the time instance.
-     * @see System#nanoTime()
+     * @see java.lang.System#nanoTime()
      */
     @Nonnull
     public static Time currentNano() {

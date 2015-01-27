@@ -74,7 +74,7 @@ import java.lang.annotation.Target;
  * <p/>
  * Created by davide on 11/11/14.
  *
- * @see AsyncType
+ * @see com.bmd.jrt.annotation.AsyncType
  */
 @Inherited
 @Target(ElementType.PARAMETER)

@@ -80,7 +80,7 @@ public interface InputChannel<INPUT> extends Channel {
      * @return this channel.
      * @throws IllegalStateException               if this channel is already closed.
      * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted.
-     * @see OutputChannel#bind(OutputConsumer)
+     * @see com.bmd.jrt.channel.OutputChannel#bind(OutputConsumer)
      */
     @Nonnull
     public InputChannel<INPUT> pass(@Nullable OutputChannel<INPUT> channel);

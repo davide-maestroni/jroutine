@@ -28,7 +28,7 @@ import javax.annotation.Nullable;
  * <p/>
  * Created by davide on 1/14/15.
  *
- * @see AndroidRoutineBuilder
+ * @see com.bmd.jrt.android.builder.AndroidRoutineBuilder
  */
 public interface AndroidChannelBuilder {
 

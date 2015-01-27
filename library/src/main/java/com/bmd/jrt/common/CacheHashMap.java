@@ -58,7 +58,7 @@ public class CacheHashMap<K, V> implements Map<K, V> {
      *
      * @param map the initial content.
      * @throws NullPointerException if the specified map is null.
-     * @see HashMap#HashMap(java.util.Map)
+     * @see java.util.HashMap#HashMap(java.util.Map)
      */
     public CacheHashMap(@Nonnull final Map<? extends K, ? extends V> map) {
 
@@ -70,7 +70,7 @@ public class CacheHashMap<K, V> implements Map<K, V> {
      * Constructor.
      *
      * @param initialCapacity the initial capacity.
-     * @see HashMap#HashMap(int)
+     * @see java.util.HashMap#HashMap(int)
      */
     public CacheHashMap(final int initialCapacity) {
 
@@ -82,7 +82,7 @@ public class CacheHashMap<K, V> implements Map<K, V> {
      *
      * @param initialCapacity the initial capacity.
      * @param loadFactor      the load factor.
-     * @see HashMap#HashMap(int, float)
+     * @see java.util.HashMap#HashMap(int, float)
      */
     public CacheHashMap(final int initialCapacity, final float loadFactor) {
 
@@ -250,7 +250,7 @@ public class CacheHashMap<K, V> implements Map<K, V> {
          *
          * @param referent the referent instance.
          * @param queue    the reference queue.
-         * @see WeakReference#WeakReference(Object, ReferenceQueue)
+         * @see java.lang.ref.WeakReference#WeakReference(Object, ReferenceQueue)
          */
         public IdentityWeakReference(final Object referent,
                 final ReferenceQueue<? super Object> queue) {
@@ -264,7 +264,7 @@ public class CacheHashMap<K, V> implements Map<K, V> {
          * Constructor.
          *
          * @param referent the referent instance.
-         * @see WeakReference#WeakReference(Object)
+         * @see java.lang.ref.WeakReference#WeakReference(Object)
          */
         private IdentityWeakReference(final Object referent) {
 

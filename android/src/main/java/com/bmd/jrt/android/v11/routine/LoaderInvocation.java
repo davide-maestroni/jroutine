@@ -308,7 +308,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
 
         final OutputChannel<OUTPUT> outputChannel = callbacks.newChannel();
 
-        if (needsRestart) {
+        if (needsRestart && (loaderManager.getLoader(loaderId) != null)) {
 
             logger.dbg("restarting loader [%d]", loaderId);
             loaderManager.restartLoader(loaderId, Bundle.EMPTY, callbacks);

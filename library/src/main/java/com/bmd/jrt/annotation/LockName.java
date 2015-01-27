@@ -46,7 +46,7 @@ import java.lang.annotation.Target;
  *         -keepattributes RuntimeVisibleAnnotations
  *
  *         -keepclassmembers class ** {
- *              &#64;com.bmd.jrt.annotation.AsyncLock *;
+ *              &#64;com.bmd.jrt.annotation.LockName *;
  *         }
  *     </code>
  * </pre>
@@ -54,14 +54,14 @@ import java.lang.annotation.Target;
  * Created by davide on 1/26/15.
  */
 @Inherited
-@Target({ElementType.TYPE, ElementType.METHOD})
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface AsyncLock {
+public @interface LockName {
 
     /**
      * Constant indicating a default name value.
      */
-    static final String DEFAULT_LOCK = "com.bmd.jrt.annotation.AsyncLock.DEFAULT_LOCK";
+    static final String DEFAULT_LOCK = "com.bmd.jrt.annotation.LockName.DEFAULT_LOCK";
 
     /**
      * Constant indicating a null lock name.

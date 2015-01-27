@@ -921,6 +921,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                 }
             }
 
+            //TODO: AbortException
             abort();
 
             return false;

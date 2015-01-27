@@ -13,15 +13,14 @@
  */
 package com.bmd.jrt.processor;
 
-import com.bmd.jrt.annotation.AsyncLock;
 import com.bmd.jrt.annotation.AsyncName;
 import com.bmd.jrt.annotation.AsyncType;
 import com.bmd.jrt.annotation.AsyncWrap;
+import com.bmd.jrt.annotation.LockName;
 import com.bmd.jrt.annotation.ParallelType;
 import com.bmd.jrt.annotation.ResultTimeout;
 import com.bmd.jrt.builder.RoutineBuilder.TimeoutAction;
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
-import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.channel.OutputChannel;
 
 import java.io.ByteArrayOutputStream;
@@ -251,54 +250,35 @@ public class RoutineProcessor extends AbstractProcessor {
         return builder.toString();
     }
 
-    private String buildOutputOptions(@Nonnull final TypeElement element,
-            final ExecutableElement methodElement) {
+    private String buildOutputOptions(final ExecutableElement methodElement) {
 
-        final ResultTimeout classAnnotation = element.getAnnotation(ResultTimeout.class);
+        final StringBuilder builder = new StringBuilder();
         final ResultTimeout methodAnnotation = methodElement.getAnnotation(ResultTimeout.class);
-
-        long resultTimeout = RoutineConfiguration.DEFAULT;
-        TimeUnit resultTimeUnit = null;
-        TimeoutAction timeoutAction = TimeoutAction.DEFAULT;
 
         if (methodAnnotation != null) {
 
-            resultTimeout = methodAnnotation.value();
-            resultTimeUnit = methodAnnotation.unit();
-            timeoutAction = methodAnnotation.action();
-        }
-
-        if ((classAnnotation != null) && (resultTimeout == RoutineConfiguration.DEFAULT)) {
-
-            resultTimeout = classAnnotation.value();
-            resultTimeUnit = classAnnotation.unit();
-            timeoutAction = classAnnotation.action();
-        }
-
-        final StringBuilder builder = new StringBuilder();
-
-        if (resultTimeout != RoutineConfiguration.DEFAULT) {
-
             builder.append(".afterMax(")
-                   .append(resultTimeout)
+                   .append(methodAnnotation.value())
                    .append(", ")
                    .append(TimeUnit.class.getCanonicalName())
                    .append(".")
-                   .append(resultTimeUnit)
+                   .append(methodAnnotation.unit())
                    .append(")");
-        }
 
-        if (timeoutAction == TimeoutAction.DEADLOCK) {
+            final TimeoutAction timeoutAction = methodAnnotation.action();
 
-            builder.append(".eventuallyDeadlock()");
+            if (timeoutAction == TimeoutAction.DEADLOCK) {
 
-        } else if (timeoutAction == TimeoutAction.EXIT) {
+                builder.append(".eventuallyDeadlock()");
 
-            builder.append(".eventuallyExit()");
+            } else if (timeoutAction == TimeoutAction.EXIT) {
 
-        } else if (timeoutAction == TimeoutAction.ABORT) {
+                builder.append(".eventuallyExit()");
 
-            builder.append(".eventuallyAbort()");
+            } else if (timeoutAction == TimeoutAction.ABORT) {
+
+                builder.append(".eventuallyAbort()");
+            }
         }
 
         return builder.toString();
@@ -453,7 +433,7 @@ public class RoutineProcessor extends AbstractProcessor {
             for (final ExecutableElement methodElement : methodElements) {
 
                 ++count;
-                writeMethod(writer, element, targetElement, methodElement, count);
+                writeMethod(writer, targetElement, methodElement, count);
             }
 
             writer.append(mFooter);
@@ -748,8 +728,7 @@ public class RoutineProcessor extends AbstractProcessor {
         }
     }
 
-    private void writeMethod(@Nonnull final Writer writer, @Nonnull final TypeElement element,
-            @Nonnull final TypeElement targetElement,
+    private void writeMethod(@Nonnull final Writer writer, @Nonnull final TypeElement targetElement,
             @Nonnull final ExecutableElement methodElement, final int count) throws IOException {
 
         final Types typeUtils = processingEnv.getTypeUtils();
@@ -861,7 +840,7 @@ public class RoutineProcessor extends AbstractProcessor {
         method = method.replace("${paramTypes}", buildParamTypes(methodElement));
         method = method.replace("${paramValues}", buildParamValues(targetMethod));
         method = method.replace("${inputParams}", buildInputParams(methodElement));
-        method = method.replace("${outputOptions}", buildOutputOptions(element, methodElement));
+        method = method.replace("${outputOptions}", buildOutputOptions(methodElement));
 
         writer.append(method);
 
@@ -874,18 +853,12 @@ public class RoutineProcessor extends AbstractProcessor {
         methodFooter = methodFooter.replace("${targetMethodName}", targetMethod.getSimpleName());
         methodFooter = methodFooter.replace("${paramValues}", buildParamValues(targetMethod));
 
-        final AsyncLock classAnnotation = element.getAnnotation(AsyncLock.class);
-        final AsyncLock methodAnnotation = methodElement.getAnnotation(AsyncLock.class);
-        String lockName = AsyncLock.DEFAULT_LOCK;
+        String lockName = LockName.DEFAULT_LOCK;
+        final LockName methodAnnotation = methodElement.getAnnotation(LockName.class);
 
         if (methodAnnotation != null) {
 
             lockName = methodAnnotation.value();
-        }
-
-        if ((classAnnotation != null) && (lockName.equals(AsyncLock.DEFAULT_LOCK))) {
-
-            lockName = classAnnotation.value();
         }
 
         methodFooter = methodFooter.replace("${lockName}", lockName);

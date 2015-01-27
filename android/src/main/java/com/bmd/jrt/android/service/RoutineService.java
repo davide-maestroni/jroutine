@@ -919,9 +919,8 @@ public class RoutineService extends Service {
          * Passes the specified input to the invocation parameter channel.
          *
          * @param input the input.
-         * @throws IllegalStateException                  if the channel is already closed.
-         * @throws com.bmd.jrt.common.InvocationException if the execution has been aborted with
-         *                                                an exception.
+         * @throws IllegalStateException               if the channel is already closed.
+         * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted.
          */
         public void pass(@Nullable final Object input) {
 
@@ -947,11 +946,10 @@ public class RoutineService extends Service {
         /**
          * Closes the input channel and binds the specified consumer to the output one.
          *
-         * @throws NullPointerException                   if the specified consumer is null.
-         * @throws IllegalStateException                  if the channel is already closed or
-         *                                                already bound to a consumer.
-         * @throws com.bmd.jrt.common.InvocationException if the execution has been aborted with
-         *                                                an exception.
+         * @throws NullPointerException                if the specified consumer is null.
+         * @throws IllegalStateException               if the channel is already closed or already
+         *                                             bound to a consumer.
+         * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted.
          */
         public void result(@Nonnull final OutputConsumer<Object> consumer) {
 

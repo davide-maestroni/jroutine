@@ -14,7 +14,6 @@
 package com.bmd.jrt.annotation;
 
 import com.bmd.jrt.builder.RoutineBuilder.TimeoutAction;
-import com.bmd.jrt.builder.RoutineConfiguration;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
@@ -83,5 +82,5 @@ public @interface ResultTimeout {
      *
      * @return the timeout.
      */
-    long value() default RoutineConfiguration.DEFAULT;
+    long value();
 }

@@ -13,8 +13,9 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.annotation.AsyncLock;
 import com.bmd.jrt.annotation.AsyncName;
+import com.bmd.jrt.annotation.LockName;
+import com.bmd.jrt.annotation.ResultTimeout;
 import com.bmd.jrt.builder.RoutineBuilder;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.builder.RoutineConfigurationBuilder;
@@ -54,11 +55,10 @@ import static com.bmd.jrt.common.Reflection.boxingClass;
  * Created by davide on 9/21/14.
  *
  * @see com.bmd.jrt.annotation.AsyncName
- * @see com.bmd.jrt.annotation.AsyncLock
+ * @see com.bmd.jrt.annotation.LockName
+ * @see com.bmd.jrt.annotation.ResultTimeout
  */
 public class ClassRoutineBuilder implements RoutineBuilder {
-
-    //TODO: ResultTimeout? AsyncType? ParallelType?
 
     protected static final CacheHashMap<Object, Map<String, Object>> sMutexCache =
             new CacheHashMap<Object, Map<String, Object>>();
@@ -145,9 +145,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      * @param <INPUT>  the input data type.
      * @param <OUTPUT> the output data type.
      * @return the routine.
-     * @throws IllegalArgumentException               if the specified method is not found.
-     * @throws com.bmd.jrt.common.InvocationException if an error occurred while instantiating
-     *                                                the optional runner or the routine.
+     * @throws IllegalArgumentException if the specified method is not found.
      */
     @Nonnull
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> annotatedMethod(@Nonnull final String name) {
@@ -265,7 +263,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      *
      * @param lockName the lock name.
      * @return this builder.
-     * @see AsyncLock
+     * @see LockName
      */
     @Nonnull
     public ClassRoutineBuilder lockName(@Nullable final String lockName) {
@@ -273,6 +271,8 @@ public class ClassRoutineBuilder implements RoutineBuilder {
         mLockName = lockName;
         return this;
     }
+
+    //TODO: annotation documentation
 
     /**
      * Returns a routine used for calling the specified method.
@@ -283,10 +283,8 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      * @param name           the method name.
      * @param parameterTypes the method parameter types.
      * @return the routine.
-     * @throws NullPointerException                   if one of the parameter is null.
-     * @throws IllegalArgumentException               if no matching method is found.
-     * @throws com.bmd.jrt.common.InvocationException if an error occurred while instantiating
-     *                                                the optional runner or the routine.
+     * @throws NullPointerException     if one of the parameter is null.
+     * @throws IllegalArgumentException if no matching method is found.
      */
     @Nonnull
     public Routine<Object, Object> method(@Nonnull final String name,
@@ -328,14 +326,12 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      * @param <INPUT>  the input data type.
      * @param <OUTPUT> the output data type.
      * @return the routine.
-     * @throws NullPointerException                   if the specified method is null.
-     * @throws com.bmd.jrt.common.InvocationException if an error occurred while instantiating
-     *                                                the optional runner or the routine.
+     * @throws NullPointerException if the specified method is null.
      */
     @Nonnull
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final Method method) {
 
-        return method(mBuilder.buildConfiguration(), mLockName, mTargetClass, method);
+        return method(mBuilder.buildConfiguration(), mLockName, method);
     }
 
     /**
@@ -415,7 +411,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
                 routineCache.put(target, routineMap);
             }
 
-            final String methodLockName = (lockName != null) ? lockName : AsyncLock.DEFAULT_LOCK;
+            final String methodLockName = (lockName != null) ? lockName : LockName.DEFAULT_LOCK;
             final RoutineInfo routineInfo = new RoutineInfo(configuration, method, methodLockName);
             routine = routineMap.get(routineInfo);
 
@@ -426,7 +422,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
             Object mutex = null;
 
-            if (!AsyncLock.NULL_LOCK.equals(methodLockName)) {
+            if (!LockName.NULL_LOCK.equals(methodLockName)) {
 
                 synchronized (sMutexCache) {
 
@@ -496,55 +492,44 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      *
      * @param configuration the routine configuration.
      * @param lockName      the lock name.
-     * @param targetClass   the target class.
      * @param targetMethod  the target method.
-     * @param <INPUT>       the input data type.
-     * @param <OUTPUT>      the output data type.
      * @return the routine.
-     * @throws NullPointerException                   if the specified configuration, class or
-     *                                                method are null.
-     * @throws com.bmd.jrt.common.InvocationException if an error occurred while instantiating
-     *                                                the optional runner or the routine.
+     * @throws NullPointerException if the specified configuration, class or method are null.
      */
     @Nonnull
     protected <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(
             @Nonnull final RoutineConfiguration configuration, @Nullable final String lockName,
-            @Nonnull final Class<?> targetClass, @Nonnull final Method targetMethod) {
+            @Nonnull final Method targetMethod) {
 
         String methodLockName = lockName;
         final RoutineConfigurationBuilder builder = new RoutineConfigurationBuilder();
+        final LockName lockAnnotation = targetMethod.getAnnotation(LockName.class);
 
-        if (lockName == null) {
+        if (lockAnnotation != null) {
 
-            final AsyncLock classAnnotation = targetClass.getAnnotation(AsyncLock.class);
+            final String annotationLockName = lockAnnotation.value();
 
-            if (classAnnotation != null) {
+            if (!LockName.DEFAULT_LOCK.equals(annotationLockName)) {
 
-                methodLockName = classAnnotation.value();
+                methodLockName = annotationLockName;
             }
         }
 
-        if (lockName == null) {
+        builder.apply(configuration)
+               .inputSize(Integer.MAX_VALUE)
+               .inputTimeout(TimeDuration.ZERO)
+               .outputSize(Integer.MAX_VALUE)
+               .outputTimeout(TimeDuration.ZERO);
 
-            final AsyncLock methodAnnotation = targetMethod.getAnnotation(AsyncLock.class);
+        final ResultTimeout timeoutAnnotation = targetMethod.getAnnotation(ResultTimeout.class);
 
-            if (methodAnnotation != null) {
+        if (timeoutAnnotation != null) {
 
-                final String annotationLockName = methodAnnotation.value();
-
-                if (!AsyncLock.DEFAULT_LOCK.equals(annotationLockName)) {
-
-                    methodLockName = annotationLockName;
-                }
-            }
+            builder.resultTimeout(timeoutAnnotation.value(), timeoutAnnotation.unit())
+                   .onResultTimeout(timeoutAnnotation.action());
         }
 
-        return getRoutine(builder.apply(configuration)
-                                 .inputSize(Integer.MAX_VALUE)
-                                 .inputTimeout(TimeDuration.ZERO)
-                                 .outputSize(Integer.MAX_VALUE)
-                                 .outputTimeout(TimeDuration.ZERO)
-                                 .buildConfiguration(), methodLockName, targetMethod);
+        return getRoutine(builder.buildConfiguration(), methodLockName, targetMethod);
     }
 
     private void fillMap(@Nonnull final HashMap<String, Method> map,

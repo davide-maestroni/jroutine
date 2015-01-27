@@ -133,7 +133,7 @@ import javax.annotation.Nonnull;
  * Created by davide on 9/7/14.
  *
  * @see com.bmd.jrt.annotation.AsyncName
- * @see com.bmd.jrt.annotation.AsyncLock
+ * @see com.bmd.jrt.annotation.LockName
  * @see com.bmd.jrt.annotation.AsyncType
  * @see com.bmd.jrt.annotation.AsyncWrap
  * @see com.bmd.jrt.annotation.ParallelType

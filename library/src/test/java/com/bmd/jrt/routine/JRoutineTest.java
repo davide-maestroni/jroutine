@@ -17,7 +17,7 @@ import com.bmd.jrt.annotation.AsyncName;
 import com.bmd.jrt.annotation.AsyncType;
 import com.bmd.jrt.annotation.LockName;
 import com.bmd.jrt.annotation.ParallelType;
-import com.bmd.jrt.annotation.ResultTimeout;
+import com.bmd.jrt.annotation.ReadTimeout;
 import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
 import com.bmd.jrt.builder.RoutineConfiguration;
@@ -152,8 +152,7 @@ public class JRoutineTest extends TestCase {
             assertThat(e.getCause().getMessage()).isEqualTo("test");
         }
 
-        final ClassRoutineBuilder builder =
-                JRoutine.on(TestStatic2.class).resultTimeout(seconds(2));
+        final ClassRoutineBuilder builder = JRoutine.on(TestStatic2.class).readTimeout(seconds(2));
 
         long startTime = System.currentTimeMillis();
 
@@ -414,7 +413,7 @@ public class JRoutineTest extends TestCase {
             assertThat(e.getCause().getMessage()).isEqualTo("test");
         }
 
-        final ObjectRoutineBuilder builder = JRoutine.on(new Test2()).resultTimeout(seconds(2));
+        final ObjectRoutineBuilder builder = JRoutine.on(new Test2()).readTimeout(seconds(2));
 
         long startTime = System.currentTimeMillis();
 
@@ -900,14 +899,14 @@ public class JRoutineTest extends TestCase {
 
     private interface ITestInc {
 
-        @ResultTimeout(1000)
+        @ReadTimeout(1000)
         @AsyncType(int.class)
         public int[] inc(@ParallelType(int.class) int... i);
     }
 
     private static interface SquareItf {
 
-        @ResultTimeout(value = 1, unit = TimeUnit.SECONDS)
+        @ReadTimeout(value = 1, unit = TimeUnit.SECONDS)
         public int compute(int i);
 
         @LockName(LockName.NULL_LOCK)

@@ -63,7 +63,7 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> implements AndroidRoutineBuild
      *
      * @param activity   the context activity.
      * @param classToken the invocation class token.
-     * @throws NullPointerException if the class token is null.
+     * @throws NullPointerException if the activity or class token are null.
      */
     DefaultAndroidRoutineBuilder(@Nonnull final FragmentActivity activity,
             @Nonnull final ClassToken<? extends AndroidInvocation<INPUT, OUTPUT>> classToken) {
@@ -76,7 +76,7 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> implements AndroidRoutineBuild
      *
      * @param fragment   the context fragment.
      * @param classToken the invocation class token.
-     * @throws NullPointerException if the class token is null.
+     * @throws NullPointerException if the fragment or class token are null.
      */
     DefaultAndroidRoutineBuilder(@Nonnull final Fragment fragment,
             @Nonnull final ClassToken<? extends AndroidInvocation<INPUT, OUTPUT>> classToken) {
@@ -89,10 +89,16 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> implements AndroidRoutineBuild
      *
      * @param context    the context instance.
      * @param classToken the invocation class token.
-     * @throws NullPointerException if the class token is null.
+     * @throws NullPointerException if the context or class token are null.
      */
+    @SuppressWarnings("ConstantConditions")
     private DefaultAndroidRoutineBuilder(@Nonnull final Object context,
             @Nonnull final ClassToken<? extends AndroidInvocation<INPUT, OUTPUT>> classToken) {
+
+        if (context == null) {
+
+            throw new NullPointerException("the routine context must not be null");
+        }
 
         mContext = new WeakReference<Object>(context);
         mConstructor = findConstructor(classToken.getRawClass());

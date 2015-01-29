@@ -76,7 +76,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
     private final TimeDuration mOutputTimeout;
 
-    private final TimeDuration mResultTimeout;
+    private final TimeDuration mReadTimeout;
 
     private final Runner mRunner;
 
@@ -97,8 +97,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     private NestedQueue<Object> mOutputQueue;
 
     private int mPendingOutputCount;
-
-    private TimeDuration mReadTimeout = ZERO;
 
     private TimeDuration mResultDelay = ZERO;
 
@@ -132,8 +130,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         mLogger = logger.subContextLogger(this);
         mHandler = handler;
         mRunner = runner;
-        mResultTimeout = configuration.getResultTimeoutOr(ZERO);
-        mTimeoutAction = configuration.getResultTimeoutActionOr(TimeoutAction.DEADLOCK);
+        mReadTimeout = configuration.getReadTimeoutOr(ZERO);
+        mTimeoutAction = configuration.getReadTimeoutActionOr(TimeoutAction.DEADLOCK);
         mMaxOutput = configuration.getOutputSizeOr(Integer.MAX_VALUE);
         mOutputTimeout = configuration.getOutputTimeoutOr(ZERO);
 
@@ -443,7 +441,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         final TimeoutAction action = mTimeoutAction;
         final OutputChannel<OUTPUT> outputChannel =
-                new DefaultOutputChannel().afterMax(mResultTimeout);
+                new DefaultOutputChannel().afterMax(mReadTimeout);
 
         if (action == TimeoutAction.EXIT) {
 
@@ -987,6 +985,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     private class DefaultOutputChannel implements OutputChannel<OUTPUT> {
 
         private final Logger mSubLogger = mLogger.subContextLogger(this);
+
+        private TimeDuration mReadTimeout = ZERO;
 
         private TimeoutAction mTimeoutAction = TimeoutAction.DEADLOCK;
 

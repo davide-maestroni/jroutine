@@ -753,11 +753,11 @@ public class RoutineService extends Service {
         }
 
         /**
-         * Makes the routine flush all the cached invocation instances.
+         * Makes the routine purge all the cached invocation instances.
          */
         public void flush() {
 
-            mRoutine.flush();
+            mRoutine.purge();
         }
 
         /**

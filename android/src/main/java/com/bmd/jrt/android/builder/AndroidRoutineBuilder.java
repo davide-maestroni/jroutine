@@ -207,16 +207,16 @@ public interface AndroidRoutineBuilder<INPUT, OUTPUT> {
         /**
          * Only in case of error the results are cleared, otherwise they are retained.
          */
-        RETAIN_RESULT,
+        STORE_RESULT,
         /**
          * Only in case of successful completion the results are cleared, otherwise they are
          * retained.
          */
-        RETAIN_ERROR,
+        STORE_ERROR,
         /**
          * On completion the invocation results are retained.
          */
-        RETAIN,
+        STORE,
         /**
          * The default type, that is, it is let to the framework decide what to do with the
          * invocation results.

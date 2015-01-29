@@ -17,7 +17,7 @@ import com.bmd.jrt.annotation.AsyncName;
 import com.bmd.jrt.annotation.AsyncType;
 import com.bmd.jrt.annotation.LockName;
 import com.bmd.jrt.annotation.ParallelType;
-import com.bmd.jrt.annotation.ResultTimeout;
+import com.bmd.jrt.annotation.ReadTimeout;
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.builder.RoutineConfigurationBuilder;
@@ -61,7 +61,7 @@ import static com.bmd.jrt.time.TimeDuration.fromUnit;
  * @see com.bmd.jrt.annotation.AsyncWrap
  * @see com.bmd.jrt.annotation.LockName
  * @see com.bmd.jrt.annotation.ParallelType
- * @see com.bmd.jrt.annotation.ResultTimeout
+ * @see com.bmd.jrt.annotation.ReadTimeout
  */
 public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
@@ -257,26 +257,25 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
     @Nonnull
     @Override
-    public ObjectRoutineBuilder onResultTimeout(@Nonnull final TimeoutAction action) {
+    public ObjectRoutineBuilder onReadTimeout(@Nonnull final TimeoutAction action) {
 
-        super.onResultTimeout(action);
+        super.onReadTimeout(action);
         return this;
     }
 
     @Nonnull
     @Override
-    public ObjectRoutineBuilder resultTimeout(final long timeout,
-            @Nonnull final TimeUnit timeUnit) {
+    public ObjectRoutineBuilder readTimeout(final long timeout, @Nonnull final TimeUnit timeUnit) {
 
-        super.resultTimeout(timeout, timeUnit);
+        super.readTimeout(timeout, timeUnit);
         return this;
     }
 
     @Nonnull
     @Override
-    public ObjectRoutineBuilder resultTimeout(@Nullable final TimeDuration timeout) {
+    public ObjectRoutineBuilder readTimeout(@Nullable final TimeDuration timeout) {
 
-        super.resultTimeout(timeout);
+        super.readTimeout(timeout);
         return this;
     }
 
@@ -308,7 +307,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * Returns a proxy object enabling asynchronous calls to the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link AsyncName} and {@link ResultTimeout} annotation.<br/>
+     * optional {@link AsyncName} and {@link ReadTimeout} annotation.<br/>
      * In case the wrapped object does not implement the specified interface, the annotation name
      * will be used to bind the interface method with the instance ones. If no name is assigned, the
      * method name will be used instead to map it.<br/>
@@ -350,7 +349,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * Returns a proxy object enabling asynchronous calls to the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link AsyncName} and {@link ResultTimeout} annotation.<br/>
+     * optional {@link AsyncName} and {@link ReadTimeout} annotation.<br/>
      * In case the wrapped object does not implement the specified interface, the annotation name
      * will be used to bind the interface method with the instance ones. If no name is assigned, the
      * method name will be used instead to map it.<br/>
@@ -373,7 +372,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * Returns a wrapper object enabling asynchronous calls to the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link AsyncName}, {@link ResultTimeout}, {@link AsyncType} and {@link ParallelType}
+     * optional {@link AsyncName}, {@link ReadTimeout}, {@link AsyncType} and {@link ParallelType}
      * annotations.<br/>
      * The wrapping object is created through code generation based on the interfaces annotated
      * with {@link com.bmd.jrt.annotation.AsyncWrap}.<br/>
@@ -460,7 +459,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * Returns a wrapper object enabling asynchronous calls to the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link AsyncName}, {@link ResultTimeout}, {@link AsyncType} and {@link ParallelType}
+     * optional {@link AsyncName}, {@link ReadTimeout}, {@link AsyncType} and {@link ParallelType}
      * annotations.<br/>
      * The wrapping object is created through code generation based on the interfaces annotated
      * with {@link com.bmd.jrt.annotation.AsyncWrap}.<br/>
@@ -781,12 +780,12 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                    .outputSize(Integer.MAX_VALUE)
                    .outputTimeout(TimeDuration.ZERO);
 
-            final ResultTimeout timeoutAnnotation = method.getAnnotation(ResultTimeout.class);
+            final ReadTimeout timeoutAnnotation = method.getAnnotation(ReadTimeout.class);
 
             if (timeoutAnnotation != null) {
 
-                builder.resultTimeout(timeoutAnnotation.value(), timeoutAnnotation.unit())
-                       .onResultTimeout(timeoutAnnotation.action());
+                builder.readTimeout(timeoutAnnotation.value(), timeoutAnnotation.unit())
+                       .onReadTimeout(timeoutAnnotation.action());
             }
 
             return getRoutine(builder.buildConfiguration(), lockName, targetMethod);
@@ -821,7 +820,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
             if (!Void.class.equals(boxingClass(returnType))) {
 
-                final ResultTimeout methodAnnotation = method.getAnnotation(ResultTimeout.class);
+                final ReadTimeout methodAnnotation = method.getAnnotation(ReadTimeout.class);
                 TimeDuration outputTimeout = null;
                 TimeoutAction outputAction = TimeoutAction.DEFAULT;
 

@@ -34,7 +34,5 @@ public class TestActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.test_v11_layout);
-
-        JRoutine.initActivity(this);
     }
 }

@@ -58,8 +58,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  *             super.onCreate(savedInstanceState);
  *             setContentView(R.layout.my_activity_layout);
  *
- *             JRoutine.initActivity(this);
- *
  *             if (savedInstanceState != null) {
  *
  *                 mResource = savedInstanceState.getParcelable(RESOURCE_KEY);
@@ -142,40 +140,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 public class JRoutine extends com.bmd.jrt.android.routine.JRoutine {
 
     /**
-     * Initializes the specified activity so to enable the creation of routines linked to its
-     * lifecycle.<br/>
-     * This method must be called in the activity <code>onCreate()</code> method.
-     *
-     * @param activity the activity instance.
-     * @throws NullPointerException if the specified activity is null.
-     */
-    public static void initActivity(@Nonnull final Activity activity) {
-
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            throw new UnsupportedOperationException(
-                    "this method is supported only with API level >= " +
-                            VERSION_CODES.HONEYCOMB
-                            + ": use com.bmd.jrt.android.v4.routine.JRoutine class instead");
-        }
-
-        LoaderInvocation.initActivity(activity);
-    }
-
-    /**
-     * Initializes the specified fragment so to enable the creation of routines linked to its
-     * lifecycle.<br/>
-     * This method must be called in the fragment <code>onCreate()</code> method.
-     *
-     * @param fragment the fragment instance.
-     * @throws NullPointerException if the specified fragment is null.
-     */
-    public static void initFragment(@Nonnull final Fragment fragment) {
-
-        LoaderInvocation.initFragment(fragment);
-    }
-
-    /**
      * Returns a builder of routines linked to the specified activity.<br/>
      * Note that the specified invocation class must be static and have a default constructor.<br/>
      * Note that also the built routine results will be always dispatched in the main UI thread,
@@ -188,8 +152,7 @@ public class JRoutine extends com.bmd.jrt.android.routine.JRoutine {
      * @param <OUTPUT>   the output data type.
      * @return the routine builder instance.
      * @throws IllegalArgumentException if the specified invocation has no default constructor.
-     * @throws IllegalStateException    if the specified activity is not initialized.
-     * @throws NullPointerException     if any of the specified parameters is null.
+     * @throws NullPointerException     if the specified activity or class token are null.
      */
     @Nonnull
     public static <INPUT, OUTPUT> AndroidRoutineBuilder<INPUT, OUTPUT> onActivity(
@@ -202,13 +165,6 @@ public class JRoutine extends com.bmd.jrt.android.routine.JRoutine {
                     "this method is supported only with API level >= " +
                             VERSION_CODES.HONEYCOMB
                             + ": use com.bmd.jrt.android.v4.routine.JRoutine class instead");
-        }
-
-        if (!LoaderInvocation.isEnabled(activity)) {
-
-            throw new IllegalStateException(
-                    "routine creation is not enabled: be sure to call JRoutine.initActivity(this) "
-                            + "in activity onCreate() method");
         }
 
         return new DefaultAndroidRoutineBuilder<INPUT, OUTPUT>(activity, classToken);
@@ -225,8 +181,7 @@ public class JRoutine extends com.bmd.jrt.android.routine.JRoutine {
      * @param id       the invocation ID.
      * @return the channel builder instance.
      * @throws IllegalArgumentException if the specified invocation ID is equal to GENERATED_ID.
-     * @throws IllegalStateException    if the specified activity is not initialized.
-     * @throws NullPointerException     if any of the specified parameters is null.
+     * @throws NullPointerException     if the specified activity is null.
      */
     @Nonnull
     public static AndroidChannelBuilder onActivity(@Nonnull final Activity activity, final int id) {
@@ -237,13 +192,6 @@ public class JRoutine extends com.bmd.jrt.android.routine.JRoutine {
                     "this method is supported only with API level >= " +
                             VERSION_CODES.HONEYCOMB
                             + ": use com.bmd.jrt.android.v4.routine.JRoutine class instead");
-        }
-
-        if (!LoaderInvocation.isEnabled(activity)) {
-
-            throw new IllegalStateException(
-                    "routine creation is not enabled: be sure to call JRoutine.initActivity(this) "
-                            + "in activity onCreate() method");
         }
 
         if (id == AndroidRoutineBuilder.GENERATED_ID) {
@@ -266,20 +214,12 @@ public class JRoutine extends com.bmd.jrt.android.routine.JRoutine {
      * @param <INPUT>    the input data type.
      * @param <OUTPUT>   the output data type.
      * @return the routine builder instance.
-     * @throws IllegalStateException if the specified activity is not initialized.
-     * @throws NullPointerException  if any of the specified parameters is null.
+     * @throws NullPointerException if the specified fragment or class token are null.
      */
     @Nonnull
     public static <INPUT, OUTPUT> AndroidRoutineBuilder<INPUT, OUTPUT> onFragment(
             @Nonnull final Fragment fragment,
             @Nonnull ClassToken<? extends AndroidInvocation<INPUT, OUTPUT>> classToken) {
-
-        if (!LoaderInvocation.isEnabled(fragment)) {
-
-            throw new IllegalStateException(
-                    "routine creation is not enabled: be sure to call JRoutine.initFragment(this) "
-                            + "in fragment onCreate() method");
-        }
 
         return new DefaultAndroidRoutineBuilder<INPUT, OUTPUT>(fragment, classToken);
     }
@@ -295,18 +235,10 @@ public class JRoutine extends com.bmd.jrt.android.routine.JRoutine {
      * @param id       the invocation ID.
      * @return the channel builder instance.
      * @throws IllegalArgumentException if the specified invocation ID is equal to GENERATED_ID.
-     * @throws IllegalStateException    if the specified activity is not initialized.
-     * @throws NullPointerException     if any of the specified parameters is null.
+     * @throws NullPointerException     if the specified fragment is null.
      */
     @Nonnull
     public static AndroidChannelBuilder onFragment(@Nonnull final Fragment fragment, final int id) {
-
-        if (!LoaderInvocation.isEnabled(fragment)) {
-
-            throw new IllegalStateException(
-                    "routine creation is not enabled: be sure to call JRoutine.initFragment(this) "
-                            + "in fragment onCreate() method");
-        }
 
         if (id == AndroidRoutineBuilder.GENERATED_ID) {
 

@@ -18,7 +18,7 @@ import com.bmd.jrt.annotation.AsyncType;
 import com.bmd.jrt.annotation.AsyncWrap;
 import com.bmd.jrt.annotation.LockName;
 import com.bmd.jrt.annotation.ParallelType;
-import com.bmd.jrt.annotation.ResultTimeout;
+import com.bmd.jrt.annotation.ReadTimeout;
 import com.bmd.jrt.builder.RoutineBuilder.TimeoutAction;
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
 import com.bmd.jrt.channel.OutputChannel;
@@ -253,7 +253,7 @@ public class RoutineProcessor extends AbstractProcessor {
     private String buildOutputOptions(final ExecutableElement methodElement) {
 
         final StringBuilder builder = new StringBuilder();
-        final ResultTimeout methodAnnotation = methodElement.getAnnotation(ResultTimeout.class);
+        final ReadTimeout methodAnnotation = methodElement.getAnnotation(ReadTimeout.class);
 
         if (methodAnnotation != null) {
 

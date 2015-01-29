@@ -15,9 +15,10 @@ package com.bmd.jrt.routine;
 
 import com.bmd.jrt.annotation.AsyncName;
 import com.bmd.jrt.annotation.AsyncType;
-import com.bmd.jrt.annotation.ResultTimeout;
+import com.bmd.jrt.annotation.ReadTimeout;
 import com.bmd.jrt.builder.InputDeadlockException;
 import com.bmd.jrt.builder.OutputDeadlockException;
+import com.bmd.jrt.builder.RoutineBuilder.TimeoutAction;
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.builder.RoutineConfigurationBuilder;
@@ -27,6 +28,7 @@ import com.bmd.jrt.channel.ParameterChannel;
 import com.bmd.jrt.channel.ReadDeadlockException;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.channel.TemplateOutputConsumer;
+import com.bmd.jrt.common.AbortException;
 import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.common.InvocationException;
 import com.bmd.jrt.invocation.Invocation;
@@ -266,6 +268,7 @@ public class RoutineTest extends TestCase {
         assertThat(isFailed.get()).isFalse();
     }
 
+    @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
     public void testAbortInput() throws InterruptedException {
 
         final Semaphore semaphore = new Semaphore(0);
@@ -908,7 +911,7 @@ public class RoutineTest extends TestCase {
         assertThat(routine5.callParallel("1", "2", "3", "4", "5")
                            .afterMax(timeout)
                            .readAll()).containsOnly("1", "2", "3", "4", "5");
-        routine5.flush();
+        routine5.purge();
         assertThat(TestDestroy.getInstanceCount()).isZero();
 
         final Routine<String, String> routine6 =
@@ -923,7 +926,7 @@ public class RoutineTest extends TestCase {
         assertThat(routine6.callParallel("1", "2", "3", "4", "5")
                            .afterMax(timeout)
                            .readAll()).containsOnly("1", "2", "3", "4", "5");
-        routine6.flush();
+        routine6.purge();
         assertThat(TestDestroy.getInstanceCount()).isZero();
     }
 
@@ -1204,17 +1207,15 @@ public class RoutineTest extends TestCase {
 
         }
 
-        assertThat(on(testClass).resultTimeout(timeout)
-                                .buildProxy(TestInterfaceAsync.class)
-                                .take(77)).isEqualTo(77);
+        assertThat(on(testClass).readTimeout(timeout).buildProxy(TestInterfaceAsync.class).take(77))
+                .isEqualTo(77);
         assertThat(on(testClass).buildProxy(TestInterfaceAsync.class)
                                 .getOne()
                                 .afterMax(timeout)
                                 .readNext()).isEqualTo(1);
 
         final TestInterfaceAsync testInterfaceAsync =
-                on(testClass).resultTimeout(1, TimeUnit.SECONDS)
-                             .buildProxy(TestInterfaceAsync.class);
+                on(testClass).readTimeout(1, TimeUnit.SECONDS).buildProxy(TestInterfaceAsync.class);
         assertThat(testInterfaceAsync.getInt(testInterfaceAsync.getOne())).isEqualTo(1);
     }
 
@@ -1669,20 +1670,134 @@ public class RoutineTest extends TestCase {
                 10);
     }
 
-    public void testTimeout() {
+    public void testTimeoutActions() {
 
-        final Routine<String, String> routine =
-                on(tokenOf(DelayedInvocation.class)).withArgs(TimeDuration.seconds(3))
+        final Routine<String, String> routine1 =
+                on(tokenOf(DelayedInvocation.class)).onReadTimeout(TimeoutAction.ABORT)
+                                                    .withArgs(seconds(1))
                                                     .buildRoutine();
 
-        final OutputChannel<String> channel = routine.callAsync("test");
-        assertThat(channel.immediately().eventuallyExit().readAll()).isEmpty();
+        try {
 
-        channel.eventuallyDeadlock();
+            routine1.callAsync("test1").readNext();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
 
         try {
 
-            channel.readNext();
+            routine1.callAsync("test1").readAll();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        try {
+
+            final ArrayList<String> results = new ArrayList<String>();
+            routine1.callAsync("test1").readAllInto(results);
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        try {
+
+            routine1.callAsync("test1").iterator().hasNext();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        try {
+
+            routine1.callAsync("test1").iterator().next();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        assertThat(routine1.callAsync("test1").checkComplete()).isFalse();
+
+        final Routine<String, String> routine2 =
+                on(tokenOf(DelayedInvocation.class)).onReadTimeout(TimeoutAction.ABORT)
+                                                    .readTimeout(millis(10))
+                                                    .withArgs(seconds(1))
+                                                    .buildRoutine();
+
+        try {
+
+            routine2.callAsync("test1").readNext();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        try {
+
+            routine2.callAsync("test1").readAll();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        try {
+
+            final ArrayList<String> results = new ArrayList<String>();
+            routine2.callAsync("test1").readAllInto(results);
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        try {
+
+            routine2.callAsync("test1").iterator().hasNext();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        try {
+
+            routine2.callAsync("test1").iterator().next();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        assertThat(routine2.callAsync("test1").checkComplete()).isFalse();
+
+        final Routine<String, String> routine3 =
+                on(tokenOf(DelayedInvocation.class)).onReadTimeout(TimeoutAction.DEADLOCK)
+                                                    .withArgs(seconds(1))
+                                                    .buildRoutine();
+        final OutputChannel<String> channel3 = routine3.callAsync("test1");
+
+        try {
+
+            channel3.readNext();
 
             fail();
 
@@ -1692,7 +1807,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            channel.readAll();
+            channel3.readAll();
 
             fail();
 
@@ -1702,7 +1817,8 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            channel.iterator().hasNext();
+            final ArrayList<String> results = new ArrayList<String>();
+            channel3.readAllInto(results);
 
             fail();
 
@@ -1712,19 +1828,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            channel.iterator().next();
-
-            fail();
-
-        } catch (final ReadDeadlockException ignored) {
-
-        }
-
-        channel.afterMax(TimeDuration.millis(10));
-
-        try {
-
-            channel.readNext();
+            channel3.iterator().hasNext();
 
             fail();
 
@@ -1734,7 +1838,21 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            channel.readAll();
+            channel3.iterator().next();
+
+            fail();
+
+        } catch (final ReadDeadlockException ignored) {
+
+        }
+
+        assertThat(channel3.checkComplete()).isFalse();
+
+        channel3.afterMax(millis(10));
+
+        try {
+
+            channel3.readNext();
 
             fail();
 
@@ -1744,7 +1862,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            channel.iterator().hasNext();
+            channel3.readAll();
 
             fail();
 
@@ -1754,7 +1872,8 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            channel.iterator().next();
+            final ArrayList<String> results = new ArrayList<String>();
+            channel3.readAllInto(results);
 
             fail();
 
@@ -1762,7 +1881,95 @@ public class RoutineTest extends TestCase {
 
         }
 
-        assertThat(channel.checkComplete()).isFalse();
+        try {
+
+            channel3.iterator().hasNext();
+
+            fail();
+
+        } catch (final ReadDeadlockException ignored) {
+
+        }
+
+        try {
+
+            channel3.iterator().next();
+
+            fail();
+
+        } catch (final ReadDeadlockException ignored) {
+
+        }
+
+        assertThat(channel3.checkComplete()).isFalse();
+
+        final Routine<String, String> routine4 =
+                on(tokenOf(DelayedInvocation.class)).onReadTimeout(TimeoutAction.EXIT)
+                                                    .withArgs(seconds(1))
+                                                    .buildRoutine();
+        final OutputChannel<String> channel4 = routine4.callAsync("test1");
+
+        try {
+
+            channel4.readNext();
+
+            fail();
+
+        } catch (final NoSuchElementException ignored) {
+
+        }
+
+        assertThat(channel4.readAll()).isEmpty();
+
+        final ArrayList<String> results = new ArrayList<String>();
+        channel4.readAllInto(results);
+        assertThat(results).isEmpty();
+
+        assertThat(channel4.iterator().hasNext()).isFalse();
+
+        try {
+
+            channel4.iterator().next();
+
+            fail();
+
+        } catch (final NoSuchElementException ignored) {
+
+        }
+
+        assertThat(channel4.checkComplete()).isFalse();
+
+        channel4.afterMax(millis(10));
+
+        try {
+
+            channel4.readNext();
+
+            fail();
+
+        } catch (final NoSuchElementException ignored) {
+
+        }
+
+        assertThat(channel4.readAll()).isEmpty();
+
+        results.clear();
+        channel4.readAllInto(results);
+        assertThat(results).isEmpty();
+
+        assertThat(channel4.iterator().hasNext()).isFalse();
+
+        try {
+
+            channel4.iterator().next();
+
+            fail();
+
+        } catch (final NoSuchElementException ignored) {
+
+        }
+
+        assertThat(channel4.checkComplete()).isFalse();
     }
 
     private void testChained(final Routine<String, String> before,
@@ -2347,7 +2554,7 @@ public class RoutineTest extends TestCase {
 
     private interface TestInterface {
 
-        @ResultTimeout(value = 1, unit = TimeUnit.SECONDS)
+        @ReadTimeout(value = 1, unit = TimeUnit.SECONDS)
         public int getInt(int i);
     }
 

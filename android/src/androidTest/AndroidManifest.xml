@@ -12,7 +12,15 @@
             android:label="test">
         </activity>
         <activity
+            android:name=".v11.routine.RotationTestActivity"
+            android:label="test">
+        </activity>
+        <activity
             android:name=".v4.routine.TestActivity"
+            android:label="test">
+        </activity>
+        <activity
+            android:name=".v4.routine.RotationTestActivity"
             android:label="test">
         </activity>
 

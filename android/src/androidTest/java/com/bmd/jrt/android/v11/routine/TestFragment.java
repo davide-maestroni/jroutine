@@ -30,14 +30,6 @@ import android.view.ViewGroup;
 @TargetApi(VERSION_CODES.HONEYCOMB)
 public class TestFragment extends Fragment {
 
-    @Override
-    public void onCreate(final Bundle savedInstanceState) {
-
-        super.onCreate(savedInstanceState);
-
-        JRoutine.initFragment(this);
-    }
-
     @Nullable
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,

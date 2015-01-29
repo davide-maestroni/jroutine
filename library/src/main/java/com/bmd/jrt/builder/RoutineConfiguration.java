@@ -61,7 +61,7 @@ public class RoutineConfiguration {
 
     private final TimeDuration mOutputTimeout;
 
-    private final TimeDuration mResultTimeout;
+    private final TimeDuration mReadTimeout;
 
     private final Runner mRunner;
 
@@ -79,8 +79,8 @@ public class RoutineConfiguration {
      *                      positive number.
      * @param availTimeout  the maximum timeout while waiting for an invocation instance to be
      *                      available.
-     * @param resultTimeout the action to be taken if the timeout elapses before a result is
-     *                      available.
+     * @param readTimeout   the action to be taken if the timeout elapses before a readable result
+     *                      is available.
      * @param actionType    the timeout for an invocation instance to produce a result.
      * @param inputMaxSize  the maximum number of buffered input data. Must be positive.
      * @param inputTimeout  the maximum timeout while waiting for an input to be passed to the
@@ -96,7 +96,7 @@ public class RoutineConfiguration {
     @SuppressWarnings("ConstantConditions")
     RoutineConfiguration(@Nullable final Runner runner, @Nonnull final RunnerType runnerType,
             final int maxRunning, final int maxRetained, @Nullable final TimeDuration availTimeout,
-            @Nullable final TimeDuration resultTimeout, @Nonnull final TimeoutAction actionType,
+            @Nullable final TimeDuration readTimeout, @Nonnull final TimeoutAction actionType,
             final int inputMaxSize, @Nullable final TimeDuration inputTimeout,
             final @Nonnull DataOrder inputOrder, final int outputMaxSize,
             @Nullable final TimeDuration outputTimeout, @Nonnull final DataOrder outputOrder,
@@ -154,7 +154,7 @@ public class RoutineConfiguration {
         mMaxRunning = maxRunning;
         mMaxRetained = maxRetained;
         mAvailTimeout = availTimeout;
-        mResultTimeout = resultTimeout;
+        mReadTimeout = readTimeout;
         mTimeoutAction = actionType;
         mInputMaxSize = inputMaxSize;
         mInputTimeout = inputTimeout;
@@ -302,28 +302,29 @@ public class RoutineConfiguration {
     }
 
     /**
-     * Returns the action to be taken if the timeout elapses before a result is available (DEFAULT
-     * by default).
+     * Returns the action to be taken if the timeout elapses before a readable result is available
+     * (DEFAULT by default).
      *
      * @param valueIfNotSet the default value if none was set.
      * @return the action type.
      */
-    public TimeoutAction getResultTimeoutActionOr(final TimeoutAction valueIfNotSet) {
+    public TimeoutAction getReadTimeoutActionOr(final TimeoutAction valueIfNotSet) {
 
         final TimeoutAction timeoutAction = mTimeoutAction;
         return (timeoutAction != TimeoutAction.DEFAULT) ? timeoutAction : valueIfNotSet;
     }
 
     /**
-     * Returns the timeout for an invocation instance to produce a result (null by default).
+     * Returns the timeout for an invocation instance to produce a readable result (null by
+     * default).
      *
      * @param valueIfNotSet the default value if none was set.
      * @return the timeout.
      */
-    public TimeDuration getResultTimeoutOr(final TimeDuration valueIfNotSet) {
+    public TimeDuration getReadTimeoutOr(final TimeDuration valueIfNotSet) {
 
-        final TimeDuration resultTimeout = mResultTimeout;
-        return (resultTimeout != null) ? resultTimeout : valueIfNotSet;
+        final TimeDuration readTimeout = mReadTimeout;
+        return (readTimeout != null) ? readTimeout : valueIfNotSet;
     }
 
     /**
@@ -365,7 +366,7 @@ public class RoutineConfiguration {
         result = 31 * result + mOutputMaxSize;
         result = 31 * result + mOutputOrder.hashCode();
         result = 31 * result + (mOutputTimeout != null ? mOutputTimeout.hashCode() : 0);
-        result = 31 * result + (mResultTimeout != null ? mResultTimeout.hashCode() : 0);
+        result = 31 * result + (mReadTimeout != null ? mReadTimeout.hashCode() : 0);
         result = 31 * result + (mRunner != null ? mRunner.hashCode() : 0);
         result = 31 * result + mRunnerType.hashCode();
         result = 31 * result + mTimeoutAction.hashCode();
@@ -397,8 +398,8 @@ public class RoutineConfiguration {
                 : that.mLog != null) && mLogLevel == that.mLogLevel
                 && mOutputOrder == that.mOutputOrder && !(mOutputTimeout != null
                 ? !mOutputTimeout.equals(that.mOutputTimeout) : that.mOutputTimeout != null) && !(
-                mResultTimeout != null ? !mResultTimeout.equals(that.mResultTimeout)
-                        : that.mResultTimeout != null) && !(mRunner != null ? !mRunner.equals(
+                mReadTimeout != null ? !mReadTimeout.equals(that.mReadTimeout)
+                        : that.mReadTimeout != null) && !(mRunner != null ? !mRunner.equals(
                 that.mRunner) : that.mRunner != null) && mRunnerType == that.mRunnerType
                 && mTimeoutAction == that.mTimeoutAction;
     }
@@ -418,7 +419,7 @@ public class RoutineConfiguration {
                 ", mOutputMaxSize=" + mOutputMaxSize +
                 ", mOutputOrder=" + mOutputOrder +
                 ", mOutputTimeout=" + mOutputTimeout +
-                ", mResultTimeout=" + mResultTimeout +
+                ", mReadTimeout=" + mReadTimeout +
                 ", mRunner=" + mRunner +
                 ", mRunnerType=" + mRunnerType +
                 ", mTimeoutAction=" + mTimeoutAction +

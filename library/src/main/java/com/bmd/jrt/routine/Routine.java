@@ -232,16 +232,6 @@ public interface Routine<INPUT, OUTPUT> {
     public OutputChannel<OUTPUT> callSync(@Nullable OutputChannel<INPUT> inputs);
 
     /**
-     * Makes the routine destroy all the cached invocation instances.
-     * <p/>
-     * This method is useful to force the release of external resources when done with the routine.
-     * Note however that the routine will still be usable after the method returns.
-     * <p/>
-     * Normally it is not needed to call this method.
-     */
-    public void flush();
-
-    /**
      * Invokes the execution of this routine in asynchronous mode.
      *
      * @return the invocation parameter channel.
@@ -264,4 +254,14 @@ public interface Routine<INPUT, OUTPUT> {
      */
     @Nonnull
     public ParameterChannel<INPUT, OUTPUT> invokeSync();
+
+    /**
+     * Makes the routine destroy all the cached invocation instances.
+     * <p/>
+     * This method is useful to force the release of external resources when done with the routine.
+     * Note however that the routine will still be usable after the method returns.
+     * <p/>
+     * Normally it is not needed to call this method.
+     */
+    public void purge();
 }

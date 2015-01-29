@@ -14,8 +14,6 @@
 package com.bmd.jrt.android.v11.routine;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
-import android.app.Fragment;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
@@ -47,7 +45,6 @@ import com.bmd.jrt.time.TimeDuration;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
-import java.util.concurrent.Semaphore;
 
 import javax.annotation.Nonnull;
 
@@ -136,7 +133,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final OutputChannel<Data> result1 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Abort.class))
                         .withId(0)
-                        .onComplete(ResultCache.RETAIN_RESULT)
+                        .onComplete(ResultCache.STORE_RESULT)
                         .buildRoutine()
                         .callAsync(data1)
                         .afterMax(timeout);
@@ -156,7 +153,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final OutputChannel<Data> result2 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class))
                         .withId(0)
-                        .onComplete(ResultCache.RETAIN_RESULT)
+                        .onComplete(ResultCache.STORE_RESULT)
                         .buildRoutine()
                         .callAsync(data1)
                         .afterMax(timeout);
@@ -187,7 +184,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final OutputChannel<Data> result1 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class))
                         .withId(0)
-                        .onComplete(ResultCache.RETAIN_ERROR)
+                        .onComplete(ResultCache.STORE_ERROR)
                         .buildRoutine()
                         .callAsync(data1)
                         .afterMax(timeout);
@@ -199,7 +196,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final OutputChannel<Data> result2 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Abort.class))
                         .withId(0)
-                        .onComplete(ResultCache.RETAIN_ERROR)
+                        .onComplete(ResultCache.STORE_ERROR)
                         .buildRoutine()
                         .callAsync(data1)
                         .afterMax(timeout);
@@ -367,7 +364,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final OutputChannel<Data> result1 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class))
                         .withId(0)
-                        .onComplete(ResultCache.RETAIN)
+                        .onComplete(ResultCache.STORE)
                         .buildRoutine()
                         .callAsync(data1)
                         .afterMax(timeout);
@@ -389,7 +386,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final OutputChannel<Data> result3 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Abort.class))
                         .withId(0)
-                        .onComplete(ResultCache.RETAIN)
+                        .onComplete(ResultCache.STORE)
                         .buildRoutine()
                         .callAsync(data1)
                         .afterMax(timeout);
@@ -428,118 +425,6 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         result4.checkComplete();
     }
 
-    public void testActivityRotationChannel() throws InterruptedException {
-
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            return;
-        }
-
-        final TimeDuration timeout = TimeDuration.seconds(10);
-        final Routine<String, String> routine =
-                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
-                        .withId(0)
-                        .outputOrder(DataOrder.INSERTION)
-                        .buildRoutine();
-        routine.callAsync("test1", "test2");
-
-        final Semaphore semaphore = new Semaphore(0);
-
-        getActivity().runOnUiThread(new Runnable() {
-
-            @Override
-            public void run() {
-
-                getActivity().recreate();
-                semaphore.release();
-            }
-        });
-
-        semaphore.acquire();
-        getInstrumentation().waitForIdleSync();
-
-        final OutputChannel<String> channel = JRoutine.onActivity(getActivity(), 0).buildChannel();
-
-        assertThat(channel.afterMax(timeout).readAll()).containsExactly("TEST1", "TEST2");
-    }
-
-    public void testActivityRotationInputs() throws InterruptedException {
-
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            return;
-        }
-
-        final TimeDuration timeout = TimeDuration.seconds(10);
-        final Routine<String, String> routine1 =
-                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
-                        .buildRoutine();
-        routine1.callAsync("test1");
-        routine1.callAsync("test2");
-
-        final Semaphore semaphore = new Semaphore(0);
-
-        getActivity().runOnUiThread(new Runnable() {
-
-            @Override
-            public void run() {
-
-                getActivity().recreate();
-                semaphore.release();
-            }
-        });
-
-        semaphore.acquire();
-        getInstrumentation().waitForIdleSync();
-
-        final Routine<String, String> routine2 =
-                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
-                        .buildRoutine();
-        final OutputChannel<String> result1 = routine2.callAsync("test1").afterMax(timeout);
-        final OutputChannel<String> result2 = routine2.callAsync("test2").afterMax(timeout);
-
-        assertThat(result1.readNext()).isEqualTo("TEST1");
-        assertThat(result2.readNext()).isEqualTo("TEST2");
-    }
-
-    public void testActivityRotationSame() throws InterruptedException {
-
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            return;
-        }
-
-        final TimeDuration timeout = TimeDuration.seconds(10);
-        final Data data1 = new Data();
-        final Routine<Data, Data> routine1 =
-                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class)).buildRoutine();
-        routine1.callAsync(data1);
-        routine1.callAsync(data1);
-
-        final Semaphore semaphore = new Semaphore(0);
-
-        getActivity().runOnUiThread(new Runnable() {
-
-            @Override
-            public void run() {
-
-                getActivity().recreate();
-                semaphore.release();
-            }
-        });
-
-        semaphore.acquire();
-        getInstrumentation().waitForIdleSync();
-
-        final Routine<Data, Data> routine2 =
-                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class)).buildRoutine();
-        final OutputChannel<Data> result1 = routine2.callAsync(data1).afterMax(timeout);
-        final OutputChannel<Data> result2 = routine2.callAsync(data1).afterMax(timeout);
-
-        assertThat(result1.readNext()).isSameAs(data1);
-        assertThat(result2.readNext()).isSameAs(data1);
-    }
-
     public void testActivitySame() {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
@@ -570,7 +455,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final OutputChannel<Data> result1 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class))
                         .withId(0)
-                        .onComplete(ResultCache.RETAIN)
+                        .onComplete(ResultCache.STORE)
                         .buildRoutine()
                         .callAsync(data1)
                         .afterMax(timeout);
@@ -608,7 +493,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            JRoutine.initActivity((Activity) null);
+            JRoutine.onActivity(null, ClassToken.tokenOf(ToUpperCase.class));
 
             fail();
 
@@ -618,7 +503,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            JRoutine.initFragment((Fragment) null);
+            JRoutine.onActivity(getActivity(), null);
 
             fail();
 
@@ -628,17 +513,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            JRoutine.onActivity((Activity) null, ClassToken.tokenOf(ToUpperCase.class));
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            JRoutine.onActivity((Activity) null, 0);
+            JRoutine.onActivity(null, 0);
 
             fail();
 
@@ -658,7 +533,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            JRoutine.onFragment((Fragment) null, ClassToken.tokenOf(ToUpperCase.class));
+            JRoutine.onFragment(null, ClassToken.tokenOf(ToUpperCase.class));
 
             fail();
 
@@ -668,7 +543,20 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            JRoutine.onFragment((Fragment) null, 0);
+            JRoutine.onFragment(null, 0);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+                                                                      .findFragmentById(
+                                                                              R.id.test_fragment);
+            JRoutine.onFragment(fragment, null);
 
             fail();
 
@@ -691,21 +579,21 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            JRoutine.onActivity(new TestActivity(), ClassToken.tokenOf(ToUpperCase.class));
+            JRoutine.onActivity(new TestActivity(), ClassToken.tokenOf(ErrorInvocation.class));
 
             fail();
 
-        } catch (final IllegalStateException ignored) {
+        } catch (final IllegalArgumentException ignored) {
 
         }
 
         try {
 
-            JRoutine.onFragment(new TestFragment(), ClassToken.tokenOf(ToUpperCase.class));
+            JRoutine.onFragment(new TestFragment(), ClassToken.tokenOf(ErrorInvocation.class));
 
             fail();
 
-        } catch (final IllegalStateException ignored) {
+        } catch (final IllegalArgumentException ignored) {
 
         }
 
@@ -1003,7 +891,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            new LoaderInvocation<String, String>(null, 0, ClashResolution.KEEP, ResultCache.RETAIN,
+            new LoaderInvocation<String, String>(null, 0, ClashResolution.KEEP, ResultCache.STORE,
                                                  ToUpperCase.class.getDeclaredConstructor(),
                                                  DataOrder.DEFAULT, logger);
 
@@ -1015,7 +903,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            new LoaderInvocation<String, String>(reference, 0, null, ResultCache.RETAIN,
+            new LoaderInvocation<String, String>(reference, 0, null, ResultCache.STORE,
                                                  ToUpperCase.class.getDeclaredConstructor(),
                                                  DataOrder.DEFAULT, logger);
 
@@ -1040,7 +928,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         try {
 
             new LoaderInvocation<String, String>(reference, 0, ClashResolution.KEEP,
-                                                 ResultCache.RETAIN, null, DataOrder.DEFAULT,
+                                                 ResultCache.STORE, null, DataOrder.DEFAULT,
                                                  logger);
 
             fail();
@@ -1052,7 +940,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         try {
 
             new LoaderInvocation<String, String>(reference, 0, ClashResolution.KEEP,
-                                                 ResultCache.RETAIN,
+                                                 ResultCache.STORE,
                                                  ToUpperCase.class.getDeclaredConstructor(), null,
                                                  logger);
 
@@ -1065,7 +953,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         try {
 
             new LoaderInvocation<String, String>(reference, 0, ClashResolution.KEEP,
-                                                 ResultCache.RETAIN,
+                                                 ResultCache.STORE,
                                                  ToUpperCase.class.getDeclaredConstructor(),
                                                  DataOrder.DEFAULT, null);
 
@@ -1091,7 +979,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         try {
 
             new AndroidRoutine<String, String>(null, reference, 0, ClashResolution.KEEP,
-                                               ResultCache.RETAIN,
+                                               ResultCache.STORE,
                                                ToUpperCase.class.getDeclaredConstructor());
 
             fail();
@@ -1103,7 +991,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         try {
 
             new AndroidRoutine<String, String>(configuration, null, 0, ClashResolution.KEEP,
-                                               ResultCache.RETAIN,
+                                               ResultCache.STORE,
                                                ToUpperCase.class.getDeclaredConstructor());
 
             fail();
@@ -1114,8 +1002,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            new AndroidRoutine<String, String>(configuration, reference, 0, null,
-                                               ResultCache.RETAIN,
+            new AndroidRoutine<String, String>(configuration, reference, 0, null, ResultCache.STORE,
                                                ToUpperCase.class.getDeclaredConstructor());
 
             fail();
@@ -1138,7 +1025,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         try {
 
             new AndroidRoutine<String, String>(configuration, reference, 0, ClashResolution.KEEP,
-                                               ResultCache.RETAIN, null);
+                                               ResultCache.STORE, null);
 
             fail();
 
@@ -1175,6 +1062,14 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         public void onInput(final Data d, @Nonnull final ResultChannel<Data> result) {
 
             result.after(TimeDuration.millis(500)).pass(d);
+        }
+    }
+
+    @SuppressWarnings("UnusedDeclaration")
+    private static class ErrorInvocation extends AndroidTemplateInvocation<String, String> {
+
+        private ErrorInvocation(final int ignored) {
+
         }
     }
 

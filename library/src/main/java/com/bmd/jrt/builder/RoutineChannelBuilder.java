@@ -71,15 +71,15 @@ public interface RoutineChannelBuilder extends RoutineBuilder {
 
     @Nonnull
     @Override
-    public RoutineChannelBuilder onResultTimeout(@Nonnull TimeoutAction action);
+    public RoutineChannelBuilder onReadTimeout(@Nonnull TimeoutAction action);
 
     @Nonnull
     @Override
-    public RoutineChannelBuilder resultTimeout(long timeout, @Nonnull TimeUnit timeUnit);
+    public RoutineChannelBuilder readTimeout(long timeout, @Nonnull TimeUnit timeUnit);
 
     @Nonnull
     @Override
-    public RoutineChannelBuilder resultTimeout(@Nullable TimeDuration timeout);
+    public RoutineChannelBuilder readTimeout(@Nullable TimeDuration timeout);
 
     @Nonnull
     @Override

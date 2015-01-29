@@ -14,6 +14,7 @@
 package com.bmd.jrt.android.invocation;
 
 import com.bmd.jrt.channel.ResultChannel;
+import com.bmd.jrt.common.ClassToken;
 
 import javax.annotation.Nonnull;
 
@@ -25,6 +26,17 @@ import javax.annotation.Nonnull;
  * @param <DATA> the data type.
  */
 public class AndroidTunnelInvocation<DATA> extends AndroidTemplateInvocation<DATA, DATA> {
+
+    /**
+     * Creates and returns the class token of a typed tunnel invocation.
+     *
+     * @param <DATA> the data type.
+     * @return the token instance.
+     */
+    public static <DATA> ClassToken<AndroidTunnelInvocation<DATA>> tokenOf() {
+
+        return new ClassToken<AndroidTunnelInvocation<DATA>>() {};
+    }
 
     @Override
     public void onInput(final DATA input, @Nonnull final ResultChannel<DATA> result) {

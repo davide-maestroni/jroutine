@@ -51,6 +51,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -135,104 +136,10 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
         mLogger = logger.subContextLogger(this);
     }
 
-    /**
-     * Enables routine invocation for the specified activity.<br/>
-     * This method must be called in the activity <code>onCreate()</code> method.
-     *
-     * @param activity the activity instance.
-     * @throws NullPointerException if the specified activity is null.
-     */
-    @SuppressWarnings("ConstantConditions")
-    static void initActivity(@Nonnull final Activity activity) {
-
-        if (activity == null) {
-
-            throw new NullPointerException("the activity instance must not be null");
-        }
-
-        synchronized (sCallbackMap) {
-
-            if (!sCallbackMap.containsKey(activity)) {
-
-                sCallbackMap.put(activity,
-                                 new SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>());
-            }
-
-            activity.getLoaderManager();
-        }
-    }
-
-    /**
-     * Enables routine invocation for the specified fragment.<br/>
-     * This method must be called in the fragment <code>onCreate()</code> method.
-     *
-     * @param fragment the fragment instance.
-     * @throws NullPointerException if the specified fragment is null.
-     */
-    @SuppressWarnings("ConstantConditions")
-    static void initFragment(@Nonnull final Fragment fragment) {
-
-        if (fragment == null) {
-
-            throw new NullPointerException("the fragment instance must not be null");
-        }
-
-        synchronized (sCallbackMap) {
-
-            if (!sCallbackMap.containsKey(fragment)) {
-
-                sCallbackMap.put(fragment,
-                                 new SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>());
-            }
-
-            fragment.getLoaderManager();
-        }
-    }
-
-    /**
-     * Checks if the specified activity is enabled for routine invocation.
-     *
-     * @param activity the activity instance.
-     * @return whether the activity is enabled.
-     * @throws NullPointerException if the specified activity is null.
-     */
-    @SuppressWarnings("ConstantConditions")
-    static boolean isEnabled(@Nonnull final Activity activity) {
-
-        if (activity == null) {
-
-            throw new NullPointerException("the activity instance must not be null");
-        }
-
-        synchronized (sCallbackMap) {
-
-            return sCallbackMap.containsKey(activity);
-        }
-    }
-
-    /**
-     * Checks if the specified fragment is enabled for routine invocation.
-     *
-     * @param fragment the fragment instance.
-     * @return whether the fragment is enabled.
-     * @throws NullPointerException if the specified fragment is null.
-     */
-    @SuppressWarnings("ConstantConditions")
-    static boolean isEnabled(@Nonnull final Fragment fragment) {
-
-        if (fragment == null) {
-
-            throw new NullPointerException("the fragment instance must not be null");
-        }
-
-        synchronized (sCallbackMap) {
-
-            return sCallbackMap.containsKey(fragment);
-        }
-    }
-
     @Override
     @SuppressWarnings("unchecked")
+    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST_OF_RETURN_VALUE",
+                        justification = "class comparison with == is done")
     public void onCall(@Nonnull final List<? extends INPUT> inputs,
             @Nonnull final ResultChannel<OUTPUT> result) {
 
@@ -277,21 +184,38 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
         }
 
         final Loader<InvocationResult<OUTPUT>> loader = loaderManager.getLoader(loaderId);
-        boolean needsRestart = (loader == null) || isClash(loader, loaderId, inputs);
+        final boolean isClash = isClash(loader, loaderId, inputs);
         final CacheHashMap<Object, SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>
                 callbackMap = sCallbackMap;
-        final SparseArray<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
+        SparseArray<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
                 callbackMap.get(context);
+
+        if (callbackArray == null) {
+
+            callbackArray = new SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>();
+            callbackMap.put(context, callbackArray);
+        }
 
         final WeakReference<RoutineLoaderCallbacks<?>> callbackReference =
                 callbackArray.get(loaderId);
         RoutineLoaderCallbacks<OUTPUT> callbacks = (callbackReference != null)
                 ? (RoutineLoaderCallbacks<OUTPUT>) callbackReference.get() : null;
 
-        if ((callbacks == null) || needsRestart) {
+        if ((callbacks == null) || (loader == null) || isClash) {
+
+            final RoutineLoader<INPUT, OUTPUT> routineLoader;
+
+            if (!isClash && (loader != null) && (loader.getClass() == RoutineLoader.class)) {
+
+                routineLoader = (RoutineLoader<INPUT, OUTPUT>) loader;
+
+            } else {
+
+                routineLoader = null;
+            }
 
             final RoutineLoaderCallbacks<OUTPUT> newCallbacks =
-                    createCallbacks(loaderContext, loaderManager, inputs, loaderId);
+                    createCallbacks(loaderContext, loaderManager, routineLoader, inputs, loaderId);
 
             if (callbacks != null) {
 
@@ -301,7 +225,6 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
 
             callbackArray.put(loaderId, new WeakReference<RoutineLoaderCallbacks<?>>(newCallbacks));
             callbacks = newCallbacks;
-            needsRestart = true;
         }
 
         logger.dbg("setting result cache type [%d]: %s", loaderId, mCacheType);
@@ -309,7 +232,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
 
         final OutputChannel<OUTPUT> outputChannel = callbacks.newChannel();
 
-        if (needsRestart && (loader != null)) {
+        if (isClash && (loader != null)) {
 
             logger.dbg("restarting loader [%d]", loaderId);
             loaderManager.restartLoader(loaderId, Bundle.EMPTY, callbacks);
@@ -324,8 +247,9 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
     }
 
     private RoutineLoaderCallbacks<OUTPUT> createCallbacks(@Nonnull final Context loaderContext,
-            @Nonnull final LoaderManager loaderManager, @Nonnull final List<? extends INPUT> inputs,
-            final int loaderId) {
+            @Nonnull final LoaderManager loaderManager,
+            @Nullable final RoutineLoader<INPUT, OUTPUT> loader,
+            @Nonnull final List<? extends INPUT> inputs, final int loaderId) {
 
         final Logger logger = mLogger;
         final Constructor<? extends AndroidInvocation<INPUT, OUTPUT>> constructor = mConstructor;
@@ -359,16 +283,21 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
             throw new InvocationException(t);
         }
 
-        final RoutineLoader<INPUT, OUTPUT> routineLoader =
-                new RoutineLoader<INPUT, OUTPUT>(loaderContext, invocation, inputs, mDataOrder,
-                                                 logger);
-        return new RoutineLoaderCallbacks<OUTPUT>(loaderManager, routineLoader, logger);
+        final RoutineLoader<INPUT, OUTPUT> callbacksLoader = (loader != null) ? loader
+                : new RoutineLoader<INPUT, OUTPUT>(loaderContext, invocation, inputs, mDataOrder,
+                                                   logger);
+        return new RoutineLoaderCallbacks<OUTPUT>(loaderManager, callbacksLoader, logger);
     }
 
-    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST_OF_RETURN_VALUE",
+    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
                         justification = "class comparison with == is done")
-    private boolean isClash(@Nonnull final Loader<InvocationResult<OUTPUT>> loader,
+    private boolean isClash(@Nullable final Loader<InvocationResult<OUTPUT>> loader,
             final int loaderId, @Nonnull final List<? extends INPUT> inputs) {
+
+        if (loader == null) {
+
+            return false;
+        }
 
         final Logger logger = mLogger;
 
@@ -526,8 +455,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
                     final ResultCache cacheType = mCacheType;
 
                     if ((cacheType == ResultCache.CLEAR) || (data.isError() ? (cacheType
-                            == ResultCache.RETAIN_RESULT)
-                            : (cacheType == ResultCache.RETAIN_ERROR))) {
+                            == ResultCache.STORE_RESULT)
+                            : (cacheType == ResultCache.STORE_ERROR))) {
 
                         final int id = internalLoader.getId();
                         logger.dbg("destroying Android loader: %d", id);

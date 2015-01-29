@@ -136,18 +136,18 @@ public interface RoutineBuilder {
     public RoutineBuilder maxRunning(int maxRunningInstances);
 
     /**
-     * Sets the action to be taken if the timeout elapses before a result is available.
+     * Sets the action to be taken if the timeout elapses before a result can be read from the
+     * output channel.
      *
      * @param action the action type.
      * @return this builder.
      * @throws NullPointerException if the specified action type is null.
      */
     @Nonnull
-    public RoutineBuilder onResultTimeout(@Nonnull TimeoutAction action);
-    //TODO: test
+    public RoutineBuilder onReadTimeout(@Nonnull TimeoutAction action);
 
     /**
-     * Sets the timeout for an invocation instance to produce a result.
+     * Sets the timeout for an invocation instance to produce a readable result.
      * <p/>
      * By default the timeout is set to 0 to avoid unexpected deadlocks.
      *
@@ -158,11 +158,11 @@ public interface RoutineBuilder {
      * @throws IllegalArgumentException if the specified timeout is negative.
      */
     @Nonnull
-    public RoutineBuilder resultTimeout(long timeout, @Nonnull TimeUnit timeUnit);
+    public RoutineBuilder readTimeout(long timeout, @Nonnull TimeUnit timeUnit);
 
     /**
-     * Sets the timeout for an invocation instance to produce a result. A null value means that
-     * it is up to the framework to chose a default duration.
+     * Sets the timeout for an invocation instance to produce a readable result. A null value means
+     * that it is up to the framework to chose a default duration.
      * <p/>
      * By default the timeout is set to 0 to avoid unexpected deadlocks.
      *
@@ -170,7 +170,7 @@ public interface RoutineBuilder {
      * @return this builder.
      */
     @Nonnull
-    public RoutineBuilder resultTimeout(@Nullable TimeDuration timeout);
+    public RoutineBuilder readTimeout(@Nullable TimeDuration timeout);
 
     /**
      * Sets the asynchronous runner instance. A null value means that it is up to the framework

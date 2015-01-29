@@ -146,12 +146,6 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                            .buildRoutine();
     }
 
-    @Override
-    public void flush() {
-
-        mRoutine.flush();
-    }
-
     @Nonnull
     @Override
     public ParameterChannel<INPUT, OUTPUT> invokeAsync() {
@@ -175,6 +169,12 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
     public ParameterChannel<INPUT, OUTPUT> invokeSync() {
 
         return mRoutine.invokeSync();
+    }
+
+    @Override
+    public void purge() {
+
+        mRoutine.purge();
     }
 
     /**

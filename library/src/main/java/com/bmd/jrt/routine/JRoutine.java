@@ -137,7 +137,7 @@ import javax.annotation.Nonnull;
  * @see com.bmd.jrt.annotation.AsyncType
  * @see com.bmd.jrt.annotation.AsyncWrap
  * @see com.bmd.jrt.annotation.ParallelType
- * @see com.bmd.jrt.annotation.ResultTimeout
+ * @see com.bmd.jrt.annotation.ReadTimeout
  */
 public class JRoutine {
 

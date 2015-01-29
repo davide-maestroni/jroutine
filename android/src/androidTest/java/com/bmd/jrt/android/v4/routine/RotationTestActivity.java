@@ -13,17 +13,20 @@
  */
 package com.bmd.jrt.android.v4.routine;
 
+import android.annotation.TargetApi;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
 import com.bmd.jrt.android.R;
 
 /**
- * Test activity.
+ * Test activity ensuring the creation of the loader manager during call to <code>onCreate()</code>.
  * <p/>
- * Created by davide on 12/16/14.
+ * Created by davide on 1/28/15.
  */
-public class TestActivity extends FragmentActivity {
+@TargetApi(VERSION_CODES.HONEYCOMB)
+public class RotationTestActivity extends FragmentActivity {
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -31,5 +34,7 @@ public class TestActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.test_v4_layout);
+
+        getSupportLoaderManager();
     }
 }

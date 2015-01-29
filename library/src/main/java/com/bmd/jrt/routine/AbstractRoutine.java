@@ -137,8 +137,46 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
         mLogger = logger.subContextLogger(this);
     }
 
+    @Nonnull
     @Override
-    public void flush() {
+    public ParameterChannel<INPUT, OUTPUT> invokeAsync() {
+
+        return invoke(true);
+    }
+
+    @Nonnull
+    @Override
+    public ParameterChannel<INPUT, OUTPUT> invokeParallel() {
+
+        mLogger.dbg("invoking routine: parallel");
+
+        if (mParallelRoutine == null) {
+
+            mParallelRoutine =
+                    new AbstractRoutine<INPUT, OUTPUT>(mConfiguration, mSyncRunner, mAsyncRunner,
+                                                       mLogger) {
+
+                        @Nonnull
+                        @Override
+                        protected Invocation<INPUT, OUTPUT> createInvocation(final boolean async) {
+
+                            return new ParallelInvocation<INPUT, OUTPUT>(AbstractRoutine.this);
+                        }
+                    };
+        }
+
+        return mParallelRoutine.invokeAsync();
+    }
+
+    @Nonnull
+    @Override
+    public ParameterChannel<INPUT, OUTPUT> invokeSync() {
+
+        return invoke(false);
+    }
+
+    @Override
+    public void purge() {
 
         synchronized (mMutex) {
 
@@ -183,44 +221,6 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
             asyncInvocations.clear();
         }
-    }
-
-    @Nonnull
-    @Override
-    public ParameterChannel<INPUT, OUTPUT> invokeAsync() {
-
-        return invoke(true);
-    }
-
-    @Nonnull
-    @Override
-    public ParameterChannel<INPUT, OUTPUT> invokeParallel() {
-
-        mLogger.dbg("invoking routine: parallel");
-
-        if (mParallelRoutine == null) {
-
-            mParallelRoutine =
-                    new AbstractRoutine<INPUT, OUTPUT>(mConfiguration, mSyncRunner, mAsyncRunner,
-                                                       mLogger) {
-
-                        @Nonnull
-                        @Override
-                        protected Invocation<INPUT, OUTPUT> createInvocation(final boolean async) {
-
-                            return new ParallelInvocation<INPUT, OUTPUT>(AbstractRoutine.this);
-                        }
-                    };
-        }
-
-        return mParallelRoutine.invokeAsync();
-    }
-
-    @Nonnull
-    @Override
-    public ParameterChannel<INPUT, OUTPUT> invokeSync() {
-
-        return invoke(false);
     }
 
     /**

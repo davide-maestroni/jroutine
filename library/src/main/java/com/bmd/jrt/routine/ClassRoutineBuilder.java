@@ -15,7 +15,7 @@ package com.bmd.jrt.routine;
 
 import com.bmd.jrt.annotation.AsyncName;
 import com.bmd.jrt.annotation.LockName;
-import com.bmd.jrt.annotation.ResultTimeout;
+import com.bmd.jrt.annotation.ReadTimeout;
 import com.bmd.jrt.builder.RoutineBuilder;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.builder.RoutineConfigurationBuilder;
@@ -56,7 +56,7 @@ import static com.bmd.jrt.common.Reflection.boxingClass;
  *
  * @see com.bmd.jrt.annotation.AsyncName
  * @see com.bmd.jrt.annotation.LockName
- * @see com.bmd.jrt.annotation.ResultTimeout
+ * @see com.bmd.jrt.annotation.ReadTimeout
  */
 public class ClassRoutineBuilder implements RoutineBuilder {
 
@@ -140,7 +140,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
     /**
      * Returns a routine used for calling the method whose identifying name is specified in a
      * {@link AsyncName} annotation.<br/>
-     * Optional {@link LockName} and {@link ResultTimeout} method annotations will be honored.
+     * Optional {@link LockName} and {@link ReadTimeout} method annotations will be honored.
      *
      * @param name     the name specified in the annotation.
      * @param <INPUT>  the input data type.
@@ -221,25 +221,25 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
     @Nonnull
     @Override
-    public ClassRoutineBuilder onResultTimeout(@Nonnull final TimeoutAction action) {
+    public ClassRoutineBuilder onReadTimeout(@Nonnull final TimeoutAction action) {
 
-        mBuilder.onResultTimeout(action);
+        mBuilder.onReadTimeout(action);
         return this;
     }
 
     @Nonnull
     @Override
-    public ClassRoutineBuilder resultTimeout(final long timeout, @Nonnull final TimeUnit timeUnit) {
+    public ClassRoutineBuilder readTimeout(final long timeout, @Nonnull final TimeUnit timeUnit) {
 
-        mBuilder.resultTimeout(timeout, timeUnit);
+        mBuilder.readTimeout(timeout, timeUnit);
         return this;
     }
 
     @Nonnull
     @Override
-    public ClassRoutineBuilder resultTimeout(@Nullable final TimeDuration timeout) {
+    public ClassRoutineBuilder readTimeout(@Nullable final TimeDuration timeout) {
 
-        mBuilder.resultTimeout(timeout);
+        mBuilder.readTimeout(timeout);
         return this;
     }
 
@@ -277,7 +277,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      * Returns a routine used for calling the specified method.
      * <p/>
      * The method is searched via reflection ignoring an optional name specified in a
-     * {@link AsyncName} annotation. Though, optional {@link LockName} and {@link ResultTimeout}
+     * {@link AsyncName} annotation. Though, optional {@link LockName} and {@link ReadTimeout}
      * method annotations will be honored.
      *
      * @param name           the method name.
@@ -320,7 +320,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      * Returns a routine used for calling the specified method.
      * <p/>
      * The method is invoked ignoring an optional name specified in a {@link AsyncName} annotation.
-     * Though, optional {@link LockName} and {@link ResultTimeout} method annotations will be
+     * Though, optional {@link LockName} and {@link ReadTimeout} method annotations will be
      * honored.
      *
      * @param method   the method instance.
@@ -523,12 +523,12 @@ public class ClassRoutineBuilder implements RoutineBuilder {
                .outputSize(Integer.MAX_VALUE)
                .outputTimeout(TimeDuration.ZERO);
 
-        final ResultTimeout timeoutAnnotation = targetMethod.getAnnotation(ResultTimeout.class);
+        final ReadTimeout timeoutAnnotation = targetMethod.getAnnotation(ReadTimeout.class);
 
         if (timeoutAnnotation != null) {
 
-            builder.resultTimeout(timeoutAnnotation.value(), timeoutAnnotation.unit())
-                   .onResultTimeout(timeoutAnnotation.action());
+            builder.readTimeout(timeoutAnnotation.value(), timeoutAnnotation.unit())
+                   .onReadTimeout(timeoutAnnotation.action());
         }
 
         return getRoutine(builder.buildConfiguration(), methodLockName, targetMethod);

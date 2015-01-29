@@ -40,6 +40,7 @@ import com.bmd.jrt.common.CacheHashMap;
 import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.common.InvocationException;
 import com.bmd.jrt.common.InvocationInterruptedException;
+import com.bmd.jrt.common.RoutineException;
 import com.bmd.jrt.invocation.SimpleInvocation;
 import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.time.TimeDuration;
@@ -94,7 +95,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
      * @param constructor the invocation constructor.
      * @param order       the input data order.
      * @param logger      the logger instance.
-     * @throws NullPointerException if any of the specified parameters is null.
+     * @throws java.lang.NullPointerException if any of the specified parameters is null.
      */
     @SuppressWarnings("ConstantConditions")
     LoaderInvocation(@Nonnull final WeakReference<Object> context, final int loaderId,
@@ -272,7 +273,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
             logger.err(e, "error creating the invocation instance");
             throw e.interrupt();
 
-        } catch (final InvocationException e) {
+        } catch (final RoutineException e) {
 
             logger.err(e, "error creating the invocation instance [%d]", loaderId);
             throw e;

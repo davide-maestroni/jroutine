@@ -75,8 +75,9 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * Constructor.
      *
      * @param target the target object instance.
-     * @throws NullPointerException     if the specified target is null.
-     * @throws IllegalArgumentException if a duplicate name in the annotations is detected.
+     * @throws java.lang.IllegalArgumentException if a duplicate name in the annotations is
+     *                                            detected.
+     * @throws java.lang.NullPointerException     if the specified target is null.
      */
     ObjectRoutineBuilder(@Nonnull final Object target) {
 
@@ -87,8 +88,9 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * Constructor.
      *
      * @param targetReference the reference to the target object.
-     * @throws NullPointerException     if the specified target is null.
-     * @throws IllegalArgumentException if a duplicate name in the annotations is detected.
+     * @throws java.lang.IllegalArgumentException if a duplicate name in the annotations is
+     *                                            detected.
+     * @throws java.lang.NullPointerException     if the specified target is null.
      */
     ObjectRoutineBuilder(@Nonnull final WeakReference<?> targetReference) {
 
@@ -317,8 +319,9 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * @param itf     the interface implemented by the return object.
      * @param <CLASS> the interface type.
      * @return the proxy object.
-     * @throws NullPointerException     if the specified class is null.
-     * @throws IllegalArgumentException if the specified class does not represent an interface.
+     * @throws java.lang.IllegalArgumentException if the specified class does not represent an
+     *                                            interface.
+     * @throws java.lang.NullPointerException     if the specified class is null.
      */
     @Nonnull
     public <CLASS> CLASS buildProxy(@Nonnull final Class<CLASS> itf) {
@@ -359,8 +362,9 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * @param itf     the token of the interface implemented by the return object.
      * @param <CLASS> the interface type.
      * @return the proxy object.
-     * @throws NullPointerException     if the specified class is null.
-     * @throws IllegalArgumentException if the specified class does not represent an interface.
+     * @throws java.lang.IllegalArgumentException if the specified class does not represent an
+     *                                            interface.
+     * @throws java.lang.NullPointerException     if the specified class is null.
      */
     @Nonnull
     public <CLASS> CLASS buildProxy(@Nonnull final ClassToken<CLASS> itf) {
@@ -382,8 +386,9 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * @param itf     the interface implemented by the return object.
      * @param <CLASS> the interface type.
      * @return the wrapping object.
-     * @throws NullPointerException     if the specified class is null.
-     * @throws IllegalArgumentException if the specified class does not represent an interface.
+     * @throws java.lang.IllegalArgumentException if the specified class does not represent an
+     *                                            interface.
+     * @throws java.lang.NullPointerException     if the specified class is null.
      */
     @Nonnull
     public <CLASS> CLASS buildWrapper(@Nonnull final Class<CLASS> itf) {
@@ -469,8 +474,9 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * @param itf     the token of the interface implemented by the return object.
      * @param <CLASS> the interface type.
      * @return the wrapping object.
-     * @throws NullPointerException     if the specified class is null.
-     * @throws IllegalArgumentException if the specified class does not represent an interface.
+     * @throws java.lang.IllegalArgumentException if the specified class does not represent an
+     *                                            interface.
+     * @throws java.lang.NullPointerException     if the specified class is null.
      */
     @Nonnull
     public <CLASS> CLASS buildWrapper(@Nonnull final ClassToken<CLASS> itf) {

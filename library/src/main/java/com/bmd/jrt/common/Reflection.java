@@ -91,8 +91,8 @@ public class Reflection {
      * @param args   the constructor arguments.
      * @param <TYPE> the target type.
      * @return the best matching constructor.
-     * @throws IllegalArgumentException if no constructor taking the specified object as parameters
-     *                                  was found.
+     * @throws java.lang.IllegalArgumentException if no constructor taking the specified object as
+     *                                            parameters was found.
      */
     @Nonnull
     @SuppressWarnings("unchecked")

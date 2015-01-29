@@ -23,6 +23,7 @@ import com.bmd.jrt.channel.Tunnel;
 import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.log.NullLog;
+import com.bmd.jrt.runner.Runner;
 import com.bmd.jrt.runner.Runners;
 
 import junit.framework.TestCase;
@@ -56,12 +57,14 @@ public class RoutineProcessorTest extends TestCase {
     @SuppressWarnings("unchecked")
     public void testWrapper() {
 
+        final NullLog log = new NullLog();
+        final Runner runner = Runners.poolRunner();
         final TestClass testClass = new TestClass();
         final TestWrapper testWrapper = JRoutine.on(testClass)
                                                 .syncRunner(RunnerType.SEQUENTIAL)
-                                                .runBy(Runners.poolRunner())
+                                                .runBy(runner)
                                                 .logLevel(LogLevel.DEBUG)
-                                                .loggedWith(new NullLog())
+                                                .loggedWith(log)
                                                 .buildWrapper(
                                                         ClassToken.tokenOf(TestWrapper.class));
 
@@ -82,6 +85,14 @@ public class RoutineProcessorTest extends TestCase {
         final Tunnel<Integer> tunnel = JRoutine.on().buildTunnel();
         tunnel.input().pass(3).close();
         assertThat(testWrapper.getString(tunnel.output())).isEqualTo("3");
+
+        assertThat(JRoutine.on(testClass)
+                           .syncRunner(RunnerType.SEQUENTIAL)
+                           .runBy(runner)
+                           .logLevel(LogLevel.DEBUG)
+                           .loggedWith(log)
+                           .buildWrapper(ClassToken.tokenOf(TestWrapper.class))).isSameAs(
+                testWrapper);
     }
 
     @SuppressWarnings("UnusedDeclaration")

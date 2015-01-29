@@ -50,7 +50,7 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineChannelBu
      * Constructor.
      *
      * @param classToken the invocation class token.
-     * @throws NullPointerException if the class token is null.
+     * @throws java.lang.NullPointerException if the class token is null.
      */
     InvocationRoutineBuilder(
             @Nonnull final ClassToken<? extends Invocation<INPUT, OUTPUT>> classToken) {
@@ -246,7 +246,7 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineChannelBu
      *
      * @param args the arguments.
      * @return this builder.
-     * @throws NullPointerException if the specified arguments array is null.
+     * @throws java.lang.NullPointerException if the specified arguments array is null.
      */
     @Nonnull
     @SuppressWarnings("ConstantConditions")

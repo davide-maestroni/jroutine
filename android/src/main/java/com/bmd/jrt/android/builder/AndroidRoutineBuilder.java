@@ -55,7 +55,7 @@ public interface AndroidRoutineBuilder<INPUT, OUTPUT> {
      *
      * @param configuration the configuration.
      * @return this builder.
-     * @throws NullPointerException if the specified configuration is null.
+     * @throws java.lang.NullPointerException if the specified configuration is null.
      */
     @Nonnull
     public AndroidRoutineBuilder<INPUT, OUTPUT> apply(@Nonnull RoutineConfiguration configuration);
@@ -73,7 +73,7 @@ public interface AndroidRoutineBuilder<INPUT, OUTPUT> {
      *
      * @param order the order type.
      * @return this builder.
-     * @throws NullPointerException if the specified order type is null.
+     * @throws java.lang.NullPointerException if the specified order type is null.
      */
     @Nonnull
     public AndroidRoutineBuilder<INPUT, OUTPUT> inputOrder(@Nonnull DataOrder order);
@@ -83,7 +83,7 @@ public interface AndroidRoutineBuilder<INPUT, OUTPUT> {
      *
      * @param level the log level.
      * @return this builder.
-     * @throws NullPointerException if the log level is null.
+     * @throws java.lang.NullPointerException if the log level is null.
      */
     @Nonnull
     public AndroidRoutineBuilder<INPUT, OUTPUT> logLevel(@Nonnull LogLevel level);
@@ -104,7 +104,7 @@ public interface AndroidRoutineBuilder<INPUT, OUTPUT> {
      *
      * @param resolution the type of resolution.
      * @return this builder.
-     * @throws NullPointerException if the specified resolution type is null.
+     * @throws java.lang.NullPointerException if the specified resolution type is null.
      */
     @Nonnull
     public AndroidRoutineBuilder<INPUT, OUTPUT> onClash(@Nonnull ClashResolution resolution);
@@ -114,7 +114,7 @@ public interface AndroidRoutineBuilder<INPUT, OUTPUT> {
      *
      * @param cacheType the cache type.
      * @return this builder.
-     * @throws NullPointerException if the specified cache type is null.
+     * @throws java.lang.NullPointerException if the specified cache type is null.
      */
     @Nonnull
     public AndroidRoutineBuilder<INPUT, OUTPUT> onComplete(@Nonnull ResultCache cacheType);
@@ -124,7 +124,7 @@ public interface AndroidRoutineBuilder<INPUT, OUTPUT> {
      *
      * @param order the order type.
      * @return this builder.
-     * @throws NullPointerException if the specified order type is null.
+     * @throws java.lang.NullPointerException if the specified order type is null.
      */
     @Nonnull
     public AndroidRoutineBuilder<INPUT, OUTPUT> outputOrder(@Nonnull DataOrder order);
@@ -134,7 +134,7 @@ public interface AndroidRoutineBuilder<INPUT, OUTPUT> {
      *
      * @param type the runner type.
      * @return this builder.
-     * @throws NullPointerException if the specified type is null.
+     * @throws java.lang.NullPointerException if the specified type is null.
      */
     @Nonnull
     public AndroidRoutineBuilder<INPUT, OUTPUT> syncRunner(@Nonnull RunnerType type);

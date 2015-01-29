@@ -151,8 +151,9 @@ public class JRoutine extends com.bmd.jrt.android.routine.JRoutine {
      * @param <INPUT>    the input data type.
      * @param <OUTPUT>   the output data type.
      * @return the routine builder instance.
-     * @throws IllegalArgumentException if the specified invocation has no default constructor.
-     * @throws NullPointerException     if the specified activity or class token are null.
+     * @throws java.lang.IllegalArgumentException if the specified invocation has no default
+     *                                            constructor.
+     * @throws java.lang.NullPointerException     if the specified activity or class token are null.
      */
     @Nonnull
     public static <INPUT, OUTPUT> AndroidRoutineBuilder<INPUT, OUTPUT> onActivity(
@@ -180,8 +181,9 @@ public class JRoutine extends com.bmd.jrt.android.routine.JRoutine {
      * @param activity the invocation activity context.
      * @param id       the invocation ID.
      * @return the channel builder instance.
-     * @throws IllegalArgumentException if the specified invocation ID is equal to GENERATED_ID.
-     * @throws NullPointerException     if the specified activity is null.
+     * @throws java.lang.IllegalArgumentException if the specified invocation ID is equal to
+     *                                            GENERATED_ID.
+     * @throws java.lang.NullPointerException     if the specified activity is null.
      */
     @Nonnull
     public static AndroidChannelBuilder onActivity(@Nonnull final Activity activity, final int id) {
@@ -214,7 +216,7 @@ public class JRoutine extends com.bmd.jrt.android.routine.JRoutine {
      * @param <INPUT>    the input data type.
      * @param <OUTPUT>   the output data type.
      * @return the routine builder instance.
-     * @throws NullPointerException if the specified fragment or class token are null.
+     * @throws java.lang.NullPointerException if the specified fragment or class token are null.
      */
     @Nonnull
     public static <INPUT, OUTPUT> AndroidRoutineBuilder<INPUT, OUTPUT> onFragment(
@@ -234,8 +236,9 @@ public class JRoutine extends com.bmd.jrt.android.routine.JRoutine {
      * @param fragment the invocation fragment context.
      * @param id       the invocation ID.
      * @return the channel builder instance.
-     * @throws IllegalArgumentException if the specified invocation ID is equal to GENERATED_ID.
-     * @throws NullPointerException     if the specified fragment is null.
+     * @throws java.lang.IllegalArgumentException if the specified invocation ID is equal to
+     *                                            GENERATED_ID.
+     * @throws java.lang.NullPointerException     if the specified fragment is null.
      */
     @Nonnull
     public static AndroidChannelBuilder onFragment(@Nonnull final Fragment fragment, final int id) {

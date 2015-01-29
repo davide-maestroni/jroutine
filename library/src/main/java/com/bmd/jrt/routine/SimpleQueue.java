@@ -117,7 +117,7 @@ class SimpleQueue<E> {
      * Peeks the first element added into the queue.
      *
      * @return the element.
-     * @throws NoSuchElementException if the queue is empty.
+     * @throws java.util.NoSuchElementException if the queue is empty.
      */
     @Nullable
     @SuppressWarnings("unchecked")
@@ -135,7 +135,7 @@ class SimpleQueue<E> {
      * Removes the first element added into the queue.
      *
      * @return the element.
-     * @throws NoSuchElementException if the queue is empty.
+     * @throws java.util.NoSuchElementException if the queue is empty.
      */
     @Nullable
     @SuppressWarnings("unchecked")

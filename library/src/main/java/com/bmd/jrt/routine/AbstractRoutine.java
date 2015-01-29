@@ -97,8 +97,8 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
      * Constructor.
      *
      * @param configuration the routine configuration.
-     * @throws NullPointerException     if one of the parameters is null.
-     * @throws IllegalArgumentException if at least one of the parameter is invalid.
+     * @throws java.lang.IllegalArgumentException if at least one of the parameter is invalid.
+     * @throws java.lang.NullPointerException     if one of the parameters is null.
      */
     @SuppressWarnings("ConstantConditions")
     protected AbstractRoutine(@Nonnull final RoutineConfiguration configuration) {
@@ -305,7 +305,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
          * Constructor.
          *
          * @param routine the routine to invoke in parallel mode.
-         * @throws NullPointerException if the routine instance is null;
+         * @throws java.lang.NullPointerException if the routine instance is null;
          */
         private ParallelInvocation(@Nonnull final Routine<INPUT, OUTPUT> routine) {
 

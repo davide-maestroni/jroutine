@@ -61,7 +61,7 @@ public interface RoutineBuilder {
      *
      * @param configuration the configuration.
      * @return this builder.
-     * @throws NullPointerException if the specified configuration is null.
+     * @throws java.lang.NullPointerException if the specified configuration is null.
      */
     @Nonnull
     public RoutineBuilder apply(@Nonnull RoutineConfiguration configuration);
@@ -74,8 +74,8 @@ public interface RoutineBuilder {
      * @param timeout  the timeout.
      * @param timeUnit the timeout time unit.
      * @return this builder.
-     * @throws NullPointerException     if the specified time unit is null.
-     * @throws IllegalArgumentException if the specified timeout is negative.
+     * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
+     * @throws java.lang.NullPointerException     if the specified time unit is null.
      */
     @Nonnull
     public RoutineBuilder availableTimeout(long timeout, @Nonnull TimeUnit timeUnit);
@@ -97,7 +97,7 @@ public interface RoutineBuilder {
      *
      * @param level the log level.
      * @return this builder.
-     * @throws NullPointerException if the log level is null.
+     * @throws java.lang.NullPointerException if the log level is null.
      */
     @Nonnull
     public RoutineBuilder logLevel(@Nonnull LogLevel level);
@@ -118,7 +118,7 @@ public interface RoutineBuilder {
      *
      * @param maxRetainedInstances the max number of instances.
      * @return this builder.
-     * @throws IllegalArgumentException if the number is negative.
+     * @throws java.lang.IllegalArgumentException if the number is negative.
      */
     @Nonnull
     public RoutineBuilder maxRetained(int maxRetainedInstances);
@@ -130,7 +130,7 @@ public interface RoutineBuilder {
      *
      * @param maxRunningInstances the max number of instances.
      * @return this builder.
-     * @throws IllegalArgumentException if the number is less than 1.
+     * @throws java.lang.IllegalArgumentException if the number is less than 1.
      */
     @Nonnull
     public RoutineBuilder maxRunning(int maxRunningInstances);
@@ -141,7 +141,7 @@ public interface RoutineBuilder {
      *
      * @param action the action type.
      * @return this builder.
-     * @throws NullPointerException if the specified action type is null.
+     * @throws java.lang.NullPointerException if the specified action type is null.
      */
     @Nonnull
     public RoutineBuilder onReadTimeout(@Nonnull TimeoutAction action);
@@ -154,8 +154,8 @@ public interface RoutineBuilder {
      * @param timeout  the timeout.
      * @param timeUnit the timeout time unit.
      * @return this builder.
-     * @throws NullPointerException     if the specified time unit is null.
-     * @throws IllegalArgumentException if the specified timeout is negative.
+     * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
+     * @throws java.lang.NullPointerException     if the specified time unit is null.
      */
     @Nonnull
     public RoutineBuilder readTimeout(long timeout, @Nonnull TimeUnit timeUnit);
@@ -187,7 +187,7 @@ public interface RoutineBuilder {
      *
      * @param type the runner type.
      * @return this builder.
-     * @throws NullPointerException if the specified type is null.
+     * @throws java.lang.NullPointerException if the specified type is null.
      */
     @Nonnull
     public RoutineBuilder syncRunner(@Nonnull RunnerType type);

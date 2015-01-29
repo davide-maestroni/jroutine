@@ -21,6 +21,7 @@ import com.bmd.jrt.channel.TemplateOutputConsumer;
 import com.bmd.jrt.channel.Tunnel.TunnelInput;
 import com.bmd.jrt.common.InvocationException;
 import com.bmd.jrt.common.InvocationInterruptedException;
+import com.bmd.jrt.common.RoutineException;
 import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.runner.Execution;
 import com.bmd.jrt.runner.Runner;
@@ -54,7 +55,7 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
 
     private final Object mMutex = new Object();
 
-    private InvocationException mAbortException;
+    private RoutineException mAbortException;
 
     private boolean mIsComplete;
 
@@ -63,7 +64,7 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
      *
      * @param loader the loader instance.
      * @param logger the logger instance.
-     * @throws NullPointerException if any of the parameter is null.
+     * @throws java.lang.NullPointerException if any of the parameter is null.
      */
     @SuppressWarnings("ConstantConditions")
     InvocationOutputConsumer(@Nonnull final RoutineLoader<?, OUTPUT> loader,
@@ -181,8 +182,7 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
 
             synchronized (mMutex) {
 
-                final InvocationException exception = mAbortException;
-                return (exception != null) ? exception.getCause() : null;
+                return mAbortException;
             }
         }
 
@@ -236,10 +236,15 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
 
                         throw e.interrupt();
 
-                    } catch (final InvocationException e) {
+                    } catch (final RoutineException e) {
 
                         mIsComplete = true;
                         mAbortException = e;
+
+                    } catch (final Throwable e) {
+
+                        mIsComplete = true;
+                        mAbortException = new InvocationException(e);
                     }
                 }
 

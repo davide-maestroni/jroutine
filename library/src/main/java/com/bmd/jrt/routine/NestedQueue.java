@@ -37,7 +37,7 @@ interface NestedQueue<E> {
      *
      * @param element the element to add.
      * @return this queue.
-     * @throws IllegalStateException if the queue has been already closed.
+     * @throws java.lang.IllegalStateException if the queue has been already closed.
      */
     @Nonnull
     public NestedQueue<E> add(@Nullable E element);
@@ -49,7 +49,7 @@ interface NestedQueue<E> {
      *
      * @param elements the element iterable.
      * @return this queue.
-     * @throws IllegalStateException if the queue has been already closed.
+     * @throws java.lang.IllegalStateException if the queue has been already closed.
      */
     @Nonnull
     public NestedQueue<E> addAll(@Nonnull Iterable<? extends E> elements);
@@ -58,7 +58,7 @@ interface NestedQueue<E> {
      * Adds a nested queue to this one.
      *
      * @return the newly added nested queue.
-     * @throws IllegalStateException if the queue has been already closed.
+     * @throws java.lang.IllegalStateException if the queue has been already closed.
      */
     @Nonnull
     public NestedQueue<E> addNested();

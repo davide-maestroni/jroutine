@@ -23,6 +23,7 @@ import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.CacheHashMap;
 import com.bmd.jrt.common.InvocationException;
 import com.bmd.jrt.common.InvocationInterruptedException;
+import com.bmd.jrt.common.RoutineException;
 import com.bmd.jrt.invocation.SimpleInvocation;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
@@ -83,9 +84,10 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      * Constructor.
      *
      * @param targetClass the target class.
-     * @throws NullPointerException     if the specified target is null.
-     * @throws IllegalArgumentException if a duplicate name in the annotations is detected, or the
-     *                                  specified class represents an interface.
+     * @throws java.lang.IllegalArgumentException if a duplicate name in the annotations is
+     *                                            detected, or the specified class represents an
+     *                                            interface.
+     * @throws java.lang.NullPointerException     if the specified target is null.
      */
     ClassRoutineBuilder(@Nonnull final Class<?> targetClass) {
 
@@ -104,8 +106,9 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      * Constructor.
      *
      * @param target the target object.
-     * @throws NullPointerException     if the specified target is null.
-     * @throws IllegalArgumentException if a duplicate name in the annotations is detected.
+     * @throws java.lang.IllegalArgumentException if a duplicate name in the annotations is
+     *                                            detected.
+     * @throws java.lang.NullPointerException     if the specified target is null.
      */
     ClassRoutineBuilder(@Nonnull final Object target) {
 
@@ -119,8 +122,9 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      * Constructor.
      *
      * @param targetReference the reference to the target object.
-     * @throws NullPointerException     if the specified target is null.
-     * @throws IllegalArgumentException if a duplicate name in the annotations is detected.
+     * @throws java.lang.IllegalArgumentException if a duplicate name in the annotations is
+     *                                            detected.
+     * @throws java.lang.NullPointerException     if the specified target is null.
      */
     ClassRoutineBuilder(@Nonnull final WeakReference<?> targetReference) {
 
@@ -146,7 +150,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      * @param <INPUT>  the input data type.
      * @param <OUTPUT> the output data type.
      * @return the routine.
-     * @throws IllegalArgumentException if the specified method is not found.
+     * @throws java.lang.IllegalArgumentException if the specified method is not found.
      */
     @Nonnull
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> annotatedMethod(@Nonnull final String name) {
@@ -283,8 +287,8 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      * @param name           the method name.
      * @param parameterTypes the method parameter types.
      * @return the routine.
-     * @throws NullPointerException     if one of the parameter is null.
-     * @throws IllegalArgumentException if no matching method is found.
+     * @throws java.lang.IllegalArgumentException if no matching method is found.
+     * @throws java.lang.NullPointerException     if one of the parameter is null.
      */
     @Nonnull
     public Routine<Object, Object> method(@Nonnull final String name,
@@ -327,7 +331,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      * @param <INPUT>  the input data type.
      * @param <OUTPUT> the output data type.
      * @return the routine.
-     * @throws NullPointerException if the specified method is null.
+     * @throws java.lang.NullPointerException if the specified method is null.
      */
     @Nonnull
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final Method method) {
@@ -496,7 +500,8 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      * @param lockName      the lock name.
      * @param targetMethod  the target method.
      * @return the routine.
-     * @throws NullPointerException if the specified configuration, class or method are null.
+     * @throws java.lang.NullPointerException if the specified configuration, class or method are
+     *                                        null.
      */
     @Nonnull
     protected <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(
@@ -670,7 +675,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
                     throw e.interrupt();
 
-                } catch (final InvocationException e) {
+                } catch (final RoutineException e) {
 
                     throw e;
 

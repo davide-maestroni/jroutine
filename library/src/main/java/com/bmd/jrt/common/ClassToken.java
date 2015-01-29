@@ -43,7 +43,7 @@ public abstract class ClassToken<CLASS> {
      * @param object  the object.
      * @param <CLASS> the class type.
      * @return the newly created token.
-     * @throws NullPointerException if the object is null.
+     * @throws java.lang.NullPointerException if the object is null.
      */
     @Nonnull
     @SuppressWarnings("unchecked")
@@ -58,7 +58,7 @@ public abstract class ClassToken<CLASS> {
      * @param rawClass the raw class.
      * @param <CLASS>  the class type.
      * @return the newly created token.
-     * @throws NullPointerException if the raw class is null.
+     * @throws java.lang.NullPointerException if the raw class is null.
      */
     @Nonnull
     @SuppressWarnings("ConstantConditions")
@@ -93,7 +93,8 @@ public abstract class ClassToken<CLASS> {
      * Gets the generic type of this token.
      *
      * @return the generic type.
-     * @throws IllegalStateException if this class does not correctly extends a class token.
+     * @throws java.lang.IllegalStateException if this class does not correctly extends a class
+     *                                         token.
      */
     @Nonnull
     public final Type getGenericType() {
@@ -130,7 +131,8 @@ public abstract class ClassToken<CLASS> {
      * Gets the raw class of this token.
      *
      * @return the raw class.
-     * @throws IllegalStateException if this class does not correctly extends a class token.
+     * @throws java.lang.IllegalStateException if this class does not correctly extends a class
+     *                                         token.
      */
     @Nonnull
     @SuppressWarnings("unchecked")
@@ -187,8 +189,9 @@ public abstract class ClassToken<CLASS> {
      *
      * @param other the class token to compare.
      * @return whether this token raw class is equal to or is a super class.
-     * @throws IllegalStateException if this class does not correctly extends a class token.
-     * @throws NullPointerException  if the other class token is null.
+     * @throws java.lang.IllegalStateException if this class does not correctly extends a class
+     *                                         token.
+     * @throws java.lang.NullPointerException  if the other class token is null.
      */
     public final boolean isAssignableFrom(@Nonnull final ClassToken<?> other) {
 
@@ -199,7 +202,8 @@ public abstract class ClassToken<CLASS> {
      * Checks if this token raw class represent an interface.
      *
      * @return whether this token raw class is an interface.
-     * @throws IllegalStateException if this class does not correctly extends a class token.
+     * @throws java.lang.IllegalStateException if this class does not correctly extends a class
+     *                                         token.
      */
     public final boolean isInterface() {
 

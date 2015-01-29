@@ -45,7 +45,7 @@ public interface AndroidChannelBuilder {
      *
      * @param level the log level.
      * @return this builder.
-     * @throws NullPointerException if the log level is null.
+     * @throws java.lang.NullPointerException if the log level is null.
      */
     @Nonnull
     public AndroidChannelBuilder logLevel(@Nonnull LogLevel level);
@@ -65,7 +65,7 @@ public interface AndroidChannelBuilder {
      *
      * @param cacheType the cache type.
      * @return this builder.
-     * @throws NullPointerException if the specified cache type is null.
+     * @throws java.lang.NullPointerException if the specified cache type is null.
      */
     @Nonnull
     public AndroidChannelBuilder onComplete(@Nonnull ResultCache cacheType);

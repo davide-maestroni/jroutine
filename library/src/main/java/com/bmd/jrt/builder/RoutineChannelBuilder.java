@@ -94,7 +94,7 @@ public interface RoutineChannelBuilder extends RoutineBuilder {
      *
      * @param order the order type.
      * @return this builder.
-     * @throws NullPointerException if the specified order type is null.
+     * @throws java.lang.NullPointerException if the specified order type is null.
      */
     @Nonnull
     public RoutineChannelBuilder inputOrder(@Nonnull DataOrder order);
@@ -106,7 +106,7 @@ public interface RoutineChannelBuilder extends RoutineBuilder {
      *
      * @param inputMaxSize the maximum size.
      * @return this builder.
-     * @throws IllegalArgumentException if the number is less than 1.
+     * @throws java.lang.IllegalArgumentException if the number is less than 1.
      */
     @Nonnull
     public RoutineChannelBuilder inputSize(int inputMaxSize);
@@ -129,8 +129,8 @@ public interface RoutineChannelBuilder extends RoutineBuilder {
      * @param timeout  the timeout.
      * @param timeUnit the timeout time unit.
      * @return this builder.
-     * @throws NullPointerException     if the specified time unit is null.
-     * @throws IllegalArgumentException if the specified timeout is negative.
+     * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
+     * @throws java.lang.NullPointerException     if the specified time unit is null.
      */
     @Nonnull
     public RoutineChannelBuilder inputTimeout(long timeout, @Nonnull TimeUnit timeUnit);
@@ -140,7 +140,7 @@ public interface RoutineChannelBuilder extends RoutineBuilder {
      *
      * @param order the order type.
      * @return this builder.
-     * @throws NullPointerException if the specified order type is null.
+     * @throws java.lang.NullPointerException if the specified order type is null.
      */
     @Nonnull
     public RoutineChannelBuilder outputOrder(@Nonnull DataOrder order);
@@ -152,7 +152,7 @@ public interface RoutineChannelBuilder extends RoutineBuilder {
      *
      * @param outputMaxSize the maximum size.
      * @return this builder.
-     * @throws IllegalArgumentException if the number is less than 1.
+     * @throws java.lang.IllegalArgumentException if the number is less than 1.
      */
     @Nonnull
     public RoutineChannelBuilder outputSize(int outputMaxSize);
@@ -165,8 +165,8 @@ public interface RoutineChannelBuilder extends RoutineBuilder {
      * @param timeout  the timeout.
      * @param timeUnit the timeout time unit.
      * @return this builder.
-     * @throws NullPointerException     if the specified time unit is null.
-     * @throws IllegalArgumentException if the specified timeout is negative.
+     * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
+     * @throws java.lang.NullPointerException     if the specified time unit is null.
      */
     @Nonnull
     public RoutineChannelBuilder outputTimeout(long timeout, @Nonnull TimeUnit timeUnit);

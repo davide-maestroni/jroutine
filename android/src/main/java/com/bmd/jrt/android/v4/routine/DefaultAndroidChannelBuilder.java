@@ -51,7 +51,7 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
      *
      * @param activity the context activity.
      * @param loaderId the loader ID.
-     * @throws NullPointerException if the activity is null.
+     * @throws java.lang.NullPointerException if the activity is null.
      */
     DefaultAndroidChannelBuilder(@Nonnull final FragmentActivity activity, final int loaderId) {
 
@@ -63,7 +63,7 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
      *
      * @param fragment the context fragment.
      * @param loaderId the loader ID.
-     * @throws NullPointerException if the fragment is null.
+     * @throws java.lang.NullPointerException if the fragment is null.
      */
     DefaultAndroidChannelBuilder(@Nonnull final Fragment fragment, final int loaderId) {
 
@@ -75,7 +75,7 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
      *
      * @param context  the context instance.
      * @param loaderId the loader ID.
-     * @throws NullPointerException if the context is null.
+     * @throws java.lang.NullPointerException if the context is null.
      */
     @SuppressWarnings("ConstantConditions")
     private DefaultAndroidChannelBuilder(@Nonnull final Object context, final int loaderId) {

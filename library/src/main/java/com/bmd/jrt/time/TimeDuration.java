@@ -47,7 +47,8 @@ public class TimeDuration extends Time {
      *
      * @param duration the time value.
      * @param unit     the time unit.
-     * @throws IllegalArgumentException if the specified duration is negative.
+     * @throws java.lang.IllegalArgumentException if the specified duration is negative.
+     * @throws java.lang.NullPointerException     if the time unit is null.
      */
     protected TimeDuration(final long duration, @Nonnull final TimeUnit unit) {
 
@@ -64,7 +65,7 @@ public class TimeDuration extends Time {
      *
      * @param days the number of days.
      * @return the time instance.
-     * @throws IllegalArgumentException if the specified duration is negative.
+     * @throws java.lang.IllegalArgumentException if the specified duration is negative.
      */
     @Nonnull
     public static TimeDuration days(final long days) {
@@ -84,8 +85,8 @@ public class TimeDuration extends Time {
      * @param time the time value.
      * @param unit the time unit.
      * @return the time instance.
-     * @throws NullPointerException     if the time unit is null.
-     * @throws IllegalArgumentException if the specified duration is negative.
+     * @throws java.lang.IllegalArgumentException if the specified duration is negative.
+     * @throws java.lang.NullPointerException     if the time unit is null.
      */
     @Nonnull
     @SuppressWarnings("ConstantConditions")
@@ -104,7 +105,7 @@ public class TimeDuration extends Time {
      *
      * @param hours the number of hours
      * @return the time instance.
-     * @throws IllegalArgumentException if the specified duration is negative.
+     * @throws java.lang.IllegalArgumentException if the specified duration is negative.
      */
     @Nonnull
     public static TimeDuration hours(final long hours) {
@@ -122,7 +123,7 @@ public class TimeDuration extends Time {
      *
      * @param micros the number of microseconds.
      * @return the time duration instance.
-     * @throws IllegalArgumentException if the specified duration is negative.
+     * @throws java.lang.IllegalArgumentException if the specified duration is negative.
      */
     @Nonnull
     public static TimeDuration micros(final long micros) {
@@ -135,7 +136,7 @@ public class TimeDuration extends Time {
      *
      * @param millis the number of milliseconds.
      * @return the time duration instance.
-     * @throws IllegalArgumentException if the specified duration is negative.
+     * @throws java.lang.IllegalArgumentException if the specified duration is negative.
      */
     @Nonnull
     public static TimeDuration millis(final long millis) {
@@ -148,7 +149,7 @@ public class TimeDuration extends Time {
      *
      * @param minutes the number of minutes.
      * @return the time duration instance.
-     * @throws IllegalArgumentException if the specified duration is negative.
+     * @throws java.lang.IllegalArgumentException if the specified duration is negative.
      */
     @Nonnull
     public static TimeDuration minutes(final long minutes) {
@@ -166,7 +167,7 @@ public class TimeDuration extends Time {
      *
      * @param nanos the number of nanoseconds.
      * @return the time duration instance.
-     * @throws IllegalArgumentException if the specified duration is negative.
+     * @throws java.lang.IllegalArgumentException if the specified duration is negative.
      */
     @Nonnull
     public static TimeDuration nanos(final long nanos) {
@@ -179,7 +180,7 @@ public class TimeDuration extends Time {
      *
      * @param seconds the number of seconds.
      * @return the time duration instance.
-     * @throws IllegalArgumentException if the specified duration is negative.
+     * @throws java.lang.IllegalArgumentException if the specified duration is negative.
      */
     @Nonnull
     public static TimeDuration seconds(final long seconds) {
@@ -278,8 +279,8 @@ public class TimeDuration extends Time {
      * Performs a {@link Thread#join()} using this duration as timeout.
      *
      * @param target the target thread.
-     * @throws InterruptedException if the current thread is interrupted.
-     * @throws NullPointerException if the time unit is null.
+     * @throws java.lang.InterruptedException if the current thread is interrupted.
+     * @throws java.lang.NullPointerException if the time unit is null.
      */
     public void join(@Nonnull final Thread target) throws InterruptedException {
 
@@ -289,7 +290,7 @@ public class TimeDuration extends Time {
     /**
      * Performs a {@link Thread#sleep(long, int)} using this duration as timeout.
      *
-     * @throws InterruptedException if the current thread is interrupted.
+     * @throws java.lang.InterruptedException if the current thread is interrupted.
      */
     public void sleep() throws InterruptedException {
 
@@ -300,7 +301,7 @@ public class TimeDuration extends Time {
      * Performs a {@link Thread#sleep(long, int)} using this duration as timeout, ensuring that
      * the sleep time is respected even if spurious wake ups happen in the while.
      *
-     * @throws InterruptedException if the current thread is interrupted.
+     * @throws java.lang.InterruptedException if the current thread is interrupted.
      */
     public void sleepAtLeast() throws InterruptedException {
 
@@ -339,8 +340,8 @@ public class TimeDuration extends Time {
      *
      * @param milliTime the starting system time in milliseconds.
      * @return whether the sleep happened at all.
-     * @throws InterruptedException  if the current thread is interrupted.
-     * @throws IllegalStateException if this duration overflows the maximum sleep time.
+     * @throws java.lang.IllegalStateException if this duration overflows the maximum sleep time.
+     * @throws java.lang.InterruptedException  if the current thread is interrupted.
      * @see java.lang.System#currentTimeMillis()
      */
     public boolean sleepSinceMillis(final long milliTime) throws InterruptedException {
@@ -373,8 +374,8 @@ public class TimeDuration extends Time {
      *
      * @param nanoTime the starting system time in nanoseconds.
      * @return whether the sleep happened at all.
-     * @throws InterruptedException  if the current thread is interrupted.
-     * @throws IllegalStateException if this duration overflows the maximum sleep time.
+     * @throws java.lang.IllegalStateException if this duration overflows the maximum sleep time.
+     * @throws java.lang.InterruptedException  if the current thread is interrupted.
      * @see java.lang.System#nanoTime()
      */
     public boolean sleepSinceNanos(final long nanoTime) throws InterruptedException {
@@ -405,8 +406,8 @@ public class TimeDuration extends Time {
      * Performs an {@link Object#wait()} using this duration as timeout.
      *
      * @param target the target object.
-     * @throws InterruptedException if the current thread is interrupted.
-     * @throws NullPointerException if the target object is null.
+     * @throws java.lang.InterruptedException if the current thread is interrupted.
+     * @throws java.lang.NullPointerException if the target object is null.
      */
     @SuppressFBWarnings(value = "WA_NOT_IN_LOOP",
                         justification = "this is just a wrapper on an Object.wait() call")
@@ -433,8 +434,8 @@ public class TimeDuration extends Time {
      * @param target    the target object.
      * @param milliTime the starting system time in milliseconds.
      * @return whether the wait happened at all.
-     * @throws InterruptedException if the current thread is interrupted.
-     * @throws NullPointerException if the target object is null.
+     * @throws java.lang.InterruptedException if the current thread is interrupted.
+     * @throws java.lang.NullPointerException if the target object is null.
      * @see java.lang.System#currentTimeMillis()
      */
     @SuppressFBWarnings(value = "WA_NOT_IN_LOOP",
@@ -472,8 +473,8 @@ public class TimeDuration extends Time {
      * @param target   the target object.
      * @param nanoTime the starting system time in nanoseconds.
      * @return whether the wait happened at all.
-     * @throws InterruptedException if the current thread is interrupted.
-     * @throws NullPointerException if the target object is null.
+     * @throws java.lang.InterruptedException if the current thread is interrupted.
+     * @throws java.lang.NullPointerException if the target object is null.
      * @see java.lang.System#nanoTime()
      */
     @SuppressFBWarnings(value = "WA_NOT_IN_LOOP",
@@ -511,8 +512,8 @@ public class TimeDuration extends Time {
      * @param target the target object.
      * @param check  the check to verify.
      * @return whether the check became true before the timeout elapsed.
-     * @throws InterruptedException if the current thread is interrupted.
-     * @throws NullPointerException if the target object or the specified check are null.
+     * @throws java.lang.InterruptedException if the current thread is interrupted.
+     * @throws java.lang.NullPointerException if the target object or the specified check are null.
      */
     public boolean waitTrue(@Nonnull final Object target, @Nonnull final Check check) throws
             InterruptedException {

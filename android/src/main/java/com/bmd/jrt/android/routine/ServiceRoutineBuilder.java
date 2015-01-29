@@ -63,7 +63,7 @@ public class ServiceRoutineBuilder<INPUT, OUTPUT> {
      *
      * @param context    the routine context.
      * @param classToken the invocation class token.
-     * @throws NullPointerException if the class token is null.
+     * @throws java.lang.NullPointerException if the class token is null.
      */
     ServiceRoutineBuilder(@Nonnull final Context context,
             @Nonnull final ClassToken<? extends AndroidInvocation<INPUT, OUTPUT>> classToken) {
@@ -78,7 +78,7 @@ public class ServiceRoutineBuilder<INPUT, OUTPUT> {
      *
      * @param configuration the configuration.
      * @return this builder.
-     * @throws NullPointerException if the specified configuration is null.
+     * @throws java.lang.NullPointerException if the specified configuration is null.
      */
     @Nonnull
     public ServiceRoutineBuilder<INPUT, OUTPUT> apply(
@@ -94,8 +94,8 @@ public class ServiceRoutineBuilder<INPUT, OUTPUT> {
      * @param timeout  the timeout.
      * @param timeUnit the timeout time unit.
      * @return this builder.
-     * @throws NullPointerException     if the specified time unit is null.
-     * @throws IllegalArgumentException if the specified timeout is negative.
+     * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
+     * @throws java.lang.NullPointerException     if the specified time unit is null.
      */
     @Nonnull
     public ServiceRoutineBuilder<INPUT, OUTPUT> availableTimeout(final long timeout,
@@ -152,7 +152,7 @@ public class ServiceRoutineBuilder<INPUT, OUTPUT> {
      *
      * @param order the order type.
      * @return this builder.
-     * @throws NullPointerException if the specified order type is null.
+     * @throws java.lang.NullPointerException if the specified order type is null.
      */
     @Nonnull
     public ServiceRoutineBuilder<INPUT, OUTPUT> inputOrder(@Nonnull final DataOrder order) {
@@ -181,7 +181,7 @@ public class ServiceRoutineBuilder<INPUT, OUTPUT> {
      *
      * @param level the log level.
      * @return this builder.
-     * @throws NullPointerException if the log level is null.
+     * @throws java.lang.NullPointerException if the log level is null.
      */
     @Nonnull
     public ServiceRoutineBuilder<INPUT, OUTPUT> logLevel(@Nonnull final LogLevel level) {
@@ -196,7 +196,7 @@ public class ServiceRoutineBuilder<INPUT, OUTPUT> {
      *
      * @param maxRetainedInstances the max number of instances.
      * @return this builder.
-     * @throws IllegalArgumentException if the number is negative.
+     * @throws java.lang.IllegalArgumentException if the number is negative.
      */
     @Nonnull
     public ServiceRoutineBuilder<INPUT, OUTPUT> maxRetained(final int maxRetainedInstances) {
@@ -212,7 +212,7 @@ public class ServiceRoutineBuilder<INPUT, OUTPUT> {
      *
      * @param maxRunningInstances the max number of instances.
      * @return this builder.
-     * @throws IllegalArgumentException if the number is less than 1.
+     * @throws java.lang.IllegalArgumentException if the number is less than 1.
      */
     @Nonnull
     public ServiceRoutineBuilder<INPUT, OUTPUT> maxRunning(final int maxRunningInstances) {
@@ -226,7 +226,7 @@ public class ServiceRoutineBuilder<INPUT, OUTPUT> {
      *
      * @param order the order type.
      * @return this builder.
-     * @throws NullPointerException if the specified order type is null.
+     * @throws java.lang.NullPointerException if the specified order type is null.
      */
     @Nonnull
     public ServiceRoutineBuilder<INPUT, OUTPUT> outputOrder(@Nonnull final DataOrder order) {
@@ -271,7 +271,7 @@ public class ServiceRoutineBuilder<INPUT, OUTPUT> {
      *
      * @param type the runner type.
      * @return this builder.
-     * @throws NullPointerException if the specified type is null.
+     * @throws java.lang.NullPointerException if the specified type is null.
      */
     @Nonnull
     public ServiceRoutineBuilder<INPUT, OUTPUT> syncRunner(@Nonnull RunnerType type) {

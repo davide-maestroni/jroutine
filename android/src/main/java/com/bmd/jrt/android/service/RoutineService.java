@@ -31,6 +31,7 @@ import com.bmd.jrt.channel.OutputConsumer;
 import com.bmd.jrt.channel.ParameterChannel;
 import com.bmd.jrt.common.InvocationException;
 import com.bmd.jrt.common.InvocationInterruptedException;
+import com.bmd.jrt.common.RoutineException;
 import com.bmd.jrt.invocation.Invocation;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
@@ -119,7 +120,7 @@ public class RoutineService extends Service {
      *
      * @param log      the log instance.
      * @param logLevel the log level.
-     * @throws NullPointerException if the specified log level is null.
+     * @throws java.lang.NullPointerException if the specified log level is null.
      */
     public RoutineService(@Nullable final Log log, @Nonnull final LogLevel logLevel) {
 
@@ -131,7 +132,7 @@ public class RoutineService extends Service {
      *
      * @param message the message.
      * @return the exception or null.
-     * @throws NullPointerException if the specified message is null.
+     * @throws java.lang.NullPointerException if the specified message is null.
      */
     @Nullable
     public static Throwable getAbortError(@Nonnull final Message message) {
@@ -152,7 +153,7 @@ public class RoutineService extends Service {
      *
      * @param message the message.
      * @return the value or null.
-     * @throws NullPointerException if the specified message is null.
+     * @throws java.lang.NullPointerException if the specified message is null.
      */
     @Nullable
     public static Object getValue(@Nonnull final Message message) {
@@ -178,7 +179,7 @@ public class RoutineService extends Service {
      * @param configuration   the routine configuration.
      * @param runnerClass     the runner class.
      * @param logClass        the log class.
-     * @throws NullPointerException if any of the specified nonnull parameters is null.
+     * @throws java.lang.NullPointerException if any of the specified nonnull parameters is null.
      */
     public static void putAsyncInvocation(@Nonnull final Bundle bundle,
             @Nonnull final String invocationId,
@@ -226,7 +227,7 @@ public class RoutineService extends Service {
      * @param configuration   the routine configuration.
      * @param runnerClass     the runner class.
      * @param logClass        the log class.
-     * @throws NullPointerException if any of the specified nonnull parameters is null.
+     * @throws java.lang.NullPointerException if any of the specified nonnull parameters is null.
      */
     public static void putParallelInvocation(@Nonnull final Bundle bundle,
             @Nonnull final String invocationId,
@@ -280,7 +281,7 @@ public class RoutineService extends Service {
      * @param configuration   the routine configuration.
      * @param runnerClass     the runner class.
      * @param logClass        the log class.
-     * @throws NullPointerException if any of the specified nonnull parameters is null.
+     * @throws java.lang.NullPointerException if any of the specified nonnull parameters is null.
      */
     private static void putInvocation(@Nonnull final Bundle bundle, boolean isParallel,
             @Nonnull final String invocationId,
@@ -540,7 +541,7 @@ public class RoutineService extends Service {
                 logger.err(e, "error creating the invocation instance");
                 throw e.interrupt();
 
-            } catch (final InvocationException e) {
+            } catch (final RoutineException e) {
 
                 logger.err(e, "error creating the invocation instance");
                 throw e;
@@ -809,7 +810,7 @@ public class RoutineService extends Service {
          *
          * @param invocation the routine invocation.
          * @param messenger  the output messenger.
-         * @throws NullPointerException if the specified messenger is null.
+         * @throws java.lang.NullPointerException if the specified messenger is null.
          */
         @SuppressWarnings("ConstantConditions")
         private ServiceOutputConsumer(@Nonnull final RoutineInvocation invocation,
@@ -919,8 +920,8 @@ public class RoutineService extends Service {
          * Passes the specified input to the invocation parameter channel.
          *
          * @param input the input.
-         * @throws IllegalStateException               if the channel is already closed.
          * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted.
+         * @throws java.lang.IllegalStateException     if the channel is already closed.
          */
         public void pass(@Nullable final Object input) {
 
@@ -946,10 +947,10 @@ public class RoutineService extends Service {
         /**
          * Closes the input channel and binds the specified consumer to the output one.
          *
-         * @throws NullPointerException                if the specified consumer is null.
-         * @throws IllegalStateException               if the channel is already closed or already
-         *                                             bound to a consumer.
          * @throws com.bmd.jrt.common.RoutineException if the execution has been aborted.
+         * @throws java.lang.IllegalStateException     if the channel is already closed or already
+         *                                             bound to a consumer.
+         * @throws java.lang.NullPointerException      if the specified consumer is null.
          */
         public void result(@Nonnull final OutputConsumer<Object> consumer) {
 

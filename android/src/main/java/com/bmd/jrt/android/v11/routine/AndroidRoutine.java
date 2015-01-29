@@ -26,6 +26,7 @@ import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.common.InvocationException;
 import com.bmd.jrt.common.InvocationInterruptedException;
+import com.bmd.jrt.common.RoutineException;
 import com.bmd.jrt.invocation.Invocation;
 import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.routine.AbstractRoutine;
@@ -68,8 +69,8 @@ class AndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
      * @param resolution    the clash resolution type.
      * @param cacheType     the result cache type.
      * @param constructor   the invocation constructor.
-     * @throws NullPointerException     if any of the specified nonnull parameter is null.
-     * @throws IllegalArgumentException if at least one of the parameter is invalid.
+     * @throws java.lang.IllegalArgumentException if at least one of the parameter is invalid.
+     * @throws java.lang.NullPointerException     if any of the specified nonnull parameter is null.
      */
     @SuppressWarnings("ConstantConditions")
     AndroidRoutine(@Nonnull final RoutineConfiguration configuration,
@@ -185,7 +186,7 @@ class AndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
             logger.err(e, "error creating the invocation instance");
             throw e.interrupt();
 
-        } catch (final InvocationException e) {
+        } catch (final RoutineException e) {
 
             logger.err(e, "error creating the invocation instance");
             throw e;

@@ -73,7 +73,7 @@ public class RoutineConfigurationBuilder implements RoutineChannelBuilder {
      * Constructor.
      *
      * @param initialConfiguration the initial configuration.
-     * @throws NullPointerException if the specified configuration instance is null.
+     * @throws java.lang.NullPointerException if the specified configuration instance is null.
      */
     public RoutineConfigurationBuilder(@Nonnull final RoutineConfiguration initialConfiguration) {
 

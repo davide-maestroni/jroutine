@@ -93,8 +93,8 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
      * @param manager       the invocation manager.
      * @param runner        the runner instance.
      * @param logger        the logger instance.
-     * @throws NullPointerException     if one of the parameters is null.
-     * @throws IllegalArgumentException if at least one of the parameter is invalid.
+     * @throws java.lang.IllegalArgumentException if at least one of the parameter is invalid.
+     * @throws java.lang.NullPointerException     if one of the parameters is null.
      */
     DefaultParameterChannel(@Nonnull final RoutineConfiguration configuration,
             @Nonnull final InvocationManager<INPUT, OUTPUT> manager, @Nonnull final Runner runner,
@@ -196,7 +196,8 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
             if (delay.isZero()) {
 
                 mLogger.dbg(reason, "aborting channel");
-                mAbortException = new AbortException(reason);
+                mAbortException =
+                        (reason instanceof AbortException) ? reason : new AbortException(reason);
                 mState = ChannelState.EXCEPTION;
             }
         }

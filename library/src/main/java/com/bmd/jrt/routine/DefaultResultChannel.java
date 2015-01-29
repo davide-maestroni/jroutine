@@ -109,8 +109,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
      * @param handler       the abort handler.
      * @param runner        the runner instance.
      * @param logger        the logger instance.
-     * @throws NullPointerException     if one of the parameters is null.
-     * @throws IllegalArgumentException if at least one of the parameter is invalid.
+     * @throws java.lang.NullPointerException if one of the parameters is null.
      */
     @SuppressWarnings("ConstantConditions")
     DefaultResultChannel(@Nonnull final RoutineConfiguration configuration,
@@ -134,21 +133,10 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         mTimeoutAction = configuration.getReadTimeoutActionOr(TimeoutAction.DEADLOCK);
         mMaxOutput = configuration.getOutputSizeOr(Integer.MAX_VALUE);
         mOutputTimeout = configuration.getOutputTimeoutOr(ZERO);
-
-        if (mOutputTimeout == null) {
-
-            throw new NullPointerException("the output timeout must not be null");
-        }
-
-        final int maxOutputSize = mMaxOutput;
-
-        if (maxOutputSize < 1) {
-
-            throw new IllegalArgumentException("the output buffer size cannot be 0 or negative");
-        }
-
         mOutputQueue = (configuration.getOutputOrderOr(DataOrder.DELIVERY) == DataOrder.DELIVERY)
                 ? new SimpleNestedQueue<Object>() : new OrderedNestedQueue<Object>();
+
+        final int maxOutputSize = mMaxOutput;
         mHasOutputs = new Check() {
 
             @Override
@@ -474,7 +462,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                 mLogger.dbg(throwable, "aborting channel");
                 mOutputQueue.clear();
                 mIsException = true;
-                mAbortException = (isImmediate) ? throwable : new AbortException(throwable);
+                mAbortException = (isImmediate || (throwable instanceof AbortException)) ? throwable
+                        : new AbortException(throwable);
                 mState = ChannelState.EXCEPTION;
             }
         }
@@ -1331,7 +1320,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                 mSubLogger.dbg(reason, "aborting output");
                 mOutputQueue.clear();
                 mIsException = true;
-                mAbortException = new AbortException(reason);
+                mAbortException =
+                        (reason instanceof AbortException) ? reason : new AbortException(reason);
                 mState = ChannelState.EXCEPTION;
             }
 

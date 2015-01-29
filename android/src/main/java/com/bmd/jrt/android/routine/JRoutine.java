@@ -89,7 +89,7 @@ public class JRoutine extends com.bmd.jrt.routine.JRoutine {
      * @param <INPUT>    the input data type.
      * @param <OUTPUT>   the output data type.
      * @return the routine builder instance.
-     * @throws NullPointerException if any of the specified parameters is null.
+     * @throws java.lang.NullPointerException if any of the specified parameters is null.
      */
     @Nonnull
     public static <INPUT, OUTPUT> ServiceRoutineBuilder<INPUT, OUTPUT> onService(

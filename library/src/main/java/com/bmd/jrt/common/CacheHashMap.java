@@ -57,7 +57,7 @@ public class CacheHashMap<K, V> implements Map<K, V> {
      * Constructor.
      *
      * @param map the initial content.
-     * @throws NullPointerException if the specified map is null.
+     * @throws java.lang.NullPointerException if the specified map is null.
      * @see java.util.HashMap#HashMap(java.util.Map)
      */
     public CacheHashMap(@Nonnull final Map<? extends K, ? extends V> map) {

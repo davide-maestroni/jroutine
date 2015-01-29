@@ -50,7 +50,7 @@ public class TunnelBuilder {
      *
      * @param configuration the configuration.
      * @return this builder.
-     * @throws NullPointerException if the specified configuration is null.
+     * @throws java.lang.NullPointerException if the specified configuration is null.
      */
     @Nonnull
     public TunnelBuilder apply(@Nonnull final RoutineConfiguration configuration) {
@@ -67,8 +67,8 @@ public class TunnelBuilder {
      * @param timeout  the timeout.
      * @param timeUnit the timeout time unit.
      * @return this builder.
-     * @throws NullPointerException     if the specified time unit is null.
-     * @throws IllegalArgumentException if the specified timeout is negative.
+     * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
+     * @throws java.lang.NullPointerException     if the specified time unit is null.
      */
     @Nonnull
     public TunnelBuilder bufferTimeout(final long timeout, @Nonnull final TimeUnit timeUnit) {
@@ -111,7 +111,7 @@ public class TunnelBuilder {
      *
      * @param order the order type.
      * @return this builder.
-     * @throws NullPointerException if the specified order type is null.
+     * @throws java.lang.NullPointerException if the specified order type is null.
      */
     @Nonnull
     public TunnelBuilder dataOrder(@Nonnull final DataOrder order) {
@@ -141,7 +141,7 @@ public class TunnelBuilder {
      *
      * @param level the log level.
      * @return this builder.
-     * @throws NullPointerException if the log level is null.
+     * @throws java.lang.NullPointerException if the log level is null.
      */
     @Nonnull
     public TunnelBuilder logLevel(@Nonnull final LogLevel level) {
@@ -173,7 +173,7 @@ public class TunnelBuilder {
      *
      * @param maxBufferSize the maximum size.
      * @return this builder.
-     * @throws IllegalArgumentException if the number is less than 1.
+     * @throws java.lang.IllegalArgumentException if the number is less than 1.
      */
     @Nonnull
     public TunnelBuilder maxSize(final int maxBufferSize) {

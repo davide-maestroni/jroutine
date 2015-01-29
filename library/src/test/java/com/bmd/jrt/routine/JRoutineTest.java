@@ -19,6 +19,7 @@ import com.bmd.jrt.annotation.LockName;
 import com.bmd.jrt.annotation.ParallelType;
 import com.bmd.jrt.annotation.ReadTimeout;
 import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
+import com.bmd.jrt.builder.RoutineBuilder.TimeoutAction;
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.builder.RoutineConfigurationBuilder;
@@ -376,6 +377,7 @@ public class JRoutineTest extends TestCase {
                                                         .maxRunning(1)
                                                         .maxRetained(1)
                                                         .availableTimeout(1, TimeUnit.SECONDS)
+                                                        .onReadTimeout(TimeoutAction.EXIT)
                                                         .logLevel(LogLevel.DEBUG)
                                                         .loggedWith(new NullLog())
                                                         .annotatedMethod(Test.GET);

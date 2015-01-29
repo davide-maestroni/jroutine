@@ -62,7 +62,7 @@ public class Logger {
      * @param contexts the array of contexts.
      * @param log      the log instance.
      * @param level    the log level.
-     * @throws NullPointerException if any of the parameters is null.
+     * @throws java.lang.NullPointerException if any of the parameters is null.
      */
     private Logger(@Nonnull final Object[] contexts, @Nullable final Log log,
             @Nonnull final LogLevel level) {
@@ -81,7 +81,7 @@ public class Logger {
      * @param level   the log level.
      * @param context the context.
      * @return the new logger.
-     * @throws NullPointerException if any of the parameters is null.
+     * @throws java.lang.NullPointerException if any of the parameters is null.
      */
     @Nonnull
     @SuppressWarnings("ConstantConditions")
@@ -132,7 +132,7 @@ public class Logger {
      * Sets the global log level.
      *
      * @param level the log level.
-     * @throws NullPointerException if the specified level is null.
+     * @throws java.lang.NullPointerException if the specified level is null.
      */
     @SuppressWarnings("ConstantConditions")
     public static void setGlobalLogLevel(@Nonnull final LogLevel level) {
@@ -150,7 +150,7 @@ public class Logger {
      *
      * @param throwable the throwable instance.
      * @return the printed stack trace.
-     * @throws NullPointerException if the specified throwable is null.
+     * @throws java.lang.NullPointerException if the specified throwable is null.
      */
     @Nonnull
     public static String printStackTrace(@Nonnull final Throwable throwable) {

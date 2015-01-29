@@ -16,6 +16,7 @@ package com.bmd.jrt.routine;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.common.InvocationException;
 import com.bmd.jrt.common.InvocationInterruptedException;
+import com.bmd.jrt.common.RoutineException;
 import com.bmd.jrt.invocation.Invocation;
 import com.bmd.jrt.log.Logger;
 
@@ -48,10 +49,10 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
      * @param configuration   the routine configuration.
      * @param invocationClass the invocation class.
      * @param invocationArgs  the invocation constructor arguments.
-     * @throws NullPointerException     if at least one of the parameter is null.
-     * @throws IllegalArgumentException if at least one of the parameter is invalid, of no
-     *                                  constructor matching the specified arguments is found for
-     *                                  the target invocation class.
+     * @throws java.lang.IllegalArgumentException if at least one of the parameter is invalid, of no
+     *                                            constructor matching the specified arguments is
+     *                                            found for the target invocation class.
+     * @throws java.lang.NullPointerException     if at least one of the parameter is null.
      */
     DefaultRoutine(@Nonnull final RoutineConfiguration configuration,
             @Nonnull final Class<? extends Invocation<INPUT, OUTPUT>> invocationClass,
@@ -85,7 +86,7 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
             logger.err(e, "error creating the invocation instance");
             throw e.interrupt();
 
-        } catch (final InvocationException e) {
+        } catch (final RoutineException e) {
 
             logger.err(e, "error creating the invocation instance");
             throw e;

@@ -99,8 +99,8 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
      * @param configuration   the routine configuration.
      * @param runnerClass     the asynchronous runner class.
      * @param logClass        the log class.
-     * @throws NullPointerException     if one of the parameters is null.
-     * @throws IllegalArgumentException if at least one of the parameter is invalid.
+     * @throws java.lang.IllegalArgumentException if at least one of the parameter is invalid.
+     * @throws java.lang.NullPointerException     if one of the parameters is null.
      */
     ServiceRoutine(@Nonnull final Context context,
             @Nullable final Class<? extends RoutineService> serviceClass,

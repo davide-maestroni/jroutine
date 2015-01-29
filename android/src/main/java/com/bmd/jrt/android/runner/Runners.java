@@ -48,7 +48,7 @@ public class Runners extends com.bmd.jrt.runner.Runners {
      *                         thread. If null, the invocation will be posted on the specified
      *                         looper.
      * @return the runner instance.
-     * @throws NullPointerException if the specified looper is null.
+     * @throws java.lang.NullPointerException if the specified looper is null.
      */
     @Nonnull
     public static Runner looperRunner(@Nonnull final Looper looper,
@@ -141,7 +141,7 @@ public class Runners extends com.bmd.jrt.runner.Runners {
      *
      * @param thread the thread.
      * @return the runner instance.
-     * @throws NullPointerException if the specified thread is null.
+     * @throws java.lang.NullPointerException if the specified thread is null.
      */
     @Nonnull
     public static Runner threadRunner(@Nonnull final HandlerThread thread) {

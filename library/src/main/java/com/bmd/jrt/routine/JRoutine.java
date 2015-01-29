@@ -164,8 +164,9 @@ public class JRoutine {
      *
      * @param target the target class.
      * @return the routine builder instance.
-     * @throws NullPointerException     if the specified target is null.
-     * @throws IllegalArgumentException if a duplicate name in the annotations is detected.
+     * @throws java.lang.IllegalArgumentException if a duplicate name in the annotations is
+     *                                            detected.
+     * @throws java.lang.NullPointerException     if the specified target is null.
      */
     @Nonnull
     public static ClassRoutineBuilder on(@Nonnull final Class<?> target) {
@@ -186,7 +187,7 @@ public class JRoutine {
      * @param <INPUT>    the input data type.
      * @param <OUTPUT>   the output data type.
      * @return the routine builder instance.
-     * @throws NullPointerException if the class token is null.
+     * @throws java.lang.NullPointerException if the class token is null.
      */
     @Nonnull
     public static <INPUT, OUTPUT> InvocationRoutineBuilder<INPUT, OUTPUT> on(
@@ -200,8 +201,9 @@ public class JRoutine {
      *
      * @param target the target object.
      * @return the routine builder instance.
-     * @throws NullPointerException     if the specified target is null.
-     * @throws IllegalArgumentException if a duplicate name in the annotations is detected.
+     * @throws java.lang.IllegalArgumentException if a duplicate name in the annotations is
+     *                                            detected.
+     * @throws java.lang.NullPointerException     if the specified target is null.
      */
     @Nonnull
     public static ObjectRoutineBuilder on(@Nonnull final Object target) {
@@ -214,8 +216,9 @@ public class JRoutine {
      *
      * @param target the target object.
      * @return the routine builder instance.
-     * @throws NullPointerException     if the specified target is null.
-     * @throws IllegalArgumentException if a duplicate name in the annotations is detected.
+     * @throws java.lang.IllegalArgumentException if a duplicate name in the annotations is
+     *                                            detected.
+     * @throws java.lang.NullPointerException     if the specified target is null.
      */
     @Nonnull
     public static ObjectRoutineBuilder onWeak(@Nonnull final Object target) {
@@ -228,8 +231,9 @@ public class JRoutine {
      *
      * @param target the reference to the target object.
      * @return the routine builder instance.
-     * @throws NullPointerException     if the specified target is null.
-     * @throws IllegalArgumentException if a duplicate name in the annotations is detected.
+     * @throws java.lang.IllegalArgumentException if a duplicate name in the annotations is
+     *                                            detected.
+     * @throws java.lang.NullPointerException     if the specified target is null.
      */
     @Nonnull
     public static ObjectRoutineBuilder onWeak(@Nonnull final WeakReference<?> target) {

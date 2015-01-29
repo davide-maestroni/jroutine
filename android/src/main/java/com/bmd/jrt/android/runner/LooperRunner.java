@@ -44,7 +44,7 @@ class LooperRunner implements Runner {
      * @param looper           the looper to employ.
      * @param sameThreadRunner the runner to be used when this one is called on its own thread.
      *                         If null, the invocation will be posted on the specified looper.
-     * @throws NullPointerException if the specified looper is null.
+     * @throws java.lang.NullPointerException if the specified looper is null.
      */
     LooperRunner(@Nonnull final Looper looper, @Nullable final Runner sameThreadRunner) {
 

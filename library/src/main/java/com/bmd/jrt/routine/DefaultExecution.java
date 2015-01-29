@@ -18,8 +18,6 @@ import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.routine.DefaultParameterChannel.InvocationManager;
 import com.bmd.jrt.runner.Execution;
 
-import java.util.NoSuchElementException;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -56,7 +54,7 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
      * @param inputs  the input iterator.
      * @param result  the result channel.
      * @param logger  the logger instance.
-     * @throws NullPointerException if one of the parameters is null.
+     * @throws java.lang.NullPointerException if one of the parameters is null.
      */
     @SuppressWarnings("ConstantConditions")
     DefaultExecution(@Nonnull final InvocationManager<INPUT, OUTPUT> manager,
@@ -212,7 +210,7 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
          * Gets the next input.
          *
          * @return the input.
-         * @throws NoSuchElementException if no more input is available.
+         * @throws java.util.NoSuchElementException if no more input is available.
          */
         @Nullable
         public INPUT nextInput();

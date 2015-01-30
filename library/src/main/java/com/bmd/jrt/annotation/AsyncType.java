@@ -96,6 +96,13 @@ import java.lang.annotation.Target;
 public @interface AsyncType {
 
     /**
+     * TODO
+     *
+     * @return
+     */
+    boolean aggregate() default false;
+
+    /**
      * The type of the overridden parameter.
      *
      * @return the parameter type.

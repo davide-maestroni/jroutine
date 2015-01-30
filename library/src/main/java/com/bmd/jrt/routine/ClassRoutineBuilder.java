@@ -377,18 +377,19 @@ public class ClassRoutineBuilder implements RoutineBuilder {
     /**
      * Creates the routine.
      *
-     * @param configuration the routine configuration.
-     * @param lockName      the lock name.
-     * @param method        the method to wrap.
-     * @param <INPUT>       the input data type.
-     * @param <OUTPUT>      the output data type.
+     * @param configuration      the routine configuration.
+     * @param lockName           the lock name.
+     * @param method             the method to wrap.
+     * @param isAggregatedInput  TODO
+     * @param isAggregatedOutput TODO
      * @return the routine instance.
      */
     @Nonnull
     @SuppressWarnings("unchecked")
     protected <INPUT, OUTPUT> Routine<INPUT, OUTPUT> getRoutine(
             @Nonnull final RoutineConfiguration configuration, @Nullable final String lockName,
-            @Nonnull final Method method) {
+            @Nonnull final Method method, final boolean isAggregatedInput,
+            final boolean isAggregatedOutput) {
 
         if (!method.isAccessible()) {
 
@@ -453,7 +454,8 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
             routine =
                     new DefaultRoutine<Object, Object>(configuration, MethodSimpleInvocation.class,
-                                                       mTargetReference, mTarget, method, mutex);
+                                                       mTargetReference, mTarget, method, mutex,
+                                                       isAggregatedInput, isAggregatedOutput);
             routineMap.put(routineInfo, routine);
         }
 
@@ -536,7 +538,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
                    .onReadTimeout(timeoutAnnotation.action());
         }
 
-        return getRoutine(builder.buildConfiguration(), methodLockName, targetMethod);
+        return getRoutine(builder.buildConfiguration(), methodLockName, targetMethod, false, false);
     }
 
     private void fillMap(@Nonnull final HashMap<String, Method> map,
@@ -601,6 +603,10 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      */
     private static class MethodSimpleInvocation extends SimpleInvocation<Object, Object> {
 
+        private final boolean mAggregatedInput;
+
+        private final boolean mAggregatedOutput;
+
         private final boolean mHasResult;
 
         private final Method mMethod;
@@ -614,19 +620,24 @@ public class ClassRoutineBuilder implements RoutineBuilder {
         /**
          * Constructor.
          *
-         * @param targetReference the reference to the target object.
-         * @param target          the target object.
-         * @param method          the method to wrap.
-         * @param mutex           the mutex used for synchronization.
+         * @param targetReference    the reference to the target object.
+         * @param target             the target object.
+         * @param method             the method to wrap.
+         * @param mutex              the mutex used for synchronization.
+         * @param isAggregatedInput  TODO
+         * @param isAggregatedOutput TODO
          */
         public MethodSimpleInvocation(final WeakReference<?> targetReference,
                 @Nullable final Object target, @Nonnull final Method method,
-                @Nullable final Object mutex) {
+                @Nullable final Object mutex, final boolean isAggregatedInput,
+                final boolean isAggregatedOutput) {
 
             mTargetReference = targetReference;
             mTarget = target;
             mMethod = method;
             mMutex = (mutex != null) ? mutex : this;
+            mAggregatedInput = isAggregatedInput;
+            mAggregatedOutput = isAggregatedOutput;
 
             final Class<?> returnType = method.getReturnType();
             mHasResult = !Void.class.equals(boxingClass(returnType));
@@ -659,12 +670,20 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
                 try {
 
-                    final Object methodResult =
-                            method.invoke(target, objects.toArray(new Object[objects.size()]));
+                    final Object[] args = (mAggregatedInput) ? new Object[]{objects}
+                            : objects.toArray(new Object[objects.size()]);
+                    final Object methodResult = method.invoke(target, args);
 
                     if (mHasResult) {
 
-                        result.pass(methodResult);
+                        if (mAggregatedOutput) {
+
+                            result.pass((List<?>) methodResult);
+
+                        } else {
+
+                            result.pass(methodResult);
+                        }
                     }
 
                 } catch (final InvocationTargetException e) {

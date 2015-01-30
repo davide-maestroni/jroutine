@@ -633,6 +633,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
             final Class<?> returnType = method.getReturnType();
             final Class<?>[] targetParameterTypes = method.getParameterTypes();
+            boolean isAggregatedInput = false;
+            boolean isAggregatedOutput = false;
             ParamType paramType = ParamType.DEFAULT;
             ResultType resultType = ResultType.DEFAULT;
 
@@ -649,9 +651,13 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                     methodCache.put(target, methodMap);
                 }
 
-                final AsyncType overrideAnnotation = method.getAnnotation(AsyncType.class);
+                final Class<?> returnClass;
+                final AsyncType methodAnnotation = method.getAnnotation(AsyncType.class);
 
-                if (overrideAnnotation != null) {
+                if (methodAnnotation != null) {
+
+                    returnClass = methodAnnotation.value();
+                    isAggregatedOutput = methodAnnotation.aggregate();
 
                     if (returnType.isArray()) {
 
@@ -664,12 +670,20 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                     } else if (returnType.isAssignableFrom(OutputChannel.class)) {
 
                         resultType = ResultType.CHANNEL;
+                    }
 
-                    } else {
+                    if ((resultType == ResultType.DEFAULT) || (isAggregatedOutput && (
+                            (resultType != ResultType.CHANNEL) || !returnClass.isAssignableFrom(
+                                    List.class)))) {
 
                         throw new IllegalArgumentException(
-                                "the async return type is not compatible");
+                                "the async return parameter annotation is not compatible with " +
+                                        "method:" + method);
                     }
+
+                } else {
+
+                    returnClass = null;
                 }
 
                 final Annotation[][] annotations = method.getParameterAnnotations();
@@ -683,20 +697,38 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
                         if (paramAnnotation.annotationType() == AsyncType.class) {
 
-                            final Class<?> parameterType = targetParameterTypes[i];
-
-                            if (!OutputChannel.class.isAssignableFrom(parameterType)) {
+                            if (paramType != ParamType.DEFAULT) {
 
                                 throw new IllegalArgumentException(
-                                        "the async input parameter is not compatible");
+                                        "input parameter incompatible annotations in method: "
+                                                + method);
+                            }
+
+                            final Class<?> parameterType = targetParameterTypes[i];
+                            final AsyncType asyncType = (AsyncType) paramAnnotation;
+                            final Class<?> asyncClass = asyncType.value();
+                            isAggregatedInput = asyncType.aggregate();
+
+                            if (!OutputChannel.class.isAssignableFrom(parameterType) || (
+                                    isAggregatedInput && ((length > 1)
+                                            || !asyncClass.isAssignableFrom(List.class)))) {
+
+                                throw new IllegalArgumentException(
+                                        "the async input parameter annotation is not compatible " +
+                                                "with method:" + method);
                             }
 
                             paramType = ParamType.ASYNC;
-                            targetParameterTypes[i] = ((AsyncType) paramAnnotation).value();
-                            break;
-                        }
+                            targetParameterTypes[i] = asyncClass;
 
-                        if (paramAnnotation.annotationType() == ParallelType.class) {
+                        } else if (paramAnnotation.annotationType() == ParallelType.class) {
+
+                            if (paramType != ParamType.DEFAULT) {
+
+                                throw new IllegalArgumentException(
+                                        "input parameter incompatible annotations in method: "
+                                                + method);
+                            }
 
                             final Class<?> parameterType = targetParameterTypes[i];
 
@@ -706,12 +738,12 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                                             && !parameterType.isArray())) {
 
                                 throw new IllegalArgumentException(
-                                        "the async input parameter is not compatible");
+                                        "the async input parameter annotation is not compatible " +
+                                                "with method:" + method);
                             }
 
                             paramType = ParamType.PARALLEL;
                             targetParameterTypes[i] = ((ParallelType) paramAnnotation).value();
-                            break;
                         }
                     }
                 }
@@ -724,7 +756,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
                     final Class<?> targetReturnType = targetMethod.getReturnType();
 
-                    if ((overrideAnnotation == null) && !returnType.isAssignableFrom(
+                    if ((methodAnnotation == null) && !returnType.isAssignableFrom(
                             targetReturnType)) {
 
                         throw new IllegalArgumentException(
@@ -742,23 +774,22 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                     methodMap.put(method, targetMethod);
                 }
 
-                if (overrideAnnotation != null) {
+                if ((returnClass != null) && !returnClass.isAssignableFrom(
+                        targetMethod.getReturnType())) {
 
-                    if (!overrideAnnotation.value()
-                                           .isAssignableFrom(targetMethod.getReturnType())) {
-
-                        throw new IllegalArgumentException(
-                                "the async return type is not compatible");
-                    }
+                    throw new IllegalArgumentException("the async return type is not compatible");
                 }
             }
 
-            final Routine<Object, Object> routine = buildRoutine(method, targetMethod, paramType);
+            final Routine<Object, Object> routine =
+                    buildRoutine(method, targetMethod, paramType, isAggregatedInput,
+                                 isAggregatedOutput);
             return callRoutine(routine, method, paramType, resultType, args);
         }
 
         private Routine<Object, Object> buildRoutine(final Method method, final Method targetMethod,
-                final ParamType paramType) {
+                final ParamType paramType, final boolean isAggregatedInput,
+                final boolean isAggregatedOutput) {
 
             String lockName = mLockName;
             final RoutineConfigurationBuilder builder = new RoutineConfigurationBuilder();
@@ -794,7 +825,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                        .onReadTimeout(timeoutAnnotation.action());
             }
 
-            return getRoutine(builder.buildConfiguration(), lockName, targetMethod);
+            return getRoutine(builder.buildConfiguration(), lockName, targetMethod,
+                              isAggregatedInput, isAggregatedOutput);
         }
     }
 

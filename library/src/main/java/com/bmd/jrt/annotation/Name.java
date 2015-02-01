@@ -38,7 +38,7 @@ import java.lang.annotation.Target;
  *
  *             public static final String METHOD_NAME = "get";
  *
- *             &#64;AsyncName(METHOD_NAME)
+ *             &#64;Name(METHOD_NAME)
  *             public int getOne() {
  *
  *                 return 1;
@@ -68,7 +68,7 @@ import java.lang.annotation.Target;
  *         -keepattributes RuntimeVisibleAnnotations
  *
  *         -keepclassmembers class ** {
- *              &#64;com.bmd.jrt.annotation.AsyncName *;
+ *              &#64;com.bmd.jrt.annotation.Name *;
  *         }
  *     </code>
  * </pre>
@@ -78,9 +78,7 @@ import java.lang.annotation.Target;
 @Inherited
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface AsyncName {
-
-    //TODO: BindName
+public @interface Name {
 
     /**
      * The name used to identify the method independently from its original signature.

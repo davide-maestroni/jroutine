@@ -13,11 +13,11 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.annotation.AsyncName;
-import com.bmd.jrt.annotation.AsyncType;
-import com.bmd.jrt.annotation.LockName;
-import com.bmd.jrt.annotation.ParallelType;
-import com.bmd.jrt.annotation.ReadTimeout;
+import com.bmd.jrt.annotation.Bind;
+import com.bmd.jrt.annotation.Bind.BindType;
+import com.bmd.jrt.annotation.Lock;
+import com.bmd.jrt.annotation.Name;
+import com.bmd.jrt.annotation.Timeout;
 import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
 import com.bmd.jrt.builder.RoutineBuilder.TimeoutAction;
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
@@ -41,6 +41,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static com.bmd.jrt.time.TimeDuration.INFINITY;
 import static com.bmd.jrt.time.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -639,7 +640,7 @@ public class JRoutineTest extends TestCase {
 
         try {
 
-            JRoutine.on(test).buildProxy(TestItf.class).throwException(null);
+            JRoutine.on(test).readTimeout(INFINITY).buildProxy(TestItf.class).throwException(null);
 
             fail();
 
@@ -649,7 +650,7 @@ public class JRoutineTest extends TestCase {
 
         try {
 
-            JRoutine.on(test).buildProxy(TestItf.class).throwException1(null);
+            JRoutine.on(test).readTimeout(INFINITY).buildProxy(TestItf.class).throwException1(null);
 
             fail();
 
@@ -901,46 +902,46 @@ public class JRoutineTest extends TestCase {
 
     private interface ITestInc {
 
-        @ReadTimeout(1000)
-        @AsyncType(int.class)
-        public int[] inc(@ParallelType(int.class) int... i);
+        @Timeout(1000)
+        @Bind(int.class)
+        public int[] inc(@Bind(int.class) int... i);
     }
 
     private static interface SquareItf {
 
-        @ReadTimeout(value = 1, unit = TimeUnit.SECONDS)
+        @Timeout(value = 1, unit = TimeUnit.SECONDS)
         public int compute(int i);
 
-        @LockName(LockName.NULL_LOCK)
-        @AsyncName("compute")
-        @AsyncType(int.class)
-        public OutputChannel<Integer> computeParallel1(@ParallelType(int.class) int... i);
+        @Lock(Lock.NULL_LOCK)
+        @Name("compute")
+        @Bind(int.class)
+        public OutputChannel<Integer> computeParallel1(@Bind(int.class) int... i);
 
-        @AsyncName("compute")
-        @AsyncType(int.class)
-        public OutputChannel<Integer> computeParallel2(@ParallelType(int.class) Integer... i);
+        @Name("compute")
+        @Bind(int.class)
+        public OutputChannel<Integer> computeParallel2(@Bind(int.class) Integer... i);
 
-        @LockName(LockName.NULL_LOCK)
-        @AsyncName("compute")
-        @AsyncType(int.class)
-        public OutputChannel<Integer> computeParallel3(@ParallelType(int.class) List<Integer> i);
+        @Lock(Lock.NULL_LOCK)
+        @Name("compute")
+        @Bind(int.class)
+        public OutputChannel<Integer> computeParallel3(@Bind(int.class) List<Integer> i);
 
-        @LockName(LockName.NULL_LOCK)
-        @AsyncName("compute")
-        @AsyncType(int.class)
+        @Lock(Lock.NULL_LOCK)
+        @Name("compute")
+        @Bind(int.class)
         public OutputChannel<Integer> computeParallel4(
-                @ParallelType(int.class) OutputChannel<Integer> i);
+                @Bind(value = int.class, type = BindType.PARALLEL) OutputChannel<Integer> i);
     }
 
     private static interface TestItf {
 
-        public void throwException(@AsyncType(int.class) RuntimeException ex);
+        public void throwException(@Bind(int.class) RuntimeException ex);
 
-        @AsyncName(Test.THROW)
-        @AsyncType(int.class)
+        @Name(Test.THROW)
+        @Bind(int.class)
         public void throwException1(RuntimeException ex);
 
-        @AsyncName(Test.THROW)
+        @Name(Test.THROW)
         public int throwException2(RuntimeException ex);
     }
 
@@ -948,13 +949,13 @@ public class JRoutineTest extends TestCase {
 
         public static final String GET = "get";
 
-        @AsyncName(GET)
+        @Name(GET)
         public int getOne() {
 
             return 1;
         }
 
-        @AsyncName(GET)
+        @Name(GET)
         public int getTwo() {
 
             return 2;
@@ -965,13 +966,13 @@ public class JRoutineTest extends TestCase {
 
         public static final String GET = "get";
 
-        @AsyncName(GET)
+        @Name(GET)
         public static int getOne() {
 
             return 1;
         }
 
-        @AsyncName(GET)
+        @Name(GET)
         public static int getTwo() {
 
             return 2;
@@ -993,14 +994,14 @@ public class JRoutineTest extends TestCase {
 
         public static final String THROW = "throw";
 
-        @AsyncName(GET)
+        @Name(GET)
         public long getLong() {
 
             return -77;
 
         }
 
-        @AsyncName(THROW)
+        @Name(THROW)
         public void throwException(final RuntimeException ex) {
 
             throw ex;
@@ -1029,15 +1030,15 @@ public class JRoutineTest extends TestCase {
 
         public static final String GET_STRING = "get_string";
 
-        @AsyncName(GET_STRING)
-        @LockName(LockName.NULL_LOCK)
+        @Name(GET_STRING)
+        @Lock(Lock.NULL_LOCK)
         public static String getStringStatic(final String string) {
 
             return string;
         }
 
-        @AsyncName(GET_STRING)
-        @LockName(LockName.NULL_LOCK)
+        @Name(GET_STRING)
+        @Lock(Lock.NULL_LOCK)
         public String getString(final String string) {
 
             return string;
@@ -1059,13 +1060,13 @@ public class JRoutineTest extends TestCase {
 
         public static final String THROW = "throw";
 
-        @AsyncName(GET)
+        @Name(GET)
         public static long getLong() {
 
             return -77;
         }
 
-        @AsyncName(THROW)
+        @Name(THROW)
         public static void throwException(final RuntimeException ex) {
 
             throw ex;

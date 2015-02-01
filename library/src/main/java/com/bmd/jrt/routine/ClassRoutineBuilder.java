@@ -13,9 +13,10 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.annotation.AsyncName;
-import com.bmd.jrt.annotation.LockName;
-import com.bmd.jrt.annotation.ReadTimeout;
+import com.bmd.jrt.annotation.Bind.BindType;
+import com.bmd.jrt.annotation.Lock;
+import com.bmd.jrt.annotation.Name;
+import com.bmd.jrt.annotation.Timeout;
 import com.bmd.jrt.builder.RoutineBuilder;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.builder.RoutineConfigurationBuilder;
@@ -31,6 +32,7 @@ import com.bmd.jrt.runner.Runner;
 import com.bmd.jrt.time.TimeDuration;
 
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -55,9 +57,9 @@ import static com.bmd.jrt.common.Reflection.boxingClass;
  * <p/>
  * Created by davide on 9/21/14.
  *
- * @see com.bmd.jrt.annotation.AsyncName
- * @see com.bmd.jrt.annotation.LockName
- * @see com.bmd.jrt.annotation.ReadTimeout
+ * @see com.bmd.jrt.annotation.Name
+ * @see com.bmd.jrt.annotation.Lock
+ * @see com.bmd.jrt.annotation.Timeout
  */
 public class ClassRoutineBuilder implements RoutineBuilder {
 
@@ -143,8 +145,10 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
     /**
      * Returns a routine used for calling the method whose identifying name is specified in a
-     * {@link AsyncName} annotation.<br/>
-     * Optional {@link LockName} and {@link ReadTimeout} method annotations will be honored.
+     * {@link com.bmd.jrt.annotation.Name} annotation.<br/>
+     * Optional {@link com.bmd.jrt.annotation.Lock} and {@link com.bmd.jrt.annotation.Timeout}
+     * method annotations
+     * will be honored.
      *
      * @param name     the name specified in the annotation.
      * @param <INPUT>  the input data type.
@@ -268,7 +272,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      *
      * @param lockName the lock name.
      * @return this builder.
-     * @see com.bmd.jrt.annotation.LockName
+     * @see com.bmd.jrt.annotation.Lock
      */
     @Nonnull
     public ClassRoutineBuilder lockName(@Nullable final String lockName) {
@@ -281,7 +285,8 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      * Returns a routine used for calling the specified method.
      * <p/>
      * The method is searched via reflection ignoring an optional name specified in a
-     * {@link AsyncName} annotation. Though, optional {@link LockName} and {@link ReadTimeout}
+     * {@link com.bmd.jrt.annotation.Name} annotation. Though, optional {@link com.bmd.jrt
+     * .annotation.Lock} and {@link com.bmd.jrt.annotation.Timeout}
      * method annotations will be honored.
      *
      * @param name           the method name.
@@ -323,8 +328,11 @@ public class ClassRoutineBuilder implements RoutineBuilder {
     /**
      * Returns a routine used for calling the specified method.
      * <p/>
-     * The method is invoked ignoring an optional name specified in a {@link AsyncName} annotation.
-     * Though, optional {@link LockName} and {@link ReadTimeout} method annotations will be
+     * The method is invoked ignoring an optional name specified in a {@link com.bmd.jrt
+     * .annotation.Name} annotation.
+     * Though, optional {@link com.bmd.jrt.annotation.Lock} and {@link com.bmd.jrt.annotation
+     * .Timeout} method
+     * annotations will be
      * honored.
      *
      * @param method   the method instance.
@@ -344,7 +352,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      *
      * @param name the name specified in the annotation.
      * @return the method or null.
-     * @see com.bmd.jrt.annotation.AsyncName
+     * @see com.bmd.jrt.annotation.Name
      */
     @Nullable
     protected Method getAnnotatedMethod(final String name) {
@@ -377,19 +385,19 @@ public class ClassRoutineBuilder implements RoutineBuilder {
     /**
      * Creates the routine.
      *
-     * @param configuration      the routine configuration.
-     * @param lockName           the lock name.
-     * @param method             the method to wrap.
-     * @param isAggregatedInput  TODO
-     * @param isAggregatedOutput TODO
+     * @param configuration the routine configuration.
+     * @param lockName      the lock name.
+     * @param method        the method to wrap.
+     * @param paramBinding  TODO
+     * @param returnBinding TODO
      * @return the routine instance.
      */
     @Nonnull
     @SuppressWarnings("unchecked")
     protected <INPUT, OUTPUT> Routine<INPUT, OUTPUT> getRoutine(
             @Nonnull final RoutineConfiguration configuration, @Nullable final String lockName,
-            @Nonnull final Method method, final boolean isAggregatedInput,
-            final boolean isAggregatedOutput) {
+            @Nonnull final Method method, @Nullable final BindType paramBinding,
+            @Nullable final BindType returnBinding) {
 
         if (!method.isAccessible()) {
 
@@ -418,7 +426,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
                 routineCache.put(target, routineMap);
             }
 
-            final String methodLockName = (lockName != null) ? lockName : LockName.DEFAULT_LOCK;
+            final String methodLockName = (lockName != null) ? lockName : Lock.DEFAULT_LOCK;
             final RoutineInfo routineInfo = new RoutineInfo(configuration, method, methodLockName);
             routine = routineMap.get(routineInfo);
 
@@ -429,7 +437,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
             Object mutex = null;
 
-            if (!LockName.NULL_LOCK.equals(methodLockName)) {
+            if (!Lock.NULL_LOCK.equals(methodLockName)) {
 
                 synchronized (sMutexCache) {
 
@@ -455,7 +463,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
             routine =
                     new DefaultRoutine<Object, Object>(configuration, MethodSimpleInvocation.class,
                                                        mTargetReference, mTarget, method, mutex,
-                                                       isAggregatedInput, isAggregatedOutput);
+                                                       paramBinding, returnBinding);
             routineMap.put(routineInfo, routine);
         }
 
@@ -512,13 +520,13 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
         String methodLockName = lockName;
         final RoutineConfigurationBuilder builder = new RoutineConfigurationBuilder();
-        final LockName lockAnnotation = targetMethod.getAnnotation(LockName.class);
+        final Lock lockAnnotation = targetMethod.getAnnotation(Lock.class);
 
         if (lockAnnotation != null) {
 
             final String annotationLockName = lockAnnotation.value();
 
-            if (!LockName.DEFAULT_LOCK.equals(annotationLockName)) {
+            if (!Lock.DEFAULT_LOCK.equals(annotationLockName)) {
 
                 methodLockName = annotationLockName;
             }
@@ -530,7 +538,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
                .outputSize(Integer.MAX_VALUE)
                .outputTimeout(TimeDuration.ZERO);
 
-        final ReadTimeout timeoutAnnotation = targetMethod.getAnnotation(ReadTimeout.class);
+        final Timeout timeoutAnnotation = targetMethod.getAnnotation(Timeout.class);
 
         if (timeoutAnnotation != null) {
 
@@ -538,7 +546,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
                    .onReadTimeout(timeoutAnnotation.action());
         }
 
-        return getRoutine(builder.buildConfiguration(), methodLockName, targetMethod, false, false);
+        return getRoutine(builder.buildConfiguration(), methodLockName, targetMethod, null, null);
     }
 
     private void fillMap(@Nonnull final HashMap<String, Method> map,
@@ -560,7 +568,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
                 continue;
             }
 
-            final AsyncName annotation = method.getAnnotation(AsyncName.class);
+            final Name annotation = method.getAnnotation(Name.class);
 
             if (annotation != null) {
 
@@ -603,15 +611,17 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      */
     private static class MethodSimpleInvocation extends SimpleInvocation<Object, Object> {
 
-        private final boolean mAggregatedInput;
-
-        private final boolean mAggregatedOutput;
-
         private final boolean mHasResult;
+
+        private final boolean mIsArrayResult;
 
         private final Method mMethod;
 
         private final Object mMutex;
+
+        private final BindType mParamBinding;
+
+        private final BindType mReturnBinding;
 
         private final Object mTarget;
 
@@ -620,27 +630,28 @@ public class ClassRoutineBuilder implements RoutineBuilder {
         /**
          * Constructor.
          *
-         * @param targetReference    the reference to the target object.
-         * @param target             the target object.
-         * @param method             the method to wrap.
-         * @param mutex              the mutex used for synchronization.
-         * @param isAggregatedInput  TODO
-         * @param isAggregatedOutput TODO
+         * @param targetReference the reference to the target object.
+         * @param target          the target object.
+         * @param method          the method to wrap.
+         * @param mutex           the mutex used for synchronization.
+         * @param paramBinding    TODO
+         * @param returnBinding   TODO
          */
         public MethodSimpleInvocation(final WeakReference<?> targetReference,
                 @Nullable final Object target, @Nonnull final Method method,
-                @Nullable final Object mutex, final boolean isAggregatedInput,
-                final boolean isAggregatedOutput) {
+                @Nullable final Object mutex, @Nullable final BindType paramBinding,
+                @Nullable final BindType returnBinding) {
 
             mTargetReference = targetReference;
             mTarget = target;
             mMethod = method;
             mMutex = (mutex != null) ? mutex : this;
-            mAggregatedInput = isAggregatedInput;
-            mAggregatedOutput = isAggregatedOutput;
+            mParamBinding = paramBinding;
+            mReturnBinding = returnBinding;
 
             final Class<?> returnType = method.getReturnType();
             mHasResult = !Void.class.equals(boxingClass(returnType));
+            mIsArrayResult = returnType.isArray();
         }
 
         @Override
@@ -670,15 +681,31 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
                 try {
 
-                    final Object[] args = (mAggregatedInput) ? new Object[]{objects}
-                            : objects.toArray(new Object[objects.size()]);
+                    final Object[] args =
+                            (mParamBinding == BindType.COLLECTION) ? new Object[]{objects}
+                                    : objects.toArray(new Object[objects.size()]);
                     final Object methodResult = method.invoke(target, args);
 
                     if (mHasResult) {
 
-                        if (mAggregatedOutput) {
+                        if (mReturnBinding == BindType.COLLECTION) {
 
-                            result.pass((List<?>) methodResult);
+                            if (mIsArrayResult) {
+
+                                if (methodResult != null) {
+
+                                    final int length = Array.getLength(methodResult);
+
+                                    for (int i = 0; i < length; ++i) {
+
+                                        result.pass(Array.get(method, i));
+                                    }
+                                }
+
+                            } else {
+
+                                result.pass((Iterable<?>) methodResult);
+                            }
 
                         } else {
 

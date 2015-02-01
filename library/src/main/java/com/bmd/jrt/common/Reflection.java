@@ -65,7 +65,6 @@ public class Reflection {
      * @param type the primitive type.
      * @return the boxing class.
      */
-    @Nullable
     public static Class<?> boxingClass(@Nullable final Class<?> type) {
 
         if (type == null) {

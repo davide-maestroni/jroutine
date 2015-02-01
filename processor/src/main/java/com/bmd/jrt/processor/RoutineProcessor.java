@@ -13,12 +13,12 @@
  */
 package com.bmd.jrt.processor;
 
-import com.bmd.jrt.annotation.AsyncName;
 import com.bmd.jrt.annotation.AsyncType;
-import com.bmd.jrt.annotation.AsyncWrap;
-import com.bmd.jrt.annotation.LockName;
+import com.bmd.jrt.annotation.Lock;
+import com.bmd.jrt.annotation.Name;
 import com.bmd.jrt.annotation.ParallelType;
-import com.bmd.jrt.annotation.ReadTimeout;
+import com.bmd.jrt.annotation.Timeout;
+import com.bmd.jrt.annotation.Wrap;
 import com.bmd.jrt.builder.RoutineBuilder.TimeoutAction;
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
 import com.bmd.jrt.channel.OutputChannel;
@@ -64,7 +64,7 @@ import javax.tools.JavaFileObject;
  * <p/>
  * Created by davide on 11/3/14.
  */
-@SupportedAnnotationTypes("com.bmd.jrt.annotation.AsyncWrap")
+@SupportedAnnotationTypes("com.bmd.jrt.annotation.Wrap")
 public class RoutineProcessor extends AbstractProcessor {
 
     private static final boolean DEBUG = false;
@@ -162,11 +162,11 @@ public class RoutineProcessor extends AbstractProcessor {
             return false;
         }
 
-        final TypeElement annotationElement = getTypeFromName(AsyncWrap.class.getCanonicalName());
+        final TypeElement annotationElement = getTypeFromName(Wrap.class.getCanonicalName());
         final TypeMirror annotationType = annotationElement.asType();
 
         for (final Element element : ElementFilter.typesIn(
-                roundEnvironment.getElementsAnnotatedWith(AsyncWrap.class))) {
+                roundEnvironment.getElementsAnnotatedWith(Wrap.class))) {
 
             final TypeElement classElement = (TypeElement) element;
             final List<ExecutableElement> methodElements =
@@ -253,7 +253,7 @@ public class RoutineProcessor extends AbstractProcessor {
     private String buildOutputOptions(final ExecutableElement methodElement) {
 
         final StringBuilder builder = new StringBuilder();
-        final ReadTimeout methodAnnotation = methodElement.getAnnotation(ReadTimeout.class);
+        final Timeout methodAnnotation = methodElement.getAnnotation(Timeout.class);
 
         if (methodAnnotation != null) {
 
@@ -466,7 +466,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
         String methodName = methodElement.getSimpleName().toString();
         ExecutableElement targetMethod = null;
-        final AsyncName asyncAnnotation = methodElement.getAnnotation(AsyncName.class);
+        final Name asyncAnnotation = methodElement.getAnnotation(Name.class);
 
         if (asyncAnnotation != null) {
 
@@ -475,8 +475,7 @@ public class RoutineProcessor extends AbstractProcessor {
             for (final ExecutableElement targetMethodElement : ElementFilter.methodsIn(
                     targetElement.getEnclosedElements())) {
 
-                final AsyncName targetAsyncAnnotation =
-                        targetMethodElement.getAnnotation(AsyncName.class);
+                final Name targetAsyncAnnotation = targetMethodElement.getAnnotation(Name.class);
 
                 if ((targetAsyncAnnotation != null) && methodName.equals(
                         targetAsyncAnnotation.value())) {
@@ -740,13 +739,32 @@ public class RoutineProcessor extends AbstractProcessor {
 
         boolean isParallel = false;
         final boolean isVoid = (targetReturnType.getKind() == TypeKind.VOID);
-        final AsyncType overrideAnnotation = methodElement.getAnnotation(AsyncType.class);
+        final AsyncType methodAnnotation = methodElement.getAnnotation(AsyncType.class);
         final List<? extends VariableElement> parameters = methodElement.getParameters();
 
-        if ((parameters.size() == 1) && (parameters.get(0).getAnnotation(ParallelType.class)
-                != null)) {
+        if (parameters.size() == 1) {
 
-            isParallel = true;
+            if (parameters.get(0).getAnnotation(ParallelType.class) != null) {
+
+                if (parameters.get(0).getAnnotation(AsyncType.class) != null) {
+
+                    throw new IllegalArgumentException(
+                            "Invalid annotations for method: " + methodElement);
+                }
+
+                isParallel = true;
+
+            } else if (parameters.get(0).getAnnotation(AsyncType.class) != null) {
+
+                if (parameters.get(0).getAnnotation(ParallelType.class) != null) {
+
+                    throw new IllegalArgumentException(
+                            "Invalid annotations for method: " + methodElement);
+                }
+
+                //TODO: if aggregate => parameters.get(0) is list (or assignable),
+                // ${paramValues} .readAll()
+            }
 
         } else {
 
@@ -762,17 +780,21 @@ public class RoutineProcessor extends AbstractProcessor {
 
         String method;
 
-        if (overrideAnnotation != null) {
+        if (methodAnnotation != null) {
 
             final TypeMirror returnType = methodElement.getReturnType();
             final TypeMirror returnTypeErasure = typeUtils.erasure(returnType);
+
+            //TODO: if aggregate => returnTypeErasure is list (or assignable),
+            // ${resultClassName} = getTypeArguments().get(0)
 
             if (returnType.getKind() == TypeKind.ARRAY) {
 
                 targetReturnType = ((ArrayType) returnType).getComponentType();
                 method = (isParallel) ? mMethodParallelArray : mMethodArray;
 
-            } else if (typeUtils.isAssignable(listElement.asType(), returnTypeErasure)) {
+            } else if (typeUtils.isAssignable(listElement.asType(),
+                                              returnTypeErasure)) { //TODO: check
 
                 final List<? extends TypeMirror> typeArguments =
                         ((DeclaredType) returnType).getTypeArguments();
@@ -823,6 +845,9 @@ public class RoutineProcessor extends AbstractProcessor {
 
         final String resultClassName = getBoxedType(targetReturnType).toString();
 
+        //TODO: ${resultClassName} if aggregate output == ?
+        //TODO: ${paramValues} if aggregate input == .readAll()
+
         String methodHeader;
         methodHeader = mMethodHeader.replace("${resultClassName}", resultClassName);
         methodHeader = methodHeader.replace("${methodCount}", Integer.toString(count));
@@ -853,12 +878,12 @@ public class RoutineProcessor extends AbstractProcessor {
         methodFooter = methodFooter.replace("${targetMethodName}", targetMethod.getSimpleName());
         methodFooter = methodFooter.replace("${paramValues}", buildParamValues(targetMethod));
 
-        String lockName = LockName.DEFAULT_LOCK;
-        final LockName methodAnnotation = methodElement.getAnnotation(LockName.class);
+        String lockName = Lock.DEFAULT_LOCK;
+        final Lock lockAnnotation = methodElement.getAnnotation(Lock.class);
 
-        if (methodAnnotation != null) {
+        if (lockAnnotation != null) {
 
-            lockName = methodAnnotation.value();
+            lockName = lockAnnotation.value();
         }
 
         methodFooter = methodFooter.replace("${lockName}", lockName);

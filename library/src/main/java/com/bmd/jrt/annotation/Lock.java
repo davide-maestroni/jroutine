@@ -46,7 +46,7 @@ import java.lang.annotation.Target;
  *         -keepattributes RuntimeVisibleAnnotations
  *
  *         -keepclassmembers class ** {
- *              &#64;com.bmd.jrt.annotation.LockName *;
+ *              &#64;com.bmd.jrt.annotation.Lock *;
  *         }
  *     </code>
  * </pre>
@@ -56,12 +56,12 @@ import java.lang.annotation.Target;
 @Inherited
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface LockName {
+public @interface Lock {
 
     /**
      * Constant indicating a default name value.
      */
-    static final String DEFAULT_LOCK = "com.bmd.jrt.annotation.LockName.DEFAULT_LOCK";
+    static final String DEFAULT_LOCK = "com.bmd.jrt.annotation.Lock.DEFAULT_LOCK";
 
     /**
      * Constant indicating a null lock name.

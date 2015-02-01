@@ -13,9 +13,9 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.annotation.AsyncName;
-import com.bmd.jrt.annotation.AsyncType;
-import com.bmd.jrt.annotation.ReadTimeout;
+import com.bmd.jrt.annotation.Bind;
+import com.bmd.jrt.annotation.Name;
+import com.bmd.jrt.annotation.Timeout;
 import com.bmd.jrt.builder.InputDeadlockException;
 import com.bmd.jrt.builder.OutputDeadlockException;
 import com.bmd.jrt.builder.RoutineBuilder.TimeoutAction;
@@ -2554,18 +2554,18 @@ public class RoutineTest extends TestCase {
 
     private interface TestInterface {
 
-        @ReadTimeout(value = 1, unit = TimeUnit.SECONDS)
+        @Timeout(value = 1, unit = TimeUnit.SECONDS)
         public int getInt(int i);
     }
 
     private interface TestInterfaceAsync {
 
-        public int getInt(@AsyncType(int.class) OutputChannel<Integer> i);
+        public int getInt(@Bind(int.class) OutputChannel<Integer> i);
 
-        @AsyncType(int.class)
+        @Bind(int.class)
         public OutputChannel<Integer> getOne();
 
-        @AsyncName(value = "getInt")
+        @Name(value = "getInt")
         public int take(int i);
     }
 
@@ -2720,7 +2720,7 @@ public class RoutineTest extends TestCase {
 
         public static final String GET = "get";
 
-        @AsyncName(GET)
+        @Name(GET)
         public static int get(final int i) {
 
             return i;
@@ -2732,7 +2732,7 @@ public class RoutineTest extends TestCase {
             return i;
         }
 
-        @AsyncName(GET)
+        @Name(GET)
         public int getOne() {
 
             return 1;

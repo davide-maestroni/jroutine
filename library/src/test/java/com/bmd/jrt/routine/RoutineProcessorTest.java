@@ -13,10 +13,9 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.annotation.AsyncType;
-import com.bmd.jrt.annotation.AsyncWrap;
-import com.bmd.jrt.annotation.ParallelType;
-import com.bmd.jrt.annotation.ReadTimeout;
+import com.bmd.jrt.annotation.Bind;
+import com.bmd.jrt.annotation.Timeout;
+import com.bmd.jrt.annotation.Wrap;
 import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.Tunnel;
@@ -101,46 +100,46 @@ public class RoutineProcessorTest extends TestCase {
         public int getOne();
     }
 
-    @AsyncWrap(TestClassInterface.class)
+    @Wrap(TestClassInterface.class)
     public interface TestInterfaceWrapper {
 
-        @ReadTimeout(300)
-        @AsyncType(int.class)
+        @Timeout(300)
+        @Bind(int.class)
         public OutputChannel<Integer> getOne();
     }
 
-    @AsyncWrap(TestClass.class)
+    @Wrap(TestClass.class)
     public interface TestWrapper {
 
-        @ReadTimeout(300)
-        @AsyncType(List.class)
-        public Iterable<Iterable> getList(@ParallelType(List.class) List<? extends List<String>> i);
+        @Timeout(300)
+        @Bind(List.class)
+        public Iterable<Iterable> getList(@Bind(List.class) List<? extends List<String>> i);
 
-        @ReadTimeout(300)
-        @AsyncType(int.class)
+        @Timeout(300)
+        @Bind(int.class)
         public OutputChannel<Integer> getOne();
 
-        @ReadTimeout(300)
-        public String getString(@ParallelType(int.class) int... i);
+        @Timeout(300)
+        public String getString(@Bind(int.class) int... i);
 
-        @ReadTimeout(300)
-        @AsyncType(int.class)
-        public OutputChannel<String> getString(@ParallelType(int.class) HashSet<Integer> i);
+        @Timeout(300)
+        @Bind(String.class)
+        public OutputChannel<String> getString(@Bind(int.class) HashSet<Integer> i);
 
-        @ReadTimeout(300)
-        @AsyncType(int.class)
-        public List<String> getString(@ParallelType(int.class) List<Integer> i);
+        @Timeout(300)
+        @Bind(String.class)
+        public List<String> getString(@Bind(int.class) List<Integer> i);
 
-        @ReadTimeout(300)
-        @AsyncType(int.class)
-        public Iterable<String> getString(@ParallelType(int.class) Iterable<Integer> i);
+        @Timeout(300)
+        @Bind(String.class)
+        public Iterable<String> getString(@Bind(int.class) Iterable<Integer> i);
 
-        @ReadTimeout(300)
-        @AsyncType(int.class)
-        public String[] getString(@ParallelType(int.class) Collection<Integer> i);
+        @Timeout(300)
+        @Bind(String.class)
+        public String[] getString(@Bind(int.class) Collection<Integer> i);
 
-        @ReadTimeout(300)
-        public String getString(@AsyncType(int.class) OutputChannel<Integer> i);
+        @Timeout(300)
+        public String getString(@Bind(int.class) OutputChannel<Integer> i);
     }
 
     @SuppressWarnings("UnusedDeclaration")

@@ -48,7 +48,7 @@ import java.util.concurrent.TimeUnit;
  *         -keepattributes RuntimeVisibleAnnotations
  *
  *         -keepclassmembers class ** {
- *              &#64;com.bmd.jrt.annotation.ReadTimeout *;
+ *              &#64;com.bmd.jrt.annotation.Timeout *;
  *         }
  *     </code>
  * </pre>
@@ -58,7 +58,7 @@ import java.util.concurrent.TimeUnit;
 @Inherited
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ReadTimeout {
+public @interface Timeout {
 
     /**
      * The type of action to take on output channel timeout.

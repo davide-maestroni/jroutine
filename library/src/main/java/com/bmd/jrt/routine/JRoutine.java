@@ -132,12 +132,11 @@ import javax.annotation.Nonnull;
  * <p/>
  * Created by davide on 9/7/14.
  *
- * @see com.bmd.jrt.annotation.Name
- * @see com.bmd.jrt.annotation.Lock
- * @see com.bmd.jrt.annotation.AsyncType
- * @see com.bmd.jrt.annotation.Wrap
- * @see com.bmd.jrt.annotation.ParallelType
+ * @see com.bmd.jrt.annotation.Async
+ * @see com.bmd.jrt.annotation.Share
+ * @see com.bmd.jrt.annotation.Bind
  * @see com.bmd.jrt.annotation.Timeout
+ * @see com.bmd.jrt.annotation.Wrap
  */
 public class JRoutine {
 

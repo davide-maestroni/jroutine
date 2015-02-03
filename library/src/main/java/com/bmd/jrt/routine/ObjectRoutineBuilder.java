@@ -13,12 +13,10 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.annotation.AsyncType;
+import com.bmd.jrt.annotation.Async;
+import com.bmd.jrt.annotation.Async.AsyncType;
 import com.bmd.jrt.annotation.Bind;
-import com.bmd.jrt.annotation.Bind.BindType;
-import com.bmd.jrt.annotation.Lock;
-import com.bmd.jrt.annotation.Name;
-import com.bmd.jrt.annotation.ParallelType;
+import com.bmd.jrt.annotation.Share;
 import com.bmd.jrt.annotation.Timeout;
 import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
 import com.bmd.jrt.builder.RoutineConfiguration;
@@ -58,12 +56,11 @@ import static com.bmd.jrt.time.TimeDuration.fromUnit;
  * <p/>
  * Created by davide on 9/21/14.
  *
- * @see com.bmd.jrt.annotation.Name
- * @see com.bmd.jrt.annotation.AsyncType
- * @see com.bmd.jrt.annotation.Wrap
- * @see com.bmd.jrt.annotation.Lock
- * @see com.bmd.jrt.annotation.ParallelType
+ * @see com.bmd.jrt.annotation.Async
+ * @see com.bmd.jrt.annotation.Share
+ * @see com.bmd.jrt.annotation.Bind
  * @see com.bmd.jrt.annotation.Timeout
+ * @see com.bmd.jrt.annotation.Wrap
  */
 public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
@@ -103,12 +100,12 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     @SuppressWarnings("unchecked")
     private static Object callRoutine(@Nonnull final Routine<Object, Object> routine,
             @Nonnull final Method method, @Nonnull final Object[] args,
-            @Nullable final BindType paramBinding) {
+            @Nullable final AsyncType paramType) {
 
         final Class<?> returnType = method.getReturnType();
         final OutputChannel<Object> outputChannel;
 
-        if (paramBinding == BindType.PARALLEL) {
+        if (paramType == AsyncType.PARALLEL) {
 
             final ParameterChannel<Object, Object> parameterChannel = routine.invokeParallel();
             final Class<?> parameterType = method.getParameterTypes()[0];
@@ -143,7 +140,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
             outputChannel = parameterChannel.result();
 
-        } else if (paramBinding == BindType.ELEMENT) {
+        } else if (paramType == AsyncType.ELEMENT) {
 
             final ParameterChannel<Object, Object> parameterChannel = routine.invokeAsync();
             final Class<?>[] parameterTypes = method.getParameterTypes();
@@ -165,7 +162,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
             outputChannel = parameterChannel.result();
 
-        } else if (paramBinding == BindType.COLLECTION) {
+        } else if (paramType == AsyncType.COLLECTION) {
 
             final ParameterChannel<Object, Object> parameterChannel = routine.invokeAsync();
             outputChannel = parameterChannel.pass((OutputChannel<Object>) args[0]).result();
@@ -205,6 +202,200 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
         }
 
         return null;
+    }
+
+    @Nonnull
+    private static AsyncType getParamType(@Nonnull final Async asyncAnnotation,
+            @Nonnull final Class[] targetParameterTypes, final int length, final int pos) {
+
+        AsyncType asyncType = asyncAnnotation.type();
+        final Class<?> paramClass = asyncAnnotation.value();
+        final Class<?> parameterType = targetParameterTypes[pos];
+
+        if (asyncType == AsyncType.AUTO) {
+
+            if (OutputChannel.class.isAssignableFrom(parameterType)) {
+
+                asyncType = AsyncType.ELEMENT;
+
+            } else if (parameterType.isArray() || Iterable.class.isAssignableFrom(parameterType)) {
+
+                if (parameterType.isArray() && !boxingClass(paramClass).isAssignableFrom(
+                        boxingClass(parameterType.getComponentType()))) {
+
+                    throw new IllegalArgumentException(
+                            "the async input array of type " + AsyncType.PARALLEL
+                                    + " does not match the bound type: "
+                                    + paramClass.getCanonicalName());
+                }
+
+                if (length > 1) {
+
+                    throw new IllegalArgumentException(
+                            "an async input of type " + AsyncType.PARALLEL +
+                                    " cannot be applied to a method taking " + length
+                                    + " input parameter");
+                }
+
+                asyncType = AsyncType.PARALLEL;
+
+            } else {
+
+                throw new IllegalArgumentException(
+                        "cannot automatically chose and async type for an output of type: "
+                                + parameterType.getCanonicalName());
+            }
+
+        } else if (asyncType == AsyncType.ELEMENT) {
+
+            if (!OutputChannel.class.isAssignableFrom(parameterType)) {
+
+                throw new IllegalArgumentException(
+                        "an async input of type " + AsyncType.ELEMENT + " must implement an "
+                                + OutputChannel.class.getCanonicalName());
+            }
+
+        } else if (asyncType == AsyncType.COLLECTION) {
+
+            if (!OutputChannel.class.isAssignableFrom(parameterType)) {
+
+                throw new IllegalArgumentException(
+                        "an async input of type " + AsyncType.COLLECTION + " must implement an "
+                                + OutputChannel.class.getCanonicalName());
+            }
+
+            if (!paramClass.isArray() && !paramClass.isAssignableFrom(List.class)) {
+
+                throw new IllegalArgumentException("an async input of type " + AsyncType.COLLECTION
+                                                           + " must be bound to an array or a " +
+                                                           "super class of "
+                                                           + List.class.getCanonicalName());
+            }
+
+            if (length > 1) {
+
+                throw new IllegalArgumentException(
+                        "an async input of type " + AsyncType.COLLECTION +
+                                " cannot be applied to a method taking " + length
+                                + " input parameter");
+            }
+
+        } else if (asyncType == AsyncType.PARALLEL) {
+
+            if (!parameterType.isArray() && !Iterable.class.isAssignableFrom(parameterType)) {
+
+                throw new IllegalArgumentException("an async input of type " + AsyncType.PARALLEL
+                                                           + " must be an array or implement an "
+                                                           + Iterable.class.getCanonicalName());
+            }
+
+            if (parameterType.isArray() && !boxingClass(paramClass).isAssignableFrom(
+                    boxingClass(parameterType.getComponentType()))) {
+
+                throw new IllegalArgumentException(
+                        "the async input array of type " + AsyncType.PARALLEL
+                                + " does not match the bound type: "
+                                + paramClass.getCanonicalName());
+            }
+
+            if (length > 1) {
+
+                throw new IllegalArgumentException("an async input of type " + AsyncType.PARALLEL +
+                                                           " cannot be applied to a method taking "
+                                                           + length + " input parameter");
+            }
+        }
+
+        targetParameterTypes[pos] = paramClass;
+        return asyncType;
+    }
+
+    @Nonnull
+    private static AsyncType getReturnType(@Nonnull final Async annotation,
+            @Nonnull final Class<?> returnType) {
+
+        AsyncType asyncType = annotation.type();
+
+        if (asyncType == AsyncType.AUTO) {
+
+            if (returnType.isAssignableFrom(OutputChannel.class)) {
+
+                asyncType = AsyncType.ELEMENT;
+
+            } else if (returnType.isArray() || returnType.isAssignableFrom(List.class)) {
+
+                final Class<?> returnClass = annotation.value();
+
+                if (returnType.isArray() && !boxingClass(
+                        returnType.getComponentType()).isAssignableFrom(boxingClass(returnClass))) {
+
+                    throw new IllegalArgumentException(
+                            "the async output array of type " + AsyncType.PARALLEL
+                                    + " does not match the bound type: "
+                                    + returnClass.getCanonicalName());
+                }
+
+                asyncType = AsyncType.PARALLEL;
+
+            } else {
+
+                throw new IllegalArgumentException(
+                        "cannot automatically chose and async type for an input of type: "
+                                + returnType.getCanonicalName());
+            }
+
+        } else if (asyncType == AsyncType.ELEMENT) {
+
+            if (!returnType.isAssignableFrom(OutputChannel.class)) {
+
+                final String channelClassName = OutputChannel.class.getCanonicalName();
+                throw new IllegalArgumentException("an async output of type " + AsyncType.ELEMENT
+                                                           + " must be a super class of "
+                                                           + channelClassName);
+            }
+
+        } else if (asyncType == AsyncType.COLLECTION) {
+
+            if (!returnType.isAssignableFrom(OutputChannel.class)) {
+
+                final String channelClassName = OutputChannel.class.getCanonicalName();
+                throw new IllegalArgumentException("an async output of type " + AsyncType.ELEMENT
+                                                           + " must be a super class of "
+                                                           + channelClassName);
+            }
+
+            final Class<?> returnClass = annotation.value();
+
+            if (!returnClass.isArray() && !Iterable.class.isAssignableFrom(returnClass)) {
+
+                throw new IllegalArgumentException("an async output of type " + AsyncType.COLLECTION
+                                                           + " must be bound to an array or a " +
+                                                           "type implementing an "
+                                                           + Iterable.class.getCanonicalName());
+            }
+
+        } else if (asyncType == AsyncType.PARALLEL) {
+
+            if (!returnType.isArray() && !returnType.isAssignableFrom(List.class)) {
+
+                throw new IllegalArgumentException("an async output of type " + AsyncType.PARALLEL
+                                                           + " must be an array or a super class " +
+                                                           "of " + List.class.getCanonicalName());
+            }
+
+            final Class<?> returnClass = annotation.value();
+
+            if (returnType.isArray() && !boxingClass(
+                    returnType.getComponentType()).isAssignableFrom(boxingClass(returnClass))) {
+
+                throw new IllegalArgumentException(
+                        "the async output array of type " + AsyncType.PARALLEL
+                                + " does not match the bound type: "
+                                + returnClass.getCanonicalName());
+            }
+        }
+
+        return asyncType;
     }
 
     @Nonnull
@@ -306,9 +497,9 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
     @Nonnull
     @Override
-    public ObjectRoutineBuilder lockName(@Nullable final String lockName) {
+    public ObjectRoutineBuilder share(@Nullable final String tag) {
 
-        super.lockName(lockName);
+        super.share(tag);
         return this;
     }
 
@@ -316,13 +507,13 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * Returns a proxy object enabling asynchronous calls to the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link com.bmd.jrt.annotation.Name} and {@link com.bmd.jrt.annotation.Timeout}
+     * optional {@link com.bmd.jrt.annotation.Bind} and {@link com.bmd.jrt.annotation.Timeout}
      * annotation.<br/>
      * In case the wrapped object does not implement the specified interface, the annotation name
      * will be used to bind the interface method with the instance ones. If no name is assigned, the
      * method name will be used instead to map it.<br/>
      * The interface will be interpreted as a mirror of the target object methods, and the optional
-     * {@link AsyncType} and {@link ParallelType} annotations will be honored.
+     * {@link com.bmd.jrt.annotation.Async} annotations will be honored.
      *
      * @param itf     the interface implemented by the return object.
      * @param <CLASS> the interface type.
@@ -360,13 +551,13 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * Returns a proxy object enabling asynchronous calls to the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link com.bmd.jrt.annotation.Name} and {@link com.bmd.jrt.annotation.Timeout}
+     * optional {@link com.bmd.jrt.annotation.Bind} and {@link com.bmd.jrt.annotation.Timeout}
      * annotation.<br/>
      * In case the wrapped object does not implement the specified interface, the annotation name
      * will be used to bind the interface method with the instance ones. If no name is assigned, the
      * method name will be used instead to map it.<br/>
      * The interface will be interpreted as a mirror of the target object methods, and the optional
-     * {@link AsyncType} and {@link ParallelType} annotations will be honored.
+     * {@link com.bmd.jrt.annotation.Async} annotations will be honored.
      *
      * @param itf     the token of the interface implemented by the return object.
      * @param <CLASS> the interface type.
@@ -385,9 +576,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * Returns a wrapper object enabling asynchronous calls to the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link com.bmd.jrt.annotation.Name}, {@link com.bmd.jrt.annotation.Timeout},
-     * {@link AsyncType} and {@link ParallelType}
-     * annotations.<br/>
+     * optional {@link com.bmd.jrt.annotation.Bind}, {@link com.bmd.jrt.annotation.Timeout},
+     * {@link com.bmd.jrt.annotation.Async} annotations.<br/>
      * The wrapping object is created through code generation based on the interfaces annotated
      * with {@link com.bmd.jrt.annotation.Wrap}.<br/>
      * Note that, you'll need to enable annotation pre-processing by adding the processor package
@@ -428,10 +618,10 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                 classMap.put(target, classes);
             }
 
-            final String lockName = getLockName();
-            final String classLockName = (lockName != null) ? lockName : Lock.DEFAULT_LOCK;
+            final String shareTag = getShareTag();
+            final String classShareTag = (shareTag != null) ? shareTag : Share.DEFAULT;
             final RoutineConfiguration configuration = getBuilder().buildConfiguration();
-            final ClassInfo classInfo = new ClassInfo(configuration, itf, classLockName);
+            final ClassInfo classInfo = new ClassInfo(configuration, itf, classShareTag);
             Object instance = classes.get(classInfo);
 
             if (instance != null) {
@@ -447,12 +637,12 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                 final String className = packageName + itf.getSimpleName() + "$$Wrapper";
                 final Class<?> wrapperClass = Class.forName(className);
                 final Constructor<?> constructor =
-                        findConstructor(wrapperClass, target, sMutexCache, classLockName,
+                        findConstructor(wrapperClass, target, sMutexCache, classShareTag,
                                         configuration);
 
                 synchronized (sMutexCache) {
 
-                    instance = constructor.newInstance(target, sMutexCache, classLockName,
+                    instance = constructor.newInstance(target, sMutexCache, classShareTag,
                                                        configuration);
                 }
 
@@ -474,9 +664,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * Returns a wrapper object enabling asynchronous calls to the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link com.bmd.jrt.annotation.Name}, {@link com.bmd.jrt.annotation.Timeout},
-     * {@link AsyncType} and {@link ParallelType}
-     * annotations.<br/>
+     * optional {@link com.bmd.jrt.annotation.Bind}, {@link com.bmd.jrt.annotation.Timeout} and
+     * {@link com.bmd.jrt.annotation.Async} annotations.<br/>
      * The wrapping object is created through code generation based on the interfaces annotated
      * with {@link com.bmd.jrt.annotation.Wrap}.<br/>
      * Note that, you'll need to enable annotation pre-processing by adding the processor package
@@ -500,7 +689,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
             @Nonnull final Class<?>[] targetParameterTypes) throws NoSuchMethodException {
 
         final Class<?> targetClass = getTargetClass();
-        final Name annotation = method.getAnnotation(Name.class);
+        final Bind annotation = method.getAnnotation(Bind.class);
 
         String name = null;
         Method targetMethod = null;
@@ -544,21 +733,21 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
         private final Class<?> mItf;
 
-        private final String mLockName;
+        private final String mShareTag;
 
         /**
          * Constructor.
          *
          * @param configuration the routine configuration.
          * @param itf           the wrapper interface.
-         * @param lockName      the lock name.
+         * @param shareTag      the share tag.
          */
         private ClassInfo(@Nonnull final RoutineConfiguration configuration,
-                @Nonnull final Class<?> itf, @Nonnull final String lockName) {
+                @Nonnull final Class<?> itf, @Nonnull final String shareTag) {
 
             mConfiguration = configuration;
             mItf = itf;
-            mLockName = lockName;
+            mShareTag = shareTag;
         }
 
         @Override
@@ -567,7 +756,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
             // auto-generated code
             int result = mConfiguration.hashCode();
             result = 31 * result + mItf.hashCode();
-            result = 31 * result + mLockName.hashCode();
+            result = 31 * result + mShareTag.hashCode();
             return result;
         }
 
@@ -586,8 +775,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
             }
 
             final ClassInfo that = (ClassInfo) o;
-            return mConfiguration.equals(that.mConfiguration) && mItf.equals(that.mItf) && mLockName
-                    .equals(that.mLockName);
+            return mConfiguration.equals(that.mConfiguration) && mItf.equals(that.mItf) && mShareTag
+                    .equals(that.mShareTag);
         }
     }
 
@@ -598,14 +787,14 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
         private final RoutineConfiguration mConfiguration;
 
-        private final String mLockName;
+        private final String mShareTag;
 
         /**
          * Constructor.
          */
         private InterfaceInvocationHandler() {
 
-            mLockName = getLockName();
+            mShareTag = getShareTag();
             mConfiguration = getBuilder().buildConfiguration();
         }
 
@@ -623,8 +812,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
             final Class<?> returnType = method.getReturnType();
             final Class<?>[] targetParameterTypes = method.getParameterTypes();
-            BindType paramBinding = null;
-            BindType returnBinding = null;
+            AsyncType asyncParamType = null;
+            AsyncType asyncReturnType = null;
 
             Method targetMethod;
 
@@ -640,90 +829,12 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                 }
 
                 Class<?> returnClass = null;
-                final Bind methodAnnotation = method.getAnnotation(Bind.class);
+                final Async methodAnnotation = method.getAnnotation(Async.class);
 
                 if (methodAnnotation != null) {
 
                     returnClass = methodAnnotation.value();
-                    returnBinding = methodAnnotation.type();
-
-                    if (returnBinding == BindType.AUTO) {
-
-                        if (returnType.isAssignableFrom(OutputChannel.class)) {
-
-                            returnBinding = BindType.ELEMENT;
-
-                        } else if (returnType.isArray() || returnType.isAssignableFrom(
-                                List.class)) {
-
-                            if (returnType.isArray() && !boxingClass(
-                                    returnType.getComponentType()).isAssignableFrom(
-                                    boxingClass(returnClass))) {
-
-                                throw new IllegalArgumentException(
-                                        "the output array binding of type " + BindType.PARALLEL
-                                                + " does not match the bound type: "
-                                                + returnClass.getCanonicalName());
-                            }
-
-                            returnBinding = BindType.PARALLEL;
-
-                        } else {
-
-                            throw new IllegalArgumentException(
-                                    "cannot automatically bind an output of type: "
-                                            + returnType.getCanonicalName());
-                        }
-
-                    } else if (returnBinding == BindType.ELEMENT) {
-
-                        if (!returnType.isAssignableFrom(OutputChannel.class)) {
-
-                            throw new IllegalArgumentException(
-                                    "an output binding of type " + BindType.ELEMENT
-                                            + " must be a super class of "
-                                            + OutputChannel.class.getCanonicalName());
-                        }
-
-                    } else if (returnBinding == BindType.COLLECTION) {
-
-                        if (!returnType.isAssignableFrom(OutputChannel.class)) {
-
-                            throw new IllegalArgumentException(
-                                    "an output binding of type " + BindType.COLLECTION
-                                            + " must be a super class of "
-                                            + OutputChannel.class.getCanonicalName());
-                        }
-
-                        if (!returnClass.isArray() && !Iterable.class.isAssignableFrom(
-                                returnClass)) {
-
-                            throw new IllegalArgumentException(
-                                    "an output binding of type " + BindType.COLLECTION
-                                            + " must be bound to an array or a type implementing " +
-                                            "an " + Iterable.class.getCanonicalName());
-                        }
-
-                    } else if (returnBinding == BindType.PARALLEL) {
-
-                        if (!returnType.isArray() && !returnType.isAssignableFrom(List.class)) {
-
-                            throw new IllegalArgumentException(
-                                    "an output binding of type " + BindType.PARALLEL
-                                            + " must be an array or a super class of "
-                                            + List.class.getCanonicalName());
-                        }
-
-                        if (returnType.isArray() && !boxingClass(
-                                returnType.getComponentType()).isAssignableFrom(
-                                boxingClass(returnClass))) {
-
-                            throw new IllegalArgumentException(
-                                    "the output array binding of type " + BindType.PARALLEL
-                                            + " does not match the bound type: "
-                                            + returnClass.getCanonicalName());
-                        }
-                    }
+                    asyncReturnType = getReturnType(methodAnnotation, returnType);
                 }
 
                 final Annotation[][] annotations = method.getParameterAnnotations();
@@ -735,120 +846,14 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
                     for (final Annotation paramAnnotation : paramAnnotations) {
 
-                        if (paramAnnotation.annotationType() != Bind.class) {
+                        if (paramAnnotation.annotationType() != Async.class) {
 
                             continue;
                         }
 
-                        final Bind bindAnnotation = (Bind) paramAnnotation;
-                        BindType bindType = bindAnnotation.type();
-                        final Class<?> paramClass = bindAnnotation.value();
-                        final Class<?> parameterType = targetParameterTypes[i];
-
-                        if (bindType == BindType.AUTO) {
-
-                            if (OutputChannel.class.isAssignableFrom(parameterType)) {
-
-                                bindType = BindType.ELEMENT;
-
-                            } else if (parameterType.isArray() || Iterable.class.isAssignableFrom(
-                                    parameterType)) {
-
-                                if (parameterType.isArray() && !boxingClass(
-                                        paramClass).isAssignableFrom(
-                                        boxingClass(parameterType.getComponentType()))) {
-
-                                    throw new IllegalArgumentException(
-                                            "the input array binding of type " + BindType.PARALLEL
-                                                    + " does not match the bound type: "
-                                                    + paramClass.getCanonicalName());
-                                }
-
-                                if (length > 1) {
-
-                                    throw new IllegalArgumentException(
-                                            "an input binding of type " + BindType.PARALLEL +
-                                                    " cannot be applied to a method taking "
-                                                    + length + " input parameter");
-                                }
-
-                                bindType = BindType.PARALLEL;
-
-                            } else {
-
-                                throw new IllegalArgumentException(
-                                        "cannot automatically bind an output of type: "
-                                                + parameterType.getCanonicalName());
-                            }
-
-                        } else if (bindType == BindType.ELEMENT) {
-
-                            if (!OutputChannel.class.isAssignableFrom(parameterType)) {
-
-                                throw new IllegalArgumentException(
-                                        "an input binding of type " + BindType.ELEMENT
-                                                + " must implement an "
-                                                + OutputChannel.class.getCanonicalName());
-                            }
-
-                        } else if (bindType == BindType.COLLECTION) {
-
-                            if (!OutputChannel.class.isAssignableFrom(parameterType)) {
-
-                                throw new IllegalArgumentException(
-                                        "an input binding of type " + BindType.COLLECTION
-                                                + " must implement an "
-                                                + OutputChannel.class.getCanonicalName());
-                            }
-
-                            if (!paramClass.isArray() && !paramClass.isAssignableFrom(List.class)) {
-
-                                throw new IllegalArgumentException(
-                                        "an input binding of type " + BindType.COLLECTION
-                                                + " must be bound to an array or a super class of "
-                                                + List.class.getCanonicalName());
-                            }
-
-                            if (length > 1) {
-
-                                throw new IllegalArgumentException(
-                                        "an input binding of type " + BindType.COLLECTION +
-                                                " cannot be applied to a method taking " + length
-                                                + " input parameter");
-                            }
-
-                        } else if (bindType == BindType.PARALLEL) {
-
-                            if (!parameterType.isArray() && !Iterable.class.isAssignableFrom(
-                                    parameterType)) {
-
-                                throw new IllegalArgumentException(
-                                        "an input binding of type " + BindType.PARALLEL
-                                                + " must be an array or implement an "
-                                                + Iterable.class.getCanonicalName());
-                            }
-
-                            if (parameterType.isArray() && !boxingClass(
-                                    paramClass).isAssignableFrom(
-                                    boxingClass(parameterType.getComponentType()))) {
-
-                                throw new IllegalArgumentException(
-                                        "the input array binding of type " + BindType.PARALLEL
-                                                + " does not match the bound type: "
-                                                + paramClass.getCanonicalName());
-                            }
-
-                            if (length > 1) {
-
-                                throw new IllegalArgumentException(
-                                        "an input binding of type " + BindType.PARALLEL +
-                                                " cannot be applied to a method taking " + length
-                                                + " input parameter");
-                            }
-                        }
-
-                        paramBinding = bindType;
-                        targetParameterTypes[i] = paramClass;
+                        asyncParamType =
+                                getParamType((Async) paramAnnotation, targetParameterTypes, length,
+                                             i);
                     }
                 }
 
@@ -867,7 +872,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
                     } else {
 
-                        if ((returnBinding == BindType.PARALLEL) && returnType.isArray()) {
+                        if ((asyncReturnType == AsyncType.PARALLEL) && returnType.isArray()) {
 
                             isError = !boxingClass(returnType.getComponentType()).isAssignableFrom(
                                     boxingClass(targetReturnType));
@@ -887,31 +892,32 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
             }
 
             final Routine<Object, Object> routine =
-                    buildRoutine(method, targetMethod, paramBinding, returnBinding);
-            return callRoutine(routine, method, args, paramBinding);
+                    buildRoutine(method, targetMethod, asyncParamType, asyncReturnType);
+            return callRoutine(routine, method, args, asyncParamType);
         }
 
+        @Nonnull
         private Routine<Object, Object> buildRoutine(@Nonnull final Method method,
-                @Nonnull final Method targetMethod, @Nullable final BindType paramBinding,
-                @Nullable final BindType returnBinding) {
+                @Nonnull final Method targetMethod, @Nullable final AsyncType paramType,
+                @Nullable final AsyncType returnType) {
 
-            String lockName = mLockName;
+            String shareTag = mShareTag;
             final RoutineConfigurationBuilder builder = new RoutineConfigurationBuilder();
-            final Lock lockAnnotation = method.getAnnotation(Lock.class);
+            final Share shareAnnotation = method.getAnnotation(Share.class);
 
-            if (lockAnnotation != null) {
+            if (shareAnnotation != null) {
 
-                final String annotationLockName = lockAnnotation.value();
+                final String annotationShareTag = shareAnnotation.value();
 
-                if (!Lock.DEFAULT_LOCK.equals(annotationLockName)) {
+                if (!Share.DEFAULT.equals(annotationShareTag)) {
 
-                    lockName = annotationLockName;
+                    shareTag = annotationShareTag;
                 }
             }
 
             builder.apply(mConfiguration);
 
-            if (paramBinding == BindType.ELEMENT) {
+            if (paramType == AsyncType.ELEMENT) {
 
                 builder.inputOrder(DataOrder.INSERTION);
             }
@@ -929,8 +935,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                        .onReadTimeout(timeoutAnnotation.action());
             }
 
-            return getRoutine(builder.buildConfiguration(), lockName, targetMethod, paramBinding,
-                              returnBinding);
+            return getRoutine(builder.buildConfiguration(), shareTag, targetMethod, paramType,
+                              returnType);
         }
     }
 
@@ -941,14 +947,14 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
         private final RoutineConfiguration mConfiguration;
 
-        private final String mLockName;
+        private final String mShareTag;
 
         /**
          * Constructor.
          */
         private ObjectInvocationHandler() {
 
-            mLockName = getLockName();
+            mShareTag = getShareTag();
             mConfiguration = getBuilder().buildConfiguration();
         }
 
@@ -957,7 +963,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                 Throwable {
 
             final OutputChannel<Object> outputChannel =
-                    method(mConfiguration, mLockName, method).callAsync(args);
+                    method(mConfiguration, mShareTag, method).callAsync(args);
             final Class<?> returnType = method.getReturnType();
 
             if (!Void.class.equals(boxingClass(returnType))) {

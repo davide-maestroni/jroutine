@@ -20,7 +20,7 @@
 
         private SimpleInvocation${methodCount}() {
 
-            final Object mutex = getMutex("${lockName}");
+            final Object mutex = getMutex("${shareTag}");
 
             mMutex = (mutex != null) ? mutex : this;
         }

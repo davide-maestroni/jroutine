@@ -27,6 +27,7 @@ import java.lang.annotation.Target;
  * In order to avoid unexpected behavior, it is advisable to avoid using the same class fields
  * (unless immutable) in protected and non-protected code, or to call synchronous methods through
  * the framework as well.<br/>
+ * TODO
  * Through this annotation, it is possible to exclude single methods from this kind of protection by
  * indicating them as having a different lock. Each lock has a name associated, and every method
  * with a specific lock is protected only from the other methods with the same lock name.
@@ -46,7 +47,7 @@ import java.lang.annotation.Target;
  *         -keepattributes RuntimeVisibleAnnotations
  *
  *         -keepclassmembers class ** {
- *              &#64;com.bmd.jrt.annotation.Lock *;
+ *              &#64;com.bmd.jrt.annotation.Share *;
  *         }
  *     </code>
  * </pre>
@@ -56,22 +57,22 @@ import java.lang.annotation.Target;
 @Inherited
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Lock {
+public @interface Share {
 
     /**
-     * Constant indicating a default name value.
+     * Constant indicating the default tag value.
      */
-    static final String DEFAULT_LOCK = "com.bmd.jrt.annotation.Lock.DEFAULT_LOCK";
+    static final String DEFAULT = "com.bmd.jrt.annotation.Share.DEFAULT";
 
     /**
-     * Constant indicating a null lock name.
+     * Constant indicating TODO.
      */
-    static final String NULL_LOCK = "";
+    static final String NONE = "";
 
     /**
-     * The name of the lock associated with the annotated method.
+     * The share tag associated with the annotated method.
      *
-     * @return the lock name.
+     * @return the tag.
      */
     String value();
 }

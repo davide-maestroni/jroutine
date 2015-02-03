@@ -13,9 +13,9 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.annotation.Bind.BindType;
-import com.bmd.jrt.annotation.Lock;
-import com.bmd.jrt.annotation.Name;
+import com.bmd.jrt.annotation.Async.AsyncType;
+import com.bmd.jrt.annotation.Bind;
+import com.bmd.jrt.annotation.Share;
 import com.bmd.jrt.annotation.Timeout;
 import com.bmd.jrt.builder.RoutineBuilder;
 import com.bmd.jrt.builder.RoutineConfiguration;
@@ -57,8 +57,8 @@ import static com.bmd.jrt.common.Reflection.boxingClass;
  * <p/>
  * Created by davide on 9/21/14.
  *
- * @see com.bmd.jrt.annotation.Name
- * @see com.bmd.jrt.annotation.Lock
+ * @see com.bmd.jrt.annotation.Share
+ * @see com.bmd.jrt.annotation.Bind
  * @see com.bmd.jrt.annotation.Timeout
  */
 public class ClassRoutineBuilder implements RoutineBuilder {
@@ -80,7 +80,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
     private final WeakReference<?> mTargetReference;
 
-    private String mLockName;
+    private String mShareTag;
 
     /**
      * Constructor.
@@ -145,10 +145,9 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
     /**
      * Returns a routine used for calling the method whose identifying name is specified in a
-     * {@link com.bmd.jrt.annotation.Name} annotation.<br/>
-     * Optional {@link com.bmd.jrt.annotation.Lock} and {@link com.bmd.jrt.annotation.Timeout}
-     * method annotations
-     * will be honored.
+     * {@link com.bmd.jrt.annotation.Bind} annotation.<br/>
+     * Optional {@link com.bmd.jrt.annotation.Share} and {@link com.bmd.jrt.annotation.Timeout}
+     * method annotations will be honored.
      *
      * @param name     the name specified in the annotation.
      * @param <INPUT>  the input data type.
@@ -268,26 +267,12 @@ public class ClassRoutineBuilder implements RoutineBuilder {
     }
 
     /**
-     * Tells the builder to create a routine using the specified lock name.
-     *
-     * @param lockName the lock name.
-     * @return this builder.
-     * @see com.bmd.jrt.annotation.Lock
-     */
-    @Nonnull
-    public ClassRoutineBuilder lockName(@Nullable final String lockName) {
-
-        mLockName = lockName;
-        return this;
-    }
-
-    /**
      * Returns a routine used for calling the specified method.
      * <p/>
      * The method is searched via reflection ignoring an optional name specified in a
-     * {@link com.bmd.jrt.annotation.Name} annotation. Though, optional {@link com.bmd.jrt
-     * .annotation.Lock} and {@link com.bmd.jrt.annotation.Timeout}
-     * method annotations will be honored.
+     * {@link com.bmd.jrt.annotation.Bind} annotation. Though, optional
+     * {@link com.bmd.jrt.annotation.Share} and {@link com.bmd.jrt.annotation.Timeout} method
+     * annotations will be honored.
      *
      * @param name           the method name.
      * @param parameterTypes the method parameter types.
@@ -328,12 +313,10 @@ public class ClassRoutineBuilder implements RoutineBuilder {
     /**
      * Returns a routine used for calling the specified method.
      * <p/>
-     * The method is invoked ignoring an optional name specified in a {@link com.bmd.jrt
-     * .annotation.Name} annotation.
-     * Though, optional {@link com.bmd.jrt.annotation.Lock} and {@link com.bmd.jrt.annotation
-     * .Timeout} method
-     * annotations will be
-     * honored.
+     * The method is invoked ignoring an optional name specified in a
+     * {@link com.bmd.jrt.annotation.Bind} annotation. Though, optional
+     * {@link com.bmd.jrt.annotation.Share} and {@link com.bmd.jrt.annotation.Timeout} method
+     * annotations will be honored.
      *
      * @param method   the method instance.
      * @param <INPUT>  the input data type.
@@ -344,7 +327,21 @@ public class ClassRoutineBuilder implements RoutineBuilder {
     @Nonnull
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final Method method) {
 
-        return method(mBuilder.buildConfiguration(), mLockName, method);
+        return method(mBuilder.buildConfiguration(), mShareTag, method);
+    }
+
+    /**
+     * Tells the builder to create a routine using the specified share tag.
+     *
+     * @param tag the tag.
+     * @return this builder.
+     * @see com.bmd.jrt.annotation.Share
+     */
+    @Nonnull
+    public ClassRoutineBuilder share(@Nullable final String tag) {
+
+        mShareTag = tag;
+        return this;
     }
 
     /**
@@ -352,7 +349,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      *
      * @param name the name specified in the annotation.
      * @return the method or null.
-     * @see com.bmd.jrt.annotation.Name
+     * @see com.bmd.jrt.annotation.Bind
      */
     @Nullable
     protected Method getAnnotatedMethod(final String name) {
@@ -372,32 +369,21 @@ public class ClassRoutineBuilder implements RoutineBuilder {
     }
 
     /**
-     * Returns the name of the lock.
-     *
-     * @return the lock name.
-     */
-    @Nullable
-    protected String getLockName() {
-
-        return mLockName;
-    }
-
-    /**
      * Creates the routine.
      *
      * @param configuration the routine configuration.
-     * @param lockName      the lock name.
+     * @param shareTag      the share tag.
      * @param method        the method to wrap.
-     * @param paramBinding  TODO
-     * @param returnBinding TODO
+     * @param paramType     TODO
+     * @param returnType    TODO
      * @return the routine instance.
      */
     @Nonnull
     @SuppressWarnings("unchecked")
     protected <INPUT, OUTPUT> Routine<INPUT, OUTPUT> getRoutine(
-            @Nonnull final RoutineConfiguration configuration, @Nullable final String lockName,
-            @Nonnull final Method method, @Nullable final BindType paramBinding,
-            @Nullable final BindType returnBinding) {
+            @Nonnull final RoutineConfiguration configuration, @Nullable final String shareTag,
+            @Nonnull final Method method, @Nullable final AsyncType paramType,
+            @Nullable final AsyncType returnType) {
 
         if (!method.isAccessible()) {
 
@@ -426,8 +412,8 @@ public class ClassRoutineBuilder implements RoutineBuilder {
                 routineCache.put(target, routineMap);
             }
 
-            final String methodLockName = (lockName != null) ? lockName : Lock.DEFAULT_LOCK;
-            final RoutineInfo routineInfo = new RoutineInfo(configuration, method, methodLockName);
+            final String methodShareTag = (shareTag != null) ? shareTag : Share.DEFAULT;
+            final RoutineInfo routineInfo = new RoutineInfo(configuration, method, methodShareTag);
             routine = routineMap.get(routineInfo);
 
             if (routine != null) {
@@ -437,7 +423,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
             Object mutex = null;
 
-            if (!Lock.NULL_LOCK.equals(methodLockName)) {
+            if (!Share.NONE.equals(methodShareTag)) {
 
                 synchronized (sMutexCache) {
 
@@ -450,12 +436,12 @@ public class ClassRoutineBuilder implements RoutineBuilder {
                         mutexCache.put(target, mutexMap);
                     }
 
-                    mutex = mutexMap.get(methodLockName);
+                    mutex = mutexMap.get(methodShareTag);
 
                     if (mutex == null) {
 
                         mutex = new Object();
-                        mutexMap.put(methodLockName, mutex);
+                        mutexMap.put(methodShareTag, mutex);
                     }
                 }
             }
@@ -463,11 +449,22 @@ public class ClassRoutineBuilder implements RoutineBuilder {
             routine =
                     new DefaultRoutine<Object, Object>(configuration, MethodSimpleInvocation.class,
                                                        mTargetReference, mTarget, method, mutex,
-                                                       paramBinding, returnBinding);
+                                                       paramType, returnType);
             routineMap.put(routineInfo, routine);
         }
 
         return (Routine<INPUT, OUTPUT>) routine;
+    }
+
+    /**
+     * Returns the share tag.
+     *
+     * @return the tag.
+     */
+    @Nullable
+    protected String getShareTag() {
+
+        return mShareTag;
     }
 
     /**
@@ -507,7 +504,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      * Returns a routine used for calling the specified method.
      *
      * @param configuration the routine configuration.
-     * @param lockName      the lock name.
+     * @param shareTag      the share tag.
      * @param targetMethod  the target method.
      * @return the routine.
      * @throws java.lang.NullPointerException if the specified configuration, class or method are
@@ -515,20 +512,20 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      */
     @Nonnull
     protected <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(
-            @Nonnull final RoutineConfiguration configuration, @Nullable final String lockName,
+            @Nonnull final RoutineConfiguration configuration, @Nullable final String shareTag,
             @Nonnull final Method targetMethod) {
 
-        String methodLockName = lockName;
+        String methodShareTag = shareTag;
         final RoutineConfigurationBuilder builder = new RoutineConfigurationBuilder();
-        final Lock lockAnnotation = targetMethod.getAnnotation(Lock.class);
+        final Share shareAnnotation = targetMethod.getAnnotation(Share.class);
 
-        if (lockAnnotation != null) {
+        if (shareAnnotation != null) {
 
-            final String annotationLockName = lockAnnotation.value();
+            final String annotationShareTag = shareAnnotation.value();
 
-            if (!Lock.DEFAULT_LOCK.equals(annotationLockName)) {
+            if (!Share.DEFAULT.equals(annotationShareTag)) {
 
-                methodLockName = annotationLockName;
+                methodShareTag = annotationShareTag;
             }
         }
 
@@ -546,7 +543,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
                    .onReadTimeout(timeoutAnnotation.action());
         }
 
-        return getRoutine(builder.buildConfiguration(), methodLockName, targetMethod, null, null);
+        return getRoutine(builder.buildConfiguration(), methodShareTag, targetMethod, null, null);
     }
 
     private void fillMap(@Nonnull final HashMap<String, Method> map,
@@ -568,7 +565,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
                 continue;
             }
 
-            final Name annotation = method.getAnnotation(Name.class);
+            final Bind annotation = method.getAnnotation(Bind.class);
 
             if (annotation != null) {
 
@@ -619,9 +616,9 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
         private final Object mMutex;
 
-        private final BindType mParamBinding;
+        private final AsyncType mParamType;
 
-        private final BindType mReturnBinding;
+        private final AsyncType mReturnType;
 
         private final Object mTarget;
 
@@ -634,24 +631,24 @@ public class ClassRoutineBuilder implements RoutineBuilder {
          * @param target          the target object.
          * @param method          the method to wrap.
          * @param mutex           the mutex used for synchronization.
-         * @param paramBinding    TODO
-         * @param returnBinding   TODO
+         * @param paramType       TODO
+         * @param returnType      TODO
          */
         public MethodSimpleInvocation(final WeakReference<?> targetReference,
                 @Nullable final Object target, @Nonnull final Method method,
-                @Nullable final Object mutex, @Nullable final BindType paramBinding,
-                @Nullable final BindType returnBinding) {
+                @Nullable final Object mutex, @Nullable final AsyncType paramType,
+                @Nullable final AsyncType returnType) {
 
             mTargetReference = targetReference;
             mTarget = target;
             mMethod = method;
             mMutex = (mutex != null) ? mutex : this;
-            mParamBinding = paramBinding;
-            mReturnBinding = returnBinding;
+            mParamType = paramType;
+            mReturnType = returnType;
 
-            final Class<?> returnType = method.getReturnType();
-            mHasResult = !Void.class.equals(boxingClass(returnType));
-            mIsArrayResult = returnType.isArray();
+            final Class<?> returnClass = method.getReturnType();
+            mHasResult = !Void.class.equals(boxingClass(returnClass));
+            mIsArrayResult = returnClass.isArray();
         }
 
         @Override
@@ -682,13 +679,13 @@ public class ClassRoutineBuilder implements RoutineBuilder {
                 try {
 
                     final Object[] args =
-                            (mParamBinding == BindType.COLLECTION) ? new Object[]{objects}
+                            (mParamType == AsyncType.COLLECTION) ? new Object[]{objects}
                                     : objects.toArray(new Object[objects.size()]);
                     final Object methodResult = method.invoke(target, args);
 
                     if (mHasResult) {
 
-                        if (mReturnBinding == BindType.COLLECTION) {
+                        if (mReturnType == AsyncType.COLLECTION) {
 
                             if (mIsArrayResult) {
 
@@ -740,22 +737,22 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
         private final RoutineConfiguration mConfiguration;
 
-        private final String mLockName;
-
         private final Method mMethod;
+
+        private final String mShareTag;
 
         /**
          * Constructor.
          *
          * @param configuration the routine configuration.
          * @param method        the method to wrap.
-         * @param lockName      the lock name.
+         * @param shareTag      the share tag.
          */
         private RoutineInfo(@Nonnull final RoutineConfiguration configuration,
-                @Nonnull final Method method, @Nonnull final String lockName) {
+                @Nonnull final Method method, @Nonnull final String shareTag) {
 
             mMethod = method;
-            mLockName = lockName;
+            mShareTag = shareTag;
             mConfiguration = configuration;
         }
 
@@ -764,8 +761,8 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
             // auto-generated code
             int result = mConfiguration.hashCode();
-            result = 31 * result + mLockName.hashCode();
             result = 31 * result + mMethod.hashCode();
+            result = 31 * result + mShareTag.hashCode();
             return result;
         }
 
@@ -784,8 +781,8 @@ public class ClassRoutineBuilder implements RoutineBuilder {
             }
 
             final RoutineInfo that = (RoutineInfo) o;
-            return mConfiguration.equals(that.mConfiguration) && mLockName.equals(that.mLockName)
-                    && mMethod.equals(that.mMethod);
+            return mConfiguration.equals(that.mConfiguration) && mMethod.equals(that.mMethod)
+                    && mShareTag.equals(that.mShareTag);
         }
     }
 

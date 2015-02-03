@@ -13,10 +13,10 @@
  */
 package com.bmd.jrt.routine;
 
+import com.bmd.jrt.annotation.Async;
+import com.bmd.jrt.annotation.Async.AsyncType;
 import com.bmd.jrt.annotation.Bind;
-import com.bmd.jrt.annotation.Bind.BindType;
-import com.bmd.jrt.annotation.Lock;
-import com.bmd.jrt.annotation.Name;
+import com.bmd.jrt.annotation.Share;
 import com.bmd.jrt.annotation.Timeout;
 import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
 import com.bmd.jrt.builder.RoutineBuilder.TimeoutAction;
@@ -133,7 +133,7 @@ public class JRoutineTest extends TestCase {
                                                          .maxRunning(1)
                                                          .maxRetained(0)
                                                          .availableTimeout(1, TimeUnit.SECONDS)
-                                                         .lockName("test")
+                                                         .share("test")
                                                          .method(TestStatic.class.getMethod(
                                                                  "getLong"));
 
@@ -158,8 +158,8 @@ public class JRoutineTest extends TestCase {
 
         long startTime = System.currentTimeMillis();
 
-        OutputChannel<Object> getOne = builder.lockName("1").method("getOne").callAsync();
-        OutputChannel<Object> getTwo = builder.lockName("2").method("getTwo").callAsync();
+        OutputChannel<Object> getOne = builder.share("1").method("getOne").callAsync();
+        OutputChannel<Object> getTwo = builder.share("2").method("getTwo").callAsync();
 
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();
@@ -397,7 +397,7 @@ public class JRoutineTest extends TestCase {
                                                          .runBy(Runners.poolRunner())
                                                          .maxRunning(1)
                                                          .availableTimeout(TimeDuration.ZERO)
-                                                         .lockName("test")
+                                                         .share("test")
                                                          .method(Test.class.getMethod("getLong"));
 
         assertThat(routine2.callSync().afterMax(timeout).readAll()).containsExactly(-77L);
@@ -420,8 +420,8 @@ public class JRoutineTest extends TestCase {
 
         long startTime = System.currentTimeMillis();
 
-        OutputChannel<Object> getOne = builder.lockName("1").method("getOne").callAsync();
-        OutputChannel<Object> getTwo = builder.lockName("2").method("getTwo").callAsync();
+        OutputChannel<Object> getOne = builder.share("1").method("getOne").callAsync();
+        OutputChannel<Object> getTwo = builder.share("2").method("getTwo").callAsync();
 
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();
@@ -886,7 +886,7 @@ public class JRoutineTest extends TestCase {
         assertThat(tunnel2.output().afterMax(timeout).readAll()).containsExactly(23, -77L);
     }
 
-    public void testTunnnelBuilderApply() {
+    public void testTunnelBuilderApply() {
 
         final RoutineConfiguration configuration =
                 new RoutineConfigurationBuilder().runBy(Runners.queuedRunner())
@@ -903,8 +903,8 @@ public class JRoutineTest extends TestCase {
     private interface ITestInc {
 
         @Timeout(1000)
-        @Bind(int.class)
-        public int[] inc(@Bind(int.class) int... i);
+        @Async(int.class)
+        public int[] inc(@Async(int.class) int... i);
     }
 
     private static interface SquareItf {
@@ -912,36 +912,36 @@ public class JRoutineTest extends TestCase {
         @Timeout(value = 1, unit = TimeUnit.SECONDS)
         public int compute(int i);
 
-        @Lock(Lock.NULL_LOCK)
-        @Name("compute")
-        @Bind(int.class)
-        public OutputChannel<Integer> computeParallel1(@Bind(int.class) int... i);
+        @Share(Share.NONE)
+        @Bind("compute")
+        @Async(int.class)
+        public OutputChannel<Integer> computeParallel1(@Async(int.class) int... i);
 
-        @Name("compute")
-        @Bind(int.class)
-        public OutputChannel<Integer> computeParallel2(@Bind(int.class) Integer... i);
+        @Bind("compute")
+        @Async(int.class)
+        public OutputChannel<Integer> computeParallel2(@Async(int.class) Integer... i);
 
-        @Lock(Lock.NULL_LOCK)
-        @Name("compute")
-        @Bind(int.class)
-        public OutputChannel<Integer> computeParallel3(@Bind(int.class) List<Integer> i);
+        @Share(Share.NONE)
+        @Bind("compute")
+        @Async(int.class)
+        public OutputChannel<Integer> computeParallel3(@Async(int.class) List<Integer> i);
 
-        @Lock(Lock.NULL_LOCK)
-        @Name("compute")
-        @Bind(int.class)
+        @Share(Share.NONE)
+        @Bind("compute")
+        @Async(int.class)
         public OutputChannel<Integer> computeParallel4(
-                @Bind(value = int.class, type = BindType.PARALLEL) OutputChannel<Integer> i);
+                @Async(value = int.class, type = AsyncType.PARALLEL) OutputChannel<Integer> i);
     }
 
     private static interface TestItf {
 
-        public void throwException(@Bind(int.class) RuntimeException ex);
+        public void throwException(@Async(int.class) RuntimeException ex);
 
-        @Name(Test.THROW)
-        @Bind(int.class)
+        @Bind(Test.THROW)
+        @Async(int.class)
         public void throwException1(RuntimeException ex);
 
-        @Name(Test.THROW)
+        @Bind(Test.THROW)
         public int throwException2(RuntimeException ex);
     }
 
@@ -949,13 +949,13 @@ public class JRoutineTest extends TestCase {
 
         public static final String GET = "get";
 
-        @Name(GET)
+        @Bind(GET)
         public int getOne() {
 
             return 1;
         }
 
-        @Name(GET)
+        @Bind(GET)
         public int getTwo() {
 
             return 2;
@@ -966,13 +966,13 @@ public class JRoutineTest extends TestCase {
 
         public static final String GET = "get";
 
-        @Name(GET)
+        @Bind(GET)
         public static int getOne() {
 
             return 1;
         }
 
-        @Name(GET)
+        @Bind(GET)
         public static int getTwo() {
 
             return 2;
@@ -994,14 +994,14 @@ public class JRoutineTest extends TestCase {
 
         public static final String THROW = "throw";
 
-        @Name(GET)
+        @Bind(GET)
         public long getLong() {
 
             return -77;
 
         }
 
-        @Name(THROW)
+        @Bind(THROW)
         public void throwException(final RuntimeException ex) {
 
             throw ex;
@@ -1030,15 +1030,15 @@ public class JRoutineTest extends TestCase {
 
         public static final String GET_STRING = "get_string";
 
-        @Name(GET_STRING)
-        @Lock(Lock.NULL_LOCK)
+        @Bind(GET_STRING)
+        @Share(Share.NONE)
         public static String getStringStatic(final String string) {
 
             return string;
         }
 
-        @Name(GET_STRING)
-        @Lock(Lock.NULL_LOCK)
+        @Bind(GET_STRING)
+        @Share(Share.NONE)
         public String getString(final String string) {
 
             return string;
@@ -1060,13 +1060,13 @@ public class JRoutineTest extends TestCase {
 
         public static final String THROW = "throw";
 
-        @Name(GET)
+        @Bind(GET)
         public static long getLong() {
 
             return -77;
         }
 
-        @Name(THROW)
+        @Bind(THROW)
         public static void throwException(final RuntimeException ex) {
 
             throw ex;

@@ -35,6 +35,8 @@ import javax.annotation.Nonnull;
  */
 public abstract class SimpleInvocation<INPUT, OUTPUT> extends TemplateInvocation<INPUT, OUTPUT> {
 
+    //TODO: ????
+
     private ArrayList<INPUT> mInputs;
 
     /**

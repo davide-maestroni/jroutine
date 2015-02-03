@@ -13,10 +13,10 @@
  */
 package com.bmd.jrt.processor;
 
-import com.bmd.jrt.annotation.AsyncType;
-import com.bmd.jrt.annotation.Lock;
-import com.bmd.jrt.annotation.Name;
-import com.bmd.jrt.annotation.ParallelType;
+import com.bmd.jrt.annotation.Async;
+import com.bmd.jrt.annotation.Async.AsyncType;
+import com.bmd.jrt.annotation.Bind;
+import com.bmd.jrt.annotation.Share;
 import com.bmd.jrt.annotation.Timeout;
 import com.bmd.jrt.annotation.Wrap;
 import com.bmd.jrt.builder.RoutineBuilder.TimeoutAction;
@@ -76,6 +76,8 @@ public class RoutineProcessor extends AbstractProcessor {
     private String mFooter;
 
     private String mHeader;
+
+    private TypeElement mIterableElement;
 
     private TypeElement mListElement;
 
@@ -143,6 +145,7 @@ public class RoutineProcessor extends AbstractProcessor {
             mFooter = parseTemplate("/templates/footer.txt", buffer);
 
             mOutputChannelElement = getTypeFromName(OutputChannel.class.getCanonicalName());
+            mIterableElement = getTypeFromName(Iterable.class.getCanonicalName());
             mListElement = getTypeFromName(List.class.getCanonicalName());
             mObjectType = getTypeFromName(Object.class.getCanonicalName()).asType();
 
@@ -234,7 +237,7 @@ public class RoutineProcessor extends AbstractProcessor {
             if (typeUtils.isAssignable(outputChannelElement.asType(),
                                        typeUtils.erasure(variableElement.asType()))) {
 
-                if (variableElement.getAnnotation(AsyncType.class) != null) {
+                if (variableElement.getAnnotation(Async.class) != null) {
 
                     builder.append("(com.bmd.jrt.channel.OutputChannel)");
 
@@ -374,7 +377,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
         for (final VariableElement parameterElement : methodElement.getParameters()) {
 
-            if (parameterElement.getAnnotation(AsyncType.class) != null) {
+            if (parameterElement.getAnnotation(Async.class) != null) {
 
                 isOverrideParameters = true;
                 break;
@@ -466,7 +469,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
         String methodName = methodElement.getSimpleName().toString();
         ExecutableElement targetMethod = null;
-        final Name asyncAnnotation = methodElement.getAnnotation(Name.class);
+        final Bind asyncAnnotation = methodElement.getAnnotation(Bind.class);
 
         if (asyncAnnotation != null) {
 
@@ -475,7 +478,7 @@ public class RoutineProcessor extends AbstractProcessor {
             for (final ExecutableElement targetMethodElement : ElementFilter.methodsIn(
                     targetElement.getEnclosedElements())) {
 
-                final Name targetAsyncAnnotation = targetMethodElement.getAnnotation(Name.class);
+                final Bind targetAsyncAnnotation = targetMethodElement.getAnnotation(Bind.class);
 
                 if ((targetAsyncAnnotation != null) && methodName.equals(
                         targetAsyncAnnotation.value())) {
@@ -491,11 +494,8 @@ public class RoutineProcessor extends AbstractProcessor {
 
             final Types typeUtils = processingEnv.getTypeUtils();
             final TypeElement asyncAnnotationElement =
-                    getTypeFromName(AsyncType.class.getCanonicalName());
+                    getTypeFromName(Async.class.getCanonicalName());
             final TypeMirror asyncAnnotationType = asyncAnnotationElement.asType();
-            final TypeElement parallelAnnotationElement =
-                    getTypeFromName(ParallelType.class.getCanonicalName());
-            final TypeMirror parallelAnnotationType = parallelAnnotationElement.asType();
 
             final List<? extends VariableElement> interfaceTypeParameters =
                     methodElement.getParameters();
@@ -521,15 +521,9 @@ public class RoutineProcessor extends AbstractProcessor {
                         Object value = null;
                         final VariableElement variableElement = interfaceTypeParameters.get(i);
 
-                        if (variableElement.getAnnotation(AsyncType.class) != null) {
+                        if (variableElement.getAnnotation(Async.class) != null) {
 
                             value = getElementValue(variableElement, asyncAnnotationType, "value");
-                        }
-
-                        if (variableElement.getAnnotation(ParallelType.class) != null) {
-
-                            value = getElementValue(variableElement, parallelAnnotationType,
-                                                    "value");
                         }
 
                         if (value != null) {
@@ -612,6 +606,216 @@ public class RoutineProcessor extends AbstractProcessor {
     private PackageElement getPackage(@Nonnull final TypeElement element) {
 
         return processingEnv.getElementUtils().getPackageOf(element);
+    }
+
+    @Nonnull
+    private AsyncType getParamType(@Nonnull final Async asyncAnnotation,
+            @Nonnull final VariableElement targetParameter, final int length) {
+
+        final Types typeUtils = processingEnv.getTypeUtils();
+        final TypeElement outputChannelElement = mOutputChannelElement;
+        final TypeElement iterableElement = mIterableElement;
+        final TypeElement listElement = mListElement;
+        final TypeMirror targetType = targetParameter.asType();
+        final TypeMirror targetTypeErasure = typeUtils.erasure(targetType);
+        final TypeElement annotationElement = getTypeFromName(Async.class.getCanonicalName());
+        final TypeMirror annotationType = annotationElement.asType();
+        final TypeMirror targetMirror =
+                (TypeMirror) getElementValue(targetParameter, annotationType, "value");
+        AsyncType asyncType = asyncAnnotation.type();
+
+        if (asyncType == AsyncType.AUTO) {
+
+            if (typeUtils.isAssignable(targetType, outputChannelElement.asType())) {
+
+                asyncType = AsyncType.ELEMENT;
+
+            } else if ((targetType.getKind() == TypeKind.ARRAY) || typeUtils.isAssignable(
+                    targetTypeErasure, iterableElement.asType())) {
+
+                if ((targetType.getKind() == TypeKind.ARRAY) && !typeUtils.isAssignable(
+                        getBoxedType(((ArrayType) targetType).getComponentType()),
+                        getBoxedType(targetMirror))) {
+
+                    throw new IllegalArgumentException(
+                            "the async input array of type " + AsyncType.PARALLEL
+                                    + " does not match the bound type: " + targetMirror);
+                }
+
+                if (length > 1) {
+
+                    throw new IllegalArgumentException(
+                            "an async input of type " + AsyncType.PARALLEL +
+                                    " cannot be applied to a method taking " + length
+                                    + " input parameter");
+                }
+
+                asyncType = AsyncType.PARALLEL;
+
+            } else {
+
+                throw new IllegalArgumentException(
+                        "cannot automatically chose and async type for an output of type: "
+                                + targetParameter);
+            }
+
+        } else if (asyncType == AsyncType.ELEMENT) {
+
+            if (!typeUtils.isAssignable(targetTypeErasure, outputChannelElement.asType())) {
+
+                throw new IllegalArgumentException(
+                        "an async input of type " + AsyncType.ELEMENT + " must implement an "
+                                + outputChannelElement);
+            }
+
+        } else if (asyncType == AsyncType.COLLECTION) {
+
+            if (!typeUtils.isAssignable(targetTypeErasure, outputChannelElement.asType())) {
+
+                throw new IllegalArgumentException(
+                        "an async input of type " + AsyncType.COLLECTION + " must implement an "
+                                + outputChannelElement);
+            }
+
+            if ((targetMirror != null) && (targetMirror.getKind() != TypeKind.ARRAY)
+                    && !typeUtils.isAssignable(typeUtils.erasure(targetMirror),
+                                               listElement.asType())) {
+
+                throw new IllegalArgumentException("an async input of type " + AsyncType.COLLECTION
+                                                           + " must be bound to an array or a " +
+                                                           "super class of " + listElement);
+            }
+
+            if (length > 1) {
+
+                throw new IllegalArgumentException(
+                        "an async input of type " + AsyncType.COLLECTION +
+                                " cannot be applied to a method taking " + length
+                                + " input parameter");
+            }
+
+        } else if (asyncType == AsyncType.PARALLEL) {
+
+            if ((targetType.getKind() != TypeKind.ARRAY) && !typeUtils.isAssignable(
+                    targetTypeErasure, iterableElement.asType())) {
+
+                throw new IllegalArgumentException("an async input of type " + AsyncType.PARALLEL
+                                                           + " must be an array or implement an "
+                                                           + iterableElement);
+            }
+
+            if ((targetType.getKind() == TypeKind.ARRAY) && !typeUtils.isAssignable(
+                    getBoxedType(((ArrayType) targetType).getComponentType()),
+                    getBoxedType(targetMirror))) {
+
+                throw new IllegalArgumentException(
+                        "the async input array of type " + AsyncType.PARALLEL
+                                + " does not match the bound type: " + targetMirror);
+            }
+
+            if (length > 1) {
+
+                throw new IllegalArgumentException("an async input of type " + AsyncType.PARALLEL +
+                                                           " cannot be applied to a method taking "
+                                                           + length + " input parameter");
+            }
+        }
+
+        return asyncType;
+    }
+
+    @Nonnull
+    private AsyncType getReturnType(@Nonnull final Async annotation,
+            @Nonnull final ExecutableElement methodElement) {
+
+        final Types typeUtils = processingEnv.getTypeUtils();
+        final TypeElement outputChannelElement = mOutputChannelElement;
+        final TypeElement iterableElement = mIterableElement;
+        final TypeElement listElement = mListElement;
+        final TypeMirror returnType = methodElement.getReturnType();
+        final TypeMirror returnTypeErasure = typeUtils.erasure(returnType);
+        final TypeElement annotationElement = getTypeFromName(Async.class.getCanonicalName());
+        final TypeMirror annotationType = annotationElement.asType();
+        final TypeMirror targetMirror =
+                (TypeMirror) getElementValue(methodElement, annotationType, "value");
+        AsyncType asyncType = annotation.type();
+
+        if (asyncType == AsyncType.AUTO) {
+
+            if (typeUtils.isAssignable(outputChannelElement.asType(), returnTypeErasure)) {
+
+                asyncType = AsyncType.ELEMENT;
+
+            } else if ((returnType.getKind() == TypeKind.ARRAY) || typeUtils.isAssignable(
+                    listElement.asType(), returnTypeErasure)) {
+
+                if ((returnType.getKind() == TypeKind.ARRAY) && !typeUtils.isAssignable(
+                        getBoxedType(targetMirror),
+                        getBoxedType(((ArrayType) returnType).getComponentType()))) {
+
+                    throw new IllegalArgumentException(
+                            "the async output array of type " + AsyncType.PARALLEL
+                                    + " does not match the bound type: " + targetMirror);
+                }
+
+                asyncType = AsyncType.PARALLEL;
+
+            } else {
+
+                throw new IllegalArgumentException(
+                        "cannot automatically chose and async type for an input of type: "
+                                + returnType);
+            }
+
+        } else if (asyncType == AsyncType.ELEMENT) {
+
+            if (!typeUtils.isAssignable(outputChannelElement.asType(), returnTypeErasure)) {
+
+                throw new IllegalArgumentException("an async output of type " + AsyncType.ELEMENT
+                                                           + " must be a super class of "
+                                                           + outputChannelElement);
+            }
+
+        } else if (asyncType == AsyncType.COLLECTION) {
+
+            if (!typeUtils.isAssignable(outputChannelElement.asType(), returnTypeErasure)) {
+
+                throw new IllegalArgumentException("an async output of type " + AsyncType.ELEMENT
+                                                           + " must be a super class of "
+                                                           + outputChannelElement);
+            }
+
+            if ((targetMirror != null) && (targetMirror.getKind() != TypeKind.ARRAY)
+                    && !typeUtils.isAssignable(typeUtils.erasure(targetMirror),
+                                               iterableElement.asType())) {
+
+                throw new IllegalArgumentException("an async output of type " + AsyncType.COLLECTION
+                                                           + " must be bound to an array or a " +
+                                                           "type implementing an "
+                                                           + iterableElement);
+            }
+
+        } else if (asyncType == AsyncType.PARALLEL) {
+
+            if ((returnType.getKind() != TypeKind.ARRAY) && !typeUtils.isAssignable(
+                    listElement.asType(), returnTypeErasure)) {
+
+                throw new IllegalArgumentException("an async output of type " + AsyncType.PARALLEL
+                                                           + " must be an array or a super class " +
+                                                           "of " + listElement);
+            }
+
+            if ((returnType.getKind() == TypeKind.ARRAY) && !typeUtils.isAssignable(
+                    getBoxedType(targetMirror),
+                    getBoxedType(((ArrayType) returnType).getComponentType()))) {
+
+                throw new IllegalArgumentException(
+                        "the async output array of type " + AsyncType.PARALLEL
+                                + " does not match the bound type: " + targetMirror);
+            }
+        }
+
+        return asyncType;
     }
 
     @Nonnull
@@ -737,50 +941,31 @@ public class RoutineProcessor extends AbstractProcessor {
         final ExecutableElement targetMethod = findMatchingMethod(methodElement, targetElement);
         TypeMirror targetReturnType = targetMethod.getReturnType();
 
-        boolean isParallel = false;
         final boolean isVoid = (targetReturnType.getKind() == TypeKind.VOID);
-        final AsyncType methodAnnotation = methodElement.getAnnotation(AsyncType.class);
+        final Async methodAnnotation = methodElement.getAnnotation(Async.class);
+        AsyncType asyncParamType = null;
+        //TODO AsyncType asyncReturnType = null;
+
         final List<? extends VariableElement> parameters = methodElement.getParameters();
 
-        if (parameters.size() == 1) {
+        for (final VariableElement parameter : parameters) {
 
-            if (parameters.get(0).getAnnotation(ParallelType.class) != null) {
+            final Async annotation = parameter.getAnnotation(Async.class);
 
-                if (parameters.get(0).getAnnotation(AsyncType.class) != null) {
+            if (annotation == null) {
 
-                    throw new IllegalArgumentException(
-                            "Invalid annotations for method: " + methodElement);
-                }
-
-                isParallel = true;
-
-            } else if (parameters.get(0).getAnnotation(AsyncType.class) != null) {
-
-                if (parameters.get(0).getAnnotation(ParallelType.class) != null) {
-
-                    throw new IllegalArgumentException(
-                            "Invalid annotations for method: " + methodElement);
-                }
-
-                //TODO: if aggregate => parameters.get(0) is list (or assignable),
-                // ${paramValues} .readAll()
+                continue;
             }
 
-        } else {
-
-            for (final VariableElement parameter : parameters) {
-
-                if (parameter.getAnnotation(ParallelType.class) != null) {
-
-                    throw new IllegalArgumentException(
-                            "Invalid annotations for method: " + methodElement);
-                }
-            }
+            asyncParamType = getParamType(annotation, parameter, parameters.size());
         }
 
         String method;
 
         if (methodAnnotation != null) {
+
+            //asyncReturnType =
+            getReturnType(methodAnnotation, methodElement);
 
             final TypeMirror returnType = methodElement.getReturnType();
             final TypeMirror returnTypeErasure = typeUtils.erasure(returnType);
@@ -791,10 +976,10 @@ public class RoutineProcessor extends AbstractProcessor {
             if (returnType.getKind() == TypeKind.ARRAY) {
 
                 targetReturnType = ((ArrayType) returnType).getComponentType();
-                method = (isParallel) ? mMethodParallelArray : mMethodArray;
+                method = (asyncParamType == AsyncType.PARALLEL) ? mMethodParallelArray
+                        : mMethodArray;
 
-            } else if (typeUtils.isAssignable(listElement.asType(),
-                                              returnTypeErasure)) { //TODO: check
+            } else if (typeUtils.isAssignable(listElement.asType(), returnTypeErasure)) {
 
                 final List<? extends TypeMirror> typeArguments =
                         ((DeclaredType) returnType).getTypeArguments();
@@ -808,7 +993,7 @@ public class RoutineProcessor extends AbstractProcessor {
                     targetReturnType = typeArguments.get(0);
                 }
 
-                method = (isParallel) ? mMethodParallelList : mMethodList;
+                method = (asyncParamType == AsyncType.PARALLEL) ? mMethodParallelList : mMethodList;
 
             } else if (typeUtils.isAssignable(outputChannelElement.asType(), returnTypeErasure)) {
 
@@ -824,7 +1009,8 @@ public class RoutineProcessor extends AbstractProcessor {
                     targetReturnType = typeArguments.get(0);
                 }
 
-                method = (isParallel) ? mMethodParallelAsync : mMethodAsync;
+                method = (asyncParamType == AsyncType.PARALLEL) ? mMethodParallelAsync
+                        : mMethodAsync;
 
             } else {
 
@@ -834,13 +1020,13 @@ public class RoutineProcessor extends AbstractProcessor {
 
         } else if (isVoid) {
 
-            method = (isParallel) ? mMethodParallelVoid : mMethodVoid;
+            method = (asyncParamType == AsyncType.PARALLEL) ? mMethodParallelVoid : mMethodVoid;
 
         } else {
 
             targetReturnType = methodElement.getReturnType();
 
-            method = (isParallel) ? mMethodParallelResult : mMethodResult;
+            method = (asyncParamType == AsyncType.PARALLEL) ? mMethodParallelResult : mMethodResult;
         }
 
         final String resultClassName = getBoxedType(targetReturnType).toString();
@@ -878,15 +1064,15 @@ public class RoutineProcessor extends AbstractProcessor {
         methodFooter = methodFooter.replace("${targetMethodName}", targetMethod.getSimpleName());
         methodFooter = methodFooter.replace("${paramValues}", buildParamValues(targetMethod));
 
-        String lockName = Lock.DEFAULT_LOCK;
-        final Lock lockAnnotation = methodElement.getAnnotation(Lock.class);
+        String shareTag = Share.DEFAULT;
+        final Share shareAnnotation = methodElement.getAnnotation(Share.class);
 
-        if (lockAnnotation != null) {
+        if (shareAnnotation != null) {
 
-            lockName = lockAnnotation.value();
+            shareTag = shareAnnotation.value();
         }
 
-        methodFooter = methodFooter.replace("${lockName}", lockName);
+        methodFooter = methodFooter.replace("${shareTag}", shareTag);
 
         writer.append(methodFooter);
     }

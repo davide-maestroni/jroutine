@@ -20,21 +20,70 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Created by davide on 1/31/15.
+ * This annotation is used to indicate methods that are to be invoked in an asynchronous way.
+ * <p/>
+ * Note that the piece of code inside such methods will be automatically protected so to avoid
+ * concurrency issues. Though, other parts of the code inside the same class will be not.<br/>
+ * In order to avoid unexpected behavior, it is advisable to avoid using the same class fields
+ * (unless immutable) in protected and non-protected code, or to call synchronous methods through
+ * the framework as well.
+ * <p/>
+ * This annotation allows to identify the method through a constant, thus avoiding issues when
+ * running obfuscation tools.<br/>
+ * For example, the following code:
+ * <pre>
+ *     <code>
+ *
+ *         public class MyClass {
+ *
+ *             public static final String METHOD_NAME = "get";
+ *
+ *             &#64;Name(METHOD_NAME)
+ *             public int getOne() {
+ *
+ *                 return 1;
+ *             }
+ *         }
+ *     </code>
+ * </pre>
+ * allows to asynchronously call the method independently from its original name like:
+ * <pre>
+ *     <code>
+ *
+ *         JRoutine.on(new MyClass()).annotatedMethod(MyClass.METHOD_NAME).callAsync();
+ *     </code>
+ * </pre>
+ * <p/>
+ * The same considerations apply to static class methods.
+ * <p/>
+ * Finally, be aware that a method might need to be made accessible in order to be called. That
+ * means that, in case a {@link java.lang.SecurityManager} is installed, a security exception might
+ * be raised based on the specific policy implemented.
+ * <p/>
+ * Remember also that, in order for the annotation to properly work at run time, you will need to
+ * add the following rules to your Proguard file (if employing it for shrinking or obfuscation):
+ * <pre>
+ *     <code>
+ *
+ *         -keepattributes RuntimeVisibleAnnotations
+ *
+ *         -keepclassmembers class ** {
+ *              &#64;com.bmd.jrt.annotation.Bind *;
+ *         }
+ *     </code>
+ * </pre>
+ * <p/>
+ * Created by davide on 1/22/15.
  */
 @Inherited
-@Target({ElementType.PARAMETER, ElementType.METHOD})
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Bind {
 
-    BindType type() default BindType.AUTO;
-
-    Class<?> value();
-
-    enum BindType {
-        ELEMENT,
-        COLLECTION,
-        PARALLEL,
-        AUTO
-    }
+    /**
+     * The name used to identify the method independently from its original signature.
+     *
+     * @return the name.
+     */
+    String value();
 }

@@ -27,6 +27,8 @@ import javax.annotation.Nonnull;
  */
 public class TunnelInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
 
+    //TODO: SimpleInvocation
+
     /**
      * Creates and returns the class token of a typed tunnel invocation.
      *

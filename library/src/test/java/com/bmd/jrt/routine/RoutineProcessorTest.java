@@ -13,7 +13,7 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.annotation.Bind;
+import com.bmd.jrt.annotation.Async;
 import com.bmd.jrt.annotation.Timeout;
 import com.bmd.jrt.annotation.Wrap;
 import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
@@ -104,7 +104,7 @@ public class RoutineProcessorTest extends TestCase {
     public interface TestInterfaceWrapper {
 
         @Timeout(300)
-        @Bind(int.class)
+        @Async(int.class)
         public OutputChannel<Integer> getOne();
     }
 
@@ -112,34 +112,34 @@ public class RoutineProcessorTest extends TestCase {
     public interface TestWrapper {
 
         @Timeout(300)
-        @Bind(List.class)
-        public Iterable<Iterable> getList(@Bind(List.class) List<? extends List<String>> i);
+        @Async(List.class)
+        public Iterable<Iterable> getList(@Async(List.class) List<? extends List<String>> i);
 
         @Timeout(300)
-        @Bind(int.class)
+        @Async(int.class)
         public OutputChannel<Integer> getOne();
 
         @Timeout(300)
-        public String getString(@Bind(int.class) int... i);
+        public String getString(@Async(int.class) int... i);
 
         @Timeout(300)
-        @Bind(String.class)
-        public OutputChannel<String> getString(@Bind(int.class) HashSet<Integer> i);
+        @Async(String.class)
+        public OutputChannel<String> getString(@Async(int.class) HashSet<Integer> i);
 
         @Timeout(300)
-        @Bind(String.class)
-        public List<String> getString(@Bind(int.class) List<Integer> i);
+        @Async(String.class)
+        public List<String> getString(@Async(int.class) List<Integer> i);
 
         @Timeout(300)
-        @Bind(String.class)
-        public Iterable<String> getString(@Bind(int.class) Iterable<Integer> i);
+        @Async(String.class)
+        public Iterable<String> getString(@Async(int.class) Iterable<Integer> i);
 
         @Timeout(300)
-        @Bind(String.class)
-        public String[] getString(@Bind(int.class) Collection<Integer> i);
+        @Async(String.class)
+        public String[] getString(@Async(int.class) Collection<Integer> i);
 
         @Timeout(300)
-        public String getString(@Bind(int.class) OutputChannel<Integer> i);
+        public String getString(@Async(int.class) OutputChannel<Integer> i);
     }
 
     @SuppressWarnings("UnusedDeclaration")

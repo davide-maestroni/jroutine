@@ -83,13 +83,21 @@ public class RoutineProcessor extends AbstractProcessor {
 
     private String mMethodArray;
 
+    private String mMethodArrayInvocation;
+
+    private String mMethodArrayInvocationCollection;
+
+    private String mMethodArrayInvocationVoid;
+
     private String mMethodAsync;
 
-    private String mMethodFooter;
-
-    private String mMethodFooterVoid;
-
     private String mMethodHeader;
+
+    private String mMethodInvocation;
+
+    private String mMethodInvocationCollection;
+
+    private String mMethodInvocationVoid;
 
     private String mMethodList;
 
@@ -140,8 +148,17 @@ public class RoutineProcessor extends AbstractProcessor {
             mMethodParallelList = parseTemplate("/templates/method_parallel_list.txt", buffer);
             mMethodParallelResult = parseTemplate("/templates/method_parallel_result.txt", buffer);
             mMethodParallelVoid = parseTemplate("/templates/method_parallel_void.txt", buffer);
-            mMethodFooter = parseTemplate("/templates/method_footer.txt", buffer);
-            mMethodFooterVoid = parseTemplate("/templates/method_footer_void.txt", buffer);
+            mMethodInvocation = parseTemplate("/templates/method_invocation.txt", buffer);
+            mMethodInvocationCollection =
+                    parseTemplate("/templates/method_invocation_collection.txt", buffer);
+            mMethodInvocationVoid =
+                    parseTemplate("/templates/method_array_invocation_void.txt", buffer);
+            mMethodArrayInvocation =
+                    parseTemplate("/templates/method_array_invocation.txt", buffer);
+            mMethodArrayInvocationCollection =
+                    parseTemplate("/templates/method_array_invocation_collection.txt", buffer);
+            mMethodArrayInvocationVoid =
+                    parseTemplate("/templates/method_invocation_void.txt", buffer);
             mFooter = parseTemplate("/templates/footer.txt", buffer);
 
             mOutputChannelElement = getTypeFromName(OutputChannel.class.getCanonicalName());
@@ -196,6 +213,14 @@ public class RoutineProcessor extends AbstractProcessor {
         }
 
         return false;
+    }
+
+    @Nonnull
+    private String buildCollectionParamValues(
+            @Nonnull final ExecutableElement targetMethodElement) {
+
+        final VariableElement targetParameter = targetMethodElement.getParameters().get(0);
+        return "(" + targetParameter.asType() + ") objects";
     }
 
     @Nonnull
@@ -628,7 +653,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
             if (typeUtils.isAssignable(targetType, outputChannelElement.asType())) {
 
-                asyncType = AsyncType.ELEMENT;
+                asyncType = AsyncType.PASS;
 
             } else if ((targetType.getKind() == TypeKind.ARRAY) || typeUtils.isAssignable(
                     targetTypeErasure, iterableElement.asType())) {
@@ -659,39 +684,38 @@ public class RoutineProcessor extends AbstractProcessor {
                                 + targetParameter);
             }
 
-        } else if (asyncType == AsyncType.ELEMENT) {
+        } else if (asyncType == AsyncType.PASS) {
 
             if (!typeUtils.isAssignable(targetTypeErasure, outputChannelElement.asType())) {
 
                 throw new IllegalArgumentException(
-                        "an async input of type " + AsyncType.ELEMENT + " must implement an "
+                        "an async input of type " + AsyncType.PASS + " must implement an "
                                 + outputChannelElement);
             }
 
-        } else if (asyncType == AsyncType.COLLECTION) {
+        } else if (asyncType == AsyncType.COLLECT) {
 
             if (!typeUtils.isAssignable(targetTypeErasure, outputChannelElement.asType())) {
 
                 throw new IllegalArgumentException(
-                        "an async input of type " + AsyncType.COLLECTION + " must implement an "
+                        "an async input of type " + AsyncType.COLLECT + " must implement an "
                                 + outputChannelElement);
             }
 
             if ((targetMirror != null) && (targetMirror.getKind() != TypeKind.ARRAY)
-                    && !typeUtils.isAssignable(typeUtils.erasure(targetMirror),
-                                               listElement.asType())) {
+                    && !typeUtils.isAssignable(listElement.asType(),
+                                               typeUtils.erasure(targetMirror))) {
 
-                throw new IllegalArgumentException("an async input of type " + AsyncType.COLLECTION
+                throw new IllegalArgumentException("an async input of type " + AsyncType.COLLECT
                                                            + " must be bound to an array or a " +
                                                            "super class of " + listElement);
             }
 
             if (length > 1) {
 
-                throw new IllegalArgumentException(
-                        "an async input of type " + AsyncType.COLLECTION +
-                                " cannot be applied to a method taking " + length
-                                + " input parameter");
+                throw new IllegalArgumentException("an async input of type " + AsyncType.COLLECT +
+                                                           " cannot be applied to a method taking "
+                                                           + length + " input parameter");
             }
 
         } else if (asyncType == AsyncType.PARALLEL) {
@@ -744,7 +768,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
             if (typeUtils.isAssignable(outputChannelElement.asType(), returnTypeErasure)) {
 
-                asyncType = AsyncType.ELEMENT;
+                asyncType = AsyncType.PASS;
 
             } else if ((returnType.getKind() == TypeKind.ARRAY) || typeUtils.isAssignable(
                     listElement.asType(), returnTypeErasure)) {
@@ -767,29 +791,29 @@ public class RoutineProcessor extends AbstractProcessor {
                                 + returnType);
             }
 
-        } else if (asyncType == AsyncType.ELEMENT) {
+        } else if (asyncType == AsyncType.PASS) {
 
             if (!typeUtils.isAssignable(outputChannelElement.asType(), returnTypeErasure)) {
 
-                throw new IllegalArgumentException("an async output of type " + AsyncType.ELEMENT
-                                                           + " must be a super class of "
-                                                           + outputChannelElement);
+                throw new IllegalArgumentException(
+                        "an async output of type " + AsyncType.PASS + " must be a super class of "
+                                + outputChannelElement);
             }
 
-        } else if (asyncType == AsyncType.COLLECTION) {
+        } else if (asyncType == AsyncType.COLLECT) {
 
             if (!typeUtils.isAssignable(outputChannelElement.asType(), returnTypeErasure)) {
 
-                throw new IllegalArgumentException("an async output of type " + AsyncType.ELEMENT
-                                                           + " must be a super class of "
-                                                           + outputChannelElement);
+                throw new IllegalArgumentException(
+                        "an async output of type " + AsyncType.PASS + " must be a super class of "
+                                + outputChannelElement);
             }
 
             if ((targetMirror != null) && (targetMirror.getKind() != TypeKind.ARRAY)
                     && !typeUtils.isAssignable(typeUtils.erasure(targetMirror),
                                                iterableElement.asType())) {
 
-                throw new IllegalArgumentException("an async output of type " + AsyncType.COLLECTION
+                throw new IllegalArgumentException("an async output of type " + AsyncType.COLLECT
                                                            + " must be bound to an array or a " +
                                                            "type implementing an "
                                                            + iterableElement);
@@ -944,7 +968,7 @@ public class RoutineProcessor extends AbstractProcessor {
         final boolean isVoid = (targetReturnType.getKind() == TypeKind.VOID);
         final Async methodAnnotation = methodElement.getAnnotation(Async.class);
         AsyncType asyncParamType = null;
-        //TODO AsyncType asyncReturnType = null;
+        AsyncType asyncReturnType = null;
 
         final List<? extends VariableElement> parameters = methodElement.getParameters();
 
@@ -964,14 +988,10 @@ public class RoutineProcessor extends AbstractProcessor {
 
         if (methodAnnotation != null) {
 
-            //asyncReturnType =
-            getReturnType(methodAnnotation, methodElement);
+            asyncReturnType = getReturnType(methodAnnotation, methodElement);
 
             final TypeMirror returnType = methodElement.getReturnType();
             final TypeMirror returnTypeErasure = typeUtils.erasure(returnType);
-
-            //TODO: if aggregate => returnTypeErasure is list (or assignable),
-            // ${resultClassName} = getTypeArguments().get(0)
 
             if (returnType.getKind() == TypeKind.ARRAY) {
 
@@ -1025,7 +1045,6 @@ public class RoutineProcessor extends AbstractProcessor {
         } else {
 
             targetReturnType = methodElement.getReturnType();
-
             method = (asyncParamType == AsyncType.PARALLEL) ? mMethodParallelResult : mMethodResult;
         }
 
@@ -1056,23 +1075,51 @@ public class RoutineProcessor extends AbstractProcessor {
         writer.append(method);
 
         String methodFooter;
-        methodFooter = (isVoid) ? mMethodFooterVoid : mMethodFooter;
+
+        if ((asyncParamType == AsyncType.COLLECT) && (
+                targetMethod.getParameters().get(0).asType().getKind() == TypeKind.ARRAY)) {
+
+            final ArrayType arrayType = (ArrayType) targetMethod.getParameters().get(0).asType();
+            methodFooter = (isVoid) ? mMethodArrayInvocationVoid
+                    : (asyncReturnType == AsyncType.COLLECT) ? mMethodArrayInvocationCollection
+                            : mMethodArrayInvocation;
+            methodFooter = methodFooter.replace("${componentType}",
+                                                arrayType.getComponentType().toString());
+
+        } else {
+
+            methodFooter = (isVoid) ? mMethodInvocationVoid
+                    : (asyncReturnType == AsyncType.COLLECT) ? mMethodInvocationCollection
+                            : mMethodInvocation;
+        }
+
         methodFooter = methodFooter.replace("${classFullName}", targetElement.asType().toString());
         methodFooter = methodFooter.replace("${resultClassName}", resultClassName);
         methodFooter = methodFooter.replace("${methodCount}", Integer.toString(count));
         methodFooter = methodFooter.replace("${methodName}", methodElement.getSimpleName());
         methodFooter = methodFooter.replace("${targetMethodName}", targetMethod.getSimpleName());
-        methodFooter = methodFooter.replace("${paramValues}", buildParamValues(targetMethod));
 
-        String shareTag = Share.DEFAULT;
+        if (asyncParamType == AsyncType.COLLECT) {
+
+            methodFooter = methodFooter.replace("${paramValues}",
+                                                buildCollectionParamValues(targetMethod));
+
+        } else {
+
+            methodFooter = methodFooter.replace("${paramValues}", buildParamValues(targetMethod));
+        }
+
         final Share shareAnnotation = methodElement.getAnnotation(Share.class);
 
         if (shareAnnotation != null) {
 
-            shareTag = shareAnnotation.value();
-        }
+            methodFooter =
+                    methodFooter.replace("${shareGroup}", "\"" + shareAnnotation.value() + "\"");
 
-        methodFooter = methodFooter.replace("${shareTag}", shareTag);
+        } else {
+
+            methodFooter = methodFooter.replace("${shareGroup}", "\"null\"");
+        }
 
         writer.append(methodFooter);
     }

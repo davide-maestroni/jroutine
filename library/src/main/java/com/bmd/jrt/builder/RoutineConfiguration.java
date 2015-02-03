@@ -180,7 +180,7 @@ public class RoutineConfiguration {
     }
 
     /**
-     * Returns the input data order (DEFAULT by default).
+     * Returns the input data order (ALL by default).
      *
      * @param valueIfNotSet the default value if none was set.
      * @return the order type.
@@ -192,7 +192,7 @@ public class RoutineConfiguration {
     }
 
     /**
-     * Returns the maximum number of buffered input data (DEFAULT by default).
+     * Returns the maximum number of buffered input data (ALL by default).
      *
      * @param valueIfNotSet the default value if none was set.
      * @return the maximum size.
@@ -217,7 +217,7 @@ public class RoutineConfiguration {
     }
 
     /**
-     * Returns the log level (DEFAULT by default).
+     * Returns the log level (ALL by default).
      *
      * @param valueIfNotSet the default value if none was set.
      * @return the log level.
@@ -241,7 +241,7 @@ public class RoutineConfiguration {
     }
 
     /**
-     * Returns the maximum number of retained invocation instances (DEFAULT by default).
+     * Returns the maximum number of retained invocation instances (ALL by default).
      *
      * @param valueIfNotSet the default value if none was set.
      * @return the maximum number.
@@ -253,7 +253,7 @@ public class RoutineConfiguration {
     }
 
     /**
-     * Returns the maximum number of parallel running invocations (DEFAULT by default).
+     * Returns the maximum number of parallel running invocations (ALL by default).
      *
      * @param valueIfNotSet the default value if none was set.
      * @return the maximum number.
@@ -265,7 +265,7 @@ public class RoutineConfiguration {
     }
 
     /**
-     * Returns the output data order (DEFAULT by default).
+     * Returns the output data order (ALL by default).
      *
      * @param valueIfNotSet the default value if none was set.
      * @return the order type.
@@ -277,7 +277,7 @@ public class RoutineConfiguration {
     }
 
     /**
-     * Returns the maximum number of buffered output data (DEFAULT by default).
+     * Returns the maximum number of buffered output data (ALL by default).
      *
      * @param valueIfNotSet the default value if none was set.
      * @return the maximum size.
@@ -303,7 +303,7 @@ public class RoutineConfiguration {
 
     /**
      * Returns the action to be taken if the timeout elapses before a readable result is available
-     * (DEFAULT by default).
+     * (ALL by default).
      *
      * @param valueIfNotSet the default value if none was set.
      * @return the action type.
@@ -340,7 +340,7 @@ public class RoutineConfiguration {
     }
 
     /**
-     * Returns the type of the runner used for synchronous invocations (DEFAULT by default).
+     * Returns the type of the runner used for synchronous invocations (ALL by default).
      *
      * @param valueIfNotSet the default value if none was set.
      * @return the runner type.

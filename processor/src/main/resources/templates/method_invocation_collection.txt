@@ -20,7 +20,7 @@
 
         private SimpleInvocation${methodCount}() {
 
-            final Object mutex = getMutex("${shareTag}");
+            final Object mutex = getMutex(${shareGroup});
 
             mMutex = (mutex != null) ? mutex : this;
         }
@@ -39,7 +39,10 @@
                     throw new IllegalStateException("target object has been destroyed");
                 }
 
-                result.pass(wrapped.${targetMethodName}(${paramValues}));
+                for (final ${resultClassName} element : wrapped.${targetMethodName}(${paramValues})) {
+
+                    result.pass(element);
+                }
             }
         }
     }

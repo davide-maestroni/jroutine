@@ -33,9 +33,32 @@ public @interface Async {
 
     Class<?> value();
 
+    /**
+     * Asynchronous variable type.<br/>
+     * The type indicates in which way a parameter is passed to the wrapped method or the result
+     * is passed outside.
+     */
     enum AsyncType {
-        ELEMENT,
-        COLLECTION,
+
+        /**
+         * Pass type.<br/>
+         * The variable is just read from or passed to an output channel.
+         * <p/>
+         * The annotated parameter must extends an {@link com.bmd.jrt.channel.OutputChannel}, while
+         * an annotated method must return a super class of it.
+         */
+        PASS,
+        /**
+         * Collect type.<br/>
+         * The inputs are collected from the channel and passed as an array or collection to the
+         * wrapped method. In a dual way, the element of the result array or collection are passed
+         * one by one to the output channel.
+         */
+        COLLECT,
+        /**
+         * Parallel type.<br/>
+         * Each input is passed to a different parallel invocation of the wrapped method.
+         */
         PARALLEL,
         AUTO
     }

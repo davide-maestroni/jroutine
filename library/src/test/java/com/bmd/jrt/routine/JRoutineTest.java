@@ -133,7 +133,7 @@ public class JRoutineTest extends TestCase {
                                                          .maxRunning(1)
                                                          .maxRetained(0)
                                                          .availableTimeout(1, TimeUnit.SECONDS)
-                                                         .share("test")
+                                                         .shareGroup("test")
                                                          .method(TestStatic.class.getMethod(
                                                                  "getLong"));
 
@@ -158,8 +158,8 @@ public class JRoutineTest extends TestCase {
 
         long startTime = System.currentTimeMillis();
 
-        OutputChannel<Object> getOne = builder.share("1").method("getOne").callAsync();
-        OutputChannel<Object> getTwo = builder.share("2").method("getTwo").callAsync();
+        OutputChannel<Object> getOne = builder.shareGroup("1").method("getOne").callAsync();
+        OutputChannel<Object> getTwo = builder.shareGroup("2").method("getTwo").callAsync();
 
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();
@@ -397,7 +397,7 @@ public class JRoutineTest extends TestCase {
                                                          .runBy(Runners.poolRunner())
                                                          .maxRunning(1)
                                                          .availableTimeout(TimeDuration.ZERO)
-                                                         .share("test")
+                                                         .shareGroup("test")
                                                          .method(Test.class.getMethod("getLong"));
 
         assertThat(routine2.callSync().afterMax(timeout).readAll()).containsExactly(-77L);
@@ -420,8 +420,8 @@ public class JRoutineTest extends TestCase {
 
         long startTime = System.currentTimeMillis();
 
-        OutputChannel<Object> getOne = builder.share("1").method("getOne").callAsync();
-        OutputChannel<Object> getTwo = builder.share("2").method("getTwo").callAsync();
+        OutputChannel<Object> getOne = builder.shareGroup("1").method("getOne").callAsync();
+        OutputChannel<Object> getTwo = builder.shareGroup("2").method("getTwo").callAsync();
 
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();

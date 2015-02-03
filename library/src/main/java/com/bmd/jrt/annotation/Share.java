@@ -60,9 +60,9 @@ import java.lang.annotation.Target;
 public @interface Share {
 
     /**
-     * Constant indicating the default tag value.
+     * Constant indicating TODO.
      */
-    static final String DEFAULT = "com.bmd.jrt.annotation.Share.DEFAULT";
+    static final String ALL = "com.bmd.jrt.annotation.Share.ALL";
 
     /**
      * Constant indicating TODO.

@@ -140,7 +140,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
             outputChannel = parameterChannel.result();
 
-        } else if (paramType == AsyncType.ELEMENT) {
+        } else if (paramType == AsyncType.PASS) {
 
             final ParameterChannel<Object, Object> parameterChannel = routine.invokeAsync();
             final Class<?>[] parameterTypes = method.getParameterTypes();
@@ -162,7 +162,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
             outputChannel = parameterChannel.result();
 
-        } else if (paramType == AsyncType.COLLECTION) {
+        } else if (paramType == AsyncType.COLLECT) {
 
             final ParameterChannel<Object, Object> parameterChannel = routine.invokeAsync();
             outputChannel = parameterChannel.pass((OutputChannel<Object>) args[0]).result();
@@ -206,22 +206,22 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
     @Nonnull
     private static AsyncType getParamType(@Nonnull final Async asyncAnnotation,
-            @Nonnull final Class[] targetParameterTypes, final int length, final int pos) {
+            @Nonnull final Class<?> targetParameterType, final int length) {
 
         AsyncType asyncType = asyncAnnotation.type();
         final Class<?> paramClass = asyncAnnotation.value();
-        final Class<?> parameterType = targetParameterTypes[pos];
 
         if (asyncType == AsyncType.AUTO) {
 
-            if (OutputChannel.class.isAssignableFrom(parameterType)) {
+            if (OutputChannel.class.isAssignableFrom(targetParameterType)) {
 
-                asyncType = AsyncType.ELEMENT;
+                asyncType = AsyncType.PASS;
 
-            } else if (parameterType.isArray() || Iterable.class.isAssignableFrom(parameterType)) {
+            } else if (targetParameterType.isArray() || Iterable.class.isAssignableFrom(
+                    targetParameterType)) {
 
-                if (parameterType.isArray() && !boxingClass(paramClass).isAssignableFrom(
-                        boxingClass(parameterType.getComponentType()))) {
+                if (targetParameterType.isArray() && !boxingClass(paramClass).isAssignableFrom(
+                        boxingClass(targetParameterType.getComponentType()))) {
 
                     throw new IllegalArgumentException(
                             "the async input array of type " + AsyncType.PARALLEL
@@ -243,30 +243,30 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
                 throw new IllegalArgumentException(
                         "cannot automatically chose and async type for an output of type: "
-                                + parameterType.getCanonicalName());
+                                + targetParameterType.getCanonicalName());
             }
 
-        } else if (asyncType == AsyncType.ELEMENT) {
+        } else if (asyncType == AsyncType.PASS) {
 
-            if (!OutputChannel.class.isAssignableFrom(parameterType)) {
+            if (!OutputChannel.class.isAssignableFrom(targetParameterType)) {
 
                 throw new IllegalArgumentException(
-                        "an async input of type " + AsyncType.ELEMENT + " must implement an "
+                        "an async input of type " + AsyncType.PASS + " must implement an "
                                 + OutputChannel.class.getCanonicalName());
             }
 
-        } else if (asyncType == AsyncType.COLLECTION) {
+        } else if (asyncType == AsyncType.COLLECT) {
 
-            if (!OutputChannel.class.isAssignableFrom(parameterType)) {
+            if (!OutputChannel.class.isAssignableFrom(targetParameterType)) {
 
                 throw new IllegalArgumentException(
-                        "an async input of type " + AsyncType.COLLECTION + " must implement an "
+                        "an async input of type " + AsyncType.COLLECT + " must implement an "
                                 + OutputChannel.class.getCanonicalName());
             }
 
             if (!paramClass.isArray() && !paramClass.isAssignableFrom(List.class)) {
 
-                throw new IllegalArgumentException("an async input of type " + AsyncType.COLLECTION
+                throw new IllegalArgumentException("an async input of type " + AsyncType.COLLECT
                                                            + " must be bound to an array or a " +
                                                            "super class of "
                                                            + List.class.getCanonicalName());
@@ -274,23 +274,23 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
             if (length > 1) {
 
-                throw new IllegalArgumentException(
-                        "an async input of type " + AsyncType.COLLECTION +
-                                " cannot be applied to a method taking " + length
-                                + " input parameter");
+                throw new IllegalArgumentException("an async input of type " + AsyncType.COLLECT +
+                                                           " cannot be applied to a method taking "
+                                                           + length + " input parameter");
             }
 
         } else if (asyncType == AsyncType.PARALLEL) {
 
-            if (!parameterType.isArray() && !Iterable.class.isAssignableFrom(parameterType)) {
+            if (!targetParameterType.isArray() && !Iterable.class.isAssignableFrom(
+                    targetParameterType)) {
 
                 throw new IllegalArgumentException("an async input of type " + AsyncType.PARALLEL
                                                            + " must be an array or implement an "
                                                            + Iterable.class.getCanonicalName());
             }
 
-            if (parameterType.isArray() && !boxingClass(paramClass).isAssignableFrom(
-                    boxingClass(parameterType.getComponentType()))) {
+            if (targetParameterType.isArray() && !boxingClass(paramClass).isAssignableFrom(
+                    boxingClass(targetParameterType.getComponentType()))) {
 
                 throw new IllegalArgumentException(
                         "the async input array of type " + AsyncType.PARALLEL
@@ -306,7 +306,6 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
             }
         }
 
-        targetParameterTypes[pos] = paramClass;
         return asyncType;
     }
 
@@ -320,7 +319,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
             if (returnType.isAssignableFrom(OutputChannel.class)) {
 
-                asyncType = AsyncType.ELEMENT;
+                asyncType = AsyncType.PASS;
 
             } else if (returnType.isArray() || returnType.isAssignableFrom(List.class)) {
 
@@ -344,31 +343,31 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                                 + returnType.getCanonicalName());
             }
 
-        } else if (asyncType == AsyncType.ELEMENT) {
+        } else if (asyncType == AsyncType.PASS) {
 
             if (!returnType.isAssignableFrom(OutputChannel.class)) {
 
                 final String channelClassName = OutputChannel.class.getCanonicalName();
-                throw new IllegalArgumentException("an async output of type " + AsyncType.ELEMENT
-                                                           + " must be a super class of "
-                                                           + channelClassName);
+                throw new IllegalArgumentException(
+                        "an async output of type " + AsyncType.PASS + " must be a super class of "
+                                + channelClassName);
             }
 
-        } else if (asyncType == AsyncType.COLLECTION) {
+        } else if (asyncType == AsyncType.COLLECT) {
 
             if (!returnType.isAssignableFrom(OutputChannel.class)) {
 
                 final String channelClassName = OutputChannel.class.getCanonicalName();
-                throw new IllegalArgumentException("an async output of type " + AsyncType.ELEMENT
-                                                           + " must be a super class of "
-                                                           + channelClassName);
+                throw new IllegalArgumentException(
+                        "an async output of type " + AsyncType.PASS + " must be a super class of "
+                                + channelClassName);
             }
 
             final Class<?> returnClass = annotation.value();
 
             if (!returnClass.isArray() && !Iterable.class.isAssignableFrom(returnClass)) {
 
-                throw new IllegalArgumentException("an async output of type " + AsyncType.COLLECTION
+                throw new IllegalArgumentException("an async output of type " + AsyncType.COLLECT
                                                            + " must be bound to an array or a " +
                                                            "type implementing an "
                                                            + Iterable.class.getCanonicalName());
@@ -497,9 +496,9 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
     @Nonnull
     @Override
-    public ObjectRoutineBuilder share(@Nullable final String tag) {
+    public ObjectRoutineBuilder shareGroup(@Nullable final String group) {
 
-        super.share(tag);
+        super.shareGroup(group);
         return this;
     }
 
@@ -618,10 +617,10 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                 classMap.put(target, classes);
             }
 
-            final String shareTag = getShareTag();
-            final String classShareTag = (shareTag != null) ? shareTag : Share.DEFAULT;
+            final String shareGroup = getShareGroup();
+            final String classShareGroup = (shareGroup != null) ? shareGroup : Share.ALL;
             final RoutineConfiguration configuration = getBuilder().buildConfiguration();
-            final ClassInfo classInfo = new ClassInfo(configuration, itf, classShareTag);
+            final ClassInfo classInfo = new ClassInfo(configuration, itf, classShareGroup);
             Object instance = classes.get(classInfo);
 
             if (instance != null) {
@@ -637,12 +636,12 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                 final String className = packageName + itf.getSimpleName() + "$$Wrapper";
                 final Class<?> wrapperClass = Class.forName(className);
                 final Constructor<?> constructor =
-                        findConstructor(wrapperClass, target, sMutexCache, classShareTag,
+                        findConstructor(wrapperClass, target, sMutexCache, classShareGroup,
                                         configuration);
 
                 synchronized (sMutexCache) {
 
-                    instance = constructor.newInstance(target, sMutexCache, classShareTag,
+                    instance = constructor.newInstance(target, sMutexCache, classShareGroup,
                                                        configuration);
                 }
 
@@ -733,21 +732,21 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
         private final Class<?> mItf;
 
-        private final String mShareTag;
+        private final String mShareGroup;
 
         /**
          * Constructor.
          *
          * @param configuration the routine configuration.
          * @param itf           the wrapper interface.
-         * @param shareTag      the share tag.
+         * @param shareGroup    the group name.
          */
         private ClassInfo(@Nonnull final RoutineConfiguration configuration,
-                @Nonnull final Class<?> itf, @Nonnull final String shareTag) {
+                @Nonnull final Class<?> itf, @Nonnull final String shareGroup) {
 
             mConfiguration = configuration;
             mItf = itf;
-            mShareTag = shareTag;
+            mShareGroup = shareGroup;
         }
 
         @Override
@@ -756,7 +755,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
             // auto-generated code
             int result = mConfiguration.hashCode();
             result = 31 * result + mItf.hashCode();
-            result = 31 * result + mShareTag.hashCode();
+            result = 31 * result + mShareGroup.hashCode();
             return result;
         }
 
@@ -775,8 +774,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
             }
 
             final ClassInfo that = (ClassInfo) o;
-            return mConfiguration.equals(that.mConfiguration) && mItf.equals(that.mItf) && mShareTag
-                    .equals(that.mShareTag);
+            return mConfiguration.equals(that.mConfiguration) && mItf.equals(that.mItf)
+                    && mShareGroup.equals(that.mShareGroup);
         }
     }
 
@@ -787,14 +786,14 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
         private final RoutineConfiguration mConfiguration;
 
-        private final String mShareTag;
+        private final String mShareGroup;
 
         /**
          * Constructor.
          */
         private InterfaceInvocationHandler() {
 
-            mShareTag = getShareTag();
+            mShareGroup = getShareGroup();
             mConfiguration = getBuilder().buildConfiguration();
         }
 
@@ -851,9 +850,10 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                             continue;
                         }
 
+                        final Async asyncAnnotation = (Async) paramAnnotation;
                         asyncParamType =
-                                getParamType((Async) paramAnnotation, targetParameterTypes, length,
-                                             i);
+                                getParamType(asyncAnnotation, targetParameterTypes[i], length);
+                        targetParameterTypes[i] = asyncAnnotation.value();
                     }
                 }
 
@@ -901,23 +901,23 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                 @Nonnull final Method targetMethod, @Nullable final AsyncType paramType,
                 @Nullable final AsyncType returnType) {
 
-            String shareTag = mShareTag;
+            String shareGroup = mShareGroup;
             final RoutineConfigurationBuilder builder = new RoutineConfigurationBuilder();
             final Share shareAnnotation = method.getAnnotation(Share.class);
 
             if (shareAnnotation != null) {
 
-                final String annotationShareTag = shareAnnotation.value();
+                final String annotationShareGroup = shareAnnotation.value();
 
-                if (!Share.DEFAULT.equals(annotationShareTag)) {
+                if (!Share.ALL.equals(annotationShareGroup)) {
 
-                    shareTag = annotationShareTag;
+                    shareGroup = annotationShareGroup;
                 }
             }
 
             builder.apply(mConfiguration);
 
-            if (paramType == AsyncType.ELEMENT) {
+            if (paramType == AsyncType.PASS) {
 
                 builder.inputOrder(DataOrder.INSERTION);
             }
@@ -935,7 +935,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                        .onReadTimeout(timeoutAnnotation.action());
             }
 
-            return getRoutine(builder.buildConfiguration(), shareTag, targetMethod, paramType,
+            return getRoutine(builder.buildConfiguration(), shareGroup, targetMethod, paramType,
                               returnType);
         }
     }
@@ -947,14 +947,14 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
         private final RoutineConfiguration mConfiguration;
 
-        private final String mShareTag;
+        private final String mShareGroup;
 
         /**
          * Constructor.
          */
         private ObjectInvocationHandler() {
 
-            mShareTag = getShareTag();
+            mShareGroup = getShareGroup();
             mConfiguration = getBuilder().buildConfiguration();
         }
 
@@ -963,7 +963,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                 Throwable {
 
             final OutputChannel<Object> outputChannel =
-                    method(mConfiguration, mShareTag, method).callAsync(args);
+                    method(mConfiguration, mShareGroup, method).callAsync(args);
             final Class<?> returnType = method.getReturnType();
 
             if (!Void.class.equals(boxingClass(returnType))) {

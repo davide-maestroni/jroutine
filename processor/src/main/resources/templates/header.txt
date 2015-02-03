@@ -18,7 +18,7 @@ package ${packageName};
 
 public final class ${interfaceName}$$Wrapper${genericTypes} implements ${interfaceFullName} {
 
-    private final String mShareTag;
+    private final String mShareGroup;
 
     private final com.bmd.jrt.common.CacheHashMap<Object, java.util.Map<String, Object>> mMutexMap;
 
@@ -26,7 +26,7 @@ public final class ${interfaceName}$$Wrapper${genericTypes} implements ${interfa
 
     public ${interfaceName}$$Wrapper(final ${classFullName} wrapped,
             final com.bmd.jrt.common.CacheHashMap<Object, java.util.Map<String, Object>> mutexMap,
-            final String shareTag, final com.bmd.jrt.builder.RoutineConfiguration configuration) {
+            final String shareGroup, final com.bmd.jrt.builder.RoutineConfiguration configuration) {
 
         if (wrapped == null) {
 
@@ -40,13 +40,13 @@ public final class ${interfaceName}$$Wrapper${genericTypes} implements ${interfa
 
         mWrapped = new java.lang.ref.WeakReference<${classFullName}>(wrapped);
         mMutexMap = mutexMap;
-        mShareTag = (shareTag != null) ? shareTag : com.bmd.jrt.annotation.Share.DEFAULT;
+        mShareGroup = (shareGroup != null) ? shareGroup : com.bmd.jrt.annotation.Share.ALL;
         ${routineFieldsInit}
     }
 
-    private Object getMutex(final String shareTag) {
+    private Object getMutex(final String shareGroup) {
 
-        if (com.bmd.jrt.annotation.Share.NONE.equals(shareTag)) {
+        if (com.bmd.jrt.annotation.Share.NONE.equals(shareGroup)) {
 
             return null;
         }
@@ -68,7 +68,7 @@ public final class ${interfaceName}$$Wrapper${genericTypes} implements ${interfa
                 mMutexMap.put(wrapped, mutexMap);
             }
 
-            final String name = (com.bmd.jrt.annotation.Share.DEFAULT.equals(shareTag)) ? mShareTag : shareTag;
+            final String name = (shareGroup != null) ? shareGroup : mShareGroup;
             Object mutex = mutexMap.get(name);
 
             if (mutex == null) {

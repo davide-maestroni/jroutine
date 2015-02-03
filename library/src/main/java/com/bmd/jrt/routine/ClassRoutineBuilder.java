@@ -80,7 +80,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
     private final WeakReference<?> mTargetReference;
 
-    private String mShareTag;
+    private String mShareGroup;
 
     /**
      * Constructor.
@@ -327,20 +327,20 @@ public class ClassRoutineBuilder implements RoutineBuilder {
     @Nonnull
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final Method method) {
 
-        return method(mBuilder.buildConfiguration(), mShareTag, method);
+        return method(mBuilder.buildConfiguration(), mShareGroup, method);
     }
 
     /**
      * Tells the builder to create a routine using the specified share tag.
      *
-     * @param tag the tag.
+     * @param group the group name.
      * @return this builder.
      * @see com.bmd.jrt.annotation.Share
      */
     @Nonnull
-    public ClassRoutineBuilder share(@Nullable final String tag) {
+    public ClassRoutineBuilder shareGroup(@Nullable final String group) {
 
-        mShareTag = tag;
+        mShareGroup = group;
         return this;
     }
 
@@ -372,7 +372,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      * Creates the routine.
      *
      * @param configuration the routine configuration.
-     * @param shareTag      the share tag.
+     * @param shareGroup    the group name.
      * @param method        the method to wrap.
      * @param paramType     TODO
      * @param returnType    TODO
@@ -381,7 +381,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
     @Nonnull
     @SuppressWarnings("unchecked")
     protected <INPUT, OUTPUT> Routine<INPUT, OUTPUT> getRoutine(
-            @Nonnull final RoutineConfiguration configuration, @Nullable final String shareTag,
+            @Nonnull final RoutineConfiguration configuration, @Nullable final String shareGroup,
             @Nonnull final Method method, @Nullable final AsyncType paramType,
             @Nullable final AsyncType returnType) {
 
@@ -412,8 +412,9 @@ public class ClassRoutineBuilder implements RoutineBuilder {
                 routineCache.put(target, routineMap);
             }
 
-            final String methodShareTag = (shareTag != null) ? shareTag : Share.DEFAULT;
-            final RoutineInfo routineInfo = new RoutineInfo(configuration, method, methodShareTag);
+            final String methodShareGroup = (shareGroup != null) ? shareGroup : Share.ALL;
+            final RoutineInfo routineInfo =
+                    new RoutineInfo(configuration, method, methodShareGroup);
             routine = routineMap.get(routineInfo);
 
             if (routine != null) {
@@ -423,7 +424,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
             Object mutex = null;
 
-            if (!Share.NONE.equals(methodShareTag)) {
+            if (!Share.NONE.equals(methodShareGroup)) {
 
                 synchronized (sMutexCache) {
 
@@ -436,12 +437,12 @@ public class ClassRoutineBuilder implements RoutineBuilder {
                         mutexCache.put(target, mutexMap);
                     }
 
-                    mutex = mutexMap.get(methodShareTag);
+                    mutex = mutexMap.get(methodShareGroup);
 
                     if (mutex == null) {
 
                         mutex = new Object();
-                        mutexMap.put(methodShareTag, mutex);
+                        mutexMap.put(methodShareGroup, mutex);
                     }
                 }
             }
@@ -457,14 +458,14 @@ public class ClassRoutineBuilder implements RoutineBuilder {
     }
 
     /**
-     * Returns the share tag.
+     * Returns the group name.
      *
-     * @return the tag.
+     * @return the group name.
      */
     @Nullable
-    protected String getShareTag() {
+    protected String getShareGroup() {
 
-        return mShareTag;
+        return mShareGroup;
     }
 
     /**
@@ -504,7 +505,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      * Returns a routine used for calling the specified method.
      *
      * @param configuration the routine configuration.
-     * @param shareTag      the share tag.
+     * @param shareGroup    the group name.
      * @param targetMethod  the target method.
      * @return the routine.
      * @throws java.lang.NullPointerException if the specified configuration, class or method are
@@ -512,20 +513,20 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      */
     @Nonnull
     protected <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(
-            @Nonnull final RoutineConfiguration configuration, @Nullable final String shareTag,
+            @Nonnull final RoutineConfiguration configuration, @Nullable final String shareGroup,
             @Nonnull final Method targetMethod) {
 
-        String methodShareTag = shareTag;
+        String methodShareGroup = shareGroup;
         final RoutineConfigurationBuilder builder = new RoutineConfigurationBuilder();
         final Share shareAnnotation = targetMethod.getAnnotation(Share.class);
 
         if (shareAnnotation != null) {
 
-            final String annotationShareTag = shareAnnotation.value();
+            final String annotationShareGroup = shareAnnotation.value();
 
-            if (!Share.DEFAULT.equals(annotationShareTag)) {
+            if (!Share.ALL.equals(annotationShareGroup)) {
 
-                methodShareTag = annotationShareTag;
+                methodShareGroup = annotationShareGroup;
             }
         }
 
@@ -543,7 +544,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
                    .onReadTimeout(timeoutAnnotation.action());
         }
 
-        return getRoutine(builder.buildConfiguration(), methodShareTag, targetMethod, null, null);
+        return getRoutine(builder.buildConfiguration(), methodShareGroup, targetMethod, null, null);
     }
 
     private void fillMap(@Nonnull final HashMap<String, Method> map,
@@ -678,14 +679,13 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
                 try {
 
-                    final Object[] args =
-                            (mParamType == AsyncType.COLLECTION) ? new Object[]{objects}
-                                    : objects.toArray(new Object[objects.size()]);
+                    final Object[] args = (mParamType == AsyncType.COLLECT) ? new Object[]{objects}
+                            : objects.toArray(new Object[objects.size()]);
                     final Object methodResult = method.invoke(target, args);
 
                     if (mHasResult) {
 
-                        if (mReturnType == AsyncType.COLLECTION) {
+                        if (mReturnType == AsyncType.COLLECT) {
 
                             if (mIsArrayResult) {
 
@@ -739,20 +739,20 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
         private final Method mMethod;
 
-        private final String mShareTag;
+        private final String mShareGroup;
 
         /**
          * Constructor.
          *
          * @param configuration the routine configuration.
          * @param method        the method to wrap.
-         * @param shareTag      the share tag.
+         * @param shareGroup    the group name.
          */
         private RoutineInfo(@Nonnull final RoutineConfiguration configuration,
-                @Nonnull final Method method, @Nonnull final String shareTag) {
+                @Nonnull final Method method, @Nonnull final String shareGroup) {
 
             mMethod = method;
-            mShareTag = shareTag;
+            mShareGroup = shareGroup;
             mConfiguration = configuration;
         }
 
@@ -762,7 +762,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
             // auto-generated code
             int result = mConfiguration.hashCode();
             result = 31 * result + mMethod.hashCode();
-            result = 31 * result + mShareTag.hashCode();
+            result = 31 * result + mShareGroup.hashCode();
             return result;
         }
 
@@ -782,7 +782,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
             final RoutineInfo that = (RoutineInfo) o;
             return mConfiguration.equals(that.mConfiguration) && mMethod.equals(that.mMethod)
-                    && mShareTag.equals(that.mShareTag);
+                    && mShareGroup.equals(that.mShareGroup);
         }
     }
 

@@ -106,7 +106,7 @@ Parallel programming on the go.
             public static void main(final String[] args) {
 
                 final ClassRoutineBuilder builder =
-                        on(Main.class).lockName(LockName.NULL_LOCK).readTimeout(TimeDuration.INFINITY);
+                        on(Main.class).shareGroup(Share.NONE).readTimeout(TimeDuration.INFINITY);
                 final Routine&lt;String, Integer&gt; parseRoutine = builder.annotatedMethod(PARSE);
                 final Routine&lt;Integer, Integer&gt; squareRoutine = builder.annotatedMethod(SQUARE);
                 final Routine&lt;List&lt;Integer&gt;, Double&gt; meanRoutine = builder.annotatedMethod(MEAN);
@@ -119,19 +119,19 @@ Parallel programming on the go.
                 System.exit(0);
             }
 
-            &commat;AsyncName(PARSE)
+            &commat;Bind(PARSE)
             private static int parseArg(final String arg) {
 
                 return Integer.parseInt(arg);
             }
 
-            &commat;AsyncName(SQUARE)
+            &commat;Bind(SQUARE)
             private static int square(final int value) {
 
                 return value * value;
             }
 
-            &commat;AsyncName(MEAN)
+            &commat;Bind(MEAN)
             private static double squareRootMean(final List&lt;Integer&gt; values) {
 
                 if (values.isEmpty()) {
@@ -162,7 +162,7 @@ Parallel programming on the go.
 
             public static void main(final String[] args) {
 
-                final AsyncMain proxy = on(new Main()).lockName(LockName.NULL_LOCK)
+                final AsyncMain proxy = on(new Main()).shareGroup(Share.NONE)
                                                       .readTimeout(TimeDuration.INFINITY)
                                                       .buildProxy(AsyncMain.class);
                 final double rms = proxy.squareRootMean(proxy.square(proxy.parseArg(args)));
@@ -201,14 +201,15 @@ Parallel programming on the go.
 
             private interface AsyncMain {
 
-                &commat;AsyncType(int.class)
-                public OutputChannel&lt;Integer&gt; parseArg(&commat;ParallelType(String.class) String[] args);
+                &commat;Async(int.class)
+                public OutputChannel&lt;Integer&gt; parseArg(&commat;Async(String.class) String[] args);
 
-                &commat;AsyncType(int.class)
-                public OutputChannel&lt;Integer&gt; square(&commat;ParallelType(int.class) OutputChannel&lt;Integer&gt; value);
+                &commat;Async(int.class)
+                public OutputChannel&lt;Integer&gt; square(
+                        &commat;Async(value = int.class, type = PARALLEL) OutputChannel&lt;Integer&gt; value);
 
                 public double squareRootMean(
-                        &commat;AsyncType(value = List.class, aggregate = true) OutputChannel&lt;Integer&gt; values);
+                        &commat;Async(value = List.class, type = COLLECT) OutputChannel&lt;Integer&gt; values);
             }
         }
     </code>
@@ -224,7 +225,7 @@ Parallel programming on the go.
 
             public static void main(final String[] args) {
 
-                final AsyncMain wrapper = on(new Main()).lockName(LockName.NULL_LOCK)
+                final AsyncMain wrapper = on(new Main()).shareGroup(Share.NONE)
                                                         .readTimeout(TimeDuration.INFINITY)
                                                         .buildWrapper(AsyncMain.class);
                 final double rms = wrapper.squareRootMean(wrapper.square(wrapper.parseArg(args)));
@@ -264,14 +265,15 @@ Parallel programming on the go.
             &commat;AsyncWrap(Main.class)
             public interface AsyncMain {
 
-                &commat;AsyncType(int.class)
-                public OutputChannel&lt;Integer&gt; parseArg(&commat;ParallelType(String.class) String[] args);
+                &commat;Async(int.class)
+                public OutputChannel&lt;Integer&gt; parseArg(&commat;Async(String.class) String[] args);
 
-                &commat;AsyncType(int.class)
-                public OutputChannel&lt;Integer&gt; square(&commat;ParallelType(int.class) OutputChannel&lt;Integer&gt; value);
+                &commat;Async(int.class)
+                public OutputChannel&lt;Integer&gt; square(
+                        &commat;Async(value = int.class, type = PARALLEL) OutputChannel&lt;Integer&gt; value);
 
                 public double squareRootMean(
-                        &commat;AsyncType(value = List.class, aggregate = true) OutputChannel&lt;Integer&gt; values);
+                        &commat;Async(value = List.class, type = COLLECT) OutputChannel&lt;Integer&gt; values);
             }
         }
     </code>

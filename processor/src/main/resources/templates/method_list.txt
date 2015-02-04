@@ -18,5 +18,5 @@
     @SuppressWarnings("unchecked")
     public ${resultType} ${methodName}(${paramTypes}) {
 
-        return this.mRoutine${methodCount}.invokeAsync()${inputParams}.result()${outputOptions}.readAll();
+        return this.mRoutine${methodCount}.${invokeMethod}()${inputParams}.result()${outputOptions}.readAll();
     }

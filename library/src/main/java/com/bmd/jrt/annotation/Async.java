@@ -29,8 +29,18 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Async {
 
+    /**
+     * The asynchronous variable type.
+     *
+     * @return the type.
+     */
     AsyncType type() default AsyncType.AUTO;
 
+    /**
+     * The bound class.
+     *
+     * @return the class.
+     */
     Class<?> value();
 
     /**
@@ -53,13 +63,27 @@ public @interface Async {
          * The inputs are collected from the channel and passed as an array or collection to the
          * wrapped method. In a dual way, the element of the result array or collection are passed
          * one by one to the output channel.
+         * <p/>
+         * The annotated parameter must extends an {@link com.bmd.jrt.channel.OutputChannel} and
+         * must be the only parameter accepted by the method, while an annotated method must return
+         * a super class of it.
          */
         COLLECT,
         /**
          * Parallel type.<br/>
          * Each input is passed to a different parallel invocation of the wrapped method.
+         * <p/>
+         * The annotated parameter must be an array or implement an {@link java.lang.Iterable} and
+         * must be the only parameter accepted by the method, while an annotated method must return
+         * an array or a super class of a {@link java.util.List}.
          */
         PARALLEL,
+        /**
+         * Automatic type.<br/>
+         * The type is automatically assigned based on the parameter or return type. Namely: if the
+         * parameters or return type match the COLLECT, they are assigned the COLLECT type; if they
+         * match the PASS type, they are assigned it; finally the PARALLEL conditions are checked.
+         */
         AUTO
     }
 }

@@ -206,22 +206,29 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
     @Nonnull
     private static AsyncType getParamType(@Nonnull final Async asyncAnnotation,
-            @Nonnull final Class<?> targetParameterType, final int length) {
+            @Nonnull final Class<?> parameterType, final int length) {
 
         AsyncType asyncType = asyncAnnotation.type();
         final Class<?> paramClass = asyncAnnotation.value();
 
         if (asyncType == AsyncType.AUTO) {
 
-            if (OutputChannel.class.isAssignableFrom(targetParameterType)) {
+            if (OutputChannel.class.isAssignableFrom(parameterType)) {
 
-                asyncType = AsyncType.PASS;
+                if ((length == 1) && (paramClass.isArray() || paramClass.isAssignableFrom(
+                        List.class))) {
 
-            } else if (targetParameterType.isArray() || Iterable.class.isAssignableFrom(
-                    targetParameterType)) {
+                    asyncType = AsyncType.COLLECT;
 
-                if (targetParameterType.isArray() && !boxingClass(paramClass).isAssignableFrom(
-                        boxingClass(targetParameterType.getComponentType()))) {
+                } else {
+
+                    asyncType = AsyncType.PASS;
+                }
+
+            } else if (parameterType.isArray() || Iterable.class.isAssignableFrom(parameterType)) {
+
+                if (parameterType.isArray() && !boxingClass(paramClass).isAssignableFrom(
+                        boxingClass(parameterType.getComponentType()))) {
 
                     throw new IllegalArgumentException(
                             "the async input array of type " + AsyncType.PARALLEL
@@ -243,24 +250,24 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
                 throw new IllegalArgumentException(
                         "cannot automatically chose and async type for an output of type: "
-                                + targetParameterType.getCanonicalName());
+                                + parameterType.getCanonicalName());
             }
 
         } else if (asyncType == AsyncType.PASS) {
 
-            if (!OutputChannel.class.isAssignableFrom(targetParameterType)) {
+            if (!OutputChannel.class.isAssignableFrom(parameterType)) {
 
                 throw new IllegalArgumentException(
-                        "an async input of type " + AsyncType.PASS + " must implement an "
+                        "an async input of type " + AsyncType.PASS + " must extends an "
                                 + OutputChannel.class.getCanonicalName());
             }
 
         } else if (asyncType == AsyncType.COLLECT) {
 
-            if (!OutputChannel.class.isAssignableFrom(targetParameterType)) {
+            if (!OutputChannel.class.isAssignableFrom(parameterType)) {
 
                 throw new IllegalArgumentException(
-                        "an async input of type " + AsyncType.COLLECT + " must implement an "
+                        "an async input of type " + AsyncType.COLLECT + " must extends an "
                                 + OutputChannel.class.getCanonicalName());
             }
 
@@ -281,16 +288,15 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
         } else if (asyncType == AsyncType.PARALLEL) {
 
-            if (!targetParameterType.isArray() && !Iterable.class.isAssignableFrom(
-                    targetParameterType)) {
+            if (!parameterType.isArray() && !Iterable.class.isAssignableFrom(parameterType)) {
 
                 throw new IllegalArgumentException("an async input of type " + AsyncType.PARALLEL
                                                            + " must be an array or implement an "
                                                            + Iterable.class.getCanonicalName());
             }
 
-            if (targetParameterType.isArray() && !boxingClass(paramClass).isAssignableFrom(
-                    boxingClass(targetParameterType.getComponentType()))) {
+            if (parameterType.isArray() && !boxingClass(paramClass).isAssignableFrom(
+                    boxingClass(parameterType.getComponentType()))) {
 
                 throw new IllegalArgumentException(
                         "the async input array of type " + AsyncType.PARALLEL
@@ -319,7 +325,16 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
             if (returnType.isAssignableFrom(OutputChannel.class)) {
 
-                asyncType = AsyncType.PASS;
+                final Class<?> returnClass = annotation.value();
+
+                if (returnClass.isArray() || Iterable.class.isAssignableFrom(returnClass)) {
+
+                    asyncType = AsyncType.COLLECT;
+
+                } else {
+
+                    asyncType = AsyncType.PASS;
+                }
 
             } else if (returnType.isArray() || returnType.isAssignableFrom(List.class)) {
 

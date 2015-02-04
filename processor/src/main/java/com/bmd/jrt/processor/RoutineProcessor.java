@@ -651,9 +651,18 @@ public class RoutineProcessor extends AbstractProcessor {
 
         if (asyncType == AsyncType.AUTO) {
 
-            if (typeUtils.isAssignable(targetType, outputChannelElement.asType())) {
+            if (typeUtils.isAssignable(targetTypeErasure, outputChannelElement.asType())) {
 
-                asyncType = AsyncType.PASS;
+                if ((length == 1) && (targetMirror != null) && (
+                        (targetMirror.getKind() == TypeKind.ARRAY) || typeUtils.isAssignable(
+                                listElement.asType(), targetMirror))) {
+
+                    asyncType = AsyncType.COLLECT;
+
+                } else {
+
+                    asyncType = AsyncType.PASS;
+                }
 
             } else if ((targetType.getKind() == TypeKind.ARRAY) || typeUtils.isAssignable(
                     targetTypeErasure, iterableElement.asType())) {
@@ -703,8 +712,7 @@ public class RoutineProcessor extends AbstractProcessor {
             }
 
             if ((targetMirror != null) && (targetMirror.getKind() != TypeKind.ARRAY)
-                    && !typeUtils.isAssignable(listElement.asType(),
-                                               typeUtils.erasure(targetMirror))) {
+                    && !typeUtils.isAssignable(listElement.asType(), targetMirror)) {
 
                 throw new IllegalArgumentException("an async input of type " + AsyncType.COLLECT
                                                            + " must be bound to an array or a " +
@@ -768,7 +776,15 @@ public class RoutineProcessor extends AbstractProcessor {
 
             if (typeUtils.isAssignable(outputChannelElement.asType(), returnTypeErasure)) {
 
-                asyncType = AsyncType.PASS;
+                if ((targetMirror != null) && ((targetMirror.getKind() == TypeKind.ARRAY)
+                        || typeUtils.isAssignable(targetMirror, iterableElement.asType()))) {
+
+                    asyncType = AsyncType.COLLECT;
+
+                } else {
+
+                    asyncType = AsyncType.PASS;
+                }
 
             } else if ((returnType.getKind() == TypeKind.ARRAY) || typeUtils.isAssignable(
                     listElement.asType(), returnTypeErasure)) {
@@ -810,8 +826,7 @@ public class RoutineProcessor extends AbstractProcessor {
             }
 
             if ((targetMirror != null) && (targetMirror.getKind() != TypeKind.ARRAY)
-                    && !typeUtils.isAssignable(typeUtils.erasure(targetMirror),
-                                               iterableElement.asType())) {
+                    && !typeUtils.isAssignable(targetMirror, iterableElement.asType())) {
 
                 throw new IllegalArgumentException("an async output of type " + AsyncType.COLLECT
                                                            + " must be bound to an array or a " +
@@ -996,8 +1011,9 @@ public class RoutineProcessor extends AbstractProcessor {
             if (returnType.getKind() == TypeKind.ARRAY) {
 
                 targetReturnType = ((ArrayType) returnType).getComponentType();
-                method = (asyncParamType == AsyncType.PARALLEL) ? mMethodParallelArray
-                        : mMethodArray;
+                method = ((asyncParamType == AsyncType.PARALLEL) && !typeUtils.isAssignable(
+                        methodElement.getParameters().get(0).asType(),
+                        outputChannelElement.asType())) ? mMethodParallelArray : mMethodArray;
 
             } else if (typeUtils.isAssignable(listElement.asType(), returnTypeErasure)) {
 
@@ -1013,7 +1029,9 @@ public class RoutineProcessor extends AbstractProcessor {
                     targetReturnType = typeArguments.get(0);
                 }
 
-                method = (asyncParamType == AsyncType.PARALLEL) ? mMethodParallelList : mMethodList;
+                method = ((asyncParamType == AsyncType.PARALLEL) && !typeUtils.isAssignable(
+                        methodElement.getParameters().get(0).asType(),
+                        outputChannelElement.asType())) ? mMethodParallelList : mMethodList;
 
             } else if (typeUtils.isAssignable(outputChannelElement.asType(), returnTypeErasure)) {
 
@@ -1029,8 +1047,9 @@ public class RoutineProcessor extends AbstractProcessor {
                     targetReturnType = typeArguments.get(0);
                 }
 
-                method = (asyncParamType == AsyncType.PARALLEL) ? mMethodParallelAsync
-                        : mMethodAsync;
+                method = ((asyncParamType == AsyncType.PARALLEL) && !typeUtils.isAssignable(
+                        methodElement.getParameters().get(0).asType(),
+                        outputChannelElement.asType())) ? mMethodParallelAsync : mMethodAsync;
 
             } else {
 
@@ -1040,18 +1059,19 @@ public class RoutineProcessor extends AbstractProcessor {
 
         } else if (isVoid) {
 
-            method = (asyncParamType == AsyncType.PARALLEL) ? mMethodParallelVoid : mMethodVoid;
+            method = ((asyncParamType == AsyncType.PARALLEL) && !typeUtils.isAssignable(
+                    methodElement.getParameters().get(0).asType(), outputChannelElement.asType()))
+                    ? mMethodParallelVoid : mMethodVoid;
 
         } else {
 
             targetReturnType = methodElement.getReturnType();
-            method = (asyncParamType == AsyncType.PARALLEL) ? mMethodParallelResult : mMethodResult;
+            method = ((asyncParamType == AsyncType.PARALLEL) && !typeUtils.isAssignable(
+                    methodElement.getParameters().get(0).asType(), outputChannelElement.asType()))
+                    ? mMethodParallelResult : mMethodResult;
         }
 
         final String resultClassName = getBoxedType(targetReturnType).toString();
-
-        //TODO: ${resultClassName} if aggregate output == ?
-        //TODO: ${paramValues} if aggregate input == .readAll()
 
         String methodHeader;
         methodHeader = mMethodHeader.replace("${resultClassName}", resultClassName);
@@ -1071,6 +1091,9 @@ public class RoutineProcessor extends AbstractProcessor {
         method = method.replace("${paramValues}", buildParamValues(targetMethod));
         method = method.replace("${inputParams}", buildInputParams(methodElement));
         method = method.replace("${outputOptions}", buildOutputOptions(methodElement));
+        method = method.replace("${invokeMethod}",
+                                (asyncParamType == AsyncType.PARALLEL) ? "invokeParallel"
+                                        : "invokeAsync");
 
         writer.append(method);
 

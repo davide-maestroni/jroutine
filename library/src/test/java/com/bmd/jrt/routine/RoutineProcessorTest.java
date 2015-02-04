@@ -14,6 +14,7 @@
 package com.bmd.jrt.routine;
 
 import com.bmd.jrt.annotation.Async;
+import com.bmd.jrt.annotation.Async.AsyncType;
 import com.bmd.jrt.annotation.Timeout;
 import com.bmd.jrt.annotation.Wrap;
 import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
@@ -112,7 +113,7 @@ public class RoutineProcessorTest extends TestCase {
     public interface TestWrapper {
 
         @Timeout(300)
-        @Async(List.class)
+        @Async(value = List.class, type = AsyncType.PASS) //TODO: investigate PASS == PARALLEL
         public Iterable<Iterable> getList(@Async(List.class) List<? extends List<String>> i);
 
         @Timeout(300)

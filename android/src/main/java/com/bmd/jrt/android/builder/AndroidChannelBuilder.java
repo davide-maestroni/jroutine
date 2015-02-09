@@ -13,7 +13,7 @@
  */
 package com.bmd.jrt.android.builder;
 
-import com.bmd.jrt.android.builder.AndroidRoutineBuilder.ResultCache;
+import com.bmd.jrt.android.builder.AndroidRoutineBuilder.CacheStrategy;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
@@ -41,14 +41,14 @@ public interface AndroidChannelBuilder {
     public <OUTPUT> OutputChannel<OUTPUT> buildChannel();
 
     /**
-     * Sets the log level.
+     * Tells the builder how to cache the invocation result after its completion. A null value means
+     * that it is up to the framework to chose a default strategy.
      *
-     * @param level the log level.
+     * @param cacheStrategy the cache strategy.
      * @return this builder.
-     * @throws java.lang.NullPointerException if the log level is null.
      */
     @Nonnull
-    public AndroidChannelBuilder logLevel(@Nonnull LogLevel level);
+    public AndroidChannelBuilder onComplete(@Nullable CacheStrategy cacheStrategy);
 
     /**
      * Sets the log instance. A null value means that it is up to the framework to chose a default
@@ -58,15 +58,15 @@ public interface AndroidChannelBuilder {
      * @return this builder.
      */
     @Nonnull
-    public AndroidChannelBuilder loggedWith(@Nullable Log log);
+    public AndroidChannelBuilder withLog(@Nullable Log log);
 
     /**
-     * Tells the builder how to cache the invocation result after its completion.
+     * Sets the log level. A null value means that it is up to the framework to chose a default
+     * level.
      *
-     * @param cacheType the cache type.
+     * @param level the log level.
      * @return this builder.
-     * @throws java.lang.NullPointerException if the specified cache type is null.
      */
     @Nonnull
-    public AndroidChannelBuilder onComplete(@Nonnull ResultCache cacheType);
+    public AndroidChannelBuilder withLogLevel(@Nullable LogLevel level);
 }

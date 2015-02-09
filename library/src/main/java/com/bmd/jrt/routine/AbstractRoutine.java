@@ -50,9 +50,9 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
     private static final TimeDuration DEFAULT_AVAIL_TIMEOUT = ZERO;
 
-    private static final int DEFAULT_MAX_RETAINED = 10;
+    private static final int DEFAULT_CORE_INVOCATIONS = 10;
 
-    private static final int DEFAULT_MAX_RUNNING = Integer.MAX_VALUE;
+    private static final int DEFAULT_MAX_INVOCATIONS = Integer.MAX_VALUE;
 
     private final LinkedList<Invocation<INPUT, OUTPUT>> mAsyncInvocations =
             new LinkedList<Invocation<INPUT, OUTPUT>>();
@@ -63,11 +63,11 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
     private final RoutineConfiguration mConfiguration;
 
+    private final int mCoreInvocations;
+
     private final Logger mLogger;
 
-    private final int mMaxRetained;
-
-    private final int mMaxRunning;
+    private final int mMaxInvocations;
 
     private final Object mMutex = new Object();
 
@@ -87,7 +87,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
         @Override
         public boolean isTrue() {
 
-            return mRunningCount < mMaxRunning;
+            return mRunningCount < mMaxInvocations;
         }
     };
 
@@ -107,8 +107,8 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
         mSyncRunner = (configuration.getSyncRunnerOr(RunnerType.QUEUED) == RunnerType.QUEUED)
                 ? Runners.queuedRunner() : Runners.sequentialRunner();
         mAsyncRunner = configuration.getRunnerOr(Runners.sharedRunner());
-        mMaxRunning = configuration.getMaxRunningOr(DEFAULT_MAX_RUNNING);
-        mMaxRetained = configuration.getMaxRetainedOr(DEFAULT_MAX_RETAINED);
+        mMaxInvocations = configuration.getMaxInvocationsOr(DEFAULT_MAX_INVOCATIONS);
+        mCoreInvocations = configuration.getCoreInvocationsOr(DEFAULT_CORE_INVOCATIONS);
         mAvailTimeout = configuration.getAvailTimeoutOr(DEFAULT_AVAIL_TIMEOUT);
         mLogger = Logger.createLogger(configuration.getLogOr(Logger.getGlobalLog()),
                                       configuration.getLogLevelOr(Logger.getGlobalLogLevel()),
@@ -131,8 +131,8 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
         mConfiguration = configuration;
         mSyncRunner = syncRunner;
         mAsyncRunner = asyncRunner;
-        mMaxRunning = DEFAULT_MAX_RUNNING;
-        mMaxRetained = DEFAULT_MAX_RETAINED;
+        mMaxInvocations = DEFAULT_MAX_INVOCATIONS;
+        mCoreInvocations = DEFAULT_CORE_INVOCATIONS;
         mAvailTimeout = DEFAULT_AVAIL_TIMEOUT;
         mLogger = logger.subContextLogger(this);
     }
@@ -350,14 +350,15 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
                 } catch (final InterruptedException e) {
 
-                    mLogger.err(e, "waiting for available instance interrupted [#%d]", mMaxRunning);
+                    mLogger.err(e, "waiting for available instance interrupted [#%d]",
+                                mMaxInvocations);
                     throw InvocationInterruptedException.interrupt(e);
                 }
 
                 if (isTimeout) {
 
                     mLogger.wrn("routine instance not available after timeout [#%d]: %s",
-                                mMaxRunning, mAvailTimeout);
+                                mMaxInvocations, mAvailTimeout);
                     throw new RoutineDeadlockException(
                             "deadlock while waiting for an available invocation instance");
                 }
@@ -372,7 +373,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
                     final Invocation<INPUT, OUTPUT> invocation = invocations.removeFirst();
                     mLogger.dbg("reusing %ssync invocation instance [%d/%d]: %s",
-                                (async) ? "a" : "", invocations.size() + 1, mMaxRetained,
+                                (async) ? "a" : "", invocations.size() + 1, mCoreInvocations,
                                 invocation);
                     return invocation;
 
@@ -386,14 +387,14 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
                         final Invocation<INPUT, OUTPUT> invocation =
                                 fallbackInvocations.removeFirst();
                         mLogger.dbg("converting %ssync invocation instance [%d/%d]: %s",
-                                    (async) ? "a" : "", invocations.size() + 1, mMaxRetained,
+                                    (async) ? "a" : "", invocations.size() + 1, mCoreInvocations,
                                     invocation);
                         return convertInvocation(async, invocation);
                     }
                 }
 
                 mLogger.dbg("creating %ssync invocation instance [1/%d]", (async) ? "a" : "",
-                            mMaxRetained);
+                            mCoreInvocations);
                 return createInvocation(async);
             }
         }
@@ -438,19 +439,19 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
                 final LinkedList<Invocation<INPUT, OUTPUT>> syncInvocations = mSyncInvocations;
                 final LinkedList<Invocation<INPUT, OUTPUT>> asyncInvocations = mAsyncInvocations;
 
-                if ((syncInvocations.size() + asyncInvocations.size()) < mMaxRetained) {
+                if ((syncInvocations.size() + asyncInvocations.size()) < mCoreInvocations) {
 
                     final LinkedList<Invocation<INPUT, OUTPUT>> invocations =
                             (async) ? asyncInvocations : syncInvocations;
                     logger.dbg("recycling %ssync invocation instance [%d/%d]: %s",
-                               (async) ? "a" : "", invocations.size() + 1, mMaxRetained,
+                               (async) ? "a" : "", invocations.size() + 1, mCoreInvocations,
                                invocation);
                     invocations.add(invocation);
 
                 } else {
 
                     logger.wrn("discarding %ssync invocation instance [%d/%d]: %s",
-                               (async) ? "a" : "", mMaxRetained, mMaxRetained, invocation);
+                               (async) ? "a" : "", mCoreInvocations, mCoreInvocations, invocation);
 
                     try {
 

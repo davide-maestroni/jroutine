@@ -19,17 +19,17 @@ import android.test.ActivityInstrumentationTestCase2;
 
 import com.bmd.jrt.android.R;
 import com.bmd.jrt.android.builder.AndroidRoutineBuilder;
+import com.bmd.jrt.android.builder.AndroidRoutineBuilder.CacheStrategy;
 import com.bmd.jrt.android.builder.AndroidRoutineBuilder.ClashResolution;
-import com.bmd.jrt.android.builder.AndroidRoutineBuilder.ResultCache;
 import com.bmd.jrt.android.builder.InputClashException;
 import com.bmd.jrt.android.builder.InvocationClashException;
 import com.bmd.jrt.android.builder.InvocationMissingException;
-import com.bmd.jrt.android.invocation.AndroidSimpleInvocation;
+import com.bmd.jrt.android.invocation.AndroidPassingInvocation;
+import com.bmd.jrt.android.invocation.AndroidSingleCallInvocation;
 import com.bmd.jrt.android.invocation.AndroidTemplateInvocation;
-import com.bmd.jrt.android.invocation.AndroidTunnelInvocation;
 import com.bmd.jrt.android.log.Logs;
 import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
-import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
+import com.bmd.jrt.builder.RoutineChannelBuilder.OrderBy;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.builder.RoutineConfigurationBuilder;
 import com.bmd.jrt.channel.OutputChannel;
@@ -68,7 +68,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final Routine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
                         .withId(0)
-                        .onClash(ClashResolution.ABORT)
+                        .onClash(ClashResolution.ABORT_THIS)
                         .buildRoutine();
         final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
         final OutputChannel<String> result2 = routine.callAsync("test1").afterMax(timeout);
@@ -92,7 +92,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final Routine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
                         .withId(0)
-                        .onClash(ClashResolution.ABORT_ON_INPUT)
+                        .onClash(ClashResolution.ABORT_THIS_INPUT)
                         .buildRoutine();
         final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
         final OutputChannel<String> result2 = routine.callAsync("test2").afterMax(timeout);
@@ -117,7 +117,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final OutputChannel<Data> result1 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Abort.class))
                         .withId(0)
-                        .onComplete(ResultCache.STORE_RESULT)
+                        .onComplete(CacheStrategy.CACHE_IF_SUCCESS)
                         .buildRoutine()
                         .callAsync(data1)
                         .afterMax(timeout);
@@ -137,7 +137,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final OutputChannel<Data> result2 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class))
                         .withId(0)
-                        .onComplete(ResultCache.STORE_RESULT)
+                        .onComplete(CacheStrategy.CACHE_IF_SUCCESS)
                         .buildRoutine()
                         .callAsync(data1)
                         .afterMax(timeout);
@@ -163,7 +163,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final OutputChannel<Data> result1 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class))
                         .withId(0)
-                        .onComplete(ResultCache.STORE_ERROR)
+                        .onComplete(CacheStrategy.CACHE_IF_ERROR)
                         .buildRoutine()
                         .callAsync(data1)
                         .afterMax(timeout);
@@ -175,7 +175,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final OutputChannel<Data> result2 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Abort.class))
                         .withId(0)
-                        .onComplete(ResultCache.STORE_ERROR)
+                        .onComplete(CacheStrategy.CACHE_IF_ERROR)
                         .buildRoutine()
                         .callAsync(data1)
                         .afterMax(timeout);
@@ -233,7 +233,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final Routine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
                         .withId(0)
-                        .onClash(ClashResolution.KEEP)
+                        .onClash(ClashResolution.KEEP_THAT)
                         .buildRoutine();
         final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
         final OutputChannel<String> result2 = routine.callAsync("test2").afterMax(timeout);
@@ -264,7 +264,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final Routine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
                         .withId(0)
-                        .onClash(ClashResolution.RESTART)
+                        .onClash(ClashResolution.ABORT_THAT)
                         .buildRoutine();
         final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
         final OutputChannel<String> result2 = routine.callAsync("test1").afterMax(timeout);
@@ -288,7 +288,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final Routine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
                         .withId(0)
-                        .onClash(ClashResolution.RESTART_ON_INPUT)
+                        .onClash(ClashResolution.ABORT_THAT_INPUT)
                         .buildRoutine();
         final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
         final OutputChannel<String> result2 = routine.callAsync("test2").afterMax(timeout);
@@ -313,7 +313,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final OutputChannel<Data> result1 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class))
                         .withId(0)
-                        .onComplete(ResultCache.STORE)
+                        .onComplete(CacheStrategy.CACHE)
                         .buildRoutine()
                         .callAsync(data1)
                         .afterMax(timeout);
@@ -335,7 +335,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final OutputChannel<Data> result3 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Abort.class))
                         .withId(0)
-                        .onComplete(ResultCache.STORE)
+                        .onComplete(CacheStrategy.CACHE)
                         .buildRoutine()
                         .callAsync(data1)
                         .afterMax(timeout);
@@ -394,7 +394,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final OutputChannel<Data> result1 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class))
                         .withId(0)
-                        .onComplete(ResultCache.STORE)
+                        .onComplete(CacheStrategy.CACHE)
                         .buildRoutine()
                         .callAsync(data1)
                         .afterMax(timeout);
@@ -457,7 +457,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            JRoutine.onActivity(getActivity(), AndroidRoutineBuilder.GENERATED_ID);
+            JRoutine.onActivity(getActivity(), AndroidRoutineBuilder.AUTO);
 
             fail();
 
@@ -503,7 +503,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                       .findFragmentById(
                                                                               R.id.test_fragment);
-            JRoutine.onFragment(fragment, AndroidRoutineBuilder.GENERATED_ID);
+            JRoutine.onFragment(fragment, AndroidRoutineBuilder.AUTO);
 
             fail();
 
@@ -530,38 +530,6 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         } catch (final IllegalArgumentException ignored) {
 
         }
-
-        try {
-
-            JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
-                    .logLevel(null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class)).onClash(null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
-                    .onComplete(null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
     }
 
     public void testFragmentAbort() {
@@ -573,7 +541,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final Routine<String, String> routine =
                 JRoutine.onFragment(fragment, ClassToken.tokenOf(ToUpperCase.class))
                         .withId(0)
-                        .onClash(ClashResolution.ABORT_ON_INPUT)
+                        .onClash(ClashResolution.ABORT_THIS_INPUT)
                         .buildRoutine();
         final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
         final OutputChannel<String> result2 = routine.callAsync("test2").afterMax(timeout);
@@ -600,7 +568,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final Routine<String, String> routine =
                 JRoutine.onFragment(fragment, ClassToken.tokenOf(ToUpperCase.class))
                         .withId(0)
-                        .outputOrder(DataOrder.INSERTION)
+                        .withOutputOrder(OrderBy.INSERTION)
                         .buildRoutine();
         final OutputChannel<String> channel1 = routine.callAsync("test1", "test2");
         final OutputChannel<String> channel2 = JRoutine.onFragment(fragment, 0).buildChannel();
@@ -633,7 +601,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final Routine<String, String> routine =
                 JRoutine.onFragment(fragment, ClassToken.tokenOf(ToUpperCase.class))
                         .withId(0)
-                        .onClash(ClashResolution.KEEP)
+                        .onClash(ClashResolution.KEEP_THAT)
                         .buildRoutine();
         final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
         final OutputChannel<String> result2 = routine.callAsync("test2").afterMax(timeout);
@@ -670,7 +638,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final Routine<String, String> routine =
                 JRoutine.onFragment(fragment, ClassToken.tokenOf(ToUpperCase.class))
                         .withId(0)
-                        .onClash(ClashResolution.RESTART)
+                        .onClash(ClashResolution.ABORT_THAT)
                         .buildRoutine();
         final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
         final OutputChannel<String> result2 = routine.callAsync("test1").afterMax(timeout);
@@ -697,7 +665,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final Routine<String, String> routine =
                 JRoutine.onFragment(fragment, ClassToken.tokenOf(ToUpperCase.class))
                         .withId(0)
-                        .onClash(ClashResolution.RESTART_ON_INPUT)
+                        .onClash(ClashResolution.ABORT_THAT_INPUT)
                         .buildRoutine();
         final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
         final OutputChannel<String> result2 = routine.callAsync("test2").afterMax(timeout);
@@ -734,12 +702,13 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
     public void testInvocations() {
 
         final TimeDuration timeout = TimeDuration.seconds(10);
-        final Routine<String, String> routine1 =
-                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(StringTunnelInvocation.class))
-                        .syncRunner(RunnerType.QUEUED)
-                        .loggedWith(Logs.androidLog())
-                        .logLevel(LogLevel.WARNING)
-                        .buildRoutine();
+        final Routine<String, String> routine1 = JRoutine.onActivity(getActivity(),
+                                                                     ClassToken.tokenOf(
+                                                                             StringPassingInvocation.class))
+                                                         .withSyncRunner(RunnerType.QUEUED)
+                                                         .withLog(Logs.androidLog())
+                                                         .withLogLevel(LogLevel.WARNING)
+                                                         .buildRoutine();
         assertThat(routine1.callSync("1", "2", "3", "4", "5")
                            .afterMax(timeout)
                            .readAll()).containsOnly("1", "2", "3", "4", "5");
@@ -750,12 +719,13 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                            .afterMax(timeout)
                            .readAll()).containsOnly("1", "2", "3", "4", "5");
 
-        final Routine<String, String> routine2 =
-                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(StringSimpleInvocation.class))
-                        .syncRunner(RunnerType.SEQUENTIAL)
-                        .loggedWith(Logs.androidLog())
-                        .logLevel(LogLevel.WARNING)
-                        .buildRoutine();
+        final Routine<String, String> routine2 = JRoutine.onActivity(getActivity(),
+                                                                     ClassToken.tokenOf(
+                                                                             StringSingleCallInvocation.class))
+                                                         .withSyncRunner(RunnerType.SEQUENTIAL)
+                                                         .withLog(Logs.androidLog())
+                                                         .withLogLevel(LogLevel.WARNING)
+                                                         .buildRoutine();
         assertThat(routine2.callSync("1", "2", "3", "4", "5")
                            .afterMax(timeout)
                            .readAll()).containsOnly("1", "2", "3", "4", "5");
@@ -770,61 +740,13 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
     @SuppressWarnings("ConstantConditions")
     public void testLoaderError() throws NoSuchMethodException {
 
-        final Logger logger = Logger.createLogger(null, LogLevel.DEFAULT, this);
+        final Logger logger = Logger.createLogger(null, null, this);
         final WeakReference<Object> reference = new WeakReference<Object>(getActivity());
 
         try {
 
-            new LoaderInvocation<String, String>(null, 0, ClashResolution.KEEP, ResultCache.STORE,
-                                                 ToUpperCase.class.getDeclaredConstructor(),
-                                                 DataOrder.DEFAULT, logger);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            new LoaderInvocation<String, String>(reference, 0, null, ResultCache.STORE,
-                                                 ToUpperCase.class.getDeclaredConstructor(),
-                                                 DataOrder.DEFAULT, logger);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            new LoaderInvocation<String, String>(reference, 0, ClashResolution.KEEP, null,
-                                                 ToUpperCase.class.getDeclaredConstructor(),
-                                                 DataOrder.DEFAULT, logger);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            new LoaderInvocation<String, String>(reference, 0, ClashResolution.KEEP,
-                                                 ResultCache.STORE, null, DataOrder.DEFAULT,
-                                                 logger);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            new LoaderInvocation<String, String>(reference, 0, ClashResolution.KEEP,
-                                                 ResultCache.STORE,
+            new LoaderInvocation<String, String>(null, 0, ClashResolution.KEEP_THAT,
+                                                 CacheStrategy.CACHE,
                                                  ToUpperCase.class.getDeclaredConstructor(), null,
                                                  logger);
 
@@ -836,10 +758,21 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            new LoaderInvocation<String, String>(reference, 0, ClashResolution.KEEP,
-                                                 ResultCache.STORE,
-                                                 ToUpperCase.class.getDeclaredConstructor(),
-                                                 DataOrder.DEFAULT, null);
+            new LoaderInvocation<String, String>(reference, 0, ClashResolution.KEEP_THAT, null,
+                                                 null, null, logger);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new LoaderInvocation<String, String>(reference, 0, ClashResolution.KEEP_THAT,
+                                                 CacheStrategy.CACHE,
+                                                 ToUpperCase.class.getDeclaredConstructor(), null,
+                                                 null);
 
             fail();
 
@@ -857,8 +790,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            new AndroidRoutine<String, String>(null, reference, 0, ClashResolution.KEEP,
-                                               ResultCache.STORE,
+            new AndroidRoutine<String, String>(null, reference, 0, ClashResolution.KEEP_THAT,
+                                               CacheStrategy.CACHE,
                                                ToUpperCase.class.getDeclaredConstructor());
 
             fail();
@@ -869,8 +802,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            new AndroidRoutine<String, String>(configuration, null, 0, ClashResolution.KEEP,
-                                               ResultCache.STORE,
+            new AndroidRoutine<String, String>(configuration, null, 0, ClashResolution.KEEP_THAT,
+                                               CacheStrategy.CACHE,
                                                ToUpperCase.class.getDeclaredConstructor());
 
             fail();
@@ -881,30 +814,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            new AndroidRoutine<String, String>(configuration, reference, 0, null, ResultCache.STORE,
-                                               ToUpperCase.class.getDeclaredConstructor());
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            new AndroidRoutine<String, String>(configuration, reference, 0, ClashResolution.KEEP,
-                                               null, ToUpperCase.class.getDeclaredConstructor());
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            new AndroidRoutine<String, String>(configuration, reference, 0, ClashResolution.KEEP,
-                                               ResultCache.STORE, null);
+            new AndroidRoutine<String, String>(configuration, reference, 0,
+                                               ClashResolution.KEEP_THAT, null, null);
 
             fail();
 
@@ -952,7 +863,12 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         }
     }
 
-    private static class StringSimpleInvocation extends AndroidSimpleInvocation<String, String> {
+    private static class StringPassingInvocation extends AndroidPassingInvocation<String> {
+
+    }
+
+    private static class StringSingleCallInvocation
+            extends AndroidSingleCallInvocation<String, String> {
 
         @Override
         public void onCall(@Nonnull final List<? extends String> strings,
@@ -960,10 +876,6 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
             result.pass(strings);
         }
-    }
-
-    private static class StringTunnelInvocation extends AndroidTunnelInvocation<String> {
-
     }
 
     private static class ToUpperCase extends AndroidTemplateInvocation<String, String> {

@@ -14,12 +14,11 @@
 package com.bmd.jrt.routine;
 
 import com.bmd.jrt.annotation.Async;
-import com.bmd.jrt.annotation.Async.AsyncType;
 import com.bmd.jrt.annotation.Timeout;
 import com.bmd.jrt.annotation.Wrap;
 import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
 import com.bmd.jrt.channel.OutputChannel;
-import com.bmd.jrt.channel.Tunnel;
+import com.bmd.jrt.channel.StandaloneChannel;
 import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.log.NullLog;
@@ -47,7 +46,7 @@ public class RoutineProcessorTest extends TestCase {
 
         final TestClass testClass = new TestClass();
         final TestInterfaceWrapper testWrapper = JRoutine.on(testClass)
-                                                         .syncRunner(RunnerType.SEQUENTIAL)
+                                                         .withSyncRunner(RunnerType.SEQUENTIAL)
                                                          .buildWrapper(ClassToken.tokenOf(
                                                                  TestInterfaceWrapper.class));
 
@@ -61,10 +60,10 @@ public class RoutineProcessorTest extends TestCase {
         final Runner runner = Runners.poolRunner();
         final TestClass testClass = new TestClass();
         final TestWrapper testWrapper = JRoutine.on(testClass)
-                                                .syncRunner(RunnerType.SEQUENTIAL)
-                                                .runBy(runner)
-                                                .logLevel(LogLevel.DEBUG)
-                                                .loggedWith(log)
+                                                .withSyncRunner(RunnerType.SEQUENTIAL)
+                                                .withRunner(runner)
+                                                .withLogLevel(LogLevel.DEBUG)
+                                                .withLog(log)
                                                 .buildWrapper(
                                                         ClassToken.tokenOf(TestWrapper.class));
 
@@ -82,15 +81,15 @@ public class RoutineProcessorTest extends TestCase {
         final ArrayList<String> list = new ArrayList<String>();
         assertThat(testWrapper.getList(Arrays.asList(list))).containsExactly(list);
 
-        final Tunnel<Integer> tunnel = JRoutine.on().buildTunnel();
-        tunnel.input().pass(3).close();
-        assertThat(testWrapper.getString(tunnel.output())).isEqualTo("3");
+        final StandaloneChannel<Integer> standaloneChannel = JRoutine.on().buildChannel();
+        standaloneChannel.input().pass(3).close();
+        assertThat(testWrapper.getString(standaloneChannel.output())).isEqualTo("3");
 
         assertThat(JRoutine.on(testClass)
-                           .syncRunner(RunnerType.SEQUENTIAL)
-                           .runBy(runner)
-                           .logLevel(LogLevel.DEBUG)
-                           .loggedWith(log)
+                           .withSyncRunner(RunnerType.SEQUENTIAL)
+                           .withRunner(runner)
+                           .withLogLevel(LogLevel.DEBUG)
+                           .withLog(log)
                            .buildWrapper(ClassToken.tokenOf(TestWrapper.class))).isSameAs(
                 testWrapper);
     }
@@ -113,7 +112,7 @@ public class RoutineProcessorTest extends TestCase {
     public interface TestWrapper {
 
         @Timeout(300)
-        @Async(value = List.class, type = AsyncType.PASS) //TODO: investigate PASS == PARALLEL
+        @Async(List.class)
         public Iterable<Iterable> getList(@Async(List.class) List<? extends List<String>> i);
 
         @Timeout(300)

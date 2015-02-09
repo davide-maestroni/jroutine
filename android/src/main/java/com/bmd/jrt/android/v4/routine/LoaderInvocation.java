@@ -23,23 +23,23 @@ import android.support.v4.content.Loader;
 import android.util.SparseArray;
 
 import com.bmd.jrt.android.builder.AndroidRoutineBuilder;
+import com.bmd.jrt.android.builder.AndroidRoutineBuilder.CacheStrategy;
 import com.bmd.jrt.android.builder.AndroidRoutineBuilder.ClashResolution;
-import com.bmd.jrt.android.builder.AndroidRoutineBuilder.ResultCache;
 import com.bmd.jrt.android.builder.InputClashException;
 import com.bmd.jrt.android.builder.InvocationClashException;
 import com.bmd.jrt.android.invocation.AndroidInvocation;
-import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
+import com.bmd.jrt.builder.RoutineChannelBuilder.OrderBy;
 import com.bmd.jrt.channel.InputChannel;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ResultChannel;
-import com.bmd.jrt.channel.Tunnel;
-import com.bmd.jrt.channel.Tunnel.TunnelInput;
+import com.bmd.jrt.channel.StandaloneChannel;
+import com.bmd.jrt.channel.StandaloneChannel.StandaloneInput;
 import com.bmd.jrt.common.CacheHashMap;
 import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.common.InvocationException;
 import com.bmd.jrt.common.InvocationInterruptedException;
 import com.bmd.jrt.common.RoutineException;
-import com.bmd.jrt.invocation.SimpleInvocation;
+import com.bmd.jrt.invocation.SingleCallInvocation;
 import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.time.TimeDuration;
 
@@ -62,13 +62,13 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
+class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT> {
 
     private static final CacheHashMap<Object, SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>
             sCallbackMap =
             new CacheHashMap<Object, SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>();
 
-    private final ResultCache mCacheType;
+    private final CacheStrategy mCacheStrategy;
 
     private final ClashResolution mClashResolution;
 
@@ -76,43 +76,33 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
 
     private final WeakReference<Object> mContext;
 
-    private final DataOrder mDataOrder;
-
     private final int mLoaderId;
 
     private final Logger mLogger;
 
+    private final OrderBy mOrderBy;
+
     /**
      * Constructor.
      *
-     * @param context     the context reference.
-     * @param loaderId    the loader ID.
-     * @param resolution  the clash resolution type.
-     * @param cacheType   the result cache type.
-     * @param constructor the invocation constructor.
-     * @param order       the input data order.
-     * @param logger      the logger instance.
-     * @throws java.lang.NullPointerException if any of the specified parameters is null.
+     * @param context       the context reference.
+     * @param loaderId      the loader ID.
+     * @param resolution    the clash resolution type.
+     * @param cacheStrategy the result cache type.
+     * @param constructor   the invocation constructor.
+     * @param order         the input data order.
+     * @param logger        the logger instance.
+     * @throws java.lang.NullPointerException if any of the specified non-null parameters is null.
      */
     @SuppressWarnings("ConstantConditions")
     LoaderInvocation(@Nonnull final WeakReference<Object> context, final int loaderId,
-            @Nonnull final ClashResolution resolution, @Nonnull final ResultCache cacheType,
+            @Nullable final ClashResolution resolution, @Nullable final CacheStrategy cacheStrategy,
             @Nonnull final Constructor<? extends AndroidInvocation<INPUT, OUTPUT>> constructor,
-            @Nonnull final DataOrder order, @Nonnull final Logger logger) {
+            @Nullable final OrderBy order, @Nonnull final Logger logger) {
 
         if (context == null) {
 
             throw new NullPointerException("the context reference must not be null");
-        }
-
-        if (resolution == null) {
-
-            throw new NullPointerException("the clash resolution type must not be null");
-        }
-
-        if (cacheType == null) {
-
-            throw new NullPointerException("the result cache type must not be null");
         }
 
         if (constructor == null) {
@@ -120,17 +110,12 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
             throw new NullPointerException("the invocation constructor must not be null");
         }
 
-        if (order == null) {
-
-            throw new NullPointerException("the data order must not be null");
-        }
-
         mContext = context;
         mLoaderId = loaderId;
-        mClashResolution = resolution;
-        mCacheType = cacheType;
+        mClashResolution = (resolution == null) ? ClashResolution.ABORT_THAT_INPUT : resolution;
+        mCacheStrategy = (cacheStrategy == null) ? CacheStrategy.CLEAR : cacheStrategy;
         mConstructor = constructor;
-        mDataOrder = order;
+        mOrderBy = order;
         mLogger = logger.subContextLogger(this);
     }
 
@@ -175,7 +160,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
 
         int loaderId = mLoaderId;
 
-        if (loaderId == AndroidRoutineBuilder.GENERATED_ID) {
+        if (loaderId == AndroidRoutineBuilder.AUTO) {
 
             loaderId = 31 * mConstructor.getDeclaringClass().hashCode() + inputs.hashCode();
             logger.dbg("generating invocation ID: %d", loaderId);
@@ -225,8 +210,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
             callbacks = newCallbacks;
         }
 
-        logger.dbg("setting result cache type [%d]: %s", loaderId, mCacheType);
-        callbacks.setCacheType(mCacheType);
+        logger.dbg("setting result cache type [%d]: %s", loaderId, mCacheStrategy);
+        callbacks.setCacheStrategy(mCacheStrategy);
 
         final OutputChannel<OUTPUT> outputChannel = callbacks.newChannel();
 
@@ -282,7 +267,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
         }
 
         final RoutineLoader<INPUT, OUTPUT> callbacksLoader = (loader != null) ? loader
-                : new RoutineLoader<INPUT, OUTPUT>(loaderContext, invocation, inputs, mDataOrder,
+                : new RoutineLoader<INPUT, OUTPUT>(loaderContext, invocation, inputs, mOrderBy,
                                                    logger);
         return new RoutineLoaderCallbacks<OUTPUT>(loaderManager, callbacksLoader, logger);
     }
@@ -320,27 +305,28 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
 
         final ClashResolution resolution = mClashResolution;
 
-        if (resolution == ClashResolution.RESTART) {
+        if (resolution == ClashResolution.ABORT_THAT) {
 
             logger.dbg("restarting existing invocation [%d]", loaderId);
             return true;
 
-        } else if (resolution == ClashResolution.ABORT) {
+        } else if (resolution == ClashResolution.ABORT_THIS) {
 
             logger.dbg("aborting invocation invocation [%d]", loaderId);
             throw new InputClashException(loaderId);
 
-        } else if ((resolution == ClashResolution.KEEP) || routineLoader.areSameInputs(inputs)) {
+        } else if ((resolution == ClashResolution.KEEP_THAT) || routineLoader.areSameInputs(
+                inputs)) {
 
             logger.dbg("keeping existing invocation [%d]", loaderId);
             return false;
 
-        } else if (resolution == ClashResolution.RESTART_ON_INPUT) {
+        } else if (resolution == ClashResolution.ABORT_THAT_INPUT) {
 
             logger.dbg("restarting existing invocation [%d]", loaderId);
             return true;
 
-        } else if (resolution == ClashResolution.ABORT_ON_INPUT) {
+        } else if (resolution == ClashResolution.ABORT_THIS_INPUT) {
 
             logger.dbg("aborting invocation invocation [%d]", loaderId);
             throw new InputClashException(loaderId);
@@ -359,8 +345,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
     private static class RoutineLoaderCallbacks<OUTPUT>
             implements LoaderCallbacks<InvocationResult<OUTPUT>> {
 
-        private final ArrayList<TunnelInput<OUTPUT>> mChannels =
-                new ArrayList<TunnelInput<OUTPUT>>();
+        private final ArrayList<StandaloneInput<OUTPUT>> mChannels =
+                new ArrayList<StandaloneInput<OUTPUT>>();
 
         private final RoutineLoader<?, OUTPUT> mLoader;
 
@@ -368,10 +354,10 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
 
         private final Logger mLogger;
 
-        private final ArrayList<TunnelInput<OUTPUT>> mNewChannels =
-                new ArrayList<TunnelInput<OUTPUT>>();
+        private final ArrayList<StandaloneInput<OUTPUT>> mNewChannels =
+                new ArrayList<StandaloneInput<OUTPUT>>();
 
-        private ResultCache mCacheType;
+        private CacheStrategy mCacheStrategy;
 
         private int mResultCount;
 
@@ -403,17 +389,20 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
             logger.dbg("creating new result channel");
 
             final RoutineLoader<?, OUTPUT> internalLoader = mLoader;
-            final ArrayList<TunnelInput<OUTPUT>> channels = mNewChannels;
-            final Tunnel<OUTPUT> tunnel = JRoutine.on()
-                                                  .maxSize(Integer.MAX_VALUE)
-                                                  .bufferTimeout(TimeDuration.ZERO)
-                                                  .loggedWith(logger.getLog())
-                                                  .logLevel(logger.getLogLevel())
-                                                  .buildTunnel();
-            channels.add(tunnel.input());
+            final ArrayList<StandaloneInput<OUTPUT>> channels = mNewChannels;
+            final StandaloneChannel<OUTPUT> standaloneChannel = JRoutine.on()
+                                                                        .withMaxSize(
+                                                                                Integer.MAX_VALUE)
+                                                                        .withBufferTimeout(
+                                                                                TimeDuration.ZERO)
+                                                                        .withLog(logger.getLog())
+                                                                        .withLogLevel(
+                                                                                logger.getLogLevel())
+                                                                        .buildChannel();
+            channels.add(standaloneChannel.input());
             internalLoader.setInvocationCount(
                     Math.max(channels.size(), internalLoader.getInvocationCount()));
-            return tunnel.output();
+            return standaloneChannel.output();
         }
 
         @Override
@@ -428,15 +417,15 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
                 final InvocationResult<OUTPUT> data) {
 
             final Logger logger = mLogger;
-            final ArrayList<TunnelInput<OUTPUT>> channels = mChannels;
-            final ArrayList<TunnelInput<OUTPUT>> newChannels = mNewChannels;
+            final ArrayList<StandaloneInput<OUTPUT>> channels = mChannels;
+            final ArrayList<StandaloneInput<OUTPUT>> newChannels = mNewChannels;
 
             logger.dbg("dispatching invocation result: %s", data);
 
             if (data.passTo(newChannels, channels)) {
 
-                final ArrayList<TunnelInput<OUTPUT>> channelsToClose =
-                        new ArrayList<TunnelInput<OUTPUT>>(channels);
+                final ArrayList<StandaloneInput<OUTPUT>> channelsToClose =
+                        new ArrayList<StandaloneInput<OUTPUT>>(channels);
                 channelsToClose.addAll(newChannels);
 
                 mResultCount += channels.size() + newChannels.size();
@@ -450,11 +439,11 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
                     mResultCount = 0;
                     internalLoader.setInvocationCount(0);
 
-                    final ResultCache cacheType = mCacheType;
+                    final CacheStrategy cacheStrategy = mCacheStrategy;
 
-                    if ((cacheType == ResultCache.CLEAR) || (data.isError() ? (cacheType
-                            == ResultCache.STORE_RESULT)
-                            : (cacheType == ResultCache.STORE_ERROR))) {
+                    if ((cacheStrategy == CacheStrategy.CLEAR) || (data.isError() ? (cacheStrategy
+                            == CacheStrategy.CACHE_IF_SUCCESS)
+                            : (cacheStrategy == CacheStrategy.CACHE_IF_ERROR))) {
 
                         final int id = internalLoader.getId();
                         logger.dbg("destroying Android loader: %d", id);
@@ -466,14 +455,14 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
 
                     final Throwable exception = data.getAbortException();
 
-                    for (final TunnelInput<OUTPUT> channel : channelsToClose) {
+                    for (final StandaloneInput<OUTPUT> channel : channelsToClose) {
 
                         channel.abort(exception);
                     }
 
                 } else {
 
-                    for (final TunnelInput<OUTPUT> channel : channelsToClose) {
+                    for (final StandaloneInput<OUTPUT> channel : channelsToClose) {
 
                         channel.close();
                     }
@@ -496,8 +485,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
         private void reset() {
 
             mLogger.dbg("aborting result channels");
-            final ArrayList<TunnelInput<OUTPUT>> channels = mChannels;
-            final ArrayList<TunnelInput<OUTPUT>> newChannels = mNewChannels;
+            final ArrayList<StandaloneInput<OUTPUT>> channels = mChannels;
+            final ArrayList<StandaloneInput<OUTPUT>> newChannels = mNewChannels;
             final InvocationClashException reason = new InvocationClashException(mLoader.getId());
 
             for (final InputChannel<OUTPUT> channel : channels) {
@@ -515,10 +504,10 @@ class LoaderInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT> {
             newChannels.clear();
         }
 
-        private void setCacheType(@Nonnull final ResultCache cacheType) {
+        private void setCacheStrategy(@Nonnull final CacheStrategy cacheStrategy) {
 
-            mLogger.dbg("setting cache type: %s", cacheType);
-            mCacheType = cacheType;
+            mLogger.dbg("setting cache type: %s", cacheStrategy);
+            mCacheStrategy = cacheStrategy;
         }
     }
 }

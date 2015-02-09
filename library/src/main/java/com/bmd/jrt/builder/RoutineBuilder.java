@@ -67,6 +67,16 @@ public interface RoutineBuilder {
     public RoutineBuilder apply(@Nonnull RoutineConfiguration configuration);
 
     /**
+     * Sets the action to be taken if the timeout elapses before a result can be read from the
+     * output channel.
+     *
+     * @param action the action type.
+     * @return this builder.
+     */
+    @Nonnull
+    public RoutineBuilder onReadTimeout(@Nullable TimeoutAction action);
+
+    /**
      * Sets the timeout for an invocation instance to become available.
      * <p/>
      * By default the timeout is set to 0 to avoid unexpected deadlocks.
@@ -78,7 +88,7 @@ public interface RoutineBuilder {
      * @throws java.lang.NullPointerException     if the specified time unit is null.
      */
     @Nonnull
-    public RoutineBuilder availableTimeout(long timeout, @Nonnull TimeUnit timeUnit);
+    public RoutineBuilder withAvailableTimeout(long timeout, @Nonnull TimeUnit timeUnit);
 
     /**
      * Sets the timeout for an invocation instance to become available. A null value means that
@@ -90,17 +100,18 @@ public interface RoutineBuilder {
      * @return this builder.
      */
     @Nonnull
-    public RoutineBuilder availableTimeout(@Nullable TimeDuration timeout);
+    public RoutineBuilder withAvailableTimeout(@Nullable TimeDuration timeout);
 
     /**
-     * Sets the log level.
+     * Sets the max number of retained invocation instances. A {@link RoutineConfiguration#DEFAULT}
+     * value means that it is up to the framework to chose a default number.
      *
-     * @param level the log level.
+     * @param coreInvocations the max number of instances.
      * @return this builder.
-     * @throws java.lang.NullPointerException if the log level is null.
+     * @throws java.lang.IllegalArgumentException if the number is negative.
      */
     @Nonnull
-    public RoutineBuilder logLevel(@Nonnull LogLevel level);
+    public RoutineBuilder withCoreInvocations(int coreInvocations);
 
     /**
      * Sets the log instance. A null value means that it is up to the framework to chose a default
@@ -110,41 +121,29 @@ public interface RoutineBuilder {
      * @return this builder.
      */
     @Nonnull
-    public RoutineBuilder loggedWith(@Nullable Log log);
+    public RoutineBuilder withLog(@Nullable Log log);
 
     /**
-     * Sets the max number of retained invocation instances. A {@link RoutineConfiguration#DEFAULT}
-     * value means that it is up to the framework to chose a default number.
+     * Sets the log level. A null value means that it is up to the framework to chose a default
+     * level.
      *
-     * @param maxRetainedInstances the max number of instances.
+     * @param level the log level.
      * @return this builder.
-     * @throws java.lang.IllegalArgumentException if the number is negative.
      */
     @Nonnull
-    public RoutineBuilder maxRetained(int maxRetainedInstances);
+    public RoutineBuilder withLogLevel(@Nullable LogLevel level);
 
     /**
      * Sets the max number of concurrently running invocation instances. A
      * {@link RoutineConfiguration#DEFAULT} value means that it is up to the framework to chose a
      * default number.
      *
-     * @param maxRunningInstances the max number of instances.
+     * @param maxInvocations the max number of instances.
      * @return this builder.
      * @throws java.lang.IllegalArgumentException if the number is less than 1.
      */
     @Nonnull
-    public RoutineBuilder maxRunning(int maxRunningInstances);
-
-    /**
-     * Sets the action to be taken if the timeout elapses before a result can be read from the
-     * output channel.
-     *
-     * @param action the action type.
-     * @return this builder.
-     * @throws java.lang.NullPointerException if the specified action type is null.
-     */
-    @Nonnull
-    public RoutineBuilder onReadTimeout(@Nonnull TimeoutAction action);
+    public RoutineBuilder withMaxInvocations(int maxInvocations);
 
     /**
      * Sets the timeout for an invocation instance to produce a readable result.
@@ -158,7 +157,7 @@ public interface RoutineBuilder {
      * @throws java.lang.NullPointerException     if the specified time unit is null.
      */
     @Nonnull
-    public RoutineBuilder readTimeout(long timeout, @Nonnull TimeUnit timeUnit);
+    public RoutineBuilder withReadTimeout(long timeout, @Nonnull TimeUnit timeUnit);
 
     /**
      * Sets the timeout for an invocation instance to produce a readable result. A null value means
@@ -170,7 +169,7 @@ public interface RoutineBuilder {
      * @return this builder.
      */
     @Nonnull
-    public RoutineBuilder readTimeout(@Nullable TimeDuration timeout);
+    public RoutineBuilder withReadTimeout(@Nullable TimeDuration timeout);
 
     /**
      * Sets the asynchronous runner instance. A null value means that it is up to the framework
@@ -180,17 +179,17 @@ public interface RoutineBuilder {
      * @return this builder.
      */
     @Nonnull
-    public RoutineBuilder runBy(@Nullable Runner runner);
+    public RoutineBuilder withRunner(@Nullable Runner runner);
 
     /**
-     * Sets the type of the synchronous runner to be used by the routine.
+     * Sets the type of the synchronous runner to be used by the routine. A null value means that it
+     * is up to the framework to chose a default order type.
      *
      * @param type the runner type.
      * @return this builder.
-     * @throws java.lang.NullPointerException if the specified type is null.
      */
     @Nonnull
-    public RoutineBuilder syncRunner(@Nonnull RunnerType type);
+    public RoutineBuilder withSyncRunner(@Nullable RunnerType type);
 
     /**
      * Synchronous runner type enumeration.
@@ -210,12 +209,7 @@ public interface RoutineBuilder {
          * to other routines.<br/>
          * The executions are run inside the calling thread.
          */
-        QUEUED,
-        /**
-         * Default runner.<br/>
-         * This value is used to indicated that the choice of the runner is left to the framework.
-         */
-        DEFAULT
+        QUEUED
     }
 
     /**
@@ -240,11 +234,6 @@ public interface RoutineBuilder {
          * If no result is available after the specified timeout, the invocation will be aborted and
          * the method will immediately exit.
          */
-        ABORT,
-        /**
-         * Default action.<br/>
-         * This value is used to indicated that the choice of the action is left to the framework.
-         */
-        DEFAULT //TODO: remove
+        ABORT
     }
 }

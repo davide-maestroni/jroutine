@@ -20,13 +20,13 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.test.ActivityInstrumentationTestCase2;
 
-import com.bmd.jrt.android.invocation.AndroidSimpleInvocation;
+import com.bmd.jrt.android.invocation.AndroidPassingInvocation;
+import com.bmd.jrt.android.invocation.AndroidSingleCallInvocation;
 import com.bmd.jrt.android.invocation.AndroidTemplateInvocation;
-import com.bmd.jrt.android.invocation.AndroidTunnelInvocation;
 import com.bmd.jrt.android.log.AndroidLog;
 import com.bmd.jrt.android.runner.MainRunner;
 import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
-import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
+import com.bmd.jrt.builder.RoutineChannelBuilder.OrderBy;
 import com.bmd.jrt.builder.RoutineConfigurationBuilder;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ResultChannel;
@@ -64,7 +64,7 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
         final Routine<Data, Data> routine1 =
                 JRoutine.onService(getActivity(), ClassToken.tokenOf(Delay.class))
                         .dispatchTo(Looper.getMainLooper())
-                        .runnerClass(MainRunner.class)
+                        .withRunnerClass(MainRunner.class)
                         .buildRoutine();
 
         final OutputChannel<Data> channel = routine1.callAsync(data);
@@ -102,12 +102,12 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
 
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine1 =
-                JRoutine.onService(getActivity(), ClassToken.tokenOf(StringTunnelInvocation.class))
+                JRoutine.onService(getActivity(), ClassToken.tokenOf(StringPassingInvocation.class))
                         .dispatchTo(Looper.getMainLooper())
-                        .syncRunner(RunnerType.QUEUED)
-                        .inputOrder(DataOrder.DELIVERY)
-                        .logClass(AndroidLog.class)
-                        .logLevel(LogLevel.DEBUG)
+                        .withSyncRunner(RunnerType.QUEUED)
+                        .withInputOrder(OrderBy.DELIVERY)
+                        .withLogClass(AndroidLog.class)
+                        .withLogLevel(LogLevel.DEBUG)
                         .buildRoutine();
         assertThat(routine1.callSync("1", "2", "3", "4", "5")
                            .afterMax(timeout)
@@ -119,14 +119,15 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
                            .afterMax(timeout)
                            .readAll()).containsOnly("1", "2", "3", "4", "5");
 
-        final Routine<String, String> routine2 =
-                JRoutine.onService(getActivity(), ClassToken.tokenOf(StringSimpleInvocation.class))
-                        .dispatchTo(Looper.getMainLooper())
-                        .syncRunner(RunnerType.SEQUENTIAL)
-                        .outputOrder(DataOrder.DELIVERY)
-                        .logClass(AndroidLog.class)
-                        .logLevel(LogLevel.DEBUG)
-                        .buildRoutine();
+        final Routine<String, String> routine2 = JRoutine.onService(getActivity(),
+                                                                    ClassToken.tokenOf(
+                                                                            StringSingleCallInvocation.class))
+                                                         .dispatchTo(Looper.getMainLooper())
+                                                         .withSyncRunner(RunnerType.SEQUENTIAL)
+                                                         .withOutputOrder(OrderBy.DELIVERY)
+                                                         .withLogClass(AndroidLog.class)
+                                                         .withLogLevel(LogLevel.DEBUG)
+                                                         .buildRoutine();
         assertThat(routine2.callSync("1", "2", "3", "4", "5")
                            .afterMax(timeout)
                            .readAll()).containsExactly("1", "2", "3", "4", "5");
@@ -138,13 +139,14 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
                            .readAll()).containsOnly("1", "2", "3", "4", "5");
 
         final RoutineConfigurationBuilder builder =
-                new RoutineConfigurationBuilder().inputOrder(DataOrder.INSERTION)
-                                                 .outputOrder(DataOrder.INSERTION);
-        final Routine<String, String> routine3 =
-                JRoutine.onService(getActivity(), ClassToken.tokenOf(StringSimpleInvocation.class))
-                        .dispatchTo(Looper.getMainLooper())
-                        .apply(builder.buildConfiguration())
-                        .buildRoutine();
+                new RoutineConfigurationBuilder().withInputOrder(OrderBy.INSERTION)
+                                                 .withOutputOrder(OrderBy.INSERTION);
+        final Routine<String, String> routine3 = JRoutine.onService(getActivity(),
+                                                                    ClassToken.tokenOf(
+                                                                            StringSingleCallInvocation.class))
+                                                         .dispatchTo(Looper.getMainLooper())
+                                                         .apply(builder.buildConfiguration())
+                                                         .buildRoutine();
         assertThat(routine3.callSync("1", "2", "3", "4", "5")
                            .afterMax(timeout)
                            .readAll()).containsExactly("1", "2", "3", "4", "5");
@@ -155,14 +157,16 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
                            .afterMax(timeout)
                            .readAll()).containsExactly("1", "2", "3", "4", "5");
 
-        final Routine<String, String> routine4 =
-                JRoutine.onService(getActivity(), ClassToken.tokenOf(StringSimpleInvocation.class))
-                        .dispatchTo(Looper.getMainLooper())
-                        .maxRetained(0)
-                        .maxRunning(2)
-                        .availableTimeout(1, TimeUnit.SECONDS)
-                        .availableTimeout(TimeDuration.millis(200))
-                        .buildRoutine();
+        final Routine<String, String> routine4 = JRoutine.onService(getActivity(),
+                                                                    ClassToken.tokenOf(
+                                                                            StringSingleCallInvocation.class))
+                                                         .dispatchTo(Looper.getMainLooper())
+                                                         .withCoreInstances(0)
+                                                         .withMaxInstances(2)
+                                                         .withAvailableTimeout(1, TimeUnit.SECONDS)
+                                                         .withAvailableTimeout(
+                                                                 TimeDuration.millis(200))
+                                                         .buildRoutine();
         assertThat(routine4.callSync("1", "2", "3", "4", "5")
                            .afterMax(timeout)
                            .readAll()).containsOnly("1", "2", "3", "4", "5");
@@ -189,9 +193,9 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
 
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine =
-                JRoutine.onService(getActivity(), ClassToken.tokenOf(StringTunnelInvocation.class))
+                JRoutine.onService(getActivity(), ClassToken.tokenOf(StringPassingInvocation.class))
                         .dispatchTo(Looper.getMainLooper())
-                        .serviceClass(TestService.class)
+                        .withServiceClass(TestService.class)
                         .buildRoutine();
         assertThat(
                 routine.callSync("1", "2", "3", "4", "5").afterMax(timeout).readAll()).containsOnly(
@@ -331,11 +335,16 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
         }
     }
 
-    private static class MyParcelableInvocation extends AndroidTunnelInvocation<MyParcelable> {
+    private static class MyParcelableInvocation extends AndroidPassingInvocation<MyParcelable> {
 
     }
 
-    private static class StringSimpleInvocation extends AndroidSimpleInvocation<String, String> {
+    private static class StringPassingInvocation extends AndroidPassingInvocation<String> {
+
+    }
+
+    private static class StringSingleCallInvocation
+            extends AndroidSingleCallInvocation<String, String> {
 
         @Override
         public void onCall(@Nonnull final List<? extends String> strings,
@@ -343,9 +352,5 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
 
             result.pass(strings);
         }
-    }
-
-    private static class StringTunnelInvocation extends AndroidTunnelInvocation<String> {
-
     }
 }

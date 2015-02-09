@@ -16,6 +16,7 @@ package com.bmd.jrt.log;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -42,8 +43,10 @@ public abstract class TemplateLog implements Log {
     private static String format(@Nonnull final LogLevel level,
             @Nonnull final List<Object> contexts, @Nullable final String message) {
 
-        return String.format(LOG_FORMAT, new SimpleDateFormat(DATE_FORMAT).format(new Date()),
-                             Thread.currentThread().getName(), contexts.toString(), level, message);
+        return String.format(LOG_FORMAT,
+                             new SimpleDateFormat(DATE_FORMAT, Locale.getDefault()).format(
+                                     new Date()), Thread.currentThread().getName(),
+                             contexts.toString(), level, message);
     }
 
     @Override

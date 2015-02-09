@@ -34,23 +34,23 @@ public class RoutineConfigurationBuilder implements RoutineChannelBuilder {
 
     private TimeDuration mAvailTimeout = null;
 
+    private int mCoreInvocations = RoutineConfiguration.DEFAULT;
+
     private int mInputMaxSize = RoutineConfiguration.DEFAULT;
 
-    private DataOrder mInputOrder = DataOrder.DEFAULT;
+    private OrderBy mInputOrder = null;
 
     private TimeDuration mInputTimeout = null;
 
     private Log mLog = null;
 
-    private LogLevel mLogLevel = LogLevel.DEFAULT;
+    private LogLevel mLogLevel = null;
 
-    private int mMaxRetained = RoutineConfiguration.DEFAULT;
-
-    private int mMaxRunning = RoutineConfiguration.DEFAULT;
+    private int mMaxInvocations = RoutineConfiguration.DEFAULT;
 
     private int mOutputMaxSize = RoutineConfiguration.DEFAULT;
 
-    private DataOrder mOutputOrder = DataOrder.DEFAULT;
+    private OrderBy mOutputOrder = null;
 
     private TimeDuration mOutputTimeout = null;
 
@@ -58,9 +58,9 @@ public class RoutineConfigurationBuilder implements RoutineChannelBuilder {
 
     private Runner mRunner = null;
 
-    private RunnerType mRunnerType = RunnerType.DEFAULT;
+    private RunnerType mRunnerType = null;
 
-    private TimeoutAction mTimeoutAction = TimeoutAction.DEFAULT;
+    private TimeoutAction mTimeoutAction = null;
 
     /**
      * Constructor.
@@ -79,8 +79,8 @@ public class RoutineConfigurationBuilder implements RoutineChannelBuilder {
 
         mRunner = initialConfiguration.getRunnerOr(mRunner);
         mRunnerType = initialConfiguration.getSyncRunnerOr(mRunnerType);
-        mMaxRunning = initialConfiguration.getMaxRunningOr(mMaxRunning);
-        mMaxRetained = initialConfiguration.getMaxRetainedOr(mMaxRetained);
+        mMaxInvocations = initialConfiguration.getMaxInvocationsOr(mMaxInvocations);
+        mCoreInvocations = initialConfiguration.getCoreInvocationsOr(mCoreInvocations);
         mAvailTimeout = initialConfiguration.getAvailTimeoutOr(mAvailTimeout);
         mReadTimeout = initialConfiguration.getReadTimeoutOr(mReadTimeout);
         mTimeoutAction = initialConfiguration.getReadTimeoutActionOr(mTimeoutAction);
@@ -102,106 +102,106 @@ public class RoutineConfigurationBuilder implements RoutineChannelBuilder {
 
         if (runner != null) {
 
-            runBy(runner);
+            withRunner(runner);
         }
 
-        final RunnerType syncRunner = configuration.getSyncRunnerOr(RunnerType.DEFAULT);
+        final RunnerType syncRunner = configuration.getSyncRunnerOr(null);
 
-        if (syncRunner != RunnerType.DEFAULT) {
+        if (syncRunner != null) {
 
-            syncRunner(syncRunner);
+            withSyncRunner(syncRunner);
         }
 
-        final int maxRunning = configuration.getMaxRunningOr(RoutineConfiguration.DEFAULT);
+        final int maxInvocations = configuration.getMaxInvocationsOr(RoutineConfiguration.DEFAULT);
 
-        if (maxRunning != RoutineConfiguration.DEFAULT) {
+        if (maxInvocations != RoutineConfiguration.DEFAULT) {
 
-            maxRunning(maxRunning);
+            withMaxInvocations(maxInvocations);
         }
 
-        final int maxRetained = configuration.getMaxRetainedOr(RoutineConfiguration.DEFAULT);
+        final int coreInvocations =
+                configuration.getCoreInvocationsOr(RoutineConfiguration.DEFAULT);
 
-        if (maxRetained != RoutineConfiguration.DEFAULT) {
+        if (coreInvocations != RoutineConfiguration.DEFAULT) {
 
-            maxRetained(maxRetained);
+            withCoreInvocations(coreInvocations);
         }
 
         final TimeDuration availTimeout = configuration.getAvailTimeoutOr(null);
 
         if (availTimeout != null) {
 
-            availableTimeout(availTimeout);
+            withAvailableTimeout(availTimeout);
         }
 
         final TimeDuration readTimeout = configuration.getReadTimeoutOr(null);
 
         if (readTimeout != null) {
 
-            readTimeout(readTimeout);
+            withReadTimeout(readTimeout);
         }
 
-        final TimeoutAction timeoutAction =
-                configuration.getReadTimeoutActionOr(TimeoutAction.DEFAULT);
+        final TimeoutAction timeoutAction = configuration.getReadTimeoutActionOr(null);
 
-        if (timeoutAction != TimeoutAction.DEFAULT) {
+        if (timeoutAction != null) {
 
             onReadTimeout(timeoutAction);
         }
 
-        final DataOrder inputOrder = configuration.getInputOrderOr(DataOrder.DEFAULT);
+        final OrderBy inputOrder = configuration.getInputOrderOr(null);
 
-        if (inputOrder != DataOrder.DEFAULT) {
+        if (inputOrder != null) {
 
-            inputOrder(inputOrder);
+            withInputOrder(inputOrder);
         }
 
         final int inputSize = configuration.getInputSizeOr(RoutineConfiguration.DEFAULT);
 
         if (inputSize != RoutineConfiguration.DEFAULT) {
 
-            inputSize(inputSize);
+            withInputSize(inputSize);
         }
 
         final TimeDuration inputTimeout = configuration.getInputTimeoutOr(null);
 
         if (inputTimeout != null) {
 
-            inputTimeout(inputTimeout);
+            withInputTimeout(inputTimeout);
         }
 
-        final DataOrder outputOrder = configuration.getOutputOrderOr(DataOrder.DEFAULT);
+        final OrderBy outputOrder = configuration.getOutputOrderOr(null);
 
-        if (outputOrder != DataOrder.DEFAULT) {
+        if (outputOrder != null) {
 
-            outputOrder(outputOrder);
+            withOutputOrder(outputOrder);
         }
 
         final int outputSize = configuration.getOutputSizeOr(RoutineConfiguration.DEFAULT);
 
         if (outputSize != RoutineConfiguration.DEFAULT) {
 
-            outputSize(outputSize);
+            withOutputSize(outputSize);
         }
 
         final TimeDuration outputTimeout = configuration.getOutputTimeoutOr(null);
 
         if (outputTimeout != null) {
 
-            outputTimeout(outputTimeout);
+            withOutputTimeout(outputTimeout);
         }
 
         final Log log = configuration.getLogOr(null);
 
         if (log != null) {
 
-            loggedWith(log);
+            withLog(log);
         }
 
-        final LogLevel logLevel = configuration.getLogLevelOr(LogLevel.DEFAULT);
+        final LogLevel logLevel = configuration.getLogLevelOr(null);
 
-        if (logLevel != LogLevel.DEFAULT) {
+        if (logLevel != null) {
 
-            logLevel(logLevel);
+            withLogLevel(logLevel);
         }
 
         return this;
@@ -209,79 +209,7 @@ public class RoutineConfigurationBuilder implements RoutineChannelBuilder {
 
     @Nonnull
     @Override
-    public RoutineConfigurationBuilder availableTimeout(final long timeout,
-            @Nonnull final TimeUnit timeUnit) {
-
-        return availableTimeout(fromUnit(timeout, timeUnit));
-    }
-
-    @Nonnull
-    @Override
-    public RoutineConfigurationBuilder availableTimeout(@Nullable final TimeDuration timeout) {
-
-        mAvailTimeout = timeout;
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    @SuppressWarnings("ConstantConditions")
-    public RoutineConfigurationBuilder logLevel(@Nonnull final LogLevel level) {
-
-        if (level == null) {
-
-            throw new NullPointerException("the log level must not be null");
-        }
-
-        mLogLevel = level;
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public RoutineConfigurationBuilder loggedWith(@Nullable final Log log) {
-
-        mLog = log;
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public RoutineConfigurationBuilder maxRetained(final int maxRetainedInstances) {
-
-        if ((maxRetainedInstances != RoutineConfiguration.DEFAULT) && (maxRetainedInstances < 0)) {
-
-            throw new IllegalArgumentException(
-                    "the maximum number of retained instances cannot be negative");
-        }
-
-        mMaxRetained = maxRetainedInstances;
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public RoutineConfigurationBuilder maxRunning(final int maxRunningInstances) {
-
-        if ((maxRunningInstances != RoutineConfiguration.DEFAULT) && (maxRunningInstances < 1)) {
-
-            throw new IllegalArgumentException(
-                    "the maximum number of concurrently running instances cannot be less than 1");
-        }
-
-        mMaxRunning = maxRunningInstances;
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    @SuppressWarnings("ConstantConditions")
-    public RoutineConfigurationBuilder onReadTimeout(@Nonnull final TimeoutAction action) {
-
-        if (action == null) {
-
-            throw new NullPointerException("the result timeout action must not be null");
-        }
+    public RoutineConfigurationBuilder onReadTimeout(@Nullable final TimeoutAction action) {
 
         mTimeoutAction = action;
         return this;
@@ -289,15 +217,75 @@ public class RoutineConfigurationBuilder implements RoutineChannelBuilder {
 
     @Nonnull
     @Override
-    public RoutineConfigurationBuilder readTimeout(final long timeout,
+    public RoutineConfigurationBuilder withAvailableTimeout(final long timeout,
             @Nonnull final TimeUnit timeUnit) {
 
-        return readTimeout(fromUnit(timeout, timeUnit));
+        return withAvailableTimeout(fromUnit(timeout, timeUnit));
     }
 
     @Nonnull
     @Override
-    public RoutineConfigurationBuilder readTimeout(@Nullable final TimeDuration timeout) {
+    public RoutineConfigurationBuilder withAvailableTimeout(@Nullable final TimeDuration timeout) {
+
+        mAvailTimeout = timeout;
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public RoutineConfigurationBuilder withCoreInvocations(final int coreInvocations) {
+
+        if ((coreInvocations != RoutineConfiguration.DEFAULT) && (coreInvocations < 0)) {
+
+            throw new IllegalArgumentException(
+                    "the maximum number of retained instances cannot be negative");
+        }
+
+        mCoreInvocations = coreInvocations;
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public RoutineConfigurationBuilder withLog(@Nullable final Log log) {
+
+        mLog = log;
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public RoutineConfigurationBuilder withLogLevel(@Nullable final LogLevel level) {
+
+        mLogLevel = level;
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public RoutineConfigurationBuilder withMaxInvocations(final int maxInvocations) {
+
+        if ((maxInvocations != RoutineConfiguration.DEFAULT) && (maxInvocations < 1)) {
+
+            throw new IllegalArgumentException(
+                    "the maximum number of concurrently running instances cannot be less than 1");
+        }
+
+        mMaxInvocations = maxInvocations;
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public RoutineConfigurationBuilder withReadTimeout(final long timeout,
+            @Nonnull final TimeUnit timeUnit) {
+
+        return withReadTimeout(fromUnit(timeout, timeUnit));
+    }
+
+    @Nonnull
+    @Override
+    public RoutineConfigurationBuilder withReadTimeout(@Nullable final TimeDuration timeout) {
 
         mReadTimeout = timeout;
         return this;
@@ -305,7 +293,7 @@ public class RoutineConfigurationBuilder implements RoutineChannelBuilder {
 
     @Nonnull
     @Override
-    public RoutineConfigurationBuilder runBy(@Nullable final Runner runner) {
+    public RoutineConfigurationBuilder withRunner(@Nullable final Runner runner) {
 
         mRunner = runner;
         return this;
@@ -313,13 +301,7 @@ public class RoutineConfigurationBuilder implements RoutineChannelBuilder {
 
     @Nonnull
     @Override
-    @SuppressWarnings("ConstantConditions")
-    public RoutineConfigurationBuilder syncRunner(@Nonnull final RunnerType type) {
-
-        if (type == null) {
-
-            throw new NullPointerException("the synchronous runner type must not be null");
-        }
+    public RoutineConfigurationBuilder withSyncRunner(@Nullable final RunnerType type) {
 
         mRunnerType = type;
         return this;
@@ -327,13 +309,7 @@ public class RoutineConfigurationBuilder implements RoutineChannelBuilder {
 
     @Nonnull
     @Override
-    @SuppressWarnings("ConstantConditions")
-    public RoutineConfigurationBuilder inputOrder(@Nonnull final DataOrder order) {
-
-        if (order == null) {
-
-            throw new NullPointerException("the input order type must not be null");
-        }
+    public RoutineConfigurationBuilder withInputOrder(@Nullable final OrderBy order) {
 
         mInputOrder = order;
         return this;
@@ -341,7 +317,7 @@ public class RoutineConfigurationBuilder implements RoutineChannelBuilder {
 
     @Nonnull
     @Override
-    public RoutineConfigurationBuilder inputSize(final int inputMaxSize) {
+    public RoutineConfigurationBuilder withInputSize(final int inputMaxSize) {
 
         if ((inputMaxSize != RoutineConfiguration.DEFAULT) && (inputMaxSize <= 0)) {
 
@@ -354,7 +330,7 @@ public class RoutineConfigurationBuilder implements RoutineChannelBuilder {
 
     @Nonnull
     @Override
-    public RoutineConfigurationBuilder inputTimeout(@Nullable final TimeDuration timeout) {
+    public RoutineConfigurationBuilder withInputTimeout(@Nullable final TimeDuration timeout) {
 
         mInputTimeout = timeout;
         return this;
@@ -362,21 +338,15 @@ public class RoutineConfigurationBuilder implements RoutineChannelBuilder {
 
     @Nonnull
     @Override
-    public RoutineConfigurationBuilder inputTimeout(final long timeout,
+    public RoutineConfigurationBuilder withInputTimeout(final long timeout,
             @Nonnull final TimeUnit timeUnit) {
 
-        return inputTimeout(fromUnit(timeout, timeUnit));
+        return withInputTimeout(fromUnit(timeout, timeUnit));
     }
 
     @Nonnull
     @Override
-    @SuppressWarnings("ConstantConditions")
-    public RoutineConfigurationBuilder outputOrder(@Nonnull final DataOrder order) {
-
-        if (order == null) {
-
-            throw new NullPointerException("the output order type must not be null");
-        }
+    public RoutineConfigurationBuilder withOutputOrder(@Nullable final OrderBy order) {
 
         mOutputOrder = order;
         return this;
@@ -384,7 +354,7 @@ public class RoutineConfigurationBuilder implements RoutineChannelBuilder {
 
     @Nonnull
     @Override
-    public RoutineConfigurationBuilder outputSize(final int outputMaxSize) {
+    public RoutineConfigurationBuilder withOutputSize(final int outputMaxSize) {
 
         if ((outputMaxSize != RoutineConfiguration.DEFAULT) && (outputMaxSize <= 0)) {
 
@@ -397,18 +367,18 @@ public class RoutineConfigurationBuilder implements RoutineChannelBuilder {
 
     @Nonnull
     @Override
-    public RoutineConfigurationBuilder outputTimeout(final long timeout,
-            @Nonnull final TimeUnit timeUnit) {
+    public RoutineConfigurationBuilder withOutputTimeout(@Nullable final TimeDuration timeout) {
 
-        return outputTimeout(fromUnit(timeout, timeUnit));
+        mOutputTimeout = timeout;
+        return this;
     }
 
     @Nonnull
     @Override
-    public RoutineConfigurationBuilder outputTimeout(@Nullable final TimeDuration timeout) {
+    public RoutineConfigurationBuilder withOutputTimeout(final long timeout,
+            @Nonnull final TimeUnit timeUnit) {
 
-        mOutputTimeout = timeout;
-        return this;
+        return withOutputTimeout(fromUnit(timeout, timeUnit));
     }
 
     /**
@@ -419,7 +389,7 @@ public class RoutineConfigurationBuilder implements RoutineChannelBuilder {
     @Nonnull
     public RoutineConfiguration buildConfiguration() {
 
-        return new RoutineConfiguration(mRunner, mRunnerType, mMaxRunning, mMaxRetained,
+        return new RoutineConfiguration(mRunner, mRunnerType, mMaxInvocations, mCoreInvocations,
                                         mAvailTimeout, mReadTimeout, mTimeoutAction, mInputMaxSize,
                                         mInputTimeout, mInputOrder, mOutputMaxSize, mOutputTimeout,
                                         mOutputOrder, mLog, mLogLevel);

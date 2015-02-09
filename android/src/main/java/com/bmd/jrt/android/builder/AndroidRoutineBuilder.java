@@ -14,7 +14,7 @@
 package com.bmd.jrt.android.builder;
 
 import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
-import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
+import com.bmd.jrt.builder.RoutineChannelBuilder.OrderBy;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
@@ -34,8 +34,8 @@ import javax.annotation.Nullable;
  * Note that the <code>equals()</code> and <code>hashCode()</code> methods of the input parameter
  * objects might be employed to check for clashing of invocations or compute the invocation ID.<br/>
  * In case the caller cannot guarantee the correct behavior of the aforementioned method
- * implementations, a user defined ID or the <code>RESTART</code> clash resolution should be used to
- * avoid unexpected results.
+ * implementations, a user defined ID or the <code>ABORT_THAT</code> clash resolution should be used
+ * to avoid unexpected results.
  * <p/>
  * Created by davide on 12/9/14.
  *
@@ -47,7 +47,7 @@ public interface AndroidRoutineBuilder<INPUT, OUTPUT> {
     /**
      * Constant identifying a routine ID computed from the executor class and the input parameters.
      */
-    public static final int GENERATED_ID = Integer.MIN_VALUE;
+    public static final int AUTO = Integer.MIN_VALUE;
 
     /**
      * Applies the specified configuration to this builder.<br/>
@@ -69,75 +69,25 @@ public interface AndroidRoutineBuilder<INPUT, OUTPUT> {
     public Routine<INPUT, OUTPUT> buildRoutine();
 
     /**
-     * Sets the order in which input data are collected from the input channel.
-     *
-     * @param order the order type.
-     * @return this builder.
-     * @throws java.lang.NullPointerException if the specified order type is null.
-     */
-    @Nonnull
-    public AndroidRoutineBuilder<INPUT, OUTPUT> inputOrder(@Nonnull DataOrder order);
-
-    /**
-     * Sets the log level.
-     *
-     * @param level the log level.
-     * @return this builder.
-     * @throws java.lang.NullPointerException if the log level is null.
-     */
-    @Nonnull
-    public AndroidRoutineBuilder<INPUT, OUTPUT> logLevel(@Nonnull LogLevel level);
-
-    /**
-     * Sets the log instance. A null value means that it is up to the framework to chose a default
-     * implementation.
-     *
-     * @param log the log instance.
-     * @return this builder.
-     */
-    @Nonnull
-    public AndroidRoutineBuilder<INPUT, OUTPUT> loggedWith(@Nullable Log log);
-
-    /**
-     * Tells the builder how to resolve clashes of invocation inputs. A clash happens when an
-     * invocation of the same type and with the same ID is still running.
+     * Tells the builder how to resolve clashes of invocations. A clash happens when an invocation
+     * of the same type and with the same ID is still running. A null value means that it is up to
+     * the framework to chose a default resolution type.
      *
      * @param resolution the type of resolution.
      * @return this builder.
-     * @throws java.lang.NullPointerException if the specified resolution type is null.
      */
     @Nonnull
-    public AndroidRoutineBuilder<INPUT, OUTPUT> onClash(@Nonnull ClashResolution resolution);
+    public AndroidRoutineBuilder<INPUT, OUTPUT> onClash(@Nullable ClashResolution resolution);
 
     /**
-     * Tells the builder how to cache the invocation result after its completion.
+     * Tells the builder how to cache the invocation result after its completion. A null value means
+     * that it is up to the framework to chose a default strategy.
      *
-     * @param cacheType the cache type.
+     * @param cacheStrategy the cache type.
      * @return this builder.
-     * @throws java.lang.NullPointerException if the specified cache type is null.
      */
     @Nonnull
-    public AndroidRoutineBuilder<INPUT, OUTPUT> onComplete(@Nonnull ResultCache cacheType);
-
-    /**
-     * Sets the order in which output data are collected from the result channel.
-     *
-     * @param order the order type.
-     * @return this builder.
-     * @throws java.lang.NullPointerException if the specified order type is null.
-     */
-    @Nonnull
-    public AndroidRoutineBuilder<INPUT, OUTPUT> outputOrder(@Nonnull DataOrder order);
-
-    /**
-     * Sets the type of the synchronous runner to be used by the routine.
-     *
-     * @param type the runner type.
-     * @return this builder.
-     * @throws java.lang.NullPointerException if the specified type is null.
-     */
-    @Nonnull
-    public AndroidRoutineBuilder<INPUT, OUTPUT> syncRunner(@Nonnull RunnerType type);
+    public AndroidRoutineBuilder<INPUT, OUTPUT> onComplete(@Nullable CacheStrategy cacheStrategy);
 
     /**
      * Tells the builder to identify the invocation with the specified ID.
@@ -147,6 +97,82 @@ public interface AndroidRoutineBuilder<INPUT, OUTPUT> {
      */
     @Nonnull
     public AndroidRoutineBuilder<INPUT, OUTPUT> withId(int id);
+
+    /**
+     * Sets the order in which input data are collected from the input channel. A null value means
+     * that it is up to the framework to chose a default order type.
+     *
+     * @param order the order type.
+     * @return this builder.
+     */
+    @Nonnull
+    public AndroidRoutineBuilder<INPUT, OUTPUT> withInputOrder(@Nullable OrderBy order);
+
+    /**
+     * Sets the log instance. A null value means that it is up to the framework to chose a default
+     * implementation.
+     *
+     * @param log the log instance.
+     * @return this builder.
+     */
+    @Nonnull
+    public AndroidRoutineBuilder<INPUT, OUTPUT> withLog(@Nullable Log log);
+
+    /**
+     * Sets the log level. A null value means that it is up to the framework to chose a default
+     * level.
+     *
+     * @param level the log level.
+     * @return this builder.
+     */
+    @Nonnull
+    public AndroidRoutineBuilder<INPUT, OUTPUT> withLogLevel(@Nullable LogLevel level);
+
+    /**
+     * Sets the order in which output data are collected from the result channel. A null value means
+     * that it is up to the framework to chose a default order type.
+     *
+     * @param order the order type.
+     * @return this builder.
+     */
+    @Nonnull
+    public AndroidRoutineBuilder<INPUT, OUTPUT> withOutputOrder(@Nullable OrderBy order);
+
+    /**
+     * Sets the type of the synchronous runner to be used by the routine. A null value means that it
+     * is up to the framework to chose a default runner type.
+     *
+     * @param type the runner type.
+     * @return this builder.
+     */
+    @Nonnull
+    public AndroidRoutineBuilder<INPUT, OUTPUT> withSyncRunner(@Nullable RunnerType type);
+
+    /**
+     * Result cache type enumeration.<br/>
+     * The cache type indicates what will happen to the result of an invocation after its
+     * completion.
+     */
+    public enum CacheStrategy {
+
+        /**
+         * On completion the invocation results are cleared.
+         */
+        CLEAR,
+        /**
+         * Only in case of error the results are cleared, otherwise they are retained.
+         */
+        CACHE_IF_SUCCESS,
+        /**
+         * Only in case of successful completion the results are cleared, otherwise they are
+         * retained.
+         */
+        CACHE_IF_ERROR,
+        /**
+         * On completion the invocation results are retained.
+         */
+        CACHE,
+    }
 
     /**
      * Invocation clash resolution enumeration.<br/>
@@ -167,60 +193,24 @@ public interface AndroidRoutineBuilder<INPUT, OUTPUT> {
         /**
          * The clash is resolved by restarting the running invocation.
          */
-        RESTART,
+        ABORT_THAT,
         /**
          * The clash is resolved by keeping the running invocation.
          */
-        KEEP,
+        KEEP_THAT,
         /**
          * The clash is resolved by aborting the invocation with an {@link InputClashException}.
          */
-        ABORT,
+        ABORT_THIS,
         /**
          * The clash is resolved by restarting the running invocation, only in case its input data
          * are different from the current ones.
          */
-        RESTART_ON_INPUT,
+        ABORT_THAT_INPUT,
         /**
          * The clash is resolved by aborting the invocation with an {@link InputClashException},
          * only in case its input data are different from the current ones.
          */
-        ABORT_ON_INPUT,
-        /**
-         * The default resolution, that is, it is let to the framework decide the best strategy to
-         * resolve the clash.
-         */
-        DEFAULT
-    }
-
-    /**
-     * Result cache type enumeration.<br/>
-     * The cache type indicates what will happen to the result of an invocation after its
-     * completion.
-     */
-    public enum ResultCache {
-
-        /**
-         * On completion the invocation results are cleared.
-         */
-        CLEAR,
-        /**
-         * Only in case of error the results are cleared, otherwise they are retained.
-         */
-        STORE_RESULT,
-        /**
-         * Only in case of successful completion the results are cleared, otherwise they are
-         * retained.
-         */
-        STORE_ERROR,
-        /**
-         * On completion the invocation results are retained.
-         */
-        STORE,
-        /**
-         * The default type, that is, it is let to the framework decide what to do with the
-         * invocation results.
-         */
-        DEFAULT
+        ABORT_THIS_INPUT,
     }
 }

@@ -13,14 +13,14 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
+import com.bmd.jrt.builder.RoutineChannelBuilder.OrderBy;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ReadDeadlockException;
-import com.bmd.jrt.channel.Tunnel;
-import com.bmd.jrt.channel.Tunnel.TunnelOutput;
+import com.bmd.jrt.channel.StandaloneChannel;
+import com.bmd.jrt.channel.StandaloneChannel.StandaloneOutput;
 import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.common.InvocationException;
-import com.bmd.jrt.invocation.TunnelInvocation;
+import com.bmd.jrt.invocation.PassingInvocation;
 import com.bmd.jrt.time.TimeDuration;
 
 import junit.framework.TestCase;
@@ -34,21 +34,21 @@ import static com.bmd.jrt.time.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Tunnel unit tests.
+ * Standalone channel unit tests.
  * <p/>
  * Created by davide on 10/26/14.
  */
-public class TunnelTest extends TestCase {
+public class StandaloneChannelTest extends TestCase {
 
     public void testAbort() {
 
         final TimeDuration timeout = seconds(1);
-        final Tunnel<String> tunnel = JRoutine.on().buildTunnel();
+        final StandaloneChannel<String> standaloneChannel = JRoutine.on().buildChannel();
         final Routine<String, String> routine =
-                JRoutine.on(new ClassToken<TunnelInvocation<String>>() {}).buildRoutine();
-        final OutputChannel<String> outputChannel = routine.callAsync(tunnel.output());
+                JRoutine.on(new ClassToken<PassingInvocation<String>>() {}).buildRoutine();
+        final OutputChannel<String> outputChannel = routine.callAsync(standaloneChannel.output());
 
-        tunnel.input().abort(new IllegalStateException());
+        standaloneChannel.input().abort(new IllegalStateException());
 
         try {
 
@@ -64,10 +64,10 @@ public class TunnelTest extends TestCase {
 
     public void testAbortDelay() {
 
-        final Tunnel<String> tunnel = JRoutine.on().buildTunnel();
-        tunnel.input().after(TimeDuration.days(1)).pass("test").close();
+        final StandaloneChannel<String> standaloneChannel = JRoutine.on().buildChannel();
+        standaloneChannel.input().after(TimeDuration.days(1)).pass("test").close();
 
-        final TunnelOutput<String> output = tunnel.output();
+        final StandaloneOutput<String> output = standaloneChannel.output();
         assertThat(output.immediately().eventuallyExit().readAll()).isEmpty();
 
         final ArrayList<String> results = new ArrayList<String>();
@@ -92,7 +92,7 @@ public class TunnelTest extends TestCase {
     public void testAsynchronousInput() {
 
         final TimeDuration timeout = seconds(1);
-        final Tunnel<String> tunnel = JRoutine.on().buildTunnel();
+        final StandaloneChannel<String> standaloneChannel = JRoutine.on().buildChannel();
 
         new Thread() {
 
@@ -107,88 +107,90 @@ public class TunnelTest extends TestCase {
 
                 } finally {
 
-                    tunnel.input().pass("test").close();
+                    standaloneChannel.input().pass("test").close();
                 }
             }
         }.start();
 
         final Routine<String, String> routine =
-                JRoutine.on(new ClassToken<TunnelInvocation<String>>() {}).buildRoutine();
-        final OutputChannel<String> outputChannel = routine.callAsync(tunnel.output());
+                JRoutine.on(new ClassToken<PassingInvocation<String>>() {}).buildRoutine();
+        final OutputChannel<String> outputChannel = routine.callAsync(standaloneChannel.output());
         assertThat(outputChannel.afterMax(timeout).readNext()).isEqualTo("test");
         assertThat(outputChannel.checkComplete()).isTrue();
 
-        final Tunnel<String> tunnel1 = JRoutine.on().dataOrder(DataOrder.INSERTION).buildTunnel();
+        final StandaloneChannel<String> standaloneChannel1 =
+                JRoutine.on().withDataOrder(OrderBy.INSERTION).buildChannel();
 
         new Thread() {
 
             @Override
             public void run() {
 
-                tunnel1.input()
-                       .after(1, TimeUnit.MILLISECONDS)
-                       .after(TimeDuration.millis(200))
-                       .pass("test1", "test2")
-                       .pass(Collections.singleton("test3"))
-                       .close();
+                standaloneChannel1.input()
+                                  .after(1, TimeUnit.MILLISECONDS)
+                                  .after(TimeDuration.millis(200))
+                                  .pass("test1", "test2")
+                                  .pass(Collections.singleton("test3"))
+                                  .close();
             }
         }.start();
 
         final Routine<String, String> routine1 =
-                JRoutine.on(new ClassToken<TunnelInvocation<String>>() {}).buildRoutine();
-        final OutputChannel<String> outputChannel1 = routine1.callAsync(tunnel1.output());
+                JRoutine.on(new ClassToken<PassingInvocation<String>>() {}).buildRoutine();
+        final OutputChannel<String> outputChannel1 =
+                routine1.callAsync(standaloneChannel1.output());
         assertThat(outputChannel1.afterMax(timeout).readAll()).containsExactly("test1", "test2",
                                                                                "test3");
     }
 
     public void testPartialOut() {
 
-        final Tunnel<String> tunnel = JRoutine.on().buildTunnel();
+        final StandaloneChannel<String> standaloneChannel = JRoutine.on().buildChannel();
 
         new Thread() {
 
             @Override
             public void run() {
 
-                tunnel.input().pass("test");
+                standaloneChannel.input().pass("test");
             }
         }.start();
 
         final long startTime = System.currentTimeMillis();
 
         final Routine<String, String> routine =
-                JRoutine.on(new ClassToken<TunnelInvocation<String>>() {}).buildRoutine();
+                JRoutine.on(new ClassToken<PassingInvocation<String>>() {}).buildRoutine();
         final OutputChannel<String> outputChannel =
-                routine.callAsync(tunnel.output()).eventuallyExit();
+                routine.callAsync(standaloneChannel.output()).eventuallyExit();
         assertThat(outputChannel.afterMax(TimeDuration.millis(500)).readAll()).containsExactly(
                 "test");
 
         assertThat(System.currentTimeMillis() - startTime).isLessThan(2000);
 
         assertThat(outputChannel.immediately().checkComplete()).isFalse();
-        tunnel.input().close();
+        standaloneChannel.input().close();
         assertThat(outputChannel.afterMax(TimeDuration.millis(500)).checkComplete()).isTrue();
     }
 
     public void testReadFirst() throws InterruptedException {
 
         final TimeDuration timeout = seconds(1);
-        final Tunnel<String> tunnel = JRoutine.on().buildTunnel();
+        final StandaloneChannel<String> standaloneChannel = JRoutine.on().buildChannel();
 
-        new WeakThread(tunnel).start();
+        new WeakThread(standaloneChannel).start();
 
         final Routine<String, String> routine =
-                JRoutine.on(new ClassToken<TunnelInvocation<String>>() {}).buildRoutine();
-        final OutputChannel<String> outputChannel = routine.callAsync(tunnel.output());
+                JRoutine.on(new ClassToken<PassingInvocation<String>>() {}).buildRoutine();
+        final OutputChannel<String> outputChannel = routine.callAsync(standaloneChannel.output());
         assertThat(outputChannel.afterMax(timeout).readNext()).isEqualTo("test");
     }
 
     public void testTimeout() {
 
-        final Tunnel<String> tunnel = JRoutine.on().buildTunnel();
-        tunnel.input().after(TimeDuration.seconds(3)).pass("test").close();
+        final StandaloneChannel<String> standaloneChannel = JRoutine.on().buildChannel();
+        standaloneChannel.input().after(TimeDuration.seconds(3)).pass("test").close();
 
-        final TunnelOutput<String> output = tunnel.output();
+        final StandaloneOutput<String> output = standaloneChannel.output();
         assertThat(output.immediately().eventuallyExit().readAll()).isEmpty();
 
         output.eventuallyDeadlock();
@@ -300,11 +302,11 @@ public class TunnelTest extends TestCase {
 
     private static class WeakThread extends Thread {
 
-        private final WeakReference<Tunnel<String>> mTunnelRef;
+        private final WeakReference<StandaloneChannel<String>> mChannelRef;
 
-        public WeakThread(final Tunnel<String> tunnel) {
+        public WeakThread(final StandaloneChannel<String> standaloneChannel) {
 
-            mTunnelRef = new WeakReference<Tunnel<String>>(tunnel);
+            mChannelRef = new WeakReference<StandaloneChannel<String>>(standaloneChannel);
         }
 
         @Override
@@ -318,11 +320,11 @@ public class TunnelTest extends TestCase {
 
             } finally {
 
-                final Tunnel<String> tunnel = mTunnelRef.get();
+                final StandaloneChannel<String> standaloneChannel = mChannelRef.get();
 
-                if (tunnel != null) {
+                if (standaloneChannel != null) {
 
-                    tunnel.input().pass("test");
+                    standaloneChannel.input().pass("test");
                 }
             }
         }

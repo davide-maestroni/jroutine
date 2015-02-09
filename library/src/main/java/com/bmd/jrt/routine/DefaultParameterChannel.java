@@ -14,7 +14,7 @@
 package com.bmd.jrt.routine;
 
 import com.bmd.jrt.builder.InputDeadlockException;
-import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
+import com.bmd.jrt.builder.RoutineChannelBuilder.OrderBy;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.OutputConsumer;
@@ -117,7 +117,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
             throw new IllegalArgumentException("the input buffer size cannot be 0 or negative");
         }
 
-        mInputQueue = (configuration.getInputOrderOr(DataOrder.DELIVERY) == DataOrder.DELIVERY)
+        mInputQueue = (configuration.getInputOrderOr(OrderBy.DELIVERY) == OrderBy.DELIVERY)
                 ? new SimpleNestedQueue<INPUT>() : new OrderedNestedQueue<INPUT>();
         mHasInputs = new Check() {
 

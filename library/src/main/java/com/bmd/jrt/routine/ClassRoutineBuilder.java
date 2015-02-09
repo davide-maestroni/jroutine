@@ -25,7 +25,7 @@ import com.bmd.jrt.common.CacheHashMap;
 import com.bmd.jrt.common.InvocationException;
 import com.bmd.jrt.common.InvocationInterruptedException;
 import com.bmd.jrt.common.RoutineException;
-import com.bmd.jrt.invocation.SimpleInvocation;
+import com.bmd.jrt.invocation.SingleCallInvocation;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.runner.Runner;
@@ -179,56 +179,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
     @Nonnull
     @Override
-    public ClassRoutineBuilder availableTimeout(final long timeout,
-            @Nonnull final TimeUnit timeUnit) {
-
-        mBuilder.availableTimeout(timeout, timeUnit);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ClassRoutineBuilder availableTimeout(@Nullable final TimeDuration timeout) {
-
-        mBuilder.availableTimeout(timeout);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ClassRoutineBuilder logLevel(@Nonnull final LogLevel level) {
-
-        mBuilder.logLevel(level);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ClassRoutineBuilder loggedWith(@Nullable final Log log) {
-
-        mBuilder.loggedWith(log);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ClassRoutineBuilder maxRetained(final int maxRetainedInstances) {
-
-        mBuilder.maxRetained(maxRetainedInstances);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ClassRoutineBuilder maxRunning(final int maxRunningInstances) {
-
-        mBuilder.maxRunning(maxRunningInstances);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ClassRoutineBuilder onReadTimeout(@Nonnull final TimeoutAction action) {
+    public ClassRoutineBuilder onReadTimeout(@Nullable final TimeoutAction action) {
 
         mBuilder.onReadTimeout(action);
         return this;
@@ -236,33 +187,83 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
     @Nonnull
     @Override
-    public ClassRoutineBuilder readTimeout(final long timeout, @Nonnull final TimeUnit timeUnit) {
+    public ClassRoutineBuilder withAvailableTimeout(final long timeout,
+            @Nonnull final TimeUnit timeUnit) {
 
-        mBuilder.readTimeout(timeout, timeUnit);
+        mBuilder.withAvailableTimeout(timeout, timeUnit);
         return this;
     }
 
     @Nonnull
     @Override
-    public ClassRoutineBuilder readTimeout(@Nullable final TimeDuration timeout) {
+    public ClassRoutineBuilder withAvailableTimeout(@Nullable final TimeDuration timeout) {
 
-        mBuilder.readTimeout(timeout);
+        mBuilder.withAvailableTimeout(timeout);
         return this;
     }
 
     @Nonnull
     @Override
-    public ClassRoutineBuilder runBy(@Nullable final Runner runner) {
+    public ClassRoutineBuilder withCoreInvocations(final int coreInvocations) {
 
-        mBuilder.runBy(runner);
+        mBuilder.withCoreInvocations(coreInvocations);
         return this;
     }
 
     @Nonnull
     @Override
-    public ClassRoutineBuilder syncRunner(@Nonnull final RunnerType type) {
+    public ClassRoutineBuilder withLog(@Nullable final Log log) {
 
-        mBuilder.syncRunner(type);
+        mBuilder.withLog(log);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public ClassRoutineBuilder withLogLevel(@Nullable final LogLevel level) {
+
+        mBuilder.withLogLevel(level);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public ClassRoutineBuilder withMaxInvocations(final int maxInvocations) {
+
+        mBuilder.withMaxInvocations(maxInvocations);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public ClassRoutineBuilder withReadTimeout(final long timeout,
+            @Nonnull final TimeUnit timeUnit) {
+
+        mBuilder.withReadTimeout(timeout, timeUnit);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public ClassRoutineBuilder withReadTimeout(@Nullable final TimeDuration timeout) {
+
+        mBuilder.withReadTimeout(timeout);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public ClassRoutineBuilder withRunner(@Nullable final Runner runner) {
+
+        mBuilder.withRunner(runner);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public ClassRoutineBuilder withSyncRunner(@Nullable final RunnerType type) {
+
+        mBuilder.withSyncRunner(type);
         return this;
     }
 
@@ -374,8 +375,8 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      * @param configuration the routine configuration.
      * @param shareGroup    the group name.
      * @param method        the method to wrap.
-     * @param paramType     TODO
-     * @param returnType    TODO
+     * @param paramType     the parameters async type.
+     * @param returnType    the result async type.
      * @return the routine instance.
      */
     @Nonnull
@@ -447,10 +448,10 @@ public class ClassRoutineBuilder implements RoutineBuilder {
                 }
             }
 
-            routine =
-                    new DefaultRoutine<Object, Object>(configuration, MethodSimpleInvocation.class,
-                                                       mTargetReference, mTarget, method, mutex,
-                                                       paramType, returnType);
+            routine = new DefaultRoutine<Object, Object>(configuration,
+                                                         MethodSingleCallInvocation.class,
+                                                         mTargetReference, mTarget, method, mutex,
+                                                         paramType, returnType);
             routineMap.put(routineInfo, routine);
         }
 
@@ -531,16 +532,16 @@ public class ClassRoutineBuilder implements RoutineBuilder {
         }
 
         builder.apply(configuration)
-               .inputSize(Integer.MAX_VALUE)
-               .inputTimeout(TimeDuration.ZERO)
-               .outputSize(Integer.MAX_VALUE)
-               .outputTimeout(TimeDuration.ZERO);
+               .withInputSize(Integer.MAX_VALUE)
+               .withInputTimeout(TimeDuration.ZERO)
+               .withOutputSize(Integer.MAX_VALUE)
+               .withOutputTimeout(TimeDuration.ZERO);
 
         final Timeout timeoutAnnotation = targetMethod.getAnnotation(Timeout.class);
 
         if (timeoutAnnotation != null) {
 
-            builder.readTimeout(timeoutAnnotation.value(), timeoutAnnotation.unit())
+            builder.withReadTimeout(timeoutAnnotation.value(), timeoutAnnotation.unit())
                    .onReadTimeout(timeoutAnnotation.action());
         }
 
@@ -607,7 +608,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
     /**
      * Implementation of a simple invocation wrapping the target method.
      */
-    private static class MethodSimpleInvocation extends SimpleInvocation<Object, Object> {
+    private static class MethodSingleCallInvocation extends SingleCallInvocation<Object, Object> {
 
         private final boolean mHasResult;
 
@@ -632,10 +633,10 @@ public class ClassRoutineBuilder implements RoutineBuilder {
          * @param target          the target object.
          * @param method          the method to wrap.
          * @param mutex           the mutex used for synchronization.
-         * @param paramType       TODO
-         * @param returnType      TODO
+         * @param paramType       the parameters async type.
+         * @param returnType      the result async type.
          */
-        public MethodSimpleInvocation(final WeakReference<?> targetReference,
+        public MethodSingleCallInvocation(final WeakReference<?> targetReference,
                 @Nullable final Object target, @Nonnull final Method method,
                 @Nullable final Object mutex, @Nullable final AsyncType paramType,
                 @Nullable final AsyncType returnType) {

@@ -181,8 +181,7 @@ public class JRoutine extends com.bmd.jrt.android.routine.JRoutine {
      * @param activity the invocation activity context.
      * @param id       the invocation ID.
      * @return the channel builder instance.
-     * @throws java.lang.IllegalArgumentException if the specified invocation ID is equal to
-     *                                            GENERATED_ID.
+     * @throws java.lang.IllegalArgumentException if the specified invocation ID is equal to AUTO.
      * @throws java.lang.NullPointerException     if the specified activity is null.
      */
     @Nonnull
@@ -196,7 +195,7 @@ public class JRoutine extends com.bmd.jrt.android.routine.JRoutine {
                             + ": use com.bmd.jrt.android.v4.routine.JRoutine class instead");
         }
 
-        if (id == AndroidRoutineBuilder.GENERATED_ID) {
+        if (id == AndroidRoutineBuilder.AUTO) {
 
             throw new IllegalArgumentException("the invocation ID must not be generated");
         }
@@ -236,14 +235,13 @@ public class JRoutine extends com.bmd.jrt.android.routine.JRoutine {
      * @param fragment the invocation fragment context.
      * @param id       the invocation ID.
      * @return the channel builder instance.
-     * @throws java.lang.IllegalArgumentException if the specified invocation ID is equal to
-     *                                            GENERATED_ID.
+     * @throws java.lang.IllegalArgumentException if the specified invocation ID is equal to AUTO.
      * @throws java.lang.NullPointerException     if the specified fragment is null.
      */
     @Nonnull
     public static AndroidChannelBuilder onFragment(@Nonnull final Fragment fragment, final int id) {
 
-        if (id == AndroidRoutineBuilder.GENERATED_ID) {
+        if (id == AndroidRoutineBuilder.AUTO) {
 
             throw new IllegalArgumentException("the invocation ID must not be generated");
         }

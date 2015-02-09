@@ -33,9 +33,8 @@ import javax.annotation.Nonnull;
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-public abstract class SimpleInvocation<INPUT, OUTPUT> extends TemplateInvocation<INPUT, OUTPUT> {
-
-    //TODO: ????
+public abstract class SingleCallInvocation<INPUT, OUTPUT>
+        extends TemplateInvocation<INPUT, OUTPUT> {
 
     private ArrayList<INPUT> mInputs;
 

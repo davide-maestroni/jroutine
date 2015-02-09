@@ -111,14 +111,15 @@ import javax.annotation.Nonnull;
  * <pre>
  *     <code>
  *
- *         final Tunnel&lt;Result&gt; tunnel = JRoutine.on().&lt;Result&gt;buildTunnel();
+ *         final StandaloneChannel&lt;Result&gt; channel = JRoutine.on().&lt;Result&gt;
+ *         buildChannel();
  *
  *         new Thread() {
  *
  *             &#64;Override
  *             public void run() {
  *
- *                 tunnel.input().pass(new Result()).close();
+ *                 channel.input().pass(new Result()).close();
  *             }
  *
  *         }.start();
@@ -126,7 +127,7 @@ import javax.annotation.Nonnull;
  *         final Routine&lt;Result, Result&gt; routine =
  *                  JRoutine.&lt;Result&gt;on().buildRoutine();
  *
- *         routine.callAsync(tunnel.output()).eventually().readAllInto(results);
+ *         routine.callAsync(channel.output()).eventually().readAllInto(results);
  *     </code>
  * </pre>
  * <p/>
@@ -148,14 +149,14 @@ public class JRoutine {
     }
 
     /**
-     * Returns a tunnel builder.
+     * Returns a standalone channel builder.
      *
-     * @return the tunnel builder instance.
+     * @return the standalone channel builder instance.
      */
     @Nonnull
-    public static TunnelBuilder on() {
+    public static StandaloneChannelBuilder on() {
 
-        return new TunnelBuilder();
+        return new StandaloneChannelBuilder();
     }
 
     /**

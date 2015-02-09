@@ -22,7 +22,7 @@ import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.common.InvocationInterruptedException;
-import com.bmd.jrt.invocation.SimpleInvocation;
+import com.bmd.jrt.invocation.SingleCallInvocation;
 import com.bmd.jrt.runner.Execution;
 import com.bmd.jrt.runner.Runner;
 import com.bmd.jrt.runner.RunnerDecorator;
@@ -70,7 +70,7 @@ public class AndroidRunnerTest extends AndroidTestCase {
         testRunner(Runners.myRunner());
 
         final OutputChannel<Object> channel =
-                JRoutine.on(ClassToken.tokenOf(new SimpleInvocation<Object, Object>() {
+                JRoutine.on(ClassToken.tokenOf(new SingleCallInvocation<Object, Object>() {
 
                     @Override
                     public void onCall(@Nonnull final List<?> objects,
@@ -79,12 +79,12 @@ public class AndroidRunnerTest extends AndroidTestCase {
                         result.pass(Looper.myLooper()).pass(Runners.myRunner());
                     }
                 }))
-                        .runBy(Runners.threadRunner(new HandlerThread("test")))
+                        .withRunner(Runners.threadRunner(new HandlerThread("test")))
                         .withArgs(this)
                         .buildRoutine()
                         .callAsync();
 
-        assertThat(JRoutine.on(ClassToken.tokenOf(new SimpleInvocation<Object, Object>() {
+        assertThat(JRoutine.on(ClassToken.tokenOf(new SingleCallInvocation<Object, Object>() {
 
             @Override
             public void onCall(@Nonnull final List<?> objects,

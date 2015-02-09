@@ -25,19 +25,17 @@ import javax.annotation.Nonnull;
  *
  * @param <DATA> the data type.
  */
-public class TunnelInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
-
-    //TODO: SimpleInvocation
+public class PassingInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
 
     /**
-     * Creates and returns the class token of a typed tunnel invocation.
+     * Creates and returns the class token of a typed passing invocation.
      *
      * @param <DATA> the data type.
      * @return the token instance.
      */
-    public static <DATA> ClassToken<TunnelInvocation<DATA>> tokenOf() {
+    public static <DATA> ClassToken<PassingInvocation<DATA>> tokenOf() {
 
-        return new ClassToken<TunnelInvocation<DATA>>() {};
+        return new ClassToken<PassingInvocation<DATA>>() {};
     }
 
     @Override

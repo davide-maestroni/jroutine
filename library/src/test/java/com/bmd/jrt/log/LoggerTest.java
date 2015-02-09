@@ -53,7 +53,7 @@ public class LoggerTest extends TestCase {
         assertThat(Logger.getGlobalLog()).isEqualTo(log);
 
         final LogLevel defaultLogLevel = Logger.getGlobalLogLevel();
-        Logger.setGlobalLogLevel(LogLevel.DEFAULT);
+        Logger.setGlobalLogLevel(null);
         assertThat(Logger.getGlobalLogLevel()).isEqualTo(defaultLogLevel);
 
         Logger.setGlobalLogLevel(LogLevel.SILENT);
@@ -63,7 +63,7 @@ public class LoggerTest extends TestCase {
         assertThat(logger.getLog()).isEqualTo(defaultLog);
         assertThat(logger.getLogLevel()).isEqualTo(LogLevel.DEBUG);
 
-        logger = Logger.createLogger(log, LogLevel.DEFAULT, this);
+        logger = Logger.createLogger(log, null, this);
         assertThat(logger.getLog()).isEqualTo(log);
         assertThat(logger.getLogLevel()).isEqualTo(defaultLogLevel);
     }
@@ -71,37 +71,8 @@ public class LoggerTest extends TestCase {
     @SuppressWarnings("ConstantConditions")
     public void testError() {
 
-        try {
-
-            Logger.createLogger(new NullLog(), null, this);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            Logger.createLogger(new NullLog(), LogLevel.DEBUG, null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
+        Logger.setGlobalLog(null);
         assertThat(Logger.getGlobalLog()).isNotNull();
-
-        try {
-
-            Logger.setGlobalLogLevel(null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
 
         try {
 
@@ -113,6 +84,7 @@ public class LoggerTest extends TestCase {
 
         }
 
+        Logger.setGlobalLogLevel(null);
         assertThat(Logger.getGlobalLogLevel()).isNotNull();
 
         Logger.createLogger(new NullLog(), LogLevel.DEBUG, this).err((Throwable) null);

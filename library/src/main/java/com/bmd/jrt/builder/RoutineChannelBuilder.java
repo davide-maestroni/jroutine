@@ -47,57 +47,57 @@ public interface RoutineChannelBuilder extends RoutineBuilder {
 
     @Nonnull
     @Override
-    public RoutineChannelBuilder availableTimeout(long timeout, @Nonnull TimeUnit timeUnit);
+    public RoutineChannelBuilder onReadTimeout(@Nullable TimeoutAction action);
 
     @Nonnull
     @Override
-    public RoutineChannelBuilder availableTimeout(@Nullable TimeDuration timeout);
+    public RoutineChannelBuilder withAvailableTimeout(long timeout, @Nonnull TimeUnit timeUnit);
 
     @Nonnull
     @Override
-    public RoutineChannelBuilder logLevel(@Nonnull LogLevel level);
+    public RoutineChannelBuilder withAvailableTimeout(@Nullable TimeDuration timeout);
 
     @Nonnull
     @Override
-    public RoutineChannelBuilder loggedWith(@Nullable Log log);
+    public RoutineChannelBuilder withCoreInvocations(int coreInvocations);
 
     @Nonnull
     @Override
-    public RoutineChannelBuilder maxRetained(int maxRetainedInstances);
+    public RoutineChannelBuilder withLog(@Nullable Log log);
 
     @Nonnull
     @Override
-    public RoutineChannelBuilder maxRunning(int maxRunningInstances);
+    public RoutineChannelBuilder withLogLevel(@Nullable LogLevel level);
 
     @Nonnull
     @Override
-    public RoutineChannelBuilder onReadTimeout(@Nonnull TimeoutAction action);
+    public RoutineChannelBuilder withMaxInvocations(int maxInvocations);
 
     @Nonnull
     @Override
-    public RoutineChannelBuilder readTimeout(long timeout, @Nonnull TimeUnit timeUnit);
+    public RoutineChannelBuilder withReadTimeout(long timeout, @Nonnull TimeUnit timeUnit);
 
     @Nonnull
     @Override
-    public RoutineChannelBuilder readTimeout(@Nullable TimeDuration timeout);
+    public RoutineChannelBuilder withReadTimeout(@Nullable TimeDuration timeout);
 
     @Nonnull
     @Override
-    public RoutineChannelBuilder runBy(@Nullable Runner runner);
+    public RoutineChannelBuilder withRunner(@Nullable Runner runner);
 
     @Nonnull
     @Override
-    public RoutineChannelBuilder syncRunner(@Nonnull RunnerType type);
+    public RoutineChannelBuilder withSyncRunner(@Nullable RunnerType type);
 
     /**
-     * Sets the order in which input data are collected from the input channel.
+     * Sets the order in which input data are collected from the input channel. A null value means
+     * that it is up to the framework to chose a default order type.
      *
      * @param order the order type.
      * @return this builder.
-     * @throws java.lang.NullPointerException if the specified order type is null.
      */
     @Nonnull
-    public RoutineChannelBuilder inputOrder(@Nonnull DataOrder order);
+    public RoutineChannelBuilder withInputOrder(@Nullable OrderBy order);
 
     /**
      * Sets the maximum number of data that the input channel can retain before they are consumed.
@@ -109,7 +109,7 @@ public interface RoutineChannelBuilder extends RoutineBuilder {
      * @throws java.lang.IllegalArgumentException if the number is less than 1.
      */
     @Nonnull
-    public RoutineChannelBuilder inputSize(int inputMaxSize);
+    public RoutineChannelBuilder withInputSize(int inputMaxSize);
 
     /**
      * Sets the timeout for an input channel to have room for additional data. A null value means
@@ -119,7 +119,7 @@ public interface RoutineChannelBuilder extends RoutineBuilder {
      * @return this builder.
      */
     @Nonnull
-    public RoutineChannelBuilder inputTimeout(@Nullable TimeDuration timeout);
+    public RoutineChannelBuilder withInputTimeout(@Nullable TimeDuration timeout);
 
     /**
      * Sets the timeout for an input channel to have room for additional data.
@@ -133,17 +133,17 @@ public interface RoutineChannelBuilder extends RoutineBuilder {
      * @throws java.lang.NullPointerException     if the specified time unit is null.
      */
     @Nonnull
-    public RoutineChannelBuilder inputTimeout(long timeout, @Nonnull TimeUnit timeUnit);
+    public RoutineChannelBuilder withInputTimeout(long timeout, @Nonnull TimeUnit timeUnit);
 
     /**
-     * Sets the order in which output data are collected from the result channel.
+     * Sets the order in which output data are collected from the result channel. A null value means
+     * that it is up to the framework to chose a default order type.
      *
      * @param order the order type.
      * @return this builder.
-     * @throws java.lang.NullPointerException if the specified order type is null.
      */
     @Nonnull
-    public RoutineChannelBuilder outputOrder(@Nonnull DataOrder order);
+    public RoutineChannelBuilder withOutputOrder(@Nullable OrderBy order);
 
     /**
      * Sets the maximum number of data that the result channel can retain before they are consumed.
@@ -155,7 +155,17 @@ public interface RoutineChannelBuilder extends RoutineBuilder {
      * @throws java.lang.IllegalArgumentException if the number is less than 1.
      */
     @Nonnull
-    public RoutineChannelBuilder outputSize(int outputMaxSize);
+    public RoutineChannelBuilder withOutputSize(int outputMaxSize);
+
+    /**
+     * Sets the timeout for a result channel to have room for additional data. A null value means
+     * that it is up to the framework to chose a default.
+     *
+     * @param timeout the timeout.
+     * @return this builder.
+     */
+    @Nonnull
+    public RoutineChannelBuilder withOutputTimeout(@Nullable TimeDuration timeout);
 
     /**
      * Sets the timeout for a result channel to have room for additional data.
@@ -169,22 +179,12 @@ public interface RoutineChannelBuilder extends RoutineBuilder {
      * @throws java.lang.NullPointerException     if the specified time unit is null.
      */
     @Nonnull
-    public RoutineChannelBuilder outputTimeout(long timeout, @Nonnull TimeUnit timeUnit);
-
-    /**
-     * Sets the timeout for a result channel to have room for additional data. A null value means
-     * that it is up to the framework to chose a default.
-     *
-     * @param timeout the timeout.
-     * @return this builder.
-     */
-    @Nonnull
-    public RoutineChannelBuilder outputTimeout(@Nullable TimeDuration timeout);
+    public RoutineChannelBuilder withOutputTimeout(long timeout, @Nonnull TimeUnit timeUnit);
 
     /**
      * Enumeration defining how data are ordered inside a channel.
      */
-    public enum DataOrder {
+    public enum OrderBy {
 
         /**
          * Insertion order.<br/>
@@ -200,10 +200,5 @@ public interface RoutineChannelBuilder extends RoutineBuilder {
          * two objects are passed one immediately after the other with the same delay.
          */
         DELIVERY,
-        /**
-         * Default order.<br/>
-         * This value is used to indicated that the choice of the order is left to the framework.
-         */
-        DEFAULT
     }
 }

@@ -17,10 +17,10 @@ import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 
+import com.bmd.jrt.android.builder.AndroidRoutineBuilder.CacheStrategy;
 import com.bmd.jrt.android.builder.AndroidRoutineBuilder.ClashResolution;
-import com.bmd.jrt.android.builder.AndroidRoutineBuilder.ResultCache;
 import com.bmd.jrt.android.invocation.AndroidInvocation;
-import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
+import com.bmd.jrt.builder.RoutineChannelBuilder.OrderBy;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.common.InvocationException;
 import com.bmd.jrt.common.InvocationInterruptedException;
@@ -34,6 +34,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Routine implementation delegating to Android loaders the asynchronous processing.
@@ -45,7 +46,7 @@ import javax.annotation.Nonnull;
  */
 class AndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
 
-    private final ResultCache mCacheType;
+    private final CacheStrategy mCacheStrategy;
 
     private final ClashResolution mClashResolution;
 
@@ -53,9 +54,9 @@ class AndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
 
     private final WeakReference<Object> mContext;
 
-    private final DataOrder mDataOrder;
-
     private final int mLoaderId;
+
+    private final OrderBy mOrderBy;
 
     /**
      * Constructor.
@@ -64,15 +65,16 @@ class AndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
      * @param context       the context reference.
      * @param loaderId      the loader ID.
      * @param resolution    the clash resolution type.
-     * @param cacheType     the result cache type.
+     * @param cacheStrategy the result cache type.
      * @param constructor   the invocation constructor.
      * @throws java.lang.IllegalArgumentException if at least one of the parameter is invalid.
-     * @throws java.lang.NullPointerException     if any of the specified nonnull parameter is null.
+     * @throws java.lang.NullPointerException     if any of the specified non-null parameter is
+     *                                            null.
      */
     @SuppressWarnings("ConstantConditions")
     AndroidRoutine(@Nonnull final RoutineConfiguration configuration,
             @Nonnull final WeakReference<Object> context, final int loaderId,
-            @Nonnull final ClashResolution resolution, @Nonnull final ResultCache cacheType,
+            @Nullable final ClashResolution resolution, @Nullable final CacheStrategy cacheStrategy,
             @Nonnull final Constructor<? extends AndroidInvocation<INPUT, OUTPUT>> constructor) {
 
         super(configuration);
@@ -82,16 +84,6 @@ class AndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
             throw new NullPointerException("the context must not be null");
         }
 
-        if (resolution == null) {
-
-            throw new NullPointerException("the clash resolution type must not be null");
-        }
-
-        if (cacheType == null) {
-
-            throw new NullPointerException("the result cache type must not be null");
-        }
-
         if (constructor == null) {
 
             throw new NullPointerException("the invocation constructor must not be null");
@@ -99,10 +91,10 @@ class AndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
 
         mContext = context;
         mLoaderId = loaderId;
-        mClashResolution = resolution;
-        mCacheType = cacheType;
+        mClashResolution = (resolution == null) ? ClashResolution.ABORT_THAT_INPUT : resolution;
+        mCacheStrategy = (cacheStrategy == null) ? CacheStrategy.CLEAR : cacheStrategy;
         mConstructor = constructor;
-        mDataOrder = configuration.getOutputOrderOr(DataOrder.DEFAULT);
+        mOrderBy = configuration.getOutputOrderOr(null);
     }
 
     @Nonnull
@@ -135,7 +127,7 @@ class AndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
         if (async) {
 
             return new LoaderInvocation<INPUT, OUTPUT>(mContext, mLoaderId, mClashResolution,
-                                                       mCacheType, mConstructor, mDataOrder,
+                                                       mCacheStrategy, mConstructor, mOrderBy,
                                                        logger);
         }
 

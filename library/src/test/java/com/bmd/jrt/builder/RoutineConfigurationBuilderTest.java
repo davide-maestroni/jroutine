@@ -13,10 +13,7 @@
  */
 package com.bmd.jrt.builder;
 
-import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
-import com.bmd.jrt.builder.RoutineBuilder.TimeoutAction;
-import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
-import com.bmd.jrt.log.Log.LogLevel;
+import com.bmd.jrt.builder.RoutineChannelBuilder.OrderBy;
 import com.bmd.jrt.log.NullLog;
 import com.bmd.jrt.runner.Runners;
 import com.bmd.jrt.time.TimeDuration;
@@ -49,7 +46,7 @@ public class RoutineConfigurationBuilderTest extends TestCase {
 
         try {
 
-            new RoutineConfigurationBuilder().availableTimeout(1, null);
+            new RoutineConfigurationBuilder().withAvailableTimeout(1, null);
 
             fail();
 
@@ -59,7 +56,7 @@ public class RoutineConfigurationBuilderTest extends TestCase {
 
         try {
 
-            new RoutineConfigurationBuilder().availableTimeout(-1, TimeUnit.MILLISECONDS);
+            new RoutineConfigurationBuilder().withAvailableTimeout(-1, TimeUnit.MILLISECONDS);
 
             fail();
 
@@ -69,7 +66,7 @@ public class RoutineConfigurationBuilderTest extends TestCase {
 
         try {
 
-            new RoutineConfigurationBuilder().inputTimeout(1, null);
+            new RoutineConfigurationBuilder().withInputTimeout(1, null);
 
             fail();
 
@@ -79,7 +76,7 @@ public class RoutineConfigurationBuilderTest extends TestCase {
 
         try {
 
-            new RoutineConfigurationBuilder().inputTimeout(-1, TimeUnit.MILLISECONDS);
+            new RoutineConfigurationBuilder().withInputTimeout(-1, TimeUnit.MILLISECONDS);
 
             fail();
 
@@ -89,7 +86,7 @@ public class RoutineConfigurationBuilderTest extends TestCase {
 
         try {
 
-            new RoutineConfigurationBuilder().inputSize(0);
+            new RoutineConfigurationBuilder().withInputSize(0);
 
             fail();
 
@@ -99,7 +96,7 @@ public class RoutineConfigurationBuilderTest extends TestCase {
 
         try {
 
-            new RoutineConfigurationBuilder().inputOrder(null);
+            new RoutineConfigurationBuilder().withOutputTimeout(1, null);
 
             fail();
 
@@ -109,17 +106,7 @@ public class RoutineConfigurationBuilderTest extends TestCase {
 
         try {
 
-            new RoutineConfigurationBuilder().outputTimeout(1, null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            new RoutineConfigurationBuilder().outputTimeout(-1, TimeUnit.MILLISECONDS);
+            new RoutineConfigurationBuilder().withOutputTimeout(-1, TimeUnit.MILLISECONDS);
 
             fail();
 
@@ -129,7 +116,7 @@ public class RoutineConfigurationBuilderTest extends TestCase {
 
         try {
 
-            new RoutineConfigurationBuilder().outputSize(0);
+            new RoutineConfigurationBuilder().withOutputSize(0);
 
             fail();
 
@@ -139,27 +126,7 @@ public class RoutineConfigurationBuilderTest extends TestCase {
 
         try {
 
-            new RoutineConfigurationBuilder().outputOrder(null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            new RoutineConfigurationBuilder().logLevel(null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            new RoutineConfigurationBuilder().maxRunning(0);
+            new RoutineConfigurationBuilder().withMaxInvocations(0);
 
             fail();
 
@@ -169,21 +136,11 @@ public class RoutineConfigurationBuilderTest extends TestCase {
 
         try {
 
-            new RoutineConfigurationBuilder().maxRetained(-1);
+            new RoutineConfigurationBuilder().withCoreInvocations(-1);
 
             fail();
 
         } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            new RoutineConfigurationBuilder().syncRunner(null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
 
         }
     }
@@ -193,21 +150,8 @@ public class RoutineConfigurationBuilderTest extends TestCase {
 
         try {
 
-            new RoutineConfiguration(null, null, 1, 0, null, null, TimeoutAction.DEFAULT, 1, null,
-                                     DataOrder.DEFAULT, 1, null, DataOrder.DEFAULT, null,
-                                     LogLevel.DEFAULT);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            new RoutineConfiguration(null, RunnerType.DEFAULT, 0, 0, null, null,
-                                     TimeoutAction.DEFAULT, 1, null, DataOrder.DEFAULT, 1, null,
-                                     DataOrder.DEFAULT, null, LogLevel.DEFAULT);
+            new RoutineConfiguration(null, null, 0, 0, null, null, null, 1, null, null, 1, null,
+                                     null, null, null);
 
             fail();
 
@@ -217,9 +161,8 @@ public class RoutineConfigurationBuilderTest extends TestCase {
 
         try {
 
-            new RoutineConfiguration(null, RunnerType.DEFAULT, 1, -1, null, null,
-                                     TimeoutAction.DEFAULT, 1, null, DataOrder.DEFAULT, 1, null,
-                                     DataOrder.DEFAULT, null, LogLevel.DEFAULT);
+            new RoutineConfiguration(null, null, 1, -1, null, null, null, 1, null, null, 1, null,
+                                     null, null, null);
 
             fail();
 
@@ -229,21 +172,8 @@ public class RoutineConfigurationBuilderTest extends TestCase {
 
         try {
 
-            new RoutineConfiguration(null, RunnerType.DEFAULT, 1, 0, null, null, null, 0, null,
-                                     DataOrder.DEFAULT, 1, null, DataOrder.DEFAULT, null,
-                                     LogLevel.DEFAULT);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            new RoutineConfiguration(null, RunnerType.DEFAULT, 1, 0, null, null,
-                                     TimeoutAction.DEFAULT, 0, null, DataOrder.DEFAULT, 1, null,
-                                     DataOrder.DEFAULT, null, LogLevel.DEFAULT);
+            new RoutineConfiguration(null, null, 1, 0, null, null, null, 0, null, null, 1, null,
+                                     null, null, null);
 
             fail();
 
@@ -253,49 +183,12 @@ public class RoutineConfigurationBuilderTest extends TestCase {
 
         try {
 
-            new RoutineConfiguration(null, RunnerType.DEFAULT, 1, 0, null, null,
-                                     TimeoutAction.DEFAULT, 1, null, null, 1, null,
-                                     DataOrder.DEFAULT, null, LogLevel.DEFAULT);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            new RoutineConfiguration(null, RunnerType.DEFAULT, 1, 0, null, null,
-                                     TimeoutAction.DEFAULT, 1, null, DataOrder.DEFAULT, 0, null,
-                                     DataOrder.DEFAULT, null, LogLevel.DEFAULT);
+            new RoutineConfiguration(null, null, 1, 0, null, null, null, 1, null, null, 0, null,
+                                     null, null, null);
 
             fail();
 
         } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            new RoutineConfiguration(null, RunnerType.DEFAULT, 1, 0, null, null,
-                                     TimeoutAction.DEFAULT, 1, null, DataOrder.DEFAULT, 1, null,
-                                     null, null, LogLevel.DEFAULT);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            new RoutineConfiguration(null, RunnerType.DEFAULT, 1, 0, null, null,
-                                     TimeoutAction.DEFAULT, 1, null, DataOrder.DEFAULT, 1, null,
-                                     DataOrder.DEFAULT, null, null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
 
         }
     }
@@ -303,11 +196,11 @@ public class RoutineConfigurationBuilderTest extends TestCase {
     public void testEquals() {
 
         final RoutineConfigurationBuilder builder = new RoutineConfigurationBuilder();
-        builder.availableTimeout(TimeDuration.millis(100))
-               .inputOrder(DataOrder.INSERTION)
-               .runBy(Runners.queuedRunner())
-               .loggedWith(new NullLog())
-               .outputSize(100);
+        builder.withAvailableTimeout(TimeDuration.millis(100))
+               .withInputOrder(OrderBy.INSERTION)
+               .withRunner(Runners.queuedRunner())
+               .withLog(new NullLog())
+               .withOutputSize(100);
 
         final RoutineConfiguration configuration = builder.buildConfiguration();
         assertThat(new RoutineConfigurationBuilder(configuration).buildConfiguration()).isEqualTo(

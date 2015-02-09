@@ -22,7 +22,7 @@ import com.bmd.jrt.android.builder.AndroidRoutineBuilder;
 import com.bmd.jrt.android.invocation.AndroidInvocation;
 import com.bmd.jrt.android.runner.Runners;
 import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
-import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
+import com.bmd.jrt.builder.RoutineChannelBuilder.OrderBy;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.builder.RoutineConfigurationBuilder;
 import com.bmd.jrt.common.ClassToken;
@@ -55,11 +55,11 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> implements AndroidRoutineBuild
 
     private final WeakReference<Object> mContext;
 
-    private ResultCache mCacheType = ResultCache.DEFAULT;
+    private CacheStrategy mCacheStrategy;
 
-    private ClashResolution mClashResolution = ClashResolution.DEFAULT;
+    private ClashResolution mClashResolution;
 
-    private int mLoaderId = AndroidRoutineBuilder.GENERATED_ID;
+    private int mLoaderId = AndroidRoutineBuilder.AUTO;
 
     /**
      * Constructor.
@@ -121,49 +121,15 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> implements AndroidRoutineBuild
     public Routine<INPUT, OUTPUT> buildRoutine() {
 
         final RoutineConfiguration configuration =
-                mBuilder.runBy(Runners.mainRunner()).buildConfiguration();
-        final ClashResolution resolution =
-                (mClashResolution == ClashResolution.DEFAULT) ? ClashResolution.RESTART_ON_INPUT
-                        : mClashResolution;
-        final ResultCache cacheType =
-                (mCacheType == ResultCache.DEFAULT) ? ResultCache.CLEAR : mCacheType;
-        return new AndroidRoutine<INPUT, OUTPUT>(configuration, mContext, mLoaderId, resolution,
-                                                 cacheType, mConstructor);
+                mBuilder.withRunner(Runners.mainRunner()).buildConfiguration();
+        return new AndroidRoutine<INPUT, OUTPUT>(configuration, mContext, mLoaderId,
+                                                 mClashResolution, mCacheStrategy, mConstructor);
     }
 
     @Nonnull
     @Override
-    public AndroidRoutineBuilder<INPUT, OUTPUT> inputOrder(@Nonnull final DataOrder order) {
-
-        mBuilder.inputOrder(order);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public AndroidRoutineBuilder<INPUT, OUTPUT> logLevel(@Nonnull final LogLevel level) {
-
-        mBuilder.logLevel(level);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public AndroidRoutineBuilder<INPUT, OUTPUT> loggedWith(@Nullable final Log log) {
-
-        mBuilder.loggedWith(log);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    @SuppressWarnings("ConstantConditions")
-    public AndroidRoutineBuilder<INPUT, OUTPUT> onClash(@Nonnull final ClashResolution resolution) {
-
-        if (resolution == null) {
-
-            throw new NullPointerException("the clash resolution type must not be null");
-        }
+    public AndroidRoutineBuilder<INPUT, OUTPUT> onClash(
+            @Nullable final ClashResolution resolution) {
 
         mClashResolution = resolution;
         return this;
@@ -171,31 +137,10 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> implements AndroidRoutineBuild
 
     @Nonnull
     @Override
-    @SuppressWarnings("ConstantConditions")
-    public AndroidRoutineBuilder<INPUT, OUTPUT> onComplete(@Nonnull final ResultCache cacheType) {
+    public AndroidRoutineBuilder<INPUT, OUTPUT> onComplete(
+            @Nullable final CacheStrategy cacheStrategy) {
 
-        if (cacheType == null) {
-
-            throw new NullPointerException("the result cache type must not be null");
-        }
-
-        mCacheType = cacheType;
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public AndroidRoutineBuilder<INPUT, OUTPUT> outputOrder(@Nonnull final DataOrder order) {
-
-        mBuilder.outputOrder(order);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public AndroidRoutineBuilder<INPUT, OUTPUT> syncRunner(@Nonnull final RunnerType type) {
-
-        mBuilder.syncRunner(type);
+        mCacheStrategy = cacheStrategy;
         return this;
     }
 
@@ -204,6 +149,46 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> implements AndroidRoutineBuild
     public AndroidRoutineBuilder<INPUT, OUTPUT> withId(final int id) {
 
         mLoaderId = id;
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public AndroidRoutineBuilder<INPUT, OUTPUT> withInputOrder(@Nullable final OrderBy order) {
+
+        mBuilder.withInputOrder(order);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public AndroidRoutineBuilder<INPUT, OUTPUT> withLog(@Nullable final Log log) {
+
+        mBuilder.withLog(log);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public AndroidRoutineBuilder<INPUT, OUTPUT> withLogLevel(@Nullable final LogLevel level) {
+
+        mBuilder.withLogLevel(level);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public AndroidRoutineBuilder<INPUT, OUTPUT> withOutputOrder(@Nullable final OrderBy order) {
+
+        mBuilder.withOutputOrder(order);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public AndroidRoutineBuilder<INPUT, OUTPUT> withSyncRunner(@Nullable final RunnerType type) {
+
+        mBuilder.withSyncRunner(type);
         return this;
     }
 }

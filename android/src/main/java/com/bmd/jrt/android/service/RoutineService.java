@@ -24,7 +24,7 @@ import android.os.Messenger;
 import android.os.RemoteException;
 
 import com.bmd.jrt.android.invocation.AndroidInvocation;
-import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
+import com.bmd.jrt.builder.RoutineChannelBuilder.OrderBy;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.builder.RoutineConfigurationBuilder;
 import com.bmd.jrt.channel.OutputConsumer;
@@ -72,6 +72,8 @@ public class RoutineService extends Service {
 
     private static final String KEY_AVAILABLE_TIMEUNIT = "avail_unit";
 
+    private static final String KEY_CORE_INVOCATIONS = "max_retained";
+
     private static final String KEY_DATA_VALUE = "data_value";
 
     private static final String KEY_INPUT_ORDER = "input_order";
@@ -84,9 +86,7 @@ public class RoutineService extends Service {
 
     private static final String KEY_LOG_LEVEL = "log_level";
 
-    private static final String KEY_MAX_RETAINED = "max_retained";
-
-    private static final String KEY_MAX_RUNNING = "max_running";
+    private static final String KEY_MAX_INVOCATIONS = "max_running";
 
     private static final String KEY_OUTPUT_ORDER = "output_order";
 
@@ -120,9 +120,8 @@ public class RoutineService extends Service {
      *
      * @param log      the log instance.
      * @param logLevel the log level.
-     * @throws java.lang.NullPointerException if the specified log level is null.
      */
-    public RoutineService(@Nullable final Log log, @Nonnull final LogLevel logLevel) {
+    public RoutineService(@Nullable final Log log, @Nullable final LogLevel logLevel) {
 
         mLogger = Logger.createLogger(log, logLevel, this);
     }
@@ -179,7 +178,7 @@ public class RoutineService extends Service {
      * @param configuration   the routine configuration.
      * @param runnerClass     the runner class.
      * @param logClass        the log class.
-     * @throws java.lang.NullPointerException if any of the specified nonnull parameters is null.
+     * @throws java.lang.NullPointerException if any of the specified non-null parameters is null.
      */
     public static void putAsyncInvocation(@Nonnull final Bundle bundle,
             @Nonnull final String invocationId,
@@ -227,7 +226,7 @@ public class RoutineService extends Service {
      * @param configuration   the routine configuration.
      * @param runnerClass     the runner class.
      * @param logClass        the log class.
-     * @throws java.lang.NullPointerException if any of the specified nonnull parameters is null.
+     * @throws java.lang.NullPointerException if any of the specified non-null parameters is null.
      */
     public static void putParallelInvocation(@Nonnull final Bundle bundle,
             @Nonnull final String invocationId,
@@ -254,18 +253,6 @@ public class RoutineService extends Service {
         putValue(bundle, value);
     }
 
-    @Nonnull
-    private static DataOrder normalize(@Nullable final DataOrder order) {
-
-        return (order != null) ? order : DataOrder.DEFAULT;
-    }
-
-    @Nonnull
-    private static LogLevel normalize(@Nullable final LogLevel level) {
-
-        return (level != null) ? level : LogLevel.DEFAULT;
-    }
-
     private static void putError(@Nonnull final Bundle bundle, @Nullable final Throwable error) {
 
         bundle.putSerializable(RoutineService.KEY_ABORT_EXCEPTION, error);
@@ -281,7 +268,7 @@ public class RoutineService extends Service {
      * @param configuration   the routine configuration.
      * @param runnerClass     the runner class.
      * @param logClass        the log class.
-     * @throws java.lang.NullPointerException if any of the specified nonnull parameters is null.
+     * @throws java.lang.NullPointerException if any of the specified non-null parameters is null.
      */
     private static void putInvocation(@Nonnull final Bundle bundle, boolean isParallel,
             @Nonnull final String invocationId,
@@ -293,9 +280,10 @@ public class RoutineService extends Service {
         bundle.putBoolean(KEY_PARALLEL_INVOCATION, isParallel);
         bundle.putString(KEY_INVOCATION_ID, invocationId);
         bundle.putSerializable(KEY_INVOCATION_CLASS, invocationClass);
-        bundle.putInt(KEY_MAX_RETAINED,
-                      configuration.getMaxRetainedOr(RoutineConfiguration.DEFAULT));
-        bundle.putInt(KEY_MAX_RUNNING, configuration.getMaxRunningOr(RoutineConfiguration.DEFAULT));
+        bundle.putInt(KEY_CORE_INVOCATIONS,
+                      configuration.getCoreInvocationsOr(RoutineConfiguration.DEFAULT));
+        bundle.putInt(KEY_MAX_INVOCATIONS,
+                      configuration.getMaxInvocationsOr(RoutineConfiguration.DEFAULT));
 
         final TimeDuration availTimeout = configuration.getAvailTimeoutOr(null);
 
@@ -305,11 +293,11 @@ public class RoutineService extends Service {
             bundle.putSerializable(KEY_AVAILABLE_TIMEUNIT, availTimeout.unit);
         }
 
-        bundle.putSerializable(KEY_INPUT_ORDER, configuration.getInputOrderOr(DataOrder.DEFAULT));
-        bundle.putSerializable(KEY_OUTPUT_ORDER, configuration.getOutputOrderOr(DataOrder.DEFAULT));
+        bundle.putSerializable(KEY_INPUT_ORDER, configuration.getInputOrderOr(null));
+        bundle.putSerializable(KEY_OUTPUT_ORDER, configuration.getOutputOrderOr(null));
         bundle.putSerializable(KEY_RUNNER_CLASS, runnerClass);
         bundle.putSerializable(KEY_LOG_CLASS, logClass);
-        bundle.putSerializable(KEY_LOG_LEVEL, configuration.getLogLevelOr(LogLevel.DEFAULT));
+        bundle.putSerializable(KEY_LOG_LEVEL, configuration.getLogLevelOr(null));
     }
 
     private static void putValue(@Nonnull final Bundle bundle, @Nullable final Object value) {
@@ -406,21 +394,19 @@ public class RoutineService extends Service {
                         "an invocation with the same ID is already running: " + invocationId);
             }
 
-            final int maxRetained = data.getInt(KEY_MAX_RETAINED);
-            final int maxRunning = data.getInt(KEY_MAX_RUNNING);
+            final int coreInvocations = data.getInt(KEY_CORE_INVOCATIONS);
+            final int maxInvocations = data.getInt(KEY_MAX_INVOCATIONS);
             final long timeout = data.getLong(KEY_AVAILABLE_TIMEOUT);
             final TimeUnit timeUnit = (TimeUnit) data.getSerializable(KEY_AVAILABLE_TIMEUNIT);
             final TimeDuration availTimeout =
                     (timeUnit != null) ? TimeDuration.fromUnit(timeout, timeUnit) : null;
-            final DataOrder inputOrder =
-                    normalize((DataOrder) data.getSerializable(KEY_INPUT_ORDER));
-            final DataOrder outputOrder =
-                    normalize((DataOrder) data.getSerializable(KEY_OUTPUT_ORDER));
+            final OrderBy inputOrder = (OrderBy) data.getSerializable(KEY_INPUT_ORDER);
+            final OrderBy outputOrder = (OrderBy) data.getSerializable(KEY_OUTPUT_ORDER);
             final Class<? extends Runner> runnerClass =
                     (Class<? extends Runner>) data.getSerializable(KEY_RUNNER_CLASS);
             final Class<? extends Log> logClass =
                     (Class<? extends Log>) data.getSerializable(KEY_LOG_CLASS);
-            final LogLevel logLevel = normalize((LogLevel) data.getSerializable(KEY_LOG_LEVEL));
+            final LogLevel logLevel = (LogLevel) data.getSerializable(KEY_LOG_LEVEL);
 
             final RoutineInfo routineInfo =
                     new RoutineInfo(invocationClass, inputOrder, outputOrder, runnerClass, logClass,
@@ -436,7 +422,7 @@ public class RoutineService extends Service {
 
                     try {
 
-                        builder.runBy(findConstructor(runnerClass).newInstance());
+                        builder.withRunner(findConstructor(runnerClass).newInstance());
 
                     } catch (final InvocationInterruptedException e) {
 
@@ -454,7 +440,7 @@ public class RoutineService extends Service {
 
                     try {
 
-                        builder.loggedWith(findConstructor(logClass).newInstance());
+                        builder.withLog(findConstructor(logClass).newInstance());
 
                     } catch (final InvocationInterruptedException e) {
 
@@ -468,12 +454,12 @@ public class RoutineService extends Service {
                     }
                 }
 
-                builder.maxRetained(maxRetained)
-                       .maxRunning(maxRunning)
-                       .availableTimeout(availTimeout)
-                       .inputOrder(inputOrder)
-                       .outputOrder(outputOrder)
-                       .logLevel(logLevel);
+                builder.withCoreInvocations(coreInvocations)
+                       .withMaxInvocations(maxInvocations)
+                       .withAvailableTimeout(availTimeout)
+                       .withInputOrder(inputOrder)
+                       .withOutputOrder(outputOrder)
+                       .withLogLevel(logLevel);
 
                 final AndroidRoutine androidRoutine =
                         new AndroidRoutine(this, builder.buildConfiguration(), invocationClass);
@@ -664,7 +650,7 @@ public class RoutineService extends Service {
      */
     private static class RoutineInfo {
 
-        private final DataOrder mInputOrder;
+        private final OrderBy mInputOrder;
 
         private final Class<? extends AndroidInvocation<?, ?>> mInvocationClass;
 
@@ -672,7 +658,7 @@ public class RoutineService extends Service {
 
         private final LogLevel mLogLevel;
 
-        private final DataOrder mOutputOrder;
+        private final OrderBy mOutputOrder;
 
         private final Class<? extends Runner> mRunnerClass;
 
@@ -687,9 +673,9 @@ public class RoutineService extends Service {
          * @param logLevel        the log level.
          */
         private RoutineInfo(@Nonnull final Class<? extends AndroidInvocation<?, ?>> invocationClass,
-                @Nonnull final DataOrder inputOrder, @Nonnull final DataOrder outputOrder,
+                @Nullable final OrderBy inputOrder, @Nullable final OrderBy outputOrder,
                 @Nullable final Class<? extends Runner> runnerClass,
-                @Nullable final Class<? extends Log> logClass, @Nonnull final LogLevel logLevel) {
+                @Nullable final Class<? extends Log> logClass, @Nullable final LogLevel logLevel) {
 
             mInvocationClass = invocationClass;
             mInputOrder = inputOrder;
@@ -722,13 +708,13 @@ public class RoutineService extends Service {
         }
 
         @Override
-        public int hashCode() {
+        public int hashCode() { //TODO: default is not equal
 
-            int result = mInputOrder.hashCode();
+            int result = (mInputOrder != null ? mInputOrder.hashCode() : 0);
             result = 31 * result + mInvocationClass.hashCode();
             result = 31 * result + (mLogClass != null ? mLogClass.hashCode() : 0);
-            result = 31 * result + mLogLevel.hashCode();
-            result = 31 * result + mOutputOrder.hashCode();
+            result = 31 * result + (mLogLevel != null ? mLogLevel.hashCode() : 0);
+            result = 31 * result + (mOutputOrder != null ? mOutputOrder.hashCode() : 0);
             result = 31 * result + (mRunnerClass != null ? mRunnerClass.hashCode() : 0);
             return result;
         }

@@ -70,58 +70,8 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineChannelBu
 
     @Nonnull
     @Override
-    public InvocationRoutineBuilder<INPUT, OUTPUT> availableTimeout(final long timeout,
-            @Nonnull final TimeUnit timeUnit) {
-
-        mBuilder.availableTimeout(timeout, timeUnit);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public InvocationRoutineBuilder<INPUT, OUTPUT> availableTimeout(
-            @Nullable final TimeDuration timeout) {
-
-        mBuilder.availableTimeout(timeout);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public InvocationRoutineBuilder<INPUT, OUTPUT> logLevel(@Nonnull final LogLevel level) {
-
-        mBuilder.logLevel(level);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public InvocationRoutineBuilder<INPUT, OUTPUT> loggedWith(@Nullable final Log log) {
-
-        mBuilder.loggedWith(log);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public InvocationRoutineBuilder<INPUT, OUTPUT> maxRetained(final int maxRetainedInstances) {
-
-        mBuilder.maxRetained(maxRetainedInstances);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public InvocationRoutineBuilder<INPUT, OUTPUT> maxRunning(final int maxRunningInstances) {
-
-        mBuilder.maxRunning(maxRunningInstances);
-        return this;
-    }
-
-    @Nonnull
-    @Override
     public InvocationRoutineBuilder<INPUT, OUTPUT> onReadTimeout(
-            @Nonnull final TimeoutAction action) {
+            @Nullable final TimeoutAction action) {
 
         mBuilder.onReadTimeout(action);
         return this;
@@ -129,103 +79,153 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineChannelBu
 
     @Nonnull
     @Override
-    public InvocationRoutineBuilder<INPUT, OUTPUT> readTimeout(final long timeout,
+    public InvocationRoutineBuilder<INPUT, OUTPUT> withAvailableTimeout(final long timeout,
             @Nonnull final TimeUnit timeUnit) {
 
-        mBuilder.readTimeout(timeout, timeUnit);
+        mBuilder.withAvailableTimeout(timeout, timeUnit);
         return this;
     }
 
     @Nonnull
     @Override
-    public InvocationRoutineBuilder<INPUT, OUTPUT> readTimeout(
+    public InvocationRoutineBuilder<INPUT, OUTPUT> withAvailableTimeout(
             @Nullable final TimeDuration timeout) {
 
-        mBuilder.readTimeout(timeout);
+        mBuilder.withAvailableTimeout(timeout);
         return this;
     }
 
     @Nonnull
     @Override
-    public InvocationRoutineBuilder<INPUT, OUTPUT> runBy(@Nullable final Runner runner) {
+    public InvocationRoutineBuilder<INPUT, OUTPUT> withCoreInvocations(final int coreInvocations) {
 
-        mBuilder.runBy(runner);
+        mBuilder.withCoreInvocations(coreInvocations);
         return this;
     }
 
     @Nonnull
     @Override
-    public InvocationRoutineBuilder<INPUT, OUTPUT> syncRunner(@Nonnull final RunnerType type) {
+    public InvocationRoutineBuilder<INPUT, OUTPUT> withLog(@Nullable final Log log) {
 
-        mBuilder.syncRunner(type);
+        mBuilder.withLog(log);
         return this;
     }
 
     @Nonnull
     @Override
-    public InvocationRoutineBuilder<INPUT, OUTPUT> inputOrder(@Nonnull final DataOrder order) {
+    public InvocationRoutineBuilder<INPUT, OUTPUT> withLogLevel(@Nullable final LogLevel level) {
 
-        mBuilder.inputOrder(order);
+        mBuilder.withLogLevel(level);
         return this;
     }
 
     @Nonnull
     @Override
-    public InvocationRoutineBuilder<INPUT, OUTPUT> inputSize(final int inputMaxSize) {
+    public InvocationRoutineBuilder<INPUT, OUTPUT> withMaxInvocations(final int maxInvocations) {
 
-        mBuilder.inputSize(inputMaxSize);
+        mBuilder.withMaxInvocations(maxInvocations);
         return this;
     }
 
     @Nonnull
     @Override
-    public InvocationRoutineBuilder<INPUT, OUTPUT> inputTimeout(
-            @Nullable final TimeDuration timeout) {
-
-        mBuilder.inputTimeout(timeout);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public InvocationRoutineBuilder<INPUT, OUTPUT> inputTimeout(final long timeout,
+    public InvocationRoutineBuilder<INPUT, OUTPUT> withReadTimeout(final long timeout,
             @Nonnull final TimeUnit timeUnit) {
 
-        mBuilder.inputTimeout(timeout, timeUnit);
+        mBuilder.withReadTimeout(timeout, timeUnit);
         return this;
     }
 
     @Nonnull
     @Override
-    public InvocationRoutineBuilder<INPUT, OUTPUT> outputOrder(@Nonnull final DataOrder order) {
-
-        mBuilder.outputOrder(order);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public InvocationRoutineBuilder<INPUT, OUTPUT> outputSize(final int outputMaxSize) {
-
-        mBuilder.outputSize(outputMaxSize);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public InvocationRoutineBuilder<INPUT, OUTPUT> outputTimeout(final long timeout,
-            @Nonnull final TimeUnit timeUnit) {
-
-        mBuilder.outputTimeout(timeout, timeUnit);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public InvocationRoutineBuilder<INPUT, OUTPUT> outputTimeout(
+    public InvocationRoutineBuilder<INPUT, OUTPUT> withReadTimeout(
             @Nullable final TimeDuration timeout) {
 
-        mBuilder.outputTimeout(timeout);
+        mBuilder.withReadTimeout(timeout);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public InvocationRoutineBuilder<INPUT, OUTPUT> withRunner(@Nullable final Runner runner) {
+
+        mBuilder.withRunner(runner);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public InvocationRoutineBuilder<INPUT, OUTPUT> withSyncRunner(@Nullable final RunnerType type) {
+
+        mBuilder.withSyncRunner(type);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public InvocationRoutineBuilder<INPUT, OUTPUT> withInputOrder(@Nullable final OrderBy order) {
+
+        mBuilder.withInputOrder(order);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public InvocationRoutineBuilder<INPUT, OUTPUT> withInputSize(final int inputMaxSize) {
+
+        mBuilder.withInputSize(inputMaxSize);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public InvocationRoutineBuilder<INPUT, OUTPUT> withInputTimeout(
+            @Nullable final TimeDuration timeout) {
+
+        mBuilder.withInputTimeout(timeout);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public InvocationRoutineBuilder<INPUT, OUTPUT> withInputTimeout(final long timeout,
+            @Nonnull final TimeUnit timeUnit) {
+
+        mBuilder.withInputTimeout(timeout, timeUnit);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public InvocationRoutineBuilder<INPUT, OUTPUT> withOutputOrder(@Nullable final OrderBy order) {
+
+        mBuilder.withOutputOrder(order);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public InvocationRoutineBuilder<INPUT, OUTPUT> withOutputSize(final int outputMaxSize) {
+
+        mBuilder.withOutputSize(outputMaxSize);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public InvocationRoutineBuilder<INPUT, OUTPUT> withOutputTimeout(
+            @Nullable final TimeDuration timeout) {
+
+        mBuilder.withOutputTimeout(timeout);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public InvocationRoutineBuilder<INPUT, OUTPUT> withOutputTimeout(final long timeout,
+            @Nonnull final TimeUnit timeUnit) {
+
+        mBuilder.withOutputTimeout(timeout, timeUnit);
         return this;
     }
 

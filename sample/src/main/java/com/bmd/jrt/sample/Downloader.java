@@ -47,8 +47,8 @@ public class Downloader {
     public Downloader(final int maxParallelDownloads) {
 
         mReadConnection = JRoutine.on(tokenOf(ReadConnection.class))
-                                  .maxRunning(maxParallelDownloads)
-                                  .availableTimeout(INFINITY)
+                                  .withMaxInvocations(maxParallelDownloads)
+                                  .withAvailableTimeout(INFINITY)
                                   .buildRoutine();
     }
 
@@ -98,8 +98,8 @@ public class Downloader {
             mDownloadedSet.remove(uri);
 
             final Routine<Chunk, Boolean> writeFile = JRoutine.on(tokenOf(WriteFile.class))
-                                                              .inputSize(8)
-                                                              .inputTimeout(seconds(30))
+                                                              .withInputSize(8)
+                                                              .withInputTimeout(seconds(30))
                                                               .withArgs(dstFile)
                                                               .buildRoutine();
 

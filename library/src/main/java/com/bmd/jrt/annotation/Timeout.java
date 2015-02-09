@@ -65,7 +65,7 @@ public @interface Timeout {
      *
      * @return the action type.
      */
-    TimeoutAction action() default TimeoutAction.DEFAULT;
+    TimeoutAction action() default TimeoutAction.DEADLOCK;
 
     /**
      * The time unit of the timeout for an invocation instance to produce a result.

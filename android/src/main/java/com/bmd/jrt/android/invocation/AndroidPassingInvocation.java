@@ -25,17 +25,17 @@ import javax.annotation.Nonnull;
  *
  * @param <DATA> the data type.
  */
-public class AndroidTunnelInvocation<DATA> extends AndroidTemplateInvocation<DATA, DATA> {
+public class AndroidPassingInvocation<DATA> extends AndroidTemplateInvocation<DATA, DATA> {
 
     /**
-     * Creates and returns the class token of a typed tunnel invocation.
+     * Creates and returns the class token of a typed passing invocation.
      *
      * @param <DATA> the data type.
      * @return the token instance.
      */
-    public static <DATA> ClassToken<AndroidTunnelInvocation<DATA>> tokenOf() {
+    public static <DATA> ClassToken<AndroidPassingInvocation<DATA>> tokenOf() {
 
-        return new ClassToken<AndroidTunnelInvocation<DATA>>() {};
+        return new ClassToken<AndroidPassingInvocation<DATA>>() {};
     }
 
     @Override

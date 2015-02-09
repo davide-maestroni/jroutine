@@ -81,8 +81,9 @@ public @interface Async {
         /**
          * Automatic type.<br/>
          * The type is automatically assigned based on the parameter or return type. Namely: if the
-         * parameters or return type match the COLLECT, they are assigned the COLLECT type; if they
-         * match the PASS type, they are assigned it; finally the PARALLEL conditions are checked.
+         * parameters or return type match the PARALLEL async type, they are assigned it; if they
+         * match the COLLECT type, they are assigned the latter; finally the PASS conditions are
+         * checked.
          */
         AUTO
     }

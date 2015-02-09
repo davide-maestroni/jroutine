@@ -19,7 +19,7 @@ import android.os.Looper;
 import com.bmd.jrt.android.invocation.AndroidInvocation;
 import com.bmd.jrt.android.service.RoutineService;
 import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
-import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
+import com.bmd.jrt.builder.RoutineChannelBuilder.OrderBy;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.builder.RoutineConfigurationBuilder;
 import com.bmd.jrt.common.ClassToken;
@@ -89,38 +89,6 @@ public class ServiceRoutineBuilder<INPUT, OUTPUT> {
     }
 
     /**
-     * Sets the timeout for an invocation instance to become available.
-     *
-     * @param timeout  the timeout.
-     * @param timeUnit the timeout time unit.
-     * @return this builder.
-     * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
-     * @throws java.lang.NullPointerException     if the specified time unit is null.
-     */
-    @Nonnull
-    public ServiceRoutineBuilder<INPUT, OUTPUT> availableTimeout(final long timeout,
-            @Nonnull final TimeUnit timeUnit) {
-
-        mBuilder.availableTimeout(timeout, timeUnit);
-        return this;
-    }
-
-    /**
-     * Sets the timeout for an invocation instance to become available. A null value means that
-     * it is up to the framework to chose a default duration.
-     *
-     * @param timeout the timeout.
-     * @return this builder.
-     */
-    @Nonnull
-    public ServiceRoutineBuilder<INPUT, OUTPUT> availableTimeout(
-            @Nullable final TimeDuration timeout) {
-
-        mBuilder.availableTimeout(timeout);
-        return this;
-    }
-
-    /**
      * Builds and returns the routine.
      *
      * @return the newly created routine instance.
@@ -148,16 +116,63 @@ public class ServiceRoutineBuilder<INPUT, OUTPUT> {
     }
 
     /**
-     * Sets the order in which input data are collected from the input channel.
+     * Sets the timeout for an invocation instance to become available.
+     *
+     * @param timeout  the timeout.
+     * @param timeUnit the timeout time unit.
+     * @return this builder.
+     * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
+     * @throws java.lang.NullPointerException     if the specified time unit is null.
+     */
+    @Nonnull
+    public ServiceRoutineBuilder<INPUT, OUTPUT> withAvailableTimeout(final long timeout,
+            @Nonnull final TimeUnit timeUnit) {
+
+        mBuilder.withAvailableTimeout(timeout, timeUnit);
+        return this;
+    }
+
+    /**
+     * Sets the timeout for an invocation instance to become available. A null value means that
+     * it is up to the framework to chose a default duration.
+     *
+     * @param timeout the timeout.
+     * @return this builder.
+     */
+    @Nonnull
+    public ServiceRoutineBuilder<INPUT, OUTPUT> withAvailableTimeout(
+            @Nullable final TimeDuration timeout) {
+
+        mBuilder.withAvailableTimeout(timeout);
+        return this;
+    }
+
+    /**
+     * Sets the max number of core invocation instances. A {@link RoutineConfiguration#DEFAULT}
+     * value means that it is up to the framework to chose a default number.
+     *
+     * @param coreInstances the max number of instances.
+     * @return this builder.
+     * @throws java.lang.IllegalArgumentException if the number is negative.
+     */
+    @Nonnull
+    public ServiceRoutineBuilder<INPUT, OUTPUT> withCoreInstances(final int coreInstances) {
+
+        mBuilder.withCoreInvocations(coreInstances);
+        return this;
+    }
+
+    /**
+     * Sets the order in which input data are collected from the input channel. A null value means
+     * that it is up to the framework to chose a default order type.
      *
      * @param order the order type.
      * @return this builder.
-     * @throws java.lang.NullPointerException if the specified order type is null.
      */
     @Nonnull
-    public ServiceRoutineBuilder<INPUT, OUTPUT> inputOrder(@Nonnull final DataOrder order) {
+    public ServiceRoutineBuilder<INPUT, OUTPUT> withInputOrder(@Nullable final OrderBy order) {
 
-        mBuilder.inputOrder(order);
+        mBuilder.withInputOrder(order);
         return this;
     }
 
@@ -169,39 +184,25 @@ public class ServiceRoutineBuilder<INPUT, OUTPUT> {
      * @return this builder.
      */
     @Nonnull
-    public ServiceRoutineBuilder<INPUT, OUTPUT> logClass(
+    public ServiceRoutineBuilder<INPUT, OUTPUT> withLogClass(
             @Nullable final Class<? extends Log> logClass) {
 
         mLogClass = logClass;
         return this;
+
     }
 
     /**
-     * Sets the log level.
+     * Sets the log level. A null value means that it is up to the framework to chose a default
+     * level.
      *
      * @param level the log level.
      * @return this builder.
-     * @throws java.lang.NullPointerException if the log level is null.
      */
     @Nonnull
-    public ServiceRoutineBuilder<INPUT, OUTPUT> logLevel(@Nonnull final LogLevel level) {
+    public ServiceRoutineBuilder<INPUT, OUTPUT> withLogLevel(@Nullable final LogLevel level) {
 
-        mBuilder.logLevel(level);
-        return this;
-    }
-
-    /**
-     * Sets the max number of retained invocation instances. A {@link RoutineConfiguration#DEFAULT}
-     * value means that it is up to the framework to chose a default number.
-     *
-     * @param maxRetainedInstances the max number of instances.
-     * @return this builder.
-     * @throws java.lang.IllegalArgumentException if the number is negative.
-     */
-    @Nonnull
-    public ServiceRoutineBuilder<INPUT, OUTPUT> maxRetained(final int maxRetainedInstances) {
-
-        mBuilder.maxRetained(maxRetainedInstances);
+        mBuilder.withLogLevel(level);
         return this;
     }
 
@@ -210,28 +211,28 @@ public class ServiceRoutineBuilder<INPUT, OUTPUT> {
      * {@link RoutineConfiguration#DEFAULT} value means that it is up to the framework to chose a
      * default number.
      *
-     * @param maxRunningInstances the max number of instances.
+     * @param maxInstances the max number of instances.
      * @return this builder.
      * @throws java.lang.IllegalArgumentException if the number is less than 1.
      */
     @Nonnull
-    public ServiceRoutineBuilder<INPUT, OUTPUT> maxRunning(final int maxRunningInstances) {
+    public ServiceRoutineBuilder<INPUT, OUTPUT> withMaxInstances(final int maxInstances) {
 
-        mBuilder.maxRunning(maxRunningInstances);
+        mBuilder.withMaxInvocations(maxInstances);
         return this;
     }
 
     /**
-     * Sets the order in which output data are collected from the result channel.
+     * Sets the order in which output data are collected from the result channel. A null value means
+     * that it is up to the framework to chose a default order type.
      *
      * @param order the order type.
      * @return this builder.
-     * @throws java.lang.NullPointerException if the specified order type is null.
      */
     @Nonnull
-    public ServiceRoutineBuilder<INPUT, OUTPUT> outputOrder(@Nonnull final DataOrder order) {
+    public ServiceRoutineBuilder<INPUT, OUTPUT> withOutputOrder(@Nullable final OrderBy order) {
 
-        mBuilder.outputOrder(order);
+        mBuilder.withOutputOrder(order);
         return this;
     }
 
@@ -243,7 +244,7 @@ public class ServiceRoutineBuilder<INPUT, OUTPUT> {
      * @return this builder.
      */
     @Nonnull
-    public ServiceRoutineBuilder<INPUT, OUTPUT> runnerClass(
+    public ServiceRoutineBuilder<INPUT, OUTPUT> withRunnerClass(
             @Nullable final Class<? extends Runner> runnerClass) {
 
         mRunnerClass = runnerClass;
@@ -258,25 +259,24 @@ public class ServiceRoutineBuilder<INPUT, OUTPUT> {
      * @return this builder.
      */
     @Nonnull
-    public ServiceRoutineBuilder<INPUT, OUTPUT> serviceClass(
+    public ServiceRoutineBuilder<INPUT, OUTPUT> withServiceClass(
             @Nullable final Class<? extends RoutineService> serviceClass) {
 
         mServiceClass = serviceClass;
         return this;
     }
 
-
     /**
-     * Sets the type of the synchronous runner to be used by the routine.
+     * Sets the type of the synchronous runner to be used by the routine. A null value means that it
+     * is up to the framework to chose a default order type.
      *
      * @param type the runner type.
      * @return this builder.
-     * @throws java.lang.NullPointerException if the specified type is null.
      */
     @Nonnull
-    public ServiceRoutineBuilder<INPUT, OUTPUT> syncRunner(@Nonnull RunnerType type) {
+    public ServiceRoutineBuilder<INPUT, OUTPUT> withSyncRunner(@Nullable RunnerType type) {
 
-        mBuilder.syncRunner(type);
+        mBuilder.withSyncRunner(type);
         return this;
     }
 }

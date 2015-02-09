@@ -62,15 +62,14 @@ public class Logger {
      * @param contexts the array of contexts.
      * @param log      the log instance.
      * @param level    the log level.
-     * @throws java.lang.NullPointerException if any of the parameters is null.
      */
     private Logger(@Nonnull final Object[] contexts, @Nullable final Log log,
-            @Nonnull final LogLevel level) {
+            @Nullable final LogLevel level) {
 
         mContexts = contexts.clone();
         mLog = (log == null) ? DEFAULT_LOG : log;
-        mLogLevel = (level == LogLevel.DEFAULT) ? DEFAULT_LEVEL : level;
-        mLevel = level.ordinal();
+        mLogLevel = (level == null) ? DEFAULT_LEVEL : level;
+        mLevel = mLogLevel.ordinal();
         mContextList = Arrays.asList(mContexts);
     }
 
@@ -81,11 +80,11 @@ public class Logger {
      * @param level   the log level.
      * @param context the context.
      * @return the new logger.
-     * @throws java.lang.NullPointerException if any of the parameters is null.
+     * @throws java.lang.NullPointerException if the specified context is null.
      */
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public static Logger createLogger(@Nullable final Log log, @Nonnull final LogLevel level,
+    public static Logger createLogger(@Nullable final Log log, @Nullable final LogLevel level,
             @Nonnull final Object context) {
 
         if (context == null) {
@@ -132,17 +131,10 @@ public class Logger {
      * Sets the global log level.
      *
      * @param level the log level.
-     * @throws java.lang.NullPointerException if the specified level is null.
      */
-    @SuppressWarnings("ConstantConditions")
-    public static void setGlobalLogLevel(@Nonnull final LogLevel level) {
+    public static void setGlobalLogLevel(@Nullable final LogLevel level) {
 
-        if (level == null) {
-
-            throw new NullPointerException("the log level must not be null");
-        }
-
-        sLogLevel.set((level == LogLevel.DEFAULT) ? DEFAULT_LEVEL : level);
+        sLogLevel.set((level == null) ? DEFAULT_LEVEL : level);
     }
 
     /**

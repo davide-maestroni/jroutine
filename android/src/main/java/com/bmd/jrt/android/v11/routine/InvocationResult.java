@@ -13,7 +13,7 @@
  */
 package com.bmd.jrt.android.v11.routine;
 
-import com.bmd.jrt.channel.Tunnel.TunnelInput;
+import com.bmd.jrt.channel.StandaloneChannel.StandaloneInput;
 
 import java.util.Collection;
 
@@ -52,6 +52,6 @@ interface InvocationResult<OUTPUT> {
      * @return whether the invocation is complete.
      * @throws java.lang.NullPointerException if any of the parameters is null.
      */
-    public boolean passTo(@Nonnull final Collection<TunnelInput<OUTPUT>> newChannels,
-            @Nonnull final Collection<TunnelInput<OUTPUT>> oldChannels);
+    public boolean passTo(@Nonnull final Collection<StandaloneInput<OUTPUT>> newChannels,
+            @Nonnull final Collection<StandaloneInput<OUTPUT>> oldChannels);
 }

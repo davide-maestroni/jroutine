@@ -15,20 +15,20 @@ package com.bmd.jrt.android.invocation;
 
 import android.content.Context;
 
-import com.bmd.jrt.invocation.SimpleInvocation;
+import com.bmd.jrt.invocation.SingleCallInvocation;
 
 import javax.annotation.Nonnull;
 
 /**
- * Simple invocation implementing an Android invocation.
+ * Single call invocation implementing an Android invocation.
  * <p/>
  * Created by davide on 1/8/15.
  *
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-public abstract class AndroidSimpleInvocation<INPUT, OUTPUT> extends SimpleInvocation<INPUT, OUTPUT>
-        implements AndroidInvocation<INPUT, OUTPUT> {
+public abstract class AndroidSingleCallInvocation<INPUT, OUTPUT>
+        extends SingleCallInvocation<INPUT, OUTPUT> implements AndroidInvocation<INPUT, OUTPUT> {
 
     private Context mContext;
 

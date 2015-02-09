@@ -22,10 +22,10 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Interface defining a tunnel.
+ * Interface defining a standalone channel.
  * <p/>
- * An tunnel is useful to make other asynchronous tasks communicate with a routine.<br/>
- * The tunnel output can be passed to a routine input channel in order to feed it with data coming
+ * An standalone channel is useful to make other asynchronous tasks communicate with a routine.<br/>
+ * The channel output can be passed to a routine input channel in order to feed it with data coming
  * asynchronously from another source. Note however, that in both cases the
  * <b><code>close()</code></b> method must be called to correctly terminate the invocation
  * lifecycle.
@@ -34,109 +34,109 @@ import javax.annotation.Nullable;
  *
  * @param <TYPE> the data type.
  */
-public interface Tunnel<TYPE> {
+public interface StandaloneChannel<TYPE> {
 
     /**
-     * Returns the input end of this tunnel.
+     * Returns the input end of this channel.
      *
      * @return the input channel.
      */
     @Nonnull
-    public TunnelInput<TYPE> input();
+    public StandaloneInput<TYPE> input();
 
     /**
-     * Returns the output end of this tunnel.
+     * Returns the output end of this channel.
      *
      * @return the output channel.
      */
     @Nonnull
-    public TunnelOutput<TYPE> output();
+    public StandaloneOutput<TYPE> output();
 
     /**
-     * Interface defining a tunnel input.
+     * Interface defining a standalone channel input.
      *
      * @param <INPUT> the input data type.
      */
-    public interface TunnelInput<INPUT> extends InputChannel<INPUT> {
+    public interface StandaloneInput<INPUT> extends InputChannel<INPUT> {
 
         @Nonnull
         @Override
-        public TunnelInput<INPUT> after(@Nonnull TimeDuration delay);
+        public StandaloneInput<INPUT> after(@Nonnull TimeDuration delay);
 
         @Nonnull
         @Override
-        public TunnelInput<INPUT> after(long delay, @Nonnull TimeUnit timeUnit);
+        public StandaloneInput<INPUT> after(long delay, @Nonnull TimeUnit timeUnit);
 
         @Nonnull
         @Override
-        public TunnelInput<INPUT> now();
+        public StandaloneInput<INPUT> now();
 
         @Nonnull
         @Override
-        public TunnelInput<INPUT> pass(@Nullable OutputChannel<INPUT> channel);
+        public StandaloneInput<INPUT> pass(@Nullable OutputChannel<INPUT> channel);
 
         @Nonnull
         @Override
-        public TunnelInput<INPUT> pass(@Nullable Iterable<? extends INPUT> inputs);
+        public StandaloneInput<INPUT> pass(@Nullable Iterable<? extends INPUT> inputs);
 
         @Nonnull
         @Override
-        public TunnelInput<INPUT> pass(@Nullable INPUT input);
+        public StandaloneInput<INPUT> pass(@Nullable INPUT input);
 
         @Nonnull
         @Override
-        public TunnelInput<INPUT> pass(@Nullable INPUT... inputs);
+        public StandaloneInput<INPUT> pass(@Nullable INPUT... inputs);
 
         /**
-         * Closes the tunnel input.<br/>
+         * Closes the channel input.<br/>
          * If the channel is already close, this method has no effect.
          * <p/>
-         * Note that this method must be always called when done with the tunnel.
+         * Note that this method must be always called when done with the channel.
          */
         public void close();
     }
 
     /**
-     * Interface defining a tunnel output.
+     * Interface defining a standalone channel output.
      *
      * @param <OUTPUT> the output data type.
      */
-    public interface TunnelOutput<OUTPUT> extends OutputChannel<OUTPUT> {
+    public interface StandaloneOutput<OUTPUT> extends OutputChannel<OUTPUT> {
 
         @Nonnull
         @Override
-        public TunnelOutput<OUTPUT> afterMax(@Nonnull TimeDuration timeout);
+        public StandaloneOutput<OUTPUT> afterMax(@Nonnull TimeDuration timeout);
 
         @Nonnull
         @Override
-        public TunnelOutput<OUTPUT> afterMax(long timeout, @Nonnull TimeUnit timeUnit);
+        public StandaloneOutput<OUTPUT> afterMax(long timeout, @Nonnull TimeUnit timeUnit);
 
         @Nonnull
         @Override
-        public TunnelOutput<OUTPUT> bind(@Nonnull OutputConsumer<OUTPUT> consumer);
+        public StandaloneOutput<OUTPUT> bind(@Nonnull OutputConsumer<OUTPUT> consumer);
 
         @Nonnull
         @Override
-        public TunnelOutput<OUTPUT> eventually();
+        public StandaloneOutput<OUTPUT> eventually();
 
         @Nonnull
         @Override
-        public TunnelOutput<OUTPUT> eventuallyAbort();
+        public StandaloneOutput<OUTPUT> eventuallyAbort();
 
         @Nonnull
         @Override
-        public TunnelOutput<OUTPUT> eventuallyDeadlock();
+        public StandaloneOutput<OUTPUT> eventuallyDeadlock();
 
         @Nonnull
         @Override
-        public TunnelOutput<OUTPUT> eventuallyExit();
+        public StandaloneOutput<OUTPUT> eventuallyExit();
 
         @Nonnull
         @Override
-        public TunnelOutput<OUTPUT> immediately();
+        public StandaloneOutput<OUTPUT> immediately();
 
         @Nonnull
         @Override
-        public TunnelOutput<OUTPUT> readAllInto(@Nonnull Collection<? super OUTPUT> results);
+        public StandaloneOutput<OUTPUT> readAllInto(@Nonnull Collection<? super OUTPUT> results);
     }
 }

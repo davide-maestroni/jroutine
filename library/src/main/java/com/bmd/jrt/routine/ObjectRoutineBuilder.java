@@ -18,7 +18,7 @@ import com.bmd.jrt.annotation.Async.AsyncType;
 import com.bmd.jrt.annotation.Bind;
 import com.bmd.jrt.annotation.Share;
 import com.bmd.jrt.annotation.Timeout;
-import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
+import com.bmd.jrt.builder.RoutineChannelBuilder.OrderBy;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.builder.RoutineConfigurationBuilder;
 import com.bmd.jrt.channel.OutputChannel;
@@ -213,19 +213,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
         if (asyncType == AsyncType.AUTO) {
 
-            if (OutputChannel.class.isAssignableFrom(parameterType)) {
-
-                if ((length == 1) && (paramClass.isArray() || paramClass.isAssignableFrom(
-                        List.class))) {
-
-                    asyncType = AsyncType.COLLECT;
-
-                } else {
-
-                    asyncType = AsyncType.PASS;
-                }
-
-            } else if (parameterType.isArray() || Iterable.class.isAssignableFrom(parameterType)) {
+            if (parameterType.isArray() || Iterable.class.isAssignableFrom(parameterType)) {
 
                 if (parameterType.isArray() && !boxingClass(paramClass).isAssignableFrom(
                         boxingClass(parameterType.getComponentType()))) {
@@ -245,6 +233,18 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                 }
 
                 asyncType = AsyncType.PARALLEL;
+
+            } else if (OutputChannel.class.isAssignableFrom(parameterType)) {
+
+                if ((length == 1) && (paramClass.isArray() || paramClass.isAssignableFrom(
+                        List.class))) {
+
+                    asyncType = AsyncType.COLLECT;
+
+                } else {
+
+                    asyncType = AsyncType.PASS;
+                }
 
             } else {
 
@@ -323,20 +323,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
         if (asyncType == AsyncType.AUTO) {
 
-            if (returnType.isAssignableFrom(OutputChannel.class)) {
-
-                final Class<?> returnClass = annotation.value();
-
-                if (returnClass.isArray() || Iterable.class.isAssignableFrom(returnClass)) {
-
-                    asyncType = AsyncType.COLLECT;
-
-                } else {
-
-                    asyncType = AsyncType.PASS;
-                }
-
-            } else if (returnType.isArray() || returnType.isAssignableFrom(List.class)) {
+            if (returnType.isArray() || returnType.isAssignableFrom(List.class)) {
 
                 final Class<?> returnClass = annotation.value();
 
@@ -350,6 +337,19 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                 }
 
                 asyncType = AsyncType.PARALLEL;
+
+            } else if (returnType.isAssignableFrom(OutputChannel.class)) {
+
+                final Class<?> returnClass = annotation.value();
+
+                if (returnClass.isArray() || Iterable.class.isAssignableFrom(returnClass)) {
+
+                    asyncType = AsyncType.COLLECT;
+
+                } else {
+
+                    asyncType = AsyncType.PASS;
+                }
 
             } else {
 
@@ -422,56 +422,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
     @Nonnull
     @Override
-    public ObjectRoutineBuilder availableTimeout(final long timeout,
-            @Nonnull final TimeUnit timeUnit) {
-
-        super.availableTimeout(timeout, timeUnit);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ObjectRoutineBuilder availableTimeout(@Nullable final TimeDuration timeout) {
-
-        super.availableTimeout(timeout);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ObjectRoutineBuilder logLevel(@Nonnull final LogLevel level) {
-
-        super.logLevel(level);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ObjectRoutineBuilder loggedWith(@Nullable final Log log) {
-
-        super.loggedWith(log);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ObjectRoutineBuilder maxRetained(final int maxRetainedInstances) {
-
-        super.maxRetained(maxRetainedInstances);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ObjectRoutineBuilder maxRunning(final int maxRunningInstances) {
-
-        super.maxRunning(maxRunningInstances);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ObjectRoutineBuilder onReadTimeout(@Nonnull final TimeoutAction action) {
+    public ObjectRoutineBuilder onReadTimeout(@Nullable final TimeoutAction action) {
 
         super.onReadTimeout(action);
         return this;
@@ -479,33 +430,83 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
     @Nonnull
     @Override
-    public ObjectRoutineBuilder readTimeout(final long timeout, @Nonnull final TimeUnit timeUnit) {
+    public ObjectRoutineBuilder withAvailableTimeout(final long timeout,
+            @Nonnull final TimeUnit timeUnit) {
 
-        super.readTimeout(timeout, timeUnit);
+        super.withAvailableTimeout(timeout, timeUnit);
         return this;
     }
 
     @Nonnull
     @Override
-    public ObjectRoutineBuilder readTimeout(@Nullable final TimeDuration timeout) {
+    public ObjectRoutineBuilder withAvailableTimeout(@Nullable final TimeDuration timeout) {
 
-        super.readTimeout(timeout);
+        super.withAvailableTimeout(timeout);
         return this;
     }
 
     @Nonnull
     @Override
-    public ObjectRoutineBuilder runBy(@Nullable final Runner runner) {
+    public ObjectRoutineBuilder withCoreInvocations(final int coreInvocations) {
 
-        super.runBy(runner);
+        super.withCoreInvocations(coreInvocations);
         return this;
     }
 
     @Nonnull
     @Override
-    public ObjectRoutineBuilder syncRunner(@Nonnull final RunnerType type) {
+    public ObjectRoutineBuilder withLog(@Nullable final Log log) {
 
-        super.syncRunner(type);
+        super.withLog(log);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public ObjectRoutineBuilder withLogLevel(@Nullable final LogLevel level) {
+
+        super.withLogLevel(level);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public ObjectRoutineBuilder withMaxInvocations(final int maxInvocations) {
+
+        super.withMaxInvocations(maxInvocations);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public ObjectRoutineBuilder withReadTimeout(final long timeout,
+            @Nonnull final TimeUnit timeUnit) {
+
+        super.withReadTimeout(timeout, timeUnit);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public ObjectRoutineBuilder withReadTimeout(@Nullable final TimeDuration timeout) {
+
+        super.withReadTimeout(timeout);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public ObjectRoutineBuilder withRunner(@Nullable final Runner runner) {
+
+        super.withRunner(runner);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public ObjectRoutineBuilder withSyncRunner(@Nullable final RunnerType type) {
+
+        super.withSyncRunner(type);
         return this;
     }
 
@@ -934,19 +935,19 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
             if (paramType == AsyncType.PASS) {
 
-                builder.inputOrder(DataOrder.INSERTION);
+                builder.withInputOrder(OrderBy.INSERTION);
             }
 
-            builder.inputSize(Integer.MAX_VALUE)
-                   .inputTimeout(TimeDuration.ZERO)
-                   .outputSize(Integer.MAX_VALUE)
-                   .outputTimeout(TimeDuration.ZERO);
+            builder.withInputSize(Integer.MAX_VALUE)
+                   .withInputTimeout(TimeDuration.ZERO)
+                   .withOutputSize(Integer.MAX_VALUE)
+                   .withOutputTimeout(TimeDuration.ZERO);
 
             final Timeout timeoutAnnotation = method.getAnnotation(Timeout.class);
 
             if (timeoutAnnotation != null) {
 
-                builder.readTimeout(timeoutAnnotation.value(), timeoutAnnotation.unit())
+                builder.withReadTimeout(timeoutAnnotation.value(), timeoutAnnotation.unit())
                        .onReadTimeout(timeoutAnnotation.action());
             }
 
@@ -985,7 +986,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
                 final Timeout methodAnnotation = method.getAnnotation(Timeout.class);
                 TimeDuration outputTimeout = null;
-                TimeoutAction outputAction = TimeoutAction.DEFAULT;
+                TimeoutAction outputAction = null;
 
                 if (methodAnnotation != null) {
 

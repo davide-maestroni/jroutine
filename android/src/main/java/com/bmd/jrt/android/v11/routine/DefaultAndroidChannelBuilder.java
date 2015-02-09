@@ -20,8 +20,8 @@ import android.os.Build.VERSION_CODES;
 
 import com.bmd.jrt.android.builder.AndroidChannelBuilder;
 import com.bmd.jrt.android.builder.AndroidRoutineBuilder;
+import com.bmd.jrt.android.builder.AndroidRoutineBuilder.CacheStrategy;
 import com.bmd.jrt.android.builder.AndroidRoutineBuilder.ClashResolution;
-import com.bmd.jrt.android.builder.AndroidRoutineBuilder.ResultCache;
 import com.bmd.jrt.builder.RoutineConfigurationBuilder;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.common.ClassToken;
@@ -47,7 +47,7 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
 
     private final int mLoaderId;
 
-    private ResultCache mCacheType = ResultCache.DEFAULT;
+    private CacheStrategy mCacheStrategy;
 
     /**
      * Constructor.
@@ -124,39 +124,33 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
         }
 
         return builder.apply(mBuilder.buildConfiguration())
-                      .onClash(ClashResolution.KEEP)
-                      .onComplete(mCacheType)
+                      .onClash(ClashResolution.KEEP_THAT)
+                      .onComplete(mCacheStrategy)
                       .buildRoutine()
                       .callAsync();
     }
 
     @Nonnull
     @Override
-    public AndroidChannelBuilder logLevel(@Nonnull final LogLevel level) {
+    public AndroidChannelBuilder onComplete(@Nullable final CacheStrategy cacheStrategy) {
 
-        mBuilder.logLevel(level);
+        mCacheStrategy = cacheStrategy;
         return this;
     }
 
     @Nonnull
     @Override
-    public AndroidChannelBuilder loggedWith(@Nullable final Log log) {
+    public AndroidChannelBuilder withLog(@Nullable final Log log) {
 
-        mBuilder.loggedWith(log);
+        mBuilder.withLog(log);
         return this;
     }
 
     @Nonnull
     @Override
-    @SuppressWarnings("ConstantConditions")
-    public AndroidChannelBuilder onComplete(@Nonnull final ResultCache cacheType) {
+    public AndroidChannelBuilder withLogLevel(@Nullable final LogLevel level) {
 
-        if (cacheType == null) {
-
-            throw new NullPointerException("the result cache type must not be null");
-        }
-
-        mCacheType = cacheType;
+        mBuilder.withLogLevel(level);
         return this;
     }
 

@@ -19,11 +19,12 @@
     private com.bmd.jrt.routine.Routine<Object, ${resultClassName}> initRoutine${methodCount}(
             final com.bmd.jrt.builder.RoutineConfiguration configuration) {
 
-        return com.bmd.jrt.routine.JRoutine.on(com.bmd.jrt.common.ClassToken.tokenOf(SimpleInvocation${methodCount}.class))
+        return com.bmd.jrt.routine.JRoutine.on(com.bmd.jrt.common.ClassToken.tokenOf(SingleCallInvocation${methodCount}.class))
+                                       .apply(configuration)
                                        ${routineBuilderOptions}
-                                       .inputSize(Integer.MAX_VALUE)
-                                       .inputTimeout(com.bmd.jrt.time.TimeDuration.ZERO)
-                                       .outputSize(Integer.MAX_VALUE)
-                                       .outputTimeout(com.bmd.jrt.time.TimeDuration.ZERO)
-                                       .apply(configuration).withArgs(this).buildRoutine();
+                                       .withInputSize(Integer.MAX_VALUE)
+                                       .withInputTimeout(com.bmd.jrt.time.TimeDuration.ZERO)
+                                       .withOutputSize(Integer.MAX_VALUE)
+                                       .withOutputTimeout(com.bmd.jrt.time.TimeDuration.ZERO)
+                                       .withArgs(this).buildRoutine();
     }

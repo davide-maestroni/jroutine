@@ -16,7 +16,7 @@ package com.bmd.jrt.routine;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.OutputConsumer;
-import com.bmd.jrt.channel.Tunnel;
+import com.bmd.jrt.channel.StandaloneChannel;
 import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.routine.DefaultResultChannel.AbortHandler;
 import com.bmd.jrt.runner.Runners;
@@ -31,59 +31,79 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Default implementation of a tunnel.
+ * Default implementation of a standalone channel.
  * <p/>
  * Created by davide on 10/24/14.
  *
  * @param <TYPE> the data type.
  */
-class DefaultTunnel<TYPE> implements Tunnel<TYPE> {
+class DefaultStandaloneChannel<TYPE> implements StandaloneChannel<TYPE> {
 
-    private final DefaultTunnelInput<TYPE> mInputChannel;
+    private final DefaultStandaloneInput<TYPE> mInputChannel;
 
-    private final DefaultTunnelOutput<TYPE> mOutputChannel;
+    private final DefaultStandaloneOutput<TYPE> mOutputChannel;
 
     /**
      * Constructor.
      *
      * @param configuration the routine configuration.
      */
-    DefaultTunnel(@Nonnull final RoutineConfiguration configuration) {
+    DefaultStandaloneChannel(@Nonnull final RoutineConfiguration configuration) {
 
         final Logger logger = Logger.createLogger(configuration.getLogOr(Logger.getGlobalLog()),
                                                   configuration.getLogLevelOr(
                                                           Logger.getGlobalLogLevel()), this);
-        final TunnelAbortHandler abortHandler = new TunnelAbortHandler();
+        final ChannelAbortHandler abortHandler = new ChannelAbortHandler();
         final DefaultResultChannel<TYPE> inputChannel =
                 new DefaultResultChannel<TYPE>(configuration, abortHandler,
                                                configuration.getRunnerOr(Runners.sharedRunner()),
                                                logger);
         abortHandler.setChannel(inputChannel);
-        mInputChannel = new DefaultTunnelInput<TYPE>(inputChannel);
-        mOutputChannel = new DefaultTunnelOutput<TYPE>(inputChannel.getOutput());
-        logger.dbg("building tunnel with configuration: %s", configuration);
+        mInputChannel = new DefaultStandaloneInput<TYPE>(inputChannel);
+        mOutputChannel = new DefaultStandaloneOutput<TYPE>(inputChannel.getOutput());
+        logger.dbg("building standalone channel with configuration: %s", configuration);
     }
 
     @Nonnull
     @Override
-    public TunnelInput<TYPE> input() {
+    public StandaloneInput<TYPE> input() {
 
         return mInputChannel;
     }
 
     @Nonnull
     @Override
-    public TunnelOutput<TYPE> output() {
+    public StandaloneOutput<TYPE> output() {
 
         return mOutputChannel;
     }
 
     /**
-     * Default implementation of a tunnel input.
+     * Abort handler used to close the input channel on abort.
+     */
+    private static class ChannelAbortHandler implements AbortHandler {
+
+        private DefaultResultChannel<?> mChannel;
+
+        @Override
+        public void onAbort(@Nullable final Throwable reason, final long delay,
+                @Nonnull final TimeUnit timeUnit) {
+
+            mChannel.close(reason);
+        }
+
+        public void setChannel(@Nonnull final DefaultResultChannel<?> channel) {
+
+            mChannel = channel;
+        }
+    }
+
+    /**
+     * Default implementation of a standalone channel input.
      *
      * @param <INPUT> the input data type.
      */
-    private static class DefaultTunnelInput<INPUT> implements TunnelInput<INPUT> {
+    private static class DefaultStandaloneInput<INPUT> implements StandaloneInput<INPUT> {
 
         private final DefaultResultChannel<INPUT> mChannel;
 
@@ -92,7 +112,7 @@ class DefaultTunnel<TYPE> implements Tunnel<TYPE> {
          *
          * @param wrapped the wrapped result channel.
          */
-        private DefaultTunnelInput(@Nonnull final DefaultResultChannel<INPUT> wrapped) {
+        private DefaultStandaloneInput(@Nonnull final DefaultResultChannel<INPUT> wrapped) {
 
             mChannel = wrapped;
         }
@@ -105,7 +125,7 @@ class DefaultTunnel<TYPE> implements Tunnel<TYPE> {
 
         @Nonnull
         @Override
-        public TunnelInput<INPUT> after(@Nonnull final TimeDuration delay) {
+        public StandaloneInput<INPUT> after(@Nonnull final TimeDuration delay) {
 
             mChannel.after(delay);
             return this;
@@ -113,7 +133,7 @@ class DefaultTunnel<TYPE> implements Tunnel<TYPE> {
 
         @Nonnull
         @Override
-        public TunnelInput<INPUT> after(final long delay, @Nonnull final TimeUnit timeUnit) {
+        public StandaloneInput<INPUT> after(final long delay, @Nonnull final TimeUnit timeUnit) {
 
             mChannel.after(delay, timeUnit);
             return this;
@@ -121,7 +141,7 @@ class DefaultTunnel<TYPE> implements Tunnel<TYPE> {
 
         @Nonnull
         @Override
-        public TunnelInput<INPUT> now() {
+        public StandaloneInput<INPUT> now() {
 
             mChannel.now();
             return this;
@@ -129,7 +149,7 @@ class DefaultTunnel<TYPE> implements Tunnel<TYPE> {
 
         @Nonnull
         @Override
-        public TunnelInput<INPUT> pass(@Nullable final OutputChannel<INPUT> channel) {
+        public StandaloneInput<INPUT> pass(@Nullable final OutputChannel<INPUT> channel) {
 
             mChannel.pass(channel);
             return this;
@@ -137,7 +157,7 @@ class DefaultTunnel<TYPE> implements Tunnel<TYPE> {
 
         @Nonnull
         @Override
-        public TunnelInput<INPUT> pass(@Nullable final Iterable<? extends INPUT> inputs) {
+        public StandaloneInput<INPUT> pass(@Nullable final Iterable<? extends INPUT> inputs) {
 
             mChannel.pass(inputs);
             return this;
@@ -145,7 +165,7 @@ class DefaultTunnel<TYPE> implements Tunnel<TYPE> {
 
         @Nonnull
         @Override
-        public TunnelInput<INPUT> pass(@Nullable final INPUT input) {
+        public StandaloneInput<INPUT> pass(@Nullable final INPUT input) {
 
             mChannel.pass(input);
             return this;
@@ -153,7 +173,7 @@ class DefaultTunnel<TYPE> implements Tunnel<TYPE> {
 
         @Nonnull
         @Override
-        public TunnelInput<INPUT> pass(@Nullable final INPUT... inputs) {
+        public StandaloneInput<INPUT> pass(@Nullable final INPUT... inputs) {
 
             mChannel.pass(inputs);
             return this;
@@ -179,11 +199,11 @@ class DefaultTunnel<TYPE> implements Tunnel<TYPE> {
     }
 
     /**
-     * Default implementation of a tunnel output.
+     * Default implementation of a standalone channel output.
      *
      * @param <OUTPUT> the output data type.
      */
-    private static class DefaultTunnelOutput<OUTPUT> implements TunnelOutput<OUTPUT> {
+    private static class DefaultStandaloneOutput<OUTPUT> implements StandaloneOutput<OUTPUT> {
 
         private final OutputChannel<OUTPUT> mChannel;
 
@@ -192,14 +212,14 @@ class DefaultTunnel<TYPE> implements Tunnel<TYPE> {
          *
          * @param wrapped the wrapped output channel.
          */
-        private DefaultTunnelOutput(@Nonnull final OutputChannel<OUTPUT> wrapped) {
+        private DefaultStandaloneOutput(@Nonnull final OutputChannel<OUTPUT> wrapped) {
 
             mChannel = wrapped;
         }
 
         @Nonnull
         @Override
-        public TunnelOutput<OUTPUT> afterMax(@Nonnull final TimeDuration timeout) {
+        public StandaloneOutput<OUTPUT> afterMax(@Nonnull final TimeDuration timeout) {
 
             mChannel.afterMax(timeout);
             return this;
@@ -207,7 +227,8 @@ class DefaultTunnel<TYPE> implements Tunnel<TYPE> {
 
         @Nonnull
         @Override
-        public TunnelOutput<OUTPUT> afterMax(final long timeout, @Nonnull final TimeUnit timeUnit) {
+        public StandaloneOutput<OUTPUT> afterMax(final long timeout,
+                @Nonnull final TimeUnit timeUnit) {
 
             mChannel.afterMax(timeout, timeUnit);
             return this;
@@ -215,7 +236,7 @@ class DefaultTunnel<TYPE> implements Tunnel<TYPE> {
 
         @Nonnull
         @Override
-        public TunnelOutput<OUTPUT> bind(@Nonnull final OutputConsumer<OUTPUT> consumer) {
+        public StandaloneOutput<OUTPUT> bind(@Nonnull final OutputConsumer<OUTPUT> consumer) {
 
             mChannel.bind(consumer);
             return this;
@@ -223,7 +244,7 @@ class DefaultTunnel<TYPE> implements Tunnel<TYPE> {
 
         @Nonnull
         @Override
-        public TunnelOutput<OUTPUT> eventually() {
+        public StandaloneOutput<OUTPUT> eventually() {
 
             mChannel.eventually();
             return this;
@@ -231,7 +252,7 @@ class DefaultTunnel<TYPE> implements Tunnel<TYPE> {
 
         @Nonnull
         @Override
-        public TunnelOutput<OUTPUT> eventuallyAbort() {
+        public StandaloneOutput<OUTPUT> eventuallyAbort() {
 
             mChannel.eventuallyAbort();
             return this;
@@ -239,7 +260,7 @@ class DefaultTunnel<TYPE> implements Tunnel<TYPE> {
 
         @Nonnull
         @Override
-        public TunnelOutput<OUTPUT> eventuallyDeadlock() {
+        public StandaloneOutput<OUTPUT> eventuallyDeadlock() {
 
             mChannel.eventuallyDeadlock();
             return this;
@@ -247,7 +268,7 @@ class DefaultTunnel<TYPE> implements Tunnel<TYPE> {
 
         @Nonnull
         @Override
-        public TunnelOutput<OUTPUT> eventuallyExit() {
+        public StandaloneOutput<OUTPUT> eventuallyExit() {
 
             mChannel.eventuallyExit();
             return this;
@@ -255,7 +276,7 @@ class DefaultTunnel<TYPE> implements Tunnel<TYPE> {
 
         @Nonnull
         @Override
-        public TunnelOutput<OUTPUT> immediately() {
+        public StandaloneOutput<OUTPUT> immediately() {
 
             mChannel.immediately();
             return this;
@@ -263,7 +284,8 @@ class DefaultTunnel<TYPE> implements Tunnel<TYPE> {
 
         @Nonnull
         @Override
-        public TunnelOutput<OUTPUT> readAllInto(@Nonnull final Collection<? super OUTPUT> result) {
+        public StandaloneOutput<OUTPUT> readAllInto(
+                @Nonnull final Collection<? super OUTPUT> result) {
 
             mChannel.readAllInto(result);
             return this;
@@ -296,7 +318,7 @@ class DefaultTunnel<TYPE> implements Tunnel<TYPE> {
 
         @Nonnull
         @Override
-        public TunnelOutput<OUTPUT> unbind(@Nullable final OutputConsumer<OUTPUT> consumer) {
+        public StandaloneOutput<OUTPUT> unbind(@Nullable final OutputConsumer<OUTPUT> consumer) {
 
             mChannel.unbind(consumer);
             return this;
@@ -324,26 +346,6 @@ class DefaultTunnel<TYPE> implements Tunnel<TYPE> {
         public boolean isOpen() {
 
             return mChannel.isOpen();
-        }
-    }
-
-    /**
-     * Abort handler used to close the input channel on abort.
-     */
-    private static class TunnelAbortHandler implements AbortHandler {
-
-        private DefaultResultChannel<?> mChannel;
-
-        @Override
-        public void onAbort(@Nullable final Throwable reason, final long delay,
-                @Nonnull final TimeUnit timeUnit) {
-
-            mChannel.close(reason);
-        }
-
-        public void setChannel(@Nonnull final DefaultResultChannel<?> channel) {
-
-            mChannel = channel;
         }
     }
 }

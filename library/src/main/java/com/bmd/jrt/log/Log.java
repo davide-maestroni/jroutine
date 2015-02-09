@@ -103,12 +103,6 @@ public interface Log {
         /**
          * Silents all the logs.
          */
-        SILENT,
-        /**
-         * Default level.<br/>
-         * This value is used to indicated that the choice of the log level is left to the
-         * framework.
-         */
-        DEFAULT
+        SILENT
     }
 }

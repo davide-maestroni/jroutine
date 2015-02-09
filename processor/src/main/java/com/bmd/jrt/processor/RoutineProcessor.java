@@ -20,7 +20,7 @@ import com.bmd.jrt.annotation.Share;
 import com.bmd.jrt.annotation.Timeout;
 import com.bmd.jrt.annotation.Wrap;
 import com.bmd.jrt.builder.RoutineBuilder.TimeoutAction;
-import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
+import com.bmd.jrt.builder.RoutineChannelBuilder.OrderBy;
 import com.bmd.jrt.channel.OutputChannel;
 
 import java.io.ByteArrayOutputStream;
@@ -411,10 +411,10 @@ public class RoutineProcessor extends AbstractProcessor {
 
         if (isOverrideParameters) {
 
-            builder.append(".inputOrder(")
-                   .append(DataOrder.class.getCanonicalName())
+            builder.append(".withInputOrder(")
+                   .append(OrderBy.class.getCanonicalName())
                    .append(".")
-                   .append(DataOrder.INSERTION)
+                   .append(OrderBy.INSERTION)
                    .append(")");
         }
 
@@ -651,20 +651,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
         if (asyncType == AsyncType.AUTO) {
 
-            if (typeUtils.isAssignable(targetTypeErasure, outputChannelElement.asType())) {
-
-                if ((length == 1) && (targetMirror != null) && (
-                        (targetMirror.getKind() == TypeKind.ARRAY) || typeUtils.isAssignable(
-                                listElement.asType(), targetMirror))) {
-
-                    asyncType = AsyncType.COLLECT;
-
-                } else {
-
-                    asyncType = AsyncType.PASS;
-                }
-
-            } else if ((targetType.getKind() == TypeKind.ARRAY) || typeUtils.isAssignable(
+            if ((targetType.getKind() == TypeKind.ARRAY) || typeUtils.isAssignable(
                     targetTypeErasure, iterableElement.asType())) {
 
                 if ((targetType.getKind() == TypeKind.ARRAY) && !typeUtils.isAssignable(
@@ -685,6 +672,19 @@ public class RoutineProcessor extends AbstractProcessor {
                 }
 
                 asyncType = AsyncType.PARALLEL;
+
+            } else if (typeUtils.isAssignable(targetTypeErasure, outputChannelElement.asType())) {
+
+                if ((length == 1) && (targetMirror != null) && (
+                        (targetMirror.getKind() == TypeKind.ARRAY) || typeUtils.isAssignable(
+                                listElement.asType(), targetMirror))) {
+
+                    asyncType = AsyncType.COLLECT;
+
+                } else {
+
+                    asyncType = AsyncType.PASS;
+                }
 
             } else {
 
@@ -774,19 +774,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
         if (asyncType == AsyncType.AUTO) {
 
-            if (typeUtils.isAssignable(outputChannelElement.asType(), returnTypeErasure)) {
-
-                if ((targetMirror != null) && ((targetMirror.getKind() == TypeKind.ARRAY)
-                        || typeUtils.isAssignable(targetMirror, iterableElement.asType()))) {
-
-                    asyncType = AsyncType.COLLECT;
-
-                } else {
-
-                    asyncType = AsyncType.PASS;
-                }
-
-            } else if ((returnType.getKind() == TypeKind.ARRAY) || typeUtils.isAssignable(
+            if ((returnType.getKind() == TypeKind.ARRAY) || typeUtils.isAssignable(
                     listElement.asType(), returnTypeErasure)) {
 
                 if ((returnType.getKind() == TypeKind.ARRAY) && !typeUtils.isAssignable(
@@ -799,6 +787,18 @@ public class RoutineProcessor extends AbstractProcessor {
                 }
 
                 asyncType = AsyncType.PARALLEL;
+
+            } else if (typeUtils.isAssignable(outputChannelElement.asType(), returnTypeErasure)) {
+
+                if ((targetMirror != null) && ((targetMirror.getKind() == TypeKind.ARRAY)
+                        || typeUtils.isAssignable(targetMirror, iterableElement.asType()))) {
+
+                    asyncType = AsyncType.COLLECT;
+
+                } else {
+
+                    asyncType = AsyncType.PASS;
+                }
 
             } else {
 

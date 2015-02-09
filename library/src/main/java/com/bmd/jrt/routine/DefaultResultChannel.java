@@ -15,7 +15,7 @@ package com.bmd.jrt.routine;
 
 import com.bmd.jrt.builder.OutputDeadlockException;
 import com.bmd.jrt.builder.RoutineBuilder.TimeoutAction;
-import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
+import com.bmd.jrt.builder.RoutineChannelBuilder.OrderBy;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.OutputConsumer;
@@ -133,7 +133,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         mTimeoutAction = configuration.getReadTimeoutActionOr(TimeoutAction.DEADLOCK);
         mMaxOutput = configuration.getOutputSizeOr(Integer.MAX_VALUE);
         mOutputTimeout = configuration.getOutputTimeoutOr(ZERO);
-        mOutputQueue = (configuration.getOutputOrderOr(DataOrder.DELIVERY) == DataOrder.DELIVERY)
+        mOutputQueue = (configuration.getOutputOrderOr(OrderBy.DELIVERY) == OrderBy.DELIVERY)
                 ? new SimpleNestedQueue<Object>() : new OrderedNestedQueue<Object>();
 
         final int maxOutputSize = mMaxOutput;

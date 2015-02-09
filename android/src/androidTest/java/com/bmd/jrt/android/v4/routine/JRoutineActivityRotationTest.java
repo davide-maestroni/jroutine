@@ -19,7 +19,7 @@ import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.bmd.jrt.android.invocation.AndroidTemplateInvocation;
-import com.bmd.jrt.builder.RoutineChannelBuilder.DataOrder;
+import com.bmd.jrt.builder.RoutineChannelBuilder.OrderBy;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.ClassToken;
@@ -58,7 +58,7 @@ public class JRoutineActivityRotationTest
         final Routine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
                         .withId(0)
-                        .outputOrder(DataOrder.INSERTION)
+                        .withOutputOrder(OrderBy.INSERTION)
                         .buildRoutine();
         routine.callAsync("test1", "test2");
 

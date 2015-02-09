@@ -103,8 +103,9 @@ public interface RoutineBuilder {
     public RoutineBuilder withAvailableTimeout(@Nullable TimeDuration timeout);
 
     /**
-     * Sets the max number of retained invocation instances. A {@link RoutineConfiguration#DEFAULT}
-     * value means that it is up to the framework to chose a default number.
+     * Sets the number of invocation instances which represents the core pool of reusable
+     * invocations. A {@link RoutineConfiguration#DEFAULT} value means that it is up to the
+     * framework to chose a default number.
      *
      * @param coreInvocations the max number of instances.
      * @return this builder.

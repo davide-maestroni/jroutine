@@ -27,10 +27,13 @@ import java.lang.annotation.Target;
  * In order to avoid unexpected behavior, it is advisable to avoid using the same class fields
  * (unless immutable) in protected and non-protected code, or to call synchronous methods through
  * the framework as well.<br/>
- * TODO
  * Through this annotation, it is possible to exclude single methods from this kind of protection by
- * indicating them as having a different lock. Each lock has a name associated, and every method
- * with a specific lock is protected only from the other methods with the same lock name.
+ * indicating them as having a different share group. Each group has a name associated, and every
+ * method within a specific group is protected so that shared class members can be safely accessed
+ * only from the other methods sharing the same group name. That means that the calling of methods
+ * within the same group cannot happen in parallel. In a dual way, methods belonging to different
+ * groups can be invoked in parallel but should not access the same members to avoid concurrency
+ * issues.
  * <p/>
  * Finally, be aware that a method might need to be made accessible in order to be called. That
  * means that, in case a {@link java.lang.SecurityManager} is installed, a security exception might
@@ -60,12 +63,12 @@ import java.lang.annotation.Target;
 public @interface Share {
 
     /**
-     * Constant indicating TODO.
+     * Constant indicating the default share group, that is, all member fields are protected.
      */
     static final String ALL = "com.bmd.jrt.annotation.Share.ALL";
 
     /**
-     * Constant indicating TODO.
+     * Constant indicating that no member field needs to be protected.
      */
     static final String NONE = "";
 

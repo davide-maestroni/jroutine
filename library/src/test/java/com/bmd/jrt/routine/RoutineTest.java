@@ -1170,17 +1170,16 @@ public class RoutineTest extends TestCase {
                                 .callSync()
                                 .afterMax(timeout)
                                 .readAll()).containsExactly(1);
-        assertThat(
-                on(testClass).annotatedMethod(TestClass.GET).callSync().afterMax(timeout).readAll())
-                .containsExactly(1);
-        assertThat(on(TestClass.class).annotatedMethod(TestClass.GET)
+        assertThat(on(testClass).boundMethod(TestClass.GET)
+                                .callSync()
+                                .afterMax(timeout)
+                                .readAll()).containsExactly(1);
+        assertThat(on(TestClass.class).boundMethod(TestClass.GET)
                                       .callSync(3)
                                       .afterMax(timeout)
                                       .readAll()).containsExactly(3);
-        assertThat(on(TestClass.class).annotatedMethod("get")
-                                      .callAsync(-3)
-                                      .afterMax(timeout)
-                                      .readAll()).containsExactly(-3);
+        assertThat(on(TestClass.class).boundMethod("get").callAsync(-3).afterMax(timeout).readAll())
+                .containsExactly(-3);
         assertThat(on(TestClass.class).method("get", int.class)
                                       .callParallel(17)
                                       .afterMax(timeout)
@@ -1190,7 +1189,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            on(TestClass.class).annotatedMethod("get").callAsync().afterMax(timeout).readAll();
+            on(TestClass.class).boundMethod("get").callAsync().afterMax(timeout).readAll();
 
             fail();
 
@@ -1200,7 +1199,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            on(TestClass.class).annotatedMethod("take");
+            on(TestClass.class).boundMethod("take");
 
             fail();
 

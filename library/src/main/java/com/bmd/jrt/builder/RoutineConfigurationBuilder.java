@@ -98,111 +98,9 @@ public class RoutineConfigurationBuilder implements RoutineChannelBuilder {
     @Override
     public RoutineConfigurationBuilder apply(@Nonnull final RoutineConfiguration configuration) {
 
-        final Runner runner = configuration.getRunnerOr(null);
-
-        if (runner != null) {
-
-            withRunner(runner);
-        }
-
-        final RunnerType syncRunner = configuration.getSyncRunnerOr(null);
-
-        if (syncRunner != null) {
-
-            withSyncRunner(syncRunner);
-        }
-
-        final int maxInvocations = configuration.getMaxInvocationsOr(RoutineConfiguration.DEFAULT);
-
-        if (maxInvocations != RoutineConfiguration.DEFAULT) {
-
-            withMaxInvocations(maxInvocations);
-        }
-
-        final int coreInvocations =
-                configuration.getCoreInvocationsOr(RoutineConfiguration.DEFAULT);
-
-        if (coreInvocations != RoutineConfiguration.DEFAULT) {
-
-            withCoreInvocations(coreInvocations);
-        }
-
-        final TimeDuration availTimeout = configuration.getAvailTimeoutOr(null);
-
-        if (availTimeout != null) {
-
-            withAvailableTimeout(availTimeout);
-        }
-
-        final TimeDuration readTimeout = configuration.getReadTimeoutOr(null);
-
-        if (readTimeout != null) {
-
-            withReadTimeout(readTimeout);
-        }
-
-        final TimeoutAction timeoutAction = configuration.getReadTimeoutActionOr(null);
-
-        if (timeoutAction != null) {
-
-            onReadTimeout(timeoutAction);
-        }
-
-        final OrderBy inputOrder = configuration.getInputOrderOr(null);
-
-        if (inputOrder != null) {
-
-            withInputOrder(inputOrder);
-        }
-
-        final int inputSize = configuration.getInputSizeOr(RoutineConfiguration.DEFAULT);
-
-        if (inputSize != RoutineConfiguration.DEFAULT) {
-
-            withInputSize(inputSize);
-        }
-
-        final TimeDuration inputTimeout = configuration.getInputTimeoutOr(null);
-
-        if (inputTimeout != null) {
-
-            withInputTimeout(inputTimeout);
-        }
-
-        final OrderBy outputOrder = configuration.getOutputOrderOr(null);
-
-        if (outputOrder != null) {
-
-            withOutputOrder(outputOrder);
-        }
-
-        final int outputSize = configuration.getOutputSizeOr(RoutineConfiguration.DEFAULT);
-
-        if (outputSize != RoutineConfiguration.DEFAULT) {
-
-            withOutputSize(outputSize);
-        }
-
-        final TimeDuration outputTimeout = configuration.getOutputTimeoutOr(null);
-
-        if (outputTimeout != null) {
-
-            withOutputTimeout(outputTimeout);
-        }
-
-        final Log log = configuration.getLogOr(null);
-
-        if (log != null) {
-
-            withLog(log);
-        }
-
-        final LogLevel logLevel = configuration.getLogLevelOr(null);
-
-        if (logLevel != null) {
-
-            withLogLevel(logLevel);
-        }
+        applyInvocationConfiguration(configuration);
+        applyChannelConfiguration(configuration);
+        applyLogConfiguration(configuration);
 
         return this;
     }
@@ -393,5 +291,120 @@ public class RoutineConfigurationBuilder implements RoutineChannelBuilder {
                                         mAvailTimeout, mReadTimeout, mTimeoutAction, mInputMaxSize,
                                         mInputTimeout, mInputOrder, mOutputMaxSize, mOutputTimeout,
                                         mOutputOrder, mLog, mLogLevel);
+    }
+
+    private void applyChannelConfiguration(@Nonnull final RoutineConfiguration configuration) {
+
+        final OrderBy inputOrder = configuration.getInputOrderOr(null);
+
+        if (inputOrder != null) {
+
+            withInputOrder(inputOrder);
+        }
+
+        final int inputSize = configuration.getInputSizeOr(RoutineConfiguration.DEFAULT);
+
+        if (inputSize != RoutineConfiguration.DEFAULT) {
+
+            withInputSize(inputSize);
+        }
+
+        final TimeDuration inputTimeout = configuration.getInputTimeoutOr(null);
+
+        if (inputTimeout != null) {
+
+            withInputTimeout(inputTimeout);
+        }
+
+        final OrderBy outputOrder = configuration.getOutputOrderOr(null);
+
+        if (outputOrder != null) {
+
+            withOutputOrder(outputOrder);
+        }
+
+        final int outputSize = configuration.getOutputSizeOr(RoutineConfiguration.DEFAULT);
+
+        if (outputSize != RoutineConfiguration.DEFAULT) {
+
+            withOutputSize(outputSize);
+        }
+
+        final TimeDuration outputTimeout = configuration.getOutputTimeoutOr(null);
+
+        if (outputTimeout != null) {
+
+            withOutputTimeout(outputTimeout);
+        }
+    }
+
+    private void applyInvocationConfiguration(@Nonnull final RoutineConfiguration configuration) {
+
+        final Runner runner = configuration.getRunnerOr(null);
+
+        if (runner != null) {
+
+            withRunner(runner);
+        }
+
+        final RunnerType syncRunner = configuration.getSyncRunnerOr(null);
+
+        if (syncRunner != null) {
+
+            withSyncRunner(syncRunner);
+        }
+
+        final int maxInvocations = configuration.getMaxInvocationsOr(RoutineConfiguration.DEFAULT);
+
+        if (maxInvocations != RoutineConfiguration.DEFAULT) {
+
+            withMaxInvocations(maxInvocations);
+        }
+
+        final int coreInvocations =
+                configuration.getCoreInvocationsOr(RoutineConfiguration.DEFAULT);
+
+        if (coreInvocations != RoutineConfiguration.DEFAULT) {
+
+            withCoreInvocations(coreInvocations);
+        }
+
+        final TimeDuration availTimeout = configuration.getAvailTimeoutOr(null);
+
+        if (availTimeout != null) {
+
+            withAvailableTimeout(availTimeout);
+        }
+
+        final TimeDuration readTimeout = configuration.getReadTimeoutOr(null);
+
+        if (readTimeout != null) {
+
+            withReadTimeout(readTimeout);
+        }
+
+        final TimeoutAction timeoutAction = configuration.getReadTimeoutActionOr(null);
+
+        if (timeoutAction != null) {
+
+            onReadTimeout(timeoutAction);
+        }
+    }
+
+    private void applyLogConfiguration(@Nonnull final RoutineConfiguration configuration) {
+
+        final Log log = configuration.getLogOr(null);
+
+        if (log != null) {
+
+            withLog(log);
+        }
+
+        final LogLevel logLevel = configuration.getLogLevelOr(null);
+
+        if (logLevel != null) {
+
+            withLogLevel(logLevel);
+        }
     }
 }

@@ -327,7 +327,7 @@ public class RoutineConfiguration {
     }
 
     @Override
-    public int hashCode() { //TODO: default is not equal
+    public int hashCode() {
 
         // auto-generated code
         int result = mAvailTimeout != null ? mAvailTimeout.hashCode() : 0;
@@ -367,7 +367,8 @@ public class RoutineConfiguration {
         return mInputMaxSize == that.mInputMaxSize && mCoreInvocations == that.mCoreInvocations
                 && mMaxInvocations == that.mMaxInvocations && mOutputMaxSize == that.mOutputMaxSize
                 && !(mAvailTimeout != null ? !mAvailTimeout.equals(that.mAvailTimeout)
-                : that.mAvailTimeout != null) && mInputOrder == that.mInputOrder && !(mInputTimeout != null ? !mInputTimeout.equals(that.mInputTimeout)
+                : that.mAvailTimeout != null) && mInputOrder == that.mInputOrder && !(
+                mInputTimeout != null ? !mInputTimeout.equals(that.mInputTimeout)
                         : that.mInputTimeout != null) && !(mLog != null ? !mLog.equals(that.mLog)
                 : that.mLog != null) && mLogLevel == that.mLogLevel
                 && mOutputOrder == that.mOutputOrder && !(mOutputTimeout != null

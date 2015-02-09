@@ -35,7 +35,7 @@ import java.lang.annotation.Target;
  *     <code>
  *
  *         -keep public class * extends my.mirror.Interface {
- *              public &lt;methods&gt;;
+ *              public &lt;init&gt;;
  *         }
  *     </code>
  * </pre>

@@ -94,7 +94,7 @@ public class JRoutineTest extends TestCase {
                                                         .withRunner(Runners.poolRunner())
                                                         .withLogLevel(LogLevel.DEBUG)
                                                         .withLog(new NullLog())
-                                                        .annotatedMethod(TestStatic.GET);
+                                                        .boundMethod(TestStatic.GET);
 
         assertThat(routine.callSync().afterMax(timeout).readAll()).containsExactly(-77L);
 
@@ -120,7 +120,7 @@ public class JRoutineTest extends TestCase {
         assertThat(routine2.callSync().afterMax(timeout).readAll()).containsExactly(-77L);
 
         final Routine<Object, Object> routine3 =
-                JRoutine.on(TestStatic.class).annotatedMethod(TestStatic.THROW);
+                JRoutine.on(TestStatic.class).boundMethod(TestStatic.THROW);
 
         try {
 
@@ -164,7 +164,7 @@ public class JRoutineTest extends TestCase {
         final Routine<Object, Object> routine = JRoutine.on(TestApply.class)
                                                         .withRunner(Runners.sharedRunner())
                                                         .apply(configuration)
-                                                        .annotatedMethod(TestApply.GET_STRING);
+                                                        .boundMethod(TestApply.GET_STRING);
 
         final OutputChannel<Object> channel =
                 routine.invokeAsync().after(TimeDuration.millis(200)).pass("test").result();
@@ -226,7 +226,7 @@ public class JRoutineTest extends TestCase {
 
         try {
 
-            new ClassRoutineBuilder(TestStatic.class).annotatedMethod("test");
+            new ClassRoutineBuilder(TestStatic.class).boundMethod("test");
 
             fail();
 
@@ -284,7 +284,7 @@ public class JRoutineTest extends TestCase {
                                                          .withRunner(Runners.sharedRunner())
                                                          .withLogLevel(LogLevel.DEBUG)
                                                          .withLog(nullLog)
-                                                         .annotatedMethod(TestStatic.GET);
+                                                         .boundMethod(TestStatic.GET);
 
         assertThat(routine1.callSync().readAll()).containsExactly(-77L);
 
@@ -293,7 +293,7 @@ public class JRoutineTest extends TestCase {
                                                          .withRunner(Runners.sharedRunner())
                                                          .withLogLevel(LogLevel.DEBUG)
                                                          .withLog(nullLog)
-                                                         .annotatedMethod(TestStatic.GET);
+                                                         .boundMethod(TestStatic.GET);
 
         assertThat(routine2.callSync().readAll()).containsExactly(-77L);
         assertThat(routine1).isEqualTo(routine2);
@@ -303,7 +303,7 @@ public class JRoutineTest extends TestCase {
                                                          .withRunner(Runners.sharedRunner())
                                                          .withLogLevel(LogLevel.DEBUG)
                                                          .withLog(nullLog)
-                                                         .annotatedMethod(TestStatic.GET);
+                                                         .boundMethod(TestStatic.GET);
 
         assertThat(routine3.callSync().readAll()).containsExactly(-77L);
         assertThat(routine1).isNotEqualTo(routine3);
@@ -314,7 +314,7 @@ public class JRoutineTest extends TestCase {
                                                          .withRunner(Runners.sharedRunner())
                                                          .withLogLevel(LogLevel.WARNING)
                                                          .withLog(nullLog)
-                                                         .annotatedMethod(TestStatic.GET);
+                                                         .boundMethod(TestStatic.GET);
 
         assertThat(routine4.callSync().readAll()).containsExactly(-77L);
         assertThat(routine3).isNotEqualTo(routine4);
@@ -324,7 +324,7 @@ public class JRoutineTest extends TestCase {
                                                          .withRunner(Runners.sharedRunner())
                                                          .withLogLevel(LogLevel.WARNING)
                                                          .withLog(new NullLog())
-                                                         .annotatedMethod(TestStatic.GET);
+                                                         .boundMethod(TestStatic.GET);
 
         assertThat(routine5.callSync().readAll()).containsExactly(-77L);
         assertThat(routine4).isNotEqualTo(routine5);
@@ -343,7 +343,7 @@ public class JRoutineTest extends TestCase {
                                                         .onReadTimeout(TimeoutAction.EXIT)
                                                         .withLogLevel(LogLevel.DEBUG)
                                                         .withLog(new NullLog())
-                                                        .annotatedMethod(Test.GET);
+                                                        .boundMethod(Test.GET);
 
         assertThat(routine.callSync().afterMax(timeout).readAll()).containsExactly(-77L);
 
@@ -364,7 +364,7 @@ public class JRoutineTest extends TestCase {
 
         assertThat(routine2.callSync().afterMax(timeout).readAll()).containsExactly(-77L);
 
-        final Routine<Object, Object> routine3 = JRoutine.onWeak(test).annotatedMethod(Test.THROW);
+        final Routine<Object, Object> routine3 = JRoutine.onWeak(test).boundMethod(Test.THROW);
 
         try {
 
@@ -408,7 +408,7 @@ public class JRoutineTest extends TestCase {
         final Routine<Object, Object> routine = JRoutine.on(testApply)
                                                         .withRunner(Runners.sharedRunner())
                                                         .apply(configuration)
-                                                        .annotatedMethod(TestApply.GET_STRING);
+                                                        .boundMethod(TestApply.GET_STRING);
 
         final OutputChannel<Object> channel =
                 routine.invokeAsync().after(TimeDuration.millis(200)).pass("test").result();
@@ -452,7 +452,7 @@ public class JRoutineTest extends TestCase {
 
         try {
 
-            new ObjectRoutineBuilder(test).annotatedMethod("test");
+            new ObjectRoutineBuilder(test).boundMethod("test");
 
             fail();
 
@@ -626,7 +626,7 @@ public class JRoutineTest extends TestCase {
                                                          .withRunner(Runners.sharedRunner())
                                                          .withLogLevel(LogLevel.DEBUG)
                                                          .withLog(nullLog)
-                                                         .annotatedMethod(Test.GET);
+                                                         .boundMethod(Test.GET);
 
         assertThat(routine1.callSync().readAll()).containsExactly(-77L);
 
@@ -635,7 +635,7 @@ public class JRoutineTest extends TestCase {
                                                          .withRunner(Runners.sharedRunner())
                                                          .withLogLevel(LogLevel.DEBUG)
                                                          .withLog(nullLog)
-                                                         .annotatedMethod(Test.GET);
+                                                         .boundMethod(Test.GET);
 
         assertThat(routine2.callSync().readAll()).containsExactly(-77L);
         assertThat(routine1).isEqualTo(routine2);
@@ -645,7 +645,7 @@ public class JRoutineTest extends TestCase {
                                                          .withRunner(Runners.sharedRunner())
                                                          .withLogLevel(LogLevel.DEBUG)
                                                          .withLog(nullLog)
-                                                         .annotatedMethod(Test.GET);
+                                                         .boundMethod(Test.GET);
 
         assertThat(routine3.callSync().readAll()).containsExactly(-77L);
         assertThat(routine1).isNotEqualTo(routine3);
@@ -656,7 +656,7 @@ public class JRoutineTest extends TestCase {
                                                          .withRunner(Runners.sharedRunner())
                                                          .withLogLevel(LogLevel.WARNING)
                                                          .withLog(nullLog)
-                                                         .annotatedMethod(Test.GET);
+                                                         .boundMethod(Test.GET);
 
         assertThat(routine4.callSync().readAll()).containsExactly(-77L);
         assertThat(routine3).isNotEqualTo(routine4);
@@ -666,7 +666,7 @@ public class JRoutineTest extends TestCase {
                                                          .withRunner(Runners.sharedRunner())
                                                          .withLogLevel(LogLevel.WARNING)
                                                          .withLog(new NullLog())
-                                                         .annotatedMethod(Test.GET);
+                                                         .boundMethod(Test.GET);
 
         assertThat(routine5.callSync().readAll()).containsExactly(-77L);
         assertThat(routine4).isNotEqualTo(routine5);

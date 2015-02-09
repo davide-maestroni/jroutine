@@ -43,7 +43,7 @@ import javax.annotation.Nullable;
  *       |    | onResult() |            |    |
  *       |    --------------            |    |
  *       |          |     --------------     |
- *       |          |    |                   | (on exception)
+ *       |          |    |                   | (if exception is thrown)
  *       |          V    V                   |
  *       |    --------------                 |
  *        ----| onReturn() |                 |

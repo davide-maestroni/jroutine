@@ -26,6 +26,7 @@ import android.os.RemoteException;
 
 import com.bmd.jrt.android.invocation.AndroidInvocation;
 import com.bmd.jrt.android.service.RoutineService;
+import com.bmd.jrt.builder.RoutineChannelBuilder.OrderBy;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.OutputConsumer;
@@ -262,35 +263,28 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
             mLogger = logger;
             final Log log = logger.getLog();
             final LogLevel logLevel = logger.getLogLevel();
-            final StandaloneChannel<INPUT> paramStandaloneChannel = JRoutine.on()
-                                                                            .withDataOrder(
-                                                                                    configuration
-                                                                                            .getInputOrderOr(
-                                                                                            null))
-                                                                            .withMaxSize(
-                                                                                    Integer.MAX_VALUE)
-                                                                            .withBufferTimeout(
-                                                                                    TimeDuration
-                                                                                            .ZERO)
-                                                                            .withLog(log)
-                                                                            .withLogLevel(logLevel)
-                                                                            .buildChannel();
-            mParamStandaloneInput = paramStandaloneChannel.input();
-            mParamStandaloneOutput = paramStandaloneChannel.output();
-            final StandaloneChannel<OUTPUT> resultStandaloneChannel = JRoutine.on()
-                                                                              .withDataOrder(
-                                                                                      configuration.getOutputOrderOr(
-                                                                                              null))
-                                                                              .withMaxSize(
-                                                                                      Integer.MAX_VALUE)
-                                                                              .withBufferTimeout(
-                                                                                      TimeDuration.ZERO)
-                                                                              .withLog(log)
-                                                                              .withLogLevel(
-                                                                                      logLevel)
-                                                                              .buildChannel();
-            mResultStandaloneInput = resultStandaloneChannel.input();
-            mResultStandaloneOutput = resultStandaloneChannel.output();
+            final OrderBy inputOrder = configuration.getInputOrderOr(null);
+            final StandaloneChannel<INPUT> paramChannel = JRoutine.on()
+                                                                  .withDataOrder(inputOrder)
+                                                                  .withMaxSize(Integer.MAX_VALUE)
+                                                                  .withBufferTimeout(
+                                                                          TimeDuration.ZERO)
+                                                                  .withLog(log)
+                                                                  .withLogLevel(logLevel)
+                                                                  .buildChannel();
+            mParamStandaloneInput = paramChannel.input();
+            mParamStandaloneOutput = paramChannel.output();
+            final OrderBy outputOrder = configuration.getOutputOrderOr(null);
+            final StandaloneChannel<OUTPUT> resultChannel = JRoutine.on()
+                                                                    .withDataOrder(outputOrder)
+                                                                    .withMaxSize(Integer.MAX_VALUE)
+                                                                    .withBufferTimeout(
+                                                                            TimeDuration.ZERO)
+                                                                    .withLog(log)
+                                                                    .withLogLevel(logLevel)
+                                                                    .buildChannel();
+            mResultStandaloneInput = resultChannel.input();
+            mResultStandaloneOutput = resultChannel.output();
         }
 
         @Override

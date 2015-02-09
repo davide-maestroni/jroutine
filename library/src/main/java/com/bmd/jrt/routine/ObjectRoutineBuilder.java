@@ -57,8 +57,8 @@ import static com.bmd.jrt.time.TimeDuration.fromUnit;
  * Created by davide on 9/21/14.
  *
  * @see com.bmd.jrt.annotation.Async
- * @see com.bmd.jrt.annotation.Share
  * @see com.bmd.jrt.annotation.Bind
+ * @see com.bmd.jrt.annotation.Share
  * @see com.bmd.jrt.annotation.Timeout
  * @see com.bmd.jrt.annotation.Wrap
  */
@@ -528,7 +528,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * will be used to bind the interface method with the instance ones. If no name is assigned, the
      * method name will be used instead to map it.<br/>
      * The interface will be interpreted as a mirror of the target object methods, and the optional
-     * {@link com.bmd.jrt.annotation.Async} annotations will be honored.
+     * {@link com.bmd.jrt.annotation.Async} annotations will be honored.<br/>
+     * Note that such annotations will override any configuration set through the builder.
      *
      * @param itf     the interface implemented by the return object.
      * @param <CLASS> the interface type.
@@ -572,7 +573,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * will be used to bind the interface method with the instance ones. If no name is assigned, the
      * method name will be used instead to map it.<br/>
      * The interface will be interpreted as a mirror of the target object methods, and the optional
-     * {@link com.bmd.jrt.annotation.Async} annotations will be honored.
+     * {@link com.bmd.jrt.annotation.Async} annotations will be honored.<br/>
+     * Note that such annotations will override any configuration set through the builder.
      *
      * @param itf     the token of the interface implemented by the return object.
      * @param <CLASS> the interface type.
@@ -591,8 +593,10 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * Returns a wrapper object enabling asynchronous calls to the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link com.bmd.jrt.annotation.Bind}, {@link com.bmd.jrt.annotation.Timeout},
+     * optional {@link com.bmd.jrt.annotation.Bind}, {@link com.bmd.jrt.annotation.Timeout} and
      * {@link com.bmd.jrt.annotation.Async} annotations.<br/>
+     * Note that such annotations will override any configuration set through the builder.
+     * <p/>
      * The wrapping object is created through code generation based on the interfaces annotated
      * with {@link com.bmd.jrt.annotation.Wrap}.<br/>
      * Note that, you'll need to enable annotation pre-processing by adding the processor package
@@ -681,6 +685,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * The routines used for calling the methods will honor the attributes specified in any
      * optional {@link com.bmd.jrt.annotation.Bind}, {@link com.bmd.jrt.annotation.Timeout} and
      * {@link com.bmd.jrt.annotation.Async} annotations.<br/>
+     * Note that such annotations will override any configuration set through the builder.
+     * <p/>
      * The wrapping object is created through code generation based on the interfaces annotated
      * with {@link com.bmd.jrt.annotation.Wrap}.<br/>
      * Note that, you'll need to enable annotation pre-processing by adding the processor package

@@ -55,10 +55,11 @@ class DynamicScheduledThreadExecutor extends ScheduledThreadPoolExecutor {
                 new LinkedBlockingQueue<Runnable>(Integer.MAX_VALUE);
         final RejectingBlockingQueue<Runnable> rejectingQueue =
                 new RejectingBlockingQueue<Runnable>(internalQueue);
+        final QueueRejectedExecutionHandler rejectedExecutionHandler =
+                new QueueRejectedExecutionHandler(internalQueue);
         mExecutor =
                 new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, keepAliveUnit,
-                                       rejectingQueue,
-                                       new QueueRejectedExecutionHandler(internalQueue));
+                                       rejectingQueue, rejectedExecutionHandler);
     }
 
     @Nonnull

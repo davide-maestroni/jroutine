@@ -20,7 +20,82 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * TODO
+ * This annotation is used to indicate methods that are to be invoked in an asynchronous way.
+ * <p/>
+ * Note that the piece of code inside such methods will be automatically protected so to avoid
+ * concurrency issues. Though, other parts of the code inside the same class will be not.<br/>
+ * In order to avoid unexpected behavior, it is advisable to avoid using the same class fields
+ * (unless immutable) in protected and non-protected code, or to call synchronous methods through
+ * the framework as well.
+ * <p/>
+ * The only use case in which this annotation is useful, is when an interface is used as a mirror
+ * of another class methods. The interface can take some input parameters or return an output in an
+ * asynchronous way. In such cases, the value specified in the annotation will indicate the type of
+ * the parameter or the return type expected by the target method.
+ * <p/>
+ * For example, a method taking two integers:
+ * <p/>
+ * <pre>
+ *     <code>
+ *
+ *         public int sum(int i1, int i2);
+ *     </code>
+ * </pre>
+ * can be mirrored by a method defined as:
+ * <p/>
+ * <pre>
+ *     <code>
+ *
+ *         public int sum(&#64;Async(int.class) OutputChannel&lt;Integer&gt; i1, int i2);
+ *     </code>
+ * </pre>
+ * <p/>
+ * Additionally, the interface can return the result as an output channel whose output data will be
+ * passed only when available.
+ * <p/>
+ * For example, a method returning an integer:
+ * <p/>
+ * <pre>
+ *     <code>
+ *
+ *         public int sum(int i1, int i2);
+ *     </code>
+ * </pre>
+ * can be mirrored by a method defined as:
+ * <p/>
+ * <pre>
+ *     <code>
+ *
+ *         &#64;Async(int.class)
+ *         public OutputChannel&lt;Integer&gt; sum(int i1, int i2);
+ *     </code>
+ * </pre>
+ * <p/>
+ * The interface can also return an array or list of outputs:
+ * <p/>
+ * <pre>
+ *     <code>
+ *
+ *         &#64;Async(int.class)
+ *         public List&lt;Integer&gt; sum(int i1, int i2);
+ *     </code>
+ * </pre>
+ * <p/>
+ * Note that the type of asynchronicity is automatically inferred by the mirror and the target type,
+ * unless specifically choose through the annotation type attribute.
+ * <p/>
+ * Remember also that, in order for the annotation to properly work at run time, you will need to
+ * add the following rules to your Proguard file (if employing it for shrinking or obfuscation):
+ * <pre>
+ *     <code>
+ *
+ *         -keepattributes RuntimeVisibleAnnotations
+ *
+ *         -keepclassmembers class ** {
+ *              &#64;com.bmd.jrt.annotation.Async *;
+ *         }
+ *     </code>
+ * </pre>
  * <p/>
  * Created by davide on 1/31/15.
  */

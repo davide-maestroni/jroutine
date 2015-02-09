@@ -38,7 +38,7 @@ import java.lang.annotation.Target;
  *
  *             public static final String METHOD_NAME = "get";
  *
- *             &#64;Name(METHOD_NAME)
+ *             &#64;Bind(METHOD_NAME)
  *             public int getOne() {
  *
  *                 return 1;
@@ -50,7 +50,7 @@ import java.lang.annotation.Target;
  * <pre>
  *     <code>
  *
- *         JRoutine.on(new MyClass()).annotatedMethod(MyClass.METHOD_NAME).callAsync();
+ *         JRoutine.on(new MyClass()).boundMethod(MyClass.METHOD_NAME).callAsync();
  *     </code>
  * </pre>
  * <p/>

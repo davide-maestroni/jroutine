@@ -24,7 +24,7 @@ public class Logs {
 
     private static final SystemLog sSystemLog = new SystemLog();
 
-    private static volatile NullLog sNullLog;
+    private static volatile NullLog sNullLog = new NullLog();
 
     /**
      * Avoid direct instantiation.
@@ -40,11 +40,6 @@ public class Logs {
      */
     @Nonnull
     public static NullLog nullLog() {
-
-        if (sNullLog == null) {
-
-            sNullLog = new NullLog();
-        }
 
         return sNullLog;
     }

@@ -111,8 +111,8 @@ import javax.annotation.Nonnull;
  * <pre>
  *     <code>
  *
- *         final StandaloneChannel&lt;Result&gt; channel = JRoutine.on().&lt;Result&gt;
- *         buildChannel();
+ *         final StandaloneChannel&lt;Result&gt; channel =
+ *                 JRoutine.on().&lt;Result&gt;buildChannel();
  *
  *         new Thread() {
  *
@@ -134,8 +134,8 @@ import javax.annotation.Nonnull;
  * Created by davide on 9/7/14.
  *
  * @see com.bmd.jrt.annotation.Async
- * @see com.bmd.jrt.annotation.Share
  * @see com.bmd.jrt.annotation.Bind
+ * @see com.bmd.jrt.annotation.Share
  * @see com.bmd.jrt.annotation.Timeout
  * @see com.bmd.jrt.annotation.Wrap
  */

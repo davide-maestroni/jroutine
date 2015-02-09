@@ -708,7 +708,7 @@ public class RoutineService extends Service {
         }
 
         @Override
-        public int hashCode() { //TODO: default is not equal
+        public int hashCode() {
 
             int result = (mInputOrder != null ? mInputOrder.hashCode() : 0);
             result = 31 * result + mInvocationClass.hashCode();

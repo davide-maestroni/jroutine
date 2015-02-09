@@ -106,8 +106,8 @@ public class StandaloneChannelBuilder {
     }
 
     /**
-     * Sets the order in which data are collected from the standalone channel. A null value means t
-     * hat it is up to the framework to chose a default order type.<br/>
+     * Sets the order in which data are collected from the standalone channel. A null value means
+     * that it is up to the framework to chose a default order type.<br/>
      * Note that the output order set through the <code>apply()</code> method will be used to fill
      * this value.
      *

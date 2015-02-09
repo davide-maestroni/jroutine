@@ -143,32 +143,6 @@ public class ClassRoutineBuilder implements RoutineBuilder {
         fillMethodMap(false);
     }
 
-    /**
-     * Returns a routine used for calling the method whose identifying name is specified in a
-     * {@link com.bmd.jrt.annotation.Bind} annotation.<br/>
-     * Optional {@link com.bmd.jrt.annotation.Share} and {@link com.bmd.jrt.annotation.Timeout}
-     * method annotations will be honored.
-     *
-     * @param name     the name specified in the annotation.
-     * @param <INPUT>  the input data type.
-     * @param <OUTPUT> the output data type.
-     * @return the routine.
-     * @throws java.lang.IllegalArgumentException if the specified method is not found.
-     */
-    @Nonnull
-    public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> annotatedMethod(@Nonnull final String name) {
-
-        final Method method = mMethodMap.get(name);
-
-        if (method == null) {
-
-            throw new IllegalArgumentException(
-                    "no annotated method with name '" + name + "' has been found");
-        }
-
-        return method(method);
-    }
-
     @Nonnull
     @Override
     public ClassRoutineBuilder apply(@Nonnull final RoutineConfiguration configuration) {
@@ -268,12 +242,40 @@ public class ClassRoutineBuilder implements RoutineBuilder {
     }
 
     /**
-     * Returns a routine used for calling the specified method.
+     * Returns a routine used to call the method whose identifying name is specified in a
+     * {@link com.bmd.jrt.annotation.Bind} annotation.<br/>
+     * Optional {@link com.bmd.jrt.annotation.Share} and {@link com.bmd.jrt.annotation.Timeout}
+     * method annotations will be honored.<br/>
+     * Note that such annotations will override any configuration set through the builder.
+     *
+     * @param name     the name specified in the annotation.
+     * @param <INPUT>  the input data type.
+     * @param <OUTPUT> the output data type.
+     * @return the routine.
+     * @throws java.lang.IllegalArgumentException if the specified method is not found.
+     */
+    @Nonnull
+    public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> boundMethod(@Nonnull final String name) {
+
+        final Method method = mMethodMap.get(name);
+
+        if (method == null) {
+
+            throw new IllegalArgumentException(
+                    "no annotated method with name '" + name + "' has been found");
+        }
+
+        return method(method);
+    }
+
+    /**
+     * Returns a routine used to call the specified method.
      * <p/>
-     * The method is searched via reflection ignoring an optional name specified in a
+     * The method is searched via reflection ignoring a name specified in a
      * {@link com.bmd.jrt.annotation.Bind} annotation. Though, optional
      * {@link com.bmd.jrt.annotation.Share} and {@link com.bmd.jrt.annotation.Timeout} method
-     * annotations will be honored.
+     * annotations will be honored.<br/>
+     * Note that such annotations will override any configuration set through the builder.
      *
      * @param name           the method name.
      * @param parameterTypes the method parameter types.
@@ -312,12 +314,13 @@ public class ClassRoutineBuilder implements RoutineBuilder {
     }
 
     /**
-     * Returns a routine used for calling the specified method.
+     * Returns a routine used to call the specified method.
      * <p/>
-     * The method is invoked ignoring an optional name specified in a
+     * The method is invoked ignoring a name specified in a
      * {@link com.bmd.jrt.annotation.Bind} annotation. Though, optional
      * {@link com.bmd.jrt.annotation.Share} and {@link com.bmd.jrt.annotation.Timeout} method
-     * annotations will be honored.
+     * annotations will be honored.<br/>
+     * Note that such annotations will override any configuration set through the builder.
      *
      * @param method   the method instance.
      * @param <INPUT>  the input data type.
@@ -370,7 +373,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
     }
 
     /**
-     * Creates the routine.
+     * Gets or creates the routine.
      *
      * @param configuration the routine configuration.
      * @param shareGroup    the group name.
@@ -503,7 +506,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
     }
 
     /**
-     * Returns a routine used for calling the specified method.
+     * Returns a routine used to call the specified method.
      *
      * @param configuration the routine configuration.
      * @param shareGroup    the group name.

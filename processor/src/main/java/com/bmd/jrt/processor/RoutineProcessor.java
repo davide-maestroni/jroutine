@@ -13,9 +13,9 @@
  */
 package com.bmd.jrt.processor;
 
-import com.bmd.jrt.annotation.Async;
-import com.bmd.jrt.annotation.Async.AsyncType;
 import com.bmd.jrt.annotation.Bind;
+import com.bmd.jrt.annotation.Pass;
+import com.bmd.jrt.annotation.Pass.PassingMode;
 import com.bmd.jrt.annotation.Share;
 import com.bmd.jrt.annotation.Timeout;
 import com.bmd.jrt.annotation.Wrap;
@@ -262,7 +262,7 @@ public class RoutineProcessor extends AbstractProcessor {
             if (typeUtils.isAssignable(outputChannelElement.asType(),
                                        typeUtils.erasure(variableElement.asType()))) {
 
-                if (variableElement.getAnnotation(Async.class) != null) {
+                if (variableElement.getAnnotation(Pass.class) != null) {
 
                     builder.append("(com.bmd.jrt.channel.OutputChannel)");
 
@@ -402,7 +402,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
         for (final VariableElement parameterElement : methodElement.getParameters()) {
 
-            if (parameterElement.getAnnotation(Async.class) != null) {
+            if (parameterElement.getAnnotation(Pass.class) != null) {
 
                 isOverrideParameters = true;
                 break;
@@ -519,7 +519,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
             final Types typeUtils = processingEnv.getTypeUtils();
             final TypeElement asyncAnnotationElement =
-                    getTypeFromName(Async.class.getCanonicalName());
+                    getTypeFromName(Pass.class.getCanonicalName());
             final TypeMirror asyncAnnotationType = asyncAnnotationElement.asType();
 
             final List<? extends VariableElement> interfaceTypeParameters =
@@ -546,7 +546,7 @@ public class RoutineProcessor extends AbstractProcessor {
                         Object value = null;
                         final VariableElement variableElement = interfaceTypeParameters.get(i);
 
-                        if (variableElement.getAnnotation(Async.class) != null) {
+                        if (variableElement.getAnnotation(Pass.class) != null) {
 
                             value = getElementValue(variableElement, asyncAnnotationType, "value");
                         }
@@ -634,7 +634,7 @@ public class RoutineProcessor extends AbstractProcessor {
     }
 
     @Nonnull
-    private AsyncType getParamType(@Nonnull final Async asyncAnnotation,
+    private PassingMode getParamMode(@Nonnull final Pass passAnnotation,
             @Nonnull final VariableElement targetParameter, final int length) {
 
         final Types typeUtils = processingEnv.getTypeUtils();
@@ -643,15 +643,28 @@ public class RoutineProcessor extends AbstractProcessor {
         final TypeElement listElement = mListElement;
         final TypeMirror targetType = targetParameter.asType();
         final TypeMirror targetTypeErasure = typeUtils.erasure(targetType);
-        final TypeElement annotationElement = getTypeFromName(Async.class.getCanonicalName());
+        final TypeElement annotationElement = getTypeFromName(Pass.class.getCanonicalName());
         final TypeMirror annotationType = annotationElement.asType();
         final TypeMirror targetMirror =
                 (TypeMirror) getElementValue(targetParameter, annotationType, "value");
-        AsyncType asyncType = asyncAnnotation.type();
+        PassingMode passingMode = passAnnotation.mode();
 
-        if (asyncType == AsyncType.AUTO) {
+        if (passingMode == PassingMode.AUTO) {
 
-            if ((targetType.getKind() == TypeKind.ARRAY) || typeUtils.isAssignable(
+            if (typeUtils.isAssignable(targetTypeErasure, outputChannelElement.asType())) {
+
+                if ((length == 1) && (targetMirror != null) && (
+                        (targetMirror.getKind() == TypeKind.ARRAY) || typeUtils.isAssignable(
+                                listElement.asType(), targetMirror))) {
+
+                    passingMode = PassingMode.COLLECTION;
+
+                } else {
+
+                    passingMode = PassingMode.OBJECT;
+                }
+
+            } else if ((targetType.getKind() == TypeKind.ARRAY) || typeUtils.isAssignable(
                     targetTypeErasure, iterableElement.asType())) {
 
                 if ((targetType.getKind() == TypeKind.ARRAY) && !typeUtils.isAssignable(
@@ -659,32 +672,19 @@ public class RoutineProcessor extends AbstractProcessor {
                         getBoxedType(targetMirror))) {
 
                     throw new IllegalArgumentException(
-                            "the async input array of type " + AsyncType.PARALLEL
+                            "the async input array of type " + PassingMode.PARALLEL
                                     + " does not match the bound type: " + targetMirror);
                 }
 
                 if (length > 1) {
 
                     throw new IllegalArgumentException(
-                            "an async input of type " + AsyncType.PARALLEL +
-                                    " cannot be applied to a method taking " + length
-                                    + " input parameter");
+                            "an async input of type " + PassingMode.PARALLEL +
+                                    " cannot be applied to a method taking " + length + " " +
+                                    "input parameter");
                 }
 
-                asyncType = AsyncType.PARALLEL;
-
-            } else if (typeUtils.isAssignable(targetTypeErasure, outputChannelElement.asType())) {
-
-                if ((length == 1) && (targetMirror != null) && (
-                        (targetMirror.getKind() == TypeKind.ARRAY) || typeUtils.isAssignable(
-                                listElement.asType(), targetMirror))) {
-
-                    asyncType = AsyncType.COLLECT;
-
-                } else {
-
-                    asyncType = AsyncType.PASS;
-                }
+                passingMode = PassingMode.PARALLEL;
 
             } else {
 
@@ -693,45 +693,46 @@ public class RoutineProcessor extends AbstractProcessor {
                                 + targetParameter);
             }
 
-        } else if (asyncType == AsyncType.PASS) {
+        } else if (passingMode == PassingMode.OBJECT) {
 
             if (!typeUtils.isAssignable(targetTypeErasure, outputChannelElement.asType())) {
 
                 throw new IllegalArgumentException(
-                        "an async input of type " + AsyncType.PASS + " must implement an "
+                        "an async input of type " + PassingMode.OBJECT + " must implement an "
                                 + outputChannelElement);
             }
 
-        } else if (asyncType == AsyncType.COLLECT) {
+        } else if (passingMode == PassingMode.COLLECTION) {
 
             if (!typeUtils.isAssignable(targetTypeErasure, outputChannelElement.asType())) {
 
                 throw new IllegalArgumentException(
-                        "an async input of type " + AsyncType.COLLECT + " must implement an "
+                        "an async input of type " + PassingMode.COLLECTION + " must implement an "
                                 + outputChannelElement);
             }
 
             if ((targetMirror != null) && (targetMirror.getKind() != TypeKind.ARRAY)
                     && !typeUtils.isAssignable(listElement.asType(), targetMirror)) {
 
-                throw new IllegalArgumentException("an async input of type " + AsyncType.COLLECT
-                                                           + " must be bound to an array or a " +
-                                                           "super class of " + listElement);
+                throw new IllegalArgumentException(
+                        "an async input of type " + PassingMode.COLLECTION
+                                + " must be bound to an array or a super class of " + listElement);
             }
 
             if (length > 1) {
 
-                throw new IllegalArgumentException("an async input of type " + AsyncType.COLLECT +
-                                                           " cannot be applied to a method taking "
-                                                           + length + " input parameter");
+                throw new IllegalArgumentException(
+                        "an async input of type " + PassingMode.COLLECTION +
+                                " cannot be applied to a method taking " + length
+                                + " input parameter");
             }
 
-        } else if (asyncType == AsyncType.PARALLEL) {
+        } else { // AsyncType.PARALLEL
 
             if ((targetType.getKind() != TypeKind.ARRAY) && !typeUtils.isAssignable(
                     targetTypeErasure, iterableElement.asType())) {
 
-                throw new IllegalArgumentException("an async input of type " + AsyncType.PARALLEL
+                throw new IllegalArgumentException("an async input of type " + PassingMode.PARALLEL
                                                            + " must be an array or implement an "
                                                            + iterableElement);
             }
@@ -741,23 +742,24 @@ public class RoutineProcessor extends AbstractProcessor {
                     getBoxedType(targetMirror))) {
 
                 throw new IllegalArgumentException(
-                        "the async input array of type " + AsyncType.PARALLEL
+                        "the async input array of type " + PassingMode.PARALLEL
                                 + " does not match the bound type: " + targetMirror);
             }
 
             if (length > 1) {
 
-                throw new IllegalArgumentException("an async input of type " + AsyncType.PARALLEL +
-                                                           " cannot be applied to a method taking "
-                                                           + length + " input parameter");
+                throw new IllegalArgumentException(
+                        "an async input of type " + PassingMode.PARALLEL +
+                                " cannot be applied to a method taking " + length
+                                + " input parameter");
             }
         }
 
-        return asyncType;
+        return passingMode;
     }
 
     @Nonnull
-    private AsyncType getReturnType(@Nonnull final Async annotation,
+    private PassingMode getReturnMode(@Nonnull final Pass annotation,
             @Nonnull final ExecutableElement methodElement) {
 
         final Types typeUtils = processingEnv.getTypeUtils();
@@ -766,13 +768,13 @@ public class RoutineProcessor extends AbstractProcessor {
         final TypeElement listElement = mListElement;
         final TypeMirror returnType = methodElement.getReturnType();
         final TypeMirror returnTypeErasure = typeUtils.erasure(returnType);
-        final TypeElement annotationElement = getTypeFromName(Async.class.getCanonicalName());
+        final TypeElement annotationElement = getTypeFromName(Pass.class.getCanonicalName());
         final TypeMirror annotationType = annotationElement.asType();
         final TypeMirror targetMirror =
                 (TypeMirror) getElementValue(methodElement, annotationType, "value");
-        AsyncType asyncType = annotation.type();
+        PassingMode passingMode = annotation.mode();
 
-        if (asyncType == AsyncType.AUTO) {
+        if (passingMode == PassingMode.AUTO) {
 
             if ((returnType.getKind() == TypeKind.ARRAY) || typeUtils.isAssignable(
                     listElement.asType(), returnTypeErasure)) {
@@ -782,22 +784,22 @@ public class RoutineProcessor extends AbstractProcessor {
                         getBoxedType(((ArrayType) returnType).getComponentType()))) {
 
                     throw new IllegalArgumentException(
-                            "the async output array of type " + AsyncType.PARALLEL
+                            "the async output array of type " + PassingMode.PARALLEL
                                     + " does not match the bound type: " + targetMirror);
                 }
 
-                asyncType = AsyncType.PARALLEL;
+                passingMode = PassingMode.PARALLEL;
 
             } else if (typeUtils.isAssignable(outputChannelElement.asType(), returnTypeErasure)) {
 
                 if ((targetMirror != null) && ((targetMirror.getKind() == TypeKind.ARRAY)
                         || typeUtils.isAssignable(targetMirror, iterableElement.asType()))) {
 
-                    asyncType = AsyncType.COLLECT;
+                    passingMode = PassingMode.COLLECTION;
 
                 } else {
 
-                    asyncType = AsyncType.PASS;
+                    passingMode = PassingMode.OBJECT;
                 }
 
             } else {
@@ -807,39 +809,39 @@ public class RoutineProcessor extends AbstractProcessor {
                                 + returnType);
             }
 
-        } else if (asyncType == AsyncType.PASS) {
+        } else if (passingMode == PassingMode.OBJECT) {
 
             if (!typeUtils.isAssignable(outputChannelElement.asType(), returnTypeErasure)) {
 
-                throw new IllegalArgumentException(
-                        "an async output of type " + AsyncType.PASS + " must be a super class of "
-                                + outputChannelElement);
+                throw new IllegalArgumentException("an async output of type " + PassingMode.OBJECT
+                                                           + " must be a super class of "
+                                                           + outputChannelElement);
             }
 
-        } else if (asyncType == AsyncType.COLLECT) {
+        } else if (passingMode == PassingMode.COLLECTION) {
 
             if (!typeUtils.isAssignable(outputChannelElement.asType(), returnTypeErasure)) {
 
-                throw new IllegalArgumentException(
-                        "an async output of type " + AsyncType.PASS + " must be a super class of "
-                                + outputChannelElement);
+                throw new IllegalArgumentException("an async output of type " + PassingMode.OBJECT
+                                                           + " must be a super class of "
+                                                           + outputChannelElement);
             }
 
             if ((targetMirror != null) && (targetMirror.getKind() != TypeKind.ARRAY)
                     && !typeUtils.isAssignable(targetMirror, iterableElement.asType())) {
 
-                throw new IllegalArgumentException("an async output of type " + AsyncType.COLLECT
-                                                           + " must be bound to an array or a " +
-                                                           "type implementing an "
-                                                           + iterableElement);
+                throw new IllegalArgumentException(
+                        "an async output of type " + PassingMode.COLLECTION
+                                + " must be bound to an array or a type implementing an "
+                                + iterableElement);
             }
 
-        } else if (asyncType == AsyncType.PARALLEL) {
+        } else { // AsyncType.PARALLEL
 
             if ((returnType.getKind() != TypeKind.ARRAY) && !typeUtils.isAssignable(
                     listElement.asType(), returnTypeErasure)) {
 
-                throw new IllegalArgumentException("an async output of type " + AsyncType.PARALLEL
+                throw new IllegalArgumentException("an async output of type " + PassingMode.PARALLEL
                                                            + " must be an array or a super class " +
                                                            "of " + listElement);
             }
@@ -849,12 +851,12 @@ public class RoutineProcessor extends AbstractProcessor {
                     getBoxedType(((ArrayType) returnType).getComponentType()))) {
 
                 throw new IllegalArgumentException(
-                        "the async output array of type " + AsyncType.PARALLEL
+                        "the async output array of type " + PassingMode.PARALLEL
                                 + " does not match the bound type: " + targetMirror);
             }
         }
 
-        return asyncType;
+        return passingMode;
     }
 
     @Nonnull
@@ -981,29 +983,29 @@ public class RoutineProcessor extends AbstractProcessor {
         TypeMirror targetReturnType = targetMethod.getReturnType();
 
         final boolean isVoid = (targetReturnType.getKind() == TypeKind.VOID);
-        final Async methodAnnotation = methodElement.getAnnotation(Async.class);
-        AsyncType asyncParamType = null;
-        AsyncType asyncReturnType = null;
+        final Pass methodAnnotation = methodElement.getAnnotation(Pass.class);
+        PassingMode asyncParamMode = null;
+        PassingMode asyncReturnMode = null;
 
         final List<? extends VariableElement> parameters = methodElement.getParameters();
 
         for (final VariableElement parameter : parameters) {
 
-            final Async annotation = parameter.getAnnotation(Async.class);
+            final Pass annotation = parameter.getAnnotation(Pass.class);
 
             if (annotation == null) {
 
                 continue;
             }
 
-            asyncParamType = getParamType(annotation, parameter, parameters.size());
+            asyncParamMode = getParamMode(annotation, parameter, parameters.size());
         }
 
         String method;
 
         if (methodAnnotation != null) {
 
-            asyncReturnType = getReturnType(methodAnnotation, methodElement);
+            asyncReturnMode = getReturnMode(methodAnnotation, methodElement);
 
             final TypeMirror returnType = methodElement.getReturnType();
             final TypeMirror returnTypeErasure = typeUtils.erasure(returnType);
@@ -1011,7 +1013,7 @@ public class RoutineProcessor extends AbstractProcessor {
             if (returnType.getKind() == TypeKind.ARRAY) {
 
                 targetReturnType = ((ArrayType) returnType).getComponentType();
-                method = ((asyncParamType == AsyncType.PARALLEL) && !typeUtils.isAssignable(
+                method = ((asyncParamMode == PassingMode.PARALLEL) && !typeUtils.isAssignable(
                         methodElement.getParameters().get(0).asType(),
                         outputChannelElement.asType())) ? mMethodParallelArray : mMethodArray;
 
@@ -1029,7 +1031,7 @@ public class RoutineProcessor extends AbstractProcessor {
                     targetReturnType = typeArguments.get(0);
                 }
 
-                method = ((asyncParamType == AsyncType.PARALLEL) && !typeUtils.isAssignable(
+                method = ((asyncParamMode == PassingMode.PARALLEL) && !typeUtils.isAssignable(
                         methodElement.getParameters().get(0).asType(),
                         outputChannelElement.asType())) ? mMethodParallelList : mMethodList;
 
@@ -1047,7 +1049,7 @@ public class RoutineProcessor extends AbstractProcessor {
                     targetReturnType = typeArguments.get(0);
                 }
 
-                method = ((asyncParamType == AsyncType.PARALLEL) && !typeUtils.isAssignable(
+                method = ((asyncParamMode == PassingMode.PARALLEL) && !typeUtils.isAssignable(
                         methodElement.getParameters().get(0).asType(),
                         outputChannelElement.asType())) ? mMethodParallelAsync : mMethodAsync;
 
@@ -1059,14 +1061,14 @@ public class RoutineProcessor extends AbstractProcessor {
 
         } else if (isVoid) {
 
-            method = ((asyncParamType == AsyncType.PARALLEL) && !typeUtils.isAssignable(
+            method = ((asyncParamMode == PassingMode.PARALLEL) && !typeUtils.isAssignable(
                     methodElement.getParameters().get(0).asType(), outputChannelElement.asType()))
                     ? mMethodParallelVoid : mMethodVoid;
 
         } else {
 
             targetReturnType = methodElement.getReturnType();
-            method = ((asyncParamType == AsyncType.PARALLEL) && !typeUtils.isAssignable(
+            method = ((asyncParamMode == PassingMode.PARALLEL) && !typeUtils.isAssignable(
                     methodElement.getParameters().get(0).asType(), outputChannelElement.asType()))
                     ? mMethodParallelResult : mMethodResult;
         }
@@ -1092,19 +1094,19 @@ public class RoutineProcessor extends AbstractProcessor {
         method = method.replace("${inputParams}", buildInputParams(methodElement));
         method = method.replace("${outputOptions}", buildOutputOptions(methodElement));
         method = method.replace("${invokeMethod}",
-                                (asyncParamType == AsyncType.PARALLEL) ? "invokeParallel"
+                                (asyncParamMode == PassingMode.PARALLEL) ? "invokeParallel"
                                         : "invokeAsync");
 
         writer.append(method);
 
         String methodFooter;
 
-        if ((asyncParamType == AsyncType.COLLECT) && (
+        if ((asyncParamMode == PassingMode.COLLECTION) && (
                 targetMethod.getParameters().get(0).asType().getKind() == TypeKind.ARRAY)) {
 
             final ArrayType arrayType = (ArrayType) targetMethod.getParameters().get(0).asType();
             methodFooter = (isVoid) ? mMethodArrayInvocationVoid
-                    : (asyncReturnType == AsyncType.COLLECT) ? mMethodArrayInvocationCollection
+                    : (asyncReturnMode == PassingMode.COLLECTION) ? mMethodArrayInvocationCollection
                             : mMethodArrayInvocation;
             methodFooter = methodFooter.replace("${componentType}",
                                                 arrayType.getComponentType().toString());
@@ -1112,7 +1114,7 @@ public class RoutineProcessor extends AbstractProcessor {
         } else {
 
             methodFooter = (isVoid) ? mMethodInvocationVoid
-                    : (asyncReturnType == AsyncType.COLLECT) ? mMethodInvocationCollection
+                    : (asyncReturnMode == PassingMode.COLLECTION) ? mMethodInvocationCollection
                             : mMethodInvocation;
         }
 
@@ -1122,7 +1124,7 @@ public class RoutineProcessor extends AbstractProcessor {
         methodFooter = methodFooter.replace("${methodName}", methodElement.getSimpleName());
         methodFooter = methodFooter.replace("${targetMethodName}", targetMethod.getSimpleName());
 
-        if (asyncParamType == AsyncType.COLLECT) {
+        if (asyncParamMode == PassingMode.COLLECTION) {
 
             methodFooter = methodFooter.replace("${paramValues}",
                                                 buildCollectionParamValues(targetMethod));

@@ -46,7 +46,7 @@ import java.lang.annotation.Target;
  * <pre>
  *     <code>
  *
- *         public int sum(&#64;Async(int.class) OutputChannel&lt;Integer&gt; i1, int i2);
+ *         public int sum(&#64;Pass(int.class) OutputChannel&lt;Integer&gt; i1, int i2);
  *     </code>
  * </pre>
  * <p/>
@@ -66,7 +66,7 @@ import java.lang.annotation.Target;
  * <pre>
  *     <code>
  *
- *         &#64;Async(int.class)
+ *         &#64;Pass(int.class)
  *         public OutputChannel&lt;Integer&gt; sum(int i1, int i2);
  *     </code>
  * </pre>
@@ -76,13 +76,13 @@ import java.lang.annotation.Target;
  * <pre>
  *     <code>
  *
- *         &#64;Async(int.class)
+ *         &#64;Pass(int.class)
  *         public List&lt;Integer&gt; sum(int i1, int i2);
  *     </code>
  * </pre>
  * <p/>
  * Note that the type of asynchronicity is automatically inferred by the mirror and the target type,
- * unless specifically choose through the annotation type attribute.
+ * unless specifically choose through the annotation mode attribute.
  * <p/>
  * Remember also that, in order for the annotation to properly work at run time, you will need to
  * add the following rules to your Proguard file (if employing it for shrinking or obfuscation):
@@ -92,7 +92,7 @@ import java.lang.annotation.Target;
  *         -keepattributes RuntimeVisibleAnnotations
  *
  *         -keepclassmembers class ** {
- *              &#64;com.bmd.jrt.annotation.Async *;
+ *              &#64;com.bmd.jrt.annotation.Pass *;
  *         }
  *     </code>
  * </pre>
@@ -102,14 +102,14 @@ import java.lang.annotation.Target;
 @Inherited
 @Target({ElementType.PARAMETER, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Async {
+public @interface Pass {
 
     /**
-     * The asynchronous variable type.
+     * The asynchronous passing mode.
      *
-     * @return the type.
+     * @return the mode.
      */
-    AsyncType type() default AsyncType.AUTO;
+    PassingMode mode() default PassingMode.AUTO;
 
     /**
      * The bound class.
@@ -119,22 +119,22 @@ public @interface Async {
     Class<?> value();
 
     /**
-     * Asynchronous variable type.<br/>
+     * Asynchronous passing mode.<br/>
      * The type indicates in which way a parameter is passed to the wrapped method or the result
      * is passed outside.
      */
-    enum AsyncType {
+    enum PassingMode {
 
         /**
-         * Pass type.<br/>
+         * Object mode.<br/>
          * The variable is just read from or passed to an output channel.
          * <p/>
          * The annotated parameter must extends an {@link com.bmd.jrt.channel.OutputChannel}, while
          * an annotated method must return a super class of it.
          */
-        PASS,
+        OBJECT,
         /**
-         * Collect type.<br/>
+         * Collection mode.<br/>
          * The inputs are collected from the channel and passed as an array or collection to the
          * wrapped method. In a dual way, the element of the result array or collection are passed
          * one by one to the output channel.
@@ -143,9 +143,9 @@ public @interface Async {
          * must be the only parameter accepted by the method, while an annotated method must return
          * a super class of it.
          */
-        COLLECT,
+        COLLECTION,
         /**
-         * Parallel type.<br/>
+         * Parallel mode.<br/>
          * Each input is passed to a different parallel invocation of the wrapped method.
          * <p/>
          * The annotated parameter must be an array or implement an {@link java.lang.Iterable} and
@@ -154,10 +154,13 @@ public @interface Async {
          */
         PARALLEL,
         /**
-         * Automatic type.<br/>
-         * The type is automatically assigned based on the parameter or return type. Namely: if the
-         * parameters or return type match the PARALLEL async type, they are assigned it; if they
-         * match the COLLECT type, they are assigned the latter; finally the PASS conditions are
+         * Automatic mode.<br/>
+         * The mode is automatically assigned based on the parameter or return type. Namely: if the
+         * parameters match the COLLECTION async mode, they are assigned it; if they match the
+         * OBJECT mode, they are assigned the latter; finally the PARALLEL conditions are checked.
+         * <p/>
+         * Dually, if the return type matches the PARALLEL async mode, it is assigned it; if it
+         * matches the COLLECTION mode, it is assigned the latter; finally the OBJECT conditions are
          * checked.
          */
         AUTO

@@ -13,7 +13,6 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.annotation.Async.AsyncType;
 import com.bmd.jrt.annotation.Bind;
 import com.bmd.jrt.annotation.Share;
 import com.bmd.jrt.annotation.Timeout;
@@ -375,19 +374,19 @@ public class ClassRoutineBuilder implements RoutineBuilder {
     /**
      * Gets or creates the routine.
      *
-     * @param configuration the routine configuration.
-     * @param shareGroup    the group name.
-     * @param method        the method to wrap.
-     * @param paramType     the parameters async type.
-     * @param returnType    the result async type.
+     * @param configuration   the routine configuration.
+     * @param shareGroup      the group name.
+     * @param method          the method to wrap.
+     * @param isCollectParam  whether we need to collect the input parameters.
+     * @param isCollectResult whether the output is a collection.
      * @return the routine instance.
      */
     @Nonnull
     @SuppressWarnings("unchecked")
     protected <INPUT, OUTPUT> Routine<INPUT, OUTPUT> getRoutine(
             @Nonnull final RoutineConfiguration configuration, @Nullable final String shareGroup,
-            @Nonnull final Method method, @Nullable final AsyncType paramType,
-            @Nullable final AsyncType returnType) {
+            @Nonnull final Method method, final boolean isCollectParam,
+            final boolean isCollectResult) {
 
         if (!method.isAccessible()) {
 
@@ -418,7 +417,8 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
             final String methodShareGroup = (shareGroup != null) ? shareGroup : Share.ALL;
             final RoutineInfo routineInfo =
-                    new RoutineInfo(configuration, method, methodShareGroup);
+                    new RoutineInfo(configuration, method, methodShareGroup, isCollectParam,
+                                    isCollectResult);
             routine = routineMap.get(routineInfo);
 
             if (routine != null) {
@@ -454,7 +454,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
             routine = new DefaultRoutine<Object, Object>(configuration,
                                                          MethodSingleCallInvocation.class,
                                                          mTargetReference, mTarget, method, mutex,
-                                                         paramType, returnType);
+                                                         isCollectParam, isCollectResult);
             routineMap.put(routineInfo, routine);
         }
 
@@ -548,7 +548,8 @@ public class ClassRoutineBuilder implements RoutineBuilder {
                    .onReadTimeout(timeoutAnnotation.action());
         }
 
-        return getRoutine(builder.buildConfiguration(), methodShareGroup, targetMethod, null, null);
+        return getRoutine(builder.buildConfiguration(), methodShareGroup, targetMethod, false,
+                          false);
     }
 
     private void fillMap(@Nonnull final HashMap<String, Method> map,
@@ -617,13 +618,13 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
         private final boolean mIsArrayResult;
 
+        private final boolean mIsCollectParam;
+
+        private final boolean mIsCollectResult;
+
         private final Method mMethod;
 
         private final Object mMutex;
-
-        private final AsyncType mParamType;
-
-        private final AsyncType mReturnType;
 
         private final Object mTarget;
 
@@ -636,20 +637,20 @@ public class ClassRoutineBuilder implements RoutineBuilder {
          * @param target          the target object.
          * @param method          the method to wrap.
          * @param mutex           the mutex used for synchronization.
-         * @param paramType       the parameters async type.
-         * @param returnType      the result async type.
+         * @param isCollectParam  whether we need to collect the input parameters.
+         * @param isCollectResult whether the output is a collection.
          */
         public MethodSingleCallInvocation(final WeakReference<?> targetReference,
                 @Nullable final Object target, @Nonnull final Method method,
-                @Nullable final Object mutex, @Nullable final AsyncType paramType,
-                @Nullable final AsyncType returnType) {
+                @Nullable final Object mutex, final boolean isCollectParam,
+                final boolean isCollectResult) {
 
             mTargetReference = targetReference;
             mTarget = target;
             mMethod = method;
             mMutex = (mutex != null) ? mutex : this;
-            mParamType = paramType;
-            mReturnType = returnType;
+            mIsCollectParam = isCollectParam;
+            mIsCollectResult = isCollectResult;
 
             final Class<?> returnClass = method.getReturnType();
             mHasResult = !Void.class.equals(boxingClass(returnClass));
@@ -683,13 +684,40 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
                 try {
 
-                    final Object[] args = (mParamType == AsyncType.COLLECT) ? new Object[]{objects}
-                            : objects.toArray(new Object[objects.size()]);
+                    final Object[] args;
+
+                    if (mIsCollectParam) {
+
+                        final Class<?> paramClass = method.getParameterTypes()[0];
+
+                        if (paramClass.isArray()) {
+
+                            final int size = objects.size();
+                            final Object array =
+                                    Array.newInstance(paramClass.getComponentType(), size);
+
+                            for (int i = 0; i < size; ++i) {
+
+                                Array.set(array, i, objects.get(i));
+                            }
+
+                            args = new Object[]{array};
+
+                        } else {
+
+                            args = new Object[]{objects};
+                        }
+
+                    } else {
+
+                        args = objects.toArray(new Object[objects.size()]);
+                    }
+
                     final Object methodResult = method.invoke(target, args);
 
                     if (mHasResult) {
 
-                        if (mReturnType == AsyncType.COLLECT) {
+                        if (mIsCollectResult) {
 
                             if (mIsArrayResult) {
 
@@ -699,7 +727,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
                                     for (int i = 0; i < length; ++i) {
 
-                                        result.pass(Array.get(method, i));
+                                        result.pass(Array.get(methodResult, i));
                                     }
                                 }
 
@@ -741,6 +769,10 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
         private final RoutineConfiguration mConfiguration;
 
+        private final boolean mIsCollectParam;
+
+        private final boolean mIsCollectResult;
+
         private final Method mMethod;
 
         private final String mShareGroup;
@@ -748,16 +780,21 @@ public class ClassRoutineBuilder implements RoutineBuilder {
         /**
          * Constructor.
          *
-         * @param configuration the routine configuration.
-         * @param method        the method to wrap.
-         * @param shareGroup    the group name.
+         * @param configuration   the routine configuration.
+         * @param method          the method to wrap.
+         * @param shareGroup      the group name.
+         * @param isCollectParam  whether we need to collect the input parameters.
+         * @param isCollectResult whether the output is a collection.
          */
         private RoutineInfo(@Nonnull final RoutineConfiguration configuration,
-                @Nonnull final Method method, @Nonnull final String shareGroup) {
+                @Nonnull final Method method, @Nonnull final String shareGroup,
+                final boolean isCollectParam, final boolean isCollectResult) {
 
             mMethod = method;
             mShareGroup = shareGroup;
             mConfiguration = configuration;
+            mIsCollectParam = isCollectParam;
+            mIsCollectResult = isCollectResult;
         }
 
         @Override
@@ -765,6 +802,8 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
             // auto-generated code
             int result = mConfiguration.hashCode();
+            result = 31 * result + (mIsCollectParam ? 1 : 0);
+            result = 31 * result + (mIsCollectResult ? 1 : 0);
             result = 31 * result + mMethod.hashCode();
             result = 31 * result + mShareGroup.hashCode();
             return result;
@@ -773,7 +812,6 @@ public class ClassRoutineBuilder implements RoutineBuilder {
         @Override
         public boolean equals(final Object o) {
 
-            // auto-generated code
             if (this == o) {
 
                 return true;
@@ -785,8 +823,11 @@ public class ClassRoutineBuilder implements RoutineBuilder {
             }
 
             final RoutineInfo that = (RoutineInfo) o;
-            return mConfiguration.equals(that.mConfiguration) && mMethod.equals(that.mMethod)
-                    && mShareGroup.equals(that.mShareGroup);
+
+            return mIsCollectParam == that.mIsCollectParam
+                    && mIsCollectResult == that.mIsCollectResult && mConfiguration.equals(
+                    that.mConfiguration) && mMethod.equals(that.mMethod) && mShareGroup.equals(
+                    that.mShareGroup);
         }
     }
 

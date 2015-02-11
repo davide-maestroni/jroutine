@@ -13,9 +13,9 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.annotation.Async;
-import com.bmd.jrt.annotation.Async.AsyncType;
 import com.bmd.jrt.annotation.Bind;
+import com.bmd.jrt.annotation.Pass;
+import com.bmd.jrt.annotation.Pass.PassingMode;
 import com.bmd.jrt.annotation.Share;
 import com.bmd.jrt.annotation.Timeout;
 import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
@@ -37,7 +37,9 @@ import com.bmd.jrt.time.TimeDuration;
 import junit.framework.TestCase;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -615,6 +617,162 @@ public class JRoutineTest extends TestCase {
         } catch (final IllegalArgumentException ignored) {
 
         }
+
+        final Sum sum = new Sum();
+
+        try {
+
+            JRoutine.on(sum).buildProxy(SumError.class).compute(1, new int[0]);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.on(sum).buildProxy(SumError.class).compute(new String[0]);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.on(sum).buildProxy(SumError.class).compute(new int[0]);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.on(sum).buildProxy(SumError.class).compute(Collections.<Integer>emptyList());
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        final StandaloneChannel<Integer> channel = JRoutine.on().buildChannel();
+
+        try {
+
+            JRoutine.on(sum).buildProxy(SumError.class).compute(channel.output());
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.on(sum).buildProxy(SumError.class).compute(1, channel.output());
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.on(sum).buildProxy(SumError.class).compute(new Object());
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.on(sum).buildProxy(SumError.class).compute(new Object[0]);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.on(sum).buildProxy(SumError.class).compute("test", new int[0]);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        final Count count = new Count();
+
+        try {
+
+            JRoutine.on(count).buildProxy(CountError.class).count(3);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.on(count).buildProxy(CountError.class).count1(3);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.on(count).buildProxy(CountError.class).count2(3);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.on(count).buildProxy(CountError.class).countList(3);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.on(count).buildProxy(CountError.class).countList1(3);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.on(count).buildProxy(CountError.class).countList2(3);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
     }
 
     public void testObjectRoutineCache() {
@@ -672,31 +830,78 @@ public class JRoutineTest extends TestCase {
         assertThat(routine4).isNotEqualTo(routine5);
     }
 
-    public void testObjectRoutineParallel() {
+    @SuppressWarnings("NullArgumentToVariableArgMethod")
+    public void testObjectRoutineProxy() {
 
         final TimeDuration timeout = seconds(1);
         final Square square = new Square();
         final SquareItf squareAsync = JRoutine.on(square).buildProxy(SquareItf.class);
 
         assertThat(squareAsync.compute(3)).isEqualTo(9);
+        assertThat(squareAsync.compute1(3)).containsExactly(9);
+        assertThat(squareAsync.compute2(3)).containsExactly(9);
         assertThat(squareAsync.computeParallel1(1, 2, 3).afterMax(timeout).readAll()).contains(1, 4,
                                                                                                9);
+        assertThat(squareAsync.computeParallel1().afterMax(timeout).readAll()).isEmpty();
+        assertThat(squareAsync.computeParallel1(null).afterMax(timeout).readAll()).isEmpty();
         assertThat(squareAsync.computeParallel2(1, 2, 3).afterMax(timeout).readAll()).contains(1, 4,
                                                                                                9);
+        assertThat(squareAsync.computeParallel2().afterMax(timeout).readAll()).isEmpty();
+        assertThat(squareAsync.computeParallel2((Integer[]) null)
+                              .afterMax(timeout)
+                              .readAll()).isEmpty();
         assertThat(squareAsync.computeParallel3(Arrays.asList(1, 2, 3)).afterMax(timeout).readAll())
                 .contains(1, 4, 9);
+        assertThat(squareAsync.computeParallel3(Collections.<Integer>emptyList())
+                              .afterMax(timeout)
+                              .readAll()).isEmpty();
+        assertThat(squareAsync.computeParallel3(null).afterMax(timeout).readAll()).isEmpty();
 
-        final StandaloneChannel<Integer> standaloneChannel = JRoutine.on().buildChannel();
+        final StandaloneChannel<Integer> channel1 = JRoutine.on().buildChannel();
+        channel1.input().pass(4).close();
+        assertThat(squareAsync.computeAsync(channel1.output())).isEqualTo(16);
 
-        standaloneChannel.input().pass(1, 2, 3).close();
-        assertThat(squareAsync.computeParallel4(standaloneChannel.output())
+        final StandaloneChannel<Integer> channel2 = JRoutine.on().buildChannel();
+        channel2.input().pass(1, 2, 3).close();
+        assertThat(squareAsync.computeParallel4(channel2.output())
                               .afterMax(timeout)
                               .readAll()).contains(1, 4, 9);
 
-        final TestInc testInc = new TestInc();
-        final int[] inc =
-                JRoutine.on(testInc).buildProxy(ClassToken.tokenOf(ITestInc.class)).inc(1, 2, 3, 4);
-        assertThat(inc).containsOnly(2, 3, 4, 5);
+        final Inc inc = new Inc();
+        final IncItf incItf = JRoutine.on(inc).buildProxy(ClassToken.tokenOf(IncItf.class));
+        assertThat(incItf.inc(1, 2, 3, 4)).containsOnly(2, 3, 4, 5);
+        assertThat(incItf.incIterable(1, 2, 3, 4)).containsOnly(2, 3, 4, 5);
+
+        final Sum sum = new Sum();
+        final SumItf sumAsync = JRoutine.on(sum).withReadTimeout(timeout).buildProxy(SumItf.class);
+        final StandaloneChannel<Integer> channel3 = JRoutine.on().buildChannel();
+        channel3.input().pass(7).close();
+        assertThat(sumAsync.compute(3, channel3.output())).isEqualTo(10);
+
+        final StandaloneChannel<Integer> channel4 = JRoutine.on().buildChannel();
+        channel4.input().pass(1, 2, 3, 4).close();
+        assertThat(sumAsync.compute(channel4.output())).isEqualTo(10);
+
+        final StandaloneChannel<int[]> channel5 = JRoutine.on().buildChannel();
+        channel5.input().pass(new int[]{1, 2, 3, 4}).close();
+        assertThat(sumAsync.compute1(channel5.output())).isEqualTo(10);
+
+        final StandaloneChannel<Integer> channel6 = JRoutine.on().buildChannel();
+        channel6.input().pass(1, 2, 3, 4).close();
+        assertThat(sumAsync.computeList(channel6.output())).isEqualTo(10);
+
+        final StandaloneChannel<Integer> channel7 = JRoutine.on().buildChannel();
+        channel7.input().pass(1, 2, 3, 4).close();
+        assertThat(sumAsync.computeList1(channel7.output())).isEqualTo(10);
+
+        final Count count = new Count();
+        final CountItf countAsync =
+                JRoutine.on(count).withReadTimeout(timeout).buildProxy(CountItf.class);
+        assertThat(countAsync.count(3).readAll()).containsExactly(0, 1, 2);
+        assertThat(countAsync.count1(3).readAll()).containsExactly(new int[]{0, 1, 2});
+        assertThat(countAsync.count2(2).readAll()).containsExactly(0, 1);
+        assertThat(countAsync.countList(3).readAll()).containsExactly(0, 1, 2);
+        assertThat(countAsync.countList1(3).readAll()).containsExactly(0, 1, 2);
     }
 
     public void testRoutineBuilder() {
@@ -841,11 +1046,62 @@ public class JRoutineTest extends TestCase {
         assertThat(channel.output().immediately().readAll()).containsExactly("test");
     }
 
-    private interface ITestInc {
+    private static interface CountError {
+
+        @Pass(int.class)
+        public String[] count(int length);
+
+        @Bind("count")
+        @Pass(value = int.class, mode = PassingMode.COLLECTION)
+        public OutputChannel<Integer> count1(int length);
+
+        @Bind("count")
+        @Pass(value = int.class, mode = PassingMode.PARALLEL)
+        public String[] count2(int length);
+
+        @Pass(value = List.class, mode = PassingMode.OBJECT)
+        public List<Integer> countList(int length);
+
+        @Bind("countList")
+        @Pass(value = List.class, mode = PassingMode.COLLECTION)
+        public List<Integer> countList1(int length);
+
+        @Bind("countList")
+        @Pass(value = List.class, mode = PassingMode.PARALLEL)
+        public OutputChannel<Integer> countList2(int length);
+    }
+
+    private static interface CountItf {
+
+        @Pass(int[].class)
+        public OutputChannel<Integer> count(int length);
+
+        @Bind("count")
+        @Pass(value = int[].class, mode = PassingMode.OBJECT)
+        public OutputChannel<int[]> count1(int length);
+
+        @Bind("count")
+        @Pass(value = int[].class, mode = PassingMode.COLLECTION)
+        public OutputChannel<Integer> count2(int length);
+
+        @Pass(List.class)
+        public OutputChannel<Integer> countList(int length);
+
+        @Bind("countList")
+        @Pass(value = List.class, mode = PassingMode.COLLECTION)
+        public OutputChannel<Integer> countList1(int length);
+    }
+
+    private interface IncItf {
 
         @Timeout(1000)
-        @Async(int.class)
-        public int[] inc(@Async(int.class) int... i);
+        @Pass(int.class)
+        public int[] inc(@Pass(int.class) int... i);
+
+        @Timeout(1000)
+        @Bind("inc")
+        @Pass(int.class)
+        public Iterable<Integer> incIterable(@Pass(int.class) int... i);
     }
 
     private static interface SquareItf {
@@ -853,37 +1109,122 @@ public class JRoutineTest extends TestCase {
         @Timeout(value = 1, unit = TimeUnit.SECONDS)
         public int compute(int i);
 
-        @Share(Share.NONE)
         @Bind("compute")
-        @Async(int.class)
-        public OutputChannel<Integer> computeParallel1(@Async(int.class) int... i);
+        @Pass(value = int.class, mode = PassingMode.PARALLEL)
+        @Timeout(1000)
+        public int[] compute1(int length);
 
         @Bind("compute")
-        @Async(int.class)
-        public OutputChannel<Integer> computeParallel2(@Async(int.class) Integer... i);
+        @Pass(value = int.class, mode = PassingMode.PARALLEL)
+        @Timeout(1000)
+        public List<Integer> compute2(int length);
+
+        @Bind("compute")
+        @Timeout(1000)
+        public int computeAsync(@Pass(int.class) OutputChannel<Integer> i);
 
         @Share(Share.NONE)
         @Bind("compute")
-        @Async(int.class)
-        public OutputChannel<Integer> computeParallel3(@Async(int.class) List<Integer> i);
+        @Pass(int.class)
+        public OutputChannel<Integer> computeParallel1(@Pass(int.class) int... i);
+
+        @Bind("compute")
+        @Pass(int.class)
+        public OutputChannel<Integer> computeParallel2(@Pass(int.class) Integer... i);
 
         @Share(Share.NONE)
         @Bind("compute")
-        @Async(int.class)
+        @Pass(int.class)
+        public OutputChannel<Integer> computeParallel3(@Pass(int.class) List<Integer> i);
+
+        @Share(Share.NONE)
+        @Bind("compute")
+        @Pass(int.class)
         public OutputChannel<Integer> computeParallel4(
-                @Async(value = int.class, type = AsyncType.PARALLEL) OutputChannel<Integer> i);
+                @Pass(value = int.class, mode = PassingMode.PARALLEL) OutputChannel<Integer> i);
+    }
+
+    private static interface SumError {
+
+        public int compute(int a, @Pass(int.class) int[] b);
+
+        public int compute(@Pass(int.class) String[] ints);
+
+        public int compute(@Pass(value = int.class, mode = PassingMode.OBJECT) int[] ints);
+
+        public int compute(
+                @Pass(value = int.class, mode = PassingMode.COLLECTION) Iterable<Integer> ints);
+
+        public int compute(@Pass(value = int.class,
+                                 mode = PassingMode.COLLECTION) OutputChannel<Integer> ints);
+
+        public int compute(int a,
+                @Pass(value = int[].class, mode = PassingMode.COLLECTION) OutputChannel<Integer> b);
+
+        public int compute(@Pass(value = int.class, mode = PassingMode.PARALLEL) Object ints);
+
+        public int compute(@Pass(value = int.class, mode = PassingMode.PARALLEL) Object[] ints);
+
+        public int compute(String text,
+                @Pass(value = int.class, mode = PassingMode.PARALLEL) int[] ints);
+    }
+
+    private static interface SumItf {
+
+        public int compute(int a, @Pass(int.class) OutputChannel<Integer> b);
+
+        public int compute(@Pass(int[].class) OutputChannel<Integer> ints);
+
+        @Bind("compute")
+        public int compute1(
+                @Pass(value = int[].class, mode = PassingMode.OBJECT) OutputChannel<int[]> ints);
+
+        @Bind("compute")
+        public int computeList(@Pass(List.class) OutputChannel<Integer> ints);
+
+        @Bind("compute")
+        public int computeList1(@Pass(value = List.class,
+                                      mode = PassingMode.COLLECTION) OutputChannel<Integer> ints);
     }
 
     private static interface TestItf {
 
-        public void throwException(@Async(int.class) RuntimeException ex);
+        public void throwException(@Pass(int.class) RuntimeException ex);
 
         @Bind(Test.THROW)
-        @Async(int.class)
+        @Pass(int.class)
         public void throwException1(RuntimeException ex);
 
         @Bind(Test.THROW)
         public int throwException2(RuntimeException ex);
+    }
+
+    @SuppressWarnings("UnusedDeclaration")
+    private static class Count {
+
+        public int[] count(final int length) {
+
+            final int[] array = new int[length];
+
+            for (int i = 0; i < length; i++) {
+
+                array[i] = i;
+            }
+
+            return array;
+        }
+
+        public List<Integer> countList(final int length) {
+
+            final ArrayList<Integer> list = new ArrayList<Integer>(length);
+
+            for (int i = 0; i < length; i++) {
+
+                list.add(i);
+            }
+
+            return list;
+        }
     }
 
     private static class DuplicateAnnotation {
@@ -921,11 +1262,53 @@ public class JRoutineTest extends TestCase {
     }
 
     @SuppressWarnings("UnusedDeclaration")
+    private static class Inc {
+
+        public int inc(final int i) {
+
+            return i + 1;
+        }
+    }
+
+    @SuppressWarnings("UnusedDeclaration")
     private static class Square {
 
         public int compute(final int i) {
 
             return i * i;
+        }
+    }
+
+    @SuppressWarnings("UnusedDeclaration")
+    private static class Sum {
+
+        public int compute(final int a, final int b) {
+
+            return a + b;
+        }
+
+        public int compute(final int... ints) {
+
+            int s = 0;
+
+            for (final int i : ints) {
+
+                s += i;
+            }
+
+            return s;
+        }
+
+        public int compute(final List<Integer> ints) {
+
+            int s = 0;
+
+            for (final int i : ints) {
+
+                s += i;
+            }
+
+            return s;
         }
     }
 
@@ -983,15 +1366,6 @@ public class JRoutineTest extends TestCase {
         public String getString(final String string) {
 
             return string;
-        }
-    }
-
-    @SuppressWarnings("UnusedDeclaration")
-    private static class TestInc {
-
-        public int inc(final int i) {
-
-            return i + 1;
         }
     }
 

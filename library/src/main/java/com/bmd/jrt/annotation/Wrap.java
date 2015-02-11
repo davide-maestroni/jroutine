@@ -25,7 +25,7 @@ import java.lang.annotation.Target;
  * The target classes are specified in the annotation attribute. For each one a new wrapper class
  * implementing the annotated interface will be generated in the interface package.<br/>
  * The routines used for calling the methods will honor the attributes specified in any optional
- * {@link Bind}, {@link Timeout} abd {@link Async}  annotation defined for each interface method.
+ * {@link Bind}, {@link Timeout} abd {@link Pass}  annotation defined for each interface method.
  * <p/>
  * Note that, you'll need to enable annotation pre-processing by adding the "jroutine-processor"
  * artifact or module to the specific project dependencies. Be sure also to include a proper rule in

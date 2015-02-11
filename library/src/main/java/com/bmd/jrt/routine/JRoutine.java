@@ -133,8 +133,8 @@ import javax.annotation.Nonnull;
  * <p/>
  * Created by davide on 9/7/14.
  *
- * @see com.bmd.jrt.annotation.Pass
  * @see com.bmd.jrt.annotation.Bind
+ * @see com.bmd.jrt.annotation.Pass
  * @see com.bmd.jrt.annotation.Share
  * @see com.bmd.jrt.annotation.Timeout
  * @see com.bmd.jrt.annotation.Wrap

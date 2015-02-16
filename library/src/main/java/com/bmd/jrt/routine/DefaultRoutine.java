@@ -18,16 +18,10 @@ import com.bmd.jrt.common.InvocationException;
 import com.bmd.jrt.common.InvocationInterruptedException;
 import com.bmd.jrt.common.RoutineException;
 import com.bmd.jrt.invocation.Invocation;
+import com.bmd.jrt.invocation.InvocationFactory;
 import com.bmd.jrt.log.Logger;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import static com.bmd.jrt.common.Reflection.NO_ARGS;
-import static com.bmd.jrt.common.Reflection.findConstructor;
 
 /**
  * Default implementation of a routine object instantiating invocation objects via reflection.
@@ -39,29 +33,28 @@ import static com.bmd.jrt.common.Reflection.findConstructor;
  */
 class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
 
-    private final Object[] mArgs;
-
-    private final Constructor<? extends Invocation<INPUT, OUTPUT>> mConstructor;
+    private final InvocationFactory<INPUT, OUTPUT> mFactory;
 
     /**
      * Constructor.
      *
-     * @param configuration   the routine configuration.
-     * @param invocationClass the invocation class.
-     * @param invocationArgs  the invocation constructor arguments.
-     * @throws java.lang.IllegalArgumentException if at least one of the parameter is invalid, of no
-     *                                            constructor matching the specified arguments is
-     *                                            found for the target invocation class.
+     * @param configuration the routine configuration.
+     * @param factory       the invocation factory.
+     * @throws java.lang.IllegalArgumentException if at least one of the parameter is invalid.
      * @throws java.lang.NullPointerException     if at least one of the parameter is null.
      */
+    @SuppressWarnings("ConstantConditions")
     DefaultRoutine(@Nonnull final RoutineConfiguration configuration,
-            @Nonnull final Class<? extends Invocation<INPUT, OUTPUT>> invocationClass,
-            @Nullable final Object... invocationArgs) {
+            @Nonnull final InvocationFactory<INPUT, OUTPUT> factory) {
 
         super(configuration);
 
-        mArgs = (invocationArgs == null) ? NO_ARGS : invocationArgs.clone();
-        mConstructor = findConstructor(invocationClass, mArgs);
+        if (factory == null) {
+
+            throw new NullPointerException("the invocation factory must not be null");
+        }
+
+        mFactory = factory;
     }
 
     @Nonnull
@@ -72,14 +65,11 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
 
         try {
 
-            final Constructor<? extends Invocation<INPUT, OUTPUT>> constructor = mConstructor;
-            logger.dbg("creating a new instance of class: %s", constructor.getDeclaringClass());
-            return constructor.newInstance(mArgs);
-
-        } catch (final InvocationTargetException e) {
-
-            logger.err(e, "error creating the invocation instance");
-            throw new InvocationException(e.getCause());
+            final InvocationFactory<INPUT, OUTPUT> factory = mFactory;
+            logger.dbg("creating a new invocation instance with factory: %s", factory);
+            final Invocation<INPUT, OUTPUT> invocation = factory.createInvocation();
+            logger.dbg("created a new instance of class: %s", invocation.getClass());
+            return invocation;
 
         } catch (final InvocationInterruptedException e) {
 

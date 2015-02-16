@@ -516,9 +516,9 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
     @Nonnull
     @Override
-    public ObjectRoutineBuilder shareGroup(@Nullable final String group) {
+    public ObjectRoutineBuilder withShareGroup(@Nullable final String group) {
 
-        super.shareGroup(group);
+        super.withShareGroup(group);
         return this;
     }
 
@@ -615,6 +615,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      */
     @Nonnull
     public <CLASS> CLASS buildWrapper(@Nonnull final Class<CLASS> itf) {
+
+        //TODO: avoid reflection...
 
         if (!itf.isInterface()) {
 

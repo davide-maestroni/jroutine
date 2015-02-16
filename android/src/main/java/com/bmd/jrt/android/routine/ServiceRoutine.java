@@ -37,6 +37,7 @@ import com.bmd.jrt.channel.StandaloneChannel.StandaloneOutput;
 import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.common.InvocationException;
 import com.bmd.jrt.invocation.Invocation;
+import com.bmd.jrt.invocation.Invocations;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.log.Logger;
@@ -140,7 +141,8 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         mLogger = Logger.createLogger((log != null) ? log : Logger.getGlobalLog(),
                                       configuration.getLogLevelOr(Logger.getGlobalLogLevel()),
                                       this);
-        mRoutine = JRoutine.on((ClassToken<? extends Invocation<INPUT, OUTPUT>>) invocationToken)
+        mRoutine = JRoutine.on(Invocations.factoryOf(
+                (ClassToken<? extends Invocation<INPUT, OUTPUT>>) invocationToken))
                            .apply(configuration)
                            .withLog(log)
                            .buildRoutine();

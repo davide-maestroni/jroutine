@@ -14,7 +14,8 @@
 package com.bmd.jrt.android.invocation;
 
 import com.bmd.jrt.channel.ResultChannel;
-import com.bmd.jrt.common.ClassToken;
+import com.bmd.jrt.invocation.Invocation;
+import com.bmd.jrt.invocation.InvocationFactory;
 
 import javax.annotation.Nonnull;
 
@@ -27,15 +28,30 @@ import javax.annotation.Nonnull;
  */
 public class AndroidPassingInvocation<DATA> extends AndroidTemplateInvocation<DATA, DATA> {
 
+    private static final AndroidPassingInvocation<Object> sInvocation =
+            new AndroidPassingInvocation<Object>();
+
+    private static final InvocationFactory<Object, Object> sFactory =
+            new InvocationFactory<Object, Object>() {
+
+                @Nonnull
+                @Override
+                public Invocation<Object, Object> createInvocation() {
+
+                    return sInvocation;
+                }
+            };
+
     /**
-     * Creates and returns the class token of a typed passing invocation.
+     * Returns a factory of passing invocations.
      *
      * @param <DATA> the data type.
-     * @return the token instance.
+     * @return the factory.
      */
-    public static <DATA> ClassToken<AndroidPassingInvocation<DATA>> tokenOf() {
+    @SuppressWarnings("unchecked")
+    public static <DATA> InvocationFactory<DATA, DATA> factoryOf() {
 
-        return new ClassToken<AndroidPassingInvocation<DATA>>() {};
+        return (InvocationFactory<DATA, DATA>) sFactory;
     }
 
     @Override

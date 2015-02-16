@@ -100,7 +100,9 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
 
         if (context == null) {
 
-            return JRoutine.on(new MissingToken<OUTPUT, OUTPUT>()).buildRoutine().callSync();
+            return JRoutine.on(MissingLoaderInvocation.<OUTPUT, OUTPUT>factoryOf())
+                           .buildRoutine()
+                           .callSync();
         }
 
         final AndroidRoutineBuilder<OUTPUT, OUTPUT> builder;

@@ -24,6 +24,8 @@ import com.bmd.jrt.common.CacheHashMap;
 import com.bmd.jrt.common.InvocationException;
 import com.bmd.jrt.common.InvocationInterruptedException;
 import com.bmd.jrt.common.RoutineException;
+import com.bmd.jrt.invocation.InvocationFactory;
+import com.bmd.jrt.invocation.Invocations;
 import com.bmd.jrt.invocation.SingleCallInvocation;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
@@ -341,7 +343,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
      * @see com.bmd.jrt.annotation.Share
      */
     @Nonnull
-    public ClassRoutineBuilder shareGroup(@Nullable final String group) {
+    public ClassRoutineBuilder withShareGroup(@Nullable final String group) {
 
         mShareGroup = group;
         return this;
@@ -451,10 +453,11 @@ public class ClassRoutineBuilder implements RoutineBuilder {
                 }
             }
 
-            routine = new DefaultRoutine<Object, Object>(configuration,
-                                                         MethodSingleCallInvocation.class,
-                                                         mTargetReference, mTarget, method, mutex,
-                                                         isCollectParam, isCollectResult);
+            final InvocationFactory<Object, Object> factory =
+                    Invocations.withArgs(mTargetReference, mTarget, method, mutex, isCollectParam,
+                                         isCollectResult)
+                               .factoryOf(MethodSingleCallInvocation.class);
+            routine = new DefaultRoutine<Object, Object>(configuration, factory);
             routineMap.put(routineInfo, routine);
         }
 

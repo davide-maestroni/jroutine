@@ -22,7 +22,11 @@ import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.common.InvocationInterruptedException;
+import com.bmd.jrt.invocation.Invocation;
+import com.bmd.jrt.invocation.InvocationFactory;
+import com.bmd.jrt.invocation.Invocations;
 import com.bmd.jrt.invocation.SingleCallInvocation;
+import com.bmd.jrt.invocation.TemplateInvocation;
 import com.bmd.jrt.runner.Execution;
 import com.bmd.jrt.runner.Runner;
 import com.bmd.jrt.runner.RunnerDecorator;
@@ -69,45 +73,48 @@ public class AndroidRunnerTest extends AndroidTestCase {
         testRunner(new LooperRunner(Looper.myLooper(), Runners.queuedRunner()));
         testRunner(Runners.myRunner());
 
+        final TemplateInvocation<Object, Object> invocation =
+                new TemplateInvocation<Object, Object>() {
+
+                    @Override
+                    public void onResult(@Nonnull final ResultChannel<Object> result) {
+
+                        result.pass(Looper.myLooper()).pass(Runners.myRunner());
+                    }
+                };
         final OutputChannel<Object> channel =
-                JRoutine.on(ClassToken.tokenOf(new SingleCallInvocation<Object, Object>() {
+                JRoutine.on(Invocations.withArgs(this).factoryOf(ClassToken.tokenOf(invocation)))
+                        .withRunner(Runners.threadRunner(new HandlerThread("test")))
+                        .buildRoutine()
+                        .callAsync();
+
+        assertThat(JRoutine.on(new InvocationFactory<Object, Object>() {
+
+            @Nonnull
+            @Override
+            public Invocation<Object, Object> createInvocation() {
+
+                return new SingleCallInvocation<Object, Object>() {
 
                     @Override
                     public void onCall(@Nonnull final List<?> objects,
                             @Nonnull final ResultChannel<Object> result) {
 
-                        result.pass(Looper.myLooper()).pass(Runners.myRunner());
+                        try {
+
+                            testRunner(new LooperRunner((Looper) objects.get(0), null));
+                            testRunner((Runner) objects.get(1));
+
+                            result.pass(true);
+
+                        } catch (final InterruptedException e) {
+
+                            throw InvocationInterruptedException.interrupt(e);
+                        }
                     }
-                }))
-                        .withRunner(Runners.threadRunner(new HandlerThread("test")))
-                        .withArgs(this)
-                        .buildRoutine()
-                        .callAsync();
-
-        assertThat(JRoutine.on(ClassToken.tokenOf(new SingleCallInvocation<Object, Object>() {
-
-            @Override
-            public void onCall(@Nonnull final List<?> objects,
-                    @Nonnull final ResultChannel<Object> result) {
-
-                try {
-
-                    testRunner(new LooperRunner((Looper) objects.get(0), null));
-                    testRunner((Runner) objects.get(1));
-
-                    result.pass(true);
-
-                } catch (final InterruptedException e) {
-
-                    throw InvocationInterruptedException.interrupt(e);
-                }
+                };
             }
-        }))
-                           .withArgs(this)
-                           .buildRoutine()
-                           .callAsync(channel)
-                           .afterMax(seconds(30))
-                           .readNext()).isEqualTo(true);
+        }).buildRoutine().callAsync(channel).afterMax(seconds(30)).readNext()).isEqualTo(true);
     }
 
     public void testMainRunner() throws InterruptedException {

@@ -18,7 +18,6 @@ import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ReadDeadlockException;
 import com.bmd.jrt.channel.StandaloneChannel;
 import com.bmd.jrt.channel.StandaloneChannel.StandaloneOutput;
-import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.common.InvocationException;
 import com.bmd.jrt.invocation.PassingInvocation;
 import com.bmd.jrt.time.TimeDuration;
@@ -45,7 +44,7 @@ public class StandaloneChannelTest extends TestCase {
         final TimeDuration timeout = seconds(1);
         final StandaloneChannel<String> standaloneChannel = JRoutine.on().buildChannel();
         final Routine<String, String> routine =
-                JRoutine.on(new ClassToken<PassingInvocation<String>>() {}).buildRoutine();
+                JRoutine.on(PassingInvocation.<String>factoryOf()).buildRoutine();
         final OutputChannel<String> outputChannel = routine.callAsync(standaloneChannel.output());
 
         standaloneChannel.input().abort(new IllegalStateException());
@@ -113,7 +112,7 @@ public class StandaloneChannelTest extends TestCase {
         }.start();
 
         final Routine<String, String> routine =
-                JRoutine.on(new ClassToken<PassingInvocation<String>>() {}).buildRoutine();
+                JRoutine.on(PassingInvocation.<String>factoryOf()).buildRoutine();
         final OutputChannel<String> outputChannel = routine.callAsync(standaloneChannel.output());
         assertThat(outputChannel.afterMax(timeout).readNext()).isEqualTo("test");
         assertThat(outputChannel.checkComplete()).isTrue();
@@ -136,7 +135,7 @@ public class StandaloneChannelTest extends TestCase {
         }.start();
 
         final Routine<String, String> routine1 =
-                JRoutine.on(new ClassToken<PassingInvocation<String>>() {}).buildRoutine();
+                JRoutine.on(PassingInvocation.<String>factoryOf()).buildRoutine();
         final OutputChannel<String> outputChannel1 =
                 routine1.callAsync(standaloneChannel1.output());
         assertThat(outputChannel1.afterMax(timeout).readAll()).containsExactly("test1", "test2",
@@ -159,7 +158,7 @@ public class StandaloneChannelTest extends TestCase {
         final long startTime = System.currentTimeMillis();
 
         final Routine<String, String> routine =
-                JRoutine.on(new ClassToken<PassingInvocation<String>>() {}).buildRoutine();
+                JRoutine.on(PassingInvocation.<String>factoryOf()).buildRoutine();
         final OutputChannel<String> outputChannel =
                 routine.callAsync(standaloneChannel.output()).eventuallyExit();
         assertThat(outputChannel.afterMax(TimeDuration.millis(500)).readAll()).containsExactly(
@@ -180,7 +179,7 @@ public class StandaloneChannelTest extends TestCase {
         new WeakThread(standaloneChannel).start();
 
         final Routine<String, String> routine =
-                JRoutine.on(new ClassToken<PassingInvocation<String>>() {}).buildRoutine();
+                JRoutine.on(PassingInvocation.<String>factoryOf()).buildRoutine();
         final OutputChannel<String> outputChannel = routine.callAsync(standaloneChannel.output());
         assertThat(outputChannel.afterMax(timeout).readNext()).isEqualTo("test");
     }

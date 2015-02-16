@@ -16,6 +16,8 @@ package com.bmd.jrt.android.v11.routine;
 import com.bmd.jrt.android.builder.InvocationMissingException;
 import com.bmd.jrt.android.invocation.AndroidTemplateInvocation;
 import com.bmd.jrt.channel.ResultChannel;
+import com.bmd.jrt.invocation.Invocation;
+import com.bmd.jrt.invocation.InvocationFactory;
 
 import javax.annotation.Nonnull;
 
@@ -28,6 +30,33 @@ import javax.annotation.Nonnull;
  * @param <OUTPUT> the output data type.
  */
 class MissingLoaderInvocation<INPUT, OUTPUT> extends AndroidTemplateInvocation<INPUT, OUTPUT> {
+
+    private static final MissingLoaderInvocation<Object, Object> sInvocation =
+            new MissingLoaderInvocation<Object, Object>();
+
+    private static final InvocationFactory<Object, Object> sFactory =
+            new InvocationFactory<Object, Object>() {
+
+                @Nonnull
+                @Override
+                public Invocation<Object, Object> createInvocation() {
+
+                    return sInvocation;
+                }
+            };
+
+    /**
+     * Returns a factory of missing loader invocations.
+     *
+     * @param <INPUT>  the input data type.
+     * @param <OUTPUT> the output data type.
+     * @return the factory.
+     */
+    @SuppressWarnings("unchecked")
+    public static <INPUT, OUTPUT> InvocationFactory<INPUT, OUTPUT> factoryOf() {
+
+        return (InvocationFactory<INPUT, OUTPUT>) sFactory;
+    }
 
     @Override
     public void onResult(@Nonnull final ResultChannel<OUTPUT> result) {

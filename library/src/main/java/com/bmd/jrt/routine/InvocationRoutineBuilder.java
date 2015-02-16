@@ -16,8 +16,7 @@ package com.bmd.jrt.routine;
 import com.bmd.jrt.builder.RoutineChannelBuilder;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.builder.RoutineConfigurationBuilder;
-import com.bmd.jrt.common.ClassToken;
-import com.bmd.jrt.invocation.Invocation;
+import com.bmd.jrt.invocation.InvocationFactory;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.runner.Runner;
@@ -27,8 +26,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import static com.bmd.jrt.common.Reflection.NO_ARGS;
 
 /**
  * Class implementing a builder of routine objects based on an invocation class token.
@@ -42,20 +39,23 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineChannelBu
 
     private final RoutineConfigurationBuilder mBuilder;
 
-    private final Class<? extends Invocation<INPUT, OUTPUT>> mInvocationClass;
-
-    private Object[] mArgs = NO_ARGS;
+    private final InvocationFactory<INPUT, OUTPUT> mFactory;
 
     /**
      * Constructor.
      *
-     * @param classToken the invocation class token.
+     * @param factory the invocation factory.
      * @throws java.lang.NullPointerException if the class token is null.
      */
-    InvocationRoutineBuilder(
-            @Nonnull final ClassToken<? extends Invocation<INPUT, OUTPUT>> classToken) {
+    @SuppressWarnings("ConstantConditions")
+    InvocationRoutineBuilder(@Nonnull final InvocationFactory<INPUT, OUTPUT> factory) {
 
-        mInvocationClass = classToken.getRawClass();
+        if (factory == null) {
+
+            throw new NullPointerException("the invocation factory must not be null");
+        }
+
+        mFactory = factory;
         mBuilder = new RoutineConfigurationBuilder();
     }
 
@@ -237,27 +237,6 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineChannelBu
     @Nonnull
     public Routine<INPUT, OUTPUT> buildRoutine() {
 
-        return new DefaultRoutine<INPUT, OUTPUT>(mBuilder.buildConfiguration(), mInvocationClass,
-                                                 mArgs);
-    }
-
-    /**
-     * Sets the arguments to be passed to the invocation constructor.
-     *
-     * @param args the arguments.
-     * @return this builder.
-     * @throws java.lang.NullPointerException if the specified arguments array is null.
-     */
-    @Nonnull
-    @SuppressWarnings("ConstantConditions")
-    public InvocationRoutineBuilder<INPUT, OUTPUT> withArgs(@Nonnull final Object... args) {
-
-        if (args == null) {
-
-            throw new NullPointerException("the arguments array must not be null");
-        }
-
-        mArgs = args;
-        return this;
+        return new DefaultRoutine<INPUT, OUTPUT>(mBuilder.buildConfiguration(), mFactory);
     }
 }

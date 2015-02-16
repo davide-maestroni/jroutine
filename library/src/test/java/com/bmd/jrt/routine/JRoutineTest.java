@@ -43,6 +43,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static com.bmd.jrt.invocation.Invocations.factoryOf;
 import static com.bmd.jrt.time.TimeDuration.INFINITY;
 import static com.bmd.jrt.time.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -115,7 +116,7 @@ public class JRoutineTest extends TestCase {
                                                          .withMaxInvocations(1)
                                                          .withCoreInvocations(0)
                                                          .withAvailableTimeout(1, TimeUnit.SECONDS)
-                                                         .shareGroup("test")
+                                                         .withShareGroup("test")
                                                          .method(TestStatic.class.getMethod(
                                                                  "getLong"));
 
@@ -141,8 +142,8 @@ public class JRoutineTest extends TestCase {
 
         long startTime = System.currentTimeMillis();
 
-        OutputChannel<Object> getOne = builder.shareGroup("1").method("getOne").callAsync();
-        OutputChannel<Object> getTwo = builder.shareGroup("2").method("getTwo").callAsync();
+        OutputChannel<Object> getOne = builder.withShareGroup("1").method("getOne").callAsync();
+        OutputChannel<Object> getTwo = builder.withShareGroup("2").method("getTwo").callAsync();
 
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();
@@ -361,7 +362,7 @@ public class JRoutineTest extends TestCase {
                                                          .withRunner(Runners.poolRunner())
                                                          .withMaxInvocations(1)
                                                          .withAvailableTimeout(TimeDuration.ZERO)
-                                                         .shareGroup("test")
+                                                         .withShareGroup("test")
                                                          .method(Test.class.getMethod("getLong"));
 
         assertThat(routine2.callSync().afterMax(timeout).readAll()).containsExactly(-77L);
@@ -384,8 +385,8 @@ public class JRoutineTest extends TestCase {
 
         long startTime = System.currentTimeMillis();
 
-        OutputChannel<Object> getOne = builder.shareGroup("1").method("getOne").callAsync();
-        OutputChannel<Object> getTwo = builder.shareGroup("2").method("getTwo").callAsync();
+        OutputChannel<Object> getOne = builder.withShareGroup("1").method("getOne").callAsync();
+        OutputChannel<Object> getTwo = builder.withShareGroup("2").method("getTwo").callAsync();
 
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();
@@ -907,7 +908,7 @@ public class JRoutineTest extends TestCase {
     public void testRoutineBuilder() {
 
         final Routine<String, String> routine =
-                JRoutine.on(new ClassToken<PassingInvocation<String>>() {})
+                JRoutine.on(factoryOf(new ClassToken<PassingInvocation<String>>() {}))
                         .withSyncRunner(RunnerType.SEQUENTIAL)
                         .withRunner(Runners.poolRunner())
                         .withCoreInvocations(0)
@@ -923,7 +924,7 @@ public class JRoutineTest extends TestCase {
         assertThat(routine.callSync("test1", "test2").readAll()).containsExactly("test1", "test2");
 
         final Routine<String, String> routine1 =
-                JRoutine.on(new ClassToken<PassingInvocation<String>>() {})
+                JRoutine.on(factoryOf(new ClassToken<PassingInvocation<String>>() {}))
                         .withSyncRunner(RunnerType.QUEUED)
                         .withRunner(Runners.poolRunner())
                         .withCoreInvocations(0)
@@ -944,7 +945,7 @@ public class JRoutineTest extends TestCase {
         final RoutineConfiguration configuration =
                 new RoutineConfigurationBuilder().withRunner(Runners.queuedRunner())
                                                  .buildConfiguration();
-        final Routine<Object, Object> routine = JRoutine.on(PassingInvocation.tokenOf())
+        final Routine<Object, Object> routine = JRoutine.on(PassingInvocation.factoryOf())
                                                         .withRunner(Runners.sharedRunner())
                                                         .apply(configuration)
                                                         .buildRoutine();
@@ -972,17 +973,7 @@ public class JRoutineTest extends TestCase {
 
         try {
 
-            new InvocationRoutineBuilder<String, String>(token).withArgs((Object[]) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            new InvocationRoutineBuilder<String, String>(token).withMaxInvocations(0);
+            new InvocationRoutineBuilder<String, String>(factoryOf(token)).withMaxInvocations(0);
 
             fail();
 
@@ -992,7 +983,7 @@ public class JRoutineTest extends TestCase {
 
         try {
 
-            new InvocationRoutineBuilder<String, String>(token).withCoreInvocations(-1);
+            new InvocationRoutineBuilder<String, String>(factoryOf(token)).withCoreInvocations(-1);
 
             fail();
 

@@ -13,8 +13,7 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.common.ClassToken;
-import com.bmd.jrt.invocation.Invocation;
+import com.bmd.jrt.invocation.InvocationFactory;
 
 import java.lang.ref.WeakReference;
 
@@ -54,13 +53,14 @@ import javax.annotation.Nonnull;
  * <pre>
  *     <code>
  *
- *         final Routine&lt;Result, Result&gt; routine =
- *                  JRoutine.&lt;Result&gt;on().buildRoutine();
+ *         final StandaloneChannel&lt;Result&gt; channel =
+ *                 JRoutine.on().&lt;Result&gt;buildChannel();
  *
- *         routine.invokeAsync()
+ *         channel.input()
  *                .pass(doSomething1.callAsync())
  *                .pass(doSomething2.callAsync())
- *                .result()
+ *                .close();
+ *         channel.output()
  *                .eventually()
  *                .readAllInto(results);
  *     </code>
@@ -176,24 +176,18 @@ public class JRoutine {
 
     /**
      * Returns a routine builder wrapping the specified invocation class token.
-     * <p/>
-     * Note that class tokens of inner and anonymous class can be passed as well. Remember however
-     * that Java creates synthetic constructor for such classes, so be sure to specify the correct
-     * arguments to guarantee proper instantiation. In fact, inner classes always have the outer
-     * instance as first constructor parameter, and anonymous classes has both the outer instance
-     * and all the variables captured in the closure.
      *
-     * @param classToken the invocation class token.
-     * @param <INPUT>    the input data type.
-     * @param <OUTPUT>   the output data type.
+     * @param invocationFactory the invocation factory.
+     * @param <INPUT>           the input data type.
+     * @param <OUTPUT>          the output data type.
      * @return the routine builder instance.
-     * @throws java.lang.NullPointerException if the class token is null.
+     * @throws java.lang.NullPointerException if the factory is null.
      */
     @Nonnull
     public static <INPUT, OUTPUT> InvocationRoutineBuilder<INPUT, OUTPUT> on(
-            @Nonnull final ClassToken<? extends Invocation<INPUT, OUTPUT>> classToken) {
+            @Nonnull final InvocationFactory<INPUT, OUTPUT> invocationFactory) {
 
-        return new InvocationRoutineBuilder<INPUT, OUTPUT>(classToken);
+        return new InvocationRoutineBuilder<INPUT, OUTPUT>(invocationFactory);
     }
 
     /**

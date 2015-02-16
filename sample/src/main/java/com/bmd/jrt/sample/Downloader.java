@@ -15,6 +15,7 @@ package com.bmd.jrt.sample;
 
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.common.InvocationException;
+import com.bmd.jrt.invocation.Invocations;
 import com.bmd.jrt.routine.JRoutine;
 import com.bmd.jrt.routine.Routine;
 import com.bmd.jrt.time.TimeDuration;
@@ -26,7 +27,6 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import static com.bmd.jrt.common.ClassToken.tokenOf;
 import static com.bmd.jrt.time.TimeDuration.INFINITY;
 import static com.bmd.jrt.time.TimeDuration.seconds;
 
@@ -46,7 +46,7 @@ public class Downloader {
 
     public Downloader(final int maxParallelDownloads) {
 
-        mReadConnection = JRoutine.on(tokenOf(ReadConnection.class))
+        mReadConnection = JRoutine.on(Invocations.factoryOf(ReadConnection.class))
                                   .withMaxInvocations(maxParallelDownloads)
                                   .withAvailableTimeout(INFINITY)
                                   .buildRoutine();
@@ -97,11 +97,11 @@ public class Downloader {
 
             mDownloadedSet.remove(uri);
 
-            final Routine<Chunk, Boolean> writeFile = JRoutine.on(tokenOf(WriteFile.class))
-                                                              .withInputSize(8)
-                                                              .withInputTimeout(seconds(30))
-                                                              .withArgs(dstFile)
-                                                              .buildRoutine();
+            final Routine<Chunk, Boolean> writeFile =
+                    JRoutine.on(Invocations.withArgs(dstFile).factoryOf(WriteFile.class))
+                            .withInputSize(8)
+                            .withInputTimeout(seconds(30))
+                            .buildRoutine();
 
             try {
 

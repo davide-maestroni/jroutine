@@ -19,9 +19,9 @@ Parallel programming on the go.
 
             public static void main(final String[] args) {
 
-                final Routine&lt;String, Integer&gt; parseRoutine = on(tokenOf(Parse.class)).buildRoutine();
-                final Routine&lt;Integer, Integer&gt; squareRoutine = on(tokenOf(Square.class)).buildRoutine();
-                final Routine&lt;Integer, Double&gt; meanRoutine = on(tokenOf(SquareRootMean.class)).buildRoutine();
+                final Routine&lt;String, Integer&gt; parseRoutine = on(factoryOf(Parse.class)).buildRoutine();
+                final Routine&lt;Integer, Integer&gt; squareRoutine = on(factoryOf(Square.class)).buildRoutine();
+                final Routine&lt;Integer, Double&gt; meanRoutine = on(factoryOf(SquareRootMean.class)).buildRoutine();
 
                 final Double rms =
                         meanRoutine.callAsync(squareRoutine.callParallel(parseRoutine.callParallel(args)))
@@ -106,7 +106,7 @@ Parallel programming on the go.
             public static void main(final String[] args) {
 
                 final ClassRoutineBuilder builder =
-                        on(Main.class).shareGroup(Share.NONE).readTimeout(TimeDuration.INFINITY);
+                        on(Main.class).withShareGroup(Share.NONE).withReadTimeout(TimeDuration.INFINITY);
                 final Routine&lt;String, Integer&gt; parseRoutine = builder.annotatedMethod(PARSE);
                 final Routine&lt;Integer, Integer&gt; squareRoutine = builder.annotatedMethod(SQUARE);
                 final Routine&lt;List&lt;Integer&gt;, Double&gt; meanRoutine = builder.annotatedMethod(MEAN);
@@ -162,7 +162,7 @@ Parallel programming on the go.
 
             public static void main(final String[] args) {
 
-                final AsyncMain proxy = on(new Main()).shareGroup(Share.NONE)
+                final AsyncMain proxy = on(new Main()).withShareGroup(Share.NONE)
                                                       .withReadTimeout(TimeDuration.INFINITY)
                                                       .buildProxy(AsyncMain.class);
                 final double rms = proxy.squareRootMean(proxy.square(proxy.parseArg(args)));
@@ -225,7 +225,7 @@ Parallel programming on the go.
 
             public static void main(final String[] args) {
 
-                final AsyncMain wrapper = on(new Main()).shareGroup(Share.NONE)
+                final AsyncMain wrapper = on(new Main()).withShareGroup(Share.NONE)
                                                         .withReadTimeout(TimeDuration.INFINITY)
                                                         .buildWrapper(AsyncMain.class);
                 final double rms = wrapper.squareRootMean(wrapper.square(wrapper.parseArg(args)));

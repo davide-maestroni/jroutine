@@ -47,9 +47,7 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map.Entry;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -124,62 +122,67 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
     /**
      * Destroys all loaders with the specified invocation class.
      *
+     * @param context         the context.
      * @param invocationClass the invocation class.
      */
-    static void purgeLoaders(@Nonnull final Class<?> invocationClass) {
+    static void purgeLoaders(@Nonnull final Object context,
+            @Nonnull final Class<?> invocationClass) {
 
-        final Iterator<Entry<Object, SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>>
-                iterator = sCallbackMap.entrySet().iterator();
+        final SparseArray<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
+                sCallbackMap.get(context);
 
-        while (iterator.hasNext()) {
+        if (callbackArray == null) {
 
-            final Entry<Object, SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>> entry =
-                    iterator.next();
-            final Object context = entry.getKey();
+            return;
+        }
 
-            final LoaderManager loaderManager;
+        final LoaderManager loaderManager;
 
-            if (context instanceof FragmentActivity) {
+        if (context instanceof FragmentActivity) {
 
-                final FragmentActivity activity = (FragmentActivity) context;
-                loaderManager = activity.getSupportLoaderManager();
+            final FragmentActivity activity = (FragmentActivity) context;
+            loaderManager = activity.getSupportLoaderManager();
 
-            } else if (context instanceof Fragment) {
+        } else if (context instanceof Fragment) {
 
-                final Fragment fragment = (Fragment) context;
-                loaderManager = fragment.getLoaderManager();
+            final Fragment fragment = (Fragment) context;
+            loaderManager = fragment.getLoaderManager();
 
-            } else {
+        } else {
 
-                iterator.remove();
+            throw new IllegalArgumentException(
+                    "invalid context type: " + context.getClass().getCanonicalName());
+        }
+
+        int i = 0;
+
+        while (i < callbackArray.size()) {
+
+            final RoutineLoaderCallbacks<?> callbacks = callbackArray.valueAt(i).get();
+
+            if (callbacks == null) {
+
+                callbackArray.remove(callbackArray.keyAt(i));
                 continue;
             }
 
-            final SparseArray<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
-                    entry.getValue();
-            int i = 0;
+            final RoutineLoader<?, ?> loader = callbacks.mLoader;
 
-            while (i < callbackArray.size()) {
+            if ((loader.getInvocationCount() == 0) && (loader.getInvocationType()
+                    == invocationClass)) {
 
-                final RoutineLoaderCallbacks<?> callbacks = callbackArray.valueAt(i).get();
-
-                if (callbacks == null) {
-
-                    callbackArray.remove(callbackArray.keyAt(i));
-                    continue;
-                }
-
-                if ((callbacks.mResultCount == 0) && (callbacks.mLoader.getInvocationType()
-                        == invocationClass)) {
-
-                    final int loaderId = callbackArray.keyAt(i);
-                    loaderManager.destroyLoader(loaderId);
-                    callbackArray.remove(loaderId);
-                    continue;
-                }
-
-                ++i;
+                final int loaderId = callbackArray.keyAt(i);
+                loaderManager.destroyLoader(loaderId);
+                callbackArray.remove(loaderId);
+                continue;
             }
+
+            ++i;
+        }
+
+        if (callbackArray.size() == 0) {
+
+            sCallbackMap.remove(context);
         }
     }
 

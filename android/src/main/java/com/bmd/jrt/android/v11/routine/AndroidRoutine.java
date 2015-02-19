@@ -66,8 +66,6 @@ class AndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
 
     private final OrderBy mOrderBy;
 
-    private final PurgeExecution mPurgeExecution;
-
     /**
      * Constructor.
      *
@@ -106,14 +104,20 @@ class AndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
         mConstructor = constructor;
         mOrderBy = configuration.getOutputOrderOr(null);
         mAsyncRunner = configuration.getRunnerOr(null);
-        mPurgeExecution = new PurgeExecution(constructor.getDeclaringClass());
     }
 
     @Override
     public void purge() {
 
         super.purge();
-        mAsyncRunner.run(mPurgeExecution, 0, TimeUnit.MILLISECONDS);
+
+        final Object context = mContext.get();
+
+        if (context != null) {
+
+            mAsyncRunner.run(new PurgeExecution(context, mConstructor.getDeclaringClass()), 0,
+                             TimeUnit.MILLISECONDS);
+        }
     }
 
     @Nonnull
@@ -211,22 +215,27 @@ class AndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
      */
     private static class PurgeExecution implements Execution {
 
+        private final Object mContext;
+
         private final Class<?> mInvocationClass;
 
         /**
          * Constructor.
          *
+         * @param context         the context.
          * @param invocationClass the invocation class.
          */
-        private PurgeExecution(@Nonnull final Class<?> invocationClass) {
+        private PurgeExecution(@Nonnull final Object context,
+                @Nonnull final Class<?> invocationClass) {
 
+            mContext = context;
             mInvocationClass = invocationClass;
         }
 
         @Override
         public void run() {
 
-            LoaderInvocation.purgeLoaders(mInvocationClass);
+            LoaderInvocation.purgeLoaders(mContext, mInvocationClass);
         }
     }
 }

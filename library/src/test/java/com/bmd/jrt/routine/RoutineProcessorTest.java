@@ -81,7 +81,7 @@ public class RoutineProcessorTest extends TestCase {
         final ArrayList<String> list = new ArrayList<String>();
         assertThat(testWrapper.getList(Arrays.asList(list))).containsExactly(list);
 
-        final StandaloneChannel<Integer> standaloneChannel = JRoutine.on().buildChannel();
+        final StandaloneChannel<Integer> standaloneChannel = JRoutine.standalone().buildChannel();
         standaloneChannel.input().pass(3).close();
         assertThat(testWrapper.getString(standaloneChannel.output())).isEqualTo("3");
 

@@ -457,7 +457,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
             final RoutineLoader<?, OUTPUT> internalLoader = mLoader;
             final ArrayList<StandaloneInput<OUTPUT>> channels = mNewChannels;
-            final StandaloneChannel<OUTPUT> channel = JRoutine.on()
+            final StandaloneChannel<OUTPUT> channel = JRoutine.standalone()
                                                               .withMaxSize(Integer.MAX_VALUE)
                                                               .withBufferTimeout(TimeDuration.ZERO)
                                                               .withLog(logger.getLog())

@@ -681,7 +681,7 @@ public class JRoutineTest extends TestCase {
 
         }
 
-        final StandaloneChannel<Integer> channel = JRoutine.on().buildChannel();
+        final StandaloneChannel<Integer> channel = JRoutine.standalone().buildChannel();
 
         try {
 
@@ -878,11 +878,11 @@ public class JRoutineTest extends TestCase {
                               .readAll()).isEmpty();
         assertThat(squareAsync.computeParallel3(null).afterMax(timeout).readAll()).isEmpty();
 
-        final StandaloneChannel<Integer> channel1 = JRoutine.on().buildChannel();
+        final StandaloneChannel<Integer> channel1 = JRoutine.standalone().buildChannel();
         channel1.input().pass(4).close();
         assertThat(squareAsync.computeAsync(channel1.output())).isEqualTo(16);
 
-        final StandaloneChannel<Integer> channel2 = JRoutine.on().buildChannel();
+        final StandaloneChannel<Integer> channel2 = JRoutine.standalone().buildChannel();
         channel2.input().pass(1, 2, 3).close();
         assertThat(squareAsync.computeParallel4(channel2.output())
                               .afterMax(timeout)
@@ -895,23 +895,23 @@ public class JRoutineTest extends TestCase {
 
         final Sum sum = new Sum();
         final SumItf sumAsync = JRoutine.on(sum).withReadTimeout(timeout).buildProxy(SumItf.class);
-        final StandaloneChannel<Integer> channel3 = JRoutine.on().buildChannel();
+        final StandaloneChannel<Integer> channel3 = JRoutine.standalone().buildChannel();
         channel3.input().pass(7).close();
         assertThat(sumAsync.compute(3, channel3.output())).isEqualTo(10);
 
-        final StandaloneChannel<Integer> channel4 = JRoutine.on().buildChannel();
+        final StandaloneChannel<Integer> channel4 = JRoutine.standalone().buildChannel();
         channel4.input().pass(1, 2, 3, 4).close();
         assertThat(sumAsync.compute(channel4.output())).isEqualTo(10);
 
-        final StandaloneChannel<int[]> channel5 = JRoutine.on().buildChannel();
+        final StandaloneChannel<int[]> channel5 = JRoutine.standalone().buildChannel();
         channel5.input().pass(new int[]{1, 2, 3, 4}).close();
         assertThat(sumAsync.compute1(channel5.output())).isEqualTo(10);
 
-        final StandaloneChannel<Integer> channel6 = JRoutine.on().buildChannel();
+        final StandaloneChannel<Integer> channel6 = JRoutine.standalone().buildChannel();
         channel6.input().pass(1, 2, 3, 4).close();
         assertThat(sumAsync.computeList(channel6.output())).isEqualTo(10);
 
-        final StandaloneChannel<Integer> channel7 = JRoutine.on().buildChannel();
+        final StandaloneChannel<Integer> channel7 = JRoutine.standalone().buildChannel();
         channel7.input().pass(1, 2, 3, 4).close();
         assertThat(sumAsync.computeList1(channel7.output())).isEqualTo(10);
 
@@ -1015,7 +1015,7 @@ public class JRoutineTest extends TestCase {
     public void testStandaloneChannelBuilder() {
 
         final TimeDuration timeout = seconds(1);
-        final StandaloneChannel<Object> channel = JRoutine.on()
+        final StandaloneChannel<Object> channel = JRoutine.standalone()
                                                           .withDataOrder(OrderBy.INSERTION)
                                                           .withRunner(Runners.sharedRunner())
                                                           .withMaxSize(1)
@@ -1028,14 +1028,14 @@ public class JRoutineTest extends TestCase {
         channel.input().pass(-77L);
         assertThat(channel.output().afterMax(timeout).readNext()).isEqualTo(-77L);
 
-        final StandaloneChannel<Object> standaloneChannel1 = JRoutine.on().buildChannel();
+        final StandaloneChannel<Object> standaloneChannel1 = JRoutine.standalone().buildChannel();
         final StandaloneInput<Object> input1 = standaloneChannel1.input();
 
         input1.after(TimeDuration.millis(200)).pass(23).now().pass(-77L).close();
         assertThat(standaloneChannel1.output().afterMax(timeout).readAll()).containsOnly(23, -77L);
 
         final StandaloneChannel<Object> standaloneChannel2 =
-                JRoutine.on().withDataOrder(OrderBy.INSERTION).buildChannel();
+                JRoutine.standalone().withDataOrder(OrderBy.INSERTION).buildChannel();
         final StandaloneInput<Object> input2 = standaloneChannel2.input();
 
         input2.after(TimeDuration.millis(200)).pass(23).now().pass(-77L).close();
@@ -1048,7 +1048,7 @@ public class JRoutineTest extends TestCase {
         final RoutineConfiguration configuration =
                 new RoutineConfigurationBuilder().withRunner(Runners.queuedRunner())
                                                  .buildConfiguration();
-        final StandaloneChannel<Object> channel = JRoutine.on()
+        final StandaloneChannel<Object> channel = JRoutine.standalone()
                                                           .withRunner(Runners.sharedRunner())
                                                           .apply(configuration)
                                                           .buildChannel();

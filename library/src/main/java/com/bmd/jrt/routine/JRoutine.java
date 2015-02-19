@@ -149,17 +149,6 @@ public class JRoutine {
     }
 
     /**
-     * Returns a standalone channel builder.
-     *
-     * @return the standalone channel builder instance.
-     */
-    @Nonnull
-    public static StandaloneChannelBuilder on() {
-
-        return new StandaloneChannelBuilder();
-    }
-
-    /**
      * Returns a routine builder wrapping the specified target class.
      *
      * @param target the target class.
@@ -233,5 +222,16 @@ public class JRoutine {
     public static ObjectRoutineBuilder onWeak(@Nonnull final WeakReference<?> target) {
 
         return new ObjectRoutineBuilder(target);
+    }
+
+    /**
+     * Returns a standalone channel builder.
+     *
+     * @return the standalone channel builder instance.
+     */
+    @Nonnull
+    public static StandaloneChannelBuilder standalone() {
+
+        return new StandaloneChannelBuilder();
     }
 }

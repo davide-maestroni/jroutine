@@ -267,7 +267,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
             final Log log = logger.getLog();
             final LogLevel logLevel = logger.getLogLevel();
             final OrderBy inputOrder = configuration.getInputOrderOr(null);
-            final StandaloneChannel<INPUT> paramChannel = JRoutine.on()
+            final StandaloneChannel<INPUT> paramChannel = JRoutine.standalone()
                                                                   .withDataOrder(inputOrder)
                                                                   .withMaxSize(Integer.MAX_VALUE)
                                                                   .withBufferTimeout(
@@ -280,7 +280,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
             final OrderBy outputOrder = configuration.getOutputOrderOr(null);
             final TimeDuration readTimeout = configuration.getReadTimeoutOr(null);
             final TimeoutAction timeoutAction = configuration.getReadTimeoutActionOr(null);
-            final StandaloneChannel<OUTPUT> resultChannel = JRoutine.on()
+            final StandaloneChannel<OUTPUT> resultChannel = JRoutine.standalone()
                                                                     .withDataOrder(outputOrder)
                                                                     .withMaxSize(Integer.MAX_VALUE)
                                                                     .withBufferTimeout(

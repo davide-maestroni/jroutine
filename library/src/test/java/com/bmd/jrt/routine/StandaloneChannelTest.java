@@ -45,7 +45,7 @@ public class StandaloneChannelTest extends TestCase {
     public void testAbort() {
 
         final TimeDuration timeout = seconds(1);
-        final StandaloneChannel<String> standaloneChannel = JRoutine.on().buildChannel();
+        final StandaloneChannel<String> standaloneChannel = JRoutine.standalone().buildChannel();
         final Routine<String, String> routine =
                 JRoutine.on(PassingInvocation.<String>factoryOf()).buildRoutine();
         final OutputChannel<String> outputChannel = routine.callAsync(standaloneChannel.output());
@@ -66,7 +66,7 @@ public class StandaloneChannelTest extends TestCase {
 
     public void testAbortDelay() {
 
-        final StandaloneChannel<String> standaloneChannel = JRoutine.on().buildChannel();
+        final StandaloneChannel<String> standaloneChannel = JRoutine.standalone().buildChannel();
         standaloneChannel.input().after(TimeDuration.days(1)).pass("test").close();
 
         final StandaloneOutput<String> output = standaloneChannel.output();
@@ -94,7 +94,7 @@ public class StandaloneChannelTest extends TestCase {
     public void testAsynchronousInput() {
 
         final TimeDuration timeout = seconds(1);
-        final StandaloneChannel<String> standaloneChannel = JRoutine.on().buildChannel();
+        final StandaloneChannel<String> standaloneChannel = JRoutine.standalone().buildChannel();
 
         new Thread() {
 
@@ -121,7 +121,7 @@ public class StandaloneChannelTest extends TestCase {
         assertThat(outputChannel.checkComplete()).isTrue();
 
         final StandaloneChannel<String> standaloneChannel1 =
-                JRoutine.on().withDataOrder(OrderBy.INSERTION).buildChannel();
+                JRoutine.standalone().withDataOrder(OrderBy.INSERTION).buildChannel();
 
         new Thread() {
 
@@ -147,7 +147,7 @@ public class StandaloneChannelTest extends TestCase {
 
     public void testPartialOut() {
 
-        final StandaloneChannel<String> standaloneChannel = JRoutine.on().buildChannel();
+        final StandaloneChannel<String> standaloneChannel = JRoutine.standalone().buildChannel();
 
         new Thread() {
 
@@ -177,7 +177,7 @@ public class StandaloneChannelTest extends TestCase {
     public void testReadFirst() throws InterruptedException {
 
         final TimeDuration timeout = seconds(1);
-        final StandaloneChannel<String> standaloneChannel = JRoutine.on().buildChannel();
+        final StandaloneChannel<String> standaloneChannel = JRoutine.standalone().buildChannel();
 
         new WeakThread(standaloneChannel).start();
 
@@ -189,14 +189,14 @@ public class StandaloneChannelTest extends TestCase {
 
     public void testReadTimeout() {
 
-        final StandaloneChannel<Object> channel1 = JRoutine.on()
+        final StandaloneChannel<Object> channel1 = JRoutine.standalone()
                                                            .withReadTimeout(millis(10))
                                                            .onReadTimeout(TimeoutAction.EXIT)
                                                            .buildChannel();
 
         assertThat(channel1.output().readAll()).isEmpty();
 
-        final StandaloneChannel<Object> channel2 = JRoutine.on()
+        final StandaloneChannel<Object> channel2 = JRoutine.standalone()
                                                            .withReadTimeout(millis(10))
                                                            .onReadTimeout(TimeoutAction.ABORT)
                                                            .buildChannel();
@@ -211,7 +211,7 @@ public class StandaloneChannelTest extends TestCase {
 
         }
 
-        final StandaloneChannel<Object> channel3 = JRoutine.on()
+        final StandaloneChannel<Object> channel3 = JRoutine.standalone()
                                                            .withReadTimeout(millis(10))
                                                            .onReadTimeout(TimeoutAction.DEADLOCK)
                                                            .buildChannel();
@@ -229,7 +229,7 @@ public class StandaloneChannelTest extends TestCase {
 
     public void testTimeout() {
 
-        final StandaloneChannel<String> standaloneChannel = JRoutine.on().buildChannel();
+        final StandaloneChannel<String> standaloneChannel = JRoutine.standalone().buildChannel();
         standaloneChannel.input().after(TimeDuration.seconds(3)).pass("test").close();
 
         final StandaloneOutput<String> output = standaloneChannel.output();

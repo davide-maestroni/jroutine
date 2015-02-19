@@ -14,11 +14,15 @@
 package com.bmd.jrt.android.builder;
 
 import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
+import com.bmd.jrt.builder.RoutineBuilder.TimeoutAction;
 import com.bmd.jrt.builder.RoutineChannelBuilder.OrderBy;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.routine.Routine;
+import com.bmd.jrt.time.TimeDuration;
+
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -90,6 +94,56 @@ public interface AndroidRoutineBuilder<INPUT, OUTPUT> {
     public AndroidRoutineBuilder<INPUT, OUTPUT> onComplete(@Nullable CacheStrategy cacheStrategy);
 
     /**
+     * Sets the action to be taken if the timeout elapses before a result can be read from the
+     * output channel.
+     *
+     * @param action the action type.
+     * @return this builder.
+     */
+    @Nonnull
+    public AndroidRoutineBuilder<INPUT, OUTPUT> onReadTimeout(@Nullable TimeoutAction action);
+
+    /**
+     * Sets the timeout for an invocation instance to become available.
+     * <p/>
+     * By default the timeout is set to 0 to avoid unexpected deadlocks.
+     *
+     * @param timeout  the timeout.
+     * @param timeUnit the timeout time unit.
+     * @return this builder.
+     * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
+     * @throws java.lang.NullPointerException     if the specified time unit is null.
+     */
+    @Nonnull
+    public AndroidRoutineBuilder<INPUT, OUTPUT> withAvailableTimeout(long timeout,
+            @Nonnull TimeUnit timeUnit);
+
+    /**
+     * Sets the timeout for an invocation instance to become available. A null value means that
+     * it is up to the framework to chose a default duration.
+     * <p/>
+     * By default the timeout is set to 0 to avoid unexpected deadlocks.
+     *
+     * @param timeout the timeout.
+     * @return this builder.
+     */
+    @Nonnull
+    public AndroidRoutineBuilder<INPUT, OUTPUT> withAvailableTimeout(
+            @Nullable TimeDuration timeout);
+
+    /**
+     * Sets the number of invocation instances which represents the core pool of reusable
+     * invocations. A {@link RoutineConfiguration#DEFAULT} value means that it is up to the
+     * framework to chose a default number.
+     *
+     * @param coreInvocations the max number of instances.
+     * @return this builder.
+     * @throws java.lang.IllegalArgumentException if the number is negative.
+     */
+    @Nonnull
+    public AndroidRoutineBuilder<INPUT, OUTPUT> withCoreInvocations(int coreInvocations);
+
+    /**
      * Tells the builder to identify the invocation with the specified ID.
      *
      * @param id the invocation ID.
@@ -129,6 +183,18 @@ public interface AndroidRoutineBuilder<INPUT, OUTPUT> {
     public AndroidRoutineBuilder<INPUT, OUTPUT> withLogLevel(@Nullable LogLevel level);
 
     /**
+     * Sets the max number of concurrently running invocation instances. A
+     * {@link RoutineConfiguration#DEFAULT} value means that it is up to the framework to chose a
+     * default number.
+     *
+     * @param maxInvocations the max number of instances.
+     * @return this builder.
+     * @throws java.lang.IllegalArgumentException if the number is less than 1.
+     */
+    @Nonnull
+    public AndroidRoutineBuilder<INPUT, OUTPUT> withMaxInvocations(int maxInvocations);
+
+    /**
      * Sets the order in which output data are collected from the result channel. A null value means
      * that it is up to the framework to chose a default order type.
      *
@@ -137,6 +203,33 @@ public interface AndroidRoutineBuilder<INPUT, OUTPUT> {
      */
     @Nonnull
     public AndroidRoutineBuilder<INPUT, OUTPUT> withOutputOrder(@Nullable OrderBy order);
+
+    /**
+     * Sets the timeout for an invocation instance to produce a readable result.
+     * <p/>
+     * By default the timeout is set to 0 to avoid unexpected deadlocks.
+     *
+     * @param timeout  the timeout.
+     * @param timeUnit the timeout time unit.
+     * @return this builder.
+     * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
+     * @throws java.lang.NullPointerException     if the specified time unit is null.
+     */
+    @Nonnull
+    public AndroidRoutineBuilder<INPUT, OUTPUT> withReadTimeout(long timeout,
+            @Nonnull TimeUnit timeUnit);
+
+    /**
+     * Sets the timeout for an invocation instance to produce a readable result. A null value means
+     * that it is up to the framework to chose a default duration.
+     * <p/>
+     * By default the timeout is set to 0 to avoid unexpected deadlocks.
+     *
+     * @param timeout the timeout.
+     * @return this builder.
+     */
+    @Nonnull
+    public AndroidRoutineBuilder<INPUT, OUTPUT> withReadTimeout(@Nullable TimeDuration timeout);
 
     /**
      * Sets the type of the synchronous runner to be used by the routine. A null value means that it

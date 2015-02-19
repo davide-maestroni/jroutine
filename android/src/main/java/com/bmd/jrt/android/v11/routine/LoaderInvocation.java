@@ -49,7 +49,9 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -120,6 +122,67 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
         mConstructor = constructor;
         mOrderBy = order;
         mLogger = logger.subContextLogger(this);
+    }
+
+    /**
+     * Destroys all loaders with the specified invocation class.
+     *
+     * @param invocationClass the invocation class.
+     */
+    static void purgeLoaders(@Nonnull final Class<?> invocationClass) {
+
+        final Iterator<Entry<Object, SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>>
+                iterator = sCallbackMap.entrySet().iterator();
+
+        while (iterator.hasNext()) {
+
+            final Entry<Object, SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>> entry =
+                    iterator.next();
+            final Object context = entry.getKey();
+
+            final LoaderManager loaderManager;
+
+            if (context instanceof Activity) {
+
+                final Activity activity = (Activity) context;
+                loaderManager = activity.getLoaderManager();
+
+            } else if (context instanceof Fragment) {
+
+                final Fragment fragment = (Fragment) context;
+                loaderManager = fragment.getLoaderManager();
+
+            } else {
+
+                iterator.remove();
+                continue;
+            }
+
+            final SparseArray<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
+                    entry.getValue();
+            int i = 0;
+
+            while (i < callbackArray.size()) {
+
+                final RoutineLoaderCallbacks<?> callbacks = callbackArray.valueAt(i).get();
+
+                if (callbacks == null) {
+
+                    callbackArray.removeAt(i);
+                    continue;
+                }
+
+                if ((callbacks.mResultCount == 0) && (callbacks.mLoader.getInvocationType()
+                        == invocationClass)) {
+
+                    loaderManager.destroyLoader(callbackArray.keyAt(i));
+                    callbackArray.removeAt(i);
+                    continue;
+                }
+
+                ++i;
+            }
+        }
     }
 
     @Override
@@ -393,19 +456,16 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
             final RoutineLoader<?, OUTPUT> internalLoader = mLoader;
             final ArrayList<StandaloneInput<OUTPUT>> channels = mNewChannels;
-            final StandaloneChannel<OUTPUT> standaloneChannel = JRoutine.on()
-                                                                        .withMaxSize(
-                                                                                Integer.MAX_VALUE)
-                                                                        .withBufferTimeout(
-                                                                                TimeDuration.ZERO)
-                                                                        .withLog(logger.getLog())
-                                                                        .withLogLevel(
-                                                                                logger.getLogLevel())
-                                                                        .buildChannel();
-            channels.add(standaloneChannel.input());
+            final StandaloneChannel<OUTPUT> channel = JRoutine.on()
+                                                              .withMaxSize(Integer.MAX_VALUE)
+                                                              .withBufferTimeout(TimeDuration.ZERO)
+                                                              .withLog(logger.getLog())
+                                                              .withLogLevel(logger.getLogLevel())
+                                                              .buildChannel();
+            channels.add(channel.input());
             internalLoader.setInvocationCount(
                     Math.max(channels.size(), internalLoader.getInvocationCount()));
-            return standaloneChannel.output();
+            return channel.output();
         }
 
         @Override

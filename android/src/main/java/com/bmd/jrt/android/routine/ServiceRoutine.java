@@ -26,6 +26,7 @@ import android.os.RemoteException;
 
 import com.bmd.jrt.android.invocation.AndroidInvocation;
 import com.bmd.jrt.android.service.RoutineService;
+import com.bmd.jrt.builder.RoutineBuilder.TimeoutAction;
 import com.bmd.jrt.builder.RoutineChannelBuilder.OrderBy;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.channel.OutputChannel;
@@ -277,11 +278,15 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
             mParamStandaloneInput = paramChannel.input();
             mParamStandaloneOutput = paramChannel.output();
             final OrderBy outputOrder = configuration.getOutputOrderOr(null);
+            final TimeDuration readTimeout = configuration.getReadTimeoutOr(null);
+            final TimeoutAction timeoutAction = configuration.getReadTimeoutActionOr(null);
             final StandaloneChannel<OUTPUT> resultChannel = JRoutine.on()
                                                                     .withDataOrder(outputOrder)
                                                                     .withMaxSize(Integer.MAX_VALUE)
                                                                     .withBufferTimeout(
                                                                             TimeDuration.ZERO)
+                                                                    .withReadTimeout(readTimeout)
+                                                                    .onReadTimeout(timeoutAction)
                                                                     .withLog(log)
                                                                     .withLogLevel(logLevel)
                                                                     .buildChannel();

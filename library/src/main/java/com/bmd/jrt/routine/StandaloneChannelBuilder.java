@@ -13,6 +13,7 @@
  */
 package com.bmd.jrt.routine;
 
+import com.bmd.jrt.builder.RoutineBuilder.TimeoutAction;
 import com.bmd.jrt.builder.RoutineChannelBuilder.OrderBy;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.builder.RoutineConfigurationBuilder;
@@ -68,6 +69,20 @@ public class StandaloneChannelBuilder {
     public <T> StandaloneChannel<T> buildChannel() {
 
         return new DefaultStandaloneChannel<T>(mBuilder.buildConfiguration());
+    }
+
+    /**
+     * Sets the action to be taken if the timeout elapses before a result can be read from the
+     * output channel.
+     *
+     * @param action the action type.
+     * @return this builder.
+     */
+    @Nonnull
+    public StandaloneChannelBuilder onReadTimeout(@Nullable final TimeoutAction action) {
+
+        mBuilder.onReadTimeout(action);
+        return this;
     }
 
     /**
@@ -164,6 +179,41 @@ public class StandaloneChannelBuilder {
     public StandaloneChannelBuilder withMaxSize(final int maxBufferSize) {
 
         mBuilder.withOutputSize(maxBufferSize);
+        return this;
+    }
+
+    /**
+     * Sets the timeout for the standalone channel to return a readable result.
+     * <p/>
+     * By default the timeout is set to 0 to avoid unexpected deadlocks.
+     *
+     * @param timeout  the timeout.
+     * @param timeUnit the timeout time unit.
+     * @return this builder.
+     * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
+     * @throws java.lang.NullPointerException     if the specified time unit is null.
+     */
+    @Nonnull
+    public StandaloneChannelBuilder withReadTimeout(final long timeout,
+            @Nonnull final TimeUnit timeUnit) {
+
+        mBuilder.withReadTimeout(timeout, timeUnit);
+        return this;
+    }
+
+    /**
+     * Sets the timeout for the standalone channel to return a readable result. A null value means
+     * that it is up to the framework to chose a default duration.
+     * <p/>
+     * By default the timeout is set to 0 to avoid unexpected deadlocks.
+     *
+     * @param timeout the timeout.
+     * @return this builder.
+     */
+    @Nonnull
+    public StandaloneChannelBuilder withReadTimeout(@Nullable final TimeDuration timeout) {
+
+        mBuilder.withReadTimeout(timeout);
         return this;
     }
 

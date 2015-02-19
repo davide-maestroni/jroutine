@@ -161,8 +161,8 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
                                                                     ClassToken.tokenOf(
                                                                             StringSingleCallInvocation.class))
                                                          .dispatchTo(Looper.getMainLooper())
-                                                         .withCoreInstances(0)
-                                                         .withMaxInstances(2)
+                                                         .withCoreInvocations(0)
+                                                         .withMaxInvocations(2)
                                                          .withAvailableTimeout(1, TimeUnit.SECONDS)
                                                          .withAvailableTimeout(
                                                                  TimeDuration.millis(200))

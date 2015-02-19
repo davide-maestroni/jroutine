@@ -32,6 +32,7 @@ import com.bmd.jrt.common.AbortException;
 import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.common.InvocationException;
 import com.bmd.jrt.invocation.Invocation;
+import com.bmd.jrt.invocation.InvocationFactory;
 import com.bmd.jrt.invocation.PassingInvocation;
 import com.bmd.jrt.invocation.SingleCallInvocation;
 import com.bmd.jrt.invocation.StatelessInvocation;
@@ -946,6 +947,35 @@ public class RoutineTest extends TestCase {
                     return new ConstructorException();
                 }
             };
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new DefaultRoutine<Object, Object>(null, new InvocationFactory<Object, Object>() {
+
+                @Nonnull
+                @Override
+                public Invocation<Object, Object> createInvocation() {
+
+                    return null;
+                }
+            });
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new DefaultRoutine<Object, Object>(
+                    new RoutineConfigurationBuilder().buildConfiguration(), null);
 
             fail();
 

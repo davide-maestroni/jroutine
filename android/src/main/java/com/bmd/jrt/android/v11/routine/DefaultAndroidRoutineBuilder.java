@@ -22,6 +22,7 @@ import com.bmd.jrt.android.builder.AndroidRoutineBuilder;
 import com.bmd.jrt.android.invocation.AndroidInvocation;
 import com.bmd.jrt.android.runner.Runners;
 import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
+import com.bmd.jrt.builder.RoutineBuilder.TimeoutAction;
 import com.bmd.jrt.builder.RoutineChannelBuilder.OrderBy;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.builder.RoutineConfigurationBuilder;
@@ -29,9 +30,11 @@ import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.log.Log;
 import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.routine.Routine;
+import com.bmd.jrt.time.TimeDuration;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -120,8 +123,14 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> implements AndroidRoutineBuild
     @Override
     public Routine<INPUT, OUTPUT> buildRoutine() {
 
-        final RoutineConfiguration configuration =
-                mBuilder.withRunner(Runners.mainRunner()).buildConfiguration();
+        final RoutineConfigurationBuilder builder =
+                new RoutineConfigurationBuilder(mBuilder.buildConfiguration());
+        final RoutineConfiguration configuration = builder.withRunner(Runners.mainRunner())
+                                                          .withInputSize(Integer.MAX_VALUE)
+                                                          .withInputTimeout(TimeDuration.INFINITY)
+                                                          .withOutputSize(Integer.MAX_VALUE)
+                                                          .withOutputTimeout(TimeDuration.INFINITY)
+                                                          .buildConfiguration();
         return new AndroidRoutine<INPUT, OUTPUT>(configuration, mContext, mLoaderId,
                                                  mClashResolution, mCacheStrategy, mConstructor);
     }
@@ -141,6 +150,41 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> implements AndroidRoutineBuild
             @Nullable final CacheStrategy cacheStrategy) {
 
         mCacheStrategy = cacheStrategy;
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public AndroidRoutineBuilder<INPUT, OUTPUT> onReadTimeout(
+            @Nullable final TimeoutAction action) {
+
+        mBuilder.onReadTimeout(action);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public AndroidRoutineBuilder<INPUT, OUTPUT> withAvailableTimeout(final long timeout,
+            @Nonnull final TimeUnit timeUnit) {
+
+        mBuilder.withAvailableTimeout(timeout, timeUnit);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public AndroidRoutineBuilder<INPUT, OUTPUT> withAvailableTimeout(
+            @Nullable final TimeDuration timeout) {
+
+        mBuilder.withAvailableTimeout(timeout);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public AndroidRoutineBuilder<INPUT, OUTPUT> withCoreInvocations(final int coreInvocations) {
+
+        mBuilder.withCoreInvocations(coreInvocations);
         return this;
     }
 
@@ -178,9 +222,35 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> implements AndroidRoutineBuild
 
     @Nonnull
     @Override
+    public AndroidRoutineBuilder<INPUT, OUTPUT> withMaxInvocations(final int maxInvocations) {
+
+        mBuilder.withMaxInvocations(maxInvocations);
+        return this;
+    }
+
+    @Nonnull
+    @Override
     public AndroidRoutineBuilder<INPUT, OUTPUT> withOutputOrder(@Nullable final OrderBy order) {
 
         mBuilder.withOutputOrder(order);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public AndroidRoutineBuilder<INPUT, OUTPUT> withReadTimeout(final long timeout,
+            @Nonnull final TimeUnit timeUnit) {
+
+        mBuilder.withReadTimeout(timeout, timeUnit);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public AndroidRoutineBuilder<INPUT, OUTPUT> withReadTimeout(
+            @Nullable final TimeDuration timeout) {
+
+        mBuilder.withReadTimeout(timeout);
         return this;
     }
 

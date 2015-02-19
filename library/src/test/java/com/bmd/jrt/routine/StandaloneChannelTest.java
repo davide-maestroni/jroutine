@@ -13,11 +13,13 @@
  */
 package com.bmd.jrt.routine;
 
+import com.bmd.jrt.builder.RoutineBuilder.TimeoutAction;
 import com.bmd.jrt.builder.RoutineChannelBuilder.OrderBy;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ReadDeadlockException;
 import com.bmd.jrt.channel.StandaloneChannel;
 import com.bmd.jrt.channel.StandaloneChannel.StandaloneOutput;
+import com.bmd.jrt.common.AbortException;
 import com.bmd.jrt.common.InvocationException;
 import com.bmd.jrt.invocation.PassingInvocation;
 import com.bmd.jrt.time.TimeDuration;
@@ -29,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
+import static com.bmd.jrt.time.TimeDuration.millis;
 import static com.bmd.jrt.time.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -182,6 +185,46 @@ public class StandaloneChannelTest extends TestCase {
                 JRoutine.on(PassingInvocation.<String>factoryOf()).buildRoutine();
         final OutputChannel<String> outputChannel = routine.callAsync(standaloneChannel.output());
         assertThat(outputChannel.afterMax(timeout).readNext()).isEqualTo("test");
+    }
+
+    public void testReadTimeout() {
+
+        final StandaloneChannel<Object> channel1 = JRoutine.on()
+                                                           .withReadTimeout(millis(10))
+                                                           .onReadTimeout(TimeoutAction.EXIT)
+                                                           .buildChannel();
+
+        assertThat(channel1.output().readAll()).isEmpty();
+
+        final StandaloneChannel<Object> channel2 = JRoutine.on()
+                                                           .withReadTimeout(millis(10))
+                                                           .onReadTimeout(TimeoutAction.ABORT)
+                                                           .buildChannel();
+
+        try {
+
+            channel2.output().readAll();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        final StandaloneChannel<Object> channel3 = JRoutine.on()
+                                                           .withReadTimeout(millis(10))
+                                                           .onReadTimeout(TimeoutAction.DEADLOCK)
+                                                           .buildChannel();
+
+        try {
+
+            channel3.output().readAll();
+
+            fail();
+
+        } catch (final ReadDeadlockException ignored) {
+
+        }
     }
 
     public void testTimeout() {

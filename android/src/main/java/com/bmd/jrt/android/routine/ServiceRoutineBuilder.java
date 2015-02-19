@@ -19,6 +19,7 @@ import android.os.Looper;
 import com.bmd.jrt.android.invocation.AndroidInvocation;
 import com.bmd.jrt.android.service.RoutineService;
 import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
+import com.bmd.jrt.builder.RoutineBuilder.TimeoutAction;
 import com.bmd.jrt.builder.RoutineChannelBuilder.OrderBy;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.builder.RoutineConfigurationBuilder;
@@ -116,6 +117,21 @@ public class ServiceRoutineBuilder<INPUT, OUTPUT> {
     }
 
     /**
+     * Sets the action to be taken if the timeout elapses before a result can be read from the
+     * output channel.
+     *
+     * @param action the action type.
+     * @return this builder.
+     */
+    @Nonnull
+    public ServiceRoutineBuilder<INPUT, OUTPUT> onReadTimeout(
+            @Nullable final TimeoutAction action) {
+
+        mBuilder.onReadTimeout(action);
+        return this;
+    }
+
+    /**
      * Sets the timeout for an invocation instance to become available.
      *
      * @param timeout  the timeout.
@@ -156,7 +172,7 @@ public class ServiceRoutineBuilder<INPUT, OUTPUT> {
      * @throws java.lang.IllegalArgumentException if the number is negative.
      */
     @Nonnull
-    public ServiceRoutineBuilder<INPUT, OUTPUT> withCoreInstances(final int coreInstances) {
+    public ServiceRoutineBuilder<INPUT, OUTPUT> withCoreInvocations(final int coreInstances) {
 
         mBuilder.withCoreInvocations(coreInstances);
         return this;
@@ -216,7 +232,7 @@ public class ServiceRoutineBuilder<INPUT, OUTPUT> {
      * @throws java.lang.IllegalArgumentException if the number is less than 1.
      */
     @Nonnull
-    public ServiceRoutineBuilder<INPUT, OUTPUT> withMaxInstances(final int maxInstances) {
+    public ServiceRoutineBuilder<INPUT, OUTPUT> withMaxInvocations(final int maxInstances) {
 
         mBuilder.withMaxInvocations(maxInstances);
         return this;
@@ -233,6 +249,42 @@ public class ServiceRoutineBuilder<INPUT, OUTPUT> {
     public ServiceRoutineBuilder<INPUT, OUTPUT> withOutputOrder(@Nullable final OrderBy order) {
 
         mBuilder.withOutputOrder(order);
+        return this;
+    }
+
+    /**
+     * Sets the timeout for an invocation instance to produce a readable result.
+     * <p/>
+     * By default the timeout is set to 0 to avoid unexpected deadlocks.
+     *
+     * @param timeout  the timeout.
+     * @param timeUnit the timeout time unit.
+     * @return this builder.
+     * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
+     * @throws java.lang.NullPointerException     if the specified time unit is null.
+     */
+    @Nonnull
+    public ServiceRoutineBuilder<INPUT, OUTPUT> withReadTimeout(final long timeout,
+            @Nonnull final TimeUnit timeUnit) {
+
+        mBuilder.withReadTimeout(timeout, timeUnit);
+        return this;
+    }
+
+    /**
+     * Sets the timeout for an invocation instance to produce a readable result. A null value means
+     * that it is up to the framework to chose a default duration.
+     * <p/>
+     * By default the timeout is set to 0 to avoid unexpected deadlocks.
+     *
+     * @param timeout the timeout.
+     * @return this builder.
+     */
+    @Nonnull
+    public ServiceRoutineBuilder<INPUT, OUTPUT> withReadTimeout(
+            @Nullable final TimeDuration timeout) {
+
+        mBuilder.withReadTimeout(timeout);
         return this;
     }
 

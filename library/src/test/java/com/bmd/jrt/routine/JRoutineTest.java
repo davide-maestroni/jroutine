@@ -87,6 +87,26 @@ public class JRoutineTest extends TestCase {
         } catch (final IllegalArgumentException ignored) {
 
         }
+
+        try {
+
+            new StandaloneChannelBuilder().withReadTimeout(-1, TimeUnit.MILLISECONDS);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            new StandaloneChannelBuilder().withReadTimeout(0, null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
     }
 
     public void testClassRoutineBuilder() throws NoSuchMethodException {

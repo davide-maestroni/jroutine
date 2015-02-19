@@ -28,10 +28,13 @@ import com.bmd.jrt.common.RoutineException;
 import com.bmd.jrt.invocation.Invocation;
 import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.routine.AbstractRoutine;
+import com.bmd.jrt.runner.Execution;
+import com.bmd.jrt.runner.Runner;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -46,6 +49,8 @@ import javax.annotation.Nullable;
  */
 class AndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
 
+    private final Runner mAsyncRunner;
+
     private final CacheStrategy mCacheStrategy;
 
     private final ClashResolution mClashResolution;
@@ -57,6 +62,8 @@ class AndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
     private final int mLoaderId;
 
     private final OrderBy mOrderBy;
+
+    private final PurgeExecution mPurgeExecution;
 
     /**
      * Constructor.
@@ -95,6 +102,15 @@ class AndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
         mCacheStrategy = (cacheStrategy == null) ? CacheStrategy.CLEAR : cacheStrategy;
         mConstructor = constructor;
         mOrderBy = configuration.getOutputOrderOr(null);
+        mAsyncRunner = configuration.getRunnerOr(null);
+        mPurgeExecution = new PurgeExecution(constructor.getDeclaringClass());
+    }
+
+    @Override
+    public void purge() {
+
+        super.purge();
+        mAsyncRunner.run(mPurgeExecution, 0, TimeUnit.MILLISECONDS);
     }
 
     @Nonnull
@@ -184,6 +200,30 @@ class AndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
 
             logger.err(t, "error creating the invocation instance");
             throw new InvocationException(t);
+        }
+    }
+
+    /**
+     * Execution implementation purging all loaders with a specific invocation class.
+     */
+    private static class PurgeExecution implements Execution {
+
+        private final Class<?> mInvocationClass;
+
+        /**
+         * Constructor.
+         *
+         * @param invocationClass the invocation class.
+         */
+        private PurgeExecution(@Nonnull final Class<?> invocationClass) {
+
+            mInvocationClass = invocationClass;
+        }
+
+        @Override
+        public void run() {
+
+            LoaderInvocation.purgeLoaders(mInvocationClass);
         }
     }
 }

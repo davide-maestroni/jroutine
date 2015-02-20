@@ -64,10 +64,21 @@ public class ServiceRoutineBuilder<INPUT, OUTPUT> {
      *
      * @param context    the routine context.
      * @param classToken the invocation class token.
-     * @throws java.lang.NullPointerException if the class token is null.
+     * @throws java.lang.NullPointerException if the context or the class token are null.
      */
+    @SuppressWarnings("ConstantConditions")
     ServiceRoutineBuilder(@Nonnull final Context context,
             @Nonnull final ClassToken<? extends AndroidInvocation<INPUT, OUTPUT>> classToken) {
+
+        if (context == null) {
+
+            throw new NullPointerException("the context must not be null");
+        }
+
+        if (classToken == null) {
+
+            throw new NullPointerException("the invocation class token must not be null");
+        }
 
         mContext = context;
         mClassToken = classToken;

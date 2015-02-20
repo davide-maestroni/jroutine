@@ -44,6 +44,8 @@ import com.bmd.jrt.time.TimeDuration;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 
@@ -781,6 +783,19 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         }
     }
 
+    public void testPurge() throws InterruptedException {
+
+        final Routine<String, String> routine =
+                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeAndroidInvocation.class))
+                        .onComplete(CacheStrategy.CACHE)
+                        .buildRoutine();
+        final OutputChannel<String> channel = routine.callAsync("test").eventually();
+        assertThat(channel.readNext()).isEqualTo("test");
+        assertThat(channel.checkComplete());
+        routine.purge();
+        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000000)).isTrue();
+    }
+
     @SuppressWarnings("ConstantConditions")
     public void testRoutineError() throws NoSuchMethodException {
 
@@ -860,6 +875,24 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         private ErrorInvocation(final int ignored) {
 
+        }
+    }
+
+    private static class PurgeAndroidInvocation extends AndroidPassingInvocation<String> {
+
+        private static final Semaphore sSemaphore = new Semaphore(0);
+
+        public static boolean waitDestroy(final int count, final long timeoutMs) throws
+                InterruptedException {
+
+            return sSemaphore.tryAcquire(count, timeoutMs, TimeUnit.MILLISECONDS);
+        }
+
+        @Override
+        public void onDestroy() {
+
+            super.onDestroy();
+            sSemaphore.release();
         }
     }
 

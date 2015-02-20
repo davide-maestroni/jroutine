@@ -26,10 +26,13 @@ import com.bmd.jrt.android.invocation.AndroidTemplateInvocation;
 import com.bmd.jrt.android.log.AndroidLog;
 import com.bmd.jrt.android.runner.MainRunner;
 import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
+import com.bmd.jrt.builder.RoutineBuilder.TimeoutAction;
 import com.bmd.jrt.builder.RoutineChannelBuilder.OrderBy;
 import com.bmd.jrt.builder.RoutineConfigurationBuilder;
 import com.bmd.jrt.channel.OutputChannel;
+import com.bmd.jrt.channel.ReadDeadlockException;
 import com.bmd.jrt.channel.ResultChannel;
+import com.bmd.jrt.common.AbortException;
 import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.common.InvocationException;
 import com.bmd.jrt.common.InvocationInterruptedException;
@@ -42,6 +45,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 
+import static com.bmd.jrt.time.TimeDuration.millis;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -95,6 +99,95 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
         } catch (final InvocationException e) {
 
             assertThat(e.getCause().getMessage()).isEqualTo("test");
+        }
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public void testBuilderError() {
+
+        final ClassToken<AndroidPassingInvocation<String>> classToken =
+                new ClassToken<AndroidPassingInvocation<String>>() {};
+
+        try {
+
+            JRoutine.onService(null, classToken);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.onService(getActivity(), null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.onService(getActivity(), classToken).withMaxInvocations(0);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.onService(getActivity(), classToken).withCoreInvocations(-1);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.onService(getActivity(), classToken)
+                    .withAvailableTimeout(-1, TimeUnit.MILLISECONDS);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.onService(getActivity(), classToken).withAvailableTimeout(0, null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.onService(getActivity(), classToken)
+                    .withReadTimeout(-1, TimeUnit.MILLISECONDS);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.onService(getActivity(), classToken).withReadTimeout(0, null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
         }
     }
 
@@ -187,6 +280,48 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
                         .dispatchTo(Looper.getMainLooper())
                         .buildRoutine();
         assertThat(routine.callAsync(p).afterMax(timeout).readNext()).isEqualTo(p);
+    }
+
+    public void testReadTimeout() {
+
+        final ClassToken<AndroidPassingInvocation<String>> classToken =
+                new ClassToken<AndroidPassingInvocation<String>>() {};
+        final Routine<String, String> routine1 = JRoutine.onService(getActivity(), classToken)
+                                                         .withReadTimeout(millis(10))
+                                                         .onReadTimeout(TimeoutAction.EXIT)
+                                                         .buildRoutine();
+
+        assertThat(routine1.callAsync("test1").readAll()).isEmpty();
+
+        final Routine<String, String> routine2 = JRoutine.onService(getActivity(), classToken)
+                                                         .withReadTimeout(millis(10))
+                                                         .onReadTimeout(TimeoutAction.ABORT)
+                                                         .buildRoutine();
+
+        try {
+
+            routine2.callAsync("test2").readAll();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        final Routine<String, String> routine3 = JRoutine.onService(getActivity(), classToken)
+                                                         .withReadTimeout(millis(10))
+                                                         .onReadTimeout(TimeoutAction.DEADLOCK)
+                                                         .buildRoutine();
+
+        try {
+
+            routine3.callAsync("test3").readAll();
+
+            fail();
+
+        } catch (final ReadDeadlockException ignored) {
+
+        }
     }
 
     public void testService() {

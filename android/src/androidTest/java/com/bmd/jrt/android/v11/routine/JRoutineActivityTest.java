@@ -901,6 +901,11 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
     public void testPurge() throws InterruptedException {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final Routine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeAndroidInvocation.class))
                         .onComplete(CacheStrategy.CACHE)

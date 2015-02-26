@@ -13,7 +13,7 @@
  */
 package com.bmd.jrt.annotation;
 
-import com.bmd.jrt.builder.RoutineBuilder.TimeoutAction;
+import com.bmd.jrt.builder.RoutineConfiguration.TimeoutAction;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;

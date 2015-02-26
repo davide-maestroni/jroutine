@@ -16,7 +16,6 @@ package com.bmd.jrt.routine;
 import com.bmd.jrt.annotation.Pass;
 import com.bmd.jrt.annotation.Timeout;
 import com.bmd.jrt.annotation.Wrap;
-import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.StandaloneChannel;
 import com.bmd.jrt.common.ClassToken;
@@ -33,6 +32,9 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
+import static com.bmd.jrt.builder.RoutineConfiguration.RunnerType;
+import static com.bmd.jrt.builder.RoutineConfiguration.builder;
+import static com.bmd.jrt.builder.RoutineConfiguration.withSyncRunner;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -46,7 +48,8 @@ public class RoutineProcessorTest extends TestCase {
 
         final TestClass testClass = new TestClass();
         final TestInterfaceWrapper testWrapper = JRoutine.on(testClass)
-                                                         .withSyncRunner(RunnerType.SEQUENTIAL)
+                                                         .withConfiguration(withSyncRunner(
+                                                                 RunnerType.SEQUENTIAL))
                                                          .buildWrapper(ClassToken.tokenOf(
                                                                  TestInterfaceWrapper.class));
 
@@ -60,12 +63,15 @@ public class RoutineProcessorTest extends TestCase {
         final Runner runner = Runners.poolRunner();
         final TestClass testClass = new TestClass();
         final TestWrapper testWrapper = JRoutine.on(testClass)
-                                                .withSyncRunner(RunnerType.SEQUENTIAL)
-                                                .withRunner(runner)
-                                                .withLogLevel(LogLevel.DEBUG)
-                                                .withLog(log)
-                                                .buildWrapper(
-                                                        ClassToken.tokenOf(TestWrapper.class));
+                                                .withConfiguration(builder().withSyncRunner(
+                                                        RunnerType.SEQUENTIAL)
+                                                                            .withRunner(runner)
+                                                                            .withLogLevel(
+                                                                                    LogLevel.DEBUG)
+                                                                            .withLog(log)
+                                                                            .buildConfiguration())
+                                                .buildWrapper(ClassToken.tokenOf(TestWrapper
+                                                                                         .class));
 
         assertThat(testWrapper.getOne().readNext()).isEqualTo(1);
         assertThat(testWrapper.getString(1, 2, 3)).isIn("1", "2", "3");
@@ -86,10 +92,11 @@ public class RoutineProcessorTest extends TestCase {
         assertThat(testWrapper.getString(standaloneChannel.output())).isEqualTo("3");
 
         assertThat(JRoutine.on(testClass)
-                           .withSyncRunner(RunnerType.SEQUENTIAL)
-                           .withRunner(runner)
-                           .withLogLevel(LogLevel.DEBUG)
-                           .withLog(log)
+                           .withConfiguration(builder().withSyncRunner(RunnerType.SEQUENTIAL)
+                                                       .withRunner(runner)
+                                                       .withLogLevel(LogLevel.DEBUG)
+                                                       .withLog(log)
+                                                       .buildConfiguration())
                            .buildWrapper(ClassToken.tokenOf(TestWrapper.class))).isSameAs(
                 testWrapper);
     }

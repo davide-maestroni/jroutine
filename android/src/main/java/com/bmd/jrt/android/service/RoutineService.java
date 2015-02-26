@@ -24,9 +24,9 @@ import android.os.Messenger;
 import android.os.RemoteException;
 
 import com.bmd.jrt.android.invocation.AndroidInvocation;
-import com.bmd.jrt.builder.RoutineChannelBuilder.OrderBy;
 import com.bmd.jrt.builder.RoutineConfiguration;
-import com.bmd.jrt.builder.RoutineConfigurationBuilder;
+import com.bmd.jrt.builder.RoutineConfiguration.Builder;
+import com.bmd.jrt.builder.RoutineConfiguration.OrderBy;
 import com.bmd.jrt.channel.OutputConsumer;
 import com.bmd.jrt.channel.ParameterChannel;
 import com.bmd.jrt.common.InvocationException;
@@ -416,7 +416,7 @@ public class RoutineService extends Service {
 
             if (routineState == null) {
 
-                final RoutineConfigurationBuilder builder = new RoutineConfigurationBuilder();
+                final Builder builder = RoutineConfiguration.builder();
 
                 if (runnerClass != null) {
 

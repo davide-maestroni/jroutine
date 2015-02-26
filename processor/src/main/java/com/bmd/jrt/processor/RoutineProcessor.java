@@ -19,8 +19,8 @@ import com.bmd.jrt.annotation.Pass.PassingMode;
 import com.bmd.jrt.annotation.Share;
 import com.bmd.jrt.annotation.Timeout;
 import com.bmd.jrt.annotation.Wrap;
-import com.bmd.jrt.builder.RoutineBuilder.TimeoutAction;
-import com.bmd.jrt.builder.RoutineChannelBuilder.OrderBy;
+import com.bmd.jrt.builder.RoutineConfiguration.OrderBy;
+import com.bmd.jrt.builder.RoutineConfiguration.TimeoutAction;
 import com.bmd.jrt.channel.OutputChannel;
 
 import java.io.ByteArrayOutputStream;
@@ -414,7 +414,7 @@ public class RoutineProcessor extends AbstractProcessor {
             builder.append(".withInputOrder(")
                    .append(OrderBy.class.getCanonicalName())
                    .append(".")
-                   .append(OrderBy.INSERTION)
+                   .append(OrderBy.PASSING)
                    .append(")");
         }
 

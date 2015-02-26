@@ -18,16 +18,13 @@ import com.bmd.jrt.annotation.Pass;
 import com.bmd.jrt.annotation.Pass.PassingMode;
 import com.bmd.jrt.annotation.Share;
 import com.bmd.jrt.annotation.Timeout;
-import com.bmd.jrt.builder.RoutineChannelBuilder.OrderBy;
 import com.bmd.jrt.builder.RoutineConfiguration;
-import com.bmd.jrt.builder.RoutineConfigurationBuilder;
+import com.bmd.jrt.builder.RoutineConfiguration.Builder;
+import com.bmd.jrt.builder.RoutineConfiguration.TimeoutAction;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ParameterChannel;
 import com.bmd.jrt.common.CacheHashMap;
 import com.bmd.jrt.common.ClassToken;
-import com.bmd.jrt.log.Log;
-import com.bmd.jrt.log.Log.LogLevel;
-import com.bmd.jrt.runner.Runner;
 import com.bmd.jrt.time.TimeDuration;
 
 import java.lang.annotation.Annotation;
@@ -39,11 +36,11 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import static com.bmd.jrt.builder.RoutineConfiguration.OrderBy;
 import static com.bmd.jrt.common.Reflection.boxingClass;
 import static com.bmd.jrt.common.Reflection.findConstructor;
 import static com.bmd.jrt.time.TimeDuration.fromUnit;
@@ -416,112 +413,6 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
         return passingMode;
     }
 
-    @Nonnull
-    @Override
-    public ClassRoutineBuilder apply(@Nonnull final RoutineConfiguration configuration) {
-
-        super.apply(configuration);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ObjectRoutineBuilder onReadTimeout(@Nullable final TimeoutAction action) {
-
-        super.onReadTimeout(action);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ObjectRoutineBuilder withAvailableTimeout(final long timeout,
-            @Nonnull final TimeUnit timeUnit) {
-
-        super.withAvailableTimeout(timeout, timeUnit);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ObjectRoutineBuilder withAvailableTimeout(@Nullable final TimeDuration timeout) {
-
-        super.withAvailableTimeout(timeout);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ObjectRoutineBuilder withCoreInvocations(final int coreInvocations) {
-
-        super.withCoreInvocations(coreInvocations);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ObjectRoutineBuilder withLog(@Nullable final Log log) {
-
-        super.withLog(log);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ObjectRoutineBuilder withLogLevel(@Nullable final LogLevel level) {
-
-        super.withLogLevel(level);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ObjectRoutineBuilder withMaxInvocations(final int maxInvocations) {
-
-        super.withMaxInvocations(maxInvocations);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ObjectRoutineBuilder withReadTimeout(final long timeout,
-            @Nonnull final TimeUnit timeUnit) {
-
-        super.withReadTimeout(timeout, timeUnit);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ObjectRoutineBuilder withReadTimeout(@Nullable final TimeDuration timeout) {
-
-        super.withReadTimeout(timeout);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ObjectRoutineBuilder withRunner(@Nullable final Runner runner) {
-
-        super.withRunner(runner);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ObjectRoutineBuilder withSyncRunner(@Nullable final RunnerType type) {
-
-        super.withSyncRunner(type);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ObjectRoutineBuilder withShareGroup(@Nullable final String group) {
-
-        super.withShareGroup(group);
-        return this;
-    }
-
     /**
      * Returns a proxy object enabling asynchronous calls to the target instance methods.
      * <p/>
@@ -645,7 +536,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
             final String shareGroup = getShareGroup();
             final String classShareGroup = (shareGroup != null) ? shareGroup : Share.ALL;
-            final RoutineConfiguration configuration = getBuilder().buildConfiguration();
+            final RoutineConfiguration configuration =
+                    RoutineConfiguration.notNull(getConfiguration());
             final ClassInfo classInfo = new ClassInfo(configuration, itf, classShareGroup);
             Object instance = classes.get(classInfo);
 
@@ -709,6 +601,29 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     public <CLASS> CLASS buildWrapper(@Nonnull final ClassToken<CLASS> itf) {
 
         return itf.cast(buildWrapper(itf.getRawClass()));
+    }
+
+    /**
+     * Note that all the options related to the output and input channels will be ignored.
+     *
+     * @param configuration the configuration.
+     * @return this builder.
+     */
+    @Nonnull
+    @Override
+    public ObjectRoutineBuilder withConfiguration(
+            @Nullable final RoutineConfiguration configuration) {
+
+        super.withConfiguration(configuration);
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public ObjectRoutineBuilder withShareGroup(@Nullable final String group) {
+
+        super.withShareGroup(group);
+        return this;
     }
 
     @Nonnull
@@ -822,7 +737,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
         private InterfaceInvocationHandler() {
 
             mShareGroup = getShareGroup();
-            mConfiguration = getBuilder().buildConfiguration();
+            mConfiguration = RoutineConfiguration.notNull(getConfiguration());
         }
 
         @Override
@@ -930,7 +845,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                 @Nullable final PassingMode returnMode) {
 
             String shareGroup = mShareGroup;
-            final RoutineConfigurationBuilder builder = new RoutineConfigurationBuilder();
+            final Builder builder = RoutineConfiguration.builderFrom(mConfiguration);
             final Share shareAnnotation = method.getAnnotation(Share.class);
 
             if (shareAnnotation != null) {
@@ -943,11 +858,9 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
                 }
             }
 
-            builder.apply(mConfiguration);
-
             if (paramMode == PassingMode.OBJECT) {
 
-                builder.withInputOrder(OrderBy.INSERTION);
+                builder.withInputOrder(OrderBy.PASSING);
             }
 
             builder.withInputSize(Integer.MAX_VALUE)
@@ -984,7 +897,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
         private ObjectInvocationHandler() {
 
             mShareGroup = getShareGroup();
-            mConfiguration = getBuilder().buildConfiguration();
+            mConfiguration = RoutineConfiguration.notNull(getConfiguration());
         }
 
         @Override

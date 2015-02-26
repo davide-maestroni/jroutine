@@ -20,11 +20,12 @@
             final com.bmd.jrt.builder.RoutineConfiguration configuration) {
 
         return com.bmd.jrt.routine.JRoutine.on(com.bmd.jrt.invocation.Invocations.withArgs(this).factoryOf(SingleCallInvocation${methodCount}.class))
-                                       .apply(configuration)
-                                       ${routineBuilderOptions}
-                                       .withInputSize(Integer.MAX_VALUE)
-                                       .withInputTimeout(com.bmd.jrt.time.TimeDuration.ZERO)
-                                       .withOutputSize(Integer.MAX_VALUE)
-                                       .withOutputTimeout(com.bmd.jrt.time.TimeDuration.ZERO)
+                                       .withConfiguration(com.bmd.jrt.builder.RoutineConfiguration.builderFrom(configuration)
+                                           ${routineBuilderOptions}
+                                           .withInputSize(Integer.MAX_VALUE)
+                                           .withInputTimeout(com.bmd.jrt.time.TimeDuration.ZERO)
+                                           .withOutputSize(Integer.MAX_VALUE)
+                                           .withOutputTimeout(com.bmd.jrt.time.TimeDuration.ZERO)
+                                           .buildConfiguration())
                                        .buildRoutine();
     }

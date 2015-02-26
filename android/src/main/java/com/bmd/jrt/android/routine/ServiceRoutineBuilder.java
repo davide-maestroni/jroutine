@@ -18,19 +18,12 @@ import android.os.Looper;
 
 import com.bmd.jrt.android.invocation.AndroidInvocation;
 import com.bmd.jrt.android.service.RoutineService;
-import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
-import com.bmd.jrt.builder.RoutineBuilder.TimeoutAction;
-import com.bmd.jrt.builder.RoutineChannelBuilder.OrderBy;
+import com.bmd.jrt.builder.RoutineBuilder;
 import com.bmd.jrt.builder.RoutineConfiguration;
-import com.bmd.jrt.builder.RoutineConfigurationBuilder;
 import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.log.Log;
-import com.bmd.jrt.log.Log.LogLevel;
 import com.bmd.jrt.routine.Routine;
 import com.bmd.jrt.runner.Runner;
-import com.bmd.jrt.time.TimeDuration;
-
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -43,13 +36,13 @@ import javax.annotation.Nullable;
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-public class ServiceRoutineBuilder<INPUT, OUTPUT> {
-
-    private final RoutineConfigurationBuilder mBuilder;
+public class ServiceRoutineBuilder<INPUT, OUTPUT> implements RoutineBuilder {
 
     private final ClassToken<? extends AndroidInvocation<INPUT, OUTPUT>> mClassToken;
 
     private final Context mContext;
+
+    private RoutineConfiguration mConfiguration;
 
     private Class<? extends Log> mLogClass;
 
@@ -82,22 +75,6 @@ public class ServiceRoutineBuilder<INPUT, OUTPUT> {
 
         mContext = context;
         mClassToken = classToken;
-        mBuilder = new RoutineConfigurationBuilder();
-    }
-
-    /**
-     * Applies the specified configuration to this builder.
-     *
-     * @param configuration the configuration.
-     * @return this builder.
-     * @throws java.lang.NullPointerException if the specified configuration is null.
-     */
-    @Nonnull
-    public ServiceRoutineBuilder<INPUT, OUTPUT> apply(
-            @Nonnull final RoutineConfiguration configuration) {
-
-        mBuilder.apply(configuration);
-        return this;
     }
 
     /**
@@ -109,8 +86,8 @@ public class ServiceRoutineBuilder<INPUT, OUTPUT> {
     public Routine<INPUT, OUTPUT> buildRoutine() {
 
         return new ServiceRoutine<INPUT, OUTPUT>(mContext, mServiceClass, mLooper, mClassToken,
-                                                 mBuilder.buildConfiguration(), mRunnerClass,
-                                                 mLogClass);
+                                                 RoutineConfiguration.notNull(mConfiguration),
+                                                 mRunnerClass, mLogClass);
     }
 
     /**
@@ -128,78 +105,18 @@ public class ServiceRoutineBuilder<INPUT, OUTPUT> {
     }
 
     /**
-     * Sets the action to be taken if the timeout elapses before a result can be read from the
-     * output channel.
+     * Note that all the options related to the output and input channels size and timeout will be
+     * ignored.
      *
-     * @param action the action type.
+     * @param configuration the configuration.
      * @return this builder.
      */
     @Nonnull
-    public ServiceRoutineBuilder<INPUT, OUTPUT> onReadTimeout(
-            @Nullable final TimeoutAction action) {
+    @Override
+    public ServiceRoutineBuilder<INPUT, OUTPUT> withConfiguration(
+            @Nullable final RoutineConfiguration configuration) {
 
-        mBuilder.onReadTimeout(action);
-        return this;
-    }
-
-    /**
-     * Sets the timeout for an invocation instance to become available.
-     *
-     * @param timeout  the timeout.
-     * @param timeUnit the timeout time unit.
-     * @return this builder.
-     * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
-     * @throws java.lang.NullPointerException     if the specified time unit is null.
-     */
-    @Nonnull
-    public ServiceRoutineBuilder<INPUT, OUTPUT> withAvailableTimeout(final long timeout,
-            @Nonnull final TimeUnit timeUnit) {
-
-        mBuilder.withAvailableTimeout(timeout, timeUnit);
-        return this;
-    }
-
-    /**
-     * Sets the timeout for an invocation instance to become available. A null value means that
-     * it is up to the framework to chose a default duration.
-     *
-     * @param timeout the timeout.
-     * @return this builder.
-     */
-    @Nonnull
-    public ServiceRoutineBuilder<INPUT, OUTPUT> withAvailableTimeout(
-            @Nullable final TimeDuration timeout) {
-
-        mBuilder.withAvailableTimeout(timeout);
-        return this;
-    }
-
-    /**
-     * Sets the max number of core invocation instances. A {@link RoutineConfiguration#DEFAULT}
-     * value means that it is up to the framework to chose a default number.
-     *
-     * @param coreInstances the max number of instances.
-     * @return this builder.
-     * @throws java.lang.IllegalArgumentException if the number is negative.
-     */
-    @Nonnull
-    public ServiceRoutineBuilder<INPUT, OUTPUT> withCoreInvocations(final int coreInstances) {
-
-        mBuilder.withCoreInvocations(coreInstances);
-        return this;
-    }
-
-    /**
-     * Sets the order in which input data are collected from the input channel. A null value means
-     * that it is up to the framework to chose a default order type.
-     *
-     * @param order the order type.
-     * @return this builder.
-     */
-    @Nonnull
-    public ServiceRoutineBuilder<INPUT, OUTPUT> withInputOrder(@Nullable final OrderBy order) {
-
-        mBuilder.withInputOrder(order);
+        mConfiguration = configuration;
         return this;
     }
 
@@ -217,86 +134,6 @@ public class ServiceRoutineBuilder<INPUT, OUTPUT> {
         mLogClass = logClass;
         return this;
 
-    }
-
-    /**
-     * Sets the log level. A null value means that it is up to the framework to chose a default
-     * level.
-     *
-     * @param level the log level.
-     * @return this builder.
-     */
-    @Nonnull
-    public ServiceRoutineBuilder<INPUT, OUTPUT> withLogLevel(@Nullable final LogLevel level) {
-
-        mBuilder.withLogLevel(level);
-        return this;
-    }
-
-    /**
-     * Sets the max number of concurrently running invocation instances. A
-     * {@link RoutineConfiguration#DEFAULT} value means that it is up to the framework to chose a
-     * default number.
-     *
-     * @param maxInstances the max number of instances.
-     * @return this builder.
-     * @throws java.lang.IllegalArgumentException if the number is less than 1.
-     */
-    @Nonnull
-    public ServiceRoutineBuilder<INPUT, OUTPUT> withMaxInvocations(final int maxInstances) {
-
-        mBuilder.withMaxInvocations(maxInstances);
-        return this;
-    }
-
-    /**
-     * Sets the order in which output data are collected from the result channel. A null value means
-     * that it is up to the framework to chose a default order type.
-     *
-     * @param order the order type.
-     * @return this builder.
-     */
-    @Nonnull
-    public ServiceRoutineBuilder<INPUT, OUTPUT> withOutputOrder(@Nullable final OrderBy order) {
-
-        mBuilder.withOutputOrder(order);
-        return this;
-    }
-
-    /**
-     * Sets the timeout for an invocation instance to produce a readable result.
-     * <p/>
-     * By default the timeout is set to 0 to avoid unexpected deadlocks.
-     *
-     * @param timeout  the timeout.
-     * @param timeUnit the timeout time unit.
-     * @return this builder.
-     * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
-     * @throws java.lang.NullPointerException     if the specified time unit is null.
-     */
-    @Nonnull
-    public ServiceRoutineBuilder<INPUT, OUTPUT> withReadTimeout(final long timeout,
-            @Nonnull final TimeUnit timeUnit) {
-
-        mBuilder.withReadTimeout(timeout, timeUnit);
-        return this;
-    }
-
-    /**
-     * Sets the timeout for an invocation instance to produce a readable result. A null value means
-     * that it is up to the framework to chose a default duration.
-     * <p/>
-     * By default the timeout is set to 0 to avoid unexpected deadlocks.
-     *
-     * @param timeout the timeout.
-     * @return this builder.
-     */
-    @Nonnull
-    public ServiceRoutineBuilder<INPUT, OUTPUT> withReadTimeout(
-            @Nullable final TimeDuration timeout) {
-
-        mBuilder.withReadTimeout(timeout);
-        return this;
     }
 
     /**
@@ -326,20 +163,6 @@ public class ServiceRoutineBuilder<INPUT, OUTPUT> {
             @Nullable final Class<? extends RoutineService> serviceClass) {
 
         mServiceClass = serviceClass;
-        return this;
-    }
-
-    /**
-     * Sets the type of the synchronous runner to be used by the routine. A null value means that it
-     * is up to the framework to chose a default order type.
-     *
-     * @param type the runner type.
-     * @return this builder.
-     */
-    @Nonnull
-    public ServiceRoutineBuilder<INPUT, OUTPUT> withSyncRunner(@Nullable RunnerType type) {
-
-        mBuilder.withSyncRunner(type);
         return this;
     }
 }

@@ -13,8 +13,8 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.builder.RoutineBuilder.TimeoutAction;
-import com.bmd.jrt.builder.RoutineChannelBuilder.OrderBy;
+import com.bmd.jrt.builder.RoutineConfiguration;
+import com.bmd.jrt.builder.RoutineConfiguration.TimeoutAction;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ReadDeadlockException;
 import com.bmd.jrt.channel.StandaloneChannel;
@@ -31,6 +31,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
+import static com.bmd.jrt.builder.RoutineConfiguration.OrderBy;
+import static com.bmd.jrt.builder.RoutineConfiguration.builder;
+import static com.bmd.jrt.builder.RoutineConfiguration.withOutputOrder;
 import static com.bmd.jrt.time.TimeDuration.millis;
 import static com.bmd.jrt.time.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -120,8 +123,9 @@ public class StandaloneChannelTest extends TestCase {
         assertThat(outputChannel.afterMax(timeout).readNext()).isEqualTo("test");
         assertThat(outputChannel.checkComplete()).isTrue();
 
+        final RoutineConfiguration configuration = withOutputOrder(OrderBy.PASSING);
         final StandaloneChannel<String> standaloneChannel1 =
-                JRoutine.standalone().withDataOrder(OrderBy.INSERTION).buildChannel();
+                JRoutine.standalone().withConfiguration(configuration).buildChannel();
 
         new Thread() {
 
@@ -189,17 +193,19 @@ public class StandaloneChannelTest extends TestCase {
 
     public void testReadTimeout() {
 
-        final StandaloneChannel<Object> channel1 = JRoutine.standalone()
-                                                           .withReadTimeout(millis(10))
-                                                           .onReadTimeout(TimeoutAction.EXIT)
-                                                           .buildChannel();
+        final RoutineConfiguration configuration1 = builder().withReadTimeout(millis(10))
+                                                             .onReadTimeout(TimeoutAction.EXIT)
+                                                             .buildConfiguration();
+        final StandaloneChannel<Object> channel1 =
+                JRoutine.standalone().withConfiguration(configuration1).buildChannel();
 
         assertThat(channel1.output().readAll()).isEmpty();
 
-        final StandaloneChannel<Object> channel2 = JRoutine.standalone()
-                                                           .withReadTimeout(millis(10))
-                                                           .onReadTimeout(TimeoutAction.ABORT)
-                                                           .buildChannel();
+        final RoutineConfiguration configuration2 = builder().withReadTimeout(millis(10))
+                                                             .onReadTimeout(TimeoutAction.ABORT)
+                                                             .buildConfiguration();
+        final StandaloneChannel<Object> channel2 =
+                JRoutine.standalone().withConfiguration(configuration2).buildChannel();
 
         try {
 
@@ -211,10 +217,11 @@ public class StandaloneChannelTest extends TestCase {
 
         }
 
-        final StandaloneChannel<Object> channel3 = JRoutine.standalone()
-                                                           .withReadTimeout(millis(10))
-                                                           .onReadTimeout(TimeoutAction.DEADLOCK)
-                                                           .buildChannel();
+        final RoutineConfiguration configuration3 = builder().withReadTimeout(millis(10))
+                                                             .onReadTimeout(TimeoutAction.DEADLOCK)
+                                                             .buildConfiguration();
+        final StandaloneChannel<Object> channel3 =
+                JRoutine.standalone().withConfiguration(configuration3).buildChannel();
 
         try {
 

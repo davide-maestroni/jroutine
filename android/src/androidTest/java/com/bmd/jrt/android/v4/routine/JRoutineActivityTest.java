@@ -28,10 +28,8 @@ import com.bmd.jrt.android.invocation.AndroidPassingInvocation;
 import com.bmd.jrt.android.invocation.AndroidSingleCallInvocation;
 import com.bmd.jrt.android.invocation.AndroidTemplateInvocation;
 import com.bmd.jrt.android.log.Logs;
-import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
-import com.bmd.jrt.builder.RoutineChannelBuilder.OrderBy;
 import com.bmd.jrt.builder.RoutineConfiguration;
-import com.bmd.jrt.builder.RoutineConfigurationBuilder;
+import com.bmd.jrt.builder.RoutineConfiguration.RunnerType;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.ClassToken;
@@ -49,6 +47,9 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 
+import static com.bmd.jrt.builder.RoutineConfiguration.OrderBy;
+import static com.bmd.jrt.builder.RoutineConfiguration.builder;
+import static com.bmd.jrt.builder.RoutineConfiguration.withOutputOrder;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -570,7 +571,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final Routine<String, String> routine =
                 JRoutine.onFragment(fragment, ClassToken.tokenOf(ToUpperCase.class))
                         .withId(0)
-                        .withOutputOrder(OrderBy.INSERTION)
+                        .withConfiguration(withOutputOrder(OrderBy.PASSING))
                         .buildRoutine();
         final OutputChannel<String> channel1 = routine.callAsync("test1", "test2");
         final OutputChannel<String> channel2 = JRoutine.onFragment(fragment, 0).buildChannel();
@@ -704,12 +705,14 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
     public void testInvocations() {
 
         final TimeDuration timeout = TimeDuration.seconds(10);
-        final Routine<String, String> routine1 = JRoutine.onActivity(getActivity(),
-                                                                     ClassToken.tokenOf(
-                                                                             StringPassingInvocation.class))
-                                                         .withSyncRunner(RunnerType.QUEUED)
-                                                         .withLog(Logs.androidLog())
-                                                         .withLogLevel(LogLevel.WARNING)
+        final ClassToken<StringPassingInvocation> token1 =
+                ClassToken.tokenOf(StringPassingInvocation.class);
+        final RoutineConfiguration configuration1 = builder().withSyncRunner(RunnerType.QUEUED)
+                                                             .withLog(Logs.androidLog())
+                                                             .withLogLevel(LogLevel.WARNING)
+                                                             .buildConfiguration();
+        final Routine<String, String> routine1 = JRoutine.onActivity(getActivity(), token1)
+                                                         .withConfiguration(configuration1)
                                                          .buildRoutine();
         assertThat(routine1.callSync("1", "2", "3", "4", "5")
                            .afterMax(timeout)
@@ -721,12 +724,14 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                            .afterMax(timeout)
                            .readAll()).containsOnly("1", "2", "3", "4", "5");
 
-        final Routine<String, String> routine2 = JRoutine.onActivity(getActivity(),
-                                                                     ClassToken.tokenOf(
-                                                                             StringSingleCallInvocation.class))
-                                                         .withSyncRunner(RunnerType.SEQUENTIAL)
-                                                         .withLog(Logs.androidLog())
-                                                         .withLogLevel(LogLevel.WARNING)
+        final ClassToken<StringSingleCallInvocation> token2 =
+                ClassToken.tokenOf(StringSingleCallInvocation.class);
+        final RoutineConfiguration configuration2 = builder().withSyncRunner(RunnerType.SEQUENTIAL)
+                                                             .withLog(Logs.androidLog())
+                                                             .withLogLevel(LogLevel.WARNING)
+                                                             .buildConfiguration();
+        final Routine<String, String> routine2 = JRoutine.onActivity(getActivity(), token2)
+                                                         .withConfiguration(configuration2)
                                                          .buildRoutine();
         assertThat(routine2.callSync("1", "2", "3", "4", "5")
                            .afterMax(timeout)
@@ -799,8 +804,6 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
     @SuppressWarnings("ConstantConditions")
     public void testRoutineError() throws NoSuchMethodException {
 
-        final RoutineConfiguration configuration =
-                new RoutineConfigurationBuilder().buildConfiguration();
         final WeakReference<Object> reference = new WeakReference<Object>(getActivity());
 
         try {
@@ -817,8 +820,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            new AndroidRoutine<String, String>(configuration, null, 0, ClashResolution.KEEP_THAT,
-                                               CacheStrategy.CACHE,
+            new AndroidRoutine<String, String>(RoutineConfiguration.EMPTY_CONFIGURATION, null, 0,
+                                               ClashResolution.KEEP_THAT, CacheStrategy.CACHE,
                                                ToUpperCase.class.getDeclaredConstructor());
 
             fail();
@@ -829,8 +832,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            new AndroidRoutine<String, String>(configuration, reference, 0,
-                                               ClashResolution.KEEP_THAT, null, null);
+            new AndroidRoutine<String, String>(RoutineConfiguration.EMPTY_CONFIGURATION, reference,
+                                               0, ClashResolution.KEEP_THAT, null, null);
 
             fail();
 

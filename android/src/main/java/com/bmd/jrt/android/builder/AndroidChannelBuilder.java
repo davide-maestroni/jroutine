@@ -14,9 +14,8 @@
 package com.bmd.jrt.android.builder;
 
 import com.bmd.jrt.android.builder.AndroidRoutineBuilder.CacheStrategy;
+import com.bmd.jrt.builder.RoutineBuilder;
 import com.bmd.jrt.channel.OutputChannel;
-import com.bmd.jrt.log.Log;
-import com.bmd.jrt.log.Log.LogLevel;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -30,7 +29,7 @@ import javax.annotation.Nullable;
  *
  * @see com.bmd.jrt.android.builder.AndroidRoutineBuilder
  */
-public interface AndroidChannelBuilder {
+public interface AndroidChannelBuilder extends RoutineBuilder {
 
     /**
      * Builds and returns the an output channel linked to the routine invocation.
@@ -49,24 +48,4 @@ public interface AndroidChannelBuilder {
      */
     @Nonnull
     public AndroidChannelBuilder onComplete(@Nullable CacheStrategy cacheStrategy);
-
-    /**
-     * Sets the log instance. A null value means that it is up to the framework to chose a default
-     * implementation.
-     *
-     * @param log the log instance.
-     * @return this builder.
-     */
-    @Nonnull
-    public AndroidChannelBuilder withLog(@Nullable Log log);
-
-    /**
-     * Sets the log level. A null value means that it is up to the framework to chose a default
-     * level.
-     *
-     * @param level the log level.
-     * @return this builder.
-     */
-    @Nonnull
-    public AndroidChannelBuilder withLogLevel(@Nullable LogLevel level);
 }

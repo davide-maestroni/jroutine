@@ -17,7 +17,8 @@ import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
 
 import com.bmd.jrt.android.invocation.AndroidInvocation;
-import com.bmd.jrt.builder.RoutineChannelBuilder.OrderBy;
+import com.bmd.jrt.builder.RoutineConfiguration;
+import com.bmd.jrt.builder.RoutineConfiguration.OrderBy;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.channel.StandaloneChannel;
@@ -32,6 +33,8 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
+import static com.bmd.jrt.builder.RoutineConfiguration.builder;
 
 /**
  * Loader implementation performing the routine invocation.
@@ -264,13 +267,15 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
          */
         private LoaderResultChannel(@Nullable final OrderBy order, @Nonnull final Logger logger) {
 
-            mStandaloneChannel = JRoutine.standalone()
-                                         .withDataOrder(order)
-                                         .withMaxSize(Integer.MAX_VALUE)
-                                         .withBufferTimeout(TimeDuration.ZERO)
-                                         .withLog(logger.getLog())
-                                         .withLogLevel(logger.getLogLevel())
-                                         .buildChannel();
+            final RoutineConfiguration configuration = builder().withOutputOrder(order)
+                                                                .withOutputSize(Integer.MAX_VALUE)
+                                                                .withOutputTimeout(
+                                                                        TimeDuration.ZERO)
+                                                                .withLog(logger.getLog())
+                                                                .withLogLevel(logger.getLogLevel())
+                                                                .buildConfiguration();
+            mStandaloneChannel =
+                    JRoutine.standalone().withConfiguration(configuration).buildChannel();
             mStandaloneInput = mStandaloneChannel.input();
         }
 

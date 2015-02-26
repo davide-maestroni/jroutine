@@ -19,7 +19,6 @@ import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.bmd.jrt.android.invocation.AndroidTemplateInvocation;
-import com.bmd.jrt.builder.RoutineChannelBuilder.OrderBy;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.ClassToken;
@@ -30,6 +29,8 @@ import java.util.concurrent.Semaphore;
 
 import javax.annotation.Nonnull;
 
+import static com.bmd.jrt.builder.RoutineConfiguration.OrderBy;
+import static com.bmd.jrt.builder.RoutineConfiguration.withOutputOrder;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -57,7 +58,7 @@ public class JRoutineActivityRotationTest
         final Routine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
                         .withId(0)
-                        .withOutputOrder(OrderBy.INSERTION)
+                        .withConfiguration(withOutputOrder(OrderBy.PASSING))
                         .buildRoutine();
         routine.callAsync("test1", "test2");
 

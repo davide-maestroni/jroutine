@@ -27,6 +27,7 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import static com.bmd.jrt.builder.RoutineConfiguration.builder;
 import static com.bmd.jrt.time.TimeDuration.INFINITY;
 import static com.bmd.jrt.time.TimeDuration.seconds;
 
@@ -47,8 +48,10 @@ public class Downloader {
     public Downloader(final int maxParallelDownloads) {
 
         mReadConnection = JRoutine.on(Invocations.factoryOf(ReadConnection.class))
-                                  .withMaxInvocations(maxParallelDownloads)
-                                  .withAvailableTimeout(INFINITY)
+                                  .withConfiguration(
+                                          builder().withMaxInvocations(maxParallelDownloads)
+                                                   .withAvailableTimeout(INFINITY)
+                                                   .buildConfiguration())
                                   .buildRoutine();
     }
 
@@ -99,8 +102,9 @@ public class Downloader {
 
             final Routine<Chunk, Boolean> writeFile =
                     JRoutine.on(Invocations.withArgs(dstFile).factoryOf(WriteFile.class))
-                            .withInputSize(8)
-                            .withInputTimeout(seconds(30))
+                            .withConfiguration(builder().withInputSize(8)
+                                                        .withInputTimeout(seconds(30))
+                                                        .buildConfiguration())
                             .buildRoutine();
 
             try {

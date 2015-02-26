@@ -13,7 +13,6 @@
  */
 package com.bmd.jrt.routine;
 
-import com.bmd.jrt.builder.RoutineBuilder.RunnerType;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.channel.ParameterChannel;
 import com.bmd.jrt.channel.ResultChannel;
@@ -33,6 +32,7 @@ import javax.annotation.Nonnull;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+import static com.bmd.jrt.builder.RoutineConfiguration.RunnerType;
 import static com.bmd.jrt.time.TimeDuration.ZERO;
 
 /**

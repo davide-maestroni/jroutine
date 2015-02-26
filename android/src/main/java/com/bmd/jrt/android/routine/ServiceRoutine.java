@@ -26,9 +26,9 @@ import android.os.RemoteException;
 
 import com.bmd.jrt.android.invocation.AndroidInvocation;
 import com.bmd.jrt.android.service.RoutineService;
-import com.bmd.jrt.builder.RoutineBuilder.TimeoutAction;
-import com.bmd.jrt.builder.RoutineChannelBuilder.OrderBy;
 import com.bmd.jrt.builder.RoutineConfiguration;
+import com.bmd.jrt.builder.RoutineConfiguration.OrderBy;
+import com.bmd.jrt.builder.RoutineConfiguration.TimeoutAction;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.OutputConsumer;
 import com.bmd.jrt.channel.ParameterChannel;
@@ -60,6 +60,7 @@ import static com.bmd.jrt.android.service.RoutineService.putError;
 import static com.bmd.jrt.android.service.RoutineService.putInvocationId;
 import static com.bmd.jrt.android.service.RoutineService.putParallelInvocation;
 import static com.bmd.jrt.android.service.RoutineService.putValue;
+import static com.bmd.jrt.builder.RoutineConfiguration.builder;
 import static com.bmd.jrt.common.Reflection.findConstructor;
 import static java.util.UUID.randomUUID;
 
@@ -112,7 +113,12 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
             @Nullable final Class<? extends Runner> runnerClass,
             @Nullable final Class<? extends Log> logClass) {
 
-        final Log log;
+        if (runnerClass != null) {
+
+            findConstructor(runnerClass);
+        }
+
+        Log log = null;
 
         if (logClass != null) {
 
@@ -126,26 +132,35 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
                 throw new IllegalArgumentException(t);
             }
+        }
+
+        final RoutineConfiguration routineConfiguration;
+
+        if (log == null) {
+
+            log = configuration.getLogOr(Logger.getGlobalLog());
+            routineConfiguration = configuration;
 
         } else {
 
-            log = null;
+            routineConfiguration = configuration.builderFrom().withLog(log).buildConfiguration();
         }
+
+        final Runner runner = configuration.getRunnerOr(null);
 
         mContext = context.getApplicationContext();
         mLooper = looper;
         mServiceClass = (serviceClass != null) ? serviceClass : RoutineService.class;
         mInvocationClass = invocationToken.getRawClass();
         mConfiguration = configuration;
-        mRunnerClass = runnerClass;
-        mLogClass = logClass;
-        mLogger = Logger.createLogger((log != null) ? log : Logger.getGlobalLog(),
-                                      configuration.getLogLevelOr(Logger.getGlobalLogLevel()),
+        mRunnerClass =
+                (runnerClass != null) ? runnerClass : (runner != null) ? runner.getClass() : null;
+        mLogClass = (logClass != null) ? logClass : log.getClass();
+        mLogger = Logger.createLogger(log, configuration.getLogLevelOr(Logger.getGlobalLogLevel()),
                                       this);
         mRoutine = JRoutine.on(Invocations.factoryOf(
                 (ClassToken<? extends Invocation<INPUT, OUTPUT>>) invocationToken))
-                           .apply(configuration)
-                           .withLog(log)
+                           .withConfiguration(routineConfiguration)
                            .buildRoutine();
     }
 
@@ -267,29 +282,33 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
             final Log log = logger.getLog();
             final LogLevel logLevel = logger.getLogLevel();
             final OrderBy inputOrder = configuration.getInputOrderOr(null);
-            final StandaloneChannel<INPUT> paramChannel = JRoutine.standalone()
-                                                                  .withDataOrder(inputOrder)
-                                                                  .withMaxSize(Integer.MAX_VALUE)
-                                                                  .withBufferTimeout(
-                                                                          TimeDuration.ZERO)
-                                                                  .withLog(log)
-                                                                  .withLogLevel(logLevel)
-                                                                  .buildChannel();
+            final RoutineConfiguration inputConfiguration = builder().withOutputOrder(inputOrder)
+                                                                     .withOutputSize(
+                                                                             Integer.MAX_VALUE)
+                                                                     .withOutputTimeout(
+                                                                             TimeDuration.ZERO)
+                                                                     .withLog(log)
+                                                                     .withLogLevel(logLevel)
+                                                                     .buildConfiguration();
+            final StandaloneChannel<INPUT> paramChannel =
+                    JRoutine.standalone().withConfiguration(inputConfiguration).buildChannel();
             mParamStandaloneInput = paramChannel.input();
             mParamStandaloneOutput = paramChannel.output();
             final OrderBy outputOrder = configuration.getOutputOrderOr(null);
             final TimeDuration readTimeout = configuration.getReadTimeoutOr(null);
             final TimeoutAction timeoutAction = configuration.getReadTimeoutActionOr(null);
-            final StandaloneChannel<OUTPUT> resultChannel = JRoutine.standalone()
-                                                                    .withDataOrder(outputOrder)
-                                                                    .withMaxSize(Integer.MAX_VALUE)
-                                                                    .withBufferTimeout(
-                                                                            TimeDuration.ZERO)
-                                                                    .withReadTimeout(readTimeout)
-                                                                    .onReadTimeout(timeoutAction)
-                                                                    .withLog(log)
-                                                                    .withLogLevel(logLevel)
-                                                                    .buildChannel();
+            final RoutineConfiguration outputConfiguration = builder().withOutputOrder(outputOrder)
+                                                                      .withOutputSize(
+                                                                              Integer.MAX_VALUE)
+                                                                      .withOutputTimeout(
+                                                                              TimeDuration.ZERO)
+                                                                      .withReadTimeout(readTimeout)
+                                                                      .onReadTimeout(timeoutAction)
+                                                                      .withLog(log)
+                                                                      .withLogLevel(logLevel)
+                                                                      .buildConfiguration();
+            final StandaloneChannel<OUTPUT> resultChannel =
+                    JRoutine.standalone().withConfiguration(outputConfiguration).buildChannel();
             mResultStandaloneInput = resultChannel.input();
             mResultStandaloneOutput = resultChannel.output();
         }

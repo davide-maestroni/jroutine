@@ -13,13 +13,6 @@
  */
 package com.bmd.jrt.builder;
 
-import com.bmd.jrt.log.Log;
-import com.bmd.jrt.log.Log.LogLevel;
-import com.bmd.jrt.runner.Runner;
-import com.bmd.jrt.time.TimeDuration;
-
-import java.util.concurrent.TimeUnit;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -38,7 +31,7 @@ import javax.annotation.Nullable;
  * The default asynchronous runner is shared among all the routines, but a custom one can be set
  * through the builder.
  * <p/>
- * The built routine is based on an invocation implementation specified by a class token.<br/>
+ * The built routine is based on an invocation implementation.<br/>
  * The invocation instance is created only when needed, by passing the specified arguments to the
  * constructor. Note that the arguments objects should be immutable or, at least, never shared
  * inside and outside the routine in order to avoid concurrency issues.<br/>
@@ -51,190 +44,29 @@ import javax.annotation.Nullable;
  * In case the timeout elapses before an invocation instance becomes available, a
  * {@link com.bmd.jrt.routine.RoutineDeadlockException} will be thrown.
  * <p/>
+ * Additionally, the number of input and output data buffered in the corresponding channel can be
+ * limited in order to avoid excessive memory consumption. In case the maximum number is reached
+ * when passing an input or output, the call blocks until enough data are consumed or the specified
+ * timeout elapses. In the latter case a {@link com.bmd.jrt.common.DeadlockException} will be
+ * thrown.<br/>
+ * By default the timeout is set to 0 to avoid unexpected deadlocks, and the order of input and
+ * output data is not guaranteed. Nevertheless, it is possible to force data to be delivered in
+ * the same order as they are passed to the channels, at the cost of a slightly increased memory
+ * usage and computation, by the proper options.
+ * <p/>
  * Created by davide on 11/11/14.
  */
 public interface RoutineBuilder {
 
     /**
-     * Applies the specified configuration to this builder.<br/>
-     * Note that the configuration options not supported by the builder methods will be ignored.
+     * Sets the specified configuration to this builder by replacing any configuration already set.
+     * <br/>
+     * Note that the configuration options not supported by the builder implementation may be
+     * ignored.
      *
      * @param configuration the configuration.
      * @return this builder.
-     * @throws java.lang.NullPointerException if the specified configuration is null.
      */
     @Nonnull
-    public RoutineBuilder apply(@Nonnull RoutineConfiguration configuration);
-
-    /**
-     * Sets the action to be taken if the timeout elapses before a result can be read from the
-     * output channel.
-     *
-     * @param action the action type.
-     * @return this builder.
-     */
-    @Nonnull
-    public RoutineBuilder onReadTimeout(@Nullable TimeoutAction action);
-
-    /**
-     * Sets the timeout for an invocation instance to become available.
-     * <p/>
-     * By default the timeout is set to 0 to avoid unexpected deadlocks.
-     *
-     * @param timeout  the timeout.
-     * @param timeUnit the timeout time unit.
-     * @return this builder.
-     * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
-     * @throws java.lang.NullPointerException     if the specified time unit is null.
-     */
-    @Nonnull
-    public RoutineBuilder withAvailableTimeout(long timeout, @Nonnull TimeUnit timeUnit);
-
-    /**
-     * Sets the timeout for an invocation instance to become available. A null value means that
-     * it is up to the framework to chose a default duration.
-     * <p/>
-     * By default the timeout is set to 0 to avoid unexpected deadlocks.
-     *
-     * @param timeout the timeout.
-     * @return this builder.
-     */
-    @Nonnull
-    public RoutineBuilder withAvailableTimeout(@Nullable TimeDuration timeout);
-
-    /**
-     * Sets the number of invocation instances which represents the core pool of reusable
-     * invocations. A {@link RoutineConfiguration#DEFAULT} value means that it is up to the
-     * framework to chose a default number.
-     *
-     * @param coreInvocations the max number of instances.
-     * @return this builder.
-     * @throws java.lang.IllegalArgumentException if the number is negative.
-     */
-    @Nonnull
-    public RoutineBuilder withCoreInvocations(int coreInvocations);
-
-    /**
-     * Sets the log instance. A null value means that it is up to the framework to chose a default
-     * implementation.
-     *
-     * @param log the log instance.
-     * @return this builder.
-     */
-    @Nonnull
-    public RoutineBuilder withLog(@Nullable Log log);
-
-    /**
-     * Sets the log level. A null value means that it is up to the framework to chose a default
-     * level.
-     *
-     * @param level the log level.
-     * @return this builder.
-     */
-    @Nonnull
-    public RoutineBuilder withLogLevel(@Nullable LogLevel level);
-
-    /**
-     * Sets the max number of concurrently running invocation instances. A
-     * {@link RoutineConfiguration#DEFAULT} value means that it is up to the framework to chose a
-     * default number.
-     *
-     * @param maxInvocations the max number of instances.
-     * @return this builder.
-     * @throws java.lang.IllegalArgumentException if the number is less than 1.
-     */
-    @Nonnull
-    public RoutineBuilder withMaxInvocations(int maxInvocations);
-
-    /**
-     * Sets the timeout for an invocation instance to produce a readable result.
-     * <p/>
-     * By default the timeout is set to 0 to avoid unexpected deadlocks.
-     *
-     * @param timeout  the timeout.
-     * @param timeUnit the timeout time unit.
-     * @return this builder.
-     * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
-     * @throws java.lang.NullPointerException     if the specified time unit is null.
-     */
-    @Nonnull
-    public RoutineBuilder withReadTimeout(long timeout, @Nonnull TimeUnit timeUnit);
-
-    /**
-     * Sets the timeout for an invocation instance to produce a readable result. A null value means
-     * that it is up to the framework to chose a default duration.
-     * <p/>
-     * By default the timeout is set to 0 to avoid unexpected deadlocks.
-     *
-     * @param timeout the timeout.
-     * @return this builder.
-     */
-    @Nonnull
-    public RoutineBuilder withReadTimeout(@Nullable TimeDuration timeout);
-
-    /**
-     * Sets the asynchronous runner instance. A null value means that it is up to the framework
-     * to chose a default instance.
-     *
-     * @param runner the runner instance.
-     * @return this builder.
-     */
-    @Nonnull
-    public RoutineBuilder withRunner(@Nullable Runner runner);
-
-    /**
-     * Sets the type of the synchronous runner to be used by the routine. A null value means that it
-     * is up to the framework to chose a default order type.
-     *
-     * @param type the runner type.
-     * @return this builder.
-     */
-    @Nonnull
-    public RoutineBuilder withSyncRunner(@Nullable RunnerType type);
-
-    /**
-     * Synchronous runner type enumeration.
-     */
-    public enum RunnerType {
-
-        /**
-         * Sequential runner.<br/>
-         * The sequential one simply runs the executions as soon as they are invoked.<br/>
-         * The executions are run inside the calling thread.
-         */
-        SEQUENTIAL,
-        /**
-         * Queued runner.<br/>
-         * The queued runner maintains an internal buffer of executions that are consumed only when
-         * the last one complete, thus avoiding overflowing the call stack because of nested calls
-         * to other routines.<br/>
-         * The executions are run inside the calling thread.
-         */
-        QUEUED
-    }
-
-    /**
-     * Enumeration indicating the action to take on output channel timeout.
-     */
-    public enum TimeoutAction {
-
-        /**
-         * Deadlock.<br/>
-         * If no result is available after the specified timeout, the called method will throw a
-         * {@link com.bmd.jrt.channel.ReadDeadlockException}.
-         */
-        DEADLOCK,
-        /**
-         * Break execution.<br/>
-         * If no result is available after the specified timeout, the called method will stop its
-         * execution and exit immediately.
-         */
-        EXIT,
-        /**
-         * Abort invocation.<br/>
-         * If no result is available after the specified timeout, the invocation will be aborted and
-         * the method will immediately exit.
-         */
-        ABORT
-    }
+    public RoutineBuilder withConfiguration(@Nullable RoutineConfiguration configuration);
 }

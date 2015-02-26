@@ -14,7 +14,6 @@
 package com.bmd.jrt.routine;
 
 import com.bmd.jrt.builder.InputDeadlockException;
-import com.bmd.jrt.builder.RoutineChannelBuilder.OrderBy;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.OutputConsumer;
@@ -39,6 +38,7 @@ import javax.annotation.Nullable;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+import static com.bmd.jrt.builder.RoutineConfiguration.OrderBy;
 import static com.bmd.jrt.time.TimeDuration.ZERO;
 import static com.bmd.jrt.time.TimeDuration.fromUnit;
 

@@ -18,10 +18,7 @@ import com.bmd.jrt.annotation.Pass;
 import com.bmd.jrt.annotation.Timeout;
 import com.bmd.jrt.builder.InputDeadlockException;
 import com.bmd.jrt.builder.OutputDeadlockException;
-import com.bmd.jrt.builder.RoutineBuilder.TimeoutAction;
-import com.bmd.jrt.builder.RoutineChannelBuilder.OrderBy;
 import com.bmd.jrt.builder.RoutineConfiguration;
-import com.bmd.jrt.builder.RoutineConfigurationBuilder;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.OutputConsumer;
 import com.bmd.jrt.channel.ParameterChannel;
@@ -62,6 +59,13 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import static com.bmd.jrt.builder.RoutineConfiguration.OrderBy;
+import static com.bmd.jrt.builder.RoutineConfiguration.TimeoutAction;
+import static com.bmd.jrt.builder.RoutineConfiguration.builder;
+import static com.bmd.jrt.builder.RoutineConfiguration.onReadTimeout;
+import static com.bmd.jrt.builder.RoutineConfiguration.withCoreInvocations;
+import static com.bmd.jrt.builder.RoutineConfiguration.withLogLevel;
+import static com.bmd.jrt.builder.RoutineConfiguration.withReadTimeout;
 import static com.bmd.jrt.invocation.Invocations.factoryOf;
 import static com.bmd.jrt.invocation.Invocations.withArgs;
 import static com.bmd.jrt.routine.JRoutine.on;
@@ -259,7 +263,8 @@ public class RoutineTest extends TestCase {
                 };
 
         final Routine<String, String> routine3 =
-                on(factoryOf(closeInvocation)).withLogLevel(LogLevel.SILENT).buildRoutine();
+                on(factoryOf(closeInvocation)).withConfiguration(withLogLevel(LogLevel.SILENT))
+                                              .buildRoutine();
 
         assertThat(routine3.callAsync("test").afterMax(timeout).readAll()).isEmpty();
         semaphore.tryAcquire(1, 1, TimeUnit.SECONDS);
@@ -606,8 +611,9 @@ public class RoutineTest extends TestCase {
 
         final Routine<String, String> routine1 =
                 JRoutine.on(withArgs(TimeDuration.millis(10)).factoryOf(DelayedInvocation.class))
-                        .withInputOrder(OrderBy.INSERTION)
-                        .withOutputOrder(OrderBy.INSERTION)
+                        .withConfiguration(builder().withInputOrder(OrderBy.PASSING)
+                                                    .withOutputOrder(OrderBy.PASSING)
+                                                    .buildConfiguration())
                         .buildRoutine();
 
         startTime = System.currentTimeMillis();
@@ -643,8 +649,12 @@ public class RoutineTest extends TestCase {
 
         final Routine<String, String> routine3 = JRoutine.on(
                 withArgs(TimeDuration.millis(10), 2).factoryOf(DelayedListInvocation.class))
-                                                         .withInputOrder(OrderBy.INSERTION)
-                                                         .withOutputOrder(OrderBy.INSERTION)
+                                                         .withConfiguration(
+                                                                 builder().withInputOrder(
+                                                                         OrderBy.PASSING)
+                                                                          .withOutputOrder(
+                                                                                  OrderBy.PASSING)
+                                                                          .buildConfiguration())
                                                          .buildRoutine();
 
         startTime = System.currentTimeMillis();
@@ -679,8 +689,9 @@ public class RoutineTest extends TestCase {
 
         final Routine<String, String> routine5 =
                 JRoutine.on(withArgs(TimeDuration.ZERO, 2).factoryOf(DelayedListInvocation.class))
-                        .withInputOrder(OrderBy.INSERTION)
-                        .withOutputOrder(OrderBy.INSERTION)
+                        .withConfiguration(builder().withInputOrder(OrderBy.PASSING)
+                                                    .withOutputOrder(OrderBy.PASSING)
+                                                    .buildConfiguration())
                         .buildRoutine();
 
         startTime = System.currentTimeMillis();
@@ -715,8 +726,12 @@ public class RoutineTest extends TestCase {
 
         final Routine<String, String> routine7 = JRoutine.on(
                 withArgs(TimeDuration.millis(10)).factoryOf(DelayedChannelInvocation.class))
-                                                         .withInputOrder(OrderBy.INSERTION)
-                                                         .withOutputOrder(OrderBy.INSERTION)
+                                                         .withConfiguration(
+                                                                 builder().withInputOrder(
+                                                                         OrderBy.PASSING)
+                                                                          .withOutputOrder(
+                                                                                  OrderBy.PASSING)
+                                                                          .buildConfiguration())
                                                          .buildRoutine();
 
         startTime = System.currentTimeMillis();
@@ -751,8 +766,9 @@ public class RoutineTest extends TestCase {
 
         final Routine<String, String> routine9 =
                 JRoutine.on(withArgs(TimeDuration.ZERO).factoryOf(DelayedChannelInvocation.class))
-                        .withInputOrder(OrderBy.INSERTION)
-                        .withOutputOrder(OrderBy.INSERTION)
+                        .withConfiguration(builder().withInputOrder(OrderBy.PASSING)
+                                                    .withOutputOrder(OrderBy.PASSING)
+                                                    .buildConfiguration())
                         .buildRoutine();
 
         startTime = System.currentTimeMillis();
@@ -839,8 +855,9 @@ public class RoutineTest extends TestCase {
     public void testDestroy() {
 
         final TimeDuration timeout = seconds(1);
-        final Routine<String, String> routine1 =
-                JRoutine.on(factoryOf(TestDestroy.class)).withCoreInvocations(0).buildRoutine();
+        final Routine<String, String> routine1 = JRoutine.on(factoryOf(TestDestroy.class))
+                                                         .withConfiguration(withCoreInvocations(0))
+                                                         .buildRoutine();
         assertThat(routine1.callSync("1", "2", "3", "4", "5")
                            .afterMax(timeout)
                            .readAll()).containsOnly("1", "2", "3", "4", "5");
@@ -853,7 +870,7 @@ public class RoutineTest extends TestCase {
         assertThat(TestDestroy.getInstanceCount()).isZero();
 
         final Routine<String, String> routine2 = JRoutine.on(factoryOf(TestDiscardException.class))
-                                                         .withCoreInvocations(0)
+                                                         .withConfiguration(withCoreInvocations(0))
                                                          .buildRoutine();
         assertThat(routine2.callSync("1", "2", "3", "4", "5")
                            .afterMax(timeout)
@@ -925,10 +942,8 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            on(factoryOf(ConstructorException.class)).withLogLevel(LogLevel.SILENT)
-                                                     .buildRoutine()
-                                                     .callSync()
-                                                     .readAll();
+            on(factoryOf(ConstructorException.class)).withConfiguration(
+                    withLogLevel(LogLevel.SILENT)).buildRoutine().callSync().readAll();
 
             fail();
 
@@ -974,8 +989,7 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            new DefaultRoutine<Object, Object>(
-                    new RoutineConfigurationBuilder().buildConfiguration(), null);
+            new DefaultRoutine<Object, Object>(RoutineConfiguration.EMPTY_CONFIGURATION, null);
 
             fail();
 
@@ -987,9 +1001,10 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            final DefaultResultChannel<Object> channel = new DefaultResultChannel<Object>(
-                    new RoutineConfigurationBuilder().buildConfiguration(), new TestAbortHandler(),
-                    Runners.sequentialRunner(), logger);
+            final DefaultResultChannel<Object> channel =
+                    new DefaultResultChannel<Object>(RoutineConfiguration.EMPTY_CONFIGURATION,
+                                                     new TestAbortHandler(),
+                                                     Runners.sequentialRunner(), logger);
 
             new DefaultExecution<Object, Object>(null, new TestInputIterator(), channel, logger);
 
@@ -1001,9 +1016,10 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            final DefaultResultChannel<Object> channel = new DefaultResultChannel<Object>(
-                    new RoutineConfigurationBuilder().buildConfiguration(), new TestAbortHandler(),
-                    Runners.sequentialRunner(), logger);
+            final DefaultResultChannel<Object> channel =
+                    new DefaultResultChannel<Object>(RoutineConfiguration.EMPTY_CONFIGURATION,
+                                                     new TestAbortHandler(),
+                                                     Runners.sequentialRunner(), logger);
 
             new DefaultExecution<Object, Object>(new TestInvocationManager(), null, channel,
                                                  logger);
@@ -1027,9 +1043,10 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            final DefaultResultChannel<Object> channel = new DefaultResultChannel<Object>(
-                    new RoutineConfigurationBuilder().buildConfiguration(), new TestAbortHandler(),
-                    Runners.sequentialRunner(), logger);
+            final DefaultResultChannel<Object> channel =
+                    new DefaultResultChannel<Object>(RoutineConfiguration.EMPTY_CONFIGURATION,
+                                                     new TestAbortHandler(),
+                                                     Runners.sequentialRunner(), logger);
 
             new DefaultExecution<Object, Object>(new TestInvocationManager(),
                                                  new TestInputIterator(), channel, null);
@@ -1147,8 +1164,11 @@ public class RoutineTest extends TestCase {
     public void testInputTimeout() {
 
         final Routine<String, String> routine = JRoutine.on(PassingInvocation.<String>factoryOf())
-                                                        .withInputSize(1)
-                                                        .withInputTimeout(TimeDuration.ZERO)
+                                                        .withConfiguration(
+                                                                builder().withInputSize(1)
+                                                                         .withInputTimeout(
+                                                                                 TimeDuration.ZERO)
+                                                                         .buildConfiguration())
                                                         .buildRoutine();
 
         try {
@@ -1224,7 +1244,7 @@ public class RoutineTest extends TestCase {
 
         }
 
-        assertThat(on(testClass).withReadTimeout(timeout)
+        assertThat(on(testClass).withConfiguration(withReadTimeout(timeout))
                                 .buildProxy(TestInterfaceAsync.class)
                                 .take(77)).isEqualTo(77);
         assertThat(on(testClass).buildProxy(TestInterfaceAsync.class)
@@ -1233,13 +1253,16 @@ public class RoutineTest extends TestCase {
                                 .readNext()).isEqualTo(1);
 
         final TestInterfaceAsync testInterfaceAsync =
-                on(testClass).withReadTimeout(1, TimeUnit.SECONDS)
+                on(testClass).withConfiguration(withReadTimeout(1, TimeUnit.SECONDS))
                              .buildProxy(TestInterfaceAsync.class);
         assertThat(testInterfaceAsync.getInt(testInterfaceAsync.getOne())).isEqualTo(1);
     }
 
     public void testOutputTimeout() {
 
+        final RoutineConfiguration configuration = builder().withOutputSize(1)
+                                                            .withOutputTimeout(TimeDuration.ZERO)
+                                                            .buildConfiguration();
         final Routine<String, String> routine = JRoutine.on(withArgs(this).factoryOf(
                 ClassToken.tokenOf(new SingleCallInvocation<String, String>() {
 
@@ -1249,7 +1272,7 @@ public class RoutineTest extends TestCase {
 
                         result.pass(strings);
                     }
-                }))).withOutputSize(1).withOutputTimeout(TimeDuration.ZERO).buildRoutine();
+                }))).withConfiguration(configuration).buildRoutine();
 
         try {
 
@@ -1269,11 +1292,8 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            final RoutineConfiguration configuration =
-                    new RoutineConfigurationBuilder().buildConfiguration();
-
-            new DefaultParameterChannel<Object, Object>(configuration, null, Runners.sharedRunner(),
-                                                        logger);
+            new DefaultParameterChannel<Object, Object>(RoutineConfiguration.EMPTY_CONFIGURATION,
+                                                        null, Runners.sharedRunner(), logger);
 
             fail();
 
@@ -1283,11 +1303,8 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            final RoutineConfiguration configuration =
-                    new RoutineConfigurationBuilder().buildConfiguration();
-
-            new DefaultParameterChannel<Object, Object>(configuration, new TestInvocationManager(),
-                                                        null, logger);
+            new DefaultParameterChannel<Object, Object>(RoutineConfiguration.EMPTY_CONFIGURATION,
+                                                        new TestInvocationManager(), null, logger);
 
             fail();
 
@@ -1297,10 +1314,8 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            final RoutineConfiguration configuration =
-                    new RoutineConfigurationBuilder().buildConfiguration();
-
-            new DefaultParameterChannel<Object, Object>(configuration, new TestInvocationManager(),
+            new DefaultParameterChannel<Object, Object>(RoutineConfiguration.EMPTY_CONFIGURATION,
+                                                        new TestInvocationManager(),
                                                         Runners.sharedRunner(), null);
 
             fail();
@@ -1322,13 +1337,10 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            final RoutineConfiguration configuration =
-                    new RoutineConfigurationBuilder().buildConfiguration();
-
             final DefaultParameterChannel<Object, Object> channel =
-                    new DefaultParameterChannel<Object, Object>(configuration,
-                                                                new TestInvocationManager(),
-                                                                Runners.sharedRunner(), logger);
+                    new DefaultParameterChannel<Object, Object>(
+                            RoutineConfiguration.EMPTY_CONFIGURATION, new TestInvocationManager(),
+                            Runners.sharedRunner(), logger);
 
             channel.result();
             channel.pass("test");
@@ -1341,13 +1353,10 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            final RoutineConfiguration configuration =
-                    new RoutineConfigurationBuilder().buildConfiguration();
-
             final DefaultParameterChannel<Object, Object> channel =
-                    new DefaultParameterChannel<Object, Object>(configuration,
-                                                                new TestInvocationManager(),
-                                                                Runners.sharedRunner(), logger);
+                    new DefaultParameterChannel<Object, Object>(
+                            RoutineConfiguration.EMPTY_CONFIGURATION, new TestInvocationManager(),
+                            Runners.sharedRunner(), logger);
 
             channel.after(null);
 
@@ -1359,13 +1368,10 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            final RoutineConfiguration configuration =
-                    new RoutineConfigurationBuilder().buildConfiguration();
-
             final DefaultParameterChannel<Object, Object> channel =
-                    new DefaultParameterChannel<Object, Object>(configuration,
-                                                                new TestInvocationManager(),
-                                                                Runners.sharedRunner(), logger);
+                    new DefaultParameterChannel<Object, Object>(
+                            RoutineConfiguration.EMPTY_CONFIGURATION, new TestInvocationManager(),
+                            Runners.sharedRunner(), logger);
 
             channel.after(1, null);
 
@@ -1377,13 +1383,10 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            final RoutineConfiguration configuration =
-                    new RoutineConfigurationBuilder().buildConfiguration();
-
             final DefaultParameterChannel<Object, Object> channel =
-                    new DefaultParameterChannel<Object, Object>(configuration,
-                                                                new TestInvocationManager(),
-                                                                Runners.sharedRunner(), logger);
+                    new DefaultParameterChannel<Object, Object>(
+                            RoutineConfiguration.EMPTY_CONFIGURATION, new TestInvocationManager(),
+                            Runners.sharedRunner(), logger);
 
             channel.after(-1, TimeUnit.MILLISECONDS);
 
@@ -1422,10 +1425,8 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            final RoutineConfiguration configuration =
-                    new RoutineConfigurationBuilder().buildConfiguration();
-
-            new DefaultResultChannel<Object>(configuration, null, Runners.sharedRunner(), logger);
+            new DefaultResultChannel<Object>(RoutineConfiguration.EMPTY_CONFIGURATION, null,
+                                             Runners.sharedRunner(), logger);
 
             fail();
 
@@ -1435,10 +1436,8 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            final RoutineConfiguration configuration =
-                    new RoutineConfigurationBuilder().buildConfiguration();
-
-            new DefaultResultChannel<Object>(configuration, new TestAbortHandler(), null, logger);
+            new DefaultResultChannel<Object>(RoutineConfiguration.EMPTY_CONFIGURATION,
+                                             new TestAbortHandler(), null, logger);
 
             fail();
 
@@ -1448,11 +1447,8 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            final RoutineConfiguration configuration =
-                    new RoutineConfigurationBuilder().buildConfiguration();
-
-            new DefaultResultChannel<Object>(configuration, new TestAbortHandler(),
-                                             Runners.sharedRunner(), null);
+            new DefaultResultChannel<Object>(RoutineConfiguration.EMPTY_CONFIGURATION,
+                                             new TestAbortHandler(), Runners.sharedRunner(), null);
 
             fail();
 
@@ -1462,11 +1458,9 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            final RoutineConfiguration configuration =
-                    new RoutineConfigurationBuilder().buildConfiguration();
-
-            new DefaultResultChannel<Object>(configuration, new TestAbortHandler(),
-                                             Runners.sharedRunner(), logger).after(null);
+            new DefaultResultChannel<Object>(RoutineConfiguration.EMPTY_CONFIGURATION,
+                                             new TestAbortHandler(), Runners.sharedRunner(), logger)
+                    .after(null);
 
             fail();
 
@@ -1476,11 +1470,9 @@ public class RoutineTest extends TestCase {
 
         try {
 
-            final RoutineConfiguration configuration =
-                    new RoutineConfigurationBuilder().buildConfiguration();
-
-            new DefaultResultChannel<Object>(configuration, new TestAbortHandler(),
-                                             Runners.sharedRunner(), logger).after(0, null);
+            new DefaultResultChannel<Object>(RoutineConfiguration.EMPTY_CONFIGURATION,
+                                             new TestAbortHandler(), Runners.sharedRunner(), logger)
+                    .after(0, null);
 
             fail();
 
@@ -1489,13 +1481,11 @@ public class RoutineTest extends TestCase {
         }
 
         try {
-
-            final RoutineConfiguration configuration =
-                    new RoutineConfigurationBuilder().buildConfiguration();
 
             final DefaultResultChannel<Object> channel =
-                    new DefaultResultChannel<Object>(configuration, new TestAbortHandler(),
-                                                     Runners.sharedRunner(), logger);
+                    new DefaultResultChannel<Object>(RoutineConfiguration.EMPTY_CONFIGURATION,
+                                                     new TestAbortHandler(), Runners.sharedRunner(),
+                                                     logger);
 
             channel.after(-1, TimeUnit.MILLISECONDS);
 
@@ -1507,7 +1497,7 @@ public class RoutineTest extends TestCase {
 
         final Routine<String, String> routine =
                 JRoutine.on(withArgs(TimeDuration.ZERO).factoryOf(DelayedInvocation.class))
-                        .withLogLevel(LogLevel.SILENT)
+                        .withConfiguration(withLogLevel(LogLevel.SILENT))
                         .buildRoutine();
         final OutputChannel<String> channel = routine.callSync();
 
@@ -1585,7 +1575,7 @@ public class RoutineTest extends TestCase {
 
         final Routine<String, String> routine1 =
                 JRoutine.on(withArgs(millis(100)).factoryOf(DelayedInvocation.class))
-                        .withLogLevel(LogLevel.SILENT)
+                        .withConfiguration(withLogLevel(LogLevel.SILENT))
                         .buildRoutine();
         final Iterator<String> iterator =
                 routine1.callSync("test").afterMax(millis(500)).eventuallyExit().iterator();
@@ -1693,8 +1683,8 @@ public class RoutineTest extends TestCase {
     public void testTimeoutActions() {
 
         final Routine<String, String> routine1 =
-                on(withArgs(seconds(1)).factoryOf(DelayedInvocation.class)).onReadTimeout(
-                        TimeoutAction.ABORT).buildRoutine();
+                on(withArgs(seconds(1)).factoryOf(DelayedInvocation.class)).withConfiguration(
+                        onReadTimeout(TimeoutAction.ABORT)).buildRoutine();
 
         try {
 
@@ -1750,8 +1740,10 @@ public class RoutineTest extends TestCase {
         assertThat(routine1.callAsync("test1").checkComplete()).isFalse();
 
         final Routine<String, String> routine2 =
-                on(withArgs(seconds(1)).factoryOf(DelayedInvocation.class)).onReadTimeout(
-                        TimeoutAction.ABORT).withReadTimeout(millis(10)).buildRoutine();
+                on(withArgs(seconds(1)).factoryOf(DelayedInvocation.class)).withConfiguration(
+                        builder().onReadTimeout(TimeoutAction.ABORT)
+                                 .withReadTimeout(millis(10))
+                                 .buildConfiguration()).buildRoutine();
 
         try {
 
@@ -1807,8 +1799,8 @@ public class RoutineTest extends TestCase {
         assertThat(routine2.callAsync("test1").checkComplete()).isFalse();
 
         final Routine<String, String> routine3 =
-                on(withArgs(seconds(1)).factoryOf(DelayedInvocation.class)).onReadTimeout(
-                        TimeoutAction.DEADLOCK).buildRoutine();
+                on(withArgs(seconds(1)).factoryOf(DelayedInvocation.class)).withConfiguration(
+                        onReadTimeout(TimeoutAction.DEADLOCK)).buildRoutine();
         final OutputChannel<String> channel3 = routine3.callAsync("test1");
 
         try {
@@ -1920,8 +1912,8 @@ public class RoutineTest extends TestCase {
         assertThat(channel3.checkComplete()).isFalse();
 
         final Routine<String, String> routine4 =
-                on(withArgs(seconds(1)).factoryOf(DelayedInvocation.class)).onReadTimeout(
-                        TimeoutAction.EXIT).buildRoutine();
+                on(withArgs(seconds(1)).factoryOf(DelayedInvocation.class)).withConfiguration(
+                        onReadTimeout(TimeoutAction.EXIT)).buildRoutine();
         final OutputChannel<String> channel4 = routine4.callAsync("test1");
 
         try {

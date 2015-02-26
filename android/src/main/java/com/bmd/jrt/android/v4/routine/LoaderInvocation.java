@@ -28,7 +28,8 @@ import com.bmd.jrt.android.builder.AndroidRoutineBuilder.ClashResolution;
 import com.bmd.jrt.android.builder.InputClashException;
 import com.bmd.jrt.android.builder.InvocationClashException;
 import com.bmd.jrt.android.invocation.AndroidInvocation;
-import com.bmd.jrt.builder.RoutineChannelBuilder.OrderBy;
+import com.bmd.jrt.builder.RoutineConfiguration;
+import com.bmd.jrt.builder.RoutineConfiguration.OrderBy;
 import com.bmd.jrt.channel.InputChannel;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ResultChannel;
@@ -53,6 +54,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
+import static com.bmd.jrt.builder.RoutineConfiguration.builder;
 
 /**
  * Invocation implementation employing loaders to perform background operations.
@@ -457,12 +460,14 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
             final RoutineLoader<?, OUTPUT> internalLoader = mLoader;
             final ArrayList<StandaloneInput<OUTPUT>> channels = mNewChannels;
-            final StandaloneChannel<OUTPUT> channel = JRoutine.standalone()
-                                                              .withMaxSize(Integer.MAX_VALUE)
-                                                              .withBufferTimeout(TimeDuration.ZERO)
-                                                              .withLog(logger.getLog())
-                                                              .withLogLevel(logger.getLogLevel())
-                                                              .buildChannel();
+            final RoutineConfiguration configuration = builder().withOutputSize(Integer.MAX_VALUE)
+                                                                .withOutputTimeout(
+                                                                        TimeDuration.ZERO)
+                                                                .withLog(logger.getLog())
+                                                                .withLogLevel(logger.getLogLevel())
+                                                                .buildConfiguration();
+            final StandaloneChannel<OUTPUT> channel =
+                    JRoutine.standalone().withConfiguration(configuration).buildChannel();
             channels.add(channel.input());
             internalLoader.setInvocationCount(
                     Math.max(channels.size(), internalLoader.getInvocationCount()));

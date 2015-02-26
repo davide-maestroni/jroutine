@@ -22,11 +22,10 @@ import com.bmd.jrt.android.builder.AndroidChannelBuilder;
 import com.bmd.jrt.android.builder.AndroidRoutineBuilder;
 import com.bmd.jrt.android.builder.AndroidRoutineBuilder.CacheStrategy;
 import com.bmd.jrt.android.builder.AndroidRoutineBuilder.ClashResolution;
-import com.bmd.jrt.builder.RoutineConfigurationBuilder;
+import com.bmd.jrt.builder.RoutineBuilder;
+import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.common.ClassToken;
-import com.bmd.jrt.log.Log;
-import com.bmd.jrt.log.Log.LogLevel;
 
 import java.lang.ref.WeakReference;
 
@@ -41,13 +40,13 @@ import javax.annotation.Nullable;
 @TargetApi(VERSION_CODES.HONEYCOMB)
 class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
 
-    private final RoutineConfigurationBuilder mBuilder = new RoutineConfigurationBuilder();
-
     private final WeakReference<Object> mContext;
 
     private final int mLoaderId;
 
     private CacheStrategy mCacheStrategy;
+
+    private RoutineConfiguration mConfiguration;
 
     /**
      * Constructor.
@@ -125,7 +124,7 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
                     "invalid context type: " + context.getClass().getCanonicalName());
         }
 
-        return builder.apply(mBuilder.buildConfiguration())
+        return builder.withConfiguration(mConfiguration)
                       .onClash(ClashResolution.KEEP_THAT)
                       .onComplete(mCacheStrategy)
                       .buildRoutine()
@@ -140,19 +139,17 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
         return this;
     }
 
+    /**
+     * Note that only the options related to logs will be employed.
+     *
+     * @param configuration the configuration.
+     * @return this builder.
+     */
     @Nonnull
     @Override
-    public AndroidChannelBuilder withLog(@Nullable final Log log) {
+    public RoutineBuilder withConfiguration(@Nullable final RoutineConfiguration configuration) {
 
-        mBuilder.withLog(log);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public AndroidChannelBuilder withLogLevel(@Nullable final LogLevel level) {
-
-        mBuilder.withLogLevel(level);
+        mConfiguration = configuration;
         return this;
     }
 

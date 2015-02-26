@@ -18,7 +18,6 @@ import com.bmd.jrt.annotation.Share;
 import com.bmd.jrt.annotation.Timeout;
 import com.bmd.jrt.builder.RoutineBuilder;
 import com.bmd.jrt.builder.RoutineConfiguration;
-import com.bmd.jrt.builder.RoutineConfigurationBuilder;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.common.CacheHashMap;
 import com.bmd.jrt.common.InvocationException;
@@ -27,9 +26,6 @@ import com.bmd.jrt.common.RoutineException;
 import com.bmd.jrt.invocation.InvocationFactory;
 import com.bmd.jrt.invocation.Invocations;
 import com.bmd.jrt.invocation.SingleCallInvocation;
-import com.bmd.jrt.log.Log;
-import com.bmd.jrt.log.Log.LogLevel;
-import com.bmd.jrt.runner.Runner;
 import com.bmd.jrt.time.TimeDuration;
 
 import java.lang.ref.WeakReference;
@@ -43,11 +39,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import static com.bmd.jrt.builder.RoutineConfiguration.Builder;
 import static com.bmd.jrt.common.Reflection.boxingClass;
 
 /**
@@ -71,8 +67,6 @@ public class ClassRoutineBuilder implements RoutineBuilder {
             sRoutineCache =
             new CacheHashMap<Object, HashMap<RoutineInfo, Routine<Object, Object>>>();
 
-    private final RoutineConfigurationBuilder mBuilder = new RoutineConfigurationBuilder();
-
     private final HashMap<String, Method> mMethodMap = new HashMap<String, Method>();
 
     private final Object mTarget;
@@ -80,6 +74,8 @@ public class ClassRoutineBuilder implements RoutineBuilder {
     private final Class<?> mTargetClass;
 
     private final WeakReference<?> mTargetReference;
+
+    private RoutineConfiguration mConfiguration;
 
     private String mShareGroup;
 
@@ -142,104 +138,6 @@ public class ClassRoutineBuilder implements RoutineBuilder {
         mTarget = null;
         mTargetReference = targetReference;
         fillMethodMap(false);
-    }
-
-    @Nonnull
-    @Override
-    public ClassRoutineBuilder apply(@Nonnull final RoutineConfiguration configuration) {
-
-        mBuilder.apply(configuration);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ClassRoutineBuilder onReadTimeout(@Nullable final TimeoutAction action) {
-
-        mBuilder.onReadTimeout(action);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ClassRoutineBuilder withAvailableTimeout(final long timeout,
-            @Nonnull final TimeUnit timeUnit) {
-
-        mBuilder.withAvailableTimeout(timeout, timeUnit);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ClassRoutineBuilder withAvailableTimeout(@Nullable final TimeDuration timeout) {
-
-        mBuilder.withAvailableTimeout(timeout);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ClassRoutineBuilder withCoreInvocations(final int coreInvocations) {
-
-        mBuilder.withCoreInvocations(coreInvocations);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ClassRoutineBuilder withLog(@Nullable final Log log) {
-
-        mBuilder.withLog(log);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ClassRoutineBuilder withLogLevel(@Nullable final LogLevel level) {
-
-        mBuilder.withLogLevel(level);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ClassRoutineBuilder withMaxInvocations(final int maxInvocations) {
-
-        mBuilder.withMaxInvocations(maxInvocations);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ClassRoutineBuilder withReadTimeout(final long timeout,
-            @Nonnull final TimeUnit timeUnit) {
-
-        mBuilder.withReadTimeout(timeout, timeUnit);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ClassRoutineBuilder withReadTimeout(@Nullable final TimeDuration timeout) {
-
-        mBuilder.withReadTimeout(timeout);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ClassRoutineBuilder withRunner(@Nullable final Runner runner) {
-
-        mBuilder.withRunner(runner);
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ClassRoutineBuilder withSyncRunner(@Nullable final RunnerType type) {
-
-        mBuilder.withSyncRunner(type);
-        return this;
     }
 
     /**
@@ -332,7 +230,22 @@ public class ClassRoutineBuilder implements RoutineBuilder {
     @Nonnull
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final Method method) {
 
-        return method(mBuilder.buildConfiguration(), mShareGroup, method);
+        return method(RoutineConfiguration.notNull(mConfiguration), mShareGroup, method);
+    }
+
+    /**
+     * Note that all the options related to the output and input channels will be ignored.
+     *
+     * @param configuration the configuration.
+     * @return this builder.
+     */
+    @Nonnull
+    @Override
+    public ClassRoutineBuilder withConfiguration(
+            @Nullable final RoutineConfiguration configuration) {
+
+        mConfiguration = configuration;
+        return this;
     }
 
     /**
@@ -363,14 +276,14 @@ public class ClassRoutineBuilder implements RoutineBuilder {
     }
 
     /**
-     * Returns the internal configurator builder.
+     * Returns the internal configurator.
      *
-     * @return the configurator builder.
+     * @return the configurator.
      */
-    @Nonnull
-    protected RoutineConfigurationBuilder getBuilder() {
+    @Nullable
+    protected RoutineConfiguration getConfiguration() {
 
-        return mBuilder;
+        return mConfiguration;
     }
 
     /**
@@ -524,7 +437,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
             @Nonnull final Method targetMethod) {
 
         String methodShareGroup = shareGroup;
-        final RoutineConfigurationBuilder builder = new RoutineConfigurationBuilder();
+        final Builder builder = RoutineConfiguration.builderFrom(configuration);
         final Share shareAnnotation = targetMethod.getAnnotation(Share.class);
 
         if (shareAnnotation != null) {
@@ -537,8 +450,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
             }
         }
 
-        builder.apply(configuration)
-               .withInputSize(Integer.MAX_VALUE)
+        builder.withInputSize(Integer.MAX_VALUE)
                .withInputTimeout(TimeDuration.ZERO)
                .withOutputSize(Integer.MAX_VALUE)
                .withOutputTimeout(TimeDuration.ZERO);

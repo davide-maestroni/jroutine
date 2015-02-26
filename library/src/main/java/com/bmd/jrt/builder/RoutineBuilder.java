@@ -64,7 +64,7 @@ public interface RoutineBuilder {
      * Note that the configuration options not supported by the builder implementation may be
      * ignored.
      *
-     * @param configuration the configuration.
+     * @param configuration the routine configuration.
      * @return this builder.
      */
     @Nonnull

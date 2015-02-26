@@ -236,7 +236,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
     /**
      * Note that all the options related to the output and input channels will be ignored.
      *
-     * @param configuration the configuration.
+     * @param configuration the routine configuration.
      * @return this builder.
      */
     @Nonnull

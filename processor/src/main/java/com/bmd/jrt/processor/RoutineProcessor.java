@@ -437,7 +437,7 @@ public class RoutineProcessor extends AbstractProcessor {
             if (!DEBUG) {
 
                 final JavaFileObject sourceFile =
-                        filer.createSourceFile(packageName + "." + interfaceName + "$$Wrapper");
+                        filer.createSourceFile(packageName + ".JRoutine_" + interfaceName);
                 writer = sourceFile.openWriter();
 
             } else {

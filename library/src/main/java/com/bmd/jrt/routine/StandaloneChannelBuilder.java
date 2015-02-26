@@ -51,7 +51,7 @@ public class StandaloneChannelBuilder implements RoutineBuilder {
      * Note that only options related to the output channel, the asynchronous runner and the logs
      * will be employed.
      *
-     * @param configuration the configuration.
+     * @param configuration the routine configuration.
      * @return this builder.
      */
     @Nonnull

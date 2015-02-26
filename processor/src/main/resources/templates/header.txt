@@ -16,15 +16,15 @@
 
 package ${packageName};
 
-public final class ${interfaceName}$$Wrapper${genericTypes} implements ${interfaceFullName} {
-
-    private final String mShareGroup;
+public final class JRoutine_${interfaceName}${genericTypes} implements ${interfaceFullName} {
 
     private final com.bmd.jrt.common.CacheHashMap<Object, java.util.Map<String, Object>> mMutexMap;
 
+    private final String mShareGroup;
+
     private final java.lang.ref.WeakReference<${classFullName}> mWrapped;
 
-    public ${interfaceName}$$Wrapper(final ${classFullName} wrapped,
+    public JRoutine_${interfaceName}(final ${classFullName} wrapped,
             final com.bmd.jrt.common.CacheHashMap<Object, java.util.Map<String, Object>> mutexMap,
             final String shareGroup, final com.bmd.jrt.builder.RoutineConfiguration configuration) {
 
@@ -42,6 +42,39 @@ public final class ${interfaceName}$$Wrapper${genericTypes} implements ${interfa
         mMutexMap = mutexMap;
         mShareGroup = (shareGroup != null) ? shareGroup : com.bmd.jrt.annotation.Share.ALL;
         ${routineFieldsInit}
+    }
+
+    @javax.annotation.Nonnull
+    public static com.bmd.jrt.routine.WrapperBuilder<${interfaceFullName}> on(final ${classFullName} wrapped) {
+
+        final com.bmd.jrt.common.ClassToken token = new com.bmd.jrt.common.ClassToken<${interfaceFullName}>() {};
+
+        return new com.bmd.jrt.routine.WrapperBuilder<${interfaceFullName}>() {
+
+            @javax.annotation.Nonnull
+            @Override
+            protected ${interfaceFullName} createInstance(@javax.annotation.Nonnull final Object target,
+                    @javax.annotation.Nonnull final com.bmd.jrt.common.CacheHashMap<Object, java.util.Map<String, Object>> mutexMap,
+                    @javax.annotation.Nonnull final String shareGroup,
+                    @javax.annotation.Nonnull final com.bmd.jrt.builder.RoutineConfiguration configuration) {
+
+                return new JRoutine_${interfaceName}(wrapped, mutexMap, shareGroup, configuration);
+            }
+
+            @javax.annotation.Nonnull
+            @Override
+            protected Object getTarget() {
+
+                return wrapped;
+            }
+
+            @javax.annotation.Nonnull
+            @Override
+            protected Class<${interfaceFullName}> getWrapperClass() {
+
+                return token.getRawClass();
+            }
+        };
     }
 
     private Object getMutex(final String shareGroup) {

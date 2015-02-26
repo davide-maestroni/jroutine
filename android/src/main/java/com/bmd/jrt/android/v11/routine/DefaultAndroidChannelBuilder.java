@@ -142,7 +142,7 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
     /**
      * Note that only the options related to logs will be employed.
      *
-     * @param configuration the configuration.
+     * @param configuration the routine configuration.
      * @return this builder.
      */
     @Nonnull

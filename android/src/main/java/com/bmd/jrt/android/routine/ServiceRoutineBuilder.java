@@ -108,7 +108,7 @@ public class ServiceRoutineBuilder<INPUT, OUTPUT> implements RoutineBuilder {
      * Note that all the options related to the output and input channels size and timeout will be
      * ignored.
      *
-     * @param configuration the configuration.
+     * @param configuration the routine configuration.
      * @return this builder.
      */
     @Nonnull

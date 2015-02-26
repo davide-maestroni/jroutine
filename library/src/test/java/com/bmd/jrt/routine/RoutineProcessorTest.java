@@ -56,7 +56,6 @@ public class RoutineProcessorTest extends TestCase {
         assertThat(testWrapper.getOne().readNext()).isEqualTo(1);
     }
 
-    @SuppressWarnings("unchecked")
     public void testWrapper() {
 
         final NullLog log = new NullLog();
@@ -72,6 +71,50 @@ public class RoutineProcessorTest extends TestCase {
                                                                             .buildConfiguration())
                                                 .buildWrapper(ClassToken.tokenOf(TestWrapper
                                                                                          .class));
+
+        assertThat(testWrapper.getOne().readNext()).isEqualTo(1);
+        assertThat(testWrapper.getString(1, 2, 3)).isIn("1", "2", "3");
+        assertThat(testWrapper.getString(new HashSet<Integer>(Arrays.asList(1, 2, 3)))
+                              .readAll()).containsOnly("1", "2", "3");
+        assertThat(testWrapper.getString(Arrays.asList(1, 2, 3))).containsOnly("1", "2", "3");
+        assertThat(testWrapper.getString((Iterable<Integer>) Arrays.asList(1, 2, 3))).containsOnly(
+                "1", "2", "3");
+        assertThat(
+                testWrapper.getString((Collection<Integer>) Arrays.asList(1, 2, 3))).containsOnly(
+                "1", "2", "3");
+
+        final ArrayList<String> list = new ArrayList<String>();
+        assertThat(testWrapper.getList(Arrays.asList(list))).containsExactly(list);
+
+        final StandaloneChannel<Integer> standaloneChannel = JRoutine.standalone().buildChannel();
+        standaloneChannel.input().pass(3).close();
+        assertThat(testWrapper.getString(standaloneChannel.output())).isEqualTo("3");
+
+        assertThat(JRoutine.on(testClass)
+                           .withConfiguration(builder().withSyncRunner(RunnerType.SEQUENTIAL)
+                                                       .withRunner(runner)
+                                                       .withLogLevel(LogLevel.DEBUG)
+                                                       .withLog(log)
+                                                       .buildConfiguration())
+                           .buildWrapper(ClassToken.tokenOf(TestWrapper.class))).isSameAs(
+                testWrapper);
+    }
+
+    public void testWrapperBuilder() {
+
+        final NullLog log = new NullLog();
+        final Runner runner = Runners.poolRunner();
+        final TestClass testClass = new TestClass();
+        final TestWrapper testWrapper = JRoutine_TestWrapper.on(testClass)
+                                                            .withConfiguration(
+                                                                    builder().withSyncRunner(
+                                                                            RunnerType.SEQUENTIAL)
+                                                                             .withRunner(runner)
+                                                                             .withLogLevel(
+                                                                                     LogLevel.DEBUG)
+                                                                             .withLog(log)
+                                                                             .buildConfiguration())
+                                                            .buildWrapper();
 
         assertThat(testWrapper.getOne().readNext()).isEqualTo(1);
         assertThat(testWrapper.getString(1, 2, 3)).isIn("1", "2", "3");

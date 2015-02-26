@@ -151,7 +151,7 @@ public class RoutineConfiguration {
     /**
      * Returns the specified configuration or the empty one if the former is null.
      *
-     * @param configuration the configuration.
+     * @param configuration the routine configuration.
      * @return the configuration.
      */
     @Nonnull
@@ -888,7 +888,7 @@ public class RoutineConfiguration {
         /**
          * Applies the specified configuration to this builder.
          *
-         * @param configuration the configuration.
+         * @param configuration the routine configuration.
          * @return this builder.
          * @throws java.lang.NullPointerException if the specified configuration is null.
          */

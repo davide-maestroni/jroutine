@@ -36,6 +36,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -60,9 +61,6 @@ import static com.bmd.jrt.time.TimeDuration.fromUnit;
  * @see com.bmd.jrt.annotation.Wrap
  */
 public class ObjectRoutineBuilder extends ClassRoutineBuilder {
-
-    public static final CacheHashMap<Object, HashMap<ClassInfo, Object>> sClassMap =
-            new CacheHashMap<Object, HashMap<ClassInfo, Object>>();
 
     private static final CacheHashMap<Object, HashMap<Method, Method>> sMethodCache =
             new CacheHashMap<Object, HashMap<Method, Method>>();
@@ -507,74 +505,23 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     @Nonnull
     public <CLASS> CLASS buildWrapper(@Nonnull final Class<CLASS> itf) {
 
-        //TODO: avoid reflection...
-
         if (!itf.isInterface()) {
 
             throw new IllegalArgumentException(
                     "the specified class is not an interface: " + itf.getCanonicalName());
         }
 
-        synchronized (sClassMap) {
+        final WeakReference<?> targetReference = getTargetReference();
+        final Object target = (targetReference != null) ? targetReference.get() : getTarget();
 
-            final WeakReference<?> targetReference = getTargetReference();
-            final Object target = (targetReference != null) ? targetReference.get() : getTarget();
+        if (target == null) {
 
-            if (target == null) {
-
-                throw new IllegalStateException("target object has been destroyed");
-            }
-
-            final CacheHashMap<Object, HashMap<ClassInfo, Object>> classMap = sClassMap;
-            HashMap<ClassInfo, Object> classes = classMap.get(target);
-
-            if (classes == null) {
-
-                classes = new HashMap<ClassInfo, Object>();
-                classMap.put(target, classes);
-            }
-
-            final String shareGroup = getShareGroup();
-            final String classShareGroup = (shareGroup != null) ? shareGroup : Share.ALL;
-            final RoutineConfiguration configuration =
-                    RoutineConfiguration.notNull(getConfiguration());
-            final ClassInfo classInfo = new ClassInfo(configuration, itf, classShareGroup);
-            Object instance = classes.get(classInfo);
-
-            if (instance != null) {
-
-                return itf.cast(instance);
-            }
-
-            try {
-
-                final Package classPackage = itf.getPackage();
-                final String packageName =
-                        (classPackage != null) ? classPackage.getName() + "." : "";
-                final String className = packageName + itf.getSimpleName() + "$$Wrapper";
-                final Class<?> wrapperClass = Class.forName(className);
-                final Constructor<?> constructor =
-                        findConstructor(wrapperClass, target, sMutexCache, classShareGroup,
-                                        configuration);
-
-                synchronized (sMutexCache) {
-
-                    instance = constructor.newInstance(target, sMutexCache, classShareGroup,
-                                                       configuration);
-                }
-
-                classes.put(classInfo, instance);
-                return itf.cast(instance);
-
-            } catch (final InstantiationException e) {
-
-                throw new IllegalArgumentException(e.getCause());
-
-            } catch (final Throwable t) {
-
-                throw new IllegalArgumentException(t);
-            }
+            throw new IllegalStateException("target object has been destroyed");
         }
+
+        return new ObjectWrapperBuilder<CLASS>(target, itf).withConfiguration(getConfiguration())
+                                                           .withShareGroup(getShareGroup())
+                                                           .buildWrapper();
     }
 
     /**
@@ -606,7 +553,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     /**
      * Note that all the options related to the output and input channels will be ignored.
      *
-     * @param configuration the configuration.
+     * @param configuration the routine configuration.
      * @return this builder.
      */
     @Nonnull
@@ -667,58 +614,71 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     }
 
     /**
-     * Class used as key to identify a specific wrapper instance.
+     * Wrapper builder implementation.
+     *
+     * @param <CLASS> the interface type.
      */
-    private static class ClassInfo {
+    private static class ObjectWrapperBuilder<CLASS> extends WrapperBuilder<CLASS> {
 
-        private final RoutineConfiguration mConfiguration;
+        private final Object mTarget;
 
-        private final Class<?> mItf;
-
-        private final String mShareGroup;
+        private final Class<CLASS> mWrapperClass;
 
         /**
          * Constructor.
          *
-         * @param configuration the routine configuration.
-         * @param itf           the wrapper interface.
-         * @param shareGroup    the group name.
+         * @param target       the target object instance.
+         * @param wrapperClass the wrapper class.
          */
-        private ClassInfo(@Nonnull final RoutineConfiguration configuration,
-                @Nonnull final Class<?> itf, @Nonnull final String shareGroup) {
+        private ObjectWrapperBuilder(@Nonnull final Object target,
+                @Nonnull final Class<CLASS> wrapperClass) {
 
-            mConfiguration = configuration;
-            mItf = itf;
-            mShareGroup = shareGroup;
+            mTarget = target;
+            mWrapperClass = wrapperClass;
         }
 
+        @Nonnull
         @Override
-        public int hashCode() {
+        protected CLASS createInstance(@Nonnull final Object target,
+                @Nonnull final CacheHashMap<Object, Map<String, Object>> mutexMap,
+                @Nonnull final String shareGroup,
+                @Nonnull final RoutineConfiguration configuration) {
 
-            // auto-generated code
-            int result = mConfiguration.hashCode();
-            result = 31 * result + mItf.hashCode();
-            result = 31 * result + mShareGroup.hashCode();
-            return result;
+            try {
+
+                final Class<CLASS> wrapperClass = mWrapperClass;
+                final Package classPackage = wrapperClass.getPackage();
+                final String packageName =
+                        (classPackage != null) ? classPackage.getName() + "." : "";
+                final String className = packageName + "JRoutine_" + wrapperClass.getSimpleName();
+                final Constructor<?> constructor =
+                        findConstructor(Class.forName(className), target, mutexMap, shareGroup,
+                                        configuration);
+                return wrapperClass.cast(
+                        constructor.newInstance(target, mutexMap, shareGroup, configuration));
+
+            } catch (final InstantiationException e) {
+
+                throw new IllegalArgumentException(e.getCause());
+
+            } catch (final Throwable t) {
+
+                throw new IllegalArgumentException(t);
+            }
         }
 
+        @Nonnull
         @Override
-        public boolean equals(final Object o) {
+        protected Object getTarget() {
 
-            // auto-generated code
-            if (this == o) {
+            return mTarget;
+        }
 
-                return true;
-            }
+        @Nonnull
+        @Override
+        protected Class<CLASS> getWrapperClass() {
 
-            if (!(o instanceof ClassInfo)) {
-
-                return false;
-            }
-
-            final ClassInfo that = (ClassInfo) o;
-            return mConfiguration.equals(that.mConfiguration) && mItf.equals(that.mItf)
-                    && mShareGroup.equals(that.mShareGroup);
+            return mWrapperClass;
         }
     }
 

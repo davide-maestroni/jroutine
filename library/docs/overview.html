@@ -105,8 +105,8 @@ Parallel programming on the go.
 
             public static void main(final String[] args) {
 
-                final ClassRoutineBuilder builder =
-                        on(Main.class).withShareGroup(Share.NONE).withReadTimeout(TimeDuration.INFINITY);
+                final ClassRoutineBuilder builder = on(Main.class).withShareGroup(Share.NONE)
+                                                                  .withConfiguration(withReadTimeout(TimeDuration.INFINITY));
                 final Routine&lt;String, Integer&gt; parseRoutine = builder.boundMethod(PARSE);
                 final Routine&lt;Integer, Integer&gt; squareRoutine = builder.boundMethod(SQUARE);
                 final Routine&lt;List&lt;Integer&gt;, Double&gt; meanRoutine = builder.boundMethod(MEAN);
@@ -163,7 +163,7 @@ Parallel programming on the go.
             public static void main(final String[] args) {
 
                 final AsyncMain proxy = on(new Main()).withShareGroup(Share.NONE)
-                                                      .withReadTimeout(TimeDuration.INFINITY)
+                                                      .withConfiguration(withReadTimeout(TimeDuration.INFINITY))
                                                       .buildProxy(AsyncMain.class);
                 final double rms = proxy.squareRootMean(proxy.square(proxy.parseArg(args)));
 
@@ -226,7 +226,7 @@ Parallel programming on the go.
             public static void main(final String[] args) {
 
                 final AsyncMain wrapper = on(new Main()).withShareGroup(Share.NONE)
-                                                        .withReadTimeout(TimeDuration.INFINITY)
+                                                        .withConfiguration(withReadTimeout(TimeDuration.INFINITY))
                                                         .buildWrapper(AsyncMain.class);
                 final double rms = wrapper.squareRootMean(wrapper.square(wrapper.parseArg(args)));
 

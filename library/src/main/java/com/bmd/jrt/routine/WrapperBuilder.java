@@ -87,7 +87,7 @@ public abstract class WrapperBuilder<CLASS> implements RoutineBuilder {
             try {
 
                 final CLASS newInstance =
-                        createInstance(target, sMutexCache, classShareGroup, configuration);
+                        createInstance(sMutexCache, classShareGroup, configuration);
                 classes.put(classInfo, newInstance);
                 return newInstance;
 
@@ -130,14 +130,13 @@ public abstract class WrapperBuilder<CLASS> implements RoutineBuilder {
     /**
      * Creates and return a new wrapper instance.
      *
-     * @param target        the target object.
      * @param mutexMap      the map of mutexes used to synchronize the method invocations.
      * @param shareGroup    the share group name.
      * @param configuration the routine configuration.
      * @return the wrapper instance.
      */
     @Nonnull
-    protected abstract CLASS createInstance(@Nonnull final Object target,
+    protected abstract CLASS createInstance(
             @Nonnull final CacheHashMap<Object, Map<String, Object>> mutexMap,
             @Nonnull final String shareGroup, @Nonnull final RoutineConfiguration configuration);
 

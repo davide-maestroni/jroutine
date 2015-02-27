@@ -47,34 +47,7 @@ public final class JRoutine_${interfaceName}${genericTypes} implements ${interfa
     @javax.annotation.Nonnull
     public static com.bmd.jrt.routine.WrapperBuilder<${interfaceFullName}> on(final ${classFullName} wrapped) {
 
-        final com.bmd.jrt.common.ClassToken token = new com.bmd.jrt.common.ClassToken<${interfaceFullName}>() {};
-
-        return new com.bmd.jrt.routine.WrapperBuilder<${interfaceFullName}>() {
-
-            @javax.annotation.Nonnull
-            @Override
-            protected ${interfaceFullName} createInstance(@javax.annotation.Nonnull final Object target,
-                    @javax.annotation.Nonnull final com.bmd.jrt.common.CacheHashMap<Object, java.util.Map<String, Object>> mutexMap,
-                    @javax.annotation.Nonnull final String shareGroup,
-                    @javax.annotation.Nonnull final com.bmd.jrt.builder.RoutineConfiguration configuration) {
-
-                return new JRoutine_${interfaceName}(wrapped, mutexMap, shareGroup, configuration);
-            }
-
-            @javax.annotation.Nonnull
-            @Override
-            protected Object getTarget() {
-
-                return wrapped;
-            }
-
-            @javax.annotation.Nonnull
-            @Override
-            protected Class<${interfaceFullName}> getWrapperClass() {
-
-                return token.getRawClass();
-            }
-        };
+        return new ${interfaceName}WrapperBuilder(wrapped);
     }
 
     private Object getMutex(final String shareGroup) {
@@ -111,5 +84,41 @@ public final class JRoutine_${interfaceName}${genericTypes} implements ${interfa
             }
 
             return mutex;
+        }
+    }
+
+    private static class ${interfaceName}WrapperBuilder extends com.bmd.jrt.routine.WrapperBuilder<${interfaceFullName}> {
+
+        private final ${classFullName} mTarget;
+
+        private final com.bmd.jrt.common.ClassToken mToken = new com.bmd.jrt.common.ClassToken<${interfaceFullName}>() {};
+
+        private ${interfaceName}WrapperBuilder(final ${classFullName} target) {
+
+            mTarget = target;
+        }
+
+        @javax.annotation.Nonnull
+        @Override
+        protected ${interfaceFullName} createInstance(
+                @javax.annotation.Nonnull final com.bmd.jrt.common.CacheHashMap<Object, java.util.Map<String, Object>> mutexMap,
+                @javax.annotation.Nonnull final String shareGroup,
+                @javax.annotation.Nonnull final com.bmd.jrt.builder.RoutineConfiguration configuration) {
+
+            return new JRoutine_${interfaceName}(mTarget, mutexMap, shareGroup, configuration);
+        }
+
+        @javax.annotation.Nonnull
+        @Override
+        protected Object getTarget() {
+
+            return mTarget;
+        }
+
+        @javax.annotation.Nonnull
+        @Override
+        protected Class<${interfaceFullName}> getWrapperClass() {
+
+            return mToken.getRawClass();
         }
     }

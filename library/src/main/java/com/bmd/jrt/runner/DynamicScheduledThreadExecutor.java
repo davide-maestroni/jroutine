@@ -14,8 +14,6 @@
 package com.bmd.jrt.runner;
 
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ScheduledFuture;
@@ -51,15 +49,12 @@ class DynamicScheduledThreadExecutor extends ScheduledThreadPoolExecutor {
 
         super(1);
 
-        final LinkedBlockingQueue<Runnable> internalQueue =
-                new LinkedBlockingQueue<Runnable>(Integer.MAX_VALUE);
-        final RejectingBlockingQueue<Runnable> rejectingQueue =
-                new RejectingBlockingQueue<Runnable>(internalQueue);
+        final RejectingBlockingQueue internalQueue = new RejectingBlockingQueue();
         final QueueRejectedExecutionHandler rejectedExecutionHandler =
                 new QueueRejectedExecutionHandler(internalQueue);
         mExecutor =
                 new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, keepAliveUnit,
-                                       rejectingQueue, rejectedExecutionHandler);
+                                       internalQueue, rejectedExecutionHandler);
     }
 
     @Nonnull
@@ -110,14 +105,14 @@ class DynamicScheduledThreadExecutor extends ScheduledThreadPoolExecutor {
      */
     private static class QueueRejectedExecutionHandler implements RejectedExecutionHandler {
 
-        private final BlockingQueue<Runnable> mQueue;
+        private final RejectingBlockingQueue mQueue;
 
         /**
          * Constructor.
          *
          * @param queue the command queue.
          */
-        private QueueRejectedExecutionHandler(@Nonnull final BlockingQueue<Runnable> queue) {
+        private QueueRejectedExecutionHandler(@Nonnull final RejectingBlockingQueue queue) {
 
             mQueue = queue;
         }
@@ -126,65 +121,33 @@ class DynamicScheduledThreadExecutor extends ScheduledThreadPoolExecutor {
         public void rejectedExecution(final Runnable runnable,
                 final ThreadPoolExecutor threadPoolExecutor) {
 
-            mQueue.add(runnable);
+            mQueue.push(runnable);
         }
     }
 
     /**
-     * Class wrapping a blocking queue instance rejecting addition of new elements.
-     *
-     * @param <E> the element type.
+     * Implementation of a blocking queue rejecting the addition of any new element.
      */
-    private static class RejectingBlockingQueue<E> implements BlockingQueue<E> {
-
-        private final BlockingQueue<E> mQueue;
+    private static class RejectingBlockingQueue extends LinkedBlockingQueue<Runnable> {
 
         /**
          * Constructor.
-         *
-         * @param wrapped the wrapped queue.
          */
-        private RejectingBlockingQueue(@Nonnull final BlockingQueue<E> wrapped) {
+        private RejectingBlockingQueue() {
 
-            mQueue = wrapped;
+            super(Integer.MAX_VALUE);
         }
 
         @Override
-        public boolean add(final E e) {
+        public boolean add(final Runnable runnable) {
 
             return false;
         }
 
         @Override
-        public boolean offer(@Nonnull final E e) {
+        public boolean addAll(final Collection<? extends Runnable> c) {
 
             return false;
-        }
-
-        @Override
-        public void put(final E e) throws InterruptedException {
-
-            throw new InterruptedException();
-        }
-
-        @Override
-        public boolean offer(final E e, final long timeout, @Nonnull final TimeUnit timeUnit) throws
-                InterruptedException {
-
-            return false;
-        }
-
-        @Override
-        public E take() throws InterruptedException {
-
-            return mQueue.take();
-        }
-
-        @Override
-        public E poll(final long timeout, @Nonnull final TimeUnit timeUnit) throws
-                InterruptedException {
-
-            return mQueue.poll(timeout, timeUnit);
         }
 
         @Override
@@ -194,115 +157,27 @@ class DynamicScheduledThreadExecutor extends ScheduledThreadPoolExecutor {
         }
 
         @Override
-        public boolean remove(final Object o) {
+        public void put(final Runnable runnable) throws InterruptedException {
 
-            return mQueue.remove(o);
+            throw new InterruptedException();
         }
 
         @Override
-        public boolean contains(final Object o) {
-
-            return mQueue.contains(o);
-        }
-
-        @Override
-        public int drainTo(@Nonnull final Collection<? super E> c) {
-
-            return mQueue.drainTo(c);
-        }
-
-        @Override
-        public int drainTo(@Nonnull final Collection<? super E> c, final int maxElements) {
-
-            return mQueue.drainTo(c, maxElements);
-        }
-
-        @Override
-        public E remove() {
-
-            return mQueue.remove();
-        }
-
-        @Override
-        public E poll() {
-
-            return mQueue.poll();
-        }
-
-        @Override
-        public E element() {
-
-            return mQueue.element();
-        }
-
-        @Override
-        public E peek() {
-
-            return mQueue.peek();
-        }
-
-        @Override
-        public int size() {
-
-            return mQueue.size();
-        }
-
-        @Override
-        public boolean isEmpty() {
-
-            return mQueue.isEmpty();
-        }
-
-        @Nonnull
-        @Override
-        public Iterator<E> iterator() {
-
-            return mQueue.iterator();
-        }
-
-        @Nonnull
-        @Override
-        public Object[] toArray() {
-
-            return mQueue.toArray();
-        }
-
-        @Nonnull
-        @Override
-        @SuppressWarnings("SuspiciousToArrayCall")
-        public <T> T[] toArray(@Nonnull final T[] array) {
-
-            return mQueue.toArray(array);
-        }
-
-        @Override
-        public boolean containsAll(@Nonnull final Collection<?> c) {
-
-            return mQueue.containsAll(c);
-        }
-
-        @Override
-        public boolean addAll(@Nonnull final Collection<? extends E> c) {
+        public boolean offer(final Runnable runnable, final long timeout,
+                @Nonnull final TimeUnit timeUnit) throws InterruptedException {
 
             return false;
         }
 
         @Override
-        public boolean removeAll(@Nonnull final Collection<?> c) {
+        public boolean offer(@Nonnull final Runnable runnable) {
 
-            return mQueue.removeAll(c);
+            return false;
         }
 
-        @Override
-        public boolean retainAll(@Nonnull final Collection<?> c) {
+        private void push(@Nonnull final Runnable runnable) {
 
-            return mQueue.retainAll(c);
-        }
-
-        @Override
-        public void clear() {
-
-            mQueue.clear();
+            super.offer(runnable);
         }
     }
 }

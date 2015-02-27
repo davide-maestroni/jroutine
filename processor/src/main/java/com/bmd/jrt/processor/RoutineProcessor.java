@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -39,7 +40,6 @@ import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
-import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
@@ -64,7 +64,6 @@ import javax.tools.JavaFileObject;
  * <p/>
  * Created by davide on 11/3/14.
  */
-@SupportedAnnotationTypes("com.bmd.jrt.annotation.Wrap")
 public class RoutineProcessor extends AbstractProcessor {
 
     private static final boolean DEBUG = false;
@@ -118,6 +117,12 @@ public class RoutineProcessor extends AbstractProcessor {
     private TypeMirror mObjectType;
 
     private TypeElement mOutputChannelElement;
+
+    @Override
+    public Set<String> getSupportedAnnotationTypes() {
+
+        return Collections.singleton(Wrap.class.getCanonicalName());
+    }
 
     @Override
     public SourceVersion getSupportedSourceVersion() {

@@ -16,6 +16,15 @@ After the invocation, the routine returns an input channel which is used to pass
 
 The main way to define a routine is to implement an invocation object. Though, the library provides several other ways (always backed by invocations) to call any method of any object (even defined in third party source code) asynchronously.
 
+##It's reactive!
+
+The library adheres to [The Reactive Manifesto][17]. It's responsive, resilient, elastic and "message driven".
+
+It's responsive because resources are allocated only when needed, and reused when possible. Computation of asynchronous invocations happens only in response of inputs and resources are freed as soon as the input is consumed.
+It's resilient because errors are gracefully handled and notified through the proper methods implemented by the specific invocation classes.
+It's elastic because the needed number of threads is allocated in response to higher loads.
+It's "message driven" because both ouputs and errors are dispatched along the chain of invocations.
+
 ##Why not RxJava?
 
 Among the many open source libraries, [RxJava][7] is one of the preferred choices when it comes to handle background tasks.
@@ -124,3 +133,4 @@ Unless required by applicable law or agreed to in writing, software distributed 
 [14]:http://davide-maestroni.github.io/jroutine/docs/android
 [15]:http://davide-maestroni.github.io/jroutine/docs/jroutine/com/bmd/jrt/runner/Runner.html
 [16]:http://retrotranslator.sourceforge.net/
+[17]:http://www.reactivemanifesto.org/

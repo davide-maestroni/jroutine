@@ -130,6 +130,9 @@ class DynamicScheduledThreadExecutor extends ScheduledThreadPoolExecutor {
      */
     private static class RejectingBlockingQueue extends LinkedBlockingQueue<Runnable> {
 
+        // just don't care...
+        private static final long serialVersionUID = -1;
+
         /**
          * Constructor.
          */
@@ -175,9 +178,9 @@ class DynamicScheduledThreadExecutor extends ScheduledThreadPoolExecutor {
             return false;
         }
 
-        private void push(@Nonnull final Runnable runnable) {
+        private boolean push(@Nonnull final Runnable runnable) {
 
-            super.offer(runnable);
+            return super.offer(runnable);
         }
     }
 }

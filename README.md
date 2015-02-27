@@ -14,7 +14,7 @@ A routine can be invoked in a synchronous, asynchronous and parallel way. The ma
 
 After the invocation, the routine returns an input channel which is used to pass the input parameters. Input data can be passed in bulk or streamed, delayed or fetched asynchronously from another channel. When done with the input, the channel is closed and returns an output channel used to read the invocation results.
 
-The main way to define a routine is to implement an invocation object. Though, the library provides several other ways (always backed by invocations) to call any method of any object (even defined in third party source code) asynchronously in separate threads.
+The main way to define a routine is to implement an invocation object. Though, the library provides several other ways (always backed by invocations) to call any method of any object (even defined in third party source code) asynchronously.
 
 ##Why not RxJava?
 

@@ -1,5 +1,8 @@
 com.bmd.jrt.android.builder
+com.bmd.jrt.android.invocation
 com.bmd.jrt.android.log
+com.bmd.jrt.android.routine
 com.bmd.jrt.android.runner
+com.bmd.jrt.android.service
 com.bmd.jrt.android.v11.routine
 com.bmd.jrt.android.v4.routine

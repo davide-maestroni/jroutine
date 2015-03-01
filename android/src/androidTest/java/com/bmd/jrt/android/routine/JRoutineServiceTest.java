@@ -69,7 +69,7 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
         final Data data = new Data();
         final Routine<Data, Data> routine1 =
                 JRoutine.onService(getActivity(), ClassToken.tokenOf(Delay.class))
-                        .dispatchTo(Looper.getMainLooper())
+                        .dispatchingOn(Looper.getMainLooper())
                         .withRunnerClass(MainRunner.class)
                         .buildRoutine();
 
@@ -89,7 +89,7 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
 
         final Routine<Data, Data> routine2 =
                 JRoutine.onService(getActivity(), ClassToken.tokenOf(Abort.class))
-                        .dispatchTo(Looper.getMainLooper())
+                        .dispatchingOn(Looper.getMainLooper())
                         .buildRoutine();
 
         try {
@@ -136,7 +136,7 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine1 =
                 JRoutine.onService(getActivity(), ClassToken.tokenOf(StringPassingInvocation.class))
-                        .dispatchTo(Looper.getMainLooper())
+                        .dispatchingOn(Looper.getMainLooper())
                         .withConfiguration(builder().withSyncRunner(RunnerType.QUEUED)
                                                     .withInputOrder(OrderBy.DELIVERY)
                                                     .withLogLevel(LogLevel.DEBUG)
@@ -160,7 +160,7 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
                                                              .withLogLevel(LogLevel.DEBUG)
                                                              .buildConfiguration();
         final Routine<String, String> routine2 = JRoutine.onService(getActivity(), token)
-                                                         .dispatchTo(Looper.getMainLooper())
+                                                         .dispatchingOn(Looper.getMainLooper())
                                                          .withConfiguration(configuration2)
                                                          .withLogClass(AndroidLog.class)
                                                          .buildRoutine();
@@ -179,7 +179,7 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
 
                                                     .withOutputOrder(OrderBy.PASSING);
         final Routine<String, String> routine3 = JRoutine.onService(getActivity(), token)
-                                                         .dispatchTo(Looper.getMainLooper())
+                                                         .dispatchingOn(Looper.getMainLooper())
                                                          .withConfiguration(
                                                                  builder.buildConfiguration())
                                                          .buildRoutine();
@@ -201,7 +201,7 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
                                                                      TimeDuration.millis(200))
                                                              .buildConfiguration();
         final Routine<String, String> routine4 = JRoutine.onService(getActivity(), token)
-                                                         .dispatchTo(Looper.getMainLooper())
+                                                         .dispatchingOn(Looper.getMainLooper())
                                                          .withConfiguration(configuration4)
                                                          .buildRoutine();
         assertThat(routine4.callSync("1", "2", "3", "4", "5")
@@ -221,7 +221,7 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
         final MyParcelable p = new MyParcelable(33, -17);
         final Routine<MyParcelable, MyParcelable> routine =
                 JRoutine.onService(getActivity(), ClassToken.tokenOf(MyParcelableInvocation.class))
-                        .dispatchTo(Looper.getMainLooper())
+                        .dispatchingOn(Looper.getMainLooper())
                         .buildRoutine();
         assertThat(routine.callAsync(p).afterMax(timeout).readNext()).isEqualTo(p);
     }
@@ -279,7 +279,7 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine =
                 JRoutine.onService(getActivity(), ClassToken.tokenOf(StringPassingInvocation.class))
-                        .dispatchTo(Looper.getMainLooper())
+                        .dispatchingOn(Looper.getMainLooper())
                         .withServiceClass(TestService.class)
                         .buildRoutine();
         assertThat(

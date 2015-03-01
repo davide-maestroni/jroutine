@@ -106,13 +106,13 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
         if (context instanceof FragmentActivity) {
 
             final FragmentActivity activity = (FragmentActivity) context;
-            builder = JRoutine.onActivity(activity, new MissingToken<OUTPUT, OUTPUT>())
+            builder = JRoutine.onActivity(activity, new MissingToken<OUTPUT>())
                               .withId(mLoaderId);
 
         } else if (context instanceof Fragment) {
 
             final Fragment fragment = (Fragment) context;
-            builder = JRoutine.onFragment(fragment, new MissingToken<OUTPUT, OUTPUT>())
+            builder = JRoutine.onFragment(fragment, new MissingToken<OUTPUT>())
                               .withId(mLoaderId);
 
         } else {
@@ -153,11 +153,10 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
     /**
      * Missing loader invocation token.
      *
-     * @param <INPUT>  the input data type.
-     * @param <OUTPUT> the output data type.
+     * @param <DATA>  the data type.
      */
-    private static class MissingToken<INPUT, OUTPUT>
-            extends ClassToken<MissingLoaderInvocation<INPUT, OUTPUT>> {
+    private static class MissingToken<DATA>
+            extends ClassToken<MissingLoaderInvocation<DATA, DATA>> {
 
     }
 }

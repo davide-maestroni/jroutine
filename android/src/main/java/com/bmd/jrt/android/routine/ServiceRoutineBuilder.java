@@ -98,7 +98,7 @@ public class ServiceRoutineBuilder<INPUT, OUTPUT> implements RoutineBuilder {
      * @return this builder.
      */
     @Nonnull
-    public ServiceRoutineBuilder<INPUT, OUTPUT> dispatchTo(@Nullable final Looper looper) {
+    public ServiceRoutineBuilder<INPUT, OUTPUT> dispatchingOn(@Nullable final Looper looper) {
 
         mLooper = looper;
         return this;

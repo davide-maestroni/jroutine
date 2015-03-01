@@ -110,15 +110,13 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> implements AndroidRoutineBuild
 
         final Builder builder =
                 RoutineConfiguration.builderFrom(RoutineConfiguration.notNull(mConfiguration));
-        final RoutineConfiguration routineConfiguration = builder.withRunner(Runners.mainRunner())
-                                                                 .withInputSize(Integer.MAX_VALUE)
-                                                                 .withInputTimeout(
-                                                                         TimeDuration.INFINITY)
-                                                                 .withOutputSize(Integer.MAX_VALUE)
-                                                                 .withOutputTimeout(
-                                                                         TimeDuration.INFINITY)
-                                                                 .buildConfiguration();
-        return new AndroidRoutine<INPUT, OUTPUT>(routineConfiguration, mContext, mLoaderId,
+        final RoutineConfiguration configuration = builder.withRunner(Runners.mainRunner())
+                                                          .withInputSize(Integer.MAX_VALUE)
+                                                          .withInputTimeout(TimeDuration.INFINITY)
+                                                          .withOutputSize(Integer.MAX_VALUE)
+                                                          .withOutputTimeout(TimeDuration.INFINITY)
+                                                          .buildConfiguration();
+        return new AndroidRoutine<INPUT, OUTPUT>(configuration, mContext, mLoaderId,
                                                  mClashResolution, mCacheStrategy, mConstructor);
     }
 

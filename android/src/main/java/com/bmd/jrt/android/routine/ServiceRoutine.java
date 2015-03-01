@@ -219,17 +219,17 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
         private final Object mMutex = new Object();
 
-        private final StandaloneInput<INPUT> mParamStandaloneInput;
-
-        private final StandaloneOutput<INPUT> mParamStandaloneOutput;
-
-        private final StandaloneInput<OUTPUT> mResultStandaloneInput;
-
-        private final StandaloneOutput<OUTPUT> mResultStandaloneOutput;
-
         private final Class<? extends Runner> mRunnerClass;
 
         private final Class<? extends RoutineService> mServiceClass;
+
+        private final StandaloneInput<INPUT> mStandaloneParamInput;
+
+        private final StandaloneOutput<INPUT> mStandaloneParamOutput;
+
+        private final StandaloneInput<OUTPUT> mStandaloneResultInput;
+
+        private final StandaloneOutput<OUTPUT> mStandaloneResultOutput;
 
         private final String mUUID;
 
@@ -292,8 +292,8 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                                                                      .buildConfiguration();
             final StandaloneChannel<INPUT> paramChannel =
                     JRoutine.standalone().withConfiguration(inputConfiguration).buildChannel();
-            mParamStandaloneInput = paramChannel.input();
-            mParamStandaloneOutput = paramChannel.output();
+            mStandaloneParamInput = paramChannel.input();
+            mStandaloneParamOutput = paramChannel.output();
             final OrderBy outputOrder = configuration.getOutputOrderOr(null);
             final TimeDuration readTimeout = configuration.getReadTimeoutOr(null);
             final TimeoutAction timeoutAction = configuration.getReadTimeoutActionOr(null);
@@ -309,35 +309,35 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                                                                       .buildConfiguration();
             final StandaloneChannel<OUTPUT> resultChannel =
                     JRoutine.standalone().withConfiguration(outputConfiguration).buildChannel();
-            mResultStandaloneInput = resultChannel.input();
-            mResultStandaloneOutput = resultChannel.output();
+            mStandaloneResultInput = resultChannel.input();
+            mStandaloneResultOutput = resultChannel.output();
         }
 
         @Override
         public boolean abort() {
 
             bindService();
-            return mParamStandaloneInput.abort();
+            return mStandaloneParamInput.abort();
         }
 
         @Override
         public boolean abort(@Nullable final Throwable reason) {
 
             bindService();
-            return mParamStandaloneInput.abort(reason);
+            return mStandaloneParamInput.abort(reason);
         }
 
         @Override
         public boolean isOpen() {
 
-            return mParamStandaloneInput.isOpen();
+            return mStandaloneParamInput.isOpen();
         }
 
         @Nonnull
         @Override
         public ParameterChannel<INPUT, OUTPUT> after(@Nonnull final TimeDuration delay) {
 
-            mParamStandaloneInput.after(delay);
+            mStandaloneParamInput.after(delay);
             return this;
         }
 
@@ -346,7 +346,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         public ParameterChannel<INPUT, OUTPUT> after(final long delay,
                 @Nonnull final TimeUnit timeUnit) {
 
-            mParamStandaloneInput.after(delay, timeUnit);
+            mStandaloneParamInput.after(delay, timeUnit);
             return this;
         }
 
@@ -354,7 +354,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         @Override
         public ParameterChannel<INPUT, OUTPUT> now() {
 
-            mParamStandaloneInput.now();
+            mStandaloneParamInput.now();
             return this;
         }
 
@@ -363,7 +363,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         public ParameterChannel<INPUT, OUTPUT> pass(@Nullable final OutputChannel<INPUT> channel) {
 
             bindService();
-            mParamStandaloneInput.pass(channel);
+            mStandaloneParamInput.pass(channel);
             return this;
         }
 
@@ -373,7 +373,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                 @Nullable final Iterable<? extends INPUT> inputs) {
 
             bindService();
-            mParamStandaloneInput.pass(inputs);
+            mStandaloneParamInput.pass(inputs);
             return this;
         }
 
@@ -382,7 +382,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         public ParameterChannel<INPUT, OUTPUT> pass(@Nullable final INPUT input) {
 
             bindService();
-            mParamStandaloneInput.pass(input);
+            mStandaloneParamInput.pass(input);
             return this;
         }
 
@@ -391,7 +391,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         public ParameterChannel<INPUT, OUTPUT> pass(@Nullable final INPUT... inputs) {
 
             bindService();
-            mParamStandaloneInput.pass(inputs);
+            mStandaloneParamInput.pass(inputs);
             return this;
         }
 
@@ -400,8 +400,8 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         public OutputChannel<OUTPUT> result() {
 
             bindService();
-            mParamStandaloneInput.close();
-            return mResultStandaloneOutput;
+            mStandaloneParamInput.close();
+            return mStandaloneResultOutput;
         }
 
         private void bindService() {
@@ -521,16 +521,16 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                     switch (msg.what) {
 
                         case RoutineService.MSG_DATA:
-                            mResultStandaloneInput.pass((OUTPUT) getValue(msg));
+                            mStandaloneResultInput.pass((OUTPUT) getValue(msg));
                             break;
 
                         case RoutineService.MSG_COMPLETE:
-                            mResultStandaloneInput.close();
+                            mStandaloneResultInput.close();
                             unbindService();
                             break;
 
                         case RoutineService.MSG_ABORT:
-                            mResultStandaloneInput.abort(getAbortError(msg));
+                            mStandaloneResultInput.abort(getAbortError(msg));
                             unbindService();
                             break;
 
@@ -554,7 +554,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                         logger.err(e, "error while sending service abort message");
                     }
 
-                    mResultStandaloneInput.abort(t);
+                    mStandaloneResultInput.abort(t);
                     unbindService();
                 }
             }
@@ -596,12 +596,12 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
                     mOutMessenger.send(message);
                     mConsumer = new ConnectionOutputConsumer();
-                    mParamStandaloneOutput.bind(mConsumer);
+                    mStandaloneParamOutput.bind(mConsumer);
 
                 } catch (final RemoteException e) {
 
                     logger.err(e, "error while sending service invocation message");
-                    mResultStandaloneInput.abort(e);
+                    mStandaloneResultInput.abort(e);
                     unbindService();
                 }
             }
@@ -610,7 +610,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
             public void onServiceDisconnected(final ComponentName name) {
 
                 mLogger.dbg("service disconnected: %s", name);
-                mParamStandaloneOutput.unbind(mConsumer);
+                mStandaloneParamOutput.unbind(mConsumer);
             }
         }
     }

@@ -107,7 +107,7 @@ public class Runners extends com.bmd.jrt.runner.Runners {
      * Returns a runner employing default async tasks.
      * <p/>
      * Beware of the caveats of using
-     * <a href="http://developer.android.com/reference/android/os/AsyncTask.html">AyncTask<a/>s
+     * <a href="http://developer.android.com/reference/android/os/AsyncTask.html">AsyncTask<a/>s
      * especially on some platform versions.
      *
      * @return the runner instance.

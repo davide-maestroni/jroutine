@@ -673,10 +673,9 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
     @Nullable
     @SuppressWarnings("unchecked")
-    private OUTPUT nextOutput(@Nonnull final NestedQueue<Object> outputQueue,
-            @Nonnull final TimeDuration timeout) {
+    private OUTPUT nextOutput(@Nonnull final TimeDuration timeout) {
 
-        final Object result = outputQueue.removeFirst();
+        final Object result = mOutputQueue.removeFirst();
         mLogger.dbg("reading output [#%d]: %s [%s]", mOutputCount, result, timeout);
 
         RoutineExceptionWrapper.raise(result);
@@ -713,7 +712,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                 }
             }
 
-            return nextOutput(outputQueue, timeout);
+            return nextOutput(timeout);
         }
 
         if (mOutputNotEmpty == null) {
@@ -749,7 +748,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             }
         }
 
-        return nextOutput(outputQueue, timeout);
+        return nextOutput(timeout);
     }
 
     private void verifyBound() {
@@ -1163,7 +1162,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                     while (!outputQueue.isEmpty()) {
 
-                        final OUTPUT result = nextOutput(outputQueue, timeout);
+                        final OUTPUT result = nextOutput(timeout);
                         logger.dbg("adding output to list: %s [%s]", result, timeout);
                         results.add(result);
                     }
@@ -1195,7 +1194,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                             while (!outputQueue.isEmpty()) {
 
-                                final OUTPUT result = nextOutput(outputQueue, timeout);
+                                final OUTPUT result = nextOutput(timeout);
                                 logger.dbg("adding output to list: %s [%s]", result, timeout);
                                 results.add(result);
                             }

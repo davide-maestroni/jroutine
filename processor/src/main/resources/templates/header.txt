@@ -18,14 +18,14 @@ package ${packageName};
 
 public final class JRoutine_${interfaceName}${genericTypes} implements ${interfaceFullName} {
 
-    private final com.bmd.jrt.common.CacheHashMap<Object, java.util.Map<String, Object>> mMutexMap;
+    private final com.bmd.jrt.common.WeakIdentityHashMap<Object, java.util.Map<String, Object>> mMutexMap;
 
     private final String mShareGroup;
 
     private final java.lang.ref.WeakReference<${classFullName}> mWrapped;
 
     public JRoutine_${interfaceName}(final ${classFullName} wrapped,
-            final com.bmd.jrt.common.CacheHashMap<Object, java.util.Map<String, Object>> mutexMap,
+            final com.bmd.jrt.common.WeakIdentityHashMap<Object, java.util.Map<String, Object>> mutexMap,
             final String shareGroup, final com.bmd.jrt.builder.RoutineConfiguration configuration) {
 
         if (wrapped == null) {
@@ -100,16 +100,6 @@ public final class JRoutine_${interfaceName}${genericTypes} implements ${interfa
 
         @javax.annotation.Nonnull
         @Override
-        protected ${interfaceFullName} createInstance(
-                @javax.annotation.Nonnull final com.bmd.jrt.common.CacheHashMap<Object, java.util.Map<String, Object>> mutexMap,
-                @javax.annotation.Nonnull final String shareGroup,
-                @javax.annotation.Nonnull final com.bmd.jrt.builder.RoutineConfiguration configuration) {
-
-            return new JRoutine_${interfaceName}(mTarget, mutexMap, shareGroup, configuration);
-        }
-
-        @javax.annotation.Nonnull
-        @Override
         protected Object getTarget() {
 
             return mTarget;
@@ -120,5 +110,15 @@ public final class JRoutine_${interfaceName}${genericTypes} implements ${interfa
         protected Class<${interfaceFullName}> getWrapperClass() {
 
             return mToken.getRawClass();
+        }
+
+        @javax.annotation.Nonnull
+        @Override
+        protected ${interfaceFullName} newWrapper(
+                @javax.annotation.Nonnull final com.bmd.jrt.common.WeakIdentityHashMap<Object, java.util.Map<String, Object>> mutexMap,
+                @javax.annotation.Nonnull final String shareGroup,
+                @javax.annotation.Nonnull final com.bmd.jrt.builder.RoutineConfiguration configuration) {
+
+            return new JRoutine_${interfaceName}(mTarget, mutexMap, shareGroup, configuration);
         }
     }

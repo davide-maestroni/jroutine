@@ -65,7 +65,7 @@ public @interface Share {
     /**
      * Constant indicating the default share group, that is, all member fields are protected.
      */
-    static final String ALL = Share.class.getCanonicalName() + ".ALL";
+    static final String ALL = "com.bmd.jrt.annotation.Share.ALL";
 
     /**
      * Constant indicating that no member field needs to be protected.

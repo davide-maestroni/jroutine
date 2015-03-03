@@ -1184,25 +1184,6 @@ public class JRoutineTest extends TestCase {
         }
     }
 
-    private static class TestApply {
-
-        public static final String GET_STRING = "get_string";
-
-        @Bind(GET_STRING)
-        @Share(Share.NONE)
-        public static String getStringStatic(final String string) {
-
-            return string;
-        }
-
-        @Bind(GET_STRING)
-        @Share(Share.NONE)
-        public String getString(final String string) {
-
-            return string;
-        }
-    }
-
     private static class TestStatic {
 
         public static final String GET = "get";

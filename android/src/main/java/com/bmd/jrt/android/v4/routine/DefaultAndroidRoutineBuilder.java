@@ -135,13 +135,6 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> implements AndroidRoutineBuild
         return this;
     }
 
-    /**
-     * Note that all the options related to the output and input channels size and timeout will be
-     * ignored.
-     *
-     * @param configuration the routine configuration.
-     * @return this builder.
-     */
     @Nonnull
     @Override
     public AndroidRoutineBuilder<INPUT, OUTPUT> withConfiguration(

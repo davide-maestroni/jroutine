@@ -30,10 +30,10 @@ import java.lang.annotation.Target;
  * Through this annotation, it is possible to exclude single methods from this kind of protection by
  * indicating them as having a different share group. Each group has a name associated, and every
  * method within a specific group is protected so that shared class members can be safely accessed
- * only from the other methods sharing the same group name. That means that the calling of methods
- * within the same group cannot happen in parallel. In a dual way, methods belonging to different
- * groups can be invoked in parallel but should not access the same members to avoid concurrency
- * issues.
+ * only from the other methods sharing the same group name. That means that the invocation of
+ * methods within the same group cannot happen in parallel. In a dual way, methods belonging to
+ * different groups can be invoked in parallel but should not access the same members to avoid
+ * concurrency issues.
  * <p/>
  * Finally, be aware that a method might need to be made accessible in order to be called. That
  * means that, in case a {@link java.lang.SecurityManager} is installed, a security exception might
@@ -65,7 +65,7 @@ public @interface Share {
     /**
      * Constant indicating the default share group, that is, all member fields are protected.
      */
-    static final String ALL = "com.bmd.jrt.annotation.Share.ALL";
+    static final String ALL = Share.class.getCanonicalName() + ".ALL";
 
     /**
      * Constant indicating that no member field needs to be protected.
@@ -73,9 +73,9 @@ public @interface Share {
     static final String NONE = "";
 
     /**
-     * The share tag associated with the annotated method.
+     * The share group name associated with the annotated method.
      *
-     * @return the tag.
+     * @return the group name.
      */
     String value();
 }

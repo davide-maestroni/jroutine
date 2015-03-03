@@ -15,14 +15,15 @@ package com.bmd.jrt.android.builder;
 
 import com.bmd.jrt.android.builder.AndroidRoutineBuilder.CacheStrategy;
 import com.bmd.jrt.builder.RoutineBuilder;
+import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.channel.OutputChannel;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Interface defining a builder of output channel linked to routine invocations.<br/>
- * In order to be successfully linked, the specific routine invocation must have a user defined ID
+ * Interface defining a builder of output channels bound to routine invocations.<br/>
+ * In order to be successfully bound, the specific routine invocation must have a user defined ID
  * and still running (or cached) at the time of the channel creation.
  * <p/>
  * Created by davide on 1/14/15.
@@ -32,7 +33,7 @@ import javax.annotation.Nullable;
 public interface AndroidChannelBuilder extends RoutineBuilder {
 
     /**
-     * Builds and returns the an output channel linked to the routine invocation.
+     * Builds and returns an output channel bound to the routine invocation.
      *
      * @return the newly created output channel.
      */
@@ -48,4 +49,14 @@ public interface AndroidChannelBuilder extends RoutineBuilder {
      */
     @Nonnull
     public AndroidChannelBuilder onComplete(@Nullable CacheStrategy cacheStrategy);
+
+    /**
+     * Note that only the options related to logs will be employed.
+     *
+     * @param configuration the routine configuration.
+     * @return this builder.
+     */
+    @Nonnull
+    @Override
+    public AndroidChannelBuilder withConfiguration(@Nullable RoutineConfiguration configuration);
 }

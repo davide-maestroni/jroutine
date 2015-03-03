@@ -35,11 +35,11 @@ import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ResultChannel;
 import com.bmd.jrt.channel.StandaloneChannel;
 import com.bmd.jrt.channel.StandaloneChannel.StandaloneInput;
-import com.bmd.jrt.common.CacheHashMap;
 import com.bmd.jrt.common.ClassToken;
 import com.bmd.jrt.common.InvocationException;
 import com.bmd.jrt.common.InvocationInterruptedException;
 import com.bmd.jrt.common.RoutineException;
+import com.bmd.jrt.common.WeakIdentityHashMap;
 import com.bmd.jrt.invocation.SingleCallInvocation;
 import com.bmd.jrt.log.Logger;
 import com.bmd.jrt.time.TimeDuration;
@@ -67,9 +67,11 @@ import static com.bmd.jrt.builder.RoutineConfiguration.builder;
  */
 class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT> {
 
-    private static final CacheHashMap<Object, SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>
+    private static final WeakIdentityHashMap<Object,
+            SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>
             sCallbackMap =
-            new CacheHashMap<Object, SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>();
+            new WeakIdentityHashMap<Object,
+                    SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>();
 
     private final CacheStrategy mCacheStrategy;
 
@@ -213,14 +215,14 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
             final FragmentActivity activity = (FragmentActivity) context;
             loaderContext = activity.getApplicationContext();
             loaderManager = activity.getSupportLoaderManager();
-            logger.dbg("running invocation linked to activity: %s", activity);
+            logger.dbg("running invocation bound to activity: %s", activity);
 
         } else if (context instanceof Fragment) {
 
             final Fragment fragment = (Fragment) context;
             loaderContext = fragment.getActivity().getApplicationContext();
             loaderManager = fragment.getLoaderManager();
-            logger.dbg("running invocation linked to fragment: %s", fragment);
+            logger.dbg("running invocation bound to fragment: %s", fragment);
 
         } else {
 
@@ -238,7 +240,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
         final Loader<InvocationResult<OUTPUT>> loader = loaderManager.getLoader(loaderId);
         final boolean isClash = isClash(loader, loaderId, inputs);
-        final CacheHashMap<Object, SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>
+        final WeakIdentityHashMap<Object, SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>
                 callbackMap = sCallbackMap;
         SparseArray<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
                 callbackMap.get(context);

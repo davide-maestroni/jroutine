@@ -140,7 +140,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 public class JRoutine extends com.bmd.jrt.android.routine.JRoutine {
 
     /**
-     * Returns a builder of routines linked to the specified activity.<br/>
+     * Returns a builder of routines bound to the specified activity.<br/>
      * Note that the specified invocation class must be static and have a default constructor.<br/>
      * Note that also the built routine results will be always dispatched in the main UI thread,
      * thus waiting for the outputs immediately after its invocation in the main thread will result
@@ -172,7 +172,7 @@ public class JRoutine extends com.bmd.jrt.android.routine.JRoutine {
     }
 
     /**
-     * Returns a builder of an output channel linked to the invocation identified by the specified
+     * Returns a builder of an output channel bound to the invocation identified by the specified
      * ID.<br/>
      * Note that, if no invocation with the specified ID is running at the time of the channel
      * creation, the output will be aborted with a
@@ -204,7 +204,7 @@ public class JRoutine extends com.bmd.jrt.android.routine.JRoutine {
     }
 
     /**
-     * Returns a builder of routines linked to the specified fragment.<br/>
+     * Returns a builder of routines bound to the specified fragment.<br/>
      * Note that the specified invocation class must be static and have a default constructor.<br/>
      * Note that also the built routine results will be always dispatched in the main UI thread,
      * thus waiting for the outputs immediately after its invocation in the main thread will result
@@ -226,7 +226,7 @@ public class JRoutine extends com.bmd.jrt.android.routine.JRoutine {
     }
 
     /**
-     * Returns a builder of an output channel linked to the invocation identified by the specified
+     * Returns a builder of an output channel bound to the invocation identified by the specified
      * ID.<br/>
      * Note that, if no invocation with the specified ID is running at the time of the channel
      * creation, the output will be aborted with a

@@ -31,5 +31,5 @@ public interface InvocationFactory<INPUT, OUTPUT> {
      * @return the invocation instance.
      */
     @Nonnull
-    public Invocation<INPUT, OUTPUT> createInvocation();
+    public Invocation<INPUT, OUTPUT> newInvocation();
 }

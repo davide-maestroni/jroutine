@@ -38,7 +38,7 @@ public class Runners extends com.bmd.jrt.runner.Runners {
     private static volatile Runner sMainRunner;
 
     /**
-     * Returns a runner employing in the specified looper.<br/>
+     * Returns a runner employing the specified looper.<br/>
      * Note that, based on the choice of the runner to be used when the invocation runs in the
      * looper thread, waiting for results in the very same thread may result in a deadlock
      * exception.
@@ -104,7 +104,7 @@ public class Runners extends com.bmd.jrt.runner.Runners {
     }
 
     /**
-     * Returns a runner employing default async tasks.
+     * Returns a runner employing async tasks.
      * <p/>
      * Beware of the caveats of using
      * <a href="http://developer.android.com/reference/android/os/AsyncTask.html">AsyncTask<a/>s

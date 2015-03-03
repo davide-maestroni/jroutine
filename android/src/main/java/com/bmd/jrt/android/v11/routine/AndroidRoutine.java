@@ -138,12 +138,12 @@ class AndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
             getLogger().wrn(t, "ignoring exception while destroying invocation instance");
         }
 
-        return createInvocation(async);
+        return newInvocation(async);
     }
 
     @Nonnull
     @Override
-    protected Invocation<INPUT, OUTPUT> createInvocation(final boolean async) {
+    protected Invocation<INPUT, OUTPUT> newInvocation(final boolean async) {
 
         final Logger logger = getLogger();
 

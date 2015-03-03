@@ -94,7 +94,7 @@ public class AndroidRunnerTest extends AndroidTestCase {
 
             @Nonnull
             @Override
-            public Invocation<Object, Object> createInvocation() {
+            public Invocation<Object, Object> newInvocation() {
 
                 return new SingleCallInvocation<Object, Object>() {
 

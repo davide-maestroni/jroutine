@@ -957,7 +957,7 @@ public class RoutineTest extends TestCase {
 
                 @Override
                 @Nonnull
-                protected Invocation<Object, Object> createInvocation(final boolean async) {
+                protected Invocation<Object, Object> newInvocation(final boolean async) {
 
                     return new ConstructorException();
                 }
@@ -975,7 +975,7 @@ public class RoutineTest extends TestCase {
 
                 @Nonnull
                 @Override
-                public Invocation<Object, Object> createInvocation() {
+                public Invocation<Object, Object> newInvocation() {
 
                     return null;
                 }

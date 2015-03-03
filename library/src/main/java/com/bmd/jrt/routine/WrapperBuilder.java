@@ -16,7 +16,7 @@ package com.bmd.jrt.routine;
 import com.bmd.jrt.annotation.Share;
 import com.bmd.jrt.builder.RoutineBuilder;
 import com.bmd.jrt.builder.RoutineConfiguration;
-import com.bmd.jrt.common.CacheHashMap;
+import com.bmd.jrt.common.WeakIdentityHashMap;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,15 +35,15 @@ import static com.bmd.jrt.routine.ClassRoutineBuilder.sMutexCache;
  */
 public abstract class WrapperBuilder<CLASS> implements RoutineBuilder {
 
-    private static final CacheHashMap<Object, HashMap<ClassInfo, Object>> sClassMap =
-            new CacheHashMap<Object, HashMap<ClassInfo, Object>>();
+    private static final WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>> sClassMap =
+            new WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>>();
 
     private RoutineConfiguration mConfiguration;
 
     private String mShareGroup;
 
     /**
-     * Returns a wrapper object enabling asynchronous calls to the target instance methods.
+     * Returns a wrapper object enabling asynchronous calling of the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
      * optional {@link com.bmd.jrt.annotation.Bind}, {@link com.bmd.jrt.annotation.Timeout} and
@@ -63,7 +63,7 @@ public abstract class WrapperBuilder<CLASS> implements RoutineBuilder {
         synchronized (sClassMap) {
 
             final Object target = getTarget();
-            final CacheHashMap<Object, HashMap<ClassInfo, Object>> classMap = sClassMap;
+            final WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>> classMap = sClassMap;
             HashMap<ClassInfo, Object> classes = classMap.get(target);
 
             if (classes == null) {
@@ -86,8 +86,7 @@ public abstract class WrapperBuilder<CLASS> implements RoutineBuilder {
 
             try {
 
-                final CLASS newInstance =
-                        createInstance(sMutexCache, classShareGroup, configuration);
+                final CLASS newInstance = newWrapper(sMutexCache, classShareGroup, configuration);
                 classes.put(classInfo, newInstance);
                 return newInstance;
 
@@ -128,19 +127,6 @@ public abstract class WrapperBuilder<CLASS> implements RoutineBuilder {
     }
 
     /**
-     * Creates and return a new wrapper instance.
-     *
-     * @param mutexMap      the map of mutexes used to synchronize the method invocations.
-     * @param shareGroup    the share group name.
-     * @param configuration the routine configuration.
-     * @return the wrapper instance.
-     */
-    @Nonnull
-    protected abstract CLASS createInstance(
-            @Nonnull final CacheHashMap<Object, Map<String, Object>> mutexMap,
-            @Nonnull final String shareGroup, @Nonnull final RoutineConfiguration configuration);
-
-    /**
      * Returns the builder target object.
      *
      * @return the target object.
@@ -155,6 +141,19 @@ public abstract class WrapperBuilder<CLASS> implements RoutineBuilder {
      */
     @Nonnull
     protected abstract Class<CLASS> getWrapperClass();
+
+    /**
+     * Creates and return a new wrapper instance.
+     *
+     * @param mutexMap      the map of mutexes used to synchronize the method invocations.
+     * @param shareGroup    the share group name.
+     * @param configuration the routine configuration.
+     * @return the wrapper instance.
+     */
+    @Nonnull
+    protected abstract CLASS newWrapper(
+            @Nonnull final WeakIdentityHashMap<Object, Map<String, Object>> mutexMap,
+            @Nonnull final String shareGroup, @Nonnull final RoutineConfiguration configuration);
 
     /**
      * Class used as key to identify a specific wrapper instance.

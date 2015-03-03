@@ -29,11 +29,11 @@ import static org.assertj.core.api.Assertions.assertThat;
  * <p/>
  * Created by davide on 11/18/14.
  */
-public class CacheHashMapTest extends TestCase {
+public class WeakIdentityHashMapTest extends TestCase {
 
     public void testAdd() {
 
-        final CacheHashMap<Object, String> map = new CacheHashMap<Object, String>(13);
+        final WeakIdentityHashMap<Object, String> map = new WeakIdentityHashMap<Object, String>(13);
 
         assertThat(map).isEmpty();
 
@@ -85,7 +85,8 @@ public class CacheHashMapTest extends TestCase {
         entries.put(key2, "test2");
         entries.put(key3, "test3");
 
-        final CacheHashMap<Object, String> map = new CacheHashMap<Object, String>(entries);
+        final WeakIdentityHashMap<Object, String> map =
+                new WeakIdentityHashMap<Object, String>(entries);
 
         assertThat(map).hasSize(4);
         assertThat(map).contains(MapEntry.entry(key0, "test0"), MapEntry.entry(key1, "test1"),
@@ -105,7 +106,7 @@ public class CacheHashMapTest extends TestCase {
 
         assertThat(key0).isEqualTo(key1);
 
-        final CacheHashMap<Integer, String> map = new CacheHashMap<Integer, String>();
+        final WeakIdentityHashMap<Integer, String> map = new WeakIdentityHashMap<Integer, String>();
 
         map.put(key0, "test0");
         map.put(key1, "test1");
@@ -119,7 +120,8 @@ public class CacheHashMapTest extends TestCase {
 
     public void testRemove() {
 
-        final CacheHashMap<Object, String> map = new CacheHashMap<Object, String>(4, 0.75f);
+        final WeakIdentityHashMap<Object, String> map =
+                new WeakIdentityHashMap<Object, String>(4, 0.75f);
 
         final HashMap<Object, String> entries = new HashMap<Object, String>();
 
@@ -279,7 +281,8 @@ public class CacheHashMapTest extends TestCase {
         entries.put(key2, "test2");
         entries.put(key3, "test3");
 
-        final CacheHashMap<Object, String> map = new CacheHashMap<Object, String>(entries);
+        final WeakIdentityHashMap<Object, String> map =
+                new WeakIdentityHashMap<Object, String>(entries);
 
         key2 = null;
 

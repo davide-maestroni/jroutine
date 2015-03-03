@@ -18,7 +18,8 @@ import com.bmd.jrt.common.DeadlockException;
 import javax.annotation.Nullable;
 
 /**
- * Exception indicating that no invocation instance became available before the timeout elapsed.
+ * Exception indicating that no invocation instance became available before the specific timeout
+ * elapsed.
  * <p/>
  * Created by davide on 9/20/14.
  */

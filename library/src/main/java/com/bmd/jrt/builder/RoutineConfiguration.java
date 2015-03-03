@@ -88,14 +88,14 @@ public class RoutineConfiguration {
      * @param readTimeout     the action to be taken if the timeout elapses before a readable result
      *                        is available.
      * @param actionType      the timeout for an invocation instance to produce a result.
+     * @param inputOrder      the order in which input data are collected from the input channel.
      * @param inputMaxSize    the maximum number of buffered input data. Must be positive.
      * @param inputTimeout    the maximum timeout while waiting for an input to be passed to the
      *                        input channel.
-     * @param inputOrder      the order in which input data are collected from the input channel.
+     * @param outputOrder     the order in which output data are collected from the result channel.
      * @param outputMaxSize   the maximum number of buffered output data. Must be positive.
      * @param outputTimeout   the maximum timeout while waiting for an output to be passed to the
      *                        result channel.
-     * @param outputOrder     the order in which output data are collected from the result channel.
      * @param log             the log instance.
      * @param logLevel        the log level.
      */
@@ -103,9 +103,9 @@ public class RoutineConfiguration {
             @Nullable final RunnerType runnerType, final int maxInvocations,
             final int coreInvocations, @Nullable final TimeDuration availTimeout,
             @Nullable final TimeDuration readTimeout, @Nullable final TimeoutAction actionType,
-            final int inputMaxSize, @Nullable final TimeDuration inputTimeout,
-            @Nullable final OrderBy inputOrder, final int outputMaxSize,
-            @Nullable final TimeDuration outputTimeout, @Nullable final OrderBy outputOrder,
+            @Nullable final OrderBy inputOrder, final int inputMaxSize,
+            @Nullable final TimeDuration inputTimeout, @Nullable final OrderBy outputOrder,
+            final int outputMaxSize, @Nullable final TimeDuration outputTimeout,
             @Nullable final Log log, @Nullable final LogLevel logLevel) {
 
         mRunner = runner;
@@ -115,12 +115,12 @@ public class RoutineConfiguration {
         mAvailTimeout = availTimeout;
         mReadTimeout = readTimeout;
         mTimeoutAction = actionType;
+        mInputOrder = inputOrder;
         mInputMaxSize = inputMaxSize;
         mInputTimeout = inputTimeout;
-        mInputOrder = inputOrder;
+        mOutputOrder = outputOrder;
         mOutputMaxSize = outputMaxSize;
         mOutputTimeout = outputTimeout;
-        mOutputOrder = outputOrder;
         mLog = log;
         mLogLevel = logLevel;
     }
@@ -439,7 +439,7 @@ public class RoutineConfiguration {
     }
 
     /**
-     * Returns the maximum number of retained invocation instances (ALL by default).
+     * Returns the maximum number of retained invocation instances (DEFAULT by default).
      *
      * @param valueIfNotSet the default value if none was set.
      * @return the maximum number.
@@ -451,7 +451,7 @@ public class RoutineConfiguration {
     }
 
     /**
-     * Returns the input data order (ALL by default).
+     * Returns the input data order (null by default).
      *
      * @param valueIfNotSet the default value if none was set.
      * @return the order type.
@@ -463,7 +463,7 @@ public class RoutineConfiguration {
     }
 
     /**
-     * Returns the maximum number of buffered input data (ALL by default).
+     * Returns the maximum number of buffered input data (DEFAULT by default).
      *
      * @param valueIfNotSet the default value if none was set.
      * @return the maximum size.
@@ -488,7 +488,7 @@ public class RoutineConfiguration {
     }
 
     /**
-     * Returns the log level (ALL by default).
+     * Returns the log level (null by default).
      *
      * @param valueIfNotSet the default value if none was set.
      * @return the log level.
@@ -512,7 +512,7 @@ public class RoutineConfiguration {
     }
 
     /**
-     * Returns the maximum number of parallel running invocations (ALL by default).
+     * Returns the maximum number of parallel running invocations (DEFAULT by default).
      *
      * @param valueIfNotSet the default value if none was set.
      * @return the maximum number.
@@ -524,7 +524,7 @@ public class RoutineConfiguration {
     }
 
     /**
-     * Returns the output data order (ALL by default).
+     * Returns the output data order (null by default).
      *
      * @param valueIfNotSet the default value if none was set.
      * @return the order type.
@@ -536,7 +536,7 @@ public class RoutineConfiguration {
     }
 
     /**
-     * Returns the maximum number of buffered output data (ALL by default).
+     * Returns the maximum number of buffered output data (DEFAULT by default).
      *
      * @param valueIfNotSet the default value if none was set.
      * @return the maximum size.
@@ -562,7 +562,7 @@ public class RoutineConfiguration {
 
     /**
      * Returns the action to be taken if the timeout elapses before a readable result is available
-     * (ALL by default).
+     * (null by default).
      *
      * @param valueIfNotSet the default value if none was set.
      * @return the action type.
@@ -599,7 +599,7 @@ public class RoutineConfiguration {
     }
 
     /**
-     * Returns the type of the runner used for synchronous invocations (ALL by default).
+     * Returns the type of the runner used for synchronous invocations (null by default).
      *
      * @param valueIfNotSet the default value if none was set.
      * @return the runner type.
@@ -833,9 +833,8 @@ public class RoutineConfiguration {
 
             return new RoutineConfiguration(mRunner, mRunnerType, mMaxInvocations, mCoreInvocations,
                                             mAvailTimeout, mReadTimeout, mTimeoutAction,
-                                            mInputMaxSize, mInputTimeout, mInputOrder,
-                                            mOutputMaxSize, mOutputTimeout, mOutputOrder, mLog,
-                                            mLogLevel);
+                                            mInputOrder, mInputMaxSize, mInputTimeout, mOutputOrder,
+                                            mOutputMaxSize, mOutputTimeout, mLog, mLogLevel);
         }
 
         /**
@@ -979,6 +978,8 @@ public class RoutineConfiguration {
         /**
          * Sets the timeout for an input channel to have room for additional data. A null value
          * means that it is up to the framework to chose a default.
+         * <p/>
+         * By default the timeout is set to 0 to avoid unexpected deadlocks.
          *
          * @param timeout the timeout.
          * @return this builder.
@@ -1097,6 +1098,8 @@ public class RoutineConfiguration {
         /**
          * Sets the timeout for a result channel to have room for additional data. A null value
          * means that it is up to the framework to chose a default.
+         * <p/>
+         * By default the timeout is set to 0 to avoid unexpected deadlocks.
          *
          * @param timeout the timeout.
          * @return this builder.

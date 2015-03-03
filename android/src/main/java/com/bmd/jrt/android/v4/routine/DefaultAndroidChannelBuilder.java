@@ -20,7 +20,6 @@ import com.bmd.jrt.android.builder.AndroidChannelBuilder;
 import com.bmd.jrt.android.builder.AndroidRoutineBuilder;
 import com.bmd.jrt.android.builder.AndroidRoutineBuilder.CacheStrategy;
 import com.bmd.jrt.android.builder.AndroidRoutineBuilder.ClashResolution;
-import com.bmd.jrt.builder.RoutineBuilder;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.common.ClassToken;
@@ -106,14 +105,12 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
         if (context instanceof FragmentActivity) {
 
             final FragmentActivity activity = (FragmentActivity) context;
-            builder = JRoutine.onActivity(activity, new MissingToken<OUTPUT>())
-                              .withId(mLoaderId);
+            builder = JRoutine.onActivity(activity, new MissingToken<OUTPUT>()).withId(mLoaderId);
 
         } else if (context instanceof Fragment) {
 
             final Fragment fragment = (Fragment) context;
-            builder = JRoutine.onFragment(fragment, new MissingToken<OUTPUT>())
-                              .withId(mLoaderId);
+            builder = JRoutine.onFragment(fragment, new MissingToken<OUTPUT>()).withId(mLoaderId);
 
         } else {
 
@@ -136,15 +133,10 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
         return this;
     }
 
-    /**
-     * Note that only the options related to logs will be employed.
-     *
-     * @param configuration the routine configuration.
-     * @return this builder.
-     */
     @Nonnull
     @Override
-    public RoutineBuilder withConfiguration(@Nullable final RoutineConfiguration configuration) {
+    public AndroidChannelBuilder withConfiguration(
+            @Nullable final RoutineConfiguration configuration) {
 
         mConfiguration = configuration;
         return this;
@@ -153,7 +145,7 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
     /**
      * Missing loader invocation token.
      *
-     * @param <DATA>  the data type.
+     * @param <DATA> the data type.
      */
     private static class MissingToken<DATA>
             extends ClassToken<MissingLoaderInvocation<DATA, DATA>> {

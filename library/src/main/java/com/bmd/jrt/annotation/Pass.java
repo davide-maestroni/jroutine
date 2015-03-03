@@ -82,7 +82,7 @@ import java.lang.annotation.Target;
  * </pre>
  * <p/>
  * Note that the type of asynchronicity is automatically inferred by the mirror and the target type,
- * unless specifically choose through the annotation mode attribute.
+ * unless specifically chosen through the annotation <code>mode</code> attribute.
  * <p/>
  * Remember also that, in order for the annotation to properly work at run time, you will need to
  * add the following rules to your Proguard file (if employing it for shrinking or obfuscation):

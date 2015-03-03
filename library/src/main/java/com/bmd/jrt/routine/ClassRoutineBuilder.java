@@ -19,10 +19,10 @@ import com.bmd.jrt.annotation.Timeout;
 import com.bmd.jrt.builder.RoutineBuilder;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.channel.ResultChannel;
-import com.bmd.jrt.common.CacheHashMap;
 import com.bmd.jrt.common.InvocationException;
 import com.bmd.jrt.common.InvocationInterruptedException;
 import com.bmd.jrt.common.RoutineException;
+import com.bmd.jrt.common.WeakIdentityHashMap;
 import com.bmd.jrt.invocation.InvocationFactory;
 import com.bmd.jrt.invocation.Invocations;
 import com.bmd.jrt.invocation.SingleCallInvocation;
@@ -60,12 +60,12 @@ import static com.bmd.jrt.common.Reflection.boxingClass;
  */
 public class ClassRoutineBuilder implements RoutineBuilder {
 
-    protected static final CacheHashMap<Object, Map<String, Object>> sMutexCache =
-            new CacheHashMap<Object, Map<String, Object>>();
+    protected static final WeakIdentityHashMap<Object, Map<String, Object>> sMutexCache =
+            new WeakIdentityHashMap<Object, Map<String, Object>>();
 
-    private static final CacheHashMap<Object, HashMap<RoutineInfo, Routine<Object, Object>>>
+    private static final WeakIdentityHashMap<Object, HashMap<RoutineInfo, Routine<Object, Object>>>
             sRoutineCache =
-            new CacheHashMap<Object, HashMap<RoutineInfo, Routine<Object, Object>>>();
+            new WeakIdentityHashMap<Object, HashMap<RoutineInfo, Routine<Object, Object>>>();
 
     private final HashMap<String, Method> mMethodMap = new HashMap<String, Method>();
 
@@ -320,8 +320,8 @@ public class ClassRoutineBuilder implements RoutineBuilder {
                 throw new IllegalStateException("target object has been destroyed");
             }
 
-            final CacheHashMap<Object, HashMap<RoutineInfo, Routine<Object, Object>>> routineCache =
-                    sRoutineCache;
+            final WeakIdentityHashMap<Object, HashMap<RoutineInfo, Routine<Object, Object>>>
+                    routineCache = sRoutineCache;
             HashMap<RoutineInfo, Routine<Object, Object>> routineMap = routineCache.get(target);
 
             if (routineMap == null) {
@@ -347,7 +347,7 @@ public class ClassRoutineBuilder implements RoutineBuilder {
 
                 synchronized (sMutexCache) {
 
-                    final CacheHashMap<Object, Map<String, Object>> mutexCache = sMutexCache;
+                    final WeakIdentityHashMap<Object, Map<String, Object>> mutexCache = sMutexCache;
                     Map<String, Object> mutexMap = mutexCache.get(target);
 
                     if (mutexMap == null) {

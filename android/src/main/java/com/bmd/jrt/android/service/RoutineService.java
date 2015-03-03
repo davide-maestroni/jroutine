@@ -258,18 +258,6 @@ public class RoutineService extends Service {
         bundle.putSerializable(RoutineService.KEY_ABORT_EXCEPTION, error);
     }
 
-    /**
-     * Puts the specified invocation info into the passed bundle.
-     *
-     * @param bundle          the bundle to fill.
-     * @param isParallel      whether the invocation is parallel.
-     * @param invocationId    the invocation ID.
-     * @param invocationClass the invocation class.
-     * @param configuration   the routine configuration.
-     * @param runnerClass     the runner class.
-     * @param logClass        the log class.
-     * @throws java.lang.NullPointerException if any of the specified non-null parameters is null.
-     */
     private static void putInvocation(@Nonnull final Bundle bundle, boolean isParallel,
             @Nonnull final String invocationId,
             @Nonnull final Class<? extends AndroidInvocation<?, ?>> invocationClass,
@@ -504,7 +492,7 @@ public class RoutineService extends Service {
 
         @Nonnull
         @Override
-        protected Invocation<Object, Object> createInvocation(final boolean async) {
+        protected Invocation<Object, Object> newInvocation(final boolean async) {
 
             final Logger logger = getLogger();
 

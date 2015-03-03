@@ -215,7 +215,7 @@ public class Invocations {
 
         @Nonnull
         @Override
-        public Invocation<INPUT, OUTPUT> createInvocation() {
+        public Invocation<INPUT, OUTPUT> newInvocation() {
 
             try {
 
@@ -263,7 +263,7 @@ public class Invocations {
 
         @Nonnull
         @Override
-        public Invocation<INPUT, OUTPUT> createInvocation() {
+        public Invocation<INPUT, OUTPUT> newInvocation() {
 
             return mInvocation;
         }

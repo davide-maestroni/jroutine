@@ -23,8 +23,8 @@ import com.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.bmd.jrt.builder.RoutineConfiguration.TimeoutAction;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.channel.ParameterChannel;
-import com.bmd.jrt.common.CacheHashMap;
 import com.bmd.jrt.common.ClassToken;
+import com.bmd.jrt.common.WeakIdentityHashMap;
 import com.bmd.jrt.time.TimeDuration;
 
 import java.lang.annotation.Annotation;
@@ -62,8 +62,8 @@ import static com.bmd.jrt.time.TimeDuration.fromUnit;
  */
 public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
-    private static final CacheHashMap<Object, HashMap<Method, Method>> sMethodCache =
-            new CacheHashMap<Object, HashMap<Method, Method>>();
+    private static final WeakIdentityHashMap<Object, HashMap<Method, Method>> sMethodCache =
+            new WeakIdentityHashMap<Object, HashMap<Method, Method>>();
 
     /**
      * Constructor.
@@ -412,14 +412,14 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     }
 
     /**
-     * Returns a proxy object enabling asynchronous calls to the target instance methods.
+     * Returns a proxy object enabling asynchronous calling of the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
      * optional {@link com.bmd.jrt.annotation.Bind} and {@link com.bmd.jrt.annotation.Timeout}
      * annotation.<br/>
-     * In case the wrapped object does not implement the specified interface, the annotation name
-     * will be used to bind the interface method with the instance ones. If no name is assigned, the
-     * method name will be used instead to map it.<br/>
+     * In case the wrapped object does not implement the specified interface, the binding annotation
+     * value will be used to bind the interface method with the instance ones. If no annotation is
+     * present, the method name will be used instead to map it.<br/>
      * The interface will be interpreted as a mirror of the target object methods, and the optional
      * {@link com.bmd.jrt.annotation.Pass} annotations will be honored.<br/>
      * Note that such annotations will override any configuration set through the builder.
@@ -457,14 +457,14 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     }
 
     /**
-     * Returns a proxy object enabling asynchronous calls to the target instance methods.
+     * Returns a proxy object enabling asynchronous calling of the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
      * optional {@link com.bmd.jrt.annotation.Bind} and {@link com.bmd.jrt.annotation.Timeout}
      * annotation.<br/>
-     * In case the wrapped object does not implement the specified interface, the annotation name
-     * will be used to bind the interface method with the instance ones. If no name is assigned, the
-     * method name will be used instead to map it.<br/>
+     * In case the wrapped object does not implement the specified interface, the binding annotation
+     * value will be used to bind the interface method with the instance ones. If no annotation is
+     * present, the method name will be used instead to map it.<br/>
      * The interface will be interpreted as a mirror of the target object methods, and the optional
      * {@link com.bmd.jrt.annotation.Pass} annotations will be honored.<br/>
      * Note that such annotations will override any configuration set through the builder.
@@ -483,7 +483,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     }
 
     /**
-     * Returns a wrapper object enabling asynchronous calls to the target instance methods.
+     * Returns a wrapper object enabling asynchronous calling of the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
      * optional {@link com.bmd.jrt.annotation.Bind}, {@link com.bmd.jrt.annotation.Timeout} and
@@ -495,8 +495,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * of the specified interface and will have a name of the type: JRoutine_&lt;itf_simple_name&gt;
      * <br/>
      * It is actually possible to avoid the use of reflection for the wrapper instantiation by
-     * explicitly call the <code>JRoutine_&lt;itf_simple_name&gt;.on()</code> method. Note, however,
-     * that, since the class is generated, a generic IDE may highlight an error even if the
+     * explicitly calling the <code>JRoutine_&lt;itf_simple_name&gt;.on()</code> method. Note,
+     * however, that, since the class is generated, a generic IDE may highlight an error even if the
      * compilation is successful.
      * <br/>
      * Note also that you'll need to enable annotation pre-processing by adding the processor
@@ -532,7 +532,7 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
     }
 
     /**
-     * Returns a wrapper object enabling asynchronous calls to the target instance methods.
+     * Returns a wrapper object enabling asynchronous calling of the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
      * optional {@link com.bmd.jrt.annotation.Bind}, {@link com.bmd.jrt.annotation.Timeout} and
@@ -544,8 +544,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
      * of the specified interface and will have a name of the type: JRoutine_&lt;itf_simple_name&gt;
      * <br/>
      * It is actually possible to avoid the use of reflection for the wrapper instantiation by
-     * explicitly call the <code>JRoutine_&lt;itf_simple_name&gt;.on()</code> method. Note, however,
-     * that, since the class is generated, a generic IDE may highlight an error even if the
+     * explicitly calling the <code>JRoutine_&lt;itf_simple_name&gt;.on()</code> method. Note,
+     * however, that, since the class is generated, a generic IDE may highlight an error even if the
      * compilation is successful.
      * <br/>
      * Note also that you'll need to enable annotation pre-processing by adding the processor
@@ -653,8 +653,22 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
         @Nonnull
         @Override
-        protected CLASS createInstance(
-                @Nonnull final CacheHashMap<Object, Map<String, Object>> mutexMap,
+        protected Object getTarget() {
+
+            return mTarget;
+        }
+
+        @Nonnull
+        @Override
+        protected Class<CLASS> getWrapperClass() {
+
+            return mWrapperClass;
+        }
+
+        @Nonnull
+        @Override
+        protected CLASS newWrapper(
+                @Nonnull final WeakIdentityHashMap<Object, Map<String, Object>> mutexMap,
                 @Nonnull final String shareGroup,
                 @Nonnull final RoutineConfiguration configuration) {
 
@@ -680,20 +694,6 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
                 throw new IllegalArgumentException(t);
             }
-        }
-
-        @Nonnull
-        @Override
-        protected Object getTarget() {
-
-            return mTarget;
-        }
-
-        @Nonnull
-        @Override
-        protected Class<CLASS> getWrapperClass() {
-
-            return mWrapperClass;
         }
     }
 
@@ -736,7 +736,8 @@ public class ObjectRoutineBuilder extends ClassRoutineBuilder {
 
             synchronized (sMethodCache) {
 
-                final CacheHashMap<Object, HashMap<Method, Method>> methodCache = sMethodCache;
+                final WeakIdentityHashMap<Object, HashMap<Method, Method>> methodCache =
+                        sMethodCache;
                 HashMap<Method, Method> methodMap = methodCache.get(target);
 
                 if (methodMap == null) {

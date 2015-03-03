@@ -24,7 +24,7 @@ import javax.annotation.Nullable;
  * <p/>
  * The interface takes inspiration from the Go routines, where functions are executed
  * asynchronously and communicate with the external world only through channels. Being Java a
- * strictly non-functional programming language, the routine itself must be an object based on
+ * strictly object oriented programming language, the routine itself must be an object based on
  * logic implemented in other objects.
  * <p/>
  * The framework includes a routine class based on the implementation of an invocation interface.

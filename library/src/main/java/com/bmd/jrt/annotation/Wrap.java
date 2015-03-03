@@ -22,10 +22,10 @@ import java.lang.annotation.Target;
  * This annotation is used to indicate interfaces used as templates to generate wrapper classes
  * enabling asynchronous calls to the target instance methods.
  * <p/>
- * The target classes are specified in the annotation attribute. For each one a new wrapper class
- * implementing the annotated interface will be generated in the interface package.<br/>
+ * The target class is specified in the annotation attribute. A wrapper class implementing the
+ * annotated interface will be generated in the interface package.<br/>
  * The routines used for calling the methods will honor the attributes specified in any optional
- * {@link Bind}, {@link Timeout} abd {@link Pass}  annotation defined for each interface method.
+ * {@link Bind}, {@link Timeout} and {@link Pass} annotations defined for each interface method.
  * <p/>
  * Note that, you'll need to enable annotation pre-processing by adding the "jroutine-processor"
  * artifact or module to the specific project dependencies. Be sure also to include a proper rule in

@@ -36,7 +36,7 @@ public class AndroidPassingInvocation<DATA> extends AndroidTemplateInvocation<DA
 
                 @Nonnull
                 @Override
-                public Invocation<Object, Object> createInvocation() {
+                public Invocation<Object, Object> newInvocation() {
 
                     return sInvocation;
                 }

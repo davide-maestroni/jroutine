@@ -19,7 +19,7 @@ import javax.annotation.Nullable;
 
 /**
  * Exception indicating that no room in the output channel buffer became available before the
- * timeout elapsed.
+ * specific timeout elapsed.
  * <p/>
  * Created by davide on 11/25/14.
  */

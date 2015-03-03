@@ -26,8 +26,7 @@ import javax.annotation.Nonnull;
  * There are mainly two ways to create a routine object:
  * <p/>
  * <b>Routine by invocation customization</b><br/>
- * The first approach consists in implementing an invocation object and build on its class token
- * a routine instance.
+ * The first approach consists in implementing an invocation object and build its factory.
  * <p/>
  * <b>Routine by method invocation</b><br/>
  * The second approach is based on the asynchronous invocation of a method of an existing class or
@@ -40,7 +39,7 @@ import javax.annotation.Nonnull;
  * apply the framework functionalities to objects defined by third party libraries which are not
  * under direct control.<br/>
  * A mirror interface adds the possibility to override input and output parameters with output
- * channels, so that data are transferred asynchronously avoiding the need to block execution while
+ * channels, so that data are transferred asynchronously, avoiding the need to block execution while
  * waiting for them to be available.<br/>
  * Finally, it also possible to create a wrapper class to enable asynchronous invocation of methods,
  * through annotation pre-processing and compile time code generation. In order to activate the
@@ -54,7 +53,7 @@ import javax.annotation.Nonnull;
  *     <code>
  *
  *         final StandaloneChannel&lt;Result&gt; channel =
- *                 JRoutine.on().&lt;Result&gt;buildChannel();
+ *                 JRoutine.standalone().&lt;Result&gt;buildChannel();
  *
  *         channel.input()
  *                .pass(doSomething1.callAsync())
@@ -112,7 +111,7 @@ import javax.annotation.Nonnull;
  *     <code>
  *
  *         final StandaloneChannel&lt;Result&gt; channel =
- *                 JRoutine.on().&lt;Result&gt;buildChannel();
+ *                 JRoutine.standalone().&lt;Result&gt;buildChannel();
  *
  *         new Thread() {
  *
@@ -125,7 +124,8 @@ import javax.annotation.Nonnull;
  *         }.start();
  *
  *         final Routine&lt;Result, Result&gt; routine =
- *                  JRoutine.&lt;Result&gt;on().buildRoutine();
+ *                  JRoutine.&lt;Result&gt;on(PassingInvocation.&lt;Result&gt;factoryOf())
+ *                          .buildRoutine();
  *
  *         routine.callAsync(channel.output()).eventually().readAllInto(results);
  *     </code>

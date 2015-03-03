@@ -59,7 +59,7 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
 
     @Nonnull
     @Override
-    protected Invocation<INPUT, OUTPUT> createInvocation(final boolean async) {
+    protected Invocation<INPUT, OUTPUT> newInvocation(final boolean async) {
 
         final Logger logger = getLogger();
 
@@ -67,7 +67,7 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
 
             final InvocationFactory<INPUT, OUTPUT> factory = mFactory;
             logger.dbg("creating a new invocation instance with factory: %s", factory);
-            final Invocation<INPUT, OUTPUT> invocation = factory.createInvocation();
+            final Invocation<INPUT, OUTPUT> invocation = factory.newInvocation();
             logger.dbg("created a new instance of class: %s", invocation.getClass());
             return invocation;
 

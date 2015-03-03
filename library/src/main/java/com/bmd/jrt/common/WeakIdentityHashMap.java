@@ -35,7 +35,7 @@ import javax.annotation.Nonnull;
  * @param <K> the key type.
  * @param <V> the value type.
  */
-public class CacheHashMap<K, V> implements Map<K, V> {
+public class WeakIdentityHashMap<K, V> implements Map<K, V> {
 
     private final HashMap<IdentityWeakReference, V> mMap;
 
@@ -48,7 +48,7 @@ public class CacheHashMap<K, V> implements Map<K, V> {
     /**
      * Constructor.
      */
-    public CacheHashMap() {
+    public WeakIdentityHashMap() {
 
         mMap = new HashMap<IdentityWeakReference, V>();
     }
@@ -60,7 +60,7 @@ public class CacheHashMap<K, V> implements Map<K, V> {
      * @throws java.lang.NullPointerException if the specified map is null.
      * @see java.util.HashMap#HashMap(java.util.Map)
      */
-    public CacheHashMap(@Nonnull final Map<? extends K, ? extends V> map) {
+    public WeakIdentityHashMap(@Nonnull final Map<? extends K, ? extends V> map) {
 
         mMap = new HashMap<IdentityWeakReference, V>(map.size());
         putAll(map);
@@ -72,7 +72,7 @@ public class CacheHashMap<K, V> implements Map<K, V> {
      * @param initialCapacity the initial capacity.
      * @see java.util.HashMap#HashMap(int)
      */
-    public CacheHashMap(final int initialCapacity) {
+    public WeakIdentityHashMap(final int initialCapacity) {
 
         mMap = new HashMap<IdentityWeakReference, V>(initialCapacity);
     }
@@ -84,7 +84,7 @@ public class CacheHashMap<K, V> implements Map<K, V> {
      * @param loadFactor      the load factor.
      * @see java.util.HashMap#HashMap(int, float)
      */
-    public CacheHashMap(final int initialCapacity, final float loadFactor) {
+    public WeakIdentityHashMap(final int initialCapacity, final float loadFactor) {
 
         mMap = new HashMap<IdentityWeakReference, V>(initialCapacity, loadFactor);
     }
@@ -402,12 +402,12 @@ public class CacheHashMap<K, V> implements Map<K, V> {
             return true;
         }
 
-        if (!(o instanceof CacheHashMap)) {
+        if (!(o instanceof WeakIdentityHashMap)) {
 
             return (o instanceof Map) && o.equals(this);
         }
 
-        final CacheHashMap that = (CacheHashMap) o;
+        final WeakIdentityHashMap that = (WeakIdentityHashMap) o;
         return mMap.equals(that.mMap);
     }
 }

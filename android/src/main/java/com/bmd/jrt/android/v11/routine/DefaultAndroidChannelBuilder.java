@@ -22,7 +22,6 @@ import com.bmd.jrt.android.builder.AndroidChannelBuilder;
 import com.bmd.jrt.android.builder.AndroidRoutineBuilder;
 import com.bmd.jrt.android.builder.AndroidRoutineBuilder.CacheStrategy;
 import com.bmd.jrt.android.builder.AndroidRoutineBuilder.ClashResolution;
-import com.bmd.jrt.builder.RoutineBuilder;
 import com.bmd.jrt.builder.RoutineConfiguration;
 import com.bmd.jrt.channel.OutputChannel;
 import com.bmd.jrt.common.ClassToken;
@@ -137,15 +136,10 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
         return this;
     }
 
-    /**
-     * Note that only the options related to logs will be employed.
-     *
-     * @param configuration the routine configuration.
-     * @return this builder.
-     */
     @Nonnull
     @Override
-    public RoutineBuilder withConfiguration(@Nullable final RoutineConfiguration configuration) {
+    public AndroidChannelBuilder withConfiguration(
+            @Nullable final RoutineConfiguration configuration) {
 
         mConfiguration = configuration;
         return this;

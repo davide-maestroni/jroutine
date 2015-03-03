@@ -158,7 +158,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
                         @Nonnull
                         @Override
-                        protected Invocation<INPUT, OUTPUT> createInvocation(final boolean async) {
+                        protected Invocation<INPUT, OUTPUT> newInvocation(final boolean async) {
 
                             return new ParallelInvocation<INPUT, OUTPUT>(AbstractRoutine.this);
                         }
@@ -183,11 +183,11 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
             final Logger logger = mLogger;
             final LinkedList<Invocation<INPUT, OUTPUT>> syncInvocations = mSyncInvocations;
 
-            for (final Invocation<INPUT, OUTPUT> syncInvocation : syncInvocations) {
+            for (final Invocation<INPUT, OUTPUT> invocation : syncInvocations) {
 
                 try {
 
-                    syncInvocation.onDestroy();
+                    invocation.onDestroy();
 
                 } catch (final InvocationInterruptedException e) {
 
@@ -239,15 +239,6 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
     }
 
     /**
-     * Creates a new invocation instance.
-     *
-     * @param async whether the invocation is asynchronous.
-     * @return the invocation instance.
-     */
-    @Nonnull
-    protected abstract Invocation<INPUT, OUTPUT> createInvocation(boolean async);
-
-    /**
      * Returns the routine logger.
      *
      * @return the logger instance.
@@ -257,6 +248,15 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
         return mLogger;
     }
+
+    /**
+     * Creates a new invocation instance.
+     *
+     * @param async whether the invocation is asynchronous.
+     * @return the invocation instance.
+     */
+    @Nonnull
+    protected abstract Invocation<INPUT, OUTPUT> newInvocation(boolean async);
 
     @Nonnull
     private DefaultInvocationManager getInvocationManager(final boolean async) {
@@ -395,7 +395,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
                 mLogger.dbg("creating %ssync invocation instance [1/%d]", (async) ? "a" : "",
                             mCoreInvocations);
-                return createInvocation(async);
+                return newInvocation(async);
             }
         }
 

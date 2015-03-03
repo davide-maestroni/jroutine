@@ -18,8 +18,8 @@ import com.bmd.jrt.common.DeadlockException;
 import javax.annotation.Nullable;
 
 /**
- * Exception indicating that no room in the input channel buffer became available before the timeout
- * elapsed.
+ * Exception indicating that no room in the input channel buffer became available before the
+ * specific timeout elapsed.
  * <p/>
  * Created by davide on 11/25/14.
  */

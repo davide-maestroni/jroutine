@@ -21,12 +21,12 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Interface defining a builder of routines linked to a context lifecycle.
+ * Interface defining a builder of routines bound to a context lifecycle.
  * <p/>
  * Routine invocations started through the returned objects can be safely restored after a change in
  * the configuration, so to avoid duplicated calls and memory leaks. Be aware, though, that the
  * invocation results will always be dispatched in the main thread, no matter the calling one was,
- * so that waiting for the outputs right after the routine invocation will result in a deadlock.
+ * so waiting for the outputs right after the routine invocation will result in a deadlock.
  * <p/>
  * Note that the <code>equals()</code> and <code>hashCode()</code> methods of the input parameter
  * objects might be employed to check for clashing of invocations or compute the invocation ID.<br/>
@@ -75,6 +75,13 @@ public interface AndroidRoutineBuilder<INPUT, OUTPUT> extends RoutineBuilder {
     @Nonnull
     public AndroidRoutineBuilder<INPUT, OUTPUT> onComplete(@Nullable CacheStrategy cacheStrategy);
 
+    /**
+     * Note that all the options related to the output and input channels size and timeout will be
+     * ignored.
+     *
+     * @param configuration the routine configuration.
+     * @return this builder.
+     */
     @Nonnull
     @Override
     public AndroidRoutineBuilder<INPUT, OUTPUT> withConfiguration(
@@ -120,10 +127,10 @@ public interface AndroidRoutineBuilder<INPUT, OUTPUT> extends RoutineBuilder {
      * The clash of two invocation happens when the same ID is already in use at the time of the
      * routine execution. The possible outcomes are:
      * <ul>
-     * <li>the running invocation is restarted</li>
+     * <li>the running invocation is aborted</li>
      * <li>the running invocation is retained, ignoring the input data</li>
      * <li>the current invocation is aborted</li>
-     * <li>the running invocation is restarted only if the input data are different from the current
+     * <li>the running invocation is aborted only if the input data are different from the current
      * ones, and retained otherwise</li>
      * <li>the current invocation is aborted only if the input data are different from the current
      * ones, and retained otherwise</li>
@@ -132,7 +139,7 @@ public interface AndroidRoutineBuilder<INPUT, OUTPUT> extends RoutineBuilder {
     public enum ClashResolution {
 
         /**
-         * The clash is resolved by restarting the running invocation.
+         * The clash is resolved by aborting the running invocation.
          */
         ABORT_THAT,
         /**
@@ -144,8 +151,8 @@ public interface AndroidRoutineBuilder<INPUT, OUTPUT> extends RoutineBuilder {
          */
         ABORT_THIS,
         /**
-         * The clash is resolved by restarting the running invocation, only in case its input data
-         * are different from the current ones.
+         * The clash is resolved by aborting the running invocation, only in case its input data are
+         * different from the current ones.
          */
         ABORT_THAT_INPUT,
         /**

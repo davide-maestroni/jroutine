@@ -25,7 +25,7 @@ import javax.annotation.Nonnull;
  * share a pool of them between different instances.<br/>
  * The only requirements is that the specified execution is called each time a run method is
  * invoked.<br/>
- * Note also that the runner methods can be called from different thread, so, it is up to the
+ * Note also that the runner methods can be called from different threads, so, it is up to the
  * implementing class to ensure synchronization when needed.
  * <p/>
  * Created by davide on 9/7/14.

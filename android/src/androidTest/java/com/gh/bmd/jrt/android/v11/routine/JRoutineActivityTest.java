@@ -29,6 +29,7 @@ import com.gh.bmd.jrt.android.invocation.AndroidPassingInvocation;
 import com.gh.bmd.jrt.android.invocation.AndroidSingleCallInvocation;
 import com.gh.bmd.jrt.android.invocation.AndroidTemplateInvocation;
 import com.gh.bmd.jrt.android.log.Logs;
+import com.gh.bmd.jrt.android.runner.Runners;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.RunnerType;
@@ -37,6 +38,7 @@ import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.common.InvocationInterruptedException;
+import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.log.Log.LogLevel;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.routine.Routine;
@@ -48,9 +50,11 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.builder;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.withOutputOrder;
+import static com.gh.bmd.jrt.time.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -444,6 +448,66 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         assertThat(result1.readNext()).isSameAs(data1);
         assertThat(result2.readNext()).isSameAs(data1);
+    }
+
+    public void testAndroidChannelBuilderWarnings() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final CountLog countLog = new CountLog();
+        final RoutineConfiguration configuration = builder().withRunner(Runners.taskRunner())
+                                                            .withInputSize(3)
+                                                            .withInputTimeout(seconds(1))
+                                                            .withOutputSize(3)
+                                                            .withOutputTimeout(seconds(1))
+                                                            .withLogLevel(LogLevel.DEBUG)
+                                                            .withLog(countLog)
+                                                            .buildConfiguration();
+        JRoutine.onActivity(getActivity(), 0).withConfiguration(configuration).buildChannel();
+        assertThat(countLog.getWrnCount()).isEqualTo(5);
+
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        JRoutine.onFragment(fragment, 0).withConfiguration(configuration).buildChannel();
+        assertThat(countLog.getWrnCount()).isEqualTo(10);
+    }
+
+    public void testAndroidRoutineBuilderWarnings() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final CountLog countLog = new CountLog();
+        final RoutineConfiguration configuration = builder().withRunner(Runners.taskRunner())
+                                                            .withInputSize(3)
+                                                            .withInputTimeout(seconds(1))
+                                                            .withOutputSize(3)
+                                                            .withOutputTimeout(seconds(1))
+                                                            .withLogLevel(LogLevel.DEBUG)
+                                                            .withLog(countLog)
+                                                            .buildConfiguration();
+        JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
+                .withConfiguration(configuration)
+                .withId(0)
+                .onClash(ClashResolution.KEEP_THAT)
+                .buildRoutine();
+        assertThat(countLog.getWrnCount()).isEqualTo(5);
+
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        JRoutine.onFragment(fragment, ClassToken.tokenOf(ToUpperCase.class))
+                .withConfiguration(configuration)
+                .withId(0)
+                .onClash(ClashResolution.KEEP_THAT)
+                .buildRoutine();
+        assertThat(countLog.getWrnCount()).isEqualTo(10);
     }
 
     public void testClash() {
@@ -983,6 +1047,52 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             }
 
             result.abort(new IllegalStateException());
+        }
+    }
+
+    @SuppressWarnings("UnusedDeclaration")
+    private static class CountLog implements Log {
+
+        private int mDgbCount;
+
+        private int mErrCount;
+
+        private int mWrnCount;
+
+        @Override
+        public void dbg(@Nonnull final List<Object> contexts, @Nullable final String message,
+                @Nullable final Throwable throwable) {
+
+            ++mDgbCount;
+        }
+
+        @Override
+        public void err(@Nonnull final List<Object> contexts, @Nullable final String message,
+                @Nullable final Throwable throwable) {
+
+            ++mErrCount;
+        }
+
+        @Override
+        public void wrn(@Nonnull final List<Object> contexts, @Nullable final String message,
+                @Nullable final Throwable throwable) {
+
+            ++mWrnCount;
+        }
+
+        public int getDgbCount() {
+
+            return mDgbCount;
+        }
+
+        public int getErrCount() {
+
+            return mErrCount;
+        }
+
+        public int getWrnCount() {
+
+            return mWrnCount;
         }
     }
 

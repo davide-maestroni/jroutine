@@ -27,6 +27,7 @@ import com.gh.bmd.jrt.channel.StandaloneChannel.StandaloneInput;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.invocation.PassingInvocation;
+import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.log.Log.LogLevel;
 import com.gh.bmd.jrt.log.NullLog;
 import com.gh.bmd.jrt.runner.Runners;
@@ -40,6 +41,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutAction;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.builder;
@@ -196,6 +200,22 @@ public class JRoutineTest extends TestCase {
         } catch (final IllegalArgumentException ignored) {
 
         }
+    }
+
+    public void testClassRoutineBuilderWarnings() {
+
+        final CountLog countLog = new CountLog();
+        final RoutineConfiguration configuration = builder().withInputOrder(OrderType.DELIVERY)
+                                                            .withInputSize(3)
+                                                            .withInputTimeout(seconds(1))
+                                                            .withOutputOrder(OrderType.DELIVERY)
+                                                            .withOutputSize(3)
+                                                            .withOutputTimeout(seconds(1))
+                                                            .withLogLevel(LogLevel.DEBUG)
+                                                            .withLog(countLog)
+                                                            .buildConfiguration();
+        JRoutine.on(TestStatic.class).withConfiguration(configuration).boundMethod(TestStatic.GET);
+        assertThat(countLog.getWrnCount()).isEqualTo(6);
     }
 
     public void testClassRoutineCache() {
@@ -656,6 +676,26 @@ public class JRoutineTest extends TestCase {
         }
     }
 
+    public void testObjectRoutineBuilderWarnings() {
+
+        final CountLog countLog = new CountLog();
+        final RoutineConfiguration configuration = builder().withInputOrder(OrderType.DELIVERY)
+                                                            .withInputSize(3)
+                                                            .withInputTimeout(seconds(1))
+                                                            .withOutputOrder(OrderType.DELIVERY)
+                                                            .withOutputSize(3)
+                                                            .withOutputTimeout(seconds(1))
+                                                            .withLogLevel(LogLevel.DEBUG)
+                                                            .withLog(countLog)
+                                                            .buildConfiguration();
+        JRoutine.on(new Test()).withConfiguration(configuration).boundMethod(Test.GET);
+        assertThat(countLog.getWrnCount()).isEqualTo(6);
+
+        final Square square = new Square();
+        JRoutine.on(square).withConfiguration(configuration).buildProxy(SquareItf.class).compute(3);
+        assertThat(countLog.getWrnCount()).isEqualTo(12);
+    }
+
     public void testObjectRoutineCache() {
 
         final Test test = new Test();
@@ -880,6 +920,23 @@ public class JRoutineTest extends TestCase {
                                                                                             -77L);
     }
 
+    public void testStandaloneChannelBuilderWarnings() {
+
+        final CountLog countLog = new CountLog();
+        final RoutineConfiguration configuration = builder().withSyncRunner(RunnerType.SEQUENTIAL)
+                                                            .withMaxInvocations(3)
+                                                            .withCoreInvocations(3)
+                                                            .withAvailableTimeout(seconds(1))
+                                                            .withInputOrder(OrderType.DELIVERY)
+                                                            .withInputSize(3)
+                                                            .withInputTimeout(seconds(1))
+                                                            .withLogLevel(LogLevel.DEBUG)
+                                                            .withLog(countLog)
+                                                            .buildConfiguration();
+        JRoutine.standalone().withConfiguration(configuration).buildChannel();
+        assertThat(countLog.getWrnCount()).isEqualTo(7);
+    }
+
     private static interface CountError {
 
         @Pass(int.class)
@@ -1058,6 +1115,52 @@ public class JRoutineTest extends TestCase {
             }
 
             return list;
+        }
+    }
+
+    @SuppressWarnings("UnusedDeclaration")
+    private static class CountLog implements Log {
+
+        private int mDgbCount;
+
+        private int mErrCount;
+
+        private int mWrnCount;
+
+        @Override
+        public void dbg(@Nonnull final List<Object> contexts, @Nullable final String message,
+                @Nullable final Throwable throwable) {
+
+            ++mDgbCount;
+        }
+
+        @Override
+        public void err(@Nonnull final List<Object> contexts, @Nullable final String message,
+                @Nullable final Throwable throwable) {
+
+            ++mErrCount;
+        }
+
+        @Override
+        public void wrn(@Nonnull final List<Object> contexts, @Nullable final String message,
+                @Nullable final Throwable throwable) {
+
+            ++mWrnCount;
+        }
+
+        public int getDgbCount() {
+
+            return mDgbCount;
+        }
+
+        public int getErrCount() {
+
+            return mErrCount;
+        }
+
+        public int getWrnCount() {
+
+            return mWrnCount;
         }
     }
 

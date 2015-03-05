@@ -16,9 +16,12 @@ package com.gh.bmd.jrt.routine;
 import com.gh.bmd.jrt.annotation.Pass;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.annotation.Wrap;
+import com.gh.bmd.jrt.builder.RoutineConfiguration;
+import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.StandaloneChannel;
 import com.gh.bmd.jrt.common.ClassToken;
+import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.log.Log.LogLevel;
 import com.gh.bmd.jrt.log.NullLog;
 import com.gh.bmd.jrt.runner.Runner;
@@ -32,9 +35,13 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.RunnerType;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.builder;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.withSyncRunner;
+import static com.gh.bmd.jrt.time.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -144,6 +151,26 @@ public class RoutineProcessorTest extends TestCase {
                 testWrapper);
     }
 
+    public void testWrapperBuilderWarnings() {
+
+        final CountLog countLog = new CountLog();
+        final RoutineConfiguration configuration = builder().withInputOrder(OrderType.DELIVERY)
+                                                            .withInputSize(3)
+                                                            .withInputTimeout(seconds(1))
+                                                            .withOutputOrder(OrderType.DELIVERY)
+                                                            .withOutputSize(3)
+                                                            .withOutputTimeout(seconds(1))
+                                                            .withLogLevel(LogLevel.DEBUG)
+                                                            .withLog(countLog)
+                                                            .buildConfiguration();
+        final TestClass testClass = new TestClass();
+        JRoutine.on(testClass)
+                .withConfiguration(configuration)
+                .buildWrapper(TestWrapper.class)
+                .getOne();
+        assertThat(countLog.getWrnCount()).isEqualTo(6);
+    }
+
     @SuppressWarnings("UnusedDeclaration")
     public interface TestClassInterface {
 
@@ -208,6 +235,52 @@ public class RoutineProcessorTest extends TestCase {
         public String getString(final int i) {
 
             return Integer.toString(i);
+        }
+    }
+
+    @SuppressWarnings("UnusedDeclaration")
+    private static class CountLog implements Log {
+
+        private int mDgbCount;
+
+        private int mErrCount;
+
+        private int mWrnCount;
+
+        @Override
+        public void dbg(@Nonnull final List<Object> contexts, @Nullable final String message,
+                @Nullable final Throwable throwable) {
+
+            ++mDgbCount;
+        }
+
+        @Override
+        public void err(@Nonnull final List<Object> contexts, @Nullable final String message,
+                @Nullable final Throwable throwable) {
+
+            ++mErrCount;
+        }
+
+        @Override
+        public void wrn(@Nonnull final List<Object> contexts, @Nullable final String message,
+                @Nullable final Throwable throwable) {
+
+            ++mWrnCount;
+        }
+
+        public int getDgbCount() {
+
+            return mDgbCount;
+        }
+
+        public int getErrCount() {
+
+            return mErrCount;
+        }
+
+        public int getWrnCount() {
+
+            return mWrnCount;
         }
     }
 }

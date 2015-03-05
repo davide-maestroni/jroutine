@@ -169,7 +169,7 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> implements AndroidRoutineBuild
         if (runner != null) {
 
             logger = Logger.newLogger(configuration, this);
-            logger.wrn("the specified runner will be ignored: %d", runner);
+            logger.wrn("the specified runner will be ignored: %s", runner);
         }
 
         final int inputSize = configuration.getInputSizeOr(RoutineConfiguration.DEFAULT);

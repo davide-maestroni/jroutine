@@ -37,6 +37,7 @@ import com.gh.bmd.jrt.common.AbortException;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.common.InvocationInterruptedException;
+import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.log.Log.LogLevel;
 import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.time.TimeDuration;
@@ -45,9 +46,11 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.builder;
 import static com.gh.bmd.jrt.time.TimeDuration.millis;
+import static com.gh.bmd.jrt.time.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -293,6 +296,24 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
                           .readAll()).containsOnly("1", "2", "3", "4", "5");
     }
 
+    public void testServiceRoutineBuilderWarnings() {
+
+        final CountLog countLog = new CountLog();
+        final RoutineConfiguration configuration = builder().withInputSize(3)
+                                                            .withInputTimeout(seconds(1))
+                                                            .withOutputSize(3)
+                                                            .withOutputTimeout(seconds(1))
+                                                            .withLogLevel(LogLevel.DEBUG)
+                                                            .withLog(countLog)
+                                                            .buildConfiguration();
+        JRoutine.onService(getActivity(), ClassToken.tokenOf(StringPassingInvocation.class))
+                .withConfiguration(configuration)
+                .dispatchingOn(Looper.getMainLooper())
+                .withServiceClass(TestService.class)
+                .buildRoutine();
+        assertThat(countLog.getWrnCount()).isEqualTo(4);
+    }
+
     private static class Abort extends AndroidTemplateInvocation<Data, Data> {
 
         @Override
@@ -308,6 +329,52 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
             }
 
             result.abort(new IllegalStateException("test"));
+        }
+    }
+
+    @SuppressWarnings("UnusedDeclaration")
+    private static class CountLog implements Log {
+
+        private int mDgbCount;
+
+        private int mErrCount;
+
+        private int mWrnCount;
+
+        @Override
+        public void dbg(@Nonnull final List<Object> contexts, @Nullable final String message,
+                @Nullable final Throwable throwable) {
+
+            ++mDgbCount;
+        }
+
+        @Override
+        public void err(@Nonnull final List<Object> contexts, @Nullable final String message,
+                @Nullable final Throwable throwable) {
+
+            ++mErrCount;
+        }
+
+        @Override
+        public void wrn(@Nonnull final List<Object> contexts, @Nullable final String message,
+                @Nullable final Throwable throwable) {
+
+            ++mWrnCount;
+        }
+
+        public int getDgbCount() {
+
+            return mDgbCount;
+        }
+
+        public int getErrCount() {
+
+            return mErrCount;
+        }
+
+        public int getWrnCount() {
+
+            return mWrnCount;
         }
     }
 

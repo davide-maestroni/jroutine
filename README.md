@@ -20,7 +20,7 @@ The main way to define a routine is to implement an invocation object. Though, t
 
 The library adheres to [The Reactive Manifesto][17]. It's responsive, resilient, elastic and "message driven".
 
-It's responsive because resources are allocated only when needed, and reused when possible. Computation of asynchronous invocations happens only in response of inputs and resources are freed as soon as the input is consumed.
+It's responsive because commands are enqueued to be executed asynchronously so to never block the calling thread. Computation of asynchronous invocations happens only in response of inputs and resources are freed as soon as the input is consumed. Resources are allocated only when needed, and reused when possible.
 It's resilient because errors are gracefully handled and notified through the proper methods implemented by the specific invocation classes.
 It's elastic because the needed number of threads is allocated in response to higher loads.
 It's "message driven" because both ouputs and errors are dispatched along the chain of invocations.
@@ -131,6 +131,6 @@ Unless required by applicable law or agreed to in writing, software distributed 
 [12]:http://joel-costigliola.github.io/assertj/
 [13]:http://davide-maestroni.github.io/jroutine/docs/jroutine
 [14]:http://davide-maestroni.github.io/jroutine/docs/android
-[15]:http://davide-maestroni.github.io/jroutine/docs/jroutine/com/bmd/jrt/runner/Runner.html
+[15]:http://davide-maestroni.github.io/jroutine/docs/jroutine/com/gh/bmd/jrt/runner/Runner.html
 [16]:http://retrotranslator.sourceforge.net/
 [17]:http://www.reactivemanifesto.org/

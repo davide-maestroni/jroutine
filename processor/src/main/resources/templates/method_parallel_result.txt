@@ -17,7 +17,7 @@
     @Override
     public ${resultType} ${methodName}(${paramTypes}) {
 
-        final com.bmd.jrt.channel.ParameterChannel<Object, ${resultClassName}> $$channel = this.mRoutine${methodCount}.invokeParallel();
+        final com.gh.bmd.jrt.channel.ParameterChannel<Object, ${resultClassName}> $$channel = this.mRoutine${methodCount}.invokeParallel();
 
         for (final Object $$object: ${params}) {
 

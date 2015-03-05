@@ -1,34 +1,34 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.bmd.jrt.android">
+    package="com.gh.bmd.jrt.android">
 
     <application
         android:label="@string/lib_name">
         <activity
-            android:name=".routine.TestActivity"
+            android:name="com.gh.bmd.jrt.android.routine.TestActivity"
             android:label="test">
         </activity>
         <activity
-            android:name=".v11.routine.TestActivity"
+            android:name="com.gh.bmd.jrt.android.v11.routine.TestActivity"
             android:label="test">
         </activity>
         <activity
-            android:name=".v11.routine.RotationTestActivity"
+            android:name="com.gh.bmd.jrt.android.v11.routine.RotationTestActivity"
             android:label="test">
         </activity>
         <activity
-            android:name=".v4.routine.TestActivity"
+            android:name="com.gh.bmd.jrt.android.v4.routine.TestActivity"
             android:label="test">
         </activity>
         <activity
-            android:name=".v4.routine.RotationTestActivity"
+            android:name="com.gh.bmd.jrt.android.v4.routine.RotationTestActivity"
             android:label="test">
         </activity>
 
         <service
-            android:name=".service.RoutineService"
+            android:name="com.gh.bmd.jrt.android.service.RoutineService"
             android:process=":remote"/>
         <service
-            android:name=".routine.TestService"
+            android:name="com.gh.bmd.jrt.android.routine.TestService"
             android:process=":remote"/>
     </application>
 

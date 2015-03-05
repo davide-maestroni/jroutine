@@ -14,18 +14,28 @@
 
 // GENERATED CODE - PLEASE DO NOT EDIT
 
-    private final com.bmd.jrt.routine.Routine<Object, ${resultClassName}> mRoutine${methodCount};
+    private final com.gh.bmd.jrt.routine.Routine<Object, ${resultClassName}> mRoutine${methodCount};
 
-    private com.bmd.jrt.routine.Routine<Object, ${resultClassName}> initRoutine${methodCount}(
-            final com.bmd.jrt.builder.RoutineConfiguration configuration) {
+    private com.gh.bmd.jrt.routine.Routine<Object, ${resultClassName}> initRoutine${methodCount}(
+            final com.gh.bmd.jrt.builder.RoutineConfiguration configuration) {
 
-        return com.bmd.jrt.routine.JRoutine.on(com.bmd.jrt.invocation.Invocations.withArgs(this).factoryOf(SingleCallInvocation${methodCount}.class))
-                                       .withConfiguration(com.bmd.jrt.builder.RoutineConfiguration.builderFrom(configuration)
+        final com.gh.bmd.jrt.invocation.InvocationFactory<Object, ${resultClassName}> factory = new com.gh.bmd.jrt.invocation.InvocationFactory<Object, ${resultClassName}>() {
+
+            @javax.annotation.Nonnull
+            public com.gh.bmd.jrt.invocation.Invocation<Object, ${resultClassName}> newInvocation() {
+
+                return new SingleCallInvocation${methodCount}();
+            }
+        };
+
+        return com.gh.bmd.jrt.routine.JRoutine.on(factory)
+                                       .withConfiguration(com.gh.bmd.jrt.builder.RoutineConfiguration.builderFrom(configuration)
                                            ${routineBuilderOptions}
                                            .withInputSize(Integer.MAX_VALUE)
-                                           .withInputTimeout(com.bmd.jrt.time.TimeDuration.ZERO)
+                                           .withInputTimeout(com.gh.bmd.jrt.time.TimeDuration.ZERO)
+                                           .withOutputOrder(com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType.DELIVERY)
                                            .withOutputSize(Integer.MAX_VALUE)
-                                           .withOutputTimeout(com.bmd.jrt.time.TimeDuration.ZERO)
+                                           .withOutputTimeout(com.gh.bmd.jrt.time.TimeDuration.ZERO)
                                            .buildConfiguration())
                                        .buildRoutine();
     }

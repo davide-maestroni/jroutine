@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.bmd.jrt.android">
+    package="com.gh.bmd.jrt.android">
 
     <application
         android:label="@string/lib_name">

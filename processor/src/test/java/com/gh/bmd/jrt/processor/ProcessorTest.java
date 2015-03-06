@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package src.com.gh.bmd.jrt.processor;
+package com.gh.bmd.jrt.processor;
 
 import com.gh.bmd.jrt.annotation.Pass;
 import com.gh.bmd.jrt.annotation.Timeout;

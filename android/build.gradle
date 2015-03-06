@@ -49,8 +49,8 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile project(':library')
     compile 'com.android.support:support-v4:21.0.3' // Travis does not support a later version
+    compile 'com.github.davide-maestroni:jroutine:1.0.0'
 
     androidTestCompile 'org.assertj:assertj-core:1.7.0'
 }

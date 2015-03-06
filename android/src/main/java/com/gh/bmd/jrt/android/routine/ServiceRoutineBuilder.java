@@ -36,7 +36,7 @@ import javax.annotation.Nullable;
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-public class ServiceRoutineBuilder<INPUT, OUTPUT> implements RoutineBuilder {
+public class ServiceRoutineBuilder<INPUT, OUTPUT> implements RoutineBuilder<INPUT, OUTPUT> {
 
     private final ClassToken<? extends AndroidInvocation<INPUT, OUTPUT>> mClassToken;
 
@@ -77,31 +77,13 @@ public class ServiceRoutineBuilder<INPUT, OUTPUT> implements RoutineBuilder {
         mClassToken = classToken;
     }
 
-    /**
-     * Builds and returns the routine.
-     *
-     * @return the newly created routine instance.
-     */
     @Nonnull
+    @Override
     public Routine<INPUT, OUTPUT> buildRoutine() {
 
         return new ServiceRoutine<INPUT, OUTPUT>(mContext, mServiceClass, mLooper, mClassToken,
                                                  RoutineConfiguration.notNull(mConfiguration),
                                                  mRunnerClass, mLogClass);
-    }
-
-    /**
-     * Sets the looper on which the results from the service are dispatched. A null value means that
-     * results will be dispatched on the invocation thread.
-     *
-     * @param looper the looper instance.
-     * @return this builder.
-     */
-    @Nonnull
-    public ServiceRoutineBuilder<INPUT, OUTPUT> dispatchingOn(@Nullable final Looper looper) {
-
-        mLooper = looper;
-        return this;
     }
 
     /**
@@ -117,6 +99,20 @@ public class ServiceRoutineBuilder<INPUT, OUTPUT> implements RoutineBuilder {
             @Nullable final RoutineConfiguration configuration) {
 
         mConfiguration = configuration;
+        return this;
+    }
+
+    /**
+     * Sets the looper on which the results from the service are dispatched. A null value means that
+     * results will be dispatched on the invocation thread.
+     *
+     * @param looper the looper instance.
+     * @return this builder.
+     */
+    @Nonnull
+    public ServiceRoutineBuilder<INPUT, OUTPUT> dispatchingOn(@Nullable final Looper looper) {
+
+        mLooper = looper;
         return this;
     }
 

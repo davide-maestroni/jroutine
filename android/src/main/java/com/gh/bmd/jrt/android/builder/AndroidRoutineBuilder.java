@@ -15,7 +15,6 @@ package com.gh.bmd.jrt.android.builder;
 
 import com.gh.bmd.jrt.builder.RoutineBuilder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.routine.Routine;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -39,20 +38,12 @@ import javax.annotation.Nullable;
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-public interface AndroidRoutineBuilder<INPUT, OUTPUT> extends RoutineBuilder {
+public interface AndroidRoutineBuilder<INPUT, OUTPUT> extends RoutineBuilder<INPUT, OUTPUT> {
 
     /**
      * Constant identifying a routine ID computed from the executor class and the input parameters.
      */
     public static final int AUTO = Integer.MIN_VALUE;
-
-    /**
-     * Builds and returns the routine.
-     *
-     * @return the newly created routine instance.
-     */
-    @Nonnull
-    public Routine<INPUT, OUTPUT> buildRoutine();
 
     /**
      * Tells the builder how to resolve clashes of invocations. A clash happens when an invocation

@@ -13,7 +13,7 @@
  */
 package com.gh.bmd.jrt.routine;
 
-import com.gh.bmd.jrt.builder.RoutineBuilder;
+import com.gh.bmd.jrt.builder.ConfigurableBuilder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.channel.StandaloneChannel;
 
@@ -25,7 +25,7 @@ import javax.annotation.Nullable;
  * <p/>
  * Created by davide on 10/25/14.
  */
-public class StandaloneChannelBuilder implements RoutineBuilder {
+public class StandaloneChannelBuilder implements ConfigurableBuilder {
 
     private RoutineConfiguration mConfiguration;
 

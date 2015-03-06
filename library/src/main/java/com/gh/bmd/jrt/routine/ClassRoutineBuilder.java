@@ -16,7 +16,7 @@ package com.gh.bmd.jrt.routine;
 import com.gh.bmd.jrt.annotation.Bind;
 import com.gh.bmd.jrt.annotation.Share;
 import com.gh.bmd.jrt.annotation.Timeout;
-import com.gh.bmd.jrt.builder.RoutineBuilder;
+import com.gh.bmd.jrt.builder.ConfigurableBuilder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.ResultChannel;
@@ -60,7 +60,7 @@ import static com.gh.bmd.jrt.common.Reflection.boxingClass;
  * @see com.gh.bmd.jrt.annotation.Bind
  * @see com.gh.bmd.jrt.annotation.Timeout
  */
-public class ClassRoutineBuilder implements RoutineBuilder {
+public class ClassRoutineBuilder implements ConfigurableBuilder {
 
     protected static final WeakIdentityHashMap<Object, Map<String, Object>> sMutexCache =
             new WeakIdentityHashMap<Object, Map<String, Object>>();

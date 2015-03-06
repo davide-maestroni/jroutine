@@ -14,7 +14,7 @@
 package com.gh.bmd.jrt.android.builder;
 
 import com.gh.bmd.jrt.android.builder.AndroidRoutineBuilder.CacheStrategy;
-import com.gh.bmd.jrt.builder.RoutineBuilder;
+import com.gh.bmd.jrt.builder.ConfigurableBuilder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.channel.OutputChannel;
 
@@ -30,7 +30,7 @@ import javax.annotation.Nullable;
  *
  * @see com.gh.bmd.jrt.android.builder.AndroidRoutineBuilder
  */
-public interface AndroidChannelBuilder extends RoutineBuilder {
+public interface AndroidChannelBuilder extends ConfigurableBuilder {
 
     /**
      * Builds and returns an output channel bound to the routine invocation.

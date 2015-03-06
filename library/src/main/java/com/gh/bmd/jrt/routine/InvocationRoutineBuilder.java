@@ -28,7 +28,7 @@ import javax.annotation.Nullable;
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineBuilder {
+public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineBuilder<INPUT, OUTPUT> {
 
     private final InvocationFactory<INPUT, OUTPUT> mFactory;
 
@@ -51,12 +51,8 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineBuilder {
         mFactory = factory;
     }
 
-    /**
-     * Builds and returns the routine.
-     *
-     * @return the newly created routine instance.
-     */
     @Nonnull
+    @Override
     public Routine<INPUT, OUTPUT> buildRoutine() {
 
         return new DefaultRoutine<INPUT, OUTPUT>(RoutineConfiguration.notNull(mConfiguration),

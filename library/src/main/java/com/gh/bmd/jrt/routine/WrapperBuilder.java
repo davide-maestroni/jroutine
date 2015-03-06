@@ -14,7 +14,7 @@
 package com.gh.bmd.jrt.routine;
 
 import com.gh.bmd.jrt.annotation.Share;
-import com.gh.bmd.jrt.builder.RoutineBuilder;
+import com.gh.bmd.jrt.builder.ConfigurableBuilder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.common.WeakIdentityHashMap;
@@ -36,7 +36,7 @@ import static com.gh.bmd.jrt.routine.ClassRoutineBuilder.sMutexCache;
  *
  * @param <CLASS>
  */
-public abstract class WrapperBuilder<CLASS> implements RoutineBuilder {
+public abstract class WrapperBuilder<CLASS> implements ConfigurableBuilder {
 
     private static final WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>> sClassMap =
             new WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>>();

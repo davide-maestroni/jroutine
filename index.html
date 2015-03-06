@@ -7,37 +7,38 @@
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script src="javascripts/respond.js"></script>
+    <script src="javascripts/main.js"></script>
     <!--[if lt IE 9]>
       <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <!--[if lt IE 8]>
-    <link rel="stylesheet" href="stylesheets/ie.css">
     <![endif]-->
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 
   </head>
   <body>
-      <div id="header">
-        <nav>
-          <li class="fork"><a href="https://github.com/davide-maestroni/jroutine">View On GitHub</a></li>
-          <li class="downloads"><a href="https://github.com/davide-maestroni/jroutine/zipball/master">ZIP</a></li>
-          <li class="downloads"><a href="https://github.com/davide-maestroni/jroutine/tarball/master">TAR</a></li>
-          <li class="title">DOWNLOADS</li>
-        </nav>
-      </div><!-- end header -->
+
+      <header>
+        <h1>JRoutine</h1>
+        <p>Parallel programming on the go</p>
+      </header>
+
+      <div id="banner">
+        <span id="logo"></span>
+
+        <a href="https://github.com/davide-maestroni/jroutine" class="button fork"><strong>View On GitHub</strong></a>
+        <div class="downloads">
+          <span>Downloads:</span>
+          <ul>
+            <li><a href="https://github.com/davide-maestroni/jroutine/zipball/master" class="button">ZIP</a></li>
+            <li><a href="https://github.com/davide-maestroni/jroutine/tarball/master" class="button">TAR</a></li>
+          </ul>
+        </div>
+      </div><!-- end banner -->
 
     <div class="wrapper">
-
+      <nav>
+        <ul></ul>
+      </nav>
       <section>
-        <div id="title">
-          <h1>JRoutine</h1>
-          <p>Parallel programming on the go</p>
-          <hr>
-          <span class="credits left">Project maintained by <a href="https://github.com/davide-maestroni">davide-maestroni</a></span>
-          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
-        </div>
-
         <h2>
 <a id="overview" class="anchor" href="#overview" aria-hidden="true"><span class="octicon octicon-link"></span></a>Overview</h2>
 
@@ -56,7 +57,7 @@
 
 <p>The library adheres to <a href="http://www.reactivemanifesto.org/">The Reactive Manifesto</a>. It's responsive, resilient, elastic and "message driven".</p>
 
-<p>It's responsive because resources are allocated only when needed, and reused when possible. Computation of asynchronous invocations happens only in response of inputs and resources are freed as soon as the input is consumed.
+<p>It's responsive because commands are enqueued to be executed asynchronously so to never block the calling thread. Computation of asynchronous invocations happens only in response of inputs and resources are freed as soon as the input is consumed. Resources are allocated only when needed, and reused when possible.
 It's resilient because errors are gracefully handled and notified through the proper methods implemented by the specific invocation classes.
 It's elastic because the needed number of threads is allocated in response to higher loads.
 It's "message driven" because both ouputs and errors are dispatched along the chain of invocations.</p>
@@ -140,6 +141,11 @@ For anything else <a href="https://github.com/">GitHub</a> is a great source of 
 <p>The project contains an additional sample module showing how to implement a file downloader with just 4 classes.</p>
 
 <h2>
+<a id="further-development" class="anchor" href="#further-development" aria-hidden="true"><span class="octicon octicon-link"></span></a>Further development</h2>
+
+<p>Feel free to contribute with your own <a href="http://davide-maestroni.github.io/jroutine/docs/jroutine/com/gh/bmd/jrt/runner/Runner.html">Runner</a> so to support more platforms other than Android.</p>
+
+<h2>
 <a id="build-instructions" class="anchor" href="#build-instructions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Build instructions</h2>
 
 <p>Please refer to the dedicated <a href="https://github.com/davide-maestroni/jroutine/wiki/Build-Instructions">wiki page</a>.</p>
@@ -184,7 +190,10 @@ For anything else <a href="https://github.com/">GitHub</a> is a great source of 
 
 <p><strong>IT'S OPEN DUDE!</strong></p>
       </section>
-
+      <footer>
+        <p>Project maintained by <a href="https://github.com/davide-maestroni">davide-maestroni</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></small></p>
+      </footer>
     </div>
     <!--[if !IE]><script>fixScale(document);</script><![endif]-->
     

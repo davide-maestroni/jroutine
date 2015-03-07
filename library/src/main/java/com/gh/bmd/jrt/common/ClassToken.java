@@ -29,47 +29,47 @@ import javax.annotation.Nonnull;
  * <p/>
  * Created by davide on 6/14/14.
  *
- * @param <CLASS> the class type.
+ * @param <TYPE> the class type.
  */
-public abstract class ClassToken<CLASS> {
+public abstract class ClassToken<TYPE> {
 
     private Type mGenericType;
 
-    private Class<CLASS> mRawClass;
+    private Class<TYPE> mRawClass;
 
     /**
      * Creates a new token from the class of the specified object.
      *
-     * @param object  the object.
-     * @param <CLASS> the class type.
+     * @param object the object.
+     * @param <TYPE> the class type.
      * @return the newly created token.
      * @throws java.lang.NullPointerException if the object is null.
      */
     @Nonnull
     @SuppressWarnings("unchecked")
-    public static <CLASS> ClassToken<CLASS> tokenOf(@Nonnull final CLASS object) {
+    public static <TYPE> ClassToken<TYPE> tokenOf(@Nonnull final TYPE object) {
 
-        return tokenOf((Class<CLASS>) object.getClass());
+        return tokenOf((Class<TYPE>) object.getClass());
     }
 
     /**
      * Creates a new token from the specified raw class.
      *
      * @param rawClass the raw class.
-     * @param <CLASS>  the class type.
+     * @param <TYPE>   the class type.
      * @return the newly created token.
      * @throws java.lang.NullPointerException if the raw class is null.
      */
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    public static <CLASS> ClassToken<CLASS> tokenOf(@Nonnull final Class<CLASS> rawClass) {
+    public static <TYPE> ClassToken<TYPE> tokenOf(@Nonnull final Class<TYPE> rawClass) {
 
         if (rawClass == null) {
 
             throw new NullPointerException("the classification raw type must not be null");
         }
 
-        final ClassToken<CLASS> classToken = new ClassToken<CLASS>() {};
+        final ClassToken<TYPE> classToken = new ClassToken<TYPE>() {};
         classToken.mGenericType = rawClass;
         classToken.mRawClass = rawClass;
         return classToken;
@@ -84,9 +84,9 @@ public abstract class ClassToken<CLASS> {
      * @return the casted object.
      */
     @SuppressWarnings("unchecked")
-    public final CLASS cast(final Object object) {
+    public final TYPE cast(final Object object) {
 
-        return (CLASS) object;
+        return (TYPE) object;
     }
 
     /**
@@ -136,7 +136,7 @@ public abstract class ClassToken<CLASS> {
      */
     @Nonnull
     @SuppressWarnings("unchecked")
-    public final Class<CLASS> getRawClass() {
+    public final Class<TYPE> getRawClass() {
 
         if (mRawClass == null) {
 
@@ -144,11 +144,11 @@ public abstract class ClassToken<CLASS> {
 
             if (type instanceof Class) {
 
-                mRawClass = ((Class<CLASS>) type);
+                mRawClass = ((Class<TYPE>) type);
 
             } else if (type instanceof ParameterizedType) {
 
-                mRawClass = ((Class<CLASS>) ((ParameterizedType) type).getRawType());
+                mRawClass = ((Class<TYPE>) ((ParameterizedType) type).getRawType());
 
             } else {
 

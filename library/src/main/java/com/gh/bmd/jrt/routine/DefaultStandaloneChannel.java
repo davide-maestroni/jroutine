@@ -37,13 +37,13 @@ import javax.annotation.Nullable;
  * <p/>
  * Created by davide on 10/24/14.
  *
- * @param <TYPE> the data type.
+ * @param <DATA> the data type.
  */
-class DefaultStandaloneChannel<TYPE> implements StandaloneChannel<TYPE> {
+class DefaultStandaloneChannel<DATA> implements StandaloneChannel<DATA> {
 
-    private final DefaultStandaloneInput<TYPE> mInputChannel;
+    private final DefaultStandaloneInput<DATA> mInputChannel;
 
-    private final DefaultStandaloneOutput<TYPE> mOutputChannel;
+    private final DefaultStandaloneOutput<DATA> mOutputChannel;
 
     /**
      * Constructor.
@@ -54,13 +54,13 @@ class DefaultStandaloneChannel<TYPE> implements StandaloneChannel<TYPE> {
 
         final Logger logger = Logger.newLogger(configuration, this);
         final ChannelAbortHandler abortHandler = new ChannelAbortHandler();
-        final DefaultResultChannel<TYPE> inputChannel =
-                new DefaultResultChannel<TYPE>(configuration, abortHandler,
+        final DefaultResultChannel<DATA> inputChannel =
+                new DefaultResultChannel<DATA>(configuration, abortHandler,
                                                configuration.getRunnerOr(Runners.sharedRunner()),
                                                logger);
         abortHandler.setChannel(inputChannel);
-        mInputChannel = new DefaultStandaloneInput<TYPE>(inputChannel);
-        mOutputChannel = new DefaultStandaloneOutput<TYPE>(inputChannel.getOutput());
+        mInputChannel = new DefaultStandaloneInput<DATA>(inputChannel);
+        mOutputChannel = new DefaultStandaloneOutput<DATA>(inputChannel.getOutput());
         logger.dbg("building standalone channel with configuration: %s", configuration);
         warn(logger, configuration);
     }
@@ -123,14 +123,14 @@ class DefaultStandaloneChannel<TYPE> implements StandaloneChannel<TYPE> {
 
     @Nonnull
     @Override
-    public StandaloneInput<TYPE> input() {
+    public StandaloneInput<DATA> input() {
 
         return mInputChannel;
     }
 
     @Nonnull
     @Override
-    public StandaloneOutput<TYPE> output() {
+    public StandaloneOutput<DATA> output() {
 
         return mOutputChannel;
     }

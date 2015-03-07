@@ -32,9 +32,9 @@ import javax.annotation.Nullable;
  * <p/>
  * Created by davide on 10/25/14.
  *
- * @param <TYPE> the data type.
+ * @param <DATA> the data type.
  */
-public interface StandaloneChannel<TYPE> {
+public interface StandaloneChannel<DATA> {
 
     /**
      * Returns the input end of this channel.
@@ -42,7 +42,7 @@ public interface StandaloneChannel<TYPE> {
      * @return the input channel.
      */
     @Nonnull
-    public StandaloneInput<TYPE> input();
+    public StandaloneInput<DATA> input();
 
     /**
      * Returns the output end of this channel.
@@ -50,7 +50,7 @@ public interface StandaloneChannel<TYPE> {
      * @return the output channel.
      */
     @Nonnull
-    public StandaloneOutput<TYPE> output();
+    public StandaloneOutput<DATA> output();
 
     /**
      * Interface defining a standalone channel input.

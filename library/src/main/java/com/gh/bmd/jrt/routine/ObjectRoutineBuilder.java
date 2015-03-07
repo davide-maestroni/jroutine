@@ -48,15 +48,14 @@ public interface ObjectRoutineBuilder extends ClassRoutineBuilder {
      * {@link com.gh.bmd.jrt.annotation.Pass} annotations will be honored.<br/>
      * Note that such annotations will override any configuration set through the builder.
      *
-     * @param itf     the interface implemented by the return object.
-     * @param <CLASS> the interface type.
+     * @param itf    the interface implemented by the return object.
+     * @param <TYPE> the interface type.
      * @return the proxy object.
-     * @throws IllegalArgumentException if the specified class does not represent an
-     *                                  interface.
+     * @throws IllegalArgumentException if the specified class does not represent an interface.
      * @throws NullPointerException     if the specified class is null.
      */
     @Nonnull
-    public <CLASS> CLASS buildProxy(@Nonnull Class<CLASS> itf);
+    public <TYPE> TYPE buildProxy(@Nonnull Class<TYPE> itf);
 
     /**
      * Returns a proxy object enabling asynchronous calling of the target instance methods.
@@ -71,15 +70,14 @@ public interface ObjectRoutineBuilder extends ClassRoutineBuilder {
      * {@link com.gh.bmd.jrt.annotation.Pass} annotations will be honored.<br/>
      * Note that such annotations will override any configuration set through the builder.
      *
-     * @param itf     the token of the interface implemented by the return object.
-     * @param <CLASS> the interface type.
+     * @param itf    the token of the interface implemented by the return object.
+     * @param <TYPE> the interface type.
      * @return the proxy object.
-     * @throws IllegalArgumentException if the specified class does not represent an
-     *                                  interface.
+     * @throws IllegalArgumentException if the specified class does not represent an interface.
      * @throws NullPointerException     if the specified class is null.
      */
     @Nonnull
-    public <CLASS> CLASS buildProxy(@Nonnull ClassToken<CLASS> itf);
+    public <TYPE> TYPE buildProxy(@Nonnull ClassToken<TYPE> itf);
 
     /**
      * Returns a wrapper object enabling asynchronous calling of the target instance methods.
@@ -101,15 +99,14 @@ public interface ObjectRoutineBuilder extends ClassRoutineBuilder {
      * Note also that you'll need to enable annotation pre-processing by adding the processor
      * package to the specific project dependencies.
      *
-     * @param itf     the interface implemented by the return object.
-     * @param <CLASS> the interface type.
+     * @param itf    the interface implemented by the return object.
+     * @param <TYPE> the interface type.
      * @return the wrapping object.
-     * @throws IllegalArgumentException if the specified class does not represent an
-     *                                  interface.
+     * @throws IllegalArgumentException if the specified class does not represent an interface.
      * @throws NullPointerException     if the specified class is null.
      */
     @Nonnull
-    public <CLASS> CLASS buildWrapper(@Nonnull Class<CLASS> itf);
+    public <TYPE> TYPE buildWrapper(@Nonnull Class<TYPE> itf);
 
     /**
      * Returns a wrapper object enabling asynchronous calling of the target instance methods.
@@ -131,15 +128,14 @@ public interface ObjectRoutineBuilder extends ClassRoutineBuilder {
      * Note also that you'll need to enable annotation pre-processing by adding the processor
      * package to the specific project dependencies.
      *
-     * @param itf     the token of the interface implemented by the return object.
-     * @param <CLASS> the interface type.
+     * @param itf    the token of the interface implemented by the return object.
+     * @param <TYPE> the interface type.
      * @return the wrapping object.
-     * @throws IllegalArgumentException if the specified class does not represent an
-     *                                  interface.
+     * @throws IllegalArgumentException if the specified class does not represent an interface.
      * @throws NullPointerException     if the specified class is null.
      */
     @Nonnull
-    public <CLASS> CLASS buildWrapper(@Nonnull ClassToken<CLASS> itf);
+    public <TYPE> TYPE buildWrapper(@Nonnull ClassToken<TYPE> itf);
 
     /**
      * Note that all the options related to the output and input channels will be ignored.

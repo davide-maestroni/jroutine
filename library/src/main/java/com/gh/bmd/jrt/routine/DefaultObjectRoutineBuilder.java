@@ -405,7 +405,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
     @Nonnull
     @Override
-    public <CLASS> CLASS buildProxy(@Nonnull final Class<CLASS> itf) {
+    public <TYPE> TYPE buildProxy(@Nonnull final Class<TYPE> itf) {
 
         if (!itf.isInterface()) {
 
@@ -431,14 +431,14 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
     @Nonnull
     @Override
-    public <CLASS> CLASS buildProxy(@Nonnull final ClassToken<CLASS> itf) {
+    public <TYPE> TYPE buildProxy(@Nonnull final ClassToken<TYPE> itf) {
 
         return itf.cast(buildProxy(itf.getRawClass()));
     }
 
     @Nonnull
     @Override
-    public <CLASS> CLASS buildWrapper(@Nonnull final Class<CLASS> itf) {
+    public <TYPE> TYPE buildWrapper(@Nonnull final Class<TYPE> itf) {
 
         if (!itf.isInterface()) {
 
@@ -454,14 +454,14 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
             throw new IllegalStateException("target object has been destroyed");
         }
 
-        return new ObjectWrapperBuilder<CLASS>(target, itf).withConfiguration(getConfiguration())
-                                                           .withShareGroup(getShareGroup())
-                                                           .buildWrapper();
+        return new ObjectWrapperBuilder<TYPE>(target, itf).withConfiguration(getConfiguration())
+                                                          .withShareGroup(getShareGroup())
+                                                          .buildWrapper();
     }
 
     @Nonnull
     @Override
-    public <CLASS> CLASS buildWrapper(@Nonnull final ClassToken<CLASS> itf) {
+    public <TYPE> TYPE buildWrapper(@Nonnull final ClassToken<TYPE> itf) {
 
         return itf.cast(buildWrapper(itf.getRawClass()));
     }
@@ -526,13 +526,13 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
     /**
      * Wrapper builder implementation.
      *
-     * @param <CLASS> the interface type.
+     * @param <TYPE> the interface type.
      */
-    private static class ObjectWrapperBuilder<CLASS> extends AbstractWrapperBuilder<CLASS> {
+    private static class ObjectWrapperBuilder<TYPE> extends AbstractWrapperBuilder<TYPE> {
 
         private final Object mTarget;
 
-        private final Class<CLASS> mWrapperClass;
+        private final Class<TYPE> mWrapperClass;
 
         /**
          * Constructor.
@@ -541,7 +541,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
          * @param wrapperClass the wrapper class.
          */
         private ObjectWrapperBuilder(@Nonnull final Object target,
-                @Nonnull final Class<CLASS> wrapperClass) {
+                @Nonnull final Class<TYPE> wrapperClass) {
 
             mTarget = target;
             mWrapperClass = wrapperClass;
@@ -556,14 +556,14 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
         @Nonnull
         @Override
-        protected Class<CLASS> getWrapperClass() {
+        protected Class<TYPE> getWrapperClass() {
 
             return mWrapperClass;
         }
 
         @Nonnull
         @Override
-        protected CLASS newWrapper(
+        protected TYPE newWrapper(
                 @Nonnull final WeakIdentityHashMap<Object, Map<String, Object>> mutexMap,
                 @Nonnull final String shareGroup,
                 @Nonnull final RoutineConfiguration configuration) {
@@ -571,7 +571,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
             try {
 
                 final Object target = mTarget;
-                final Class<CLASS> wrapperClass = mWrapperClass;
+                final Class<TYPE> wrapperClass = mWrapperClass;
                 final Package classPackage = wrapperClass.getPackage();
                 final String packageName =
                         (classPackage != null) ? classPackage.getName() + "." : "";

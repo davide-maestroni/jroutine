@@ -33,9 +33,9 @@ import static com.gh.bmd.jrt.routine.DefaultClassRoutineBuilder.sMutexCache;
  * <p/>
  * Created by davide on 2/26/15.
  *
- * @param <CLASS> the wrapping class.
+ * @param <TYPE> the interface type.
  */
-public abstract class AbstractWrapperBuilder<CLASS> implements WrapperBuilder<CLASS> {
+public abstract class AbstractWrapperBuilder<TYPE> implements WrapperBuilder<TYPE> {
 
     private static final WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>> sClassMap =
             new WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>>();
@@ -46,7 +46,7 @@ public abstract class AbstractWrapperBuilder<CLASS> implements WrapperBuilder<CL
 
     @Nonnull
     @Override
-    public CLASS buildWrapper() {
+    public TYPE buildWrapper() {
 
         synchronized (sClassMap) {
 
@@ -63,7 +63,7 @@ public abstract class AbstractWrapperBuilder<CLASS> implements WrapperBuilder<CL
             final String shareGroup = mShareGroup;
             final String classShareGroup = (shareGroup != null) ? shareGroup : Share.ALL;
             final RoutineConfiguration configuration = RoutineConfiguration.notNull(mConfiguration);
-            final Class<CLASS> itf = getWrapperClass();
+            final Class<TYPE> itf = getWrapperClass();
             final ClassInfo classInfo = new ClassInfo(itf, configuration, classShareGroup);
             final Object instance = classes.get(classInfo);
 
@@ -76,7 +76,7 @@ public abstract class AbstractWrapperBuilder<CLASS> implements WrapperBuilder<CL
 
             try {
 
-                final CLASS newInstance = newWrapper(sMutexCache, classShareGroup, configuration);
+                final TYPE newInstance = newWrapper(sMutexCache, classShareGroup, configuration);
                 classes.put(classInfo, newInstance);
                 return newInstance;
 
@@ -89,7 +89,7 @@ public abstract class AbstractWrapperBuilder<CLASS> implements WrapperBuilder<CL
 
     @Nonnull
     @Override
-    public WrapperBuilder<CLASS> withConfiguration(
+    public WrapperBuilder<TYPE> withConfiguration(
             @Nullable final RoutineConfiguration configuration) {
 
         mConfiguration = configuration;
@@ -98,7 +98,7 @@ public abstract class AbstractWrapperBuilder<CLASS> implements WrapperBuilder<CL
 
     @Nonnull
     @Override
-    public WrapperBuilder<CLASS> withShareGroup(@Nullable final String group) {
+    public WrapperBuilder<TYPE> withShareGroup(@Nullable final String group) {
 
         mShareGroup = group;
         return this;
@@ -118,7 +118,7 @@ public abstract class AbstractWrapperBuilder<CLASS> implements WrapperBuilder<CL
      * @return the wrapper class.
      */
     @Nonnull
-    protected abstract Class<CLASS> getWrapperClass();
+    protected abstract Class<TYPE> getWrapperClass();
 
     /**
      * Creates and return a new wrapper instance.
@@ -129,7 +129,7 @@ public abstract class AbstractWrapperBuilder<CLASS> implements WrapperBuilder<CL
      * @return the wrapper instance.
      */
     @Nonnull
-    protected abstract CLASS newWrapper(
+    protected abstract TYPE newWrapper(
             @Nonnull final WeakIdentityHashMap<Object, Map<String, Object>> mutexMap,
             @Nonnull final String shareGroup, @Nonnull final RoutineConfiguration configuration);
 

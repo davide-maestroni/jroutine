@@ -23,9 +23,9 @@ import javax.annotation.Nullable;
  * <p/>
  * Created by davide on 3/7/15.
  *
- * @param <CLASS> the wrapping class.
+ * @param <TYPE> the interface type.
  */
-public interface WrapperBuilder<CLASS> extends SharableBuilder {
+public interface WrapperBuilder<TYPE> extends SharableBuilder {
 
     /**
      * Returns a wrapper object enabling asynchronous calling of the target instance methods.
@@ -43,7 +43,7 @@ public interface WrapperBuilder<CLASS> extends SharableBuilder {
      * @return the wrapping object.
      */
     @Nonnull
-    public CLASS buildWrapper();
+    public TYPE buildWrapper();
 
     /**
      * Note that all the options related to the output and input channels will be ignored.
@@ -53,9 +53,9 @@ public interface WrapperBuilder<CLASS> extends SharableBuilder {
      */
     @Nonnull
     @Override
-    public WrapperBuilder<CLASS> withConfiguration(@Nullable RoutineConfiguration configuration);
+    public WrapperBuilder<TYPE> withConfiguration(@Nullable RoutineConfiguration configuration);
 
     @Nonnull
     @Override
-    public WrapperBuilder<CLASS> withShareGroup(@Nullable String group);
+    public WrapperBuilder<TYPE> withShareGroup(@Nullable String group);
 }

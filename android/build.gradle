@@ -20,7 +20,7 @@ apply plugin: 'com.github.kt3k.coveralls'
 apply from: '../upload.gradle'
 
 group = 'com.github.davide-maestroni'
-version = '1.2.0'
+version = '1.2.1'
 archivesBaseName = "${project.parent.name}-${project.name}"
 
 android {
@@ -49,8 +49,8 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    //compile project(':library')
-    compile 'com.github.davide-maestroni:jroutine:1.2.0'
+    compile project(':library')
+    //compile 'com.github.davide-maestroni:jroutine:1.2.1'
     compile 'com.android.support:support-v4:21.0.3' // Travis does not support a later version
 
     androidTestCompile 'org.assertj:assertj-core:1.7.0'

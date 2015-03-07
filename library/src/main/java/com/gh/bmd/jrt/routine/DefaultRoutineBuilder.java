@@ -28,7 +28,9 @@ import javax.annotation.Nullable;
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineBuilder<INPUT, OUTPUT> {
+class DefaultRoutineBuilder<INPUT, OUTPUT> implements RoutineBuilder<INPUT, OUTPUT> {
+
+    //TODO: interface
 
     private final InvocationFactory<INPUT, OUTPUT> mFactory;
 
@@ -41,7 +43,7 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineBuilder<I
      * @throws java.lang.NullPointerException if the class token is null.
      */
     @SuppressWarnings("ConstantConditions")
-    InvocationRoutineBuilder(@Nonnull final InvocationFactory<INPUT, OUTPUT> factory) {
+    DefaultRoutineBuilder(@Nonnull final InvocationFactory<INPUT, OUTPUT> factory) {
 
         if (factory == null) {
 
@@ -61,7 +63,7 @@ public class InvocationRoutineBuilder<INPUT, OUTPUT> implements RoutineBuilder<I
 
     @Nonnull
     @Override
-    public InvocationRoutineBuilder<INPUT, OUTPUT> withConfiguration(
+    public RoutineBuilder<INPUT, OUTPUT> withConfiguration(
             @Nullable final RoutineConfiguration configuration) {
 
         mConfiguration = configuration;

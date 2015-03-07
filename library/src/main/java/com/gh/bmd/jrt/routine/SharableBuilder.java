@@ -15,34 +15,30 @@ package com.gh.bmd.jrt.routine;
 
 import com.gh.bmd.jrt.builder.ConfigurableBuilder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.channel.StandaloneChannel;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Interface defining a builder of standalone channel objects.
+ * Interface defining a builder of sharable routines.
  * <p/>
  * Created by davide on 3/7/15.
+ *
+ * @see com.gh.bmd.jrt.annotation.Share
  */
-public interface StandaloneChannelBuilder extends ConfigurableBuilder {
+public interface SharableBuilder extends ConfigurableBuilder {
 
-    /**
-     * Builds and returns the standalone channel instance.
-     *
-     * @return the newly created channel.
-     */
-    @Nonnull
-    public <T> StandaloneChannel<T> buildChannel();
-
-    /**
-     * Note that only options related to the output channel, the asynchronous runner and the logs
-     * will be employed.
-     *
-     * @param configuration the routine configuration.
-     * @return this builder.
-     */
     @Nonnull
     @Override
-    public StandaloneChannelBuilder withConfiguration(@Nullable RoutineConfiguration configuration);
+    public SharableBuilder withConfiguration(@Nullable RoutineConfiguration configuration);
+
+    /**
+     * Tells the builder to create a routine using the specified share tag.
+     *
+     * @param group the group name.
+     * @return this builder.
+     * @see com.gh.bmd.jrt.annotation.Share
+     */
+    @Nonnull
+    public SharableBuilder withShareGroup(@Nullable String group);
 }

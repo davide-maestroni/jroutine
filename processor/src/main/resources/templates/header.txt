@@ -87,7 +87,7 @@ public final class JRoutine_${interfaceName}${genericTypes} implements ${interfa
         }
     }
 
-    private static class ${interfaceName}WrapperBuilder extends com.gh.bmd.jrt.routine.WrapperBuilder<${interfaceFullName}> {
+    private static class ${interfaceName}WrapperBuilder extends com.gh.bmd.jrt.routine.AbstractWrapperBuilder<${interfaceFullName}> {
 
         private final ${classFullName} mTarget;
 

@@ -150,8 +150,7 @@ public class Logger {
     public static Logger newLogger(@Nonnull final RoutineConfiguration configuration,
             @Nonnull final Object context) {
 
-        return newLogger(configuration.getLogOr(Logger.getGlobalLog()),
-                         configuration.getLogLevelOr(Logger.getGlobalLogLevel()), context);
+        return newLogger(configuration.getLogOr(null), configuration.getLogLevelOr(null), context);
     }
 
     /**

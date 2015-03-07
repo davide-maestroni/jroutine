@@ -43,5 +43,6 @@ public interface RoutineBuilder<INPUT, OUTPUT> extends ConfigurableBuilder {
 
     @Nonnull
     @Override
-    public RoutineBuilder withConfiguration(@Nullable RoutineConfiguration configuration);
+    public RoutineBuilder<INPUT, OUTPUT> withConfiguration(
+            @Nullable RoutineConfiguration configuration);
 }

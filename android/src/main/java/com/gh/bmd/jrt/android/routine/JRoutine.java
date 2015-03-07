@@ -96,6 +96,6 @@ public class JRoutine extends com.gh.bmd.jrt.routine.JRoutine {
             @Nonnull final Context context,
             @Nonnull ClassToken<? extends AndroidInvocation<INPUT, OUTPUT>> classToken) {
 
-        return new ServiceRoutineBuilder<INPUT, OUTPUT>(context, classToken);
+        return new DefaultServiceRoutineBuilder<INPUT, OUTPUT>(context, classToken);
     }
 }

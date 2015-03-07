@@ -13,6 +13,7 @@
  */
 package com.gh.bmd.jrt.routine;
 
+import com.gh.bmd.jrt.builder.RoutineBuilder;
 import com.gh.bmd.jrt.invocation.InvocationFactory;
 
 import java.lang.ref.WeakReference;
@@ -160,7 +161,7 @@ public class JRoutine {
     @Nonnull
     public static ClassRoutineBuilder on(@Nonnull final Class<?> target) {
 
-        return new ClassRoutineBuilder(target);
+        return new DefaultClassRoutineBuilder(target);
     }
 
     /**
@@ -173,10 +174,10 @@ public class JRoutine {
      * @throws java.lang.NullPointerException if the factory is null.
      */
     @Nonnull
-    public static <INPUT, OUTPUT> InvocationRoutineBuilder<INPUT, OUTPUT> on(
+    public static <INPUT, OUTPUT> RoutineBuilder<INPUT, OUTPUT> on(
             @Nonnull final InvocationFactory<INPUT, OUTPUT> invocationFactory) {
 
-        return new InvocationRoutineBuilder<INPUT, OUTPUT>(invocationFactory);
+        return new DefaultRoutineBuilder<INPUT, OUTPUT>(invocationFactory);
     }
 
     /**
@@ -191,7 +192,7 @@ public class JRoutine {
     @Nonnull
     public static ObjectRoutineBuilder on(@Nonnull final Object target) {
 
-        return new ObjectRoutineBuilder(target);
+        return new DefaultObjectRoutineBuilder(target);
     }
 
     /**
@@ -221,7 +222,7 @@ public class JRoutine {
     @Nonnull
     public static ObjectRoutineBuilder onWeak(@Nonnull final WeakReference<?> target) {
 
-        return new ObjectRoutineBuilder(target);
+        return new DefaultObjectRoutineBuilder(target);
     }
 
     /**
@@ -232,6 +233,6 @@ public class JRoutine {
     @Nonnull
     public static StandaloneChannelBuilder standalone() {
 
-        return new StandaloneChannelBuilder();
+        return new DefaultStandaloneChannelBuilder();
     }
 }

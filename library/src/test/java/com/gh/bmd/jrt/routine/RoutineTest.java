@@ -955,8 +955,8 @@ public class RoutineTest extends TestCase {
 
             new AbstractRoutine<Object, Object>(null) {
 
-                @Override
                 @Nonnull
+                @Override
                 protected Invocation<Object, Object> newInvocation(final boolean async) {
 
                     return new ConstructorException();
@@ -2875,8 +2875,8 @@ public class RoutineTest extends TestCase {
 
     private static class TestInvocationManager implements InvocationManager<Object, Object> {
 
-        @Override
         @Nonnull
+        @Override
         public Invocation<Object, Object> create() {
 
             return new TemplateInvocation<Object, Object>() {};

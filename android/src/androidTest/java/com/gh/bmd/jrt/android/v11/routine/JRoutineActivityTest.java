@@ -301,6 +301,31 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         }
     }
 
+    public void testActivityPurge() throws InterruptedException {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final Routine<String, String> routine =
+                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeAndroidInvocation.class))
+                        .withId(0)
+                        .onComplete(CacheStrategy.CACHE)
+                        .buildRoutine();
+        final OutputChannel<String> channel = routine.callAsync("test").eventually();
+        assertThat(channel.readNext()).isEqualTo("test");
+        assertThat(channel.checkComplete());
+        routine.purge();
+        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+
+        final OutputChannel<String> channel1 = routine.callAsync("test").eventually();
+        assertThat(channel1.readNext()).isEqualTo("test");
+        assertThat(channel1.checkComplete());
+        JRoutine.onActivity(getActivity(), 0).purge();
+        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+    }
+
     public void testActivityRestart() {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
@@ -787,6 +812,34 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         }
     }
 
+    public void testFragmentPurge() throws InterruptedException {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        final Routine<String, String> routine =
+                JRoutine.onFragment(fragment, ClassToken.tokenOf(PurgeAndroidInvocation.class))
+                        .withId(0)
+                        .onComplete(CacheStrategy.CACHE)
+                        .buildRoutine();
+        final OutputChannel<String> channel = routine.callAsync("test").eventually();
+        assertThat(channel.readNext()).isEqualTo("test");
+        assertThat(channel.checkComplete());
+        routine.purge();
+        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+
+        final OutputChannel<String> channel1 = routine.callAsync("test").eventually();
+        assertThat(channel1.readNext()).isEqualTo("test");
+        assertThat(channel1.checkComplete());
+        JRoutine.onFragment(fragment, 0).purge();
+        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+    }
+
     public void testFragmentReset() {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
@@ -966,24 +1019,6 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         } catch (final NullPointerException ignored) {
 
         }
-    }
-
-    public void testPurge() throws InterruptedException {
-
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            return;
-        }
-
-        final Routine<String, String> routine =
-                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeAndroidInvocation.class))
-                        .onComplete(CacheStrategy.CACHE)
-                        .buildRoutine();
-        final OutputChannel<String> channel = routine.callAsync("test").eventually();
-        assertThat(channel.readNext()).isEqualTo("test");
-        assertThat(channel.checkComplete());
-        routine.purge();
-        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000000)).isTrue();
     }
 
     @SuppressWarnings("ConstantConditions")

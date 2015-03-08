@@ -239,7 +239,9 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
-                        .withId(0).onClash(ClashResolution.KEEP_THAT).buildRoutine();
+                        .withId(0)
+                        .onClash(ClashResolution.KEEP_THAT)
+                        .buildRoutine();
         final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
         final OutputChannel<String> result2 = routine.callAsync("test2").afterMax(timeout);
 
@@ -263,12 +265,33 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         }
     }
 
+    public void testActivityPurge() throws InterruptedException {
+
+        final Routine<String, String> routine =
+                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeAndroidInvocation.class))
+                        .withId(0)
+                        .onComplete(CacheStrategy.CACHE)
+                        .buildRoutine();
+        final OutputChannel<String> channel = routine.callAsync("test").eventually();
+        assertThat(channel.readNext()).isEqualTo("test");
+        assertThat(channel.checkComplete());
+        routine.purge();
+        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+
+        final OutputChannel<String> channel1 = routine.callAsync("test").eventually();
+        assertThat(channel1.readNext()).isEqualTo("test");
+        assertThat(channel1.checkComplete());
+        JRoutine.onActivity(getActivity(), 0).purge();
+        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+    }
+
     public void testActivityRestart() {
 
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
-                        .withId(0).onClash(ClashResolution.ABORT_THAT)
+                        .withId(0)
+                        .onClash(ClashResolution.ABORT_THAT)
                         .buildRoutine();
         final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
         final OutputChannel<String> result2 = routine.callAsync("test1").afterMax(timeout);
@@ -621,7 +644,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                                                                           R.id.test_fragment);
         final Routine<String, String> routine =
                 JRoutine.onFragment(fragment, ClassToken.tokenOf(ToUpperCase.class))
-                        .withId(0).withConfiguration(withOutputOrder(OrderType.PASSING))
+                        .withId(0)
+                        .withConfiguration(withOutputOrder(OrderType.PASSING))
                         .buildRoutine();
         final OutputChannel<String> channel1 = routine.callAsync("test1", "test2");
         final OutputChannel<String> channel2 = JRoutine.onFragment(fragment, 0).buildChannel();
@@ -682,6 +706,29 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         }
     }
 
+    public void testFragmentPurge() throws InterruptedException {
+
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        final Routine<String, String> routine =
+                JRoutine.onFragment(fragment, ClassToken.tokenOf(PurgeAndroidInvocation.class))
+                        .withId(0)
+                        .onComplete(CacheStrategy.CACHE)
+                        .buildRoutine();
+        final OutputChannel<String> channel = routine.callAsync("test").eventually();
+        assertThat(channel.readNext()).isEqualTo("test");
+        assertThat(channel.checkComplete());
+        routine.purge();
+        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+
+        final OutputChannel<String> channel1 = routine.callAsync("test").eventually();
+        assertThat(channel1.readNext()).isEqualTo("test");
+        assertThat(channel1.checkComplete());
+        JRoutine.onFragment(fragment, 0).purge();
+        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+    }
+
     public void testFragmentReset() {
 
         final TimeDuration timeout = TimeDuration.seconds(10);
@@ -717,7 +764,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                                                                           R.id.test_fragment);
         final Routine<String, String> routine =
                 JRoutine.onFragment(fragment, ClassToken.tokenOf(ToUpperCase.class))
-                        .withId(0).onClash(ClashResolution.ABORT_THAT_INPUT)
+                        .withId(0)
+                        .onClash(ClashResolution.ABORT_THAT_INPUT)
                         .buildRoutine();
         final OutputChannel<String> result1 = routine.callAsync("test1").afterMax(timeout);
         final OutputChannel<String> result2 = routine.callAsync("test2").afterMax(timeout);
@@ -835,19 +883,6 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         } catch (final NullPointerException ignored) {
 
         }
-    }
-
-    public void testPurge() throws InterruptedException {
-
-        final Routine<String, String> routine =
-                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeAndroidInvocation.class))
-                        .onComplete(CacheStrategy.CACHE)
-                        .buildRoutine();
-        final OutputChannel<String> channel = routine.callAsync("test").eventually();
-        assertThat(channel.readNext()).isEqualTo("test");
-        assertThat(channel.checkComplete());
-        routine.purge();
-        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000000)).isTrue();
     }
 
     @SuppressWarnings("ConstantConditions")

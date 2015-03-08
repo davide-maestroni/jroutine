@@ -51,6 +51,11 @@ public interface AndroidChannelBuilder extends ConfigurableBuilder {
     public AndroidChannelBuilder onComplete(@Nullable CacheStrategy cacheStrategy);
 
     /**
+     * Makes the builder destroy the cached invocation instance.
+     */
+    public void purge();
+
+    /**
      * Note that only the options related to logs will be employed.
      *
      * @param configuration the routine configuration.

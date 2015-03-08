@@ -22,6 +22,7 @@ import android.os.Build.VERSION_CODES;
 import com.gh.bmd.jrt.android.builder.AndroidRoutineBuilder.CacheStrategy;
 import com.gh.bmd.jrt.android.builder.AndroidRoutineBuilder.ClashResolution;
 import com.gh.bmd.jrt.android.invocation.AndroidInvocation;
+import com.gh.bmd.jrt.android.runner.Runners;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.common.InvocationException;
@@ -31,7 +32,6 @@ import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.routine.AbstractRoutine;
 import com.gh.bmd.jrt.runner.Execution;
-import com.gh.bmd.jrt.runner.Runner;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
@@ -51,8 +51,6 @@ import javax.annotation.Nullable;
  */
 @TargetApi(VERSION_CODES.HONEYCOMB)
 class AndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
-
-    private final Runner mAsyncRunner;
 
     private final CacheStrategy mCacheStrategy;
 
@@ -103,7 +101,6 @@ class AndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
         mCacheStrategy = (cacheStrategy == null) ? CacheStrategy.CLEAR : cacheStrategy;
         mConstructor = constructor;
         mOrderType = configuration.getOutputOrderOr(null);
-        mAsyncRunner = configuration.getRunnerOr(null);
     }
 
     @Override
@@ -111,12 +108,13 @@ class AndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
 
         super.purge();
 
-        final Object context = mContext.get();
+        final WeakReference<Object> context = mContext;
 
-        if (context != null) {
+        if (context.get() != null) {
 
-            mAsyncRunner.run(new PurgeExecution(context, mConstructor.getDeclaringClass()), 0,
-                             TimeUnit.MILLISECONDS);
+            Runners.mainRunner()
+                   .run(new PurgeExecution(context, mConstructor.getDeclaringClass()), 0,
+                        TimeUnit.MILLISECONDS);
         }
     }
 
@@ -215,17 +213,17 @@ class AndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
      */
     private static class PurgeExecution implements Execution {
 
-        private final Object mContext;
+        private final WeakReference<Object> mContext;
 
         private final Class<?> mInvocationClass;
 
         /**
          * Constructor.
          *
-         * @param context         the context.
+         * @param context         the context reference.
          * @param invocationClass the invocation class.
          */
-        private PurgeExecution(@Nonnull final Object context,
+        private PurgeExecution(@Nonnull final WeakReference<Object> context,
                 @Nonnull final Class<?> invocationClass) {
 
             mContext = context;
@@ -235,7 +233,12 @@ class AndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
         @Override
         public void run() {
 
-            LoaderInvocation.purgeLoaders(mContext, mInvocationClass);
+            final Object context = mContext.get();
+
+            if (context != null) {
+
+                LoaderInvocation.purgeLoaders(context, mInvocationClass);
+            }
         }
     }
 }

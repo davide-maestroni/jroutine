@@ -55,7 +55,7 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> implements AndroidRoutineBuild
 
     private RoutineConfiguration mConfiguration;
 
-    private int mLoaderId = AndroidRoutineBuilder.AUTO;
+    private int mInvocationId = AndroidRoutineBuilder.AUTO;
 
     /**
      * Constructor.
@@ -116,8 +116,9 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> implements AndroidRoutineBuild
                                                         .withInputTimeout(TimeDuration.INFINITY)
                                                         .withOutputSize(Integer.MAX_VALUE)
                                                         .withOutputTimeout(TimeDuration.INFINITY)
-                                                        .buildConfiguration(), mContext, mLoaderId,
-                                                 mClashResolution, mCacheStrategy, mConstructor);
+                                                        .buildConfiguration(), mContext,
+                                                 mInvocationId, mClashResolution, mCacheStrategy,
+                                                 mConstructor);
     }
 
     @Nonnull
@@ -151,7 +152,7 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> implements AndroidRoutineBuild
     @Override
     public AndroidRoutineBuilder<INPUT, OUTPUT> withId(final int id) {
 
-        mLoaderId = id;
+        mInvocationId = id;
         return this;
     }
 

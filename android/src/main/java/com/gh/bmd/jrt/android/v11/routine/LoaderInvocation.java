@@ -128,6 +128,71 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
     }
 
     /**
+     * Destroys the loader with the specified ID.
+     *
+     * @param context the context.
+     * @param id      the loader ID.
+     */
+    static void purgeLoader(@Nonnull final Object context, final int id) {
+
+        final SparseArray<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
+                sCallbackMap.get(context);
+
+        if (callbackArray == null) {
+
+            return;
+        }
+
+        final LoaderManager loaderManager;
+
+        if (context instanceof Activity) {
+
+            final Activity activity = (Activity) context;
+            loaderManager = activity.getLoaderManager();
+
+        } else if (context instanceof Fragment) {
+
+            final Fragment fragment = (Fragment) context;
+            loaderManager = fragment.getLoaderManager();
+
+        } else {
+
+            throw new IllegalArgumentException(
+                    "invalid context type: " + context.getClass().getCanonicalName());
+        }
+
+        int i = 0;
+
+        while (i < callbackArray.size()) {
+
+            final RoutineLoaderCallbacks<?> callbacks = callbackArray.valueAt(i).get();
+
+            if (callbacks == null) {
+
+                callbackArray.removeAt(i);
+                continue;
+            }
+
+            final RoutineLoader<?, ?> loader = callbacks.mLoader;
+            final int loaderId = callbackArray.keyAt(i);
+
+            if ((loaderId == id) && (loader.getInvocationCount() == 0)) {
+
+                loaderManager.destroyLoader(loaderId);
+                callbackArray.removeAt(i);
+                continue;
+            }
+
+            ++i;
+        }
+
+        if (callbackArray.size() == 0) {
+
+            sCallbackMap.remove(context);
+        }
+    }
+
+    /**
      * Destroys all loaders with the specified invocation class.
      *
      * @param context         the context.
@@ -176,8 +241,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
             final RoutineLoader<?, ?> loader = callbacks.mLoader;
 
-            if ((loader.getInvocationCount() == 0) && (loader.getInvocationType()
-                    == invocationClass)) {
+            if ((loader.getInvocationType() == invocationClass) && (loader.getInvocationCount()
+                    == 0)) {
 
                 loaderManager.destroyLoader(callbackArray.keyAt(i));
                 callbackArray.removeAt(i);

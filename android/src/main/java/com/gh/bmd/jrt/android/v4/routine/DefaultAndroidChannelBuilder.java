@@ -20,11 +20,14 @@ import com.gh.bmd.jrt.android.builder.AndroidChannelBuilder;
 import com.gh.bmd.jrt.android.builder.AndroidRoutineBuilder;
 import com.gh.bmd.jrt.android.builder.AndroidRoutineBuilder.CacheStrategy;
 import com.gh.bmd.jrt.android.builder.AndroidRoutineBuilder.ClashResolution;
+import com.gh.bmd.jrt.android.runner.Runners;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.common.ClassToken;
+import com.gh.bmd.jrt.runner.Execution;
 
 import java.lang.ref.WeakReference;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -38,7 +41,7 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
 
     private final WeakReference<Object> mContext;
 
-    private final int mLoaderId;
+    private final int mId;
 
     private CacheStrategy mCacheStrategy;
 
@@ -48,35 +51,35 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
      * Constructor.
      *
      * @param activity the context activity.
-     * @param loaderId the loader ID.
+     * @param id       the invocation ID.
      * @throws java.lang.NullPointerException if the activity is null.
      */
-    DefaultAndroidChannelBuilder(@Nonnull final FragmentActivity activity, final int loaderId) {
+    DefaultAndroidChannelBuilder(@Nonnull final FragmentActivity activity, final int id) {
 
-        this((Object) activity, loaderId);
+        this((Object) activity, id);
     }
 
     /**
      * Constructor.
      *
      * @param fragment the context fragment.
-     * @param loaderId the loader ID.
+     * @param id       the invocation ID.
      * @throws java.lang.NullPointerException if the fragment is null.
      */
-    DefaultAndroidChannelBuilder(@Nonnull final Fragment fragment, final int loaderId) {
+    DefaultAndroidChannelBuilder(@Nonnull final Fragment fragment, final int id) {
 
-        this((Object) fragment, loaderId);
+        this((Object) fragment, id);
     }
 
     /**
      * Constructor.
      *
-     * @param context  the context instance.
-     * @param loaderId the loader ID.
+     * @param context the context instance.
+     * @param id      the invocation ID.
      * @throws java.lang.NullPointerException if the context is null.
      */
     @SuppressWarnings("ConstantConditions")
-    private DefaultAndroidChannelBuilder(@Nonnull final Object context, final int loaderId) {
+    private DefaultAndroidChannelBuilder(@Nonnull final Object context, final int id) {
 
         if (context == null) {
 
@@ -84,7 +87,7 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
         }
 
         mContext = new WeakReference<Object>(context);
-        mLoaderId = loaderId;
+        mId = id;
     }
 
     @Nonnull
@@ -105,12 +108,12 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
         if (context instanceof FragmentActivity) {
 
             final FragmentActivity activity = (FragmentActivity) context;
-            builder = JRoutine.onActivity(activity, new MissingToken<OUTPUT>()).withId(mLoaderId);
+            builder = JRoutine.onActivity(activity, new MissingToken<OUTPUT>()).withId(mId);
 
         } else if (context instanceof Fragment) {
 
             final Fragment fragment = (Fragment) context;
-            builder = JRoutine.onFragment(fragment, new MissingToken<OUTPUT>()).withId(mLoaderId);
+            builder = JRoutine.onFragment(fragment, new MissingToken<OUTPUT>()).withId(mId);
 
         } else {
 
@@ -133,6 +136,12 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
         return this;
     }
 
+    @Override
+    public void purge() {
+
+        Runners.mainRunner().run(new PurgeExecution(mContext, mId), 0, TimeUnit.MILLISECONDS);
+    }
+
     @Nonnull
     @Override
     public AndroidChannelBuilder withConfiguration(
@@ -150,5 +159,38 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
     private static class MissingToken<DATA>
             extends ClassToken<MissingLoaderInvocation<DATA, DATA>> {
 
+    }
+
+    /**
+     * Execution implementation purging the loader with the specified ID.
+     */
+    private static class PurgeExecution implements Execution {
+
+        private final WeakReference<Object> mContext;
+
+        private final int mId;
+
+        /**
+         * Constructor.
+         *
+         * @param context the context reference.
+         * @param id      the invocation ID.
+         */
+        private PurgeExecution(@Nonnull final WeakReference<Object> context, final int id) {
+
+            mContext = context;
+            mId = id;
+        }
+
+        @Override
+        public void run() {
+
+            final Object context = mContext.get();
+
+            if (context != null) {
+
+                LoaderInvocation.purgeLoader(context, mId);
+            }
+        }
     }
 }

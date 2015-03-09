@@ -29,6 +29,7 @@ import com.gh.bmd.jrt.android.invocation.AndroidPassingInvocation;
 import com.gh.bmd.jrt.android.invocation.AndroidSingleCallInvocation;
 import com.gh.bmd.jrt.android.invocation.AndroidTemplateInvocation;
 import com.gh.bmd.jrt.android.log.Logs;
+import com.gh.bmd.jrt.android.routine.AndroidRoutine;
 import com.gh.bmd.jrt.android.runner.Runners;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
@@ -45,6 +46,7 @@ import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.time.TimeDuration;
 
 import java.lang.ref.WeakReference;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
@@ -308,8 +310,11 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
             return;
         }
 
-        final Routine<String, String> routine =
+        final AndroidRoutine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeAndroidInvocation.class))
+                        .withConfiguration(builder().withInputOrder(OrderType.PASSING)
+                                                    .withOutputOrder(OrderType.PASSING)
+                                                    .buildConfiguration())
                         .withId(0)
                         .onComplete(CacheStrategy.CACHE)
                         .buildRoutine();
@@ -322,7 +327,43 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final OutputChannel<String> channel1 = routine.callAsync("test").eventually();
         assertThat(channel1.readNext()).isEqualTo("test");
         assertThat(channel1.checkComplete());
+        routine.purge("test");
+        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+
+        final OutputChannel<String> channel2 = routine.callAsync("test1", "test2").eventually();
+        assertThat(channel2.readAll()).containsExactly("test1", "test2");
+        assertThat(channel2.checkComplete());
+        routine.purge("test1", "test2");
+        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+
+        final OutputChannel<String> channel3 = routine.callAsync("test1", "test2").eventually();
+        assertThat(channel3.readAll()).containsExactly("test1", "test2");
+        assertThat(channel3.checkComplete());
+        routine.purge(Arrays.asList("test1", "test2"));
+        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+
+        final OutputChannel<String> channel4 = routine.callAsync("test").eventually();
+        assertThat(channel4.readNext()).isEqualTo("test");
+        assertThat(channel4.checkComplete());
         JRoutine.onActivity(getActivity(), 0).purge();
+        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+
+        final OutputChannel<String> channel5 = routine.callAsync("test").eventually();
+        assertThat(channel5.readNext()).isEqualTo("test");
+        assertThat(channel5.checkComplete());
+        JRoutine.onActivity(getActivity(), 0).purge("test");
+        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+
+        final OutputChannel<String> channel6 = routine.callAsync("test1", "test2").eventually();
+        assertThat(channel6.readAll()).containsExactly("test1", "test2");
+        assertThat(channel6.checkComplete());
+        JRoutine.onActivity(getActivity(), 0).purge("test1", "test2");
+        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+
+        final OutputChannel<String> channel7 = routine.callAsync("test1", "test2").eventually();
+        assertThat(channel7.readAll()).containsExactly("test1", "test2");
+        assertThat(channel7.checkComplete());
+        JRoutine.onActivity(getActivity(), 0).purge(Arrays.asList((Object) "test1", "test2"));
         assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
     }
 
@@ -822,8 +863,11 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final Routine<String, String> routine =
+        final AndroidRoutine<String, String> routine =
                 JRoutine.onFragment(fragment, ClassToken.tokenOf(PurgeAndroidInvocation.class))
+                        .withConfiguration(builder().withInputOrder(OrderType.PASSING)
+                                                    .withOutputOrder(OrderType.PASSING)
+                                                    .buildConfiguration())
                         .withId(0)
                         .onComplete(CacheStrategy.CACHE)
                         .buildRoutine();
@@ -836,7 +880,43 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final OutputChannel<String> channel1 = routine.callAsync("test").eventually();
         assertThat(channel1.readNext()).isEqualTo("test");
         assertThat(channel1.checkComplete());
+        routine.purge("test");
+        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+
+        final OutputChannel<String> channel2 = routine.callAsync("test1", "test2").eventually();
+        assertThat(channel2.readAll()).containsExactly("test1", "test2");
+        assertThat(channel2.checkComplete());
+        routine.purge("test1", "test2");
+        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+
+        final OutputChannel<String> channel3 = routine.callAsync("test1", "test2").eventually();
+        assertThat(channel3.readAll()).containsExactly("test1", "test2");
+        assertThat(channel3.checkComplete());
+        routine.purge(Arrays.asList("test1", "test2"));
+        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+
+        final OutputChannel<String> channel4 = routine.callAsync("test").eventually();
+        assertThat(channel4.readNext()).isEqualTo("test");
+        assertThat(channel4.checkComplete());
         JRoutine.onFragment(fragment, 0).purge();
+        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+
+        final OutputChannel<String> channel5 = routine.callAsync("test").eventually();
+        assertThat(channel5.readNext()).isEqualTo("test");
+        assertThat(channel5.checkComplete());
+        JRoutine.onFragment(fragment, 0).purge("test");
+        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+
+        final OutputChannel<String> channel6 = routine.callAsync("test1", "test2").eventually();
+        assertThat(channel6.readAll()).containsExactly("test1", "test2");
+        assertThat(channel6.checkComplete());
+        JRoutine.onFragment(fragment, 0).purge("test1", "test2");
+        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+
+        final OutputChannel<String> channel7 = routine.callAsync("test1", "test2").eventually();
+        assertThat(channel7.readAll()).containsExactly("test1", "test2");
+        assertThat(channel7.checkComplete());
+        JRoutine.onFragment(fragment, 0).purge(Arrays.asList((Object) "test1", "test2"));
         assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
     }
 

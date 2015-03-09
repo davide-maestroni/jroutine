@@ -27,6 +27,8 @@ import javax.annotation.Nullable;
 /**
  * Interface defining a builder of routine objects based on an invocation class token.
  * <p/>
+ * The context of the invocations will be the specific service instance.
+ * <p/>
  * Created by davide on 3/7/15.
  *
  * @param <INPUT>  the input data type.

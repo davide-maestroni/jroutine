@@ -29,6 +29,10 @@ import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.runner.Execution;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
@@ -142,7 +146,69 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
     @Override
     public void purge() {
 
-        Runners.mainRunner().run(new PurgeExecution(mContext, mId), 0, TimeUnit.MILLISECONDS);
+        final WeakReference<Object> context = mContext;
+
+        if (context.get() != null) {
+
+            Runners.mainRunner().run(new PurgeExecution(context, mId), 0, TimeUnit.MILLISECONDS);
+        }
+    }
+
+    @Override
+    public void purge(@Nullable final Object input) {
+
+        final WeakReference<Object> context = mContext;
+
+        if (context.get() != null) {
+
+            Runners.mainRunner()
+                   .run(new PurgeInputsExecution(context, mId, Collections.singletonList(input)), 0,
+                        TimeUnit.MILLISECONDS);
+        }
+    }
+
+    @Override
+    public void purge(@Nullable final Object... inputs) {
+
+        final WeakReference<Object> context = mContext;
+
+        if (context.get() != null) {
+
+            final List<Object> inputList =
+                    (inputs == null) ? Collections.emptyList() : Arrays.asList(inputs);
+            Runners.mainRunner()
+                   .run(new PurgeInputsExecution(context, mId, inputList), 0,
+                        TimeUnit.MILLISECONDS);
+        }
+    }
+
+    @Override
+    public void purge(@Nullable final Iterable<Object> inputs) {
+
+        final WeakReference<Object> context = mContext;
+
+        if (context.get() != null) {
+
+            final List<Object> inputList;
+
+            if (inputs == null) {
+
+                inputList = Collections.emptyList();
+
+            } else {
+
+                inputList = new ArrayList<Object>();
+
+                for (final Object input : inputs) {
+
+                    inputList.add(input);
+                }
+            }
+
+            Runners.mainRunner()
+                   .run(new PurgeInputsExecution(context, mId, inputList), 0,
+                        TimeUnit.MILLISECONDS);
+        }
     }
 
     @Nonnull
@@ -165,7 +231,7 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
     }
 
     /**
-     * Execution implementation purging the loader with the specified ID.
+     * Execution implementation purging the loader with a specific ID.
      */
     private static class PurgeExecution implements Execution {
 
@@ -193,6 +259,44 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
             if (context != null) {
 
                 LoaderInvocation.purgeLoader(context, mId);
+            }
+        }
+    }
+
+    /**
+     * Execution implementation purging the loader with a specific ID and inputs.
+     */
+    private static class PurgeInputsExecution implements Execution {
+
+        private final WeakReference<Object> mContext;
+
+        private final int mId;
+
+        private final List<Object> mInputs;
+
+        /**
+         * Constructor.
+         *
+         * @param context the context reference.
+         * @param id      the invocation ID.
+         * @param inputs  the list of inputs.
+         */
+        private PurgeInputsExecution(@Nonnull final WeakReference<Object> context, final int id,
+                @Nonnull final List<Object> inputs) {
+
+            mContext = context;
+            mId = id;
+            mInputs = inputs;
+        }
+
+        @Override
+        public void run() {
+
+            final Object context = mContext.get();
+
+            if (context != null) {
+
+                LoaderInvocation.purgeLoader(context, mId, mInputs);
             }
         }
     }

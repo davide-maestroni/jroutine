@@ -13,6 +13,7 @@
  */
 package com.gh.bmd.jrt.android.builder;
 
+import com.gh.bmd.jrt.android.routine.AndroidRoutine;
 import com.gh.bmd.jrt.builder.RoutineBuilder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 
@@ -45,6 +46,22 @@ public interface AndroidRoutineBuilder<INPUT, OUTPUT> extends RoutineBuilder<INP
      */
     public static final int AUTO = Integer.MIN_VALUE;
 
+    @Nonnull
+    @Override
+    public AndroidRoutine<INPUT, OUTPUT> buildRoutine();
+
+    /**
+     * Note that all the options related to the output and input channels size and timeout will be
+     * ignored.
+     *
+     * @param configuration the routine configuration.
+     * @return this builder.
+     */
+    @Nonnull
+    @Override
+    public AndroidRoutineBuilder<INPUT, OUTPUT> withConfiguration(
+            @Nullable RoutineConfiguration configuration);
+
     /**
      * Tells the builder how to resolve clashes of invocations. A clash happens when an invocation
      * of the same type and with the same ID is still running. A null value means that it is up to
@@ -65,18 +82,6 @@ public interface AndroidRoutineBuilder<INPUT, OUTPUT> extends RoutineBuilder<INP
      */
     @Nonnull
     public AndroidRoutineBuilder<INPUT, OUTPUT> onComplete(@Nullable CacheStrategy cacheStrategy);
-
-    /**
-     * Note that all the options related to the output and input channels size and timeout will be
-     * ignored.
-     *
-     * @param configuration the routine configuration.
-     * @return this builder.
-     */
-    @Nonnull
-    @Override
-    public AndroidRoutineBuilder<INPUT, OUTPUT> withConfiguration(
-            @Nullable RoutineConfiguration configuration);
 
     /**
      * Tells the builder to identify the invocation with the specified ID.

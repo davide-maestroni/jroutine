@@ -190,6 +190,146 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
     }
 
     /**
+     * Destroys all loaders with the specified invocation class and the specified inputs.
+     *
+     * @param context         the context.
+     * @param invocationClass the invocation class.
+     * @param inputs          the invocation inputs.
+     */
+    @SuppressWarnings("unchecked")
+    static void purgeLoader(@Nonnull final Object context, @Nonnull final Class<?> invocationClass,
+            @Nonnull final List<?> inputs) {
+
+        final SparseArray<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
+                sCallbackMap.get(context);
+
+        if (callbackArray == null) {
+
+            return;
+        }
+
+        final LoaderManager loaderManager;
+
+        if (context instanceof FragmentActivity) {
+
+            final FragmentActivity activity = (FragmentActivity) context;
+            loaderManager = activity.getSupportLoaderManager();
+
+        } else if (context instanceof Fragment) {
+
+            final Fragment fragment = (Fragment) context;
+            loaderManager = fragment.getLoaderManager();
+
+        } else {
+
+            throw new IllegalArgumentException(
+                    "invalid context type: " + context.getClass().getCanonicalName());
+        }
+
+        int i = 0;
+
+        while (i < callbackArray.size()) {
+
+            final RoutineLoaderCallbacks<?> callbacks = callbackArray.valueAt(i).get();
+
+            if (callbacks == null) {
+
+                callbackArray.remove(callbackArray.keyAt(i));
+                continue;
+            }
+
+            final RoutineLoader<Object, Object> loader =
+                    (RoutineLoader<Object, Object>) callbacks.mLoader;
+            final int loaderId = callbackArray.keyAt(i);
+
+            if ((loader.getInvocationType() == invocationClass) && (loader.getInvocationCount()
+                    == 0) && loader.areSameInputs(inputs)) {
+
+                loaderManager.destroyLoader(loaderId);
+                callbackArray.remove(loaderId);
+                continue;
+            }
+
+            ++i;
+        }
+
+        if (callbackArray.size() == 0) {
+
+            sCallbackMap.remove(context);
+        }
+    }
+
+    /**
+     * Destroys the loader with the specified ID and the specified inputs.
+     *
+     * @param context the context.
+     * @param id      the loader ID.
+     * @param inputs  the invocation inputs.
+     */
+    @SuppressWarnings("unchecked")
+    static void purgeLoader(@Nonnull final Object context, final int id,
+            @Nonnull final List<?> inputs) {
+
+        final SparseArray<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
+                sCallbackMap.get(context);
+
+        if (callbackArray == null) {
+
+            return;
+        }
+
+        final LoaderManager loaderManager;
+
+        if (context instanceof FragmentActivity) {
+
+            final FragmentActivity activity = (FragmentActivity) context;
+            loaderManager = activity.getSupportLoaderManager();
+
+        } else if (context instanceof Fragment) {
+
+            final Fragment fragment = (Fragment) context;
+            loaderManager = fragment.getLoaderManager();
+
+        } else {
+
+            throw new IllegalArgumentException(
+                    "invalid context type: " + context.getClass().getCanonicalName());
+        }
+
+        int i = 0;
+
+        while (i < callbackArray.size()) {
+
+            final RoutineLoaderCallbacks<?> callbacks = callbackArray.valueAt(i).get();
+
+            if (callbacks == null) {
+
+                callbackArray.remove(callbackArray.keyAt(i));
+                continue;
+            }
+
+            final RoutineLoader<Object, Object> loader =
+                    (RoutineLoader<Object, Object>) callbacks.mLoader;
+            final int loaderId = callbackArray.keyAt(i);
+
+            if ((loaderId == id) && (loader.getInvocationCount() == 0) && loader.areSameInputs(
+                    inputs)) {
+
+                loaderManager.destroyLoader(loaderId);
+                callbackArray.remove(loaderId);
+                continue;
+            }
+
+            ++i;
+        }
+
+        if (callbackArray.size() == 0) {
+
+            sCallbackMap.remove(context);
+        }
+    }
+
+    /**
      * Destroys all loaders with the specified invocation class.
      *
      * @param context         the context.

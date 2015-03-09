@@ -20,6 +20,8 @@ import com.gh.bmd.jrt.invocation.Invocation;
 import javax.annotation.Nonnull;
 
 /**
+ * Interface defining an invocation aware of the specific Android context.
+ * <p/>
  * Created by davide on 1/8/15.
  *
  * @param <INPUT>  the input data type.

@@ -18,12 +18,12 @@ import android.support.v4.app.FragmentActivity;
 
 import com.gh.bmd.jrt.android.builder.AndroidRoutineBuilder;
 import com.gh.bmd.jrt.android.invocation.AndroidInvocation;
+import com.gh.bmd.jrt.android.routine.AndroidRoutine;
 import com.gh.bmd.jrt.android.runner.Runners;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.log.Logger;
-import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.time.TimeDuration;
 
@@ -105,20 +105,29 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> implements AndroidRoutineBuild
 
     @Nonnull
     @Override
-    public Routine<INPUT, OUTPUT> buildRoutine() {
+    public AndroidRoutine<INPUT, OUTPUT> buildRoutine() {
 
         final RoutineConfiguration configuration = RoutineConfiguration.notNull(mConfiguration);
         warn(configuration);
 
-        final Builder builder = configuration.builderFrom();
-        return new AndroidRoutine<INPUT, OUTPUT>(builder.withRunner(Runners.mainRunner())
-                                                        .withInputSize(Integer.MAX_VALUE)
-                                                        .withInputTimeout(TimeDuration.INFINITY)
-                                                        .withOutputSize(Integer.MAX_VALUE)
-                                                        .withOutputTimeout(TimeDuration.INFINITY)
-                                                        .buildConfiguration(), mContext,
-                                                 mInvocationId, mClashResolution, mCacheStrategy,
-                                                 mConstructor);
+        final Builder builder = configuration.builderFrom()
+                                             .withRunner(Runners.mainRunner())
+                                             .withInputSize(Integer.MAX_VALUE)
+                                             .withInputTimeout(TimeDuration.INFINITY)
+                                             .withOutputSize(Integer.MAX_VALUE)
+                                             .withOutputTimeout(TimeDuration.INFINITY);
+        return new DefaultAndroidRoutine<INPUT, OUTPUT>(builder.buildConfiguration(), mContext,
+                                                        mInvocationId, mClashResolution,
+                                                        mCacheStrategy, mConstructor);
+    }
+
+    @Nonnull
+    @Override
+    public AndroidRoutineBuilder<INPUT, OUTPUT> withConfiguration(
+            @Nullable final RoutineConfiguration configuration) {
+
+        mConfiguration = configuration;
+        return this;
     }
 
     @Nonnull
@@ -136,15 +145,6 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> implements AndroidRoutineBuild
             @Nullable final CacheStrategy cacheStrategy) {
 
         mCacheStrategy = cacheStrategy;
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public AndroidRoutineBuilder<INPUT, OUTPUT> withConfiguration(
-            @Nullable final RoutineConfiguration configuration) {
-
-        mConfiguration = configuration;
         return this;
     }
 

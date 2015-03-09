@@ -56,6 +56,27 @@ public interface AndroidChannelBuilder extends ConfigurableBuilder {
     public void purge();
 
     /**
+     * Makes the builder destroy the cached invocation instance with the specified input.
+     *
+     * @param input the input.
+     */
+    public void purge(@Nullable Object input);
+
+    /**
+     * Makes the builder destroy the cached invocation instance with the specified inputs.
+     *
+     * @param inputs the inputs.
+     */
+    public void purge(@Nullable Object... inputs);
+
+    /**
+     * Makes the builder destroy the cached invocation instance with the specified inputs.
+     *
+     * @param inputs the inputs.
+     */
+    public void purge(@Nullable Iterable<Object> inputs);
+
+    /**
      * Note that only the options related to logs will be employed.
      *
      * @param configuration the routine configuration.

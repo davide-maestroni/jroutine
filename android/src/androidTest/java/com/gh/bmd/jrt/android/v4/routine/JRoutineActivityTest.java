@@ -892,9 +892,9 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            new AndroidRoutine<String, String>(null, reference, 0, ClashResolution.KEEP_THAT,
-                                               CacheStrategy.CACHE,
-                                               ToUpperCase.class.getDeclaredConstructor());
+            new DefaultAndroidRoutine<String, String>(null, reference, 0, ClashResolution.KEEP_THAT,
+                                                      CacheStrategy.CACHE,
+                                                      ToUpperCase.class.getDeclaredConstructor());
 
             fail();
 
@@ -904,9 +904,10 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            new AndroidRoutine<String, String>(RoutineConfiguration.EMPTY_CONFIGURATION, null, 0,
-                                               ClashResolution.KEEP_THAT, CacheStrategy.CACHE,
-                                               ToUpperCase.class.getDeclaredConstructor());
+            new DefaultAndroidRoutine<String, String>(RoutineConfiguration.EMPTY_CONFIGURATION,
+                                                      null, 0, ClashResolution.KEEP_THAT,
+                                                      CacheStrategy.CACHE,
+                                                      ToUpperCase.class.getDeclaredConstructor());
 
             fail();
 
@@ -916,8 +917,9 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         try {
 
-            new AndroidRoutine<String, String>(RoutineConfiguration.EMPTY_CONFIGURATION, reference,
-                                               0, ClashResolution.KEEP_THAT, null, null);
+            new DefaultAndroidRoutine<String, String>(RoutineConfiguration.EMPTY_CONFIGURATION,
+                                                      reference, 0, ClashResolution.KEEP_THAT, null,
+                                                      null);
 
             fail();
 

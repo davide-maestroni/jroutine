@@ -18,7 +18,7 @@ The main way to define a routine is to implement an invocation object. Though, t
 
 ##It's reactive!
 
-The library adheres to [The Reactive Manifesto][17]. It's responsive, resilient, elastic and "message driven".
+The library adheres to [The Reactive Manifesto][18]. It's responsive, resilient, elastic and "message driven".
 
 It's responsive because commands are enqueued to be executed asynchronously so to never block the calling thread. Computation of asynchronous invocations happens only in response of inputs and resources are freed as soon as the input is consumed. Resources are allocated only when needed, and reused when possible.
 It's resilient because errors are gracefully handled and notified through the proper methods implemented by the specific invocation classes.
@@ -60,7 +60,7 @@ And more:
 * ***Java 5+**** ***and Android 1.6+***
 * ***@Nullable and @Nonnull annotations***
 
-(*) for older Java versions please have a look at [Retrotranslator][16].
+(*) for older Java versions please have a look at [Retrotranslator][17].
 
 ##Why not JRoutine?
 
@@ -83,7 +83,7 @@ The project contains an additional sample module showing how to implement a file
 
 ##Further development
 
-Feel free to contribute with your own [Runner][15] so to support more platforms other than Android.
+Feel free to contribute with your own [Routine][15] or [Runner][16] implementations, in order to support more platforms other than Android.
 
 ##Build instructions
 
@@ -131,6 +131,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 [12]:http://joel-costigliola.github.io/assertj/
 [13]:http://davide-maestroni.github.io/jroutine/docs/jroutine
 [14]:http://davide-maestroni.github.io/jroutine/docs/android
-[15]:http://davide-maestroni.github.io/jroutine/docs/jroutine/com/gh/bmd/jrt/runner/Runner.html
-[16]:http://retrotranslator.sourceforge.net/
-[17]:http://www.reactivemanifesto.org/
+[15]:http://davide-maestroni.github.io/jroutine/docs/jroutine/com/gh/bmd/jrt/routine/Routine.html
+[16]:http://davide-maestroni.github.io/jroutine/docs/jroutine/com/gh/bmd/jrt/runner/Runner.html
+[17]:http://retrotranslator.sourceforge.net/
+[18]:http://www.reactivemanifesto.org/

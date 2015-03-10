@@ -25,7 +25,7 @@ dependencies {
     if (project.hasProperty('dep') && project.dep.equals('module')) {
         compile project(':library')
     } else {
-        compile 'com.github.davide-maestroni:jroutine:1.2.1'
+        compile 'com.github.davide-maestroni:jroutine:1.2.2'
     }
 
     testCompile 'junit:junit:4.12'

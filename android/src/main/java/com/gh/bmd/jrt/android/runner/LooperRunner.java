@@ -2,9 +2,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p/>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,8 +25,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Implementation of a runner employing the Android {@link android.os.Looper} queue to execute
- * the routine invocations.
+ * Implementation of a runner employing the Android {@link android.os.Looper} queue to execute the
+ * routine invocations.
  * <p/>
  * Created by davide on 9/28/14.
  */
@@ -61,6 +61,19 @@ class LooperRunner implements Runner {
         };
     }
 
+    private void runInternal(@Nonnull final Execution execution, final long delay,
+            @Nonnull final TimeUnit timeUnit) {
+
+        if (delay > 0) {
+
+            mHandler.postDelayed(execution, timeUnit.toMillis(delay));
+
+        } else {
+
+            mHandler.post(execution);
+        }
+    }
+
     @Override
     public void run(@Nonnull final Execution execution, final long delay,
             @Nonnull final TimeUnit timeUnit) {
@@ -75,16 +88,5 @@ class LooperRunner implements Runner {
         }
     }
 
-    private void runInternal(@Nonnull final Execution execution, final long delay,
-            @Nonnull final TimeUnit timeUnit) {
 
-        if (delay > 0) {
-
-            mHandler.postDelayed(execution, timeUnit.toMillis(delay));
-
-        } else {
-
-            mHandler.post(execution);
-        }
-    }
 }

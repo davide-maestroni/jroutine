@@ -2,9 +2,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p/>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,6 +34,7 @@ import junit.framework.TestCase;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
@@ -77,8 +78,8 @@ public class ProcessorTest extends TestCase {
                                                                                     LogLevel.DEBUG)
                                                                             .withLog(log)
                                                                             .buildConfiguration())
-                                                .buildWrapper(ClassToken.tokenOf(TestWrapper
-                                                                                         .class));
+                                                .buildWrapper(
+                                                        ClassToken.tokenOf(TestWrapper.class));
 
         assertThat(testWrapper.getOne().readNext()).isEqualTo(1);
         assertThat(testWrapper.getString(1, 2, 3)).isIn("1", "2", "3");
@@ -92,7 +93,7 @@ public class ProcessorTest extends TestCase {
                 "1", "2", "3");
 
         final ArrayList<String> list = new ArrayList<String>();
-        assertThat(testWrapper.getList(Arrays.asList(list))).containsExactly(list);
+        assertThat(testWrapper.getList(Collections.singletonList(list))).containsExactly(list);
 
         final StandaloneChannel<Integer> standaloneChannel = JRoutine.standalone().buildChannel();
         standaloneChannel.input().pass(3).close();
@@ -136,7 +137,7 @@ public class ProcessorTest extends TestCase {
                 "1", "2", "3");
 
         final ArrayList<String> list = new ArrayList<String>();
-        assertThat(testWrapper.getList(Arrays.asList(list))).containsExactly(list);
+        assertThat(testWrapper.getList(Collections.singletonList(list))).containsExactly(list);
 
         final StandaloneChannel<Integer> standaloneChannel = JRoutine.standalone().buildChannel();
         standaloneChannel.input().pass(3).close();
@@ -175,7 +176,7 @@ public class ProcessorTest extends TestCase {
     @SuppressWarnings("UnusedDeclaration")
     public interface TestClassInterface {
 
-        public int getOne();
+        int getOne();
     }
 
     @Wrap(TestClassInterface.class)
@@ -183,7 +184,7 @@ public class ProcessorTest extends TestCase {
 
         @Timeout(300)
         @Pass(int.class)
-        public OutputChannel<Integer> getOne();
+        OutputChannel<Integer> getOne();
     }
 
     @Wrap(TestClass.class)
@@ -191,33 +192,33 @@ public class ProcessorTest extends TestCase {
 
         @Timeout(300)
         @Pass(List.class)
-        public Iterable<Iterable> getList(@Pass(List.class) List<? extends List<String>> i);
+        Iterable<Iterable> getList(@Pass(List.class) List<? extends List<String>> i);
 
         @Timeout(300)
         @Pass(int.class)
-        public OutputChannel<Integer> getOne();
+        OutputChannel<Integer> getOne();
 
         @Timeout(300)
-        public String getString(@Pass(int.class) int... i);
-
-        @Timeout(300)
-        @Pass(String.class)
-        public OutputChannel<String> getString(@Pass(int.class) HashSet<Integer> i);
+        String getString(@Pass(int.class) int... i);
 
         @Timeout(300)
         @Pass(String.class)
-        public List<String> getString(@Pass(int.class) List<Integer> i);
+        OutputChannel<String> getString(@Pass(int.class) HashSet<Integer> i);
 
         @Timeout(300)
         @Pass(String.class)
-        public Iterable<String> getString(@Pass(int.class) Iterable<Integer> i);
+        List<String> getString(@Pass(int.class) List<Integer> i);
 
         @Timeout(300)
         @Pass(String.class)
-        public String[] getString(@Pass(int.class) Collection<Integer> i);
+        Iterable<String> getString(@Pass(int.class) Iterable<Integer> i);
 
         @Timeout(300)
-        public String getString(@Pass(int.class) OutputChannel<Integer> i);
+        @Pass(String.class)
+        String[] getString(@Pass(int.class) Collection<Integer> i);
+
+        @Timeout(300)
+        String getString(@Pass(int.class) OutputChannel<Integer> i);
     }
 
     @SuppressWarnings("UnusedDeclaration")

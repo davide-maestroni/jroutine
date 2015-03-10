@@ -2,9 +2,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p/>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,20 +36,6 @@ public class Reflection {
 
     private static final HashMap<Class<?>, Class<?>> sBoxMap = new HashMap<Class<?>, Class<?>>(9);
 
-    static {
-
-        final HashMap<Class<?>, Class<?>> boxMap = sBoxMap;
-        boxMap.put(boolean.class, Boolean.class);
-        boxMap.put(byte.class, Byte.class);
-        boxMap.put(char.class, Character.class);
-        boxMap.put(double.class, Double.class);
-        boxMap.put(float.class, Float.class);
-        boxMap.put(int.class, Integer.class);
-        boxMap.put(long.class, Long.class);
-        boxMap.put(short.class, Short.class);
-        boxMap.put(void.class, Void.class);
-    }
-
     /**
      * Avoid direct instantiation.
      */
@@ -65,12 +51,8 @@ public class Reflection {
      * @param type the primitive type.
      * @return the boxing class.
      */
-    public static Class<?> boxingClass(@Nullable final Class<?> type) {
-
-        if (type == null) {
-
-            return null;
-        }
+    @Nonnull
+    public static Class<?> boxingClass(@Nonnull final Class<?> type) {
 
         if (!type.isPrimitive()) {
 
@@ -213,5 +195,19 @@ public class Reflection {
             mmConstructor.setAccessible(true);
             return null;
         }
+    }
+
+    static {
+
+        final HashMap<Class<?>, Class<?>> boxMap = sBoxMap;
+        boxMap.put(boolean.class, Boolean.class);
+        boxMap.put(byte.class, Byte.class);
+        boxMap.put(char.class, Character.class);
+        boxMap.put(double.class, Double.class);
+        boxMap.put(float.class, Float.class);
+        boxMap.put(int.class, Integer.class);
+        boxMap.put(long.class, Long.class);
+        boxMap.put(short.class, Short.class);
+        boxMap.put(void.class, Void.class);
     }
 }

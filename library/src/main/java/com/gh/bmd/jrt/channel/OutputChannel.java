@@ -2,9 +2,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p/>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -48,7 +48,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @throws java.lang.NullPointerException         if the specified timeout is null.
      */
     @Nonnull
-    public OutputChannel<OUTPUT> afterMax(@Nonnull TimeDuration timeout);
+    OutputChannel<OUTPUT> afterMax(@Nonnull TimeDuration timeout);
 
     /**
      * Tells the channel to wait at max the specified time duration for the next result to be
@@ -65,7 +65,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      *                                                consumer.
      */
     @Nonnull
-    public OutputChannel<OUTPUT> afterMax(long timeout, @Nonnull TimeUnit timeUnit);
+    OutputChannel<OUTPUT> afterMax(long timeout, @Nonnull TimeUnit timeUnit);
 
     /**
      * Binds the specified consumer to this channel. After the call all the output will be passed
@@ -77,7 +77,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @throws java.lang.NullPointerException  if the specified consumer is null.
      */
     @Nonnull
-    public OutputChannel<OUTPUT> bind(@Nonnull OutputConsumer<OUTPUT> consumer);
+    OutputChannel<OUTPUT> bind(@Nonnull OutputConsumer<OUTPUT> consumer);
 
     /**
      * Checks if the routine is complete waiting at the maximum for the set timeout.
@@ -87,7 +87,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
      * @see #immediately()
      */
-    public boolean checkComplete();
+    boolean checkComplete();
 
     /**
      * Tells the channel to wait indefinitely for results to be available.
@@ -100,7 +100,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      *                                                consumer.
      */
     @Nonnull
-    public OutputChannel<OUTPUT> eventually();
+    OutputChannel<OUTPUT> eventually();
 
     /**
      * Tells the channel to abort the invocation execution in case no result is available before
@@ -112,7 +112,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @see #immediately()
      */
     @Nonnull
-    public OutputChannel<OUTPUT> eventuallyAbort();
+    OutputChannel<OUTPUT> eventuallyAbort();
 
     /**
      * Tells the channel to throw a {@link ReadDeadlockException} in case no result is available
@@ -126,7 +126,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @see #immediately()
      */
     @Nonnull
-    public OutputChannel<OUTPUT> eventuallyDeadlock();
+    OutputChannel<OUTPUT> eventuallyDeadlock();
 
     /**
      * Tells the channel to break execution in case no result is available before the timeout has
@@ -140,7 +140,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @see #immediately()
      */
     @Nonnull
-    public OutputChannel<OUTPUT> eventuallyExit();
+    OutputChannel<OUTPUT> eventuallyExit();
 
     /**
      * Tells the channel to not wait for results to be available.
@@ -153,14 +153,14 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      *                                                consumer.
      */
     @Nonnull
-    public OutputChannel<OUTPUT> immediately();
+    OutputChannel<OUTPUT> immediately();
 
     /**
      * Checks if this channel is bound to a consumer.
      *
      * @return whether the channel is bound.
      */
-    public boolean isBound();
+    boolean isBound();
 
     /**
      * Reads all the results by waiting for the routine to complete at the maximum for the set
@@ -179,7 +179,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @see #eventuallyExit()
      */
     @Nonnull
-    public List<OUTPUT> readAll();
+    List<OUTPUT> readAll();
 
     /**
      * Reads all the results by waiting for the routine to complete at the maximum for the set
@@ -200,7 +200,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @see #eventuallyExit()
      */
     @Nonnull
-    public OutputChannel<OUTPUT> readAllInto(@Nonnull Collection<? super OUTPUT> results);
+    OutputChannel<OUTPUT> readAllInto(@Nonnull Collection<? super OUTPUT> results);
 
     /**
      * Reads the first available result by waiting at the maximum for the set timeout.
@@ -221,7 +221,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @see #eventuallyDeadlock()
      * @see #eventuallyExit()
      */
-    public OUTPUT readNext();
+    OUTPUT readNext();
 
     /**
      * Unbinds the specified consumer from this channel. After the call the output will returned to
@@ -231,5 +231,5 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @return this channel.
      */
     @Nonnull
-    public OutputChannel<OUTPUT> unbind(@Nullable OutputConsumer<OUTPUT> consumer);
+    OutputChannel<OUTPUT> unbind(@Nullable OutputConsumer<OUTPUT> consumer);
 }

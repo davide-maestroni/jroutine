@@ -2,9 +2,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p/>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -520,7 +520,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
     /**
      * Enumeration identifying the channel internal state.
      */
-    private static enum ChannelState {
+    private enum ChannelState {
 
         INPUT,      // input channel is open
         OUTPUT,     // no more input
@@ -542,21 +542,21 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
          * @return the invocation instance.
          */
         @Nonnull
-        public Invocation<INPUT, OUTPUT> create();
+        Invocation<INPUT, OUTPUT> create();
 
         /**
          * Discards the specified invocation.
          *
          * @param invocation the invocation instance.
          */
-        public void discard(@Nonnull Invocation<INPUT, OUTPUT> invocation);
+        void discard(@Nonnull Invocation<INPUT, OUTPUT> invocation);
 
         /**
          * Recycles the specified invocation.
          *
          * @param invocation the invocation instance.
          */
-        public void recycle(@Nonnull Invocation<INPUT, OUTPUT> invocation);
+        void recycle(@Nonnull Invocation<INPUT, OUTPUT> invocation);
     }
 
     /**
@@ -619,7 +619,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
         @Nullable
         @Override
         @SuppressFBWarnings(value = "NO_NOTIFY_NOT_NOTIFYALL",
-                            justification = "only one input is released")
+                justification = "only one input is released")
         public INPUT nextInput() {
 
             synchronized (mMutex) {

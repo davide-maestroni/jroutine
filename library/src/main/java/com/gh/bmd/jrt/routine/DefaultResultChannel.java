@@ -2,9 +2,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p/>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -520,7 +520,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     }
 
     @SuppressFBWarnings(value = "UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR",
-                        justification = "cannot be called if output consumer is null")
+            justification = "cannot be called if output consumer is null")
     private void closeConsumer(final ChannelState state) {
 
         if (state != ChannelState.ABORTED) {
@@ -803,7 +803,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     /**
      * Enumeration identifying the channel internal state.
      */
-    private static enum ChannelState {
+    private enum ChannelState {
 
         OUTPUT,     // result channel is open
         RESULT,     // result channel is closed
@@ -825,7 +825,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
          * @param delay    the abortion delay.
          * @param timeUnit the delay time unit.
          */
-        public void onAbort(@Nullable Throwable reason, long delay, @Nonnull TimeUnit timeUnit);
+        void onAbort(@Nullable Throwable reason, long delay, @Nonnull TimeUnit timeUnit);
     }
 
     /**
@@ -944,7 +944,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         @Nullable
         @Override
         @SuppressFBWarnings(value = "IT_NO_SUCH_ELEMENT",
-                            justification = "NestedQueue.removeFirst() actually throws it")
+                justification = "NestedQueue.removeFirst() actually throws it")
         public OUTPUT next() {
 
             boolean isAbort = false;

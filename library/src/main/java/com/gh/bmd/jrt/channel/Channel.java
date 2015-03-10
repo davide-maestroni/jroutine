@@ -2,9 +2,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p/>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,7 +32,7 @@ public interface Channel {
      *
      * @return whether the channel status changed as a result of the call.
      */
-    public boolean abort();
+    boolean abort();
 
     /**
      * Closes the channel and abort the transfer of data, thus aborting the routine execution and
@@ -43,12 +43,12 @@ public interface Channel {
      * @param reason the throwable object identifying the reason of the routine abortion.
      * @return whether the channel status changed as a result of the call.
      */
-    public boolean abort(@Nullable Throwable reason);
+    boolean abort(@Nullable Throwable reason);
 
     /**
      * Checks if the channel is open, that is, data can be written or read.
      *
      * @return whether the channel is open.
      */
-    public boolean isOpen();
+    boolean isOpen();
 }

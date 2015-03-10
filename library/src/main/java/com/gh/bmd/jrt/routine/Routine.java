@@ -2,9 +2,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p/>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -89,7 +89,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @throws com.gh.bmd.jrt.common.RoutineException if the execution has been aborted.
      */
     @Nonnull
-    public OutputChannel<OUTPUT> callAsync();
+    OutputChannel<OUTPUT> callAsync();
 
     /**
      * Short for <b><code>invokeAsync().pass(input).result()</code></b>.
@@ -99,7 +99,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @throws com.gh.bmd.jrt.common.RoutineException if the execution has been aborted.
      */
     @Nonnull
-    public OutputChannel<OUTPUT> callAsync(@Nullable INPUT input);
+    OutputChannel<OUTPUT> callAsync(@Nullable INPUT input);
 
     /**
      * Short for <b><code>invokeAsync().pass(inputs).result()</code></b>.
@@ -109,7 +109,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @throws com.gh.bmd.jrt.common.RoutineException if the execution has been aborted.
      */
     @Nonnull
-    public OutputChannel<OUTPUT> callAsync(@Nullable INPUT... inputs);
+    OutputChannel<OUTPUT> callAsync(@Nullable INPUT... inputs);
 
     /**
      * Short for <b><code>invokeAsync().pass(inputs).result()</code></b>.
@@ -119,7 +119,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @throws com.gh.bmd.jrt.common.RoutineException if the execution has been aborted.
      */
     @Nonnull
-    public OutputChannel<OUTPUT> callAsync(@Nullable Iterable<? extends INPUT> inputs);
+    OutputChannel<OUTPUT> callAsync(@Nullable Iterable<? extends INPUT> inputs);
 
     /**
      * Short for <b><code>invokeAsync().pass(inputs).result()</code></b>.
@@ -129,7 +129,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @throws com.gh.bmd.jrt.common.RoutineException if the execution has been aborted.
      */
     @Nonnull
-    public OutputChannel<OUTPUT> callAsync(@Nullable OutputChannel<INPUT> inputs);
+    OutputChannel<OUTPUT> callAsync(@Nullable OutputChannel<INPUT> inputs);
 
     /**
      * Short for <b><code>invokeParallel().result()</code></b>.
@@ -140,7 +140,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @throws com.gh.bmd.jrt.common.RoutineException if the execution has been aborted.
      */
     @Nonnull
-    public OutputChannel<OUTPUT> callParallel();
+    OutputChannel<OUTPUT> callParallel();
 
     /**
      * Short for <b><code>invokeParallel().pass(input).result()</code></b>.
@@ -150,7 +150,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @throws com.gh.bmd.jrt.common.RoutineException if the execution has been aborted.
      */
     @Nonnull
-    public OutputChannel<OUTPUT> callParallel(@Nullable INPUT input);
+    OutputChannel<OUTPUT> callParallel(@Nullable INPUT input);
 
     /**
      * Short for <b><code>invokeParallel().pass(inputs).result()</code></b>.
@@ -160,7 +160,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @throws com.gh.bmd.jrt.common.RoutineException if the execution has been aborted.
      */
     @Nonnull
-    public OutputChannel<OUTPUT> callParallel(@Nullable INPUT... inputs);
+    OutputChannel<OUTPUT> callParallel(@Nullable INPUT... inputs);
 
     /**
      * Short for <b><code>invokeParallel().pass(inputs).result()</code></b>.
@@ -170,7 +170,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @throws com.gh.bmd.jrt.common.RoutineException if the execution has been aborted.
      */
     @Nonnull
-    public OutputChannel<OUTPUT> callParallel(@Nullable Iterable<? extends INPUT> inputs);
+    OutputChannel<OUTPUT> callParallel(@Nullable Iterable<? extends INPUT> inputs);
 
     /**
      * Short for <b><code>invokeParallel().pass(inputs).result()</code></b>.
@@ -180,7 +180,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @throws com.gh.bmd.jrt.common.RoutineException if the execution has been aborted.
      */
     @Nonnull
-    public OutputChannel<OUTPUT> callParallel(@Nullable OutputChannel<INPUT> inputs);
+    OutputChannel<OUTPUT> callParallel(@Nullable OutputChannel<INPUT> inputs);
 
     /**
      * Short for <b><code>invokeSync().result()</code></b>.
@@ -189,7 +189,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @throws com.gh.bmd.jrt.common.RoutineException if the execution has been aborted.
      */
     @Nonnull
-    public OutputChannel<OUTPUT> callSync();
+    OutputChannel<OUTPUT> callSync();
 
     /**
      * Short for <b><code>invokeSync().pass(input).result()</code></b>.
@@ -199,7 +199,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @throws com.gh.bmd.jrt.common.RoutineException if the execution has been aborted.
      */
     @Nonnull
-    public OutputChannel<OUTPUT> callSync(@Nullable INPUT input);
+    OutputChannel<OUTPUT> callSync(@Nullable INPUT input);
 
     /**
      * Short for <b><code>invokeSync().pass(inputs).result()</code></b>.
@@ -209,7 +209,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @throws com.gh.bmd.jrt.common.RoutineException if the execution has been aborted.
      */
     @Nonnull
-    public OutputChannel<OUTPUT> callSync(@Nullable INPUT... inputs);
+    OutputChannel<OUTPUT> callSync(@Nullable INPUT... inputs);
 
     /**
      * Short for <b><code>invokeSync().pass(inputs).result()</code></b>.
@@ -219,7 +219,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @throws com.gh.bmd.jrt.common.RoutineException if the execution has been aborted.
      */
     @Nonnull
-    public OutputChannel<OUTPUT> callSync(@Nullable Iterable<? extends INPUT> inputs);
+    OutputChannel<OUTPUT> callSync(@Nullable Iterable<? extends INPUT> inputs);
 
     /**
      * Short for <b><code>invokeSync().pass(inputs).result()</code></b>.
@@ -229,7 +229,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @throws com.gh.bmd.jrt.common.RoutineException if the execution has been aborted.
      */
     @Nonnull
-    public OutputChannel<OUTPUT> callSync(@Nullable OutputChannel<INPUT> inputs);
+    OutputChannel<OUTPUT> callSync(@Nullable OutputChannel<INPUT> inputs);
 
     /**
      * Invokes the execution of this routine in asynchronous mode.
@@ -237,7 +237,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @return the invocation parameter channel.
      */
     @Nonnull
-    public ParameterChannel<INPUT, OUTPUT> invokeAsync();
+    ParameterChannel<INPUT, OUTPUT> invokeAsync();
 
     /**
      * Invokes the execution of this routine in parallel mode.
@@ -245,7 +245,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @return the invocation parameter channel.
      */
     @Nonnull
-    public ParameterChannel<INPUT, OUTPUT> invokeParallel();
+    ParameterChannel<INPUT, OUTPUT> invokeParallel();
 
     /**
      * Invokes the execution of this routine in synchronous mode.
@@ -253,7 +253,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @return the invocation parameter channel.
      */
     @Nonnull
-    public ParameterChannel<INPUT, OUTPUT> invokeSync();
+    ParameterChannel<INPUT, OUTPUT> invokeSync();
 
     /**
      * Makes the routine destroy all the cached invocation instances.
@@ -263,5 +263,5 @@ public interface Routine<INPUT, OUTPUT> {
      * <p/>
      * Normally it is not needed to call this method.
      */
-    public void purge();
+    void purge();
 }

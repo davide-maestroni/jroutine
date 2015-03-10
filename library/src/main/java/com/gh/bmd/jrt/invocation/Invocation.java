@@ -2,9 +2,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p/>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -85,18 +85,18 @@ public interface Invocation<INPUT, OUTPUT> {
      *
      * @param reason the reason of the abortion.
      */
-    public void onAbort(@Nullable Throwable reason);
+    void onAbort(@Nullable Throwable reason);
 
     /**
      * Called when the routine invocation is no longer needed.
      */
-    public void onDestroy();
+    void onDestroy();
 
     /**
      * Called when the routine invocation is initialized.<br/>
      * This is always the first method in the invocation lifecycle.
      */
-    public void onInit();
+    void onInit();
 
     /**
      * Called when an input is passed to the routine.<br/>
@@ -105,7 +105,7 @@ public interface Invocation<INPUT, OUTPUT> {
      * @param input  the input.
      * @param result the result channel.
      */
-    public void onInput(INPUT input, @Nonnull ResultChannel<OUTPUT> result);
+    void onInput(INPUT input, @Nonnull ResultChannel<OUTPUT> result);
 
     /**
      * Called when all the inputs has been passed to the routine.<br/>
@@ -114,10 +114,10 @@ public interface Invocation<INPUT, OUTPUT> {
      *
      * @param result the result channel.
      */
-    public void onResult(@Nonnull ResultChannel<OUTPUT> result);
+    void onResult(@Nonnull ResultChannel<OUTPUT> result);
 
     /**
      * Called when the routine execution has completed.
      */
-    public void onReturn();
+    void onReturn();
 }

@@ -2,9 +2,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p/>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -410,7 +410,7 @@ public class TimeDuration extends Time {
      * @throws java.lang.NullPointerException if the target object is null.
      */
     @SuppressFBWarnings(value = "WA_NOT_IN_LOOP",
-                        justification = "this is just a wrapper on an Object.wait() call")
+            justification = "this is just a wrapper on an Object.wait() call")
     public void wait(@Nonnull final Object target) throws InterruptedException {
 
         if (isZero()) {
@@ -439,7 +439,7 @@ public class TimeDuration extends Time {
      * @see java.lang.System#currentTimeMillis()
      */
     @SuppressFBWarnings(value = "WA_NOT_IN_LOOP",
-                        justification = "this is just a wrapper on an Object.wait() call")
+            justification = "this is just a wrapper on an Object.wait() call")
     public boolean waitSinceMillis(@Nonnull final Object target, final long milliTime) throws
             InterruptedException {
 
@@ -478,7 +478,7 @@ public class TimeDuration extends Time {
      * @see java.lang.System#nanoTime()
      */
     @SuppressFBWarnings(value = "WA_NOT_IN_LOOP",
-                        justification = "this is just a wrapper on an Object.wait() call")
+            justification = "this is just a wrapper on an Object.wait() call")
     public boolean waitSinceNanos(@Nonnull final Object target, final long nanoTime) throws
             InterruptedException {
 
@@ -571,6 +571,6 @@ public class TimeDuration extends Time {
          *
          * @return whether the check is verified.
          */
-        public boolean isTrue();
+        boolean isTrue();
     }
 }

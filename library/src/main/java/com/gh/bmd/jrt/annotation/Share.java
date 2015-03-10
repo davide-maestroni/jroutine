@@ -2,9 +2,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p/>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -65,12 +65,12 @@ public @interface Share {
     /**
      * Constant indicating the default share group, that is, all member fields are protected.
      */
-    static final String ALL = "com.gh.bmd.jrt.annotation.Share.ALL";
+    String ALL = "com.gh.bmd.jrt.annotation.Share.ALL";
 
     /**
      * Constant indicating that no member field needs to be protected.
      */
-    static final String NONE = "";
+    String NONE = "";
 
     /**
      * The share group name associated with the annotated method.

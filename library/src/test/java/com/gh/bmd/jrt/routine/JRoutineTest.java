@@ -2,9 +2,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p/>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -937,157 +937,155 @@ public class JRoutineTest extends TestCase {
         assertThat(countLog.getWrnCount()).isEqualTo(7);
     }
 
-    private static interface CountError {
+    private interface CountError {
 
         @Pass(int.class)
-        public String[] count(int length);
+        String[] count(int length);
 
         @Bind("count")
         @Pass(value = int.class, mode = PassingMode.COLLECTION)
-        public OutputChannel<Integer> count1(int length);
+        OutputChannel<Integer> count1(int length);
 
         @Bind("count")
         @Pass(value = int.class, mode = PassingMode.PARALLEL)
-        public String[] count2(int length);
+        String[] count2(int length);
 
         @Pass(value = List.class, mode = PassingMode.OBJECT)
-        public List<Integer> countList(int length);
+        List<Integer> countList(int length);
 
         @Bind("countList")
         @Pass(value = List.class, mode = PassingMode.COLLECTION)
-        public List<Integer> countList1(int length);
+        List<Integer> countList1(int length);
 
         @Bind("countList")
         @Pass(value = List.class, mode = PassingMode.PARALLEL)
-        public OutputChannel<Integer> countList2(int length);
+        OutputChannel<Integer> countList2(int length);
     }
 
-    private static interface CountItf {
+    private interface CountItf {
 
         @Pass(int[].class)
-        public OutputChannel<Integer> count(int length);
+        OutputChannel<Integer> count(int length);
 
         @Bind("count")
         @Pass(value = int[].class, mode = PassingMode.OBJECT)
-        public OutputChannel<int[]> count1(int length);
+        OutputChannel<int[]> count1(int length);
 
         @Bind("count")
         @Pass(value = int[].class, mode = PassingMode.COLLECTION)
-        public OutputChannel<Integer> count2(int length);
+        OutputChannel<Integer> count2(int length);
 
         @Pass(List.class)
-        public OutputChannel<Integer> countList(int length);
+        OutputChannel<Integer> countList(int length);
 
         @Bind("countList")
         @Pass(value = List.class, mode = PassingMode.COLLECTION)
-        public OutputChannel<Integer> countList1(int length);
+        OutputChannel<Integer> countList1(int length);
     }
 
     private interface IncItf {
 
         @Timeout(1000)
         @Pass(int.class)
-        public int[] inc(@Pass(int.class) int... i);
+        int[] inc(@Pass(int.class) int... i);
 
         @Timeout(1000)
         @Bind("inc")
         @Pass(int.class)
-        public Iterable<Integer> incIterable(@Pass(int.class) int... i);
+        Iterable<Integer> incIterable(@Pass(int.class) int... i);
     }
 
-    private static interface SquareItf {
+    private interface SquareItf {
 
         @Timeout(value = 1, unit = TimeUnit.SECONDS)
-        public int compute(int i);
+        int compute(int i);
 
         @Bind("compute")
         @Pass(value = int.class, mode = PassingMode.PARALLEL)
         @Timeout(1000)
-        public int[] compute1(int length);
+        int[] compute1(int length);
 
         @Bind("compute")
         @Pass(value = int.class, mode = PassingMode.PARALLEL)
         @Timeout(1000)
-        public List<Integer> compute2(int length);
+        List<Integer> compute2(int length);
 
         @Bind("compute")
         @Timeout(1000)
-        public int computeAsync(@Pass(int.class) OutputChannel<Integer> i);
+        int computeAsync(@Pass(int.class) OutputChannel<Integer> i);
 
         @Share(Share.NONE)
         @Bind("compute")
         @Pass(int.class)
-        public OutputChannel<Integer> computeParallel1(@Pass(int.class) int... i);
+        OutputChannel<Integer> computeParallel1(@Pass(int.class) int... i);
 
         @Bind("compute")
         @Pass(int.class)
-        public OutputChannel<Integer> computeParallel2(@Pass(int.class) Integer... i);
-
-        @Share(Share.NONE)
-        @Bind("compute")
-        @Pass(int.class)
-        public OutputChannel<Integer> computeParallel3(@Pass(int.class) List<Integer> i);
+        OutputChannel<Integer> computeParallel2(@Pass(int.class) Integer... i);
 
         @Share(Share.NONE)
         @Bind("compute")
         @Pass(int.class)
-        public OutputChannel<Integer> computeParallel4(
+        OutputChannel<Integer> computeParallel3(@Pass(int.class) List<Integer> i);
+
+        @Share(Share.NONE)
+        @Bind("compute")
+        @Pass(int.class)
+        OutputChannel<Integer> computeParallel4(
                 @Pass(value = int.class, mode = PassingMode.PARALLEL) OutputChannel<Integer> i);
     }
 
-    private static interface SumError {
+    private interface SumError {
 
-        public int compute(int a, @Pass(int.class) int[] b);
+        int compute(int a, @Pass(int.class) int[] b);
 
-        public int compute(@Pass(int.class) String[] ints);
+        int compute(@Pass(int.class) String[] ints);
 
-        public int compute(@Pass(value = int.class, mode = PassingMode.OBJECT) int[] ints);
+        int compute(@Pass(value = int.class, mode = PassingMode.OBJECT) int[] ints);
 
-        public int compute(
-                @Pass(value = int.class, mode = PassingMode.COLLECTION) Iterable<Integer> ints);
+        int compute(@Pass(value = int.class, mode = PassingMode.COLLECTION) Iterable<Integer> ints);
 
-        public int compute(@Pass(value = int.class,
-                                 mode = PassingMode.COLLECTION) OutputChannel<Integer> ints);
+        int compute(@Pass(value = int.class,
+                mode = PassingMode.COLLECTION) OutputChannel<Integer> ints);
 
-        public int compute(int a,
+        int compute(int a,
                 @Pass(value = int[].class, mode = PassingMode.COLLECTION) OutputChannel<Integer> b);
 
-        public int compute(@Pass(value = int.class, mode = PassingMode.PARALLEL) Object ints);
+        int compute(@Pass(value = int.class, mode = PassingMode.PARALLEL) Object ints);
 
-        public int compute(@Pass(value = int.class, mode = PassingMode.PARALLEL) Object[] ints);
+        int compute(@Pass(value = int.class, mode = PassingMode.PARALLEL) Object[] ints);
 
-        public int compute(String text,
-                @Pass(value = int.class, mode = PassingMode.PARALLEL) int[] ints);
+        int compute(String text, @Pass(value = int.class, mode = PassingMode.PARALLEL) int[] ints);
     }
 
-    private static interface SumItf {
+    private interface SumItf {
 
-        public int compute(int a, @Pass(int.class) OutputChannel<Integer> b);
+        int compute(int a, @Pass(int.class) OutputChannel<Integer> b);
 
-        public int compute(@Pass(int[].class) OutputChannel<Integer> ints);
+        int compute(@Pass(int[].class) OutputChannel<Integer> ints);
 
         @Bind("compute")
-        public int compute1(
+        int compute1(
                 @Pass(value = int[].class, mode = PassingMode.OBJECT) OutputChannel<int[]> ints);
 
         @Bind("compute")
-        public int computeList(@Pass(List.class) OutputChannel<Integer> ints);
+        int computeList(@Pass(List.class) OutputChannel<Integer> ints);
 
         @Bind("compute")
-        public int computeList1(@Pass(value = List.class,
-                                      mode = PassingMode.COLLECTION) OutputChannel<Integer> ints);
+        int computeList1(@Pass(value = List.class,
+                mode = PassingMode.COLLECTION) OutputChannel<Integer> ints);
     }
 
-    private static interface TestItf {
+    private interface TestItf {
 
-        public void throwException(@Pass(int.class) RuntimeException ex);
+        void throwException(@Pass(int.class) RuntimeException ex);
 
         @Bind(Test.THROW)
         @Pass(int.class)
-        public void throwException1(RuntimeException ex);
+        void throwException1(RuntimeException ex);
 
         @Bind(Test.THROW)
-        public int throwException2(RuntimeException ex);
+        int throwException2(RuntimeException ex);
     }
 
     @SuppressWarnings("UnusedDeclaration")

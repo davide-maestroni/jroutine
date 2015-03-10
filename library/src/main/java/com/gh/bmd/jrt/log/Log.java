@@ -2,9 +2,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p/>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -55,7 +55,7 @@ public interface Log {
      * @param message   the message.
      * @param throwable the optional throwable or null.
      */
-    public void dbg(@Nonnull List<Object> contexts, @Nullable String message,
+    void dbg(@Nonnull List<Object> contexts, @Nullable String message,
             @Nullable Throwable throwable);
 
     /**
@@ -65,7 +65,7 @@ public interface Log {
      * @param message   the message.
      * @param throwable the optional throwable or null.
      */
-    public void err(@Nonnull List<Object> contexts, @Nullable String message,
+    void err(@Nonnull List<Object> contexts, @Nullable String message,
             @Nullable Throwable throwable);
 
     /**
@@ -75,13 +75,13 @@ public interface Log {
      * @param message   the message.
      * @param throwable the optional throwable or null.
      */
-    public void wrn(@Nonnull List<Object> contexts, @Nullable String message,
+    void wrn(@Nonnull List<Object> contexts, @Nullable String message,
             @Nullable Throwable throwable);
 
     /**
      * Log levels enumeration from more to less verbose.
      */
-    public enum LogLevel {
+    enum LogLevel {
 
         /**
          * The most verbose log level.<br/>

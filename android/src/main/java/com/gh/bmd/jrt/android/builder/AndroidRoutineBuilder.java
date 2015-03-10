@@ -2,9 +2,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p/>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -45,11 +45,11 @@ public interface AndroidRoutineBuilder<INPUT, OUTPUT> extends RoutineBuilder<INP
     /**
      * Constant identifying a routine ID computed from the executor class and the input parameters.
      */
-    public static final int AUTO = Integer.MIN_VALUE;
+    int AUTO = Integer.MIN_VALUE;
 
     @Nonnull
     @Override
-    public AndroidRoutine<INPUT, OUTPUT> buildRoutine();
+    AndroidRoutine<INPUT, OUTPUT> buildRoutine();
 
     /**
      * Note that all the options related to the output and input channels size and timeout will be
@@ -60,7 +60,7 @@ public interface AndroidRoutineBuilder<INPUT, OUTPUT> extends RoutineBuilder<INP
      */
     @Nonnull
     @Override
-    public AndroidRoutineBuilder<INPUT, OUTPUT> withConfiguration(
+    AndroidRoutineBuilder<INPUT, OUTPUT> withConfiguration(
             @Nullable RoutineConfiguration configuration);
 
     /**
@@ -72,7 +72,7 @@ public interface AndroidRoutineBuilder<INPUT, OUTPUT> extends RoutineBuilder<INP
      * @return this builder.
      */
     @Nonnull
-    public AndroidRoutineBuilder<INPUT, OUTPUT> onClash(@Nullable ClashResolution resolution);
+    AndroidRoutineBuilder<INPUT, OUTPUT> onClash(@Nullable ClashResolution resolution);
 
     /**
      * Tells the builder how to cache the invocation result after its completion. A null value means
@@ -82,7 +82,7 @@ public interface AndroidRoutineBuilder<INPUT, OUTPUT> extends RoutineBuilder<INP
      * @return this builder.
      */
     @Nonnull
-    public AndroidRoutineBuilder<INPUT, OUTPUT> onComplete(@Nullable CacheStrategy cacheStrategy);
+    AndroidRoutineBuilder<INPUT, OUTPUT> onComplete(@Nullable CacheStrategy cacheStrategy);
 
     /**
      * Tells the builder to identify the invocation with the specified ID.
@@ -91,14 +91,14 @@ public interface AndroidRoutineBuilder<INPUT, OUTPUT> extends RoutineBuilder<INP
      * @return this builder.
      */
     @Nonnull
-    public AndroidRoutineBuilder<INPUT, OUTPUT> withId(int id);
+    AndroidRoutineBuilder<INPUT, OUTPUT> withId(int id);
 
     /**
      * Result cache type enumeration.<br/>
      * The cache type indicates what will happen to the result of an invocation after its
      * completion.
      */
-    public enum CacheStrategy {
+    enum CacheStrategy {
 
         /**
          * On completion the invocation results are cleared.
@@ -133,7 +133,7 @@ public interface AndroidRoutineBuilder<INPUT, OUTPUT> extends RoutineBuilder<INP
      * ones, and retained otherwise</li>
      * </ul>
      */
-    public enum ClashResolution {
+    enum ClashResolution {
 
         /**
          * The clash is resolved by aborting the running invocation.

@@ -2,9 +2,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p/>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -44,7 +44,7 @@ public interface ServiceRoutineBuilder<INPUT, OUTPUT> extends RoutineBuilder<INP
      * @return this builder.
      */
     @Nonnull
-    public ServiceRoutineBuilder<INPUT, OUTPUT> dispatchingOn(@Nullable Looper looper);
+    ServiceRoutineBuilder<INPUT, OUTPUT> dispatchingOn(@Nullable Looper looper);
 
     /**
      * Note that all the options related to the output and input channels size and timeout will be
@@ -55,7 +55,7 @@ public interface ServiceRoutineBuilder<INPUT, OUTPUT> extends RoutineBuilder<INP
      */
     @Nonnull
     @Override
-    public ServiceRoutineBuilder<INPUT, OUTPUT> withConfiguration(
+    ServiceRoutineBuilder<INPUT, OUTPUT> withConfiguration(
             @Nullable RoutineConfiguration configuration);
 
     /**
@@ -66,8 +66,7 @@ public interface ServiceRoutineBuilder<INPUT, OUTPUT> extends RoutineBuilder<INP
      * @return this builder.
      */
     @Nonnull
-    public ServiceRoutineBuilder<INPUT, OUTPUT> withLogClass(
-            @Nullable Class<? extends Log> logClass);
+    ServiceRoutineBuilder<INPUT, OUTPUT> withLogClass(@Nullable Class<? extends Log> logClass);
 
     /**
      * Sets the runner class. A null value means that it is up to the framework to chose a default
@@ -77,7 +76,7 @@ public interface ServiceRoutineBuilder<INPUT, OUTPUT> extends RoutineBuilder<INP
      * @return this builder.
      */
     @Nonnull
-    public ServiceRoutineBuilder<INPUT, OUTPUT> withRunnerClass(
+    ServiceRoutineBuilder<INPUT, OUTPUT> withRunnerClass(
             @Nullable Class<? extends Runner> runnerClass);
 
     /**
@@ -88,6 +87,6 @@ public interface ServiceRoutineBuilder<INPUT, OUTPUT> extends RoutineBuilder<INP
      * @return this builder.
      */
     @Nonnull
-    public ServiceRoutineBuilder<INPUT, OUTPUT> withServiceClass(
+    ServiceRoutineBuilder<INPUT, OUTPUT> withServiceClass(
             @Nullable Class<? extends RoutineService> serviceClass);
 }

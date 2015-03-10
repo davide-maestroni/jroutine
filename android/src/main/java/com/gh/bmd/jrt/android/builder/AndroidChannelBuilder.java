@@ -2,9 +2,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p/>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,7 +38,7 @@ public interface AndroidChannelBuilder extends ConfigurableBuilder {
      * @return the newly created output channel.
      */
     @Nonnull
-    public <OUTPUT> OutputChannel<OUTPUT> buildChannel();
+    <OUTPUT> OutputChannel<OUTPUT> buildChannel();
 
     /**
      * Tells the builder how to cache the invocation result after its completion. A null value means
@@ -48,33 +48,33 @@ public interface AndroidChannelBuilder extends ConfigurableBuilder {
      * @return this builder.
      */
     @Nonnull
-    public AndroidChannelBuilder onComplete(@Nullable CacheStrategy cacheStrategy);
+    AndroidChannelBuilder onComplete(@Nullable CacheStrategy cacheStrategy);
 
     /**
      * Makes the builder destroy the cached invocation instance.
      */
-    public void purge();
+    void purge();
 
     /**
      * Makes the builder destroy the cached invocation instance with the specified input.
      *
      * @param input the input.
      */
-    public void purge(@Nullable Object input);
+    void purge(@Nullable Object input);
 
     /**
      * Makes the builder destroy the cached invocation instance with the specified inputs.
      *
      * @param inputs the inputs.
      */
-    public void purge(@Nullable Object... inputs);
+    void purge(@Nullable Object... inputs);
 
     /**
      * Makes the builder destroy the cached invocation instance with the specified inputs.
      *
      * @param inputs the inputs.
      */
-    public void purge(@Nullable Iterable<Object> inputs);
+    void purge(@Nullable Iterable<Object> inputs);
 
     /**
      * Note that only the options related to logs will be employed.
@@ -84,5 +84,5 @@ public interface AndroidChannelBuilder extends ConfigurableBuilder {
      */
     @Nonnull
     @Override
-    public AndroidChannelBuilder withConfiguration(@Nullable RoutineConfiguration configuration);
+    AndroidChannelBuilder withConfiguration(@Nullable RoutineConfiguration configuration);
 }

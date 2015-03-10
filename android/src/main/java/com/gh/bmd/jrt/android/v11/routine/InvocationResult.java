@@ -2,9 +2,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p/>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,14 +35,14 @@ interface InvocationResult<OUTPUT> {
      * @return the exception.
      */
     @Nullable
-    public Throwable getAbortException();
+    Throwable getAbortException();
 
     /**
      * Checks if this result represents an error.
      *
      * @return whether the result is an error.
      */
-    public boolean isError();
+    boolean isError();
 
     /**
      * Passes the cached results to the specified channels.
@@ -52,6 +52,6 @@ interface InvocationResult<OUTPUT> {
      * @return whether the invocation is complete.
      * @throws java.lang.NullPointerException if any of the parameters is null.
      */
-    public boolean passTo(@Nonnull final Collection<StandaloneInput<OUTPUT>> newChannels,
+    boolean passTo(@Nonnull final Collection<StandaloneInput<OUTPUT>> newChannels,
             @Nonnull final Collection<StandaloneInput<OUTPUT>> oldChannels);
 }

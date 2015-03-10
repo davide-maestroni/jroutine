@@ -2,9 +2,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p/>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -48,7 +48,7 @@ public interface ClassRoutineBuilder extends SharableBuilder {
      * @throws IllegalArgumentException if the specified method is not found.
      */
     @Nonnull
-    public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> boundMethod(@Nonnull String name);
+    <INPUT, OUTPUT> Routine<INPUT, OUTPUT> boundMethod(@Nonnull String name);
 
     /**
      * Returns a routine used to call the specified method.
@@ -66,8 +66,7 @@ public interface ClassRoutineBuilder extends SharableBuilder {
      * @throws NullPointerException     if one of the parameter is null.
      */
     @Nonnull
-    public Routine<Object, Object> method(@Nonnull String name,
-            @Nonnull Class<?>... parameterTypes);
+    Routine<Object, Object> method(@Nonnull String name, @Nonnull Class<?>... parameterTypes);
 
     /**
      * Returns a routine used to call the specified method.
@@ -85,7 +84,7 @@ public interface ClassRoutineBuilder extends SharableBuilder {
      * @throws NullPointerException if the specified method is null.
      */
     @Nonnull
-    public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull Method method);
+    <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull Method method);
 
     /**
      * Note that all the options related to the output and input channels will be ignored.
@@ -95,9 +94,9 @@ public interface ClassRoutineBuilder extends SharableBuilder {
      */
     @Nonnull
     @Override
-    public ClassRoutineBuilder withConfiguration(@Nullable RoutineConfiguration configuration);
+    ClassRoutineBuilder withConfiguration(@Nullable RoutineConfiguration configuration);
 
     @Nonnull
     @Override
-    public ClassRoutineBuilder withShareGroup(@Nullable String group);
+    ClassRoutineBuilder withShareGroup(@Nullable String group);
 }

@@ -2,9 +2,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p/>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,7 +40,7 @@ interface NestedQueue<E> {
      * @throws java.lang.IllegalStateException if the queue has been already closed.
      */
     @Nonnull
-    public NestedQueue<E> add(@Nullable E element);
+    NestedQueue<E> add(@Nullable E element);
 
     /**
      * Adds all the elements returned by the specified iterable.
@@ -52,7 +52,7 @@ interface NestedQueue<E> {
      * @throws java.lang.IllegalStateException if the queue has been already closed.
      */
     @Nonnull
-    public NestedQueue<E> addAll(@Nonnull Iterable<? extends E> elements);
+    NestedQueue<E> addAll(@Nonnull Iterable<? extends E> elements);
 
     /**
      * Adds a nested queue to this one.
@@ -61,7 +61,7 @@ interface NestedQueue<E> {
      * @throws java.lang.IllegalStateException if the queue has been already closed.
      */
     @Nonnull
-    public NestedQueue<E> addNested();
+    NestedQueue<E> addNested();
 
     /**
      * Clears the queue.
@@ -69,7 +69,7 @@ interface NestedQueue<E> {
      * @return this queue.
      */
     @Nonnull
-    public NestedQueue<E> clear();
+    NestedQueue<E> clear();
 
     /**
      * Closes this queue.<br/>
@@ -79,14 +79,14 @@ interface NestedQueue<E> {
      * @return this queue.
      */
     @Nonnull
-    public NestedQueue<E> close();
+    NestedQueue<E> close();
 
     /**
      * Check if the queue does not contain any element.
      *
      * @return whether the queue is empty.
      */
-    public boolean isEmpty();
+    boolean isEmpty();
 
     /**
      * Moves all the elements to the specified collection.
@@ -95,7 +95,7 @@ interface NestedQueue<E> {
      * @return this queue.
      */
     @Nonnull
-    public NestedQueue<E> moveTo(@Nonnull final Collection<? super E> collection);
+    NestedQueue<E> moveTo(@Nonnull final Collection<? super E> collection);
 
     /**
      * Removes the first element added into the queue.
@@ -104,5 +104,5 @@ interface NestedQueue<E> {
      * @throws java.util.NoSuchElementException if the queue is empty.
      */
     @Nullable
-    public E removeFirst();
+    E removeFirst();
 }

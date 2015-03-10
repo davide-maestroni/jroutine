@@ -2,9 +2,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p/>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,16 +36,16 @@ public class Logger {
 
     private static final LogLevel DEFAULT_LEVEL = LogLevel.ERROR;
 
-    private static final AtomicReference<LogLevel> sLogLevel =
-            new AtomicReference<LogLevel>(DEFAULT_LEVEL);
-
     private static final SystemLog DEFAULT_LOG = Logs.systemLog();
-
-    private static final AtomicReference<Log> sLog = new AtomicReference<Log>(DEFAULT_LOG);
 
     private static final int ERROR_LEVEL = LogLevel.ERROR.ordinal();
 
     private static final int WARNING_LEVEL = LogLevel.WARNING.ordinal();
+
+    private static final AtomicReference<Log> sLog = new AtomicReference<Log>(DEFAULT_LOG);
+
+    private static final AtomicReference<LogLevel> sLogLevel =
+            new AtomicReference<LogLevel>(DEFAULT_LEVEL);
 
     private final List<Object> mContextList;
 

@@ -2,9 +2,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p/>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -399,7 +399,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
     @Override
     @SuppressWarnings("unchecked")
     @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST_OF_RETURN_VALUE",
-                        justification = "class comparison with == is done")
+            justification = "class comparison with == is done")
     public void onCall(@Nonnull final List<? extends INPUT> inputs,
             @Nonnull final ResultChannel<OUTPUT> result) {
 
@@ -492,7 +492,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
         final OutputChannel<OUTPUT> outputChannel = callbacks.newChannel();
 
-        if (isClash && (loader != null)) {
+        if (isClash) {
 
             logger.dbg("restarting loader [%d]", loaderId);
             loaderManager.restartLoader(loaderId, Bundle.EMPTY, callbacks);
@@ -550,7 +550,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
     }
 
     @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
-                        justification = "class comparison with == is done")
+            justification = "class comparison with == is done")
     private boolean isClash(@Nullable final Loader<InvocationResult<OUTPUT>> loader,
             final int loaderId, @Nonnull final List<? extends INPUT> inputs) {
 

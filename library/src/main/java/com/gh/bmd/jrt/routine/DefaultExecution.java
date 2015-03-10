@@ -2,9 +2,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p/>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -190,21 +190,21 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
          * @return the reason of the abortion.
          */
         @Nullable
-        public Throwable getAbortException();
+        Throwable getAbortException();
 
         /**
          * Checks if an input is available.
          *
          * @return whether an input is available.
          */
-        public boolean hasInput();
+        boolean hasInput();
 
         /**
          * Checks if the input channel is aborting the execution.
          *
          * @return whether the execution is aborting.
          */
-        public boolean isAborting();
+        boolean isAborting();
 
         /**
          * Gets the next input.
@@ -213,29 +213,29 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
          * @throws java.util.NoSuchElementException if no more input is available.
          */
         @Nullable
-        public INPUT nextInput();
+        INPUT nextInput();
 
         /**
          * Notifies that the execution abortion is complete.
          */
-        public void onAbortComplete();
+        void onAbortComplete();
 
         /**
          * Checks if the input has completed, that is, all the inputs have been consumed.
          *
          * @return whether the input has completed.
          */
-        public boolean onConsumeComplete();
+        boolean onConsumeComplete();
 
         /**
          * Notifies that the available inputs are about to be consumed.
          */
-        public void onConsumeStart();
+        void onConsumeStart();
 
         /**
          * Notifies that the invocation execution is complete.
          */
-        public void onInvocationComplete();
+        void onInvocationComplete();
     }
 
     /**

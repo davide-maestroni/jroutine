@@ -2,9 +2,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p/>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,31 +33,31 @@ public interface ParameterChannel<INPUT, OUTPUT> extends InputChannel<INPUT> {
 
     @Nonnull
     @Override
-    public ParameterChannel<INPUT, OUTPUT> after(@Nonnull TimeDuration delay);
+    ParameterChannel<INPUT, OUTPUT> after(@Nonnull TimeDuration delay);
 
     @Nonnull
     @Override
-    public ParameterChannel<INPUT, OUTPUT> after(long delay, @Nonnull TimeUnit timeUnit);
+    ParameterChannel<INPUT, OUTPUT> after(long delay, @Nonnull TimeUnit timeUnit);
 
     @Nonnull
     @Override
-    public ParameterChannel<INPUT, OUTPUT> now();
+    ParameterChannel<INPUT, OUTPUT> now();
 
     @Nonnull
     @Override
-    public ParameterChannel<INPUT, OUTPUT> pass(@Nullable OutputChannel<INPUT> channel);
+    ParameterChannel<INPUT, OUTPUT> pass(@Nullable OutputChannel<INPUT> channel);
 
     @Nonnull
     @Override
-    public ParameterChannel<INPUT, OUTPUT> pass(@Nullable Iterable<? extends INPUT> inputs);
+    ParameterChannel<INPUT, OUTPUT> pass(@Nullable Iterable<? extends INPUT> inputs);
 
     @Nonnull
     @Override
-    public ParameterChannel<INPUT, OUTPUT> pass(@Nullable INPUT input);
+    ParameterChannel<INPUT, OUTPUT> pass(@Nullable INPUT input);
 
     @Nonnull
     @Override
-    public ParameterChannel<INPUT, OUTPUT> pass(@Nullable INPUT... inputs);
+    ParameterChannel<INPUT, OUTPUT> pass(@Nullable INPUT... inputs);
 
     /**
      * Closes the input channel and returns the output one.
@@ -67,5 +67,5 @@ public interface ParameterChannel<INPUT, OUTPUT> extends InputChannel<INPUT> {
      * @throws java.lang.IllegalStateException        if this channel is already closed.
      */
     @Nonnull
-    public OutputChannel<OUTPUT> result();
+    OutputChannel<OUTPUT> result();
 }

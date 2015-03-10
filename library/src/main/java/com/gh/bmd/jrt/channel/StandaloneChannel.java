@@ -2,9 +2,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p/>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,7 +42,7 @@ public interface StandaloneChannel<DATA> {
      * @return the input channel.
      */
     @Nonnull
-    public StandaloneInput<DATA> input();
+    StandaloneInput<DATA> input();
 
     /**
      * Returns the output end of this channel.
@@ -50,42 +50,42 @@ public interface StandaloneChannel<DATA> {
      * @return the output channel.
      */
     @Nonnull
-    public StandaloneOutput<DATA> output();
+    StandaloneOutput<DATA> output();
 
     /**
      * Interface defining a standalone channel input.
      *
      * @param <INPUT> the input data type.
      */
-    public interface StandaloneInput<INPUT> extends InputChannel<INPUT> {
+    interface StandaloneInput<INPUT> extends InputChannel<INPUT> {
 
         @Nonnull
         @Override
-        public StandaloneInput<INPUT> after(@Nonnull TimeDuration delay);
+        StandaloneInput<INPUT> after(@Nonnull TimeDuration delay);
 
         @Nonnull
         @Override
-        public StandaloneInput<INPUT> after(long delay, @Nonnull TimeUnit timeUnit);
+        StandaloneInput<INPUT> after(long delay, @Nonnull TimeUnit timeUnit);
 
         @Nonnull
         @Override
-        public StandaloneInput<INPUT> now();
+        StandaloneInput<INPUT> now();
 
         @Nonnull
         @Override
-        public StandaloneInput<INPUT> pass(@Nullable OutputChannel<INPUT> channel);
+        StandaloneInput<INPUT> pass(@Nullable OutputChannel<INPUT> channel);
 
         @Nonnull
         @Override
-        public StandaloneInput<INPUT> pass(@Nullable Iterable<? extends INPUT> inputs);
+        StandaloneInput<INPUT> pass(@Nullable Iterable<? extends INPUT> inputs);
 
         @Nonnull
         @Override
-        public StandaloneInput<INPUT> pass(@Nullable INPUT input);
+        StandaloneInput<INPUT> pass(@Nullable INPUT input);
 
         @Nonnull
         @Override
-        public StandaloneInput<INPUT> pass(@Nullable INPUT... inputs);
+        StandaloneInput<INPUT> pass(@Nullable INPUT... inputs);
 
         /**
          * Closes the channel input.<br/>
@@ -93,7 +93,7 @@ public interface StandaloneChannel<DATA> {
          * <p/>
          * Note that this method must be always called when done with the channel.
          */
-        public void close();
+        void close();
     }
 
     /**
@@ -101,42 +101,42 @@ public interface StandaloneChannel<DATA> {
      *
      * @param <OUTPUT> the output data type.
      */
-    public interface StandaloneOutput<OUTPUT> extends OutputChannel<OUTPUT> {
+    interface StandaloneOutput<OUTPUT> extends OutputChannel<OUTPUT> {
 
         @Nonnull
         @Override
-        public StandaloneOutput<OUTPUT> afterMax(@Nonnull TimeDuration timeout);
+        StandaloneOutput<OUTPUT> afterMax(@Nonnull TimeDuration timeout);
 
         @Nonnull
         @Override
-        public StandaloneOutput<OUTPUT> afterMax(long timeout, @Nonnull TimeUnit timeUnit);
+        StandaloneOutput<OUTPUT> afterMax(long timeout, @Nonnull TimeUnit timeUnit);
 
         @Nonnull
         @Override
-        public StandaloneOutput<OUTPUT> bind(@Nonnull OutputConsumer<OUTPUT> consumer);
+        StandaloneOutput<OUTPUT> bind(@Nonnull OutputConsumer<OUTPUT> consumer);
 
         @Nonnull
         @Override
-        public StandaloneOutput<OUTPUT> eventually();
+        StandaloneOutput<OUTPUT> eventually();
 
         @Nonnull
         @Override
-        public StandaloneOutput<OUTPUT> eventuallyAbort();
+        StandaloneOutput<OUTPUT> eventuallyAbort();
 
         @Nonnull
         @Override
-        public StandaloneOutput<OUTPUT> eventuallyDeadlock();
+        StandaloneOutput<OUTPUT> eventuallyDeadlock();
 
         @Nonnull
         @Override
-        public StandaloneOutput<OUTPUT> eventuallyExit();
+        StandaloneOutput<OUTPUT> eventuallyExit();
 
         @Nonnull
         @Override
-        public StandaloneOutput<OUTPUT> immediately();
+        StandaloneOutput<OUTPUT> immediately();
 
         @Nonnull
         @Override
-        public StandaloneOutput<OUTPUT> readAllInto(@Nonnull Collection<? super OUTPUT> results);
+        StandaloneOutput<OUTPUT> readAllInto(@Nonnull Collection<? super OUTPUT> results);
     }
 }

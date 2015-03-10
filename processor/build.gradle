@@ -17,12 +17,12 @@ apply plugin: 'findbugs'
 apply from: '../upload.gradle'
 
 group = 'com.github.davide-maestroni'
-version = '1.2.1'
+version = '1.2.2'
 archivesBaseName = "${project.parent.name}-${project.name}"
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    if (project.hasProperty("dep") && project.dep.equals("module")) {
+    if (project.hasProperty('dep') && project.dep.equals('module')) {
         compile project(':library')
     } else {
         compile 'com.github.davide-maestroni:jroutine:1.2.1'
@@ -33,7 +33,7 @@ dependencies {
 }
 
 task('jacocoTest', dependsOn: 'test') {
-    description = "Runs the tests and generates the JaCoCo report files."
+    description = 'Runs the tests and generates the JaCoCo report files.'
 } << {
     tasks.jacocoTestReport.execute()
 }
@@ -62,13 +62,13 @@ tasks.findbugsTest.onlyIf { false }
 
 artifacts {
     archives task('sourcesJar', type: Jar) {
-        description "Generates sources Jar"
+        description 'Generates sources Jar'
         classifier = 'sources'
         from sourceSets.main.allSource
     }
 
     archives task('javadocJar', type: Jar, dependsOn: 'javadoc') {
-        description "Generates Javadoc Jar"
+        description 'Generates Javadoc Jar'
         classifier = 'javadoc'
         from 'build/docs/javadoc'
     }

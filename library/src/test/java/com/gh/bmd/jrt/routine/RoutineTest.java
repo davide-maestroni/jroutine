@@ -2,9 +2,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p/>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -2562,18 +2562,18 @@ public class RoutineTest extends TestCase {
     private interface TestInterface {
 
         @Timeout(value = 1, unit = TimeUnit.SECONDS)
-        public int getInt(int i);
+        int getInt(int i);
     }
 
     private interface TestInterfaceAsync {
 
-        public int getInt(@Pass(int.class) OutputChannel<Integer> i);
+        int getInt(@Pass(int.class) OutputChannel<Integer> i);
 
         @Pass(int.class)
-        public OutputChannel<Integer> getOne();
+        OutputChannel<Integer> getOne();
 
         @Bind(value = "getInt")
-        public int take(int i);
+        int take(int i);
     }
 
     private static class ConstructorException extends TemplateInvocation<Object, Object> {

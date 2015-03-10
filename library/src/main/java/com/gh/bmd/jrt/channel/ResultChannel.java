@@ -2,9 +2,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p/>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,29 +32,29 @@ public interface ResultChannel<OUTPUT> extends InputChannel<OUTPUT> {
 
     @Nonnull
     @Override
-    public ResultChannel<OUTPUT> after(@Nonnull TimeDuration delay);
+    ResultChannel<OUTPUT> after(@Nonnull TimeDuration delay);
 
     @Nonnull
     @Override
-    public ResultChannel<OUTPUT> after(long delay, @Nonnull TimeUnit timeUnit);
+    ResultChannel<OUTPUT> after(long delay, @Nonnull TimeUnit timeUnit);
 
     @Nonnull
     @Override
-    public ResultChannel<OUTPUT> now();
+    ResultChannel<OUTPUT> now();
 
     @Nonnull
     @Override
-    public ResultChannel<OUTPUT> pass(@Nullable OutputChannel<OUTPUT> channel);
+    ResultChannel<OUTPUT> pass(@Nullable OutputChannel<OUTPUT> channel);
 
     @Nonnull
     @Override
-    public ResultChannel<OUTPUT> pass(@Nullable Iterable<? extends OUTPUT> outputs);
+    ResultChannel<OUTPUT> pass(@Nullable Iterable<? extends OUTPUT> outputs);
 
     @Nonnull
     @Override
-    public ResultChannel<OUTPUT> pass(@Nullable OUTPUT output);
+    ResultChannel<OUTPUT> pass(@Nullable OUTPUT output);
 
     @Nonnull
     @Override
-    public ResultChannel<OUTPUT> pass(@Nullable OUTPUT... outputs);
+    ResultChannel<OUTPUT> pass(@Nullable OUTPUT... outputs);
 }

@@ -2,9 +2,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p/>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -43,7 +43,7 @@ public interface InputChannel<INPUT> extends Channel {
      * @throws java.lang.NullPointerException         if the specified delay is null.
      */
     @Nonnull
-    public InputChannel<INPUT> after(@Nonnull TimeDuration delay);
+    InputChannel<INPUT> after(@Nonnull TimeDuration delay);
 
     /**
      * Tells the channel to delay the transfer of data of the specified time duration.<br/>
@@ -58,7 +58,7 @@ public interface InputChannel<INPUT> extends Channel {
      * @throws java.lang.IllegalStateException        if this channel is already closed.
      */
     @Nonnull
-    public InputChannel<INPUT> after(long delay, @Nonnull TimeUnit timeUnit);
+    InputChannel<INPUT> after(long delay, @Nonnull TimeUnit timeUnit);
 
     /**
      * Tells the channel to not delay the transfer of data.
@@ -68,7 +68,7 @@ public interface InputChannel<INPUT> extends Channel {
      * @throws java.lang.IllegalStateException        if this channel is already closed.
      */
     @Nonnull
-    public InputChannel<INPUT> now();
+    InputChannel<INPUT> now();
 
     /**
      * Passes the specified channel to this one.
@@ -83,7 +83,7 @@ public interface InputChannel<INPUT> extends Channel {
      * @see com.gh.bmd.jrt.channel.OutputChannel#bind(OutputConsumer)
      */
     @Nonnull
-    public InputChannel<INPUT> pass(@Nullable OutputChannel<INPUT> channel);
+    InputChannel<INPUT> pass(@Nullable OutputChannel<INPUT> channel);
 
     /**
      * Passes the data returned by the specified iterable to this channel.
@@ -94,7 +94,7 @@ public interface InputChannel<INPUT> extends Channel {
      * @throws java.lang.IllegalStateException        if this channel is already closed.
      */
     @Nonnull
-    public InputChannel<INPUT> pass(@Nullable Iterable<? extends INPUT> inputs);
+    InputChannel<INPUT> pass(@Nullable Iterable<? extends INPUT> inputs);
 
     /**
      * Passes the specified input to this channel.
@@ -105,7 +105,7 @@ public interface InputChannel<INPUT> extends Channel {
      * @throws java.lang.IllegalStateException        if this channel is already closed.
      */
     @Nonnull
-    public InputChannel<INPUT> pass(@Nullable INPUT input);
+    InputChannel<INPUT> pass(@Nullable INPUT input);
 
     /**
      * Passes the specified input data to this channel.
@@ -116,5 +116,5 @@ public interface InputChannel<INPUT> extends Channel {
      * @throws java.lang.IllegalStateException        if this channel is already closed.
      */
     @Nonnull
-    public InputChannel<INPUT> pass(@Nullable INPUT... inputs);
+    InputChannel<INPUT> pass(@Nullable INPUT... inputs);
 }

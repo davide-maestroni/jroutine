@@ -23,6 +23,7 @@ import com.gh.bmd.jrt.channel.ReadDeadlockException;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.common.AbortException;
 import com.gh.bmd.jrt.common.InvocationInterruptedException;
+import com.gh.bmd.jrt.common.WeakIdentityHashMap;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.runner.Execution;
 import com.gh.bmd.jrt.runner.Runner;
@@ -60,9 +61,12 @@ import static com.gh.bmd.jrt.time.TimeDuration.fromUnit;
  */
 class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
+    private static final WeakIdentityHashMap<OutputConsumer<?>, Object> sMutexMap =
+            new WeakIdentityHashMap<OutputConsumer<?>, Object>();
+
     private final ArrayList<OutputChannel<?>> mBoundChannels = new ArrayList<OutputChannel<?>>();
 
-    private final Object mConsumerMutex = new Object();
+    private final Object mFlushMutex = new Object();
 
     private final AbortHandler mHandler;
 
@@ -83,6 +87,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     private final TimeoutAction mTimeoutAction;
 
     private Throwable mAbortException;
+
+    private Object mConsumerMutex;
 
     private boolean mIsException;
 
@@ -145,6 +151,21 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                 return (mOutputCount <= maxOutputSize);
             }
         };
+    }
+
+    @Nonnull
+    private static Object getMutex(@Nonnull final OutputConsumer<?> consumer) {
+
+        final WeakIdentityHashMap<OutputConsumer<?>, Object> mutexMap = sMutexMap;
+        Object mutex = mutexMap.get(consumer);
+
+        if (mutex == null) {
+
+            mutex = new Object();
+            mutexMap.put(consumer, mutex);
+        }
+
+        return mutex;
     }
 
     @Override
@@ -532,12 +553,12 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         }
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"SynchronizeOnNonFinalField", "unchecked"})
     private void flushOutput(final boolean forceClose) {
 
         Throwable abortException = null;
 
-        synchronized (mConsumerMutex) {
+        synchronized (mFlushMutex) {
 
             final Logger logger = mLogger;
             final ArrayList<Object> outputs;
@@ -568,73 +589,76 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                 mMutex.notifyAll();
             }
 
-            try {
+            synchronized (mConsumerMutex) {
 
-                for (final Object output : outputs) {
+                try {
 
-                    if (output instanceof RoutineExceptionWrapper) {
+                    for (final Object output : outputs) {
 
-                        try {
+                        if (output instanceof RoutineExceptionWrapper) {
 
-                            logger.dbg("aborting consumer (%s): %s", consumer, output);
-                            consumer.onError(((RoutineExceptionWrapper) output).getCause());
+                            try {
 
-                        } catch (final InvocationInterruptedException e) {
+                                logger.dbg("aborting consumer (%s): %s", consumer, output);
+                                consumer.onError(((RoutineExceptionWrapper) output).getCause());
 
-                            throw e;
+                            } catch (final InvocationInterruptedException e) {
 
-                        } catch (final Throwable t) {
+                                throw e;
 
-                            logger.wrn(t, "ignoring consumer exception (%s)", consumer);
+                            } catch (final Throwable t) {
+
+                                logger.wrn(t, "ignoring consumer exception (%s)", consumer);
+                            }
+
+                            break;
+
+                        } else {
+
+                            logger.dbg("output consumer (%s): %s", consumer, output);
+                            consumer.onOutput((OUTPUT) output);
                         }
-
-                        break;
-
-                    } else {
-
-                        logger.dbg("output consumer (%s): %s", consumer, output);
-                        consumer.onOutput((OUTPUT) output);
                     }
-                }
 
-                if (forceClose || !isOutputPending(state)) {
+                    if (forceClose || !isOutputPending(state)) {
 
-                    closeConsumer(state);
-                }
-
-            } catch (final InvocationInterruptedException e) {
-
-                throw e;
-
-            } catch (final Throwable t) {
-
-                boolean isClose = false;
-                final ChannelState finalState;
-
-                synchronized (mMutex) {
-
-                    logger.wrn(t, "consumer exception (%s)", mOutputConsumer);
-                    finalState = mState;
-
-                    if (forceClose || !isOutputPending(finalState)) {
-
-                        isClose = true;
-
-                    } else if (finalState != ChannelState.EXCEPTION) {
-
-                        logger.wrn(t, "aborting on consumer exception (%s)", mOutputConsumer);
-                        abortException = t;
-
-                        mOutputQueue.clear();
-                        mIsException = true;
-                        mAbortException = t;
-                        mState = ChannelState.EXCEPTION;
+                        closeConsumer(state);
                     }
-                }
 
-                if (isClose) {
+                } catch (final InvocationInterruptedException e) {
 
-                    closeConsumer(finalState);
+                    throw e;
+
+                } catch (final Throwable t) {
+
+                    boolean isClose = false;
+                    final ChannelState finalState;
+
+                    synchronized (mMutex) {
+
+                        logger.wrn(t, "consumer exception (%s)", mOutputConsumer);
+                        finalState = mState;
+
+                        if (forceClose || !isOutputPending(finalState)) {
+
+                            isClose = true;
+
+                        } else if (finalState != ChannelState.EXCEPTION) {
+
+                            logger.wrn(t, "aborting on consumer exception (%s)", mOutputConsumer);
+                            abortException = t;
+
+                            mOutputQueue.clear();
+                            mIsException = true;
+                            mAbortException = t;
+                            mState = ChannelState.EXCEPTION;
+                        }
+                    }
+
+                    if (isClose) {
+
+                        closeConsumer(finalState);
+                    }
                 }
             }
         }
@@ -1026,6 +1050,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                 state = mState;
                 forceClose = (state == ChannelState.DONE);
                 mOutputConsumer = consumer;
+                mConsumerMutex = getMutex(consumer);
             }
 
             flushOutput(forceClose);
@@ -1275,6 +1300,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                 if (mOutputConsumer == consumer) {
 
                     mOutputConsumer = null;
+                    mConsumerMutex = null;
                 }
             }
 

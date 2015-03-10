@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.builder;
-import static com.gh.bmd.jrt.time.TimeDuration.INFINITY;
 import static com.gh.bmd.jrt.time.TimeDuration.seconds;
 
 /**
@@ -50,7 +49,7 @@ public class Downloader {
         mReadConnection = JRoutine.on(Invocations.factoryOf(ReadConnection.class))
                                   .withConfiguration(
                                           builder().withMaxInvocations(maxParallelDownloads)
-                                                   .withAvailableTimeout(INFINITY)
+                                                   .withAvailableTimeout(seconds(30))
                                                    .buildConfiguration())
                                   .buildRoutine();
     }

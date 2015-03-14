@@ -26,7 +26,15 @@ import javax.annotation.Nullable;
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-public abstract class StatelessInvocation<INPUT, OUTPUT> implements Invocation<INPUT, OUTPUT> {
+public abstract class StatelessInvocation<INPUT, OUTPUT>
+        implements Invocation<INPUT, OUTPUT>, InvocationFactory<INPUT, OUTPUT> {
+
+    @Nonnull
+    @Override
+    public final Invocation<INPUT, OUTPUT> newInvocation() {
+
+        return this;
+    }
 
     @Override
     public final void onAbort(@Nullable final Throwable reason) {

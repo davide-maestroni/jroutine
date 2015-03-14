@@ -35,7 +35,6 @@ import com.gh.bmd.jrt.channel.ParameterChannel;
 import com.gh.bmd.jrt.channel.StandaloneChannel;
 import com.gh.bmd.jrt.channel.StandaloneChannel.StandaloneInput;
 import com.gh.bmd.jrt.channel.StandaloneChannel.StandaloneOutput;
-import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.invocation.Invocations;
@@ -98,7 +97,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
      * @param context         the routine context.
      * @param serviceClass    the service class.
      * @param looper          the message looper.
-     * @param invocationToken the invocation class token.
+     * @param invocationClass the invocation class.
      * @param configuration   the routine configuration.
      * @param runnerClass     the asynchronous runner class.
      * @param logClass        the log class.
@@ -108,7 +107,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
     ServiceRoutine(@Nonnull final Context context,
             @Nullable final Class<? extends RoutineService> serviceClass,
             @Nullable final Looper looper,
-            @Nonnull final ClassToken<? extends AndroidInvocation<INPUT, OUTPUT>> invocationToken,
+            @Nonnull final Class<? extends AndroidInvocation<INPUT, OUTPUT>> invocationClass,
             @Nonnull final RoutineConfiguration configuration,
             @Nullable final Class<? extends Runner> runnerClass,
             @Nullable final Class<? extends Log> logClass) {
@@ -144,15 +143,15 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         mContext = context.getApplicationContext();
         mLooper = looper;
         mServiceClass = (serviceClass != null) ? serviceClass : RoutineService.class;
-        mInvocationClass = invocationToken.getRawClass();
+        mInvocationClass = invocationClass;
         mConfiguration = configuration;
         mRunnerClass =
                 (runnerClass != null) ? runnerClass : (runner != null) ? runner.getClass() : null;
         mLogClass = (logClass != null) ? logClass : log.getClass();
         mLogger = Logger.newLogger(log, configuration.getLogLevelOr(Logger.getGlobalLogLevel()),
                                    this);
-        mRoutine = JRoutine.on(Invocations.factoryOf(
-                (ClassToken<? extends Invocation<INPUT, OUTPUT>>) invocationToken))
+        mRoutine = JRoutine.on(
+                Invocations.factoryOf((Class<? extends Invocation<INPUT, OUTPUT>>) invocationClass))
                            .withConfiguration(configuration.builderFrom()
                                                            .withInputSize(Integer.MAX_VALUE)
                                                            .withInputTimeout(TimeDuration.ZERO)

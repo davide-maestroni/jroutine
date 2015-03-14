@@ -49,10 +49,10 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    if (project.hasProperty('dep') && project.dep.equals('module')) {
+    if (project.hasProperty('local')) {
         compile project(':library')
     } else {
-        compile 'com.github.davide-maestroni:jroutine:1.2.2'
+        compile 'com.github.davide-maestroni:jroutine:1.2.+'
     }
     compile 'com.android.support:support-v4:21.0.3' // Travis does not support a later version
 

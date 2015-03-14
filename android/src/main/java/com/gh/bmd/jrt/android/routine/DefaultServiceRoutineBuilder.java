@@ -20,9 +20,11 @@ import com.gh.bmd.jrt.android.builder.ServiceRoutineBuilder;
 import com.gh.bmd.jrt.android.invocation.AndroidInvocation;
 import com.gh.bmd.jrt.android.service.RoutineService;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
+import com.gh.bmd.jrt.channel.ParameterChannel;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.routine.Routine;
+import com.gh.bmd.jrt.routine.TemplateRoutine;
 import com.gh.bmd.jrt.runner.Runner;
 
 import javax.annotation.Nonnull;
@@ -36,11 +38,12 @@ import javax.annotation.Nullable;
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-class DefaultServiceRoutineBuilder<INPUT, OUTPUT> implements ServiceRoutineBuilder<INPUT, OUTPUT> {
-
-    private final ClassToken<? extends AndroidInvocation<INPUT, OUTPUT>> mClassToken;
+class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT>
+        implements ServiceRoutineBuilder<INPUT, OUTPUT> {
 
     private final Context mContext;
+
+    private final Class<? extends AndroidInvocation<INPUT, OUTPUT>> mInvocationClass;
 
     private RoutineConfiguration mConfiguration;
 
@@ -68,20 +71,15 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT> implements ServiceRoutineBuild
             throw new NullPointerException("the context must not be null");
         }
 
-        if (classToken == null) {
-
-            throw new NullPointerException("the invocation class token must not be null");
-        }
-
         mContext = context;
-        mClassToken = classToken;
+        mInvocationClass = classToken.getRawClass();
     }
 
     @Nonnull
     @Override
     public Routine<INPUT, OUTPUT> buildRoutine() {
 
-        return new ServiceRoutine<INPUT, OUTPUT>(mContext, mServiceClass, mLooper, mClassToken,
+        return new ServiceRoutine<INPUT, OUTPUT>(mContext, mServiceClass, mLooper, mInvocationClass,
                                                  RoutineConfiguration.notNull(mConfiguration),
                                                  mRunnerClass, mLogClass);
     }
@@ -129,5 +127,26 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT> implements ServiceRoutineBuild
 
         mServiceClass = serviceClass;
         return this;
+    }
+
+    @Nonnull
+    @Override
+    public ParameterChannel<INPUT, OUTPUT> invokeAsync() {
+
+        return buildRoutine().invokeAsync();
+    }
+
+    @Nonnull
+    @Override
+    public ParameterChannel<INPUT, OUTPUT> invokeParallel() {
+
+        return buildRoutine().invokeParallel();
+    }
+
+    @Nonnull
+    @Override
+    public ParameterChannel<INPUT, OUTPUT> invokeSync() {
+
+        return buildRoutine().invokeSync();
     }
 }

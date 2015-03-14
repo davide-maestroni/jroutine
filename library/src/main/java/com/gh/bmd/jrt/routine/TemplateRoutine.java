@@ -135,4 +135,9 @@ public abstract class TemplateRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
 
         return invokeSync().pass(inputs).result();
     }
+
+    @Override
+    public void purge() {
+
+    }
 }

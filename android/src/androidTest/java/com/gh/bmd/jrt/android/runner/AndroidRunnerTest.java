@@ -87,7 +87,6 @@ public class AndroidRunnerTest extends AndroidTestCase {
                 JRoutine.on(Invocations.withArgs(this).factoryOf(ClassToken.tokenOf(invocation)))
                         .withConfiguration(
                                 withRunner(Runners.threadRunner(new HandlerThread("test"))))
-                        .buildRoutine()
                         .callAsync();
 
         assertThat(JRoutine.on(new InvocationFactory<Object, Object>() {
@@ -116,7 +115,7 @@ public class AndroidRunnerTest extends AndroidTestCase {
                     }
                 };
             }
-        }).buildRoutine().callAsync(channel).afterMax(seconds(30)).readNext()).isEqualTo(true);
+        }).callAsync(channel).afterMax(seconds(30)).readNext()).isEqualTo(true);
     }
 
     public void testMainRunner() throws InterruptedException {

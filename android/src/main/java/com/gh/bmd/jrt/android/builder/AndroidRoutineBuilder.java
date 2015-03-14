@@ -40,7 +40,8 @@ import javax.annotation.Nullable;
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-public interface AndroidRoutineBuilder<INPUT, OUTPUT> extends RoutineBuilder<INPUT, OUTPUT> {
+public interface AndroidRoutineBuilder<INPUT, OUTPUT>
+        extends RoutineBuilder<INPUT, OUTPUT>, AndroidRoutine<INPUT, OUTPUT> {
 
     /**
      * Constant identifying a routine ID computed from the executor class and the input parameters.

@@ -15,6 +15,18 @@ package com.gh.bmd.jrt.routine;
 
 import com.gh.bmd.jrt.builder.RoutineBuilder;
 import com.gh.bmd.jrt.invocation.InvocationFactory;
+import com.gh.bmd.jrt.invocation.Invocations.Function0;
+import com.gh.bmd.jrt.invocation.Invocations.Function1;
+import com.gh.bmd.jrt.invocation.Invocations.Function2;
+import com.gh.bmd.jrt.invocation.Invocations.Function3;
+import com.gh.bmd.jrt.invocation.Invocations.Function4;
+import com.gh.bmd.jrt.invocation.Invocations.FunctionN;
+import com.gh.bmd.jrt.invocation.Invocations.Procedure0;
+import com.gh.bmd.jrt.invocation.Invocations.Procedure1;
+import com.gh.bmd.jrt.invocation.Invocations.Procedure2;
+import com.gh.bmd.jrt.invocation.Invocations.Procedure3;
+import com.gh.bmd.jrt.invocation.Invocations.Procedure4;
+import com.gh.bmd.jrt.invocation.Invocations.ProcedureN;
 
 import java.lang.ref.WeakReference;
 
@@ -104,8 +116,8 @@ import javax.annotation.Nonnull;
  *         callback.onResults(doSomething1.callAsync(), doSomething2.callAsync());
  *     </code>
  * </pre>
- * Where the object <code>myCallback</code> implements a method <code>public void onResults(Result
- * result1, Result result2)</code>.
+ * Where the object <code>myCallback</code> implements a method
+ * <code>public void onResults(Result result1, Result result2)</code>.
  * <p/>
  * <b>Example 4:</b> Asynchronously feed a routine from a different thread.
  * <pre>
@@ -165,19 +177,250 @@ public class JRoutine {
     }
 
     /**
-     * Returns a routine builder wrapping the specified invocation class token.
+     * Returns a routine builder based on the specified invocation class token.
      *
      * @param invocationFactory the invocation factory.
      * @param <INPUT>           the input data type.
      * @param <OUTPUT>          the output data type.
      * @return the routine builder instance.
-     * @throws java.lang.NullPointerException if the factory is null.
+     * @throws java.lang.NullPointerException if the specified factory is null.
      */
     @Nonnull
     public static <INPUT, OUTPUT> RoutineBuilder<INPUT, OUTPUT> on(
             @Nonnull final InvocationFactory<INPUT, OUTPUT> invocationFactory) {
 
         return new DefaultRoutineBuilder<INPUT, OUTPUT>(invocationFactory);
+    }
+
+    /**
+     * Returns a routine builder based on the specified function.
+     * <p/>
+     * Note that the function object must be stateless in order to avoid concurrency issues.
+     *
+     * @param function the function instance.
+     * @param <OUTPUT> the output data type.
+     * @return the builder instance.
+     * @throws NullPointerException if the specified function is null.
+     */
+    @Nonnull
+    public static <OUTPUT> RoutineBuilder<Void, OUTPUT> on(
+            @Nonnull final Function0<OUTPUT> function) {
+
+        return FunctionRoutineBuilder.newInstance(function);
+    }
+
+    /**
+     * Returns a routine builder based on the specified function.
+     * <p/>
+     * Note that the function object must be stateless in order to avoid concurrency issues.
+     *
+     * @param function the function instance.
+     * @param <INPUT>  the input data type.
+     * @param <OUTPUT> the output data type.
+     * @return the builder instance.
+     * @throws NullPointerException if the specified function is null.
+     */
+    @Nonnull
+    public static <INPUT, OUTPUT> RoutineBuilder<INPUT, OUTPUT> on(
+            @Nonnull final Function1<INPUT, OUTPUT> function) {
+
+        return FunctionRoutineBuilder.newInstance(function);
+    }
+
+    /**
+     * Returns a routine builder based on the specified function.
+     * <p/>
+     * Note that the function object must be stateless in order to avoid concurrency issues.
+     *
+     * @param function the function instance.
+     * @param <INPUT>  the input data type.
+     * @param <INPUT1> the first parameter type.
+     * @param <INPUT2> the second parameter type.
+     * @param <OUTPUT> the output data type.
+     * @return the builder instance.
+     * @throws NullPointerException if the specified function is null.
+     */
+    @Nonnull
+    public static <INPUT, INPUT1 extends INPUT, INPUT2 extends INPUT, OUTPUT>
+    RoutineBuilder<INPUT, OUTPUT> on(
+            @Nonnull final Function2<INPUT1, INPUT2, OUTPUT> function) {
+
+        return FunctionRoutineBuilder.newInstance(function);
+    }
+
+    /**
+     * Returns a routine builder based on the specified function.
+     * <p/>
+     * Note that the function object must be stateless in order to avoid concurrency issues.
+     *
+     * @param function the function instance.
+     * @param <INPUT>  the input data type.
+     * @param <INPUT1> the first parameter type.
+     * @param <INPUT2> the second parameter type.
+     * @param <INPUT3> the third parameter type.
+     * @param <OUTPUT> the output data type.
+     * @return the builder instance.
+     * @throws NullPointerException if the specified function is null.
+     */
+    @Nonnull
+    public static <INPUT, INPUT1 extends INPUT, INPUT2 extends INPUT, INPUT3 extends INPUT,
+            OUTPUT> RoutineBuilder<INPUT, OUTPUT> on(
+            @Nonnull final Function3<INPUT1, INPUT2, INPUT3, OUTPUT> function) {
+
+        return FunctionRoutineBuilder.newInstance(function);
+    }
+
+    /**
+     * Returns a routine builder based on the specified function.
+     * <p/>
+     * Note that the function object must be stateless in order to avoid concurrency issues.
+     *
+     * @param function the function instance.
+     * @param <INPUT>  the input data type.
+     * @param <INPUT1> the first parameter type.
+     * @param <INPUT2> the second parameter type.
+     * @param <INPUT3> the third parameter type.
+     * @param <INPUT4> the fourth parameter type.
+     * @param <OUTPUT> the output data type.
+     * @return the builder instance.
+     * @throws NullPointerException if the specified function is null.
+     */
+    @Nonnull
+    public static <INPUT, INPUT1 extends INPUT, INPUT2 extends INPUT, INPUT3 extends INPUT,
+            INPUT4 extends INPUT, OUTPUT> RoutineBuilder<INPUT, OUTPUT> on(
+            @Nonnull final Function4<INPUT1, INPUT2, INPUT3, INPUT4, OUTPUT> function) {
+
+        return FunctionRoutineBuilder.newInstance(function);
+    }
+
+    /**
+     * Returns a routine builder based on the specified function.
+     * <p/>
+     * Note that the function object must be stateless in order to avoid concurrency issues.
+     *
+     * @param function the function instance.
+     * @param <INPUT>  the input data type.
+     * @param <OUTPUT> the output data type.
+     * @return the builder instance.
+     * @throws NullPointerException if the specified function is null.
+     */
+    @Nonnull
+    public static <INPUT, OUTPUT> RoutineBuilder<INPUT, OUTPUT> on(
+            @Nonnull final FunctionN<INPUT, OUTPUT> function) {
+
+        return FunctionRoutineBuilder.newInstance(function);
+    }
+
+    /**
+     * Returns a routine builder based on the specified procedure.
+     * <p/>
+     * Note that the procedure object must be stateless in order to avoid concurrency issues.
+     *
+     * @param procedure the procedure instance.
+     * @return the builder instance.
+     * @throws NullPointerException if the specified procedure is null.
+     */
+    @Nonnull
+    public static RoutineBuilder<Void, Void> on(@Nonnull final Procedure0 procedure) {
+
+        return FunctionRoutineBuilder.newInstance(procedure);
+    }
+
+    /**
+     * Returns a routine builder based on the specified procedure.
+     * <p/>
+     * Note that the procedure object must be stateless in order to avoid concurrency issues.
+     *
+     * @param procedure the procedure instance.
+     * @param <INPUT>   the input data type.
+     * @return the builder instance.
+     * @throws NullPointerException if the specified procedure is null.
+     */
+    @Nonnull
+    public static <INPUT> RoutineBuilder<INPUT, Void> on(
+            @Nonnull final Procedure1<INPUT> procedure) {
+
+        return FunctionRoutineBuilder.newInstance(procedure);
+    }
+
+    /**
+     * Returns a routine builder based on the specified procedure.
+     * <p/>
+     * Note that the procedure object must be stateless in order to avoid concurrency issues.
+     *
+     * @param procedure the procedure instance.
+     * @param <INPUT>   the input data type.
+     * @param <INPUT1>  the first parameter type.
+     * @param <INPUT2>  the second parameter type.
+     * @return the builder instance.
+     * @throws NullPointerException if the specified procedure is null.
+     */
+    @Nonnull
+    public static <INPUT, INPUT1 extends INPUT, INPUT2 extends INPUT> RoutineBuilder<INPUT, Void>
+    on(
+            @Nonnull final Procedure2<INPUT1, INPUT2> procedure) {
+
+        return FunctionRoutineBuilder.newInstance(procedure);
+    }
+
+    /**
+     * Returns a routine builder based on the specified procedure.
+     * <p/>
+     * Note that the procedure object must be stateless in order to avoid concurrency issues.
+     *
+     * @param procedure the procedure instance.
+     * @param <INPUT>   the input data type.
+     * @param <INPUT1>  the first parameter type.
+     * @param <INPUT2>  the second parameter type.
+     * @param <INPUT3>  the third parameter type.
+     * @return the builder instance.
+     * @throws NullPointerException if the specified procedure is null.
+     */
+    @Nonnull
+    public static <INPUT, INPUT1 extends INPUT, INPUT2 extends INPUT, INPUT3 extends INPUT>
+    RoutineBuilder<INPUT, Void> on(
+            @Nonnull final Procedure3<INPUT1, INPUT2, INPUT3> procedure) {
+
+        return FunctionRoutineBuilder.newInstance(procedure);
+    }
+
+    /**
+     * Returns a routine builder based on the specified procedure.
+     * <p/>
+     * Note that the procedure object must be stateless in order to avoid concurrency issues.
+     *
+     * @param procedure the procedure instance.
+     * @param <INPUT>   the input data type.
+     * @param <INPUT1>  the first parameter type.
+     * @param <INPUT2>  the second parameter type.
+     * @param <INPUT3>  the third parameter type.
+     * @param <INPUT4>  the fourth parameter type.
+     * @return the builder instance.
+     * @throws NullPointerException if the specified procedure is null.
+     */
+    @Nonnull
+    public static <INPUT, INPUT1 extends INPUT, INPUT2 extends INPUT, INPUT3 extends INPUT,
+            INPUT4 extends INPUT> RoutineBuilder<INPUT, Void> on(
+            @Nonnull final Procedure4<INPUT1, INPUT2, INPUT3, INPUT4> procedure) {
+
+        return FunctionRoutineBuilder.newInstance(procedure);
+    }
+
+    /**
+     * Returns a routine builder based on the specified procedure.
+     * <p/>
+     * Note that the procedure object must be stateless in order to avoid concurrency issues.
+     *
+     * @param procedure the procedure instance.
+     * @param <INPUT>   the input data type.
+     * @return the builder instance.
+     * @throws NullPointerException if the specified procedure is null.
+     */
+    @Nonnull
+    public static <INPUT> RoutineBuilder<INPUT, Void> on(
+            @Nonnull final ProcedureN<INPUT> procedure) {
+
+        return FunctionRoutineBuilder.newInstance(procedure);
     }
 
     /**

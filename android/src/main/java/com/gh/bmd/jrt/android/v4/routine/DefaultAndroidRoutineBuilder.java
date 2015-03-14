@@ -22,8 +22,10 @@ import com.gh.bmd.jrt.android.routine.AndroidRoutine;
 import com.gh.bmd.jrt.android.runner.Runners;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
+import com.gh.bmd.jrt.channel.ParameterChannel;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.log.Logger;
+import com.gh.bmd.jrt.routine.TemplateRoutine;
 import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.time.TimeDuration;
 
@@ -43,7 +45,8 @@ import static com.gh.bmd.jrt.common.Reflection.findConstructor;
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> implements AndroidRoutineBuilder<INPUT, OUTPUT> {
+class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT>
+        implements AndroidRoutineBuilder<INPUT, OUTPUT> {
 
     private final Constructor<? extends AndroidInvocation<INPUT, OUTPUT>> mConstructor;
 
@@ -154,6 +157,51 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> implements AndroidRoutineBuild
 
         mInvocationId = id;
         return this;
+    }
+
+    @Nonnull
+    @Override
+    public ParameterChannel<INPUT, OUTPUT> invokeAsync() {
+
+        return buildRoutine().invokeAsync();
+    }
+
+    @Nonnull
+    @Override
+    public ParameterChannel<INPUT, OUTPUT> invokeParallel() {
+
+        return buildRoutine().invokeParallel();
+    }
+
+    @Nonnull
+    @Override
+    public ParameterChannel<INPUT, OUTPUT> invokeSync() {
+
+        return buildRoutine().invokeSync();
+    }
+
+    @Override
+    public void purge() {
+
+        buildRoutine().purge();
+    }
+
+    @Override
+    public void purge(@Nullable final INPUT input) {
+
+        buildRoutine().purge(input);
+    }
+
+    @Override
+    public void purge(@Nullable final INPUT... inputs) {
+
+        buildRoutine().purge(inputs);
+    }
+
+    @Override
+    public void purge(@Nullable final Iterable<? extends INPUT> inputs) {
+
+        buildRoutine().purge(inputs);
     }
 
     /**

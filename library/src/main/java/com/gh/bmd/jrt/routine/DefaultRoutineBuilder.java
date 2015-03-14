@@ -15,6 +15,7 @@ package com.gh.bmd.jrt.routine;
 
 import com.gh.bmd.jrt.builder.RoutineBuilder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
+import com.gh.bmd.jrt.channel.ParameterChannel;
 import com.gh.bmd.jrt.invocation.InvocationFactory;
 
 import javax.annotation.Nonnull;
@@ -28,7 +29,8 @@ import javax.annotation.Nullable;
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-class DefaultRoutineBuilder<INPUT, OUTPUT> implements RoutineBuilder<INPUT, OUTPUT> {
+class DefaultRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT>
+        implements RoutineBuilder<INPUT, OUTPUT> {
 
     private final InvocationFactory<INPUT, OUTPUT> mFactory;
 
@@ -66,5 +68,26 @@ class DefaultRoutineBuilder<INPUT, OUTPUT> implements RoutineBuilder<INPUT, OUTP
 
         mConfiguration = configuration;
         return this;
+    }
+
+    @Nonnull
+    @Override
+    public ParameterChannel<INPUT, OUTPUT> invokeAsync() {
+
+        return buildRoutine().invokeAsync();
+    }
+
+    @Nonnull
+    @Override
+    public ParameterChannel<INPUT, OUTPUT> invokeParallel() {
+
+        return buildRoutine().invokeParallel();
+    }
+
+    @Nonnull
+    @Override
+    public ParameterChannel<INPUT, OUTPUT> invokeSync() {
+
+        return buildRoutine().invokeSync();
     }
 }

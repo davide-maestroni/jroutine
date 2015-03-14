@@ -56,16 +56,6 @@ public class InvocationsTest extends TestCase {
         } catch (final NullPointerException ignored) {
 
         }
-
-        try {
-
-            Invocations.factoryOf((TestInvocation) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
     }
 
     private static class TestInvocation extends StatelessInvocation<Object, Object> {

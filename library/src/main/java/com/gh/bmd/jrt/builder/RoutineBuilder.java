@@ -31,7 +31,7 @@ import javax.annotation.Nullable;
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-public interface RoutineBuilder<INPUT, OUTPUT> extends ConfigurableBuilder {
+public interface RoutineBuilder<INPUT, OUTPUT> extends ConfigurableBuilder, Routine<INPUT, OUTPUT> {
 
     /**
      * Builds and returns the routine.

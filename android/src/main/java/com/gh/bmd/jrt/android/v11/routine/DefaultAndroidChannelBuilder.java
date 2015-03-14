@@ -106,7 +106,6 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
         if (context == null) {
 
             return JRoutine.on(MissingLoaderInvocation.<OUTPUT, OUTPUT>factoryOf())
-                           .buildRoutine()
                            .callSync();
         }
 
@@ -131,7 +130,6 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
         return builder.withConfiguration(mConfiguration)
                       .onClash(ClashResolution.KEEP_THAT)
                       .onComplete(mCacheStrategy)
-                      .buildRoutine()
                       .callAsync();
     }
 

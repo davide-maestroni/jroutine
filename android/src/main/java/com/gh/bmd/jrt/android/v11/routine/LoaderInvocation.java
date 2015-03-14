@@ -196,12 +196,13 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
      * Destroys all loaders with the specified invocation class and the specified inputs.
      *
      * @param context         the context.
+     * @param id              the loader ID.
      * @param invocationClass the invocation class.
      * @param inputs          the invocation inputs.
      */
     @SuppressWarnings("unchecked")
-    static void purgeLoader(@Nonnull final Object context, @Nonnull final Class<?> invocationClass,
-            @Nonnull final List<?> inputs) {
+    static void purgeLoader(@Nonnull final Object context, final int id,
+            @Nonnull final Class<?> invocationClass, @Nonnull final List<?> inputs) {
 
         final SparseArray<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
                 sCallbackMap.get(context);
@@ -246,7 +247,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
             final int loaderId = callbackArray.keyAt(i);
 
             if ((loader.getInvocationType() == invocationClass) && (loader.getInvocationCount()
-                    == 0) && loader.areSameInputs(inputs)) {
+                    == 0) && ((id == AndroidRoutineBuilder.AUTO) || (id == loaderId))
+                    && loader.areSameInputs(inputs)) {
 
                 loaderManager.destroyLoader(loaderId);
                 callbackArray.removeAt(i);
@@ -336,9 +338,10 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
      * Destroys all loaders with the specified invocation class.
      *
      * @param context         the context.
+     * @param id              the loader ID.
      * @param invocationClass the invocation class.
      */
-    static void purgeLoaders(@Nonnull final Object context,
+    static void purgeLoaders(@Nonnull final Object context, final int id,
             @Nonnull final Class<?> invocationClass) {
 
         final SparseArray<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
@@ -384,9 +387,14 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
             if ((loader.getInvocationType() == invocationClass) && (loader.getInvocationCount()
                     == 0)) {
 
-                loaderManager.destroyLoader(callbackArray.keyAt(i));
-                callbackArray.removeAt(i);
-                continue;
+                final int loaderId = callbackArray.keyAt(i);
+
+                if ((id == AndroidRoutineBuilder.AUTO) || (id == loaderId)) {
+
+                    loaderManager.destroyLoader(loaderId);
+                    callbackArray.removeAt(i);
+                    continue;
+                }
             }
 
             ++i;

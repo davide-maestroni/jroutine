@@ -14,15 +14,19 @@
 apply plugin: 'java'
 apply plugin: 'jacoco'
 apply plugin: 'findbugs'
-apply from: '../upload.gradle'
+apply from: '../extra.gradle'
 
 group = 'com.github.davide-maestroni'
 version = '1.2.2'
 archivesBaseName = "${project.parent.name}-${project.name}"
 
+def getWorkingBranch() {
+    return "git --git-dir=${rootDir}/.git --work-tree=${rootDir} rev-parse --abbrev-ref HEAD".execute().text.trim()
+}
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    if (project.hasProperty('local')) {
+    if (project.hasProperty('switchdep') == "master".equals(workingBranch)) {
         compile project(':library')
     } else {
         compile 'com.github.davide-maestroni:jroutine:1.2.+'

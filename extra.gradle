@@ -14,6 +14,12 @@
 apply plugin: 'maven'
 apply plugin: 'signing'
 
+gradle.allprojects {
+    ext.workingBranch = {
+        return "git --git-dir=${rootDir}/.git --work-tree=${rootDir} rev-parse --abbrev-ref HEAD".execute().text.trim()
+    }
+}
+
 afterEvaluate { project ->
 
     if (project.hasProperty('uploadEnabled')) {

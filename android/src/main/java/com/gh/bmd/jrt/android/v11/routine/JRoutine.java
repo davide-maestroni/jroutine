@@ -134,7 +134,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * Created by davide on 12/8/14.
  */
 @SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS",
-        justification = "utility class extending functionalities of another utility " + "class")
+        justification = "utility class extending functionalities of another utility class")
 @TargetApi(VERSION_CODES.HONEYCOMB)
 public class JRoutine extends com.gh.bmd.jrt.android.routine.JRoutine {
 

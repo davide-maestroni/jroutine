@@ -23,7 +23,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * Created by davide on 12/22/14.
  */
 @SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS",
-        justification = "utility class extending functionalities of another utility " + "class")
+        justification = "utility class extending functionalities of another utility class")
 public class Logs extends com.gh.bmd.jrt.log.Logs {
 
     private static volatile AndroidLog sAndroidLog;

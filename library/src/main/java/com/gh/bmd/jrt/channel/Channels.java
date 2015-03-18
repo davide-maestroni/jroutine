@@ -22,6 +22,8 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /**
  * Utility class for handling channels.
  * <p/>
@@ -100,6 +102,8 @@ public class Channels {
      *
      * @param <DATA> the data type.
      */
+    @SuppressFBWarnings(value = "URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD",
+            justification = "this is an immutable record class")
     public static class Selectable<DATA> {
 
         /**

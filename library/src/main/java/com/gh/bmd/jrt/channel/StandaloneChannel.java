@@ -73,7 +73,7 @@ public interface StandaloneChannel<DATA> {
 
         @Nonnull
         @Override
-        StandaloneInput<INPUT> pass(@Nullable OutputChannel<INPUT> channel);
+        StandaloneInput<INPUT> pass(@Nullable OutputChannel<? extends INPUT> channel);
 
         @Nonnull
         @Override
@@ -113,7 +113,7 @@ public interface StandaloneChannel<DATA> {
 
         @Nonnull
         @Override
-        StandaloneOutput<OUTPUT> bind(@Nonnull OutputConsumer<OUTPUT> consumer);
+        StandaloneOutput<OUTPUT> bind(@Nonnull OutputConsumer<? super OUTPUT> consumer);
 
         @Nonnull
         @Override
@@ -138,5 +138,9 @@ public interface StandaloneChannel<DATA> {
         @Nonnull
         @Override
         StandaloneOutput<OUTPUT> readAllInto(@Nonnull Collection<? super OUTPUT> results);
+
+        @Nonnull
+        @Override
+        StandaloneOutput<OUTPUT> unbind(@Nullable OutputConsumer<? super OUTPUT> consumer);
     }
 }

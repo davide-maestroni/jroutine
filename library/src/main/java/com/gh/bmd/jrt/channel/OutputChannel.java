@@ -77,7 +77,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @throws java.lang.NullPointerException  if the specified consumer is null.
      */
     @Nonnull
-    OutputChannel<OUTPUT> bind(@Nonnull OutputConsumer<OUTPUT> consumer);
+    OutputChannel<OUTPUT> bind(@Nonnull OutputConsumer<? super OUTPUT> consumer);
 
     /**
      * Checks if the routine is complete waiting at the maximum for the set timeout.
@@ -231,5 +231,5 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @return this channel.
      */
     @Nonnull
-    OutputChannel<OUTPUT> unbind(@Nullable OutputConsumer<OUTPUT> consumer);
+    OutputChannel<OUTPUT> unbind(@Nullable OutputConsumer<? super OUTPUT> consumer);
 }

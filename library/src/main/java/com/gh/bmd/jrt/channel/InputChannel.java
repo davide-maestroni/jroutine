@@ -34,7 +34,7 @@ public interface InputChannel<INPUT> extends Channel {
     /**
      * Tells the channel to delay the transfer of data of the specified time duration.<br/>
      * Note that an abort execution will be delayed as well. Note, however, that a delayed abort
-     * will not prevent the invocation to complete, as input data do.
+     * will not prevent the invocation from completing, as input data do.
      *
      * @param delay the delay.
      * @return this channel.
@@ -48,7 +48,7 @@ public interface InputChannel<INPUT> extends Channel {
     /**
      * Tells the channel to delay the transfer of data of the specified time duration.<br/>
      * Note that an abort execution will be delayed as well. Note, however, that a delayed abort
-     * will not prevent the invocation to complete, as input data do.
+     * will not prevent the invocation from completing, as input data do.
      *
      * @param delay    the delay value.
      * @param timeUnit the delay time unit.
@@ -74,7 +74,7 @@ public interface InputChannel<INPUT> extends Channel {
      * Passes the specified channel to this one.
      * <p/>
      * Note that this channel will be bound as a result of the call, thus preventing any other
-     * reader to get data from the output channel.
+     * reader getting data from the output channel.
      *
      * @param channel the output channel.
      * @return this channel.
@@ -83,7 +83,7 @@ public interface InputChannel<INPUT> extends Channel {
      * @see com.gh.bmd.jrt.channel.OutputChannel#bind(OutputConsumer)
      */
     @Nonnull
-    InputChannel<INPUT> pass(@Nullable OutputChannel<INPUT> channel);
+    InputChannel<INPUT> pass(@Nullable OutputChannel<? extends INPUT> channel);
 
     /**
      * Passes the data returned by the specified iterable to this channel.

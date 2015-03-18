@@ -92,7 +92,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
     private boolean mIsException;
 
-    private OutputConsumer<OUTPUT> mOutputConsumer;
+    private OutputConsumer<? super OUTPUT> mOutputConsumer;
 
     private int mOutputCount;
 
@@ -211,7 +211,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
     @Nonnull
     @Override
-    public ResultChannel<OUTPUT> pass(@Nullable final OutputChannel<OUTPUT> channel) {
+    public ResultChannel<OUTPUT> pass(@Nullable final OutputChannel<? extends OUTPUT> channel) {
 
         final TimeDuration delay;
         final DefaultOutputConsumer consumer;
@@ -526,7 +526,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         if (state != ChannelState.ABORTED) {
 
             final Logger logger = mLogger;
-            final OutputConsumer<OUTPUT> consumer = mOutputConsumer;
+            final OutputConsumer<? super OUTPUT> consumer = mOutputConsumer;
 
             try {
 
@@ -562,7 +562,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             final Logger logger = mLogger;
             final ArrayList<Object> outputs;
-            final OutputConsumer<OUTPUT> consumer;
+            final OutputConsumer<? super OUTPUT> consumer;
             final ChannelState state;
 
             synchronized (mMutex) {
@@ -1032,7 +1032,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         @Nonnull
         @Override
         @SuppressWarnings("ConstantConditions")
-        public OutputChannel<OUTPUT> bind(@Nonnull final OutputConsumer<OUTPUT> consumer) {
+        public OutputChannel<OUTPUT> bind(@Nonnull final OutputConsumer<? super OUTPUT> consumer) {
 
             final boolean forceClose;
             final ChannelState state;
@@ -1215,7 +1215,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                     try {
 
-                        while (timeout.waitSinceMillis(mMutex, startTime)) {
+                        do {
 
                             while (!outputQueue.isEmpty()) {
 
@@ -1228,7 +1228,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                                 break;
                             }
-                        }
+
+                        } while (timeout.waitSinceMillis(mMutex, startTime));
 
                         isTimeout = (mState != ChannelState.DONE);
 
@@ -1293,7 +1294,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         @Nonnull
         @Override
-        public OutputChannel<OUTPUT> unbind(@Nullable final OutputConsumer<OUTPUT> consumer) {
+        public OutputChannel<OUTPUT> unbind(
+                @Nullable final OutputConsumer<? super OUTPUT> consumer) {
 
             synchronized (mMutex) {
 

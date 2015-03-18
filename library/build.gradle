@@ -35,8 +35,8 @@ tasks.withType(JavaCompile) {
     if ((java5 != null) && (java5.length() > 0)) {
         options.bootClasspath = "${java5}/jre/lib/rt.jar"
     }
-    sourceCompatibility = 1.5
-    targetCompatibility = 1.5
+    sourceCompatibility = JavaVersion.VERSION_1_5
+    targetCompatibility = JavaVersion.VERSION_1_5
 }
 
 task('jacocoTest', dependsOn: 'test') {

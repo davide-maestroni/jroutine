@@ -70,6 +70,7 @@ import static com.gh.bmd.jrt.builder.RoutineConfiguration.withReadTimeout;
 import static com.gh.bmd.jrt.invocation.Invocations.factoryOf;
 import static com.gh.bmd.jrt.invocation.Invocations.withArgs;
 import static com.gh.bmd.jrt.routine.JRoutine.on;
+import static com.gh.bmd.jrt.routine.JRoutine.onFunction;
 import static com.gh.bmd.jrt.time.TimeDuration.INFINITY;
 import static com.gh.bmd.jrt.time.TimeDuration.millis;
 import static com.gh.bmd.jrt.time.TimeDuration.seconds;
@@ -472,7 +473,7 @@ public class RoutineTest extends TestCase {
             }
         };
 
-        final Routine<Integer, Integer> squareRoutine = on(invokeSquare).buildRoutine();
+        final Routine<Integer, Integer> squareRoutine = onFunction(invokeSquare).buildRoutine();
 
         assertThat(
                 sumRoutine.callSync(squareRoutine.callSync(1, 2, 3, 4)).afterMax(timeout).readAll())
@@ -530,7 +531,7 @@ public class RoutineTest extends TestCase {
             }
         };
 
-        final Routine<Integer, Integer> squareRoutine = on(invokeSquare).buildRoutine();
+        final Routine<Integer, Integer> squareRoutine = onFunction(invokeSquare).buildRoutine();
 
         final TemplateInvocation<Integer, Integer> invokeSquareSum =
                 new TemplateInvocation<Integer, Integer>() {

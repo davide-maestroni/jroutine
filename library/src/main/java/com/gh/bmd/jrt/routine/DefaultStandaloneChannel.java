@@ -206,7 +206,7 @@ class DefaultStandaloneChannel<DATA> implements StandaloneChannel<DATA> {
 
         @Nonnull
         @Override
-        public StandaloneInput<INPUT> pass(@Nullable final OutputChannel<INPUT> channel) {
+        public StandaloneInput<INPUT> pass(@Nullable final OutputChannel<? extends INPUT> channel) {
 
             mChannel.pass(channel);
             return this;
@@ -293,7 +293,8 @@ class DefaultStandaloneChannel<DATA> implements StandaloneChannel<DATA> {
 
         @Nonnull
         @Override
-        public StandaloneOutput<OUTPUT> bind(@Nonnull final OutputConsumer<OUTPUT> consumer) {
+        public StandaloneOutput<OUTPUT> bind(
+                @Nonnull final OutputConsumer<? super OUTPUT> consumer) {
 
             mChannel.bind(consumer);
             return this;
@@ -348,6 +349,15 @@ class DefaultStandaloneChannel<DATA> implements StandaloneChannel<DATA> {
             return this;
         }
 
+        @Nonnull
+        @Override
+        public StandaloneOutput<OUTPUT> unbind(
+                @Nullable final OutputConsumer<? super OUTPUT> consumer) {
+
+            mChannel.unbind(consumer);
+            return this;
+        }
+
         @Override
         public boolean checkComplete() {
 
@@ -371,14 +381,6 @@ class DefaultStandaloneChannel<DATA> implements StandaloneChannel<DATA> {
         public OUTPUT readNext() {
 
             return mChannel.readNext();
-        }
-
-        @Nonnull
-        @Override
-        public StandaloneOutput<OUTPUT> unbind(@Nullable final OutputConsumer<OUTPUT> consumer) {
-
-            mChannel.unbind(consumer);
-            return this;
         }
 
         @Override

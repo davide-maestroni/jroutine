@@ -261,7 +261,8 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
     @Nonnull
     @Override
-    public ParameterChannel<INPUT, OUTPUT> pass(@Nullable final OutputChannel<INPUT> channel) {
+    public ParameterChannel<INPUT, OUTPUT> pass(
+            @Nullable final OutputChannel<? extends INPUT> channel) {
 
         final TimeDuration delay;
         final DefaultOutputConsumer consumer;

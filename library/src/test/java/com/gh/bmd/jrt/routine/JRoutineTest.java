@@ -32,12 +32,6 @@ import com.gh.bmd.jrt.invocation.Invocations.Function2;
 import com.gh.bmd.jrt.invocation.Invocations.Function3;
 import com.gh.bmd.jrt.invocation.Invocations.Function4;
 import com.gh.bmd.jrt.invocation.Invocations.FunctionN;
-import com.gh.bmd.jrt.invocation.Invocations.Procedure0;
-import com.gh.bmd.jrt.invocation.Invocations.Procedure1;
-import com.gh.bmd.jrt.invocation.Invocations.Procedure2;
-import com.gh.bmd.jrt.invocation.Invocations.Procedure3;
-import com.gh.bmd.jrt.invocation.Invocations.Procedure4;
-import com.gh.bmd.jrt.invocation.Invocations.ProcedureN;
 import com.gh.bmd.jrt.invocation.PassingInvocation;
 import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.log.Log.LogLevel;
@@ -306,7 +300,8 @@ public class JRoutineTest extends TestCase {
                 return "test0";
             }
         };
-        assertThat(JRoutine.on(function0).callAsync().eventually().readNext()).isEqualTo("test0");
+        assertThat(JRoutine.onFunction(function0).callAsync().eventually().readNext()).isEqualTo(
+                "test0");
 
         final Function1<String, String> function1 = new Function1<String, String>() {
 
@@ -316,8 +311,10 @@ public class JRoutineTest extends TestCase {
                 return param1;
             }
         };
-        assertThat(JRoutine.on(function1).callAsync("test1").eventually().readNext()).isEqualTo(
-                "test1");
+        assertThat(JRoutine.onFunction(function1)
+                           .callAsync("test1")
+                           .eventually()
+                           .readNext()).isEqualTo("test1");
 
         final Function2<String, String, String> function2 =
                 new Function2<String, String, String>() {
@@ -328,7 +325,7 @@ public class JRoutineTest extends TestCase {
                         return param1 + " " + param2;
                     }
                 };
-        assertThat(JRoutine.on(function2)
+        assertThat(JRoutine.onFunction(function2)
                            .callAsync("test1", "test2")
                            .eventually()
                            .readNext()).isEqualTo("test1 test2");
@@ -343,9 +340,10 @@ public class JRoutineTest extends TestCase {
                         return param1 + " " + param2 + " " + param3;
                     }
                 };
-        assertThat(
-                JRoutine.on(function3).callAsync("test1", "test2", "test3").eventually().readNext())
-                .isEqualTo("test1 test2 test3");
+        assertThat(JRoutine.onFunction(function3)
+                           .callAsync("test1", "test2", "test3")
+                           .eventually()
+                           .readNext()).isEqualTo("test1 test2 test3");
 
         final Function4<String, String, String, String, String> function4 =
                 new Function4<String, String, String, String, String>() {
@@ -357,7 +355,7 @@ public class JRoutineTest extends TestCase {
                         return param1 + " " + param2 + " " + param3 + " " + param4;
                     }
                 };
-        assertThat(JRoutine.on(function4)
+        assertThat(JRoutine.onFunction(function4)
                            .callAsync("test1", "test2", "test3", "test4")
                            .eventually()
                            .readNext()).isEqualTo("test1 test2 test3 test4");
@@ -377,19 +375,19 @@ public class JRoutineTest extends TestCase {
                 return builder.toString();
             }
         };
-        assertThat(JRoutine.on(functionN)
+        assertThat(JRoutine.onFunction(functionN)
                            .callAsync("test1", "test2", "test3", "test4")
                            .eventually()
                            .readNext()).isEqualTo("test1test2test3test4");
 
-        assertThat(JRoutine.on(function4)
+        assertThat(JRoutine.onFunction(function4)
                            .withConfiguration(withInputOrder(OrderType.DELIVERY))
                            .callAsync("test1", "test2", "test3", "test4")
                            .eventually()
                            .readNext()).isEqualTo("test1 test2 test3 test4");
 
-        assertThat(JRoutine.on(function1).callSync("test0").readNext()).isEqualTo("test0");
-        assertThat(JRoutine.on(function1)
+        assertThat(JRoutine.onFunction(function1).callSync("test0").readNext()).isEqualTo("test0");
+        assertThat(JRoutine.onFunction(function1)
                            .callParallel("test1", "test2", "test3")
                            .eventually()
                            .readAll()).containsOnly("test1", "test2", "test3");
@@ -949,81 +947,107 @@ public class JRoutineTest extends TestCase {
     public void testProcedureBuilder() throws InterruptedException {
 
         final Semaphore semaphore = new Semaphore(0);
-        final Procedure0 procedure0 = new Procedure0() {
+        final Function0<Void> procedure0 = new Function0<Void>() {
 
             @Override
-            public void execute() {
+            public Void call() {
 
                 semaphore.release();
+                return null;
             }
         };
-        JRoutine.on(procedure0).callAsync();
-        assertThat(semaphore.tryAcquire(1, TimeUnit.SECONDS)).isTrue();
+        assertThat(JRoutine.onProcedure(procedure0).callAsync().eventually().readAll()).isEmpty();
+        assertThat(semaphore.tryAcquire(0, TimeUnit.SECONDS)).isTrue();
 
-        final Procedure1<String> procedure1 = new Procedure1<String>() {
+        final Function1<String, Void> procedure1 = new Function1<String, Void>() {
 
             @Override
-            public void execute(final String param1) {
+            public Void call(final String param1) {
 
                 semaphore.release();
+                return null;
             }
         };
-        JRoutine.on(procedure1).callAsync("test1");
-        assertThat(semaphore.tryAcquire(1, TimeUnit.SECONDS)).isTrue();
+        assertThat(JRoutine.onProcedure(procedure1)
+                           .callAsync("test1")
+                           .eventually()
+                           .readAll()).isEmpty();
+        assertThat(semaphore.tryAcquire(0, TimeUnit.SECONDS)).isTrue();
 
-        final Procedure2<String, String> procedure2 = new Procedure2<String, String>() {
+        final Function2<String, String, Void> procedure2 = new Function2<String, String, Void>() {
 
             @Override
-            public void execute(final String param1, final String param2) {
+            public Void call(final String param1, final String param2) {
 
                 semaphore.release();
+                return null;
             }
         };
-        JRoutine.on(procedure2).callAsync("test1", "test2");
-        assertThat(semaphore.tryAcquire(1, TimeUnit.SECONDS)).isTrue();
+        assertThat(
+                JRoutine.onProcedure(procedure2).callAsync("test1", "test2").eventually().readAll())
+                .isEmpty();
+        assertThat(semaphore.tryAcquire(0, TimeUnit.SECONDS)).isTrue();
 
-        final Procedure3<String, String, String> procedure3 =
-                new Procedure3<String, String, String>() {
+        final Function3<String, String, String, Void> procedure3 =
+                new Function3<String, String, String, Void>() {
 
                     @Override
-                    public void execute(final String param1, final String param2,
+                    public Void call(final String param1, final String param2,
                             final String param3) {
 
                         semaphore.release();
+                        return null;
                     }
                 };
-        JRoutine.on(procedure3).callAsync("test1", "test2", "test3");
-        assertThat(semaphore.tryAcquire(1, TimeUnit.SECONDS)).isTrue();
+        assertThat(JRoutine.onProcedure(procedure3)
+                           .callAsync("test1", "test2", "test3")
+                           .eventually()
+                           .readAll()).isEmpty();
+        assertThat(semaphore.tryAcquire(0, TimeUnit.SECONDS)).isTrue();
 
-        final Procedure4<String, String, String, String> procedure4 =
-                new Procedure4<String, String, String, String>() {
+        final Function4<String, String, String, String, Void> procedure4 =
+                new Function4<String, String, String, String, Void>() {
 
                     @Override
-                    public void execute(final String param1, final String param2,
-                            final String param3, final String param4) {
+                    public Void call(final String param1, final String param2, final String param3,
+                            final String param4) {
 
                         semaphore.release();
+                        return null;
                     }
                 };
-        JRoutine.on(procedure4).callAsync("test1", "test2", "test3", "test4");
-        assertThat(semaphore.tryAcquire(1, TimeUnit.SECONDS)).isTrue();
+        assertThat(JRoutine.onProcedure(procedure4)
+                           .callAsync("test1", "test2", "test3", "test4")
+                           .eventually()
+                           .readAll()).isEmpty();
+        assertThat(semaphore.tryAcquire(0, TimeUnit.SECONDS)).isTrue();
 
-        final ProcedureN<String> procedureN = new ProcedureN<String>() {
+        final FunctionN<String, Void> procedureN = new FunctionN<String, Void>() {
 
             @Override
-            public void execute(@Nonnull final List<? extends String> strings) {
+            public Void call(@Nonnull final List<? extends String> strings) {
 
                 semaphore.release();
+                return null;
             }
         };
-        JRoutine.on(procedureN).callAsync("test1", "test2", "test3", "test4");
-        assertThat(semaphore.tryAcquire(1, TimeUnit.SECONDS)).isTrue();
+        assertThat(JRoutine.onProcedure(procedureN)
+                           .callAsync("test1", "test2", "test3", "test4")
+                           .eventually()
+                           .readAll()).isEmpty();
+        assertThat(semaphore.tryAcquire(0, TimeUnit.SECONDS)).isTrue();
 
-        JRoutine.on(procedure1).callSync("test0");
-        assertThat(semaphore.tryAcquire(1, TimeUnit.SECONDS)).isTrue();
+        assertThat(JRoutine.onProcedure(procedure1)
+                           .callSync("test0")
+                           .eventually()
+                           .readAll()).isEmpty();
+        assertThat(semaphore.tryAcquire(0, TimeUnit.SECONDS)).isTrue();
 
-        JRoutine.on(procedure1).callParallel("test0", "test1", "test2");
-        assertThat(semaphore.tryAcquire(3, TimeUnit.SECONDS)).isTrue();
+        assertThat(JRoutine.onProcedure(procedure1)
+                           .callParallel("test0", "test1", "test2")
+                           .eventually()
+                           .readAll()).isEmpty();
+        assertThat(semaphore.tryAcquire(0, TimeUnit.SECONDS)).isTrue();
     }
 
     public void testRoutineBuilder() {
@@ -1080,7 +1104,7 @@ public class JRoutineTest extends TestCase {
 
         try {
 
-            JRoutine.on((Function0<Object>) null);
+            JRoutine.onFunction((Function0<Object>) null);
 
             fail();
 
@@ -1090,7 +1114,7 @@ public class JRoutineTest extends TestCase {
 
         try {
 
-            JRoutine.on((Function1<Object, Object>) null);
+            JRoutine.onFunction((Function1<Object, Object>) null);
 
             fail();
 
@@ -1100,7 +1124,7 @@ public class JRoutineTest extends TestCase {
 
         try {
 
-            JRoutine.on((Function2<Object, Object, Object>) null);
+            JRoutine.onFunction((Function2<Object, Object, Object>) null);
 
             fail();
 
@@ -1110,7 +1134,7 @@ public class JRoutineTest extends TestCase {
 
         try {
 
-            JRoutine.on((Function3<Object, Object, Object, Object>) null);
+            JRoutine.onFunction((Function3<Object, Object, Object, Object>) null);
 
             fail();
 
@@ -1120,7 +1144,7 @@ public class JRoutineTest extends TestCase {
 
         try {
 
-            JRoutine.on((Function4<Object, Object, Object, Object, Object>) null);
+            JRoutine.onFunction((Function4<Object, Object, Object, Object, Object>) null);
 
             fail();
 
@@ -1130,7 +1154,7 @@ public class JRoutineTest extends TestCase {
 
         try {
 
-            JRoutine.on((FunctionN<Object, Object>) null);
+            JRoutine.onFunction((FunctionN<Object, Object>) null);
 
             fail();
 
@@ -1140,7 +1164,7 @@ public class JRoutineTest extends TestCase {
 
         try {
 
-            JRoutine.on((Procedure0) null);
+            JRoutine.onProcedure((Function0<Void>) null);
 
             fail();
 
@@ -1150,7 +1174,7 @@ public class JRoutineTest extends TestCase {
 
         try {
 
-            JRoutine.on((Procedure1<Object>) null);
+            JRoutine.onProcedure((Function1<Object, Void>) null);
 
             fail();
 
@@ -1160,7 +1184,7 @@ public class JRoutineTest extends TestCase {
 
         try {
 
-            JRoutine.on((Procedure2<Object, Object>) null);
+            JRoutine.onProcedure((Function2<Object, Object, Void>) null);
 
             fail();
 
@@ -1170,7 +1194,7 @@ public class JRoutineTest extends TestCase {
 
         try {
 
-            JRoutine.on((Procedure3<Object, Object, Object>) null);
+            JRoutine.onProcedure((Function3<Object, Object, Object, Void>) null);
 
             fail();
 
@@ -1180,7 +1204,7 @@ public class JRoutineTest extends TestCase {
 
         try {
 
-            JRoutine.on((Procedure4<Object, Object, Object, Object>) null);
+            JRoutine.onProcedure((Function4<Object, Object, Object, Object, Void>) null);
 
             fail();
 
@@ -1190,7 +1214,7 @@ public class JRoutineTest extends TestCase {
 
         try {
 
-            JRoutine.on((ProcedureN<Object>) null);
+            JRoutine.onProcedure((FunctionN<Object, Void>) null);
 
             fail();
 

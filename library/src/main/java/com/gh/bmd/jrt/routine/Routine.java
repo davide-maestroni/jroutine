@@ -129,7 +129,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @throws com.gh.bmd.jrt.common.RoutineException if the execution has been aborted.
      */
     @Nonnull
-    OutputChannel<OUTPUT> callAsync(@Nullable OutputChannel<INPUT> inputs);
+    OutputChannel<OUTPUT> callAsync(@Nullable OutputChannel<? extends INPUT> inputs);
 
     /**
      * Short for <b><code>invokeParallel().result()</code></b>.
@@ -180,7 +180,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @throws com.gh.bmd.jrt.common.RoutineException if the execution has been aborted.
      */
     @Nonnull
-    OutputChannel<OUTPUT> callParallel(@Nullable OutputChannel<INPUT> inputs);
+    OutputChannel<OUTPUT> callParallel(@Nullable OutputChannel<? extends INPUT> inputs);
 
     /**
      * Short for <b><code>invokeSync().result()</code></b>.
@@ -229,7 +229,7 @@ public interface Routine<INPUT, OUTPUT> {
      * @throws com.gh.bmd.jrt.common.RoutineException if the execution has been aborted.
      */
     @Nonnull
-    OutputChannel<OUTPUT> callSync(@Nullable OutputChannel<INPUT> inputs);
+    OutputChannel<OUTPUT> callSync(@Nullable OutputChannel<? extends INPUT> inputs);
 
     /**
      * Invokes the execution of this routine in asynchronous mode.

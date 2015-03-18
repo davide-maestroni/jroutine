@@ -45,7 +45,7 @@ public interface ParameterChannel<INPUT, OUTPUT> extends InputChannel<INPUT> {
 
     @Nonnull
     @Override
-    ParameterChannel<INPUT, OUTPUT> pass(@Nullable OutputChannel<INPUT> channel);
+    ParameterChannel<INPUT, OUTPUT> pass(@Nullable OutputChannel<? extends INPUT> channel);
 
     @Nonnull
     @Override

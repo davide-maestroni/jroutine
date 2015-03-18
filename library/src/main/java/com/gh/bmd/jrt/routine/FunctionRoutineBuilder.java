@@ -25,12 +25,6 @@ import com.gh.bmd.jrt.invocation.Invocations.Function2;
 import com.gh.bmd.jrt.invocation.Invocations.Function3;
 import com.gh.bmd.jrt.invocation.Invocations.Function4;
 import com.gh.bmd.jrt.invocation.Invocations.FunctionN;
-import com.gh.bmd.jrt.invocation.Invocations.Procedure0;
-import com.gh.bmd.jrt.invocation.Invocations.Procedure1;
-import com.gh.bmd.jrt.invocation.Invocations.Procedure2;
-import com.gh.bmd.jrt.invocation.Invocations.Procedure3;
-import com.gh.bmd.jrt.invocation.Invocations.Procedure4;
-import com.gh.bmd.jrt.invocation.Invocations.ProcedureN;
 import com.gh.bmd.jrt.invocation.SingleCallInvocation;
 import com.gh.bmd.jrt.invocation.StatelessInvocation;
 
@@ -39,8 +33,10 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import static com.gh.bmd.jrt.builder.RoutineConfiguration.withInputOrder;
+
 /**
- * Class implementing a builder of routine objects based on an invocation class token.
+ * Class implementing a builder of routine objects based on a function or procedure instance.
  * <p/>
  * Created by davide on 9/21/14.
  *
@@ -53,13 +49,13 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
      * Constructor.
      *
      * @param factory the invocation factory.
-     * @throws NullPointerException if the class token is null.
+     * @throws java.lang.NullPointerException if the class token is null.
      */
     @SuppressWarnings("ConstantConditions")
     private FunctionRoutineBuilder(@Nonnull final InvocationFactory<INPUT, OUTPUT> factory) {
 
         super(factory);
-        super.withConfiguration(RoutineConfiguration.withInputOrder(OrderType.PASSING));
+        super.withConfiguration(withInputOrder(OrderType.PASSING));
     }
 
     /**
@@ -70,12 +66,12 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
      * @param function the function instance.
      * @param <OUTPUT> the output data type.
      * @return the builder instance.
-     * @throws NullPointerException if the specified function is null.
+     * @throws java.lang.NullPointerException if the specified function is null.
      */
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    static <OUTPUT> FunctionRoutineBuilder<Void, OUTPUT> newInstance(
-            @Nonnull final Function0<OUTPUT> function) {
+    static <OUTPUT> FunctionRoutineBuilder<Void, OUTPUT> fromFunction(
+            @Nonnull final Function0<? extends OUTPUT> function) {
 
         if (function == null) {
 
@@ -111,12 +107,12 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
      * @param <INPUT>  the input data type.
      * @param <OUTPUT> the output data type.
      * @return the builder instance.
-     * @throws NullPointerException if the specified function is null.
+     * @throws java.lang.NullPointerException if the specified function is null.
      */
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    static <INPUT, OUTPUT> FunctionRoutineBuilder<INPUT, OUTPUT> newInstance(
-            @Nonnull final Function1<INPUT, OUTPUT> function) {
+    static <INPUT, INPUT1 extends INPUT, OUTPUT> FunctionRoutineBuilder<INPUT, OUTPUT> fromFunction(
+            @Nonnull final Function1<INPUT1, ? extends OUTPUT> function) {
 
         if (function == null) {
 
@@ -126,9 +122,10 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
         return new FunctionRoutineBuilder<INPUT, OUTPUT>(new StatelessInvocation<INPUT, OUTPUT>() {
 
             @Override
+            @SuppressWarnings("unchecked")
             public void onInput(final INPUT input, @Nonnull final ResultChannel<OUTPUT> result) {
 
-                result.pass(function.call(input));
+                result.pass(function.call((INPUT1) input));
             }
         });
     }
@@ -144,13 +141,13 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
      * @param <INPUT2> the second parameter type.
      * @param <OUTPUT> the output data type.
      * @return the builder instance.
-     * @throws NullPointerException if the specified function is null.
+     * @throws java.lang.NullPointerException if the specified function is null.
      */
     @Nonnull
     @SuppressWarnings("ConstantConditions")
     static <INPUT, INPUT1 extends INPUT, INPUT2 extends INPUT, OUTPUT>
-    FunctionRoutineBuilder<INPUT, OUTPUT> newInstance(
-            @Nonnull final Function2<INPUT1, INPUT2, OUTPUT> function) {
+    FunctionRoutineBuilder<INPUT, OUTPUT> fromFunction(
+            @Nonnull final Function2<INPUT1, INPUT2, ? extends OUTPUT> function) {
 
         if (function == null) {
 
@@ -189,13 +186,13 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
      * @param <INPUT3> the third parameter type.
      * @param <OUTPUT> the output data type.
      * @return the builder instance.
-     * @throws NullPointerException if the specified function is null.
+     * @throws java.lang.NullPointerException if the specified function is null.
      */
     @Nonnull
     @SuppressWarnings("ConstantConditions")
     static <INPUT, INPUT1 extends INPUT, INPUT2 extends INPUT, INPUT3 extends INPUT, OUTPUT>
-    FunctionRoutineBuilder<INPUT, OUTPUT> newInstance(
-            @Nonnull final Function3<INPUT1, INPUT2, INPUT3, OUTPUT> function) {
+    FunctionRoutineBuilder<INPUT, OUTPUT> fromFunction(
+            @Nonnull final Function3<INPUT1, INPUT2, INPUT3, ? extends OUTPUT> function) {
 
         if (function == null) {
 
@@ -236,13 +233,13 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
      * @param <INPUT4> the fourth parameter type.
      * @param <OUTPUT> the output data type.
      * @return the builder instance.
-     * @throws NullPointerException if the specified function is null.
+     * @throws java.lang.NullPointerException if the specified function is null.
      */
     @Nonnull
     @SuppressWarnings("ConstantConditions")
     static <INPUT, INPUT1 extends INPUT, INPUT2 extends INPUT, INPUT3 extends INPUT, INPUT4
-            extends INPUT, OUTPUT> FunctionRoutineBuilder<INPUT, OUTPUT> newInstance(
-            @Nonnull final Function4<INPUT1, INPUT2, INPUT3, INPUT4, OUTPUT> function) {
+            extends INPUT, OUTPUT> FunctionRoutineBuilder<INPUT, OUTPUT> fromFunction(
+            @Nonnull final Function4<INPUT1, INPUT2, INPUT3, INPUT4, ? extends OUTPUT> function) {
 
         if (function == null) {
 
@@ -279,12 +276,12 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
      * @param <INPUT>  the input data type.
      * @param <OUTPUT> the output data type.
      * @return the builder instance.
-     * @throws NullPointerException if the specified function is null.
+     * @throws java.lang.NullPointerException if the specified function is null.
      */
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    static <INPUT, OUTPUT> FunctionRoutineBuilder<INPUT, OUTPUT> newInstance(
-            @Nonnull final FunctionN<INPUT, OUTPUT> function) {
+    static <INPUT, OUTPUT> FunctionRoutineBuilder<INPUT, OUTPUT> fromFunction(
+            @Nonnull final FunctionN<INPUT, ? extends OUTPUT> function) {
 
         if (function == null) {
 
@@ -312,17 +309,19 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
     }
 
     /**
-     * Returns a new builder based on the specified procedure.
+     * Returns a new builder based on the specified procedure.<br/>
+     * The procedure output will be discarded.
      * <p/>
      * Note that the procedure object must be stateless in order to avoid concurrency issues.
      *
      * @param procedure the procedure instance.
      * @return the builder instance.
-     * @throws NullPointerException if the specified procedure is null.
+     * @throws java.lang.NullPointerException if the specified procedure is null.
      */
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    static FunctionRoutineBuilder<Void, Void> newInstance(@Nonnull final Procedure0 procedure) {
+    static FunctionRoutineBuilder<Void, Void> fromProcedure(
+            @Nonnull final Function0<Void> procedure) {
 
         if (procedure == null) {
 
@@ -342,7 +341,7 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
                     public void onCall(@Nonnull final List<? extends Void> inputs,
                             @Nonnull final ResultChannel<Void> result) {
 
-                        procedure.execute();
+                        procedure.call();
                     }
                 };
             }
@@ -350,19 +349,20 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
     }
 
     /**
-     * Returns a new builder based on the specified procedure.
+     * Returns a new builder based on the specified procedure.<br/>
+     * The procedure output will be discarded.
      * <p/>
      * Note that the procedure object must be stateless in order to avoid concurrency issues.
      *
      * @param procedure the procedure instance.
      * @param <INPUT>   the input data type.
      * @return the builder instance.
-     * @throws NullPointerException if the specified procedure is null.
+     * @throws java.lang.NullPointerException if the specified procedure is null.
      */
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    static <INPUT> FunctionRoutineBuilder<INPUT, Void> newInstance(
-            @Nonnull final Procedure1<INPUT> procedure) {
+    static <INPUT, INPUT1 extends INPUT> FunctionRoutineBuilder<INPUT, Void> fromProcedure(
+            @Nonnull final Function1<INPUT1, Void> procedure) {
 
         if (procedure == null) {
 
@@ -372,15 +372,17 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
         return new FunctionRoutineBuilder<INPUT, Void>(new StatelessInvocation<INPUT, Void>() {
 
             @Override
+            @SuppressWarnings("unchecked")
             public void onInput(final INPUT input, @Nonnull final ResultChannel<Void> result) {
 
-                procedure.execute(input);
+                procedure.call((INPUT1) input);
             }
         });
     }
 
     /**
-     * Returns a new builder based on the specified procedure.
+     * Returns a new builder based on the specified procedure.<br/>
+     * The procedure output will be discarded.
      * <p/>
      * Note that the procedure object must be stateless in order to avoid concurrency issues.
      *
@@ -389,13 +391,13 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
      * @param <INPUT1>  the first parameter type.
      * @param <INPUT2>  the second parameter type.
      * @return the builder instance.
-     * @throws NullPointerException if the specified procedure is null.
+     * @throws java.lang.NullPointerException if the specified procedure is null.
      */
     @Nonnull
     @SuppressWarnings("ConstantConditions")
     static <INPUT, INPUT1 extends INPUT, INPUT2 extends INPUT> FunctionRoutineBuilder<INPUT,
-            Void> newInstance(
-            @Nonnull final Procedure2<INPUT1, INPUT2> procedure) {
+            Void> fromProcedure(
+            @Nonnull final Function2<INPUT1, INPUT2, Void> procedure) {
 
         if (procedure == null) {
 
@@ -415,7 +417,7 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
                     public void onCall(@Nonnull final List<? extends INPUT> inputs,
                             @Nonnull final ResultChannel<Void> result) {
 
-                        procedure.execute((INPUT1) inputs.get(0), (INPUT2) inputs.get(1));
+                        procedure.call((INPUT1) inputs.get(0), (INPUT2) inputs.get(1));
                     }
                 };
             }
@@ -423,7 +425,8 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
     }
 
     /**
-     * Returns a new builder based on the specified procedure.
+     * Returns a new builder based on the specified procedure.<br/>
+     * The procedure output will be discarded.
      * <p/>
      * Note that the procedure object must be stateless in order to avoid concurrency issues.
      *
@@ -433,13 +436,13 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
      * @param <INPUT2>  the second parameter type.
      * @param <INPUT3>  the third parameter type.
      * @return the builder instance.
-     * @throws NullPointerException if the specified procedure is null.
+     * @throws java.lang.NullPointerException if the specified procedure is null.
      */
     @Nonnull
     @SuppressWarnings("ConstantConditions")
     static <INPUT, INPUT1 extends INPUT, INPUT2 extends INPUT, INPUT3 extends INPUT>
-    FunctionRoutineBuilder<INPUT, Void> newInstance(
-            @Nonnull final Procedure3<INPUT1, INPUT2, INPUT3> procedure) {
+    FunctionRoutineBuilder<INPUT, Void> fromProcedure(
+            @Nonnull final Function3<INPUT1, INPUT2, INPUT3, Void> procedure) {
 
         if (procedure == null) {
 
@@ -459,8 +462,8 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
                     public void onCall(@Nonnull final List<? extends INPUT> inputs,
                             @Nonnull final ResultChannel<Void> result) {
 
-                        procedure.execute((INPUT1) inputs.get(0), (INPUT2) inputs.get(1),
-                                          (INPUT3) inputs.get(2));
+                        procedure.call((INPUT1) inputs.get(0), (INPUT2) inputs.get(1),
+                                       (INPUT3) inputs.get(2));
                     }
                 };
             }
@@ -468,7 +471,8 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
     }
 
     /**
-     * Returns a new builder based on the specified procedure.
+     * Returns a new builder based on the specified procedure.<br/>
+     * The procedure output will be discarded.
      * <p/>
      * Note that the procedure object must be stateless in order to avoid concurrency issues.
      *
@@ -479,13 +483,13 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
      * @param <INPUT3>  the third parameter type.
      * @param <INPUT4>  the fourth parameter type.
      * @return the builder instance.
-     * @throws NullPointerException if the specified procedure is null.
+     * @throws java.lang.NullPointerException if the specified procedure is null.
      */
     @Nonnull
     @SuppressWarnings("ConstantConditions")
     static <INPUT, INPUT1 extends INPUT, INPUT2 extends INPUT, INPUT3 extends INPUT, INPUT4
-            extends INPUT> FunctionRoutineBuilder<INPUT, Void> newInstance(
-            @Nonnull final Procedure4<INPUT1, INPUT2, INPUT3, INPUT4> procedure) {
+            extends INPUT> FunctionRoutineBuilder<INPUT, Void> fromProcedure(
+            @Nonnull final Function4<INPUT1, INPUT2, INPUT3, INPUT4, Void> procedure) {
 
         if (procedure == null) {
 
@@ -505,8 +509,8 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
                     public void onCall(@Nonnull final List<? extends INPUT> inputs,
                             @Nonnull final ResultChannel<Void> result) {
 
-                        procedure.execute((INPUT1) inputs.get(0), (INPUT2) inputs.get(1),
-                                          (INPUT3) inputs.get(2), (INPUT4) inputs.get(3));
+                        procedure.call((INPUT1) inputs.get(0), (INPUT2) inputs.get(1),
+                                       (INPUT3) inputs.get(2), (INPUT4) inputs.get(3));
                     }
                 };
             }
@@ -514,19 +518,20 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
     }
 
     /**
-     * Returns a new builder based on the specified procedure.
+     * Returns a new builder based on the specified procedure.<br/>
+     * The procedure output will be discarded.
      * <p/>
      * Note that the procedure object must be stateless in order to avoid concurrency issues.
      *
      * @param procedure the procedure instance.
      * @param <INPUT>   the input data type.
      * @return the builder instance.
-     * @throws NullPointerException if the specified procedure is null.
+     * @throws java.lang.NullPointerException if the specified procedure is null.
      */
     @Nonnull
     @SuppressWarnings("ConstantConditions")
-    static <INPUT> FunctionRoutineBuilder<INPUT, Void> newInstance(
-            @Nonnull final ProcedureN<INPUT> procedure) {
+    static <INPUT> FunctionRoutineBuilder<INPUT, Void> fromProcedure(
+            @Nonnull final FunctionN<INPUT, Void> procedure) {
 
         if (procedure == null) {
 
@@ -546,7 +551,7 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
                     public void onCall(@Nonnull final List<? extends INPUT> inputs,
                             @Nonnull final ResultChannel<Void> result) {
 
-                        procedure.execute(inputs);
+                        procedure.call(inputs);
                     }
                 };
             }

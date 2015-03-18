@@ -20,11 +20,10 @@ import com.gh.bmd.jrt.android.builder.ServiceRoutineBuilder;
 import com.gh.bmd.jrt.android.invocation.AndroidInvocation;
 import com.gh.bmd.jrt.android.service.RoutineService;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
-import com.gh.bmd.jrt.channel.ParameterChannel;
+import com.gh.bmd.jrt.builder.TemplateRoutineBuilder;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.routine.Routine;
-import com.gh.bmd.jrt.routine.TemplateRoutine;
 import com.gh.bmd.jrt.runner.Runner;
 
 import javax.annotation.Nonnull;
@@ -38,14 +37,12 @@ import javax.annotation.Nullable;
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT>
+class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder<INPUT, OUTPUT>
         implements ServiceRoutineBuilder<INPUT, OUTPUT> {
 
     private final Context mContext;
 
     private final Class<? extends AndroidInvocation<INPUT, OUTPUT>> mInvocationClass;
-
-    private RoutineConfiguration mConfiguration;
 
     private Class<? extends Log> mLogClass;
 
@@ -80,8 +77,7 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutine<INPUT,
     public Routine<INPUT, OUTPUT> buildRoutine() {
 
         return new ServiceRoutine<INPUT, OUTPUT>(mContext, mServiceClass, mLooper, mInvocationClass,
-                                                 RoutineConfiguration.notNull(mConfiguration),
-                                                 mRunnerClass, mLogClass);
+                                                 getConfiguration(), mRunnerClass, mLogClass);
     }
 
     @Nonnull
@@ -89,15 +85,6 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutine<INPUT,
     public ServiceRoutineBuilder<INPUT, OUTPUT> dispatchingOn(@Nullable final Looper looper) {
 
         mLooper = looper;
-        return this;
-    }
-
-    @Nonnull
-    @Override
-    public ServiceRoutineBuilder<INPUT, OUTPUT> withConfiguration(
-            @Nullable final RoutineConfiguration configuration) {
-
-        mConfiguration = configuration;
         return this;
     }
 
@@ -131,22 +118,10 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutine<INPUT,
 
     @Nonnull
     @Override
-    public ParameterChannel<INPUT, OUTPUT> invokeAsync() {
+    public ServiceRoutineBuilder<INPUT, OUTPUT> withConfiguration(
+            @Nullable final RoutineConfiguration configuration) {
 
-        return buildRoutine().invokeAsync();
-    }
-
-    @Nonnull
-    @Override
-    public ParameterChannel<INPUT, OUTPUT> invokeParallel() {
-
-        return buildRoutine().invokeParallel();
-    }
-
-    @Nonnull
-    @Override
-    public ParameterChannel<INPUT, OUTPUT> invokeSync() {
-
-        return buildRoutine().invokeSync();
+        super.withConfiguration(configuration);
+        return this;
     }
 }

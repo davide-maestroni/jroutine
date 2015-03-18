@@ -61,7 +61,7 @@ public abstract class TemplateRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
 
     @Nonnull
     @Override
-    public OutputChannel<OUTPUT> callAsync(@Nullable final OutputChannel<INPUT> inputs) {
+    public OutputChannel<OUTPUT> callAsync(@Nullable final OutputChannel<? extends INPUT> inputs) {
 
         return invokeAsync().pass(inputs).result();
     }
@@ -96,7 +96,8 @@ public abstract class TemplateRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
 
     @Nonnull
     @Override
-    public OutputChannel<OUTPUT> callParallel(@Nullable final OutputChannel<INPUT> inputs) {
+    public OutputChannel<OUTPUT> callParallel(
+            @Nullable final OutputChannel<? extends INPUT> inputs) {
 
         return invokeParallel().pass(inputs).result();
     }
@@ -131,7 +132,7 @@ public abstract class TemplateRoutine<INPUT, OUTPUT> implements Routine<INPUT, O
 
     @Nonnull
     @Override
-    public OutputChannel<OUTPUT> callSync(@Nullable final OutputChannel<INPUT> inputs) {
+    public OutputChannel<OUTPUT> callSync(@Nullable final OutputChannel<? extends INPUT> inputs) {
 
         return invokeSync().pass(inputs).result();
     }

@@ -44,7 +44,7 @@ public interface ResultChannel<OUTPUT> extends InputChannel<OUTPUT> {
 
     @Nonnull
     @Override
-    ResultChannel<OUTPUT> pass(@Nullable OutputChannel<OUTPUT> channel);
+    ResultChannel<OUTPUT> pass(@Nullable OutputChannel<? extends OUTPUT> channel);
 
     @Nonnull
     @Override

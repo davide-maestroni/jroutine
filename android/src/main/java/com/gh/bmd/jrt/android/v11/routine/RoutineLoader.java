@@ -326,7 +326,7 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
 
         @Nonnull
         @Override
-        public ResultChannel<OUTPUT> pass(@Nullable final OutputChannel<OUTPUT> channel) {
+        public ResultChannel<OUTPUT> pass(@Nullable final OutputChannel<? extends OUTPUT> channel) {
 
             mStandaloneInput.pass(channel);
             return this;

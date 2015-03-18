@@ -21,10 +21,8 @@ import javax.annotation.Nullable;
 /**
  * Interface defining a builder of routine objects.
  * <p/>
- * The built routine is based on an invocation implementation.<br/>
- * The invocation instance is created only when needed, by passing the specified arguments to the
- * constructor. Note that the arguments objects should be immutable or, at least, never shared
- * inside and outside the routine in order to avoid concurrency issues.
+ * Note that when the invocation is started directly from the builder, a new routine instance is
+ * implicitly created.
  * <p/>
  * Created by davide on 11/11/14.
  *

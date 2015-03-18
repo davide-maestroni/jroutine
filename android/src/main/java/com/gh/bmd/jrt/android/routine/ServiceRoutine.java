@@ -394,7 +394,8 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
         @Nonnull
         @Override
-        public ParameterChannel<INPUT, OUTPUT> pass(@Nullable final OutputChannel<INPUT> channel) {
+        public ParameterChannel<INPUT, OUTPUT> pass(
+                @Nullable final OutputChannel<? extends INPUT> channel) {
 
             bindService();
             mStandaloneParamInput.pass(channel);

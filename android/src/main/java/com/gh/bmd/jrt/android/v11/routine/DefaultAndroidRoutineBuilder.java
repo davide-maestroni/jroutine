@@ -24,10 +24,9 @@ import com.gh.bmd.jrt.android.routine.AndroidRoutine;
 import com.gh.bmd.jrt.android.runner.Runners;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
-import com.gh.bmd.jrt.channel.ParameterChannel;
+import com.gh.bmd.jrt.builder.TemplateRoutineBuilder;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.log.Logger;
-import com.gh.bmd.jrt.routine.TemplateRoutine;
 import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.time.TimeDuration;
 
@@ -48,7 +47,7 @@ import static com.gh.bmd.jrt.common.Reflection.findConstructor;
  * @param <OUTPUT> the output data type.
  */
 @TargetApi(VERSION_CODES.HONEYCOMB)
-class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT>
+class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder<INPUT, OUTPUT>
         implements AndroidRoutineBuilder<INPUT, OUTPUT> {
 
     private final Constructor<? extends AndroidInvocation<INPUT, OUTPUT>> mConstructor;
@@ -58,8 +57,6 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutine<INPUT,
     private CacheStrategy mCacheStrategy;
 
     private ClashResolution mClashResolution;
-
-    private RoutineConfiguration mConfiguration;
 
     private int mInvocationId = AndroidRoutineBuilder.AUTO;
 
@@ -113,7 +110,7 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutine<INPUT,
     @Override
     public AndroidRoutine<INPUT, OUTPUT> buildRoutine() {
 
-        final RoutineConfiguration configuration = RoutineConfiguration.notNull(mConfiguration);
+        final RoutineConfiguration configuration = getConfiguration();
         warn(configuration);
 
         final Builder builder = configuration.builderFrom()
@@ -125,15 +122,6 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutine<INPUT,
         return new DefaultAndroidRoutine<INPUT, OUTPUT>(builder.buildConfiguration(), mContext,
                                                         mInvocationId, mClashResolution,
                                                         mCacheStrategy, mConstructor);
-    }
-
-    @Nonnull
-    @Override
-    public AndroidRoutineBuilder<INPUT, OUTPUT> withConfiguration(
-            @Nullable final RoutineConfiguration configuration) {
-
-        mConfiguration = configuration;
-        return this;
     }
 
     @Nonnull
@@ -162,27 +150,6 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutine<INPUT,
         return this;
     }
 
-    @Nonnull
-    @Override
-    public ParameterChannel<INPUT, OUTPUT> invokeAsync() {
-
-        return buildRoutine().invokeAsync();
-    }
-
-    @Nonnull
-    @Override
-    public ParameterChannel<INPUT, OUTPUT> invokeParallel() {
-
-        return buildRoutine().invokeParallel();
-    }
-
-    @Nonnull
-    @Override
-    public ParameterChannel<INPUT, OUTPUT> invokeSync() {
-
-        return buildRoutine().invokeSync();
-    }
-
     @Override
     public void purge() {
 
@@ -205,6 +172,15 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutine<INPUT,
     public void purge(@Nullable final Iterable<? extends INPUT> inputs) {
 
         buildRoutine().purge(inputs);
+    }
+
+    @Nonnull
+    @Override
+    public AndroidRoutineBuilder<INPUT, OUTPUT> withConfiguration(
+            @Nullable final RoutineConfiguration configuration) {
+
+        super.withConfiguration(configuration);
+        return this;
     }
 
     /**

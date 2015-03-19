@@ -718,7 +718,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
                 throw new IllegalArgumentException(
                         "an async input of type " + PassingMode.COLLECTION
-                                + " must be bound to an array or a super class of " + listElement);
+                                + " must be bound to an array or a superclass of " + listElement);
             }
 
             if (length > 1) {
@@ -816,7 +816,7 @@ public class RoutineProcessor extends AbstractProcessor {
             if (!typeUtils.isAssignable(outputChannelElement.asType(), returnTypeErasure)) {
 
                 throw new IllegalArgumentException("an async output of type " + PassingMode.OBJECT
-                                                           + " must be a super class of "
+                                                           + " must be a superclass of "
                                                            + outputChannelElement);
             }
 
@@ -825,7 +825,7 @@ public class RoutineProcessor extends AbstractProcessor {
             if (!typeUtils.isAssignable(outputChannelElement.asType(), returnTypeErasure)) {
 
                 throw new IllegalArgumentException("an async output of type " + PassingMode.OBJECT
-                                                           + " must be a super class of "
+                                                           + " must be a superclass of "
                                                            + outputChannelElement);
             }
 
@@ -844,7 +844,7 @@ public class RoutineProcessor extends AbstractProcessor {
                     listElement.asType(), returnTypeErasure)) {
 
                 throw new IllegalArgumentException("an async output of type " + PassingMode.PARALLEL
-                                                           + " must be an array or a super class " +
+                                                           + " must be an array or a superclass " +
                                                            "of " + listElement);
             }
 

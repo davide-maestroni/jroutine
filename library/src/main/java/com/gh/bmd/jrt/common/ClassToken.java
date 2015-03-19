@@ -186,10 +186,10 @@ public abstract class ClassToken<TYPE> {
     }
 
     /**
-     * Checks if this token raw class is equal to or is a super class of the specified one.
+     * Checks if this token raw class is equal to or is a superclass of the specified one.
      *
      * @param other the class token to compare.
-     * @return whether this token raw class is equal to or is a super class.
+     * @return whether this token raw class is equal to or is a superclass.
      * @throws java.lang.IllegalStateException if this class does not correctly extend a class
      *                                         token.
      * @throws java.lang.NullPointerException  if the other class token is null.

@@ -978,7 +978,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     }
 
     /**
-     * Default implementation of an routine output channel.
+     * Default implementation of a routine output channel.
      */
     private class DefaultOutputChannel implements OutputChannel<OUTPUT> {
 
@@ -1332,7 +1332,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     }
 
     /**
-     * Default implementation of an output consumer pushing the consume data into the output
+     * Default implementation of an output consumer pushing the data to consume into the output
      * channel queue.
      */
     private class DefaultOutputConsumer implements OutputConsumer<OUTPUT> {

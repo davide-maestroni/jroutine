@@ -66,7 +66,8 @@ public interface ClassRoutineBuilder extends SharableBuilder {
      * @throws java.lang.NullPointerException     if one of the parameter is null.
      */
     @Nonnull
-    Routine<Object, Object> method(@Nonnull String name, @Nonnull Class<?>... parameterTypes);
+    <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull String name,
+            @Nonnull Class<?>... parameterTypes);
 
     /**
      * Returns a routine used to call the specified method.
@@ -95,6 +96,9 @@ public interface ClassRoutineBuilder extends SharableBuilder {
     @Nonnull
     ClassRoutineBuilder withConfiguration(@Nullable RoutineConfiguration configuration);
 
+    /**
+     * {@inheritDoc}
+     */
     @Nonnull
     ClassRoutineBuilder withShareGroup(@Nullable String group);
 }

@@ -682,7 +682,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
     }
 
     /**
-     * Default implementation of an output consumer pushing the consume data into the input
+     * Default implementation of an output consumer pushing the data to consume into the input
      * channel queue.
      */
     private class DefaultOutputConsumer implements OutputConsumer<INPUT> {

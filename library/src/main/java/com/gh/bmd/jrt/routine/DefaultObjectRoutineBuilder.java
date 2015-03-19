@@ -229,7 +229,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
                     throw new IllegalArgumentException(
                             "an async input of type " + PassingMode.PARALLEL +
                                     " cannot be applied to a method taking " + length +
-                                    " input parameter");
+                                    " input parameters");
 
                 }
 
@@ -238,7 +238,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
             } else {
 
                 throw new IllegalArgumentException(
-                        "cannot automatically choose an async type for an output of type: "
+                        "cannot automatically choose a passing mode for an output of type: "
                                 + parameterType.getCanonicalName());
             }
 
@@ -247,8 +247,8 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
             if (!OutputChannel.class.isAssignableFrom(parameterType)) {
 
                 throw new IllegalArgumentException(
-                        "an async input of type " + PassingMode.OBJECT + " must extends an "
-                                + OutputChannel.class.getCanonicalName());
+                        "an async input with passing mode " + PassingMode.OBJECT
+                                + " must extends an " + OutputChannel.class.getCanonicalName());
             }
 
         } else if (passingMode == PassingMode.COLLECTION) {
@@ -256,40 +256,41 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
             if (!OutputChannel.class.isAssignableFrom(parameterType)) {
 
                 throw new IllegalArgumentException(
-                        "an async input of type " + PassingMode.COLLECTION + " must extends an "
-                                + OutputChannel.class.getCanonicalName());
+                        "an async input with passing mode " + PassingMode.COLLECTION
+                                + " must extends an " + OutputChannel.class.getCanonicalName());
             }
 
             if (!paramClass.isArray() && !paramClass.isAssignableFrom(List.class)) {
 
                 throw new IllegalArgumentException(
-                        "an async input of type " + PassingMode.COLLECTION
-                                + " must be bound to an array or a super class of "
+                        "an async input with passing mode " + PassingMode.COLLECTION
+                                + " must be bound to an array or a superclass of "
                                 + List.class.getCanonicalName());
             }
 
             if (length > 1) {
 
                 throw new IllegalArgumentException(
-                        "an async input of type " + PassingMode.COLLECTION +
+                        "an async input with passing mode " + PassingMode.COLLECTION +
                                 " cannot be applied to a method taking " + length
-                                + " input parameter");
+                                + " input parameters");
             }
 
         } else { // AsyncType.PARALLEL
 
             if (!isArray && !Iterable.class.isAssignableFrom(parameterType)) {
 
-                throw new IllegalArgumentException("an async input of type " + PassingMode.PARALLEL
-                                                           + " must be an array or implement an "
-                                                           + Iterable.class.getCanonicalName());
+                throw new IllegalArgumentException(
+                        "an async input with passing mode " + PassingMode.PARALLEL
+                                + " must be an array or implement an "
+                                + Iterable.class.getCanonicalName());
             }
 
             if (isArray && !boxingClass(paramClass).isAssignableFrom(
                     boxingClass(parameterType.getComponentType()))) {
 
                 throw new IllegalArgumentException(
-                        "the async input array of type " + PassingMode.PARALLEL
+                        "the async input array with passing mode " + PassingMode.PARALLEL
                                 + " does not match the bound type: "
                                 + paramClass.getCanonicalName());
             }
@@ -297,9 +298,9 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
             if (length > 1) {
 
                 throw new IllegalArgumentException(
-                        "an async input of type " + PassingMode.PARALLEL +
+                        "an async input with passing mode " + PassingMode.PARALLEL +
                                 " cannot be applied to a method taking " + length
-                                + " input parameter");
+                                + " input parameters");
             }
         }
 
@@ -322,7 +323,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
                         returnType.getComponentType()).isAssignableFrom(boxingClass(returnClass))) {
 
                     throw new IllegalArgumentException(
-                            "the async output array of type " + PassingMode.PARALLEL
+                            "the async output array with passing mode " + PassingMode.PARALLEL
                                     + " does not match the bound type: "
                                     + returnClass.getCanonicalName());
                 }
@@ -345,7 +346,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
             } else {
 
                 throw new IllegalArgumentException(
-                        "cannot automatically choose an async type for an input of type: "
+                        "cannot automatically choose a passing mode for an input of type: "
                                 + returnType.getCanonicalName());
             }
 
@@ -354,9 +355,9 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
             if (!returnType.isAssignableFrom(OutputChannel.class)) {
 
                 final String channelClassName = OutputChannel.class.getCanonicalName();
-                throw new IllegalArgumentException("an async output of type " + PassingMode.OBJECT
-                                                           + " must be a super class of "
-                                                           + channelClassName);
+                throw new IllegalArgumentException(
+                        "an async output with passing mode " + PassingMode.OBJECT
+                                + " must be a superclass of " + channelClassName);
             }
 
         } else if (passingMode == PassingMode.COLLECTION) {
@@ -364,9 +365,9 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
             if (!returnType.isAssignableFrom(OutputChannel.class)) {
 
                 final String channelClassName = OutputChannel.class.getCanonicalName();
-                throw new IllegalArgumentException("an async output of type " + PassingMode.OBJECT
-                                                           + " must be a super class of "
-                                                           + channelClassName);
+                throw new IllegalArgumentException(
+                        "an async output with passing mode " + PassingMode.OBJECT
+                                + " must be a superclass of " + channelClassName);
             }
 
             final Class<?> returnClass = annotation.value();
@@ -374,7 +375,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
             if (!returnClass.isArray() && !Iterable.class.isAssignableFrom(returnClass)) {
 
                 throw new IllegalArgumentException(
-                        "an async output of type " + PassingMode.COLLECTION
+                        "an async output with passing mode " + PassingMode.COLLECTION
                                 + " must be bound to an array or a type implementing an "
                                 + Iterable.class.getCanonicalName());
             }
@@ -383,9 +384,10 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
             if (!returnType.isArray() && !returnType.isAssignableFrom(List.class)) {
 
-                throw new IllegalArgumentException("an async output of type " + PassingMode.PARALLEL
-                                                           + " must be an array or a super class " +
-                                                           "of " + List.class.getCanonicalName());
+                throw new IllegalArgumentException(
+                        "an async output with passing mode " + PassingMode.PARALLEL
+                                + " must be an array or a superclass " +
+                                "of " + List.class.getCanonicalName());
             }
 
             final Class<?> returnClass = annotation.value();
@@ -394,7 +396,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
                     returnType.getComponentType()).isAssignableFrom(boxingClass(returnClass))) {
 
                 throw new IllegalArgumentException(
-                        "the async output array of type " + PassingMode.PARALLEL
+                        "the async output array with passing mode " + PassingMode.PARALLEL
                                 + " does not match the bound type: "
                                 + returnClass.getCanonicalName());
             }

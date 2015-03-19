@@ -87,6 +87,7 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
      *
      * @return the execution.
      */
+    @Nonnull
     public Execution abort() {
 
         synchronized (mAbortMutex) {

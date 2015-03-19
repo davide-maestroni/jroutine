@@ -19,7 +19,7 @@ import com.gh.bmd.jrt.invocation.InvocationFactory;
 import javax.annotation.Nonnull;
 
 /**
- * Class implementing a builder of routine objects based on an invocation class token.
+ * Class implementing a builder of routine objects based on an invocation factory.
  * <p/>
  * Created by davide on 9/21/14.
  *
@@ -34,7 +34,7 @@ class DefaultRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder<INPUT,
      * Constructor.
      *
      * @param factory the invocation factory.
-     * @throws java.lang.NullPointerException if the class token is null.
+     * @throws java.lang.NullPointerException if the factory is null.
      */
     @SuppressWarnings("ConstantConditions")
     DefaultRoutineBuilder(@Nonnull final InvocationFactory<INPUT, OUTPUT> factory) {

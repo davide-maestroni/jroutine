@@ -238,7 +238,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
             } else {
 
                 throw new IllegalArgumentException(
-                        "cannot automatically chose and async type for an output of type: "
+                        "cannot automatically choose an async type for an output of type: "
                                 + parameterType.getCanonicalName());
             }
 
@@ -345,7 +345,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
             } else {
 
                 throw new IllegalArgumentException(
-                        "cannot automatically chose and async type for an input of type: "
+                        "cannot automatically choose an async type for an input of type: "
                                 + returnType.getCanonicalName());
             }
 

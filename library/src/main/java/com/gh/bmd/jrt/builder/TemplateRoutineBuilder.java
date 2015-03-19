@@ -60,6 +60,11 @@ public abstract class TemplateRoutineBuilder<INPUT, OUTPUT> extends TemplateRout
         return this;
     }
 
+    /**
+     * Returns the routine configuration.
+     *
+     * @return the configuration.
+     */
     @Nonnull
     protected RoutineConfiguration getConfiguration() {
 

@@ -42,7 +42,7 @@ public interface AndroidChannelBuilder extends ConfigurableBuilder {
 
     /**
      * Tells the builder how to cache the invocation result after its completion. A null value means
-     * that it is up to the framework to chose a default strategy.
+     * that it is up to the framework to choose a default strategy.
      *
      * @param cacheStrategy the cache strategy.
      * @return this builder.

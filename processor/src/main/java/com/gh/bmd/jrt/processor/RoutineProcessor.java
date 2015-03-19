@@ -691,7 +691,7 @@ public class RoutineProcessor extends AbstractProcessor {
             } else {
 
                 throw new IllegalArgumentException(
-                        "cannot automatically chose and async type for an output of type: "
+                        "cannot automatically choose an async type for an output of type: "
                                 + targetParameter);
             }
 
@@ -807,7 +807,7 @@ public class RoutineProcessor extends AbstractProcessor {
             } else {
 
                 throw new IllegalArgumentException(
-                        "cannot automatically chose and async type for an input of type: "
+                        "cannot automatically choose an async type for an input of type: "
                                 + returnType);
             }
 

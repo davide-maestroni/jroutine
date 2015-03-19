@@ -39,6 +39,9 @@ public interface RoutineBuilder<INPUT, OUTPUT> extends ConfigurableBuilder, Rout
     @Nonnull
     Routine<INPUT, OUTPUT> buildRoutine();
 
+    /**
+     * {@inheritDoc}
+     */
     @Nonnull
     RoutineBuilder<INPUT, OUTPUT> withConfiguration(@Nullable RoutineConfiguration configuration);
 }

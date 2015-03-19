@@ -65,7 +65,7 @@ public interface AndroidRoutineBuilder<INPUT, OUTPUT>
     /**
      * Tells the builder how to resolve clashes of invocations. A clash happens when an invocation
      * of the same type and with the same ID is still running. A null value means that it is up to
-     * the framework to chose a default resolution type.
+     * the framework to choose a default resolution type.
      *
      * @param resolution the type of resolution.
      * @return this builder.
@@ -75,7 +75,7 @@ public interface AndroidRoutineBuilder<INPUT, OUTPUT>
 
     /**
      * Tells the builder how to cache the invocation result after its completion. A null value means
-     * that it is up to the framework to chose a default strategy.
+     * that it is up to the framework to choose a default strategy.
      *
      * @param cacheStrategy the cache type.
      * @return this builder.

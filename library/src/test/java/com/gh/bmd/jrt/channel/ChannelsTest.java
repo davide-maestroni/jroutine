@@ -27,7 +27,7 @@ import java.util.Arrays;
 
 import javax.annotation.Nonnull;
 
-import static com.gh.bmd.jrt.builder.RoutineConfiguration.withInputOrder;
+import static com.gh.bmd.jrt.builder.RoutineConfiguration.withOutputOrder;
 import static com.gh.bmd.jrt.time.TimeDuration.millis;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -42,7 +42,7 @@ public class ChannelsTest extends TestCase {
     public void testSelect() {
 
         final StandaloneChannelBuilder builder =
-                JRoutine.standalone().withConfiguration(withInputOrder(OrderType.PASSING));
+                JRoutine.standalone().withConfiguration(withOutputOrder(OrderType.PASSING));
         final StandaloneChannel<String> channel1 = builder.buildChannel();
         final StandaloneChannel<String> channel2 = builder.buildChannel();
         final StandaloneChannel<String> channel3 = builder.buildChannel();

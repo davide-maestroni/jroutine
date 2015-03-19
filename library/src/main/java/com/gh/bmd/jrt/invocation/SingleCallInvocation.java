@@ -25,8 +25,7 @@ import javax.annotation.Nonnull;
  * single method, which gets called only when all the inputs are available.
  * <p/>
  * The implementing class may additionally override the invocation methods to specifically handle
- * the object lifecycle. Note anyway that the super class must be invoked in order to properly
- * work.
+ * the object lifecycle. Note anyway that the superclass must be invoked in order to properly work.
  * <p/>
  * Created by davide on 9/7/14.
  *

@@ -22,9 +22,9 @@ import javax.annotation.Nonnull;
  */
 public class Logs {
 
-    private static final SystemLog sSystemLog = new SystemLog();
+    private static final NullLog sNullLog = new NullLog();
 
-    private static volatile NullLog sNullLog = new NullLog();
+    private static final SystemLog sSystemLog = new SystemLog();
 
     /**
      * Avoid direct instantiation.

@@ -41,13 +41,13 @@ public class Invocations {
     }
 
     /**
-     * Builds an returns a new invocation factory creating instances of the specified class.
+     * Builds and returns a new invocation factory creating instances of the specified class.
      * <p/>
      * Note that inner and anonymous classes can be passed as well. Remember however that Java
      * creates synthetic constructor for such classes, so be sure to specify the correct arguments
-     * to guarantee proper instantiation. In fact, inner classes always have the outer instance as
-     * first constructor parameter, and anonymous classes has both the outer instance and all the
-     * variables captured in the closure.
+     * to guarantee proper instantiation (see {@link #withArgs(Object...)}). In fact, inner classes
+     * always have the outer instance as first constructor parameter, and anonymous classes has both
+     * the outer instance and all the variables captured in the closure.
      *
      * @param invocationClass the invocation class.
      * @param <INPUT>         the input data type.
@@ -65,13 +65,14 @@ public class Invocations {
     }
 
     /**
-     * Builds an returns a new invocation factory creating instances of the specified class token.
+     * Builds and returns a new invocation factory creating instances of the specified class token.
      * <p/>
      * Note that class tokens of inner and anonymous class can be passed as well. Remember however
      * that Java creates synthetic constructor for such classes, so be sure to specify the correct
-     * arguments to guarantee proper instantiation. In fact, inner classes always have the outer
-     * instance as first constructor parameter, and anonymous classes has both the outer instance
-     * and all the variables captured in the closure.
+     * arguments to guarantee proper instantiation (see {@link #withArgs(Object...)}). In fact,
+     * inner
+     * classes always have the outer instance as first constructor parameter, and anonymous classes
+     * has both the outer instance and all the variables captured in the closure.
      *
      * @param invocationToken the invocation class token.
      * @param <INPUT>         the input data type.
@@ -90,7 +91,7 @@ public class Invocations {
     /**
      * Creates and returns a factory builder passing the specified arguments to the invocation
      * constructor.<br/>
-     * Note that, in case no constructor taking the specified arguments as parameter is found, an
+     * Note that, in case no constructor taking the specified arguments as parameters is found, an
      * exception will be thrown.
      *
      * @param args the constructor arguments.
@@ -232,7 +233,7 @@ public class Invocations {
         }
 
         /**
-         * Builds an returns a new invocation factory creating instances of the specified class
+         * Builds and returns a new invocation factory creating instances of the specified class
          * token.
          * <p/>
          * Note that class tokens of inner and anonymous class can be passed as well. Remember
@@ -256,7 +257,7 @@ public class Invocations {
         }
 
         /**
-         * Builds an returns a new invocation factory creating instances of the specified class.
+         * Builds and returns a new invocation factory creating instances of the specified class.
          * <p/>
          * Note that inner and anonymous classes can be passed as well. Remember however that Java
          * creates synthetic constructor for such classes, so be sure to specify the correct

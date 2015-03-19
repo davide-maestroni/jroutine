@@ -288,7 +288,7 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
             }
 
             final Object referent = get();
-            return (referent == that.get()) && ((referent != null) || (this == that));
+            return (referent != null) && (referent == that.get());
         }
     }
 

@@ -24,9 +24,9 @@ import javax.annotation.Nullable;
 /**
  * Interface defining a standalone channel.
  * <p/>
- * An standalone channel is useful to make other asynchronous tasks communicate with a routine.<br/>
+ * A standalone channel is useful to make other asynchronous tasks communicate with a routine.<br/>
  * The channel output can be passed to a routine input channel in order to feed it with data coming
- * asynchronously from another source. Note however, that in both cases the
+ * asynchronously from other sources. Note however, that in both cases the
  * <b><code>close()</code></b> method must be called to correctly terminate the invocation
  * lifecycle.
  * <p/>
@@ -59,24 +59,45 @@ public interface StandaloneChannel<DATA> {
      */
     interface StandaloneInput<INPUT> extends InputChannel<INPUT> {
 
+        /**
+         * {@inheritDoc}
+         */
         @Nonnull
         StandaloneInput<INPUT> after(@Nonnull TimeDuration delay);
 
+        /**
+         * {@inheritDoc}
+         */
         @Nonnull
         StandaloneInput<INPUT> after(long delay, @Nonnull TimeUnit timeUnit);
 
+        /**
+         * {@inheritDoc}
+         */
         @Nonnull
         StandaloneInput<INPUT> now();
 
+        /**
+         * {@inheritDoc}
+         */
         @Nonnull
         StandaloneInput<INPUT> pass(@Nullable OutputChannel<? extends INPUT> channel);
 
+        /**
+         * {@inheritDoc}
+         */
         @Nonnull
         StandaloneInput<INPUT> pass(@Nullable Iterable<? extends INPUT> inputs);
 
+        /**
+         * {@inheritDoc}
+         */
         @Nonnull
         StandaloneInput<INPUT> pass(@Nullable INPUT input);
 
+        /**
+         * {@inheritDoc}
+         */
         @Nonnull
         StandaloneInput<INPUT> pass(@Nullable INPUT... inputs);
 
@@ -96,33 +117,63 @@ public interface StandaloneChannel<DATA> {
      */
     interface StandaloneOutput<OUTPUT> extends OutputChannel<OUTPUT> {
 
+        /**
+         * {@inheritDoc}
+         */
         @Nonnull
         StandaloneOutput<OUTPUT> afterMax(@Nonnull TimeDuration timeout);
 
+        /**
+         * {@inheritDoc}
+         */
         @Nonnull
         StandaloneOutput<OUTPUT> afterMax(long timeout, @Nonnull TimeUnit timeUnit);
 
+        /**
+         * {@inheritDoc}
+         */
         @Nonnull
         StandaloneOutput<OUTPUT> bind(@Nonnull OutputConsumer<? super OUTPUT> consumer);
 
+        /**
+         * {@inheritDoc}
+         */
         @Nonnull
         StandaloneOutput<OUTPUT> eventually();
 
+        /**
+         * {@inheritDoc}
+         */
         @Nonnull
         StandaloneOutput<OUTPUT> eventuallyAbort();
 
+        /**
+         * {@inheritDoc}
+         */
         @Nonnull
         StandaloneOutput<OUTPUT> eventuallyDeadlock();
 
+        /**
+         * {@inheritDoc}
+         */
         @Nonnull
         StandaloneOutput<OUTPUT> eventuallyExit();
 
+        /**
+         * {@inheritDoc}
+         */
         @Nonnull
         StandaloneOutput<OUTPUT> immediately();
 
+        /**
+         * {@inheritDoc}
+         */
         @Nonnull
         StandaloneOutput<OUTPUT> readAllInto(@Nonnull Collection<? super OUTPUT> results);
 
+        /**
+         * {@inheritDoc}
+         */
         @Nonnull
         StandaloneOutput<OUTPUT> unbind(@Nullable OutputConsumer<? super OUTPUT> consumer);
     }

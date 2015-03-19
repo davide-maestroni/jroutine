@@ -31,24 +31,45 @@ import javax.annotation.Nullable;
  */
 public interface ParameterChannel<INPUT, OUTPUT> extends InputChannel<INPUT> {
 
+    /**
+     * {@inheritDoc}
+     */
     @Nonnull
     ParameterChannel<INPUT, OUTPUT> after(@Nonnull TimeDuration delay);
 
+    /**
+     * {@inheritDoc}
+     */
     @Nonnull
     ParameterChannel<INPUT, OUTPUT> after(long delay, @Nonnull TimeUnit timeUnit);
 
+    /**
+     * {@inheritDoc}
+     */
     @Nonnull
     ParameterChannel<INPUT, OUTPUT> now();
 
+    /**
+     * {@inheritDoc}
+     */
     @Nonnull
     ParameterChannel<INPUT, OUTPUT> pass(@Nullable OutputChannel<? extends INPUT> channel);
 
+    /**
+     * {@inheritDoc}
+     */
     @Nonnull
     ParameterChannel<INPUT, OUTPUT> pass(@Nullable Iterable<? extends INPUT> inputs);
 
+    /**
+     * {@inheritDoc}
+     */
     @Nonnull
     ParameterChannel<INPUT, OUTPUT> pass(@Nullable INPUT input);
 
+    /**
+     * {@inheritDoc}
+     */
     @Nonnull
     ParameterChannel<INPUT, OUTPUT> pass(@Nullable INPUT... inputs);
 

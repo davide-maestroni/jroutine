@@ -81,7 +81,7 @@ public interface Invocation<INPUT, OUTPUT> {
 
     /**
      * Called when the routine execution is aborted.<br/>
-     * This method can be called at any time after the invocation initialization.
+     * This method may be called at any time after the invocation initialization.
      *
      * @param reason the reason of the abortion.
      */

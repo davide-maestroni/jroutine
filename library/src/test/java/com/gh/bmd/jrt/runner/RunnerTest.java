@@ -270,7 +270,6 @@ public class RunnerTest extends TestCase {
             return mIsPassed;
         }
 
-        @Override
         public void run() {
 
             // the JVM might not have nanosecond precision...

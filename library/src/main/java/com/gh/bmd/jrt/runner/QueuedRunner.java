@@ -33,7 +33,6 @@ import javax.annotation.Nonnull;
  */
 class QueuedRunner implements Runner {
 
-    @Override
     public void run(@Nonnull final Execution execution, final long delay,
             @Nonnull final TimeUnit timeUnit) {
 

@@ -60,31 +60,24 @@ public interface StandaloneChannel<DATA> {
     interface StandaloneInput<INPUT> extends InputChannel<INPUT> {
 
         @Nonnull
-        @Override
         StandaloneInput<INPUT> after(@Nonnull TimeDuration delay);
 
         @Nonnull
-        @Override
         StandaloneInput<INPUT> after(long delay, @Nonnull TimeUnit timeUnit);
 
         @Nonnull
-        @Override
         StandaloneInput<INPUT> now();
 
         @Nonnull
-        @Override
         StandaloneInput<INPUT> pass(@Nullable OutputChannel<? extends INPUT> channel);
 
         @Nonnull
-        @Override
         StandaloneInput<INPUT> pass(@Nullable Iterable<? extends INPUT> inputs);
 
         @Nonnull
-        @Override
         StandaloneInput<INPUT> pass(@Nullable INPUT input);
 
         @Nonnull
-        @Override
         StandaloneInput<INPUT> pass(@Nullable INPUT... inputs);
 
         /**
@@ -104,43 +97,33 @@ public interface StandaloneChannel<DATA> {
     interface StandaloneOutput<OUTPUT> extends OutputChannel<OUTPUT> {
 
         @Nonnull
-        @Override
         StandaloneOutput<OUTPUT> afterMax(@Nonnull TimeDuration timeout);
 
         @Nonnull
-        @Override
         StandaloneOutput<OUTPUT> afterMax(long timeout, @Nonnull TimeUnit timeUnit);
 
         @Nonnull
-        @Override
         StandaloneOutput<OUTPUT> bind(@Nonnull OutputConsumer<? super OUTPUT> consumer);
 
         @Nonnull
-        @Override
         StandaloneOutput<OUTPUT> eventually();
 
         @Nonnull
-        @Override
         StandaloneOutput<OUTPUT> eventuallyAbort();
 
         @Nonnull
-        @Override
         StandaloneOutput<OUTPUT> eventuallyDeadlock();
 
         @Nonnull
-        @Override
         StandaloneOutput<OUTPUT> eventuallyExit();
 
         @Nonnull
-        @Override
         StandaloneOutput<OUTPUT> immediately();
 
         @Nonnull
-        @Override
         StandaloneOutput<OUTPUT> readAllInto(@Nonnull Collection<? super OUTPUT> results);
 
         @Nonnull
-        @Override
         StandaloneOutput<OUTPUT> unbind(@Nullable OutputConsumer<? super OUTPUT> consumer);
     }
 }

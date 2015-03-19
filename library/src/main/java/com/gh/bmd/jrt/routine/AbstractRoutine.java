@@ -84,7 +84,6 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
     private final Check mIsInvocationAvailable = new Check() {
 
-        @Override
         public boolean isTrue() {
 
             return mRunningCount < mMaxInvocations;
@@ -136,14 +135,12 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
     }
 
     @Nonnull
-    @Override
     public ParameterChannel<INPUT, OUTPUT> invokeAsync() {
 
         return invoke(true);
     }
 
     @Nonnull
-    @Override
     public ParameterChannel<INPUT, OUTPUT> invokeParallel() {
 
         mLogger.dbg("invoking routine: parallel");
@@ -167,7 +164,6 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
     }
 
     @Nonnull
-    @Override
     public ParameterChannel<INPUT, OUTPUT> invokeSync() {
 
         return invoke(false);
@@ -335,7 +331,6 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
         }
 
         @Nonnull
-        @Override
         public Invocation<INPUT, OUTPUT> create() {
 
             synchronized (mMutex) {
@@ -397,7 +392,6 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
             }
         }
 
-        @Override
         @SuppressFBWarnings(value = "NO_NOTIFY_NOT_NOTIFYALL",
                 justification = "only one invocation is released")
         public void discard(@Nonnull final Invocation<INPUT, OUTPUT> invocation) {
@@ -425,7 +419,6 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
             }
         }
 
-        @Override
         @SuppressFBWarnings(value = "NO_NOTIFY_NOT_NOTIFYALL",
                 justification = "only one invocation is released")
         public void recycle(@Nonnull final Invocation<INPUT, OUTPUT> invocation) {

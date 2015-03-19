@@ -89,7 +89,6 @@ public class Channels {
 
         return JRoutine.onFunction(new Function1<OUTPUT, Selectable<OUTPUT>>() {
 
-            @Override
             public Selectable<OUTPUT> call(final OUTPUT param1) {
 
                 return new Selectable<OUTPUT>(param1, channel, index);
@@ -103,7 +102,7 @@ public class Channels {
      * @param <DATA> the data type.
      */
     @SuppressFBWarnings(value = "URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD",
-            justification = "this is an immutable record class")
+            justification = "this is an immutable data class")
     public static class Selectable<DATA> {
 
         /**

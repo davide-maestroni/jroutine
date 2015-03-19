@@ -799,7 +799,6 @@ public class RoutineService extends Service {
             mOutMessenger = messenger;
         }
 
-        @Override
         public void onComplete() {
 
             mInvocation.recycle();
@@ -814,7 +813,6 @@ public class RoutineService extends Service {
             }
         }
 
-        @Override
         public void onError(@Nullable final Throwable error) {
 
             mInvocation.recycle();
@@ -832,7 +830,6 @@ public class RoutineService extends Service {
             }
         }
 
-        @Override
         public void onOutput(final Object o) {
 
             final Message message = Message.obtain(null, RoutineService.MSG_DATA);

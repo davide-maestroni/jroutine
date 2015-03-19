@@ -95,7 +95,6 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
     }
 
     @Nonnull
-    @Override
     public <OUTPUT> OutputChannel<OUTPUT> buildChannel() {
 
         final Object context = mContext.get();
@@ -131,14 +130,12 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
     }
 
     @Nonnull
-    @Override
     public AndroidChannelBuilder onComplete(@Nullable final CacheStrategy cacheStrategy) {
 
         mCacheStrategy = cacheStrategy;
         return this;
     }
 
-    @Override
     public void purge() {
 
         final WeakReference<Object> context = mContext;
@@ -149,7 +146,6 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
         }
     }
 
-    @Override
     public void purge(@Nullable final Object input) {
 
         final WeakReference<Object> context = mContext;
@@ -162,7 +158,6 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
         }
     }
 
-    @Override
     public void purge(@Nullable final Object... inputs) {
 
         final WeakReference<Object> context = mContext;
@@ -177,7 +172,6 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
         }
     }
 
-    @Override
     public void purge(@Nullable final Iterable<Object> inputs) {
 
         final WeakReference<Object> context = mContext;
@@ -207,7 +201,6 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
     }
 
     @Nonnull
-    @Override
     public AndroidChannelBuilder withConfiguration(
             @Nullable final RoutineConfiguration configuration) {
 
@@ -246,7 +239,6 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
             mId = id;
         }
 
-        @Override
         public void run() {
 
             final Object context = mContext.get();
@@ -284,7 +276,6 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
             mInputs = inputs;
         }
 
-        @Override
         public void run() {
 
             final Object context = mContext.get();

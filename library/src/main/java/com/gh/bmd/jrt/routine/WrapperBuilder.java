@@ -52,10 +52,8 @@ public interface WrapperBuilder<TYPE> extends SharableBuilder {
      * @return this builder.
      */
     @Nonnull
-    @Override
     WrapperBuilder<TYPE> withConfiguration(@Nullable RoutineConfiguration configuration);
 
     @Nonnull
-    @Override
     WrapperBuilder<TYPE> withShareGroup(@Nullable String group);
 }

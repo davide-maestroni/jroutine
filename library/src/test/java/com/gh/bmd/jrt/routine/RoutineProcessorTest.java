@@ -248,21 +248,18 @@ public class RoutineProcessorTest extends TestCase {
 
         private int mWrnCount;
 
-        @Override
         public void dbg(@Nonnull final List<Object> contexts, @Nullable final String message,
                 @Nullable final Throwable throwable) {
 
             ++mDgbCount;
         }
 
-        @Override
         public void err(@Nonnull final List<Object> contexts, @Nullable final String message,
                 @Nullable final Throwable throwable) {
 
             ++mErrCount;
         }
 
-        @Override
         public void wrn(@Nonnull final List<Object> contexts, @Nullable final String message,
                 @Nullable final Throwable throwable) {
 

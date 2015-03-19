@@ -83,6 +83,5 @@ public interface AndroidChannelBuilder extends ConfigurableBuilder {
      * @return this builder.
      */
     @Nonnull
-    @Override
     AndroidChannelBuilder withConfiguration(@Nullable RoutineConfiguration configuration);
 }

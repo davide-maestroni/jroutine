@@ -28,7 +28,7 @@ import javax.annotation.Nullable;
  *
  * @param <E> the element type.
  */
-interface NestedQueue<E> {
+interface NestedQueue<E> { //TODO: builder?
 
     /**
      * Adds the specified element to the queue.

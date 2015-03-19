@@ -73,7 +73,6 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
     }
 
     @Nonnull
-    @Override
     public Routine<INPUT, OUTPUT> buildRoutine() {
 
         return new ServiceRoutine<INPUT, OUTPUT>(mContext, mServiceClass, mLooper, mInvocationClass,
@@ -81,7 +80,6 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
     }
 
     @Nonnull
-    @Override
     public ServiceRoutineBuilder<INPUT, OUTPUT> dispatchingOn(@Nullable final Looper looper) {
 
         mLooper = looper;
@@ -89,7 +87,6 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
     }
 
     @Nonnull
-    @Override
     public ServiceRoutineBuilder<INPUT, OUTPUT> withLogClass(
             @Nullable final Class<? extends Log> logClass) {
 
@@ -99,7 +96,6 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
     }
 
     @Nonnull
-    @Override
     public ServiceRoutineBuilder<INPUT, OUTPUT> withRunnerClass(
             @Nullable final Class<? extends Runner> runnerClass) {
 
@@ -108,7 +104,6 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
     }
 
     @Nonnull
-    @Override
     public ServiceRoutineBuilder<INPUT, OUTPUT> withServiceClass(
             @Nullable final Class<? extends RoutineService> serviceClass) {
 

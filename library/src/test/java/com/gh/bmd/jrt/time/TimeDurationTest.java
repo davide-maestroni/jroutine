@@ -424,7 +424,6 @@ public class TimeDurationTest extends TestCase {
 
             TimeDuration.seconds(1).waitTrue(null, new Check() {
 
-                @Override
                 public boolean isTrue() {
 
                     return false;
@@ -716,7 +715,6 @@ public class TimeDurationTest extends TestCase {
 
         final Check alwaysFalse = new Check() {
 
-            @Override
             public boolean isTrue() {
 
                 return false;
@@ -724,7 +722,6 @@ public class TimeDurationTest extends TestCase {
         };
         final Check alwaysTrue = new Check() {
 
-            @Override
             public boolean isTrue() {
 
                 return true;
@@ -808,7 +805,6 @@ public class TimeDurationTest extends TestCase {
 
                 private boolean mToggle = true;
 
-                @Override
                 public boolean isTrue() {
 
                     return (mToggle = !mToggle);

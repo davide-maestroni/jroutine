@@ -65,7 +65,6 @@ public class JRoutineActivityRotationTest
 
         getActivity().runOnUiThread(new Runnable() {
 
-            @Override
             public void run() {
 
                 getActivity().recreate();
@@ -100,7 +99,6 @@ public class JRoutineActivityRotationTest
 
         getActivity().runOnUiThread(new Runnable() {
 
-            @Override
             public void run() {
 
                 getActivity().recreate();
@@ -140,7 +138,6 @@ public class JRoutineActivityRotationTest
 
         getActivity().runOnUiThread(new Runnable() {
 
-            @Override
             public void run() {
 
                 getActivity().recreate();

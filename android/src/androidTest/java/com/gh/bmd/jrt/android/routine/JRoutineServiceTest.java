@@ -337,21 +337,18 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
 
         private int mWrnCount;
 
-        @Override
         public void dbg(@Nonnull final List<Object> contexts, @Nullable final String message,
                 @Nullable final Throwable throwable) {
 
             ++mDgbCount;
         }
 
-        @Override
         public void err(@Nonnull final List<Object> contexts, @Nullable final String message,
                 @Nullable final Throwable throwable) {
 
             ++mErrCount;
         }
 
-        @Override
         public void wrn(@Nonnull final List<Object> contexts, @Nullable final String message,
                 @Nullable final Throwable throwable) {
 
@@ -378,27 +375,23 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
 
         public static final Creator<Data> CREATOR = new Creator<Data>() {
 
-            @Override
             public Data createFromParcel(@Nonnull final Parcel source) {
 
                 return new Data();
             }
 
             @Nonnull
-            @Override
             public Data[] newArray(final int size) {
 
                 return new Data[size];
             }
         };
 
-        @Override
         public int describeContents() {
 
             return 0;
         }
 
-        @Override
         public void writeToParcel(@Nonnull final Parcel dest, final int flags) {
 
         }
@@ -417,7 +410,6 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
 
         public static final Creator<MyParcelable> CREATOR = new Creator<MyParcelable>() {
 
-            @Override
             public MyParcelable createFromParcel(@Nonnull final Parcel source) {
 
                 final int x = source.readInt();
@@ -426,7 +418,6 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
             }
 
             @Nonnull
-            @Override
             public MyParcelable[] newArray(final int size) {
 
                 return new MyParcelable[0];
@@ -469,13 +460,11 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
             return result;
         }
 
-        @Override
         public int describeContents() {
 
             return 0;
         }
 
-        @Override
         public void writeToParcel(@Nonnull final Parcel dest, final int flags) {
 
             dest.writeInt(mX);

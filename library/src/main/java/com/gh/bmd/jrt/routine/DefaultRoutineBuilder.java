@@ -48,7 +48,6 @@ class DefaultRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder<INPUT,
     }
 
     @Nonnull
-    @Override
     public Routine<INPUT, OUTPUT> buildRoutine() {
 
         return new DefaultRoutine<INPUT, OUTPUT>(getConfiguration(), mFactory);

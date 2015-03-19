@@ -135,7 +135,6 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
     }
 
     @Nonnull
-    @Override
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> boundMethod(@Nonnull final String name) {
 
         final Method method = mMethodMap.get(name);
@@ -150,7 +149,6 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
     }
 
     @Nonnull
-    @Override
     public Routine<Object, Object> method(@Nonnull final String name,
             @Nonnull final Class<?>... parameterTypes) {
 
@@ -181,14 +179,12 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
     }
 
     @Nonnull
-    @Override
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final Method method) {
 
         return method(RoutineConfiguration.notNull(mConfiguration), mShareGroup, method);
     }
 
     @Nonnull
-    @Override
     public ClassRoutineBuilder withConfiguration(
             @Nullable final RoutineConfiguration configuration) {
 
@@ -197,7 +193,6 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
     }
 
     @Nonnull
-    @Override
     public ClassRoutineBuilder withShareGroup(@Nullable final String group) {
 
         mShareGroup = group;
@@ -786,7 +781,6 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
             mMethod = method;
         }
 
-        @Override
         public Void run() {
 
             mMethod.setAccessible(true);

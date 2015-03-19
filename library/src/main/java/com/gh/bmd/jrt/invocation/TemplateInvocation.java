@@ -30,32 +30,26 @@ import javax.annotation.Nullable;
  */
 public abstract class TemplateInvocation<INPUT, OUTPUT> implements Invocation<INPUT, OUTPUT> {
 
-    @Override
     public void onAbort(@Nullable final Throwable reason) {
 
     }
 
-    @Override
     public void onDestroy() {
 
     }
 
-    @Override
     public void onInit() {
 
     }
 
-    @Override
     public void onInput(final INPUT input, @Nonnull final ResultChannel<OUTPUT> result) {
 
     }
 
-    @Override
     public void onResult(@Nonnull final ResultChannel<OUTPUT> result) {
 
     }
 
-    @Override
     public void onReturn() {
 
     }

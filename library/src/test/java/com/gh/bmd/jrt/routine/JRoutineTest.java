@@ -294,7 +294,6 @@ public class JRoutineTest extends TestCase {
 
         final Function0<String> function0 = new Function0<String>() {
 
-            @Override
             public String call() {
 
                 return "test0";
@@ -305,7 +304,6 @@ public class JRoutineTest extends TestCase {
 
         final Function1<String, String> function1 = new Function1<String, String>() {
 
-            @Override
             public String call(final String param1) {
 
                 return param1;
@@ -319,7 +317,6 @@ public class JRoutineTest extends TestCase {
         final Function2<String, String, String> function2 =
                 new Function2<String, String, String>() {
 
-                    @Override
                     public String call(final String param1, final String param2) {
 
                         return param1 + " " + param2;
@@ -333,7 +330,6 @@ public class JRoutineTest extends TestCase {
         final Function3<String, String, String, String> function3 =
                 new Function3<String, String, String, String>() {
 
-                    @Override
                     public String call(final String param1, final String param2,
                             final String param3) {
 
@@ -348,7 +344,6 @@ public class JRoutineTest extends TestCase {
         final Function4<String, String, String, String, String> function4 =
                 new Function4<String, String, String, String, String>() {
 
-                    @Override
                     public String call(final String param1, final String param2,
                             final String param3, final String param4) {
 
@@ -362,7 +357,6 @@ public class JRoutineTest extends TestCase {
 
         final FunctionN<String, String> functionN = new FunctionN<String, String>() {
 
-            @Override
             public String call(@Nonnull final List<? extends String> strings) {
 
                 final StringBuilder builder = new StringBuilder();
@@ -949,7 +943,6 @@ public class JRoutineTest extends TestCase {
         final Semaphore semaphore = new Semaphore(0);
         final Function0<Void> procedure0 = new Function0<Void>() {
 
-            @Override
             public Void call() {
 
                 semaphore.release();
@@ -961,7 +954,6 @@ public class JRoutineTest extends TestCase {
 
         final Function1<String, Void> procedure1 = new Function1<String, Void>() {
 
-            @Override
             public Void call(final String param1) {
 
                 semaphore.release();
@@ -976,7 +968,6 @@ public class JRoutineTest extends TestCase {
 
         final Function2<String, String, Void> procedure2 = new Function2<String, String, Void>() {
 
-            @Override
             public Void call(final String param1, final String param2) {
 
                 semaphore.release();
@@ -991,7 +982,6 @@ public class JRoutineTest extends TestCase {
         final Function3<String, String, String, Void> procedure3 =
                 new Function3<String, String, String, Void>() {
 
-                    @Override
                     public Void call(final String param1, final String param2,
                             final String param3) {
 
@@ -1008,7 +998,6 @@ public class JRoutineTest extends TestCase {
         final Function4<String, String, String, String, Void> procedure4 =
                 new Function4<String, String, String, String, Void>() {
 
-                    @Override
                     public Void call(final String param1, final String param2, final String param3,
                             final String param4) {
 
@@ -1024,7 +1013,6 @@ public class JRoutineTest extends TestCase {
 
         final FunctionN<String, Void> procedureN = new FunctionN<String, Void>() {
 
-            @Override
             public Void call(@Nonnull final List<? extends String> strings) {
 
                 semaphore.release();
@@ -1460,21 +1448,18 @@ public class JRoutineTest extends TestCase {
 
         private int mWrnCount;
 
-        @Override
         public void dbg(@Nonnull final List<Object> contexts, @Nullable final String message,
                 @Nullable final Throwable throwable) {
 
             ++mDgbCount;
         }
 
-        @Override
         public void err(@Nonnull final List<Object> contexts, @Nullable final String message,
                 @Nullable final Throwable throwable) {
 
             ++mErrCount;
         }
 
-        @Override
         public void wrn(@Nonnull final List<Object> contexts, @Nullable final String message,
                 @Nullable final Throwable throwable) {
 

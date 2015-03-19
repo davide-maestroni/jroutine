@@ -35,28 +35,24 @@ public abstract class TemplateRoutineBuilder<INPUT, OUTPUT> extends TemplateRout
     private RoutineConfiguration mConfiguration;
 
     @Nonnull
-    @Override
     public ParameterChannel<INPUT, OUTPUT> invokeAsync() {
 
         return buildRoutine().invokeAsync();
     }
 
     @Nonnull
-    @Override
     public ParameterChannel<INPUT, OUTPUT> invokeParallel() {
 
         return buildRoutine().invokeParallel();
     }
 
     @Nonnull
-    @Override
     public ParameterChannel<INPUT, OUTPUT> invokeSync() {
 
         return buildRoutine().invokeSync();
     }
 
     @Nonnull
-    @Override
     public RoutineBuilder<INPUT, OUTPUT> withConfiguration(
             @Nullable final RoutineConfiguration configuration) {
 

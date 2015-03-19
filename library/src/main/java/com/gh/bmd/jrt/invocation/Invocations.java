@@ -309,7 +309,6 @@ public class Invocations {
         }
 
         @Nonnull
-        @Override
         public Invocation<INPUT, OUTPUT> newInvocation() {
 
             try {

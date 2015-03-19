@@ -121,7 +121,6 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
                 ? new SimpleNestedQueue<INPUT>() : new OrderedNestedQueue<INPUT>();
         mHasInputs = new Check() {
 
-            @Override
             public boolean isTrue() {
 
                 return (mInputCount <= maxInputSize);
@@ -129,7 +128,6 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
         };
         mResultChanel = new DefaultResultChannel<OUTPUT>(configuration, new AbortHandler() {
 
-            @Override
             public void onAbort(@Nullable final Throwable reason, final long delay,
                     @Nonnull final TimeUnit timeUnit) {
 
@@ -172,13 +170,11 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
                                                          mResultChanel, logger);
     }
 
-    @Override
     public boolean abort() {
 
         return abort(null);
     }
 
-    @Override
     public boolean abort(@Nullable final Throwable reason) {
 
         final TimeDuration delay;
@@ -214,7 +210,6 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
         return true;
     }
 
-    @Override
     public boolean isOpen() {
 
         synchronized (mMutex) {
@@ -224,7 +219,6 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
     }
 
     @Nonnull
-    @Override
     @SuppressWarnings("ConstantConditions")
     public ParameterChannel<INPUT, OUTPUT> after(@Nonnull final TimeDuration delay) {
 
@@ -245,7 +239,6 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
     }
 
     @Nonnull
-    @Override
     public ParameterChannel<INPUT, OUTPUT> after(final long delay,
             @Nonnull final TimeUnit timeUnit) {
 
@@ -253,14 +246,12 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
     }
 
     @Nonnull
-    @Override
     public ParameterChannel<INPUT, OUTPUT> now() {
 
         return after(ZERO);
     }
 
     @Nonnull
-    @Override
     public ParameterChannel<INPUT, OUTPUT> pass(
             @Nullable final OutputChannel<? extends INPUT> channel) {
 
@@ -291,7 +282,6 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
     }
 
     @Nonnull
-    @Override
     public ParameterChannel<INPUT, OUTPUT> pass(@Nullable final Iterable<? extends INPUT> inputs) {
 
         NestedQueue<INPUT> inputQueue;
@@ -370,7 +360,6 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
     }
 
     @Nonnull
-    @Override
     public ParameterChannel<INPUT, OUTPUT> pass(@Nullable final INPUT input) {
 
         NestedQueue<INPUT> inputQueue;
@@ -428,7 +417,6 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
     }
 
     @Nonnull
-    @Override
     public ParameterChannel<INPUT, OUTPUT> pass(@Nullable final INPUT... inputs) {
 
         synchronized (mMutex) {
@@ -446,7 +434,6 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
     }
 
     @Nonnull
-    @Override
     public OutputChannel<OUTPUT> result() {
 
         final boolean needsExecution;
@@ -577,7 +564,6 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
             mReason = reason;
         }
 
-        @Override
         public void run() {
 
             mResultChanel.close(mReason);
@@ -590,7 +576,6 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
     private class DefaultInputIterator implements InputIterator<INPUT> {
 
         @Nullable
-        @Override
         public Throwable getAbortException() {
 
             synchronized (mMutex) {
@@ -599,7 +584,6 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
             }
         }
 
-        @Override
         public boolean hasInput() {
 
             synchronized (mMutex) {
@@ -608,7 +592,6 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
             }
         }
 
-        @Override
         public boolean isAborting() {
 
             synchronized (mMutex) {
@@ -618,7 +601,6 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
         }
 
         @Nullable
-        @Override
         @SuppressFBWarnings(value = "NO_NOTIFY_NOT_NOTIFYALL",
                 justification = "only one input is released")
         public INPUT nextInput() {
@@ -640,7 +622,6 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
             }
         }
 
-        @Override
         public void onAbortComplete() {
 
             final Throwable exception;
@@ -661,7 +642,6 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
             }
         }
 
-        @Override
         public boolean onConsumeComplete() {
 
             synchronized (mMutex) {
@@ -671,7 +651,6 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
             }
         }
 
-        @Override
         public void onConsumeStart() {
 
             synchronized (mMutex) {
@@ -690,7 +669,6 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
             }
         }
 
-        @Override
         public void onInvocationComplete() {
 
             synchronized (mMutex) {
@@ -726,7 +704,6 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
             mQueue = mInputQueue.addNested();
         }
 
-        @Override
         public void onComplete() {
 
             final boolean needsExecution;
@@ -755,7 +732,6 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
             }
         }
 
-        @Override
         public void onError(@Nullable final Throwable error) {
 
             synchronized (mMutex) {
@@ -775,7 +751,6 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
             mRunner.run(mExecution.abort(), delay.time, delay.unit);
         }
 
-        @Override
         public void onOutput(final INPUT output) {
 
             NestedQueue<INPUT> inputQueue;
@@ -863,7 +838,6 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
             mThrowable = throwable;
         }
 
-        @Override
         public void run() {
 
             final Throwable throwable = mThrowable;
@@ -907,7 +881,6 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
             mInput = input;
         }
 
-        @Override
         public void run() {
 
             synchronized (mMutex) {
@@ -949,7 +922,6 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
             mQueue = queue;
         }
 
-        @Override
         public void run() {
 
             synchronized (mMutex) {

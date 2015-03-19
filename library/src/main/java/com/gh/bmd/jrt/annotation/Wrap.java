@@ -23,7 +23,8 @@ import java.lang.annotation.Target;
  * enabling asynchronous calls to the target instance methods.
  * <p/>
  * The target class is specified in the annotation attribute. A wrapper class implementing the
- * annotated interface will be generated in the interface package.<br/>
+ * annotated interface will be generated in the interface package and its name will be obtained by
+ * prepending "JRoutine_" to the interface simple name.<br/>
  * The routines used for calling the methods will honor the attributes specified in any optional
  * {@link Bind}, {@link Timeout} and {@link Pass} annotations defined for each interface method.
  * <p/>

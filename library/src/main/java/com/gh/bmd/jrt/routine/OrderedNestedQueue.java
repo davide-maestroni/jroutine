@@ -94,7 +94,6 @@ class OrderedNestedQueue<E> implements NestedQueue<E> {
     }
 
     @Nonnull
-    @Override
     public NestedQueue<E> add(@Nullable final E element) {
 
         checkOpen();
@@ -103,7 +102,6 @@ class OrderedNestedQueue<E> implements NestedQueue<E> {
     }
 
     @Nonnull
-    @Override
     public NestedQueue<E> addAll(@Nonnull final Iterable<? extends E> elements) {
 
         checkOpen();
@@ -112,7 +110,6 @@ class OrderedNestedQueue<E> implements NestedQueue<E> {
     }
 
     @Nonnull
-    @Override
     public NestedQueue<E> addNested() {
 
         checkOpen();
@@ -122,7 +119,6 @@ class OrderedNestedQueue<E> implements NestedQueue<E> {
     }
 
     @Nonnull
-    @Override
     public NestedQueue<E> clear() {
 
         mQueue.clear();
@@ -130,14 +126,12 @@ class OrderedNestedQueue<E> implements NestedQueue<E> {
     }
 
     @Nonnull
-    @Override
     public NestedQueue<E> close() {
 
         mClosed = true;
         return this;
     }
 
-    @Override
     public boolean isEmpty() {
 
         purge(this);
@@ -155,7 +149,6 @@ class OrderedNestedQueue<E> implements NestedQueue<E> {
     }
 
     @Nonnull
-    @Override
     @SuppressWarnings("unchecked")
     public NestedQueue<E> moveTo(@Nonnull final Collection<? super E> collection) {
 
@@ -189,7 +182,6 @@ class OrderedNestedQueue<E> implements NestedQueue<E> {
     }
 
     @Nullable
-    @Override
     @SuppressWarnings("unchecked")
     public E removeFirst() {
 

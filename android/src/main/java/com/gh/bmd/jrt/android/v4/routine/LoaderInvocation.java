@@ -688,14 +688,12 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
             return channel.output();
         }
 
-        @Override
         public Loader<InvocationResult<OUTPUT>> onCreateLoader(final int id, final Bundle args) {
 
             mLogger.dbg("creating Android loader: %d", id);
             return mLoader;
         }
 
-        @Override
         public void onLoadFinished(final Loader<InvocationResult<OUTPUT>> loader,
                 final InvocationResult<OUTPUT> data) {
 
@@ -758,7 +756,6 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
             }
         }
 
-        @Override
         public void onLoaderReset(final Loader<InvocationResult<OUTPUT>> loader) {
 
             mLogger.dbg("resetting Android loader: %d", mLoader.getId());

@@ -60,7 +60,6 @@ public class InvocationsTest extends TestCase {
 
     private static class TestInvocation extends StatelessInvocation<Object, Object> {
 
-        @Override
         public void onInput(final Object o, @Nonnull final ResultChannel<Object> result) {
 
         }

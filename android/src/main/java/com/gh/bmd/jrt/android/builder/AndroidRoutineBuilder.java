@@ -49,7 +49,6 @@ public interface AndroidRoutineBuilder<INPUT, OUTPUT>
     int AUTO = Integer.MIN_VALUE;
 
     @Nonnull
-    @Override
     AndroidRoutine<INPUT, OUTPUT> buildRoutine();
 
     /**
@@ -60,7 +59,6 @@ public interface AndroidRoutineBuilder<INPUT, OUTPUT>
      * @return this builder.
      */
     @Nonnull
-    @Override
     AndroidRoutineBuilder<INPUT, OUTPUT> withConfiguration(
             @Nullable RoutineConfiguration configuration);
 

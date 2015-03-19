@@ -104,7 +104,6 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
     }
 
     @Nonnull
-    @Override
     public AndroidRoutine<INPUT, OUTPUT> buildRoutine() {
 
         final RoutineConfiguration configuration = getConfiguration();
@@ -122,7 +121,6 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
     }
 
     @Nonnull
-    @Override
     public AndroidRoutineBuilder<INPUT, OUTPUT> onClash(
             @Nullable final ClashResolution resolution) {
 
@@ -131,7 +129,6 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
     }
 
     @Nonnull
-    @Override
     public AndroidRoutineBuilder<INPUT, OUTPUT> onComplete(
             @Nullable final CacheStrategy cacheStrategy) {
 
@@ -140,7 +137,6 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
     }
 
     @Nonnull
-    @Override
     public AndroidRoutineBuilder<INPUT, OUTPUT> withId(final int id) {
 
         mInvocationId = id;
@@ -153,19 +149,16 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
         buildRoutine().purge();
     }
 
-    @Override
     public void purge(@Nullable final INPUT input) {
 
         buildRoutine().purge(input);
     }
 
-    @Override
     public void purge(@Nullable final INPUT... inputs) {
 
         buildRoutine().purge(inputs);
     }
 
-    @Override
     public void purge(@Nullable final Iterable<? extends INPUT> inputs) {
 
         buildRoutine().purge(inputs);

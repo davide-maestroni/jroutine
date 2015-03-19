@@ -199,7 +199,6 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
     }
 
     @Nonnull
-    @Override
     public ParameterChannel<INPUT, OUTPUT> invokeAsync() {
 
         return new ServiceChannel<INPUT, OUTPUT>(false, mContext, mServiceClass, mLooper,
@@ -208,7 +207,6 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
     }
 
     @Nonnull
-    @Override
     public ParameterChannel<INPUT, OUTPUT> invokeParallel() {
 
         return new ServiceChannel<INPUT, OUTPUT>(true, mContext, mServiceClass, mLooper,
@@ -217,7 +215,6 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
     }
 
     @Nonnull
-    @Override
     public ParameterChannel<INPUT, OUTPUT> invokeSync() {
 
         return mRoutine.invokeSync();
@@ -347,28 +344,24 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
             mStandaloneResultOutput = resultChannel.output();
         }
 
-        @Override
         public boolean abort() {
 
             bindService();
             return mStandaloneParamInput.abort();
         }
 
-        @Override
         public boolean abort(@Nullable final Throwable reason) {
 
             bindService();
             return mStandaloneParamInput.abort(reason);
         }
 
-        @Override
         public boolean isOpen() {
 
             return mStandaloneParamInput.isOpen();
         }
 
         @Nonnull
-        @Override
         public ParameterChannel<INPUT, OUTPUT> after(@Nonnull final TimeDuration delay) {
 
             mStandaloneParamInput.after(delay);
@@ -376,7 +369,6 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         }
 
         @Nonnull
-        @Override
         public ParameterChannel<INPUT, OUTPUT> after(final long delay,
                 @Nonnull final TimeUnit timeUnit) {
 
@@ -385,7 +377,6 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         }
 
         @Nonnull
-        @Override
         public ParameterChannel<INPUT, OUTPUT> now() {
 
             mStandaloneParamInput.now();
@@ -393,7 +384,6 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         }
 
         @Nonnull
-        @Override
         public ParameterChannel<INPUT, OUTPUT> pass(
                 @Nullable final OutputChannel<? extends INPUT> channel) {
 
@@ -403,7 +393,6 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         }
 
         @Nonnull
-        @Override
         public ParameterChannel<INPUT, OUTPUT> pass(
                 @Nullable final Iterable<? extends INPUT> inputs) {
 
@@ -413,7 +402,6 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         }
 
         @Nonnull
-        @Override
         public ParameterChannel<INPUT, OUTPUT> pass(@Nullable final INPUT input) {
 
             bindService();
@@ -422,7 +410,6 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         }
 
         @Nonnull
-        @Override
         public ParameterChannel<INPUT, OUTPUT> pass(@Nullable final INPUT... inputs) {
 
             bindService();
@@ -431,7 +418,6 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         }
 
         @Nonnull
-        @Override
         public OutputChannel<OUTPUT> result() {
 
             bindService();
@@ -475,7 +461,6 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
          */
         private class ConnectionOutputConsumer implements OutputConsumer<INPUT> {
 
-            @Override
             public void onComplete() {
 
                 final Message message = Message.obtain(null, RoutineService.MSG_COMPLETE);
@@ -493,7 +478,6 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                 }
             }
 
-            @Override
             public void onError(@Nullable final Throwable error) {
 
                 final Message message = Message.obtain(null, RoutineService.MSG_ABORT);
@@ -511,7 +495,6 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                 }
             }
 
-            @Override
             public void onOutput(final INPUT input) {
 
                 final Message message = Message.obtain(null, RoutineService.MSG_DATA);
@@ -602,7 +585,6 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
             private ConnectionOutputConsumer mConsumer;
 
-            @Override
             public void onServiceConnected(final ComponentName name, final IBinder service) {
 
                 final Logger logger = mLogger;
@@ -641,7 +623,6 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                 }
             }
 
-            @Override
             public void onServiceDisconnected(final ComponentName name) {
 
                 mLogger.dbg("service disconnected: %s", name);

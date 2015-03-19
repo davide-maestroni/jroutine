@@ -36,7 +36,6 @@ public class MainRunner extends RunnerDecorator {
 
         private final Runner mQueued = Runners.queuedRunner();
 
-        @Override
         public void run(@Nonnull final Execution execution, final long delay,
                 @Nonnull final TimeUnit timeUnit) {
 

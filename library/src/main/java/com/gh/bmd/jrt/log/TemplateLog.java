@@ -49,21 +49,18 @@ public abstract class TemplateLog implements Log {
                              contexts.toString(), level, message);
     }
 
-    @Override
     public void dbg(@Nonnull final List<Object> contexts, @Nullable final String message,
             @Nullable final Throwable throwable) {
 
         log(LogLevel.DEBUG, contexts, message, throwable);
     }
 
-    @Override
     public void err(@Nonnull final List<Object> contexts, @Nullable final String message,
             @Nullable final Throwable throwable) {
 
         log(LogLevel.ERROR, contexts, message, throwable);
     }
 
-    @Override
     public void wrn(@Nonnull final List<Object> contexts, @Nullable final String message,
             @Nullable final Throwable throwable) {
 

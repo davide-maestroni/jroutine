@@ -73,7 +73,6 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
 
         mDeliverResult = new Execution() {
 
-            @Override
             public void run() {
 
                 loader.deliverResult(createResult());
@@ -173,7 +172,6 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
     private class Result implements InvocationResult<OUTPUT> {
 
         @Nullable
-        @Override
         public Throwable getAbortException() {
 
             synchronized (mMutex) {
@@ -182,7 +180,6 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
             }
         }
 
-        @Override
         public boolean isError() {
 
             synchronized (mMutex) {
@@ -191,7 +188,6 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
             }
         }
 
-        @Override
         public boolean passTo(@Nonnull final Collection<StandaloneInput<OUTPUT>> newChannels,
                 @Nonnull final Collection<StandaloneInput<OUTPUT>> oldChannels) {
 

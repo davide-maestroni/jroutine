@@ -211,7 +211,6 @@ class DefaultAndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
         }
     }
 
-    @Override
     public void purge(@Nullable final INPUT input) {
 
         final WeakReference<Object> context = mContext;
@@ -226,7 +225,6 @@ class DefaultAndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
         }
     }
 
-    @Override
     public void purge(@Nullable final INPUT... inputs) {
 
         final WeakReference<Object> context = mContext;
@@ -242,7 +240,6 @@ class DefaultAndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
         }
     }
 
-    @Override
     public void purge(@Nullable final Iterable<? extends INPUT> inputs) {
 
         final WeakReference<Object> context = mContext;
@@ -298,7 +295,6 @@ class DefaultAndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
             mInvocationClass = invocationClass;
         }
 
-        @Override
         public void run() {
 
             final Object context = mContext.get();
@@ -342,7 +338,6 @@ class DefaultAndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
             mInputs = inputs;
         }
 
-        @Override
         public void run() {
 
             final Object context = mContext.get();

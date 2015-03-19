@@ -81,7 +81,6 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
         return new FunctionRoutineBuilder<Void, OUTPUT>(new InvocationFactory<Void, OUTPUT>() {
 
             @Nonnull
-            @Override
             public Invocation<Void, OUTPUT> newInvocation() {
 
                 return new SingleCallInvocation<Void, OUTPUT>() {
@@ -121,7 +120,6 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
 
         return new FunctionRoutineBuilder<INPUT, OUTPUT>(new StatelessInvocation<INPUT, OUTPUT>() {
 
-            @Override
             @SuppressWarnings("unchecked")
             public void onInput(final INPUT input, @Nonnull final ResultChannel<OUTPUT> result) {
 
@@ -157,7 +155,6 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
         return new FunctionRoutineBuilder<INPUT, OUTPUT>(new InvocationFactory<INPUT, OUTPUT>() {
 
             @Nonnull
-            @Override
             public Invocation<INPUT, OUTPUT> newInvocation() {
 
                 return new SingleCallInvocation<INPUT, OUTPUT>() {
@@ -202,7 +199,6 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
         return new FunctionRoutineBuilder<INPUT, OUTPUT>(new InvocationFactory<INPUT, OUTPUT>() {
 
             @Nonnull
-            @Override
             public Invocation<INPUT, OUTPUT> newInvocation() {
 
                 return new SingleCallInvocation<INPUT, OUTPUT>() {
@@ -249,7 +245,6 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
         return new FunctionRoutineBuilder<INPUT, OUTPUT>(new InvocationFactory<INPUT, OUTPUT>() {
 
             @Nonnull
-            @Override
             public Invocation<INPUT, OUTPUT> newInvocation() {
 
                 return new SingleCallInvocation<INPUT, OUTPUT>() {
@@ -291,7 +286,6 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
         return new FunctionRoutineBuilder<INPUT, OUTPUT>(new InvocationFactory<INPUT, OUTPUT>() {
 
             @Nonnull
-            @Override
             public Invocation<INPUT, OUTPUT> newInvocation() {
 
                 return new SingleCallInvocation<INPUT, OUTPUT>() {
@@ -331,7 +325,6 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
         return new FunctionRoutineBuilder<Void, Void>(new InvocationFactory<Void, Void>() {
 
             @Nonnull
-            @Override
             public Invocation<Void, Void> newInvocation() {
 
                 return new SingleCallInvocation<Void, Void>() {
@@ -371,7 +364,6 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
 
         return new FunctionRoutineBuilder<INPUT, Void>(new StatelessInvocation<INPUT, Void>() {
 
-            @Override
             @SuppressWarnings("unchecked")
             public void onInput(final INPUT input, @Nonnull final ResultChannel<Void> result) {
 
@@ -407,7 +399,6 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
         return new FunctionRoutineBuilder<INPUT, Void>(new InvocationFactory<INPUT, Void>() {
 
             @Nonnull
-            @Override
             public Invocation<INPUT, Void> newInvocation() {
 
                 return new SingleCallInvocation<INPUT, Void>() {
@@ -452,7 +443,6 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
         return new FunctionRoutineBuilder<INPUT, Void>(new InvocationFactory<INPUT, Void>() {
 
             @Nonnull
-            @Override
             public Invocation<INPUT, Void> newInvocation() {
 
                 return new SingleCallInvocation<INPUT, Void>() {
@@ -499,7 +489,6 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
         return new FunctionRoutineBuilder<INPUT, Void>(new InvocationFactory<INPUT, Void>() {
 
             @Nonnull
-            @Override
             public Invocation<INPUT, Void> newInvocation() {
 
                 return new SingleCallInvocation<INPUT, Void>() {
@@ -541,7 +530,6 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
         return new FunctionRoutineBuilder<INPUT, Void>(new InvocationFactory<INPUT, Void>() {
 
             @Nonnull
-            @Override
             public Invocation<INPUT, Void> newInvocation() {
 
                 return new SingleCallInvocation<INPUT, Void>() {

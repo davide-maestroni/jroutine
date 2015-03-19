@@ -38,7 +38,6 @@ class MissingLoaderInvocation<INPUT, OUTPUT> extends AndroidTemplateInvocation<I
             new InvocationFactory<Object, Object>() {
 
                 @Nonnull
-                @Override
                 public Invocation<Object, Object> newInvocation() {
 
                     return sInvocation;

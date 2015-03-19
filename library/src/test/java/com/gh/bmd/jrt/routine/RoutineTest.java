@@ -153,7 +153,6 @@ public class RoutineTest extends TestCase {
         final StatelessInvocation<String, String> abortInvocation =
                 new StatelessInvocation<String, String>() {
 
-                    @Override
                     public void onInput(final String s,
                             @Nonnull final ResultChannel<String> result) {
 
@@ -194,7 +193,6 @@ public class RoutineTest extends TestCase {
         final StatelessInvocation<String, String> abortInvocation2 =
                 new StatelessInvocation<String, String>() {
 
-                    @Override
                     public void onInput(final String s,
                             @Nonnull final ResultChannel<String> result) {
 
@@ -224,7 +222,6 @@ public class RoutineTest extends TestCase {
         final StatelessInvocation<String, String> closeInvocation =
                 new StatelessInvocation<String, String>() {
 
-                    @Override
                     public void onInput(final String s,
                             @Nonnull final ResultChannel<String> result) {
 
@@ -465,7 +462,6 @@ public class RoutineTest extends TestCase {
 
         final Function1<Integer, Integer> invokeSquare = new Function1<Integer, Integer>() {
 
-            @Override
             public Integer call(final Integer param1) {
 
                 final int input = param1;
@@ -523,7 +519,6 @@ public class RoutineTest extends TestCase {
 
         final Function1<Integer, Integer> invokeSquare = new Function1<Integer, Integer>() {
 
-            @Override
             public Integer call(final Integer param1) {
 
                 final int input = param1;
@@ -930,7 +925,6 @@ public class RoutineTest extends TestCase {
             new DefaultRoutine<Object, Object>(null, new InvocationFactory<Object, Object>() {
 
                 @Nonnull
-                @Override
                 public Invocation<Object, Object> newInvocation() {
 
                     return null;
@@ -2665,7 +2659,6 @@ public class RoutineTest extends TestCase {
 
     private static class TestAbortHandler implements AbortHandler {
 
-        @Override
         public void onAbort(@Nullable final Throwable reason, final long delay,
                 @Nonnull final TimeUnit timeUnit) {
 
@@ -2682,7 +2675,6 @@ public class RoutineTest extends TestCase {
             return i;
         }
 
-        @Override
         public int getInt(final int i) {
 
             return i;
@@ -2776,47 +2768,39 @@ public class RoutineTest extends TestCase {
     private static class TestInputIterator implements InputIterator<Object> {
 
         @Nullable
-        @Override
         public Throwable getAbortException() {
 
             return null;
         }
 
-        @Override
         public boolean hasInput() {
 
             return false;
         }
 
-        @Override
         public boolean isAborting() {
 
             return false;
         }
 
-        @Override
         public Object nextInput() {
 
             return null;
         }
 
-        @Override
         public void onAbortComplete() {
 
         }
 
-        @Override
         public boolean onConsumeComplete() {
 
             return false;
         }
 
-        @Override
         public void onConsumeStart() {
 
         }
 
-        @Override
         public void onInvocationComplete() {
 
         }
@@ -2825,18 +2809,15 @@ public class RoutineTest extends TestCase {
     private static class TestInvocationManager implements InvocationManager<Object, Object> {
 
         @Nonnull
-        @Override
         public Invocation<Object, Object> create() {
 
             return new TemplateInvocation<Object, Object>() {};
         }
 
-        @Override
         public void discard(@Nonnull final Invocation<Object, Object> invocation) {
 
         }
 
-        @Override
         public void recycle(@Nonnull final Invocation<Object, Object> invocation) {
 
         }

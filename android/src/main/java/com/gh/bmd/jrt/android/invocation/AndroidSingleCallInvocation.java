@@ -32,7 +32,6 @@ public abstract class AndroidSingleCallInvocation<INPUT, OUTPUT>
 
     private Context mContext;
 
-    @Override
     public void onContext(@Nonnull final Context context) {
 
         mContext = context;

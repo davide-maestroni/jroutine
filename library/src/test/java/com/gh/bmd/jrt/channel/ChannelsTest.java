@@ -38,6 +38,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class ChannelsTest extends TestCase {
 
+    @SuppressWarnings("unchecked")
     public void testSelect() {
 
         final StandaloneChannelBuilder builder =

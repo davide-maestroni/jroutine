@@ -32,7 +32,6 @@ public class PassingInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
             new InvocationFactory<Object, Object>() {
 
                 @Nonnull
-                @Override
                 public Invocation<Object, Object> newInvocation() {
 
                     return sInvocation;

@@ -92,7 +92,6 @@ public class AndroidRunnerTest extends AndroidTestCase {
         assertThat(JRoutine.on(new InvocationFactory<Object, Object>() {
 
             @Nonnull
-            @Override
             public Invocation<Object, Object> newInvocation() {
 
                 return new SingleCallInvocation<Object, Object>() {
@@ -291,7 +290,6 @@ public class AndroidRunnerTest extends AndroidTestCase {
             return mIsPassed;
         }
 
-        @Override
         public void run() {
 
             // it looks like that handlers and the kind are not so accurate after all...

@@ -148,10 +148,8 @@ public interface ObjectRoutineBuilder extends ClassRoutineBuilder {
      * @return this builder.
      */
     @Nonnull
-    @Override
     ObjectRoutineBuilder withConfiguration(@Nullable RoutineConfiguration configuration);
 
     @Nonnull
-    @Override
     ObjectRoutineBuilder withShareGroup(@Nullable String group);
 }

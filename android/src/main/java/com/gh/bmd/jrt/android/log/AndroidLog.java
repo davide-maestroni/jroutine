@@ -27,7 +27,6 @@ import javax.annotation.Nullable;
  */
 public class AndroidLog implements com.gh.bmd.jrt.log.Log {
 
-    @Override
     public void dbg(@Nonnull final List<Object> contexts, @Nullable final String message,
             @Nullable final Throwable throwable) {
 
@@ -41,7 +40,6 @@ public class AndroidLog implements com.gh.bmd.jrt.log.Log {
         }
     }
 
-    @Override
     public void err(@Nonnull final List<Object> contexts, @Nullable final String message,
             @Nullable final Throwable throwable) {
 
@@ -55,7 +53,6 @@ public class AndroidLog implements com.gh.bmd.jrt.log.Log {
         }
     }
 
-    @Override
     public void wrn(@Nonnull final List<Object> contexts, @Nullable final String message,
             @Nullable final Throwable throwable) {
 

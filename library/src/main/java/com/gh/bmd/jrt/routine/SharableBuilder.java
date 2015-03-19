@@ -29,7 +29,6 @@ import javax.annotation.Nullable;
 public interface SharableBuilder extends ConfigurableBuilder {
 
     @Nonnull
-    @Override
     SharableBuilder withConfiguration(@Nullable RoutineConfiguration configuration);
 
     /**

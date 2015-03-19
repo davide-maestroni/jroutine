@@ -282,26 +282,22 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
             mStandaloneInput = mStandaloneChannel.input();
         }
 
-        @Override
         public boolean abort() {
 
             return mStandaloneInput.abort();
         }
 
-        @Override
         public boolean abort(@Nullable final Throwable reason) {
 
             return mStandaloneInput.abort(reason);
         }
 
-        @Override
         public boolean isOpen() {
 
             return mStandaloneInput.isOpen();
         }
 
         @Nonnull
-        @Override
         public ResultChannel<OUTPUT> after(@Nonnull final TimeDuration delay) {
 
             mStandaloneInput.after(delay);
@@ -309,7 +305,6 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
         }
 
         @Nonnull
-        @Override
         public ResultChannel<OUTPUT> after(final long delay, @Nonnull final TimeUnit timeUnit) {
 
             mStandaloneInput.after(delay, timeUnit);
@@ -317,7 +312,6 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
         }
 
         @Nonnull
-        @Override
         public ResultChannel<OUTPUT> now() {
 
             mStandaloneInput.now();
@@ -325,7 +319,6 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
         }
 
         @Nonnull
-        @Override
         public ResultChannel<OUTPUT> pass(@Nullable final OutputChannel<? extends OUTPUT> channel) {
 
             mStandaloneInput.pass(channel);
@@ -333,7 +326,6 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
         }
 
         @Nonnull
-        @Override
         public ResultChannel<OUTPUT> pass(@Nullable final Iterable<? extends OUTPUT> outputs) {
 
             mStandaloneInput.pass(outputs);
@@ -341,7 +333,6 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
         }
 
         @Nonnull
-        @Override
         public ResultChannel<OUTPUT> pass(@Nullable final OUTPUT output) {
 
             mStandaloneInput.pass(output);
@@ -349,7 +340,6 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
         }
 
         @Nonnull
-        @Override
         public ResultChannel<OUTPUT> pass(@Nullable final OUTPUT... outputs) {
 
             mStandaloneInput.pass(outputs);

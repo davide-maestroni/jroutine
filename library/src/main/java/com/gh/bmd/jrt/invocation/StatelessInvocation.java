@@ -30,33 +30,27 @@ public abstract class StatelessInvocation<INPUT, OUTPUT>
         implements Invocation<INPUT, OUTPUT>, InvocationFactory<INPUT, OUTPUT> {
 
     @Nonnull
-    @Override
     public final Invocation<INPUT, OUTPUT> newInvocation() {
 
         return this;
     }
 
-    @Override
     public final void onAbort(@Nullable final Throwable reason) {
 
     }
 
-    @Override
     public final void onDestroy() {
 
     }
 
-    @Override
     public final void onInit() {
 
     }
 
-    @Override
     public final void onResult(@Nonnull final ResultChannel<OUTPUT> result) {
 
     }
 
-    @Override
     public final void onReturn() {
 
     }

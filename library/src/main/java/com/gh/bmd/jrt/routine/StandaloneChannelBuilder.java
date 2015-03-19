@@ -43,6 +43,5 @@ public interface StandaloneChannelBuilder extends ConfigurableBuilder {
      * @return this builder.
      */
     @Nonnull
-    @Override
     StandaloneChannelBuilder withConfiguration(@Nullable RoutineConfiguration configuration);
 }

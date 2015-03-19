@@ -24,7 +24,7 @@
             @javax.annotation.Nonnull
             public com.gh.bmd.jrt.invocation.Invocation<Object, ${resultClassName}> newInvocation() {
 
-                return new SingleCallInvocation${methodCount}();
+                return new Invocation${methodCount}();
             }
         };
 

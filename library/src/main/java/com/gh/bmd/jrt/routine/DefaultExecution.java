@@ -100,7 +100,6 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
         }
     }
 
-    @Override
     public void run() {
 
         synchronized (mMutex) {
@@ -243,7 +242,6 @@ class DefaultExecution<INPUT, OUTPUT> implements Execution {
      */
     private class AbortExecution implements Execution {
 
-        @Override
         public void run() {
 
             synchronized (mMutex) {

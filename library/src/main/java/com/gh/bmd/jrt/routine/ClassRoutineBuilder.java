@@ -93,10 +93,8 @@ public interface ClassRoutineBuilder extends SharableBuilder {
      * @return this builder.
      */
     @Nonnull
-    @Override
     ClassRoutineBuilder withConfiguration(@Nullable RoutineConfiguration configuration);
 
     @Nonnull
-    @Override
     ClassRoutineBuilder withShareGroup(@Nullable String group);
 }

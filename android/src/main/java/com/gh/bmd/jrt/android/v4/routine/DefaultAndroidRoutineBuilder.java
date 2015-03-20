@@ -137,9 +137,9 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
     }
 
     @Nonnull
-    public AndroidRoutineBuilder<INPUT, OUTPUT> withId(final int id) {
+    public AndroidRoutineBuilder<INPUT, OUTPUT> withId(final int invocationId) {
 
-        mInvocationId = id;
+        mInvocationId = invocationId;
         return this;
     }
 

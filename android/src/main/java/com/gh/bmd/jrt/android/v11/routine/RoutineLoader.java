@@ -62,12 +62,7 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
     private InvocationResult<OUTPUT> mResult;
 
     /**
-     * Stores away the application context associated with context.
-     * Since Loaders can be used across multiple activities it's dangerous to
-     * store the context directly; always use {@link #getContext()} to retrieve
-     * the Loader's Context, don't use the constructor argument directly.
-     * The Context returned by {@link #getContext} is safe to use across
-     * Activity instances.
+     * Constructor.
      *
      * @param context    used to retrieve the application context.
      * @param invocation the invocation instance.
@@ -158,17 +153,6 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
         super.onReset();
     }
 
-    /**
-     * Returns the type of the loader invocation.
-     *
-     * @return the invocation class.
-     */
-    @Nonnull
-    public Class<?> getInvocationType() {
-
-        return mInvocation.getClass();
-    }
-
     @Override
     public InvocationResult<OUTPUT> loadInBackground() {
 
@@ -249,6 +233,17 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
     void setInvocationCount(final int count) {
 
         mInvocationCount = count;
+    }
+
+    /**
+     * Returns the type of the loader invocation.
+     *
+     * @return the invocation class.
+     */
+    @Nonnull
+    Class<?> getInvocationType() {
+
+        return mInvocation.getClass();
     }
 
     /**

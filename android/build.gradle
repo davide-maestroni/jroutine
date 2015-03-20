@@ -61,7 +61,7 @@ dependencies {
     }
     compile 'com.android.support:support-v4:21.0.3' // Travis does not support a later version
 
-    androidTestCompile 'org.assertj:assertj-core:1.7.0'
+    androidTestCompile 'org.assertj:assertj-core:1.7.1'
 }
 
 task('jacocoTest', dependsOn: 'connectedCheck') {

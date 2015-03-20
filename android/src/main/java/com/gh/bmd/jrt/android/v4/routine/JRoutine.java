@@ -135,11 +135,11 @@ public class JRoutine extends com.gh.bmd.jrt.android.routine.JRoutine {
     /**
      * Returns a builder of routines bound to the specified activity.<br/>
      * Note that the specified invocation class must be static and have a default constructor.<br/>
-     * Note that also the built routine results will be always dispatched in the main UI thread,
+     * Note also that the built routine results will be always dispatched in the main UI thread,
      * thus waiting for the outputs immediately after its invocation in the main thread will result
      * in a deadlock.
      *
-     * @param activity   the activity instance.
+     * @param activity   the invocation activity context.
      * @param classToken the invocation class token.
      * @param <INPUT>    the input data type.
      * @param <OUTPUT>   the output data type.
@@ -163,37 +163,39 @@ public class JRoutine extends com.gh.bmd.jrt.android.routine.JRoutine {
      * creation, the output will be aborted with a
      * {@link com.gh.bmd.jrt.android.builder.InvocationMissingException}.
      *
-     * @param activity the invocation activity context.
-     * @param id       the invocation ID.
+     * @param activity     the invocation activity context.
+     * @param invocationId the invocation ID.
      * @return the channel builder instance.
      * @throws java.lang.IllegalArgumentException if the specified invocation ID is equal to AUTO.
      * @throws java.lang.NullPointerException     if the specified activity is null.
      */
     @Nonnull
     public static AndroidChannelBuilder onActivity(@Nonnull final FragmentActivity activity,
-            final int id) {
+            final int invocationId) {
 
-        if (id == AndroidRoutineBuilder.AUTO) {
+        if (invocationId == AndroidRoutineBuilder.AUTO) {
 
             throw new IllegalArgumentException("the invocation ID must not be generated");
         }
 
-        return new DefaultAndroidChannelBuilder(activity, id);
+        return new DefaultAndroidChannelBuilder(activity, invocationId);
     }
 
     /**
      * Returns a builder of routines bound to the specified fragment.<br/>
      * Note that the specified invocation class must be static and have a default constructor.<br/>
-     * Note that also the built routine results will be always dispatched in the main UI thread,
+     * Note also that the built routine results will be always dispatched in the main UI thread,
      * thus waiting for the outputs immediately after its invocation in the main thread will result
      * in a deadlock.
      *
-     * @param fragment   the fragment instance.
+     * @param fragment   the invocation fragment context.
      * @param classToken the invocation class token.
      * @param <INPUT>    the input data type.
      * @param <OUTPUT>   the output data type.
      * @return the routine builder instance.
-     * @throws java.lang.NullPointerException if the specified fragment or class token are null.
+     * @throws java.lang.IllegalArgumentException if the specified invocation has no default
+     *                                            constructor.
+     * @throws java.lang.NullPointerException     if the specified fragment or class token are null.
      */
     @Nonnull
     public static <INPUT, OUTPUT> AndroidRoutineBuilder<INPUT, OUTPUT> onFragment(
@@ -210,20 +212,21 @@ public class JRoutine extends com.gh.bmd.jrt.android.routine.JRoutine {
      * creation, the output will be aborted with a
      * {@link com.gh.bmd.jrt.android.builder.InvocationMissingException}.
      *
-     * @param fragment the invocation fragment context.
-     * @param id       the invocation ID.
+     * @param fragment     the invocation fragment context.
+     * @param invocationId the invocation ID.
      * @return the channel builder instance.
      * @throws java.lang.IllegalArgumentException if the specified invocation ID is equal to AUTO.
      * @throws java.lang.NullPointerException     if the specified fragment is null.
      */
     @Nonnull
-    public static AndroidChannelBuilder onFragment(@Nonnull final Fragment fragment, final int id) {
+    public static AndroidChannelBuilder onFragment(@Nonnull final Fragment fragment,
+            final int invocationId) {
 
-        if (id == AndroidRoutineBuilder.AUTO) {
+        if (invocationId == AndroidRoutineBuilder.AUTO) {
 
             throw new IllegalArgumentException("the invocation ID must not be generated");
         }
 
-        return new DefaultAndroidChannelBuilder(fragment, id);
+        return new DefaultAndroidChannelBuilder(fragment, invocationId);
     }
 }

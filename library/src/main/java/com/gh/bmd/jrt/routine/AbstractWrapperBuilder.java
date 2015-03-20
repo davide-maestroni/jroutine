@@ -135,7 +135,7 @@ public abstract class AbstractWrapperBuilder<TYPE> implements WrapperBuilder<TYP
      *
      * @param configuration the routine configuration.
      */
-    protected void warn(@Nonnull final RoutineConfiguration configuration) {
+    private void warn(@Nonnull final RoutineConfiguration configuration) {
 
         Logger logger = null;
 

@@ -45,7 +45,7 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
 
     private final WeakReference<Object> mContext;
 
-    private final int mId;
+    private final int mInvocationId;
 
     private CacheStrategy mCacheStrategy;
 
@@ -54,36 +54,36 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
     /**
      * Constructor.
      *
-     * @param activity the context activity.
-     * @param id       the invocation ID.
+     * @param activity     the context activity.
+     * @param invocationId the invocation ID.
      * @throws java.lang.NullPointerException if the activity is null.
      */
-    DefaultAndroidChannelBuilder(@Nonnull final FragmentActivity activity, final int id) {
+    DefaultAndroidChannelBuilder(@Nonnull final FragmentActivity activity, final int invocationId) {
 
-        this((Object) activity, id);
+        this((Object) activity, invocationId);
     }
 
     /**
      * Constructor.
      *
-     * @param fragment the context fragment.
-     * @param id       the invocation ID.
+     * @param fragment     the context fragment.
+     * @param invocationId the invocation ID.
      * @throws java.lang.NullPointerException if the fragment is null.
      */
-    DefaultAndroidChannelBuilder(@Nonnull final Fragment fragment, final int id) {
+    DefaultAndroidChannelBuilder(@Nonnull final Fragment fragment, final int invocationId) {
 
-        this((Object) fragment, id);
+        this((Object) fragment, invocationId);
     }
 
     /**
      * Constructor.
      *
-     * @param context the context instance.
-     * @param id      the invocation ID.
+     * @param context      the context instance.
+     * @param invocationId the invocation ID.
      * @throws java.lang.NullPointerException if the context is null.
      */
     @SuppressWarnings("ConstantConditions")
-    private DefaultAndroidChannelBuilder(@Nonnull final Object context, final int id) {
+    private DefaultAndroidChannelBuilder(@Nonnull final Object context, final int invocationId) {
 
         if (context == null) {
 
@@ -91,7 +91,7 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
         }
 
         mContext = new WeakReference<Object>(context);
-        mId = id;
+        mInvocationId = invocationId;
     }
 
     @Nonnull
@@ -101,8 +101,7 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
 
         if (context == null) {
 
-            return JRoutine.on(MissingLoaderInvocation.<OUTPUT, OUTPUT>factoryOf())
-                           .callSync();
+            return JRoutine.on(MissingLoaderInvocation.<OUTPUT, OUTPUT>factoryOf()).callSync();
         }
 
         final AndroidRoutineBuilder<OUTPUT, OUTPUT> builder;
@@ -110,12 +109,14 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
         if (context instanceof FragmentActivity) {
 
             final FragmentActivity activity = (FragmentActivity) context;
-            builder = JRoutine.onActivity(activity, new MissingToken<OUTPUT>()).withId(mId);
+            builder =
+                    JRoutine.onActivity(activity, new MissingToken<OUTPUT>()).withId(mInvocationId);
 
         } else if (context instanceof Fragment) {
 
             final Fragment fragment = (Fragment) context;
-            builder = JRoutine.onFragment(fragment, new MissingToken<OUTPUT>()).withId(mId);
+            builder =
+                    JRoutine.onFragment(fragment, new MissingToken<OUTPUT>()).withId(mInvocationId);
 
         } else {
 
@@ -142,7 +143,8 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
 
         if (context.get() != null) {
 
-            Runners.mainRunner().run(new PurgeExecution(context, mId), 0, TimeUnit.MILLISECONDS);
+            Runners.mainRunner()
+                   .run(new PurgeExecution(context, mInvocationId), 0, TimeUnit.MILLISECONDS);
         }
     }
 
@@ -152,8 +154,8 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
 
         if (context.get() != null) {
 
-            Runners.mainRunner()
-                   .run(new PurgeInputsExecution(context, mId, Collections.singletonList(input)), 0,
+            final List<Object> inputList = Collections.singletonList(input);
+            Runners.mainRunner().run(new PurgeInputsExecution(context, mInvocationId, inputList), 0,
                         TimeUnit.MILLISECONDS);
         }
     }
@@ -166,8 +168,7 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
 
             final List<Object> inputList =
                     (inputs == null) ? Collections.emptyList() : Arrays.asList(inputs);
-            Runners.mainRunner()
-                   .run(new PurgeInputsExecution(context, mId, inputList), 0,
+            Runners.mainRunner().run(new PurgeInputsExecution(context, mInvocationId, inputList), 0,
                         TimeUnit.MILLISECONDS);
         }
     }
@@ -194,8 +195,7 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
                 }
             }
 
-            Runners.mainRunner()
-                   .run(new PurgeInputsExecution(context, mId, inputList), 0,
+            Runners.mainRunner().run(new PurgeInputsExecution(context, mInvocationId, inputList), 0,
                         TimeUnit.MILLISECONDS);
         }
     }
@@ -225,18 +225,19 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
 
         private final WeakReference<Object> mContext;
 
-        private final int mId;
+        private final int mInvocationId;
 
         /**
          * Constructor.
          *
-         * @param context the context reference.
-         * @param id      the invocation ID.
+         * @param context      the context reference.
+         * @param invocationId the invocation ID.
          */
-        private PurgeExecution(@Nonnull final WeakReference<Object> context, final int id) {
+        private PurgeExecution(@Nonnull final WeakReference<Object> context,
+                final int invocationId) {
 
             mContext = context;
-            mId = id;
+            mInvocationId = invocationId;
         }
 
         public void run() {
@@ -245,7 +246,7 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
 
             if (context != null) {
 
-                LoaderInvocation.purgeLoader(context, mId);
+                LoaderInvocation.purgeLoader(context, mInvocationId);
             }
         }
     }
@@ -257,22 +258,22 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
 
         private final WeakReference<Object> mContext;
 
-        private final int mId;
-
         private final List<Object> mInputs;
+
+        private final int mInvocationId;
 
         /**
          * Constructor.
          *
-         * @param context the context reference.
-         * @param id      the invocation ID.
-         * @param inputs  the list of inputs.
+         * @param context      the context reference.
+         * @param invocationId the invocation ID.
+         * @param inputs       the list of inputs.
          */
-        private PurgeInputsExecution(@Nonnull final WeakReference<Object> context, final int id,
-                @Nonnull final List<Object> inputs) {
+        private PurgeInputsExecution(@Nonnull final WeakReference<Object> context,
+                final int invocationId, @Nonnull final List<Object> inputs) {
 
             mContext = context;
-            mId = id;
+            mInvocationId = invocationId;
             mInputs = inputs;
         }
 
@@ -282,7 +283,7 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
 
             if (context != null) {
 
-                LoaderInvocation.purgeLoader(context, mId, mInputs);
+                LoaderInvocation.purgeLoader(context, mInvocationId, mInputs);
             }
         }
     }

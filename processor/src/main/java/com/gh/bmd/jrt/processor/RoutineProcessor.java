@@ -423,6 +423,7 @@ public class RoutineProcessor extends AbstractProcessor {
         return builder.toString();
     }
 
+    @SuppressWarnings("PointlessBooleanExpression")
     private void createWrapper(@Nonnull final TypeElement element,
             @Nonnull final TypeElement targetElement,
             @Nonnull final List<ExecutableElement> methodElements) {
@@ -435,7 +436,6 @@ public class RoutineProcessor extends AbstractProcessor {
             final String interfaceName = element.getSimpleName().toString();
             final Filer filer = processingEnv.getFiler();
 
-            //noinspection PointlessBooleanExpression,ConstantConditions
             if (!DEBUG) {
 
                 final JavaFileObject sourceFile =

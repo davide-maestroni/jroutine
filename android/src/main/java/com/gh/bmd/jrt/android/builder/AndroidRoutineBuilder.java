@@ -89,11 +89,11 @@ public interface AndroidRoutineBuilder<INPUT, OUTPUT>
     /**
      * Tells the builder to identify the invocation with the specified ID.
      *
-     * @param id the invocation ID.
+     * @param invocationId the invocation ID.
      * @return this builder.
      */
     @Nonnull
-    AndroidRoutineBuilder<INPUT, OUTPUT> withId(int id);
+    AndroidRoutineBuilder<INPUT, OUTPUT> withId(int invocationId);
 
     /**
      * Result cache type enumeration.<br/>

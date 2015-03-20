@@ -165,6 +165,11 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         warn(logger, configuration);
     }
 
+    /**
+     * Logs any warning related to ignored options in the specified configuration.
+     *
+     * @param configuration the routine configuration.
+     */
     private static void warn(@Nonnull final Logger logger,
             @Nonnull final RoutineConfiguration configuration) {
 

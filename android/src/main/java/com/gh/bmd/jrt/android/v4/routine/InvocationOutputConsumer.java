@@ -158,6 +158,8 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
      */
     InvocationResult<OUTPUT> createResult() {
 
+        // need to create a new instance each time to trick the loader manager into thinking that a
+        // brand new result is available
         return new Result();
     }
 

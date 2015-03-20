@@ -15,7 +15,7 @@ package com.gh.bmd.jrt.sample;
 
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.common.InvocationException;
-import com.gh.bmd.jrt.invocation.TemplateInvocation;
+import com.gh.bmd.jrt.invocation.StatelessInvocation;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,15 +26,14 @@ import java.net.URLConnection;
 import javax.annotation.Nonnull;
 
 /**
- * Invocation reading from URL connection.
+ * Invocation reading data from the URL connection.
  * <p/>
  * Created by davide on 10/17/14.
  */
-public class ReadConnection extends TemplateInvocation<URI, Chunk> {
+public class ReadConnection extends StatelessInvocation<URI, Chunk> {
 
     private static final int MAX_CHUNK_SIZE = 2048;
 
-    @Override
     public void onInput(final URI uri, @Nonnull final ResultChannel<Chunk> result) {
 
         try {
@@ -52,12 +51,12 @@ public class ReadConnection extends TemplateInvocation<URI, Chunk> {
             }
 
             final InputStream inputStream = connection.getInputStream();
-            Chunk chunk = new Chunk(MAX_CHUNK_SIZE);
+            Chunk chunk = new Chunk(MAX_CHUNK_SIZE, inputStream);
 
-            while (chunk.readFrom(inputStream)) {
+            while (chunk.getLength() > 0) {
 
                 result.pass(chunk);
-                chunk = new Chunk(MAX_CHUNK_SIZE);
+                chunk = new Chunk(MAX_CHUNK_SIZE, inputStream);
             }
 
         } catch (final IOException e) {

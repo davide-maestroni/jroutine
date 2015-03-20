@@ -27,7 +27,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Invocation writing into output file.
+ * Invocation writing the downloaded data into the output file.
  * <p/>
  * Created by davide on 10/17/14.
  */

@@ -12,6 +12,9 @@
  * limitations under the License.
  */
 apply plugin: 'java'
+apply from: '../extra.gradle'
+
+javaCompatibility = JavaVersion.VERSION_1_5
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])

@@ -36,7 +36,7 @@ import javax.annotation.Nonnull;
  * There are mainly two ways to create a routine object:
  * <p/>
  * <b>Routine by invocation customization</b><br/>
- * The first approach consists in implementing an invocation object and build its factory.
+ * The first approach consists in implementing an invocation object.
  * <p/>
  * <b>Routine by method invocation</b><br/>
  * The second approach is based on the asynchronous invocation of a method of an existing class or
@@ -52,9 +52,11 @@ import javax.annotation.Nonnull;
  * channels, so that data are transferred asynchronously, avoiding the need to block execution while
  * waiting for them to be available.<br/>
  * Finally, it also possible to create a wrapper class to enable asynchronous invocation of methods,
- * through annotation pre-processing and compile time code generation. In order to activate the
+ * through annotation pre-processing and compile-time code generation. In order to activate the
  * processing of annotations, it is simply necessary to include the "jroutine-processor" artifact
  * or module in the project dependencies.
+ * <p/>
+ * The class gives also the faculty to build standalone channel instances.
  * <p/>
  * <b>Some usage examples</b>
  * <p/>
@@ -62,8 +64,7 @@ import javax.annotation.Nonnull;
  * <pre>
  *     <code>
  *
- *         final StandaloneChannel&lt;Result&gt; channel =
- *                 JRoutine.standalone().&lt;Result&gt;buildChannel();
+ *         final StandaloneChannel&lt;Result&gt; channel = JRoutine.standalone().buildChannel();
  *
  *         channel.input()
  *                .pass(doSomething1.callAsync())
@@ -120,8 +121,7 @@ import javax.annotation.Nonnull;
  * <pre>
  *     <code>
  *
- *         final StandaloneChannel&lt;Result&gt; channel =
- *                 JRoutine.standalone().&lt;Result&gt;buildChannel();
+ *         final StandaloneChannel&lt;Result&gt; channel = JRoutine.standalone().buildChannel();
  *
  *         new Thread() {
  *
@@ -176,7 +176,6 @@ public class JRoutine {
     /**
      * Returns a routine builder based on the specified invocation factory.
      * <p/>
-     * The built routines are based on the invocation implementation.<br/>
      * The invocation instance is created only when needed, by passing the specified arguments to
      * the constructor. Note that the arguments objects should be immutable or, at least, never
      * shared inside and outside the routine in order to avoid concurrency issues.
@@ -197,8 +196,7 @@ public class JRoutine {
     /**
      * Returns a routine builder based on the specified invocation class token.
      * <p/>
-     * The built routines are based on the invocation implementation.<br/>
-     * The invocation instance is created only when needed.
+     * The invocation instance is created through reflection only when needed.
      *
      * @param invocationToken the class token.
      * @param <INPUT>         the input data type.

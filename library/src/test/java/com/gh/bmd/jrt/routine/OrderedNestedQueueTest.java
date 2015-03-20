@@ -35,9 +35,12 @@ public class OrderedNestedQueueTest extends TestCase {
         queue.add(13);
         final NestedQueue<Integer> nested0 = queue.addNested();
         queue.add(7);
-        final NestedQueue<Integer> nested1 = queue.addNested().addAll(Arrays.asList(11, 5));
-        final NestedQueue<Integer> nested2 = nested1.addNested().add(-77);
-        final NestedQueue<Integer> nested3 = nested2.addNested().add(-33);
+        final NestedQueue<Integer> nested1 = queue.addNested();
+        nested1.addAll(Arrays.asList(11, 5));
+        final NestedQueue<Integer> nested2 = nested1.addNested();
+        nested2.add(-77);
+        final NestedQueue<Integer> nested3 = nested2.addNested();
+        nested3.add(-33);
         queue.add(1);
 
         assertThat(queue.isEmpty()).isFalse();
@@ -72,15 +75,15 @@ public class OrderedNestedQueueTest extends TestCase {
         queue.add(13);
         queue.addNested();
         queue.add(7);
-        final NestedQueue<Integer> nested = queue.addNested()
-                                                 .addAll(Arrays.asList(11, 5))
-                                                 .addNested()
-                                                 .add(-77)
-                                                 .addNested()
-                                                 .add(-33);
+        NestedQueue<Integer> nested = queue.addNested();
+        nested.addAll(Arrays.asList(11, 5));
+        nested = nested.addNested();
+        nested.add(-77);
+        nested.addNested().add(-33);
         queue.add(1);
 
-        nested.close().clear();
+        nested.close();
+        nested.clear();
         assertThat(queue.isEmpty()).isFalse();
 
         queue.clear();
@@ -151,7 +154,12 @@ public class OrderedNestedQueueTest extends TestCase {
 
         }
 
-        queue.clear().addNested().addAll(Arrays.asList(1, 2, 3, 4)).close().clear();
+        queue.clear();
+
+        NestedQueue<Integer> nested = queue.addNested();
+        nested.addAll(Arrays.asList(1, 2, 3, 4));
+        nested.close();
+        nested.clear();
 
         try {
 
@@ -165,7 +173,10 @@ public class OrderedNestedQueueTest extends TestCase {
 
         try {
 
-            queue.addNested().addNested().close().add(1);
+            nested = queue.addNested();
+            nested = nested.addNested();
+            nested.close();
+            nested.add(1);
 
             fail();
 
@@ -175,7 +186,10 @@ public class OrderedNestedQueueTest extends TestCase {
 
         try {
 
-            queue.addNested().addNested().close().addAll(Arrays.asList(1, 2, 3, 4));
+            nested = queue.addNested();
+            nested = nested.addNested();
+            nested.close();
+            nested.addAll(Arrays.asList(1, 2, 3, 4));
 
             fail();
 
@@ -185,7 +199,10 @@ public class OrderedNestedQueueTest extends TestCase {
 
         try {
 
-            queue.addNested().addNested().close().addNested();
+            nested = queue.addNested();
+            nested = nested.addNested();
+            nested.close();
+            nested.addNested();
 
             fail();
 
@@ -195,7 +212,9 @@ public class OrderedNestedQueueTest extends TestCase {
 
         try {
 
-            queue.addNested().close().add(1);
+            nested = queue.addNested();
+            nested.close();
+            nested.add(1);
 
             fail();
 
@@ -205,7 +224,9 @@ public class OrderedNestedQueueTest extends TestCase {
 
         try {
 
-            queue.addNested().close().addAll(Arrays.asList(1, 2, 3, 4));
+            nested = queue.addNested();
+            nested.close();
+            nested.addAll(Arrays.asList(1, 2, 3, 4));
 
             fail();
 
@@ -215,7 +236,9 @@ public class OrderedNestedQueueTest extends TestCase {
 
         try {
 
-            queue.addNested().close().addNested();
+            nested = queue.addNested();
+            nested.close();
+            nested.addNested();
 
             fail();
 
@@ -263,9 +286,12 @@ public class OrderedNestedQueueTest extends TestCase {
         queue.add(13);
         final NestedQueue<Integer> nested0 = queue.addNested();
         queue.add(7);
-        final NestedQueue<Integer> nested1 = queue.addNested().addAll(Arrays.asList(11, 5));
-        final NestedQueue<Integer> nested2 = nested1.addNested().add(-77);
-        final NestedQueue<Integer> nested3 = nested2.addNested().add(-33);
+        final NestedQueue<Integer> nested1 = queue.addNested();
+        nested1.addAll(Arrays.asList(11, 5));
+        final NestedQueue<Integer> nested2 = nested1.addNested();
+        nested2.add(-77);
+        final NestedQueue<Integer> nested3 = nested2.addNested();
+        nested3.add(-33);
         queue.add(1);
 
         final ArrayList<Integer> list = new ArrayList<Integer>();
@@ -299,9 +325,12 @@ public class OrderedNestedQueueTest extends TestCase {
         queue.add(13);
         final NestedQueue<Integer> nested0 = queue.addNested();
         queue.add(7);
-        final NestedQueue<Integer> nested1 = queue.addNested().addAll(Arrays.asList(11, 5));
-        final NestedQueue<Integer> nested2 = nested1.addNested().add(-77);
-        final NestedQueue<Integer> nested3 = nested2.addNested().add(-33);
+        final NestedQueue<Integer> nested1 = queue.addNested();
+        nested1.addAll(Arrays.asList(11, 5));
+        final NestedQueue<Integer> nested2 = nested1.addNested();
+        nested2.add(-77);
+        final NestedQueue<Integer> nested3 = nested2.addNested();
+        nested3.add(-33);
         queue.add(1);
 
         nested0.close();

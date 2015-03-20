@@ -70,9 +70,8 @@ public class Invocations {
      * Note that class tokens of inner and anonymous class can be passed as well. Remember however
      * that Java creates synthetic constructor for such classes, so be sure to specify the correct
      * arguments to guarantee proper instantiation (see {@link #withArgs(Object...)}). In fact,
-     * inner
-     * classes always have the outer instance as first constructor parameter, and anonymous classes
-     * has both the outer instance and all the variables captured in the closure.
+     * inner classes always have the outer instance as first constructor parameter, and anonymous
+     * classes has both the outer instance and all the variables captured in the closure.
      *
      * @param invocationToken the invocation class token.
      * @param <INPUT>         the input data type.

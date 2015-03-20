@@ -892,8 +892,10 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
                     return;
                 }
 
+                final NestedQueue<INPUT> queue = mQueue;
                 mLogger.dbg("delayed input execution: %s", mInput);
-                mQueue.add(mInput).close();
+                queue.add(mInput);
+                queue.close();
             }
 
             mExecution.run();
@@ -933,8 +935,10 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
                     return;
                 }
 
+                final NestedQueue<INPUT> queue = mQueue;
                 mLogger.dbg("delayed input execution: %s", mInputs);
-                mQueue.addAll(mInputs).close();
+                queue.addAll(mInputs);
+                queue.close();
             }
 
             mExecution.run();

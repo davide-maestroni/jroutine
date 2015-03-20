@@ -36,7 +36,7 @@ import javax.annotation.Nullable;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.withInputOrder;
 
 /**
- * Class implementing a builder of routine objects based on a function or procedure instance.
+ * Class implementing a builder of routine objects based on function or procedure instances.
  * <p/>
  * Created by davide on 9/21/14.
  *
@@ -49,9 +49,8 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
      * Constructor.
      *
      * @param factory the invocation factory.
-     * @throws java.lang.NullPointerException if the class token is null.
+     * @throws java.lang.NullPointerException if the factory is null.
      */
-    @SuppressWarnings("ConstantConditions")
     private FunctionRoutineBuilder(@Nonnull final InvocationFactory<INPUT, OUTPUT> factory) {
 
         super(factory);

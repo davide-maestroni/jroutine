@@ -366,7 +366,7 @@ public class Time {
      * @return the time value in the specified unit.
      * @throws java.lang.NullPointerException if the specified time unit is null.
      */
-    public long to(final TimeUnit timeUnit) {
+    public long to(@Nonnull final TimeUnit timeUnit) {
 
         return timeUnit.convert(time, unit);
     }

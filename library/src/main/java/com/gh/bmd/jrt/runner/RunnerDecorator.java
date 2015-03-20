@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 
 /**
- * Decorator implementation of a runner object.
+ * Implementation of a decorator of a runner object.
  * <p/>
  * Created by davide on 9/22/14.
  */

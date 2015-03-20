@@ -1537,7 +1537,9 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                     mState = ChannelState.FLUSH;
                 }
 
-                mQueue.addAll(mOutputs).close();
+                final NestedQueue<Object> queue = mQueue;
+                queue.addAll(mOutputs);
+                queue.close();
             }
 
             flushOutput(false);
@@ -1584,7 +1586,9 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                     mState = ChannelState.FLUSH;
                 }
 
-                mQueue.add(mOutput).close();
+                final NestedQueue<Object> queue = mQueue;
+                queue.add(mOutput);
+                queue.close();
             }
 
             flushOutput(false);

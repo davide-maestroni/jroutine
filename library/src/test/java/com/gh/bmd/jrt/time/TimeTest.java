@@ -119,6 +119,16 @@ public class TimeTest extends TestCase {
         assertThat(time.hashCode()).isEqualTo(time.nanosTime().hashCode());
     }
 
+    public void testCurrentTime() {
+
+        final long systemTimeMs = System.currentTimeMillis();
+        assertThat(Time.current().toMillis()).isBetween(systemTimeMs - 50, systemTimeMs + 50);
+
+        final long systemTimeNs = System.nanoTime();
+        assertThat(Time.currentNano().toNanos()).isBetween(systemTimeNs - 50000000,
+                                                           systemTimeNs + 50000000);
+    }
+
     @SuppressWarnings("ConstantConditions")
     public void testError() {
 

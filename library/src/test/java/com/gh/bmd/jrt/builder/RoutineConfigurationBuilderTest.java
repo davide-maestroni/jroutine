@@ -283,5 +283,24 @@ public class RoutineConfigurationBuilderTest extends TestCase {
                 builder().withRunner(Runners.sharedRunner()).buildConfiguration());
         assertThat(withSyncRunner(RunnerType.QUEUED)).isEqualTo(
                 builder().withSyncRunner(RunnerType.QUEUED).buildConfiguration());
+
+        assertThat(configuration).isNotEqualTo(withAvailableTimeout(TimeDuration.ZERO));
+        assertThat(configuration).isNotEqualTo(withAvailableTimeout(1, TimeUnit.MILLISECONDS));
+        assertThat(configuration).isNotEqualTo(withCoreInvocations(3));
+        assertThat(configuration).isNotEqualTo(withInputOrder(OrderType.PASSING));
+        assertThat(configuration).isNotEqualTo(withInputSize(10));
+        assertThat(configuration).isNotEqualTo(withInputTimeout(TimeDuration.ZERO));
+        assertThat(configuration).isNotEqualTo(withInputTimeout(1, TimeUnit.MILLISECONDS));
+        assertThat(configuration).isNotEqualTo(withLog(Logs.nullLog()));
+        assertThat(configuration).isNotEqualTo(withLogLevel(LogLevel.DEBUG));
+        assertThat(configuration).isNotEqualTo(withMaxInvocations(4));
+        assertThat(configuration).isNotEqualTo(withOutputOrder(OrderType.DELIVERY));
+        assertThat(configuration).isNotEqualTo(withOutputSize(10));
+        assertThat(configuration).isNotEqualTo(withOutputTimeout(TimeDuration.ZERO));
+        assertThat(configuration).isNotEqualTo(withOutputTimeout(1, TimeUnit.MILLISECONDS));
+        assertThat(configuration).isNotEqualTo(withReadTimeout(TimeDuration.ZERO));
+        assertThat(configuration).isNotEqualTo(withReadTimeout(1, TimeUnit.MILLISECONDS));
+        assertThat(configuration).isNotEqualTo(withRunner(Runners.sharedRunner()));
+        assertThat(configuration).isNotEqualTo(withSyncRunner(RunnerType.QUEUED));
     }
 }

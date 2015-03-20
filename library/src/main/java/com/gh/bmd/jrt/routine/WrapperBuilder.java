@@ -37,7 +37,7 @@ public interface WrapperBuilder<TYPE> extends SharableBuilder {
      * <p/>
      * The wrapping object is created through code generation based on the interfaces annotated
      * with {@link com.gh.bmd.jrt.annotation.Wrap}.<br/>
-     * Note that, you'll need to enable annotation pre-processing by adding the processor package
+     * Note that, you'll need to enable annotation pre-processing by adding the processor artifact
      * to the specific project dependencies.
      *
      * @return the wrapping object.
@@ -54,6 +54,9 @@ public interface WrapperBuilder<TYPE> extends SharableBuilder {
     @Nonnull
     WrapperBuilder<TYPE> withConfiguration(@Nullable RoutineConfiguration configuration);
 
+    /**
+     * {@inheritDoc}
+     */
     @Nonnull
     WrapperBuilder<TYPE> withShareGroup(@Nullable String group);
 }

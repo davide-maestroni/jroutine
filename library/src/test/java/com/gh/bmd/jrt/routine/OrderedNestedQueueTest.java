@@ -13,21 +13,23 @@
  */
 package com.gh.bmd.jrt.routine;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 
 /**
  * Ordered nested queue unit tests.
  * <p/>
  * Created by davide on 10/2/14.
  */
-public class OrderedNestedQueueTest extends TestCase {
+public class OrderedNestedQueueTest {
 
+    @Test
     public void testAdd() {
 
         final OrderedNestedQueue<Integer> queue = new OrderedNestedQueue<Integer>();
@@ -68,6 +70,7 @@ public class OrderedNestedQueueTest extends TestCase {
         assertThat(queue.isEmpty()).isTrue();
     }
 
+    @Test
     public void testClear() {
 
         final OrderedNestedQueue<Integer> queue = new OrderedNestedQueue<Integer>();
@@ -90,6 +93,7 @@ public class OrderedNestedQueueTest extends TestCase {
         assertThat(queue.isEmpty()).isTrue();
     }
 
+    @Test
     public void testError() {
 
         final OrderedNestedQueue<Integer> queue = new OrderedNestedQueue<Integer>();
@@ -279,6 +283,7 @@ public class OrderedNestedQueueTest extends TestCase {
         }
     }
 
+    @Test
     public void testMove() {
 
         final OrderedNestedQueue<Integer> queue = new OrderedNestedQueue<Integer>();
@@ -318,6 +323,7 @@ public class OrderedNestedQueueTest extends TestCase {
         assertThat(list).containsExactly(1);
     }
 
+    @Test
     public void testMove2() {
 
         final OrderedNestedQueue<Integer> queue = new OrderedNestedQueue<Integer>();

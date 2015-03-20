@@ -13,9 +13,8 @@
  */
 package com.gh.bmd.jrt.common;
 
-import junit.framework.TestCase;
-
 import org.assertj.core.data.MapEntry;
+import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -23,14 +22,16 @@ import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 
 /**
  * Cache hash map unit tests.
  * <p/>
  * Created by davide on 11/18/14.
  */
-public class WeakIdentityHashMapTest extends TestCase {
+public class WeakIdentityHashMapTest {
 
+    @Test
     public void testAdd() {
 
         final WeakIdentityHashMap<Object, String> map = new WeakIdentityHashMap<Object, String>(13);
@@ -71,6 +72,7 @@ public class WeakIdentityHashMapTest extends TestCase {
         assertThat(map.get(entry.getKey())).isEqualTo("test");
     }
 
+    @Test
     public void testEquals() {
 
         final HashMap<Object, String> entries = new HashMap<Object, String>();
@@ -98,6 +100,7 @@ public class WeakIdentityHashMapTest extends TestCase {
         assertThat(map.entrySet()).isEqualTo(entries.entrySet());
     }
 
+    @Test
     @SuppressWarnings({"UnnecessaryBoxing", "Annotator"})
     public void testIdentity() {
 
@@ -118,6 +121,7 @@ public class WeakIdentityHashMapTest extends TestCase {
         assertThat(map).contains(MapEntry.entry(key1, "test1"));
     }
 
+    @Test
     public void testRemove() {
 
         final WeakIdentityHashMap<Object, String> map =
@@ -266,6 +270,7 @@ public class WeakIdentityHashMapTest extends TestCase {
         assertThat(map).isEmpty();
     }
 
+    @Test
     @SuppressWarnings("UnusedAssignment")
     public void testWeakReference() {
 

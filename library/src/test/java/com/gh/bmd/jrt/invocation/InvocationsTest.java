@@ -16,19 +16,21 @@ package com.gh.bmd.jrt.invocation;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.common.ClassToken;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 import javax.annotation.Nonnull;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 
 /**
  * Invocations unit tests.
  * <p/>
  * Created by davide on 2/16/15.
  */
-public class InvocationsTest extends TestCase {
+public class InvocationsTest {
 
+    @Test
     @SuppressWarnings({"NullArgumentToVariableArgMethod", "ConstantConditions"})
     public void testInvocationFactory() {
 

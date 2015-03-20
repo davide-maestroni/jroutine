@@ -45,7 +45,7 @@ import com.gh.bmd.jrt.routine.DefaultResultChannel.AbortHandler;
 import com.gh.bmd.jrt.runner.Runners;
 import com.gh.bmd.jrt.time.TimeDuration;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -75,14 +75,16 @@ import static com.gh.bmd.jrt.time.TimeDuration.INFINITY;
 import static com.gh.bmd.jrt.time.TimeDuration.millis;
 import static com.gh.bmd.jrt.time.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 
 /**
  * Routine unit tests.
  * <p/>
  * Created by davide on 9/9/14.
  */
-public class RoutineTest extends TestCase {
+public class RoutineTest {
 
+    @Test
     public void testAbort() throws InterruptedException {
 
         final TimeDuration timeout = seconds(1);
@@ -265,6 +267,7 @@ public class RoutineTest extends TestCase {
         assertThat(isFailed.get()).isFalse();
     }
 
+    @Test
     @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
     public void testAbortInput() throws InterruptedException {
 
@@ -303,6 +306,7 @@ public class RoutineTest extends TestCase {
         assertThat(abortReason.get().getCause()).isEqualTo(exception1);
     }
 
+    @Test
     public void testBind() {
 
         final TestOutputConsumer consumer = new TestOutputConsumer();
@@ -338,6 +342,7 @@ public class RoutineTest extends TestCase {
         assertThat(consumer.getOutput()).isEqualTo("test2");
     }
 
+    @Test
     public void testCalls() {
 
         final TimeDuration timeout = seconds(1);
@@ -436,6 +441,7 @@ public class RoutineTest extends TestCase {
                           .readAll()).containsOnly("test1", "test2");
     }
 
+    @Test
     public void testChainedRoutine() {
 
         final TimeDuration timeout = seconds(1);
@@ -493,6 +499,7 @@ public class RoutineTest extends TestCase {
                              .readAll()).containsExactly(30);
     }
 
+    @Test
     public void testComposedRoutine() {
 
         final TimeDuration timeout = seconds(1);
@@ -571,6 +578,7 @@ public class RoutineTest extends TestCase {
                 30);
     }
 
+    @Test
     public void testDelay() {
 
         long startTime = System.currentTimeMillis();
@@ -735,6 +743,7 @@ public class RoutineTest extends TestCase {
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(100);
     }
 
+    @Test
     public void testDelayedAbort() throws InterruptedException {
 
         final TimeDuration timeout = seconds(1);
@@ -784,6 +793,7 @@ public class RoutineTest extends TestCase {
         }
     }
 
+    @Test
     public void testDelayedBind() {
 
         final TimeDuration timeout = seconds(1);
@@ -803,6 +813,7 @@ public class RoutineTest extends TestCase {
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(500);
     }
 
+    @Test
     public void testDestroy() {
 
         final TimeDuration timeout = seconds(1);
@@ -888,6 +899,7 @@ public class RoutineTest extends TestCase {
         assertThat(TestDestroy.getInstanceCount()).isZero();
     }
 
+    @Test
     @SuppressWarnings("ConstantConditions")
     public void testError() {
 
@@ -1008,6 +1020,7 @@ public class RoutineTest extends TestCase {
         }
     }
 
+    @Test
     public void testErrorConsumerOnComplete() {
 
         final TemplateOutputConsumer<String> exceptionConsumer =
@@ -1023,6 +1036,7 @@ public class RoutineTest extends TestCase {
         testConsumer(exceptionConsumer);
     }
 
+    @Test
     public void testErrorConsumerOnOutput() {
 
         final TemplateOutputConsumer<String> exceptionConsumer =
@@ -1038,6 +1052,7 @@ public class RoutineTest extends TestCase {
         testConsumer(exceptionConsumer);
     }
 
+    @Test
     public void testErrorOnInit() {
 
         final TemplateInvocation<String, String> exceptionOnInit =
@@ -1062,6 +1077,7 @@ public class RoutineTest extends TestCase {
         testChained(exceptionRoutine, passingRoutine, "test", "test1");
     }
 
+    @Test
     public void testErrorOnInput() {
 
         final TemplateInvocation<String, String> exceptionOnInput =
@@ -1087,6 +1103,7 @@ public class RoutineTest extends TestCase {
         testChained(exceptionRoutine, passingRoutine, "test2", "test2");
     }
 
+    @Test
     public void testErrorOnResult() {
 
         final TemplateInvocation<String, String> exceptionOnResult =
@@ -1111,6 +1128,7 @@ public class RoutineTest extends TestCase {
         testChained(exceptionRoutine, passingRoutine, "test", "test3");
     }
 
+    @Test
     public void testInputTimeout() {
 
         try {
@@ -1129,6 +1147,7 @@ public class RoutineTest extends TestCase {
         }
     }
 
+    @Test
     public void testInvocationLifecycle() throws InterruptedException {
 
         final OutputChannel<String> outputChannel =
@@ -1141,6 +1160,7 @@ public class RoutineTest extends TestCase {
         assertThat(TestLifecycle.sIsError).isFalse();
     }
 
+    @Test
     public void testMethod() throws NoSuchMethodException {
 
         final TimeDuration timeout = seconds(1);
@@ -1204,6 +1224,7 @@ public class RoutineTest extends TestCase {
         assertThat(testInterfaceAsync.getInt(testInterfaceAsync.getOne())).isEqualTo(1);
     }
 
+    @Test
     public void testOutputTimeout() {
 
         final RoutineConfiguration configuration = builder().withOutputSize(1)
@@ -1231,6 +1252,7 @@ public class RoutineTest extends TestCase {
         }
     }
 
+    @Test
     @SuppressWarnings("ConstantConditions")
     public void testParameterChannelError() {
 
@@ -1343,6 +1365,7 @@ public class RoutineTest extends TestCase {
         }
     }
 
+    @Test
     public void testPartialOut() {
 
         final TemplateInvocation<String, String> invocation =
@@ -1362,6 +1385,7 @@ public class RoutineTest extends TestCase {
                            .readAll()).containsExactly("test");
     }
 
+    @Test
     @SuppressWarnings("ConstantConditions")
     public void testResultChannelError() {
 
@@ -1567,6 +1591,7 @@ public class RoutineTest extends TestCase {
         }
     }
 
+    @Test
     public void testRoutine() {
 
         final TimeDuration timeout = seconds(1);
@@ -1594,6 +1619,7 @@ public class RoutineTest extends TestCase {
                 1, 4, 9, 16);
     }
 
+    @Test
     public void testRoutineFunction() {
 
         final TimeDuration timeout = seconds(1);
@@ -1623,6 +1649,7 @@ public class RoutineTest extends TestCase {
                 10);
     }
 
+    @Test
     public void testTimeoutActions() {
 
         final Routine<String, String> routine1 =

@@ -39,7 +39,7 @@ import com.gh.bmd.jrt.log.NullLog;
 import com.gh.bmd.jrt.runner.Runners;
 import com.gh.bmd.jrt.time.TimeDuration;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -61,14 +61,16 @@ import static com.gh.bmd.jrt.invocation.Invocations.factoryOf;
 import static com.gh.bmd.jrt.time.TimeDuration.INFINITY;
 import static com.gh.bmd.jrt.time.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 
 /**
  * Routine builder unit tests.
  * <p/>
  * Created by davide on 10/16/14.
  */
-public class JRoutineTest extends TestCase {
+public class JRoutineTest {
 
+    @Test
     public void testClassRoutineBuilder() throws NoSuchMethodException {
 
         final TimeDuration timeout = seconds(1);
@@ -146,6 +148,7 @@ public class JRoutineTest extends TestCase {
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
     }
 
+    @Test
     @SuppressWarnings("ConstantConditions")
     public void testClassRoutineBuilderError() {
 
@@ -210,6 +213,7 @@ public class JRoutineTest extends TestCase {
         }
     }
 
+    @Test
     public void testClassRoutineBuilderWarnings() {
 
         final CountLog countLog = new CountLog();
@@ -226,6 +230,7 @@ public class JRoutineTest extends TestCase {
         assertThat(countLog.getWrnCount()).isEqualTo(6);
     }
 
+    @Test
     public void testClassRoutineCache() {
 
         final NullLog nullLog = new NullLog();
@@ -290,6 +295,7 @@ public class JRoutineTest extends TestCase {
         assertThat(routine4).isNotEqualTo(routine5);
     }
 
+    @Test
     public void testFunctionBuilder() {
 
         final Function0<String> function0 = new Function0<String>() {
@@ -387,10 +393,11 @@ public class JRoutineTest extends TestCase {
                            .readAll()).containsOnly("test1", "test2", "test3");
     }
 
+    @Test
     public void testObjectRoutineBuilder() throws NoSuchMethodException {
 
         final TimeDuration timeout = seconds(1);
-        final Test test = new Test();
+        final TestClass test = new TestClass();
         final RoutineConfiguration configuration = builder().withSyncRunner(RunnerType.SEQUENTIAL)
                                                             .withRunner(Runners.poolRunner())
                                                             .withMaxInvocations(1)
@@ -402,7 +409,7 @@ public class JRoutineTest extends TestCase {
                                                             .withLog(new NullLog())
                                                             .buildConfiguration();
         final Routine<Object, Object> routine =
-                JRoutine.on(test).withConfiguration(configuration).boundMethod(Test.GET);
+                JRoutine.on(test).withConfiguration(configuration).boundMethod(TestClass.GET);
 
         assertThat(routine.callSync().afterMax(timeout).readAll()).containsExactly(-77L);
 
@@ -423,11 +430,12 @@ public class JRoutineTest extends TestCase {
         final Routine<Object, Object> routine2 = JRoutine.on(test)
                                                          .withConfiguration(configuration2)
                                                          .withShareGroup("test")
-                                                         .method(Test.class.getMethod("getLong"));
+                                                         .method(TestClass.class.getMethod(
+                                                                 "getLong"));
 
         assertThat(routine2.callSync().afterMax(timeout).readAll()).containsExactly(-77L);
 
-        final Routine<Object, Object> routine3 = JRoutine.onWeak(test).boundMethod(Test.THROW);
+        final Routine<Object, Object> routine3 = JRoutine.onWeak(test).boundMethod(TestClass.THROW);
 
         try {
 
@@ -442,7 +450,7 @@ public class JRoutineTest extends TestCase {
         }
 
         final ObjectRoutineBuilder builder =
-                JRoutine.on(new Test2()).withConfiguration(withReadTimeout(seconds(2)));
+                JRoutine.on(new TestClass2()).withConfiguration(withReadTimeout(seconds(2)));
 
         long startTime = System.currentTimeMillis();
 
@@ -463,6 +471,7 @@ public class JRoutineTest extends TestCase {
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
     }
 
+    @Test
     @SuppressWarnings("ConstantConditions")
     public void testObjectRoutineBuilderError() {
 
@@ -486,7 +495,7 @@ public class JRoutineTest extends TestCase {
 
         }
 
-        final Test test = new Test();
+        final TestClass test = new TestClass();
 
         try {
 
@@ -530,7 +539,7 @@ public class JRoutineTest extends TestCase {
 
         try {
 
-            new DefaultObjectRoutineBuilder(test).buildProxy(Test.class);
+            new DefaultObjectRoutineBuilder(test).buildProxy(TestClass.class);
 
             fail();
 
@@ -540,7 +549,7 @@ public class JRoutineTest extends TestCase {
 
         try {
 
-            new DefaultObjectRoutineBuilder(test).buildProxy(ClassToken.tokenOf(Test.class));
+            new DefaultObjectRoutineBuilder(test).buildProxy(ClassToken.tokenOf(TestClass.class));
 
             fail();
 
@@ -570,7 +579,7 @@ public class JRoutineTest extends TestCase {
 
         try {
 
-            new DefaultObjectRoutineBuilder(test).buildWrapper(Test.class);
+            new DefaultObjectRoutineBuilder(test).buildWrapper(TestClass.class);
 
             fail();
 
@@ -580,7 +589,7 @@ public class JRoutineTest extends TestCase {
 
         try {
 
-            new DefaultObjectRoutineBuilder(test).buildWrapper(ClassToken.tokenOf(Test.class));
+            new DefaultObjectRoutineBuilder(test).buildWrapper(ClassToken.tokenOf(TestClass.class));
 
             fail();
 
@@ -781,6 +790,7 @@ public class JRoutineTest extends TestCase {
         }
     }
 
+    @Test
     public void testObjectRoutineBuilderWarnings() {
 
         final CountLog countLog = new CountLog();
@@ -793,7 +803,7 @@ public class JRoutineTest extends TestCase {
                                                             .withLogLevel(LogLevel.DEBUG)
                                                             .withLog(countLog)
                                                             .buildConfiguration();
-        JRoutine.on(new Test()).withConfiguration(configuration).boundMethod(Test.GET);
+        JRoutine.on(new TestClass()).withConfiguration(configuration).boundMethod(TestClass.GET);
         assertThat(countLog.getWrnCount()).isEqualTo(6);
 
         final Square square = new Square();
@@ -801,9 +811,10 @@ public class JRoutineTest extends TestCase {
         assertThat(countLog.getWrnCount()).isEqualTo(12);
     }
 
+    @Test
     public void testObjectRoutineCache() {
 
-        final Test test = new Test();
+        final TestClass test = new TestClass();
         final NullLog nullLog = new NullLog();
         final RoutineConfiguration configuration1 = builder().withSyncRunner(RunnerType.SEQUENTIAL)
                                                              .withRunner(Runners.sharedRunner())
@@ -811,7 +822,7 @@ public class JRoutineTest extends TestCase {
                                                              .withLog(nullLog)
                                                              .buildConfiguration();
         final Routine<Object, Object> routine1 =
-                JRoutine.on(test).withConfiguration(configuration1).boundMethod(Test.GET);
+                JRoutine.on(test).withConfiguration(configuration1).boundMethod(TestClass.GET);
 
         assertThat(routine1.callSync().readAll()).containsExactly(-77L);
 
@@ -821,7 +832,7 @@ public class JRoutineTest extends TestCase {
                                                              .withLog(nullLog)
                                                              .buildConfiguration();
         final Routine<Object, Object> routine2 =
-                JRoutine.on(test).withConfiguration(configuration2).boundMethod(Test.GET);
+                JRoutine.on(test).withConfiguration(configuration2).boundMethod(TestClass.GET);
 
         assertThat(routine2.callSync().readAll()).containsExactly(-77L);
         assertThat(routine1).isEqualTo(routine2);
@@ -832,7 +843,7 @@ public class JRoutineTest extends TestCase {
                                                              .withLog(nullLog)
                                                              .buildConfiguration();
         final Routine<Object, Object> routine3 =
-                JRoutine.on(test).withConfiguration(configuration3).boundMethod(Test.GET);
+                JRoutine.on(test).withConfiguration(configuration3).boundMethod(TestClass.GET);
 
         assertThat(routine3.callSync().readAll()).containsExactly(-77L);
         assertThat(routine1).isNotEqualTo(routine3);
@@ -844,7 +855,7 @@ public class JRoutineTest extends TestCase {
                                                              .withLog(nullLog)
                                                              .buildConfiguration();
         final Routine<Object, Object> routine4 =
-                JRoutine.on(test).withConfiguration(configuration4).boundMethod(Test.GET);
+                JRoutine.on(test).withConfiguration(configuration4).boundMethod(TestClass.GET);
 
         assertThat(routine4.callSync().readAll()).containsExactly(-77L);
         assertThat(routine3).isNotEqualTo(routine4);
@@ -855,12 +866,13 @@ public class JRoutineTest extends TestCase {
                                                              .withLog(new NullLog())
                                                              .buildConfiguration();
         final Routine<Object, Object> routine5 =
-                JRoutine.on(test).withConfiguration(configuration5).boundMethod(Test.GET);
+                JRoutine.on(test).withConfiguration(configuration5).boundMethod(TestClass.GET);
 
         assertThat(routine5.callSync().readAll()).containsExactly(-77L);
         assertThat(routine4).isNotEqualTo(routine5);
     }
 
+    @Test
     @SuppressWarnings("NullArgumentToVariableArgMethod")
     public void testObjectRoutineProxy() {
 
@@ -938,6 +950,7 @@ public class JRoutineTest extends TestCase {
         assertThat(countAsync.countList1(3).readAll()).containsExactly(0, 1, 2);
     }
 
+    @Test
     public void testProcedureBuilder() throws InterruptedException {
 
         final Semaphore semaphore = new Semaphore(0);
@@ -1038,6 +1051,7 @@ public class JRoutineTest extends TestCase {
         assertThat(semaphore.tryAcquire(0, TimeUnit.SECONDS)).isTrue();
     }
 
+    @Test
     public void testRoutineBuilder() {
 
         final RoutineConfiguration configuration = builder().withSyncRunner(RunnerType.SEQUENTIAL)
@@ -1077,6 +1091,7 @@ public class JRoutineTest extends TestCase {
                            .readAll()).containsExactly("test1", "test2");
     }
 
+    @Test
     @SuppressWarnings("ConstantConditions")
     public void testRoutineBuilderError() {
 
@@ -1211,6 +1226,7 @@ public class JRoutineTest extends TestCase {
         }
     }
 
+    @Test
     public void testStandaloneChannelBuilder() {
 
         final TimeDuration timeout = seconds(1);
@@ -1243,6 +1259,7 @@ public class JRoutineTest extends TestCase {
                                                                                             -77L);
     }
 
+    @Test
     public void testStandaloneChannelBuilderWarnings() {
 
         final CountLog countLog = new CountLog();
@@ -1403,11 +1420,11 @@ public class JRoutineTest extends TestCase {
 
         void throwException(@Pass(int.class) RuntimeException ex);
 
-        @Bind(Test.THROW)
+        @Bind(TestClass.THROW)
         @Pass(int.class)
         void throwException1(RuntimeException ex);
 
-        @Bind(Test.THROW)
+        @Bind(TestClass.THROW)
         int throwException2(RuntimeException ex);
     }
 
@@ -1567,7 +1584,7 @@ public class JRoutineTest extends TestCase {
         }
     }
 
-    private static class Test {
+    private static class TestClass {
 
         public static final String GET = "get";
 
@@ -1588,7 +1605,7 @@ public class JRoutineTest extends TestCase {
     }
 
     @SuppressWarnings("UnusedDeclaration")
-    private static class Test2 {
+    private static class TestClass2 {
 
         public int getOne() throws InterruptedException {
 

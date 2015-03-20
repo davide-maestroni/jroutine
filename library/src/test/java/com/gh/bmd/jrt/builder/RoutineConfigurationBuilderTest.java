@@ -22,7 +22,7 @@ import com.gh.bmd.jrt.log.NullLog;
 import com.gh.bmd.jrt.runner.Runners;
 import com.gh.bmd.jrt.time.TimeDuration;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
 
@@ -43,14 +43,16 @@ import static com.gh.bmd.jrt.builder.RoutineConfiguration.withReadTimeout;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.withRunner;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.withSyncRunner;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 
 /**
  * Configuration builder unit tests.
  * <p/>
  * Created by davide on 11/22/14.
  */
-public class RoutineConfigurationBuilderTest extends TestCase {
+public class RoutineConfigurationBuilderTest {
 
+    @Test
     @SuppressWarnings("ConstantConditions")
     public void testBuilderError() {
 
@@ -235,6 +237,7 @@ public class RoutineConfigurationBuilderTest extends TestCase {
         }
     }
 
+    @Test
     public void testEquals() {
 
         final Builder builder = builder();

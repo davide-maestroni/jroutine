@@ -13,7 +13,7 @@
  */
 package com.gh.bmd.jrt.common;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -22,13 +22,15 @@ import static org.assertj.core.api.Assertions.assertThat;
  * <p/>
  * Created by davide on 10/2/14.
  */
-public class ExceptionTest extends TestCase {
+public class ExceptionTest {
 
+    @Test
     public void testExceptions() {
 
         assertThat(new DeadlockException("")).hasNoCause();
     }
 
+    @Test
     public void testRoutineException() {
 
         assertThat(new InvocationException(new NullPointerException())).isExactlyInstanceOf(
@@ -39,6 +41,7 @@ public class ExceptionTest extends TestCase {
         assertThat(new InvocationException(null)).hasNoCause();
     }
 
+    @Test
     public void testRoutineInterruptedException() {
 
         assertThat(

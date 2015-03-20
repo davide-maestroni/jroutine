@@ -15,20 +15,21 @@ package com.gh.bmd.jrt.log;
 
 import com.gh.bmd.jrt.log.Log.LogLevel;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 import java.util.List;
 
 import javax.annotation.Nonnull;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 
 /**
  * Logger unit tests.
  * <p/>
  * Created by davide on 10/4/14.
  */
-public class LoggerTest extends TestCase {
+public class LoggerTest {
 
     private static final String[] ARGS = new String[]{"test1", "test2", "test3", "test4", "test5"};
 
@@ -42,6 +43,7 @@ public class LoggerTest extends TestCase {
 
     private static final String FORMAT4 = "0: %s - 1: %s - 2: %s - 3: %s - 4: %s";
 
+    @Test
     public void testDefault() {
 
         final Log defaultLog = Logger.getGlobalLog();
@@ -68,6 +70,7 @@ public class LoggerTest extends TestCase {
         assertThat(logger.getLogLevel()).isEqualTo(defaultLogLevel);
     }
 
+    @Test
     @SuppressWarnings("ConstantConditions")
     public void testError() {
 
@@ -90,6 +93,7 @@ public class LoggerTest extends TestCase {
         Logger.newLogger(new NullLog(), LogLevel.DEBUG, this).err((Throwable) null);
     }
 
+    @Test
     public void testLoggerDebug() {
 
         final NullPointerException ex = new NullPointerException();
@@ -270,6 +274,7 @@ public class LoggerTest extends TestCase {
                 String.format(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]));
     }
 
+    @Test
     public void testLoggerError() {
 
         final NullPointerException ex = new NullPointerException();
@@ -442,6 +447,7 @@ public class LoggerTest extends TestCase {
                 String.format(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]));
     }
 
+    @Test
     public void testLoggerSilent() {
 
         final NullPointerException ex = new NullPointerException();
@@ -610,6 +616,7 @@ public class LoggerTest extends TestCase {
         assertThat(log.getMessage()).isNull();
     }
 
+    @Test
     public void testLoggerWarning() {
 
         final NullPointerException ex = new NullPointerException();
@@ -786,6 +793,7 @@ public class LoggerTest extends TestCase {
                 String.format(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]));
     }
 
+    @Test
     public void testSubContext() {
 
         final TestLog log = new TestLog();

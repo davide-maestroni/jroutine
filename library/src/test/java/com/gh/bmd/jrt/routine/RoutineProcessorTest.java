@@ -27,7 +27,7 @@ import com.gh.bmd.jrt.log.NullLog;
 import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.runner.Runners;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,8 +50,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  * <p/>
  * Created by davide on 11/18/14.
  */
-public class RoutineProcessorTest extends TestCase {
+public class RoutineProcessorTest {
 
+    @Test
     public void testInterface() {
 
         final TestClass testClass = new TestClass();
@@ -64,6 +65,7 @@ public class RoutineProcessorTest extends TestCase {
         assertThat(testWrapper.getOne().readNext()).isEqualTo(1);
     }
 
+    @Test
     public void testWrapper() {
 
         final NullLog log = new NullLog();
@@ -108,6 +110,7 @@ public class RoutineProcessorTest extends TestCase {
                 testWrapper);
     }
 
+    @Test
     public void testWrapperBuilder() {
 
         final NullLog log = new NullLog();
@@ -152,6 +155,7 @@ public class RoutineProcessorTest extends TestCase {
                 testWrapper);
     }
 
+    @Test
     public void testWrapperBuilderWarnings() {
 
         final CountLog countLog = new CountLog();

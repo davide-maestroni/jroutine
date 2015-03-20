@@ -13,21 +13,23 @@
  */
 package com.gh.bmd.jrt.common;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 
 /**
  * Reflection utils unit tests.
  * <p/>
  * Created by davide on 10/4/14.
  */
-public class ReflectionTest extends TestCase {
+public class ReflectionTest {
 
+    @Test
     public void testBoxingClass() {
 
         assertThat(Void.class.equals(Reflection.boxingClass(void.class))).isTrue();
@@ -39,9 +41,10 @@ public class ReflectionTest extends TestCase {
         assertThat(Long.class.equals(Reflection.boxingClass(long.class))).isTrue();
         assertThat(Float.class.equals(Reflection.boxingClass(float.class))).isTrue();
         assertThat(Double.class.equals(Reflection.boxingClass(double.class))).isTrue();
-        assertThat(TestCase.class.equals(Reflection.boxingClass(TestCase.class))).isTrue();
+        assertThat(Reflection.class.equals(Reflection.boxingClass(Reflection.class))).isTrue();
     }
 
+    @Test
     public void testConstructor() {
 
         assertThat(Reflection.findConstructor(TestClass.class)).isNotNull();

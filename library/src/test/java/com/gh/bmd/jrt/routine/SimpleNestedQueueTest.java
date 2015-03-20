@@ -13,21 +13,23 @@
  */
 package com.gh.bmd.jrt.routine;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 
 /**
  * Simple nested queue unit tests.
  * <p/>
  * Created by davide on 10/1/14.
  */
-public class SimpleNestedQueueTest extends TestCase {
+public class SimpleNestedQueueTest {
 
+    @Test
     public void testAdd() {
 
         final SimpleNestedQueue<Integer> queue = new SimpleNestedQueue<Integer>();
@@ -60,6 +62,7 @@ public class SimpleNestedQueueTest extends TestCase {
         assertThat(queue.isEmpty()).isTrue();
     }
 
+    @Test
     public void testClear() {
 
         final SimpleNestedQueue<Integer> queue = new SimpleNestedQueue<Integer>();
@@ -80,6 +83,7 @@ public class SimpleNestedQueueTest extends TestCase {
         assertThat(queue.isEmpty()).isTrue();
     }
 
+    @Test
     public void testError() {
 
         final SimpleNestedQueue<Integer> queue = new SimpleNestedQueue<Integer>();
@@ -269,6 +273,7 @@ public class SimpleNestedQueueTest extends TestCase {
         }
     }
 
+    @Test
     public void testMove() {
 
         final SimpleNestedQueue<Integer> queue = new SimpleNestedQueue<Integer>();

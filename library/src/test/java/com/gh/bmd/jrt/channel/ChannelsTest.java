@@ -21,7 +21,7 @@ import com.gh.bmd.jrt.routine.JRoutine;
 import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.routine.StandaloneChannelBuilder;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 import java.util.Arrays;
 
@@ -36,8 +36,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  * <p/>
  * Created by davide on 3/18/15.
  */
-public class ChannelsTest extends TestCase {
+public class ChannelsTest {
 
+    @Test
     @SuppressWarnings("unchecked")
     public void testSelect() {
 

@@ -219,7 +219,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
                         boxingClass(parameterType.getComponentType()))) {
 
                     throw new IllegalArgumentException(
-                            "the async input array of type " + PassingMode.PARALLEL
+                            "the async input array with passing mode " + PassingMode.PARALLEL
                                     + " does not match the bound type: "
                                     + paramClass.getCanonicalName());
                 }
@@ -227,7 +227,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
                 if (length > 1) {
 
                     throw new IllegalArgumentException(
-                            "an async input of type " + PassingMode.PARALLEL +
+                            "an async input with passing mode " + PassingMode.PARALLEL +
                                     " cannot be applied to a method taking " + length +
                                     " input parameters");
 

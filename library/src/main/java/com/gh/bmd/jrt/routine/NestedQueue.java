@@ -66,7 +66,7 @@ interface NestedQueue<E> {
 
     /**
      * Closes this queue.<br/>
-     * After the method returns no more addition can be made to this queue. Though, elements can
+     * After the method returns no further additions can be made to this queue. Though, elements can
      * be safely removed.
      */
     void close();

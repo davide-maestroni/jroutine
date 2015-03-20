@@ -511,7 +511,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
     private enum ChannelState {
 
         INPUT,      // input channel is open
-        OUTPUT,     // no more input
+        OUTPUT,     // no more inputs
         RESULT,     // result called
         EXCEPTION   // abort issued
     }

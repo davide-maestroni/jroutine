@@ -26,8 +26,8 @@ import javax.annotation.Nullable;
  * Routine invocations started through the returned objects can be safely restored after a change in
  * the configuration, so to avoid duplicated calls and memory leaks. Be aware, though, that the
  * invocation results will always be dispatched in the main thread, no matter the calling one was,
- * so waiting for the outputs right after the routine invocation will result in a deadlock.<br/>
- * The context of the invocations will be always the application one.
+ * so, waiting for the outputs right after the routine invocation, will result in a deadlock.<br/>
+ * The local context of the invocations will always be the application one.
  * <p/>
  * Note that the <code>equals()</code> and <code>hashCode()</code> methods of the input parameter
  * objects might be employed to check for clashing of invocations or compute the invocation ID.<br/>
@@ -48,6 +48,9 @@ public interface AndroidRoutineBuilder<INPUT, OUTPUT>
      */
     int AUTO = Integer.MIN_VALUE;
 
+    /**
+     * {@inheritDoc}
+     */
     @Nonnull
     AndroidRoutine<INPUT, OUTPUT> buildRoutine();
 

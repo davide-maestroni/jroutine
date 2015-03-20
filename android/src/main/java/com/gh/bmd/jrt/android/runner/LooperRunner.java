@@ -55,12 +55,12 @@ class LooperRunner implements Runner {
             public void run(@Nonnull final Execution execution, final long delay,
                     @Nonnull final TimeUnit timeUnit) {
 
-                runInternal(execution, delay, timeUnit);
+                internalRun(execution, delay, timeUnit);
             }
         };
     }
 
-    private void runInternal(@Nonnull final Execution execution, final long delay,
+    private void internalRun(@Nonnull final Execution execution, final long delay,
             @Nonnull final TimeUnit timeUnit) {
 
         if (delay > 0) {
@@ -82,9 +82,7 @@ class LooperRunner implements Runner {
 
         } else {
 
-            runInternal(execution, delay, timeUnit);
+            internalRun(execution, delay, timeUnit);
         }
     }
-
-
 }

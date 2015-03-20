@@ -121,10 +121,11 @@ public class AndroidRunnerTest extends AndroidTestCase {
 
         testRunner(Runners.mainRunner());
         testRunner(new MainRunner());
-        testRunner(Runners.mainRunner(null));
-        testRunner(new RunnerDecorator(Runners.mainRunner(null)));
-        testRunner(Runners.mainRunner(Runners.queuedRunner()));
-        testRunner(new RunnerDecorator(Runners.mainRunner(Runners.queuedRunner())));
+        testRunner(Runners.looperRunner(Looper.getMainLooper()));
+        testRunner(new RunnerDecorator(Runners.looperRunner(Looper.getMainLooper())));
+        testRunner(Runners.looperRunner(Looper.getMainLooper(), Runners.queuedRunner()));
+        testRunner(new RunnerDecorator(
+                Runners.looperRunner(Looper.getMainLooper(), Runners.queuedRunner())));
     }
 
     public void testTaskRunner() throws InterruptedException {

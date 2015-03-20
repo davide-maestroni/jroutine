@@ -57,7 +57,7 @@ class LocalQueue {
     private int mLast;
 
     /**
-     * Default constructor.
+     * Constructor.
      */
     private LocalQueue() {
 

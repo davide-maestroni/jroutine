@@ -33,7 +33,7 @@ class OrderedNestedQueue<E> implements NestedQueue<E> {
     private boolean mClosed;
 
     /**
-     * Default constructor.
+     * Constructor.
      */
     OrderedNestedQueue() {
 

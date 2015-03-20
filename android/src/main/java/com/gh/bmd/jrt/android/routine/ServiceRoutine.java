@@ -64,7 +64,7 @@ import static com.gh.bmd.jrt.common.Reflection.findConstructor;
 import static java.util.UUID.randomUUID;
 
 /**
- * Routine implementation employing an Android remote service to run its invocations.
+ * Routine implementation employing an Android service to run its invocations.
  * <p/>
  * Created by davide on 1/8/15.
  *
@@ -96,9 +96,9 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
      *
      * @param context         the routine context.
      * @param serviceClass    the service class.
-     * @param looper          the message looper.
      * @param invocationClass the invocation class.
      * @param configuration   the routine configuration.
+     * @param looper          the message looper.
      * @param runnerClass     the asynchronous runner class.
      * @param logClass        the log class.
      * @throws java.lang.IllegalArgumentException if at least one of the parameter is invalid.
@@ -106,9 +106,8 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
      */
     ServiceRoutine(@Nonnull final Context context,
             @Nullable final Class<? extends RoutineService> serviceClass,
-            @Nullable final Looper looper,
             @Nonnull final Class<? extends AndroidInvocation<INPUT, OUTPUT>> invocationClass,
-            @Nonnull final RoutineConfiguration configuration,
+            @Nonnull final RoutineConfiguration configuration, @Nullable final Looper looper,
             @Nullable final Class<? extends Runner> runnerClass,
             @Nullable final Class<? extends Log> logClass) {
 
@@ -201,17 +200,17 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
     @Nonnull
     public ParameterChannel<INPUT, OUTPUT> invokeAsync() {
 
-        return new ServiceChannel<INPUT, OUTPUT>(false, mContext, mServiceClass, mLooper,
-                                                 mInvocationClass, mConfiguration, mRunnerClass,
-                                                 mLogClass, mLogger);
+        return new ServiceChannel<INPUT, OUTPUT>(false, mContext, mServiceClass, mInvocationClass,
+                                                 mConfiguration, mLooper, mRunnerClass, mLogClass,
+                                                 mLogger);
     }
 
     @Nonnull
     public ParameterChannel<INPUT, OUTPUT> invokeParallel() {
 
-        return new ServiceChannel<INPUT, OUTPUT>(true, mContext, mServiceClass, mLooper,
-                                                 mInvocationClass, mConfiguration, mRunnerClass,
-                                                 mLogClass, mLogger);
+        return new ServiceChannel<INPUT, OUTPUT>(true, mContext, mServiceClass, mInvocationClass,
+                                                 mConfiguration, mLooper, mRunnerClass, mLogClass,
+                                                 mLogger);
     }
 
     @Nonnull
@@ -278,18 +277,17 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
          * @param isParallel      whether the invocation is parallel.
          * @param context         the routine context.
          * @param serviceClass    the service class.
-         * @param looper          the message looper.
          * @param invocationClass the invocation class.
          * @param configuration   the routine configuration.
+         * @param looper          the message looper.
          * @param runnerClass     the asynchronous runner class.
          * @param logClass        the log class.
          * @param logger          the routine logger.
          */
         private ServiceChannel(boolean isParallel, @Nonnull final Context context,
                 @Nonnull final Class<? extends RoutineService> serviceClass,
-                @Nullable final Looper looper,
                 @Nonnull Class<? extends AndroidInvocation<INPUT, OUTPUT>> invocationClass,
-                @Nonnull final RoutineConfiguration configuration,
+                @Nonnull final RoutineConfiguration configuration, @Nullable final Looper looper,
                 @Nullable final Class<? extends Runner> runnerClass,
                 @Nullable final Class<? extends Log> logClass, @Nonnull final Logger logger) {
 
@@ -457,7 +455,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         }
 
         /**
-         * Output consumer sending messages to the remote service.
+         * Output consumer sending messages to the service.
          */
         private class ConnectionOutputConsumer implements OutputConsumer<INPUT> {
 
@@ -513,7 +511,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         }
 
         /**
-         * Handler implementation managing incoming messages from the remote service.
+         * Handler implementation managing incoming messages from the service.
          */
         private class IncomingHandler extends Handler {
 
@@ -579,7 +577,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         }
 
         /**
-         * Service connection implementation managing the remote service communication state.
+         * Service connection implementation managing the service communication state.
          */
         private class RoutineServiceConnection implements ServiceConnection {
 

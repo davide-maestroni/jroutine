@@ -172,7 +172,7 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
         }
     }
 
-    public void purge(@Nullable final Iterable<Object> inputs) {
+    public void purge(@Nullable final Iterable<?> inputs) {
 
         final WeakReference<Object> context = mContext;
 

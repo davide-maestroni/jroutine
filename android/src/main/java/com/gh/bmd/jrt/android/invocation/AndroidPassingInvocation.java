@@ -14,8 +14,6 @@
 package com.gh.bmd.jrt.android.invocation;
 
 import com.gh.bmd.jrt.channel.ResultChannel;
-import com.gh.bmd.jrt.invocation.Invocation;
-import com.gh.bmd.jrt.invocation.InvocationFactory;
 
 import javax.annotation.Nonnull;
 
@@ -27,31 +25,6 @@ import javax.annotation.Nonnull;
  * @param <DATA> the data type.
  */
 public class AndroidPassingInvocation<DATA> extends AndroidTemplateInvocation<DATA, DATA> {
-
-    private static final AndroidPassingInvocation<Object> sInvocation =
-            new AndroidPassingInvocation<Object>();
-
-    private static final InvocationFactory<Object, Object> sFactory =
-            new InvocationFactory<Object, Object>() {
-
-                @Nonnull
-                public Invocation<Object, Object> newInvocation() {
-
-                    return sInvocation;
-                }
-            };
-
-    /**
-     * Returns a factory of passing invocations.
-     *
-     * @param <DATA> the data type.
-     * @return the factory.
-     */
-    @SuppressWarnings("unchecked")
-    public static <DATA> InvocationFactory<DATA, DATA> factoryOf() {
-
-        return (InvocationFactory<DATA, DATA>) sFactory;
-    }
 
     @Override
     public void onInput(final DATA input, @Nonnull final ResultChannel<DATA> result) {

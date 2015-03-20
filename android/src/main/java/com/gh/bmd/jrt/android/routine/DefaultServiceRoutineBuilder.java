@@ -75,8 +75,9 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
     @Nonnull
     public Routine<INPUT, OUTPUT> buildRoutine() {
 
-        return new ServiceRoutine<INPUT, OUTPUT>(mContext, mServiceClass, mLooper, mInvocationClass,
-                                                 getConfiguration(), mRunnerClass, mLogClass);
+        return new ServiceRoutine<INPUT, OUTPUT>(mContext, mServiceClass, mInvocationClass,
+                                                 getConfiguration(), mLooper, mRunnerClass,
+                                                 mLogClass);
     }
 
     @Nonnull

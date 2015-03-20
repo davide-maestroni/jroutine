@@ -13,6 +13,8 @@
  */
 package com.gh.bmd.jrt.android.runner;
 
+import android.os.Looper;
+
 import com.gh.bmd.jrt.runner.Execution;
 import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.runner.RunnerDecorator;
@@ -30,25 +32,26 @@ import javax.annotation.Nonnull;
  */
 public class MainRunner extends RunnerDecorator {
 
-    private static final Runner sMainRunner = Runners.mainRunner(new Runner() {
+    private static final Runner sMainRunner =
+            Runners.looperRunner(Looper.getMainLooper(), new Runner() {
 
-        private final Runner mMain = Runners.mainRunner(null);
+                private final Runner mMain = Runners.looperRunner(Looper.getMainLooper());
 
-        private final Runner mQueued = Runners.queuedRunner();
+                private final Runner mQueued = Runners.queuedRunner();
 
-        public void run(@Nonnull final Execution execution, final long delay,
-                @Nonnull final TimeUnit timeUnit) {
+                public void run(@Nonnull final Execution execution, final long delay,
+                        @Nonnull final TimeUnit timeUnit) {
 
-            if (delay == 0) {
+                    if (delay == 0) {
 
-                mQueued.run(execution, delay, timeUnit);
+                        mQueued.run(execution, delay, timeUnit);
 
-            } else {
+                    } else {
 
-                mMain.run(execution, delay, timeUnit);
-            }
-        }
-    });
+                        mMain.run(execution, delay, timeUnit);
+                    }
+                }
+            });
 
     /**
      * Constructor.

@@ -13,7 +13,6 @@
  */
 package com.gh.bmd.jrt.android.runner;
 
-import android.os.Build.VERSION_CODES;
 import android.os.HandlerThread;
 import android.os.Looper;
 
@@ -118,7 +117,7 @@ public class Runners extends com.gh.bmd.jrt.runner.Runners {
      * especially on some platform versions.
      * <p/>
      * Note also that the executor instance will be ignored on platforms with API level less than
-     * {@link VERSION_CODES#HONEYCOMB}.
+     * HONEYCOMB.
      *
      * @param executor the executor.
      * @return the runner instance.

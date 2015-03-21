@@ -31,10 +31,24 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * Created by davide on 9/28/14.
  */
 @SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS",
-        justification = "utility class extending functionalities of another utility " + "class")
+        justification = "utility class extending functionalities of another utility class")
 public class Runners extends com.gh.bmd.jrt.runner.Runners {
 
-    private static volatile Runner sMainRunner;
+    private static final Runner sMainRunner = new MainRunner();
+
+    /**
+     * Returns a runner employing the specified looper.<br/>
+     * Note that, waiting for results in the very same thread may result in a deadlock exception.
+     *
+     * @param looper the looper instance.
+     * @return the runner instance.
+     * @throws java.lang.NullPointerException if the specified looper is null.
+     */
+    @Nonnull
+    public static Runner looperRunner(@Nonnull final Looper looper) {
+
+        return looperRunner(looper, null);
+    }
 
     /**
      * Returns a runner employing the specified looper.<br/>
@@ -44,8 +58,7 @@ public class Runners extends com.gh.bmd.jrt.runner.Runners {
      *
      * @param looper           the looper instance.
      * @param sameThreadRunner the runner to be used when the specified looper is called on its own
-     *                         thread. If null, the invocation will be posted on the specified
-     *                         looper.
+     *                         thread. If null, the invocation will be posted on the same looper.
      * @return the runner instance.
      * @throws java.lang.NullPointerException if the specified looper is null.
      */
@@ -57,36 +70,15 @@ public class Runners extends com.gh.bmd.jrt.runner.Runners {
     }
 
     /**
-     * Returns a runner employing the main thread looper.<br/>
-     * Note that, based on the choice of the runner to be used when the invocation runs in the
-     * looper thread, waiting for results in the very same thread may result in a deadlock
-     * exception.
-     *
-     * @param sameThreadRunner the runner to be used when the main looper is called on its own
-     *                         thread. If null, the invocation will be posted on the main looper.
-     * @return the runner instance.
-     */
-    @Nonnull
-    public static Runner mainRunner(@Nullable final Runner sameThreadRunner) {
-
-        return looperRunner(Looper.getMainLooper(), sameThreadRunner);
-    }
-
-    /**
      * Returns the shared runner employing the main thread looper.<br/>
      * Note that, when the invocation runs in the main thread, the executions with a delay of 0 will
-     * be performed synchronously, while the ones with a positive delay will be posted on the UI
+     * be performed synchronously, while the ones with a positive delay will be posted on the main
      * thread.
      *
      * @return the runner instance.
      */
     @Nonnull
     public static Runner mainRunner() {
-
-        if (sMainRunner == null) {
-
-            sMainRunner = new MainRunner();
-        }
 
         return sMainRunner;
     }
@@ -124,7 +116,8 @@ public class Runners extends com.gh.bmd.jrt.runner.Runners {
      * <a href="http://developer.android.com/reference/android/os/AsyncTask.html">AsyncTask<a/>s
      * especially on some platform versions.
      * <p/>
-     * Note also that the executor instance will be ignored on platforms with API level < 11.
+     * Note also that the executor instance will be ignored on platforms with API level less than
+     * HONEYCOMB.
      *
      * @param executor the executor.
      * @return the runner instance.
@@ -150,6 +143,6 @@ public class Runners extends com.gh.bmd.jrt.runner.Runners {
             thread.start();
         }
 
-        return looperRunner(thread.getLooper(), null);
+        return looperRunner(thread.getLooper(), queuedRunner());
     }
 }

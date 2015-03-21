@@ -26,7 +26,7 @@ import javax.annotation.Nullable;
  * that a routine instance cannot dynamically change its log after creation.
  * <p/>
  * Note also that a log instance is typically accessed from different threads, so, it is
- * responsibility of the implementing class to avoid concurrency issues by synchronizing mutable
+ * responsibility of the implementing class to avoid concurrency issues, by synchronizing mutable
  * fields when needed.
  * <p/>
  * To avoid an excessive number of log messages it is sufficient to set an higher log level.
@@ -51,7 +51,7 @@ public interface Log {
     /**
      * Logs a debug message.
      *
-     * @param contexts  the array of contexts.
+     * @param contexts  the list of contexts.
      * @param message   the message.
      * @param throwable the optional throwable or null.
      */
@@ -61,7 +61,7 @@ public interface Log {
     /**
      * Logs an error message.
      *
-     * @param contexts  the array of contexts.
+     * @param contexts  the list of contexts.
      * @param message   the message.
      * @param throwable the optional throwable or null.
      */
@@ -71,7 +71,7 @@ public interface Log {
     /**
      * Logs a warning message.
      *
-     * @param contexts  the array of contexts.
+     * @param contexts  the list of contexts.
      * @param message   the message.
      * @param throwable the optional throwable or null.
      */

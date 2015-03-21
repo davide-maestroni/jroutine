@@ -13,9 +13,11 @@
  */
 package com.gh.bmd.jrt.android.runner;
 
+import android.os.Looper;
+
 import com.gh.bmd.jrt.runner.Execution;
 import com.gh.bmd.jrt.runner.Runner;
-import com.gh.bmd.jrt.runner.RunnerDecorator;
+import com.gh.bmd.jrt.runner.Runners;
 
 import java.util.concurrent.TimeUnit;
 
@@ -28,15 +30,14 @@ import javax.annotation.Nonnull;
  * <p/>
  * Created by davide on 12/17/14.
  */
-public class MainRunner extends RunnerDecorator {
+public class MainRunner extends LooperRunner {
 
-    private static final Runner sMainRunner = Runners.mainRunner(new Runner() {
+    private static final Runner sSameThreadRunner = new Runner() {
 
-        private final Runner mMain = Runners.mainRunner(null);
+        private final Runner mMain = new LooperRunner(Looper.getMainLooper(), null);
 
         private final Runner mQueued = Runners.queuedRunner();
 
-        @Override
         public void run(@Nonnull final Execution execution, final long delay,
                 @Nonnull final TimeUnit timeUnit) {
 
@@ -49,13 +50,13 @@ public class MainRunner extends RunnerDecorator {
                 mMain.run(execution, delay, timeUnit);
             }
         }
-    });
+    };
 
     /**
      * Constructor.
      */
     public MainRunner() {
 
-        super(sMainRunner);
+        super(Looper.getMainLooper(), sSameThreadRunner);
     }
 }

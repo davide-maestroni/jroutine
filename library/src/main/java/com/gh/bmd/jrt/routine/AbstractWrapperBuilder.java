@@ -45,7 +45,6 @@ public abstract class AbstractWrapperBuilder<TYPE> implements WrapperBuilder<TYP
     private String mShareGroup;
 
     @Nonnull
-    @Override
     public TYPE buildWrapper() {
 
         synchronized (sClassMap) {
@@ -88,7 +87,6 @@ public abstract class AbstractWrapperBuilder<TYPE> implements WrapperBuilder<TYP
     }
 
     @Nonnull
-    @Override
     public WrapperBuilder<TYPE> withConfiguration(
             @Nullable final RoutineConfiguration configuration) {
 
@@ -97,7 +95,6 @@ public abstract class AbstractWrapperBuilder<TYPE> implements WrapperBuilder<TYP
     }
 
     @Nonnull
-    @Override
     public WrapperBuilder<TYPE> withShareGroup(@Nullable final String group) {
 
         mShareGroup = group;
@@ -138,7 +135,7 @@ public abstract class AbstractWrapperBuilder<TYPE> implements WrapperBuilder<TYP
      *
      * @param configuration the routine configuration.
      */
-    protected void warn(@Nonnull final RoutineConfiguration configuration) {
+    private void warn(@Nonnull final RoutineConfiguration configuration) {
 
         Logger logger = null;
 

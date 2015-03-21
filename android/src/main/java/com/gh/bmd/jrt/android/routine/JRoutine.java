@@ -28,12 +28,12 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * specific to the Android platform.<br/>
  * Routine invocations created through the returned builder will be execute inside a service
  * specified through the routine builder. Be aware, though, that the invocation results will be
- * dispatched in the looper specified through the builder, so that waiting for the outputs right
- * after the routine invocation in the looper thread will result in a deadlock.
+ * dispatched in the specified looper, so that, waiting for the outputs right after the routine
+ * invocation in the looper thread, will result in a deadlock.
  * <p/>
- * Note that it is up to the calling library or application to properly declare the service in the
- * manifest file. Note also that it is possible to manage the service lifecycle starting it through
- * the {@link Context#startService(android.content.Intent)} method. Normally the service will stay
+ * Note that it is up to the caller to properly declare the service in the manifest file. Note also
+ * that it is possible to manage the service lifecycle starting it through the
+ * {@link Context#startService(android.content.Intent)} method. Normally the service will stay
  * active only during a routine invocation.<br/>
  * The service can be also made run in a different process, however, in such case, the data passed
  * through the routine input and output channels must comply to the
@@ -74,14 +74,14 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * Created by davide on 1/8/15.
  */
 @SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS",
-        justification = "utility class extending functionalities of another utility " + "class")
+        justification = "utility class extending functionalities of another utility class")
 public class JRoutine extends com.gh.bmd.jrt.routine.JRoutine {
 
     /**
      * Returns a builder of routines running in a service based on the specified context.
      * <p/>
      * Note that the built routine results will be dispatched in the looper specified through the
-     * builder, thus waiting for the outputs immediately after its invocation in the looper thread
+     * builder, thus, waiting for the outputs immediately after its invocation in the looper thread,
      * will result in a deadlock.
      *
      * @param context    the routine context.

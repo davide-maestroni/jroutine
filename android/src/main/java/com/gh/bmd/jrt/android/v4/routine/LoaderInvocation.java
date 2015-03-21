@@ -127,10 +127,10 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
     /**
      * Destroys the loader with the specified ID.
      *
-     * @param context the context.
-     * @param id      the loader ID.
+     * @param context  the context.
+     * @param loaderId the loader ID.
      */
-    static void purgeLoader(@Nonnull final Object context, final int id) {
+    static void purgeLoader(@Nonnull final Object context, final int loaderId) {
 
         final SparseArray<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
                 sCallbackMap.get(context);
@@ -171,9 +171,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
             }
 
             final RoutineLoader<?, ?> loader = callbacks.mLoader;
-            final int loaderId = callbackArray.keyAt(i);
 
-            if ((loaderId == id) && (loader.getInvocationCount() == 0)) {
+            if ((loaderId == callbackArray.keyAt(i)) && (loader.getInvocationCount() == 0)) {
 
                 loaderManager.destroyLoader(loaderId);
                 callbackArray.remove(loaderId);
@@ -193,12 +192,13 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
      * Destroys all loaders with the specified invocation class and the specified inputs.
      *
      * @param context         the context.
+     * @param loaderId        the loader ID.
      * @param invocationClass the invocation class.
      * @param inputs          the invocation inputs.
      */
     @SuppressWarnings("unchecked")
-    static void purgeLoader(@Nonnull final Object context, @Nonnull final Class<?> invocationClass,
-            @Nonnull final List<?> inputs) {
+    static void purgeLoader(@Nonnull final Object context, final int loaderId,
+            @Nonnull final Class<?> invocationClass, @Nonnull final List<?> inputs) {
 
         final SparseArray<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
                 sCallbackMap.get(context);
@@ -240,14 +240,19 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
             final RoutineLoader<Object, Object> loader =
                     (RoutineLoader<Object, Object>) callbacks.mLoader;
-            final int loaderId = callbackArray.keyAt(i);
 
             if ((loader.getInvocationType() == invocationClass) && (loader.getInvocationCount()
-                    == 0) && loader.areSameInputs(inputs)) {
+                    == 0)) {
 
-                loaderManager.destroyLoader(loaderId);
-                callbackArray.remove(loaderId);
-                continue;
+                final int id = callbackArray.keyAt(i);
+
+                if (((loaderId == AndroidRoutineBuilder.AUTO) || (loaderId == id))
+                        && loader.areSameInputs(inputs)) {
+
+                    loaderManager.destroyLoader(id);
+                    callbackArray.remove(id);
+                    continue;
+                }
             }
 
             ++i;
@@ -262,12 +267,12 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
     /**
      * Destroys the loader with the specified ID and the specified inputs.
      *
-     * @param context the context.
-     * @param id      the loader ID.
-     * @param inputs  the invocation inputs.
+     * @param context  the context.
+     * @param loaderId the loader ID.
+     * @param inputs   the invocation inputs.
      */
     @SuppressWarnings("unchecked")
-    static void purgeLoader(@Nonnull final Object context, final int id,
+    static void purgeLoader(@Nonnull final Object context, final int loaderId,
             @Nonnull final List<?> inputs) {
 
         final SparseArray<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
@@ -310,10 +315,9 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
             final RoutineLoader<Object, Object> loader =
                     (RoutineLoader<Object, Object>) callbacks.mLoader;
-            final int loaderId = callbackArray.keyAt(i);
 
-            if ((loaderId == id) && (loader.getInvocationCount() == 0) && loader.areSameInputs(
-                    inputs)) {
+            if ((loader.getInvocationCount() == 0) && (loaderId == callbackArray.keyAt(i)) && loader
+                    .areSameInputs(inputs)) {
 
                 loaderManager.destroyLoader(loaderId);
                 callbackArray.remove(loaderId);
@@ -333,9 +337,10 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
      * Destroys all loaders with the specified invocation class.
      *
      * @param context         the context.
+     * @param loaderId        the loader ID.
      * @param invocationClass the invocation class.
      */
-    static void purgeLoaders(@Nonnull final Object context,
+    static void purgeLoaders(@Nonnull final Object context, final int loaderId,
             @Nonnull final Class<?> invocationClass) {
 
         final SparseArray<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
@@ -381,10 +386,14 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
             if ((loader.getInvocationType() == invocationClass) && (loader.getInvocationCount()
                     == 0)) {
 
-                final int loaderId = callbackArray.keyAt(i);
-                loaderManager.destroyLoader(loaderId);
-                callbackArray.remove(loaderId);
-                continue;
+                final int id = callbackArray.keyAt(i);
+
+                if ((loaderId == AndroidRoutineBuilder.AUTO) || (loaderId == id)) {
+
+                    loaderManager.destroyLoader(id);
+                    callbackArray.remove(id);
+                    continue;
+                }
             }
 
             ++i;
@@ -589,7 +598,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
         } else if (resolution == ClashResolution.ABORT_THIS) {
 
-            logger.dbg("aborting invocation invocation [%d]", loaderId);
+            logger.dbg("aborting invocation [%d]", loaderId);
             throw new InputClashException(loaderId);
 
         } else if ((resolution == ClashResolution.KEEP_THAT) || routineLoader.areSameInputs(
@@ -605,7 +614,7 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
         } else if (resolution == ClashResolution.ABORT_THIS_INPUT) {
 
-            logger.dbg("aborting invocation invocation [%d]", loaderId);
+            logger.dbg("aborting invocation [%d]", loaderId);
             throw new InputClashException(loaderId);
         }
 
@@ -614,8 +623,8 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
     /**
      * Loader callbacks implementation.<br/>
-     * The callbacks object will make sure that the loader results are passed to the output channels
-     * returned.
+     * The callbacks object will make sure that the loader results are passed to the returned output
+     * channels.
      *
      * @param <OUTPUT> the output data type.
      */
@@ -681,14 +690,12 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
             return channel.output();
         }
 
-        @Override
         public Loader<InvocationResult<OUTPUT>> onCreateLoader(final int id, final Bundle args) {
 
             mLogger.dbg("creating Android loader: %d", id);
             return mLoader;
         }
 
-        @Override
         public void onLoadFinished(final Loader<InvocationResult<OUTPUT>> loader,
                 final InvocationResult<OUTPUT> data) {
 
@@ -751,7 +758,6 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
             }
         }
 
-        @Override
         public void onLoaderReset(final Loader<InvocationResult<OUTPUT>> loader) {
 
             mLogger.dbg("resetting Android loader: %d", mLoader.getId());

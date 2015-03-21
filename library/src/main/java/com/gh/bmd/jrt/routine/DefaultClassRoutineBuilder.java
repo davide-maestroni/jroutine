@@ -135,7 +135,6 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
     }
 
     @Nonnull
-    @Override
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> boundMethod(@Nonnull final String name) {
 
         final Method method = mMethodMap.get(name);
@@ -150,8 +149,7 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
     }
 
     @Nonnull
-    @Override
-    public Routine<Object, Object> method(@Nonnull final String name,
+    public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final String name,
             @Nonnull final Class<?>... parameterTypes) {
 
         final Class<?> targetClass = mTargetClass;
@@ -181,14 +179,12 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
     }
 
     @Nonnull
-    @Override
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final Method method) {
 
         return method(RoutineConfiguration.notNull(mConfiguration), mShareGroup, method);
     }
 
     @Nonnull
-    @Override
     public ClassRoutineBuilder withConfiguration(
             @Nullable final RoutineConfiguration configuration) {
 
@@ -197,7 +193,6 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
     }
 
     @Nonnull
-    @Override
     public ClassRoutineBuilder withShareGroup(@Nullable final String group) {
 
         mShareGroup = group;
@@ -218,9 +213,9 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
     }
 
     /**
-     * Returns the internal configurator.
+     * Returns the internal configuration.
      *
-     * @return the configurator.
+     * @return the configuration.
      */
     @Nullable
     protected RoutineConfiguration getConfiguration() {
@@ -232,7 +227,7 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
      * Gets or creates the routine.
      *
      * @param configuration   the routine configuration.
-     * @param shareGroup      the group name.
+     * @param shareGroup      the share group name.
      * @param method          the method to wrap.
      * @param isCollectParam  whether we need to collect the input parameters.
      * @param isCollectResult whether the output is a collection.
@@ -320,9 +315,9 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
     }
 
     /**
-     * Returns the group name.
+     * Returns the share group name.
      *
-     * @return the group name.
+     * @return the share group name.
      */
     @Nullable
     protected String getShareGroup() {
@@ -370,8 +365,7 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
      * @param shareGroup    the group name.
      * @param targetMethod  the target method.
      * @return the routine.
-     * @throws java.lang.NullPointerException if the specified configuration, class or method are
-     *                                        null.
+     * @throws java.lang.NullPointerException if the specified configuration or method are null.
      */
     @Nonnull
     protected <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(
@@ -786,7 +780,6 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
             mMethod = method;
         }
 
-        @Override
         public Void run() {
 
             mMethod.setAccessible(true);

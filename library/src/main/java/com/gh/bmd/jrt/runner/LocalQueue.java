@@ -26,8 +26,8 @@ import static com.gh.bmd.jrt.time.TimeDuration.nanos;
 /**
  * Class maintaining a queue of executions which is local to the calling thread.
  * <p/>
- * The implementation ensures that recursive executions are broken into a consuming loop running
- * in the same thread.
+ * The implementation ensures that recursive executions are broken into commands handled inside a
+ * consuming loop, running in the same thread.
  * <p/>
  * Created by davide on 9/18/14.
  */
@@ -57,7 +57,7 @@ class LocalQueue {
     private int mLast;
 
     /**
-     * Default constructor.
+     * Constructor.
      */
     private LocalQueue() {
 

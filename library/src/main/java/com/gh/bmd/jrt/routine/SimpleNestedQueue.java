@@ -34,7 +34,7 @@ class SimpleNestedQueue<E> implements NestedQueue<E> {
     private boolean mClosed;
 
     /**
-     * Default constructor.
+     * Constructor.
      */
     SimpleNestedQueue() {
 
@@ -51,64 +51,46 @@ class SimpleNestedQueue<E> implements NestedQueue<E> {
         mQueue = queue;
     }
 
-    @Nonnull
-    @Override
-    public NestedQueue<E> add(@Nullable final E element) {
+    public void add(@Nullable final E element) {
 
         checkOpen();
         mQueue.add(element);
-        return this;
     }
 
-    @Nonnull
-    @Override
-    public NestedQueue<E> addAll(@Nonnull final Iterable<? extends E> elements) {
+    public void addAll(@Nonnull final Iterable<? extends E> elements) {
 
         checkOpen();
         mQueue.addAll(elements);
-        return this;
     }
 
     @Nonnull
-    @Override
     public NestedQueue<E> addNested() {
 
         checkOpen();
         return new SimpleNestedQueue<E>(mQueue);
     }
 
-    @Nonnull
-    @Override
-    public NestedQueue<E> clear() {
+    public void clear() {
 
         mQueue.clear();
-        return this;
     }
 
-    @Nonnull
-    @Override
-    public NestedQueue<E> close() {
+    public void close() {
 
         mClosed = true;
-        return this;
     }
 
-    @Override
     public boolean isEmpty() {
 
         return mQueue.isEmpty();
     }
 
-    @Nonnull
-    @Override
-    public NestedQueue<E> moveTo(@Nonnull final Collection<? super E> collection) {
+    public void moveTo(@Nonnull final Collection<? super E> collection) {
 
         mQueue.moveTo(collection);
-        return this;
     }
 
     @Nullable
-    @Override
     public E removeFirst() {
 
         return mQueue.removeFirst();

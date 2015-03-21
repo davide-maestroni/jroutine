@@ -13,7 +13,7 @@
  */
 package com.gh.bmd.jrt.time;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -21,13 +21,14 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 
 /**
  * Time unit tests.
  * <p/>
  * Created by davide on 10/2/14.
  */
-public class TimeTest extends TestCase {
+public class TimeTest {
 
     private static final long ONE_DAY_NANOS = Time.days(1).toNanos();
 
@@ -66,6 +67,7 @@ public class TimeTest extends TestCase {
         return null;
     }
 
+    @Test
     public void testConstants() {
 
         assertThat(Time.SECONDS_IN_MINUTE).isEqualTo(60);
@@ -76,6 +78,7 @@ public class TimeTest extends TestCase {
         assertThat(Time.HOURS_IN_DAY).isEqualTo(24);
     }
 
+    @Test
     public void testConversions() throws InvocationTargetException, IllegalAccessException {
 
         final Random random = new Random();
@@ -119,6 +122,18 @@ public class TimeTest extends TestCase {
         assertThat(time.hashCode()).isEqualTo(time.nanosTime().hashCode());
     }
 
+    @Test
+    public void testCurrentTime() {
+
+        final long systemTimeMs = System.currentTimeMillis();
+        assertThat(Time.current().toMillis()).isBetween(systemTimeMs - 50, systemTimeMs + 50);
+
+        final long systemTimeNs = System.nanoTime();
+        assertThat(Time.currentNano().toNanos()).isBetween(systemTimeNs - 50000000,
+                                                           systemTimeNs + 50000000);
+    }
+
+    @Test
     @SuppressWarnings("ConstantConditions")
     public void testError() {
 
@@ -203,6 +218,7 @@ public class TimeTest extends TestCase {
         }
     }
 
+    @Test
     public void testZero() {
 
         assertThat(Time.nanos(0).isZero()).isTrue();

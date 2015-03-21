@@ -38,8 +38,8 @@ import static com.gh.bmd.jrt.time.TimeDuration.ZERO;
 /**
  * Basic abstract implementation of a routine.
  * <p/>
- * This class provides implementations for all the routine functionalities. The inheriting class
- * just need to creates invocation objects when required.
+ * This class provides a default implementation of all the routine functionalities. The inheriting
+ * class just need to create invocation objects when required.
  * <p/>
  * Created by davide on 9/7/14.
  *
@@ -71,6 +71,8 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
     private final Object mMutex = new Object();
 
+    private final Object mParallelMutex = new Object();
+
     private final LinkedList<Invocation<INPUT, OUTPUT>> mSyncInvocations =
             new LinkedList<Invocation<INPUT, OUTPUT>>();
 
@@ -78,13 +80,12 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
     private volatile DefaultInvocationManager mAsyncManager;
 
-    private volatile AbstractRoutine<INPUT, OUTPUT> mParallelRoutine;
+    private AbstractRoutine<INPUT, OUTPUT> mParallelRoutine;
 
     private int mRunningCount;
 
     private final Check mIsInvocationAvailable = new Check() {
 
-        @Override
         public boolean isTrue() {
 
             return mRunningCount < mMaxInvocations;
@@ -98,7 +99,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
      *
      * @param configuration the routine configuration.
      * @throws java.lang.IllegalArgumentException if at least one of the parameter is invalid.
-     * @throws java.lang.NullPointerException     if one of the parameters is null.
+     * @throws java.lang.NullPointerException     if the specified configuration is null.
      */
     @SuppressWarnings("ConstantConditions")
     protected AbstractRoutine(@Nonnull final RoutineConfiguration configuration) {
@@ -136,38 +137,37 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
     }
 
     @Nonnull
-    @Override
     public ParameterChannel<INPUT, OUTPUT> invokeAsync() {
 
         return invoke(true);
     }
 
     @Nonnull
-    @Override
     public ParameterChannel<INPUT, OUTPUT> invokeParallel() {
 
-        mLogger.dbg("invoking routine: parallel");
+        synchronized (mParallelMutex) {
 
-        if (mParallelRoutine == null) {
+            mLogger.dbg("invoking routine: parallel");
 
-            mParallelRoutine =
-                    new AbstractRoutine<INPUT, OUTPUT>(mConfiguration, mSyncRunner, mAsyncRunner,
-                                                       mLogger) {
+            if (mParallelRoutine == null) {
 
-                        @Nonnull
-                        @Override
-                        protected Invocation<INPUT, OUTPUT> newInvocation(final boolean async) {
+                mParallelRoutine = new AbstractRoutine<INPUT, OUTPUT>(mConfiguration, mSyncRunner,
+                                                                      mAsyncRunner, mLogger) {
 
-                            return new ParallelInvocation<INPUT, OUTPUT>(AbstractRoutine.this);
-                        }
-                    };
+                    @Nonnull
+                    @Override
+                    protected Invocation<INPUT, OUTPUT> newInvocation(final boolean async) {
+
+                        return new ParallelInvocation<INPUT, OUTPUT>(AbstractRoutine.this);
+                    }
+                };
+            }
         }
 
         return mParallelRoutine.invokeAsync();
     }
 
     @Nonnull
-    @Override
     public ParameterChannel<INPUT, OUTPUT> invokeSync() {
 
         return invoke(false);
@@ -222,7 +222,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
     }
 
     /**
-     * Converts an invocation instance
+     * Converts an invocation instance from synchronous to asynchronous or the contrary.
      *
      * @param async      whether the converted invocation is asynchronous.
      * @param invocation the invocation to convert.
@@ -303,7 +303,6 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
          * Constructor.
          *
          * @param routine the routine to invoke in parallel mode.
-         * @throws java.lang.NullPointerException if the routine instance is null;
          */
         private ParallelInvocation(@Nonnull final Routine<INPUT, OUTPUT> routine) {
 
@@ -335,7 +334,6 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
         }
 
         @Nonnull
-        @Override
         public Invocation<INPUT, OUTPUT> create() {
 
             synchronized (mMutex) {
@@ -348,7 +346,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
                 } catch (final InterruptedException e) {
 
-                    mLogger.err(e, "waiting for available instance interrupted [#%d]",
+                    mLogger.err(e, "waiting for available instances interrupted [#%d]",
                                 mMaxInvocations);
                     throw InvocationInterruptedException.interrupt(e);
                 }
@@ -397,7 +395,6 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
             }
         }
 
-        @Override
         @SuppressFBWarnings(value = "NO_NOTIFY_NOT_NOTIFYALL",
                 justification = "only one invocation is released")
         public void discard(@Nonnull final Invocation<INPUT, OUTPUT> invocation) {
@@ -425,7 +422,6 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
             }
         }
 
-        @Override
         @SuppressFBWarnings(value = "NO_NOTIFY_NOT_NOTIFYALL",
                 justification = "only one invocation is released")
         public void recycle(@Nonnull final Invocation<INPUT, OUTPUT> invocation) {

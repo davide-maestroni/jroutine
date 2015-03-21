@@ -55,18 +55,15 @@ public class JRoutineActivityRotationTest
         }
 
         final TimeDuration timeout = TimeDuration.seconds(10);
-        final Routine<String, String> routine =
-                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
-                        .withId(0)
-                        .withConfiguration(withOutputOrder(OrderType.PASSING))
-                        .buildRoutine();
-        routine.callAsync("test1", "test2");
+        JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
+                .withId(0)
+                .withConfiguration(withOutputOrder(OrderType.PASSING))
+                .callAsync("test1", "test2");
 
         final Semaphore semaphore = new Semaphore(0);
 
         getActivity().runOnUiThread(new Runnable() {
 
-            @Override
             public void run() {
 
                 getActivity().recreate();
@@ -100,7 +97,6 @@ public class JRoutineActivityRotationTest
 
         getActivity().runOnUiThread(new Runnable() {
 
-            @Override
             public void run() {
 
                 getActivity().recreate();
@@ -139,7 +135,6 @@ public class JRoutineActivityRotationTest
 
         getActivity().runOnUiThread(new Runnable() {
 
-            @Override
             public void run() {
 
                 getActivity().recreate();

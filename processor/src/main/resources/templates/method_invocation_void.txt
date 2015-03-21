@@ -14,11 +14,11 @@
 
 // GENERATED CODE - PLEASE DO NOT EDIT
 
-    private class SingleCallInvocation${methodCount} extends com.gh.bmd.jrt.invocation.SingleCallInvocation<Object, ${resultClassName}> {
+    private class Invocation${methodCount} extends com.gh.bmd.jrt.invocation.SingleCallInvocation<Object, ${resultClassName}> {
 
         private final Object mMutex;
 
-        private SingleCallInvocation${methodCount}() {
+        private Invocation${methodCount}() {
 
             final Object mutex = getMutex(${shareGroup});
 

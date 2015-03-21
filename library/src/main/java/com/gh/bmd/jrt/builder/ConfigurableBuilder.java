@@ -45,10 +45,10 @@ import javax.annotation.Nullable;
  * when passing an input or output, the call blocks until enough data are consumed or the specified
  * timeout elapses. In the latter case a {@link com.gh.bmd.jrt.common.DeadlockException} will be
  * thrown.<br/>
- * By default the timeout is set to 0 to avoid unexpected deadlocks, and the order of input and
- * output data is not guaranteed. Nevertheless, it is possible to force data to be delivered in
- * the same order as they are passed to the channels, at the cost of a slightly increased memory
- * usage and computation, by the proper options.
+ * By default the timeout is set to 0 to avoid unexpected deadlocks.<br/>
+ * The order of input and output data is not guaranteed. Nevertheless, it is possible to force data
+ * to be delivered in the same order as they are passed to the channels, at the cost of a slightly
+ * increased memory usage and computation.
  * <p/>
  * Created by davide on 3/6/15.
  */
@@ -57,7 +57,7 @@ public interface ConfigurableBuilder {
     /**
      * Sets the specified configuration to this builder by replacing any configuration already set.
      * <br/>
-     * Note that the configuration options not supported by the builder implementation may be
+     * Note that the configuration options not supported by the builder implementation might be
      * ignored.
      *
      * @param configuration the configuration.

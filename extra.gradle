@@ -14,6 +14,34 @@
 apply plugin: 'maven'
 apply plugin: 'signing'
 
+Project.metaClass.dependencyVersion = { String version ->
+
+    version.replaceAll("^(.*)\\.[0-9]+\$", "\$1\\.+")
+}
+Project.metaClass.getWorkingBranch = {
+
+    "git --git-dir=${rootDir}/.git --work-tree=${rootDir} rev-parse --abbrev-ref HEAD".execute().text.trim()
+}
+Project.metaClass.isWorkingBranch = { String branch ->
+
+    (branch != null) && branch.equals(delegate.workingBranch)
+}
+Project.metaClass.getJavaCompatibility = {
+
+    sourceCompatibility
+}
+Project.metaClass.setJavaCompatibility = { JavaVersion javaVersion ->
+
+    tasks.withType(JavaCompile) {
+        def javaHome = System.getenv("JAVA${javaVersion.ordinal() + 1}_HOME")
+        if ((javaHome != null) && (javaHome.length() > 0)) {
+            options.bootClasspath = "${javaHome}/jre/lib/rt.jar"
+        }
+        sourceCompatibility = javaVersion
+        targetCompatibility = javaVersion
+    }
+}
+
 afterEvaluate { project ->
 
     if (project.hasProperty('uploadEnabled')) {

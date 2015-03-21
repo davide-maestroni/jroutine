@@ -68,7 +68,7 @@ class SimpleQueue<E> {
     /**
      * Adds all the elements returned by the specified iterable.
      * <p/>
-     * Note that the any of the returned element can be null.
+     * Note that any of the returned element can be null.
      *
      * @param elements the element iterable.
      */

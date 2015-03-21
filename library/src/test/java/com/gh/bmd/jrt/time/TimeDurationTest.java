@@ -16,7 +16,7 @@ package com.gh.bmd.jrt.time;
 import com.gh.bmd.jrt.common.InvocationInterruptedException;
 import com.gh.bmd.jrt.time.TimeDuration.Check;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -24,13 +24,14 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 
 /**
  * Time duration unit tests.
  * <p/>
  * Created by davide on 10/2/14.
  */
-public class TimeDurationTest extends TestCase {
+public class TimeDurationTest {
 
     private static final long ONE_DAY_NANOS = TimeDuration.days(1).toNanos();
 
@@ -63,6 +64,7 @@ public class TimeDurationTest extends TestCase {
         return null;
     }
 
+    @Test
     public void testConversions() throws InvocationTargetException, IllegalAccessException {
 
         final Random random = new Random();
@@ -110,6 +112,7 @@ public class TimeDurationTest extends TestCase {
         assertThat(duration.hashCode()).isEqualTo(duration.nanosTime().hashCode());
     }
 
+    @Test
     @SuppressWarnings("ConstantConditions")
     public void testError() {
 
@@ -424,7 +427,6 @@ public class TimeDurationTest extends TestCase {
 
             TimeDuration.seconds(1).waitTrue(null, new Check() {
 
-                @Override
                 public boolean isTrue() {
 
                     return false;
@@ -467,12 +469,14 @@ public class TimeDurationTest extends TestCase {
         }
     }
 
+    @Test
     public void testInfinite() {
 
         assertThat(TimeDuration.INFINITY.isZero()).isFalse();
         assertThat(TimeDuration.INFINITY.isInfinite()).isTrue();
     }
 
+    @Test
     public void testJoin() throws InterruptedException {
 
         final Thread thread = new Thread() {
@@ -498,6 +502,7 @@ public class TimeDurationTest extends TestCase {
         TimeDuration.seconds(1).join(thread);
     }
 
+    @Test
     public void testSleep() throws InterruptedException {
 
         long startTime = System.currentTimeMillis();
@@ -557,6 +562,7 @@ public class TimeDurationTest extends TestCase {
         assertThat(TimeDuration.ZERO.sleepSinceNanos(startTime)).isFalse();
     }
 
+    @Test
     @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
     public void testWait() throws InterruptedException {
 
@@ -711,12 +717,12 @@ public class TimeDurationTest extends TestCase {
         }
     }
 
+    @Test
     @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
     public void testWaitTrue() throws InterruptedException {
 
         final Check alwaysFalse = new Check() {
 
-            @Override
             public boolean isTrue() {
 
                 return false;
@@ -724,7 +730,6 @@ public class TimeDurationTest extends TestCase {
         };
         final Check alwaysTrue = new Check() {
 
-            @Override
             public boolean isTrue() {
 
                 return true;
@@ -808,7 +813,6 @@ public class TimeDurationTest extends TestCase {
 
                 private boolean mToggle = true;
 
-                @Override
                 public boolean isTrue() {
 
                     return (mToggle = !mToggle);
@@ -817,6 +821,7 @@ public class TimeDurationTest extends TestCase {
         }
     }
 
+    @Test
     public void testZero() {
 
         assertThat(TimeDuration.nanos(0).isZero()).isTrue();

@@ -62,12 +62,7 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
     private InvocationResult<OUTPUT> mResult;
 
     /**
-     * Stores away the application context associated with context.
-     * Since Loaders can be used across multiple activities it's dangerous to
-     * store the context directly; always use {@link #getContext()} to retrieve
-     * the Loader's Context, don't use the constructor argument directly.
-     * The Context returned by {@link #getContext} is safe to use across
-     * Activity instances.
+     * Constructor.
      *
      * @param context    used to retrieve the application context.
      * @param invocation the invocation instance.
@@ -158,17 +153,6 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
         super.onReset();
     }
 
-    /**
-     * Returns the type of the loader invocation.
-     *
-     * @return the invocation class.
-     */
-    @Nonnull
-    public Class<?> getInvocationType() {
-
-        return mInvocation.getClass();
-    }
-
     @Override
     public InvocationResult<OUTPUT> loadInBackground() {
 
@@ -252,6 +236,17 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
     }
 
     /**
+     * Returns the type of the loader invocation.
+     *
+     * @return the invocation class.
+     */
+    @Nonnull
+    Class<?> getInvocationType() {
+
+        return mInvocation.getClass();
+    }
+
+    /**
      * Loader result channel.
      *
      * @param <OUTPUT> the output data type.
@@ -282,26 +277,22 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
             mStandaloneInput = mStandaloneChannel.input();
         }
 
-        @Override
         public boolean abort() {
 
             return mStandaloneInput.abort();
         }
 
-        @Override
         public boolean abort(@Nullable final Throwable reason) {
 
             return mStandaloneInput.abort(reason);
         }
 
-        @Override
         public boolean isOpen() {
 
             return mStandaloneInput.isOpen();
         }
 
         @Nonnull
-        @Override
         public ResultChannel<OUTPUT> after(@Nonnull final TimeDuration delay) {
 
             mStandaloneInput.after(delay);
@@ -309,7 +300,6 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
         }
 
         @Nonnull
-        @Override
         public ResultChannel<OUTPUT> after(final long delay, @Nonnull final TimeUnit timeUnit) {
 
             mStandaloneInput.after(delay, timeUnit);
@@ -317,7 +307,6 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
         }
 
         @Nonnull
-        @Override
         public ResultChannel<OUTPUT> now() {
 
             mStandaloneInput.now();
@@ -325,15 +314,13 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
         }
 
         @Nonnull
-        @Override
-        public ResultChannel<OUTPUT> pass(@Nullable final OutputChannel<OUTPUT> channel) {
+        public ResultChannel<OUTPUT> pass(@Nullable final OutputChannel<? extends OUTPUT> channel) {
 
             mStandaloneInput.pass(channel);
             return this;
         }
 
         @Nonnull
-        @Override
         public ResultChannel<OUTPUT> pass(@Nullable final Iterable<? extends OUTPUT> outputs) {
 
             mStandaloneInput.pass(outputs);
@@ -341,7 +328,6 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
         }
 
         @Nonnull
-        @Override
         public ResultChannel<OUTPUT> pass(@Nullable final OUTPUT output) {
 
             mStandaloneInput.pass(output);
@@ -349,7 +335,6 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
         }
 
         @Nonnull
-        @Override
         public ResultChannel<OUTPUT> pass(@Nullable final OUTPUT... outputs) {
 
             mStandaloneInput.pass(outputs);

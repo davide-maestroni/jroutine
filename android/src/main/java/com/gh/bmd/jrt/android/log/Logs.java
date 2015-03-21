@@ -23,10 +23,10 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * Created by davide on 12/22/14.
  */
 @SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS",
-        justification = "utility class extending functionalities of another utility " + "class")
+        justification = "utility class extending functionalities of another utility class")
 public class Logs extends com.gh.bmd.jrt.log.Logs {
 
-    private static volatile AndroidLog sAndroidLog;
+    private static final AndroidLog sAndroidLog = new AndroidLog();
 
     /**
      * Returns the Android log shared instance.
@@ -35,11 +35,6 @@ public class Logs extends com.gh.bmd.jrt.log.Logs {
      */
     @Nonnull
     public static AndroidLog androidLog() {
-
-        if (sAndroidLog == null) {
-
-            sAndroidLog = new AndroidLog();
-        }
 
         return sAndroidLog;
     }

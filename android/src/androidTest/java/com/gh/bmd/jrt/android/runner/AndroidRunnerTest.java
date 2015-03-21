@@ -87,13 +87,11 @@ public class AndroidRunnerTest extends AndroidTestCase {
                 JRoutine.on(Invocations.withArgs(this).factoryOf(ClassToken.tokenOf(invocation)))
                         .withConfiguration(
                                 withRunner(Runners.threadRunner(new HandlerThread("test"))))
-                        .buildRoutine()
                         .callAsync();
 
         assertThat(JRoutine.on(new InvocationFactory<Object, Object>() {
 
             @Nonnull
-            @Override
             public Invocation<Object, Object> newInvocation() {
 
                 return new SingleCallInvocation<Object, Object>() {
@@ -116,17 +114,18 @@ public class AndroidRunnerTest extends AndroidTestCase {
                     }
                 };
             }
-        }).buildRoutine().callAsync(channel).afterMax(seconds(30)).readNext()).isEqualTo(true);
+        }).callAsync(channel).afterMax(seconds(30)).readNext()).isEqualTo(true);
     }
 
     public void testMainRunner() throws InterruptedException {
 
         testRunner(Runners.mainRunner());
         testRunner(new MainRunner());
-        testRunner(Runners.mainRunner(null));
-        testRunner(new RunnerDecorator(Runners.mainRunner(null)));
-        testRunner(Runners.mainRunner(Runners.queuedRunner()));
-        testRunner(new RunnerDecorator(Runners.mainRunner(Runners.queuedRunner())));
+        testRunner(Runners.looperRunner(Looper.getMainLooper()));
+        testRunner(new RunnerDecorator(Runners.looperRunner(Looper.getMainLooper())));
+        testRunner(Runners.looperRunner(Looper.getMainLooper(), Runners.queuedRunner()));
+        testRunner(new RunnerDecorator(
+                Runners.looperRunner(Looper.getMainLooper(), Runners.queuedRunner())));
     }
 
     public void testTaskRunner() throws InterruptedException {
@@ -292,7 +291,6 @@ public class AndroidRunnerTest extends AndroidTestCase {
             return mIsPassed;
         }
 
-        @Override
         public void run() {
 
             // it looks like that handlers and the kind are not so accurate after all...

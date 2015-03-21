@@ -68,8 +68,9 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
     OutputChannel<OUTPUT> afterMax(long timeout, @Nonnull TimeUnit timeUnit);
 
     /**
-     * Binds the specified consumer to this channel. After the call all the output will be passed
-     * only to the consumer and not returned to readers.
+     * Binds the specified consumer to this channel. After the call, all the output will be passed
+     * only to the consumer. Attempting to read through the dedicated methods will cause an
+     * {@link IllegalStateException} to be thrown.
      *
      * @param consumer the consumer instance.
      * @return this channel.
@@ -77,7 +78,7 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @throws java.lang.NullPointerException  if the specified consumer is null.
      */
     @Nonnull
-    OutputChannel<OUTPUT> bind(@Nonnull OutputConsumer<OUTPUT> consumer);
+    OutputChannel<OUTPUT> bind(@Nonnull OutputConsumer<? super OUTPUT> consumer);
 
     /**
      * Checks if the routine is complete waiting at the maximum for the set timeout.
@@ -105,11 +106,15 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
     /**
      * Tells the channel to abort the invocation execution in case no result is available before
      * the timeout has elapsed.
+     * <p/>
+     * By default a {@link ReadDeadlockException} exception will be thrown.
      *
      * @return this channel.
      * @see #afterMax(com.gh.bmd.jrt.time.TimeDuration)
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
      * @see #immediately()
+     * @see #eventuallyDeadlock()
+     * @see #eventuallyExit()
      */
     @Nonnull
     OutputChannel<OUTPUT> eventuallyAbort();
@@ -124,6 +129,8 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @see #afterMax(com.gh.bmd.jrt.time.TimeDuration)
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
      * @see #immediately()
+     * @see #eventuallyAbort()
+     * @see #eventuallyExit()
      */
     @Nonnull
     OutputChannel<OUTPUT> eventuallyDeadlock();
@@ -132,12 +139,14 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * Tells the channel to break execution in case no result is available before the timeout has
      * elapsed.
      * <p/>
-     * By default an exception will be thrown.
+     * By default a {@link ReadDeadlockException} exception will be thrown.
      *
      * @return this channel.
      * @see #afterMax(com.gh.bmd.jrt.time.TimeDuration)
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
      * @see #immediately()
+     * @see #eventuallyAbort()
+     * @see #eventuallyDeadlock()
      */
     @Nonnull
     OutputChannel<OUTPUT> eventuallyExit();
@@ -174,7 +183,9 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      *                                                      consumer.
      * @see #afterMax(com.gh.bmd.jrt.time.TimeDuration)
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
+     * @see #eventually()
      * @see #immediately()
+     * @see #eventuallyAbort()
      * @see #eventuallyDeadlock()
      * @see #eventuallyExit()
      */
@@ -195,7 +206,9 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      * @throws java.lang.NullPointerException               if the specified collection is null.
      * @see #afterMax(com.gh.bmd.jrt.time.TimeDuration)
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
+     * @see #eventually()
      * @see #immediately()
+     * @see #eventuallyAbort()
      * @see #eventuallyDeadlock()
      * @see #eventuallyExit()
      */
@@ -217,19 +230,21 @@ public interface OutputChannel<OUTPUT> extends Channel, Iterable<OUTPUT> {
      *                                                      to be thrown).
      * @see #afterMax(com.gh.bmd.jrt.time.TimeDuration)
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
+     * @see #eventually()
      * @see #immediately()
+     * @see #eventuallyAbort()
      * @see #eventuallyDeadlock()
      * @see #eventuallyExit()
      */
     OUTPUT readNext();
 
     /**
-     * Unbinds the specified consumer from this channel. After the call the output will returned to
-     * readers.
+     * Unbinds the specified consumer from this channel. After the call the outputs will be returned
+     * to readers.
      *
      * @param consumer the consumer instance.
      * @return this channel.
      */
     @Nonnull
-    OutputChannel<OUTPUT> unbind(@Nullable OutputConsumer<OUTPUT> consumer);
+    OutputChannel<OUTPUT> unbind(@Nullable OutputConsumer<? super OUTPUT> consumer);
 }

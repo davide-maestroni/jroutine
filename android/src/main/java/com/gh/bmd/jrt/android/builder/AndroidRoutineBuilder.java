@@ -26,8 +26,8 @@ import javax.annotation.Nullable;
  * Routine invocations started through the returned objects can be safely restored after a change in
  * the configuration, so to avoid duplicated calls and memory leaks. Be aware, though, that the
  * invocation results will always be dispatched in the main thread, no matter the calling one was,
- * so waiting for the outputs right after the routine invocation will result in a deadlock.<br/>
- * The context of the invocations will be always the application one.
+ * so, waiting for the outputs right after the routine invocation, will result in a deadlock.<br/>
+ * The local context of the invocations will always be the application one.
  * <p/>
  * Note that the <code>equals()</code> and <code>hashCode()</code> methods of the input parameter
  * objects might be employed to check for clashing of invocations or compute the invocation ID.<br/>
@@ -40,15 +40,18 @@ import javax.annotation.Nullable;
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-public interface AndroidRoutineBuilder<INPUT, OUTPUT> extends RoutineBuilder<INPUT, OUTPUT> {
+public interface AndroidRoutineBuilder<INPUT, OUTPUT>
+        extends RoutineBuilder<INPUT, OUTPUT>, AndroidRoutine<INPUT, OUTPUT> {
 
     /**
      * Constant identifying a routine ID computed from the executor class and the input parameters.
      */
     int AUTO = Integer.MIN_VALUE;
 
+    /**
+     * {@inheritDoc}
+     */
     @Nonnull
-    @Override
     AndroidRoutine<INPUT, OUTPUT> buildRoutine();
 
     /**
@@ -59,14 +62,13 @@ public interface AndroidRoutineBuilder<INPUT, OUTPUT> extends RoutineBuilder<INP
      * @return this builder.
      */
     @Nonnull
-    @Override
     AndroidRoutineBuilder<INPUT, OUTPUT> withConfiguration(
             @Nullable RoutineConfiguration configuration);
 
     /**
      * Tells the builder how to resolve clashes of invocations. A clash happens when an invocation
      * of the same type and with the same ID is still running. A null value means that it is up to
-     * the framework to chose a default resolution type.
+     * the framework to choose a default resolution type.
      *
      * @param resolution the type of resolution.
      * @return this builder.
@@ -76,7 +78,7 @@ public interface AndroidRoutineBuilder<INPUT, OUTPUT> extends RoutineBuilder<INP
 
     /**
      * Tells the builder how to cache the invocation result after its completion. A null value means
-     * that it is up to the framework to chose a default strategy.
+     * that it is up to the framework to choose a default strategy.
      *
      * @param cacheStrategy the cache type.
      * @return this builder.
@@ -87,11 +89,11 @@ public interface AndroidRoutineBuilder<INPUT, OUTPUT> extends RoutineBuilder<INP
     /**
      * Tells the builder to identify the invocation with the specified ID.
      *
-     * @param id the invocation ID.
+     * @param invocationId the invocation ID.
      * @return this builder.
      */
     @Nonnull
-    AndroidRoutineBuilder<INPUT, OUTPUT> withId(int id);
+    AndroidRoutineBuilder<INPUT, OUTPUT> withId(int invocationId);
 
     /**
      * Result cache type enumeration.<br/>

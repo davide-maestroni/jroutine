@@ -2,7 +2,8 @@ package com.gh.bmd.jrt.sample;
 
 import com.gh.bmd.jrt.time.TimeDuration;
 
-import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * <p/>
  * Created by davide on 10/17/14.
  */
-public class DownloaderTest extends TestCase {
+public class DownloaderTest {
 
     private static final String FAIL_URL = "http://this.domain.does.not.exist/test.txt";
 
@@ -46,6 +47,17 @@ public class DownloaderTest extends TestCase {
         mDownloader = new Downloader(2);
     }
 
+    @Before
+    public void setUp() throws Exception {
+
+        delete(FAIL_URL);
+        delete(HUGE_FILE_URL);
+        delete(SMALL_FILE_URL1);
+        delete(SMALL_FILE_URL2);
+        delete(SMALL_FILE_URL3);
+    }
+
+    @Test
     public void testAll() throws IOException, URISyntaxException {
 
         final String tmpDirPath = mTmpDirPath;
@@ -112,6 +124,7 @@ public class DownloaderTest extends TestCase {
         assertThat(outFile3).exists();
     }
 
+    @Test
     public void testDownload() throws IOException, URISyntaxException {
 
         final String tmpDirPath = mTmpDirPath;
@@ -168,6 +181,7 @@ public class DownloaderTest extends TestCase {
         assertThat(outFile3).exists();
     }
 
+    @Test
     public void testFail() throws IOException, URISyntaxException {
 
         final String tmpDirPath = mTmpDirPath;
@@ -190,6 +204,7 @@ public class DownloaderTest extends TestCase {
         checkNotExists(outFile);
     }
 
+    @Test
     public void testRepeatedAbort() throws IOException, URISyntaxException {
 
         final String tmpDirPath = mTmpDirPath;
@@ -222,6 +237,7 @@ public class DownloaderTest extends TestCase {
         checkNotExists(outFile);//XXX
     }
 
+    @Test
     public void testSimpleAbort() throws IOException, URISyntaxException {
 
         final String tmpDirPath = mTmpDirPath;
@@ -260,18 +276,6 @@ public class DownloaderTest extends TestCase {
 
         assertThat(downloader.isDownloaded(uri)).isFalse();
         checkNotExists(outFile);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-
-        super.setUp();
-
-        delete(FAIL_URL);
-        delete(HUGE_FILE_URL);
-        delete(SMALL_FILE_URL1);
-        delete(SMALL_FILE_URL2);
-        delete(SMALL_FILE_URL3);
     }
 
     private void checkNotExists(final File file) {

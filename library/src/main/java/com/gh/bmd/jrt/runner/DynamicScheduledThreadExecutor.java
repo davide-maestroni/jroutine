@@ -93,7 +93,6 @@ class DynamicScheduledThreadExecutor extends ScheduledThreadPoolExecutor {
             mCommand = command;
         }
 
-        @Override
         public void run() {
 
             mExecutor.execute(mCommand);
@@ -117,7 +116,6 @@ class DynamicScheduledThreadExecutor extends ScheduledThreadPoolExecutor {
             mQueue = queue;
         }
 
-        @Override
         public void rejectedExecution(final Runnable runnable,
                 final ThreadPoolExecutor threadPoolExecutor) {
 

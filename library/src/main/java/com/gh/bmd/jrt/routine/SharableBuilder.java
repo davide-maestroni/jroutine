@@ -28,12 +28,14 @@ import javax.annotation.Nullable;
  */
 public interface SharableBuilder extends ConfigurableBuilder {
 
+    /**
+     * {@inheritDoc}
+     */
     @Nonnull
-    @Override
     SharableBuilder withConfiguration(@Nullable RoutineConfiguration configuration);
 
     /**
-     * Tells the builder to create a routine using the specified share tag.
+     * Tells the builder to create a routine using the specified share group.
      *
      * @param group the group name.
      * @return this builder.

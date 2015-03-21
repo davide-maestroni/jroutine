@@ -42,7 +42,7 @@ public interface AndroidChannelBuilder extends ConfigurableBuilder {
 
     /**
      * Tells the builder how to cache the invocation result after its completion. A null value means
-     * that it is up to the framework to chose a default strategy.
+     * that it is up to the framework to choose a default strategy.
      *
      * @param cacheStrategy the cache strategy.
      * @return this builder.
@@ -51,30 +51,30 @@ public interface AndroidChannelBuilder extends ConfigurableBuilder {
     AndroidChannelBuilder onComplete(@Nullable CacheStrategy cacheStrategy);
 
     /**
-     * Makes the builder destroy the cached invocation instance.
+     * Makes the builder destroy all the cached invocation instances.
      */
     void purge();
 
     /**
-     * Makes the builder destroy the cached invocation instance with the specified input.
+     * Makes the builder destroy the cached invocation instances with the specified input.
      *
      * @param input the input.
      */
     void purge(@Nullable Object input);
 
     /**
-     * Makes the builder destroy the cached invocation instance with the specified inputs.
+     * Makes the builder destroy the cached invocation instances with the specified inputs.
      *
      * @param inputs the inputs.
      */
     void purge(@Nullable Object... inputs);
 
     /**
-     * Makes the builder destroy the cached invocation instance with the specified inputs.
+     * Makes the builder destroy the cached invocation instances with the specified inputs.
      *
      * @param inputs the inputs.
      */
-    void purge(@Nullable Iterable<Object> inputs);
+    void purge(@Nullable Iterable<?> inputs);
 
     /**
      * Note that only the options related to logs will be employed.
@@ -83,6 +83,5 @@ public interface AndroidChannelBuilder extends ConfigurableBuilder {
      * @return this builder.
      */
     @Nonnull
-    @Override
     AndroidChannelBuilder withConfiguration(@Nullable RoutineConfiguration configuration);
 }

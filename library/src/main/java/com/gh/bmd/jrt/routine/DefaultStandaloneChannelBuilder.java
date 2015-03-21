@@ -36,14 +36,12 @@ class DefaultStandaloneChannelBuilder implements StandaloneChannelBuilder {
     }
 
     @Nonnull
-    @Override
     public <T> StandaloneChannel<T> buildChannel() {
 
         return new DefaultStandaloneChannel<T>(RoutineConfiguration.notNull(mConfiguration));
     }
 
     @Nonnull
-    @Override
     public StandaloneChannelBuilder withConfiguration(
             @Nullable final RoutineConfiguration configuration) {
 

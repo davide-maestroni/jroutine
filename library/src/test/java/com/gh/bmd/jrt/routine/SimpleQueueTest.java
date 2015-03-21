@@ -13,20 +13,22 @@
  */
 package com.gh.bmd.jrt.routine;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 
 /**
  * Simple queue unit tests.
  * <p/>
  * Created by davide on 10/1/14.
  */
-public class SimpleQueueTest extends TestCase {
+public class SimpleQueueTest {
 
+    @Test
     public void testAdd() {
 
         final SimpleQueue<Integer> queue = new SimpleQueue<Integer>();
@@ -72,6 +74,7 @@ public class SimpleQueueTest extends TestCase {
         assertThat(queue.isEmpty()).isTrue();
     }
 
+    @Test
     public void testClear() {
 
         final SimpleQueue<Integer> queue = new SimpleQueue<Integer>();
@@ -93,6 +96,7 @@ public class SimpleQueueTest extends TestCase {
         assertThat(queue.isEmpty()).isTrue();
     }
 
+    @Test
     public void testError() {
 
         final SimpleQueue<Integer> queue = new SimpleQueue<Integer>();
@@ -177,6 +181,7 @@ public class SimpleQueueTest extends TestCase {
         }
     }
 
+    @Test
     public void testMove() {
 
         final SimpleQueue<Integer> queue = new SimpleQueue<Integer>();

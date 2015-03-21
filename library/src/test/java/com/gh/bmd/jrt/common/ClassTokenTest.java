@@ -13,20 +13,22 @@
  */
 package com.gh.bmd.jrt.common;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 
 /**
  * Class token unit tests.
  * <p/>
  * Created by davide on 6/15/14.
  */
-public class ClassTokenTest extends TestCase {
+public class ClassTokenTest {
 
+    @Test
     public void testCast() {
 
         final ClassToken<List<Integer>> classToken = new ClassToken<List<Integer>>() {};
@@ -46,6 +48,7 @@ public class ClassTokenTest extends TestCase {
         }
     }
 
+    @Test
     @SuppressWarnings("ObjectEqualsNull")
     public void testEquals() {
 
@@ -70,6 +73,7 @@ public class ClassTokenTest extends TestCase {
                 new ClassToken<ArrayList<String>>() {});
     }
 
+    @Test
     @SuppressWarnings("ConstantConditions")
     public void testError() {
 
@@ -114,6 +118,7 @@ public class ClassTokenTest extends TestCase {
         }
     }
 
+    @Test
     @SuppressWarnings("EqualsBetweenInconvertibleTypes")
     public void testType() {
 

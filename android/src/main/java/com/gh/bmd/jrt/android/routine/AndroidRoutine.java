@@ -29,21 +29,21 @@ import javax.annotation.Nullable;
 public interface AndroidRoutine<INPUT, OUTPUT> extends Routine<INPUT, OUTPUT> {
 
     /**
-     * Makes the builder destroy the cached invocation instance with the specified input.
+     * Makes the builder destroy the cached invocation instances with the specified input.
      *
      * @param input the input.
      */
     void purge(@Nullable INPUT input);
 
     /**
-     * Makes the builder destroy the cached invocation instance with the specified inputs.
+     * Makes the builder destroy the cached invocation instances with the specified inputs.
      *
      * @param inputs the inputs.
      */
     void purge(@Nullable INPUT... inputs);
 
     /**
-     * Makes the builder destroy the cached invocation instance with the specified inputs.
+     * Makes the builder destroy the cached invocation instances with the specified inputs.
      *
      * @param inputs the inputs.
      */

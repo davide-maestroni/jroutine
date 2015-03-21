@@ -79,7 +79,6 @@ class AsyncTaskRunner extends MainRunner {
             mExecution = execution;
         }
 
-        @Override
         @TargetApi(VERSION_CODES.HONEYCOMB)
         public void run() {
 

@@ -18,7 +18,7 @@ import com.gh.bmd.jrt.common.DeadlockException;
 import javax.annotation.Nullable;
 
 /**
- * Exception indicating that no result became available before the timeout elapsed.
+ * Exception indicating that no result became available before the read timeout elapsed.
  * <p/>
  * Created by davide on 11/25/14.
  */

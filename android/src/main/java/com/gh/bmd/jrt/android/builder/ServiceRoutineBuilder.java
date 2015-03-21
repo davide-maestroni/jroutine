@@ -27,7 +27,7 @@ import javax.annotation.Nullable;
 /**
  * Interface defining a builder of routine objects based on an invocation class token.
  * <p/>
- * The context of the invocations will be the specific service instance.
+ * The local context of the invocations will be the specific service instance.
  * <p/>
  * Created by davide on 3/7/15.
  *
@@ -54,12 +54,11 @@ public interface ServiceRoutineBuilder<INPUT, OUTPUT> extends RoutineBuilder<INP
      * @return this builder.
      */
     @Nonnull
-    @Override
     ServiceRoutineBuilder<INPUT, OUTPUT> withConfiguration(
             @Nullable RoutineConfiguration configuration);
 
     /**
-     * Sets the log class. A null value means that it is up to the framework to chose a default
+     * Sets the log class. A null value means that it is up to the framework to choose a default
      * implementation.
      *
      * @param logClass the log class.
@@ -69,7 +68,7 @@ public interface ServiceRoutineBuilder<INPUT, OUTPUT> extends RoutineBuilder<INP
     ServiceRoutineBuilder<INPUT, OUTPUT> withLogClass(@Nullable Class<? extends Log> logClass);
 
     /**
-     * Sets the runner class. A null value means that it is up to the framework to chose a default
+     * Sets the runner class. A null value means that it is up to the framework to choose a default
      * implementation.
      *
      * @param runnerClass the runner class.
@@ -81,7 +80,7 @@ public interface ServiceRoutineBuilder<INPUT, OUTPUT> extends RoutineBuilder<INP
 
     /**
      * Sets the class of the service executing the built routine. A null value means that it is up
-     * to the framework to chose the default service class.
+     * to the framework to choose the default service class.
      *
      * @param serviceClass the service class.
      * @return this builder.

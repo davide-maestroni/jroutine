@@ -65,6 +65,11 @@ class DefaultStandaloneChannel<DATA> implements StandaloneChannel<DATA> {
         warn(logger, configuration);
     }
 
+    /**
+     * Logs any warning related to ignored options in the specified configuration.
+     *
+     * @param configuration the routine configuration.
+     */
     private static void warn(@Nonnull final Logger logger,
             @Nonnull final RoutineConfiguration configuration) {
 
@@ -122,14 +127,12 @@ class DefaultStandaloneChannel<DATA> implements StandaloneChannel<DATA> {
     }
 
     @Nonnull
-    @Override
     public StandaloneInput<DATA> input() {
 
         return mInputChannel;
     }
 
     @Nonnull
-    @Override
     public StandaloneOutput<DATA> output() {
 
         return mOutputChannel;
@@ -142,14 +145,13 @@ class DefaultStandaloneChannel<DATA> implements StandaloneChannel<DATA> {
 
         private DefaultResultChannel<?> mChannel;
 
-        @Override
         public void onAbort(@Nullable final Throwable reason, final long delay,
                 @Nonnull final TimeUnit timeUnit) {
 
             mChannel.close(reason);
         }
 
-        public void setChannel(@Nonnull final DefaultResultChannel<?> channel) {
+        private void setChannel(@Nonnull final DefaultResultChannel<?> channel) {
 
             mChannel = channel;
         }
@@ -174,14 +176,12 @@ class DefaultStandaloneChannel<DATA> implements StandaloneChannel<DATA> {
             mChannel = wrapped;
         }
 
-        @Override
         public boolean abort() {
 
             return mChannel.abort();
         }
 
         @Nonnull
-        @Override
         public StandaloneInput<INPUT> after(@Nonnull final TimeDuration delay) {
 
             mChannel.after(delay);
@@ -189,7 +189,6 @@ class DefaultStandaloneChannel<DATA> implements StandaloneChannel<DATA> {
         }
 
         @Nonnull
-        @Override
         public StandaloneInput<INPUT> after(final long delay, @Nonnull final TimeUnit timeUnit) {
 
             mChannel.after(delay, timeUnit);
@@ -197,7 +196,6 @@ class DefaultStandaloneChannel<DATA> implements StandaloneChannel<DATA> {
         }
 
         @Nonnull
-        @Override
         public StandaloneInput<INPUT> now() {
 
             mChannel.now();
@@ -205,15 +203,13 @@ class DefaultStandaloneChannel<DATA> implements StandaloneChannel<DATA> {
         }
 
         @Nonnull
-        @Override
-        public StandaloneInput<INPUT> pass(@Nullable final OutputChannel<INPUT> channel) {
+        public StandaloneInput<INPUT> pass(@Nullable final OutputChannel<? extends INPUT> channel) {
 
             mChannel.pass(channel);
             return this;
         }
 
         @Nonnull
-        @Override
         public StandaloneInput<INPUT> pass(@Nullable final Iterable<? extends INPUT> inputs) {
 
             mChannel.pass(inputs);
@@ -221,7 +217,6 @@ class DefaultStandaloneChannel<DATA> implements StandaloneChannel<DATA> {
         }
 
         @Nonnull
-        @Override
         public StandaloneInput<INPUT> pass(@Nullable final INPUT input) {
 
             mChannel.pass(input);
@@ -229,26 +224,22 @@ class DefaultStandaloneChannel<DATA> implements StandaloneChannel<DATA> {
         }
 
         @Nonnull
-        @Override
         public StandaloneInput<INPUT> pass(@Nullable final INPUT... inputs) {
 
             mChannel.pass(inputs);
             return this;
         }
 
-        @Override
         public void close() {
 
             mChannel.close();
         }
 
-        @Override
         public boolean abort(@Nullable final Throwable reason) {
 
             return mChannel.abort(reason);
         }
 
-        @Override
         public boolean isOpen() {
 
             return mChannel.isOpen();
@@ -275,7 +266,6 @@ class DefaultStandaloneChannel<DATA> implements StandaloneChannel<DATA> {
         }
 
         @Nonnull
-        @Override
         public StandaloneOutput<OUTPUT> afterMax(@Nonnull final TimeDuration timeout) {
 
             mChannel.afterMax(timeout);
@@ -283,7 +273,6 @@ class DefaultStandaloneChannel<DATA> implements StandaloneChannel<DATA> {
         }
 
         @Nonnull
-        @Override
         public StandaloneOutput<OUTPUT> afterMax(final long timeout,
                 @Nonnull final TimeUnit timeUnit) {
 
@@ -292,15 +281,14 @@ class DefaultStandaloneChannel<DATA> implements StandaloneChannel<DATA> {
         }
 
         @Nonnull
-        @Override
-        public StandaloneOutput<OUTPUT> bind(@Nonnull final OutputConsumer<OUTPUT> consumer) {
+        public StandaloneOutput<OUTPUT> bind(
+                @Nonnull final OutputConsumer<? super OUTPUT> consumer) {
 
             mChannel.bind(consumer);
             return this;
         }
 
         @Nonnull
-        @Override
         public StandaloneOutput<OUTPUT> eventually() {
 
             mChannel.eventually();
@@ -308,7 +296,6 @@ class DefaultStandaloneChannel<DATA> implements StandaloneChannel<DATA> {
         }
 
         @Nonnull
-        @Override
         public StandaloneOutput<OUTPUT> eventuallyAbort() {
 
             mChannel.eventuallyAbort();
@@ -316,7 +303,6 @@ class DefaultStandaloneChannel<DATA> implements StandaloneChannel<DATA> {
         }
 
         @Nonnull
-        @Override
         public StandaloneOutput<OUTPUT> eventuallyDeadlock() {
 
             mChannel.eventuallyDeadlock();
@@ -324,7 +310,6 @@ class DefaultStandaloneChannel<DATA> implements StandaloneChannel<DATA> {
         }
 
         @Nonnull
-        @Override
         public StandaloneOutput<OUTPUT> eventuallyExit() {
 
             mChannel.eventuallyExit();
@@ -332,7 +317,6 @@ class DefaultStandaloneChannel<DATA> implements StandaloneChannel<DATA> {
         }
 
         @Nonnull
-        @Override
         public StandaloneOutput<OUTPUT> immediately() {
 
             mChannel.immediately();
@@ -340,7 +324,6 @@ class DefaultStandaloneChannel<DATA> implements StandaloneChannel<DATA> {
         }
 
         @Nonnull
-        @Override
         public StandaloneOutput<OUTPUT> readAllInto(
                 @Nonnull final Collection<? super OUTPUT> result) {
 
@@ -348,58 +331,50 @@ class DefaultStandaloneChannel<DATA> implements StandaloneChannel<DATA> {
             return this;
         }
 
-        @Override
+        @Nonnull
+        public StandaloneOutput<OUTPUT> unbind(
+                @Nullable final OutputConsumer<? super OUTPUT> consumer) {
+
+            mChannel.unbind(consumer);
+            return this;
+        }
+
         public boolean checkComplete() {
 
             return mChannel.checkComplete();
         }
 
-        @Override
         public boolean isBound() {
 
             return mChannel.isBound();
         }
 
         @Nonnull
-        @Override
         public List<OUTPUT> readAll() {
 
             return mChannel.readAll();
         }
 
-        @Override
         public OUTPUT readNext() {
 
             return mChannel.readNext();
         }
 
-        @Nonnull
-        @Override
-        public StandaloneOutput<OUTPUT> unbind(@Nullable final OutputConsumer<OUTPUT> consumer) {
-
-            mChannel.unbind(consumer);
-            return this;
-        }
-
-        @Override
         public Iterator<OUTPUT> iterator() {
 
             return mChannel.iterator();
         }
 
-        @Override
         public boolean abort() {
 
             return mChannel.abort();
         }
 
-        @Override
         public boolean abort(@Nullable final Throwable reason) {
 
             return mChannel.abort(reason);
         }
 
-        @Override
         public boolean isOpen() {
 
             return mChannel.isOpen();

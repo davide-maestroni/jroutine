@@ -22,7 +22,7 @@ import javax.annotation.Nullable;
  * Interface defining a queue with the possibility to add nested queues with additional elements.
  * <p/>
  * This interface is used to abstract the handling of placeholders for asynchronously available
- * data in order to support forced input and output ordering.
+ * data, in order to support forced input and output ordering.
  * <p/>
  * Created by davide on 9/30/14.
  *
@@ -36,11 +36,9 @@ interface NestedQueue<E> {
      * Note that the element can be null.
      *
      * @param element the element to add.
-     * @return this queue.
      * @throws java.lang.IllegalStateException if the queue has been already closed.
      */
-    @Nonnull
-    NestedQueue<E> add(@Nullable E element);
+    void add(@Nullable E element);
 
     /**
      * Adds all the elements returned by the specified iterable.
@@ -48,11 +46,9 @@ interface NestedQueue<E> {
      * Note that the any of the returned element can be null.
      *
      * @param elements the element iterable.
-     * @return this queue.
      * @throws java.lang.IllegalStateException if the queue has been already closed.
      */
-    @Nonnull
-    NestedQueue<E> addAll(@Nonnull Iterable<? extends E> elements);
+    void addAll(@Nonnull Iterable<? extends E> elements);
 
     /**
      * Adds a nested queue to this one.
@@ -65,21 +61,15 @@ interface NestedQueue<E> {
 
     /**
      * Clears the queue.
-     *
-     * @return this queue.
      */
-    @Nonnull
-    NestedQueue<E> clear();
+    void clear();
 
     /**
      * Closes this queue.<br/>
-     * After the method returns no more addition can be made to this queue. Though, elements can
+     * After the method returns no further additions can be made to this queue. Though, elements can
      * be safely removed.
-     *
-     * @return this queue.
      */
-    @Nonnull
-    NestedQueue<E> close();
+    void close();
 
     /**
      * Check if the queue does not contain any element.
@@ -92,10 +82,8 @@ interface NestedQueue<E> {
      * Moves all the elements to the specified collection.
      *
      * @param collection the collection to fill.
-     * @return this queue.
      */
-    @Nonnull
-    NestedQueue<E> moveTo(@Nonnull final Collection<? super E> collection);
+    void moveTo(@Nonnull final Collection<? super E> collection);
 
     /**
      * Removes the first element added into the queue.

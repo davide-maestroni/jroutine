@@ -300,7 +300,7 @@ public class RoutineService extends Service {
 
             for (final RoutineState routineState : mRoutineMap.values()) {
 
-                routineState.flush();
+                routineState.purge();
             }
         }
 
@@ -728,14 +728,6 @@ public class RoutineService extends Service {
         }
 
         /**
-         * Makes the routine purge all the cached invocation instances.
-         */
-        public void flush() {
-
-            mRoutine.purge();
-        }
-
-        /**
          * Increments count of the running routines and starts an asynchronous invocation.
          *
          * @return the invocation parameter channel.
@@ -757,6 +749,14 @@ public class RoutineService extends Service {
 
             ++mInvocationCount;
             return mRoutine.invokeParallel();
+        }
+
+        /**
+         * Makes the routine purge all the cached invocation instances.
+         */
+        public void purge() {
+
+            mRoutine.purge();
         }
 
         /**
@@ -799,7 +799,6 @@ public class RoutineService extends Service {
             mOutMessenger = messenger;
         }
 
-        @Override
         public void onComplete() {
 
             mInvocation.recycle();
@@ -814,7 +813,6 @@ public class RoutineService extends Service {
             }
         }
 
-        @Override
         public void onError(@Nullable final Throwable error) {
 
             mInvocation.recycle();
@@ -832,7 +830,6 @@ public class RoutineService extends Service {
             }
         }
 
-        @Override
         public void onOutput(final Object o) {
 
             final Message message = Message.obtain(null, RoutineService.MSG_DATA);
@@ -923,8 +920,7 @@ public class RoutineService extends Service {
          *
          * @throws com.gh.bmd.jrt.common.RoutineException if the execution has been aborted.
          * @throws java.lang.IllegalStateException        if the channel is already closed or
-         *                                                already
-         *                                                bound to a consumer.
+         *                                                already bound to a consumer.
          * @throws java.lang.NullPointerException         if the specified consumer is null.
          */
         public void result(@Nonnull final OutputConsumer<Object> consumer) {

@@ -35,7 +35,6 @@ import com.gh.bmd.jrt.channel.ParameterChannel;
 import com.gh.bmd.jrt.channel.StandaloneChannel;
 import com.gh.bmd.jrt.channel.StandaloneChannel.StandaloneInput;
 import com.gh.bmd.jrt.channel.StandaloneChannel.StandaloneOutput;
-import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.invocation.Invocations;
@@ -65,7 +64,7 @@ import static com.gh.bmd.jrt.common.Reflection.findConstructor;
 import static java.util.UUID.randomUUID;
 
 /**
- * Routine implementation employing an Android remote service to run its invocations.
+ * Routine implementation employing an Android service to run its invocations.
  * <p/>
  * Created by davide on 1/8/15.
  *
@@ -97,9 +96,9 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
      *
      * @param context         the routine context.
      * @param serviceClass    the service class.
-     * @param looper          the message looper.
-     * @param invocationToken the invocation class token.
+     * @param invocationClass the invocation class.
      * @param configuration   the routine configuration.
+     * @param looper          the message looper.
      * @param runnerClass     the asynchronous runner class.
      * @param logClass        the log class.
      * @throws java.lang.IllegalArgumentException if at least one of the parameter is invalid.
@@ -107,9 +106,8 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
      */
     ServiceRoutine(@Nonnull final Context context,
             @Nullable final Class<? extends RoutineService> serviceClass,
-            @Nullable final Looper looper,
-            @Nonnull final ClassToken<? extends AndroidInvocation<INPUT, OUTPUT>> invocationToken,
-            @Nonnull final RoutineConfiguration configuration,
+            @Nonnull final Class<? extends AndroidInvocation<INPUT, OUTPUT>> invocationClass,
+            @Nonnull final RoutineConfiguration configuration, @Nullable final Looper looper,
             @Nullable final Class<? extends Runner> runnerClass,
             @Nullable final Class<? extends Log> logClass) {
 
@@ -144,15 +142,15 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         mContext = context.getApplicationContext();
         mLooper = looper;
         mServiceClass = (serviceClass != null) ? serviceClass : RoutineService.class;
-        mInvocationClass = invocationToken.getRawClass();
+        mInvocationClass = invocationClass;
         mConfiguration = configuration;
         mRunnerClass =
                 (runnerClass != null) ? runnerClass : (runner != null) ? runner.getClass() : null;
         mLogClass = (logClass != null) ? logClass : log.getClass();
         mLogger = Logger.newLogger(log, configuration.getLogLevelOr(Logger.getGlobalLogLevel()),
                                    this);
-        mRoutine = JRoutine.on(Invocations.factoryOf(
-                (ClassToken<? extends Invocation<INPUT, OUTPUT>>) invocationToken))
+        mRoutine = JRoutine.on(
+                Invocations.factoryOf((Class<? extends Invocation<INPUT, OUTPUT>>) invocationClass))
                            .withConfiguration(configuration.builderFrom()
                                                            .withInputSize(Integer.MAX_VALUE)
                                                            .withInputTimeout(TimeDuration.ZERO)
@@ -167,6 +165,11 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         warn(logger, configuration);
     }
 
+    /**
+     * Logs any warning related to ignored options in the specified configuration.
+     *
+     * @param configuration the routine configuration.
+     */
     private static void warn(@Nonnull final Logger logger,
             @Nonnull final RoutineConfiguration configuration) {
 
@@ -200,25 +203,22 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
     }
 
     @Nonnull
-    @Override
     public ParameterChannel<INPUT, OUTPUT> invokeAsync() {
 
-        return new ServiceChannel<INPUT, OUTPUT>(false, mContext, mServiceClass, mLooper,
-                                                 mInvocationClass, mConfiguration, mRunnerClass,
-                                                 mLogClass, mLogger);
+        return new ServiceChannel<INPUT, OUTPUT>(false, mContext, mServiceClass, mInvocationClass,
+                                                 mConfiguration, mLooper, mRunnerClass, mLogClass,
+                                                 mLogger);
     }
 
     @Nonnull
-    @Override
     public ParameterChannel<INPUT, OUTPUT> invokeParallel() {
 
-        return new ServiceChannel<INPUT, OUTPUT>(true, mContext, mServiceClass, mLooper,
-                                                 mInvocationClass, mConfiguration, mRunnerClass,
-                                                 mLogClass, mLogger);
+        return new ServiceChannel<INPUT, OUTPUT>(true, mContext, mServiceClass, mInvocationClass,
+                                                 mConfiguration, mLooper, mRunnerClass, mLogClass,
+                                                 mLogger);
     }
 
     @Nonnull
-    @Override
     public ParameterChannel<INPUT, OUTPUT> invokeSync() {
 
         return mRoutine.invokeSync();
@@ -282,18 +282,17 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
          * @param isParallel      whether the invocation is parallel.
          * @param context         the routine context.
          * @param serviceClass    the service class.
-         * @param looper          the message looper.
          * @param invocationClass the invocation class.
          * @param configuration   the routine configuration.
+         * @param looper          the message looper.
          * @param runnerClass     the asynchronous runner class.
          * @param logClass        the log class.
          * @param logger          the routine logger.
          */
         private ServiceChannel(boolean isParallel, @Nonnull final Context context,
                 @Nonnull final Class<? extends RoutineService> serviceClass,
-                @Nullable final Looper looper,
                 @Nonnull Class<? extends AndroidInvocation<INPUT, OUTPUT>> invocationClass,
-                @Nonnull final RoutineConfiguration configuration,
+                @Nonnull final RoutineConfiguration configuration, @Nullable final Looper looper,
                 @Nullable final Class<? extends Runner> runnerClass,
                 @Nullable final Class<? extends Log> logClass, @Nonnull final Logger logger) {
 
@@ -348,28 +347,24 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
             mStandaloneResultOutput = resultChannel.output();
         }
 
-        @Override
         public boolean abort() {
 
             bindService();
             return mStandaloneParamInput.abort();
         }
 
-        @Override
         public boolean abort(@Nullable final Throwable reason) {
 
             bindService();
             return mStandaloneParamInput.abort(reason);
         }
 
-        @Override
         public boolean isOpen() {
 
             return mStandaloneParamInput.isOpen();
         }
 
         @Nonnull
-        @Override
         public ParameterChannel<INPUT, OUTPUT> after(@Nonnull final TimeDuration delay) {
 
             mStandaloneParamInput.after(delay);
@@ -377,7 +372,6 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         }
 
         @Nonnull
-        @Override
         public ParameterChannel<INPUT, OUTPUT> after(final long delay,
                 @Nonnull final TimeUnit timeUnit) {
 
@@ -386,7 +380,6 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         }
 
         @Nonnull
-        @Override
         public ParameterChannel<INPUT, OUTPUT> now() {
 
             mStandaloneParamInput.now();
@@ -394,8 +387,8 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         }
 
         @Nonnull
-        @Override
-        public ParameterChannel<INPUT, OUTPUT> pass(@Nullable final OutputChannel<INPUT> channel) {
+        public ParameterChannel<INPUT, OUTPUT> pass(
+                @Nullable final OutputChannel<? extends INPUT> channel) {
 
             bindService();
             mStandaloneParamInput.pass(channel);
@@ -403,7 +396,6 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         }
 
         @Nonnull
-        @Override
         public ParameterChannel<INPUT, OUTPUT> pass(
                 @Nullable final Iterable<? extends INPUT> inputs) {
 
@@ -413,7 +405,6 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         }
 
         @Nonnull
-        @Override
         public ParameterChannel<INPUT, OUTPUT> pass(@Nullable final INPUT input) {
 
             bindService();
@@ -422,7 +413,6 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         }
 
         @Nonnull
-        @Override
         public ParameterChannel<INPUT, OUTPUT> pass(@Nullable final INPUT... inputs) {
 
             bindService();
@@ -431,7 +421,6 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         }
 
         @Nonnull
-        @Override
         public OutputChannel<OUTPUT> result() {
 
             bindService();
@@ -471,11 +460,10 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         }
 
         /**
-         * Output consumer sending messages to the remote service.
+         * Output consumer sending messages to the service.
          */
         private class ConnectionOutputConsumer implements OutputConsumer<INPUT> {
 
-            @Override
             public void onComplete() {
 
                 final Message message = Message.obtain(null, RoutineService.MSG_COMPLETE);
@@ -493,7 +481,6 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                 }
             }
 
-            @Override
             public void onError(@Nullable final Throwable error) {
 
                 final Message message = Message.obtain(null, RoutineService.MSG_ABORT);
@@ -511,7 +498,6 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                 }
             }
 
-            @Override
             public void onOutput(final INPUT input) {
 
                 final Message message = Message.obtain(null, RoutineService.MSG_DATA);
@@ -530,7 +516,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         }
 
         /**
-         * Handler implementation managing incoming messages from the remote service.
+         * Handler implementation managing incoming messages from the service.
          */
         private class IncomingHandler extends Handler {
 
@@ -596,13 +582,12 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         }
 
         /**
-         * Service connection implementation managing the remote service communication state.
+         * Service connection implementation managing the service communication state.
          */
         private class RoutineServiceConnection implements ServiceConnection {
 
             private ConnectionOutputConsumer mConsumer;
 
-            @Override
             public void onServiceConnected(final ComponentName name, final IBinder service) {
 
                 final Logger logger = mLogger;
@@ -641,7 +626,6 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
                 }
             }
 
-            @Override
             public void onServiceDisconnected(final ComponentName name) {
 
                 mLogger.dbg("service disconnected: %s", name);

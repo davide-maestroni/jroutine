@@ -98,12 +98,11 @@ Parallel programming on the go.
 
             public static void main(final String[] args) {
 
-                final Routine&lt;String, Integer&gt; parseRoutine = on(factoryOf(new Parse())).buildRoutine();
-                final Routine&lt;Integer, Integer&gt; squareRoutine = on(factoryOf(new Square())).buildRoutine();
+                final Routine&lt;String, Integer&gt; parseRoutine = on(new Parse()).buildRoutine();
+                final Routine&lt;Integer, Integer&gt; squareRoutine = on(new Square()).buildRoutine();
                 final Routine&lt;Integer, Double&gt; meanRoutine = on(new InvocationFactory&lt;Integer, Double&gt;() {
 
                     &commat;Nonnull
-                    &commat;Override
                     public Invocation&lt;Integer, Double&gt; newInvocation() {
 
                         return new SquareRootMean();
@@ -122,7 +121,6 @@ Parallel programming on the go.
 
             private static class Parse extends StatelessInvocation&lt;String, Integer&gt; {
 
-                &commat;Override
                 public void onInput(final String s, &commat;Nonnull final ResultChannel&lt;Integer&gt; result) {
 
                     result.pass(Integer.parseInt(s));
@@ -131,7 +129,6 @@ Parallel programming on the go.
 
             private static class Square extends StatelessInvocation&lt;Integer, Integer&gt; {
 
-                &commat;Override
                 public void onInput(final Integer integer, &commat;Nonnull final ResultChannel&lt;Integer&gt; result) {
 
                     final int input = integer;
@@ -289,14 +286,13 @@ Parallel programming on the go.
             private interface AsyncMain {
 
                 &commat;Pass(int.class)
-                public OutputChannel&lt;Integer&gt; parseArg(&commat;Pass(String.class) String[] args);
+                OutputChannel&lt;Integer&gt; parseArg(&commat;Pass(String.class) String[] args);
 
                 &commat;Pass(int.class)
-                public OutputChannel&lt;Integer&gt; square(
+                OutputChannel&lt;Integer&gt; square(
                         &commat;Pass(value = int.class, mode = PassingMode.PARALLEL) OutputChannel&lt;Integer&gt; value);
 
-                public double squareRootMean(
-                        &commat;Pass(List.class) OutputChannel&lt;Integer&gt; values);
+                double squareRootMean(&commat;Pass(List.class) OutputChannel&lt;Integer&gt; values);
             }
         }
     </code>
@@ -353,14 +349,13 @@ Parallel programming on the go.
             public interface AsyncMain {
 
                 &commat;Pass(int.class)
-                public OutputChannel&lt;Integer&gt; parseArg(&commat;Pass(String.class) String[] args);
+                OutputChannel&lt;Integer&gt; parseArg(&commat;Pass(String.class) String[] args);
 
                 &commat;Pass(int.class)
-                public OutputChannel&lt;Integer&gt; square(
+                OutputChannel&lt;Integer&gt; square(
                         &commat;Pass(value = int.class, mode = PassingMode.PARALLEL) OutputChannel&lt;Integer&gt; value);
 
-                public double squareRootMean(
-                        &commat;Pass(List.class) OutputChannel&lt;Integer&gt; values);
+                double squareRootMean(&commat;Pass(List.class) OutputChannel&lt;Integer&gt; values);
             }
         }
     </code>
@@ -418,14 +413,13 @@ Parallel programming on the go.
             public interface AsyncMain {
 
                 &commat;Pass(int.class)
-                public OutputChannel&lt;Integer&gt; parseArg(&commat;Pass(String.class) String[] args);
+                OutputChannel&lt;Integer&gt; parseArg(&commat;Pass(String.class) String[] args);
 
                 &commat;Pass(int.class)
-                public OutputChannel&lt;Integer&gt; square(
+                OutputChannel&lt;Integer&gt; square(
                         &commat;Pass(value = int.class, mode = PassingMode.PARALLEL) OutputChannel&lt;Integer&gt; value);
 
-                public double squareRootMean(
-                        &commat;Pass(List.class) OutputChannel&lt;Integer&gt; values);
+                double squareRootMean(&commat;Pass(List.class) OutputChannel&lt;Integer&gt; values);
             }
         }
     </code>

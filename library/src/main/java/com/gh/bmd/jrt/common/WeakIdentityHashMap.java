@@ -95,56 +95,48 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
         return mMap.hashCode();
     }
 
-    @Override
     public int size() {
 
         cleanUp();
         return mMap.size();
     }
 
-    @Override
     public boolean isEmpty() {
 
         cleanUp();
         return mMap.isEmpty();
     }
 
-    @Override
     public boolean containsKey(final Object o) {
 
         cleanUp();
         return mMap.containsKey(new IdentityWeakReference(o));
     }
 
-    @Override
     public boolean containsValue(final Object o) {
 
         cleanUp();
         return mMap.containsValue(o);
     }
 
-    @Override
     public V get(final Object o) {
 
         cleanUp();
         return mMap.get(new IdentityWeakReference(o));
     }
 
-    @Override
     public V put(final K k, final V v) {
 
         cleanUp();
         return mMap.put(new IdentityWeakReference(k, mQueue), v);
     }
 
-    @Override
     public V remove(final Object o) {
 
         cleanUp();
         return mMap.remove(new IdentityWeakReference(o));
     }
 
-    @Override
     public void putAll(@Nonnull final Map<? extends K, ? extends V> map) {
 
         cleanUp();
@@ -158,14 +150,12 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
         }
     }
 
-    @Override
     public void clear() {
 
         mMap.clear();
     }
 
     @Nonnull
-    @Override
     public Set<K> keySet() {
 
         if (mKeySet == null) {
@@ -191,14 +181,12 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
     }
 
     @Nonnull
-    @Override
     public Collection<V> values() {
 
         return mMap.values();
     }
 
     @Nonnull
-    @Override
     public Set<Entry<K, V>> entrySet() {
 
         if (mEntrySet == null) {
@@ -300,7 +288,7 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
             }
 
             final Object referent = get();
-            return (referent == that.get()) && ((referent != null) || (this == that));
+            return (referent != null) && (referent == that.get());
         }
     }
 
@@ -311,19 +299,16 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
 
         private final Iterator<IdentityWeakReference> mIterator = mMap.keySet().iterator();
 
-        @Override
         public boolean hasNext() {
 
             return mIterator.hasNext();
         }
 
-        @Override
         public Entry<K, V> next() {
 
             return new WeakEntry(mIterator.next());
         }
 
-        @Override
         public void remove() {
 
             mIterator.remove();
@@ -337,20 +322,17 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
 
         private final Iterator<IdentityWeakReference> mIterator = mMap.keySet().iterator();
 
-        @Override
         public boolean hasNext() {
 
             return mIterator.hasNext();
         }
 
-        @Override
         @SuppressWarnings("unchecked")
         public K next() {
 
             return (K) mIterator.next().get();
         }
 
-        @Override
         public void remove() {
 
             mIterator.remove();
@@ -374,20 +356,17 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
             mReference = key;
         }
 
-        @Override
         @SuppressWarnings("unchecked")
         public K getKey() {
 
             return (K) mReference.get();
         }
 
-        @Override
         public V getValue() {
 
             return mMap.get(mReference);
         }
 
-        @Override
         public V setValue(final V v) {
 
             return mMap.put(mReference, v);

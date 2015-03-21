@@ -45,7 +45,7 @@ public interface ClassRoutineBuilder extends SharableBuilder {
      * @param <INPUT>  the input data type.
      * @param <OUTPUT> the output data type.
      * @return the routine.
-     * @throws IllegalArgumentException if the specified method is not found.
+     * @throws java.lang.IllegalArgumentException if the specified method is not found.
      */
     @Nonnull
     <INPUT, OUTPUT> Routine<INPUT, OUTPUT> boundMethod(@Nonnull String name);
@@ -62,11 +62,12 @@ public interface ClassRoutineBuilder extends SharableBuilder {
      * @param name           the method name.
      * @param parameterTypes the method parameter types.
      * @return the routine.
-     * @throws IllegalArgumentException if no matching method is found.
-     * @throws NullPointerException     if one of the parameter is null.
+     * @throws java.lang.IllegalArgumentException if no matching method is found.
+     * @throws java.lang.NullPointerException     if one of the parameter is null.
      */
     @Nonnull
-    Routine<Object, Object> method(@Nonnull String name, @Nonnull Class<?>... parameterTypes);
+    <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull String name,
+            @Nonnull Class<?>... parameterTypes);
 
     /**
      * Returns a routine used to call the specified method.
@@ -81,7 +82,7 @@ public interface ClassRoutineBuilder extends SharableBuilder {
      * @param <INPUT>  the input data type.
      * @param <OUTPUT> the output data type.
      * @return the routine.
-     * @throws NullPointerException if the specified method is null.
+     * @throws java.lang.NullPointerException if the specified method is null.
      */
     @Nonnull
     <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull Method method);
@@ -93,10 +94,11 @@ public interface ClassRoutineBuilder extends SharableBuilder {
      * @return this builder.
      */
     @Nonnull
-    @Override
     ClassRoutineBuilder withConfiguration(@Nullable RoutineConfiguration configuration);
 
+    /**
+     * {@inheritDoc}
+     */
     @Nonnull
-    @Override
     ClassRoutineBuilder withShareGroup(@Nullable String group);
 }

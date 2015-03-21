@@ -43,7 +43,6 @@ class ScheduledRunner implements Runner {
         mService = service;
     }
 
-    @Override
     public void run(@Nonnull final Execution execution, final long delay,
             @Nonnull final TimeUnit timeUnit) {
 

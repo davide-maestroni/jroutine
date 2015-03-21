@@ -70,13 +70,10 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
 
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Data data = new Data();
-        final Routine<Data, Data> routine1 =
+        final OutputChannel<Data> channel =
                 JRoutine.onService(getActivity(), ClassToken.tokenOf(Delay.class))
                         .dispatchingOn(Looper.getMainLooper())
-                        .withRunnerClass(MainRunner.class)
-                        .buildRoutine();
-
-        final OutputChannel<Data> channel = routine1.callAsync(data);
+                        .withRunnerClass(MainRunner.class).callAsync(data);
         assertThat(channel.abort(new IllegalArgumentException("test"))).isTrue();
 
         try {
@@ -90,14 +87,13 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
             assertThat(e.getCause().getMessage()).isEqualTo("test");
         }
 
-        final Routine<Data, Data> routine2 =
-                JRoutine.onService(getActivity(), ClassToken.tokenOf(Abort.class))
-                        .dispatchingOn(Looper.getMainLooper())
-                        .buildRoutine();
-
         try {
 
-            routine2.callAsync(data).afterMax(timeout).readNext();
+            JRoutine.onService(getActivity(), ClassToken.tokenOf(Abort.class))
+                    .dispatchingOn(Looper.getMainLooper())
+                    .callAsync(data)
+                    .afterMax(timeout)
+                    .readNext();
 
             fail();
 
@@ -222,11 +218,12 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
 
         final TimeDuration timeout = TimeDuration.seconds(10);
         final MyParcelable p = new MyParcelable(33, -17);
-        final Routine<MyParcelable, MyParcelable> routine =
+        assertThat(
                 JRoutine.onService(getActivity(), ClassToken.tokenOf(MyParcelableInvocation.class))
                         .dispatchingOn(Looper.getMainLooper())
-                        .buildRoutine();
-        assertThat(routine.callAsync(p).afterMax(timeout).readNext()).isEqualTo(p);
+                        .callAsync(p)
+                        .afterMax(timeout)
+                        .readNext()).isEqualTo(p);
     }
 
     public void testReadTimeout() {
@@ -236,22 +233,21 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
         final RoutineConfiguration configuration1 = builder().withReadTimeout(millis(10))
                                                              .onReadTimeout(TimeoutAction.EXIT)
                                                              .buildConfiguration();
-        final Routine<String, String> routine1 = JRoutine.onService(getActivity(), classToken)
-                                                         .withConfiguration(configuration1)
-                                                         .buildRoutine();
-
-        assertThat(routine1.callAsync("test1").readAll()).isEmpty();
+        assertThat(JRoutine.onService(getActivity(), classToken)
+                           .withConfiguration(configuration1)
+                           .callAsync("test1")
+                           .readAll()).isEmpty();
 
         final RoutineConfiguration configuration2 = builder().withReadTimeout(millis(10))
                                                              .onReadTimeout(TimeoutAction.ABORT)
                                                              .buildConfiguration();
-        final Routine<String, String> routine2 = JRoutine.onService(getActivity(), classToken)
-                                                         .withConfiguration(configuration2)
-                                                         .buildRoutine();
 
         try {
 
-            routine2.callAsync("test2").readAll();
+            JRoutine.onService(getActivity(), classToken)
+                    .withConfiguration(configuration2)
+                    .callAsync("test2")
+                    .readAll();
 
             fail();
 
@@ -262,13 +258,13 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
         final RoutineConfiguration configuration3 = builder().withReadTimeout(millis(10))
                                                              .onReadTimeout(TimeoutAction.DEADLOCK)
                                                              .buildConfiguration();
-        final Routine<String, String> routine3 = JRoutine.onService(getActivity(), classToken)
-                                                         .withConfiguration(configuration3)
-                                                         .buildRoutine();
 
         try {
 
-            routine3.callAsync("test3").readAll();
+            JRoutine.onService(getActivity(), classToken)
+                    .withConfiguration(configuration3)
+                    .callAsync("test3")
+                    .readAll();
 
             fail();
 
@@ -341,21 +337,18 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
 
         private int mWrnCount;
 
-        @Override
         public void dbg(@Nonnull final List<Object> contexts, @Nullable final String message,
                 @Nullable final Throwable throwable) {
 
             ++mDgbCount;
         }
 
-        @Override
         public void err(@Nonnull final List<Object> contexts, @Nullable final String message,
                 @Nullable final Throwable throwable) {
 
             ++mErrCount;
         }
 
-        @Override
         public void wrn(@Nonnull final List<Object> contexts, @Nullable final String message,
                 @Nullable final Throwable throwable) {
 
@@ -382,27 +375,23 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
 
         public static final Creator<Data> CREATOR = new Creator<Data>() {
 
-            @Override
             public Data createFromParcel(@Nonnull final Parcel source) {
 
                 return new Data();
             }
 
             @Nonnull
-            @Override
             public Data[] newArray(final int size) {
 
                 return new Data[size];
             }
         };
 
-        @Override
         public int describeContents() {
 
             return 0;
         }
 
-        @Override
         public void writeToParcel(@Nonnull final Parcel dest, final int flags) {
 
         }
@@ -421,7 +410,6 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
 
         public static final Creator<MyParcelable> CREATOR = new Creator<MyParcelable>() {
 
-            @Override
             public MyParcelable createFromParcel(@Nonnull final Parcel source) {
 
                 final int x = source.readInt();
@@ -430,7 +418,6 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
             }
 
             @Nonnull
-            @Override
             public MyParcelable[] newArray(final int size) {
 
                 return new MyParcelable[0];
@@ -473,13 +460,11 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
             return result;
         }
 
-        @Override
         public int describeContents() {
 
             return 0;
         }
 
-        @Override
         public void writeToParcel(@Nonnull final Parcel dest, final int flags) {
 
             dest.writeInt(mX);

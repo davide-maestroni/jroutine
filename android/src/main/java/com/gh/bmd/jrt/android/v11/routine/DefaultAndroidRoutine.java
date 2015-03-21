@@ -66,7 +66,7 @@ class DefaultAndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
 
     private final WeakReference<Object> mContext;
 
-    private final int mLoaderId;
+    private final int mInvocationId;
 
     private final OrderType mOrderType;
 
@@ -75,7 +75,7 @@ class DefaultAndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
      *
      * @param configuration the routine configuration.
      * @param context       the context reference.
-     * @param loaderId      the loader ID.
+     * @param invocationId  the invocation ID.
      * @param resolution    the clash resolution type.
      * @param cacheStrategy the result cache type.
      * @param constructor   the invocation constructor.
@@ -85,7 +85,7 @@ class DefaultAndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
      */
     @SuppressWarnings("ConstantConditions")
     DefaultAndroidRoutine(@Nonnull final RoutineConfiguration configuration,
-            @Nonnull final WeakReference<Object> context, final int loaderId,
+            @Nonnull final WeakReference<Object> context, final int invocationId,
             @Nullable final ClashResolution resolution, @Nullable final CacheStrategy cacheStrategy,
             @Nonnull final Constructor<? extends AndroidInvocation<INPUT, OUTPUT>> constructor) {
 
@@ -102,7 +102,7 @@ class DefaultAndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
         }
 
         mContext = context;
-        mLoaderId = loaderId;
+        mInvocationId = invocationId;
         mClashResolution = (resolution == null) ? ClashResolution.ABORT_THAT_INPUT : resolution;
         mCacheStrategy = (cacheStrategy == null) ? CacheStrategy.CLEAR : cacheStrategy;
         mConstructor = constructor;
@@ -118,8 +118,9 @@ class DefaultAndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
 
         if (context.get() != null) {
 
-            Runners.mainRunner()
-                   .run(new PurgeExecution(context, mConstructor.getDeclaringClass()), 0,
+            final Class<? extends AndroidInvocation<INPUT, OUTPUT>> invocationClass =
+                    mConstructor.getDeclaringClass();
+            Runners.mainRunner().run(new PurgeExecution(context, mInvocationId, invocationClass), 0,
                         TimeUnit.MILLISECONDS);
         }
     }
@@ -153,7 +154,7 @@ class DefaultAndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
 
         if (async) {
 
-            return new LoaderInvocation<INPUT, OUTPUT>(mContext, mLoaderId, mClashResolution,
+            return new LoaderInvocation<INPUT, OUTPUT>(mContext, mInvocationId, mClashResolution,
                                                        mCacheStrategy, mConstructor, mOrderType,
                                                        logger);
         }
@@ -214,36 +215,37 @@ class DefaultAndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
         }
     }
 
-    @Override
     public void purge(@Nullable final INPUT input) {
 
         final WeakReference<Object> context = mContext;
 
         if (context.get() != null) {
 
+            final Class<? extends AndroidInvocation<INPUT, OUTPUT>> invocationClass =
+                    mConstructor.getDeclaringClass();
+            final List<INPUT> inputList = Collections.singletonList(input);
             Runners.mainRunner()
-                   .run(new PurgeInputsExecution<INPUT>(context, mConstructor.getDeclaringClass(),
-                                                        Collections.singletonList(input)), 0,
-                        TimeUnit.MILLISECONDS);
+                   .run(new PurgeInputsExecution<INPUT>(context, mInvocationId, invocationClass,
+                                                        inputList), 0, TimeUnit.MILLISECONDS);
         }
     }
 
-    @Override
     public void purge(@Nullable final INPUT... inputs) {
 
         final WeakReference<Object> context = mContext;
 
         if (context.get() != null) {
 
+            final Class<? extends AndroidInvocation<INPUT, OUTPUT>> invocationClass =
+                    mConstructor.getDeclaringClass();
             final List<INPUT> inputList =
                     (inputs == null) ? Collections.<INPUT>emptyList() : Arrays.asList(inputs);
             Runners.mainRunner()
-                   .run(new PurgeInputsExecution<INPUT>(context, mConstructor.getDeclaringClass(),
+                   .run(new PurgeInputsExecution<INPUT>(context, mInvocationId, invocationClass,
                                                         inputList), 0, TimeUnit.MILLISECONDS);
         }
     }
 
-    @Override
     public void purge(@Nullable final Iterable<? extends INPUT> inputs) {
 
         final WeakReference<Object> context = mContext;
@@ -266,8 +268,10 @@ class DefaultAndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
                 }
             }
 
+            final Class<? extends AndroidInvocation<INPUT, OUTPUT>> invocationClass =
+                    mConstructor.getDeclaringClass();
             Runners.mainRunner()
-                   .run(new PurgeInputsExecution<INPUT>(context, mConstructor.getDeclaringClass(),
+                   .run(new PurgeInputsExecution<INPUT>(context, mInvocationId, invocationClass,
                                                         inputList), 0, TimeUnit.MILLISECONDS);
         }
     }
@@ -281,27 +285,30 @@ class DefaultAndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
 
         private final Class<?> mInvocationClass;
 
+        private final int mInvocationId;
+
         /**
          * Constructor.
          *
          * @param context         the context reference.
+         * @param invocationId    the invocation ID.
          * @param invocationClass the invocation class.
          */
-        private PurgeExecution(@Nonnull final WeakReference<Object> context,
+        private PurgeExecution(@Nonnull final WeakReference<Object> context, final int invocationId,
                 @Nonnull final Class<?> invocationClass) {
 
             mContext = context;
+            mInvocationId = invocationId;
             mInvocationClass = invocationClass;
         }
 
-        @Override
         public void run() {
 
             final Object context = mContext.get();
 
             if (context != null) {
 
-                LoaderInvocation.purgeLoaders(context, mInvocationClass);
+                LoaderInvocation.purgeLoaders(context, mInvocationId, mInvocationClass);
             }
         }
     }
@@ -319,29 +326,33 @@ class DefaultAndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
 
         private final Class<?> mInvocationClass;
 
+        private final int mInvocationId;
+
         /**
          * Constructor.
          *
          * @param context         the context reference.
+         * @param invocationId    the invocation ID.
          * @param invocationClass the invocation class.
          * @param inputs          the list of inputs.
          */
         private PurgeInputsExecution(@Nonnull final WeakReference<Object> context,
-                @Nonnull final Class<?> invocationClass, @Nonnull final List<INPUT> inputs) {
+                final int invocationId, @Nonnull final Class<?> invocationClass,
+                @Nonnull final List<INPUT> inputs) {
 
             mContext = context;
+            mInvocationId = invocationId;
             mInvocationClass = invocationClass;
             mInputs = inputs;
         }
 
-        @Override
         public void run() {
 
             final Object context = mContext.get();
 
             if (context != null) {
 
-                LoaderInvocation.purgeLoader(context, mInvocationClass, mInputs);
+                LoaderInvocation.purgeLoader(context, mInvocationId, mInvocationClass, mInputs);
             }
         }
     }

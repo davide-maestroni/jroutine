@@ -18,7 +18,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * Chunk of bytes.
+ * Chunk of bytes.<br/>
+ * The objects are immutable since the internal data are read in the constructor and written to an
+ * output stream.
  * <p/>
  * Created by davide on 10/17/14.
  */
@@ -28,15 +30,16 @@ public class Chunk {
 
     private int mLength;
 
-    public Chunk(final int maxSize) {
+    public Chunk(final int maxSize, final InputStream stream) throws IOException {
 
-        mData = new byte[maxSize];
+        final byte[] data = new byte[maxSize];
+        mLength = stream.read(data);
+        mData = data;
     }
 
-    public boolean readFrom(final InputStream stream) throws IOException {
+    public int getLength() {
 
-        mLength = stream.read(mData);
-        return (mLength >= 0);
+        return mLength;
     }
 
     public void writeTo(final OutputStream stream) throws IOException {

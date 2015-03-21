@@ -14,22 +14,24 @@
 apply plugin: 'java'
 apply plugin: 'jacoco'
 apply plugin: 'findbugs'
-apply from: '../upload.gradle'
+apply from: '../extra.gradle'
 
-group = 'com.github.davide-maestroni'
-version = '1.2.2'
+group = project.getProperty('groupName')
+version = project.getProperty('releaseVersion')
 archivesBaseName = "${project.parent.name}-${project.name}"
+
+def mainProject = project.parent.subprojects.find { it.name.equals('library') };
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    if (project.hasProperty('dep') && project.dep.equals('module')) {
-        compile project(':library')
+    if (isWorkingBranch('master') && !version.contains('PREVIEW') && mainProject.hasProperty('releaseVersion')) {
+        compile "com.github.davide-maestroni:jroutine:${dependencyVersion(mainProject.getProperty('releaseVersion'))}"
     } else {
-        compile 'com.github.davide-maestroni:jroutine:1.2.2'
+        compile project(':library')
     }
 
     testCompile 'junit:junit:4.12'
-    testCompile 'org.assertj:assertj-core:1.7.0'
+    testCompile 'org.assertj:assertj-core:1.7.1'
 }
 
 task('jacocoTest', dependsOn: 'test') {

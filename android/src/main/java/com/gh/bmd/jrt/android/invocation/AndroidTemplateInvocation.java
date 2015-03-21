@@ -32,7 +32,6 @@ public class AndroidTemplateInvocation<INPUT, OUTPUT> extends TemplateInvocation
 
     private Context mContext;
 
-    @Override
     public void onContext(@Nonnull final Context context) {
 
         mContext = context;

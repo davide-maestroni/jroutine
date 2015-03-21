@@ -17,7 +17,7 @@ import com.gh.bmd.jrt.builder.InputDeadlockException;
 import com.gh.bmd.jrt.builder.OutputDeadlockException;
 import com.gh.bmd.jrt.channel.ReadDeadlockException;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -26,8 +26,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  * <p/>
  * Created by davide on 10/3/14.
  */
-public class ExceptionTest extends TestCase {
+public class ExceptionTest {
 
+    @Test
     public void testExceptions() {
 
         assertThat(new InputDeadlockException("")).hasNoCause();

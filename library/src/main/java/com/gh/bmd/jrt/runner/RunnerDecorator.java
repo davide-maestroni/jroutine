@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 
 /**
- * Decorator implementation of a runner object.
+ * Implementation of a decorator of a runner object.
  * <p/>
  * Created by davide on 9/22/14.
  */
@@ -43,7 +43,6 @@ public class RunnerDecorator implements Runner {
         mRunner = wrapped;
     }
 
-    @Override
     public void run(@Nonnull final Execution execution, final long delay,
             @Nonnull final TimeUnit timeUnit) {
 

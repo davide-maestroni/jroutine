@@ -16,7 +16,7 @@ package com.gh.bmd.jrt.runner;
 import com.gh.bmd.jrt.time.Time;
 import com.gh.bmd.jrt.time.TimeDuration;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -30,14 +30,16 @@ import static com.gh.bmd.jrt.time.TimeDuration.micros;
 import static com.gh.bmd.jrt.time.TimeDuration.millis;
 import static com.gh.bmd.jrt.time.TimeDuration.nanos;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 
 /**
  * Runners unit tests.
  * <p/>
  * Created by davide on 10/2/14.
  */
-public class RunnerTest extends TestCase {
+public class RunnerTest {
 
+    @Test
     public void testDynamicPoolRunner() throws InterruptedException {
 
         testRunner(Runners.sharedRunner());
@@ -46,6 +48,7 @@ public class RunnerTest extends TestCase {
         testRunner(new RunnerDecorator(Runners.dynamicPoolRunner(1, 4, 0L, TimeUnit.SECONDS)));
     }
 
+    @Test
     @SuppressWarnings("ConstantConditions")
     public void testError() {
 
@@ -90,12 +93,14 @@ public class RunnerTest extends TestCase {
         }
     }
 
+    @Test
     public void testPoolRunner() throws InterruptedException {
 
         testRunner(Runners.poolRunner(3));
         testRunner(new RunnerDecorator(Runners.poolRunner(4)));
     }
 
+    @Test
     public void testQueuedRunner() throws InterruptedException {
 
         testRunner(new QueuedRunner());
@@ -103,6 +108,7 @@ public class RunnerTest extends TestCase {
         testRunner(new RunnerDecorator(new QueuedRunner()));
     }
 
+    @Test
     public void testScheduledRunner() throws InterruptedException {
 
         testRunner(new ScheduledRunner(Executors.newSingleThreadScheduledExecutor()));
@@ -111,6 +117,7 @@ public class RunnerTest extends TestCase {
                 new ScheduledRunner(Executors.newSingleThreadScheduledExecutor())));
     }
 
+    @Test
     public void testSequentialRunner() throws InterruptedException {
 
         testRunner(new SequentialRunner());
@@ -270,7 +277,6 @@ public class RunnerTest extends TestCase {
             return mIsPassed;
         }
 
-        @Override
         public void run() {
 
             // the JVM might not have nanosecond precision...

@@ -40,10 +40,10 @@ public interface ObjectRoutineBuilder extends ClassRoutineBuilder {
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
      * optional {@link com.gh.bmd.jrt.annotation.Bind} and {@link com.gh.bmd.jrt.annotation.Timeout}
-     * annotation.<br/>
+     * annotations.<br/>
      * In case the wrapped object does not implement the specified interface, the binding annotation
      * value will be used to bind the interface method with the instance ones. If no annotation is
-     * present, the method name will be used instead to map it.<br/>
+     * present, the method name will be used instead.<br/>
      * The interface will be interpreted as a mirror of the target object methods, and the optional
      * {@link com.gh.bmd.jrt.annotation.Pass} annotations will be honored.<br/>
      * Note that such annotations will override any configuration set through the builder.
@@ -51,8 +51,9 @@ public interface ObjectRoutineBuilder extends ClassRoutineBuilder {
      * @param itf    the interface implemented by the return object.
      * @param <TYPE> the interface type.
      * @return the proxy object.
-     * @throws IllegalArgumentException if the specified class does not represent an interface.
-     * @throws NullPointerException     if the specified class is null.
+     * @throws java.lang.IllegalArgumentException if the specified class does not represent an
+     *                                            interface.
+     * @throws java.lang.NullPointerException     if the specified class is null.
      */
     @Nonnull
     <TYPE> TYPE buildProxy(@Nonnull Class<TYPE> itf);
@@ -62,10 +63,10 @@ public interface ObjectRoutineBuilder extends ClassRoutineBuilder {
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any
      * optional {@link com.gh.bmd.jrt.annotation.Bind} and {@link com.gh.bmd.jrt.annotation.Timeout}
-     * annotation.<br/>
+     * annotations.<br/>
      * In case the wrapped object does not implement the specified interface, the binding annotation
      * value will be used to bind the interface method with the instance ones. If no annotation is
-     * present, the method name will be used instead to map it.<br/>
+     * present, the method name will be used instead.<br/>
      * The interface will be interpreted as a mirror of the target object methods, and the optional
      * {@link com.gh.bmd.jrt.annotation.Pass} annotations will be honored.<br/>
      * Note that such annotations will override any configuration set through the builder.
@@ -73,8 +74,9 @@ public interface ObjectRoutineBuilder extends ClassRoutineBuilder {
      * @param itf    the token of the interface implemented by the return object.
      * @param <TYPE> the interface type.
      * @return the proxy object.
-     * @throws IllegalArgumentException if the specified class does not represent an interface.
-     * @throws NullPointerException     if the specified class is null.
+     * @throws java.lang.IllegalArgumentException if the specified class does not represent an
+     *                                            interface.
+     * @throws java.lang.NullPointerException     if the specified class is null.
      */
     @Nonnull
     <TYPE> TYPE buildProxy(@Nonnull ClassToken<TYPE> itf);
@@ -97,13 +99,14 @@ public interface ObjectRoutineBuilder extends ClassRoutineBuilder {
      * compilation is successful.
      * <br/>
      * Note also that you'll need to enable annotation pre-processing by adding the processor
-     * package to the specific project dependencies.
+     * artifact to the specific project dependencies.
      *
      * @param itf    the interface implemented by the return object.
      * @param <TYPE> the interface type.
      * @return the wrapping object.
-     * @throws IllegalArgumentException if the specified class does not represent an interface.
-     * @throws NullPointerException     if the specified class is null.
+     * @throws java.lang.IllegalArgumentException if the specified class does not represent an
+     *                                            interface.
+     * @throws java.lang.NullPointerException     if the specified class is null.
      */
     @Nonnull
     <TYPE> TYPE buildWrapper(@Nonnull Class<TYPE> itf);
@@ -126,13 +129,14 @@ public interface ObjectRoutineBuilder extends ClassRoutineBuilder {
      * compilation is successful.
      * <br/>
      * Note also that you'll need to enable annotation pre-processing by adding the processor
-     * package to the specific project dependencies.
+     * artifact to the specific project dependencies.
      *
      * @param itf    the token of the interface implemented by the return object.
      * @param <TYPE> the interface type.
      * @return the wrapping object.
-     * @throws IllegalArgumentException if the specified class does not represent an interface.
-     * @throws NullPointerException     if the specified class is null.
+     * @throws java.lang.IllegalArgumentException if the specified class does not represent an
+     *                                            interface.
+     * @throws java.lang.NullPointerException     if the specified class is null.
      */
     @Nonnull
     <TYPE> TYPE buildWrapper(@Nonnull ClassToken<TYPE> itf);
@@ -144,10 +148,11 @@ public interface ObjectRoutineBuilder extends ClassRoutineBuilder {
      * @return this builder.
      */
     @Nonnull
-    @Override
     ObjectRoutineBuilder withConfiguration(@Nullable RoutineConfiguration configuration);
 
+    /**
+     * {@inheritDoc}
+     */
     @Nonnull
-    @Override
     ObjectRoutineBuilder withShareGroup(@Nullable String group);
 }

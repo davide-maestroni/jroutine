@@ -49,7 +49,7 @@ public class Runners {
      *
      * @param corePoolSize    the number of threads to keep in the pool, even if they are idle.
      * @param maximumPoolSize the maximum number of threads to allow in the pool.
-     * @param keepAliveTime   when the number of threads is greater than the core, this is the
+     * @param keepAliveTime   when the number of threads is greater than the core one, this is the
      *                        maximum time that excess idle threads will wait for new tasks before
      *                        terminating.
      * @param keepAliveUnit   the time unit for the keep alive time.

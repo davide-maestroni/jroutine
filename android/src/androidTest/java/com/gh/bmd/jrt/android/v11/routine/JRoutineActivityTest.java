@@ -143,7 +143,6 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Abort.class))
                         .withId(0)
                         .onComplete(CacheStrategy.CACHE_IF_SUCCESS)
-                        .buildRoutine()
                         .callAsync(data1)
                         .afterMax(timeout);
 
@@ -163,7 +162,6 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class))
                         .withId(0)
                         .onComplete(CacheStrategy.CACHE_IF_SUCCESS)
-                        .buildRoutine()
                         .callAsync(data1)
                         .afterMax(timeout);
 
@@ -173,7 +171,6 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final OutputChannel<Data> result3 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class))
                         .withId(0)
-                        .buildRoutine()
                         .callAsync(data1)
                         .afterMax(timeout);
 
@@ -194,7 +191,6 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class))
                         .withId(0)
                         .onComplete(CacheStrategy.CACHE_IF_ERROR)
-                        .buildRoutine()
                         .callAsync(data1)
                         .afterMax(timeout);
 
@@ -206,7 +202,6 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Abort.class))
                         .withId(0)
                         .onComplete(CacheStrategy.CACHE_IF_ERROR)
-                        .buildRoutine()
                         .callAsync(data1)
                         .afterMax(timeout);
 
@@ -226,7 +221,6 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final OutputChannel<Data> result3 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Abort.class))
                         .withId(0)
-                        .buildRoutine()
                         .callAsync(data1)
                         .afterMax(timeout);
 
@@ -438,7 +432,6 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class))
                         .withId(0)
                         .onComplete(CacheStrategy.CACHE)
-                        .buildRoutine()
                         .callAsync(data1)
                         .afterMax(timeout);
 
@@ -448,7 +441,6 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final OutputChannel<Data> result2 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class))
                         .withId(0)
-                        .buildRoutine()
                         .callAsync(data1)
                         .afterMax(timeout);
 
@@ -460,7 +452,6 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Abort.class))
                         .withId(0)
                         .onComplete(CacheStrategy.CACHE)
-                        .buildRoutine()
                         .callAsync(data1)
                         .afterMax(timeout);
 
@@ -589,7 +580,6 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Delay.class))
                         .withId(0)
                         .onComplete(CacheStrategy.CACHE)
-                        .buildRoutine()
                         .callAsync(data1)
                         .afterMax(timeout);
 
@@ -599,7 +589,6 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final OutputChannel<Data> result2 =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(Abort.class))
                         .withId(0)
-                        .buildRoutine()
                         .callAsync(data1)
                         .afterMax(timeout);
 
@@ -1176,21 +1165,18 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         private int mWrnCount;
 
-        @Override
         public void dbg(@Nonnull final List<Object> contexts, @Nullable final String message,
                 @Nullable final Throwable throwable) {
 
             ++mDgbCount;
         }
 
-        @Override
         public void err(@Nonnull final List<Object> contexts, @Nullable final String message,
                 @Nullable final Throwable throwable) {
 
             ++mErrCount;
         }
 
-        @Override
         public void wrn(@Nonnull final List<Object> contexts, @Nullable final String message,
                 @Nullable final Throwable throwable) {
 

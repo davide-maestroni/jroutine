@@ -92,7 +92,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
     private boolean mIsException;
 
-    private OutputConsumer<OUTPUT> mOutputConsumer;
+    private OutputConsumer<? super OUTPUT> mOutputConsumer;
 
     private int mOutputCount;
 
@@ -145,7 +145,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         final int maxOutputSize = mMaxOutput;
         mHasOutputs = new Check() {
 
-            @Override
             public boolean isTrue() {
 
                 return (mOutputCount <= maxOutputSize);
@@ -168,14 +167,12 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         return mutex;
     }
 
-    @Override
     public boolean abort() {
 
         return abort(null);
     }
 
     @Nonnull
-    @Override
     @SuppressWarnings("ConstantConditions")
     public ResultChannel<OUTPUT> after(@Nonnull final TimeDuration delay) {
 
@@ -196,22 +193,19 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     }
 
     @Nonnull
-    @Override
     public ResultChannel<OUTPUT> after(final long delay, @Nonnull final TimeUnit timeUnit) {
 
         return after(fromUnit(delay, timeUnit));
     }
 
     @Nonnull
-    @Override
     public ResultChannel<OUTPUT> now() {
 
         return after(ZERO);
     }
 
     @Nonnull
-    @Override
-    public ResultChannel<OUTPUT> pass(@Nullable final OutputChannel<OUTPUT> channel) {
+    public ResultChannel<OUTPUT> pass(@Nullable final OutputChannel<? extends OUTPUT> channel) {
 
         final TimeDuration delay;
         final DefaultOutputConsumer consumer;
@@ -240,7 +234,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     }
 
     @Nonnull
-    @Override
     public ResultChannel<OUTPUT> pass(@Nullable final Iterable<? extends OUTPUT> outputs) {
 
         NestedQueue<Object> outputQueue;
@@ -301,7 +294,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     }
 
     @Nonnull
-    @Override
     public ResultChannel<OUTPUT> pass(@Nullable final OUTPUT output) {
 
         NestedQueue<Object> outputQueue;
@@ -341,7 +333,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     }
 
     @Nonnull
-    @Override
     public ResultChannel<OUTPUT> pass(@Nullable final OUTPUT... outputs) {
 
         synchronized (mMutex) {
@@ -526,7 +517,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         if (state != ChannelState.ABORTED) {
 
             final Logger logger = mLogger;
-            final OutputConsumer<OUTPUT> consumer = mOutputConsumer;
+            final OutputConsumer<? super OUTPUT> consumer = mOutputConsumer;
 
             try {
 
@@ -562,7 +553,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             final Logger logger = mLogger;
             final ArrayList<Object> outputs;
-            final OutputConsumer<OUTPUT> consumer;
+            final OutputConsumer<? super OUTPUT> consumer;
             final ChannelState state;
 
             synchronized (mMutex) {
@@ -743,7 +734,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
             mOutputNotEmpty = new Check() {
 
-                @Override
                 public boolean isTrue() {
 
                     return !outputQueue.isEmpty();
@@ -854,7 +844,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             mAction = action;
         }
 
-        @Override
         public boolean hasNext() {
 
             boolean isAbort = false;
@@ -893,7 +882,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                         mOutputHasNext = new Check() {
 
-                            @Override
                             public boolean isTrue() {
 
                                 return !outputQueue.isEmpty() || (mState == ChannelState.DONE);
@@ -942,7 +930,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         }
 
         @Nullable
-        @Override
         @SuppressFBWarnings(value = "IT_NO_SUCH_ELEMENT",
                 justification = "NestedQueue.removeFirst() actually throws it")
         public OUTPUT next() {
@@ -973,7 +960,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             }
         }
 
-        @Override
         public void remove() {
 
             synchronized (mMutex) {
@@ -992,7 +978,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     }
 
     /**
-     * Default implementation of an routine output channel.
+     * Default implementation of a routine output channel.
      */
     private class DefaultOutputChannel implements OutputChannel<OUTPUT> {
 
@@ -1003,7 +989,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         private TimeoutAction mTimeoutAction = TimeoutAction.DEADLOCK;
 
         @Nonnull
-        @Override
         @SuppressWarnings("ConstantConditions")
         public OutputChannel<OUTPUT> afterMax(@Nonnull final TimeDuration timeout) {
 
@@ -1022,7 +1007,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         }
 
         @Nonnull
-        @Override
         public OutputChannel<OUTPUT> afterMax(final long timeout,
                 @Nonnull final TimeUnit timeUnit) {
 
@@ -1030,9 +1014,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         }
 
         @Nonnull
-        @Override
         @SuppressWarnings("ConstantConditions")
-        public OutputChannel<OUTPUT> bind(@Nonnull final OutputConsumer<OUTPUT> consumer) {
+        public OutputChannel<OUTPUT> bind(@Nonnull final OutputConsumer<? super OUTPUT> consumer) {
 
             final boolean forceClose;
             final ChannelState state;
@@ -1058,7 +1041,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             return this;
         }
 
-        @Override
         public boolean checkComplete() {
 
             final boolean isDone;
@@ -1071,7 +1053,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                     isDone = timeout.waitTrue(mMutex, new Check() {
 
-                        @Override
                         public boolean isTrue() {
 
                             return (mState == ChannelState.DONE);
@@ -1093,14 +1074,12 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         }
 
         @Nonnull
-        @Override
         public OutputChannel<OUTPUT> eventually() {
 
             return afterMax(INFINITY);
         }
 
         @Nonnull
-        @Override
         public OutputChannel<OUTPUT> eventuallyAbort() {
 
             synchronized (mMutex) {
@@ -1112,7 +1091,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         }
 
         @Nonnull
-        @Override
         public OutputChannel<OUTPUT> eventuallyDeadlock() {
 
             synchronized (mMutex) {
@@ -1124,7 +1102,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         }
 
         @Nonnull
-        @Override
         public OutputChannel<OUTPUT> eventuallyExit() {
 
             synchronized (mMutex) {
@@ -1136,13 +1113,11 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         }
 
         @Nonnull
-        @Override
         public OutputChannel<OUTPUT> immediately() {
 
             return afterMax(ZERO);
         }
 
-        @Override
         public boolean isBound() {
 
             synchronized (mMutex) {
@@ -1152,7 +1127,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         }
 
         @Nonnull
-        @Override
         public List<OUTPUT> readAll() {
 
             final ArrayList<OUTPUT> results = new ArrayList<OUTPUT>();
@@ -1161,7 +1135,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         }
 
         @Nonnull
-        @Override
         @SuppressWarnings({"unchecked", "ConstantConditions"})
         public OutputChannel<OUTPUT> readAllInto(
                 @Nonnull final Collection<? super OUTPUT> results) {
@@ -1215,7 +1188,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                     try {
 
-                        while (timeout.waitSinceMillis(mMutex, startTime)) {
+                        do {
 
                             while (!outputQueue.isEmpty()) {
 
@@ -1228,7 +1201,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                                 break;
                             }
-                        }
+
+                        } while (timeout.waitSinceMillis(mMutex, startTime));
 
                         isTimeout = (mState != ChannelState.DONE);
 
@@ -1264,7 +1238,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             return this;
         }
 
-        @Override
         public OUTPUT readNext() {
 
             boolean isAbort = false;
@@ -1292,8 +1265,8 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         }
 
         @Nonnull
-        @Override
-        public OutputChannel<OUTPUT> unbind(@Nullable final OutputConsumer<OUTPUT> consumer) {
+        public OutputChannel<OUTPUT> unbind(
+                @Nullable final OutputConsumer<? super OUTPUT> consumer) {
 
             synchronized (mMutex) {
 
@@ -1308,7 +1281,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         }
 
         @Nonnull
-        @Override
         public Iterator<OUTPUT> iterator() {
 
             final TimeDuration timeout;
@@ -1325,13 +1297,11 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             return new DefaultIterator(timeout, action);
         }
 
-        @Override
         public boolean abort() {
 
             return abort(null);
         }
 
-        @Override
         public boolean abort(@Nullable final Throwable reason) {
 
             synchronized (mMutex) {
@@ -1355,7 +1325,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             return true;
         }
 
-        @Override
         public boolean isOpen() {
 
             return isOutputOpen();
@@ -1363,7 +1332,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     }
 
     /**
-     * Default implementation of an output consumer pushing the consume data into the output
+     * Default implementation of an output consumer pushing the data to consume into the output
      * channel queue.
      */
     private class DefaultOutputConsumer implements OutputConsumer<OUTPUT> {
@@ -1385,7 +1354,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             mQueue = mOutputQueue.addNested();
         }
 
-        @Override
         public void onComplete() {
 
             boolean isFlush = false;
@@ -1415,7 +1383,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             }
         }
 
-        @Override
         public void onError(@Nullable final Throwable error) {
 
             synchronized (mMutex) {
@@ -1437,7 +1404,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             mHandler.onAbort(error, delay.time, delay.unit);
         }
 
-        @Override
         public void onOutput(final OUTPUT output) {
 
             NestedQueue<Object> outputQueue;
@@ -1508,7 +1474,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             mThrowable = throwable;
         }
 
-        @Override
         public void run() {
 
             final Throwable throwable = mThrowable;
@@ -1554,7 +1519,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             mQueue = queue;
         }
 
-        @Override
         public void run() {
 
             synchronized (mMutex) {
@@ -1573,7 +1537,9 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                     mState = ChannelState.FLUSH;
                 }
 
-                mQueue.addAll(mOutputs).close();
+                final NestedQueue<Object> queue = mQueue;
+                queue.addAll(mOutputs);
+                queue.close();
             }
 
             flushOutput(false);
@@ -1602,7 +1568,6 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
             mOutput = output;
         }
 
-        @Override
         public void run() {
 
             synchronized (mMutex) {
@@ -1621,20 +1586,20 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
                     mState = ChannelState.FLUSH;
                 }
 
-                mQueue.add(mOutput).close();
+                final NestedQueue<Object> queue = mQueue;
+                queue.add(mOutput);
+                queue.close();
             }
 
             flushOutput(false);
         }
     }
 
-    @Override
     public boolean abort(@Nullable final Throwable reason) {
 
         return abort(reason, false);
     }
 
-    @Override
     public boolean isOpen() {
 
         return isResultOpen();

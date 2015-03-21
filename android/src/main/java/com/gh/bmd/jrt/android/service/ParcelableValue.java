@@ -32,14 +32,12 @@ class ParcelableValue implements Parcelable {
      */
     public static final Creator<ParcelableValue> CREATOR = new Creator<ParcelableValue>() {
 
-        @Override
         public ParcelableValue createFromParcel(@Nonnull final Parcel source) {
 
             return new ParcelableValue(source.readValue(ParcelableValue.class.getClassLoader()));
         }
 
         @Nonnull
-        @Override
         public ParcelableValue[] newArray(final int size) {
 
             return new ParcelableValue[size];
@@ -58,13 +56,11 @@ class ParcelableValue implements Parcelable {
         mValue = value;
     }
 
-    @Override
     public int describeContents() {
 
         return 0;
     }
 
-    @Override
     public void writeToParcel(@Nonnull final Parcel dest, final int flags) {
 
         dest.writeValue(mValue);

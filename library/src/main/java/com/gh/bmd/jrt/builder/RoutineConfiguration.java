@@ -79,7 +79,7 @@ public class RoutineConfiguration {
      * Constructor.
      *
      * @param runner          the runner used for asynchronous invocations.
-     * @param runnerType      the type of the runner used for synchronous invocations.
+     * @param runnerType      the type of runner used for synchronous invocations.
      * @param maxInvocations  the maximum number of parallel running invocations. Must be positive.
      * @param coreInvocations the maximum number of retained invocation instances. Must be 0 or a
      *                        positive number.
@@ -633,6 +633,7 @@ public class RoutineConfiguration {
     }
 
     @Override
+    @SuppressWarnings("SimplifiableIfStatement")
     public boolean equals(final Object o) {
 
         // auto-generated code
@@ -648,19 +649,81 @@ public class RoutineConfiguration {
 
         final RoutineConfiguration that = (RoutineConfiguration) o;
 
-        return mInputMaxSize == that.mInputMaxSize && mCoreInvocations == that.mCoreInvocations
-                && mMaxInvocations == that.mMaxInvocations && mOutputMaxSize == that.mOutputMaxSize
-                && !(mAvailTimeout != null ? !mAvailTimeout.equals(that.mAvailTimeout)
-                : that.mAvailTimeout != null) && mInputOrder == that.mInputOrder && !(
-                mInputTimeout != null ? !mInputTimeout.equals(that.mInputTimeout)
-                        : that.mInputTimeout != null) && !(mLog != null ? !mLog.equals(that.mLog)
-                : that.mLog != null) && mLogLevel == that.mLogLevel
-                && mOutputOrder == that.mOutputOrder && !(mOutputTimeout != null
-                ? !mOutputTimeout.equals(that.mOutputTimeout) : that.mOutputTimeout != null) && !(
-                mReadTimeout != null ? !mReadTimeout.equals(that.mReadTimeout)
-                        : that.mReadTimeout != null) && !(mRunner != null ? !mRunner.equals(
-                that.mRunner) : that.mRunner != null) && mRunnerType == that.mRunnerType
-                && mTimeoutAction == that.mTimeoutAction;
+        if (mCoreInvocations != that.mCoreInvocations) {
+
+            return false;
+        }
+
+        if (mInputMaxSize != that.mInputMaxSize) {
+
+            return false;
+        }
+
+        if (mMaxInvocations != that.mMaxInvocations) {
+
+            return false;
+        }
+
+        if (mOutputMaxSize != that.mOutputMaxSize) {
+
+            return false;
+        }
+
+        if (mAvailTimeout != null ? !mAvailTimeout.equals(that.mAvailTimeout)
+                : that.mAvailTimeout != null) {
+
+            return false;
+        }
+
+        if (mInputOrder != that.mInputOrder) {
+
+            return false;
+        }
+
+        if (mInputTimeout != null ? !mInputTimeout.equals(that.mInputTimeout)
+                : that.mInputTimeout != null) {
+
+            return false;
+        }
+
+        if (mLog != null ? !mLog.equals(that.mLog) : that.mLog != null) {
+
+            return false;
+        }
+
+        if (mLogLevel != that.mLogLevel) {
+
+            return false;
+        }
+
+        if (mOutputOrder != that.mOutputOrder) {
+
+            return false;
+        }
+
+        if (mOutputTimeout != null ? !mOutputTimeout.equals(that.mOutputTimeout)
+                : that.mOutputTimeout != null) {
+
+            return false;
+        }
+
+        if (mReadTimeout != null ? !mReadTimeout.equals(that.mReadTimeout)
+                : that.mReadTimeout != null) {
+
+            return false;
+        }
+
+        if (mRunner != null ? !mRunner.equals(that.mRunner) : that.mRunner != null) {
+
+            return false;
+        }
+
+        if (mRunnerType != that.mRunnerType) {
+
+            return false;
+        }
+
+        return mTimeoutAction == that.mTimeoutAction;
     }
 
     @Override
@@ -714,15 +777,15 @@ public class RoutineConfiguration {
         /**
          * Sequential runner.<br/>
          * The sequential one simply runs the executions as soon as they are invoked.<br/>
-         * The executions are run inside the calling thread.
+         * The executions will run inside the calling thread.
          */
         SEQUENTIAL,
         /**
          * Queued runner.<br/>
          * The queued runner maintains an internal buffer of executions that are consumed only when
-         * the last one complete, thus avoiding overflowing the call stack because of nested calls
+         * the last one completes, thus avoiding overflowing the call stack because of nested calls
          * to other routines.<br/>
-         * The executions are run inside the calling thread.
+         * The executions will run inside the calling thread.
          */
         QUEUED
     }
@@ -853,8 +916,6 @@ public class RoutineConfiguration {
 
         /**
          * Sets the timeout for an invocation instance to become available.
-         * <p/>
-         * By default the timeout is set to 0 to avoid unexpected deadlocks.
          *
          * @param timeout  the timeout.
          * @param timeUnit the timeout time unit.
@@ -870,9 +931,7 @@ public class RoutineConfiguration {
 
         /**
          * Sets the timeout for an invocation instance to become available. A null value means that
-         * it is up to the framework to chose a default duration.
-         * <p/>
-         * By default the timeout is set to 0 to avoid unexpected deadlocks.
+         * it is up to the framework to choose a default duration.
          *
          * @param timeout the timeout.
          * @return this builder.
@@ -904,7 +963,7 @@ public class RoutineConfiguration {
         /**
          * Sets the number of invocation instances which represents the core pool of reusable
          * invocations. A {@link RoutineConfiguration#DEFAULT} value means that it is up to the
-         * framework to chose a default number.
+         * framework to choose a default number.
          *
          * @param coreInvocations the max number of instances.
          * @return this builder.
@@ -925,7 +984,7 @@ public class RoutineConfiguration {
 
         /**
          * Sets the order in which input data are collected from the input channel. A null value
-         * means that it is up to the framework to chose a default order type.
+         * means that it is up to the framework to choose a default order type.
          *
          * @param order the order type.
          * @return this builder.
@@ -940,7 +999,7 @@ public class RoutineConfiguration {
         /**
          * Sets the maximum number of data that the input channel can retain before they are
          * consumed. A {@link RoutineConfiguration#DEFAULT} value means that it is up to the
-         * framework to chose a default size.
+         * framework to choose a default size.
          *
          * @param inputMaxSize the maximum size.
          * @return this builder.
@@ -960,8 +1019,6 @@ public class RoutineConfiguration {
 
         /**
          * Sets the timeout for an input channel to have room for additional data.
-         * <p/>
-         * By default the timeout is set to 0 to avoid unexpected deadlocks.
          *
          * @param timeout  the timeout.
          * @param timeUnit the timeout time unit.
@@ -977,9 +1034,7 @@ public class RoutineConfiguration {
 
         /**
          * Sets the timeout for an input channel to have room for additional data. A null value
-         * means that it is up to the framework to chose a default.
-         * <p/>
-         * By default the timeout is set to 0 to avoid unexpected deadlocks.
+         * means that it is up to the framework to choose a default.
          *
          * @param timeout the timeout.
          * @return this builder.
@@ -992,7 +1047,7 @@ public class RoutineConfiguration {
         }
 
         /**
-         * Sets the log instance. A null value means that it is up to the framework to chose a
+         * Sets the log instance. A null value means that it is up to the framework to choose a
          * default implementation.
          *
          * @param log the log instance.
@@ -1006,7 +1061,7 @@ public class RoutineConfiguration {
         }
 
         /**
-         * Sets the log level. A null value means that it is up to the framework to chose a default
+         * Sets the log level. A null value means that it is up to the framework to choose a default
          * level.
          *
          * @param level the log level.
@@ -1021,7 +1076,7 @@ public class RoutineConfiguration {
 
         /**
          * Sets the max number of concurrently running invocation instances. A
-         * {@link RoutineConfiguration#DEFAULT} value means that it is up to the framework to chose
+         * {@link RoutineConfiguration#DEFAULT} value means that it is up to the framework to choose
          * a default number.
          *
          * @param maxInvocations the max number of instances.
@@ -1044,7 +1099,7 @@ public class RoutineConfiguration {
 
         /**
          * Sets the order in which output data are collected from the result channel. A null value
-         * means that it is up to the framework to chose a default order type.
+         * means that it is up to the framework to choose a default order type.
          *
          * @param order the order type.
          * @return this builder.
@@ -1059,7 +1114,7 @@ public class RoutineConfiguration {
         /**
          * Sets the maximum number of data that the result channel can retain before they are
          * consumed. A {@link RoutineConfiguration#DEFAULT} value means that it is up to the
-         * framework to chose a default size.
+         * framework to choose a default size.
          *
          * @param outputMaxSize the maximum size.
          * @return this builder.
@@ -1080,8 +1135,6 @@ public class RoutineConfiguration {
 
         /**
          * Sets the timeout for a result channel to have room for additional data.
-         * <p/>
-         * By default the timeout is set to 0 to avoid unexpected deadlocks.
          *
          * @param timeout  the timeout.
          * @param timeUnit the timeout time unit.
@@ -1097,9 +1150,7 @@ public class RoutineConfiguration {
 
         /**
          * Sets the timeout for a result channel to have room for additional data. A null value
-         * means that it is up to the framework to chose a default.
-         * <p/>
-         * By default the timeout is set to 0 to avoid unexpected deadlocks.
+         * means that it is up to the framework to choose a default.
          *
          * @param timeout the timeout.
          * @return this builder.
@@ -1113,8 +1164,6 @@ public class RoutineConfiguration {
 
         /**
          * Sets the timeout for an invocation instance to produce a readable result.
-         * <p/>
-         * By default the timeout is set to 0 to avoid unexpected deadlocks.
          *
          * @param timeout  the timeout.
          * @param timeUnit the timeout time unit.
@@ -1130,9 +1179,7 @@ public class RoutineConfiguration {
 
         /**
          * Sets the timeout for an invocation instance to produce a readable result. A null value
-         * means that it is up to the framework to chose a default duration.
-         * <p/>
-         * By default the timeout is set to 0 to avoid unexpected deadlocks.
+         * means that it is up to the framework to choose a default duration.
          *
          * @param timeout the timeout.
          * @return this builder.
@@ -1146,7 +1193,7 @@ public class RoutineConfiguration {
 
         /**
          * Sets the asynchronous runner instance. A null value means that it is up to the framework
-         * to chose a default instance.
+         * to choose a default instance.
          *
          * @param runner the runner instance.
          * @return this builder.
@@ -1160,7 +1207,7 @@ public class RoutineConfiguration {
 
         /**
          * Sets the type of the synchronous runner to be used by the routine. A null value means
-         * that it is up to the framework to chose a default order type.
+         * that it is up to the framework to choose a default order type.
          *
          * @param type the runner type.
          * @return this builder.

@@ -26,7 +26,6 @@ import com.gh.bmd.jrt.invocation.Invocations.Function3;
 import com.gh.bmd.jrt.invocation.Invocations.Function4;
 import com.gh.bmd.jrt.invocation.Invocations.FunctionN;
 import com.gh.bmd.jrt.invocation.SingleCallInvocation;
-import com.gh.bmd.jrt.invocation.StatelessInvocation;
 
 import java.util.List;
 
@@ -117,12 +116,21 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
             throw new NullPointerException("the function must not be null");
         }
 
-        return new FunctionRoutineBuilder<INPUT, OUTPUT>(new StatelessInvocation<INPUT, OUTPUT>() {
+        return new FunctionRoutineBuilder<INPUT, OUTPUT>(new InvocationFactory<INPUT, OUTPUT>() {
 
-            @SuppressWarnings("unchecked")
-            public void onInput(final INPUT input, @Nonnull final ResultChannel<OUTPUT> result) {
+            @Nonnull
+            public Invocation<INPUT, OUTPUT> newInvocation() {
 
-                result.pass(function.call((INPUT1) input));
+                return new SingleCallInvocation<INPUT, OUTPUT>() {
+
+                    @Override
+                    @SuppressWarnings("unchecked")
+                    public void onCall(@Nonnull final List<? extends INPUT> inputs,
+                            @Nonnull final ResultChannel<OUTPUT> result) {
+
+                        result.pass(function.call((INPUT1) inputs.get(0)));
+                    }
+                };
             }
         });
     }
@@ -361,12 +369,21 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
             throw new NullPointerException("the procedure must not be null");
         }
 
-        return new FunctionRoutineBuilder<INPUT, Void>(new StatelessInvocation<INPUT, Void>() {
+        return new FunctionRoutineBuilder<INPUT, Void>(new InvocationFactory<INPUT, Void>() {
 
-            @SuppressWarnings("unchecked")
-            public void onInput(final INPUT input, @Nonnull final ResultChannel<Void> result) {
+            @Nonnull
+            public Invocation<INPUT, Void> newInvocation() {
 
-                procedure.call((INPUT1) input);
+                return new SingleCallInvocation<INPUT, Void>() {
+
+                    @Override
+                    @SuppressWarnings("unchecked")
+                    public void onCall(@Nonnull final List<? extends INPUT> inputs,
+                            @Nonnull final ResultChannel<Void> result) {
+
+                        procedure.call((INPUT1) inputs.get(0));
+                    }
+                };
             }
         });
     }

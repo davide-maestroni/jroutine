@@ -227,7 +227,10 @@ public class JRoutine {
     }
 
     /**
-     * Returns a routine builder based on the specified function.
+     * Returns a routine builder based on the specified function.<br/>
+     * The inputs will be passed to the function only when the invocation completes, so, it is up to
+     * the caller to verify that the correct number of parameters is passed to the input channel in
+     * order to avoid unexpected behaviors.
      * <p/>
      * Note that the function object must be stateless in order to avoid concurrency issues.
      *
@@ -244,7 +247,10 @@ public class JRoutine {
     }
 
     /**
-     * Returns a routine builder based on the specified function.
+     * Returns a routine builder based on the specified function.<br/>
+     * The inputs will be passed to the function only when the invocation completes, so, it is up to
+     * the caller to verify that the correct number of parameters is passed to the input channel in
+     * order to avoid unexpected behaviors.
      * <p/>
      * Note that the function object must be stateless in order to avoid concurrency issues.
      *
@@ -262,7 +268,10 @@ public class JRoutine {
     }
 
     /**
-     * Returns a routine builder based on the specified function.
+     * Returns a routine builder based on the specified function.<br/>
+     * The inputs will be passed to the function only when the invocation completes, so, it is up to
+     * the caller to verify that the correct number of parameters is passed to the input channel in
+     * order to avoid unexpected behaviors.
      * <p/>
      * Note that the function object must be stateless in order to avoid concurrency issues.
      *
@@ -275,15 +284,18 @@ public class JRoutine {
      * @throws java.lang.NullPointerException if the specified function is null.
      */
     @Nonnull
-    public static <INPUT, INPUT1 extends INPUT, INPUT2 extends INPUT, OUTPUT> RoutineBuilder
-            <INPUT, OUTPUT> onFunction(
+    public static <INPUT, INPUT1 extends INPUT, INPUT2 extends INPUT, OUTPUT>
+    RoutineBuilder<INPUT, OUTPUT> onFunction(
             @Nonnull final Function2<INPUT1, INPUT2, ? extends OUTPUT> function) {
 
         return FunctionRoutineBuilder.fromFunction(function);
     }
 
     /**
-     * Returns a routine builder based on the specified function.
+     * Returns a routine builder based on the specified function.<br/>
+     * The inputs will be passed to the function only when the invocation completes, so, it is up to
+     * the caller to verify that the correct number of parameters is passed to the input channel in
+     * order to avoid unexpected behaviors.
      * <p/>
      * Note that the function object must be stateless in order to avoid concurrency issues.
      *
@@ -305,7 +317,10 @@ public class JRoutine {
     }
 
     /**
-     * Returns a routine builder based on the specified function.
+     * Returns a routine builder based on the specified function.<br/>
+     * The inputs will be passed to the function only when the invocation completes, so, it is up to
+     * the caller to verify that the correct number of parameters is passed to the input channel in
+     * order to avoid unexpected behaviors.
      * <p/>
      * Note that the function object must be stateless in order to avoid concurrency issues.
      *
@@ -328,7 +343,10 @@ public class JRoutine {
     }
 
     /**
-     * Returns a routine builder based on the specified function.
+     * Returns a routine builder based on the specified function.<br/>
+     * The inputs will be passed to the function only when the invocation completes, so, it is up to
+     * the caller to verify that the correct number of parameters is passed to the input channel in
+     * order to avoid unexpected behaviors.
      * <p/>
      * Note that the function object must be stateless in order to avoid concurrency issues.
      *
@@ -347,6 +365,9 @@ public class JRoutine {
 
     /**
      * Returns a routine builder based on the specified procedure.<br/>
+     * The inputs will be passed to the procedure only when the invocation completes, so, it is up
+     * to the caller to verify that the correct number of parameters is passed to the input channel
+     * in order to avoid unexpected behaviors.<br/>
      * The procedure output will be discarded.
      * <p/>
      * Note that the procedure object must be stateless in order to avoid concurrency issues.
@@ -363,6 +384,9 @@ public class JRoutine {
 
     /**
      * Returns a routine builder based on the specified procedure.<br/>
+     * The inputs will be passed to the procedure only when the invocation completes, so, it is up
+     * to the caller to verify that the correct number of parameters is passed to the input channel
+     * in order to avoid unexpected behaviors.<br/>
      * The procedure output will be discarded.
      * <p/>
      * Note that the procedure object must be stateless in order to avoid concurrency issues.
@@ -382,6 +406,9 @@ public class JRoutine {
 
     /**
      * Returns a routine builder based on the specified procedure.<br/>
+     * The inputs will be passed to the procedure only when the invocation completes, so, it is up
+     * to the caller to verify that the correct number of parameters is passed to the input channel
+     * in order to avoid unexpected behaviors.<br/>
      * The procedure output will be discarded.
      * <p/>
      * Note that the procedure object must be stateless in order to avoid concurrency issues.
@@ -403,6 +430,9 @@ public class JRoutine {
 
     /**
      * Returns a routine builder based on the specified procedure.<br/>
+     * The inputs will be passed to the procedure only when the invocation completes, so, it is up
+     * to the caller to verify that the correct number of parameters is passed to the input channel
+     * in order to avoid unexpected behaviors.<br/>
      * The procedure output will be discarded.
      * <p/>
      * Note that the procedure object must be stateless in order to avoid concurrency issues.
@@ -425,6 +455,9 @@ public class JRoutine {
 
     /**
      * Returns a routine builder based on the specified procedure.<br/>
+     * The inputs will be passed to the procedure only when the invocation completes, so, it is up
+     * to the caller to verify that the correct number of parameters is passed to the input channel
+     * in order to avoid unexpected behaviors.<br/>
      * The procedure output will be discarded.
      * <p/>
      * Note that the procedure object must be stateless in order to avoid concurrency issues.
@@ -448,6 +481,9 @@ public class JRoutine {
 
     /**
      * Returns a routine builder based on the specified procedure.<br/>
+     * The inputs will be passed to the procedure only when the invocation completes, so, it is up
+     * to the caller to verify that the correct number of parameters is passed to the input channel
+     * in order to avoid unexpected behaviors.<br/>
      * The procedure output will be discarded.
      * <p/>
      * Note that the procedure object must be stateless in order to avoid concurrency issues.

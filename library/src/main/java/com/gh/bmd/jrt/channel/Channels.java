@@ -14,7 +14,7 @@
 package com.gh.bmd.jrt.channel;
 
 import com.gh.bmd.jrt.channel.StandaloneChannel.StandaloneInput;
-import com.gh.bmd.jrt.invocation.Invocations.Function1;
+import com.gh.bmd.jrt.invocation.StatelessInvocation;
 import com.gh.bmd.jrt.routine.JRoutine;
 
 import java.util.List;
@@ -87,11 +87,12 @@ public class Channels {
     public static <OUTPUT> OutputChannel<Selectable<OUTPUT>> selectable(final int index,
             @Nullable final OutputChannel<? extends OUTPUT> channel) {
 
-        return JRoutine.onFunction(new Function1<OUTPUT, Selectable<OUTPUT>>() {
+        return JRoutine.on(new StatelessInvocation<OUTPUT, Selectable<OUTPUT>>() {
 
-            public Selectable<OUTPUT> call(final OUTPUT param1) {
+            public void onInput(final OUTPUT output,
+                    @Nonnull final ResultChannel<Selectable<OUTPUT>> result) {
 
-                return new Selectable<OUTPUT>(param1, channel, index);
+                result.pass(new Selectable<OUTPUT>(output, channel, index));
             }
         }).callSync(channel);
     }

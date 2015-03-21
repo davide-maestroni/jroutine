@@ -17,8 +17,8 @@ apply plugin: 'findbugs'
 apply plugin: 'com.github.kt3k.coveralls'
 apply from: '../extra.gradle'
 
-group = 'com.github.davide-maestroni'
-version = '1.3.0'
+group = project.getProperty('groupName')
+version = project.getProperty('releaseVersion')
 archivesBaseName = project.parent.name
 javaCompatibility = JavaVersion.VERSION_1_5
 

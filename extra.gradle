@@ -44,7 +44,7 @@ Project.metaClass.setJavaCompatibility = { JavaVersion javaVersion ->
 
 afterEvaluate { project ->
 
-    if (project.hasProperty('releaseVersion')) {
+    if (project.hasProperty('uploadEnabled')) {
 
         signing {
             sign configurations.archives

@@ -155,16 +155,19 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
     @Nonnull
     private static Object getMutex(@Nonnull final OutputConsumer<?> consumer) {
 
-        final WeakIdentityHashMap<OutputConsumer<?>, Object> mutexMap = sMutexMap;
-        Object mutex = mutexMap.get(consumer);
+        synchronized (sMutexMap) {
 
-        if (mutex == null) {
+            final WeakIdentityHashMap<OutputConsumer<?>, Object> mutexMap = sMutexMap;
+            Object mutex = mutexMap.get(consumer);
 
-            mutex = new Object();
-            mutexMap.put(consumer, mutex);
+            if (mutex == null) {
+
+                mutex = new Object();
+                mutexMap.put(consumer, mutex);
+            }
+
+            return mutex;
         }
-
-        return mutex;
     }
 
     public boolean abort() {

@@ -466,16 +466,18 @@ public class RoutineTest {
         final Routine<Integer, Integer> sumRoutine =
                 on(withArgs(this).factoryOf(ClassToken.tokenOf(execSum))).buildRoutine();
 
-        final Function1<Integer, Integer> invokeSquare = new Function1<Integer, Integer>() {
+        final StatelessInvocation<Integer, Integer> invokeSquare =
+                new StatelessInvocation<Integer, Integer>() {
 
-            public Integer call(final Integer param1) {
+                    public void onInput(final Integer integer,
+                            @Nonnull final ResultChannel<Integer> result) {
 
-                final int input = param1;
-                return input * input;
-            }
-        };
+                        final int input = integer;
+                        result.pass(input * input);
+                    }
+                };
 
-        final Routine<Integer, Integer> squareRoutine = onFunction(invokeSquare).buildRoutine();
+        final Routine<Integer, Integer> squareRoutine = on(invokeSquare).buildRoutine();
 
         assertThat(
                 sumRoutine.callSync(squareRoutine.callSync(1, 2, 3, 4)).afterMax(timeout).readAll())

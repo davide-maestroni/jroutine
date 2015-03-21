@@ -56,9 +56,9 @@ What the library has to offer is:
 
 And more:
 
-* ***< 190KB Jar***
+* ***< 220KB Jar***
 * ***Java 5+**** ***and Android 1.6+***
-* ***@Nullable and @Nonnull annotations***
+* ***Nullability annotations***
 
 (*) for older Java versions please have a look at [Retrotranslator][17].
 

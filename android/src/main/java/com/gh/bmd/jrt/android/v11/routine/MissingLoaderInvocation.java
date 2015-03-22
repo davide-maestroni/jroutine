@@ -29,20 +29,18 @@ import javax.annotation.Nonnull;
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-class MissingLoaderInvocation<INPUT, OUTPUT> extends AndroidTemplateInvocation<INPUT, OUTPUT> {
+class MissingLoaderInvocation<INPUT, OUTPUT> extends AndroidTemplateInvocation<INPUT, OUTPUT>
+        implements InvocationFactory<INPUT, OUTPUT> {
 
     private static final MissingLoaderInvocation<Object, Object> sInvocation =
             new MissingLoaderInvocation<Object, Object>();
 
-    private static final InvocationFactory<Object, Object> sFactory =
-            new InvocationFactory<Object, Object>() {
+    /**
+     * Avoid instantiation.
+     */
+    private MissingLoaderInvocation() {
 
-                @Nonnull
-                public Invocation<Object, Object> newInvocation() {
-
-                    return sInvocation;
-                }
-            };
+    }
 
     /**
      * Returns a factory of missing loader invocations.
@@ -54,7 +52,13 @@ class MissingLoaderInvocation<INPUT, OUTPUT> extends AndroidTemplateInvocation<I
     @SuppressWarnings("unchecked")
     public static <INPUT, OUTPUT> InvocationFactory<INPUT, OUTPUT> factoryOf() {
 
-        return (InvocationFactory<INPUT, OUTPUT>) sFactory;
+        return (InvocationFactory<INPUT, OUTPUT>) sInvocation;
+    }
+
+    @Nonnull
+    public Invocation<INPUT, OUTPUT> newInvocation() {
+
+        return this;
     }
 
     @Override

@@ -19,8 +19,8 @@ import java.io.OutputStream;
 
 /**
  * Chunk of bytes.<br/>
- * The objects are immutable since the internal data are read in the constructor and written to an
- * output stream.
+ * The objects are immutable since the internal data are read in the constructor and then written to
+ * an output stream.
  * <p/>
  * Created by davide on 10/17/14.
  */

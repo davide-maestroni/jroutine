@@ -387,7 +387,7 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
             return (o instanceof Map) && o.equals(this);
         }
 
-        final WeakIdentityHashMap<?, ?> that = (WeakIdentityHashMap) o;
+        final WeakIdentityHashMap<?, ?> that = (WeakIdentityHashMap<?, ?>) o;
         return mMap.equals(that.mMap);
     }
 }

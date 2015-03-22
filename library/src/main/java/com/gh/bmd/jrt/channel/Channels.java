@@ -14,11 +14,9 @@
 package com.gh.bmd.jrt.channel;
 
 import com.gh.bmd.jrt.channel.StandaloneChannel.StandaloneInput;
-import com.gh.bmd.jrt.common.WeakIdentityHashMap;
 import com.gh.bmd.jrt.invocation.StatelessInvocation;
 import com.gh.bmd.jrt.routine.JRoutine;
 
-import java.lang.ref.WeakReference;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -32,9 +30,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * Created by davide on 3/15/15.
  */
 public class Channels {
-
-    private static final WeakIdentityHashMap<OutputConsumer<?>, Object> sMutexMap =
-            new WeakIdentityHashMap<OutputConsumer<?>, Object>();
 
     /**
      * Avoid direct instantiation.
@@ -103,39 +98,7 @@ public class Channels {
     }
 
     /**
-     * TODO
-     *
-     * @param consumer
-     * @param <OUTPUT>
-     * @return
-     */
-    @Nonnull
-    public static <OUTPUT> OutputConsumer<OUTPUT> weakConsumer(
-            @Nonnull final OutputConsumer<OUTPUT> consumer) {
-
-        return new WeakOutputConsumer<OUTPUT>(consumer);
-    }
-
-    @Nonnull
-    private static Object getMutex(@Nonnull final OutputConsumer<?> consumer) {
-
-        synchronized (sMutexMap) {
-
-            final WeakIdentityHashMap<OutputConsumer<?>, Object> mutexMap = sMutexMap;
-            Object mutex = mutexMap.get(consumer);
-
-            if (mutex == null) {
-
-                mutex = new Object();
-                mutexMap.put(consumer, mutex);
-            }
-
-            return mutex;
-        }
-    }
-
-    /**
-     * Record class storing information about the origin of the data.
+     * Data class storing information about the origin of the data.
      *
      * @param <DATA> the data type.
      */
@@ -170,68 +133,6 @@ public class Channels {
             this.data = data;
             this.channel = channel;
             this.index = index;
-        }
-    }
-
-    /**
-     * TODO
-     *
-     * @param <OUTPUT>
-     */
-    private static class WeakOutputConsumer<OUTPUT> implements OutputConsumer<OUTPUT> {
-
-        private final WeakReference<OutputConsumer<OUTPUT>> mConsumer;
-
-        private final Object mMutex;
-
-        /**
-         * TODO
-         *
-         * @param wrapped
-         */
-        private WeakOutputConsumer(@Nonnull final OutputConsumer<OUTPUT> wrapped) {
-
-            mConsumer = new WeakReference<OutputConsumer<OUTPUT>>(wrapped);
-            mMutex = getMutex(wrapped);
-        }
-
-        public void onComplete() {
-
-            final OutputConsumer<OUTPUT> consumer = mConsumer.get();
-
-            if (consumer != null) {
-
-                synchronized (mMutex) {
-
-                    consumer.onComplete();
-                }
-            }
-        }
-
-        public void onError(@Nullable final Throwable error) {
-
-            final OutputConsumer<OUTPUT> consumer = mConsumer.get();
-
-            if (consumer != null) {
-
-                synchronized (mMutex) {
-
-                    consumer.onError(error);
-                }
-            }
-        }
-
-        public void onOutput(final OUTPUT output) {
-
-            final OutputConsumer<OUTPUT> consumer = mConsumer.get();
-
-            if (consumer != null) {
-
-                synchronized (mMutex) {
-
-                    consumer.onOutput(output);
-                }
-            }
         }
     }
 }

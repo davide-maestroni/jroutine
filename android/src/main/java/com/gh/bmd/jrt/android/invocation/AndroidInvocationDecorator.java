@@ -22,7 +22,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * TODO
+ * Implementation of an invocation decorator implementing the platform specific Android invocation.
  * <p/>
  * Created by davide on 3/21/15.
  *
@@ -34,9 +34,10 @@ public class AndroidInvocationDecorator<INPUT, OUTPUT> implements AndroidInvocat
     private final Invocation<INPUT, OUTPUT> mInvocation;
 
     /**
-     * TODO
+     * Constructor.
      *
-     * @param invocation
+     * @param invocation the wrapped invocation.
+     * @throws java.lang.NullPointerException if the specified invocation is null.
      */
     @SuppressWarnings("ConstantConditions")
     public AndroidInvocationDecorator(@Nonnull final Invocation<INPUT, OUTPUT> invocation) {

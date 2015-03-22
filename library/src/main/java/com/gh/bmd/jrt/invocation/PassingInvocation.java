@@ -24,19 +24,16 @@ import javax.annotation.Nonnull;
  *
  * @param <DATA> the data type.
  */
-public class PassingInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
+public class PassingInvocation<DATA> extends StatelessInvocation<DATA, DATA> {
 
     private static final PassingInvocation<Object> sInvocation = new PassingInvocation<Object>();
 
-    private static final InvocationFactory<Object, Object> sFactory =
-            new InvocationFactory<Object, Object>() {
+    /**
+     * Avoid instantiation.
+     */
+    private PassingInvocation() {
 
-                @Nonnull
-                public Invocation<Object, Object> newInvocation() {
-
-                    return sInvocation;
-                }
-            };
+    }
 
     /**
      * Returns a factory of passing invocations.
@@ -47,10 +44,9 @@ public class PassingInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
     @SuppressWarnings("unchecked")
     public static <DATA> InvocationFactory<DATA, DATA> factoryOf() {
 
-        return (InvocationFactory<DATA, DATA>) sFactory;
+        return (InvocationFactory<DATA, DATA>) sInvocation;
     }
 
-    @Override
     public void onInput(final DATA input, @Nonnull final ResultChannel<DATA> result) {
 
         result.pass(input);

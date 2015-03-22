@@ -98,7 +98,7 @@ public class Channels {
     }
 
     /**
-     * Record class storing information about the origin of the data.
+     * Data class storing information about the origin of the data.
      *
      * @param <DATA> the data type.
      */

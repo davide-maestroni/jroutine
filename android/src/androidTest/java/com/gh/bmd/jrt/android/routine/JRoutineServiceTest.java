@@ -20,6 +20,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.test.ActivityInstrumentationTestCase2;
 
+import com.gh.bmd.jrt.android.invocation.AndroidInvocationDecorator;
 import com.gh.bmd.jrt.android.invocation.AndroidPassingInvocation;
 import com.gh.bmd.jrt.android.invocation.AndroidSingleCallInvocation;
 import com.gh.bmd.jrt.android.invocation.AndroidTemplateInvocation;
@@ -37,6 +38,7 @@ import com.gh.bmd.jrt.common.AbortException;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.common.InvocationInterruptedException;
+import com.gh.bmd.jrt.invocation.PassingInvocation;
 import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.log.Log.LogLevel;
 import com.gh.bmd.jrt.routine.Routine;
@@ -73,7 +75,8 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
         final OutputChannel<Data> channel =
                 JRoutine.onService(getActivity(), ClassToken.tokenOf(Delay.class))
                         .dispatchingOn(Looper.getMainLooper())
-                        .withRunnerClass(MainRunner.class).callAsync(data);
+                        .withRunnerClass(MainRunner.class)
+                        .callAsync(data);
         assertThat(channel.abort(new IllegalArgumentException("test"))).isTrue();
 
         try {
@@ -128,6 +131,25 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
         } catch (final NullPointerException ignored) {
 
         }
+    }
+
+    public void testDecorator() {
+
+        final TimeDuration timeout = TimeDuration.seconds(10);
+        final ClassToken<PassingDecorator<String>> token =
+                ClassToken.tokenOf(new PassingDecorator<String>());
+        final RoutineConfiguration configuration = builder().withSyncRunner(RunnerType.QUEUED)
+                                                            .withInputOrder(OrderType.DELIVERY)
+                                                            .withLogLevel(LogLevel.DEBUG)
+                                                            .buildConfiguration();
+        final Routine<String, String> routine = JRoutine.onService(getActivity(), token)
+                                                        .dispatchingOn(Looper.getMainLooper())
+                                                        .withConfiguration(configuration)
+                                                        .withLogClass(AndroidLog.class)
+                                                        .buildRoutine();
+        assertThat(
+                routine.callSync("1", "2", "3", "4", "5").afterMax(timeout).readAll()).containsOnly(
+                "1", "2", "3", "4", "5");
     }
 
     public void testInvocations() throws InterruptedException {
@@ -474,6 +496,14 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
 
     private static class MyParcelableInvocation extends AndroidPassingInvocation<MyParcelable> {
 
+    }
+
+    private static class PassingDecorator<DATA> extends AndroidInvocationDecorator<DATA, DATA> {
+
+        public PassingDecorator() {
+
+            super(PassingInvocation.<DATA>factoryOf().newInvocation());
+        }
     }
 
     private static class StringPassingInvocation extends AndroidPassingInvocation<String> {

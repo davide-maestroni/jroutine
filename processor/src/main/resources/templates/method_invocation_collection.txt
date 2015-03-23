@@ -39,9 +39,20 @@
                     throw new IllegalStateException("target object has been destroyed");
                 }
 
-                for (final ${resultClassName} element : wrapped.${targetMethodName}(${paramValues})) {
+                try {
 
-                    result.pass(element);
+                    for (final ${resultClassName} element : wrapped.${targetMethodName}(${paramValues})) {
+
+                        result.pass(element);
+                    }
+
+                } catch (final com.gh.bmd.jrt.common.RoutineException e) {
+
+                    throw e;
+
+                } catch (final Throwable t) {
+
+                    throw new com.gh.bmd.jrt.common.InvocationException(t);
                 }
             }
         }

@@ -51,13 +51,5 @@ public class ExceptionTest {
                 new InterruptedException()).getCause()).isExactlyInstanceOf(
                 InterruptedException.class);
         assertThat(new InvocationInterruptedException(null)).hasNoCause();
-
-        try {
-
-            throw InvocationInterruptedException.interrupt(new InterruptedException());
-
-        } catch (final InvocationInterruptedException ignored) {
-
-        }
     }
 }

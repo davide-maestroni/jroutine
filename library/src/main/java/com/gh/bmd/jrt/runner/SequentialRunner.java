@@ -45,7 +45,7 @@ class SequentialRunner implements Runner {
 
         } catch (final InterruptedException e) {
 
-            throw InvocationInterruptedException.interrupt(e);
+            throw new InvocationInterruptedException(e);
         }
     }
 }

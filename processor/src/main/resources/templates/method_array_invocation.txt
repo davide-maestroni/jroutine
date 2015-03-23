@@ -47,7 +47,18 @@
                     array[i++] = (${componentType}) object;
                 }
 
-                result.pass(wrapped.${targetMethodName}(array));
+                try {
+
+                    result.pass(wrapped.${targetMethodName}(array));
+
+                } catch (final com.gh.bmd.jrt.common.RoutineException e) {
+
+                    throw e;
+
+                } catch (final Throwable t) {
+
+                    throw new com.gh.bmd.jrt.common.InvocationException(t);
+                }
             }
         }
     }

@@ -136,7 +136,7 @@ class DefaultAndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
 
         } catch (final InvocationInterruptedException e) {
 
-            throw e.interrupt();
+            throw e;
 
         } catch (final Throwable t) {
 
@@ -197,11 +197,6 @@ class DefaultAndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
 
             logger.err(e, "error creating the invocation instance");
             throw new InvocationException(e.getCause());
-
-        } catch (final InvocationInterruptedException e) {
-
-            logger.err(e, "error creating the invocation instance");
-            throw e.interrupt();
 
         } catch (final RoutineException e) {
 

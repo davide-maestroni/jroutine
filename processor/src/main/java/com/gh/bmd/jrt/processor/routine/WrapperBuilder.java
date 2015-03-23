@@ -11,9 +11,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.routine;
+package com.gh.bmd.jrt.processor.routine;
 
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
+import com.gh.bmd.jrt.routine.SharableBuilder;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -36,7 +37,7 @@ public interface WrapperBuilder<TYPE> extends SharableBuilder {
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
      * The wrapping object is created through code generation based on the interfaces annotated
-     * with {@link com.gh.bmd.jrt.annotation.Wrap}.<br/>
+     * with {@link com.gh.bmd.jrt.processor.annotation.Wrap}.<br/>
      * Note that, you'll need to enable annotation pre-processing by adding the processor artifact
      * to the specific project dependencies.
      *

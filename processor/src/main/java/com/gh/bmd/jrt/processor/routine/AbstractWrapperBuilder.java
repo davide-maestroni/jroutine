@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.routine;
+package com.gh.bmd.jrt.processor.routine;
 
 import com.gh.bmd.jrt.annotation.Share;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
@@ -21,12 +21,9 @@ import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.time.TimeDuration;
 
 import java.util.HashMap;
-import java.util.Map;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import static com.gh.bmd.jrt.routine.DefaultClassRoutineBuilder.sMutexCache;
 
 /**
  * Abstract implementation of a builder of async wrapper objects.
@@ -75,7 +72,7 @@ public abstract class AbstractWrapperBuilder<TYPE> implements WrapperBuilder<TYP
 
             try {
 
-                final TYPE newInstance = newWrapper(sMutexCache, classShareGroup, configuration);
+                final TYPE newInstance = newWrapper(classShareGroup, configuration);
                 classes.put(classInfo, newInstance);
                 return newInstance;
 
@@ -120,15 +117,13 @@ public abstract class AbstractWrapperBuilder<TYPE> implements WrapperBuilder<TYP
     /**
      * Creates and return a new wrapper instance.
      *
-     * @param mutexMap      the map of mutexes used to synchronize the method invocations.
      * @param shareGroup    the share group name.
      * @param configuration the routine configuration.
      * @return the wrapper instance.
      */
     @Nonnull
-    protected abstract TYPE newWrapper(
-            @Nonnull final WeakIdentityHashMap<Object, Map<String, Object>> mutexMap,
-            @Nonnull final String shareGroup, @Nonnull final RoutineConfiguration configuration);
+    protected abstract TYPE newWrapper(@Nonnull final String shareGroup,
+            @Nonnull final RoutineConfiguration configuration);
 
     /**
      * Logs any warning related to ignored options in the specified configuration.

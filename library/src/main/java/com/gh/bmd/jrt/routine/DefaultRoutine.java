@@ -15,7 +15,6 @@ package com.gh.bmd.jrt.routine;
 
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.common.InvocationException;
-import com.gh.bmd.jrt.common.InvocationInterruptedException;
 import com.gh.bmd.jrt.common.RoutineException;
 import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.invocation.InvocationFactory;
@@ -70,11 +69,6 @@ class DefaultRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT> {
             final Invocation<INPUT, OUTPUT> invocation = factory.newInvocation();
             logger.dbg("created a new instance of class: %s", invocation.getClass());
             return invocation;
-
-        } catch (final InvocationInterruptedException e) {
-
-            logger.err(e, "error creating the invocation instance");
-            throw e.interrupt();
 
         } catch (final RoutineException e) {
 

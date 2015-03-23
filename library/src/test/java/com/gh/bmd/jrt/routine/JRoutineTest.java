@@ -417,7 +417,7 @@ public class JRoutineTest {
                                                              .withRunner(Runners.poolRunner())
                                                              .buildConfiguration();
         final Routine<Object, Object> routine1 =
-                JRoutine.onWeak(test).withConfiguration(configuration1).method("getLong");
+                JRoutine.on(test).withConfiguration(configuration1).method("getLong");
 
         assertThat(routine1.callSync().afterMax(timeout).readAll()).containsExactly(-77L);
 
@@ -435,7 +435,7 @@ public class JRoutineTest {
 
         assertThat(routine2.callSync().afterMax(timeout).readAll()).containsExactly(-77L);
 
-        final Routine<Object, Object> routine3 = JRoutine.onWeak(test).boundMethod(TestClass.THROW);
+        final Routine<Object, Object> routine3 = JRoutine.on(test).boundMethod(TestClass.THROW);
 
         try {
 
@@ -449,8 +449,9 @@ public class JRoutineTest {
             assertThat(e.getCause().getMessage()).isEqualTo("test");
         }
 
+        final TestClass2 test2 = new TestClass2();
         final ObjectRoutineBuilder builder =
-                JRoutine.on(new TestClass2()).withConfiguration(withReadTimeout(seconds(2)));
+                JRoutine.on(test2).withConfiguration(withReadTimeout(seconds(2)));
 
         long startTime = System.currentTimeMillis();
 
@@ -550,46 +551,6 @@ public class JRoutineTest {
         try {
 
             new DefaultObjectRoutineBuilder(test).buildProxy(ClassToken.tokenOf(TestClass.class));
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            new DefaultObjectRoutineBuilder(test).buildWrapper((Class<?>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            new DefaultObjectRoutineBuilder(test).buildWrapper((ClassToken<?>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            new DefaultObjectRoutineBuilder(test).buildWrapper(TestClass.class);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            new DefaultObjectRoutineBuilder(test).buildWrapper(ClassToken.tokenOf(TestClass.class));
 
             fail();
 
@@ -793,6 +754,7 @@ public class JRoutineTest {
     @Test
     public void testObjectRoutineBuilderWarnings() {
 
+        final TestClass test = new TestClass();
         final CountLog countLog = new CountLog();
         final RoutineConfiguration configuration = builder().withInputOrder(OrderType.DELIVERY)
                                                             .withInputSize(3)
@@ -803,7 +765,7 @@ public class JRoutineTest {
                                                             .withLogLevel(LogLevel.DEBUG)
                                                             .withLog(countLog)
                                                             .buildConfiguration();
-        JRoutine.on(new TestClass()).withConfiguration(configuration).boundMethod(TestClass.GET);
+        JRoutine.on(test).withConfiguration(configuration).boundMethod(TestClass.GET);
         assertThat(countLog.getWrnCount()).isEqualTo(6);
 
         final Square square = new Square();

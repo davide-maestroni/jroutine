@@ -475,7 +475,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
 
         } catch (final InterruptedException e) {
 
-            throw InvocationInterruptedException.interrupt(e);
+            throw new InvocationInterruptedException(e);
         }
     }
 

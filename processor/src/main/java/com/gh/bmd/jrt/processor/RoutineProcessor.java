@@ -18,10 +18,10 @@ import com.gh.bmd.jrt.annotation.Pass;
 import com.gh.bmd.jrt.annotation.Pass.PassingMode;
 import com.gh.bmd.jrt.annotation.Share;
 import com.gh.bmd.jrt.annotation.Timeout;
-import com.gh.bmd.jrt.annotation.Wrap;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutAction;
 import com.gh.bmd.jrt.channel.OutputChannel;
+import com.gh.bmd.jrt.processor.annotation.Wrap;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

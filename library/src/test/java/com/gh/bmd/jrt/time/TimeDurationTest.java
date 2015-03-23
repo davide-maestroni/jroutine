@@ -492,7 +492,7 @@ public class TimeDurationTest {
 
                 } catch (final InterruptedException e) {
 
-                    throw InvocationInterruptedException.interrupt(e);
+                    throw new InvocationInterruptedException(e);
                 }
             }
         };
@@ -599,7 +599,7 @@ public class TimeDurationTest {
 
                 } catch (final InterruptedException e) {
 
-                    throw InvocationInterruptedException.interrupt(e);
+                    throw new InvocationInterruptedException(e);
                 }
             }
         };
@@ -677,7 +677,7 @@ public class TimeDurationTest {
 
                 } catch (final InterruptedException e) {
 
-                    throw InvocationInterruptedException.interrupt(e);
+                    throw new InvocationInterruptedException(e);
                 }
             }
         };
@@ -705,7 +705,7 @@ public class TimeDurationTest {
 
                 } catch (final InterruptedException e) {
 
-                    throw InvocationInterruptedException.interrupt(e);
+                    throw new InvocationInterruptedException(e);
                 }
             }
         };
@@ -801,7 +801,7 @@ public class TimeDurationTest {
 
                 } catch (final InterruptedException e) {
 
-                    throw InvocationInterruptedException.interrupt(e);
+                    throw new InvocationInterruptedException(e);
                 }
             }
         };

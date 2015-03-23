@@ -18,6 +18,7 @@ import com.gh.bmd.jrt.annotation.Pass;
 import com.gh.bmd.jrt.annotation.Pass.PassingMode;
 import com.gh.bmd.jrt.annotation.Share;
 import com.gh.bmd.jrt.annotation.Timeout;
+import com.gh.bmd.jrt.builder.RoutineBuilders.Initializer;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
@@ -25,25 +26,21 @@ import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutAction;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ParameterChannel;
 import com.gh.bmd.jrt.common.ClassToken;
-import com.gh.bmd.jrt.common.WeakIdentityHashMap;
 import com.gh.bmd.jrt.time.TimeDuration;
 
 import java.lang.annotation.Annotation;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Array;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import static com.gh.bmd.jrt.builder.RoutineBuilders.getProxiedMethod;
 import static com.gh.bmd.jrt.common.Reflection.boxingClass;
-import static com.gh.bmd.jrt.common.Reflection.findConstructor;
 import static com.gh.bmd.jrt.time.TimeDuration.fromUnit;
 
 /**
@@ -53,9 +50,6 @@ import static com.gh.bmd.jrt.time.TimeDuration.fromUnit;
  */
 class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
         implements ObjectRoutineBuilder {
-
-    private static final WeakIdentityHashMap<Object, HashMap<Method, Method>> sMethodCache =
-            new WeakIdentityHashMap<Object, HashMap<Method, Method>>();
 
     /**
      * Constructor.
@@ -68,19 +62,6 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
     DefaultObjectRoutineBuilder(@Nonnull final Object target) {
 
         super(target);
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param targetReference the reference to the target object.
-     * @throws java.lang.IllegalArgumentException if a duplicate name in the annotations is
-     *                                            detected.
-     * @throws java.lang.NullPointerException     if the specified target is null.
-     */
-    DefaultObjectRoutineBuilder(@Nonnull final WeakReference<?> targetReference) {
-
-        super(targetReference);
     }
 
     @Nullable
@@ -437,34 +418,6 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
     }
 
     @Nonnull
-    public <TYPE> TYPE buildWrapper(@Nonnull final Class<TYPE> itf) {
-
-        if (!itf.isInterface()) {
-
-            throw new IllegalArgumentException(
-                    "the specified class is not an interface: " + itf.getCanonicalName());
-        }
-
-        final WeakReference<?> targetReference = getTargetReference();
-        final Object target = (targetReference != null) ? targetReference.get() : getTarget();
-
-        if (target == null) {
-
-            throw new IllegalStateException("target object has been destroyed");
-        }
-
-        return new ObjectWrapperBuilder<TYPE>(target, itf).withConfiguration(getConfiguration())
-                                                          .withShareGroup(getShareGroup())
-                                                          .buildWrapper();
-    }
-
-    @Nonnull
-    public <TYPE> TYPE buildWrapper(@Nonnull final ClassToken<TYPE> itf) {
-
-        return itf.cast(buildWrapper(itf.getRawClass()));
-    }
-
-    @Nonnull
     @Override
     public ObjectRoutineBuilder withConfiguration(
             @Nullable final RoutineConfiguration configuration) {
@@ -522,76 +475,6 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
     }
 
     /**
-     * Wrapper builder implementation.
-     *
-     * @param <TYPE> the interface type.
-     */
-    private static class ObjectWrapperBuilder<TYPE> extends AbstractWrapperBuilder<TYPE> {
-
-        private final Object mTarget;
-
-        private final Class<TYPE> mWrapperClass;
-
-        /**
-         * Constructor.
-         *
-         * @param target       the target object instance.
-         * @param wrapperClass the wrapper class.
-         */
-        private ObjectWrapperBuilder(@Nonnull final Object target,
-                @Nonnull final Class<TYPE> wrapperClass) {
-
-            mTarget = target;
-            mWrapperClass = wrapperClass;
-        }
-
-        @Nonnull
-        @Override
-        protected Object getTarget() {
-
-            return mTarget;
-        }
-
-        @Nonnull
-        @Override
-        protected Class<TYPE> getWrapperClass() {
-
-            return mWrapperClass;
-        }
-
-        @Nonnull
-        @Override
-        protected TYPE newWrapper(
-                @Nonnull final WeakIdentityHashMap<Object, Map<String, Object>> mutexMap,
-                @Nonnull final String shareGroup,
-                @Nonnull final RoutineConfiguration configuration) {
-
-            try {
-
-                final Object target = mTarget;
-                final Class<TYPE> wrapperClass = mWrapperClass;
-                final Package classPackage = wrapperClass.getPackage();
-                final String packageName =
-                        (classPackage != null) ? classPackage.getName() + "." : "";
-                final String className = packageName + "JRoutine_" + wrapperClass.getSimpleName();
-                final Constructor<?> constructor =
-                        findConstructor(Class.forName(className), target, mutexMap, shareGroup,
-                                        configuration);
-                return wrapperClass.cast(
-                        constructor.newInstance(target, mutexMap, shareGroup, configuration));
-
-            } catch (final InstantiationException e) {
-
-                throw new IllegalArgumentException(e.getCause());
-
-            } catch (final Throwable t) {
-
-                throw new IllegalArgumentException(t);
-            }
-        }
-    }
-
-    /**
      * Invocation handler adapting a different interface to the target object instance.
      */
     private class InterfaceInvocationHandler implements InvocationHandler {
@@ -613,7 +496,13 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
                 Throwable {
 
             final WeakReference<?> targetReference = getTargetReference();
-            final Object target = (targetReference != null) ? targetReference.get() : getTarget();
+
+            if (targetReference == null) {
+
+                throw new IllegalStateException("target reference must not be null");
+            }
+
+            final Object target = targetReference.get();
 
             if (target == null) {
 
@@ -627,80 +516,85 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
             Method targetMethod;
 
-            synchronized (sMethodCache) {
+            Class<?> returnClass = null;
+            final Pass methodAnnotation = method.getAnnotation(Pass.class);
 
-                final WeakIdentityHashMap<Object, HashMap<Method, Method>> methodCache =
-                        sMethodCache;
-                HashMap<Method, Method> methodMap = methodCache.get(target);
+            if (methodAnnotation != null) {
 
-                if (methodMap == null) {
+                returnClass = methodAnnotation.value();
+                asyncReturnMode = getReturnMode(methodAnnotation, returnType);
+            }
 
-                    methodMap = new HashMap<Method, Method>();
-                    methodCache.put(target, methodMap);
+            final Annotation[][] annotations = method.getParameterAnnotations();
+            final int length = annotations.length;
+
+            for (int i = 0; i < length; ++i) {
+
+                final Annotation[] paramAnnotations = annotations[i];
+
+                for (final Annotation paramAnnotation : paramAnnotations) {
+
+                    if (paramAnnotation.annotationType() != Pass.class) {
+
+                        continue;
+                    }
+
+                    final Pass passAnnotation = (Pass) paramAnnotation;
+                    asyncParamMode = getParamMode(passAnnotation, targetParameterTypes[i], length);
+                    targetParameterTypes[i] = passAnnotation.value();
                 }
+            }
 
-                Class<?> returnClass = null;
-                final Pass methodAnnotation = method.getAnnotation(Pass.class);
+            targetMethod = getProxiedMethod(target, method);
 
-                if (methodAnnotation != null) {
+            if (targetMethod == null) {
 
-                    returnClass = methodAnnotation.value();
-                    asyncReturnMode = getReturnMode(methodAnnotation, returnType);
-                }
+                final PassingMode returnMode = asyncReturnMode;
+                final Class<?> annotationReturnType = returnClass;
+                targetMethod = getProxiedMethod(target, method, new Initializer<Method>() {
 
-                final Annotation[][] annotations = method.getParameterAnnotations();
-                final int length = annotations.length;
+                    @Nonnull
+                    public Method initialValue() {
 
-                for (int i = 0; i < length; ++i) {
+                        final Method targetMethod;
 
-                    final Annotation[] paramAnnotations = annotations[i];
+                        try {
 
-                    for (final Annotation paramAnnotation : paramAnnotations) {
+                            targetMethod = getTargetMethod(method, targetParameterTypes);
 
-                        if (paramAnnotation.annotationType() != Pass.class) {
+                        } catch (final NoSuchMethodException e) {
 
-                            continue;
+                            throw new IllegalArgumentException(e);
                         }
 
-                        final Pass passAnnotation = (Pass) paramAnnotation;
-                        asyncParamMode =
-                                getParamMode(passAnnotation, targetParameterTypes[i], length);
-                        targetParameterTypes[i] = passAnnotation.value();
-                    }
-                }
+                        final Class<?> targetReturnType = targetMethod.getReturnType();
+                        boolean isError = false;
 
-                targetMethod = methodMap.get(method);
+                        if (methodAnnotation == null) {
 
-                if (targetMethod == null) {
+                            isError = !returnType.isAssignableFrom(targetReturnType);
 
-                    targetMethod = getTargetMethod(method, targetParameterTypes);
+                        } else {
 
-                    final Class<?> targetReturnType = targetMethod.getReturnType();
-                    boolean isError = false;
+                            if ((returnMode == PassingMode.PARALLEL) && returnType.isArray()) {
 
-                    if (methodAnnotation == null) {
+                                isError = !boxingClass(
+                                        returnType.getComponentType()).isAssignableFrom(
+                                        boxingClass(targetReturnType));
+                            }
 
-                        isError = !returnType.isAssignableFrom(targetReturnType);
-
-                    } else {
-
-                        if ((asyncReturnMode == PassingMode.PARALLEL) && returnType.isArray()) {
-
-                            isError = !boxingClass(returnType.getComponentType()).isAssignableFrom(
-                                    boxingClass(targetReturnType));
+                            isError |= !annotationReturnType.isAssignableFrom(targetReturnType);
                         }
 
-                        isError |= !returnClass.isAssignableFrom(targetReturnType);
+                        if (isError) {
+
+                            throw new IllegalArgumentException(
+                                    "bound method has incompatible return type: " + targetMethod);
+                        }
+
+                        return targetMethod;
                     }
-
-                    if (isError) {
-
-                        throw new IllegalArgumentException(
-                                "bound method has incompatible return type: " + targetMethod);
-                    }
-
-                    methodMap.put(method, targetMethod);
-                }
+                });
             }
 
             final Routine<Object, Object> routine =

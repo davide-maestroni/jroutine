@@ -25,8 +25,6 @@ import com.gh.bmd.jrt.invocation.Invocations.Function3;
 import com.gh.bmd.jrt.invocation.Invocations.Function4;
 import com.gh.bmd.jrt.invocation.Invocations.FunctionN;
 
-import java.lang.ref.WeakReference;
-
 import javax.annotation.Nonnull;
 
 /**
@@ -56,7 +54,7 @@ import javax.annotation.Nonnull;
  * processing of annotations, it is simply necessary to include the "jroutine-processor" artifact
  * or module in the project dependencies.
  * <p/>
- * The class gives also the faculty to build standalone channel instances.
+ * The class gives also the faculty to build standalone channel instances. TODO???
  * <p/>
  * <b>Some usage examples</b>
  * <p/>
@@ -147,7 +145,6 @@ import javax.annotation.Nonnull;
  * @see com.gh.bmd.jrt.annotation.Pass
  * @see com.gh.bmd.jrt.annotation.Share
  * @see com.gh.bmd.jrt.annotation.Timeout
- * @see com.gh.bmd.jrt.annotation.Wrap
  */
 public class JRoutine {
 
@@ -180,17 +177,17 @@ public class JRoutine {
      * the constructor. Note that the arguments objects should be immutable or, at least, never
      * shared inside and outside the routine in order to avoid concurrency issues.
      *
-     * @param invocationFactory the invocation factory.
-     * @param <INPUT>           the input data type.
-     * @param <OUTPUT>          the output data type.
+     * @param factory  the invocation factory.
+     * @param <INPUT>  the input data type.
+     * @param <OUTPUT> the output data type.
      * @return the routine builder instance.
      * @throws java.lang.NullPointerException if the specified factory is null.
      */
     @Nonnull
     public static <INPUT, OUTPUT> RoutineBuilder<INPUT, OUTPUT> on(
-            @Nonnull final InvocationFactory<INPUT, OUTPUT> invocationFactory) {
+            @Nonnull final InvocationFactory<INPUT, OUTPUT> factory) {
 
-        return new DefaultRoutineBuilder<INPUT, OUTPUT>(invocationFactory);
+        return new DefaultRoutineBuilder<INPUT, OUTPUT>(factory);
     }
 
     /**
@@ -198,21 +195,23 @@ public class JRoutine {
      * <p/>
      * The invocation instance is created through reflection only when needed.
      *
-     * @param invocationToken the class token.
-     * @param <INPUT>         the input data type.
-     * @param <OUTPUT>        the output data type.
+     * @param token    the invocation class token.
+     * @param <INPUT>  the input data type.
+     * @param <OUTPUT> the output data type.
      * @return the routine builder instance.
      * @throws java.lang.NullPointerException if the specified factory is null.
      */
     @Nonnull
     public static <INPUT, OUTPUT> RoutineBuilder<INPUT, OUTPUT> on(
-            @Nonnull final ClassToken<? extends Invocation<INPUT, OUTPUT>> invocationToken) {
+            @Nonnull final ClassToken<? extends Invocation<INPUT, OUTPUT>> token) {
 
-        return on(Invocations.factoryOf(invocationToken));
+        return on(Invocations.factoryOf(token));
     }
 
     /**
-     * Returns a routine builder wrapping the specified target object.
+     * Returns a routine builder wrapping a weak reference to the specified target object.<br/>
+     * Note that it is responsibility of the caller to retain a strong reference to the target
+     * instance to prevent it from being garbage collected.
      *
      * @param target the target object.
      * @return the routine builder instance.
@@ -498,36 +497,6 @@ public class JRoutine {
             @Nonnull final FunctionN<INPUT, Void> procedure) {
 
         return FunctionRoutineBuilder.fromProcedure(procedure);
-    }
-
-    /**
-     * Returns a routine builder wrapping a weak reference to the specified target object.
-     *
-     * @param target the target object.
-     * @return the routine builder instance.
-     * @throws java.lang.IllegalArgumentException if a duplicate name in the annotations is
-     *                                            detected.
-     * @throws java.lang.NullPointerException     if the specified target is null.
-     */
-    @Nonnull
-    public static ObjectRoutineBuilder onWeak(@Nonnull final Object target) {
-
-        return onWeak(new WeakReference<Object>(target));
-    }
-
-    /**
-     * Returns a routine builder wrapping the specified weak reference of the target object.
-     *
-     * @param target the reference to the target object.
-     * @return the routine builder instance.
-     * @throws java.lang.IllegalArgumentException if a duplicate name in the annotations is
-     *                                            detected.
-     * @throws java.lang.NullPointerException     if the specified target is null.
-     */
-    @Nonnull
-    public static ObjectRoutineBuilder onWeak(@Nonnull final WeakReference<?> target) {
-
-        return new DefaultObjectRoutineBuilder(target);
     }
 
     /**

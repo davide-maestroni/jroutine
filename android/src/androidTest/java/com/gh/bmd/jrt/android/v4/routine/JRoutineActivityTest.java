@@ -1007,7 +1007,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
             } catch (final InterruptedException e) {
 
-                throw InvocationInterruptedException.interrupt(e);
+                throw new InvocationInterruptedException(e);
             }
 
             result.abort(new IllegalStateException());

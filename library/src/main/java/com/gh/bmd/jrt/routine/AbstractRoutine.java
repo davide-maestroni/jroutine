@@ -189,7 +189,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
                 } catch (final InvocationInterruptedException e) {
 
-                    throw e.interrupt();
+                    throw e;
 
                 } catch (final Throwable t) {
 
@@ -209,7 +209,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
                 } catch (final InvocationInterruptedException e) {
 
-                    throw e.interrupt();
+                    throw e;
 
                 } catch (final Throwable t) {
 
@@ -348,7 +348,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
                     mLogger.err(e, "waiting for available instances interrupted [#%d]",
                                 mMaxInvocations);
-                    throw InvocationInterruptedException.interrupt(e);
+                    throw new InvocationInterruptedException(e);
                 }
 
                 if (isTimeout) {
@@ -410,7 +410,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
                 } catch (final InvocationInterruptedException e) {
 
-                    throw e.interrupt();
+                    throw e;
 
                 } catch (final Throwable t) {
 
@@ -453,7 +453,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
                     } catch (final InvocationInterruptedException e) {
 
-                        throw e.interrupt();
+                        throw e;
 
                     } catch (final Throwable t) {
 

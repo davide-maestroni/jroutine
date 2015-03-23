@@ -232,7 +232,7 @@ class InvocationOutputConsumer<OUTPUT> extends TemplateOutputConsumer<OUTPUT> {
 
                     } catch (final InvocationInterruptedException e) {
 
-                        throw e.interrupt();
+                        throw e;
 
                     } catch (final RoutineException e) {
 

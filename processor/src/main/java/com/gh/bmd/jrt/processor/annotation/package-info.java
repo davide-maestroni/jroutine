@@ -10,26 +10,15 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ * <p/>
+ * Processor annotation definitions.
+ * <p/>
+ * Created by davide on 03/23/15.
  */
-package com.gh.bmd.jrt.common;
-
-import javax.annotation.Nullable;
 
 /**
- * Exception wrapping a thread interrupted exception caught inside a routine execution.
+ * Processor annotation definitions.
  * <p/>
- * Created by davide on 9/8/14.
+ * Created by davide on 03/23/15.
  */
-public class InvocationInterruptedException extends RoutineException {
-
-    /**
-     * Constructor.
-     *
-     * @param cause the wrapped exception.
-     */
-    public InvocationInterruptedException(@Nullable final InterruptedException cause) {
-
-        super(cause);
-        Thread.currentThread().interrupt();
-    }
-}
+package com.gh.bmd.jrt.processor.annotation;

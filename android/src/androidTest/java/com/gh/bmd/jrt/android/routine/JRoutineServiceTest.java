@@ -343,7 +343,7 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
 
             } catch (final InterruptedException e) {
 
-                throw InvocationInterruptedException.interrupt(e);
+                throw new InvocationInterruptedException(e);
             }
 
             result.abort(new IllegalStateException("test"));

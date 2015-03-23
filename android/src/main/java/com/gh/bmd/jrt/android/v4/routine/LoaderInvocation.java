@@ -37,7 +37,6 @@ import com.gh.bmd.jrt.channel.StandaloneChannel;
 import com.gh.bmd.jrt.channel.StandaloneChannel.StandaloneInput;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.common.InvocationException;
-import com.gh.bmd.jrt.common.InvocationInterruptedException;
 import com.gh.bmd.jrt.common.RoutineException;
 import com.gh.bmd.jrt.common.WeakIdentityHashMap;
 import com.gh.bmd.jrt.invocation.SingleCallInvocation;
@@ -535,11 +534,6 @@ class LoaderInvocation<INPUT, OUTPUT> extends SingleCallInvocation<INPUT, OUTPUT
 
             logger.err(e, "error creating the invocation instance [%d]", loaderId);
             throw new InvocationException(e.getCause());
-
-        } catch (final InvocationInterruptedException e) {
-
-            logger.err(e, "error creating the invocation instance");
-            throw e.interrupt();
 
         } catch (final RoutineException e) {
 

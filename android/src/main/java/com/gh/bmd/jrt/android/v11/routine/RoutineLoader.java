@@ -141,7 +141,7 @@ class RoutineLoader<INPUT, OUTPUT> extends AsyncTaskLoader<InvocationResult<OUTP
 
         } catch (final InvocationInterruptedException e) {
 
-            throw e.interrupt();
+            throw e;
 
         } catch (final Throwable t) {
 

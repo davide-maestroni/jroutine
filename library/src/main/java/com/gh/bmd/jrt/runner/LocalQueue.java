@@ -252,7 +252,7 @@ class LocalQueue {
 
                     } catch (final InterruptedException e) {
 
-                        throw InvocationInterruptedException.interrupt(e);
+                        throw new InvocationInterruptedException(e);
                     }
                 }
 
@@ -263,7 +263,7 @@ class LocalQueue {
 
                 } catch (final InvocationInterruptedException e) {
 
-                    throw e.interrupt();
+                    throw e;
 
                 } catch (final Throwable ignored) {
 

@@ -30,7 +30,6 @@ import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.OutputConsumer;
 import com.gh.bmd.jrt.channel.ParameterChannel;
 import com.gh.bmd.jrt.common.InvocationException;
-import com.gh.bmd.jrt.common.InvocationInterruptedException;
 import com.gh.bmd.jrt.common.RoutineException;
 import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.log.Log;
@@ -412,11 +411,6 @@ public class RoutineService extends Service {
 
                         builder.withRunner(findConstructor(runnerClass).newInstance());
 
-                    } catch (final InvocationInterruptedException e) {
-
-                        mLogger.err(e, "error creating the runner instance");
-                        throw e.interrupt();
-
                     } catch (final Throwable t) {
 
                         mLogger.err(t, "error creating the runner instance");
@@ -429,11 +423,6 @@ public class RoutineService extends Service {
                     try {
 
                         builder.withLog(findConstructor(logClass).newInstance());
-
-                    } catch (final InvocationInterruptedException e) {
-
-                        mLogger.err(e, "error creating the log instance");
-                        throw e.interrupt();
 
                     } catch (final Throwable t) {
 
@@ -509,11 +498,6 @@ public class RoutineService extends Service {
 
                 logger.err(e, "error creating the invocation instance");
                 throw new InvocationException(e.getCause());
-
-            } catch (final InvocationInterruptedException e) {
-
-                logger.err(e, "error creating the invocation instance");
-                throw e.interrupt();
 
             } catch (final RoutineException e) {
 

@@ -509,7 +509,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         } catch (final InterruptedException e) {
 
-            throw InvocationInterruptedException.interrupt(e);
+            throw new InvocationInterruptedException(e);
         }
     }
 
@@ -752,7 +752,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
         } catch (final InterruptedException e) {
 
-            throw InvocationInterruptedException.interrupt(e);
+            throw new InvocationInterruptedException(e);
         }
 
         if (isTimeout) {
@@ -900,7 +900,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                     } catch (final InterruptedException e) {
 
-                        throw InvocationInterruptedException.interrupt(e);
+                        throw new InvocationInterruptedException(e);
                     }
 
                     if (isTimeout) {
@@ -1064,7 +1064,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                 } catch (final InterruptedException e) {
 
-                    throw InvocationInterruptedException.interrupt(e);
+                    throw new InvocationInterruptedException(e);
                 }
 
                 if (!isDone) {
@@ -1211,7 +1211,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
 
                     } catch (final InterruptedException e) {
 
-                        throw InvocationInterruptedException.interrupt(e);
+                        throw new InvocationInterruptedException(e);
                     }
 
                     if (isTimeout) {

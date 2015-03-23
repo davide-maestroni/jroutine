@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.annotation;
+package com.gh.bmd.jrt.processor.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -26,11 +26,12 @@ import java.lang.annotation.Target;
  * annotated interface will be generated in the interface package and its name will be obtained by
  * prepending "JRoutine_" to the interface simple name.<br/>
  * The routines used for calling the methods will honor the attributes specified in any optional
- * {@link Bind}, {@link Timeout} and {@link Pass} annotations defined for each interface method.
+ * {@link com.gh.bmd.jrt.annotation.Bind}, {@link com.gh.bmd.jrt.annotation.Timeout} and
+ * {@link com.gh.bmd.jrt.annotation.Pass} annotations defined for each interface method.
  * <p/>
  * Note that, you'll need to enable annotation pre-processing by adding the "jroutine-processor"
  * artifact or module to the specific project dependencies. Be sure also to include a proper rule in
- * your Proguard file, so to keep the signatures of all the classes implementing the specific mirror
+ * your Proguard file, so to keep the name of all the classes implementing the specific mirror
  * interface, like, for example:
  * <pre>
  *     <code>

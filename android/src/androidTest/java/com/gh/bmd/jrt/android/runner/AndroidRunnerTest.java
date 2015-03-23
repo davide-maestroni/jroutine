@@ -109,7 +109,7 @@ public class AndroidRunnerTest extends AndroidTestCase {
 
                         } catch (final InterruptedException e) {
 
-                            throw InvocationInterruptedException.interrupt(e);
+                            throw new InvocationInterruptedException(e);
                         }
                     }
                 };

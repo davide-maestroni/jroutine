@@ -16,13 +16,13 @@ package com.gh.bmd.jrt.routine;
 import com.gh.bmd.jrt.annotation.Bind;
 import com.gh.bmd.jrt.annotation.Share;
 import com.gh.bmd.jrt.annotation.Timeout;
+import com.gh.bmd.jrt.builder.RoutineBuilders.Initializer;
+import com.gh.bmd.jrt.builder.RoutineBuilders.RoutineInfo;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.common.InvocationException;
-import com.gh.bmd.jrt.common.InvocationInterruptedException;
 import com.gh.bmd.jrt.common.RoutineException;
-import com.gh.bmd.jrt.common.WeakIdentityHashMap;
 import com.gh.bmd.jrt.invocation.InvocationFactory;
 import com.gh.bmd.jrt.invocation.Invocations;
 import com.gh.bmd.jrt.invocation.SingleCallInvocation;
@@ -38,12 +38,13 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import static com.gh.bmd.jrt.builder.RoutineBuilders.getMethodRoutine;
+import static com.gh.bmd.jrt.builder.RoutineBuilders.getSharedMutex;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import static com.gh.bmd.jrt.common.Reflection.boxingClass;
 
@@ -54,16 +55,7 @@ import static com.gh.bmd.jrt.common.Reflection.boxingClass;
  */
 class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
 
-    protected static final WeakIdentityHashMap<Object, Map<String, Object>> sMutexCache =
-            new WeakIdentityHashMap<Object, Map<String, Object>>();
-
-    private static final WeakIdentityHashMap<Object, HashMap<RoutineInfo, Routine<Object, Object>>>
-            sRoutineCache =
-            new WeakIdentityHashMap<Object, HashMap<RoutineInfo, Routine<Object, Object>>>();
-
     private final HashMap<String, Method> mMethodMap = new HashMap<String, Method>();
-
-    private final Object mTarget;
 
     private final Class<?> mTargetClass;
 
@@ -90,7 +82,6 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
         }
 
         mTargetClass = targetClass;
-        mTarget = null;
         mTargetReference = null;
         fillMethodMap(true);
     }
@@ -106,31 +97,7 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
     DefaultClassRoutineBuilder(@Nonnull final Object target) {
 
         mTargetClass = target.getClass();
-        mTarget = target;
-        mTargetReference = null;
-        fillMethodMap(false);
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param targetReference the reference to the target object.
-     * @throws java.lang.IllegalArgumentException if a duplicate name in the annotations is
-     *                                            detected.
-     * @throws java.lang.NullPointerException     if the specified target is null.
-     */
-    DefaultClassRoutineBuilder(@Nonnull final WeakReference<?> targetReference) {
-
-        final Object target = targetReference.get();
-
-        if (target == null) {
-
-            throw new IllegalStateException("target object has been destroyed");
-        }
-
-        mTargetClass = target.getClass();
-        mTarget = null;
-        mTargetReference = targetReference;
+        mTargetReference = new WeakReference<Object>(target);
         fillMethodMap(false);
     }
 
@@ -245,73 +212,49 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
             AccessController.doPrivileged(new SetAccessibleAction(method));
         }
 
-        Routine<Object, Object> routine;
+        final Object target = (mTargetReference != null) ? mTargetReference.get() : mTargetClass;
 
-        synchronized (sRoutineCache) {
+        if (target == null) {
 
-            final Object target = (mTargetReference != null) ? mTargetReference.get()
-                    : (mTarget != null) ? mTarget : mTargetClass;
-
-            if (target == null) {
-
-                throw new IllegalStateException("target object has been destroyed");
-            }
-
-            final WeakIdentityHashMap<Object, HashMap<RoutineInfo, Routine<Object, Object>>>
-                    routineCache = sRoutineCache;
-            HashMap<RoutineInfo, Routine<Object, Object>> routineMap = routineCache.get(target);
-
-            if (routineMap == null) {
-
-                routineMap = new HashMap<RoutineInfo, Routine<Object, Object>>();
-                routineCache.put(target, routineMap);
-            }
-
-            final String methodShareGroup = (shareGroup != null) ? shareGroup : Share.ALL;
-            final RoutineInfo routineInfo =
-                    new RoutineInfo(configuration, method, methodShareGroup, isCollectParam,
-                                    isCollectResult);
-            routine = routineMap.get(routineInfo);
-
-            if (routine != null) {
-
-                return (Routine<INPUT, OUTPUT>) routine;
-            }
-
-            Object mutex = null;
-
-            if (!Share.NONE.equals(methodShareGroup)) {
-
-                synchronized (sMutexCache) {
-
-                    final WeakIdentityHashMap<Object, Map<String, Object>> mutexCache = sMutexCache;
-                    Map<String, Object> mutexMap = mutexCache.get(target);
-
-                    if (mutexMap == null) {
-
-                        mutexMap = new HashMap<String, Object>();
-                        mutexCache.put(target, mutexMap);
-                    }
-
-                    mutex = mutexMap.get(methodShareGroup);
-
-                    if (mutex == null) {
-
-                        mutex = new Object();
-                        mutexMap.put(methodShareGroup, mutex);
-                    }
-                }
-            }
-
-            final InvocationFactory<Object, Object> factory =
-                    Invocations.withArgs(mTargetReference, mTarget, method, mutex, isCollectParam,
-                                         isCollectResult)
-                               .factoryOf(MethodSingleCallInvocation.class);
-            routine = new DefaultRoutine<Object, Object>(configuration, factory);
-            routineMap.put(routineInfo, routine);
+            throw new IllegalStateException("target object has been destroyed");
         }
 
-        return (Routine<INPUT, OUTPUT>) routine;
+        final String methodShareGroup = (shareGroup != null) ? shareGroup : Share.ALL;
+        final RoutineInfo routineInfo =
+                new RoutineInfo(configuration, method, methodShareGroup, isCollectParam,
+                                isCollectResult);
+        final Routine<INPUT, OUTPUT> routine = getMethodRoutine(target, routineInfo);
+
+        if (routine != null) {
+
+            return routine;
+        }
+
+        final Object mutex;
+
+        if (!Share.NONE.equals(methodShareGroup)) {
+
+            mutex = getSharedMutex(target, methodShareGroup);
+
+        } else {
+
+            mutex = null;
+        }
+
+        final Initializer<Routine<Object, Object>> initializer =
+                new Initializer<Routine<Object, Object>>() {
+
+                    @Nonnull
+                    public Routine<Object, Object> initialValue() {
+
+                        final InvocationFactory<Object, Object> factory =
+                                Invocations.withArgs(target, method, mutex, isCollectParam,
+                                                     isCollectResult)
+                                           .factoryOf(MethodSingleCallInvocation.class);
+                        return new DefaultRoutine<Object, Object>(configuration, factory);
+                    }
+                };
+        return (Routine<INPUT, OUTPUT>) getMethodRoutine(target, routineInfo, initializer);
     }
 
     /**
@@ -323,17 +266,6 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
     protected String getShareGroup() {
 
         return mShareGroup;
-    }
-
-    /**
-     * Returns the builder target object.
-     *
-     * @return the target object.
-     */
-    @Nullable
-    protected Object getTarget() {
-
-        return mTarget;
     }
 
     /**
@@ -558,27 +490,22 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
 
         private final Object mMutex;
 
-        private final Object mTarget;
-
         private final WeakReference<?> mTargetReference;
 
         /**
          * Constructor.
          *
-         * @param targetReference the reference to the target object.
          * @param target          the target object.
          * @param method          the method to wrap.
          * @param mutex           the mutex used for synchronization.
          * @param isCollectParam  whether we need to collect the input parameters.
          * @param isCollectResult whether the output is a collection.
          */
-        public MethodSingleCallInvocation(final WeakReference<?> targetReference,
-                @Nullable final Object target, @Nonnull final Method method,
-                @Nullable final Object mutex, final boolean isCollectParam,
-                final boolean isCollectResult) {
+        public MethodSingleCallInvocation(@Nullable final Object target,
+                @Nonnull final Method method, @Nullable final Object mutex,
+                final boolean isCollectParam, final boolean isCollectResult) {
 
-            mTargetReference = targetReference;
-            mTarget = target;
+            mTargetReference = new WeakReference<Object>(target);
             mMethod = method;
             mMutex = (mutex != null) ? mutex : this;
             mIsCollectParam = isCollectParam;
@@ -595,21 +522,11 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
 
             synchronized (mMutex) {
 
-                final Object target;
-                final WeakReference<?> targetReference = mTargetReference;
+                final Object target = mTargetReference.get();
 
-                if (targetReference != null) {
+                if (target == null) {
 
-                    target = targetReference.get();
-
-                    if (target == null) {
-
-                        throw new IllegalStateException("target object has been destroyed");
-                    }
-
-                } else {
-
-                    target = mTarget;
+                    throw new IllegalStateException("target object has been destroyed");
                 }
 
                 final Method method = mMethod;
@@ -678,10 +595,6 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
 
                     throw new InvocationException(e.getCause());
 
-                } catch (final InvocationInterruptedException e) {
-
-                    throw e.interrupt();
-
                 } catch (final RoutineException e) {
 
                     throw e;
@@ -691,75 +604,6 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
                     throw new InvocationException(t);
                 }
             }
-        }
-    }
-
-    /**
-     * Class used as key to identify a specific routine instance.
-     */
-    private static class RoutineInfo {
-
-        private final RoutineConfiguration mConfiguration;
-
-        private final boolean mIsCollectParam;
-
-        private final boolean mIsCollectResult;
-
-        private final Method mMethod;
-
-        private final String mShareGroup;
-
-        /**
-         * Constructor.
-         *
-         * @param configuration   the routine configuration.
-         * @param method          the method to wrap.
-         * @param shareGroup      the group name.
-         * @param isCollectParam  whether we need to collect the input parameters.
-         * @param isCollectResult whether the output is a collection.
-         */
-        private RoutineInfo(@Nonnull final RoutineConfiguration configuration,
-                @Nonnull final Method method, @Nonnull final String shareGroup,
-                final boolean isCollectParam, final boolean isCollectResult) {
-
-            mMethod = method;
-            mShareGroup = shareGroup;
-            mConfiguration = configuration;
-            mIsCollectParam = isCollectParam;
-            mIsCollectResult = isCollectResult;
-        }
-
-        @Override
-        public int hashCode() {
-
-            // auto-generated code
-            int result = mConfiguration.hashCode();
-            result = 31 * result + (mIsCollectParam ? 1 : 0);
-            result = 31 * result + (mIsCollectResult ? 1 : 0);
-            result = 31 * result + mMethod.hashCode();
-            result = 31 * result + mShareGroup.hashCode();
-            return result;
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-
-                return true;
-            }
-
-            if (!(o instanceof RoutineInfo)) {
-
-                return false;
-            }
-
-            final RoutineInfo that = (RoutineInfo) o;
-
-            return mIsCollectParam == that.mIsCollectParam
-                    && mIsCollectResult == that.mIsCollectResult && mConfiguration.equals(
-                    that.mConfiguration) && mMethod.equals(that.mMethod) && mShareGroup.equals(
-                    that.mShareGroup);
         }
     }
 

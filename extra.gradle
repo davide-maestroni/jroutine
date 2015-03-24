@@ -14,6 +14,10 @@
 apply plugin: 'maven'
 apply plugin: 'signing'
 
+Project.metaClass.toVersionRange = { String version ->
+
+    version.replaceAll("^(.*)\\.[0-9]+\$", "\$1\\.+")
+}
 Project.metaClass.getWorkingBranch = {
 
     "git --git-dir=${rootDir}/.git --work-tree=${rootDir} rev-parse --abbrev-ref HEAD".execute().text.trim()

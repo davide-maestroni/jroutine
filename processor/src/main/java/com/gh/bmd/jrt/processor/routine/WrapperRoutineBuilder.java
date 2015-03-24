@@ -13,9 +13,9 @@
  */
 package com.gh.bmd.jrt.processor.routine;
 
-import com.gh.bmd.jrt.builder.ConfigurableBuilder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.common.ClassToken;
+import com.gh.bmd.jrt.routine.SharableBuilder;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -34,7 +34,7 @@ import javax.annotation.Nullable;
  * @see com.gh.bmd.jrt.annotation.Timeout
  * @see com.gh.bmd.jrt.processor.annotation.Wrap
  */
-public interface WrapperRoutineBuilder extends ConfigurableBuilder {
+public interface WrapperRoutineBuilder extends SharableBuilder {
 
     /**
      * Returns a wrapper object enabling asynchronous calling of the target instance methods.

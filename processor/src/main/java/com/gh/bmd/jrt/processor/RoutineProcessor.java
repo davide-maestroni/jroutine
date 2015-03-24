@@ -156,14 +156,13 @@ public class RoutineProcessor extends AbstractProcessor {
             mMethodInvocation = parseTemplate("/templates/method_invocation.txt", buffer);
             mMethodInvocationCollection =
                     parseTemplate("/templates/method_invocation_collection.txt", buffer);
-            mMethodInvocationVoid =
-                    parseTemplate("/templates/method_array_invocation_void.txt", buffer);
+            mMethodInvocationVoid = parseTemplate("/templates/method_invocation_void.txt", buffer);
             mMethodArrayInvocation =
                     parseTemplate("/templates/method_array_invocation.txt", buffer);
             mMethodArrayInvocationCollection =
                     parseTemplate("/templates/method_array_invocation_collection.txt", buffer);
             mMethodArrayInvocationVoid =
-                    parseTemplate("/templates/method_invocation_void.txt", buffer);
+                    parseTemplate("/templates/method_array_invocation_void.txt", buffer);
             mFooter = parseTemplate("/templates/footer.txt", buffer);
 
             mOutputChannelElement = getTypeFromName(OutputChannel.class.getCanonicalName());
@@ -592,7 +591,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
     private TypeMirror getBoxedType(final TypeMirror type) {
 
-        if ((type != null) && type.getKind().isPrimitive()) {
+        if ((type != null) && (type.getKind().isPrimitive() || (type.getKind() == TypeKind.VOID))) {
 
             return processingEnv.getTypeUtils().boxedClass((PrimitiveType) type).asType();
         }

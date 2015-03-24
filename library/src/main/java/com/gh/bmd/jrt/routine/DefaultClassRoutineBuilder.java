@@ -241,19 +241,10 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
             mutex = null;
         }
 
-        final Initializer<Routine<Object, Object>> initializer =
-                new Initializer<Routine<Object, Object>>() {
-
-                    @Nonnull
-                    public Routine<Object, Object> initialValue() {
-
-                        final InvocationFactory<Object, Object> factory =
-                                Invocations.withArgs(target, method, mutex, isCollectParam,
-                                                     isCollectResult)
-                                           .factoryOf(MethodSingleCallInvocation.class);
-                        return new DefaultRoutine<Object, Object>(configuration, factory);
-                    }
-                };
+        final InvocationFactory<Object, Object> factory =
+                Invocations.withArgs(target, method, mutex, isCollectParam, isCollectResult)
+                           .factoryOf(MethodSingleCallInvocation.class);
+        final RoutineInitializer initializer = new RoutineInitializer(configuration, factory);
         return (Routine<INPUT, OUTPUT>) getMethodRoutine(target, routineInfo, initializer);
     }
 
@@ -604,6 +595,35 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
                     throw new InvocationException(t);
                 }
             }
+        }
+    }
+
+    /**
+     * Routine initializer implementation.
+     */
+    private static class RoutineInitializer implements Initializer<Routine<Object, Object>> {
+
+        private final RoutineConfiguration mConfiguration;
+
+        private final InvocationFactory<Object, Object> mFactory;
+
+        /**
+         * Constructor.
+         *
+         * @param configuration the routine configuration.
+         * @param factory       the invocation factory.
+         */
+        private RoutineInitializer(@Nonnull final RoutineConfiguration configuration,
+                @Nonnull final InvocationFactory<Object, Object> factory) {
+
+            mConfiguration = configuration;
+            mFactory = factory;
+        }
+
+        @Nonnull
+        public Routine<Object, Object> initialValue() {
+
+            return new DefaultRoutine<Object, Object>(mConfiguration, mFactory);
         }
     }
 

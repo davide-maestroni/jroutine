@@ -32,8 +32,6 @@ import javax.annotation.Nonnull;
  */
 class DynamicScheduledThreadExecutor extends ScheduledThreadPoolExecutor {
 
-    //TODO: profiling
-
     private final ThreadPoolExecutor mExecutor;
 
     /**

@@ -54,7 +54,8 @@ import javax.annotation.Nonnull;
  * processing of annotations, it is simply necessary to include the "jroutine-processor" artifact
  * or module in the project dependencies.
  * <p/>
- * The class gives also the faculty to build standalone channel instances. TODO???
+ * This class provides also a way to build standalone channel instances, which can be used to pass
+ * data without the need to start a routine invocation.
  * <p/>
  * <b>Some usage examples</b>
  * <p/>

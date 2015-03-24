@@ -11,15 +11,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-apply plugin: 'java'
-apply from: '../extra.gradle'
-
-javaCompatibility = JavaVersion.VERSION_1_5
-
-dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile project(':library')
-
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.assertj:assertj-core:1.7.1'
-}
+/**
+ * Processor routine interfaces and implementations.
+ * <p/>
+ * Created by davide on 03/24/14.
+ */
+package com.gh.bmd.jrt.processor.routine;

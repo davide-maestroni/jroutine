@@ -1,10 +1,10 @@
-/**
+/*
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p/>
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p/>
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -319,7 +319,7 @@ public class RoutineService extends Service {
 
         if (data == null) {
 
-            throw new IllegalArgumentException("service message must not have null data");
+            throw new IllegalArgumentException("the service message has no data");
         }
 
         data.setClassLoader(getClassLoader());
@@ -327,7 +327,7 @@ public class RoutineService extends Service {
 
         if (invocationId == null) {
 
-            throw new IllegalArgumentException("service message is missing invocation ID");
+            throw new IllegalArgumentException("the service message has no invocation ID");
         }
 
         synchronized (mMutex) {
@@ -337,7 +337,7 @@ public class RoutineService extends Service {
             if (invocation == null) {
 
                 throw new IllegalArgumentException(
-                        "service message has invalid invocation ID: " + invocationId);
+                        "the service message has invalid invocation ID: " + invocationId);
             }
 
             return invocation;
@@ -351,7 +351,7 @@ public class RoutineService extends Service {
 
         if (data == null) {
 
-            throw new IllegalArgumentException("service message must not have null data");
+            throw new IllegalArgumentException("the service message has no data");
         }
 
         data.setClassLoader(getClassLoader());
@@ -359,7 +359,7 @@ public class RoutineService extends Service {
 
         if (invocationId == null) {
 
-            throw new IllegalArgumentException("service message is missing invocation ID");
+            throw new IllegalArgumentException("the service message has no invocation ID");
         }
 
         final Class<? extends AndroidInvocation<Object, Object>> invocationClass =
@@ -368,7 +368,7 @@ public class RoutineService extends Service {
 
         if (invocationClass == null) {
 
-            throw new IllegalArgumentException("service message is missing invocation class");
+            throw new IllegalArgumentException("the service message has no invocation class");
         }
 
         synchronized (mMutex) {

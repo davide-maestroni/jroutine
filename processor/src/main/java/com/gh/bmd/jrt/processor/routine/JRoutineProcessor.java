@@ -1,10 +1,10 @@
-/**
+/*
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p/>
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p/>
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,13 +42,13 @@ public class JRoutineProcessor {
     }
 
     /**
-     * Returns a routine builder wrapping the specified target object.
+     * Returns a routine builder wrapping the specified target object.<br/>
+     * Note that it is responsibility of the caller to retain a strong reference to the target
+     * instance to prevent it from being garbage collected.
      *
      * @param target the target object.
      * @return the routine builder instance.
-     * @throws java.lang.IllegalArgumentException if a duplicate name in the annotations is
-     *                                            detected.
-     * @throws java.lang.NullPointerException     if the specified target is null.
+     * @throws java.lang.NullPointerException if the specified target is null.
      */
     @Nonnull
     public static WrapperRoutineBuilder on(@Nonnull final Object target) {

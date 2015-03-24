@@ -56,7 +56,7 @@ public final class JRoutine_${interfaceName}${genericTypes} implements ${interfa
 
         private final ${classFullName} mTarget;
 
-        private final com.gh.bmd.jrt.common.ClassToken mToken = new com.gh.bmd.jrt.common.ClassToken<${interfaceFullName}>() {};
+        private final com.gh.bmd.jrt.common.ClassToken<${interfaceFullName}> mToken = new com.gh.bmd.jrt.common.ClassToken<${interfaceFullName}>() {};
 
         private ${interfaceName}WrapperBuilder(@javax.annotation.Nonnull final ${classFullName} target) {
 
@@ -65,16 +65,16 @@ public final class JRoutine_${interfaceName}${genericTypes} implements ${interfa
 
         @javax.annotation.Nonnull
         @Override
-        protected Object getTarget() {
+        protected com.gh.bmd.jrt.common.ClassToken<${interfaceFullName}> getInterfaceToken() {
 
-            return mTarget;
+            return mToken;
         }
 
         @javax.annotation.Nonnull
         @Override
-        protected Class<${interfaceFullName}> getWrapperClass() {
+        protected Object getTarget() {
 
-            return mToken.getRawClass();
+            return mTarget;
         }
 
         @javax.annotation.Nonnull

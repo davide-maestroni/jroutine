@@ -19,7 +19,7 @@ apply from: '../extra.gradle'
 group = project.getProperty('groupName')
 version = project.getProperty('releaseVersion')
 archivesBaseName = "${project.parent.name}-${project.name}"
-//javaCompatibility = JavaVersion.VERSION_1_6
+javaCompatibility = JavaVersion.VERSION_1_6
 
 def mainProject = project.parent.subprojects.find { it.name.equals('library') };
 

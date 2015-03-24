@@ -16,10 +16,12 @@ package com.gh.bmd.jrt.processor.routine;
 import com.gh.bmd.jrt.annotation.Share;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
+import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.common.WeakIdentityHashMap;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.time.TimeDuration;
 
+import java.lang.reflect.Type;
 import java.util.HashMap;
 
 import javax.annotation.Nonnull;
@@ -59,13 +61,13 @@ public abstract class AbstractWrapperBuilder<TYPE> implements WrapperBuilder<TYP
             final String shareGroup = mShareGroup;
             final String classShareGroup = (shareGroup != null) ? shareGroup : Share.ALL;
             final RoutineConfiguration configuration = RoutineConfiguration.notNull(mConfiguration);
-            final Class<TYPE> itf = getWrapperClass();
-            final ClassInfo classInfo = new ClassInfo(itf, configuration, classShareGroup);
+            final ClassToken<TYPE> token = getInterfaceToken();
+            final ClassInfo classInfo = new ClassInfo(token, configuration, classShareGroup);
             final Object instance = classes.get(classInfo);
 
             if (instance != null) {
 
-                return itf.cast(instance);
+                return token.cast(instance);
             }
 
             warn(configuration);
@@ -99,20 +101,20 @@ public abstract class AbstractWrapperBuilder<TYPE> implements WrapperBuilder<TYP
     }
 
     /**
+     * Returns the builder wrapper class token.
+     *
+     * @return the wrapper class token.
+     */
+    @Nonnull
+    protected abstract ClassToken<TYPE> getInterfaceToken();
+
+    /**
      * Returns the builder target object.
      *
      * @return the target object.
      */
     @Nonnull
     protected abstract Object getTarget();
-
-    /**
-     * Returns the builder wrapper class.
-     *
-     * @return the wrapper class.
-     */
-    @Nonnull
-    protected abstract Class<TYPE> getWrapperClass();
 
     /**
      * Creates and return a new wrapper instance.
@@ -210,22 +212,22 @@ public abstract class AbstractWrapperBuilder<TYPE> implements WrapperBuilder<TYP
 
         private final RoutineConfiguration mConfiguration;
 
-        private final Class<?> mItf;
-
         private final String mShareGroup;
+
+        private final Type mType;
 
         /**
          * Constructor.
          *
-         * @param itf           the wrapper interface.
+         * @param token         the wrapper interface token.
          * @param configuration the routine configuration.
          * @param shareGroup    the share group name.
          */
-        private ClassInfo(@Nonnull final Class<?> itf,
+        private ClassInfo(@Nonnull final ClassToken<?> token,
                 @Nonnull final RoutineConfiguration configuration,
                 @Nonnull final String shareGroup) {
 
-            mItf = itf;
+            mType = token.getRawClass();
             mConfiguration = configuration;
             mShareGroup = shareGroup;
         }
@@ -235,7 +237,7 @@ public abstract class AbstractWrapperBuilder<TYPE> implements WrapperBuilder<TYP
 
             // auto-generated code
             int result = mConfiguration.hashCode();
-            result = 31 * result + mItf.hashCode();
+            result = 31 * result + mType.hashCode();
             result = 31 * result + mShareGroup.hashCode();
             return result;
         }
@@ -255,7 +257,7 @@ public abstract class AbstractWrapperBuilder<TYPE> implements WrapperBuilder<TYP
             }
 
             final ClassInfo that = (ClassInfo) o;
-            return mConfiguration.equals(that.mConfiguration) && mItf.equals(that.mItf)
+            return mConfiguration.equals(that.mConfiguration) && mType.equals(that.mType)
                     && mShareGroup.equals(that.mShareGroup);
         }
     }

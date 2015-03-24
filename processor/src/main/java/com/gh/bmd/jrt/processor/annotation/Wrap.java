@@ -29,6 +29,54 @@ import java.lang.annotation.Target;
  * {@link com.gh.bmd.jrt.annotation.Bind}, {@link com.gh.bmd.jrt.annotation.Timeout} and
  * {@link com.gh.bmd.jrt.annotation.Pass} annotations defined for each interface method.
  * <p/>
+ * Special care must be taken when dealing with wrappers of generic classes. First of all, the
+ * wrapper interface must declare the same generic types as the wrapped class or interface.
+ * Additionally, the generic parameters must be declared as Object in order for the wrapper
+ * interface methods to match the target ones.<br/>
+ * Be also aware that it is responsibility of the caller to ensure that the same instance is not
+ * wrapped around two different generic interfaces.<br/>
+ * For example, a class of the type:
+ * <pre>
+ *     <code>
+ *
+ *             public class MyList&lt;TYPE&gt; {
+ *
+ *                 private final ArrayList&lt;TYPE&gt; mList = new ArrayList&lt;TYPE&gt;();
+ *
+ *                 public void add(final TYPE element) {
+ *
+ *                     mList.add(element);
+ *                 }
+ *
+ *                 public TYPE get(final int i) {
+ *
+ *                     return mList.get(i);
+ *                 }
+ *             }
+ *     </code>
+ * </pre>
+ * can be correctly wrapped by an interface of the type:
+ * <pre>
+ *     <code>
+ *
+ *             &#64;Wrap(MyList.class)
+ *             public interface MyListAsync&lt;TYPE&gt; {
+ *
+ *                 void add(Object element);
+ *
+ *                 TYPE get(int i);
+ *
+ *                 &#64;Bind("get")
+ *                 &#64;Pass(Object.class)
+ *                 OutputChannel&lt;TYPE&gt; getAsync(int i);
+ *
+ *                 &#64;Bind("get")
+ *                 &#64;Pass(Object.class)
+ *                 List&lt;TYPE&gt; getList(int i);
+ *             }
+ *     </code>
+ * </pre>
+ * <p/>
  * Note that, you'll need to enable annotation pre-processing by adding the "jroutine-processor"
  * artifact or module to the specific project dependencies. Be sure also to include a proper rule in
  * your Proguard file, so to keep the name of all the classes implementing the specific mirror

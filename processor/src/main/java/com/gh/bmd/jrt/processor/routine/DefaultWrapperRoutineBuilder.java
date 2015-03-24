@@ -59,10 +59,17 @@ class DefaultWrapperRoutineBuilder implements WrapperRoutineBuilder {
     @Nonnull
     public <TYPE> TYPE buildWrapper(@Nonnull final Class<TYPE> itf) {
 
+        return buildWrapper(ClassToken.tokenOf(itf));
+    }
+
+    @Nonnull
+    public <TYPE> TYPE buildWrapper(@Nonnull final ClassToken<TYPE> itf) {
+
         if (!itf.isInterface()) {
 
             throw new IllegalArgumentException(
-                    "the specified class is not an interface: " + itf.getCanonicalName());
+                    "the specified class is not an interface: " + itf.getRawClass()
+                                                                     .getCanonicalName());
         }
 
         final Object target = mTargetReference.get();
@@ -81,14 +88,6 @@ class DefaultWrapperRoutineBuilder implements WrapperRoutineBuilder {
         }
 
         return builder.withShareGroup(mShareGroup).buildWrapper();
-    }
-
-    @Nonnull
-    public <TYPE> TYPE buildWrapper(@Nonnull final ClassToken<TYPE> itf) {
-
-        //TODO: what about generic type???
-
-        return buildWrapper(itf.getRawClass());
     }
 
     @Nonnull
@@ -113,21 +112,28 @@ class DefaultWrapperRoutineBuilder implements WrapperRoutineBuilder {
      */
     private static class ObjectWrapperBuilder<TYPE> extends AbstractWrapperBuilder<TYPE> {
 
-        private final Object mTarget;
+        private final ClassToken<TYPE> mInterfaceToken;
 
-        private final Class<TYPE> mWrapperClass;
+        private final Object mTarget;
 
         /**
          * Constructor.
          *
-         * @param target       the target object instance.
-         * @param wrapperClass the wrapper class.
+         * @param target         the target object instance.
+         * @param interfaceToken the wrapper interface token.
          */
         private ObjectWrapperBuilder(@Nonnull final Object target,
-                @Nonnull final Class<TYPE> wrapperClass) {
+                @Nonnull final ClassToken<TYPE> interfaceToken) {
 
             mTarget = target;
-            mWrapperClass = wrapperClass;
+            mInterfaceToken = interfaceToken;
+        }
+
+        @Nonnull
+        @Override
+        protected ClassToken<TYPE> getInterfaceToken() {
+
+            return mInterfaceToken;
         }
 
         @Nonnull
@@ -139,28 +145,21 @@ class DefaultWrapperRoutineBuilder implements WrapperRoutineBuilder {
 
         @Nonnull
         @Override
-        protected Class<TYPE> getWrapperClass() {
-
-            return mWrapperClass;
-        }
-
-        @Nonnull
-        @Override
         protected TYPE newWrapper(@Nonnull final String shareGroup,
                 @Nonnull final RoutineConfiguration configuration) {
 
             try {
 
                 final Object target = mTarget;
-                final Class<TYPE> wrapperClass = mWrapperClass;
-                final Package classPackage = wrapperClass.getPackage();
+                final Class<TYPE> interfaceClass = mInterfaceToken.getRawClass();
+                final Package classPackage = interfaceClass.getPackage();
                 final String packageName =
                         (classPackage != null) ? classPackage.getName() + "." : "";
-                final String className = packageName + "JRoutine_" + wrapperClass.getSimpleName();
+                final String className = packageName + "JRoutine_" + interfaceClass.getSimpleName();
                 final Constructor<?> constructor =
                         findConstructor(Class.forName(className), target, shareGroup,
                                         configuration);
-                return wrapperClass.cast(
+                return interfaceClass.cast(
                         constructor.newInstance(target, shareGroup, configuration));
 
             } catch (final InstantiationException e) {

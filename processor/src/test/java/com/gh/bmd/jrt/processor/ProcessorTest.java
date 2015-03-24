@@ -13,6 +13,7 @@
  */
 package com.gh.bmd.jrt.processor;
 
+import com.gh.bmd.jrt.annotation.Bind;
 import com.gh.bmd.jrt.annotation.Pass;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
@@ -46,6 +47,7 @@ import javax.annotation.Nullable;
 
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.builder;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.withReadTimeout;
+import static com.gh.bmd.jrt.builder.RoutineConfiguration.withRunner;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.withSyncRunner;
 import static com.gh.bmd.jrt.time.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -103,6 +105,34 @@ public class ProcessorTest {
         } catch (final IllegalArgumentException ignored) {
 
         }
+    }
+
+    @Test
+    public void testCache() {
+
+        final TestList<String> testList = new TestList<String>();
+        final WrapperRoutineBuilder builder = JRoutineProcessor.on(testList)
+                                                               .withConfiguration(withRunner(
+                                                                       Runners.queuedRunner()));
+
+        final TestListItf<String> testListItf1 =
+                builder.buildWrapper(new ClassToken<TestListItf<String>>() {});
+        testListItf1.add("test");
+
+        assertThat(testListItf1.get(0)).isEqualTo("test");
+        assertThat(builder.buildWrapper(new ClassToken<TestListItf<Integer>>() {})).isSameAs(
+                testListItf1);
+
+        final TestListItf<Integer> testListItf2 =
+                builder.buildWrapper(new ClassToken<TestListItf<Integer>>() {});
+        assertThat(testListItf2).isSameAs(testListItf1);
+        assertThat(builder.buildWrapper(new ClassToken<TestListItf<Integer>>() {})).isSameAs(
+                testListItf2);
+
+        testListItf2.add(3);
+        assertThat(testListItf2.get(1)).isEqualTo(3);
+        assertThat(testListItf2.getAsync(1).readNext()).isEqualTo(3);
+        assertThat(testListItf2.getList(1)).containsExactly(3);
     }
 
     @Test
@@ -256,7 +286,7 @@ public class ProcessorTest {
         OutputChannel<Integer> getTwo();
     }
 
-    @SuppressWarnings("UnusedDeclaration")
+    @SuppressWarnings("unused")
     public interface TestClassInterface {
 
         int getOne();
@@ -268,6 +298,22 @@ public class ProcessorTest {
         @Timeout(300)
         @Pass(int.class)
         OutputChannel<Integer> getOne();
+    }
+
+    @Wrap(TestList.class)
+    public interface TestListItf<TYPE> {
+
+        void add(Object t);
+
+        TYPE get(int i);
+
+        @Bind("get")
+        @Pass(Object.class)
+        OutputChannel<TYPE> getAsync(int i);
+
+        @Bind("get")
+        @Pass(Object.class)
+        List<TYPE> getList(int i);
     }
 
     @Wrap(TestClass.class)
@@ -304,7 +350,7 @@ public class ProcessorTest {
         String getString(@Pass(int.class) OutputChannel<Integer> i);
     }
 
-    @SuppressWarnings("UnusedDeclaration")
+    @SuppressWarnings("unused")
     public static class TestClass implements TestClassInterface {
 
         public List<String> getList(final List<String> list) {
@@ -323,7 +369,23 @@ public class ProcessorTest {
         }
     }
 
-    @SuppressWarnings("UnusedDeclaration")
+    @SuppressWarnings("unused")
+    public static class TestList<TYPE> {
+
+        private final ArrayList<TYPE> mList = new ArrayList<TYPE>();
+
+        public void add(TYPE t) {
+
+            mList.add(t);
+        }
+
+        public TYPE get(int i) {
+
+            return mList.get(i);
+        }
+    }
+
+    @SuppressWarnings("unused")
     private static class CountLog implements Log {
 
         private int mDgbCount;

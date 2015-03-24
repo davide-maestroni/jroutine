@@ -90,7 +90,7 @@ Parallel programming on the go.
 </pre>
 <b>Example 2:</b> via invocation implementations (again).
 <p>
-    It is possible to completely avoid the use of reflection by slightly modify the example above.
+    It is possible to completely avoid the use of reflection by slightly modifying the example above.
 </p>
 <pre>
     <code>
@@ -246,9 +246,10 @@ Parallel programming on the go.
 
             public static void main(final String[] args) {
 
-                final AsyncMain proxy = on(new Main()).withShareGroup(Share.NONE)
-                                                      .withConfiguration(withReadTimeout(TimeDuration.INFINITY))
-                                                      .buildProxy(AsyncMain.class);
+                final Main instance = new Main();
+                final AsyncMain proxy = on(instance).withShareGroup(Share.NONE)
+                                                    .withConfiguration(withReadTimeout(TimeDuration.INFINITY))
+                                                    .buildProxy(AsyncMain.class);
                 final double rms = proxy.squareRootMean(proxy.square(proxy.parseArg(args)));
 
                 System.out.println(rms);
@@ -284,133 +285,6 @@ Parallel programming on the go.
             }
 
             private interface AsyncMain {
-
-                &commat;Pass(int.class)
-                OutputChannel&lt;Integer&gt; parseArg(&commat;Pass(String.class) String[] args);
-
-                &commat;Pass(int.class)
-                OutputChannel&lt;Integer&gt; square(
-                        &commat;Pass(value = int.class, mode = PassingMode.PARALLEL) OutputChannel&lt;Integer&gt; value);
-
-                double squareRootMean(&commat;Pass(List.class) OutputChannel&lt;Integer&gt; values);
-            }
-        }
-    </code>
-</pre>
-<b>Example 5:</b> via code generation.
-<p>
-    This example is the same as the previous one, with the only difference that the class methods are not called through reflection, but a concrete object is dynamically generated through an annotation processor.<br/>
-    Note that, unlike the previous example, the proxy interface and the class methods bust be declared as public in order to be called by the wrapper object.
-</p>
-<pre>
-    <code>
-        public class Main {
-
-            public static void main(final String[] args) {
-
-                final AsyncMain wrapper = on(new Main()).withShareGroup(Share.NONE)
-                                                        .withConfiguration(withReadTimeout(TimeDuration.INFINITY))
-                                                        .buildWrapper(AsyncMain.class);
-                final double rms = wrapper.squareRootMean(wrapper.square(wrapper.parseArg(args)));
-
-                System.out.println(rms);
-
-                System.exit(0);
-            }
-
-            public int parseArg(final String arg) {
-
-                return Integer.parseInt(arg);
-            }
-
-            public int square(final int value) {
-
-                return value * value;
-            }
-
-            public double squareRootMean(final List&lt;Integer&gt; values) {
-
-                if (values.isEmpty()) {
-
-                    return 0;
-                }
-
-                int sum = 0;
-
-                for (final int value : values) {
-
-                    sum += value;
-                }
-
-                return Math.sqrt((double) sum / values.size());
-            }
-
-            &commat;Wrap(Main.class)
-            public interface AsyncMain {
-
-                &commat;Pass(int.class)
-                OutputChannel&lt;Integer&gt; parseArg(&commat;Pass(String.class) String[] args);
-
-                &commat;Pass(int.class)
-                OutputChannel&lt;Integer&gt; square(
-                        &commat;Pass(value = int.class, mode = PassingMode.PARALLEL) OutputChannel&lt;Integer&gt; value);
-
-                double squareRootMean(&commat;Pass(List.class) OutputChannel&lt;Integer&gt; values);
-            }
-        }
-    </code>
-</pre>
-<b>Example 6:</b> via code generation (again).
-<p>
-    It is possible to completely avoid the use of reflection by slightly modify the example above.<br/>
-    Note that, since the <i>JRoutine_XXX</i> class is generated, a generic IDE may highlight an error even if the compilation is successful.
-</p>
-<pre>
-    <code>
-        public class Main {
-
-            public static void main(final String[] args) {
-
-                final AsyncMain wrapper = JRoutine_AsyncMain.on(new Main())
-                                                            .withShareGroup(Share.NONE)
-                                                            .withConfiguration(withReadTimeout(TimeDuration.INFINITY))
-                                                            .buildWrapper();
-                final double rms = wrapper.squareRootMean(wrapper.square(wrapper.parseArg(args)));
-
-                System.out.println(rms);
-
-                System.exit(0);
-            }
-
-            public int parseArg(final String arg) {
-
-                return Integer.parseInt(arg);
-            }
-
-            public int square(final int value) {
-
-                return value * value;
-            }
-
-            public double squareRootMean(final List&lt;Integer&gt; values) {
-
-                if (values.isEmpty()) {
-
-                    return 0;
-                }
-
-                int sum = 0;
-
-                for (final int value : values) {
-
-                    sum += value;
-                }
-
-                return Math.sqrt((double) sum / values.size());
-            }
-
-            &commat;Wrap(Main.class)
-            public interface AsyncMain {
 
                 &commat;Pass(int.class)
                 OutputChannel&lt;Integer&gt; parseArg(&commat;Pass(String.class) String[] args);

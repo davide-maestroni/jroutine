@@ -36,7 +36,7 @@ public final class JRoutine_${interfaceName}${genericTypes} implements ${interfa
     }
 
     @javax.annotation.Nonnull
-    public static ${genericTypes} com.gh.bmd.jrt.processor.routine.WrapperBuilder<${interfaceFullName}> on(final ${classFullName} wrapped) {
+    public static ${genericTypes} com.gh.bmd.jrt.processor.builder.WrapperBuilder<${interfaceFullName}> on(final ${classFullName} wrapped) {
 
         return new ${interfaceName}WrapperBuilder${genericTypes}(wrapped);
     }
@@ -52,7 +52,7 @@ public final class JRoutine_${interfaceName}${genericTypes} implements ${interfa
         return com.gh.bmd.jrt.builder.RoutineBuilders.getSharedMutex(mWrapped, groupName);
     }
 
-    private static class ${interfaceName}WrapperBuilder${genericTypes} extends com.gh.bmd.jrt.processor.routine.AbstractWrapperBuilder<${interfaceFullName}> {
+    private static class ${interfaceName}WrapperBuilder${genericTypes} extends com.gh.bmd.jrt.processor.builder.AbstractWrapperBuilder<${interfaceFullName}> {
 
         private final ${classFullName} mTarget;
 

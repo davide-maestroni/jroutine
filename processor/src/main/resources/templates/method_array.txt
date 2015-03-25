@@ -19,7 +19,7 @@
 
         final java.util.List<${resultClassName}> $$list = this.mRoutine${methodCount}.${invokeMethod}()${inputParams}.result()${outputOptions}.readAll();
         final int $$size = $$list.size();
-        final ${resultRawClass}[] $$array = new ${resultRawClass}[$$size];
+        final ${resultRawClass}[] $$array = new ${resultRawSizedArray};
 
         for (int $$i = 0; $$i < $$size; ++$$i) {
 

@@ -39,6 +39,13 @@
                     throw new IllegalStateException("target object has been destroyed");
                 }
 
+                if (objects.size() > ${maxParamSize}) {
+
+                    throw new IllegalArgumentException(
+                            "wrong number of input parameters for method '${targetMethodName}': " +
+                            "was " + objects.size() + " while expected " + (${maxParamSize}));
+                }
+
                 try {
 
                     wrapped.${targetMethodName}(${paramValues});

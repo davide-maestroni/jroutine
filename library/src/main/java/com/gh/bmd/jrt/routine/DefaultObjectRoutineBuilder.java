@@ -18,6 +18,7 @@ import com.gh.bmd.jrt.annotation.Pass;
 import com.gh.bmd.jrt.annotation.Pass.PassingMode;
 import com.gh.bmd.jrt.annotation.Share;
 import com.gh.bmd.jrt.annotation.Timeout;
+import com.gh.bmd.jrt.builder.ObjectRoutineBuilder;
 import com.gh.bmd.jrt.builder.RoutineBuilders.Initializer;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
@@ -68,12 +69,13 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
     @SuppressWarnings("unchecked")
     private static Object callRoutine(@Nonnull final Routine<Object, Object> routine,
             @Nonnull final Method method, @Nonnull final Object[] args,
-            @Nullable final PassingMode paramType) {
+            @Nullable final PassingMode paramMode,
+            @Nullable final PassingMode returnMode) { //TODO returnType
 
         final Class<?> returnType = method.getReturnType();
         final OutputChannel<Object> outputChannel;
 
-        if (paramType == PassingMode.PARALLEL) {
+        if (paramMode == PassingMode.PARALLEL) {
 
             final ParameterChannel<Object, Object> parameterChannel = routine.invokeParallel();
             final Class<?> parameterType = method.getParameterTypes()[0];
@@ -108,7 +110,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
             outputChannel = parameterChannel.result();
 
-        } else if (paramType == PassingMode.OBJECT) {
+        } else if (paramMode == PassingMode.OBJECT) {
 
             final ParameterChannel<Object, Object> parameterChannel = routine.invokeAsync();
             final Class<?>[] parameterTypes = method.getParameterTypes();
@@ -130,7 +132,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
             outputChannel = parameterChannel.result();
 
-        } else if (paramType == PassingMode.COLLECTION) {
+        } else if (paramMode == PassingMode.COLLECTION) {
 
             final ParameterChannel<Object, Object> parameterChannel = routine.invokeAsync();
             outputChannel = parameterChannel.pass((OutputChannel<Object>) args[0]).result();
@@ -142,28 +144,31 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
         if (!Void.class.equals(boxingClass(returnType))) {
 
-            if (OutputChannel.class.isAssignableFrom(returnType)) {
+            if (returnMode != null) {
 
-                return outputChannel;
-            }
+                if (OutputChannel.class.isAssignableFrom(returnType)) {
 
-            if (returnType.isAssignableFrom(List.class)) {
-
-                return outputChannel.readAll();
-            }
-
-            if (returnType.isArray()) {
-
-                final List<Object> results = outputChannel.readAll();
-                final int size = results.size();
-                final Object array = Array.newInstance(returnType.getComponentType(), size);
-
-                for (int i = 0; i < size; ++i) {
-
-                    Array.set(array, i, results.get(i));
+                    return outputChannel;
                 }
 
-                return array;
+                if (returnType.isAssignableFrom(List.class)) {
+
+                    return outputChannel.readAll();
+                }
+
+                if (returnType.isArray()) {
+
+                    final List<Object> results = outputChannel.readAll();
+                    final int size = results.size();
+                    final Object array = Array.newInstance(returnType.getComponentType(), size);
+
+                    for (int i = 0; i < size; ++i) {
+
+                        Array.set(array, i, results.get(i));
+                    }
+
+                    return array;
+                }
             }
 
             return outputChannel.readNext();
@@ -600,7 +605,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
             final Routine<Object, Object> routine =
                     buildRoutine(method, targetMethod, asyncParamMode, asyncReturnMode);
-            return callRoutine(routine, method, args, asyncParamMode);
+            return callRoutine(routine, method, args, asyncParamMode, asyncReturnMode);
         }
 
         @Nonnull

@@ -15,6 +15,8 @@ package com.gh.bmd.jrt.processor.routine;
 
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.common.ClassToken;
+import com.gh.bmd.jrt.processor.builder.AbstractWrapperBuilder;
+import com.gh.bmd.jrt.processor.builder.WrapperRoutineBuilder;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;

@@ -13,6 +13,8 @@
  */
 package com.gh.bmd.jrt.processor.routine;
 
+import com.gh.bmd.jrt.processor.builder.WrapperRoutineBuilder;
+
 import javax.annotation.Nonnull;
 
 /**

@@ -44,7 +44,7 @@
 
                 for (final Object object : objects) {
 
-                    array[i++] = (${componentType}) object;
+                    array[i++] = (${boxedType}) object;
                 }
 
                 try {

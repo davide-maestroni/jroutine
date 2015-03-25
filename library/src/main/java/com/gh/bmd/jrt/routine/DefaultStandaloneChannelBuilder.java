@@ -14,6 +14,7 @@
 package com.gh.bmd.jrt.routine;
 
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
+import com.gh.bmd.jrt.builder.StandaloneChannelBuilder;
 import com.gh.bmd.jrt.channel.StandaloneChannel;
 
 import javax.annotation.Nonnull;

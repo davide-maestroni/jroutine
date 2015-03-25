@@ -11,10 +11,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.routine;
+package com.gh.bmd.jrt.builder;
 
-import com.gh.bmd.jrt.builder.ConfigurableBuilder;
-import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.channel.StandaloneChannel;
 
 import javax.annotation.Nonnull;

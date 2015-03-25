@@ -16,6 +16,7 @@ package com.gh.bmd.jrt.routine;
 import com.gh.bmd.jrt.annotation.Bind;
 import com.gh.bmd.jrt.annotation.Share;
 import com.gh.bmd.jrt.annotation.Timeout;
+import com.gh.bmd.jrt.builder.ClassRoutineBuilder;
 import com.gh.bmd.jrt.builder.RoutineBuilders.Initializer;
 import com.gh.bmd.jrt.builder.RoutineBuilders.RoutineInfo;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;

@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.processor.routine;
+package com.gh.bmd.jrt.processor.builder;
 
 import com.gh.bmd.jrt.annotation.Share;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;

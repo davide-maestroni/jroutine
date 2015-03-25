@@ -264,16 +264,14 @@ public class RoutineProcessor extends AbstractProcessor {
             builder.append(".pass(");
 
             if (typeUtils.isAssignable(outputChannelElement.asType(),
-                                       typeUtils.erasure(variableElement.asType()))) {
+                                       typeUtils.erasure(variableElement.asType())) && (
+                    variableElement.getAnnotation(Pass.class) != null)) {
 
-                if (variableElement.getAnnotation(Pass.class) != null) {
+                builder.append("(com.gh.bmd.jrt.channel.OutputChannel)");
 
-                    builder.append("(com.gh.bmd.jrt.channel.OutputChannel)");
+            } else {
 
-                } else {
-
-                    builder.append("(Object)");
-                }
+                builder.append("(Object)");
             }
 
             builder.append(variableElement).append(")");
@@ -418,6 +416,27 @@ public class RoutineProcessor extends AbstractProcessor {
                .append(".")
                .append((isOverrideParameters) ? OrderType.PASSING : OrderType.DELIVERY)
                .append(")");
+
+        return builder.toString();
+    }
+
+    private String buildSizedArray(final TypeMirror returnType) {
+
+        final StringBuilder builder = new StringBuilder();
+
+        if (returnType.getKind() == TypeKind.ARRAY) {
+
+            final String typeString = returnType.toString();
+            final int firstBracket = typeString.indexOf('[');
+
+            builder.append(typeString.substring(0, firstBracket))
+                   .append("[$$size]")
+                   .append(typeString.substring(firstBracket));
+
+        } else {
+
+            builder.append(returnType).append("[$$size]");
+        }
 
         return builder.toString();
     }
@@ -1086,12 +1105,12 @@ public class RoutineProcessor extends AbstractProcessor {
 
         method = method.replace("${resultClassName}", resultClassName);
         method = method.replace("${resultRawClass}", targetReturnType.toString());
+        method = method.replace("${resultRawSizedArray}", buildSizedArray(targetReturnType));
         method = method.replace("${resultType}", methodElement.getReturnType().toString());
         method = method.replace("${methodCount}", Integer.toString(count));
         method = method.replace("${methodName}", methodElement.getSimpleName());
         method = method.replace("${params}", buildParams(methodElement));
         method = method.replace("${paramTypes}", buildParamTypes(methodElement));
-        method = method.replace("${paramValues}", buildParamValues(targetMethod));
         method = method.replace("${inputParams}", buildInputParams(methodElement));
         method = method.replace("${outputOptions}", buildOutputOptions(methodElement));
         method = method.replace("${invokeMethod}",
@@ -1100,53 +1119,62 @@ public class RoutineProcessor extends AbstractProcessor {
 
         writer.append(method);
 
-        String methodFooter;
+        String methodInvocation;
 
         if ((asyncParamMode == PassingMode.COLLECTION) && (
                 targetMethod.getParameters().get(0).asType().getKind() == TypeKind.ARRAY)) {
 
             final ArrayType arrayType = (ArrayType) targetMethod.getParameters().get(0).asType();
-            methodFooter = (isVoid) ? mMethodArrayInvocationVoid
+            methodInvocation = (isVoid) ? mMethodArrayInvocationVoid
                     : (asyncReturnMode == PassingMode.COLLECTION) ? mMethodArrayInvocationCollection
                             : mMethodArrayInvocation;
-            methodFooter = methodFooter.replace("${componentType}",
-                                                arrayType.getComponentType().toString());
+            methodInvocation = methodInvocation.replace("${componentType}",
+                                                        arrayType.getComponentType().toString());
+            methodInvocation = methodInvocation.replace("${boxedType}", getBoxedType(
+                    arrayType.getComponentType()).toString());
 
         } else {
 
-            methodFooter = (isVoid) ? mMethodInvocationVoid
+            methodInvocation = (isVoid) ? mMethodInvocationVoid
                     : (asyncReturnMode == PassingMode.COLLECTION) ? mMethodInvocationCollection
                             : mMethodInvocation;
         }
 
-        methodFooter = methodFooter.replace("${classFullName}", targetElement.asType().toString());
-        methodFooter = methodFooter.replace("${resultClassName}", resultClassName);
-        methodFooter = methodFooter.replace("${methodCount}", Integer.toString(count));
-        methodFooter = methodFooter.replace("${methodName}", methodElement.getSimpleName());
-        methodFooter = methodFooter.replace("${targetMethodName}", targetMethod.getSimpleName());
+        methodInvocation =
+                methodInvocation.replace("${classFullName}", targetElement.asType().toString());
+        methodInvocation = methodInvocation.replace("${resultClassName}", resultClassName);
+        methodInvocation = methodInvocation.replace("${methodCount}", Integer.toString(count));
+        methodInvocation = methodInvocation.replace("${methodName}", methodElement.getSimpleName());
+        methodInvocation =
+                methodInvocation.replace("${targetMethodName}", targetMethod.getSimpleName());
 
         if (asyncParamMode == PassingMode.COLLECTION) {
 
-            methodFooter = methodFooter.replace("${paramValues}",
-                                                buildCollectionParamValues(targetMethod));
+            methodInvocation = methodInvocation.replace("${maxParamSize}",
+                                                        Integer.toString(Integer.MAX_VALUE));
+            methodInvocation = methodInvocation.replace("${paramValues}",
+                                                        buildCollectionParamValues(targetMethod));
 
         } else {
 
-            methodFooter = methodFooter.replace("${paramValues}", buildParamValues(targetMethod));
+            methodInvocation = methodInvocation.replace("${maxParamSize}", Integer.toString(
+                    targetMethod.getParameters().size()));
+            methodInvocation =
+                    methodInvocation.replace("${paramValues}", buildParamValues(targetMethod));
         }
 
         final Share shareAnnotation = methodElement.getAnnotation(Share.class);
 
         if (shareAnnotation != null) {
 
-            methodFooter =
-                    methodFooter.replace("${shareGroup}", "\"" + shareAnnotation.value() + "\"");
+            methodInvocation = methodInvocation.replace("${shareGroup}",
+                                                        "\"" + shareAnnotation.value() + "\"");
 
         } else {
 
-            methodFooter = methodFooter.replace("${shareGroup}", "\"null\"");
+            methodInvocation = methodInvocation.replace("${shareGroup}", "\"null\"");
         }
 
-        writer.append(methodFooter);
+        writer.append(methodInvocation);
     }
 }

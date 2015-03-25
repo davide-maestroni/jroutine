@@ -18,6 +18,8 @@ import com.gh.bmd.jrt.annotation.Pass;
 import com.gh.bmd.jrt.annotation.Pass.PassingMode;
 import com.gh.bmd.jrt.annotation.Share;
 import com.gh.bmd.jrt.annotation.Timeout;
+import com.gh.bmd.jrt.builder.ClassRoutineBuilder;
+import com.gh.bmd.jrt.builder.ObjectRoutineBuilder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.RunnerType;
@@ -1014,6 +1016,187 @@ public class JRoutineTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
+    public void testProxyAnnotations() {
+
+        final Impl impl = new Impl();
+        final Itf itf = JRoutine.on(impl)
+                                .withConfiguration(withReadTimeout(INFINITY))
+                                .buildProxy(Itf.class);
+
+        assertThat(itf.add0('c')).isEqualTo((int) 'c');
+        final StandaloneChannel<Character> channel1 = JRoutine.standalone().buildChannel();
+        channel1.input().pass('a').close();
+        assertThat(itf.add1(channel1.output())).isEqualTo((int) 'a');
+        final StandaloneChannel<Character> channel2 = JRoutine.standalone().buildChannel();
+        channel2.input().pass('d', 'e', 'f').close();
+        assertThat(itf.add2(channel2.output())).isIn((int) 'd', (int) 'e', (int) 'f');
+        assertThat(itf.add3('c').readAll()).containsExactly((int) 'c');
+        final StandaloneChannel<Character> channel3 = JRoutine.standalone().buildChannel();
+        channel3.input().pass('a').close();
+        assertThat(itf.add4(channel3.output()).readAll()).containsExactly((int) 'a');
+        final StandaloneChannel<Character> channel4 = JRoutine.standalone().buildChannel();
+        channel4.input().pass('d', 'e', 'f').close();
+        assertThat(itf.add5(channel4.output()).readAll()).containsOnly((int) 'd', (int) 'e',
+                                                                       (int) 'f');
+        assertThat(itf.addA00(new char[]{'c', 'z'})).isEqualTo(new int[]{'c', 'z'});
+        final StandaloneChannel<char[]> channel5 = JRoutine.standalone().buildChannel();
+        channel5.input().pass(new char[]{'a', 'z'}).close();
+        assertThat(itf.addA01(channel5.output())).isEqualTo(new int[]{'a', 'z'});
+        final StandaloneChannel<Character> channel6 = JRoutine.standalone().buildChannel();
+        channel6.input().pass('d', 'e', 'f').close();
+        assertThat(itf.addA02(channel6.output())).isEqualTo(new int[]{'d', 'e', 'f'});
+        final StandaloneChannel<char[]> channel7 = JRoutine.standalone().buildChannel();
+        channel7.input()
+                .pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'})
+                .close();
+        assertThat(itf.addA03(channel7.output())).isIn(new int[]{'d', 'z'}, new int[]{'e', 'z'},
+                                                       new int[]{'f', 'z'});
+        assertThat(itf.addA04(new char[]{'c', 'z'}).readAll()).containsExactly(new int[]{'c', 'z'});
+        final StandaloneChannel<char[]> channel8 = JRoutine.standalone().buildChannel();
+        channel8.input().pass(new char[]{'a', 'z'}).close();
+        assertThat(itf.addA05(channel8.output()).readAll()).containsExactly(new int[]{'a', 'z'});
+        final StandaloneChannel<Character> channel9 = JRoutine.standalone().buildChannel();
+        channel9.input().pass('d', 'e', 'f').close();
+        assertThat(itf.addA06(channel9.output()).readAll()).containsExactly(
+                new int[]{'d', 'e', 'f'});
+        final StandaloneChannel<char[]> channel10 = JRoutine.standalone().buildChannel();
+        channel10.input()
+                 .pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'})
+                 .close();
+        assertThat(itf.addA07(channel10.output()).readAll()).containsOnly(new int[]{'d', 'z'},
+                                                                          new int[]{'e', 'z'},
+                                                                          new int[]{'f', 'z'});
+        assertThat(itf.addA08(new char[]{'c', 'z'}).readAll()).containsExactly((int) 'c',
+                                                                               (int) 'z');
+        final StandaloneChannel<char[]> channel11 = JRoutine.standalone().buildChannel();
+        channel11.input().pass(new char[]{'a', 'z'}).close();
+        assertThat(itf.addA09(channel11.output()).readAll()).containsExactly((int) 'a', (int) 'z');
+        final StandaloneChannel<Character> channel12 = JRoutine.standalone().buildChannel();
+        channel12.input().pass('d', 'e', 'f').close();
+        assertThat(itf.addA10(channel12.output()).readAll()).containsExactly((int) 'd', (int) 'e',
+                                                                             (int) 'f');
+        final StandaloneChannel<char[]> channel13 = JRoutine.standalone().buildChannel();
+        channel13.input()
+                 .pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'})
+                 .close();
+        assertThat(itf.addA11(channel13.output()).readAll()).containsOnly((int) 'd', (int) 'e',
+                                                                          (int) 'f', (int) 'z');
+        assertThat(itf.addA12(new char[]{'c', 'z'})).containsExactly(new int[]{'c', 'z'});
+        final StandaloneChannel<char[]> channel14 = JRoutine.standalone().buildChannel();
+        channel14.input().pass(new char[]{'a', 'z'}).close();
+        assertThat(itf.addA13(channel14.output())).containsExactly(new int[]{'a', 'z'});
+        final StandaloneChannel<Character> channel15 = JRoutine.standalone().buildChannel();
+        channel15.input().pass('d', 'e', 'f').close();
+        assertThat(itf.addA14(channel15.output())).containsExactly(new int[]{'d', 'e', 'f'});
+        final StandaloneChannel<char[]> channel16 = JRoutine.standalone().buildChannel();
+        channel16.input()
+                 .pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'})
+                 .close();
+        assertThat(itf.addA15(channel16.output())).containsOnly(new int[]{'d', 'z'},
+                                                                new int[]{'e', 'z'},
+                                                                new int[]{'f', 'z'});
+        assertThat(itf.addA16(new char[]{'c', 'z'})).containsExactly(new int[]{'c', 'z'});
+        final StandaloneChannel<char[]> channel17 = JRoutine.standalone().buildChannel();
+        channel17.input().pass(new char[]{'a', 'z'}).close();
+        assertThat(itf.addA17(channel17.output())).containsExactly(new int[]{'a', 'z'});
+        final StandaloneChannel<Character> channel18 = JRoutine.standalone().buildChannel();
+        channel18.input().pass('d', 'e', 'f').close();
+        assertThat(itf.addA18(channel18.output())).containsExactly(new int[]{'d', 'e', 'f'});
+        final StandaloneChannel<char[]> channel19 = JRoutine.standalone().buildChannel();
+        channel19.input()
+                 .pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'})
+                 .close();
+        assertThat(itf.addA19(channel19.output())).containsOnly(new int[]{'d', 'z'},
+                                                                new int[]{'e', 'z'},
+                                                                new int[]{'f', 'z'});
+        assertThat(itf.addL00(Arrays.asList('c', 'z'))).isEqualTo(
+                Arrays.asList((int) 'c', (int) 'z'));
+        final StandaloneChannel<List<Character>> channel20 = JRoutine.standalone().buildChannel();
+        channel20.input().pass(Arrays.asList('a', 'z')).close();
+        assertThat(itf.addL01(channel20.output())).isEqualTo(Arrays.asList((int) 'a', (int) 'z'));
+        final StandaloneChannel<Character> channel21 = JRoutine.standalone().buildChannel();
+        channel21.input().pass('d', 'e', 'f').close();
+        assertThat(itf.addL02(channel21.output())).isEqualTo(
+                Arrays.asList((int) 'd', (int) 'e', (int) 'f'));
+        final StandaloneChannel<List<Character>> channel22 = JRoutine.standalone().buildChannel();
+        channel22.input()
+                 .pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
+                 .close();
+        assertThat(itf.addL03(channel22.output())).isIn(Arrays.asList((int) 'd', (int) 'z'),
+                                                        Arrays.asList((int) 'e', (int) 'z'),
+                                                        Arrays.asList((int) 'f', (int) 'z'));
+        assertThat(itf.addL04(Arrays.asList('c', 'z')).readAll()).containsExactly(
+                Arrays.asList((int) 'c', (int) 'z'));
+        final StandaloneChannel<List<Character>> channel23 = JRoutine.standalone().buildChannel();
+        channel23.input().pass(Arrays.asList('a', 'z')).close();
+        assertThat(itf.addL05(channel23.output()).readAll()).containsExactly(
+                Arrays.asList((int) 'a', (int) 'z'));
+        final StandaloneChannel<Character> channel24 = JRoutine.standalone().buildChannel();
+        channel24.input().pass('d', 'e', 'f').close();
+        assertThat(itf.addL06(channel24.output()).readAll()).containsExactly(
+                Arrays.asList((int) 'd', (int) 'e', (int) 'f'));
+        final StandaloneChannel<List<Character>> channel25 = JRoutine.standalone().buildChannel();
+        channel25.input()
+                 .pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
+                 .close();
+        assertThat(itf.addL07(channel25.output()).readAll()).containsOnly(
+                Arrays.asList((int) 'd', (int) 'z'), Arrays.asList((int) 'e', (int) 'z'),
+                Arrays.asList((int) 'f', (int) 'z'));
+        assertThat(itf.addL08(Arrays.asList('c', 'z')).readAll()).containsExactly((int) 'c',
+                                                                                  (int) 'z');
+        final StandaloneChannel<List<Character>> channel26 = JRoutine.standalone().buildChannel();
+        channel26.input().pass(Arrays.asList('a', 'z')).close();
+        assertThat(itf.addL09(channel26.output()).readAll()).containsExactly((int) 'a', (int) 'z');
+        final StandaloneChannel<Character> channel27 = JRoutine.standalone().buildChannel();
+        channel27.input().pass('d', 'e', 'f').close();
+        assertThat(itf.addL10(channel27.output()).readAll()).containsExactly((int) 'd', (int) 'e',
+                                                                             (int) 'f');
+        final StandaloneChannel<List<Character>> channel28 = JRoutine.standalone().buildChannel();
+        channel28.input()
+                 .pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
+                 .close();
+        assertThat(itf.addL11(channel28.output()).readAll()).containsOnly((int) 'd', (int) 'e',
+                                                                          (int) 'f', (int) 'z');
+        assertThat(itf.addL12(Arrays.asList('c', 'z'))).containsExactly(
+                Arrays.asList((int) 'c', (int) 'z'));
+        final StandaloneChannel<List<Character>> channel29 = JRoutine.standalone().buildChannel();
+        channel29.input().pass(Arrays.asList('a', 'z')).close();
+        assertThat(itf.addL13(channel29.output())).containsExactly(
+                Arrays.asList((int) 'a', (int) 'z'));
+        final StandaloneChannel<Character> channel30 = JRoutine.standalone().buildChannel();
+        channel30.input().pass('d', 'e', 'f').close();
+        assertThat(itf.addL14(channel30.output())).containsExactly(
+                Arrays.asList((int) 'd', (int) 'e', (int) 'f'));
+        final StandaloneChannel<List<Character>> channel31 = JRoutine.standalone().buildChannel();
+        channel31.input()
+                 .pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
+                 .close();
+        assertThat(itf.addL15(channel31.output())).containsOnly(Arrays.asList((int) 'd', (int) 'z'),
+                                                                Arrays.asList((int) 'e', (int) 'z'),
+                                                                Arrays.asList((int) 'f',
+                                                                              (int) 'z'));
+        assertThat(itf.addL16(Arrays.asList('c', 'z'))).containsExactly(
+                Arrays.asList((int) 'c', (int) 'z'));
+        final StandaloneChannel<List<Character>> channel32 = JRoutine.standalone().buildChannel();
+        channel32.input().pass(Arrays.asList('a', 'z')).close();
+        assertThat(itf.addL17(channel32.output())).containsExactly(
+                Arrays.asList((int) 'a', (int) 'z'));
+        final StandaloneChannel<Character> channel33 = JRoutine.standalone().buildChannel();
+        channel33.input().pass('d', 'e', 'f').close();
+        assertThat(itf.addL18(channel33.output())).containsExactly(
+                Arrays.asList((int) 'd', (int) 'e', (int) 'f'));
+        final StandaloneChannel<List<Character>> channel34 = JRoutine.standalone().buildChannel();
+        channel34.input()
+                 .pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
+                 .close();
+        assertThat(itf.addL19(channel34.output())).containsOnly(Arrays.asList((int) 'd', (int) 'z'),
+                                                                Arrays.asList((int) 'e', (int) 'z'),
+                                                                Arrays.asList((int) 'f',
+                                                                              (int) 'z'));
+    }
+
+    @Test
     public void testRoutineBuilder() {
 
         final RoutineConfiguration configuration = builder().withSyncRunner(RunnerType.SEQUENTIAL)
@@ -1239,6 +1422,288 @@ public class JRoutineTest {
         assertThat(countLog.getWrnCount()).isEqualTo(7);
     }
 
+    public interface Itf {
+
+        @Bind("a")
+        int add0(char c);
+
+        @Bind("a")
+        int add1(@Pass(value = char.class, mode = PassingMode.OBJECT) OutputChannel<Character> c);
+
+        @Bind("a")
+        int add2(@Pass(value = char.class, mode = PassingMode.PARALLEL) OutputChannel<Character> c);
+
+        @Bind("a")
+        @Pass(value = int.class, mode = PassingMode.OBJECT)
+        OutputChannel<Integer> add3(char c);
+
+        @Bind("a")
+        @Pass(value = int.class, mode = PassingMode.OBJECT)
+        OutputChannel<Integer> add4(
+                @Pass(value = char.class, mode = PassingMode.OBJECT) OutputChannel<Character> c);
+
+        @Bind("a")
+        @Pass(value = int.class, mode = PassingMode.OBJECT)
+        OutputChannel<Integer> add5(
+                @Pass(value = char.class, mode = PassingMode.PARALLEL) OutputChannel<Character> c);
+
+        @Bind("aa")
+        int[] addA00(char[] c);
+
+        @Bind("aa")
+        int[] addA01(@Pass(value = char[].class,
+                mode = PassingMode.OBJECT) OutputChannel<char[]> c);
+
+        @Bind("aa")
+        int[] addA02(@Pass(value = char[].class,
+                mode = PassingMode.COLLECTION) OutputChannel<Character> c);
+
+        @Bind("aa")
+        int[] addA03(@Pass(value = char[].class,
+                mode = PassingMode.PARALLEL) OutputChannel<char[]> c);
+
+        @Bind("aa")
+        @Pass(value = int[].class, mode = PassingMode.OBJECT)
+        OutputChannel<int[]> addA04(char[] c);
+
+        @Bind("aa")
+        @Pass(value = int[].class, mode = PassingMode.OBJECT)
+        OutputChannel<int[]> addA05(
+                @Pass(value = char[].class, mode = PassingMode.OBJECT) OutputChannel<char[]> c);
+
+        @Bind("aa")
+        @Pass(value = int[].class, mode = PassingMode.OBJECT)
+        OutputChannel<int[]> addA06(@Pass(value = char[].class,
+                mode = PassingMode.COLLECTION) OutputChannel<Character> c);
+
+        @Bind("aa")
+        @Pass(value = int[].class, mode = PassingMode.OBJECT)
+        OutputChannel<int[]> addA07(@Pass(value = char[].class,
+                mode = PassingMode.PARALLEL) OutputChannel<char[]> c);
+
+        @Bind("aa")
+        @Pass(value = int[].class, mode = PassingMode.COLLECTION)
+        OutputChannel<Integer> addA08(char[] c);
+
+        @Bind("aa")
+        @Pass(value = int[].class, mode = PassingMode.COLLECTION)
+        OutputChannel<Integer> addA09(
+                @Pass(value = char[].class, mode = PassingMode.OBJECT) OutputChannel<char[]> c);
+
+        @Bind("aa")
+        @Pass(value = int[].class, mode = PassingMode.COLLECTION)
+        OutputChannel<Integer> addA10(@Pass(value = char[].class,
+                mode = PassingMode.COLLECTION) OutputChannel<Character> c);
+
+        @Bind("aa")
+        @Pass(value = int[].class, mode = PassingMode.COLLECTION)
+        OutputChannel<Integer> addA11(@Pass(value = char[].class,
+                mode = PassingMode.PARALLEL) OutputChannel<char[]> c);
+
+        @Bind("aa")
+        @Pass(value = int[].class, mode = PassingMode.PARALLEL)
+        List<int[]> addA12(char[] c);
+
+        @Bind("aa")
+        @Pass(value = int[].class, mode = PassingMode.PARALLEL)
+        List<int[]> addA13(
+                @Pass(value = char[].class, mode = PassingMode.OBJECT) OutputChannel<char[]> c);
+
+        @Bind("aa")
+        @Pass(value = int[].class, mode = PassingMode.PARALLEL)
+        List<int[]> addA14(@Pass(value = char[].class,
+                mode = PassingMode.COLLECTION) OutputChannel<Character> c);
+
+        @Bind("aa")
+        @Pass(value = int[].class, mode = PassingMode.PARALLEL)
+        List<int[]> addA15(@Pass(value = char[].class,
+                mode = PassingMode.PARALLEL) OutputChannel<char[]> c);
+
+        @Bind("aa")
+        @Pass(value = int[].class, mode = PassingMode.PARALLEL)
+        int[][] addA16(char[] c);
+
+        @Bind("aa")
+        @Pass(value = int[].class, mode = PassingMode.PARALLEL)
+        int[][] addA17(
+                @Pass(value = char[].class, mode = PassingMode.OBJECT) OutputChannel<char[]> c);
+
+        @Bind("aa")
+        @Pass(value = int[].class, mode = PassingMode.PARALLEL)
+        int[][] addA18(@Pass(value = char[].class,
+                mode = PassingMode.COLLECTION) OutputChannel<Character> c);
+
+        @Bind("aa")
+        @Pass(value = int[].class, mode = PassingMode.PARALLEL)
+        int[][] addA19(@Pass(value = char[].class,
+                mode = PassingMode.PARALLEL) OutputChannel<char[]> c);
+
+        @Bind("al")
+        List<Integer> addL00(List<Character> c);
+
+        @Bind("al")
+        List<Integer> addL01(@Pass(value = List.class,
+                mode = PassingMode.OBJECT) OutputChannel<List<Character>> c);
+
+        @Bind("al")
+        List<Integer> addL02(@Pass(value = List.class,
+                mode = PassingMode.COLLECTION) OutputChannel<Character> c);
+
+        @Bind("al")
+        List<Integer> addL03(@Pass(value = List.class,
+                mode = PassingMode.PARALLEL) OutputChannel<List<Character>> c);
+
+        @Bind("al")
+        @Pass(value = List.class, mode = PassingMode.OBJECT)
+        OutputChannel<List<Integer>> addL04(List<Character> c);
+
+        @Bind("al")
+        @Pass(value = List.class, mode = PassingMode.OBJECT)
+        OutputChannel<List<Integer>> addL05(@Pass(value = List.class,
+                mode = PassingMode.OBJECT) OutputChannel<List<Character>> c);
+
+        @Bind("al")
+        @Pass(value = List.class, mode = PassingMode.OBJECT)
+        OutputChannel<List<Integer>> addL06(@Pass(value = List.class,
+                mode = PassingMode.COLLECTION) OutputChannel<Character> c);
+
+        @Bind("al")
+        @Pass(value = List.class, mode = PassingMode.OBJECT)
+        OutputChannel<List<Integer>> addL07(@Pass(value = List.class,
+                mode = PassingMode.PARALLEL) OutputChannel<List<Character>> c);
+
+        @Bind("al")
+        @Pass(value = List.class, mode = PassingMode.COLLECTION)
+        OutputChannel<Integer> addL08(List<Character> c);
+
+        @Bind("al")
+        @Pass(value = List.class, mode = PassingMode.COLLECTION)
+        OutputChannel<Integer> addL09(@Pass(value = List.class,
+                mode = PassingMode.OBJECT) OutputChannel<List<Character>> c);
+
+        @Bind("al")
+        @Pass(value = List.class, mode = PassingMode.COLLECTION)
+        OutputChannel<Integer> addL10(@Pass(value = List.class,
+                mode = PassingMode.COLLECTION) OutputChannel<Character> c);
+
+        @Bind("al")
+        @Pass(value = List.class, mode = PassingMode.COLLECTION)
+        OutputChannel<Integer> addL11(@Pass(value = List.class,
+                mode = PassingMode.PARALLEL) OutputChannel<List<Character>> c);
+
+        @Bind("al")
+        @Pass(value = List.class, mode = PassingMode.PARALLEL)
+        List<List<Integer>> addL12(List<Character> c);
+
+        @Bind("al")
+        @Pass(value = List.class, mode = PassingMode.PARALLEL)
+        List<List<Integer>> addL13(@Pass(value = List.class,
+                mode = PassingMode.OBJECT) OutputChannel<List<Character>> c);
+
+        @Bind("al")
+        @Pass(value = List.class, mode = PassingMode.PARALLEL)
+        List<List<Integer>> addL14(@Pass(value = List.class,
+                mode = PassingMode.COLLECTION) OutputChannel<Character> c);
+
+        @Bind("al")
+        @Pass(value = List.class, mode = PassingMode.PARALLEL)
+        List<List<Integer>> addL15(@Pass(value = List.class,
+                mode = PassingMode.PARALLEL) OutputChannel<List<Character>> c);
+
+        @Bind("al")
+        @Pass(value = List.class, mode = PassingMode.PARALLEL)
+        List[] addL16(List<Character> c);
+
+        @Bind("al")
+        @Pass(value = List.class, mode = PassingMode.PARALLEL)
+        List[] addL17(@Pass(value = List.class,
+                mode = PassingMode.OBJECT) OutputChannel<List<Character>> c);
+
+        @Bind("al")
+        @Pass(value = List.class, mode = PassingMode.PARALLEL)
+        List[] addL18(@Pass(value = List.class,
+                mode = PassingMode.COLLECTION) OutputChannel<Character> c);
+
+        @Bind("al")
+        @Pass(value = List.class, mode = PassingMode.PARALLEL)
+        List[] addL19(@Pass(value = List.class,
+                mode = PassingMode.PARALLEL) OutputChannel<List<Character>> c);
+
+        @Bind("g")
+        int get0();
+
+        @Bind("s")
+        void set0(int i);
+
+        @Bind("g")
+        @Pass(value = int.class, mode = PassingMode.OBJECT)
+        OutputChannel<Integer> get1();
+
+        @Bind("s")
+        void set1(@Pass(value = int.class, mode = PassingMode.OBJECT) OutputChannel<Integer> i);
+
+        @Bind("ga")
+        int[] getA0();
+
+        @Bind("sa")
+        void setA0(int[] i);
+
+        @Bind("ga")
+        @Pass(value = int[].class, mode = PassingMode.COLLECTION)
+        OutputChannel<Integer> getA1();
+
+        @Bind("sa")
+        void setA1(@Pass(value = int[].class, mode = PassingMode.OBJECT) OutputChannel<int[]> i);
+
+        @Bind("ga")
+        @Pass(value = int[].class, mode = PassingMode.PARALLEL)
+        List<int[]> getA2();
+
+        @Bind("sa")
+        void setA2(
+                @Pass(value = int[].class, mode = PassingMode.COLLECTION) OutputChannel<Integer> i);
+
+        @Bind("ga")
+        @Pass(value = int[].class, mode = PassingMode.PARALLEL)
+        int[][] getA3();
+
+        @Bind("sa")
+        void setA3(@Pass(value = int[].class, mode = PassingMode.PARALLEL) OutputChannel<int[]> i);
+
+        @Bind("gl")
+        List<Integer> getL0();
+
+        @Bind("sl")
+        void setL0(List<Integer> i);
+
+        @Bind("gl")
+        @Pass(value = List.class, mode = PassingMode.COLLECTION)
+        OutputChannel<Integer> getL1();
+
+        @Bind("sl")
+        void setL1(@Pass(value = List.class,
+                mode = PassingMode.OBJECT) OutputChannel<List<Integer>> i);
+
+        @Bind("gl")
+        @Pass(value = List.class, mode = PassingMode.PARALLEL)
+        List<List<Integer>> getL2();
+
+        @Bind("sl")
+        void setL2(
+                @Pass(value = List.class, mode = PassingMode.COLLECTION) OutputChannel<Integer> i);
+
+        @Bind("gl")
+        @Pass(value = List.class, mode = PassingMode.PARALLEL)
+        List[] getL3();
+
+        @Bind("sl")
+        void setL3(@Pass(value = List.class,
+                mode = PassingMode.PARALLEL) OutputChannel<List<Integer>> i);
+
+        @Bind("s")
+        void set2(@Pass(value = int.class, mode = PassingMode.PARALLEL) OutputChannel<Integer> i);
+    }
+
     private interface CountError {
 
         @Pass(int.class)
@@ -1388,6 +1853,74 @@ public class JRoutineTest {
 
         @Bind(TestClass.THROW)
         int throwException2(RuntimeException ex);
+    }
+
+    public static class Impl {
+
+        @Bind("a")
+        public int add(char c) {
+
+            return c;
+        }
+
+        @Bind("aa")
+        public int[] addArray(char[] c) {
+
+            final int[] array = new int[c.length];
+
+            for (int i = 0; i < c.length; i++) {
+
+                array[i] = c[i];
+            }
+
+            return array;
+        }
+
+        @Bind("al")
+        public List<Integer> addList(List<Character> c) {
+
+            final ArrayList<Integer> list = new ArrayList<Integer>(c.size());
+
+            for (final Character character : c) {
+
+                list.add((int) character);
+            }
+
+            return list;
+        }
+
+        @Bind("g")
+        public int get() {
+
+            return 31;
+        }
+
+        @Bind("ga")
+        public int[] getArray() {
+
+            return new int[3];
+        }
+
+        @Bind("sa")
+        public void setArray(int[] i) {
+
+        }
+
+        @Bind("gl")
+        public List<Integer> getList() {
+
+            return Arrays.asList(1, 2, 3);
+        }
+
+        @Bind("sl")
+        public void setList(List<Integer> l) {
+
+        }
+
+        @Bind("s")
+        public void set(int i) {
+
+        }
     }
 
     @SuppressWarnings("UnusedDeclaration")

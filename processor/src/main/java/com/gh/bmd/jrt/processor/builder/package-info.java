@@ -12,8 +12,8 @@
  * limitations under the License.
  */
 /**
- * Processor annotation definitions.
+ * Classes and interfaces related to processor routine builders.
  * <p/>
- * Created by davide on 3/23/15.
+ * Created by davide on 3/25/14.
  */
-package com.gh.bmd.jrt.processor.annotation;
+package com.gh.bmd.jrt.processor.builder;

@@ -19,7 +19,6 @@ import com.gh.bmd.jrt.annotation.Pass.PassingMode;
 import com.gh.bmd.jrt.annotation.Share;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.builder.ObjectRoutineBuilder;
-import com.gh.bmd.jrt.builder.RoutineBuilders.Initializer;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
@@ -27,6 +26,7 @@ import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutAction;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ParameterChannel;
 import com.gh.bmd.jrt.common.ClassToken;
+import com.gh.bmd.jrt.common.WeakIdentityHashMap;
 import com.gh.bmd.jrt.time.TimeDuration;
 
 import java.lang.annotation.Annotation;
@@ -35,12 +35,12 @@ import java.lang.reflect.Array;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static com.gh.bmd.jrt.builder.RoutineBuilders.getProxiedMethod;
 import static com.gh.bmd.jrt.common.Reflection.boxingClass;
 import static com.gh.bmd.jrt.time.TimeDuration.fromUnit;
 
@@ -51,6 +51,9 @@ import static com.gh.bmd.jrt.time.TimeDuration.fromUnit;
  */
 class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
         implements ObjectRoutineBuilder {
+
+    private static final WeakIdentityHashMap<Object, HashMap<Method, Method>> sMethodCache =
+            new WeakIdentityHashMap<Object, HashMap<Method, Method>>();
 
     /**
      * Constructor.
@@ -519,8 +522,6 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
             PassingMode asyncParamMode = null;
             PassingMode asyncReturnMode = null;
 
-            Method targetMethod;
-
             Class<?> returnClass = null;
             final Pass methodAnnotation = method.getAnnotation(Pass.class);
 
@@ -550,57 +551,57 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
                 }
             }
 
-            targetMethod = getProxiedMethod(target, method);
+            Method targetMethod;
 
-            if (targetMethod == null) {
+            synchronized (sMethodCache) {
 
-                final PassingMode returnMode = asyncReturnMode;
-                final Class<?> annotationReturnType = returnClass;
-                targetMethod = getProxiedMethod(target, method, new Initializer<Method>() {
+                final WeakIdentityHashMap<Object, HashMap<Method, Method>> methodCache =
+                        sMethodCache;
+                HashMap<Method, Method> methodMap = methodCache.get(target);
 
-                    @Nonnull
-                    public Method initialValue() {
+                if (methodMap == null) {
 
-                        final Method targetMethod;
+                    methodMap = new HashMap<Method, Method>();
+                    methodCache.put(target, methodMap);
+                }
 
-                        try {
+                targetMethod = methodMap.get(method);
 
-                            targetMethod = getTargetMethod(method, targetParameterTypes);
+                if (targetMethod == null) {
 
-                        } catch (final NoSuchMethodException e) {
+                    try {
 
-                            throw new IllegalArgumentException(e);
-                        }
+                        targetMethod = getTargetMethod(method, targetParameterTypes);
 
-                        final Class<?> targetReturnType = targetMethod.getReturnType();
-                        boolean isError = false;
+                    } catch (final NoSuchMethodException e) {
 
-                        if (methodAnnotation == null) {
-
-                            isError = !returnType.isAssignableFrom(targetReturnType);
-
-                        } else {
-
-                            if ((returnMode == PassingMode.PARALLEL) && returnType.isArray()) {
-
-                                isError = !boxingClass(
-                                        returnType.getComponentType()).isAssignableFrom(
-                                        boxingClass(targetReturnType));
-                            }
-
-                            isError |= !annotationReturnType.isAssignableFrom(targetReturnType);
-                        }
-
-                        if (isError) {
-
-                            throw new IllegalArgumentException(
-                                    "the bound method has incompatible return type: "
-                                            + targetMethod);
-                        }
-
-                        return targetMethod;
+                        throw new IllegalArgumentException(e);
                     }
-                });
+
+                    final Class<?> targetReturnType = targetMethod.getReturnType();
+                    boolean isError = false;
+
+                    if (methodAnnotation == null) {
+
+                        isError = !returnType.isAssignableFrom(targetReturnType);
+
+                    } else {
+
+                        if ((asyncReturnMode == PassingMode.PARALLEL) && returnType.isArray()) {
+
+                            isError = !boxingClass(returnType.getComponentType()).isAssignableFrom(
+                                    boxingClass(targetReturnType));
+                        }
+
+                        isError |= !returnClass.isAssignableFrom(targetReturnType);
+                    }
+
+                    if (isError) {
+
+                        throw new IllegalArgumentException(
+                                "the bound method has incompatible return type: " + targetMethod);
+                    }
+                }
             }
 
             final Routine<Object, Object> routine =

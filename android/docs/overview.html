@@ -7,5 +7,180 @@ Parallel programming on the go.
 <p>
     Android platform customization of the <a href="http://davide-maestroni.github.io/jroutine/javadocs/overview-summary.html">jroutine</a> library.
 </p>
+<p>
+    The code below shows how it is possible to load an image from the network in a background thread, by letting automatically handle any change in the configuration.
+</p>
+<b>Example 1:</b> simple approach.
+<p>
+    Note that this approach is fairly naive, since it lets the framework retain the instance of the downloaded bitmap.<br/>
+    A smarter implementation would involve the use of a dedicated cache.
+</p>
+<pre>
+    <code>
+        public class MainActivity extends Activity {
+
+            private static final String IMAGE_URI = "http://...";
+
+            &commat;Override
+            protected void onCreate(final Bundle savedInstanceState) {
+
+                super.onCreate(savedInstanceState);
+                setContentView(R.layout.main_layout);
+
+                try {
+
+                    final ImageView imageView = (ImageView) findViewById(R.id.image);
+                    JRoutine.onActivity(this, ClassToken.tokenOf(LoadBitmap.class))
+                            .onComplete(CacheStrategy.CACHE_IF_SUCCESS)
+                            .callAsync(new URI(IMAGE_URI))
+                            .bind(new TemplateOutputConsumer&lt;Bitmap&gt;() {
+
+                                &commat;Override
+                                public void onError(&commat;Nullable final Throwable error) {
+
+                                    Toast.makeText(MainTestActivity.this, (error != null) ? error.getMessage()
+                                            : "Cannot load image", Toast.LENGTH_LONG).show();
+                                }
+
+                                &commat;Override
+                                public void onOutput(final Bitmap bitmap) {
+
+                                    imageView.setImageBitmap(bitmap);
+                                }
+                            });
+
+                } catch (final URISyntaxException ignored) {
+
+                }
+            }
+
+            private static class LoadBitmap extends AndroidTemplateInvocation&lt;URI, Bitmap&gt; {
+
+                &commat;Override
+                public void onInput(final URI uri, &commat;Nonnull final ResultChannel&lt;Bitmap&gt; result) {
+
+                    try {
+
+                        final InputStream stream = uri.toURL().openConnection().getInputStream();
+                        final Bitmap bitmap = BitmapFactory.decodeStream(stream);
+
+                        if (bitmap != null) {
+
+                            result.pass(bitmap);
+
+                        } else {
+
+                            result.abort();
+                        }
+
+                    } catch (final IOException e) {
+
+                        throw new InvocationException(e);
+
+                    } catch (final InterruptedException e) {
+
+                        throw new InvocationInterruptedException(e);
+                    }
+                }
+            }
+        }
+    </code>
+</pre>
+<b>Example 2:</b> load in a service.
+<p>
+    The above example can be slightly modified to make the real loading happen in a dedicated service.<br/>
+    Note that the service might even run in a separate process, since the Bitmap class implements the Parcelable interface. However, keep in mind that, depending on the specific image size, the amount of serialized data might exceed the parcel limits.
+</p>
+<pre>
+    <code>
+        public class MainActivity extends Activity {
+
+            private static final String IMAGE_URI = "http://...";
+
+            &commat;Override
+            protected void onCreate(final Bundle savedInstanceState) {
+
+                super.onCreate(savedInstanceState);
+                setContentView(R.layout.main_layout);
+
+                try {
+
+                    final ImageView imageView = (ImageView) findViewById(R.id.image);
+                    JRoutine.onActivity(this, ClassToken.tokenOf(LoadBitmapFromService.class))
+                            .onComplete(CacheStrategy.CACHE_IF_SUCCESS)
+                            .callAsync(new URI(IMAGE_URI))
+                            .bind(new TemplateOutputConsumer&lt;Bitmap&gt;() {
+
+                                &commat;Override
+                                public void onError(&commat;Nullable final Throwable error) {
+
+                                    Toast.makeText(MainTestActivity.this, (error != null) ? error.getMessage()
+                                            : "Cannot load image", Toast.LENGTH_LONG).show();
+                                }
+
+                                &commat;Override
+                                public void onOutput(final Bitmap bitmap) {
+
+                                    imageView.setImageBitmap(bitmap);
+                                }
+                            });
+
+                } catch (final URISyntaxException ignored) {
+
+                }
+            }
+
+            private static class LoadBitmap extends AndroidTemplateInvocation&lt;URI, Bitmap&gt; {
+
+                &commat;Override
+                public void onInput(final URI uri, &commat;Nonnull final ResultChannel&lt;Bitmap&gt; result) {
+
+                    try {
+
+                        final InputStream stream = uri.toURL().openConnection().getInputStream();
+                        final Bitmap bitmap = BitmapFactory.decodeStream(stream);
+
+                        if (bitmap != null) {
+
+                            result.pass(bitmap);
+
+                        } else {
+
+                            result.abort();
+                        }
+
+                    } catch (final IOException e) {
+
+                        throw new InvocationException(e);
+
+                    } catch (final InterruptedException e) {
+
+                        throw new InvocationInterruptedException(e);
+                    }
+                }
+            }
+
+            private static class LoadBitmapFromService extends AndroidTemplateInvocation&lt;URI, Bitmap&gt; {
+
+                private Routine&lt;URI, Bitmap&gt; mRoutine;
+
+                &commat;Override
+                public void onContext(&commat;Nonnull final Context context) {
+
+                    super.onContext(context);
+
+                    mRoutine = JRoutine.onService(getContext(), ClassToken.tokenOf(LoadBitmap.class))
+                                       .buildRoutine();
+                }
+
+                &commat;Override
+                public void onInput(final URI uri, &commat;Nonnull final ResultChannel&lt;Bitmap&gt; result) {
+
+                    result.pass(mRoutine.callAsync(uri));
+                }
+            }
+        }
+    </code>
+</pre>
 </body>
 </html>

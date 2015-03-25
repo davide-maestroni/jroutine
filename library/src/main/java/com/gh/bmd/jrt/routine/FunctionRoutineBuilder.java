@@ -88,6 +88,14 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
                     public void onCall(@Nonnull final List<? extends Void> inputs,
                             @Nonnull final ResultChannel<OUTPUT> result) {
 
+                        if (inputs.size() != 0) {
+
+                            throw new IllegalArgumentException(
+                                    "[" + function.getClass().getCanonicalName() +
+                                            "] wrong number of input parameters: was "
+                                            + inputs.size() + " while expected 0");
+                        }
+
                         result.pass(function.call());
                     }
                 };
@@ -127,6 +135,14 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
                     @SuppressWarnings("unchecked")
                     public void onCall(@Nonnull final List<? extends INPUT> inputs,
                             @Nonnull final ResultChannel<OUTPUT> result) {
+
+                        if (inputs.size() != 1) {
+
+                            throw new IllegalArgumentException(
+                                    "[" + function.getClass().getCanonicalName() +
+                                            "] wrong number of input parameters: was "
+                                            + inputs.size() + " while expected 1");
+                        }
 
                         result.pass(function.call((INPUT1) inputs.get(0)));
                     }
@@ -171,6 +187,14 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
                     public void onCall(@Nonnull final List<? extends INPUT> inputs,
                             @Nonnull final ResultChannel<OUTPUT> result) {
 
+                        if (inputs.size() != 2) {
+
+                            throw new IllegalArgumentException(
+                                    "[" + function.getClass().getCanonicalName() +
+                                            "] wrong number of input parameters: was "
+                                            + inputs.size() + " while expected 2");
+                        }
+
                         result.pass(function.call((INPUT1) inputs.get(0), (INPUT2) inputs.get(1)));
                     }
                 };
@@ -214,6 +238,14 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
                     @SuppressWarnings("unchecked")
                     public void onCall(@Nonnull final List<? extends INPUT> inputs,
                             @Nonnull final ResultChannel<OUTPUT> result) {
+
+                        if (inputs.size() != 3) {
+
+                            throw new IllegalArgumentException(
+                                    "[" + function.getClass().getCanonicalName() +
+                                            "] wrong number of input parameters: was "
+                                            + inputs.size() + " while expected 3");
+                        }
 
                         result.pass(function.call((INPUT1) inputs.get(0), (INPUT2) inputs.get(1),
                                                   (INPUT3) inputs.get(2)));
@@ -260,6 +292,14 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
                     @SuppressWarnings("unchecked")
                     public void onCall(@Nonnull final List<? extends INPUT> inputs,
                             @Nonnull final ResultChannel<OUTPUT> result) {
+
+                        if (inputs.size() != 4) {
+
+                            throw new IllegalArgumentException(
+                                    "[" + function.getClass().getCanonicalName() +
+                                            "] wrong number of input parameters: was "
+                                            + inputs.size() + " while expected 4");
+                        }
 
                         result.pass(function.call((INPUT1) inputs.get(0), (INPUT2) inputs.get(1),
                                                   (INPUT3) inputs.get(2), (INPUT4) inputs.get(3)));
@@ -341,6 +381,14 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
                     public void onCall(@Nonnull final List<? extends Void> inputs,
                             @Nonnull final ResultChannel<Void> result) {
 
+                        if (inputs.size() != 0) {
+
+                            throw new IllegalArgumentException(
+                                    "[" + procedure.getClass().getCanonicalName() +
+                                            "] wrong number of input parameters: was "
+                                            + inputs.size() + " while expected 0");
+                        }
+
                         procedure.call();
                     }
                 };
@@ -380,6 +428,14 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
                     @SuppressWarnings("unchecked")
                     public void onCall(@Nonnull final List<? extends INPUT> inputs,
                             @Nonnull final ResultChannel<Void> result) {
+
+                        if (inputs.size() != 1) {
+
+                            throw new IllegalArgumentException(
+                                    "[" + procedure.getClass().getCanonicalName() +
+                                            "] wrong number of input parameters: was "
+                                            + inputs.size() + " while expected 1");
+                        }
 
                         procedure.call((INPUT1) inputs.get(0));
                     }
@@ -424,6 +480,14 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
                     public void onCall(@Nonnull final List<? extends INPUT> inputs,
                             @Nonnull final ResultChannel<Void> result) {
 
+                        if (inputs.size() != 2) {
+
+                            throw new IllegalArgumentException(
+                                    "[" + procedure.getClass().getCanonicalName() +
+                                            "] wrong number of input parameters: was "
+                                            + inputs.size() + " while expected 2");
+                        }
+
                         procedure.call((INPUT1) inputs.get(0), (INPUT2) inputs.get(1));
                     }
                 };
@@ -467,6 +531,14 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
                     @SuppressWarnings("unchecked")
                     public void onCall(@Nonnull final List<? extends INPUT> inputs,
                             @Nonnull final ResultChannel<Void> result) {
+
+                        if (inputs.size() != 3) {
+
+                            throw new IllegalArgumentException(
+                                    "[" + procedure.getClass().getCanonicalName() +
+                                            "] wrong number of input parameters: was "
+                                            + inputs.size() + " while expected 3");
+                        }
 
                         procedure.call((INPUT1) inputs.get(0), (INPUT2) inputs.get(1),
                                        (INPUT3) inputs.get(2));
@@ -513,6 +585,14 @@ class FunctionRoutineBuilder<INPUT, OUTPUT> extends DefaultRoutineBuilder<INPUT,
                     @SuppressWarnings("unchecked")
                     public void onCall(@Nonnull final List<? extends INPUT> inputs,
                             @Nonnull final ResultChannel<Void> result) {
+
+                        if (inputs.size() != 4) {
+
+                            throw new IllegalArgumentException(
+                                    "[" + procedure.getClass().getCanonicalName() +
+                                            "] wrong number of input parameters: was "
+                                            + inputs.size() + " while expected 4");
+                        }
 
                         procedure.call((INPUT1) inputs.get(0), (INPUT2) inputs.get(1),
                                        (INPUT3) inputs.get(2), (INPUT4) inputs.get(3));

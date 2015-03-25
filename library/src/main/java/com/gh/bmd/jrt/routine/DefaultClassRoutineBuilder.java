@@ -80,7 +80,8 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
 
         if (targetClass.isInterface()) {
 
-            throw new IllegalArgumentException("the target class must not be an interface");
+            throw new IllegalArgumentException(
+                    "the target class must not be an interface: " + targetClass.getCanonicalName());
         }
 
         mTargetClass = targetClass;

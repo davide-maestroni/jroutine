@@ -127,7 +127,7 @@ public class Time {
 
         if ((days > MAX_DAYS) || (days < -MAX_DAYS)) {
 
-            throw new IllegalArgumentException("time value overflow");
+            throw new IllegalArgumentException("time value overflow: " + days + " days");
         }
 
         return new Time(days * SECONDS_IN_DAY, TimeUnit.SECONDS);
@@ -165,7 +165,7 @@ public class Time {
 
         if ((hours > MAX_HOURS) || (hours < -MAX_HOURS)) {
 
-            throw new IllegalArgumentException("time value overflow");
+            throw new IllegalArgumentException("time value overflow: " + hours + " hours");
         }
 
         return new Time(hours * SECONDS_IN_HOUR, TimeUnit.SECONDS);
@@ -206,7 +206,7 @@ public class Time {
 
         if ((minutes > MAX_MINUTES) || (minutes < -MAX_MINUTES)) {
 
-            throw new IllegalArgumentException("time value overflow");
+            throw new IllegalArgumentException("time value overflow: " + minutes + " minutes");
         }
 
         return new Time(minutes * SECONDS_IN_MINUTE, TimeUnit.SECONDS);

@@ -56,7 +56,7 @@ public class TimeDuration extends Time {
 
         if (duration < 0) {
 
-            throw new IllegalArgumentException("the time duration cannot be negative");
+            throw new IllegalArgumentException("the time duration cannot be negative: " + duration);
         }
     }
 
@@ -72,7 +72,7 @@ public class TimeDuration extends Time {
 
         if ((days > MAX_DAYS) || (days < -MAX_DAYS)) {
 
-            throw new IllegalArgumentException("time value overflow");
+            throw new IllegalArgumentException("time value overflow: " + days + " days");
         }
 
         return new TimeDuration(days * SECONDS_IN_DAY, TimeUnit.SECONDS);
@@ -112,7 +112,7 @@ public class TimeDuration extends Time {
 
         if ((hours > MAX_HOURS) || (hours < -MAX_HOURS)) {
 
-            throw new IllegalArgumentException("time value overflow");
+            throw new IllegalArgumentException("time value overflow: " + hours + " hours");
         }
 
         return new TimeDuration(hours * SECONDS_IN_HOUR, TimeUnit.SECONDS);
@@ -156,7 +156,7 @@ public class TimeDuration extends Time {
 
         if ((minutes > MAX_MINUTES) || (minutes < -MAX_MINUTES)) {
 
-            throw new IllegalArgumentException("time value overflow");
+            throw new IllegalArgumentException("time value overflow: " + minutes + " minutes");
         }
 
         return new TimeDuration(minutes * SECONDS_IN_MINUTE, TimeUnit.SECONDS);
@@ -353,7 +353,8 @@ public class TimeDuration extends Time {
 
         if (toDays() > MILLI_DAYS_OVERFLOW) {
 
-            throw new IllegalStateException("the duration overflows the maximum sleep time");
+            throw new IllegalStateException("the duration overflows the maximum sleep time: " +
+                                                    toDays() + " days");
         }
 
         final long millisToSleep = milliTime - System.currentTimeMillis() + toMillis();
@@ -387,7 +388,8 @@ public class TimeDuration extends Time {
 
         if (toDays() > NANO_DAYS_OVERFLOW) {
 
-            throw new IllegalStateException("the duration overflows the maximum sleep time");
+            throw new IllegalStateException("the duration overflows the maximum sleep time: " +
+                                                    toDays() + " days");
         }
 
         final long nanosToSleep = nanoTime - System.nanoTime() + toNanos();

@@ -117,7 +117,7 @@ public class Runners extends com.gh.bmd.jrt.runner.Runners {
      * especially on some platform versions.
      * <p/>
      * Note also that the executor instance will be ignored on platforms with API level less than
-     * HONEYCOMB.
+     * {@value android.os.Build.VERSION_CODES#HONEYCOMB}.
      *
      * @param executor the executor.
      * @return the runner instance.

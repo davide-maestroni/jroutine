@@ -975,7 +975,8 @@ public class RoutineConfiguration {
             if ((coreInvocations != DEFAULT) && (coreInvocations < 0)) {
 
                 throw new IllegalArgumentException(
-                        "the maximum number of retained instances cannot be negative");
+                        "the maximum number of retained instances cannot be negative: "
+                                + coreInvocations);
             }
 
             mCoreInvocations = coreInvocations;
@@ -1010,7 +1011,8 @@ public class RoutineConfiguration {
 
             if ((inputMaxSize != DEFAULT) && (inputMaxSize <= 0)) {
 
-                throw new IllegalArgumentException("the input buffer size cannot be 0 or negative");
+                throw new IllegalArgumentException(
+                        "the input buffer size cannot be 0 or negative: " + inputMaxSize);
             }
 
             mInputMaxSize = inputMaxSize;
@@ -1090,7 +1092,7 @@ public class RoutineConfiguration {
 
                 throw new IllegalArgumentException(
                         "the maximum number of concurrently running instances cannot be less than"
-                                + " 1");
+                                + " 1: " + maxInvocations);
             }
 
             mMaxInvocations = maxInvocations;
@@ -1126,7 +1128,7 @@ public class RoutineConfiguration {
             if ((outputMaxSize != DEFAULT) && (outputMaxSize <= 0)) {
 
                 throw new IllegalArgumentException(
-                        "the output buffer size cannot be 0 or negative");
+                        "the output buffer size cannot be 0 or negative: " + outputMaxSize);
             }
 
             mOutputMaxSize = outputMaxSize;

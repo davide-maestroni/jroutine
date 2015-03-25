@@ -129,7 +129,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  *     </code>
  * </pre>
  * <p/>
- * See {@link com.gh.bmd.jrt.android.v4.routine.JRoutine} for pre-HONEYCOMB support.
+ * See {@link com.gh.bmd.jrt.android.v4.routine.JRoutine} for support of API levels less than
+ * {@value android.os.Build.VERSION_CODES#HONEYCOMB}.
  * <p/>
  * Created by davide on 12/8/14.
  */

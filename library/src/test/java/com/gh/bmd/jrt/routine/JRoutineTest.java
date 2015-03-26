@@ -396,6 +396,217 @@ public class JRoutineTest {
     }
 
     @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testFunctionBuilderError() {
+
+        try {
+
+            JRoutine.onFunction((Function0<Object>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.onFunction(new Function0<Object>() {
+
+                public Object call() {
+
+                    return null;
+                }
+            }).callAsync((Void) null).eventually().readAll();
+
+            fail();
+
+        } catch (final InvocationException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.onFunction((Function1<Object, Object>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.onFunction(new Function1<Object, Object>() {
+
+                public Object call(final Object param1) {
+
+                    return null;
+                }
+            }).callAsync().eventually().readAll();
+
+            fail();
+
+        } catch (final InvocationException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.onFunction(new Function1<Object, Object>() {
+
+                public Object call(final Object param1) {
+
+                    return null;
+                }
+            }).callAsync(1, 2).eventually().readAll();
+
+            fail();
+
+        } catch (final InvocationException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.onFunction((Function2<Object, Object, Object>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.onFunction(new Function2<Object, Object, Object>() {
+
+                public Object call(final Object param1, final Object param2) {
+
+                    return null;
+                }
+            }).callAsync(1).eventually().readAll();
+
+            fail();
+
+        } catch (final InvocationException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.onFunction(new Function2<Object, Object, Object>() {
+
+                public Object call(final Object param1, final Object param2) {
+
+                    return null;
+                }
+            }).callAsync(1, 2, 3).eventually().readAll();
+
+            fail();
+
+        } catch (final InvocationException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.onFunction((Function3<Object, Object, Object, Object>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.onFunction(new Function3<Object, Object, Object, Object>() {
+
+                public Object call(final Object param1, final Object param2, final Object param3) {
+
+                    return null;
+                }
+            }).callAsync(1, 2).eventually().readAll();
+
+            fail();
+
+        } catch (final InvocationException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.onFunction(new Function3<Object, Object, Object, Object>() {
+
+                public Object call(final Object param1, final Object param2, final Object param3) {
+
+                    return null;
+                }
+            }).callAsync(1, 2, 3, 4).eventually().readAll();
+
+            fail();
+
+        } catch (final InvocationException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.onFunction((Function4<Object, Object, Object, Object, Object>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.onFunction(new Function4<Object, Object, Object, Object, Object>() {
+
+                public Object call(final Object param1, final Object param2, final Object param3,
+                        final Object param4) {
+
+                    return null;
+                }
+            }).callAsync(1, 2, 3).eventually().readAll();
+
+            fail();
+
+        } catch (final InvocationException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.onFunction(new Function4<Object, Object, Object, Object, Object>() {
+
+                public Object call(final Object param1, final Object param2, final Object param3,
+                        final Object param4) {
+
+                    return null;
+                }
+            }).callAsync(1, 2, 3, 4, 5).eventually().readAll();
+
+            fail();
+
+        } catch (final InvocationException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.onFunction((FunctionN<Object, Object>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
     public void testObjectRoutineBuilder() throws NoSuchMethodException {
 
         final TimeDuration timeout = seconds(1);
@@ -1016,6 +1227,217 @@ public class JRoutineTest {
     }
 
     @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testProcedureBuilderError() {
+
+        try {
+
+            JRoutine.onProcedure((Function0<Void>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.onProcedure(new Function0<Void>() {
+
+                public Void call() {
+
+                    return null;
+                }
+            }).callAsync((Void) null).eventually().readAll();
+
+            fail();
+
+        } catch (final InvocationException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.onProcedure((Function1<Object, Void>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.onProcedure(new Function1<Object, Void>() {
+
+                public Void call(final Object param1) {
+
+                    return null;
+                }
+            }).callAsync().eventually().readAll();
+
+            fail();
+
+        } catch (final InvocationException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.onProcedure(new Function1<Object, Void>() {
+
+                public Void call(final Object param1) {
+
+                    return null;
+                }
+            }).callAsync(1, 2).eventually().readAll();
+
+            fail();
+
+        } catch (final InvocationException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.onProcedure((Function2<Object, Object, Void>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.onProcedure(new Function2<Object, Object, Void>() {
+
+                public Void call(final Object param1, final Object param2) {
+
+                    return null;
+                }
+            }).callAsync(1).eventually().readAll();
+
+            fail();
+
+        } catch (final InvocationException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.onProcedure(new Function2<Object, Object, Void>() {
+
+                public Void call(final Object param1, final Object param2) {
+
+                    return null;
+                }
+            }).callAsync(1, 2, 3).eventually().readAll();
+
+            fail();
+
+        } catch (final InvocationException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.onProcedure((Function3<Object, Object, Object, Void>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.onProcedure(new Function3<Object, Object, Object, Void>() {
+
+                public Void call(final Object param1, final Object param2, final Object param3) {
+
+                    return null;
+                }
+            }).callAsync(1, 2).eventually().readAll();
+
+            fail();
+
+        } catch (final InvocationException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.onProcedure(new Function3<Object, Object, Object, Void>() {
+
+                public Void call(final Object param1, final Object param2, final Object param3) {
+
+                    return null;
+                }
+            }).callAsync(1, 2, 3, 4).eventually().readAll();
+
+            fail();
+
+        } catch (final InvocationException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.onProcedure((Function4<Object, Object, Object, Object, Void>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.onProcedure(new Function4<Object, Object, Object, Object, Void>() {
+
+                public Void call(final Object param1, final Object param2, final Object param3,
+                        final Object param4) {
+
+                    return null;
+                }
+            }).callAsync(1, 2, 3).eventually().readAll();
+
+            fail();
+
+        } catch (final InvocationException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.onProcedure(new Function4<Object, Object, Object, Object, Void>() {
+
+                public Void call(final Object param1, final Object param2, final Object param3,
+                        final Object param4) {
+
+                    return null;
+                }
+            }).callAsync(1, 2, 3, 4, 5).eventually().readAll();
+
+            fail();
+
+        } catch (final InvocationException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.onProcedure((FunctionN<Object, Void>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
     @SuppressWarnings("unchecked")
     public void testProxyAnnotations() {
 
@@ -1243,126 +1665,6 @@ public class JRoutineTest {
         try {
 
             new DefaultRoutineBuilder<String, String>(null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            JRoutine.onFunction((Function0<Object>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            JRoutine.onFunction((Function1<Object, Object>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            JRoutine.onFunction((Function2<Object, Object, Object>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            JRoutine.onFunction((Function3<Object, Object, Object, Object>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            JRoutine.onFunction((Function4<Object, Object, Object, Object, Object>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            JRoutine.onFunction((FunctionN<Object, Object>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            JRoutine.onProcedure((Function0<Void>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            JRoutine.onProcedure((Function1<Object, Void>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            JRoutine.onProcedure((Function2<Object, Object, Void>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            JRoutine.onProcedure((Function3<Object, Object, Object, Void>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            JRoutine.onProcedure((Function4<Object, Object, Object, Object, Void>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            JRoutine.onProcedure((FunctionN<Object, Void>) null);
 
             fail();
 

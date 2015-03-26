@@ -295,4 +295,31 @@ public class SimpleNestedQueueTest {
 
         assertThat(list).containsExactly(13, 7, 11, 5, -77, -33, 1);
     }
+
+    @Test
+    public void testMove2() {
+
+        final OrderedNestedQueue<Integer> queue = new OrderedNestedQueue<Integer>();
+
+        queue.add(13);
+        final NestedQueue<Integer> nested0 = queue.addNested();
+        queue.add(7);
+        final NestedQueue<Integer> nested1 = queue.addNested();
+        nested1.addAll(Arrays.asList(11, 5));
+        final NestedQueue<Integer> nested2 = nested1.addNested();
+        nested2.add(-77);
+        final NestedQueue<Integer> nested3 = nested2.addNested();
+        nested3.add(-33);
+        queue.add(1);
+
+        nested0.close();
+        nested1.close();
+        nested2.close();
+        nested3.close();
+
+        final ArrayList<Integer> list = new ArrayList<Integer>();
+
+        queue.moveTo(list);
+        assertThat(list).containsExactly(13, 7, 11, 5, -77, -33, 1);
+    }
 }

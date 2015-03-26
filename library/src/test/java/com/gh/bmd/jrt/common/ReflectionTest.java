@@ -49,6 +49,12 @@ public class ReflectionTest {
 
         assertThat(Reflection.findConstructor(TestClass.class)).isNotNull();
         assertThat(Reflection.findConstructor(TestClass.class, "test")).isNotNull();
+        assertThat(
+                Reflection.findConstructor(TestClass.class, new ArrayList<String>())).isNotNull();
+    }
+
+    @Test
+    public void testConstructorError() {
 
         try {
 
@@ -59,23 +65,28 @@ public class ReflectionTest {
         } catch (final IllegalArgumentException ignored) {
 
         }
+    }
+
+    @Test
+    public void testConstructorNullParamError() {
 
         try {
 
-            Reflection.findConstructor(TestClass.class, "test", 4);
+            Reflection.findConstructor(TestClass.class, (Object) null);
 
             fail();
 
         } catch (final IllegalArgumentException ignored) {
 
         }
+    }
 
-        assertThat(
-                Reflection.findConstructor(TestClass.class, new ArrayList<String>())).isNotNull();
+    @Test
+    public void testConstructorParamNumberError() {
 
         try {
 
-            Reflection.findConstructor(TestClass.class, (Object) null);
+            Reflection.findConstructor(TestClass.class, "test", 4);
 
             fail();
 

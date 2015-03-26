@@ -25,16 +25,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ExceptionTest {
 
     @Test
-    public void testExceptions() {
+    public void testAbortException() {
+
+        assertThat(new AbortException(new NullPointerException()).getCause()).isExactlyInstanceOf(
+                NullPointerException.class);
+        assertThat(new AbortException(null)).hasNoCause();
+    }
+
+    @Test
+    public void testDeadlockException() {
 
         assertThat(new DeadlockException("")).hasNoCause();
     }
 
     @Test
-    public void testRoutineException() {
+    public void testInvocationException() {
 
-        assertThat(new InvocationException(new NullPointerException())).isExactlyInstanceOf(
-                InvocationException.class);
         assertThat(
                 new InvocationException(new NullPointerException()).getCause()).isExactlyInstanceOf(
                 NullPointerException.class);
@@ -44,9 +50,6 @@ public class ExceptionTest {
     @Test
     public void testRoutineInterruptedException() {
 
-        assertThat(
-                new InvocationInterruptedException(new InterruptedException())).isExactlyInstanceOf(
-                InvocationInterruptedException.class);
         assertThat(new InvocationInterruptedException(
                 new InterruptedException()).getCause()).isExactlyInstanceOf(
                 InterruptedException.class);

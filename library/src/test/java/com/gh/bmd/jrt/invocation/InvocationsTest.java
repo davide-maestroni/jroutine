@@ -31,27 +31,37 @@ import static org.junit.Assert.fail;
 public class InvocationsTest {
 
     @Test
-    @SuppressWarnings({"NullArgumentToVariableArgMethod", "ConstantConditions"})
+    @SuppressWarnings("NullArgumentToVariableArgMethod")
     public void testInvocationFactory() {
 
         final InvocationFactory<Object, Object> factory =
                 Invocations.withArgs((Object[]) null).factoryOf(TestInvocation.class);
 
         assertThat(factory.newInvocation()).isExactlyInstanceOf(TestInvocation.class);
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testNullClassError() {
 
         try {
 
-            Invocations.factoryOf((ClassToken<TestInvocation>) null);
+            Invocations.factoryOf((Class<TestInvocation>) null);
 
             fail();
 
         } catch (final NullPointerException ignored) {
 
         }
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testNullTokenError() {
 
         try {
 
-            Invocations.factoryOf((Class<TestInvocation>) null);
+            Invocations.factoryOf((ClassToken<TestInvocation>) null);
 
             fail();
 

@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh.bmd.jrt.routine;
+package com.gh.bmd.jrt.builder;
 
 import org.junit.Test;
 
@@ -20,13 +20,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Exception unit tests.
  * <p/>
- * Created by davide on 10/3/14.
+ * Created by davide on 3/26/15.
  */
 public class ExceptionTest {
 
     @Test
-    public void testExceptions() {
+    public void testInputDeadlockException() {
 
-        assertThat(new RoutineDeadlockException("")).hasNoCause();
+        assertThat(new InputDeadlockException("")).hasNoCause();
+    }
+
+    @Test
+    public void testOutputDeadlockException() {
+
+        assertThat(new OutputDeadlockException("")).hasNoCause();
     }
 }

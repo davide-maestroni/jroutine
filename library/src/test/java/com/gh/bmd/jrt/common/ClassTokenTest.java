@@ -29,6 +29,18 @@ import static org.junit.Assert.fail;
 public class ClassTokenTest {
 
     @Test
+    @SuppressWarnings("EqualsBetweenInconvertibleTypes")
+    public void testArrayListType() {
+
+        final ClassToken<String> classToken1 = new ClassToken<String>() {};
+        final ClassToken<ArrayList<String>> classToken2 = new ClassToken<ArrayList<String>>() {};
+
+        assertThat(classToken2.getGenericType()).isNotEqualTo(ArrayList.class);
+        assertThat(ArrayList.class.equals(classToken2.getRawClass())).isTrue();
+        assertThat(classToken1.isInterface()).isFalse();
+    }
+
+    @Test
     public void testCast() {
 
         final ClassToken<List<Integer>> classToken = new ClassToken<List<Integer>>() {};
@@ -60,6 +72,23 @@ public class ClassTokenTest {
         assertThat(classToken1).isEqualTo(new SubStringClassToken());
         assertThat(classToken1.hashCode()).isEqualTo(new SubStringClassToken().hashCode());
         assertThat(classToken1.equals(null)).isFalse();
+    }
+
+    @Test
+    @SuppressWarnings("EqualsBetweenInconvertibleTypes")
+    public void testListArrayListType() {
+
+        final ClassToken<List<ArrayList<String>>> classToken4 =
+                new ClassToken<List<ArrayList<String>>>() {};
+
+        assertThat(classToken4.getGenericType()).isNotEqualTo(List.class);
+        assertThat(List.class.equals(classToken4.getRawClass())).isTrue();
+        assertThat(classToken4.isInterface()).isTrue();
+    }
+
+    @Test
+    @SuppressWarnings("ObjectEqualsNull")
+    public void testListEquals() {
 
         final ClassToken<List<String>> classToken2 = new ClassToken<List<String>>() {};
 
@@ -74,8 +103,34 @@ public class ClassTokenTest {
     }
 
     @Test
+    @SuppressWarnings("EqualsBetweenInconvertibleTypes")
+    public void testListType() {
+
+        final ClassToken<List<String>> classToken3 = new ClassToken<List<String>>() {};
+
+        assertThat(classToken3.getGenericType()).isNotEqualTo(List.class);
+        assertThat(List.class.equals(classToken3.getRawClass())).isTrue();
+        assertThat(classToken3.isInterface()).isTrue();
+    }
+
+    @Test
     @SuppressWarnings("ConstantConditions")
-    public void testError() {
+    public void testNullClassError() {
+
+        try {
+
+            ClassToken.tokenOf((Class<?>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testNullObjectError() {
 
         try {
 
@@ -86,16 +141,11 @@ public class ClassTokenTest {
         } catch (final NullPointerException ignored) {
 
         }
+    }
 
-        try {
-
-            ClassToken.tokenOf(null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testSubClassError() {
 
         try {
 
@@ -127,25 +177,6 @@ public class ClassTokenTest {
         assertThat(classToken1.getGenericType()).isEqualTo(String.class);
         assertThat(String.class.equals(classToken1.getRawClass())).isTrue();
         assertThat(classToken1.isInterface()).isFalse();
-
-        final ClassToken<ArrayList<String>> classToken2 = new ClassToken<ArrayList<String>>() {};
-
-        assertThat(classToken2.getGenericType()).isNotEqualTo(ArrayList.class);
-        assertThat(ArrayList.class.equals(classToken2.getRawClass())).isTrue();
-        assertThat(classToken1.isInterface()).isFalse();
-
-        final ClassToken<List<String>> classToken3 = new ClassToken<List<String>>() {};
-
-        assertThat(classToken3.getGenericType()).isNotEqualTo(List.class);
-        assertThat(List.class.equals(classToken3.getRawClass())).isTrue();
-        assertThat(classToken3.isInterface()).isTrue();
-
-        final ClassToken<List<ArrayList<String>>> classToken4 =
-                new ClassToken<List<ArrayList<String>>>() {};
-
-        assertThat(classToken4.getGenericType()).isNotEqualTo(List.class);
-        assertThat(List.class.equals(classToken4.getRawClass())).isTrue();
-        assertThat(classToken4.isInterface()).isTrue();
     }
 
     private static class StringClassToken extends ClassToken<String> {

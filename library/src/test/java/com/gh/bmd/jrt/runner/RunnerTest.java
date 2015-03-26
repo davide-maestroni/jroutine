@@ -49,8 +49,61 @@ public class RunnerTest {
     }
 
     @Test
+    public void testPoolRunner() throws InterruptedException {
+
+        testRunner(Runners.poolRunner(3));
+        testRunner(new RunnerDecorator(Runners.poolRunner(4)));
+    }
+
+    @Test
+    public void testPoolRunnerError() {
+
+        try {
+
+            Runners.poolRunner(-1);
+
+            fail();
+
+        } catch (final Exception ignored) {
+
+        }
+    }
+
+    @Test
+    public void testQueuedRunner() throws InterruptedException {
+
+        testRunner(new QueuedRunner());
+        testRunner(Runners.queuedRunner());
+        testRunner(new RunnerDecorator(new QueuedRunner()));
+    }
+
+    @Test
     @SuppressWarnings("ConstantConditions")
-    public void testError() {
+    public void testRunnerDecoratorError() {
+
+        try {
+
+            new RunnerDecorator(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testScheduledRunner() throws InterruptedException {
+
+        testRunner(new ScheduledRunner(Executors.newSingleThreadScheduledExecutor()));
+        testRunner(Runners.scheduledRunner(Executors.newSingleThreadScheduledExecutor()));
+        testRunner(new RunnerDecorator(
+                new ScheduledRunner(Executors.newSingleThreadScheduledExecutor())));
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testScheduledRunnerError() {
 
         try {
 
@@ -71,50 +124,6 @@ public class RunnerTest {
         } catch (final Exception ignored) {
 
         }
-
-        try {
-
-            Runners.poolRunner(-1);
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        try {
-
-            new RunnerDecorator(null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-    }
-
-    @Test
-    public void testPoolRunner() throws InterruptedException {
-
-        testRunner(Runners.poolRunner(3));
-        testRunner(new RunnerDecorator(Runners.poolRunner(4)));
-    }
-
-    @Test
-    public void testQueuedRunner() throws InterruptedException {
-
-        testRunner(new QueuedRunner());
-        testRunner(Runners.queuedRunner());
-        testRunner(new RunnerDecorator(new QueuedRunner()));
-    }
-
-    @Test
-    public void testScheduledRunner() throws InterruptedException {
-
-        testRunner(new ScheduledRunner(Executors.newSingleThreadScheduledExecutor()));
-        testRunner(Runners.scheduledRunner(Executors.newSingleThreadScheduledExecutor()));
-        testRunner(new RunnerDecorator(
-                new ScheduledRunner(Executors.newSingleThreadScheduledExecutor())));
     }
 
     @Test

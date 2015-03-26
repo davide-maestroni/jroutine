@@ -98,6 +98,102 @@ public class StandaloneChannelTest {
     }
 
     @Test
+    public void testAllIntoTimeout() {
+
+        final StandaloneChannel<String> standaloneChannel = JRoutine.standalone().buildChannel();
+        standaloneChannel.input().after(TimeDuration.seconds(3)).pass("test").close();
+
+        final StandaloneOutput<String> output = standaloneChannel.output();
+        assertThat(output.immediately().eventuallyExit().readAll()).isEmpty();
+
+        output.eventuallyDeadlock();
+
+        try {
+
+            output.readAllInto(new ArrayList<String>());
+
+            fail();
+
+        } catch (final ReadDeadlockException ignored) {
+
+        }
+
+        assertThat(output.checkComplete()).isFalse();
+    }
+
+    @Test
+    public void testAllIntoTimeout2() {
+
+        final StandaloneChannel<String> standaloneChannel = JRoutine.standalone().buildChannel();
+        standaloneChannel.input().after(TimeDuration.seconds(3)).pass("test").close();
+
+        final StandaloneOutput<String> output = standaloneChannel.output();
+        assertThat(output.immediately().eventuallyExit().readAll()).isEmpty();
+
+        output.afterMax(TimeDuration.millis(10));
+
+        try {
+
+            output.readAllInto(new ArrayList<String>());
+
+            fail();
+
+        } catch (final ReadDeadlockException ignored) {
+
+        }
+
+        assertThat(output.checkComplete()).isFalse();
+    }
+
+    @Test
+    public void testAllTimeout() {
+
+        final StandaloneChannel<String> standaloneChannel = JRoutine.standalone().buildChannel();
+        standaloneChannel.input().after(TimeDuration.seconds(3)).pass("test").close();
+
+        final StandaloneOutput<String> output = standaloneChannel.output();
+        assertThat(output.immediately().eventuallyExit().readAll()).isEmpty();
+
+        output.eventuallyDeadlock();
+
+        try {
+
+            output.readAll();
+
+            fail();
+
+        } catch (final ReadDeadlockException ignored) {
+
+        }
+
+        assertThat(output.checkComplete()).isFalse();
+    }
+
+    @Test
+    public void testAllTimeout2() {
+
+        final StandaloneChannel<String> standaloneChannel = JRoutine.standalone().buildChannel();
+        standaloneChannel.input().after(TimeDuration.seconds(3)).pass("test").close();
+
+        final StandaloneOutput<String> output = standaloneChannel.output();
+        assertThat(output.immediately().eventuallyExit().readAll()).isEmpty();
+
+        output.afterMax(TimeDuration.millis(10));
+
+        try {
+
+            output.readAll();
+
+            fail();
+
+        } catch (final ReadDeadlockException ignored) {
+
+        }
+
+        assertThat(output.checkComplete()).isFalse();
+    }
+
+    @Test
     public void testAsynchronousInput() {
 
         final TimeDuration timeout = seconds(1);
@@ -126,7 +222,12 @@ public class StandaloneChannelTest {
                         .callAsync(standaloneChannel.output());
         assertThat(outputChannel.afterMax(timeout).readNext()).isEqualTo("test");
         assertThat(outputChannel.checkComplete()).isTrue();
+    }
 
+    @Test
+    public void testAsynchronousInput2() {
+
+        final TimeDuration timeout = seconds(1);
         final RoutineConfiguration configuration = withOutputOrder(OrderType.PASSING);
         final StandaloneChannel<String> standaloneChannel1 =
                 JRoutine.standalone().withConfiguration(configuration).buildChannel();
@@ -150,6 +251,150 @@ public class StandaloneChannelTest {
                         .callAsync(standaloneChannel1.output());
         assertThat(outputChannel1.afterMax(timeout).readAll()).containsExactly("test1", "test2",
                                                                                "test3");
+    }
+
+    @Test
+    public void testHasNextIteratorTimeout() {
+
+        final StandaloneChannel<String> standaloneChannel = JRoutine.standalone().buildChannel();
+        standaloneChannel.input().after(TimeDuration.seconds(3)).pass("test").close();
+
+        final StandaloneOutput<String> output = standaloneChannel.output();
+        assertThat(output.immediately().eventuallyExit().readAll()).isEmpty();
+
+        output.eventuallyDeadlock();
+
+        try {
+
+            output.iterator().hasNext();
+
+            fail();
+
+        } catch (final ReadDeadlockException ignored) {
+
+        }
+
+        assertThat(output.checkComplete()).isFalse();
+    }
+
+    @Test
+    public void testHasNextIteratorTimeout2() {
+
+        final StandaloneChannel<String> standaloneChannel = JRoutine.standalone().buildChannel();
+        standaloneChannel.input().after(TimeDuration.seconds(3)).pass("test").close();
+
+        final StandaloneOutput<String> output = standaloneChannel.output();
+        assertThat(output.immediately().eventuallyExit().readAll()).isEmpty();
+
+        output.afterMax(TimeDuration.millis(10));
+
+        try {
+
+            output.iterator().hasNext();
+
+            fail();
+
+        } catch (final ReadDeadlockException ignored) {
+
+        }
+
+        assertThat(output.checkComplete()).isFalse();
+    }
+
+    @Test
+    public void testNextIteratorTimeout() {
+
+        final StandaloneChannel<String> standaloneChannel = JRoutine.standalone().buildChannel();
+        standaloneChannel.input().after(TimeDuration.seconds(3)).pass("test").close();
+
+        final StandaloneOutput<String> output = standaloneChannel.output();
+        assertThat(output.immediately().eventuallyExit().readAll()).isEmpty();
+
+        output.eventuallyDeadlock();
+
+        try {
+
+            output.iterator().next();
+
+            fail();
+
+        } catch (final ReadDeadlockException ignored) {
+
+        }
+
+        assertThat(output.checkComplete()).isFalse();
+    }
+
+    @Test
+    public void testNextIteratorTimeout2() {
+
+        final StandaloneChannel<String> standaloneChannel = JRoutine.standalone().buildChannel();
+        standaloneChannel.input().after(TimeDuration.seconds(3)).pass("test").close();
+
+        final StandaloneOutput<String> output = standaloneChannel.output();
+        assertThat(output.immediately().eventuallyExit().readAll()).isEmpty();
+
+        output.afterMax(TimeDuration.millis(10));
+
+        try {
+
+            output.iterator().next();
+
+            fail();
+
+        } catch (final ReadDeadlockException ignored) {
+
+        }
+
+        assertThat(output.checkComplete()).isFalse();
+    }
+
+    @Test
+    public void testNextTimeout() {
+
+        final StandaloneChannel<String> standaloneChannel = JRoutine.standalone().buildChannel();
+        standaloneChannel.input().after(TimeDuration.seconds(3)).pass("test").close();
+
+        final StandaloneOutput<String> output = standaloneChannel.output();
+        assertThat(output.immediately().eventuallyExit().readAll()).isEmpty();
+
+        output.eventuallyDeadlock();
+
+        try {
+
+            output.readNext();
+
+            fail();
+
+        } catch (final ReadDeadlockException ignored) {
+
+        }
+
+        assertThat(output.checkComplete()).isFalse();
+    }
+
+    @Test
+    public void testNextTimeout2() {
+
+        final StandaloneChannel<String> standaloneChannel = JRoutine.standalone().buildChannel();
+        standaloneChannel.input().after(TimeDuration.seconds(3)).pass("test").close();
+
+        final StandaloneOutput<String> output = standaloneChannel.output();
+        assertThat(output.immediately().eventuallyExit().readAll()).isEmpty();
+
+        output.afterMax(TimeDuration.millis(10));
+
+        try {
+
+            output.readNext();
+
+            fail();
+
+        } catch (final ReadDeadlockException ignored) {
+
+        }
+
+        assertThat(output.checkComplete()).isFalse();
     }
 
     @Test
@@ -206,6 +451,10 @@ public class StandaloneChannelTest {
                 JRoutine.standalone().withConfiguration(configuration1).buildChannel();
 
         assertThat(channel1.output().readAll()).isEmpty();
+    }
+
+    @Test
+    public void testReadTimeout2() {
 
         final RoutineConfiguration configuration2 = builder().withReadTimeout(millis(10))
                                                              .onReadTimeout(TimeoutAction.ABORT)
@@ -222,6 +471,10 @@ public class StandaloneChannelTest {
         } catch (final AbortException ignored) {
 
         }
+    }
+
+    @Test
+    public void testReadTimeout3() {
 
         final RoutineConfiguration configuration3 = builder().withReadTimeout(millis(10))
                                                              .onReadTimeout(TimeoutAction.DEADLOCK)
@@ -238,122 +491,6 @@ public class StandaloneChannelTest {
         } catch (final ReadDeadlockException ignored) {
 
         }
-    }
-
-    @Test
-    public void testTimeout() {
-
-        final StandaloneChannel<String> standaloneChannel = JRoutine.standalone().buildChannel();
-        standaloneChannel.input().after(TimeDuration.seconds(3)).pass("test").close();
-
-        final StandaloneOutput<String> output = standaloneChannel.output();
-        assertThat(output.immediately().eventuallyExit().readAll()).isEmpty();
-
-        output.eventuallyDeadlock();
-
-        try {
-
-            output.readNext();
-
-            fail();
-
-        } catch (final ReadDeadlockException ignored) {
-
-        }
-
-        try {
-
-            output.readAllInto(new ArrayList<String>());
-
-            fail();
-
-        } catch (final ReadDeadlockException ignored) {
-
-        }
-
-        try {
-
-            output.readAll();
-
-            fail();
-
-        } catch (final ReadDeadlockException ignored) {
-
-        }
-
-        try {
-
-            output.iterator().hasNext();
-
-            fail();
-
-        } catch (final ReadDeadlockException ignored) {
-
-        }
-
-        try {
-
-            output.iterator().next();
-
-            fail();
-
-        } catch (final ReadDeadlockException ignored) {
-
-        }
-
-        output.afterMax(TimeDuration.millis(10));
-
-        try {
-
-            output.readNext();
-
-            fail();
-
-        } catch (final ReadDeadlockException ignored) {
-
-        }
-
-        try {
-
-            output.readAllInto(new ArrayList<String>());
-
-            fail();
-
-        } catch (final ReadDeadlockException ignored) {
-
-        }
-
-        try {
-
-            output.readAll();
-
-            fail();
-
-        } catch (final ReadDeadlockException ignored) {
-
-        }
-
-        try {
-
-            output.iterator().hasNext();
-
-            fail();
-
-        } catch (final ReadDeadlockException ignored) {
-
-        }
-
-        try {
-
-            output.iterator().next();
-
-            fail();
-
-        } catch (final ReadDeadlockException ignored) {
-
-        }
-
-        assertThat(output.checkComplete()).isFalse();
     }
 
     private static class WeakThread extends Thread {

@@ -97,91 +97,6 @@ public class SimpleQueueTest {
     }
 
     @Test
-    public void testError() {
-
-        final SimpleQueue<Integer> queue = new SimpleQueue<Integer>();
-
-        try {
-
-            queue.peekFirst();
-
-            fail();
-
-        } catch (final NoSuchElementException ignored) {
-
-        }
-
-        try {
-
-            queue.removeFirst();
-
-            fail();
-
-        } catch (final NoSuchElementException ignored) {
-
-        }
-
-        for (int i = 0; i < 7; i++) {
-
-            queue.add(i);
-        }
-
-        for (int i = 0; i < 7; i++) {
-
-            assertThat(queue.isEmpty()).isFalse();
-            assertThat(queue.peekFirst()).isEqualTo(i);
-            assertThat(queue.removeFirst()).isEqualTo(i);
-        }
-
-        try {
-
-            queue.peekFirst();
-
-            fail();
-
-        } catch (final NoSuchElementException ignored) {
-
-        }
-
-        try {
-
-            queue.removeFirst();
-
-            fail();
-
-        } catch (final NoSuchElementException ignored) {
-
-        }
-
-        for (int i = 0; i < 7; i++) {
-
-            queue.add(i);
-        }
-
-        queue.clear();
-
-        try {
-
-            queue.peekFirst();
-
-            fail();
-
-        } catch (final NoSuchElementException ignored) {
-
-        }
-
-        try {
-
-            queue.removeFirst();
-
-            fail();
-
-        } catch (final NoSuchElementException ignored) {
-
-        }
-    }
-
-    @Test
     public void testMove() {
 
         final SimpleQueue<Integer> queue = new SimpleQueue<Integer>();
@@ -207,6 +122,140 @@ public class SimpleQueueTest {
         for (int i = 3; i < 7; i++) {
 
             assertThat(list.get(i - 3)).isEqualTo(i);
+        }
+    }
+
+    @Test
+    public void testPeekAllError() {
+
+        final SimpleQueue<Integer> queue = new SimpleQueue<Integer>();
+
+        for (int i = 0; i < 7; i++) {
+
+            queue.add(i);
+        }
+
+        for (int i = 0; i < 7; i++) {
+
+            assertThat(queue.isEmpty()).isFalse();
+            assertThat(queue.peekFirst()).isEqualTo(i);
+            assertThat(queue.removeFirst()).isEqualTo(i);
+        }
+
+        try {
+
+            queue.peekFirst();
+
+            fail();
+
+        } catch (final NoSuchElementException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testPeekClearError() {
+
+        final SimpleQueue<Integer> queue = new SimpleQueue<Integer>();
+
+        for (int i = 0; i < 7; i++) {
+
+            queue.add(i);
+        }
+
+        queue.clear();
+
+        try {
+
+            queue.peekFirst();
+
+            fail();
+
+        } catch (final NoSuchElementException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testPeekEmptyError() {
+
+        final SimpleQueue<Integer> queue = new SimpleQueue<Integer>();
+
+        try {
+
+            queue.peekFirst();
+
+            fail();
+
+        } catch (final NoSuchElementException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testRemoveAllError() {
+
+        final SimpleQueue<Integer> queue = new SimpleQueue<Integer>();
+
+        for (int i = 0; i < 7; i++) {
+
+            queue.add(i);
+        }
+
+        for (int i = 0; i < 7; i++) {
+
+            assertThat(queue.isEmpty()).isFalse();
+            assertThat(queue.peekFirst()).isEqualTo(i);
+            assertThat(queue.removeFirst()).isEqualTo(i);
+        }
+
+        try {
+
+            queue.removeFirst();
+
+            fail();
+
+        } catch (final NoSuchElementException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testRemoveClearError() {
+
+        final SimpleQueue<Integer> queue = new SimpleQueue<Integer>();
+
+        for (int i = 0; i < 7; i++) {
+
+            queue.add(i);
+        }
+
+        queue.clear();
+
+        try {
+
+            queue.removeFirst();
+
+            fail();
+
+        } catch (final NoSuchElementException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testRemoveEmptyError() {
+
+        final SimpleQueue<Integer> queue = new SimpleQueue<Integer>();
+
+        try {
+
+            queue.removeFirst();
+
+            fail();
+
+        } catch (final NoSuchElementException ignored) {
+
         }
     }
 }

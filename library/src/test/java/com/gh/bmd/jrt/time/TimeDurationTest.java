@@ -38,6 +38,8 @@ public class TimeDurationTest {
     private static final int MAX_DURATION =
             (int) Math.min(Integer.MAX_VALUE, Long.MAX_VALUE / ONE_DAY_NANOS);
 
+    private static final Random sRandom = new Random();
+
     private static Method getMethod(final String name) {
 
         try {
@@ -65,363 +67,8 @@ public class TimeDurationTest {
     }
 
     @Test
-    public void testConversions() throws InvocationTargetException, IllegalAccessException {
-
-        final Random random = new Random();
-
-        testConversions(TimeDuration.nanos(random.nextInt(MAX_DURATION)), true);
-        testConversions(TimeDuration.micros(random.nextInt(MAX_DURATION)), true);
-        testConversions(TimeDuration.millis(random.nextInt(MAX_DURATION)), true);
-        testConversions(TimeDuration.seconds(random.nextInt(MAX_DURATION)), true);
-        testConversions(TimeDuration.minutes(random.nextInt(MAX_DURATION)), true);
-        testConversions(TimeDuration.hours(random.nextInt(MAX_DURATION)), true);
-        testConversions(TimeDuration.days(random.nextInt(MAX_DURATION)), true);
-
-        testConversions(TimeDuration.fromUnit(random.nextInt(MAX_DURATION), TimeUnit.NANOSECONDS),
-                        true);
-        testConversions(TimeDuration.fromUnit(random.nextInt(MAX_DURATION), TimeUnit.MICROSECONDS),
-                        true);
-        testConversions(TimeDuration.fromUnit(random.nextInt(MAX_DURATION), TimeUnit.MILLISECONDS),
-                        true);
-        testConversions(TimeDuration.fromUnit(random.nextInt(MAX_DURATION), TimeUnit.SECONDS),
-                        true);
-
-        final TimeUnit minutes = getUnit("MINUTES");
-        if (minutes != null) {
-
-            testConversions(TimeDuration.fromUnit(random.nextInt(MAX_DURATION), minutes), true);
-        }
-
-        final TimeUnit hours = getUnit("HOURS");
-        if (hours != null) {
-
-            testConversions(TimeDuration.fromUnit(random.nextInt(MAX_DURATION), hours), true);
-        }
-
-        final TimeUnit days = getUnit("DAYS");
-        if (days != null) {
-
-            testConversions(TimeDuration.fromUnit(random.nextInt(MAX_DURATION), days), true);
-        }
-
-        final TimeDuration duration = TimeDuration.nanos(random.nextInt(MAX_DURATION));
-        assertThat(duration).isEqualTo(duration);
-        assertThat(duration).isEqualTo(duration.nanosTime());
-        assertThat(duration).isNotEqualTo(duration.millisTime());
-        assertThat(duration.equals(new Object())).isFalse();
-        assertThat(duration.hashCode()).isEqualTo(duration.nanosTime().hashCode());
-    }
-
-    @Test
     @SuppressWarnings("ConstantConditions")
-    public void testError() {
-
-        try {
-
-            TimeDuration.fromUnit(0, null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            TimeDuration.seconds(1).to(null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            TimeDuration.nanos(-1);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            TimeDuration.micros(-1);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            TimeDuration.millis(-1);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            TimeDuration.seconds(-1);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            TimeDuration.minutes(-1);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            TimeDuration.minutes(Long.MAX_VALUE);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            TimeDuration.minutes(Long.MIN_VALUE);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            TimeDuration.hours(-1);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            TimeDuration.hours(Long.MAX_VALUE);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            TimeDuration.hours(Long.MIN_VALUE);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            TimeDuration.days(-1);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            TimeDuration.days(Long.MAX_VALUE);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            TimeDuration.days(Long.MIN_VALUE);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            TimeDuration.fromUnit(-1, TimeUnit.NANOSECONDS);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            TimeDuration.fromUnit(-1, TimeUnit.MICROSECONDS);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            TimeDuration.fromUnit(-1, TimeUnit.MILLISECONDS);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            TimeDuration.fromUnit(-1, TimeUnit.SECONDS);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            final TimeUnit minutes = getUnit("MINUTES");
-
-            if (minutes != null) {
-
-                TimeDuration.fromUnit(-1, minutes);
-
-                fail();
-            }
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            final TimeUnit hours = getUnit("HOURS");
-
-            if (hours != null) {
-
-                TimeDuration.fromUnit(-1, hours);
-
-                fail();
-            }
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            final TimeUnit days = getUnit("DAYS");
-
-            if (days != null) {
-
-                TimeDuration.fromUnit(-1, days);
-
-                fail();
-            }
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            TimeDuration.seconds(1).join(null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        } catch (final InterruptedException ignored) {
-
-        }
-
-        try {
-
-            TimeDuration.INFINITY.sleepSinceMillis(System.currentTimeMillis());
-
-            fail();
-
-        } catch (final IllegalStateException ignored) {
-
-        } catch (final InterruptedException ignored) {
-
-        }
-
-        try {
-
-            TimeDuration.INFINITY.sleepSinceNanos(System.nanoTime());
-
-            fail();
-
-        } catch (final IllegalStateException ignored) {
-
-        } catch (final InterruptedException ignored) {
-
-        }
-
-        try {
-
-            TimeDuration.seconds(1).wait(null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        } catch (final InterruptedException ignored) {
-
-        }
-
-        try {
-
-            TimeDuration.seconds(1).waitSinceMillis(null, System.currentTimeMillis());
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        } catch (final InterruptedException ignored) {
-
-        }
-
-        try {
-
-            TimeDuration.seconds(1).waitSinceNanos(null, System.nanoTime());
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        } catch (final InterruptedException ignored) {
-
-        }
+    public void testCheckError() {
 
         try {
 
@@ -470,6 +117,147 @@ public class TimeDurationTest {
     }
 
     @Test
+    public void testDayConversions() throws InvocationTargetException, IllegalAccessException {
+
+        testConversions(TimeDuration.days(sRandom.nextInt(MAX_DURATION)), true);
+
+        final TimeUnit days = getUnit("DAYS");
+        if (days != null) {
+
+            testConversions(TimeDuration.fromUnit(sRandom.nextInt(MAX_DURATION), days), true);
+        }
+    }
+
+    @Test
+    public void testDayError() {
+
+        try {
+
+            TimeDuration.days(-1);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            final TimeUnit days = getUnit("DAYS");
+
+            if (days != null) {
+
+                TimeDuration.fromUnit(-1, days);
+
+                fail();
+            }
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testDayOverflowError() {
+
+        try {
+
+            TimeDuration.days(Long.MAX_VALUE);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            TimeDuration.days(Long.MIN_VALUE);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testEqualConversions() throws InvocationTargetException, IllegalAccessException {
+
+        final TimeDuration duration = TimeDuration.nanos(sRandom.nextInt(MAX_DURATION));
+        assertThat(duration).isEqualTo(duration);
+        assertThat(duration).isEqualTo(duration.nanosTime());
+        assertThat(duration).isNotEqualTo(duration.millisTime());
+        assertThat(duration.equals(new Object())).isFalse();
+        assertThat(duration.hashCode()).isEqualTo(duration.nanosTime().hashCode());
+    }
+
+    @Test
+    public void testHourConversions() throws InvocationTargetException, IllegalAccessException {
+
+        testConversions(TimeDuration.hours(sRandom.nextInt(MAX_DURATION)), true);
+
+        final TimeUnit hours = getUnit("HOURS");
+        if (hours != null) {
+
+            testConversions(TimeDuration.fromUnit(sRandom.nextInt(MAX_DURATION), hours), true);
+        }
+    }
+
+    @Test
+    public void testHourError() {
+
+        try {
+
+            TimeDuration.hours(-1);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            final TimeUnit hours = getUnit("HOURS");
+
+            if (hours != null) {
+
+                TimeDuration.fromUnit(-1, hours);
+
+                fail();
+            }
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testHourOverflowError() {
+
+        try {
+
+            TimeDuration.hours(Long.MAX_VALUE);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            TimeDuration.hours(Long.MIN_VALUE);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+    }
+
+    @Test
     public void testInfinite() {
 
         assertThat(TimeDuration.INFINITY.isZero()).isFalse();
@@ -503,27 +291,267 @@ public class TimeDurationTest {
     }
 
     @Test
-    public void testSleep() throws InterruptedException {
+    @SuppressWarnings("ConstantConditions")
+    public void testJoinError() {
+
+        try {
+
+            TimeDuration.seconds(1).join(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        } catch (final InterruptedException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testMicroConversions() throws InvocationTargetException, IllegalAccessException {
+
+        testConversions(TimeDuration.micros(sRandom.nextInt(MAX_DURATION)), true);
+        testConversions(TimeDuration.fromUnit(sRandom.nextInt(MAX_DURATION), TimeUnit.MICROSECONDS),
+                        true);
+    }
+
+    @Test
+    public void testMicroError() {
+
+        try {
+
+            TimeDuration.micros(-1);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            TimeDuration.fromUnit(-1, TimeUnit.MICROSECONDS);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testMilliConversions() throws InvocationTargetException, IllegalAccessException {
+
+        testConversions(TimeDuration.millis(sRandom.nextInt(MAX_DURATION)), true);
+        testConversions(TimeDuration.fromUnit(sRandom.nextInt(MAX_DURATION), TimeUnit.MILLISECONDS),
+                        true);
+    }
+
+    @Test
+    public void testMilliError() {
+
+        try {
+
+            TimeDuration.millis(-1);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            TimeDuration.fromUnit(-1, TimeUnit.MILLISECONDS);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testMinuteConversions() throws InvocationTargetException, IllegalAccessException {
+
+        testConversions(TimeDuration.minutes(sRandom.nextInt(MAX_DURATION)), true);
+
+        final TimeUnit minutes = getUnit("MINUTES");
+        if (minutes != null) {
+
+            testConversions(TimeDuration.fromUnit(sRandom.nextInt(MAX_DURATION), minutes), true);
+        }
+    }
+
+    @Test
+    public void testMinuteError() {
+
+        try {
+
+            TimeDuration.minutes(-1);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            final TimeUnit minutes = getUnit("MINUTES");
+
+            if (minutes != null) {
+
+                TimeDuration.fromUnit(-1, minutes);
+
+                fail();
+            }
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testMinuteOverflowError() {
+
+        try {
+
+            TimeDuration.minutes(Long.MAX_VALUE);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            TimeDuration.minutes(Long.MIN_VALUE);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testNanoConversions() throws InvocationTargetException, IllegalAccessException {
+
+        testConversions(TimeDuration.nanos(sRandom.nextInt(MAX_DURATION)), true);
+        testConversions(TimeDuration.fromUnit(sRandom.nextInt(MAX_DURATION), TimeUnit.NANOSECONDS),
+                        true);
+    }
+
+    @Test
+    public void testNanoError() {
+
+        try {
+
+            TimeDuration.nanos(-1);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            TimeDuration.fromUnit(-1, TimeUnit.NANOSECONDS);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testSecondConversions() throws InvocationTargetException, IllegalAccessException {
+
+        testConversions(TimeDuration.seconds(sRandom.nextInt(MAX_DURATION)), true);
+        testConversions(TimeDuration.fromUnit(sRandom.nextInt(MAX_DURATION), TimeUnit.SECONDS),
+                        true);
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testSecondError() {
+
+        try {
+
+            TimeDuration.seconds(-1);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            TimeDuration.seconds(1).to(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            TimeDuration.fromUnit(-1, TimeUnit.SECONDS);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testSleepError() {
+
+        try {
+
+            TimeDuration.INFINITY.sleepSinceMillis(System.currentTimeMillis());
+
+            fail();
+
+        } catch (final IllegalStateException ignored) {
+
+        } catch (final InterruptedException ignored) {
+
+        }
+
+        try {
+
+            TimeDuration.INFINITY.sleepSinceNanos(System.nanoTime());
+
+            fail();
+
+        } catch (final IllegalStateException ignored) {
+
+        } catch (final InterruptedException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testSleepMilli() throws InterruptedException {
 
         long startTime = System.currentTimeMillis();
 
         TimeDuration.millis(100).sleep();
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(100);
 
-        startTime = System.nanoTime();
-
-        TimeDuration.nanos(11573573).sleep();
-        assertThat(System.nanoTime() - startTime).isGreaterThanOrEqualTo(11573573);
-
         startTime = System.currentTimeMillis();
 
         TimeDuration.millis(100).sleepAtLeast();
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(100);
-
-        startTime = System.nanoTime();
-
-        TimeDuration.nanos(11573573).sleepAtLeast();
-        assertThat(System.nanoTime() - startTime).isGreaterThanOrEqualTo(11573573);
 
         startTime = System.currentTimeMillis() - 1000;
         assertThat(TimeDuration.millis(100).sleepSinceMillis(startTime)).isFalse();
@@ -532,28 +560,32 @@ public class TimeDurationTest {
         assertThat(TimeDuration.millis(100).sleepSinceMillis(startTime)).isTrue();
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(100);
 
+        startTime = System.currentTimeMillis() - 1000;
+        assertThat(TimeDuration.ZERO.sleepSinceMillis(startTime)).isFalse();
+
+        startTime = System.currentTimeMillis();
+        assertThat(TimeDuration.ZERO.sleepSinceMillis(startTime)).isFalse();
+    }
+
+    @Test
+    public void testSleepNano() throws InterruptedException {
+
+        long startTime = System.nanoTime();
+
+        TimeDuration.nanos(11573573).sleep();
+        assertThat(System.nanoTime() - startTime).isGreaterThanOrEqualTo(11573573);
+
+        startTime = System.nanoTime();
+
+        TimeDuration.nanos(11573573).sleepAtLeast();
+        assertThat(System.nanoTime() - startTime).isGreaterThanOrEqualTo(11573573);
+
         startTime = System.nanoTime() - 100000000;
         assertThat(TimeDuration.nanos(11573573).sleepSinceNanos(startTime)).isFalse();
 
         startTime = System.nanoTime();
         assertThat(TimeDuration.nanos(11573573).sleepSinceNanos(startTime)).isTrue();
         assertThat(System.nanoTime() - startTime).isGreaterThanOrEqualTo(11573573);
-
-        startTime = System.currentTimeMillis();
-
-        TimeDuration.ZERO.sleep();
-        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(0);
-
-        startTime = System.currentTimeMillis();
-
-        TimeDuration.ZERO.sleepAtLeast();
-        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(0);
-
-        startTime = System.currentTimeMillis() - 1000;
-        assertThat(TimeDuration.ZERO.sleepSinceMillis(startTime)).isFalse();
-
-        startTime = System.currentTimeMillis();
-        assertThat(TimeDuration.ZERO.sleepSinceMillis(startTime)).isFalse();
 
         startTime = System.nanoTime() - 100000000;
         assertThat(TimeDuration.ZERO.sleepSinceNanos(startTime)).isFalse();
@@ -563,8 +595,54 @@ public class TimeDurationTest {
     }
 
     @Test
+    public void testSleepZero() throws InterruptedException {
+
+        long startTime = System.currentTimeMillis();
+
+        TimeDuration.ZERO.sleep();
+        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(0);
+
+        startTime = System.currentTimeMillis();
+
+        TimeDuration.ZERO.sleepAtLeast();
+        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(0);
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testUnitError() {
+
+        try {
+
+            TimeDuration.fromUnit(0, null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testWaitError() {
+
+        try {
+
+            TimeDuration.seconds(1).wait(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        } catch (final InterruptedException ignored) {
+
+        }
+    }
+
+    @Test
     @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
-    public void testWait() throws InterruptedException {
+    public void testWaitMilli() throws InterruptedException {
 
         long startTime = System.currentTimeMillis();
 
@@ -573,14 +651,6 @@ public class TimeDurationTest {
             TimeDuration.millis(100).wait(this);
         }
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(100);
-
-        startTime = System.currentTimeMillis();
-
-        synchronized (this) {
-
-            TimeDuration.ZERO.wait(this);
-        }
-        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(0);
 
         Thread thread = new Thread() {
 
@@ -623,43 +693,6 @@ public class TimeDurationTest {
         }
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(100);
 
-        startTime = System.nanoTime() - 100000000;
-        synchronized (this) {
-
-            assertThat(TimeDuration.nanos(10000573).waitSinceNanos(this, startTime)).isFalse();
-        }
-
-        startTime = System.nanoTime();
-        synchronized (this) {
-
-            assertThat(TimeDuration.nanos(10000573).waitSinceNanos(this, startTime)).isTrue();
-        }
-        assertThat(System.nanoTime() - startTime).isGreaterThanOrEqualTo(10000573);
-
-        startTime = System.currentTimeMillis() - 1000;
-        synchronized (this) {
-
-            assertThat(TimeDuration.ZERO.waitSinceMillis(this, startTime)).isFalse();
-        }
-
-        startTime = System.currentTimeMillis();
-        synchronized (this) {
-
-            assertThat(TimeDuration.ZERO.waitSinceMillis(this, startTime)).isFalse();
-        }
-
-        startTime = System.nanoTime() - 100000000;
-        synchronized (this) {
-
-            assertThat(TimeDuration.ZERO.waitSinceNanos(this, startTime)).isFalse();
-        }
-
-        startTime = System.nanoTime();
-        synchronized (this) {
-
-            assertThat(TimeDuration.ZERO.waitSinceNanos(this, startTime)).isFalse();
-        }
-
         thread = new Thread() {
 
             @Override
@@ -687,8 +720,26 @@ public class TimeDurationTest {
 
             TimeDuration.INFINITY.waitSinceMillis(thread, System.currentTimeMillis());
         }
+    }
 
-        thread = new Thread() {
+    @Test
+    @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
+    public void testWaitNano() throws InterruptedException {
+
+        long startTime = System.nanoTime() - 100000000;
+        synchronized (this) {
+
+            assertThat(TimeDuration.nanos(10000573).waitSinceNanos(this, startTime)).isFalse();
+        }
+
+        startTime = System.nanoTime();
+        synchronized (this) {
+
+            assertThat(TimeDuration.nanos(10000573).waitSinceNanos(this, startTime)).isTrue();
+        }
+        assertThat(System.nanoTime() - startTime).isGreaterThanOrEqualTo(10000573);
+
+        final Thread thread = new Thread() {
 
             @Override
             public void run() {
@@ -718,8 +769,37 @@ public class TimeDurationTest {
     }
 
     @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testWaitSinceError() {
+
+        try {
+
+            TimeDuration.seconds(1).waitSinceMillis(null, System.currentTimeMillis());
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        } catch (final InterruptedException ignored) {
+
+        }
+
+        try {
+
+            TimeDuration.seconds(1).waitSinceNanos(null, System.nanoTime());
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        } catch (final InterruptedException ignored) {
+
+        }
+    }
+
+    @Test
     @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
-    public void testWaitTrue() throws InterruptedException {
+    public void testWaitTrueMilli() throws InterruptedException {
 
         final Check alwaysFalse = new Check() {
 
@@ -748,41 +828,9 @@ public class TimeDurationTest {
 
         synchronized (this) {
 
-            assertThat(TimeDuration.ZERO.waitTrue(this, alwaysFalse)).isFalse();
-        }
-        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(0);
-
-        startTime = System.currentTimeMillis();
-
-        synchronized (this) {
-
             assertThat(TimeDuration.millis(100).waitTrue(this, alwaysTrue)).isTrue();
         }
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(0);
-
-        startTime = System.currentTimeMillis();
-
-        synchronized (this) {
-
-            assertThat(TimeDuration.ZERO.waitTrue(this, alwaysTrue)).isTrue();
-        }
-        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(0);
-
-        startTime = System.nanoTime();
-
-        synchronized (this) {
-
-            assertThat(TimeDuration.nanos(10573).waitTrue(this, alwaysFalse)).isFalse();
-        }
-        assertThat(System.nanoTime() - startTime).isGreaterThanOrEqualTo(100);
-
-        startTime = System.nanoTime();
-
-        synchronized (this) {
-
-            assertThat(TimeDuration.nanos(10573).waitTrue(this, alwaysTrue)).isTrue();
-        }
-        assertThat(System.nanoTime() - startTime).isGreaterThanOrEqualTo(0);
 
         final Thread thread = new Thread() {
 
@@ -822,38 +870,176 @@ public class TimeDurationTest {
     }
 
     @Test
-    public void testZero() {
+    @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
+    public void testWaitTrueNano() throws InterruptedException {
 
-        assertThat(TimeDuration.nanos(0).isZero()).isTrue();
-        assertThat(TimeDuration.micros(0).isZero()).isTrue();
-        assertThat(TimeDuration.millis(0).isZero()).isTrue();
-        assertThat(TimeDuration.seconds(0).isZero()).isTrue();
-        assertThat(TimeDuration.minutes(0).isZero()).isTrue();
-        assertThat(TimeDuration.hours(0).isZero()).isTrue();
+        final Check alwaysFalse = new Check() {
+
+            public boolean isTrue() {
+
+                return false;
+            }
+        };
+        final Check alwaysTrue = new Check() {
+
+            public boolean isTrue() {
+
+                return true;
+            }
+        };
+
+        long startTime = System.nanoTime();
+
+        synchronized (this) {
+
+            assertThat(TimeDuration.nanos(10573).waitTrue(this, alwaysFalse)).isFalse();
+        }
+        assertThat(System.nanoTime() - startTime).isGreaterThanOrEqualTo(100);
+
+        startTime = System.nanoTime();
+
+        synchronized (this) {
+
+            assertThat(TimeDuration.nanos(10573).waitTrue(this, alwaysTrue)).isTrue();
+        }
+        assertThat(System.nanoTime() - startTime).isGreaterThanOrEqualTo(0);
+    }
+
+    @Test
+    @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
+    public void testWaitTrueZero() throws InterruptedException {
+
+        final Check alwaysFalse = new Check() {
+
+            public boolean isTrue() {
+
+                return false;
+            }
+        };
+        final Check alwaysTrue = new Check() {
+
+            public boolean isTrue() {
+
+                return true;
+            }
+        };
+
+        long startTime = System.currentTimeMillis();
+
+        synchronized (this) {
+
+            assertThat(TimeDuration.ZERO.waitTrue(this, alwaysFalse)).isFalse();
+        }
+        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(0);
+
+        startTime = System.currentTimeMillis();
+
+        synchronized (this) {
+
+            assertThat(TimeDuration.ZERO.waitTrue(this, alwaysTrue)).isTrue();
+        }
+        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(0);
+    }
+
+    @Test
+    @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
+    public void testWaitZero() throws InterruptedException {
+
+        long startTime = System.currentTimeMillis();
+
+        synchronized (this) {
+
+            TimeDuration.ZERO.wait(this);
+        }
+        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(0);
+
+        startTime = System.currentTimeMillis() - 1000;
+        synchronized (this) {
+
+            assertThat(TimeDuration.ZERO.waitSinceMillis(this, startTime)).isFalse();
+        }
+
+        startTime = System.currentTimeMillis();
+        synchronized (this) {
+
+            assertThat(TimeDuration.ZERO.waitSinceMillis(this, startTime)).isFalse();
+        }
+
+        startTime = System.nanoTime() - 100000000;
+        synchronized (this) {
+
+            assertThat(TimeDuration.ZERO.waitSinceNanos(this, startTime)).isFalse();
+        }
+
+        startTime = System.nanoTime();
+        synchronized (this) {
+
+            assertThat(TimeDuration.ZERO.waitSinceNanos(this, startTime)).isFalse();
+        }
+    }
+
+    @Test
+    public void testZeroDay() {
+
         assertThat(TimeDuration.days(0).isZero()).isTrue();
-
-        assertThat(TimeDuration.fromUnit(0, TimeUnit.NANOSECONDS).isZero()).isTrue();
-        assertThat(TimeDuration.fromUnit(0, TimeUnit.MICROSECONDS).isZero()).isTrue();
-        assertThat(TimeDuration.fromUnit(0, TimeUnit.MILLISECONDS).isZero()).isTrue();
-        assertThat(TimeDuration.fromUnit(0, TimeUnit.SECONDS).isZero()).isTrue();
-
-        final TimeUnit minutes = getUnit("MINUTES");
-        if (minutes != null) {
-
-            assertThat(TimeDuration.fromUnit(0, minutes).isZero()).isTrue();
-        }
-
-        final TimeUnit hours = getUnit("HOURS");
-        if (hours != null) {
-
-            assertThat(TimeDuration.fromUnit(0, hours).isZero()).isTrue();
-        }
 
         final TimeUnit days = getUnit("DAYS");
         if (days != null) {
 
             assertThat(TimeDuration.fromUnit(0, days).isZero()).isTrue();
         }
+    }
+
+    @Test
+    public void testZeroHour() {
+
+        assertThat(TimeDuration.hours(0).isZero()).isTrue();
+
+        final TimeUnit hours = getUnit("HOURS");
+        if (hours != null) {
+
+            assertThat(TimeDuration.fromUnit(0, hours).isZero()).isTrue();
+        }
+    }
+
+    @Test
+    public void testZeroMicro() {
+
+        assertThat(TimeDuration.micros(0).isZero()).isTrue();
+        assertThat(TimeDuration.fromUnit(0, TimeUnit.MICROSECONDS).isZero()).isTrue();
+    }
+
+    @Test
+    public void testZeroMilli() {
+
+        assertThat(TimeDuration.millis(0).isZero()).isTrue();
+        assertThat(TimeDuration.fromUnit(0, TimeUnit.MILLISECONDS).isZero()).isTrue();
+    }
+
+    @Test
+    public void testZeroMinute() {
+
+        assertThat(TimeDuration.minutes(0).isZero()).isTrue();
+
+        final TimeUnit minutes = getUnit("MINUTES");
+        if (minutes != null) {
+
+            assertThat(TimeDuration.fromUnit(0, minutes).isZero()).isTrue();
+        }
+    }
+
+    @Test
+    public void testZeroNano() {
+
+        assertThat(TimeDuration.nanos(0).isZero()).isTrue();
+        assertThat(TimeDuration.fromUnit(0, TimeUnit.NANOSECONDS).isZero()).isTrue();
+    }
+
+    @Test
+    public void testZeroSecond() {
+
+        assertThat(TimeDuration.seconds(0).isZero()).isTrue();
+        assertThat(TimeDuration.fromUnit(0, TimeUnit.SECONDS).isZero()).isTrue();
     }
 
     private void testConversions(final TimeDuration time, final boolean isFirst) throws

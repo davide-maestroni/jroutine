@@ -18,7 +18,7 @@ The main way to define a routine is to implement an invocation object. Though, t
 
 ##It's reactive!
 
-The library adheres to [The Reactive Manifesto][18]. It's responsive, resilient, elastic and "message driven".
+The library adheres to [The Reactive Manifesto][reactive manifesto]. It's responsive, resilient, elastic and "message driven".
 
 It's responsive because commands are enqueued to be executed asynchronously so to never block the calling thread. Computation of asynchronous invocations happens only in response of inputs and resources are freed as soon as the input is consumed. Resources are allocated only when needed, and reused when possible.
 It's resilient because errors are gracefully handled and notified through the proper methods implemented by the specific invocation classes.
@@ -27,8 +27,8 @@ It's "message driven" because both ouputs and errors are dispatched along the ch
 
 ##Why not RxJava?
 
-Among the many open source libraries, [RxJava][7] is one of the preferred choices when it comes to handle background tasks.
-Although [Reactive Extensions][8] is a great tool for managing events and composing event listeners, it has not been clearly designed with parallel programming in mind.
+Among the many open source libraries, [RxJava][rxjava] is one of the preferred choices when it comes to handle background tasks.
+Although [Reactive Extensions][reactivex] is a great tool for managing events and composing event listeners, it has not been clearly designed with parallel programming in mind.
 In fact, RxJava shows a few limits in this respect.
 The framework has once been compared, with a fitting example, to a line of domino pieces: once the first tile falls down, all the others are to follow, and there is no way to stop them other than to cut the line.
 Each time a background operation is required, the whole chain of observables/subscribers must be rebuilt from scratch, the chained functions are called recursively and many objects are created in the while.
@@ -60,34 +60,34 @@ And more:
 * ***Java 5+**** ***and Android 1.6+***
 * ***Nullability annotations***
 
-(*) for older Java versions please have a look at [Retrotranslator][17].
+(*) for older Java versions please have a look at [Retrotranslator][retrotranslator].
 
 ##Why not JRoutine?
 
 The JRoutine library is designed for parallel programming and nothing else. It's no golden hammer and does not pretend to.
-If you need event handling, please use [RxJava][7], it's one of the best library out there. If you need distributed scalable computing, consider using [Akka][9].
-For anything else [GitHub][10] is a great source of inspiration.
+If you need event handling, please use [RxJava][rxjava], it's one of the best library out there. If you need distributed scalable computing, consider using [Akka][akka].
+For anything else [GitHub][github] is a great source of inspiration.
 
 ##Usage examples
 
-Please have a look at the dedicated [wiki page][5].
+Please have a look at the dedicated [wiki page][wiki usage].
 
 ##Documentation
 
 Complete Javadoc with insights and examples is available for:
 
-* [JRoutine][13]
-* [JRoutine-Android][14]
+* [JRoutine][javadoc]
+* [JRoutine-Android][javadoc android]
 
 The project contains an additional sample module showing how to implement a file downloader with just 4 classes.
 
 ##Further development
 
-Feel free to contribute with your own [Routine][15] or [Runner][16] implementations, in order to support more platforms other than Android.
+Feel free to contribute with your own [Routine][javadoc routine] or [Runner][javadoc runner] implementations, in order to support more platforms other than Android.
 
 ##Build instructions
 
-Please refer to the dedicated [wiki page][4].
+Please refer to the dedicated [wiki page][wiki build].
 
 ##Dependencies
 
@@ -97,14 +97,14 @@ Please refer to the dedicated [wiki page][4].
 
 ####Compile dependencies
 
-- [FindBugs][11] annotations ([Lesser GNU Public License][3])
-- Android SDK ([Terms and Condition][1])
-- Android Support Library ([Apache License v2.0][2])
+- [FindBugs][findbugs] annotations ([Lesser GNU Public License][lgpl license])
+- Android SDK ([Terms and Condition][android sdk])
+- Android Support Library ([Apache License v2.0][apache license])
 
 ####Test dependencies
 
-- JUnit ([Eclipse Public License v1.0][6])
-- [AssertJ][12] ([Apache License v2.0][2])
+- JUnit ([Eclipse Public License v1.0][eclipse license])
+- [AssertJ][assertj] ([Apache License v2.0][apache license])
 
 ##Artifacts
 
@@ -118,28 +118,28 @@ JRoutine-Android | [![Maven Central](https://maven-badges.herokuapp.com/maven-ce
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 
-&nbsp;&nbsp;&nbsp;&nbsp;[http://www.apache.org/licenses/LICENSE-2.0][2]
+&nbsp;&nbsp;&nbsp;&nbsp;[http://www.apache.org/licenses/LICENSE-2.0][apache license]
 
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 
 **IT'S OPEN DUDE!**
 
 
-[1]:http://developer.android.com/sdk/terms.html
-[2]:http://www.apache.org/licenses/LICENSE-2.0
-[3]:http://www.gnu.org/licenses/lgpl.html
-[4]:https://github.com/davide-maestroni/jroutine/wiki/Build-Instructions
-[5]:https://github.com/davide-maestroni/jroutine/wiki/Usage-Examples
-[6]:https://www.eclipse.org/legal/epl-v10.html
-[7]:https://github.com/ReactiveX/RxJava
-[8]:http://reactivex.io/
-[9]:http://akka.io/
-[10]:https://github.com/
-[11]:http://findbugs.sourceforge.net/
-[12]:http://joel-costigliola.github.io/assertj/
-[13]:http://davide-maestroni.github.io/jroutine/docs/jroutine
-[14]:http://davide-maestroni.github.io/jroutine/docs/android
-[15]:http://davide-maestroni.github.io/jroutine/docs/jroutine/com/gh/bmd/jrt/routine/Routine.html
-[16]:http://davide-maestroni.github.io/jroutine/docs/jroutine/com/gh/bmd/jrt/runner/Runner.html
-[17]:http://retrotranslator.sourceforge.net/
-[18]:http://www.reactivemanifesto.org/
+[apache license]:http://www.apache.org/licenses/LICENSE-2.0
+[eclipse license]:https://www.eclipse.org/legal/epl-v10.html
+[lgpl license]:http://www.gnu.org/licenses/lgpl.html
+[reactive manifesto]:http://www.reactivemanifesto.org/
+[android sdk]:http://developer.android.com/sdk/terms.html
+[findbugs]:http://findbugs.sourceforge.net/
+[assertj]:http://joel-costigliola.github.io/assertj/
+[retrotranslator]:http://retrotranslator.sourceforge.net/
+[github]:https://github.com/
+[rxjava]:https://github.com/ReactiveX/RxJava
+[reactivex]:http://reactivex.io/
+[akka]:http://akka.io/
+[wiki build]:https://github.com/davide-maestroni/jroutine/wiki/Build-Instructions
+[wiki usage]:https://github.com/davide-maestroni/jroutine/wiki/Usage-Examples
+[javadoc]:http://davide-maestroni.github.io/jroutine/docs/jroutine
+[javadoc android]:http://davide-maestroni.github.io/jroutine/docs/android
+[javadoc routine]:http://davide-maestroni.github.io/jroutine/docs/jroutine/com/gh/bmd/jrt/routine/Routine.html
+[javadoc runner]:http://davide-maestroni.github.io/jroutine/docs/jroutine/com/gh/bmd/jrt/runner/Runner.html

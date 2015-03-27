@@ -755,7 +755,7 @@ public class RoutineProcessor extends AbstractProcessor {
                                 + " input parameters");
             }
 
-        } else { // AsyncType.PARALLEL
+        } else { // PassingMode.PARALLEL
 
             if ((targetType.getKind() != TypeKind.ARRAY) && !typeUtils.isAssignable(
                     targetTypeErasure, iterableElement.asType())) {
@@ -871,7 +871,7 @@ public class RoutineProcessor extends AbstractProcessor {
                                 + iterableElement);
             }
 
-        } else { // AsyncType.PARALLEL
+        } else { // PassingMode.PARALLEL
 
             if ((returnType.getKind() != TypeKind.ARRAY) && !typeUtils.isAssignable(
                     listElement.asType(), returnTypeErasure)) {

@@ -270,7 +270,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
                                 + " input parameters");
             }
 
-        } else { // AsyncType.PARALLEL
+        } else { // PassingMode.PARALLEL
 
             if (!isArray && !Iterable.class.isAssignableFrom(parameterType)) {
 
@@ -375,7 +375,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
                                 + Iterable.class.getCanonicalName());
             }
 
-        } else { // AsyncType.PARALLEL
+        } else { // PassingMode.PARALLEL
 
             if (!returnType.isArray() && !returnType.isAssignableFrom(List.class)) {
 

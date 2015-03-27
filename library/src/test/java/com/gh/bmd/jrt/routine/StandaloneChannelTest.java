@@ -15,14 +15,20 @@ package com.gh.bmd.jrt.routine;
 
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
+import com.gh.bmd.jrt.builder.RoutineConfiguration.RunnerType;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutAction;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ReadDeadlockException;
 import com.gh.bmd.jrt.channel.StandaloneChannel;
+import com.gh.bmd.jrt.channel.StandaloneChannel.StandaloneInput;
 import com.gh.bmd.jrt.channel.StandaloneChannel.StandaloneOutput;
 import com.gh.bmd.jrt.common.AbortException;
 import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.invocation.PassingInvocation;
+import com.gh.bmd.jrt.log.Log;
+import com.gh.bmd.jrt.log.Log.LogLevel;
+import com.gh.bmd.jrt.log.NullLog;
+import com.gh.bmd.jrt.runner.Runners;
 import com.gh.bmd.jrt.time.TimeDuration;
 
 import org.junit.Test;
@@ -30,7 +36,11 @@ import org.junit.Test;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.builder;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.withOutputOrder;
@@ -130,7 +140,7 @@ public class StandaloneChannelTest {
         final StandaloneOutput<String> output = standaloneChannel.output();
         assertThat(output.immediately().eventuallyExit().readAll()).isEmpty();
 
-        output.afterMax(TimeDuration.millis(10));
+        output.eventuallyDeadlock().afterMax(TimeDuration.millis(10));
 
         try {
 
@@ -178,7 +188,7 @@ public class StandaloneChannelTest {
         final StandaloneOutput<String> output = standaloneChannel.output();
         assertThat(output.immediately().eventuallyExit().readAll()).isEmpty();
 
-        output.afterMax(TimeDuration.millis(10));
+        output.eventuallyDeadlock().afterMax(TimeDuration.millis(10));
 
         try {
 
@@ -254,6 +264,24 @@ public class StandaloneChannelTest {
     }
 
     @Test
+    public void testConfigurationWarnings() {
+
+        final CountLog countLog = new CountLog();
+        final RoutineConfiguration configuration = builder().withSyncRunner(RunnerType.SEQUENTIAL)
+                                                            .withMaxInvocations(3)
+                                                            .withCoreInvocations(3)
+                                                            .withAvailableTimeout(seconds(1))
+                                                            .withInputOrder(OrderType.DELIVERY)
+                                                            .withInputSize(3)
+                                                            .withInputTimeout(seconds(1))
+                                                            .withLogLevel(LogLevel.DEBUG)
+                                                            .withLog(countLog)
+                                                            .buildConfiguration();
+        JRoutine.standalone().withConfiguration(configuration).buildChannel();
+        assertThat(countLog.getWrnCount()).isEqualTo(7);
+    }
+
+    @Test
     public void testHasNextIteratorTimeout() {
 
         final StandaloneChannel<String> standaloneChannel = JRoutine.standalone().buildChannel();
@@ -286,7 +314,7 @@ public class StandaloneChannelTest {
         final StandaloneOutput<String> output = standaloneChannel.output();
         assertThat(output.immediately().eventuallyExit().readAll()).isEmpty();
 
-        output.afterMax(TimeDuration.millis(10));
+        output.eventuallyDeadlock().afterMax(TimeDuration.millis(10));
 
         try {
 
@@ -334,7 +362,7 @@ public class StandaloneChannelTest {
         final StandaloneOutput<String> output = standaloneChannel.output();
         assertThat(output.immediately().eventuallyExit().readAll()).isEmpty();
 
-        output.afterMax(TimeDuration.millis(10));
+        output.eventuallyDeadlock().afterMax(TimeDuration.millis(10));
 
         try {
 
@@ -382,7 +410,7 @@ public class StandaloneChannelTest {
         final StandaloneOutput<String> output = standaloneChannel.output();
         assertThat(output.immediately().eventuallyExit().readAll()).isEmpty();
 
-        output.afterMax(TimeDuration.millis(10));
+        output.eventuallyDeadlock().afterMax(TimeDuration.millis(10));
 
         try {
 
@@ -395,6 +423,39 @@ public class StandaloneChannelTest {
         }
 
         assertThat(output.checkComplete()).isFalse();
+    }
+
+    @Test
+    public void testOrderType() {
+
+        final TimeDuration timeout = seconds(1);
+        final RoutineConfiguration config = builder().withOutputOrder(OrderType.PASSING)
+                                                     .withRunner(Runners.sharedRunner())
+                                                     .withOutputSize(1)
+                                                     .withOutputTimeout(1, TimeUnit.MILLISECONDS)
+                                                     .withOutputTimeout(seconds(1))
+                                                     .withLogLevel(LogLevel.DEBUG)
+                                                     .withLog(new NullLog())
+                                                     .buildConfiguration();
+        final StandaloneChannel<Object> channel =
+                JRoutine.standalone().withConfiguration(config).buildChannel();
+        channel.input().pass(-77L);
+        assertThat(channel.output().afterMax(timeout).readNext()).isEqualTo(-77L);
+
+        final StandaloneChannel<Object> standaloneChannel1 = JRoutine.standalone().buildChannel();
+        final StandaloneInput<Object> input1 = standaloneChannel1.input();
+
+        input1.after(TimeDuration.millis(200)).pass(23).now().pass(-77L).close();
+        assertThat(standaloneChannel1.output().afterMax(timeout).readAll()).containsOnly(23, -77L);
+
+        final RoutineConfiguration config2 = withOutputOrder(OrderType.PASSING);
+        final StandaloneChannel<Object> standaloneChannel2 =
+                JRoutine.standalone().withConfiguration(config2).buildChannel();
+        final StandaloneInput<Object> input2 = standaloneChannel2.input();
+
+        input2.after(TimeDuration.millis(200)).pass(23).now().pass(-77L).close();
+        assertThat(standaloneChannel2.output().afterMax(timeout).readAll()).containsExactly(23,
+                                                                                            -77L);
     }
 
     @Test
@@ -490,6 +551,49 @@ public class StandaloneChannelTest {
 
         } catch (final ReadDeadlockException ignored) {
 
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private static class CountLog implements Log {
+
+        private int mDgbCount;
+
+        private int mErrCount;
+
+        private int mWrnCount;
+
+        public void dbg(@Nonnull final List<Object> contexts, @Nullable final String message,
+                @Nullable final Throwable throwable) {
+
+            ++mDgbCount;
+        }
+
+        public void err(@Nonnull final List<Object> contexts, @Nullable final String message,
+                @Nullable final Throwable throwable) {
+
+            ++mErrCount;
+        }
+
+        public void wrn(@Nonnull final List<Object> contexts, @Nullable final String message,
+                @Nullable final Throwable throwable) {
+
+            ++mWrnCount;
+        }
+
+        public int getDgbCount() {
+
+            return mDgbCount;
+        }
+
+        public int getErrCount() {
+
+            return mErrCount;
+        }
+
+        public int getWrnCount() {
+
+            return mWrnCount;
         }
     }
 

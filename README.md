@@ -56,7 +56,7 @@ What the library has to offer is:
 
 And more:
 
-* ***< 220KB Jar***
+* ***< 210KB Jar***
 * ***Java 5+**** ***and Android 1.6+***
 * ***Nullability annotations***
 
@@ -77,6 +77,7 @@ Please have a look at the dedicated [wiki page][wiki usage].
 Complete Javadoc with insights and examples is available for:
 
 * [JRoutine][javadoc]
+* [JRoutine-Processor][javadoc processor]
 * [JRoutine-Android][javadoc android]
 
 The project contains an additional sample module showing how to implement a file downloader with just 4 classes.
@@ -140,6 +141,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 [wiki build]:https://github.com/davide-maestroni/jroutine/wiki/Build-Instructions
 [wiki usage]:https://github.com/davide-maestroni/jroutine/wiki/Usage-Examples
 [javadoc]:http://davide-maestroni.github.io/jroutine/docs/jroutine
+[javadoc processor]:http://davide-maestroni.github.io/jroutine/docs/processor
 [javadoc android]:http://davide-maestroni.github.io/jroutine/docs/android
 [javadoc routine]:http://davide-maestroni.github.io/jroutine/docs/jroutine/com/gh/bmd/jrt/routine/Routine.html
 [javadoc runner]:http://davide-maestroni.github.io/jroutine/docs/jroutine/com/gh/bmd/jrt/runner/Runner.html

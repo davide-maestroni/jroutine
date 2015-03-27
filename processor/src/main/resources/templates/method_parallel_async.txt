@@ -14,6 +14,7 @@
 
 // GENERATED CODE - PLEASE DO NOT EDIT
 
+    @SuppressWarnings({"unchecked", "RedundantCast"})
     public ${resultType} ${methodName}(${paramTypes}) {
 
         final com.gh.bmd.jrt.channel.ParameterChannel<Object, ${resultClassName}> $$channel = this.mRoutine${methodCount}.invokeParallel();

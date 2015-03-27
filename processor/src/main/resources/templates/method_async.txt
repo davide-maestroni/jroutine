@@ -14,7 +14,7 @@
 
 // GENERATED CODE - PLEASE DO NOT EDIT
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "RedundantCast"})
     public ${resultType} ${methodName}(${paramTypes}) {
 
         return this.mRoutine${methodCount}.${invokeMethod}()${inputParams}.result()${outputOptions};

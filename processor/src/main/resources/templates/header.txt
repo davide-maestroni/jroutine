@@ -22,6 +22,7 @@ public final class JRoutine_${interfaceName}${genericTypes} implements ${interfa
 
     private final java.lang.ref.WeakReference<${classFullName}> mWrapped;
 
+    @SuppressWarnings("ConstantConditions")
     public JRoutine_${interfaceName}(@javax.annotation.Nonnull final ${classFullName} wrapped,
             final String shareGroup, final com.gh.bmd.jrt.builder.RoutineConfiguration configuration) {
 
@@ -83,6 +84,6 @@ public final class JRoutine_${interfaceName}${genericTypes} implements ${interfa
                 @javax.annotation.Nonnull final String shareGroup,
                 @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration configuration) {
 
-            return new JRoutine_${interfaceName}(mTarget, shareGroup, configuration);
+            return new JRoutine_${interfaceName}${genericTypes}(mTarget, shareGroup, configuration);
         }
     }

@@ -63,7 +63,7 @@ import static org.junit.Assert.fail;
 public class ProcessorTest {
 
     @Test
-    public void testCache() {
+    public void testGenericWrapperCache() {
 
         final TestList<String> testList = new TestList<String>();
         final WrapperRoutineBuilder builder = JRoutineProcessor.on(testList)

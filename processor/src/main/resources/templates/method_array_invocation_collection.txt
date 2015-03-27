@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -44,12 +44,23 @@
 
                 for (final Object object : objects) {
 
-                    array[i++] = (${componentType}) object;
+                    array[i++] = (${boxedType}) object;
                 }
 
-                for (final ${resultClassName} element : wrapped.${targetMethodName}(array)) {
+                try {
 
-                    result.pass(element);
+                    for (final ${resultClassName} element : wrapped.${targetMethodName}(array)) {
+
+                        result.pass(element);
+                    }
+
+                } catch (final com.gh.bmd.jrt.common.RoutineException e) {
+
+                    throw e;
+
+                } catch (final Throwable t) {
+
+                    throw new com.gh.bmd.jrt.common.InvocationException(t);
                 }
             }
         }

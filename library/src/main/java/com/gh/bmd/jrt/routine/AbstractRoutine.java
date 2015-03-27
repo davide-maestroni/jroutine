@@ -1,10 +1,10 @@
-/**
+/*
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p/>
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p/>
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -189,7 +189,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
                 } catch (final InvocationInterruptedException e) {
 
-                    throw e.interrupt();
+                    throw e;
 
                 } catch (final Throwable t) {
 
@@ -209,7 +209,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
                 } catch (final InvocationInterruptedException e) {
 
-                    throw e.interrupt();
+                    throw e;
 
                 } catch (final Throwable t) {
 
@@ -348,7 +348,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
                     mLogger.err(e, "waiting for available instances interrupted [#%d]",
                                 mMaxInvocations);
-                    throw InvocationInterruptedException.interrupt(e);
+                    throw new InvocationInterruptedException(e);
                 }
 
                 if (isTimeout) {
@@ -410,7 +410,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
                 } catch (final InvocationInterruptedException e) {
 
-                    throw e.interrupt();
+                    throw e;
 
                 } catch (final Throwable t) {
 
@@ -453,7 +453,7 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
 
                     } catch (final InvocationInterruptedException e) {
 
-                        throw e.interrupt();
+                        throw e;
 
                     } catch (final Throwable t) {
 

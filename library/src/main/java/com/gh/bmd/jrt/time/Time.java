@@ -1,10 +1,10 @@
-/**
+/*
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p/>
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p/>
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -127,7 +127,7 @@ public class Time {
 
         if ((days > MAX_DAYS) || (days < -MAX_DAYS)) {
 
-            throw new IllegalArgumentException("time value overflow");
+            throw new IllegalArgumentException("time value overflow: " + days + " days");
         }
 
         return new Time(days * SECONDS_IN_DAY, TimeUnit.SECONDS);
@@ -165,7 +165,7 @@ public class Time {
 
         if ((hours > MAX_HOURS) || (hours < -MAX_HOURS)) {
 
-            throw new IllegalArgumentException("time value overflow");
+            throw new IllegalArgumentException("time value overflow: " + hours + " hours");
         }
 
         return new Time(hours * SECONDS_IN_HOUR, TimeUnit.SECONDS);
@@ -206,7 +206,7 @@ public class Time {
 
         if ((minutes > MAX_MINUTES) || (minutes < -MAX_MINUTES)) {
 
-            throw new IllegalArgumentException("time value overflow");
+            throw new IllegalArgumentException("time value overflow: " + minutes + " minutes");
         }
 
         return new Time(minutes * SECONDS_IN_MINUTE, TimeUnit.SECONDS);

@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,12 +14,12 @@
 
 // GENERATED CODE - PLEASE DO NOT EDIT
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "RedundantCast"})
     public ${resultType} ${methodName}(${paramTypes}) {
 
         final java.util.List<${resultClassName}> $$list = this.mRoutine${methodCount}.${invokeMethod}()${inputParams}.result()${outputOptions}.readAll();
         final int $$size = $$list.size();
-        final ${resultRawClass}[] $$array = new ${resultRawClass}[$$size];
+        final ${resultRawClass}[] $$array = new ${resultRawSizedArray};
 
         for (int $$i = 0; $$i < $$size; ++$$i) {
 

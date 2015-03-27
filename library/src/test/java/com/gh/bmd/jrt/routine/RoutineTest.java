@@ -1,10 +1,10 @@
-/**
+/*
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p/>
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p/>
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -1166,19 +1166,18 @@ public class RoutineTest {
     public void testMethod() throws NoSuchMethodException {
 
         final TimeDuration timeout = seconds(1);
-        final TestClass testClass = new TestClass();
-        assertThat(on(testClass).method(TestClass.class.getMethod("getOne"))
-                                .callSync()
-                                .afterMax(timeout)
-                                .readAll()).containsExactly(1);
-        assertThat(on(testClass).method("getOne")
-                                .callSync()
-                                .afterMax(timeout)
-                                .readAll()).containsExactly(1);
-        assertThat(on(testClass).boundMethod(TestClass.GET)
-                                .callSync()
-                                .afterMax(timeout)
-                                .readAll()).containsExactly(1);
+        final TestClass test = new TestClass();
+        assertThat(on(test).method(TestClass.class.getMethod("getOne"))
+                           .callSync()
+                           .afterMax(timeout)
+                           .readAll()).containsExactly(1);
+        assertThat(
+                on(test).method("getOne").callSync().afterMax(timeout).readAll()).containsExactly(
+                1);
+        assertThat(on(test).boundMethod(TestClass.GET)
+                           .callSync()
+                           .afterMax(timeout)
+                           .readAll()).containsExactly(1);
         assertThat(on(TestClass.class).boundMethod(TestClass.GET)
                                       .callSync(3)
                                       .afterMax(timeout)
@@ -1190,7 +1189,7 @@ public class RoutineTest {
                                       .afterMax(timeout)
                                       .readAll()).containsExactly(17);
 
-        assertThat(on(testClass).buildProxy(TestInterface.class).getInt(2)).isEqualTo(2);
+        assertThat(on(test).buildProxy(TestInterface.class).getInt(2)).isEqualTo(2);
 
         try {
 
@@ -1212,17 +1211,16 @@ public class RoutineTest {
 
         }
 
-        assertThat(on(testClass).withConfiguration(withReadTimeout(timeout))
-                                .buildProxy(TestInterfaceAsync.class)
-                                .take(77)).isEqualTo(77);
-        assertThat(on(testClass).buildProxy(TestInterfaceAsync.class)
-                                .getOne()
-                                .afterMax(timeout)
-                                .readNext()).isEqualTo(1);
+        assertThat(on(test).withConfiguration(withReadTimeout(timeout))
+                           .buildProxy(TestInterfaceAsync.class)
+                           .take(77)).isEqualTo(77);
+        assertThat(
+                on(test).buildProxy(TestInterfaceAsync.class).getOne().afterMax(timeout).readNext())
+                .isEqualTo(1);
 
         final TestInterfaceAsync testInterfaceAsync =
-                on(testClass).withConfiguration(withReadTimeout(1, TimeUnit.SECONDS))
-                             .buildProxy(TestInterfaceAsync.class);
+                on(test).withConfiguration(withReadTimeout(1, TimeUnit.SECONDS))
+                        .buildProxy(TestInterfaceAsync.class);
         assertThat(testInterfaceAsync.getInt(testInterfaceAsync.getOne())).isEqualTo(1);
     }
 

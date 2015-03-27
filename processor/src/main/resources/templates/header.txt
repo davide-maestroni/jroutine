@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,14 +18,12 @@ package ${packageName};
 
 public final class JRoutine_${interfaceName}${genericTypes} implements ${interfaceFullName} {
 
-    private final com.gh.bmd.jrt.common.WeakIdentityHashMap<Object, java.util.Map<String, Object>> mMutexMap;
-
     private final String mShareGroup;
 
     private final java.lang.ref.WeakReference<${classFullName}> mWrapped;
 
-    public JRoutine_${interfaceName}(final ${classFullName} wrapped,
-            final com.gh.bmd.jrt.common.WeakIdentityHashMap<Object, java.util.Map<String, Object>> mutexMap,
+    @SuppressWarnings("ConstantConditions")
+    public JRoutine_${interfaceName}(@javax.annotation.Nonnull final ${classFullName} wrapped,
             final String shareGroup, final com.gh.bmd.jrt.builder.RoutineConfiguration configuration) {
 
         if (wrapped == null) {
@@ -33,21 +31,15 @@ public final class JRoutine_${interfaceName}${genericTypes} implements ${interfa
             throw new NullPointerException("the wrapped instance must not be null");
         }
 
-        if (mutexMap == null) {
-
-            throw new NullPointerException("the mutex map must not be null");
-        }
-
         mWrapped = new java.lang.ref.WeakReference<${classFullName}>(wrapped);
-        mMutexMap = mutexMap;
         mShareGroup = (shareGroup != null) ? shareGroup : com.gh.bmd.jrt.annotation.Share.ALL;
         ${routineFieldsInit}
     }
 
     @javax.annotation.Nonnull
-    public static com.gh.bmd.jrt.routine.WrapperBuilder<${interfaceFullName}> on(final ${classFullName} wrapped) {
+    public static ${genericTypes} com.gh.bmd.jrt.processor.builder.WrapperBuilder<${interfaceFullName}> on(final ${classFullName} wrapped) {
 
-        return new ${interfaceName}WrapperBuilder(wrapped);
+        return new ${interfaceName}WrapperBuilder${genericTypes}(wrapped);
     }
 
     private Object getMutex(final String shareGroup) {
@@ -57,45 +49,26 @@ public final class JRoutine_${interfaceName}${genericTypes} implements ${interfa
             return null;
         }
 
-        synchronized (mMutexMap) {
-
-            final ${classFullName} wrapped = mWrapped.get();
-
-            if (wrapped == null) {
-
-                throw new IllegalStateException("target object has been destroyed");
-            }
-
-            java.util.Map<String, Object> mutexMap = mMutexMap.get(wrapped);
-
-            if (mutexMap == null) {
-
-                mutexMap = new java.util.HashMap<String, Object>();
-                mMutexMap.put(wrapped, mutexMap);
-            }
-
-            final String name = (shareGroup != null) ? shareGroup : mShareGroup;
-            Object mutex = mutexMap.get(name);
-
-            if (mutex == null) {
-
-                mutex = new Object();
-                mutexMap.put(name, mutex);
-            }
-
-            return mutex;
-        }
+        final String groupName = (shareGroup != null) ? shareGroup : mShareGroup;
+        return com.gh.bmd.jrt.builder.RoutineBuilders.getSharedMutex(mWrapped, groupName);
     }
 
-    private static class ${interfaceName}WrapperBuilder extends com.gh.bmd.jrt.routine.AbstractWrapperBuilder<${interfaceFullName}> {
+    private static class ${interfaceName}WrapperBuilder${genericTypes} extends com.gh.bmd.jrt.processor.builder.AbstractWrapperBuilder<${interfaceFullName}> {
 
         private final ${classFullName} mTarget;
 
-        private final com.gh.bmd.jrt.common.ClassToken mToken = new com.gh.bmd.jrt.common.ClassToken<${interfaceFullName}>() {};
+        private final com.gh.bmd.jrt.common.ClassToken<${interfaceFullName}> mToken = new com.gh.bmd.jrt.common.ClassToken<${interfaceFullName}>() {};
 
-        private ${interfaceName}WrapperBuilder(final ${classFullName} target) {
+        private ${interfaceName}WrapperBuilder(@javax.annotation.Nonnull final ${classFullName} target) {
 
             mTarget = target;
+        }
+
+        @javax.annotation.Nonnull
+        @Override
+        protected com.gh.bmd.jrt.common.ClassToken<${interfaceFullName}> getInterfaceToken() {
+
+            return mToken;
         }
 
         @javax.annotation.Nonnull
@@ -107,18 +80,10 @@ public final class JRoutine_${interfaceName}${genericTypes} implements ${interfa
 
         @javax.annotation.Nonnull
         @Override
-        protected Class<${interfaceFullName}> getWrapperClass() {
-
-            return mToken.getRawClass();
-        }
-
-        @javax.annotation.Nonnull
-        @Override
         protected ${interfaceFullName} newWrapper(
-                @javax.annotation.Nonnull final com.gh.bmd.jrt.common.WeakIdentityHashMap<Object, java.util.Map<String, Object>> mutexMap,
                 @javax.annotation.Nonnull final String shareGroup,
                 @javax.annotation.Nonnull final com.gh.bmd.jrt.builder.RoutineConfiguration configuration) {
 
-            return new JRoutine_${interfaceName}(mTarget, mutexMap, shareGroup, configuration);
+            return new JRoutine_${interfaceName}${genericTypes}(mTarget, shareGroup, configuration);
         }
     }

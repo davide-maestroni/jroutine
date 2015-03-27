@@ -1,10 +1,10 @@
-/**
+/*
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p/>
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p/>
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,6 +18,7 @@ import com.gh.bmd.jrt.annotation.Pass;
 import com.gh.bmd.jrt.annotation.Pass.PassingMode;
 import com.gh.bmd.jrt.annotation.Share;
 import com.gh.bmd.jrt.annotation.Timeout;
+import com.gh.bmd.jrt.builder.ObjectRoutineBuilder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
@@ -31,19 +32,16 @@ import com.gh.bmd.jrt.time.TimeDuration;
 import java.lang.annotation.Annotation;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Array;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import static com.gh.bmd.jrt.common.Reflection.boxingClass;
-import static com.gh.bmd.jrt.common.Reflection.findConstructor;
 import static com.gh.bmd.jrt.time.TimeDuration.fromUnit;
 
 /**
@@ -70,29 +68,17 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
         super(target);
     }
 
-    /**
-     * Constructor.
-     *
-     * @param targetReference the reference to the target object.
-     * @throws java.lang.IllegalArgumentException if a duplicate name in the annotations is
-     *                                            detected.
-     * @throws java.lang.NullPointerException     if the specified target is null.
-     */
-    DefaultObjectRoutineBuilder(@Nonnull final WeakReference<?> targetReference) {
-
-        super(targetReference);
-    }
-
     @Nullable
     @SuppressWarnings("unchecked")
     private static Object callRoutine(@Nonnull final Routine<Object, Object> routine,
             @Nonnull final Method method, @Nonnull final Object[] args,
-            @Nullable final PassingMode paramType) {
+            @Nullable final PassingMode paramMode,
+            @Nullable final PassingMode returnMode) { //TODO returnType
 
         final Class<?> returnType = method.getReturnType();
         final OutputChannel<Object> outputChannel;
 
-        if (paramType == PassingMode.PARALLEL) {
+        if (paramMode == PassingMode.PARALLEL) {
 
             final ParameterChannel<Object, Object> parameterChannel = routine.invokeParallel();
             final Class<?> parameterType = method.getParameterTypes()[0];
@@ -127,7 +113,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
             outputChannel = parameterChannel.result();
 
-        } else if (paramType == PassingMode.OBJECT) {
+        } else if (paramMode == PassingMode.OBJECT) {
 
             final ParameterChannel<Object, Object> parameterChannel = routine.invokeAsync();
             final Class<?>[] parameterTypes = method.getParameterTypes();
@@ -149,7 +135,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
             outputChannel = parameterChannel.result();
 
-        } else if (paramType == PassingMode.COLLECTION) {
+        } else if (paramMode == PassingMode.COLLECTION) {
 
             final ParameterChannel<Object, Object> parameterChannel = routine.invokeAsync();
             outputChannel = parameterChannel.pass((OutputChannel<Object>) args[0]).result();
@@ -161,28 +147,31 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
         if (!Void.class.equals(boxingClass(returnType))) {
 
-            if (OutputChannel.class.isAssignableFrom(returnType)) {
+            if (returnMode != null) {
 
-                return outputChannel;
-            }
+                if (OutputChannel.class.isAssignableFrom(returnType)) {
 
-            if (returnType.isAssignableFrom(List.class)) {
-
-                return outputChannel.readAll();
-            }
-
-            if (returnType.isArray()) {
-
-                final List<Object> results = outputChannel.readAll();
-                final int size = results.size();
-                final Object array = Array.newInstance(returnType.getComponentType(), size);
-
-                for (int i = 0; i < size; ++i) {
-
-                    Array.set(array, i, results.get(i));
+                    return outputChannel;
                 }
 
-                return array;
+                if (returnType.isAssignableFrom(List.class)) {
+
+                    return outputChannel.readAll();
+                }
+
+                if (returnType.isArray()) {
+
+                    final List<Object> results = outputChannel.readAll();
+                    final int size = results.size();
+                    final Object array = Array.newInstance(returnType.getComponentType(), size);
+
+                    for (int i = 0; i < size; ++i) {
+
+                        Array.set(array, i, results.get(i));
+                    }
+
+                    return array;
+                }
             }
 
             return outputChannel.readNext();
@@ -192,8 +181,9 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
     }
 
     @Nonnull
-    private static PassingMode getParamMode(@Nonnull final Pass passAnnotation,
-            @Nonnull final Class<?> parameterType, final int length) {
+    private static PassingMode getParamMode(@Nonnull final Method method,
+            @Nonnull final Pass passAnnotation, @Nonnull final Class<?> parameterType,
+            final int length) {
 
         PassingMode passingMode = passAnnotation.mode();
         final Class<?> paramClass = passAnnotation.value();
@@ -219,16 +209,17 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
                         boxingClass(parameterType.getComponentType()))) {
 
                     throw new IllegalArgumentException(
-                            "the async input array with passing mode " + PassingMode.PARALLEL
-                                    + " does not match the bound type: "
+                            "[" + method + "] the async input array with passing mode "
+                                    + PassingMode.PARALLEL + " does not match the bound type: "
                                     + paramClass.getCanonicalName());
                 }
 
                 if (length > 1) {
 
                     throw new IllegalArgumentException(
-                            "an async input with passing mode " + PassingMode.PARALLEL +
-                                    " cannot be applied to a method taking " + length +
+                            "[" + method + "] an async input with passing mode "
+                                    + PassingMode.PARALLEL
+                                    + " cannot be applied to a method taking " + length +
                                     " input parameters");
 
                 }
@@ -237,9 +228,9 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
             } else {
 
-                throw new IllegalArgumentException(
-                        "cannot automatically choose a passing mode for an output of type: "
-                                + parameterType.getCanonicalName());
+                throw new IllegalArgumentException("[" + method + "] cannot automatically choose a "
+                                                           + "passing mode for an output of type: "
+                                                           + parameterType.getCanonicalName());
             }
 
         } else if (passingMode == PassingMode.OBJECT) {
@@ -247,7 +238,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
             if (!OutputChannel.class.isAssignableFrom(parameterType)) {
 
                 throw new IllegalArgumentException(
-                        "an async input with passing mode " + PassingMode.OBJECT
+                        "[" + method + "] an async input with passing mode " + PassingMode.OBJECT
                                 + " must extends an " + OutputChannel.class.getCanonicalName());
             }
 
@@ -256,14 +247,16 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
             if (!OutputChannel.class.isAssignableFrom(parameterType)) {
 
                 throw new IllegalArgumentException(
-                        "an async input with passing mode " + PassingMode.COLLECTION
-                                + " must extends an " + OutputChannel.class.getCanonicalName());
+                        "[" + method + "] an async input with passing mode "
+                                + PassingMode.COLLECTION + " must extends an " + OutputChannel.class
+                                .getCanonicalName());
             }
 
             if (!paramClass.isArray() && !paramClass.isAssignableFrom(List.class)) {
 
                 throw new IllegalArgumentException(
-                        "an async input with passing mode " + PassingMode.COLLECTION
+                        "[" + method + "] an async input with passing mode "
+                                + PassingMode.COLLECTION
                                 + " must be bound to an array or a superclass of "
                                 + List.class.getCanonicalName());
             }
@@ -271,17 +264,18 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
             if (length > 1) {
 
                 throw new IllegalArgumentException(
-                        "an async input with passing mode " + PassingMode.COLLECTION +
+                        "[" + method + "] an async input with passing mode "
+                                + PassingMode.COLLECTION +
                                 " cannot be applied to a method taking " + length
                                 + " input parameters");
             }
 
-        } else { // AsyncType.PARALLEL
+        } else { // PassingMode.PARALLEL
 
             if (!isArray && !Iterable.class.isAssignableFrom(parameterType)) {
 
                 throw new IllegalArgumentException(
-                        "an async input with passing mode " + PassingMode.PARALLEL
+                        "[" + method + "] an async input with passing mode " + PassingMode.PARALLEL
                                 + " must be an array or implement an "
                                 + Iterable.class.getCanonicalName());
             }
@@ -290,16 +284,16 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
                     boxingClass(parameterType.getComponentType()))) {
 
                 throw new IllegalArgumentException(
-                        "the async input array with passing mode " + PassingMode.PARALLEL
-                                + " does not match the bound type: "
+                        "[" + method + "] the async input array with passing mode "
+                                + PassingMode.PARALLEL + " does not match the bound type: "
                                 + paramClass.getCanonicalName());
             }
 
             if (length > 1) {
 
                 throw new IllegalArgumentException(
-                        "an async input with passing mode " + PassingMode.PARALLEL +
-                                " cannot be applied to a method taking " + length
+                        "[" + method + "] an async input with passing mode " + PassingMode.PARALLEL
+                                + " cannot be applied to a method taking " + length
                                 + " input parameters");
             }
         }
@@ -308,8 +302,8 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
     }
 
     @Nonnull
-    private static PassingMode getReturnMode(@Nonnull final Pass annotation,
-            @Nonnull final Class<?> returnType) {
+    private static PassingMode getReturnMode(@Nonnull final Method method,
+            @Nonnull final Pass annotation, @Nonnull final Class<?> returnType) {
 
         PassingMode passingMode = annotation.mode();
 
@@ -323,8 +317,8 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
                         returnType.getComponentType()).isAssignableFrom(boxingClass(returnClass))) {
 
                     throw new IllegalArgumentException(
-                            "the async output array with passing mode " + PassingMode.PARALLEL
-                                    + " does not match the bound type: "
+                            "[" + method + "] the async output array with passing mode "
+                                    + PassingMode.PARALLEL + " does not match the bound type: "
                                     + returnClass.getCanonicalName());
                 }
 
@@ -345,9 +339,9 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
             } else {
 
-                throw new IllegalArgumentException(
-                        "cannot automatically choose a passing mode for an input of type: "
-                                + returnType.getCanonicalName());
+                throw new IllegalArgumentException("[" + method + "] cannot automatically choose a "
+                                                           + "passing mode for an input of type: "
+                                                           + returnType.getCanonicalName());
             }
 
         } else if (passingMode == PassingMode.OBJECT) {
@@ -356,7 +350,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
                 final String channelClassName = OutputChannel.class.getCanonicalName();
                 throw new IllegalArgumentException(
-                        "an async output with passing mode " + PassingMode.OBJECT
+                        "[" + method + "] an async output with passing mode " + PassingMode.OBJECT
                                 + " must be a superclass of " + channelClassName);
             }
 
@@ -366,7 +360,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
                 final String channelClassName = OutputChannel.class.getCanonicalName();
                 throw new IllegalArgumentException(
-                        "an async output with passing mode " + PassingMode.OBJECT
+                        "[" + method + "] an async output with passing mode " + PassingMode.OBJECT
                                 + " must be a superclass of " + channelClassName);
             }
 
@@ -375,17 +369,18 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
             if (!returnClass.isArray() && !Iterable.class.isAssignableFrom(returnClass)) {
 
                 throw new IllegalArgumentException(
-                        "an async output with passing mode " + PassingMode.COLLECTION
+                        "[" + method + "] an async output with passing mode "
+                                + PassingMode.COLLECTION
                                 + " must be bound to an array or a type implementing an "
                                 + Iterable.class.getCanonicalName());
             }
 
-        } else { // AsyncType.PARALLEL
+        } else { // PassingMode.PARALLEL
 
             if (!returnType.isArray() && !returnType.isAssignableFrom(List.class)) {
 
                 throw new IllegalArgumentException(
-                        "an async output with passing mode " + PassingMode.PARALLEL
+                        "[" + method + "] an async output with passing mode " + PassingMode.PARALLEL
                                 + " must be an array or a superclass " +
                                 "of " + List.class.getCanonicalName());
             }
@@ -396,8 +391,8 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
                     returnType.getComponentType()).isAssignableFrom(boxingClass(returnClass))) {
 
                 throw new IllegalArgumentException(
-                        "the async output array with passing mode " + PassingMode.PARALLEL
-                                + " does not match the bound type: "
+                        "[" + method + "] the async output array with passing mode "
+                                + PassingMode.PARALLEL + " does not match the bound type: "
                                 + returnClass.getCanonicalName());
             }
         }
@@ -434,34 +429,6 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
     public <TYPE> TYPE buildProxy(@Nonnull final ClassToken<TYPE> itf) {
 
         return itf.cast(buildProxy(itf.getRawClass()));
-    }
-
-    @Nonnull
-    public <TYPE> TYPE buildWrapper(@Nonnull final Class<TYPE> itf) {
-
-        if (!itf.isInterface()) {
-
-            throw new IllegalArgumentException(
-                    "the specified class is not an interface: " + itf.getCanonicalName());
-        }
-
-        final WeakReference<?> targetReference = getTargetReference();
-        final Object target = (targetReference != null) ? targetReference.get() : getTarget();
-
-        if (target == null) {
-
-            throw new IllegalStateException("target object has been destroyed");
-        }
-
-        return new ObjectWrapperBuilder<TYPE>(target, itf).withConfiguration(getConfiguration())
-                                                          .withShareGroup(getShareGroup())
-                                                          .buildWrapper();
-    }
-
-    @Nonnull
-    public <TYPE> TYPE buildWrapper(@Nonnull final ClassToken<TYPE> itf) {
-
-        return itf.cast(buildWrapper(itf.getRawClass()));
     }
 
     @Nonnull
@@ -522,76 +489,6 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
     }
 
     /**
-     * Wrapper builder implementation.
-     *
-     * @param <TYPE> the interface type.
-     */
-    private static class ObjectWrapperBuilder<TYPE> extends AbstractWrapperBuilder<TYPE> {
-
-        private final Object mTarget;
-
-        private final Class<TYPE> mWrapperClass;
-
-        /**
-         * Constructor.
-         *
-         * @param target       the target object instance.
-         * @param wrapperClass the wrapper class.
-         */
-        private ObjectWrapperBuilder(@Nonnull final Object target,
-                @Nonnull final Class<TYPE> wrapperClass) {
-
-            mTarget = target;
-            mWrapperClass = wrapperClass;
-        }
-
-        @Nonnull
-        @Override
-        protected Object getTarget() {
-
-            return mTarget;
-        }
-
-        @Nonnull
-        @Override
-        protected Class<TYPE> getWrapperClass() {
-
-            return mWrapperClass;
-        }
-
-        @Nonnull
-        @Override
-        protected TYPE newWrapper(
-                @Nonnull final WeakIdentityHashMap<Object, Map<String, Object>> mutexMap,
-                @Nonnull final String shareGroup,
-                @Nonnull final RoutineConfiguration configuration) {
-
-            try {
-
-                final Object target = mTarget;
-                final Class<TYPE> wrapperClass = mWrapperClass;
-                final Package classPackage = wrapperClass.getPackage();
-                final String packageName =
-                        (classPackage != null) ? classPackage.getName() + "." : "";
-                final String className = packageName + "JRoutine_" + wrapperClass.getSimpleName();
-                final Constructor<?> constructor =
-                        findConstructor(Class.forName(className), target, mutexMap, shareGroup,
-                                        configuration);
-                return wrapperClass.cast(
-                        constructor.newInstance(target, mutexMap, shareGroup, configuration));
-
-            } catch (final InstantiationException e) {
-
-                throw new IllegalArgumentException(e.getCause());
-
-            } catch (final Throwable t) {
-
-                throw new IllegalArgumentException(t);
-            }
-        }
-    }
-
-    /**
      * Invocation handler adapting a different interface to the target object instance.
      */
     private class InterfaceInvocationHandler implements InvocationHandler {
@@ -613,17 +510,53 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
                 Throwable {
 
             final WeakReference<?> targetReference = getTargetReference();
-            final Object target = (targetReference != null) ? targetReference.get() : getTarget();
+
+            if (targetReference == null) {
+
+                throw new IllegalStateException("the target reference must not be null");
+            }
+
+            final Object target = targetReference.get();
 
             if (target == null) {
 
-                throw new IllegalStateException("target object has been destroyed");
+                throw new IllegalStateException("the target object has been destroyed");
             }
 
             final Class<?> returnType = method.getReturnType();
             final Class<?>[] targetParameterTypes = method.getParameterTypes();
             PassingMode asyncParamMode = null;
             PassingMode asyncReturnMode = null;
+
+            Class<?> returnClass = null;
+            final Pass methodAnnotation = method.getAnnotation(Pass.class);
+
+            if (methodAnnotation != null) {
+
+                returnClass = methodAnnotation.value();
+                asyncReturnMode = getReturnMode(method, methodAnnotation, returnType);
+            }
+
+            final Annotation[][] annotations = method.getParameterAnnotations();
+            final int length = annotations.length;
+
+            for (int i = 0; i < length; ++i) {
+
+                final Annotation[] paramAnnotations = annotations[i];
+
+                for (final Annotation paramAnnotation : paramAnnotations) {
+
+                    if (paramAnnotation.annotationType() != Pass.class) {
+
+                        continue;
+                    }
+
+                    final Pass passAnnotation = (Pass) paramAnnotation;
+                    asyncParamMode =
+                            getParamMode(method, passAnnotation, targetParameterTypes[i], length);
+                    targetParameterTypes[i] = passAnnotation.value();
+                }
+            }
 
             Method targetMethod;
 
@@ -639,41 +572,18 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
                     methodCache.put(target, methodMap);
                 }
 
-                Class<?> returnClass = null;
-                final Pass methodAnnotation = method.getAnnotation(Pass.class);
-
-                if (methodAnnotation != null) {
-
-                    returnClass = methodAnnotation.value();
-                    asyncReturnMode = getReturnMode(methodAnnotation, returnType);
-                }
-
-                final Annotation[][] annotations = method.getParameterAnnotations();
-                final int length = annotations.length;
-
-                for (int i = 0; i < length; ++i) {
-
-                    final Annotation[] paramAnnotations = annotations[i];
-
-                    for (final Annotation paramAnnotation : paramAnnotations) {
-
-                        if (paramAnnotation.annotationType() != Pass.class) {
-
-                            continue;
-                        }
-
-                        final Pass passAnnotation = (Pass) paramAnnotation;
-                        asyncParamMode =
-                                getParamMode(passAnnotation, targetParameterTypes[i], length);
-                        targetParameterTypes[i] = passAnnotation.value();
-                    }
-                }
-
                 targetMethod = methodMap.get(method);
 
                 if (targetMethod == null) {
 
-                    targetMethod = getTargetMethod(method, targetParameterTypes);
+                    try {
+
+                        targetMethod = getTargetMethod(method, targetParameterTypes);
+
+                    } catch (final NoSuchMethodException e) {
+
+                        throw new IllegalArgumentException(e);
+                    }
 
                     final Class<?> targetReturnType = targetMethod.getReturnType();
                     boolean isError = false;
@@ -696,16 +606,14 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
                     if (isError) {
 
                         throw new IllegalArgumentException(
-                                "bound method has incompatible return type: " + targetMethod);
+                                "the bound method has incompatible return type: " + targetMethod);
                     }
-
-                    methodMap.put(method, targetMethod);
                 }
             }
 
             final Routine<Object, Object> routine =
                     buildRoutine(method, targetMethod, asyncParamMode, asyncReturnMode);
-            return callRoutine(routine, method, args, asyncParamMode);
+            return callRoutine(routine, method, args, asyncParamMode, asyncReturnMode);
         }
 
         @Nonnull

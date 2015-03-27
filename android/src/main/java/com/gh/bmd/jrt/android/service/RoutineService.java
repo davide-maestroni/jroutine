@@ -1,10 +1,10 @@
-/**
+/*
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p/>
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p/>
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,7 +30,6 @@ import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
 import com.gh.bmd.jrt.channel.OutputConsumer;
 import com.gh.bmd.jrt.channel.ParameterChannel;
 import com.gh.bmd.jrt.common.InvocationException;
-import com.gh.bmd.jrt.common.InvocationInterruptedException;
 import com.gh.bmd.jrt.common.RoutineException;
 import com.gh.bmd.jrt.invocation.Invocation;
 import com.gh.bmd.jrt.log.Log;
@@ -320,7 +319,9 @@ public class RoutineService extends Service {
 
         if (data == null) {
 
-            throw new IllegalArgumentException("service message must not have null data");
+            mLogger.err("the service message has no data");
+            throw new IllegalArgumentException(
+                    "[" + getClass().getCanonicalName() + "] the service message has no data");
         }
 
         data.setClassLoader(getClassLoader());
@@ -328,7 +329,10 @@ public class RoutineService extends Service {
 
         if (invocationId == null) {
 
-            throw new IllegalArgumentException("service message is missing invocation ID");
+            mLogger.err("the service message has no invocation ID");
+            throw new IllegalArgumentException(
+                    "[" + getClass().getCanonicalName() + "] the service message has no invocation"
+                            + " ID");
         }
 
         synchronized (mMutex) {
@@ -337,8 +341,10 @@ public class RoutineService extends Service {
 
             if (invocation == null) {
 
+                mLogger.err("the service message has no invalid invocation ID: %d", invocationId);
                 throw new IllegalArgumentException(
-                        "service message has invalid invocation ID: " + invocationId);
+                        "[" + getClass().getCanonicalName() + "] the service message has invalid "
+                                + "invocation ID: " + invocationId);
             }
 
             return invocation;
@@ -352,7 +358,9 @@ public class RoutineService extends Service {
 
         if (data == null) {
 
-            throw new IllegalArgumentException("service message must not have null data");
+            mLogger.err("the service message has no data");
+            throw new IllegalArgumentException(
+                    "[" + getClass().getCanonicalName() + "] the service message has no data");
         }
 
         data.setClassLoader(getClassLoader());
@@ -360,7 +368,10 @@ public class RoutineService extends Service {
 
         if (invocationId == null) {
 
-            throw new IllegalArgumentException("service message is missing invocation ID");
+            mLogger.err("the service message has no invocation ID");
+            throw new IllegalArgumentException(
+                    "[" + getClass().getCanonicalName() + "] the service message has no invocation "
+                            + "ID");
         }
 
         final Class<? extends AndroidInvocation<Object, Object>> invocationClass =
@@ -369,7 +380,10 @@ public class RoutineService extends Service {
 
         if (invocationClass == null) {
 
-            throw new IllegalArgumentException("service message is missing invocation class");
+            mLogger.err("the service message has no invocation class");
+            throw new IllegalArgumentException(
+                    "[" + getClass().getCanonicalName() + "] the service message has no invocation"
+                            + " class");
         }
 
         synchronized (mMutex) {
@@ -378,8 +392,10 @@ public class RoutineService extends Service {
 
             if (invocationMap.containsKey(invocationId)) {
 
+                mLogger.err("an invocation with the same ID is already running: %d", invocationId);
                 throw new IllegalArgumentException(
-                        "an invocation with the same ID is already running: " + invocationId);
+                        "[" + getClass().getCanonicalName() + "] an invocation with the same ID is"
+                                + " already running: " + invocationId);
             }
 
             final int coreInvocations = data.getInt(KEY_CORE_INVOCATIONS);
@@ -412,11 +428,6 @@ public class RoutineService extends Service {
 
                         builder.withRunner(findConstructor(runnerClass).newInstance());
 
-                    } catch (final InvocationInterruptedException e) {
-
-                        mLogger.err(e, "error creating the runner instance");
-                        throw e.interrupt();
-
                     } catch (final Throwable t) {
 
                         mLogger.err(t, "error creating the runner instance");
@@ -429,11 +440,6 @@ public class RoutineService extends Service {
                     try {
 
                         builder.withLog(findConstructor(logClass).newInstance());
-
-                    } catch (final InvocationInterruptedException e) {
-
-                        mLogger.err(e, "error creating the log instance");
-                        throw e.interrupt();
 
                     } catch (final Throwable t) {
 
@@ -509,11 +515,6 @@ public class RoutineService extends Service {
 
                 logger.err(e, "error creating the invocation instance");
                 throw new InvocationException(e.getCause());
-
-            } catch (final InvocationInterruptedException e) {
-
-                logger.err(e, "error creating the invocation instance");
-                throw e.interrupt();
 
             } catch (final RoutineException e) {
 

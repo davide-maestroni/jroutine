@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -39,7 +39,25 @@
                     throw new IllegalStateException("target object has been destroyed");
                 }
 
-                wrapped.${targetMethodName}(${paramValues});
+                if (objects.size() > ${maxParamSize}) {
+
+                    throw new IllegalArgumentException(
+                            "wrong number of input parameters for method '${targetMethodName}': " +
+                            "was " + objects.size() + " while expected " + (${maxParamSize}));
+                }
+
+                try {
+
+                    wrapped.${targetMethodName}(${paramValues});
+
+                } catch (final com.gh.bmd.jrt.common.RoutineException e) {
+
+                    throw e;
+
+                } catch (final Throwable t) {
+
+                    throw new com.gh.bmd.jrt.common.InvocationException(t);
+                }
             }
         }
     }

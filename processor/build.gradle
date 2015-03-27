@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,13 +19,14 @@ apply from: '../extra.gradle'
 group = project.getProperty('groupName')
 version = project.getProperty('releaseVersion')
 archivesBaseName = "${project.parent.name}-${project.name}"
+javaCompatibility = JavaVersion.VERSION_1_6
 
 def mainProject = project.parent.subprojects.find { it.name.equals('library') };
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     if (isWorkingBranch('master') && !version.contains('PREVIEW') && mainProject.hasProperty('releaseVersion')) {
-        compile "com.github.davide-maestroni:jroutine:${mainProject.getProperty('releaseVersion')}"
+        compile "com.github.davide-maestroni:jroutine:${toVersionRange(mainProject.getProperty('releaseVersion'))}"
     } else {
         compile project(':library')
     }
@@ -38,6 +39,13 @@ task('jacocoTest', dependsOn: 'test') {
     description = 'Runs the tests and generates the JaCoCo report files.'
 } << {
     tasks.jacocoTestReport.execute()
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled = true // Coveralls plugin depends on xml format report
+        html.enabled = true
+    }
 }
 
 javadoc {

@@ -1,10 +1,10 @@
-/**
+/*
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p/>
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p/>
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,6 +35,8 @@ public class TimeTest {
     private static final long MAX_TIME = Long.MAX_VALUE / ONE_DAY_NANOS;
 
     private static final long MIN_TIME = Long.MIN_VALUE / ONE_DAY_NANOS;
+
+    private static final Random sRandom = new Random();
 
     private static long clip(final int i) {
 
@@ -79,50 +81,6 @@ public class TimeTest {
     }
 
     @Test
-    public void testConversions() throws InvocationTargetException, IllegalAccessException {
-
-        final Random random = new Random();
-
-        testConversions(Time.nanos(clip(random.nextInt())), true);
-        testConversions(Time.micros(clip(random.nextInt())), true);
-        testConversions(Time.millis(clip(random.nextInt())), true);
-        testConversions(Time.seconds(clip(random.nextInt())), true);
-        testConversions(Time.minutes(clip(random.nextInt())), true);
-        testConversions(Time.hours(clip(random.nextInt())), true);
-        testConversions(Time.days(clip(random.nextInt())), true);
-
-        testConversions(Time.fromUnit(clip(random.nextInt()), TimeUnit.NANOSECONDS), true);
-        testConversions(Time.fromUnit(clip(random.nextInt()), TimeUnit.MICROSECONDS), true);
-        testConversions(Time.fromUnit(clip(random.nextInt()), TimeUnit.MILLISECONDS), true);
-        testConversions(Time.fromUnit(clip(random.nextInt()), TimeUnit.SECONDS), true);
-
-        final TimeUnit minutes = getUnit("MINUTES");
-        if (minutes != null) {
-
-            testConversions(Time.fromUnit(clip(random.nextInt()), minutes), true);
-        }
-
-        final TimeUnit hours = getUnit("HOURS");
-        if (hours != null) {
-
-            testConversions(Time.fromUnit(clip(random.nextInt()), hours), true);
-        }
-
-        final TimeUnit days = getUnit("DAYS");
-        if (days != null) {
-
-            testConversions(Time.fromUnit(clip(random.nextInt()), days), true);
-        }
-
-        final Time time = Time.nanos(clip(random.nextInt()));
-        assertThat(time).isEqualTo(time);
-        assertThat(time).isEqualTo(time.nanosTime());
-        assertThat(time).isNotEqualTo(time.millisTime());
-        assertThat(time.equals(new Object())).isFalse();
-        assertThat(time.hashCode()).isEqualTo(time.nanosTime().hashCode());
-    }
-
-    @Test
     public void testCurrentTime() {
 
         final long systemTimeMs = System.currentTimeMillis();
@@ -134,68 +92,20 @@ public class TimeTest {
     }
 
     @Test
-    @SuppressWarnings("ConstantConditions")
-    public void testError() {
+    public void testDayConversions() throws InvocationTargetException, IllegalAccessException {
 
-        try {
+        testConversions(Time.days(clip(sRandom.nextInt())), true);
 
-            Time.fromUnit(0, null);
+        final TimeUnit days = getUnit("DAYS");
+        if (days != null) {
 
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
+            testConversions(Time.fromUnit(clip(sRandom.nextInt()), days), true);
         }
 
-        try {
+    }
 
-            Time.seconds(1).to(null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            Time.minutes(Long.MAX_VALUE);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            Time.minutes(Long.MIN_VALUE);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            Time.hours(Long.MAX_VALUE);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            Time.hours(Long.MIN_VALUE);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
+    @Test
+    public void testDayOverflowError() {
 
         try {
 
@@ -219,38 +129,208 @@ public class TimeTest {
     }
 
     @Test
-    public void testZero() {
+    public void testEqualConversions() throws InvocationTargetException, IllegalAccessException {
 
-        assertThat(Time.nanos(0).isZero()).isTrue();
-        assertThat(Time.micros(0).isZero()).isTrue();
-        assertThat(Time.millis(0).isZero()).isTrue();
-        assertThat(Time.seconds(0).isZero()).isTrue();
-        assertThat(Time.minutes(0).isZero()).isTrue();
-        assertThat(Time.hours(0).isZero()).isTrue();
-        assertThat(Time.days(0).isZero()).isTrue();
+        final Time time = Time.nanos(clip(sRandom.nextInt()));
+        assertThat(time).isEqualTo(time);
+        assertThat(time).isEqualTo(time.nanosTime());
+        assertThat(time).isNotEqualTo(time.millisTime());
+        assertThat(time.equals(new Object())).isFalse();
+        assertThat(time.hashCode()).isEqualTo(time.nanosTime().hashCode());
+    }
 
-        assertThat(Time.fromUnit(0, TimeUnit.NANOSECONDS).isZero()).isTrue();
-        assertThat(Time.fromUnit(0, TimeUnit.MICROSECONDS).isZero()).isTrue();
-        assertThat(Time.fromUnit(0, TimeUnit.MILLISECONDS).isZero()).isTrue();
-        assertThat(Time.fromUnit(0, TimeUnit.SECONDS).isZero()).isTrue();
+    @Test
+    public void testHourConversions() throws InvocationTargetException, IllegalAccessException {
 
-        final TimeUnit minutes = getUnit("MINUTES");
-        if (minutes != null) {
-
-            assertThat(Time.fromUnit(0, minutes).isZero()).isTrue();
-        }
+        testConversions(Time.hours(clip(sRandom.nextInt())), true);
 
         final TimeUnit hours = getUnit("HOURS");
         if (hours != null) {
 
-            assertThat(Time.fromUnit(0, hours).isZero()).isTrue();
+            testConversions(Time.fromUnit(clip(sRandom.nextInt()), hours), true);
         }
+    }
+
+    @Test
+    public void testHourOverflowError() {
+
+        try {
+
+            Time.hours(Long.MAX_VALUE);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            Time.hours(Long.MIN_VALUE);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testMicroConversions() throws InvocationTargetException, IllegalAccessException {
+
+        testConversions(Time.micros(clip(sRandom.nextInt())), true);
+        testConversions(Time.fromUnit(clip(sRandom.nextInt()), TimeUnit.MICROSECONDS), true);
+    }
+
+    @Test
+    public void testMilliConversions() throws InvocationTargetException, IllegalAccessException {
+
+        testConversions(Time.millis(clip(sRandom.nextInt())), true);
+        testConversions(Time.fromUnit(clip(sRandom.nextInt()), TimeUnit.MILLISECONDS), true);
+    }
+
+    @Test
+    public void testMinuteConversions() throws InvocationTargetException, IllegalAccessException {
+
+        testConversions(Time.minutes(clip(sRandom.nextInt())), true);
+
+        final TimeUnit minutes = getUnit("MINUTES");
+        if (minutes != null) {
+
+            testConversions(Time.fromUnit(clip(sRandom.nextInt()), minutes), true);
+        }
+    }
+
+    @Test
+    public void testMinuteOverflowError() {
+
+        try {
+
+            Time.minutes(Long.MAX_VALUE);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            Time.minutes(Long.MIN_VALUE);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testNanoConversions() throws InvocationTargetException, IllegalAccessException {
+
+        testConversions(Time.nanos(clip(sRandom.nextInt())), true);
+        testConversions(Time.fromUnit(clip(sRandom.nextInt()), TimeUnit.NANOSECONDS), true);
+    }
+
+    @Test
+    public void testSecondConversions() throws InvocationTargetException, IllegalAccessException {
+
+        testConversions(Time.seconds(clip(sRandom.nextInt())), true);
+        testConversions(Time.fromUnit(clip(sRandom.nextInt()), TimeUnit.SECONDS), true);
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testSecondError() {
+
+        try {
+
+            Time.seconds(1).to(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testUnitError() {
+
+        try {
+
+            Time.fromUnit(0, null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testZeroDay() {
+
+        assertThat(Time.days(0).isZero()).isTrue();
 
         final TimeUnit days = getUnit("DAYS");
         if (days != null) {
 
             assertThat(Time.fromUnit(0, days).isZero()).isTrue();
         }
+    }
+
+    @Test
+    public void testZeroHour() {
+
+        assertThat(Time.hours(0).isZero()).isTrue();
+
+        final TimeUnit hours = getUnit("HOURS");
+        if (hours != null) {
+
+            assertThat(Time.fromUnit(0, hours).isZero()).isTrue();
+        }
+    }
+
+    @Test
+    public void testZeroMicro() {
+
+        assertThat(Time.micros(0).isZero()).isTrue();
+        assertThat(Time.fromUnit(0, TimeUnit.MICROSECONDS).isZero()).isTrue();
+    }
+
+    @Test
+    public void testZeroMilli() {
+
+        assertThat(Time.millis(0).isZero()).isTrue();
+        assertThat(Time.fromUnit(0, TimeUnit.MILLISECONDS).isZero()).isTrue();
+    }
+
+    @Test
+    public void testZeroMinute() {
+
+        assertThat(Time.minutes(0).isZero()).isTrue();
+
+        final TimeUnit minutes = getUnit("MINUTES");
+        if (minutes != null) {
+
+            assertThat(Time.fromUnit(0, minutes).isZero()).isTrue();
+        }
+    }
+
+    @Test
+    public void testZeroNano() {
+
+        assertThat(Time.nanos(0).isZero()).isTrue();
+        assertThat(Time.fromUnit(0, TimeUnit.NANOSECONDS).isZero()).isTrue();
+    }
+
+    @Test
+    public void testZeroSecond() {
+
+        assertThat(Time.seconds(0).isZero()).isTrue();
+        assertThat(Time.fromUnit(0, TimeUnit.SECONDS).isZero()).isTrue();
     }
 
     private void testConversions(final Time time, final boolean isFirst) throws

@@ -1,10 +1,10 @@
-/**
+/*
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p/>
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p/>
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -975,7 +975,8 @@ public class RoutineConfiguration {
             if ((coreInvocations != DEFAULT) && (coreInvocations < 0)) {
 
                 throw new IllegalArgumentException(
-                        "the maximum number of retained instances cannot be negative");
+                        "the maximum number of retained instances cannot be negative: "
+                                + coreInvocations);
             }
 
             mCoreInvocations = coreInvocations;
@@ -1010,7 +1011,8 @@ public class RoutineConfiguration {
 
             if ((inputMaxSize != DEFAULT) && (inputMaxSize <= 0)) {
 
-                throw new IllegalArgumentException("the input buffer size cannot be 0 or negative");
+                throw new IllegalArgumentException(
+                        "the input buffer size cannot be 0 or negative: " + inputMaxSize);
             }
 
             mInputMaxSize = inputMaxSize;
@@ -1090,7 +1092,7 @@ public class RoutineConfiguration {
 
                 throw new IllegalArgumentException(
                         "the maximum number of concurrently running instances cannot be less than"
-                                + " 1");
+                                + " 1: " + maxInvocations);
             }
 
             mMaxInvocations = maxInvocations;
@@ -1126,7 +1128,7 @@ public class RoutineConfiguration {
             if ((outputMaxSize != DEFAULT) && (outputMaxSize <= 0)) {
 
                 throw new IllegalArgumentException(
-                        "the output buffer size cannot be 0 or negative");
+                        "the output buffer size cannot be 0 or negative: " + outputMaxSize);
             }
 
             mOutputMaxSize = outputMaxSize;

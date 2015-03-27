@@ -1,10 +1,10 @@
-/**
+/*
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p/>
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p/>
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -49,6 +49,12 @@ public class ReflectionTest {
 
         assertThat(Reflection.findConstructor(TestClass.class)).isNotNull();
         assertThat(Reflection.findConstructor(TestClass.class, "test")).isNotNull();
+        assertThat(
+                Reflection.findConstructor(TestClass.class, new ArrayList<String>())).isNotNull();
+    }
+
+    @Test
+    public void testConstructorError() {
 
         try {
 
@@ -59,23 +65,28 @@ public class ReflectionTest {
         } catch (final IllegalArgumentException ignored) {
 
         }
+    }
+
+    @Test
+    public void testConstructorNullParamError() {
 
         try {
 
-            Reflection.findConstructor(TestClass.class, "test", 4);
+            Reflection.findConstructor(TestClass.class, (Object) null);
 
             fail();
 
         } catch (final IllegalArgumentException ignored) {
 
         }
+    }
 
-        assertThat(
-                Reflection.findConstructor(TestClass.class, new ArrayList<String>())).isNotNull();
+    @Test
+    public void testConstructorParamNumberError() {
 
         try {
 
-            Reflection.findConstructor(TestClass.class, (Object) null);
+            Reflection.findConstructor(TestClass.class, "test", 4);
 
             fail();
 

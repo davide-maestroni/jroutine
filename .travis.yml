@@ -1,16 +1,15 @@
-language: android
-
 # Enable Docker
 sudo: false
 
 # Android environment setup
+language: android
 android:
   components:
     # The BuildTools version
-    - build-tools-21.1.1
+    - build-tools-22.0.0
 
     # The SDK version
-    - android-21
+    - android-22
 
 # Env matrix
 env:

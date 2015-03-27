@@ -1,10 +1,10 @@
-/**
+/*
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p/>
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p/>
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -44,33 +44,6 @@ public class LoggerTest {
     private static final String FORMAT4 = "0: %s - 1: %s - 2: %s - 3: %s - 4: %s";
 
     @Test
-    public void testDefault() {
-
-        final Log defaultLog = Logger.getGlobalLog();
-        Logger.setGlobalLog(null);
-        assertThat(Logger.getGlobalLog()).isEqualTo(defaultLog);
-
-        final NullLog log = Logs.nullLog();
-        Logger.setGlobalLog(log);
-        assertThat(Logger.getGlobalLog()).isEqualTo(log);
-
-        final LogLevel defaultLogLevel = Logger.getGlobalLogLevel();
-        Logger.setGlobalLogLevel(null);
-        assertThat(Logger.getGlobalLogLevel()).isEqualTo(defaultLogLevel);
-
-        Logger.setGlobalLogLevel(LogLevel.SILENT);
-        assertThat(Logger.getGlobalLogLevel()).isEqualTo(LogLevel.SILENT);
-
-        Logger logger = Logger.newLogger(null, LogLevel.DEBUG, this);
-        assertThat(logger.getLog()).isEqualTo(defaultLog);
-        assertThat(logger.getLogLevel()).isEqualTo(LogLevel.DEBUG);
-
-        logger = Logger.newLogger(log, null, this);
-        assertThat(logger.getLog()).isEqualTo(log);
-        assertThat(logger.getLogLevel()).isEqualTo(defaultLogLevel);
-    }
-
-    @Test
     @SuppressWarnings("ConstantConditions")
     public void testError() {
 
@@ -91,6 +64,38 @@ public class LoggerTest {
         assertThat(Logger.getGlobalLogLevel()).isNotNull();
 
         Logger.newLogger(new NullLog(), LogLevel.DEBUG, this).err((Throwable) null);
+    }
+
+    @Test
+    public void testGlobalLog() {
+
+        final Log globalLog = Logger.getGlobalLog();
+        Logger.setGlobalLog(null);
+        assertThat(Logger.getGlobalLog()).isEqualTo(globalLog);
+
+        final NullLog log = Logs.nullLog();
+        Logger.setGlobalLog(log);
+        assertThat(Logger.getGlobalLog()).isEqualTo(log);
+
+        final Logger logger = Logger.newLogger(null, LogLevel.DEBUG, this);
+        assertThat(logger.getLog()).isEqualTo(globalLog);
+        assertThat(logger.getLogLevel()).isEqualTo(LogLevel.DEBUG);
+    }
+
+    @Test
+    public void testGlobalLogLevel() {
+
+        final LogLevel globalLogLevel = Logger.getGlobalLogLevel();
+        Logger.setGlobalLogLevel(null);
+        assertThat(Logger.getGlobalLogLevel()).isEqualTo(globalLogLevel);
+
+        Logger.setGlobalLogLevel(LogLevel.SILENT);
+        assertThat(Logger.getGlobalLogLevel()).isEqualTo(LogLevel.SILENT);
+
+        final NullLog log = Logs.nullLog();
+        final Logger logger = Logger.newLogger(log, null, this);
+        assertThat(logger.getLog()).isEqualTo(log);
+        assertThat(logger.getLogLevel()).isEqualTo(globalLogLevel);
     }
 
     @Test

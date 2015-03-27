@@ -130,6 +130,62 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         }
     }
 
+    public void testActivityBuilderPurge() throws InterruptedException {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final AndroidRoutine<String, String> routine =
+                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeAndroidInvocation.class))
+                        .withConfiguration(builder().withInputOrder(OrderType.PASSING)
+                                                    .withOutputOrder(OrderType.PASSING)
+                                                    .buildConfiguration())
+                        .withId(0)
+                        .onComplete(CacheStrategy.CACHE)
+                        .buildRoutine();
+        final OutputChannel<String> channel4 = routine.callAsync("test").eventually();
+        assertThat(channel4.readNext()).isEqualTo("test");
+        assertThat(channel4.checkComplete());
+        JRoutine.onActivity(getActivity(), 0).purge();
+        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+    }
+
+    public void testActivityBuilderPurgeInputs() throws InterruptedException {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final AndroidRoutine<String, String> routine =
+                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeAndroidInvocation.class))
+                        .withConfiguration(builder().withInputOrder(OrderType.PASSING)
+                                                    .withOutputOrder(OrderType.PASSING)
+                                                    .buildConfiguration())
+                        .withId(0)
+                        .onComplete(CacheStrategy.CACHE)
+                        .buildRoutine();
+        final OutputChannel<String> channel5 = routine.callAsync("test").eventually();
+        assertThat(channel5.readNext()).isEqualTo("test");
+        assertThat(channel5.checkComplete());
+        JRoutine.onActivity(getActivity(), 0).purge("test");
+        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+
+        final OutputChannel<String> channel6 = routine.callAsync("test1", "test2").eventually();
+        assertThat(channel6.readAll()).containsExactly("test1", "test2");
+        assertThat(channel6.checkComplete());
+        JRoutine.onActivity(getActivity(), 0).purge("test1", "test2");
+        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+
+        final OutputChannel<String> channel7 = routine.callAsync("test1", "test2").eventually();
+        assertThat(channel7.readAll()).containsExactly("test1", "test2");
+        assertThat(channel7.checkComplete());
+        JRoutine.onActivity(getActivity(), 0).purge(Arrays.asList((Object) "test1", "test2"));
+        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+    }
+
     public void testActivityClearError() {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
@@ -256,6 +312,42 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         assertThat(result2.readNext()).isEqualTo("TEST2");
     }
 
+    public void testActivityInvalidIdError() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        try {
+
+            JRoutine.onActivity(getActivity(), AndroidRoutineBuilder.AUTO);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+    }
+
+    public void testActivityInvalidTokenError() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        try {
+
+            JRoutine.onActivity(new TestActivity(), ClassToken.tokenOf(ErrorInvocation.class));
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+    }
+
     public void testActivityKeep() {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
@@ -297,68 +389,43 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         }
     }
 
-    public void testActivityPurge() throws InterruptedException {
+    @SuppressWarnings("ConstantConditions")
+    public void testActivityNullPointerErrors() {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
 
             return;
         }
 
-        final AndroidRoutine<String, String> routine =
-                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeAndroidInvocation.class))
-                        .withConfiguration(builder().withInputOrder(OrderType.PASSING)
-                                                    .withOutputOrder(OrderType.PASSING)
-                                                    .buildConfiguration())
-                        .withId(0)
-                        .onComplete(CacheStrategy.CACHE)
-                        .buildRoutine();
-        final OutputChannel<String> channel = routine.callAsync("test").eventually();
-        assertThat(channel.readNext()).isEqualTo("test");
-        assertThat(channel.checkComplete());
-        routine.purge();
-        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+        try {
 
-        final OutputChannel<String> channel1 = routine.callAsync("test").eventually();
-        assertThat(channel1.readNext()).isEqualTo("test");
-        assertThat(channel1.checkComplete());
-        routine.purge("test");
-        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+            JRoutine.onActivity(null, ClassToken.tokenOf(ToUpperCase.class));
 
-        final OutputChannel<String> channel2 = routine.callAsync("test1", "test2").eventually();
-        assertThat(channel2.readAll()).containsExactly("test1", "test2");
-        assertThat(channel2.checkComplete());
-        routine.purge("test1", "test2");
-        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+            fail();
 
-        final OutputChannel<String> channel3 = routine.callAsync("test1", "test2").eventually();
-        assertThat(channel3.readAll()).containsExactly("test1", "test2");
-        assertThat(channel3.checkComplete());
-        routine.purge(Arrays.asList("test1", "test2"));
-        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+        } catch (final NullPointerException ignored) {
 
-        final OutputChannel<String> channel4 = routine.callAsync("test").eventually();
-        assertThat(channel4.readNext()).isEqualTo("test");
-        assertThat(channel4.checkComplete());
-        JRoutine.onActivity(getActivity(), 0).purge();
-        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+        }
 
-        final OutputChannel<String> channel5 = routine.callAsync("test").eventually();
-        assertThat(channel5.readNext()).isEqualTo("test");
-        assertThat(channel5.checkComplete());
-        JRoutine.onActivity(getActivity(), 0).purge("test");
-        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+        try {
 
-        final OutputChannel<String> channel6 = routine.callAsync("test1", "test2").eventually();
-        assertThat(channel6.readAll()).containsExactly("test1", "test2");
-        assertThat(channel6.checkComplete());
-        JRoutine.onActivity(getActivity(), 0).purge("test1", "test2");
-        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+            JRoutine.onActivity(getActivity(), null);
 
-        final OutputChannel<String> channel7 = routine.callAsync("test1", "test2").eventually();
-        assertThat(channel7.readAll()).containsExactly("test1", "test2");
-        assertThat(channel7.checkComplete());
-        JRoutine.onActivity(getActivity(), 0).purge(Arrays.asList((Object) "test1", "test2"));
-        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.onActivity(null, 0);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
     }
 
     public void testActivityRestart() {
@@ -489,6 +556,62 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         result4.checkComplete();
     }
 
+    public void testActivityRoutinePurge() throws InterruptedException {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final AndroidRoutine<String, String> routine =
+                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeAndroidInvocation.class))
+                        .withConfiguration(builder().withInputOrder(OrderType.PASSING)
+                                                    .withOutputOrder(OrderType.PASSING)
+                                                    .buildConfiguration())
+                        .withId(0)
+                        .onComplete(CacheStrategy.CACHE)
+                        .buildRoutine();
+        final OutputChannel<String> channel = routine.callAsync("test").eventually();
+        assertThat(channel.readNext()).isEqualTo("test");
+        assertThat(channel.checkComplete());
+        routine.purge();
+        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+    }
+
+    public void testActivityRoutinePurgeInputs() throws InterruptedException {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final AndroidRoutine<String, String> routine =
+                JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeAndroidInvocation.class))
+                        .withConfiguration(builder().withInputOrder(OrderType.PASSING)
+                                                    .withOutputOrder(OrderType.PASSING)
+                                                    .buildConfiguration())
+                        .withId(0)
+                        .onComplete(CacheStrategy.CACHE)
+                        .buildRoutine();
+        final OutputChannel<String> channel1 = routine.callAsync("test").eventually();
+        assertThat(channel1.readNext()).isEqualTo("test");
+        assertThat(channel1.checkComplete());
+        routine.purge("test");
+        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+
+        final OutputChannel<String> channel2 = routine.callAsync("test1", "test2").eventually();
+        assertThat(channel2.readAll()).containsExactly("test1", "test2");
+        assertThat(channel2.checkComplete());
+        routine.purge("test1", "test2");
+        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+
+        final OutputChannel<String> channel3 = routine.callAsync("test1", "test2").eventually();
+        assertThat(channel3.readAll()).containsExactly("test1", "test2");
+        assertThat(channel3.checkComplete());
+        routine.purge(Arrays.asList("test1", "test2"));
+        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+    }
+
     public void testActivitySame() {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
@@ -605,121 +728,6 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         result2.checkComplete();
     }
 
-    @SuppressWarnings({"ConstantConditions", "RedundantCast"})
-    public void testErrors() {
-
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            return;
-        }
-
-        try {
-
-            JRoutine.onActivity(null, ClassToken.tokenOf(ToUpperCase.class));
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            JRoutine.onActivity(getActivity(), null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            JRoutine.onActivity(null, 0);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            JRoutine.onActivity(getActivity(), AndroidRoutineBuilder.AUTO);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            JRoutine.onFragment(null, ClassToken.tokenOf(ToUpperCase.class));
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            JRoutine.onFragment(null, 0);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
-                                                                      .findFragmentById(
-                                                                              R.id.test_fragment);
-            JRoutine.onFragment(fragment, null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
-                                                                      .findFragmentById(
-                                                                              R.id.test_fragment);
-            JRoutine.onFragment(fragment, AndroidRoutineBuilder.AUTO);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            JRoutine.onActivity(new TestActivity(), ClassToken.tokenOf(ErrorInvocation.class));
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            JRoutine.onFragment(new TestFragment(), ClassToken.tokenOf(ErrorInvocation.class));
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-    }
-
     public void testFragmentAbort() {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
@@ -750,6 +758,68 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         } catch (final InputClashException ignored) {
 
         }
+    }
+
+    public void testFragmentBuilderPurge() throws InterruptedException {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        final AndroidRoutine<String, String> routine =
+                JRoutine.onFragment(fragment, ClassToken.tokenOf(PurgeAndroidInvocation.class))
+                        .withConfiguration(builder().withInputOrder(OrderType.PASSING)
+                                                    .withOutputOrder(OrderType.PASSING)
+                                                    .buildConfiguration())
+                        .withId(0)
+                        .onComplete(CacheStrategy.CACHE)
+                        .buildRoutine();
+        final OutputChannel<String> channel4 = routine.callAsync("test").eventually();
+        assertThat(channel4.readNext()).isEqualTo("test");
+        assertThat(channel4.checkComplete());
+        JRoutine.onFragment(fragment, 0).purge();
+        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+    }
+
+    public void testFragmentBuilderPurgeInputs() throws InterruptedException {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        final AndroidRoutine<String, String> routine =
+                JRoutine.onFragment(fragment, ClassToken.tokenOf(PurgeAndroidInvocation.class))
+                        .withConfiguration(builder().withInputOrder(OrderType.PASSING)
+                                                    .withOutputOrder(OrderType.PASSING)
+                                                    .buildConfiguration())
+                        .withId(0)
+                        .onComplete(CacheStrategy.CACHE)
+                        .buildRoutine();
+        final OutputChannel<String> channel5 = routine.callAsync("test").eventually();
+        assertThat(channel5.readNext()).isEqualTo("test");
+        assertThat(channel5.checkComplete());
+        JRoutine.onFragment(fragment, 0).purge("test");
+        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+
+        final OutputChannel<String> channel6 = routine.callAsync("test1", "test2").eventually();
+        assertThat(channel6.readAll()).containsExactly("test1", "test2");
+        assertThat(channel6.checkComplete());
+        JRoutine.onFragment(fragment, 0).purge("test1", "test2");
+        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+
+        final OutputChannel<String> channel7 = routine.callAsync("test1", "test2").eventually();
+        assertThat(channel7.readAll()).containsExactly("test1", "test2");
+        assertThat(channel7.checkComplete());
+        JRoutine.onFragment(fragment, 0).purge(Arrays.asList((Object) "test1", "test2"));
+        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
     }
 
     public void testFragmentChannel() {
@@ -793,6 +863,45 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         assertThat(result1.readNext()).isEqualTo("TEST1");
         assertThat(result2.readNext()).isEqualTo("TEST2");
+    }
+
+    public void testFragmentInvalidIdError() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        try {
+
+            final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+                                                                      .findFragmentById(
+                                                                              R.id.test_fragment);
+            JRoutine.onFragment(fragment, AndroidRoutineBuilder.AUTO);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+    }
+
+    public void testFragmentInvalidTokenError() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        try {
+
+            JRoutine.onFragment(new TestFragment(), ClassToken.tokenOf(ErrorInvocation.class));
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
     }
 
     public void testFragmentKeep() {
@@ -842,71 +951,46 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         }
     }
 
-    public void testFragmentPurge() throws InterruptedException {
+    @SuppressWarnings("ConstantConditions")
+    public void testFragmentNullPointerErrors() {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
 
             return;
         }
 
-        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
-                                                                  .findFragmentById(
-                                                                          R.id.test_fragment);
-        final AndroidRoutine<String, String> routine =
-                JRoutine.onFragment(fragment, ClassToken.tokenOf(PurgeAndroidInvocation.class))
-                        .withConfiguration(builder().withInputOrder(OrderType.PASSING)
-                                                    .withOutputOrder(OrderType.PASSING)
-                                                    .buildConfiguration())
-                        .withId(0)
-                        .onComplete(CacheStrategy.CACHE)
-                        .buildRoutine();
-        final OutputChannel<String> channel = routine.callAsync("test").eventually();
-        assertThat(channel.readNext()).isEqualTo("test");
-        assertThat(channel.checkComplete());
-        routine.purge();
-        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+        try {
 
-        final OutputChannel<String> channel1 = routine.callAsync("test").eventually();
-        assertThat(channel1.readNext()).isEqualTo("test");
-        assertThat(channel1.checkComplete());
-        routine.purge("test");
-        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+            JRoutine.onFragment(null, ClassToken.tokenOf(ToUpperCase.class));
 
-        final OutputChannel<String> channel2 = routine.callAsync("test1", "test2").eventually();
-        assertThat(channel2.readAll()).containsExactly("test1", "test2");
-        assertThat(channel2.checkComplete());
-        routine.purge("test1", "test2");
-        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+            fail();
 
-        final OutputChannel<String> channel3 = routine.callAsync("test1", "test2").eventually();
-        assertThat(channel3.readAll()).containsExactly("test1", "test2");
-        assertThat(channel3.checkComplete());
-        routine.purge(Arrays.asList("test1", "test2"));
-        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+        } catch (final NullPointerException ignored) {
 
-        final OutputChannel<String> channel4 = routine.callAsync("test").eventually();
-        assertThat(channel4.readNext()).isEqualTo("test");
-        assertThat(channel4.checkComplete());
-        JRoutine.onFragment(fragment, 0).purge();
-        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+        }
 
-        final OutputChannel<String> channel5 = routine.callAsync("test").eventually();
-        assertThat(channel5.readNext()).isEqualTo("test");
-        assertThat(channel5.checkComplete());
-        JRoutine.onFragment(fragment, 0).purge("test");
-        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+        try {
 
-        final OutputChannel<String> channel6 = routine.callAsync("test1", "test2").eventually();
-        assertThat(channel6.readAll()).containsExactly("test1", "test2");
-        assertThat(channel6.checkComplete());
-        JRoutine.onFragment(fragment, 0).purge("test1", "test2");
-        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+            JRoutine.onFragment(null, 0);
 
-        final OutputChannel<String> channel7 = routine.callAsync("test1", "test2").eventually();
-        assertThat(channel7.readAll()).containsExactly("test1", "test2");
-        assertThat(channel7.checkComplete());
-        JRoutine.onFragment(fragment, 0).purge(Arrays.asList((Object) "test1", "test2"));
-        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+                                                                      .findFragmentById(
+                                                                              R.id.test_fragment);
+            JRoutine.onFragment(fragment, null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
     }
 
     public void testFragmentReset() {
@@ -971,6 +1055,68 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         }
 
         assertThat(result2.readNext()).isEqualTo("TEST2");
+    }
+
+    public void testFragmentRoutinePurge() throws InterruptedException {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        final AndroidRoutine<String, String> routine =
+                JRoutine.onFragment(fragment, ClassToken.tokenOf(PurgeAndroidInvocation.class))
+                        .withConfiguration(builder().withInputOrder(OrderType.PASSING)
+                                                    .withOutputOrder(OrderType.PASSING)
+                                                    .buildConfiguration())
+                        .withId(0)
+                        .onComplete(CacheStrategy.CACHE)
+                        .buildRoutine();
+        final OutputChannel<String> channel = routine.callAsync("test").eventually();
+        assertThat(channel.readNext()).isEqualTo("test");
+        assertThat(channel.checkComplete());
+        routine.purge();
+        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+    }
+
+    public void testFragmentRoutinePurgeInputs() throws InterruptedException {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        final AndroidRoutine<String, String> routine =
+                JRoutine.onFragment(fragment, ClassToken.tokenOf(PurgeAndroidInvocation.class))
+                        .withConfiguration(builder().withInputOrder(OrderType.PASSING)
+                                                    .withOutputOrder(OrderType.PASSING)
+                                                    .buildConfiguration())
+                        .withId(0)
+                        .onComplete(CacheStrategy.CACHE)
+                        .buildRoutine();
+        final OutputChannel<String> channel1 = routine.callAsync("test").eventually();
+        assertThat(channel1.readNext()).isEqualTo("test");
+        assertThat(channel1.checkComplete());
+        routine.purge("test");
+        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+
+        final OutputChannel<String> channel2 = routine.callAsync("test1", "test2").eventually();
+        assertThat(channel2.readAll()).containsExactly("test1", "test2");
+        assertThat(channel2.checkComplete());
+        routine.purge("test1", "test2");
+        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
+
+        final OutputChannel<String> channel3 = routine.callAsync("test1", "test2").eventually();
+        assertThat(channel3.readAll()).containsExactly("test1", "test2");
+        assertThat(channel3.checkComplete());
+        routine.purge(Arrays.asList("test1", "test2"));
+        assertThat(PurgeAndroidInvocation.waitDestroy(1, 1000)).isTrue();
     }
 
     public void testFragmentSame() throws InterruptedException {

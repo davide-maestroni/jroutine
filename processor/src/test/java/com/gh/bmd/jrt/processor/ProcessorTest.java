@@ -63,53 +63,6 @@ import static org.junit.Assert.fail;
 public class ProcessorTest {
 
     @Test
-    @SuppressWarnings("ConstantConditions")
-    public void testBuilderError() {
-
-        final TestClass test = new TestClass();
-
-        try {
-
-            JRoutineProcessor.on(test).buildWrapper((Class<?>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            JRoutineProcessor.on(test).buildWrapper((ClassToken<?>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            JRoutineProcessor.on(test).buildWrapper(TestClass.class);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            JRoutineProcessor.on(test).buildWrapper(ClassToken.tokenOf(TestClass.class));
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-    }
-
-    @Test
     public void testCache() {
 
         final TestList<String> testList = new TestList<String>();
@@ -149,6 +102,33 @@ public class ProcessorTest {
                                                                   .buildWrapper(token);
 
         assertThat(testWrapper.getOne().readNext()).isEqualTo(1);
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testNullPointerError() {
+
+        final TestClass test = new TestClass();
+
+        try {
+
+            JRoutineProcessor.on(test).buildWrapper((Class<?>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            JRoutineProcessor.on(test).buildWrapper((ClassToken<?>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
     }
 
     @Test
@@ -393,11 +373,6 @@ public class ProcessorTest {
         final StandaloneChannel<Integer> standaloneChannel = JRoutine.standalone().buildChannel();
         standaloneChannel.input().pass(3).close();
         assertThat(testWrapper.getString(standaloneChannel.output())).isEqualTo("3");
-
-        assertThat(JRoutineProcessor.on(test)
-                                    .withConfiguration(configuration)
-                                    .buildWrapper(ClassToken.tokenOf(TestWrapper.class))).isSameAs(
-                testWrapper);
     }
 
     @Test
@@ -457,6 +432,54 @@ public class ProcessorTest {
                          .buildWrapper(TestWrapper.class)
                          .getOne();
         assertThat(countLog.getWrnCount()).isEqualTo(6);
+    }
+
+    @Test
+    public void testWrapperCache() {
+
+        final NullLog log = new NullLog();
+        final Runner runner = Runners.poolRunner();
+        final TestClass test = new TestClass();
+        final RoutineConfiguration configuration = builder().withSyncRunner(RunnerType.SEQUENTIAL)
+                                                            .withRunner(runner)
+                                                            .withLogLevel(LogLevel.DEBUG)
+                                                            .withLog(log)
+                                                            .buildConfiguration();
+        final TestWrapper testWrapper = JRoutineProcessor.on(test)
+                                                         .withConfiguration(configuration)
+                                                         .buildWrapper(ClassToken.tokenOf(
+                                                                 TestWrapper.class));
+
+        assertThat(JRoutineProcessor.on(test)
+                                    .withConfiguration(configuration)
+                                    .buildWrapper(ClassToken.tokenOf(TestWrapper.class))).isSameAs(
+                testWrapper);
+    }
+
+    @Test
+    public void testWrapperError() {
+
+        final TestClass test = new TestClass();
+
+        try {
+
+            JRoutineProcessor.on(test).buildWrapper(TestClass.class);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            JRoutineProcessor.on(test).buildWrapper(ClassToken.tokenOf(TestClass.class));
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
     }
 
     @Wrap(Impl.class)

@@ -173,7 +173,11 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
         assertThat(routine1.callParallel("1", "2", "3", "4", "5")
                            .afterMax(timeout)
                            .readAll()).containsOnly("1", "2", "3", "4", "5");
+    }
 
+    public void testInvocations2() throws InterruptedException {
+
+        final TimeDuration timeout = TimeDuration.seconds(10);
         final ClassToken<StringSingleCallInvocation> token =
                 ClassToken.tokenOf(StringSingleCallInvocation.class);
         final RoutineConfiguration configuration2 = builder().withSyncRunner(RunnerType.SEQUENTIAL)
@@ -194,7 +198,13 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
         assertThat(routine2.callParallel("1", "2", "3", "4", "5")
                            .afterMax(timeout)
                            .readAll()).containsOnly("1", "2", "3", "4", "5");
+    }
 
+    public void testInvocations3() throws InterruptedException {
+
+        final TimeDuration timeout = TimeDuration.seconds(10);
+        final ClassToken<StringSingleCallInvocation> token =
+                ClassToken.tokenOf(StringSingleCallInvocation.class);
         final Builder builder = RoutineConfiguration.builder().withInputOrder(OrderType.PASSING)
 
 
@@ -213,7 +223,13 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
         assertThat(routine3.callParallel("1", "2", "3", "4", "5")
                            .afterMax(timeout)
                            .readAll()).containsExactly("1", "2", "3", "4", "5");
+    }
 
+    public void testInvocations4() throws InterruptedException {
+
+        final TimeDuration timeout = TimeDuration.seconds(10);
+        final ClassToken<StringSingleCallInvocation> token =
+                ClassToken.tokenOf(StringSingleCallInvocation.class);
         final RoutineConfiguration configuration4 = builder().withCoreInvocations(0)
                                                              .withMaxInvocations(2)
                                                              .withAvailableTimeout(1,
@@ -259,7 +275,12 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
                            .withConfiguration(configuration1)
                            .callAsync("test1")
                            .readAll()).isEmpty();
+    }
 
+    public void testReadTimeout2() {
+
+        final ClassToken<AndroidPassingInvocation<String>> classToken =
+                new ClassToken<AndroidPassingInvocation<String>>() {};
         final RoutineConfiguration configuration2 = builder().withReadTimeout(millis(10))
                                                              .onReadTimeout(TimeoutAction.ABORT)
                                                              .buildConfiguration();
@@ -276,7 +297,12 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
         } catch (final AbortException ignored) {
 
         }
+    }
 
+    public void testReadTimeout3() {
+
+        final ClassToken<AndroidPassingInvocation<String>> classToken =
+                new ClassToken<AndroidPassingInvocation<String>>() {};
         final RoutineConfiguration configuration3 = builder().withReadTimeout(millis(10))
                                                              .onReadTimeout(TimeoutAction.DEADLOCK)
                                                              .buildConfiguration();

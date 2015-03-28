@@ -26,10 +26,10 @@ import com.gh.bmd.jrt.android.invocation.AndroidSingleCallInvocation;
 import com.gh.bmd.jrt.android.invocation.AndroidTemplateInvocation;
 import com.gh.bmd.jrt.android.log.AndroidLog;
 import com.gh.bmd.jrt.android.runner.MainRunner;
+import com.gh.bmd.jrt.android.runner.Runners;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.RunnerType;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutAction;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ReadDeadlockException;
@@ -138,8 +138,8 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
         final TimeDuration timeout = TimeDuration.seconds(10);
         final ClassToken<PassingDecorator<String>> token =
                 ClassToken.tokenOf(new PassingDecorator<String>());
-        final RoutineConfiguration configuration = builder().withSyncRunner(RunnerType.QUEUED)
-                                                            .withInputOrder(OrderType.DELIVERY)
+        final RoutineConfiguration configuration =
+                builder().withSyncRunner(Runners.queuedRunner()).withInputOrder(OrderType.NONE)
                                                             .withLogLevel(LogLevel.DEBUG)
                                                             .buildConfiguration();
         final Routine<String, String> routine = JRoutine.onService(getActivity(), token)
@@ -158,8 +158,8 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
         final Routine<String, String> routine1 =
                 JRoutine.onService(getActivity(), ClassToken.tokenOf(StringPassingInvocation.class))
                         .dispatchingOn(Looper.getMainLooper())
-                        .withConfiguration(builder().withSyncRunner(RunnerType.QUEUED)
-                                                    .withInputOrder(OrderType.DELIVERY)
+                        .withConfiguration(builder().withSyncRunner(Runners.queuedRunner())
+                                                    .withInputOrder(OrderType.NONE)
                                                     .withLogLevel(LogLevel.DEBUG)
                                                     .buildConfiguration())
                         .withLogClass(AndroidLog.class)
@@ -180,8 +180,8 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
         final TimeDuration timeout = TimeDuration.seconds(10);
         final ClassToken<StringSingleCallInvocation> token =
                 ClassToken.tokenOf(StringSingleCallInvocation.class);
-        final RoutineConfiguration configuration2 = builder().withSyncRunner(RunnerType.SEQUENTIAL)
-                                                             .withOutputOrder(OrderType.DELIVERY)
+        final RoutineConfiguration configuration2 =
+                builder().withSyncRunner(Runners.queuedRunner()).withOutputOrder(OrderType.NONE)
                                                              .withLogLevel(LogLevel.DEBUG)
                                                              .buildConfiguration();
         final Routine<String, String> routine2 = JRoutine.onService(getActivity(), token)
@@ -205,10 +205,9 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
         final TimeDuration timeout = TimeDuration.seconds(10);
         final ClassToken<StringSingleCallInvocation> token =
                 ClassToken.tokenOf(StringSingleCallInvocation.class);
-        final Builder builder = RoutineConfiguration.builder().withInputOrder(OrderType.PASSING)
-
-
-                                                    .withOutputOrder(OrderType.PASSING);
+        final Builder builder = RoutineConfiguration.builder()
+                                                    .withInputOrder(OrderType.PASSING_ORDER)
+                                                    .withOutputOrder(OrderType.PASSING_ORDER);
         final Routine<String, String> routine3 = JRoutine.onService(getActivity(), token)
                                                          .dispatchingOn(Looper.getMainLooper())
                                                          .withConfiguration(

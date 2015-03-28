@@ -139,7 +139,7 @@ class DefaultResultChannel<OUTPUT> implements ResultChannel<OUTPUT> {
         mTimeoutAction = configuration.getReadTimeoutActionOr(TimeoutAction.DEADLOCK);
         mMaxOutput = configuration.getOutputSizeOr(Integer.MAX_VALUE);
         mOutputTimeout = configuration.getOutputTimeoutOr(ZERO);
-        mOutputQueue = (configuration.getOutputOrderOr(OrderType.DELIVERY) == OrderType.DELIVERY)
+        mOutputQueue = (configuration.getOutputOrderOr(OrderType.NONE) == OrderType.NONE)
                 ? new SimpleNestedQueue<Object>() : new OrderedNestedQueue<Object>();
 
         final int maxOutputSize = mMaxOutput;

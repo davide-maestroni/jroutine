@@ -117,7 +117,7 @@ class DefaultParameterChannel<INPUT, OUTPUT> implements ParameterChannel<INPUT, 
             throw new IllegalArgumentException("the input buffer size cannot be 0 or negative");
         }
 
-        mInputQueue = (configuration.getInputOrderOr(OrderType.DELIVERY) == OrderType.DELIVERY)
+        mInputQueue = (configuration.getInputOrderOr(OrderType.NONE) == OrderType.NONE)
                 ? new SimpleNestedQueue<INPUT>() : new OrderedNestedQueue<INPUT>();
         mHasInputs = new Check() {
 

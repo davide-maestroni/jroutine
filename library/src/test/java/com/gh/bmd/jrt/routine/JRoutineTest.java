@@ -15,7 +15,6 @@ package com.gh.bmd.jrt.routine;
 
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.RunnerType;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.invocation.PassingInvocation;
 import com.gh.bmd.jrt.runner.Runners;
@@ -40,26 +39,26 @@ public class JRoutineTest {
     @Test
     public void testRoutineBuilder() {
 
-        final RoutineConfiguration configuration = builder().withSyncRunner(RunnerType.SEQUENTIAL)
-                                                            .withRunner(Runners.poolRunner())
-                                                            .withCoreInvocations(0)
-                                                            .withMaxInvocations(1)
-                                                            .withAvailableTimeout(1,
-                                                                                  TimeUnit.SECONDS)
-                                                            .withInputSize(2)
-                                                            .withInputTimeout(1, TimeUnit.SECONDS)
-                                                            .withOutputSize(2)
-                                                            .withOutputTimeout(1, TimeUnit.SECONDS)
-                                                            .withOutputOrder(OrderType.PASSING)
-                                                            .buildConfiguration();
+        final RoutineConfiguration configuration =
+                builder().withSyncRunner(Runners.sequentialRunner())
+                         .withAsyncRunner(Runners.poolRunner())
+                         .withCoreInvocations(0)
+                         .withMaxInvocations(1)
+                         .withAvailableTimeout(1, TimeUnit.SECONDS)
+                         .withInputSize(2)
+                         .withInputTimeout(1, TimeUnit.SECONDS)
+                         .withOutputSize(2)
+                         .withOutputTimeout(1, TimeUnit.SECONDS)
+                         .withOutputOrder(OrderType.PASSING_ORDER)
+                         .buildConfiguration();
 
         assertThat(JRoutine.on(factoryOf(new ClassToken<PassingInvocation<String>>() {}))
                            .withConfiguration(configuration)
                            .callSync("test1", "test2")
                            .readAll()).containsExactly("test1", "test2");
 
-        final RoutineConfiguration configuration1 = builder().withSyncRunner(RunnerType.QUEUED)
-                                                             .withRunner(Runners.poolRunner())
+        final RoutineConfiguration configuration1 = builder().withSyncRunner(Runners.queuedRunner())
+                                                             .withAsyncRunner(Runners.poolRunner())
                                                              .withCoreInvocations(0)
                                                              .withMaxInvocations(1)
                                                              .withAvailableTimeout(
@@ -68,7 +67,8 @@ public class JRoutineTest {
                                                              .withInputTimeout(TimeDuration.ZERO)
                                                              .withOutputSize(2)
                                                              .withOutputTimeout(TimeDuration.ZERO)
-                                                             .withOutputOrder(OrderType.PASSING)
+                                                             .withOutputOrder(
+                                                                     OrderType.PASSING_ORDER)
                                                              .buildConfiguration();
 
         assertThat(JRoutine.on(factoryOf(new ClassToken<PassingInvocation<String>>() {}))

@@ -16,7 +16,8 @@ apply plugin: 'signing'
 
 Project.metaClass.toVersionRange = { String version ->
 
-    version.replaceAll("^(.*)\\.[0-9]+\$", "\$1\\.+")
+    def versions = version.split('\\.')
+    "[" + versions[0] + "." + versions[1] + "," + versions[0] + "." + ++versions[1] + ")"
 }
 Project.metaClass.getWorkingBranch = {
 

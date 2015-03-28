@@ -56,8 +56,7 @@ public class JRoutineActivityRotationTest
 
         final TimeDuration timeout = TimeDuration.seconds(10);
         JRoutine.onActivity(getActivity(), ClassToken.tokenOf(ToUpperCase.class))
-                .withId(0)
-                .withConfiguration(withOutputOrder(OrderType.PASSING))
+                .withId(0).withConfiguration(withOutputOrder(OrderType.PASSING_ORDER))
                 .callAsync("test1", "test2");
 
         final Semaphore semaphore = new Semaphore(0);

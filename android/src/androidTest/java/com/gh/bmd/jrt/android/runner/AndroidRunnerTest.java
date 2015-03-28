@@ -40,7 +40,7 @@ import java.util.concurrent.Semaphore;
 
 import javax.annotation.Nonnull;
 
-import static com.gh.bmd.jrt.builder.RoutineConfiguration.withRunner;
+import static com.gh.bmd.jrt.builder.RoutineConfiguration.withAsyncRunner;
 import static com.gh.bmd.jrt.time.TimeDuration.ZERO;
 import static com.gh.bmd.jrt.time.TimeDuration.micros;
 import static com.gh.bmd.jrt.time.TimeDuration.millis;
@@ -86,7 +86,7 @@ public class AndroidRunnerTest extends AndroidTestCase {
         final OutputChannel<Object> channel =
                 JRoutine.on(Invocations.withArgs(this).factoryOf(ClassToken.tokenOf(invocation)))
                         .withConfiguration(
-                                withRunner(Runners.threadRunner(new HandlerThread("test"))))
+                                withAsyncRunner(Runners.threadRunner(new HandlerThread("test"))))
                         .callAsync();
 
         assertThat(JRoutine.on(new InvocationFactory<Object, Object>() {

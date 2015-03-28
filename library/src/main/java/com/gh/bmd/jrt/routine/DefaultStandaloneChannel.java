@@ -15,12 +15,12 @@ package com.gh.bmd.jrt.routine;
 
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.RunnerType;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.OutputConsumer;
 import com.gh.bmd.jrt.channel.StandaloneChannel;
 import com.gh.bmd.jrt.log.Logger;
 import com.gh.bmd.jrt.routine.DefaultResultChannel.AbortHandler;
+import com.gh.bmd.jrt.runner.Runner;
 import com.gh.bmd.jrt.runner.Runners;
 import com.gh.bmd.jrt.time.TimeDuration;
 
@@ -56,8 +56,8 @@ class DefaultStandaloneChannel<DATA> implements StandaloneChannel<DATA> {
         final ChannelAbortHandler abortHandler = new ChannelAbortHandler();
         final DefaultResultChannel<DATA> inputChannel =
                 new DefaultResultChannel<DATA>(configuration, abortHandler,
-                                               configuration.getRunnerOr(Runners.sharedRunner()),
-                                               logger);
+                                               configuration.getAsyncRunnerOr(
+                                                       Runners.sharedRunner()), logger);
         abortHandler.setChannel(inputChannel);
         mInputChannel = new DefaultStandaloneInput<DATA>(inputChannel);
         mOutputChannel = new DefaultStandaloneOutput<DATA>(inputChannel.getOutput());
@@ -73,11 +73,11 @@ class DefaultStandaloneChannel<DATA> implements StandaloneChannel<DATA> {
     private static void warn(@Nonnull final Logger logger,
             @Nonnull final RoutineConfiguration configuration) {
 
-        final RunnerType syncRunner = configuration.getSyncRunnerOr(null);
+        final Runner syncRunner = configuration.getSyncRunnerOr(null);
 
         if (syncRunner != null) {
 
-            logger.wrn("the specified synchronous runner type will be ignored: %s", syncRunner);
+            logger.wrn("the specified synchronous runner will be ignored: %s", syncRunner);
         }
 
         final int maxInvocations = configuration.getMaxInvocationsOr(RoutineConfiguration.DEFAULT);

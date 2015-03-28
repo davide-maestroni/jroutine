@@ -25,7 +25,7 @@ def mainProject = project.parent.subprojects.find { it.name.equals('library') };
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    if (isWorkingBranch('master') && !version.contains('PREVIEW') && mainProject.hasProperty('releaseVersion')) {
+    if (!version.contains('PREVIEW') && mainProject.hasProperty('releaseVersion')) {
         compile "com.github.davide-maestroni:jroutine:${toVersionRange(mainProject.getProperty('releaseVersion'))}"
     } else {
         compile project(':library')

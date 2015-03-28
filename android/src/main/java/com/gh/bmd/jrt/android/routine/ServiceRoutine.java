@@ -137,15 +137,15 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
             log = configuration.getLogOr(Logger.getGlobalLog());
         }
 
-        final Runner runner = configuration.getRunnerOr(null);
+        final Runner asyncRunner = configuration.getAsyncRunnerOr(null);
 
         mContext = context.getApplicationContext();
         mLooper = looper;
         mServiceClass = (serviceClass != null) ? serviceClass : RoutineService.class;
         mInvocationClass = invocationClass;
         mConfiguration = configuration;
-        mRunnerClass =
-                (runnerClass != null) ? runnerClass : (runner != null) ? runner.getClass() : null;
+        mRunnerClass = (runnerClass != null) ? runnerClass
+                : (asyncRunner != null) ? asyncRunner.getClass() : null;
         mLogClass = (logClass != null) ? logClass : log.getClass();
         mLogger = Logger.newLogger(log, configuration.getLogLevelOr(Logger.getGlobalLogLevel()),
                                    this);

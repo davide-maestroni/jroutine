@@ -603,8 +603,8 @@ public class RoutineTest {
 
         final ParameterChannel<String, String> channel1 =
                 JRoutine.on(withArgs(TimeDuration.millis(10)).factoryOf(DelayedInvocation.class))
-                        .withConfiguration(builder().withInputOrder(OrderType.PASSING)
-                                                    .withOutputOrder(OrderType.PASSING)
+                        .withConfiguration(builder().withInputOrder(OrderType.PASSING_ORDER)
+                                                    .withOutputOrder(OrderType.PASSING_ORDER)
                                                     .buildConfiguration())
                         .invokeAsync();
         channel1.after(100, TimeUnit.MILLISECONDS).pass("test1");
@@ -635,8 +635,9 @@ public class RoutineTest {
 
         startTime = System.currentTimeMillis();
 
-        final RoutineConfiguration configuration = builder().withInputOrder(OrderType.PASSING)
-                                                            .withOutputOrder(OrderType.PASSING)
+        final RoutineConfiguration configuration = builder().withInputOrder(OrderType.PASSING_ORDER)
+                                                            .withOutputOrder(
+                                                                    OrderType.PASSING_ORDER)
                                                             .buildConfiguration();
         final ParameterChannel<String, String> channel3 = JRoutine.on(
                 withArgs(TimeDuration.millis(10), 2).factoryOf(DelayedListInvocation.class))

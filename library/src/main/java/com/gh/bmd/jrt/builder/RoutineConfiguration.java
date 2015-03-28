@@ -45,6 +45,8 @@ public class RoutineConfiguration {
      */
     public static final RoutineConfiguration EMPTY_CONFIGURATION = builder().buildConfiguration();
 
+    private final Runner mAsyncRunner;
+
     private final TimeDuration mAvailTimeout;
 
     private final int mCoreInvocations;
@@ -69,17 +71,15 @@ public class RoutineConfiguration {
 
     private final TimeDuration mReadTimeout;
 
-    private final Runner mRunner;
-
-    private final RunnerType mRunnerType;
+    private final Runner mSyncRunner;
 
     private final TimeoutAction mTimeoutAction;
 
     /**
      * Constructor.
      *
-     * @param runner          the runner used for asynchronous invocations.
-     * @param runnerType      the type of runner used for synchronous invocations.
+     * @param syncRunner      the runner used for synchronous invocations.
+     * @param asyncRunner     the runner used for asynchronous invocations.
      * @param maxInvocations  the maximum number of parallel running invocations. Must be positive.
      * @param coreInvocations the maximum number of retained invocation instances. Must be 0 or a
      *                        positive number.
@@ -99,17 +99,17 @@ public class RoutineConfiguration {
      * @param log             the log instance.
      * @param logLevel        the log level.
      */
-    private RoutineConfiguration(@Nullable final Runner runner,
-            @Nullable final RunnerType runnerType, final int maxInvocations,
-            final int coreInvocations, @Nullable final TimeDuration availTimeout,
-            @Nullable final TimeDuration readTimeout, @Nullable final TimeoutAction actionType,
-            @Nullable final OrderType inputOrder, final int inputMaxSize,
-            @Nullable final TimeDuration inputTimeout, @Nullable final OrderType outputOrder,
-            final int outputMaxSize, @Nullable final TimeDuration outputTimeout,
-            @Nullable final Log log, @Nullable final LogLevel logLevel) {
+    private RoutineConfiguration(@Nullable final Runner syncRunner,
+            @Nullable final Runner asyncRunner, final int maxInvocations, final int coreInvocations,
+            @Nullable final TimeDuration availTimeout, @Nullable final TimeDuration readTimeout,
+            @Nullable final TimeoutAction actionType, @Nullable final OrderType inputOrder,
+            final int inputMaxSize, @Nullable final TimeDuration inputTimeout,
+            @Nullable final OrderType outputOrder, final int outputMaxSize,
+            @Nullable final TimeDuration outputTimeout, @Nullable final Log log,
+            @Nullable final LogLevel logLevel) {
 
-        mRunner = runner;
-        mRunnerType = runnerType;
+        mSyncRunner = syncRunner;
+        mAsyncRunner = asyncRunner;
         mMaxInvocations = maxInvocations;
         mCoreInvocations = coreInvocations;
         mAvailTimeout = availTimeout;
@@ -170,6 +170,18 @@ public class RoutineConfiguration {
     public static RoutineConfiguration onReadTimeout(@Nullable final TimeoutAction action) {
 
         return builder().onReadTimeout(action).buildConfiguration();
+    }
+
+    /**
+     * Short for <b><code>builder().withAsyncRunner(runner).buildConfiguration()</code></b>.
+     *
+     * @param runner the runner instance.
+     * @return the routine configuration.
+     */
+    @Nonnull
+    public static RoutineConfiguration withAsyncRunner(@Nullable final Runner runner) {
+
+        return builder().withAsyncRunner(runner).buildConfiguration();
     }
 
     /**
@@ -391,27 +403,15 @@ public class RoutineConfiguration {
     }
 
     /**
-     * Short for <b><code>builder().withRunner(runner).buildConfiguration()</code></b>.
+     * Short for <b><code>builder().withSyncRunner(runner).buildConfiguration()</code></b>.
      *
      * @param runner the runner instance.
-     * @return the routine configuration.
-     */
-    @Nonnull
-    public static RoutineConfiguration withRunner(@Nullable final Runner runner) {
-
-        return builder().withRunner(runner).buildConfiguration();
-    }
-
-    /**
-     * Short for <b><code>builder().withSyncRunner(type).buildConfiguration()</code></b>.
-     *
-     * @param type the runner type.
      * @return this builder.
      */
     @Nonnull
-    public static RoutineConfiguration withSyncRunner(@Nullable final RunnerType type) {
+    public static RoutineConfiguration withSyncRunner(@Nullable final Runner runner) {
 
-        return builder().withSyncRunner(type).buildConfiguration();
+        return builder().withSyncRunner(runner).buildConfiguration();
     }
 
     /**
@@ -423,6 +423,18 @@ public class RoutineConfiguration {
     public Builder builderFrom() {
 
         return new Builder(this);
+    }
+
+    /**
+     * Returns the runner used for asynchronous invocations (null by default).
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the runner instance.
+     */
+    public Runner getAsyncRunnerOr(@Nullable final Runner valueIfNotSet) {
+
+        final Runner runner = mAsyncRunner;
+        return (runner != null) ? runner : valueIfNotSet;
     }
 
     /**
@@ -587,34 +599,23 @@ public class RoutineConfiguration {
     }
 
     /**
-     * Returns the runner used for asynchronous invocations (null by default).
+     * Returns the runner used for synchronous invocations (null by default).
      *
      * @param valueIfNotSet the default value if none was set.
      * @return the runner instance.
      */
-    public Runner getRunnerOr(@Nullable final Runner valueIfNotSet) {
+    public Runner getSyncRunnerOr(@Nullable final Runner valueIfNotSet) {
 
-        final Runner runner = mRunner;
+        final Runner runner = mSyncRunner;
         return (runner != null) ? runner : valueIfNotSet;
-    }
-
-    /**
-     * Returns the type of the runner used for synchronous invocations (null by default).
-     *
-     * @param valueIfNotSet the default value if none was set.
-     * @return the runner type.
-     */
-    public RunnerType getSyncRunnerOr(@Nullable final RunnerType valueIfNotSet) {
-
-        final RunnerType runnerType = mRunnerType;
-        return (runnerType != null) ? runnerType : valueIfNotSet;
     }
 
     @Override
     public int hashCode() {
 
         // auto-generated code
-        int result = mAvailTimeout != null ? mAvailTimeout.hashCode() : 0;
+        int result = mAsyncRunner != null ? mAsyncRunner.hashCode() : 0;
+        result = 31 * result + (mAvailTimeout != null ? mAvailTimeout.hashCode() : 0);
         result = 31 * result + mCoreInvocations;
         result = 31 * result + mInputMaxSize;
         result = 31 * result + (mInputOrder != null ? mInputOrder.hashCode() : 0);
@@ -626,8 +627,7 @@ public class RoutineConfiguration {
         result = 31 * result + (mOutputOrder != null ? mOutputOrder.hashCode() : 0);
         result = 31 * result + (mOutputTimeout != null ? mOutputTimeout.hashCode() : 0);
         result = 31 * result + (mReadTimeout != null ? mReadTimeout.hashCode() : 0);
-        result = 31 * result + (mRunner != null ? mRunner.hashCode() : 0);
-        result = 31 * result + (mRunnerType != null ? mRunnerType.hashCode() : 0);
+        result = 31 * result + (mSyncRunner != null ? mSyncRunner.hashCode() : 0);
         result = 31 * result + (mTimeoutAction != null ? mTimeoutAction.hashCode() : 0);
         return result;
     }
@@ -665,6 +665,12 @@ public class RoutineConfiguration {
         }
 
         if (mOutputMaxSize != that.mOutputMaxSize) {
+
+            return false;
+        }
+
+        if (mAsyncRunner != null ? !mAsyncRunner.equals(that.mAsyncRunner)
+                : that.mAsyncRunner != null) {
 
             return false;
         }
@@ -713,12 +719,8 @@ public class RoutineConfiguration {
             return false;
         }
 
-        if (mRunner != null ? !mRunner.equals(that.mRunner) : that.mRunner != null) {
-
-            return false;
-        }
-
-        if (mRunnerType != that.mRunnerType) {
+        if (mSyncRunner != null ? !mSyncRunner.equals(that.mSyncRunner)
+                : that.mSyncRunner != null) {
 
             return false;
         }
@@ -730,7 +732,8 @@ public class RoutineConfiguration {
     public String toString() {
 
         return "RoutineConfiguration{" +
-                "mAvailTimeout=" + mAvailTimeout +
+                "mAsyncRunner=" + mAsyncRunner +
+                ", mAvailTimeout=" + mAvailTimeout +
                 ", mCoreInvocations=" + mCoreInvocations +
                 ", mInputMaxSize=" + mInputMaxSize +
                 ", mInputOrder=" + mInputOrder +
@@ -742,8 +745,7 @@ public class RoutineConfiguration {
                 ", mOutputOrder=" + mOutputOrder +
                 ", mOutputTimeout=" + mOutputTimeout +
                 ", mReadTimeout=" + mReadTimeout +
-                ", mRunner=" + mRunner +
-                ", mRunnerType=" + mRunnerType +
+                ", mSyncRunner=" + mSyncRunner +
                 ", mTimeoutAction=" + mTimeoutAction +
                 '}';
     }
@@ -758,36 +760,12 @@ public class RoutineConfiguration {
          * Data are returned in the same order as they are passed to the channel, independently from
          * the specific delay.
          */
-        PASSING,
+        PASSING_ORDER,
         /**
-         * Delivery order.<br/>
-         * Data are returned in the same order as they are delivered, taking also into consideration
-         * the specific delay. Note that the delivery time might be different based on the specific
-         * runner implementation, so there is no guarantee about the data order when, for example,
-         * two objects are passed one immediately after the other with the same delay.
+         * No order.<br/>
+         * There is no guarantee about the data order.
          */
-        DELIVERY,
-    }
-
-    /**
-     * Synchronous runner type enumeration.
-     */
-    public enum RunnerType {
-
-        /**
-         * Sequential runner.<br/>
-         * The sequential one simply runs the executions as soon as they are invoked.<br/>
-         * The executions will run inside the calling thread.
-         */
-        SEQUENTIAL,
-        /**
-         * Queued runner.<br/>
-         * The queued runner maintains an internal buffer of executions that are consumed only when
-         * the last one completes, thus avoiding overflowing the call stack because of nested calls
-         * to other routines.<br/>
-         * The executions will run inside the calling thread.
-         */
-        QUEUED
+        NONE,
     }
 
     /**
@@ -820,6 +798,8 @@ public class RoutineConfiguration {
      */
     public static class Builder {
 
+        private Runner mAsyncRunner;
+
         private TimeDuration mAvailTimeout;
 
         private int mCoreInvocations;
@@ -844,9 +824,7 @@ public class RoutineConfiguration {
 
         private TimeDuration mReadTimeout;
 
-        private Runner mRunner;
-
-        private RunnerType mRunnerType;
+        private Runner mSyncRunner;
 
         private TimeoutAction mTimeoutAction;
 
@@ -869,8 +847,8 @@ public class RoutineConfiguration {
          */
         private Builder(@Nonnull final RoutineConfiguration initialConfiguration) {
 
-            mRunner = initialConfiguration.getRunnerOr(null);
-            mRunnerType = initialConfiguration.getSyncRunnerOr(null);
+            mSyncRunner = initialConfiguration.getSyncRunnerOr(null);
+            mAsyncRunner = initialConfiguration.getAsyncRunnerOr(null);
             mMaxInvocations = initialConfiguration.getMaxInvocationsOr(DEFAULT);
             mCoreInvocations = initialConfiguration.getCoreInvocationsOr(DEFAULT);
             mAvailTimeout = initialConfiguration.getAvailTimeoutOr(null);
@@ -894,10 +872,11 @@ public class RoutineConfiguration {
         @Nonnull
         public RoutineConfiguration buildConfiguration() {
 
-            return new RoutineConfiguration(mRunner, mRunnerType, mMaxInvocations, mCoreInvocations,
-                                            mAvailTimeout, mReadTimeout, mTimeoutAction,
-                                            mInputOrder, mInputMaxSize, mInputTimeout, mOutputOrder,
-                                            mOutputMaxSize, mOutputTimeout, mLog, mLogLevel);
+            return new RoutineConfiguration(mSyncRunner, mAsyncRunner, mMaxInvocations,
+                                            mCoreInvocations, mAvailTimeout, mReadTimeout,
+                                            mTimeoutAction, mInputOrder, mInputMaxSize,
+                                            mInputTimeout, mOutputOrder, mOutputMaxSize,
+                                            mOutputTimeout, mLog, mLogLevel);
         }
 
         /**
@@ -911,6 +890,20 @@ public class RoutineConfiguration {
         public Builder onReadTimeout(@Nullable final TimeoutAction action) {
 
             mTimeoutAction = action;
+            return this;
+        }
+
+        /**
+         * Sets the asynchronous runner instance. A null value means that it is up to the framework
+         * to choose a default instance.
+         *
+         * @param runner the runner instance.
+         * @return this builder.
+         */
+        @Nonnull
+        public Builder withAsyncRunner(@Nullable final Runner runner) {
+
+            mAsyncRunner = runner;
             return this;
         }
 
@@ -1194,30 +1187,16 @@ public class RoutineConfiguration {
         }
 
         /**
-         * Sets the asynchronous runner instance. A null value means that it is up to the framework
+         * Sets the synchronous runner instance. A null value means that it is up to the framework
          * to choose a default instance.
          *
          * @param runner the runner instance.
          * @return this builder.
          */
         @Nonnull
-        public Builder withRunner(@Nullable final Runner runner) {
+        public Builder withSyncRunner(@Nullable final Runner runner) {
 
-            mRunner = runner;
-            return this;
-        }
-
-        /**
-         * Sets the type of the synchronous runner to be used by the routine. A null value means
-         * that it is up to the framework to choose a default order type.
-         *
-         * @param type the runner type.
-         * @return this builder.
-         */
-        @Nonnull
-        public Builder withSyncRunner(@Nullable final RunnerType type) {
-
-            mRunnerType = type;
+            mSyncRunner = runner;
             return this;
         }
 
@@ -1269,18 +1248,18 @@ public class RoutineConfiguration {
         private void applyInvocationConfiguration(
                 @Nonnull final RoutineConfiguration configuration) {
 
-            final Runner runner = configuration.getRunnerOr(null);
-
-            if (runner != null) {
-
-                withRunner(runner);
-            }
-
-            final RunnerType syncRunner = configuration.getSyncRunnerOr(null);
+            final Runner syncRunner = configuration.getSyncRunnerOr(null);
 
             if (syncRunner != null) {
 
                 withSyncRunner(syncRunner);
+            }
+
+            final Runner asyncRunner = configuration.getAsyncRunnerOr(null);
+
+            if (asyncRunner != null) {
+
+                withAsyncRunner(asyncRunner);
             }
 
             final int maxInvocations = configuration.getMaxInvocationsOr(DEFAULT);

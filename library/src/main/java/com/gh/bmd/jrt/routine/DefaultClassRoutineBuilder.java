@@ -327,7 +327,7 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
 
         warn(configuration);
 
-        builder.withInputOrder(OrderType.PASSING)
+        builder.withInputOrder(OrderType.PASSING_ORDER)
                .withInputSize(Integer.MAX_VALUE)
                .withInputTimeout(TimeDuration.ZERO)
                .withOutputSize(Integer.MAX_VALUE)

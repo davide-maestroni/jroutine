@@ -33,7 +33,6 @@
                                            ${routineBuilderOptions}
                                            .withInputSize(Integer.MAX_VALUE)
                                            .withInputTimeout(com.gh.bmd.jrt.time.TimeDuration.ZERO)
-                                           .withOutputOrder(com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType.DELIVERY)
                                            .withOutputSize(Integer.MAX_VALUE)
                                            .withOutputTimeout(com.gh.bmd.jrt.time.TimeDuration.ZERO)
                                            .buildConfiguration())

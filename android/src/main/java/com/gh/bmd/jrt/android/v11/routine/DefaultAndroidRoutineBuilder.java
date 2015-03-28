@@ -112,8 +112,7 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
         final RoutineConfiguration configuration = getConfiguration();
         warn(configuration);
 
-        final Builder builder = configuration.builderFrom()
-                                             .withRunner(Runners.mainRunner())
+        final Builder builder = configuration.builderFrom().withAsyncRunner(Runners.mainRunner())
                                              .withInputSize(Integer.MAX_VALUE)
                                              .withInputTimeout(TimeDuration.INFINITY)
                                              .withOutputSize(Integer.MAX_VALUE)
@@ -185,12 +184,12 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
 
         Logger logger = null;
 
-        final Runner runner = configuration.getRunnerOr(null);
+        final Runner asyncRunner = configuration.getAsyncRunnerOr(null);
 
-        if (runner != null) {
+        if (asyncRunner != null) {
 
             logger = Logger.newLogger(configuration, this);
-            logger.wrn("the specified runner will be ignored: %s", runner);
+            logger.wrn("the specified runner will be ignored: %s", asyncRunner);
         }
 
         final int inputSize = configuration.getInputSizeOr(RoutineConfiguration.DEFAULT);

@@ -426,7 +426,7 @@ public class RoutineService extends Service {
 
                     try {
 
-                        builder.withRunner(findConstructor(runnerClass).newInstance());
+                        builder.withAsyncRunner(findConstructor(runnerClass).newInstance());
 
                     } catch (final Throwable t) {
 

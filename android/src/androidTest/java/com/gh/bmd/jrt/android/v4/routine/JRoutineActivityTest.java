@@ -32,7 +32,6 @@ import com.gh.bmd.jrt.android.routine.AndroidRoutine;
 import com.gh.bmd.jrt.android.runner.Runners;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.RunnerType;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.common.ClassToken;
@@ -123,8 +122,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         final AndroidRoutine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeAndroidInvocation.class))
-                        .withConfiguration(builder().withInputOrder(OrderType.PASSING)
-                                                    .withOutputOrder(OrderType.PASSING)
+                        .withConfiguration(builder().withInputOrder(OrderType.PASSING_ORDER)
+                                                    .withOutputOrder(OrderType.PASSING_ORDER)
                                                     .buildConfiguration())
                         .withId(0)
                         .onComplete(CacheStrategy.CACHE)
@@ -140,8 +139,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         final AndroidRoutine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeAndroidInvocation.class))
-                        .withConfiguration(builder().withInputOrder(OrderType.PASSING)
-                                                    .withOutputOrder(OrderType.PASSING)
+                        .withConfiguration(builder().withInputOrder(OrderType.PASSING_ORDER)
+                                                    .withOutputOrder(OrderType.PASSING_ORDER)
                                                     .buildConfiguration())
                         .withId(0)
                         .onComplete(CacheStrategy.CACHE)
@@ -483,8 +482,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         final AndroidRoutine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeAndroidInvocation.class))
-                        .withConfiguration(builder().withInputOrder(OrderType.PASSING)
-                                                    .withOutputOrder(OrderType.PASSING)
+                        .withConfiguration(builder().withInputOrder(OrderType.PASSING_ORDER)
+                                                    .withOutputOrder(OrderType.PASSING_ORDER)
                                                     .buildConfiguration())
                         .withId(0)
                         .onComplete(CacheStrategy.CACHE)
@@ -500,8 +499,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         final AndroidRoutine<String, String> routine =
                 JRoutine.onActivity(getActivity(), ClassToken.tokenOf(PurgeAndroidInvocation.class))
-                        .withConfiguration(builder().withInputOrder(OrderType.PASSING)
-                                                    .withOutputOrder(OrderType.PASSING)
+                        .withConfiguration(builder().withInputOrder(OrderType.PASSING_ORDER)
+                                                    .withOutputOrder(OrderType.PASSING_ORDER)
                                                     .buildConfiguration())
                         .withId(0)
                         .onComplete(CacheStrategy.CACHE)
@@ -541,7 +540,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
     public void testAndroidChannelBuilderWarnings() {
 
         final CountLog countLog = new CountLog();
-        final RoutineConfiguration configuration = builder().withRunner(Runners.taskRunner())
+        final RoutineConfiguration configuration = builder().withAsyncRunner(Runners.taskRunner())
                                                             .withInputSize(3)
                                                             .withInputTimeout(seconds(1))
                                                             .withOutputSize(3)
@@ -562,7 +561,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
     public void testAndroidRoutineBuilderWarnings() {
 
         final CountLog countLog = new CountLog();
-        final RoutineConfiguration configuration = builder().withRunner(Runners.taskRunner())
+        final RoutineConfiguration configuration = builder().withAsyncRunner(Runners.taskRunner())
                                                             .withInputSize(3)
                                                             .withInputTimeout(seconds(1))
                                                             .withOutputSize(3)
@@ -655,8 +654,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                                                                           R.id.test_fragment);
         final AndroidRoutine<String, String> routine =
                 JRoutine.onFragment(fragment, ClassToken.tokenOf(PurgeAndroidInvocation.class))
-                        .withConfiguration(builder().withInputOrder(OrderType.PASSING)
-                                                    .withOutputOrder(OrderType.PASSING)
+                        .withConfiguration(builder().withInputOrder(OrderType.PASSING_ORDER)
+                                                    .withOutputOrder(OrderType.PASSING_ORDER)
                                                     .buildConfiguration())
                         .withId(0)
                         .onComplete(CacheStrategy.CACHE)
@@ -675,8 +674,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                                                                           R.id.test_fragment);
         final AndroidRoutine<String, String> routine =
                 JRoutine.onFragment(fragment, ClassToken.tokenOf(PurgeAndroidInvocation.class))
-                        .withConfiguration(builder().withInputOrder(OrderType.PASSING)
-                                                    .withOutputOrder(OrderType.PASSING)
+                        .withConfiguration(builder().withInputOrder(OrderType.PASSING_ORDER)
+                                                    .withOutputOrder(OrderType.PASSING_ORDER)
                                                     .buildConfiguration())
                         .withId(0)
                         .onComplete(CacheStrategy.CACHE)
@@ -708,8 +707,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                                                                           R.id.test_fragment);
         final Routine<String, String> routine =
                 JRoutine.onFragment(fragment, ClassToken.tokenOf(ToUpperCase.class))
-                        .withId(0)
-                        .withConfiguration(withOutputOrder(OrderType.PASSING))
+                        .withId(0).withConfiguration(withOutputOrder(OrderType.PASSING_ORDER))
                         .buildRoutine();
         final OutputChannel<String> channel1 = routine.callAsync("test1", "test2");
         final OutputChannel<String> channel2 = JRoutine.onFragment(fragment, 0).buildChannel();
@@ -897,8 +895,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                                                                           R.id.test_fragment);
         final AndroidRoutine<String, String> routine =
                 JRoutine.onFragment(fragment, ClassToken.tokenOf(PurgeAndroidInvocation.class))
-                        .withConfiguration(builder().withInputOrder(OrderType.PASSING)
-                                                    .withOutputOrder(OrderType.PASSING)
+                        .withConfiguration(builder().withInputOrder(OrderType.PASSING_ORDER)
+                                                    .withOutputOrder(OrderType.PASSING_ORDER)
                                                     .buildConfiguration())
                         .withId(0)
                         .onComplete(CacheStrategy.CACHE)
@@ -917,8 +915,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                                                                           R.id.test_fragment);
         final AndroidRoutine<String, String> routine =
                 JRoutine.onFragment(fragment, ClassToken.tokenOf(PurgeAndroidInvocation.class))
-                        .withConfiguration(builder().withInputOrder(OrderType.PASSING)
-                                                    .withOutputOrder(OrderType.PASSING)
+                        .withConfiguration(builder().withInputOrder(OrderType.PASSING_ORDER)
+                                                    .withOutputOrder(OrderType.PASSING_ORDER)
                                                     .buildConfiguration())
                         .withId(0)
                         .onComplete(CacheStrategy.CACHE)
@@ -963,7 +961,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
         final TimeDuration timeout = TimeDuration.seconds(10);
         final ClassToken<StringPassingInvocation> token1 =
                 ClassToken.tokenOf(StringPassingInvocation.class);
-        final RoutineConfiguration configuration1 = builder().withSyncRunner(RunnerType.QUEUED)
+        final RoutineConfiguration configuration1 = builder().withSyncRunner(Runners.queuedRunner())
                                                              .withLog(Logs.androidLog())
                                                              .withLogLevel(LogLevel.WARNING)
                                                              .buildConfiguration();
@@ -982,7 +980,7 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
 
         final ClassToken<StringSingleCallInvocation> token2 =
                 ClassToken.tokenOf(StringSingleCallInvocation.class);
-        final RoutineConfiguration configuration2 = builder().withSyncRunner(RunnerType.SEQUENTIAL)
+        final RoutineConfiguration configuration2 = builder().withSyncRunner(Runners.queuedRunner())
                                                              .withLog(Logs.androidLog())
                                                              .withLogLevel(LogLevel.WARNING)
                                                              .buildConfiguration();

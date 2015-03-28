@@ -15,13 +15,12 @@ package com.gh.bmd.jrt.routine;
 
 import com.gh.bmd.jrt.annotation.Bind;
 import com.gh.bmd.jrt.annotation.Pass;
-import com.gh.bmd.jrt.annotation.Pass.PassingMode;
+import com.gh.bmd.jrt.annotation.Pass.ParamMode;
 import com.gh.bmd.jrt.annotation.Share;
 import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.builder.ObjectRoutineBuilder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
-import com.gh.bmd.jrt.builder.RoutineConfiguration.RunnerType;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.TimeoutAction;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.StandaloneChannel;
@@ -107,16 +106,16 @@ public class ObjectRoutineBuilderTest {
 
         final TimeDuration timeout = seconds(1);
         final TestClass test = new TestClass();
-        final RoutineConfiguration configuration = builder().withSyncRunner(RunnerType.SEQUENTIAL)
-                                                            .withRunner(Runners.poolRunner())
-                                                            .withMaxInvocations(1)
-                                                            .withCoreInvocations(1)
-                                                            .withAvailableTimeout(1,
-                                                                                  TimeUnit.SECONDS)
-                                                            .onReadTimeout(TimeoutAction.EXIT)
-                                                            .withLogLevel(LogLevel.DEBUG)
-                                                            .withLog(new NullLog())
-                                                            .buildConfiguration();
+        final RoutineConfiguration configuration =
+                builder().withSyncRunner(Runners.sequentialRunner())
+                         .withAsyncRunner(Runners.poolRunner())
+                         .withMaxInvocations(1)
+                         .withCoreInvocations(1)
+                         .withAvailableTimeout(1, TimeUnit.SECONDS)
+                         .onReadTimeout(TimeoutAction.EXIT)
+                         .withLogLevel(LogLevel.DEBUG)
+                         .withLog(new NullLog())
+                         .buildConfiguration();
         final Routine<Object, Object> routine =
                 JRoutine.on(test).withConfiguration(configuration).boundMethod(TestClass.GET);
 
@@ -128,10 +127,10 @@ public class ObjectRoutineBuilderTest {
 
         final TestClass test = new TestClass();
         final CountLog countLog = new CountLog();
-        final RoutineConfiguration configuration = builder().withInputOrder(OrderType.DELIVERY)
+        final RoutineConfiguration configuration = builder().withInputOrder(OrderType.NONE)
                                                             .withInputSize(3)
                                                             .withInputTimeout(seconds(1))
-                                                            .withOutputOrder(OrderType.DELIVERY)
+                                                            .withOutputOrder(OrderType.NONE)
                                                             .withOutputSize(3)
                                                             .withOutputTimeout(seconds(1))
                                                             .withLogLevel(LogLevel.DEBUG)
@@ -416,8 +415,8 @@ public class ObjectRoutineBuilderTest {
 
         final TimeDuration timeout = seconds(1);
         final TestClass test = new TestClass();
-        final RoutineConfiguration configuration2 = builder().withSyncRunner(RunnerType.QUEUED)
-                                                             .withRunner(Runners.poolRunner())
+        final RoutineConfiguration configuration2 = builder().withSyncRunner(Runners.queuedRunner())
+                                                             .withAsyncRunner(Runners.poolRunner())
                                                              .withMaxInvocations(1)
                                                              .withAvailableTimeout(
                                                                      TimeDuration.ZERO)
@@ -437,8 +436,8 @@ public class ObjectRoutineBuilderTest {
 
         final TimeDuration timeout = seconds(1);
         final TestClass test = new TestClass();
-        final RoutineConfiguration configuration1 = builder().withSyncRunner(RunnerType.QUEUED)
-                                                             .withRunner(Runners.poolRunner())
+        final RoutineConfiguration configuration1 = builder().withSyncRunner(Runners.queuedRunner())
+                                                             .withAsyncRunner(Runners.poolRunner())
                                                              .buildConfiguration();
         final Routine<Object, Object> routine1 =
                 JRoutine.on(test).withConfiguration(configuration1).method("getLong");
@@ -751,29 +750,32 @@ public class ObjectRoutineBuilderTest {
 
         final TestClass test = new TestClass();
         final NullLog nullLog = new NullLog();
-        final RoutineConfiguration configuration1 = builder().withSyncRunner(RunnerType.SEQUENTIAL)
-                                                             .withRunner(Runners.sharedRunner())
-                                                             .withLogLevel(LogLevel.DEBUG)
-                                                             .withLog(nullLog)
-                                                             .buildConfiguration();
+        final RoutineConfiguration configuration1 =
+                builder().withSyncRunner(Runners.sequentialRunner())
+                         .withAsyncRunner(Runners.sharedRunner())
+                         .withLogLevel(LogLevel.DEBUG)
+                         .withLog(nullLog)
+                         .buildConfiguration();
         final Routine<Object, Object> routine1 =
                 JRoutine.on(test).withConfiguration(configuration1).boundMethod(TestClass.GET);
 
         assertThat(routine1.callSync().readAll()).containsExactly(-77L);
 
-        final RoutineConfiguration configuration2 = builder().withSyncRunner(RunnerType.SEQUENTIAL)
-                                                             .withRunner(Runners.sharedRunner())
-                                                             .withLogLevel(LogLevel.DEBUG)
-                                                             .withLog(nullLog)
-                                                             .buildConfiguration();
+        final RoutineConfiguration configuration2 =
+                builder().withSyncRunner(Runners.sequentialRunner())
+                         .withAsyncRunner(Runners.sharedRunner())
+                         .withLogLevel(LogLevel.DEBUG)
+                         .withLog(nullLog)
+                         .buildConfiguration();
         final Routine<Object, Object> routine2 =
                 JRoutine.on(test).withConfiguration(configuration2).boundMethod(TestClass.GET);
 
         assertThat(routine2.callSync().readAll()).containsExactly(-77L);
         assertThat(routine1).isEqualTo(routine2);
 
-        final RoutineConfiguration configuration3 = builder().withSyncRunner(RunnerType.QUEUED)
-                                                             .withRunner(Runners.sharedRunner())
+        final RoutineConfiguration configuration3 = builder().withSyncRunner(Runners.queuedRunner())
+                                                             .withAsyncRunner(
+                                                                     Runners.sharedRunner())
                                                              .withLogLevel(LogLevel.DEBUG)
                                                              .withLog(nullLog)
                                                              .buildConfiguration();
@@ -784,8 +786,9 @@ public class ObjectRoutineBuilderTest {
         assertThat(routine1).isNotEqualTo(routine3);
         assertThat(routine2).isNotEqualTo(routine3);
 
-        final RoutineConfiguration configuration4 = builder().withSyncRunner(RunnerType.QUEUED)
-                                                             .withRunner(Runners.sharedRunner())
+        final RoutineConfiguration configuration4 = builder().withSyncRunner(Runners.queuedRunner())
+                                                             .withAsyncRunner(
+                                                                     Runners.sharedRunner())
                                                              .withLogLevel(LogLevel.WARNING)
                                                              .withLog(nullLog)
                                                              .buildConfiguration();
@@ -795,8 +798,9 @@ public class ObjectRoutineBuilderTest {
         assertThat(routine4.callSync().readAll()).containsExactly(-77L);
         assertThat(routine3).isNotEqualTo(routine4);
 
-        final RoutineConfiguration configuration5 = builder().withSyncRunner(RunnerType.QUEUED)
-                                                             .withRunner(Runners.sharedRunner())
+        final RoutineConfiguration configuration5 = builder().withSyncRunner(Runners.queuedRunner())
+                                                             .withAsyncRunner(
+                                                                     Runners.sharedRunner())
                                                              .withLogLevel(LogLevel.WARNING)
                                                              .withLog(new NullLog())
                                                              .buildConfiguration();
@@ -839,206 +843,206 @@ public class ObjectRoutineBuilderTest {
         int add0(char c);
 
         @Bind("a")
-        int add1(@Pass(value = char.class, mode = PassingMode.OBJECT) OutputChannel<Character> c);
+        int add1(@Pass(value = char.class, mode = ParamMode.OBJECT) OutputChannel<Character> c);
 
         @Bind("a")
-        int add2(@Pass(value = char.class, mode = PassingMode.PARALLEL) OutputChannel<Character> c);
+        int add2(@Pass(value = char.class, mode = ParamMode.PARALLEL) OutputChannel<Character> c);
 
         @Bind("a")
-        @Pass(value = int.class, mode = PassingMode.OBJECT)
+        @Pass(value = int.class, mode = ParamMode.OBJECT)
         OutputChannel<Integer> add3(char c);
 
         @Bind("a")
-        @Pass(value = int.class, mode = PassingMode.OBJECT)
+        @Pass(value = int.class, mode = ParamMode.OBJECT)
         OutputChannel<Integer> add4(
-                @Pass(value = char.class, mode = PassingMode.OBJECT) OutputChannel<Character> c);
+                @Pass(value = char.class, mode = ParamMode.OBJECT) OutputChannel<Character> c);
 
         @Bind("a")
-        @Pass(value = int.class, mode = PassingMode.OBJECT)
+        @Pass(value = int.class, mode = ParamMode.OBJECT)
         OutputChannel<Integer> add5(
-                @Pass(value = char.class, mode = PassingMode.PARALLEL) OutputChannel<Character> c);
+                @Pass(value = char.class, mode = ParamMode.PARALLEL) OutputChannel<Character> c);
 
         @Bind("aa")
         int[] addA00(char[] c);
 
         @Bind("aa")
         int[] addA01(@Pass(value = char[].class,
-                mode = PassingMode.OBJECT) OutputChannel<char[]> c);
+                mode = ParamMode.OBJECT) OutputChannel<char[]> c);
 
         @Bind("aa")
         int[] addA02(@Pass(value = char[].class,
-                mode = PassingMode.COLLECTION) OutputChannel<Character> c);
+                mode = ParamMode.COLLECTION) OutputChannel<Character> c);
 
         @Bind("aa")
         int[] addA03(@Pass(value = char[].class,
-                mode = PassingMode.PARALLEL) OutputChannel<char[]> c);
+                mode = ParamMode.PARALLEL) OutputChannel<char[]> c);
 
         @Bind("aa")
-        @Pass(value = int[].class, mode = PassingMode.OBJECT)
+        @Pass(value = int[].class, mode = ParamMode.OBJECT)
         OutputChannel<int[]> addA04(char[] c);
 
         @Bind("aa")
-        @Pass(value = int[].class, mode = PassingMode.OBJECT)
+        @Pass(value = int[].class, mode = ParamMode.OBJECT)
         OutputChannel<int[]> addA05(
-                @Pass(value = char[].class, mode = PassingMode.OBJECT) OutputChannel<char[]> c);
+                @Pass(value = char[].class, mode = ParamMode.OBJECT) OutputChannel<char[]> c);
 
         @Bind("aa")
-        @Pass(value = int[].class, mode = PassingMode.OBJECT)
+        @Pass(value = int[].class, mode = ParamMode.OBJECT)
         OutputChannel<int[]> addA06(@Pass(value = char[].class,
-                mode = PassingMode.COLLECTION) OutputChannel<Character> c);
+                mode = ParamMode.COLLECTION) OutputChannel<Character> c);
 
         @Bind("aa")
-        @Pass(value = int[].class, mode = PassingMode.OBJECT)
+        @Pass(value = int[].class, mode = ParamMode.OBJECT)
         OutputChannel<int[]> addA07(@Pass(value = char[].class,
-                mode = PassingMode.PARALLEL) OutputChannel<char[]> c);
+                mode = ParamMode.PARALLEL) OutputChannel<char[]> c);
 
         @Bind("aa")
-        @Pass(value = int[].class, mode = PassingMode.COLLECTION)
+        @Pass(value = int[].class, mode = ParamMode.COLLECTION)
         OutputChannel<Integer> addA08(char[] c);
 
         @Bind("aa")
-        @Pass(value = int[].class, mode = PassingMode.COLLECTION)
+        @Pass(value = int[].class, mode = ParamMode.COLLECTION)
         OutputChannel<Integer> addA09(
-                @Pass(value = char[].class, mode = PassingMode.OBJECT) OutputChannel<char[]> c);
+                @Pass(value = char[].class, mode = ParamMode.OBJECT) OutputChannel<char[]> c);
 
         @Bind("aa")
-        @Pass(value = int[].class, mode = PassingMode.COLLECTION)
+        @Pass(value = int[].class, mode = ParamMode.COLLECTION)
         OutputChannel<Integer> addA10(@Pass(value = char[].class,
-                mode = PassingMode.COLLECTION) OutputChannel<Character> c);
+                mode = ParamMode.COLLECTION) OutputChannel<Character> c);
 
         @Bind("aa")
-        @Pass(value = int[].class, mode = PassingMode.COLLECTION)
+        @Pass(value = int[].class, mode = ParamMode.COLLECTION)
         OutputChannel<Integer> addA11(@Pass(value = char[].class,
-                mode = PassingMode.PARALLEL) OutputChannel<char[]> c);
+                mode = ParamMode.PARALLEL) OutputChannel<char[]> c);
 
         @Bind("aa")
-        @Pass(value = int[].class, mode = PassingMode.PARALLEL)
+        @Pass(value = int[].class, mode = ParamMode.PARALLEL)
         List<int[]> addA12(char[] c);
 
         @Bind("aa")
-        @Pass(value = int[].class, mode = PassingMode.PARALLEL)
+        @Pass(value = int[].class, mode = ParamMode.PARALLEL)
         List<int[]> addA13(
-                @Pass(value = char[].class, mode = PassingMode.OBJECT) OutputChannel<char[]> c);
+                @Pass(value = char[].class, mode = ParamMode.OBJECT) OutputChannel<char[]> c);
 
         @Bind("aa")
-        @Pass(value = int[].class, mode = PassingMode.PARALLEL)
+        @Pass(value = int[].class, mode = ParamMode.PARALLEL)
         List<int[]> addA14(@Pass(value = char[].class,
-                mode = PassingMode.COLLECTION) OutputChannel<Character> c);
+                mode = ParamMode.COLLECTION) OutputChannel<Character> c);
 
         @Bind("aa")
-        @Pass(value = int[].class, mode = PassingMode.PARALLEL)
+        @Pass(value = int[].class, mode = ParamMode.PARALLEL)
         List<int[]> addA15(@Pass(value = char[].class,
-                mode = PassingMode.PARALLEL) OutputChannel<char[]> c);
+                mode = ParamMode.PARALLEL) OutputChannel<char[]> c);
 
         @Bind("aa")
-        @Pass(value = int[].class, mode = PassingMode.PARALLEL)
+        @Pass(value = int[].class, mode = ParamMode.PARALLEL)
         int[][] addA16(char[] c);
 
         @Bind("aa")
-        @Pass(value = int[].class, mode = PassingMode.PARALLEL)
+        @Pass(value = int[].class, mode = ParamMode.PARALLEL)
         int[][] addA17(
-                @Pass(value = char[].class, mode = PassingMode.OBJECT) OutputChannel<char[]> c);
+                @Pass(value = char[].class, mode = ParamMode.OBJECT) OutputChannel<char[]> c);
 
         @Bind("aa")
-        @Pass(value = int[].class, mode = PassingMode.PARALLEL)
+        @Pass(value = int[].class, mode = ParamMode.PARALLEL)
         int[][] addA18(@Pass(value = char[].class,
-                mode = PassingMode.COLLECTION) OutputChannel<Character> c);
+                mode = ParamMode.COLLECTION) OutputChannel<Character> c);
 
         @Bind("aa")
-        @Pass(value = int[].class, mode = PassingMode.PARALLEL)
+        @Pass(value = int[].class, mode = ParamMode.PARALLEL)
         int[][] addA19(@Pass(value = char[].class,
-                mode = PassingMode.PARALLEL) OutputChannel<char[]> c);
+                mode = ParamMode.PARALLEL) OutputChannel<char[]> c);
 
         @Bind("al")
         List<Integer> addL00(List<Character> c);
 
         @Bind("al")
         List<Integer> addL01(@Pass(value = List.class,
-                mode = PassingMode.OBJECT) OutputChannel<List<Character>> c);
+                mode = ParamMode.OBJECT) OutputChannel<List<Character>> c);
 
         @Bind("al")
         List<Integer> addL02(@Pass(value = List.class,
-                mode = PassingMode.COLLECTION) OutputChannel<Character> c);
+                mode = ParamMode.COLLECTION) OutputChannel<Character> c);
 
         @Bind("al")
         List<Integer> addL03(@Pass(value = List.class,
-                mode = PassingMode.PARALLEL) OutputChannel<List<Character>> c);
+                mode = ParamMode.PARALLEL) OutputChannel<List<Character>> c);
 
         @Bind("al")
-        @Pass(value = List.class, mode = PassingMode.OBJECT)
+        @Pass(value = List.class, mode = ParamMode.OBJECT)
         OutputChannel<List<Integer>> addL04(List<Character> c);
 
         @Bind("al")
-        @Pass(value = List.class, mode = PassingMode.OBJECT)
+        @Pass(value = List.class, mode = ParamMode.OBJECT)
         OutputChannel<List<Integer>> addL05(@Pass(value = List.class,
-                mode = PassingMode.OBJECT) OutputChannel<List<Character>> c);
+                mode = ParamMode.OBJECT) OutputChannel<List<Character>> c);
 
         @Bind("al")
-        @Pass(value = List.class, mode = PassingMode.OBJECT)
+        @Pass(value = List.class, mode = ParamMode.OBJECT)
         OutputChannel<List<Integer>> addL06(@Pass(value = List.class,
-                mode = PassingMode.COLLECTION) OutputChannel<Character> c);
+                mode = ParamMode.COLLECTION) OutputChannel<Character> c);
 
         @Bind("al")
-        @Pass(value = List.class, mode = PassingMode.OBJECT)
+        @Pass(value = List.class, mode = ParamMode.OBJECT)
         OutputChannel<List<Integer>> addL07(@Pass(value = List.class,
-                mode = PassingMode.PARALLEL) OutputChannel<List<Character>> c);
+                mode = ParamMode.PARALLEL) OutputChannel<List<Character>> c);
 
         @Bind("al")
-        @Pass(value = List.class, mode = PassingMode.COLLECTION)
+        @Pass(value = List.class, mode = ParamMode.COLLECTION)
         OutputChannel<Integer> addL08(List<Character> c);
 
         @Bind("al")
-        @Pass(value = List.class, mode = PassingMode.COLLECTION)
+        @Pass(value = List.class, mode = ParamMode.COLLECTION)
         OutputChannel<Integer> addL09(@Pass(value = List.class,
-                mode = PassingMode.OBJECT) OutputChannel<List<Character>> c);
+                mode = ParamMode.OBJECT) OutputChannel<List<Character>> c);
 
         @Bind("al")
-        @Pass(value = List.class, mode = PassingMode.COLLECTION)
+        @Pass(value = List.class, mode = ParamMode.COLLECTION)
         OutputChannel<Integer> addL10(@Pass(value = List.class,
-                mode = PassingMode.COLLECTION) OutputChannel<Character> c);
+                mode = ParamMode.COLLECTION) OutputChannel<Character> c);
 
         @Bind("al")
-        @Pass(value = List.class, mode = PassingMode.COLLECTION)
+        @Pass(value = List.class, mode = ParamMode.COLLECTION)
         OutputChannel<Integer> addL11(@Pass(value = List.class,
-                mode = PassingMode.PARALLEL) OutputChannel<List<Character>> c);
+                mode = ParamMode.PARALLEL) OutputChannel<List<Character>> c);
 
         @Bind("al")
-        @Pass(value = List.class, mode = PassingMode.PARALLEL)
+        @Pass(value = List.class, mode = ParamMode.PARALLEL)
         List<List<Integer>> addL12(List<Character> c);
 
         @Bind("al")
-        @Pass(value = List.class, mode = PassingMode.PARALLEL)
+        @Pass(value = List.class, mode = ParamMode.PARALLEL)
         List<List<Integer>> addL13(@Pass(value = List.class,
-                mode = PassingMode.OBJECT) OutputChannel<List<Character>> c);
+                mode = ParamMode.OBJECT) OutputChannel<List<Character>> c);
 
         @Bind("al")
-        @Pass(value = List.class, mode = PassingMode.PARALLEL)
+        @Pass(value = List.class, mode = ParamMode.PARALLEL)
         List<List<Integer>> addL14(@Pass(value = List.class,
-                mode = PassingMode.COLLECTION) OutputChannel<Character> c);
+                mode = ParamMode.COLLECTION) OutputChannel<Character> c);
 
         @Bind("al")
-        @Pass(value = List.class, mode = PassingMode.PARALLEL)
+        @Pass(value = List.class, mode = ParamMode.PARALLEL)
         List<List<Integer>> addL15(@Pass(value = List.class,
-                mode = PassingMode.PARALLEL) OutputChannel<List<Character>> c);
+                mode = ParamMode.PARALLEL) OutputChannel<List<Character>> c);
 
         @Bind("al")
-        @Pass(value = List.class, mode = PassingMode.PARALLEL)
+        @Pass(value = List.class, mode = ParamMode.PARALLEL)
         List[] addL16(List<Character> c);
 
         @Bind("al")
-        @Pass(value = List.class, mode = PassingMode.PARALLEL)
+        @Pass(value = List.class, mode = ParamMode.PARALLEL)
         List[] addL17(@Pass(value = List.class,
-                mode = PassingMode.OBJECT) OutputChannel<List<Character>> c);
+                mode = ParamMode.OBJECT) OutputChannel<List<Character>> c);
 
         @Bind("al")
-        @Pass(value = List.class, mode = PassingMode.PARALLEL)
+        @Pass(value = List.class, mode = ParamMode.PARALLEL)
         List[] addL18(@Pass(value = List.class,
-                mode = PassingMode.COLLECTION) OutputChannel<Character> c);
+                mode = ParamMode.COLLECTION) OutputChannel<Character> c);
 
         @Bind("al")
-        @Pass(value = List.class, mode = PassingMode.PARALLEL)
+        @Pass(value = List.class, mode = ParamMode.PARALLEL)
         List[] addL19(@Pass(value = List.class,
-                mode = PassingMode.PARALLEL) OutputChannel<List<Character>> c);
+                mode = ParamMode.PARALLEL) OutputChannel<List<Character>> c);
 
         @Bind("g")
         int get0();
@@ -1047,11 +1051,11 @@ public class ObjectRoutineBuilderTest {
         void set0(int i);
 
         @Bind("g")
-        @Pass(value = int.class, mode = PassingMode.OBJECT)
+        @Pass(value = int.class, mode = ParamMode.OBJECT)
         OutputChannel<Integer> get1();
 
         @Bind("s")
-        void set1(@Pass(value = int.class, mode = PassingMode.OBJECT) OutputChannel<Integer> i);
+        void set1(@Pass(value = int.class, mode = ParamMode.OBJECT) OutputChannel<Integer> i);
 
         @Bind("ga")
         int[] getA0();
@@ -1060,26 +1064,26 @@ public class ObjectRoutineBuilderTest {
         void setA0(int[] i);
 
         @Bind("ga")
-        @Pass(value = int[].class, mode = PassingMode.COLLECTION)
+        @Pass(value = int[].class, mode = ParamMode.COLLECTION)
         OutputChannel<Integer> getA1();
 
         @Bind("sa")
-        void setA1(@Pass(value = int[].class, mode = PassingMode.OBJECT) OutputChannel<int[]> i);
+        void setA1(@Pass(value = int[].class, mode = ParamMode.OBJECT) OutputChannel<int[]> i);
 
         @Bind("ga")
-        @Pass(value = int[].class, mode = PassingMode.PARALLEL)
+        @Pass(value = int[].class, mode = ParamMode.PARALLEL)
         List<int[]> getA2();
 
         @Bind("sa")
         void setA2(
-                @Pass(value = int[].class, mode = PassingMode.COLLECTION) OutputChannel<Integer> i);
+                @Pass(value = int[].class, mode = ParamMode.COLLECTION) OutputChannel<Integer> i);
 
         @Bind("ga")
-        @Pass(value = int[].class, mode = PassingMode.PARALLEL)
+        @Pass(value = int[].class, mode = ParamMode.PARALLEL)
         int[][] getA3();
 
         @Bind("sa")
-        void setA3(@Pass(value = int[].class, mode = PassingMode.PARALLEL) OutputChannel<int[]> i);
+        void setA3(@Pass(value = int[].class, mode = ParamMode.PARALLEL) OutputChannel<int[]> i);
 
         @Bind("gl")
         List<Integer> getL0();
@@ -1088,31 +1092,30 @@ public class ObjectRoutineBuilderTest {
         void setL0(List<Integer> i);
 
         @Bind("gl")
-        @Pass(value = List.class, mode = PassingMode.COLLECTION)
+        @Pass(value = List.class, mode = ParamMode.COLLECTION)
         OutputChannel<Integer> getL1();
 
         @Bind("sl")
         void setL1(@Pass(value = List.class,
-                mode = PassingMode.OBJECT) OutputChannel<List<Integer>> i);
+                mode = ParamMode.OBJECT) OutputChannel<List<Integer>> i);
 
         @Bind("gl")
-        @Pass(value = List.class, mode = PassingMode.PARALLEL)
+        @Pass(value = List.class, mode = ParamMode.PARALLEL)
         List<List<Integer>> getL2();
 
         @Bind("sl")
-        void setL2(
-                @Pass(value = List.class, mode = PassingMode.COLLECTION) OutputChannel<Integer> i);
+        void setL2(@Pass(value = List.class, mode = ParamMode.COLLECTION) OutputChannel<Integer> i);
 
         @Bind("gl")
-        @Pass(value = List.class, mode = PassingMode.PARALLEL)
+        @Pass(value = List.class, mode = ParamMode.PARALLEL)
         List[] getL3();
 
         @Bind("sl")
         void setL3(@Pass(value = List.class,
-                mode = PassingMode.PARALLEL) OutputChannel<List<Integer>> i);
+                mode = ParamMode.PARALLEL) OutputChannel<List<Integer>> i);
 
         @Bind("s")
-        void set2(@Pass(value = int.class, mode = PassingMode.PARALLEL) OutputChannel<Integer> i);
+        void set2(@Pass(value = int.class, mode = ParamMode.PARALLEL) OutputChannel<Integer> i);
     }
 
     private interface CountError {
@@ -1121,22 +1124,22 @@ public class ObjectRoutineBuilderTest {
         String[] count(int length);
 
         @Bind("count")
-        @Pass(value = int.class, mode = PassingMode.COLLECTION)
+        @Pass(value = int.class, mode = ParamMode.COLLECTION)
         OutputChannel<Integer> count1(int length);
 
         @Bind("count")
-        @Pass(value = int.class, mode = PassingMode.PARALLEL)
+        @Pass(value = int.class, mode = ParamMode.PARALLEL)
         String[] count2(int length);
 
-        @Pass(value = List.class, mode = PassingMode.OBJECT)
+        @Pass(value = List.class, mode = ParamMode.OBJECT)
         List<Integer> countList(int length);
 
         @Bind("countList")
-        @Pass(value = List.class, mode = PassingMode.COLLECTION)
+        @Pass(value = List.class, mode = ParamMode.COLLECTION)
         List<Integer> countList1(int length);
 
         @Bind("countList")
-        @Pass(value = List.class, mode = PassingMode.PARALLEL)
+        @Pass(value = List.class, mode = ParamMode.PARALLEL)
         OutputChannel<Integer> countList2(int length);
     }
 
@@ -1146,18 +1149,18 @@ public class ObjectRoutineBuilderTest {
         OutputChannel<Integer> count(int length);
 
         @Bind("count")
-        @Pass(value = int[].class, mode = PassingMode.OBJECT)
+        @Pass(value = int[].class, mode = ParamMode.OBJECT)
         OutputChannel<int[]> count1(int length);
 
         @Bind("count")
-        @Pass(value = int[].class, mode = PassingMode.COLLECTION)
+        @Pass(value = int[].class, mode = ParamMode.COLLECTION)
         OutputChannel<Integer> count2(int length);
 
         @Pass(List.class)
         OutputChannel<Integer> countList(int length);
 
         @Bind("countList")
-        @Pass(value = List.class, mode = PassingMode.COLLECTION)
+        @Pass(value = List.class, mode = ParamMode.COLLECTION)
         OutputChannel<Integer> countList1(int length);
     }
 
@@ -1179,12 +1182,12 @@ public class ObjectRoutineBuilderTest {
         int compute(int i);
 
         @Bind("compute")
-        @Pass(value = int.class, mode = PassingMode.PARALLEL)
+        @Pass(value = int.class, mode = ParamMode.PARALLEL)
         @Timeout(1000)
         int[] compute1(int length);
 
         @Bind("compute")
-        @Pass(value = int.class, mode = PassingMode.PARALLEL)
+        @Pass(value = int.class, mode = ParamMode.PARALLEL)
         @Timeout(1000)
         List<Integer> compute2(int length);
 
@@ -1210,7 +1213,7 @@ public class ObjectRoutineBuilderTest {
         @Bind("compute")
         @Pass(int.class)
         OutputChannel<Integer> computeParallel4(
-                @Pass(value = int.class, mode = PassingMode.PARALLEL) OutputChannel<Integer> i);
+                @Pass(value = int.class, mode = ParamMode.PARALLEL) OutputChannel<Integer> i);
     }
 
     private interface SumError {
@@ -1219,21 +1222,21 @@ public class ObjectRoutineBuilderTest {
 
         int compute(@Pass(int.class) String[] ints);
 
-        int compute(@Pass(value = int.class, mode = PassingMode.OBJECT) int[] ints);
+        int compute(@Pass(value = int.class, mode = ParamMode.OBJECT) int[] ints);
 
-        int compute(@Pass(value = int.class, mode = PassingMode.COLLECTION) Iterable<Integer> ints);
+        int compute(@Pass(value = int.class, mode = ParamMode.COLLECTION) Iterable<Integer> ints);
 
         int compute(@Pass(value = int.class,
-                mode = PassingMode.COLLECTION) OutputChannel<Integer> ints);
+                mode = ParamMode.COLLECTION) OutputChannel<Integer> ints);
 
         int compute(int a,
-                @Pass(value = int[].class, mode = PassingMode.COLLECTION) OutputChannel<Integer> b);
+                @Pass(value = int[].class, mode = ParamMode.COLLECTION) OutputChannel<Integer> b);
 
-        int compute(@Pass(value = int.class, mode = PassingMode.PARALLEL) Object ints);
+        int compute(@Pass(value = int.class, mode = ParamMode.PARALLEL) Object ints);
 
-        int compute(@Pass(value = int.class, mode = PassingMode.PARALLEL) Object[] ints);
+        int compute(@Pass(value = int.class, mode = ParamMode.PARALLEL) Object[] ints);
 
-        int compute(String text, @Pass(value = int.class, mode = PassingMode.PARALLEL) int[] ints);
+        int compute(String text, @Pass(value = int.class, mode = ParamMode.PARALLEL) int[] ints);
     }
 
     private interface SumItf {
@@ -1243,15 +1246,14 @@ public class ObjectRoutineBuilderTest {
         int compute(@Pass(int[].class) OutputChannel<Integer> ints);
 
         @Bind("compute")
-        int compute1(
-                @Pass(value = int[].class, mode = PassingMode.OBJECT) OutputChannel<int[]> ints);
+        int compute1(@Pass(value = int[].class, mode = ParamMode.OBJECT) OutputChannel<int[]> ints);
 
         @Bind("compute")
         int computeList(@Pass(List.class) OutputChannel<Integer> ints);
 
         @Bind("compute")
         int computeList1(@Pass(value = List.class,
-                mode = PassingMode.COLLECTION) OutputChannel<Integer> ints);
+                mode = ParamMode.COLLECTION) OutputChannel<Integer> ints);
     }
 
     private interface TestItf {

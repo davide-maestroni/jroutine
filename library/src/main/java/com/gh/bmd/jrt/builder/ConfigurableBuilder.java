@@ -20,7 +20,7 @@ import javax.annotation.Nullable;
  * Interface defining a configurable builder.
  * <p/>
  * The configuration has a synchronous and an asynchronous runner associated. The synchronous
- * implementation can only be chosen between queued (the default one) and sequential.<br/>
+ * implementation already included in the library are queued (the default one) and sequential.<br/>
  * The queued one maintains an internal buffer of executions that are consumed only when the
  * last one completes, thus avoiding overflowing the call stack because of nested calls to other
  * routines.<br/>

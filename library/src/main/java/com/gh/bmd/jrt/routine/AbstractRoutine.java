@@ -32,7 +32,6 @@ import javax.annotation.Nonnull;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-import static com.gh.bmd.jrt.builder.RoutineConfiguration.RunnerType;
 import static com.gh.bmd.jrt.time.TimeDuration.ZERO;
 
 /**
@@ -105,9 +104,8 @@ public abstract class AbstractRoutine<INPUT, OUTPUT> extends TemplateRoutine<INP
     protected AbstractRoutine(@Nonnull final RoutineConfiguration configuration) {
 
         mConfiguration = configuration;
-        mSyncRunner = (configuration.getSyncRunnerOr(RunnerType.QUEUED) == RunnerType.QUEUED)
-                ? Runners.queuedRunner() : Runners.sequentialRunner();
-        mAsyncRunner = configuration.getRunnerOr(Runners.sharedRunner());
+        mSyncRunner = configuration.getSyncRunnerOr(Runners.queuedRunner());
+        mAsyncRunner = configuration.getAsyncRunnerOr(Runners.sharedRunner());
         mMaxInvocations = configuration.getMaxInvocationsOr(DEFAULT_MAX_INVOCATIONS);
         mCoreInvocations = configuration.getCoreInvocationsOr(DEFAULT_CORE_INVOCATIONS);
         mAvailTimeout = configuration.getAvailTimeoutOr(DEFAULT_AVAIL_TIMEOUT);

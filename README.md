@@ -68,7 +68,7 @@ The JRoutine library is designed for parallel programming and nothing else. It's
 If you need event handling, please use [RxJava][rxjava], it's one of the best library out there. If you need distributed scalable computing, consider using [Akka][akka].
 For anything else [GitHub][github] is a great source of inspiration.
 
-##Usage examples
+##Usage
 
 Please have a look at the dedicated [wiki page][wiki usage].
 

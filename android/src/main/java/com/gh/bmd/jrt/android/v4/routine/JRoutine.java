@@ -151,7 +151,7 @@ public class JRoutine extends com.gh.bmd.jrt.android.routine.JRoutine {
     @Nonnull
     public static <INPUT, OUTPUT> AndroidRoutineBuilder<INPUT, OUTPUT> onActivity(
             @Nonnull final FragmentActivity activity,
-            @Nonnull ClassToken<? extends AndroidInvocation<INPUT, OUTPUT>> classToken) {
+            @Nonnull final ClassToken<? extends AndroidInvocation<INPUT, OUTPUT>> classToken) {
 
         return new DefaultAndroidRoutineBuilder<INPUT, OUTPUT>(activity, classToken);
     }
@@ -200,7 +200,7 @@ public class JRoutine extends com.gh.bmd.jrt.android.routine.JRoutine {
     @Nonnull
     public static <INPUT, OUTPUT> AndroidRoutineBuilder<INPUT, OUTPUT> onFragment(
             @Nonnull final Fragment fragment,
-            @Nonnull ClassToken<? extends AndroidInvocation<INPUT, OUTPUT>> classToken) {
+            @Nonnull final ClassToken<? extends AndroidInvocation<INPUT, OUTPUT>> classToken) {
 
         return new DefaultAndroidRoutineBuilder<INPUT, OUTPUT>(fragment, classToken);
     }

@@ -37,7 +37,6 @@ import com.gh.bmd.jrt.channel.StandaloneChannel.StandaloneInput;
 import com.gh.bmd.jrt.channel.StandaloneChannel.StandaloneOutput;
 import com.gh.bmd.jrt.common.InvocationException;
 import com.gh.bmd.jrt.invocation.Invocation;
-import com.gh.bmd.jrt.invocation.Invocations;
 import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.log.Log.LogLevel;
 import com.gh.bmd.jrt.log.Logger;
@@ -61,6 +60,7 @@ import static com.gh.bmd.jrt.android.service.RoutineService.putParallelInvocatio
 import static com.gh.bmd.jrt.android.service.RoutineService.putValue;
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.builder;
 import static com.gh.bmd.jrt.common.Reflection.findConstructor;
+import static com.gh.bmd.jrt.invocation.Invocations.withArgs;
 import static java.util.UUID.randomUUID;
 
 /**
@@ -76,6 +76,8 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
     private final RoutineConfiguration mConfiguration;
 
     private final Context mContext;
+
+    private final Object[] mInvocationArgs;
 
     private final Class<? extends AndroidInvocation<INPUT, OUTPUT>> mInvocationClass;
 
@@ -97,19 +99,24 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
      * @param context         the routine context.
      * @param serviceClass    the service class.
      * @param invocationClass the invocation class.
+     * @param invocationArgs  the invocation constructor arguments.
      * @param configuration   the routine configuration.
      * @param looper          the message looper.
      * @param runnerClass     the asynchronous runner class.
      * @param logClass        the log class.
      * @throws java.lang.IllegalArgumentException if at least one of the parameter is invalid.
-     * @throws java.lang.NullPointerException     if one of the parameters is null.
+     * @throws java.lang.NullPointerException     if any of the specified non-null parameters is
+     *                                            null.
      */
     ServiceRoutine(@Nonnull final Context context,
             @Nullable final Class<? extends RoutineService> serviceClass,
             @Nonnull final Class<? extends AndroidInvocation<INPUT, OUTPUT>> invocationClass,
+            @Nonnull final Object[] invocationArgs,
             @Nonnull final RoutineConfiguration configuration, @Nullable final Looper looper,
             @Nullable final Class<? extends Runner> runnerClass,
             @Nullable final Class<? extends Log> logClass) {
+
+        findConstructor(invocationClass, invocationArgs);
 
         if (runnerClass != null) {
 
@@ -143,14 +150,15 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         mLooper = looper;
         mServiceClass = (serviceClass != null) ? serviceClass : RoutineService.class;
         mInvocationClass = invocationClass;
+        mInvocationArgs = invocationArgs;
         mConfiguration = configuration;
         mRunnerClass = (runnerClass != null) ? runnerClass
                 : (asyncRunner != null) ? asyncRunner.getClass() : null;
         mLogClass = (logClass != null) ? logClass : log.getClass();
         mLogger = Logger.newLogger(log, configuration.getLogLevelOr(Logger.getGlobalLogLevel()),
                                    this);
-        mRoutine = JRoutine.on(
-                Invocations.factoryOf((Class<? extends Invocation<INPUT, OUTPUT>>) invocationClass))
+        mRoutine = JRoutine.on(withArgs(invocationArgs).factoryOf(
+                (Class<? extends Invocation<INPUT, OUTPUT>>) invocationClass))
                            .withConfiguration(configuration.builderFrom()
                                                            .withInputSize(Integer.MAX_VALUE)
                                                            .withInputTimeout(TimeDuration.ZERO)
@@ -206,16 +214,16 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
     public ParameterChannel<INPUT, OUTPUT> invokeAsync() {
 
         return new ServiceChannel<INPUT, OUTPUT>(false, mContext, mServiceClass, mInvocationClass,
-                                                 mConfiguration, mLooper, mRunnerClass, mLogClass,
-                                                 mLogger);
+                                                 mInvocationArgs, mConfiguration, mLooper,
+                                                 mRunnerClass, mLogClass, mLogger);
     }
 
     @Nonnull
     public ParameterChannel<INPUT, OUTPUT> invokeParallel() {
 
         return new ServiceChannel<INPUT, OUTPUT>(true, mContext, mServiceClass, mInvocationClass,
-                                                 mConfiguration, mLooper, mRunnerClass, mLogClass,
-                                                 mLogger);
+                                                 mInvocationArgs, mConfiguration, mLooper,
+                                                 mRunnerClass, mLogClass, mLogger);
     }
 
     @Nonnull
@@ -243,6 +251,8 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         private final Context mContext;
 
         private final Messenger mInMessenger;
+
+        private final Object[] mInvocationArgs;
 
         private final Class<? extends AndroidInvocation<INPUT, OUTPUT>> mInvocationClass;
 
@@ -283,6 +293,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
          * @param context         the routine context.
          * @param serviceClass    the service class.
          * @param invocationClass the invocation class.
+         * @param invocationArgs  the invocation constructor arguments.
          * @param configuration   the routine configuration.
          * @param looper          the message looper.
          * @param runnerClass     the asynchronous runner class.
@@ -292,6 +303,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
         private ServiceChannel(boolean isParallel, @Nonnull final Context context,
                 @Nonnull final Class<? extends RoutineService> serviceClass,
                 @Nonnull Class<? extends AndroidInvocation<INPUT, OUTPUT>> invocationClass,
+                @Nonnull final Object[] invocationArgs,
                 @Nonnull final RoutineConfiguration configuration, @Nullable final Looper looper,
                 @Nullable final Class<? extends Runner> runnerClass,
                 @Nullable final Class<? extends Log> logClass, @Nonnull final Logger logger) {
@@ -309,6 +321,7 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
             mInMessenger = new Messenger(new IncomingHandler(handlerLooper));
             mServiceClass = serviceClass;
             mInvocationClass = invocationClass;
+            mInvocationArgs = invocationArgs;
             mConfiguration = configuration;
             mRunnerClass = runnerClass;
             mLogClass = logClass;
@@ -601,13 +614,13 @@ class ServiceRoutine<INPUT, OUTPUT> extends TemplateRoutine<INPUT, OUTPUT> {
 
                     logger.dbg("sending parallel invocation message");
                     putParallelInvocation(message.getData(), mUUID, mInvocationClass,
-                                          mConfiguration, mRunnerClass, mLogClass);
+                                          mInvocationArgs, mConfiguration, mRunnerClass, mLogClass);
 
                 } else {
 
                     logger.dbg("sending async invocation message");
-                    putAsyncInvocation(message.getData(), mUUID, mInvocationClass, mConfiguration,
-                                       mRunnerClass, mLogClass);
+                    putAsyncInvocation(message.getData(), mUUID, mInvocationClass, mInvocationArgs,
+                                       mConfiguration, mRunnerClass, mLogClass);
                 }
 
                 message.replyTo = mInMessenger;

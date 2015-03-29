@@ -21,6 +21,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
+import android.os.Parcelable;
 import android.os.RemoteException;
 
 import com.gh.bmd.jrt.android.invocation.AndroidInvocation;
@@ -42,6 +43,7 @@ import com.gh.bmd.jrt.time.TimeDuration;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -76,6 +78,8 @@ public class RoutineService extends Service {
     private static final String KEY_DATA_VALUE = "data_value";
 
     private static final String KEY_INPUT_ORDER = "input_order";
+
+    private static final String KEY_INVOCATION_ARGS = "invocation_args";
 
     private static final String KEY_INVOCATION_CLASS = "invocation_class";
 
@@ -174,6 +178,7 @@ public class RoutineService extends Service {
      * @param bundle          the bundle to fill.
      * @param invocationId    the invocation ID.
      * @param invocationClass the invocation class.
+     * @param invocationArgs  the invocation constructor arguments.
      * @param configuration   the routine configuration.
      * @param runnerClass     the runner class.
      * @param logClass        the log class.
@@ -182,12 +187,13 @@ public class RoutineService extends Service {
     public static void putAsyncInvocation(@Nonnull final Bundle bundle,
             @Nonnull final String invocationId,
             @Nonnull final Class<? extends AndroidInvocation<?, ?>> invocationClass,
+            @Nonnull final Object[] invocationArgs,
             @Nonnull final RoutineConfiguration configuration,
             @Nullable final Class<? extends Runner> runnerClass,
             @Nullable final Class<? extends Log> logClass) {
 
-        putInvocation(bundle, false, invocationId, invocationClass, configuration, runnerClass,
-                      logClass);
+        putInvocation(bundle, false, invocationId, invocationClass, invocationArgs, configuration,
+                      runnerClass, logClass);
     }
 
     /**
@@ -222,6 +228,7 @@ public class RoutineService extends Service {
      * @param bundle          the bundle to fill.
      * @param invocationId    the invocation ID.
      * @param invocationClass the invocation class.
+     * @param invocationArgs  the invocation constructor arguments.
      * @param configuration   the routine configuration.
      * @param runnerClass     the runner class.
      * @param logClass        the log class.
@@ -230,12 +237,13 @@ public class RoutineService extends Service {
     public static void putParallelInvocation(@Nonnull final Bundle bundle,
             @Nonnull final String invocationId,
             @Nonnull final Class<? extends AndroidInvocation<?, ?>> invocationClass,
+            @Nonnull final Object[] invocationArgs,
             @Nonnull final RoutineConfiguration configuration,
             @Nullable final Class<? extends Runner> runnerClass,
             @Nullable final Class<? extends Log> logClass) {
 
-        putInvocation(bundle, true, invocationId, invocationClass, configuration, runnerClass,
-                      logClass);
+        putInvocation(bundle, true, invocationId, invocationClass, invocationArgs, configuration,
+                      runnerClass, logClass);
     }
 
     /**
@@ -260,6 +268,7 @@ public class RoutineService extends Service {
     private static void putInvocation(@Nonnull final Bundle bundle, boolean isParallel,
             @Nonnull final String invocationId,
             @Nonnull final Class<? extends AndroidInvocation<?, ?>> invocationClass,
+            @Nonnull final Object[] invocationArgs,
             @Nonnull final RoutineConfiguration configuration,
             @Nullable final Class<? extends Runner> runnerClass,
             @Nullable final Class<? extends Log> logClass) {
@@ -267,6 +276,16 @@ public class RoutineService extends Service {
         bundle.putBoolean(KEY_PARALLEL_INVOCATION, isParallel);
         bundle.putString(KEY_INVOCATION_ID, invocationId);
         bundle.putSerializable(KEY_INVOCATION_CLASS, invocationClass);
+
+        final int length = invocationArgs.length;
+        final Parcelable[] argValues = new Parcelable[length];
+
+        for (int i = 0; i < length; i++) {
+
+            argValues[i] = new ParcelableValue(invocationArgs[i]);
+        }
+
+        bundle.putParcelableArray(KEY_INVOCATION_ARGS, argValues);
         bundle.putInt(KEY_CORE_INVOCATIONS,
                       configuration.getCoreInvocationsOr(RoutineConfiguration.DEFAULT));
         bundle.putInt(KEY_MAX_INVOCATIONS,
@@ -386,6 +405,24 @@ public class RoutineService extends Service {
                             + " class");
         }
 
+        final Parcelable[] parcelableArgs = data.getParcelableArray(KEY_INVOCATION_ARGS);
+
+        if (parcelableArgs == null) {
+
+            mLogger.err("the service message has no invocation arguments");
+            throw new IllegalArgumentException(
+                    "[" + getClass().getCanonicalName() + "] the service message has no invocation"
+                            + " arguments");
+        }
+
+        final int length = parcelableArgs.length;
+        final Object[] invocationArgs = new Object[length];
+
+        for (int i = 0; i < length; i++) {
+
+            invocationArgs[i] = ((ParcelableValue) parcelableArgs[i]).getValue();
+        }
+
         synchronized (mMutex) {
 
             final HashMap<String, RoutineInvocation> invocationMap = mInvocationMap;
@@ -413,8 +450,8 @@ public class RoutineService extends Service {
             final LogLevel logLevel = (LogLevel) data.getSerializable(KEY_LOG_LEVEL);
 
             final RoutineInfo routineInfo =
-                    new RoutineInfo(invocationClass, inputOrder, outputOrder, runnerClass, logClass,
-                                    logLevel);
+                    new RoutineInfo(invocationClass, invocationArgs, inputOrder, outputOrder,
+                                    runnerClass, logClass, logLevel);
             final HashMap<RoutineInfo, RoutineState> routineMap = mRoutineMap;
             RoutineState routineState = routineMap.get(routineInfo);
 
@@ -456,7 +493,8 @@ public class RoutineService extends Service {
                        .withLogLevel(logLevel);
 
                 final AndroidRoutine androidRoutine =
-                        new AndroidRoutine(this, builder.buildConfiguration(), invocationClass);
+                        new AndroidRoutine(this, builder.buildConfiguration(), invocationClass,
+                                           invocationArgs);
                 routineState = new RoutineState(androidRoutine);
                 routineMap.put(routineInfo, routineState);
             }
@@ -475,6 +513,8 @@ public class RoutineService extends Service {
      */
     private static class AndroidRoutine extends AbstractRoutine<Object, Object> {
 
+        private final Object[] mArgs;
+
         private final Constructor<? extends AndroidInvocation<Object, Object>> mConstructor;
 
         private final Context mContext;
@@ -485,15 +525,18 @@ public class RoutineService extends Service {
          * @param context         the routine context.
          * @param configuration   the routine configuration.
          * @param invocationClass the invocation class.
+         * @param invocationArgs  the invocation constructor arguments.
          */
         private AndroidRoutine(@Nonnull final Context context,
                 @Nonnull final RoutineConfiguration configuration,
-                @Nonnull final Class<? extends AndroidInvocation<Object, Object>> invocationClass) {
+                @Nonnull final Class<? extends AndroidInvocation<Object, Object>> invocationClass,
+                final Object[] invocationArgs) {
 
             super(configuration);
 
             mContext = context;
-            mConstructor = findConstructor(invocationClass);
+            mConstructor = findConstructor(invocationClass, invocationArgs);
+            mArgs = invocationArgs;
         }
 
         @Nonnull
@@ -507,7 +550,7 @@ public class RoutineService extends Service {
                 final Constructor<? extends AndroidInvocation<Object, Object>> constructor =
                         mConstructor;
                 logger.dbg("creating a new instance of class: %s", constructor.getDeclaringClass());
-                final AndroidInvocation<Object, Object> invocation = constructor.newInstance();
+                final AndroidInvocation<Object, Object> invocation = constructor.newInstance(mArgs);
                 invocation.onContext(mContext);
                 return invocation;
 
@@ -641,6 +684,8 @@ public class RoutineService extends Service {
 
         private final OrderType mInputOrder;
 
+        private final Object[] mInvocationArgs;
+
         private final Class<? extends AndroidInvocation<?, ?>> mInvocationClass;
 
         private final Class<? extends Log> mLogClass;
@@ -655,6 +700,7 @@ public class RoutineService extends Service {
          * Constructor.
          *
          * @param invocationClass the invocation class.
+         * @param invocationArgs  the invocation constructor arguments.
          * @param inputOrder      the input data order.
          * @param outputOrder     the output data order.
          * @param runnerClass     the runner class.
@@ -662,11 +708,13 @@ public class RoutineService extends Service {
          * @param logLevel        the log level.
          */
         private RoutineInfo(@Nonnull final Class<? extends AndroidInvocation<?, ?>> invocationClass,
-                @Nullable final OrderType inputOrder, @Nullable final OrderType outputOrder,
+                @Nonnull final Object[] invocationArgs, @Nullable final OrderType inputOrder,
+                @Nullable final OrderType outputOrder,
                 @Nullable final Class<? extends Runner> runnerClass,
                 @Nullable final Class<? extends Log> logClass, @Nullable final LogLevel logLevel) {
 
             mInvocationClass = invocationClass;
+            mInvocationArgs = invocationArgs;
             mInputOrder = inputOrder;
             mOutputOrder = outputOrder;
             mRunnerClass = runnerClass;
@@ -677,6 +725,7 @@ public class RoutineService extends Service {
         @Override
         public boolean equals(final Object o) {
 
+            // auto-generated code
             if (this == o) {
 
                 return true;
@@ -689,17 +738,21 @@ public class RoutineService extends Service {
 
             final RoutineInfo that = (RoutineInfo) o;
 
-            return mInputOrder == that.mInputOrder && mInvocationClass.equals(that.mInvocationClass)
-                    && !(mLogClass != null ? !mLogClass.equals(that.mLogClass)
-                    : that.mLogClass != null) && mLogLevel == that.mLogLevel
-                    && mOutputOrder == that.mOutputOrder && !(mRunnerClass != null
-                    ? !mRunnerClass.equals(that.mRunnerClass) : that.mRunnerClass != null);
+            return mInputOrder == that.mInputOrder && Arrays.equals(mInvocationArgs,
+                                                                    that.mInvocationArgs)
+                    && mInvocationClass.equals(that.mInvocationClass) && !(mLogClass != null
+                    ? !mLogClass.equals(that.mLogClass) : that.mLogClass != null)
+                    && mLogLevel == that.mLogLevel && mOutputOrder == that.mOutputOrder && !(
+                    mRunnerClass != null ? !mRunnerClass.equals(that.mRunnerClass)
+                            : that.mRunnerClass != null);
         }
 
         @Override
         public int hashCode() {
 
-            int result = (mInputOrder != null ? mInputOrder.hashCode() : 0);
+            // auto-generated code
+            int result = mInputOrder != null ? mInputOrder.hashCode() : 0;
+            result = 31 * result + Arrays.hashCode(mInvocationArgs);
             result = 31 * result + mInvocationClass.hashCode();
             result = 31 * result + (mLogClass != null ? mLogClass.hashCode() : 0);
             result = 31 * result + (mLogLevel != null ? mLogLevel.hashCode() : 0);

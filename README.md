@@ -70,7 +70,7 @@ For anything else [GitHub][github] is a great source of inspiration.
 
 ##Usage
 
-Please have a look at the dedicated [wiki page][wiki usage].
+Please have a look at the [wiki][wiki].
 
 ##Documentation
 
@@ -138,8 +138,8 @@ Unless required by applicable law or agreed to in writing, software distributed 
 [rxjava]:https://github.com/ReactiveX/RxJava
 [reactivex]:http://reactivex.io/
 [akka]:http://akka.io/
+[wiki]:https://github.com/davide-maestroni/jroutine/wiki
 [wiki build]:https://github.com/davide-maestroni/jroutine/wiki/Build-Instructions
-[wiki usage]:https://github.com/davide-maestroni/jroutine/wiki/Usage-Examples
 [javadoc]:http://davide-maestroni.github.io/jroutine/docs/jroutine
 [javadoc processor]:http://davide-maestroni.github.io/jroutine/docs/processor
 [javadoc android]:http://davide-maestroni.github.io/jroutine/docs/android

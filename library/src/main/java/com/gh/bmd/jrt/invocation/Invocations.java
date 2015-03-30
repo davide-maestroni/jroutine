@@ -228,7 +228,7 @@ public class Invocations {
          */
         private FactoryBuilder(@Nullable final Object[] args) {
 
-            mArgs = (args == null) ? Reflection.NO_ARGS : args;
+            mArgs = (args == null) ? Reflection.NO_ARGS : args.clone();
         }
 
         /**

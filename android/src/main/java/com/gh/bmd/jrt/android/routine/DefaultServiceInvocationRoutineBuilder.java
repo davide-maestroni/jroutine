@@ -22,14 +22,13 @@ import com.gh.bmd.jrt.android.service.RoutineService;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.TemplateRoutineBuilder;
 import com.gh.bmd.jrt.common.ClassToken;
+import com.gh.bmd.jrt.common.Reflection;
 import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.runner.Runner;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import static com.gh.bmd.jrt.common.Reflection.NO_ARGS;
 
 /**
  * Class implementing a builder of routine objects based on an invocation class token.
@@ -47,7 +46,7 @@ class DefaultServiceInvocationRoutineBuilder<INPUT, OUTPUT>
 
     private final Class<? extends AndroidInvocation<INPUT, OUTPUT>> mInvocationClass;
 
-    private Object[] mArgs;
+    private Object[] mArgs = Reflection.NO_ARGS;
 
     private Class<? extends Log> mLogClass;
 
@@ -80,9 +79,7 @@ class DefaultServiceInvocationRoutineBuilder<INPUT, OUTPUT>
     @Nonnull
     public Routine<INPUT, OUTPUT> buildRoutine() {
 
-        final Object[] args = mArgs;
-        return new ServiceRoutine<INPUT, OUTPUT>(mContext, mServiceClass, mInvocationClass,
-                                                 (args != null) ? args : NO_ARGS,
+        return new ServiceRoutine<INPUT, OUTPUT>(mContext, mServiceClass, mInvocationClass, mArgs,
                                                  getConfiguration(), mLooper, mRunnerClass,
                                                  mLogClass);
     }
@@ -123,7 +120,7 @@ class DefaultServiceInvocationRoutineBuilder<INPUT, OUTPUT>
     @Nonnull
     public ServiceInvocationRoutineBuilder<INPUT, OUTPUT> withArgs(@Nullable final Object... args) {
 
-        mArgs = (args != null) ? args.clone() : null;
+        mArgs = (args == null) ? Reflection.NO_ARGS : args.clone();
         return this;
     }
 

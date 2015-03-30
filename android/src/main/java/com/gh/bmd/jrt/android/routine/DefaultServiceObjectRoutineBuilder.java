@@ -30,6 +30,7 @@ import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.common.InvocationException;
+import com.gh.bmd.jrt.common.Reflection;
 import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.runner.Runner;
@@ -50,9 +51,11 @@ import static com.gh.bmd.jrt.common.Reflection.boxingClass;
 import static com.gh.bmd.jrt.common.Reflection.findConstructor;
 
 /**
- * TODO
+ * Class implementing a builder of routine objects based on methods of a concrete object instance.
  * <p/>
  * Created by davide on 3/29/15.
+ *
+ * @param <CLASS> the wrapped object class.
  */
 class DefaultServiceObjectRoutineBuilder<CLASS> implements ServiceObjectRoutineBuilder {
 
@@ -62,7 +65,7 @@ class DefaultServiceObjectRoutineBuilder<CLASS> implements ServiceObjectRoutineB
 
     private final Class<CLASS> mTargetClass;
 
-    private Object[] mArgs;
+    private Object[] mArgs = Reflection.NO_ARGS;
 
     private RoutineConfiguration mConfiguration;
 
@@ -76,8 +79,16 @@ class DefaultServiceObjectRoutineBuilder<CLASS> implements ServiceObjectRoutineB
 
     private String mShareGroup;
 
+    /**
+     * Constructor.
+     *
+     * @param context      the routine context.
+     * @param classToken   the object class token.
+     * @param factoryToken the object factory class token.
+     * @throws java.lang.NullPointerException if any of the parameter is null.
+     */
     @SuppressWarnings("ConstantConditions")
-    public DefaultServiceObjectRoutineBuilder(@Nonnull final Context context,
+    DefaultServiceObjectRoutineBuilder(@Nonnull final Context context,
             @Nonnull final ClassToken<CLASS> classToken,
             @Nonnull final ClassToken<? extends InstanceFactory<CLASS>> factoryToken) {
 
@@ -121,8 +132,8 @@ class DefaultServiceObjectRoutineBuilder<CLASS> implements ServiceObjectRoutineB
         return paramMode;
     }
 
-    @Nonnull
-    private static String withShareAnnotation(@Nonnull final String shareGroup,
+    @Nullable
+    private static String withShareAnnotation(@Nullable final String shareGroup,
             @Nonnull final Method method) {
 
         final Share shareAnnotation = method.getAnnotation(Share.class);
@@ -135,9 +146,9 @@ class DefaultServiceObjectRoutineBuilder<CLASS> implements ServiceObjectRoutineB
         return shareGroup;
     }
 
-    @Nonnull
+    @Nullable
     private static RoutineConfiguration withTimeoutAnnotation(
-            @Nonnull final RoutineConfiguration configuration, @Nonnull final Method method) {
+            @Nullable final RoutineConfiguration configuration, @Nonnull final Method method) {
 
         final Timeout timeoutAnnotation = method.getAnnotation(Timeout.class);
 
@@ -186,14 +197,15 @@ class DefaultServiceObjectRoutineBuilder<CLASS> implements ServiceObjectRoutineB
 
             if (targetMethod == null) {
 
-                throw new IllegalArgumentException(""); //TODO
+                throw new IllegalArgumentException(
+                        "no annotated method with name '" + name + "' has been found");
             }
         }
 
         final ClassToken<BoundMethodInvocation<INPUT, OUTPUT>> classToken =
                 new ClassToken<BoundMethodInvocation<INPUT, OUTPUT>>() {};
         final Class<? extends InstanceFactory> tokenClass = mFactoryClass;
-        final Object[] args = (mArgs != null) ? mArgs : NO_ARGS;
+        final Object[] args = mArgs;
         return JRoutine.onService(mContext, classToken)
                        .withArgs(findConstructor(tokenClass, args), args,
                                  withShareAnnotation(mShareGroup, targetMethod), name)
@@ -230,7 +242,7 @@ class DefaultServiceObjectRoutineBuilder<CLASS> implements ServiceObjectRoutineB
         final ClassToken<MethodSignatureInvocation<INPUT, OUTPUT>> classToken =
                 new ClassToken<MethodSignatureInvocation<INPUT, OUTPUT>>() {};
         final Class<? extends InstanceFactory> tokenClass = mFactoryClass;
-        final Object[] args = (mArgs != null) ? mArgs : NO_ARGS;
+        final Object[] args = mArgs;
         return JRoutine.onService(mContext, classToken)
                        .withArgs(findConstructor(tokenClass, args), args,
                                  withShareAnnotation(mShareGroup, targetMethod), name,
@@ -295,7 +307,7 @@ class DefaultServiceObjectRoutineBuilder<CLASS> implements ServiceObjectRoutineB
     @Nonnull
     public ServiceObjectRoutineBuilder withArgs(@Nullable final Object... args) {
 
-        mArgs = (args != null) ? args.clone() : null;
+        mArgs = (args == null) ? Reflection.NO_ARGS : args.clone();
         return this;
     }
 
@@ -314,12 +326,18 @@ class DefaultServiceObjectRoutineBuilder<CLASS> implements ServiceObjectRoutineB
         return this;
     }
 
+    /**
+     * Bound method invocation.
+     *
+     * @param <INPUT>  the input data type.
+     * @param <OUTPUT> the output data type.
+     */
     private static class BoundMethodInvocation<INPUT, OUTPUT>
             extends AndroidSingleCallInvocation<INPUT, OUTPUT> {
 
         private final Object[] mArgs;
 
-        private final String mBoundName;
+        private final String mBindingName;
 
         private final String mShareGroup;
 
@@ -327,15 +345,23 @@ class DefaultServiceObjectRoutineBuilder<CLASS> implements ServiceObjectRoutineB
 
         private Routine<INPUT, OUTPUT> mRoutine;
 
+        /**
+         * Constructor.
+         *
+         * @param constructor the object factory constructor.
+         * @param args        the factory constructor arguments.
+         * @param shareGroup  the share group name.
+         * @param name        the binding name.
+         */
         public BoundMethodInvocation(
                 @Nonnull final Constructor<? extends InstanceFactory> constructor,
-                @Nonnull final Object[] args, @Nullable final String group,
+                @Nonnull final Object[] args, @Nullable final String shareGroup,
                 @Nonnull final String name) {
 
             mTokenConstructor = constructor;
             mArgs = args;
-            mShareGroup = group;
-            mBoundName = name;
+            mShareGroup = shareGroup;
+            mBindingName = name;
         }
 
         @Override
@@ -353,8 +379,7 @@ class DefaultServiceObjectRoutineBuilder<CLASS> implements ServiceObjectRoutineB
             try {
 
                 mRoutine = JRoutine.on(mTokenConstructor.newInstance(mArgs).newInstance(context))
-                                   .withShareGroup(mShareGroup)
-                                   .boundMethod(mBoundName);
+                                   .withShareGroup(mShareGroup).boundMethod(mBindingName);
 
             } catch (final InstantiationException e) {
 
@@ -371,6 +396,12 @@ class DefaultServiceObjectRoutineBuilder<CLASS> implements ServiceObjectRoutineB
         }
     }
 
+    /**
+     * Generic method invocation.
+     *
+     * @param <INPUT>  the input data type.
+     * @param <OUTPUT> the output data type.
+     */
     private static class MethodSignatureInvocation<INPUT, OUTPUT>
             extends AndroidSingleCallInvocation<INPUT, OUTPUT> {
 
@@ -386,14 +417,23 @@ class DefaultServiceObjectRoutineBuilder<CLASS> implements ServiceObjectRoutineB
 
         private Routine<INPUT, OUTPUT> mRoutine;
 
+        /**
+         * Constructor.
+         *
+         * @param constructor    the object factory constructor.
+         * @param args           the factory constructor arguments.
+         * @param shareGroup     the share group name.
+         * @param name           the method name.
+         * @param parameterTypes the method parameter types.
+         */
         public MethodSignatureInvocation(
                 @Nonnull final Constructor<? extends InstanceFactory> constructor,
-                @Nonnull final Object[] args, @Nullable final String group,
+                @Nonnull final Object[] args, @Nullable final String shareGroup,
                 @Nonnull final String name, @Nonnull final Class<?>[] parameterTypes) {
 
             mTokenConstructor = constructor;
             mArgs = args;
-            mShareGroup = group;
+            mShareGroup = shareGroup;
             mMethodName = name;
             mParameterTypes = parameterTypes;
         }
@@ -431,6 +471,9 @@ class DefaultServiceObjectRoutineBuilder<CLASS> implements ServiceObjectRoutineB
         }
     }
 
+    /**
+     * Proxy method invocation.
+     */
     private static class ProxyInvocation extends AndroidSingleCallInvocation<Object, Object> {
 
         private final Object[] mArgs;
@@ -447,15 +490,25 @@ class DefaultServiceObjectRoutineBuilder<CLASS> implements ServiceObjectRoutineB
 
         private Object mProxy;
 
-        public ProxyInvocation(@Nonnull final Constructor<? extends InstanceFactory> constructor,
-                @Nonnull final Object[] args, @Nonnull final Class<?> proxyClass,
-                @Nullable final String group, @Nonnull final String name,
-                @Nonnull final Class<?>[] parameterTypes) {
+        /**
+         * Constructor.
+         *
+         * @param proxyClass     the proxy class.
+         * @param constructor    the object factory constructor.
+         * @param args           the factory constructor arguments.
+         * @param shareGroup     the share group name.
+         * @param name           the method name.
+         * @param parameterTypes the method parameter types.
+         */
+        public ProxyInvocation(@Nonnull final Class<?> proxyClass,
+                @Nonnull final Constructor<? extends InstanceFactory> constructor,
+                @Nonnull final Object[] args, @Nullable final String shareGroup,
+                @Nonnull final String name, @Nonnull final Class<?>[] parameterTypes) {
 
             mTokenConstructor = constructor;
             mArgs = args;
             mProxyClass = proxyClass;
-            mShareGroup = group;
+            mShareGroup = shareGroup;
             mMethodName = name;
             mParameterTypes = parameterTypes;
         }
@@ -560,6 +613,12 @@ class DefaultServiceObjectRoutineBuilder<CLASS> implements ServiceObjectRoutineB
 
         private final Constructor<? extends InstanceFactory<CLASS>> mTokenConstructor;
 
+        /**
+         * Constructor.
+         *
+         * @param builder    the builder instance.
+         * @param proxyClass the proxy class.
+         */
         private ProxyInvocationHandler(
                 @Nonnull final DefaultServiceObjectRoutineBuilder<CLASS> builder,
                 @Nonnull final Class<?> proxyClass) {
@@ -586,7 +645,7 @@ class DefaultServiceObjectRoutineBuilder<CLASS> implements ServiceObjectRoutineB
 
             final OutputChannel<Object> outputChannel =
                     JRoutine.onService(mContext, ClassToken.tokenOf(ProxyInvocation.class))
-                            .withArgs(mTokenConstructor, mArgs, mProxyClass,
+                            .withArgs(mProxyClass, mTokenConstructor, mArgs,
                                       withShareAnnotation(mShareGroup, method), method.getName(),
                                       method.getParameterTypes())
                             .withConfiguration(withTimeoutAnnotation(mConfiguration, method))

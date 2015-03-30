@@ -66,10 +66,13 @@ public interface ServiceInvocationRoutineBuilder<INPUT, OUTPUT>
             @Nullable Class<? extends RoutineService> serviceClass);
 
     /**
-     * TODO
+     * Sets the arguments to be passed to the invocation constructor.
+     * <p/>
+     * Note that, like the object passed to the service routine input and output channels, the
+     * specified arguments must comply with the {@link android.os.Parcel#writeValue(Object)} method.
      *
-     * @param args
-     * @return
+     * @param args the arguments.
+     * @return this builder.
      */
     @Nonnull
     ServiceInvocationRoutineBuilder<INPUT, OUTPUT> withArgs(@Nullable Object... args);

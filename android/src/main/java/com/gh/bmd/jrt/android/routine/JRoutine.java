@@ -37,7 +37,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * {@link Context#startService(android.content.Intent)} method. Normally the service will stay
  * active only during a routine invocation.<br/>
  * The service can be also made run in a different process, however, in such case, the data passed
- * through the routine input and output channels must comply to the
+ * through the routine input and output channels must comply with the
  * {@link android.os.Parcel#writeValue(Object)} method.
  * <p/>
  * For example, in order to get a resource from the network, needed to fill an activity UI:
@@ -101,13 +101,15 @@ public class JRoutine extends com.gh.bmd.jrt.routine.JRoutine {
     }
 
     /**
-     * TODO
+     * Returns a builder of routines running in a service based on the specified context, wrapping
+     * the instance created through the specified factory.
      *
-     * @param context
-     * @param classToken
-     * @param factoryToken
-     * @param <TYPE>
-     * @return
+     * @param context      the routine context.
+     * @param classToken   the wrapped object class token.
+     * @param factoryToken the object factory class token.
+     * @param <TYPE>       the wrapped object type.
+     * @return the routine builder instance.
+     * @throws java.lang.NullPointerException if any of the specified parameters is null.
      */
     @Nonnull
     public static <TYPE> ServiceObjectRoutineBuilder onService(@Nonnull final Context context,
@@ -118,10 +120,16 @@ public class JRoutine extends com.gh.bmd.jrt.routine.JRoutine {
     }
 
     /**
-     * TODO
+     * Interface defining a factory of an object instance.
      */
     public interface InstanceFactory<TYPE> {
 
+        /**
+         * Returns an instance of the object.
+         *
+         * @param context the routine context.
+         * @return the object instance.
+         */
         @Nonnull
         TYPE newInstance(@Nonnull Context context);
     }

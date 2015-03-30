@@ -25,7 +25,10 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * TODO
+ * Class implementing a builder of routine objects based on methods of a concrete object instance.
+ * <p/>
+ * The single methods can be accessed via reflection or the whole instance can be proxied through
+ * an interface.
  * <p/>
  * Created by davide on 3/29/15.
  */
@@ -57,10 +60,13 @@ public interface ServiceObjectRoutineBuilder extends ServiceRoutineBuilder, Obje
             @Nullable Class<? extends RoutineService> serviceClass);
 
     /**
-     * TODO
+     * Sets the arguments to be passed to the constructor of the wrapped instance factory.
+     * <p/>
+     * Note that, like the object passed to the service routine input and output channels, the
+     * specified arguments must comply with the {@link android.os.Parcel#writeValue(Object)} method.
      *
-     * @param args
-     * @return
+     * @param args the arguments.
+     * @return this builder.
      */
     @Nonnull
     ServiceObjectRoutineBuilder withArgs(@Nullable Object... args);

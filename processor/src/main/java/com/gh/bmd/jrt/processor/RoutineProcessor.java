@@ -396,33 +396,14 @@ public class RoutineProcessor extends AbstractProcessor {
     }
 
     @Nonnull
-    private String buildRoutineOptions(@Nonnull final ExecutableElement methodElement) {
+    private String buildRoutineOptions(@Nullable final ParamMode paramMode,
+            @Nullable final ParamMode returnMode) {
 
-        final StringBuilder builder = new StringBuilder();
-
-        boolean isOverrideParameters = false;
-
-        for (final VariableElement parameterElement : methodElement.getParameters()) {
-
-            if (parameterElement.getAnnotation(Pass.class) != null) {
-
-                isOverrideParameters = true;
-                break;
-            }
-        }
-
-        builder.append(".withInputOrder(")
-               .append(OrderType.class.getCanonicalName())
-               .append(".")
-               .append((isOverrideParameters) ? OrderType.PASSING_ORDER : OrderType.NONE)
-               .append(").withOutputOrder(")
-               .append(OrderType.class.getCanonicalName())
-               .append(".")
-               .append((methodElement.getAnnotation(Pass.class) != null) ? OrderType.PASSING_ORDER
-                               : OrderType.NONE)
-               .append(")");
-
-        return builder.toString();
+        return ".withInputOrder(" + OrderType.class.getCanonicalName() + "." + (
+                (paramMode == ParamMode.PARALLEL) ? OrderType.NONE : OrderType.PASSING_ORDER)
+                + ").withOutputOrder(" + OrderType.class.getCanonicalName() + "." + (
+                (returnMode == ParamMode.COLLECTION) ? OrderType.PASSING_ORDER : OrderType.NONE)
+                + ")";
     }
 
     private String buildSizedArray(final TypeMirror returnType) {
@@ -1119,7 +1100,7 @@ public class RoutineProcessor extends AbstractProcessor {
         methodHeader = mMethodHeader.replace("${resultClassName}", resultClassName);
         methodHeader = methodHeader.replace("${methodCount}", Integer.toString(count));
         methodHeader = methodHeader.replace("${routineBuilderOptions}",
-                                            buildRoutineOptions(methodElement));
+                                            buildRoutineOptions(asyncParamMode, asyncReturnMode));
 
         writer.append(methodHeader);
 

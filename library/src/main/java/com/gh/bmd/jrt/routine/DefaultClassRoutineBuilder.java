@@ -664,6 +664,7 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
         @Override
         public boolean equals(final Object o) {
 
+            // auto-generated code
             if (this == o) {
 
                 return true;

@@ -16,7 +16,7 @@ package com.gh.bmd.jrt.android.routine;
 import android.content.Context;
 import android.os.Looper;
 
-import com.gh.bmd.jrt.android.builder.ServiceRoutineBuilder;
+import com.gh.bmd.jrt.android.builder.ServiceInvocationRoutineBuilder;
 import com.gh.bmd.jrt.android.invocation.AndroidInvocation;
 import com.gh.bmd.jrt.android.service.RoutineService;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
@@ -39,8 +39,9 @@ import static com.gh.bmd.jrt.common.Reflection.NO_ARGS;
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder<INPUT, OUTPUT>
-        implements ServiceRoutineBuilder<INPUT, OUTPUT> {
+class DefaultServiceInvocationRoutineBuilder<INPUT, OUTPUT>
+        extends TemplateRoutineBuilder<INPUT, OUTPUT>
+        implements ServiceInvocationRoutineBuilder<INPUT, OUTPUT> {
 
     private final Context mContext;
 
@@ -64,7 +65,7 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
      * @throws java.lang.NullPointerException if the context or the class token are null.
      */
     @SuppressWarnings("ConstantConditions")
-    DefaultServiceRoutineBuilder(@Nonnull final Context context,
+    DefaultServiceInvocationRoutineBuilder(@Nonnull final Context context,
             @Nonnull final ClassToken<? extends AndroidInvocation<INPUT, OUTPUT>> classToken) {
 
         if (context == null) {
@@ -87,14 +88,15 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
     }
 
     @Nonnull
-    public ServiceRoutineBuilder<INPUT, OUTPUT> dispatchingOn(@Nullable final Looper looper) {
+    public ServiceInvocationRoutineBuilder<INPUT, OUTPUT> dispatchingOn(
+            @Nullable final Looper looper) {
 
         mLooper = looper;
         return this;
     }
 
     @Nonnull
-    public ServiceRoutineBuilder<INPUT, OUTPUT> withLogClass(
+    public ServiceInvocationRoutineBuilder<INPUT, OUTPUT> withLogClass(
             @Nullable final Class<? extends Log> logClass) {
 
         mLogClass = logClass;
@@ -103,7 +105,7 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
     }
 
     @Nonnull
-    public ServiceRoutineBuilder<INPUT, OUTPUT> withRunnerClass(
+    public ServiceInvocationRoutineBuilder<INPUT, OUTPUT> withRunnerClass(
             @Nullable final Class<? extends Runner> runnerClass) {
 
         mRunnerClass = runnerClass;
@@ -111,7 +113,7 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
     }
 
     @Nonnull
-    public ServiceRoutineBuilder<INPUT, OUTPUT> withServiceClass(
+    public ServiceInvocationRoutineBuilder<INPUT, OUTPUT> withServiceClass(
             @Nullable final Class<? extends RoutineService> serviceClass) {
 
         mServiceClass = serviceClass;
@@ -119,7 +121,7 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
     }
 
     @Nonnull
-    public ServiceRoutineBuilder<INPUT, OUTPUT> withArgs(@Nullable final Object... args) {
+    public ServiceInvocationRoutineBuilder<INPUT, OUTPUT> withArgs(@Nullable final Object... args) {
 
         mArgs = (args != null) ? args.clone() : null;
         return this;
@@ -127,7 +129,7 @@ class DefaultServiceRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
 
     @Nonnull
     @Override
-    public ServiceRoutineBuilder<INPUT, OUTPUT> withConfiguration(
+    public ServiceInvocationRoutineBuilder<INPUT, OUTPUT> withConfiguration(
             @Nullable final RoutineConfiguration configuration) {
 
         super.withConfiguration(configuration);

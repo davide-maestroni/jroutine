@@ -20,7 +20,10 @@ import com.gh.bmd.jrt.android.builder.ServiceObjectRoutineBuilder;
 import com.gh.bmd.jrt.android.invocation.AndroidSingleCallInvocation;
 import com.gh.bmd.jrt.android.routine.JRoutine.ObjectFactory;
 import com.gh.bmd.jrt.android.service.RoutineService;
+import com.gh.bmd.jrt.annotation.Pass;
+import com.gh.bmd.jrt.annotation.Pass.ParamMode;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
+import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
 import com.gh.bmd.jrt.common.ClassToken;
 import com.gh.bmd.jrt.common.InvocationException;
@@ -28,12 +31,19 @@ import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.routine.Routine;
 import com.gh.bmd.jrt.runner.Runner;
 
+import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import static com.gh.bmd.jrt.common.Reflection.NO_ARGS;
+import static com.gh.bmd.jrt.common.Reflection.boxingClass;
 import static com.gh.bmd.jrt.common.Reflection.findConstructor;
 
 /**
@@ -46,6 +56,8 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder 
     private final Context mContext;
 
     private final Class<? extends ObjectFactory> mFactoryClass;
+
+    private Object[] mArgs;
 
     private RoutineConfiguration mConfiguration;
 
@@ -73,10 +85,38 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder 
             throw new NullPointerException("the factory class must not be null");
         }
 
-        findConstructor(factoryClass);
-
         mContext = context;
         mFactoryClass = factoryClass;
+    }
+
+    @Nonnull
+    private static ParamMode getReturnMode(@Nonnull final Pass annotation,
+            @Nonnull final Class<?> returnType) {
+
+        ParamMode paramMode = annotation.mode();
+
+        if (paramMode == ParamMode.AUTO) {
+
+            if (returnType.isArray() || returnType.isAssignableFrom(List.class)) {
+
+                paramMode = ParamMode.PARALLEL;
+
+            } else if (returnType.isAssignableFrom(OutputChannel.class)) {
+
+                final Class<?> returnClass = annotation.value();
+
+                if (returnClass.isArray() || Iterable.class.isAssignableFrom(returnClass)) {
+
+                    paramMode = ParamMode.COLLECTION;
+
+                } else {
+
+                    paramMode = ParamMode.OBJECT;
+                }
+            }
+        }
+
+        return paramMode;
     }
 
     @Nonnull
@@ -84,8 +124,10 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder 
 
         final ClassToken<BoundMethodInvocation<INPUT, OUTPUT>> classToken =
                 new ClassToken<BoundMethodInvocation<INPUT, OUTPUT>>() {};
+        final Class<? extends ObjectFactory> factoryClass = mFactoryClass;
+        final Object[] args = (mArgs != null) ? mArgs : NO_ARGS;
         return JRoutine.onService(mContext, classToken)
-                       .withArgs(mFactoryClass, mShareGroup, name)
+                       .withArgs(findConstructor(factoryClass, args), args, mShareGroup, name)
                        .withConfiguration(mConfiguration)
                        .withServiceClass(mServiceClass)
                        .withRunnerClass(mRunnerClass)
@@ -99,8 +141,11 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder 
 
         final ClassToken<MethodSignatureInvocation<INPUT, OUTPUT>> classToken =
                 new ClassToken<MethodSignatureInvocation<INPUT, OUTPUT>>() {};
+        final Class<? extends ObjectFactory> factoryClass = mFactoryClass;
+        final Object[] args = (mArgs != null) ? mArgs : NO_ARGS;
         return JRoutine.onService(mContext, classToken)
-                       .withArgs(mFactoryClass, mShareGroup, name, parameterTypes)
+                       .withArgs(findConstructor(factoryClass, args), args, mShareGroup, name,
+                                 parameterTypes)
                        .withConfiguration(mConfiguration)
                        .withServiceClass(mServiceClass)
                        .withRunnerClass(mRunnerClass)
@@ -111,27 +156,21 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder 
     @Nonnull
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final Method method) {
 
-        final ClassToken<MethodInvocation<INPUT, OUTPUT>> classToken =
-                new ClassToken<MethodInvocation<INPUT, OUTPUT>>() {};
-        return JRoutine.onService(mContext, classToken)
-                       .withArgs(mFactoryClass, mShareGroup, method)
-                       .withConfiguration(mConfiguration)
-                       .withServiceClass(mServiceClass)
-                       .withRunnerClass(mRunnerClass)
-                       .withLogClass(mLogClass)
-                       .dispatchingOn(mLooper);
+        return method(method.getName(), method.getParameterTypes());
     }
 
     @Nonnull
     public <TYPE> TYPE buildProxy(@Nonnull final Class<TYPE> itf) {
 
-        return null;
+        final Object proxy = Proxy.newProxyInstance(itf.getClassLoader(), new Class[]{itf},
+                                                    new ProxyInvocationHandler(this, itf));
+        return itf.cast(proxy);
     }
 
     @Nonnull
     public <TYPE> TYPE buildProxy(@Nonnull final ClassToken<TYPE> itf) {
 
-        return null;
+        return buildProxy(itf.getRawClass());
     }
 
     @Nonnull
@@ -165,6 +204,13 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder 
     }
 
     @Nonnull
+    public ServiceObjectRoutineBuilder withArgs(@Nullable final Object... args) {
+
+        mArgs = (args != null) ? args.clone() : null;
+        return this;
+    }
+
+    @Nonnull
     public ServiceObjectRoutineBuilder withConfiguration(
             @Nullable final RoutineConfiguration configuration) {
 
@@ -182,18 +228,23 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder 
     private static class BoundMethodInvocation<INPUT, OUTPUT>
             extends AndroidSingleCallInvocation<INPUT, OUTPUT> {
 
+        private final Object[] mArgs;
+
         private final String mBoundName;
 
-        private final Class<? extends ObjectFactory> mFactoryClass;
+        private final Constructor<? extends ObjectFactory> mFactoryConstructor;
 
         private final String mShareGroup;
 
         private Routine<INPUT, OUTPUT> mRoutine;
 
-        public BoundMethodInvocation(@Nonnull final Class<? extends ObjectFactory> factoryClass,
-                @Nullable final String group, @Nonnull final String name) {
+        public BoundMethodInvocation(
+                @Nonnull final Constructor<? extends ObjectFactory> constructor,
+                @Nonnull final Object[] args, @Nullable final String group,
+                @Nonnull final String name) {
 
-            mFactoryClass = factoryClass;
+            mFactoryConstructor = constructor;
+            mArgs = args;
             mShareGroup = group;
             mBoundName = name;
         }
@@ -212,7 +263,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder 
 
             try {
 
-                mRoutine = JRoutine.on(mFactoryClass.newInstance().newObject(context))
+                mRoutine = JRoutine.on(mFactoryConstructor.newInstance(mArgs).newObject(context))
                                    .withShareGroup(mShareGroup)
                                    .boundMethod(mBoundName);
 
@@ -220,51 +271,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder 
 
                 throw new InvocationException(e);
 
-            } catch (final IllegalAccessException e) {
-
-                throw new InvocationException(e);
-            }
-        }
-    }
-
-    private static class MethodInvocation<INPUT, OUTPUT>
-            extends AndroidSingleCallInvocation<INPUT, OUTPUT> {
-
-        private final Class<? extends ObjectFactory> mFactoryClass;
-
-        private final Method mMethod;
-
-        private final String mShareGroup;
-
-        private Routine<INPUT, OUTPUT> mRoutine;
-
-        public MethodInvocation(@Nonnull final Class<? extends ObjectFactory> factoryClass,
-                @Nullable final String group, @Nonnull final Method method) {
-
-            mFactoryClass = factoryClass;
-            mShareGroup = group;
-            mMethod = method;
-        }
-
-        @Override
-        public void onCall(@Nonnull final List<? extends INPUT> inputs,
-                @Nonnull final ResultChannel<OUTPUT> result) {
-
-            result.pass(mRoutine.callSync(inputs));
-        }
-
-        @Override
-        public void onContext(@Nonnull final Context context) {
-
-            super.onContext(context);
-
-            try {
-
-                mRoutine = JRoutine.on(mFactoryClass.newInstance().newObject(context))
-                                   .withShareGroup(mShareGroup)
-                                   .method(mMethod);
-
-            } catch (final InstantiationException e) {
+            } catch (final InvocationTargetException e) {
 
                 throw new InvocationException(e);
 
@@ -278,7 +285,9 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder 
     private static class MethodSignatureInvocation<INPUT, OUTPUT>
             extends AndroidSingleCallInvocation<INPUT, OUTPUT> {
 
-        private final Class<? extends ObjectFactory> mFactoryClass;
+        private final Object[] mArgs;
+
+        private final Constructor<? extends ObjectFactory> mFactoryConstructor;
 
         private final String mMethodName;
 
@@ -288,11 +297,13 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder 
 
         private Routine<INPUT, OUTPUT> mRoutine;
 
-        public MethodSignatureInvocation(@Nonnull final Class<? extends ObjectFactory> factoryClass,
-                @Nullable final String group, @Nonnull final String name,
-                @Nonnull final Class<?>[] parameterTypes) {
+        public MethodSignatureInvocation(
+                @Nonnull final Constructor<? extends ObjectFactory> constructor,
+                @Nonnull final Object[] args, @Nullable final String group,
+                @Nonnull final String name, @Nonnull final Class<?>[] parameterTypes) {
 
-            mFactoryClass = factoryClass;
+            mFactoryConstructor = constructor;
+            mArgs = args;
             mShareGroup = group;
             mMethodName = name;
             mParameterTypes = parameterTypes;
@@ -312,7 +323,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder 
 
             try {
 
-                mRoutine = JRoutine.on(mFactoryClass.newInstance().newObject(context))
+                mRoutine = JRoutine.on(mFactoryConstructor.newInstance(mArgs).newObject(context))
                                    .withShareGroup(mShareGroup)
                                    .method(mMethodName, mParameterTypes);
 
@@ -320,10 +331,214 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder 
 
                 throw new InvocationException(e);
 
+            } catch (final InvocationTargetException e) {
+
+                throw new InvocationException(e);
+
             } catch (final IllegalAccessException e) {
 
                 throw new InvocationException(e);
             }
+        }
+    }
+
+    private static class ProxyInvocation extends AndroidSingleCallInvocation<Object, Object> {
+
+        private final Object[] mArgs;
+
+        private final Constructor<? extends ObjectFactory> mFactoryConstructor;
+
+        private final String mMethodName;
+
+        private final Class<?>[] mParameterTypes;
+
+        private final Class<?> mProxyClass;
+
+        private final String mShareGroup;
+
+        private Object mProxy;
+
+        public ProxyInvocation(@Nonnull final Constructor<? extends ObjectFactory> constructor,
+                @Nonnull final Object[] args, @Nonnull final Class<?> proxyClass,
+                @Nullable final String group, @Nonnull final String name,
+                @Nonnull final Class<?>[] parameterTypes) {
+
+            mFactoryConstructor = constructor;
+            mArgs = args;
+            mProxyClass = proxyClass;
+            mShareGroup = group;
+            mMethodName = name;
+            mParameterTypes = parameterTypes;
+        }
+
+        @Override
+        public void onCall(@Nonnull final List<?> objects,
+                @Nonnull final ResultChannel<Object> result) {
+
+            try {
+
+                final Object proxy = mProxy;
+                final Method method = mProxyClass.getMethod(mMethodName, mParameterTypes);
+                final Object methodResult = method.invoke(proxy, objects.toArray());
+                final Class<?> returnType = method.getReturnType();
+
+                if (!Void.class.equals(boxingClass(returnType))) {
+
+                    final Pass annotation = method.getAnnotation(Pass.class);
+
+                    if (annotation != null) {
+
+                        final ParamMode returnMode = getReturnMode(annotation, returnType);
+
+                        if ((returnMode == ParamMode.OBJECT) || ((returnMode == ParamMode.OBJECT)
+                                && OutputChannel.class.isAssignableFrom(returnType))) {
+
+                            result.pass((OutputChannel<?>) methodResult);
+
+                        } else {
+
+                            result.pass(methodResult);
+                        }
+
+                    } else {
+
+                        result.pass(methodResult);
+                    }
+                }
+
+            } catch (final NoSuchMethodException e) {
+
+                throw new InvocationException(e);
+
+            } catch (final InvocationTargetException e) {
+
+                throw new InvocationException(e);
+
+            } catch (final IllegalAccessException e) {
+
+                throw new InvocationException(e);
+            }
+        }
+
+        @Override
+        public void onContext(@Nonnull final Context context) {
+
+            super.onContext(context);
+
+            try {
+
+                mProxy = JRoutine.on(mFactoryConstructor.newInstance(mArgs).newObject(context))
+                                 .withShareGroup(mShareGroup)
+                                 .buildProxy(mProxyClass);
+
+            } catch (final InstantiationException e) {
+
+                throw new InvocationException(e);
+
+            } catch (final InvocationTargetException e) {
+
+                throw new InvocationException(e);
+
+            } catch (final IllegalAccessException e) {
+
+                throw new InvocationException(e);
+            }
+        }
+    }
+
+    /**
+     * Invocation handler adapting a different interface to the target object instance.
+     */
+    private static class ProxyInvocationHandler implements InvocationHandler {
+
+        private final Object[] mArgs;
+
+        private final RoutineConfiguration mConfiguration;
+
+        private final Context mContext;
+
+        private final Constructor<? extends ObjectFactory> mFactoryConstructor;
+
+        private final Class<? extends Log> mLogClass;
+
+        private final Looper mLooper;
+
+        private final Class<?> mProxyClass;
+
+        private final Class<? extends Runner> mRunnerClass;
+
+        private final Class<? extends RoutineService> mServiceClass;
+
+        private final String mShareGroup;
+
+        private ProxyInvocationHandler(@Nonnull final DefaultServiceObjectRoutineBuilder builder,
+                @Nonnull final Class<?> proxyClass) {
+
+            final Object[] args = builder.mArgs;
+
+            mContext = builder.mContext;
+            mFactoryConstructor =
+                    findConstructor(builder.mFactoryClass, (args != null) ? args : NO_ARGS);
+            mArgs = args;
+            mServiceClass = builder.mServiceClass;
+            mConfiguration = RoutineConfiguration.notNull(builder.mConfiguration)
+                                                 .builderFrom()
+                                                 .buildConfiguration();
+            mShareGroup = builder.mShareGroup;
+            mRunnerClass = builder.mRunnerClass;
+            mLogClass = builder.mLogClass;
+            mLooper = builder.mLooper;
+            mProxyClass = proxyClass;
+        }
+
+        public Object invoke(final Object proxy, @Nonnull final Method method,
+                final Object[] args) throws Throwable {
+
+            final OutputChannel<Object> outputChannel =
+                    JRoutine.onService(mContext, ClassToken.tokenOf(ProxyInvocation.class))
+                            .withArgs(mFactoryConstructor, mArgs, mProxyClass, mShareGroup,
+                                      method.getName(), method.getParameterTypes())
+                            .withConfiguration(mConfiguration)
+                            .withServiceClass(mServiceClass)
+                            .withRunnerClass(mRunnerClass)
+                            .withLogClass(mLogClass)
+                            .dispatchingOn(mLooper)
+                            .callAsync(args);
+            final Class<?> returnType = method.getReturnType();
+
+            if (!Void.class.equals(boxingClass(returnType))) {
+
+                if (method.getAnnotation(Pass.class) != null) {
+
+                    if (OutputChannel.class.isAssignableFrom(returnType)) {
+
+                        return outputChannel;
+                    }
+
+                    if (returnType.isAssignableFrom(List.class)) {
+
+                        return outputChannel.readAll();
+                    }
+
+                    if (returnType.isArray()) {
+
+                        final List<Object> results = outputChannel.readAll();
+                        final int size = results.size();
+                        final Object array = Array.newInstance(returnType.getComponentType(), size);
+
+                        for (int i = 0; i < size; ++i) {
+
+                            Array.set(array, i, results.get(i));
+                        }
+
+                        return array;
+                    }
+                }
+
+                return outputChannel.readNext();
+            }
+
+            return null;
         }
     }
 }

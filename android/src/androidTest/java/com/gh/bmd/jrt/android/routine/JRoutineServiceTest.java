@@ -14,6 +14,7 @@
 package com.gh.bmd.jrt.android.routine;
 
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.os.Build.VERSION_CODES;
 import android.os.Looper;
 import android.os.Parcel;
@@ -25,8 +26,12 @@ import com.gh.bmd.jrt.android.invocation.AndroidPassingInvocation;
 import com.gh.bmd.jrt.android.invocation.AndroidSingleCallInvocation;
 import com.gh.bmd.jrt.android.invocation.AndroidTemplateInvocation;
 import com.gh.bmd.jrt.android.log.AndroidLog;
+import com.gh.bmd.jrt.android.routine.JRoutine.ObjectFactory;
 import com.gh.bmd.jrt.android.runner.MainRunner;
 import com.gh.bmd.jrt.android.runner.Runners;
+import com.gh.bmd.jrt.annotation.Bind;
+import com.gh.bmd.jrt.annotation.Pass;
+import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.Builder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration.OrderType;
@@ -51,6 +56,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.builder;
+import static com.gh.bmd.jrt.builder.RoutineConfiguration.withReadTimeout;
+import static com.gh.bmd.jrt.time.TimeDuration.days;
 import static com.gh.bmd.jrt.time.TimeDuration.millis;
 import static com.gh.bmd.jrt.time.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -66,6 +73,22 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
     public JRoutineServiceTest() {
 
         super(TestActivity.class);
+    }
+
+    public void testAAA() {
+
+        assertThat(JRoutine.onServicee(getActivity(), Ciao.class)
+                           .dispatchingOn(Looper.getMainLooper())
+                           .boundMethod("ciao")
+                           .callAsync()
+                           .eventually()
+                           .readNext()).isEqualTo(new Ciao().hello());
+        assertThat(JRoutine.onServicee(getActivity(), Ciao.class)
+                           .withConfiguration(withReadTimeout(days(1000)))
+                           .dispatchingOn(Looper.getMainLooper())
+                           .buildProxy(CiaoItf.class)
+                           .ciao()
+                           .readNext()).isEqualTo(new Ciao().hello());
     }
 
     public void testAbort() {
@@ -355,6 +378,29 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
                 .withServiceClass(TestService.class)
                 .buildRoutine();
         assertThat(countLog.getWrnCount()).isEqualTo(4);
+    }
+
+    public interface CiaoItf {
+
+        @Bind("ciao")
+        @Timeout(1000)
+        @Pass(String.class)
+        OutputChannel<String> ciao();
+    }
+
+    public static class Ciao implements ObjectFactory {
+
+        @Bind("ciao")
+        public String hello() {
+
+            return "Hello!!";
+        }
+
+        @Nonnull
+        public Object newObject(@Nonnull final Context context) {
+
+            return this;
+        }
     }
 
     private static class Abort extends AndroidTemplateInvocation<Data, Data> {

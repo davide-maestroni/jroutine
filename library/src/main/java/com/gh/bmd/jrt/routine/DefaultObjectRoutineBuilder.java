@@ -407,11 +407,11 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
         if (itf.isAssignableFrom(getTargetClass())) {
 
-            handler = new ObjectInvocationHandler();
+            handler = new InterfaceInvocationHandler();
 
         } else {
 
-            handler = new InterfaceInvocationHandler();
+            handler = new ProxyInvocationHandler();
         }
 
         final Object proxy =
@@ -483,7 +483,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
     }
 
     /**
-     * Invocation handler adapting a different interface to the target object instance.
+     * Invocation handler wrapping the target object instance.
      */
     private class InterfaceInvocationHandler implements InvocationHandler {
 
@@ -498,6 +498,112 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
             mShareGroup = getShareGroup();
             mConfiguration = RoutineConfiguration.notNull(getConfiguration());
+        }
+
+        public Object invoke(final Object proxy, final Method method, final Object[] args) throws
+                Throwable {
+
+            final OutputChannel<Object> outputChannel =
+                    method(mConfiguration, mShareGroup, method).callAsync(args);
+            final Class<?> returnType = method.getReturnType();
+
+            if (!Void.class.equals(boxingClass(returnType))) {
+
+                final Timeout methodAnnotation = method.getAnnotation(Timeout.class);
+                TimeDuration outputTimeout = null;
+                TimeoutAction outputAction = null;
+
+                if (methodAnnotation != null) {
+
+                    outputTimeout = fromUnit(methodAnnotation.value(), methodAnnotation.unit());
+                    outputAction = methodAnnotation.action();
+                }
+
+                if (outputTimeout != null) {
+
+                    outputChannel.afterMax(outputTimeout);
+                }
+
+                if (outputAction == TimeoutAction.DEADLOCK) {
+
+                    outputChannel.eventuallyDeadlock();
+
+                } else if (outputAction == TimeoutAction.EXIT) {
+
+                    outputChannel.eventuallyExit();
+
+                } else if (outputAction == TimeoutAction.ABORT) {
+
+                    outputChannel.eventuallyAbort();
+                }
+
+                return outputChannel.readNext();
+            }
+
+            return null;
+        }
+    }
+
+    /**
+     * Invocation handler adapting a different interface to the target object instance.
+     */
+    private class ProxyInvocationHandler implements InvocationHandler {
+
+        private final RoutineConfiguration mConfiguration;
+
+        private final String mShareGroup;
+
+        /**
+         * Constructor.
+         */
+        private ProxyInvocationHandler() {
+
+            mShareGroup = getShareGroup();
+            mConfiguration = RoutineConfiguration.notNull(getConfiguration());
+        }
+
+        @Nonnull
+        private Routine<Object, Object> buildRoutine(@Nonnull final Method method,
+                @Nonnull final Method targetMethod, @Nullable final ParamMode paramMode,
+                @Nullable final ParamMode returnMode) {
+
+            String shareGroup = mShareGroup;
+            final RoutineConfiguration configuration = mConfiguration;
+            final Builder builder = RoutineConfiguration.builderFrom(configuration);
+            final Share shareAnnotation = method.getAnnotation(Share.class);
+
+            if (shareAnnotation != null) {
+
+                final String annotationShareGroup = shareAnnotation.value();
+
+                if (!Share.ALL.equals(annotationShareGroup)) {
+
+                    shareGroup = annotationShareGroup;
+                }
+            }
+
+            warn(configuration);
+
+            builder.withInputOrder(
+                    (paramMode == ParamMode.PARALLEL) ? OrderType.NONE : OrderType.PASSING_ORDER)
+                   .withInputSize(Integer.MAX_VALUE)
+                   .withInputTimeout(TimeDuration.ZERO)
+                   .withOutputOrder((returnMode == ParamMode.COLLECTION) ? OrderType.PASSING_ORDER
+                                            : OrderType.NONE)
+                   .withOutputSize(Integer.MAX_VALUE)
+                   .withOutputTimeout(TimeDuration.ZERO);
+
+            final Timeout timeoutAnnotation = method.getAnnotation(Timeout.class);
+
+            if (timeoutAnnotation != null) {
+
+                builder.withReadTimeout(timeoutAnnotation.value(), timeoutAnnotation.unit())
+                       .onReadTimeout(timeoutAnnotation.action());
+            }
+
+            return getRoutine(builder.buildConfiguration(), shareGroup, targetMethod,
+                              (paramMode == ParamMode.COLLECTION),
+                              (returnMode == ParamMode.COLLECTION));
         }
 
         public Object invoke(final Object proxy, final Method method, final Object[] args) throws
@@ -556,14 +662,15 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
             synchronized (sMethodCache) {
 
+                final Class<?> targetClass = getTargetClass();
                 final WeakIdentityHashMap<Object, HashMap<Method, Method>> methodCache =
                         sMethodCache;
-                HashMap<Method, Method> methodMap = methodCache.get(target);
+                HashMap<Method, Method> methodMap = methodCache.get(targetClass);
 
                 if (methodMap == null) {
 
                     methodMap = new HashMap<Method, Method>();
-                    methodCache.put(target, methodMap);
+                    methodCache.put(targetClass, methodMap);
                 }
 
                 targetMethod = methodMap.get(method);
@@ -608,110 +715,6 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
             final Routine<Object, Object> routine =
                     buildRoutine(method, targetMethod, asyncParamMode, asyncReturnMode);
             return callRoutine(routine, method, args, asyncParamMode, asyncReturnMode);
-        }
-
-        @Nonnull
-        private Routine<Object, Object> buildRoutine(@Nonnull final Method method,
-                @Nonnull final Method targetMethod, @Nullable final ParamMode paramMode,
-                @Nullable final ParamMode returnMode) {
-
-            String shareGroup = mShareGroup;
-            final RoutineConfiguration configuration = mConfiguration;
-            final Builder builder = RoutineConfiguration.builderFrom(configuration);
-            final Share shareAnnotation = method.getAnnotation(Share.class);
-
-            if (shareAnnotation != null) {
-
-                final String annotationShareGroup = shareAnnotation.value();
-
-                if (!Share.ALL.equals(annotationShareGroup)) {
-
-                    shareGroup = annotationShareGroup;
-                }
-            }
-
-            warn(configuration);
-
-            builder.withInputOrder(
-                    (paramMode == ParamMode.PARALLEL) ? OrderType.NONE : OrderType.PASSING_ORDER)
-                   .withInputSize(Integer.MAX_VALUE)
-                   .withInputTimeout(TimeDuration.ZERO).withOutputOrder(OrderType.PASSING_ORDER)
-                   .withOutputSize(Integer.MAX_VALUE)
-                   .withOutputTimeout(TimeDuration.ZERO);
-
-            final Timeout timeoutAnnotation = method.getAnnotation(Timeout.class);
-
-            if (timeoutAnnotation != null) {
-
-                builder.withReadTimeout(timeoutAnnotation.value(), timeoutAnnotation.unit())
-                       .onReadTimeout(timeoutAnnotation.action());
-            }
-
-            return getRoutine(builder.buildConfiguration(), shareGroup, targetMethod,
-                              (paramMode == ParamMode.COLLECTION),
-                              (returnMode == ParamMode.COLLECTION));
-        }
-    }
-
-    /**
-     * Invocation handler wrapping the target object instance.
-     */
-    private class ObjectInvocationHandler implements InvocationHandler {
-
-        private final RoutineConfiguration mConfiguration;
-
-        private final String mShareGroup;
-
-        /**
-         * Constructor.
-         */
-        private ObjectInvocationHandler() {
-
-            mShareGroup = getShareGroup();
-            mConfiguration = RoutineConfiguration.notNull(getConfiguration());
-        }
-
-        public Object invoke(final Object proxy, final Method method, final Object[] args) throws
-                Throwable {
-
-            final OutputChannel<Object> outputChannel =
-                    method(mConfiguration, mShareGroup, method).callAsync(args);
-            final Class<?> returnType = method.getReturnType();
-
-            if (!Void.class.equals(boxingClass(returnType))) {
-
-                final Timeout methodAnnotation = method.getAnnotation(Timeout.class);
-                TimeDuration outputTimeout = null;
-                TimeoutAction outputAction = null;
-
-                if (methodAnnotation != null) {
-
-                    outputTimeout = fromUnit(methodAnnotation.value(), methodAnnotation.unit());
-                    outputAction = methodAnnotation.action();
-                }
-
-                if (outputTimeout != null) {
-
-                    outputChannel.afterMax(outputTimeout);
-                }
-
-                if (outputAction == TimeoutAction.DEADLOCK) {
-
-                    outputChannel.eventuallyDeadlock();
-
-                } else if (outputAction == TimeoutAction.EXIT) {
-
-                    outputChannel.eventuallyExit();
-
-                } else if (outputAction == TimeoutAction.ABORT) {
-
-                    outputChannel.eventuallyAbort();
-                }
-
-                return outputChannel.readNext();
-            }
-
-            return null;
         }
     }
 }

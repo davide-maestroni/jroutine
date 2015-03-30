@@ -15,8 +15,8 @@ package com.gh.bmd.jrt.android.routine;
 
 import android.content.Context;
 
+import com.gh.bmd.jrt.android.builder.ServiceInvocationRoutineBuilder;
 import com.gh.bmd.jrt.android.builder.ServiceObjectRoutineBuilder;
-import com.gh.bmd.jrt.android.builder.ServiceRoutineBuilder;
 import com.gh.bmd.jrt.android.invocation.AndroidInvocation;
 import com.gh.bmd.jrt.common.ClassToken;
 
@@ -79,20 +79,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 public class JRoutine extends com.gh.bmd.jrt.routine.JRoutine {
 
     /**
-     * TODO
-     *
-     * @param context
-     * @param factoryClass
-     * @return
-     */
-    @Nonnull
-    public static ServiceObjectRoutineBuilder onFactory(@Nonnull final Context context,
-            @Nonnull final Class<? extends ObjectFactory> factoryClass) {
-
-        return new DefaultServiceObjectRoutineBuilder(context, factoryClass);
-    }
-
-    /**
      * Returns a builder of routines running in a service based on the specified context.
      * <p/>
      * Note that the built routine results will be dispatched in the looper specified through the
@@ -107,11 +93,25 @@ public class JRoutine extends com.gh.bmd.jrt.routine.JRoutine {
      * @throws java.lang.NullPointerException if any of the specified parameters is null.
      */
     @Nonnull
-    public static <INPUT, OUTPUT> ServiceRoutineBuilder<INPUT, OUTPUT> onService(
+    public static <INPUT, OUTPUT> ServiceInvocationRoutineBuilder<INPUT, OUTPUT> onService(
             @Nonnull final Context context,
             @Nonnull final ClassToken<? extends AndroidInvocation<INPUT, OUTPUT>> classToken) {
 
-        return new DefaultServiceRoutineBuilder<INPUT, OUTPUT>(context, classToken);
+        return new DefaultServiceInvocationRoutineBuilder<INPUT, OUTPUT>(context, classToken);
+    }
+
+    /**
+     * TODO
+     *
+     * @param context
+     * @param factoryClass
+     * @return
+     */
+    @Nonnull
+    public static ServiceObjectRoutineBuilder onServicee(@Nonnull final Context context,
+            @Nonnull final Class<? extends ObjectFactory> factoryClass) {
+
+        return new DefaultServiceObjectRoutineBuilder(context, factoryClass);
     }
 
     /**

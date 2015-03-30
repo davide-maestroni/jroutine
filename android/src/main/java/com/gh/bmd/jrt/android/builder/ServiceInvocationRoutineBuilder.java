@@ -16,7 +16,7 @@ package com.gh.bmd.jrt.android.builder;
 import android.os.Looper;
 
 import com.gh.bmd.jrt.android.service.RoutineService;
-import com.gh.bmd.jrt.builder.ObjectRoutineBuilder;
+import com.gh.bmd.jrt.builder.RoutineBuilder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.runner.Runner;
@@ -25,35 +25,44 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * TODO
+ * Interface defining a builder of routine objects based on an invocation class token.<br/>
+ * The invocation execution will happen in a dedicated service.
  * <p/>
- * Created by davide on 3/29/15.
+ * The local context of the invocations will be the specific service instance.
+ * <p/>
+ * Created by davide on 3/7/15.
+ *
+ * @param <INPUT>  the input data type.
+ * @param <OUTPUT> the output data type.
  */
-public interface ServiceObjectRoutineBuilder extends ServiceRoutineBuilder, ObjectRoutineBuilder {
+public interface ServiceInvocationRoutineBuilder<INPUT, OUTPUT>
+        extends ServiceRoutineBuilder, RoutineBuilder<INPUT, OUTPUT> {
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ServiceObjectRoutineBuilder dispatchingOn(@Nullable Looper looper);
+    ServiceInvocationRoutineBuilder<INPUT, OUTPUT> dispatchingOn(@Nullable Looper looper);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ServiceObjectRoutineBuilder withLogClass(@Nullable Class<? extends Log> logClass);
+    ServiceInvocationRoutineBuilder<INPUT, OUTPUT> withLogClass(
+            @Nullable Class<? extends Log> logClass);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ServiceObjectRoutineBuilder withRunnerClass(@Nullable Class<? extends Runner> runnerClass);
+    ServiceInvocationRoutineBuilder<INPUT, OUTPUT> withRunnerClass(
+            @Nullable Class<? extends Runner> runnerClass);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ServiceObjectRoutineBuilder withServiceClass(
+    ServiceInvocationRoutineBuilder<INPUT, OUTPUT> withServiceClass(
             @Nullable Class<? extends RoutineService> serviceClass);
 
     /**
@@ -63,17 +72,12 @@ public interface ServiceObjectRoutineBuilder extends ServiceRoutineBuilder, Obje
      * @return
      */
     @Nonnull
-    ServiceObjectRoutineBuilder withArgs(@Nullable Object... args);
+    ServiceInvocationRoutineBuilder<INPUT, OUTPUT> withArgs(@Nullable Object... args);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ServiceObjectRoutineBuilder withConfiguration(@Nullable RoutineConfiguration configuration);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Nonnull
-    ServiceObjectRoutineBuilder withShareGroup(@Nullable String group);
+    ServiceInvocationRoutineBuilder<INPUT, OUTPUT> withConfiguration(
+            @Nullable RoutineConfiguration configuration);
 }

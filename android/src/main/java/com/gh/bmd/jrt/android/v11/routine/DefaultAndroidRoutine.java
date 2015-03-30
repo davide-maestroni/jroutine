@@ -120,7 +120,8 @@ class DefaultAndroidRoutine<INPUT, OUTPUT> extends AbstractRoutine<INPUT, OUTPUT
 
             final Class<? extends AndroidInvocation<INPUT, OUTPUT>> invocationClass =
                     mConstructor.getDeclaringClass();
-            Runners.mainRunner().run(new PurgeExecution(context, mInvocationId, invocationClass), 0,
+            Runners.mainRunner()
+                   .run(new PurgeExecution(context, mInvocationId, invocationClass), 0,
                         TimeUnit.MILLISECONDS);
         }
     }

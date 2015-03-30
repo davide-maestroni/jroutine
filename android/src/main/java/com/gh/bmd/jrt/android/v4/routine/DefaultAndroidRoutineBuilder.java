@@ -109,7 +109,8 @@ class DefaultAndroidRoutineBuilder<INPUT, OUTPUT> extends TemplateRoutineBuilder
         final RoutineConfiguration configuration = getConfiguration();
         warn(configuration);
 
-        final Builder builder = configuration.builderFrom().withAsyncRunner(Runners.mainRunner())
+        final Builder builder = configuration.builderFrom()
+                                             .withAsyncRunner(Runners.mainRunner())
                                              .withInputSize(Integer.MAX_VALUE)
                                              .withInputTimeout(TimeDuration.INFINITY)
                                              .withOutputSize(Integer.MAX_VALUE)

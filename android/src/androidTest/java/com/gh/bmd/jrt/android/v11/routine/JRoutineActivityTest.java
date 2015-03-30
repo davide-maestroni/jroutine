@@ -834,7 +834,8 @@ public class JRoutineActivityTest extends ActivityInstrumentationTestCase2<TestA
                                                                           R.id.test_fragment);
         final Routine<String, String> routine =
                 JRoutine.onFragment(fragment, ClassToken.tokenOf(ToUpperCase.class))
-                        .withId(0).withConfiguration(withOutputOrder(OrderType.PASSING_ORDER))
+                        .withId(0)
+                        .withConfiguration(withOutputOrder(OrderType.PASSING_ORDER))
                         .buildRoutine();
         final OutputChannel<String> channel1 = routine.callAsync("test1", "test2");
         final OutputChannel<String> channel2 = JRoutine.onFragment(fragment, 0).buildChannel();

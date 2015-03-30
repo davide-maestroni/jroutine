@@ -155,7 +155,8 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
         if (context.get() != null) {
 
             final List<Object> inputList = Collections.singletonList(input);
-            Runners.mainRunner().run(new PurgeInputsExecution(context, mInvocationId, inputList), 0,
+            Runners.mainRunner()
+                   .run(new PurgeInputsExecution(context, mInvocationId, inputList), 0,
                         TimeUnit.MILLISECONDS);
         }
     }
@@ -168,7 +169,8 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
 
             final List<Object> inputList =
                     (inputs == null) ? Collections.emptyList() : Arrays.asList(inputs);
-            Runners.mainRunner().run(new PurgeInputsExecution(context, mInvocationId, inputList), 0,
+            Runners.mainRunner()
+                   .run(new PurgeInputsExecution(context, mInvocationId, inputList), 0,
                         TimeUnit.MILLISECONDS);
         }
     }
@@ -195,7 +197,8 @@ class DefaultAndroidChannelBuilder implements AndroidChannelBuilder {
                 }
             }
 
-            Runners.mainRunner().run(new PurgeInputsExecution(context, mInvocationId, inputList), 0,
+            Runners.mainRunner()
+                   .run(new PurgeInputsExecution(context, mInvocationId, inputList), 0,
                         TimeUnit.MILLISECONDS);
         }
     }

@@ -317,12 +317,7 @@ class DefaultClassRoutineBuilder implements ClassRoutineBuilder {
 
         if (shareAnnotation != null) {
 
-            final String annotationShareGroup = shareAnnotation.value();
-
-            if (!Share.ALL.equals(annotationShareGroup)) {
-
-                methodShareGroup = annotationShareGroup;
-            }
+            methodShareGroup = shareAnnotation.value();
         }
 
         warn(configuration);

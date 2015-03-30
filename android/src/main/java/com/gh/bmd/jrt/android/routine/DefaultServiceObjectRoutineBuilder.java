@@ -18,10 +18,13 @@ import android.os.Looper;
 
 import com.gh.bmd.jrt.android.builder.ServiceObjectRoutineBuilder;
 import com.gh.bmd.jrt.android.invocation.AndroidSingleCallInvocation;
-import com.gh.bmd.jrt.android.routine.JRoutine.ObjectFactory;
+import com.gh.bmd.jrt.android.routine.JRoutine.InstanceFactory;
 import com.gh.bmd.jrt.android.service.RoutineService;
+import com.gh.bmd.jrt.annotation.Bind;
 import com.gh.bmd.jrt.annotation.Pass;
 import com.gh.bmd.jrt.annotation.Pass.ParamMode;
+import com.gh.bmd.jrt.annotation.Share;
+import com.gh.bmd.jrt.annotation.Timeout;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.channel.OutputChannel;
 import com.gh.bmd.jrt.channel.ResultChannel;
@@ -51,11 +54,13 @@ import static com.gh.bmd.jrt.common.Reflection.findConstructor;
  * <p/>
  * Created by davide on 3/29/15.
  */
-class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder {
+class DefaultServiceObjectRoutineBuilder<CLASS> implements ServiceObjectRoutineBuilder {
 
     private final Context mContext;
 
-    private final Class<? extends ObjectFactory> mFactoryClass;
+    private final Class<? extends InstanceFactory<CLASS>> mFactoryClass;
+
+    private final Class<CLASS> mTargetClass;
 
     private Object[] mArgs;
 
@@ -73,20 +78,17 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder 
 
     @SuppressWarnings("ConstantConditions")
     public DefaultServiceObjectRoutineBuilder(@Nonnull final Context context,
-            @Nonnull final Class<? extends ObjectFactory> factoryClass) {
+            @Nonnull final ClassToken<CLASS> classToken,
+            @Nonnull final ClassToken<? extends InstanceFactory<CLASS>> factoryToken) {
 
         if (context == null) {
 
             throw new NullPointerException("the context must not be null");
         }
 
-        if (factoryClass == null) {
-
-            throw new NullPointerException("the factory class must not be null");
-        }
-
         mContext = context;
-        mFactoryClass = factoryClass;
+        mTargetClass = classToken.getRawClass();
+        mFactoryClass = factoryToken.getRawClass();
     }
 
     @Nonnull
@@ -120,15 +122,82 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder 
     }
 
     @Nonnull
+    private static String withShareAnnotation(@Nonnull final String shareGroup,
+            @Nonnull final Method method) {
+
+        final Share shareAnnotation = method.getAnnotation(Share.class);
+
+        if (shareAnnotation != null) {
+
+            return shareAnnotation.value();
+        }
+
+        return shareGroup;
+    }
+
+    @Nonnull
+    private static RoutineConfiguration withTimeoutAnnotation(
+            @Nonnull final RoutineConfiguration configuration, @Nonnull final Method method) {
+
+        final Timeout timeoutAnnotation = method.getAnnotation(Timeout.class);
+
+        if (timeoutAnnotation != null) {
+
+            return RoutineConfiguration.notNull(configuration)
+                                       .builderFrom()
+                                       .withReadTimeout(timeoutAnnotation.value(),
+                                                        timeoutAnnotation.unit())
+                                       .onReadTimeout(timeoutAnnotation.action())
+                                       .buildConfiguration();
+        }
+
+        return configuration;
+    }
+
+    @Nonnull
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> boundMethod(@Nonnull final String name) {
+
+        Method targetMethod = null;
+        final Class<CLASS> targetClass = mTargetClass;
+
+        for (final Method method : targetClass.getMethods()) {
+
+            final Bind annotation = method.getAnnotation(Bind.class);
+
+            if ((annotation != null) && name.equals(annotation.value())) {
+
+                targetMethod = method;
+                break;
+            }
+        }
+
+        if (targetMethod == null) {
+
+            for (final Method method : targetClass.getDeclaredMethods()) {
+
+                final Bind annotation = method.getAnnotation(Bind.class);
+
+                if ((annotation != null) && name.equals(annotation.value())) {
+
+                    targetMethod = method;
+                    break;
+                }
+            }
+
+            if (targetMethod == null) {
+
+                throw new IllegalArgumentException(""); //TODO
+            }
+        }
 
         final ClassToken<BoundMethodInvocation<INPUT, OUTPUT>> classToken =
                 new ClassToken<BoundMethodInvocation<INPUT, OUTPUT>>() {};
-        final Class<? extends ObjectFactory> factoryClass = mFactoryClass;
+        final Class<? extends InstanceFactory> tokenClass = mFactoryClass;
         final Object[] args = (mArgs != null) ? mArgs : NO_ARGS;
         return JRoutine.onService(mContext, classToken)
-                       .withArgs(findConstructor(factoryClass, args), args, mShareGroup, name)
-                       .withConfiguration(mConfiguration)
+                       .withArgs(findConstructor(tokenClass, args), args,
+                                 withShareAnnotation(mShareGroup, targetMethod), name)
+                       .withConfiguration(withTimeoutAnnotation(mConfiguration, targetMethod))
                        .withServiceClass(mServiceClass)
                        .withRunnerClass(mRunnerClass)
                        .withLogClass(mLogClass)
@@ -139,14 +208,34 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder 
     public <INPUT, OUTPUT> Routine<INPUT, OUTPUT> method(@Nonnull final String name,
             @Nonnull final Class<?>... parameterTypes) {
 
+        Method targetMethod;
+        final Class<CLASS> targetClass = mTargetClass;
+
+        try {
+
+            targetMethod = targetClass.getMethod(name, parameterTypes);
+
+        } catch (final NoSuchMethodException ignored) {
+
+            try {
+
+                targetMethod = targetClass.getDeclaredMethod(name, parameterTypes);
+
+            } catch (final NoSuchMethodException e) {
+
+                throw new IllegalArgumentException(e);
+            }
+        }
+
         final ClassToken<MethodSignatureInvocation<INPUT, OUTPUT>> classToken =
                 new ClassToken<MethodSignatureInvocation<INPUT, OUTPUT>>() {};
-        final Class<? extends ObjectFactory> factoryClass = mFactoryClass;
+        final Class<? extends InstanceFactory> tokenClass = mFactoryClass;
         final Object[] args = (mArgs != null) ? mArgs : NO_ARGS;
         return JRoutine.onService(mContext, classToken)
-                       .withArgs(findConstructor(factoryClass, args), args, mShareGroup, name,
+                       .withArgs(findConstructor(tokenClass, args), args,
+                                 withShareAnnotation(mShareGroup, targetMethod), name,
                                  parameterTypes)
-                       .withConfiguration(mConfiguration)
+                       .withConfiguration(withTimeoutAnnotation(mConfiguration, targetMethod))
                        .withServiceClass(mServiceClass)
                        .withRunnerClass(mRunnerClass)
                        .withLogClass(mLogClass)
@@ -163,7 +252,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder 
     public <TYPE> TYPE buildProxy(@Nonnull final Class<TYPE> itf) {
 
         final Object proxy = Proxy.newProxyInstance(itf.getClassLoader(), new Class[]{itf},
-                                                    new ProxyInvocationHandler(this, itf));
+                                                    new ProxyInvocationHandler<CLASS>(this, itf));
         return itf.cast(proxy);
     }
 
@@ -232,18 +321,18 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder 
 
         private final String mBoundName;
 
-        private final Constructor<? extends ObjectFactory> mFactoryConstructor;
-
         private final String mShareGroup;
+
+        private final Constructor<? extends InstanceFactory> mTokenConstructor;
 
         private Routine<INPUT, OUTPUT> mRoutine;
 
         public BoundMethodInvocation(
-                @Nonnull final Constructor<? extends ObjectFactory> constructor,
+                @Nonnull final Constructor<? extends InstanceFactory> constructor,
                 @Nonnull final Object[] args, @Nullable final String group,
                 @Nonnull final String name) {
 
-            mFactoryConstructor = constructor;
+            mTokenConstructor = constructor;
             mArgs = args;
             mShareGroup = group;
             mBoundName = name;
@@ -263,7 +352,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder 
 
             try {
 
-                mRoutine = JRoutine.on(mFactoryConstructor.newInstance(mArgs).newObject(context))
+                mRoutine = JRoutine.on(mTokenConstructor.newInstance(mArgs).newInstance(context))
                                    .withShareGroup(mShareGroup)
                                    .boundMethod(mBoundName);
 
@@ -287,22 +376,22 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder 
 
         private final Object[] mArgs;
 
-        private final Constructor<? extends ObjectFactory> mFactoryConstructor;
-
         private final String mMethodName;
 
         private final Class<?>[] mParameterTypes;
 
         private final String mShareGroup;
 
+        private final Constructor<? extends InstanceFactory> mTokenConstructor;
+
         private Routine<INPUT, OUTPUT> mRoutine;
 
         public MethodSignatureInvocation(
-                @Nonnull final Constructor<? extends ObjectFactory> constructor,
+                @Nonnull final Constructor<? extends InstanceFactory> constructor,
                 @Nonnull final Object[] args, @Nullable final String group,
                 @Nonnull final String name, @Nonnull final Class<?>[] parameterTypes) {
 
-            mFactoryConstructor = constructor;
+            mTokenConstructor = constructor;
             mArgs = args;
             mShareGroup = group;
             mMethodName = name;
@@ -323,7 +412,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder 
 
             try {
 
-                mRoutine = JRoutine.on(mFactoryConstructor.newInstance(mArgs).newObject(context))
+                mRoutine = JRoutine.on(mTokenConstructor.newInstance(mArgs).newInstance(context))
                                    .withShareGroup(mShareGroup)
                                    .method(mMethodName, mParameterTypes);
 
@@ -346,8 +435,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder 
 
         private final Object[] mArgs;
 
-        private final Constructor<? extends ObjectFactory> mFactoryConstructor;
-
         private final String mMethodName;
 
         private final Class<?>[] mParameterTypes;
@@ -356,14 +443,16 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder 
 
         private final String mShareGroup;
 
+        private final Constructor<? extends InstanceFactory> mTokenConstructor;
+
         private Object mProxy;
 
-        public ProxyInvocation(@Nonnull final Constructor<? extends ObjectFactory> constructor,
+        public ProxyInvocation(@Nonnull final Constructor<? extends InstanceFactory> constructor,
                 @Nonnull final Object[] args, @Nonnull final Class<?> proxyClass,
                 @Nullable final String group, @Nonnull final String name,
                 @Nonnull final Class<?>[] parameterTypes) {
 
-            mFactoryConstructor = constructor;
+            mTokenConstructor = constructor;
             mArgs = args;
             mProxyClass = proxyClass;
             mShareGroup = group;
@@ -427,7 +516,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder 
 
             try {
 
-                mProxy = JRoutine.on(mFactoryConstructor.newInstance(mArgs).newObject(context))
+                mProxy = JRoutine.on(mTokenConstructor.newInstance(mArgs).newInstance(context))
                                  .withShareGroup(mShareGroup)
                                  .buildProxy(mProxyClass);
 
@@ -449,15 +538,13 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder 
     /**
      * Invocation handler adapting a different interface to the target object instance.
      */
-    private static class ProxyInvocationHandler implements InvocationHandler {
+    private static class ProxyInvocationHandler<CLASS> implements InvocationHandler {
 
         private final Object[] mArgs;
 
         private final RoutineConfiguration mConfiguration;
 
         private final Context mContext;
-
-        private final Constructor<? extends ObjectFactory> mFactoryConstructor;
 
         private final Class<? extends Log> mLogClass;
 
@@ -471,13 +558,16 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder 
 
         private final String mShareGroup;
 
-        private ProxyInvocationHandler(@Nonnull final DefaultServiceObjectRoutineBuilder builder,
+        private final Constructor<? extends InstanceFactory<CLASS>> mTokenConstructor;
+
+        private ProxyInvocationHandler(
+                @Nonnull final DefaultServiceObjectRoutineBuilder<CLASS> builder,
                 @Nonnull final Class<?> proxyClass) {
 
             final Object[] args = builder.mArgs;
 
             mContext = builder.mContext;
-            mFactoryConstructor =
+            mTokenConstructor =
                     findConstructor(builder.mFactoryClass, (args != null) ? args : NO_ARGS);
             mArgs = args;
             mServiceClass = builder.mServiceClass;
@@ -496,9 +586,10 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder 
 
             final OutputChannel<Object> outputChannel =
                     JRoutine.onService(mContext, ClassToken.tokenOf(ProxyInvocation.class))
-                            .withArgs(mFactoryConstructor, mArgs, mProxyClass, mShareGroup,
-                                      method.getName(), method.getParameterTypes())
-                            .withConfiguration(mConfiguration)
+                            .withArgs(mTokenConstructor, mArgs, mProxyClass,
+                                      withShareAnnotation(mShareGroup, method), method.getName(),
+                                      method.getParameterTypes())
+                            .withConfiguration(withTimeoutAnnotation(mConfiguration, method))
                             .withServiceClass(mServiceClass)
                             .withRunnerClass(mRunnerClass)
                             .withLogClass(mLogClass)

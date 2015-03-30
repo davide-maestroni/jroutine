@@ -574,12 +574,7 @@ class DefaultObjectRoutineBuilder extends DefaultClassRoutineBuilder
 
             if (shareAnnotation != null) {
 
-                final String annotationShareGroup = shareAnnotation.value();
-
-                if (!Share.ALL.equals(annotationShareGroup)) {
-
-                    shareGroup = annotationShareGroup;
-                }
+                shareGroup = shareAnnotation.value();
             }
 
             warn(configuration);

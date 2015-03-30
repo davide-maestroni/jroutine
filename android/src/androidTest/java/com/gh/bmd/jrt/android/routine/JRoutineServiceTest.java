@@ -26,7 +26,7 @@ import com.gh.bmd.jrt.android.invocation.AndroidPassingInvocation;
 import com.gh.bmd.jrt.android.invocation.AndroidSingleCallInvocation;
 import com.gh.bmd.jrt.android.invocation.AndroidTemplateInvocation;
 import com.gh.bmd.jrt.android.log.AndroidLog;
-import com.gh.bmd.jrt.android.routine.JRoutine.ObjectFactory;
+import com.gh.bmd.jrt.android.routine.JRoutine.InstanceFactory;
 import com.gh.bmd.jrt.android.runner.MainRunner;
 import com.gh.bmd.jrt.android.runner.Runners;
 import com.gh.bmd.jrt.annotation.Bind;
@@ -56,8 +56,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import static com.gh.bmd.jrt.builder.RoutineConfiguration.builder;
-import static com.gh.bmd.jrt.builder.RoutineConfiguration.withReadTimeout;
-import static com.gh.bmd.jrt.time.TimeDuration.days;
 import static com.gh.bmd.jrt.time.TimeDuration.millis;
 import static com.gh.bmd.jrt.time.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -77,14 +75,14 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
 
     public void testAAA() {
 
-        assertThat(JRoutine.onServicee(getActivity(), Ciao.class)
+        assertThat(JRoutine.onService(getActivity(), ClassToken.tokenOf(Ciao.class),
+                                      ClassToken.tokenOf(Ciao.class))
                            .dispatchingOn(Looper.getMainLooper())
                            .boundMethod("ciao")
                            .callAsync()
-                           .eventually()
                            .readNext()).isEqualTo(new Ciao().hello());
-        assertThat(JRoutine.onServicee(getActivity(), Ciao.class)
-                           .withConfiguration(withReadTimeout(days(1000)))
+        assertThat(JRoutine.onService(getActivity(), ClassToken.tokenOf(Ciao.class),
+                                      ClassToken.tokenOf(Ciao.class))
                            .dispatchingOn(Looper.getMainLooper())
                            .buildProxy(CiaoItf.class)
                            .ciao()
@@ -388,16 +386,17 @@ public class JRoutineServiceTest extends ActivityInstrumentationTestCase2<TestAc
         OutputChannel<String> ciao();
     }
 
-    public static class Ciao implements ObjectFactory {
+    public static class Ciao implements InstanceFactory<Ciao> {
 
         @Bind("ciao")
+        @Timeout(1000)
         public String hello() {
 
             return "Hello!!";
         }
 
         @Nonnull
-        public Object newObject(@Nonnull final Context context) {
+        public Ciao newInstance(@Nonnull final Context context) {
 
             return this;
         }

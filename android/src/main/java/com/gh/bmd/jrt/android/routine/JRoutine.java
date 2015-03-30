@@ -104,22 +104,25 @@ public class JRoutine extends com.gh.bmd.jrt.routine.JRoutine {
      * TODO
      *
      * @param context
-     * @param factoryClass
+     * @param classToken
+     * @param factoryToken
+     * @param <TYPE>
      * @return
      */
     @Nonnull
-    public static ServiceObjectRoutineBuilder onServicee(@Nonnull final Context context,
-            @Nonnull final Class<? extends ObjectFactory> factoryClass) {
+    public static <TYPE> ServiceObjectRoutineBuilder onService(@Nonnull final Context context,
+            @Nonnull final ClassToken<TYPE> classToken,
+            @Nonnull final ClassToken<? extends InstanceFactory<TYPE>> factoryToken) {
 
-        return new DefaultServiceObjectRoutineBuilder(context, factoryClass);
+        return new DefaultServiceObjectRoutineBuilder<TYPE>(context, classToken, factoryToken);
     }
 
     /**
      * TODO
      */
-    public interface ObjectFactory {
+    public interface InstanceFactory<TYPE> {
 
         @Nonnull
-        Object newObject(@Nonnull Context context);
+        TYPE newInstance(@Nonnull Context context);
     }
 }

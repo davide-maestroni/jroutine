@@ -15,8 +15,8 @@ package com.gh.bmd.jrt.android.routine;
 
 import android.content.Context;
 
-import com.gh.bmd.jrt.android.builder.ServiceInvocationRoutineBuilder;
-import com.gh.bmd.jrt.android.builder.ServiceObjectRoutineBuilder;
+import com.gh.bmd.jrt.android.builder.InvocationServiceRoutineBuilder;
+import com.gh.bmd.jrt.android.builder.ObjectServiceRoutineBuilder;
 import com.gh.bmd.jrt.android.invocation.AndroidInvocation;
 import com.gh.bmd.jrt.common.ClassToken;
 
@@ -93,11 +93,11 @@ public class JRoutine extends com.gh.bmd.jrt.routine.JRoutine {
      * @throws java.lang.NullPointerException if any of the specified parameters is null.
      */
     @Nonnull
-    public static <INPUT, OUTPUT> ServiceInvocationRoutineBuilder<INPUT, OUTPUT> onService(
+    public static <INPUT, OUTPUT> InvocationServiceRoutineBuilder<INPUT, OUTPUT> onService(
             @Nonnull final Context context,
             @Nonnull final ClassToken<? extends AndroidInvocation<INPUT, OUTPUT>> classToken) {
 
-        return new DefaultServiceInvocationRoutineBuilder<INPUT, OUTPUT>(context, classToken);
+        return new DefaultInvocationServiceRoutineBuilder<INPUT, OUTPUT>(context, classToken);
     }
 
     /**
@@ -112,11 +112,11 @@ public class JRoutine extends com.gh.bmd.jrt.routine.JRoutine {
      * @throws java.lang.NullPointerException if any of the specified parameters is null.
      */
     @Nonnull
-    public static <TYPE> ServiceObjectRoutineBuilder onService(@Nonnull final Context context,
+    public static <TYPE> ObjectServiceRoutineBuilder onService(@Nonnull final Context context,
             @Nonnull final ClassToken<TYPE> classToken,
             @Nonnull final ClassToken<? extends InstanceFactory<TYPE>> factoryToken) {
 
-        return new DefaultServiceObjectRoutineBuilder<TYPE>(context, classToken, factoryToken);
+        return new DefaultObjectServiceRoutineBuilder<TYPE>(context, classToken, factoryToken);
     }
 
     /**

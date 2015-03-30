@@ -16,7 +16,7 @@ package com.gh.bmd.jrt.android.routine;
 import android.content.Context;
 import android.os.Looper;
 
-import com.gh.bmd.jrt.android.builder.ServiceObjectRoutineBuilder;
+import com.gh.bmd.jrt.android.builder.ObjectServiceRoutineBuilder;
 import com.gh.bmd.jrt.android.invocation.AndroidSingleCallInvocation;
 import com.gh.bmd.jrt.android.routine.JRoutine.InstanceFactory;
 import com.gh.bmd.jrt.android.service.RoutineService;
@@ -57,7 +57,7 @@ import static com.gh.bmd.jrt.common.Reflection.findConstructor;
  *
  * @param <CLASS> the wrapped object class.
  */
-class DefaultServiceObjectRoutineBuilder<CLASS> implements ServiceObjectRoutineBuilder {
+class DefaultObjectServiceRoutineBuilder<CLASS> implements ObjectServiceRoutineBuilder {
 
     private final Context mContext;
 
@@ -88,7 +88,7 @@ class DefaultServiceObjectRoutineBuilder<CLASS> implements ServiceObjectRoutineB
      * @throws java.lang.NullPointerException if any of the parameter is null.
      */
     @SuppressWarnings("ConstantConditions")
-    DefaultServiceObjectRoutineBuilder(@Nonnull final Context context,
+    DefaultObjectServiceRoutineBuilder(@Nonnull final Context context,
             @Nonnull final ClassToken<CLASS> classToken,
             @Nonnull final ClassToken<? extends InstanceFactory<CLASS>> factoryToken) {
 
@@ -275,21 +275,21 @@ class DefaultServiceObjectRoutineBuilder<CLASS> implements ServiceObjectRoutineB
     }
 
     @Nonnull
-    public ServiceObjectRoutineBuilder dispatchingOn(@Nullable final Looper looper) {
+    public ObjectServiceRoutineBuilder dispatchingOn(@Nullable final Looper looper) {
 
         mLooper = looper;
         return this;
     }
 
     @Nonnull
-    public ServiceObjectRoutineBuilder withLogClass(@Nullable final Class<? extends Log> logClass) {
+    public ObjectServiceRoutineBuilder withLogClass(@Nullable final Class<? extends Log> logClass) {
 
         mLogClass = logClass;
         return this;
     }
 
     @Nonnull
-    public ServiceObjectRoutineBuilder withRunnerClass(
+    public ObjectServiceRoutineBuilder withRunnerClass(
             @Nullable final Class<? extends Runner> runnerClass) {
 
         mRunnerClass = runnerClass;
@@ -297,7 +297,7 @@ class DefaultServiceObjectRoutineBuilder<CLASS> implements ServiceObjectRoutineB
     }
 
     @Nonnull
-    public ServiceObjectRoutineBuilder withServiceClass(
+    public ObjectServiceRoutineBuilder withServiceClass(
             @Nullable final Class<? extends RoutineService> serviceClass) {
 
         mServiceClass = serviceClass;
@@ -305,14 +305,14 @@ class DefaultServiceObjectRoutineBuilder<CLASS> implements ServiceObjectRoutineB
     }
 
     @Nonnull
-    public ServiceObjectRoutineBuilder withArgs(@Nullable final Object... args) {
+    public ObjectServiceRoutineBuilder withArgs(@Nullable final Object... args) {
 
         mArgs = (args == null) ? Reflection.NO_ARGS : args.clone();
         return this;
     }
 
     @Nonnull
-    public ServiceObjectRoutineBuilder withConfiguration(
+    public ObjectServiceRoutineBuilder withConfiguration(
             @Nullable final RoutineConfiguration configuration) {
 
         mConfiguration = configuration;
@@ -320,7 +320,7 @@ class DefaultServiceObjectRoutineBuilder<CLASS> implements ServiceObjectRoutineB
     }
 
     @Nonnull
-    public ServiceObjectRoutineBuilder withShareGroup(@Nullable final String group) {
+    public ObjectServiceRoutineBuilder withShareGroup(@Nullable final String group) {
 
         mShareGroup = group;
         return this;
@@ -620,7 +620,7 @@ class DefaultServiceObjectRoutineBuilder<CLASS> implements ServiceObjectRoutineB
          * @param proxyClass the proxy class.
          */
         private ProxyInvocationHandler(
-                @Nonnull final DefaultServiceObjectRoutineBuilder<CLASS> builder,
+                @Nonnull final DefaultObjectServiceRoutineBuilder<CLASS> builder,
                 @Nonnull final Class<?> proxyClass) {
 
             final Object[] args = builder.mArgs;

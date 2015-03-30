@@ -16,7 +16,7 @@ package com.gh.bmd.jrt.android.builder;
 import android.os.Looper;
 
 import com.gh.bmd.jrt.android.service.RoutineService;
-import com.gh.bmd.jrt.builder.ObjectRoutineBuilder;
+import com.gh.bmd.jrt.builder.RoutineBuilder;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
 import com.gh.bmd.jrt.log.Log;
 import com.gh.bmd.jrt.runner.Runner;
@@ -25,42 +25,48 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Class implementing a builder of routine objects based on methods of a concrete object instance.
+ * Interface defining a builder of routine objects based on an invocation class token.<br/>
+ * The invocation execution will happen in a dedicated service.
  * <p/>
- * The single methods can be accessed via reflection or the whole instance can be proxied through
- * an interface.
+ * The local context of the invocations will be the specific service instance.
  * <p/>
- * Created by davide on 3/29/15.
+ * Created by davide on 3/7/15.
+ *
+ * @param <INPUT>  the input data type.
+ * @param <OUTPUT> the output data type.
  */
-public interface ServiceObjectRoutineBuilder extends ServiceRoutineBuilder, ObjectRoutineBuilder {
+public interface InvocationServiceRoutineBuilder<INPUT, OUTPUT>
+        extends ServiceRoutineBuilder, RoutineBuilder<INPUT, OUTPUT> {
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ServiceObjectRoutineBuilder dispatchingOn(@Nullable Looper looper);
+    InvocationServiceRoutineBuilder<INPUT, OUTPUT> dispatchingOn(@Nullable Looper looper);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ServiceObjectRoutineBuilder withLogClass(@Nullable Class<? extends Log> logClass);
+    InvocationServiceRoutineBuilder<INPUT, OUTPUT> withLogClass(
+            @Nullable Class<? extends Log> logClass);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ServiceObjectRoutineBuilder withRunnerClass(@Nullable Class<? extends Runner> runnerClass);
+    InvocationServiceRoutineBuilder<INPUT, OUTPUT> withRunnerClass(
+            @Nullable Class<? extends Runner> runnerClass);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ServiceObjectRoutineBuilder withServiceClass(
+    InvocationServiceRoutineBuilder<INPUT, OUTPUT> withServiceClass(
             @Nullable Class<? extends RoutineService> serviceClass);
 
     /**
-     * Sets the arguments to be passed to the constructor of the wrapped instance factory.
+     * Sets the arguments to be passed to the invocation constructor.
      * <p/>
      * Note that, like the object passed to the service routine input and output channels, the
      * specified arguments must comply with the {@link android.os.Parcel#writeValue(Object)} method.
@@ -69,17 +75,12 @@ public interface ServiceObjectRoutineBuilder extends ServiceRoutineBuilder, Obje
      * @return this builder.
      */
     @Nonnull
-    ServiceObjectRoutineBuilder withArgs(@Nullable Object... args);
+    InvocationServiceRoutineBuilder<INPUT, OUTPUT> withArgs(@Nullable Object... args);
 
     /**
      * {@inheritDoc}
      */
     @Nonnull
-    ServiceObjectRoutineBuilder withConfiguration(@Nullable RoutineConfiguration configuration);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Nonnull
-    ServiceObjectRoutineBuilder withShareGroup(@Nullable String group);
+    InvocationServiceRoutineBuilder<INPUT, OUTPUT> withConfiguration(
+            @Nullable RoutineConfiguration configuration);
 }

@@ -25,9 +25,11 @@
         </activity>
 
         <service
-            android:name="com.gh.bmd.jrt.android.service.RoutineService"/>
+            android:name="com.gh.bmd.jrt.android.service.RoutineService"
+            android:process=":remote"/>
         <service
-            android:name="com.gh.bmd.jrt.android.routine.TestService"/>
+            android:name="com.gh.bmd.jrt.android.routine.TestService"
+            android:process=":remote"/>
     </application>
 
 </manifest>

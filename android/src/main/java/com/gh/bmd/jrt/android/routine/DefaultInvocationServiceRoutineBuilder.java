@@ -16,7 +16,7 @@ package com.gh.bmd.jrt.android.routine;
 import android.content.Context;
 import android.os.Looper;
 
-import com.gh.bmd.jrt.android.builder.ServiceInvocationRoutineBuilder;
+import com.gh.bmd.jrt.android.builder.InvocationServiceRoutineBuilder;
 import com.gh.bmd.jrt.android.invocation.AndroidInvocation;
 import com.gh.bmd.jrt.android.service.RoutineService;
 import com.gh.bmd.jrt.builder.RoutineConfiguration;
@@ -38,9 +38,9 @@ import javax.annotation.Nullable;
  * @param <INPUT>  the input data type.
  * @param <OUTPUT> the output data type.
  */
-class DefaultServiceInvocationRoutineBuilder<INPUT, OUTPUT>
+class DefaultInvocationServiceRoutineBuilder<INPUT, OUTPUT>
         extends TemplateRoutineBuilder<INPUT, OUTPUT>
-        implements ServiceInvocationRoutineBuilder<INPUT, OUTPUT> {
+        implements InvocationServiceRoutineBuilder<INPUT, OUTPUT> {
 
     private final Context mContext;
 
@@ -64,7 +64,7 @@ class DefaultServiceInvocationRoutineBuilder<INPUT, OUTPUT>
      * @throws java.lang.NullPointerException if the context or the class token are null.
      */
     @SuppressWarnings("ConstantConditions")
-    DefaultServiceInvocationRoutineBuilder(@Nonnull final Context context,
+    DefaultInvocationServiceRoutineBuilder(@Nonnull final Context context,
             @Nonnull final ClassToken<? extends AndroidInvocation<INPUT, OUTPUT>> classToken) {
 
         if (context == null) {
@@ -85,7 +85,7 @@ class DefaultServiceInvocationRoutineBuilder<INPUT, OUTPUT>
     }
 
     @Nonnull
-    public ServiceInvocationRoutineBuilder<INPUT, OUTPUT> dispatchingOn(
+    public InvocationServiceRoutineBuilder<INPUT, OUTPUT> dispatchingOn(
             @Nullable final Looper looper) {
 
         mLooper = looper;
@@ -93,7 +93,7 @@ class DefaultServiceInvocationRoutineBuilder<INPUT, OUTPUT>
     }
 
     @Nonnull
-    public ServiceInvocationRoutineBuilder<INPUT, OUTPUT> withLogClass(
+    public InvocationServiceRoutineBuilder<INPUT, OUTPUT> withLogClass(
             @Nullable final Class<? extends Log> logClass) {
 
         mLogClass = logClass;
@@ -102,7 +102,7 @@ class DefaultServiceInvocationRoutineBuilder<INPUT, OUTPUT>
     }
 
     @Nonnull
-    public ServiceInvocationRoutineBuilder<INPUT, OUTPUT> withRunnerClass(
+    public InvocationServiceRoutineBuilder<INPUT, OUTPUT> withRunnerClass(
             @Nullable final Class<? extends Runner> runnerClass) {
 
         mRunnerClass = runnerClass;
@@ -110,7 +110,7 @@ class DefaultServiceInvocationRoutineBuilder<INPUT, OUTPUT>
     }
 
     @Nonnull
-    public ServiceInvocationRoutineBuilder<INPUT, OUTPUT> withServiceClass(
+    public InvocationServiceRoutineBuilder<INPUT, OUTPUT> withServiceClass(
             @Nullable final Class<? extends RoutineService> serviceClass) {
 
         mServiceClass = serviceClass;
@@ -118,7 +118,7 @@ class DefaultServiceInvocationRoutineBuilder<INPUT, OUTPUT>
     }
 
     @Nonnull
-    public ServiceInvocationRoutineBuilder<INPUT, OUTPUT> withArgs(@Nullable final Object... args) {
+    public InvocationServiceRoutineBuilder<INPUT, OUTPUT> withArgs(@Nullable final Object... args) {
 
         mArgs = (args == null) ? Reflection.NO_ARGS : args.clone();
         return this;
@@ -126,7 +126,7 @@ class DefaultServiceInvocationRoutineBuilder<INPUT, OUTPUT>
 
     @Nonnull
     @Override
-    public ServiceInvocationRoutineBuilder<INPUT, OUTPUT> withConfiguration(
+    public InvocationServiceRoutineBuilder<INPUT, OUTPUT> withConfiguration(
             @Nullable final RoutineConfiguration configuration) {
 
         super.withConfiguration(configuration);
